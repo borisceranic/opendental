@@ -277,7 +277,7 @@ namespace OpenDental{
 			}
 			else{//edit
 				if(listComputers.SelectedIndex>0) {//If "All" is selected, the computerName will already be blank, so it only needs reset if it isn't "All".
-					computerName=Computers.List[listComputers.SelectedIndex].CompName;
+					computerName=Computers.List[listComputers.SelectedIndex-1].CompName;
 				}
 				FormSigButDefEdit FormS=new FormSigButDefEdit();
 				FormS.ButtonCur=button.Copy();
