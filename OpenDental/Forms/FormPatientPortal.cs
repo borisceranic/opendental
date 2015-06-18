@@ -299,43 +299,43 @@ namespace OpenDental {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient first name.";
+				strErrors+=Lan.g(this,"Missing patient first name.");
 			}
 			if(PatCur.LName.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient last name.";
+				strErrors+=Lan.g(this,"Missing patient last name.");
 			}
 			if(PatCur.Address.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient address line 1.";
+				strErrors+=Lan.g(this,"Missing patient address line 1.");
 			}
 			if(PatCur.City.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient city.";
+				strErrors+=Lan.g(this,"Missing patient city.");
 			}
 			if(PatCur.State.Trim().Length!=2) {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Invalid patient state.  Must be two letters.";
+				strErrors+=Lan.g(this,"Invalid patient state.  Must be two letters.");
 			}
 			if(PatCur.Birthdate.Year<1880) {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient birth date.";
+				strErrors+=Lan.g(this,"Missing patient birth date.");
 			}
 			if(PatCur.HmPhone.Trim()=="" && PatCur.WirelessPhone.Trim()=="" && PatCur.WkPhone.Trim()=="") {
 				if(strErrors!="") {
 					strErrors+="\r\n";
 				}
-				strErrors+="Missing patient phone. Must have home, wireless, or work phone.";
+				strErrors+=Lan.g(this,"Missing patient phone;  Must have home, wireless, or work phone.");
 			}
 			return strErrors;
 		}
@@ -348,7 +348,9 @@ namespace OpenDental {
 					return;
 				}
 				if(!WasPrinted) {
-					DialogResult result=MessageBox.Show(Lan.g(this,"Online Password changed but was not printed, would you like to print?"),Lan.g(this,"Print Patient Info"),MessageBoxButtons.YesNoCancel);
+					DialogResult result=MessageBox.Show(Lan.g(this,"Online Password changed but was not printed, would you like to print?")
+						,Lan.g(this,"Print Patient Info")
+						,MessageBoxButtons.YesNoCancel);
 					if(result==DialogResult.Yes) {
 						//Print the showing information.
 						PrintPatientInfo();
