@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return claimAttach.ClaimAttachNum;
 		}
 
+		///<summary>Inserts one ClaimAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimAttach claimAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimAttach.ClaimAttachNum=DbHelper.GetNextOracleKey("claimattach","ClaimAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(claimAttach,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimAttach claimAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimattach (";
+			if(!useExistingPK && isRandomKeys) {
+				claimAttach.ClaimAttachNum=ReplicationServers.GetKeyNoCache("claimattach","ClaimAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimAttachNum,";
+			}
+			command+="ClaimNum,DisplayedFileName,ActualFileName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimAttach.ClaimAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (claimAttach.ClaimNum)+","
+				+"'"+POut.String(claimAttach.DisplayedFileName)+"',"
+				+"'"+POut.String(claimAttach.ActualFileName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimAttach.ClaimAttachNum=Db.NonQ(command,true);
+			}
+			return claimAttach.ClaimAttachNum;
+		}
+
 		///<summary>Updates one ClaimAttach in the database.</summary>
 		public static void Update(ClaimAttach claimAttach){
 			string command="UPDATE claimattach SET "

@@ -91,6 +91,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets a list of CEMT usergroups without using the cache.  Useful for multithreaded connections.</summary>
 		public static List<UserGroup> GetCEMTGroupsNoCache() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<UserGroup>>(MethodBase.GetCurrentMethod());
+			}
 			List<UserGroup> retVal=new List<UserGroup>();
 			string command="SELECT * FROM usergroup WHERE UserGroupNumCEMT!=0";
 			DataTable tableUserGroups=Db.GetTable(command);
@@ -107,9 +110,12 @@ namespace OpenDentBusiness{
 			return Crud.UserGroupCrud.Insert(group);
 		}
 
+		///<summary>Insertion logic that doesn't use the cache. Has special cases for generating random PK's and handling Oracle insertions.</summary>
 		public static long InsertNoCache(UserGroup group) {
-			string command="INSERT INTO usergroup (Description,UserGroupNumCEMT) VALUES('"+POut.String(group.Description)+"',"+group.UserGroupNumCEMT+")";
-			return Db.NonQ(command,true);
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),group);
+			}
+			return Crud.UserGroupCrud.InsertNoCache(group);
 		}
 
 		///<summary>Checks for dependencies first</summary>
@@ -140,6 +146,10 @@ namespace OpenDentBusiness{
 		
 		///<summary>Deletes without using the cache.  Doesn't check dependencies.  Useful for multithreaded connections.</summary>
 		public static void DeleteNoCache(UserGroup group) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),group);
+				return;
+			}
 			string command="DELETE FROM usergroup WHERE UserGroupNum="+POut.Long(group.UserGroupNum);
 			Db.NonQ(command);
 			command="DELETE FROM grouppermission WHERE UserGroupNum="+POut.Long(group.UserGroupNum);

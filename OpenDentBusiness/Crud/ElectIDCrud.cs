@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return electID.ElectIDNum;
 		}
 
+		///<summary>Inserts one ElectID into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ElectID electID){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(electID,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					electID.ElectIDNum=DbHelper.GetNextOracleKey("electid","ElectIDNum"); //Cacheless method
+				}
+				return InsertNoCache(electID,true);
+			}
+		}
+
+		///<summary>Inserts one ElectID into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ElectID electID,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO electid (";
+			if(!useExistingPK && isRandomKeys) {
+				electID.ElectIDNum=ReplicationServers.GetKeyNoCache("electid","ElectIDNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ElectIDNum,";
+			}
+			command+="PayorID,CarrierName,IsMedicaid,ProviderTypes,Comments) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(electID.ElectIDNum)+",";
+			}
+			command+=
+				 "'"+POut.String(electID.PayorID)+"',"
+				+"'"+POut.String(electID.CarrierName)+"',"
+				+    POut.Bool  (electID.IsMedicaid)+","
+				+"'"+POut.String(electID.ProviderTypes)+"',"
+				+"'"+POut.String(electID.Comments)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				electID.ElectIDNum=Db.NonQ(command,true);
+			}
+			return electID.ElectIDNum;
+		}
+
 		///<summary>Updates one ElectID in the database.</summary>
 		public static void Update(ElectID electID){
 			string command="UPDATE electid SET "

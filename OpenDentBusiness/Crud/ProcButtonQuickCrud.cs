@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return procButtonQuick.ProcButtonQuickNum;
 		}
 
+		///<summary>Inserts one ProcButtonQuick into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButtonQuick procButtonQuick){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procButtonQuick,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procButtonQuick.ProcButtonQuickNum=DbHelper.GetNextOracleKey("procbuttonquick","ProcButtonQuickNum"); //Cacheless method
+				}
+				return InsertNoCache(procButtonQuick,true);
+			}
+		}
+
+		///<summary>Inserts one ProcButtonQuick into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButtonQuick procButtonQuick,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procbuttonquick (";
+			if(!useExistingPK && isRandomKeys) {
+				procButtonQuick.ProcButtonQuickNum=ReplicationServers.GetKeyNoCache("procbuttonquick","ProcButtonQuickNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcButtonQuickNum,";
+			}
+			command+="Description,CodeValue,Surf,YPos,ItemOrder,IsLabel) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procButtonQuick.ProcButtonQuickNum)+",";
+			}
+			command+=
+				 "'"+POut.String(procButtonQuick.Description)+"',"
+				+"'"+POut.String(procButtonQuick.CodeValue)+"',"
+				+"'"+POut.String(procButtonQuick.Surf)+"',"
+				+    POut.Int   (procButtonQuick.YPos)+","
+				+    POut.Int   (procButtonQuick.ItemOrder)+","
+				+    POut.Bool  (procButtonQuick.IsLabel)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procButtonQuick.ProcButtonQuickNum=Db.NonQ(command,true);
+			}
+			return procButtonQuick.ProcButtonQuickNum;
+		}
+
 		///<summary>Updates one ProcButtonQuick in the database.</summary>
 		public static void Update(ProcButtonQuick procButtonQuick){
 			string command="UPDATE procbuttonquick SET "

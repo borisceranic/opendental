@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return phoneNumber.PhoneNumberNum;
 		}
 
+		///<summary>Inserts one PhoneNumber into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneNumber phoneNumber){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(phoneNumber,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					phoneNumber.PhoneNumberNum=DbHelper.GetNextOracleKey("phonenumber","PhoneNumberNum"); //Cacheless method
+				}
+				return InsertNoCache(phoneNumber,true);
+			}
+		}
+
+		///<summary>Inserts one PhoneNumber into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneNumber phoneNumber,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO phonenumber (";
+			if(!useExistingPK && isRandomKeys) {
+				phoneNumber.PhoneNumberNum=ReplicationServers.GetKeyNoCache("phonenumber","PhoneNumberNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PhoneNumberNum,";
+			}
+			command+="PatNum,PhoneNumberVal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(phoneNumber.PhoneNumberNum)+",";
+			}
+			command+=
+				     POut.Long  (phoneNumber.PatNum)+","
+				+"'"+POut.String(phoneNumber.PhoneNumberVal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				phoneNumber.PhoneNumberNum=Db.NonQ(command,true);
+			}
+			return phoneNumber.PhoneNumberNum;
+		}
+
 		///<summary>Updates one PhoneNumber in the database.</summary>
 		public static void Update(PhoneNumber phoneNumber){
 			string command="UPDATE phonenumber SET "

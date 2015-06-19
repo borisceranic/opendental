@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return timeCardRule.TimeCardRuleNum;
 		}
 
+		///<summary>Inserts one TimeCardRule into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TimeCardRule timeCardRule){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(timeCardRule,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					timeCardRule.TimeCardRuleNum=DbHelper.GetNextOracleKey("timecardrule","TimeCardRuleNum"); //Cacheless method
+				}
+				return InsertNoCache(timeCardRule,true);
+			}
+		}
+
+		///<summary>Inserts one TimeCardRule into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TimeCardRule timeCardRule,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO timecardrule (";
+			if(!useExistingPK && isRandomKeys) {
+				timeCardRule.TimeCardRuleNum=ReplicationServers.GetKeyNoCache("timecardrule","TimeCardRuleNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TimeCardRuleNum,";
+			}
+			command+="EmployeeNum,OverHoursPerDay,AfterTimeOfDay,BeforeTimeOfDay) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(timeCardRule.TimeCardRuleNum)+",";
+			}
+			command+=
+				     POut.Long  (timeCardRule.EmployeeNum)+","
+				+    POut.Time  (timeCardRule.OverHoursPerDay)+","
+				+    POut.Time  (timeCardRule.AfterTimeOfDay)+","
+				+    POut.Time  (timeCardRule.BeforeTimeOfDay)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				timeCardRule.TimeCardRuleNum=Db.NonQ(command,true);
+			}
+			return timeCardRule.TimeCardRuleNum;
+		}
+
 		///<summary>Updates one TimeCardRule in the database.</summary>
 		public static void Update(TimeCardRule timeCardRule){
 			string command="UPDATE timecardrule SET "

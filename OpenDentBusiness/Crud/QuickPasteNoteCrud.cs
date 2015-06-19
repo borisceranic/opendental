@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return quickPasteNote.QuickPasteNoteNum;
 		}
 
+		///<summary>Inserts one QuickPasteNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(QuickPasteNote quickPasteNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(quickPasteNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					quickPasteNote.QuickPasteNoteNum=DbHelper.GetNextOracleKey("quickpastenote","QuickPasteNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(quickPasteNote,true);
+			}
+		}
+
+		///<summary>Inserts one QuickPasteNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(QuickPasteNote quickPasteNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO quickpastenote (";
+			if(!useExistingPK && isRandomKeys) {
+				quickPasteNote.QuickPasteNoteNum=ReplicationServers.GetKeyNoCache("quickpastenote","QuickPasteNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="QuickPasteNoteNum,";
+			}
+			command+="QuickPasteCatNum,ItemOrder,Note,Abbreviation) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(quickPasteNote.QuickPasteNoteNum)+",";
+			}
+			command+=
+				     POut.Long  (quickPasteNote.QuickPasteCatNum)+","
+				+    POut.Int   (quickPasteNote.ItemOrder)+","
+				+"'"+POut.String(quickPasteNote.Note)+"',"
+				+"'"+POut.String(quickPasteNote.Abbreviation)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				quickPasteNote.QuickPasteNoteNum=Db.NonQ(command,true);
+			}
+			return quickPasteNote.QuickPasteNoteNum;
+		}
+
 		///<summary>Updates one QuickPasteNote in the database.</summary>
 		public static void Update(QuickPasteNote quickPasteNote){
 			string command="UPDATE quickpastenote SET "

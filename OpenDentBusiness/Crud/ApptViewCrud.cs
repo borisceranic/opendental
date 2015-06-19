@@ -121,6 +121,53 @@ namespace OpenDentBusiness.Crud{
 			return apptView.ApptViewNum;
 		}
 
+		///<summary>Inserts one ApptView into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ApptView apptView){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(apptView,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					apptView.ApptViewNum=DbHelper.GetNextOracleKey("apptview","ApptViewNum"); //Cacheless method
+				}
+				return InsertNoCache(apptView,true);
+			}
+		}
+
+		///<summary>Inserts one ApptView into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ApptView apptView,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO apptview (";
+			if(!useExistingPK && isRandomKeys) {
+				apptView.ApptViewNum=ReplicationServers.GetKeyNoCache("apptview","ApptViewNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ApptViewNum,";
+			}
+			command+="Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,ClinicNum,ApptTimeScrollStart) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(apptView.ApptViewNum)+",";
+			}
+			command+=
+				 "'"+POut.String(apptView.Description)+"',"
+				+    POut.Int   (apptView.ItemOrder)+","
+				+    POut.Byte  (apptView.RowsPerIncr)+","
+				+    POut.Bool  (apptView.OnlyScheduledProvs)+","
+				+    POut.Time  (apptView.OnlySchedBeforeTime)+","
+				+    POut.Time  (apptView.OnlySchedAfterTime)+","
+				+    POut.Int   ((int)apptView.StackBehavUR)+","
+				+    POut.Int   ((int)apptView.StackBehavLR)+","
+				+    POut.Long  (apptView.ClinicNum)+","
+				+    POut.Time  (apptView.ApptTimeScrollStart)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				apptView.ApptViewNum=Db.NonQ(command,true);
+			}
+			return apptView.ApptViewNum;
+		}
+
 		///<summary>Updates one ApptView in the database.</summary>
 		public static void Update(ApptView apptView){
 			string command="UPDATE apptview SET "

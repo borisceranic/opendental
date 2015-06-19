@@ -121,6 +121,53 @@ namespace OpenDentBusiness.Crud{
 			return centralConnection.CentralConnectionNum;
 		}
 
+		///<summary>Inserts one CentralConnection into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CentralConnection centralConnection){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(centralConnection,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					centralConnection.CentralConnectionNum=DbHelper.GetNextOracleKey("centralconnection","CentralConnectionNum"); //Cacheless method
+				}
+				return InsertNoCache(centralConnection,true);
+			}
+		}
+
+		///<summary>Inserts one CentralConnection into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CentralConnection centralConnection,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO centralconnection (";
+			if(!useExistingPK && isRandomKeys) {
+				centralConnection.CentralConnectionNum=ReplicationServers.GetKeyNoCache("centralconnection","CentralConnectionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CentralConnectionNum,";
+			}
+			command+="ServerName,DatabaseName,MySqlUser,MySqlPassword,ServiceURI,OdUser,OdPassword,Note,ItemOrder,WebServiceIsEcw) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(centralConnection.CentralConnectionNum)+",";
+			}
+			command+=
+				 "'"+POut.String(centralConnection.ServerName)+"',"
+				+"'"+POut.String(centralConnection.DatabaseName)+"',"
+				+"'"+POut.String(centralConnection.MySqlUser)+"',"
+				+"'"+POut.String(centralConnection.MySqlPassword)+"',"
+				+"'"+POut.String(centralConnection.ServiceURI)+"',"
+				+"'"+POut.String(centralConnection.OdUser)+"',"
+				+"'"+POut.String(centralConnection.OdPassword)+"',"
+				+"'"+POut.String(centralConnection.Note)+"',"
+				+    POut.Int   (centralConnection.ItemOrder)+","
+				+    POut.Bool  (centralConnection.WebServiceIsEcw)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				centralConnection.CentralConnectionNum=Db.NonQ(command,true);
+			}
+			return centralConnection.CentralConnectionNum;
+		}
+
 		///<summary>Updates one CentralConnection in the database.</summary>
 		public static void Update(CentralConnection centralConnection){
 			string command="UPDATE centralconnection SET "

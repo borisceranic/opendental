@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return taskAncestor.TaskAncestorNum;
 		}
 
+		///<summary>Inserts one TaskAncestor into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskAncestor taskAncestor){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskAncestor,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskAncestor.TaskAncestorNum=DbHelper.GetNextOracleKey("taskancestor","TaskAncestorNum"); //Cacheless method
+				}
+				return InsertNoCache(taskAncestor,true);
+			}
+		}
+
+		///<summary>Inserts one TaskAncestor into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskAncestor taskAncestor,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO taskancestor (";
+			if(!useExistingPK && isRandomKeys) {
+				taskAncestor.TaskAncestorNum=ReplicationServers.GetKeyNoCache("taskancestor","TaskAncestorNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskAncestorNum,";
+			}
+			command+="TaskNum,TaskListNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskAncestor.TaskAncestorNum)+",";
+			}
+			command+=
+				     POut.Long  (taskAncestor.TaskNum)+","
+				+    POut.Long  (taskAncestor.TaskListNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				taskAncestor.TaskAncestorNum=Db.NonQ(command,true);
+			}
+			return taskAncestor.TaskAncestorNum;
+		}
+
 		///<summary>Updates one TaskAncestor in the database.</summary>
 		public static void Update(TaskAncestor taskAncestor){
 			string command="UPDATE taskancestor SET "

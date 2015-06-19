@@ -118,6 +118,47 @@ namespace OpenDentBusiness.Crud{
 			return oIDExternal.OIDExternalNum;
 		}
 
+		///<summary>Inserts one OIDExternal into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OIDExternal oIDExternal){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(oIDExternal,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					oIDExternal.OIDExternalNum=DbHelper.GetNextOracleKey("oidexternal","OIDExternalNum"); //Cacheless method
+				}
+				return InsertNoCache(oIDExternal,true);
+			}
+		}
+
+		///<summary>Inserts one OIDExternal into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OIDExternal oIDExternal,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO oidexternal (";
+			if(!useExistingPK && isRandomKeys) {
+				oIDExternal.OIDExternalNum=ReplicationServers.GetKeyNoCache("oidexternal","OIDExternalNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="OIDExternalNum,";
+			}
+			command+="IDType,IDInternal,IDExternal,rootExternal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(oIDExternal.OIDExternalNum)+",";
+			}
+			command+=
+				 "'"+POut.String(oIDExternal.IDType.ToString())+"',"
+				+    POut.Long  (oIDExternal.IDInternal)+","
+				+"'"+POut.String(oIDExternal.IDExternal)+"',"
+				+"'"+POut.String(oIDExternal.rootExternal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				oIDExternal.OIDExternalNum=Db.NonQ(command,true);
+			}
+			return oIDExternal.OIDExternalNum;
+		}
+
 		///<summary>Updates one OIDExternal in the database.</summary>
 		public static void Update(OIDExternal oIDExternal){
 			string command="UPDATE oidexternal SET "

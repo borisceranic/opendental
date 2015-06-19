@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return covCat.CovCatNum;
 		}
 
+		///<summary>Inserts one CovCat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CovCat covCat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(covCat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					covCat.CovCatNum=DbHelper.GetNextOracleKey("covcat","CovCatNum"); //Cacheless method
+				}
+				return InsertNoCache(covCat,true);
+			}
+		}
+
+		///<summary>Inserts one CovCat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CovCat covCat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO covcat (";
+			if(!useExistingPK && isRandomKeys) {
+				covCat.CovCatNum=ReplicationServers.GetKeyNoCache("covcat","CovCatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CovCatNum,";
+			}
+			command+="Description,DefaultPercent,CovOrder,IsHidden,EbenefitCat) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(covCat.CovCatNum)+",";
+			}
+			command+=
+				 "'"+POut.String(covCat.Description)+"',"
+				+    POut.Int   (covCat.DefaultPercent)+","
+				+    POut.Byte  (covCat.CovOrder)+","
+				+    POut.Bool  (covCat.IsHidden)+","
+				+    POut.Int   ((int)covCat.EbenefitCat)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				covCat.CovCatNum=Db.NonQ(command,true);
+			}
+			return covCat.CovCatNum;
+		}
+
 		///<summary>Updates one CovCat in the database.</summary>
 		public static void Update(CovCat covCat){
 			string command="UPDATE covcat SET "

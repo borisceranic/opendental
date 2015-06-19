@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return replicationServer.ReplicationServerNum;
 		}
 
+		///<summary>Inserts one ReplicationServer into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReplicationServer replicationServer){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(replicationServer,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					replicationServer.ReplicationServerNum=DbHelper.GetNextOracleKey("replicationserver","ReplicationServerNum"); //Cacheless method
+				}
+				return InsertNoCache(replicationServer,true);
+			}
+		}
+
+		///<summary>Inserts one ReplicationServer into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReplicationServer replicationServer,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO replicationserver (";
+			if(!useExistingPK && isRandomKeys) {
+				replicationServer.ReplicationServerNum=ReplicationServers.GetKeyNoCache("replicationserver","ReplicationServerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReplicationServerNum,";
+			}
+			command+="Descript,ServerId,RangeStart,RangeEnd,AtoZpath,UpdateBlocked,SlaveMonitor) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(replicationServer.ReplicationServerNum)+",";
+			}
+			command+=
+				 "'"+POut.String(replicationServer.Descript)+"',"
+				+    POut.Int   (replicationServer.ServerId)+","
+				+    POut.Long  (replicationServer.RangeStart)+","
+				+    POut.Long  (replicationServer.RangeEnd)+","
+				+"'"+POut.String(replicationServer.AtoZpath)+"',"
+				+    POut.Bool  (replicationServer.UpdateBlocked)+","
+				+"'"+POut.String(replicationServer.SlaveMonitor)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				replicationServer.ReplicationServerNum=Db.NonQ(command,true);
+			}
+			return replicationServer.ReplicationServerNum;
+		}
+
 		///<summary>Updates one ReplicationServer in the database.</summary>
 		public static void Update(ReplicationServer replicationServer){
 			string command="UPDATE replicationserver SET "

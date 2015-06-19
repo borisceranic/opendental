@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return creditCard.CreditCardNum;
 		}
 
+		///<summary>Inserts one CreditCard into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CreditCard creditCard){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(creditCard,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					creditCard.CreditCardNum=DbHelper.GetNextOracleKey("creditcard","CreditCardNum"); //Cacheless method
+				}
+				return InsertNoCache(creditCard,true);
+			}
+		}
+
+		///<summary>Inserts one CreditCard into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CreditCard creditCard,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO creditcard (";
+			if(!useExistingPK && isRandomKeys) {
+				creditCard.CreditCardNum=ReplicationServers.GetKeyNoCache("creditcard","CreditCardNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CreditCardNum,";
+			}
+			command+="PatNum,Address,Zip,XChargeToken,CCNumberMasked,CCExpiration,ItemOrder,ChargeAmt,DateStart,DateStop,Note,PayPlanNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(creditCard.CreditCardNum)+",";
+			}
+			command+=
+				     POut.Long  (creditCard.PatNum)+","
+				+"'"+POut.String(creditCard.Address)+"',"
+				+"'"+POut.String(creditCard.Zip)+"',"
+				+"'"+POut.String(creditCard.XChargeToken)+"',"
+				+"'"+POut.String(creditCard.CCNumberMasked)+"',"
+				+    POut.Date  (creditCard.CCExpiration)+","
+				+    POut.Int   (creditCard.ItemOrder)+","
+				+"'"+POut.Double(creditCard.ChargeAmt)+"',"
+				+    POut.Date  (creditCard.DateStart)+","
+				+    POut.Date  (creditCard.DateStop)+","
+				+"'"+POut.String(creditCard.Note)+"',"
+				+    POut.Long  (creditCard.PayPlanNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				creditCard.CreditCardNum=Db.NonQ(command,true);
+			}
+			return creditCard.CreditCardNum;
+		}
+
 		///<summary>Updates one CreditCard in the database.</summary>
 		public static void Update(CreditCard creditCard){
 			string command="UPDATE creditcard SET "

@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return patPlan.PatPlanNum;
 		}
 
+		///<summary>Inserts one PatPlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatPlan patPlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(patPlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					patPlan.PatPlanNum=DbHelper.GetNextOracleKey("patplan","PatPlanNum"); //Cacheless method
+				}
+				return InsertNoCache(patPlan,true);
+			}
+		}
+
+		///<summary>Inserts one PatPlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatPlan patPlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO patplan (";
+			if(!useExistingPK && isRandomKeys) {
+				patPlan.PatPlanNum=ReplicationServers.GetKeyNoCache("patplan","PatPlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PatPlanNum,";
+			}
+			command+="PatNum,Ordinal,IsPending,Relationship,PatID,InsSubNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(patPlan.PatPlanNum)+",";
+			}
+			command+=
+				     POut.Long  (patPlan.PatNum)+","
+				+    POut.Byte  (patPlan.Ordinal)+","
+				+    POut.Bool  (patPlan.IsPending)+","
+				+    POut.Int   ((int)patPlan.Relationship)+","
+				+"'"+POut.String(patPlan.PatID)+"',"
+				+    POut.Long  (patPlan.InsSubNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				patPlan.PatPlanNum=Db.NonQ(command,true);
+			}
+			return patPlan.PatPlanNum;
+		}
+
 		///<summary>Updates one PatPlan in the database.</summary>
 		public static void Update(PatPlan patPlan){
 			string command="UPDATE patplan SET "

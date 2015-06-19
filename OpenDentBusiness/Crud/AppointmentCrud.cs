@@ -155,6 +155,70 @@ namespace OpenDentBusiness.Crud{
 			return appointment.AptNum;
 		}
 
+		///<summary>Inserts one Appointment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Appointment appointment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(appointment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					appointment.AptNum=DbHelper.GetNextOracleKey("appointment","AptNum"); //Cacheless method
+				}
+				return InsertNoCache(appointment,true);
+			}
+		}
+
+		///<summary>Inserts one Appointment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Appointment appointment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO appointment (";
+			if(!useExistingPK && isRandomKeys) {
+				appointment.AptNum=ReplicationServers.GetKeyNoCache("appointment","AptNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AptNum,";
+			}
+			command+="PatNum,AptStatus,Pattern,Confirmed,TimeLocked,Op,Note,ProvNum,ProvHyg,AptDateTime,NextAptNum,UnschedStatus,IsNewPatient,ProcDescript,Assistant,ClinicNum,IsHygiene,DateTimeArrived,DateTimeSeated,DateTimeDismissed,InsPlan1,InsPlan2,DateTimeAskedToArrive,ProcsColored,ColorOverride,AppointmentTypeNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(appointment.AptNum)+",";
+			}
+			command+=
+				     POut.Long  (appointment.PatNum)+","
+				+    POut.Int   ((int)appointment.AptStatus)+","
+				+"'"+POut.String(appointment.Pattern)+"',"
+				+    POut.Long  (appointment.Confirmed)+","
+				+    POut.Bool  (appointment.TimeLocked)+","
+				+    POut.Long  (appointment.Op)+","
+				+"'"+POut.String(appointment.Note)+"',"
+				+    POut.Long  (appointment.ProvNum)+","
+				+    POut.Long  (appointment.ProvHyg)+","
+				+    POut.DateT (appointment.AptDateTime)+","
+				+    POut.Long  (appointment.NextAptNum)+","
+				+    POut.Long  (appointment.UnschedStatus)+","
+				+    POut.Bool  (appointment.IsNewPatient)+","
+				+"'"+POut.String(appointment.ProcDescript)+"',"
+				+    POut.Long  (appointment.Assistant)+","
+				+    POut.Long  (appointment.ClinicNum)+","
+				+    POut.Bool  (appointment.IsHygiene)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.DateT (appointment.DateTimeArrived)+","
+				+    POut.DateT (appointment.DateTimeSeated)+","
+				+    POut.DateT (appointment.DateTimeDismissed)+","
+				+    POut.Long  (appointment.InsPlan1)+","
+				+    POut.Long  (appointment.InsPlan2)+","
+				+    POut.DateT (appointment.DateTimeAskedToArrive)+","
+				+"'"+POut.String(appointment.ProcsColored)+"',"
+				+    POut.Int   (appointment.ColorOverride.ToArgb())+","
+				+    POut.Long  (appointment.AppointmentTypeNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				appointment.AptNum=Db.NonQ(command,true);
+			}
+			return appointment.AptNum;
+		}
+
 		///<summary>Updates one Appointment in the database.</summary>
 		public static void Update(Appointment appointment){
 			string command="UPDATE appointment SET "

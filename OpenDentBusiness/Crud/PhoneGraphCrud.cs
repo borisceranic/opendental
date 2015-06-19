@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return phoneGraph.PhoneGraphNum;
 		}
 
+		///<summary>Inserts one PhoneGraph into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneGraph phoneGraph){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(phoneGraph,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					phoneGraph.PhoneGraphNum=DbHelper.GetNextOracleKey("phonegraph","PhoneGraphNum"); //Cacheless method
+				}
+				return InsertNoCache(phoneGraph,true);
+			}
+		}
+
+		///<summary>Inserts one PhoneGraph into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneGraph phoneGraph,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO phonegraph (";
+			if(!useExistingPK && isRandomKeys) {
+				phoneGraph.PhoneGraphNum=ReplicationServers.GetKeyNoCache("phonegraph","PhoneGraphNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PhoneGraphNum,";
+			}
+			command+="EmployeeNum,IsGraphed,DateEntry) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(phoneGraph.PhoneGraphNum)+",";
+			}
+			command+=
+				     POut.Long  (phoneGraph.EmployeeNum)+","
+				+    POut.Bool  (phoneGraph.IsGraphed)+","
+				+    POut.Date  (phoneGraph.DateEntry)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				phoneGraph.PhoneGraphNum=Db.NonQ(command,true);
+			}
+			return phoneGraph.PhoneGraphNum;
+		}
+
 		///<summary>Updates one PhoneGraph in the database.</summary>
 		public static void Update(PhoneGraph phoneGraph){
 			string command="UPDATE phonegraph SET "

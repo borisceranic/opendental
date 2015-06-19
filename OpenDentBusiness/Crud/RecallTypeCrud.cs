@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return recallType.RecallTypeNum;
 		}
 
+		///<summary>Inserts one RecallType into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RecallType recallType){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(recallType,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					recallType.RecallTypeNum=DbHelper.GetNextOracleKey("recalltype","RecallTypeNum"); //Cacheless method
+				}
+				return InsertNoCache(recallType,true);
+			}
+		}
+
+		///<summary>Inserts one RecallType into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RecallType recallType,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO recalltype (";
+			if(!useExistingPK && isRandomKeys) {
+				recallType.RecallTypeNum=ReplicationServers.GetKeyNoCache("recalltype","RecallTypeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RecallTypeNum,";
+			}
+			command+="Description,DefaultInterval,TimePattern,Procedures) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(recallType.RecallTypeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(recallType.Description)+"',"
+				+    POut.Int   (recallType.DefaultInterval.ToInt())+","
+				+"'"+POut.String(recallType.TimePattern)+"',"
+				+"'"+POut.String(recallType.Procedures)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				recallType.RecallTypeNum=Db.NonQ(command,true);
+			}
+			return recallType.RecallTypeNum;
+		}
+
 		///<summary>Updates one RecallType in the database.</summary>
 		public static void Update(RecallType recallType){
 			string command="UPDATE recalltype SET "

@@ -144,6 +144,55 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabResultsCopyTo.EhrLabResultsCopyToNum;
 		}
 
+		///<summary>Inserts one EhrLabResultsCopyTo into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabResultsCopyTo ehrLabResultsCopyTo){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabResultsCopyTo,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabResultsCopyTo.EhrLabResultsCopyToNum=DbHelper.GetNextOracleKey("ehrlabresultscopyto","EhrLabResultsCopyToNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabResultsCopyTo,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabResultsCopyTo into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabResultsCopyTo ehrLabResultsCopyTo,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabresultscopyto (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabResultsCopyTo.EhrLabResultsCopyToNum=ReplicationServers.GetKeyNoCache("ehrlabresultscopyto","EhrLabResultsCopyToNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabResultsCopyToNum,";
+			}
+			command+="EhrLabNum,CopyToID,CopyToLName,CopyToFName,CopyToMiddleNames,CopyToSuffix,CopyToPrefix,CopyToAssigningAuthorityNamespaceID,CopyToAssigningAuthorityUniversalID,CopyToAssigningAuthorityIDType,CopyToNameTypeCode,CopyToIdentifierTypeCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabResultsCopyTo.EhrLabResultsCopyToNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabResultsCopyTo.EhrLabNum)+","
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToID)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToLName)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToFName)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToMiddleNames)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToSuffix)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToPrefix)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType)+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToNameTypeCode.ToString())+"',"
+				+"'"+POut.String(ehrLabResultsCopyTo.CopyToIdentifierTypeCode.ToString())+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabResultsCopyTo.EhrLabResultsCopyToNum=Db.NonQ(command,true);
+			}
+			return ehrLabResultsCopyTo.EhrLabResultsCopyToNum;
+		}
+
 		///<summary>Updates one EhrLabResultsCopyTo in the database.</summary>
 		public static void Update(EhrLabResultsCopyTo ehrLabResultsCopyTo){
 			string command="UPDATE ehrlabresultscopyto SET "

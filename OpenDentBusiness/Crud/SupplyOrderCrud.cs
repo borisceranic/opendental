@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return supplyOrder.SupplyOrderNum;
 		}
 
+		///<summary>Inserts one SupplyOrder into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SupplyOrder supplyOrder){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(supplyOrder,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					supplyOrder.SupplyOrderNum=DbHelper.GetNextOracleKey("supplyorder","SupplyOrderNum"); //Cacheless method
+				}
+				return InsertNoCache(supplyOrder,true);
+			}
+		}
+
+		///<summary>Inserts one SupplyOrder into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SupplyOrder supplyOrder,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO supplyorder (";
+			if(!useExistingPK && isRandomKeys) {
+				supplyOrder.SupplyOrderNum=ReplicationServers.GetKeyNoCache("supplyorder","SupplyOrderNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SupplyOrderNum,";
+			}
+			command+="SupplierNum,DatePlaced,Note,AmountTotal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(supplyOrder.SupplyOrderNum)+",";
+			}
+			command+=
+				     POut.Long  (supplyOrder.SupplierNum)+","
+				+    POut.Date  (supplyOrder.DatePlaced)+","
+				+"'"+POut.String(supplyOrder.Note)+"',"
+				+"'"+POut.Double(supplyOrder.AmountTotal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				supplyOrder.SupplyOrderNum=Db.NonQ(command,true);
+			}
+			return supplyOrder.SupplyOrderNum;
+		}
+
 		///<summary>Updates one SupplyOrder in the database.</summary>
 		public static void Update(SupplyOrder supplyOrder){
 			string command="UPDATE supplyorder SET "

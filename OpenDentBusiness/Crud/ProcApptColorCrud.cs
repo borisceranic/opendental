@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return procApptColor.ProcApptColorNum;
 		}
 
+		///<summary>Inserts one ProcApptColor into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcApptColor procApptColor){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procApptColor,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procApptColor.ProcApptColorNum=DbHelper.GetNextOracleKey("procapptcolor","ProcApptColorNum"); //Cacheless method
+				}
+				return InsertNoCache(procApptColor,true);
+			}
+		}
+
+		///<summary>Inserts one ProcApptColor into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcApptColor procApptColor,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procapptcolor (";
+			if(!useExistingPK && isRandomKeys) {
+				procApptColor.ProcApptColorNum=ReplicationServers.GetKeyNoCache("procapptcolor","ProcApptColorNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcApptColorNum,";
+			}
+			command+="CodeRange,ShowPreviousDate,ColorText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procApptColor.ProcApptColorNum)+",";
+			}
+			command+=
+				 "'"+POut.String(procApptColor.CodeRange)+"',"
+				+    POut.Bool  (procApptColor.ShowPreviousDate)+","
+				+    POut.Int   (procApptColor.ColorText.ToArgb())+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procApptColor.ProcApptColorNum=Db.NonQ(command,true);
+			}
+			return procApptColor.ProcApptColorNum;
+		}
+
 		///<summary>Updates one ProcApptColor in the database.</summary>
 		public static void Update(ProcApptColor procApptColor){
 			string command="UPDATE procapptcolor SET "

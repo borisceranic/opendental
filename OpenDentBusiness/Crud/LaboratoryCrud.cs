@@ -121,6 +121,53 @@ namespace OpenDentBusiness.Crud{
 			return laboratory.LaboratoryNum;
 		}
 
+		///<summary>Inserts one Laboratory into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Laboratory laboratory){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(laboratory,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					laboratory.LaboratoryNum=DbHelper.GetNextOracleKey("laboratory","LaboratoryNum"); //Cacheless method
+				}
+				return InsertNoCache(laboratory,true);
+			}
+		}
+
+		///<summary>Inserts one Laboratory into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Laboratory laboratory,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO laboratory (";
+			if(!useExistingPK && isRandomKeys) {
+				laboratory.LaboratoryNum=ReplicationServers.GetKeyNoCache("laboratory","LaboratoryNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LaboratoryNum,";
+			}
+			command+="Description,Phone,Notes,Slip,Address,City,State,Zip,Email,WirelessPhone) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(laboratory.LaboratoryNum)+",";
+			}
+			command+=
+				 "'"+POut.String(laboratory.Description)+"',"
+				+"'"+POut.String(laboratory.Phone)+"',"
+				+"'"+POut.String(laboratory.Notes)+"',"
+				+    POut.Long  (laboratory.Slip)+","
+				+"'"+POut.String(laboratory.Address)+"',"
+				+"'"+POut.String(laboratory.City)+"',"
+				+"'"+POut.String(laboratory.State)+"',"
+				+"'"+POut.String(laboratory.Zip)+"',"
+				+"'"+POut.String(laboratory.Email)+"',"
+				+"'"+POut.String(laboratory.WirelessPhone)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				laboratory.LaboratoryNum=Db.NonQ(command,true);
+			}
+			return laboratory.LaboratoryNum;
+		}
+
 		///<summary>Updates one Laboratory in the database.</summary>
 		public static void Update(Laboratory laboratory){
 			string command="UPDATE laboratory SET "

@@ -137,6 +137,61 @@ namespace OpenDentBusiness.Crud{
 			return vitalsign.VitalsignNum;
 		}
 
+		///<summary>Inserts one Vitalsign into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Vitalsign vitalsign){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(vitalsign,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					vitalsign.VitalsignNum=DbHelper.GetNextOracleKey("vitalsign","VitalsignNum"); //Cacheless method
+				}
+				return InsertNoCache(vitalsign,true);
+			}
+		}
+
+		///<summary>Inserts one Vitalsign into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Vitalsign vitalsign,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO vitalsign (";
+			if(!useExistingPK && isRandomKeys) {
+				vitalsign.VitalsignNum=ReplicationServers.GetKeyNoCache("vitalsign","VitalsignNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="VitalsignNum,";
+			}
+			command+="PatNum,Height,Weight,BpSystolic,BpDiastolic,DateTaken,HasFollowupPlan,IsIneligible,Documentation,ChildGotNutrition,ChildGotPhysCouns,WeightCode,HeightExamCode,WeightExamCode,BMIExamCode,EhrNotPerformedNum,PregDiseaseNum,BMIPercentile) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(vitalsign.VitalsignNum)+",";
+			}
+			command+=
+				     POut.Long  (vitalsign.PatNum)+","
+				+    POut.Float (vitalsign.Height)+","
+				+    POut.Float (vitalsign.Weight)+","
+				+    POut.Int   (vitalsign.BpSystolic)+","
+				+    POut.Int   (vitalsign.BpDiastolic)+","
+				+    POut.Date  (vitalsign.DateTaken)+","
+				+    POut.Bool  (vitalsign.HasFollowupPlan)+","
+				+    POut.Bool  (vitalsign.IsIneligible)+","
+				+"'"+POut.String(vitalsign.Documentation)+"',"
+				+    POut.Bool  (vitalsign.ChildGotNutrition)+","
+				+    POut.Bool  (vitalsign.ChildGotPhysCouns)+","
+				+"'"+POut.String(vitalsign.WeightCode)+"',"
+				+"'"+POut.String(vitalsign.HeightExamCode)+"',"
+				+"'"+POut.String(vitalsign.WeightExamCode)+"',"
+				+"'"+POut.String(vitalsign.BMIExamCode)+"',"
+				+    POut.Long  (vitalsign.EhrNotPerformedNum)+","
+				+    POut.Long  (vitalsign.PregDiseaseNum)+","
+				+    POut.Int   (vitalsign.BMIPercentile)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				vitalsign.VitalsignNum=Db.NonQ(command,true);
+			}
+			return vitalsign.VitalsignNum;
+		}
+
 		///<summary>Updates one Vitalsign in the database.</summary>
 		public static void Update(Vitalsign vitalsign){
 			string command="UPDATE vitalsign SET "

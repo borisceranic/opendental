@@ -103,6 +103,44 @@ namespace OpenDentBusiness.Crud{
 			return dictCustom.DictCustomNum;
 		}
 
+		///<summary>Inserts one DictCustom into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DictCustom dictCustom){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(dictCustom,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					dictCustom.DictCustomNum=DbHelper.GetNextOracleKey("dictcustom","DictCustomNum"); //Cacheless method
+				}
+				return InsertNoCache(dictCustom,true);
+			}
+		}
+
+		///<summary>Inserts one DictCustom into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DictCustom dictCustom,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO dictcustom (";
+			if(!useExistingPK && isRandomKeys) {
+				dictCustom.DictCustomNum=ReplicationServers.GetKeyNoCache("dictcustom","DictCustomNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DictCustomNum,";
+			}
+			command+="WordText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(dictCustom.DictCustomNum)+",";
+			}
+			command+=
+				 "'"+POut.String(dictCustom.WordText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				dictCustom.DictCustomNum=Db.NonQ(command,true);
+			}
+			return dictCustom.DictCustomNum;
+		}
+
 		///<summary>Updates one DictCustom in the database.</summary>
 		public static void Update(DictCustom dictCustom){
 			string command="UPDATE dictcustom SET "

@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return rxDef.RxDefNum;
 		}
 
+		///<summary>Inserts one RxDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxDef rxDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(rxDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					rxDef.RxDefNum=DbHelper.GetNextOracleKey("rxdef","RxDefNum"); //Cacheless method
+				}
+				return InsertNoCache(rxDef,true);
+			}
+		}
+
+		///<summary>Inserts one RxDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxDef rxDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO rxdef (";
+			if(!useExistingPK && isRandomKeys) {
+				rxDef.RxDefNum=ReplicationServers.GetKeyNoCache("rxdef","RxDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RxDefNum,";
+			}
+			command+="Drug,Sig,Disp,Refills,Notes,IsControlled,RxCui) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(rxDef.RxDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(rxDef.Drug)+"',"
+				+"'"+POut.String(rxDef.Sig)+"',"
+				+"'"+POut.String(rxDef.Disp)+"',"
+				+"'"+POut.String(rxDef.Refills)+"',"
+				+"'"+POut.String(rxDef.Notes)+"',"
+				+    POut.Bool  (rxDef.IsControlled)+","
+				+    POut.Long  (rxDef.RxCui)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				rxDef.RxDefNum=Db.NonQ(command,true);
+			}
+			return rxDef.RxDefNum;
+		}
+
 		///<summary>Updates one RxDef in the database.</summary>
 		public static void Update(RxDef rxDef){
 			string command="UPDATE rxdef SET "

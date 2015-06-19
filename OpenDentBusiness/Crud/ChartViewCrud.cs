@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return chartView.ChartViewNum;
 		}
 
+		///<summary>Inserts one ChartView into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ChartView chartView){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(chartView,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					chartView.ChartViewNum=DbHelper.GetNextOracleKey("chartview","ChartViewNum"); //Cacheless method
+				}
+				return InsertNoCache(chartView,true);
+			}
+		}
+
+		///<summary>Inserts one ChartView into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ChartView chartView,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO chartview (";
+			if(!useExistingPK && isRandomKeys) {
+				chartView.ChartViewNum=ReplicationServers.GetKeyNoCache("chartview","ChartViewNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ChartViewNum,";
+			}
+			command+="Description,ItemOrder,ProcStatuses,ObjectTypes,ShowProcNotes,IsAudit,SelectedTeethOnly,OrionStatusFlags,DatesShowing) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(chartView.ChartViewNum)+",";
+			}
+			command+=
+				 "'"+POut.String(chartView.Description)+"',"
+				+    POut.Int   (chartView.ItemOrder)+","
+				+    POut.Int   ((int)chartView.ProcStatuses)+","
+				+    POut.Int   ((int)chartView.ObjectTypes)+","
+				+    POut.Bool  (chartView.ShowProcNotes)+","
+				+    POut.Bool  (chartView.IsAudit)+","
+				+    POut.Bool  (chartView.SelectedTeethOnly)+","
+				+    POut.Int   ((int)chartView.OrionStatusFlags)+","
+				+    POut.Int   ((int)chartView.DatesShowing)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				chartView.ChartViewNum=Db.NonQ(command,true);
+			}
+			return chartView.ChartViewNum;
+		}
+
 		///<summary>Updates one ChartView in the database.</summary>
 		public static void Update(ChartView chartView){
 			string command="UPDATE chartview SET "

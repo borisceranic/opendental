@@ -149,6 +149,67 @@ namespace OpenDentBusiness.Crud{
 			return clearinghouse.ClearinghouseNum;
 		}
 
+		///<summary>Inserts one Clearinghouse into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Clearinghouse clearinghouse){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(clearinghouse,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					clearinghouse.ClearinghouseNum=DbHelper.GetNextOracleKey("clearinghouse","ClearinghouseNum"); //Cacheless method
+				}
+				return InsertNoCache(clearinghouse,true);
+			}
+		}
+
+		///<summary>Inserts one Clearinghouse into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Clearinghouse clearinghouse,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO clearinghouse (";
+			if(!useExistingPK && isRandomKeys) {
+				clearinghouse.ClearinghouseNum=ReplicationServers.GetKeyNoCache("clearinghouse","ClearinghouseNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClearinghouseNum,";
+			}
+			command+="Description,ExportPath,Payors,Eformat,ISA05,SenderTIN,ISA07,ISA08,ISA15,Password,ResponsePath,CommBridge,ClientProgram,LastBatchNumber,ModemPort,LoginID,SenderName,SenderTelephone,GS03,ISA02,ISA04,ISA16,SeparatorData,SeparatorSegment) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(clearinghouse.ClearinghouseNum)+",";
+			}
+			command+=
+				 "'"+POut.String(clearinghouse.Description)+"',"
+				+"'"+POut.String(clearinghouse.ExportPath)+"',"
+				+"'"+POut.String(clearinghouse.Payors)+"',"
+				+    POut.Int   ((int)clearinghouse.Eformat)+","
+				+"'"+POut.String(clearinghouse.ISA05)+"',"
+				+"'"+POut.String(clearinghouse.SenderTIN)+"',"
+				+"'"+POut.String(clearinghouse.ISA07)+"',"
+				+"'"+POut.String(clearinghouse.ISA08)+"',"
+				+"'"+POut.String(clearinghouse.ISA15)+"',"
+				+"'"+POut.String(clearinghouse.Password)+"',"
+				+"'"+POut.String(clearinghouse.ResponsePath)+"',"
+				+    POut.Int   ((int)clearinghouse.CommBridge)+","
+				+"'"+POut.String(clearinghouse.ClientProgram)+"',"
+				+    POut.Int   (clearinghouse.LastBatchNumber)+","
+				+    POut.Byte  (clearinghouse.ModemPort)+","
+				+"'"+POut.String(clearinghouse.LoginID)+"',"
+				+"'"+POut.String(clearinghouse.SenderName)+"',"
+				+"'"+POut.String(clearinghouse.SenderTelephone)+"',"
+				+"'"+POut.String(clearinghouse.GS03)+"',"
+				+"'"+POut.String(clearinghouse.ISA02)+"',"
+				+"'"+POut.String(clearinghouse.ISA04)+"',"
+				+"'"+POut.String(clearinghouse.ISA16)+"',"
+				+"'"+POut.String(clearinghouse.SeparatorData)+"',"
+				+"'"+POut.String(clearinghouse.SeparatorSegment)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				clearinghouse.ClearinghouseNum=Db.NonQ(command,true);
+			}
+			return clearinghouse.ClearinghouseNum;
+		}
+
 		///<summary>Updates one Clearinghouse in the database.</summary>
 		public static void Update(Clearinghouse clearinghouse){
 			string command="UPDATE clearinghouse SET "

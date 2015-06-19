@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return groupPermission.GroupPermNum;
 		}
 
+		///<summary>Inserts one GroupPermission into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GroupPermission groupPermission){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(groupPermission,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					groupPermission.GroupPermNum=DbHelper.GetNextOracleKey("grouppermission","GroupPermNum"); //Cacheless method
+				}
+				return InsertNoCache(groupPermission,true);
+			}
+		}
+
+		///<summary>Inserts one GroupPermission into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GroupPermission groupPermission,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO grouppermission (";
+			if(!useExistingPK && isRandomKeys) {
+				groupPermission.GroupPermNum=ReplicationServers.GetKeyNoCache("grouppermission","GroupPermNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="GroupPermNum,";
+			}
+			command+="NewerDate,NewerDays,UserGroupNum,PermType) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(groupPermission.GroupPermNum)+",";
+			}
+			command+=
+				     POut.Date  (groupPermission.NewerDate)+","
+				+    POut.Int   (groupPermission.NewerDays)+","
+				+    POut.Long  (groupPermission.UserGroupNum)+","
+				+    POut.Int   ((int)groupPermission.PermType)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				groupPermission.GroupPermNum=Db.NonQ(command,true);
+			}
+			return groupPermission.GroupPermNum;
+		}
+
 		///<summary>Updates one GroupPermission in the database.</summary>
 		public static void Update(GroupPermission groupPermission){
 			string command="UPDATE grouppermission SET "

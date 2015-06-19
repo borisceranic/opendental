@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return program.ProgramNum;
 		}
 
+		///<summary>Inserts one Program into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Program program){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(program,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					program.ProgramNum=DbHelper.GetNextOracleKey("program","ProgramNum"); //Cacheless method
+				}
+				return InsertNoCache(program,true);
+			}
+		}
+
+		///<summary>Inserts one Program into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Program program,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO program (";
+			if(!useExistingPK && isRandomKeys) {
+				program.ProgramNum=ReplicationServers.GetKeyNoCache("program","ProgramNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProgramNum,";
+			}
+			command+="ProgName,ProgDesc,Enabled,Path,CommandLine,Note,PluginDllName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(program.ProgramNum)+",";
+			}
+			command+=
+				 "'"+POut.String(program.ProgName)+"',"
+				+"'"+POut.String(program.ProgDesc)+"',"
+				+    POut.Bool  (program.Enabled)+","
+				+"'"+POut.String(program.Path)+"',"
+				+"'"+POut.String(program.CommandLine)+"',"
+				+"'"+POut.String(program.Note)+"',"
+				+"'"+POut.String(program.PluginDllName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				program.ProgramNum=Db.NonQ(command,true);
+			}
+			return program.ProgramNum;
+		}
+
 		///<summary>Updates one Program in the database.</summary>
 		public static void Update(Program program){
 			string command="UPDATE program SET "

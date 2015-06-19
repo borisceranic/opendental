@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return taskSubscription.TaskSubscriptionNum;
 		}
 
+		///<summary>Inserts one TaskSubscription into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskSubscription taskSubscription){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskSubscription,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskSubscription.TaskSubscriptionNum=DbHelper.GetNextOracleKey("tasksubscription","TaskSubscriptionNum"); //Cacheless method
+				}
+				return InsertNoCache(taskSubscription,true);
+			}
+		}
+
+		///<summary>Inserts one TaskSubscription into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskSubscription taskSubscription,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO tasksubscription (";
+			if(!useExistingPK && isRandomKeys) {
+				taskSubscription.TaskSubscriptionNum=ReplicationServers.GetKeyNoCache("tasksubscription","TaskSubscriptionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskSubscriptionNum,";
+			}
+			command+="UserNum,TaskListNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskSubscription.TaskSubscriptionNum)+",";
+			}
+			command+=
+				     POut.Long  (taskSubscription.UserNum)+","
+				+    POut.Long  (taskSubscription.TaskListNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				taskSubscription.TaskSubscriptionNum=Db.NonQ(command,true);
+			}
+			return taskSubscription.TaskSubscriptionNum;
+		}
+
 		///<summary>Updates one TaskSubscription in the database.</summary>
 		public static void Update(TaskSubscription taskSubscription){
 			string command="UPDATE tasksubscription SET "

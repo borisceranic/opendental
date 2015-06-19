@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return ehrCode.EhrCodeNum;
 		}
 
+		///<summary>Inserts one EhrCode into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrCode ehrCode){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrCode,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrCode.EhrCodeNum=DbHelper.GetNextOracleKey("ehrcode","EhrCodeNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrCode,true);
+			}
+		}
+
+		///<summary>Inserts one EhrCode into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrCode ehrCode,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrcode (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrCode.EhrCodeNum=ReplicationServers.GetKeyNoCache("ehrcode","EhrCodeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrCodeNum,";
+			}
+			command+="MeasureIds,ValueSetName,ValueSetOID,QDMCategory,CodeValue,Description,CodeSystem,CodeSystemOID,IsInDb) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrCode.EhrCodeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(ehrCode.MeasureIds)+"',"
+				+"'"+POut.String(ehrCode.ValueSetName)+"',"
+				+"'"+POut.String(ehrCode.ValueSetOID)+"',"
+				+"'"+POut.String(ehrCode.QDMCategory)+"',"
+				+"'"+POut.String(ehrCode.CodeValue)+"',"
+				+"'"+POut.String(ehrCode.Description)+"',"
+				+"'"+POut.String(ehrCode.CodeSystem)+"',"
+				+"'"+POut.String(ehrCode.CodeSystemOID)+"',"
+				+    POut.Bool  (ehrCode.IsInDb)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrCode.EhrCodeNum=Db.NonQ(command,true);
+			}
+			return ehrCode.EhrCodeNum;
+		}
+
 		///<summary>Updates one EhrCode in the database.</summary>
 		public static void Update(EhrCode ehrCode){
 			string command="UPDATE ehrcode SET "

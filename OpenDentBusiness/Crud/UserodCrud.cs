@@ -129,6 +129,57 @@ namespace OpenDentBusiness.Crud{
 			return userod.UserNum;
 		}
 
+		///<summary>Inserts one Userod into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Userod userod){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(userod,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					userod.UserNum=DbHelper.GetNextOracleKey("userod","UserNum"); //Cacheless method
+				}
+				return InsertNoCache(userod,true);
+			}
+		}
+
+		///<summary>Inserts one Userod into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Userod userod,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO userod (";
+			if(!useExistingPK && isRandomKeys) {
+				userod.UserNum=ReplicationServers.GetKeyNoCache("userod","UserNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="UserNum,";
+			}
+			command+="UserName,Password,UserGroupNum,EmployeeNum,ClinicNum,ProvNum,IsHidden,TaskListInBox,AnesthProvType,DefaultHidePopups,PasswordIsStrong,ClinicIsRestricted,InboxHidePopups,UserNumCEMT) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(userod.UserNum)+",";
+			}
+			command+=
+				 "'"+POut.String(userod.UserName)+"',"
+				+"'"+POut.String(userod.Password)+"',"
+				+    POut.Long  (userod.UserGroupNum)+","
+				+    POut.Long  (userod.EmployeeNum)+","
+				+    POut.Long  (userod.ClinicNum)+","
+				+    POut.Long  (userod.ProvNum)+","
+				+    POut.Bool  (userod.IsHidden)+","
+				+    POut.Long  (userod.TaskListInBox)+","
+				+    POut.Int   (userod.AnesthProvType)+","
+				+    POut.Bool  (userod.DefaultHidePopups)+","
+				+    POut.Bool  (userod.PasswordIsStrong)+","
+				+    POut.Bool  (userod.ClinicIsRestricted)+","
+				+    POut.Bool  (userod.InboxHidePopups)+","
+				+    POut.Long  (userod.UserNumCEMT)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				userod.UserNum=Db.NonQ(command,true);
+			}
+			return userod.UserNum;
+		}
+
 		///<summary>Updates one Userod in the database.</summary>
 		public static void Update(Userod userod){
 			string command="UPDATE userod SET "

@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return repeatCharge.RepeatChargeNum;
 		}
 
+		///<summary>Inserts one RepeatCharge into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RepeatCharge repeatCharge){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(repeatCharge,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					repeatCharge.RepeatChargeNum=DbHelper.GetNextOracleKey("repeatcharge","RepeatChargeNum"); //Cacheless method
+				}
+				return InsertNoCache(repeatCharge,true);
+			}
+		}
+
+		///<summary>Inserts one RepeatCharge into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RepeatCharge repeatCharge,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO repeatcharge (";
+			if(!useExistingPK && isRandomKeys) {
+				repeatCharge.RepeatChargeNum=ReplicationServers.GetKeyNoCache("repeatcharge","RepeatChargeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RepeatChargeNum,";
+			}
+			command+="PatNum,ProcCode,ChargeAmt,DateStart,DateStop,Note,CopyNoteToProc,CreatesClaim,IsEnabled) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(repeatCharge.RepeatChargeNum)+",";
+			}
+			command+=
+				     POut.Long  (repeatCharge.PatNum)+","
+				+"'"+POut.String(repeatCharge.ProcCode)+"',"
+				+"'"+POut.Double(repeatCharge.ChargeAmt)+"',"
+				+    POut.Date  (repeatCharge.DateStart)+","
+				+    POut.Date  (repeatCharge.DateStop)+","
+				+"'"+POut.String(repeatCharge.Note)+"',"
+				+    POut.Bool  (repeatCharge.CopyNoteToProc)+","
+				+    POut.Bool  (repeatCharge.CreatesClaim)+","
+				+    POut.Bool  (repeatCharge.IsEnabled)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				repeatCharge.RepeatChargeNum=Db.NonQ(command,true);
+			}
+			return repeatCharge.RepeatChargeNum;
+		}
+
 		///<summary>Updates one RepeatCharge in the database.</summary>
 		public static void Update(RepeatCharge repeatCharge){
 			string command="UPDATE repeatcharge SET "

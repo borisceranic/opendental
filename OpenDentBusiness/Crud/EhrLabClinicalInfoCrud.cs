@@ -118,6 +118,51 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabClinicalInfo.EhrLabClinicalInfoNum;
 		}
 
+		///<summary>Inserts one EhrLabClinicalInfo into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabClinicalInfo ehrLabClinicalInfo){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabClinicalInfo,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabClinicalInfo.EhrLabClinicalInfoNum=DbHelper.GetNextOracleKey("ehrlabclinicalinfo","EhrLabClinicalInfoNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabClinicalInfo,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabClinicalInfo into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabClinicalInfo ehrLabClinicalInfo,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabclinicalinfo (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabClinicalInfo.EhrLabClinicalInfoNum=ReplicationServers.GetKeyNoCache("ehrlabclinicalinfo","EhrLabClinicalInfoNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabClinicalInfoNum,";
+			}
+			command+="EhrLabNum,ClinicalInfoID,ClinicalInfoText,ClinicalInfoCodeSystemName,ClinicalInfoIDAlt,ClinicalInfoTextAlt,ClinicalInfoCodeSystemNameAlt,ClinicalInfoTextOriginal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabClinicalInfo.EhrLabClinicalInfoNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabClinicalInfo.EhrLabNum)+","
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoID)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoText)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoIDAlt)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoTextAlt)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoTextOriginal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabClinicalInfo.EhrLabClinicalInfoNum=Db.NonQ(command,true);
+			}
+			return ehrLabClinicalInfo.EhrLabClinicalInfoNum;
+		}
+
 		///<summary>Updates one EhrLabClinicalInfo in the database.</summary>
 		public static void Update(EhrLabClinicalInfo ehrLabClinicalInfo){
 			string command="UPDATE ehrlabclinicalinfo SET "

@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return procCodeNote.ProcCodeNoteNum;
 		}
 
+		///<summary>Inserts one ProcCodeNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcCodeNote procCodeNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procCodeNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procCodeNote.ProcCodeNoteNum=DbHelper.GetNextOracleKey("proccodenote","ProcCodeNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(procCodeNote,true);
+			}
+		}
+
+		///<summary>Inserts one ProcCodeNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcCodeNote procCodeNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO proccodenote (";
+			if(!useExistingPK && isRandomKeys) {
+				procCodeNote.ProcCodeNoteNum=ReplicationServers.GetKeyNoCache("proccodenote","ProcCodeNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcCodeNoteNum,";
+			}
+			command+="CodeNum,ProvNum,Note,ProcTime) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procCodeNote.ProcCodeNoteNum)+",";
+			}
+			command+=
+				     POut.Long  (procCodeNote.CodeNum)+","
+				+    POut.Long  (procCodeNote.ProvNum)+","
+				+"'"+POut.String(procCodeNote.Note)+"',"
+				+"'"+POut.String(procCodeNote.ProcTime)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procCodeNote.ProcCodeNoteNum=Db.NonQ(command,true);
+			}
+			return procCodeNote.ProcCodeNoteNum;
+		}
+
 		///<summary>Updates one ProcCodeNote in the database.</summary>
 		public static void Update(ProcCodeNote procCodeNote){
 			string command="UPDATE proccodenote SET "

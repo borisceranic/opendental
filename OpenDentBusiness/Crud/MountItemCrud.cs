@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return mountItem.MountItemNum;
 		}
 
+		///<summary>Inserts one MountItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MountItem mountItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(mountItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					mountItem.MountItemNum=DbHelper.GetNextOracleKey("mountitem","MountItemNum"); //Cacheless method
+				}
+				return InsertNoCache(mountItem,true);
+			}
+		}
+
+		///<summary>Inserts one MountItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MountItem mountItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO mountitem (";
+			if(!useExistingPK && isRandomKeys) {
+				mountItem.MountItemNum=ReplicationServers.GetKeyNoCache("mountitem","MountItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MountItemNum,";
+			}
+			command+="MountNum,Xpos,Ypos,OrdinalPos,Width,Height) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(mountItem.MountItemNum)+",";
+			}
+			command+=
+				     POut.Long  (mountItem.MountNum)+","
+				+    POut.Int   (mountItem.Xpos)+","
+				+    POut.Int   (mountItem.Ypos)+","
+				+    POut.Int   (mountItem.OrdinalPos)+","
+				+    POut.Int   (mountItem.Width)+","
+				+    POut.Int   (mountItem.Height)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				mountItem.MountItemNum=Db.NonQ(command,true);
+			}
+			return mountItem.MountItemNum;
+		}
+
 		///<summary>Updates one MountItem in the database.</summary>
 		public static void Update(MountItem mountItem){
 			string command="UPDATE mountitem SET "

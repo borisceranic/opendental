@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return wikiListHist.WikiListHistNum;
 		}
 
+		///<summary>Inserts one WikiListHist into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiListHist wikiListHist){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(wikiListHist,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					wikiListHist.WikiListHistNum=DbHelper.GetNextOracleKey("wikilisthist","WikiListHistNum"); //Cacheless method
+				}
+				return InsertNoCache(wikiListHist,true);
+			}
+		}
+
+		///<summary>Inserts one WikiListHist into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiListHist wikiListHist,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO wikilisthist (";
+			if(!useExistingPK && isRandomKeys) {
+				wikiListHist.WikiListHistNum=ReplicationServers.GetKeyNoCache("wikilisthist","WikiListHistNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="WikiListHistNum,";
+			}
+			command+="UserNum,ListName,ListHeaders,ListContent,DateTimeSaved) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(wikiListHist.WikiListHistNum)+",";
+			}
+			command+=
+				     POut.Long  (wikiListHist.UserNum)+","
+				+"'"+POut.String(wikiListHist.ListName)+"',"
+				+"'"+POut.String(wikiListHist.ListHeaders)+"',"
+				+"'"+POut.String(wikiListHist.ListContent)+"',"
+				+    POut.DateT (wikiListHist.DateTimeSaved)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				wikiListHist.WikiListHistNum=Db.NonQ(command,true);
+			}
+			return wikiListHist.WikiListHistNum;
+		}
+
 		///<summary>Updates one WikiListHist in the database.</summary>
 		public static void Update(WikiListHist wikiListHist){
 			string command="UPDATE wikilisthist SET "

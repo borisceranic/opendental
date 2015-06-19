@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return transaction.TransactionNum;
 		}
 
+		///<summary>Inserts one Transaction into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Transaction transaction){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(transaction,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					transaction.TransactionNum=DbHelper.GetNextOracleKey("transaction","TransactionNum"); //Cacheless method
+				}
+				return InsertNoCache(transaction,true);
+			}
+		}
+
+		///<summary>Inserts one Transaction into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Transaction transaction,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO transaction (";
+			if(!useExistingPK && isRandomKeys) {
+				transaction.TransactionNum=ReplicationServers.GetKeyNoCache("transaction","TransactionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TransactionNum,";
+			}
+			command+="DateTimeEntry,UserNum,DepositNum,PayNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(transaction.TransactionNum)+",";
+			}
+			command+=
+				     DbHelper.Now()+","
+				+    POut.Long  (transaction.UserNum)+","
+				+    POut.Long  (transaction.DepositNum)+","
+				+    POut.Long  (transaction.PayNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				transaction.TransactionNum=Db.NonQ(command,true);
+			}
+			return transaction.TransactionNum;
+		}
+
 		///<summary>Updates one Transaction in the database.</summary>
 		public static void Update(Transaction transaction){
 			string command="UPDATE transaction SET "

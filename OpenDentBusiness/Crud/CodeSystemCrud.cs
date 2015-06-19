@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return codeSystem.CodeSystemNum;
 		}
 
+		///<summary>Inserts one CodeSystem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CodeSystem codeSystem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(codeSystem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					codeSystem.CodeSystemNum=DbHelper.GetNextOracleKey("codesystem","CodeSystemNum"); //Cacheless method
+				}
+				return InsertNoCache(codeSystem,true);
+			}
+		}
+
+		///<summary>Inserts one CodeSystem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CodeSystem codeSystem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO codesystem (";
+			if(!useExistingPK && isRandomKeys) {
+				codeSystem.CodeSystemNum=ReplicationServers.GetKeyNoCache("codesystem","CodeSystemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CodeSystemNum,";
+			}
+			command+="CodeSystemName,VersionCur,VersionAvail,HL7OID,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(codeSystem.CodeSystemNum)+",";
+			}
+			command+=
+				 "'"+POut.String(codeSystem.CodeSystemName)+"',"
+				+"'"+POut.String(codeSystem.VersionCur)+"',"
+				+"'"+POut.String(codeSystem.VersionAvail)+"',"
+				+"'"+POut.String(codeSystem.HL7OID)+"',"
+				+"'"+POut.String(codeSystem.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				codeSystem.CodeSystemNum=Db.NonQ(command,true);
+			}
+			return codeSystem.CodeSystemNum;
+		}
+
 		///<summary>Updates one CodeSystem in the database.</summary>
 		public static void Update(CodeSystem codeSystem){
 			string command="UPDATE codesystem SET "

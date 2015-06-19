@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return reqStudent.ReqStudentNum;
 		}
 
+		///<summary>Inserts one ReqStudent into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReqStudent reqStudent){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(reqStudent,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					reqStudent.ReqStudentNum=DbHelper.GetNextOracleKey("reqstudent","ReqStudentNum"); //Cacheless method
+				}
+				return InsertNoCache(reqStudent,true);
+			}
+		}
+
+		///<summary>Inserts one ReqStudent into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReqStudent reqStudent,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO reqstudent (";
+			if(!useExistingPK && isRandomKeys) {
+				reqStudent.ReqStudentNum=ReplicationServers.GetKeyNoCache("reqstudent","ReqStudentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReqStudentNum,";
+			}
+			command+="ReqNeededNum,Descript,SchoolCourseNum,ProvNum,AptNum,PatNum,InstructorNum,DateCompleted) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(reqStudent.ReqStudentNum)+",";
+			}
+			command+=
+				     POut.Long  (reqStudent.ReqNeededNum)+","
+				+"'"+POut.String(reqStudent.Descript)+"',"
+				+    POut.Long  (reqStudent.SchoolCourseNum)+","
+				+    POut.Long  (reqStudent.ProvNum)+","
+				+    POut.Long  (reqStudent.AptNum)+","
+				+    POut.Long  (reqStudent.PatNum)+","
+				+    POut.Long  (reqStudent.InstructorNum)+","
+				+    POut.Date  (reqStudent.DateCompleted)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				reqStudent.ReqStudentNum=Db.NonQ(command,true);
+			}
+			return reqStudent.ReqStudentNum;
+		}
+
 		///<summary>Updates one ReqStudent in the database.</summary>
 		public static void Update(ReqStudent reqStudent){
 			string command="UPDATE reqstudent SET "

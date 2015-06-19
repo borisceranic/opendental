@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return screenGroup.ScreenGroupNum;
 		}
 
+		///<summary>Inserts one ScreenGroup into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScreenGroup screenGroup){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(screenGroup,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					screenGroup.ScreenGroupNum=DbHelper.GetNextOracleKey("screengroup","ScreenGroupNum"); //Cacheless method
+				}
+				return InsertNoCache(screenGroup,true);
+			}
+		}
+
+		///<summary>Inserts one ScreenGroup into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScreenGroup screenGroup,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO screengroup (";
+			if(!useExistingPK && isRandomKeys) {
+				screenGroup.ScreenGroupNum=ReplicationServers.GetKeyNoCache("screengroup","ScreenGroupNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ScreenGroupNum,";
+			}
+			command+="Description,SGDate) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(screenGroup.ScreenGroupNum)+",";
+			}
+			command+=
+				 "'"+POut.String(screenGroup.Description)+"',"
+				+    POut.Date  (screenGroup.SGDate)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				screenGroup.ScreenGroupNum=Db.NonQ(command,true);
+			}
+			return screenGroup.ScreenGroupNum;
+		}
+
 		///<summary>Updates one ScreenGroup in the database.</summary>
 		public static void Update(ScreenGroup screenGroup){
 			string command="UPDATE screengroup SET "

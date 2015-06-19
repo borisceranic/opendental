@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return medLabFacility.MedLabFacilityNum;
 		}
 
+		///<summary>Inserts one MedLabFacility into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabFacility medLabFacility){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medLabFacility,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medLabFacility.MedLabFacilityNum=DbHelper.GetNextOracleKey("medlabfacility","MedLabFacilityNum"); //Cacheless method
+				}
+				return InsertNoCache(medLabFacility,true);
+			}
+		}
+
+		///<summary>Inserts one MedLabFacility into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabFacility medLabFacility,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medlabfacility (";
+			if(!useExistingPK && isRandomKeys) {
+				medLabFacility.MedLabFacilityNum=ReplicationServers.GetKeyNoCache("medlabfacility","MedLabFacilityNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedLabFacilityNum,";
+			}
+			command+="FacilityName,Address,City,State,Zip,Phone,DirectorTitle,DirectorLName,DirectorFName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medLabFacility.MedLabFacilityNum)+",";
+			}
+			command+=
+				 "'"+POut.String(medLabFacility.FacilityName)+"',"
+				+"'"+POut.String(medLabFacility.Address)+"',"
+				+"'"+POut.String(medLabFacility.City)+"',"
+				+"'"+POut.String(medLabFacility.State)+"',"
+				+"'"+POut.String(medLabFacility.Zip)+"',"
+				+"'"+POut.String(medLabFacility.Phone)+"',"
+				+"'"+POut.String(medLabFacility.DirectorTitle)+"',"
+				+"'"+POut.String(medLabFacility.DirectorLName)+"',"
+				+"'"+POut.String(medLabFacility.DirectorFName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medLabFacility.MedLabFacilityNum=Db.NonQ(command,true);
+			}
+			return medLabFacility.MedLabFacilityNum;
+		}
+
 		///<summary>Updates one MedLabFacility in the database.</summary>
 		public static void Update(MedLabFacility medLabFacility){
 			string command="UPDATE medlabfacility SET "

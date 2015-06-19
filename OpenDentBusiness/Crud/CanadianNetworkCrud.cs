@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return canadianNetwork.CanadianNetworkNum;
 		}
 
+		///<summary>Inserts one CanadianNetwork into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CanadianNetwork canadianNetwork){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(canadianNetwork,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					canadianNetwork.CanadianNetworkNum=DbHelper.GetNextOracleKey("canadiannetwork","CanadianNetworkNum"); //Cacheless method
+				}
+				return InsertNoCache(canadianNetwork,true);
+			}
+		}
+
+		///<summary>Inserts one CanadianNetwork into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CanadianNetwork canadianNetwork,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO canadiannetwork (";
+			if(!useExistingPK && isRandomKeys) {
+				canadianNetwork.CanadianNetworkNum=ReplicationServers.GetKeyNoCache("canadiannetwork","CanadianNetworkNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CanadianNetworkNum,";
+			}
+			command+="Abbrev,Descript,CanadianTransactionPrefix,CanadianIsRprHandler) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(canadianNetwork.CanadianNetworkNum)+",";
+			}
+			command+=
+				 "'"+POut.String(canadianNetwork.Abbrev)+"',"
+				+"'"+POut.String(canadianNetwork.Descript)+"',"
+				+"'"+POut.String(canadianNetwork.CanadianTransactionPrefix)+"',"
+				+    POut.Bool  (canadianNetwork.CanadianIsRprHandler)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				canadianNetwork.CanadianNetworkNum=Db.NonQ(command,true);
+			}
+			return canadianNetwork.CanadianNetworkNum;
+		}
+
 		///<summary>Updates one CanadianNetwork in the database.</summary>
 		public static void Update(CanadianNetwork canadianNetwork){
 			string command="UPDATE canadiannetwork SET "

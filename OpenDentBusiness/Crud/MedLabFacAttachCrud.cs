@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return medLabFacAttach.MedLabFacAttachNum;
 		}
 
+		///<summary>Inserts one MedLabFacAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabFacAttach medLabFacAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medLabFacAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medLabFacAttach.MedLabFacAttachNum=DbHelper.GetNextOracleKey("medlabfacattach","MedLabFacAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(medLabFacAttach,true);
+			}
+		}
+
+		///<summary>Inserts one MedLabFacAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabFacAttach medLabFacAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medlabfacattach (";
+			if(!useExistingPK && isRandomKeys) {
+				medLabFacAttach.MedLabFacAttachNum=ReplicationServers.GetKeyNoCache("medlabfacattach","MedLabFacAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedLabFacAttachNum,";
+			}
+			command+="MedLabNum,MedLabResultNum,MedLabFacilityNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medLabFacAttach.MedLabFacAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (medLabFacAttach.MedLabNum)+","
+				+    POut.Long  (medLabFacAttach.MedLabResultNum)+","
+				+    POut.Long  (medLabFacAttach.MedLabFacilityNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medLabFacAttach.MedLabFacAttachNum=Db.NonQ(command,true);
+			}
+			return medLabFacAttach.MedLabFacAttachNum;
+		}
+
 		///<summary>Updates one MedLabFacAttach in the database.</summary>
 		public static void Update(MedLabFacAttach medLabFacAttach){
 			string command="UPDATE medlabfacattach SET "

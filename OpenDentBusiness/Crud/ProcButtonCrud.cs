@@ -113,6 +113,51 @@ namespace OpenDentBusiness.Crud{
 			return procButton.ProcButtonNum;
 		}
 
+		///<summary>Inserts one ProcButton into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButton procButton){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procButton,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procButton.ProcButtonNum=DbHelper.GetNextOracleKey("procbutton","ProcButtonNum"); //Cacheless method
+				}
+				return InsertNoCache(procButton,true);
+			}
+		}
+
+		///<summary>Inserts one ProcButton into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButton procButton,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procbutton (";
+			if(!useExistingPK && isRandomKeys) {
+				procButton.ProcButtonNum=ReplicationServers.GetKeyNoCache("procbutton","ProcButtonNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcButtonNum,";
+			}
+			command+="Description,ItemOrder,Category,ButtonImage) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procButton.ProcButtonNum)+",";
+			}
+			command+=
+				 "'"+POut.String(procButton.Description)+"',"
+				+    POut.Int   (procButton.ItemOrder)+","
+				+    POut.Long  (procButton.Category)+","
+				+    DbHelper.ParamChar+"paramButtonImage)";
+			if(procButton.ButtonImage==null) {
+				procButton.ButtonImage="";
+			}
+			OdSqlParameter paramButtonImage=new OdSqlParameter("paramButtonImage",OdDbType.Text,procButton.ButtonImage);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramButtonImage);
+			}
+			else {
+				procButton.ProcButtonNum=Db.NonQ(command,true,paramButtonImage);
+			}
+			return procButton.ProcButtonNum;
+		}
+
 		///<summary>Updates one ProcButton in the database.</summary>
 		public static void Update(ProcButton procButton){
 			string command="UPDATE procbutton SET "

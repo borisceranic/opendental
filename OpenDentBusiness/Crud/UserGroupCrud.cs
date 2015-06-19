@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return userGroup.UserGroupNum;
 		}
 
+		///<summary>Inserts one UserGroup into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserGroup userGroup){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(userGroup,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					userGroup.UserGroupNum=DbHelper.GetNextOracleKey("usergroup","UserGroupNum"); //Cacheless method
+				}
+				return InsertNoCache(userGroup,true);
+			}
+		}
+
+		///<summary>Inserts one UserGroup into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserGroup userGroup,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO usergroup (";
+			if(!useExistingPK && isRandomKeys) {
+				userGroup.UserGroupNum=ReplicationServers.GetKeyNoCache("usergroup","UserGroupNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="UserGroupNum,";
+			}
+			command+="Description,UserGroupNumCEMT) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(userGroup.UserGroupNum)+",";
+			}
+			command+=
+				 "'"+POut.String(userGroup.Description)+"',"
+				+    POut.Long  (userGroup.UserGroupNumCEMT)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				userGroup.UserGroupNum=Db.NonQ(command,true);
+			}
+			return userGroup.UserGroupNum;
+		}
+
 		///<summary>Updates one UserGroup in the database.</summary>
 		public static void Update(UserGroup userGroup){
 			string command="UPDATE usergroup SET "

@@ -22,6 +22,7 @@ namespace xCrudGenerator {
 		private const string t3="\t\t\t";
 		private const string t4="\t\t\t\t";
 		private const string t5="\t\t\t\t\t";
+		private const string t6="\t\t\t\t\t\t";
 		private List<Type> tableTypes;
 		private List<Type> tableTypesAll;
 		private List<Type> tableTypesM;
@@ -526,6 +527,177 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t2+"}");
 			}
 			#endregion Insert
+			#region InsertNoCache
+			//InsertNoCache---------------------------------------------------------------------------------------------
+			fieldsExceptPri=null; 
+			if(isMobile) {
+				//Mobile sync does not use cache already.
+			}
+			else {
+				fieldsExceptPri=CrudGenHelper.GetFieldsExceptPriKey(fields,priKey);
+				strb.Append(rn+rn+t2+"///<summary>Inserts one "+typeClass.Name+" into the database.  Returns the new priKey.  Doesn't use the cache.</summary>");
+				strb.Append(rn+t2+"public static long InsertNoCache("+typeClass.Name+" "+obj+"){");
+				strb.Append(rn+t3+"if(DataConnection.DBtype==DatabaseType.MySql) {");
+				strb.Append(rn+t4+"return InsertNoCache("+obj+",false);");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"else {");
+				strb.Append(rn+t4+"if(DataConnection.DBtype==DatabaseType.Oracle) {");
+				strb.Append(rn+t5+obj+"."+priKey.Name+"=DbHelper.GetNextOracleKey(\""+tablename+"\",\""+priKey.Name+"\"); //Cacheless method");
+				strb.Append(rn+t4+"}");
+				strb.Append(rn+t4+"return InsertNoCache("+obj+",true);");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t2+"}");
+				//second override
+				strb.Append(rn+rn+t2+"///<summary>Inserts one "+typeClass.Name+" into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>");
+				strb.Append(rn+t2+"public static long InsertNoCache("+typeClass.Name+" "+obj+",bool useExistingPK){");
+				strb.Append(rn+t3+"bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);");
+				strb.Append(rn+t3+"string command=\"INSERT INTO "+tablename+" (\";");
+				strb.Append(rn+t3+"if(!useExistingPK && isRandomKeys) {");
+				strb.Append(rn+t4+obj+"."+priKey.Name+"=ReplicationServers.GetKeyNoCache(\""+tablename+"\",\""+priKey.Name+"\");");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"if(isRandomKeys || useExistingPK) {");
+				strb.Append(rn+t4+"command+=\""+priKey.Name+",\";");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"command+=\"");
+				for(int f=0;f<fieldsExceptPri.Count;f++) {
+					if(CrudGenHelper.GetSpecialType(fieldsExceptPri[f])==CrudSpecialColType.TimeStamp) {
+						continue;
+					}
+					if(f>0) {
+						strb.Append(",");
+					}
+					strb.Append(fieldsExceptPri[f].Name);
+				}
+				strb.Append(") VALUES(\";");
+				strb.Append(rn+t3+"if(isRandomKeys || useExistingPK) {");
+				strb.Append(rn+t4+"command+=POut.Long("+obj+"."+priKey.Name+")+\",\";");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"command+=");
+			}
+			//a quick and dirty temporary list that just helps keep track of which columns take parameters
+			paramList=new List<OdSqlParameter>();
+			for(int f=0;f<fieldsExceptPri.Count;f++) {
+				strb.Append(rn+t4);
+				specialType=CrudGenHelper.GetSpecialType(fieldsExceptPri[f]);
+				if(specialType==CrudSpecialColType.TimeStamp) {
+					strb.Append("//"+fieldsExceptPri[f].Name+" can only be set by MySQL");
+					continue;
+				}
+				if(f==0) {
+					strb.Append(" ");
+				}
+				else {
+					strb.Append("+");
+				}
+				if(specialType==CrudSpecialColType.DateEntry
+					|| specialType==CrudSpecialColType.DateEntryEditable
+					|| specialType==CrudSpecialColType.DateTEntry
+					|| specialType==CrudSpecialColType.DateTEntryEditable) 
+				{
+					strb.Append("    DbHelper.Now()+\"");
+				}
+				else if(specialType==CrudSpecialColType.DateT) {
+					strb.Append("    POut.DateT ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+				}
+				else if(specialType==CrudSpecialColType.EnumAsString) {
+					strb.Append("\"'\"+POut.String("+obj+"."+fieldsExceptPri[f].Name+".ToString())+\"'");
+				}
+				else if(specialType==CrudSpecialColType.TimeSpanNeg) {
+					strb.Append("\"'\"+POut.TSpan ("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
+				}
+				else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
+					strb.Append("    DbHelper.ParamChar+\"param"+fieldsExceptPri[f].Name);
+					paramList.Add(new OdSqlParameter(fieldsExceptPri[f].Name,OdDbType.Text,specialType));
+				}
+				else if(fieldsExceptPri[f].FieldType.IsEnum) {
+					strb.Append("    POut.Int   ((int)"+obj+"."+fieldsExceptPri[f].Name+")+\"");
+				}
+				else switch(fieldsExceptPri[f].FieldType.Name) {
+					default:
+						throw new ApplicationException("Type not yet supported: "+fieldsExceptPri[f].FieldType.Name);
+					case "Bitmap":
+						strb.Append("    POut.Bitmap("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Boolean":
+						strb.Append("    POut.Bool  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Byte":
+						strb.Append("    POut.Byte  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Color":
+						strb.Append("    POut.Int   ("+obj+"."+fieldsExceptPri[f].Name+".ToArgb())+\"");
+						break;
+					case "DateTime"://This is only for date, not dateT.
+						strb.Append("    POut.Date  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Double":
+						strb.Append("\"'\"+POut.Double("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
+						break;
+					case "Interval":
+						strb.Append("    POut.Int   ("+obj+"."+fieldsExceptPri[f].Name+".ToInt())+\"");
+						break;
+					case "Int64":
+						strb.Append("    POut.Long  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Int32":
+						strb.Append("    POut.Int   ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "Single":
+						strb.Append("    POut.Float ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+					case "String":
+						strb.Append("\"'\"+POut.String("+obj+"."+fieldsExceptPri[f].Name+")+\"'");
+						break;
+					case "TimeSpan":
+						strb.Append("    POut.Time  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
+						break;
+				}
+				if(f==fieldsExceptPri.Count-2
+					&& CrudGenHelper.GetSpecialType(fieldsExceptPri[f+1])==CrudSpecialColType.TimeStamp) 
+				{
+					//in case the last field is a timestamp
+					strb.Append(")\";");
+				}
+				else if(f<fieldsExceptPri.Count-1) {
+					strb.Append(",\"");
+				}
+				else {
+					strb.Append(")\";");
+				}
+			}
+			for(int i=0;i<paramList.Count;i++) {
+				strb.Append(rn+t3+"if("+obj+"."+paramList[i].ParameterName+"==null) {");
+				strb.Append(rn+t4+""+obj+"."+paramList[i].ParameterName+"=\"\";");
+				strb.Append(rn+t3+"}");
+				//example: OdSqlParameter paramNote=new OdSqlParameter("paramNote",
+				//           OdDbType.Text,procNote.Note);
+				strb.Append(rn+t3+"OdSqlParameter param"+paramList[i].ParameterName+"=new OdSqlParameter(\"param"+paramList[i].ParameterName+"\","
+					+"OdDbType.Text,");
+				if((CrudSpecialColType)paramList[i].Value==CrudSpecialColType.TextIsClobNote) {
+					strb.Append("POut.StringNote("+obj+"."+paramList[i].ParameterName+"));");//This is where large amounts of consecutive newlines are stripped away.
+				}
+				else {
+					strb.Append(obj+"."+paramList[i].ParameterName+");");
+				}
+			}
+			paramsString="";//example: ,paramNote,paramAltNote
+			for(int i=0;i<paramList.Count;i++){
+				paramsString+=",param"+paramList[i].ParameterName;
+			}	
+			if(isMobile) {
+				//Not supported.
+			}
+			else {
+				strb.Append(rn+t3+"if(useExistingPK || PrefC.RandomKeys) {");
+				strb.Append(rn+t4+"Db.NonQ(command"+paramsString+");");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"else {");
+				strb.Append(rn+t4+obj+"."+priKey.Name+"=Db.NonQ(command,true"+paramsString+");");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"return "+obj+"."+priKey.Name+";");
+				strb.Append(rn+t2+"}");
+			}
+			#endregion InsertNoCache			
 			#region Update
 			//Update---------------------------------------------------------------------------------------------
 			strb.Append(rn+rn+t2+"///<summary>Updates one "+typeClass.Name+" in the database.</summary>");

@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return autoNote.AutoNoteNum;
 		}
 
+		///<summary>Inserts one AutoNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoNote autoNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(autoNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					autoNote.AutoNoteNum=DbHelper.GetNextOracleKey("autonote","AutoNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(autoNote,true);
+			}
+		}
+
+		///<summary>Inserts one AutoNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoNote autoNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO autonote (";
+			if(!useExistingPK && isRandomKeys) {
+				autoNote.AutoNoteNum=ReplicationServers.GetKeyNoCache("autonote","AutoNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AutoNoteNum,";
+			}
+			command+="AutoNoteName,MainText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(autoNote.AutoNoteNum)+",";
+			}
+			command+=
+				 "'"+POut.String(autoNote.AutoNoteName)+"',"
+				+"'"+POut.String(autoNote.MainText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				autoNote.AutoNoteNum=Db.NonQ(command,true);
+			}
+			return autoNote.AutoNoteNum;
+		}
+
 		///<summary>Updates one AutoNote in the database.</summary>
 		public static void Update(AutoNote autoNote){
 			string command="UPDATE autonote SET "

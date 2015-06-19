@@ -109,6 +109,49 @@ namespace OpenDentBusiness.Crud{
 			return letter.LetterNum;
 		}
 
+		///<summary>Inserts one Letter into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Letter letter){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(letter,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					letter.LetterNum=DbHelper.GetNextOracleKey("letter","LetterNum"); //Cacheless method
+				}
+				return InsertNoCache(letter,true);
+			}
+		}
+
+		///<summary>Inserts one Letter into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Letter letter,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO letter (";
+			if(!useExistingPK && isRandomKeys) {
+				letter.LetterNum=ReplicationServers.GetKeyNoCache("letter","LetterNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LetterNum,";
+			}
+			command+="Description,BodyText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(letter.LetterNum)+",";
+			}
+			command+=
+				 "'"+POut.String(letter.Description)+"',"
+				+    DbHelper.ParamChar+"paramBodyText)";
+			if(letter.BodyText==null) {
+				letter.BodyText="";
+			}
+			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,letter.BodyText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramBodyText);
+			}
+			else {
+				letter.LetterNum=Db.NonQ(command,true,paramBodyText);
+			}
+			return letter.LetterNum;
+		}
+
 		///<summary>Updates one Letter in the database.</summary>
 		public static void Update(Letter letter){
 			string command="UPDATE letter SET "

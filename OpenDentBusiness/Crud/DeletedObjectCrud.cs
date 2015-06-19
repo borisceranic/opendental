@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return deletedObject.DeletedObjectNum;
 		}
 
+		///<summary>Inserts one DeletedObject into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DeletedObject deletedObject){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(deletedObject,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					deletedObject.DeletedObjectNum=DbHelper.GetNextOracleKey("deletedobject","DeletedObjectNum"); //Cacheless method
+				}
+				return InsertNoCache(deletedObject,true);
+			}
+		}
+
+		///<summary>Inserts one DeletedObject into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DeletedObject deletedObject,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO deletedobject (";
+			if(!useExistingPK && isRandomKeys) {
+				deletedObject.DeletedObjectNum=ReplicationServers.GetKeyNoCache("deletedobject","DeletedObjectNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DeletedObjectNum,";
+			}
+			command+="ObjectNum,ObjectType) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(deletedObject.DeletedObjectNum)+",";
+			}
+			command+=
+				     POut.Long  (deletedObject.ObjectNum)+","
+				+    POut.Int   ((int)deletedObject.ObjectType)+")";
+				//DateTStamp can only be set by MySQL
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				deletedObject.DeletedObjectNum=Db.NonQ(command,true);
+			}
+			return deletedObject.DeletedObjectNum;
+		}
+
 		///<summary>Updates one DeletedObject in the database.</summary>
 		public static void Update(DeletedObject deletedObject){
 			string command="UPDATE deletedobject SET "

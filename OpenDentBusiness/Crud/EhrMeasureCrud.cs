@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return ehrMeasure.EhrMeasureNum;
 		}
 
+		///<summary>Inserts one EhrMeasure into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrMeasure ehrMeasure){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrMeasure,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrMeasure.EhrMeasureNum=DbHelper.GetNextOracleKey("ehrmeasure","EhrMeasureNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrMeasure,true);
+			}
+		}
+
+		///<summary>Inserts one EhrMeasure into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrMeasure ehrMeasure,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrmeasure (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrMeasure.EhrMeasureNum=ReplicationServers.GetKeyNoCache("ehrmeasure","EhrMeasureNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrMeasureNum,";
+			}
+			command+="MeasureType,Numerator,Denominator) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrMeasure.EhrMeasureNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)ehrMeasure.MeasureType)+","
+				+    POut.Int   (ehrMeasure.Numerator)+","
+				+    POut.Int   (ehrMeasure.Denominator)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrMeasure.EhrMeasureNum=Db.NonQ(command,true);
+			}
+			return ehrMeasure.EhrMeasureNum;
+		}
+
 		///<summary>Updates one EhrMeasure in the database.</summary>
 		public static void Update(EhrMeasure ehrMeasure){
 			string command="UPDATE ehrmeasure SET "

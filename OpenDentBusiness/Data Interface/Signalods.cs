@@ -326,8 +326,12 @@ namespace OpenDentBusiness{
 			Insert(sig);
 		}
 
-		///<summary>Sends a signal for cache refresh to a database and doesn't use the local cache.  Useful for multithreaded connections.</summary>
+		///<summary>Insertion logic that doesn't use the cache. Has special cases for generating random PK's and handling Oracle insertions.</summary>
 		public static void SetInvalidNoCache(params InvalidType[] itypes) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),itypes);
+				return;
+			}
 			string itypeString="";
 			for(int i=0;i<itypes.Length;i++) {
 				if(i>0) {
@@ -341,17 +345,7 @@ namespace OpenDentBusiness{
 			sig.SigType=SignalType.Invalid;
 			sig.TaskNum=0;
 			sig.SigDateTime=MiscData.GetNowDateTime();
-			string command="INSERT INTO signalod (FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum) VALUES("
-				+"'',"
-				+sig.ITypes+","
-				+POut.DateT(sig.DateViewing)+","
-				+(int)sig.SigType+","
-				+"'',"
-				+POut.DateT(sig.SigDateTime)+","
-				+"'',"
-				+POut.DateT(sig.AckTime)+","
-				+sig.TaskNum+")";
-			Db.NonQ(command);
+			Crud.SignalodCrud.InsertNoCache(sig);
 		}
 
 		///<summary>Acknowledge one signal from the manage module grid</summary>

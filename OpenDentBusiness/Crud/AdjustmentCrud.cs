@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return adjustment.AdjNum;
 		}
 
+		///<summary>Inserts one Adjustment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Adjustment adjustment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(adjustment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					adjustment.AdjNum=DbHelper.GetNextOracleKey("adjustment","AdjNum"); //Cacheless method
+				}
+				return InsertNoCache(adjustment,true);
+			}
+		}
+
+		///<summary>Inserts one Adjustment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Adjustment adjustment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO adjustment (";
+			if(!useExistingPK && isRandomKeys) {
+				adjustment.AdjNum=ReplicationServers.GetKeyNoCache("adjustment","AdjNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AdjNum,";
+			}
+			command+="AdjDate,AdjAmt,PatNum,AdjType,ProvNum,AdjNote,ProcDate,ProcNum,DateEntry,ClinicNum,StatementNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(adjustment.AdjNum)+",";
+			}
+			command+=
+				     POut.Date  (adjustment.AdjDate)+","
+				+"'"+POut.Double(adjustment.AdjAmt)+"',"
+				+    POut.Long  (adjustment.PatNum)+","
+				+    POut.Long  (adjustment.AdjType)+","
+				+    POut.Long  (adjustment.ProvNum)+","
+				+"'"+POut.String(adjustment.AdjNote)+"',"
+				+    POut.Date  (adjustment.ProcDate)+","
+				+    POut.Long  (adjustment.ProcNum)+","
+				+    DbHelper.Now()+","
+				+    POut.Long  (adjustment.ClinicNum)+","
+				+    POut.Long  (adjustment.StatementNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				adjustment.AdjNum=Db.NonQ(command,true);
+			}
+			return adjustment.AdjNum;
+		}
+
 		///<summary>Updates one Adjustment in the database.</summary>
 		public static void Update(Adjustment adjustment){
 			string command="UPDATE adjustment SET "

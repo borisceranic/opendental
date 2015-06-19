@@ -107,6 +107,48 @@ namespace OpenDentBusiness.Crud{
 			return etransMessageText.EtransMessageTextNum;
 		}
 
+		///<summary>Inserts one EtransMessageText into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EtransMessageText etransMessageText){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(etransMessageText,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					etransMessageText.EtransMessageTextNum=DbHelper.GetNextOracleKey("etransmessagetext","EtransMessageTextNum"); //Cacheless method
+				}
+				return InsertNoCache(etransMessageText,true);
+			}
+		}
+
+		///<summary>Inserts one EtransMessageText into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EtransMessageText etransMessageText,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO etransmessagetext (";
+			if(!useExistingPK && isRandomKeys) {
+				etransMessageText.EtransMessageTextNum=ReplicationServers.GetKeyNoCache("etransmessagetext","EtransMessageTextNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EtransMessageTextNum,";
+			}
+			command+="MessageText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(etransMessageText.EtransMessageTextNum)+",";
+			}
+			command+=
+				     DbHelper.ParamChar+"paramMessageText)";
+			if(etransMessageText.MessageText==null) {
+				etransMessageText.MessageText="";
+			}
+			OdSqlParameter paramMessageText=new OdSqlParameter("paramMessageText",OdDbType.Text,etransMessageText.MessageText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMessageText);
+			}
+			else {
+				etransMessageText.EtransMessageTextNum=Db.NonQ(command,true,paramMessageText);
+			}
+			return etransMessageText.EtransMessageTextNum;
+		}
+
 		///<summary>Updates one EtransMessageText in the database.</summary>
 		public static void Update(EtransMessageText etransMessageText){
 			string command="UPDATE etransmessagetext SET "

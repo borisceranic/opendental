@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return connGroupAttach.ConnGroupAttachNum;
 		}
 
+		///<summary>Inserts one ConnGroupAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ConnGroupAttach connGroupAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(connGroupAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					connGroupAttach.ConnGroupAttachNum=DbHelper.GetNextOracleKey("conngroupattach","ConnGroupAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(connGroupAttach,true);
+			}
+		}
+
+		///<summary>Inserts one ConnGroupAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ConnGroupAttach connGroupAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO conngroupattach (";
+			if(!useExistingPK && isRandomKeys) {
+				connGroupAttach.ConnGroupAttachNum=ReplicationServers.GetKeyNoCache("conngroupattach","ConnGroupAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ConnGroupAttachNum,";
+			}
+			command+="ConnectionGroupNum,CentralConnectionNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(connGroupAttach.ConnGroupAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (connGroupAttach.ConnectionGroupNum)+","
+				+    POut.Long  (connGroupAttach.CentralConnectionNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				connGroupAttach.ConnGroupAttachNum=Db.NonQ(command,true);
+			}
+			return connGroupAttach.ConnGroupAttachNum;
+		}
+
 		///<summary>Updates one ConnGroupAttach in the database.</summary>
 		public static void Update(ConnGroupAttach connGroupAttach){
 			string command="UPDATE conngroupattach SET "

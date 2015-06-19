@@ -157,6 +157,71 @@ namespace OpenDentBusiness.Crud{
 			return insPlan.PlanNum;
 		}
 
+		///<summary>Inserts one InsPlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsPlan insPlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(insPlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					insPlan.PlanNum=DbHelper.GetNextOracleKey("insplan","PlanNum"); //Cacheless method
+				}
+				return InsertNoCache(insPlan,true);
+			}
+		}
+
+		///<summary>Inserts one InsPlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsPlan insPlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO insplan (";
+			if(!useExistingPK && isRandomKeys) {
+				insPlan.PlanNum=ReplicationServers.GetKeyNoCache("insplan","PlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PlanNum,";
+			}
+			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(insPlan.PlanNum)+",";
+			}
+			command+=
+				 "'"+POut.String(insPlan.GroupName)+"',"
+				+"'"+POut.String(insPlan.GroupNum)+"',"
+				+"'"+POut.String(insPlan.PlanNote)+"',"
+				+    POut.Long  (insPlan.FeeSched)+","
+				+"'"+POut.String(insPlan.PlanType)+"',"
+				+    POut.Long  (insPlan.ClaimFormNum)+","
+				+    POut.Bool  (insPlan.UseAltCode)+","
+				+    POut.Bool  (insPlan.ClaimsUseUCR)+","
+				+    POut.Long  (insPlan.CopayFeeSched)+","
+				+    POut.Long  (insPlan.EmployerNum)+","
+				+    POut.Long  (insPlan.CarrierNum)+","
+				+    POut.Long  (insPlan.AllowedFeeSched)+","
+				+"'"+POut.String(insPlan.TrojanID)+"',"
+				+"'"+POut.String(insPlan.DivisionNo)+"',"
+				+    POut.Bool  (insPlan.IsMedical)+","
+				+    POut.Long  (insPlan.FilingCode)+","
+				+    POut.Byte  (insPlan.DentaideCardSequence)+","
+				+    POut.Bool  (insPlan.ShowBaseUnits)+","
+				+    POut.Bool  (insPlan.CodeSubstNone)+","
+				+    POut.Bool  (insPlan.IsHidden)+","
+				+    POut.Byte  (insPlan.MonthRenew)+","
+				+    POut.Long  (insPlan.FilingCodeSubtype)+","
+				+"'"+POut.String(insPlan.CanadianPlanFlag)+"',"
+				+"'"+POut.String(insPlan.CanadianDiagnosticCode)+"',"
+				+"'"+POut.String(insPlan.CanadianInstitutionCode)+"',"
+				+"'"+POut.String(insPlan.RxBIN)+"',"
+				+    POut.Int   ((int)insPlan.CobRule)+","
+				+"'"+POut.String(insPlan.SopCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				insPlan.PlanNum=Db.NonQ(command,true);
+			}
+			return insPlan.PlanNum;
+		}
+
 		///<summary>Updates one InsPlan in the database.</summary>
 		public static void Update(InsPlan insPlan){
 			string command="UPDATE insplan SET "

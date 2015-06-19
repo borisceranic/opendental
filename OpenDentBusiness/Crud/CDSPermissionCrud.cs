@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return cDSPermission.CDSPermissionNum;
 		}
 
+		///<summary>Inserts one CDSPermission into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CDSPermission cDSPermission){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(cDSPermission,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					cDSPermission.CDSPermissionNum=DbHelper.GetNextOracleKey("cdspermission","CDSPermissionNum"); //Cacheless method
+				}
+				return InsertNoCache(cDSPermission,true);
+			}
+		}
+
+		///<summary>Inserts one CDSPermission into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CDSPermission cDSPermission,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO cdspermission (";
+			if(!useExistingPK && isRandomKeys) {
+				cDSPermission.CDSPermissionNum=ReplicationServers.GetKeyNoCache("cdspermission","CDSPermissionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CDSPermissionNum,";
+			}
+			command+="UserNum,SetupCDS,ShowCDS,ShowInfobutton,EditBibliography,ProblemCDS,MedicationCDS,AllergyCDS,DemographicCDS,LabTestCDS,VitalCDS) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(cDSPermission.CDSPermissionNum)+",";
+			}
+			command+=
+				     POut.Long  (cDSPermission.UserNum)+","
+				+    POut.Bool  (cDSPermission.SetupCDS)+","
+				+    POut.Bool  (cDSPermission.ShowCDS)+","
+				+    POut.Bool  (cDSPermission.ShowInfobutton)+","
+				+    POut.Bool  (cDSPermission.EditBibliography)+","
+				+    POut.Bool  (cDSPermission.ProblemCDS)+","
+				+    POut.Bool  (cDSPermission.MedicationCDS)+","
+				+    POut.Bool  (cDSPermission.AllergyCDS)+","
+				+    POut.Bool  (cDSPermission.DemographicCDS)+","
+				+    POut.Bool  (cDSPermission.LabTestCDS)+","
+				+    POut.Bool  (cDSPermission.VitalCDS)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				cDSPermission.CDSPermissionNum=Db.NonQ(command,true);
+			}
+			return cDSPermission.CDSPermissionNum;
+		}
+
 		///<summary>Updates one CDSPermission in the database.</summary>
 		public static void Update(CDSPermission cDSPermission){
 			string command="UPDATE cdspermission SET "

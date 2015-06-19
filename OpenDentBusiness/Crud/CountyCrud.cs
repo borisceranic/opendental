@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return county.CountyNum;
 		}
 
+		///<summary>Inserts one County into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(County county){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(county,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					county.CountyNum=DbHelper.GetNextOracleKey("county","CountyNum"); //Cacheless method
+				}
+				return InsertNoCache(county,true);
+			}
+		}
+
+		///<summary>Inserts one County into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(County county,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO county (";
+			if(!useExistingPK && isRandomKeys) {
+				county.CountyNum=ReplicationServers.GetKeyNoCache("county","CountyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CountyNum,";
+			}
+			command+="CountyName,CountyCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(county.CountyNum)+",";
+			}
+			command+=
+				 "'"+POut.String(county.CountyName)+"',"
+				+"'"+POut.String(county.CountyCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				county.CountyNum=Db.NonQ(command,true);
+			}
+			return county.CountyNum;
+		}
+
 		///<summary>Updates one County in the database.</summary>
 		public static void Update(County county){
 			string command="UPDATE county SET "

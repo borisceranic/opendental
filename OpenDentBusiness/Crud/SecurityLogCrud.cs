@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return securityLog.SecurityLogNum;
 		}
 
+		///<summary>Inserts one SecurityLog into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SecurityLog securityLog){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(securityLog,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					securityLog.SecurityLogNum=DbHelper.GetNextOracleKey("securitylog","SecurityLogNum"); //Cacheless method
+				}
+				return InsertNoCache(securityLog,true);
+			}
+		}
+
+		///<summary>Inserts one SecurityLog into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SecurityLog securityLog,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO securitylog (";
+			if(!useExistingPK && isRandomKeys) {
+				securityLog.SecurityLogNum=ReplicationServers.GetKeyNoCache("securitylog","SecurityLogNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SecurityLogNum,";
+			}
+			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(securityLog.SecurityLogNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)securityLog.PermType)+","
+				+    POut.Long  (securityLog.UserNum)+","
+				+    DbHelper.Now()+","
+				+"'"+POut.String(securityLog.LogText)+"',"
+				+    POut.Long  (securityLog.PatNum)+","
+				+"'"+POut.String(securityLog.CompName)+"',"
+				+    POut.Long  (securityLog.FKey)+","
+				+    POut.Int   ((int)securityLog.LogSource)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				securityLog.SecurityLogNum=Db.NonQ(command,true);
+			}
+			return securityLog.SecurityLogNum;
+		}
+
 		///<summary>Updates one SecurityLog in the database.</summary>
 		public static void Update(SecurityLog securityLog){
 			string command="UPDATE securitylog SET "

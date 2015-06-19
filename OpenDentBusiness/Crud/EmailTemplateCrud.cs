@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return emailTemplate.EmailTemplateNum;
 		}
 
+		///<summary>Inserts one EmailTemplate into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailTemplate emailTemplate){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(emailTemplate,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					emailTemplate.EmailTemplateNum=DbHelper.GetNextOracleKey("emailtemplate","EmailTemplateNum"); //Cacheless method
+				}
+				return InsertNoCache(emailTemplate,true);
+			}
+		}
+
+		///<summary>Inserts one EmailTemplate into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailTemplate emailTemplate,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO emailtemplate (";
+			if(!useExistingPK && isRandomKeys) {
+				emailTemplate.EmailTemplateNum=ReplicationServers.GetKeyNoCache("emailtemplate","EmailTemplateNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmailTemplateNum,";
+			}
+			command+="Subject,BodyText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(emailTemplate.EmailTemplateNum)+",";
+			}
+			command+=
+				 "'"+POut.String(emailTemplate.Subject)+"',"
+				+"'"+POut.String(emailTemplate.BodyText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				emailTemplate.EmailTemplateNum=Db.NonQ(command,true);
+			}
+			return emailTemplate.EmailTemplateNum;
+		}
+
 		///<summary>Updates one EmailTemplate in the database.</summary>
 		public static void Update(EmailTemplate emailTemplate){
 			string command="UPDATE emailtemplate SET "

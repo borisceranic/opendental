@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return securityLogHash.SecurityLogHashNum;
 		}
 
+		///<summary>Inserts one SecurityLogHash into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SecurityLogHash securityLogHash){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(securityLogHash,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					securityLogHash.SecurityLogHashNum=DbHelper.GetNextOracleKey("securityloghash","SecurityLogHashNum"); //Cacheless method
+				}
+				return InsertNoCache(securityLogHash,true);
+			}
+		}
+
+		///<summary>Inserts one SecurityLogHash into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SecurityLogHash securityLogHash,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO securityloghash (";
+			if(!useExistingPK && isRandomKeys) {
+				securityLogHash.SecurityLogHashNum=ReplicationServers.GetKeyNoCache("securityloghash","SecurityLogHashNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SecurityLogHashNum,";
+			}
+			command+="SecurityLogNum,LogHash) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(securityLogHash.SecurityLogHashNum)+",";
+			}
+			command+=
+				     POut.Long  (securityLogHash.SecurityLogNum)+","
+				+"'"+POut.String(securityLogHash.LogHash)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				securityLogHash.SecurityLogHashNum=Db.NonQ(command,true);
+			}
+			return securityLogHash.SecurityLogHashNum;
+		}
+
 		///<summary>Updates one SecurityLogHash in the database.</summary>
 		public static void Update(SecurityLogHash securityLogHash){
 			string command="UPDATE securityloghash SET "

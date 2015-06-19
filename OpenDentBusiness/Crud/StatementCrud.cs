@@ -141,6 +141,65 @@ namespace OpenDentBusiness.Crud{
 			return statement.StatementNum;
 		}
 
+		///<summary>Inserts one Statement into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Statement statement){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(statement,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					statement.StatementNum=DbHelper.GetNextOracleKey("statement","StatementNum"); //Cacheless method
+				}
+				return InsertNoCache(statement,true);
+			}
+		}
+
+		///<summary>Inserts one Statement into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Statement statement,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO statement (";
+			if(!useExistingPK && isRandomKeys) {
+				statement.StatementNum=ReplicationServers.GetKeyNoCache("statement","StatementNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="StatementNum,";
+			}
+			command+="PatNum,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(statement.StatementNum)+",";
+			}
+			command+=
+				     POut.Long  (statement.PatNum)+","
+				+    POut.Date  (statement.DateSent)+","
+				+    POut.Date  (statement.DateRangeFrom)+","
+				+    POut.Date  (statement.DateRangeTo)+","
+				+"'"+POut.String(statement.Note)+"',"
+				+"'"+POut.String(statement.NoteBold)+"',"
+				+    POut.Int   ((int)statement.Mode_)+","
+				+    POut.Bool  (statement.HidePayment)+","
+				+    POut.Bool  (statement.SinglePatient)+","
+				+    POut.Bool  (statement.Intermingled)+","
+				+    POut.Bool  (statement.IsSent)+","
+				+    POut.Long  (statement.DocNum)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Bool  (statement.IsReceipt)+","
+				+    POut.Bool  (statement.IsInvoice)+","
+				+    POut.Bool  (statement.IsInvoiceCopy)+","
+				+"'"+POut.String(statement.EmailSubject)+"',"
+				+    DbHelper.ParamChar+"paramEmailBody)";
+			if(statement.EmailBody==null) {
+				statement.EmailBody="";
+			}
+			OdSqlParameter paramEmailBody=new OdSqlParameter("paramEmailBody",OdDbType.Text,statement.EmailBody);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramEmailBody);
+			}
+			else {
+				statement.StatementNum=Db.NonQ(command,true,paramEmailBody);
+			}
+			return statement.StatementNum;
+		}
+
 		///<summary>Updates one Statement in the database.</summary>
 		public static void Update(Statement statement){
 			string command="UPDATE statement SET "

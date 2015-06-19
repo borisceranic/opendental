@@ -129,6 +129,57 @@ namespace OpenDentBusiness.Crud{
 			return xChargeTransaction.XChargeTransactionNum;
 		}
 
+		///<summary>Inserts one XChargeTransaction into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(XChargeTransaction xChargeTransaction){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(xChargeTransaction,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					xChargeTransaction.XChargeTransactionNum=DbHelper.GetNextOracleKey("xchargetransaction","XChargeTransactionNum"); //Cacheless method
+				}
+				return InsertNoCache(xChargeTransaction,true);
+			}
+		}
+
+		///<summary>Inserts one XChargeTransaction into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(XChargeTransaction xChargeTransaction,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO xchargetransaction (";
+			if(!useExistingPK && isRandomKeys) {
+				xChargeTransaction.XChargeTransactionNum=ReplicationServers.GetKeyNoCache("xchargetransaction","XChargeTransactionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="XChargeTransactionNum,";
+			}
+			command+="TransType,Amount,CCEntry,PatNum,Result,ClerkID,ResultCode,Expiration,CCType,CreditCardNum,BatchNum,ItemNum,ApprCode,TransactionDateTime) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(xChargeTransaction.XChargeTransactionNum)+",";
+			}
+			command+=
+				 "'"+POut.String(xChargeTransaction.TransType)+"',"
+				+"'"+POut.Double(xChargeTransaction.Amount)+"',"
+				+"'"+POut.String(xChargeTransaction.CCEntry)+"',"
+				+    POut.Long  (xChargeTransaction.PatNum)+","
+				+"'"+POut.String(xChargeTransaction.Result)+"',"
+				+"'"+POut.String(xChargeTransaction.ClerkID)+"',"
+				+"'"+POut.String(xChargeTransaction.ResultCode)+"',"
+				+"'"+POut.String(xChargeTransaction.Expiration)+"',"
+				+"'"+POut.String(xChargeTransaction.CCType)+"',"
+				+"'"+POut.String(xChargeTransaction.CreditCardNum)+"',"
+				+"'"+POut.String(xChargeTransaction.BatchNum)+"',"
+				+"'"+POut.String(xChargeTransaction.ItemNum)+"',"
+				+"'"+POut.String(xChargeTransaction.ApprCode)+"',"
+				+    POut.DateT (xChargeTransaction.TransactionDateTime)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				xChargeTransaction.XChargeTransactionNum=Db.NonQ(command,true);
+			}
+			return xChargeTransaction.XChargeTransactionNum;
+		}
+
 		///<summary>Updates one XChargeTransaction in the database.</summary>
 		public static void Update(XChargeTransaction xChargeTransaction){
 			string command="UPDATE xchargetransaction SET "

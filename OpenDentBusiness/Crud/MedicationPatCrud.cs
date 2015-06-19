@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return medicationPat.MedicationPatNum;
 		}
 
+		///<summary>Inserts one MedicationPat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedicationPat medicationPat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medicationPat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medicationPat.MedicationPatNum=DbHelper.GetNextOracleKey("medicationpat","MedicationPatNum"); //Cacheless method
+				}
+				return InsertNoCache(medicationPat,true);
+			}
+		}
+
+		///<summary>Inserts one MedicationPat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedicationPat medicationPat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medicationpat (";
+			if(!useExistingPK && isRandomKeys) {
+				medicationPat.MedicationPatNum=ReplicationServers.GetKeyNoCache("medicationpat","MedicationPatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedicationPatNum,";
+			}
+			command+="PatNum,MedicationNum,PatNote,DateStart,DateStop,ProvNum,MedDescript,RxCui,NewCropGuid,IsCpoe) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medicationPat.MedicationPatNum)+",";
+			}
+			command+=
+				     POut.Long  (medicationPat.PatNum)+","
+				+    POut.Long  (medicationPat.MedicationNum)+","
+				+"'"+POut.String(medicationPat.PatNote)+"',"
+				//DateTStamp can only be set by MySQL
+				+    POut.Date  (medicationPat.DateStart)+","
+				+    POut.Date  (medicationPat.DateStop)+","
+				+    POut.Long  (medicationPat.ProvNum)+","
+				+"'"+POut.String(medicationPat.MedDescript)+"',"
+				+    POut.Long  (medicationPat.RxCui)+","
+				+"'"+POut.String(medicationPat.NewCropGuid)+"',"
+				+    POut.Bool  (medicationPat.IsCpoe)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medicationPat.MedicationPatNum=Db.NonQ(command,true);
+			}
+			return medicationPat.MedicationPatNum;
+		}
+
 		///<summary>Updates one MedicationPat in the database.</summary>
 		public static void Update(MedicationPat medicationPat){
 			string command="UPDATE medicationpat SET "

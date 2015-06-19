@@ -137,6 +137,61 @@ namespace OpenDentBusiness.Crud{
 			return loinc.LoincNum;
 		}
 
+		///<summary>Inserts one Loinc into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Loinc loinc){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(loinc,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					loinc.LoincNum=DbHelper.GetNextOracleKey("loinc","LoincNum"); //Cacheless method
+				}
+				return InsertNoCache(loinc,true);
+			}
+		}
+
+		///<summary>Inserts one Loinc into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Loinc loinc,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO loinc (";
+			if(!useExistingPK && isRandomKeys) {
+				loinc.LoincNum=ReplicationServers.GetKeyNoCache("loinc","LoincNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LoincNum,";
+			}
+			command+="LoincCode,Component,PropertyObserved,TimeAspct,SystemMeasured,ScaleType,MethodType,StatusOfCode,NameShort,ClassType,UnitsRequired,OrderObs,HL7FieldSubfieldID,ExternalCopyrightNotice,NameLongCommon,UnitsUCUM,RankCommonTests,RankCommonOrders) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(loinc.LoincNum)+",";
+			}
+			command+=
+				 "'"+POut.String(loinc.LoincCode)+"',"
+				+"'"+POut.String(loinc.Component)+"',"
+				+"'"+POut.String(loinc.PropertyObserved)+"',"
+				+"'"+POut.String(loinc.TimeAspct)+"',"
+				+"'"+POut.String(loinc.SystemMeasured)+"',"
+				+"'"+POut.String(loinc.ScaleType)+"',"
+				+"'"+POut.String(loinc.MethodType)+"',"
+				+"'"+POut.String(loinc.StatusOfCode)+"',"
+				+"'"+POut.String(loinc.NameShort)+"',"
+				+"'"+POut.String(loinc.ClassType)+"',"
+				+    POut.Bool  (loinc.UnitsRequired)+","
+				+"'"+POut.String(loinc.OrderObs)+"',"
+				+"'"+POut.String(loinc.HL7FieldSubfieldID)+"',"
+				+"'"+POut.String(loinc.ExternalCopyrightNotice)+"',"
+				+"'"+POut.String(loinc.NameLongCommon)+"',"
+				+"'"+POut.String(loinc.UnitsUCUM)+"',"
+				+    POut.Int   (loinc.RankCommonTests)+","
+				+    POut.Int   (loinc.RankCommonOrders)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				loinc.LoincNum=Db.NonQ(command,true);
+			}
+			return loinc.LoincNum;
+		}
+
 		///<summary>Updates one Loinc in the database.</summary>
 		public static void Update(Loinc loinc){
 			string command="UPDATE loinc SET "

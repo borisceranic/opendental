@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return medLabSpecimen.MedLabSpecimenNum;
 		}
 
+		///<summary>Inserts one MedLabSpecimen into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabSpecimen medLabSpecimen){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medLabSpecimen,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medLabSpecimen.MedLabSpecimenNum=DbHelper.GetNextOracleKey("medlabspecimen","MedLabSpecimenNum"); //Cacheless method
+				}
+				return InsertNoCache(medLabSpecimen,true);
+			}
+		}
+
+		///<summary>Inserts one MedLabSpecimen into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabSpecimen medLabSpecimen,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medlabspecimen (";
+			if(!useExistingPK && isRandomKeys) {
+				medLabSpecimen.MedLabSpecimenNum=ReplicationServers.GetKeyNoCache("medlabspecimen","MedLabSpecimenNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedLabSpecimenNum,";
+			}
+			command+="MedLabNum,SpecimenID,SpecimenDescript,DateTimeCollected) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medLabSpecimen.MedLabSpecimenNum)+",";
+			}
+			command+=
+				     POut.Long  (medLabSpecimen.MedLabNum)+","
+				+"'"+POut.String(medLabSpecimen.SpecimenID)+"',"
+				+"'"+POut.String(medLabSpecimen.SpecimenDescript)+"',"
+				+    POut.DateT (medLabSpecimen.DateTimeCollected)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medLabSpecimen.MedLabSpecimenNum=Db.NonQ(command,true);
+			}
+			return medLabSpecimen.MedLabSpecimenNum;
+		}
+
 		///<summary>Updates one MedLabSpecimen in the database.</summary>
 		public static void Update(MedLabSpecimen medLabSpecimen){
 			string command="UPDATE medlabspecimen SET "

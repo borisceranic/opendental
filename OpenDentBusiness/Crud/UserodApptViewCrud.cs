@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return userodApptView.UserodApptViewNum;
 		}
 
+		///<summary>Inserts one UserodApptView into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserodApptView userodApptView){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(userodApptView,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					userodApptView.UserodApptViewNum=DbHelper.GetNextOracleKey("userodapptview","UserodApptViewNum"); //Cacheless method
+				}
+				return InsertNoCache(userodApptView,true);
+			}
+		}
+
+		///<summary>Inserts one UserodApptView into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserodApptView userodApptView,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO userodapptview (";
+			if(!useExistingPK && isRandomKeys) {
+				userodApptView.UserodApptViewNum=ReplicationServers.GetKeyNoCache("userodapptview","UserodApptViewNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="UserodApptViewNum,";
+			}
+			command+="UserNum,ClinicNum,ApptViewNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(userodApptView.UserodApptViewNum)+",";
+			}
+			command+=
+				     POut.Long  (userodApptView.UserNum)+","
+				+    POut.Long  (userodApptView.ClinicNum)+","
+				+    POut.Long  (userodApptView.ApptViewNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				userodApptView.UserodApptViewNum=Db.NonQ(command,true);
+			}
+			return userodApptView.UserodApptViewNum;
+		}
+
 		///<summary>Updates one UserodApptView in the database.</summary>
 		public static void Update(UserodApptView userodApptView){
 			string command="UPDATE userodapptview SET "

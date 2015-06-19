@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return sop.SopNum;
 		}
 
+		///<summary>Inserts one Sop into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Sop sop){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sop,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sop.SopNum=DbHelper.GetNextOracleKey("sop","SopNum"); //Cacheless method
+				}
+				return InsertNoCache(sop,true);
+			}
+		}
+
+		///<summary>Inserts one Sop into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Sop sop,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sop (";
+			if(!useExistingPK && isRandomKeys) {
+				sop.SopNum=ReplicationServers.GetKeyNoCache("sop","SopNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SopNum,";
+			}
+			command+="SopCode,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sop.SopNum)+",";
+			}
+			command+=
+				 "'"+POut.String(sop.SopCode)+"',"
+				+"'"+POut.String(sop.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				sop.SopNum=Db.NonQ(command,true);
+			}
+			return sop.SopNum;
+		}
+
 		///<summary>Updates one Sop in the database.</summary>
 		public static void Update(Sop sop){
 			string command="UPDATE sop SET "

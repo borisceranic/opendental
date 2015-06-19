@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return autoNoteControl.AutoNoteControlNum;
 		}
 
+		///<summary>Inserts one AutoNoteControl into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoNoteControl autoNoteControl){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(autoNoteControl,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					autoNoteControl.AutoNoteControlNum=DbHelper.GetNextOracleKey("autonotecontrol","AutoNoteControlNum"); //Cacheless method
+				}
+				return InsertNoCache(autoNoteControl,true);
+			}
+		}
+
+		///<summary>Inserts one AutoNoteControl into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoNoteControl autoNoteControl,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO autonotecontrol (";
+			if(!useExistingPK && isRandomKeys) {
+				autoNoteControl.AutoNoteControlNum=ReplicationServers.GetKeyNoCache("autonotecontrol","AutoNoteControlNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AutoNoteControlNum,";
+			}
+			command+="Descript,ControlType,ControlLabel,ControlOptions) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(autoNoteControl.AutoNoteControlNum)+",";
+			}
+			command+=
+				 "'"+POut.String(autoNoteControl.Descript)+"',"
+				+"'"+POut.String(autoNoteControl.ControlType)+"',"
+				+"'"+POut.String(autoNoteControl.ControlLabel)+"',"
+				+"'"+POut.String(autoNoteControl.ControlOptions)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				autoNoteControl.AutoNoteControlNum=Db.NonQ(command,true);
+			}
+			return autoNoteControl.AutoNoteControlNum;
+		}
+
 		///<summary>Updates one AutoNoteControl in the database.</summary>
 		public static void Update(AutoNoteControl autoNoteControl){
 			string command="UPDATE autonotecontrol SET "

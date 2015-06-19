@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return dashboardAR.DashboardARNum;
 		}
 
+		///<summary>Inserts one DashboardAR into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DashboardAR dashboardAR){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(dashboardAR,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					dashboardAR.DashboardARNum=DbHelper.GetNextOracleKey("dashboardar","DashboardARNum"); //Cacheless method
+				}
+				return InsertNoCache(dashboardAR,true);
+			}
+		}
+
+		///<summary>Inserts one DashboardAR into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DashboardAR dashboardAR,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO dashboardar (";
+			if(!useExistingPK && isRandomKeys) {
+				dashboardAR.DashboardARNum=ReplicationServers.GetKeyNoCache("dashboardar","DashboardARNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DashboardARNum,";
+			}
+			command+="DateCalc,BalTotal,InsEst) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(dashboardAR.DashboardARNum)+",";
+			}
+			command+=
+				     POut.Date  (dashboardAR.DateCalc)+","
+				+"'"+POut.Double(dashboardAR.BalTotal)+"',"
+				+"'"+POut.Double(dashboardAR.InsEst)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				dashboardAR.DashboardARNum=Db.NonQ(command,true);
+			}
+			return dashboardAR.DashboardARNum;
+		}
+
 		///<summary>Updates one DashboardAR in the database.</summary>
 		public static void Update(DashboardAR dashboardAR){
 			string command="UPDATE dashboardar SET "

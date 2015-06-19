@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return mount.MountNum;
 		}
 
+		///<summary>Inserts one Mount into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Mount mount){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(mount,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					mount.MountNum=DbHelper.GetNextOracleKey("mount","MountNum"); //Cacheless method
+				}
+				return InsertNoCache(mount,true);
+			}
+		}
+
+		///<summary>Inserts one Mount into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Mount mount,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO mount (";
+			if(!useExistingPK && isRandomKeys) {
+				mount.MountNum=ReplicationServers.GetKeyNoCache("mount","MountNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MountNum,";
+			}
+			command+="PatNum,DocCategory,DateCreated,Description,Note,ImgType,Width,Height) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(mount.MountNum)+",";
+			}
+			command+=
+				     POut.Long  (mount.PatNum)+","
+				+    POut.Long  (mount.DocCategory)+","
+				+    POut.Date  (mount.DateCreated)+","
+				+"'"+POut.String(mount.Description)+"',"
+				+"'"+POut.String(mount.Note)+"',"
+				+    POut.Int   ((int)mount.ImgType)+","
+				+    POut.Int   (mount.Width)+","
+				+    POut.Int   (mount.Height)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				mount.MountNum=Db.NonQ(command,true);
+			}
+			return mount.MountNum;
+		}
+
 		///<summary>Updates one Mount in the database.</summary>
 		public static void Update(Mount mount){
 			string command="UPDATE mount SET "

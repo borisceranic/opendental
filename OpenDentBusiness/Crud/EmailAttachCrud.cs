@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return emailAttach.EmailAttachNum;
 		}
 
+		///<summary>Inserts one EmailAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailAttach emailAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(emailAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					emailAttach.EmailAttachNum=DbHelper.GetNextOracleKey("emailattach","EmailAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(emailAttach,true);
+			}
+		}
+
+		///<summary>Inserts one EmailAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailAttach emailAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO emailattach (";
+			if(!useExistingPK && isRandomKeys) {
+				emailAttach.EmailAttachNum=ReplicationServers.GetKeyNoCache("emailattach","EmailAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmailAttachNum,";
+			}
+			command+="EmailMessageNum,DisplayedFileName,ActualFileName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(emailAttach.EmailAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (emailAttach.EmailMessageNum)+","
+				+"'"+POut.String(emailAttach.DisplayedFileName)+"',"
+				+"'"+POut.String(emailAttach.ActualFileName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				emailAttach.EmailAttachNum=Db.NonQ(command,true);
+			}
+			return emailAttach.EmailAttachNum;
+		}
+
 		///<summary>Updates one EmailAttach in the database.</summary>
 		public static void Update(EmailAttach emailAttach){
 			string command="UPDATE emailattach SET "

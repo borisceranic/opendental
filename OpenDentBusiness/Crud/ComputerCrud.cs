@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return computer.ComputerNum;
 		}
 
+		///<summary>Inserts one Computer into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Computer computer){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(computer,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					computer.ComputerNum=DbHelper.GetNextOracleKey("computer","ComputerNum"); //Cacheless method
+				}
+				return InsertNoCache(computer,true);
+			}
+		}
+
+		///<summary>Inserts one Computer into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Computer computer,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO computer (";
+			if(!useExistingPK && isRandomKeys) {
+				computer.ComputerNum=ReplicationServers.GetKeyNoCache("computer","ComputerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ComputerNum,";
+			}
+			command+="CompName,LastHeartBeat) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(computer.ComputerNum)+",";
+			}
+			command+=
+				 "'"+POut.String(computer.CompName)+"',"
+				+    POut.DateT (computer.LastHeartBeat)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				computer.ComputerNum=Db.NonQ(command,true);
+			}
+			return computer.ComputerNum;
+		}
+
 		///<summary>Updates one Computer in the database.</summary>
 		public static void Update(Computer computer){
 			string command="UPDATE computer SET "

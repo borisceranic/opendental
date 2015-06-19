@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return ehrQuarterlyKey.EhrQuarterlyKeyNum;
 		}
 
+		///<summary>Inserts one EhrQuarterlyKey into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrQuarterlyKey ehrQuarterlyKey){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrQuarterlyKey,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrQuarterlyKey.EhrQuarterlyKeyNum=DbHelper.GetNextOracleKey("ehrquarterlykey","EhrQuarterlyKeyNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrQuarterlyKey,true);
+			}
+		}
+
+		///<summary>Inserts one EhrQuarterlyKey into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrQuarterlyKey ehrQuarterlyKey,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrquarterlykey (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrQuarterlyKey.EhrQuarterlyKeyNum=ReplicationServers.GetKeyNoCache("ehrquarterlykey","EhrQuarterlyKeyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrQuarterlyKeyNum,";
+			}
+			command+="YearValue,QuarterValue,PracticeName,KeyValue,PatNum,Notes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrQuarterlyKey.EhrQuarterlyKeyNum)+",";
+			}
+			command+=
+				     POut.Int   (ehrQuarterlyKey.YearValue)+","
+				+    POut.Int   (ehrQuarterlyKey.QuarterValue)+","
+				+"'"+POut.String(ehrQuarterlyKey.PracticeName)+"',"
+				+"'"+POut.String(ehrQuarterlyKey.KeyValue)+"',"
+				+    POut.Long  (ehrQuarterlyKey.PatNum)+","
+				+"'"+POut.String(ehrQuarterlyKey.Notes)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrQuarterlyKey.EhrQuarterlyKeyNum=Db.NonQ(command,true);
+			}
+			return ehrQuarterlyKey.EhrQuarterlyKeyNum;
+		}
+
 		///<summary>Updates one EhrQuarterlyKey in the database.</summary>
 		public static void Update(EhrQuarterlyKey ehrQuarterlyKey){
 			string command="UPDATE ehrquarterlykey SET "

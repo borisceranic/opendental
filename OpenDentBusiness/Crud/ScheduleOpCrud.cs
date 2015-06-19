@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return scheduleOp.ScheduleOpNum;
 		}
 
+		///<summary>Inserts one ScheduleOp into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScheduleOp scheduleOp){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(scheduleOp,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					scheduleOp.ScheduleOpNum=DbHelper.GetNextOracleKey("scheduleop","ScheduleOpNum"); //Cacheless method
+				}
+				return InsertNoCache(scheduleOp,true);
+			}
+		}
+
+		///<summary>Inserts one ScheduleOp into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScheduleOp scheduleOp,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO scheduleop (";
+			if(!useExistingPK && isRandomKeys) {
+				scheduleOp.ScheduleOpNum=ReplicationServers.GetKeyNoCache("scheduleop","ScheduleOpNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ScheduleOpNum,";
+			}
+			command+="ScheduleNum,OperatoryNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(scheduleOp.ScheduleOpNum)+",";
+			}
+			command+=
+				     POut.Long  (scheduleOp.ScheduleNum)+","
+				+    POut.Long  (scheduleOp.OperatoryNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				scheduleOp.ScheduleOpNum=Db.NonQ(command,true);
+			}
+			return scheduleOp.ScheduleOpNum;
+		}
+
 		///<summary>Updates one ScheduleOp in the database.</summary>
 		public static void Update(ScheduleOp scheduleOp){
 			string command="UPDATE scheduleop SET "

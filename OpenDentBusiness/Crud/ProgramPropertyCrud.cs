@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return programProperty.ProgramPropertyNum;
 		}
 
+		///<summary>Inserts one ProgramProperty into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProgramProperty programProperty){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(programProperty,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					programProperty.ProgramPropertyNum=DbHelper.GetNextOracleKey("programproperty","ProgramPropertyNum"); //Cacheless method
+				}
+				return InsertNoCache(programProperty,true);
+			}
+		}
+
+		///<summary>Inserts one ProgramProperty into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProgramProperty programProperty,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO programproperty (";
+			if(!useExistingPK && isRandomKeys) {
+				programProperty.ProgramPropertyNum=ReplicationServers.GetKeyNoCache("programproperty","ProgramPropertyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProgramPropertyNum,";
+			}
+			command+="ProgramNum,PropertyDesc,PropertyValue,ComputerName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(programProperty.ProgramPropertyNum)+",";
+			}
+			command+=
+				     POut.Long  (programProperty.ProgramNum)+","
+				+"'"+POut.String(programProperty.PropertyDesc)+"',"
+				+"'"+POut.String(programProperty.PropertyValue)+"',"
+				+"'"+POut.String(programProperty.ComputerName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				programProperty.ProgramPropertyNum=Db.NonQ(command,true);
+			}
+			return programProperty.ProgramPropertyNum;
+		}
+
 		///<summary>Updates one ProgramProperty in the database.</summary>
 		public static void Update(ProgramProperty programProperty){
 			string command="UPDATE programproperty SET "

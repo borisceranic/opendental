@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return evaluation.EvaluationNum;
 		}
 
+		///<summary>Inserts one Evaluation into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Evaluation evaluation){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(evaluation,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					evaluation.EvaluationNum=DbHelper.GetNextOracleKey("evaluation","EvaluationNum"); //Cacheless method
+				}
+				return InsertNoCache(evaluation,true);
+			}
+		}
+
+		///<summary>Inserts one Evaluation into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Evaluation evaluation,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO evaluation (";
+			if(!useExistingPK && isRandomKeys) {
+				evaluation.EvaluationNum=ReplicationServers.GetKeyNoCache("evaluation","EvaluationNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EvaluationNum,";
+			}
+			command+="InstructNum,StudentNum,SchoolCourseNum,EvalTitle,DateEval,GradingScaleNum,OverallGradeShowing,OverallGradeNumber,Notes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(evaluation.EvaluationNum)+",";
+			}
+			command+=
+				     POut.Long  (evaluation.InstructNum)+","
+				+    POut.Long  (evaluation.StudentNum)+","
+				+    POut.Long  (evaluation.SchoolCourseNum)+","
+				+"'"+POut.String(evaluation.EvalTitle)+"',"
+				+    POut.Date  (evaluation.DateEval)+","
+				+    POut.Long  (evaluation.GradingScaleNum)+","
+				+"'"+POut.String(evaluation.OverallGradeShowing)+"',"
+				+    POut.Float (evaluation.OverallGradeNumber)+","
+				+"'"+POut.String(evaluation.Notes)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				evaluation.EvaluationNum=Db.NonQ(command,true);
+			}
+			return evaluation.EvaluationNum;
+		}
+
 		///<summary>Updates one Evaluation in the database.</summary>
 		public static void Update(Evaluation evaluation){
 			string command="UPDATE evaluation SET "

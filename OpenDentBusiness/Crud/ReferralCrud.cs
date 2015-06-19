@@ -147,6 +147,66 @@ namespace OpenDentBusiness.Crud{
 			return referral.ReferralNum;
 		}
 
+		///<summary>Inserts one Referral into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Referral referral){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(referral,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					referral.ReferralNum=DbHelper.GetNextOracleKey("referral","ReferralNum"); //Cacheless method
+				}
+				return InsertNoCache(referral,true);
+			}
+		}
+
+		///<summary>Inserts one Referral into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Referral referral,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO referral (";
+			if(!useExistingPK && isRandomKeys) {
+				referral.ReferralNum=ReplicationServers.GetKeyNoCache("referral","ReferralNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReferralNum,";
+			}
+			command+="LName,FName,MName,SSN,UsingTIN,Specialty,ST,Telephone,Address,Address2,City,Zip,Note,Phone2,IsHidden,NotPerson,Title,EMail,PatNum,NationalProvID,Slip,IsDoctor,IsTrustedDirect) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(referral.ReferralNum)+",";
+			}
+			command+=
+				 "'"+POut.String(referral.LName)+"',"
+				+"'"+POut.String(referral.FName)+"',"
+				+"'"+POut.String(referral.MName)+"',"
+				+"'"+POut.String(referral.SSN)+"',"
+				+    POut.Bool  (referral.UsingTIN)+","
+				+    POut.Int   ((int)referral.Specialty)+","
+				+"'"+POut.String(referral.ST)+"',"
+				+"'"+POut.String(referral.Telephone)+"',"
+				+"'"+POut.String(referral.Address)+"',"
+				+"'"+POut.String(referral.Address2)+"',"
+				+"'"+POut.String(referral.City)+"',"
+				+"'"+POut.String(referral.Zip)+"',"
+				+"'"+POut.String(referral.Note)+"',"
+				+"'"+POut.String(referral.Phone2)+"',"
+				+    POut.Bool  (referral.IsHidden)+","
+				+    POut.Bool  (referral.NotPerson)+","
+				+"'"+POut.String(referral.Title)+"',"
+				+"'"+POut.String(referral.EMail)+"',"
+				+    POut.Long  (referral.PatNum)+","
+				+"'"+POut.String(referral.NationalProvID)+"',"
+				+    POut.Long  (referral.Slip)+","
+				+    POut.Bool  (referral.IsDoctor)+","
+				+    POut.Bool  (referral.IsTrustedDirect)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				referral.ReferralNum=Db.NonQ(command,true);
+			}
+			return referral.ReferralNum;
+		}
+
 		///<summary>Updates one Referral in the database.</summary>
 		public static void Update(Referral referral){
 			string command="UPDATE referral SET "

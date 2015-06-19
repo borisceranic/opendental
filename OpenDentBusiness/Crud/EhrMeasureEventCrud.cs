@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return ehrMeasureEvent.EhrMeasureEventNum;
 		}
 
+		///<summary>Inserts one EhrMeasureEvent into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrMeasureEvent ehrMeasureEvent){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrMeasureEvent,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrMeasureEvent.EhrMeasureEventNum=DbHelper.GetNextOracleKey("ehrmeasureevent","EhrMeasureEventNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrMeasureEvent,true);
+			}
+		}
+
+		///<summary>Inserts one EhrMeasureEvent into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrMeasureEvent ehrMeasureEvent,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrmeasureevent (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrMeasureEvent.EhrMeasureEventNum=ReplicationServers.GetKeyNoCache("ehrmeasureevent","EhrMeasureEventNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrMeasureEventNum,";
+			}
+			command+="DateTEvent,EventType,PatNum,MoreInfo,CodeValueEvent,CodeSystemEvent,CodeValueResult,CodeSystemResult,FKey) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrMeasureEvent.EhrMeasureEventNum)+",";
+			}
+			command+=
+				     POut.DateT (ehrMeasureEvent.DateTEvent)+","
+				+    POut.Int   ((int)ehrMeasureEvent.EventType)+","
+				+    POut.Long  (ehrMeasureEvent.PatNum)+","
+				+"'"+POut.String(ehrMeasureEvent.MoreInfo)+"',"
+				+"'"+POut.String(ehrMeasureEvent.CodeValueEvent)+"',"
+				+"'"+POut.String(ehrMeasureEvent.CodeSystemEvent)+"',"
+				+"'"+POut.String(ehrMeasureEvent.CodeValueResult)+"',"
+				+"'"+POut.String(ehrMeasureEvent.CodeSystemResult)+"',"
+				+    POut.Long  (ehrMeasureEvent.FKey)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrMeasureEvent.EhrMeasureEventNum=Db.NonQ(command,true);
+			}
+			return ehrMeasureEvent.EhrMeasureEventNum;
+		}
+
 		///<summary>Updates one EhrMeasureEvent in the database.</summary>
 		public static void Update(EhrMeasureEvent ehrMeasureEvent){
 			string command="UPDATE ehrmeasureevent SET "

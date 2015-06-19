@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return gradingScaleItem.GradingScaleItemNum;
 		}
 
+		///<summary>Inserts one GradingScaleItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GradingScaleItem gradingScaleItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(gradingScaleItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					gradingScaleItem.GradingScaleItemNum=DbHelper.GetNextOracleKey("gradingscaleitem","GradingScaleItemNum"); //Cacheless method
+				}
+				return InsertNoCache(gradingScaleItem,true);
+			}
+		}
+
+		///<summary>Inserts one GradingScaleItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GradingScaleItem gradingScaleItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO gradingscaleitem (";
+			if(!useExistingPK && isRandomKeys) {
+				gradingScaleItem.GradingScaleItemNum=ReplicationServers.GetKeyNoCache("gradingscaleitem","GradingScaleItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="GradingScaleItemNum,";
+			}
+			command+="GradingScaleNum,GradeShowing,GradeNumber,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(gradingScaleItem.GradingScaleItemNum)+",";
+			}
+			command+=
+				     POut.Long  (gradingScaleItem.GradingScaleNum)+","
+				+"'"+POut.String(gradingScaleItem.GradeShowing)+"',"
+				+    POut.Float (gradingScaleItem.GradeNumber)+","
+				+"'"+POut.String(gradingScaleItem.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				gradingScaleItem.GradingScaleItemNum=Db.NonQ(command,true);
+			}
+			return gradingScaleItem.GradingScaleItemNum;
+		}
+
 		///<summary>Updates one GradingScaleItem in the database.</summary>
 		public static void Update(GradingScaleItem gradingScaleItem){
 			string command="UPDATE gradingscaleitem SET "

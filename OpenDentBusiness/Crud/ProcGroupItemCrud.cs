@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return procGroupItem.ProcGroupItemNum;
 		}
 
+		///<summary>Inserts one ProcGroupItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcGroupItem procGroupItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procGroupItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procGroupItem.ProcGroupItemNum=DbHelper.GetNextOracleKey("procgroupitem","ProcGroupItemNum"); //Cacheless method
+				}
+				return InsertNoCache(procGroupItem,true);
+			}
+		}
+
+		///<summary>Inserts one ProcGroupItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcGroupItem procGroupItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procgroupitem (";
+			if(!useExistingPK && isRandomKeys) {
+				procGroupItem.ProcGroupItemNum=ReplicationServers.GetKeyNoCache("procgroupitem","ProcGroupItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcGroupItemNum,";
+			}
+			command+="ProcNum,GroupNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procGroupItem.ProcGroupItemNum)+",";
+			}
+			command+=
+				     POut.Long  (procGroupItem.ProcNum)+","
+				+    POut.Long  (procGroupItem.GroupNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procGroupItem.ProcGroupItemNum=Db.NonQ(command,true);
+			}
+			return procGroupItem.ProcGroupItemNum;
+		}
+
 		///<summary>Updates one ProcGroupItem in the database.</summary>
 		public static void Update(ProcGroupItem procGroupItem){
 			string command="UPDATE procgroupitem SET "

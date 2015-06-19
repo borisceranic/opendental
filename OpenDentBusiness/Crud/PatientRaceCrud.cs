@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return patientRace.PatientRaceNum;
 		}
 
+		///<summary>Inserts one PatientRace into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatientRace patientRace){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(patientRace,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					patientRace.PatientRaceNum=DbHelper.GetNextOracleKey("patientrace","PatientRaceNum"); //Cacheless method
+				}
+				return InsertNoCache(patientRace,true);
+			}
+		}
+
+		///<summary>Inserts one PatientRace into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatientRace patientRace,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO patientrace (";
+			if(!useExistingPK && isRandomKeys) {
+				patientRace.PatientRaceNum=ReplicationServers.GetKeyNoCache("patientrace","PatientRaceNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PatientRaceNum,";
+			}
+			command+="PatNum,Race,CdcrecCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(patientRace.PatientRaceNum)+",";
+			}
+			command+=
+				     POut.Long  (patientRace.PatNum)+","
+				+    POut.Int   ((int)patientRace.Race)+","
+				+"'"+POut.String(patientRace.CdcrecCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				patientRace.PatientRaceNum=Db.NonQ(command,true);
+			}
+			return patientRace.PatientRaceNum;
+		}
+
 		///<summary>Updates one PatientRace in the database.</summary>
 		public static void Update(PatientRace patientRace){
 			string command="UPDATE patientrace SET "

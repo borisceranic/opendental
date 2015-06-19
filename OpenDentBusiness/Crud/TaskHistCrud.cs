@@ -139,6 +139,64 @@ namespace OpenDentBusiness.Crud{
 			return taskHist.TaskHistNum;
 		}
 
+		///<summary>Inserts one TaskHist into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskHist taskHist){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskHist,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskHist.TaskHistNum=DbHelper.GetNextOracleKey("taskhist","TaskHistNum"); //Cacheless method
+				}
+				return InsertNoCache(taskHist,true);
+			}
+		}
+
+		///<summary>Inserts one TaskHist into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskHist taskHist,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO taskhist (";
+			if(!useExistingPK && isRandomKeys) {
+				taskHist.TaskHistNum=ReplicationServers.GetKeyNoCache("taskhist","TaskHistNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskHistNum,";
+			}
+			command+="UserNumHist,DateTStamp,IsNoteChange,TaskNum,TaskListNum,DateTask,KeyNum,Descript,TaskStatus,IsRepeating,DateType,FromNum,ObjectType,DateTimeEntry,UserNum,DateTimeFinished,PriorityDefNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskHist.TaskHistNum)+",";
+			}
+			command+=
+				     POut.Long  (taskHist.UserNumHist)+","
+				+    DbHelper.Now()+","
+				+    POut.Bool  (taskHist.IsNoteChange)+","
+				+    POut.Long  (taskHist.TaskNum)+","
+				+    POut.Long  (taskHist.TaskListNum)+","
+				+    POut.Date  (taskHist.DateTask)+","
+				+    POut.Long  (taskHist.KeyNum)+","
+				+    DbHelper.ParamChar+"paramDescript,"
+				+    POut.Int   ((int)taskHist.TaskStatus)+","
+				+    POut.Bool  (taskHist.IsRepeating)+","
+				+    POut.Int   ((int)taskHist.DateType)+","
+				+    POut.Long  (taskHist.FromNum)+","
+				+    POut.Int   ((int)taskHist.ObjectType)+","
+				+    POut.DateT (taskHist.DateTimeEntry)+","
+				+    POut.Long  (taskHist.UserNum)+","
+				+    POut.DateT (taskHist.DateTimeFinished)+","
+				+    POut.Long  (taskHist.PriorityDefNum)+")";
+			if(taskHist.Descript==null) {
+				taskHist.Descript="";
+			}
+			OdSqlParameter paramDescript=new OdSqlParameter("paramDescript",OdDbType.Text,taskHist.Descript);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramDescript);
+			}
+			else {
+				taskHist.TaskHistNum=Db.NonQ(command,true,paramDescript);
+			}
+			return taskHist.TaskHistNum;
+		}
+
 		///<summary>Updates one TaskHist in the database.</summary>
 		public static void Update(TaskHist taskHist){
 			string command="UPDATE taskhist SET "

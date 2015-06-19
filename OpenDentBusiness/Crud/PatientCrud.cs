@@ -255,6 +255,122 @@ namespace OpenDentBusiness.Crud{
 			return patient.PatNum;
 		}
 
+		///<summary>Inserts one Patient into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Patient patient){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(patient,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					patient.PatNum=DbHelper.GetNextOracleKey("patient","PatNum"); //Cacheless method
+				}
+				return InsertNoCache(patient,true);
+			}
+		}
+
+		///<summary>Inserts one Patient into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Patient patient,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO patient (";
+			if(!useExistingPK && isRandomKeys) {
+				patient.PatNum=ReplicationServers.GetKeyNoCache("patient","PatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PatNum,";
+			}
+			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(patient.PatNum)+",";
+			}
+			command+=
+				 "'"+POut.String(patient.LName)+"',"
+				+"'"+POut.String(patient.FName)+"',"
+				+"'"+POut.String(patient.MiddleI)+"',"
+				+"'"+POut.String(patient.Preferred)+"',"
+				+    POut.Int   ((int)patient.PatStatus)+","
+				+    POut.Int   ((int)patient.Gender)+","
+				+    POut.Int   ((int)patient.Position)+","
+				+    POut.Date  (patient.Birthdate)+","
+				+"'"+POut.String(patient.SSN)+"',"
+				+"'"+POut.String(patient.Address)+"',"
+				+"'"+POut.String(patient.Address2)+"',"
+				+"'"+POut.String(patient.City)+"',"
+				+"'"+POut.String(patient.State)+"',"
+				+"'"+POut.String(patient.Zip)+"',"
+				+"'"+POut.String(patient.HmPhone)+"',"
+				+"'"+POut.String(patient.WkPhone)+"',"
+				+"'"+POut.String(patient.WirelessPhone)+"',"
+				+    POut.Long  (patient.Guarantor)+","
+				+"'"+POut.String(patient.CreditType)+"',"
+				+"'"+POut.String(patient.Email)+"',"
+				+"'"+POut.String(patient.Salutation)+"',"
+				+"'"+POut.Double(patient.EstBalance)+"',"
+				+    POut.Long  (patient.PriProv)+","
+				+    POut.Long  (patient.SecProv)+","
+				+    POut.Long  (patient.FeeSched)+","
+				+    POut.Long  (patient.BillingType)+","
+				+"'"+POut.String(patient.ImageFolder)+"',"
+				+"'"+POut.String(patient.AddrNote)+"',"
+				+    DbHelper.ParamChar+"paramFamFinUrgNote,"
+				+"'"+POut.String(patient.MedUrgNote)+"',"
+				+"'"+POut.String(patient.ApptModNote)+"',"
+				+"'"+POut.String(patient.StudentStatus)+"',"
+				+"'"+POut.String(patient.SchoolName)+"',"
+				+"'"+POut.String(patient.ChartNumber)+"',"
+				+"'"+POut.String(patient.MedicaidID)+"',"
+				+"'"+POut.Double(patient.Bal_0_30)+"',"
+				+"'"+POut.Double(patient.Bal_31_60)+"',"
+				+"'"+POut.Double(patient.Bal_61_90)+"',"
+				+"'"+POut.Double(patient.BalOver90)+"',"
+				+"'"+POut.Double(patient.InsEst)+"',"
+				+"'"+POut.Double(patient.BalTotal)+"',"
+				+    POut.Long  (patient.EmployerNum)+","
+				+"'"+POut.String(patient.EmploymentNote)+"',"
+				+"'"+POut.String(patient.County)+"',"
+				+    POut.Int   ((int)patient.GradeLevel)+","
+				+    POut.Int   ((int)patient.Urgency)+","
+				+    POut.Date  (patient.DateFirstVisit)+","
+				+    POut.Long  (patient.ClinicNum)+","
+				+"'"+POut.String(patient.HasIns)+"',"
+				+"'"+POut.String(patient.TrophyFolder)+"',"
+				+    POut.Bool  (patient.PlannedIsDone)+","
+				+    POut.Bool  (patient.Premed)+","
+				+"'"+POut.String(patient.Ward)+"',"
+				+    POut.Int   ((int)patient.PreferConfirmMethod)+","
+				+    POut.Int   ((int)patient.PreferContactMethod)+","
+				+    POut.Int   ((int)patient.PreferRecallMethod)+","
+				+    POut.Time  (patient.SchedBeforeTime)+","
+				+    POut.Time  (patient.SchedAfterTime)+","
+				+    POut.Byte  (patient.SchedDayOfWeek)+","
+				+"'"+POut.String(patient.Language)+"',"
+				+    POut.Date  (patient.AdmitDate)+","
+				+"'"+POut.String(patient.Title)+"',"
+				+"'"+POut.Double(patient.PayPlanDue)+"',"
+				+    POut.Long  (patient.SiteNum)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (patient.ResponsParty)+","
+				+    POut.Byte  (patient.CanadianEligibilityCode)+","
+				+    POut.Int   (patient.AskToArriveEarly)+","
+				+"'"+POut.String(patient.OnlinePassword)+"',"
+				+    POut.Int   ((int)patient.PreferContactConfidential)+","
+				+    POut.Long  (patient.SuperFamily)+","
+				+    POut.Int   ((int)patient.TxtMsgOk)+","
+				+"'"+POut.String(patient.SmokingSnoMed)+"',"
+				+"'"+POut.String(patient.Country)+"',"
+				+    POut.DateT (patient.DateTimeDeceased)+")";
+			if(patient.FamFinUrgNote==null) {
+				patient.FamFinUrgNote="";
+			}
+			OdSqlParameter paramFamFinUrgNote=new OdSqlParameter("paramFamFinUrgNote",OdDbType.Text,POut.StringNote(patient.FamFinUrgNote));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramFamFinUrgNote);
+			}
+			else {
+				patient.PatNum=Db.NonQ(command,true,paramFamFinUrgNote);
+			}
+			return patient.PatNum;
+		}
+
 		///<summary>Updates one Patient in the database.</summary>
 		public static void Update(Patient patient){
 			string command="UPDATE patient SET "

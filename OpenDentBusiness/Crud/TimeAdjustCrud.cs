@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return timeAdjust.TimeAdjustNum;
 		}
 
+		///<summary>Inserts one TimeAdjust into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TimeAdjust timeAdjust){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(timeAdjust,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					timeAdjust.TimeAdjustNum=DbHelper.GetNextOracleKey("timeadjust","TimeAdjustNum"); //Cacheless method
+				}
+				return InsertNoCache(timeAdjust,true);
+			}
+		}
+
+		///<summary>Inserts one TimeAdjust into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TimeAdjust timeAdjust,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO timeadjust (";
+			if(!useExistingPK && isRandomKeys) {
+				timeAdjust.TimeAdjustNum=ReplicationServers.GetKeyNoCache("timeadjust","TimeAdjustNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TimeAdjustNum,";
+			}
+			command+="EmployeeNum,TimeEntry,RegHours,OTimeHours,Note,IsAuto) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(timeAdjust.TimeAdjustNum)+",";
+			}
+			command+=
+				     POut.Long  (timeAdjust.EmployeeNum)+","
+				+    POut.DateT (timeAdjust.TimeEntry)+","
+				+"'"+POut.TSpan (timeAdjust.RegHours)+"',"
+				+"'"+POut.TSpan (timeAdjust.OTimeHours)+"',"
+				+"'"+POut.String(timeAdjust.Note)+"',"
+				+    POut.Bool  (timeAdjust.IsAuto)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				timeAdjust.TimeAdjustNum=Db.NonQ(command,true);
+			}
+			return timeAdjust.TimeAdjustNum;
+		}
+
 		///<summary>Updates one TimeAdjust in the database.</summary>
 		public static void Update(TimeAdjust timeAdjust){
 			string command="UPDATE timeadjust SET "

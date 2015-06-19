@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return screenPat.ScreenPatNum;
 		}
 
+		///<summary>Inserts one ScreenPat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScreenPat screenPat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(screenPat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					screenPat.ScreenPatNum=DbHelper.GetNextOracleKey("screenpat","ScreenPatNum"); //Cacheless method
+				}
+				return InsertNoCache(screenPat,true);
+			}
+		}
+
+		///<summary>Inserts one ScreenPat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ScreenPat screenPat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO screenpat (";
+			if(!useExistingPK && isRandomKeys) {
+				screenPat.ScreenPatNum=ReplicationServers.GetKeyNoCache("screenpat","ScreenPatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ScreenPatNum,";
+			}
+			command+="PatNum,ScreenGroupNum,SheetNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(screenPat.ScreenPatNum)+",";
+			}
+			command+=
+				     POut.Long  (screenPat.PatNum)+","
+				+    POut.Long  (screenPat.ScreenGroupNum)+","
+				+    POut.Long  (screenPat.SheetNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				screenPat.ScreenPatNum=Db.NonQ(command,true);
+			}
+			return screenPat.ScreenPatNum;
+		}
+
 		///<summary>Updates one ScreenPat in the database.</summary>
 		public static void Update(ScreenPat screenPat){
 			string command="UPDATE screenpat SET "

@@ -131,6 +131,58 @@ namespace OpenDentBusiness.Crud{
 			return carrier.CarrierNum;
 		}
 
+		///<summary>Inserts one Carrier into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Carrier carrier){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(carrier,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					carrier.CarrierNum=DbHelper.GetNextOracleKey("carrier","CarrierNum"); //Cacheless method
+				}
+				return InsertNoCache(carrier,true);
+			}
+		}
+
+		///<summary>Inserts one Carrier into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Carrier carrier,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO carrier (";
+			if(!useExistingPK && isRandomKeys) {
+				carrier.CarrierNum=ReplicationServers.GetKeyNoCache("carrier","CarrierNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CarrierNum,";
+			}
+			command+="CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(carrier.CarrierNum)+",";
+			}
+			command+=
+				 "'"+POut.String(carrier.CarrierName)+"',"
+				+"'"+POut.String(carrier.Address)+"',"
+				+"'"+POut.String(carrier.Address2)+"',"
+				+"'"+POut.String(carrier.City)+"',"
+				+"'"+POut.String(carrier.State)+"',"
+				+"'"+POut.String(carrier.Zip)+"',"
+				+"'"+POut.String(carrier.Phone)+"',"
+				+"'"+POut.String(carrier.ElectID)+"',"
+				+    POut.Bool  (carrier.NoSendElect)+","
+				+    POut.Bool  (carrier.IsCDA)+","
+				+"'"+POut.String(carrier.CDAnetVersion)+"',"
+				+    POut.Long  (carrier.CanadianNetworkNum)+","
+				+    POut.Bool  (carrier.IsHidden)+","
+				+    POut.Byte  (carrier.CanadianEncryptionMethod)+","
+				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				carrier.CarrierNum=Db.NonQ(command,true);
+			}
+			return carrier.CarrierNum;
+		}
+
 		///<summary>Updates one Carrier in the database.</summary>
 		public static void Update(Carrier carrier){
 			string command="UPDATE carrier SET "

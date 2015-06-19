@@ -133,6 +133,59 @@ namespace OpenDentBusiness.Crud{
 			return procTP.ProcTPNum;
 		}
 
+		///<summary>Inserts one ProcTP into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcTP procTP){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procTP,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procTP.ProcTPNum=DbHelper.GetNextOracleKey("proctp","ProcTPNum"); //Cacheless method
+				}
+				return InsertNoCache(procTP,true);
+			}
+		}
+
+		///<summary>Inserts one ProcTP into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcTP procTP,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO proctp (";
+			if(!useExistingPK && isRandomKeys) {
+				procTP.ProcTPNum=ReplicationServers.GetKeyNoCache("proctp","ProcTPNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcTPNum,";
+			}
+			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procTP.ProcTPNum)+",";
+			}
+			command+=
+				     POut.Long  (procTP.TreatPlanNum)+","
+				+    POut.Long  (procTP.PatNum)+","
+				+    POut.Long  (procTP.ProcNumOrig)+","
+				+    POut.Int   (procTP.ItemOrder)+","
+				+    POut.Long  (procTP.Priority)+","
+				+"'"+POut.String(procTP.ToothNumTP)+"',"
+				+"'"+POut.String(procTP.Surf)+"',"
+				+"'"+POut.String(procTP.ProcCode)+"',"
+				+"'"+POut.String(procTP.Descript)+"',"
+				+"'"+POut.Double(procTP.FeeAmt)+"',"
+				+"'"+POut.Double(procTP.PriInsAmt)+"',"
+				+"'"+POut.Double(procTP.SecInsAmt)+"',"
+				+"'"+POut.Double(procTP.PatAmt)+"',"
+				+"'"+POut.Double(procTP.Discount)+"',"
+				+"'"+POut.String(procTP.Prognosis)+"',"
+				+"'"+POut.String(procTP.Dx)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procTP.ProcTPNum=Db.NonQ(command,true);
+			}
+			return procTP.ProcTPNum;
+		}
+
 		///<summary>Updates one ProcTP in the database.</summary>
 		public static void Update(ProcTP procTP){
 			string command="UPDATE proctp SET "

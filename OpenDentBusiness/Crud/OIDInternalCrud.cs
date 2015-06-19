@@ -114,6 +114,45 @@ namespace OpenDentBusiness.Crud{
 			return oIDInternal.OIDInternalNum;
 		}
 
+		///<summary>Inserts one OIDInternal into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OIDInternal oIDInternal){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(oIDInternal,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					oIDInternal.OIDInternalNum=DbHelper.GetNextOracleKey("oidinternal","OIDInternalNum"); //Cacheless method
+				}
+				return InsertNoCache(oIDInternal,true);
+			}
+		}
+
+		///<summary>Inserts one OIDInternal into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OIDInternal oIDInternal,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO oidinternal (";
+			if(!useExistingPK && isRandomKeys) {
+				oIDInternal.OIDInternalNum=ReplicationServers.GetKeyNoCache("oidinternal","OIDInternalNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="OIDInternalNum,";
+			}
+			command+="IDType,IDRoot) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(oIDInternal.OIDInternalNum)+",";
+			}
+			command+=
+				 "'"+POut.String(oIDInternal.IDType.ToString())+"',"
+				+"'"+POut.String(oIDInternal.IDRoot)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				oIDInternal.OIDInternalNum=Db.NonQ(command,true);
+			}
+			return oIDInternal.OIDInternalNum;
+		}
+
 		///<summary>Updates one OIDInternal in the database.</summary>
 		public static void Update(OIDInternal oIDInternal){
 			string command="UPDATE oidinternal SET "

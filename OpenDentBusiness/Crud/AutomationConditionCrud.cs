@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return automationCondition.AutomationConditionNum;
 		}
 
+		///<summary>Inserts one AutomationCondition into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutomationCondition automationCondition){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(automationCondition,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					automationCondition.AutomationConditionNum=DbHelper.GetNextOracleKey("automationcondition","AutomationConditionNum"); //Cacheless method
+				}
+				return InsertNoCache(automationCondition,true);
+			}
+		}
+
+		///<summary>Inserts one AutomationCondition into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutomationCondition automationCondition,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO automationcondition (";
+			if(!useExistingPK && isRandomKeys) {
+				automationCondition.AutomationConditionNum=ReplicationServers.GetKeyNoCache("automationcondition","AutomationConditionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AutomationConditionNum,";
+			}
+			command+="AutomationNum,CompareField,Comparison,CompareString) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(automationCondition.AutomationConditionNum)+",";
+			}
+			command+=
+				     POut.Long  (automationCondition.AutomationNum)+","
+				+    POut.Int   ((int)automationCondition.CompareField)+","
+				+    POut.Int   ((int)automationCondition.Comparison)+","
+				+"'"+POut.String(automationCondition.CompareString)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				automationCondition.AutomationConditionNum=Db.NonQ(command,true);
+			}
+			return automationCondition.AutomationConditionNum;
+		}
+
 		///<summary>Updates one AutomationCondition in the database.</summary>
 		public static void Update(AutomationCondition automationCondition){
 			string command="UPDATE automationcondition SET "

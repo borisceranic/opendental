@@ -52,6 +52,15 @@ namespace OpenDentBusiness{
 			PrefC.Dict=dictPrefs;
 		}
 
+		///<summary>Gets a pref of type bool without using the cache.</summary>
+		public static bool GetBoolNoCache(PrefName prefName) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),prefName);
+			}
+			string command="SELECT ValueString FROM preference WHERE PrefName = '"+POut.String(prefName.ToString())+"'";
+			return PIn.Bool(Db.GetScalar(command));
+		}
+
 		///<summary></summary>
 		public static void ClearCache() {
 			PrefC.Dict=null;
@@ -77,6 +86,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Updates a pref of type int without using the cache.  Useful for multithreaded connections.</summary>
 		public static void UpdateIntNoCache(PrefName prefName,int newValue) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),prefName,newValue);
+				return;
+			}
 			string command="UPDATE preference SET ValueString='"+POut.Long(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
 			Db.NonQ(command);
 		}
@@ -170,6 +183,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Updates a bool without using cache classes.  Useful for multithreaded connections.</summary>
 		public static void UpdateBoolNoCache(PrefName prefName,bool newValue) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),prefName,newValue);
+				return;
+			}
 			string command="UPDATE preference SET ValueString='"+POut.Bool(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
 			Db.NonQ(command);
 		}
@@ -205,6 +222,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Updates a pref string without using the cache classes.  Useful for multithreaded connections.</summary>
 		public static void UpdateStringNoCache(PrefName prefName,string newValue) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),prefName,newValue);
+				return;
+			}
 			string command="UPDATE preference SET ValueString='"+POut.String(newValue)+"' WHERE PrefName='"+POut.String(prefName.ToString())+"'";
 			Db.NonQ(command);
 		}

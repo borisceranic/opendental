@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return zipCode.ZipCodeNum;
 		}
 
+		///<summary>Inserts one ZipCode into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ZipCode zipCode){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(zipCode,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					zipCode.ZipCodeNum=DbHelper.GetNextOracleKey("zipcode","ZipCodeNum"); //Cacheless method
+				}
+				return InsertNoCache(zipCode,true);
+			}
+		}
+
+		///<summary>Inserts one ZipCode into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ZipCode zipCode,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO zipcode (";
+			if(!useExistingPK && isRandomKeys) {
+				zipCode.ZipCodeNum=ReplicationServers.GetKeyNoCache("zipcode","ZipCodeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ZipCodeNum,";
+			}
+			command+="ZipCodeDigits,City,State,IsFrequent) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(zipCode.ZipCodeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(zipCode.ZipCodeDigits)+"',"
+				+"'"+POut.String(zipCode.City)+"',"
+				+"'"+POut.String(zipCode.State)+"',"
+				+    POut.Bool  (zipCode.IsFrequent)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				zipCode.ZipCodeNum=Db.NonQ(command,true);
+			}
+			return zipCode.ZipCodeNum;
+		}
+
 		///<summary>Updates one ZipCode in the database.</summary>
 		public static void Update(ZipCode zipCode){
 			string command="UPDATE zipcode SET "

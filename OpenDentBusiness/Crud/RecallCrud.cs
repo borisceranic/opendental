@@ -127,6 +127,56 @@ namespace OpenDentBusiness.Crud{
 			return recall.RecallNum;
 		}
 
+		///<summary>Inserts one Recall into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Recall recall){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(recall,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					recall.RecallNum=DbHelper.GetNextOracleKey("recall","RecallNum"); //Cacheless method
+				}
+				return InsertNoCache(recall,true);
+			}
+		}
+
+		///<summary>Inserts one Recall into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Recall recall,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO recall (";
+			if(!useExistingPK && isRandomKeys) {
+				recall.RecallNum=ReplicationServers.GetKeyNoCache("recall","RecallNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RecallNum,";
+			}
+			command+="PatNum,DateDueCalc,DateDue,DatePrevious,RecallInterval,RecallStatus,Note,IsDisabled,RecallTypeNum,DisableUntilBalance,DisableUntilDate,DateScheduled) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(recall.RecallNum)+",";
+			}
+			command+=
+				     POut.Long  (recall.PatNum)+","
+				+    POut.Date  (recall.DateDueCalc)+","
+				+    POut.Date  (recall.DateDue)+","
+				+    POut.Date  (recall.DatePrevious)+","
+				+    POut.Int   (recall.RecallInterval.ToInt())+","
+				+    POut.Long  (recall.RecallStatus)+","
+				+"'"+POut.String(recall.Note)+"',"
+				+    POut.Bool  (recall.IsDisabled)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (recall.RecallTypeNum)+","
+				+"'"+POut.Double(recall.DisableUntilBalance)+"',"
+				+    POut.Date  (recall.DisableUntilDate)+","
+				+    POut.Date  (recall.DateScheduled)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				recall.RecallNum=Db.NonQ(command,true);
+			}
+			return recall.RecallNum;
+		}
+
 		///<summary>Updates one Recall in the database.</summary>
 		public static void Update(Recall recall){
 			string command="UPDATE recall SET "

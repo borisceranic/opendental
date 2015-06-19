@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return treatPlan.TreatPlanNum;
 		}
 
+		///<summary>Inserts one TreatPlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TreatPlan treatPlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(treatPlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					treatPlan.TreatPlanNum=DbHelper.GetNextOracleKey("treatplan","TreatPlanNum"); //Cacheless method
+				}
+				return InsertNoCache(treatPlan,true);
+			}
+		}
+
+		///<summary>Inserts one TreatPlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TreatPlan treatPlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO treatplan (";
+			if(!useExistingPK && isRandomKeys) {
+				treatPlan.TreatPlanNum=ReplicationServers.GetKeyNoCache("treatplan","TreatPlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TreatPlanNum,";
+			}
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(treatPlan.TreatPlanNum)+",";
+			}
+			command+=
+				     POut.Long  (treatPlan.PatNum)+","
+				+    POut.Date  (treatPlan.DateTP)+","
+				+"'"+POut.String(treatPlan.Heading)+"',"
+				+"'"+POut.String(treatPlan.Note)+"',"
+				+"'"+POut.String(treatPlan.Signature)+"',"
+				+    POut.Bool  (treatPlan.SigIsTopaz)+","
+				+    POut.Long  (treatPlan.ResponsParty)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				treatPlan.TreatPlanNum=Db.NonQ(command,true);
+			}
+			return treatPlan.TreatPlanNum;
+		}
+
 		///<summary>Updates one TreatPlan in the database.</summary>
 		public static void Update(TreatPlan treatPlan){
 			string command="UPDATE treatplan SET "

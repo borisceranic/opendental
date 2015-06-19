@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return toothGridCell.ToothGridCellNum;
 		}
 
+		///<summary>Inserts one ToothGridCell into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridCell toothGridCell){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(toothGridCell,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					toothGridCell.ToothGridCellNum=DbHelper.GetNextOracleKey("toothgridcell","ToothGridCellNum"); //Cacheless method
+				}
+				return InsertNoCache(toothGridCell,true);
+			}
+		}
+
+		///<summary>Inserts one ToothGridCell into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridCell toothGridCell,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO toothgridcell (";
+			if(!useExistingPK && isRandomKeys) {
+				toothGridCell.ToothGridCellNum=ReplicationServers.GetKeyNoCache("toothgridcell","ToothGridCellNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ToothGridCellNum,";
+			}
+			command+="SheetFieldNum,ToothGridColNum,ValueEntered,ToothNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(toothGridCell.ToothGridCellNum)+",";
+			}
+			command+=
+				     POut.Long  (toothGridCell.SheetFieldNum)+","
+				+    POut.Long  (toothGridCell.ToothGridColNum)+","
+				+"'"+POut.String(toothGridCell.ValueEntered)+"',"
+				+"'"+POut.String(toothGridCell.ToothNum)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				toothGridCell.ToothGridCellNum=Db.NonQ(command,true);
+			}
+			return toothGridCell.ToothGridCellNum;
+		}
+
 		///<summary>Updates one ToothGridCell in the database.</summary>
 		public static void Update(ToothGridCell toothGridCell){
 			string command="UPDATE toothgridcell SET "

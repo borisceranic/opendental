@@ -113,6 +113,51 @@ namespace OpenDentBusiness.Crud{
 			return ehrSummaryCcd.EhrSummaryCcdNum;
 		}
 
+		///<summary>Inserts one EhrSummaryCcd into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrSummaryCcd ehrSummaryCcd){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrSummaryCcd,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrSummaryCcd.EhrSummaryCcdNum=DbHelper.GetNextOracleKey("ehrsummaryccd","EhrSummaryCcdNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrSummaryCcd,true);
+			}
+		}
+
+		///<summary>Inserts one EhrSummaryCcd into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrSummaryCcd ehrSummaryCcd,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrsummaryccd (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrSummaryCcd.EhrSummaryCcdNum=ReplicationServers.GetKeyNoCache("ehrsummaryccd","EhrSummaryCcdNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrSummaryCcdNum,";
+			}
+			command+="PatNum,DateSummary,ContentSummary,EmailAttachNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrSummaryCcd.EhrSummaryCcdNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrSummaryCcd.PatNum)+","
+				+    POut.Date  (ehrSummaryCcd.DateSummary)+","
+				+    DbHelper.ParamChar+"paramContentSummary,"
+				+    POut.Long  (ehrSummaryCcd.EmailAttachNum)+")";
+			if(ehrSummaryCcd.ContentSummary==null) {
+				ehrSummaryCcd.ContentSummary="";
+			}
+			OdSqlParameter paramContentSummary=new OdSqlParameter("paramContentSummary",OdDbType.Text,ehrSummaryCcd.ContentSummary);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramContentSummary);
+			}
+			else {
+				ehrSummaryCcd.EhrSummaryCcdNum=Db.NonQ(command,true,paramContentSummary);
+			}
+			return ehrSummaryCcd.EhrSummaryCcdNum;
+		}
+
 		///<summary>Updates one EhrSummaryCcd in the database.</summary>
 		public static void Update(EhrSummaryCcd ehrSummaryCcd){
 			string command="UPDATE ehrsummaryccd SET "

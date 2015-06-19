@@ -113,6 +113,51 @@ namespace OpenDentBusiness.Crud{
 			return documentMisc.DocMiscNum;
 		}
 
+		///<summary>Inserts one DocumentMisc into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DocumentMisc documentMisc){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(documentMisc,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					documentMisc.DocMiscNum=DbHelper.GetNextOracleKey("documentmisc","DocMiscNum"); //Cacheless method
+				}
+				return InsertNoCache(documentMisc,true);
+			}
+		}
+
+		///<summary>Inserts one DocumentMisc into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DocumentMisc documentMisc,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO documentmisc (";
+			if(!useExistingPK && isRandomKeys) {
+				documentMisc.DocMiscNum=ReplicationServers.GetKeyNoCache("documentmisc","DocMiscNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DocMiscNum,";
+			}
+			command+="DateCreated,FileName,DocMiscType,RawBase64) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(documentMisc.DocMiscNum)+",";
+			}
+			command+=
+				     POut.Date  (documentMisc.DateCreated)+","
+				+"'"+POut.String(documentMisc.FileName)+"',"
+				+    POut.Int   ((int)documentMisc.DocMiscType)+","
+				+    DbHelper.ParamChar+"paramRawBase64)";
+			if(documentMisc.RawBase64==null) {
+				documentMisc.RawBase64="";
+			}
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,documentMisc.RawBase64);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramRawBase64);
+			}
+			else {
+				documentMisc.DocMiscNum=Db.NonQ(command,true,paramRawBase64);
+			}
+			return documentMisc.DocMiscNum;
+		}
+
 		///<summary>Updates one DocumentMisc in the database.</summary>
 		public static void Update(DocumentMisc documentMisc){
 			string command="UPDATE documentmisc SET "

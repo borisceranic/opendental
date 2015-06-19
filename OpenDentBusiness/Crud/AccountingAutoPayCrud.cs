@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return accountingAutoPay.AccountingAutoPayNum;
 		}
 
+		///<summary>Inserts one AccountingAutoPay into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AccountingAutoPay accountingAutoPay){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(accountingAutoPay,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					accountingAutoPay.AccountingAutoPayNum=DbHelper.GetNextOracleKey("accountingautopay","AccountingAutoPayNum"); //Cacheless method
+				}
+				return InsertNoCache(accountingAutoPay,true);
+			}
+		}
+
+		///<summary>Inserts one AccountingAutoPay into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AccountingAutoPay accountingAutoPay,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO accountingautopay (";
+			if(!useExistingPK && isRandomKeys) {
+				accountingAutoPay.AccountingAutoPayNum=ReplicationServers.GetKeyNoCache("accountingautopay","AccountingAutoPayNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AccountingAutoPayNum,";
+			}
+			command+="PayType,PickList) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(accountingAutoPay.AccountingAutoPayNum)+",";
+			}
+			command+=
+				     POut.Long  (accountingAutoPay.PayType)+","
+				+"'"+POut.String(accountingAutoPay.PickList)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				accountingAutoPay.AccountingAutoPayNum=Db.NonQ(command,true);
+			}
+			return accountingAutoPay.AccountingAutoPayNum;
+		}
+
 		///<summary>Updates one AccountingAutoPay in the database.</summary>
 		public static void Update(AccountingAutoPay accountingAutoPay){
 			string command="UPDATE accountingautopay SET "

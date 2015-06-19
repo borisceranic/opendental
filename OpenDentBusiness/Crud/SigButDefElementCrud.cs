@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return sigButDefElement.ElementNum;
 		}
 
+		///<summary>Inserts one SigButDefElement into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigButDefElement sigButDefElement){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sigButDefElement,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sigButDefElement.ElementNum=DbHelper.GetNextOracleKey("sigbutdefelement","ElementNum"); //Cacheless method
+				}
+				return InsertNoCache(sigButDefElement,true);
+			}
+		}
+
+		///<summary>Inserts one SigButDefElement into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigButDefElement sigButDefElement,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sigbutdefelement (";
+			if(!useExistingPK && isRandomKeys) {
+				sigButDefElement.ElementNum=ReplicationServers.GetKeyNoCache("sigbutdefelement","ElementNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ElementNum,";
+			}
+			command+="SigButDefNum,SigElementDefNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sigButDefElement.ElementNum)+",";
+			}
+			command+=
+				     POut.Long  (sigButDefElement.SigButDefNum)+","
+				+    POut.Long  (sigButDefElement.SigElementDefNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				sigButDefElement.ElementNum=Db.NonQ(command,true);
+			}
+			return sigButDefElement.ElementNum;
+		}
+
 		///<summary>Updates one SigButDefElement in the database.</summary>
 		public static void Update(SigButDefElement sigButDefElement){
 			string command="UPDATE sigbutdefelement SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return ucum.UcumNum;
 		}
 
+		///<summary>Inserts one Ucum into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Ucum ucum){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ucum,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ucum.UcumNum=DbHelper.GetNextOracleKey("ucum","UcumNum"); //Cacheless method
+				}
+				return InsertNoCache(ucum,true);
+			}
+		}
+
+		///<summary>Inserts one Ucum into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Ucum ucum,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ucum (";
+			if(!useExistingPK && isRandomKeys) {
+				ucum.UcumNum=ReplicationServers.GetKeyNoCache("ucum","UcumNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="UcumNum,";
+			}
+			command+="UcumCode,Description,IsInUse) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ucum.UcumNum)+",";
+			}
+			command+=
+				 "'"+POut.String(ucum.UcumCode)+"',"
+				+"'"+POut.String(ucum.Description)+"',"
+				+    POut.Bool  (ucum.IsInUse)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ucum.UcumNum=Db.NonQ(command,true);
+			}
+			return ucum.UcumNum;
+		}
+
 		///<summary>Updates one Ucum in the database.</summary>
 		public static void Update(Ucum ucum){
 			string command="UPDATE ucum SET "

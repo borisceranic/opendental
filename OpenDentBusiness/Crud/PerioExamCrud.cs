@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return perioExam.PerioExamNum;
 		}
 
+		///<summary>Inserts one PerioExam into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PerioExam perioExam){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(perioExam,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					perioExam.PerioExamNum=DbHelper.GetNextOracleKey("perioexam","PerioExamNum"); //Cacheless method
+				}
+				return InsertNoCache(perioExam,true);
+			}
+		}
+
+		///<summary>Inserts one PerioExam into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PerioExam perioExam,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO perioexam (";
+			if(!useExistingPK && isRandomKeys) {
+				perioExam.PerioExamNum=ReplicationServers.GetKeyNoCache("perioexam","PerioExamNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PerioExamNum,";
+			}
+			command+="PatNum,ExamDate,ProvNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(perioExam.PerioExamNum)+",";
+			}
+			command+=
+				     POut.Long  (perioExam.PatNum)+","
+				+    POut.Date  (perioExam.ExamDate)+","
+				+    POut.Long  (perioExam.ProvNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				perioExam.PerioExamNum=Db.NonQ(command,true);
+			}
+			return perioExam.PerioExamNum;
+		}
+
 		///<summary>Updates one PerioExam in the database.</summary>
 		public static void Update(PerioExam perioExam){
 			string command="UPDATE perioexam SET "

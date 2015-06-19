@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return payorType.PayorTypeNum;
 		}
 
+		///<summary>Inserts one PayorType into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayorType payorType){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(payorType,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					payorType.PayorTypeNum=DbHelper.GetNextOracleKey("payortype","PayorTypeNum"); //Cacheless method
+				}
+				return InsertNoCache(payorType,true);
+			}
+		}
+
+		///<summary>Inserts one PayorType into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayorType payorType,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO payortype (";
+			if(!useExistingPK && isRandomKeys) {
+				payorType.PayorTypeNum=ReplicationServers.GetKeyNoCache("payortype","PayorTypeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PayorTypeNum,";
+			}
+			command+="PatNum,DateStart,SopCode,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(payorType.PayorTypeNum)+",";
+			}
+			command+=
+				     POut.Long  (payorType.PatNum)+","
+				+    POut.Date  (payorType.DateStart)+","
+				+"'"+POut.String(payorType.SopCode)+"',"
+				+"'"+POut.String(payorType.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				payorType.PayorTypeNum=Db.NonQ(command,true);
+			}
+			return payorType.PayorTypeNum;
+		}
+
 		///<summary>Updates one PayorType in the database.</summary>
 		public static void Update(PayorType payorType){
 			string command="UPDATE payortype SET "

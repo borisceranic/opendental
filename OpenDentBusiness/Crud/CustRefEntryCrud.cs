@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return custRefEntry.CustRefEntryNum;
 		}
 
+		///<summary>Inserts one CustRefEntry into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CustRefEntry custRefEntry){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(custRefEntry,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					custRefEntry.CustRefEntryNum=DbHelper.GetNextOracleKey("custrefentry","CustRefEntryNum"); //Cacheless method
+				}
+				return InsertNoCache(custRefEntry,true);
+			}
+		}
+
+		///<summary>Inserts one CustRefEntry into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CustRefEntry custRefEntry,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO custrefentry (";
+			if(!useExistingPK && isRandomKeys) {
+				custRefEntry.CustRefEntryNum=ReplicationServers.GetKeyNoCache("custrefentry","CustRefEntryNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CustRefEntryNum,";
+			}
+			command+="PatNumCust,PatNumRef,DateEntry,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(custRefEntry.CustRefEntryNum)+",";
+			}
+			command+=
+				     POut.Long  (custRefEntry.PatNumCust)+","
+				+    POut.Long  (custRefEntry.PatNumRef)+","
+				+    POut.Date  (custRefEntry.DateEntry)+","
+				+"'"+POut.String(custRefEntry.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				custRefEntry.CustRefEntryNum=Db.NonQ(command,true);
+			}
+			return custRefEntry.CustRefEntryNum;
+		}
+
 		///<summary>Updates one CustRefEntry in the database.</summary>
 		public static void Update(CustRefEntry custRefEntry){
 			string command="UPDATE custrefentry SET "

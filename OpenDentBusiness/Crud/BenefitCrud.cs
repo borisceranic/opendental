@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return benefit.BenefitNum;
 		}
 
+		///<summary>Inserts one Benefit into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Benefit benefit){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(benefit,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					benefit.BenefitNum=DbHelper.GetNextOracleKey("benefit","BenefitNum"); //Cacheless method
+				}
+				return InsertNoCache(benefit,true);
+			}
+		}
+
+		///<summary>Inserts one Benefit into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Benefit benefit,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO benefit (";
+			if(!useExistingPK && isRandomKeys) {
+				benefit.BenefitNum=ReplicationServers.GetKeyNoCache("benefit","BenefitNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="BenefitNum,";
+			}
+			command+="PlanNum,PatPlanNum,CovCatNum,BenefitType,Percent,MonetaryAmt,TimePeriod,QuantityQualifier,Quantity,CodeNum,CoverageLevel) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(benefit.BenefitNum)+",";
+			}
+			command+=
+				     POut.Long  (benefit.PlanNum)+","
+				+    POut.Long  (benefit.PatPlanNum)+","
+				+    POut.Long  (benefit.CovCatNum)+","
+				+    POut.Int   ((int)benefit.BenefitType)+","
+				+    POut.Int   (benefit.Percent)+","
+				+"'"+POut.Double(benefit.MonetaryAmt)+"',"
+				+    POut.Int   ((int)benefit.TimePeriod)+","
+				+    POut.Int   ((int)benefit.QuantityQualifier)+","
+				+    POut.Byte  (benefit.Quantity)+","
+				+    POut.Long  (benefit.CodeNum)+","
+				+    POut.Int   ((int)benefit.CoverageLevel)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				benefit.BenefitNum=Db.NonQ(command,true);
+			}
+			return benefit.BenefitNum;
+		}
+
 		///<summary>Updates one Benefit in the database.</summary>
 		public static void Update(Benefit benefit){
 			string command="UPDATE benefit SET "

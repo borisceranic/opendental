@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return labCase.LabCaseNum;
 		}
 
+		///<summary>Inserts one LabCase into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabCase labCase){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(labCase,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					labCase.LabCaseNum=DbHelper.GetNextOracleKey("labcase","LabCaseNum"); //Cacheless method
+				}
+				return InsertNoCache(labCase,true);
+			}
+		}
+
+		///<summary>Inserts one LabCase into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabCase labCase,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO labcase (";
+			if(!useExistingPK && isRandomKeys) {
+				labCase.LabCaseNum=ReplicationServers.GetKeyNoCache("labcase","LabCaseNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LabCaseNum,";
+			}
+			command+="PatNum,LaboratoryNum,AptNum,PlannedAptNum,DateTimeDue,DateTimeCreated,DateTimeSent,DateTimeRecd,DateTimeChecked,ProvNum,Instructions,LabFee) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(labCase.LabCaseNum)+",";
+			}
+			command+=
+				     POut.Long  (labCase.PatNum)+","
+				+    POut.Long  (labCase.LaboratoryNum)+","
+				+    POut.Long  (labCase.AptNum)+","
+				+    POut.Long  (labCase.PlannedAptNum)+","
+				+    POut.DateT (labCase.DateTimeDue)+","
+				+    POut.DateT (labCase.DateTimeCreated)+","
+				+    POut.DateT (labCase.DateTimeSent)+","
+				+    POut.DateT (labCase.DateTimeRecd)+","
+				+    POut.DateT (labCase.DateTimeChecked)+","
+				+    POut.Long  (labCase.ProvNum)+","
+				+"'"+POut.String(labCase.Instructions)+"',"
+				+"'"+POut.Double(labCase.LabFee)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				labCase.LabCaseNum=Db.NonQ(command,true);
+			}
+			return labCase.LabCaseNum;
+		}
+
 		///<summary>Updates one LabCase in the database.</summary>
 		public static void Update(LabCase labCase){
 			string command="UPDATE labcase SET "

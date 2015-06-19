@@ -117,6 +117,53 @@ namespace OpenDentBusiness.Crud{
 			return patientNote.PatNum;
 		}
 
+		///<summary>Inserts one PatientNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatientNote patientNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(patientNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					patientNote.PatNum=DbHelper.GetNextOracleKey("patientnote","PatNum"); //Cacheless method
+				}
+				return InsertNoCache(patientNote,true);
+			}
+		}
+
+		///<summary>Inserts one PatientNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatientNote patientNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO patientnote (";
+			if(!useExistingPK && isRandomKeys) {
+				patientNote.PatNum=ReplicationServers.GetKeyNoCache("patientnote","PatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PatNum,";
+			}
+			command+="FamFinancial,ApptPhone,Medical,Service,MedicalComp,Treatment) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(patientNote.PatNum)+",";
+			}
+			command+=
+				 "'"+POut.String(patientNote.FamFinancial)+"',"
+				+"'"+POut.String(patientNote.ApptPhone)+"',"
+				+"'"+POut.String(patientNote.Medical)+"',"
+				+"'"+POut.String(patientNote.Service)+"',"
+				+    DbHelper.ParamChar+"paramMedicalComp,"
+				+"'"+POut.String(patientNote.Treatment)+"')";
+			if(patientNote.MedicalComp==null) {
+				patientNote.MedicalComp="";
+			}
+			OdSqlParameter paramMedicalComp=new OdSqlParameter("paramMedicalComp",OdDbType.Text,patientNote.MedicalComp);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMedicalComp);
+			}
+			else {
+				patientNote.PatNum=Db.NonQ(command,true,paramMedicalComp);
+			}
+			return patientNote.PatNum;
+		}
+
 		///<summary>Updates one PatientNote in the database.</summary>
 		public static void Update(PatientNote patientNote){
 			string command="UPDATE patientnote SET "

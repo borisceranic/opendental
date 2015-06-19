@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return sheetDef.SheetDefNum;
 		}
 
+		///<summary>Inserts one SheetDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetDef sheetDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sheetDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sheetDef.SheetDefNum=DbHelper.GetNextOracleKey("sheetdef","SheetDefNum"); //Cacheless method
+				}
+				return InsertNoCache(sheetDef,true);
+			}
+		}
+
+		///<summary>Inserts one SheetDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetDef sheetDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sheetdef (";
+			if(!useExistingPK && isRandomKeys) {
+				sheetDef.SheetDefNum=ReplicationServers.GetKeyNoCache("sheetdef","SheetDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SheetDefNum,";
+			}
+			command+="Description,SheetType,FontSize,FontName,Width,Height,IsLandscape,PageCount,IsMultiPage) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sheetDef.SheetDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(sheetDef.Description)+"',"
+				+    POut.Int   ((int)sheetDef.SheetType)+","
+				+    POut.Float (sheetDef.FontSize)+","
+				+"'"+POut.String(sheetDef.FontName)+"',"
+				+    POut.Int   (sheetDef.Width)+","
+				+    POut.Int   (sheetDef.Height)+","
+				+    POut.Bool  (sheetDef.IsLandscape)+","
+				+    POut.Int   (sheetDef.PageCount)+","
+				+    POut.Bool  (sheetDef.IsMultiPage)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				sheetDef.SheetDefNum=Db.NonQ(command,true);
+			}
+			return sheetDef.SheetDefNum;
+		}
+
 		///<summary>Updates one SheetDef in the database.</summary>
 		public static void Update(SheetDef sheetDef){
 			string command="UPDATE sheetdef SET "

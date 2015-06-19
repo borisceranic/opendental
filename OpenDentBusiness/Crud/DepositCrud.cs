@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return deposit.DepositNum;
 		}
 
+		///<summary>Inserts one Deposit into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Deposit deposit){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(deposit,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					deposit.DepositNum=DbHelper.GetNextOracleKey("deposit","DepositNum"); //Cacheless method
+				}
+				return InsertNoCache(deposit,true);
+			}
+		}
+
+		///<summary>Inserts one Deposit into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Deposit deposit,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO deposit (";
+			if(!useExistingPK && isRandomKeys) {
+				deposit.DepositNum=ReplicationServers.GetKeyNoCache("deposit","DepositNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DepositNum,";
+			}
+			command+="DateDeposit,BankAccountInfo,Amount,Memo) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(deposit.DepositNum)+",";
+			}
+			command+=
+				     POut.Date  (deposit.DateDeposit)+","
+				+"'"+POut.String(deposit.BankAccountInfo)+"',"
+				+"'"+POut.Double(deposit.Amount)+"',"
+				+"'"+POut.String(deposit.Memo)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				deposit.DepositNum=Db.NonQ(command,true);
+			}
+			return deposit.DepositNum;
+		}
+
 		///<summary>Updates one Deposit in the database.</summary>
 		public static void Update(Deposit deposit){
 			string command="UPDATE deposit SET "

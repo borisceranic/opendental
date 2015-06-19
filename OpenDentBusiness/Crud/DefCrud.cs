@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return def.DefNum;
 		}
 
+		///<summary>Inserts one Def into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Def def){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(def,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					def.DefNum=DbHelper.GetNextOracleKey("definition","DefNum"); //Cacheless method
+				}
+				return InsertNoCache(def,true);
+			}
+		}
+
+		///<summary>Inserts one Def into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Def def,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO definition (";
+			if(!useExistingPK && isRandomKeys) {
+				def.DefNum=ReplicationServers.GetKeyNoCache("definition","DefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DefNum,";
+			}
+			command+="Category,ItemOrder,ItemName,ItemValue,ItemColor,IsHidden) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(def.DefNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)def.Category)+","
+				+    POut.Int   (def.ItemOrder)+","
+				+"'"+POut.String(def.ItemName)+"',"
+				+"'"+POut.String(def.ItemValue)+"',"
+				+    POut.Int   (def.ItemColor.ToArgb())+","
+				+    POut.Bool  (def.IsHidden)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				def.DefNum=Db.NonQ(command,true);
+			}
+			return def.DefNum;
+		}
+
 		///<summary>Updates one Def in the database.</summary>
 		public static void Update(Def def){
 			string command="UPDATE definition SET "

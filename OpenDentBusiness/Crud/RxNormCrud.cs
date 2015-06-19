@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return rxNorm.RxNormNum;
 		}
 
+		///<summary>Inserts one RxNorm into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxNorm rxNorm){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(rxNorm,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					rxNorm.RxNormNum=DbHelper.GetNextOracleKey("rxnorm","RxNormNum"); //Cacheless method
+				}
+				return InsertNoCache(rxNorm,true);
+			}
+		}
+
+		///<summary>Inserts one RxNorm into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxNorm rxNorm,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO rxnorm (";
+			if(!useExistingPK && isRandomKeys) {
+				rxNorm.RxNormNum=ReplicationServers.GetKeyNoCache("rxnorm","RxNormNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RxNormNum,";
+			}
+			command+="RxCui,MmslCode,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(rxNorm.RxNormNum)+",";
+			}
+			command+=
+				 "'"+POut.String(rxNorm.RxCui)+"',"
+				+"'"+POut.String(rxNorm.MmslCode)+"',"
+				+"'"+POut.String(rxNorm.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				rxNorm.RxNormNum=Db.NonQ(command,true);
+			}
+			return rxNorm.RxNormNum;
+		}
+
 		///<summary>Updates one RxNorm in the database.</summary>
 		public static void Update(RxNorm rxNorm){
 			string command="UPDATE rxnorm SET "

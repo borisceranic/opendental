@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return hcpcs.HcpcsNum;
 		}
 
+		///<summary>Inserts one Hcpcs into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Hcpcs hcpcs){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hcpcs,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hcpcs.HcpcsNum=DbHelper.GetNextOracleKey("hcpcs","HcpcsNum"); //Cacheless method
+				}
+				return InsertNoCache(hcpcs,true);
+			}
+		}
+
+		///<summary>Inserts one Hcpcs into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Hcpcs hcpcs,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hcpcs (";
+			if(!useExistingPK && isRandomKeys) {
+				hcpcs.HcpcsNum=ReplicationServers.GetKeyNoCache("hcpcs","HcpcsNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HcpcsNum,";
+			}
+			command+="HcpcsCode,DescriptionShort) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hcpcs.HcpcsNum)+",";
+			}
+			command+=
+				 "'"+POut.String(hcpcs.HcpcsCode)+"',"
+				+"'"+POut.String(hcpcs.DescriptionShort)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				hcpcs.HcpcsNum=Db.NonQ(command,true);
+			}
+			return hcpcs.HcpcsNum;
+		}
+
 		///<summary>Updates one Hcpcs in the database.</summary>
 		public static void Update(Hcpcs hcpcs){
 			string command="UPDATE hcpcs SET "

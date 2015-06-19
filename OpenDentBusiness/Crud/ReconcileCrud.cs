@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return reconcile.ReconcileNum;
 		}
 
+		///<summary>Inserts one Reconcile into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Reconcile reconcile){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(reconcile,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					reconcile.ReconcileNum=DbHelper.GetNextOracleKey("reconcile","ReconcileNum"); //Cacheless method
+				}
+				return InsertNoCache(reconcile,true);
+			}
+		}
+
+		///<summary>Inserts one Reconcile into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Reconcile reconcile,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO reconcile (";
+			if(!useExistingPK && isRandomKeys) {
+				reconcile.ReconcileNum=ReplicationServers.GetKeyNoCache("reconcile","ReconcileNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReconcileNum,";
+			}
+			command+="AccountNum,StartingBal,EndingBal,DateReconcile,IsLocked) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(reconcile.ReconcileNum)+",";
+			}
+			command+=
+				     POut.Long  (reconcile.AccountNum)+","
+				+"'"+POut.Double(reconcile.StartingBal)+"',"
+				+"'"+POut.Double(reconcile.EndingBal)+"',"
+				+    POut.Date  (reconcile.DateReconcile)+","
+				+    POut.Bool  (reconcile.IsLocked)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				reconcile.ReconcileNum=Db.NonQ(command,true);
+			}
+			return reconcile.ReconcileNum;
+		}
+
 		///<summary>Updates one Reconcile in the database.</summary>
 		public static void Update(Reconcile reconcile){
 			string command="UPDATE reconcile SET "

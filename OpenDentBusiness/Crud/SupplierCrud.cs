@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return supplier.SupplierNum;
 		}
 
+		///<summary>Inserts one Supplier into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Supplier supplier){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(supplier,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					supplier.SupplierNum=DbHelper.GetNextOracleKey("supplier","SupplierNum"); //Cacheless method
+				}
+				return InsertNoCache(supplier,true);
+			}
+		}
+
+		///<summary>Inserts one Supplier into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Supplier supplier,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO supplier (";
+			if(!useExistingPK && isRandomKeys) {
+				supplier.SupplierNum=ReplicationServers.GetKeyNoCache("supplier","SupplierNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SupplierNum,";
+			}
+			command+="Name,Phone,CustomerId,Website,UserName,Password,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(supplier.SupplierNum)+",";
+			}
+			command+=
+				 "'"+POut.String(supplier.Name)+"',"
+				+"'"+POut.String(supplier.Phone)+"',"
+				+"'"+POut.String(supplier.CustomerId)+"',"
+				+"'"+POut.String(supplier.Website)+"',"
+				+"'"+POut.String(supplier.UserName)+"',"
+				+"'"+POut.String(supplier.Password)+"',"
+				+"'"+POut.String(supplier.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				supplier.SupplierNum=Db.NonQ(command,true);
+			}
+			return supplier.SupplierNum;
+		}
+
 		///<summary>Updates one Supplier in the database.</summary>
 		public static void Update(Supplier supplier){
 			string command="UPDATE supplier SET "

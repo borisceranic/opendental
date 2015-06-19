@@ -125,6 +125,57 @@ namespace OpenDentBusiness.Crud{
 			return ehrAmendment.EhrAmendmentNum;
 		}
 
+		///<summary>Inserts one EhrAmendment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrAmendment ehrAmendment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrAmendment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrAmendment.EhrAmendmentNum=DbHelper.GetNextOracleKey("ehramendment","EhrAmendmentNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrAmendment,true);
+			}
+		}
+
+		///<summary>Inserts one EhrAmendment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrAmendment ehrAmendment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehramendment (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrAmendment.EhrAmendmentNum=ReplicationServers.GetKeyNoCache("ehramendment","EhrAmendmentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrAmendmentNum,";
+			}
+			command+="PatNum,IsAccepted,Description,Source,SourceName,FileName,RawBase64,DateTRequest,DateTAcceptDeny,DateTAppend) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrAmendment.EhrAmendmentNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrAmendment.PatNum)+","
+				+    POut.Int   ((int)ehrAmendment.IsAccepted)+","
+				+"'"+POut.String(ehrAmendment.Description)+"',"
+				+    POut.Int   ((int)ehrAmendment.Source)+","
+				+"'"+POut.String(ehrAmendment.SourceName)+"',"
+				+"'"+POut.String(ehrAmendment.FileName)+"',"
+				+    DbHelper.ParamChar+"paramRawBase64,"
+				+    POut.DateT (ehrAmendment.DateTRequest)+","
+				+    POut.DateT (ehrAmendment.DateTAcceptDeny)+","
+				+    POut.DateT (ehrAmendment.DateTAppend)+")";
+			if(ehrAmendment.RawBase64==null) {
+				ehrAmendment.RawBase64="";
+			}
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,ehrAmendment.RawBase64);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramRawBase64);
+			}
+			else {
+				ehrAmendment.EhrAmendmentNum=Db.NonQ(command,true,paramRawBase64);
+			}
+			return ehrAmendment.EhrAmendmentNum;
+		}
+
 		///<summary>Updates one EhrAmendment in the database.</summary>
 		public static void Update(EhrAmendment ehrAmendment){
 			string command="UPDATE ehramendment SET "

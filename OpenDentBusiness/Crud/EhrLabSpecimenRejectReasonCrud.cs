@@ -118,6 +118,51 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum;
 		}
 
+		///<summary>Inserts one EhrLabSpecimenRejectReason into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabSpecimenRejectReason,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum=DbHelper.GetNextOracleKey("ehrlabspecimenrejectreason","EhrLabSpecimenRejectReasonNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabSpecimenRejectReason,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabSpecimenRejectReason into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabspecimenrejectreason (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum=ReplicationServers.GetKeyNoCache("ehrlabspecimenrejectreason","EhrLabSpecimenRejectReasonNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabSpecimenRejectReasonNum,";
+			}
+			command+="EhrLabSpecimenNum,SpecimenRejectReasonID,SpecimenRejectReasonText,SpecimenRejectReasonCodeSystemName,SpecimenRejectReasonIDAlt,SpecimenRejectReasonTextAlt,SpecimenRejectReasonCodeSystemNameAlt,SpecimenRejectReasonTextOriginal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabSpecimenRejectReason.EhrLabSpecimenNum)+","
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonID)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonText)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum=Db.NonQ(command,true);
+			}
+			return ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum;
+		}
+
 		///<summary>Updates one EhrLabSpecimenRejectReason in the database.</summary>
 		public static void Update(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason){
 			string command="UPDATE ehrlabspecimenrejectreason SET "

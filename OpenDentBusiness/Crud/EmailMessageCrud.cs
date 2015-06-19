@@ -127,6 +127,58 @@ namespace OpenDentBusiness.Crud{
 			return emailMessage.EmailMessageNum;
 		}
 
+		///<summary>Inserts one EmailMessage into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailMessage emailMessage){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(emailMessage,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					emailMessage.EmailMessageNum=DbHelper.GetNextOracleKey("emailmessage","EmailMessageNum"); //Cacheless method
+				}
+				return InsertNoCache(emailMessage,true);
+			}
+		}
+
+		///<summary>Inserts one EmailMessage into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailMessage emailMessage,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO emailmessage (";
+			if(!useExistingPK && isRandomKeys) {
+				emailMessage.EmailMessageNum=ReplicationServers.GetKeyNoCache("emailmessage","EmailMessageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmailMessageNum,";
+			}
+			command+="PatNum,ToAddress,FromAddress,Subject,BodyText,MsgDateTime,SentOrReceived,RecipientAddress,RawEmailIn,ProvNumWebMail,PatNumSubj) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(emailMessage.EmailMessageNum)+",";
+			}
+			command+=
+				     POut.Long  (emailMessage.PatNum)+","
+				+"'"+POut.String(emailMessage.ToAddress)+"',"
+				+"'"+POut.String(emailMessage.FromAddress)+"',"
+				+"'"+POut.String(emailMessage.Subject)+"',"
+				+    DbHelper.ParamChar+"paramBodyText,"
+				+    POut.DateT (emailMessage.MsgDateTime)+","
+				+    POut.Int   ((int)emailMessage.SentOrReceived)+","
+				+"'"+POut.String(emailMessage.RecipientAddress)+"',"
+				+"'"+POut.String(emailMessage.RawEmailIn)+"',"
+				+    POut.Long  (emailMessage.ProvNumWebMail)+","
+				+    POut.Long  (emailMessage.PatNumSubj)+")";
+			if(emailMessage.BodyText==null) {
+				emailMessage.BodyText="";
+			}
+			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,emailMessage.BodyText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramBodyText);
+			}
+			else {
+				emailMessage.EmailMessageNum=Db.NonQ(command,true,paramBodyText);
+			}
+			return emailMessage.EmailMessageNum;
+		}
+
 		///<summary>Updates one EmailMessage in the database.</summary>
 		public static void Update(EmailMessage emailMessage){
 			string command="UPDATE emailmessage SET "

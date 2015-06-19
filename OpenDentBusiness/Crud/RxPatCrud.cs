@@ -131,6 +131,58 @@ namespace OpenDentBusiness.Crud{
 			return rxPat.RxNum;
 		}
 
+		///<summary>Inserts one RxPat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxPat rxPat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(rxPat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					rxPat.RxNum=DbHelper.GetNextOracleKey("rxpat","RxNum"); //Cacheless method
+				}
+				return InsertNoCache(rxPat,true);
+			}
+		}
+
+		///<summary>Inserts one RxPat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxPat rxPat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO rxpat (";
+			if(!useExistingPK && isRandomKeys) {
+				rxPat.RxNum=ReplicationServers.GetKeyNoCache("rxpat","RxNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RxNum,";
+			}
+			command+="PatNum,RxDate,Drug,Sig,Disp,Refills,ProvNum,Notes,PharmacyNum,IsControlled,SendStatus,RxCui,DosageCode,NewCropGuid) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(rxPat.RxNum)+",";
+			}
+			command+=
+				     POut.Long  (rxPat.PatNum)+","
+				+    POut.Date  (rxPat.RxDate)+","
+				+"'"+POut.String(rxPat.Drug)+"',"
+				+"'"+POut.String(rxPat.Sig)+"',"
+				+"'"+POut.String(rxPat.Disp)+"',"
+				+"'"+POut.String(rxPat.Refills)+"',"
+				+    POut.Long  (rxPat.ProvNum)+","
+				+"'"+POut.String(rxPat.Notes)+"',"
+				+    POut.Long  (rxPat.PharmacyNum)+","
+				+    POut.Bool  (rxPat.IsControlled)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Int   ((int)rxPat.SendStatus)+","
+				+    POut.Long  (rxPat.RxCui)+","
+				+"'"+POut.String(rxPat.DosageCode)+"',"
+				+"'"+POut.String(rxPat.NewCropGuid)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				rxPat.RxNum=Db.NonQ(command,true);
+			}
+			return rxPat.RxNum;
+		}
+
 		///<summary>Updates one RxPat in the database.</summary>
 		public static void Update(RxPat rxPat){
 			string command="UPDATE rxpat SET "

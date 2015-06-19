@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return intervention.InterventionNum;
 		}
 
+		///<summary>Inserts one Intervention into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Intervention intervention){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(intervention,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					intervention.InterventionNum=DbHelper.GetNextOracleKey("intervention","InterventionNum"); //Cacheless method
+				}
+				return InsertNoCache(intervention,true);
+			}
+		}
+
+		///<summary>Inserts one Intervention into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Intervention intervention,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO intervention (";
+			if(!useExistingPK && isRandomKeys) {
+				intervention.InterventionNum=ReplicationServers.GetKeyNoCache("intervention","InterventionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="InterventionNum,";
+			}
+			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEntry,CodeSet) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(intervention.InterventionNum)+",";
+			}
+			command+=
+				     POut.Long  (intervention.PatNum)+","
+				+    POut.Long  (intervention.ProvNum)+","
+				+"'"+POut.String(intervention.CodeValue)+"',"
+				+"'"+POut.String(intervention.CodeSystem)+"',"
+				+"'"+POut.String(intervention.Note)+"',"
+				+    POut.Date  (intervention.DateEntry)+","
+				+    POut.Int   ((int)intervention.CodeSet)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				intervention.InterventionNum=Db.NonQ(command,true);
+			}
+			return intervention.InterventionNum;
+		}
+
 		///<summary>Updates one Intervention in the database.</summary>
 		public static void Update(Intervention intervention){
 			string command="UPDATE intervention SET "

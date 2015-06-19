@@ -127,6 +127,56 @@ namespace OpenDentBusiness.Crud{
 			return sheet.SheetNum;
 		}
 
+		///<summary>Inserts one Sheet into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Sheet sheet){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sheet,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sheet.SheetNum=DbHelper.GetNextOracleKey("sheet","SheetNum"); //Cacheless method
+				}
+				return InsertNoCache(sheet,true);
+			}
+		}
+
+		///<summary>Inserts one Sheet into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Sheet sheet,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sheet (";
+			if(!useExistingPK && isRandomKeys) {
+				sheet.SheetNum=ReplicationServers.GetKeyNoCache("sheet","SheetNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SheetNum,";
+			}
+			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sheet.SheetNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)sheet.SheetType)+","
+				+    POut.Long  (sheet.PatNum)+","
+				+    POut.DateT (sheet.DateTimeSheet)+","
+				+    POut.Float (sheet.FontSize)+","
+				+"'"+POut.String(sheet.FontName)+"',"
+				+    POut.Int   (sheet.Width)+","
+				+    POut.Int   (sheet.Height)+","
+				+    POut.Bool  (sheet.IsLandscape)+","
+				+"'"+POut.String(sheet.InternalNote)+"',"
+				+"'"+POut.String(sheet.Description)+"',"
+				+    POut.Byte  (sheet.ShowInTerminal)+","
+				+    POut.Bool  (sheet.IsWebForm)+","
+				+    POut.Bool  (sheet.IsMultiPage)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				sheet.SheetNum=Db.NonQ(command,true);
+			}
+			return sheet.SheetNum;
+		}
+
 		///<summary>Updates one Sheet in the database.</summary>
 		public static void Update(Sheet sheet){
 			string command="UPDATE sheet SET "

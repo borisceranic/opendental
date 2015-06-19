@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return drugManufacturer.DrugManufacturerNum;
 		}
 
+		///<summary>Inserts one DrugManufacturer into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DrugManufacturer drugManufacturer){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(drugManufacturer,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					drugManufacturer.DrugManufacturerNum=DbHelper.GetNextOracleKey("drugmanufacturer","DrugManufacturerNum"); //Cacheless method
+				}
+				return InsertNoCache(drugManufacturer,true);
+			}
+		}
+
+		///<summary>Inserts one DrugManufacturer into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DrugManufacturer drugManufacturer,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO drugmanufacturer (";
+			if(!useExistingPK && isRandomKeys) {
+				drugManufacturer.DrugManufacturerNum=ReplicationServers.GetKeyNoCache("drugmanufacturer","DrugManufacturerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DrugManufacturerNum,";
+			}
+			command+="ManufacturerName,ManufacturerCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(drugManufacturer.DrugManufacturerNum)+",";
+			}
+			command+=
+				 "'"+POut.String(drugManufacturer.ManufacturerName)+"',"
+				+"'"+POut.String(drugManufacturer.ManufacturerCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				drugManufacturer.DrugManufacturerNum=Db.NonQ(command,true);
+			}
+			return drugManufacturer.DrugManufacturerNum;
+		}
+
 		///<summary>Updates one DrugManufacturer in the database.</summary>
 		public static void Update(DrugManufacturer drugManufacturer){
 			string command="UPDATE drugmanufacturer SET "

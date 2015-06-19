@@ -119,6 +119,54 @@ namespace OpenDentBusiness.Crud{
 			return procNote.ProcNoteNum;
 		}
 
+		///<summary>Inserts one ProcNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcNote procNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procNote.ProcNoteNum=DbHelper.GetNextOracleKey("procnote","ProcNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(procNote,true);
+			}
+		}
+
+		///<summary>Inserts one ProcNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcNote procNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procnote (";
+			if(!useExistingPK && isRandomKeys) {
+				procNote.ProcNoteNum=ReplicationServers.GetKeyNoCache("procnote","ProcNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcNoteNum,";
+			}
+			command+="PatNum,ProcNum,EntryDateTime,UserNum,Note,SigIsTopaz,Signature) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procNote.ProcNoteNum)+",";
+			}
+			command+=
+				     POut.Long  (procNote.PatNum)+","
+				+    POut.Long  (procNote.ProcNum)+","
+				+    DbHelper.Now()+","
+				+    POut.Long  (procNote.UserNum)+","
+				+    DbHelper.ParamChar+"paramNote,"
+				+    POut.Bool  (procNote.SigIsTopaz)+","
+				+"'"+POut.String(procNote.Signature)+"')";
+			if(procNote.Note==null) {
+				procNote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,procNote.Note);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				procNote.ProcNoteNum=Db.NonQ(command,true,paramNote);
+			}
+			return procNote.ProcNoteNum;
+		}
+
 		///<summary>Updates one ProcNote in the database.</summary>
 		public static void Update(ProcNote procNote){
 			string command="UPDATE procnote SET "

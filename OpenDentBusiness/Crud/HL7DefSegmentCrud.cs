@@ -126,6 +126,53 @@ namespace OpenDentBusiness.Crud{
 			return hL7DefSegment.HL7DefSegmentNum;
 		}
 
+		///<summary>Inserts one HL7DefSegment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefSegment hL7DefSegment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hL7DefSegment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hL7DefSegment.HL7DefSegmentNum=DbHelper.GetNextOracleKey("hl7defsegment","HL7DefSegmentNum"); //Cacheless method
+				}
+				return InsertNoCache(hL7DefSegment,true);
+			}
+		}
+
+		///<summary>Inserts one HL7DefSegment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefSegment hL7DefSegment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hl7defsegment (";
+			if(!useExistingPK && isRandomKeys) {
+				hL7DefSegment.HL7DefSegmentNum=ReplicationServers.GetKeyNoCache("hl7defsegment","HL7DefSegmentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HL7DefSegmentNum,";
+			}
+			command+="HL7DefMessageNum,ItemOrder,CanRepeat,IsOptional,SegmentName,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hL7DefSegment.HL7DefSegmentNum)+",";
+			}
+			command+=
+				     POut.Long  (hL7DefSegment.HL7DefMessageNum)+","
+				+    POut.Int   (hL7DefSegment.ItemOrder)+","
+				+    POut.Bool  (hL7DefSegment.CanRepeat)+","
+				+    POut.Bool  (hL7DefSegment.IsOptional)+","
+				+"'"+POut.String(hL7DefSegment.SegmentName.ToString())+"',"
+				+    DbHelper.ParamChar+"paramNote)";
+			if(hL7DefSegment.Note==null) {
+				hL7DefSegment.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,hL7DefSegment.Note);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				hL7DefSegment.HL7DefSegmentNum=Db.NonQ(command,true,paramNote);
+			}
+			return hL7DefSegment.HL7DefSegmentNum;
+		}
+
 		///<summary>Updates one HL7DefSegment in the database.</summary>
 		public static void Update(HL7DefSegment hL7DefSegment){
 			string command="UPDATE hl7defsegment SET "

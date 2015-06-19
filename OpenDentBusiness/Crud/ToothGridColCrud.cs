@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return toothGridCol.ToothGridColNum;
 		}
 
+		///<summary>Inserts one ToothGridCol into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridCol toothGridCol){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(toothGridCol,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					toothGridCol.ToothGridColNum=DbHelper.GetNextOracleKey("toothgridcol","ToothGridColNum"); //Cacheless method
+				}
+				return InsertNoCache(toothGridCol,true);
+			}
+		}
+
+		///<summary>Inserts one ToothGridCol into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridCol toothGridCol,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO toothgridcol (";
+			if(!useExistingPK && isRandomKeys) {
+				toothGridCol.ToothGridColNum=ReplicationServers.GetKeyNoCache("toothgridcol","ToothGridColNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ToothGridColNum,";
+			}
+			command+="SheetFieldNum,NameItem,CellType,ItemOrder,ColumnWidth,CodeNum,ProcStatus) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(toothGridCol.ToothGridColNum)+",";
+			}
+			command+=
+				     POut.Long  (toothGridCol.SheetFieldNum)+","
+				+"'"+POut.String(toothGridCol.NameItem)+"',"
+				+    POut.Int   ((int)toothGridCol.CellType)+","
+				+    POut.Int   (toothGridCol.ItemOrder)+","
+				+    POut.Int   (toothGridCol.ColumnWidth)+","
+				+    POut.Long  (toothGridCol.CodeNum)+","
+				+    POut.Int   ((int)toothGridCol.ProcStatus)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				toothGridCol.ToothGridColNum=Db.NonQ(command,true);
+			}
+			return toothGridCol.ToothGridColNum;
+		}
+
 		///<summary>Updates one ToothGridCol in the database.</summary>
 		public static void Update(ToothGridCol toothGridCol){
 			string command="UPDATE toothgridcol SET "

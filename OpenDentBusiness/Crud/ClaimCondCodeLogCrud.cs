@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return claimCondCodeLog.ClaimCondCodeLogNum;
 		}
 
+		///<summary>Inserts one ClaimCondCodeLog into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimCondCodeLog claimCondCodeLog){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimCondCodeLog,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimCondCodeLog.ClaimCondCodeLogNum=DbHelper.GetNextOracleKey("claimcondcodelog","ClaimCondCodeLogNum"); //Cacheless method
+				}
+				return InsertNoCache(claimCondCodeLog,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimCondCodeLog into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimCondCodeLog claimCondCodeLog,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimcondcodelog (";
+			if(!useExistingPK && isRandomKeys) {
+				claimCondCodeLog.ClaimCondCodeLogNum=ReplicationServers.GetKeyNoCache("claimcondcodelog","ClaimCondCodeLogNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimCondCodeLogNum,";
+			}
+			command+="ClaimNum,Code0,Code1,Code2,Code3,Code4,Code5,Code6,Code7,Code8,Code9,Code10) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimCondCodeLog.ClaimCondCodeLogNum)+",";
+			}
+			command+=
+				     POut.Long  (claimCondCodeLog.ClaimNum)+","
+				+"'"+POut.String(claimCondCodeLog.Code0)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code1)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code2)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code3)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code4)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code5)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code6)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code7)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code8)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code9)+"',"
+				+"'"+POut.String(claimCondCodeLog.Code10)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimCondCodeLog.ClaimCondCodeLogNum=Db.NonQ(command,true);
+			}
+			return claimCondCodeLog.ClaimCondCodeLogNum;
+		}
+
 		///<summary>Updates one ClaimCondCodeLog in the database.</summary>
 		public static void Update(ClaimCondCodeLog claimCondCodeLog){
 			string command="UPDATE claimcondcodelog SET "

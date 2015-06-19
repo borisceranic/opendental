@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return medication.MedicationNum;
 		}
 
+		///<summary>Inserts one Medication into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Medication medication){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medication,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medication.MedicationNum=DbHelper.GetNextOracleKey("medication","MedicationNum"); //Cacheless method
+				}
+				return InsertNoCache(medication,true);
+			}
+		}
+
+		///<summary>Inserts one Medication into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Medication medication,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medication (";
+			if(!useExistingPK && isRandomKeys) {
+				medication.MedicationNum=ReplicationServers.GetKeyNoCache("medication","MedicationNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedicationNum,";
+			}
+			command+="MedName,GenericNum,Notes,RxCui) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medication.MedicationNum)+",";
+			}
+			command+=
+				 "'"+POut.String(medication.MedName)+"',"
+				+    POut.Long  (medication.GenericNum)+","
+				+"'"+POut.String(medication.Notes)+"',"
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (medication.RxCui)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medication.MedicationNum=Db.NonQ(command,true);
+			}
+			return medication.MedicationNum;
+		}
+
 		///<summary>Updates one Medication in the database.</summary>
 		public static void Update(Medication medication){
 			string command="UPDATE medication SET "

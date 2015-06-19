@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return toolButItem.ToolButItemNum;
 		}
 
+		///<summary>Inserts one ToolButItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToolButItem toolButItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(toolButItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					toolButItem.ToolButItemNum=DbHelper.GetNextOracleKey("toolbutitem","ToolButItemNum"); //Cacheless method
+				}
+				return InsertNoCache(toolButItem,true);
+			}
+		}
+
+		///<summary>Inserts one ToolButItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToolButItem toolButItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO toolbutitem (";
+			if(!useExistingPK && isRandomKeys) {
+				toolButItem.ToolButItemNum=ReplicationServers.GetKeyNoCache("toolbutitem","ToolButItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ToolButItemNum,";
+			}
+			command+="ProgramNum,ToolBar,ButtonText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(toolButItem.ToolButItemNum)+",";
+			}
+			command+=
+				     POut.Long  (toolButItem.ProgramNum)+","
+				+    POut.Int   ((int)toolButItem.ToolBar)+","
+				+"'"+POut.String(toolButItem.ButtonText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				toolButItem.ToolButItemNum=Db.NonQ(command,true);
+			}
+			return toolButItem.ToolButItemNum;
+		}
+
 		///<summary>Updates one ToolButItem in the database.</summary>
 		public static void Update(ToolButItem toolButItem){
 			string command="UPDATE toolbutitem SET "

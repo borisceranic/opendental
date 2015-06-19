@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return insFilingCode.InsFilingCodeNum;
 		}
 
+		///<summary>Inserts one InsFilingCode into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsFilingCode insFilingCode){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(insFilingCode,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					insFilingCode.InsFilingCodeNum=DbHelper.GetNextOracleKey("insfilingcode","InsFilingCodeNum"); //Cacheless method
+				}
+				return InsertNoCache(insFilingCode,true);
+			}
+		}
+
+		///<summary>Inserts one InsFilingCode into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsFilingCode insFilingCode,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO insfilingcode (";
+			if(!useExistingPK && isRandomKeys) {
+				insFilingCode.InsFilingCodeNum=ReplicationServers.GetKeyNoCache("insfilingcode","InsFilingCodeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="InsFilingCodeNum,";
+			}
+			command+="Descript,EclaimCode,ItemOrder) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(insFilingCode.InsFilingCodeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(insFilingCode.Descript)+"',"
+				+"'"+POut.String(insFilingCode.EclaimCode)+"',"
+				+    POut.Int   (insFilingCode.ItemOrder)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				insFilingCode.InsFilingCodeNum=Db.NonQ(command,true);
+			}
+			return insFilingCode.InsFilingCodeNum;
+		}
+
 		///<summary>Updates one InsFilingCode in the database.</summary>
 		public static void Update(InsFilingCode insFilingCode){
 			string command="UPDATE insfilingcode SET "

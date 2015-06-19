@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return displayField.DisplayFieldNum;
 		}
 
+		///<summary>Inserts one DisplayField into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DisplayField displayField){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(displayField,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					displayField.DisplayFieldNum=DbHelper.GetNextOracleKey("displayfield","DisplayFieldNum"); //Cacheless method
+				}
+				return InsertNoCache(displayField,true);
+			}
+		}
+
+		///<summary>Inserts one DisplayField into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DisplayField displayField,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO displayfield (";
+			if(!useExistingPK && isRandomKeys) {
+				displayField.DisplayFieldNum=ReplicationServers.GetKeyNoCache("displayfield","DisplayFieldNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DisplayFieldNum,";
+			}
+			command+="InternalName,ItemOrder,Description,ColumnWidth,Category,ChartViewNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(displayField.DisplayFieldNum)+",";
+			}
+			command+=
+				 "'"+POut.String(displayField.InternalName)+"',"
+				+    POut.Int   (displayField.ItemOrder)+","
+				+"'"+POut.String(displayField.Description)+"',"
+				+    POut.Int   (displayField.ColumnWidth)+","
+				+    POut.Int   ((int)displayField.Category)+","
+				+    POut.Long  (displayField.ChartViewNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				displayField.DisplayFieldNum=Db.NonQ(command,true);
+			}
+			return displayField.DisplayFieldNum;
+		}
+
 		///<summary>Updates one DisplayField in the database.</summary>
 		public static void Update(DisplayField displayField){
 			string command="UPDATE displayfield SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return iCD9.ICD9Num;
 		}
 
+		///<summary>Inserts one ICD9 into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ICD9 iCD9){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(iCD9,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					iCD9.ICD9Num=DbHelper.GetNextOracleKey("icd9","ICD9Num"); //Cacheless method
+				}
+				return InsertNoCache(iCD9,true);
+			}
+		}
+
+		///<summary>Inserts one ICD9 into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ICD9 iCD9,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO icd9 (";
+			if(!useExistingPK && isRandomKeys) {
+				iCD9.ICD9Num=ReplicationServers.GetKeyNoCache("icd9","ICD9Num");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ICD9Num,";
+			}
+			command+="ICD9Code,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(iCD9.ICD9Num)+",";
+			}
+			command+=
+				 "'"+POut.String(iCD9.ICD9Code)+"',"
+				+"'"+POut.String(iCD9.Description)+"')";
+				//DateTStamp can only be set by MySQL
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				iCD9.ICD9Num=Db.NonQ(command,true);
+			}
+			return iCD9.ICD9Num;
+		}
+
 		///<summary>Updates one ICD9 in the database.</summary>
 		public static void Update(ICD9 iCD9){
 			string command="UPDATE icd9 SET "

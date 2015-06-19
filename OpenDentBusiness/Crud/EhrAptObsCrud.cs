@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return ehrAptObs.EhrAptObsNum;
 		}
 
+		///<summary>Inserts one EhrAptObs into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrAptObs ehrAptObs){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrAptObs,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrAptObs.EhrAptObsNum=DbHelper.GetNextOracleKey("ehraptobs","EhrAptObsNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrAptObs,true);
+			}
+		}
+
+		///<summary>Inserts one EhrAptObs into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrAptObs ehrAptObs,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehraptobs (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrAptObs.EhrAptObsNum=ReplicationServers.GetKeyNoCache("ehraptobs","EhrAptObsNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrAptObsNum,";
+			}
+			command+="AptNum,IdentifyingCode,ValType,ValReported,UcumCode,ValCodeSystem) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrAptObs.EhrAptObsNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrAptObs.AptNum)+","
+				+    POut.Int   ((int)ehrAptObs.IdentifyingCode)+","
+				+    POut.Int   ((int)ehrAptObs.ValType)+","
+				+"'"+POut.String(ehrAptObs.ValReported)+"',"
+				+"'"+POut.String(ehrAptObs.UcumCode)+"',"
+				+"'"+POut.String(ehrAptObs.ValCodeSystem)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrAptObs.EhrAptObsNum=Db.NonQ(command,true);
+			}
+			return ehrAptObs.EhrAptObsNum;
+		}
+
 		///<summary>Updates one EhrAptObs in the database.</summary>
 		public static void Update(EhrAptObs ehrAptObs){
 			string command="UPDATE ehraptobs SET "

@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return site.SiteNum;
 		}
 
+		///<summary>Inserts one Site into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Site site){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(site,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					site.SiteNum=DbHelper.GetNextOracleKey("site","SiteNum"); //Cacheless method
+				}
+				return InsertNoCache(site,true);
+			}
+		}
+
+		///<summary>Inserts one Site into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Site site,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO site (";
+			if(!useExistingPK && isRandomKeys) {
+				site.SiteNum=ReplicationServers.GetKeyNoCache("site","SiteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SiteNum,";
+			}
+			command+="Description,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(site.SiteNum)+",";
+			}
+			command+=
+				 "'"+POut.String(site.Description)+"',"
+				+"'"+POut.String(site.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				site.SiteNum=Db.NonQ(command,true);
+			}
+			return site.SiteNum;
+		}
+
 		///<summary>Updates one Site in the database.</summary>
 		public static void Update(Site site){
 			string command="UPDATE site SET "

@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return toothGridDef.ToothGridDefNum;
 		}
 
+		///<summary>Inserts one ToothGridDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridDef toothGridDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(toothGridDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					toothGridDef.ToothGridDefNum=DbHelper.GetNextOracleKey("toothgriddef","ToothGridDefNum"); //Cacheless method
+				}
+				return InsertNoCache(toothGridDef,true);
+			}
+		}
+
+		///<summary>Inserts one ToothGridDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothGridDef toothGridDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO toothgriddef (";
+			if(!useExistingPK && isRandomKeys) {
+				toothGridDef.ToothGridDefNum=ReplicationServers.GetKeyNoCache("toothgriddef","ToothGridDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ToothGridDefNum,";
+			}
+			command+="SheetFieldDefNum,NameInternal,NameShowing,CellType,ItemOrder,ColumnWidth,CodeNum,ProcStatus) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(toothGridDef.ToothGridDefNum)+",";
+			}
+			command+=
+				     POut.Long  (toothGridDef.SheetFieldDefNum)+","
+				+"'"+POut.String(toothGridDef.NameInternal)+"',"
+				+"'"+POut.String(toothGridDef.NameShowing)+"',"
+				+    POut.Int   ((int)toothGridDef.CellType)+","
+				+    POut.Int   (toothGridDef.ItemOrder)+","
+				+    POut.Int   (toothGridDef.ColumnWidth)+","
+				+    POut.Long  (toothGridDef.CodeNum)+","
+				+    POut.Int   ((int)toothGridDef.ProcStatus)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				toothGridDef.ToothGridDefNum=Db.NonQ(command,true);
+			}
+			return toothGridDef.ToothGridDefNum;
+		}
+
 		///<summary>Updates one ToothGridDef in the database.</summary>
 		public static void Update(ToothGridDef toothGridDef){
 			string command="UPDATE toothgriddef SET "

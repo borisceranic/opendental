@@ -113,6 +113,51 @@ namespace OpenDentBusiness.Crud{
 			return eobAttach.EobAttachNum;
 		}
 
+		///<summary>Inserts one EobAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EobAttach eobAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(eobAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					eobAttach.EobAttachNum=DbHelper.GetNextOracleKey("eobattach","EobAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(eobAttach,true);
+			}
+		}
+
+		///<summary>Inserts one EobAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EobAttach eobAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO eobattach (";
+			if(!useExistingPK && isRandomKeys) {
+				eobAttach.EobAttachNum=ReplicationServers.GetKeyNoCache("eobattach","EobAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EobAttachNum,";
+			}
+			command+="ClaimPaymentNum,DateTCreated,FileName,RawBase64) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(eobAttach.EobAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (eobAttach.ClaimPaymentNum)+","
+				+    POut.DateT (eobAttach.DateTCreated)+","
+				+"'"+POut.String(eobAttach.FileName)+"',"
+				+    DbHelper.ParamChar+"paramRawBase64)";
+			if(eobAttach.RawBase64==null) {
+				eobAttach.RawBase64="";
+			}
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,eobAttach.RawBase64);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramRawBase64);
+			}
+			else {
+				eobAttach.EobAttachNum=Db.NonQ(command,true,paramRawBase64);
+			}
+			return eobAttach.EobAttachNum;
+		}
+
 		///<summary>Updates one EobAttach in the database.</summary>
 		public static void Update(EobAttach eobAttach){
 			string command="UPDATE eobattach SET "

@@ -143,6 +143,64 @@ namespace OpenDentBusiness.Crud{
 			return screen.ScreenNum;
 		}
 
+		///<summary>Inserts one Screen into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Screen screen){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(screen,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					screen.ScreenNum=DbHelper.GetNextOracleKey("screen","ScreenNum"); //Cacheless method
+				}
+				return InsertNoCache(screen,true);
+			}
+		}
+
+		///<summary>Inserts one Screen into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Screen screen,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO screen (";
+			if(!useExistingPK && isRandomKeys) {
+				screen.ScreenNum=ReplicationServers.GetKeyNoCache("screen","ScreenNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ScreenNum,";
+			}
+			command+="ScreenDate,GradeSchool,County,PlaceService,ProvNum,ProvName,Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(screen.ScreenNum)+",";
+			}
+			command+=
+				     POut.Date  (screen.ScreenDate)+","
+				+"'"+POut.String(screen.GradeSchool)+"',"
+				+"'"+POut.String(screen.County)+"',"
+				+    POut.Int   ((int)screen.PlaceService)+","
+				+    POut.Long  (screen.ProvNum)+","
+				+"'"+POut.String(screen.ProvName)+"',"
+				+    POut.Int   ((int)screen.Gender)+","
+				+    POut.Int   ((int)screen.RaceOld)+","
+				+    POut.Int   ((int)screen.GradeLevel)+","
+				+    POut.Byte  (screen.Age)+","
+				+    POut.Int   ((int)screen.Urgency)+","
+				+    POut.Int   ((int)screen.HasCaries)+","
+				+    POut.Int   ((int)screen.NeedsSealants)+","
+				+    POut.Int   ((int)screen.CariesExperience)+","
+				+    POut.Int   ((int)screen.EarlyChildCaries)+","
+				+    POut.Int   ((int)screen.ExistingSealants)+","
+				+    POut.Int   ((int)screen.MissingAllTeeth)+","
+				+    POut.Date  (screen.Birthdate)+","
+				+    POut.Long  (screen.ScreenGroupNum)+","
+				+    POut.Int   (screen.ScreenGroupOrder)+","
+				+"'"+POut.String(screen.Comments)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				screen.ScreenNum=Db.NonQ(command,true);
+			}
+			return screen.ScreenNum;
+		}
+
 		///<summary>Updates one Screen in the database.</summary>
 		public static void Update(Screen screen){
 			string command="UPDATE screen SET "

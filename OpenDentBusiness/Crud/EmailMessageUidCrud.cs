@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return emailMessageUid.EmailMessageUidNum;
 		}
 
+		///<summary>Inserts one EmailMessageUid into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailMessageUid emailMessageUid){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(emailMessageUid,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					emailMessageUid.EmailMessageUidNum=DbHelper.GetNextOracleKey("emailmessageuid","EmailMessageUidNum"); //Cacheless method
+				}
+				return InsertNoCache(emailMessageUid,true);
+			}
+		}
+
+		///<summary>Inserts one EmailMessageUid into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailMessageUid emailMessageUid,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO emailmessageuid (";
+			if(!useExistingPK && isRandomKeys) {
+				emailMessageUid.EmailMessageUidNum=ReplicationServers.GetKeyNoCache("emailmessageuid","EmailMessageUidNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmailMessageUidNum,";
+			}
+			command+="MsgId,RecipientAddress) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(emailMessageUid.EmailMessageUidNum)+",";
+			}
+			command+=
+				 "'"+POut.String(emailMessageUid.MsgId)+"',"
+				+"'"+POut.String(emailMessageUid.RecipientAddress)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				emailMessageUid.EmailMessageUidNum=Db.NonQ(command,true);
+			}
+			return emailMessageUid.EmailMessageUidNum;
+		}
+
 		///<summary>Updates one EmailMessageUid in the database.</summary>
 		public static void Update(EmailMessageUid emailMessageUid){
 			string command="UPDATE emailmessageuid SET "

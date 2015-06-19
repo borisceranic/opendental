@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return recallTrigger.RecallTriggerNum;
 		}
 
+		///<summary>Inserts one RecallTrigger into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RecallTrigger recallTrigger){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(recallTrigger,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					recallTrigger.RecallTriggerNum=DbHelper.GetNextOracleKey("recalltrigger","RecallTriggerNum"); //Cacheless method
+				}
+				return InsertNoCache(recallTrigger,true);
+			}
+		}
+
+		///<summary>Inserts one RecallTrigger into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RecallTrigger recallTrigger,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO recalltrigger (";
+			if(!useExistingPK && isRandomKeys) {
+				recallTrigger.RecallTriggerNum=ReplicationServers.GetKeyNoCache("recalltrigger","RecallTriggerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RecallTriggerNum,";
+			}
+			command+="RecallTypeNum,CodeNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(recallTrigger.RecallTriggerNum)+",";
+			}
+			command+=
+				     POut.Long  (recallTrigger.RecallTypeNum)+","
+				+    POut.Long  (recallTrigger.CodeNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				recallTrigger.RecallTriggerNum=Db.NonQ(command,true);
+			}
+			return recallTrigger.RecallTriggerNum;
+		}
+
 		///<summary>Updates one RecallTrigger in the database.</summary>
 		public static void Update(RecallTrigger recallTrigger){
 			string command="UPDATE recalltrigger SET "

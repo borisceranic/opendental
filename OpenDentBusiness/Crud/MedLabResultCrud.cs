@@ -168,6 +168,67 @@ namespace OpenDentBusiness.Crud{
 			return medLabResult.MedLabResultNum;
 		}
 
+		///<summary>Inserts one MedLabResult into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabResult medLabResult){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medLabResult,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medLabResult.MedLabResultNum=DbHelper.GetNextOracleKey("medlabresult","MedLabResultNum"); //Cacheless method
+				}
+				return InsertNoCache(medLabResult,true);
+			}
+		}
+
+		///<summary>Inserts one MedLabResult into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLabResult medLabResult,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medlabresult (";
+			if(!useExistingPK && isRandomKeys) {
+				medLabResult.MedLabResultNum=ReplicationServers.GetKeyNoCache("medlabresult","MedLabResultNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedLabResultNum,";
+			}
+			command+="MedLabNum,ObsID,ObsText,ObsLoinc,ObsLoincText,ObsIDSub,ObsValue,ObsSubType,ObsUnits,ReferenceRange,AbnormalFlag,ResultStatus,DateTimeObs,FacilityID,DocNum,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medLabResult.MedLabResultNum)+",";
+			}
+			command+=
+				     POut.Long  (medLabResult.MedLabNum)+","
+				+"'"+POut.String(medLabResult.ObsID)+"',"
+				+"'"+POut.String(medLabResult.ObsText)+"',"
+				+"'"+POut.String(medLabResult.ObsLoinc)+"',"
+				+"'"+POut.String(medLabResult.ObsLoincText)+"',"
+				+"'"+POut.String(medLabResult.ObsIDSub)+"',"
+				+    DbHelper.ParamChar+"paramObsValue,"
+				+"'"+POut.String(medLabResult.ObsSubType.ToString())+"',"
+				+"'"+POut.String(medLabResult.ObsUnits)+"',"
+				+"'"+POut.String(medLabResult.ReferenceRange)+"',"
+				+"'"+POut.String(medLabResult.AbnormalFlag.ToString())+"',"
+				+"'"+POut.String(medLabResult.ResultStatus.ToString())+"',"
+				+    POut.DateT (medLabResult.DateTimeObs)+","
+				+"'"+POut.String(medLabResult.FacilityID)+"',"
+				+    POut.Long  (medLabResult.DocNum)+","
+				+    DbHelper.ParamChar+"paramNote)";
+			if(medLabResult.ObsValue==null) {
+				medLabResult.ObsValue="";
+			}
+			OdSqlParameter paramObsValue=new OdSqlParameter("paramObsValue",OdDbType.Text,medLabResult.ObsValue);
+			if(medLabResult.Note==null) {
+				medLabResult.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,medLabResult.Note);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramObsValue,paramNote);
+			}
+			else {
+				medLabResult.MedLabResultNum=Db.NonQ(command,true,paramObsValue,paramNote);
+			}
+			return medLabResult.MedLabResultNum;
+		}
+
 		///<summary>Updates one MedLabResult in the database.</summary>
 		public static void Update(MedLabResult medLabResult){
 			string command="UPDATE medlabresult SET "

@@ -113,6 +113,51 @@ namespace OpenDentBusiness.Crud{
 			return erxLog.ErxLogNum;
 		}
 
+		///<summary>Inserts one ErxLog into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ErxLog erxLog){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(erxLog,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					erxLog.ErxLogNum=DbHelper.GetNextOracleKey("erxlog","ErxLogNum"); //Cacheless method
+				}
+				return InsertNoCache(erxLog,true);
+			}
+		}
+
+		///<summary>Inserts one ErxLog into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ErxLog erxLog,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO erxlog (";
+			if(!useExistingPK && isRandomKeys) {
+				erxLog.ErxLogNum=ReplicationServers.GetKeyNoCache("erxlog","ErxLogNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ErxLogNum,";
+			}
+			command+="PatNum,MsgText,ProvNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(erxLog.ErxLogNum)+",";
+			}
+			command+=
+				     POut.Long  (erxLog.PatNum)+","
+				+    DbHelper.ParamChar+"paramMsgText,"
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (erxLog.ProvNum)+")";
+			if(erxLog.MsgText==null) {
+				erxLog.MsgText="";
+			}
+			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,erxLog.MsgText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMsgText);
+			}
+			else {
+				erxLog.ErxLogNum=Db.NonQ(command,true,paramMsgText);
+			}
+			return erxLog.ErxLogNum;
+		}
+
 		///<summary>Updates one ErxLog in the database.</summary>
 		public static void Update(ErxLog erxLog){
 			string command="UPDATE erxlog SET "

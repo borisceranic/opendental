@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return claimPayment.ClaimPaymentNum;
 		}
 
+		///<summary>Inserts one ClaimPayment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimPayment claimPayment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimPayment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimPayment.ClaimPaymentNum=DbHelper.GetNextOracleKey("claimpayment","ClaimPaymentNum"); //Cacheless method
+				}
+				return InsertNoCache(claimPayment,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimPayment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimPayment claimPayment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimpayment (";
+			if(!useExistingPK && isRandomKeys) {
+				claimPayment.ClaimPaymentNum=ReplicationServers.GetKeyNoCache("claimpayment","ClaimPaymentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimPaymentNum,";
+			}
+			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimPayment.ClaimPaymentNum)+",";
+			}
+			command+=
+				     POut.Date  (claimPayment.CheckDate)+","
+				+"'"+POut.Double(claimPayment.CheckAmt)+"',"
+				+"'"+POut.String(claimPayment.CheckNum)+"',"
+				+"'"+POut.String(claimPayment.BankBranch)+"',"
+				+"'"+POut.String(claimPayment.Note)+"',"
+				+    POut.Long  (claimPayment.ClinicNum)+","
+				+    POut.Long  (claimPayment.DepositNum)+","
+				+"'"+POut.String(claimPayment.CarrierName)+"',"
+				+    POut.Date  (claimPayment.DateIssued)+","
+				+    POut.Bool  (claimPayment.IsPartial)+","
+				+    POut.Long  (claimPayment.PayType)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimPayment.ClaimPaymentNum=Db.NonQ(command,true);
+			}
+			return claimPayment.ClaimPaymentNum;
+		}
+
 		///<summary>Updates one ClaimPayment in the database.</summary>
 		public static void Update(ClaimPayment claimPayment){
 			string command="UPDATE claimpayment SET "

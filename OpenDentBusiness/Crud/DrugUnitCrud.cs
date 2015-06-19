@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return drugUnit.DrugUnitNum;
 		}
 
+		///<summary>Inserts one DrugUnit into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DrugUnit drugUnit){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(drugUnit,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					drugUnit.DrugUnitNum=DbHelper.GetNextOracleKey("drugunit","DrugUnitNum"); //Cacheless method
+				}
+				return InsertNoCache(drugUnit,true);
+			}
+		}
+
+		///<summary>Inserts one DrugUnit into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DrugUnit drugUnit,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO drugunit (";
+			if(!useExistingPK && isRandomKeys) {
+				drugUnit.DrugUnitNum=ReplicationServers.GetKeyNoCache("drugunit","DrugUnitNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DrugUnitNum,";
+			}
+			command+="UnitIdentifier,UnitText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(drugUnit.DrugUnitNum)+",";
+			}
+			command+=
+				 "'"+POut.String(drugUnit.UnitIdentifier)+"',"
+				+"'"+POut.String(drugUnit.UnitText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				drugUnit.DrugUnitNum=Db.NonQ(command,true);
+			}
+			return drugUnit.DrugUnitNum;
+		}
+
 		///<summary>Updates one DrugUnit in the database.</summary>
 		public static void Update(DrugUnit drugUnit){
 			string command="UPDATE drugunit SET "

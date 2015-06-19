@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return wikiPage.WikiPageNum;
 		}
 
+		///<summary>Inserts one WikiPage into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiPage wikiPage){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(wikiPage,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					wikiPage.WikiPageNum=DbHelper.GetNextOracleKey("wikipage","WikiPageNum"); //Cacheless method
+				}
+				return InsertNoCache(wikiPage,true);
+			}
+		}
+
+		///<summary>Inserts one WikiPage into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiPage wikiPage,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO wikipage (";
+			if(!useExistingPK && isRandomKeys) {
+				wikiPage.WikiPageNum=ReplicationServers.GetKeyNoCache("wikipage","WikiPageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="WikiPageNum,";
+			}
+			command+="UserNum,PageTitle,KeyWords,PageContent,DateTimeSaved) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(wikiPage.WikiPageNum)+",";
+			}
+			command+=
+				     POut.Long  (wikiPage.UserNum)+","
+				+"'"+POut.String(wikiPage.PageTitle)+"',"
+				+"'"+POut.String(wikiPage.KeyWords)+"',"
+				+"'"+POut.String(wikiPage.PageContent)+"',"
+				+    DbHelper.Now()+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				wikiPage.WikiPageNum=Db.NonQ(command,true);
+			}
+			return wikiPage.WikiPageNum;
+		}
+
 		///<summary>Updates one WikiPage in the database.</summary>
 		public static void Update(WikiPage wikiPage){
 			string command="UPDATE wikipage SET "

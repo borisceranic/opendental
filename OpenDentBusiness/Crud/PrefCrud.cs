@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return pref.PrefNum;
 		}
 
+		///<summary>Inserts one Pref into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Pref pref){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(pref,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					pref.PrefNum=DbHelper.GetNextOracleKey("preference","PrefNum"); //Cacheless method
+				}
+				return InsertNoCache(pref,true);
+			}
+		}
+
+		///<summary>Inserts one Pref into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Pref pref,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO preference (";
+			if(!useExistingPK && isRandomKeys) {
+				pref.PrefNum=ReplicationServers.GetKeyNoCache("preference","PrefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PrefNum,";
+			}
+			command+="PrefName,ValueString,Comments) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(pref.PrefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(pref.PrefName)+"',"
+				+"'"+POut.String(pref.ValueString)+"',"
+				+"'"+POut.String(pref.Comments)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				pref.PrefNum=Db.NonQ(command,true);
+			}
+			return pref.PrefNum;
+		}
+
 		///<summary>Updates one Pref in the database.</summary>
 		public static void Update(Pref pref){
 			string command="UPDATE preference SET "

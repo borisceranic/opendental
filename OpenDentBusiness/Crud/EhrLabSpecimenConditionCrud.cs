@@ -118,6 +118,51 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabSpecimenCondition.EhrLabSpecimenConditionNum;
 		}
 
+		///<summary>Inserts one EhrLabSpecimenCondition into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabSpecimenCondition ehrLabSpecimenCondition){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabSpecimenCondition,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabSpecimenCondition.EhrLabSpecimenConditionNum=DbHelper.GetNextOracleKey("ehrlabspecimencondition","EhrLabSpecimenConditionNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabSpecimenCondition,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabSpecimenCondition into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabSpecimenCondition ehrLabSpecimenCondition,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabspecimencondition (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabSpecimenCondition.EhrLabSpecimenConditionNum=ReplicationServers.GetKeyNoCache("ehrlabspecimencondition","EhrLabSpecimenConditionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabSpecimenConditionNum,";
+			}
+			command+="EhrLabSpecimenNum,SpecimenConditionID,SpecimenConditionText,SpecimenConditionCodeSystemName,SpecimenConditionIDAlt,SpecimenConditionTextAlt,SpecimenConditionCodeSystemNameAlt,SpecimenConditionTextOriginal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabSpecimenCondition.EhrLabSpecimenConditionNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabSpecimenCondition.EhrLabSpecimenNum)+","
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionID)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionText)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionIDAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionTextAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabSpecimenCondition.SpecimenConditionTextOriginal)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabSpecimenCondition.EhrLabSpecimenConditionNum=Db.NonQ(command,true);
+			}
+			return ehrLabSpecimenCondition.EhrLabSpecimenConditionNum;
+		}
+
 		///<summary>Updates one EhrLabSpecimenCondition in the database.</summary>
 		public static void Update(EhrLabSpecimenCondition ehrLabSpecimenCondition){
 			string command="UPDATE ehrlabspecimencondition SET "

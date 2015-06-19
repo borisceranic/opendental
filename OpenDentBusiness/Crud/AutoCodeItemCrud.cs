@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return autoCodeItem.AutoCodeItemNum;
 		}
 
+		///<summary>Inserts one AutoCodeItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoCodeItem autoCodeItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(autoCodeItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					autoCodeItem.AutoCodeItemNum=DbHelper.GetNextOracleKey("autocodeitem","AutoCodeItemNum"); //Cacheless method
+				}
+				return InsertNoCache(autoCodeItem,true);
+			}
+		}
+
+		///<summary>Inserts one AutoCodeItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AutoCodeItem autoCodeItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO autocodeitem (";
+			if(!useExistingPK && isRandomKeys) {
+				autoCodeItem.AutoCodeItemNum=ReplicationServers.GetKeyNoCache("autocodeitem","AutoCodeItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AutoCodeItemNum,";
+			}
+			command+="AutoCodeNum,OldCode,CodeNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(autoCodeItem.AutoCodeItemNum)+",";
+			}
+			command+=
+				     POut.Long  (autoCodeItem.AutoCodeNum)+","
+				+"'"+POut.String(autoCodeItem.OldCode)+"',"
+				+    POut.Long  (autoCodeItem.CodeNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				autoCodeItem.AutoCodeItemNum=Db.NonQ(command,true);
+			}
+			return autoCodeItem.AutoCodeItemNum;
+		}
+
 		///<summary>Updates one AutoCodeItem in the database.</summary>
 		public static void Update(AutoCodeItem autoCodeItem){
 			string command="UPDATE autocodeitem SET "

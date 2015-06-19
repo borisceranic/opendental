@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return registrationKey.RegistrationKeyNum;
 		}
 
+		///<summary>Inserts one RegistrationKey into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RegistrationKey registrationKey){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(registrationKey,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					registrationKey.RegistrationKeyNum=DbHelper.GetNextOracleKey("registrationkey","RegistrationKeyNum"); //Cacheless method
+				}
+				return InsertNoCache(registrationKey,true);
+			}
+		}
+
+		///<summary>Inserts one RegistrationKey into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RegistrationKey registrationKey,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO registrationkey (";
+			if(!useExistingPK && isRandomKeys) {
+				registrationKey.RegistrationKeyNum=ReplicationServers.GetKeyNoCache("registrationkey","RegistrationKeyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RegistrationKeyNum,";
+			}
+			command+="PatNum,RegKey,Note,DateStarted,DateDisabled,DateEnded,IsForeign,UsesServerVersion,IsFreeVersion,IsOnlyForTesting,VotesAllotted,IsResellerCustomer) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(registrationKey.RegistrationKeyNum)+",";
+			}
+			command+=
+				     POut.Long  (registrationKey.PatNum)+","
+				+"'"+POut.String(registrationKey.RegKey)+"',"
+				+"'"+POut.String(registrationKey.Note)+"',"
+				+    POut.Date  (registrationKey.DateStarted)+","
+				+    POut.Date  (registrationKey.DateDisabled)+","
+				+    POut.Date  (registrationKey.DateEnded)+","
+				+    POut.Bool  (registrationKey.IsForeign)+","
+				+    POut.Bool  (registrationKey.UsesServerVersion)+","
+				+    POut.Bool  (registrationKey.IsFreeVersion)+","
+				+    POut.Bool  (registrationKey.IsOnlyForTesting)+","
+				+    POut.Int   (registrationKey.VotesAllotted)+","
+				+    POut.Bool  (registrationKey.IsResellerCustomer)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				registrationKey.RegistrationKeyNum=Db.NonQ(command,true);
+			}
+			return registrationKey.RegistrationKeyNum;
+		}
+
 		///<summary>Updates one RegistrationKey in the database.</summary>
 		public static void Update(RegistrationKey registrationKey){
 			string command="UPDATE registrationkey SET "

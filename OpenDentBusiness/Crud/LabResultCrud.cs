@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return labResult.LabResultNum;
 		}
 
+		///<summary>Inserts one LabResult into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabResult labResult){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(labResult,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					labResult.LabResultNum=DbHelper.GetNextOracleKey("labresult","LabResultNum"); //Cacheless method
+				}
+				return InsertNoCache(labResult,true);
+			}
+		}
+
+		///<summary>Inserts one LabResult into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabResult labResult,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO labresult (";
+			if(!useExistingPK && isRandomKeys) {
+				labResult.LabResultNum=ReplicationServers.GetKeyNoCache("labresult","LabResultNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LabResultNum,";
+			}
+			command+="LabPanelNum,DateTimeTest,TestName,TestID,ObsValue,ObsUnits,ObsRange,AbnormalFlag) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(labResult.LabResultNum)+",";
+			}
+			command+=
+				     POut.Long  (labResult.LabPanelNum)+","
+				+    POut.DateT (labResult.DateTimeTest)+","
+				+"'"+POut.String(labResult.TestName)+"',"
+				//DateTStamp can only be set by MySQL
+				+"'"+POut.String(labResult.TestID)+"',"
+				+"'"+POut.String(labResult.ObsValue)+"',"
+				+"'"+POut.String(labResult.ObsUnits)+"',"
+				+"'"+POut.String(labResult.ObsRange)+"',"
+				+    POut.Int   ((int)labResult.AbnormalFlag)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				labResult.LabResultNum=Db.NonQ(command,true);
+			}
+			return labResult.LabResultNum;
+		}
+
 		///<summary>Updates one LabResult in the database.</summary>
 		public static void Update(LabResult labResult){
 			string command="UPDATE labresult SET "

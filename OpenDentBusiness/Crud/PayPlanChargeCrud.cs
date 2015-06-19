@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return payPlanCharge.PayPlanChargeNum;
 		}
 
+		///<summary>Inserts one PayPlanCharge into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPlanCharge payPlanCharge){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(payPlanCharge,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					payPlanCharge.PayPlanChargeNum=DbHelper.GetNextOracleKey("payplancharge","PayPlanChargeNum"); //Cacheless method
+				}
+				return InsertNoCache(payPlanCharge,true);
+			}
+		}
+
+		///<summary>Inserts one PayPlanCharge into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPlanCharge payPlanCharge,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO payplancharge (";
+			if(!useExistingPK && isRandomKeys) {
+				payPlanCharge.PayPlanChargeNum=ReplicationServers.GetKeyNoCache("payplancharge","PayPlanChargeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PayPlanChargeNum,";
+			}
+			command+="PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Interest,Note,ProvNum,ClinicNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(payPlanCharge.PayPlanChargeNum)+",";
+			}
+			command+=
+				     POut.Long  (payPlanCharge.PayPlanNum)+","
+				+    POut.Long  (payPlanCharge.Guarantor)+","
+				+    POut.Long  (payPlanCharge.PatNum)+","
+				+    POut.Date  (payPlanCharge.ChargeDate)+","
+				+"'"+POut.Double(payPlanCharge.Principal)+"',"
+				+"'"+POut.Double(payPlanCharge.Interest)+"',"
+				+"'"+POut.String(payPlanCharge.Note)+"',"
+				+    POut.Long  (payPlanCharge.ProvNum)+","
+				+    POut.Long  (payPlanCharge.ClinicNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				payPlanCharge.PayPlanChargeNum=Db.NonQ(command,true);
+			}
+			return payPlanCharge.PayPlanChargeNum;
+		}
+
 		///<summary>Updates one PayPlanCharge in the database.</summary>
 		public static void Update(PayPlanCharge payPlanCharge){
 			string command="UPDATE payplancharge SET "

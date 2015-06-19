@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return supply.SupplyNum;
 		}
 
+		///<summary>Inserts one Supply into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Supply supply){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(supply,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					supply.SupplyNum=DbHelper.GetNextOracleKey("supply","SupplyNum"); //Cacheless method
+				}
+				return InsertNoCache(supply,true);
+			}
+		}
+
+		///<summary>Inserts one Supply into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Supply supply,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO supply (";
+			if(!useExistingPK && isRandomKeys) {
+				supply.SupplyNum=ReplicationServers.GetKeyNoCache("supply","SupplyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SupplyNum,";
+			}
+			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(supply.SupplyNum)+",";
+			}
+			command+=
+				     POut.Long  (supply.SupplierNum)+","
+				+"'"+POut.String(supply.CatalogNumber)+"',"
+				+"'"+POut.String(supply.Descript)+"',"
+				+    POut.Long  (supply.Category)+","
+				+    POut.Int   (supply.ItemOrder)+","
+				+    POut.Float (supply.LevelDesired)+","
+				+    POut.Bool  (supply.IsHidden)+","
+				+"'"+POut.Double(supply.Price)+"',"
+				+"'"+POut.String(supply.BarCodeOrID)+"',"
+				+    POut.Float (supply.DispDefaultQuant)+","
+				+    POut.Int   (supply.DispUnitsCount)+","
+				+"'"+POut.String(supply.DispUnitDesc)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				supply.SupplyNum=Db.NonQ(command,true);
+			}
+			return supply.SupplyNum;
+		}
+
 		///<summary>Updates one Supply in the database.</summary>
 		public static void Update(Supply supply){
 			string command="UPDATE supply SET "

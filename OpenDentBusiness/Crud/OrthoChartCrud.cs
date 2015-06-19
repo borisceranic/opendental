@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return orthoChart.OrthoChartNum;
 		}
 
+		///<summary>Inserts one OrthoChart into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OrthoChart orthoChart){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(orthoChart,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					orthoChart.OrthoChartNum=DbHelper.GetNextOracleKey("orthochart","OrthoChartNum"); //Cacheless method
+				}
+				return InsertNoCache(orthoChart,true);
+			}
+		}
+
+		///<summary>Inserts one OrthoChart into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OrthoChart orthoChart,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO orthochart (";
+			if(!useExistingPK && isRandomKeys) {
+				orthoChart.OrthoChartNum=ReplicationServers.GetKeyNoCache("orthochart","OrthoChartNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="OrthoChartNum,";
+			}
+			command+="PatNum,DateService,FieldName,FieldValue) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(orthoChart.OrthoChartNum)+",";
+			}
+			command+=
+				     POut.Long  (orthoChart.PatNum)+","
+				+    POut.Date  (orthoChart.DateService)+","
+				+"'"+POut.String(orthoChart.FieldName)+"',"
+				+"'"+POut.String(orthoChart.FieldValue)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				orthoChart.OrthoChartNum=Db.NonQ(command,true);
+			}
+			return orthoChart.OrthoChartNum;
+		}
+
 		///<summary>Updates one OrthoChart in the database.</summary>
 		public static void Update(OrthoChart orthoChart){
 			string command="UPDATE orthochart SET "

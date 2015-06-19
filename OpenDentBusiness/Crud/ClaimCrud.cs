@@ -243,6 +243,114 @@ namespace OpenDentBusiness.Crud{
 			return claim.ClaimNum;
 		}
 
+		///<summary>Inserts one Claim into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Claim claim){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claim,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claim.ClaimNum=DbHelper.GetNextOracleKey("claim","ClaimNum"); //Cacheless method
+				}
+				return InsertNoCache(claim,true);
+			}
+		}
+
+		///<summary>Inserts one Claim into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Claim claim,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claim (";
+			if(!useExistingPK && isRandomKeys) {
+				claim.ClaimNum=ReplicationServers.GetKeyNoCache("claim","ClaimNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimNum,";
+			}
+			command+="PatNum,DateService,DateSent,ClaimStatus,DateReceived,PlanNum,ProvTreat,ClaimFee,InsPayEst,InsPayAmt,DedApplied,PreAuthString,IsProsthesis,PriorDate,ReasonUnderPaid,ClaimNote,ClaimType,ProvBill,ReferringProv,RefNumString,PlaceService,AccidentRelated,AccidentDate,AccidentST,EmployRelated,IsOrtho,OrthoRemainM,OrthoDate,PatRelat,PlanNum2,PatRelat2,WriteOff,Radiographs,ClinicNum,ClaimForm,AttachedImages,AttachedModels,AttachedFlags,AttachmentID,CanadianMaterialsForwarded,CanadianReferralProviderNum,CanadianReferralReason,CanadianIsInitialLower,CanadianDateInitialLower,CanadianMandProsthMaterial,CanadianIsInitialUpper,CanadianDateInitialUpper,CanadianMaxProsthMaterial,InsSubNum,InsSubNum2,CanadaTransRefNum,CanadaEstTreatStartDate,CanadaInitialPayment,CanadaPaymentMode,CanadaTreatDuration,CanadaNumAnticipatedPayments,CanadaAnticipatedPayAmount,PriorAuthorizationNumber,SpecialProgramCode,UniformBillType,MedType,AdmissionTypeCode,AdmissionSourceCode,PatientStatusCode,CustomTracking,DateResent,CorrectionType,ClaimIdentifier,OrigRefNum,ProvOrderOverride,OrthoTotalM) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claim.ClaimNum)+",";
+			}
+			command+=
+				     POut.Long  (claim.PatNum)+","
+				+    POut.Date  (claim.DateService)+","
+				+    POut.Date  (claim.DateSent)+","
+				+"'"+POut.String(claim.ClaimStatus)+"',"
+				+    POut.Date  (claim.DateReceived)+","
+				+    POut.Long  (claim.PlanNum)+","
+				+    POut.Long  (claim.ProvTreat)+","
+				+"'"+POut.Double(claim.ClaimFee)+"',"
+				+"'"+POut.Double(claim.InsPayEst)+"',"
+				+"'"+POut.Double(claim.InsPayAmt)+"',"
+				+"'"+POut.Double(claim.DedApplied)+"',"
+				+"'"+POut.String(claim.PreAuthString)+"',"
+				+"'"+POut.String(claim.IsProsthesis)+"',"
+				+    POut.Date  (claim.PriorDate)+","
+				+"'"+POut.String(claim.ReasonUnderPaid)+"',"
+				+"'"+POut.String(claim.ClaimNote)+"',"
+				+"'"+POut.String(claim.ClaimType)+"',"
+				+    POut.Long  (claim.ProvBill)+","
+				+    POut.Long  (claim.ReferringProv)+","
+				+"'"+POut.String(claim.RefNumString)+"',"
+				+    POut.Int   ((int)claim.PlaceService)+","
+				+"'"+POut.String(claim.AccidentRelated)+"',"
+				+    POut.Date  (claim.AccidentDate)+","
+				+"'"+POut.String(claim.AccidentST)+"',"
+				+    POut.Int   ((int)claim.EmployRelated)+","
+				+    POut.Bool  (claim.IsOrtho)+","
+				+    POut.Byte  (claim.OrthoRemainM)+","
+				+    POut.Date  (claim.OrthoDate)+","
+				+    POut.Int   ((int)claim.PatRelat)+","
+				+    POut.Long  (claim.PlanNum2)+","
+				+    POut.Int   ((int)claim.PatRelat2)+","
+				+"'"+POut.Double(claim.WriteOff)+"',"
+				+    POut.Byte  (claim.Radiographs)+","
+				+    POut.Long  (claim.ClinicNum)+","
+				+    POut.Long  (claim.ClaimForm)+","
+				+    POut.Int   (claim.AttachedImages)+","
+				+    POut.Int   (claim.AttachedModels)+","
+				+"'"+POut.String(claim.AttachedFlags)+"',"
+				+"'"+POut.String(claim.AttachmentID)+"',"
+				+"'"+POut.String(claim.CanadianMaterialsForwarded)+"',"
+				+"'"+POut.String(claim.CanadianReferralProviderNum)+"',"
+				+    POut.Byte  (claim.CanadianReferralReason)+","
+				+"'"+POut.String(claim.CanadianIsInitialLower)+"',"
+				+    POut.Date  (claim.CanadianDateInitialLower)+","
+				+    POut.Byte  (claim.CanadianMandProsthMaterial)+","
+				+"'"+POut.String(claim.CanadianIsInitialUpper)+"',"
+				+    POut.Date  (claim.CanadianDateInitialUpper)+","
+				+    POut.Byte  (claim.CanadianMaxProsthMaterial)+","
+				+    POut.Long  (claim.InsSubNum)+","
+				+    POut.Long  (claim.InsSubNum2)+","
+				+"'"+POut.String(claim.CanadaTransRefNum)+"',"
+				+    POut.Date  (claim.CanadaEstTreatStartDate)+","
+				+"'"+POut.Double(claim.CanadaInitialPayment)+"',"
+				+    POut.Byte  (claim.CanadaPaymentMode)+","
+				+    POut.Byte  (claim.CanadaTreatDuration)+","
+				+    POut.Byte  (claim.CanadaNumAnticipatedPayments)+","
+				+"'"+POut.Double(claim.CanadaAnticipatedPayAmount)+"',"
+				+"'"+POut.String(claim.PriorAuthorizationNumber)+"',"
+				+    POut.Int   ((int)claim.SpecialProgramCode)+","
+				+"'"+POut.String(claim.UniformBillType)+"',"
+				+    POut.Int   ((int)claim.MedType)+","
+				+"'"+POut.String(claim.AdmissionTypeCode)+"',"
+				+"'"+POut.String(claim.AdmissionSourceCode)+"',"
+				+"'"+POut.String(claim.PatientStatusCode)+"',"
+				+    POut.Long  (claim.CustomTracking)+","
+				+    POut.Date  (claim.DateResent)+","
+				+    POut.Int   ((int)claim.CorrectionType)+","
+				+"'"+POut.String(claim.ClaimIdentifier)+"',"
+				+"'"+POut.String(claim.OrigRefNum)+"',"
+				+    POut.Long  (claim.ProvOrderOverride)+","
+				+    POut.Byte  (claim.OrthoTotalM)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claim.ClaimNum=Db.NonQ(command,true);
+			}
+			return claim.ClaimNum;
+		}
+
 		///<summary>Updates one Claim in the database.</summary>
 		public static void Update(Claim claim){
 			string command="UPDATE claim SET "

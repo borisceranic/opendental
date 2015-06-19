@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return procButtonItem.ProcButtonItemNum;
 		}
 
+		///<summary>Inserts one ProcButtonItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButtonItem procButtonItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procButtonItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procButtonItem.ProcButtonItemNum=DbHelper.GetNextOracleKey("procbuttonitem","ProcButtonItemNum"); //Cacheless method
+				}
+				return InsertNoCache(procButtonItem,true);
+			}
+		}
+
+		///<summary>Inserts one ProcButtonItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcButtonItem procButtonItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procbuttonitem (";
+			if(!useExistingPK && isRandomKeys) {
+				procButtonItem.ProcButtonItemNum=ReplicationServers.GetKeyNoCache("procbuttonitem","ProcButtonItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcButtonItemNum,";
+			}
+			command+="ProcButtonNum,OldCode,AutoCodeNum,CodeNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procButtonItem.ProcButtonItemNum)+",";
+			}
+			command+=
+				     POut.Long  (procButtonItem.ProcButtonNum)+","
+				+"'"+POut.String(procButtonItem.OldCode)+"',"
+				+    POut.Long  (procButtonItem.AutoCodeNum)+","
+				+    POut.Long  (procButtonItem.CodeNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procButtonItem.ProcButtonItemNum=Db.NonQ(command,true);
+			}
+			return procButtonItem.ProcButtonItemNum;
+		}
+
 		///<summary>Updates one ProcButtonItem in the database.</summary>
 		public static void Update(ProcButtonItem procButtonItem){
 			string command="UPDATE procbuttonitem SET "

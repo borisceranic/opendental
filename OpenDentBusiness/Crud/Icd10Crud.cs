@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return icd10.Icd10Num;
 		}
 
+		///<summary>Inserts one Icd10 into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Icd10 icd10){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(icd10,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					icd10.Icd10Num=DbHelper.GetNextOracleKey("icd10","Icd10Num"); //Cacheless method
+				}
+				return InsertNoCache(icd10,true);
+			}
+		}
+
+		///<summary>Inserts one Icd10 into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Icd10 icd10,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO icd10 (";
+			if(!useExistingPK && isRandomKeys) {
+				icd10.Icd10Num=ReplicationServers.GetKeyNoCache("icd10","Icd10Num");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="Icd10Num,";
+			}
+			command+="Icd10Code,Description,IsCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(icd10.Icd10Num)+",";
+			}
+			command+=
+				 "'"+POut.String(icd10.Icd10Code)+"',"
+				+"'"+POut.String(icd10.Description)+"',"
+				+"'"+POut.String(icd10.IsCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				icd10.Icd10Num=Db.NonQ(command,true);
+			}
+			return icd10.Icd10Num;
+		}
+
 		///<summary>Updates one Icd10 in the database.</summary>
 		public static void Update(Icd10 icd10){
 			string command="UPDATE icd10 SET "

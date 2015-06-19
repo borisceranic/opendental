@@ -131,6 +131,60 @@ namespace OpenDentBusiness.Crud{
 			return payment.PayNum;
 		}
 
+		///<summary>Inserts one Payment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Payment payment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(payment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					payment.PayNum=DbHelper.GetNextOracleKey("payment","PayNum"); //Cacheless method
+				}
+				return InsertNoCache(payment,true);
+			}
+		}
+
+		///<summary>Inserts one Payment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Payment payment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO payment (";
+			if(!useExistingPK && isRandomKeys) {
+				payment.PayNum=ReplicationServers.GetKeyNoCache("payment","PayNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PayNum,";
+			}
+			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(payment.PayNum)+",";
+			}
+			command+=
+				     POut.Long  (payment.PayType)+","
+				+    POut.Date  (payment.PayDate)+","
+				+"'"+POut.Double(payment.PayAmt)+"',"
+				+"'"+POut.String(payment.CheckNum)+"',"
+				+"'"+POut.String(payment.BankBranch)+"',"
+				+"'"+POut.String(payment.PayNote)+"',"
+				+    POut.Bool  (payment.IsSplit)+","
+				+    POut.Long  (payment.PatNum)+","
+				+    POut.Long  (payment.ClinicNum)+","
+				+    DbHelper.Now()+","
+				+    POut.Long  (payment.DepositNum)+","
+				+    DbHelper.ParamChar+"paramReceipt,"
+				+    POut.Bool  (payment.IsRecurringCC)+")";
+			if(payment.Receipt==null) {
+				payment.Receipt="";
+			}
+			OdSqlParameter paramReceipt=new OdSqlParameter("paramReceipt",OdDbType.Text,payment.Receipt);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramReceipt);
+			}
+			else {
+				payment.PayNum=Db.NonQ(command,true,paramReceipt);
+			}
+			return payment.PayNum;
+		}
+
 		///<summary>Updates one Payment in the database.</summary>
 		public static void Update(Payment payment){
 			string command="UPDATE payment SET "

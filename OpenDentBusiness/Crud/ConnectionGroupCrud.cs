@@ -103,6 +103,44 @@ namespace OpenDentBusiness.Crud{
 			return connectionGroup.ConnectionGroupNum;
 		}
 
+		///<summary>Inserts one ConnectionGroup into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ConnectionGroup connectionGroup){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(connectionGroup,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					connectionGroup.ConnectionGroupNum=DbHelper.GetNextOracleKey("connectiongroup","ConnectionGroupNum"); //Cacheless method
+				}
+				return InsertNoCache(connectionGroup,true);
+			}
+		}
+
+		///<summary>Inserts one ConnectionGroup into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ConnectionGroup connectionGroup,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO connectiongroup (";
+			if(!useExistingPK && isRandomKeys) {
+				connectionGroup.ConnectionGroupNum=ReplicationServers.GetKeyNoCache("connectiongroup","ConnectionGroupNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ConnectionGroupNum,";
+			}
+			command+="Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(connectionGroup.ConnectionGroupNum)+",";
+			}
+			command+=
+				 "'"+POut.String(connectionGroup.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				connectionGroup.ConnectionGroupNum=Db.NonQ(command,true);
+			}
+			return connectionGroup.ConnectionGroupNum;
+		}
+
 		///<summary>Updates one ConnectionGroup in the database.</summary>
 		public static void Update(ConnectionGroup connectionGroup){
 			string command="UPDATE connectiongroup SET "

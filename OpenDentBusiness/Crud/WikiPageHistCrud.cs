@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return wikiPageHist.WikiPageNum;
 		}
 
+		///<summary>Inserts one WikiPageHist into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiPageHist wikiPageHist){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(wikiPageHist,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					wikiPageHist.WikiPageNum=DbHelper.GetNextOracleKey("wikipagehist","WikiPageNum"); //Cacheless method
+				}
+				return InsertNoCache(wikiPageHist,true);
+			}
+		}
+
+		///<summary>Inserts one WikiPageHist into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiPageHist wikiPageHist,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO wikipagehist (";
+			if(!useExistingPK && isRandomKeys) {
+				wikiPageHist.WikiPageNum=ReplicationServers.GetKeyNoCache("wikipagehist","WikiPageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="WikiPageNum,";
+			}
+			command+="UserNum,PageTitle,PageContent,DateTimeSaved,IsDeleted) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(wikiPageHist.WikiPageNum)+",";
+			}
+			command+=
+				     POut.Long  (wikiPageHist.UserNum)+","
+				+"'"+POut.String(wikiPageHist.PageTitle)+"',"
+				+"'"+POut.String(wikiPageHist.PageContent)+"',"
+				+    POut.DateT (wikiPageHist.DateTimeSaved)+","
+				+    POut.Bool  (wikiPageHist.IsDeleted)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				wikiPageHist.WikiPageNum=Db.NonQ(command,true);
+			}
+			return wikiPageHist.WikiPageNum;
+		}
+
 		///<summary>Updates one WikiPageHist in the database.</summary>
 		public static void Update(WikiPageHist wikiPageHist){
 			string command="UPDATE wikipagehist SET "

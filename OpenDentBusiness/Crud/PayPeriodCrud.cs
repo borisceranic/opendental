@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return payPeriod.PayPeriodNum;
 		}
 
+		///<summary>Inserts one PayPeriod into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPeriod payPeriod){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(payPeriod,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					payPeriod.PayPeriodNum=DbHelper.GetNextOracleKey("payperiod","PayPeriodNum"); //Cacheless method
+				}
+				return InsertNoCache(payPeriod,true);
+			}
+		}
+
+		///<summary>Inserts one PayPeriod into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPeriod payPeriod,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO payperiod (";
+			if(!useExistingPK && isRandomKeys) {
+				payPeriod.PayPeriodNum=ReplicationServers.GetKeyNoCache("payperiod","PayPeriodNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PayPeriodNum,";
+			}
+			command+="DateStart,DateStop,DatePaycheck) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(payPeriod.PayPeriodNum)+",";
+			}
+			command+=
+				     POut.Date  (payPeriod.DateStart)+","
+				+    POut.Date  (payPeriod.DateStop)+","
+				+    POut.Date  (payPeriod.DatePaycheck)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				payPeriod.PayPeriodNum=Db.NonQ(command,true);
+			}
+			return payPeriod.PayPeriodNum;
+		}
+
 		///<summary>Updates one PayPeriod in the database.</summary>
 		public static void Update(PayPeriod payPeriod){
 			string command="UPDATE payperiod SET "

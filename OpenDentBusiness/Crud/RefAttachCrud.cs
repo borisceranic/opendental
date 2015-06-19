@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return refAttach.RefAttachNum;
 		}
 
+		///<summary>Inserts one RefAttach into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RefAttach refAttach){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(refAttach,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					refAttach.RefAttachNum=DbHelper.GetNextOracleKey("refattach","RefAttachNum"); //Cacheless method
+				}
+				return InsertNoCache(refAttach,true);
+			}
+		}
+
+		///<summary>Inserts one RefAttach into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RefAttach refAttach,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO refattach (";
+			if(!useExistingPK && isRandomKeys) {
+				refAttach.RefAttachNum=ReplicationServers.GetKeyNoCache("refattach","RefAttachNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RefAttachNum,";
+			}
+			command+="ReferralNum,PatNum,ItemOrder,RefDate,IsFrom,RefToStatus,Note,IsTransitionOfCare,ProcNum,DateProcComplete,ProvNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(refAttach.RefAttachNum)+",";
+			}
+			command+=
+				     POut.Long  (refAttach.ReferralNum)+","
+				+    POut.Long  (refAttach.PatNum)+","
+				+    POut.Int   (refAttach.ItemOrder)+","
+				+    POut.Date  (refAttach.RefDate)+","
+				+    POut.Bool  (refAttach.IsFrom)+","
+				+    POut.Int   ((int)refAttach.RefToStatus)+","
+				+"'"+POut.String(refAttach.Note)+"',"
+				+    POut.Bool  (refAttach.IsTransitionOfCare)+","
+				+    POut.Long  (refAttach.ProcNum)+","
+				+    POut.Date  (refAttach.DateProcComplete)+","
+				+    POut.Long  (refAttach.ProvNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				refAttach.RefAttachNum=Db.NonQ(command,true);
+			}
+			return refAttach.RefAttachNum;
+		}
+
 		///<summary>Updates one RefAttach in the database.</summary>
 		public static void Update(RefAttach refAttach){
 			string command="UPDATE refattach SET "

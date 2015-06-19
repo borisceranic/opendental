@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return letterMergeField.FieldNum;
 		}
 
+		///<summary>Inserts one LetterMergeField into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LetterMergeField letterMergeField){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(letterMergeField,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					letterMergeField.FieldNum=DbHelper.GetNextOracleKey("lettermergefield","FieldNum"); //Cacheless method
+				}
+				return InsertNoCache(letterMergeField,true);
+			}
+		}
+
+		///<summary>Inserts one LetterMergeField into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LetterMergeField letterMergeField,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO lettermergefield (";
+			if(!useExistingPK && isRandomKeys) {
+				letterMergeField.FieldNum=ReplicationServers.GetKeyNoCache("lettermergefield","FieldNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="FieldNum,";
+			}
+			command+="LetterMergeNum,FieldName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(letterMergeField.FieldNum)+",";
+			}
+			command+=
+				     POut.Long  (letterMergeField.LetterMergeNum)+","
+				+"'"+POut.String(letterMergeField.FieldName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				letterMergeField.FieldNum=Db.NonQ(command,true);
+			}
+			return letterMergeField.FieldNum;
+		}
+
 		///<summary>Updates one LetterMergeField in the database.</summary>
 		public static void Update(LetterMergeField letterMergeField){
 			string command="UPDATE lettermergefield SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return wikiListHeaderWidth.WikiListHeaderWidthNum;
 		}
 
+		///<summary>Inserts one WikiListHeaderWidth into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiListHeaderWidth wikiListHeaderWidth){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(wikiListHeaderWidth,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					wikiListHeaderWidth.WikiListHeaderWidthNum=DbHelper.GetNextOracleKey("wikilistheaderwidth","WikiListHeaderWidthNum"); //Cacheless method
+				}
+				return InsertNoCache(wikiListHeaderWidth,true);
+			}
+		}
+
+		///<summary>Inserts one WikiListHeaderWidth into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(WikiListHeaderWidth wikiListHeaderWidth,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO wikilistheaderwidth (";
+			if(!useExistingPK && isRandomKeys) {
+				wikiListHeaderWidth.WikiListHeaderWidthNum=ReplicationServers.GetKeyNoCache("wikilistheaderwidth","WikiListHeaderWidthNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="WikiListHeaderWidthNum,";
+			}
+			command+="ListName,ColName,ColWidth) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(wikiListHeaderWidth.WikiListHeaderWidthNum)+",";
+			}
+			command+=
+				 "'"+POut.String(wikiListHeaderWidth.ListName)+"',"
+				+"'"+POut.String(wikiListHeaderWidth.ColName)+"',"
+				+    POut.Int   (wikiListHeaderWidth.ColWidth)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				wikiListHeaderWidth.WikiListHeaderWidthNum=Db.NonQ(command,true);
+			}
+			return wikiListHeaderWidth.WikiListHeaderWidthNum;
+		}
+
 		///<summary>Updates one WikiListHeaderWidth in the database.</summary>
 		public static void Update(WikiListHeaderWidth wikiListHeaderWidth){
 			string command="UPDATE wikilistheaderwidth SET "

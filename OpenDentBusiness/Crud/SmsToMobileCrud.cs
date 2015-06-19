@@ -137,6 +137,63 @@ namespace OpenDentBusiness.Crud{
 			return smsToMobile.SmsToMobileNum;
 		}
 
+		///<summary>Inserts one SmsToMobile into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsToMobile smsToMobile){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(smsToMobile,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					smsToMobile.SmsToMobileNum=DbHelper.GetNextOracleKey("smstomobile","SmsToMobileNum"); //Cacheless method
+				}
+				return InsertNoCache(smsToMobile,true);
+			}
+		}
+
+		///<summary>Inserts one SmsToMobile into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsToMobile smsToMobile,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO smstomobile (";
+			if(!useExistingPK && isRandomKeys) {
+				smsToMobile.SmsToMobileNum=ReplicationServers.GetKeyNoCache("smstomobile","SmsToMobileNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SmsToMobileNum,";
+			}
+			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(smsToMobile.SmsToMobileNum)+",";
+			}
+			command+=
+				     POut.Long  (smsToMobile.PatNum)+","
+				+"'"+POut.String(smsToMobile.GuidMessage)+"',"
+				+"'"+POut.String(smsToMobile.GuidBatch)+"',"
+				+"'"+POut.String(smsToMobile.SmsPhoneNumber)+"',"
+				+"'"+POut.String(smsToMobile.MobilePhoneNumber)+"',"
+				+    POut.Bool  (smsToMobile.IsTimeSensitive)+","
+				+    POut.Int   ((int)smsToMobile.MsgType)+","
+				+    DbHelper.ParamChar+"paramMsgText,"
+				+    POut.Int   ((int)smsToMobile.Status)+","
+				+    POut.Int   (smsToMobile.MsgParts)+","
+				+"'"+POut.Double(smsToMobile.MsgChargeUSD)+"',"
+				+    POut.Long  (smsToMobile.ClinicNum)+","
+				+"'"+POut.String(smsToMobile.CustErrorText)+"',"
+				+    POut.DateT (smsToMobile.DateTimeSent)+","
+				+    POut.DateT (smsToMobile.DateTimeTerminated)+","
+				+    POut.Bool  (smsToMobile.IsHidden)+")";
+			if(smsToMobile.MsgText==null) {
+				smsToMobile.MsgText="";
+			}
+			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,POut.StringNote(smsToMobile.MsgText));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMsgText);
+			}
+			else {
+				smsToMobile.SmsToMobileNum=Db.NonQ(command,true,paramMsgText);
+			}
+			return smsToMobile.SmsToMobileNum;
+		}
+
 		///<summary>Updates one SmsToMobile in the database.</summary>
 		public static void Update(SmsToMobile smsToMobile){
 			string command="UPDATE smstomobile SET "

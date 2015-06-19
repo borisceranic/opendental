@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return question.QuestionNum;
 		}
 
+		///<summary>Inserts one Question into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Question question){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(question,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					question.QuestionNum=DbHelper.GetNextOracleKey("question","QuestionNum"); //Cacheless method
+				}
+				return InsertNoCache(question,true);
+			}
+		}
+
+		///<summary>Inserts one Question into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Question question,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO question (";
+			if(!useExistingPK && isRandomKeys) {
+				question.QuestionNum=ReplicationServers.GetKeyNoCache("question","QuestionNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="QuestionNum,";
+			}
+			command+="PatNum,ItemOrder,Description,Answer,FormPatNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(question.QuestionNum)+",";
+			}
+			command+=
+				     POut.Long  (question.PatNum)+","
+				+    POut.Int   (question.ItemOrder)+","
+				+"'"+POut.String(question.Description)+"',"
+				+"'"+POut.String(question.Answer)+"',"
+				+    POut.Long  (question.FormPatNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				question.QuestionNum=Db.NonQ(command,true);
+			}
+			return question.QuestionNum;
+		}
+
 		///<summary>Updates one Question in the database.</summary>
 		public static void Update(Question question){
 			string command="UPDATE question SET "

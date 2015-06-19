@@ -215,6 +215,100 @@ namespace OpenDentBusiness.Crud{
 			return procedure.ProcNum;
 		}
 
+		///<summary>Inserts one Procedure into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Procedure procedure){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procedure,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procedure.ProcNum=DbHelper.GetNextOracleKey("procedurelog","ProcNum"); //Cacheless method
+				}
+				return InsertNoCache(procedure,true);
+			}
+		}
+
+		///<summary>Inserts one Procedure into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Procedure procedure,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procedurelog (";
+			if(!useExistingPK && isRandomKeys) {
+				procedure.ProcNum=ReplicationServers.GetKeyNoCache("procedurelog","ProcNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProcNum,";
+			}
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procedure.ProcNum)+",";
+			}
+			command+=
+				     POut.Long  (procedure.PatNum)+","
+				+    POut.Long  (procedure.AptNum)+","
+				+"'"+POut.String(procedure.OldCode)+"',"
+				+    POut.Date  (procedure.ProcDate)+","
+				+"'"+POut.Double(procedure.ProcFee)+"',"
+				+"'"+POut.String(procedure.Surf)+"',"
+				+"'"+POut.String(procedure.ToothNum)+"',"
+				+"'"+POut.String(procedure.ToothRange)+"',"
+				+    POut.Long  (procedure.Priority)+","
+				+    POut.Int   ((int)procedure.ProcStatus)+","
+				+    POut.Long  (procedure.ProvNum)+","
+				+    POut.Long  (procedure.Dx)+","
+				+    POut.Long  (procedure.PlannedAptNum)+","
+				+    POut.Int   ((int)procedure.PlaceService)+","
+				+"'"+POut.String(procedure.Prosthesis)+"',"
+				+    POut.Date  (procedure.DateOriginalProsth)+","
+				+"'"+POut.String(procedure.ClaimNote)+"',"
+				+    DbHelper.Now()+","
+				+    POut.Long  (procedure.ClinicNum)+","
+				+"'"+POut.String(procedure.MedicalCode)+"',"
+				+"'"+POut.String(procedure.DiagnosticCode)+"',"
+				+    POut.Bool  (procedure.IsPrincDiag)+","
+				+    POut.Long  (procedure.ProcNumLab)+","
+				+    POut.Long  (procedure.BillingTypeOne)+","
+				+    POut.Long  (procedure.BillingTypeTwo)+","
+				+    POut.Long  (procedure.CodeNum)+","
+				+"'"+POut.String(procedure.CodeMod1)+"',"
+				+"'"+POut.String(procedure.CodeMod2)+"',"
+				+"'"+POut.String(procedure.CodeMod3)+"',"
+				+"'"+POut.String(procedure.CodeMod4)+"',"
+				+"'"+POut.String(procedure.RevCode)+"',"
+				+    POut.Int   (procedure.UnitQty)+","
+				+    POut.Int   (procedure.BaseUnits)+","
+				+    POut.Int   (procedure.StartTime)+","
+				+    POut.Int   (procedure.StopTime)+","
+				+    POut.Date  (procedure.DateTP)+","
+				+    POut.Long  (procedure.SiteNum)+","
+				+    POut.Bool  (procedure.HideGraphics)+","
+				+"'"+POut.String(procedure.CanadianTypeCodes)+"',"
+				+    POut.Time  (procedure.ProcTime)+","
+				+    POut.Time  (procedure.ProcTimeEnd)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (procedure.Prognosis)+","
+				+    POut.Int   ((int)procedure.DrugUnit)+","
+				+    POut.Float (procedure.DrugQty)+","
+				+    POut.Int   ((int)procedure.UnitQtyType)+","
+				+    POut.Long  (procedure.StatementNum)+","
+				+    POut.Bool  (procedure.IsLocked)+","
+				+"'"+POut.String(procedure.BillingNote)+"',"
+				+    POut.Long  (procedure.RepeatChargeNum)+","
+				+"'"+POut.String(procedure.DiagnosticCode2)+"',"
+				+"'"+POut.String(procedure.DiagnosticCode3)+"',"
+				+"'"+POut.String(procedure.DiagnosticCode4)+"',"
+				+"'"+POut.Double(procedure.Discount)+"',"
+				+"'"+POut.String(procedure.SnomedBodySite)+"',"
+				+    POut.Long  (procedure.ProvOrderOverride)+","
+				+    POut.Bool  (procedure.IsDateProsthEst)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procedure.ProcNum=Db.NonQ(command,true);
+			}
+			return procedure.ProcNum;
+		}
+
 		///<summary>Updates one Procedure in the database.</summary>
 		public static void Update(Procedure procedure){
 			string command="UPDATE procedurelog SET "

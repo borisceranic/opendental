@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return appointmentRule.AppointmentRuleNum;
 		}
 
+		///<summary>Inserts one AppointmentRule into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AppointmentRule appointmentRule){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(appointmentRule,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					appointmentRule.AppointmentRuleNum=DbHelper.GetNextOracleKey("appointmentrule","AppointmentRuleNum"); //Cacheless method
+				}
+				return InsertNoCache(appointmentRule,true);
+			}
+		}
+
+		///<summary>Inserts one AppointmentRule into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AppointmentRule appointmentRule,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO appointmentrule (";
+			if(!useExistingPK && isRandomKeys) {
+				appointmentRule.AppointmentRuleNum=ReplicationServers.GetKeyNoCache("appointmentrule","AppointmentRuleNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AppointmentRuleNum,";
+			}
+			command+="RuleDesc,CodeStart,CodeEnd,IsEnabled) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(appointmentRule.AppointmentRuleNum)+",";
+			}
+			command+=
+				 "'"+POut.String(appointmentRule.RuleDesc)+"',"
+				+"'"+POut.String(appointmentRule.CodeStart)+"',"
+				+"'"+POut.String(appointmentRule.CodeEnd)+"',"
+				+    POut.Bool  (appointmentRule.IsEnabled)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				appointmentRule.AppointmentRuleNum=Db.NonQ(command,true);
+			}
+			return appointmentRule.AppointmentRuleNum;
+		}
+
 		///<summary>Updates one AppointmentRule in the database.</summary>
 		public static void Update(AppointmentRule appointmentRule){
 			string command="UPDATE appointmentrule SET "

@@ -139,6 +139,62 @@ namespace OpenDentBusiness.Crud{
 			return etrans.EtransNum;
 		}
 
+		///<summary>Inserts one Etrans into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Etrans etrans){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(etrans,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					etrans.EtransNum=DbHelper.GetNextOracleKey("etrans","EtransNum"); //Cacheless method
+				}
+				return InsertNoCache(etrans,true);
+			}
+		}
+
+		///<summary>Inserts one Etrans into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Etrans etrans,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO etrans (";
+			if(!useExistingPK && isRandomKeys) {
+				etrans.EtransNum=ReplicationServers.GetKeyNoCache("etrans","EtransNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EtransNum,";
+			}
+			command+="DateTimeTrans,ClearingHouseNum,Etype,ClaimNum,OfficeSequenceNumber,CarrierTransCounter,CarrierTransCounter2,CarrierNum,CarrierNum2,PatNum,BatchNumber,AckCode,TransSetNum,Note,EtransMessageTextNum,AckEtransNum,PlanNum,InsSubNum,TranSetId835) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(etrans.EtransNum)+",";
+			}
+			command+=
+				     DbHelper.Now()+","
+				+    POut.Long  (etrans.ClearingHouseNum)+","
+				+    POut.Int   ((int)etrans.Etype)+","
+				+    POut.Long  (etrans.ClaimNum)+","
+				+    POut.Int   (etrans.OfficeSequenceNumber)+","
+				+    POut.Int   (etrans.CarrierTransCounter)+","
+				+    POut.Int   (etrans.CarrierTransCounter2)+","
+				+    POut.Long  (etrans.CarrierNum)+","
+				+    POut.Long  (etrans.CarrierNum2)+","
+				+    POut.Long  (etrans.PatNum)+","
+				+    POut.Int   (etrans.BatchNumber)+","
+				+"'"+POut.String(etrans.AckCode)+"',"
+				+    POut.Int   (etrans.TransSetNum)+","
+				+"'"+POut.String(etrans.Note)+"',"
+				+    POut.Long  (etrans.EtransMessageTextNum)+","
+				+    POut.Long  (etrans.AckEtransNum)+","
+				+    POut.Long  (etrans.PlanNum)+","
+				+    POut.Long  (etrans.InsSubNum)+","
+				+"'"+POut.String(etrans.TranSetId835)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				etrans.EtransNum=Db.NonQ(command,true);
+			}
+			return etrans.EtransNum;
+		}
+
 		///<summary>Updates one Etrans in the database.</summary>
 		public static void Update(Etrans etrans){
 			string command="UPDATE etrans SET "

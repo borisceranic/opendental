@@ -145,6 +145,67 @@ namespace OpenDentBusiness.Crud{
 			return sheetFieldDef.SheetFieldDefNum;
 		}
 
+		///<summary>Inserts one SheetFieldDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetFieldDef sheetFieldDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sheetFieldDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sheetFieldDef.SheetFieldDefNum=DbHelper.GetNextOracleKey("sheetfielddef","SheetFieldDefNum"); //Cacheless method
+				}
+				return InsertNoCache(sheetFieldDef,true);
+			}
+		}
+
+		///<summary>Inserts one SheetFieldDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetFieldDef sheetFieldDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sheetfielddef (";
+			if(!useExistingPK && isRandomKeys) {
+				sheetFieldDef.SheetFieldDefNum=ReplicationServers.GetKeyNoCache("sheetfielddef","SheetFieldDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SheetFieldDefNum,";
+			}
+			command+="SheetDefNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,IsPaymentOption,ItemColor) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sheetFieldDef.SheetFieldDefNum)+",";
+			}
+			command+=
+				     POut.Long  (sheetFieldDef.SheetDefNum)+","
+				+    POut.Int   ((int)sheetFieldDef.FieldType)+","
+				+"'"+POut.String(sheetFieldDef.FieldName)+"',"
+				+    DbHelper.ParamChar+"paramFieldValue,"
+				+    POut.Float (sheetFieldDef.FontSize)+","
+				+"'"+POut.String(sheetFieldDef.FontName)+"',"
+				+    POut.Bool  (sheetFieldDef.FontIsBold)+","
+				+    POut.Int   (sheetFieldDef.XPos)+","
+				+    POut.Int   (sheetFieldDef.YPos)+","
+				+    POut.Int   (sheetFieldDef.Width)+","
+				+    POut.Int   (sheetFieldDef.Height)+","
+				+    POut.Int   ((int)sheetFieldDef.GrowthBehavior)+","
+				+"'"+POut.String(sheetFieldDef.RadioButtonValue)+"',"
+				+"'"+POut.String(sheetFieldDef.RadioButtonGroup)+"',"
+				+    POut.Bool  (sheetFieldDef.IsRequired)+","
+				+    POut.Int   (sheetFieldDef.TabOrder)+","
+				+"'"+POut.String(sheetFieldDef.ReportableName)+"',"
+				+    POut.Int   ((int)sheetFieldDef.TextAlign)+","
+				+    POut.Bool  (sheetFieldDef.IsPaymentOption)+","
+				+    POut.Int   (sheetFieldDef.ItemColor.ToArgb())+")";
+			if(sheetFieldDef.FieldValue==null) {
+				sheetFieldDef.FieldValue="";
+			}
+			OdSqlParameter paramFieldValue=new OdSqlParameter("paramFieldValue",OdDbType.Text,sheetFieldDef.FieldValue);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramFieldValue);
+			}
+			else {
+				sheetFieldDef.SheetFieldDefNum=Db.NonQ(command,true,paramFieldValue);
+			}
+			return sheetFieldDef.SheetFieldDefNum;
+		}
+
 		///<summary>Updates one SheetFieldDef in the database.</summary>
 		public static void Update(SheetFieldDef sheetFieldDef){
 			string command="UPDATE sheetfielddef SET "

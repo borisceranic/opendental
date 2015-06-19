@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return pharmacy.PharmacyNum;
 		}
 
+		///<summary>Inserts one Pharmacy into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Pharmacy pharmacy){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(pharmacy,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					pharmacy.PharmacyNum=DbHelper.GetNextOracleKey("pharmacy","PharmacyNum"); //Cacheless method
+				}
+				return InsertNoCache(pharmacy,true);
+			}
+		}
+
+		///<summary>Inserts one Pharmacy into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Pharmacy pharmacy,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO pharmacy (";
+			if(!useExistingPK && isRandomKeys) {
+				pharmacy.PharmacyNum=ReplicationServers.GetKeyNoCache("pharmacy","PharmacyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PharmacyNum,";
+			}
+			command+="PharmID,StoreName,Phone,Fax,Address,Address2,City,State,Zip,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(pharmacy.PharmacyNum)+",";
+			}
+			command+=
+				 "'"+POut.String(pharmacy.PharmID)+"',"
+				+"'"+POut.String(pharmacy.StoreName)+"',"
+				+"'"+POut.String(pharmacy.Phone)+"',"
+				+"'"+POut.String(pharmacy.Fax)+"',"
+				+"'"+POut.String(pharmacy.Address)+"',"
+				+"'"+POut.String(pharmacy.Address2)+"',"
+				+"'"+POut.String(pharmacy.City)+"',"
+				+"'"+POut.String(pharmacy.State)+"',"
+				+"'"+POut.String(pharmacy.Zip)+"',"
+				+"'"+POut.String(pharmacy.Note)+"')";
+				//DateTStamp can only be set by MySQL
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				pharmacy.PharmacyNum=Db.NonQ(command,true);
+			}
+			return pharmacy.PharmacyNum;
+		}
+
 		///<summary>Updates one Pharmacy in the database.</summary>
 		public static void Update(Pharmacy pharmacy){
 			string command="UPDATE pharmacy SET "

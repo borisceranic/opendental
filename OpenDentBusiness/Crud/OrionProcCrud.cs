@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return orionProc.OrionProcNum;
 		}
 
+		///<summary>Inserts one OrionProc into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OrionProc orionProc){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(orionProc,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					orionProc.OrionProcNum=DbHelper.GetNextOracleKey("orionproc","OrionProcNum"); //Cacheless method
+				}
+				return InsertNoCache(orionProc,true);
+			}
+		}
+
+		///<summary>Inserts one OrionProc into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(OrionProc orionProc,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO orionproc (";
+			if(!useExistingPK && isRandomKeys) {
+				orionProc.OrionProcNum=ReplicationServers.GetKeyNoCache("orionproc","OrionProcNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="OrionProcNum,";
+			}
+			command+="ProcNum,DPC,DPCpost,DateScheduleBy,DateStopClock,Status2,IsOnCall,IsEffectiveComm,IsRepair) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(orionProc.OrionProcNum)+",";
+			}
+			command+=
+				     POut.Long  (orionProc.ProcNum)+","
+				+    POut.Int   ((int)orionProc.DPC)+","
+				+    POut.Int   ((int)orionProc.DPCpost)+","
+				+    POut.Date  (orionProc.DateScheduleBy)+","
+				+    POut.Date  (orionProc.DateStopClock)+","
+				+    POut.Int   ((int)orionProc.Status2)+","
+				+    POut.Bool  (orionProc.IsOnCall)+","
+				+    POut.Bool  (orionProc.IsEffectiveComm)+","
+				+    POut.Bool  (orionProc.IsRepair)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				orionProc.OrionProcNum=Db.NonQ(command,true);
+			}
+			return orionProc.OrionProcNum;
+		}
+
 		///<summary>Updates one OrionProc in the database.</summary>
 		public static void Update(OrionProc orionProc){
 			string command="UPDATE orionproc SET "

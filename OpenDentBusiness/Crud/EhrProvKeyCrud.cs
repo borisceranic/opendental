@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return ehrProvKey.EhrProvKeyNum;
 		}
 
+		///<summary>Inserts one EhrProvKey into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrProvKey ehrProvKey){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrProvKey,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrProvKey.EhrProvKeyNum=DbHelper.GetNextOracleKey("ehrprovkey","EhrProvKeyNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrProvKey,true);
+			}
+		}
+
+		///<summary>Inserts one EhrProvKey into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrProvKey ehrProvKey,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrprovkey (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrProvKey.EhrProvKeyNum=ReplicationServers.GetKeyNoCache("ehrprovkey","EhrProvKeyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrProvKeyNum,";
+			}
+			command+="PatNum,LName,FName,ProvKey,FullTimeEquiv,Notes,YearValue) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrProvKey.EhrProvKeyNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrProvKey.PatNum)+","
+				+"'"+POut.String(ehrProvKey.LName)+"',"
+				+"'"+POut.String(ehrProvKey.FName)+"',"
+				+"'"+POut.String(ehrProvKey.ProvKey)+"',"
+				+    POut.Float (ehrProvKey.FullTimeEquiv)+","
+				+"'"+POut.String(ehrProvKey.Notes)+"',"
+				+    POut.Int   (ehrProvKey.YearValue)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrProvKey.EhrProvKeyNum=Db.NonQ(command,true);
+			}
+			return ehrProvKey.EhrProvKeyNum;
+		}
+
 		///<summary>Updates one EhrProvKey in the database.</summary>
 		public static void Update(EhrProvKey ehrProvKey){
 			string command="UPDATE ehrprovkey SET "

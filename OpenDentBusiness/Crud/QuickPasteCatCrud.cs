@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return quickPasteCat.QuickPasteCatNum;
 		}
 
+		///<summary>Inserts one QuickPasteCat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(QuickPasteCat quickPasteCat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(quickPasteCat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					quickPasteCat.QuickPasteCatNum=DbHelper.GetNextOracleKey("quickpastecat","QuickPasteCatNum"); //Cacheless method
+				}
+				return InsertNoCache(quickPasteCat,true);
+			}
+		}
+
+		///<summary>Inserts one QuickPasteCat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(QuickPasteCat quickPasteCat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO quickpastecat (";
+			if(!useExistingPK && isRandomKeys) {
+				quickPasteCat.QuickPasteCatNum=ReplicationServers.GetKeyNoCache("quickpastecat","QuickPasteCatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="QuickPasteCatNum,";
+			}
+			command+="Description,ItemOrder,DefaultForTypes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(quickPasteCat.QuickPasteCatNum)+",";
+			}
+			command+=
+				 "'"+POut.String(quickPasteCat.Description)+"',"
+				+    POut.Int   (quickPasteCat.ItemOrder)+","
+				+"'"+POut.String(quickPasteCat.DefaultForTypes)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				quickPasteCat.QuickPasteCatNum=Db.NonQ(command,true);
+			}
+			return quickPasteCat.QuickPasteCatNum;
+		}
+
 		///<summary>Updates one QuickPasteCat in the database.</summary>
 		public static void Update(QuickPasteCat quickPasteCat){
 			string command="UPDATE quickpastecat SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return reqNeeded.ReqNeededNum;
 		}
 
+		///<summary>Inserts one ReqNeeded into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReqNeeded reqNeeded){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(reqNeeded,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					reqNeeded.ReqNeededNum=DbHelper.GetNextOracleKey("reqneeded","ReqNeededNum"); //Cacheless method
+				}
+				return InsertNoCache(reqNeeded,true);
+			}
+		}
+
+		///<summary>Inserts one ReqNeeded into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReqNeeded reqNeeded,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO reqneeded (";
+			if(!useExistingPK && isRandomKeys) {
+				reqNeeded.ReqNeededNum=ReplicationServers.GetKeyNoCache("reqneeded","ReqNeededNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReqNeededNum,";
+			}
+			command+="Descript,SchoolCourseNum,SchoolClassNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(reqNeeded.ReqNeededNum)+",";
+			}
+			command+=
+				 "'"+POut.String(reqNeeded.Descript)+"',"
+				+    POut.Long  (reqNeeded.SchoolCourseNum)+","
+				+    POut.Long  (reqNeeded.SchoolClassNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				reqNeeded.ReqNeededNum=Db.NonQ(command,true);
+			}
+			return reqNeeded.ReqNeededNum;
+		}
+
 		///<summary>Updates one ReqNeeded in the database.</summary>
 		public static void Update(ReqNeeded reqNeeded){
 			string command="UPDATE reqneeded SET "

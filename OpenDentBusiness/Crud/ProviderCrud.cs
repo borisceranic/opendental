@@ -167,6 +167,76 @@ namespace OpenDentBusiness.Crud{
 			return provider.ProvNum;
 		}
 
+		///<summary>Inserts one Provider into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Provider provider){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(provider,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					provider.ProvNum=DbHelper.GetNextOracleKey("provider","ProvNum"); //Cacheless method
+				}
+				return InsertNoCache(provider,true);
+			}
+		}
+
+		///<summary>Inserts one Provider into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Provider provider,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO provider (";
+			if(!useExistingPK && isRandomKeys) {
+				provider.ProvNum=ReplicationServers.GetKeyNoCache("provider","ProvNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProvNum,";
+			}
+			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(provider.ProvNum)+",";
+			}
+			command+=
+				 "'"+POut.String(provider.Abbr)+"',"
+				+    POut.Int   (provider.ItemOrder)+","
+				+"'"+POut.String(provider.LName)+"',"
+				+"'"+POut.String(provider.FName)+"',"
+				+"'"+POut.String(provider.MI)+"',"
+				+"'"+POut.String(provider.Suffix)+"',"
+				+    POut.Long  (provider.FeeSched)+","
+				+    POut.Int   ((int)provider.Specialty)+","
+				+"'"+POut.String(provider.SSN)+"',"
+				+"'"+POut.String(provider.StateLicense)+"',"
+				+"'"+POut.String(provider.DEANum)+"',"
+				+    POut.Bool  (provider.IsSecondary)+","
+				+    POut.Int   (provider.ProvColor.ToArgb())+","
+				+    POut.Bool  (provider.IsHidden)+","
+				+    POut.Bool  (provider.UsingTIN)+","
+				+"'"+POut.String(provider.BlueCrossID)+"',"
+				+    POut.Bool  (provider.SigOnFile)+","
+				+"'"+POut.String(provider.MedicaidID)+"',"
+				+    POut.Int   (provider.OutlineColor.ToArgb())+","
+				+    POut.Long  (provider.SchoolClassNum)+","
+				+"'"+POut.String(provider.NationalProvID)+"',"
+				+"'"+POut.String(provider.CanadianOfficeNum)+"',"
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (provider.AnesthProvType)+","
+				+"'"+POut.String(provider.TaxonomyCodeOverride)+"',"
+				+    POut.Bool  (provider.IsCDAnet)+","
+				+"'"+POut.String(provider.EcwID)+"',"
+				+"'"+POut.String(provider.StateRxID)+"',"
+				+    POut.Bool  (provider.IsNotPerson)+","
+				+"'"+POut.String(provider.StateWhereLicensed)+"',"
+				+    POut.Long  (provider.EmailAddressNum)+","
+				+    POut.Bool  (provider.IsInstructor)+","
+				+    POut.Int   (provider.EhrMuStage)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				provider.ProvNum=Db.NonQ(command,true);
+			}
+			return provider.ProvNum;
+		}
+
 		///<summary>Updates one Provider in the database.</summary>
 		public static void Update(Provider provider){
 			string command="UPDATE provider SET "

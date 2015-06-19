@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return cdcrec.CdcrecNum;
 		}
 
+		///<summary>Inserts one Cdcrec into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cdcrec cdcrec){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(cdcrec,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					cdcrec.CdcrecNum=DbHelper.GetNextOracleKey("cdcrec","CdcrecNum"); //Cacheless method
+				}
+				return InsertNoCache(cdcrec,true);
+			}
+		}
+
+		///<summary>Inserts one Cdcrec into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cdcrec cdcrec,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO cdcrec (";
+			if(!useExistingPK && isRandomKeys) {
+				cdcrec.CdcrecNum=ReplicationServers.GetKeyNoCache("cdcrec","CdcrecNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CdcrecNum,";
+			}
+			command+="CdcrecCode,HeirarchicalCode,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(cdcrec.CdcrecNum)+",";
+			}
+			command+=
+				 "'"+POut.String(cdcrec.CdcrecCode)+"',"
+				+"'"+POut.String(cdcrec.HeirarchicalCode)+"',"
+				+"'"+POut.String(cdcrec.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				cdcrec.CdcrecNum=Db.NonQ(command,true);
+			}
+			return cdcrec.CdcrecNum;
+		}
+
 		///<summary>Updates one Cdcrec in the database.</summary>
 		public static void Update(Cdcrec cdcrec){
 			string command="UPDATE cdcrec SET "

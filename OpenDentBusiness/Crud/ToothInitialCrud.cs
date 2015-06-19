@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return toothInitial.ToothInitialNum;
 		}
 
+		///<summary>Inserts one ToothInitial into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothInitial toothInitial){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(toothInitial,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					toothInitial.ToothInitialNum=DbHelper.GetNextOracleKey("toothinitial","ToothInitialNum"); //Cacheless method
+				}
+				return InsertNoCache(toothInitial,true);
+			}
+		}
+
+		///<summary>Inserts one ToothInitial into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ToothInitial toothInitial,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO toothinitial (";
+			if(!useExistingPK && isRandomKeys) {
+				toothInitial.ToothInitialNum=ReplicationServers.GetKeyNoCache("toothinitial","ToothInitialNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ToothInitialNum,";
+			}
+			command+="PatNum,ToothNum,InitialType,Movement,DrawingSegment,ColorDraw) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(toothInitial.ToothInitialNum)+",";
+			}
+			command+=
+				     POut.Long  (toothInitial.PatNum)+","
+				+"'"+POut.String(toothInitial.ToothNum)+"',"
+				+    POut.Int   ((int)toothInitial.InitialType)+","
+				+    POut.Float (toothInitial.Movement)+","
+				+"'"+POut.String(toothInitial.DrawingSegment)+"',"
+				+    POut.Int   (toothInitial.ColorDraw.ToArgb())+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				toothInitial.ToothInitialNum=Db.NonQ(command,true);
+			}
+			return toothInitial.ToothInitialNum;
+		}
+
 		///<summary>Updates one ToothInitial in the database.</summary>
 		public static void Update(ToothInitial toothInitial){
 			string command="UPDATE toothinitial SET "

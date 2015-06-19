@@ -119,6 +119,54 @@ namespace OpenDentBusiness.Crud{
 			return dunning.DunningNum;
 		}
 
+		///<summary>Inserts one Dunning into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Dunning dunning){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(dunning,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					dunning.DunningNum=DbHelper.GetNextOracleKey("dunning","DunningNum"); //Cacheless method
+				}
+				return InsertNoCache(dunning,true);
+			}
+		}
+
+		///<summary>Inserts one Dunning into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Dunning dunning,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO dunning (";
+			if(!useExistingPK && isRandomKeys) {
+				dunning.DunningNum=ReplicationServers.GetKeyNoCache("dunning","DunningNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DunningNum,";
+			}
+			command+="DunMessage,BillingType,AgeAccount,InsIsPending,MessageBold,EmailSubject,EmailBody) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(dunning.DunningNum)+",";
+			}
+			command+=
+				 "'"+POut.String(dunning.DunMessage)+"',"
+				+    POut.Long  (dunning.BillingType)+","
+				+    POut.Byte  (dunning.AgeAccount)+","
+				+    POut.Int   ((int)dunning.InsIsPending)+","
+				+"'"+POut.String(dunning.MessageBold)+"',"
+				+"'"+POut.String(dunning.EmailSubject)+"',"
+				+    DbHelper.ParamChar+"paramEmailBody)";
+			if(dunning.EmailBody==null) {
+				dunning.EmailBody="";
+			}
+			OdSqlParameter paramEmailBody=new OdSqlParameter("paramEmailBody",OdDbType.Text,dunning.EmailBody);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramEmailBody);
+			}
+			else {
+				dunning.DunningNum=Db.NonQ(command,true,paramEmailBody);
+			}
+			return dunning.DunningNum;
+		}
+
 		///<summary>Updates one Dunning in the database.</summary>
 		public static void Update(Dunning dunning){
 			string command="UPDATE dunning SET "

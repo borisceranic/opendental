@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return appointmentType.AppointmentTypeNum;
 		}
 
+		///<summary>Inserts one AppointmentType into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AppointmentType appointmentType){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(appointmentType,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					appointmentType.AppointmentTypeNum=DbHelper.GetNextOracleKey("appointmenttype","AppointmentTypeNum"); //Cacheless method
+				}
+				return InsertNoCache(appointmentType,true);
+			}
+		}
+
+		///<summary>Inserts one AppointmentType into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AppointmentType appointmentType,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO appointmenttype (";
+			if(!useExistingPK && isRandomKeys) {
+				appointmentType.AppointmentTypeNum=ReplicationServers.GetKeyNoCache("appointmenttype","AppointmentTypeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AppointmentTypeNum,";
+			}
+			command+="AppointmentTypeName,AppointmentTypeColor,ItemOrder,IsHidden) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(appointmentType.AppointmentTypeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(appointmentType.AppointmentTypeName)+"',"
+				+    POut.Int   (appointmentType.AppointmentTypeColor.ToArgb())+","
+				+    POut.Int   (appointmentType.ItemOrder)+","
+				+    POut.Bool  (appointmentType.IsHidden)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				appointmentType.AppointmentTypeNum=Db.NonQ(command,true);
+			}
+			return appointmentType.AppointmentTypeNum;
+		}
+
 		///<summary>Updates one AppointmentType in the database.</summary>
 		public static void Update(AppointmentType appointmentType){
 			string command="UPDATE appointmenttype SET "

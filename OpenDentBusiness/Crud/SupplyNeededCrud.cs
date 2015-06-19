@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return supplyNeeded.SupplyNeededNum;
 		}
 
+		///<summary>Inserts one SupplyNeeded into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SupplyNeeded supplyNeeded){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(supplyNeeded,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					supplyNeeded.SupplyNeededNum=DbHelper.GetNextOracleKey("supplyneeded","SupplyNeededNum"); //Cacheless method
+				}
+				return InsertNoCache(supplyNeeded,true);
+			}
+		}
+
+		///<summary>Inserts one SupplyNeeded into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SupplyNeeded supplyNeeded,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO supplyneeded (";
+			if(!useExistingPK && isRandomKeys) {
+				supplyNeeded.SupplyNeededNum=ReplicationServers.GetKeyNoCache("supplyneeded","SupplyNeededNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SupplyNeededNum,";
+			}
+			command+="Description,DateAdded) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(supplyNeeded.SupplyNeededNum)+",";
+			}
+			command+=
+				 "'"+POut.String(supplyNeeded.Description)+"',"
+				+    POut.Date  (supplyNeeded.DateAdded)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				supplyNeeded.SupplyNeededNum=Db.NonQ(command,true);
+			}
+			return supplyNeeded.SupplyNeededNum;
+		}
+
 		///<summary>Updates one SupplyNeeded in the database.</summary>
 		public static void Update(SupplyNeeded supplyNeeded){
 			string command="UPDATE supplyneeded SET "

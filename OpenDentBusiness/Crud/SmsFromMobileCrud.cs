@@ -131,6 +131,60 @@ namespace OpenDentBusiness.Crud{
 			return smsFromMobile.SmsFromMobileNum;
 		}
 
+		///<summary>Inserts one SmsFromMobile into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsFromMobile smsFromMobile){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(smsFromMobile,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					smsFromMobile.SmsFromMobileNum=DbHelper.GetNextOracleKey("smsfrommobile","SmsFromMobileNum"); //Cacheless method
+				}
+				return InsertNoCache(smsFromMobile,true);
+			}
+		}
+
+		///<summary>Inserts one SmsFromMobile into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsFromMobile smsFromMobile,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO smsfrommobile (";
+			if(!useExistingPK && isRandomKeys) {
+				smsFromMobile.SmsFromMobileNum=ReplicationServers.GetKeyNoCache("smsfrommobile","SmsFromMobileNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SmsFromMobileNum,";
+			}
+			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(smsFromMobile.SmsFromMobileNum)+",";
+			}
+			command+=
+				     POut.Long  (smsFromMobile.PatNum)+","
+				+    POut.Long  (smsFromMobile.ClinicNum)+","
+				+    POut.Long  (smsFromMobile.CommlogNum)+","
+				+    DbHelper.ParamChar+"paramMsgText,"
+				+    POut.DateT (smsFromMobile.DateTimeReceived)+","
+				+"'"+POut.String(smsFromMobile.SmsPhoneNumber)+"',"
+				+"'"+POut.String(smsFromMobile.MobilePhoneNumber)+"',"
+				+    POut.Int   (smsFromMobile.MsgPart)+","
+				+    POut.Int   (smsFromMobile.MsgTotal)+","
+				+"'"+POut.String(smsFromMobile.MsgRefID)+"',"
+				+    POut.Int   ((int)smsFromMobile.SmsStatus)+","
+				+"'"+POut.String(smsFromMobile.Flags)+"',"
+				+    POut.Bool  (smsFromMobile.IsHidden)+")";
+			if(smsFromMobile.MsgText==null) {
+				smsFromMobile.MsgText="";
+			}
+			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,POut.StringNote(smsFromMobile.MsgText));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMsgText);
+			}
+			else {
+				smsFromMobile.SmsFromMobileNum=Db.NonQ(command,true,paramMsgText);
+			}
+			return smsFromMobile.SmsFromMobileNum;
+		}
+
 		///<summary>Updates one SmsFromMobile in the database.</summary>
 		public static void Update(SmsFromMobile smsFromMobile){
 			string command="UPDATE smsfrommobile SET "

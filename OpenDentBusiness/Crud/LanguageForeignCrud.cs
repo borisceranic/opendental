@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return languageForeign.LanguageForeignNum;
 		}
 
+		///<summary>Inserts one LanguageForeign into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LanguageForeign languageForeign){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(languageForeign,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					languageForeign.LanguageForeignNum=DbHelper.GetNextOracleKey("languageforeign","LanguageForeignNum"); //Cacheless method
+				}
+				return InsertNoCache(languageForeign,true);
+			}
+		}
+
+		///<summary>Inserts one LanguageForeign into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LanguageForeign languageForeign,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO languageforeign (";
+			if(!useExistingPK && isRandomKeys) {
+				languageForeign.LanguageForeignNum=ReplicationServers.GetKeyNoCache("languageforeign","LanguageForeignNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LanguageForeignNum,";
+			}
+			command+="ClassType,English,Culture,Translation,Comments) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(languageForeign.LanguageForeignNum)+",";
+			}
+			command+=
+				 "'"+POut.String(languageForeign.ClassType)+"',"
+				+"'"+POut.String(languageForeign.English)+"',"
+				+"'"+POut.String(languageForeign.Culture)+"',"
+				+"'"+POut.String(languageForeign.Translation)+"',"
+				+"'"+POut.String(languageForeign.Comments)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				languageForeign.LanguageForeignNum=Db.NonQ(command,true);
+			}
+			return languageForeign.LanguageForeignNum;
+		}
+
 		///<summary>Updates one LanguageForeign in the database.</summary>
 		public static void Update(LanguageForeign languageForeign){
 			string command="UPDATE languageforeign SET "

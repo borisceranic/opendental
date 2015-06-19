@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return operatory.OperatoryNum;
 		}
 
+		///<summary>Inserts one Operatory into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Operatory operatory){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(operatory,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					operatory.OperatoryNum=DbHelper.GetNextOracleKey("operatory","OperatoryNum"); //Cacheless method
+				}
+				return InsertNoCache(operatory,true);
+			}
+		}
+
+		///<summary>Inserts one Operatory into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Operatory operatory,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO operatory (";
+			if(!useExistingPK && isRandomKeys) {
+				operatory.OperatoryNum=ReplicationServers.GetKeyNoCache("operatory","OperatoryNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="OperatoryNum,";
+			}
+			command+="OpName,Abbrev,ItemOrder,IsHidden,ProvDentist,ProvHygienist,IsHygiene,ClinicNum,SetProspective) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(operatory.OperatoryNum)+",";
+			}
+			command+=
+				 "'"+POut.String(operatory.OpName)+"',"
+				+"'"+POut.String(operatory.Abbrev)+"',"
+				+    POut.Int   (operatory.ItemOrder)+","
+				+    POut.Bool  (operatory.IsHidden)+","
+				+    POut.Long  (operatory.ProvDentist)+","
+				+    POut.Long  (operatory.ProvHygienist)+","
+				+    POut.Bool  (operatory.IsHygiene)+","
+				+    POut.Long  (operatory.ClinicNum)+","
+				+    POut.Bool  (operatory.SetProspective)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				operatory.OperatoryNum=Db.NonQ(command,true);
+			}
+			return operatory.OperatoryNum;
+		}
+
 		///<summary>Updates one Operatory in the database.</summary>
 		public static void Update(Operatory operatory){
 			string command="UPDATE operatory SET "

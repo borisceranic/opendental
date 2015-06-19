@@ -168,6 +168,74 @@ namespace OpenDentBusiness.Crud{
 			return hL7Def.HL7DefNum;
 		}
 
+		///<summary>Inserts one HL7Def into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7Def hL7Def){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hL7Def,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hL7Def.HL7DefNum=DbHelper.GetNextOracleKey("hl7def","HL7DefNum"); //Cacheless method
+				}
+				return InsertNoCache(hL7Def,true);
+			}
+		}
+
+		///<summary>Inserts one HL7Def into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7Def hL7Def,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hl7def (";
+			if(!useExistingPK && isRandomKeys) {
+				hL7Def.HL7DefNum=ReplicationServers.GetKeyNoCache("hl7def","HL7DefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HL7DefNum,";
+			}
+			command+="Description,ModeTx,IncomingFolder,OutgoingFolder,IncomingPort,OutgoingIpPort,FieldSeparator,ComponentSeparator,SubcomponentSeparator,RepetitionSeparator,EscapeCharacter,IsInternal,InternalType,InternalTypeVersion,IsEnabled,Note,HL7Server,HL7ServiceName,ShowDemographics,ShowAppts,ShowAccount,IsQuadAsToothNum,LabResultImageCat,SftpUsername,SftpPassword,SftpInSocket,HasLongDCodes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hL7Def.HL7DefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(hL7Def.Description)+"',"
+				+    POut.Int   ((int)hL7Def.ModeTx)+","
+				+"'"+POut.String(hL7Def.IncomingFolder)+"',"
+				+"'"+POut.String(hL7Def.OutgoingFolder)+"',"
+				+"'"+POut.String(hL7Def.IncomingPort)+"',"
+				+"'"+POut.String(hL7Def.OutgoingIpPort)+"',"
+				+"'"+POut.String(hL7Def.FieldSeparator)+"',"
+				+"'"+POut.String(hL7Def.ComponentSeparator)+"',"
+				+"'"+POut.String(hL7Def.SubcomponentSeparator)+"',"
+				+"'"+POut.String(hL7Def.RepetitionSeparator)+"',"
+				+"'"+POut.String(hL7Def.EscapeCharacter)+"',"
+				+    POut.Bool  (hL7Def.IsInternal)+","
+				+"'"+POut.String(hL7Def.InternalType.ToString())+"',"
+				+"'"+POut.String(hL7Def.InternalTypeVersion)+"',"
+				+    POut.Bool  (hL7Def.IsEnabled)+","
+				+    DbHelper.ParamChar+"paramNote,"
+				+"'"+POut.String(hL7Def.HL7Server)+"',"
+				+"'"+POut.String(hL7Def.HL7ServiceName)+"',"
+				+    POut.Int   ((int)hL7Def.ShowDemographics)+","
+				+    POut.Bool  (hL7Def.ShowAppts)+","
+				+    POut.Bool  (hL7Def.ShowAccount)+","
+				+    POut.Bool  (hL7Def.IsQuadAsToothNum)+","
+				+    POut.Long  (hL7Def.LabResultImageCat)+","
+				+"'"+POut.String(hL7Def.SftpUsername)+"',"
+				+"'"+POut.String(hL7Def.SftpPassword)+"',"
+				+"'"+POut.String(hL7Def.SftpInSocket)+"',"
+				+    POut.Bool  (hL7Def.HasLongDCodes)+")";
+			if(hL7Def.Note==null) {
+				hL7Def.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,hL7Def.Note);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				hL7Def.HL7DefNum=Db.NonQ(command,true,paramNote);
+			}
+			return hL7Def.HL7DefNum;
+		}
+
 		///<summary>Updates one HL7Def in the database.</summary>
 		public static void Update(HL7Def hL7Def){
 			string command="UPDATE hl7def SET "

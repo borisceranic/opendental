@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return feeSched.FeeSchedNum;
 		}
 
+		///<summary>Inserts one FeeSched into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FeeSched feeSched){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(feeSched,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					feeSched.FeeSchedNum=DbHelper.GetNextOracleKey("feesched","FeeSchedNum"); //Cacheless method
+				}
+				return InsertNoCache(feeSched,true);
+			}
+		}
+
+		///<summary>Inserts one FeeSched into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FeeSched feeSched,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO feesched (";
+			if(!useExistingPK && isRandomKeys) {
+				feeSched.FeeSchedNum=ReplicationServers.GetKeyNoCache("feesched","FeeSchedNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="FeeSchedNum,";
+			}
+			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(feeSched.FeeSchedNum)+",";
+			}
+			command+=
+				 "'"+POut.String(feeSched.Description)+"',"
+				+    POut.Int   ((int)feeSched.FeeSchedType)+","
+				+    POut.Int   (feeSched.ItemOrder)+","
+				+    POut.Bool  (feeSched.IsHidden)+","
+				+    POut.Bool  (feeSched.IsGlobal)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				feeSched.FeeSchedNum=Db.NonQ(command,true);
+			}
+			return feeSched.FeeSchedNum;
+		}
+
 		///<summary>Updates one FeeSched in the database.</summary>
 		public static void Update(FeeSched feeSched){
 			string command="UPDATE feesched SET "

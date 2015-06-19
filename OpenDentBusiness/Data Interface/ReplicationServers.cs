@@ -127,6 +127,36 @@ namespace OpenDentBusiness{
 			return rndLong;
 		}
 
+		///<summary>Generates a random primary key without using the cache.</summary>
+		public static long GetKeyNoCache(string tablename,string field) {
+			long rangeStart=10000;
+			long rangeEnd=long.MaxValue;
+			long server_id=GetServer_id();
+			if(server_id!=0) {
+				ReplicationServer thisServer=ReplicationServers.GetServer(server_id);
+				if(thisServer!=null && thisServer.RangeEnd-thisServer.RangeStart >= 999999) {
+					rangeStart=thisServer.RangeStart;
+					rangeEnd=thisServer.RangeEnd;
+				}
+			}
+			long span=rangeEnd-rangeStart;
+			long rndLong=(long)(_random.NextDouble()*span)+rangeStart;
+			while(rndLong==0 
+				|| rndLong<rangeStart 
+				|| rndLong>rangeStart 
+				|| KeyInUse(tablename,field,rndLong))
+			{
+				rndLong=(long)(_random.NextDouble()*span)+rangeStart;
+			}
+			return rndLong;
+		}
+
+		///<summary>Gets a single ReplicationServer based on server_id.  Used to avoid cache issues.</summary>
+		public static ReplicationServer GetServer(long server_id) {
+			string command="SELECT * FROM replicationserver WHERE server_id="+POut.Long(server_id);
+			return Crud.ReplicationServerCrud.SelectOne(command);
+		}
+
 		private static bool KeyInUse(string tablename,string field,long keynum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),tablename,field,keynum);

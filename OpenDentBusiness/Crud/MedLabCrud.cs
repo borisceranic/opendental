@@ -193,6 +193,84 @@ namespace OpenDentBusiness.Crud{
 			return medLab.MedLabNum;
 		}
 
+		///<summary>Inserts one MedLab into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLab medLab){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medLab,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medLab.MedLabNum=DbHelper.GetNextOracleKey("medlab","MedLabNum"); //Cacheless method
+				}
+				return InsertNoCache(medLab,true);
+			}
+		}
+
+		///<summary>Inserts one MedLab into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedLab medLab,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medlab (";
+			if(!useExistingPK && isRandomKeys) {
+				medLab.MedLabNum=ReplicationServers.GetKeyNoCache("medlab","MedLabNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedLabNum,";
+			}
+			command+="ProvNum,SendingApp,SendingFacility,PatNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,SpecimenID,SpecimenIDFiller,ObsTestID,ObsTestDescript,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,DateTimeReported,ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,OriginalPIDSegment) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medLab.MedLabNum)+",";
+			}
+			command+=
+				     POut.Long  (medLab.ProvNum)+","
+				+"'"+POut.String(medLab.SendingApp)+"',"
+				+"'"+POut.String(medLab.SendingFacility)+"',"
+				+    POut.Long  (medLab.PatNum)+","
+				+"'"+POut.String(medLab.PatIDLab)+"',"
+				+"'"+POut.String(medLab.PatIDAlt)+"',"
+				+"'"+POut.String(medLab.PatAge)+"',"
+				+"'"+POut.String(medLab.PatAccountNum)+"',"
+				+    POut.Int   ((int)medLab.PatFasting)+","
+				+"'"+POut.String(medLab.SpecimenID)+"',"
+				+"'"+POut.String(medLab.SpecimenIDFiller)+"',"
+				+"'"+POut.String(medLab.ObsTestID)+"',"
+				+"'"+POut.String(medLab.ObsTestDescript)+"',"
+				+"'"+POut.String(medLab.ObsTestLoinc)+"',"
+				+"'"+POut.String(medLab.ObsTestLoincText)+"',"
+				+    POut.DateT (medLab.DateTimeCollected)+","
+				+"'"+POut.String(medLab.TotalVolume)+"',"
+				+"'"+POut.String(medLab.ActionCode.ToString())+"',"
+				+"'"+POut.String(medLab.ClinicalInfo)+"',"
+				+    POut.DateT (medLab.DateTimeEntered)+","
+				+"'"+POut.String(medLab.OrderingProvNPI)+"',"
+				+"'"+POut.String(medLab.OrderingProvLocalID)+"',"
+				+"'"+POut.String(medLab.OrderingProvLName)+"',"
+				+"'"+POut.String(medLab.OrderingProvFName)+"',"
+				+"'"+POut.String(medLab.SpecimenIDAlt)+"',"
+				+    POut.DateT (medLab.DateTimeReported)+","
+				+"'"+POut.String(medLab.ResultStatus.ToString())+"',"
+				+"'"+POut.String(medLab.ParentObsID)+"',"
+				+"'"+POut.String(medLab.ParentObsTestID)+"',"
+				+    DbHelper.ParamChar+"paramNotePat,"
+				+    DbHelper.ParamChar+"paramNoteLab,"
+				+"'"+POut.String(medLab.FileName)+"',"
+				+"'"+POut.String(medLab.OriginalPIDSegment)+"')";
+			if(medLab.NotePat==null) {
+				medLab.NotePat="";
+			}
+			OdSqlParameter paramNotePat=new OdSqlParameter("paramNotePat",OdDbType.Text,medLab.NotePat);
+			if(medLab.NoteLab==null) {
+				medLab.NoteLab="";
+			}
+			OdSqlParameter paramNoteLab=new OdSqlParameter("paramNoteLab",OdDbType.Text,medLab.NoteLab);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNotePat,paramNoteLab);
+			}
+			else {
+				medLab.MedLabNum=Db.NonQ(command,true,paramNotePat,paramNoteLab);
+			}
+			return medLab.MedLabNum;
+		}
+
 		///<summary>Updates one MedLab in the database.</summary>
 		public static void Update(MedLab medLab){
 			string command="UPDATE medlab SET "

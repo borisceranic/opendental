@@ -123,6 +123,54 @@ namespace OpenDentBusiness.Crud{
 			return phoneEmpDefault.EmployeeNum;
 		}
 
+		///<summary>Inserts one PhoneEmpDefault into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneEmpDefault phoneEmpDefault){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(phoneEmpDefault,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					phoneEmpDefault.EmployeeNum=DbHelper.GetNextOracleKey("phoneempdefault","EmployeeNum"); //Cacheless method
+				}
+				return InsertNoCache(phoneEmpDefault,true);
+			}
+		}
+
+		///<summary>Inserts one PhoneEmpDefault into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneEmpDefault phoneEmpDefault,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO phoneempdefault (";
+			if(!useExistingPK && isRandomKeys) {
+				phoneEmpDefault.EmployeeNum=ReplicationServers.GetKeyNoCache("phoneempdefault","EmployeeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmployeeNum,";
+			}
+			command+="IsGraphed,HasColor,RingGroups,EmpName,PhoneExt,StatusOverride,Notes,ComputerName,IsPrivateScreen,IsTriageOperator,EscalationOrder) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(phoneEmpDefault.EmployeeNum)+",";
+			}
+			command+=
+				     POut.Bool  (phoneEmpDefault.IsGraphed)+","
+				+    POut.Bool  (phoneEmpDefault.HasColor)+","
+				+    POut.Int   ((int)phoneEmpDefault.RingGroups)+","
+				+"'"+POut.String(phoneEmpDefault.EmpName)+"',"
+				+    POut.Int   (phoneEmpDefault.PhoneExt)+","
+				+    POut.Int   ((int)phoneEmpDefault.StatusOverride)+","
+				+"'"+POut.String(phoneEmpDefault.Notes)+"',"
+				+"'"+POut.String(phoneEmpDefault.ComputerName)+"',"
+				+    POut.Bool  (phoneEmpDefault.IsPrivateScreen)+","
+				+    POut.Bool  (phoneEmpDefault.IsTriageOperator)+","
+				+    POut.Int   (phoneEmpDefault.EscalationOrder)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				phoneEmpDefault.EmployeeNum=Db.NonQ(command,true);
+			}
+			return phoneEmpDefault.EmployeeNum;
+		}
+
 		///<summary>Updates one PhoneEmpDefault in the database.</summary>
 		public static void Update(PhoneEmpDefault phoneEmpDefault){
 			string command="UPDATE phoneempdefault SET "

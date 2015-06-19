@@ -133,6 +133,59 @@ namespace OpenDentBusiness.Crud{
 			return clinic.ClinicNum;
 		}
 
+		///<summary>Inserts one Clinic into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Clinic clinic){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(clinic,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					clinic.ClinicNum=DbHelper.GetNextOracleKey("clinic","ClinicNum"); //Cacheless method
+				}
+				return InsertNoCache(clinic,true);
+			}
+		}
+
+		///<summary>Inserts one Clinic into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Clinic clinic,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO clinic (";
+			if(!useExistingPK && isRandomKeys) {
+				clinic.ClinicNum=ReplicationServers.GetKeyNoCache("clinic","ClinicNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClinicNum,";
+			}
+			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(clinic.ClinicNum)+",";
+			}
+			command+=
+				 "'"+POut.String(clinic.Description)+"',"
+				+"'"+POut.String(clinic.Address)+"',"
+				+"'"+POut.String(clinic.Address2)+"',"
+				+"'"+POut.String(clinic.City)+"',"
+				+"'"+POut.String(clinic.State)+"',"
+				+"'"+POut.String(clinic.Zip)+"',"
+				+"'"+POut.String(clinic.Phone)+"',"
+				+"'"+POut.String(clinic.BankNumber)+"',"
+				+    POut.Int   ((int)clinic.DefaultPlaceService)+","
+				+    POut.Long  (clinic.InsBillingProv)+","
+				+"'"+POut.String(clinic.Fax)+"',"
+				+    POut.Long  (clinic.EmailAddressNum)+","
+				+    POut.Long  (clinic.DefaultProv)+","
+				+    POut.DateT (clinic.SmsContractDate)+","
+				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
+				+    POut.Bool  (clinic.IsMedicalOnly)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				clinic.ClinicNum=Db.NonQ(command,true);
+			}
+			return clinic.ClinicNum;
+		}
+
 		///<summary>Updates one Clinic in the database.</summary>
 		public static void Update(Clinic clinic){
 			string command="UPDATE clinic SET "

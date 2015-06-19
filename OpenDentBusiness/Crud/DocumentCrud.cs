@@ -153,6 +153,73 @@ namespace OpenDentBusiness.Crud{
 			return document.DocNum;
 		}
 
+		///<summary>Inserts one Document into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Document document){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(document,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					document.DocNum=DbHelper.GetNextOracleKey("document","DocNum"); //Cacheless method
+				}
+				return InsertNoCache(document,true);
+			}
+		}
+
+		///<summary>Inserts one Document into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Document document,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO document (";
+			if(!useExistingPK && isRandomKeys) {
+				document.DocNum=ReplicationServers.GetKeyNoCache("document","DocNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DocNum,";
+			}
+			command+="Description,DateCreated,DocCategory,PatNum,FileName,ImgType,IsFlipped,DegreesRotated,ToothNumbers,Note,SigIsTopaz,Signature,CropX,CropY,CropW,CropH,WindowingMin,WindowingMax,MountItemNum,RawBase64,Thumbnail) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(document.DocNum)+",";
+			}
+			command+=
+				 "'"+POut.String(document.Description)+"',"
+				+    POut.Date  (document.DateCreated)+","
+				+    POut.Long  (document.DocCategory)+","
+				+    POut.Long  (document.PatNum)+","
+				+"'"+POut.String(document.FileName)+"',"
+				+    POut.Int   ((int)document.ImgType)+","
+				+    POut.Bool  (document.IsFlipped)+","
+				+    POut.Int   (document.DegreesRotated)+","
+				+"'"+POut.String(document.ToothNumbers)+"',"
+				+"'"+POut.String(document.Note)+"',"
+				+    POut.Bool  (document.SigIsTopaz)+","
+				+"'"+POut.String(document.Signature)+"',"
+				+    POut.Int   (document.CropX)+","
+				+    POut.Int   (document.CropY)+","
+				+    POut.Int   (document.CropW)+","
+				+    POut.Int   (document.CropH)+","
+				+    POut.Int   (document.WindowingMin)+","
+				+    POut.Int   (document.WindowingMax)+","
+				+    POut.Long  (document.MountItemNum)+","
+				//DateTStamp can only be set by MySQL
+				+    DbHelper.ParamChar+"paramRawBase64,"
+				+    DbHelper.ParamChar+"paramThumbnail)";
+			if(document.RawBase64==null) {
+				document.RawBase64="";
+			}
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,document.RawBase64);
+			if(document.Thumbnail==null) {
+				document.Thumbnail="";
+			}
+			OdSqlParameter paramThumbnail=new OdSqlParameter("paramThumbnail",OdDbType.Text,document.Thumbnail);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramRawBase64,paramThumbnail);
+			}
+			else {
+				document.DocNum=Db.NonQ(command,true,paramRawBase64,paramThumbnail);
+			}
+			return document.DocNum;
+		}
+
 		///<summary>Updates one Document in the database.</summary>
 		public static void Update(Document document){
 			string command="UPDATE document SET "

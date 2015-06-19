@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return disease.DiseaseNum;
 		}
 
+		///<summary>Inserts one Disease into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Disease disease){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(disease,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					disease.DiseaseNum=DbHelper.GetNextOracleKey("disease","DiseaseNum"); //Cacheless method
+				}
+				return InsertNoCache(disease,true);
+			}
+		}
+
+		///<summary>Inserts one Disease into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Disease disease,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO disease (";
+			if(!useExistingPK && isRandomKeys) {
+				disease.DiseaseNum=ReplicationServers.GetKeyNoCache("disease","DiseaseNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DiseaseNum,";
+			}
+			command+="PatNum,DiseaseDefNum,PatNote,ProbStatus,DateStart,DateStop,SnomedProblemType,FunctionStatus) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(disease.DiseaseNum)+",";
+			}
+			command+=
+				     POut.Long  (disease.PatNum)+","
+				+    POut.Long  (disease.DiseaseDefNum)+","
+				+"'"+POut.String(disease.PatNote)+"',"
+				//DateTStamp can only be set by MySQL
+				+    POut.Int   ((int)disease.ProbStatus)+","
+				+    POut.Date  (disease.DateStart)+","
+				+    POut.Date  (disease.DateStop)+","
+				+"'"+POut.String(disease.SnomedProblemType)+"',"
+				+    POut.Int   ((int)disease.FunctionStatus)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				disease.DiseaseNum=Db.NonQ(command,true);
+			}
+			return disease.DiseaseNum;
+		}
+
 		///<summary>Updates one Disease in the database.</summary>
 		public static void Update(Disease disease){
 			string command="UPDATE disease SET "

@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return taskUnread.TaskUnreadNum;
 		}
 
+		///<summary>Inserts one TaskUnread into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskUnread taskUnread){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskUnread,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskUnread.TaskUnreadNum=DbHelper.GetNextOracleKey("taskunread","TaskUnreadNum"); //Cacheless method
+				}
+				return InsertNoCache(taskUnread,true);
+			}
+		}
+
+		///<summary>Inserts one TaskUnread into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskUnread taskUnread,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO taskunread (";
+			if(!useExistingPK && isRandomKeys) {
+				taskUnread.TaskUnreadNum=ReplicationServers.GetKeyNoCache("taskunread","TaskUnreadNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskUnreadNum,";
+			}
+			command+="TaskNum,UserNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskUnread.TaskUnreadNum)+",";
+			}
+			command+=
+				     POut.Long  (taskUnread.TaskNum)+","
+				+    POut.Long  (taskUnread.UserNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				taskUnread.TaskUnreadNum=Db.NonQ(command,true);
+			}
+			return taskUnread.TaskUnreadNum;
+		}
+
 		///<summary>Updates one TaskUnread in the database.</summary>
 		public static void Update(TaskUnread taskUnread){
 			string command="UPDATE taskunread SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return cvx.CvxNum;
 		}
 
+		///<summary>Inserts one Cvx into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cvx cvx){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(cvx,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					cvx.CvxNum=DbHelper.GetNextOracleKey("cvx","CvxNum"); //Cacheless method
+				}
+				return InsertNoCache(cvx,true);
+			}
+		}
+
+		///<summary>Inserts one Cvx into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cvx cvx,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO cvx (";
+			if(!useExistingPK && isRandomKeys) {
+				cvx.CvxNum=ReplicationServers.GetKeyNoCache("cvx","CvxNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CvxNum,";
+			}
+			command+="CvxCode,Description,IsActive) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(cvx.CvxNum)+",";
+			}
+			command+=
+				 "'"+POut.String(cvx.CvxCode)+"',"
+				+"'"+POut.String(cvx.Description)+"',"
+				+"'"+POut.String(cvx.IsActive)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				cvx.CvxNum=Db.NonQ(command,true);
+			}
+			return cvx.CvxNum;
+		}
+
 		///<summary>Updates one Cvx in the database.</summary>
 		public static void Update(Cvx cvx){
 			string command="UPDATE cvx SET "

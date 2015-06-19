@@ -123,6 +123,56 @@ namespace OpenDentBusiness.Crud{
 			return insSub.InsSubNum;
 		}
 
+		///<summary>Inserts one InsSub into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsSub insSub){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(insSub,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					insSub.InsSubNum=DbHelper.GetNextOracleKey("inssub","InsSubNum"); //Cacheless method
+				}
+				return InsertNoCache(insSub,true);
+			}
+		}
+
+		///<summary>Inserts one InsSub into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsSub insSub,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO inssub (";
+			if(!useExistingPK && isRandomKeys) {
+				insSub.InsSubNum=ReplicationServers.GetKeyNoCache("inssub","InsSubNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="InsSubNum,";
+			}
+			command+="PlanNum,Subscriber,DateEffective,DateTerm,ReleaseInfo,AssignBen,SubscriberID,BenefitNotes,SubscNote) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(insSub.InsSubNum)+",";
+			}
+			command+=
+				     POut.Long  (insSub.PlanNum)+","
+				+    POut.Long  (insSub.Subscriber)+","
+				+    POut.Date  (insSub.DateEffective)+","
+				+    POut.Date  (insSub.DateTerm)+","
+				+    POut.Bool  (insSub.ReleaseInfo)+","
+				+    POut.Bool  (insSub.AssignBen)+","
+				+"'"+POut.String(insSub.SubscriberID)+"',"
+				+    DbHelper.ParamChar+"paramBenefitNotes,"
+				+"'"+POut.String(insSub.SubscNote)+"')";
+			if(insSub.BenefitNotes==null) {
+				insSub.BenefitNotes="";
+			}
+			OdSqlParameter paramBenefitNotes=new OdSqlParameter("paramBenefitNotes",OdDbType.Text,insSub.BenefitNotes);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramBenefitNotes);
+			}
+			else {
+				insSub.InsSubNum=Db.NonQ(command,true,paramBenefitNotes);
+			}
+			return insSub.InsSubNum;
+		}
+
 		///<summary>Updates one InsSub in the database.</summary>
 		public static void Update(InsSub insSub){
 			string command="UPDATE inssub SET "

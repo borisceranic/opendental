@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return evaluationDef.EvaluationDefNum;
 		}
 
+		///<summary>Inserts one EvaluationDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EvaluationDef evaluationDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(evaluationDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					evaluationDef.EvaluationDefNum=DbHelper.GetNextOracleKey("evaluationdef","EvaluationDefNum"); //Cacheless method
+				}
+				return InsertNoCache(evaluationDef,true);
+			}
+		}
+
+		///<summary>Inserts one EvaluationDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EvaluationDef evaluationDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO evaluationdef (";
+			if(!useExistingPK && isRandomKeys) {
+				evaluationDef.EvaluationDefNum=ReplicationServers.GetKeyNoCache("evaluationdef","EvaluationDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EvaluationDefNum,";
+			}
+			command+="SchoolCourseNum,EvalTitle,GradingScaleNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(evaluationDef.EvaluationDefNum)+",";
+			}
+			command+=
+				     POut.Long  (evaluationDef.SchoolCourseNum)+","
+				+"'"+POut.String(evaluationDef.EvalTitle)+"',"
+				+    POut.Long  (evaluationDef.GradingScaleNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				evaluationDef.EvaluationDefNum=Db.NonQ(command,true);
+			}
+			return evaluationDef.EvaluationDefNum;
+		}
+
 		///<summary>Updates one EvaluationDef in the database.</summary>
 		public static void Update(EvaluationDef evaluationDef){
 			string command="UPDATE evaluationdef SET "

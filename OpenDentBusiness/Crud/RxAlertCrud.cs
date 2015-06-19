@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return rxAlert.RxAlertNum;
 		}
 
+		///<summary>Inserts one RxAlert into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxAlert rxAlert){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(rxAlert,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					rxAlert.RxAlertNum=DbHelper.GetNextOracleKey("rxalert","RxAlertNum"); //Cacheless method
+				}
+				return InsertNoCache(rxAlert,true);
+			}
+		}
+
+		///<summary>Inserts one RxAlert into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(RxAlert rxAlert,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO rxalert (";
+			if(!useExistingPK && isRandomKeys) {
+				rxAlert.RxAlertNum=ReplicationServers.GetKeyNoCache("rxalert","RxAlertNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="RxAlertNum,";
+			}
+			command+="RxDefNum,DiseaseDefNum,AllergyDefNum,MedicationNum,NotificationMsg,IsHighSignificance) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(rxAlert.RxAlertNum)+",";
+			}
+			command+=
+				     POut.Long  (rxAlert.RxDefNum)+","
+				+    POut.Long  (rxAlert.DiseaseDefNum)+","
+				+    POut.Long  (rxAlert.AllergyDefNum)+","
+				+    POut.Long  (rxAlert.MedicationNum)+","
+				+"'"+POut.String(rxAlert.NotificationMsg)+"',"
+				+    POut.Bool  (rxAlert.IsHighSignificance)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				rxAlert.RxAlertNum=Db.NonQ(command,true);
+			}
+			return rxAlert.RxAlertNum;
+		}
+
 		///<summary>Updates one RxAlert in the database.</summary>
 		public static void Update(RxAlert rxAlert){
 			string command="UPDATE rxalert SET "

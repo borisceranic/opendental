@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return insFilingCodeSubtype.InsFilingCodeSubtypeNum;
 		}
 
+		///<summary>Inserts one InsFilingCodeSubtype into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsFilingCodeSubtype insFilingCodeSubtype){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(insFilingCodeSubtype,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					insFilingCodeSubtype.InsFilingCodeSubtypeNum=DbHelper.GetNextOracleKey("insfilingcodesubtype","InsFilingCodeSubtypeNum"); //Cacheless method
+				}
+				return InsertNoCache(insFilingCodeSubtype,true);
+			}
+		}
+
+		///<summary>Inserts one InsFilingCodeSubtype into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InsFilingCodeSubtype insFilingCodeSubtype,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO insfilingcodesubtype (";
+			if(!useExistingPK && isRandomKeys) {
+				insFilingCodeSubtype.InsFilingCodeSubtypeNum=ReplicationServers.GetKeyNoCache("insfilingcodesubtype","InsFilingCodeSubtypeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="InsFilingCodeSubtypeNum,";
+			}
+			command+="InsFilingCodeNum,Descript) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(insFilingCodeSubtype.InsFilingCodeSubtypeNum)+",";
+			}
+			command+=
+				     POut.Long  (insFilingCodeSubtype.InsFilingCodeNum)+","
+				+"'"+POut.String(insFilingCodeSubtype.Descript)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				insFilingCodeSubtype.InsFilingCodeSubtypeNum=Db.NonQ(command,true);
+			}
+			return insFilingCodeSubtype.InsFilingCodeSubtypeNum;
+		}
+
 		///<summary>Updates one InsFilingCodeSubtype in the database.</summary>
 		public static void Update(InsFilingCodeSubtype insFilingCodeSubtype){
 			string command="UPDATE insfilingcodesubtype SET "

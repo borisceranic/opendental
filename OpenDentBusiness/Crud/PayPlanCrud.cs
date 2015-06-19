@@ -125,6 +125,55 @@ namespace OpenDentBusiness.Crud{
 			return payPlan.PayPlanNum;
 		}
 
+		///<summary>Inserts one PayPlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPlan payPlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(payPlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					payPlan.PayPlanNum=DbHelper.GetNextOracleKey("payplan","PayPlanNum"); //Cacheless method
+				}
+				return InsertNoCache(payPlan,true);
+			}
+		}
+
+		///<summary>Inserts one PayPlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PayPlan payPlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO payplan (";
+			if(!useExistingPK && isRandomKeys) {
+				payPlan.PayPlanNum=ReplicationServers.GetKeyNoCache("payplan","PayPlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PayPlanNum,";
+			}
+			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(payPlan.PayPlanNum)+",";
+			}
+			command+=
+				     POut.Long  (payPlan.PatNum)+","
+				+    POut.Long  (payPlan.Guarantor)+","
+				+    POut.Date  (payPlan.PayPlanDate)+","
+				+"'"+POut.Double(payPlan.APR)+"',"
+				+"'"+POut.String(payPlan.Note)+"',"
+				+    POut.Long  (payPlan.PlanNum)+","
+				+"'"+POut.Double(payPlan.CompletedAmt)+"',"
+				+    POut.Long  (payPlan.InsSubNum)+","
+				+    POut.Int   ((int)payPlan.PaySchedule)+","
+				+    POut.Int   (payPlan.NumberOfPayments)+","
+				+"'"+POut.Double(payPlan.PayAmt)+"',"
+				+"'"+POut.Double(payPlan.DownPayment)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				payPlan.PayPlanNum=Db.NonQ(command,true);
+			}
+			return payPlan.PayPlanNum;
+		}
+
 		///<summary>Updates one PayPlan in the database.</summary>
 		public static void Update(PayPlan payPlan){
 			string command="UPDATE payplan SET "

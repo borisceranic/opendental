@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return taskList.TaskListNum;
 		}
 
+		///<summary>Inserts one TaskList into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskList taskList){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskList,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskList.TaskListNum=DbHelper.GetNextOracleKey("tasklist","TaskListNum"); //Cacheless method
+				}
+				return InsertNoCache(taskList,true);
+			}
+		}
+
+		///<summary>Inserts one TaskList into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskList taskList,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO tasklist (";
+			if(!useExistingPK && isRandomKeys) {
+				taskList.TaskListNum=ReplicationServers.GetKeyNoCache("tasklist","TaskListNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskListNum,";
+			}
+			command+="Descript,Parent,DateTL,IsRepeating,DateType,FromNum,ObjectType,DateTimeEntry) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskList.TaskListNum)+",";
+			}
+			command+=
+				 "'"+POut.String(taskList.Descript)+"',"
+				+    POut.Long  (taskList.Parent)+","
+				+    POut.Date  (taskList.DateTL)+","
+				+    POut.Bool  (taskList.IsRepeating)+","
+				+    POut.Int   ((int)taskList.DateType)+","
+				+    POut.Long  (taskList.FromNum)+","
+				+    POut.Int   ((int)taskList.ObjectType)+","
+				+    DbHelper.Now()+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				taskList.TaskListNum=Db.NonQ(command,true);
+			}
+			return taskList.TaskListNum;
+		}
+
 		///<summary>Updates one TaskList in the database.</summary>
 		public static void Update(TaskList taskList){
 			string command="UPDATE tasklist SET "

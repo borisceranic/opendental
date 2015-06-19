@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return automation.AutomationNum;
 		}
 
+		///<summary>Inserts one Automation into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Automation automation){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(automation,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					automation.AutomationNum=DbHelper.GetNextOracleKey("automation","AutomationNum"); //Cacheless method
+				}
+				return InsertNoCache(automation,true);
+			}
+		}
+
+		///<summary>Inserts one Automation into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Automation automation,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO automation (";
+			if(!useExistingPK && isRandomKeys) {
+				automation.AutomationNum=ReplicationServers.GetKeyNoCache("automation","AutomationNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AutomationNum,";
+			}
+			command+="Description,Autotrigger,ProcCodes,AutoAction,SheetDefNum,CommType,MessageContent) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(automation.AutomationNum)+",";
+			}
+			command+=
+				 "'"+POut.String(automation.Description)+"',"
+				+    POut.Int   ((int)automation.Autotrigger)+","
+				+"'"+POut.String(automation.ProcCodes)+"',"
+				+    POut.Int   ((int)automation.AutoAction)+","
+				+    POut.Long  (automation.SheetDefNum)+","
+				+    POut.Long  (automation.CommType)+","
+				+"'"+POut.String(automation.MessageContent)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				automation.AutomationNum=Db.NonQ(command,true);
+			}
+			return automation.AutomationNum;
+		}
+
 		///<summary>Updates one Automation in the database.</summary>
 		public static void Update(Automation automation){
 			string command="UPDATE automation SET "

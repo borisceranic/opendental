@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return language.LanguageNum;
 		}
 
+		///<summary>Inserts one Language into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Language language){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(language,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					language.LanguageNum=DbHelper.GetNextOracleKey("language","LanguageNum"); //Cacheless method
+				}
+				return InsertNoCache(language,true);
+			}
+		}
+
+		///<summary>Inserts one Language into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Language language,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO language (";
+			if(!useExistingPK && isRandomKeys) {
+				language.LanguageNum=ReplicationServers.GetKeyNoCache("language","LanguageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LanguageNum,";
+			}
+			command+="EnglishComments,ClassType,English,IsObsolete) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(language.LanguageNum)+",";
+			}
+			command+=
+				 "'"+POut.String(language.EnglishComments)+"',"
+				+"'"+POut.String(language.ClassType)+"',"
+				+"'"+POut.String(language.English)+"',"
+				+    POut.Bool  (language.IsObsolete)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				language.LanguageNum=Db.NonQ(command,true);
+			}
+			return language.LanguageNum;
+		}
+
 		///<summary>Updates one Language in the database.</summary>
 		public static void Update(Language language){
 			string command="UPDATE language SET "

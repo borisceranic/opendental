@@ -141,6 +141,63 @@ namespace OpenDentBusiness.Crud{
 			return vaccinePat.VaccinePatNum;
 		}
 
+		///<summary>Inserts one VaccinePat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(VaccinePat vaccinePat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(vaccinePat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					vaccinePat.VaccinePatNum=DbHelper.GetNextOracleKey("vaccinepat","VaccinePatNum"); //Cacheless method
+				}
+				return InsertNoCache(vaccinePat,true);
+			}
+		}
+
+		///<summary>Inserts one VaccinePat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(VaccinePat vaccinePat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO vaccinepat (";
+			if(!useExistingPK && isRandomKeys) {
+				vaccinePat.VaccinePatNum=ReplicationServers.GetKeyNoCache("vaccinepat","VaccinePatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="VaccinePatNum,";
+			}
+			command+="VaccineDefNum,DateTimeStart,DateTimeEnd,AdministeredAmt,DrugUnitNum,LotNumber,PatNum,Note,FilledCity,FilledST,CompletionStatus,AdministrationNoteCode,UserNum,ProvNumOrdering,ProvNumAdminister,DateExpire,RefusalReason,ActionCode,AdministrationRoute,AdministrationSite) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(vaccinePat.VaccinePatNum)+",";
+			}
+			command+=
+				     POut.Long  (vaccinePat.VaccineDefNum)+","
+				+    POut.DateT (vaccinePat.DateTimeStart)+","
+				+    POut.DateT (vaccinePat.DateTimeEnd)+","
+				+    POut.Float (vaccinePat.AdministeredAmt)+","
+				+    POut.Long  (vaccinePat.DrugUnitNum)+","
+				+"'"+POut.String(vaccinePat.LotNumber)+"',"
+				+    POut.Long  (vaccinePat.PatNum)+","
+				+"'"+POut.String(vaccinePat.Note)+"',"
+				+"'"+POut.String(vaccinePat.FilledCity)+"',"
+				+"'"+POut.String(vaccinePat.FilledST)+"',"
+				+    POut.Int   ((int)vaccinePat.CompletionStatus)+","
+				+    POut.Int   ((int)vaccinePat.AdministrationNoteCode)+","
+				+    POut.Long  (vaccinePat.UserNum)+","
+				+    POut.Long  (vaccinePat.ProvNumOrdering)+","
+				+    POut.Long  (vaccinePat.ProvNumAdminister)+","
+				+    POut.Date  (vaccinePat.DateExpire)+","
+				+    POut.Int   ((int)vaccinePat.RefusalReason)+","
+				+    POut.Int   ((int)vaccinePat.ActionCode)+","
+				+    POut.Int   ((int)vaccinePat.AdministrationRoute)+","
+				+    POut.Int   ((int)vaccinePat.AdministrationSite)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				vaccinePat.VaccinePatNum=Db.NonQ(command,true);
+			}
+			return vaccinePat.VaccinePatNum;
+		}
+
 		///<summary>Updates one VaccinePat in the database.</summary>
 		public static void Update(VaccinePat vaccinePat){
 			string command="UPDATE vaccinepat SET "

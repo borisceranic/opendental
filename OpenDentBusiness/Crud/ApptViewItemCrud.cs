@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return apptViewItem.ApptViewItemNum;
 		}
 
+		///<summary>Inserts one ApptViewItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ApptViewItem apptViewItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(apptViewItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					apptViewItem.ApptViewItemNum=DbHelper.GetNextOracleKey("apptviewitem","ApptViewItemNum"); //Cacheless method
+				}
+				return InsertNoCache(apptViewItem,true);
+			}
+		}
+
+		///<summary>Inserts one ApptViewItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ApptViewItem apptViewItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO apptviewitem (";
+			if(!useExistingPK && isRandomKeys) {
+				apptViewItem.ApptViewItemNum=ReplicationServers.GetKeyNoCache("apptviewitem","ApptViewItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ApptViewItemNum,";
+			}
+			command+="ApptViewNum,OpNum,ProvNum,ElementDesc,ElementOrder,ElementColor,ElementAlignment,ApptFieldDefNum,PatFieldDefNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(apptViewItem.ApptViewItemNum)+",";
+			}
+			command+=
+				     POut.Long  (apptViewItem.ApptViewNum)+","
+				+    POut.Long  (apptViewItem.OpNum)+","
+				+    POut.Long  (apptViewItem.ProvNum)+","
+				+"'"+POut.String(apptViewItem.ElementDesc)+"',"
+				+    POut.Byte  (apptViewItem.ElementOrder)+","
+				+    POut.Int   (apptViewItem.ElementColor.ToArgb())+","
+				+    POut.Int   ((int)apptViewItem.ElementAlignment)+","
+				+    POut.Long  (apptViewItem.ApptFieldDefNum)+","
+				+    POut.Long  (apptViewItem.PatFieldDefNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				apptViewItem.ApptViewItemNum=Db.NonQ(command,true);
+			}
+			return apptViewItem.ApptViewItemNum;
+		}
+
 		///<summary>Updates one ApptViewItem in the database.</summary>
 		public static void Update(ApptViewItem apptViewItem){
 			string command="UPDATE apptviewitem SET "

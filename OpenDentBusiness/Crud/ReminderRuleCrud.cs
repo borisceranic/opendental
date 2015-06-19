@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return reminderRule.ReminderRuleNum;
 		}
 
+		///<summary>Inserts one ReminderRule into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReminderRule reminderRule){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(reminderRule,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					reminderRule.ReminderRuleNum=DbHelper.GetNextOracleKey("reminderrule","ReminderRuleNum"); //Cacheless method
+				}
+				return InsertNoCache(reminderRule,true);
+			}
+		}
+
+		///<summary>Inserts one ReminderRule into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ReminderRule reminderRule,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO reminderrule (";
+			if(!useExistingPK && isRandomKeys) {
+				reminderRule.ReminderRuleNum=ReplicationServers.GetKeyNoCache("reminderrule","ReminderRuleNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ReminderRuleNum,";
+			}
+			command+="ReminderCriterion,CriterionFK,CriterionValue,Message) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(reminderRule.ReminderRuleNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)reminderRule.ReminderCriterion)+","
+				+    POut.Long  (reminderRule.CriterionFK)+","
+				+"'"+POut.String(reminderRule.CriterionValue)+"',"
+				+"'"+POut.String(reminderRule.Message)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				reminderRule.ReminderRuleNum=Db.NonQ(command,true);
+			}
+			return reminderRule.ReminderRuleNum;
+		}
+
 		///<summary>Updates one ReminderRule in the database.</summary>
 		public static void Update(ReminderRule reminderRule){
 			string command="UPDATE reminderrule SET "

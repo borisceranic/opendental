@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return labTurnaround.LabTurnaroundNum;
 		}
 
+		///<summary>Inserts one LabTurnaround into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabTurnaround labTurnaround){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(labTurnaround,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					labTurnaround.LabTurnaroundNum=DbHelper.GetNextOracleKey("labturnaround","LabTurnaroundNum"); //Cacheless method
+				}
+				return InsertNoCache(labTurnaround,true);
+			}
+		}
+
+		///<summary>Inserts one LabTurnaround into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabTurnaround labTurnaround,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO labturnaround (";
+			if(!useExistingPK && isRandomKeys) {
+				labTurnaround.LabTurnaroundNum=ReplicationServers.GetKeyNoCache("labturnaround","LabTurnaroundNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LabTurnaroundNum,";
+			}
+			command+="LaboratoryNum,Description,DaysPublished,DaysActual) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(labTurnaround.LabTurnaroundNum)+",";
+			}
+			command+=
+				     POut.Long  (labTurnaround.LaboratoryNum)+","
+				+"'"+POut.String(labTurnaround.Description)+"',"
+				+    POut.Int   (labTurnaround.DaysPublished)+","
+				+    POut.Int   (labTurnaround.DaysActual)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				labTurnaround.LabTurnaroundNum=Db.NonQ(command,true);
+			}
+			return labTurnaround.LabTurnaroundNum;
+		}
+
 		///<summary>Updates one LabTurnaround in the database.</summary>
 		public static void Update(LabTurnaround labTurnaround){
 			string command="UPDATE labturnaround SET "

@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return reseller.ResellerNum;
 		}
 
+		///<summary>Inserts one Reseller into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Reseller reseller){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(reseller,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					reseller.ResellerNum=DbHelper.GetNextOracleKey("reseller","ResellerNum"); //Cacheless method
+				}
+				return InsertNoCache(reseller,true);
+			}
+		}
+
+		///<summary>Inserts one Reseller into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Reseller reseller,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO reseller (";
+			if(!useExistingPK && isRandomKeys) {
+				reseller.ResellerNum=ReplicationServers.GetKeyNoCache("reseller","ResellerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ResellerNum,";
+			}
+			command+="PatNum,UserName,ResellerPassword) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(reseller.ResellerNum)+",";
+			}
+			command+=
+				     POut.Long  (reseller.PatNum)+","
+				+"'"+POut.String(reseller.UserName)+"',"
+				+"'"+POut.String(reseller.ResellerPassword)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				reseller.ResellerNum=Db.NonQ(command,true);
+			}
+			return reseller.ResellerNum;
+		}
+
 		///<summary>Updates one Reseller in the database.</summary>
 		public static void Update(Reseller reseller){
 			string command="UPDATE reseller SET "

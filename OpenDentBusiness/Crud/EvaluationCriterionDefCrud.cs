@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return evaluationCriterionDef.EvaluationCriterionDefNum;
 		}
 
+		///<summary>Inserts one EvaluationCriterionDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EvaluationCriterionDef evaluationCriterionDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(evaluationCriterionDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					evaluationCriterionDef.EvaluationCriterionDefNum=DbHelper.GetNextOracleKey("evaluationcriteriondef","EvaluationCriterionDefNum"); //Cacheless method
+				}
+				return InsertNoCache(evaluationCriterionDef,true);
+			}
+		}
+
+		///<summary>Inserts one EvaluationCriterionDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EvaluationCriterionDef evaluationCriterionDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO evaluationcriteriondef (";
+			if(!useExistingPK && isRandomKeys) {
+				evaluationCriterionDef.EvaluationCriterionDefNum=ReplicationServers.GetKeyNoCache("evaluationcriteriondef","EvaluationCriterionDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EvaluationCriterionDefNum,";
+			}
+			command+="EvaluationDefNum,CriterionDescript,IsCategoryName,GradingScaleNum,ItemOrder,MaxPointsPoss) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(evaluationCriterionDef.EvaluationCriterionDefNum)+",";
+			}
+			command+=
+				     POut.Long  (evaluationCriterionDef.EvaluationDefNum)+","
+				+"'"+POut.String(evaluationCriterionDef.CriterionDescript)+"',"
+				+    POut.Bool  (evaluationCriterionDef.IsCategoryName)+","
+				+    POut.Long  (evaluationCriterionDef.GradingScaleNum)+","
+				+    POut.Int   (evaluationCriterionDef.ItemOrder)+","
+				+    POut.Float (evaluationCriterionDef.MaxPointsPoss)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				evaluationCriterionDef.EvaluationCriterionDefNum=Db.NonQ(command,true);
+			}
+			return evaluationCriterionDef.EvaluationCriterionDefNum;
+		}
+
 		///<summary>Updates one EvaluationCriterionDef in the database.</summary>
 		public static void Update(EvaluationCriterionDef evaluationCriterionDef){
 			string command="UPDATE evaluationcriteriondef SET "

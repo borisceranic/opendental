@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return signalod.SignalNum;
 		}
 
+		///<summary>Inserts one Signalod into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Signalod signalod){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(signalod,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					signalod.SignalNum=DbHelper.GetNextOracleKey("signalod","SignalNum"); //Cacheless method
+				}
+				return InsertNoCache(signalod,true);
+			}
+		}
+
+		///<summary>Inserts one Signalod into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Signalod signalod,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO signalod (";
+			if(!useExistingPK && isRandomKeys) {
+				signalod.SignalNum=ReplicationServers.GetKeyNoCache("signalod","SignalNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SignalNum,";
+			}
+			command+="FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(signalod.SignalNum)+",";
+			}
+			command+=
+				 "'"+POut.String(signalod.FromUser)+"',"
+				+"'"+POut.String(signalod.ITypes)+"',"
+				+    POut.Date  (signalod.DateViewing)+","
+				+    POut.Int   ((int)signalod.SigType)+","
+				+"'"+POut.String(signalod.SigText)+"',"
+				+    POut.DateT (signalod.SigDateTime)+","
+				+"'"+POut.String(signalod.ToUser)+"',"
+				+    POut.DateT (signalod.AckTime)+","
+				+    POut.Long  (signalod.TaskNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				signalod.SignalNum=Db.NonQ(command,true);
+			}
+			return signalod.SignalNum;
+		}
+
 		///<summary>Updates one Signalod in the database.</summary>
 		public static void Update(Signalod signalod){
 			string command="UPDATE signalod SET "

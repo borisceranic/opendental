@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return schoolClass.SchoolClassNum;
 		}
 
+		///<summary>Inserts one SchoolClass into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SchoolClass schoolClass){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(schoolClass,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					schoolClass.SchoolClassNum=DbHelper.GetNextOracleKey("schoolclass","SchoolClassNum"); //Cacheless method
+				}
+				return InsertNoCache(schoolClass,true);
+			}
+		}
+
+		///<summary>Inserts one SchoolClass into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SchoolClass schoolClass,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO schoolclass (";
+			if(!useExistingPK && isRandomKeys) {
+				schoolClass.SchoolClassNum=ReplicationServers.GetKeyNoCache("schoolclass","SchoolClassNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SchoolClassNum,";
+			}
+			command+="GradYear,Descript) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(schoolClass.SchoolClassNum)+",";
+			}
+			command+=
+				     POut.Int   (schoolClass.GradYear)+","
+				+"'"+POut.String(schoolClass.Descript)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				schoolClass.SchoolClassNum=Db.NonQ(command,true);
+			}
+			return schoolClass.SchoolClassNum;
+		}
+
 		///<summary>Updates one SchoolClass in the database.</summary>
 		public static void Update(SchoolClass schoolClass){
 			string command="UPDATE schoolclass SET "

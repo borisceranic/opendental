@@ -42,6 +42,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Update that doesnt use the local cache.  Useful for multithreaded connections.</summary>
 		public static void UpdateNoCache(GroupPermission gp) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),gp);
+				return;
+			}
 			string command="UPDATE grouppermission SET "
 				+"NewerDate   =  "+POut.Date  (gp.NewerDate)+", "
 				+"NewerDays   =  "+POut.Int   (gp.NewerDays)+", "
@@ -63,6 +67,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Deletes without using the cache.  Useful for multithreaded connections.</summary>
 		public static void DeleteNoCache(GroupPermission gp) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),gp);
+				return;
+			}
 			string command="DELETE FROM grouppermission WHERE GroupPermNum="+POut.Long(gp.GroupPermNum);
 			Db.NonQ(command);
 		}
@@ -93,14 +101,12 @@ namespace OpenDentBusiness{
 			return Crud.GroupPermissionCrud.Insert(gp);
 		}
 
-		///<summary>Inserts without using the local cache.  Useful for multithreaded connections.  Doesn't validate SecurityAdminPermission like the normal Insert does.</summary>
+		///<summary>Insertion logic that doesn't use the cache. Has special cases for generating random PK's and handling Oracle insertions.</summary>
 		public static long InsertNoCache(GroupPermission gp) {
-			string command="INSERT INTO grouppermission (NewerDate,NewerDays,UserGroupNum,PermType) VALUES("
-				+		 POut.Date  (gp.NewerDate)+","
-				+    POut.Int   (gp.NewerDays)+","
-				+    POut.Long  (gp.UserGroupNum)+","
-				+    POut.Int   ((int)gp.PermType)+")";
-			return Db.NonQ(command,true);
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),gp);
+			}
+			return Crud.GroupPermissionCrud.InsertNoCache(gp);
 		}
 
 		///<summary></summary>
@@ -150,6 +156,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets a list of GroupPermissions for the supplied UserGroupNum without using the local cache.  Useful for multithreaded connections.</summary>
 		public static List<GroupPermission> GetPermsNoCache(long userGroupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<GroupPermission>>(MethodBase.GetCurrentMethod(),userGroupNum);
+			}
 			List<GroupPermission> retVal=new List<GroupPermission>();
 			string command="SELECT * FROM grouppermission WHERE UserGroupNum="+POut.Long(userGroupNum);
 			DataTable tableGroupPerms=Db.GetTable(command);

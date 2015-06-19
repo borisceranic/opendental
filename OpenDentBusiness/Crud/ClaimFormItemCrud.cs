@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return claimFormItem.ClaimFormItemNum;
 		}
 
+		///<summary>Inserts one ClaimFormItem into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimFormItem claimFormItem){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimFormItem,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimFormItem.ClaimFormItemNum=DbHelper.GetNextOracleKey("claimformitem","ClaimFormItemNum"); //Cacheless method
+				}
+				return InsertNoCache(claimFormItem,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimFormItem into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimFormItem claimFormItem,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimformitem (";
+			if(!useExistingPK && isRandomKeys) {
+				claimFormItem.ClaimFormItemNum=ReplicationServers.GetKeyNoCache("claimformitem","ClaimFormItemNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimFormItemNum,";
+			}
+			command+="ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimFormItem.ClaimFormItemNum)+",";
+			}
+			command+=
+				     POut.Long  (claimFormItem.ClaimFormNum)+","
+				+"'"+POut.String(claimFormItem.ImageFileName)+"',"
+				+"'"+POut.String(claimFormItem.FieldName)+"',"
+				+"'"+POut.String(claimFormItem.FormatString)+"',"
+				+    POut.Float (claimFormItem.XPos)+","
+				+    POut.Float (claimFormItem.YPos)+","
+				+    POut.Float (claimFormItem.Width)+","
+				+    POut.Float (claimFormItem.Height)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimFormItem.ClaimFormItemNum=Db.NonQ(command,true);
+			}
+			return claimFormItem.ClaimFormItemNum;
+		}
+
 		///<summary>Updates one ClaimFormItem in the database.</summary>
 		public static void Update(ClaimFormItem claimFormItem){
 			string command="UPDATE claimformitem SET "

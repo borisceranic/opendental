@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return plannedAppt.PlannedApptNum;
 		}
 
+		///<summary>Inserts one PlannedAppt into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PlannedAppt plannedAppt){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(plannedAppt,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					plannedAppt.PlannedApptNum=DbHelper.GetNextOracleKey("plannedappt","PlannedApptNum"); //Cacheless method
+				}
+				return InsertNoCache(plannedAppt,true);
+			}
+		}
+
+		///<summary>Inserts one PlannedAppt into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PlannedAppt plannedAppt,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO plannedappt (";
+			if(!useExistingPK && isRandomKeys) {
+				plannedAppt.PlannedApptNum=ReplicationServers.GetKeyNoCache("plannedappt","PlannedApptNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PlannedApptNum,";
+			}
+			command+="PatNum,AptNum,ItemOrder) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(plannedAppt.PlannedApptNum)+",";
+			}
+			command+=
+				     POut.Long  (plannedAppt.PatNum)+","
+				+    POut.Long  (plannedAppt.AptNum)+","
+				+    POut.Int   (plannedAppt.ItemOrder)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				plannedAppt.PlannedApptNum=Db.NonQ(command,true);
+			}
+			return plannedAppt.PlannedApptNum;
+		}
+
 		///<summary>Updates one PlannedAppt in the database.</summary>
 		public static void Update(PlannedAppt plannedAppt){
 			string command="UPDATE plannedappt SET "

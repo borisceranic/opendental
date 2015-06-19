@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return allergy.AllergyNum;
 		}
 
+		///<summary>Inserts one Allergy into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Allergy allergy){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(allergy,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					allergy.AllergyNum=DbHelper.GetNextOracleKey("allergy","AllergyNum"); //Cacheless method
+				}
+				return InsertNoCache(allergy,true);
+			}
+		}
+
+		///<summary>Inserts one Allergy into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Allergy allergy,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO allergy (";
+			if(!useExistingPK && isRandomKeys) {
+				allergy.AllergyNum=ReplicationServers.GetKeyNoCache("allergy","AllergyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AllergyNum,";
+			}
+			command+="AllergyDefNum,PatNum,Reaction,StatusIsActive,DateAdverseReaction,SnomedReaction) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(allergy.AllergyNum)+",";
+			}
+			command+=
+				     POut.Long  (allergy.AllergyDefNum)+","
+				+    POut.Long  (allergy.PatNum)+","
+				+"'"+POut.String(allergy.Reaction)+"',"
+				+    POut.Bool  (allergy.StatusIsActive)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Date  (allergy.DateAdverseReaction)+","
+				+"'"+POut.String(allergy.SnomedReaction)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				allergy.AllergyNum=Db.NonQ(command,true);
+			}
+			return allergy.AllergyNum;
+		}
+
 		///<summary>Updates one Allergy in the database.</summary>
 		public static void Update(Allergy allergy){
 			string command="UPDATE allergy SET "

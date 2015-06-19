@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return medicalOrder.MedicalOrderNum;
 		}
 
+		///<summary>Inserts one MedicalOrder into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedicalOrder medicalOrder){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(medicalOrder,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					medicalOrder.MedicalOrderNum=DbHelper.GetNextOracleKey("medicalorder","MedicalOrderNum"); //Cacheless method
+				}
+				return InsertNoCache(medicalOrder,true);
+			}
+		}
+
+		///<summary>Inserts one MedicalOrder into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MedicalOrder medicalOrder,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO medicalorder (";
+			if(!useExistingPK && isRandomKeys) {
+				medicalOrder.MedicalOrderNum=ReplicationServers.GetKeyNoCache("medicalorder","MedicalOrderNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MedicalOrderNum,";
+			}
+			command+="MedOrderType,PatNum,DateTimeOrder,Description,IsDiscontinued,ProvNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(medicalOrder.MedicalOrderNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)medicalOrder.MedOrderType)+","
+				+    POut.Long  (medicalOrder.PatNum)+","
+				+    POut.DateT (medicalOrder.DateTimeOrder)+","
+				+"'"+POut.String(medicalOrder.Description)+"',"
+				+    POut.Bool  (medicalOrder.IsDiscontinued)+","
+				+    POut.Long  (medicalOrder.ProvNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				medicalOrder.MedicalOrderNum=Db.NonQ(command,true);
+			}
+			return medicalOrder.MedicalOrderNum;
+		}
+
 		///<summary>Updates one MedicalOrder in the database.</summary>
 		public static void Update(MedicalOrder medicalOrder){
 			string command="UPDATE medicalorder SET "

@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return mapArea.MapAreaNum;
 		}
 
+		///<summary>Inserts one MapArea into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MapArea mapArea){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(mapArea,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					mapArea.MapAreaNum=DbHelper.GetNextOracleKey("maparea","MapAreaNum"); //Cacheless method
+				}
+				return InsertNoCache(mapArea,true);
+			}
+		}
+
+		///<summary>Inserts one MapArea into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MapArea mapArea,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO maparea (";
+			if(!useExistingPK && isRandomKeys) {
+				mapArea.MapAreaNum=ReplicationServers.GetKeyNoCache("maparea","MapAreaNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MapAreaNum,";
+			}
+			command+="Extension,XPos,YPos,Width,Height,Description,ItemType) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(mapArea.MapAreaNum)+",";
+			}
+			command+=
+				     POut.Int   (mapArea.Extension)+","
+				+"'"+POut.Double(mapArea.XPos)+"',"
+				+"'"+POut.Double(mapArea.YPos)+"',"
+				+"'"+POut.Double(mapArea.Width)+"',"
+				+"'"+POut.Double(mapArea.Height)+"',"
+				+"'"+POut.String(mapArea.Description)+"',"
+				+    POut.Int   ((int)mapArea.ItemType)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				mapArea.MapAreaNum=Db.NonQ(command,true);
+			}
+			return mapArea.MapAreaNum;
+		}
+
 		///<summary>Updates one MapArea in the database.</summary>
 		public static void Update(MapArea mapArea){
 			string command="UPDATE maparea SET "

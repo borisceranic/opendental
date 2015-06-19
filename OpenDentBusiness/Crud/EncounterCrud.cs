@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return encounter.EncounterNum;
 		}
 
+		///<summary>Inserts one Encounter into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Encounter encounter){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(encounter,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					encounter.EncounterNum=DbHelper.GetNextOracleKey("encounter","EncounterNum"); //Cacheless method
+				}
+				return InsertNoCache(encounter,true);
+			}
+		}
+
+		///<summary>Inserts one Encounter into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Encounter encounter,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO encounter (";
+			if(!useExistingPK && isRandomKeys) {
+				encounter.EncounterNum=ReplicationServers.GetKeyNoCache("encounter","EncounterNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EncounterNum,";
+			}
+			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEncounter) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(encounter.EncounterNum)+",";
+			}
+			command+=
+				     POut.Long  (encounter.PatNum)+","
+				+    POut.Long  (encounter.ProvNum)+","
+				+"'"+POut.String(encounter.CodeValue)+"',"
+				+"'"+POut.String(encounter.CodeSystem)+"',"
+				+"'"+POut.String(encounter.Note)+"',"
+				+    POut.Date  (encounter.DateEncounter)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				encounter.EncounterNum=Db.NonQ(command,true);
+			}
+			return encounter.EncounterNum;
+		}
+
 		///<summary>Updates one Encounter in the database.</summary>
 		public static void Update(Encounter encounter){
 			string command="UPDATE encounter SET "

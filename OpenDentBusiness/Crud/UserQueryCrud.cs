@@ -111,6 +111,50 @@ namespace OpenDentBusiness.Crud{
 			return userQuery.QueryNum;
 		}
 
+		///<summary>Inserts one UserQuery into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserQuery userQuery){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(userQuery,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					userQuery.QueryNum=DbHelper.GetNextOracleKey("userquery","QueryNum"); //Cacheless method
+				}
+				return InsertNoCache(userQuery,true);
+			}
+		}
+
+		///<summary>Inserts one UserQuery into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(UserQuery userQuery,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO userquery (";
+			if(!useExistingPK && isRandomKeys) {
+				userQuery.QueryNum=ReplicationServers.GetKeyNoCache("userquery","QueryNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="QueryNum,";
+			}
+			command+="Description,FileName,QueryText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(userQuery.QueryNum)+",";
+			}
+			command+=
+				 "'"+POut.String(userQuery.Description)+"',"
+				+"'"+POut.String(userQuery.FileName)+"',"
+				+    DbHelper.ParamChar+"paramQueryText)";
+			if(userQuery.QueryText==null) {
+				userQuery.QueryText="";
+			}
+			OdSqlParameter paramQueryText=new OdSqlParameter("paramQueryText",OdDbType.Text,userQuery.QueryText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramQueryText);
+			}
+			else {
+				userQuery.QueryNum=Db.NonQ(command,true,paramQueryText);
+			}
+			return userQuery.QueryNum;
+		}
+
 		///<summary>Updates one UserQuery in the database.</summary>
 		public static void Update(UserQuery userQuery){
 			string command="UPDATE userquery SET "

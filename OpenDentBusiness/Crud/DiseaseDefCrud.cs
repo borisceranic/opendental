@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return diseaseDef.DiseaseDefNum;
 		}
 
+		///<summary>Inserts one DiseaseDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DiseaseDef diseaseDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(diseaseDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					diseaseDef.DiseaseDefNum=DbHelper.GetNextOracleKey("diseasedef","DiseaseDefNum"); //Cacheless method
+				}
+				return InsertNoCache(diseaseDef,true);
+			}
+		}
+
+		///<summary>Inserts one DiseaseDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DiseaseDef diseaseDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO diseasedef (";
+			if(!useExistingPK && isRandomKeys) {
+				diseaseDef.DiseaseDefNum=ReplicationServers.GetKeyNoCache("diseasedef","DiseaseDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DiseaseDefNum,";
+			}
+			command+="DiseaseName,ItemOrder,IsHidden,ICD9Code,SnomedCode,Icd10Code) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(diseaseDef.DiseaseDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(diseaseDef.DiseaseName)+"',"
+				+    POut.Int   (diseaseDef.ItemOrder)+","
+				+    POut.Bool  (diseaseDef.IsHidden)+","
+				//DateTStamp can only be set by MySQL
+				+"'"+POut.String(diseaseDef.ICD9Code)+"',"
+				+"'"+POut.String(diseaseDef.SnomedCode)+"',"
+				+"'"+POut.String(diseaseDef.Icd10Code)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				diseaseDef.DiseaseDefNum=Db.NonQ(command,true);
+			}
+			return diseaseDef.DiseaseDefNum;
+		}
+
 		///<summary>Updates one DiseaseDef in the database.</summary>
 		public static void Update(DiseaseDef diseaseDef){
 			string command="UPDATE diseasedef SET "

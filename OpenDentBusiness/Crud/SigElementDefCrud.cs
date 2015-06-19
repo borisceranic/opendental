@@ -117,6 +117,53 @@ namespace OpenDentBusiness.Crud{
 			return sigElementDef.SigElementDefNum;
 		}
 
+		///<summary>Inserts one SigElementDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigElementDef sigElementDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sigElementDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sigElementDef.SigElementDefNum=DbHelper.GetNextOracleKey("sigelementdef","SigElementDefNum"); //Cacheless method
+				}
+				return InsertNoCache(sigElementDef,true);
+			}
+		}
+
+		///<summary>Inserts one SigElementDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigElementDef sigElementDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sigelementdef (";
+			if(!useExistingPK && isRandomKeys) {
+				sigElementDef.SigElementDefNum=ReplicationServers.GetKeyNoCache("sigelementdef","SigElementDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SigElementDefNum,";
+			}
+			command+="LightRow,LightColor,SigElementType,SigText,Sound,ItemOrder) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sigElementDef.SigElementDefNum)+",";
+			}
+			command+=
+				     POut.Byte  (sigElementDef.LightRow)+","
+				+    POut.Int   (sigElementDef.LightColor.ToArgb())+","
+				+    POut.Int   ((int)sigElementDef.SigElementType)+","
+				+"'"+POut.String(sigElementDef.SigText)+"',"
+				+    DbHelper.ParamChar+"paramSound,"
+				+    POut.Int   (sigElementDef.ItemOrder)+")";
+			if(sigElementDef.Sound==null) {
+				sigElementDef.Sound="";
+			}
+			OdSqlParameter paramSound=new OdSqlParameter("paramSound",OdDbType.Text,sigElementDef.Sound);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramSound);
+			}
+			else {
+				sigElementDef.SigElementDefNum=Db.NonQ(command,true,paramSound);
+			}
+			return sigElementDef.SigElementDefNum;
+		}
+
 		///<summary>Updates one SigElementDef in the database.</summary>
 		public static void Update(SigElementDef sigElementDef){
 			string command="UPDATE sigelementdef SET "

@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return account.AccountNum;
 		}
 
+		///<summary>Inserts one Account into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Account account){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(account,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					account.AccountNum=DbHelper.GetNextOracleKey("account","AccountNum"); //Cacheless method
+				}
+				return InsertNoCache(account,true);
+			}
+		}
+
+		///<summary>Inserts one Account into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Account account,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO account (";
+			if(!useExistingPK && isRandomKeys) {
+				account.AccountNum=ReplicationServers.GetKeyNoCache("account","AccountNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AccountNum,";
+			}
+			command+="Description,AcctType,BankNumber,Inactive,AccountColor) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(account.AccountNum)+",";
+			}
+			command+=
+				 "'"+POut.String(account.Description)+"',"
+				+    POut.Int   ((int)account.AcctType)+","
+				+"'"+POut.String(account.BankNumber)+"',"
+				+    POut.Bool  (account.Inactive)+","
+				+    POut.Int   (account.AccountColor.ToArgb())+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				account.AccountNum=Db.NonQ(command,true);
+			}
+			return account.AccountNum;
+		}
+
 		///<summary>Updates one Account in the database.</summary>
 		public static void Update(Account account){
 			string command="UPDATE account SET "

@@ -79,6 +79,9 @@ namespace OpenDentBusiness {
 		
 		///<summary>Returns a list of all users without using the local cache.  Useful for multithreaded connections.</summary>
 		public static List<Userod> GetUsersNoCache() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Userod>>(MethodBase.GetCurrentMethod());
+			}
 			List<Userod> retVal=new List<Userod>();
 			string command="SELECT * FROM userod";
 			DataTable tableUsers=Db.GetTable(command);
@@ -512,28 +515,11 @@ namespace OpenDentBusiness {
 			return Crud.UserodCrud.Insert(userod);
 		}
 
-		///<summary>Inserts a record without using the local cache.  Useful for multithreaded connections.</summary>
-		public static long InsertNoCache(Userod userod) {
-			Validate(true,userod,false);
-			string command="INSERT INTO userod ("
-			+"UserName,Password,UserGroupNum,EmployeeNum,ClinicNum,ProvNum,IsHidden,"
-			+"TaskListInBox,AnesthProvType,DefaultHidePopups,PasswordIsStrong,ClinicIsRestricted,InboxHidePopups,UserNumCEMT) "
-			+"VALUES("
-			+"'"+POut.String(userod.UserName)+"',"
-				+"'"+POut.String(userod.Password)+"',"
-				+    POut.Long  (userod.UserGroupNum)+","
-				+    POut.Long  (userod.EmployeeNum)+","
-				+    POut.Long  (userod.ClinicNum)+","
-				+    POut.Long  (userod.ProvNum)+","
-				+    POut.Bool  (userod.IsHidden)+","
-				+    POut.Long  (userod.TaskListInBox)+","
-				+    POut.Int   (userod.AnesthProvType)+","
-				+    POut.Bool  (userod.DefaultHidePopups)+","
-				+    POut.Bool  (userod.PasswordIsStrong)+","
-				+    POut.Bool  (userod.ClinicIsRestricted)+","
-				+    POut.Bool  (userod.InboxHidePopups)+","
-				+    POut.Long  (userod.UserNumCEMT)+")";
-			return Db.NonQ(command,true);
+		public static long InsertNoCache(Userod userod){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),userod);
+			}
+			return Crud.UserodCrud.InsertNoCache(userod);
 		}
 
 		///<summary>Surround with try/catch because it can throw exceptions.  We don't really need to make this public, but it's required in order to follow the RemotingRole pattern.</summary>

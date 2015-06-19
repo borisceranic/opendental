@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return terminalActive.TerminalActiveNum;
 		}
 
+		///<summary>Inserts one TerminalActive into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TerminalActive terminalActive){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(terminalActive,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					terminalActive.TerminalActiveNum=DbHelper.GetNextOracleKey("terminalactive","TerminalActiveNum"); //Cacheless method
+				}
+				return InsertNoCache(terminalActive,true);
+			}
+		}
+
+		///<summary>Inserts one TerminalActive into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TerminalActive terminalActive,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO terminalactive (";
+			if(!useExistingPK && isRandomKeys) {
+				terminalActive.TerminalActiveNum=ReplicationServers.GetKeyNoCache("terminalactive","TerminalActiveNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TerminalActiveNum,";
+			}
+			command+="ComputerName,TerminalStatus,PatNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(terminalActive.TerminalActiveNum)+",";
+			}
+			command+=
+				 "'"+POut.String(terminalActive.ComputerName)+"',"
+				+    POut.Int   ((int)terminalActive.TerminalStatus)+","
+				+    POut.Long  (terminalActive.PatNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				terminalActive.TerminalActiveNum=Db.NonQ(command,true);
+			}
+			return terminalActive.TerminalActiveNum;
+		}
+
 		///<summary>Updates one TerminalActive in the database.</summary>
 		public static void Update(TerminalActive terminalActive){
 			string command="UPDATE terminalactive SET "

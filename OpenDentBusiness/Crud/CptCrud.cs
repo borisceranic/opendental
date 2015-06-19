@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return cpt.CptNum;
 		}
 
+		///<summary>Inserts one Cpt into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cpt cpt){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(cpt,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					cpt.CptNum=DbHelper.GetNextOracleKey("cpt","CptNum"); //Cacheless method
+				}
+				return InsertNoCache(cpt,true);
+			}
+		}
+
+		///<summary>Inserts one Cpt into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Cpt cpt,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO cpt (";
+			if(!useExistingPK && isRandomKeys) {
+				cpt.CptNum=ReplicationServers.GetKeyNoCache("cpt","CptNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CptNum,";
+			}
+			command+="CptCode,Description,VersionIDs) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(cpt.CptNum)+",";
+			}
+			command+=
+				 "'"+POut.String(cpt.CptCode)+"',"
+				+"'"+POut.String(cpt.Description)+"',"
+				+"'"+POut.String(cpt.VersionIDs)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				cpt.CptNum=Db.NonQ(command,true);
+			}
+			return cpt.CptNum;
+		}
+
 		///<summary>Updates one Cpt in the database.</summary>
 		public static void Update(Cpt cpt){
 			string command="UPDATE cpt SET "

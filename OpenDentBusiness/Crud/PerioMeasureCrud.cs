@@ -121,6 +121,53 @@ namespace OpenDentBusiness.Crud{
 			return perioMeasure.PerioMeasureNum;
 		}
 
+		///<summary>Inserts one PerioMeasure into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PerioMeasure perioMeasure){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(perioMeasure,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					perioMeasure.PerioMeasureNum=DbHelper.GetNextOracleKey("periomeasure","PerioMeasureNum"); //Cacheless method
+				}
+				return InsertNoCache(perioMeasure,true);
+			}
+		}
+
+		///<summary>Inserts one PerioMeasure into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PerioMeasure perioMeasure,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO periomeasure (";
+			if(!useExistingPK && isRandomKeys) {
+				perioMeasure.PerioMeasureNum=ReplicationServers.GetKeyNoCache("periomeasure","PerioMeasureNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PerioMeasureNum,";
+			}
+			command+="PerioExamNum,SequenceType,IntTooth,ToothValue,MBvalue,Bvalue,DBvalue,MLvalue,Lvalue,DLvalue) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(perioMeasure.PerioMeasureNum)+",";
+			}
+			command+=
+				     POut.Long  (perioMeasure.PerioExamNum)+","
+				+    POut.Int   ((int)perioMeasure.SequenceType)+","
+				+    POut.Int   (perioMeasure.IntTooth)+","
+				+    POut.Int   (perioMeasure.ToothValue)+","
+				+    POut.Int   (perioMeasure.MBvalue)+","
+				+    POut.Int   (perioMeasure.Bvalue)+","
+				+    POut.Int   (perioMeasure.DBvalue)+","
+				+    POut.Int   (perioMeasure.MLvalue)+","
+				+    POut.Int   (perioMeasure.Lvalue)+","
+				+    POut.Int   (perioMeasure.DLvalue)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				perioMeasure.PerioMeasureNum=Db.NonQ(command,true);
+			}
+			return perioMeasure.PerioMeasureNum;
+		}
+
 		///<summary>Updates one PerioMeasure in the database.</summary>
 		public static void Update(PerioMeasure perioMeasure){
 			string command="UPDATE periomeasure SET "

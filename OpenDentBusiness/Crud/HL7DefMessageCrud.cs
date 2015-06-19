@@ -146,6 +146,54 @@ namespace OpenDentBusiness.Crud{
 			return hL7DefMessage.HL7DefMessageNum;
 		}
 
+		///<summary>Inserts one HL7DefMessage into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefMessage hL7DefMessage){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hL7DefMessage,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hL7DefMessage.HL7DefMessageNum=DbHelper.GetNextOracleKey("hl7defmessage","HL7DefMessageNum"); //Cacheless method
+				}
+				return InsertNoCache(hL7DefMessage,true);
+			}
+		}
+
+		///<summary>Inserts one HL7DefMessage into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefMessage hL7DefMessage,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hl7defmessage (";
+			if(!useExistingPK && isRandomKeys) {
+				hL7DefMessage.HL7DefMessageNum=ReplicationServers.GetKeyNoCache("hl7defmessage","HL7DefMessageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HL7DefMessageNum,";
+			}
+			command+="HL7DefNum,MessageType,EventType,InOrOut,ItemOrder,Note,MessageStructure) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hL7DefMessage.HL7DefMessageNum)+",";
+			}
+			command+=
+				     POut.Long  (hL7DefMessage.HL7DefNum)+","
+				+"'"+POut.String(hL7DefMessage.MessageType.ToString())+"',"
+				+"'"+POut.String(hL7DefMessage.EventType.ToString())+"',"
+				+    POut.Int   ((int)hL7DefMessage.InOrOut)+","
+				+    POut.Int   (hL7DefMessage.ItemOrder)+","
+				+    DbHelper.ParamChar+"paramNote,"
+				+"'"+POut.String(hL7DefMessage.MessageStructure.ToString())+"')";
+			if(hL7DefMessage.Note==null) {
+				hL7DefMessage.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,hL7DefMessage.Note);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				hL7DefMessage.HL7DefMessageNum=Db.NonQ(command,true,paramNote);
+			}
+			return hL7DefMessage.HL7DefMessageNum;
+		}
+
 		///<summary>Updates one HL7DefMessage in the database.</summary>
 		public static void Update(HL7DefMessage hL7DefMessage){
 			string command="UPDATE hl7defmessage SET "

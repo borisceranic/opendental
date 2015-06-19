@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return formPat.FormPatNum;
 		}
 
+		///<summary>Inserts one FormPat into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FormPat formPat){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(formPat,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					formPat.FormPatNum=DbHelper.GetNextOracleKey("formpat","FormPatNum"); //Cacheless method
+				}
+				return InsertNoCache(formPat,true);
+			}
+		}
+
+		///<summary>Inserts one FormPat into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FormPat formPat,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO formpat (";
+			if(!useExistingPK && isRandomKeys) {
+				formPat.FormPatNum=ReplicationServers.GetKeyNoCache("formpat","FormPatNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="FormPatNum,";
+			}
+			command+="PatNum,FormDateTime) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(formPat.FormPatNum)+",";
+			}
+			command+=
+				     POut.Long  (formPat.PatNum)+","
+				+    POut.DateT (formPat.FormDateTime)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				formPat.FormPatNum=Db.NonQ(command,true);
+			}
+			return formPat.FormPatNum;
+		}
+
 		///<summary>Updates one FormPat in the database.</summary>
 		public static void Update(FormPat formPat){
 			string command="UPDATE formpat SET "

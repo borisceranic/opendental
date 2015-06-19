@@ -121,6 +121,53 @@ namespace OpenDentBusiness.Crud{
 			return schedule.ScheduleNum;
 		}
 
+		///<summary>Inserts one Schedule into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Schedule schedule){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(schedule,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					schedule.ScheduleNum=DbHelper.GetNextOracleKey("schedule","ScheduleNum"); //Cacheless method
+				}
+				return InsertNoCache(schedule,true);
+			}
+		}
+
+		///<summary>Inserts one Schedule into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Schedule schedule,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO schedule (";
+			if(!useExistingPK && isRandomKeys) {
+				schedule.ScheduleNum=ReplicationServers.GetKeyNoCache("schedule","ScheduleNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ScheduleNum,";
+			}
+			command+="SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(schedule.ScheduleNum)+",";
+			}
+			command+=
+				     POut.Date  (schedule.SchedDate)+","
+				+    POut.Time  (schedule.StartTime)+","
+				+    POut.Time  (schedule.StopTime)+","
+				+    POut.Int   ((int)schedule.SchedType)+","
+				+    POut.Long  (schedule.ProvNum)+","
+				+    POut.Long  (schedule.BlockoutType)+","
+				+"'"+POut.String(schedule.Note)+"',"
+				+    POut.Int   ((int)schedule.Status)+","
+				+    POut.Long  (schedule.EmployeeNum)+")";
+				//DateTStamp can only be set by MySQL
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				schedule.ScheduleNum=Db.NonQ(command,true);
+			}
+			return schedule.ScheduleNum;
+		}
+
 		///<summary>Updates one Schedule in the database.</summary>
 		public static void Update(Schedule schedule){
 			string command="UPDATE schedule SET "

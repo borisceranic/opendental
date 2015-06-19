@@ -142,6 +142,59 @@ namespace OpenDentBusiness.Crud{
 			return phone.PhoneNum;
 		}
 
+		///<summary>Inserts one Phone into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Phone phone){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(phone,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					phone.PhoneNum=DbHelper.GetNextOracleKey("phone","PhoneNum"); //Cacheless method
+				}
+				return InsertNoCache(phone,true);
+			}
+		}
+
+		///<summary>Inserts one Phone into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Phone phone,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO phone (";
+			if(!useExistingPK && isRandomKeys) {
+				phone.PhoneNum=ReplicationServers.GetKeyNoCache("phone","PhoneNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PhoneNum,";
+			}
+			command+="Extension,EmployeeName,ClockStatus,Description,ColorBar,ColorText,EmployeeNum,CustomerNumber,InOrOut,PatNum,DateTimeStart,WebCamImage,ScreenshotPath,ScreenshotImage,CustomerNumberRaw,LastCallTimeStart) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(phone.PhoneNum)+",";
+			}
+			command+=
+				     POut.Int   (phone.Extension)+","
+				+"'"+POut.String(phone.EmployeeName)+"',"
+				+"'"+POut.String(phone.ClockStatus.ToString())+"',"
+				+"'"+POut.String(phone.Description)+"',"
+				+    POut.Int   (phone.ColorBar.ToArgb())+","
+				+    POut.Int   (phone.ColorText.ToArgb())+","
+				+    POut.Long  (phone.EmployeeNum)+","
+				+"'"+POut.String(phone.CustomerNumber)+"',"
+				+"'"+POut.String(phone.InOrOut)+"',"
+				+    POut.Long  (phone.PatNum)+","
+				+    POut.DateT (phone.DateTimeStart)+","
+				+"'"+POut.String(phone.WebCamImage)+"',"
+				+"'"+POut.String(phone.ScreenshotPath)+"',"
+				+"'"+POut.String(phone.ScreenshotImage)+"',"
+				+"'"+POut.String(phone.CustomerNumberRaw)+"',"
+				+    POut.DateT (phone.LastCallTimeStart)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				phone.PhoneNum=Db.NonQ(command,true);
+			}
+			return phone.PhoneNum;
+		}
+
 		///<summary>Updates one Phone in the database.</summary>
 		public static void Update(Phone phone){
 			string command="UPDATE phone SET "

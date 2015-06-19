@@ -269,6 +269,104 @@ namespace OpenDentBusiness.Crud{
 			return ehrLab.EhrLabNum;
 		}
 
+		///<summary>Inserts one EhrLab into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLab ehrLab){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLab,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLab.EhrLabNum=DbHelper.GetNextOracleKey("ehrlab","EhrLabNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLab,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLab into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLab ehrLab,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlab (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLab.EhrLabNum=ReplicationServers.GetKeyNoCache("ehrlab","EhrLabNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabNum,";
+			}
+			command+="PatNum,OrderControlCode,PlacerOrderNum,PlacerOrderNamespace,PlacerOrderUniversalID,PlacerOrderUniversalIDType,FillerOrderNum,FillerOrderNamespace,FillerOrderUniversalID,FillerOrderUniversalIDType,PlacerGroupNum,PlacerGroupNamespace,PlacerGroupUniversalID,PlacerGroupUniversalIDType,OrderingProviderID,OrderingProviderLName,OrderingProviderFName,OrderingProviderMiddleNames,OrderingProviderSuffix,OrderingProviderPrefix,OrderingProviderAssigningAuthorityNamespaceID,OrderingProviderAssigningAuthorityUniversalID,OrderingProviderAssigningAuthorityIDType,OrderingProviderNameTypeCode,OrderingProviderIdentifierTypeCode,SetIdOBR,UsiID,UsiText,UsiCodeSystemName,UsiIDAlt,UsiTextAlt,UsiCodeSystemNameAlt,UsiTextOriginal,ObservationDateTimeStart,ObservationDateTimeEnd,SpecimenActionCode,ResultDateTime,ResultStatus,ParentObservationID,ParentObservationText,ParentObservationCodeSystemName,ParentObservationIDAlt,ParentObservationTextAlt,ParentObservationCodeSystemNameAlt,ParentObservationTextOriginal,ParentObservationSubID,ParentPlacerOrderNum,ParentPlacerOrderNamespace,ParentPlacerOrderUniversalID,ParentPlacerOrderUniversalIDType,ParentFillerOrderNum,ParentFillerOrderNamespace,ParentFillerOrderUniversalID,ParentFillerOrderUniversalIDType,ListEhrLabResultsHandlingF,ListEhrLabResultsHandlingN,TQ1SetId,TQ1DateTimeStart,TQ1DateTimeEnd,IsCpoe,OriginalPIDSegment) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLab.EhrLabNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLab.PatNum)+","
+				+"'"+POut.String(ehrLab.OrderControlCode.ToString())+"',"
+				+"'"+POut.String(ehrLab.PlacerOrderNum)+"',"
+				+"'"+POut.String(ehrLab.PlacerOrderNamespace)+"',"
+				+"'"+POut.String(ehrLab.PlacerOrderUniversalID)+"',"
+				+"'"+POut.String(ehrLab.PlacerOrderUniversalIDType)+"',"
+				+"'"+POut.String(ehrLab.FillerOrderNum)+"',"
+				+"'"+POut.String(ehrLab.FillerOrderNamespace)+"',"
+				+"'"+POut.String(ehrLab.FillerOrderUniversalID)+"',"
+				+"'"+POut.String(ehrLab.FillerOrderUniversalIDType)+"',"
+				+"'"+POut.String(ehrLab.PlacerGroupNum)+"',"
+				+"'"+POut.String(ehrLab.PlacerGroupNamespace)+"',"
+				+"'"+POut.String(ehrLab.PlacerGroupUniversalID)+"',"
+				+"'"+POut.String(ehrLab.PlacerGroupUniversalIDType)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderID)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderLName)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderFName)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderMiddleNames)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderSuffix)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderPrefix)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderAssigningAuthorityNamespaceID)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderAssigningAuthorityUniversalID)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderAssigningAuthorityIDType)+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderNameTypeCode.ToString())+"',"
+				+"'"+POut.String(ehrLab.OrderingProviderIdentifierTypeCode.ToString())+"',"
+				+    POut.Long  (ehrLab.SetIdOBR)+","
+				+"'"+POut.String(ehrLab.UsiID)+"',"
+				+"'"+POut.String(ehrLab.UsiText)+"',"
+				+"'"+POut.String(ehrLab.UsiCodeSystemName)+"',"
+				+"'"+POut.String(ehrLab.UsiIDAlt)+"',"
+				+"'"+POut.String(ehrLab.UsiTextAlt)+"',"
+				+"'"+POut.String(ehrLab.UsiCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLab.UsiTextOriginal)+"',"
+				+"'"+POut.String(ehrLab.ObservationDateTimeStart)+"',"
+				+"'"+POut.String(ehrLab.ObservationDateTimeEnd)+"',"
+				+"'"+POut.String(ehrLab.SpecimenActionCode.ToString())+"',"
+				+"'"+POut.String(ehrLab.ResultDateTime)+"',"
+				+"'"+POut.String(ehrLab.ResultStatus.ToString())+"',"
+				+"'"+POut.String(ehrLab.ParentObservationID)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationText)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationCodeSystemName)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationIDAlt)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationTextAlt)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationTextOriginal)+"',"
+				+"'"+POut.String(ehrLab.ParentObservationSubID)+"',"
+				+"'"+POut.String(ehrLab.ParentPlacerOrderNum)+"',"
+				+"'"+POut.String(ehrLab.ParentPlacerOrderNamespace)+"',"
+				+"'"+POut.String(ehrLab.ParentPlacerOrderUniversalID)+"',"
+				+"'"+POut.String(ehrLab.ParentPlacerOrderUniversalIDType)+"',"
+				+"'"+POut.String(ehrLab.ParentFillerOrderNum)+"',"
+				+"'"+POut.String(ehrLab.ParentFillerOrderNamespace)+"',"
+				+"'"+POut.String(ehrLab.ParentFillerOrderUniversalID)+"',"
+				+"'"+POut.String(ehrLab.ParentFillerOrderUniversalIDType)+"',"
+				+    POut.Bool  (ehrLab.ListEhrLabResultsHandlingF)+","
+				+    POut.Bool  (ehrLab.ListEhrLabResultsHandlingN)+","
+				+    POut.Long  (ehrLab.TQ1SetId)+","
+				+"'"+POut.String(ehrLab.TQ1DateTimeStart)+"',"
+				+"'"+POut.String(ehrLab.TQ1DateTimeEnd)+"',"
+				+    POut.Bool  (ehrLab.IsCpoe)+","
+				+"'"+POut.String(ehrLab.OriginalPIDSegment)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLab.EhrLabNum=Db.NonQ(command,true);
+			}
+			return ehrLab.EhrLabNum;
+		}
+
 		///<summary>Updates one EhrLab in the database.</summary>
 		public static void Update(EhrLab ehrLab){
 			string command="UPDATE ehrlab SET "

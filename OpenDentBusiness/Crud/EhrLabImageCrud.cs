@@ -106,6 +106,45 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabImage.EhrLabImageNum;
 		}
 
+		///<summary>Inserts one EhrLabImage into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabImage ehrLabImage){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabImage,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabImage.EhrLabImageNum=DbHelper.GetNextOracleKey("ehrlabimage","EhrLabImageNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabImage,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabImage into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabImage ehrLabImage,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabimage (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabImage.EhrLabImageNum=ReplicationServers.GetKeyNoCache("ehrlabimage","EhrLabImageNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabImageNum,";
+			}
+			command+="EhrLabNum,DocNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabImage.EhrLabImageNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabImage.EhrLabNum)+","
+				+    POut.Long  (ehrLabImage.DocNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabImage.EhrLabImageNum=Db.NonQ(command,true);
+			}
+			return ehrLabImage.EhrLabImageNum;
+		}
+
 		///<summary>Updates one EhrLabImage in the database.</summary>
 		public static void Update(EhrLabImage ehrLabImage){
 			string command="UPDATE ehrlabimage SET "

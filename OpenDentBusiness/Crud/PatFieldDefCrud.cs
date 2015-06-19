@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return patFieldDef.PatFieldDefNum;
 		}
 
+		///<summary>Inserts one PatFieldDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatFieldDef patFieldDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(patFieldDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					patFieldDef.PatFieldDefNum=DbHelper.GetNextOracleKey("patfielddef","PatFieldDefNum"); //Cacheless method
+				}
+				return InsertNoCache(patFieldDef,true);
+			}
+		}
+
+		///<summary>Inserts one PatFieldDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PatFieldDef patFieldDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO patfielddef (";
+			if(!useExistingPK && isRandomKeys) {
+				patFieldDef.PatFieldDefNum=ReplicationServers.GetKeyNoCache("patfielddef","PatFieldDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PatFieldDefNum,";
+			}
+			command+="FieldName,FieldType,PickList) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(patFieldDef.PatFieldDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(patFieldDef.FieldName)+"',"
+				+    POut.Int   ((int)patFieldDef.FieldType)+","
+				+"'"+POut.String(patFieldDef.PickList)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				patFieldDef.PatFieldDefNum=Db.NonQ(command,true);
+			}
+			return patFieldDef.PatFieldDefNum;
+		}
+
 		///<summary>Updates one PatFieldDef in the database.</summary>
 		public static void Update(PatFieldDef patFieldDef){
 			string command="UPDATE patfielddef SET "

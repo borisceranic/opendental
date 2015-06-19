@@ -131,6 +131,58 @@ namespace OpenDentBusiness.Crud{
 			return ehrTrigger.EhrTriggerNum;
 		}
 
+		///<summary>Inserts one EhrTrigger into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrTrigger ehrTrigger){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrTrigger,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrTrigger.EhrTriggerNum=DbHelper.GetNextOracleKey("ehrtrigger","EhrTriggerNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrTrigger,true);
+			}
+		}
+
+		///<summary>Inserts one EhrTrigger into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrTrigger ehrTrigger,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrtrigger (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrTrigger.EhrTriggerNum=ReplicationServers.GetKeyNoCache("ehrtrigger","EhrTriggerNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrTriggerNum,";
+			}
+			command+="Description,ProblemSnomedList,ProblemIcd9List,ProblemIcd10List,ProblemDefNumList,MedicationNumList,RxCuiList,CvxList,AllergyDefNumList,DemographicsList,LabLoincList,VitalLoincList,Instructions,Bibliography,Cardinality) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrTrigger.EhrTriggerNum)+",";
+			}
+			command+=
+				 "'"+POut.String(ehrTrigger.Description)+"',"
+				+"'"+POut.String(ehrTrigger.ProblemSnomedList)+"',"
+				+"'"+POut.String(ehrTrigger.ProblemIcd9List)+"',"
+				+"'"+POut.String(ehrTrigger.ProblemIcd10List)+"',"
+				+"'"+POut.String(ehrTrigger.ProblemDefNumList)+"',"
+				+"'"+POut.String(ehrTrigger.MedicationNumList)+"',"
+				+"'"+POut.String(ehrTrigger.RxCuiList)+"',"
+				+"'"+POut.String(ehrTrigger.CvxList)+"',"
+				+"'"+POut.String(ehrTrigger.AllergyDefNumList)+"',"
+				+"'"+POut.String(ehrTrigger.DemographicsList)+"',"
+				+"'"+POut.String(ehrTrigger.LabLoincList)+"',"
+				+"'"+POut.String(ehrTrigger.VitalLoincList)+"',"
+				+"'"+POut.String(ehrTrigger.Instructions)+"',"
+				+"'"+POut.String(ehrTrigger.Bibliography)+"',"
+				+    POut.Int   ((int)ehrTrigger.Cardinality)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrTrigger.EhrTriggerNum=Db.NonQ(command,true);
+			}
+			return ehrTrigger.EhrTriggerNum;
+		}
+
 		///<summary>Updates one EhrTrigger in the database.</summary>
 		public static void Update(EhrTrigger ehrTrigger){
 			string command="UPDATE ehrtrigger SET "

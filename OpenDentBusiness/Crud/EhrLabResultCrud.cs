@@ -291,6 +291,106 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabResult.EhrLabResultNum;
 		}
 
+		///<summary>Inserts one EhrLabResult into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabResult ehrLabResult){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabResult,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabResult.EhrLabResultNum=DbHelper.GetNextOracleKey("ehrlabresult","EhrLabResultNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabResult,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabResult into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabResult ehrLabResult,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabresult (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabResult.EhrLabResultNum=ReplicationServers.GetKeyNoCache("ehrlabresult","EhrLabResultNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabResultNum,";
+			}
+			command+="EhrLabNum,SetIdOBX,ValueType,ObservationIdentifierID,ObservationIdentifierText,ObservationIdentifierCodeSystemName,ObservationIdentifierIDAlt,ObservationIdentifierTextAlt,ObservationIdentifierCodeSystemNameAlt,ObservationIdentifierTextOriginal,ObservationIdentifierSub,ObservationValueCodedElementID,ObservationValueCodedElementText,ObservationValueCodedElementCodeSystemName,ObservationValueCodedElementIDAlt,ObservationValueCodedElementTextAlt,ObservationValueCodedElementCodeSystemNameAlt,ObservationValueCodedElementTextOriginal,ObservationValueDateTime,ObservationValueTime,ObservationValueComparator,ObservationValueNumber1,ObservationValueSeparatorOrSuffix,ObservationValueNumber2,ObservationValueNumeric,ObservationValueText,UnitsID,UnitsText,UnitsCodeSystemName,UnitsIDAlt,UnitsTextAlt,UnitsCodeSystemNameAlt,UnitsTextOriginal,referenceRange,AbnormalFlags,ObservationResultStatus,ObservationDateTime,AnalysisDateTime,PerformingOrganizationName,PerformingOrganizationNameAssigningAuthorityNamespaceId,PerformingOrganizationNameAssigningAuthorityUniversalId,PerformingOrganizationNameAssigningAuthorityUniversalIdType,PerformingOrganizationIdentifierTypeCode,PerformingOrganizationIdentifier,PerformingOrganizationAddressStreet,PerformingOrganizationAddressOtherDesignation,PerformingOrganizationAddressCity,PerformingOrganizationAddressStateOrProvince,PerformingOrganizationAddressZipOrPostalCode,PerformingOrganizationAddressCountryCode,PerformingOrganizationAddressAddressType,PerformingOrganizationAddressCountyOrParishCode,MedicalDirectorID,MedicalDirectorLName,MedicalDirectorFName,MedicalDirectorMiddleNames,MedicalDirectorSuffix,MedicalDirectorPrefix,MedicalDirectorAssigningAuthorityNamespaceID,MedicalDirectorAssigningAuthorityUniversalID,MedicalDirectorAssigningAuthorityIDType,MedicalDirectorNameTypeCode,MedicalDirectorIdentifierTypeCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabResult.EhrLabResultNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabResult.EhrLabNum)+","
+				+    POut.Long  (ehrLabResult.SetIdOBX)+","
+				+"'"+POut.String(ehrLabResult.ValueType.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierID)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierText)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierIDAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierTextAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierTextOriginal)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationIdentifierSub)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementID)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementText)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementIDAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementTextAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueCodedElementTextOriginal)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueDateTime)+"',"
+				+    POut.Time  (ehrLabResult.ObservationValueTime)+","
+				+"'"+POut.String(ehrLabResult.ObservationValueComparator)+"',"
+				+"'"+POut.Double(ehrLabResult.ObservationValueNumber1)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueSeparatorOrSuffix)+"',"
+				+"'"+POut.Double(ehrLabResult.ObservationValueNumber2)+"',"
+				+"'"+POut.Double(ehrLabResult.ObservationValueNumeric)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationValueText)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsID)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsText)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsCodeSystemName)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsIDAlt)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsTextAlt)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsCodeSystemNameAlt)+"',"
+				+"'"+POut.String(ehrLabResult.UnitsTextOriginal)+"',"
+				+"'"+POut.String(ehrLabResult.referenceRange)+"',"
+				+"'"+POut.String(ehrLabResult.AbnormalFlags)+"',"
+				+"'"+POut.String(ehrLabResult.ObservationResultStatus.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.ObservationDateTime)+"',"
+				+"'"+POut.String(ehrLabResult.AnalysisDateTime)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationName)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationNameAssigningAuthorityNamespaceId)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalId)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalIdType)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationIdentifierTypeCode.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationIdentifier)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressStreet)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressOtherDesignation)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressCity)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressStateOrProvince.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressZipOrPostalCode)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressCountryCode)+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressAddressType.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.PerformingOrganizationAddressCountyOrParishCode)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorID)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorLName)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorFName)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorMiddleNames)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorSuffix)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorPrefix)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorAssigningAuthorityNamespaceID)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorAssigningAuthorityUniversalID)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorAssigningAuthorityIDType)+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorNameTypeCode.ToString())+"',"
+				+"'"+POut.String(ehrLabResult.MedicalDirectorIdentifierTypeCode.ToString())+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrLabResult.EhrLabResultNum=Db.NonQ(command,true);
+			}
+			return ehrLabResult.EhrLabResultNum;
+		}
+
 		///<summary>Updates one EhrLabResult in the database.</summary>
 		public static void Update(EhrLabResult ehrLabResult){
 			string command="UPDATE ehrlabresult SET "

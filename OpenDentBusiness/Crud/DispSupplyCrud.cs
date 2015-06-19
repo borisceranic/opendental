@@ -115,6 +115,52 @@ namespace OpenDentBusiness.Crud{
 			return dispSupply.DispSupplyNum;
 		}
 
+		///<summary>Inserts one DispSupply into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DispSupply dispSupply){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(dispSupply,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					dispSupply.DispSupplyNum=DbHelper.GetNextOracleKey("dispsupply","DispSupplyNum"); //Cacheless method
+				}
+				return InsertNoCache(dispSupply,true);
+			}
+		}
+
+		///<summary>Inserts one DispSupply into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(DispSupply dispSupply,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO dispsupply (";
+			if(!useExistingPK && isRandomKeys) {
+				dispSupply.DispSupplyNum=ReplicationServers.GetKeyNoCache("dispsupply","DispSupplyNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="DispSupplyNum,";
+			}
+			command+="SupplyNum,ProvNum,DateDispensed,DispQuantity,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(dispSupply.DispSupplyNum)+",";
+			}
+			command+=
+				     POut.Long  (dispSupply.SupplyNum)+","
+				+    POut.Long  (dispSupply.ProvNum)+","
+				+    POut.Date  (dispSupply.DateDispensed)+","
+				+    POut.Float (dispSupply.DispQuantity)+","
+				+    DbHelper.ParamChar+"paramNote)";
+			if(dispSupply.Note==null) {
+				dispSupply.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,POut.StringNote(dispSupply.Note));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				dispSupply.DispSupplyNum=Db.NonQ(command,true,paramNote);
+			}
+			return dispSupply.DispSupplyNum;
+		}
+
 		///<summary>Updates one DispSupply in the database.</summary>
 		public static void Update(DispSupply dispSupply){
 			string command="UPDATE dispsupply SET "

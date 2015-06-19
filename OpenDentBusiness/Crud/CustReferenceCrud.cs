@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return custReference.CustReferenceNum;
 		}
 
+		///<summary>Inserts one CustReference into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CustReference custReference){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(custReference,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					custReference.CustReferenceNum=DbHelper.GetNextOracleKey("custreference","CustReferenceNum"); //Cacheless method
+				}
+				return InsertNoCache(custReference,true);
+			}
+		}
+
+		///<summary>Inserts one CustReference into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CustReference custReference,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO custreference (";
+			if(!useExistingPK && isRandomKeys) {
+				custReference.CustReferenceNum=ReplicationServers.GetKeyNoCache("custreference","CustReferenceNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CustReferenceNum,";
+			}
+			command+="PatNum,DateMostRecent,Note,IsBadRef) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(custReference.CustReferenceNum)+",";
+			}
+			command+=
+				     POut.Long  (custReference.PatNum)+","
+				+    POut.Date  (custReference.DateMostRecent)+","
+				+"'"+POut.String(custReference.Note)+"',"
+				+    POut.Bool  (custReference.IsBadRef)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				custReference.CustReferenceNum=Db.NonQ(command,true);
+			}
+			return custReference.CustReferenceNum;
+		}
+
 		///<summary>Updates one CustReference in the database.</summary>
 		public static void Update(CustReference custReference){
 			string command="UPDATE custreference SET "

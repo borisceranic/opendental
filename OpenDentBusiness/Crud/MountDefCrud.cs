@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return mountDef.MountDefNum;
 		}
 
+		///<summary>Inserts one MountDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MountDef mountDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(mountDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					mountDef.MountDefNum=DbHelper.GetNextOracleKey("mountdef","MountDefNum"); //Cacheless method
+				}
+				return InsertNoCache(mountDef,true);
+			}
+		}
+
+		///<summary>Inserts one MountDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(MountDef mountDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO mountdef (";
+			if(!useExistingPK && isRandomKeys) {
+				mountDef.MountDefNum=ReplicationServers.GetKeyNoCache("mountdef","MountDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="MountDefNum,";
+			}
+			command+="Description,ItemOrder,IsRadiograph,Width,Height) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(mountDef.MountDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(mountDef.Description)+"',"
+				+    POut.Int   (mountDef.ItemOrder)+","
+				+    POut.Bool  (mountDef.IsRadiograph)+","
+				+    POut.Int   (mountDef.Width)+","
+				+    POut.Int   (mountDef.Height)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				mountDef.MountDefNum=Db.NonQ(command,true);
+			}
+			return mountDef.MountDefNum;
+		}
+
 		///<summary>Updates one MountDef in the database.</summary>
 		public static void Update(MountDef mountDef){
 			string command="UPDATE mountdef SET "

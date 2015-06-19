@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return smsPhone.SmsPhoneNum;
 		}
 
+		///<summary>Inserts one SmsPhone into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsPhone smsPhone){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(smsPhone,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					smsPhone.SmsPhoneNum=DbHelper.GetNextOracleKey("smsphone","SmsPhoneNum"); //Cacheless method
+				}
+				return InsertNoCache(smsPhone,true);
+			}
+		}
+
+		///<summary>Inserts one SmsPhone into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SmsPhone smsPhone,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO smsphone (";
+			if(!useExistingPK && isRandomKeys) {
+				smsPhone.SmsPhoneNum=ReplicationServers.GetKeyNoCache("smsphone","SmsPhoneNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SmsPhoneNum,";
+			}
+			command+="ClinicNum,PhoneNumber,DateTimeActive,DateTimeInactive,InactiveCode,CountryCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(smsPhone.SmsPhoneNum)+",";
+			}
+			command+=
+				     POut.Long  (smsPhone.ClinicNum)+","
+				+"'"+POut.String(smsPhone.PhoneNumber)+"',"
+				+    POut.DateT (smsPhone.DateTimeActive)+","
+				+    POut.DateT (smsPhone.DateTimeInactive)+","
+				+"'"+POut.String(smsPhone.InactiveCode)+"',"
+				+"'"+POut.String(smsPhone.CountryCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				smsPhone.SmsPhoneNum=Db.NonQ(command,true);
+			}
+			return smsPhone.SmsPhoneNum;
+		}
+
 		///<summary>Updates one SmsPhone in the database.</summary>
 		public static void Update(SmsPhone smsPhone){
 			string command="UPDATE smsphone SET "

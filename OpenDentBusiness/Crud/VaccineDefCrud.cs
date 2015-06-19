@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return vaccineDef.VaccineDefNum;
 		}
 
+		///<summary>Inserts one VaccineDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(VaccineDef vaccineDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(vaccineDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					vaccineDef.VaccineDefNum=DbHelper.GetNextOracleKey("vaccinedef","VaccineDefNum"); //Cacheless method
+				}
+				return InsertNoCache(vaccineDef,true);
+			}
+		}
+
+		///<summary>Inserts one VaccineDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(VaccineDef vaccineDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO vaccinedef (";
+			if(!useExistingPK && isRandomKeys) {
+				vaccineDef.VaccineDefNum=ReplicationServers.GetKeyNoCache("vaccinedef","VaccineDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="VaccineDefNum,";
+			}
+			command+="CVXCode,VaccineName,DrugManufacturerNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(vaccineDef.VaccineDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(vaccineDef.CVXCode)+"',"
+				+"'"+POut.String(vaccineDef.VaccineName)+"',"
+				+    POut.Long  (vaccineDef.DrugManufacturerNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				vaccineDef.VaccineDefNum=Db.NonQ(command,true);
+			}
+			return vaccineDef.VaccineDefNum;
+		}
+
 		///<summary>Updates one VaccineDef in the database.</summary>
 		public static void Update(VaccineDef vaccineDef){
 			string command="UPDATE vaccinedef SET "

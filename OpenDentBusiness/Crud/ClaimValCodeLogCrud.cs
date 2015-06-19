@@ -111,6 +111,48 @@ namespace OpenDentBusiness.Crud{
 			return claimValCodeLog.ClaimValCodeLogNum;
 		}
 
+		///<summary>Inserts one ClaimValCodeLog into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimValCodeLog claimValCodeLog){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimValCodeLog,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimValCodeLog.ClaimValCodeLogNum=DbHelper.GetNextOracleKey("claimvalcodelog","ClaimValCodeLogNum"); //Cacheless method
+				}
+				return InsertNoCache(claimValCodeLog,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimValCodeLog into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimValCodeLog claimValCodeLog,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimvalcodelog (";
+			if(!useExistingPK && isRandomKeys) {
+				claimValCodeLog.ClaimValCodeLogNum=ReplicationServers.GetKeyNoCache("claimvalcodelog","ClaimValCodeLogNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimValCodeLogNum,";
+			}
+			command+="ClaimNum,ClaimField,ValCode,ValAmount,Ordinal) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimValCodeLog.ClaimValCodeLogNum)+",";
+			}
+			command+=
+				     POut.Long  (claimValCodeLog.ClaimNum)+","
+				+"'"+POut.String(claimValCodeLog.ClaimField)+"',"
+				+"'"+POut.String(claimValCodeLog.ValCode)+"',"
+				+"'"+POut.Double(claimValCodeLog.ValAmount)+"',"
+				+    POut.Int   (claimValCodeLog.Ordinal)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimValCodeLog.ClaimValCodeLogNum=Db.NonQ(command,true);
+			}
+			return claimValCodeLog.ClaimValCodeLogNum;
+		}
+
 		///<summary>Updates one ClaimValCodeLog in the database.</summary>
 		public static void Update(ClaimValCodeLog claimValCodeLog){
 			string command="UPDATE claimvalcodelog SET "

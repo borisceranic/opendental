@@ -107,6 +107,46 @@ namespace OpenDentBusiness.Crud{
 			return covSpan.CovSpanNum;
 		}
 
+		///<summary>Inserts one CovSpan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CovSpan covSpan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(covSpan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					covSpan.CovSpanNum=DbHelper.GetNextOracleKey("covspan","CovSpanNum"); //Cacheless method
+				}
+				return InsertNoCache(covSpan,true);
+			}
+		}
+
+		///<summary>Inserts one CovSpan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(CovSpan covSpan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO covspan (";
+			if(!useExistingPK && isRandomKeys) {
+				covSpan.CovSpanNum=ReplicationServers.GetKeyNoCache("covspan","CovSpanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CovSpanNum,";
+			}
+			command+="CovCatNum,FromCode,ToCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(covSpan.CovSpanNum)+",";
+			}
+			command+=
+				     POut.Long  (covSpan.CovCatNum)+","
+				+"'"+POut.String(covSpan.FromCode)+"',"
+				+"'"+POut.String(covSpan.ToCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				covSpan.CovSpanNum=Db.NonQ(command,true);
+			}
+			return covSpan.CovSpanNum;
+		}
+
 		///<summary>Updates one CovSpan in the database.</summary>
 		public static void Update(CovSpan covSpan){
 			string command="UPDATE covspan SET "

@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return ehrNotPerformed.EhrNotPerformedNum;
 		}
 
+		///<summary>Inserts one EhrNotPerformed into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrNotPerformed ehrNotPerformed){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrNotPerformed,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrNotPerformed.EhrNotPerformedNum=DbHelper.GetNextOracleKey("ehrnotperformed","EhrNotPerformedNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrNotPerformed,true);
+			}
+		}
+
+		///<summary>Inserts one EhrNotPerformed into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrNotPerformed ehrNotPerformed,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrnotperformed (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrNotPerformed.EhrNotPerformedNum=ReplicationServers.GetKeyNoCache("ehrnotperformed","EhrNotPerformedNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrNotPerformedNum,";
+			}
+			command+="PatNum,ProvNum,CodeValue,CodeSystem,CodeValueReason,CodeSystemReason,Note,DateEntry) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrNotPerformed.EhrNotPerformedNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrNotPerformed.PatNum)+","
+				+    POut.Long  (ehrNotPerformed.ProvNum)+","
+				+"'"+POut.String(ehrNotPerformed.CodeValue)+"',"
+				+"'"+POut.String(ehrNotPerformed.CodeSystem)+"',"
+				+"'"+POut.String(ehrNotPerformed.CodeValueReason)+"',"
+				+"'"+POut.String(ehrNotPerformed.CodeSystemReason)+"',"
+				+"'"+POut.String(ehrNotPerformed.Note)+"',"
+				+    POut.Date  (ehrNotPerformed.DateEntry)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrNotPerformed.EhrNotPerformedNum=Db.NonQ(command,true);
+			}
+			return ehrNotPerformed.EhrNotPerformedNum;
+		}
+
 		///<summary>Updates one EhrNotPerformed in the database.</summary>
 		public static void Update(EhrNotPerformed ehrNotPerformed){
 			string command="UPDATE ehrnotperformed SET "

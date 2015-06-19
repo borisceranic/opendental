@@ -19,12 +19,12 @@ namespace OpenDentBusiness{
 			return Crud.SecurityLogHashCrud.Insert(securityLogHash);
 		}
 
-		///<summary>Inserts securityloghash into DB without using cache.  Usually used when multithreading connections.</summary>
+		///<summary>Insertion logic that doesn't use the cache. Has special cases for generating random PK's and handling Oracle insertions.</summary>
 		public static long InsertNoCache(SecurityLogHash securityLogHash) {
-			string command="INSERT INTO securityloghash (SecurityLogNum,LogHash) VALUES("
-				+    POut.Long  (securityLogHash.SecurityLogNum)+","
-				+"'"+POut.String(securityLogHash.LogHash)+"')";
-			return Db.NonQ(command);
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),securityLogHash);
+			}
+			return Crud.SecurityLogHashCrud.InsertNoCache(securityLogHash);
 		}
 
 		///<summary>Creates a new SecurityLogHash entry in the Db.</summary>

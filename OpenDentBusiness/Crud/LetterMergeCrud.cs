@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return letterMerge.LetterMergeNum;
 		}
 
+		///<summary>Inserts one LetterMerge into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LetterMerge letterMerge){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(letterMerge,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					letterMerge.LetterMergeNum=DbHelper.GetNextOracleKey("lettermerge","LetterMergeNum"); //Cacheless method
+				}
+				return InsertNoCache(letterMerge,true);
+			}
+		}
+
+		///<summary>Inserts one LetterMerge into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LetterMerge letterMerge,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO lettermerge (";
+			if(!useExistingPK && isRandomKeys) {
+				letterMerge.LetterMergeNum=ReplicationServers.GetKeyNoCache("lettermerge","LetterMergeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LetterMergeNum,";
+			}
+			command+="Description,TemplateName,DataFileName,Category) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(letterMerge.LetterMergeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(letterMerge.Description)+"',"
+				+"'"+POut.String(letterMerge.TemplateName)+"',"
+				+"'"+POut.String(letterMerge.DataFileName)+"',"
+				+    POut.Long  (letterMerge.Category)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				letterMerge.LetterMergeNum=Db.NonQ(command,true);
+			}
+			return letterMerge.LetterMergeNum;
+		}
+
 		///<summary>Updates one LetterMerge in the database.</summary>
 		public static void Update(LetterMerge letterMerge){
 			string command="UPDATE lettermerge SET "

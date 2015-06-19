@@ -144,18 +144,12 @@ namespace OpenDentBusiness{
 			SecurityLogHashes.InsertSecurityLogHashNoCache(securityLog.SecurityLogNum);
 		}
 
-		///<summary>Used for inserting without using the cache.  Usually used when multithreading connections.</summary>
-		private static long InsertNoCache(SecurityLog securityLog) {
-			string command="INSERT INTO securitylog (PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES("
-				+    POut.Int((int)securityLog.PermType)+","
-				+    POut.Long(securityLog.UserNum)+","
-				+    DbHelper.Now()+","
-				+"'"+POut.String(securityLog.LogText)+"',"
-				+    POut.Long(securityLog.PatNum)+","
-				+"'"+POut.String(securityLog.CompName)+"',"
-				+    POut.Long(securityLog.FKey)+","
-				+    POut.Int((int)securityLog.LogSource)+")";
-			return Db.NonQ(command,true);
+		///<summary>Insertion logic that doesn't use the cache. Has special cases for generating random PK's and handling Oracle insertions.</summary>
+		public static long InsertNoCache(SecurityLog securityLog) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),securityLog);
+			}
+			return Crud.SecurityLogCrud.InsertNoCache(securityLog);
 		}
 
 	}

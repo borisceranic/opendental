@@ -119,6 +119,52 @@ namespace OpenDentBusiness.Crud{
 			return journalEntry.JournalEntryNum;
 		}
 
+		///<summary>Inserts one JournalEntry into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(JournalEntry journalEntry){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(journalEntry,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					journalEntry.JournalEntryNum=DbHelper.GetNextOracleKey("journalentry","JournalEntryNum"); //Cacheless method
+				}
+				return InsertNoCache(journalEntry,true);
+			}
+		}
+
+		///<summary>Inserts one JournalEntry into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(JournalEntry journalEntry,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO journalentry (";
+			if(!useExistingPK && isRandomKeys) {
+				journalEntry.JournalEntryNum=ReplicationServers.GetKeyNoCache("journalentry","JournalEntryNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="JournalEntryNum,";
+			}
+			command+="TransactionNum,AccountNum,DateDisplayed,DebitAmt,CreditAmt,Memo,Splits,CheckNumber,ReconcileNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(journalEntry.JournalEntryNum)+",";
+			}
+			command+=
+				     POut.Long  (journalEntry.TransactionNum)+","
+				+    POut.Long  (journalEntry.AccountNum)+","
+				+    POut.Date  (journalEntry.DateDisplayed)+","
+				+"'"+POut.Double(journalEntry.DebitAmt)+"',"
+				+"'"+POut.Double(journalEntry.CreditAmt)+"',"
+				+"'"+POut.String(journalEntry.Memo)+"',"
+				+"'"+POut.String(journalEntry.Splits)+"',"
+				+"'"+POut.String(journalEntry.CheckNumber)+"',"
+				+    POut.Long  (journalEntry.ReconcileNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				journalEntry.JournalEntryNum=Db.NonQ(command,true);
+			}
+			return journalEntry.JournalEntryNum;
+		}
+
 		///<summary>Updates one JournalEntry in the database.</summary>
 		public static void Update(JournalEntry journalEntry){
 			string command="UPDATE journalentry SET "

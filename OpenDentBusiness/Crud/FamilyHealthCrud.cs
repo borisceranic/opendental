@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return familyHealth.FamilyHealthNum;
 		}
 
+		///<summary>Inserts one FamilyHealth into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FamilyHealth familyHealth){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(familyHealth,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					familyHealth.FamilyHealthNum=DbHelper.GetNextOracleKey("familyhealth","FamilyHealthNum"); //Cacheless method
+				}
+				return InsertNoCache(familyHealth,true);
+			}
+		}
+
+		///<summary>Inserts one FamilyHealth into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(FamilyHealth familyHealth,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO familyhealth (";
+			if(!useExistingPK && isRandomKeys) {
+				familyHealth.FamilyHealthNum=ReplicationServers.GetKeyNoCache("familyhealth","FamilyHealthNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="FamilyHealthNum,";
+			}
+			command+="PatNum,Relationship,DiseaseDefNum,PersonName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(familyHealth.FamilyHealthNum)+",";
+			}
+			command+=
+				     POut.Long  (familyHealth.PatNum)+","
+				+    POut.Int   ((int)familyHealth.Relationship)+","
+				+    POut.Long  (familyHealth.DiseaseDefNum)+","
+				+"'"+POut.String(familyHealth.PersonName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				familyHealth.FamilyHealthNum=Db.NonQ(command,true);
+			}
+			return familyHealth.FamilyHealthNum;
+		}
+
 		///<summary>Updates one FamilyHealth in the database.</summary>
 		public static void Update(FamilyHealth familyHealth){
 			string command="UPDATE familyhealth SET "

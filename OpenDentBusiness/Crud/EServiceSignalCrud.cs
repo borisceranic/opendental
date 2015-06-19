@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return eServiceSignal.EServiceSignalNum;
 		}
 
+		///<summary>Inserts one EServiceSignal into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EServiceSignal eServiceSignal){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(eServiceSignal,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					eServiceSignal.EServiceSignalNum=DbHelper.GetNextOracleKey("eservicesignal","EServiceSignalNum"); //Cacheless method
+				}
+				return InsertNoCache(eServiceSignal,true);
+			}
+		}
+
+		///<summary>Inserts one EServiceSignal into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EServiceSignal eServiceSignal,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO eservicesignal (";
+			if(!useExistingPK && isRandomKeys) {
+				eServiceSignal.EServiceSignalNum=ReplicationServers.GetKeyNoCache("eservicesignal","EServiceSignalNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EServiceSignalNum,";
+			}
+			command+="ServiceCode,ReasonCategory,ReasonCode,Severity,Description,SigDateTime,Tag,IsProcessed) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(eServiceSignal.EServiceSignalNum)+",";
+			}
+			command+=
+				     POut.Int   (eServiceSignal.ServiceCode)+","
+				+    POut.Int   (eServiceSignal.ReasonCategory)+","
+				+    POut.Int   (eServiceSignal.ReasonCode)+","
+				+    POut.Int   ((int)eServiceSignal.Severity)+","
+				+"'"+POut.String(eServiceSignal.Description)+"',"
+				+    POut.DateT (eServiceSignal.SigDateTime)+","
+				+"'"+POut.String(eServiceSignal.Tag)+"',"
+				+    POut.Bool  (eServiceSignal.IsProcessed)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				eServiceSignal.EServiceSignalNum=Db.NonQ(command,true);
+			}
+			return eServiceSignal.EServiceSignalNum;
+		}
+
 		///<summary>Updates one EServiceSignal in the database.</summary>
 		public static void Update(EServiceSignal eServiceSignal){
 			string command="UPDATE eservicesignal SET "

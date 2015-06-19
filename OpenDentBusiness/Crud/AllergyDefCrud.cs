@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return allergyDef.AllergyDefNum;
 		}
 
+		///<summary>Inserts one AllergyDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AllergyDef allergyDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(allergyDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					allergyDef.AllergyDefNum=DbHelper.GetNextOracleKey("allergydef","AllergyDefNum"); //Cacheless method
+				}
+				return InsertNoCache(allergyDef,true);
+			}
+		}
+
+		///<summary>Inserts one AllergyDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(AllergyDef allergyDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO allergydef (";
+			if(!useExistingPK && isRandomKeys) {
+				allergyDef.AllergyDefNum=ReplicationServers.GetKeyNoCache("allergydef","AllergyDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="AllergyDefNum,";
+			}
+			command+="Description,IsHidden,SnomedType,MedicationNum,UniiCode) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(allergyDef.AllergyDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(allergyDef.Description)+"',"
+				+    POut.Bool  (allergyDef.IsHidden)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Int   ((int)allergyDef.SnomedType)+","
+				+    POut.Long  (allergyDef.MedicationNum)+","
+				+"'"+POut.String(allergyDef.UniiCode)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				allergyDef.AllergyDefNum=Db.NonQ(command,true);
+			}
+			return allergyDef.AllergyDefNum;
+		}
+
 		///<summary>Updates one AllergyDef in the database.</summary>
 		public static void Update(AllergyDef allergyDef){
 			string command="UPDATE allergydef SET "

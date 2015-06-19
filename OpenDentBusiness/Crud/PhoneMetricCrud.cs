@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return phoneMetric.PhoneMetricNum;
 		}
 
+		///<summary>Inserts one PhoneMetric into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneMetric phoneMetric){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(phoneMetric,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					phoneMetric.PhoneMetricNum=DbHelper.GetNextOracleKey("phonemetric","PhoneMetricNum"); //Cacheless method
+				}
+				return InsertNoCache(phoneMetric,true);
+			}
+		}
+
+		///<summary>Inserts one PhoneMetric into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PhoneMetric phoneMetric,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO phonemetric (";
+			if(!useExistingPK && isRandomKeys) {
+				phoneMetric.PhoneMetricNum=ReplicationServers.GetKeyNoCache("phonemetric","PhoneMetricNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PhoneMetricNum,";
+			}
+			command+="DateTimeEntry,VoiceMails,Triages,MinutesBehind) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(phoneMetric.PhoneMetricNum)+",";
+			}
+			command+=
+				     POut.DateT (phoneMetric.DateTimeEntry)+","
+				+    POut.Int   (phoneMetric.VoiceMails)+","
+				+    POut.Int   (phoneMetric.Triages)+","
+				+    POut.Int   (phoneMetric.MinutesBehind)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				phoneMetric.PhoneMetricNum=Db.NonQ(command,true);
+			}
+			return phoneMetric.PhoneMetricNum;
+		}
+
 		///<summary>Updates one PhoneMetric in the database.</summary>
 		public static void Update(PhoneMetric phoneMetric){
 			string command="UPDATE phonemetric SET "

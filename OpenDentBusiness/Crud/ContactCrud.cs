@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return contact.ContactNum;
 		}
 
+		///<summary>Inserts one Contact into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Contact contact){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(contact,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					contact.ContactNum=DbHelper.GetNextOracleKey("contact","ContactNum"); //Cacheless method
+				}
+				return InsertNoCache(contact,true);
+			}
+		}
+
+		///<summary>Inserts one Contact into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Contact contact,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO contact (";
+			if(!useExistingPK && isRandomKeys) {
+				contact.ContactNum=ReplicationServers.GetKeyNoCache("contact","ContactNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ContactNum,";
+			}
+			command+="LName,FName,WkPhone,Fax,Category,Notes) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(contact.ContactNum)+",";
+			}
+			command+=
+				 "'"+POut.String(contact.LName)+"',"
+				+"'"+POut.String(contact.FName)+"',"
+				+"'"+POut.String(contact.WkPhone)+"',"
+				+"'"+POut.String(contact.Fax)+"',"
+				+    POut.Long  (contact.Category)+","
+				+"'"+POut.String(contact.Notes)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				contact.ContactNum=Db.NonQ(command,true);
+			}
+			return contact.ContactNum;
+		}
+
 		///<summary>Updates one Contact in the database.</summary>
 		public static void Update(Contact contact){
 			string command="UPDATE contact SET "

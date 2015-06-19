@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return guardian.GuardianNum;
 		}
 
+		///<summary>Inserts one Guardian into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Guardian guardian){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(guardian,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					guardian.GuardianNum=DbHelper.GetNextOracleKey("guardian","GuardianNum"); //Cacheless method
+				}
+				return InsertNoCache(guardian,true);
+			}
+		}
+
+		///<summary>Inserts one Guardian into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Guardian guardian,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO guardian (";
+			if(!useExistingPK && isRandomKeys) {
+				guardian.GuardianNum=ReplicationServers.GetKeyNoCache("guardian","GuardianNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="GuardianNum,";
+			}
+			command+="PatNumChild,PatNumGuardian,Relationship,IsGuardian) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(guardian.GuardianNum)+",";
+			}
+			command+=
+				     POut.Long  (guardian.PatNumChild)+","
+				+    POut.Long  (guardian.PatNumGuardian)+","
+				+    POut.Int   ((int)guardian.Relationship)+","
+				+    POut.Bool  (guardian.IsGuardian)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				guardian.GuardianNum=Db.NonQ(command,true);
+			}
+			return guardian.GuardianNum;
+		}
+
 		///<summary>Updates one Guardian in the database.</summary>
 		public static void Update(Guardian guardian){
 			string command="UPDATE guardian SET "

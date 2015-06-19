@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return taskNote.TaskNoteNum;
 		}
 
+		///<summary>Inserts one TaskNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskNote taskNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(taskNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					taskNote.TaskNoteNum=DbHelper.GetNextOracleKey("tasknote","TaskNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(taskNote,true);
+			}
+		}
+
+		///<summary>Inserts one TaskNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(TaskNote taskNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO tasknote (";
+			if(!useExistingPK && isRandomKeys) {
+				taskNote.TaskNoteNum=ReplicationServers.GetKeyNoCache("tasknote","TaskNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskNoteNum,";
+			}
+			command+="TaskNum,UserNum,DateTimeNote,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(taskNote.TaskNoteNum)+",";
+			}
+			command+=
+				     POut.Long  (taskNote.TaskNum)+","
+				+    POut.Long  (taskNote.UserNum)+","
+				+    DbHelper.Now()+","
+				+"'"+POut.String(taskNote.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				taskNote.TaskNoteNum=Db.NonQ(command,true);
+			}
+			return taskNote.TaskNoteNum;
+		}
+
 		///<summary>Updates one TaskNote in the database.</summary>
 		public static void Update(TaskNote taskNote){
 			string command="UPDATE tasknote SET "

@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return eduResource.EduResourceNum;
 		}
 
+		///<summary>Inserts one EduResource into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EduResource eduResource){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(eduResource,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					eduResource.EduResourceNum=DbHelper.GetNextOracleKey("eduresource","EduResourceNum"); //Cacheless method
+				}
+				return InsertNoCache(eduResource,true);
+			}
+		}
+
+		///<summary>Inserts one EduResource into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EduResource eduResource,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO eduresource (";
+			if(!useExistingPK && isRandomKeys) {
+				eduResource.EduResourceNum=ReplicationServers.GetKeyNoCache("eduresource","EduResourceNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EduResourceNum,";
+			}
+			command+="DiseaseDefNum,MedicationNum,LabResultID,LabResultName,LabResultCompare,ResourceUrl) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(eduResource.EduResourceNum)+",";
+			}
+			command+=
+				     POut.Long  (eduResource.DiseaseDefNum)+","
+				+    POut.Long  (eduResource.MedicationNum)+","
+				+"'"+POut.String(eduResource.LabResultID)+"',"
+				+"'"+POut.String(eduResource.LabResultName)+"',"
+				+"'"+POut.String(eduResource.LabResultCompare)+"',"
+				+"'"+POut.String(eduResource.ResourceUrl)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				eduResource.EduResourceNum=Db.NonQ(command,true);
+			}
+			return eduResource.EduResourceNum;
+		}
+
 		///<summary>Updates one EduResource in the database.</summary>
 		public static void Update(EduResource eduResource){
 			string command="UPDATE eduresource SET "

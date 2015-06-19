@@ -123,6 +123,56 @@ namespace OpenDentBusiness.Crud{
 			return labPanel.LabPanelNum;
 		}
 
+		///<summary>Inserts one LabPanel into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabPanel labPanel){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(labPanel,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					labPanel.LabPanelNum=DbHelper.GetNextOracleKey("labpanel","LabPanelNum"); //Cacheless method
+				}
+				return InsertNoCache(labPanel,true);
+			}
+		}
+
+		///<summary>Inserts one LabPanel into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(LabPanel labPanel,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO labpanel (";
+			if(!useExistingPK && isRandomKeys) {
+				labPanel.LabPanelNum=ReplicationServers.GetKeyNoCache("labpanel","LabPanelNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="LabPanelNum,";
+			}
+			command+="PatNum,RawMessage,LabNameAddress,SpecimenCondition,SpecimenSource,ServiceId,ServiceName,MedicalOrderNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(labPanel.LabPanelNum)+",";
+			}
+			command+=
+				     POut.Long  (labPanel.PatNum)+","
+				+    DbHelper.ParamChar+"paramRawMessage,"
+				+"'"+POut.String(labPanel.LabNameAddress)+"',"
+				//DateTStamp can only be set by MySQL
+				+"'"+POut.String(labPanel.SpecimenCondition)+"',"
+				+"'"+POut.String(labPanel.SpecimenSource)+"',"
+				+"'"+POut.String(labPanel.ServiceId)+"',"
+				+"'"+POut.String(labPanel.ServiceName)+"',"
+				+    POut.Long  (labPanel.MedicalOrderNum)+")";
+			if(labPanel.RawMessage==null) {
+				labPanel.RawMessage="";
+			}
+			OdSqlParameter paramRawMessage=new OdSqlParameter("paramRawMessage",OdDbType.Text,labPanel.RawMessage);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramRawMessage);
+			}
+			else {
+				labPanel.LabPanelNum=Db.NonQ(command,true,paramRawMessage);
+			}
+			return labPanel.LabPanelNum;
+		}
+
 		///<summary>Updates one LabPanel in the database.</summary>
 		public static void Update(LabPanel labPanel){
 			string command="UPDATE labpanel SET "

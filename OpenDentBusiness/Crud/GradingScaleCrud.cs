@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return gradingScale.GradingScaleNum;
 		}
 
+		///<summary>Inserts one GradingScale into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GradingScale gradingScale){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(gradingScale,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					gradingScale.GradingScaleNum=DbHelper.GetNextOracleKey("gradingscale","GradingScaleNum"); //Cacheless method
+				}
+				return InsertNoCache(gradingScale,true);
+			}
+		}
+
+		///<summary>Inserts one GradingScale into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(GradingScale gradingScale,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO gradingscale (";
+			if(!useExistingPK && isRandomKeys) {
+				gradingScale.GradingScaleNum=ReplicationServers.GetKeyNoCache("gradingscale","GradingScaleNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="GradingScaleNum,";
+			}
+			command+="ScaleType,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(gradingScale.GradingScaleNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)gradingScale.ScaleType)+","
+				+"'"+POut.String(gradingScale.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				gradingScale.GradingScaleNum=Db.NonQ(command,true);
+			}
+			return gradingScale.GradingScaleNum;
+		}
+
 		///<summary>Updates one GradingScale in the database.</summary>
 		public static void Update(GradingScale gradingScale){
 			string command="UPDATE gradingscale SET "

@@ -155,6 +155,70 @@ namespace OpenDentBusiness.Crud{
 			return procedureCode.CodeNum;
 		}
 
+		///<summary>Inserts one ProcedureCode into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcedureCode procedureCode){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(procedureCode,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					procedureCode.CodeNum=DbHelper.GetNextOracleKey("procedurecode","CodeNum"); //Cacheless method
+				}
+				return InsertNoCache(procedureCode,true);
+			}
+		}
+
+		///<summary>Inserts one ProcedureCode into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProcedureCode procedureCode,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO procedurecode (";
+			if(!useExistingPK && isRandomKeys) {
+				procedureCode.CodeNum=ReplicationServers.GetKeyNoCache("procedurecode","CodeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CodeNum,";
+			}
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(procedureCode.CodeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(procedureCode.ProcCode)+"',"
+				+"'"+POut.String(procedureCode.Descript)+"',"
+				+"'"+POut.String(procedureCode.AbbrDesc)+"',"
+				+"'"+POut.String(procedureCode.ProcTime)+"',"
+				+    POut.Long  (procedureCode.ProcCat)+","
+				+    POut.Int   ((int)procedureCode.TreatArea)+","
+				+    POut.Bool  (procedureCode.NoBillIns)+","
+				+    POut.Bool  (procedureCode.IsProsth)+","
+				+"'"+POut.String(procedureCode.DefaultNote)+"',"
+				+    POut.Bool  (procedureCode.IsHygiene)+","
+				+    POut.Int   (procedureCode.GTypeNum)+","
+				+"'"+POut.String(procedureCode.AlternateCode1)+"',"
+				+"'"+POut.String(procedureCode.MedicalCode)+"',"
+				+    POut.Bool  (procedureCode.IsTaxed)+","
+				+    POut.Int   ((int)procedureCode.PaintType)+","
+				+    POut.Int   (procedureCode.GraphicColor.ToArgb())+","
+				+"'"+POut.String(procedureCode.LaymanTerm)+"',"
+				+    POut.Bool  (procedureCode.IsCanadianLab)+","
+				+    POut.Bool  (procedureCode.PreExisting)+","
+				+    POut.Int   (procedureCode.BaseUnits)+","
+				+"'"+POut.String(procedureCode.SubstitutionCode)+"',"
+				+    POut.Int   ((int)procedureCode.SubstOnlyIf)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Bool  (procedureCode.IsMultiVisit)+","
+				+"'"+POut.String(procedureCode.DrugNDC)+"',"
+				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
+				+    POut.Long  (procedureCode.ProvNumDefault)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				procedureCode.CodeNum=Db.NonQ(command,true);
+			}
+			return procedureCode.CodeNum;
+		}
+
 		///<summary>Updates one ProcedureCode in the database.</summary>
 		public static void Update(ProcedureCode procedureCode){
 			string command="UPDATE procedurecode SET "

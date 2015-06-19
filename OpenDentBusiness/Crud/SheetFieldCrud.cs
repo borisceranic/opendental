@@ -143,6 +143,66 @@ namespace OpenDentBusiness.Crud{
 			return sheetField.SheetFieldNum;
 		}
 
+		///<summary>Inserts one SheetField into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetField sheetField){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sheetField,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sheetField.SheetFieldNum=DbHelper.GetNextOracleKey("sheetfield","SheetFieldNum"); //Cacheless method
+				}
+				return InsertNoCache(sheetField,true);
+			}
+		}
+
+		///<summary>Inserts one SheetField into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SheetField sheetField,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sheetfield (";
+			if(!useExistingPK && isRandomKeys) {
+				sheetField.SheetFieldNum=ReplicationServers.GetKeyNoCache("sheetfield","SheetFieldNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SheetFieldNum,";
+			}
+			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,ItemColor) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sheetField.SheetFieldNum)+",";
+			}
+			command+=
+				     POut.Long  (sheetField.SheetNum)+","
+				+    POut.Int   ((int)sheetField.FieldType)+","
+				+"'"+POut.String(sheetField.FieldName)+"',"
+				+    DbHelper.ParamChar+"paramFieldValue,"
+				+    POut.Float (sheetField.FontSize)+","
+				+"'"+POut.String(sheetField.FontName)+"',"
+				+    POut.Bool  (sheetField.FontIsBold)+","
+				+    POut.Int   (sheetField.XPos)+","
+				+    POut.Int   (sheetField.YPos)+","
+				+    POut.Int   (sheetField.Width)+","
+				+    POut.Int   (sheetField.Height)+","
+				+    POut.Int   ((int)sheetField.GrowthBehavior)+","
+				+"'"+POut.String(sheetField.RadioButtonValue)+"',"
+				+"'"+POut.String(sheetField.RadioButtonGroup)+"',"
+				+    POut.Bool  (sheetField.IsRequired)+","
+				+    POut.Int   (sheetField.TabOrder)+","
+				+"'"+POut.String(sheetField.ReportableName)+"',"
+				+    POut.Int   ((int)sheetField.TextAlign)+","
+				+    POut.Int   (sheetField.ItemColor.ToArgb())+")";
+			if(sheetField.FieldValue==null) {
+				sheetField.FieldValue="";
+			}
+			OdSqlParameter paramFieldValue=new OdSqlParameter("paramFieldValue",OdDbType.Text,sheetField.FieldValue);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramFieldValue);
+			}
+			else {
+				sheetField.SheetFieldNum=Db.NonQ(command,true,paramFieldValue);
+			}
+			return sheetField.SheetFieldNum;
+		}
+
 		///<summary>Updates one SheetField in the database.</summary>
 		public static void Update(SheetField sheetField){
 			string command="UPDATE sheetfield SET "

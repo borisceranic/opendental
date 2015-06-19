@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return providerIdent.ProviderIdentNum;
 		}
 
+		///<summary>Inserts one ProviderIdent into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProviderIdent providerIdent){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(providerIdent,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					providerIdent.ProviderIdentNum=DbHelper.GetNextOracleKey("providerident","ProviderIdentNum"); //Cacheless method
+				}
+				return InsertNoCache(providerIdent,true);
+			}
+		}
+
+		///<summary>Inserts one ProviderIdent into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ProviderIdent providerIdent,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO providerident (";
+			if(!useExistingPK && isRandomKeys) {
+				providerIdent.ProviderIdentNum=ReplicationServers.GetKeyNoCache("providerident","ProviderIdentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ProviderIdentNum,";
+			}
+			command+="ProvNum,PayorID,SuppIDType,IDNumber) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(providerIdent.ProviderIdentNum)+",";
+			}
+			command+=
+				     POut.Long  (providerIdent.ProvNum)+","
+				+"'"+POut.String(providerIdent.PayorID)+"',"
+				+    POut.Int   ((int)providerIdent.SuppIDType)+","
+				+"'"+POut.String(providerIdent.IDNumber)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				providerIdent.ProviderIdentNum=Db.NonQ(command,true);
+			}
+			return providerIdent.ProviderIdentNum;
+		}
+
 		///<summary>Updates one ProviderIdent in the database.</summary>
 		public static void Update(ProviderIdent providerIdent){
 			string command="UPDATE providerident SET "

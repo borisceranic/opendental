@@ -122,6 +122,49 @@ namespace OpenDentBusiness.Crud{
 			return hL7DefField.HL7DefFieldNum;
 		}
 
+		///<summary>Inserts one HL7DefField into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefField hL7DefField){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hL7DefField,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hL7DefField.HL7DefFieldNum=DbHelper.GetNextOracleKey("hl7deffield","HL7DefFieldNum"); //Cacheless method
+				}
+				return InsertNoCache(hL7DefField,true);
+			}
+		}
+
+		///<summary>Inserts one HL7DefField into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7DefField hL7DefField,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hl7deffield (";
+			if(!useExistingPK && isRandomKeys) {
+				hL7DefField.HL7DefFieldNum=ReplicationServers.GetKeyNoCache("hl7deffield","HL7DefFieldNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HL7DefFieldNum,";
+			}
+			command+="HL7DefSegmentNum,OrdinalPos,TableId,DataType,FieldName,FixedText) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hL7DefField.HL7DefFieldNum)+",";
+			}
+			command+=
+				     POut.Long  (hL7DefField.HL7DefSegmentNum)+","
+				+    POut.Int   (hL7DefField.OrdinalPos)+","
+				+"'"+POut.String(hL7DefField.TableId)+"',"
+				+"'"+POut.String(hL7DefField.DataType.ToString())+"',"
+				+"'"+POut.String(hL7DefField.FieldName)+"',"
+				+"'"+POut.String(hL7DefField.FixedText)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				hL7DefField.HL7DefFieldNum=Db.NonQ(command,true);
+			}
+			return hL7DefField.HL7DefFieldNum;
+		}
+
 		///<summary>Updates one HL7DefField in the database.</summary>
 		public static void Update(HL7DefField hL7DefField){
 			string command="UPDATE hl7deffield SET "

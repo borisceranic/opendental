@@ -113,6 +113,49 @@ namespace OpenDentBusiness.Crud{
 			return installmentPlan.InstallmentPlanNum;
 		}
 
+		///<summary>Inserts one InstallmentPlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InstallmentPlan installmentPlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(installmentPlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					installmentPlan.InstallmentPlanNum=DbHelper.GetNextOracleKey("installmentplan","InstallmentPlanNum"); //Cacheless method
+				}
+				return InsertNoCache(installmentPlan,true);
+			}
+		}
+
+		///<summary>Inserts one InstallmentPlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(InstallmentPlan installmentPlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO installmentplan (";
+			if(!useExistingPK && isRandomKeys) {
+				installmentPlan.InstallmentPlanNum=ReplicationServers.GetKeyNoCache("installmentplan","InstallmentPlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="InstallmentPlanNum,";
+			}
+			command+="PatNum,DateAgreement,DateFirstPayment,MonthlyPayment,APR,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(installmentPlan.InstallmentPlanNum)+",";
+			}
+			command+=
+				     POut.Long  (installmentPlan.PatNum)+","
+				+    POut.Date  (installmentPlan.DateAgreement)+","
+				+    POut.Date  (installmentPlan.DateFirstPayment)+","
+				+"'"+POut.Double(installmentPlan.MonthlyPayment)+"',"
+				+    POut.Float (installmentPlan.APR)+","
+				+"'"+POut.String(installmentPlan.Note)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				installmentPlan.InstallmentPlanNum=Db.NonQ(command,true);
+			}
+			return installmentPlan.InstallmentPlanNum;
+		}
+
 		///<summary>Updates one InstallmentPlan in the database.</summary>
 		public static void Update(InstallmentPlan installmentPlan){
 			string command="UPDATE installmentplan SET "

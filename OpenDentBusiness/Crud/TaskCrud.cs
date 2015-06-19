@@ -131,6 +131,60 @@ namespace OpenDentBusiness.Crud{
 			return task.TaskNum;
 		}
 
+		///<summary>Inserts one Task into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Task task){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(task,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					task.TaskNum=DbHelper.GetNextOracleKey("task","TaskNum"); //Cacheless method
+				}
+				return InsertNoCache(task,true);
+			}
+		}
+
+		///<summary>Inserts one Task into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Task task,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO task (";
+			if(!useExistingPK && isRandomKeys) {
+				task.TaskNum=ReplicationServers.GetKeyNoCache("task","TaskNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="TaskNum,";
+			}
+			command+="TaskListNum,DateTask,KeyNum,Descript,TaskStatus,IsRepeating,DateType,FromNum,ObjectType,DateTimeEntry,UserNum,DateTimeFinished,PriorityDefNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(task.TaskNum)+",";
+			}
+			command+=
+				     POut.Long  (task.TaskListNum)+","
+				+    POut.Date  (task.DateTask)+","
+				+    POut.Long  (task.KeyNum)+","
+				+    DbHelper.ParamChar+"paramDescript,"
+				+    POut.Int   ((int)task.TaskStatus)+","
+				+    POut.Bool  (task.IsRepeating)+","
+				+    POut.Int   ((int)task.DateType)+","
+				+    POut.Long  (task.FromNum)+","
+				+    POut.Int   ((int)task.ObjectType)+","
+				+    POut.DateT (task.DateTimeEntry)+","
+				+    POut.Long  (task.UserNum)+","
+				+    POut.DateT (task.DateTimeFinished)+","
+				+    POut.Long  (task.PriorityDefNum)+")";
+			if(task.Descript==null) {
+				task.Descript="";
+			}
+			OdSqlParameter paramDescript=new OdSqlParameter("paramDescript",OdDbType.Text,task.Descript);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramDescript);
+			}
+			else {
+				task.TaskNum=Db.NonQ(command,true,paramDescript);
+			}
+			return task.TaskNum;
+		}
+
 		///<summary>Updates one Task in the database.</summary>
 		public static void Update(Task task){
 			string command="UPDATE task SET "

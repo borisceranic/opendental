@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				fee.UseDefaultCov= PIn.Bool  (table.Rows[i]["UseDefaultCov"].ToString());
 				fee.CodeNum      = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
 				fee.ClinicNum    = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				fee.ProvNum      = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
 				retVal.Add(fee);
 			}
 			return retVal;
@@ -94,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="FeeNum,";
 			}
-			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum) VALUES(";
+			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(fee.FeeNum)+",";
 			}
@@ -105,7 +106,53 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (fee.UseDefaultFee)+","
 				+    POut.Bool  (fee.UseDefaultCov)+","
 				+    POut.Long  (fee.CodeNum)+","
-				+    POut.Long  (fee.ClinicNum)+")";
+				+    POut.Long  (fee.ClinicNum)+","
+				+    POut.Long  (fee.ProvNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				fee.FeeNum=Db.NonQ(command,true);
+			}
+			return fee.FeeNum;
+		}
+
+		///<summary>Inserts one Fee into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Fee fee){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(fee,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					fee.FeeNum=DbHelper.GetNextOracleKey("fee","FeeNum"); //Cacheless method
+				}
+				return InsertNoCache(fee,true);
+			}
+		}
+
+		///<summary>Inserts one Fee into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Fee fee,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO fee (";
+			if(!useExistingPK && isRandomKeys) {
+				fee.FeeNum=ReplicationServers.GetKeyNoCache("fee","FeeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="FeeNum,";
+			}
+			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(fee.FeeNum)+",";
+			}
+			command+=
+				 "'"+POut.Double(fee.Amount)+"',"
+				+"'"+POut.String(fee.OldCode)+"',"
+				+    POut.Long  (fee.FeeSched)+","
+				+    POut.Bool  (fee.UseDefaultFee)+","
+				+    POut.Bool  (fee.UseDefaultCov)+","
+				+    POut.Long  (fee.CodeNum)+","
+				+    POut.Long  (fee.ClinicNum)+","
+				+    POut.Long  (fee.ProvNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -124,7 +171,8 @@ namespace OpenDentBusiness.Crud{
 				+"UseDefaultFee=  "+POut.Bool  (fee.UseDefaultFee)+", "
 				+"UseDefaultCov=  "+POut.Bool  (fee.UseDefaultCov)+", "
 				+"CodeNum      =  "+POut.Long  (fee.CodeNum)+", "
-				+"ClinicNum    =  "+POut.Long  (fee.ClinicNum)+" "
+				+"ClinicNum    =  "+POut.Long  (fee.ClinicNum)+", "
+				+"ProvNum      =  "+POut.Long  (fee.ProvNum)+" "
 				+"WHERE FeeNum = "+POut.Long(fee.FeeNum);
 			Db.NonQ(command);
 		}
@@ -160,6 +208,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClinicNum = "+POut.Long(fee.ClinicNum)+"";
 			}
+			if(fee.ProvNum != oldFee.ProvNum) {
+				if(command!=""){ command+=",";}
+				command+="ProvNum = "+POut.Long(fee.ProvNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -174,6 +226,69 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM fee "
 				+"WHERE FeeNum = "+POut.Long(feeNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<Fee> listNew,List<Fee> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<Fee> listIns    =new List<Fee>();
+			List<Fee> listUpdNew =new List<Fee>();
+			List<Fee> listUpdDB  =new List<Fee>();
+			List<Fee> listDel    =new List<Fee>();
+			listNew.Sort((Fee x,Fee y) => { return x.FeeNum.CompareTo(y.FeeNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((Fee x,Fee y) => { return x.FeeNum.CompareTo(y.FeeNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			Fee fieldNew;
+			Fee fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.FeeNum<fieldDB.FeeNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.FeeNum>fieldDB.FeeNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				Update(listUpdNew[i],listUpdDB[i]);
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].FeeNum);
+			}
 		}
 
 	}

@@ -117,6 +117,53 @@ namespace OpenDentBusiness.Crud{
 			return hL7Msg.HL7MsgNum;
 		}
 
+		///<summary>Inserts one HL7Msg into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7Msg hL7Msg){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(hL7Msg,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					hL7Msg.HL7MsgNum=DbHelper.GetNextOracleKey("hl7msg","HL7MsgNum"); //Cacheless method
+				}
+				return InsertNoCache(hL7Msg,true);
+			}
+		}
+
+		///<summary>Inserts one HL7Msg into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(HL7Msg hL7Msg,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO hl7msg (";
+			if(!useExistingPK && isRandomKeys) {
+				hL7Msg.HL7MsgNum=ReplicationServers.GetKeyNoCache("hl7msg","HL7MsgNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="HL7MsgNum,";
+			}
+			command+="HL7Status,MsgText,AptNum,PatNum,Note) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(hL7Msg.HL7MsgNum)+",";
+			}
+			command+=
+				     POut.Int   ((int)hL7Msg.HL7Status)+","
+				+    DbHelper.ParamChar+"paramMsgText,"
+				+    POut.Long  (hL7Msg.AptNum)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.Long  (hL7Msg.PatNum)+","
+				+"'"+POut.String(hL7Msg.Note)+"')";
+			if(hL7Msg.MsgText==null) {
+				hL7Msg.MsgText="";
+			}
+			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,hL7Msg.MsgText);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramMsgText);
+			}
+			else {
+				hL7Msg.HL7MsgNum=Db.NonQ(command,true,paramMsgText);
+			}
+			return hL7Msg.HL7MsgNum;
+		}
+
 		///<summary>Updates one HL7Msg in the database.</summary>
 		public static void Update(HL7Msg hL7Msg){
 			string command="UPDATE hl7msg SET "

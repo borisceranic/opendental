@@ -131,6 +131,60 @@ namespace OpenDentBusiness.Crud{
 			return equipment.EquipmentNum;
 		}
 
+		///<summary>Inserts one Equipment into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Equipment equipment){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(equipment,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					equipment.EquipmentNum=DbHelper.GetNextOracleKey("equipment","EquipmentNum"); //Cacheless method
+				}
+				return InsertNoCache(equipment,true);
+			}
+		}
+
+		///<summary>Inserts one Equipment into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Equipment equipment,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO equipment (";
+			if(!useExistingPK && isRandomKeys) {
+				equipment.EquipmentNum=ReplicationServers.GetKeyNoCache("equipment","EquipmentNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EquipmentNum,";
+			}
+			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(equipment.EquipmentNum)+",";
+			}
+			command+=
+				 "'"+POut.String(equipment.Description)+"',"
+				+"'"+POut.String(equipment.SerialNumber)+"',"
+				+"'"+POut.String(equipment.ModelYear)+"',"
+				+    POut.Date  (equipment.DatePurchased)+","
+				+    POut.Date  (equipment.DateSold)+","
+				+"'"+POut.Double(equipment.PurchaseCost)+"',"
+				+"'"+POut.Double(equipment.MarketValue)+"',"
+				+"'"+POut.String(equipment.Location)+"',"
+				+    POut.Date  (equipment.DateEntry)+","
+				+    POut.Long  (equipment.ProvNumCheckedOut)+","
+				+    POut.Date  (equipment.DateCheckedOut)+","
+				+    POut.Date  (equipment.DateExpectedBack)+","
+				+    DbHelper.ParamChar+"paramDispenseNote)";
+			if(equipment.DispenseNote==null) {
+				equipment.DispenseNote="";
+			}
+			OdSqlParameter paramDispenseNote=new OdSqlParameter("paramDispenseNote",OdDbType.Text,POut.StringNote(equipment.DispenseNote));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramDispenseNote);
+			}
+			else {
+				equipment.EquipmentNum=Db.NonQ(command,true,paramDispenseNote);
+			}
+			return equipment.EquipmentNum;
+		}
+
 		///<summary>Updates one Equipment in the database.</summary>
 		public static void Update(Equipment equipment){
 			string command="UPDATE equipment SET "

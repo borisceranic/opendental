@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return ehrCarePlan.EhrCarePlanNum;
 		}
 
+		///<summary>Inserts one EhrCarePlan into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrCarePlan ehrCarePlan){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrCarePlan,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrCarePlan.EhrCarePlanNum=DbHelper.GetNextOracleKey("ehrcareplan","EhrCarePlanNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrCarePlan,true);
+			}
+		}
+
+		///<summary>Inserts one EhrCarePlan into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrCarePlan ehrCarePlan,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrcareplan (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrCarePlan.EhrCarePlanNum=ReplicationServers.GetKeyNoCache("ehrcareplan","EhrCarePlanNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrCarePlanNum,";
+			}
+			command+="PatNum,SnomedEducation,Instructions,DatePlanned) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrCarePlan.EhrCarePlanNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrCarePlan.PatNum)+","
+				+"'"+POut.String(ehrCarePlan.SnomedEducation)+"',"
+				+"'"+POut.String(ehrCarePlan.Instructions)+"',"
+				+    POut.Date  (ehrCarePlan.DatePlanned)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				ehrCarePlan.EhrCarePlanNum=Db.NonQ(command,true);
+			}
+			return ehrCarePlan.EhrCarePlanNum;
+		}
+
 		///<summary>Updates one EhrCarePlan in the database.</summary>
 		public static void Update(EhrCarePlan ehrCarePlan){
 			string command="UPDATE ehrcareplan SET "

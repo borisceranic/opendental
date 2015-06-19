@@ -177,6 +177,81 @@ namespace OpenDentBusiness.Crud{
 			return claimProc.ClaimProcNum;
 		}
 
+		///<summary>Inserts one ClaimProc into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimProc claimProc){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimProc,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimProc.ClaimProcNum=DbHelper.GetNextOracleKey("claimproc","ClaimProcNum"); //Cacheless method
+				}
+				return InsertNoCache(claimProc,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimProc into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimProc claimProc,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimproc (";
+			if(!useExistingPK && isRandomKeys) {
+				claimProc.ClaimProcNum=ReplicationServers.GetKeyNoCache("claimproc","ClaimProcNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimProcNum,";
+			}
+			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimProc.ClaimProcNum)+",";
+			}
+			command+=
+				     POut.Long  (claimProc.ProcNum)+","
+				+    POut.Long  (claimProc.ClaimNum)+","
+				+    POut.Long  (claimProc.PatNum)+","
+				+    POut.Long  (claimProc.ProvNum)+","
+				+"'"+POut.Double(claimProc.FeeBilled)+"',"
+				+"'"+POut.Double(claimProc.InsPayEst)+"',"
+				+"'"+POut.Double(claimProc.DedApplied)+"',"
+				+    POut.Int   ((int)claimProc.Status)+","
+				+"'"+POut.Double(claimProc.InsPayAmt)+"',"
+				+"'"+POut.String(claimProc.Remarks)+"',"
+				+    POut.Long  (claimProc.ClaimPaymentNum)+","
+				+    POut.Long  (claimProc.PlanNum)+","
+				+    POut.Date  (claimProc.DateCP)+","
+				+"'"+POut.Double(claimProc.WriteOff)+"',"
+				+"'"+POut.String(claimProc.CodeSent)+"',"
+				+"'"+POut.Double(claimProc.AllowedOverride)+"',"
+				+    POut.Int   (claimProc.Percentage)+","
+				+    POut.Int   (claimProc.PercentOverride)+","
+				+"'"+POut.Double(claimProc.CopayAmt)+"',"
+				+    POut.Bool  (claimProc.NoBillIns)+","
+				+"'"+POut.Double(claimProc.PaidOtherIns)+"',"
+				+"'"+POut.Double(claimProc.BaseEst)+"',"
+				+"'"+POut.Double(claimProc.CopayOverride)+"',"
+				+    POut.Date  (claimProc.ProcDate)+","
+				+    POut.Date  (claimProc.DateEntry)+","
+				+    POut.Byte  (claimProc.LineNumber)+","
+				+"'"+POut.Double(claimProc.DedEst)+"',"
+				+"'"+POut.Double(claimProc.DedEstOverride)+"',"
+				+"'"+POut.Double(claimProc.InsEstTotal)+"',"
+				+"'"+POut.Double(claimProc.InsEstTotalOverride)+"',"
+				+"'"+POut.Double(claimProc.PaidOtherInsOverride)+"',"
+				+"'"+POut.String(claimProc.EstimateNote)+"',"
+				+"'"+POut.Double(claimProc.WriteOffEst)+"',"
+				+"'"+POut.Double(claimProc.WriteOffEstOverride)+"',"
+				+    POut.Long  (claimProc.ClinicNum)+","
+				+    POut.Long  (claimProc.InsSubNum)+","
+				+    POut.Int   (claimProc.PaymentRow)+","
+				+    POut.Long  (claimProc.PayPlanNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimProc.ClaimProcNum=Db.NonQ(command,true);
+			}
+			return claimProc.ClaimProcNum;
+		}
+
 		///<summary>Updates one ClaimProc in the database.</summary>
 		public static void Update(ClaimProc claimProc){
 			string command="UPDATE claimproc SET "

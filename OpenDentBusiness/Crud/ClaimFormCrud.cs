@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return claimForm.ClaimFormNum;
 		}
 
+		///<summary>Inserts one ClaimForm into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimForm claimForm){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(claimForm,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					claimForm.ClaimFormNum=DbHelper.GetNextOracleKey("claimform","ClaimFormNum"); //Cacheless method
+				}
+				return InsertNoCache(claimForm,true);
+			}
+		}
+
+		///<summary>Inserts one ClaimForm into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClaimForm claimForm,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO claimform (";
+			if(!useExistingPK && isRandomKeys) {
+				claimForm.ClaimFormNum=ReplicationServers.GetKeyNoCache("claimform","ClaimFormNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClaimFormNum,";
+			}
+			command+="Description,IsHidden,FontName,FontSize,UniqueID,PrintImages,OffsetX,OffsetY) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(claimForm.ClaimFormNum)+",";
+			}
+			command+=
+				 "'"+POut.String(claimForm.Description)+"',"
+				+    POut.Bool  (claimForm.IsHidden)+","
+				+"'"+POut.String(claimForm.FontName)+"',"
+				+    POut.Float (claimForm.FontSize)+","
+				+"'"+POut.String(claimForm.UniqueID)+"',"
+				+    POut.Bool  (claimForm.PrintImages)+","
+				+    POut.Int   (claimForm.OffsetX)+","
+				+    POut.Int   (claimForm.OffsetY)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				claimForm.ClaimFormNum=Db.NonQ(command,true);
+			}
+			return claimForm.ClaimFormNum;
+		}
+
 		///<summary>Updates one ClaimForm in the database.</summary>
 		public static void Update(ClaimForm claimForm){
 			string command="UPDATE claimform SET "

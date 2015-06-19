@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return popup.PopupNum;
 		}
 
+		///<summary>Inserts one Popup into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Popup popup){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(popup,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					popup.PopupNum=DbHelper.GetNextOracleKey("popup","PopupNum"); //Cacheless method
+				}
+				return InsertNoCache(popup,true);
+			}
+		}
+
+		///<summary>Inserts one Popup into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Popup popup,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO popup (";
+			if(!useExistingPK && isRandomKeys) {
+				popup.PopupNum=ReplicationServers.GetKeyNoCache("popup","PopupNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PopupNum,";
+			}
+			command+="PatNum,Description,IsDisabled,PopupLevel,UserNum,DateTimeEntry,IsArchived,PopupNumArchive) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(popup.PopupNum)+",";
+			}
+			command+=
+				     POut.Long  (popup.PatNum)+","
+				+"'"+POut.String(popup.Description)+"',"
+				+    POut.Bool  (popup.IsDisabled)+","
+				+    POut.Int   ((int)popup.PopupLevel)+","
+				+    POut.Long  (popup.UserNum)+","
+				+    DbHelper.Now()+","
+				+    POut.Bool  (popup.IsArchived)+","
+				+    POut.Long  (popup.PopupNumArchive)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				popup.PopupNum=Db.NonQ(command,true);
+			}
+			return popup.PopupNum;
+		}
+
 		///<summary>Updates one Popup in the database.</summary>
 		public static void Update(Popup popup){
 			string command="UPDATE popup SET "

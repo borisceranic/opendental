@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return sigButDef.SigButDefNum;
 		}
 
+		///<summary>Inserts one SigButDef into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigButDef sigButDef){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(sigButDef,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sigButDef.SigButDefNum=DbHelper.GetNextOracleKey("sigbutdef","SigButDefNum"); //Cacheless method
+				}
+				return InsertNoCache(sigButDef,true);
+			}
+		}
+
+		///<summary>Inserts one SigButDef into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(SigButDef sigButDef,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO sigbutdef (";
+			if(!useExistingPK && isRandomKeys) {
+				sigButDef.SigButDefNum=ReplicationServers.GetKeyNoCache("sigbutdef","SigButDefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SigButDefNum,";
+			}
+			command+="ButtonText,ButtonIndex,SynchIcon,ComputerName) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(sigButDef.SigButDefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(sigButDef.ButtonText)+"',"
+				+    POut.Int   (sigButDef.ButtonIndex)+","
+				+    POut.Byte  (sigButDef.SynchIcon)+","
+				+"'"+POut.String(sigButDef.ComputerName)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				sigButDef.SigButDefNum=Db.NonQ(command,true);
+			}
+			return sigButDef.SigButDefNum;
+		}
+
 		///<summary>Updates one SigButDef in the database.</summary>
 		public static void Update(SigButDef sigButDef){
 			string command="UPDATE sigbutdef SET "

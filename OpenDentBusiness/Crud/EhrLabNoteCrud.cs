@@ -112,6 +112,50 @@ namespace OpenDentBusiness.Crud{
 			return ehrLabNote.EhrLabNoteNum;
 		}
 
+		///<summary>Inserts one EhrLabNote into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabNote ehrLabNote){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(ehrLabNote,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					ehrLabNote.EhrLabNoteNum=DbHelper.GetNextOracleKey("ehrlabnote","EhrLabNoteNum"); //Cacheless method
+				}
+				return InsertNoCache(ehrLabNote,true);
+			}
+		}
+
+		///<summary>Inserts one EhrLabNote into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EhrLabNote ehrLabNote,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO ehrlabnote (";
+			if(!useExistingPK && isRandomKeys) {
+				ehrLabNote.EhrLabNoteNum=ReplicationServers.GetKeyNoCache("ehrlabnote","EhrLabNoteNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EhrLabNoteNum,";
+			}
+			command+="EhrLabNum,EhrLabResultNum,Comments) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(ehrLabNote.EhrLabNoteNum)+",";
+			}
+			command+=
+				     POut.Long  (ehrLabNote.EhrLabNum)+","
+				+    POut.Long  (ehrLabNote.EhrLabResultNum)+","
+				+    DbHelper.ParamChar+"paramComments)";
+			if(ehrLabNote.Comments==null) {
+				ehrLabNote.Comments="";
+			}
+			OdSqlParameter paramComments=new OdSqlParameter("paramComments",OdDbType.Text,ehrLabNote.Comments);
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramComments);
+			}
+			else {
+				ehrLabNote.EhrLabNoteNum=Db.NonQ(command,true,paramComments);
+			}
+			return ehrLabNote.EhrLabNoteNum;
+		}
+
 		///<summary>Updates one EhrLabNote in the database.</summary>
 		public static void Update(EhrLabNote ehrLabNote){
 			string command="UPDATE ehrlabnote SET "

@@ -129,6 +129,57 @@ namespace OpenDentBusiness.Crud{
 			return clockEvent.ClockEventNum;
 		}
 
+		///<summary>Inserts one ClockEvent into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClockEvent clockEvent){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(clockEvent,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					clockEvent.ClockEventNum=DbHelper.GetNextOracleKey("clockevent","ClockEventNum"); //Cacheless method
+				}
+				return InsertNoCache(clockEvent,true);
+			}
+		}
+
+		///<summary>Inserts one ClockEvent into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ClockEvent clockEvent,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO clockevent (";
+			if(!useExistingPK && isRandomKeys) {
+				clockEvent.ClockEventNum=ReplicationServers.GetKeyNoCache("clockevent","ClockEventNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ClockEventNum,";
+			}
+			command+="EmployeeNum,TimeEntered1,TimeDisplayed1,ClockStatus,Note,TimeEntered2,TimeDisplayed2,OTimeHours,OTimeAuto,Adjust,AdjustAuto,AdjustIsOverridden,Rate2Hours,Rate2Auto) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(clockEvent.ClockEventNum)+",";
+			}
+			command+=
+				     POut.Long  (clockEvent.EmployeeNum)+","
+				+    DbHelper.Now()+","
+				+    DbHelper.Now()+","
+				+    POut.Int   ((int)clockEvent.ClockStatus)+","
+				+"'"+POut.String(clockEvent.Note)+"',"
+				+    POut.DateT (clockEvent.TimeEntered2)+","
+				+    POut.DateT (clockEvent.TimeDisplayed2)+","
+				+"'"+POut.TSpan (clockEvent.OTimeHours)+"',"
+				+"'"+POut.TSpan (clockEvent.OTimeAuto)+"',"
+				+"'"+POut.TSpan (clockEvent.Adjust)+"',"
+				+"'"+POut.TSpan (clockEvent.AdjustAuto)+"',"
+				+    POut.Bool  (clockEvent.AdjustIsOverridden)+","
+				+"'"+POut.TSpan (clockEvent.Rate2Hours)+"',"
+				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				clockEvent.ClockEventNum=Db.NonQ(command,true);
+			}
+			return clockEvent.ClockEventNum;
+		}
+
 		///<summary>Updates one ClockEvent in the database.</summary>
 		public static void Update(ClockEvent clockEvent){
 			string command="UPDATE clockevent SET "

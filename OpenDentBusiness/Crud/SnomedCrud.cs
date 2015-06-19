@@ -105,6 +105,45 @@ namespace OpenDentBusiness.Crud{
 			return snomed.SnomedNum;
 		}
 
+		///<summary>Inserts one Snomed into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Snomed snomed){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(snomed,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					snomed.SnomedNum=DbHelper.GetNextOracleKey("snomed","SnomedNum"); //Cacheless method
+				}
+				return InsertNoCache(snomed,true);
+			}
+		}
+
+		///<summary>Inserts one Snomed into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Snomed snomed,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO snomed (";
+			if(!useExistingPK && isRandomKeys) {
+				snomed.SnomedNum=ReplicationServers.GetKeyNoCache("snomed","SnomedNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SnomedNum,";
+			}
+			command+="SnomedCode,Description) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(snomed.SnomedNum)+",";
+			}
+			command+=
+				 "'"+POut.String(snomed.SnomedCode)+"',"
+				+"'"+POut.String(snomed.Description)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				snomed.SnomedNum=Db.NonQ(command,true);
+			}
+			return snomed.SnomedNum;
+		}
+
 		///<summary>Updates one Snomed in the database.</summary>
 		public static void Update(Snomed snomed){
 			string command="UPDATE snomed SET "

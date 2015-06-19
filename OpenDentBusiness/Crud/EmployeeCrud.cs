@@ -115,6 +115,50 @@ namespace OpenDentBusiness.Crud{
 			return employee.EmployeeNum;
 		}
 
+		///<summary>Inserts one Employee into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Employee employee){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(employee,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					employee.EmployeeNum=DbHelper.GetNextOracleKey("employee","EmployeeNum"); //Cacheless method
+				}
+				return InsertNoCache(employee,true);
+			}
+		}
+
+		///<summary>Inserts one Employee into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Employee employee,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO employee (";
+			if(!useExistingPK && isRandomKeys) {
+				employee.EmployeeNum=ReplicationServers.GetKeyNoCache("employee","EmployeeNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmployeeNum,";
+			}
+			command+="LName,FName,MiddleI,IsHidden,ClockStatus,PhoneExt,PayrollID) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(employee.EmployeeNum)+",";
+			}
+			command+=
+				 "'"+POut.String(employee.LName)+"',"
+				+"'"+POut.String(employee.FName)+"',"
+				+"'"+POut.String(employee.MiddleI)+"',"
+				+    POut.Bool  (employee.IsHidden)+","
+				+"'"+POut.String(employee.ClockStatus)+"',"
+				+    POut.Int   (employee.PhoneExt)+","
+				+"'"+POut.String(employee.PayrollID)+"')";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				employee.EmployeeNum=Db.NonQ(command,true);
+			}
+			return employee.EmployeeNum;
+		}
+
 		///<summary>Updates one Employee in the database.</summary>
 		public static void Update(Employee employee){
 			string command="UPDATE employee SET "

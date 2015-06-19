@@ -149,6 +149,67 @@ namespace OpenDentBusiness.Crud{
 			return computerPref.ComputerPrefNum;
 		}
 
+		///<summary>Inserts one ComputerPref into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ComputerPref computerPref){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(computerPref,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					computerPref.ComputerPrefNum=DbHelper.GetNextOracleKey("computerpref","ComputerPrefNum"); //Cacheless method
+				}
+				return InsertNoCache(computerPref,true);
+			}
+		}
+
+		///<summary>Inserts one ComputerPref into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(ComputerPref computerPref,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO computerpref (";
+			if(!useExistingPK && isRandomKeys) {
+				computerPref.ComputerPrefNum=ReplicationServers.GetKeyNoCache("computerpref","ComputerPrefNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="ComputerPrefNum,";
+			}
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(computerPref.ComputerPrefNum)+",";
+			}
+			command+=
+				 "'"+POut.String(computerPref.ComputerName)+"',"
+				+    POut.Bool  (computerPref.GraphicsUseHardware)+","
+				+    POut.Int   ((int)computerPref.GraphicsSimple)+","
+				+"'"+POut.String(computerPref.SensorType)+"',"
+				+    POut.Bool  (computerPref.SensorBinned)+","
+				+    POut.Int   (computerPref.SensorPort)+","
+				+    POut.Int   (computerPref.SensorExposure)+","
+				+    POut.Bool  (computerPref.GraphicsDoubleBuffering)+","
+				+    POut.Int   (computerPref.PreferredPixelFormatNum)+","
+				+"'"+POut.String(computerPref.AtoZpath)+"',"
+				+    POut.Bool  (computerPref.TaskKeepListHidden)+","
+				+    POut.Int   (computerPref.TaskDock)+","
+				+    POut.Int   (computerPref.TaskX)+","
+				+    POut.Int   (computerPref.TaskY)+","
+				+"'"+POut.String(computerPref.DirectXFormat)+"',"
+				+    POut.Bool  (computerPref.ScanDocSelectSource)+","
+				+    POut.Bool  (computerPref.ScanDocShowOptions)+","
+				+    POut.Bool  (computerPref.ScanDocDuplex)+","
+				+    POut.Bool  (computerPref.ScanDocGrayscale)+","
+				+    POut.Int   (computerPref.ScanDocResolution)+","
+				+    POut.Byte  (computerPref.ScanDocQuality)+","
+				+    POut.Long  (computerPref.ClinicNum)+","
+				+    POut.Long  (computerPref.ApptViewNum)+","
+				+    POut.Byte  (computerPref.RecentApptView)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				computerPref.ComputerPrefNum=Db.NonQ(command,true);
+			}
+			return computerPref.ComputerPrefNum;
+		}
+
 		///<summary>Updates one ComputerPref in the database.</summary>
 		public static void Update(ComputerPref computerPref){
 			string command="UPDATE computerpref SET "

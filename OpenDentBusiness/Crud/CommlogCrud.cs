@@ -129,6 +129,59 @@ namespace OpenDentBusiness.Crud{
 			return commlog.CommlogNum;
 		}
 
+		///<summary>Inserts one Commlog into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Commlog commlog){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(commlog,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					commlog.CommlogNum=DbHelper.GetNextOracleKey("commlog","CommlogNum"); //Cacheless method
+				}
+				return InsertNoCache(commlog,true);
+			}
+		}
+
+		///<summary>Inserts one Commlog into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Commlog commlog,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO commlog (";
+			if(!useExistingPK && isRandomKeys) {
+				commlog.CommlogNum=ReplicationServers.GetKeyNoCache("commlog","CommlogNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="CommlogNum,";
+			}
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,IsWebSched) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(commlog.CommlogNum)+",";
+			}
+			command+=
+				     POut.Long  (commlog.PatNum)+","
+				+    POut.DateT (commlog.CommDateTime)+","
+				+    POut.Long  (commlog.CommType)+","
+				+    DbHelper.ParamChar+"paramNote,"
+				+    POut.Int   ((int)commlog.Mode_)+","
+				+    POut.Int   ((int)commlog.SentOrReceived)+","
+				+    POut.Long  (commlog.UserNum)+","
+				+"'"+POut.String(commlog.Signature)+"',"
+				+    POut.Bool  (commlog.SigIsTopaz)+","
+				//DateTStamp can only be set by MySQL
+				+    POut.DateT (commlog.DateTimeEnd)+","
+				+    POut.Bool  (commlog.IsWebSched)+")";
+			if(commlog.Note==null) {
+				commlog.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,POut.StringNote(commlog.Note));
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command,paramNote);
+			}
+			else {
+				commlog.CommlogNum=Db.NonQ(command,true,paramNote);
+			}
+			return commlog.CommlogNum;
+		}
+
 		///<summary>Updates one Commlog in the database.</summary>
 		public static void Update(Commlog commlog){
 			string command="UPDATE commlog SET "

@@ -127,6 +127,56 @@ namespace OpenDentBusiness.Crud{
 			return paySplit.SplitNum;
 		}
 
+		///<summary>Inserts one PaySplit into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PaySplit paySplit){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(paySplit,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					paySplit.SplitNum=DbHelper.GetNextOracleKey("paysplit","SplitNum"); //Cacheless method
+				}
+				return InsertNoCache(paySplit,true);
+			}
+		}
+
+		///<summary>Inserts one PaySplit into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(PaySplit paySplit,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO paysplit (";
+			if(!useExistingPK && isRandomKeys) {
+				paySplit.SplitNum=ReplicationServers.GetKeyNoCache("paysplit","SplitNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="SplitNum,";
+			}
+			command+="SplitAmt,PatNum,ProcDate,PayNum,IsDiscount,DiscountType,ProvNum,PayPlanNum,DatePay,ProcNum,DateEntry,UnearnedType,ClinicNum) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(paySplit.SplitNum)+",";
+			}
+			command+=
+				 "'"+POut.Double(paySplit.SplitAmt)+"',"
+				+    POut.Long  (paySplit.PatNum)+","
+				+    POut.Date  (paySplit.ProcDate)+","
+				+    POut.Long  (paySplit.PayNum)+","
+				+    POut.Bool  (paySplit.IsDiscount)+","
+				+    POut.Byte  (paySplit.DiscountType)+","
+				+    POut.Long  (paySplit.ProvNum)+","
+				+    POut.Long  (paySplit.PayPlanNum)+","
+				+    POut.Date  (paySplit.DatePay)+","
+				+    POut.Long  (paySplit.ProcNum)+","
+				+    DbHelper.Now()+","
+				+    POut.Long  (paySplit.UnearnedType)+","
+				+    POut.Long  (paySplit.ClinicNum)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				paySplit.SplitNum=Db.NonQ(command,true);
+			}
+			return paySplit.SplitNum;
+		}
+
 		///<summary>Updates one PaySplit in the database.</summary>
 		public static void Update(PaySplit paySplit){
 			string command="UPDATE paysplit SET "

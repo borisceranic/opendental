@@ -117,6 +117,51 @@ namespace OpenDentBusiness.Crud{
 			return emailAddress.EmailAddressNum;
 		}
 
+		///<summary>Inserts one EmailAddress into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailAddress emailAddress){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(emailAddress,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					emailAddress.EmailAddressNum=DbHelper.GetNextOracleKey("emailaddress","EmailAddressNum"); //Cacheless method
+				}
+				return InsertNoCache(emailAddress,true);
+			}
+		}
+
+		///<summary>Inserts one EmailAddress into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(EmailAddress emailAddress,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO emailaddress (";
+			if(!useExistingPK && isRandomKeys) {
+				emailAddress.EmailAddressNum=ReplicationServers.GetKeyNoCache("emailaddress","EmailAddressNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="EmailAddressNum,";
+			}
+			command+="SMTPserver,EmailUsername,EmailPassword,ServerPort,UseSSL,SenderAddress,Pop3ServerIncoming,ServerPortIncoming) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(emailAddress.EmailAddressNum)+",";
+			}
+			command+=
+				 "'"+POut.String(emailAddress.SMTPserver)+"',"
+				+"'"+POut.String(emailAddress.EmailUsername)+"',"
+				+"'"+POut.String(emailAddress.EmailPassword)+"',"
+				+    POut.Int   (emailAddress.ServerPort)+","
+				+    POut.Bool  (emailAddress.UseSSL)+","
+				+"'"+POut.String(emailAddress.SenderAddress)+"',"
+				+"'"+POut.String(emailAddress.Pop3ServerIncoming)+"',"
+				+    POut.Int   (emailAddress.ServerPortIncoming)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				emailAddress.EmailAddressNum=Db.NonQ(command,true);
+			}
+			return emailAddress.EmailAddressNum;
+		}
+
 		///<summary>Updates one EmailAddress in the database.</summary>
 		public static void Update(EmailAddress emailAddress){
 			string command="UPDATE emailaddress SET "

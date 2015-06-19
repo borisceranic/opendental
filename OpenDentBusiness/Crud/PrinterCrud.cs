@@ -109,6 +109,47 @@ namespace OpenDentBusiness.Crud{
 			return printer.PrinterNum;
 		}
 
+		///<summary>Inserts one Printer into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Printer printer){
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				return InsertNoCache(printer,false);
+			}
+			else {
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					printer.PrinterNum=DbHelper.GetNextOracleKey("printer","PrinterNum"); //Cacheless method
+				}
+				return InsertNoCache(printer,true);
+			}
+		}
+
+		///<summary>Inserts one Printer into the database.  Provides option to use the existing priKey.  Doesn't use the cache.</summary>
+		public static long InsertNoCache(Printer printer,bool useExistingPK){
+			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
+			string command="INSERT INTO printer (";
+			if(!useExistingPK && isRandomKeys) {
+				printer.PrinterNum=ReplicationServers.GetKeyNoCache("printer","PrinterNum");
+			}
+			if(isRandomKeys || useExistingPK) {
+				command+="PrinterNum,";
+			}
+			command+="ComputerNum,PrintSit,PrinterName,DisplayPrompt) VALUES(";
+			if(isRandomKeys || useExistingPK) {
+				command+=POut.Long(printer.PrinterNum)+",";
+			}
+			command+=
+				     POut.Long  (printer.ComputerNum)+","
+				+    POut.Int   ((int)printer.PrintSit)+","
+				+"'"+POut.String(printer.PrinterName)+"',"
+				+    POut.Bool  (printer.DisplayPrompt)+")";
+			if(useExistingPK || PrefC.RandomKeys) {
+				Db.NonQ(command);
+			}
+			else {
+				printer.PrinterNum=Db.NonQ(command,true);
+			}
+			return printer.PrinterNum;
+		}
+
 		///<summary>Updates one Printer in the database.</summary>
 		public static void Update(Printer printer){
 			string command="UPDATE printer SET "
