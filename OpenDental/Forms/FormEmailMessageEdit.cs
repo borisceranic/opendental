@@ -29,7 +29,7 @@ namespace OpenDental{
 		private UI.Button butDecrypt;
 		private UI.Button butDirectMessage;
 		private UI.Button butRawMessage;
-		private User_Controls.EmailPreviewControl emailPreview;
+		private EmailPreviewControl emailPreview;
 
 		///<summary></summary>
 		public FormEmailMessageEdit(EmailMessage emailMessage){
@@ -78,7 +78,7 @@ namespace OpenDental{
 			this.butSave = new OpenDental.UI.Button();
 			this.butSend = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
+			this.emailPreview = new OpenDental.EmailPreviewControl();
 			this.panelTemplates.SuspendLayout();
 			this.SuspendLayout();
 			// 

@@ -1,4 +1,4 @@
-﻿namespace OpenDental.User_Controls {
+﻿namespace OpenDental {
 	partial class EmailPreviewControl {
 		/// <summary> 
 		/// Required designer variable.

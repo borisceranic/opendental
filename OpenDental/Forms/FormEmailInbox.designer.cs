@@ -34,7 +34,7 @@ namespace OpenDental{
 			this.textComputerNameReceive = new OpenDental.ODtextBox();
 			this.splitContainerNoFlicker = new OpenDental.SplitContainerNoFlicker();
 			this.gridEmailMessages = new OpenDental.UI.ODGrid();
-			this.emailPreview = new OpenDental.User_Controls.EmailPreviewControl();
+			this.emailPreview = new OpenDental.EmailPreviewControl();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butChangePat = new OpenDental.UI.Button();
 			this.butMarkUnread = new OpenDental.UI.Button();
@@ -329,7 +329,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelThisComputer;
 		private UI.Button butChangePat;
 		private UI.Button butDelete;
-		private User_Controls.EmailPreviewControl emailPreview;
+		private EmailPreviewControl emailPreview;
 		private SplitContainerNoFlicker splitContainerNoFlicker;
 		private System.Windows.Forms.Label label1;
 		private ODtextBox textComputerNameReceive;

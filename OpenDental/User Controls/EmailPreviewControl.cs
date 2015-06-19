@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using CodeBase;
 using OpenDentBusiness;
 
-namespace OpenDental.User_Controls {
+namespace OpenDental {
 	public partial class EmailPreviewControl:UserControl {
 
 		///<summary>TODO: Replace this flag with a new flag on the email address object.</summary>
