@@ -18,7 +18,7 @@ namespace OpenDental {
 	public class SheetPrinting {
 		///<summary>If there is only one sheet, then this will stay 0.</Summary>
 		private static int _sheetsPrinted;
-		///<summary>Pages printed on current sheet. Only used for printing, not for generating PDFs.</summary>
+		///<summary>Pages printed on current sheet.</summary>
 		private static int _pagesPrinted;
 		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
 		private static int _yPosPrint;
@@ -32,6 +32,23 @@ namespace OpenDental {
 		private static bool _isPrinting=false;
 		private static Statement _stmt;
 		private static MedLab _medLab;
+
+		///<summary>The treatment finder needs to be able to clear out the pages printed variable before it prints a batch.</summary>
+		public static int PagesPrinted {
+			get {
+				return _pagesPrinted;
+			}
+			set {
+				_pagesPrinted=value;
+			}
+		}
+
+		///<summary>The treatment finder needs this so that it can use the same Margins in its page calculations.</summary>
+		public static Margins PrintMargin {
+			get {
+				return _printMargin;
+			}
+		}
 
 
 		/////<summary>Not used. This code is copied and pasted in several locations. Easiest to find by searching for "info.Verb="print";"</summary>
