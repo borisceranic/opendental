@@ -3095,10 +3095,16 @@ namespace OpenDental{
 						}
 					}
 					ToolBarMain.Buttons["LabCase"].Enabled=false;
-					ToolBarMain.Buttons["Perio"].Enabled = false;
-					ToolBarMain.Buttons["Ortho"].Enabled = false;
+					if(ToolBarMain.Buttons["Perio"]!=null) {
+						ToolBarMain.Buttons["Perio"].Enabled = false;
+					}
+					if(ToolBarMain.Buttons["Ortho"]!=null) {
+						ToolBarMain.Buttons["Ortho"].Enabled = false;
+					}
 					ToolBarMain.Buttons["Consent"].Enabled = false;
-					ToolBarMain.Buttons["ToothChart"].Enabled = false;
+					if(ToolBarMain.Buttons["ToothChart"]!=null) {
+						ToolBarMain.Buttons["ToothChart"].Enabled = false;
+					}
 					ToolBarMain.Buttons["ExamSheet"].Enabled=false;
 					if(UsingEcwTight()) {
 						ToolBarMain.Buttons["Commlog"].Enabled=false;
@@ -3154,8 +3160,10 @@ namespace OpenDental{
 				}
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"LabCase"),-1,"","LabCase"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Perio Chart"),2,"","Perio"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Ortho Chart"),-1,"","Ortho"));
+			if(!ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Perio Chart"),2,"","Perio"));
+				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Ortho Chart"),-1,"","Ortho"));
+			}			
 			button=new ODToolBarButton(Lan.g(this,"Consent"),-1,"","Consent");
 			button.Style=ODToolBarButtonStyle.DropDownButton;
 			button.DropDownMenu=menuConsent;
@@ -3163,10 +3171,12 @@ namespace OpenDental{
 			//if(PrefC.GetBool(PrefName.ToothChartMoveMenuToRight)) {
 			//	ToolBarMain.Buttons.Add(new ODToolBarButton("                   .",-1,"",""));
 			//}
-			button=new ODToolBarButton(Lan.g(this,"Tooth Chart"),-1,"","ToothChart");
-			button.Style=ODToolBarButtonStyle.DropDownButton;
-			button.DropDownMenu=menuToothChart;
-			ToolBarMain.Buttons.Add(button);
+			if(!ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+				button=new ODToolBarButton(Lan.g(this,"Tooth Chart"),-1,"","ToothChart");
+				button.Style=ODToolBarButtonStyle.DropDownButton;
+				button.DropDownMenu=menuToothChart;
+				ToolBarMain.Buttons.Add(button);
+			}
 			button=new ODToolBarButton(Lan.g(this,"Exam Sheet"),-1,"","ExamSheet");
 			button.Style=ODToolBarButtonStyle.PushButton;
 			ToolBarMain.Buttons.Add(button);
@@ -3271,6 +3281,7 @@ namespace OpenDental{
 
 		private void RefreshModuleScreen(){
 			//ParentForm.Text=Patients.GetMainTitle(PatCur);
+			LayoutToolBar();
 			if(PatCur==null){
 				//groupShow.Enabled=false;
 				gridPtInfo.Enabled=false;
@@ -3294,10 +3305,16 @@ namespace OpenDental{
 					}
 				}
 				ToolBarMain.Buttons["LabCase"].Enabled=false;
-				ToolBarMain.Buttons["Perio"].Enabled = false;
-				ToolBarMain.Buttons["Ortho"].Enabled = false;
+				if(ToolBarMain.Buttons["Perio"]!=null) {
+					ToolBarMain.Buttons["Perio"].Enabled = false;
+				}
+				if(ToolBarMain.Buttons["Ortho"]!=null) {
+					ToolBarMain.Buttons["Ortho"].Enabled = false;
+				}
 				ToolBarMain.Buttons["Consent"].Enabled = false;
-				ToolBarMain.Buttons["ToothChart"].Enabled = false;
+				if(ToolBarMain.Buttons["ToothChart"]!=null) {
+					ToolBarMain.Buttons["ToothChart"].Enabled = false;
+				}
 				ToolBarMain.Buttons["ExamSheet"].Enabled=false;
 				if(UsingEcwTight()) {
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
@@ -3338,10 +3355,16 @@ namespace OpenDental{
 					}
 				}
 				ToolBarMain.Buttons["LabCase"].Enabled=true;
-				ToolBarMain.Buttons["Perio"].Enabled = true;
-				ToolBarMain.Buttons["Ortho"].Enabled = true;
+				if(ToolBarMain.Buttons["Perio"]!=null) {
+					ToolBarMain.Buttons["Perio"].Enabled = true;
+				}
+				if(ToolBarMain.Buttons["Ortho"]!=null) {
+					ToolBarMain.Buttons["Ortho"].Enabled = true;
+				}
 				ToolBarMain.Buttons["Consent"].Enabled = true;
-				ToolBarMain.Buttons["ToothChart"].Enabled =true;
+				if(ToolBarMain.Buttons["ToothChart"]!=null) {
+					ToolBarMain.Buttons["ToothChart"].Enabled =true;
+				}
 				ToolBarMain.Buttons["ExamSheet"].Enabled=true;
 				if(UsingEcwTightOrFull()) {
 					if(UsingEcwTight()) {
@@ -3450,6 +3473,25 @@ namespace OpenDental{
 			}
 			if(!UsingEcwTightOrFull()) {
 				ChartLayoutHelper.SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
+				if(ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+					tabProc.TabPages.Remove(tabMissing);
+					tabProc.TabPages.Remove(tabMovements);
+					tabProc.TabPages.Remove(tabPrimary);
+				}
+				else {
+					tabProc.TabPages.Remove(tabMissing);
+					tabProc.TabPages.Remove(tabMovements);
+					tabProc.TabPages.Remove(tabPrimary);
+					tabProc.TabPages.Remove(tabPlanned);
+					tabProc.TabPages.Remove(tabShow);
+					tabProc.TabPages.Remove(tabDraw);
+					tabProc.TabPages.Add(tabMissing);
+					tabProc.TabPages.Add(tabMovements);
+					tabProc.TabPages.Add(tabPrimary);
+					tabProc.TabPages.Add(tabPlanned);
+					tabProc.TabPages.Add(tabShow);
+					tabProc.TabPages.Add(tabDraw);
+				}
 			}
 			ToolBarMain.Invalidate();
 			ClearButtons();

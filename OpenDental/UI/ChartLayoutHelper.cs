@@ -18,7 +18,7 @@ namespace OpenDental {
 		///<summary>If clinics are not enabled, this will return true if the pref PracticeIsMedicalOnly is true.
 		///If clinics are enabled, this will return true if either the headquarters 'clinic' is selected (FormOpenDental.ClinicNum=0) and the pref
 		///PracticeIsMedicalOnly is true OR if the currently selected clinic's IsMedicalOnly flag is true.  Otherwise returns false.</summary>
-		private static bool IsMedicalPracticeOrClinic() {
+		public static bool IsMedicalPracticeOrClinic() {
 			if(FormOpenDental.ClinicNum==0) {//either headquarters is selected or the clinics feature is not enabled, use practice pref
 				return PrefC.GetBool(PrefName.PracticeIsMedicalOnly);
 			}
