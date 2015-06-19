@@ -37,12 +37,12 @@ namespace OpenDental{
 			this.textPatient = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkSent = new System.Windows.Forms.CheckBox();
-			this.checkReceivedAndRead = new System.Windows.Forms.CheckBox();
-			this.checkReceivedAndUnread = new System.Windows.Forms.CheckBox();
-			this.gridMessageThread = new OpenDental.UI.ODGrid();
+			this.checkRead = new System.Windows.Forms.CheckBox();
 			this.gridMessages = new OpenDental.UI.ODGrid();
 			this.textDateTo = new ODR.ValidDate();
 			this.textDateFrom = new ODR.ValidDate();
+			this.smsService1 = new OpenDental.CallFireService.SMSService();
+			this.smsThreadView = new OpenDental.SmsThreadView();
 			this.butPatCurrent = new OpenDental.UI.Button();
 			this.butPatAll = new OpenDental.UI.Button();
 			this.butPatFind = new OpenDental.UI.Button();
@@ -53,9 +53,9 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(154, 61);
+			this.labelClinic.Location = new System.Drawing.Point(641, 37);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(111, 21);
+			this.labelClinic.Size = new System.Drawing.Size(70, 21);
 			this.labelClinic.TabIndex = 6;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -81,11 +81,10 @@ namespace OpenDental{
 			// 
 			// checkHidden
 			// 
-			this.checkHidden.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkHidden.Location = new System.Drawing.Point(643, 11);
+			this.checkHidden.Location = new System.Drawing.Point(482, 8);
 			this.checkHidden.Name = "checkHidden";
 			this.checkHidden.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkHidden.Size = new System.Drawing.Size(150, 16);
+			this.checkHidden.Size = new System.Drawing.Size(80, 16);
 			this.checkHidden.TabIndex = 153;
 			this.checkHidden.Text = "Hidden";
 			this.checkHidden.UseVisualStyleBackColor = true;
@@ -131,7 +130,7 @@ namespace OpenDental{
 			// 
 			// textPatient
 			// 
-			this.textPatient.Location = new System.Drawing.Point(266, 10);
+			this.textPatient.Location = new System.Drawing.Point(252, 10);
 			this.textPatient.Name = "textPatient";
 			this.textPatient.ReadOnly = true;
 			this.textPatient.Size = new System.Drawing.Size(216, 20);
@@ -141,57 +140,30 @@ namespace OpenDental{
 			// 
 			this.label1.Location = new System.Drawing.Point(181, 14);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(84, 13);
+			this.label1.Size = new System.Drawing.Size(70, 13);
 			this.label1.TabIndex = 155;
 			this.label1.Text = "Patient";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkSent
 			// 
-			this.checkSent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkSent.Location = new System.Drawing.Point(493, 11);
+			this.checkSent.Location = new System.Drawing.Point(482, 38);
 			this.checkSent.Name = "checkSent";
 			this.checkSent.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkSent.Size = new System.Drawing.Size(150, 16);
+			this.checkSent.Size = new System.Drawing.Size(80, 16);
 			this.checkSent.TabIndex = 161;
 			this.checkSent.Text = "Sent";
 			this.checkSent.UseVisualStyleBackColor = true;
 			// 
-			// checkReceivedAndRead
+			// checkRead
 			// 
-			this.checkReceivedAndRead.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkReceivedAndRead.Location = new System.Drawing.Point(493, 35);
-			this.checkReceivedAndRead.Name = "checkReceivedAndRead";
-			this.checkReceivedAndRead.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkReceivedAndRead.Size = new System.Drawing.Size(150, 16);
-			this.checkReceivedAndRead.TabIndex = 162;
-			this.checkReceivedAndRead.Text = "Received and Read";
-			this.checkReceivedAndRead.UseVisualStyleBackColor = true;
-			// 
-			// checkReceivedAndUnread
-			// 
-			this.checkReceivedAndUnread.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkReceivedAndUnread.Location = new System.Drawing.Point(643, 35);
-			this.checkReceivedAndUnread.Name = "checkReceivedAndUnread";
-			this.checkReceivedAndUnread.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkReceivedAndUnread.Size = new System.Drawing.Size(150, 16);
-			this.checkReceivedAndUnread.TabIndex = 163;
-			this.checkReceivedAndUnread.Text = "Recieved and Unread";
-			this.checkReceivedAndUnread.UseVisualStyleBackColor = true;
-			// 
-			// gridMessageThread
-			// 
-			this.gridMessageThread.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMessageThread.HasMultilineHeaders = false;
-			this.gridMessageThread.HScrollVisible = false;
-			this.gridMessageThread.Location = new System.Drawing.Point(712, 88);
-			this.gridMessageThread.Name = "gridMessageThread";
-			this.gridMessageThread.ScrollValue = 0;
-			this.gridMessageThread.Size = new System.Drawing.Size(250, 566);
-			this.gridMessageThread.TabIndex = 0;
-			this.gridMessageThread.Title = "Message Thread";
-			this.gridMessageThread.TranslationName = null;
+			this.checkRead.Location = new System.Drawing.Point(482, 23);
+			this.checkRead.Name = "checkRead";
+			this.checkRead.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.checkRead.Size = new System.Drawing.Size(80, 16);
+			this.checkRead.TabIndex = 162;
+			this.checkRead.Text = "Read";
+			this.checkRead.UseVisualStyleBackColor = true;
 			// 
 			// gridMessages
 			// 
@@ -201,10 +173,10 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMessages.HasMultilineHeaders = false;
 			this.gridMessages.HScrollVisible = false;
-			this.gridMessages.Location = new System.Drawing.Point(12, 88);
+			this.gridMessages.Location = new System.Drawing.Point(12, 61);
 			this.gridMessages.Name = "gridMessages";
 			this.gridMessages.ScrollValue = 0;
-			this.gridMessages.Size = new System.Drawing.Size(698, 566);
+			this.gridMessages.Size = new System.Drawing.Size(698, 593);
 			this.gridMessages.TabIndex = 4;
 			this.gridMessages.Title = "Text Messages - Right click for options";
 			this.gridMessages.TranslationName = null;
@@ -224,6 +196,24 @@ namespace OpenDental{
 			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
 			this.textDateFrom.TabIndex = 7;
 			// 
+			// smsService1
+			// 
+			this.smsService1.Credentials = null;
+			this.smsService1.Url = "https://www.callfire.com/service/SMSService";
+			this.smsService1.UseDefaultCredentials = false;
+			// 
+			// smsThreadView
+			// 
+			this.smsThreadView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.smsThreadView.BackColor = System.Drawing.SystemColors.Control;
+			this.smsThreadView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.smsThreadView.ListSmsThreadMessages = null;
+			this.smsThreadView.Location = new System.Drawing.Point(712, 61);
+			this.smsThreadView.Name = "smsThreadView";
+			this.smsThreadView.Size = new System.Drawing.Size(250, 593);
+			this.smsThreadView.TabIndex = 164;
+			// 
 			// butPatCurrent
 			// 
 			this.butPatCurrent.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -231,7 +221,7 @@ namespace OpenDental{
 			this.butPatCurrent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatCurrent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatCurrent.CornerRadius = 4F;
-			this.butPatCurrent.Location = new System.Drawing.Point(266, 31);
+			this.butPatCurrent.Location = new System.Drawing.Point(252, 31);
 			this.butPatCurrent.Name = "butPatCurrent";
 			this.butPatCurrent.Size = new System.Drawing.Size(63, 24);
 			this.butPatCurrent.TabIndex = 159;
@@ -245,7 +235,7 @@ namespace OpenDental{
 			this.butPatAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatAll.CornerRadius = 4F;
-			this.butPatAll.Location = new System.Drawing.Point(419, 31);
+			this.butPatAll.Location = new System.Drawing.Point(405, 31);
 			this.butPatAll.Name = "butPatAll";
 			this.butPatAll.Size = new System.Drawing.Size(63, 24);
 			this.butPatAll.TabIndex = 158;
@@ -259,7 +249,7 @@ namespace OpenDental{
 			this.butPatFind.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatFind.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatFind.CornerRadius = 4F;
-			this.butPatFind.Location = new System.Drawing.Point(342, 31);
+			this.butPatFind.Location = new System.Drawing.Point(328, 31);
 			this.butPatFind.Name = "butPatFind";
 			this.butPatFind.Size = new System.Drawing.Size(63, 24);
 			this.butPatFind.TabIndex = 157;
@@ -271,10 +261,10 @@ namespace OpenDental{
 			this.comboClinic.BackColor = System.Drawing.SystemColors.Window;
 			this.comboClinic.DroppedDown = false;
 			this.comboClinic.Items = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.Items")));
-			this.comboClinic.Location = new System.Drawing.Point(266, 61);
+			this.comboClinic.Location = new System.Drawing.Point(712, 37);
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboClinic.SelectedIndices")));
-			this.comboClinic.Size = new System.Drawing.Size(225, 21);
+			this.comboClinic.Size = new System.Drawing.Size(165, 21);
 			this.comboClinic.TabIndex = 154;
 			this.comboClinic.UseCommas = true;
 			this.comboClinic.Visible = false;
@@ -287,7 +277,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(887, 59);
+			this.butRefresh.Location = new System.Drawing.Point(887, 36);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 13;
@@ -313,10 +303,9 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
-			this.Controls.Add(this.gridMessageThread);
+			this.Controls.Add(this.smsThreadView);
 			this.Controls.Add(this.gridMessages);
-			this.Controls.Add(this.checkReceivedAndUnread);
-			this.Controls.Add(this.checkReceivedAndRead);
+			this.Controls.Add(this.checkRead);
 			this.Controls.Add(this.checkSent);
 			this.Controls.Add(this.butPatCurrent);
 			this.Controls.Add(this.butPatAll);
@@ -367,8 +356,8 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPatient;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.CheckBox checkSent;
-		private System.Windows.Forms.CheckBox checkReceivedAndRead;
-		private System.Windows.Forms.CheckBox checkReceivedAndUnread;
-		private UI.ODGrid gridMessageThread;
+		private System.Windows.Forms.CheckBox checkRead;
+		private CallFireService.SMSService smsService1;
+		private SmsThreadView smsThreadView;
 	}
 }

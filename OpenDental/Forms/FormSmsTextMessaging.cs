@@ -47,8 +47,7 @@ namespace OpenDental {
 				checkSent.Checked=true;
 			}
 			else {
-				checkReceivedAndRead.Checked=true;
-				checkReceivedAndUnread.Checked=true;
+				checkRead.Checked=true;
 			}
 			FillGridTextMessages();
 		}
@@ -68,16 +67,23 @@ namespace OpenDental {
 			gridMessages.Rows.Clear();
 			gridMessages.Columns.Clear();
 			gridMessages.Columns.Add(new UI.ODGridColumn("DateTime",140,HorizontalAlignment.Left));
+			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
 			gridMessages.Columns.Add(new UI.ODGridColumn("In or Out",80,HorizontalAlignment.Center));
+			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridMessages.Columns.Add(new UI.ODGridColumn("Status",90,HorizontalAlignment.Center));
+			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			if(checkHidden.Checked) {
 				gridMessages.Columns.Add(new UI.ODGridColumn("Hidden",44,HorizontalAlignment.Center));
+				gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			}
 			gridMessages.Columns.Add(new UI.ODGridColumn("Cost",32,HorizontalAlignment.Right));
+			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.AmountParse;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
 				gridMessages.Columns.Add(new UI.ODGridColumn("Clinic",130,HorizontalAlignment.Left));
+				gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			}
 			gridMessages.Columns.Add(new UI.ODGridColumn("Patient",150,HorizontalAlignment.Left));
+			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			List<long> listClinicNums=new List<long>();//Leaving this blank will cause the clinic filter to be ignored in SmsFromMobiles.GetMessages().
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
 				for(int i=0;i<comboClinic.SelectedIndices.Count;i++) {
@@ -86,11 +92,9 @@ namespace OpenDental {
 				}
 			}
 			List <SmsFromStatus> listSmsFromStatuses=new List<SmsFromStatus>();
-			if(checkReceivedAndRead.Checked) {
+			listSmsFromStatuses.Add(SmsFromStatus.ReceivedUnread);//Unread messages always show, unless we can later think of a reason why not.
+			if(checkRead.Checked) {
 				listSmsFromStatuses.Add(SmsFromStatus.ReceivedRead);
-			}
-			if(checkReceivedAndUnread.Checked) {
-				listSmsFromStatuses.Add(SmsFromStatus.ReceivedUnread);
 			}
 			DateTime dateFrom=PIn.Date(textDateFrom.Text);
 			DateTime dateTo=PIn.Date(textDateTo.Text);
@@ -181,13 +185,8 @@ namespace OpenDental {
 		}
 
 		private void FillGridMessageThread(long patNum) {
-			gridMessageThread.BeginUpdate();
-			gridMessageThread.Rows.Clear();
-			gridMessageThread.Columns.Clear();
-			gridMessageThread.Columns.Add(new UI.ODGridColumn("",0));//DateTime, for sorting.  Zero width, because invisible for now.
-			gridMessageThread.Columns.Add(new UI.ODGridColumn("",0));//Message
 			if(patNum==0) {
-				gridMessageThread.EndUpdate();
+				smsThreadView.ListSmsThreadMessages=null;
 				return;
 			}
 			List<long> listClinicNums=new List<long>();//Leaving this blank will cause the clinic filter to be ignored in SmsFromMobiles.GetMessages().
@@ -197,29 +196,30 @@ namespace OpenDental {
 					listClinicNums.Add(_listClinics[index].ClinicNum);
 				}
 			}
+			object selectedTag=null;
+			if(gridMessages.GetSelectedIndex()!=-1) {
+				selectedTag=gridMessages.Rows[gridMessages.GetSelectedIndex()].Tag;
+			}
+			List<SmsThreadMessage> listSmsThreadMessages=new List<SmsThreadMessage>();
 			List<SmsFromMobile> listSmsFromMobile=SmsFromMobiles.GetMessages(DateTime.MinValue,DateTime.MinValue,listClinicNums,patNum);
 			for(int i=0;i<listSmsFromMobile.Count;i++) {
-				UI.ODGridRow row=new UI.ODGridRow();
-				row.Cells.Add(listSmsFromMobile[i].DateTimeReceived.ToShortDateString());
-				row.Cells.Add(listSmsFromMobile[i].MsgText);
-				row.Bold=true;
-				gridMessageThread.Rows.Add(row);
+				bool isHighlighted=false;
+				if(selectedTag is SmsFromMobile	&& ((SmsFromMobile)selectedTag).SmsFromMobileNum==listSmsFromMobile[i].SmsFromMobileNum) {
+					isHighlighted=true;
+				}
+				listSmsThreadMessages.Add(new SmsThreadMessage(listSmsFromMobile[i].DateTimeReceived,listSmsFromMobile[i].MsgText,true,false,isHighlighted));
 			}
 			List<SmsToMobile> listSmsToMobile=SmsToMobiles.GetMessages(DateTime.MinValue,DateTime.MinValue,listClinicNums,patNum);
 			for(int i=0;i<listSmsToMobile.Count;i++) {
-				UI.ODGridRow row=new UI.ODGridRow();
-				row.Cells.Add(listSmsToMobile[i].DateTimeSent.ToShortDateString());
-				row.Cells.Add(listSmsToMobile[i].MsgText);
-				gridMessageThread.Rows.Add(row);
+				bool isHighlighted=false;
+				if(selectedTag is SmsToMobile	&& ((SmsToMobile)selectedTag).SmsToMobileNum==listSmsToMobile[i].SmsToMobileNum) {
+					isHighlighted=true;
+				}
+				listSmsThreadMessages.Add(new SmsThreadMessage(listSmsToMobile[i].DateTimeSent,
+					listSmsToMobile[i].MsgText,false,listSmsToMobile[i].IsTimeSensitive,isHighlighted));
 			}
-			gridMessageThread.EndUpdate();
-			gridMessageThread.SortForced(0,false);//Always sorted by datetime.
-			gridMessageThread.BeginUpdate();
-			gridMessageThread.Columns.RemoveAt(0);//Because we do not want the datetime to show, it was only used for sorting.
-			for(int i=0;i<gridMessageThread.Rows.Count;i++) {
-				gridMessageThread.Rows[i].Cells.RemoveAt(0);//Remove datetime.
-			}
-			gridMessageThread.EndUpdate();
+			listSmsThreadMessages.Sort(SmsThreadMessage.CompareMessages);
+			smsThreadView.ListSmsThreadMessages=listSmsThreadMessages;
 		}
 
 		private void butPatCurrent_Click(object sender,EventArgs e) {
