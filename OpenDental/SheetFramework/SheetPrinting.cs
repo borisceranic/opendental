@@ -15,7 +15,7 @@ namespace OpenDental {
 	public class SheetPrinting {
 		///<summary>If there is only one sheet, then this will stay 0.</Summary>
 		private static int _sheetsPrinted;
-		///<summary>Pages printed on current sheet. Only used for printing, not for generating PDFs.</summary>
+		///<summary>Pages printed on current sheet.</summary>
 		private static int _pagesPrinted;
 		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
 		private static int _yPosPrint;
@@ -599,8 +599,18 @@ namespace OpenDental {
 			}
 			drawHeader(sheet,null,g);
 			drawFooter(sheet,null,g);
-			//Set the _yPosPrint for the next page
+			#region Set variables for next page to be printed
 			_yPosPrint+=sheet.HeightPage-(_printMargin.Bottom+_printMargin.Top);//move _yPosPrint down equal to the amount of printable area per page.
+			_pagesPrinted++;
+			if(_pagesPrinted<Sheets.CalculatePageCount(sheet,_printMargin)) {
+				//More pages need to be created for this pdf.  Do not manipulate _yPosPrint and simply continue.
+			}
+			else {//we are printing the last page of the current sheet.
+				_yPosPrint=0;
+				_pagesPrinted=0;
+				_sheetsPrinted++;
+			}
+			#endregion
 		}
 
 		private static bool fieldOnCurPageHelper(SheetField field,Sheet sheet,Margins _printMargin,int _yPosPrint) {
