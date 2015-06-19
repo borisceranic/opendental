@@ -3448,6 +3448,9 @@ namespace OpenDental{
 				groupBox2.Height=54;
 				menuItemSetComplete.Visible=false;
 			}
+			if(!UsingEcwTightOrFull()) {
+				ChartLayoutHelper.SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
+			}
 			ToolBarMain.Invalidate();
 			ClearButtons();
 			FillChartViewsGrid();
@@ -5847,6 +5850,9 @@ namespace OpenDental{
 
 		///<summary>This is, of course, called when module refreshed.  But it's also called when user sets missing teeth or tooth movements.  In that case, the Progress notes are not refreshed, so it's a little faster.  This also fills in the movement amounts.</summary>
 		private void FillToothChart(bool retainSelection){
+			if(toothChart.Visible==false) {//if the tooth chart is not visible (for medical only feature), no need to fill with patient data
+				return;
+			}
 			Cursor=Cursors.WaitCursor;
 			toothChart.SuspendLayout();
 			toothChart.ColorBackground=DefC.Long[(int)DefCat.ChartGraphicColors][10].ItemColor;

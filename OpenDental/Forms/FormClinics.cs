@@ -143,6 +143,9 @@ namespace OpenDental{
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
 			Clinic ClinicCur=new Clinic();
+			if(PrefC.GetBool(PrefName.PracticeIsMedicalOnly)) {
+				ClinicCur.IsMedicalOnly=true;
+			}
 			FormClinicEdit FormCE=new FormClinicEdit(ClinicCur);
 			FormCE.IsNew=true;
 			FormCE.ShowDialog();

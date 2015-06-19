@@ -344,6 +344,8 @@ namespace OpenDentBusiness {
 		PracticeDefaultProv,
 		///<summary>In USA and Canada, enforced to be exactly 10 digits or blank.</summary>
 		PracticeFax,
+		///<summary>This preference is used to hide/change certain OD features, like hiding the tooth chart and changing 'dentist' to 'provider'.</summary>
+		PracticeIsMedicalOnly,
 		PracticePayToAddress,
 		PracticePayToAddress2,
 		PracticePayToCity,

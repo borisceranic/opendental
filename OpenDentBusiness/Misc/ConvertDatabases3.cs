@@ -8560,7 +8560,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProgramVersionLastUpdated ','')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProgramVersionLastUpdated','')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -8705,6 +8705,26 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD IsMedicalOnly tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD IsMedicalOnly number(3)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET IsMedicalOnly = 0 WHERE IsMedicalOnly IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY IsMedicalOnly NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PracticeIsMedicalOnly','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PracticeIsMedicalOnly','0')";
+					Db.NonQ(command);
+				}
 
 
 

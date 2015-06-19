@@ -39,6 +39,9 @@ namespace OpenDentBusiness{
 		public DateTime SmsContractDate;
 		///<summary>Always stored in USD, this is the desired limit for SMS out for a given month.</summary>
 		public double SmsMonthlyLimit;
+		///<summary>True if this clinic is a medical clinic.  Used to hide/change certain areas of Open Dental, like hiding the tooth chart and changing
+		///'dentist' to 'provider'.</summary>
+		public bool IsMedicalOnly;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

@@ -5360,6 +5360,7 @@ namespace OpenDental{
 			FormPractice FormPr=new FormPractice();
 			FormPr.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Practice Info");
+			RefreshCurrentModule();
 		}
 
 		private void menuItemProblems_Click(object sender,EventArgs e) {
@@ -5475,22 +5476,24 @@ namespace OpenDental{
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Default");
 		}*/
 
-		private void menuItemSecurity_Click(object sender, System.EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.SecurityAdmin)){
+		private void menuItemSecurity_Click(object sender,System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.SecurityAdmin)) {
 				return;
 			}
-			FormSecurity FormS=new FormSecurity(); 
+			FormSecurity FormS=new FormSecurity();
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"");
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					ClinicNum=Security.CurUser.ClinicNum;
-				}
-				Clinics.ClinicNum=ClinicNum;
-				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
-				RefreshMenuClinics();
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {//clinics not enabled, refresh current module and return
+				RefreshCurrentModule();
+				return;
 			}
-			RefreshCurrentModule();
+			//clinics is enabled
+			if(Security.CurUser.ClinicIsRestricted) {
+				ClinicNum=Security.CurUser.ClinicNum;
+			}
+			Clinics.ClinicNum=ClinicNum;
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			RefreshMenuClinics();//this calls ModuleSelected, so no need to call RefreshCurrentModule
 		}
 
 		private void menuItemSheets_Click(object sender,EventArgs e) {

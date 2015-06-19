@@ -15,6 +15,35 @@ namespace OpenDental {
 			return Programs.UsingEcwTightOrFullMode();
 		}
 
+		///<summary>If clinics are not enabled, this will return true if the pref PracticeIsMedicalOnly is true.
+		///If clinics are enabled, this will return true if either the headquarters 'clinic' is selected (FormOpenDental.ClinicNum=0) and the pref
+		///PracticeIsMedicalOnly is true OR if the currently selected clinic's IsMedicalOnly flag is true.  Otherwise returns false.</summary>
+		private static bool IsMedicalPracticeOrClinic() {
+			if(FormOpenDental.ClinicNum==0) {//either headquarters is selected or the clinics feature is not enabled, use practice pref
+				return PrefC.GetBool(PrefName.PracticeIsMedicalOnly);
+			}
+			Clinic clinicCur=Clinics.GetClinic(FormOpenDental.ClinicNum);
+			if(clinicCur!=null) {
+				return clinicCur.IsMedicalOnly;
+			}
+			return false;
+		}
+
+		///<summary>If medical only, this will hide the tooth chart and fill the space with the treatement notes text box.  Not for eCWTightOrFull.
+		///This is made public so that it can be called from ContrChart.</summary>
+		public static void SetToothChartVisibleHelper(ToothChartWrapper toothChart,RichTextBox textTreatmentNotes) {
+			if(IsMedicalPracticeOrClinic()) {
+				toothChart.Visible=false;
+				textTreatmentNotes.Location=new Point(0,toothChart.Top);
+				textTreatmentNotes.Height=toothChart.Height+72;//textTreatmentNotes height is 71, +1 for distance between toothChart and textTreatmentNotes
+			}
+			else {
+				toothChart.Visible=true;
+				textTreatmentNotes.Location=new Point(0,toothChart.Bottom+1);
+				textTreatmentNotes.Height=71;
+			}
+		}
+
 		public static void Resize(ODGrid gridProg,Panel panelImages,Panel panelEcw,TabControl tabControlImages,Size ClientSize,ODGrid gridPtInfo,ToothChartWrapper toothChart,RichTextBox textTreatmentNotes) {
 			if(ProgramC.HListIsNull()) {
 				return;
@@ -54,6 +83,9 @@ namespace OpenDental {
 					panelEcw.Height=tabControlImages.Top-panelEcw.Top+1;
 				}
 				return;
+			}
+			else {//the medical only logic to hide the tooth chart and dental buttons is not going to be used with eCW
+				SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
 			}
 			if(Programs.UsingOrion) {//full width
 				gridProg.Width=ClientSize.Width-gridProg.Location.X-1;
@@ -111,6 +143,7 @@ namespace OpenDental {
 				tabProc.Location=new Point(415,28);
 				gridProg.Location=new Point(415,tabProc.Bottom+2);
 				gridProg.Height=ClientSize.Height-gridProg.Location.Y-2;
+				SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
 			}
 			if(Programs.UsingOrion) {
 				textTreatmentNotes.Visible=false;

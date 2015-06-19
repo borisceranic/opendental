@@ -62,6 +62,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.DefaultProv        = PIn.Long  (table.Rows[i]["DefaultProv"].ToString());
 				clinic.SmsContractDate    = PIn.DateT (table.Rows[i]["SmsContractDate"].ToString());
 				clinic.SmsMonthlyLimit    = PIn.Double(table.Rows[i]["SmsMonthlyLimit"].ToString());
+				clinic.IsMedicalOnly      = PIn.Bool  (table.Rows[i]["IsMedicalOnly"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -102,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -121,7 +122,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (clinic.EmailAddressNum)+","
 				+    POut.Long  (clinic.DefaultProv)+","
 				+    POut.DateT (clinic.SmsContractDate)+","
-				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"')";
+				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
+				+    POut.Bool  (clinic.IsMedicalOnly)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -148,7 +150,8 @@ namespace OpenDentBusiness.Crud{
 				+"EmailAddressNum    =  "+POut.Long  (clinic.EmailAddressNum)+", "
 				+"DefaultProv        =  "+POut.Long  (clinic.DefaultProv)+", "
 				+"SmsContractDate    =  "+POut.DateT (clinic.SmsContractDate)+", "
-				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"' "
+				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"', "
+				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -215,6 +218,10 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.SmsMonthlyLimit != oldClinic.SmsMonthlyLimit) {
 				if(command!=""){ command+=",";}
 				command+="SmsMonthlyLimit = '"+POut.Double(clinic.SmsMonthlyLimit)+"'";
+			}
+			if(clinic.IsMedicalOnly != oldClinic.IsMedicalOnly) {
+				if(command!=""){ command+=",";}
+				command+="IsMedicalOnly = "+POut.Bool(clinic.IsMedicalOnly)+"";
 			}
 			if(command==""){
 				return false;

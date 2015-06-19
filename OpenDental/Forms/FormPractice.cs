@@ -65,6 +65,7 @@ namespace OpenDental{
 		private Label label17;
 		private TextBox textFax;
 		private Label label19;
+		private CheckBox checkIsMedicalOnly;
 		private System.Windows.Forms.GroupBox groupBox4;// Required designer variable.
 
 		///<summary></summary>
@@ -143,6 +144,7 @@ namespace OpenDental{
 			this.textPayToAddress = new System.Windows.Forms.TextBox();
 			this.label14 = new System.Windows.Forms.Label();
 			this.label15 = new System.Windows.Forms.Label();
+			this.checkIsMedicalOnly = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.groupSwiss.SuspendLayout();
@@ -154,14 +156,14 @@ namespace OpenDental{
 			// 
 			this.listBillType.Items.AddRange(new object[] {
             ""});
-			this.listBillType.Location = new System.Drawing.Point(629, 29);
+			this.listBillType.Location = new System.Drawing.Point(629, 30);
 			this.listBillType.Name = "listBillType";
 			this.listBillType.Size = new System.Drawing.Size(160, 147);
 			this.listBillType.TabIndex = 5;
 			// 
 			// label12
 			// 
-			this.label12.Location = new System.Drawing.Point(628, 9);
+			this.label12.Location = new System.Drawing.Point(628, 10);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(154, 17);
 			this.label12.TabIndex = 29;
@@ -170,7 +172,7 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(491, 9);
+			this.label10.Location = new System.Drawing.Point(491, 10);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(110, 16);
 			this.label10.TabIndex = 26;
@@ -181,14 +183,14 @@ namespace OpenDental{
 			// 
 			this.listProvider.Items.AddRange(new object[] {
             ""});
-			this.listProvider.Location = new System.Drawing.Point(492, 29);
+			this.listProvider.Location = new System.Drawing.Point(492, 30);
 			this.listProvider.Name = "listProvider";
 			this.listProvider.Size = new System.Drawing.Size(129, 147);
 			this.listProvider.TabIndex = 4;
 			// 
 			// textBankNumber
 			// 
-			this.textBankNumber.Location = new System.Drawing.Point(144, 478);
+			this.textBankNumber.Location = new System.Drawing.Point(144, 479);
 			this.textBankNumber.Multiline = true;
 			this.textBankNumber.Name = "textBankNumber";
 			this.textBankNumber.Size = new System.Drawing.Size(317, 49);
@@ -196,7 +198,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(26, 477);
+			this.label4.Location = new System.Drawing.Point(26, 478);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(117, 31);
 			this.label4.TabIndex = 22;
@@ -218,7 +220,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.label6);
 			this.groupBox2.Controls.Add(this.label9);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(41, 58);
+			this.groupBox2.Location = new System.Drawing.Point(41, 68);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(429, 130);
 			this.groupBox2.TabIndex = 1;
@@ -323,14 +325,14 @@ namespace OpenDental{
 			// 
 			// textPracticeTitle
 			// 
-			this.textPracticeTitle.Location = new System.Drawing.Point(144, 29);
+			this.textPracticeTitle.Location = new System.Drawing.Point(144, 39);
 			this.textPracticeTitle.Name = "textPracticeTitle";
 			this.textPracticeTitle.Size = new System.Drawing.Size(317, 20);
 			this.textPracticeTitle.TabIndex = 0;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(50, 24);
+			this.label3.Location = new System.Drawing.Point(50, 34);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(96, 28);
 			this.label3.TabIndex = 19;
@@ -338,7 +340,7 @@ namespace OpenDental{
 			// 
 			// labelPlaceService
 			// 
-			this.labelPlaceService.Location = new System.Drawing.Point(490, 185);
+			this.labelPlaceService.Location = new System.Drawing.Point(490, 186);
 			this.labelPlaceService.Name = "labelPlaceService";
 			this.labelPlaceService.Size = new System.Drawing.Size(156, 18);
 			this.labelPlaceService.TabIndex = 44;
@@ -347,7 +349,7 @@ namespace OpenDental{
 			// 
 			// listPlaceService
 			// 
-			this.listPlaceService.Location = new System.Drawing.Point(492, 206);
+			this.listPlaceService.Location = new System.Drawing.Point(492, 207);
 			this.listPlaceService.Name = "listPlaceService";
 			this.listPlaceService.Size = new System.Drawing.Size(145, 160);
 			this.listPlaceService.TabIndex = 45;
@@ -359,7 +361,7 @@ namespace OpenDental{
 			this.groupBox4.Controls.Add(this.radioInsBillingProvTreat);
 			this.groupBox4.Controls.Add(this.radioInsBillingProvDefault);
 			this.groupBox4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox4.Location = new System.Drawing.Point(649, 200);
+			this.groupBox4.Location = new System.Drawing.Point(649, 201);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(235, 104);
 			this.groupBox4.TabIndex = 50;
@@ -409,7 +411,7 @@ namespace OpenDental{
 			this.groupSwiss.Controls.Add(this.label2);
 			this.groupSwiss.Controls.Add(this.textBankRouting);
 			this.groupSwiss.Controls.Add(this.label1);
-			this.groupSwiss.Location = new System.Drawing.Point(492, 381);
+			this.groupSwiss.Location = new System.Drawing.Point(492, 382);
 			this.groupSwiss.Name = "groupSwiss";
 			this.groupSwiss.Size = new System.Drawing.Size(392, 146);
 			this.groupSwiss.TabIndex = 51;
@@ -463,7 +465,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label8);
 			this.groupBox1.Controls.Add(this.label11);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(41, 194);
+			this.groupBox1.Location = new System.Drawing.Point(41, 204);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(429, 140);
 			this.groupBox1.TabIndex = 52;
@@ -595,7 +597,7 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.label14);
 			this.groupBox3.Controls.Add(this.label15);
 			this.groupBox3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox3.Location = new System.Drawing.Point(41, 341);
+			this.groupBox3.Location = new System.Drawing.Point(41, 350);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(429, 122);
 			this.groupBox3.TabIndex = 53;
@@ -673,10 +675,21 @@ namespace OpenDental{
 			this.label15.Text = "City, ST, Zip";
 			this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// checkIsMedicalOnly
+			// 
+			this.checkIsMedicalOnly.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsMedicalOnly.Location = new System.Drawing.Point(12, 12);
+			this.checkIsMedicalOnly.Name = "checkIsMedicalOnly";
+			this.checkIsMedicalOnly.Size = new System.Drawing.Size(146, 16);
+			this.checkIsMedicalOnly.TabIndex = 165;
+			this.checkIsMedicalOnly.Text = "Practice is Medical";
+			this.checkIsMedicalOnly.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormPractice
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(892, 596);
+			this.Controls.Add(this.checkIsMedicalOnly);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.groupSwiss);
@@ -718,6 +731,10 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPractice_Load(object sender, System.EventArgs e) {
+			checkIsMedicalOnly.Checked=PrefC.GetBool(PrefName.PracticeIsMedicalOnly);
+			if(Programs.UsingEcwTightOrFullMode()) {
+				checkIsMedicalOnly.Visible=false;
+			}
 			textPracticeTitle.Text=PrefC.GetString(PrefName.PracticeTitle);
 			textAddress.Text=PrefC.GetString(PrefName.PracticeAddress);
 			textAddress2.Text=PrefC.GetString(PrefName.PracticeAddress2);
@@ -864,7 +881,8 @@ namespace OpenDental{
 				return;
 			}
 			bool changed=false;
-			if( Prefs.UpdateString(PrefName.PracticeTitle,textPracticeTitle.Text)
+			if( Prefs.UpdateBool(PrefName.PracticeIsMedicalOnly,checkIsMedicalOnly.Checked)
+				| Prefs.UpdateString(PrefName.PracticeTitle,textPracticeTitle.Text)
 				| Prefs.UpdateString(PrefName.PracticeAddress,textAddress.Text)
 				| Prefs.UpdateString(PrefName.PracticeAddress2,textAddress2.Text)
 				| Prefs.UpdateString(PrefName.PracticeCity,textCity.Text)
