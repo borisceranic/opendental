@@ -26,6 +26,23 @@ namespace OpenDental {
 		/////<summary>Used to force old single page behavior. Used for labels.</summary>
 		//private static bool _forceSinglePage;
 
+		///<summary>The treatment finder needs to be able to clear out the pages printed variable before it prints a batch.</summary>
+		public static int PagesPrinted {
+			get {
+				return _pagesPrinted;
+			}
+			set {
+				_pagesPrinted=value;
+			}
+		}
+
+		///<summary>The treatment finder needs this so that it can use the same Margins in its page calculations.</summary>
+		public static Margins PrintMargin {
+			get {
+				return _printMargin;
+			}
+		}
+
 		///<summary>Surround with try/catch.</summary>
 		public static void PrintBatch(List<Sheet> sheetBatch){
 			//currently no validation for parameters in a batch because of the way it was created.

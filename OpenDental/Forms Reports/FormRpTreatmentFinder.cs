@@ -681,18 +681,20 @@ namespace OpenDental{
 			Sheet sheet=null;
 			for(int i=0;i<FormS.SelectedSheetDefs.Count;i++) {
 				PdfDocument document=new PdfDocument();
-				FormSheetFillEdit FormSF=null;
 				PdfPage page=new PdfPage();
 				string filePathAndName="";
 				for(int j=0;j<gridMain.SelectedIndices.Length;j++) {
-					page=document.AddPage();
 					sheetDef=FormS.SelectedSheetDefs[i];
 					sheet=SheetUtil.CreateSheet(sheetDef,PIn.Long(table.Rows[gridMain.SelectedIndices[j]]["PatNum"].ToString()));
 					SheetParameter.SetParameter(sheet,"PatNum",PIn.Long(table.Rows[gridMain.SelectedIndices[j]]["PatNum"].ToString()));
 					SheetFiller.FillFields(sheet);
 					SheetUtil.CalculateHeights(sheet,this.CreateGraphics());
-					FormSF=new FormSheetFillEdit(sheet);
-					SheetPrinting.CreatePdfPage(sheet,page);
+					SheetPrinting.PagesPrinted=0;//Clear out the pages printed variable before printing all pages for this sheet.
+					int pageCount=Sheets.CalculatePageCount(sheet,SheetPrinting.PrintMargin);
+					for(int k=0;k<pageCount;k++) {
+						page=document.AddPage();
+						SheetPrinting.CreatePdfPage(sheet,page);
+					}
 				}
 				filePathAndName=Path.ChangeExtension(Path.GetTempFileName(),".pdf");
 				document.Save(filePathAndName);
