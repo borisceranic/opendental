@@ -1864,7 +1864,11 @@ namespace OpenDental{
 			//any other TP
 			ProcTP procT=(ProcTP)gridMain.Rows[e.Row].Tag;
 			DateTime dateTP=PlanList[gridPlans.SelectedIndices[0]-1].DateTP;
-			FormProcTPEdit FormP=new FormProcTPEdit(procT,dateTP);
+			bool isSigned=false;
+			if(PlanList[gridPlans.SelectedIndices[0]-1].Signature!="") {
+				isSigned=true;
+			}
+			FormProcTPEdit FormP=new FormProcTPEdit(procT,dateTP,isSigned);
 			FormP.ShowDialog();
 			if(FormP.DialogResult==DialogResult.Cancel){
 				return;
