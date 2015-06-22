@@ -345,6 +345,7 @@ namespace OpenDental{
 		private Color COLOR_ESERVICE_ERROR_TEXT=Color.OrangeRed;
 		///<summary>A specific reference to the "Text" button.  This special reference helps us preserve the notification text on the button after setup is modified.</summary>
 		private ODToolBarButton _butText;
+		private string _showForm="";
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -2340,7 +2341,6 @@ namespace OpenDental{
 				Clinics.ClinicNum=ClinicNum;
 				RefreshMenuClinics();
 			}
-			SetModuleSelected();
 			Cursor=Cursors.Default;
 			if(myOutlookBar.SelectedIndex==-1){
 				MsgBox.Show(this,"You do not have permission to use any modules.");
@@ -2422,6 +2422,20 @@ namespace OpenDental{
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
 			StartEServiceMonitoring();
+			Patient pat=Patients.GetPat(CurPatNum);
+			if(pat!=null && (_showForm=="popup" || _showForm=="popups") && myOutlookBar.SelectedIndex!=-1) {
+				FormPopupsForFam FormP=new FormPopupsForFam();
+				FormP.PatCur=pat;
+				FormP.ShowDialog();
+			}
+			bool isApptModuleSelected=false;
+			if(myOutlookBar.SelectedIndex==0){
+				isApptModuleSelected=true;
+			}
+			if(CurPatNum!=0 && _showForm=="apptsforpatient" && isApptModuleSelected) {
+				FormApptsOther FormA=new FormApptsOther(CurPatNum);
+				FormA.ShowDialog();
+			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -6228,6 +6242,7 @@ namespace OpenDental{
 		public void ProcessCommandLine(string[] args) {
 			//if(!Programs.UsingEcwTight() && args.Length==0){
 			if(!Programs.UsingEcwTightOrFullMode() && args.Length==0){//May have to modify to accept from other sw.
+				SetModuleSelected();
 				return;
 			}
 			/*string descript="";
@@ -6255,6 +6270,16 @@ namespace OpenDental{
 			string jSessionId = "";
 			string jSessionIdSSO = "";
 			string lbSessionId="";
+			Dictionary<string,int> dictModules=new Dictionary<string,int>();
+			dictModules.Add("appt",0);
+			dictModules.Add("family",1);
+			dictModules.Add("account",2);
+			dictModules.Add("txplan",3);
+			dictModules.Add("treatplan",3);
+			dictModules.Add("chart",4);
+			dictModules.Add("images",5);
+			dictModules.Add("manage",6);
+			int startingModuleIdx=-1;
 			for(int i=0;i<args.Length;i++) {
 				if(args[i].StartsWith("PatNum=") && args[i].Length>7) {
 					string patNumStr=args[i].Substring(7).Trim('"');
@@ -6296,6 +6321,15 @@ namespace OpenDental{
 				}
 				if(args[i].StartsWith("LBSESSIOINID=") && args[i].Length>12) {
 					lbSessionId=args[i].Substring(12).Trim('"');
+				}
+				if(args[i].ToLower().StartsWith("module=") && args[i].Length>7) {
+					string moduleName=args[i].Substring(7).Trim('"').ToLower();
+					if(dictModules.ContainsKey(moduleName)) {
+						startingModuleIdx=dictModules[moduleName];
+					}
+				}
+				if(args[i].ToLower().StartsWith("show=") && args[i].Length>5) {
+					_showForm=args[i].Substring(5).Trim('"').ToLower();//Currently only looks for "Popup" and "ApptsForPatient"
 				}
 			}
 			if(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsLBSessionIdExcluded")=="1" //if check box in Program Links is checked
@@ -6392,6 +6426,13 @@ namespace OpenDental{
 					MsgBox.Show(this,"You do not have permission to use any modules.");
 				}
 			}
+			if(startingModuleIdx!=-1 && startingModuleIdx==Security.GetModule(startingModuleIdx)) {
+				UnselectActive();
+				allNeutral();//Sets all controls to false.  Needed to set the new module as selected.
+				myOutlookBar.SelectedIndex=startingModuleIdx;
+				myOutlookBar.Invalidate();
+			}
+			SetModuleSelected();
 			//patient id----------------------------------------------------------------
 			if(patNum!=0) {
 				Patient pat=Patients.GetPat(patNum);
@@ -6433,6 +6474,9 @@ namespace OpenDental{
 					RefreshCurrentModule();
 					FillPatientButton(pat);
 				}
+			}
+			else{
+					FillPatientButton(null);
 			}
 		}
 
