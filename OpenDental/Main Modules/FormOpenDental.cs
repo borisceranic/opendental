@@ -6426,7 +6426,10 @@ namespace OpenDental{
 					MsgBox.Show(this,"You do not have permission to use any modules.");
 				}
 			}
-			if(startingModuleIdx!=-1 && startingModuleIdx==Security.GetModule(startingModuleIdx)) {
+			if(startingModuleIdx!=-1//A starting module was requested
+				&& startingModuleIdx==Security.GetModule(startingModuleIdx)//and the user has access to the specified module
+				&& myOutlookBar.Buttons[startingModuleIdx].Visible)//and the module is an available option (ex would not be availble for eCW tight/full).
+			{
 				UnselectActive();
 				allNeutral();//Sets all controls to false.  Needed to set the new module as selected.
 				myOutlookBar.SelectedIndex=startingModuleIdx;
