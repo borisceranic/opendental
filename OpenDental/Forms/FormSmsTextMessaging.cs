@@ -142,7 +142,7 @@ namespace OpenDental {
 					row.Tag=listSmsToMobile[i];
 					row.Cells.Add(listSmsToMobile[i].DateTimeSent.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Sent"));//Type
-					row.Cells.Add(listSmsToMobile[i].Status.ToString());//Status
+					row.Cells.Add(listSmsToMobile[i].SmsStatus.ToString());//Status
 					if(checkHidden.Checked) {
 						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
 					}
