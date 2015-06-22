@@ -777,14 +777,7 @@ namespace OpenDental.UI {
 			}
 			ComputeColumns();//it's only here because I can't figure out how to do it when columns are added. It will be removed.
 			Bitmap doubleBuffer=new Bitmap(Width,Height,e.Graphics);
-			using(Graphics g=Graphics.FromImage(doubleBuffer)) 
-			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold))
-			{
-				if(_hasMultilineHeaders) {
-					foreach(ODGridColumn column in columns){
-						headerHeight=Math.Max(headerHeight,Convert.ToInt32(g.MeasureString(column.Heading,headerFont).Height));
-					}
-				}
+			using(Graphics g=Graphics.FromImage(doubleBuffer)) {
 				g.SmoothingMode=SmoothingMode.HighQuality;//for the up/down triangles
 				//g.TextRenderingHint=TextRenderingHint.AntiAlias;//for accurate string measurements. Didn't work
 				//g.TextRenderingHint=TextRenderingHint.SingleBitPerPixelGridFit;
@@ -794,6 +787,21 @@ namespace OpenDental.UI {
 				DrawTitleAndHeaders(g);//this will draw on top of any grid stuff
 				DrawOutline(g);
 				e.Graphics.DrawImageUnscaled(doubleBuffer,0,0);
+			}
+			doubleBuffer.Dispose();
+			doubleBuffer=null;
+		}
+
+		private void setHeaderHeightHelper() {
+			if(!_hasMultilineHeaders) {
+				return;
+			}
+			Bitmap doubleBuffer=new Bitmap(Width,Height);
+			using(Graphics g=Graphics.FromImage(doubleBuffer))
+			using(Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold)) {				
+				foreach(ODGridColumn column in columns) {
+					headerHeight=Math.Max(headerHeight,Convert.ToInt32(g.MeasureString(column.Heading,headerFont).Height+2));
+				}				
 			}
 			doubleBuffer.Dispose();
 			doubleBuffer=null;
@@ -1074,9 +1082,16 @@ namespace OpenDental.UI {
 							-hScroll.Value+1+ColPos[i]+1,titleHeight+headerHeight-2);
 					}
 					format.Alignment=StringAlignment.Center;
+					float verticalAdjust=0;
+					if(_hasMultilineHeaders) {
+						verticalAdjust=(headerHeight-g.MeasureString(columns[i].Heading,headerFont).Height)/2;//usually 0
+					}
+					if(verticalAdjust>2) {
+						verticalAdjust-=2;//text looked too low. This shifts the text up a little for any of the non-multiline headers.
+					}
 					g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
 						-hScroll.Value+ColPos[i]+columns[i].ColWidth/2,
-						titleHeight+2,
+						titleHeight+2+verticalAdjust,
 						format);
 					if(sortedByColumnIdx==i) {
 						PointF p=new PointF(-hScroll.Value+1+ColPos[i]+6,titleHeight+(float)headerHeight/2f);
@@ -2205,6 +2220,7 @@ namespace OpenDental.UI {
 
 		#region Scrolling
 		private void LayoutScrollBars() {
+			setHeaderHeightHelper();
 			vScroll.Location=new Point(this.Width-vScroll.Width-1,titleHeight+headerHeight+1);
 			if(this.hScrollVisible) {
 				hScroll.Visible=true;
