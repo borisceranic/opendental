@@ -602,7 +602,7 @@ namespace OpenDental{
       //ALpatFilter.Add("PriRelationship"); 
       //ALpatFilter.Add("RecallInterval"); 
       ALpatFilter.Add("RecallStatus");
-			ALpatFilter.Add("Referred From Dentist");//new, need to add functionality
+			ALpatFilter.Add("Referred From Provider");//new, need to add functionality
 			ALpatFilter.Add("Referred From Patient");//new, need to add functionality 
       ALpatFilter.Add("Salutation"); 
       //ALpatFilter.Add("Secondary Carrier");
@@ -995,10 +995,10 @@ namespace OpenDental{
           labelHelp.Visible=true;
           labelHelp.Text="Type in Name of Insurance Company";
           break;
-        case "Referred From Dentist":
+        case "Referred From Provider":
           labelHelp.Visible=true;
           SetTextBoxConditions();
-          labelHelp.Text="Type in last name of dentist"; 
+          labelHelp.Text="Type in last name of provider"; 
  					break;    		
         case "Referred From Patient":
           SetTextBoxConditions();
@@ -1181,7 +1181,7 @@ namespace OpenDental{
 					}
           UsingInsPlans[UsingInsPlans.Count-1]=true;
 				}//	end	else if(DropListFilter.SelectedItem.ToString()=="Secondary Carrier"){
-				else if(DropListFilter.SelectedItem.ToString()=="Referred From Dentist"){
+				else if(DropListFilter.SelectedItem.ToString()=="Referred From Provider"){
 					if(ListConditions.SelectedIndex==0){
 					  ListPrerequisites.Items.Add("referral.patnum=0 AND referral.LName LIKE '%" +TextBox.Text+"%'");    
 					}

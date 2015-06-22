@@ -193,7 +193,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableOperatories","Clinic"),80);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableOperatories","Dentist"),70);
+			col=new ODGridColumn(Lan.g("TableOperatories","Provider"),70);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableOperatories","Hygienist"),70);
 			gridMain.Columns.Add(col);

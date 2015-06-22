@@ -847,7 +847,7 @@ namespace OpenDental {
 			this.butProvDentist.Name = "butProvDentist";
 			this.butProvDentist.Size = new System.Drawing.Size(73, 22);
 			this.butProvDentist.TabIndex = 91;
-			this.butProvDentist.Text = "Dentists";
+			this.butProvDentist.Text = "Providers";
 			this.butProvDentist.Click += new System.EventHandler(this.butProvDentist_Click);
 			// 
 			// butProvPick
@@ -1100,6 +1100,7 @@ namespace OpenDental {
 			this.gridWaiting.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridWaiting.HasMultilineHeaders = false;
 			this.gridWaiting.HScrollVisible = false;
 			this.gridWaiting.Location = new System.Drawing.Point(0, 0);
 			this.gridWaiting.Margin = new System.Windows.Forms.Padding(0);
@@ -1126,6 +1127,7 @@ namespace OpenDental {
 			this.gridEmpSched.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridEmpSched.HasMultilineHeaders = false;
 			this.gridEmpSched.HScrollVisible = true;
 			this.gridEmpSched.Location = new System.Drawing.Point(0, 0);
 			this.gridEmpSched.Margin = new System.Windows.Forms.Padding(0);

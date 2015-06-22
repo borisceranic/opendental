@@ -401,6 +401,8 @@ namespace OpenDental{
 			this.textPlan = new System.Windows.Forms.TextBox();
 			this.label21 = new System.Windows.Forms.Label();
 			this.groupOrtho = new System.Windows.Forms.GroupBox();
+			this.textOrthoTotalM = new OpenDental.ValidNum();
+			this.label96 = new System.Windows.Forms.Label();
 			this.textOrthoDate = new OpenDental.ValidDate();
 			this.labelOrthoDate = new System.Windows.Forms.Label();
 			this.textOrthoRemainM = new OpenDental.ValidNum();
@@ -666,8 +668,6 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butPickProvBill = new OpenDental.UI.Button();
 			this.butPickProvTreat = new OpenDental.UI.Button();
-			this.textOrthoTotalM = new OpenDental.ValidNum();
-			this.label96 = new System.Windows.Forms.Label();
 			this.groupProsth.SuspendLayout();
 			this.groupOrtho.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -698,7 +698,7 @@ namespace OpenDental{
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(94, 15);
 			this.label3.TabIndex = 2;
-			this.label3.Text = "Billing Dentist";
+			this.label3.Text = "Billing Provider";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label6
@@ -875,7 +875,7 @@ namespace OpenDental{
 			this.label21.Name = "label21";
 			this.label21.Size = new System.Drawing.Size(102, 15);
 			this.label21.TabIndex = 93;
-			this.label21.Text = "Treating Dentist";
+			this.label21.Text = "Treating Provider";
 			this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// groupOrtho
@@ -895,6 +895,24 @@ namespace OpenDental{
 			this.groupOrtho.TabIndex = 11;
 			this.groupOrtho.TabStop = false;
 			this.groupOrtho.Text = "Ortho";
+			// 
+			// textOrthoTotalM
+			// 
+			this.textOrthoTotalM.Location = new System.Drawing.Point(115, 58);
+			this.textOrthoTotalM.MaxVal = 255;
+			this.textOrthoTotalM.MinVal = 0;
+			this.textOrthoTotalM.Name = "textOrthoTotalM";
+			this.textOrthoTotalM.Size = new System.Drawing.Size(39, 20);
+			this.textOrthoTotalM.TabIndex = 105;
+			// 
+			// label96
+			// 
+			this.label96.Location = new System.Drawing.Point(2, 59);
+			this.label96.Name = "label96";
+			this.label96.Size = new System.Drawing.Size(112, 18);
+			this.label96.TabIndex = 106;
+			this.label96.Text = "Months Total";
+			this.label96.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textOrthoDate
 			// 
@@ -3424,6 +3442,7 @@ namespace OpenDental{
 			// 
 			// gridPay
 			// 
+			this.gridPay.HasMultilineHeaders = false;
 			this.gridPay.HScrollVisible = false;
 			this.gridPay.Location = new System.Drawing.Point(2, 389);
 			this.gridPay.Name = "gridPay";
@@ -3454,6 +3473,7 @@ namespace OpenDental{
 			// 
 			// gridProc
 			// 
+			this.gridProc.HasMultilineHeaders = false;
 			this.gridProc.HScrollVisible = false;
 			this.gridProc.Location = new System.Drawing.Point(2, 159);
 			this.gridProc.Name = "gridProc";
@@ -3674,24 +3694,6 @@ namespace OpenDental{
 			this.butPickProvTreat.TabIndex = 262;
 			this.butPickProvTreat.Text = "...";
 			this.butPickProvTreat.Click += new System.EventHandler(this.butPickProvTreat_Click);
-			// 
-			// textOrthoTotalM
-			// 
-			this.textOrthoTotalM.Location = new System.Drawing.Point(115, 58);
-			this.textOrthoTotalM.MaxVal = 255;
-			this.textOrthoTotalM.MinVal = 0;
-			this.textOrthoTotalM.Name = "textOrthoTotalM";
-			this.textOrthoTotalM.Size = new System.Drawing.Size(39, 20);
-			this.textOrthoTotalM.TabIndex = 105;
-			// 
-			// label96
-			// 
-			this.label96.Location = new System.Drawing.Point(2, 59);
-			this.label96.Name = "label96";
-			this.label96.Size = new System.Drawing.Size(112, 18);
-			this.label96.TabIndex = 106;
-			this.label96.Text = "Months Total";
-			this.label96.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormClaimEdit
 			// 

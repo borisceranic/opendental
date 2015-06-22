@@ -394,7 +394,7 @@ namespace OpenDental{
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(98, 16);
 			this.label2.TabIndex = 126;
-			this.label2.Text = "Dentist";
+			this.label2.Text = "Provider";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelApptNote
@@ -1813,7 +1813,7 @@ namespace OpenDental{
 
 		private void butAdd_Click(object sender,EventArgs e) {
 			if(comboProvNum.SelectedIndex==-1) {
-				MsgBox.Show(this,"Please select a dentist.");
+				MsgBox.Show(this,"Please select a provider.");
 				return;
 			}
 			FormProcCodes FormP=new FormProcCodes();
@@ -2155,7 +2155,7 @@ namespace OpenDental{
 
 		private void listQuickAdd_MouseDown(object sender,System.Windows.Forms.MouseEventArgs e) {
 			if(comboProvNum.SelectedIndex==-1){
-				MsgBox.Show(this,"Please select a dentist.");
+				MsgBox.Show(this,"Please select a provider.");
 				return;
 			}
 			if(listQuickAdd.IndexFromPoint(e.X,e.Y)==-1) {
@@ -3197,7 +3197,7 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(comboProvNum.SelectedIndex==-1) {
-				MsgBox.Show(this,"Please select a dentist.");
+				MsgBox.Show(this,"Please select a provider.");
 				return;
 			}
 			if(!UpdateToDB()){

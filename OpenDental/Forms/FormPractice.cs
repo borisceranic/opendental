@@ -336,7 +336,7 @@ namespace OpenDental{
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(96, 28);
 			this.label3.TabIndex = 19;
-			this.label3.Text = "Dentist Name or Practice Title";
+			this.label3.Text = "Provider Name or Practice Title";
 			// 
 			// labelPlaceService
 			// 
@@ -366,7 +366,7 @@ namespace OpenDental{
 			this.groupBox4.Size = new System.Drawing.Size(235, 104);
 			this.groupBox4.TabIndex = 50;
 			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Default Insurance Billing Dentist";
+			this.groupBox4.Text = "Default Insurance Billing Provider";
 			// 
 			// comboInsBillingProv
 			// 

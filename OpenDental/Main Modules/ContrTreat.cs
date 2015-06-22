@@ -2363,7 +2363,7 @@ namespace OpenDental{
 				MigraDocHelper.InsertSpacer(section,15);
 				par=section.AddParagraph();
 				par.Format.Alignment=ParagraphAlignment.Center;
-				par.AddFormattedText(Lan.g(this,"Family Dental Insurance Benefits"),totalFontx);
+				par.AddFormattedText(Lan.g(this,"Family Insurance Benefits"),totalFontx);
 				MigraDocHelper.InsertSpacer(section,2);
 				MigraDocHelper.DrawGrid(section,gridFamIns);
 				gridFamIns.Dispose();
@@ -2420,7 +2420,7 @@ namespace OpenDental{
 				MigraDocHelper.InsertSpacer(section,15);
 				par=section.AddParagraph();
 				par.Format.Alignment=ParagraphAlignment.Center;
-				par.AddFormattedText(Lan.g(this,"Individual Dental Insurance Benefits"),totalFontx);
+				par.AddFormattedText(Lan.g(this,"Individual Insurance Benefits"),totalFontx);
 				MigraDocHelper.InsertSpacer(section,2);
 				MigraDocHelper.DrawGrid(section,gridIns);
 				gridIns.Dispose();

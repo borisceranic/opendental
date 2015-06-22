@@ -291,7 +291,7 @@ namespace OpenDental{
 			this.groupBox4.Size = new System.Drawing.Size(262, 101);
 			this.groupBox4.TabIndex = 11;
 			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Default Insurance Billing Dentist";
+			this.groupBox4.Text = "Default Insurance Billing Provider";
 			// 
 			// butPickInsBillingProv
 			// 

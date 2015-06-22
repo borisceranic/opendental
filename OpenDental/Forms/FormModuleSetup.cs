@@ -219,6 +219,7 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.checkGoogleAddress = new System.Windows.Forms.CheckBox();
 			this.checkInsPPOsecWriteoffs = new System.Windows.Forms.CheckBox();
 			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
 			this.checkInsDefaultAssignmentOfBenefits = new System.Windows.Forms.CheckBox();
@@ -275,7 +276,6 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkGoogleAddress = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -366,7 +366,7 @@ namespace OpenDental{
 			this.checkClaimFormTreatDentSaysSigOnFile.Name = "checkClaimFormTreatDentSaysSigOnFile";
 			this.checkClaimFormTreatDentSaysSigOnFile.Size = new System.Drawing.Size(381, 17);
 			this.checkClaimFormTreatDentSaysSigOnFile.TabIndex = 197;
-			this.checkClaimFormTreatDentSaysSigOnFile.Text = "Claim Form treating dentist shows Signature On File rather than name";
+			this.checkClaimFormTreatDentSaysSigOnFile.Text = "Claim Form treating provider shows Signature On File rather than name";
 			this.checkClaimFormTreatDentSaysSigOnFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textClaimAttachPath
@@ -948,6 +948,17 @@ namespace OpenDental{
 			this.tabFamily.Size = new System.Drawing.Size(466, 479);
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
+			// 
+			// checkGoogleAddress
+			// 
+			this.checkGoogleAddress.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkGoogleAddress.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkGoogleAddress.Location = new System.Drawing.Point(58, 200);
+			this.checkGoogleAddress.Name = "checkGoogleAddress";
+			this.checkGoogleAddress.Size = new System.Drawing.Size(382, 18);
+			this.checkGoogleAddress.TabIndex = 215;
+			this.checkGoogleAddress.Text = "Show Google Maps in patient edit";
+			this.checkGoogleAddress.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkInsPPOsecWriteoffs
 			// 
@@ -1602,17 +1613,6 @@ namespace OpenDental{
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// checkGoogleAddress
-			// 
-			this.checkGoogleAddress.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkGoogleAddress.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkGoogleAddress.Location = new System.Drawing.Point(58, 200);
-			this.checkGoogleAddress.Name = "checkGoogleAddress";
-			this.checkGoogleAddress.Size = new System.Drawing.Size(382, 18);
-			this.checkGoogleAddress.TabIndex = 215;
-			this.checkGoogleAddress.Text = "Show Google Maps in patient edit";
-			this.checkGoogleAddress.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 

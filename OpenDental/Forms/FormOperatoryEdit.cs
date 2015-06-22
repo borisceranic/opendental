@@ -92,34 +92,34 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(9,21);
+			this.label1.Location = new System.Drawing.Point(9, 21);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(148,17);
+			this.label1.Size = new System.Drawing.Size(148, 17);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Op Name";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textOpName
 			// 
-			this.textOpName.Location = new System.Drawing.Point(160,20);
+			this.textOpName.Location = new System.Drawing.Point(160, 20);
 			this.textOpName.MaxLength = 255;
 			this.textOpName.Name = "textOpName";
-			this.textOpName.Size = new System.Drawing.Size(241,20);
+			this.textOpName.Size = new System.Drawing.Size(241, 20);
 			this.textOpName.TabIndex = 0;
 			// 
 			// textAbbrev
 			// 
-			this.textAbbrev.Location = new System.Drawing.Point(160,40);
+			this.textAbbrev.Location = new System.Drawing.Point(160, 40);
 			this.textAbbrev.MaxLength = 5;
 			this.textAbbrev.Name = "textAbbrev";
-			this.textAbbrev.Size = new System.Drawing.Size(78,20);
+			this.textAbbrev.Size = new System.Drawing.Size(78, 20);
 			this.textAbbrev.TabIndex = 1;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(8,43);
+			this.label2.Location = new System.Drawing.Point(8, 43);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(151,17);
+			this.label2.Size = new System.Drawing.Size(151, 17);
 			this.label2.TabIndex = 99;
 			this.label2.Text = "Abbrev (max 5 char)";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -128,9 +128,9 @@ namespace OpenDental{
 			// 
 			this.checkIsHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsHidden.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsHidden.Location = new System.Drawing.Point(69,63);
+			this.checkIsHidden.Location = new System.Drawing.Point(69, 63);
 			this.checkIsHidden.Name = "checkIsHidden";
-			this.checkIsHidden.Size = new System.Drawing.Size(104,16);
+			this.checkIsHidden.Size = new System.Drawing.Size(104, 16);
 			this.checkIsHidden.TabIndex = 110;
 			this.checkIsHidden.Text = "Is Hidden";
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -138,52 +138,52 @@ namespace OpenDental{
 			// comboProvHygienist
 			// 
 			this.comboProvHygienist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProvHygienist.Location = new System.Drawing.Point(160,123);
+			this.comboProvHygienist.Location = new System.Drawing.Point(160, 123);
 			this.comboProvHygienist.MaxDropDownItems = 30;
 			this.comboProvHygienist.Name = "comboProvHygienist";
-			this.comboProvHygienist.Size = new System.Drawing.Size(126,21);
+			this.comboProvHygienist.Size = new System.Drawing.Size(126, 21);
 			this.comboProvHygienist.TabIndex = 114;
 			// 
 			// comboProvDentist
 			// 
 			this.comboProvDentist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProvDentist.Location = new System.Drawing.Point(160,102);
+			this.comboProvDentist.Location = new System.Drawing.Point(160, 102);
 			this.comboProvDentist.MaxDropDownItems = 100;
 			this.comboProvDentist.Name = "comboProvDentist";
-			this.comboProvDentist.Size = new System.Drawing.Size(126,21);
+			this.comboProvDentist.Size = new System.Drawing.Size(126, 21);
 			this.comboProvDentist.TabIndex = 113;
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(34,127);
+			this.label6.Location = new System.Drawing.Point(34, 127);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(123,16);
+			this.label6.Size = new System.Drawing.Size(123, 16);
 			this.label6.TabIndex = 112;
 			this.label6.Text = "Hygienist";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(23,106);
+			this.label7.Location = new System.Drawing.Point(23, 106);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(134,16);
+			this.label7.Size = new System.Drawing.Size(134, 16);
 			this.label7.TabIndex = 111;
-			this.label7.Text = "Dentist";
+			this.label7.Text = "Provider";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(178,64);
+			this.label8.Location = new System.Drawing.Point(178, 64);
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(316,16);
+			this.label8.Size = new System.Drawing.Size(316, 16);
 			this.label8.TabIndex = 115;
 			this.label8.Text = "(because you can\'t delete an operatory)";
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(178,150);
+			this.label9.Location = new System.Drawing.Point(178, 150);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(363,16);
+			this.label9.Size = new System.Drawing.Size(363, 16);
 			this.label9.TabIndex = 117;
 			this.label9.Text = "The hygienist will be considered the main provider for this op.";
 			// 
@@ -191,9 +191,9 @@ namespace OpenDental{
 			// 
 			this.checkIsHygiene.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsHygiene.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsHygiene.Location = new System.Drawing.Point(69,149);
+			this.checkIsHygiene.Location = new System.Drawing.Point(69, 149);
 			this.checkIsHygiene.Name = "checkIsHygiene";
-			this.checkIsHygiene.Size = new System.Drawing.Size(104,16);
+			this.checkIsHygiene.Size = new System.Drawing.Size(104, 16);
 			this.checkIsHygiene.TabIndex = 116;
 			this.checkIsHygiene.Text = "Is Hygiene";
 			this.checkIsHygiene.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -201,17 +201,17 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(160,81);
+			this.comboClinic.Location = new System.Drawing.Point(160, 81);
 			this.comboClinic.MaxDropDownItems = 100;
 			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(126,21);
+			this.comboClinic.Size = new System.Drawing.Size(126, 21);
 			this.comboClinic.TabIndex = 119;
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(59,85);
+			this.labelClinic.Location = new System.Drawing.Point(59, 85);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(98,16);
+			this.labelClinic.Size = new System.Drawing.Size(98, 16);
 			this.labelClinic.TabIndex = 118;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -220,55 +220,55 @@ namespace OpenDental{
 			// 
 			this.checkSetProspective.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSetProspective.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSetProspective.Location = new System.Drawing.Point(69,168);
+			this.checkSetProspective.Location = new System.Drawing.Point(69, 168);
 			this.checkSetProspective.Name = "checkSetProspective";
-			this.checkSetProspective.Size = new System.Drawing.Size(104,16);
+			this.checkSetProspective.Size = new System.Drawing.Size(104, 16);
 			this.checkSetProspective.TabIndex = 116;
 			this.checkSetProspective.Text = "Set Prospective";
 			this.checkSetProspective.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(178,169);
+			this.label3.Location = new System.Drawing.Point(178, 169);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(363,16);
+			this.label3.Size = new System.Drawing.Size(363, 16);
 			this.label3.TabIndex = 117;
 			this.label3.Text = "Change status of patients in this operatory to prospective.";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(382,204);
+			this.butOK.Location = new System.Drawing.Point(382, 204);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 8;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(473,204);
+			this.butCancel.Location = new System.Drawing.Point(473, 204);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 9;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// FormOperatoryEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(574,248);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(574, 248);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.label3);
