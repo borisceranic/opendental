@@ -98,6 +98,13 @@ namespace OpenDentBusiness{
 			return Crud.SmsPhoneCrud.Insert(smsPhone);
 		}
 
+		///<summary>Gets sms phones when not using clinics.</summary>
+		public static List<SmsPhone> GetForPractice() {
+			//No remoting role check, No call to database.
+			//Get for practice is just getting for clinic num 0
+			return GetForClinics(new List<Clinic>() { new Clinic() });//clinic num 0
+		}
+
 		public static List<SmsPhone> GetForClinics(List<Clinic> listClinics) {
 			if(listClinics.Count==0){
 				return new List<SmsPhone>();
@@ -113,96 +120,105 @@ namespace OpenDentBusiness{
 			return Crud.SmsPhoneCrud.SelectMany(command);
 		}
 
-		///<summary>Gets sms phones when not using clinics.</summary>
-		public static List<SmsPhone> GetForPractice() {
-			//No remoting role check, No call to database.
-			//Get for practice is just getting for clinic num 0
-			return GetForClinics(new List<Clinic>() { new Clinic() });
-		}
-
-		///<summary>Returns usage for each of the phone numbers passed in. the list of int's are counts of messages 
-		///for [SentAllTime],[SentLastMonth],[SentThisMonth],[CostThisMonth],[RcvdAllTime],[RcvdLastMonth],[RcvdThisMonth],[CostThisMonth].</summary>
-		public static Dictionary<string,Dictionary<string,double>> GetSmsUsageLocal(List<SmsPhone> phones) {
+		///<summary>Returns data table containing usage for supplied phones for the given month.  
+		///Pass in all phones for a given clinic, or a single phone for individual usage.  Returns null if no valid phones supplied.</summary>
+		public static DataTable GetSmsUsageLocal(List<SmsPhone> phones, DateTime DateMonth) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Dictionary<string,Dictionary<string,double>>>(MethodBase.GetCurrentMethod(),phones);
+				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),phones,DateMonth);
 			}
-			//Dictionary<string,List<double>> retVal=new Dictionary<string,List<double>>();
-			Dictionary<string,Dictionary<string,double>> retVal=new Dictionary<string,Dictionary<string,double>>();
-			foreach(SmsPhone phone in phones) {
-				retVal.Add(phone.PhoneNumber,new Dictionary<string,double>());
-				//Initialize values to zero here. Important, otherwise we can get jagged arrays.
-				retVal[phone.PhoneNumber].Add("SentAllTime",0);
-				retVal[phone.PhoneNumber].Add("SentLastMonth",0);
-				retVal[phone.PhoneNumber].Add("SentThisMonth",0);
-				retVal[phone.PhoneNumber].Add("SentThisMonthCost",0);
-				retVal[phone.PhoneNumber].Add("InboundAllTime",0);
-				retVal[phone.PhoneNumber].Add("InboundLastMonth",0);
-				retVal[phone.PhoneNumber].Add("InboundThisMonth",0);
-				retVal[phone.PhoneNumber].Add("InboundThisMonthCost",0);
+			#region Initialize retVal DataTable
+			//Dictionary contains Clinic Num and the first SmsPhone (the main phone) for each account. Should have been passed in.
+			Dictionary<long,SmsPhone> ClinicNumInitialPhoneDate=new Dictionary<long,SmsPhone>();
+			for(int i=0;i<phones.Count;i++) {
+				if(!ClinicNumInitialPhoneDate.ContainsKey(phones[i].ClinicNum)){
+					ClinicNumInitialPhoneDate.Add(phones[i].ClinicNum,phones[i]);
+				}
+				else if(ClinicNumInitialPhoneDate[phones[i].ClinicNum].DateTimeActive>phones[i].DateTimeActive){
+					ClinicNumInitialPhoneDate[phones[i].ClinicNum]=phones[i];
+				}
 			}
-			//Sent All Time
-			string command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile WHERE MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
+			List<long> listPhoneNums=new List<long>();
+			foreach(SmsPhone phone in ClinicNumInitialPhoneDate.Values) {
+				listPhoneNums.Add(phone.SmsPhoneNum);
+			}
+			if(listPhoneNums.Count==0) {
+				return null;//no valid phone nums supplied.
+			}
+			DateTime dateStart=DateMonth.Date.AddDays(1-DateMonth.Day);//remove time portion and day of month portion. Remainder should be midnight of the first of the month
+			DateTime dateEnd=dateStart.AddMonths(1);//This should be midnight of the first of the following month.
+			//This query builds the data table that will be filled from several other queries, instead of writing one large complex query.
+			//It is written this way so that the queries are simple to write and understand, and makes Oracle compatibility easier to maintain.
+			string command=@"SELECT 
+							  ClinicNum,
+							  PhoneNumber,
+							  CountryCode,
+							  0 SentMonth,
+							  0.0 SentCharge,
+							  0 ReceivedMonth,
+							  0.0 ReceivedCharge 
+							FROM
+							  SmsPhone 
+							WHERE SmsPhoneNum IN ("+String.Join(",",listPhoneNums)+")";
+			DataTable retVal=Db.GetTable(command);
+			#endregion
+			#region Fill retVal DataTable
+			////Sent All Time
+			//command="SELECT ClinicNum, COUNT(*) FROM smstomobile WHERE MsgChargeUSD>0 GROUP BY ClinicNum";
+			//DataTable table=Db.GetTable(command);
+			//for(int i=0;i<table.Rows.Count;i++) {
+			//	for(int j=0;j<retVal.Rows.Count;j++) {
+			//		if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
+			//			continue;
+			//		}
+			//		retVal.Rows[j]["SentAllTime"]=table.Rows[i][1].ToString();
+			//		break;
+			//	}
+			//}
+			//Sent Last Month
+			command="SELECT ClinicNum, COUNT(*), ROUND(SUM(MsgChargeUSD),2) FROM smstomobile "
+				+"WHERE DateTimeSent >="+POut.Date(dateStart)+" "
+				+"AND DateTimeSent<"+POut.Date(dateEnd)+" "
+				+"AND MsgChargeUSD>0 GROUP BY ClinicNum";
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {//if there are messages in the table for that Phone number 
-					retVal[phone]["SentAllTime"]=PIn.Int(table.Rows[i][1].ToString());
+				for(int j=0;j<retVal.Rows.Count;j++) {
+					if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
+						continue;
+					}
+					retVal.Rows[j]["SentMonth"]=table.Rows[i][1];//.ToString();
+					retVal.Rows[j]["SentCharge"]=table.Rows[i][2];//.ToString();
+					break;
 				}
 			}
-			//Sent Last Month
-			DateTime dateStartMonthCur=DateTime.Now.AddDays(-DateTime.Now.Day).Date;
-			command="SELECT SmsPhoneNumber, COUNT(*) FROM smstomobile "
-				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
-				+"AND DateTimeSent<"+POut.Date(dateStartMonthCur)+" AND MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
+			////Received All Time
+			//command="SELECT ClinicNum, COUNT(*) FROM smsfrommobile GROUP BY ClinicNum";
+			//table=Db.GetTable(command);
+			//for(int i=0;i<table.Rows.Count;i++) {
+			//	for(int j=0;j<retVal.Rows.Count;j++) {
+			//		if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
+			//			continue;
+			//		}
+			//		retVal.Rows[j]["SentAllTime"]=table.Rows[i][1].ToString();
+			//		break;
+			//	}
+			//}
+			//Received Month
+			command="SELECT ClinicNum, COUNT(*) FROM smsfrommobile "
+				+"WHERE DateTimeReceived >="+POut.Date(dateStart)+" "
+				+"AND DateTimeReceived<"+POut.Date(dateEnd)+" "
+				+"GROUP BY ClinicNum";
 			table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {
-					retVal[phone]["SentLastMonth"]=PIn.Int(table.Rows[i][1].ToString());
+				for(int j=0;j<retVal.Rows.Count;j++) {
+					if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
+						continue;
+					}
+					retVal.Rows[j]["ReceivedMonth"]=table.Rows[i][1].ToString();
+					retVal.Rows[j]["ReceivedCharge"]="0";
+					break;
 				}
 			}
-			//count and cost sent this month
-			command="SELECT SmsPhoneNumber, COUNT(*), SUM(MsgChargeUSD) FROM smstomobile "
-				+"WHERE DateTimeSent >"+POut.Date(dateStartMonthCur)+" AND MsgChargeUSD>0 GROUP BY SmsPhoneNumber";
-			table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {
-					retVal[phone]["SentThisMonth"]=PIn.Int(table.Rows[i][1].ToString());//msg count
-					retVal[phone]["SentThisMonthCost"]=PIn.Double(table.Rows[i][2].ToString());//msg costs
-				}
-			}
-			//Inbound All Time
-			command="SELECT SmsPhoneNumber, COUNT(*) FROM smsfrommobile GROUP BY SmsPhoneNumber";
-			table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {//if there are messages in the table for that Phone number 
-					retVal[phone]["InboundAllTime"]=PIn.Int(table.Rows[i][1].ToString());
-				}
-			}
-			//Inbound Last Month
-			command="SELECT SmsPhoneNumber, COUNT(*) FROM smsfrommobile "
-				+"WHERE DateTimeReceived >"+POut.Date(dateStartMonthCur.AddMonths(-1))+" "
-				+"AND DateTimeReceived<"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
-			table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {
-					retVal[phone]["InboundLastMonth"]=PIn.Int(table.Rows[i][1].ToString());
-				}
-			}
-			//count and cost Inbound This Month
-			command="SELECT SmsPhoneNumber, COUNT(*) FROM smsfrommobile "
-				+"WHERE DateTimeReceived >"+POut.Date(dateStartMonthCur)+" GROUP BY SmsPhoneNumber";
-			table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				string phone=table.Rows[i][0].ToString();
-				if(retVal.ContainsKey(phone)) {
-					retVal[phone]["InboundThisMonth"]=PIn.Int(table.Rows[i][1].ToString());//msg count
-					retVal[phone]["InboundThisMonthCost"]=0;//PIn.Double(table.Rows[i][2].ToString());//msg costs
-				}
-			}
+			#endregion
 			return retVal;
 		}
 		

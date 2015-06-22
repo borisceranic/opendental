@@ -162,10 +162,24 @@ Installing the Listener Service for the first time requires installing the OpenD
 This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
 For more information, see our online manual.</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="butBackMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        R0lGODlhDQAPAIIAAAAAAAAAeH9/fwAA/3V1/+Df4wAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQB
+        AAAFACwAAAAADQAPAAAITwALCBxYAADBgwIBABCAcCAAAgsbFiQAUaFCgg8JDNi4MeJEjRw7MswYkuNC
+        kiVFFkxpkuFKlh5fDghAM0DMlxYVunQ4YKGAnzsd3mx4MyAAOw==
+</value>
+  </data>
+  <data name="butFwdMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        R0lGODlhDQAPAIIAAAAAAAAAeH9/fwAA/3V1/+Df4wAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQB
+        AAAFACwAAAAADQAPAAAITwALCBQIYKBBgwIAFDyIEACBhQYVSiTwsOGAixcpQkyIEaNGgRw7ZqwYUuQA
+        jSVNFkzZcWHCADADYNwoUeFFiAUE6NQJYADOgwl/AhVaICAAOw==
+</value>
+  </data>
   <data name="label29.Text" xml:space="preserve">
     <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAMAEBAQAAAAAAAoAQAANgAAACAgEAAAAAAA6AIAAF4BAAAQEAAAAAAAAGgFAABGBAAAKAAAABAA

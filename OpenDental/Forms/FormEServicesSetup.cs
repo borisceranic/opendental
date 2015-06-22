@@ -15,6 +15,8 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Globalization;
+using System.Data;
+using System.Linq;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup.  Also includes monitoring for the Listener Service that is required for HQ hosted eServices.</summary>
@@ -110,11 +112,30 @@ namespace OpenDental {
 			if(_clinicCur==null && _listClinics.Count>0) {
 				_clinicCur=_listClinics[0];//default to first clinic in list, if no clinics were passed into this form using the constructor.
 			}
+			FillComboClinicSms();
+			textCountryCode.Text=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
 			FillGridClinics();
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();
+#if DEBUG
+			butSmsTestData.Visible=true;
+#endif
 			#endregion
 			SetControlEnabledState();
+		}
+
+		private void FillComboClinicSms() {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				comboClinicSms.Items.Add(PrefC.GetString(PrefName.PracticeTitle));
+				comboClinicSms.SelectedIndex=0;
+				comboClinicSms.Enabled=false;
+			}
+			else {
+				for(int i=0;i<_listClinics.Count;i++) {
+					comboClinicSms.Items.Add(_listClinics[i].Description);
+				}
+				comboClinicSms.SelectedIndex=0;
+			}
 		}
 
 		private void SetControlEnabledState() {
@@ -1128,17 +1149,15 @@ namespace OpenDental {
 			}
 		}
 
+		private void comboClinicSms_SelectedIndexChanged(object sender,EventArgs e) {
+			_clinicCur=_listClinics[comboClinicSms.SelectedIndex];
+			textSmsLimit.Text="";
+			SetSmsServiceAgreement();
+		}
+
 		private void FillGridClinics() {
 			Clinics.RefreshCache();
 			_listClinics=Clinics.GetForUserod(Security.CurUser);//refresh potentially changed data.
-			if(_clinicCur!=null) {//refresh the "selected" clinic.
-				foreach(Clinic clinic in _listClinics) {
-					if(clinic.ClinicNum==_clinicCur.ClinicNum) {
-						_clinicCur=clinic;
-						break;
-					}
-				}
-			}
 			gridClinics.BeginUpdate();
 			gridClinics.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Location"),150);
@@ -1155,7 +1174,6 @@ namespace OpenDental {
 				row.Cells.Add(PrefC.GetDate(PrefName.SmsContractDate).Year>1800?"Yes":"No");
 				row.Cells.Add((PrefC.GetDouble(PrefName.SmsMonthlyLimit)).ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
 				gridClinics.Rows.Add(row);
-				gridClinics.SetSelected(0,true);
 			}
 			else {
 				for(int i=0;i<_listClinics.Count;i++) {
@@ -1164,9 +1182,6 @@ namespace OpenDental {
 					row.Cells.Add(_listClinics[i].SmsContractDate.Year>1800?"Yes":"No");
 					row.Cells.Add(_listClinics[i].SmsMonthlyLimit.ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
 					gridClinics.Rows.Add(row);
-					if(_clinicCur.ClinicNum==_listClinics[i].ClinicNum) {
-						gridClinics.SetSelected(i,true);
-					}
 				}
 			}
 			gridClinics.EndUpdate();
@@ -1177,269 +1192,294 @@ namespace OpenDental {
 				_listPhones=SmsPhones.GetForPractice();
 			}
 			else {
-				_listPhones=SmsPhones.GetForClinics(new List<Clinic>{_clinicCur});
+				_listPhones=SmsPhones.GetForClinics(_listClinics); //new List<Clinic> { _clinicCur });
 			}
 			gridSmsSummary.BeginUpdate();
 			gridSmsSummary.Columns.Clear();
-			//ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Sent All Time"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Sent Last Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Sent This Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Charge This Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Rcvd All Time"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Rcvd Last Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Rcvd This Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Charge This Mo"),100,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual\r\nPhone\r\nNumber"),130,HorizontalAlignment.Right);
+			ODGridColumn col=new ODGridColumn(Lan.g(this,"Location"),120,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"All Time"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Primary\r\nPhone Number"),105,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Sent"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Country\r\nCode"),60,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
+			//col=new ODGridColumn(Lan.g(this,"Sent\r\nAll Time"),70,HorizontalAlignment.Right);
+			//gridSmsSummary.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Sent\r\nFor Month"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Sent\r\nCharges"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Received"),60,HorizontalAlignment.Right);
+			//col=new ODGridColumn(Lan.g(this,"Recieved\r\nAll Time"),70,HorizontalAlignment.Right);
+			//gridSmsSummary.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Recieved\r\nFor Month"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Last Month"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Received This Month"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Charge This Month"),60,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Recieved\r\nCharges"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
 			gridSmsSummary.Rows.Clear();
-			ODGridRow row;
-			Dictionary<string,Dictionary<string,double>> usage=SmsPhones.GetSmsUsageLocal(_listPhones);
-			for(int i=0;i<_listPhones.Count;i++) {
-				row=new ODGridRow();
-				row.Cells.Add(_listPhones[i].PhoneNumber);
-				if(usage.ContainsKey(_listPhones[i].PhoneNumber)) {
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["SentAllTime"].ToString());//Sent All Time
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["SentLastMonth"].ToString());//Sent Last Month
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["SentThisMonth"].ToString());//Sent This Month
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["SentThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge this month
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["InboundAllTime"].ToString());//Rcvd All Time
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["InboundLastMonth"].ToString());//Rcvd Last Month
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["InboundThisMonth"].ToString());//Rcvd This Month
-					row.Cells.Add(usage[_listPhones[i].PhoneNumber]["InboundThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge This Month
+			DataTable usage=SmsPhones.GetSmsUsageLocal(_listPhones,dateTimePickerSms.Value);
+			if(usage==null || usage.Rows.Count==0) {
+				gridSmsSummary.EndUpdate();
+				return;
+			}
+			for(int i=0;i<_listClinics.Count || i==0;i++) {// Or i==0 allows us to use the same code for practice and clinics
+				ODGridRow row=new ODGridRow();
+				if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+					row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle));
 				}
 				else {
-					row.Cells.Add("0");//Sent All Time
-					row.Cells.Add("0");//Sent Last Month
-					row.Cells.Add("0");//Sent This Month
-					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-					row.Cells.Add("0");//Rcvd All Time
-					row.Cells.Add("0");//Rcvd Last Month
-					row.Cells.Add("0");//Rcvd This Month
-					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+					row.Cells.Add(_listClinics[i].Description);
 				}
-				gridSmsSummary.Rows.Add(row);
-			}
-			gridSmsSummary.EndUpdate();
-		}
-
-
-		///<summary>Not used. Delete after porting required code form it.</summary>
-		private void FillGridSmsUsageTwo() {
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				_listPhones=SmsPhones.GetForPractice();
-			}
-			else {
-				_listPhones=SmsPhones.GetForClinics(_listClinics);
-			}
-			gridSmsSummary.BeginUpdate();
-			gridSmsSummary.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Location"),130);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Subscribed"),50);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Limit"),75,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Sent All Time"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Sent Last Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Sent This Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Charge This Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Rcvd All Time"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Rcvd Last Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Rcvd This Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Charge This Mo"),60,HorizontalAlignment.Right);
-			gridSmsSummary.Columns.Add(col);
-			//ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"All Time"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Sent"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Received"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Last Month"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Received This Month"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Charge This Month"),60,HorizontalAlignment.Right);
-			//gridSmsSummary.Columns.Add(col);
-			gridSmsSummary.Rows.Clear();
-			ODGridRow row;
-			Dictionary<string,Dictionary<string,double>> usage=SmsPhones.GetSmsUsageLocal(_listPhones);
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {//Practice level information
-				row=new ODGridRow();
-				row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle));
-				row.Cells.Add(PrefC.GetDate(PrefName.SmsContractDate).Year>1800?"Yes":"No");
-				row.Cells.Add((PrefC.GetDouble(PrefName.SmsMonthlyLimit)).ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
-				bool firstRow=true;
-				if(_listPhones.Count==0) {
-					_listPhones.Add(new SmsPhone() { PhoneNumber="" });//dummy row
-				}
-				foreach(SmsPhone phone in _listPhones) {
-					if(phone.ClinicNum!=0) {
+				bool hasRow=false;
+				foreach(DataRow dataRow in usage.Rows) {
+					if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+						//do nothing, we want to run through this code for practice level usage
+					}
+					else if(PIn.Long(dataRow["ClinicNum"].ToString())!=_listClinics[i].ClinicNum) {
 						continue;
 					}
-					if(!firstRow) {
-						row=new ODGridRow();
-						row.Cells.Add("");
-						row.Cells.Add("");
-						row.Cells.Add("");
-					}
-					row.Cells.Add(phone.PhoneNumber);
-					if(usage.ContainsKey(phone.PhoneNumber)) {
-						row.Cells.Add(usage[phone.PhoneNumber]["SentAllTime"].ToString());//Sent All Time
-						row.Cells.Add(usage[phone.PhoneNumber]["SentLastMonth"].ToString());//Sent Last Month
-						row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonth"].ToString());//Sent This Month
-						row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge this month
-						row.Cells.Add(usage[phone.PhoneNumber]["InboundAllTime"].ToString());//Rcvd All Time
-						row.Cells.Add(usage[phone.PhoneNumber]["InboundLastMonth"].ToString());//Rcvd Last Month
-						row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonth"].ToString());//Rcvd This Month
-						row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge This Month
-					}
-					else {
-						row.Cells.Add("0");//Sent All Time
-						row.Cells.Add("0");//Sent Last Month
-						row.Cells.Add("0");//Sent This Month
-						row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-						row.Cells.Add("0");//Rcvd All Time
-						row.Cells.Add("0");//Rcvd Last Month
-						row.Cells.Add("0");//Rcvd This Month
-						row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-					}
-					firstRow=false;
-					gridSmsSummary.Rows.Add(row);
+					hasRow=true;
+					row.Cells.Add(dataRow["PhoneNumber"].ToString());
+					row.Cells.Add(dataRow["CountryCode"].ToString());
+					//row.Cells.Add(dataRow["SentAllTime"].ToString());
+					row.Cells.Add(dataRow["SentMonth"].ToString());
+					row.Cells.Add(PIn.Double(dataRow["SentCharge"].ToString()).ToString("c",new CultureInfo("en-US")));
+					//row.Cells.Add(dataRow["ReceivedAllTime"].ToString());
+					row.Cells.Add(dataRow["ReceivedMonth"].ToString());
+					row.Cells.Add(PIn.Double(dataRow["ReceivedCharge"].ToString()).ToString("c",new CultureInfo("en-US")));
 				}
-				row=new ODGridRow();
-				row.Cells.Add("");
-				row.Cells.Add("");
-				row.Cells.Add("");
-				row.Cells.Add("TOTALS");
-				row.Cells.Add("0");//Sent All Time
-				row.Cells.Add("0");//Sent Last Month
-				row.Cells.Add("0");//Sent This Month
-				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-				row.Cells.Add("0");//Rcvd All Time
-				row.Cells.Add("0");//Rcvd Last Month
-				row.Cells.Add("0");//Rcvd This Month
-				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+				if(!hasRow) {
+					row.Cells.Add("");//phone number
+					row.Cells.Add("");//country code
+					//row.Cells.Add("0");//Sent All Time
+					row.Cells.Add("0");//Sent Month
+					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Sent Charge
+					//row.Cells.Add("0");//Rcvd All Time
+					row.Cells.Add("0");//Rcvd Month
+					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Rcvd Charge
+				}
 				gridSmsSummary.Rows.Add(row);
 			}
-			else {//Using Clinics
-				for(int i=0;i<_listClinics.Count;i++) {
-					row=new ODGridRow();
-					row.Cells.Add(_listClinics[i].Description);
-					row.Cells.Add(_listClinics[i].SmsContractDate.Year>1800?"Yes":"No");
-					row.Cells.Add(_listClinics[i].SmsMonthlyLimit.ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
-					bool firstRow=true;
-					if(_listPhones.Count==0 || !_listPhones.Exists(p => p.ClinicNum==_listClinics[i].ClinicNum)) {
-						_listPhones.Add(new SmsPhone() { PhoneNumber="",ClinicNum=_listClinics[i].ClinicNum });//dummy row
-					}
-					foreach(SmsPhone phone in _listPhones) {
-						if(phone.ClinicNum!=_listClinics[i].ClinicNum) {
-							continue;
-						}
-						if(!firstRow) {
-							row=new ODGridRow();
-							row.Cells.Add("");
-							row.Cells.Add("");
-							row.Cells.Add("");
-						}
-						row.Cells.Add(phone.PhoneNumber);
-						if(usage.ContainsKey(phone.PhoneNumber)) {
-							row.Cells.Add(usage[phone.PhoneNumber]["SentAllTime"].ToString());//Sent All Time
-							row.Cells.Add(usage[phone.PhoneNumber]["SentLastMonth"].ToString());//Sent Last Month
-							row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonth"].ToString());//Sent This Month
-							row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge this month
-							row.Cells.Add(usage[phone.PhoneNumber]["InboundAllTime"].ToString());//Rcvd All Time
-							row.Cells.Add(usage[phone.PhoneNumber]["InboundLastMonth"].ToString());//Rcvd Last Month
-							row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonth"].ToString());//Rcvd This Month
-							row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge This Month
-						}
-						else {
-							row.Cells.Add("0");//Sent All Time
-							row.Cells.Add("0");//Sent Last Month
-							row.Cells.Add("0");//Sent This Month
-							row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-							row.Cells.Add("0");//Rcvd All Time
-							row.Cells.Add("0");//Rcvd Last Month
-							row.Cells.Add("0");//Rcvd This Month
-							row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-						}
-						firstRow=false;
-						gridSmsSummary.Rows.Add(row);
-					}
-					row=new ODGridRow();
-					row.ColorBackG=Color.LightGray;
-					row.Cells.Add("");
-					row.Cells.Add("");
-					row.Cells.Add("");
-					row.Cells.Add("Totals Per Clinic");
-					row.Cells.Add("0");//Sent All Time
-					row.Cells.Add("0");//Sent Last Month
-					row.Cells.Add("0");//Sent This Month
-					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-					row.Cells.Add("0");//Rcvd All Time
-					row.Cells.Add("0");//Rcvd Last Month
-					row.Cells.Add("0");//Rcvd This Month
-					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-					gridSmsSummary.Rows.Add(row);
+			if(_listClinics.Count>1) {//Total row if there is more than one clinic (Will not display for practice because practice will have no clinics.
+				ODGridRow row=new ODGridRow();
+				//long totalSent=0;
+				long totalSentMonth=0;
+				double totalSentCharge=0f;
+				//long totalReceived=0;
+				long totalReceivedMonth=0;
+				double totalReceivedCharge=0f;
+				foreach(DataRow dataRow in usage.Rows) {
+					//totalSent+=PIn.Long(dataRow["SentAllTime"].ToString());
+					totalSentMonth+=PIn.Long(dataRow["SentMonth"].ToString());
+					totalSentCharge+=PIn.Double(dataRow["SentCharge"].ToString());
+					//totalReceived+=PIn.Long(dataRow["ReceivedAllTime"].ToString());
+					totalReceivedMonth+=PIn.Long(dataRow["ReceivedMonth"].ToString());
+					totalReceivedCharge+=PIn.Double(dataRow["ReceivedCharge"].ToString());
 				}
-				row=new ODGridRow();
-				row.ColorBackG=Color.Gray;
 				row.Cells.Add("");
 				row.Cells.Add("");
-				row.Cells.Add("");
-				row.Cells.Add("Totals For All");
-				row.Cells.Add("0");//Sent All Time
-				row.Cells.Add("0");//Sent Last Month
-				row.Cells.Add("0");//Sent This Month
-				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
-				row.Cells.Add("0");//Rcvd All Time
-				row.Cells.Add("0");//Rcvd Last Month
-				row.Cells.Add("0");//Rcvd This Month
-				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+				row.Cells.Add(Lans.g(this,"Total"));
+				//row.Cells.Add(totalSent.ToString());
+				row.Cells.Add(totalSentMonth.ToString());
+				row.Cells.Add(totalSentCharge.ToString("c",new CultureInfo("en-US")));
+				//row.Cells.Add(totalReceived.ToString());
+				row.Cells.Add(totalReceivedMonth.ToString());
+				row.Cells.Add(totalReceivedCharge.ToString("c",new CultureInfo("en-US")));
+				row.ColorBackG=Color.LightYellow;
 				gridSmsSummary.Rows.Add(row);
 			}
 			gridSmsSummary.EndUpdate();
 		}
+
+		/////<summary>Not used. Delete after porting required code form it.</summary>
+		//private void FillGridSmsUsageTwo() {
+		//	if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+		//		_listPhones=SmsPhones.GetForPractice();
+		//	}
+		//	else {
+		//		_listPhones=SmsPhones.GetForClinics(_listClinics);
+		//	}
+		//	gridSmsSummary.BeginUpdate();
+		//	gridSmsSummary.Columns.Clear();
+		//	ODGridColumn col=new ODGridColumn(Lan.g(this,"Location"),130);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Subscribed"),50);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Limit"),75,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Sent All Time"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Sent Last Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Sent This Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Charge This Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Rcvd All Time"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Rcvd Last Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Rcvd This Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	col=new ODGridColumn(Lan.g(this,"Charge This Mo"),60,HorizontalAlignment.Right);
+		//	gridSmsSummary.Columns.Add(col);
+		//	//ODGridColumn col=new ODGridColumn(Lan.g(this,"Virtual Phone #"),130,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"All Time"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"Sent"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"This Month"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"Received"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"Last Month"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"Received This Month"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	//col=new ODGridColumn(Lan.g(this,"Charge This Month"),60,HorizontalAlignment.Right);
+		//	//gridSmsSummary.Columns.Add(col);
+		//	gridSmsSummary.Rows.Clear();
+		//	ODGridRow row;
+		//	Dictionary<string,Dictionary<string,double>> usage=SmsPhones.GetSmsUsageLocal(_listPhones,dateTimePickerSms.Value);
+		//	if(PrefC.GetBool(PrefName.EasyNoClinics)) {//Practice level information
+		//		row=new ODGridRow();
+		//		row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle));
+		//		row.Cells.Add(PrefC.GetDate(PrefName.SmsContractDate).Year>1800?"Yes":"No");
+		//		row.Cells.Add((PrefC.GetDouble(PrefName.SmsMonthlyLimit)).ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
+		//		bool firstRow=true;
+		//		if(_listPhones.Count==0) {
+		//			_listPhones.Add(new SmsPhone() { PhoneNumber="" });//dummy row
+		//		}
+		//		foreach(SmsPhone phone in _listPhones) {
+		//			if(phone.ClinicNum!=0) {
+		//				continue;
+		//			}
+		//			if(!firstRow) {
+		//				row=new ODGridRow();
+		//				row.Cells.Add("");
+		//				row.Cells.Add("");
+		//				row.Cells.Add("");
+		//			}
+		//			row.Cells.Add(phone.PhoneNumber);
+		//			if(usage.ContainsKey(phone.PhoneNumber)) {
+		//				row.Cells.Add(usage[phone.PhoneNumber]["SentAllTime"].ToString());//Sent All Time
+		//				row.Cells.Add(usage[phone.PhoneNumber]["SentLastMonth"].ToString());//Sent Last Month
+		//				row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonth"].ToString());//Sent This Month
+		//				row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge this month
+		//				row.Cells.Add(usage[phone.PhoneNumber]["InboundAllTime"].ToString());//Rcvd All Time
+		//				row.Cells.Add(usage[phone.PhoneNumber]["InboundLastMonth"].ToString());//Rcvd Last Month
+		//				row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonth"].ToString());//Rcvd This Month
+		//				row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge This Month
+		//			}
+		//			else {
+		//				row.Cells.Add("0");//Sent All Time
+		//				row.Cells.Add("0");//Sent Last Month
+		//				row.Cells.Add("0");//Sent This Month
+		//				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//				row.Cells.Add("0");//Rcvd All Time
+		//				row.Cells.Add("0");//Rcvd Last Month
+		//				row.Cells.Add("0");//Rcvd This Month
+		//				row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//			}
+		//			firstRow=false;
+		//			gridSmsSummary.Rows.Add(row);
+		//		}
+		//		row=new ODGridRow();
+		//		row.Cells.Add("");
+		//		row.Cells.Add("");
+		//		row.Cells.Add("");
+		//		row.Cells.Add("TOTALS");
+		//		row.Cells.Add("0");//Sent All Time
+		//		row.Cells.Add("0");//Sent Last Month
+		//		row.Cells.Add("0");//Sent This Month
+		//		row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//		row.Cells.Add("0");//Rcvd All Time
+		//		row.Cells.Add("0");//Rcvd Last Month
+		//		row.Cells.Add("0");//Rcvd This Month
+		//		row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//		gridSmsSummary.Rows.Add(row);
+		//	}
+		//	else {//Using Clinics
+		//		for(int i=0;i<_listClinics.Count;i++) {
+		//			row=new ODGridRow();
+		//			row.Cells.Add(_listClinics[i].Description);
+		//			row.Cells.Add(_listClinics[i].SmsContractDate.Year>1800?"Yes":"No");
+		//			row.Cells.Add(_listClinics[i].SmsMonthlyLimit.ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
+		//			bool firstRow=true;
+		//			if(_listPhones.Count==0 || !_listPhones.Exists(p => p.ClinicNum==_listClinics[i].ClinicNum)) {
+		//				_listPhones.Add(new SmsPhone() { PhoneNumber="",ClinicNum=_listClinics[i].ClinicNum });//dummy row
+		//			}
+		//			foreach(SmsPhone phone in _listPhones) {
+		//				if(phone.ClinicNum!=_listClinics[i].ClinicNum) {
+		//					continue;
+		//				}
+		//				if(!firstRow) {
+		//					row=new ODGridRow();
+		//					row.Cells.Add("");
+		//					row.Cells.Add("");
+		//					row.Cells.Add("");
+		//				}
+		//				row.Cells.Add(phone.PhoneNumber);
+		//				if(usage.ContainsKey(phone.PhoneNumber)) {
+		//					row.Cells.Add(usage[phone.PhoneNumber]["SentAllTime"].ToString());//Sent All Time
+		//					row.Cells.Add(usage[phone.PhoneNumber]["SentLastMonth"].ToString());//Sent Last Month
+		//					row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonth"].ToString());//Sent This Month
+		//					row.Cells.Add(usage[phone.PhoneNumber]["SentThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge this month
+		//					row.Cells.Add(usage[phone.PhoneNumber]["InboundAllTime"].ToString());//Rcvd All Time
+		//					row.Cells.Add(usage[phone.PhoneNumber]["InboundLastMonth"].ToString());//Rcvd Last Month
+		//					row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonth"].ToString());//Rcvd This Month
+		//					row.Cells.Add(usage[phone.PhoneNumber]["InboundThisMonthCost"].ToString("c",new CultureInfo("en-US")));//Charge This Month
+		//				}
+		//				else {
+		//					row.Cells.Add("0");//Sent All Time
+		//					row.Cells.Add("0");//Sent Last Month
+		//					row.Cells.Add("0");//Sent This Month
+		//					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//					row.Cells.Add("0");//Rcvd All Time
+		//					row.Cells.Add("0");//Rcvd Last Month
+		//					row.Cells.Add("0");//Rcvd This Month
+		//					row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//				}
+		//				firstRow=false;
+		//				gridSmsSummary.Rows.Add(row);
+		//			}
+		//			row=new ODGridRow();
+		//			row.ColorBackG=Color.LightGray;
+		//			row.Cells.Add("");
+		//			row.Cells.Add("");
+		//			row.Cells.Add("");
+		//			row.Cells.Add("Totals Per Clinic");
+		//			row.Cells.Add("0");//Sent All Time
+		//			row.Cells.Add("0");//Sent Last Month
+		//			row.Cells.Add("0");//Sent This Month
+		//			row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//			row.Cells.Add("0");//Rcvd All Time
+		//			row.Cells.Add("0");//Rcvd Last Month
+		//			row.Cells.Add("0");//Rcvd This Month
+		//			row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//			gridSmsSummary.Rows.Add(row);
+		//		}
+		//		row=new ODGridRow();
+		//		row.ColorBackG=Color.Gray;
+		//		row.Cells.Add("");
+		//		row.Cells.Add("");
+		//		row.Cells.Add("");
+		//		row.Cells.Add("Totals For All");
+		//		row.Cells.Add("0");//Sent All Time
+		//		row.Cells.Add("0");//Sent Last Month
+		//		row.Cells.Add("0");//Sent This Month
+		//		row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//		row.Cells.Add("0");//Rcvd All Time
+		//		row.Cells.Add("0");//Rcvd Last Month
+		//		row.Cells.Add("0");//Rcvd This Month
+		//		row.Cells.Add((0f).ToString("c",new CultureInfo("en-US")));//Charge this month
+		//		gridSmsSummary.Rows.Add(row);
+		//	}
+		//	gridSmsSummary.EndUpdate();
+		//}
 
 
 		private void textSmsLimit_TextChanged(object sender,EventArgs e) {
@@ -1507,32 +1547,7 @@ namespace OpenDental {
 
 		private void butSmsCancel_Click(object sender,EventArgs e) {
 			//textSmsLimit.Text="";//clear user input
-			//SetSmsServiceAgreement();//sets to previous value if applicable.
-#if DEBUG
-			Random rand=new Random();
-			SmsPhone phoneNew =new SmsPhone() {
-				ClinicNum=(_clinicCur??new Clinic()).ClinicNum,
-				PhoneNumber="1555123"+rand.Next(9999).ToString().PadLeft(4,'0'),
-				DateTimeActive=DateTime.Now
-			};
-			phoneNew.SmsPhoneNum=SmsPhones.Insert(phoneNew);
-			_listPhones.Add(phoneNew);
-			//Add dummy messages
-			foreach(SmsPhone phone in _listPhones) {
-				int msgCount=rand.Next(100,1000);
-				for(int i=0;i<msgCount;i++) {
-					DateTime msgDate=DateTime.Now.AddDays(-rand.Next(364));
-					string GUID = Guid.NewGuid().ToString();
-					SmsToMobiles.Insert(new SmsToMobile() {
-						DateTimeSent=msgDate, DateTimeTerminated=msgDate.AddMinutes(rand.Next(60)),
-						GuidMessage=GUID, GuidBatch=GUID, MsgParts=1, ClinicNum=phone.ClinicNum, MsgChargeUSD=0.04f,
-						PatNum=1, MobilePhoneNumber="12223334444", Status= SmsDeliveryStatus.DeliveryConf, MsgText="This is msg #"+i+" of "+msgCount,
-						SmsPhoneNumber=phone.PhoneNumber, MsgType= SmsMessageSource.DirectSms, IsTimeSensitive=true
-					});
-					//This line left intentionally blank. lol.
-				}
-			}
-#endif
+			SetSmsServiceAgreement();//sets to previous value if applicable.
 		}
 
 		private void gridClinics_CellClick(object sender,ODGridClickEventArgs e) {
@@ -1568,6 +1583,131 @@ namespace OpenDental {
 				MessageBox.Show(ex.Message);
 				return;
 			}
+			FillGridClinics();
+			FillGridSmsUsage();
+			SetSmsServiceAgreement();
+		}
+
+		private void butBackMonth_Click(object sender,EventArgs e) {
+			dateTimePickerSms.Value=dateTimePickerSms.Value.AddMonths(-1);
+		}
+
+		private void butFwdMonth_Click(object sender,EventArgs e) {
+			dateTimePickerSms.Value=dateTimePickerSms.Value.AddMonths(1);//triggers refresh
+		}
+
+		private void butToday_Click(object sender,EventArgs e) {
+			dateTimePickerSms.Value=DateTime.Now.Date;//triggers refresh
+		}
+
+		private void dateTimePickerSms_ValueChanged(object sender,EventArgs e) {
+			FillGridSmsUsage();
+		}
+
+		private void butSmsTestData_Click(object sender,EventArgs e) {
+#if !DEBUG
+			//this button is not visible if not in debug anyways, this is just an extra precaution.
+#endif
+			string command="TRUNCATE TABLE smsphone";
+			DataCore.NonQ(command);
+			command="TRUNCATE TABLE smstomobile";
+			DataCore.NonQ(command);
+			command="TRUNCATE TABLE smsfrommobile";
+			DataCore.NonQ(command);
+			command="TRUNCATE TABLE clinic";
+			DataCore.NonQ(command);
+			for(int i=0;i<8;i++) {//setup 6 clinics
+				Clinic clinic=new Clinic();
+				clinic.Description="Clinic "+(i+1);
+				Clinics.Insert(clinic);
+			}
+			Clinics.RefreshCache();
+			List<Clinic> _listClinics=Clinics.GetList().ToList();
+			_listClinics.Add(new Clinic());//to simulate non-clinic
+			Random rand=new Random();
+			List<Snomed> listSnomed=Snomeds.GetByCodeOrDescription("p");//any snomeds containing the letter p in the description... 2632 of them.
+			List<Patient> listPatients=Patients.GetSimilarList("Patient","",DateTime.MinValue);
+			foreach(Patient p in listPatients) {//set patient phone numbers and clinics.
+				p.HmPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
+				p.WirelessPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
+				p.WkPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
+				p.ClinicNum=_listClinics[rand.Next(_listClinics.Count-1)].ClinicNum;
+				Patients.Update(p,new Patient());
+			}
+			foreach(Clinic c in _listClinics) {
+				int phoneCount=rand.Next(5);
+				List<SmsPhone> listPhones=new List<SmsPhone>();
+				for(int i=0;i<phoneCount;i++) {
+					SmsPhone phoneNew=new SmsPhone() {
+						ClinicNum=c.ClinicNum,
+						CountryCode="US",
+						PhoneNumber="1555123"+rand.Next(9999).ToString().PadLeft(4,'0'),
+						DateTimeActive=DateTime.Now
+					};
+					phoneNew.SmsPhoneNum=SmsPhones.Insert(phoneNew);
+					listPhones.Add(phoneNew);
+				}
+				foreach(SmsPhone phone in listPhones) {
+					int inMsgCount=rand.Next(5);
+					int outMsgCount=rand.Next(5);
+					for(int i=0;i<inMsgCount;i++) {
+						SmsToMobile msg=new SmsToMobile();
+						msg.ClinicNum=c.ClinicNum;
+						msg.DateTimeSent=DateTime.Now.AddDays(-rand.Next(365)).AddSeconds(rand.Next(86400));//some time within the last year, at any time of day
+						msg.DateTimeTerminated=msg.DateTimeSent.AddSeconds(259200);//within 3 days.
+						msg.GuidMessage=Guid.NewGuid().ToString();
+						msg.GuidBatch=msg.GuidMessage;
+						msg.IsHidden=rand.Next(100)<5;//5% change of hidden msg
+						msg.IsTimeSensitive=true;
+						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
+						msg.MsgChargeUSD=.04f;
+						msg.MsgParts=1;
+						msg.MsgText="1111";//listSnomed[rand.Next(listSnomed.Count-1)].Description;
+						msg.MsgType=SmsMessageSource.DirectSms;
+						msg.PatNum=rand.Next(1,5);
+						msg.SmsPhoneNumber=phone.PhoneNumber;
+						msg.SmsStatus=(SmsDeliveryStatus)rand.Next(0,5);
+						SmsToMobiles.Insert(msg);
+					}
+					List<SmsFromMobile> listMessagesIn=new List<SmsFromMobile>();
+					for(int i=0;i<outMsgCount;i++) {
+						SmsFromMobile msg=new SmsFromMobile();
+						msg.ClinicNum=c.ClinicNum;
+						msg.IsHidden=rand.Next(100)<5;//5% change of hidden msg
+						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');//.03% change it is from one of the patients above.
+						msg.MsgPart=1;
+						msg.MsgRefID=Guid.NewGuid().ToString();
+						msg.MsgText="1111";// (string)listSnomed[rand.Next(listSnomed.Count-1)].Description;
+						msg.MsgTotal=1;
+						msg.SmsPhoneNumber=phone.PhoneNumber;
+						msg.SmsStatus=(SmsFromStatus)rand.Next(3);
+						listMessagesIn.Add(msg);
+					}
+					SmsFromMobiles.ProcessInboundSms(listMessagesIn);
+				}
+				if(c.ClinicNum==0) {//practice level
+					if(rand.Next(100)<25) {
+						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.MinValue);
+						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,0f);
+					}
+					else {
+						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.Now.AddDays(-rand.Next(365)));
+						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,rand.NextDouble()*50);
+					}
+				}
+				else {//clinic level
+					if(rand.Next(100)<25) {
+						c.SmsContractDate=DateTime.MinValue;
+						c.SmsMonthlyLimit=0f;
+					}
+					else {
+						c.SmsContractDate=DateTime.Now.AddDays(-rand.Next(365));
+						c.SmsMonthlyLimit=rand.NextDouble()*50;
+					}
+					Clinics.Update(c);
+				}
+			}//end for each clinic
+			Clinics.RefreshCache();
 			FillGridClinics();
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();
