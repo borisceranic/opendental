@@ -906,7 +906,7 @@ namespace OpenDental{
 			this.butPDF.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPDF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPDF.CornerRadius = 4F;
-			this.butPDF.Location = new System.Drawing.Point(880, 484);
+			this.butPDF.Location = new System.Drawing.Point(880, 457);
 			this.butPDF.Name = "butPDF";
 			this.butPDF.Size = new System.Drawing.Size(92, 24);
 			this.butPDF.TabIndex = 161;
@@ -922,7 +922,7 @@ namespace OpenDental{
 			this.butComplete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butComplete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butComplete.CornerRadius = 4F;
-			this.butComplete.Location = new System.Drawing.Point(880, 510);
+			this.butComplete.Location = new System.Drawing.Point(880, 483);
 			this.butComplete.Name = "butComplete";
 			this.butComplete.Size = new System.Drawing.Size(92, 24);
 			this.butComplete.TabIndex = 155;
@@ -1010,7 +1010,7 @@ namespace OpenDental{
 			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAudit.CornerRadius = 4F;
-			this.butAudit.Location = new System.Drawing.Point(880, 536);
+			this.butAudit.Location = new System.Drawing.Point(880, 509);
 			this.butAudit.Name = "butAudit";
 			this.butAudit.Size = new System.Drawing.Size(92, 24);
 			this.butAudit.TabIndex = 125;
@@ -1025,7 +1025,7 @@ namespace OpenDental{
 			this.butTask.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butTask.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butTask.CornerRadius = 4F;
-			this.butTask.Location = new System.Drawing.Point(880, 562);
+			this.butTask.Location = new System.Drawing.Point(880, 535);
 			this.butTask.Name = "butTask";
 			this.butTask.Size = new System.Drawing.Size(92, 24);
 			this.butTask.TabIndex = 124;
@@ -1042,7 +1042,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(880, 614);
+			this.butDelete.Location = new System.Drawing.Point(880, 587);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(92, 24);
 			this.butDelete.TabIndex = 123;
@@ -1059,7 +1059,7 @@ namespace OpenDental{
 			this.butPin.CornerRadius = 4F;
 			this.butPin.Image = ((System.Drawing.Image)(resources.GetObject("butPin.Image")));
 			this.butPin.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPin.Location = new System.Drawing.Point(880, 588);
+			this.butPin.Location = new System.Drawing.Point(880, 561);
 			this.butPin.Name = "butPin";
 			this.butPin.Size = new System.Drawing.Size(92, 24);
 			this.butPin.TabIndex = 122;
