@@ -8725,6 +8725,40 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PracticeIsMedicalOnly','0')";
 					Db.NonQ(command);
 				}
+				//Every time the payment window was opened, a tempfambal table would get created and then deleted after use.
+				//We have had several complaints about orphaned tempfambal tables lingering in databases.
+				//It is always okay to drop tempfambal tables in v15.3 because they are no longer used.
+				//Therefore, this one time only, we're going to loop through all tempfambal tables and try to drop them.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="SELECT DATABASE()";
+						table=Db.GetTable(command);
+						string databaseName=table.Rows[0][0].ToString();
+						command="SHOW TABLES FROM "+databaseName+" LIKE 'tempfambal%'";
+						table=Db.GetTable(command);
+						for(int i=0;i<table.Rows.Count;i++) {
+							command="DROP TABLE IF EXISTS "+databaseName+"."+table.Rows[i][0].ToString();
+							Db.NonQ(command);
+						}
+					}
+					else {//Oracle
+						command="SELECT USER FROM dual";
+						table=Db.GetTable(command);
+						string ownerName=table.Rows[0][0].ToString();
+						command="SELECT TABLE_NAME "
+							+"FROM DBA_TABLES "
+							+"WHERE TABLE_NAME LIKE 'TEMPFAMBAL%' "
+							+"AND OWNER='"+ownerName+"'";
+						table=Db.GetTable(command);
+						for(int i=0;i<table.Rows.Count;i++) {
+							command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE "+table.Rows[i][0].ToString()+"'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+							Db.NonQ(command);
+						}
+					}
+				}
+				catch(Exception e) {
+					//Dropping the orphaned tempfambal tables failed.  This doesn't matter at all so just continue on with the script.
+				}
 
 
 
