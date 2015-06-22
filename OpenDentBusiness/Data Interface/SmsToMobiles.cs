@@ -159,7 +159,7 @@ namespace OpenDentBusiness{
 			smsToMobile.PatNum=patNum;
 			smsToMobile.MsgText=message;
 			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
-			smsToMobile.Status=SmsDeliveryStatus.Pending;
+			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;
 			SmsToMobiles.Insert(smsToMobile);
 			return true;

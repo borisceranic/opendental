@@ -25,7 +25,7 @@ namespace OpenDentBusiness {
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string MsgText;
 		///<summary>Enum:SmsDeliveryStatus  Set by the Listener, tracks status of SMS.</summary>
-		public SmsDeliveryStatus Status;
+		public SmsDeliveryStatus SmsStatus;
 		///<summary>The count of parts that this message will be broken into when sent.
 		///A single long message will be broken into several smaller 153 utf8 or 70 unicode character messages.</summary>
 		public int MsgParts;
