@@ -661,9 +661,7 @@ namespace OpenDental{
 				}
 			}
 			//Stop users from hiding the last definition in categories that must have at least one def in them.
-			if(DefsList[DefsSelected].Category==DefCat.TaskPriorities
-				|| DefsList[DefsSelected].Category==DefCat.ProcCodeCats) 
-			{
+			if(Defs.IsHidable(DefsList[DefsSelected].Category))	{
 				int countShowing=0;
 				for(int i=0;i<DefsList.Length;i++) {
 					if(DefsList[i].DefNum==DefsList[DefsSelected].DefNum) {

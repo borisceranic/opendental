@@ -129,5 +129,31 @@ namespace OpenDentBusiness {
 			Defs.Update(def);
 		}
 
+		///<summary>Returns true if this category has definitions that can be hidden.</summary>
+		public static bool IsHidable(DefCat category) {
+			if(category==DefCat.AdjTypes
+				|| category==DefCat.ApptConfirmed
+				|| category==DefCat.ApptProcsQuickAdd
+				|| category==DefCat.BillingTypes
+				|| category==DefCat.BlockoutTypes
+				|| category==DefCat.CommLogTypes
+				|| category==DefCat.ContactCategories
+				|| category==DefCat.Diagnosis
+				|| category==DefCat.ImageCats
+				|| category==DefCat.LetterMergeCats
+				|| category==DefCat.PaymentTypes
+				|| category==DefCat.PaySplitUnearnedType
+				|| category==DefCat.ProcButtonCats
+				|| category==DefCat.ProcCodeCats
+				|| category==DefCat.Prognosis
+				|| category==DefCat.RecallUnschedStatus
+				|| category==DefCat.TaskPriorities
+				|| category==DefCat.TxPriorities) 
+			{
+				return true;
+			}
+			return false;
+		}
+
 	}
 }

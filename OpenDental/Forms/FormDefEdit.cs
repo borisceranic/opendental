@@ -287,8 +287,11 @@ namespace OpenDental{
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(DefCur.Category==DefCat.InsurancePaymentType && DefC.GetList(DefCat.InsurancePaymentType).Length==1) {
-				MsgBox.Show(this,"Cannot delete the last def from this category.");
+			if(DefCur.Category==DefCat.ClaimCustomTracking && DefC.GetList(DefCat.ClaimCustomTracking).Length==1
+				|| DefCur.Category==DefCat.InsurancePaymentType && DefC.GetList(DefCat.InsurancePaymentType).Length==1
+				|| DefCur.Category==DefCat.SupplyCats && DefC.GetList(DefCat.SupplyCats).Length==1) 
+			{
+				MsgBox.Show(this,"Cannot delete the last definition from this category.");
 				return;
 			}
 			try{
@@ -301,6 +304,23 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			//Stop users from hiding the last definition in categories that must have at least one def in them.
+			if(Defs.IsHidable(DefCur.Category)) {
+				int countShowing=0;
+				for(int i=0;i<_defsList.Length;i++) {
+					if(_defsList[i].DefNum==DefCur.DefNum) {
+						continue;
+					}
+					if(_defsList[i].IsHidden) {
+						continue;
+					}
+					countShowing++;
+				}
+				if(countShowing==0) {
+					MsgBox.Show(this,"You cannot hide the last definition in this category.");
+					return;
+				}
+			}
 			if(textName.Text==""){
 				MsgBox.Show(this,"Name required.");
 				return;
