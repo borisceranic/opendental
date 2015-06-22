@@ -263,6 +263,9 @@ namespace OpenDental {
 		}
 
 		private void Edit_Click() {
+			if(Plugins.HookMethod(this,"FormWiki.Edit_Click")) {
+				return;
+			}
 			if(WikiPageCur==null) {
 				return;
 			}
