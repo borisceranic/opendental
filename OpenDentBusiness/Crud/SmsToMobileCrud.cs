@@ -55,7 +55,7 @@ namespace OpenDentBusiness.Crud{
 				smsToMobile.IsTimeSensitive   = PIn.Bool  (table.Rows[i]["IsTimeSensitive"].ToString());
 				smsToMobile.MsgType           = (OpenDentBusiness.SmsMessageSource)PIn.Int(table.Rows[i]["MsgType"].ToString());
 				smsToMobile.MsgText           = PIn.String(table.Rows[i]["MsgText"].ToString());
-				smsToMobile.Status            = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(table.Rows[i]["Status"].ToString());
+				smsToMobile.SmsStatus         = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(table.Rows[i]["SmsStatus"].ToString());
 				smsToMobile.MsgParts          = PIn.Int   (table.Rows[i]["MsgParts"].ToString());
 				smsToMobile.MsgChargeUSD      = PIn.Double(table.Rows[i]["MsgChargeUSD"].ToString());
 				smsToMobile.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
@@ -103,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsToMobileNum,";
 			}
-			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
+			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,SmsStatus,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsToMobile.SmsToMobileNum)+",";
 			}
@@ -116,7 +116,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (smsToMobile.IsTimeSensitive)+","
 				+    POut.Int   ((int)smsToMobile.MsgType)+","
 				+    DbHelper.ParamChar+"paramMsgText,"
-				+    POut.Int   ((int)smsToMobile.Status)+","
+				+    POut.Int   ((int)smsToMobile.SmsStatus)+","
 				+    POut.Int   (smsToMobile.MsgParts)+","
 				+"'"+POut.Double(smsToMobile.MsgChargeUSD)+"',"
 				+    POut.Long  (smsToMobile.ClinicNum)+","
@@ -160,7 +160,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SmsToMobileNum,";
 			}
-			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,Status,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
+			command+="PatNum,GuidMessage,GuidBatch,SmsPhoneNumber,MobilePhoneNumber,IsTimeSensitive,MsgType,MsgText,SmsStatus,MsgParts,MsgChargeUSD,ClinicNum,CustErrorText,DateTimeSent,DateTimeTerminated,IsHidden) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(smsToMobile.SmsToMobileNum)+",";
 			}
@@ -173,7 +173,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (smsToMobile.IsTimeSensitive)+","
 				+    POut.Int   ((int)smsToMobile.MsgType)+","
 				+    DbHelper.ParamChar+"paramMsgText,"
-				+    POut.Int   ((int)smsToMobile.Status)+","
+				+    POut.Int   ((int)smsToMobile.SmsStatus)+","
 				+    POut.Int   (smsToMobile.MsgParts)+","
 				+"'"+POut.Double(smsToMobile.MsgChargeUSD)+"',"
 				+    POut.Long  (smsToMobile.ClinicNum)+","
@@ -205,7 +205,7 @@ namespace OpenDentBusiness.Crud{
 				+"IsTimeSensitive   =  "+POut.Bool  (smsToMobile.IsTimeSensitive)+", "
 				+"MsgType           =  "+POut.Int   ((int)smsToMobile.MsgType)+", "
 				+"MsgText           =  "+DbHelper.ParamChar+"paramMsgText, "
-				+"Status            =  "+POut.Int   ((int)smsToMobile.Status)+", "
+				+"SmsStatus         =  "+POut.Int   ((int)smsToMobile.SmsStatus)+", "
 				+"MsgParts          =  "+POut.Int   (smsToMobile.MsgParts)+", "
 				+"MsgChargeUSD      = '"+POut.Double(smsToMobile.MsgChargeUSD)+"', "
 				+"ClinicNum         =  "+POut.Long  (smsToMobile.ClinicNum)+", "
@@ -256,9 +256,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="MsgText = "+DbHelper.ParamChar+"paramMsgText";
 			}
-			if(smsToMobile.Status != oldSmsToMobile.Status) {
+			if(smsToMobile.SmsStatus != oldSmsToMobile.SmsStatus) {
 				if(command!=""){ command+=",";}
-				command+="Status = "+POut.Int   ((int)smsToMobile.Status)+"";
+				command+="SmsStatus = "+POut.Int   ((int)smsToMobile.SmsStatus)+"";
 			}
 			if(smsToMobile.MsgParts != oldSmsToMobile.MsgParts) {
 				if(command!=""){ command+=",";}

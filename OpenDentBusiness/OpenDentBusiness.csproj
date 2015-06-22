@@ -402,6 +402,7 @@
     <Compile Include="Crud\SigElementDefCrud.cs" />
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
+    <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
     <Compile Include="Crud\SmsToMobileCrud.cs" />
     <Compile Include="Crud\SmsPhoneCrud.cs" />
@@ -506,11 +507,12 @@
     <Compile Include="Data Interface\OIDInternals.cs" />
     <Compile Include="Data Interface\PatientRaces.cs" />
     <Compile Include="Data Interface\PayorTypes.cs" />
+    <Compile Include="InternalTools\IntegratedTexting\SmsBillings.cs" />
     <Compile Include="Data Interface\SmsFromMobiles.cs" />
     <Compile Include="Data Interface\SmsToMobiles.cs" />
     <Compile Include="Data Interface\SmsPhones.cs" />
     <Compile Include="Data Interface\TaskHists.cs" />
-    <Compile Include="InternalTools\IntegratedTexting\SmsBilling.cs" />
+    <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
     <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />
@@ -1353,6 +1355,7 @@
   <ItemGroup>
     <None Include="Web References\WebServiceMainHQ\webservicemainhq.disco" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
