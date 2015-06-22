@@ -510,6 +510,7 @@
     <Compile Include="Data Interface\SmsToMobiles.cs" />
     <Compile Include="Data Interface\SmsPhones.cs" />
     <Compile Include="Data Interface\TaskHists.cs" />
+    <Compile Include="InternalTools\IntegratedTexting\SmsBilling.cs" />
     <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />
