@@ -53,11 +53,9 @@ namespace OpenDentBusiness.Crud{
 				smsBilling.MsgChargeTotalUSD = PIn.Float (table.Rows[i]["MsgChargeTotalUSD"].ToString());
 				smsBilling.ClinicsTotal      = PIn.Int   (table.Rows[i]["ClinicsTotal"].ToString());
 				smsBilling.ClinicsActive     = PIn.Int   (table.Rows[i]["ClinicsActive"].ToString());
-				smsBilling.ClinicsInactive   = PIn.Int   (table.Rows[i]["ClinicsInactive"].ToString());
 				smsBilling.ClinicsWithUsage  = PIn.Int   (table.Rows[i]["ClinicsWithUsage"].ToString());
 				smsBilling.PhonesTotal       = PIn.Int   (table.Rows[i]["PhonesTotal"].ToString());
 				smsBilling.PhonesActive      = PIn.Int   (table.Rows[i]["PhonesActive"].ToString());
-				smsBilling.PhonesInactive    = PIn.Int   (table.Rows[i]["PhonesInactive"].ToString());
 				smsBilling.PhonesWithUsage   = PIn.Int   (table.Rows[i]["PhonesWithUsage"].ToString());
 				retVal.Add(smsBilling);
 			}
@@ -110,11 +108,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Float (smsBilling.MsgChargeTotalUSD)+","
 				+    POut.Int   (smsBilling.ClinicsTotal)+","
 				+    POut.Int   (smsBilling.ClinicsActive)+","
-				+    POut.Int   (smsBilling.ClinicsInactive)+","
 				+    POut.Int   (smsBilling.ClinicsWithUsage)+","
 				+    POut.Int   (smsBilling.PhonesTotal)+","
 				+    POut.Int   (smsBilling.PhonesActive)+","
-				+    POut.Int   (smsBilling.PhonesInactive)+","
 				+    POut.Int   (smsBilling.PhonesWithUsage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
@@ -159,11 +155,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Float (smsBilling.MsgChargeTotalUSD)+","
 				+    POut.Int   (smsBilling.ClinicsTotal)+","
 				+    POut.Int   (smsBilling.ClinicsActive)+","
-				+    POut.Int   (smsBilling.ClinicsInactive)+","
 				+    POut.Int   (smsBilling.ClinicsWithUsage)+","
 				+    POut.Int   (smsBilling.PhonesTotal)+","
 				+    POut.Int   (smsBilling.PhonesActive)+","
-				+    POut.Int   (smsBilling.PhonesInactive)+","
 				+    POut.Int   (smsBilling.PhonesWithUsage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
@@ -183,11 +177,9 @@ namespace OpenDentBusiness.Crud{
 				+"MsgChargeTotalUSD =  "+POut.Float (smsBilling.MsgChargeTotalUSD)+", "
 				+"ClinicsTotal      =  "+POut.Int   (smsBilling.ClinicsTotal)+", "
 				+"ClinicsActive     =  "+POut.Int   (smsBilling.ClinicsActive)+", "
-				+"ClinicsInactive   =  "+POut.Int   (smsBilling.ClinicsInactive)+", "
 				+"ClinicsWithUsage  =  "+POut.Int   (smsBilling.ClinicsWithUsage)+", "
 				+"PhonesTotal       =  "+POut.Int   (smsBilling.PhonesTotal)+", "
 				+"PhonesActive      =  "+POut.Int   (smsBilling.PhonesActive)+", "
-				+"PhonesInactive    =  "+POut.Int   (smsBilling.PhonesInactive)+", "
 				+"PhonesWithUsage   =  "+POut.Int   (smsBilling.PhonesWithUsage)+" "
 				+"WHERE SmsBillingNum = "+POut.Long(smsBilling.SmsBillingNum);
 			Db.NonQ(command);
@@ -220,10 +212,6 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClinicsActive = "+POut.Int(smsBilling.ClinicsActive)+"";
 			}
-			if(smsBilling.ClinicsInactive != oldSmsBilling.ClinicsInactive) {
-				if(command!=""){ command+=",";}
-				command+="ClinicsInactive = "+POut.Int(smsBilling.ClinicsInactive)+"";
-			}
 			if(smsBilling.ClinicsWithUsage != oldSmsBilling.ClinicsWithUsage) {
 				if(command!=""){ command+=",";}
 				command+="ClinicsWithUsage = "+POut.Int(smsBilling.ClinicsWithUsage)+"";
@@ -235,10 +223,6 @@ namespace OpenDentBusiness.Crud{
 			if(smsBilling.PhonesActive != oldSmsBilling.PhonesActive) {
 				if(command!=""){ command+=",";}
 				command+="PhonesActive = "+POut.Int(smsBilling.PhonesActive)+"";
-			}
-			if(smsBilling.PhonesInactive != oldSmsBilling.PhonesInactive) {
-				if(command!=""){ command+=",";}
-				command+="PhonesInactive = "+POut.Int(smsBilling.PhonesInactive)+"";
 			}
 			if(smsBilling.PhonesWithUsage != oldSmsBilling.PhonesWithUsage) {
 				if(command!=""){ command+=",";}

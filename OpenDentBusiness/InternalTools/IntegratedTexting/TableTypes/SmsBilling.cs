@@ -24,8 +24,6 @@ namespace OpenDentBusiness{
 		///These clinics should each be included in the repeating charge for the given calendar month.
 		/// ClinicsActive + ClinicsInactive = ClinicsTotal.</summary>
 		public int ClinicsActive;
-		///<summary>Subset of ClinicsTotal. Represents number of clinics which have an inactive date before 1st of the calendar month. ClinicsActive + ClinicsInactive = ClinicsTotal.</summary>
-		public int ClinicsInactive;
 		///<summary>Subset of ClinicsTotal. Represents number of clinics which actually accrued messaging charges for the given calendar month.</summary>
 		public int ClinicsWithUsage;
 		///<summary>Total number of phones for this customer. PhonesActive + PhonesInactive = PhonesTotal.</summary>
@@ -33,8 +31,6 @@ namespace OpenDentBusiness{
 		///<summary>Subset of PhonesTotal. Represents number of Phones which have no inactive date or an inactive date on or after 1st of the given calendar month. 
 		///PhonesActive + PhonesInactive = PhonesTotal.</summary>
 		public int PhonesActive;
-		///<summary>Subset of PhonesTotal. Represents number of Phones which have an inactive date before 1st of the calendar month. PhonesActive + PhonesInactive = PhonesTotal.</summary>
-		public int PhonesInactive;
 		///<summary>Subset of PhonesTotal. Represents number of Phones which actually accrued messaging charges for the given calendar month.</summary>
 		public int PhonesWithUsage;
 
