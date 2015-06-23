@@ -13,8 +13,6 @@ namespace OpenDental {
 		public string WirelessPhone;
 		public string Message;
 		public YN TxtMsgOk;
-		///<summary>Set to false to use CallFire, true to use integrated Texting.</summary>
-		public bool IsIntegratedTexting;
 		
 		public FormTxtMsgEdit() {
 			InitializeComponent();
@@ -40,15 +38,15 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter a phone number.");
 				return false;
 			}
-			if(IsIntegratedTexting) {
+			if(SmsPhones.IsIntegratedTextingEnabled()) {
 				if(clinicNum==0 && PrefC.GetDateT(PrefName.SmsContractDate).Year<1880) {
 					//Technically this should be impossible and should never happen.
-					MsgBox.Show(this,"Integrated Texting has not been enabled from the eServices setup window.");
+					MsgBox.Show(this,"Integrated Texting has not been enabled.");
 					return false;
 				}
 				else if(!Clinics.IsTextingEnabled(clinicNum)) {
 					//This is likely to happen a few times per office until they setup texting properly.
-					MsgBox.Show(this,"Integrated Texting has not been enabled for this clinic from the eServices setup window.");
+					MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\n"+Clinics.GetClinic(clinicNum).Description+".");
 					return false;
 				}
 			}
@@ -68,7 +66,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Text length must be less than 160 characters.");
 				return false;
 			}
-			if(IsIntegratedTexting) {
+			if(SmsPhones.IsIntegratedTextingEnabled()) {
 				try {
 					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);
 				}

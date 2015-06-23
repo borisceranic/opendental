@@ -97,53 +97,49 @@ namespace OpenDentBusiness{
 
 
 		/*
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="DROP TABLE IF EXISTS smsbilling";
-					Db.NonQ(command);
-					command=@"CREATE TABLE smsbilling (
-						SmsBillingNum bigint NOT NULL auto_increment PRIMARY KEY,
-						RegistrationKeyNum bigint NOT NULL,
-						CustPatNum bigint NOT NULL,
-						DateUsage date NOT NULL DEFAULT '0001-01-01',
-						MsgChargeTotalUSD float NOT NULL,
-						ClinicsTotal int NOT NULL,
-						ClinicsActive int NOT NULL,
-						ClinicsInactive int NOT NULL,
-						ClinicsWithUsage int NOT NULL,
-						PhonesTotal int NOT NULL,
-						PhonesActive int NOT NULL,
-						PhonesInactive int NOT NULL,
-						PhonesWithUsage int NOT NULL,
-						INDEX(RegistrationKeyNum),
-						INDEX(CustPatNum)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsbilling'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE smsbilling (
-						SmsBillingNum number(20) NOT NULL,
-						RegistrationKeyNum number(20) NOT NULL,
-						CustPatNum number(20) NOT NULL,
-						DateUsage date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
-						MsgChargeTotalUSD number(38,8) NOT NULL,
-						ClinicsTotal number(11) NOT NULL,
-						ClinicsActive number(11) NOT NULL,
-						ClinicsInactive number(11) NOT NULL,
-						ClinicsWithUsage number(11) NOT NULL,
-						PhonesTotal number(11) NOT NULL,
-						PhonesActive number(11) NOT NULL,
-						PhonesInactive number(11) NOT NULL,
-						PhonesWithUsage number(11) NOT NULL,
-						CONSTRAINT smsbilling_SmsBillingNum PRIMARY KEY (SmsBillingNum)
-						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX smsbilling_RegistrationKeyNum ON smsbilling (RegistrationKeyNum)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX smsbilling_CustPatNum ON smsbilling (CustPatNum)";
-					Db.NonQ(command);
-				}
+		if(DataConnection.DBtype==DatabaseType.MySql) {
+			command="DROP TABLE IF EXISTS smsbilling";
+			Db.NonQ(command);
+			command=@"CREATE TABLE smsbilling (
+				SmsBillingNum bigint NOT NULL auto_increment PRIMARY KEY,
+				RegistrationKeyNum bigint NOT NULL,
+				CustPatNum bigint NOT NULL,
+				DateUsage date NOT NULL DEFAULT '0001-01-01',
+				MsgChargeTotalUSD float NOT NULL,
+				ClinicsTotal int NOT NULL,
+				ClinicsActive int NOT NULL,
+				ClinicsWithUsage int NOT NULL,
+				PhonesTotal int NOT NULL,
+				PhonesActive int NOT NULL,
+				PhonesWithUsage int NOT NULL,
+				INDEX(RegistrationKeyNum),
+				INDEX(CustPatNum)
+				) DEFAULT CHARSET=utf8";
+			Db.NonQ(command);
+		}
+		else {//oracle
+			command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsbilling'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+			Db.NonQ(command);
+			command=@"CREATE TABLE smsbilling (
+				SmsBillingNum number(20) NOT NULL,
+				RegistrationKeyNum number(20) NOT NULL,
+				CustPatNum number(20) NOT NULL,
+				DateUsage date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+				MsgChargeTotalUSD number(38,8) NOT NULL,
+				ClinicsTotal number(11) NOT NULL,
+				ClinicsActive number(11) NOT NULL,
+				ClinicsWithUsage number(11) NOT NULL,
+				PhonesTotal number(11) NOT NULL,
+				PhonesActive number(11) NOT NULL,
+				PhonesWithUsage number(11) NOT NULL,
+				CONSTRAINT smsbilling_SmsBillingNum PRIMARY KEY (SmsBillingNum)
+				)";
+			Db.NonQ(command);
+			command=@"CREATE INDEX smsbilling_RegistrationKeyNum ON smsbilling (RegistrationKeyNum)";
+			Db.NonQ(command);
+			command=@"CREATE INDEX smsbilling_CustPatNum ON smsbilling (CustPatNum)";
+			Db.NonQ(command);
+		}
 		*/
 
 	}

@@ -162,18 +162,6 @@ namespace OpenDentBusiness{
 			DataTable retVal=Db.GetTable(command);
 			#endregion
 			#region Fill retVal DataTable
-			////Sent All Time
-			//command="SELECT ClinicNum, COUNT(*) FROM smstomobile WHERE MsgChargeUSD>0 GROUP BY ClinicNum";
-			//DataTable table=Db.GetTable(command);
-			//for(int i=0;i<table.Rows.Count;i++) {
-			//	for(int j=0;j<retVal.Rows.Count;j++) {
-			//		if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
-			//			continue;
-			//		}
-			//		retVal.Rows[j]["SentAllTime"]=table.Rows[i][1].ToString();
-			//		break;
-			//	}
-			//}
 			//Sent Last Month
 			command="SELECT ClinicNum, COUNT(*), ROUND(SUM(MsgChargeUSD),2) FROM smstomobile "
 				+"WHERE DateTimeSent >="+POut.Date(dateStart)+" "
@@ -190,18 +178,6 @@ namespace OpenDentBusiness{
 					break;
 				}
 			}
-			////Received All Time
-			//command="SELECT ClinicNum, COUNT(*) FROM smsfrommobile GROUP BY ClinicNum";
-			//table=Db.GetTable(command);
-			//for(int i=0;i<table.Rows.Count;i++) {
-			//	for(int j=0;j<retVal.Rows.Count;j++) {
-			//		if(retVal.Rows[j]["ClinicNum"].ToString()!=table.Rows[i]["ClinicNum"].ToString()) {
-			//			continue;
-			//		}
-			//		retVal.Rows[j]["SentAllTime"]=table.Rows[i][1].ToString();
-			//		break;
-			//	}
-			//}
 			//Received Month
 			command="SELECT ClinicNum, COUNT(*) FROM smsfrommobile "
 				+"WHERE DateTimeReceived >="+POut.Date(dateStart)+" "
