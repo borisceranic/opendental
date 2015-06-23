@@ -139,8 +139,8 @@ namespace OpenDental {
 			//Make sure every condition returns true
 			for(int i=0;i<autoConditionsList.Count;i++) {
 				switch(autoConditionsList[i].CompareField) {
-					case AutoCondField.SheetNotCompletedTodayWithName:
-						if(SheetNotCompletedTodayWithName(autoConditionsList[i],patNum)) {
+					case AutoCondField.NeedsSheet:
+						if(NeedsSheet(autoConditionsList[i],patNum)) {
 							return false;
 						}
 						break;
@@ -174,13 +174,18 @@ namespace OpenDental {
 							return false;
 						}
 						break;
+					case AutoCondField.InsuranceNotEffective:
+						if(!InsuranceNotEffectiveComparison(autoConditionsList[i],patNum)) {
+							return false;
+						}
+						break;
 				}
 			}
 			return true;
 		}
 
 		#region Comparisons
-		private static bool SheetNotCompletedTodayWithName(AutomationCondition autoCond, long patNum) {
+		private static bool NeedsSheet(AutomationCondition autoCond, long patNum) {
 			List<Sheet> sheetList=Sheets.GetForPatientForToday(patNum);
 			switch(autoCond.Comparison) {//Find out what operand to use.
 				case AutoCondComparison.Equals:
@@ -317,6 +322,22 @@ namespace OpenDental {
 					break;
 			}
 			return false;
+		}
+
+		///<summary>Returns false if the insurance plan is effictve.  True if today is outside of the insurance effective date range.</summary>
+		private static bool InsuranceNotEffectiveComparison(AutomationCondition autoCond,long patNum) {
+			PatPlan patPlanCur=PatPlans.GetPatPlan(patNum,1);
+			if(patPlanCur==null) {
+				return true;
+			}
+			InsSub insSubCur=InsSubs.GetOne(patPlanCur.InsSubNum);
+			if(insSubCur==null) {
+				return true;
+			}
+			if(DateTime.Today>=insSubCur.DateEffective && DateTime.Today<=insSubCur.DateTerm) {
+				return false;//Allen - Not not effective
+			}
+			return true;
 		}
 		#endregion
 

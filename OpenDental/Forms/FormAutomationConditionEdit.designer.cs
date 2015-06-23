@@ -30,6 +30,7 @@ namespace OpenDental{
 			this.labelComparison = new System.Windows.Forms.Label();
 			this.listCompareField = new System.Windows.Forms.ListBox();
 			this.listComparison = new System.Windows.Forms.ListBox();
+			this.labelWarning = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -78,6 +79,7 @@ namespace OpenDental{
 			this.listCompareField.Name = "listCompareField";
 			this.listCompareField.Size = new System.Drawing.Size(181, 212);
 			this.listCompareField.TabIndex = 71;
+			this.listCompareField.Click += new System.EventHandler(this.listCompareField_Click);
 			// 
 			// listComparison
 			// 
@@ -88,6 +90,19 @@ namespace OpenDental{
 			this.listComparison.Name = "listComparison";
 			this.listComparison.Size = new System.Drawing.Size(138, 212);
 			this.listComparison.TabIndex = 72;
+			// 
+			// labelWarning
+			// 
+			this.labelWarning.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelWarning.Location = new System.Drawing.Point(234, 43);
+			this.labelWarning.Name = "labelWarning";
+			this.labelWarning.Size = new System.Drawing.Size(479, 212);
+			this.labelWarning.TabIndex = 73;
+			this.labelWarning.Text = resources.GetString("labelWarning.Text");
+			this.labelWarning.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelWarning.Visible = false;
 			// 
 			// butDelete
 			// 
@@ -140,15 +155,16 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(738, 353);
+			this.Controls.Add(this.textCompareString);
 			this.Controls.Add(this.listComparison);
 			this.Controls.Add(this.listCompareField);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.labelComparison);
 			this.Controls.Add(this.labelCompareField);
-			this.Controls.Add(this.textCompareString);
 			this.Controls.Add(this.labelCompareString);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.Controls.Add(this.labelWarning);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormAutomationConditionEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -170,5 +186,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butDelete;
 		private System.Windows.Forms.ListBox listCompareField;
 		private System.Windows.Forms.ListBox listComparison;
+		private System.Windows.Forms.Label labelWarning;
 	}
 }

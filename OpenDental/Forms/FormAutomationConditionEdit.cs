@@ -20,17 +20,42 @@ namespace OpenDental {
 
 		private void FormAutomationConditionEdit_Load(object sender,EventArgs e) {
 			for(int i=0;i<Enum.GetNames(typeof(AutoCondField)).Length;i++) {
-				listCompareField.Items.Add(Enum.GetNames(typeof(AutoCondField))[i]);
+				listCompareField.Items.Add(Lan.g("enumAutoCondField",Enum.GetNames(typeof(AutoCondField))[i]));
 				listCompareField.SelectedIndex=0;
 			}
 			for(int i=0;i<Enum.GetNames(typeof(AutoCondComparison)).Length;i++) {
-				listComparison.Items.Add(Enum.GetNames(typeof(AutoCondComparison))[i]);
+				if(Enum.GetNames(typeof(AutoCondComparison))[i]=="None") {//Skip none as an option for the comparison field
+					continue;
+				}
+				listComparison.Items.Add(Lan.g("enumAutoCondComparison",Enum.GetNames(typeof(AutoCondComparison))[i]));
 				listComparison.SelectedIndex=0;
 			}
 			if(!IsNew) {
 				textCompareString.Text=ConditionCur.CompareString;
 				listCompareField.SelectedIndex=(int)ConditionCur.CompareField;
-				listComparison.SelectedIndex=(int)ConditionCur.Comparison;
+				if(ConditionCur.CompareField!=AutoCondField.InsuranceNotEffective) {
+					listComparison.SelectedIndex=(int)ConditionCur.Comparison;
+				}
+				ShowOrHideFields((AutoCondField)listCompareField.SelectedIndex);
+			}
+		}
+
+		///<summary>Show or hides the form fileds based of needs.</summary>
+		private void ShowOrHideFields(AutoCondField autoCondField) {
+			if(autoCondField==AutoCondField.InsuranceNotEffective) {//Hide fields
+				//labelWarning.Text=""; //Currently, this is the only condition that shows the warning label.  No need to dynamically set the text.
+				labelWarning.Visible=true;
+				labelComparison.Visible=false;
+				labelCompareString.Visible=false;
+				listComparison.Visible=false;
+				textCompareString.Visible=false;
+			}
+			else {//Show fields
+				labelWarning.Visible=false;
+				labelComparison.Visible=true;
+				labelCompareString.Visible=true;
+				listComparison.Visible=true;
+				textCompareString.Visible=true;
 			}
 		}
 
@@ -54,6 +79,10 @@ namespace OpenDental {
 			return true;
 		}
 
+		private void listCompareField_Click(object sender,EventArgs e) {
+			ShowOrHideFields((AutoCondField)listCompareField.SelectedIndex);
+		}
+
 		private void butDelete_Click(object sender,EventArgs e) {
 			if(IsNew) {
 				DialogResult=DialogResult.Cancel;
@@ -72,23 +101,30 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(textCompareString.Text.Trim()=="") {
-				MsgBox.Show(this,"Text not allowed to be blank.");
-				return;
+			if((AutoCondField)listCompareField.SelectedIndex==AutoCondField.InsuranceNotEffective) {
+				ConditionCur.CompareString=""; 
+				ConditionCur.CompareField=AutoCondField.InsuranceNotEffective;
+				ConditionCur.Comparison=AutoCondComparison.None;
 			}
-			if(!ReasonableLogic()) {
-				MsgBox.Show(this,"Comparison does not make sense with chosen field.");
-				return;
+			else {
+				if(textCompareString.Text.Trim()=="") {
+					MsgBox.Show(this,"Text not allowed to be blank.");
+					return;
+				}
+				if(!ReasonableLogic()) {
+					MsgBox.Show(this,"Comparison does not make sense with chosen field.");
+					return;
+				}
+				if(((AutoCondField)listCompareField.SelectedIndex==AutoCondField.Gender
+					&& !(textCompareString.Text.ToLower()=="m" || textCompareString.Text.ToLower()=="f"))) 
+				{
+					MsgBox.Show(this,"Allowed gender values are M or F.");
+					return;
+				}
+				ConditionCur.CompareString=textCompareString.Text;
+				ConditionCur.CompareField=(AutoCondField)listCompareField.SelectedIndex;
+				ConditionCur.Comparison=(AutoCondComparison)listComparison.SelectedIndex;
 			}
-			if(((AutoCondField)listCompareField.SelectedIndex==AutoCondField.Gender
-				&& !(textCompareString.Text.ToLower()=="m" || textCompareString.Text.ToLower()=="f"))) 
-			{
-				MsgBox.Show(this,"Allowed gender values are M or F.");
-				return;
-			}
-			ConditionCur.CompareString=textCompareString.Text;
-			ConditionCur.CompareField=(AutoCondField)listCompareField.SelectedIndex;
-			ConditionCur.Comparison=(AutoCondComparison)listComparison.SelectedIndex;
 			if(IsNew) {
 				AutomationConditions.Insert(ConditionCur);
 			}

@@ -27,7 +27,7 @@ namespace OpenDentBusiness{
 
 	public enum AutoCondField {
 		///<summary>Typically specify Equals the exact name/description of the sheet.</summary>
-		SheetNotCompletedTodayWithName,
+		NeedsSheet,
 		///<summary>disease</summary>
 		Problem,
 		Medication,
@@ -36,7 +36,8 @@ namespace OpenDentBusiness{
 		Age,
 		///<summary>Allowed values are M or F, not case sensitive.  Enforce at entry time.</summary>
 		Gender,
-		Labresult
+		Labresult,
+		InsuranceNotEffective
 	}
 
 	public enum AutoCondComparison{
@@ -45,7 +46,9 @@ namespace OpenDentBusiness{
 		GreaterThan,
 		LessThan,
 		///<summary>aka Like</summary>
-		Contains
+		Contains,
+		///<summary>Should not be displayed to users to choose from.  Used when the condition has one and only one 'comparison' to trigger it.  E.g. ins not effective.</summary>
+		None
 		//Exists,
 		//NotEquals,
 		//
