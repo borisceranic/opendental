@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>There is one entry in this table for each fee for a single procedurecode.  So if there are 5 different fees stored for one procedurecode, then there will be five entries here.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class Fee:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -23,6 +24,8 @@ namespace OpenDentBusiness{
 		public long CodeNum;
 		///<summary>FK to clinic.ClinicNum.  (Used if localization of fees for a feesched is enabled)</summary>
 		public long ClinicNum;
+		///<summary>FK to provider.ProvNum.  (Used if localization of fees for a feesched is enabled)</summary>
+		public long ProvNum;
 
 		///<summary></summary>
 		public Fee Copy(){
