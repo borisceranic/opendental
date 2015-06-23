@@ -671,8 +671,16 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary>Used only in ClaimProcs.ComputeBaseEst.  Calculates the most specific limitation for the specified code.  This is usually an annual max, ortho max, or fluoride limitation (only if age match).  Ignores benefits that do not match either the planNum or the patPlanNum.  It figures out how much was already used and reduces the returned value by that amount.  Both individual and family limitations will reduce the returned value independently.  Works for individual procs, categories, and general.  Also outputs a string description of the limitation.  There don't seem to be any situations where multiple limitations would each partially reduce coverage for a single code, other than ind/fam.  The returned value will be the original insEstTotal passed in unless there was some limitation that reduced it.</summary>
-		public static double GetLimitationByCode(List<Benefit> benList,long planNum,long patPlanNum,DateTime procDate,string procCodeStr,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,InsPlan plan,long patNum,out string note,double insEstTotal,int patientAge,long insSubNum) {
+		///<summary>Used only in ClaimProcs.ComputeBaseEst.  Calculates the most specific limitation for the specified code.  
+		///This is usually an annual max, ortho max, or fluoride limitation (only if age match).  
+		///Ignores benefits that do not match either the planNum or the patPlanNum.  
+		///It figures out how much was already used and reduces the returned value by that amount.  
+		///Both individual and family limitations will reduce the returned value independently.  
+		///Works for individual procs, categories, and general.  Also outputs a string description of the limitation.  
+		///There don't seem to be any situations where multiple limitations would each partially reduce coverage for a single code, other than ind/fam.  
+		///The returned value will be the original insEstTotal passed in unless there was some limitation that reduced it.
+		///Considers InsEstTotalOverride when dynamically writing the EstimateNote.</summary>
+		public static double GetLimitationByCode(List<Benefit> benList,long planNum,long patPlanNum,DateTime procDate,string procCodeStr,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,InsPlan plan,long patNum,out string note,double insEstTotal,int patientAge,long insSubNum,double insEstTotalOverride) {
 			//No need to check RemotingRole;no call to db.
 			note ="";
 			//first, create a much shorter list with only relevant benefits in it.
@@ -990,6 +998,12 @@ namespace OpenDentBusiness {
 					retVal=maxInd;//insurance will only cover up to the remaining annual max
 				}
 			}
+			double insRemainingOverride=insEstTotalOverride;  //insEstTotalOverride or the amount ind remaining.  Same concept as retVal but never returned.
+			if(benInd!=null) {
+				if(maxInd < insEstTotalOverride) {//if there's not enough left in the individual annual max to cover this proc.
+					insRemainingOverride=maxInd;//insurance will only cover up to the remaining annual max
+				}
+			}
 			//Three situations:
 			//1. Ind only. 
  			//Handled in the next 10 lines, then return.
@@ -1002,13 +1016,25 @@ namespace OpenDentBusiness {
 			//maxInd=-1
 			//benInd=null
 			if(benFam==null || benFam.MonetaryAmt==-1) {//if no family max.  Ind only.
-				if(retVal != insEstTotal){//and procedure is not fully covered by ind max
+				//If there is an override, calculate annual max note from it instead
+				if(insEstTotalOverride==-1 && retVal != insEstTotal){//and procedure is not fully covered by ind max
 					if(benInd!=null) {//redundant
 						if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
 							note+=Lans.g("Benefits","Over lifetime max");
 						}
 						else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
 							|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
+							note+=Lans.g("Benefits","Over annual max");
+						}
+					}
+				}
+				else if(insEstTotalOverride!=-1 && insRemainingOverride != insEstTotalOverride) {
+					if(benInd!=null) {//redundant
+						if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
+							note+=Lans.g("Benefits","Over lifetime max");
+						}
+						else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
+								|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
 							note+=Lans.g("Benefits","Over annual max");
 						}
 					}
@@ -1122,24 +1148,65 @@ namespace OpenDentBusiness {
 				return retVal;
 			}*/
 			if((benInd==null) || (maxFam < maxInd)) {//restrict by maxFam
-				if(maxFam < retVal) {//if there's not enough left in the annual max to cover this proc.
-					//example. retVal=$70.  But 2970 of 3000 family max has been used.  maxFam=30.  We need to return 30.
-					if(benInd==null) {
-						note+=Lans.g("Benefits","Over family max");
-					}
-					else{//both ind and fam
-						if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
-							note+=Lans.g("Benefits","Over family lifetime max");
+				if(insEstTotalOverride==-1) {//No insEstTotalOverride used, use normal insEstTotal
+					if(maxFam < retVal) {//if there's not enough left in the annual max to cover this proc.
+						//example. retVal=$70.  But 2970 of 3000 family max has been used.  maxFam=30.  We need to return 30.
+						if(benInd==null) {
+							note+=Lans.g("Benefits","Over family max");
 						}
-						else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
-						|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
-							note+=Lans.g("Benefits","Over family annual max");
+						else {//both ind and fam
+							if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
+								note+=Lans.g("Benefits","Over family lifetime max");
+							}
+							else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
+								|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
+								note+=Lans.g("Benefits","Over family annual max");
+							}
+						}
+						return maxFam;//insurance will only cover up to the remaining annual max
+					}
+				}
+				else {//If there is an override, calculate family max note from it instead
+					//First calculate the note using override
+					if(maxFam < insRemainingOverride) {//if there's not enough left in the annual max to cover this proc.
+						//example. insRemainingOverride=$70.  But 2970 of 3000 family max has been used.  maxFam=30.
+						if(benInd==null) {
+							note+=Lans.g("Benefits","Over family max");
+						}
+						else {//both ind and fam
+							if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
+								note+=Lans.g("Benefits","Over family lifetime max");
+							}
+							else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
+								|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
+								note+=Lans.g("Benefits","Over family annual max");
+							}
 						}
 					}
-					return maxFam;//insurance will only cover up to the remaining annual max
+					//Now return the same amount you would have if there wasn't an override
+					if(maxFam < retVal) {
+						return maxFam;
+					}
 				}
 			}
-			if(retVal < insEstTotal) {//must have been an individual restriction
+			if(insEstTotalOverride==-1) {//No insEstTotalOverride used, use normal insEstTotal
+				if(retVal < insEstTotal) {//must have been an individual restriction
+					if(benInd==null) {//js I don't understand this situation. It will probably not happen, but this is safe.
+						note+=Lans.g("Benefits","Over annual max");
+					}
+					else {
+						if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
+							note+=Lans.g("Benefits","Over lifetime max");
+						}
+						else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
+							|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
+							note+=Lans.g("Benefits","Over annual max");
+						}
+					}
+				}
+			}
+			//If there is an override, calculate max note from it instead.  Must have been an individual restriction.
+			else if(insRemainingOverride < insEstTotalOverride) {
 				if(benInd==null) {//js I don't understand this situation. It will probably not happen, but this is safe.
 					note+=Lans.g("Benefits","Over annual max");
 				}
@@ -1148,7 +1215,7 @@ namespace OpenDentBusiness {
 						note+=Lans.g("Benefits","Over lifetime max");
 					}
 					else if(benInd.TimePeriod==BenefitTimePeriod.CalendarYear
-					|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
+						|| benInd.TimePeriod==BenefitTimePeriod.ServiceYear) {
 						note+=Lans.g("Benefits","Over annual max");
 					}
 				}

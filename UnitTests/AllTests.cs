@@ -792,7 +792,7 @@ namespace UnitTests {
 
 		///<summary></summary>
 		public static string TestFourteen(int specificTest) {
-			if(specificTest != 0 && specificTest !=15) {
+			if(specificTest != 0 && specificTest !=14) {
 				return "";
 			}
 			string suffix="14";
@@ -1345,7 +1345,7 @@ namespace UnitTests {
 			if(specificTest != 0 && specificTest !=22) {
 				return "";
 			}
-			return "22: Deprecated";
+			return "22: Deprecated\r\n";
 			string suffix="22";
 			DateTime startDate=DateTime.Parse("2001-01-01");
 			Employee emp = EmployeeT.CreateEmployee(suffix);
@@ -1377,7 +1377,7 @@ namespace UnitTests {
 			if(specificTest != 0 && specificTest !=23) {
 				return "";
 			}
-			return "23: Deprecated";
+			return "23: Deprecated\r\n";
 			string suffix="23";
 			DateTime startDate=DateTime.Parse("2001-01-01");
 			Employee emp = EmployeeT.CreateEmployee(suffix);
@@ -2700,6 +2700,148 @@ namespace UnitTests {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D1110 procedure attached to Pat1. \r\n");
 			}
 			retVal+="48: Passed.  PaySplitManager created paysplits for procedures partially paid by claimprocs. \r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFourtyNine(int specificTest) {
+			if(specificTest != 0 && specificTest !=49) {
+				return "";
+			}
+			string suffix="49";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateAnnualMaxFamily(plan.PlanNum,400);
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.Restorative,100);
+			PatPlan pplan=PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			//procs - D2140 (amalgum fillings)
+			Procedure proc1=ProcedureT.CreateProcedure(pat,"D2140",ProcStat.TP,"18",500);
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			Procedure[] ProcListTP=Procedures.GetListTP(ProcList);//sorted by priority, then toothnum
+			//Validate
+			string retVal="";
+			for(int i=0;i<ProcListTP.Length;i++) {
+				Procedures.ComputeEstimates(ProcListTP[i],pat.PatNum,ref claimProcs,false,planList,patPlans,benefitList,
+					histList,loopList,false,pat.Age,subList);
+				//then, add this information to loopList so that the next procedure is aware of it.
+				loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs,ProcListTP[i].ProcNum,ProcListTP[i].CodeNum));
+			}
+			//save changes in the list to the database
+			ClaimProcs.Synch(ref claimProcs,claimProcListOld);
+			claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			//change override
+			claimProcs[0].InsEstTotalOverride=399;
+			ClaimProcs.Update(claimProcs[0]);
+			//Lists2
+			List<ClaimProc> claimProcs2=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld2=ClaimProcs.Refresh(pat.PatNum);
+			Family fam2=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList2=InsSubs.RefreshForFam(fam2);
+			List<InsPlan> planList2=InsPlans.RefreshForSubList(subList2);
+			List<PatPlan> patPlans2=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList2=Benefits.Refresh(patPlans2,subList2);
+			List<ClaimProcHist> histList2=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList2=new List<ClaimProcHist>();
+			List<Procedure> ProcList2=Procedures.Refresh(pat.PatNum);
+			Procedure[] ProcListTP2=Procedures.GetListTP(ProcList2);//sorted by priority, then toothnum
+			//Validate again
+			for(int i=0;i<ProcListTP.Length;i++) {
+				Procedures.ComputeEstimates(ProcListTP2[i],pat.PatNum,ref claimProcs2,false,planList2,patPlans2,benefitList2,
+					histList2,loopList2,false,pat.Age,subList2);
+				//then, add this information to loopList so that the next procedure is aware of it.
+				loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs2,ProcListTP2[i].ProcNum,ProcListTP2[i].CodeNum));
+			}
+			ClaimProcs.Synch(ref claimProcs2,claimProcListOld2);
+			claimProcs2=ClaimProcs.Refresh(pat.PatNum);
+			//Check to see if note still says over annual max
+			if(claimProcs2[0].EstimateNote!="") {//The override should be under the family annual max of 400 so no there should be no EstimateNote.
+				throw new Exception("Claimproc's EstimateNote was "+claimProcs2[0].EstimateNote+", should be blank.\r\n");
+			}
+			retVal+="49: Passed.  Insurance estimate with override under family max had blank EstimateNote.\r\n";
+			return retVal;
+		}
+
+		///<summary></summary>
+		public static string TestFifty(int specificTest) {
+			if(specificTest != 0 && specificTest !=50) {
+				return "";
+			}
+			string suffix="50";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateAnnualMaxFamily(plan.PlanNum,400);
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.Restorative,100);
+			PatPlan pplan=PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			//procs - D2140 (amalgum fillings)
+			Procedure proc1=ProcedureT.CreateProcedure(pat,"D2140",ProcStat.TP,"18",500);
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			Procedure[] ProcListTP=Procedures.GetListTP(ProcList);//sorted by priority, then toothnum
+			//Validate
+			string retVal="";
+			for(int i=0;i<ProcListTP.Length;i++) {
+				Procedures.ComputeEstimates(ProcListTP[i],pat.PatNum,ref claimProcs,false,planList,patPlans,benefitList,
+					histList,loopList,false,pat.Age,subList);
+				//then, add this information to loopList so that the next procedure is aware of it.
+				loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs,ProcListTP[i].ProcNum,ProcListTP[i].CodeNum));
+			}
+			//save changes in the list to the database
+			ClaimProcs.Synch(ref claimProcs,claimProcListOld);
+			claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			//change override
+			claimProcs[0].InsEstTotalOverride=401;
+			ClaimProcs.Update(claimProcs[0]);
+			//Lists2
+			List<ClaimProc> claimProcs2=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld2=ClaimProcs.Refresh(pat.PatNum);
+			Family fam2=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList2=InsSubs.RefreshForFam(fam2);
+			List<InsPlan> planList2=InsPlans.RefreshForSubList(subList2);
+			List<PatPlan> patPlans2=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList2=Benefits.Refresh(patPlans2,subList2);
+			List<ClaimProcHist> histList2=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList2=new List<ClaimProcHist>();
+			List<Procedure> ProcList2=Procedures.Refresh(pat.PatNum);
+			Procedure[] ProcListTP2=Procedures.GetListTP(ProcList2);//sorted by priority, then toothnum
+			//Validate again
+			for(int i=0;i<ProcListTP.Length;i++) {
+				Procedures.ComputeEstimates(ProcListTP2[i],pat.PatNum,ref claimProcs2,false,planList2,patPlans2,benefitList2,
+					histList2,loopList2,false,pat.Age,subList2);
+				//then, add this information to loopList so that the next procedure is aware of it.
+				loopList.AddRange(ClaimProcs.GetHistForProc(claimProcs2,ProcListTP2[i].ProcNum,ProcListTP2[i].CodeNum));
+			}
+			ClaimProcs.Synch(ref claimProcs2,claimProcListOld2);
+			claimProcs2=ClaimProcs.Refresh(pat.PatNum);
+			//Check to see if note still says over annual max
+			if(claimProcs2[0].EstimateNote!="Over family max") {//The override should be under the family annual max of 400 so no there should be no remarks.
+				throw new Exception("Claimproc's EstimateNote was "+claimProcs2[0].EstimateNote+", should be \"Over family max\".\r\n");
+			}
+			retVal+="50: Passed.  Insurance estimate with override over family max showed \"over family max\" EstimateNote.\r\n";
 			return retVal;
 		}
 			
