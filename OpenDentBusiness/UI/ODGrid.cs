@@ -2634,22 +2634,21 @@ namespace OpenDental.UI {
 		private void editBox_NextCell() {
 			editBox.Dispose();//This fires editBox_LostFocus, which is where we call OnCellLeave.
 			editBox=null;
-			//OnCellLeave(selectedCell.X,selectedCell.Y);
 			//find the next editable cell to the right.
 			int nextCellToRight=-1;
-			for(int i=selectedCell.X+1;i<columns.Count;i++) {
+			for(int i=oldSelectedCell.X+1;i<columns.Count;i++) {
 				if(columns[i].IsEditable) {
 					nextCellToRight=i;
 					break;
 				}
 			}
 			if(nextCellToRight!=-1) {
-				selectedCell=new Point(nextCellToRight,selectedCell.Y);
+				selectedCell=new Point(nextCellToRight,oldSelectedCell.Y);
 				CreateEditBox();
 				return;
 			}
 			//can't move to the right, so attempt to move down.
-			if(selectedCell.Y==rows.Count-1) {
+			if(oldSelectedCell.Y==rows.Count-1) {
 				return;//can't move down
 			}
 			nextCellToRight=-1;
@@ -2660,7 +2659,7 @@ namespace OpenDental.UI {
 				}
 			}
 			//guaranteed to have a value
-			selectedCell=new Point(nextCellToRight,selectedCell.Y+1);
+			selectedCell=new Point(nextCellToRight,oldSelectedCell.Y+1);
 			CreateEditBox();
 		}
 		
