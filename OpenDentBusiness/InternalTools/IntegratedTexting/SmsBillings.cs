@@ -8,6 +8,15 @@ using System.Linq;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class SmsBillings{
+		/// <summary>dateFrom is inclusive. dateTo is exclusive. Used by OD Broadcaster. DO NOT REMOVE!!!</summary>
+		public static List<SmsBilling> GetByDateRange(DateTime dateFrom,DateTime dateTo) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<SmsBilling>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
+			}
+			string command="SELECT * FROM smsbilling WHERE DateUsage >= "+POut.Date(dateFrom,true)+" AND DateUsage < "+POut.Date(dateTo,true);
+			return Crud.SmsBillingCrud.SelectMany(command);
+		}
+
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*
 		#region CachePattern
