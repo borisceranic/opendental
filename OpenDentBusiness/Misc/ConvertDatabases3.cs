@@ -8759,6 +8759,17 @@ namespace OpenDentBusiness {
 				catch(Exception e) {
 					//Dropping the orphaned tempfambal tables failed.  This doesn't matter at all so just continue on with the script.
 				}
+				//Associating Providers to Fee Schedules
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE fee ADD ProvNum bigint NOT NULL";//0 is default
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE fee ADD ProvNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE fee SET ProvNum = 0 WHERE ProvNum IS NULL";//0 is default
+					Db.NonQ(command);
+				}
 
 
 
@@ -8796,4 +8807,3 @@ namespace OpenDentBusiness {
 
 
 
-    
