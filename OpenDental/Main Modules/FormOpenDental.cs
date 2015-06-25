@@ -2493,13 +2493,11 @@ namespace OpenDental{
 						Application.Exit();
 						return false;
 					}
-					DialogResult result=MessageBox.Show("An update is in progress on "+updateComputerName+".  Not allowed to start up until that update is complete.\r\n\r\nIf you are the person who started the update and you wish to override this message because an update is not in progress, click Retry.\r\n\r\nDo not click Retry unless you started the update.",
-						"",MessageBoxButtons.RetryCancel);
-					if(result==DialogResult.Retry) {
-						Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");
-						MsgBox.Show(this,"You will be allowed access when you restart.");
+					FormUpdateInProgress formUIP=new FormUpdateInProgress(updateComputerName);
+					DialogResult result=formUIP.ShowDialog();
+					if(result!=DialogResult.OK) {
+						return false;//Either the user canceled out of the window or clicked the override button which 
 					}
-					return false;
 				}
 			}
 			//if RemotingRole.ClientWeb, version will have already been checked at login, so no danger here.
