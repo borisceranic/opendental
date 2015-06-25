@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -95,52 +96,16 @@ namespace OpenDentBusiness{
 		}
 		*/
 
+		///<summary>Can return null. Date usage should be the first of the month, if not will return the SmsBilling for the given patnum where month and year match dateUsage.</summary>
+		public static SmsBilling getForPatNum(long patNum,DateTime dateUsage) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<SmsBilling>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM smsbilling WHERE PatNum = "+POut.Long(patNum);
+			List<SmsBilling> listSmsBillingAll=Crud.SmsBillingCrud.SelectMany(command);
+			return listSmsBillingAll.First(x => x.DateUsage.Year==dateUsage.Year && x.DateUsage.Month==dateUsage.Month);
+		}
 
-		/*
-		if(DataConnection.DBtype==DatabaseType.MySql) {
-			command="DROP TABLE IF EXISTS smsbilling";
-			Db.NonQ(command);
-			command=@"CREATE TABLE smsbilling (
-				SmsBillingNum bigint NOT NULL auto_increment PRIMARY KEY,
-				RegistrationKeyNum bigint NOT NULL,
-				CustPatNum bigint NOT NULL,
-				DateUsage date NOT NULL DEFAULT '0001-01-01',
-				MsgChargeTotalUSD float NOT NULL,
-				ClinicsTotal int NOT NULL,
-				ClinicsActive int NOT NULL,
-				ClinicsWithUsage int NOT NULL,
-				PhonesTotal int NOT NULL,
-				PhonesActive int NOT NULL,
-				PhonesWithUsage int NOT NULL,
-				INDEX(RegistrationKeyNum),
-				INDEX(CustPatNum)
-				) DEFAULT CHARSET=utf8";
-			Db.NonQ(command);
-		}
-		else {//oracle
-			command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE smsbilling'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-			Db.NonQ(command);
-			command=@"CREATE TABLE smsbilling (
-				SmsBillingNum number(20) NOT NULL,
-				RegistrationKeyNum number(20) NOT NULL,
-				CustPatNum number(20) NOT NULL,
-				DateUsage date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
-				MsgChargeTotalUSD number(38,8) NOT NULL,
-				ClinicsTotal number(11) NOT NULL,
-				ClinicsActive number(11) NOT NULL,
-				ClinicsWithUsage number(11) NOT NULL,
-				PhonesTotal number(11) NOT NULL,
-				PhonesActive number(11) NOT NULL,
-				PhonesWithUsage number(11) NOT NULL,
-				CONSTRAINT smsbilling_SmsBillingNum PRIMARY KEY (SmsBillingNum)
-				)";
-			Db.NonQ(command);
-			command=@"CREATE INDEX smsbilling_RegistrationKeyNum ON smsbilling (RegistrationKeyNum)";
-			Db.NonQ(command);
-			command=@"CREATE INDEX smsbilling_CustPatNum ON smsbilling (CustPatNum)";
-			Db.NonQ(command);
-		}
-		*/
 
 	}
 }

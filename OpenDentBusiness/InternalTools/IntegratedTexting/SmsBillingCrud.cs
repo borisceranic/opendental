@@ -46,17 +46,22 @@ namespace OpenDentBusiness.Crud{
 			SmsBilling smsBilling;
 			for(int i=0;i<table.Rows.Count;i++) {
 				smsBilling=new SmsBilling();
-				smsBilling.SmsBillingNum     = PIn.Long  (table.Rows[i]["SmsBillingNum"].ToString());
-				smsBilling.RegistrationKeyNum= PIn.Long  (table.Rows[i]["RegistrationKeyNum"].ToString());
-				smsBilling.CustPatNum        = PIn.Long  (table.Rows[i]["CustPatNum"].ToString());
-				smsBilling.DateUsage         = PIn.Date  (table.Rows[i]["DateUsage"].ToString());
-				smsBilling.MsgChargeTotalUSD = PIn.Float (table.Rows[i]["MsgChargeTotalUSD"].ToString());
-				smsBilling.ClinicsTotal      = PIn.Int   (table.Rows[i]["ClinicsTotal"].ToString());
-				smsBilling.ClinicsActive     = PIn.Int   (table.Rows[i]["ClinicsActive"].ToString());
-				smsBilling.ClinicsWithUsage  = PIn.Int   (table.Rows[i]["ClinicsWithUsage"].ToString());
-				smsBilling.PhonesTotal       = PIn.Int   (table.Rows[i]["PhonesTotal"].ToString());
-				smsBilling.PhonesActive      = PIn.Int   (table.Rows[i]["PhonesActive"].ToString());
-				smsBilling.PhonesWithUsage   = PIn.Int   (table.Rows[i]["PhonesWithUsage"].ToString());
+				smsBilling.SmsBillingNum       = PIn.Long  (table.Rows[i]["SmsBillingNum"].ToString());
+				smsBilling.RegistrationKeyNum  = PIn.Long  (table.Rows[i]["RegistrationKeyNum"].ToString());
+				smsBilling.CustPatNum          = PIn.Long  (table.Rows[i]["CustPatNum"].ToString());
+				smsBilling.DateUsage           = PIn.Date  (table.Rows[i]["DateUsage"].ToString());
+				smsBilling.MsgChargeTotalUSD   = PIn.Float (table.Rows[i]["MsgChargeTotalUSD"].ToString());
+				smsBilling.AccessChargeTotalUSD= PIn.Float (table.Rows[i]["AccessChargeTotalUSD"].ToString());
+				smsBilling.ClinicsTotalCount   = PIn.Int   (table.Rows[i]["ClinicsTotalCount"].ToString());
+				smsBilling.ClinicsActiveCount  = PIn.Int   (table.Rows[i]["ClinicsActiveCount"].ToString());
+				smsBilling.ClinicsUsedCount    = PIn.Int   (table.Rows[i]["ClinicsUsedCount"].ToString());
+				smsBilling.PhonesTotalCount    = PIn.Int   (table.Rows[i]["PhonesTotalCount"].ToString());
+				smsBilling.PhonesActiveCount   = PIn.Int   (table.Rows[i]["PhonesActiveCount"].ToString());
+				smsBilling.PhonesUsedCount     = PIn.Int   (table.Rows[i]["PhonesUsedCount"].ToString());
+				smsBilling.MsgSentOkCount      = PIn.Int   (table.Rows[i]["MsgSentOkCount"].ToString());
+				smsBilling.MsgRcvOkCount       = PIn.Int   (table.Rows[i]["MsgRcvOkCount"].ToString());
+				smsBilling.MsgSentFailCount    = PIn.Int   (table.Rows[i]["MsgSentFailCount"].ToString());
+				smsBilling.MsgRcvFailCount     = PIn.Int   (table.Rows[i]["MsgRcvFailCount"].ToString());
 				retVal.Add(smsBilling);
 			}
 			return retVal;
@@ -97,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsBillingNum,";
 			}
-			command+="RegistrationKeyNum,CustPatNum,DateUsage,MsgChargeTotalUSD,ClinicsTotal,ClinicsActive,ClinicsInactive,ClinicsWithUsage,PhonesTotal,PhonesActive,PhonesInactive,PhonesWithUsage) VALUES(";
+			command+="RegistrationKeyNum,CustPatNum,DateUsage,MsgChargeTotalUSD,AccessChargeTotalUSD,ClinicsTotalCount,ClinicsActiveCount,ClinicsUsedCount,PhonesTotalCount,PhonesActiveCount,PhonesUsedCount,MsgSentOkCount,MsgRcvOkCount,MsgSentFailCount,MsgRcvFailCount) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsBilling.SmsBillingNum)+",";
 			}
@@ -106,12 +111,17 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (smsBilling.CustPatNum)+","
 				+    POut.Date  (smsBilling.DateUsage)+","
 				+    POut.Float (smsBilling.MsgChargeTotalUSD)+","
-				+    POut.Int   (smsBilling.ClinicsTotal)+","
-				+    POut.Int   (smsBilling.ClinicsActive)+","
-				+    POut.Int   (smsBilling.ClinicsWithUsage)+","
-				+    POut.Int   (smsBilling.PhonesTotal)+","
-				+    POut.Int   (smsBilling.PhonesActive)+","
-				+    POut.Int   (smsBilling.PhonesWithUsage)+")";
+				+    POut.Float (smsBilling.AccessChargeTotalUSD)+","
+				+    POut.Int   (smsBilling.ClinicsTotalCount)+","
+				+    POut.Int   (smsBilling.ClinicsActiveCount)+","
+				+    POut.Int   (smsBilling.ClinicsUsedCount)+","
+				+    POut.Int   (smsBilling.PhonesTotalCount)+","
+				+    POut.Int   (smsBilling.PhonesActiveCount)+","
+				+    POut.Int   (smsBilling.PhonesUsedCount)+","
+				+    POut.Int   (smsBilling.MsgSentOkCount)+","
+				+    POut.Int   (smsBilling.MsgRcvOkCount)+","
+				+    POut.Int   (smsBilling.MsgSentFailCount)+","
+				+    POut.Int   (smsBilling.MsgRcvFailCount)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -144,7 +154,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SmsBillingNum,";
 			}
-			command+="RegistrationKeyNum,CustPatNum,DateUsage,MsgChargeTotalUSD,ClinicsTotal,ClinicsActive,ClinicsInactive,ClinicsWithUsage,PhonesTotal,PhonesActive,PhonesInactive,PhonesWithUsage) VALUES(";
+			command+="RegistrationKeyNum,CustPatNum,DateUsage,MsgChargeTotalUSD,AccessChargeTotalUSD,ClinicsTotalCount,ClinicsActiveCount,ClinicsUsedCount,PhonesTotalCount,PhonesActiveCount,PhonesUsedCount,MsgSentOkCount,MsgRcvOkCount,MsgSentFailCount,MsgRcvFailCount) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(smsBilling.SmsBillingNum)+",";
 			}
@@ -153,12 +163,17 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (smsBilling.CustPatNum)+","
 				+    POut.Date  (smsBilling.DateUsage)+","
 				+    POut.Float (smsBilling.MsgChargeTotalUSD)+","
-				+    POut.Int   (smsBilling.ClinicsTotal)+","
-				+    POut.Int   (smsBilling.ClinicsActive)+","
-				+    POut.Int   (smsBilling.ClinicsWithUsage)+","
-				+    POut.Int   (smsBilling.PhonesTotal)+","
-				+    POut.Int   (smsBilling.PhonesActive)+","
-				+    POut.Int   (smsBilling.PhonesWithUsage)+")";
+				+    POut.Float (smsBilling.AccessChargeTotalUSD)+","
+				+    POut.Int   (smsBilling.ClinicsTotalCount)+","
+				+    POut.Int   (smsBilling.ClinicsActiveCount)+","
+				+    POut.Int   (smsBilling.ClinicsUsedCount)+","
+				+    POut.Int   (smsBilling.PhonesTotalCount)+","
+				+    POut.Int   (smsBilling.PhonesActiveCount)+","
+				+    POut.Int   (smsBilling.PhonesUsedCount)+","
+				+    POut.Int   (smsBilling.MsgSentOkCount)+","
+				+    POut.Int   (smsBilling.MsgRcvOkCount)+","
+				+    POut.Int   (smsBilling.MsgSentFailCount)+","
+				+    POut.Int   (smsBilling.MsgRcvFailCount)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -171,16 +186,21 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one SmsBilling in the database.</summary>
 		public static void Update(SmsBilling smsBilling){
 			string command="UPDATE smsbilling SET "
-				+"RegistrationKeyNum=  "+POut.Long  (smsBilling.RegistrationKeyNum)+", "
-				+"CustPatNum        =  "+POut.Long  (smsBilling.CustPatNum)+", "
-				+"DateUsage         =  "+POut.Date  (smsBilling.DateUsage)+", "
-				+"MsgChargeTotalUSD =  "+POut.Float (smsBilling.MsgChargeTotalUSD)+", "
-				+"ClinicsTotal      =  "+POut.Int   (smsBilling.ClinicsTotal)+", "
-				+"ClinicsActive     =  "+POut.Int   (smsBilling.ClinicsActive)+", "
-				+"ClinicsWithUsage  =  "+POut.Int   (smsBilling.ClinicsWithUsage)+", "
-				+"PhonesTotal       =  "+POut.Int   (smsBilling.PhonesTotal)+", "
-				+"PhonesActive      =  "+POut.Int   (smsBilling.PhonesActive)+", "
-				+"PhonesWithUsage   =  "+POut.Int   (smsBilling.PhonesWithUsage)+" "
+				+"RegistrationKeyNum  =  "+POut.Long  (smsBilling.RegistrationKeyNum)+", "
+				+"CustPatNum          =  "+POut.Long  (smsBilling.CustPatNum)+", "
+				+"DateUsage           =  "+POut.Date  (smsBilling.DateUsage)+", "
+				+"MsgChargeTotalUSD   =  "+POut.Float (smsBilling.MsgChargeTotalUSD)+", "
+				+"AccessChargeTotalUSD=  "+POut.Float (smsBilling.AccessChargeTotalUSD)+", "
+				+"ClinicsTotalCount   =  "+POut.Int   (smsBilling.ClinicsTotalCount)+", "
+				+"ClinicsActiveCount  =  "+POut.Int   (smsBilling.ClinicsActiveCount)+", "
+				+"ClinicsUsedCount    =  "+POut.Int   (smsBilling.ClinicsUsedCount)+", "
+				+"PhonesTotalCount    =  "+POut.Int   (smsBilling.PhonesTotalCount)+", "
+				+"PhonesActiveCount   =  "+POut.Int   (smsBilling.PhonesActiveCount)+", "
+				+"PhonesUsedCount     =  "+POut.Int   (smsBilling.PhonesUsedCount)+", "
+				+"MsgSentOkCount      =  "+POut.Int   (smsBilling.MsgSentOkCount)+", "
+				+"MsgRcvOkCount       =  "+POut.Int   (smsBilling.MsgRcvOkCount)+", "
+				+"MsgSentFailCount    =  "+POut.Int   (smsBilling.MsgSentFailCount)+", "
+				+"MsgRcvFailCount     =  "+POut.Int   (smsBilling.MsgRcvFailCount)+" "
 				+"WHERE SmsBillingNum = "+POut.Long(smsBilling.SmsBillingNum);
 			Db.NonQ(command);
 		}
@@ -204,29 +224,49 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="MsgChargeTotalUSD = "+POut.Float(smsBilling.MsgChargeTotalUSD)+"";
 			}
-			if(smsBilling.ClinicsTotal != oldSmsBilling.ClinicsTotal) {
+			if(smsBilling.AccessChargeTotalUSD != oldSmsBilling.AccessChargeTotalUSD) {
 				if(command!=""){ command+=",";}
-				command+="ClinicsTotal = "+POut.Int(smsBilling.ClinicsTotal)+"";
+				command+="AccessChargeTotalUSD = "+POut.Float(smsBilling.AccessChargeTotalUSD)+"";
 			}
-			if(smsBilling.ClinicsActive != oldSmsBilling.ClinicsActive) {
+			if(smsBilling.ClinicsTotalCount != oldSmsBilling.ClinicsTotalCount) {
 				if(command!=""){ command+=",";}
-				command+="ClinicsActive = "+POut.Int(smsBilling.ClinicsActive)+"";
+				command+="ClinicsTotalCount = "+POut.Int(smsBilling.ClinicsTotalCount)+"";
 			}
-			if(smsBilling.ClinicsWithUsage != oldSmsBilling.ClinicsWithUsage) {
+			if(smsBilling.ClinicsActiveCount != oldSmsBilling.ClinicsActiveCount) {
 				if(command!=""){ command+=",";}
-				command+="ClinicsWithUsage = "+POut.Int(smsBilling.ClinicsWithUsage)+"";
+				command+="ClinicsActiveCount = "+POut.Int(smsBilling.ClinicsActiveCount)+"";
 			}
-			if(smsBilling.PhonesTotal != oldSmsBilling.PhonesTotal) {
+			if(smsBilling.ClinicsUsedCount != oldSmsBilling.ClinicsUsedCount) {
 				if(command!=""){ command+=",";}
-				command+="PhonesTotal = "+POut.Int(smsBilling.PhonesTotal)+"";
+				command+="ClinicsUsedCount = "+POut.Int(smsBilling.ClinicsUsedCount)+"";
 			}
-			if(smsBilling.PhonesActive != oldSmsBilling.PhonesActive) {
+			if(smsBilling.PhonesTotalCount != oldSmsBilling.PhonesTotalCount) {
 				if(command!=""){ command+=",";}
-				command+="PhonesActive = "+POut.Int(smsBilling.PhonesActive)+"";
+				command+="PhonesTotalCount = "+POut.Int(smsBilling.PhonesTotalCount)+"";
 			}
-			if(smsBilling.PhonesWithUsage != oldSmsBilling.PhonesWithUsage) {
+			if(smsBilling.PhonesActiveCount != oldSmsBilling.PhonesActiveCount) {
 				if(command!=""){ command+=",";}
-				command+="PhonesWithUsage = "+POut.Int(smsBilling.PhonesWithUsage)+"";
+				command+="PhonesActiveCount = "+POut.Int(smsBilling.PhonesActiveCount)+"";
+			}
+			if(smsBilling.PhonesUsedCount != oldSmsBilling.PhonesUsedCount) {
+				if(command!=""){ command+=",";}
+				command+="PhonesUsedCount = "+POut.Int(smsBilling.PhonesUsedCount)+"";
+			}
+			if(smsBilling.MsgSentOkCount != oldSmsBilling.MsgSentOkCount) {
+				if(command!=""){ command+=",";}
+				command+="MsgSentOkCount = "+POut.Int(smsBilling.MsgSentOkCount)+"";
+			}
+			if(smsBilling.MsgRcvOkCount != oldSmsBilling.MsgRcvOkCount) {
+				if(command!=""){ command+=",";}
+				command+="MsgRcvOkCount = "+POut.Int(smsBilling.MsgRcvOkCount)+"";
+			}
+			if(smsBilling.MsgSentFailCount != oldSmsBilling.MsgSentFailCount) {
+				if(command!=""){ command+=",";}
+				command+="MsgSentFailCount = "+POut.Int(smsBilling.MsgSentFailCount)+"";
+			}
+			if(smsBilling.MsgRcvFailCount != oldSmsBilling.MsgRcvFailCount) {
+				if(command!=""){ command+=",";}
+				command+="MsgRcvFailCount = "+POut.Int(smsBilling.MsgRcvFailCount)+"";
 			}
 			if(command==""){
 				return false;
