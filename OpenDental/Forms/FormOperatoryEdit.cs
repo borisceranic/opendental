@@ -131,7 +131,7 @@ namespace OpenDental{
 			this.checkIsHidden.Location = new System.Drawing.Point(69, 63);
 			this.checkIsHidden.Name = "checkIsHidden";
 			this.checkIsHidden.Size = new System.Drawing.Size(104, 16);
-			this.checkIsHidden.TabIndex = 110;
+			this.checkIsHidden.TabIndex = 2;
 			this.checkIsHidden.Text = "Is Hidden";
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -142,7 +142,7 @@ namespace OpenDental{
 			this.comboProvHygienist.MaxDropDownItems = 30;
 			this.comboProvHygienist.Name = "comboProvHygienist";
 			this.comboProvHygienist.Size = new System.Drawing.Size(126, 21);
-			this.comboProvHygienist.TabIndex = 114;
+			this.comboProvHygienist.TabIndex = 5;
 			// 
 			// comboProvDentist
 			// 
@@ -151,7 +151,7 @@ namespace OpenDental{
 			this.comboProvDentist.MaxDropDownItems = 100;
 			this.comboProvDentist.Name = "comboProvDentist";
 			this.comboProvDentist.Size = new System.Drawing.Size(126, 21);
-			this.comboProvDentist.TabIndex = 113;
+			this.comboProvDentist.TabIndex = 4;
 			// 
 			// label6
 			// 
@@ -194,7 +194,7 @@ namespace OpenDental{
 			this.checkIsHygiene.Location = new System.Drawing.Point(69, 149);
 			this.checkIsHygiene.Name = "checkIsHygiene";
 			this.checkIsHygiene.Size = new System.Drawing.Size(104, 16);
-			this.checkIsHygiene.TabIndex = 116;
+			this.checkIsHygiene.TabIndex = 6;
 			this.checkIsHygiene.Text = "Is Hygiene";
 			this.checkIsHygiene.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -205,7 +205,7 @@ namespace OpenDental{
 			this.comboClinic.MaxDropDownItems = 100;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(126, 21);
-			this.comboClinic.TabIndex = 119;
+			this.comboClinic.TabIndex = 3;
 			// 
 			// labelClinic
 			// 
@@ -223,7 +223,7 @@ namespace OpenDental{
 			this.checkSetProspective.Location = new System.Drawing.Point(69, 168);
 			this.checkSetProspective.Name = "checkSetProspective";
 			this.checkSetProspective.Size = new System.Drawing.Size(104, 16);
-			this.checkSetProspective.TabIndex = 116;
+			this.checkSetProspective.TabIndex = 7;
 			this.checkSetProspective.Text = "Set Prospective";
 			this.checkSetProspective.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -336,7 +336,12 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textOpName.Text==""){
-				MessageBox.Show(Lan.g(this,"Op Name cannot be blank."));
+				MsgBox.Show(this,"Operatory name cannot be blank.");
+				return;
+			}
+			if(checkIsHidden.Checked==true && Operatories.HasFutureApts(OpCur.OperatoryNum)) {
+				MsgBox.Show(this,"Can not hide an operatory with future appointments.");
+				checkIsHidden.Checked=false;
 				return;
 			}
 			OpCur.OpName=textOpName.Text;

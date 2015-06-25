@@ -125,7 +125,17 @@ namespace OpenDentBusiness{
 			}
 			return listRetVal;
 		}
-		
+
+		///<summary>Gets a list of all future appointments for a given Operatory.  Ordered by dateTime</summary>
+		public static bool HasFutureApts(long operatoryNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),operatoryNum);
+			}
+			string command="SELECT COUNT(*) FROM appointment "
+				+"WHERE Op = "+POut.Long(operatoryNum)+" "
+				+"AND AptDateTime > "+DbHelper.Now();
+			return PIn.Int(Db.GetScalar(command))>0;
+		}
 	
 	}
 	
