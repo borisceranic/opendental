@@ -494,7 +494,8 @@ namespace OpenDentBusiness{
 						tsDailyDifferentialTotal+=listClockEvent[i].TimeDisplayed1.TimeOfDay-tsDifferentialAMRule;//add a negative timespan
 					}
 					//Adjust AM differential by overbreaks-----
-					TimeSpan tsAMBreakTimeCounter=new TimeSpan();
+					TimeSpan tsAMBreakTimeCounter=new TimeSpan();//tracks all break time for use in calculating overages.
+					TimeSpan tsAMBreakDuringDiff=new TimeSpan();//tracks only the portion of breaks that occured during differential hours.
 					for(int b=0;b<listClockEventBreak.Count;b++) {
 						if(tsAMBreakTimeCounter>TimeSpan.FromMinutes(30)) {
 							tsAMBreakTimeCounter=TimeSpan.FromMinutes(30);//reset overages for next calculation.
@@ -503,6 +504,7 @@ namespace OpenDentBusiness{
 							continue;//skip breaks for other days.
 						}
 						tsAMBreakTimeCounter+=listClockEventBreak[b].TimeDisplayed2-listClockEventBreak[b].TimeDisplayed1;
+						tsAMBreakDuringDiff+=calcDifferentialPortion(tsDifferentialAMRule,TimeSpan.FromHours(24),listClockEventBreak[b]);
 						if(tsAMBreakTimeCounter<TimeSpan.FromMinutes(30)) {
 							continue;//not over thirty minutes yet.
 						}
@@ -516,9 +518,12 @@ namespace OpenDentBusiness{
 							continue;//entirety of break overage occured after AM differential time.
 						}
 						//Make adjustments because: 30+ minutes of break, break occured during clockEvent, break started before the AM rule.
-						TimeSpan tsAMAdjustAmount=TimeSpan.Zero;
-						tsAMAdjustAmount+=tsDifferentialAMRule-(listClockEventBreak[b].TimeDisplayed2.TimeOfDay-(tsAMBreakTimeCounter-TimeSpan.FromMinutes(30)));//should be negative timespan
-						tsDailyDifferentialTotal+=tsAMAdjustAmount;
+						TimeSpan tsAMAdjustAmount=System.TimeSpan.FromMinutes(30)-tsAMBreakTimeCounter;
+						if(tsAMAdjustAmount<-tsAMBreakDuringDiff) {
+							tsAMAdjustAmount=-tsAMBreakDuringDiff;//cannot adjust off more break overage time than we have had breaks during this time.
+						}
+						tsDailyDifferentialTotal+=tsAMAdjustAmount;//adjust down
+						tsAMBreakDuringDiff+=tsAMAdjustAmount;//adjust down
 					}
 				}
 				//PM-------------------------------------
@@ -528,7 +533,8 @@ namespace OpenDentBusiness{
 						tsDailyDifferentialTotal+=tsDifferentialPMRule-listClockEvent[i].TimeDisplayed1.TimeOfDay;//add a negative timespan
 					}
 					//Adjust PM differential by overbreaks-----
-					TimeSpan tsPMBreakTimeCounter=new TimeSpan();
+					TimeSpan tsPMBreakTimeCounter=new TimeSpan();//tracks all break time for use in calculating overages.
+					TimeSpan tsPMBreakDuringDiff=new TimeSpan();//tracks only the portion of breaks that occured during differential hours.
 					for(int b=0;b<listClockEventBreak.Count;b++) {
 						if(tsPMBreakTimeCounter>TimeSpan.FromMinutes(30)) {
 							tsPMBreakTimeCounter=TimeSpan.FromMinutes(30);//reset overages for next calculation.
@@ -537,6 +543,7 @@ namespace OpenDentBusiness{
 							continue;//skip breaks for other days.
 						}
 						tsPMBreakTimeCounter+=listClockEventBreak[b].TimeDisplayed2-listClockEventBreak[b].TimeDisplayed1;
+						tsPMBreakDuringDiff+=calcDifferentialPortion(TimeSpan.Zero,tsDifferentialPMRule,listClockEventBreak[b]);
 						if(tsPMBreakTimeCounter<TimeSpan.FromMinutes(30)) {
 							continue;//not over thirty minutes yet.
 						}
@@ -544,21 +551,21 @@ namespace OpenDentBusiness{
 							continue;//There must be multiple clock events for this day, and we have gone over breaks during a different clock event period
 						}
 						if(listClockEventBreak[b].TimeDisplayed2.TimeOfDay<tsDifferentialPMRule) {
-							continue;//this break ended before the PM differential so there is nothing left to do in this loop. break out of the entire loop.
-						}
-						if(listClockEventBreak[b].TimeDisplayed2.TimeOfDay<tsDifferentialPMRule) {
 							continue;//entirety of break overage occured before PM differential time.
 						}
 						//Make adjustments because: 30+ minutes of break, break occured during clockEvent, break ended after the PM rule.
-						TimeSpan tsPMAdjustAmount=TimeSpan.Zero;
-						tsPMAdjustAmount+=tsDifferentialPMRule-(listClockEventBreak[b].TimeDisplayed2.TimeOfDay-(tsPMBreakTimeCounter-TimeSpan.FromMinutes(30)));//should be negative timespan
-						tsDailyDifferentialTotal+=tsPMAdjustAmount;
+						TimeSpan tsPMAdjustAmount=System.TimeSpan.FromMinutes(30)-tsPMBreakTimeCounter;//tsPMBreakTimeCounter is always > 30 at this point in time
+						if(tsPMAdjustAmount<-tsPMBreakDuringDiff) {
+							tsPMAdjustAmount=-tsPMBreakDuringDiff;//cannot adjust off more break overage time than we have had breaks during this time.
+						}
+						tsDailyDifferentialTotal+=tsPMAdjustAmount;//adjust down
+						tsPMBreakDuringDiff+=tsPMAdjustAmount;//adjust down
 					}
 				}
 				//Apply differential to clock event-----------------------------------------------------------------------------------
 				if(tsDailyDifferentialTotal<TimeSpan.Zero) {
 					//this should never happen. If it ever does, we need to know about it, because that means some math has been miscalculated.
-					throw new Exception(" - "+listClockEvent[i].TimeDisplayed1.Date.ToShortDateString()+" : calculated differential hours was negative.");
+					throw new Exception(" - "+listClockEvent[i].TimeDisplayed1.Date.ToShortDateString()+", "+employee.FName+" "+employee.LName+" : calculated differential hours was negative.");
 				}
 				listClockEvent[i].Rate2Auto=tsDailyDifferentialTotal;//should be zero or greater.
 				#endregion
@@ -609,6 +616,31 @@ namespace OpenDentBusiness{
 				#endregion
 				ClockEvents.Update(listClockEvent[i]);
 			}//end clockEvent loop.
+		}
+
+		private static TimeSpan calcDifferentialPortion(TimeSpan tsDifferentialAMRule,TimeSpan tsDifferentialPMRule,ClockEvent clockEventBreak) {
+			TimeSpan retVal=new TimeSpan();
+			//AM overlap==========================================================
+			//Visual representation
+			//AM Rule      :           X
+			//Entire Break :o-------o  |             Stop-Start == Entire Break
+			//Partial Break:      o----|---o         Rule-Start == Partial Break
+			//No Break     :           |  o------o   Rule-Rule  == No break (won't actually happen in this block)
+			retVal+=TimeSpan.FromTicks(
+				Math.Min(clockEventBreak.TimeDisplayed2.TimeOfDay.Ticks,tsDifferentialAMRule.Ticks)//min of stop or rule
+				-Math.Min(clockEventBreak.TimeDisplayed1.TimeOfDay.Ticks,tsDifferentialAMRule.Ticks)//min of start or rule
+				);//equals the entire break, part of the break, or non of the break.
+			//PM overlap==========================================================
+			//Visual representation
+			//PM Rule      :           X
+			//Entire Break :o-------o  |             Rule-Rule   == No Break
+			//Partial Break:      o----|---o         Stop-Rule   == Partial Break
+			//No Break     :           |  o------o   Stop-Start  == Entire break
+			retVal+=TimeSpan.FromTicks(
+				Math.Max(clockEventBreak.TimeDisplayed2.TimeOfDay.Ticks,tsDifferentialPMRule.Ticks)//max of stop or rule
+				-Math.Max(clockEventBreak.TimeDisplayed1.TimeOfDay.Ticks,tsDifferentialPMRule.Ticks)//max of start or rule
+				);//equals the entire break, part of the break, or non of the break.
+			return retVal;
 		}
 
 		///<summary>Returns true if two clock events overlap. Useful for determining if a break applies to a given clock event.  
