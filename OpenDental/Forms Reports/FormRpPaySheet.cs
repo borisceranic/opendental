@@ -438,7 +438,7 @@ namespace OpenDental{
 				whereClin+=") ";
 			}
 			string queryIns=
-				@"SELECT CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+",CHAR(25)) DateCP,carrier.CarrierName,MAX("
+				@"SELECT claimproc.DateCP,carrier.CarrierName,MAX("
 +DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") lfname,
 provider.Abbr, ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
@@ -469,7 +469,7 @@ provider.Abbr, ";
 				}
 				queryIns+=") ";
 			}
-			queryIns+=@"GROUP BY CONVERT("+DbHelper.DateFormatColumn("claimproc.DateCP","%c/%d/%Y")+@",CHAR(25)),"
+			queryIns+=@"GROUP BY claimproc.DateCP,"
 				+"claimproc.ClaimPaymentNum,provider.ProvNum,";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				queryIns+="claimproc.ClinicNum,clinic.Description,";
@@ -518,7 +518,7 @@ provider.Abbr, ";
 				whereClin+=") ";
 			}
 			string queryPat=
-				@"SELECT CONVERT("+DbHelper.DateFormatColumn("payment.PayDate","%c/%d/%Y")+",CHAR(25)) AS DatePay,MAX("
+				@"SELECT payment.PayDate DatePay,MAX("
 +DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+@") AS lfname,provider.Abbr, ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				queryPat+="clinic.Description clinicDesc, ";
