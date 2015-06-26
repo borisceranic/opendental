@@ -132,9 +132,11 @@ namespace OpenDental{
 			}
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=@"SELECT ScreenDate,ProvName,County,county.CountyCode,
-				site.Description AS schoolName,site.Note AS schoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,
-				HasCaries,EarlyChildCaries,CariesExperience,ExistingSealants,NeedsSealants,MissingAllTeeth,
-				Comments FROM screen
+				site.Description AS schoolName,site.Note AS schoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,";
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)){
+				report.Query+="HasCaries,EarlyChildCaries,CariesExperience,ExistingSealants,NeedsSealants,MissingAllTeeth,";
+			}
+			report.Query+=@"Comments FROM screen
 				LEFT JOIN site ON screen.GradeSchool=site.Description
 				LEFT JOIN county ON screen.County=county.CountyName
 				WHERE ScreenDate >= "+POut.Date(date1.SelectionStart)+" "

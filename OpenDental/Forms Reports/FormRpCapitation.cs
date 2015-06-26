@@ -243,10 +243,17 @@ namespace OpenDental{
 			query.GetColumnDetail("Subsc SSN").SuppressIfDuplicate=true;
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Pat DOB",80,FieldValueType.Date,font);
-			query.AddColumn("Code",50,FieldValueType.String,font);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				query.AddColumn("Code",120,FieldValueType.String,font);
+			}
+			else {
+				query.AddColumn("Code",50,FieldValueType.String,font);
+			}
 			query.AddColumn("Proc Description",120,FieldValueType.String,font);
-			query.AddColumn("Tth",30,FieldValueType.String,font);
-			query.AddColumn("Surf",40,FieldValueType.String,font);
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				query.AddColumn("Tth",30,FieldValueType.String,font);
+				query.AddColumn("Surf",40,FieldValueType.String,font);
+			}
 			query.AddColumn("Date",80,FieldValueType.Date,font);
 			query.AddColumn("UCR Fee",70,FieldValueType.Number,font);
 			query.AddColumn("Co-Pay",70,FieldValueType.Number,font);

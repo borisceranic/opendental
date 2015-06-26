@@ -162,8 +162,10 @@ namespace OpenDental{
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Code",50,FieldValueType.String,font);
 			query.AddColumn("Description",120,FieldValueType.String,font);
-			query.AddColumn("Tth",30,FieldValueType.String,font);
-			query.AddColumn("Surf",40,FieldValueType.String,font);
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				query.AddColumn("Tth",30,FieldValueType.String,font);
+				query.AddColumn("Surf",40,FieldValueType.String,font);
+			}
 			if(!report.SubmitQueries()) {
 				DialogResult=DialogResult.Cancel;
 				return;

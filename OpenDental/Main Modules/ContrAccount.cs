@@ -4409,10 +4409,12 @@ namespace OpenDental {
 			gridProg.Columns.Clear();
 			ODGridColumn col = new ODGridColumn(Lan.g("TableProg", "Date"), 67);
 			gridProg.Columns.Add(col);
-			col = new ODGridColumn(Lan.g("TableProg", "Th"), 27);
-			gridProg.Columns.Add(col);
-			col = new ODGridColumn(Lan.g("TableProg", "Surf"), 40);
-			gridProg.Columns.Add(col);
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col = new ODGridColumn(Lan.g("TableProg","Th"),27);
+				gridProg.Columns.Add(col);
+				col = new ODGridColumn(Lan.g("TableProg","Surf"),40);
+				gridProg.Columns.Add(col);
+			}
 			col = new ODGridColumn(Lan.g("TableProg", "Dx"), 28);
 			gridProg.Columns.Add(col);
 			col = new ODGridColumn(Lan.g("TableProg", "Description"), 218);
@@ -4474,8 +4476,10 @@ namespace OpenDental {
 				row.ColorLborder = Color.Black;
 				//remember that columns that start with lowercase are already altered for display rather than being raw data.
 				row.Cells.Add(table.Rows[i]["procDate"].ToString());
-				row.Cells.Add(table.Rows[i]["toothNum"].ToString());
-				row.Cells.Add(table.Rows[i]["Surf"].ToString());
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row.Cells.Add(table.Rows[i]["toothNum"].ToString());
+					row.Cells.Add(table.Rows[i]["Surf"].ToString());
+				}
 				row.Cells.Add(table.Rows[i]["dx"].ToString());
 				row.Cells.Add(table.Rows[i]["description"].ToString());
 				row.Cells.Add(table.Rows[i]["procStatus"].ToString());

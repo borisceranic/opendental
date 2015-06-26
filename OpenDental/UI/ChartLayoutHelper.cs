@@ -15,24 +15,10 @@ namespace OpenDental {
 			return Programs.UsingEcwTightOrFullMode();
 		}
 
-		///<summary>If clinics are not enabled, this will return true if the pref PracticeIsMedicalOnly is true.
-		///If clinics are enabled, this will return true if either the headquarters 'clinic' is selected (FormOpenDental.ClinicNum=0) and the pref
-		///PracticeIsMedicalOnly is true OR if the currently selected clinic's IsMedicalOnly flag is true.  Otherwise returns false.</summary>
-		public static bool IsMedicalPracticeOrClinic() {
-			if(FormOpenDental.ClinicNum==0) {//either headquarters is selected or the clinics feature is not enabled, use practice pref
-				return PrefC.GetBool(PrefName.PracticeIsMedicalOnly);
-			}
-			Clinic clinicCur=Clinics.GetClinic(FormOpenDental.ClinicNum);
-			if(clinicCur!=null) {
-				return clinicCur.IsMedicalOnly;
-			}
-			return false;
-		}
-
 		///<summary>If medical only, this will hide the tooth chart and fill the space with the treatement notes text box.  Not for eCWTightOrFull.
 		///This is made public so that it can be called from ContrChart.</summary>
 		public static void SetToothChartVisibleHelper(ToothChartWrapper toothChart,RichTextBox textTreatmentNotes) {
-			if(IsMedicalPracticeOrClinic()) {
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 				toothChart.Visible=false;
 				textTreatmentNotes.Location=new Point(0,toothChart.Top);
 				textTreatmentNotes.Height=toothChart.Height+72;//textTreatmentNotes height is 71, +1 for distance between toothChart and textTreatmentNotes

@@ -4470,7 +4470,7 @@ namespace OpenDental{
 						ContrChart2.ModuleSelectedNewCrop(CurPatNum);//Special refresh that also queries the NewCrop web service for prescription information.
 					}
 					else {
-						ContrChart2.ModuleSelected(CurPatNum);
+						ContrChart2.ModuleSelected(CurPatNum,true);
 					}
 					TryNonPatientPopup();
 					break;
@@ -4542,7 +4542,7 @@ namespace OpenDental{
 				ContrTreat2.ModuleSelected(CurPatNum);
 			}
 			if(ContrChart2.Visible){
-				ContrChart2.ModuleSelected(CurPatNum);
+				ContrChart2.ModuleSelected(CurPatNum,true);
 			}
 			if(ContrImages2.Visible){
 				ContrImages2.ModuleSelected(CurPatNum);

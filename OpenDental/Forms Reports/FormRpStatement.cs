@@ -1138,10 +1138,16 @@ namespace OpenDental{
 			gcol=new ODGridColumn(Lan.g(this,"Patient"),100);
 			gridPat.Columns.Add(gcol);
 			//prov
-			gcol=new ODGridColumn(Lan.g(this,"Code"),45);
-			gridPat.Columns.Add(gcol);
-			gcol=new ODGridColumn(Lan.g(this,"Tooth"),42);
-			gridPat.Columns.Add(gcol);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				gcol=new ODGridColumn(Lan.g(this,"Code"),87);
+				gridPat.Columns.Add(gcol);
+			}
+			else {
+				gcol=new ODGridColumn(Lan.g(this,"Code"),45);
+				gridPat.Columns.Add(gcol);
+				gcol=new ODGridColumn(Lan.g(this,"Tooth"),42);
+				gridPat.Columns.Add(gcol);
+			}
 			gcol=new ODGridColumn(Lan.g(this,"Description"),270);
 			gridPat.Columns.Add(gcol);
 			gcol=new ODGridColumn(Lan.g(this,"Charges"),60,HorizontalAlignment.Right);
@@ -1218,12 +1224,16 @@ namespace OpenDental{
 						}
 						else {
 							grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
-							grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+							if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+								grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+							}
 						}
 					}
 					else {
 						grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
-						grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+						if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+							grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+						}
 					}
 					if(CultureInfo.CurrentCulture.Name=="en-AU") {//English (Australia)
 						if(tableAccount.Rows[p]["prov"].ToString().Trim()!="") {

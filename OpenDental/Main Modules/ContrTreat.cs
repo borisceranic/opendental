@@ -917,6 +917,12 @@ namespace OpenDental{
 			FillSummary();
       FillPreAuth();
 			//FillMisc();
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkShowCompleted.Visible=false;
+			}
+			else {
+				checkShowCompleted.Visible=true;
+			}
 		}
 
 		private void ToolBarMain_ButtonClick(object sender, OpenDental.UI.ODToolBarButtonClickEventArgs e) {
@@ -2143,80 +2149,83 @@ namespace OpenDental{
 			//benefitsPrinted=false;
 			//notePrinted=false;
 			//pagesPrinted=0;
-			if(PrefC.GetBool(PrefName.TreatPlanShowGraphics)){
-				//prints the graphical tooth chart and legend
-				//Panel panelHide=new Panel();
-				//panelHide.Size=new Size(600,500);
-				//panelHide.BackColor=this.BackColor;
-				//panelHide.SendToBack();
-				//this.Controls.Add(panelHide);
-				toothChart=new ToothChartWrapper();
-				toothChart.ColorBackground=DefC.Long[(int)DefCat.ChartGraphicColors][14].ItemColor;
-				toothChart.ColorText=DefC.Long[(int)DefCat.ChartGraphicColors][15].ItemColor;
-				//toothChart.TaoRenderEnabled=true;
-				//toothChart.TaoInitializeContexts();
-				toothChart.Size=new Size(500,370);
-				//toothChart.Location=new Point(-600,-500);//off the visible screen
-				//toothChart.SendToBack();
-				//ComputerPref computerPref=ComputerPrefs.GetForLocalComputer();
-				toothChart.UseHardware=ComputerPrefs.LocalComputer.GraphicsUseHardware;
-				toothChart.SetToothNumberingNomenclature((ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
-				toothChart.PreferredPixelFormatNumber=ComputerPrefs.LocalComputer.PreferredPixelFormatNum;
-				toothChart.DeviceFormat=new ToothChartDirectX.DirectXDeviceFormat(ComputerPrefs.LocalComputer.DirectXFormat);
-				//Must be last setting set for preferences, because
-																														//this is the line where the device pixel format is
-																														//recreated.
-																														//The preferred pixel format number changes to the selected pixel format number after a context is chosen.
-				toothChart.DrawMode=ComputerPrefs.LocalComputer.GraphicsSimple;
-				ComputerPrefs.LocalComputer.PreferredPixelFormatNum=toothChart.PreferredPixelFormatNumber;
-				ComputerPrefs.Update(ComputerPrefs.LocalComputer);
-				this.Controls.Add(toothChart);
-				toothChart.BringToFront();
-				toothChart.ResetTeeth();
-				ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
-				//first, primary.  That way, you can still set a primary tooth missing afterwards.
-				for(int i=0;i<ToothInitialList.Count;i++) {
-					if(ToothInitialList[i].InitialType==ToothInitialType.Primary) {
-						toothChart.SetPrimary(ToothInitialList[i].ToothNum);
-					}
-				}
-				for(int i=0;i<ToothInitialList.Count;i++) {
-					switch(ToothInitialList[i].InitialType) {
-						case ToothInitialType.Missing:
-							toothChart.SetMissing(ToothInitialList[i].ToothNum);
-							break;
-						case ToothInitialType.Hidden:
-							toothChart.SetHidden(ToothInitialList[i].ToothNum);
-							break;
-						case ToothInitialType.Rotate:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,ToothInitialList[i].Movement,0,0,0,0,0);
-							break;
-						case ToothInitialType.TipM:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,ToothInitialList[i].Movement,0,0,0,0);
-							break;
-						case ToothInitialType.TipB:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,ToothInitialList[i].Movement,0,0,0);
-							break;
-						case ToothInitialType.ShiftM:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,ToothInitialList[i].Movement,0,0);
-							break;
-						case ToothInitialType.ShiftO:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,0,ToothInitialList[i].Movement,0);
-							break;
-						case ToothInitialType.ShiftB:
-							toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,0,0,ToothInitialList[i].Movement);
-							break;
-						case ToothInitialType.Drawing:
-							toothChart.AddDrawingSegment(ToothInitialList[i].Copy());
-							break;
-					}
-				}
-				ComputeProcListFiltered();
-				DrawProcsGraphics();
-				toothChart.AutoFinish=true;
-				chartBitmap=toothChart.GetBitmap();
-				toothChart.Dispose();
+			if(!PrefC.GetBool(PrefName.TreatPlanShowGraphics) 
+				|| Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum))
+			{
+				return;
 			}
+			//prints the graphical tooth chart and legend
+			//Panel panelHide=new Panel();
+			//panelHide.Size=new Size(600,500);
+			//panelHide.BackColor=this.BackColor;
+			//panelHide.SendToBack();
+			//this.Controls.Add(panelHide);
+			toothChart=new ToothChartWrapper();
+			toothChart.ColorBackground=DefC.Long[(int)DefCat.ChartGraphicColors][14].ItemColor;
+			toothChart.ColorText=DefC.Long[(int)DefCat.ChartGraphicColors][15].ItemColor;
+			//toothChart.TaoRenderEnabled=true;
+			//toothChart.TaoInitializeContexts();
+			toothChart.Size=new Size(500,370);
+			//toothChart.Location=new Point(-600,-500);//off the visible screen
+			//toothChart.SendToBack();
+			//ComputerPref computerPref=ComputerPrefs.GetForLocalComputer();
+			toothChart.UseHardware=ComputerPrefs.LocalComputer.GraphicsUseHardware;
+			toothChart.SetToothNumberingNomenclature((ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
+			toothChart.PreferredPixelFormatNumber=ComputerPrefs.LocalComputer.PreferredPixelFormatNum;
+			toothChart.DeviceFormat=new ToothChartDirectX.DirectXDeviceFormat(ComputerPrefs.LocalComputer.DirectXFormat);
+			//Must be last setting set for preferences, because
+																													//this is the line where the device pixel format is
+																													//recreated.
+																													//The preferred pixel format number changes to the selected pixel format number after a context is chosen.
+			toothChart.DrawMode=ComputerPrefs.LocalComputer.GraphicsSimple;
+			ComputerPrefs.LocalComputer.PreferredPixelFormatNum=toothChart.PreferredPixelFormatNumber;
+			ComputerPrefs.Update(ComputerPrefs.LocalComputer);
+			this.Controls.Add(toothChart);
+			toothChart.BringToFront();
+			toothChart.ResetTeeth();
+			ToothInitialList=ToothInitials.Refresh(PatCur.PatNum);
+			//first, primary.  That way, you can still set a primary tooth missing afterwards.
+			for(int i=0;i<ToothInitialList.Count;i++) {
+				if(ToothInitialList[i].InitialType==ToothInitialType.Primary) {
+					toothChart.SetPrimary(ToothInitialList[i].ToothNum);
+				}
+			}
+			for(int i=0;i<ToothInitialList.Count;i++) {
+				switch(ToothInitialList[i].InitialType) {
+					case ToothInitialType.Missing:
+						toothChart.SetMissing(ToothInitialList[i].ToothNum);
+						break;
+					case ToothInitialType.Hidden:
+						toothChart.SetHidden(ToothInitialList[i].ToothNum);
+						break;
+					case ToothInitialType.Rotate:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,ToothInitialList[i].Movement,0,0,0,0,0);
+						break;
+					case ToothInitialType.TipM:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,ToothInitialList[i].Movement,0,0,0,0);
+						break;
+					case ToothInitialType.TipB:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,ToothInitialList[i].Movement,0,0,0);
+						break;
+					case ToothInitialType.ShiftM:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,ToothInitialList[i].Movement,0,0);
+						break;
+					case ToothInitialType.ShiftO:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,0,ToothInitialList[i].Movement,0);
+						break;
+					case ToothInitialType.ShiftB:
+						toothChart.MoveTooth(ToothInitialList[i].ToothNum,0,0,0,0,0,ToothInitialList[i].Movement);
+						break;
+					case ToothInitialType.Drawing:
+						toothChart.AddDrawingSegment(ToothInitialList[i].Copy());
+						break;
+				}
+			}
+			ComputeProcListFiltered();
+			DrawProcsGraphics();
+			toothChart.AutoFinish=true;
+			chartBitmap=toothChart.GetBitmap();
+			toothChart.Dispose();
 		}
 
 		private MigraDoc.DocumentObjectModel.Document CreateDocument(){
@@ -2288,7 +2297,9 @@ namespace OpenDental{
 			#region PrintGraphics
 			TextFrame frame;
 			int widthDoc=MigraDocHelper.GetDocWidth();
-			if(PrefC.GetBool(PrefName.TreatPlanShowGraphics)) {	
+			if(PrefC.GetBool(PrefName.TreatPlanShowGraphics)
+				&& !Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum))
+			{	
 				frame=MigraDocHelper.CreateContainer(section);
 				MigraDocHelper.DrawString(frame,Lan.g(this,"Your")+"\r\n"+Lan.g(this,"Right"),bodyFontx,
 					new RectangleF(widthDoc/2-toothChart.Width/2-50,toothChart.Height/2-10,50,100));
@@ -3187,30 +3198,10 @@ namespace OpenDental{
 			}
 		}
 
-	
 
-	
-		
-	
-
-	
-
-		
-
-		
-
-		
-	
-
-		
-
-		
-
-		
-
-
-		
 	}
+
+
 
 	public class TpRow {
 		public string Done;
@@ -3231,6 +3222,4 @@ namespace OpenDental{
 		public bool Bold;
 		public object Tag;
 	}
-
-	
 }

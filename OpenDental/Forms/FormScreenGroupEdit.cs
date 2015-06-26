@@ -436,18 +436,20 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Urgency"),70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Caries"),45);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"ECC"),30);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"CarExp"),50);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"ExSeal"),45);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"NeedSeal"),60);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"NoTeeth"),55);
-			gridMain.Columns.Add(col);
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g(this,"Caries"),45);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"ECC"),30);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"CarExp"),50);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"ExSeal"),45);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"NeedSeal"),60);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"NoTeeth"),55);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g(this,"Comments"),100);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
@@ -460,12 +462,14 @@ namespace OpenDental{
 				row.Cells.Add(ScreenList[i].RaceOld.ToString());
 				row.Cells.Add(ScreenList[i].Gender.ToString());
 				row.Cells.Add(ScreenList[i].Urgency.ToString());
-				row.Cells.Add(getX(ScreenList[i].HasCaries));
-				row.Cells.Add(getX(ScreenList[i].EarlyChildCaries));
-				row.Cells.Add(getX(ScreenList[i].CariesExperience));
-				row.Cells.Add(getX(ScreenList[i].ExistingSealants));
-				row.Cells.Add(getX(ScreenList[i].NeedsSealants));
-				row.Cells.Add(getX(ScreenList[i].MissingAllTeeth));
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row.Cells.Add(getX(ScreenList[i].HasCaries));
+					row.Cells.Add(getX(ScreenList[i].EarlyChildCaries));
+					row.Cells.Add(getX(ScreenList[i].CariesExperience));
+					row.Cells.Add(getX(ScreenList[i].ExistingSealants));
+					row.Cells.Add(getX(ScreenList[i].NeedsSealants));
+					row.Cells.Add(getX(ScreenList[i].MissingAllTeeth));
+				}
 				row.Cells.Add(ScreenList[i].Comments);
 				gridMain.Rows.Add(row);
 			}

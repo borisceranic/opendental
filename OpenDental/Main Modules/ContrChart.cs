@@ -3160,7 +3160,7 @@ namespace OpenDental{
 				}
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"LabCase"),-1,"","LabCase"));
-			if(!ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Perio Chart"),2,"","Perio"));
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Ortho Chart"),-1,"","Ortho"));
 			}			
@@ -3171,7 +3171,7 @@ namespace OpenDental{
 			//if(PrefC.GetBool(PrefName.ToothChartMoveMenuToRight)) {
 			//	ToolBarMain.Buttons.Add(new ODToolBarButton("                   .",-1,"",""));
 			//}
-			if(!ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 				button=new ODToolBarButton(Lan.g(this,"Tooth Chart"),-1,"","ToothChart");
 				button.Style=ODToolBarButtonStyle.DropDownButton;
 				button.DropDownMenu=menuToothChart;
@@ -3205,7 +3205,7 @@ namespace OpenDental{
 
 		///<summary>This function does not follow our usual pattern. This function is just like ModuleSelected() but also pulls down prescription data for the current patient from the NewCrop web service. It was created to limit the number of times that NewCrop prescriptions are refreshed. Each time that NewCrop data is refreshed, the user must wait at least a few seconds. This function allows the chart to fully load, then a wait cursor displays while the web service call is being performed. If new data is pulled in from NewCrop, then the module is refreshed again to show the new prescriptions. Only called from FormOpenDental when the Chart module button is clicked or when a new patient is selected from within the Chart.</summary>
 		public void ModuleSelectedNewCrop(long patNum) {
-			ModuleSelected(patNum);
+			ModuleSelected(patNum,true);
 			this.Cursor=Cursors.WaitCursor;
 			Application.DoEvents();
 			if(NewCropRefreshPrescriptions()) {
@@ -3216,14 +3216,21 @@ namespace OpenDental{
 
 		/// <summary></summary>
 		public void ModuleSelected(long patNum) {
-			ModuleSelected(patNum,true);
+			ModuleSelected(patNum,true,false);
+		}
+
+		/// <summary>Only use this overload when isClinicRefresh is set to true.  This is only used when calling ModuleSelected from FromOpenDental.
+		///When isClinicRefresh is true the tab control tabProc is redrawn and only needs to be done when the clinic is changed or the module is selected
+		///for the first time.</summary>
+		public void ModuleSelected(long patNum,bool isClinicRefresh) {
+			ModuleSelected(patNum,true,isClinicRefresh);
 		}
 
 		///<summary>Only use this overload when isFullRefresh is set to false.  This is ONLY in a few places and only for eCW at this point.  Speeds things up by refreshing less data.</summary>
-		public void ModuleSelected(long patNum,bool isFullRefresh) {
+		public void ModuleSelected(long patNum,bool isFullRefresh,bool isClinicRefresh) {
 			EasyHideClinicalData();
 			RefreshModuleData(patNum,isFullRefresh);
-			RefreshModuleScreen();
+			RefreshModuleScreen(isClinicRefresh);
 			Plugins.HookAddCode(this,"ContrChart.ModuleSelected_end",patNum);
 		}
 
@@ -3279,7 +3286,7 @@ namespace OpenDental{
 			}
 		}		
 
-		private void RefreshModuleScreen(){
+		private void RefreshModuleScreen(bool isClinicRefresh=false){
 			//ParentForm.Text=Patients.GetMainTitle(PatCur);
 			LayoutToolBar();
 			if(PatCur==null){
@@ -3471,14 +3478,27 @@ namespace OpenDental{
 				groupBox2.Height=54;
 				menuItemSetComplete.Visible=false;
 			}
-			if(!UsingEcwTightOrFull()) {
+			if(!UsingEcwTightOrFull() && isClinicRefresh) {
 				ChartLayoutHelper.SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
-				if(ChartLayoutHelper.IsMedicalPracticeOrClinic()) {
+				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 					tabProc.TabPages.Remove(tabMissing);
 					tabProc.TabPages.Remove(tabMovements);
 					tabProc.TabPages.Remove(tabPrimary);
+					if(tabProc.SelectedTab==tabMissing || tabProc.SelectedTab==tabMovements || tabProc.SelectedTab==tabPrimary) {
+						tabProc.SelectedTab=tabEnterTx;
+					}
+					SelectedProcTab=tabProc.SelectedIndex;
+					textSurf.Visible=false;
+					butBF.Visible=false;
+					butOI.Visible=false;
+					butV.Visible=false;
+					butM.Visible=false;
+					butD.Visible=false;
+					butL.Visible=false;
+					checkShowTeeth.Visible=false;
 				}
 				else {
+					TabPage selectedTab=tabProc.SelectedTab;
 					tabProc.TabPages.Remove(tabMissing);
 					tabProc.TabPages.Remove(tabMovements);
 					tabProc.TabPages.Remove(tabPrimary);
@@ -3491,6 +3511,16 @@ namespace OpenDental{
 					tabProc.TabPages.Add(tabPlanned);
 					tabProc.TabPages.Add(tabShow);
 					tabProc.TabPages.Add(tabDraw);
+					tabProc.SelectedTab=selectedTab;
+					SelectedProcTab=tabProc.SelectedIndex;
+					textSurf.Visible=true;
+					butBF.Visible=true;
+					butOI.Visible=true;
+					butV.Visible=true;
+					butM.Visible=true;
+					butD.Visible=true;
+					butL.Visible=true;
+					checkShowTeeth.Visible=true;
 				}
 			}
 			ToolBarMain.Invalidate();

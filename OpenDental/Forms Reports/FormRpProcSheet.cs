@@ -429,31 +429,37 @@ namespace OpenDental{
 			DataRow row;
 			decimal dec=0;
 			decimal total=0;
+			int toothIndexOffset=0;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				toothIndexOffset=1;
+			}
 			for(int i=0;i<table.Rows.Count;i++) {
 				row = report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
 				row[0]=PIn.Date(table.Rows[i][0].ToString()).ToShortDateString();
 				row[1]=table.Rows[i][1].ToString();//name
 				row[2]=table.Rows[i][2].ToString();//adacode
-				row[3]=Tooth.ToInternat(table.Rows[i][3].ToString());//tooth
-				row[4]=table.Rows[i][4].ToString();//descript
-				row[5]=table.Rows[i][5].ToString();//prov
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row[3]=Tooth.ToInternat(table.Rows[i][3].ToString());//tooth
+				}
+				row[4-toothIndexOffset]=table.Rows[i][4].ToString();//descript
+				row[5-toothIndexOffset]=table.Rows[i][5].ToString();//prov
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-					row[6]=Clinics.GetDesc(PIn.Long(table.Rows[i][6].ToString()));//clinic
+					row[6-toothIndexOffset]=Clinics.GetDesc(PIn.Long(table.Rows[i][6].ToString()));//clinic
 					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[7]=dec.ToString("n");
+					row[7-toothIndexOffset]=dec.ToString("n");
 				}
 				else {
 					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[6]=dec.ToString("n");
+					row[6-toothIndexOffset]=dec.ToString("n");
 				}
 				total+=dec;
 				report.TableQ.Rows.Add(row);
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.ColTotal[7]=total;
+				report.ColTotal[7-toothIndexOffset]=total;
 			}
 			else {
-				report.ColTotal[6]=total;
+				report.ColTotal[6-toothIndexOffset]=total;
 			}
 			FormQuery2.ResetGrid();			
 			report.Title="Daily Procedures";
@@ -500,15 +506,17 @@ namespace OpenDental{
 			report.SetColumn(this,0,"Date",80);
 			report.SetColumn(this,1,"Patient Name",130);
 			report.SetColumn(this,2,"ADA Code",75);
-			report.SetColumn(this,3,"Tooth",45);
-			report.SetColumn(this,4,"Description",200);
-			report.SetColumn(this,5,"Provider",50);
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				report.SetColumn(this,3,"Tooth",45);
+			}
+			report.SetColumn(this,4-toothIndexOffset,"Description",200);
+			report.SetColumn(this,5-toothIndexOffset,"Provider",50);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.SetColumn(this,6,"Clinic",70);
-				report.SetColumn(this,7,"Fee",90,HorizontalAlignment.Right);
+				report.SetColumn(this,6-toothIndexOffset,"Clinic",70);
+				report.SetColumn(this,7-toothIndexOffset,"Fee",90,HorizontalAlignment.Right);
 			}
 			else{
-				report.SetColumn(this,6,"Fee",90,HorizontalAlignment.Right);
+				report.SetColumn(this,6-toothIndexOffset,"Fee",90,HorizontalAlignment.Right);
 			}
 			FormQuery2.ShowDialog();
 			DialogResult=DialogResult.OK;
