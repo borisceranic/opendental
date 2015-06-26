@@ -279,6 +279,9 @@ namespace OpenDentBusiness {
 		MainWindowTitle,
 		///<summary>0=Meaningful Use Stage 1, 1=Meaningful Use Stage 2.  Global, affects all providers.  Changes the MU grid that is seen for individual patients and for summary reports.</summary>
 		MeaningfulUseTwo,
+		///<summary>Number of days after medication order start date until stop date.  Used when automatically inserting a medication order when creating
+		///a new Rx.  Default value is 7 days.  If set to 0 days, the automatic stop date will not be entered.</summary>
+		MedDefaultStopDays,
 		///<summary>New procs will use the fee amount tied to the medical code instead of the ADA code.</summary>
 		MedicalFeeUsedForNewProcs,
 		///<summary>FK to medication.MedicationNum</summary>

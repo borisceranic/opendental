@@ -71,7 +71,10 @@ namespace OpenDentBusiness{
 			long medOrderNum;
 			MedicationPat medOrder=new MedicationPat();//The medication order corresponding to the prescription.
 			medOrder.DateStart=rxPat.RxDate;
-			medOrder.DateStop=rxPat.RxDate.AddDays(7);//Is there a way to easily calculate this information from the prescription information? The medical order will be inactive after this date.
+			int numDays=PrefC.GetInt(PrefName.MedDefaultStopDays);
+			if(numDays!=0) {
+				medOrder.DateStop=rxPat.RxDate.AddDays(numDays);
+			}
 			medOrder.MedDescript=rxPat.Drug;
 			medOrder.RxCui=rxCui;
 			medOrder.NewCropGuid=rxPat.NewCropGuid;

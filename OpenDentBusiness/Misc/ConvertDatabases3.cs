@@ -8771,6 +8771,14 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('MedDefaultStopDays','7')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'MedDefaultStopDays','7')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('DxIcdVersion','9')";
 					Db.NonQ(command);
 				}
@@ -8810,7 +8818,6 @@ namespace OpenDentBusiness {
 						+"WHERE claimformnum="+POut.Long(claimFormNum)+" AND FieldName='FixedText' AND FormatString='B' AND YPos>=600 AND YPos<=700";
 					Db.NonQ(command);
 				}
-
 
 
 
