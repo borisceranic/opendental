@@ -74,6 +74,15 @@ namespace OpenDentBusiness {
 			return PIn.Int(dictPrefs[prefName.ToString()].ValueString);
 		}
 
+		///<summary>Gets a pref of type byte.  Used when the pref is a very small integer (0-255).</summary>
+		public static byte GetByte(PrefName prefName) {
+			Dictionary<string,Pref> dictPrefs=GetDict();
+			if(!dictPrefs.ContainsKey(prefName.ToString())) {
+				throw new Exception(prefName+" is an invalid pref name.");
+			}
+			return PIn.Byte(dictPrefs[prefName.ToString()].ValueString);
+		}
+
 		///<summary>Gets a pref of type double.</summary>
 		public static double GetDouble(PrefName prefName) {
 			Dictionary<string,Pref> dictPrefs=GetDict();

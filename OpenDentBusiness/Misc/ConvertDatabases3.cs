@@ -8770,7 +8770,46 @@ namespace OpenDentBusiness {
 					command="UPDATE fee SET ProvNum = 0 WHERE ProvNum IS NULL";//0 is default
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('DxIcdVersion','9')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DxIcdVersion','9')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD IcdVersion tinyint unsigned NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD IcdVersion number(3)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET IcdVersion = 0 WHERE IcdVersion IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY IcdVersion NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE procedurelog SET IcdVersion=9";//All ICD codes up this this point have been ICD-9 codes.
+				Db.NonQ(command);
+				//Get the ADA 2012 claim form primary key.  The unique ID is OD11.  There cannot be more than one such row.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD11') WHERE RowNum<=1";
+				}
+				DataTable tableClaimFormNum=Db.GetTable(command);
+				if(tableClaimFormNum.Rows.Count>0) {//The claim form should exist, but might not if foreign.
+					long claimFormNum=PIn.Long(tableClaimFormNum.Rows[0][0].ToString());
+					//Change ICD version indicator from fixed text "B" (which indicates ICD-9 always),
+					//to field ICDindicatorAB which indicates "AB" for ICD-10 and " B" for ICD-9.
+					//The current fixed text field for ICD-9 indicator is at Y position 650 by default.  We want to allow the user to have moved the field
+					//a little bit, but we need to limit the Y values affected so that we are sure we do not inadvertently affect another field (per pattern).
+					command="UPDATE claimformitem SET FieldName='ICDindicatorAB',FormatString='',Width=24,XPos=XPos+12 "
+						+"WHERE claimformnum="+POut.Long(claimFormNum)+" AND FieldName='FixedText' AND FormatString='B' AND YPos>=600 AND YPos<=700";
+					Db.NonQ(command);
+				}
 
 
 

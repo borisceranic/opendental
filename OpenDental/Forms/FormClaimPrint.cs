@@ -336,7 +336,8 @@ namespace OpenDental{
 						|| ClaimFormCur.Items[i].FieldName=="MedValAmount41a"
 						|| ClaimFormCur.Items[i].FieldName=="MedValAmount41b"
 						|| ClaimFormCur.Items[i].FieldName=="MedValAmount41c"
-						|| ClaimFormCur.Items[i].FieldName=="MedValAmount41d")
+						|| ClaimFormCur.Items[i].FieldName=="MedValAmount41d"
+						|| ClaimFormCur.Items[i].FieldName=="ICDindicatorAB")
 					{
 						//this aligns it to the right
 						xPosText-=grfx.MeasureString(displayStrings[i],new Font(ClaimFormCur.FontName,ClaimFormCur.FontSize)).Width;
@@ -1984,8 +1985,31 @@ namespace OpenDental{
 							displayStrings[i]="04";
 						}
 						break;
-					case "ICDindicator": //TODO: Allow 0 once ICD10 has been implemented
-						displayStrings[i]="9";
+					case "ICDindicator"://For the 1500_02_12 claim form.
+						byte icdVersion=0;
+						if(ListClaimProcs.Count>0) {
+							proc=Procedures.GetProcFromList(ListProc,ListClaimProcs[0].ProcNum);
+							icdVersion=proc.IcdVersion;
+						}
+						if(icdVersion==9) {
+							displayStrings[i]="9";
+						}
+						else if(icdVersion==10) {
+							displayStrings[i]="0";
+						}
+						break;
+					case "ICDindicatorAB"://For the ADA 2012 claim form.
+						icdVersion=0;
+						if(ListClaimProcs.Count>0) {
+							proc=Procedures.GetProcFromList(ListProc,ListClaimProcs[0].ProcNum);
+							icdVersion=proc.IcdVersion;
+						}
+						if(icdVersion==9) {
+							displayStrings[i]="B";
+						}
+						else if(icdVersion==10) {
+							displayStrings[i]="AB";
+						}
 						break;
 				}//switch
 				if(CultureInfo.CurrentCulture.Name=="nl-BE"	&& displayStrings[i]==""){//Dutch Belgium
@@ -3017,9 +3041,6 @@ namespace OpenDental{
 						else {
 							displayStrings[i]=dateService.ToString(ClaimFormCur.Items[i].FormatString);
 						}
-						break;
-					case "ICDindicator"://TODO: Allow 0 once ICD10 has been implemented
-						displayStrings[i]="9";
 						break;
 				}//switch
 				if(CultureInfo.CurrentCulture.Name=="nl-BE" && displayStrings[i]==""){//Dutch Belgium

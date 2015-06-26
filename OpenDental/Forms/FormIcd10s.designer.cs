@@ -30,6 +30,7 @@ namespace OpenDental{
 			this.butSearch = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butCodeImport = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// textCode
@@ -55,6 +56,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(20, 38);
 			this.gridMain.Name = "gridMain";
@@ -111,10 +113,27 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butCodeImport
+			// 
+			this.butCodeImport.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCodeImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCodeImport.Autosize = true;
+			this.butCodeImport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCodeImport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCodeImport.CornerRadius = 4F;
+			this.butCodeImport.Location = new System.Drawing.Point(877, 38);
+			this.butCodeImport.Name = "butCodeImport";
+			this.butCodeImport.Size = new System.Drawing.Size(75, 24);
+			this.butCodeImport.TabIndex = 21;
+			this.butCodeImport.Text = "Import";
+			this.butCodeImport.UseVisualStyleBackColor = false;
+			this.butCodeImport.Click += new System.EventHandler(this.butCodeImport_Click);
+			// 
 			// FormIcd10s
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(961, 691);
+			this.Controls.Add(this.butCodeImport);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.label1);
@@ -122,6 +141,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(705, 330);
 			this.Name = "FormIcd10s";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "ICD10";
@@ -139,5 +159,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private UI.Button butSearch;
 		private UI.ODGrid gridMain;
+		private UI.Button butCodeImport;
 	}
 }

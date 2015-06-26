@@ -108,6 +108,11 @@ namespace OpenDental {
 			FillGrid();
 		}*/
 
+		private void butCodeImport_Click(object sender,EventArgs e) {
+			FormCodeSystemsImport FormCSI=new FormCodeSystemsImport();
+			FormCSI.ShowDialog();
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			//not even visible unless IsSelectionMode
 			if(gridMain.GetSelectedIndex()==-1) {

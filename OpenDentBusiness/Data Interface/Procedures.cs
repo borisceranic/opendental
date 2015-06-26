@@ -1516,36 +1516,64 @@ namespace OpenDentBusiness {
 			//Reporting.Allocators.AllocatorCollection.CallAll_Allocators(pt.Guarantor);
 		}
 
-		//<summary>Returns all the unique diagnostic codes in the list.  If there is less than 12 unique codes then it will pad the list with empty entries if isPadded is true.  Will always place the principal diagnosis as the first item in the list.</summary>
+		///<summary>Returns all the unique diagnostic codes in the list.  If there is less than 12 unique codes then it will pad the list with empty
+		///entries if isPadded is true.  Will always place the principal diagnosis as the first item in the list.</summary>
 		public static List<string> GetUniqueDiagnosticCodes(List<Procedure> listProcs,bool isPadded) {
+			return GetUniqueDiagnosticCodes(listProcs,isPadded,new List<byte>());
+		}
+
+		///<summary>Returns all the unique diagnostic codes in the list.  If there is less than 12 unique codes then it will pad the list with empty
+		///entries if isPadded is true.  Will always place the principal diagnosis as the first item in the list.  The returned list and
+		///listDiagnosticVersions will be the same length upon return.  When returning, listDiagnosticVersions will contain the diagnostic code versions
+		///of each code in the returned list, used for allowing the user to mix diagnostic code versions on a single claim.  The listDiagnosticVersions
+		///must be a valid list (not null).</summary>
+		public static List<string> GetUniqueDiagnosticCodes(List<Procedure> listProcs,bool isPadded,List<byte> listDiagnosticVersions) {
 			//No need to check RemotingRole; no call to db.
 			List<string> listDiagnosticCodes=new List<string>();
+			listDiagnosticVersions.Clear();
 			for(int i=0;i<listProcs.Count;i++) {//Ensure that the principal diagnosis is first in the list.
 				Procedure proc=listProcs[i];
 				if(proc.IsPrincDiag && proc.DiagnosticCode!="") {
 					listDiagnosticCodes.Add(proc.DiagnosticCode);
+					listDiagnosticVersions.Add(proc.IcdVersion);
 					break;
 				}
 			}
 			for(int i=0;i<listProcs.Count;i++) {
 				Procedure proc=listProcs[i];
-				if(proc.DiagnosticCode!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode)) {
+				if(proc.DiagnosticCode!="" && !ExistsDiagnosticCode(listDiagnosticCodes,listDiagnosticVersions,proc.DiagnosticCode,proc.IcdVersion)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode);
+					listDiagnosticVersions.Add(proc.IcdVersion);
 				}
-				if(proc.DiagnosticCode2!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode2)) {
+				if(proc.DiagnosticCode2!="" && !ExistsDiagnosticCode(listDiagnosticCodes,listDiagnosticVersions,proc.DiagnosticCode2,proc.IcdVersion)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode2);
+					listDiagnosticVersions.Add(proc.IcdVersion);
 				}
-				if(proc.DiagnosticCode3!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode3)) {
+				if(proc.DiagnosticCode3!="" && !ExistsDiagnosticCode(listDiagnosticCodes,listDiagnosticVersions,proc.DiagnosticCode3,proc.IcdVersion)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode3);
+					listDiagnosticVersions.Add(proc.IcdVersion);
 				}
-				if(proc.DiagnosticCode4!="" && !listDiagnosticCodes.Contains(proc.DiagnosticCode4)) {
+				if(proc.DiagnosticCode4!="" && !ExistsDiagnosticCode(listDiagnosticCodes,listDiagnosticVersions,proc.DiagnosticCode4,proc.IcdVersion)) {
 					listDiagnosticCodes.Add(proc.DiagnosticCode4);
+					listDiagnosticVersions.Add(proc.IcdVersion);
 				}
 			}
 			while(isPadded && listDiagnosticCodes.Count<12) {//Pad to at least 12 items.  Simplifies claim printing logic.
 				listDiagnosticCodes.Add("");
+				listDiagnosticVersions.Add(0);
 			}
 			return listDiagnosticCodes;
+		}
+
+		///<summary>Both listDiagCodes and listDiagVersions must be the same length and not null.</summary>
+		private static bool ExistsDiagnosticCode(List<string> listDiagCodes,List<byte> listDiagVersions,string diagnosticCode,byte diagnosticVersion)	{
+			//No need to check RemotingRole; no call to db.
+			for(int i=0;i<listDiagCodes.Count;i++) {
+				if(listDiagCodes[i]==diagnosticCode && listDiagVersions[i]==diagnosticVersion) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		///<summary></summary>

@@ -130,6 +130,10 @@ namespace OpenDentBusiness {
 		public long ProvOrderOverride;
 		///<summary>For prosthesis replacement procedures on 5010 eclaims only.  If true, indicates that the DateOriginalProsth is an estimated date.  Estimated dates are often used when the original prosthesis was performed by another doctor.</summary>
 		public bool IsDateProsthEst;
+		///<summary>The ICD code version for all diagnosis codes on this procedure, including DiagnosisCode, DiagnosisCode2, DiagnosisCode3,
+		///and DiagnosisCode4.  Value of 9 for ICD-9, 10 for ICD-10, etc.  Default value is 0.  This value is copied from the DxIcdVersion preference
+		///when a procedure is created.  The user can also manually change the IcdVersion on individual procedures.</summary>
+		public byte IcdVersion;
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
@@ -168,6 +172,7 @@ namespace OpenDentBusiness {
 
 		public Procedure() {
 			UnitQty=1;
+			IcdVersion=PrefC.GetByte(PrefName.DxIcdVersion);
 		}
 
 		///<summary>Returns a copy of the procedure.</summary>

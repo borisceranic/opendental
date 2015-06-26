@@ -585,9 +585,9 @@ namespace OpenDental{
 					else myColor=Color.Blue;
 					xPosRect=ClaimFormCur.Items[i].XPos;
 					xPosText=xPosRect;
-					if(displayStrings[i]=="1234.00"){
+					if(displayStrings[i]=="1234.00" || displayStrings[i]=="AB") {//right aligned fields: any amount field, or ICDindicatorAB
 						xPosRect-=ClaimFormCur.Items[i].Width;//this aligns it to the right
-						xPosText-=grfx.MeasureString("1234.00"
+						xPosText-=grfx.MeasureString(displayStrings[i]
 							,new Font(ClaimFormCur.FontName,ClaimFormCur.FontSize)).Width;
 					}
 					grfx.DrawRectangle(new Pen(myColor)
@@ -853,6 +853,9 @@ namespace OpenDental{
 					case "MedConditionCode27":
 					case "MedConditionCode28":
 						displayStrings[i]="01";
+						break;
+					case "ICDindicatorAB":
+						displayStrings[i]="AB";
 						break;
 					case "Remarks":
 						displayStrings[i]="This is a test of the remarks section of the claim form.";
@@ -1201,9 +1204,9 @@ namespace OpenDental{
 					myColor=Color.Blue;
 					xPosRect=ClaimFormCur.Items[i].XPos+ClaimFormCur.OffsetX;
 					xPosText=xPosRect;
-					if(displayStrings[i]=="1234.00"){
+					if(displayStrings[i]=="1234.00" || displayStrings[i]=="AB") {//right aligned fields: any amount field, or ICDindicatorAB
 						xPosRect-=ClaimFormCur.Items[i].Width;//this aligns it to the right
-						xPosText-=grfx.MeasureString("1234.00"
+						xPosText-=grfx.MeasureString(displayStrings[i]
 							,new Font(ClaimFormCur.FontName,ClaimFormCur.FontSize)).Width;
 					}
 					grfx.DrawRectangle(new Pen(myColor)

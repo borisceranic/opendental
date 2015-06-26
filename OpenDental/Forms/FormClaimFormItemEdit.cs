@@ -777,7 +777,8 @@ namespace OpenDental{
 				"MedAdmissionSourceCode",
 				"MedPatientStatusCode",
 				"MedAccidentCode",
-				"ICDindicator"
+				"ICDindicator",
+				"ICDindicatorAB"
 			};
 		}
 

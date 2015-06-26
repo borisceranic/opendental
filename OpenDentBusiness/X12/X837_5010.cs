@@ -956,40 +956,41 @@ namespace OpenDentBusiness
 				#endregion Claim K3 NTE CRx
 				#region Claim HI HCP
 				//HI loops-------------------------------------------------------------------------------------------------------
-				List<string> listDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(claimProcs),false);
+				List<byte> listDiagnosesVersions=new List<byte>();
+				List<string> listDiagnoses=Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(claimProcs),false,listDiagnosesVersions);
 				//2300 HI: BK (medical,institutional,dental) Health Care Diagnosis Code. Situational.  
 				//todo: validate that diagnoses are actual ICD9 or ICD10 codes.
 				if(medType==EnumClaimMedType.Institutional && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
 					sw.Write("HI"+s
-						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
+						+((listDiagnosesVersions[0]==9)?"BK":"ABK")+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9,ABK=ICD-10 Principal Diagnosis
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
 					EndSegment(sw);
 					//Institutional claims only support 1 diagnosis code here, the principal diagnosis.
 				}
 				else if(medType==EnumClaimMedType.Medical) {//Validation guarantees there is at least one (principal) diagnosis code as required
 					sw.Write("HI"+s
-						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
+						+((listDiagnosesVersions[0]==9)?"BK":"ABK")+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9,ABK=ICD-10 Principal Diagnosis
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
 					for(int j=1;j<listDiagnoses.Count;j++) {//Validated below that there are 12 or fewer common diagnoses for the entire claim.
 						if(listDiagnoses[j]=="") {
 							continue;
 						}
 						sw.Write(s//this is the separator from the _previous_ field.
-							+"BF"+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9 Diagnosis
+							+((listDiagnosesVersions[j]==9)?"BF":"ABF")+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9,ABF=ICD-10 Diagnosis
 							+Sout(listDiagnoses[j].Replace(".",""),30));//HI0#-2 1/30 Industry Code: Diagnosis code. No periods.
 					}
 					EndSegment(sw);
 				}
 				else if(medType==EnumClaimMedType.Dental && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one diagnosis.
 					sw.Write("HI"+s
-						+"BK"+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9 Principal Diagnosis.
+						+((listDiagnosesVersions[0]==9)?"BK":"ABK")+isa16//HI01-1 1/3 Code List Qualifier Code: BK=ICD-9,ABK=ICD-10 Principal Diagnosis
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: Diagnosis code. No periods.
 					for(int j=1;j<listDiagnoses.Count;j++) {//We allow up to 12 diagnosis codes per claim (for medical), but the dental format only allows up to 4 (see validation).
 						if(listDiagnoses[j]=="") {
 							continue;
 						}
 						sw.Write(s//this is the separator from the _previous_ field.
-							+"BF"+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9 Diagnosis
+							+((listDiagnosesVersions[j]==9)?"BF":"ABF")+isa16//HI0#-1 1/3 Code List Qualifier Code: BF=ICD-9,ABF=ICD-10 Diagnosis
 							+Sout(listDiagnoses[j].Replace(".",""),30));//HI0#-2 1/30 Industry Code: Diagnosis code. No periods.
 					}
 					EndSegment(sw);

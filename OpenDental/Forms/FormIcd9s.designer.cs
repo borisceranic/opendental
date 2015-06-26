@@ -30,6 +30,7 @@ namespace OpenDental{
 			this.textCode = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butSearch = new OpenDental.UI.Button();
+			this.butCodeImport = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// listMain
@@ -52,7 +53,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(549, 598);
+			this.butOK.Location = new System.Drawing.Point(527, 624);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -67,7 +68,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(549, 639);
+			this.butClose.Location = new System.Drawing.Point(527, 654);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -104,10 +105,27 @@ namespace OpenDental{
 			this.butSearch.Text = "Search";
 			this.butSearch.Click += new System.EventHandler(this.butSearch_Click);
 			// 
+			// butCodeImport
+			// 
+			this.butCodeImport.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCodeImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCodeImport.Autosize = true;
+			this.butCodeImport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCodeImport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCodeImport.CornerRadius = 4F;
+			this.butCodeImport.Location = new System.Drawing.Point(527, 36);
+			this.butCodeImport.Name = "butCodeImport";
+			this.butCodeImport.Size = new System.Drawing.Size(75, 24);
+			this.butCodeImport.TabIndex = 20;
+			this.butCodeImport.Text = "Import";
+			this.butCodeImport.UseVisualStyleBackColor = false;
+			this.butCodeImport.Click += new System.EventHandler(this.butCodeImport_Click);
+			// 
 			// FormIcd9s
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(649, 690);
+			this.ClientSize = new System.Drawing.Size(614, 690);
+			this.Controls.Add(this.butCodeImport);
 			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textCode);
@@ -115,6 +133,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(600, 330);
 			this.Name = "FormIcd9s";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "ICD9s";
@@ -132,5 +151,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textCode;
 		private System.Windows.Forms.Label label1;
 		private UI.Button butSearch;
+		private UI.Button butCodeImport;
 	}
 }

@@ -187,6 +187,8 @@ namespace OpenDentBusiness {
 		DockPhonePanelShow,
 		///<summary>The AtoZ folder path.</summary>
 		DocPath,
+		///<summary>The ICD Diagnosis Code version primarily used by the practice.  Value of '9' for ICD-9, and '10' for ICD-10.</summary>
+		DxIcdVersion,
 		EasyBasicModules,
 		/// <summary>Depricated.</summary>
 		EasyHideAdvancedIns,
@@ -250,7 +252,8 @@ namespace OpenDentBusiness {
 		HL7FolderIn,
 		///<summary>Used by HQ. Projected onto wall displayed on top of FormMapHQ</summary>
 		HQTriageCoordinator,
-		///<summary>procedurelog.DiagnosticCode will be set to this for new procedures and complete procedures if this field was blank when set complete.</summary>
+		///<summary>procedurelog.DiagnosticCode will be set to this for new procedures and complete procedures if this field was blank when set complete.
+		///This can be an ICD-9 or an ICD-10.  In future versions, could be another an ICD-11, ICD-12, etc.</summary>
 		ICD9DefaultForNewProcs,
 		ImagesModuleTreeIsCollapsed,
 		ImageWindowingMax,

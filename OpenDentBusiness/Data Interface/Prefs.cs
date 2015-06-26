@@ -84,6 +84,11 @@ namespace OpenDentBusiness{
 			return UpdateLong(prefName,newValue);
 		}
 
+		///<summary>Updates a pref of type byte.  Returns true if a change was required, or false if no change needed.</summary>
+		public static bool UpdateByte(PrefName prefName,byte newValue) {
+			return UpdateLong(prefName,newValue);
+		}
+
 		///<summary>Updates a pref of type int without using the cache.  Useful for multithreaded connections.</summary>
 		public static void UpdateIntNoCache(PrefName prefName,int newValue) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

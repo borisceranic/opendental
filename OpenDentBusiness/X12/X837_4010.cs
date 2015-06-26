@@ -845,7 +845,7 @@ namespace OpenDentBusiness {
 				//2300 CR2: (medical) Spinal Manipulation Service Info
 				//2300 CRC: (medical) About 3 irrelevant segments
 				ArrayList diagnoses=new ArrayList();//princDiag will always be the first element.
-				if(isMedical) {
+				if(isMedical) {//We never really supported Medical in 4010, thus we do not need to support ICD-10 diagnosis codes.
 					for(int j=0;j<claimProcs.Count;j++) {
 						proc=Procedures.GetProcFromList(procList,claimProcs[j].ProcNum);
 						if(proc.DiagnosticCode=="") {

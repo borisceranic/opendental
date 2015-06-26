@@ -89,7 +89,7 @@ namespace OpenDental{
 		private CheckBox checkAppointmentTimeIsLocked;
 		private CheckBox checkTextMsgOkStatusTreatAsNo;
 		private TextBox textICD9DefaultForNewProcs;
-		private Label label17;
+		private Label labelIcdCodeDefault;
 		private CheckBox checkInsDefaultAssignmentOfBenefits;
 		private GroupBox groupBox1;
 		private CheckBox checkIntermingleDefault;
@@ -127,6 +127,8 @@ namespace OpenDental{
 		private Label label24;
 		private ValidNum textBillingElectBatchMax;
 		private CheckBox checkGoogleAddress;
+		private CheckBox checkDxIcdVersion;
+		private UI.Button butDiagnosisCode;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -245,7 +247,7 @@ namespace OpenDental{
 			this.checkProcGroupNoteDoesAggregate = new System.Windows.Forms.CheckBox();
 			this.butAllergiesIndicateNone = new OpenDental.UI.Button();
 			this.textAllergiesIndicateNone = new System.Windows.Forms.TextBox();
-			this.label17 = new System.Windows.Forms.Label();
+			this.labelIcdCodeDefault = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
 			this.butMedicationsIndicateNone = new OpenDental.UI.Button();
 			this.textMedicationsIndicateNone = new System.Windows.Forms.TextBox();
@@ -276,6 +278,8 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkDxIcdVersion = new System.Windows.Forms.CheckBox();
+			this.butDiagnosisCode = new OpenDental.UI.Button();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -1171,6 +1175,8 @@ namespace OpenDental{
 			// tabChart
 			// 
 			this.tabChart.BackColor = System.Drawing.SystemColors.Window;
+			this.tabChart.Controls.Add(this.butDiagnosisCode);
+			this.tabChart.Controls.Add(this.checkDxIcdVersion);
 			this.tabChart.Controls.Add(this.checkChartNonPatientWarn);
 			this.tabChart.Controls.Add(this.checkProcLockingIsAllowed);
 			this.tabChart.Controls.Add(this.textICD9DefaultForNewProcs);
@@ -1178,7 +1184,7 @@ namespace OpenDental{
 			this.tabChart.Controls.Add(this.checkProcGroupNoteDoesAggregate);
 			this.tabChart.Controls.Add(this.butAllergiesIndicateNone);
 			this.tabChart.Controls.Add(this.textAllergiesIndicateNone);
-			this.tabChart.Controls.Add(this.label17);
+			this.tabChart.Controls.Add(this.labelIcdCodeDefault);
 			this.tabChart.Controls.Add(this.label14);
 			this.tabChart.Controls.Add(this.butMedicationsIndicateNone);
 			this.tabChart.Controls.Add(this.textMedicationsIndicateNone);
@@ -1198,12 +1204,11 @@ namespace OpenDental{
 			// 
 			// checkChartNonPatientWarn
 			// 
-			this.checkChartNonPatientWarn.AutoSize = true;
 			this.checkChartNonPatientWarn.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkChartNonPatientWarn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkChartNonPatientWarn.Location = new System.Drawing.Point(309, 222);
+			this.checkChartNonPatientWarn.Location = new System.Drawing.Point(310, 241);
 			this.checkChartNonPatientWarn.Name = "checkChartNonPatientWarn";
-			this.checkChartNonPatientWarn.Size = new System.Drawing.Size(131, 18);
+			this.checkChartNonPatientWarn.Size = new System.Drawing.Size(131, 15);
 			this.checkChartNonPatientWarn.TabIndex = 211;
 			this.checkChartNonPatientWarn.Text = "Non Patient Warning";
 			this.checkChartNonPatientWarn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1214,7 +1219,7 @@ namespace OpenDental{
 			// 
 			this.checkProcLockingIsAllowed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkProcLockingIsAllowed.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkProcLockingIsAllowed.Location = new System.Drawing.Point(59, 207);
+			this.checkProcLockingIsAllowed.Location = new System.Drawing.Point(60, 224);
 			this.checkProcLockingIsAllowed.Name = "checkProcLockingIsAllowed";
 			this.checkProcLockingIsAllowed.Size = new System.Drawing.Size(381, 15);
 			this.checkProcLockingIsAllowed.TabIndex = 210;
@@ -1225,7 +1230,7 @@ namespace OpenDental{
 			// 
 			// textICD9DefaultForNewProcs
 			// 
-			this.textICD9DefaultForNewProcs.Location = new System.Drawing.Point(358, 182);
+			this.textICD9DefaultForNewProcs.Location = new System.Drawing.Point(332, 199);
 			this.textICD9DefaultForNewProcs.Name = "textICD9DefaultForNewProcs";
 			this.textICD9DefaultForNewProcs.Size = new System.Drawing.Size(83, 20);
 			this.textICD9DefaultForNewProcs.TabIndex = 209;
@@ -1276,15 +1281,15 @@ namespace OpenDental{
 			this.textAllergiesIndicateNone.Size = new System.Drawing.Size(145, 20);
 			this.textAllergiesIndicateNone.TabIndex = 204;
 			// 
-			// label17
+			// labelIcdCodeDefault
 			// 
-			this.label17.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label17.Location = new System.Drawing.Point(106, 185);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(246, 16);
-			this.label17.TabIndex = 203;
-			this.label17.Text = "Default ICD9 code for new procedures";
-			this.label17.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelIcdCodeDefault.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.labelIcdCodeDefault.Location = new System.Drawing.Point(80, 202);
+			this.labelIcdCodeDefault.Name = "labelIcdCodeDefault";
+			this.labelIcdCodeDefault.Size = new System.Drawing.Size(246, 16);
+			this.labelIcdCodeDefault.TabIndex = 203;
+			this.labelIcdCodeDefault.Text = "Default ICD-10 code for new procedures";
+			this.labelIcdCodeDefault.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label14
 			// 
@@ -1614,6 +1619,33 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkDxIcdVersion
+			// 
+			this.checkDxIcdVersion.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDxIcdVersion.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkDxIcdVersion.Location = new System.Drawing.Point(60, 179);
+			this.checkDxIcdVersion.Name = "checkDxIcdVersion";
+			this.checkDxIcdVersion.Size = new System.Drawing.Size(381, 15);
+			this.checkDxIcdVersion.TabIndex = 212;
+			this.checkDxIcdVersion.Text = "Use ICD-10 Diagnosis Codes (uncheck for ICD-9)";
+			this.checkDxIcdVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDxIcdVersion.UseVisualStyleBackColor = true;
+			this.checkDxIcdVersion.Click += new System.EventHandler(this.checkDxIcdVersion_Click);
+			// 
+			// butDiagnosisCode
+			// 
+			this.butDiagnosisCode.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDiagnosisCode.Autosize = true;
+			this.butDiagnosisCode.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDiagnosisCode.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDiagnosisCode.CornerRadius = 4F;
+			this.butDiagnosisCode.Location = new System.Drawing.Point(419, 198);
+			this.butDiagnosisCode.Name = "butDiagnosisCode";
+			this.butDiagnosisCode.Size = new System.Drawing.Size(22, 22);
+			this.butDiagnosisCode.TabIndex = 213;
+			this.butDiagnosisCode.Text = "...";
+			this.butDiagnosisCode.Click += new System.EventHandler(this.butDiagnosisCode_Click);
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1797,6 +1829,13 @@ namespace OpenDental{
 			checkChartNonPatientWarn.Checked=PrefC.GetBool(PrefName.ChartNonPatientWarn);
 			//checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);//Not implemented.  May revisit some day.
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
+			if(PrefC.GetByte(PrefName.DxIcdVersion)==9) {
+				checkDxIcdVersion.Checked=false;
+			}
+			else {//ICD-10
+				checkDxIcdVersion.Checked=true;
+			}
+			SetIcdLabels();
 			textICD9DefaultForNewProcs.Text=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			checkProcLockingIsAllowed.Checked=PrefC.GetBool(PrefName.ProcLockingIsAllowed);
 			#endregion
@@ -1955,6 +1994,35 @@ namespace OpenDental{
 			}
 		}
 
+		private void butDiagnosisCode_Click(object sender,EventArgs e) {
+			if(checkDxIcdVersion.Checked) {//ICD-10
+				FormIcd10s formI=new FormIcd10s();
+				formI.IsSelectionMode=true;
+				if(formI.ShowDialog()==DialogResult.OK) {
+					textICD9DefaultForNewProcs.Text=formI.SelectedIcd10.Icd10Code;
+				}
+			}
+			else {//ICD-9
+				FormIcd9s formI=new FormIcd9s();
+				formI.IsSelectionMode=true;
+				if(formI.ShowDialog()==DialogResult.OK) {
+					textICD9DefaultForNewProcs.Text=formI.SelectedIcd9.ICD9Code;
+				}
+			}
+		}
+
+		private void SetIcdLabels() {
+			byte icdVersion=9;
+			if(checkDxIcdVersion.Checked) {
+				icdVersion=10;
+			}
+			labelIcdCodeDefault.Text=Lan.g(this,"Default ICD")+"-"+icdVersion+" "+Lan.g(this,"code for new procedures");
+		}
+
+		private void checkDxIcdVersion_Click(object sender,EventArgs e) {
+			SetIcdLabels();
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			float percent=0;//Placeholder
 			if(!float.TryParse(textDiscountPercentage.Text,out percent)) {
@@ -2057,6 +2125,7 @@ namespace OpenDental{
 				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
 				| Prefs.UpdateInt(PrefName.InsDefaultCobRule,comboCobRule.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.MedicalFeeUsedForNewProcs,checkMedicalFeeUsedForNewProcs.Checked)
+				| Prefs.UpdateByte(PrefName.DxIcdVersion,(byte)(checkDxIcdVersion.Checked?10:9))
 				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
 				| Prefs.UpdateInt(PrefName.TimeCardOvertimeFirstDayOfWeek,comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
