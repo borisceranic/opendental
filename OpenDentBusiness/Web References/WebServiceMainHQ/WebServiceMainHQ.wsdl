@@ -203,13 +203,13 @@
   </wsdl:binding>
   <wsdl:service name="WebServiceMainHQ">
     <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
-      <soap:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+      <soap:address location="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
-      <soap12:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+      <soap12:address location="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
-      <http:address location="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
+      <http:address location="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

@@ -659,6 +659,7 @@
     <Compile Include="Misc\ConvertDatabases1.cs" />
     <Compile Include="Misc\Mime.cs" />
     <Compile Include="Misc\NTPv4.cs" />
+    <Compile Include="Misc\WebServiceMainHQProxy.cs" />
     <Compile Include="Misc\WindowsTime.cs" />
     <Compile Include="Mobile\Crud\AllergyDefmCrud.cs" />
     <Compile Include="Mobile\Crud\AllergymCrud.cs" />
@@ -1301,7 +1302,7 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Web References\WebServiceMainHQ\webservicemainhq.wsdl" />
+    <None Include="Web References\WebServiceMainHQ\WebServiceMainHQ.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WebReferenceUrl Include="http://localhost/OpenDentalServer/ServiceMain.asmx">
@@ -1315,10 +1316,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OpenDentBusiness_OpenDentalServer_ServiceMain</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx">
+    <WebReferenceUrl Include="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\WebServiceMainHQ\</RelPath>
-      <UpdateFromURL>http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx</UpdateFromURL>
+      <UpdateFromURL>http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -1353,9 +1354,8 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Web References\WebServiceMainHQ\webservicemainhq.disco" />
+    <None Include="Web References\WebServiceMainHQ\WebServiceMainHQ.disco" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

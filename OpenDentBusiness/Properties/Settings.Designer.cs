@@ -36,7 +36,7 @@ namespace OpenDentBusiness.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://patientviewer.com/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx")]
         public string OpenDentBusiness_WebServiceMainHQ_WebServiceMainHQ {
             get {
                 return ((string)(this["OpenDentBusiness_WebServiceMainHQ_WebServiceMainHQ"]));

@@ -1093,41 +1093,51 @@ namespace OpenDental {
 
 		///<summary>Called on form load and when typing into Monthly limit box.</summary>
 		private void SetSmsServiceAgreement(bool isTyping=false) {
-			double monthlyLimit=-1;//can be clinic or practice level
-			//fill with existing contract data if text box is empty.
-			if(String.IsNullOrEmpty(textSmsLimit.Text) && !isTyping) {
-				if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-					monthlyLimit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
-				}
-				else {
-					monthlyLimit=_clinicCur.SmsMonthlyLimit;
-				}
-				textSmsLimit.Text=monthlyLimit.ToString("c",new CultureInfo("en-US"));
+			double smsMonthlyLimit;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				smsMonthlyLimit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
 			}
-			//No Contract, everything is blank.
-			if(String.IsNullOrEmpty(textSmsLimit.Text) || monthlyLimit==0) {
-				butSmsUnsubscribe.Enabled=false;
-				butSmsCancel.Enabled=false;//nothing to cancel
-				butSmsSubmit.Enabled=false;//can't submit until there is something worth submitting
-				checkSmsAgree.Checked=false;//nothing has been agreed to
-				checkSmsAgree.Enabled=false;//don't allow them to agree to terms unless they enter a valid amount
-			}
-			//They are changing the contract from the one that was signed.
-			else if(textSmsLimit.Text!=monthlyLimit.ToString("c",new CultureInfo("en-US"))) {//They are changing the contract
-				butSmsUnsubscribe.Enabled=false;
-				butSmsCancel.Enabled=true;//allow cancel/undo
-				butSmsSubmit.Enabled=false;//cannot submit until they agree
-				checkSmsAgree.Checked=false;//uncheck agree, because they have changed something
-				checkSmsAgree.Enabled=true;//allow them to check agree
-			}
-			//They have signed a contract in the past and it is still valid
 			else {
-				butSmsUnsubscribe.Enabled=true;
-				butSmsCancel.Enabled=false;//nothing to cancel
-				butSmsSubmit.Enabled=false;//nothing to submit
-				checkSmsAgree.Checked=true;//show that they have agreed in the past
-				checkSmsAgree.Enabled=false;//don't allow them to un-agree
+				smsMonthlyLimit=_listClinics[comboClinicSms.SelectedIndex].SmsMonthlyLimit;
 			}
+			//fill text
+			if(String.IsNullOrEmpty(textSmsLimit.Text) && !isTyping) {//blank text box, fill with stored value
+				textSmsLimit.Text=smsMonthlyLimit.ToString("c",new CultureInfo("en-US"));
+			}
+			//parse text, which will usually be displayed in USD, unless the user is typing
+			double smsMonthlyLimitText=PIn.Double(textSmsLimit.Text.Trim('$'));
+			//If they have a non-zero contract amount they should always be able to click unsubscribe.
+			if(smsMonthlyLimit>0) {
+				butSmsUnsubscribe.Enabled=true;
+				butSmsSubmit.Text=Lans.g(this,"Update");
+			}
+			else {
+				butSmsUnsubscribe.Enabled=false;
+				butSmsSubmit.Text=Lans.g(this,"Submit");
+			}
+			//If they have entered something that does not match what is stored in DB enable cancel button.
+			if(smsMonthlyLimitText==smsMonthlyLimit) {
+				butSmsCancel.Enabled=false;
+			}
+			else {
+				butSmsCancel.Enabled=true;
+			}
+			//They have typed in blank or 0
+			if(smsMonthlyLimitText==0) {
+				checkSmsAgree.Enabled=false;
+				checkSmsAgree.Checked=false;
+			}
+			//Either they typed in the same amount or nothing has been edited
+			else if(smsMonthlyLimitText==smsMonthlyLimit) {
+				checkSmsAgree.Enabled=false;
+				checkSmsAgree.Checked=true;
+			}
+			//They have typed something in that is not zero and does not match their currently set limit.
+			else {
+				checkSmsAgree.Enabled=true;
+				checkSmsAgree.Checked=false;
+			}
+			butSmsSubmit.Enabled=checkSmsAgree.Checked&checkSmsAgree.Enabled;
 		}
 
 		private void checkSmsAgree_CheckedChanged(object sender,EventArgs e) {
@@ -1546,11 +1556,15 @@ namespace OpenDental {
 		}
 
 		private void butSmsCancel_Click(object sender,EventArgs e) {
-			//textSmsLimit.Text="";//clear user input
+			textSmsLimit.Text="";//clear user input
 			SetSmsServiceAgreement();//sets to previous value if applicable.
 		}
 
 		private void gridClinics_CellClick(object sender,ODGridClickEventArgs e) {
+			if(e.Row==-1) {
+				return;
+			}
+			comboClinicSms.SelectedIndex=e.Row;
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();
 		}
@@ -1567,14 +1581,16 @@ namespace OpenDental {
 				}
 				if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 					Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.MinValue);
+					textSmsLimit.Text="";
 					Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,0);
 					DataValid.SetInvalid(InvalidType.Prefs);
 					Prefs.RefreshCache();
 				}
 				else {
-					_clinicCur.SmsMonthlyLimit=0;
-					_clinicCur.SmsContractDate=DateTime.MinValue;
-					Clinics.Update(_clinicCur);
+					_listClinics[comboClinicSms.SelectedIndex].SmsMonthlyLimit=0;
+					textSmsLimit.Text="";
+					_listClinics[comboClinicSms.SelectedIndex].SmsContractDate=DateTime.MinValue;
+					Clinics.Update(_listClinics[comboClinicSms.SelectedIndex]);
 					DataValid.SetInvalid(InvalidType.Providers);
 					Clinics.RefreshCache();
 				}
@@ -1635,7 +1651,34 @@ namespace OpenDental {
 				Patients.Update(p,new Patient());
 			}
 			foreach(Clinic c in _listClinics) {
-				int phoneCount=rand.Next(5);
+				bool skipClinic=false;
+				if(c.ClinicNum==0) {//practice level
+					if(rand.Next(100)<25) {
+						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.MinValue);
+						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,0f);
+						skipClinic=true;
+					}
+					else {
+						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.Now.AddDays(-rand.Next(365)));
+						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,rand.Next(5,50));
+					}
+				}
+				else {//clinic level
+					if(rand.Next(100)<25) {
+						c.SmsContractDate=DateTime.MinValue;
+						c.SmsMonthlyLimit=0f;
+						skipClinic=true;
+					}
+					else {
+						c.SmsContractDate=DateTime.Now.AddDays(-rand.Next(365));
+						c.SmsMonthlyLimit=rand.Next(5,50);
+					}
+					Clinics.Update(c);
+				}
+				if(skipClinic) {
+					continue;
+				}
+				int phoneCount=rand.Next(1,5);
 				List<SmsPhone> listPhones=new List<SmsPhone>();
 				for(int i=0;i<phoneCount;i++) {
 					SmsPhone phoneNew=new SmsPhone() {
@@ -1648,8 +1691,8 @@ namespace OpenDental {
 					listPhones.Add(phoneNew);
 				}
 				foreach(SmsPhone phone in listPhones) {
-					int inMsgCount=rand.Next(5);
-					int outMsgCount=rand.Next(5);
+					int inMsgCount=rand.Next(500);
+					int outMsgCount=rand.Next(50);
 					for(int i=0;i<inMsgCount;i++) {
 						SmsToMobile msg=new SmsToMobile();
 						msg.ClinicNum=c.ClinicNum;
@@ -1662,7 +1705,7 @@ namespace OpenDental {
 						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
 						msg.MsgChargeUSD=.04f;
 						msg.MsgParts=1;
-						msg.MsgText="1111";//listSnomed[rand.Next(listSnomed.Count-1)].Description;
+						msg.MsgText="test";// listSnomed[rand.Next(listSnomed.Count-1)].Description;
 						msg.MsgType=SmsMessageSource.DirectSms;
 						msg.PatNum=rand.Next(1,5);
 						msg.SmsPhoneNumber=phone.PhoneNumber;
@@ -1677,34 +1720,13 @@ namespace OpenDental {
 						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');//.03% change it is from one of the patients above.
 						msg.MsgPart=1;
 						msg.MsgRefID=Guid.NewGuid().ToString();
-						msg.MsgText="1111";// (string)listSnomed[rand.Next(listSnomed.Count-1)].Description;
+						msg.MsgText="test";// listSnomed[rand.Next(listSnomed.Count-1)].Description;
 						msg.MsgTotal=1;
 						msg.SmsPhoneNumber=phone.PhoneNumber;
 						msg.SmsStatus=(SmsFromStatus)rand.Next(3);
 						listMessagesIn.Add(msg);
 					}
 					SmsFromMobiles.ProcessInboundSms(listMessagesIn);
-				}
-				if(c.ClinicNum==0) {//practice level
-					if(rand.Next(100)<25) {
-						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.MinValue);
-						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,0f);
-					}
-					else {
-						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.Now.AddDays(-rand.Next(365)));
-						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,rand.NextDouble()*50);
-					}
-				}
-				else {//clinic level
-					if(rand.Next(100)<25) {
-						c.SmsContractDate=DateTime.MinValue;
-						c.SmsMonthlyLimit=0f;
-					}
-					else {
-						c.SmsContractDate=DateTime.Now.AddDays(-rand.Next(365));
-						c.SmsMonthlyLimit=rand.NextDouble()*50;
-					}
-					Clinics.Update(c);
 				}
 			}//end for each clinic
 			Clinics.RefreshCache();

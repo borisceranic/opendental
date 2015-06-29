@@ -197,7 +197,7 @@ namespace OpenDentBusiness{
 			#endregion
 			return retVal;
 		}
-		
+
 		///<summary>Surround with Try/Catch</summary>
 		public static List<SmsPhone> SignContract(long clinicNum,double monthlyLimitUSD) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -239,10 +239,7 @@ namespace OpenDentBusiness{
 				writer.WriteEndElement(); //Payload	
 				writer.WriteEndElement(); //Request
 			}
-			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
-#if DEBUG
-			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
-#endif
+			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
 			string result = "";
 			try {
 				result=service.SmsSignAgreement(strbuild.ToString());
@@ -309,10 +306,7 @@ namespace OpenDentBusiness{
 				writer.WriteEndElement(); //Payload	
 				writer.WriteEndElement(); //Request
 			}
-			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
-#if DEBUG
-			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
-#endif
+			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
 			string result = "";
 			try {
 				result=service.SmsCancelService(strbuild.ToString());

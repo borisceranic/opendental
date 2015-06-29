@@ -211,13 +211,10 @@ namespace OpenDentBusiness{
 				writer.WriteEndElement(); //Payload	
 				writer.WriteEndElement(); //Request
 			}
-			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
-#if DEBUG
-			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";
-#endif
+			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();			
 			string result = "";
 			try {
-				service.SmsSend(strbuild.ToString());
+				result=service.SmsSend(strbuild.ToString());
 			}
 			catch(Exception ex) {
 				throw new Exception("Unable to send using web service.");
