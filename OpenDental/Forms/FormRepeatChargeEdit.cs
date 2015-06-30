@@ -349,6 +349,8 @@ namespace OpenDental{
 			// textChargeAmt
 			// 
 			this.textChargeAmt.Location = new System.Drawing.Point(162, 136);
+			this.textChargeAmt.MaxVal = 100000000D;
+			this.textChargeAmt.MinVal = -100000000D;
 			this.textChargeAmt.Name = "textChargeAmt";
 			this.textChargeAmt.Size = new System.Drawing.Size(100, 20);
 			this.textChargeAmt.TabIndex = 5;
@@ -462,6 +464,23 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//OD HQ disable the IsEnabled and CreatesClaim checkboxes
 				checkCreatesClaim.Enabled=false;
 				checkIsEnabled.Enabled=false;
+			}
+			if(RepeatCur.ProcCode=="038") {
+				textDesc.ReadOnly=true;
+				textTotalAmount.ReadOnly=true;
+				textNumOfCharges.ReadOnly=true;
+				textChargeAmt.ReadOnly=true;
+				textDateStart.ReadOnly=true;
+				textDateStop.ReadOnly=true;
+				textNote.ReadOnly=true;
+				checkCreatesClaim.AutoCheck=false;
+				checkIsEnabled.AutoCheck=false;
+				checkCopyNoteToProc.AutoCheck=false;
+				butDelete.Enabled=false;
+				butMaunal.Enabled=false;
+				butCalculate.Enabled=false;
+				butOK.Enabled=false;
+				butCancel.Text=Lan.g(this,"Close");
 			}
 		}
 
