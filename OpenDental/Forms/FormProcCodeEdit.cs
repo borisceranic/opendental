@@ -14,7 +14,7 @@ namespace OpenDental{
 ///<summary></summary>
 	public class FormProcCodeEdit : System.Windows.Forms.Form{
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Label labelTreatArea;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label7;
@@ -105,7 +105,7 @@ namespace OpenDental{
 		private void InitializeComponent(){
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProcCodeEdit));
 			this.label1 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
+			this.labelTreatArea = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
@@ -172,14 +172,14 @@ namespace OpenDental{
 			this.label1.Text = "Proc Code";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label4
+			// labelTreatArea
 			// 
-			this.label4.Location = new System.Drawing.Point(493, 247);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(100, 14);
-			this.label4.TabIndex = 3;
-			this.label4.Text = "Treatment Area";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelTreatArea.Location = new System.Drawing.Point(493, 247);
+			this.labelTreatArea.Name = "labelTreatArea";
+			this.labelTreatArea.Size = new System.Drawing.Size(100, 14);
+			this.labelTreatArea.TabIndex = 3;
+			this.labelTreatArea.Text = "Treatment Area";
+			this.labelTreatArea.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label5
 			// 
@@ -550,6 +550,7 @@ namespace OpenDental{
 			// 
 			// gridNotes
 			// 
+			this.gridNotes.HasMultilineHeaders = false;
 			this.gridNotes.HScrollVisible = false;
 			this.gridNotes.Location = new System.Drawing.Point(44, 482);
 			this.gridNotes.Name = "gridNotes";
@@ -588,6 +589,7 @@ namespace OpenDental{
 			// 
 			// gridFees
 			// 
+			this.gridFees.HasMultilineHeaders = false;
 			this.gridFees.HScrollVisible = false;
 			this.gridFees.Location = new System.Drawing.Point(739, 31);
 			this.gridFees.Name = "gridFees";
@@ -600,6 +602,8 @@ namespace OpenDental{
 			// 
 			// textNote
 			// 
+			this.textNote.AcceptsTab = true;
+			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(44, 372);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Procedure;
@@ -780,7 +784,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label5);
-			this.Controls.Add(this.label4);
+			this.Controls.Add(this.labelTreatArea);
 			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -863,6 +867,10 @@ namespace OpenDental{
 				if(ProviderC.ListShort[i].ProvNum==ProcCode.ProvNumDefault) {
 					comboProvNumDefault.SelectedIndex=i+1;//List starts with None at the top.
 				}
+			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				labelTreatArea.Visible=false;
+				listTreatArea.Visible=false;
 			}
 			FillTime();
 			FillFees();

@@ -19,8 +19,8 @@ namespace OpenDental{
 		private ProcTP ProcCur;
 		private OpenDental.UI.Button butDelete;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.Label labelToothNum;
+		private System.Windows.Forms.Label labelSurface;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Label label8;
@@ -84,8 +84,8 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormProcTPEdit));
 			this.textToothNumTP = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
+			this.labelToothNum = new System.Windows.Forms.Label();
+			this.labelSurface = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -128,23 +128,23 @@ namespace OpenDental{
 			this.label1.Text = "Priority";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label4
+			// labelToothNum
 			// 
-			this.label4.Location = new System.Drawing.Point(34, 65);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(137, 16);
-			this.label4.TabIndex = 10;
-			this.label4.Text = "Tooth Num";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelToothNum.Location = new System.Drawing.Point(34, 65);
+			this.labelToothNum.Name = "labelToothNum";
+			this.labelToothNum.Size = new System.Drawing.Size(137, 16);
+			this.labelToothNum.TabIndex = 10;
+			this.labelToothNum.Text = "Tooth Num";
+			this.labelToothNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label5
+			// labelSurface
 			// 
-			this.label5.Location = new System.Drawing.Point(82, 89);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(89, 16);
-			this.label5.TabIndex = 11;
-			this.label5.Text = "Surf";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSurface.Location = new System.Drawing.Point(82, 89);
+			this.labelSurface.Name = "labelSurface";
+			this.labelSurface.Size = new System.Drawing.Size(89, 16);
+			this.labelSurface.TabIndex = 11;
+			this.labelSurface.Text = "Surf";
+			this.labelSurface.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label6
 			// 
@@ -402,8 +402,8 @@ namespace OpenDental{
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.label6);
-			this.Controls.Add(this.label5);
-			this.Controls.Add(this.label4);
+			this.Controls.Add(this.labelSurface);
+			this.Controls.Add(this.labelToothNum);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textToothNumTP);
@@ -451,6 +451,12 @@ namespace OpenDental{
 			textPatAmt.Text=ProcCur.PatAmt.ToString("F");
 			textPrognosis.Text=ProcCur.Prognosis;
 			textDx.Text=ProcCur.Dx;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				labelToothNum.Visible=false;
+				textToothNumTP.Visible=false;
+				labelSurface.Visible=false;
+				textSurf.Visible=false;
+			}
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {

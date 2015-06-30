@@ -1832,15 +1832,27 @@ namespace OpenDental{
 			textTreatNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
 			checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
 			checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
+			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized); if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkTreatPlanShowGraphics.Visible=false;
+				checkTreatPlanShowCompleted.Visible=false;
+			}
+			else {
+				checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
+				checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
+			}
 			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized);
 			#endregion
 			#region Chart Module
 			//Chart module-----------------------------------------------------------------------
-			comboToothNomenclature.Items.Add(Lan.g(this, "Universal (Common in the US, 1-32)"));
-			comboToothNomenclature.Items.Add(Lan.g(this, "FDI Notation (International, 11-48)"));
-			comboToothNomenclature.Items.Add(Lan.g(this, "Haderup (Danish)"));
-			comboToothNomenclature.Items.Add(Lan.g(this, "Palmer (Ortho)"));
+			comboToothNomenclature.Items.Add(Lan.g(this,"Universal (Common in the US, 1-32)"));
+			comboToothNomenclature.Items.Add(Lan.g(this,"FDI Notation (International, 11-48)"));
+			comboToothNomenclature.Items.Add(Lan.g(this,"Haderup (Danish)"));
+			comboToothNomenclature.Items.Add(Lan.g(this,"Palmer (Ortho)"));
 			comboToothNomenclature.SelectedIndex = PrefC.GetInt(PrefName.UseInternationalToothNumbers);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				labelToothNomenclature.Visible=false;
+				comboToothNomenclature.Visible=false;
+			}
 			checkAutoClearEntryStatus.Checked=PrefC.GetBool(PrefName.AutoResetTPEntryStatus);
 			checkAllowSettingProcsComplete.Checked=PrefC.GetBool(PrefName.AllowSettingProcsComplete);
 			//checkChartQuickAddHideAmalgam.Checked=PrefC.GetBool(PrefName.ChartQuickAddHideAmalgam); //Deprecated.

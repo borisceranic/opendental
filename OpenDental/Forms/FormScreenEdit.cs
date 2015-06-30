@@ -493,6 +493,20 @@ namespace OpenDental{
 			else
 				textBirthdate.Text=ScreenCur.Birthdate.ToShortDateString();
 			textComments.Text=ScreenCur.Comments;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkCariesExperience.Visible=false;
+				checkEarlyChildCaries.Visible=false;
+				checkExistingSealants.Visible=false;
+				checkMissingAllTeeth.Visible=false;
+				checkNeedsSealants.Visible=false;
+				checkHasCaries.Visible=false;
+				checkCariesExperience.CheckState=CheckState.Unchecked;
+				checkEarlyChildCaries.CheckState=CheckState.Unchecked;
+				checkExistingSealants.CheckState=CheckState.Unchecked;
+				checkMissingAllTeeth.CheckState=CheckState.Unchecked;
+				checkNeedsSealants.CheckState=CheckState.Unchecked;
+				checkHasCaries.CheckState=CheckState.Unchecked;
+			}
 		}
 
 		private void SetCheckState(CheckBox checkBox,YN state){

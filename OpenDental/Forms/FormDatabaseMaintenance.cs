@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
@@ -31,7 +32,7 @@ namespace OpenDental {
 		private Label label6;
 		private UI.Button butInnoDB;
 		private Label label5;
-		private Label label4;
+		private Label labelApptProcs;
 		private Label label3;
 		private Label label2;
 		private UI.Button butSpecChar;
@@ -106,7 +107,7 @@ namespace OpenDental {
 			this.label6 = new System.Windows.Forms.Label();
 			this.butInnoDB = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
+			this.labelApptProcs = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.butSpecChar = new OpenDental.UI.Button();
@@ -216,7 +217,7 @@ namespace OpenDental {
 			this.groupBox1.Controls.Add(this.label6);
 			this.groupBox1.Controls.Add(this.butInnoDB);
 			this.groupBox1.Controls.Add(this.label5);
-			this.groupBox1.Controls.Add(this.label4);
+			this.groupBox1.Controls.Add(this.labelApptProcs);
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Controls.Add(this.butSpecChar);
@@ -332,14 +333,14 @@ namespace OpenDental {
 			this.label5.Text = "Removes special characters from appt notes and appt proc descriptions.";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// label4
+			// labelApptProcs
 			// 
-			this.label4.Location = new System.Drawing.Point(103, 71);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(355, 20);
-			this.label4.TabIndex = 37;
-			this.label4.Text = "Fixes procs in the Appt module that aren\'t correctly showing tooth nums.";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelApptProcs.Location = new System.Drawing.Point(103, 71);
+			this.labelApptProcs.Name = "labelApptProcs";
+			this.labelApptProcs.Size = new System.Drawing.Size(355, 20);
+			this.labelApptProcs.TabIndex = 37;
+			this.labelApptProcs.Text = "Fixes procs in the Appt module that aren\'t correctly showing tooth nums.";
+			this.labelApptProcs.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label3
 			// 
@@ -420,6 +421,7 @@ namespace OpenDental {
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(27, 77);
 			this.gridMain.Name = "gridMain";
@@ -510,6 +512,10 @@ namespace OpenDental {
 			if(Security.IsAuthorized(Permissions.SecurityAdmin,true)){
 				butEtrans.Enabled=true;
 			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				butApptProcs.Visible=false;
+				labelApptProcs.Visible=false;
+			}
 			FillGrid();
 		}
 
@@ -525,6 +531,11 @@ namespace OpenDental {
 			ODGridRow row;
 			//_listDbmMethodsGrid has already been filled on load with the correct methods to display in the grid.
 			for(int i=0;i<_listDbmMethodsGrid.Count;i++) {
+				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(Regex.IsMatch(_listDbmMethodsGrid[i].Name,"tooth|ortho",RegexOptions.IgnoreCase)) {
+						continue;
+					}
+				}
 				row=new ODGridRow();
 				row.Cells.Add(_listDbmMethodsGrid[i].Name);
 				row.Cells.Add("");

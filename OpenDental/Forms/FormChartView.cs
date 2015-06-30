@@ -747,6 +747,9 @@ namespace OpenDental{
 			checkAudit.Checked=ChartViewCur.IsAudit;
 			DisplayFields.RefreshCache();
 			ListShowing=DisplayFields.GetForChartView(ChartViewCur.ChartViewNum);//This will be zero for a new ChartView
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkShowTeeth.Visible=false;
+			}
 			FillGrids();
 		}
 

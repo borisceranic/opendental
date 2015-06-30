@@ -1899,6 +1899,9 @@ namespace OpenDental{
 			else {
 				textElectBenLastDate.Text=dateLast270.ToShortDateString();
 			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkCodeSubst.Visible=false;
+			}
 			Cursor=Cursors.Default;
 		}
 

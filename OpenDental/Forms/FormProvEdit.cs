@@ -179,6 +179,7 @@ namespace OpenDental{
 			this.textStateWhereLicensed = new System.Windows.Forms.TextBox();
 			this.checkIsInstructor = new System.Windows.Forms.CheckBox();
 			this.groupDentalSchools = new System.Windows.Forms.GroupBox();
+			this.labelPassDescription = new System.Windows.Forms.Label();
 			this.textUserName = new System.Windows.Forms.TextBox();
 			this.textPassword = new System.Windows.Forms.TextBox();
 			this.textProvNum = new System.Windows.Forms.TextBox();
@@ -187,7 +188,6 @@ namespace OpenDental{
 			this.label18 = new System.Windows.Forms.Label();
 			this.labelEhrMU = new System.Windows.Forms.Label();
 			this.comboEhrMu = new System.Windows.Forms.ComboBox();
-			this.labelPassDescription = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupAnesthProvType.SuspendLayout();
@@ -281,7 +281,7 @@ namespace OpenDental{
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(147, 14);
 			this.label9.TabIndex = 20;
-			this.label9.Text = "Suffix (DMD,DDS,Jr,etc)";
+			this.label9.Text = "Suffix (MD,DMD,DDS,etc)";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label10
@@ -813,6 +813,15 @@ namespace OpenDental{
 			this.groupDentalSchools.Text = "Dental Schools";
 			this.groupDentalSchools.Visible = false;
 			// 
+			// labelPassDescription
+			// 
+			this.labelPassDescription.Location = new System.Drawing.Point(120, 105);
+			this.labelPassDescription.Name = "labelPassDescription";
+			this.labelPassDescription.Size = new System.Drawing.Size(138, 27);
+			this.labelPassDescription.TabIndex = 248;
+			this.labelPassDescription.Text = "To keep the old password, leave the box empty.";
+			this.labelPassDescription.Visible = false;
+			// 
 			// textUserName
 			// 
 			this.textUserName.Location = new System.Drawing.Point(101, 62);
@@ -882,15 +891,6 @@ namespace OpenDental{
 			this.comboEhrMu.Name = "comboEhrMu";
 			this.comboEhrMu.Size = new System.Drawing.Size(100, 21);
 			this.comboEhrMu.TabIndex = 15;
-			// 
-			// labelPassDescription
-			// 
-			this.labelPassDescription.Location = new System.Drawing.Point(120, 105);
-			this.labelPassDescription.Name = "labelPassDescription";
-			this.labelPassDescription.Size = new System.Drawing.Size(138, 27);
-			this.labelPassDescription.TabIndex = 248;
-			this.labelPassDescription.Text = "To keep the old password, leave the box empty.";
-			this.labelPassDescription.Visible = false;
 			// 
 			// FormProvEdit
 			// 

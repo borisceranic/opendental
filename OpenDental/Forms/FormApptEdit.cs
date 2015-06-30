@@ -1543,8 +1543,14 @@ namespace OpenDental{
 		private void CalcPatientFeeThisAppt() {
 			double feeThisAppt=0;
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				feeThisAppt+=PIn.Double(gridProc.Rows[gridProc.SelectedIndices[i]].Cells[6].Text);
+				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					feeThisAppt+=PIn.Double(gridProc.Rows[gridProc.SelectedIndices[i]].Cells[4].Text);
+				}
+				else {
+					feeThisAppt+=PIn.Double(gridProc.Rows[gridProc.SelectedIndices[i]].Cells[6].Text);
+				}
 			}
+				
 			gridPatient.Rows[gridPatient.Rows.Count-1].Cells[1].Text=POut.Double(feeThisAppt);
 			gridPatient.Invalidate();
 		}
@@ -1606,12 +1612,18 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableApptProcs","Priority"),45);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptProcs","Tth"),25);
-			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptProcs","Surf"),50);
-			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptProcs","Code"),50);
-			gridProc.Columns.Add(col);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g("TableApptProcs","Code"),125);
+				gridProc.Columns.Add(col);
+			}
+			else {
+				col=new ODGridColumn(Lan.g("TableApptProcs","Tth"),25);
+				gridProc.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableApptProcs","Surf"),50);
+				gridProc.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableApptProcs","Code"),50);
+				gridProc.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableApptProcs","Description"),275);
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableApptProcs","Fee"),60,HorizontalAlignment.Right);
@@ -1622,8 +1634,10 @@ namespace OpenDental{
 				row=new ODGridRow();
 				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["status"].ToString());
 				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["priority"].ToString());
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["toothNum"].ToString());
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["Surf"].ToString());
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row.Cells.Add(DS.Tables["Procedure"].Rows[i]["toothNum"].ToString());
+					row.Cells.Add(DS.Tables["Procedure"].Rows[i]["Surf"].ToString());
+				}		
 				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["ProcCode"].ToString());
 				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["descript"].ToString());
 				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["fee"].ToString());

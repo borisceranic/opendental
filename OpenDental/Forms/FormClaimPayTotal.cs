@@ -313,19 +313,23 @@ namespace OpenDental
 
 		private void FormClaimPayTotal_Load(object sender, System.EventArgs e) {
 			ProcList=Procedures.Refresh(PatCur.PatNum);
+			int toothIndexOffset=0;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				toothIndexOffset=1;
+			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-				_labFeeIdx=6;
-				_deductIdx=7;
-				_allowedIdx=8;
-				_insPayIdx=9;
-				_writeoffIdx=10;
+				_labFeeIdx=6-toothIndexOffset;
+				_deductIdx=7-toothIndexOffset;
+				_allowedIdx=8-toothIndexOffset;
+				_insPayIdx=9-toothIndexOffset;
+				_writeoffIdx=10-toothIndexOffset;
 			}
 			else {//United States
 				_labFeeIdx=-1;//Not used in United States.  Canada only.
-				_deductIdx=6;
-				_allowedIdx=7;
-				_insPayIdx=8;
-				_writeoffIdx=9;
+				_deductIdx=6-toothIndexOffset;
+				_allowedIdx=7-toothIndexOffset;
+				_insPayIdx=8-toothIndexOffset;
+				_writeoffIdx=9-toothIndexOffset;
 				textLabFees.Visible=false;
 				textDedApplied.Location=textLabFees.Location;
 				textInsPayAllowed.Location=new Point(textDedApplied.Right-1,textInsPayAllowed.Location.Y);
@@ -356,10 +360,16 @@ namespace OpenDental
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Code"),50);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),25);
-			gridMain.Columns.Add(col);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),75);
+				gridMain.Columns.Add(col);
+			}
+			else {
+				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),50);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),25);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableClaimProc","Description"),130);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
@@ -397,13 +407,17 @@ namespace OpenDental
 				row.Cells.Add(Providers.GetAbbr(ClaimProcsToEdit[i].ProvNum));
 				if(ClaimProcsToEdit[i].ProcNum==0) {
 					row.Cells.Add("");
-					row.Cells.Add("");
+					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+						row.Cells.Add("");
+					}
 					row.Cells.Add(Lan.g(this,"Total Payment"));
 				}
 				else {
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
-					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
+					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+						row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
+					}
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
 				}
 				row.Cells.Add(ClaimProcsToEdit[i].FeeBilled.ToString("F"));
@@ -571,7 +585,11 @@ namespace OpenDental
 				}
 				ClaimProcsToEdit[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[_insPayIdx].Text);
 				ClaimProcsToEdit[i].WriteOff=PIn.Double(gridMain.Rows[i].Cells[_writeoffIdx].Text);
-				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[12].Text;
+				int toothIndexOffset=0;
+				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					toothIndexOffset=1;
+				}
+				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[12-toothIndexOffset].Text;
 			}
 		}
 
@@ -770,25 +788,6 @@ namespace OpenDental
 		}
 
 	
-		
-
-	
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
 	}
 }
 

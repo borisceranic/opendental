@@ -38,7 +38,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textSize;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textToothNumbers;
-		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.Label labelToothNums;
 		private Patient PatCur;
 		private Document DocCur;
 		private Document DocOld;
@@ -89,7 +89,7 @@ namespace OpenDental{
 			this.textSize = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textToothNumbers = new System.Windows.Forms.TextBox();
-			this.label7 = new System.Windows.Forms.Label();
+			this.labelToothNums = new System.Windows.Forms.Label();
 			this.butOpen = new OpenDental.UI.Button();
 			this.butAudit = new OpenDental.UI.Button();
 			this.SuspendLayout();
@@ -233,14 +233,14 @@ namespace OpenDental{
 			this.textToothNumbers.Size = new System.Drawing.Size(240, 20);
 			this.textToothNumbers.TabIndex = 15;
 			// 
-			// label7
+			// labelToothNums
 			// 
-			this.label7.Location = new System.Drawing.Point(149, 206);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(100, 18);
-			this.label7.TabIndex = 14;
-			this.label7.Text = "Tooth Numbers";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelToothNums.Location = new System.Drawing.Point(149, 206);
+			this.labelToothNums.Name = "labelToothNums";
+			this.labelToothNums.Size = new System.Drawing.Size(100, 18);
+			this.labelToothNums.TabIndex = 14;
+			this.labelToothNums.Text = "Tooth Numbers";
+			this.labelToothNums.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// butOpen
 			// 
@@ -281,7 +281,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.butOpen);
 			this.Controls.Add(this.textToothNumbers);
-			this.Controls.Add(this.label7);
+			this.Controls.Add(this.labelToothNums);
 			this.Controls.Add(this.textSize);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label5);
@@ -344,6 +344,10 @@ namespace OpenDental{
 			}
 			textToothNumbers.Text=Tooth.FormatRangeForDisplay(DocCur.ToothNumbers);
 			//textNote.Text=DocCur.Note;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				labelToothNums.Visible=false;
+				textToothNumbers.Visible=false;
+			}
 		}
 
 		private void butOpen_Click(object sender,EventArgs e) {

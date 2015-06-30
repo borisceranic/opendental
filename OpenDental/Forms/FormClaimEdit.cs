@@ -230,7 +230,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butExport;
 		private Label label61;
 		private GroupBox groupAttachments;
-		private Label label62;
+		private Label labelOralImages;
 		private ValidNum textAttachImages;
 		private CheckBox checkAttachMisc;
 		private CheckBox checkAttachPerio;
@@ -245,7 +245,7 @@ namespace OpenDental{
 		private Label label65;
 		private List<Claim> ClaimList;
 		private TabPage tabCanadian;
-		private GroupBox groupBox7;
+		private GroupBox groupMaxPros;
 		private Label label69;
 		private ValidDate textDateInitialUpper;
 		private Label label70;
@@ -263,7 +263,7 @@ namespace OpenDental{
 		private Label label73;
 		private TextBox textReferralProvider;
 		private ComboBox comboMaxProsth;
-		private GroupBox groupBox6;
+		private GroupBox groupMandPros;
 		private ComboBox comboMandProsth;
 		private Label label66;
 		private ValidDate textDateInitialLower;
@@ -276,8 +276,8 @@ namespace OpenDental{
 		private GroupBox groupAccident;
 		private CheckBox checkCanadianIsOrtho;
 		private TextBox textMissingTeeth;
-		private Label label75;
-		private Label label74;
+		private Label labelCanadaMissingTeeth;
+		private Label labelExtractedTeeth;
 		private ListBox listExtractedTeeth;
 		private OpenDental.UI.Button butHistory;
 		private bool doubleClickWarningAlreadyDisplayed=false;
@@ -500,7 +500,7 @@ namespace OpenDental{
 			this.checkAttachEoB = new System.Windows.Forms.CheckBox();
 			this.label63 = new System.Windows.Forms.Label();
 			this.textAttachModels = new OpenDental.ValidNum();
-			this.label62 = new System.Windows.Forms.Label();
+			this.labelOralImages = new System.Windows.Forms.Label();
 			this.textAttachImages = new OpenDental.ValidNum();
 			this.textRadiographs = new OpenDental.ValidNum();
 			this.groupAttachedImages = new System.Windows.Forms.GroupBox();
@@ -594,20 +594,20 @@ namespace OpenDental{
 			this.label76 = new System.Windows.Forms.Label();
 			this.butReverse = new OpenDental.UI.Button();
 			this.textMissingTeeth = new System.Windows.Forms.TextBox();
-			this.label75 = new System.Windows.Forms.Label();
-			this.label74 = new System.Windows.Forms.Label();
+			this.labelCanadaMissingTeeth = new System.Windows.Forms.Label();
+			this.labelExtractedTeeth = new System.Windows.Forms.Label();
 			this.listExtractedTeeth = new System.Windows.Forms.ListBox();
 			this.checkCanadianIsOrtho = new System.Windows.Forms.CheckBox();
 			this.label43 = new System.Windows.Forms.Label();
 			this.butMissingTeethHelp = new OpenDental.UI.Button();
-			this.groupBox6 = new System.Windows.Forms.GroupBox();
+			this.groupMandPros = new System.Windows.Forms.GroupBox();
 			this.comboMandProsth = new System.Windows.Forms.ComboBox();
 			this.label66 = new System.Windows.Forms.Label();
 			this.textDateInitialLower = new OpenDental.ValidDate();
 			this.label67 = new System.Windows.Forms.Label();
 			this.comboMandProsthMaterial = new System.Windows.Forms.ComboBox();
 			this.label68 = new System.Windows.Forms.Label();
-			this.groupBox7 = new System.Windows.Forms.GroupBox();
+			this.groupMaxPros = new System.Windows.Forms.GroupBox();
 			this.comboMaxProsth = new System.Windows.Forms.ComboBox();
 			this.label69 = new System.Windows.Forms.Label();
 			this.textDateInitialUpper = new OpenDental.ValidDate();
@@ -685,8 +685,8 @@ namespace OpenDental{
 			this.groupBox1.SuspendLayout();
 			this.tabCanadian.SuspendLayout();
 			this.groupCanadaOrthoPredeterm.SuspendLayout();
-			this.groupBox6.SuspendLayout();
-			this.groupBox7.SuspendLayout();
+			this.groupMandPros.SuspendLayout();
+			this.groupMaxPros.SuspendLayout();
 			this.groupBox8.SuspendLayout();
 			this.groupBox9.SuspendLayout();
 			this.groupEnterPayment.SuspendLayout();
@@ -1766,7 +1766,7 @@ namespace OpenDental{
 			this.groupAttachments.Controls.Add(this.checkAttachEoB);
 			this.groupAttachments.Controls.Add(this.label63);
 			this.groupAttachments.Controls.Add(this.textAttachModels);
-			this.groupAttachments.Controls.Add(this.label62);
+			this.groupAttachments.Controls.Add(this.labelOralImages);
 			this.groupAttachments.Controls.Add(this.textAttachImages);
 			this.groupAttachments.Controls.Add(this.labelRadiographs);
 			this.groupAttachments.Controls.Add(this.textRadiographs);
@@ -1887,14 +1887,14 @@ namespace OpenDental{
 			this.textAttachModels.TabIndex = 120;
 			this.textAttachModels.Text = "0";
 			// 
-			// label62
+			// labelOralImages
 			// 
-			this.label62.Location = new System.Drawing.Point(28, 60);
-			this.label62.Name = "label62";
-			this.label62.Size = new System.Drawing.Size(79, 18);
-			this.label62.TabIndex = 119;
-			this.label62.Text = "Oral Images";
-			this.label62.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelOralImages.Location = new System.Drawing.Point(28, 60);
+			this.labelOralImages.Name = "labelOralImages";
+			this.labelOralImages.Size = new System.Drawing.Size(79, 18);
+			this.labelOralImages.TabIndex = 119;
+			this.labelOralImages.Text = "Oral Images";
+			this.labelOralImages.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textAttachImages
 			// 
@@ -2696,14 +2696,14 @@ namespace OpenDental{
 			this.tabCanadian.Controls.Add(this.label76);
 			this.tabCanadian.Controls.Add(this.butReverse);
 			this.tabCanadian.Controls.Add(this.textMissingTeeth);
-			this.tabCanadian.Controls.Add(this.label75);
-			this.tabCanadian.Controls.Add(this.label74);
+			this.tabCanadian.Controls.Add(this.labelCanadaMissingTeeth);
+			this.tabCanadian.Controls.Add(this.labelExtractedTeeth);
 			this.tabCanadian.Controls.Add(this.listExtractedTeeth);
 			this.tabCanadian.Controls.Add(this.checkCanadianIsOrtho);
 			this.tabCanadian.Controls.Add(this.label43);
 			this.tabCanadian.Controls.Add(this.butMissingTeethHelp);
-			this.tabCanadian.Controls.Add(this.groupBox6);
-			this.tabCanadian.Controls.Add(this.groupBox7);
+			this.tabCanadian.Controls.Add(this.groupMandPros);
+			this.tabCanadian.Controls.Add(this.groupMaxPros);
 			this.tabCanadian.Controls.Add(this.groupBox8);
 			this.tabCanadian.Controls.Add(this.groupBox9);
 			this.tabCanadian.Controls.Add(this.textCanadianAccidentDate);
@@ -2880,25 +2880,25 @@ namespace OpenDental{
 			this.textMissingTeeth.Size = new System.Drawing.Size(172, 44);
 			this.textMissingTeeth.TabIndex = 144;
 			// 
-			// label75
+			// labelCanadaMissingTeeth
 			// 
-			this.label75.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label75.Location = new System.Drawing.Point(762, 122);
-			this.label75.Name = "label75";
-			this.label75.Size = new System.Drawing.Size(83, 17);
-			this.label75.TabIndex = 143;
-			this.label75.Text = "Missing Teeth";
-			this.label75.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelCanadaMissingTeeth.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.labelCanadaMissingTeeth.Location = new System.Drawing.Point(762, 122);
+			this.labelCanadaMissingTeeth.Name = "labelCanadaMissingTeeth";
+			this.labelCanadaMissingTeeth.Size = new System.Drawing.Size(83, 17);
+			this.labelCanadaMissingTeeth.TabIndex = 143;
+			this.labelCanadaMissingTeeth.Text = "Missing Teeth";
+			this.labelCanadaMissingTeeth.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// label74
+			// labelExtractedTeeth
 			// 
-			this.label74.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-			this.label74.Location = new System.Drawing.Point(762, 5);
-			this.label74.Name = "label74";
-			this.label74.Size = new System.Drawing.Size(143, 17);
-			this.label74.TabIndex = 142;
-			this.label74.Text = "Extracted Teeth";
-			this.label74.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelExtractedTeeth.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.labelExtractedTeeth.Location = new System.Drawing.Point(762, 5);
+			this.labelExtractedTeeth.Name = "labelExtractedTeeth";
+			this.labelExtractedTeeth.Size = new System.Drawing.Size(143, 17);
+			this.labelExtractedTeeth.TabIndex = 142;
+			this.labelExtractedTeeth.Text = "Extracted Teeth";
+			this.labelExtractedTeeth.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listExtractedTeeth
 			// 
@@ -2941,20 +2941,20 @@ namespace OpenDental{
 			this.butMissingTeethHelp.Text = "?";
 			this.butMissingTeethHelp.Click += new System.EventHandler(this.butMissingTeethHelp_Click);
 			// 
-			// groupBox6
+			// groupMandPros
 			// 
-			this.groupBox6.Controls.Add(this.comboMandProsth);
-			this.groupBox6.Controls.Add(this.label66);
-			this.groupBox6.Controls.Add(this.textDateInitialLower);
-			this.groupBox6.Controls.Add(this.label67);
-			this.groupBox6.Controls.Add(this.comboMandProsthMaterial);
-			this.groupBox6.Controls.Add(this.label68);
-			this.groupBox6.Location = new System.Drawing.Point(402, 98);
-			this.groupBox6.Name = "groupBox6";
-			this.groupBox6.Size = new System.Drawing.Size(355, 88);
-			this.groupBox6.TabIndex = 13;
-			this.groupBox6.TabStop = false;
-			this.groupBox6.Text = "Mandibular Prosthesis";
+			this.groupMandPros.Controls.Add(this.comboMandProsth);
+			this.groupMandPros.Controls.Add(this.label66);
+			this.groupMandPros.Controls.Add(this.textDateInitialLower);
+			this.groupMandPros.Controls.Add(this.label67);
+			this.groupMandPros.Controls.Add(this.comboMandProsthMaterial);
+			this.groupMandPros.Controls.Add(this.label68);
+			this.groupMandPros.Location = new System.Drawing.Point(402, 98);
+			this.groupMandPros.Name = "groupMandPros";
+			this.groupMandPros.Size = new System.Drawing.Size(355, 88);
+			this.groupMandPros.TabIndex = 13;
+			this.groupMandPros.TabStop = false;
+			this.groupMandPros.Text = "Mandibular Prosthesis";
 			// 
 			// comboMandProsth
 			// 
@@ -3012,20 +3012,20 @@ namespace OpenDental{
 			this.label68.Text = "Prosthesis Material";
 			this.label68.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// groupBox7
+			// groupMaxPros
 			// 
-			this.groupBox7.Controls.Add(this.comboMaxProsth);
-			this.groupBox7.Controls.Add(this.label69);
-			this.groupBox7.Controls.Add(this.textDateInitialUpper);
-			this.groupBox7.Controls.Add(this.label70);
-			this.groupBox7.Controls.Add(this.comboMaxProsthMaterial);
-			this.groupBox7.Controls.Add(this.label71);
-			this.groupBox7.Location = new System.Drawing.Point(402, 5);
-			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(355, 88);
-			this.groupBox7.TabIndex = 12;
-			this.groupBox7.TabStop = false;
-			this.groupBox7.Text = "Maxillary Prosthesis";
+			this.groupMaxPros.Controls.Add(this.comboMaxProsth);
+			this.groupMaxPros.Controls.Add(this.label69);
+			this.groupMaxPros.Controls.Add(this.textDateInitialUpper);
+			this.groupMaxPros.Controls.Add(this.label70);
+			this.groupMaxPros.Controls.Add(this.comboMaxProsthMaterial);
+			this.groupMaxPros.Controls.Add(this.label71);
+			this.groupMaxPros.Location = new System.Drawing.Point(402, 5);
+			this.groupMaxPros.Name = "groupMaxPros";
+			this.groupMaxPros.Size = new System.Drawing.Size(355, 88);
+			this.groupMaxPros.TabIndex = 12;
+			this.groupMaxPros.TabStop = false;
+			this.groupMaxPros.Text = "Maxillary Prosthesis";
 			// 
 			// comboMaxProsth
 			// 
@@ -3798,10 +3798,10 @@ namespace OpenDental{
 			this.tabCanadian.PerformLayout();
 			this.groupCanadaOrthoPredeterm.ResumeLayout(false);
 			this.groupCanadaOrthoPredeterm.PerformLayout();
-			this.groupBox6.ResumeLayout(false);
-			this.groupBox6.PerformLayout();
-			this.groupBox7.ResumeLayout(false);
-			this.groupBox7.PerformLayout();
+			this.groupMandPros.ResumeLayout(false);
+			this.groupMandPros.PerformLayout();
+			this.groupMaxPros.ResumeLayout(false);
+			this.groupMaxPros.PerformLayout();
 			this.groupBox8.ResumeLayout(false);
 			this.groupBox9.ResumeLayout(false);
 			this.groupBox9.PerformLayout();
@@ -4003,6 +4003,14 @@ namespace OpenDental{
 			}
 			if(comboProvTreat.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
 				comboProvTreat.Text=Providers.GetProv(_provNumTreatSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
+			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				groupProsth.Visible=false;
+				groupOrtho.Visible=false;
+				labelOralImages.Visible=false;
+				textAttachImages.Visible=false;
+				checkAttachPerio.Visible=false;
+				butAttachPerio.Visible=false;
 			}
 			FillForm();
 			FillCanadian();
@@ -4296,9 +4304,13 @@ namespace OpenDental{
 			comboReferralReason.Items.Add("Seizure Disorders");
 			comboReferralReason.Items.Add("Extensive Surgery");
 			comboReferralReason.Items.Add("Surgical Complexity");
-			comboReferralReason.Items.Add("Rampant decay");
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				comboReferralReason.Items.Add("Rampant decay");
+			}
 			comboReferralReason.Items.Add("Medical History (to provide details upon request)");
-			comboReferralReason.Items.Add("Temporal Mandibular Joint Anomalies");
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				comboReferralReason.Items.Add("Temporal Mandibular Joint Anomalies");
+			}
 			comboReferralReason.Items.Add("Accidental Injury");
 			comboReferralReason.Items.Add("Anaesthesia complications (local or general)");
 			comboReferralReason.Items.Add("Developmental Anomalies");
@@ -4401,6 +4413,17 @@ namespace OpenDental{
 				missingstr+=Tooth.ToInternat(al[i]);
 			}
 			textMissingTeeth.Text=missingstr;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkCanadianIsOrtho.Visible=false;
+				groupCanadaOrthoPredeterm.Visible=false;
+				groupMaxPros.Visible=false;
+				groupMandPros.Visible=false;
+				labelExtractedTeeth.Visible=false;
+				butMissingTeethHelp.Visible=false;
+				listExtractedTeeth.Visible=false;
+				labelCanadaMissingTeeth.Visible=false;
+				textMissingTeeth.Visible=false;
+			}
 		}
 
 		private void SetCanadianExtractedTeeth() {
@@ -4448,10 +4471,16 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
 			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Code"),50);
-			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),25);
-			gridProc.Columns.Add(col);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),75);
+				gridProc.Columns.Add(col);
+			}
+			else {
+				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),50);
+				gridProc.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableClaimProc","Tth"),25);
+				gridProc.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableClaimProc","Description"),130);
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
@@ -4501,7 +4530,9 @@ namespace OpenDental{
 				row.Cells.Add(Providers.GetAbbr(((ClaimProc)ClaimProcsForClaim[i]).ProvNum));
 				if(ClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");//code
-					row.Cells.Add("");//tooth
+					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+						row.Cells.Add("");//tooth
+					}
 					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived)
 						row.Cells.Add(Lan.g(this,"Estimate"));
 					else
@@ -4511,7 +4542,9 @@ namespace OpenDental{
 					//claimProcsForClaim list already handles ProcNum=0 above
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
 					row.Cells.Add(ClaimProcsForClaim[i].CodeSent);
-					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
+					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+						row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
+					}
 					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(procCodeSent.Descript);
 				}

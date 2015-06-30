@@ -5439,6 +5439,10 @@ namespace OpenDental{
 					}
 				}
 			}
+			bool showSelectedTeeth=checkShowTeeth.Checked;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkShowTeeth.Checked=false;
+			}
 			DataSetMain=null;
 			if(PatCur!=null){
 				if(UsingEcwTight()) {//ecw customers
@@ -5739,6 +5743,7 @@ namespace OpenDental{
 				Chartscrollval=0;
 			}
 			FillToothChart(retainSelection);
+			checkShowTeeth.Checked=showSelectedTeeth;
 		}
 
 		private void FillChartViewsGrid() {

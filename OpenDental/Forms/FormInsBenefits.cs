@@ -1109,6 +1109,7 @@ namespace OpenDental{
 				|| CovCats.GetForEbenCat(EbenefitCategory.Restorative)==null
 				|| CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive)==null
 				|| CovCats.GetForEbenCat(EbenefitCategory.DiagnosticXRay)==null
+				|| Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)
 				)
 			{
 				dontAllowSimplified=true;
@@ -1124,6 +1125,9 @@ namespace OpenDental{
 			if(SubCur==null) {
 				textSubscNote.Visible=false;
 				labelSubscNote.Visible=false;
+			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				checkSimplified.Visible=false;
 			}
 		}
 

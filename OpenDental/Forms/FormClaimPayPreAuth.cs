@@ -168,8 +168,12 @@ namespace OpenDental
 		}
 
 		private void FormClaimPayTotal_Shown(object sender,EventArgs e) {
+			int toothIndexOffset=0;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				toothIndexOffset=1;
+			}
 			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,PlanList);
-			gridMain.SetSelected(new Point(4,0));
+			gridMain.SetSelected(new Point(4-toothIndexOffset,0));
 		}
 
 		private void FillGrid(){
@@ -180,10 +184,16 @@ namespace OpenDental
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn(Lan.g(this,"Code"),50);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Tth"),35);
-			gridMain.Columns.Add(col);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g(this,"Code"),85);
+				gridMain.Columns.Add(col);
+			}
+			else {
+				col=new ODGridColumn(Lan.g(this,"Code"),50);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Tth"),35);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g(this,"Description"),120);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Fee"),55,HorizontalAlignment.Right);
@@ -200,7 +210,9 @@ namespace OpenDental
 				//for pre-auths, there are no total payments, so ProcNum must be >0
 				ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
-				row.Cells.Add(ProcCur.ToothNum);
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row.Cells.Add(ProcCur.ToothNum);
+				}
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
 				row.Cells.Add(ClaimProcsToEdit[i].FeeBilled.ToString("F"));
 				row.Cells.Add(ClaimProcsToEdit[i].InsPayEst.ToString("F"));
@@ -239,9 +251,13 @@ namespace OpenDental
 		///<Summary>Fails silently if text is in invalid format.</Summary>
 		private void FillTotals(){
 			double insPayEst=0;
+			int toothIndexOffset=0;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				toothIndexOffset=1;
+			}
 			for(int i=0;i<gridMain.Rows.Count;i++){
 				try {
-					insPayEst+=Convert.ToDouble(gridMain.Rows[i].Cells[4].Text);
+					insPayEst+=Convert.ToDouble(gridMain.Rows[i].Cells[4-toothIndexOffset].Text);
 				}
 				catch { 
 				
@@ -254,19 +270,23 @@ namespace OpenDental
 		private void SaveGridChanges(){
 			//validate all grid cells
 			double dbl;
+			int toothIndexOffset=0;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				toothIndexOffset=1;
+			}
 			for(int i=0;i<gridMain.Rows.Count;i++){
-				if(gridMain.Rows[i].Cells[4].Text!=""){
+				if(gridMain.Rows[i].Cells[4-toothIndexOffset].Text!="") {
 					try{
-						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[4].Text);
+						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[4-toothIndexOffset].Text);
 					}
 					catch{
-						throw new ApplicationException(Lan.g(this,"Amount not valid: ")+gridMain.Rows[i].Cells[4].Text);
+						throw new ApplicationException(Lan.g(this,"Amount not valid: ")+gridMain.Rows[i].Cells[4-toothIndexOffset].Text);
 					}
 				}
 			}
 			for(int i=0;i<ClaimProcsToEdit.Count;i++){
-				ClaimProcsToEdit[i].InsPayEst=PIn.Double(gridMain.Rows[i].Cells[4].Text);
-				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[5].Text;
+				ClaimProcsToEdit[i].InsPayEst=PIn.Double(gridMain.Rows[i].Cells[4-toothIndexOffset].Text);
+				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[5-toothIndexOffset].Text;
 			}
 		}
 

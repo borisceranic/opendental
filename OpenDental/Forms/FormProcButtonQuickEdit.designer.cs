@@ -33,7 +33,7 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
+			this.labelSurfaces = new System.Windows.Forms.Label();
 			this.textSurfaces = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
@@ -138,14 +138,14 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// label1
+			// labelSurfaces
 			// 
-			this.label1.Location = new System.Drawing.Point(82, 67);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(98, 14);
-			this.label1.TabIndex = 55;
-			this.label1.Text = "Surfaces";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelSurfaces.Location = new System.Drawing.Point(82, 67);
+			this.labelSurfaces.Name = "labelSurfaces";
+			this.labelSurfaces.Size = new System.Drawing.Size(98, 14);
+			this.labelSurfaces.TabIndex = 55;
+			this.labelSurfaces.Text = "Surfaces";
+			this.labelSurfaces.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSurfaces
 			// 
@@ -166,7 +166,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.checkIsLabel);
 			this.Controls.Add(this.textSurfaces);
-			this.Controls.Add(this.label1);
+			this.Controls.Add(this.labelSurfaces);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -191,7 +191,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label3;
 		private UI.Button butDelete;
 		private System.Windows.Forms.Button butPickProc;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelSurfaces;
 		private System.Windows.Forms.TextBox textSurfaces;
 	}
 }

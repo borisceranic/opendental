@@ -15,7 +15,7 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
-		private System.Windows.Forms.Label label25;
+		private System.Windows.Forms.Label labelPanoBW;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Label label37;
 		private ContrWindowingSlider slider;
@@ -62,7 +62,7 @@ namespace OpenDental{
 				this.label6,
 				this.label7,
 				this.label12,
-				this.label25,
+				this.labelPanoBW,
 				this.label37
 			});
 			Lan.C("All", new System.Windows.Forms.Control[] {
@@ -105,7 +105,7 @@ namespace OpenDental{
 			this.textScanDocQuality = new OpenDental.ValidNum();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.label25 = new System.Windows.Forms.Label();
+			this.labelPanoBW = new System.Windows.Forms.Label();
 			this.slider = new OpenDental.UI.ContrWindowingSlider();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.label37 = new System.Windows.Forms.Label();
@@ -287,7 +287,7 @@ namespace OpenDental{
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.label1);
-			this.groupBox2.Controls.Add(this.label25);
+			this.groupBox2.Controls.Add(this.labelPanoBW);
 			this.groupBox2.Controls.Add(this.slider);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox2.Location = new System.Drawing.Point(20, 251);
@@ -306,13 +306,13 @@ namespace OpenDental{
 			this.label1.Text = "Default pixel windowing for new radiographs, both scanned and digital";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// label25
+			// labelPanoBW
 			// 
-			this.label25.Location = new System.Drawing.Point(13, 65);
-			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(465, 24);
-			this.label25.TabIndex = 15;
-			this.label25.Text = "Suggested setting for scanning panos is Greyscale, 300 dpi.  For BWs, 400dpi.";
+			this.labelPanoBW.Location = new System.Drawing.Point(13, 65);
+			this.labelPanoBW.Name = "labelPanoBW";
+			this.labelPanoBW.Size = new System.Drawing.Size(465, 24);
+			this.labelPanoBW.TabIndex = 15;
+			this.labelPanoBW.Text = "Suggested setting for scanning panos is Greyscale, 300 dpi.  For BWs, 400dpi.";
 			// 
 			// slider
 			// 
@@ -566,6 +566,9 @@ namespace OpenDental{
 			upDownExposure.Value=exposureLevelVal;
 			//checkScanDocShowOptions.Checked=PrefC.GetBool(PrefName.ScannerSuppressDialog);
 			//textScanDocResolution.Text=PrefC.GetString(PrefName.ScannerResolution);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				labelPanoBW.Visible=false;
+			}
 		}
 
 		private void radioScanDocShowOptions_CheckedChanged(object sender,EventArgs e) {

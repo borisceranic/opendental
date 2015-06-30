@@ -166,10 +166,16 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableProcSelect","Code"),55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProcSelect","Tooth"),50);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableProcSelect","Description"),250);
-			gridMain.Columns.Add(col);
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				col=new ODGridColumn(Lan.g("TableProcSelect","Description"),300);
+				gridMain.Columns.Add(col);
+			}
+			else {
+				col=new ODGridColumn(Lan.g("TableProcSelect","Tooth"),50);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g("TableProcSelect","Description"),250);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableProcSelect","Fee"),60,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
@@ -179,7 +185,9 @@ namespace OpenDental{
 				row.Cells.Add(ProcList[i].ProcDate.ToShortDateString());
 				row.Cells.Add(Providers.GetAbbr(ProcList[i].ProvNum));
 				row.Cells.Add(ProcedureCodes.GetStringProcCode(ProcList[i].CodeNum));
-				row.Cells.Add(Tooth.ToInternat(ProcList[i].ToothNum));
+				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					row.Cells.Add(Tooth.ToInternat(ProcList[i].ToothNum));
+				}		
 				string descript="";
 				if(ProcList[i].PatNum!=PatNum) {//when IsForProvKeys
 					Patient pat=Patients.GetLim(ProcList[i].PatNum);

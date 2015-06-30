@@ -138,7 +138,9 @@ namespace OpenDental{
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AppointmentBubble"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ChartPatientInformation"));
 			//skip None because user not allowed to select that
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","OrthoChart"));
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","OrthoChart"));
+			}
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientInformation"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientSelect"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ProcedureGroupNote"));
