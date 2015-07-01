@@ -4,7 +4,7 @@ using System.Collections;
 namespace OpenDentBusiness{
 	///<summary>Only used internally by OpenDental, Inc.  Not used by anyone else. Aggregates customer charges for integrated texting.</summary>
 	[Serializable()]
-	//[CrudTable(IsMissingInGeneral=true)]//Remove this line to perform one-time CRUD updated to this class. Place back before committing changes.
+	[CrudTable(IsMissingInGeneral=true)]//Remove this line to perform one-time CRUD updated to this class. Place back before committing changes.
 	public class SmsBilling:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

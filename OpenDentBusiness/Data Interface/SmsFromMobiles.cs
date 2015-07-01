@@ -163,6 +163,8 @@ namespace OpenDentBusiness{
 			for(int i=0;i<listMessages.Count;i++) {
 				SmsFromMobile sms=listMessages[i];
 				sms.DateTimeReceived=DateTime.Now;
+				//todo: Ryan, look this up on Wednesday and set it according.
+				sms.ClinicNum=1;
 				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber);
 				//We could not find definitive match, either 0 matches found, or more than one match found
 				if(listPatNums.Count!=1) {

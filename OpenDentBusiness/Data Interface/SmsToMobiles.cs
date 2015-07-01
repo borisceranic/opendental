@@ -4,6 +4,8 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using System.Linq;
+using System.Globalization;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -143,21 +145,42 @@ namespace OpenDentBusiness{
 			}
 			return Crud.SmsToMobileCrud.SelectMany(command);
 		}
-		
+
+		///<summary>Convert a phone number to internation format and remove all punctuation. Validates input number format. Throws exceptions.</summary>
+		public static string ConvertPhoneToInternational(string phoneRaw,string countryCode) {
+			if(string.IsNullOrWhiteSpace(phoneRaw)) {
+				throw new Exception("Input phone number must be set");
+			}
+			//Remove non-numeric.
+			string ret=new string(phoneRaw.Where(x => char.IsDigit(x)).ToArray());			
+			switch(countryCode.ToUpper()) {
+				case "US":
+					if(!ret.StartsWith("1")) { //Add a "1" if US.
+						ret="1"+ret;
+					}
+					if(ret.Length!=11) {
+						throw new Exception("Input phone number cannot be properly formatted for country code: "+countryCode);
+					}
+					break;
+			}			
+			return ret;
+		}
+
 		///<summary>Surround with Try/Catch.  Sent as time sensitive message.</summary>
 		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum) {
 			double balance=SmsPhones.GetClinicBalance(clinicNum);
 			if(balance-0.04<0) {
 				throw new Exception("To send this message first increase spending limit for integrated texting from eServices Setup.");
-			}
+			}				
 			SmsToMobile smsToMobile=new SmsToMobile();
 			smsToMobile.ClinicNum=clinicNum;
 			smsToMobile.GuidMessage=Guid.NewGuid().ToString();
 			smsToMobile.GuidBatch=smsToMobile.GuidMessage;
 			smsToMobile.IsTimeSensitive=true;
-			smsToMobile.MobilePhoneNumber=wirelessPhone;
+			smsToMobile.MobilePhoneNumber=ConvertPhoneToInternational(wirelessPhone,CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
 			smsToMobile.PatNum=patNum;
 			smsToMobile.MsgText=message;
+			smsToMobile.MsgType=SmsMessageSource.DirectSms;
 			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
 			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;

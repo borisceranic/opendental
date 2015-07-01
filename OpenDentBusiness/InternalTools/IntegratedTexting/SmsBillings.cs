@@ -17,6 +17,14 @@ namespace OpenDentBusiness{
 			return Crud.SmsBillingCrud.SelectMany(command);
 		}
 
+		///<summary></summary>
+		public static long Insert(SmsBilling smsBilling) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				smsBilling.SmsBillingNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsBilling);
+				return smsBilling.SmsBillingNum;
+			}
+			return Crud.SmsBillingCrud.Insert(smsBilling);
+		}
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*
 		#region CachePattern
@@ -76,15 +84,7 @@ namespace OpenDentBusiness{
 			}
 			return Crud.SmsBillingCrud.SelectOne(smsBillingNum);
 		}
-
-		///<summary></summary>
-		public static long Insert(SmsBilling smsBilling){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				smsBilling.SmsBillingNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsBilling);
-				return smsBilling.SmsBillingNum;
-			}
-			return Crud.SmsBillingCrud.Insert(smsBilling);
-		}
+			
 
 		///<summary></summary>
 		public static void Update(SmsBilling smsBilling){

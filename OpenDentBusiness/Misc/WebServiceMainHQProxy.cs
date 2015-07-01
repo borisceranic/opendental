@@ -8,6 +8,7 @@ namespace OpenDentBusiness {
 #if DEBUG
 			//service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//localhost
 			service.Url="http://10.10.2.18/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
+			service.Timeout=(int)TimeSpan.FromMinutes(20).TotalMilliseconds;
 #endif
 			return service;
 		}
