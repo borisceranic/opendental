@@ -429,37 +429,37 @@ namespace OpenDental{
 			DataRow row;
 			decimal dec=0;
 			decimal total=0;
-			int toothIndexOffset=0;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				toothIndexOffset=1;
+			int medicalIndexOffset=0;
+			if(AnyClinicSelectedIsMedical()) {
+				medicalIndexOffset=1;
 			}
 			for(int i=0;i<table.Rows.Count;i++) {
 				row = report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
 				row[0]=PIn.Date(table.Rows[i][0].ToString()).ToShortDateString();
 				row[1]=table.Rows[i][1].ToString();//name
 				row[2]=table.Rows[i][2].ToString();//adacode
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(medicalIndexOffset==0) {
 					row[3]=Tooth.ToInternat(table.Rows[i][3].ToString());//tooth
 				}
-				row[4-toothIndexOffset]=table.Rows[i][4].ToString();//descript
-				row[5-toothIndexOffset]=table.Rows[i][5].ToString();//prov
+				row[4-medicalIndexOffset]=table.Rows[i][4].ToString();//descript
+				row[5-medicalIndexOffset]=table.Rows[i][5].ToString();//prov
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-					row[6-toothIndexOffset]=Clinics.GetDesc(PIn.Long(table.Rows[i][6].ToString()));//clinic
+					row[6-medicalIndexOffset]=Clinics.GetDesc(PIn.Long(table.Rows[i][6].ToString()));//clinic
 					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[7-toothIndexOffset]=dec.ToString("n");
+					row[7-medicalIndexOffset]=dec.ToString("n");
 				}
 				else {
 					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[6-toothIndexOffset]=dec.ToString("n");
+					row[6-medicalIndexOffset]=dec.ToString("n");
 				}
 				total+=dec;
 				report.TableQ.Rows.Add(row);
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.ColTotal[7-toothIndexOffset]=total;
+				report.ColTotal[7-medicalIndexOffset]=total;
 			}
 			else {
-				report.ColTotal[6-toothIndexOffset]=total;
+				report.ColTotal[6-medicalIndexOffset]=total;
 			}
 			FormQuery2.ResetGrid();			
 			report.Title="Daily Procedures";
@@ -505,18 +505,21 @@ namespace OpenDental{
 			}
 			report.SetColumn(this,0,"Date",80);
 			report.SetColumn(this,1,"Patient Name",130);
-			report.SetColumn(this,2,"ADA Code",75);
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(medicalIndexOffset==1) {
+				report.SetColumn(this,2,"Code",140);
+			}
+			else {
+				report.SetColumn(this,2,"Code",95);
 				report.SetColumn(this,3,"Tooth",45);
 			}
-			report.SetColumn(this,4-toothIndexOffset,"Description",200);
-			report.SetColumn(this,5-toothIndexOffset,"Provider",50);
+			report.SetColumn(this,4-medicalIndexOffset,"Description",200);
+			report.SetColumn(this,5-medicalIndexOffset,"Provider",50);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.SetColumn(this,6-toothIndexOffset,"Clinic",70);
-				report.SetColumn(this,7-toothIndexOffset,"Fee",90,HorizontalAlignment.Right);
+				report.SetColumn(this,6-medicalIndexOffset,"Clinic",70);
+				report.SetColumn(this,7-medicalIndexOffset,"Fee",70,HorizontalAlignment.Right);
 			}
 			else{
-				report.SetColumn(this,6-toothIndexOffset,"Fee",90,HorizontalAlignment.Right);
+				report.SetColumn(this,6-medicalIndexOffset,"Fee",70,HorizontalAlignment.Right);
 			}
 			FormQuery2.ShowDialog();
 			DialogResult=DialogResult.OK;
@@ -587,7 +590,7 @@ namespace OpenDental{
 				}
 			}
 			report.SetColumn(this,0,"Category",150);
-			report.SetColumn(this,1,"Code",90);
+			report.SetColumn(this,1,"Code",130);
 			report.SetColumn(this,2,"Description",180);
 			report.SetColumn(this,3,"Quantity",60,HorizontalAlignment.Right);
 			report.SetColumn(this,4,"Average Fee",110,HorizontalAlignment.Right);
@@ -595,8 +598,24 @@ namespace OpenDental{
 			FormQuery2.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
-		
 
+		private bool AnyClinicSelectedIsMedical() {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				return Clinics.IsMedicalPracticeOrClinic(0);//Check if the practice is medical
+			}
+			for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+				if(!Security.CurUser.ClinicIsRestricted
+					&& listClin.SelectedIndices[i]==0
+					&& Clinics.IsMedicalPracticeOrClinic(0)) //Check if the practice is medical
+				{
+					return true;
+				}
+				if(Clinics.IsMedicalPracticeOrClinic(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum)) {//Minus 1 from the selected index
+					return true;
+				}
+			}
+			return false;
+		}
 		
 	}
 }

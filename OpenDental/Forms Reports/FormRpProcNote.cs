@@ -160,9 +160,13 @@ namespace OpenDental{
 				ORDER BY ProcDate","","",SplitByKind.None,1,true);
 			query.AddColumn("Date",80,FieldValueType.Date,font);
 			query.AddColumn("Patient",120,FieldValueType.String,font);
-			query.AddColumn("Code",50,FieldValueType.String,font);
-			query.AddColumn("Description",120,FieldValueType.String,font);
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				query.AddColumn("Code",150,FieldValueType.String,font);
+				query.AddColumn("Description",220,FieldValueType.String,font);
+			}
+			else {
+				query.AddColumn("Code",80,FieldValueType.String,font);
+				query.AddColumn("Description",220,FieldValueType.String,font);
 				query.AddColumn("Tth",30,FieldValueType.String,font);
 				query.AddColumn("Surf",40,FieldValueType.String,font);
 			}

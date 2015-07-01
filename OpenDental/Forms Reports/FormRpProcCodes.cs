@@ -164,10 +164,10 @@ namespace OpenDental{
       string catName="";  //string to hold current category name
 			Fees fee=new Fees();
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query= "SELECT procedurecode.ProcCode,fee.Amount,'     ',procedurecode.Descript,"
-			  +"procedurecode.AbbrDesc FROM procedurecode,fee "
-				+"WHERE procedurecode.CodeNum=fee.CodeNum AND fee.FeeSched='"+feeSched.ToString()
-         +"' ORDER BY procedurecode.ProcCode";
+			report.Query= "SELECT procedurecode.ProcCode,fee.Amount,'  ',procedurecode.Descript,"
+				+"'  ',procedurecode.AbbrDesc FROM procedurecode,fee "
+				+"WHERE procedurecode.CodeNum=fee.CodeNum AND fee.FeeSched='"+POut.String(feeSched.ToString())+"' "
+				+"ORDER BY procedurecode.ProcCode";
 			FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
       if (radioCode.Checked==true)  {
@@ -175,11 +175,17 @@ namespace OpenDental{
 				report.Title="Procedure Codes";
 				report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
 				report.SubTitle.Add(FeeScheds.GetDescription(feeSched));
-				report.SetColumn(this,0,"Code",70);
+				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					report.SetColumn(this,0,"Code",150);
+				}
+				else {
+					report.SetColumn(this,0,"Code",70);
+				}
 				report.SetColumn(this,1,"Fee Amount",70,HorizontalAlignment.Right);
-				report.SetColumn(this,2," ",80);//otherwise, the amount gets bunched up next to the description.
-				report.SetColumn(this,3,"Description",200);
-				report.SetColumn(this,4,"Abbr Description",200);
+				report.SetColumn(this,2," ",40);//otherwise, the amount gets bunched up next to the description.
+				report.SetColumn(this,3,"Description",320);
+				report.SetColumn(this,4," ",20);
+				report.SetColumn(this,5,"Abbr Description",200);
 				FormQuery2.ShowDialog();
 				DialogResult=DialogResult.OK;		
       }
@@ -187,7 +193,7 @@ namespace OpenDental{
 			  //report.SubmitTemp();//create TableTemp which is not actually used
 	      ProcedureCode[] ProcList=ProcedureCodes.GetProcList();
 				report.TableQ=new DataTable(null);
-			  for(int i=0;i<5;i++){//add columns
+			  for(int i=0;i<6;i++){//add columns
 				  report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
 			  }
 				report.InitializeColumns();
@@ -196,9 +202,9 @@ namespace OpenDental{
 				catName=row[0].ToString();
 				row[1]=ProcList[0].ProcCode;
 				row[2]=ProcList[0].Descript;
-				row[3]=ProcList[0].AbbrDesc;
-			  row[4]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched)).ToString("F");
-				report.ColTotal[4]+=PIn.Decimal(row[4].ToString());
+				row[4]=ProcList[0].AbbrDesc;
+			  row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched)).ToString("F");
+				report.ColTotal[5]+=PIn.Decimal(row[5].ToString());
 				report.TableQ.Rows.Add(row);
 				for(int i=1;i<ProcList.Length;i++){//loop through data rows
 					row=report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
@@ -211,8 +217,8 @@ namespace OpenDental{
           }
 					row[1]=ProcList[i].ProcCode.ToString();
 					row[2]=ProcList[i].Descript;
-					row[3]=ProcList[i].AbbrDesc.ToString();
-					row[4]=((double)Fees.GetAmount0(ProcList[i].CodeNum,feeSched)).ToString("F");
+					row[4]=ProcList[i].AbbrDesc.ToString();
+					row[5]=((double)Fees.GetAmount0(ProcList[i].CodeNum,feeSched)).ToString("F");
   				//report.ColTotal[4]+=PIn.PDouble(row[4].ToString());
 					report.TableQ.Rows.Add(row);
 				}
@@ -223,15 +229,16 @@ namespace OpenDental{
 				report.ColPos[0]=20;
 				report.ColPos[1]=120;
 				report.ColPos[2]=270;
-				report.ColPos[3]=470;
-				report.ColPos[4]=620;
-				report.ColPos[5]=770;
+				report.ColPos[3]=580;
+				report.ColPos[4]=600;
+				report.ColPos[5]=700;
+				report.ColPos[6]=770;
 				report.ColCaption[0]="Category";
 				report.ColCaption[1]="Code";
 				report.ColCaption[2]="Description";
-				report.ColCaption[3]="Abbr Description";
-				report.ColCaption[4]="Fee Amount";
-				report.ColAlign[4]=HorizontalAlignment.Right;
+				report.ColCaption[4]="Abbr Description";
+				report.ColCaption[5]="Fee Amount";
+				report.ColAlign[5]=HorizontalAlignment.Right;
 				FormQuery2.ShowDialog();
 				DialogResult=DialogResult.OK;
 			}

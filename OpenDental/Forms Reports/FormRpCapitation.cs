@@ -214,11 +214,14 @@ namespace OpenDental{
 			report.AddTitle("Title",Lan.g(this,"Capitation Utilization"),fontTitle);
 			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			report.AddSubTitle("Date",textDateStart.Text+" - "+textDateEnd.Text,fontSubTitle);
-			QueryObject query=report.AddQuery(@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
+			string queryString=@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
 				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
-				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript
-				,procedurelog.ToothNum,procedurelog.Surf,procedurelog.ProcDate
-				,procedurelog.ProcFee,procedurelog.ProcFee-claimproc.WriteOff
+				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript";
+			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				queryString+=",procedurelog.ToothNum,procedurelog.Surf";
+			}
+			queryString+=@",procedurelog.ProcDate,procedurelog.ProcFee
+				,procedurelog.ProcFee-claimproc.WriteOff
 				FROM procedurelog,patient AS patSub,patient AS patPat
 				,insplan,inssub,carrier,procedurecode,claimproc
 				WHERE procedurelog.PatNum = patPat.PatNum
@@ -234,7 +237,8 @@ namespace OpenDental{
 				+"AND procedurelog.ProcDate >= "+POut.Date(dateStart)+" "
 				+"AND procedurelog.ProcDate <= "+POut.Date(dateEnd)+" "
 				+"AND insplan.PlanType = 'c' "
-				+"AND procedurelog.ProcStatus = 2","","",SplitByKind.None,1,true);
+				+"AND procedurelog.ProcStatus = 2";
+			QueryObject query=report.AddQuery(queryString,"","",SplitByKind.None,1,true);
 			query.AddColumn("Carrier",150,FieldValueType.String,font);
 			query.GetColumnDetail("Carrier").SuppressIfDuplicate=true;
 			query.AddColumn("Subscriber",120,FieldValueType.String,font);
@@ -244,19 +248,21 @@ namespace OpenDental{
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Pat DOB",80,FieldValueType.Date,font);
 			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				query.AddColumn("Code",120,FieldValueType.String,font);
+				query.AddColumn("Code",140,FieldValueType.String,font);
+				query.AddColumn("Proc Description",120,FieldValueType.String,font);
+				query.AddColumn("Date",80,FieldValueType.Date,font);
+				query.AddColumn("UCR Fee",60,FieldValueType.Number,font);
+				query.AddColumn("Co-Pay",60,FieldValueType.Number,font);
 			}
 			else {
 				query.AddColumn("Code",50,FieldValueType.String,font);
-			}
-			query.AddColumn("Proc Description",120,FieldValueType.String,font);
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				query.AddColumn("Proc Description",120,FieldValueType.String,font);
 				query.AddColumn("Tth",30,FieldValueType.String,font);
 				query.AddColumn("Surf",40,FieldValueType.String,font);
+				query.AddColumn("Date",80,FieldValueType.Date,font);
+				query.AddColumn("UCR Fee",70,FieldValueType.Number,font);
+				query.AddColumn("Co-Pay",70,FieldValueType.Number,font);
 			}
-			query.AddColumn("Date",80,FieldValueType.Date,font);
-			query.AddColumn("UCR Fee",70,FieldValueType.Number,font);
-			query.AddColumn("Co-Pay",70,FieldValueType.Number,font);
 			if(!report.SubmitQueries()) {
 				//DialogResult=DialogResult.Cancel;
 				return;
