@@ -597,6 +597,13 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
+			if(textScanDocQuality.Text=="100"
+				|| (radioScanDocUseOptionsBelow.Checked && PIn.Int(textScanDocResolution.Text)>300)) 
+			{
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"With the provided settings the file created may be extremely large.  Would you like to continue?")) {
+					return;
+				}
+			}
 			ComputerPrefs.LocalComputer.ScanDocSelectSource=checkScanDocSelectSource.Checked;
 			ComputerPrefs.LocalComputer.ScanDocShowOptions=radioScanDocShowOptions.Checked;
 			ComputerPrefs.LocalComputer.ScanDocDuplex=checkScanDocDuplex.Checked;
