@@ -175,7 +175,7 @@ namespace OpenDental{
 			this.textAdjDate.Location = new System.Drawing.Point(112,52);
 			this.textAdjDate.Name = "textAdjDate";
 			this.textAdjDate.Size = new System.Drawing.Size(80,20);
-			this.textAdjDate.TabIndex = 0;
+			this.textAdjDate.TabIndex = 8;
 			// 
 			// label3
 			// 
@@ -205,7 +205,7 @@ namespace OpenDental{
 			this.textAmount.Location = new System.Drawing.Point(112,100);
 			this.textAmount.Name = "textAmount";
 			this.textAmount.Size = new System.Drawing.Size(68,20);
-			this.textAmount.TabIndex = 1;
+			this.textAmount.TabIndex = 0;
 			// 
 			// listTypePos
 			// 
@@ -228,7 +228,7 @@ namespace OpenDental{
 			this.textProcDate.Location = new System.Drawing.Point(112,76);
 			this.textProcDate.Name = "textProcDate";
 			this.textProcDate.Size = new System.Drawing.Size(80,20);
-			this.textProcDate.TabIndex = 19;
+			this.textProcDate.TabIndex = 9;
 			// 
 			// label7
 			// 
@@ -277,7 +277,7 @@ namespace OpenDental{
 			this.comboProv.MaxDropDownItems = 30;
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(158,21);
-			this.comboProv.TabIndex = 164;
+			this.comboProv.TabIndex = 1;
 			// 
 			// comboClinic
 			// 
@@ -286,7 +286,7 @@ namespace OpenDental{
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(177,21);
-			this.comboClinic.TabIndex = 162;
+			this.comboClinic.TabIndex = 2;
 			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
 			// 
 			// labelClinic
@@ -306,7 +306,7 @@ namespace OpenDental{
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Adjustment;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(355,140);
-			this.textNote.TabIndex = 0;
+			this.textNote.TabIndex = 5;
 			// 
 			// FormAdjust
 			// 
