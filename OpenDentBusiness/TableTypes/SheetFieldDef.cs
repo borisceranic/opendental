@@ -151,7 +151,7 @@ namespace OpenDentBusiness{
 			HorizontalAlignment textAlign=HorizontalAlignment.Left) 
 		{
 			return new SheetFieldDef(SheetFieldType.StaticText,"",fieldValue,fontSize,fontName,fontIsBold,
-				xPos,yPos,width,height,GrowthBehaviorEnum.None,"",isPaymentOption,itemColor,textAlign);
+				xPos,yPos,width,height,growthBehavior,"",isPaymentOption,itemColor,textAlign);
 		}
 
 		public static SheetFieldDef NewInput(string fieldName,float fontSize,string fontName,bool fontIsBold,
