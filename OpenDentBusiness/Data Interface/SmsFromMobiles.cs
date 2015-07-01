@@ -163,8 +163,10 @@ namespace OpenDentBusiness{
 			for(int i=0;i<listMessages.Count;i++) {
 				SmsFromMobile sms=listMessages[i];
 				sms.DateTimeReceived=DateTime.Now;
-				//todo: Ryan, look this up on Wednesday and set it according.
-				sms.ClinicNum=1;
+				SmsPhone smsPhone=SmsPhones.GetByPhone(sms.SmsPhoneNumber);
+				if(smsPhone!=null) {
+					sms.ClinicNum=smsPhone.ClinicNum;
+				}
 				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber);
 				//We could not find definitive match, either 0 matches found, or more than one match found
 				if(listPatNums.Count!=1) {
@@ -208,19 +210,38 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
-		public static List<long> FindPatNums(string PhonePat) {
+		public static List<long> FindPatNums(string phonePat) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),PhonePat);
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),phonePat);
 			}
-			List<long> listPatNums=new List<long>();
 			try {
-				string command="SELECT PatNum FROM phonenumber WHERE PhoneNumberVal='"+POut.String(PhonePat)+"'";
-				listPatNums = Db.GetListLong(command);
-				command="SELECT PatNum FROM patient WHERE HmPhone='"+POut.String(PhonePat)+"' OR WkPhone='"+POut.String(PhonePat)+"' OR WirelessPhone='"+POut.String(PhonePat)+"'";
-				listPatNums.AddRange(Db.GetListLong(command));
+				string phoneRegexp=ConvertPhoneToRegexp(phonePat);
+				//DO NOT POut THESE PHONE NUMBERS. They have been cleaned for use in this function by dirtyPhoneHelper.
+				DbHelper.Regexp("WirelessPhone",phoneRegexp);
+				string command="SELECT PatNum FROM patient WHERE '"
+					+DbHelper.Regexp("HmPhone",phoneRegexp)+"' "
+					+"OR "+DbHelper.Regexp("WkPhone",phoneRegexp)+" "
+					+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp);
+				return Db.GetListLong(command);
 			}
-			catch {	}
-			return listPatNums.Distinct().ToList();
+			catch {	
+				//should only happen if phone number is blank, if so, return empty list below.
+			}
+			return new List<long>();
+		}
+
+		///<summary>Expands a phone number into a string that can be used to ignore punctuation in a phone number.
+		///Any string that passes through this function does not need to, and should not, go through POut.String()
+		///Expands </summary>
+		public static string ConvertPhoneToRegexp(string phoneRaw) {
+			//strip all non-numeric characters just in case.
+			string retVal=new string(phoneRaw.Where(x => char.IsDigit(x)).ToArray());
+			if(String.IsNullOrEmpty(retVal)) {
+				throw new Exception("Phone number cannot be blank.");
+			}
+			string wildcard=".*";
+			retVal=wildcard+String.Join("",retVal.Select(x => x+wildcard).ToList());
+			return retVal;
 		}
 
 	}

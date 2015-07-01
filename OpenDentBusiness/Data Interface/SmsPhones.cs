@@ -89,6 +89,15 @@ namespace OpenDentBusiness{
 		}
 		*/
 
+		///<summary>Gets one SmsPhone from the db. Returns null if not found.</summary>
+		public static SmsPhone GetByPhone(string phoneNumber) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<SmsPhone>(MethodBase.GetCurrentMethod(),phoneNumber);
+			}
+			string command="SELECT * FROM smsphone WHERE PhoneNumber='"+POut.String(phoneNumber)+"'";
+			return Crud.SmsPhoneCrud.SelectOne(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(SmsPhone smsPhone) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -397,6 +406,7 @@ namespace OpenDentBusiness{
 			}
 			return Clinics.List[0].ClinicNum;
 		}
+
 
 	}
 }
