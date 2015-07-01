@@ -342,6 +342,15 @@ namespace OpenDentBusiness{
 			return pref;
 		}
 
+		///<summary>Returns true if DockPhonePanelShow is enabled. Convenience function that should be used if for ODHQ only, and not resellers.</summary>
+		/// <returns></returns>
+		public static bool IsODHQ() {
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)){
+				return true;
+			}
+			return false;
+		}
+
 	}
 
 	

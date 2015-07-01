@@ -465,7 +465,7 @@ namespace OpenDental{
 				checkCreatesClaim.Enabled=false;
 				checkIsEnabled.Enabled=false;
 			}
-			if(RepeatCur.ProcCode=="038") {
+			if(Prefs.IsODHQ() && RepeatCur.ProcCode=="038") {//Integrated Texting Access Charge
 				textDesc.ReadOnly=true;
 				textTotalAmount.ReadOnly=true;
 				textNumOfCharges.ReadOnly=true;
