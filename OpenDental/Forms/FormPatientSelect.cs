@@ -1280,6 +1280,9 @@ namespace OpenDental{
 			if(textFName.Text.Length>1){
 				PatCur.FName=textFName.Text.Substring(0,1).ToUpper()+textFName.Text.Substring(1);
 			}
+			if(textBirthdate.Text.Length>1) {
+				PatCur.Birthdate=PIn.Date(textBirthdate.Text);
+			}
 			PatCur.PatStatus=PatientStatus.Patient;
 			PatCur.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
 			//Explicitly use the combo clinic instead of FormOpenDental.ClinicNum becuase the combo box should default to that clinic unless manually changed by the user.
@@ -1331,6 +1334,9 @@ namespace OpenDental{
 			}
 			if(textFName.Text.Length>1){
 				FormP.FName=textFName.Text.Substring(0,1).ToUpper()+textFName.Text.Substring(1);
+			}
+			if(textBirthdate.Text.Length>1) {
+				FormP.Birthdate=PIn.Date(textBirthdate.Text);
 			}
 			FormP.ShowDialog();
 			if(FormP.DialogResult!=DialogResult.OK){

@@ -10,6 +10,7 @@ namespace OpenDental {
 	public partial class FormPatientAddAll:Form {
 		public string LName;
 		public string FName;
+		public DateTime Birthdate;
 		public long SelectedPatNum;
 		private string _lnameOld1;
 		private string _fnameOld2="";
@@ -109,6 +110,13 @@ namespace OpenDental {
 		private void FormPatientAddAll_Load(object sender,EventArgs e) {
 			textLName1.Text=LName;
 			textFName1.Text=FName;
+			if(Birthdate.Year<1880) {
+				textBirthdate1.Text="";
+			}
+			else {
+				textBirthdate1.Text=Birthdate.ToShortDateString();
+			}
+			textBirthdate1_Validated(this,null);
 			listGender1.SelectedIndex=0;
 			listGender2.SelectedIndex=0;
 			listGender3.SelectedIndex=0;
