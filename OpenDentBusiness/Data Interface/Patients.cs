@@ -268,16 +268,12 @@ namespace OpenDentBusiness{
 			string command="SELECT DISTINCT patient.PatNum,patient.LName,patient.FName,patient.MiddleI,patient.Preferred,patient.Birthdate,patient.SSN"
 				+",patient.HmPhone,patient.WkPhone,patient.Address,patient.PatStatus,patient.BillingType,patient.ChartNumber,patient.City,patient.State"
 				+",patient.PriProv,patient.SiteNum,patient.Email,patient.Country,patient.ClinicNum "
-				+",patient.SecProv,patient.WirelessPhone,guar.BalTotal"
-				+",MAX(CASE WHEN apt.AptDateTime <= " + DbHelper.Now() +" AND apt.AptStatus=2 THEN apt.AptDateTime ELSE NULL END) AS LastVisit"
-				+",MIN(CASE WHEN apt.AptDateTime > " +  DbHelper.Now() +" AND apt.AptStatus=1 THEN apt.AptDateTime ELSE NULL END) AS NextVisit ";
+				+",patient.SecProv,patient.WirelessPhone ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+=",GROUP_CONCAT(DISTINCT phonenumber.PhoneNumberVal) AS OtherPhone ";//this customer might have multiple extra phone numbers that match the param.
 				command+=",registrationkey.RegKey ";
 			}
 			command+="FROM patient ";
-			command+="LEFT JOIN appointment apt ON patient.PatNum=apt.PatNum ";
-			command+="LEFT JOIN patient guar on patient.Guarantor=guar.PatNum ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+="LEFT JOIN phonenumber ON phonenumber.PatNum=patient.PatNum ";
 				if(regexp!="") {
@@ -407,9 +403,9 @@ namespace OpenDentBusiness{
 			if(subscriberId!=""){
 				command+="AND inssub.SubscriberId LIKE '%"+POut.String(subscriberId)+"%' ";
 			}
-			command+="GROUP BY patient.PatNum,patient.LName,patient.FName,patient.MiddleI,patient.Preferred,patient.Birthdate,patient.SSN"
-				+",patient.HmPhone,patient.WkPhone,patient.Address,patient.PatStatus,patient.BillingType,patient.ChartNumber,patient.City,patient.State"
-				+",patient.PriProv,patient.SiteNum,patient.Email,patient.Country,patient.ClinicNum,patient.SecProv,patient.WirelessPhone,guar.BalTotal ";
+			if(PrefC.GetBool(PrefName.DistributorKey)) { //if for OD HQ
+				command+="GROUP BY patient.PatNum ";
+			}
 			command+="ORDER BY patient.LName,patient.FName ";
 			if(limit){
 				command=DbHelper.LimitOrderBy(command,40);
@@ -465,23 +461,9 @@ namespace OpenDentBusiness{
 					r["OtherPhone"]=table.Rows[i]["OtherPhone"].ToString();
 					r["RegKey"]=table.Rows[i]["RegKey"].ToString();
 				}
-				date=PIn.Date(table.Rows[i]["LastVisit"].ToString());
-				if(date.Year>1880) {
-					r["LastVisit"]=date.ToShortDateString();
-				}
-				else {
-					r["LastVisit"]="";
-				}
 				r["WirelessPhone"]=table.Rows[i]["WirelessPhone"].ToString();
 				r["SecProv"]=Providers.GetAbbr(PIn.Long(table.Rows[i]["SecProv"].ToString()));
-				r["BalTotal"]=table.Rows[i]["BalTotal"].ToString();
-				date=PIn.Date(table.Rows[i]["NextVisit"].ToString());
-				if(date.Year>1880) {
-					r["NextVisit"]=date.ToShortDateString();
-				}
-				else {
-					r["NextVisit"]="";
-				}
+
 				PtDataTable.Rows.Add(r);
 			}
 			return PtDataTable;
