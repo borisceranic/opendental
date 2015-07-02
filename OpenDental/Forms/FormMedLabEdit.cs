@@ -420,9 +420,10 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			List<string[]> listFileNamesDateMod=new List<string[]>();
 			for(int i=0;i<ListMedLabs.Count;i++) {
+				string filePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),ListMedLabs[i].FileName);
 				bool isFileAdded=false;
 				for(int j=0;j<listFileNamesDateMod.Count;j++) {
-					if(listFileNamesDateMod[j][0]==ListMedLabs[i].FileName) {
+					if(listFileNamesDateMod[j][0]==filePath) {
 						isFileAdded=true;
 						break;
 					}
@@ -432,12 +433,12 @@ namespace OpenDental {
 				}
 				string dateModified=DateTime.MinValue.ToString();
 				try {
-					dateModified=File.GetLastWriteTime(ListMedLabs[i].FileName).ToString();
+					dateModified=File.GetLastWriteTime(filePath).ToString();
 				}
 				catch(Exception ex) {
 					//dateModified will be min value, do nothing?
 				}
-				listFileNamesDateMod.Add(new string[] { ListMedLabs[i].FileName,dateModified });
+				listFileNamesDateMod.Add(new string[] { filePath,dateModified });
 			}
 			FormMedLabHL7MsgText FormMsgText=new FormMedLabHL7MsgText();
 			FormMsgText.ListFileNamesDatesMod=listFileNamesDateMod;
