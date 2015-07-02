@@ -142,7 +142,7 @@ namespace OpenDental{
 			Docs=Documents.GetAllWithPat(PatNum);
 			for(int i=0;i<Docs.Length;i++){
 				row=new ODGridRow();
-				row.Cells.Add(Docs[i].DateCreated.ToShortDateString());
+				row.Cells.Add(Docs[i].DateCreated.ToString());
 				row.Cells.Add(DefC.GetName(DefCat.ImageCats,Docs[i].DocCategory));
 			  row.Cells.Add(Docs[i].Description);
 				gridMain.Rows.Add(row);

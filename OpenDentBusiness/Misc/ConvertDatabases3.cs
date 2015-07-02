@@ -8818,6 +8818,13 @@ namespace OpenDentBusiness {
 						+"WHERE claimformnum="+POut.Long(claimFormNum)+" AND FieldName='FixedText' AND FormatString='B' AND YPos>=600 AND YPos<=700";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE document MODIFY DateCreated datetime NOT NULL";//times automatically updated in MySQL to 00:00:00.
+					Db.NonQ(command);
+				}
+				else {//oracle
+					//Oracle only has one date column data type which is 'date' and it already includes the time portion.
+				}
 
 
 

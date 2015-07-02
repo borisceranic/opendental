@@ -48,7 +48,7 @@ namespace OpenDentBusiness.Crud{
 				document=new Document();
 				document.DocNum        = PIn.Long  (table.Rows[i]["DocNum"].ToString());
 				document.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				document.DateCreated   = PIn.Date  (table.Rows[i]["DateCreated"].ToString());
+				document.DateCreated   = PIn.DateT (table.Rows[i]["DateCreated"].ToString());
 				document.DocCategory   = PIn.Long  (table.Rows[i]["DocCategory"].ToString());
 				document.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				document.FileName      = PIn.String(table.Rows[i]["FileName"].ToString());
@@ -115,7 +115,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				 "'"+POut.String(document.Description)+"',"
-				+    POut.Date  (document.DateCreated)+","
+				+    POut.DateT (document.DateCreated)+","
 				+    POut.Long  (document.DocCategory)+","
 				+    POut.Long  (document.PatNum)+","
 				+"'"+POut.String(document.FileName)+"',"
@@ -182,7 +182,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				 "'"+POut.String(document.Description)+"',"
-				+    POut.Date  (document.DateCreated)+","
+				+    POut.DateT (document.DateCreated)+","
 				+    POut.Long  (document.DocCategory)+","
 				+    POut.Long  (document.PatNum)+","
 				+"'"+POut.String(document.FileName)+"',"
@@ -224,7 +224,7 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(Document document){
 			string command="UPDATE document SET "
 				+"Description   = '"+POut.String(document.Description)+"', "
-				+"DateCreated   =  "+POut.Date  (document.DateCreated)+", "
+				+"DateCreated   =  "+POut.DateT (document.DateCreated)+", "
 				+"DocCategory   =  "+POut.Long  (document.DocCategory)+", "
 				+"PatNum        =  "+POut.Long  (document.PatNum)+", "
 				+"FileName      = '"+POut.String(document.FileName)+"', "
@@ -266,7 +266,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(document.DateCreated != oldDocument.DateCreated) {
 				if(command!=""){ command+=",";}
-				command+="DateCreated = "+POut.Date(document.DateCreated)+"";
+				command+="DateCreated = "+POut.DateT(document.DateCreated)+"";
 			}
 			if(document.DocCategory != oldDocument.DocCategory) {
 				if(command!=""){ command+=",";}

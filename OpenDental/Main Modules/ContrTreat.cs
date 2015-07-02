@@ -2085,7 +2085,7 @@ namespace OpenDental{
 						}
 					}
 					docSave.ImgType=ImageType.Document;
-					docSave.DateCreated=DateTime.Today;
+					docSave.DateCreated=DateTime.Now;
 					docSave.PatNum=PatCur.PatNum;
 					docSave.DocCategory=category;
 					docSave.Description=fileName;

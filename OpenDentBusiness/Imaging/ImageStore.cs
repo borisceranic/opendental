@@ -372,7 +372,7 @@ namespace OpenDentBusiness {
 			Document doc = new Document();
 			doc.ImgType = imageType;
 			doc.FileName = ".jpg";
-			doc.DateCreated = DateTime.Today;
+			doc.DateCreated = DateTime.Now;
 			doc.PatNum = pat.PatNum;
 			doc.DocCategory = docCategory;
 			Documents.Insert(doc,pat);//creates filename and saves to db
@@ -424,7 +424,7 @@ namespace OpenDentBusiness {
 			}
 			Document doc = new Document();
 			doc.FileName = Path.GetExtension(pathSourceFile);
-			doc.DateCreated = DateTime.Today;
+			doc.DateCreated = DateTime.Now;
 			doc.DocCategory = docCategory;
 			doc.PatNum = pat.PatNum;
 			doc.ImgType = ImageType.Document;
@@ -449,7 +449,7 @@ namespace OpenDentBusiness {
 			doc.DegreesRotated = rotationAngle;
 			doc.ImgType = ImageType.Radiograph;
 			doc.FileName = fileExtention;
-			doc.DateCreated = DateTime.Today;
+			doc.DateCreated = DateTime.Now;
 			doc.PatNum = pat.PatNum;
 			doc.DocCategory = docCategory;
 			doc.WindowingMin = PrefC.GetInt(PrefName.ImageWindowingMin);

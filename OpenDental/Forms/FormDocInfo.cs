@@ -44,6 +44,8 @@ namespace OpenDental{
 		private Document DocOld;
 		private UI.Button butOpen;
 		private UI.Button butAudit;
+		private Label label4;
+		private TextBox textTime;
 		private string initialSelection;
 		
 		///<summary>ALWAYS save docCur before loading this form.</summary>
@@ -92,6 +94,8 @@ namespace OpenDental{
 			this.labelToothNums = new System.Windows.Forms.Label();
 			this.butOpen = new OpenDental.UI.Button();
 			this.butAudit = new OpenDental.UI.Button();
+			this.label4 = new System.Windows.Forms.Label();
+			this.textTime = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// listCategory
@@ -111,7 +115,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(122, 237);
+			this.label2.Location = new System.Drawing.Point(122, 267);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(127, 18);
 			this.label2.TabIndex = 2;
@@ -120,7 +124,7 @@ namespace OpenDental{
 			// 
 			// textDescript
 			// 
-			this.textDescript.Location = new System.Drawing.Point(252, 234);
+			this.textDescript.Location = new System.Drawing.Point(252, 264);
 			this.textDescript.MaxLength = 255;
 			this.textDescript.Multiline = true;
 			this.textDescript.Name = "textDescript";
@@ -135,7 +139,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(668, 368);
+			this.butOK.Location = new System.Drawing.Point(665, 382);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 25);
 			this.butOK.TabIndex = 3;
@@ -151,7 +155,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(766, 368);
+			this.butCancel.Location = new System.Drawing.Point(763, 382);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 25);
 			this.butCancel.TabIndex = 4;
@@ -190,12 +194,12 @@ namespace OpenDental{
 			// 
 			this.textDate.Location = new System.Drawing.Point(252, 92);
 			this.textDate.Name = "textDate";
-			this.textDate.Size = new System.Drawing.Size(100, 20);
+			this.textDate.Size = new System.Drawing.Size(104, 20);
 			this.textDate.TabIndex = 1;
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(149, 123);
+			this.label5.Location = new System.Drawing.Point(149, 153);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(100, 18);
 			this.label5.TabIndex = 11;
@@ -204,7 +208,7 @@ namespace OpenDental{
 			// 
 			// listType
 			// 
-			this.listType.Location = new System.Drawing.Point(252, 123);
+			this.listType.Location = new System.Drawing.Point(252, 153);
 			this.listType.Name = "listType";
 			this.listType.Size = new System.Drawing.Size(104, 69);
 			this.listType.TabIndex = 10;
@@ -228,14 +232,14 @@ namespace OpenDental{
 			// 
 			// textToothNumbers
 			// 
-			this.textToothNumbers.Location = new System.Drawing.Point(252, 203);
+			this.textToothNumbers.Location = new System.Drawing.Point(252, 233);
 			this.textToothNumbers.Name = "textToothNumbers";
 			this.textToothNumbers.Size = new System.Drawing.Size(240, 20);
 			this.textToothNumbers.TabIndex = 15;
 			// 
 			// labelToothNums
 			// 
-			this.labelToothNums.Location = new System.Drawing.Point(149, 206);
+			this.labelToothNums.Location = new System.Drawing.Point(149, 234);
 			this.labelToothNums.Name = "labelToothNums";
 			this.labelToothNums.Size = new System.Drawing.Size(100, 18);
 			this.labelToothNums.TabIndex = 14;
@@ -265,12 +269,28 @@ namespace OpenDental{
 			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAudit.CornerRadius = 4F;
-			this.butAudit.Location = new System.Drawing.Point(252, 369);
+			this.butAudit.Location = new System.Drawing.Point(249, 383);
 			this.butAudit.Name = "butAudit";
 			this.butAudit.Size = new System.Drawing.Size(92, 24);
 			this.butAudit.TabIndex = 126;
 			this.butAudit.Text = "Audit Trail";
 			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(154, 125);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(95, 16);
+			this.label4.TabIndex = 128;
+			this.label4.Text = "Time";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textTime
+			// 
+			this.textTime.Location = new System.Drawing.Point(252, 122);
+			this.textTime.Name = "textTime";
+			this.textTime.Size = new System.Drawing.Size(104, 20);
+			this.textTime.TabIndex = 129;
 			// 
 			// FormDocInfo
 			// 
@@ -278,6 +298,8 @@ namespace OpenDental{
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(868, 419);
+			this.Controls.Add(this.textTime);
+			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butAudit);
 			this.Controls.Add(this.butOpen);
 			this.Controls.Add(this.textToothNumbers);
@@ -326,7 +348,8 @@ namespace OpenDental{
 			listType.Items.AddRange(Enum.GetNames(typeof(ImageType)));
 			listType.SelectedIndex=(int)DocCur.ImgType;
 			textToothNumbers.Text=Tooth.FormatRangeForDisplay(DocCur.ToothNumbers);
-			textDate.Text=DocCur.DateCreated.ToString("d");
+			textDate.Text=DocCur.DateCreated.ToShortDateString();
+			textTime.Text=DocCur.DateCreated.ToShortTimeString();
 			textDescript.Text=DocCur.Description;
 			if(PrefC.AtoZfolderUsed) {
 				string patFolder=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
@@ -363,15 +386,27 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter a date.");
 				return;
 			}
+			if(textTime.Text=="") {
+				MsgBox.Show(this,"Please enter a time.");
+				return;
+			}
+			DateTime time;
+			if(!DateTime.TryParse(textTime.Text,out time)) {
+				MsgBox.Show(this,"Please enter a valid time.");
+				return;
+			}
 			//We had a security bug where users could change the date to a more recent date, and then subsequently delete.
 			//The code below is for that specific scenario.
-			DateTime dateEntered=PIn.Date(textDate.Text);
-			if(dateEntered>DocCur.DateCreated) {
+			DateTime dateTimeEntered=PIn.DateT(textDate.Text+" "+textTime.Text);
+			if(dateTimeEntered>DocCur.DateCreated) {
 				//user is trying to change the date to some date after the previously linked date
 				//is the new doc date allowed?
 				if(!Security.IsAuthorized(Permissions.ImageDelete,DocCur.DateCreated,true)) {
 					//suppress the default security message above (it's too confusing for this case) and generate our own here
-					MessageBox.Show(this,Lan.g(this,"Image forward-date edit not allowed")+": "+DocCur.DateCreated.ToShortDateString()+" to "+dateEntered.ToShortDateString()+"\r\n"+Lan.g(this,"Requires 'Image Delete' Security Permission."));
+					MessageBox.Show(this,Lan.g(this,"Not allowed to future date this image from")+": "
+						+"\r\n"+DocCur.DateCreated.ToString()+" to "+dateTimeEntered.ToString()
+						+"\r\n\r\n"+Lan.g(this,"A user with the SecurityAdmin permission must grant you access for")
+						+":\r\n"+GroupPermissions.GetDesc(Permissions.ImageDelete));
 					return;
 				}
 			}
@@ -385,7 +420,7 @@ namespace OpenDental{
 			DocCur.DocCategory=DefC.Short[(int)DefCat.ImageCats][listCategory.SelectedIndex].DefNum;
 			DocCur.ImgType=(ImageType)listType.SelectedIndex;
 			DocCur.Description=textDescript.Text;			
-			DocCur.DateCreated=dateEntered;	
+			DocCur.DateCreated=dateTimeEntered;	
 			try{//incomplete
 				DocCur.ToothNumbers=Tooth.FormatRangeForDb(textToothNumbers.Text);
 			}

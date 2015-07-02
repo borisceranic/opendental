@@ -61,7 +61,7 @@ namespace OpenDental {
 				bool isAttached=EhrLabImages.GetDocNumExistsInList(_ehrLabNum,_listPatientDocuments[i].DocNum,_listAttached);
 				row=new ODGridRow();
 				row.Cells.Add(isAttached?"X":"");
-				row.Cells.Add(_listPatientDocuments[i].DateCreated.ToShortDateString());
+				row.Cells.Add(_listPatientDocuments[i].DateCreated.ToString());
 				row.Cells.Add(DefC.GetName(DefCat.ImageCats,_listPatientDocuments[i].DocCategory));			  
 				row.Cells.Add(_listPatientDocuments[i].Description);
 				row.Tag=_listPatientDocuments[i];

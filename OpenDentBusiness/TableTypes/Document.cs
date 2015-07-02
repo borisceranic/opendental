@@ -11,7 +11,8 @@ namespace OpenDentBusiness{
 		public long DocNum;
 		/// <summary>Description of the document.</summary>
 		public string Description;
-		/// <summary>Date created.</summary>
+		/// <summary>Date/time created.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateCreated;
 		/// <summary>FK to definition.DefNum. Categories for documents.</summary>
 		public long DocCategory;
