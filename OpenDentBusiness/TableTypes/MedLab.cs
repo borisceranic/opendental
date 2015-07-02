@@ -123,7 +123,10 @@ namespace OpenDentBusiness {
 		///associated medlabresult, medlabspecimen, and medlabfacility obects.  The files will be stored in the OpenDentImages folder in a sub-folder
 		///called MedLabHL7.  If a message is processed correctly it will be moved into the sub-folder MedLabHL7/Processed.  Any message that remains in
 		///the MedLabHL7 folder and aren't moved into the Processed folder failed at some point during processing.  If the option to store images directly
-		///in the database is chosen, this will be an empty field and there will not be the option to display the original HL7 message.</summary>
+		///in the database is chosen, this will be an empty field and there will not be the option to display the original HL7 message.  
+		///This is a relative file path from the ImageStore.GetPreferredAtoZpath(), 
+		///Example: "MedLabHL7/FileName.txt" OR "MedLabHL7/Processed/FileName.txt" 
+		///Use: string pathToFile=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),FileName)</summary>
 		public string FileName;
 		///<summary>The PID Segment from the HL7 message used to generate this MedLab object.</summary>
 		public string OriginalPIDSegment;

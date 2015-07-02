@@ -405,14 +405,14 @@ namespace OpenDentHL7 {
 							sb.Append(Tamir.SharpSsh.java.String.getStringUTF8(fileBytes,0,numBytes));
 							numBytes=fileStream.Read(fileBytes,0,fileBytes.Length);
 						}
-						string msgArchiveFile="";
+						string msgArchiveFilePath="";
 						if(isMedLab && msgArchivePath!="") {
 							if(IsVerboseLogging) {
 								EventLog.WriteEntry("OpenDentHL7","Create the archive of the SFTP HL7 message "+msgArchivePath,EventLogEntryType.Information);
 							}
 							try {
-								msgArchiveFile=ODFileUtils.CreateRandomFile(msgArchivePath,".txt");
-								File.WriteAllText(msgArchiveFile,sb.ToString());
+								msgArchiveFilePath=ODFileUtils.CreateRandomFile(msgArchivePath,".txt");
+								File.WriteAllText(msgArchiveFilePath,sb.ToString());
 							}
 							catch(Exception ex) {
 								//do nothing, don't archive the message, might be a permission issue
@@ -427,16 +427,16 @@ namespace OpenDentHL7 {
 						}
 						List<long> medLabNumList=new List<long>();
 						if(isMedLab) {
-							medLabNumList=MessageParserMedLab.Process(messageHl7Object,msgArchiveFile,IsVerboseLogging);
+							medLabNumList=MessageParserMedLab.Process(messageHl7Object,msgArchiveFilePath,IsVerboseLogging);
 						}
 						else {
 							MessageParser.Process(messageHl7Object,IsVerboseLogging);
 						}
-						if(isMedLab && msgArchiveProcessedPath!="" && msgArchiveFile!="") {
+						if(isMedLab && msgArchiveProcessedPath!="" && msgArchiveFilePath!="") {
 							try {
-								string msgArchiveFileProcessed=ODFileUtils.CombinePaths(msgArchiveProcessedPath,Path.GetFileName(msgArchiveFile));
-								File.Move(msgArchiveFile,msgArchiveFileProcessed);
-								MedLabs.UpdateFileNames(medLabNumList,msgArchiveFileProcessed);
+								string msgArchiveFilePathProcessed=ODFileUtils.CombinePaths(msgArchiveProcessedPath,Path.GetFileName(msgArchiveFilePath));
+								File.Move(msgArchiveFilePath,msgArchiveFilePathProcessed);
+								MedLabs.UpdateFileNames(medLabNumList,ODFileUtils.CombinePaths("MedLabHL7","Processed",Path.GetFileName(msgArchiveFilePathProcessed)));
 							}
 							catch(Exception ex) {
 								//do nothing, the file will remain in the root location
