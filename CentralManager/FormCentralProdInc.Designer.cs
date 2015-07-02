@@ -41,6 +41,7 @@ namespace CentralManager {
 			this.textToday = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.radioProvider = new System.Windows.Forms.RadioButton();
 			this.radioAnnual = new System.Windows.Forms.RadioButton();
 			this.radioDaily = new System.Windows.Forms.RadioButton();
 			this.radioMonthly = new System.Windows.Forms.RadioButton();
@@ -102,10 +103,12 @@ namespace CentralManager {
 			// radioWriteoffProc
 			// 
 			this.radioWriteoffProc.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
+			this.radioWriteoffProc.Checked = true;
 			this.radioWriteoffProc.Location = new System.Drawing.Point(9, 41);
 			this.radioWriteoffProc.Name = "radioWriteoffProc";
 			this.radioWriteoffProc.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffProc.TabIndex = 1;
+			this.radioWriteoffProc.TabStop = true;
 			this.radioWriteoffProc.Text = "Using procedure date.";
 			this.radioWriteoffProc.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.radioWriteoffProc.UseVisualStyleBackColor = true;
@@ -113,12 +116,10 @@ namespace CentralManager {
 			// radioWriteoffPay
 			// 
 			this.radioWriteoffPay.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-			this.radioWriteoffPay.Checked = true;
 			this.radioWriteoffPay.Location = new System.Drawing.Point(9, 20);
 			this.radioWriteoffPay.Name = "radioWriteoffPay";
 			this.radioWriteoffPay.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffPay.TabIndex = 0;
-			this.radioWriteoffPay.TabStop = true;
 			this.radioWriteoffPay.Text = "Using insurance payment date.";
 			this.radioWriteoffPay.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.radioWriteoffPay.UseVisualStyleBackColor = true;
@@ -233,16 +234,27 @@ namespace CentralManager {
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.radioProvider);
 			this.groupBox1.Controls.Add(this.radioAnnual);
 			this.groupBox1.Controls.Add(this.radioDaily);
 			this.groupBox1.Controls.Add(this.radioMonthly);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(35, 188);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(123, 95);
+			this.groupBox1.Size = new System.Drawing.Size(123, 104);
 			this.groupBox1.TabIndex = 47;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Report Type";
+			// 
+			// radioProvider
+			// 
+			this.radioProvider.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioProvider.Location = new System.Drawing.Point(14, 77);
+			this.radioProvider.Name = "radioProvider";
+			this.radioProvider.Size = new System.Drawing.Size(104, 17);
+			this.radioProvider.TabIndex = 36;
+			this.radioProvider.Text = "Provider";
+			this.radioProvider.Click += new System.EventHandler(this.radioProvider_Click);
 			// 
 			// radioAnnual
 			// 
@@ -327,5 +339,6 @@ namespace CentralManager {
 		private System.Windows.Forms.RadioButton radioAnnual;
 		private System.Windows.Forms.RadioButton radioDaily;
 		private System.Windows.Forms.RadioButton radioMonthly;
+		private System.Windows.Forms.RadioButton radioProvider;
 	}
 }

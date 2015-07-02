@@ -49,6 +49,7 @@ namespace OpenDental{
 		private CheckBox checkAllClin;
 		///<summary>If set externally, then this sets the date on startup.</summary>
 		public DateTime DateEnd;
+		private RadioButton radioProvider;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -101,6 +102,7 @@ namespace OpenDental{
 			this.checkAllClin = new System.Windows.Forms.CheckBox();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.radioProvider = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -148,13 +150,14 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.radioProvider);
 			this.groupBox1.Controls.Add(this.radioAnnual);
 			this.groupBox1.Controls.Add(this.radioDaily);
 			this.groupBox1.Controls.Add(this.radioMonthly);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(37, 13);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(123, 84);
+			this.groupBox1.Size = new System.Drawing.Size(123, 101);
 			this.groupBox1.TabIndex = 35;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Report Type";
@@ -391,6 +394,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// radioProvider
+			// 
+			this.radioProvider.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioProvider.Location = new System.Drawing.Point(14, 78);
+			this.radioProvider.Name = "radioProvider";
+			this.radioProvider.Size = new System.Drawing.Size(104, 17);
+			this.radioProvider.TabIndex = 36;
+			this.radioProvider.Text = "Provider";
+			this.radioProvider.Click += new System.EventHandler(this.radioProvider_Click);
+			// 
 			// FormRpProdInc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -527,13 +540,17 @@ namespace OpenDental{
 			SetDates();
 		}
 
+		private void radioProvider_Click(object sender,EventArgs e) {
+			SetDates();
+		}
+
 		private void SetDates(){
-			if(radioDaily.Checked){
+			if(radioDaily.Checked || radioProvider.Checked) {
 				textDateFrom.Text=DateTime.Today.ToShortDateString();
 				textDateTo.Text=DateTime.Today.ToShortDateString();
 				butThis.Text=Lan.g(this,"Today");
 			}
-			else if(radioMonthly.Checked){
+			else if(radioMonthly.Checked) {
 				textDateFrom.Text=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1).ToShortDateString();
 				textDateTo.Text=new DateTime(DateTime.Today.Year,DateTime.Today.Month
 					,DateTime.DaysInMonth(DateTime.Today.Year,DateTime.Today.Month)).ToShortDateString();
@@ -991,6 +1008,127 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
+		private void RunProvider() {
+			dateFrom=PIn.Date(textDateFrom.Text);
+			dateTo=PIn.Date(textDateTo.Text);
+			if(checkAllProv.Checked) {
+				for(int i=0;i<listProv.Items.Count;i++) {
+					listProv.SetSelected(i,true);
+				}
+			}
+			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			dateFrom=PIn.Date(textDateFrom.Text);
+			dateTo=PIn.Date(textDateTo.Text);
+			List<long> listProvNums=new List<long>();
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+			}
+			List<long> listClinicNums=new List<long>();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+					if(Security.CurUser.ClinicIsRestricted) {
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+					}
+					else {
+						if(listClin.SelectedIndices[i]==0) {
+							listClinicNums.Add(0);
+						}
+						else {
+							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
+					}
+				}
+			}
+			DataSet ds=RpProdInc.GetProviderDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			ReportComplex report=new ReportComplex(true,true);
+			report.ReportName="Provider P&I";
+			report.AddTitle("Title",Lan.g(this,"Provider Production and Income"));
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
+			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
+			if(checkAllProv.Checked) {
+				report.AddSubTitle("Providers",Lan.g(this,"All Providers"));
+			}
+			else {
+				string str="";
+				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+					if(i>0) {
+						str+=", ";
+					}
+					str+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
+				}
+				report.AddSubTitle("Providers",str);
+			}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(checkAllClin.Checked) {
+					report.AddSubTitle("Clinics",Lan.g(this,"All Clinics"));
+				}
+				else {
+					string clinNames="";
+					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+						if(i>0) {
+							clinNames+=", ";
+						}
+						if(Security.CurUser.ClinicIsRestricted) {
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
+						}
+						else {
+							if(listClin.SelectedIndices[i]==0) {
+								clinNames+=Lan.g(this,"Unassigned");
+							}
+							else {
+								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
+						}
+					}
+					report.AddSubTitle("Clinics",clinNames);
+				}
+			}
+			//setup query
+			QueryObject query;
+			DataTable dtClinic=ds.Tables["Clinic"].Copy();
+			DataTable dt=ds.Tables["Total"].Copy();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				query=report.AddQuery(dtClinic,"","Clinic",SplitByKind.Value,1,true);
+			}
+			else {
+				query=report.AddQuery(dt,"","",SplitByKind.None,1,true);
+			}
+			// add columns to report
+			query.AddColumn("Provider",75,FieldValueType.String);
+			query.AddColumn("Production",120,FieldValueType.Number);
+			query.AddColumn("Adjustments",120,FieldValueType.Number);
+			query.AddColumn("Writeoff",120,FieldValueType.Number);
+			query.AddColumn("Tot Prod",120,FieldValueType.Number);
+			query.AddColumn("Pt Income",120,FieldValueType.Number);
+			query.AddColumn("Ins Income",120,FieldValueType.Number);
+			query.AddColumn("Total Income",120,FieldValueType.Number);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1) {
+				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
+				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
+				query.AddColumn("Provider",75,FieldValueType.String);
+				query.AddColumn("Production",120,FieldValueType.Number);
+				query.AddColumn("Adjustments",120,FieldValueType.Number);
+				query.AddColumn("Writeoff",120,FieldValueType.Number);
+				query.AddColumn("Tot Prod",120,FieldValueType.Number);
+				query.AddColumn("Pt Income",120,FieldValueType.Number);
+				query.AddColumn("Ins Income",120,FieldValueType.Number);
+				query.AddColumn("Total Income",120,FieldValueType.Number);
+			}
+			report.AddPageNum();
+			// execute query
+			if(!report.SubmitQueries()) {//Does not actually submit queries because we use datatables in the central management tool.
+				return;
+			}
+			// display the report
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(  textDateFrom.errorProvider1.GetError(textDateFrom)!=""
 				|| textDateTo.errorProvider1.GetError(textDateTo)!=""
@@ -1020,12 +1158,15 @@ namespace OpenDental{
 			else if(radioMonthly.Checked){
 				RunMonthly();
 			}
-			else{//annual
+			else if(radioAnnual.Checked) {
 				if(dateFrom.AddYears(1) <= dateTo || dateFrom.Year != dateTo.Year) {
 					MsgBox.Show(this,"Date range for annual report cannot be greater than one year and must be within the same year.");
 					return;
 				}
 				RunAnnual();
+			}
+			else {//Provider
+				RunProvider();
 			}
 			//DialogResult=DialogResult.OK;//Stay here so that a series of similar reports can be run
 		}

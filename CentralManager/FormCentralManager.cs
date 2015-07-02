@@ -14,6 +14,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 using OpenDental;
 using CodeBase;
+using System.Globalization;
 
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
@@ -45,6 +46,11 @@ namespace CentralManager {
 			if(FormCLO.ShowDialog()!=DialogResult.OK) {
 				Application.Exit();
 				return;
+			}
+			if(CultureInfo.CurrentCulture.Name=="en-US") {
+				CultureInfo cInfo=(CultureInfo)CultureInfo.CurrentCulture.Clone();
+				cInfo.DateTimeFormat.ShortDatePattern="MM/dd/yyyy";
+				Application.CurrentCulture=cInfo;
 			}
 			this.Text+=" - "+Security.CurUser.UserName;
 			_listConnectionGroups=ConnectionGroups.GetListt();
