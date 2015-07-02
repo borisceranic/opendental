@@ -336,7 +336,6 @@ namespace OpenDental{
 			// 
 			// comboBillingChargeAdjType
 			// 
-			this.comboBillingChargeAdjType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBillingChargeAdjType.FormattingEnabled = true;
 			this.comboBillingChargeAdjType.Location = new System.Drawing.Point(278, 101);
 			this.comboBillingChargeAdjType.MaxDropDownItems = 30;
@@ -427,7 +426,6 @@ namespace OpenDental{
 			// 
 			// comboFinanceChargeAdjType
 			// 
-			this.comboFinanceChargeAdjType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboFinanceChargeAdjType.FormattingEnabled = true;
 			this.comboFinanceChargeAdjType.Location = new System.Drawing.Point(278, 77);
 			this.comboFinanceChargeAdjType.MaxDropDownItems = 30;
@@ -611,7 +609,6 @@ namespace OpenDental{
 			// 
 			// comboBrokenApptAdjType
 			// 
-			this.comboBrokenApptAdjType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBrokenApptAdjType.FormattingEnabled = true;
 			this.comboBrokenApptAdjType.Location = new System.Drawing.Point(238, 94);
 			this.comboBrokenApptAdjType.MaxDropDownItems = 30;
@@ -1146,7 +1143,6 @@ namespace OpenDental{
 			// 
 			// comboProcDiscountType
 			// 
-			this.comboProcDiscountType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProcDiscountType.FormattingEnabled = true;
 			this.comboProcDiscountType.Location = new System.Drawing.Point(277, 102);
 			this.comboProcDiscountType.MaxDropDownItems = 30;
@@ -1658,25 +1654,42 @@ namespace OpenDental{
 			checkAppointmentBubblesDisabled.Checked=PrefC.GetBool(PrefName.AppointmentBubblesDisabled);
 			posAdjTypes=DefC.GetPositiveAdjTypes();
 			negAdjTypes=DefC.GetNegativeAdjTypes();
+			long financeChargeAdjDefNum=PrefC.GetLong(PrefName.FinanceChargeAdjustmentType);
+			long billingChargeAdjDefNum=PrefC.GetLong(PrefName.BillingChargeAdjustmentType);
+			long brokenApptAdjDefNum=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+			long treatPlanDiscountAdjDefNum=PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType);
 			for(int i=0;i<posAdjTypes.Count;i++) {
 				comboFinanceChargeAdjType.Items.Add(posAdjTypes[i].ItemName);
-				if(PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)==posAdjTypes[i].DefNum) {
+				if(financeChargeAdjDefNum==posAdjTypes[i].DefNum) {
 					comboFinanceChargeAdjType.SelectedIndex=i;
 				}
 				comboBillingChargeAdjType.Items.Add(posAdjTypes[i].ItemName);
-				if(PrefC.GetLong(PrefName.BillingChargeAdjustmentType)==posAdjTypes[i].DefNum) {
+				if(billingChargeAdjDefNum==posAdjTypes[i].DefNum) {
 					comboBillingChargeAdjType.SelectedIndex=i;
 				}
 				comboBrokenApptAdjType.Items.Add(posAdjTypes[i].ItemName);
-				if(PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)==posAdjTypes[i].DefNum) {
+				if(brokenApptAdjDefNum==posAdjTypes[i].DefNum) {
 					comboBrokenApptAdjType.SelectedIndex=i;
 				}
 			}
 			for(int i=0;i<negAdjTypes.Count;i++) {
 				comboProcDiscountType.Items.Add(negAdjTypes[i].ItemName);
-				if(PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)==negAdjTypes[i].DefNum) {
+				if(treatPlanDiscountAdjDefNum==negAdjTypes[i].DefNum) {
 					comboProcDiscountType.SelectedIndex=i;
 				}
+			}
+			//Check to see if any adjustment type preferences are hidden.
+			if(financeChargeAdjDefNum>0 && comboFinanceChargeAdjType.SelectedIndex==-1) {
+				comboFinanceChargeAdjType.Text=DefC.GetDef(DefCat.AdjTypes,financeChargeAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
+			}
+			if(billingChargeAdjDefNum>0 && comboBillingChargeAdjType.SelectedIndex==-1) {
+				comboBillingChargeAdjType.Text=DefC.GetDef(DefCat.AdjTypes,billingChargeAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
+			}
+			if(brokenApptAdjDefNum>0 && comboBrokenApptAdjType.SelectedIndex==-1) {
+				comboBrokenApptAdjType.Text=DefC.GetDef(DefCat.AdjTypes,brokenApptAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
+			}
+			if(treatPlanDiscountAdjDefNum>0 && comboProcDiscountType.SelectedIndex==-1) {
+				comboProcDiscountType.Text=DefC.GetDef(DefCat.AdjTypes,treatPlanDiscountAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
 			}
 			textDiscountPercentage.Text=PrefC.GetDouble(PrefName.TreatPlanDiscountPercent).ToString();
 			checkApptExclamation.Checked=PrefC.GetBool(PrefName.ApptExclamationShowForUnsentIns);
