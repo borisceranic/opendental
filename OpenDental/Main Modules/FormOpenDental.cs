@@ -49,6 +49,7 @@ using SparksToothChart;
 //using OpenDental.SmartCards;
 using OpenDental.UI;
 using System.ServiceProcess;
+using System.Linq;
 #if EHRTEST
 using EHR;
 #endif
@@ -3524,32 +3525,36 @@ namespace OpenDental{
 
 		///<summary>Set isSignalNeeded to true if a refresh signal should be sent out to the other workstations.</summary>
 		private void SetSmsNotificationText(string smsNotificationText,bool isSignalNeeded) {
-			if(_butText==null) {
-				return;//This button does not exist in eCW tight integration mode.
-			}
-			if(!_butText.Enabled) {
-				return;//This button is disabled when neither of the Text Messaging bridges have been enabled.
-			}
-			if(this.InvokeRequired) {//For when called from the ThreadSmsTextMessageNotify() thread.
-				this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText,isSignalNeeded); });
-			}
-			if(smsNotificationText=="0") {
-				smsNotificationText="";
-			}
-			if(_butText.NotificationText==smsNotificationText) {
-				return;//This prevents the toolbar from being invalidated unnecessarily.  Also prevents unnecessary signals.
-			}
-			_butText.NotificationText=smsNotificationText;
-			if(menuItemTextMessagesReceived.Text.Contains("(")) {//Remove the old count from the menu item.
-				menuItemTextMessagesReceived.Text=menuItemTextMessagesReceived.Text.Substring(0,menuItemTextMessagesReceived.Text.IndexOf("(")-1);
-			}
-			if(smsNotificationText!="") {
-				menuItemTextMessagesReceived.Text+=" ("+smsNotificationText+")";
-			}
-			ToolBarMain.Invalidate();//To cause the Text button to redraw.
-			if(isSignalNeeded) {
-				Signalods.InsertSmsNotification(PIn.Long(smsNotificationText));
-			}
+			try {
+				if(_butText==null) {
+					return;//This button does not exist in eCW tight integration mode.
+				}
+				if(!_butText.Enabled) {
+					return;//This button is disabled when neither of the Text Messaging bridges have been enabled.
+				}
+				if(this.InvokeRequired) {//For when called from the ThreadSmsTextMessageNotify() thread.
+					this.Invoke((Action)delegate() { SetSmsNotificationText(smsNotificationText,isSignalNeeded); });
+				}
+				if(smsNotificationText=="0") {
+					smsNotificationText="";
+				}
+				if(_butText.NotificationText==smsNotificationText) {
+					return;//This prevents the toolbar from being invalidated unnecessarily.  Also prevents unnecessary signals.
+				}
+				_butText.NotificationText=smsNotificationText;
+				if(menuItemTextMessagesReceived.Text.Contains("(")) {//Remove the old count from the menu item.
+					menuItemTextMessagesReceived.Text=menuItemTextMessagesReceived.Text.Substring(0,menuItemTextMessagesReceived.Text.IndexOf("(")-1);
+				}
+				if(smsNotificationText!="") {
+					menuItemTextMessagesReceived.Text+=" ("+smsNotificationText+")";
+				}
+				if(isSignalNeeded) {
+					Signalods.InsertSmsNotification(PIn.Long(smsNotificationText));
+				}
+			}			
+			finally { //Always redraw the toolbar item. We may call this method just for this purpose.
+				ToolBarMain.Invalidate();//To cause the Text button to redraw.			
+			}			
 		}
 
 		#endregion SMS Text Messaging
@@ -4074,14 +4079,17 @@ namespace OpenDental{
 			}
 			try {
 				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs				
-				if(_butText!=null && _butText.Enabled) {//Not visible if eCW, and not enabled unless Text Messaging is enabled.
-					for(int i=sigList.Count-1;i>=0;i--) {//Look backwards because we only care about the latest SMS Unread Message Count.
-						if(sigList[i].SigType==SignalType.Invalid && sigList[i].ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString()) {
-							SetSmsNotificationText(sigList[i].SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
-							break;//We only care about the latest count.
-						}
-					}
-					if(_butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
+				if(_butText!=null){ //Not visible if eCW, and not enabled unless Text Messaging is enabled.					
+					//Check for the specific sms signal.
+					Signalod signal=sigList.OrderByDescending(x => x.SigDateTime)
+						.FirstOrDefault(x => x.SigType==SignalType.Invalid && x.ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString());
+					if(signal!=null){
+						//This signal is not used when using Callfire so we should not have any conflicts here.
+						//The toolbar button might need to change state if we have just recently changed the state of IsIntegratedTextingEnabled().
+						_butText.Enabled=SmsPhones.IsIntegratedTextingEnabled();
+						SetSmsNotificationText(signal.SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
+					}					
+					if(_butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
 						SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
 					}
 				}

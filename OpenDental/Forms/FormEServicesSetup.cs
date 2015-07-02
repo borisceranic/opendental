@@ -49,7 +49,7 @@ namespace OpenDental {
 		private Clinic _clinicCur;
 		private List<Clinic> _listClinics;
 		private List<SmsPhone> _listPhones;
-
+		
 		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
 		public FormEServicesSetup(EService setTab=EService.PatientPortal) {
 			InitializeComponent();
@@ -1553,6 +1553,7 @@ namespace OpenDental {
 			FillGridSmsUsage();
 			textSmsLimit.Text="";//set blank so that when we call SetSmsServiceAgreement it will populate with new value.
 			SetSmsServiceAgreement();
+			DataValid.SetInvalid(InvalidType.SmsTextMsgReceivedUnreadCount);
 		}
 
 		private void butSmsCancel_Click(object sender,EventArgs e) {
@@ -1602,6 +1603,7 @@ namespace OpenDental {
 			FillGridClinics();
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();
+			DataValid.SetInvalid(InvalidType.SmsTextMsgReceivedUnreadCount);
 		}
 
 		private void butBackMonth_Click(object sender,EventArgs e) {
