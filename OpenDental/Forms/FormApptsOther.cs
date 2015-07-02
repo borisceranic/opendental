@@ -740,16 +740,14 @@ namespace OpenDental{
 			for(int i=0;i<FamCur.ListPats.Length;i++){
 				procList=Procedures.Refresh(FamCur.ListPats[i].PatNum);
 				recallList=Recalls.GetList(FamCur.ListPats[i].PatNum);//get the recall for this pt
-				if(recallList.Count==0) {
-					noRecalls++;
-					//MsgBox.Show(this,"This patient does not have any recall due.");
-					continue;
-				}
-				if(recallList[0].IsDisabled){
+				//Check to see if the special type recall is disabled or already scheduled.  This is also done in AppointmentL.CreateRecallApt() below so I'm
+				//	not sure why we do it here.
+				List<Recall> listRecalls=recallList.FindAll(x => x.RecallTypeNum==RecallTypes.PerioType || x.RecallTypeNum==RecallTypes.ProphyType);
+				if(listRecalls.Count==0 || listRecalls.Exists(x => x.IsDisabled)) {
 					noRecalls++;
 					continue;
 				}
-				if(recallList[0].DateScheduled.Year > 1880) {
+				if(listRecalls.Exists(x => x.DateScheduled.Year > 1880)) {
 					alreadySched++;
 					continue;
 				}
