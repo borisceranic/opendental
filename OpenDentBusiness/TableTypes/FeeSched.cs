@@ -4,6 +4,7 @@ using System.Collections;
 namespace OpenDentBusiness{
 	///<summary>Fee schedule names used to be in the definition table, but now they have their own table.  We are about to have many many more fee schedules as we start automating allowed fees.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class FeeSched : TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

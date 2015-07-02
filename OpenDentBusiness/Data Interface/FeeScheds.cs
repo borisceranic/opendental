@@ -50,6 +50,16 @@ namespace OpenDentBusiness{
 			Crud.FeeSchedCrud.Update(feeSched);
 		}
 
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<FeeSched> listNew) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
+				return;
+			}
+			List<FeeSched> listDB=FeeSchedC.GetListLong();
+			Crud.FeeSchedCrud.Sync(listNew,listDB);
+		}
+
 		///<summary>Gets one fee sched from the cache.  Will return null if not found.</summary>
 		public static FeeSched GetOne(long feeSchedNum,List<FeeSched> listFeeScheds) {
 			for(int i=0;i<listFeeScheds.Count;i++) {
@@ -114,15 +124,19 @@ namespace OpenDentBusiness{
 
 		///<summary>Only used in FormInsPlan and FormFeeScheds.</summary>
 		public static List<FeeSched> GetListForType(FeeScheduleType feeSchedType,bool includeHidden) {
+			return GetListForType(feeSchedType,includeHidden,FeeSchedC.GetListLong());
+		}
+
+		///<summary>Used to find FeeScheds of a certain type from within a given list.</summary>
+		public static List<FeeSched> GetListForType(FeeScheduleType feeSchedType,bool includeHidden,List<FeeSched> listFeeScheds) {
 			//No need to check RemotingRole; no call to db.
 			List<FeeSched> retVal=new List<FeeSched>();
-			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			for(int i=0;i<listFeeScheds.Count;i++) {
 				if(!includeHidden && listFeeScheds[i].IsHidden){
 					continue;
 				}
 				if(listFeeScheds[i].FeeSchedType==feeSchedType){
-					retVal.Add(listFeeScheds[i].Copy());
+					retVal.Add(listFeeScheds[i]);
 				}
 			}
 			return retVal;

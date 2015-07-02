@@ -651,7 +651,7 @@ namespace OpenDentBusiness{
 			else {
 				//no point in wasting time calculating this unless it's needed.
 				double carrierAllowed=InsPlans.GetAllowed(ProcedureCodes.GetProcCode(codeNum).ProcCode,plan.FeeSched,plan.AllowedFeeSched,
-					plan.CodeSubstNone,plan.PlanType,toothNum,cp.ProvNum);
+					plan.CodeSubstNone,plan.PlanType,toothNum,proc.ProvNum,proc.ClinicNum);
 				if(carrierAllowed != -1) {
 					carrierAllowed=carrierAllowed*Math.Max(1,proc.BaseUnits+proc.UnitQty);
 					if(carrierAllowed > procFee) {
@@ -667,7 +667,7 @@ namespace OpenDentBusiness{
 				}
 			}
 			//Copay----------------------------------------------------------------------------------------------
-			cp.CopayAmt=InsPlans.GetCopay(codeNum,plan.FeeSched,plan.CopayFeeSched,plan.CodeSubstNone,toothNum);
+			cp.CopayAmt=InsPlans.GetCopay(codeNum,plan.FeeSched,plan.CopayFeeSched,plan.CodeSubstNone,toothNum,proc.ClinicNum,proc.ProvNum);
 			if(cp.CopayAmt!=-1) {
 				cp.CopayAmt=cp.CopayAmt*Math.Max(1,proc.BaseUnits+proc.UnitQty);
 			}
@@ -851,7 +851,7 @@ namespace OpenDentBusiness{
 				//so we will calculate the allowed all over again, but this time, without using a substitution code.
 				//AllowedFeeSched and toothNum do not need to be passed in.  codeSubstNone is set to true to not subst.
 				double carrierAllowedNoSubst=InsPlans.GetAllowed(ProcedureCodes.GetProcCode(codeNum).ProcCode,plan.FeeSched,0,
-					true,"p","",cp.ProvNum);
+					true,"p","",proc.ProvNum,proc.ClinicNum);
 				double allowedNoSubst=procFee;
 				if(carrierAllowedNoSubst != -1) {
 					carrierAllowedNoSubst=carrierAllowedNoSubst*Math.Max(1,proc.BaseUnits+proc.UnitQty);

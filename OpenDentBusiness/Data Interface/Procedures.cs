@@ -996,30 +996,21 @@ namespace OpenDentBusiness {
 				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
 			string command=@"SELECT procedurecode.CodeNum,ProcNum,patient.PatNum,procedurelog.PatNum,
-				insplan.FeeSched AS PlanFeeSched,patient.FeeSched AS PatFeeSched,patient.PriProv,
-				procedurelog.ProcFee,insplan.PlanType
+				insplan.FeeSched PlanFeeSched,patient.FeeSched PatFeeSched,procedurelog.ProvNum,
+				procedurelog.ProcFee,insplan.PlanType,procedurelog.ClinicNum
 				FROM procedurelog
 				LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum
 				LEFT JOIN patplan ON patplan.PatNum=procedurelog.PatNum
-				AND patplan.Ordinal=1
+					AND patplan.Ordinal=1
 				LEFT JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum
 				LEFT JOIN inssub ON inssub.InsSubNum=patplan.InsSubNum
 				LEFT JOIN insplan ON insplan.PlanNum=inssub.PlanNum
-				WHERE procedurelog.ProcStatus=1";
-			/*@"SELECT procedurelog.ProcCode,insplan.FeeSched AS PlanFeeSched,patient.FeeSched AS PatFeeSched,
-							patient.PriProv,ProcNum
-							FROM procedurelog,patient
-							LEFT JOIN patplan ON patplan.PatNum=procedurelog.PatNum
-							AND patplan.Ordinal=1
-							LEFT JOIN insplan ON insplan.PlanNum=patplan.PlanNum
-							WHERE procedurelog.ProcStatus=1
-							AND patient.PatNum=procedurelog.PatNum
-						";*/
+				WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP);
 			DataTable table=Db.GetTable(command);
 			long priPlanFeeSched;
 			//int feeSchedNum;
 			long patFeeSched;
-			long patProv;
+			long procProv;
 			string planType;
 			double insfee;
 			double standardfee;
@@ -1029,11 +1020,16 @@ namespace OpenDentBusiness {
 			for(int i=0;i<table.Rows.Count;i++) {
 				priPlanFeeSched=PIn.Long(table.Rows[i]["PlanFeeSched"].ToString());
 				patFeeSched=PIn.Long(table.Rows[i]["PatFeeSched"].ToString());
-				patProv=PIn.Long(table.Rows[i]["PriProv"].ToString());
+				procProv=PIn.Long(table.Rows[i]["ProvNum"].ToString());
 				planType=PIn.String(table.Rows[i]["PlanType"].ToString());
-				insfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString()),Fees.GetFeeSched(priPlanFeeSched,patFeeSched,patProv));
+				insfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
+					,Fees.GetFeeSched(priPlanFeeSched,patFeeSched,procProv)
+					,PIn.Long(table.Rows[i]["ClinicNum"].ToString()),procProv);
 				if(planType=="p") {//PPO
-					standardfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString()),Providers.GetProv(patProv).FeeSched);
+					standardfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
+						,Providers.GetProv(procProv).FeeSched
+						,PIn.Long(table.Rows[i]["ClinicNum"].ToString())
+						,procProv);
 					if(standardfee>insfee) {
 						newFee=standardfee;
 					} 

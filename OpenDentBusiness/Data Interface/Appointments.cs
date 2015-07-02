@@ -2228,15 +2228,18 @@ namespace OpenDentBusiness{
 				else {
 					feeSch=Fees.GetFeeSched(patCur,listPlans,listPatPlans,listSubs);
 				}
+				procCur.ProvNum=patCur.PriProv;
+				//Procedures.Cur.Dx=
+				procCur.ClinicNum=patCur.ClinicNum;
 				//Get the fee amount for medical or dental.
 				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(procCur.MedicalCode).CodeNum,feeSch);
+					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(procCur.MedicalCode).CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 				}
 				else {
-					insfee=Fees.GetAmount0(procCur.CodeNum,feeSch);
+					insfee=Fees.GetAmount0(procCur.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 				}
 				if(priplan!=null && priplan.PlanType=="p") {//PPO
-					standardfee=Fees.GetAmount0(procCur.CodeNum,Providers.GetProv(Patients.GetProvNum(patCur)).FeeSched);
+					standardfee=Fees.GetAmount0(procCur.CodeNum,Providers.GetProv(Patients.GetProvNum(patCur)).FeeSched,procCur.ClinicNum,procCur.ProvNum);
 					if(standardfee>insfee) {
 						procCur.ProcFee=standardfee;
 					}
@@ -2257,9 +2260,6 @@ namespace OpenDentBusiness{
 				//Procedures.Cur.PriEstim=
 				//Procedures.Cur.SecEstim=
 				//claimnum
-				procCur.ProvNum=patCur.PriProv;
-				//Procedures.Cur.Dx=
-				procCur.ClinicNum=patCur.ClinicNum;
 				//nextaptnum
 				procCur.BaseUnits = ProcedureCodes.GetProcCode(procCur.CodeNum).BaseUnits;
 				procCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);

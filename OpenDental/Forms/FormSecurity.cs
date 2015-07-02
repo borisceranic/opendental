@@ -500,6 +500,8 @@ namespace OpenDental{
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Providers);
 					node.Nodes.Add(node2);
+				node2=SetNode(Permissions.ProviderFeeEdit);
+					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Blockouts);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.UserQuery);

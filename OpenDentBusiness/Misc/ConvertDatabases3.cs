@@ -8825,6 +8825,25 @@ namespace OpenDentBusiness {
 				else {//oracle
 					//Oracle only has one date column data type which is 'date' and it already includes the time portion.
 				}
+				//Add ProviderFeeEdit to groups with SecurityAdmin ------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=24";
+				table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",93)"; //93: ProviderFeeEdit
+						Db.NonQ(command);
+					}
+				}	
+				else {//oracle
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+				    command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",93)";
+				      Db.NonQ(command);
+				  }
+				}
 
 
 

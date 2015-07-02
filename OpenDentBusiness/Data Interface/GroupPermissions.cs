@@ -277,6 +277,7 @@ namespace OpenDentBusiness{
 				//case Permissions.EhrMeasureEventEdit:
 				//case Permissions.EServicesSetup:
 				//case Permissions.FeeSchedEdit:
+				case Permissions.ProviderFeeEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -398,6 +399,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Show Procedure Fee");
 				case Permissions.Providers:
 					return Lans.g("enumPermissions","Providers");
+				case Permissions.ProviderFeeEdit:
+					return Lans.g("enumPermissions","Provider Fee Edit");
 				case Permissions.Reports:
 					return Lans.g("enumPermissions","Reports");
 				case Permissions.RefAttachAdd:

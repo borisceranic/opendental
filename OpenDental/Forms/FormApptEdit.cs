@@ -1872,25 +1872,6 @@ namespace OpenDental{
 			else {
 				feeSch=Fees.GetFeeSched(pat,PlanList,patPlanList,SubList);
 			}
-			//Get the fee amount for medical or dental.
-			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
-			}
-			else {
-				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
-			}
-			if(priplan!=null && priplan.PlanType=="p") {//PPO
-				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched);
-				if(standardfee>insfee) {
-					ProcCur.ProcFee=standardfee;
-				}
-				else {
-					ProcCur.ProcFee=insfee;
-				}
-			}
-			else {
-				ProcCur.ProcFee=insfee;
-			}
 			//surf
 			//ToothNum
 			//Procedures.Cur.ToothRange
@@ -1915,8 +1896,27 @@ namespace OpenDental{
 			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//Override provider for procedures with a default provider
 				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
 			}
-			ProcCur.Note="";
 			ProcCur.ClinicNum=pat.ClinicNum;
+			//Get the fee amount for medical or dental.
+			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
+				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+			}
+			else {
+				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+			}
+			if(priplan!=null && priplan.PlanType=="p") {//PPO
+				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
+				if(standardfee>insfee) {
+					ProcCur.ProcFee=standardfee;
+				}
+				else {
+					ProcCur.ProcFee=insfee;
+				}
+			}
+			else {
+				ProcCur.ProcFee=insfee;
+			}
+			ProcCur.Note="";
 			//dx
 			//nextaptnum
 			ProcCur.DateEntryC=DateTime.Now;
@@ -2222,15 +2222,22 @@ namespace OpenDental{
 				else {
 					feeSch=Fees.GetFeeSched(pat,PlanList,PatPlanList,SubList);
 				}
-				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
+				if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault==0) {//Override ProvNum if there is a default provider for this proc
+					ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;//Normal behavior
 				}
 				else {
-					insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
+					ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;//New behavior for procs with default provider
+				}
+				ProcCur.ClinicNum=AptCur.ClinicNum;
+				//Get the fee amount for medical or dental.
+				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
+					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+				}
+				else {
+					insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				if(priplan!=null && priplan.PlanType=="p") {//PPO
-					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched);
+					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
 					if(standardfee>insfee) {
 						ProcCur.ProcFee=standardfee;
 					}
@@ -2247,14 +2254,7 @@ namespace OpenDental{
 				//priority
 				ProcCur.ProcStatus=ProcStat.TP;
 				//procnote
-				if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault==0) {//Override ProvNum if there is a default provider for this proc
-					ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;//Normal behavior
-				}
-				else {
-					ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;//New behavior for procs with default provider
-				}
 				//Dx
-				ProcCur.ClinicNum=AptCur.ClinicNum;
 				ProcCur.SiteNum=pat.SiteNum;
 				ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
 				if(AptCur.AptStatus==ApptStatus.Planned) {

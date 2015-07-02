@@ -1746,6 +1746,7 @@ namespace OpenDental{
 			this.butPickSecondary.Size = new System.Drawing.Size(23, 21);
 			this.butPickSecondary.TabIndex = 45;
 			this.butPickSecondary.Text = "...";
+			this.butPickSecondary.Click += new System.EventHandler(this.butPickSecondary_Click);
 			// 
 			// comboBillType
 			// 
@@ -1769,6 +1770,7 @@ namespace OpenDental{
 			this.butPickPrimary.Size = new System.Drawing.Size(23, 21);
 			this.butPickPrimary.TabIndex = 43;
 			this.butPickPrimary.Text = "...";
+			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
 			// 
 			// label1
 			// 

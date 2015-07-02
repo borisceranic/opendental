@@ -2145,7 +2145,7 @@ namespace OpenDentBusiness {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
 			}
-			command="SELECT FeeNum,FeeSched,CodeNum,Amount FROM fee GROUP BY FeeSched,CodeNum HAVING COUNT(CodeNum)>1";
+			command="SELECT FeeNum,FeeSched,CodeNum,Amount,ClinicNum,ProvNum FROM fee GROUP BY FeeSched,CodeNum,ClinicNum,ProvNum HAVING COUNT(CodeNum)>1";
 			table=Db.GetTable(command);
 			int count=table.Rows.Count;
 			string log="";
@@ -2167,11 +2167,13 @@ namespace OpenDentBusiness {
 					//At least one fee needs to stay.  Each row in table is a random fee, so we'll just keep that one and delete the rest.
 					command="DELETE FROM fee WHERE FeeSched="+table.Rows[i]["FeeSched"].ToString()
 						+" AND CodeNum="+table.Rows[i]["CodeNum"].ToString()
+						+" AND ClinicNum="+table.Rows[i]["ClinicNum"].ToString()
+						+" AND ProvNum="+table.Rows[i]["ProvNum"].ToString()
 						+" AND FeeNum!="+table.Rows[i]["FeeNum"].ToString();//This is the random fee we will keep.
 					numberFixed+=Db.NonQ(command);
 				}
 				if(numberFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Duplicate fees deleted: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Duplicate fees deleted")+": "+numberFixed.ToString()+"\r\n";
 				}
 			}
 			return log;

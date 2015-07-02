@@ -747,11 +747,13 @@ namespace OpenDental
 				if(codeNum==0){
 					continue;
 				}
-				FeeCur=Fees.GetFee(codeNum,feeSched);
+				FeeCur=Fees.GetFee(codeNum,feeSched,proc.ClinicNum,proc.ProvNum);
 				if(FeeCur==null){
 					FeeCur=new Fee();
 					FeeCur.FeeSched=feeSched;
 					FeeCur.CodeNum=codeNum;
+					FeeCur.ClinicNum=proc.ClinicNum;
+					FeeCur.ProvNum=proc.ProvNum;
 					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
 					Fees.Insert(FeeCur);
 				}
@@ -763,7 +765,6 @@ namespace OpenDental
 					+", "+Lan.g(this,"Fee: ")+""+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(FeeCur.FeeSched)
 					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),FeeCur.CodeNum);
 			}
-			//Fees.Refresh();//redundant?
 			DataValid.SetInvalid(InvalidType.Fees);
 		}
 

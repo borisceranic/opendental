@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>
@@ -25,6 +26,7 @@ namespace OpenDental{
 		private CheckBox checkIsGlobal;
 		public FeeSched FeeSchedCur;
 		public Clinic ClinicCur;
+		public List<FeeSched> ListFeeScheds;
 
 		///<summary></summary>
 		public FormFeeSchedEdit()
@@ -214,16 +216,15 @@ namespace OpenDental{
 
 		private void checkIsGlobal_Click(object sender,EventArgs e) {
 			if(checkIsGlobal.Checked) {//Checking IsGlobal (They want to delete their local fees for the feeschedule and use the HQ ones)
-				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Checking this option will use the global HQ fees and delete any clinic specific fees.  Are you sure?")) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Checking this option will use the global HQ fees and hide any clinic or provider specific fees.  Are you sure?")) {
 					checkIsGlobal.Checked=false;
 				}
 			}
 			else {//Unchecking IsGlobal (They want to create local fees for the feeschedule and override the HQ ones)
-				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Unchecking this option will override the global HQ fees with the clinic fees for this fee schedule.  Are you sure?")){
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Unchecking this option will override the global HQ fees with the clinic or provider fees for this fee schedule.  Are you sure?")){
 					checkIsGlobal.Checked=true;
 				}
 			}
-		
 		}
 
 		private void checkIsHidden_Click(object sender,EventArgs e) {
@@ -259,20 +260,8 @@ namespace OpenDental{
 			FeeSchedCur.IsHidden=checkIsHidden.Checked;
 			bool isGlobalOld=FeeSchedCur.IsGlobal;
 			FeeSchedCur.IsGlobal=checkIsGlobal.Checked;
-			try{
-				if(FeeSchedCur.IsNew) {
-					FeeScheds.Insert(FeeSchedCur);
-				}
-				else {
-					FeeScheds.Update(FeeSchedCur);
-				}
-			}
-			catch(Exception ex){
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			if(!isGlobalOld && FeeSchedCur.IsGlobal) {//Feesched was clinic specific and now it isn't. Delete non-HQ clinic fees for this feesched.
-				Fees.DeleteNonHQFeesForSched(FeeSchedCur.FeeSchedNum);
+			if(FeeSchedCur.IsNew) {
+				ListFeeScheds.Add(FeeSchedCur);
 			}
 			if(isGlobalOld!=FeeSchedCur.IsGlobal) {
 				string log="Edited Fee Schedule \""+textDescription.Text+"\": Changed \"Use Headquarter's Fees\" from ";

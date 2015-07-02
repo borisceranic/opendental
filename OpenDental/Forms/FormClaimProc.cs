@@ -1506,8 +1506,8 @@ namespace OpenDental
 				long insFeeSch = Fees.GetFeeSched(PatCur, PlanList, PatPlanList,SubList);
 				long standFeeSch = Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched;
 				if(plan.PlanType=="p"){//if ppo
-					double insFee = Fees.GetAmount0(proc.CodeNum, insFeeSch);
-					double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched);
+					double insFee=Fees.GetAmount0(proc.CodeNum, insFeeSch,proc.ClinicNum,proc.ProvNum);
+					double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,proc.ClinicNum,proc.ProvNum);
 					if(insFee>standardfee) {//if ppo fee is higher than the standard fee (unusual)
 						textFeeSched.Text=FeeScheds.GetDescription(insFeeSch);
 					}
@@ -1599,7 +1599,7 @@ namespace OpenDental
 			if(IsProc){
 				InsPlan plan=InsPlans.GetPlan(ClaimProcCur.PlanNum,PlanList);
 				CarrierAllowedAmount=InsPlans.GetAllowed(ProcedureCodes.GetStringProcCode(proc.CodeNum),plan.FeeSched,plan.AllowedFeeSched,
-					plan.CodeSubstNone,plan.PlanType,proc.ToothNum,ClaimProcCur.ProvNum);
+					plan.CodeSubstNone,plan.PlanType,proc.ToothNum,proc.ProvNum,proc.ClinicNum);
 				if(CarrierAllowedAmount==-1){
 					textCarrierAllowed.Text="";
 				}
@@ -1640,12 +1640,14 @@ namespace OpenDental
 				MsgBox.Show(this,"Allowed fee schedule is hidden, so no changes can be made.");
 				return;
 			}
-			Fee FeeCur=Fees.GetFee(proc.CodeNum,feeSched);
+			Fee FeeCur=Fees.GetFee(proc.CodeNum,feeSched,proc.ClinicNum,proc.ProvNum);
 			FormFeeEdit FormFE=new FormFeeEdit();
 			if(FeeCur==null){
 				FeeCur=new Fee();
 				FeeCur.FeeSched=feeSched;
 				FeeCur.CodeNum=proc.CodeNum;
+				FeeCur.ClinicNum=proc.ClinicNum;
+				FeeCur.ProvNum=proc.ProvNum;
 				Fees.Insert(FeeCur);
 				//SecurityLog is updated in FormFeeEdit.
 				FormFE.IsNew=true;

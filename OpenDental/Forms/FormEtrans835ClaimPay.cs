@@ -849,11 +849,13 @@ namespace OpenDental {
 				if(codeNum==0){
 					continue;
 				}
-				feeCur=Fees.GetFee(codeNum,feeSched);
+				feeCur=Fees.GetFee(codeNum,feeSched,proc.ClinicNum,proc.ProvNum);
 				if(feeCur==null){
 					feeCur=new Fee();
 					feeCur.FeeSched=feeSched;
 					feeCur.CodeNum=codeNum;
+					feeCur.ClinicNum=proc.ClinicNum;
+					feeCur.ProvNum=proc.ProvNum;
 					feeCur.Amount=PIn.Double(gridPayments.Rows[i].Cells[7].Text);
 					Fees.Insert(feeCur);
 				}

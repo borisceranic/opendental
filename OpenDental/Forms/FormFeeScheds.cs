@@ -28,10 +28,15 @@ namespace OpenDental{
 		private Label label6;
 		private Label label1;
 		private OpenDental.UI.Button butSort;
-		private Label label2;
+		private Label labelSort;
 		private Label labelCleanUp;
 		private UI.Button butCleanUp;
-		private List<FeeSched> FeeSchedsForType;
+		private List<FeeSched> _listFeeSchedsForType;
+		///<summary>Set this list prior to loading this window to use a custom list of fee schedules.  Otherwise, uses the cache.</summary>
+		public List<FeeSched> ListFeeScheds;
+		public bool IsSelectionMode;
+		private UI.Button butOK;
+		public long SelectedFeeSchedNum;
 
 		///<summary></summary>
 		public FormFeeScheds()
@@ -72,7 +77,7 @@ namespace OpenDental{
 			this.label6 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.label2 = new System.Windows.Forms.Label();
+			this.labelSort = new System.Windows.Forms.Label();
 			this.labelCleanUp = new System.Windows.Forms.Label();
 			this.butCleanUp = new OpenDental.UI.Button();
 			this.butSort = new OpenDental.UI.Button();
@@ -80,6 +85,7 @@ namespace OpenDental{
 			this.butUp = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
 			this.groupBox7.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -138,6 +144,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(17, 12);
 			this.gridMain.Name = "gridMain";
@@ -148,13 +155,13 @@ namespace OpenDental{
 			this.gridMain.TranslationName = "TableFeeScheds";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
-			// label2
+			// labelSort
 			// 
-			this.label2.Location = new System.Drawing.Point(315, 241);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(123, 44);
-			this.label2.TabIndex = 20;
-			this.label2.Text = "Sorts by type and alphabetically";
+			this.labelSort.Location = new System.Drawing.Point(315, 241);
+			this.labelSort.Name = "labelSort";
+			this.labelSort.Size = new System.Drawing.Size(123, 44);
+			this.labelSort.TabIndex = 20;
+			this.labelSort.Text = "Sorts by type and alphabetically";
 			// 
 			// labelCleanUp
 			// 
@@ -257,13 +264,30 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(412, 570);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 24);
+			this.butOK.TabIndex = 23;
+			this.butOK.Text = "&OK";
+			this.butOK.Visible = false;
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
 			// FormFeeScheds
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(515, 644);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.labelCleanUp);
 			this.Controls.Add(this.butCleanUp);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.labelSort);
 			this.Controls.Add(this.butSort);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.groupBox7);
@@ -289,7 +313,10 @@ namespace OpenDental{
 		#endregion
 
 		private void FormFeeSchedules_Load(object sender, System.EventArgs e) {
-			listType.Items.Add(Lan.g(this,"all"));
+			if(ListFeeScheds==null) {
+				ListFeeScheds=FeeSchedC.GetListLong();
+			}
+			listType.Items.Add(Lan.g(this,"All"));
 			Array arrayValues=Enum.GetValues(typeof(FeeScheduleType));
 			for(int i=0;i<arrayValues.Length;i++) {
 				FeeScheduleType feeSchedType=((FeeScheduleType)arrayValues.GetValue(i));
@@ -305,31 +332,28 @@ namespace OpenDental{
 				butCleanUp.Visible=false;
 				labelCleanUp.Visible=false;
 			}
+			if(IsSelectionMode) {
+				butOK.Visible=true;
+				butUp.Visible=false;
+				butDown.Visible=false;
+				butSort.Visible=false;
+				labelSort.Visible=false;
+				butAdd.Visible=false;
+				butCleanUp.Visible=false;
+				labelCleanUp.Visible=false;
+				groupBox7.Visible=false;
+			}
 			FillGrid();
 		}
 
 		private void FillGrid(){
-			FeeScheds.RefreshCache();
-			if(listType.SelectedIndex==0){
-				FeeSchedsForType=new List<FeeSched>(FeeSchedC.ListLong);
-				//synch the itemorders just in case
-				bool outOfSynch=false;
-				for(int i=0;i<FeeSchedsForType.Count;i++){
-					if(FeeSchedsForType[i].ItemOrder!=i){
-						FeeSchedsForType[i].ItemOrder=i;
-						FeeScheds.Update(FeeSchedsForType[i]);
-						outOfSynch=true;
-						changed=true;
-					}
-				}
-				if(outOfSynch){
-					FeeScheds.RefreshCache();
-					FeeSchedsForType=new List<FeeSched>(FeeSchedC.ListLong);
-				}
+			if(listType.SelectedIndex==0){ //All option
+				_listFeeSchedsForType=ListFeeScheds;
 			}
 			else{
-				FeeSchedsForType=FeeScheds.GetListForType((FeeScheduleType)(listType.SelectedIndex-1),true);
+				_listFeeSchedsForType=FeeScheds.GetListForType((FeeScheduleType)(listType.SelectedIndex-1),true,ListFeeScheds);
 			}
+			_listFeeSchedsForType.Sort(CompareItemOrder);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableFeeScheds","Description"),145);
@@ -340,11 +364,15 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<FeeSchedsForType.Count;i++){
+			for(int i=0;i<_listFeeSchedsForType.Count;i++){
+				if(IsSelectionMode && _listFeeSchedsForType[i].IsHidden) {
+					continue;
+				}
 				row=new ODGridRow();
-				row.Cells.Add(FeeSchedsForType[i].Description);
-				row.Cells.Add(FeeSchedsForType[i].FeeSchedType.ToString());
-				if(FeeSchedsForType[i].IsHidden){
+				row.Tag=_listFeeSchedsForType[i];
+				row.Cells.Add(_listFeeSchedsForType[i].Description);
+				row.Cells.Add(_listFeeSchedsForType[i].FeeSchedType.ToString());
+				if(_listFeeSchedsForType[i].IsHidden){
 					row.Cells.Add("X");
 				}
 				else{
@@ -359,28 +387,34 @@ namespace OpenDental{
 			FormFeeSchedEdit FormF=new FormFeeSchedEdit();
 			FormF.FeeSchedCur=new FeeSched();
 			FormF.FeeSchedCur.IsNew=true;
-			FormF.FeeSchedCur.ItemOrder=FeeSchedC.ListLong.Count;
+			FormF.FeeSchedCur.ItemOrder=ListFeeScheds.Count;
+			FormF.ListFeeScheds=ListFeeScheds;
 			if(listType.SelectedIndex>0){
 				FormF.FeeSchedCur.FeeSchedType=(FeeScheduleType)(listType.SelectedIndex-1);
 			}
 			FormF.ShowDialog();
 			FillGrid();
 			changed=true;
-			for(int i=0;i<FeeSchedsForType.Count;i++){
-				if(FormF.FeeSchedCur.FeeSchedNum==FeeSchedsForType[i].FeeSchedNum){
+			for(int i=0;i<_listFeeSchedsForType.Count;i++){
+				if(FormF.FeeSchedCur.FeeSchedNum==_listFeeSchedsForType[i].FeeSchedNum){
 					gridMain.SetSelected(i,true);
 				}
 			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(IsSelectionMode) {
+				SelectedFeeSchedNum=((FeeSched)gridMain.Rows[e.Row].Tag).FeeSchedNum;
+				DialogResult=DialogResult.OK;
+				return;
+			}
 			FormFeeSchedEdit FormF=new FormFeeSchedEdit();
-			FormF.FeeSchedCur=FeeSchedsForType[e.Row];
+			FormF.FeeSchedCur=_listFeeSchedsForType[e.Row];
 			FormF.ShowDialog();
 			FillGrid();
 			changed=true;
-			for(int i=0;i<FeeSchedsForType.Count;i++){
-				if(FormF.FeeSchedCur.FeeSchedNum==FeeSchedsForType[i].FeeSchedNum){
+			for(int i=0;i<_listFeeSchedsForType.Count;i++){
+				if(FormF.FeeSchedCur.FeeSchedNum==_listFeeSchedsForType[i].FeeSchedNum){
 					gridMain.SetSelected(i,true);
 				}
 			}
@@ -406,12 +440,10 @@ namespace OpenDental{
 				return;
 			}
 			//swap the orders.  This makes it work no matter which types are being viewed.
-			int order1=FeeSchedsForType[idx-1].ItemOrder;
-			int order2=FeeSchedsForType[idx].ItemOrder;
-			FeeSchedsForType[idx-1].ItemOrder=order2;
-			FeeScheds.Update(FeeSchedsForType[idx-1]);
-			FeeSchedsForType[idx].ItemOrder=order1;
-			FeeScheds.Update(FeeSchedsForType[idx]);
+			int order1=_listFeeSchedsForType[idx-1].ItemOrder;
+			int order2=_listFeeSchedsForType[idx].ItemOrder;
+			_listFeeSchedsForType[idx-1].ItemOrder=order2;
+			_listFeeSchedsForType[idx].ItemOrder=order1;
 			changed=true;
 			FillGrid();
 			gridMain.SetSelected(idx-1,true);
@@ -423,15 +455,13 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a fee schedule first.");
 				return;
 			}
-			if(idx==FeeSchedsForType.Count-1){
+			if(idx==_listFeeSchedsForType.Count-1){
 				return;
 			}
-			int order1=FeeSchedsForType[idx].ItemOrder;
-			int order2=FeeSchedsForType[idx+1].ItemOrder;
-			FeeSchedsForType[idx].ItemOrder=order2;
-			FeeScheds.Update(FeeSchedsForType[idx]);
-			FeeSchedsForType[idx+1].ItemOrder=order1;
-			FeeScheds.Update(FeeSchedsForType[idx+1]);
+			int order1=_listFeeSchedsForType[idx].ItemOrder;
+			int order2=_listFeeSchedsForType[idx+1].ItemOrder;
+			_listFeeSchedsForType[idx].ItemOrder=order2;
+			_listFeeSchedsForType[idx+1].ItemOrder=order1;
 			changed=true;
 			FillGrid();
 			gridMain.SetSelected(idx+1,true);
@@ -440,15 +470,19 @@ namespace OpenDental{
 		private void butSort_Click(object sender,EventArgs e) {
 			//only enabled if viewing all types
 			//FeeSchedComparer comparer=new FeeSchedComparer();
-			FeeSchedsForType.Sort(CompareFeeScheds);
-			for(int i=0;i<FeeSchedsForType.Count;i++){
-				if(FeeSchedsForType[i].ItemOrder!=i){
-					FeeSchedsForType[i].ItemOrder=i;
-					FeeScheds.Update(FeeSchedsForType[i]);
+			_listFeeSchedsForType.Sort(CompareFeeScheds);
+			for(int i=0;i<_listFeeSchedsForType.Count;i++) {
+				if(_listFeeSchedsForType[i].ItemOrder!=i) {
+					_listFeeSchedsForType[i].ItemOrder=i;
 				}
 			}
 			changed=true;
 			FillGrid();
+		}
+
+		///<summary>This sorts feescheds by their item order.</summary>
+		private static int CompareItemOrder(FeeSched feeSched1,FeeSched feeSched2) {
+			return feeSched1.ItemOrder.CompareTo(feeSched2.ItemOrder);
 		}
 
 		///<summary>This sorts feescheds by type and alphabetically.</summary>
@@ -476,12 +510,21 @@ namespace OpenDental{
 			//DialogResult=DialogResult.OK;
 		}
 
+		private void butOK_Click(object sender,EventArgs e) {
+			if(IsSelectionMode && gridMain.SelectedIndices.Length>0) {
+				SelectedFeeSchedNum=((FeeSched)gridMain.Rows[gridMain.GetSelectedIndex()].Tag).FeeSchedNum;
+			}
+			Close();
+		}
+
 		private void butClose_Click(object sender, System.EventArgs e) {
+			SelectedFeeSchedNum=0;
 			Close();
 		}
 
 		private void FormFeeSchedules_FormClosing(object sender,FormClosingEventArgs e) {
 			if(changed){
+				FeeScheds.Sync(ListFeeScheds);
 				DataValid.SetInvalid(InvalidType.FeeScheds);
 			}
 		}
@@ -491,10 +534,11 @@ namespace OpenDental{
 				return;
 			}
 			long changed=FeeScheds.CleanupAllowedScheds();
-			MessageBox.Show(changed.ToString()+Lan.g(this," unused fee schedules deleted."));
+			MessageBox.Show(changed.ToString()+" "+Lan.g(this,"unused fee schedules deleted."));
+			FeeScheds.RefreshCache();
+			ListFeeScheds=FeeSchedC.GetListLong();  //After deletion, refresh in-memory copy to continue editing.
 			FillGrid();
 		}
-
 		
 
 		

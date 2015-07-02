@@ -153,15 +153,22 @@ namespace OpenDental {
 			else {
 				feeSch=Fees.GetFeeSched(pat,planList,patPlanList,subList);
 			}
-			//Get the fee amount for medical or dental.
-			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
+			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && pat.SecProv != 0) {
+				ProcCur.ProvNum=pat.SecProv;
 			}
 			else {
-				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
+				ProcCur.ProvNum=pat.PriProv;
+			}
+			ProcCur.ClinicNum=pat.ClinicNum;
+			//Get the fee amount for medical or dental.
+			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
+				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+			}
+			else {
+				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 			}
 			if(priplan!=null && priplan.PlanType=="p") {//PPO
-				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched);
+				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
 				if(standardfee>insfee) {
 					ProcCur.ProcFee=standardfee;
 				}
@@ -178,15 +185,7 @@ namespace OpenDental {
 			//ProcCur.NoBillIns=ProcedureCodes.GetProcCode(ProcCur.ProcCode).NoBillIns;
 			ProcCur.Priority=0;
 			ProcCur.ProcStatus=ProcStat.TP;
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene
-				&& pat.SecProv != 0){
-				ProcCur.ProvNum=pat.SecProv;
-			}
-			else{
-				ProcCur.ProvNum=pat.PriProv;
-			}
 			ProcCur.Note="";
-			ProcCur.ClinicNum=pat.ClinicNum;
 			//dx
 			//nextaptnum
 			ProcCur.DateEntryC=DateTime.Now;

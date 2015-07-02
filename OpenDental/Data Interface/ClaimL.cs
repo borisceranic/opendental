@@ -98,7 +98,7 @@ namespace OpenDental{
 						provNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
 					}
 					//get the fee based on code and prov fee sched
-					double feebilled=Fees.GetAmount0(ProcCur.CodeNum,ProviderC.ListLong[Providers.GetIndexLong(provNum)].FeeSched);
+					double feebilled=Fees.GetAmount0(ProcCur.CodeNum,ProviderC.ListLong[Providers.GetIndexLong(provNum)].FeeSched,ProcCur.ClinicNum,provNum);
 					if(feebilled > ProcCur.ProcFee) {
 						ClaimProcsForClaim[i].FeeBilled=qty*feebilled;
 					}

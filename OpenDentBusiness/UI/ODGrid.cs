@@ -91,7 +91,7 @@ namespace OpenDental.UI {
 		private int RowsPrinted;
 		///<summary>If we are part way through drawing a note when we reach the end of a page, this will contain the remainder of the note still to be printed.  If it is empty string, then we are not in the middle of a note.</summary>
 		private string NoteRemaining;
-		private Point oldSelectedCell;
+		private Point SelectedCellOld;
 		///<summary>Holds the amount of the grid that is hidden due to the user making the window too small.  We need to keep track of this so that when they resize the window the scroll bar will become visible again.</summary>
 		private int widthHidden;
 		///<summary>Is set when ComputeRows is called, then used . If any columns are editable HasEditableColumn is true.</summary>
@@ -2575,12 +2575,12 @@ namespace OpenDental.UI {
 			}
 			editBox.Focus();
 			//Set the cell of the current editBox so that the value of that cell is saved when it looses focus (used for mouse click).
-			oldSelectedCell=new Point(selectedCell.X,selectedCell.Y);
+			SelectedCellOld=new Point(selectedCell.X,selectedCell.Y);
 		}
 
 		void editBox_LostFocus(object sender,EventArgs e) {
 			//editBox_Leave wouldn't catch all scenarios
-			OnCellLeave(oldSelectedCell.X,oldSelectedCell.Y);//this is the only place where OnCellLeave gets called.
+			OnCellLeave(SelectedCellOld.X,SelectedCellOld.Y);//this is the only place where OnCellLeave gets called.
 			if(!editBox.Disposing || !editBox.IsDisposed) {
 				editBox.Dispose();
 				editBox=null;
@@ -2588,7 +2588,7 @@ namespace OpenDental.UI {
 		}
 
 		void editBox_GotFocus(object sender,EventArgs e) {
-			OnCellEnter(oldSelectedCell.X,oldSelectedCell.Y);//this is the only place where OnCellEnter gets called.
+			OnCellEnter(SelectedCellOld.X,SelectedCellOld.Y);//this is the only place where OnCellEnter gets called.
 		}
 
 		void editBox_KeyDown(object sender,KeyEventArgs e) {
@@ -2606,11 +2606,10 @@ namespace OpenDental.UI {
 				if(editableAcceptsCR) {//When multiline it moves down inside the text instead of down to the next cell.
 					return;
 				}
-				if(selectedCell.Y<rows.Count-1) {
+				if(SelectedCellOld.Y<rows.Count-1) {
 					editBox.Dispose();
 					editBox=null;
-					//OnCellLeave(selectedCell.X,selectedCell.Y);
-					selectedCell=new Point(selectedCell.X,selectedCell.Y+1);
+					selectedCell=new Point(SelectedCellOld.X,SelectedCellOld.Y+1);
 					CreateEditBox();
 				}
 			}
@@ -2618,11 +2617,10 @@ namespace OpenDental.UI {
 				if(editableAcceptsCR) {//When multiline it moves up inside the text instead of up to the next cell.
 					return;
 				}
-				if(selectedCell.Y>0) {
+				if(SelectedCellOld.Y>0) {
 					editBox.Dispose();
 					editBox=null;
-					//OnCellLeave(selectedCell.X,selectedCell.Y);
-					selectedCell=new Point(selectedCell.X,selectedCell.Y-1);
+					selectedCell=new Point(SelectedCellOld.X,SelectedCellOld.Y-1);
 					CreateEditBox();
 				}
 			}
@@ -2636,19 +2634,19 @@ namespace OpenDental.UI {
 			editBox=null;
 			//find the next editable cell to the right.
 			int nextCellToRight=-1;
-			for(int i=oldSelectedCell.X+1;i<columns.Count;i++) {
+			for(int i=SelectedCellOld.X+1;i<columns.Count;i++) {
 				if(columns[i].IsEditable) {
 					nextCellToRight=i;
 					break;
 				}
 			}
 			if(nextCellToRight!=-1) {
-				selectedCell=new Point(nextCellToRight,oldSelectedCell.Y);
+				selectedCell=new Point(nextCellToRight,SelectedCellOld.Y);
 				CreateEditBox();
 				return;
 			}
 			//can't move to the right, so attempt to move down.
-			if(oldSelectedCell.Y==rows.Count-1) {
+			if(SelectedCellOld.Y==rows.Count-1) {
 				return;//can't move down
 			}
 			nextCellToRight=-1;
@@ -2659,7 +2657,7 @@ namespace OpenDental.UI {
 				}
 			}
 			//guaranteed to have a value
-			selectedCell=new Point(nextCellToRight,oldSelectedCell.Y+1);
+			selectedCell=new Point(nextCellToRight,SelectedCellOld.Y+1);
 			CreateEditBox();
 		}
 		

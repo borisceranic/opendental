@@ -6640,6 +6640,18 @@ namespace OpenDental{
 				ProcCur.ProcDate=PIn.Date(textDate.Text);
 			}
 			ProcCur.DateTP=ProcCur.ProcDate;
+			long provPri=PatCur.PriProv;
+			long provSec=PatCur.SecProv;
+			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && provSec != 0) {
+				ProcCur.ProvNum=provSec;
+			}
+			else {
+				ProcCur.ProvNum=provPri;
+			}
+			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
+				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
+			}
+			ProcCur.ClinicNum=PatCur.ClinicNum;
 			if(newStatus==ProcStat.R || newStatus==ProcStat.EO || newStatus==ProcStat.EC) {
 				ProcCur.ProcFee=0;
 			}
@@ -6668,13 +6680,13 @@ namespace OpenDental{
 				}
 				//Get the fee amount for medical or dental.
 				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && hasMedCode) {
-					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
+					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				else {
-					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
+					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !(hasMedCode && insPlanPrimary.IsMedical)) {//PPO
-					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched);
+					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
 					if(provFee>procFee) {
 						ProcCur.ProcFee=provFee;
 					}
@@ -6699,8 +6711,6 @@ namespace OpenDental{
 				ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
 			}
 			ProcCur.ProcStatus=newStatus;
-			long provPri=PatCur.PriProv;
-			long provSec=PatCur.SecProv;
 			for(int i=0;i<ApptList.Length;i++) {
 				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
 					provPri=ApptList[i].ProvNum;
@@ -6708,24 +6718,12 @@ namespace OpenDental{
 					break;
 				}
 			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene
-				&& provSec != 0)
-			{
-				ProcCur.ProvNum=provSec;
-			}
-			else{
-				ProcCur.ProvNum=provPri;
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
-				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
-			}
 			if(newStatus==ProcStat.C) {
 				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
 			}
 			else {
 				ProcCur.Note="";
 			}
-			ProcCur.ClinicNum=PatCur.ClinicNum;
 			if(listDx.SelectedIndex!=-1) {
 				ProcCur.Dx=DefC.Short[(int)DefCat.Diagnosis][listDx.SelectedIndex].DefNum;
 			}
@@ -6796,6 +6794,31 @@ namespace OpenDental{
 				ProcCur.ProcDate=PIn.Date(textDate.Text);
 			}
 			ProcCur.DateTP=ProcCur.ProcDate;
+			long provPri=PatCur.PriProv;
+			long provSec=PatCur.SecProv;
+			for(int i=0;i<ApptList.Length;i++) {
+				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
+					provPri=ApptList[i].ProvNum;
+					provSec=ApptList[i].ProvHyg;
+					break;
+				}
+			}
+			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && provSec != 0) {
+				ProcCur.ProvNum=provSec;
+			}
+			else {
+				ProcCur.ProvNum=provPri;
+			}
+			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
+				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
+			}
+			if(newStatus==ProcStat.C) {
+				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
+			}
+			else {
+				ProcCur.Note="";
+			}
+			ProcCur.ClinicNum=PatCur.ClinicNum;
 			if(newStatus==ProcStat.R || newStatus==ProcStat.EO || newStatus==ProcStat.EC) {
 				ProcCur.ProcFee=0;
 			}
@@ -6823,13 +6846,13 @@ namespace OpenDental{
 				}
 				//Get the fee amount for medical or dental.
 				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && hasMedCode) {
-					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch);
+					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				else {
-					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch);
+					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !(hasMedCode && insPlanPrimary.IsMedical)) {//PPO
-					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched);
+					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
 					if(provFee>procFee) {
 						ProcCur.ProcFee=provFee;
 					}
@@ -6851,32 +6874,6 @@ namespace OpenDental{
 				ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
 			}
 			ProcCur.ProcStatus=newStatus;
-			long provPri=PatCur.PriProv;
-			long provSec=PatCur.SecProv;
-			for(int i=0;i<ApptList.Length;i++) {
-				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
-					provPri=ApptList[i].ProvNum;
-					provSec=ApptList[i].ProvHyg;
-					break;
-				}
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene
-				&& provSec != 0) {
-				ProcCur.ProvNum=provSec;
-			}
-			else {
-				ProcCur.ProvNum=provPri;
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
-				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
-			}
-			if(newStatus==ProcStat.C) {
-				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
-			}
-			else {
-				ProcCur.Note="";
-			}
-			ProcCur.ClinicNum=PatCur.ClinicNum;
 			if(listDx.SelectedIndex!=-1) {
 				ProcCur.Dx=DefC.Short[(int)DefCat.Diagnosis][listDx.SelectedIndex].DefNum;
 			}

@@ -195,7 +195,7 @@ namespace OpenDentBusiness{
 		TreatPlanDiscountEdit,
 		///<summary>83- There is no user interface in the security window for this permission.  It is only used for tracking.</summary>
 		UserLogOnOff,
-		///<summary>84- There is no user interface in the sercurity window for this permission.</summary>
+		///<summary>84- Allows user to edit other users' tasks.</summary>
 		TaskEdit,
 		///<summary>85- Allows user to send unsecured email</summary>
 		EmailSend,
@@ -212,7 +212,9 @@ namespace OpenDentBusiness{
 		///<summary>91- Allows users to edit settings in the eServices Setup window.  Also causes the Listener Service monitor thread to start upon logging in.</summary>
 		EServicesSetup,
 		///<summary>92- There is no user interface in the security window for this permission.  It is only used for tracking.  Tracks editing of fee schedule properties.</summary>
-		FeeSchedEdit
+		FeeSchedEdit,
+		///<summary>93- Allows user to edit and delete provider specific fees overrides.</summary>
+		ProviderFeeEdit
 	}
 
 	

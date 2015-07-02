@@ -1784,10 +1784,10 @@ namespace OpenDentBusiness.HL7 {
 			//Get the fee amount for medical or dental
 			double insfee;
 			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetCodeNum(procCur.MedicalCode),feeSch);
+				insfee=Fees.GetAmount0(ProcedureCodes.GetCodeNum(procCur.MedicalCode),feeSch,procCur.ClinicNum,procCur.ProvNum);
 			}
 			else {
-				insfee=Fees.GetAmount0(procCode.CodeNum,feeSch);
+				insfee=Fees.GetAmount0(procCode.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 			}
 			InsPlan priplan=null;
 			if(listPatPlan.Count>0) {
@@ -1798,7 +1798,7 @@ namespace OpenDentBusiness.HL7 {
 				if(patProv==null) {
 					patProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 				}
-				double standardFee=Fees.GetAmount0(procCode.CodeNum,patProv.FeeSched);
+				double standardFee=Fees.GetAmount0(procCode.CodeNum,patProv.FeeSched,procCur.ClinicNum,procCur.ProvNum);
 				if(standardFee>insfee) {
 					procCur.ProcFee=standardFee;
 				}

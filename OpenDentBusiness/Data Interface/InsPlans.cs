@@ -839,35 +839,8 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		//public static int GenerateOneAllowedFeeSchedule(){
-
-		//}
-
 		///<summary>Returns -1 if no copay feeschedule.  Can return -1 if copay amount is blank.</summary>
-		public static double GetCopay(string myCode,InsPlan plan) {
-			//No need to check RemotingRole; no call to db.
-			if(plan==null) {
-				return -1;
-			}
-			if(plan.CopayFeeSched==0) {
-				return -1;
-			}
-			double retVal=Fees.GetAmount(ProcedureCodes.GetCodeNum(myCode),plan.CopayFeeSched);
-			if(retVal==-1) {//blank co-pay
-				if(PrefC.GetBool(PrefName.CoPay_FeeSchedule_BlankLikeZero)) {
-					return -1;//will act like zero.  No patient co-pay.
-				} 
-				else {
-					//The amount from the regular fee schedule
-					//In other words, the patient is responsible for procs that are not specified in a managed care fee schedule.
-					return Fees.GetAmount(ProcedureCodes.GetCodeNum(myCode),plan.FeeSched);
-				}
-			}
-			return retVal;
-		}
-
-		///<summary>Returns -1 if no copay feeschedule.  Can return -1 if copay amount is blank.</summary>
-		public static double GetCopay(long codeNum,long feeSched,long copayFeeSched,bool codeSubstNone,string toothNum) {
+		public static double GetCopay(long codeNum,long feeSched,long copayFeeSched,bool codeSubstNone,string toothNum,long clinicNum,long provNum) {
 			//No need to check RemotingRole; no call to db.
 			if(copayFeeSched==0) {
 				return -1;
@@ -878,7 +851,7 @@ namespace OpenDentBusiness {
 				//Plan allows substitution codes.  Get the substitution code if one exists.
 				substCodeNum=ProcedureCodes.GetSubstituteCodeNum(ProcedureCodes.GetStringProcCode(codeNum),toothNum);//for posterior composites
 			}
-			double retVal=Fees.GetAmount(substCodeNum,copayFeeSched);
+			double retVal=Fees.GetAmount(substCodeNum,copayFeeSched,clinicNum,provNum);
 			if(retVal==-1) {//blank co-pay
 				if(PrefC.GetBool(PrefName.CoPay_FeeSchedule_BlankLikeZero)) {
 					return -1;//will act like zero.  No patient co-pay.
@@ -886,22 +859,15 @@ namespace OpenDentBusiness {
 				else {
 					//The amount from the regular fee schedule
 					//In other words, the patient is responsible for procs that are not specified in a managed care fee schedule.
-					return Fees.GetAmount(substCodeNum,feeSched);
+					return Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
 				}
 			}
 			return retVal;
 		}
 
 		///<summary>Returns -1 if no allowed feeschedule or fee unknown for this procCode. Otherwise, returns the allowed fee including 0. Can handle a planNum of 0.  Tooth num is used for posterior composites.  It can be left blank in some situations.  Provider must be supplied in case plan has no assigned fee schedule.  Then it will use the fee schedule for the provider.</summary>
-		public static double GetAllowed(string procCodeStr,long feeSched,long allowedFeeSched,bool codeSubstNone,string planType,string toothNum,long provNum) {
+		public static double GetAllowed(string procCodeStr,long feeSched,long allowedFeeSched,bool codeSubstNone,string planType,string toothNum,long provNum,long clinicNum) {
 			//No need to check RemotingRole; no call to db.
-			//if(planNum==0) {
-			//	return -1;
-			//}
-			//InsPlan plan=InsPlans.GetPlan(planNum,PlanList);
-			//if(plan==null) {
-			//	return -1;
-			//}
 			long codeNum=ProcedureCodes.GetCodeNum(procCodeStr);
 			long substCodeNum=codeNum;
 			if(!codeSubstNone) {
@@ -909,11 +875,11 @@ namespace OpenDentBusiness {
 			}
 			//PPO always returns the PPO fee for the code or substituted code.
 			if(planType=="p") {
-				return Fees.GetAmount(substCodeNum,feeSched);
+				return Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
 			}
 			//or, if not PPO, and an allowed fee schedule exists, then we use that.
 			if(allowedFeeSched!=0) {
-				return Fees.GetAmount(substCodeNum,allowedFeeSched);//whether post composite or not
+				return Fees.GetAmount(substCodeNum,allowedFeeSched,clinicNum,provNum);//whether post composite or not
 			}
 			//must be an ordinary fee schedule, so if no substitution code, then no allowed override
 			if(codeNum==substCodeNum) {
@@ -923,11 +889,11 @@ namespace OpenDentBusiness {
 			//Although it won't happen very often, it's possible that there is no fee schedule assigned to the plan.
 			if(feeSched==0) {
 				if(provNum==0) {//slight corruption
-					return Fees.GetAmount(substCodeNum,Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv)).FeeSched);
+					return Fees.GetAmount(substCodeNum,Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv)).FeeSched,clinicNum,provNum);
 				}
-				return Fees.GetAmount(substCodeNum,Providers.GetProv(provNum).FeeSched);
+				return Fees.GetAmount(substCodeNum,Providers.GetProv(provNum).FeeSched,clinicNum,provNum);
 			}
-			return Fees.GetAmount(substCodeNum,feeSched);
+			return Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
 		}
 
 

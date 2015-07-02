@@ -10,7 +10,9 @@ namespace OpenDentBusiness{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long FeeNum;
-		///<summary>The amount usually charged.  If an amount is unknown, then the entire Fee entry is deleted from the database.  The absence of a fee is sometimes shown in the user interface as a blank entry, and sometimes as 0.00.</summary>
+		///<summary>The amount usually charged.  If an amount is unknown, then the entire Fee entry is deleted from the database.  
+		///The absence of a fee is shown in the user interface as a blank entry.
+		///For clinic and/or provider fees, amount can be set to -1 which indicates that their fee should be blank and not use the default fee.</summary>
 		public double Amount;
 		///<summary>Do not use.</summary>
 		public string OldCode;
