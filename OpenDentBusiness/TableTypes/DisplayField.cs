@@ -71,7 +71,9 @@ namespace OpenDentBusiness{
 		///<summary>9</summary>
 		AppointmentBubble,
 		///<summary>10- Account module patient information</summary>
-		AccountPatientInformation
+		AccountPatientInformation,
+		///<summary>11</summary>
+		StatementMainGrid
 	}
 	
 

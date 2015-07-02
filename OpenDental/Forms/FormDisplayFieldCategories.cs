@@ -75,7 +75,7 @@ namespace OpenDental{
 			this.listCategory.FormattingEnabled = true;
 			this.listCategory.Location = new System.Drawing.Point(23, 34);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(155, 134);
+			this.listCategory.Size = new System.Drawing.Size(144, 147);
 			this.listCategory.TabIndex = 57;
 			this.listCategory.DoubleClick += new System.EventHandler(this.listCategory_DoubleClick);
 			// 
@@ -87,7 +87,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(92, 183);
+			this.butOK.Location = new System.Drawing.Point(92, 196);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 56;
@@ -102,7 +102,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(173, 183);
+			this.butCancel.Location = new System.Drawing.Point(173, 196);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -112,7 +112,7 @@ namespace OpenDental{
 			// FormDisplayFieldCategories
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(271, 222);
+			this.ClientSize = new System.Drawing.Size(271, 235);
 			this.Controls.Add(this.listCategory);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label1);
@@ -145,6 +145,7 @@ namespace OpenDental{
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientSelect"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ProcedureGroupNote"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","RecallList"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","StatementMainGrid"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","TreatmentPlanModule"));
 			listCategory.SelectedIndex=0;
 		}
@@ -162,7 +163,8 @@ namespace OpenDental{
 				case 6: selectedCategory=DisplayFieldCategory.PatientSelect; break;
 				case 7: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
 				case 8: selectedCategory=DisplayFieldCategory.RecallList; break;
-				case 9: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+				case 9: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
+				case 10: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
 			}
 			if(selectedCategory==DisplayFieldCategory.None) {
 				return;//This could happen if a programmer added a new item to the list and didn't include it in the switch statement above.
@@ -186,7 +188,8 @@ namespace OpenDental{
 				case 6: selectedCategory=DisplayFieldCategory.PatientSelect; break;
 				case 7: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
 				case 8: selectedCategory=DisplayFieldCategory.RecallList; break;
-				case 9: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+				case 9: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
+				case 10: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
 			}
 			if(selectedCategory==DisplayFieldCategory.None) {  //This should never happen
 				return;

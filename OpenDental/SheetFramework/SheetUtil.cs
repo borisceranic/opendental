@@ -459,14 +459,7 @@ namespace OpenDental{
 			List<DisplayField> retVal=new List<DisplayField>();
 			switch(gridType) {
 				case "StatementMain":
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="date",Description="Date",ColumnWidth=75,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="patient",Description="Patient",ColumnWidth=100,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="ProcCode",Description="Code",ColumnWidth=45,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="tth",Description="Tooth",ColumnWidth=45,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="description",Description="Description",ColumnWidth=275,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
-					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
+					retVal=DisplayFields.GetForCategory(DisplayFieldCategory.StatementMainGrid);
 					break;
 				case "StatementEnclosed":
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="AmountDue",Description="Amount Due",ColumnWidth=107,ItemOrder=++i });

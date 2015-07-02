@@ -423,6 +423,11 @@ namespace OpenDental {
 				}
 				#endregion
 				if(listFields.SelectedIndices.Contains(i)) {
+					Columns=SheetUtil.GetGridColumnsAvailable(SheetDefCur.SheetFieldDefs[i].FieldName);
+					SheetDefCur.SheetFieldDefs[i].Width=0;
+					for(int c=0;c<Columns.Count;c++) {
+						SheetDefCur.SheetFieldDefs[i].Width+=Columns[c].ColumnWidth;
+					}	
 					g.DrawRectangle(_argsDF.penRedThick,
 						SheetDefCur.SheetFieldDefs[i].XPos,
 						SheetDefCur.SheetFieldDefs[i].YPos,
