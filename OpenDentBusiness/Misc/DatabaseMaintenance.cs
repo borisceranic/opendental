@@ -3801,6 +3801,34 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string ProcedurecodeInvalidProvNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command=@"SELECT procedurecode.CodeNum FROM procedurecode 
+				LEFT JOIN provider ON procedurecode.ProvNumDefault=provider.ProvNum 
+				WHERE provider.ProvNum IS NULL 
+				AND procedurecode.ProvNumDefault!=0";
+			List<long> listProcNums=Db.GetListLong(command);
+			if(isCheck) {
+				if(listProcNums.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedure codes with invalid Default Provider found")+": "+listProcNums.Count+"\r\n";
+				}
+			}
+			else {//fix
+				if(listProcNums.Count>0) {
+					command="UPDATE procedurecode SET procedurecode.ProvNumDefault=0 WHERE procedurecode.CodeNum IN ("+String.Join(",",listProcNums)+")";
+					Db.NonQ(command);
+				}
+				if(listProcNums.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedure codes with invalid Default Provider fixed")+": "+listProcNums.Count+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ProcedurelogAttachedToApptWithProcStatusDeleted(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
