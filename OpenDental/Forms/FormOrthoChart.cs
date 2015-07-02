@@ -124,19 +124,19 @@ namespace OpenDental {
 			PatFieldDefs.RefreshCache();
 			ODGridRow row;
 			//define and fill rows in grid at the same time.
-			for(int i=0;i<PatFieldDefs.List.Length;i++) {
+			for(int i=0;i<PatFieldDefs.ListShort.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(PatFieldDefs.List[i].FieldName);
+				row.Cells.Add(PatFieldDefs.ListShort[i].FieldName);
 				for(int j=0;j<=_arrayPatientFields.Length;j++) {
 					if(j==_arrayPatientFields.Length) {//no matches in the list
 						row.Cells.Add("");
 						break;
 					}
-					if(_arrayPatientFields[j].FieldName==PatFieldDefs.List[i].FieldName) {
-						if(PatFieldDefs.List[i].FieldType==PatFieldType.Checkbox) {
+					if(_arrayPatientFields[j].FieldName==PatFieldDefs.ListShort[i].FieldName) {
+						if(PatFieldDefs.ListShort[i].FieldType==PatFieldType.Checkbox) {
 							row.Cells.Add("X");
 						}
-						else if(PatFieldDefs.List[i].FieldType==PatFieldType.Currency) {
+						else if(PatFieldDefs.ListShort[i].FieldType==PatFieldType.Currency) {
 							row.Cells.Add(PIn.Double(_arrayPatientFields[j].FieldValue).ToString("c"));
 						}
 						else {
@@ -247,56 +247,56 @@ namespace OpenDental {
 		}
 
 		private void gridPat_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			PatField field=PatFields.GetByName(PatFieldDefs.List[e.Row].FieldName,_arrayPatientFields);
+			PatField field=PatFields.GetByName(PatFieldDefs.ListShort[e.Row].FieldName,_arrayPatientFields);
 			if(field==null) {
 				field=new PatField();
 				field.PatNum=_patCur.PatNum;
-				field.FieldName=PatFieldDefs.List[e.Row].FieldName;
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Text) {
+				field.FieldName=PatFieldDefs.ListShort[e.Row].FieldName;
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
 					FormPF.IsLaunchedFromOrtho=true;
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.PickList) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.PickList) {
 					FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Date) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Date) {
 					FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Checkbox) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Checkbox) {
 					FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Currency) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Currency) {
 					FormPatFieldCurrencyEdit FormPF=new FormPatFieldCurrencyEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
 			}
 			else {
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Text) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.PickList) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.PickList) {
 					FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Date) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Date) {
 					FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Checkbox) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Checkbox) {
 					FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[e.Row].FieldType==PatFieldType.Currency) {
+				if(PatFieldDefs.ListShort[e.Row].FieldType==PatFieldType.Currency) {
 					FormPatFieldCurrencyEdit FormPF=new FormPatFieldCurrencyEdit(field);
 					FormPF.ShowDialog();
 				}

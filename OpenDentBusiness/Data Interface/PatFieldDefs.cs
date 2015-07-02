@@ -3,30 +3,64 @@ using System.Data;
 using System.Diagnostics;
 using System.Collections;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace OpenDentBusiness {
 	///<summary></summary>
 	public class PatFieldDefs {
 		#region CachePattern
-		private static PatFieldDef[] list;
+		private static List<PatFieldDef> _listLong;
+		private static List<PatFieldDef> _listShort;
 
 		///<summary>A list of all allowable patFields.</summary>
-		public static PatFieldDef[] List {
+		public static List<PatFieldDef> ListLong {
 			//No need to check RemotingRole; no call to db.
 			get {
-				if(list==null) {
+				if(_listLong==null) {
 					RefreshCache();
 				}
-				return list;
+				return _listLong;
 			}
 			set {
-				list=value;
+				_listLong=value;
 			}
+		}
+
+		///<summary>A list of patFields that are not hidden.</summary>
+		public static List<PatFieldDef> ListShort {
+			//No need to check RemotingRole; no call to db.
+			get {
+				if(_listShort==null) {
+					RefreshCache();
+				}
+				return _listShort;
+			}
+			set {
+				_listShort=value;
+			}
+		}
+
+		///<summary>Gets a deep copy of patFields that are not hidden.</summary>
+		public static List<PatFieldDef> GetListShort() {
+			List<PatFieldDef> listPatFieldDefs=new List<PatFieldDef>();
+			for(int i=0;i<PatFieldDefs.ListShort.Count;i++) {
+				listPatFieldDefs.Add(PatFieldDefs.ListShort[i].Copy());
+			}
+			return listPatFieldDefs;
+		}
+
+		///<summary>Gets a deep copy of all allowable patFields.</summary>
+		public static List<PatFieldDef> GetListLong() {
+			List<PatFieldDef>  listPatFieldDefs=new List<PatFieldDef>();
+			for(int i=0;i<PatFieldDefs.ListLong.Count;i++) {
+				listPatFieldDefs.Add(PatFieldDefs.ListLong[i].Copy());
+			}
+			return listPatFieldDefs;
 		}
 
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM patfielddef";
+			string command="SELECT * FROM patfielddef ORDER BY ItemOrder";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="PatFieldDef";
 			FillCache(table);
@@ -36,14 +70,15 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			List=new PatFieldDef[table.Rows.Count];
-			for(int i=0;i<table.Rows.Count;i++) {
-				List[i]=new PatFieldDef();
-				List[i].PatFieldDefNum=PIn.Long(table.Rows[i][0].ToString());
-				List[i].FieldName=PIn.String(table.Rows[i][1].ToString());
-				List[i].FieldType=(PatFieldType)PIn.Int(table.Rows[i][2].ToString());
-				List[i].PickList=PIn.String(table.Rows[i][3].ToString());
+			List<PatFieldDef> listShort=new List<PatFieldDef>();
+			List<PatFieldDef> listLong=Crud.PatFieldDefCrud.TableToList(table);
+			for(int i=0;i<listLong.Count;i++) {
+				if(!listLong[i].IsHidden) {
+					listShort.Add(listLong[i]);
+				}
 			}
+			ListLong=listLong;
+			ListShort=listShort;
 		}
 		#endregion
 
@@ -96,9 +131,10 @@ namespace OpenDentBusiness {
 		/// <summary>GetFieldName returns the field name identified by the field definition number passed as a parameter.</summary>
 		public static string GetFieldName(long patFieldDefNum) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++){
-				if(List[i].PatFieldDefNum==patFieldDefNum) {
-					return List[i].FieldName;
+			List<PatFieldDef> listPatDefs=GetListShort();
+			for(int i=0;i<listPatDefs.Count;i++) {
+				if(listPatDefs[i].PatFieldDefNum==patFieldDefNum) {
+					return listPatDefs[i].FieldName;
 				}
 			}
 			return "";
@@ -107,12 +143,23 @@ namespace OpenDentBusiness {
 		/// <summary>GetPickListByFieldName returns the pick list identified by the field name passed as a parameter.</summary>
 		public static string GetPickListByFieldName(string FieldName) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++) {
-				if(List[i].FieldName==FieldName) {
-					return List[i].PickList;
+			List<PatFieldDef> listPatDefs=GetListShort();
+			for(int i=0;i<listPatDefs.Count;i++) {
+				if(listPatDefs[i].FieldName==FieldName) {
+					return listPatDefs[i].PickList;
 				}
 			}
 			return "";
+		}
+
+		///<summary>Sync pattern, must sync entire table. Probably only to be used in the master problem list window.</summary>
+		public static void Sync(List<PatFieldDef> listDefs) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listDefs);
+				return;
+			}
+			PatFieldDefs.RefreshCache();
+			Crud.PatFieldDefCrud.Sync(listDefs,new List<PatFieldDef>(GetListLong()));
 		}
 	}
 }

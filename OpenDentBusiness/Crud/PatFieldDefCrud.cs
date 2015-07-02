@@ -50,6 +50,8 @@ namespace OpenDentBusiness.Crud{
 				patFieldDef.FieldName     = PIn.String(table.Rows[i]["FieldName"].ToString());
 				patFieldDef.FieldType     = (OpenDentBusiness.PatFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
 				patFieldDef.PickList      = PIn.String(table.Rows[i]["PickList"].ToString());
+				patFieldDef.ItemOrder     = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				patFieldDef.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
 				retVal.Add(patFieldDef);
 			}
 			return retVal;
@@ -90,14 +92,16 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PatFieldDefNum,";
 			}
-			command+="FieldName,FieldType,PickList) VALUES(";
+			command+="FieldName,FieldType,PickList,ItemOrder,IsHidden) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(patFieldDef.PatFieldDefNum)+",";
 			}
 			command+=
 				 "'"+POut.String(patFieldDef.FieldName)+"',"
 				+    POut.Int   ((int)patFieldDef.FieldType)+","
-				+"'"+POut.String(patFieldDef.PickList)+"')";
+				+"'"+POut.String(patFieldDef.PickList)+"',"
+				+    POut.Int   (patFieldDef.ItemOrder)+","
+				+    POut.Bool  (patFieldDef.IsHidden)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -130,14 +134,16 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PatFieldDefNum,";
 			}
-			command+="FieldName,FieldType,PickList) VALUES(";
+			command+="FieldName,FieldType,PickList,ItemOrder,IsHidden) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(patFieldDef.PatFieldDefNum)+",";
 			}
 			command+=
 				 "'"+POut.String(patFieldDef.FieldName)+"',"
 				+    POut.Int   ((int)patFieldDef.FieldType)+","
-				+"'"+POut.String(patFieldDef.PickList)+"')";
+				+"'"+POut.String(patFieldDef.PickList)+"',"
+				+    POut.Int   (patFieldDef.ItemOrder)+","
+				+    POut.Bool  (patFieldDef.IsHidden)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -152,7 +158,9 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE patfielddef SET "
 				+"FieldName     = '"+POut.String(patFieldDef.FieldName)+"', "
 				+"FieldType     =  "+POut.Int   ((int)patFieldDef.FieldType)+", "
-				+"PickList      = '"+POut.String(patFieldDef.PickList)+"' "
+				+"PickList      = '"+POut.String(patFieldDef.PickList)+"', "
+				+"ItemOrder     =  "+POut.Int   (patFieldDef.ItemOrder)+", "
+				+"IsHidden      =  "+POut.Bool  (patFieldDef.IsHidden)+" "
 				+"WHERE PatFieldDefNum = "+POut.Long(patFieldDef.PatFieldDefNum);
 			Db.NonQ(command);
 		}
@@ -172,6 +180,14 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PickList = '"+POut.String(patFieldDef.PickList)+"'";
 			}
+			if(patFieldDef.ItemOrder != oldPatFieldDef.ItemOrder) {
+				if(command!=""){ command+=",";}
+				command+="ItemOrder = "+POut.Int(patFieldDef.ItemOrder)+"";
+			}
+			if(patFieldDef.IsHidden != oldPatFieldDef.IsHidden) {
+				if(command!=""){ command+=",";}
+				command+="IsHidden = "+POut.Bool(patFieldDef.IsHidden)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -188,5 +204,67 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<PatFieldDef> listNew,List<PatFieldDef> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<PatFieldDef> listIns    =new List<PatFieldDef>();
+			List<PatFieldDef> listUpdNew =new List<PatFieldDef>();
+			List<PatFieldDef> listUpdDB  =new List<PatFieldDef>();
+			List<PatFieldDef> listDel    =new List<PatFieldDef>();
+			listNew.Sort((PatFieldDef x,PatFieldDef y) => { return x.PatFieldDefNum.CompareTo(y.PatFieldDefNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((PatFieldDef x,PatFieldDef y) => { return x.PatFieldDefNum.CompareTo(y.PatFieldDefNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			PatFieldDef fieldNew;
+			PatFieldDef fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.PatFieldDefNum<fieldDB.PatFieldDefNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.PatFieldDefNum>fieldDB.PatFieldDefNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				Update(listUpdNew[i],listUpdDB[i]);
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].PatFieldDefNum);
+			}
+		}
 	}
 }

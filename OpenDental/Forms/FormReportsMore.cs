@@ -494,7 +494,7 @@ namespace OpenDental {
 				"Household % of Poverty",
 			};
 			int[] fieldCounts=new int[patientFieldNames.Length];
-			foreach(PatFieldDef pfd in PatFieldDefs.List) {
+			foreach(PatFieldDef pfd in PatFieldDefs.ListShort) {
 				for(int i=0;i<patientFieldNames.Length;i++) {
 					if(pfd.FieldName.ToLower()==patientFieldNames[i].ToLower()) {
 						fieldCounts[i]++;

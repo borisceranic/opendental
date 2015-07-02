@@ -8844,6 +8844,30 @@ namespace OpenDentBusiness {
 				      Db.NonQ(command);
 				  }
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patfielddef ADD ItemOrder int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patfielddef ADD ItemOrder number(11)";
+					Db.NonQ(command);
+					command="UPDATE patfielddef SET ItemOrder = 0 WHERE ItemOrder IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfielddef MODIFY ItemOrder NOT NULL";
+					Db.NonQ(command);
+				} 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patfielddef ADD IsHidden tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patfielddef ADD IsHidden number(3)";
+					Db.NonQ(command);
+					command="UPDATE patfielddef SET IsHidden = 0 WHERE IsHidden IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfielddef MODIFY IsHidden NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
@@ -8857,24 +8881,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-				
-
 
 
 

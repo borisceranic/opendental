@@ -13,10 +13,14 @@ namespace OpenDentBusiness{
 		public string FieldName;
 		///<summary>Enum:PatFieldType Text=0,PickList=1,Date=2,Checkbox=3,Currency=4</summary>
 		public PatFieldType FieldType;
-		/// <summary>The text that contains pick list values.</summary>
+		///<summary>The text that contains pick list values.</summary>
 		public string PickList;
 		//<summary>Enum:PatFieldMapping Certain reports such as Medicaid make use of patient fields that are explicitly mapped.</summary>
 		//public PatFieldMapping FieldMapping;
+		///<summary></summary>
+		public int ItemOrder;
+		///<summary></summary>
+		public bool IsHidden;
 
 		///<summary></summary>
 		public PatFieldDef Copy() {

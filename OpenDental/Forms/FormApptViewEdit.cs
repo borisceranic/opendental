@@ -38,7 +38,7 @@ namespace OpenDental{
 		///<summary>The actual ApptFieldDefNums of all available elements because no language translation is needed.</summary>
 		private List<long> displayedAvailableApptFieldDefs;
 		///<summary>The actual PatFieldDefNums of all available elements because no language translation is needed.</summary>
-		private List<long> displayedAvailablePatFieldDefs;
+		private List<long> _listPatFieldDefNums;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textRowsPerIncr;
 		///<summary>A local list of ApptViewItems which are displayed in all three lists on the right.  Not updated to db until the form is closed.</summary>
@@ -852,12 +852,12 @@ namespace OpenDental{
 			col=new ODGridColumn("",100);
 			gridPatFieldDefs.Columns.Add(col);
 			gridPatFieldDefs.Rows.Clear();
-			displayedAvailablePatFieldDefs=new List<long>();
-			for(int i=0;i<PatFieldDefs.List.Length;i++) {
-				if(!PatFieldIsDisplayed(PatFieldDefs.List[i].PatFieldDefNum)) {
-					displayedAvailablePatFieldDefs.Add(PatFieldDefs.List[i].PatFieldDefNum);
+			_listPatFieldDefNums=new List<long>();
+			for(int i=0;i<PatFieldDefs.ListShort.Count;i++) {
+				if(!PatFieldIsDisplayed(PatFieldDefs.ListShort[i].PatFieldDefNum)) {
+					_listPatFieldDefNums.Add(PatFieldDefs.ListShort[i].PatFieldDefNum);
 					row=new ODGridRow();
-					row.Cells.Add(PatFieldDefs.List[i].FieldName);
+					row.Cells.Add(PatFieldDefs.ListShort[i].FieldName);
 					gridPatFieldDefs.Rows.Add(row);
 				}
 			}
@@ -987,7 +987,7 @@ namespace OpenDental{
 			else if(gridPatFieldDefs.GetSelectedIndex()!=-1) {
 				ApptViewItem item=new ApptViewItem();
 				item.ElementColor=Color.Black;
-				item.PatFieldDefNum=displayedAvailablePatFieldDefs[gridPatFieldDefs.GetSelectedIndex()]; 
+				item.PatFieldDefNum=_listPatFieldDefNums[gridPatFieldDefs.GetSelectedIndex()]; 
 				if(gridMain.SelectedIndices.Length==1) {//insert
 					int newIdx=displayedElementsAll.IndexOf(displayedElementsMain[gridMain.GetSelectedIndex()]);
 					displayedElementsAll.Insert(newIdx,item);

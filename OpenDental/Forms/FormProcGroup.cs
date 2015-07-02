@@ -807,17 +807,17 @@ namespace OpenDental{
 					//...
 					case "PatFields":
 						PatField field;
-						for(int i=0;i<PatFieldDefs.List.Length;i++){
+						for(int i=0;i<PatFieldDefs.ListShort.Count;i++) {
 							if(i>0){
 								row=new ODGridRow();
 							}
-							row.Cells.Add(PatFieldDefs.List[i].FieldName);
-							field=PatFields.GetByName(PatFieldDefs.List[i].FieldName,PatFieldList);
+							row.Cells.Add(PatFieldDefs.ListShort[i].FieldName);
+							field=PatFields.GetByName(PatFieldDefs.ListShort[i].FieldName,PatFieldList);
 							if(field==null){
 								row.Cells.Add("");
 							}
 							else{
-								if(PatFieldDefs.List[i].FieldType==PatFieldType.Checkbox) {
+								if(PatFieldDefs.ListShort[i].FieldType==PatFieldType.Checkbox) {
 									row.Cells.Add("X");
 								}
 								else {
@@ -1362,46 +1362,46 @@ namespace OpenDental{
 			string tag=gridPat.Rows[e.Row].Tag.ToString();
 			tag=tag.Substring(8);//strips off all but the number: PatField1
 			int index=PIn.Int(tag);
-			PatField field=PatFields.GetByName(PatFieldDefs.List[index].FieldName,PatFieldList);
+			PatField field=PatFields.GetByName(PatFieldDefs.ListShort[index].FieldName,PatFieldList);
 			if(field==null) {
 				field=new PatField();
 				field.PatNum=PatCur.PatNum;
-				field.FieldName=PatFieldDefs.List[index].FieldName;
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Text) {
+				field.FieldName=PatFieldDefs.ListShort[index].FieldName;
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.PickList) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.PickList) {
 					FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Date) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Date) {
 					FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Checkbox) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Checkbox) {
 					FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
 					FormPF.IsNew=true;
 					FormPF.ShowDialog();
 				}
 			}
 			else {
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Text) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Text) {
 					FormPatFieldEdit FormPF=new FormPatFieldEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.PickList) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.PickList) {
 					FormPatFieldPickEdit FormPF=new FormPatFieldPickEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Date) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Date) {
 					FormPatFieldDateEdit FormPF=new FormPatFieldDateEdit(field);
 					FormPF.ShowDialog();
 				}
-				if(PatFieldDefs.List[index].FieldType==PatFieldType.Checkbox) {
+				if(PatFieldDefs.ListShort[index].FieldType==PatFieldType.Checkbox) {
 					FormPatFieldCheckEdit FormPF=new FormPatFieldCheckEdit(field);
 					FormPF.ShowDialog();
 				}
