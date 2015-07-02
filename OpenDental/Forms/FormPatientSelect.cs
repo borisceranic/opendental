@@ -1235,6 +1235,21 @@ namespace OpenDental{
 						case "OtherPhone"://will only be available if OD HQ
 							row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
 							break;
+						case "LastVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["LastVisit"].ToString());
+							break;
+						case "Cell Phone":
+							row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
+							break;
+						case "Sec Prov":
+							row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
+							break;
+						case "AccBalance":
+							row.Cells.Add(PtDataTable.Rows[i]["BalTotal"].ToString());
+							break;
+						case "NextVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["NextVisit"].ToString());
+							break;
 					}
 				}
 				gridMain.Rows.Add(row);

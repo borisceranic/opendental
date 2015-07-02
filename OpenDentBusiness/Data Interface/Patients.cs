@@ -230,7 +230,7 @@ namespace OpenDentBusiness{
 			}
 			string billingsnippet=" ";
 			if(billingtype!=0){
-				billingsnippet+="AND BillingType="+POut.Long(billingtype)+" ";
+				billingsnippet+="AND patient.BillingType="+POut.Long(billingtype)+" ";
 			}
 			/*for(int i=0;i<billingtypes.Length;i++){//if length==0, it will get all billing types
 				if(i==0){
@@ -239,7 +239,7 @@ namespace OpenDentBusiness{
 				else{
 					billingsnippet+="OR ";
 				}
-				billingsnippet+="BillingType ='"+billingtypes[i].ToString()+"' ";
+				billingsnippet+="patient.BillingType ='"+billingtypes[i].ToString()+"' ";
 				if(i==billingtypes.Length-1){//if there is only one row, this will also be triggered.
 					billingsnippet+=") ";
 				}
@@ -265,13 +265,19 @@ namespace OpenDentBusiness{
 				}
 				regexp+=phonedigits[i];
 			}
-			string command="SELECT DISTINCT patient.PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
-				+",BillingType,ChartNumber,City,State,PriProv,SiteNum,Email,Country,patient.ClinicNum ";
+			string command="SELECT DISTINCT patient.PatNum,patient.LName,patient.FName,patient.MiddleI,patient.Preferred,patient.Birthdate,patient.SSN"
+				+",patient.HmPhone,patient.WkPhone,patient.Address,patient.PatStatus,patient.BillingType,patient.ChartNumber,patient.City,patient.State"
+				+",patient.PriProv,patient.SiteNum,patient.Email,patient.Country,patient.ClinicNum "
+				+",patient.SecProv,patient.WirelessPhone,guar.BalTotal"
+				+",MAX(CASE WHEN apt.AptDateTime <= " + DbHelper.Now() +" AND apt.AptStatus=2 THEN apt.AptDateTime ELSE NULL END) AS LastVisit"
+				+",MIN(CASE WHEN apt.AptDateTime > " +  DbHelper.Now() +" AND apt.AptStatus=1 THEN apt.AptDateTime ELSE NULL END) AS NextVisit ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+=",GROUP_CONCAT(DISTINCT phonenumber.PhoneNumberVal) AS OtherPhone ";//this customer might have multiple extra phone numbers that match the param.
 				command+=",registrationkey.RegKey ";
 			}
 			command+="FROM patient ";
+			command+="LEFT JOIN appointment apt ON patient.PatNum=apt.PatNum ";
+			command+="LEFT JOIN patient guar on patient.Guarantor=guar.PatNum ";
 			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 				command+="LEFT JOIN phonenumber ON phonenumber.PatNum=patient.PatNum ";
 				if(regexp!="") {
@@ -284,53 +290,53 @@ namespace OpenDentBusiness{
 					+"LEFT JOIN inssub ON patplan.InsSubNum=inssub.InsSubNum "
 					+"LEFT JOIN insplan ON inssub.PlanNum=insplan.PlanNum ";
 			}
-			command+="WHERE PatStatus != '4' ";//not status 'deleted'
+			command+="WHERE patient.PatStatus != '4' ";//not status 'deleted'
 			if(DataConnection.DBtype==DatabaseType.MySql) {//LIKE is case insensitive in mysql.
 				if(lname.Length>0) {
 					if(limit) {//normal behavior is fast
 						if(PrefC.GetBool(PrefName.DistributorKey)) {
-							command+="AND (LName LIKE '"+POut.String(lname)+"%' OR Preferred LIKE '"+POut.String(lname)+"%') ";
+							command+="AND (patient.LName LIKE '"+POut.String(lname)+"%' OR patient.Preferred LIKE '"+POut.String(lname)+"%') ";
 						}
 						else {
-							command+="AND LName LIKE '"+POut.String(lname)+"%' ";
+							command+="AND patient.LName LIKE '"+POut.String(lname)+"%' ";
 						}
 					}
 					else {//slower, but more inclusive.  User explicitly looking for all matches.
 						if(PrefC.GetBool(PrefName.DistributorKey)) {
-							command+="AND (LName LIKE '"+POut.String(lname)+"%' OR Preferred LIKE '"+POut.String(lname)+"%') ";
+							command+="AND (patient.LName LIKE '"+POut.String(lname)+"%' OR patient.Preferred LIKE '"+POut.String(lname)+"%') ";
 						}
 						else {
-							command+="AND LName LIKE '"+POut.String(lname)+"%' ";
+							command+="AND patient.LName LIKE '"+POut.String(lname)+"%' ";
 						}
 					}
 				}
 				if(fname.Length>0){
 						if(PrefC.GetBool(PrefName.DistributorKey)) {
-							command+="AND (FName LIKE '"+POut.String(fname)+"%' OR Preferred LIKE '"+POut.String(fname)+"%') ";
+							command+="AND (patient.FName LIKE '"+POut.String(fname)+"%' OR patient.Preferred LIKE '"+POut.String(fname)+"%') ";
 						}
 						else {
-							command+="AND FName LIKE '"+POut.String(fname)+"%' ";
+							command+="AND patient.FName LIKE '"+POut.String(fname)+"%' ";
 						}
 				}
 			}
 			else {//oracle, case matters in a like statement
 				if(lname.Length>0) {
 					if(limit) {
-						command+="AND LOWER(LName) LIKE '"+POut.String(lname)+"%' ";
+						command+="AND LOWER(patient.LName) LIKE '"+POut.String(lname)+"%' ";
 					}
 					else {
-						command+="AND LOWER(LName) LIKE '%"+POut.String(lname)+"%' ";
+						command+="AND LOWER(patient.LName) LIKE '%"+POut.String(lname)+"%' ";
 					}
 				}
 				if(fname.Length>0) {
-					command+="AND LOWER(FName) LIKE '"+POut.String(fname)+"%' ";
+					command+="AND LOWER(patient.FName) LIKE '"+POut.String(fname)+"%' ";
 				}
 			}
 			if(regexp!="") {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command+="AND (HmPhone REGEXP '"+POut.String(regexp)+"' "
-						+"OR WkPhone REGEXP '"+POut.String(regexp)+"' "
-						+"OR WirelessPhone REGEXP '"+POut.String(regexp)+"' ";
+					command+="AND (patient.HmPhone REGEXP '"+POut.String(regexp)+"' "
+						+"OR patient.WkPhone REGEXP '"+POut.String(regexp)+"' "
+						+"OR patient.WirelessPhone REGEXP '"+POut.String(regexp)+"' ";
 					if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ, so never going to be Oracle
 						command+="OR phonenumber.PhoneNumberVal REGEXP '"+POut.String(regexp)+"' ";
 					}
@@ -344,47 +350,47 @@ namespace OpenDentBusiness{
 			}
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+=
-					(address.Length>0?"AND Address LIKE '%"+POut.String(address)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(city.Length>0?"AND City LIKE '"+POut.String(city)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(state.Length>0?"AND State LIKE '"+POut.String(state)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(ssn.Length>0?"AND SSN LIKE '"+POut.String(ssn)+"%' ":"")//LIKE is case insensitive in mysql.
+					(address.Length>0?"AND patient.Address LIKE '%"+POut.String(address)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(city.Length>0?"AND patient.City LIKE '"+POut.String(city)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(state.Length>0?"AND patient.State LIKE '"+POut.String(state)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(ssn.Length>0?"AND patient.SSN LIKE '"+POut.String(ssn)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(chartnumber.Length>0?"AND ChartNumber LIKE '"+POut.String(chartnumber)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(email.Length>0?"AND Email LIKE '%"+POut.String(email)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(country.Length>0?"AND Country LIKE '%"+POut.String(country)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(chartnumber.Length>0?"AND patient.ChartNumber LIKE '"+POut.String(chartnumber)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(email.Length>0?"AND patient.Email LIKE '%"+POut.String(email)+"%' ":"")//LIKE is case insensitive in mysql.
+					+(country.Length>0?"AND patient.Country LIKE '%"+POut.String(country)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(regKey.Length>0?"AND registrationkey.RegKey LIKE '%"+POut.String(regKey)+"%' ":"");//LIKE is case insensitive in mysql.
 			}
 			else {//oracle
 				command+=
-					(address.Length>0?"AND LOWER(Address) LIKE '%"+POut.String(address).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(city.Length>0?"AND LOWER(City) LIKE '"+POut.String(city).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(state.Length>0?"AND LOWER(State) LIKE '"+POut.String(state).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(ssn.Length>0?"AND LOWER(SSN) LIKE '"+POut.String(ssn).ToLower()+"%' ":"")//In case an office uses this field for something else.
+					(address.Length>0?"AND LOWER(patient.Address) LIKE '%"+POut.String(address).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(city.Length>0?"AND LOWER(patient.City) LIKE '"+POut.String(city).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(state.Length>0?"AND LOWER(patient.State) LIKE '"+POut.String(state).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(ssn.Length>0?"AND LOWER(patient.SSN) LIKE '"+POut.String(ssn).ToLower()+"%' ":"")//In case an office uses this field for something else.
 					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//case matters in a like statement in oracle.
-					+(chartnumber.Length>0?"AND LOWER(ChartNumber) LIKE '"+POut.String(chartnumber).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(email.Length>0?"AND LOWER(Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(country.Length>0?"AND LOWER(Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(chartnumber.Length>0?"AND LOWER(patient.ChartNumber) LIKE '"+POut.String(chartnumber).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(email.Length>0?"AND LOWER(patient.Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+					+(country.Length>0?"AND LOWER(patient.Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(regKey.Length>0?"AND LOWER(registrationkey.RegKey) LIKE '%"+POut.String(regKey).ToLower()+"%' ":"");//case matters in a like statement in oracle.
 
 			}
 			if(birthdate.Year>1880 && birthdate.Year<2100){
-				command+="AND Birthdate ="+POut.Date(birthdate)+" ";
+				command+="AND patient.Birthdate ="+POut.Date(birthdate)+" ";
 			}
 			command+=billingsnippet;
 			if(hideInactive){
-				command+="AND PatStatus != '"+POut.Int((int)PatientStatus.Inactive)+"' ";
+				command+="AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Inactive)+"' ";
 			}
 			if(!showArchived) {
-				command+="AND PatStatus != '"+POut.Int((int)PatientStatus.Archived)+"' AND PatStatus != '"+POut.Int((int)PatientStatus.Deceased)+"' ";
+				command+="AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Archived)+"' AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Deceased)+"' ";
 			}
 			//if(showProspectiveOnly) {
-			//	command+="AND PatStatus = "+POut.Int((int)PatientStatus.Prospective)+" ";
+			//	command+="AND patient.PatStatus = "+POut.Int((int)PatientStatus.Prospective)+" ";
 			//}
 			//if(!showProspectiveOnly) {
-			//	command+="AND PatStatus != "+POut.Int((int)PatientStatus.Prospective)+" ";
+			//	command+="AND patient.PatStatus != "+POut.Int((int)PatientStatus.Prospective)+" ";
 			//}
 			if(guarOnly){
-				command+="AND patient.PatNum = Guarantor ";
+				command+="AND patient.PatNum = patient.Guarantor ";
 			}
 			if(clinicNums!="") {
 				command+="AND patient.Guarantor IN ( "
@@ -396,15 +402,15 @@ namespace OpenDentBusiness{
 				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN (0,"+POut.String(clinicNums)+"))) "; //Includes patients that are not assigned to any clinic.  May need to restrict selection of these patients in the future.
 			}
 			if(siteNum>0) {
-				command+="AND SiteNum="+POut.Long(siteNum)+" ";
+				command+="AND patient.SiteNum="+POut.Long(siteNum)+" ";
 			}
 			if(subscriberId!=""){
 				command+="AND inssub.SubscriberId LIKE '%"+POut.String(subscriberId)+"%' ";
 			}
-			if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
-				command+="GROUP BY patient.PatNum ";
-			}
-			command+="ORDER BY LName,FName ";
+			command+="GROUP BY patient.PatNum,patient.LName,patient.FName,patient.MiddleI,patient.Preferred,patient.Birthdate,patient.SSN"
+				+",patient.HmPhone,patient.WkPhone,patient.Address,patient.PatStatus,patient.BillingType,patient.ChartNumber,patient.City,patient.State"
+				+",patient.PriProv,patient.SiteNum,patient.Email,patient.Country,patient.ClinicNum,patient.SecProv,patient.WirelessPhone,guar.BalTotal ";
+			command+="ORDER BY patient.LName,patient.FName ";
 			if(limit){
 				command=DbHelper.LimitOrderBy(command,40);
 			}
@@ -458,6 +464,23 @@ namespace OpenDentBusiness{
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
 					r["OtherPhone"]=table.Rows[i]["OtherPhone"].ToString();
 					r["RegKey"]=table.Rows[i]["RegKey"].ToString();
+				}
+				date=PIn.Date(table.Rows[i]["LastVisit"].ToString());
+				if(date.Year>1880) {
+					r["LastVisit"]=date.ToShortDateString();
+				}
+				else {
+					r["LastVisit"]="";
+				}
+				r["WirelessPhone"]=table.Rows[i]["WirelessPhone"].ToString();
+				r["SecProv"]=Providers.GetAbbr(PIn.Long(table.Rows[i]["SecProv"].ToString()));
+				r["BalTotal"]=table.Rows[i]["BalTotal"].ToString();
+				date=PIn.Date(table.Rows[i]["NextVisit"].ToString());
+				if(date.Year>1880) {
+					r["NextVisit"]=date.ToShortDateString();
+				}
+				else {
+					r["NextVisit"]="";
 				}
 				PtDataTable.Rows.Add(r);
 			}
