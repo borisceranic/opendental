@@ -227,6 +227,14 @@ namespace OpenDental {
 			newPat.FName=FirstName;
 			newPat.Birthdate=birthDate;
 			newPat.ClinicNum=Security.CurUser.ClinicNum;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				//Set the patients primary provider to the practice default provider.
+				newPat.PriProv=Providers.GetDefaultProvider().ProvNum;
+			}
+			else {//Using clinics.
+				//Set the patients primary provider to the clinic default provider.
+				newPat.PriProv=Providers.GetDefaultProvider(FormOpenDental.ClinicNum).ProvNum;
+			}
 			Type t=newPat.GetType();
 			FieldInfo[] fi=t.GetFields();
 			foreach(FieldInfo field in fi) {
