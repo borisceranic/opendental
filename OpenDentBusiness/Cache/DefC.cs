@@ -222,7 +222,7 @@ namespace OpenDentBusiness {
 			return retVal;
 		}*/
 
-		///<summary></summary>
+		///<summary>Returns defs from the AdjTypes that contain '+' in the ItemValue column.</summary>
 		public static List<Def> GetPositiveAdjTypes() {
 			List<Def> retVal=new List<Def>();
 			Def[][] arrayDefs=GetArrayShort();
@@ -234,7 +234,7 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary></summary>
+		///<summary>Returns defs from the AdjTypes that contain '-' in the ItemValue column.</summary>
 		public static List<Def> GetNegativeAdjTypes() {
 			List<Def> retVal=new List<Def>();
 			Def[][] arrayDefs=GetArrayShort();
