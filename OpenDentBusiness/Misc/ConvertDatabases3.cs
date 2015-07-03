@@ -8868,6 +8868,26 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE patfielddef MODIFY IsHidden NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard ADD PayConnectToken varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard ADD PayConnectToken varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard ADD PayConnectTokenExp date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard ADD PayConnectTokenExp date";
+					Db.NonQ(command);
+					command="UPDATE creditcard SET PayConnectTokenExp = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE PayConnectTokenExp IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE creditcard MODIFY PayConnectTokenExp NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

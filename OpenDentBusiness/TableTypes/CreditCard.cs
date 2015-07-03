@@ -33,6 +33,11 @@ namespace OpenDentBusiness {
 		public string Note;
 		///<summary>FK to payplan.PayPlanNum.</summary>
 		public long PayPlanNum;
+		///<summary>Token for PayConnect.  PayConnect returns a token and token expiration, when requested by the merchant's system, to be used instead
+		///of actual credit card number in subsequent transactions.</summary>
+		public string PayConnectToken;
+		///<summary>Expiration for the PayConnect token.  Used with the PayConnect token instead of the actual credit card number and expiration.</summary>
+		public DateTime PayConnectTokenExp;
 
 		///<summary></summary>
 		public CreditCard Clone() {

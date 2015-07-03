@@ -411,12 +411,6 @@
     <Compile Include="Forms\FormProcCodeEditMore.designer.cs">
       <DependentUpon>FormProcCodeEditMore.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormUpdateInProgress.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormUpdateInProgress.designer.cs">
-      <DependentUpon>FormUpdateInProgress.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormTaskHist.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -512,6 +506,12 @@
     </Compile>
     <Compile Include="Forms\FormSheetFieldGrid.designer.cs">
       <DependentUpon>FormSheetFieldGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormUpdateInProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormUpdateInProgress.designer.cs">
+      <DependentUpon>FormUpdateInProgress.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormWikiListHistory.cs">
       <SubType>Form</SubType>
@@ -3701,9 +3701,6 @@
     <EmbeddedResource Include="Forms\FormProcCodeEditMore.resx">
       <DependentUpon>FormProcCodeEditMore.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormUpdateInProgress.resx">
-      <DependentUpon>FormUpdateInProgress.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTaskHist.resx">
       <DependentUpon>FormTaskHist.cs</DependentUpon>
     </EmbeddedResource>
@@ -3751,6 +3748,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormSheetFieldGrid.resx">
       <DependentUpon>FormSheetFieldGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormUpdateInProgress.resx">
+      <DependentUpon>FormUpdateInProgress.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormWikiListHistory.resx">
       <DependentUpon>FormWikiListHistory.cs</DependentUpon>
@@ -6448,6 +6448,15 @@
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\NewCrop\Update1.wsdl" />
+    <None Include="Web References\PayConnectService\cardType.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\PayConnectService\MerchantService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\PayConnectService\MerchantService0.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Web References\WebSheets\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -7001,8 +7010,6 @@
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\PayConnectService\MerchantService.wsdl" />
-    <None Include="Web References\PayConnectService\MerchantService_schema1.xsd" />
-    <None Include="Web References\PayConnectService\MerchantService_schema2.xsd" />
     <None Include="Web References\PayConnectService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -7081,10 +7088,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="C:\development\Shared Project Subversion\Bridge Info\DentalXChange\PayConnect\Merchant Services WSDL.wsdl">
+    <WebReferenceUrl Include="https://webservices.dentalxchange.com/merchant/MerchantService%3fwsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\PayConnectService\</RelPath>
-      <UpdateFromURL>C:\development\Shared Project Subversion\Bridge Info\DentalXChange\PayConnect\Merchant Services WSDL.wsdl</UpdateFromURL>
+      <UpdateFromURL>https://webservices.dentalxchange.com/merchant/MerchantService%3fwsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

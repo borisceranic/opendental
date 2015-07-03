@@ -55,6 +55,10 @@ namespace OpenDental {
 			}
 			this.textNameOnCard.Text=PatCur.GetNameFL();
 			this.textAmount.Text=amountInit;
+			checkSaveToken.Checked=PrefC.GetBool(PrefName.StoreCCtokens);
+			if(PrefC.GetBool(PrefName.StoreCCnumbers)) {
+				labelStoreCCNumWarning.Visible=true;
+			}
 		}
 
 		private void radioSale_Click(object sender,EventArgs e) {
@@ -162,16 +166,22 @@ namespace OpenDental {
 				MsgBox.Show(this,"Invalid Card Number.");
 				return false;
 			}
-			if(Regex.IsMatch(textExpDate.Text,@"^\d\d[/\- ]\d\d$")){//08/07 or 08-07 or 08 07
-				expYear=Convert.ToInt32("20"+textExpDate.Text.Substring(3,2));
-				expMonth=Convert.ToInt32(textExpDate.Text.Substring(0,2));
+			try {//PIn.Int will throw an exception if not a valid format
+				if(Regex.IsMatch(textExpDate.Text,@"^\d\d[/\- ]\d\d$")) {//08/07 or 08-07 or 08 07
+					expYear=PIn.Int("20"+textExpDate.Text.Substring(3,2));
+					expMonth=PIn.Int(textExpDate.Text.Substring(0,2));
+				}
+				else if(Regex.IsMatch(textExpDate.Text,@"^\d{4}$")) {//0807
+					expYear=PIn.Int("20"+textExpDate.Text.Substring(2,2));
+					expMonth=PIn.Int(textExpDate.Text.Substring(0,2));
+				}
+				else {
+					MsgBox.Show(this,"Expiration format invalid.");
+					return false;
+				}
 			}
-			else if(Regex.IsMatch(textExpDate.Text,@"^\d{4}$")){//0807
-				expYear=Convert.ToInt32("20"+textExpDate.Text.Substring(2,2));
-				expMonth=Convert.ToInt32(textExpDate.Text.Substring(0,2));
-			}  
-			else {
-			  MsgBox.Show(this,"Expiration format invalid.");
+			catch(Exception ex) {
+				MsgBox.Show(this,"Expiration format invalid.");
 				return false;
 			}
 			if(textNameOnCard.Text.Trim()==""){
@@ -293,6 +303,19 @@ namespace OpenDental {
 #endif
 		}
 
+		///<summary>If the user had previously chosen to save the PayConnect token and then unchecks the box, they will not have the original CC number to use in this transaction and will have to re-enter it.  If the box was checked and there was a stored token with a masked CC number and they uncheck the box, clear out the masked CC number and expiration date that is associated with the stored token.  If it was unchecked and they check it, and the original CC number associated with CreditCardCur was a masked CC number and there is a stored PayConnectToken and now textCardNumber.Text is the CC number the user has typed in, clear the PayConnectToken and PayConnectTokenExp fields to prepare to store the new token for the user entered card number.</summary>
+		private void checkSaveToken_Click(object sender,EventArgs e) {
+			if(checkSaveToken.Checked) {
+
+			}
+			else {
+				if(CreditCardCur.PayConnectToken!="") {//user unchecked the save token box and there was a token stored for this 
+					textCardNumber.Clear();
+					textExpDate.Clear();
+				}
+			}
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			int expYear;
@@ -305,17 +328,64 @@ namespace OpenDental {
 			if(trantype==PayConnectService.transType.VOID || trantype==PayConnectService.transType.RETURN) {
 				refNumber=textRefNumber.Text;
 			}
-			PayConnectService.creditCardRequest request=Bridges.PayConnect.BuildSaleRequest(Convert.ToDecimal(textAmount.Text),
-				textCardNumber.Text,expYear,expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,(parser!=null?parser.Track2:null),trantype,refNumber);
-			response=Bridges.PayConnect.ProcessCreditCard(request);
-			if(trantype==PayConnectService.transType.SALE && response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
-				receiptStr=BuildReceiptString(request,response);
-				PrintReceipt(receiptStr);
+			string magData=null;
+			if(parser!=null) {
+				magData=parser.Track2;
 			}
+			string cardNumber=textCardNumber.Text;
+			//if the user has chosen to store CC tokens and the stored CC has a token and the token is not expired,
+			//then use it instead of the CC number and CC expiration.
+			if(checkSaveToken.Checked
+				&& CreditCardCur!=null //if the user selected a saved CC
+				&& CreditCardCur.PayConnectToken!="" //there is a stored token for this card
+				&& CreditCardCur.PayConnectTokenExp.Date>=DateTime.Today.Date) //the token is not expired
+			{
+				cardNumber=CreditCardCur.PayConnectToken;
+				expYear=CreditCardCur.PayConnectTokenExp.Year;
+				expMonth=CreditCardCur.PayConnectTokenExp.Month;
+			}
+			PayConnectService.creditCardRequest request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
+				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,trantype,refNumber,checkSaveToken.Checked);
+			response=Bridges.PayConnect.ProcessCreditCard(request);
 			if(response==null || response.Status.code!=0) {//error in transaction
 				Cursor=Cursors.Default;
 				DialogResult=DialogResult.Cancel;
 				return;
+			}
+			if(trantype==PayConnectService.transType.SALE && response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
+				receiptStr=BuildReceiptString(request,response);
+				PrintReceipt(receiptStr);
+			}
+			if(!PrefC.GetBool(PrefName.StoreCCnumbers) && !checkSaveToken.Checked) {//not storing the card number or the token
+				Cursor=Cursors.Default;
+				DialogResult=DialogResult.OK;
+				return;
+			}
+			//response must be non-null and the status code must be 0=Approved
+			//also, the user must have the pref StoreCCnumbers enabled or they have the checkSaveTokens checked
+			if(CreditCardCur==null) {//user selected Add new card from the payment window, save it or its token depending on settings
+				CreditCardCur=new CreditCard();
+				CreditCardCur.IsNew=true;
+				CreditCardCur.PatNum=PatCur.PatNum;
+				List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
+				CreditCardCur.ItemOrder=itemOrderCount.Count;
+			}
+			CreditCardCur.CCExpiration=new DateTime(expYear,expMonth,DateTime.DaysInMonth(expYear,expMonth));
+			CreditCardCur.Zip=textZipCode.Text;
+			CreditCardCur.CCNumberMasked=textCardNumber.Text;
+			CreditCardCur.PayConnectToken="";
+			CreditCardCur.PayConnectTokenExp=DateTime.MinValue;
+			if(checkSaveToken.Checked) {//store the token and the masked CC number (only last four digits)
+				CreditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
+				CreditCardCur.PayConnectToken=response.PaymentToken.TokenId;
+				CreditCardCur.PayConnectTokenExp=new DateTime(response.PaymentToken.Expiration.year,response.PaymentToken.Expiration.month,
+					DateTime.DaysInMonth(response.PaymentToken.Expiration.year,response.PaymentToken.Expiration.month));
+			}
+			if(CreditCardCur.IsNew) {
+				CreditCards.Insert(CreditCardCur);
+			}
+			else {
+				CreditCards.Update(CreditCardCur);
 			}
 			Cursor=Cursors.Default;
 			DialogResult=DialogResult.OK;

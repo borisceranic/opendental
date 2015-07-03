@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="dxci.merchant" xmlns:ns1="dxci.common" targetNamespace="dxci.merchant" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="MerchantService_schema2.xsd" namespace="dxci.common" />
+  <xs:import schemaLocation="https://webservices.dentalxchange.com:443/merchant/MerchantService?xsd=2" namespace="dxci.common" />
   <xs:element name="CheckRequest" type="tns:checkRequest" />
   <xs:element name="CreditCardRequest" type="tns:creditCardRequest" />
   <xs:element name="DebitCardRequest" type="tns:debitCardRequest" />
@@ -13,10 +13,11 @@
   <xs:element name="getCardTypeResponse" type="tns:getCardTypeResponse" />
   <xs:element name="getMerchantInfo" type="tns:getMerchantInfo" />
   <xs:element name="getMerchantInfoResponse" type="tns:getMerchantInfoResponse" />
-  <xs:element name="isValidExpiration" type="tns:isValidExpiration" />
-  <xs:element name="isValidExpirationResponse" type="tns:isValidExpirationResponse" />
   <xs:element name="isValidCard" type="tns:isValidCard" />
   <xs:element name="isValidCardResponse" type="tns:isValidCardResponse" />
+  <xs:element name="isValidExpiration" type="tns:isValidExpiration" />
+  <xs:element name="isValidExpirationResponse" type="tns:isValidExpirationResponse" />
+  <xs:element name="paymentTokenResponse" type="tns:Token" />
   <xs:element name="processCheck" type="tns:processCheck" />
   <xs:element name="processCheckResponse" type="tns:processCheckResponse" />
   <xs:element name="processCreditCard" type="tns:processCreditCard" />
@@ -25,7 +26,7 @@
   <xs:element name="processDebitCardResponse" type="tns:processDebitCardResponse" />
   <xs:complexType name="isValidCard">
     <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="xs:string" />
+      <xs:element minOccurs="0" name="number" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="isValidCardResponse">
@@ -69,6 +70,7 @@
           <xs:element minOccurs="0" name="RefNumber" type="xs:string" />
           <xs:element minOccurs="0" name="Zip" type="xs:string" />
           <xs:element minOccurs="0" name="SecurityCode" type="xs:string" />
+          <xs:element name="PaymentTokenRequested" type="xs:boolean" />
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -108,9 +110,30 @@
         <xs:sequence>
           <xs:element minOccurs="0" name="AuthCode" type="xs:string" />
           <xs:element minOccurs="0" name="RefNumber" type="xs:string" />
+          <xs:element minOccurs="0" name="PaymentToken" type="tns:Token" />
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Token">
+    <xs:complexContent mixed="false">
+      <xs:extension base="ns1:Response">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="TokenId" type="xs:string" />
+          <xs:element minOccurs="0" name="Expiration" type="tns:expiration" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="isValidExpiration">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="expiration" type="tns:expiration" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="isValidExpirationResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean" />
+    </xs:sequence>
   </xs:complexType>
   <xs:complexType name="processCreditCard">
     <xs:sequence>
@@ -125,22 +148,12 @@
   </xs:complexType>
   <xs:complexType name="getCardType">
     <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="xs:string" />
+      <xs:element minOccurs="0" name="number" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="getCardTypeResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="return" type="tns:cardType" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="isValidExpiration">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="arg0" type="tns:expiration" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="isValidExpirationResponse">
-    <xs:sequence>
-      <xs:element name="return" type="xs:boolean" />
+      <xs:element minOccurs="0" name="cardType" type="tns:cardType" />
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="getMerchantInfo">
@@ -162,9 +175,11 @@
           <xs:element name="AutoCloseBatch" type="xs:boolean" />
           <xs:element name="Echeck" type="xs:boolean" />
           <xs:element minOccurs="0" name="AcceptedCards">
-            <xs:simpleType>
-              <xs:list itemType="tns:cardType" />
-            </xs:simpleType>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="AcceptedCard" type="tns:cardType" />
+              </xs:sequence>
+            </xs:complexType>
           </xs:element>
         </xs:sequence>
       </xs:extension>
@@ -187,6 +202,7 @@
       <xs:enumeration value="AUTH" />
       <xs:enumeration value="RETURN" />
       <xs:enumeration value="VOID" />
+      <xs:enumeration value="FORCE" />
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="cardType">

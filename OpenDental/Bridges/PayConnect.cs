@@ -23,13 +23,16 @@ namespace OpenDental.Bridges {
 				}
 			}
 			cred.Client="OpenDental2";
+#if DEBUG
+			cred.ServiceID="DCI Web Service ID: 002778";//Testing
+#else
 			cred.ServiceID="DCI Web Service ID: 006328";//Production
-			//cred.ServiceID="DCI Web Service ID: 002778";//Testing
+#endif
 			cred.version="0310";
 			return cred;
 		}
 
-		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber) {
+		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber,bool tokenRequested) {
 			PayConnectService.creditCardRequest request=new OpenDental.PayConnectService.creditCardRequest();
 			request.Amount=amount;
 			request.AmountSpecified=true;
@@ -45,22 +48,29 @@ namespace OpenDental.Bridges {
 			request.SecurityCode=securityCode;
 			request.TransType=transtype;
 			request.Zip=zip;
+			request.PaymentTokenRequested=tokenRequested;
 			return request;
 		}
 
 		///<summary>Shows a message box on error.</summary>
 		public static PayConnectService.transResponse ProcessCreditCard(PayConnectService.creditCardRequest request) {
-			try{
+			try {
 				Program prog=Programs.GetCur(ProgramName.PayConnect);
 				PayConnectService.Credentials cred=GetCredentials(prog);
 				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+#if DEBUG
+				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
+#else
+				ms.Url="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl";
+#endif
 				PayConnectService.transResponse response=ms.processCreditCard(cred,request);
 				ms.Dispose();
-				if(response.Status.code!=0){//Error
+				if(response.Status.code!=0) {//Error
 					MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Pay Connect: \""+response.Status.description+"\"");
 				}
 				return response;
-			}catch(Exception ex){
+			}
+			catch(Exception ex) {
 				MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Open Dental: \""+ex.Message+"\"");
 			}
 			return null;

@@ -12,7 +12,7 @@
       <Value Profile="(Default)">http://50.201.161.44:1942/WebServiceCustomerUpdates/Service1.asmx</Value>
     </Setting>
     <Setting Name="OpenDental_PayConnect_MerchantService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">https://webservices.dentalxchange.com/merchant/MerchantService?wsdl</Value>
+      <Value Profile="(Default)">https://webservices.dentalxchange.com:443/merchant/MerchantService</Value>
     </Setting>
     <Setting Name="OpenDental_WebSheets_Sheets" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://localhost:2923/Sheets.asmx</Value>

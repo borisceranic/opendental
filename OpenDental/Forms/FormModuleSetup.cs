@@ -1078,7 +1078,7 @@ namespace OpenDental{
 			this.checkStoreCCTokens.Name = "checkStoreCCTokens";
 			this.checkStoreCCTokens.Size = new System.Drawing.Size(368, 17);
 			this.checkStoreCCTokens.TabIndex = 203;
-			this.checkStoreCCTokens.Text = "Automatically store X-Charge Tokens";
+			this.checkStoreCCTokens.Text = "Automatically store credit card tokens";
 			this.checkStoreCCTokens.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkStoreCCTokens.UseVisualStyleBackColor = true;
 			// 

@@ -2,10 +2,10 @@
 <definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="dxci.merchant" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" name="MerchantService" targetNamespace="dxci.merchant" xmlns="http://schemas.xmlsoap.org/wsdl/">
   <types>
     <xsd:schema>
-      <xsd:import schemaLocation="MerchantService_schema1.xsd" namespace="dxci.merchant" />
+      <xsd:import schemaLocation="https://webservices.dentalxchange.com:443/merchant/MerchantService?xsd=1" namespace="dxci.merchant" />
     </xsd:schema>
     <xsd:schema>
-      <xsd:import schemaLocation="MerchantService_schema2.xsd" namespace="dxci.common" />
+      <xsd:import schemaLocation="https://webservices.dentalxchange.com:443/merchant/MerchantService?xsd=2" namespace="dxci.common" />
     </xsd:schema>
   </types>
   <message name="getMerchantInfo">
@@ -148,7 +148,7 @@
   </binding>
   <service name="MerchantService">
     <port name="MerchantServiceInstancePort" binding="tns:MerchantServiceInstancePortBinding">
-      <soap:address location="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl" />
+      <soap:address location="https://webservices.dentalxchange.com:443/merchant/MerchantService" />
     </port>
   </service>
 </definitions>

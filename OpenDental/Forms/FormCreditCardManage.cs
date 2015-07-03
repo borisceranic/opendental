@@ -22,8 +22,10 @@ namespace OpenDental {
 		}
 		
 		private void FormCreditCardManage_Load(object sender,EventArgs e) {
-			if(PrefC.GetBool(PrefName.StoreCCnumbers) && Programs.IsEnabled(ProgramName.Xcharge)) {
-				labelXChargeWarning.Visible=true;
+			if(PrefC.GetBool(PrefName.StoreCCnumbers)
+				&& (Programs.IsEnabled(ProgramName.Xcharge) || Programs.IsEnabled(ProgramName.PayConnect)))//tokens supported by Xcharge and PayConnect
+			{
+				labelStoreCCNumWarning.Visible=true;
 			}
 			RefreshCardList();
 			if(creditCards.Count>0) {
@@ -155,6 +157,9 @@ namespace OpenDental {
 						return;
 					}
 					return;
+				}
+				else if(Programs.IsEnabled(ProgramName.PayConnect)) {
+
 				}
 				else {
 					MsgBox.Show(this,"Not allowed to store credit cards.");
