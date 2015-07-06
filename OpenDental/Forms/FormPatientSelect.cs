@@ -1241,6 +1241,12 @@ namespace OpenDental{
 						case "Sec Prov":
 							row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
 							break;
+						case "LastVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["lastVisit"].ToString());
+							break;
+						case "NextVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["nextVisit"].ToString());
+							break;
 					}
 				}
 				gridMain.Rows.Add(row);
