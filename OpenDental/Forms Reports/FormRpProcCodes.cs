@@ -5,19 +5,27 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
 	public class FormRpProcCodes : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
-		private System.Windows.Forms.ListBox listFeeSched;
+		private System.Windows.Forms.ListBox listBoxFeeSched;
 		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.RadioButton radioCategories;
 		private System.Windows.Forms.RadioButton radioCode;
 		private System.ComponentModel.Container components = null;
 		private Label label1;
+		private ListBox listBoxClinics;
+		private ListBox listBoxProviders;
+		private Label label2;
+		private Label label3;
 		private FormQuery FormQuery2;
+		private List<FeeSched> _listFeeScheds;
+		private Clinic[] _arrayClinics;
+		private List<Provider> _listProviders;
 
 		///<summary></summary>
 		public FormRpProcCodes(){
@@ -44,67 +52,71 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRpProcCodes));
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.listFeeSched = new System.Windows.Forms.ListBox();
+			this.listBoxFeeSched = new System.Windows.Forms.ListBox();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.radioCategories = new System.Windows.Forms.RadioButton();
 			this.radioCode = new System.Windows.Forms.RadioButton();
 			this.label1 = new System.Windows.Forms.Label();
+			this.listBoxClinics = new System.Windows.Forms.ListBox();
+			this.listBoxProviders = new System.Windows.Forms.ListBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(337,276);
+			this.butCancel.Location = new System.Drawing.Point(337, 276);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 3;
 			this.butCancel.Text = "&Cancel";
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(337,241);
+			this.butOK.Location = new System.Drawing.Point(337, 241);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 2;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// listFeeSched
 			// 
-			this.listFeeSched.Location = new System.Drawing.Point(33,41);
-			this.listFeeSched.Name = "listFeeSched";
-			this.listFeeSched.ScrollAlwaysVisible = true;
-			this.listFeeSched.Size = new System.Drawing.Size(129,173);
-			this.listFeeSched.TabIndex = 0;
+			this.listBoxFeeSched.Location = new System.Drawing.Point(12, 42);
+			this.listBoxFeeSched.Name = "listFeeSched";
+			this.listBoxFeeSched.ScrollAlwaysVisible = true;
+			this.listBoxFeeSched.Size = new System.Drawing.Size(129, 173);
+			this.listBoxFeeSched.TabIndex = 0;
 			// 
 			// panel1
 			// 
 			this.panel1.Controls.Add(this.radioCategories);
 			this.panel1.Controls.Add(this.radioCode);
-			this.panel1.Location = new System.Drawing.Point(206,25);
+			this.panel1.Location = new System.Drawing.Point(227, 241);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(104,60);
+			this.panel1.Size = new System.Drawing.Size(104, 60);
 			this.panel1.TabIndex = 1;
 			// 
 			// radioCategories
 			// 
 			this.radioCategories.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioCategories.Location = new System.Drawing.Point(8,32);
+			this.radioCategories.Location = new System.Drawing.Point(8, 32);
 			this.radioCategories.Name = "radioCategories";
-			this.radioCategories.Size = new System.Drawing.Size(88,24);
+			this.radioCategories.Size = new System.Drawing.Size(88, 24);
 			this.radioCategories.TabIndex = 1;
 			this.radioCategories.Text = "Categories";
 			// 
@@ -112,31 +124,69 @@ namespace OpenDental{
 			// 
 			this.radioCode.Checked = true;
 			this.radioCode.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioCode.Location = new System.Drawing.Point(8,8);
+			this.radioCode.Location = new System.Drawing.Point(8, 8);
 			this.radioCode.Name = "radioCode";
-			this.radioCode.Size = new System.Drawing.Size(88,24);
+			this.radioCode.Size = new System.Drawing.Size(88, 24);
 			this.radioCode.TabIndex = 0;
 			this.radioCode.TabStop = true;
 			this.radioCode.Text = "Code";
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(30,17);
+			this.label1.Location = new System.Drawing.Point(9, 17);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(132,22);
+			this.label1.Size = new System.Drawing.Size(132, 22);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "Fee Schedule";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// listClinics
+			// 
+			this.listBoxClinics.Location = new System.Drawing.Point(147, 42);
+			this.listBoxClinics.Name = "listClinics";
+			this.listBoxClinics.ScrollAlwaysVisible = true;
+			this.listBoxClinics.Size = new System.Drawing.Size(129, 173);
+			this.listBoxClinics.TabIndex = 5;
+			// 
+			// listProviders
+			// 
+			this.listBoxProviders.Location = new System.Drawing.Point(283, 42);
+			this.listBoxProviders.Name = "listProviders";
+			this.listBoxProviders.ScrollAlwaysVisible = true;
+			this.listBoxProviders.Size = new System.Drawing.Size(129, 173);
+			this.listBoxProviders.TabIndex = 6;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(144, 17);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(132, 22);
+			this.label2.TabIndex = 7;
+			this.label2.Text = "Clinic";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(280, 17);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(132, 22);
+			this.label3.TabIndex = 8;
+			this.label3.Text = "Provider";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormRpProcCodes
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(423,314);
+			this.ClientSize = new System.Drawing.Size(423, 314);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.listBoxProviders);
+			this.Controls.Add(this.listBoxClinics);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.panel1);
-			this.Controls.Add(this.listFeeSched);
+			this.Controls.Add(this.listBoxFeeSched);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -153,21 +203,37 @@ namespace OpenDental{
 		}
 		#endregion
 		private void FormRpProcCodes_Load(object sender, System.EventArgs e) {
-			for(int i=0;i<FeeSchedC.ListShort.Count;i++){
-				listFeeSched.Items.Add(FeeSchedC.ListShort[i].Description);
+			_listFeeScheds=FeeSchedC.GetListShort();
+			_listProviders=ProviderC.GetListShort();
+			_arrayClinics=Clinics.GetList();
+			for(int i=0;i<_listFeeScheds.Count;i++){
+				listBoxFeeSched.Items.Add(_listFeeScheds[i].Description);
 			}		
-			listFeeSched.SelectedIndex=0;
+			listBoxFeeSched.SelectedIndex=0;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				listBoxClinics.Items.Add("Default");
+			}
+			else {
+				listBoxClinics.Items.Add("Default");
+				for(int i=0;i<_arrayClinics.Length;i++) {
+					listBoxClinics.Items.Add(_arrayClinics[i].Description);
+				}
+			}
+			listBoxProviders.Items.Add("Default");
+			for(int i=0;i<_listProviders.Count;i++) {
+				listBoxProviders.Items.Add(_listProviders[i].Abbr);
+			}
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			long feeSched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;	
+		private void butOK_Click(object sender,System.EventArgs e) {
+			long feeSched=FeeSchedC.ListShort[listBoxFeeSched.SelectedIndex].FeeSchedNum;	
       string catName="";  //string to hold current category name
 			Fees fee=new Fees();
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query= "SELECT procedurecode.ProcCode,fee.Amount,'  ',procedurecode.Descript,"
 				+"'  ',procedurecode.AbbrDesc FROM procedurecode,fee "
 				+"WHERE procedurecode.CodeNum=fee.CodeNum AND fee.FeeSched='"+POut.String(feeSched.ToString())+"' "
-				+"ORDER BY procedurecode.ProcCode";
+				+"ORDER BY procedurecode.ProcCode";			
 			FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
       if (radioCode.Checked==true)  {
@@ -203,7 +269,7 @@ namespace OpenDental{
 				row[1]=ProcList[0].ProcCode;
 				row[2]=ProcList[0].Descript;
 				row[4]=ProcList[0].AbbrDesc;
-			  row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched)).ToString("F");
+			  row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched,FormOpenDental.ClinicNum,0)).ToString("F");
 				report.ColTotal[5]+=PIn.Decimal(row[5].ToString());
 				report.TableQ.Rows.Add(row);
 				for(int i=1;i<ProcList.Length;i++){//loop through data rows
@@ -218,8 +284,7 @@ namespace OpenDental{
 					row[1]=ProcList[i].ProcCode.ToString();
 					row[2]=ProcList[i].Descript;
 					row[4]=ProcList[i].AbbrDesc.ToString();
-					row[5]=((double)Fees.GetAmount0(ProcList[i].CodeNum,feeSched)).ToString("F");
-  				//report.ColTotal[4]+=PIn.PDouble(row[4].ToString());
+					row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched,FormOpenDental.ClinicNum,0)).ToString("F");  				//report.ColTotal[4]+=PIn.PDouble(row[4].ToString());
 					report.TableQ.Rows.Add(row);
 				}
 				FormQuery2.ResetGrid();//this is a method in FormQuery2;
