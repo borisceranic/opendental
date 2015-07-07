@@ -140,6 +140,15 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
+  <data name="labelRecallMessage.Text" xml:space="preserve">
+    <value>Settings are used from different places throughout the program that dictate which available time slots are shown and how recall appointments will be created.  These are some shortcuts to those places that help fine tune your Web Sched.</value>
+  </data>
+  <data name="labelWebSchedDesc.Text" xml:space="preserve">
+    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
+
+This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
+For more information, see our online manual.</value>
+  </data>
   <data name="label25.Text" xml:space="preserve">
     <value>The Listener Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the Listener Service again.  Make sure to install the Listener Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
 
@@ -153,15 +162,6 @@ Installing the Listener Service for the first time requires installing the OpenD
   <data name="label12.Text" xml:space="preserve">
     <value>Only used when Open Dental is hosting your mobile web application.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
-  <data name="labelRecallMessage.Text" xml:space="preserve">
-    <value>Settings are used from different places throughout the program that dictate which available time slots are shown and how recall appointments will be created.  These are some shortcuts to those places that help fine tune your Web Sched.</value>
-  </data>
-  <data name="labelWebSchedDesc.Text" xml:space="preserve">
-    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
-
-This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
-For more information, see our online manual.</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="butBackMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -170,15 +170,15 @@ For more information, see our online manual.</value>
         kiVFFkxpkuFKlh5fDghAM0DMlxYVunQ4YKGAnzsd3mx4MyAAOw==
 </value>
   </data>
+  <data name="label29.Text" xml:space="preserve">
+    <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
+  </data>
   <data name="butFwdMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         R0lGODlhDQAPAIIAAAAAAAAAeH9/fwAA/3V1/+Df4wAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQB
         AAAFACwAAAAADQAPAAAITwALCBQIYKBBgwIAFDyIEACBhQYVSiTwsOGAixcpQkyIEaNGgRw7ZqwYUuQA
         jSVNFkzZcWHCADADYNwoUeFFiAUE6NQJYADOgwl/AhVaICAAOw==
 </value>
-  </data>
-  <data name="label29.Text" xml:space="preserve">
-    <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
