@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Collections.Generic;
+using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -13,7 +14,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ListBox listBoxFeeSched;
-		private System.Windows.Forms.Panel panel1;
 		private System.Windows.Forms.RadioButton radioCategories;
 		private System.Windows.Forms.RadioButton radioCode;
 		private System.ComponentModel.Container components = null;
@@ -25,6 +25,8 @@ namespace OpenDental{
 		private FormQuery FormQuery2;
 		private List<FeeSched> _listFeeScheds;
 		private Clinic[] _arrayClinics;
+		private CheckBox checkShowBlankFees;
+		private GroupBox groupBox5;
 		private List<Provider> _listProviders;
 
 		///<summary></summary>
@@ -53,7 +55,6 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.listBoxFeeSched = new System.Windows.Forms.ListBox();
-			this.panel1 = new System.Windows.Forms.Panel();
 			this.radioCategories = new System.Windows.Forms.RadioButton();
 			this.radioCode = new System.Windows.Forms.RadioButton();
 			this.label1 = new System.Windows.Forms.Label();
@@ -61,7 +62,9 @@ namespace OpenDental{
 			this.listBoxProviders = new System.Windows.Forms.ListBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.panel1.SuspendLayout();
+			this.checkShowBlankFees = new System.Windows.Forms.CheckBox();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.groupBox5.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -94,27 +97,18 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// listFeeSched
+			// listBoxFeeSched
 			// 
 			this.listBoxFeeSched.Location = new System.Drawing.Point(12, 42);
-			this.listBoxFeeSched.Name = "listFeeSched";
+			this.listBoxFeeSched.Name = "listBoxFeeSched";
 			this.listBoxFeeSched.ScrollAlwaysVisible = true;
 			this.listBoxFeeSched.Size = new System.Drawing.Size(129, 173);
 			this.listBoxFeeSched.TabIndex = 0;
 			// 
-			// panel1
-			// 
-			this.panel1.Controls.Add(this.radioCategories);
-			this.panel1.Controls.Add(this.radioCode);
-			this.panel1.Location = new System.Drawing.Point(227, 241);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(104, 60);
-			this.panel1.TabIndex = 1;
-			// 
 			// radioCategories
 			// 
 			this.radioCategories.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioCategories.Location = new System.Drawing.Point(8, 32);
+			this.radioCategories.Location = new System.Drawing.Point(6, 39);
 			this.radioCategories.Name = "radioCategories";
 			this.radioCategories.Size = new System.Drawing.Size(88, 24);
 			this.radioCategories.TabIndex = 1;
@@ -124,7 +118,7 @@ namespace OpenDental{
 			// 
 			this.radioCode.Checked = true;
 			this.radioCode.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioCode.Location = new System.Drawing.Point(8, 8);
+			this.radioCode.Location = new System.Drawing.Point(6, 15);
 			this.radioCode.Name = "radioCode";
 			this.radioCode.Size = new System.Drawing.Size(88, 24);
 			this.radioCode.TabIndex = 0;
@@ -140,18 +134,18 @@ namespace OpenDental{
 			this.label1.Text = "Fee Schedule";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// listClinics
+			// listBoxClinics
 			// 
 			this.listBoxClinics.Location = new System.Drawing.Point(147, 42);
-			this.listBoxClinics.Name = "listClinics";
+			this.listBoxClinics.Name = "listBoxClinics";
 			this.listBoxClinics.ScrollAlwaysVisible = true;
 			this.listBoxClinics.Size = new System.Drawing.Size(129, 173);
 			this.listBoxClinics.TabIndex = 5;
 			// 
-			// listProviders
+			// listBoxProviders
 			// 
 			this.listBoxProviders.Location = new System.Drawing.Point(283, 42);
-			this.listBoxProviders.Name = "listProviders";
+			this.listBoxProviders.Name = "listBoxProviders";
 			this.listBoxProviders.ScrollAlwaysVisible = true;
 			this.listBoxProviders.Size = new System.Drawing.Size(129, 173);
 			this.listBoxProviders.TabIndex = 6;
@@ -174,18 +168,38 @@ namespace OpenDental{
 			this.label3.Text = "Provider";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// checkShowBlankFees
+			// 
+			this.checkShowBlankFees.Location = new System.Drawing.Point(45, 246);
+			this.checkShowBlankFees.Name = "checkShowBlankFees";
+			this.checkShowBlankFees.Size = new System.Drawing.Size(166, 24);
+			this.checkShowBlankFees.TabIndex = 9;
+			this.checkShowBlankFees.Text = "Show blank fees";
+			this.checkShowBlankFees.UseVisualStyleBackColor = true;
+			// 
+			// groupBox5
+			// 
+			this.groupBox5.Controls.Add(this.radioCategories);
+			this.groupBox5.Controls.Add(this.radioCode);
+			this.groupBox5.Location = new System.Drawing.Point(217, 231);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(114, 71);
+			this.groupBox5.TabIndex = 31;
+			this.groupBox5.TabStop = false;
+			// 
 			// FormRpProcCodes
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(423, 314);
+			this.Controls.Add(this.groupBox5);
+			this.Controls.Add(this.checkShowBlankFees);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.listBoxProviders);
 			this.Controls.Add(this.listBoxClinics);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.listBoxFeeSched);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
@@ -197,7 +211,7 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Procedure Codes Report";
 			this.Load += new System.EventHandler(this.FormRpProcCodes_Load);
-			this.panel1.ResumeLayout(false);
+			this.groupBox5.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -209,104 +223,60 @@ namespace OpenDental{
 			for(int i=0;i<_listFeeScheds.Count;i++){
 				listBoxFeeSched.Items.Add(_listFeeScheds[i].Description);
 			}		
-			listBoxFeeSched.SelectedIndex=0;
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				listBoxClinics.Items.Add("Default");
-			}
-			else {
-				listBoxClinics.Items.Add("Default");
+			listBoxFeeSched.SelectedIndex=0;	
+			listBoxClinics.Items.Add("Default");
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<_arrayClinics.Length;i++) {
 					listBoxClinics.Items.Add(_arrayClinics[i].Description);
 				}
 			}
+			listBoxClinics.SelectedIndex=0;
 			listBoxProviders.Items.Add("Default");
 			for(int i=0;i<_listProviders.Count;i++) {
 				listBoxProviders.Items.Add(_listProviders[i].Abbr);
 			}
+			listBoxProviders.SelectedIndex=0;
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			long feeSched=FeeSchedC.ListShort[listBoxFeeSched.SelectedIndex].FeeSchedNum;	
-      string catName="";  //string to hold current category name
-			Fees fee=new Fees();
-			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query= "SELECT procedurecode.ProcCode,fee.Amount,'  ',procedurecode.Descript,"
-				+"'  ',procedurecode.AbbrDesc FROM procedurecode,fee "
-				+"WHERE procedurecode.CodeNum=fee.CodeNum AND fee.FeeSched='"+POut.String(feeSched.ToString())+"' "
-				+"ORDER BY procedurecode.ProcCode";			
-			FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-      if (radioCode.Checked==true)  {
-			  FormQuery2.SubmitReportQuery();			      
-				report.Title="Procedure Codes";
-				report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-				report.SubTitle.Add(FeeScheds.GetDescription(feeSched));
-				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					report.SetColumn(this,0,"Code",150);
-				}
-				else {
-					report.SetColumn(this,0,"Code",70);
-				}
-				report.SetColumn(this,1,"Fee Amount",70,HorizontalAlignment.Right);
-				report.SetColumn(this,2," ",40);//otherwise, the amount gets bunched up next to the description.
-				report.SetColumn(this,3,"Description",320);
-				report.SetColumn(this,4," ",20);
-				report.SetColumn(this,5,"Abbr Description",200);
-				FormQuery2.ShowDialog();
-				DialogResult=DialogResult.OK;		
-      }
-			else {//categories
-			  //report.SubmitTemp();//create TableTemp which is not actually used
-	      ProcedureCode[] ProcList=ProcedureCodes.GetProcList();
-				report.TableQ=new DataTable(null);
-			  for(int i=0;i<6;i++){//add columns
-				  report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
-			  }
-				report.InitializeColumns();
-        DataRow row=report.TableQ.NewRow();//add first row by hand to get value for temp
-				row[0]=DefC.GetName(DefCat.ProcCodeCats,ProcList[0].ProcCat);
-				catName=row[0].ToString();
-				row[1]=ProcList[0].ProcCode;
-				row[2]=ProcList[0].Descript;
-				row[4]=ProcList[0].AbbrDesc;
-			  row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched,FormOpenDental.ClinicNum,0)).ToString("F");
-				report.ColTotal[5]+=PIn.Decimal(row[5].ToString());
-				report.TableQ.Rows.Add(row);
-				for(int i=1;i<ProcList.Length;i++){//loop through data rows
-					row=report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
-					row[0]=DefC.GetName(DefCat.ProcCodeCats,ProcList[i].ProcCat);
-					if(catName==row[0].ToString()){
-            row[0]=""; 
-					}
-					else  {
-						catName=row[0].ToString();
-          }
-					row[1]=ProcList[i].ProcCode.ToString();
-					row[2]=ProcList[i].Descript;
-					row[4]=ProcList[i].AbbrDesc.ToString();
-					row[5]=((double)Fees.GetAmount0(ProcList[0].CodeNum,feeSched,FormOpenDental.ClinicNum,0)).ToString("F");  				//report.ColTotal[4]+=PIn.PDouble(row[4].ToString());
-					report.TableQ.Rows.Add(row);
-				}
-				FormQuery2.ResetGrid();//this is a method in FormQuery2;
-				report.Title="Procedure Codes";
-				report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-				report.SubTitle.Add(FeeScheds.GetDescription(feeSched));
-				report.ColPos[0]=20;
-				report.ColPos[1]=120;
-				report.ColPos[2]=270;
-				report.ColPos[3]=580;
-				report.ColPos[4]=600;
-				report.ColPos[5]=700;
-				report.ColPos[6]=770;
-				report.ColCaption[0]="Category";
-				report.ColCaption[1]="Code";
-				report.ColCaption[2]="Description";
-				report.ColCaption[4]="Abbr Description";
-				report.ColCaption[5]="Fee Amount";
-				report.ColAlign[5]=HorizontalAlignment.Right;
-				FormQuery2.ShowDialog();
-				DialogResult=DialogResult.OK;
+			FeeSched feeSched=_listFeeScheds[listBoxFeeSched.SelectedIndex];
+			long clinicNum=0;
+			if(listBoxClinics.SelectedIndex>0){
+				clinicNum=_arrayClinics[listBoxClinics.SelectedIndex-1].ClinicNum;
 			}
+			long provNum=0;
+			if(listBoxProviders.SelectedIndex>0){
+				provNum=_listProviders[listBoxProviders.SelectedIndex-1].ProvNum;
+			}
+			DataTable dataTable=RpProcCodes.GetData(feeSched.FeeSchedNum,clinicNum,provNum,radioCategories.Checked,checkShowBlankFees.Checked);
+			ReportComplex report=new ReportComplex(true,true);
+			report.ReportName="Procedure Codes";
+			report.AddTitle("Title",Lan.g(this,"Procedure Codes"));
+			report.AddSubTitle("Fee Schedule",feeSched.Description);
+			report.AddSubTitle("Clinic",listBoxClinics.Items[listBoxClinics.SelectedIndex].ToString());
+			report.AddSubTitle("Provider",listBoxProviders.Items[listBoxProviders.SelectedIndex].ToString());
+			report.AddSubTitle("Date",DateTime.Now.ToShortDateString());
+			QueryObject queryObject=new QueryObject();
+			queryObject=report.AddQuery(dataTable,"","",SplitByKind.None,1,true);
+			if(radioCategories.Checked) {
+				queryObject.AddColumn("Category",100,FieldValueType.String);
+				queryObject.GetColumnDetail("Category").SuppressIfDuplicate=true;
+			}
+			queryObject.AddColumn("Code",100,FieldValueType.String);
+			queryObject.AddColumn("Desc",600,FieldValueType.String);
+			queryObject.AddColumn("Abbr",100,FieldValueType.String);
+			queryObject.AddColumn("Fee",100,FieldValueType.String);
+			queryObject.GetColumnDetail("Fee").ContentAlignment=ContentAlignment.MiddleRight;
+			queryObject.GetColumnDetail("Fee").StringFormat="C"; //This isn't working...
+			report.AddPageNum();
+			// execute query
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			// display report
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
 		}
 	}
 }
