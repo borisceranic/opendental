@@ -14,7 +14,7 @@ namespace OpenDentBusiness{
 		///<summary>Gets data for the history grid in the SendClaims window.  The listEtransType must contain as least one item.</summary>
 		public static DataTable RefreshHistory(DateTime dateFrom,DateTime dateTo,List<EtransType> listEtransType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listEtransType);
 			}
 			string command="Select CONCAT(CONCAT(patient.LName,', '),patient.FName) AS PatName,carrier.CarrierName,"
 				+"clearinghouse.Description AS Clearinghouse,DateTimeTrans,etrans.OfficeSequenceNumber,"
