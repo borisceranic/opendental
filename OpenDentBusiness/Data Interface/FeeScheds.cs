@@ -50,18 +50,23 @@ namespace OpenDentBusiness{
 			Crud.FeeSchedCrud.Update(feeSched);
 		}
 
+		///<summary>Returns the description of the fee schedule.  Appends (hidden) if the fee schedule has been hidden.</summary>
 		public static string GetDescription(long feeSchedNum) {
 			//No need to check RemotingRole; no call to db.
-			if(feeSchedNum==0){
-				return "";
+			string feeSchedDesc="";
+			if(feeSchedNum==0) {
+				return feeSchedDesc;
 			}
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
-			for(int i=0;i<listFeeScheds.Count;i++){
-				if(listFeeScheds[i].FeeSchedNum==feeSchedNum){
-					return listFeeScheds[i].Description;
+			for(int i=0;i<listFeeScheds.Count;i++) {
+				if(listFeeScheds[i].FeeSchedNum!=feeSchedNum) {
+					continue;
 				}
+				feeSchedDesc=listFeeScheds[i].Description;
+				feeSchedDesc+=listFeeScheds[i].IsHidden?" ("+Lans.g("FeeScheds","hidden")+")":"";
+				break;
 			}
-			return "";
+			return feeSchedDesc;
 		}
 
 		public static bool GetIsHidden(long feeSchedNum) {

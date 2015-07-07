@@ -10,8 +10,8 @@ namespace OpenDentBusiness{
 		private static List<Fee> _listt;
 		private static object _lockObj=new object();
 
-		///<summary>A list of all Fees.</summary>
-		public static List<Fee> Listt{
+		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
+		public static List<Fee> Listt {
 			get {
 				return GetListt();
 			}
@@ -22,7 +22,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>A list of all Fees.</summary>
+		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
 		public static List<Fee> GetListt() {
 			bool isListNull=false;
 			lock(_lockObj) {
@@ -34,9 +34,20 @@ namespace OpenDentBusiness{
 				Fees.RefreshCache();
 			}
 			List<Fee> listFees=new List<Fee>();
+			//Get a deep copy of the visible fee schedules to help figure out which fees are 'hidden'.
+			List<FeeSched> listFeeSchedules=FeeSchedC.GetListShort();
 			lock(_lockObj) {
-				for(int i=0;i<_listt.Count;i++) {
-					listFees.Add(_listt[i].Copy());
+				//This is not common at all.  Typically there will be a "GetListShort" that will return all cached items that are not hidden.
+				//However, there is no such thing as hiding a fee.  There is however such a thing as hiding a fee schedule.
+				//Hiding a fee schedule is just a good as hiding the fees it is associated to.
+				//For speed purposes, we need to grab deep copies of fees that are not associated to a hidden fee schedule.
+				//There are places in the program (e.g. computing estimates) that call GetListt many times in a loop.
+				//Those loops are extremely slow when getting a deep copy of the entire fee table (e.g. 359,421 fees) when only a portion of them are used.
+				//An example is when you change nothing and leave the Ins Plan Edit window by clicking OK.
+				//That window was taking an office several seconds to close.  By not grabbing a deep copy of hidden fees, the time was cut in half.
+				List<Fee> listNonHiddenFees=_listt.FindAll(x => listFeeSchedules.Exists(y => y.FeeSchedNum==x.FeeSched));//Get all non-hidden fees.
+				for(int i=0;i<listNonHiddenFees.Count;i++) {
+					listFees.Add(listNonHiddenFees[i].Copy());
 				}
 			}
 			return listFees;
