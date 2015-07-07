@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	/// <summary>These are the definitions for the custom patient fields added and managed by the user.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class PatFieldDef:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
