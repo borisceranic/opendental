@@ -948,19 +948,24 @@ namespace OpenDentBusiness {
 			ComputeEstimatesForPatNums(patnums);
 		}
 
-		private static void ComputeEstimatesForPatNums(List<long> patnums){
+		private static void ComputeEstimatesForPatNums(List<long> patnums) {
+			//No need to check RemotingRole; no call to db.
 			long patNum=0;
 			for(int i=0;i<patnums.Count;i++) {
 				patNum=patnums[i];
 				Family fam=Patients.GetFamily(patNum);
 				Patient pat=fam.GetPatient(patNum);
-				List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
 				List<Procedure> procs=Procedures.Refresh(patNum);
+				//Only grab the procedures that have not been completed yet.
+				List<Procedure> listNonCompletedProcs=procs.FindAll(x => x.ProcStatus!=ProcStat.C && x.ProcStatus!=ProcStat.D);
+				List<ClaimProc> claimProcs=ClaimProcs.Refresh(patNum);
+				//Only use the claim procs associated to the non-completed procedures.
+				List<ClaimProc> listNonCompletedClaimProcs=claimProcs.FindAll(x => listNonCompletedProcs.Exists(y => y.ProcNum==x.ProcNum));
 				List<InsSub> subs=InsSubs.RefreshForFam(fam);
 				List<InsPlan> plans=InsPlans.RefreshForSubList(subs);
 				List<PatPlan> patPlans=PatPlans.Refresh(patNum);
 				List<Benefit> benefitList=Benefits.Refresh(patPlans,subs);
-				Procedures.ComputeEstimatesForAll(patNum,claimProcs,procs,plans,patPlans,benefitList,pat.Age,subs);
+				Procedures.ComputeEstimatesForAll(patNum,listNonCompletedClaimProcs,listNonCompletedProcs,plans,patPlans,benefitList,pat.Age,subs);
 				Patients.SetHasIns(patNum);
 			}
 		}
