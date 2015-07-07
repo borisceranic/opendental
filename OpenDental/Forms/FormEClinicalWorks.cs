@@ -62,6 +62,7 @@ namespace OpenDental{
 		private Label label12;
 		private CheckBox checkHideButChartRx;
 		private Label labelHL7FolderIn;
+		private CheckBox checkProcRequireSignature;
 		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
@@ -138,6 +139,7 @@ namespace OpenDental{
 			this.checkLBSessionId = new System.Windows.Forms.CheckBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.checkHideButChartRx = new System.Windows.Forms.CheckBox();
+			this.checkProcRequireSignature = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -150,7 +152,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(563, 560);
+			this.butCancel.Location = new System.Drawing.Point(563, 592);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
@@ -165,7 +167,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(482, 560);
+			this.butOK.Location = new System.Drawing.Point(482, 592);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -368,7 +370,7 @@ namespace OpenDental{
 			this.butDiagnostic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDiagnostic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDiagnostic.CornerRadius = 4F;
-			this.butDiagnostic.Location = new System.Drawing.Point(299, 560);
+			this.butDiagnostic.Location = new System.Drawing.Point(299, 592);
 			this.butDiagnostic.Name = "butDiagnostic";
 			this.butDiagnostic.Size = new System.Drawing.Size(90, 24);
 			this.butDiagnostic.TabIndex = 61;
@@ -535,7 +537,7 @@ namespace OpenDental{
 			// 
 			this.checkHideButChartRx.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHideButChartRx.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHideButChartRx.Location = new System.Drawing.Point(12, 538);
+			this.checkHideButChartRx.Location = new System.Drawing.Point(11, 538);
 			this.checkHideButChartRx.Name = "checkHideButChartRx";
 			this.checkHideButChartRx.Size = new System.Drawing.Size(211, 21);
 			this.checkHideButChartRx.TabIndex = 79;
@@ -543,11 +545,24 @@ namespace OpenDental{
 			this.checkHideButChartRx.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHideButChartRx.UseVisualStyleBackColor = true;
 			// 
+			// checkProcRequireSignature
+			// 
+			this.checkProcRequireSignature.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProcRequireSignature.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkProcRequireSignature.Location = new System.Drawing.Point(1, 558);
+			this.checkProcRequireSignature.Name = "checkProcRequireSignature";
+			this.checkProcRequireSignature.Size = new System.Drawing.Size(221, 21);
+			this.checkProcRequireSignature.TabIndex = 80;
+			this.checkProcRequireSignature.Text = "Require Signatures for Procedure Notes";
+			this.checkProcRequireSignature.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProcRequireSignature.UseVisualStyleBackColor = true;
+			// 
 			// FormEClinicalWorks
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(650, 596);
+			this.ClientSize = new System.Drawing.Size(650, 628);
+			this.Controls.Add(this.checkProcRequireSignature);
 			this.Controls.Add(this.checkHideButChartRx);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.checkLBSessionId);
@@ -625,6 +640,12 @@ namespace OpenDental{
 			}
 			else {
 				checkHideButChartRx.Checked=false;
+			}
+			if(GetProp("ProcRequireSignature")=="1") {
+				checkProcRequireSignature.Checked=true;
+			}
+			else {
+				checkProcRequireSignature.Checked=false;
 			}
 			SetModeRadioButtons(GetProp("eClinicalWorksMode"));
 			SetModeVisibilities();
@@ -818,6 +839,12 @@ namespace OpenDental{
 			}
 			else {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","0");
+			}
+			if(checkProcRequireSignature.Checked) {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcRequireSignature","1");
+			}
+			else {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcRequireSignature","0");
 			}
 			if(radioModeTight.Checked || radioModeFull.Checked) {
 				if(radioModeTight.Checked) {

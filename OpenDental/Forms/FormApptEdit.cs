@@ -3027,6 +3027,24 @@ namespace OpenDental{
 					MessageBox.Show(duplicateProcs);
 					return;
 				}
+				if(ProgramProperties.GetPropVal(ProgramName.eClinicalWorks,"ProcRequireSignature")=="1") {
+					bool unsignedNotesPresent=false;
+					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
+						if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="0") {//not attached
+							continue;
+						}
+						long procNum=PIn.Long(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString());
+						Procedure proc=Procedures.GetOneProc(procNum,true);
+						if(proc.Note!=""
+						&& proc.Signature=="") {
+							unsignedNotesPresent=true;
+						}
+					}
+					if(unsignedNotesPresent) {
+						MsgBox.Show(this,"This appointment cannot be sent because there are unsigned procedure notes.");
+						return;
+					}
+				}			
 				////check to make sure that the appointment and all attached procedures are marked complete as required.
 				//bool procsAreComplete=true;
 				//for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
