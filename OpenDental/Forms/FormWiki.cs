@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Text.RegularExpressions;
 
 namespace OpenDental {
 	public partial class FormWiki:Form {
@@ -414,7 +415,10 @@ namespace OpenDental {
 			}
 			else if(e.Url.ToString().StartsWith("wiki:")) {//user clicked on an internal link
 				historyNavBack--;//We have to decrement historyNavBack to tell whether or not we need to branch our page history or add to page history
-				LoadWikiPage(e.Url.ToString().Substring(5));
+				//It is invalid to have more than one space in a row in URLs.
+				//When there is more than one space in a row, WebBrowserNavigatingEventArgs will convert the spaces into '&nbsp'
+				//In order for our internal wiki page links to work, we need to always replace the '&nbsp' chars with spaces again.
+				LoadWikiPage(Regex.Replace(e.Url.ToString(),@"\u00A0"," ").Substring(5));
 				e.Cancel=true;
 				return;
 			}
