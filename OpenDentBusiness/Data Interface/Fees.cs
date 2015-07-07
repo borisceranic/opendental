@@ -161,13 +161,13 @@ namespace OpenDentBusiness{
 				if(bestFee!=null) {
 					return bestFee;
 				}
-				//Try to find a clinic match
-				bestFee=listFees.Find(fee => fee.FeeSched==feeSched.FeeSchedNum && fee.CodeNum==codeNum && fee.ClinicNum==clinicNum && fee.ProvNum==0);
+				//Try to find a provider match
+				bestFee=listFees.Find(fee => fee.FeeSched==feeSched.FeeSchedNum && fee.CodeNum==codeNum && fee.ProvNum==provNum && fee.ClinicNum==0);
 				if(bestFee!=null) {
 					return bestFee;
 				}
-				//Try to find a provider match
-				bestFee=listFees.Find(fee => fee.FeeSched==feeSched.FeeSchedNum && fee.CodeNum==codeNum && fee.ProvNum==provNum && fee.ClinicNum==0);
+				//Try to find a clinic match
+				bestFee=listFees.Find(fee => fee.FeeSched==feeSched.FeeSchedNum && fee.CodeNum==codeNum && fee.ClinicNum==clinicNum && fee.ProvNum==0);
 				if(bestFee!=null) {
 					return bestFee;
 				}

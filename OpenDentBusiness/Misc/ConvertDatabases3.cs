@@ -8908,10 +8908,27 @@ namespace OpenDentBusiness {
 						+"FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'),'ProcNotesNoIncomplete',0)";
 					Db.NonQ(command);
 				}
-
-
-
-
+				//Add 4 new definitions for the Fee colors. Only the colors are editable. ------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) { //34 is DefCat.FeeColors
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemColor) VALUES (34,'Default',0,-16777216)"; //Black
+					Db.NonQ(command);
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemColor) VALUES (34,'Provider',1,-15161839)"; //Greenish
+					Db.NonQ(command);
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemColor) VALUES (34,'Clinic',2,-3176419)"; //Brownish
+					Db.NonQ(command);
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemColor) VALUES (34,'Provider and Clinic',3,-16776961)"; //Blue
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Default',0,-16777216)";
+					Db.NonQ(command);
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Provider',1,-15161839)";
+					Db.NonQ(command);
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Clinic',2,-3176419)";
+					Db.NonQ(command);
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Provider and Clinic',3,-16776961)";
+					Db.NonQ(command);
+				}
 
 
 

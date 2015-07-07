@@ -68,24 +68,20 @@ namespace OpenDental{
 		private List<Provider> _listProviders;
 		///<summary>List of all fees, stored in memory for easy access and editing.  Synced on form close.</summary>
 		private List<Fee> _listFees;
-		private Label label12;
-		private Label label10;
-		private Label label8;
-		private Label label9;
-		private Label label11;
-		private Label label13;
-		private Label label14;
-		private Label label15;
-		private Label label16;
+		private Label labelSched1;
+		private Label labelClinic1;
+		private Label labelProvider1;
+		private Label labelSched2;
+		private Label labelClinic2;
+		private Label labelProvider2;
+		private Label labelSched3;
+		private Label labelClinic3;
+		private Label labelProvider3;
 		private GroupBox groupBox5;
 		private Label label22;
 		private Label label20;
 		private Label label19;
-		private Label labelBlack;
-		private Label labelBlue;
-		private Label labelGreen;
 		private Label label21;
-		private Label labelBeige;
 		private UI.Button butPickProv1;
 		private UI.Button butPickClinic1;
 		private UI.Button butPickSched1;
@@ -96,10 +92,14 @@ namespace OpenDental{
 		private UI.Button butPickClinic3;
 		private UI.Button butPickSched3;
 		private List<ProcedureCode> _listProcCodes;
-		private Color _colorClinic=ODPaintTools.ColorNotifyDark;
-		private Color _colorProv=Color.Green;//TODO: decide on a color later.
-		private Color _colorDefault=Color.Black;//TODO: decide on a color later.
-		private Color _colorClinAndProv=Color.Blue;//TODO: decide on a color later.
+		private Color _colorClinic;
+		private Color _colorProv;
+		private Color _colorProvClinic;
+		private Color _colorDefault;
+		private System.Windows.Forms.Button butColorClinicProv;
+		private System.Windows.Forms.Button butColorProvider;
+		private System.Windows.Forms.Button butColorClinic;
+		private System.Windows.Forms.Button butColorDefault;
 
 		///<summary></summary>
 		public FormProcCodes() {
@@ -150,9 +150,9 @@ namespace OpenDental{
 			this.butPickProv1 = new OpenDental.UI.Button();
 			this.butPickClinic1 = new OpenDental.UI.Button();
 			this.butPickSched1 = new OpenDental.UI.Button();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
+			this.labelSched1 = new System.Windows.Forms.Label();
+			this.labelClinic1 = new System.Windows.Forms.Label();
+			this.labelProvider1 = new System.Windows.Forms.Label();
 			this.comboProvider1 = new System.Windows.Forms.ComboBox();
 			this.comboClinic1 = new System.Windows.Forms.ComboBox();
 			this.comboFeeSched1 = new System.Windows.Forms.ComboBox();
@@ -160,31 +160,31 @@ namespace OpenDental{
 			this.butPickProv2 = new OpenDental.UI.Button();
 			this.butPickClinic2 = new OpenDental.UI.Button();
 			this.butPickSched2 = new OpenDental.UI.Button();
-			this.label9 = new System.Windows.Forms.Label();
+			this.labelSched2 = new System.Windows.Forms.Label();
 			this.comboProvider2 = new System.Windows.Forms.ComboBox();
-			this.label11 = new System.Windows.Forms.Label();
+			this.labelClinic2 = new System.Windows.Forms.Label();
 			this.comboClinic2 = new System.Windows.Forms.ComboBox();
-			this.label13 = new System.Windows.Forms.Label();
+			this.labelProvider2 = new System.Windows.Forms.Label();
 			this.comboFeeSched2 = new System.Windows.Forms.ComboBox();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.butPickProv3 = new OpenDental.UI.Button();
 			this.butPickClinic3 = new OpenDental.UI.Button();
 			this.butPickSched3 = new OpenDental.UI.Button();
-			this.label14 = new System.Windows.Forms.Label();
+			this.labelSched3 = new System.Windows.Forms.Label();
 			this.comboProvider3 = new System.Windows.Forms.ComboBox();
-			this.label15 = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
+			this.labelClinic3 = new System.Windows.Forms.Label();
+			this.labelProvider3 = new System.Windows.Forms.Label();
 			this.comboClinic3 = new System.Windows.Forms.ComboBox();
 			this.comboFeeSched3 = new System.Windows.Forms.ComboBox();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.butColorClinicProv = new System.Windows.Forms.Button();
+			this.butColorProvider = new System.Windows.Forms.Button();
+			this.butColorClinic = new System.Windows.Forms.Button();
+			this.butColorDefault = new System.Windows.Forms.Button();
 			this.label21 = new System.Windows.Forms.Label();
-			this.labelBeige = new System.Windows.Forms.Label();
 			this.label22 = new System.Windows.Forms.Label();
 			this.label20 = new System.Windows.Forms.Label();
 			this.label19 = new System.Windows.Forms.Label();
-			this.labelBlack = new System.Windows.Forms.Label();
-			this.labelBlue = new System.Windows.Forms.Label();
-			this.labelGreen = new System.Windows.Forms.Label();
 			this.groupFeeScheds.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupProcCodeSetup.SuspendLayout();
@@ -526,9 +526,9 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.butPickProv1);
 			this.groupBox2.Controls.Add(this.butPickClinic1);
 			this.groupBox2.Controls.Add(this.butPickSched1);
-			this.groupBox2.Controls.Add(this.label12);
-			this.groupBox2.Controls.Add(this.label10);
-			this.groupBox2.Controls.Add(this.label8);
+			this.groupBox2.Controls.Add(this.labelSched1);
+			this.groupBox2.Controls.Add(this.labelClinic1);
+			this.groupBox2.Controls.Add(this.labelProvider1);
 			this.groupBox2.Controls.Add(this.comboProvider1);
 			this.groupBox2.Controls.Add(this.comboClinic1);
 			this.groupBox2.Controls.Add(this.comboFeeSched1);
@@ -581,32 +581,32 @@ namespace OpenDental{
 			this.butPickSched1.Text = "...";
 			this.butPickSched1.Click += new System.EventHandler(this.butPickFeeSched_Click);
 			// 
-			// label12
+			// labelSched1
 			// 
-			this.label12.Location = new System.Drawing.Point(14, 16);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(174, 17);
-			this.label12.TabIndex = 32;
-			this.label12.Text = "Fee Schedule";
-			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelSched1.Location = new System.Drawing.Point(14, 16);
+			this.labelSched1.Name = "labelSched1";
+			this.labelSched1.Size = new System.Drawing.Size(174, 17);
+			this.labelSched1.TabIndex = 32;
+			this.labelSched1.Text = "Fee Schedule";
+			this.labelSched1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// label10
+			// labelClinic1
 			// 
-			this.label10.Location = new System.Drawing.Point(14, 56);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(174, 17);
-			this.label10.TabIndex = 30;
-			this.label10.Text = "Clinic";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelClinic1.Location = new System.Drawing.Point(14, 56);
+			this.labelClinic1.Name = "labelClinic1";
+			this.labelClinic1.Size = new System.Drawing.Size(174, 17);
+			this.labelClinic1.TabIndex = 30;
+			this.labelClinic1.Text = "Clinic";
+			this.labelClinic1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// label8
+			// labelProvider1
 			// 
-			this.label8.Location = new System.Drawing.Point(14, 96);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(174, 17);
-			this.label8.TabIndex = 28;
-			this.label8.Text = "Provider";
-			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelProvider1.Location = new System.Drawing.Point(14, 96);
+			this.labelProvider1.Name = "labelProvider1";
+			this.labelProvider1.Size = new System.Drawing.Size(174, 17);
+			this.labelProvider1.TabIndex = 28;
+			this.labelProvider1.Text = "Provider";
+			this.labelProvider1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboProvider1
 			// 
@@ -643,11 +643,11 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.butPickProv2);
 			this.groupBox3.Controls.Add(this.butPickClinic2);
 			this.groupBox3.Controls.Add(this.butPickSched2);
-			this.groupBox3.Controls.Add(this.label9);
+			this.groupBox3.Controls.Add(this.labelSched2);
 			this.groupBox3.Controls.Add(this.comboProvider2);
-			this.groupBox3.Controls.Add(this.label11);
+			this.groupBox3.Controls.Add(this.labelClinic2);
 			this.groupBox3.Controls.Add(this.comboClinic2);
-			this.groupBox3.Controls.Add(this.label13);
+			this.groupBox3.Controls.Add(this.labelProvider2);
 			this.groupBox3.Controls.Add(this.comboFeeSched2);
 			this.groupBox3.Location = new System.Drawing.Point(780, 192);
 			this.groupBox3.Name = "groupBox3";
@@ -698,14 +698,14 @@ namespace OpenDental{
 			this.butPickSched2.Text = "...";
 			this.butPickSched2.Click += new System.EventHandler(this.butPickFeeSched_Click);
 			// 
-			// label9
+			// labelSched2
 			// 
-			this.label9.Location = new System.Drawing.Point(14, 16);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(174, 17);
-			this.label9.TabIndex = 35;
-			this.label9.Text = "Fee Schedule";
-			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelSched2.Location = new System.Drawing.Point(14, 16);
+			this.labelSched2.Name = "labelSched2";
+			this.labelSched2.Size = new System.Drawing.Size(174, 17);
+			this.labelSched2.TabIndex = 35;
+			this.labelSched2.Text = "Fee Schedule";
+			this.labelSched2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboProvider2
 			// 
@@ -717,14 +717,14 @@ namespace OpenDental{
 			this.comboProvider2.TabIndex = 10;
 			this.comboProvider2.SelectionChangeCommitted += new System.EventHandler(this.comboGeneric_SelectionChangeCommitted);
 			// 
-			// label11
+			// labelClinic2
 			// 
-			this.label11.Location = new System.Drawing.Point(14, 56);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(174, 17);
-			this.label11.TabIndex = 34;
-			this.label11.Text = "Clinic";
-			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelClinic2.Location = new System.Drawing.Point(14, 56);
+			this.labelClinic2.Name = "labelClinic2";
+			this.labelClinic2.Size = new System.Drawing.Size(174, 17);
+			this.labelClinic2.TabIndex = 34;
+			this.labelClinic2.Text = "Clinic";
+			this.labelClinic2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboClinic2
 			// 
@@ -736,14 +736,14 @@ namespace OpenDental{
 			this.comboClinic2.TabIndex = 8;
 			this.comboClinic2.SelectionChangeCommitted += new System.EventHandler(this.comboGeneric_SelectionChangeCommitted);
 			// 
-			// label13
+			// labelProvider2
 			// 
-			this.label13.Location = new System.Drawing.Point(14, 96);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(174, 17);
-			this.label13.TabIndex = 33;
-			this.label13.Text = "Provider";
-			this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelProvider2.Location = new System.Drawing.Point(14, 96);
+			this.labelProvider2.Name = "labelProvider2";
+			this.labelProvider2.Size = new System.Drawing.Size(174, 17);
+			this.labelProvider2.TabIndex = 33;
+			this.labelProvider2.Text = "Provider";
+			this.labelProvider2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboFeeSched2
 			// 
@@ -760,10 +760,10 @@ namespace OpenDental{
 			this.groupBox4.Controls.Add(this.butPickProv3);
 			this.groupBox4.Controls.Add(this.butPickClinic3);
 			this.groupBox4.Controls.Add(this.butPickSched3);
-			this.groupBox4.Controls.Add(this.label14);
+			this.groupBox4.Controls.Add(this.labelSched3);
 			this.groupBox4.Controls.Add(this.comboProvider3);
-			this.groupBox4.Controls.Add(this.label15);
-			this.groupBox4.Controls.Add(this.label16);
+			this.groupBox4.Controls.Add(this.labelClinic3);
+			this.groupBox4.Controls.Add(this.labelProvider3);
 			this.groupBox4.Controls.Add(this.comboClinic3);
 			this.groupBox4.Controls.Add(this.comboFeeSched3);
 			this.groupBox4.Location = new System.Drawing.Point(780, 352);
@@ -815,14 +815,14 @@ namespace OpenDental{
 			this.butPickSched3.Text = "...";
 			this.butPickSched3.Click += new System.EventHandler(this.butPickFeeSched_Click);
 			// 
-			// label14
+			// labelSched3
 			// 
-			this.label14.Location = new System.Drawing.Point(14, 16);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(174, 17);
-			this.label14.TabIndex = 38;
-			this.label14.Text = "Fee Schedule";
-			this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelSched3.Location = new System.Drawing.Point(14, 16);
+			this.labelSched3.Name = "labelSched3";
+			this.labelSched3.Size = new System.Drawing.Size(174, 17);
+			this.labelSched3.TabIndex = 38;
+			this.labelSched3.Text = "Fee Schedule";
+			this.labelSched3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboProvider3
 			// 
@@ -834,23 +834,23 @@ namespace OpenDental{
 			this.comboProvider3.TabIndex = 16;
 			this.comboProvider3.SelectionChangeCommitted += new System.EventHandler(this.comboGeneric_SelectionChangeCommitted);
 			// 
-			// label15
+			// labelClinic3
 			// 
-			this.label15.Location = new System.Drawing.Point(14, 56);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(174, 17);
-			this.label15.TabIndex = 37;
-			this.label15.Text = "Clinic";
-			this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelClinic3.Location = new System.Drawing.Point(14, 56);
+			this.labelClinic3.Name = "labelClinic3";
+			this.labelClinic3.Size = new System.Drawing.Size(174, 17);
+			this.labelClinic3.TabIndex = 37;
+			this.labelClinic3.Text = "Clinic";
+			this.labelClinic3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// label16
+			// labelProvider3
 			// 
-			this.label16.Location = new System.Drawing.Point(14, 96);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(174, 17);
-			this.label16.TabIndex = 36;
-			this.label16.Text = "Provider";
-			this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelProvider3.Location = new System.Drawing.Point(14, 96);
+			this.labelProvider3.Name = "labelProvider3";
+			this.labelProvider3.Size = new System.Drawing.Size(174, 17);
+			this.labelProvider3.TabIndex = 36;
+			this.labelProvider3.Text = "Provider";
+			this.labelProvider3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboClinic3
 			// 
@@ -874,42 +874,69 @@ namespace OpenDental{
 			// 
 			// groupBox5
 			// 
+			this.groupBox5.Controls.Add(this.butColorClinicProv);
+			this.groupBox5.Controls.Add(this.butColorProvider);
+			this.groupBox5.Controls.Add(this.butColorClinic);
+			this.groupBox5.Controls.Add(this.butColorDefault);
 			this.groupBox5.Controls.Add(this.label21);
-			this.groupBox5.Controls.Add(this.labelBeige);
 			this.groupBox5.Controls.Add(this.label22);
 			this.groupBox5.Controls.Add(this.label20);
 			this.groupBox5.Controls.Add(this.label19);
-			this.groupBox5.Controls.Add(this.labelBlack);
-			this.groupBox5.Controls.Add(this.labelBlue);
-			this.groupBox5.Controls.Add(this.labelGreen);
 			this.groupBox5.Location = new System.Drawing.Point(780, 512);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(200, 87);
 			this.groupBox5.TabIndex = 30;
 			this.groupBox5.TabStop = false;
-			this.groupBox5.Text = "Legend";
+			this.groupBox5.Text = "Fee Colors";
+			// 
+			// butColorClinicProv
+			// 
+			this.butColorClinicProv.Enabled = false;
+			this.butColorClinicProv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.butColorClinicProv.Location = new System.Drawing.Point(89, 54);
+			this.butColorClinicProv.Name = "butColorClinicProv";
+			this.butColorClinicProv.Size = new System.Drawing.Size(20, 20);
+			this.butColorClinicProv.TabIndex = 163;
+			// 
+			// butColorProvider
+			// 
+			this.butColorProvider.Enabled = false;
+			this.butColorProvider.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.butColorProvider.Location = new System.Drawing.Point(10, 54);
+			this.butColorProvider.Name = "butColorProvider";
+			this.butColorProvider.Size = new System.Drawing.Size(20, 20);
+			this.butColorProvider.TabIndex = 162;
+			// 
+			// butColorClinic
+			// 
+			this.butColorClinic.Enabled = false;
+			this.butColorClinic.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.butColorClinic.Location = new System.Drawing.Point(89, 23);
+			this.butColorClinic.Name = "butColorClinic";
+			this.butColorClinic.Size = new System.Drawing.Size(20, 20);
+			this.butColorClinic.TabIndex = 161;
+			// 
+			// butColorDefault
+			// 
+			this.butColorDefault.Enabled = false;
+			this.butColorDefault.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.butColorDefault.Location = new System.Drawing.Point(10, 22);
+			this.butColorDefault.Name = "butColorDefault";
+			this.butColorDefault.Size = new System.Drawing.Size(20, 20);
+			this.butColorDefault.TabIndex = 160;
 			// 
 			// label21
 			// 
-			this.label21.Location = new System.Drawing.Point(117, 22);
+			this.label21.Location = new System.Drawing.Point(110, 24);
 			this.label21.Name = "label21";
 			this.label21.Size = new System.Drawing.Size(48, 17);
 			this.label21.TabIndex = 48;
 			this.label21.Text = "= Clinic";
 			this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// labelBeige
-			// 
-			this.labelBeige.Location = new System.Drawing.Point(87, 22);
-			this.labelBeige.Name = "labelBeige";
-			this.labelBeige.Size = new System.Drawing.Size(40, 17);
-			this.labelBeige.TabIndex = 47;
-			this.labelBeige.Text = "Beige";
-			this.labelBeige.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// label22
 			// 
-			this.label22.Location = new System.Drawing.Point(35, 57);
+			this.label22.Location = new System.Drawing.Point(31, 57);
 			this.label22.Name = "label22";
 			this.label22.Size = new System.Drawing.Size(55, 17);
 			this.label22.TabIndex = 46;
@@ -927,39 +954,12 @@ namespace OpenDental{
 			// 
 			// label19
 			// 
-			this.label19.Location = new System.Drawing.Point(32, 23);
+			this.label19.Location = new System.Drawing.Point(31, 24);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(60, 17);
 			this.label19.TabIndex = 43;
 			this.label19.Text = "= Default";
 			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// labelBlack
-			// 
-			this.labelBlack.Location = new System.Drawing.Point(2, 23);
-			this.labelBlack.Name = "labelBlack";
-			this.labelBlack.Size = new System.Drawing.Size(40, 17);
-			this.labelBlack.TabIndex = 39;
-			this.labelBlack.Text = "Black";
-			this.labelBlack.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// labelBlue
-			// 
-			this.labelBlue.Location = new System.Drawing.Point(87, 57);
-			this.labelBlue.Name = "labelBlue";
-			this.labelBlue.Size = new System.Drawing.Size(29, 17);
-			this.labelBlue.TabIndex = 41;
-			this.labelBlue.Text = "Blue";
-			this.labelBlue.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// labelGreen
-			// 
-			this.labelGreen.Location = new System.Drawing.Point(3, 57);
-			this.labelGreen.Name = "labelGreen";
-			this.labelGreen.Size = new System.Drawing.Size(40, 17);
-			this.labelGreen.TabIndex = 42;
-			this.labelGreen.Text = "Green";
-			this.labelGreen.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// FormProcCodes
 			// 
@@ -1020,10 +1020,24 @@ namespace OpenDental{
 			_listProviders=ProviderC.GetListShort();
 			_listFees=Fees.GetListt();
 			_listProcCodes=ProcedureCodeC.GetListLong();
-			labelGreen.ForeColor=_colorProv;
-			labelBlue.ForeColor=_colorClinAndProv;
-			labelBeige.ForeColor=_colorClinic;
-			labelBlack.ForeColor=_colorDefault;
+			_colorProv=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider"));
+			_colorProvClinic=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider and Clinic"));
+			_colorClinic=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Clinic"));
+			_colorDefault=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Default"));
+			butColorProvider.BackColor=_colorProv;
+			butColorClinicProv.BackColor=_colorProvClinic;
+			butColorClinic.BackColor=_colorClinic;
+			butColorDefault.BackColor=_colorDefault;
+			labelSched1.ForeColor=_colorDefault;
+			labelSched2.ForeColor=_colorDefault;
+			labelSched3.ForeColor=_colorDefault;
+			labelClinic1.ForeColor=_colorClinic;
+			labelClinic2.ForeColor=_colorClinic;
+			labelClinic3.ForeColor=_colorClinic;
+			labelProvider1.ForeColor=_colorProv;
+			labelProvider2.ForeColor=_colorProv;
+			labelProvider3.ForeColor=_colorProv;
+
 			FillComboBoxes();
 			//Try to select the currently set Clinic.
 			for(int i=0;i<_arrayClinics.Length;i++) {
@@ -1265,11 +1279,11 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableProcedures","Code"),50);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Fee1",50,HorizontalAlignment.Right,true);
+			col=new ODGridColumn("Fee 1",50,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Fee2",50,HorizontalAlignment.Right,true);
+			col=new ODGridColumn("Fee 2",50,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Fee3",50,HorizontalAlignment.Right,true);
+			col=new ODGridColumn("Fee 3",50,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -1342,7 +1356,7 @@ namespace OpenDental{
 
 		private Color GetColorForFee(Fee fee) {
 			if(fee.ClinicNum!=0 && fee.ProvNum!=0) {
-				return _colorClinAndProv;
+				return _colorProvClinic;
 			}
 			if(fee.ClinicNum!=0) {
 				return _colorClinic;

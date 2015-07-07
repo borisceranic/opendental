@@ -128,7 +128,9 @@ namespace OpenDentBusiness {
 		///<summary>32- PayType for claims such as 'Check', 'EFT', etc.</summary>
 		InsurancePaymentType,
 		///<summary>33- Categories of priorities for tasks.</summary>
-		TaskPriorities
+		TaskPriorities,
+		///<summary>34- Categories for fee override colors.</summary>
+		FeeColors
 	}
 
 	
