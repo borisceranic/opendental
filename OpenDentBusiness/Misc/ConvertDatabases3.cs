@@ -8898,7 +8898,17 @@ namespace OpenDentBusiness {
 						+"FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'),'ProcRequireSignature',0)";
 					Db.NonQ(command);
 				}
-				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty(ProgramNum,PropertyDesc,PropertyValue) VALUES((SELECT ProgramNum FROM program WHERE "
+						+"ProgName='eClinicalWorks'),'ProcNotesNoIncomplete',0)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty(ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) VALUES((SELECT MAX(ProgramPropertyNum)+1 "
+						+"FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'),'ProcNotesNoIncomplete',0)";
+					Db.NonQ(command);
+				}
+
 
 
 

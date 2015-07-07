@@ -63,6 +63,7 @@ namespace OpenDental{
 		private CheckBox checkHideButChartRx;
 		private Label labelHL7FolderIn;
 		private CheckBox checkProcRequireSignature;
+		private CheckBox checkProcNotesNoIncomplete;
 		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
@@ -140,6 +141,7 @@ namespace OpenDental{
 			this.label12 = new System.Windows.Forms.Label();
 			this.checkHideButChartRx = new System.Windows.Forms.CheckBox();
 			this.checkProcRequireSignature = new System.Windows.Forms.CheckBox();
+			this.checkProcNotesNoIncomplete = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -557,11 +559,24 @@ namespace OpenDental{
 			this.checkProcRequireSignature.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkProcRequireSignature.UseVisualStyleBackColor = true;
 			// 
+			// checkProcNotesNoIncomplete
+			// 
+			this.checkProcNotesNoIncomplete.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProcNotesNoIncomplete.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkProcNotesNoIncomplete.Location = new System.Drawing.Point(1, 578);
+			this.checkProcNotesNoIncomplete.Name = "checkProcNotesNoIncomplete";
+			this.checkProcNotesNoIncomplete.Size = new System.Drawing.Size(221, 21);
+			this.checkProcNotesNoIncomplete.TabIndex = 81;
+			this.checkProcNotesNoIncomplete.Text = "Don\'t Allow Incomplete Procedure Notes";
+			this.checkProcNotesNoIncomplete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProcNotesNoIncomplete.UseVisualStyleBackColor = true;
+			// 
 			// FormEClinicalWorks
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(650, 628);
+			this.Controls.Add(this.checkProcNotesNoIncomplete);
 			this.Controls.Add(this.checkProcRequireSignature);
 			this.Controls.Add(this.checkHideButChartRx);
 			this.Controls.Add(this.label12);
@@ -646,6 +661,12 @@ namespace OpenDental{
 			}
 			else {
 				checkProcRequireSignature.Checked=false;
+			}
+			if(GetProp("ProcNotesNoIncomplete")=="1") {
+				checkProcNotesNoIncomplete.Checked=true;
+			}
+			else {
+				checkProcNotesNoIncomplete.Checked=false;
 			}
 			SetModeRadioButtons(GetProp("eClinicalWorksMode"));
 			SetModeVisibilities();
@@ -845,6 +866,12 @@ namespace OpenDental{
 			}
 			else {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcRequireSignature","0");
+			}
+			if(checkProcNotesNoIncomplete.Checked) {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcNotesNoIncomplete","1");
+			}
+			else {
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcNotesNoIncomplete","0");
 			}
 			if(radioModeTight.Checked || radioModeFull.Checked) {
 				if(radioModeTight.Checked) {
