@@ -4,6 +4,7 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Linq;
+using System.Globalization;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -164,10 +165,12 @@ namespace OpenDentBusiness{
 				SmsFromMobile sms=listMessages[i];
 				sms.DateTimeReceived=DateTime.Now;
 				SmsPhone smsPhone=SmsPhones.GetByPhone(sms.SmsPhoneNumber);
+				string countryCode=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
 				if(smsPhone!=null) {
 					sms.ClinicNum=smsPhone.ClinicNum;
+					countryCode=smsPhone.CountryCode;
 				}
-				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber);
+				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber,countryCode);
 				//We could not find definitive match, either 0 matches found, or more than one match found
 				if(listPatNums.Count!=1) {
 					Insert(sms);
@@ -188,6 +191,12 @@ namespace OpenDentBusiness{
 				sms.CommlogNum=Commlogs.Insert(comm);
 				Insert(sms);
 			}
+			Signalod sig=new Signalod();
+			sig.ITypes=((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString();		
+			sig.DateViewing=DateTime.MinValue;
+			sig.SigType=SignalType.Invalid;
+			sig.SigText=GetSmsNotification();
+			Signalods.Insert(sig);
 		}
 
 		public static string GetSmsFromStatusDescript(SmsFromStatus smsFromStatus) {
@@ -210,16 +219,15 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
-		public static List<long> FindPatNums(string phonePat) {
+		public static List<long> FindPatNums(string phonePat,string countryCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),phonePat);
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),phonePat,countryCode);
 			}
 			try {
-				string phoneRegexp=ConvertPhoneToRegexp(phonePat);
+				string phoneRegexp=ConvertPhoneToRegexp(phonePat,countryCode);
 				//DO NOT POut THESE PHONE NUMBERS. They have been cleaned for use in this function by dirtyPhoneHelper.
-				DbHelper.Regexp("WirelessPhone",phoneRegexp);
-				string command="SELECT PatNum FROM patient WHERE '"
-					+DbHelper.Regexp("HmPhone",phoneRegexp)+"' "
+				string command="SELECT PatNum FROM patient WHERE "
+					+DbHelper.Regexp("HmPhone",phoneRegexp)+" "
 					+"OR "+DbHelper.Regexp("WkPhone",phoneRegexp)+" "
 					+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp);
 				return Db.GetListLong(command);
@@ -233,16 +241,29 @@ namespace OpenDentBusiness{
 		///<summary>Expands a phone number into a string that can be used to ignore punctuation in a phone number.
 		///Any string that passes through this function does not need to, and should not, go through POut.String()
 		///Expands </summary>
-		public static string ConvertPhoneToRegexp(string phoneRaw) {
-			//strip all non-numeric characters just in case.
+		public static string ConvertPhoneToRegexp(string phoneRaw,string countryCode) {
+			//Strip all non-numeric characters just in case.
 			string retVal=new string(phoneRaw.Where(x => char.IsDigit(x)).ToArray());
+			string prefix="";
+			switch(countryCode.ToUpper()) {
+				case "US":
+					//Number prefixed with a country and not prefixed with a country code should both be prefixed with a country code.
+					//EG: Both of the following should yield the same 11-digit string... 80012345678, 180012345678 == 180012345678.
+					if(retVal.Length==11) { //We have an 11-digit number coming in.
+						//Prefix with * in order to make country code optional.
+						prefix=retVal[0]+"*";
+						//Remove the first char, which we just included in the prefix above.
+						retVal=retVal.Substring(1);
+					}
+					break;
+			}		
 			if(String.IsNullOrEmpty(retVal)) {
 				throw new Exception("Phone number cannot be blank.");
 			}
 			string wildcard=".*";
-			retVal=wildcard+String.Join("",retVal.Select(x => x+wildcard).ToList());
+			//Add back the optional prefix from above and converto a RegEx.
+			retVal=wildcard+prefix+String.Join("",retVal.Select(x => x+wildcard).ToList());			
 			return retVal;
 		}
-
 	}
 }

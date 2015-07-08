@@ -70,15 +70,6 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void Update(SmsPhone smsVln){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsVln);
-				return;
-			}
-			Crud.SmsVlnCrud.Update(smsVln);
-		}
-
-		///<summary></summary>
 		public static void Delete(long smsVlnNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsVlnNum);
@@ -105,6 +96,15 @@ namespace OpenDentBusiness{
 				return smsPhone.SmsPhoneNum;
 			}
 			return Crud.SmsPhoneCrud.Insert(smsPhone);
+		}
+
+		///<summary></summary>
+		public static void Update(SmsPhone smsPhone) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),smsPhone);
+				return;
+			}
+			Crud.SmsPhoneCrud.Update(smsPhone);
 		}
 
 		///<summary>Gets sms phones when not using clinics.</summary>
