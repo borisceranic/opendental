@@ -793,7 +793,7 @@ namespace OpenDental.UI {
 		}
 
 		private void setHeaderHeightHelper() {
-			if(!_hasMultilineHeaders) {
+			if(!_hasMultilineHeaders || Width==0 || Height==0) {
 				return;
 			}
 			Bitmap doubleBuffer=new Bitmap(Width,Height);
