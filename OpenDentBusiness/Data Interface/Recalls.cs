@@ -1083,7 +1083,8 @@ namespace OpenDentBusiness{
 		///<param name="error">Empty unless the customer is not valid for the Web Sched service or there was an error with the web service response.</param>
 		///<param name="errorCode">0=no errors. 110=No Web Sched repeating charge. 120=Invalid web service response. 190=All other errors.</param>
 		///<returns>True if user is an active customer and they have an active WebSched repeating charge.</returns>
-		public static bool IsWebSchedResponseValid(string response, out string error, out int errorCode) {
+		public static bool IsWebSchedResponseValid(string response,out string error,out int errorCode) {
+			//No need to check RemotingRole; no call to db.
 			error="";
 			errorCode=0;
 			XmlDocument doc=new XmlDocument();
@@ -1133,6 +1134,7 @@ namespace OpenDentBusiness{
 		///<para>The DataTable returned will have 3 columns: SchedDate (date), HourStart (int), OperatoryNum (long)</para>
 		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
 		public static DataTable GetAvailableWebSchedTimeSlots(long recallNum,DateTime dateStart,DateTime dateEnd) {
+			//No need to check RemotingRole; no call to db.
 			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(dateStart,dateEnd);
 			List<long> opNums=null;//Put the unique operatory nums into a list.
 			DataTable tableBlockouts=null;//Make a table that will store all blockouts.
@@ -1279,6 +1281,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Throws exception if no operatories are found.  This means that the office has not set up their operatories or provider schedules correctly.</summary>
 		private static void GetUniqueOpsAndBlockoutsFromSchedule(DataTable tableSchedules,out List<long> opNums,out DataTable tableBlockouts) {
+			//No need to check RemotingRole; no call to db.
 			opNums=new List<long>();
 			tableBlockouts=tableSchedules.Clone();
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
@@ -1300,6 +1303,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Checks if the two times passed in overlap.</summary>
 		private static bool IsTimeOverlapping(TimeSpan timeStartBegin,TimeSpan timeStartEnd,TimeSpan timeStopBegin,TimeSpan timeStopEnd) {
+			//No need to check RemotingRole; no call to db.
 			//Test start times
 			if(timeStartBegin >= timeStopBegin && timeStartBegin < timeStopEnd) {
 				return true;
