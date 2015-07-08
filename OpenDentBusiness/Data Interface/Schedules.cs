@@ -567,6 +567,52 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
+		///<summary>Gets a data table that contains all schedules and blockouts that meet our Web Sched requirements.  See comments inside for more detail.</summary>
+		public static DataTable GetSchedulesAndBlockoutsForWebSched(DateTime dateStart,DateTime dateEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+			}
+			//Grab all schedules within operatories that meet the following logic:
+			//			(
+			//				*any opertories marked as ishygiene where the operatory is shown open on schedule
+			//				OR
+			//				*where a hygienist is set as the primary or secondary provider for the operatory from the operatory setup and the operatory is shown open on schedule OR
+			//				*where a hygienist is set as the primary or secondary provider for the operatory for time segments via schedule-op entries
+			//			)
+			//			AND
+			//				*where there are no blockouts (not including provider schedule op entries of course)
+			//				*where the operatory is not a prospective op
+			string command=@"-- First, get all schedules associated to operatories.
+				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder
+					FROM schedule 
+					INNER JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
+					INNER JOIN operatory ON operatory.OperatoryNum=scheduleop.OperatoryNum
+					LEFT JOIN provider dentist ON operatory.ProvDentist=dentist.ProvNum
+					LEFT JOIN provider hygienist ON operatory.ProvHygienist=hygienist.ProvNum
+					WHERE (operatory.IsHidden!=1 AND (operatory.IsHygiene=1 OR (dentist.IsSecondary=1 OR hygienist.IsSecondary=1)))
+					AND operatory.SetProspective=0 -- Prospective operatories should always be excluded from the Web Sched (convo with Nathan 01/08/2015)
+					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
+					AND "+DbHelper.DtimeToDate("schedule.SchedDate")+">="+POut.Date(dateStart)+" "
+					+"AND "+DbHelper.DtimeToDate("schedule.SchedDate")+"<="+POut.Date(dateEnd)+") "
+				+@"UNION -- Using UNION instead of UNION ALL because we want duplicate entries to be removed.
+				-- Next, get all schedules that are not associated to any operatories
+				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder 
+					FROM schedule
+					INNER JOIN provider ON schedule.ProvNum=provider.ProvNum
+					INNER JOIN operatory ON schedule.ProvNum=operatory.ProvDentist OR schedule.ProvNum=operatory.ProvHygienist
+					LEFT JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
+					WHERE provider.IsHidden!=1
+					AND operatory.IsHidden!=1 
+					AND operatory.SetProspective=0 -- Prospective operatories should always be excluded from the Web Sched (convo with Nathan 01/08/2015)
+					AND (operatory.IsHygiene=1 OR (operatory.IsHygiene=0 AND operatory.ProvDentist=provider.ProvNum AND provider.IsSecondary=1)) -- Hyg op or the op dentist is secondary
+					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
+					AND scheduleop.OperatoryNum IS NULL -- Only consider schedules that are NOT assigned to any operatories (dynamic schedules)
+					AND "+DbHelper.DtimeToDate("schedule.SchedDate")+">="+POut.Date(dateStart)+" "
+					+"AND "+DbHelper.DtimeToDate("schedule.SchedDate")+"<="+POut.Date(dateEnd)+") "
+				+"ORDER BY SchedDate,ItemOrder";//Order the entire result set by SchedDate then by operatory ItemOrder.  This is important for speed when filtering out results and when choosing a time slot.
+			return DataCore.GetTable(command);
+		}
+
 		///<summary>Returns the 0-based row where endDate will fall in a calendar grid.  It is not necessary to have a function to retrieve the column, because that is simply (int)myDate.DayOfWeek</summary>
 		public static int GetRowCal(DateTime startDate,DateTime endDate){
 			//No need to check RemotingRole; no call to db.

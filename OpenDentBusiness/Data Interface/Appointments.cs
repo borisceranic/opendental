@@ -1991,6 +1991,22 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Gets all appointments scheduled in the operatories passed in that fall within the start and end dates.
+		///Does not currently consider the time portion of the DateTimes passed in.</summary>
+		public static List<Appointment> GetAppointmentsForOpsByPeriod(List<long> opNums,DateTime dateStart,DateTime dateEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),opNums,dateStart,dateEnd);
+			}
+			string command="SELECT * FROM appointment WHERE Op > 0 ";
+			if(opNums!=null && opNums.Count > 0) {
+				command+="AND Op IN("+String.Join(",",opNums)+") ";
+			}
+			command+="AND "+DbHelper.DtimeToDate("AptDateTime")+">="+POut.Date(dateStart)+" "
+				+"AND "+DbHelper.DtimeToDate("AptDateTime")+"<="+POut.Date(dateEnd)+" "
+				+"ORDER BY AptDateTime,Op";//Ordering by AptDateTime then Op is important for speed when checking for collisions in Web Sched.
+			return Crud.AppointmentCrud.SelectMany(command);
+		}
+
 		///<summary>Gets the ProvNum for the last completed appointment for a patient. If none, returns 0.</summary>
 		public static long GetProvNumFromLastApptForPat(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 
@@ -1128,15 +1129,25 @@ namespace OpenDentBusiness{
 			#endregion
 		}
 
-		///<summary>Gets up to 30 days of open slots by looping through each operatory hour by hour on the hour and finds the hour blocks that have no appointments and no blockouts within.
+		///<summary>Gets roughly 30 open time slots by looping through each operatory hour by hour on the hour and finds the hour blocks that have no appointments and no blockouts within.
 		///<para>The DataTable returned will have 3 columns: SchedDate (date), HourStart (int), OperatoryNum (long)</para>
 		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
-		public static DataTable GetAvailableTimeSlotsTable(long recallNum,DateTime dateStart,DateTime dateEnd) {
-			DataTable tableSchedules=GetSchedulesAndBlockoutsFromDb(dateStart,dateEnd);
+		public static DataTable GetAvailableWebSchedTimeSlots(long recallNum,DateTime dateStart,DateTime dateEnd) {
+			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(dateStart,dateEnd);
 			List<long> opNums=null;//Put the unique operatory nums into a list.
 			DataTable tableBlockouts=null;//Make a table that will store all blockouts.
 			GetUniqueOpsAndBlockoutsFromSchedule(tableSchedules,out opNums,out tableBlockouts);
-			DataTable tableAppts=GetAppointmentsForOpsFromDb(opNums,dateStart,dateEnd);
+			List<Appointment> listApptsForOps=Appointments.GetAppointmentsForOpsByPeriod(opNums,dateStart,dateEnd); 
+			DataTable tableAppts=new DataTable();
+			tableAppts.Columns.Add("Op");
+			tableAppts.Columns.Add("AptDateTime");
+			tableAppts.Columns.Add("AptDateTimeEnd");
+			//Loop through each appointment in the operatories and fill the custom data table we just created for ease of use.
+			for(int i=0;i<listApptsForOps.Count;i++) {
+				tableAppts.Rows.Add(listApptsForOps[i].Op
+					,listApptsForOps[i].AptDateTime
+					,listApptsForOps[i].AptDateTime.AddMinutes(listApptsForOps[i].Pattern.Length*5));
+			}
 			//Loop through each operatory hour by hour on the hour and find the hour blocks that have no appointments and no blockouts within them.
 			DataTable tableAvailableTimes=new DataTable();
 			tableAvailableTimes.Columns.Add("SchedDate");
@@ -1144,7 +1155,7 @@ namespace OpenDentBusiness{
 			tableAvailableTimes.Columns.Add("OperatoryNum");//Needed for when a time slot has been chosen.
 			Dictionary<DateTime,List<int>> dictTimeSlots=new Dictionary<DateTime,List<int>>();
 			DateTime dateLastTimeSlot=new DateTime(1800,1,1);
-			long patientClinicNum=GetClinicNumFromRecallNum(recallNum);
+			Clinic patientClinic=Clinics.GetClinicForRecall(recallNum);
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
 				if(PIn.Long(tableSchedules.Rows[i]["BlockoutType"].ToString()) > 0) {
 					continue;//Blockouts should not have appointments scheduled on top of them.
@@ -1161,10 +1172,10 @@ namespace OpenDentBusiness{
 				long schedOpNum=PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString());
 				TimeSpan timeSchedStart=PIn.Time(tableSchedules.Rows[i]["StartTime"].ToString());
 				TimeSpan timeSchedStop=PIn.Time(tableSchedules.Rows[i]["StopTime"].ToString());
-				if(patientClinicNum>0) {
+				if(patientClinic!=null) {
 					//Skip this schedule entry if the operatory's clinic does not match the patient's clinic.
 					Operatory op=Operatories.GetOperatory(schedOpNum);
-					if(op==null || op.ClinicNum!=patientClinicNum) {
+					if(op==null || op.ClinicNum!=patientClinic.ClinicNum) {
 						continue;
 					}
 				}
@@ -1259,54 +1270,11 @@ namespace OpenDentBusiness{
 							,tableSchedules.Rows[i]["OperatoryNum"].ToString());
 					}
 				}
-				if(dictTimeSlots.Count>=30) {//Once we hit at least 30 days of time slots, we want to finish getting all the open slots for that day then kick out.
+				if(dictTimeSlots.Count>=30) {//Once we hit at least 30 time slots, we want to finish getting all the open slots for that day then kick out.
 					dateLastTimeSlot=dateSched;
 				}
 			}
 			return tableAvailableTimes;
-		}
-
-		///<summary>Gets a data table that contains all schedules and blockouts that meet our Web Sched requirements.  See comments inside for more detail.</summary>
-		private static DataTable GetSchedulesAndBlockoutsFromDb(DateTime dateStart,DateTime dateEnd) {
-			//Grab all schedules within operatories that meet the following logic:
-			//			(
-			//				*any opertories marked as ishygiene where the operatory is shown open on schedule
-			//				OR
-			//				*where a hygienist is set as the primary or secondary provider for the operatory from the operatory setup and the operatory is shown open on schedule OR
-			//				*where a hygienist is set as the primary or secondary provider for the operatory for time segments via schedule-op entries
-			//			)
-			//			AND
-			//				*where there are no blockouts (not including provider schedule op entries of course)
-			//				*where the operatory is not a prospective op
-			string command=@"-- First, get all schedules associated to operatories.
-				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder
-					FROM schedule 
-					INNER JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
-					INNER JOIN operatory ON operatory.OperatoryNum=scheduleop.OperatoryNum
-					LEFT JOIN provider dentist ON operatory.ProvDentist=dentist.ProvNum
-					LEFT JOIN provider hygienist ON operatory.ProvHygienist=hygienist.ProvNum
-					WHERE (operatory.IsHidden!=1 AND (operatory.IsHygiene=1 OR (dentist.IsSecondary=1 OR hygienist.IsSecondary=1)))
-					AND operatory.SetProspective=0 -- Prospective operatories should always be excluded from the Web Sched (convo with Nathan 01/08/2015)
-					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
-					AND DATE(schedule.SchedDate)>="+POut.Date(dateStart)+" "
-					+"AND DATE(schedule.SchedDate)<="+POut.Date(dateEnd)+") "
-				+@"UNION -- Using UNION instead of UNION ALL because we want duplicate entries to be removed.
-				-- Next, get all schedules that are not associated to any operatories
-				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder 
-					FROM schedule
-					INNER JOIN provider ON schedule.ProvNum=provider.ProvNum
-					INNER JOIN operatory ON schedule.ProvNum=operatory.ProvDentist OR schedule.ProvNum=operatory.ProvHygienist
-					LEFT JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
-					WHERE provider.IsHidden!=1
-					AND operatory.IsHidden!=1 
-					AND operatory.SetProspective=0 -- Prospective operatories should always be excluded from the Web Sched (convo with Nathan 01/08/2015)
-					AND (operatory.IsHygiene=1 OR (operatory.IsHygiene=0 AND operatory.ProvDentist=provider.ProvNum AND provider.IsSecondary=1)) -- Hyg op or the op dentist is secondary
-					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
-					AND scheduleop.OperatoryNum IS NULL -- Only consider schedules that are NOT assigned to any operatories (dynamic schedules)
-					AND DATE(schedule.SchedDate)>="+POut.Date(dateStart)+" "
-					+"AND DATE(schedule.SchedDate)<="+POut.Date(dateEnd)+") "
-				+"ORDER BY SchedDate,ItemOrder";//Order the entire result set by SchedDate then by operatory ItemOrder.  This is important for speed when filtering out results and when choosing a time slot.
-			return DataCore.GetTable(command);
 		}
 
 		///<summary>Throws exception if no operatories are found.  This means that the office has not set up their operatories or provider schedules correctly.</summary>
@@ -1324,22 +1292,10 @@ namespace OpenDentBusiness{
 				opNums.Add(PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()));
 			}
 			if(opNums.Count < 1) {//This is very possible for offices that aren't set up the way that we expect them to be.
-				throw new ODException("Operatories are not yet set up for recalls.\r\nPlease call us to schedule your appointment.");
+				string errorMsg=Lans.g("WebSched","Operatories are not yet set up for recalls.")+"\r\n"
+					+Lans.g("WebSched","Please call us to schedule your appointment.");
+				throw new ODException(errorMsg);
 			}
-		}
-
-		///<summary>Grabs all appointments currently scheduled in the operatories passed in.</summary>
-		private static DataTable GetAppointmentsForOpsFromDb(List<long> opNums,DateTime dateStart,DateTime dateEnd) {
-			string command="SELECT Op,AptDateTime,DATE_ADD(AptDateTime, INTERVAL (CHAR_LENGTH(Pattern)*5) MINUTE) AS AptDateTimeEnd "
-				+"FROM appointment "
-				+"WHERE Op > 0 ";
-			if(opNums!=null && opNums.Count > 0) {
-				command+="AND Op IN("+String.Join(",",opNums)+") ";
-			}
-			command+="AND DATE(AptDateTime)>="+POut.Date(dateStart)+" "
-				+"AND DATE(AptDateTime)<="+POut.Date(dateEnd)+" "
-				+"ORDER BY AptDateTime,Op";//Ordering by AptDateTime then Op is important for speed when checking for collisions later on.
-			return DataCore.GetTable(command);
 		}
 
 		///<summary>Checks if the two times passed in overlap.</summary>
@@ -1357,35 +1313,6 @@ namespace OpenDentBusiness{
 				return true;
 			}
 			return false;
-		}
-
-		///<summary>Returns patient.ClinicNum from the patient associated to the recall passed in if the patient has a clinic set.
-		///If the patient doesn't have a clinic set, the clinic of the scheduled or completed appointment with the largest date will be used.
-		///Returns 0 if clinics feature is not activate or no clinic found.</summary>
-		private static long GetClinicNumFromRecallNum(long recallNum) {
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				return 0;
-			}
-			string command="SELECT patient.ClinicNum FROM patient "
-				+"INNER JOIN recall ON patient.PatNum=recall.PatNum "
-				+"WHERE recall.RecallNum="+POut.Long(recallNum)+" "
-				+"LIMIT 1";
-			long patientClinicNum=PIn.Long(DataCore.GetScalar(command));
-			if(patientClinicNum>0) {
-				return patientClinicNum;
-			}
-			//Patient does not have an assigned clinic.  Grab the clinic from a scheduled or completed appointment with the largest date.
-			command=@"SELECT appointment.ClinicNum,appointment.AptDateTime 
-				FROM appointment
-				INNER JOIN recall ON appointment.PatNum=recall.PatNum AND recall.RecallNum="+POut.Long(recallNum)+@"
-				WHERE appointment.AptStatus IN ("+(int)ApptStatus.Scheduled+","+(int)ApptStatus.Complete+")"+@"
-				ORDER BY AptDateTime DESC 
-				LIMIT 1";
-			long appointmentClinicNum=PIn.Long(DataCore.GetScalar(command));
-			if(appointmentClinicNum>0) {
-				return appointmentClinicNum;
-			}
-			return 0;//If all else fails, return 0.
 		}
 		#endregion
 	}

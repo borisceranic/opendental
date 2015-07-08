@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -216,6 +217,40 @@ namespace OpenDentBusiness{
 				listClinics.Add(GetClinic(listClinicNums[i]));
 			}
 			return listClinics;
+		}
+
+		///<summary>Returns the patient's clinic based on the recall passed in.
+		///If the patient is no longer associated to a clinic, 
+		///  returns the clinic associated to the appointment (scheduled or completed) with the largest date.
+		///Returns null if the patient doesn't have a clinic or if the clinics feature is not activate.</summary>
+		public static Clinic GetClinicForRecall(long recallNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Clinic>(MethodBase.GetCurrentMethod(),recallNum);
+			}
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				return null;
+			}
+			List<Clinic> listClinics=Clinics.GetList().ToList();
+			string command="SELECT patient.ClinicNum FROM patient "
+				+"INNER JOIN recall ON patient.PatNum=recall.PatNum "
+				+"WHERE recall.RecallNum="+POut.Long(recallNum)+" "
+				+DbHelper.LimitAnd(1);
+			long patientClinicNum=PIn.Long(DataCore.GetScalar(command));
+			if(patientClinicNum>0) {
+				return listClinics.FirstOrDefault(x => x.ClinicNum==patientClinicNum);
+			}
+			//Patient does not have an assigned clinic.  Grab the clinic from a scheduled or completed appointment with the largest date.
+			command=@"SELECT appointment.ClinicNum,appointment.AptDateTime 
+				FROM appointment
+				INNER JOIN recall ON appointment.PatNum=recall.PatNum AND recall.RecallNum="+POut.Long(recallNum)+@"
+				WHERE appointment.AptStatus IN ("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.Complete)+")"+@"
+				ORDER BY AptDateTime DESC";
+			command=DbHelper.LimitOrderBy(command,1);
+			long appointmentClinicNum=PIn.Long(DataCore.GetScalar(command));
+			if(appointmentClinicNum>0) {
+				return listClinics.FirstOrDefault(x => x.ClinicNum==appointmentClinicNum);
+			}
+			return null;
 		}
 
 		///<summary>Returns an empty string for invalid clinicNums.</summary>
