@@ -78,12 +78,15 @@ namespace OpenDentBusiness {
 		}
 
 		private static DataTable GetDataSet(long feeSchedNum,long clinicNum,long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),feeSchedNum,clinicNum,provNum);
+			}
 			string command="SELECT procedurecode.ProcCode,fee.Amount,procedurecode.Descript,"
 				+"procedurecode.AbbrDesc FROM procedurecode,fee "
 				+"WHERE procedurecode.CodeNum=fee.CodeNum "
-				+"AND fee.FeeSched='"+POut.String(feeSchedNum.ToString())+"' "
-				+"AND fee.ClinicNum='"+POut.String(clinicNum.ToString())+"' "
-				+"AND fee.ProvNum='"+POut.String(provNum.ToString())+"' "
+				+"AND fee.FeeSched='"+POut.Long(feeSchedNum)+"' "
+				+"AND fee.ClinicNum='"+POut.Long(clinicNum)+"' "
+				+"AND fee.ProvNum='"+POut.Long(provNum)+"' "
 				+"ORDER BY procedurecode.ProcCode";
 			return Db.GetTable(command);
 		}

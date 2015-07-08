@@ -469,17 +469,12 @@ namespace OpenDentBusiness{
 			//don't forget to refresh procedurecodes.
 		}
 
-		public static List<string> GetAllCodes() {
+		public static List<ProcedureCode> GetAllCodes() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<List<ProcedureCode>>(MethodBase.GetCurrentMethod());
 			}
-			List<string> retVal=new List<string>();
-			string command="SELECT ProcCode FROM procedurecode";
-			DataTable Table=Db.GetTable(command);
-			for(int i=0;i<Table.Rows.Count;i++) {
-				retVal.Add(Table.Rows[i][0].ToString());
-			}
-			return retVal;
+			string command="SELECT * from procedurecode ORDER BY ProcCode";
+			return Crud.ProcedureCodeCrud.SelectMany(command);
 		}
 
 
