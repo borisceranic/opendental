@@ -136,6 +136,13 @@ namespace OpenDentBusiness{
 			Crud.FeeCrud.Sync(listNew,listDB);
 		}
 
+		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>
+		public static Fee GetFee(long codeNum,long feeSchedNum) {
+			//No need to check RemotingRole; no call to db.
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),0,0,GetListt());
+		}
+
 		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.
 		///Attempts to find the most accurate fee based on the clinic and provider passed in.</summary>
 		public static Fee GetFee(long codeNum,long feeSchedNum,long clinicNum,long provNum) {
@@ -206,6 +213,11 @@ namespace OpenDentBusiness{
 				return -1;
 			}
 			return fee.Amount;
+		}
+
+		public static double GetAmount0(long codeNum,long feeSched) {
+			//No need to check RemotingRole; no call to db.
+			return GetAmount0(codeNum,feeSched,0,0);													 
 		}
 
 		///<summary>Almost the same as GetAmount.  But never returns -1;  Returns an amount if a fee has been entered.  Prefers local clinic fees over HQ fees.  Returns 0 if code can't be found.
