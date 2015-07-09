@@ -3,6 +3,7 @@ using System.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -80,11 +81,8 @@ namespace OpenDentBusiness{
 
 		///<summary>Get the list of all RepeatCharge rows. DO NOT REMOVE! Used by OD WebApps solution.</summary>
 		public static List<RepeatCharge> GetAll() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<RepeatCharge>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM repeatcharge";
-			return Crud.RepeatChargeCrud.SelectMany(command);
+			//No need to check RemotingRole; no call to db.
+			return Refresh(0).ToList();			
 		}
 		
 

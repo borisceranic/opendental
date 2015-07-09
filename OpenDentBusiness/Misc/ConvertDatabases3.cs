@@ -8445,7 +8445,7 @@ namespace OpenDentBusiness {
 						MsgText text NOT NULL,
 						SmsStatus tinyint NOT NULL,
 						MsgParts int NOT NULL,
-						MsgChargeUSD double NOT NULL,
+						MsgChargeUSD float NOT NULL,
 						ClinicNum bigint NOT NULL,
 						CustErrorText varchar(255) NOT NULL,
 						DateTimeSent datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
@@ -8943,7 +8943,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
 
 
 
