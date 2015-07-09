@@ -38,6 +38,9 @@ namespace OpenDental {
 			if(Supp.LevelDesired!=0){
 				textLevelDesired.Text=Supp.LevelDesired.ToString();
 			}
+			if(Supp.LevelOnHand!=0) {
+				textLevelOnHand.Text=Supp.LevelOnHand.ToString();
+			}
 			if(Supp.Price!=0){
 				textPrice.Text=Supp.Price.ToString("n");
 			}
@@ -78,6 +81,7 @@ namespace OpenDental {
 			Supp.CatalogNumber=textCatalogNumber.Text;
 			Supp.Descript=textDescript.Text;
 			Supp.LevelDesired=PIn.Float(textLevelDesired.Text);
+			Supp.LevelOnHand=PIn.Float(textLevelOnHand.Text);
 			Supp.Price=PIn.Double(textPrice.Text);
 			Supp.IsHidden=checkIsHidden.Checked;
 			if(Supp.Category!=categoryInitialVal) {

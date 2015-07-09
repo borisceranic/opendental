@@ -35,6 +35,7 @@ namespace OpenDental {
 				textMarketValue.Text=Equip.MarketValue.ToString("f");
 			}
 			textLocation.Text=Equip.Location;
+			textStatus.Text=Equip.Status;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -87,6 +88,7 @@ namespace OpenDental {
 			Equip.PurchaseCost=PIn.Double(textPurchaseCost.Text);
 			Equip.MarketValue=PIn.Double(textMarketValue.Text);
 			Equip.Location=textLocation.Text;
+			Equip.Status=textStatus.Text;
 			if(IsNew) {
 				Equipments.Insert(Equip);
 			}

@@ -36,7 +36,8 @@ namespace OpenDentBusiness{
 		///<summary>Any notes regarding the equipment checked out.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string DispenseNote;
-
+		///<summary>Status of the equipment.</summary>
+		public string Status;
 
 	}
 

@@ -32,6 +32,8 @@ namespace OpenDentBusiness{
 		public int DispUnitsCount;
 		/// <summary>Only used in dental schools.  Description of the units when dispensing for use.  For example: Capsule, cartridge, carpule, glove, or needle.</summary>
 		public string DispUnitDesc;
+		///<summary>Quantity of the supply available.</summary>
+		public float LevelOnHand;
 
 		///<summary></summary>
 		public Supply Copy() {

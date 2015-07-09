@@ -107,6 +107,8 @@ namespace OpenDental {
 				col=new ODGridColumn(Lan.g(this,"Location"),80);
 				gridMain.Columns.Add(col);
 			}
+			col=new ODGridColumn(Lan.g(this,"Status"),160);
+			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<listEquip.Count;i++){
@@ -128,6 +130,7 @@ namespace OpenDental {
 				if(display!=EnumEquipmentDisplayMode.Purchased) {
 					row.Cells.Add(listEquip[i].Location);
 				}
+				row.Cells.Add(listEquip[i].Status.ToString());
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();

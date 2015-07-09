@@ -59,6 +59,7 @@ namespace OpenDentBusiness.Crud{
 				supply.DispDefaultQuant= PIn.Float (table.Rows[i]["DispDefaultQuant"].ToString());
 				supply.DispUnitsCount  = PIn.Int   (table.Rows[i]["DispUnitsCount"].ToString());
 				supply.DispUnitDesc    = PIn.String(table.Rows[i]["DispUnitDesc"].ToString());
+				supply.LevelOnHand     = PIn.Float (table.Rows[i]["LevelOnHand"].ToString());
 				retVal.Add(supply);
 			}
 			return retVal;
@@ -99,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SupplyNum,";
 			}
-			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc) VALUES(";
+			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc,LevelOnHand) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(supply.SupplyNum)+",";
 			}
@@ -115,7 +116,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(supply.BarCodeOrID)+"',"
 				+    POut.Float (supply.DispDefaultQuant)+","
 				+    POut.Int   (supply.DispUnitsCount)+","
-				+"'"+POut.String(supply.DispUnitDesc)+"')";
+				+"'"+POut.String(supply.DispUnitDesc)+"',"
+				+    POut.Float (supply.LevelOnHand)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -148,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SupplyNum,";
 			}
-			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc) VALUES(";
+			command+="SupplierNum,CatalogNumber,Descript,Category,ItemOrder,LevelDesired,IsHidden,Price,BarCodeOrID,DispDefaultQuant,DispUnitsCount,DispUnitDesc,LevelOnHand) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(supply.SupplyNum)+",";
 			}
@@ -164,7 +166,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(supply.BarCodeOrID)+"',"
 				+    POut.Float (supply.DispDefaultQuant)+","
 				+    POut.Int   (supply.DispUnitsCount)+","
-				+"'"+POut.String(supply.DispUnitDesc)+"')";
+				+"'"+POut.String(supply.DispUnitDesc)+"',"
+				+    POut.Float (supply.LevelOnHand)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -188,7 +191,8 @@ namespace OpenDentBusiness.Crud{
 				+"BarCodeOrID     = '"+POut.String(supply.BarCodeOrID)+"', "
 				+"DispDefaultQuant=  "+POut.Float (supply.DispDefaultQuant)+", "
 				+"DispUnitsCount  =  "+POut.Int   (supply.DispUnitsCount)+", "
-				+"DispUnitDesc    = '"+POut.String(supply.DispUnitDesc)+"' "
+				+"DispUnitDesc    = '"+POut.String(supply.DispUnitDesc)+"', "
+				+"LevelOnHand     =  "+POut.Float (supply.LevelOnHand)+" "
 				+"WHERE SupplyNum = "+POut.Long(supply.SupplyNum);
 			Db.NonQ(command);
 		}
@@ -243,6 +247,10 @@ namespace OpenDentBusiness.Crud{
 			if(supply.DispUnitDesc != oldSupply.DispUnitDesc) {
 				if(command!=""){ command+=",";}
 				command+="DispUnitDesc = '"+POut.String(supply.DispUnitDesc)+"'";
+			}
+			if(supply.LevelOnHand != oldSupply.LevelOnHand) {
+				if(command!=""){ command+=",";}
+				command+="LevelOnHand = "+POut.Float(supply.LevelOnHand)+"";
 			}
 			if(command==""){
 				return false;

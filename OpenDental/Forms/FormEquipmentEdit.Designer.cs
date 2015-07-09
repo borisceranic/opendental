@@ -46,6 +46,8 @@ namespace OpenDental{
 			this.textDateEntry = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textStatus = new OpenDental.ODtextBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -195,10 +197,10 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(27, 306);
+			this.butDelete.Location = new System.Drawing.Point(27, 347);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(81, 24);
-			this.butDelete.TabIndex = 10;
+			this.butDelete.TabIndex = 11;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -210,10 +212,10 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(402, 306);
+			this.butOK.Location = new System.Drawing.Point(402, 347);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 8;
+			this.butOK.TabIndex = 9;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -225,10 +227,10 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(491, 306);
+			this.butCancel.Location = new System.Drawing.Point(491, 347);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 9;
+			this.butCancel.TabIndex = 10;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -258,10 +260,33 @@ namespace OpenDental{
 			this.label10.Text = "(for security purposes)";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(3, 272);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(132, 18);
+			this.label11.TabIndex = 29;
+			this.label11.Text = "Status";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textStatus
+			// 
+			this.textStatus.AcceptsTab = true;
+			this.textStatus.DetectUrls = false;
+			this.textStatus.Location = new System.Drawing.Point(135, 271);
+			this.textStatus.Name = "textStatus";
+			this.textStatus.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textStatus.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textStatus.Size = new System.Drawing.Size(401, 60);
+			this.textStatus.TabIndex = 30;
+			this.textStatus.Text = "";
+			// 
 			// FormEquipmentEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(591, 357);
+			this.ClientSize = new System.Drawing.Size(591, 398);
+			this.Controls.Add(this.textStatus);
+			this.Controls.Add(this.label11);
 			this.Controls.Add(this.label10);
 			this.Controls.Add(this.textDateEntry);
 			this.Controls.Add(this.label9);
@@ -318,5 +343,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textDateEntry;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Label label11;
+		private ODtextBox textStatus;
 	}
 }

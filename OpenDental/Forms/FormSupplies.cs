@@ -78,11 +78,13 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Supplier"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Description"),240);
+			col=new ODGridColumn(Lan.g(this,"Description"),200);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Price"),60,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"StockQty"),60,HorizontalAlignment.Center);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"OnHandQty"),80,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"IsHidden"),40,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
@@ -111,6 +113,7 @@ namespace OpenDental {
 				else {
 					row.Cells.Add(ListSupply[i].LevelDesired.ToString());
 				}
+				row.Cells.Add(ListSupply[i].LevelOnHand.ToString());
 				if(ListSupply[i].IsHidden) {
 					row.Cells.Add("X");
 				}
@@ -198,6 +201,14 @@ namespace OpenDental {
 		}
 
 		private void checkShowHidden_Click(object sender,EventArgs e) {
+			SelectedGridItems.Clear();
+			foreach(int index in gridMain.SelectedIndices) {
+				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+			}
+			FillGrid();
+		}
+
+		private void checkShowShoppingList_Click(object sender,EventArgs e) {
 			SelectedGridItems.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
 				SelectedGridItems.Add(ListSupply[index].SupplyNum);
@@ -392,6 +403,9 @@ namespace OpenDental {
 				if(supplier!=0 && supply.SupplierNum!=supplier) {
 					continue;//skip supplies that do not match selected supplier
 				}
+				if(checkShowShoppingList.Checked && supply.LevelOnHand >= supply.LevelDesired) {
+					continue;
+				}
 				if(textFind.Text=="") {//Start filtering based on findText
 					ListSupply.Add(supply);
 					continue;
@@ -499,6 +513,11 @@ namespace OpenDental {
 				text=Lan.g(this,"Supply List");
 				g.DrawString(text,headingFont,Brushes.Black,425-g.MeasureString(text,headingFont).Width/2,yPos);
 				yPos+=(int)g.MeasureString(text,headingFont).Height;
+				if(checkShowShoppingList.Checked) {
+					text=Lan.g(this,"Shopping List");
+					g.DrawString(text,subHeadingFont,Brushes.Black,425-g.MeasureString(text,subHeadingFont).Width/2,yPos);
+					yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
+				}
 				if(checkShowHidden.Checked) {
 					text=Lan.g(this,"Showing Hidden Items");
 					g.DrawString(text,subHeadingFont,Brushes.Black,425-g.MeasureString(text,subHeadingFont).Width/2,yPos);

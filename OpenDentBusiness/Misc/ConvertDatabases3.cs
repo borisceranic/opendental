@@ -8984,6 +8984,26 @@ namespace OpenDentBusiness {
 					command="UPDATE operatory SET IsWebSched=1 WHERE OperatoryNum IN ("+String.Join(",",listOpNums)+")";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE equipment ADD Status text NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE equipment ADD Status varchar2(4000)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE supply ADD LevelOnHand float NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE supply ADD LevelOnHand number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE supply SET LevelOnHand = 0 WHERE LevelOnHand IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE supply MODIFY LevelOnHand NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

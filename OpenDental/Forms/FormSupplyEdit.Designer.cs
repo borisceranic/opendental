@@ -41,6 +41,9 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.textLevelOnHand = new OpenDental.ValidDouble();
+			this.label4 = new System.Windows.Forms.Label();
+			this.label7 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -114,17 +117,17 @@ namespace OpenDental{
 			// checkIsHidden
 			// 
 			this.checkIsHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsHidden.Location = new System.Drawing.Point(76, 164);
+			this.checkIsHidden.Location = new System.Drawing.Point(76, 190);
 			this.checkIsHidden.Name = "checkIsHidden";
 			this.checkIsHidden.Size = new System.Drawing.Size(104, 18);
-			this.checkIsHidden.TabIndex = 7;
+			this.checkIsHidden.TabIndex = 5;
 			this.checkIsHidden.Text = "Hidden";
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsHidden.UseVisualStyleBackColor = true;
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(32, 139);
+			this.label8.Location = new System.Drawing.Point(32, 165);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(132, 18);
 			this.label8.TabIndex = 20;
@@ -143,28 +146,33 @@ namespace OpenDental{
 			// 
 			this.comboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboCategory.FormattingEnabled = true;
+			this.comboCategory.ItemHeight = 13;
 			this.comboCategory.Location = new System.Drawing.Point(166, 34);
 			this.comboCategory.Name = "comboCategory";
 			this.comboCategory.Size = new System.Drawing.Size(228, 21);
-			this.comboCategory.TabIndex = 11;
+			this.comboCategory.TabIndex = 9;
 			// 
 			// textLevelDesired
 			// 
 			this.textLevelDesired.BackColor = System.Drawing.SystemColors.Window;
 			this.textLevelDesired.ForeColor = System.Drawing.SystemColors.WindowText;
 			this.textLevelDesired.Location = new System.Drawing.Point(166, 113);
+			this.textLevelDesired.MaxVal = 100000000D;
+			this.textLevelDesired.MinVal = -100000000D;
 			this.textLevelDesired.Name = "textLevelDesired";
 			this.textLevelDesired.Size = new System.Drawing.Size(62, 20);
-			this.textLevelDesired.TabIndex = 4;
+			this.textLevelDesired.TabIndex = 2;
 			// 
 			// textPrice
 			// 
 			this.textPrice.BackColor = System.Drawing.SystemColors.Window;
 			this.textPrice.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.textPrice.Location = new System.Drawing.Point(166, 139);
+			this.textPrice.Location = new System.Drawing.Point(166, 165);
+			this.textPrice.MaxVal = 100000000D;
+			this.textPrice.MinVal = -100000000D;
 			this.textPrice.Name = "textPrice";
 			this.textPrice.Size = new System.Drawing.Size(80, 20);
-			this.textPrice.TabIndex = 5;
+			this.textPrice.TabIndex = 4;
 			// 
 			// butDelete
 			// 
@@ -179,7 +187,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(27, 214);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(81, 26);
-			this.butDelete.TabIndex = 6;
+			this.butDelete.TabIndex = 8;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -194,7 +202,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(499, 173);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 8;
+			this.butOK.TabIndex = 6;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -209,14 +217,45 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(499, 214);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 9;
+			this.butCancel.TabIndex = 7;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// textLevelOnHand
+			// 
+			this.textLevelOnHand.BackColor = System.Drawing.SystemColors.Window;
+			this.textLevelOnHand.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.textLevelOnHand.Location = new System.Drawing.Point(166, 141);
+			this.textLevelOnHand.MaxVal = 100000000D;
+			this.textLevelOnHand.MinVal = -100000000D;
+			this.textLevelOnHand.Name = "textLevelOnHand";
+			this.textLevelOnHand.Size = new System.Drawing.Size(62, 20);
+			this.textLevelOnHand.TabIndex = 3;
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(228, 141);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(173, 19);
+			this.label4.TabIndex = 27;
+			this.label4.Text = "Decimals allowed.";
+			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(32, 138);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(132, 18);
+			this.label7.TabIndex = 26;
+			this.label7.Text = "Level On Hand";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormSupplyEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(599, 265);
+			this.Controls.Add(this.textLevelOnHand);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.label7);
 			this.Controls.Add(this.textLevelDesired);
 			this.Controls.Add(this.comboCategory);
 			this.Controls.Add(this.textPrice);
@@ -263,5 +302,8 @@ namespace OpenDental{
 		private ValidDouble textPrice;
 		private System.Windows.Forms.ComboBox comboCategory;
 		private ValidDouble textLevelDesired;
+		private ValidDouble textLevelOnHand;
+		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Label label7;
 	}
 }

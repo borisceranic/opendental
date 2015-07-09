@@ -60,6 +60,7 @@ namespace OpenDentBusiness.Crud{
 				equipment.DateCheckedOut   = PIn.Date  (table.Rows[i]["DateCheckedOut"].ToString());
 				equipment.DateExpectedBack = PIn.Date  (table.Rows[i]["DateExpectedBack"].ToString());
 				equipment.DispenseNote     = PIn.String(table.Rows[i]["DispenseNote"].ToString());
+				equipment.Status           = PIn.String(table.Rows[i]["Status"].ToString());
 				retVal.Add(equipment);
 			}
 			return retVal;
@@ -100,7 +101,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EquipmentNum,";
 			}
-			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote) VALUES(";
+			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote,Status) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(equipment.EquipmentNum)+",";
 			}
@@ -117,7 +118,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (equipment.ProvNumCheckedOut)+","
 				+    POut.Date  (equipment.DateCheckedOut)+","
 				+    POut.Date  (equipment.DateExpectedBack)+","
-				+    DbHelper.ParamChar+"paramDispenseNote)";
+				+    DbHelper.ParamChar+"paramDispenseNote,"
+				+"'"+POut.String(equipment.Status)+"')";
 			if(equipment.DispenseNote==null) {
 				equipment.DispenseNote="";
 			}
@@ -154,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EquipmentNum,";
 			}
-			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote) VALUES(";
+			command+="Description,SerialNumber,ModelYear,DatePurchased,DateSold,PurchaseCost,MarketValue,Location,DateEntry,ProvNumCheckedOut,DateCheckedOut,DateExpectedBack,DispenseNote,Status) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(equipment.EquipmentNum)+",";
 			}
@@ -171,7 +173,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (equipment.ProvNumCheckedOut)+","
 				+    POut.Date  (equipment.DateCheckedOut)+","
 				+    POut.Date  (equipment.DateExpectedBack)+","
-				+    DbHelper.ParamChar+"paramDispenseNote)";
+				+    DbHelper.ParamChar+"paramDispenseNote,"
+				+"'"+POut.String(equipment.Status)+"')";
 			if(equipment.DispenseNote==null) {
 				equipment.DispenseNote="";
 			}
@@ -200,7 +203,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProvNumCheckedOut=  "+POut.Long  (equipment.ProvNumCheckedOut)+", "
 				+"DateCheckedOut   =  "+POut.Date  (equipment.DateCheckedOut)+", "
 				+"DateExpectedBack =  "+POut.Date  (equipment.DateExpectedBack)+", "
-				+"DispenseNote     =  "+DbHelper.ParamChar+"paramDispenseNote "
+				+"DispenseNote     =  "+DbHelper.ParamChar+"paramDispenseNote, "
+				+"Status           = '"+POut.String(equipment.Status)+"' "
 				+"WHERE EquipmentNum = "+POut.Long(equipment.EquipmentNum);
 			if(equipment.DispenseNote==null) {
 				equipment.DispenseNote="";
@@ -263,6 +267,10 @@ namespace OpenDentBusiness.Crud{
 			if(equipment.DispenseNote != oldEquipment.DispenseNote) {
 				if(command!=""){ command+=",";}
 				command+="DispenseNote = "+DbHelper.ParamChar+"paramDispenseNote";
+			}
+			if(equipment.Status != oldEquipment.Status) {
+				if(command!=""){ command+=",";}
+				command+="Status = '"+POut.String(equipment.Status)+"'";
 			}
 			if(command==""){
 				return false;
