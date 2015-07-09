@@ -49,19 +49,23 @@ namespace OpenDentBusiness{
 		/// <summary>Derived from Birthdate.  Not in the database table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		private int _age;
-		/// <summary>Single char. Shows at upper right corner of appointments.  Suggested use is A,B,or C to designate creditworthiness, but it can actually be used for any purpose.</summary>
+		/// <summary>Single char. Shows at upper right corner of appointments.  Suggested use is A,B,or C to designate creditworthiness, 
+		/// but it can actually be used for any purpose.</summary>
 		public string CreditType;
 		/// <summary>.</summary>
 		public string Email;
-		/// <summary>Dear __.  This field does not include the "Dear" or a trailing comma.  If this field is blank, then the typical salutation is FName.  Or, if a Preferred name is present, that is used instead of FName.</summary>
+		/// <summary>Dear __.  This field does not include the "Dear" or a trailing comma.  If this field is blank, then the typical salutation is 
+		/// FName.  Or, if a Preferred name is present, that is used instead of FName.</summary>
 		public string Salutation;
 		/// <summary>Current patient balance.(not family). Never subtracts insurance estimates.</summary>
 		public double EstBalance;
-		/// <summary>FK to provider.ProvNum.  The patient's primary provider.  Required.  The database maintenance tool ensures that every patient always has this number set, so the program no longer has to handle 0.</summary>
+		/// <summary>FK to provider.ProvNum.  The patient's primary provider.  Required.  The database maintenance tool ensures that every patient 
+		/// always has this number set, so the program no longer has to handle 0.</summary>
 		public long PriProv;
 		/// <summary>FK to provider.ProvNum.  Secondary provider (hygienist). Optional.</summary>
 		public long SecProv;
-		/// <summary>FK to feesched.FeeSchedNum.  Fee schedule for this patient.  Usually not used.  If missing, the practice default fee schedule is used. If patient has insurance, then the fee schedule for the insplan is used.</summary>
+		/// <summary>FK to feesched.FeeSchedNum.  Fee schedule for this patient.  Usually not used.  If missing, the practice default fee schedule is 
+		/// used. If patient has insurance, then the fee schedule for the insplan is used.</summary>
 		public long FeeSched;
 		/// <summary>FK to definition.DefNum.  Must have a value, or the patient will not show on some reports.</summary>
 		public long BillingType;
@@ -78,7 +82,8 @@ namespace OpenDentBusiness{
 		public string ApptModNote;
 		/// <summary>Single char.  Nonstudent='N' or blank, Parttime='P', Fulltime='F'.</summary>
 		public string StudentStatus;
-		/// <summary>College name.  If Canadian, then this is field C10 and must be filled if C9 (patient.CanadianEligibilityCode) is 1 and patient is 18 or older.</summary>
+		/// <summary>College name.  If Canadian, then this is field C10 and must be filled if C9 (patient.CanadianEligibilityCode) is 1 and patient 
+		/// is 18 or older.</summary>
 		public string SchoolName;
 		/// <summary>Max 15 char.  Used for reference to previous programs.</summary>
 		public string ChartNumber;
@@ -94,7 +99,8 @@ namespace OpenDentBusiness{
 		public double BalOver90;
 		/// <summary>Insurance Estimate for entire family.</summary>
 		public double InsEst;
-		/// <summary>Total balance for entire family before insurance estimate.  Not the same as the sum of the 4 aging balances because this can be negative.  Only stored with guarantor.</summary>
+		/// <summary>Total balance for entire family before insurance estimate.  Not the same as the sum of the 4 aging balances because this can be 
+		/// negative.  Only stored with guarantor.</summary>
 		public double BalTotal;
 		/// <summary>FK to employer.EmployerNum.</summary>
 		public long EmployerNum;
@@ -110,11 +116,13 @@ namespace OpenDentBusiness{
 		public DateTime DateFirstVisit;
 		/// <summary>FK to clinic.ClinicNum. Can be zero if not attached to a clinic or no clinics set up.</summary>
 		public long ClinicNum;
-		/// <summary>For now, an 'I' indicates that the patient has insurance.  This is only used when displaying appointments.  It will later be expanded.  User can't edit.</summary>
+		/// <summary>For now, an 'I' indicates that the patient has insurance.  This is only used when displaying appointments.  
+		/// It will later be expanded.  User can't edit.</summary>
 		public string HasIns;
-		/// <summary>The Trophy bridge is inadequate.  This is an attempt to make it usable for offices that have already invested in Trophy hardware.</summary>
+		/// <summary>The Trophy bridge is inadequate, this attempts to make it usable for offices that have invested in Trophy hardware.</summary>
 		public string TrophyFolder;
-		/// <summary>This simply indicates whether the 'done' box is checked in the chart module.  Used to be handled as a -1 in the NextAptNum field, but now that field is unsigned.</summary>
+		/// <summary>This simply indicates whether the 'done' box is checked in the chart module.  Used to be handled as a -1 in the NextAptNum field,
+		/// but now that field is unsigned.</summary>
 		public bool PlannedIsDone;
 		/// <summary>Set to true if patient needs to be premedicated for appointments, includes PAC, halcion, etc.</summary>
 		public bool Premed;
@@ -134,30 +142,41 @@ namespace OpenDentBusiness{
 		public TimeSpan SchedAfterTime;
 		/// <summary>We do not use this, but some users do, so here it is. 0=none. Otherwise, 1-7 for day.</summary>
 		public byte SchedDayOfWeek;
-		/// <summary>The primary language of the patient.  Typically eng (English), fra (French), spa (Spanish), or similar.  If it's a custom language, then it might look like Tahitian.</summary>
+		/// <summary>The primary language of the patient.  Typically eng (English), fra (French), spa (Spanish), or similar.  
+		/// If it's a custom language, then it might look like Tahitian.</summary>
 		public string Language;
 		/// <summary>Used in hospitals.  It can be before the first visit date.  It typically gets set automatically by the hospital system.</summary>
 		public DateTime AdmitDate;
-		/// <summary>Includes any punctuation.  For example, Mr., Mrs., Miss, Dr., etc.  There is no selection mechanism yet for user; they must simply type it in.</summary>
+		/// <summary>Includes any punctuation.  For example, Mr., Mrs., Miss, Dr., etc.  
+		/// There is no selection mechanism yet for user; they must simply type it in.</summary>
 		public string Title;
-		/// <summary>Amount "due now" for all payment plans such that someone in this family is the payment plan guarantor.  This is the total of all payment plan charges past due (taking into account the PayPlansBillInAdvanceDays setting) subtract the amount already paid for the payment plans.  Only stored with family guarantor.</summary>
+		/// <summary>Amount "due now" for all payment plans such that someone in this family is the payment plan guarantor.  
+		/// This is the total of all payment plan charges past due (taking into account the PayPlansBillInAdvanceDays setting) subtract the amount 
+		/// already paid for the payment plans.  Only stored with family guarantor.</summary>
 		public double PayPlanDue;
 		///<summary>FK to site.SiteNum. Can be zero. Replaces the old GradeSchool field with a proper foreign key.</summary>
 		public long SiteNum;
-		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program updates.  Not user editable.</summary>
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or 
+		///program updates.  Not user editable.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime DateTStamp;
-		///<summary>FK to patient.PatNum. Can be zero.  Person responsible for medical decisions rather than finances.  Guarantor is still responsible for finances.  This is useful for nursing home residents.  Part of public health.</summary>
+		///<summary>FK to patient.PatNum. Can be zero.  Person responsible for medical decisions rather than finances.  Guarantor is still responsible
+		///for finances.  This is useful for nursing home residents.  Part of public health.</summary>
 		public long ResponsParty;
-		///<summary>C09.  Eligibility Exception Code.  A number between 1-4.  0 is not acceptable for e-claims. 1=FT student, 2=disabled, 3=disabled student, 4=code not applicable.  Warning.  4 is a 0 if using CDAnet version 02. This column should have been created as an int. </summary>
+		///<summary>C09.  Eligibility Exception Code.  A number between 1-4.  0 is not acceptable for e-claims.
+		///1=FT student, 2=disabled, 3=disabled student, 4=code not applicable.  Warning.  4 is a 0 if using CDAnet version 02. 
+		///This column should have been created as an int. </summary>
 		public byte CanadianEligibilityCode;
 		///<summary>Number of minutes patient is asked to come early to appointments.</summary>
 		public int AskToArriveEarly;
-		///<summary>The hashed password for online access to patient portal for this patient.  Blank if no password set yet.  Blank password indicates no online access.</summary>
+		///<summary>The hashed password for online access to patient portal for this patient.  Blank if no password set yet.  
+		///Blank password indicates no online access.</summary>
 		public string OnlinePassword;
 		///<summary>Enum:ContactMethod  Used for EHR.</summary>
 		public ContactMethod PreferContactConfidential;
-		///<summary>FK to patient.PatNum.  If this is the same as PatNum, then this is a SuperHead.  If zero, then not part of a superfamily.  Synched for entire family.  If family is part of a superfamily, then the guarantor for this family will show in the superfamily list in the Family module for anyone else who is in the superfamily.  Only a guarantor can be a superfamily head.</summary>
+		///<summary>FK to patient.PatNum.  If this is the same as PatNum, then this is a SuperHead.  If zero, then not part of a superfamily.  
+		///Synched for entire family.  If family is part of a superfamily, then the guarantor for this family will show in the superfamily list in the
+		///Family module for anyone else who is in the superfamily.  Only a guarantor can be a superfamily head.</summary>
 		public long SuperFamily;
 		///<summary>Enum:YN</summary>
 		public YN TxtMsgOk;
@@ -165,11 +184,19 @@ namespace OpenDentBusiness{
 		public string SmokingSnoMed;
 		///<summary>Country name.  Only used by HQ to add country names to statements.</summary>
 		public string Country;
-		///<summary>Needed for EHR syndromic surveillance messaging.  Used in HL7 PID-29.  Also for feature request #3040.  Date and time because we need precision to the minute in syndromic surveillence messging.</summary>
+		///<summary>Needed for EHR syndromic surveillance messaging.  Used in HL7 PID-29.  Also for feature request #3040.  Date and time because we 
+		///need precision to the minute in syndromic surveillence messging.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeDeceased;
+		///<summary>A number between 1 and 31 that is the day of month that repeat charges should be applied to this account. 
+		///Previously this was determined by the start date of the repeate charges.</summary>
+		public int BillingCycleDay;
 
-		//<summary>Decided not to add since this data is already available and synchronizing would take too much time.  Will add later.  Not editable. If the patient happens to have a future appointment, this will contain the date of that appointment.  Once appointment is set complete, this date is deleted.  If there is more than one appointment scheduled, this will only contain the earliest one.  Used mostly to exclude patients from recall lists.  If you want all future appointments, use Appointments.GetForPat() instead. You can loop through that list and exclude appointments with dates earlier than today.</summary>
+		/////<summary>Decided not to add since this data is already available and synchronizing would take too much time.  Will add later.  
+		/////Not editable. If the patient happens to have a future appointment, this will contain the date of that appointment.  
+		/////Once appointment is set complete, this date is deleted.  If there is more than one appointment scheduled, this will only contain the 
+		/////earliest one.  Used mostly to exclude patients from recall lists.  If you want all future appointments, use Appointments.GetForPat() 
+		/////instead. You can loop through that list and exclude appointments with dates earlier than today.</summary>
 		//public DateTime DateScheduled;
 
 		///<summary>Used only for serialization purposes</summary>

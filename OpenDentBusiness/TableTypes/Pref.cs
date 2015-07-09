@@ -115,6 +115,8 @@ namespace OpenDentBusiness {
 		BillingExcludeNegative,
 		BillingIgnoreInPerson,
 		BillingIncludeChanged,
+		///<summary>Used with repeate charges to apply repeate charges to patients accoutn on billing cycle date.</summary>
+		BillingUseBillingCycleDay,
 		BillingSelectBillingTypes,
 		/// <summary>0=no,1=EHG,2=POS(xml file),3=ClaimX(xml file)</summary>
 		BillingUseElectronic,

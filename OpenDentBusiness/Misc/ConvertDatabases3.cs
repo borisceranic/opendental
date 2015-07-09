@@ -8817,7 +8817,7 @@ namespace OpenDentBusiness {
 					command="UPDATE claimformitem SET FieldName='ICDindicatorAB',FormatString='',Width=24,XPos=XPos+12 "
 						+"WHERE claimformnum="+POut.Long(claimFormNum)+" AND FieldName='FixedText' AND FormatString='B' AND YPos>=600 AND YPos<=700";
 					Db.NonQ(command);
-				}
+				} 
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE document MODIFY DateCreated datetime NOT NULL";//times automatically updated in MySQL to 00:00:00.
 					Db.NonQ(command);
@@ -8927,6 +8927,26 @@ namespace OpenDentBusiness {
 					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Clinic',2,-3176419)";
 					Db.NonQ(command);
 					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemColor) VALUES ((SELECT MAX(DefNum)+1 FROM definition),34,'Provider and Clinic',3,-16776961)";
+					Db.NonQ(command);
+				}
+				if (DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patient ADD BillingCycleDay int NOT NULL DEFAULT 1";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patient ADD BillingCycleDay number(11) DEFAULT 1";
+					Db.NonQ(command);
+					command="UPDATE patient SET BillingCycleDay = 1 WHERE BillingCycleDay IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patient MODIFY BillingCycleDay NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('BillingUseBillingCycleDay','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BillingUseBillingCycleDay','0')";
 					Db.NonQ(command);
 				}
 
