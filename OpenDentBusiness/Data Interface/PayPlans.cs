@@ -130,10 +130,20 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),plan);
 				return;
 			}
-			string command="SELECT COUNT(*) FROM paysplit WHERE PayPlanNum="+plan.PayPlanNum.ToString();
-			if(Db.GetCount(command)!="0"){
-				throw new ApplicationException
-					(Lans.g("PayPlans","You cannot delete a payment plan with payments attached.  Unattach the payments first."));
+			string command;
+			if(plan.PlanNum==0) {  //Patient payment plan
+				command="SELECT COUNT(*) FROM paysplit WHERE PayPlanNum="+plan.PayPlanNum.ToString();
+				if(Db.GetCount(command)!="0") {
+					throw new ApplicationException
+						(Lans.g("PayPlans","You cannot delete a payment plan with patient payments attached.  Unattach the payments first."));
+				}
+			}
+			else {  //Insurance payment plan
+				command="SELECT COUNT(*) FROM claimproc WHERE PayPlanNum="+plan.PayPlanNum.ToString();
+				if(Db.GetCount(command)!="0") {
+					throw new ApplicationException
+						(Lans.g("PayPlans","You cannot delete a payment plan with insurance payments attached.  Unattach the payments first."));
+				}
 			}
 			command="DELETE FROM payplancharge WHERE PayPlanNum="+plan.PayPlanNum.ToString();
 			Db.NonQ(command);
