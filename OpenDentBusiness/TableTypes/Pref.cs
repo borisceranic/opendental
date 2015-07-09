@@ -556,6 +556,8 @@ namespace OpenDentBusiness {
 		WebSchedMessage,
 		WebSchedMessage2,
 		WebSchedMessage3,
+		///<summary>Enum: WebSchedProviderRules 0=FirstAvailable, 1=PrimaryProvider, 2=SecondaryProvider, 3=LastSeenHygienist</summary>
+		WebSchedProviderRule,
 		///<summary>Boolean. 0 by default. True when Web Sched service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>
 		WebSchedService,
 		WebSchedSubject,
@@ -576,6 +578,18 @@ namespace OpenDentBusiness {
 	public enum AccountingSoftware {
 		OpenDental,
 		QuickBooks
+	}
+
+	///<summary>Used by pref "WebSchedProviderRule". Determines how Web Sched will decide on what provider time slots to show patients.</summary>
+	public enum WebSchedProviderRules {
+		///<summary>0 - Dynamically picks the first available provider based on the time slot picked by the patient.</summary>
+		FirstAvailable,
+		///<summary>1 - Only shows time slots that are available via the patient's primary provider.</summary>
+		PrimaryProvider,
+		///<summary>2 - Only shows time slots that are available via the patient's secondary provider.</summary>
+		SecondaryProvider,
+		///<summary>3 - Only shows time slots that are available via the patient's last seen hygienist.</summary>
+		LastSeenHygienist
 	}
 	
 

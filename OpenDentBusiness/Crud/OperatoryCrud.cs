@@ -56,6 +56,7 @@ namespace OpenDentBusiness.Crud{
 				operatory.IsHygiene     = PIn.Bool  (table.Rows[i]["IsHygiene"].ToString());
 				operatory.ClinicNum     = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				operatory.SetProspective= PIn.Bool  (table.Rows[i]["SetProspective"].ToString());
+				operatory.IsWebSched    = PIn.Bool  (table.Rows[i]["IsWebSched"].ToString());
 				retVal.Add(operatory);
 			}
 			return retVal;
@@ -96,7 +97,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="OperatoryNum,";
 			}
-			command+="OpName,Abbrev,ItemOrder,IsHidden,ProvDentist,ProvHygienist,IsHygiene,ClinicNum,SetProspective) VALUES(";
+			command+="OpName,Abbrev,ItemOrder,IsHidden,ProvDentist,ProvHygienist,IsHygiene,ClinicNum,SetProspective,IsWebSched) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(operatory.OperatoryNum)+",";
 			}
@@ -109,7 +110,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (operatory.ProvHygienist)+","
 				+    POut.Bool  (operatory.IsHygiene)+","
 				+    POut.Long  (operatory.ClinicNum)+","
-				+    POut.Bool  (operatory.SetProspective)+")";
+				+    POut.Bool  (operatory.SetProspective)+","
+				+    POut.Bool  (operatory.IsWebSched)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="OperatoryNum,";
 			}
-			command+="OpName,Abbrev,ItemOrder,IsHidden,ProvDentist,ProvHygienist,IsHygiene,ClinicNum,SetProspective) VALUES(";
+			command+="OpName,Abbrev,ItemOrder,IsHidden,ProvDentist,ProvHygienist,IsHygiene,ClinicNum,SetProspective,IsWebSched) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(operatory.OperatoryNum)+",";
 			}
@@ -155,7 +157,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (operatory.ProvHygienist)+","
 				+    POut.Bool  (operatory.IsHygiene)+","
 				+    POut.Long  (operatory.ClinicNum)+","
-				+    POut.Bool  (operatory.SetProspective)+")";
+				+    POut.Bool  (operatory.SetProspective)+","
+				+    POut.Bool  (operatory.IsWebSched)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -176,7 +179,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProvHygienist =  "+POut.Long  (operatory.ProvHygienist)+", "
 				+"IsHygiene     =  "+POut.Bool  (operatory.IsHygiene)+", "
 				+"ClinicNum     =  "+POut.Long  (operatory.ClinicNum)+", "
-				+"SetProspective=  "+POut.Bool  (operatory.SetProspective)+" "
+				+"SetProspective=  "+POut.Bool  (operatory.SetProspective)+", "
+				+"IsWebSched    =  "+POut.Bool  (operatory.IsWebSched)+" "
 				+"WHERE OperatoryNum = "+POut.Long(operatory.OperatoryNum);
 			Db.NonQ(command);
 		}
@@ -219,6 +223,10 @@ namespace OpenDentBusiness.Crud{
 			if(operatory.SetProspective != oldOperatory.SetProspective) {
 				if(command!=""){ command+=",";}
 				command+="SetProspective = "+POut.Bool(operatory.SetProspective)+"";
+			}
+			if(operatory.IsWebSched != oldOperatory.IsWebSched) {
+				if(command!=""){ command+=",";}
+				command+="IsWebSched = "+POut.Bool(operatory.IsWebSched)+"";
 			}
 			if(command==""){
 				return false;

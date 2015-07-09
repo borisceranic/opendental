@@ -28,6 +28,8 @@ namespace OpenDentBusiness{
 		///<summary>If true patients put into this operatory will have status set to prospective.</summary>
 		public bool SetProspective;
 		//DateTStamp
+		///<summary>Operatories with IsWebSched set to true will be the ONLY operatories considered when searching for available time slots.</summary>
+		public bool IsWebSched;
 
 		///<summary>Returns a copy of this Operatory.</summary>
 		public Operatory Copy(){

@@ -8949,6 +8949,27 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BillingUseBillingCycleDay','0')";
 					Db.NonQ(command);
 				}
+				//A new Web Sched pref to keep track of how provider time slots are shown.  ValueString is an enum that is defaulted to 'FirstAvailable'.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('WebSchedProviderRule','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedProviderRule','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE operatory ADD IsWebSched tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE operatory ADD IsWebSched number(3)";
+					Db.NonQ(command);
+					command="UPDATE operatory SET IsWebSched = 0 WHERE IsWebSched IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE operatory MODIFY IsWebSched NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
