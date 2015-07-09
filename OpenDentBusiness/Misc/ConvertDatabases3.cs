@@ -8970,6 +8970,20 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE operatory MODIFY IsWebSched NOT NULL";
 					Db.NonQ(command);
 				}
+				//Take the current logic for considering operatories as 'Web Sched' ops and set their 'IsWebSched' to true.
+				//Going forward, our users will be able to manually dictate whether or not to include operatories for Web Sched.
+				//Using two queries instead of one update statement because Oracle cannot use JOINs in an update statement.
+				command=@"SELECT operatory.OperatoryNum 
+					FROM operatory
+					LEFT JOIN provider dentist ON operatory.ProvDentist=dentist.ProvNum
+					LEFT JOIN provider hygienist ON operatory.ProvHygienist=hygienist.ProvNum
+					WHERE (operatory.IsHidden!=1 AND (operatory.IsHygiene=1 OR (dentist.IsSecondary=1 OR hygienist.IsSecondary=1)))
+					AND operatory.SetProspective=0";//Prospective operatories will be excluded from the Web Sched (convo with Nathan 01/08/2015)
+				List<long> listOpNums=Db.GetListLong(command);
+				if(listOpNums.Count>0) {
+					command="UPDATE operatory SET IsWebSched=1 WHERE OperatoryNum IN ("+String.Join(",",listOpNums)+")";
+					Db.NonQ(command);
+				}
 
 
 
