@@ -3582,6 +3582,9 @@
       <DependentUpon>ODButtonPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ODPanelItem.cs" />
+    <Compile Include="UI\ODPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="User Controls\ContrFamilyEcw.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -5973,12 +5976,11 @@
       <SubType>Designer</SubType>
       <DependentUpon>ContrWindowingSlider.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\ODPictureBox.resx">
+      <DependentUpon>ODPictureBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\ODToolBar.resx">
       <DependentUpon>ODToolBar.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\PictureBox.resx">
-      <DependentUpon>PictureBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FormPrintPreview.resx">
@@ -6240,9 +6242,6 @@
     <Compile Include="UI\PanelOD.Designer.cs">
       <DependentUpon>PanelOD.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\PictureBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="UI\PinBoard.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -6473,6 +6472,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\butDentalIntel.png" />
     <None Include="Resources\webSched_PV_Button.png" />
     <None Include="Resources\HICF2012.jpg" />
     <None Include="Resources\phoneInUse.png" />

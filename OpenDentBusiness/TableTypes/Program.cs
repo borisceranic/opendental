@@ -45,6 +45,7 @@ namespace OpenDentBusiness{
 		DBSWin,
 		DemandForce,
 		DentalEye,
+		DentalIntel,
 		DentalStudio,
 		DentForms,
 		DentX,

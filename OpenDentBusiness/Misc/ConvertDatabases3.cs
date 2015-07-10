@@ -9004,6 +9004,30 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE supply MODIFY LevelOnHand NOT NULL";
 					Db.NonQ(command);
 				}
+				//Insert Dental Intel Link
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"'DentalIntel', "
+				    +"'Dental Intel from www.dentalintel.com', "
+				    +"'0', "
+				    +"'',"
+				    +"'', "
+				    +"'')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramNum)+1 FROM program),"
+				    +"'DentalIntel', "
+				    +"'Dental Intel from www.dentalintel.com', "
+				    +"'0', "
+				    +"'',"
+				    +"'', "
+				    +"'')";
+					Db.NonQ(command);
+				}//end Dental Intel Link
 
 
 

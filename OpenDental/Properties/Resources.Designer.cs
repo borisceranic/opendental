@@ -123,6 +123,16 @@ namespace OpenDental.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap butDentalIntel {
+            get {
+                object obj = ResourceManager.GetObject("butDentalIntel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap butExport {
             get {
                 object obj = ResourceManager.GetObject("butExport", resourceCulture);

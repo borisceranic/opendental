@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace OpenDental.UI
 {
 	/// <summary>Better and simpler than the MS picturebox.  Always resizes the image to fit in the box.  Never crops or stretches.</summary>
-	public class PictureBox : System.Windows.Forms.Control
+	public class ODPictureBox : System.Windows.Forms.Control
 	{
 		/// <summary> 
 		/// Required designer variable.
@@ -18,13 +18,14 @@ namespace OpenDental.UI
 		private System.ComponentModel.Container components = null;
 		private Image image;
 		private string textNullImage;
+		private bool _hasBorder;
 
 		///<summary></summary>
-		public PictureBox()
+		public ODPictureBox()
 		{
 			// This call is required by the Windows.Forms Form Designer.
 			InitializeComponent();
-
+			HasBorder=true;//Required because we specified a default value of true for the designer.
 		}
 
 		/// <summary> 
@@ -79,11 +80,26 @@ namespace OpenDental.UI
 		}
 
 		///<summary></summary>
+		[Category("Appearance"),Description("Determines whether to draw the border of the picturebox.")]
+		[DefaultValue(true)]
+		public bool HasBorder {
+			set {
+				_hasBorder=value;
+				Invalidate();
+			}
+			get {
+				return _hasBorder;
+			}
+		}
+
+		///<summary></summary>
 		protected override void OnPaint(PaintEventArgs e) {
 			base.OnPaint (e);
 			Graphics g=e.Graphics;
 			g.InterpolationMode=InterpolationMode.High;
-			g.DrawRectangle(Pens.Gray,0,0,Width-1,Height-1);
+			if(HasBorder) {
+				g.DrawRectangle(Pens.Gray,0,0,Width-1,Height-1);
+			}
 			if(image==null){
 				StringFormat format=new StringFormat();
 				format.Alignment=StringAlignment.Center;

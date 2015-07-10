@@ -36,12 +36,15 @@ namespace OpenDental {
 		private OpenDental.UI.ListBoxClickable listArizonaPrimaryCare;
 		private Label labelArizonaPrimaryCare;
 		private OpenDental.UI.ListBoxClickable listMonthly;
-		private UI.Button butDashboard;
+		private UI.Button butGraphicReports;
 		private MenuStrip menuMain;
 		private ToolStripMenuItem setupToolStripMenuItem;
 		private UI.Button butUDS;
 		private UI.Button butPatList;
 		private UI.Button butPatExport;
+		private GroupBox groupBox1;
+		private UI.ODPictureBox pictureDentalIntel;
+		private Label label7;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
 
@@ -80,7 +83,16 @@ namespace OpenDental {
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.labelArizonaPrimaryCare = new System.Windows.Forms.Label();
+			this.menuMain = new System.Windows.Forms.MenuStrip();
+			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label7 = new System.Windows.Forms.Label();
+			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
+			this.butPatExport = new OpenDental.UI.Button();
+			this.butPatList = new OpenDental.UI.Button();
+			this.butGraphicReports = new OpenDental.UI.Button();
 			this.listArizonaPrimaryCare = new OpenDental.UI.ListBoxClickable();
+			this.butUDS = new OpenDental.UI.Button();
 			this.butLaserLabels = new OpenDental.UI.Button();
 			this.listDaily = new OpenDental.UI.ListBoxClickable();
 			this.listProdInc = new OpenDental.UI.ListBoxClickable();
@@ -90,13 +102,7 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
-			this.butDashboard = new OpenDental.UI.Button();
-			this.menuMain = new System.Windows.Forms.MenuStrip();
-			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.butUDS = new OpenDental.UI.Button();
-			this.butPatList = new OpenDental.UI.Button();
-			this.butPatExport = new OpenDental.UI.Button();
-			this.menuMain.SuspendLayout();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -163,6 +169,95 @@ namespace OpenDental {
 			this.labelArizonaPrimaryCare.Text = "Arizona Primary Care";
 			this.labelArizonaPrimaryCare.Visible = false;
 			// 
+			// menuMain
+			// 
+			this.menuMain.Location = new System.Drawing.Point(0, 0);
+			this.menuMain.Name = "menuMain";
+			this.menuMain.Size = new System.Drawing.Size(680, 24);
+			this.menuMain.TabIndex = 22;
+			// 
+			// setupToolStripMenuItem
+			// 
+			this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
+			this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+			this.setupToolStripMenuItem.Text = "Setup";
+			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.label7);
+			this.groupBox1.Controls.Add(this.pictureDentalIntel);
+			this.groupBox1.Location = new System.Drawing.Point(542, 182);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(114, 307);
+			this.groupBox1.TabIndex = 26;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Premium";
+			// 
+			// label7
+			// 
+			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label7.Location = new System.Drawing.Point(7, 235);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(101, 69);
+			this.label7.TabIndex = 27;
+			this.label7.Text = "There is no charge to click into premium reports without a subscription.";
+			// 
+			// pictureDentalIntel
+			// 
+			this.pictureDentalIntel.HasBorder = false;
+			this.pictureDentalIntel.Image = ((System.Drawing.Image)(resources.GetObject("pictureDentalIntel.Image")));
+			this.pictureDentalIntel.Location = new System.Drawing.Point(9, 21);
+			this.pictureDentalIntel.Name = "pictureDentalIntel";
+			this.pictureDentalIntel.Size = new System.Drawing.Size(95, 24);
+			this.pictureDentalIntel.TabIndex = 0;
+			this.pictureDentalIntel.TextNullImage = null;
+			this.pictureDentalIntel.Click += new System.EventHandler(this.pictureDentalIntel_Click);
+			// 
+			// butPatExport
+			// 
+			this.butPatExport.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatExport.Autosize = true;
+			this.butPatExport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatExport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatExport.CornerRadius = 4F;
+			this.butPatExport.Location = new System.Drawing.Point(552, 117);
+			this.butPatExport.Name = "butPatExport";
+			this.butPatExport.Size = new System.Drawing.Size(100, 24);
+			this.butPatExport.TabIndex = 24;
+			this.butPatExport.Text = "EHR Pat Export";
+			this.butPatExport.Visible = false;
+			this.butPatExport.Click += new System.EventHandler(this.butPatExport_Click);
+			// 
+			// butPatList
+			// 
+			this.butPatList.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatList.Autosize = true;
+			this.butPatList.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatList.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatList.CornerRadius = 4F;
+			this.butPatList.Location = new System.Drawing.Point(552, 87);
+			this.butPatList.Name = "butPatList";
+			this.butPatList.Size = new System.Drawing.Size(100, 24);
+			this.butPatList.TabIndex = 23;
+			this.butPatList.Text = "EHR Patient List";
+			this.butPatList.Click += new System.EventHandler(this.butPatList_Click);
+			// 
+			// butGraphicReports
+			// 
+			this.butGraphicReports.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butGraphicReports.Autosize = true;
+			this.butGraphicReports.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butGraphicReports.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butGraphicReports.CornerRadius = 4F;
+			this.butGraphicReports.Location = new System.Drawing.Point(552, 35);
+			this.butGraphicReports.Name = "butGraphicReports";
+			this.butGraphicReports.Size = new System.Drawing.Size(101, 24);
+			this.butGraphicReports.TabIndex = 21;
+			this.butGraphicReports.Text = "Graphic Reports";
+			this.butGraphicReports.UseVisualStyleBackColor = true;
+			this.butGraphicReports.Click += new System.EventHandler(this.butGraphicReports_Click);
+			// 
 			// listArizonaPrimaryCare
 			// 
 			this.listArizonaPrimaryCare.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -175,6 +270,22 @@ namespace OpenDental {
 			this.listArizonaPrimaryCare.TabIndex = 19;
 			this.listArizonaPrimaryCare.Visible = false;
 			this.listArizonaPrimaryCare.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listArizonaPrimaryCare_MouseDown);
+			// 
+			// butUDS
+			// 
+			this.butUDS.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUDS.Autosize = true;
+			this.butUDS.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUDS.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUDS.CornerRadius = 4F;
+			this.butUDS.Location = new System.Drawing.Point(427, 35);
+			this.butUDS.Name = "butUDS";
+			this.butUDS.Size = new System.Drawing.Size(92, 24);
+			this.butUDS.TabIndex = 18;
+			this.butUDS.Text = "UDS Reporting";
+			this.butUDS.UseVisualStyleBackColor = true;
+			this.butUDS.Visible = false;
+			this.butUDS.Click += new System.EventHandler(this.butUDS_Click);
 			// 
 			// butLaserLabels
 			// 
@@ -294,89 +405,14 @@ namespace OpenDental {
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// butDashboard
-			// 
-			this.butDashboard.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDashboard.Autosize = true;
-			this.butDashboard.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDashboard.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDashboard.CornerRadius = 4F;
-			this.butDashboard.Location = new System.Drawing.Point(558, 35);
-			this.butDashboard.Name = "butDashboard";
-			this.butDashboard.Size = new System.Drawing.Size(75, 24);
-			this.butDashboard.TabIndex = 21;
-			this.butDashboard.Text = "Dashboard";
-			this.butDashboard.UseVisualStyleBackColor = true;
-			this.butDashboard.Click += new System.EventHandler(this.butDashboard_Click);
-			// 
-			// menuMain
-			// 
-			this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.setupToolStripMenuItem});
-			this.menuMain.Location = new System.Drawing.Point(0, 0);
-			this.menuMain.Name = "menuMain";
-			this.menuMain.Size = new System.Drawing.Size(680, 24);
-			this.menuMain.TabIndex = 22;
-			// 
-			// setupToolStripMenuItem
-			// 
-			this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-			this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
-			this.setupToolStripMenuItem.Text = "Setup";
-			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
-			// 
-			// butUDS
-			// 
-			this.butUDS.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butUDS.Autosize = true;
-			this.butUDS.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butUDS.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butUDS.CornerRadius = 4F;
-			this.butUDS.Location = new System.Drawing.Point(427, 35);
-			this.butUDS.Name = "butUDS";
-			this.butUDS.Size = new System.Drawing.Size(92, 24);
-			this.butUDS.TabIndex = 18;
-			this.butUDS.Text = "UDS Reporting";
-			this.butUDS.UseVisualStyleBackColor = true;
-			this.butUDS.Visible = false;
-			this.butUDS.Click += new System.EventHandler(this.butUDS_Click);
-			// 
-			// butPatList
-			// 
-			this.butPatList.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPatList.Autosize = true;
-			this.butPatList.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPatList.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPatList.CornerRadius = 4F;
-			this.butPatList.Location = new System.Drawing.Point(549, 87);
-			this.butPatList.Name = "butPatList";
-			this.butPatList.Size = new System.Drawing.Size(92, 24);
-			this.butPatList.TabIndex = 23;
-			this.butPatList.Text = "EHR Patient List";
-			this.butPatList.Click += new System.EventHandler(this.butPatList_Click);
-			// 
-			// butPatExport
-			// 
-			this.butPatExport.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPatExport.Autosize = true;
-			this.butPatExport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPatExport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPatExport.CornerRadius = 4F;
-			this.butPatExport.Location = new System.Drawing.Point(549, 117);
-			this.butPatExport.Name = "butPatExport";
-			this.butPatExport.Size = new System.Drawing.Size(92, 24);
-			this.butPatExport.TabIndex = 24;
-			this.butPatExport.Text = "EHR Pat Export";
-			this.butPatExport.Visible = false;
-			this.butPatExport.Click += new System.EventHandler(this.butPatExport_Click);
-			// 
 			// FormReportsMore
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(680, 612);
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butPatExport);
 			this.Controls.Add(this.butPatList);
-			this.Controls.Add(this.butDashboard);
+			this.Controls.Add(this.butGraphicReports);
 			this.Controls.Add(this.labelArizonaPrimaryCare);
 			this.Controls.Add(this.listArizonaPrimaryCare);
 			this.Controls.Add(this.butUDS);
@@ -405,8 +441,7 @@ namespace OpenDental {
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Reports";
 			this.Load += new System.EventHandler(this.FormReportsMore_Load);
-			this.menuMain.ResumeLayout(false);
-			this.menuMain.PerformLayout();
+			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -841,7 +876,7 @@ namespace OpenDental {
 			FormRU.ShowDialog();
 		}
 
-		private void butDashboard_Click(object sender,EventArgs e) {
+		private void butGraphicReports_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.ReportDashboard)) {
 				return;
 			}
@@ -864,6 +899,25 @@ namespace OpenDental {
 		private void butPatExport_Click(object sender,EventArgs e) {
 			FormEhrPatientExport FormEhrPE=new FormEhrPatientExport();
 			FormEhrPE.ShowDialog();
+		}
+
+		private void pictureDentalIntel_Click(object sender,EventArgs e) {
+			if(Programs.IsEnabled(ProgramName.DentalIntel)) {
+				try {
+					Process.Start("https://portal.dentalintel.com/");
+				}
+				catch {
+					MsgBox.Show(this,"Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
+				}
+			}
+			else {
+				try {
+					Process.Start("https://opendental.dentalintel.com/");
+				}
+				catch {
+					MsgBox.Show(this,"Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
+				}
+			}
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {

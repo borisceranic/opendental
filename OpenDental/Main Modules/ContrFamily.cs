@@ -33,7 +33,7 @@ namespace OpenDental{
 		public event PatientSelectedEventHandler PatientSelected=null;
 		private Patient PatCur;
 		private Family FamCur;
-		private OpenDental.UI.PictureBox picturePat;
+		private OpenDental.UI.ODPictureBox picturePat;
 		private List <InsPlan> PlanList;
 		private OpenDental.UI.ODGrid gridIns;
 		private List <PatPlan> PatPlanList;
@@ -76,7 +76,7 @@ namespace OpenDental{
 			this.imageListToolBar = new System.Windows.Forms.ImageList(this.components);
 			this.menuInsurance = new System.Windows.Forms.ContextMenu();
 			this.menuPlansForFam = new System.Windows.Forms.MenuItem();
-			this.picturePat = new OpenDental.UI.PictureBox();
+			this.picturePat = new OpenDental.UI.ODPictureBox();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.gridSuperFam = new OpenDental.UI.ODGrid();
 			this.gridRecall = new OpenDental.UI.ODGrid();
@@ -89,13 +89,13 @@ namespace OpenDental{
 			// 
 			this.imageListToolBar.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListToolBar.ImageStream")));
 			this.imageListToolBar.TransparentColor = System.Drawing.Color.Transparent;
-			this.imageListToolBar.Images.SetKeyName(0,"");
-			this.imageListToolBar.Images.SetKeyName(1,"");
-			this.imageListToolBar.Images.SetKeyName(2,"");
-			this.imageListToolBar.Images.SetKeyName(3,"");
-			this.imageListToolBar.Images.SetKeyName(4,"");
-			this.imageListToolBar.Images.SetKeyName(5,"");
-			this.imageListToolBar.Images.SetKeyName(6,"Umbrella.gif");
+			this.imageListToolBar.Images.SetKeyName(0, "");
+			this.imageListToolBar.Images.SetKeyName(1, "");
+			this.imageListToolBar.Images.SetKeyName(2, "");
+			this.imageListToolBar.Images.SetKeyName(3, "");
+			this.imageListToolBar.Images.SetKeyName(4, "");
+			this.imageListToolBar.Images.SetKeyName(5, "");
+			this.imageListToolBar.Images.SetKeyName(6, "Umbrella.gif");
 			// 
 			// menuInsurance
 			// 
@@ -110,9 +110,9 @@ namespace OpenDental{
 			// 
 			// picturePat
 			// 
-			this.picturePat.Location = new System.Drawing.Point(1,27);
+			this.picturePat.Location = new System.Drawing.Point(1, 27);
 			this.picturePat.Name = "picturePat";
-			this.picturePat.Size = new System.Drawing.Size(100,100);
+			this.picturePat.Size = new System.Drawing.Size(100, 100);
 			this.picturePat.TabIndex = 28;
 			this.picturePat.Text = "picturePat";
 			this.picturePat.TextNullImage = "Patient Picture Unavailable";
@@ -121,9 +121,9 @@ namespace OpenDental{
 			// 
 			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
 			this.ToolBarMain.ImageList = this.imageListToolBar;
-			this.ToolBarMain.Location = new System.Drawing.Point(0,0);
+			this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
 			this.ToolBarMain.Name = "ToolBarMain";
-			this.ToolBarMain.Size = new System.Drawing.Size(939,25);
+			this.ToolBarMain.Size = new System.Drawing.Size(939, 25);
 			this.ToolBarMain.TabIndex = 19;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
@@ -131,11 +131,12 @@ namespace OpenDental{
 			// 
 			this.gridSuperFam.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridSuperFam.HasMultilineHeaders = false;
 			this.gridSuperFam.HScrollVisible = false;
-			this.gridSuperFam.Location = new System.Drawing.Point(254,129);
+			this.gridSuperFam.Location = new System.Drawing.Point(254, 129);
 			this.gridSuperFam.Name = "gridSuperFam";
 			this.gridSuperFam.ScrollValue = 0;
-			this.gridSuperFam.Size = new System.Drawing.Size(329,579);
+			this.gridSuperFam.Size = new System.Drawing.Size(329, 579);
 			this.gridSuperFam.TabIndex = 33;
 			this.gridSuperFam.Title = "Super Family";
 			this.gridSuperFam.TranslationName = "TableSuper";
@@ -144,12 +145,13 @@ namespace OpenDental{
 			// 
 			// gridRecall
 			// 
+			this.gridRecall.HasMultilineHeaders = false;
 			this.gridRecall.HScrollVisible = false;
-			this.gridRecall.Location = new System.Drawing.Point(585,27);
+			this.gridRecall.Location = new System.Drawing.Point(585, 27);
 			this.gridRecall.Name = "gridRecall";
 			this.gridRecall.ScrollValue = 0;
 			this.gridRecall.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridRecall.Size = new System.Drawing.Size(525,100);
+			this.gridRecall.Size = new System.Drawing.Size(525, 100);
 			this.gridRecall.TabIndex = 32;
 			this.gridRecall.Title = "Recall";
 			this.gridRecall.TranslationName = "TableRecall";
@@ -158,12 +160,13 @@ namespace OpenDental{
 			// 
 			// gridFamily
 			// 
+			this.gridFamily.HasMultilineHeaders = false;
 			this.gridFamily.HScrollVisible = false;
-			this.gridFamily.Location = new System.Drawing.Point(103,27);
+			this.gridFamily.Location = new System.Drawing.Point(103, 27);
 			this.gridFamily.Name = "gridFamily";
 			this.gridFamily.ScrollValue = 0;
 			this.gridFamily.SelectedRowColor = System.Drawing.Color.DarkSalmon;
-			this.gridFamily.Size = new System.Drawing.Size(480,100);
+			this.gridFamily.Size = new System.Drawing.Size(480, 100);
 			this.gridFamily.TabIndex = 31;
 			this.gridFamily.Title = "Family Members";
 			this.gridFamily.TranslationName = "TablePatient";
@@ -173,12 +176,13 @@ namespace OpenDental{
 			// 
 			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPat.HasMultilineHeaders = false;
 			this.gridPat.HScrollVisible = false;
-			this.gridPat.Location = new System.Drawing.Point(0,129);
+			this.gridPat.Location = new System.Drawing.Point(0, 129);
 			this.gridPat.Name = "gridPat";
 			this.gridPat.ScrollValue = 0;
 			this.gridPat.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridPat.Size = new System.Drawing.Size(252,579);
+			this.gridPat.Size = new System.Drawing.Size(252, 579);
 			this.gridPat.TabIndex = 30;
 			this.gridPat.Title = "Patient Information";
 			this.gridPat.TranslationName = "TablePatient";
@@ -189,12 +193,13 @@ namespace OpenDental{
 			this.gridIns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridIns.HasMultilineHeaders = false;
 			this.gridIns.HScrollVisible = true;
-			this.gridIns.Location = new System.Drawing.Point(254,129);
+			this.gridIns.Location = new System.Drawing.Point(254, 129);
 			this.gridIns.Name = "gridIns";
 			this.gridIns.ScrollValue = 0;
 			this.gridIns.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridIns.Size = new System.Drawing.Size(685,579);
+			this.gridIns.Size = new System.Drawing.Size(685, 579);
 			this.gridIns.TabIndex = 29;
 			this.gridIns.Title = "Insurance Plans";
 			this.gridIns.TranslationName = "TableCoverage";
@@ -210,7 +215,7 @@ namespace OpenDental{
 			this.Controls.Add(this.picturePat);
 			this.Controls.Add(this.ToolBarMain);
 			this.Name = "ContrFamily";
-			this.Size = new System.Drawing.Size(939,708);
+			this.Size = new System.Drawing.Size(939, 708);
 			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.ContrFamily_Layout);
 			this.Resize += new System.EventHandler(this.ContrFamily_Resize);
 			this.ResumeLayout(false);
@@ -2521,7 +2526,8 @@ namespace OpenDental{
 
 		#endregion gridIns
 
-		
+
+
 
 
 

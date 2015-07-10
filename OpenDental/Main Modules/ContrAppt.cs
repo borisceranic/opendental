@@ -122,7 +122,7 @@ namespace OpenDental {
 		private DateTime bubbleTime;
 		private Point bubbleLocation;
 		private ODGrid gridEmpSched;
-		private OpenDental.UI.PictureBox PicturePat;
+		private OpenDental.UI.ODPictureBox PicturePat;
 		//private string PatCurName;
 		//private int PatCurNum;
 		private Timer timerInfoBubble;
@@ -186,7 +186,7 @@ namespace OpenDental {
 			infoBubble.Size=new Size(200,300);
 			infoBubble.MouseMove+=new MouseEventHandler(InfoBubble_MouseMove);
 			infoBubble.BackColor=Color.FromArgb(255,250,190);
-			PicturePat=new OpenDental.UI.PictureBox();
+			PicturePat=new OpenDental.UI.ODPictureBox();
 			PicturePat.Location=new Point(6,17);
 			PicturePat.Size=new Size(100,100);
 			PicturePat.BackColor=Color.FromArgb(232,220,190);
