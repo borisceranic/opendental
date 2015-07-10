@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
+using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -143,6 +144,34 @@ namespace OpenDentBusiness{
 				}
 			}
 			return "";
+		}
+
+		///<summary>Converts the passed in time pattern into 5 minute increments.
+		///The time pattern returned is altered based on the AppointmentTimeIncrement preference.
+		///E.g. "/XX/" passed in with 10 minute increments set will return "//XXXX//"
+		///If an empty timePattern is passed in, a default pattern of //XX// will be returned (unless using 15 min inc, then ///XXX///)</summary>
+		public static string ConvertTimePattern(string timePattern) {
+			//convert time pattern to 5 minute increment
+			StringBuilder patternConverted=new StringBuilder();
+			for(int i=0;i<timePattern.Length;i++) {
+				patternConverted.Append(timePattern.Substring(i,1));
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==10) {
+					patternConverted.Append(timePattern.Substring(i,1));
+				}
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
+					patternConverted.Append(timePattern.Substring(i,1));
+					patternConverted.Append(timePattern.Substring(i,1));
+				}
+			}
+			if(patternConverted.ToString()=="") {
+				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
+					patternConverted.Append("///XXX///");
+				}
+				else {
+					patternConverted.Append("//XX//");
+				}
+			}
+			return patternConverted.ToString();
 		}
 
 		public static string GetSpecialTypeStr(long recallTypeNum) {

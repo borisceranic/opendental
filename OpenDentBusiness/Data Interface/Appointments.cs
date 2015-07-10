@@ -2142,27 +2142,7 @@ namespace OpenDentBusiness{
 					}
 				}
 			}
-			//convert time pattern to 5 minute increment
-			StringBuilder savePattern=new StringBuilder();
-			for(int i=0;i<recallPattern.Length;i++) {
-				savePattern.Append(recallPattern.Substring(i,1));
-				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==10) {
-					savePattern.Append(recallPattern.Substring(i,1));
-				}
-				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
-					savePattern.Append(recallPattern.Substring(i,1));
-					savePattern.Append(recallPattern.Substring(i,1));
-				}
-			}
-			if(savePattern.ToString()=="") {
-				if(PrefC.GetLong(PrefName.AppointmentTimeIncrement)==15) {
-					savePattern.Append("///XXX///");
-				}
-				else {
-					savePattern.Append("//XX//");
-				}
-			}
-			aptCur.Pattern=savePattern.ToString();
+			aptCur.Pattern=RecallTypes.ConvertTimePattern(recallPattern);
 			//Add films------------------------------------------------------------------------------------------------------
 			if(RecallTypes.IsSpecialRecallType(recallCur.RecallTypeNum)) {//if this is a prophy or perio
 				for(int i=0;i<listRecalls.Count;i++) {

@@ -351,7 +351,7 @@ namespace OpenDental{
 			this.groupBox4.Controls.Add(this.textListenerPort);
 			this.groupBox4.Controls.Add(this.label10);
 			this.groupBox4.Controls.Add(this.butSaveListenerPort);
-			this.groupBox4.Location = new System.Drawing.Point(119, 455);
+			this.groupBox4.Location = new System.Drawing.Point(117, 445);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(711, 133);
 			this.groupBox4.TabIndex = 252;
@@ -409,9 +409,9 @@ namespace OpenDental{
 			// label25
 			// 
 			this.label25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label25.Location = new System.Drawing.Point(125, 8);
+			this.label25.Location = new System.Drawing.Point(6, 8);
 			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(687, 99);
+			this.label25.Size = new System.Drawing.Size(932, 84);
 			this.label25.TabIndex = 251;
 			this.label25.Text = resources.GetString("label25.Text");
 			// 
@@ -428,9 +428,9 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.labelListenerStatus);
 			this.groupBox3.Controls.Add(this.butListenerAlertsOff);
 			this.groupBox3.Controls.Add(this.textListenerServiceStatus);
-			this.groupBox3.Location = new System.Drawing.Point(119, 110);
+			this.groupBox3.Location = new System.Drawing.Point(9, 100);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(711, 339);
+			this.groupBox3.Size = new System.Drawing.Size(929, 339);
 			this.groupBox3.TabIndex = 249;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Listener Service Monitor";
@@ -438,7 +438,7 @@ namespace OpenDental{
 			// labelListenerServiceAck
 			// 
 			this.labelListenerServiceAck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelListenerServiceAck.Location = new System.Drawing.Point(60, 263);
+			this.labelListenerServiceAck.Location = new System.Drawing.Point(278, 263);
 			this.labelListenerServiceAck.Name = "labelListenerServiceAck";
 			this.labelListenerServiceAck.Size = new System.Drawing.Size(578, 13);
 			this.labelListenerServiceAck.TabIndex = 254;
@@ -453,7 +453,7 @@ namespace OpenDental{
 			this.butListenerServiceAck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butListenerServiceAck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butListenerServiceAck.CornerRadius = 4F;
-			this.butListenerServiceAck.Location = new System.Drawing.Point(644, 257);
+			this.butListenerServiceAck.Location = new System.Drawing.Point(862, 257);
 			this.butListenerServiceAck.Name = "butListenerServiceAck";
 			this.butListenerServiceAck.Size = new System.Drawing.Size(61, 24);
 			this.butListenerServiceAck.TabIndex = 253;
@@ -464,7 +464,7 @@ namespace OpenDental{
 			// 
 			this.label27.Location = new System.Drawing.Point(7, 18);
 			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(684, 19);
+			this.label27.Size = new System.Drawing.Size(916, 19);
 			this.label27.TabIndex = 252;
 			this.label27.Text = "Open Dental monitors the status of the Listener Service and alerts all workstatio" +
     "ns when status is critical.";
@@ -476,7 +476,7 @@ namespace OpenDental{
 			this.butListenerServiceHistoryRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butListenerServiceHistoryRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butListenerServiceHistoryRefresh.CornerRadius = 4F;
-			this.butListenerServiceHistoryRefresh.Location = new System.Drawing.Point(644, 87);
+			this.butListenerServiceHistoryRefresh.Location = new System.Drawing.Point(862, 87);
 			this.butListenerServiceHistoryRefresh.Name = "butListenerServiceHistoryRefresh";
 			this.butListenerServiceHistoryRefresh.Size = new System.Drawing.Size(61, 24);
 			this.butListenerServiceHistoryRefresh.TabIndex = 251;
@@ -487,7 +487,7 @@ namespace OpenDental{
 			// 
 			this.label26.Location = new System.Drawing.Point(3, 70);
 			this.label26.Name = "label26";
-			this.label26.Size = new System.Drawing.Size(620, 37);
+			this.label26.Size = new System.Drawing.Size(853, 37);
 			this.label26.TabIndex = 250;
 			this.label26.Text = resources.GetString("label26.Text");
 			this.label26.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -502,7 +502,7 @@ namespace OpenDental{
 			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
 			this.gridListenerServiceStatusHistory.Name = "gridListenerServiceStatusHistory";
 			this.gridListenerServiceStatusHistory.ScrollValue = 0;
-			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(699, 138);
+			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(917, 138);
 			this.gridListenerServiceStatusHistory.TabIndex = 249;
 			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
 			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
@@ -516,7 +516,7 @@ namespace OpenDental{
 			this.butStartListenerService.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butStartListenerService.CornerRadius = 4F;
 			this.butStartListenerService.Enabled = false;
-			this.butStartListenerService.Location = new System.Drawing.Point(417, 45);
+			this.butStartListenerService.Location = new System.Drawing.Point(527, 45);
 			this.butStartListenerService.Name = "butStartListenerService";
 			this.butStartListenerService.Size = new System.Drawing.Size(61, 24);
 			this.butStartListenerService.TabIndex = 245;
@@ -535,7 +535,7 @@ namespace OpenDental{
 			// 
 			// labelListenerStatus
 			// 
-			this.labelListenerStatus.Location = new System.Drawing.Point(67, 48);
+			this.labelListenerStatus.Location = new System.Drawing.Point(177, 48);
 			this.labelListenerStatus.Name = "labelListenerStatus";
 			this.labelListenerStatus.Size = new System.Drawing.Size(238, 17);
 			this.labelListenerStatus.TabIndex = 244;
@@ -559,7 +559,7 @@ namespace OpenDental{
 			// 
 			// textListenerServiceStatus
 			// 
-			this.textListenerServiceStatus.Location = new System.Drawing.Point(311, 47);
+			this.textListenerServiceStatus.Location = new System.Drawing.Point(421, 47);
 			this.textListenerServiceStatus.Name = "textListenerServiceStatus";
 			this.textListenerServiceStatus.ReadOnly = true;
 			this.textListenerServiceStatus.Size = new System.Drawing.Size(100, 20);
@@ -944,7 +944,7 @@ namespace OpenDental{
 			this.butSignUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSignUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSignUp.CornerRadius = 4F;
-			this.butSignUp.Location = new System.Drawing.Point(742, 109);
+			this.butSignUp.Location = new System.Drawing.Point(818, 98);
 			this.butSignUp.Name = "butSignUp";
 			this.butSignUp.Size = new System.Drawing.Size(103, 24);
 			this.butSignUp.TabIndex = 301;
@@ -961,7 +961,7 @@ namespace OpenDental{
 			this.groupWebSchedPreview.Controls.Add(this.labelWebSchedRecallTypes);
 			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedClinic);
 			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedRecallTypes);
-			this.groupWebSchedPreview.Location = new System.Drawing.Point(266, 392);
+			this.groupWebSchedPreview.Location = new System.Drawing.Point(266, 387);
 			this.groupWebSchedPreview.Name = "groupWebSchedPreview";
 			this.groupWebSchedPreview.Size = new System.Drawing.Size(412, 194);
 			this.groupWebSchedPreview.TabIndex = 252;
@@ -1069,21 +1069,20 @@ namespace OpenDental{
 			this.groupRecallSetup.Controls.Add(this.label35);
 			this.groupRecallSetup.Controls.Add(this.label31);
 			this.groupRecallSetup.Controls.Add(this.butRecallSchedSetup);
-			this.groupRecallSetup.Location = new System.Drawing.Point(93, 139);
+			this.groupRecallSetup.Location = new System.Drawing.Point(6, 128);
 			this.groupRecallSetup.Name = "groupRecallSetup";
-			this.groupRecallSetup.Size = new System.Drawing.Size(758, 247);
+			this.groupRecallSetup.Size = new System.Drawing.Size(935, 247);
 			this.groupRecallSetup.TabIndex = 247;
 			this.groupRecallSetup.TabStop = false;
 			this.groupRecallSetup.Text = "Web Sched Settings";
 			// 
 			// label21
 			// 
-			this.label21.Location = new System.Drawing.Point(144, 191);
+			this.label21.Location = new System.Drawing.Point(144, 184);
 			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(235, 49);
+			this.label21.Size = new System.Drawing.Size(406, 56);
 			this.label21.TabIndex = 310;
-			this.label21.Text = "Provider preference.  Determines which provider will be used in order to find ope" +
-    "n time slots in regards to each patient.";
+			this.label21.Text = resources.GetString("label21.Text");
 			// 
 			// listBoxWebSchedProviderPref
 			// 
@@ -1104,7 +1103,7 @@ namespace OpenDental{
 			this.gridWebSchedRecallTypes.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.gridWebSchedRecallTypes.HasMultilineHeaders = false;
 			this.gridWebSchedRecallTypes.HScrollVisible = false;
-			this.gridWebSchedRecallTypes.Location = new System.Drawing.Point(404, 31);
+			this.gridWebSchedRecallTypes.Location = new System.Drawing.Point(573, 31);
 			this.gridWebSchedRecallTypes.Name = "gridWebSchedRecallTypes";
 			this.gridWebSchedRecallTypes.ScrollValue = 0;
 			this.gridWebSchedRecallTypes.SelectionMode = OpenDental.UI.GridSelectionMode.None;
@@ -1119,12 +1118,12 @@ namespace OpenDental{
 			// 
 			this.gridWebSchedOperatories.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.gridWebSchedOperatories.HasMultilineHeaders = false;
-			this.gridWebSchedOperatories.HScrollVisible = true;
+			this.gridWebSchedOperatories.HScrollVisible = false;
 			this.gridWebSchedOperatories.Location = new System.Drawing.Point(18, 31);
 			this.gridWebSchedOperatories.Name = "gridWebSchedOperatories";
 			this.gridWebSchedOperatories.ScrollValue = 0;
 			this.gridWebSchedOperatories.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridWebSchedOperatories.Size = new System.Drawing.Size(359, 147);
+			this.gridWebSchedOperatories.Size = new System.Drawing.Size(532, 147);
 			this.gridWebSchedOperatories.TabIndex = 307;
 			this.gridWebSchedOperatories.Title = "Operatories Considered";
 			this.gridWebSchedOperatories.TranslationName = "FormEServicesSetup";
@@ -1133,15 +1132,16 @@ namespace OpenDental{
 			// 
 			// label20
 			// 
-			this.label20.Location = new System.Drawing.Point(513, 197);
+			this.label20.Location = new System.Drawing.Point(573, 197);
 			this.label20.Name = "label20";
-			this.label20.Size = new System.Drawing.Size(235, 30);
+			this.label20.Size = new System.Drawing.Size(233, 28);
 			this.label20.TabIndex = 247;
 			this.label20.Text = "Customize the notification message that will be sent to the patient.";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label35
 			// 
-			this.label35.Location = new System.Drawing.Point(401, 13);
+			this.label35.Location = new System.Drawing.Point(570, 13);
 			this.label35.Name = "label35";
 			this.label35.Size = new System.Drawing.Size(345, 15);
 			this.label35.TabIndex = 254;
@@ -1150,7 +1150,7 @@ namespace OpenDental{
 			// 
 			// label31
 			// 
-			this.label31.Location = new System.Drawing.Point(120, 13);
+			this.label31.Location = new System.Drawing.Point(293, 13);
 			this.label31.Name = "label31";
 			this.label31.Size = new System.Drawing.Size(257, 15);
 			this.label31.TabIndex = 254;
@@ -1164,7 +1164,7 @@ namespace OpenDental{
 			this.butRecallSchedSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRecallSchedSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRecallSchedSetup.CornerRadius = 4F;
-			this.butRecallSchedSetup.Location = new System.Drawing.Point(404, 199);
+			this.butRecallSchedSetup.Location = new System.Drawing.Point(812, 199);
 			this.butRecallSchedSetup.Name = "butRecallSchedSetup";
 			this.butRecallSchedSetup.Size = new System.Drawing.Size(103, 24);
 			this.butRecallSchedSetup.TabIndex = 308;
@@ -1178,7 +1178,7 @@ namespace OpenDental{
 			this.butWebSchedEnable.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butWebSchedEnable.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butWebSchedEnable.CornerRadius = 4F;
-			this.butWebSchedEnable.Location = new System.Drawing.Point(102, 109);
+			this.butWebSchedEnable.Location = new System.Drawing.Point(24, 98);
 			this.butWebSchedEnable.Name = "butWebSchedEnable";
 			this.butWebSchedEnable.Size = new System.Drawing.Size(102, 24);
 			this.butWebSchedEnable.TabIndex = 300;
@@ -1187,7 +1187,7 @@ namespace OpenDental{
 			// 
 			// labelWebSchedEnable
 			// 
-			this.labelWebSchedEnable.Location = new System.Drawing.Point(210, 115);
+			this.labelWebSchedEnable.Location = new System.Drawing.Point(129, 104);
 			this.labelWebSchedEnable.Name = "labelWebSchedEnable";
 			this.labelWebSchedEnable.Size = new System.Drawing.Size(526, 17);
 			this.labelWebSchedEnable.TabIndex = 245;
@@ -1195,9 +1195,9 @@ namespace OpenDental{
 			// 
 			// labelWebSchedDesc
 			// 
-			this.labelWebSchedDesc.Location = new System.Drawing.Point(93, 12);
+			this.labelWebSchedDesc.Location = new System.Drawing.Point(6, 12);
 			this.labelWebSchedDesc.Name = "labelWebSchedDesc";
-			this.labelWebSchedDesc.Size = new System.Drawing.Size(758, 94);
+			this.labelWebSchedDesc.Size = new System.Drawing.Size(935, 83);
 			this.labelWebSchedDesc.TabIndex = 52;
 			this.labelWebSchedDesc.Text = resources.GetString("labelWebSchedDesc.Text");
 			// 

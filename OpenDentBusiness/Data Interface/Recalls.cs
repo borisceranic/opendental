@@ -1130,27 +1130,39 @@ namespace OpenDentBusiness{
 			#endregion
 		}
 
-		///<summary>Gets roughly 30 open time slots by looping through each operatory hour by hour on the hour and finds the hour blocks that have no appointments and no blockouts within.
-		///<para>The DataTable returned will have 3 columns: SchedDate (date), HourStart (int), OperatoryNum (long)</para>
-		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
+		///<summary>Gets up to 30 days of open time slots based on the recall passed in.
+		///Open time slots are found by looping through operatories flagged for Web Sched and finding openings that can hold the recall.
+		///The amount of time required to be considered "available" is dictated by the RecallType associated to the recall passed in.</summary>
+		///<returns>DataTable with 4 columns: SchedDate (date), TimeStart (DateTime), TimeStop (DateTime), OperatoryNum (long)</returns>
 		public static DataTable GetAvailableWebSchedTimeSlots(long recallNum,DateTime dateStart,DateTime dateEnd) {
 			//No need to check RemotingRole; no call to db.
 			Clinic clinic=Clinics.GetClinicForRecall(recallNum);
-			return GetAvailableWebSchedTimeSlots(clinic,dateStart,dateEnd);
+			Recall recall=Recalls.GetRecall(recallNum);
+			if(recall==null) {
+				throw new ODException(Lans.g("WebSched","The recall appointment you are trying to schedule is no longer available.")+"\r\n"
+					+Lans.g("WebSched","Please call us to schedule your appointment."));
+			}
+			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
+			RecallType recallType=listRecallTypes.FirstOrDefault(x => x.RecallTypeNum==recall.RecallTypeNum);
+			return GetAvailableWebSchedTimeSlots(recallType,clinic,dateStart,dateEnd);
 		}
 
-		///<summary>Gets 30 days of open time slots by looping through each operatory hour by hour on the hour, finding the hour blocks that have no appointments and no blockouts within.
-		///<para>The DataTable returned will have 3 columns: SchedDate (date), HourStart (int), OperatoryNum (long)</para>
-		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
-		public static DataTable GetAvailableWebSchedTimeSlots(Clinic clinic,DateTime dateStart,DateTime dateEnd) {
+		///<summary>Gets up to 30 days of open time slots based on the RecallType passed in.
+		///Open time slots are found by looping through operatories flagged for Web Sched and finding openings that can hold the RecallType.
+		///The RecallType passed in must be a valid recall type.  Passing in a null clinic will not filter ops by clinics.</summary>
+		///<returns>DataTable with 4 columns: SchedDate (date), TimeStart (DateTime), TimeStop (DateTime), OperatoryNum (long)</returns>
+		public static DataTable GetAvailableWebSchedTimeSlots(RecallType recallType,Clinic clinic,DateTime dateStart,DateTime dateEnd) {
 			//No need to check RemotingRole; no call to db.
+			if(recallType==null) {//Validate that recallType is not null.
+				throw new ODException(Lans.g("WebSched","The recall appointment you are trying to schedule is no longer available.")+"\r\n"
+					+Lans.g("WebSched","Please call us to schedule your appointment."));
+			}
 			//Get all the Operatories that are flagged for Web Sched.
 			List<Operatory> listWebSchedOps=Operatories.GetOpsForWebSched();
 			List<long> listWebSchedOpNums=listWebSchedOps.Select(x => x.OperatoryNum).Distinct().ToList();
 			if(listWebSchedOpNums.Count < 1) {//This is very possible for offices that aren't set up the way that we expect them to be.
-				string errorMsg=Lans.g("WebSched","There are no operatories set up for Web Sched.")+"\r\n"
-					+Lans.g("WebSched","Please call us to schedule your appointment.");
-				throw new ODException(errorMsg);
+				throw new ODException(Lans.g("WebSched","There are no operatories set up for Web Sched.")+"\r\n"
+					+Lans.g("WebSched","Please call us to schedule your appointment."));
 			}
 			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(dateStart,dateEnd);
 			//Make a table that will store all blockouts.
@@ -1166,13 +1178,18 @@ namespace OpenDentBusiness{
 					,listApptsForOps[i].AptDateTime
 					,listApptsForOps[i].AptDateTime.AddMinutes(listApptsForOps[i].Pattern.Length*5));
 			}
-			//Loop through each operatory hour by hour on the hour and find the hour blocks that have no appointments and no blockouts within them.
+			//Create the custom DataTable of available time slots which we will be returning.
 			DataTable tableAvailableTimes=new DataTable();
 			tableAvailableTimes.Columns.Add("SchedDate");
-			tableAvailableTimes.Columns.Add("HourStart");
+			tableAvailableTimes.Columns.Add("TimeStart");
+			tableAvailableTimes.Columns.Add("TimeStop");
 			tableAvailableTimes.Columns.Add("OperatoryNum");//Needed for when a time slot has been chosen.
+			List<TimeSlot> listTimeSlots=new List<TimeSlot>();//Create a list of available time slots.
+			DateTime dateLastTimeSlot=new DateTime(1800,1,1);//Keeps track of what date the last time slot was found.
+			//Figure out how large of a time slot we need to find in order to consider this time slot "available".
+			int apptLength=RecallTypes.ConvertTimePattern(recallType.TimePattern).Length * 5;
 			Dictionary<DateTime,List<int>> dictTimeSlots=new Dictionary<DateTime,List<int>>();
-			DateTime dateLastTimeSlot=new DateTime(1800,1,1);
+			//Loop through all schedules five minutes at a time to find time slots large enough that have no appointments and no blockouts within them.
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
 				if(PIn.Long(tableSchedules.Rows[i]["BlockoutType"].ToString()) > 0) {
 					continue;//Blockouts should not have appointments scheduled on top of them.
@@ -1271,17 +1288,19 @@ namespace OpenDentBusiness{
 					if(isOverlapping) {
 						continue;
 					}
-					//We now know that there are no blockouts or appointments for this hour time slot.  Lets double check that the time slot completely fits within our schedule.
+					//We now know that there are no blockouts or appointments for this hour time slot.
+					//Lets double check that the time slot completely fits within our schedule.
 					if(timeSlotStart < timeSchedStart || timeSlotStop > timeSchedStop) {
 						continue;
 					}
-					//Everything looks good, add this starting hour block to our dictionary of available blocks for the day.
+					//Everything looks good, add this time slot to our dictionary of available slots for the day.
 					if(!startingHours.Contains(j)) {
 						startingHours.Add(j);
 						dictTimeSlots[dateSched]=startingHours;//Overwrites old key value pair if necessary.
 						//Add this time slot information to our return table.
 						tableAvailableTimes.Rows.Add(tableSchedules.Rows[i]["SchedDate"].ToString()
-							,j.ToString()
+							,j.ToString()//TODO: make this TimeStart
+							,j.ToString()//TODO: make this TimeStop
 							,tableSchedules.Rows[i]["OperatoryNum"].ToString());
 					}
 				}
@@ -1322,6 +1341,11 @@ namespace OpenDentBusiness{
 				return true;
 			}
 			return false;
+		}
+
+		private struct TimeSlot {
+			public DateTime DateTimeStart;
+			public DateTime DateTimeStop;
 		}
 		#endregion
 	}

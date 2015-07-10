@@ -119,7 +119,7 @@ namespace OpenDental {
 			}
 			FillGridWebSchedRecallTypes();
 			FillGridWebSchedOperatories();
-			//Changing the selected index on listBoxWebSchedProviderPref will trigger the Time Slots preview to automatically fill.
+			FillGridWebSchedTimeSlots();
 			listBoxWebSchedProviderPref.SelectedIndex=PrefC.GetInt(PrefName.WebSchedProviderRule);
 			#endregion
 			#region Listener Service
@@ -883,7 +883,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				row.Cells.Add(_listRecallTypes[i].Description);
 				row.Cells.Add(_listRecallTypes[i].TimePattern);
-				int timeLength=_listRecallTypes[i].TimePattern.Length * 5;//Each char represents 5 minutes.
+				int timeLength=RecallTypes.ConvertTimePattern(_listRecallTypes[i].TimePattern).Length * 5;
 				if(timeLength==0) {
 					row.Cells.Add("");
 				}
@@ -899,19 +899,15 @@ namespace OpenDental {
 			_listWebSchedOps=Operatories.GetOpsForWebSched();
 			gridWebSchedOperatories.BeginUpdate();
 			gridWebSchedOperatories.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableOperatories","Op Name"),150);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableOperatories","Op Name"),170);
 			gridWebSchedOperatories.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableOperatories","Abbrev"),70);
 			gridWebSchedOperatories.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableOperatories","Clinic"),80);
 			gridWebSchedOperatories.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableOperatories","Provider"),100);
+			col=new ODGridColumn(Lan.g("TableOperatories","Provider"),90);
 			gridWebSchedOperatories.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableOperatories","Hygienist"),100);
-			gridWebSchedOperatories.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableOperatories","IsHygienist"),72,HorizontalAlignment.Center);
-			gridWebSchedOperatories.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableOperatories","IsWebSched"),72,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableOperatories","Hygienist"),90);
 			gridWebSchedOperatories.Columns.Add(col);
 			gridWebSchedOperatories.Rows.Clear();
 			ODGridRow row;
@@ -922,8 +918,6 @@ namespace OpenDental {
 				row.Cells.Add(Clinics.GetDesc(_listWebSchedOps[i].ClinicNum));
 				row.Cells.Add(Providers.GetAbbr(_listWebSchedOps[i].ProvDentist));
 				row.Cells.Add(Providers.GetAbbr(_listWebSchedOps[i].ProvHygienist));
-				row.Cells.Add(_listWebSchedOps[i].IsHygiene?"X":"");
-				row.Cells.Add(_listWebSchedOps[i].IsWebSched?"X":"");
 				gridWebSchedOperatories.Rows.Add(row);
 			}
 			gridWebSchedOperatories.EndUpdate();
@@ -935,8 +929,12 @@ namespace OpenDental {
 				//Don't bother warning the user.  It will just be annoying.  The red indecator should be sufficient.
 				return;
 			}
+			if(comboWebSchedRecallTypes.SelectedIndex < 0) {
+				//This should not be possible.  If it is, I cannot accurately show time slots without a default time length to search for.
+				return;
+			}
 			DateTime dateStart=PIn.Date(textWebSchedDateStart.Text);
-			//TODO: utilize all of the combo boxes.
+			RecallType recallType=_listRecallTypes[comboWebSchedRecallTypes.SelectedIndex];
 			Clinic clinic=null;
 			if(comboWebSchedClinic.SelectedIndex > 0) {
 				clinic=_listClinics[comboWebSchedClinic.SelectedIndex-1];//Add one for 'All'.
@@ -945,7 +943,7 @@ namespace OpenDental {
 			DataTable tableTimeSlots=new DataTable();
 			try {
 				//Get the next 30 days of open time schedules with the current settings
-				tableTimeSlots=Recalls.GetAvailableWebSchedTimeSlots(clinic,dateStart,dateStart.AddDays(30));
+				tableTimeSlots=Recalls.GetAvailableWebSchedTimeSlots(recallType,clinic,dateStart,dateStart.AddDays(30));
 			}
 			catch(Exception ex) {
 				//The user might not have Web Sched ops set up correctly.  Don't warn them here because it is just annoying.  They'll figure it out.
@@ -971,7 +969,7 @@ namespace OpenDental {
 					gridWebSchedTimeSlots.Rows.Add(row);
 				}
 				row=new ODGridRow();
-				int hourStart=PIn.Int(tableTimeSlots.Rows[i]["HourStart"].ToString());
+				int hourStart=PIn.Int(tableTimeSlots.Rows[i]["TimeStart"].ToString());
 				row.Cells.Add(hourStart+":00 - "+(hourStart+1)+":00");//TODO: enhance after making it possible to schedule recalls off the hour.
 				gridWebSchedTimeSlots.Rows.Add(row);
 			}
