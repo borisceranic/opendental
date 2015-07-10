@@ -1235,7 +1235,7 @@ namespace OpenDental{
 						case "OtherPhone"://will only be available if OD HQ
 							row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
 							break;
-						case "Cell Phone":
+						case "Wireless Ph":
 							row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
 							break;
 						case "Sec Prov":

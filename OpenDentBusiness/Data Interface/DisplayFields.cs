@@ -143,7 +143,7 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("Site",90,category));
 				//list.Add(new DisplayField("Email",90,category));
 				//list.Add(new DisplayField("Clinic",90,category));
-				//list.Add(new DisplayField("Cell Phone",90,category));
+				//list.Add(new DisplayField("Wireless Ph",90,category));
 				//list.Add(new DisplayField("Sec Prov",85,category));
 				//list.Add(new DisplayField("LastVisit",70,category));
 				//list.Add(new DisplayField("NextVisit",70,category));
@@ -401,7 +401,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Site",90,category));
 				list.Add(new DisplayField("Email",90,category));
 				list.Add(new DisplayField("Clinic",90,category));
-				list.Add(new DisplayField("Cell Phone",90,category));
+				list.Add(new DisplayField("Wireless Ph",90,category));
 				list.Add(new DisplayField("Sec Prov",85,category));
 				list.Add(new DisplayField("LastVisit",70,category));
 				list.Add(new DisplayField("NextVisit",70,category));
