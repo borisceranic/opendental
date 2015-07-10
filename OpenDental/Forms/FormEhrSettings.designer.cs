@@ -26,6 +26,7 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrSettings));
 			this.checkMU2 = new System.Windows.Forms.CheckBox();
 			this.groupEncounter = new System.Windows.Forms.GroupBox();
+			this.textEncCodeDescript = new System.Windows.Forms.TextBox();
 			this.butEncCpt = new OpenDental.UI.Button();
 			this.comboEncCodes = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
@@ -40,6 +41,7 @@ namespace OpenDental{
 			this.butEncSnomed = new OpenDental.UI.Button();
 			this.butEncCdt = new OpenDental.UI.Button();
 			this.groupPregnancy = new System.Windows.Forms.GroupBox();
+			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
 			this.comboPregCodes = new System.Windows.Forms.ComboBox();
 			this.labelPregWarning = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -56,8 +58,8 @@ namespace OpenDental{
 			this.checkAlertHighSeverity = new System.Windows.Forms.CheckBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.textEncCodeDescript = new System.Windows.Forms.TextBox();
-			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
+			this.butEncounterTool = new OpenDental.UI.Button();
+			this.label7 = new System.Windows.Forms.Label();
 			this.groupEncounter.SuspendLayout();
 			this.groupPregnancy.SuspendLayout();
 			this.groupGlobalSettings.SuspendLayout();
@@ -78,6 +80,8 @@ namespace OpenDental{
 			// 
 			// groupEncounter
 			// 
+			this.groupEncounter.Controls.Add(this.label7);
+			this.groupEncounter.Controls.Add(this.butEncounterTool);
 			this.groupEncounter.Controls.Add(this.textEncCodeDescript);
 			this.groupEncounter.Controls.Add(this.butEncCpt);
 			this.groupEncounter.Controls.Add(this.comboEncCodes);
@@ -94,10 +98,22 @@ namespace OpenDental{
 			this.groupEncounter.Controls.Add(this.butEncCdt);
 			this.groupEncounter.Location = new System.Drawing.Point(12, 70);
 			this.groupEncounter.Name = "groupEncounter";
-			this.groupEncounter.Size = new System.Drawing.Size(453, 265);
+			this.groupEncounter.Size = new System.Drawing.Size(453, 298);
 			this.groupEncounter.TabIndex = 119;
 			this.groupEncounter.TabStop = false;
 			this.groupEncounter.Text = "Default Encounter Code";
+			// 
+			// textEncCodeDescript
+			// 
+			this.textEncCodeDescript.AcceptsTab = true;
+			this.textEncCodeDescript.Location = new System.Drawing.Point(124, 102);
+			this.textEncCodeDescript.MaxLength = 2147483647;
+			this.textEncCodeDescript.Multiline = true;
+			this.textEncCodeDescript.Name = "textEncCodeDescript";
+			this.textEncCodeDescript.ReadOnly = true;
+			this.textEncCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textEncCodeDescript.Size = new System.Drawing.Size(323, 46);
+			this.textEncCodeDescript.TabIndex = 108;
 			// 
 			// butEncCpt
 			// 
@@ -254,12 +270,24 @@ namespace OpenDental{
 			this.groupPregnancy.Controls.Add(this.label11);
 			this.groupPregnancy.Controls.Add(this.label12);
 			this.groupPregnancy.Controls.Add(this.label13);
-			this.groupPregnancy.Location = new System.Drawing.Point(12, 341);
+			this.groupPregnancy.Location = new System.Drawing.Point(12, 374);
 			this.groupPregnancy.Name = "groupPregnancy";
 			this.groupPregnancy.Size = new System.Drawing.Size(453, 265);
 			this.groupPregnancy.TabIndex = 120;
 			this.groupPregnancy.TabStop = false;
 			this.groupPregnancy.Text = "Default Pregnancy Diagnosis Code";
+			// 
+			// textPregCodeDescript
+			// 
+			this.textPregCodeDescript.AcceptsTab = true;
+			this.textPregCodeDescript.Location = new System.Drawing.Point(124, 102);
+			this.textPregCodeDescript.MaxLength = 2147483647;
+			this.textPregCodeDescript.Multiline = true;
+			this.textPregCodeDescript.Name = "textPregCodeDescript";
+			this.textPregCodeDescript.ReadOnly = true;
+			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textPregCodeDescript.Size = new System.Drawing.Size(323, 46);
+			this.textPregCodeDescript.TabIndex = 131;
 			// 
 			// comboPregCodes
 			// 
@@ -418,7 +446,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(309, 621);
+			this.butOK.Location = new System.Drawing.Point(309, 649);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -433,41 +461,42 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(390, 621);
+			this.butCancel.Location = new System.Drawing.Point(390, 649);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// textEncCodeDescript
+			// butEncounterTool
 			// 
-			this.textEncCodeDescript.AcceptsTab = true;
-			this.textEncCodeDescript.Location = new System.Drawing.Point(124, 102);
-			this.textEncCodeDescript.MaxLength = 2147483647;
-			this.textEncCodeDescript.Multiline = true;
-			this.textEncCodeDescript.Name = "textEncCodeDescript";
-			this.textEncCodeDescript.ReadOnly = true;
-			this.textEncCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textEncCodeDescript.Size = new System.Drawing.Size(323, 46);
-			this.textEncCodeDescript.TabIndex = 108;
+			this.butEncounterTool.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEncounterTool.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butEncounterTool.Autosize = true;
+			this.butEncounterTool.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEncounterTool.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEncounterTool.CornerRadius = 4F;
+			this.butEncounterTool.Location = new System.Drawing.Point(9, 268);
+			this.butEncounterTool.Name = "butEncounterTool";
+			this.butEncounterTool.Size = new System.Drawing.Size(75, 24);
+			this.butEncounterTool.TabIndex = 122;
+			this.butEncounterTool.Text = "Insert Encs";
+			this.butEncounterTool.Click += new System.EventHandler(this.butEncounterTool_Click);
 			// 
-			// textPregCodeDescript
+			// label7
 			// 
-			this.textPregCodeDescript.AcceptsTab = true;
-			this.textPregCodeDescript.Location = new System.Drawing.Point(124, 102);
-			this.textPregCodeDescript.MaxLength = 2147483647;
-			this.textPregCodeDescript.Multiline = true;
-			this.textPregCodeDescript.Name = "textPregCodeDescript";
-			this.textPregCodeDescript.ReadOnly = true;
-			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textPregCodeDescript.Size = new System.Drawing.Size(323, 46);
-			this.textPregCodeDescript.TabIndex = 131;
+			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label7.Location = new System.Drawing.Point(90, 272);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(357, 17);
+			this.label7.TabIndex = 131;
+			this.label7.Text = "Insert encounters for a specified code for a specified date range.";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// FormEhrSettings
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(477, 657);
+			this.ClientSize = new System.Drawing.Size(477, 685);
 			this.Controls.Add(this.groupGlobalSettings);
 			this.Controls.Add(this.groupPregnancy);
 			this.Controls.Add(this.groupEncounter);
@@ -523,5 +552,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkAlertHighSeverity;
 		private System.Windows.Forms.TextBox textEncCodeDescript;
 		private System.Windows.Forms.TextBox textPregCodeDescript;
+		private UI.Button butEncounterTool;
+		private System.Windows.Forms.Label label7;
 	}
 }

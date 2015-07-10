@@ -27,75 +27,15 @@ namespace OpenDental {
 			}
 			checkAlertHighSeverity.Checked=PrefC.GetBool(PrefName.EhrRxAlertHighSeverity);
 			checkMU2.Checked=PrefC.GetBool(PrefName.MeaningfulUseTwo);
-			#region DefaultEncounterGroup
 			FillRecEncCodesList();
-			string defaultEncCode=PrefC.GetString(PrefName.CQMDefaultEncounterCodeValue);
-			string defaultEncCodeSystem=PrefC.GetString(PrefName.CQMDefaultEncounterCodeSystem);
-			NewEncCodeSystem=defaultEncCodeSystem;
-			OldEncListSelectedIdx=-1;
-			int countNotInSnomedTable=0;
-			for(int i=0;i<ListRecEncCodes.Count;i++) {
-				if(i==0) {
-					comboEncCodes.Items.Add(ListRecEncCodes[i]);
-					comboEncCodes.SelectedIndex=i;
-					if(defaultEncCode==ListRecEncCodes[i]) {
-						comboEncCodes.SelectedIndex=i;
-						OldEncListSelectedIdx=i;
-					}
-					continue;
-				}
-				if(!Snomeds.CodeExists(ListRecEncCodes[i])) {
-					countNotInSnomedTable++;
-					continue;
-				}
-				comboEncCodes.Items.Add(ListRecEncCodes[i]);
-				if(ListRecEncCodes[i]==defaultEncCode && defaultEncCodeSystem=="SNOMEDCT") {
-					comboEncCodes.SelectedIndex=i;
-					OldEncListSelectedIdx=i;
-					labelEncWarning.Visible=false;	
-					textEncCodeDescript.Text=Snomeds.GetByCode(ListRecEncCodes[i]).Description;//Guaranteed to exist in snomed table from above check
-				}
-			}
-			if(countNotInSnomedTable>0) {
-				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended encounter codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | Chart | EHR.");
-			}
-			if(comboEncCodes.SelectedIndex==-1) {//default enc code set to code not in recommended list and not 'none'
-				switch(defaultEncCodeSystem) {
-					case "CDT":
-						textEncCodeValue.Text=ProcedureCodes.GetProcCode(defaultEncCode).ProcCode;//Will return a new ProcCode object, not null, if not found
-						textEncCodeDescript.Text=ProcedureCodes.GetProcCode(defaultEncCode).Descript;
-						break;
-					case "CPT":
-						Cpt cEnc=Cpts.GetByCode(defaultEncCode);
-						if(cEnc!=null) {
-							textEncCodeValue.Text=cEnc.CptCode;
-							textEncCodeDescript.Text=cEnc.Description;
-						}
-						break;
-					case "SNOMEDCT":
-						Snomed sEnc=Snomeds.GetByCode(defaultEncCode);
-						if(sEnc!=null) {
-							textEncCodeValue.Text=sEnc.SnomedCode;
-							textEncCodeDescript.Text=sEnc.Description;
-						}						
-						break;
-					case "HCPCS":
-						Hcpcs hEnc=Hcpcses.GetByCode(defaultEncCode);
-						if(hEnc!=null) {
-							textEncCodeValue.Text=hEnc.HcpcsCode;
-							textEncCodeDescript.Text=hEnc.DescriptionShort;
-						}
-						break;
-				}
-			}
-			#endregion
+			FillDefaultEncCode();
 			#region DefaultPregnancyGroup
 			FillRecPregCodesList();
 			string defaultPregCode=PrefC.GetString(PrefName.PregnancyDefaultCodeValue);
 			string defaultPregCodeSystem=PrefC.GetString(PrefName.PregnancyDefaultCodeSystem);
 			NewPregCodeSystem=defaultPregCodeSystem;
 			OldPregListSelectedIdx=-1;
-			countNotInSnomedTable=0;
+			int countNotInSnomedTable=0;
 			for(int i=0;i<ListRecPregCodes.Count;i++) {
 				if(i==0) {
 					comboPregCodes.Items.Add(ListRecPregCodes[i]);
@@ -185,6 +125,68 @@ namespace OpenDental {
 			ListRecPregCodes.Add("237238006");//Pregnancy with uncertain dates (finding)
 			ListRecPregCodes.Add("248985009");//Presentation of pregnancy (finding)
 			ListRecPregCodes.Add("314204000");//Early stage of pregnancy (finding)
+		}
+
+		private void FillDefaultEncCode() {
+			string defaultEncCode=PrefC.GetString(PrefName.CQMDefaultEncounterCodeValue);
+			string defaultEncCodeSystem=PrefC.GetString(PrefName.CQMDefaultEncounterCodeSystem);
+			NewEncCodeSystem=defaultEncCodeSystem;
+			OldEncListSelectedIdx=-1;
+			int countNotInSnomedTable=0;
+			for(int i=0;i<ListRecEncCodes.Count;i++) {
+				if(i==0) {
+					comboEncCodes.Items.Add(ListRecEncCodes[i]);
+					comboEncCodes.SelectedIndex=i;
+					if(defaultEncCode==ListRecEncCodes[i]) {
+						comboEncCodes.SelectedIndex=i;
+						OldEncListSelectedIdx=i;
+					}
+					continue;
+				}
+				if(!Snomeds.CodeExists(ListRecEncCodes[i])) {
+					countNotInSnomedTable++;
+					continue;
+				}
+				comboEncCodes.Items.Add(ListRecEncCodes[i]);
+				if(ListRecEncCodes[i]==defaultEncCode && defaultEncCodeSystem=="SNOMEDCT") {
+					comboEncCodes.SelectedIndex=i;
+					OldEncListSelectedIdx=i;
+					labelEncWarning.Visible=false;
+					textEncCodeDescript.Text=Snomeds.GetByCode(ListRecEncCodes[i]).Description;//Guaranteed to exist in snomed table from above check
+				}
+			}
+			if(countNotInSnomedTable>0) {
+				MsgBox.Show(this,"The snomed table does not contain one or more codes from the list of recommended encounter codes.  The snomed table should be updated by running the Code System Importer tool found in Setup | Chart | EHR.");
+			}
+			if(comboEncCodes.SelectedIndex==-1) {//default enc code set to code not in recommended list and not 'none'
+				switch(defaultEncCodeSystem) {
+					case "CDT":
+						textEncCodeValue.Text=ProcedureCodes.GetProcCode(defaultEncCode).ProcCode;//Will return a new ProcCode object, not null, if not found
+						textEncCodeDescript.Text=ProcedureCodes.GetProcCode(defaultEncCode).Descript;
+						break;
+					case "CPT":
+						Cpt cEnc=Cpts.GetByCode(defaultEncCode);
+						if(cEnc!=null) {
+							textEncCodeValue.Text=cEnc.CptCode;
+							textEncCodeDescript.Text=cEnc.Description;
+						}
+						break;
+					case "SNOMEDCT":
+						Snomed sEnc=Snomeds.GetByCode(defaultEncCode);
+						if(sEnc!=null) {
+							textEncCodeValue.Text=sEnc.SnomedCode;
+							textEncCodeDescript.Text=sEnc.Description;
+						}
+						break;
+					case "HCPCS":
+						Hcpcs hEnc=Hcpcses.GetByCode(defaultEncCode);
+						if(hEnc!=null) {
+							textEncCodeValue.Text=hEnc.HcpcsCode;
+							textEncCodeDescript.Text=hEnc.DescriptionShort;
+						}
+						break;
+				}
+			}
 		}
 
 		private void checkMU2_Click(object sender,EventArgs e) {
@@ -320,6 +322,24 @@ namespace OpenDental {
 				textEncCodeValue.Text=FormC.SelectedCpt.CptCode;
 				textEncCodeDescript.Text=FormC.SelectedCpt.Description;
 				labelEncWarning.Visible=true;
+			}
+		}
+
+		private void butEncounterTool_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.SecurityAdmin,false)) {
+				return;
+			}
+			FormEncounterTool FormE=new FormEncounterTool();
+			if(comboEncCodes.SelectedIndex!=-1) {
+				FormE.EncListSelectedIdx=comboEncCodes.SelectedIndex-1;//subtract 1 for 'none'
+			}
+			FormE.EncCodeValue=textEncCodeValue.Text;
+			FormE.EncCodeSystem=NewEncCodeSystem;
+			FormE.CodeDescription=textEncCodeDescript.Text;
+			FormE.ShowDialog();
+			if(FormE.DialogResult==DialogResult.OK) {
+				comboEncCodes.Items.Clear();
+				FillDefaultEncCode();
 			}
 		}
 
