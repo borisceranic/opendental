@@ -124,7 +124,7 @@ provider.Abbr, ";
 				LEFT JOIN provider ON paysplit.ProvNum=provider.ProvNum
 				LEFT JOIN definition ON payment.PayType=definition.DefNum ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryPat+="LEFT JOIN clinic ON clinic.ClinicNum=payment.ClinicNum ";
+				queryPat+="LEFT JOIN clinic ON clinic.ClinicNum=paysplit.ClinicNum ";
 			}
 			queryPat+="WHERE 1 "
 				+whereProv
