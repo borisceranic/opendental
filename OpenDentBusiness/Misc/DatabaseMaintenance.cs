@@ -1389,7 +1389,7 @@ namespace OpenDentBusiness {
 					for(int i=0;i<table.Rows.Count;i++) {
 						log+="   "+Lans.g("FormDatabaseMaintenance","Date")+": "+PIn.Date(table.Rows[i]["CheckDate"].ToString()).ToShortDateString();
 						log+=", "+Lans.g("FormDatabaseMaintenance","Type")+": "+PIn.String(table.Rows[i]["ItemName"].ToString());
-						log+=", "+Lans.g("FormDatabaseMaintenance","Amount")+": "+PIn.Long(table.Rows[i]["CheckAmt"].ToString()).ToString("c");
+						log+=", "+Lans.g("FormDatabaseMaintenance","Amount")+": "+PIn.Double(table.Rows[i]["CheckAmt"].ToString()).ToString("c");
 						//Partial will always be blank
 						log+=", "+Lans.g("FormDatabaseMaintenance","Carrier")+": "+PIn.String(table.Rows[i]["CarrierName"].ToString());
 						log+=", "+Lans.g("FormDatabaseMaintenance","Clinic")+": "+PIn.String(table.Rows[i]["Description"].ToString());
