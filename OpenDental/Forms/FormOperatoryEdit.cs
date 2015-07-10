@@ -34,6 +34,8 @@ namespace OpenDental{
 		private CheckBox checkSetProspective;
 		private Label label3;
 		private Operatory OpCur;
+		private Label label4;
+		private CheckBox checkIsWebSched;
 		public List<Operatory> ListOps;
 
 		///<summary></summary>
@@ -88,6 +90,8 @@ namespace OpenDental{
 			this.label3 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.label4 = new System.Windows.Forms.Label();
+			this.checkIsWebSched = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -243,7 +247,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(382, 204);
+			this.butOK.Location = new System.Drawing.Point(382, 222);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 8;
@@ -258,17 +262,38 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(473, 204);
+			this.butCancel.Location = new System.Drawing.Point(473, 222);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 9;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(178, 188);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(384, 16);
+			this.label4.TabIndex = 120;
+			this.label4.Text = "When enabled, only operatories with this set will be available for Web Sched.";
+			// 
+			// checkIsWebSched
+			// 
+			this.checkIsWebSched.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIsWebSched.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkIsWebSched.Location = new System.Drawing.Point(12, 187);
+			this.checkIsWebSched.Name = "checkIsWebSched";
+			this.checkIsWebSched.Size = new System.Drawing.Size(161, 16);
+			this.checkIsWebSched.TabIndex = 119;
+			this.checkIsWebSched.Text = "Web Sched Override";
+			this.checkIsWebSched.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormOperatoryEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(574, 248);
+			this.ClientSize = new System.Drawing.Size(574, 266);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.checkIsWebSched);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.label3);
@@ -332,6 +357,7 @@ namespace OpenDental{
 			}
 			checkIsHygiene.Checked=OpCur.IsHygiene;
 			checkSetProspective.Checked=OpCur.SetProspective;
+			checkIsWebSched.Checked=OpCur.IsWebSched;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -361,6 +387,7 @@ namespace OpenDental{
 				OpCur.ProvHygienist=ProviderC.ListShort[comboProvHygienist.SelectedIndex-1].ProvNum;
 			OpCur.IsHygiene=checkIsHygiene.Checked;
 			OpCur.SetProspective=checkSetProspective.Checked;
+			OpCur.IsWebSched=checkIsWebSched.Checked;
 			if(IsNew) {
 				ListOps.Insert(OpCur.ItemOrder,OpCur);//Insert into list at appropriate spot
 				for(int i=0;i<ListOps.Count;i++) {

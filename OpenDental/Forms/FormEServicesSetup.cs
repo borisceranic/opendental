@@ -50,8 +50,8 @@ namespace OpenDental {
 		private List<Clinic> _listClinics;
 		private List<Clinic> _listAllClinics;
 		private List<SmsPhone> _listPhones;
-		private List<Provider> _listProviders;
 		private List<RecallType> _listRecallTypes;
+		private List<Operatory> _listWebSchedOps;
 		
 		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
 		public FormEServicesSetup(EService setTab=EService.PatientPortal) {
@@ -105,21 +105,22 @@ namespace OpenDental {
 				butWebSchedEnable.Enabled=false;
 				labelWebSchedEnable.Text=Lan.g(this,"Web Sched service is currently enabled.");
 			}
-			comboWebSchedProv.Items.Clear();
-			_listProviders=ProviderC.GetListShort();
-			for(int i=0;i<_listProviders.Count;i++) {
-				comboWebSchedProv.Items.Add(_listProviders[i].GetLongDesc());
-			}
+			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
 			comboWebSchedClinic.Items.Clear();
+			comboWebSchedClinic.Items.Add(Lan.g(this,"All"));
 			_listAllClinics=Clinics.GetList().ToList();
 			for(int i=0;i<_listAllClinics.Count;i++) {
 				comboWebSchedClinic.Items.Add(_listAllClinics[i].Description);
 			}
+			comboWebSchedClinic.SelectedIndex=0;
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				labelWebSchedClinic.Visible=false;
 				comboWebSchedClinic.Visible=false;
 			}
 			FillGridWebSchedRecallTypes();
+			FillGridWebSchedOperatories();
+			//Changing the selected index on listBoxWebSchedProviderPref will trigger the Time Slots preview to automatically fill.
+			listBoxWebSchedProviderPref.SelectedIndex=PrefC.GetInt(PrefName.WebSchedProviderRule);
 			#endregion
 			#region Listener Service
 			FillTextListenerServiceStatus();
@@ -166,8 +167,6 @@ namespace OpenDental {
 				butListenerServiceAck.Enabled=false;
 				butSaveListenerPort.Enabled=false;
 				butWebSchedEnable.Enabled=false;
-				butOperatories.Enabled=false;
-				butRecallTypes.Enabled=false;
 				butRecallSchedSetup.Enabled=false;
 				((Control)tabMobileOld).Enabled=false;
 				return;
@@ -850,36 +849,6 @@ namespace OpenDental {
 		#endregion
 
 		#region web sched
-		private void FillGridWebSchedTimeSlots() {
-			//TODO: implement the web sched time slot logic here.
-			List<string> listTimeSlots=new List<string>() 
-				{ "07/07/15"
-					,"09:00 AM - 10:00 AM"
-					,"01:00 PM - 02:00 PM"
-					,"04:00 PM - 05:00 PM"
-					,"08/08/15"
-					,"09:00 AM - 10:00 AM"
-					,"01:00 PM - 02:00 PM"
-					,"04:00 PM - 05:00 PM" 
-				};
-			gridWebSchedTimeSlots.BeginUpdate();
-			gridWebSchedTimeSlots.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("",0);
-			col.TextAlign=HorizontalAlignment.Center;
-			gridWebSchedTimeSlots.Columns.Add(col);
-			gridWebSchedTimeSlots.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<listTimeSlots.Count;i++) {
-				row=new ODGridRow();
-				if(i==0 || i==4) {//TODO: color date rows only
-					row.ColorBackG=Color.LightBlue;
-				}
-				row.Cells.Add(listTimeSlots[i]);
-				gridWebSchedTimeSlots.Rows.Add(row);
-			}
-			gridWebSchedTimeSlots.EndUpdate();
-		}
-
 		///<summary>Also refreshed the combo box of available recall types.</summary>
 		private void FillGridWebSchedRecallTypes() {
 			//Keep track of the previously selected recall type.
@@ -895,6 +864,9 @@ namespace OpenDental {
 				if(_listRecallTypes[i].RecallTypeNum==selectedRecallTypeNum) {
 					comboWebSchedRecallTypes.SelectedIndex=i;
 				}
+			}
+			if(selectedRecallTypeNum==0 && comboWebSchedRecallTypes.Items.Count > 0) {
+				comboWebSchedRecallTypes.SelectedIndex=0;//Arbitrarily select the first recall type.
 			}
 			gridWebSchedRecallTypes.BeginUpdate();
 			gridWebSchedRecallTypes.Columns.Clear();
@@ -923,11 +895,90 @@ namespace OpenDental {
 			gridWebSchedRecallTypes.EndUpdate();
 		}
 
-		private void gridWebSchedRecallTypes_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			ShowRecallTypes();
+		private void FillGridWebSchedOperatories() {
+			_listWebSchedOps=Operatories.GetOpsForWebSched();
+			gridWebSchedOperatories.BeginUpdate();
+			gridWebSchedOperatories.Columns.Clear();
+			ODGridColumn col=new ODGridColumn(Lan.g("TableOperatories","Op Name"),150);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","Abbrev"),70);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","Clinic"),80);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","Provider"),100);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","Hygienist"),100);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","IsHygienist"),72,HorizontalAlignment.Center);
+			gridWebSchedOperatories.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableOperatories","IsWebSched"),72,HorizontalAlignment.Center);
+			gridWebSchedOperatories.Columns.Add(col);
+			gridWebSchedOperatories.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_listWebSchedOps.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(_listWebSchedOps[i].OpName);
+				row.Cells.Add(_listWebSchedOps[i].Abbrev);
+				row.Cells.Add(Clinics.GetDesc(_listWebSchedOps[i].ClinicNum));
+				row.Cells.Add(Providers.GetAbbr(_listWebSchedOps[i].ProvDentist));
+				row.Cells.Add(Providers.GetAbbr(_listWebSchedOps[i].ProvHygienist));
+				row.Cells.Add(_listWebSchedOps[i].IsHygiene?"X":"");
+				row.Cells.Add(_listWebSchedOps[i].IsWebSched?"X":"");
+				gridWebSchedOperatories.Rows.Add(row);
+			}
+			gridWebSchedOperatories.EndUpdate();
 		}
 
-		private void ShowRecallTypes() {
+		private void FillGridWebSchedTimeSlots() {
+			//Validate time slot settings.
+			if(textWebSchedDateStart.errorProvider1.GetError(textWebSchedDateStart)!="") {
+				//Don't bother warning the user.  It will just be annoying.  The red indecator should be sufficient.
+				return;
+			}
+			DateTime dateStart=PIn.Date(textWebSchedDateStart.Text);
+			//TODO: utilize all of the combo boxes.
+			Clinic clinic=null;
+			if(comboWebSchedClinic.SelectedIndex > 0) {
+				clinic=_listClinics[comboWebSchedClinic.SelectedIndex-1];//Add one for 'All'.
+			}
+			Cursor=Cursors.WaitCursor;
+			DataTable tableTimeSlots=new DataTable();
+			try {
+				//Get the next 30 days of open time schedules with the current settings
+				tableTimeSlots=Recalls.GetAvailableWebSchedTimeSlots(clinic,dateStart,dateStart.AddDays(30));
+			}
+			catch(Exception ex) {
+				//The user might not have Web Sched ops set up correctly.  Don't warn them here because it is just annoying.  They'll figure it out.
+				Cursor=Cursors.Default;
+			}
+			Cursor=Cursors.Default;
+			gridWebSchedTimeSlots.BeginUpdate();
+			gridWebSchedTimeSlots.Columns.Clear();
+			ODGridColumn col=new ODGridColumn("",0);
+			col.TextAlign=HorizontalAlignment.Center;
+			gridWebSchedTimeSlots.Columns.Add(col);
+			gridWebSchedTimeSlots.Rows.Clear();
+			ODGridRow row;
+			DateTime dateTimeSlotLast=DateTime.MinValue;
+			for(int i=0;i<tableTimeSlots.Rows.Count;i++) {
+				DateTime dateTimeSlot=PIn.Date(tableTimeSlots.Rows[i]["SchedDate"].ToString());
+				//Make a new row for every unique day.
+				if(dateTimeSlotLast.Date!=dateTimeSlot.Date) {
+					dateTimeSlotLast=dateTimeSlot;
+					row=new ODGridRow();
+					row.ColorBackG=Color.LightBlue;
+					row.Cells.Add(dateTimeSlot.ToShortDateString());
+					gridWebSchedTimeSlots.Rows.Add(row);
+				}
+				row=new ODGridRow();
+				int hourStart=PIn.Int(tableTimeSlots.Rows[i]["HourStart"].ToString());
+				row.Cells.Add(hourStart+":00 - "+(hourStart+1)+":00");//TODO: enhance after making it possible to schedule recalls off the hour.
+				gridWebSchedTimeSlots.Rows.Add(row);
+			}
+			gridWebSchedTimeSlots.EndUpdate();
+		}
+
+		private void gridWebSchedRecallTypes_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
 			}
@@ -935,6 +986,31 @@ namespace OpenDental {
 			FormRT.ShowDialog();
 			FillGridWebSchedRecallTypes();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Types accessed via EServices Setup window.");
+		}
+
+		private void gridWebSchedOperatories_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormOperatories FormO=new FormOperatories();
+			FormO.ShowDialog();
+			FillGridWebSchedOperatories();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Operatories accessed via EServices Setup window.");
+		}
+
+		private void listBoxWebSchedProviderPref_SelectedIndexChanged(object sender,EventArgs e) {
+			if(Prefs.UpdateInt(PrefName.WebSchedProviderRule,listBoxWebSchedProviderPref.SelectedIndex)) {
+				_changed=true;
+			}
+			//FillGridWebSchedTimeSlots();
+		}
+
+		private void comboWebSchedRecallTypes_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGridWebSchedTimeSlots();
+		}
+
+		private void comboWebSchedClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGridWebSchedTimeSlots();
 		}
 
 		private void butWebSchedEnable_Click(object sender,EventArgs e) {
@@ -1020,6 +1096,18 @@ namespace OpenDental {
 			}
 		}
 
+		private void butWebSchedToday_Click(object sender,EventArgs e) {
+			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
+			FillGridWebSchedTimeSlots();
+		}
+
+		private void textWebSchedDateStart_TextChanged(object sender,EventArgs e) {
+			//Only refresh the grid if the user has typed in a valid date.
+			if(textWebSchedDateStart.errorProvider1.GetError(textWebSchedDateStart)=="") {
+				FillGridWebSchedTimeSlots();
+			}
+		}
+
 		private void butWebSchedRefresh_Click(object sender,EventArgs e) {
 			FillGridWebSchedTimeSlots();
 		}
@@ -1031,19 +1119,6 @@ namespace OpenDental {
 			FormRecallSetup FormRS=new FormRecallSetup();
 			FormRS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Setup accessed via EServices Setup window.");
-		}
-
-		private void butRecallTypes_Click(object sender,EventArgs e) {
-			ShowRecallTypes();
-		}
-
-		private void butOperatories_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
-				return;
-			}
-			FormOperatories FormO=new FormOperatories();
-			FormO.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Operatories accessed via EServices Setup window.");
 		}
 		#endregion
 

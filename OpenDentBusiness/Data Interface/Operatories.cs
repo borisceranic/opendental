@@ -126,6 +126,13 @@ namespace OpenDentBusiness{
 			return listRetVal;
 		}
 
+		public static List<Operatory> GetOpsForWebSched() {
+			//No need to check RemotingRole; no call to db.
+			List<Operatory> listOpsShort=OperatoryC.GetListShort();
+			//Only return the ops flagged as IsWebSched.
+			return listOpsShort.FindAll(x => x.IsWebSched);
+		}
+
 		///<summary>Gets a list of all future appointments for a given Operatory.  Ordered by dateTime</summary>
 		public static bool HasFutureApts(long operatoryNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

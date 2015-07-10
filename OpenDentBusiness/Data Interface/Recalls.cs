@@ -1135,11 +1135,27 @@ namespace OpenDentBusiness{
 		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
 		public static DataTable GetAvailableWebSchedTimeSlots(long recallNum,DateTime dateStart,DateTime dateEnd) {
 			//No need to check RemotingRole; no call to db.
+			Clinic clinic=Clinics.GetClinicForRecall(recallNum);
+			return GetAvailableWebSchedTimeSlots(clinic,dateStart,dateEnd);
+		}
+
+		///<summary>Gets 30 days of open time slots by looping through each operatory hour by hour on the hour, finding the hour blocks that have no appointments and no blockouts within.
+		///<para>The DataTable returned will have 3 columns: SchedDate (date), HourStart (int), OperatoryNum (long)</para>
+		///<para>This method used to return a simple dictionary but had to get enhanced to returning a table (I didn't want to) due to the complexities of picking a time slot.</para></summary>
+		public static DataTable GetAvailableWebSchedTimeSlots(Clinic clinic,DateTime dateStart,DateTime dateEnd) {
+			//No need to check RemotingRole; no call to db.
+			//Get all the Operatories that are flagged for Web Sched.
+			List<Operatory> listWebSchedOps=Operatories.GetOpsForWebSched();
+			List<long> listWebSchedOpNums=listWebSchedOps.Select(x => x.OperatoryNum).Distinct().ToList();
+			if(listWebSchedOpNums.Count < 1) {//This is very possible for offices that aren't set up the way that we expect them to be.
+				string errorMsg=Lans.g("WebSched","There are no operatories set up for Web Sched.")+"\r\n"
+					+Lans.g("WebSched","Please call us to schedule your appointment.");
+				throw new ODException(errorMsg);
+			}
 			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(dateStart,dateEnd);
-			List<long> opNums=null;//Put the unique operatory nums into a list.
-			DataTable tableBlockouts=null;//Make a table that will store all blockouts.
-			GetUniqueOpsAndBlockoutsFromSchedule(tableSchedules,out opNums,out tableBlockouts);
-			List<Appointment> listApptsForOps=Appointments.GetAppointmentsForOpsByPeriod(opNums,dateStart,dateEnd); 
+			//Make a table that will store all blockouts.
+			DataTable tableBlockouts=GetUniqueBlockoutsFromSchedule(tableSchedules);
+			List<Appointment> listApptsForOps=Appointments.GetAppointmentsForOpsByPeriod(listWebSchedOpNums,dateStart,dateEnd); 
 			DataTable tableAppts=new DataTable();
 			tableAppts.Columns.Add("Op");
 			tableAppts.Columns.Add("AptDateTime");
@@ -1157,7 +1173,6 @@ namespace OpenDentBusiness{
 			tableAvailableTimes.Columns.Add("OperatoryNum");//Needed for when a time slot has been chosen.
 			Dictionary<DateTime,List<int>> dictTimeSlots=new Dictionary<DateTime,List<int>>();
 			DateTime dateLastTimeSlot=new DateTime(1800,1,1);
-			Clinic patientClinic=Clinics.GetClinicForRecall(recallNum);
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
 				if(PIn.Long(tableSchedules.Rows[i]["BlockoutType"].ToString()) > 0) {
 					continue;//Blockouts should not have appointments scheduled on top of them.
@@ -1165,19 +1180,17 @@ namespace OpenDentBusiness{
 				DateTime dateSched=PIn.Date(tableSchedules.Rows[i]["SchedDate"].ToString());
 				//If dateLastTimeSlot has a valid year, that means we have at least 30 days of time slots that will be sent back to the Web Sched app.
 				if(dateLastTimeSlot.Year > 1880 && dateSched.Date!=dateLastTimeSlot.Date) {
-					//We only want to break out once we are finished sending all available time slots for the date that the 30th available time slot fell on.
-					//E.g. there are 35 time slots, the last six time slot days are 2014-12-1, 2014-12-01, 2014-12-01, 2014-12-01, 2014-12-03, 2014-12-03
-					//We want to return 33 time slots in order to comletely send all available time slots for 2014-12-01.  
+					//We only want to break out once we are finished sending all available time slots for the 30th (last) day.
 					//This makes the logic easier for the mobile app when they want to get "more dates".
 					break;
 				}
 				long schedOpNum=PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString());
 				TimeSpan timeSchedStart=PIn.Time(tableSchedules.Rows[i]["StartTime"].ToString());
 				TimeSpan timeSchedStop=PIn.Time(tableSchedules.Rows[i]["StopTime"].ToString());
-				if(patientClinic!=null) {
+				if(clinic!=null) {
 					//Skip this schedule entry if the operatory's clinic does not match the patient's clinic.
 					Operatory op=Operatories.GetOperatory(schedOpNum);
-					if(op==null || op.ClinicNum!=patientClinic.ClinicNum) {
+					if(op==null || op.ClinicNum!=clinic.ClinicNum) {
 						continue;
 					}
 				}
@@ -1272,33 +1285,25 @@ namespace OpenDentBusiness{
 							,tableSchedules.Rows[i]["OperatoryNum"].ToString());
 					}
 				}
-				if(dictTimeSlots.Count>=30) {//Once we hit at least 30 time slots, we want to finish getting all the open slots for that day then kick out.
+				if(dictTimeSlots.Count>=30) {//Once we hit at least 30 days of time slots, we want to finish getting the rest for that day then kick out.
 					dateLastTimeSlot=dateSched;
 				}
 			}
 			return tableAvailableTimes;
 		}
 
-		///<summary>Throws exception if no operatories are found.  This means that the office has not set up their operatories or provider schedules correctly.</summary>
-		private static void GetUniqueOpsAndBlockoutsFromSchedule(DataTable tableSchedules,out List<long> opNums,out DataTable tableBlockouts) {
+		///<summary>Returns a datatable that matches the structure of the table passed in where the column BlockoutType is > 0.
+		///Returns an empty DataTable if no blockouts found.</summary>
+		private static DataTable GetUniqueBlockoutsFromSchedule(DataTable tableSchedules) {
 			//No need to check RemotingRole; no call to db.
-			opNums=new List<long>();
-			tableBlockouts=tableSchedules.Clone();
+			DataTable tableBlockouts=tableSchedules.Clone();
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
 				if(PIn.Long(tableSchedules.Rows[i]["BlockoutType"].ToString()) > 0) {
 					tableBlockouts.Rows.Add(tableSchedules.Rows[i].ItemArray);//This is a blockout so add it to our table of blockouts.
-					continue;//There is nothing else that is important about blockouts.
+					continue;
 				}
-				if(opNums.Contains(PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()))) {
-					continue;//Op is already part of our opNums list.
-				}
-				opNums.Add(PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()));
 			}
-			if(opNums.Count < 1) {//This is very possible for offices that aren't set up the way that we expect them to be.
-				string errorMsg=Lans.g("WebSched","Operatories are not yet set up for recalls.")+"\r\n"
-					+Lans.g("WebSched","Please call us to schedule your appointment.");
-				throw new ODException(errorMsg);
-			}
+			return tableBlockouts;
 		}
 
 		///<summary>Checks if the two times passed in overlap.</summary>

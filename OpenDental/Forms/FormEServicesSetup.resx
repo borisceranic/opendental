@@ -140,9 +140,6 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
-  <data name="labelRecallMessage.Text" xml:space="preserve">
-    <value>Settings are used from different places throughout the program that dictate which available time slots are shown and how recall appointments will be created.  These are some shortcuts to those places that help fine tune your Web Sched.</value>
-  </data>
   <data name="labelWebSchedDesc.Text" xml:space="preserve">
     <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
 
