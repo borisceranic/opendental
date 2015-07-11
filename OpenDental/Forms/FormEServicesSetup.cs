@@ -969,8 +969,9 @@ namespace OpenDental {
 					gridWebSchedTimeSlots.Rows.Add(row);
 				}
 				row=new ODGridRow();
-				int hourStart=PIn.Int(tableTimeSlots.Rows[i]["TimeStart"].ToString());
-				row.Cells.Add(hourStart+":00 - "+(hourStart+1)+":00");//TODO: enhance after making it possible to schedule recalls off the hour.
+				DateTime timeStart=PIn.DateT(tableTimeSlots.Rows[i]["TimeStart"].ToString());
+				DateTime timeStop=PIn.DateT(tableTimeSlots.Rows[i]["TimeStop"].ToString());
+				row.Cells.Add(timeStart.ToShortTimeString()+" - "+timeStop.ToShortTimeString());
 				gridWebSchedTimeSlots.Rows.Add(row);
 			}
 			gridWebSchedTimeSlots.EndUpdate();

@@ -1187,14 +1187,18 @@ namespace OpenDentBusiness{
 			List<TimeSlot> listTimeSlots=new List<TimeSlot>();//Create a list of available time slots.
 			DateTime dateLastTimeSlot=new DateTime(1800,1,1);//Keeps track of what date the last time slot was found.
 			//Figure out how large of a time slot we need to find in order to consider this time slot "available".
-			int apptLength=RecallTypes.ConvertTimePattern(recallType.TimePattern).Length * 5;
-			Dictionary<DateTime,List<int>> dictTimeSlots=new Dictionary<DateTime,List<int>>();
+			int apptLengthMins=RecallTypes.ConvertTimePattern(recallType.TimePattern).Length * 5;
+			List<DateTime> listUniqueDays=new List<DateTime>();
+			List<TimeSlot> listAvailableTimeSlots=new List<TimeSlot>();
 			//Loop through all schedules five minutes at a time to find time slots large enough that have no appointments and no blockouts within them.
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
 				if(PIn.Long(tableSchedules.Rows[i]["BlockoutType"].ToString()) > 0) {
 					continue;//Blockouts should not have appointments scheduled on top of them.
 				}
 				DateTime dateSched=PIn.Date(tableSchedules.Rows[i]["SchedDate"].ToString());
+				if(!listUniqueDays.Contains(dateSched)) {
+					listUniqueDays.Add(dateSched);
+				}
 				//If dateLastTimeSlot has a valid year, that means we have at least 30 days of time slots that will be sent back to the Web Sched app.
 				if(dateLastTimeSlot.Year > 1880 && dateSched.Date!=dateLastTimeSlot.Date) {
 					//We only want to break out once we are finished sending all available time slots for the 30th (last) day.
@@ -1211,40 +1215,56 @@ namespace OpenDentBusiness{
 						continue;
 					}
 				}
-				//This logic will assume that the stop time cannot be before the start time and cannot span multiple days.
-				int startingHour=timeSchedStart.Hours;//0-23
-				if(timeSchedStart.Minutes!=0) {//If the starting time does not start on the hour, we need to skip forward to the next whole hour.
-					startingHour++;
+				//Straight up ignore schedules in the past.  This should not be possible but is just in case.
+				if(dateSched.Date < DateTime.Today) {
+					continue;
 				}
-				//Check to see if the date we are about to loop through is todays date.
-				//If it is today, only show the open hours AFTER right now.  This is so that open slots prior to now cannot be selected.
-				if(dateSched.Date==DateTime.Now.Date && startingHour<=DateTime.Now.Hour) {
-					//Set the starting hour to the next hour to guarantee the user cannot select a time slot in the past.
-					startingHour=DateTime.Now.Hour+1;
-				}
-				if(startingHour>=timeSchedStop.Hours) {
-					continue;//This should never happen unless an office is open for less than an hour... OR the stop time is before the start time (maybe on the next day though)?
-				}
-				List<int> startingHours=null;
-				for(int j=startingHour;j<timeSchedStop.Hours;j++) {//Loop through the hours that the op is scheduled for
-					if(!dictTimeSlots.TryGetValue(dateSched,out startingHours)) {
-						startingHours=new List<int>();//This is the first open slot for the current dateSched date.
+				//Check to see if we are currently looking at today's date. 
+				if(dateSched.Date==DateTime.Now.Date) {
+					//We need to make sure that we are looking for openings AFTER right now.
+					//First, check the stop time of this schedule to make sure that right now isn't past the stop time of the schedule.
+					if(DateTime.Now.TimeOfDay>=timeSchedStop) {
+						continue;//The current time is or has passed the ending time for the schedule.
 					}
-					//Now we need to make sure that there are no blockouts or appointments within the next hour
+					//Next, make sure that the start time is after right now.  If it isn't, set timeSchedStart to right now.
+					if(DateTime.Now.TimeOfDay > timeSchedStart) {
+						timeSchedStart=DateTime.Now.TimeOfDay;
+						//Now, make sure that the start time is set to a 5 min increment.
+						int minsOver=(timeSchedStart.Minutes)%5;
+						if(minsOver>0) {
+							int minsToAdd=5-minsOver;
+							timeSchedStart=timeSchedStart.Add(new TimeSpan(0,minsToAdd,0));
+						}
+						//Double check that we haven't pushed the start time past the stop time.
+						if(timeSchedStart>=timeSchedStop) {
+							continue;
+						}
+					}
+				}
+				//At this point, we know that timeSchedStart is set to a valid time that we need to start looking for openings 5 minutes at a time.
+				//Start going through this operatories schedule 5 minutes at a time looking for a gap that can handle apptLengthMins.
+				TimeSpan timeSlotStart=timeSchedStart;
+				for(TimeSpan timeSlotStop=timeSchedStart.Add(new TimeSpan(0,5,0)) //Start looking for openings 5 minutes AFTER the start time.
+					;timeSlotStop<=timeSchedStop																		//Stop as soon as the slots stop time meets or passes the sched stop time.
+					;timeSlotStop=timeSlotStop.Add(new TimeSpan(0,5,0)))						//Iteratre through the schedule 5 minutes at a time.
+				{
+					//Check to see if we've found an opening.
+					TimeSpan timeSpanCur=timeSlotStop-timeSlotStart;
+					if(timeSpanCur.Minutes==apptLengthMins) {
+						DateTime dateTimeSlotStart=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStart.Hours,timeSlotStart.Minutes,0);
+						DateTime dateTimeSlotStop=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStop.Hours,timeSlotStop.Minutes,0);
+						TimeSlot timeSlot=new TimeSlot(dateTimeSlotStart,dateTimeSlotStop,PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()));
+						//We just found an opening.  Make sure we don't already have this time slot available.
+						if(!listAvailableTimeSlots.Contains(timeSlot)) {//TODO: actually make this work.  Maybe use a dictionary?
+							//Add the time slot to our list of available time slots.
+							listAvailableTimeSlots.Add(timeSlot);
+						}
+						//Now that we have the available slot.  Continue looking for open slots at the end of this time slot.
+						timeSlotStart=timeSlotStop;
+						continue;
+					}
+					//Check to see if there is an appointment or a blockout that colides with this blockout.
 					bool isOverlapping=false;
-					TimeSpan timeSlotStart;
-					TimeSpan timeSlotStop;
-					try {
-						timeSlotStart=new TimeSpan(j,0,0);
-						timeSlotStop=new TimeSpan(j+1,0,0);
-					}
-					catch {
-						continue;//Not sure what else to do.  I don't necessarily want to exit out at this point.
-					}
-					//Make sure that these times make sense.
-					if(timeSlotStart > timeSchedStop || timeSlotStop > timeSchedStop) {
-						continue;//This might happen if j+1 is 25+
-					}
 					//First we'll look at blockouts because it should be quicker than looking at the appointments
 					for(int k=0;k<tableBlockouts.Rows.Count;k++) {
 						if(schedOpNum!=PIn.Long(tableBlockouts.Rows[k]["OperatoryNum"].ToString())) {
@@ -1266,6 +1286,8 @@ namespace OpenDentBusiness{
 						}
 					}
 					if(isOverlapping) {//This check is here so that we don't waste time looping through appointments if we don't need to.
+						//There was a collision, set the time slot start time to the stop time and continue from there.
+						timeSlotStart=timeSlotStop;
 						continue;
 					}
 					//Next we'll look for overlapping appointments
@@ -1286,6 +1308,8 @@ namespace OpenDentBusiness{
 						}
 					}
 					if(isOverlapping) {
+						//There was a collision, set the time slot start time to the stop time and continue from there.
+						timeSlotStart=timeSlotStop;
 						continue;
 					}
 					//We now know that there are no blockouts or appointments for this hour time slot.
@@ -1293,20 +1317,17 @@ namespace OpenDentBusiness{
 					if(timeSlotStart < timeSchedStart || timeSlotStop > timeSchedStop) {
 						continue;
 					}
-					//Everything looks good, add this time slot to our dictionary of available slots for the day.
-					if(!startingHours.Contains(j)) {
-						startingHours.Add(j);
-						dictTimeSlots[dateSched]=startingHours;//Overwrites old key value pair if necessary.
-						//Add this time slot information to our return table.
-						tableAvailableTimes.Rows.Add(tableSchedules.Rows[i]["SchedDate"].ToString()
-							,j.ToString()//TODO: make this TimeStart
-							,j.ToString()//TODO: make this TimeStop
-							,tableSchedules.Rows[i]["OperatoryNum"].ToString());
-					}
 				}
-				if(dictTimeSlots.Count>=30) {//Once we hit at least 30 days of time slots, we want to finish getting the rest for that day then kick out.
+				if(listUniqueDays.Count>=30) {//Once we hit at least 30 days of time slots, we want to finish getting the rest for that day then kick out.
 					dateLastTimeSlot=dateSched;
 				}
+			}
+			//Turn the list of available times into a DataTable.
+			for(int i=0;i<listAvailableTimeSlots.Count;i++) {
+				tableAvailableTimes.Rows.Add(listAvailableTimeSlots[i].DateTimeStart.ToShortDateString()
+						,listAvailableTimeSlots[i].DateTimeStart.ToString("yyyy-MM-dd HH:mm:ss")
+						,listAvailableTimeSlots[i].DateTimeStop.ToString("yyyy-MM-dd HH:mm:ss")
+						,listAvailableTimeSlots[i].OperatoryNum.ToString());
 			}
 			return tableAvailableTimes;
 		}
@@ -1346,6 +1367,13 @@ namespace OpenDentBusiness{
 		private struct TimeSlot {
 			public DateTime DateTimeStart;
 			public DateTime DateTimeStop;
+			public long OperatoryNum;
+
+			public TimeSlot(DateTime dateTimeStart,DateTime dateTimeStop,long operatoryNum) {
+				DateTimeStart=dateTimeStart;
+				DateTimeStop=dateTimeStop;
+				OperatoryNum=operatoryNum;
+			}
 		}
 		#endregion
 	}
