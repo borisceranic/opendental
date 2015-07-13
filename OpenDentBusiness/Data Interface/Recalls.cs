@@ -1255,11 +1255,21 @@ namespace OpenDentBusiness{
 						DateTime dateTimeSlotStop=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStop.Hours,timeSlotStop.Minutes,0);
 						TimeSlot timeSlot=new TimeSlot(dateTimeSlotStart,dateTimeSlotStop,PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()));
 						//We just found an opening.  Make sure we don't already have this time slot available.
-						if(!listAvailableTimeSlots.Contains(timeSlot)) {//TODO: actually make this work.  Maybe use a dictionary?
-							//Add the time slot to our list of available time slots.
+						bool isTimeSlotAlreadyAvailable=false;
+						for(int j=0;j<listAvailableTimeSlots.Count;j++) {
+							if(listAvailableTimeSlots[j].DateTimeStart==dateTimeSlotStart
+								&& listAvailableTimeSlots[j].DateTimeStop==dateTimeSlotStop) 
+							{
+								isTimeSlotAlreadyAvailable=true;
+								break;
+							}
+						}
+						if(!isTimeSlotAlreadyAvailable) {
+							//If the time slot doesn't already exist, add it to our list of available time slots.
 							listAvailableTimeSlots.Add(timeSlot);
 						}
-						//Now that we have the available slot.  Continue looking for open slots at the end of this time slot.
+						//Continue looking for more open slots starting at the end of this time slot.
+						//E.g. we just found 9:30 AM to 10:00 AM.  We need to continue from 10:00 AM.
 						timeSlotStart=timeSlotStop;
 						continue;
 					}
