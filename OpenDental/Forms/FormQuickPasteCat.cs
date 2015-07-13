@@ -72,7 +72,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(497, 418);
+			this.butCancel.Location = new System.Drawing.Point(545, 429);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
@@ -87,7 +87,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(497, 377);
+			this.butOK.Location = new System.Drawing.Point(545, 388);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
@@ -115,7 +115,7 @@ namespace OpenDental{
 			this.listType.Location = new System.Drawing.Point(126, 61);
 			this.listType.Name = "listType";
 			this.listType.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listType.Size = new System.Drawing.Size(120, 381);
+			this.listType.Size = new System.Drawing.Size(120, 394);
 			this.listType.TabIndex = 4;
 			// 
 			// label2
@@ -130,7 +130,7 @@ namespace OpenDental{
 			// FormQuickPasteCat
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(588, 458);
+			this.ClientSize = new System.Drawing.Size(632, 467);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.listType);
 			this.Controls.Add(this.label1);

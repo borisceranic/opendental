@@ -784,7 +784,9 @@ namespace OpenDentBusiness{
 		///<summary>27</summary>
 		Task,
 		///<summary>28</summary>
-		Schedule
+		Schedule,
+		///<summary>29</summary>
+		TreatPlan
 	}
 
 	///<summary>For every type of electronic claim format that Open Dental can create, there will be an item in this enumeration.  All e-claim formats are hard coded due to complexity.</summary>
