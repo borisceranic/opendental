@@ -137,16 +137,13 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		///<summary>Uses the input parameters to construct a List&lt;ProviderSchedule&gt;. It is written to reduce the number of queries to the database.</summary>
+		///<summary>Uses the input parameters to construct a List&lt;ApptSearchProviderSchedule&gt;. It is written to reduce the number of queries to the database.</summary>
 		/// <param name="ProviderNums">PrimaryKeys to Provider.</param>
 		/// <param name="ScheduleDate">The date to construct the schedule for.</param>
 		/// <param name="ScheduleList">A List of Schedules containing all of the schedules for the given day, or possibly more. 
 		/// Intended to be all schedules between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
 		/// <param name="AppointmentList">A List of Appointments containing all of the schedules for the given day, or possibly more. 
 		/// Intended to be all Appointments between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
-		/// <param name="ScheduleOpList">A List of all ScheduleOps . 
-		/// Intended to be all Appointments between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
-		/// <param name="OperatoryList">A List of all operatories. This is to reduce queries to DB.</param> 
 		private static List<ApptSearchProviderSchedule> GetForProvidersAndDate(List<long> ProviderNums,DateTime ScheduleDate,List<Schedule> ScheduleList,List<Appointment> AppointmentList) {//Not working properly when scheduled but no ops are set.
 			List<ApptSearchProviderSchedule> retVal=new List<ApptSearchProviderSchedule>();
 			ScheduleDate=ScheduleDate.Date;
@@ -195,7 +192,7 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		/// <summary>Uses Inputs to construct a List&lt;OperatorySchedule&gt;. It is written to reduce the number of queries to the database.</summary>
+		/// <summary>Uses Inputs to construct a List&lt;ApptSearchOperatorySchedule&gt;. It is written to reduce the number of queries to the database.</summary>
 		private static List<ApptSearchOperatorySchedule> GetAllForDate(DateTime ScheduleDate,List<Schedule> ScheduleList,List<Appointment> AppointmentList,List<ScheduleOp> ScheduleOpList,List<long> OperatoryNums,List<long> ProviderNums) {
 			List<ApptSearchOperatorySchedule> retVal = new List<ApptSearchOperatorySchedule>();
 			List<ApptSearchOperatorySchedule> opSchedListAll = new List<ApptSearchOperatorySchedule>();

@@ -569,7 +569,7 @@ namespace OpenDentBusiness {
 		XRayExposureLevel
 	}
 
-	///<summary>Used by pref "SearchBehavior". </summary>
+	///<summary>Used by pref "AppointmentSearchBehavior". </summary>
 	public enum SearchBehaviorCriteria {
 		ProviderTime,
 		ProviderTimeOperatory
