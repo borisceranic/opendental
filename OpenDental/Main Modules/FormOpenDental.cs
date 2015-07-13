@@ -4088,7 +4088,7 @@ namespace OpenDental{
 					if(signal!=null){
 						//This signal is not used when using Callfire so we should not have any conflicts here.
 						//The toolbar button might need to change state if we have just recently changed the state of IsIntegratedTextingEnabled().
-						_butText.Enabled=SmsPhones.IsIntegratedTextingEnabled();
+						_butText.Enabled=(Programs.IsEnabled(ProgramName.CallFire) || SmsPhones.IsIntegratedTextingEnabled());
 						SetSmsNotificationText(signal.SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
 					}					
 					if(_butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
