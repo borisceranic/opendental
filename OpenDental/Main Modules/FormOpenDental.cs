@@ -3939,11 +3939,13 @@ namespace OpenDental{
 			Color color;
 			for(int i=0;i<sigListButs.Count;i++){
 				if(sigListButs[i].AckTime.Year>1880){//process ack
-					int rowAck=lightSignalGrid1.ProcessAck(sigListButs[i].SignalNum);
-					if(rowAck!=-1){
-						butDef=SigButDefs.GetByIndex(rowAck,SigButDefList);
-						if(butDef!=null){
-							PaintOnIcon(butDef.SynchIcon,Color.White);
+					for(int j=0;j<sigListButs[i].ElementList.Length;j++) {
+						int rowAck=lightSignalGrid1.ProcessAck(sigListButs[i].ElementList[j].SignalNum);
+						if(rowAck!=-1) {
+							butDef=SigButDefs.GetByIndex(rowAck,SigButDefList);
+							if(butDef!=null) {
+								PaintOnIcon(butDef.SynchIcon,Color.White);
+							}
 						}
 					}
 				}
