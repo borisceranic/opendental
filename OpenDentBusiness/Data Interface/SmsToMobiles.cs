@@ -203,41 +203,19 @@ namespace OpenDentBusiness{
 			if(listMessages==null || listMessages.Count==0) {
 				throw new Exception("No messages to send.");
 			}
-			XmlWriterSettings settings = new XmlWriterSettings();
-			settings.Indent = true;
-			settings.IndentChars = ("    ");
 			StringBuilder strbuild=new StringBuilder();
-			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
-				writer.WriteStartElement("Request");
-				writer.WriteStartElement("Credentials");
-				writer.WriteStartElement("RegistrationKey");
-				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticeTitle");
-				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticePhone");
-				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ProgramVersion");
-				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ServiceCode");
-				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
-				writer.WriteEndElement();
-				writer.WriteEndElement(); //Credentials
+			using(XmlWriter writer=XmlWriter.Create(strbuild,WebServiceMainHQProxy.CreateXmlWriterSettings(true))){
 				writer.WriteStartElement("Payload");
 				writer.WriteStartElement("ListSmsToMobile");
 				System.Xml.Serialization.XmlSerializer xmlListSmsToMobileSerializer=new System.Xml.Serialization.XmlSerializer(typeof(List<SmsToMobile>));
 				xmlListSmsToMobileSerializer.Serialize(writer,listMessages);
 				writer.WriteEndElement(); //ListSmsToMobile	
 				writer.WriteEndElement(); //Payload	
-				writer.WriteEndElement(); //Request
 			}
 			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();			
 			string result = "";
 			try {
-				result=service.SmsSend(strbuild.ToString());
+				result=service.SmsSend(WebServiceMainHQProxy.CreateWebServiceHQPayload(strbuild.ToString(),eServiceCode.IntegratedTexting));
 			}
 			catch(Exception ex) {
 				throw new Exception("Unable to send using web service.");

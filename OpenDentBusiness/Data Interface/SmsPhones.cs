@@ -212,29 +212,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<SmsPhone>>(MethodBase.GetCurrentMethod(),clinicNum,monthlyLimitUSD);
 			}
-			XmlWriterSettings settings = new XmlWriterSettings();
-			settings.Indent = true;
-			settings.IndentChars = ("    ");
 			StringBuilder strbuild=new StringBuilder();
-			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)){
-				writer.WriteStartElement("Request");
-				writer.WriteStartElement("Credentials");
-				writer.WriteStartElement("RegistrationKey");
-				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticeTitle");
-				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticePhone");
-				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ProgramVersion");
-				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ServiceCode");
-				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
-				writer.WriteEndElement();
-				writer.WriteEndElement();//End Credentials
+			using(XmlWriter writer=XmlWriter.Create(strbuild,WebServiceMainHQProxy.CreateXmlWriterSettings(true))){
 				writer.WriteStartElement("Payload");
 				writer.WriteStartElement("ClinicNum");
 				writer.WriteString(clinicNum.ToString());
@@ -246,12 +225,11 @@ namespace OpenDentBusiness{
 				writer.WriteString(CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
 				writer.WriteEndElement(); //SmsMonthlyLimit	
 				writer.WriteEndElement(); //Payload	
-				writer.WriteEndElement(); //Request
 			}
 			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
 			string result = "";
 			try {
-				result=service.SmsSignAgreement(strbuild.ToString());
+				result=service.SmsSignAgreement(WebServiceMainHQProxy.CreateWebServiceHQPayload(strbuild.ToString(),eServiceCode.IntegratedTexting));
 			}
 			catch(Exception ex) {
 				throw new Exception("Unable to sign agreement using web service.");
@@ -285,40 +263,18 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),clinicNum);
 			}
-			XmlWriterSettings settings = new XmlWriterSettings();
-			settings.Indent = true;
-			settings.IndentChars = ("    ");
 			StringBuilder strbuild=new StringBuilder();
-			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
-				writer.WriteStartElement("Request");
-				writer.WriteStartElement("Credentials");
-				writer.WriteStartElement("RegistrationKey");
-				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticeTitle");
-				writer.WriteString(PrefC.GetString(PrefName.PracticeTitle));
-				writer.WriteEndElement();
-				writer.WriteStartElement("PracticePhone");
-				writer.WriteString(PrefC.GetString(PrefName.PracticePhone));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ProgramVersion");
-				writer.WriteString(PrefC.GetString(PrefName.ProgramVersion));
-				writer.WriteEndElement();
-				writer.WriteStartElement("ServiceCode");
-				writer.WriteString(eServiceCode.IntegratedTexting.ToString());
-				writer.WriteEndElement();
-				writer.WriteEndElement();//End Credentials
+			using(XmlWriter writer=XmlWriter.Create(strbuild,WebServiceMainHQProxy.CreateXmlWriterSettings(true))){
 				writer.WriteStartElement("Payload");
 				writer.WriteStartElement("ClinicNum");
 				writer.WriteString(clinicNum.ToString());
 				writer.WriteEndElement(); //ClinicNum	
 				writer.WriteEndElement(); //Payload	
-				writer.WriteEndElement(); //Request
 			}
 			WebServiceMainHQ.WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
 			string result = "";
 			try {
-				result=service.SmsCancelService(strbuild.ToString());
+				result=service.SmsCancelService(WebServiceMainHQProxy.CreateWebServiceHQPayload(strbuild.ToString(),eServiceCode.IntegratedTexting));
 			}
 			catch(Exception ex) {
 				//nothing to do here. Throw up to UI layer.

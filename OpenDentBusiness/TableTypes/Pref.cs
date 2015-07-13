@@ -557,6 +557,7 @@ namespace OpenDentBusiness {
 		WebSchedMessage,
 		WebSchedMessage2,
 		WebSchedMessage3,
+		WebServiceHQServerURL,
 		///<summary>Enum: WebSchedProviderRules 0=FirstAvailable, 1=PrimaryProvider, 2=SecondaryProvider, 3=LastSeenHygienist</summary>
 		WebSchedProviderRule,
 		///<summary>Boolean. 0 by default. True when Web Sched service is enabled.  Loosely keeps track of service status, calling our web service to verify active service is still required.  This preference is mainly used to quickly (without web call) make the UI of Open Dental different and less annoying (advertising wise) depeding on if the service is enabled or not.</summary>

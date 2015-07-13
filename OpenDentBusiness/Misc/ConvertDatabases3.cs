@@ -9028,7 +9028,15 @@ namespace OpenDentBusiness {
 				    +"'')";
 					Db.NonQ(command);
 				}//end Dental Intel Link
-
+				//Preference used to point to WebServicesHQ. No UI, must be edited in the DB for now.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('WebServiceHQServerURL','http://www.patientviewer.com:49999/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebServiceHQServerURL','http://www.patientviewer.com:49999/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx')";
+					Db.NonQ(command);
+				}
 
 
 
