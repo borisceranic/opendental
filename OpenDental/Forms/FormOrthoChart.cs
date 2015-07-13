@@ -85,6 +85,7 @@ namespace OpenDental {
 
 		/// <summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
 		private void FillGrid() {
+			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -109,6 +110,13 @@ namespace OpenDental {
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			if(gridMainScrollValue==0) {
+				gridMain.ScrollToEnd();
+			}
+			else {
+				gridMain.ScrollValue=gridMainScrollValue;
+				gridMainScrollValue=0;
+			}
 		}
 
 		private void FillGridPat() {
