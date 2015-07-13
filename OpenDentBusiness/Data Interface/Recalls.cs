@@ -1219,6 +1219,7 @@ namespace OpenDentBusiness{
 				if(dateSched.Date < DateTime.Today) {
 					continue;
 				}
+				int timeIncrement=PrefC.GetInt(PrefName.AppointmentTimeIncrement);
 				//Check to see if we are currently looking at today's date. 
 				if(dateSched.Date==DateTime.Now.Date) {
 					//We need to make sure that we are looking for openings AFTER right now.
@@ -1229,24 +1230,27 @@ namespace OpenDentBusiness{
 					//Next, make sure that the start time is after right now.  If it isn't, set timeSchedStart to right now.
 					if(DateTime.Now.TimeOfDay > timeSchedStart) {
 						timeSchedStart=DateTime.Now.TimeOfDay;
-						//Now, make sure that the start time is set to a 5 min increment.
-						int minsOver=(timeSchedStart.Minutes)%5;
-						if(minsOver>0) {
-							int minsToAdd=5-minsOver;
-							timeSchedStart=timeSchedStart.Add(new TimeSpan(0,minsToAdd,0));
-						}
-						//Double check that we haven't pushed the start time past the stop time.
-						if(timeSchedStart>=timeSchedStop) {
-							continue;
-						}
 					}
+				}
+				//Now, make sure that the start time is set to a starting time that makes sense with the appointment time increment preference.
+				int minsOver=(timeSchedStart.Minutes)%timeIncrement;
+				if(minsOver>0) {
+					int minsToAdd=timeIncrement-minsOver;
+					timeSchedStart=timeSchedStart.Add(new TimeSpan(0,minsToAdd,0));
+				}
+				//Double check that we haven't pushed the start time past the stop time.
+				if(timeSchedStart>=timeSchedStop) {
+					continue;
 				}
 				//At this point, we know that timeSchedStart is set to a valid time that we need to start looking for openings 5 minutes at a time.
 				//Start going through this operatories schedule 5 minutes at a time looking for a gap that can handle apptLengthMins.
 				TimeSpan timeSlotStart=timeSchedStart;
-				for(TimeSpan timeSlotStop=timeSchedStart.Add(new TimeSpan(0,5,0)) //Start looking for openings 5 minutes AFTER the start time.
-					;timeSlotStop<=timeSchedStop																		//Stop as soon as the slots stop time meets or passes the sched stop time.
-					;timeSlotStop=timeSlotStop.Add(new TimeSpan(0,5,0)))						//Iteratre through the schedule 5 minutes at a time.
+				//Start looking for collisions AFTER the start time.
+				//Stop as soon as the slots stop time meets or passes the sched stop time.
+				//Iteratre through the schedule via the time increment preference.
+				for(TimeSpan timeSlotStop=timeSchedStart.Add(new TimeSpan(0,timeIncrement,0))
+					;timeSlotStop<=timeSchedStop
+					;timeSlotStop=timeSlotStop.Add(new TimeSpan(0,timeIncrement,0)))
 				{
 					//Check to see if we've found an opening.
 					TimeSpan timeSpanCur=timeSlotStop-timeSlotStart;

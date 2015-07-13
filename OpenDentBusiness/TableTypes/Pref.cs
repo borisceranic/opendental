@@ -52,6 +52,7 @@ namespace OpenDentBusiness {
 		AppointmentSearchBehavior,
 		AppointmentTimeArrivedTrigger,
 		AppointmentTimeDismissedTrigger,
+		///<summary>The number of minutes that the appointment schedule is broken up into.  E.g. "10" represents 10 minute increments.</summary>
 		AppointmentTimeIncrement,
 		///<summary>Set to true if appointment times are locked by default.</summary>
 		AppointmentTimeIsLocked,
