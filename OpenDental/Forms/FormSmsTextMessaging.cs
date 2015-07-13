@@ -23,6 +23,9 @@ namespace OpenDental {
 		public long CurPatNum;
 		///<summary>The selected patNum.  Can be 0 to include all.</summary>
 		private long _patNum=0;
+		///<summary>The column index of the Status column within the Messages grid.
+		///This is a class-wide variable to prevent bugs if we decide to change the column order of the Messages grid.</summary>
+		private int _columnStatusIdx=0;
 
 		public FormSmsTextMessaging() {
 			InitializeComponent();
@@ -72,6 +75,7 @@ namespace OpenDental {
 			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridMessages.Columns.Add(new UI.ODGridColumn("Status",90,HorizontalAlignment.Center));
 			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			_columnStatusIdx=gridMessages.Columns.Count-1;
 			if(checkHidden.Checked) {
 				gridMessages.Columns.Add(new UI.ODGridColumn("Hidden",44,HorizontalAlignment.Center));
 				gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
@@ -255,14 +259,24 @@ namespace OpenDental {
 
 		private void gridMessages_CellClick(object sender,UI.ODGridClickEventArgs e) {
 			if(gridMessages.Rows[e.Row].Tag is SmsFromMobile) {
+				//Update the message thread control to show the message thread for the currently selected message.
 				SmsFromMobile smsFromMobile=(SmsFromMobile)gridMessages.Rows[e.Row].Tag;
+				FillGridMessageThread(smsFromMobile.PatNum);
+				//If the clicked/selected message was a ReceivedUnread message, then mark the message ReceivedRead in the db as well as the grid.
 				if(smsFromMobile.SmsStatus==SmsFromStatus.ReceivedUnread) {
 					SmsFromMobile oldSmsFromMobile=smsFromMobile.Copy();
 					smsFromMobile.SmsStatus=SmsFromStatus.ReceivedRead;
 					SmsFromMobiles.Update(smsFromMobile,oldSmsFromMobile);
+					gridMessages.Rows[e.Row].Cells[_columnStatusIdx].Text=SmsFromMobiles.GetSmsFromStatusDescript(SmsFromStatus.ReceivedRead);
+					gridMessages.Rows[e.Row].Bold=false;
+					gridMessages.Invalidate();//To show the status changes in the grid.
 				}
 			}
-			FillGridTextMessages();
+			if(gridMessages.Rows[e.Row].Tag is SmsToMobile) {
+				//Update the message thread control to show the message thread for the currently selected message.
+				SmsToMobile smsToMobile=(SmsToMobile)gridMessages.Rows[e.Row].Tag;
+				FillGridMessageThread(smsToMobile.PatNum);
+			}
 		}
 
 		///<summary>Unselects all sent messages.  Returns true if there is at least one received message selected.</summary>
@@ -305,8 +319,13 @@ namespace OpenDental {
 				SmsFromMobile oldSmsFromMobile=smsFromMobile.Copy();
 				smsFromMobile.SmsStatus=smsFromStatus;
 				SmsFromMobiles.Update(smsFromMobile,oldSmsFromMobile);
+				gridMessages.Rows[index].Cells[_columnStatusIdx].Text=SmsFromMobiles.GetSmsFromStatusDescript(smsFromStatus);
+				gridMessages.Rows[index].Bold=false;
+				if(smsFromStatus==SmsFromStatus.ReceivedUnread) {
+					gridMessages.Rows[index].Bold=true;
+				}
 			}
-			FillGridTextMessages();//Refresh grid to show changed status.
+			gridMessages.Invalidate();//To show the status changes in the grid.
 			Cursor=Cursors.Default;
 		}
 
