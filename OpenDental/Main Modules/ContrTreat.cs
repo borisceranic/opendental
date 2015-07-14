@@ -3097,6 +3097,10 @@ namespace OpenDental{
 				//OK if 0, because auto select first in list when open claim
 			}
 			ClaimCur.ProvBill=Providers.GetBillingProvNum(ClaimCur.ProvTreat,ClaimCur.ClinicNum);
+			Provider prov=Providers.GetProv(ClaimCur.ProvBill);
+			if(prov.ProvNumBillingOverride!=0) {
+				ClaimCur.ProvBill=prov.ProvNumBillingOverride;
+			}
 			ClaimCur.EmployRelated=YN.No;
       ClaimCur.ClaimType="PreAuth";
 			//this could be a little better if we automate figuring out the patrelat

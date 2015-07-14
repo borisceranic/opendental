@@ -3189,6 +3189,10 @@ namespace OpenDental {
 			//	clinicInsBillingProv=Clinics.GetClinic(ClaimCur.ClinicNum).InsBillingProv;
 			//}
 			ClaimCur.ProvBill=Providers.GetBillingProvNum(ClaimCur.ProvTreat,ClaimCur.ClinicNum);//,useClinic,clinicInsBillingProv);//OK if zero, because it will get fixed in claim
+			Provider prov=Providers.GetProv(ClaimCur.ProvBill);
+			if(prov.ProvNumBillingOverride!=0) {
+				ClaimCur.ProvBill=prov.ProvNumBillingOverride;
+			}
 			ClaimCur.EmployRelated=YN.No;
 			ClaimCur.ClaimForm=PlanCur.ClaimFormNum;
 			//attach procedures

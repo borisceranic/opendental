@@ -46,40 +46,41 @@ namespace OpenDentBusiness.Crud{
 			Provider provider;
 			for(int i=0;i<table.Rows.Count;i++) {
 				provider=new Provider();
-				provider.ProvNum             = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				provider.Abbr                = PIn.String(table.Rows[i]["Abbr"].ToString());
-				provider.ItemOrder           = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				provider.LName               = PIn.String(table.Rows[i]["LName"].ToString());
-				provider.FName               = PIn.String(table.Rows[i]["FName"].ToString());
-				provider.MI                  = PIn.String(table.Rows[i]["MI"].ToString());
-				provider.Suffix              = PIn.String(table.Rows[i]["Suffix"].ToString());
-				provider.FeeSched            = PIn.Long  (table.Rows[i]["FeeSched"].ToString());
-				provider.Specialty           = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
-				provider.SSN                 = PIn.String(table.Rows[i]["SSN"].ToString());
-				provider.StateLicense        = PIn.String(table.Rows[i]["StateLicense"].ToString());
-				provider.DEANum              = PIn.String(table.Rows[i]["DEANum"].ToString());
-				provider.IsSecondary         = PIn.Bool  (table.Rows[i]["IsSecondary"].ToString());
-				provider.ProvColor           = Color.FromArgb(PIn.Int(table.Rows[i]["ProvColor"].ToString()));
-				provider.IsHidden            = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				provider.UsingTIN            = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
-				provider.BlueCrossID         = PIn.String(table.Rows[i]["BlueCrossID"].ToString());
-				provider.SigOnFile           = PIn.Bool  (table.Rows[i]["SigOnFile"].ToString());
-				provider.MedicaidID          = PIn.String(table.Rows[i]["MedicaidID"].ToString());
-				provider.OutlineColor        = Color.FromArgb(PIn.Int(table.Rows[i]["OutlineColor"].ToString()));
-				provider.SchoolClassNum      = PIn.Long  (table.Rows[i]["SchoolClassNum"].ToString());
-				provider.NationalProvID      = PIn.String(table.Rows[i]["NationalProvID"].ToString());
-				provider.CanadianOfficeNum   = PIn.String(table.Rows[i]["CanadianOfficeNum"].ToString());
-				provider.DateTStamp          = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				provider.AnesthProvType      = PIn.Long  (table.Rows[i]["AnesthProvType"].ToString());
-				provider.TaxonomyCodeOverride= PIn.String(table.Rows[i]["TaxonomyCodeOverride"].ToString());
-				provider.IsCDAnet            = PIn.Bool  (table.Rows[i]["IsCDAnet"].ToString());
-				provider.EcwID               = PIn.String(table.Rows[i]["EcwID"].ToString());
-				provider.StateRxID           = PIn.String(table.Rows[i]["StateRxID"].ToString());
-				provider.IsNotPerson         = PIn.Bool  (table.Rows[i]["IsNotPerson"].ToString());
-				provider.StateWhereLicensed  = PIn.String(table.Rows[i]["StateWhereLicensed"].ToString());
-				provider.EmailAddressNum     = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());
-				provider.IsInstructor        = PIn.Bool  (table.Rows[i]["IsInstructor"].ToString());
-				provider.EhrMuStage          = PIn.Int   (table.Rows[i]["EhrMuStage"].ToString());
+				provider.ProvNum               = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				provider.Abbr                  = PIn.String(table.Rows[i]["Abbr"].ToString());
+				provider.ItemOrder             = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				provider.LName                 = PIn.String(table.Rows[i]["LName"].ToString());
+				provider.FName                 = PIn.String(table.Rows[i]["FName"].ToString());
+				provider.MI                    = PIn.String(table.Rows[i]["MI"].ToString());
+				provider.Suffix                = PIn.String(table.Rows[i]["Suffix"].ToString());
+				provider.FeeSched              = PIn.Long  (table.Rows[i]["FeeSched"].ToString());
+				provider.Specialty             = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				provider.SSN                   = PIn.String(table.Rows[i]["SSN"].ToString());
+				provider.StateLicense          = PIn.String(table.Rows[i]["StateLicense"].ToString());
+				provider.DEANum                = PIn.String(table.Rows[i]["DEANum"].ToString());
+				provider.IsSecondary           = PIn.Bool  (table.Rows[i]["IsSecondary"].ToString());
+				provider.ProvColor             = Color.FromArgb(PIn.Int(table.Rows[i]["ProvColor"].ToString()));
+				provider.IsHidden              = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				provider.UsingTIN              = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
+				provider.BlueCrossID           = PIn.String(table.Rows[i]["BlueCrossID"].ToString());
+				provider.SigOnFile             = PIn.Bool  (table.Rows[i]["SigOnFile"].ToString());
+				provider.MedicaidID            = PIn.String(table.Rows[i]["MedicaidID"].ToString());
+				provider.OutlineColor          = Color.FromArgb(PIn.Int(table.Rows[i]["OutlineColor"].ToString()));
+				provider.SchoolClassNum        = PIn.Long  (table.Rows[i]["SchoolClassNum"].ToString());
+				provider.NationalProvID        = PIn.String(table.Rows[i]["NationalProvID"].ToString());
+				provider.CanadianOfficeNum     = PIn.String(table.Rows[i]["CanadianOfficeNum"].ToString());
+				provider.DateTStamp            = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
+				provider.AnesthProvType        = PIn.Long  (table.Rows[i]["AnesthProvType"].ToString());
+				provider.TaxonomyCodeOverride  = PIn.String(table.Rows[i]["TaxonomyCodeOverride"].ToString());
+				provider.IsCDAnet              = PIn.Bool  (table.Rows[i]["IsCDAnet"].ToString());
+				provider.EcwID                 = PIn.String(table.Rows[i]["EcwID"].ToString());
+				provider.StateRxID             = PIn.String(table.Rows[i]["StateRxID"].ToString());
+				provider.IsNotPerson           = PIn.Bool  (table.Rows[i]["IsNotPerson"].ToString());
+				provider.StateWhereLicensed    = PIn.String(table.Rows[i]["StateWhereLicensed"].ToString());
+				provider.EmailAddressNum       = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());
+				provider.IsInstructor          = PIn.Bool  (table.Rows[i]["IsInstructor"].ToString());
+				provider.EhrMuStage            = PIn.Int   (table.Rows[i]["EhrMuStage"].ToString());
+				provider.ProvNumBillingOverride= PIn.Long  (table.Rows[i]["ProvNumBillingOverride"].ToString());
 				retVal.Add(provider);
 			}
 			return retVal;
@@ -120,7 +121,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProvNum,";
 			}
-			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage) VALUES(";
+			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(provider.ProvNum)+",";
 			}
@@ -157,7 +158,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(provider.StateWhereLicensed)+"',"
 				+    POut.Long  (provider.EmailAddressNum)+","
 				+    POut.Bool  (provider.IsInstructor)+","
-				+    POut.Int   (provider.EhrMuStage)+")";
+				+    POut.Int   (provider.EhrMuStage)+","
+				+    POut.Long  (provider.ProvNumBillingOverride)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -190,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProvNum,";
 			}
-			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage) VALUES(";
+			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(provider.ProvNum)+",";
 			}
@@ -227,7 +229,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(provider.StateWhereLicensed)+"',"
 				+    POut.Long  (provider.EmailAddressNum)+","
 				+    POut.Bool  (provider.IsInstructor)+","
-				+    POut.Int   (provider.EhrMuStage)+")";
+				+    POut.Int   (provider.EhrMuStage)+","
+				+    POut.Long  (provider.ProvNumBillingOverride)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -240,39 +243,40 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Provider in the database.</summary>
 		public static void Update(Provider provider){
 			string command="UPDATE provider SET "
-				+"Abbr                = '"+POut.String(provider.Abbr)+"', "
-				+"ItemOrder           =  "+POut.Int   (provider.ItemOrder)+", "
-				+"LName               = '"+POut.String(provider.LName)+"', "
-				+"FName               = '"+POut.String(provider.FName)+"', "
-				+"MI                  = '"+POut.String(provider.MI)+"', "
-				+"Suffix              = '"+POut.String(provider.Suffix)+"', "
-				+"FeeSched            =  "+POut.Long  (provider.FeeSched)+", "
-				+"Specialty           =  "+POut.Int   ((int)provider.Specialty)+", "
-				+"SSN                 = '"+POut.String(provider.SSN)+"', "
-				+"StateLicense        = '"+POut.String(provider.StateLicense)+"', "
-				+"DEANum              = '"+POut.String(provider.DEANum)+"', "
-				+"IsSecondary         =  "+POut.Bool  (provider.IsSecondary)+", "
-				+"ProvColor           =  "+POut.Int   (provider.ProvColor.ToArgb())+", "
-				+"IsHidden            =  "+POut.Bool  (provider.IsHidden)+", "
-				+"UsingTIN            =  "+POut.Bool  (provider.UsingTIN)+", "
-				+"BlueCrossID         = '"+POut.String(provider.BlueCrossID)+"', "
-				+"SigOnFile           =  "+POut.Bool  (provider.SigOnFile)+", "
-				+"MedicaidID          = '"+POut.String(provider.MedicaidID)+"', "
-				+"OutlineColor        =  "+POut.Int   (provider.OutlineColor.ToArgb())+", "
-				+"SchoolClassNum      =  "+POut.Long  (provider.SchoolClassNum)+", "
-				+"NationalProvID      = '"+POut.String(provider.NationalProvID)+"', "
-				+"CanadianOfficeNum   = '"+POut.String(provider.CanadianOfficeNum)+"', "
+				+"Abbr                  = '"+POut.String(provider.Abbr)+"', "
+				+"ItemOrder             =  "+POut.Int   (provider.ItemOrder)+", "
+				+"LName                 = '"+POut.String(provider.LName)+"', "
+				+"FName                 = '"+POut.String(provider.FName)+"', "
+				+"MI                    = '"+POut.String(provider.MI)+"', "
+				+"Suffix                = '"+POut.String(provider.Suffix)+"', "
+				+"FeeSched              =  "+POut.Long  (provider.FeeSched)+", "
+				+"Specialty             =  "+POut.Int   ((int)provider.Specialty)+", "
+				+"SSN                   = '"+POut.String(provider.SSN)+"', "
+				+"StateLicense          = '"+POut.String(provider.StateLicense)+"', "
+				+"DEANum                = '"+POut.String(provider.DEANum)+"', "
+				+"IsSecondary           =  "+POut.Bool  (provider.IsSecondary)+", "
+				+"ProvColor             =  "+POut.Int   (provider.ProvColor.ToArgb())+", "
+				+"IsHidden              =  "+POut.Bool  (provider.IsHidden)+", "
+				+"UsingTIN              =  "+POut.Bool  (provider.UsingTIN)+", "
+				+"BlueCrossID           = '"+POut.String(provider.BlueCrossID)+"', "
+				+"SigOnFile             =  "+POut.Bool  (provider.SigOnFile)+", "
+				+"MedicaidID            = '"+POut.String(provider.MedicaidID)+"', "
+				+"OutlineColor          =  "+POut.Int   (provider.OutlineColor.ToArgb())+", "
+				+"SchoolClassNum        =  "+POut.Long  (provider.SchoolClassNum)+", "
+				+"NationalProvID        = '"+POut.String(provider.NationalProvID)+"', "
+				+"CanadianOfficeNum     = '"+POut.String(provider.CanadianOfficeNum)+"', "
 				//DateTStamp can only be set by MySQL
-				+"AnesthProvType      =  "+POut.Long  (provider.AnesthProvType)+", "
-				+"TaxonomyCodeOverride= '"+POut.String(provider.TaxonomyCodeOverride)+"', "
-				+"IsCDAnet            =  "+POut.Bool  (provider.IsCDAnet)+", "
-				+"EcwID               = '"+POut.String(provider.EcwID)+"', "
-				+"StateRxID           = '"+POut.String(provider.StateRxID)+"', "
-				+"IsNotPerson         =  "+POut.Bool  (provider.IsNotPerson)+", "
-				+"StateWhereLicensed  = '"+POut.String(provider.StateWhereLicensed)+"', "
-				+"EmailAddressNum     =  "+POut.Long  (provider.EmailAddressNum)+", "
-				+"IsInstructor        =  "+POut.Bool  (provider.IsInstructor)+", "
-				+"EhrMuStage          =  "+POut.Int   (provider.EhrMuStage)+" "
+				+"AnesthProvType        =  "+POut.Long  (provider.AnesthProvType)+", "
+				+"TaxonomyCodeOverride  = '"+POut.String(provider.TaxonomyCodeOverride)+"', "
+				+"IsCDAnet              =  "+POut.Bool  (provider.IsCDAnet)+", "
+				+"EcwID                 = '"+POut.String(provider.EcwID)+"', "
+				+"StateRxID             = '"+POut.String(provider.StateRxID)+"', "
+				+"IsNotPerson           =  "+POut.Bool  (provider.IsNotPerson)+", "
+				+"StateWhereLicensed    = '"+POut.String(provider.StateWhereLicensed)+"', "
+				+"EmailAddressNum       =  "+POut.Long  (provider.EmailAddressNum)+", "
+				+"IsInstructor          =  "+POut.Bool  (provider.IsInstructor)+", "
+				+"EhrMuStage            =  "+POut.Int   (provider.EhrMuStage)+", "
+				+"ProvNumBillingOverride=  "+POut.Long  (provider.ProvNumBillingOverride)+" "
 				+"WHERE ProvNum = "+POut.Long(provider.ProvNum);
 			Db.NonQ(command);
 		}
@@ -408,6 +412,10 @@ namespace OpenDentBusiness.Crud{
 			if(provider.EhrMuStage != oldProvider.EhrMuStage) {
 				if(command!=""){ command+=",";}
 				command+="EhrMuStage = "+POut.Int(provider.EhrMuStage)+"";
+			}
+			if(provider.ProvNumBillingOverride != oldProvider.ProvNumBillingOverride) {
+				if(command!=""){ command+=",";}
+				command+="ProvNumBillingOverride = "+POut.Long(provider.ProvNumBillingOverride)+"";
 			}
 			if(command==""){
 				return false;

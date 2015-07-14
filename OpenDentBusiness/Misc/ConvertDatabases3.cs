@@ -9037,6 +9037,22 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebServiceHQServerURL','http://www.patientviewer.com:49999/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider ADD ProvNumBillingOverride bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE provider ADD INDEX (ProvNumBillingOverride)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider ADD ProvNumBillingOverride number(20)";
+					Db.NonQ(command);
+					command="UPDATE provider SET ProvNumBillingOverride = 0 WHERE ProvNumBillingOverride IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE provider MODIFY ProvNumBillingOverride NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX provider_ProvNumBillingOverrid ON provider (ProvNumBillingOverride)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -9050,6 +9066,3 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
-
