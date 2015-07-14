@@ -147,44 +147,63 @@ namespace OpenDentBusiness {
 			}
 			if(PrefC.GetString(PrefName.PracticeBillingAddress).Trim()=="") {
 				Comma(strb);
-				strb.Append("Billing Address");
+				strb.Append("Practice Billing Address");
 			}
 			if(PrefC.GetString(PrefName.PracticeBillingCity).Trim().Length<2) {
 				Comma(strb);
-				strb.Append("Billing City");
+				strb.Append("Practice Billing City");
 			}
 			if(PrefC.GetString(PrefName.PracticeBillingST).Trim().Length!=2) {
 				Comma(strb);
-				strb.Append("Billing State(2 char)");
+				strb.Append("Practice Billing State(2 char)");
 			}
-			if(!Regex.IsMatch(PrefC.GetString(PrefName.PracticeBillingZip).Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
+			if(!Regex.IsMatch(PrefC.GetString(PrefName.PracticeBillingZip).Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {
+				//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
 				Comma(strb);
-				strb.Append("Billing Zip");
+				strb.Append("Practice Billing Zip");
 			}
 		}
 
 		///<summary>Clinic passed in must not be null.</summary>
 		public static void Clinic(Clinic clinic,StringBuilder strb) {
+			if(clinic.BillingAddress!="") { //If we're using billing address, check the clinic's billing info for validity.
+				if(clinic.BillingCity.Trim().Length<2) {
+					Comma(strb);
+					strb.Append("Clinic Billing City");
+				}
+				if(clinic.BillingState.Trim().Length!=2) {
+					Comma(strb);
+					strb.Append("Clinic Billing State(2 char)");
+				}
+				if(!Regex.IsMatch(clinic.BillingZip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {
+					//#####, or #####-, or #####-####, or #########.  Dashes are removed when X12 is generated.
+					Comma(strb);
+					strb.Append("Clinic Billing Zip");
+				}
+			}
+			else { //If we're not using billing address, check the clinic's regular info for validity.
+				if(clinic.Address.Trim()=="") {
+					Comma(strb);
+					strb.Append("Clinic Address");
+				}
+				if(clinic.City.Trim().Length<2) {
+					Comma(strb);
+					strb.Append("Clinic City");
+				}
+				if(clinic.State.Trim().Length!=2) {
+					Comma(strb);
+					strb.Append("Clinic State(2 char)");
+				}
+				if(!Regex.IsMatch(clinic.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {
+					//#####, or #####-, or #####-####, or #########.  Dashes are removed when X12 is generated.
+					Comma(strb);
+					strb.Append("Clinic Zip");
+				}
+			}
 			if(clinic.Phone.Length!=10) {//1000A PER04 min length=1.
 				//But 10 digit phone is required in 2010AA and is universally assumed 
 				Comma(strb);
 				strb.Append("Clinic Phone");
-			}
-			if(clinic.Address.Trim()=="") {
-				Comma(strb);
-				strb.Append("Clinic Address");
-			}
-			if(clinic.City.Trim().Length<2) {
-				Comma(strb);
-				strb.Append("Clinic City");
-			}
-			if(clinic.State.Trim().Length!=2) {
-				Comma(strb);
-				strb.Append("Clinic State(2 char)");
-			}
-			if(!Regex.IsMatch(clinic.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
-				Comma(strb);
-				strb.Append("Clinic Zip");
 			}
 		}
 

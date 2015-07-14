@@ -271,6 +271,13 @@ namespace OpenDentBusiness
 					billingState=PrefC.GetString(PrefName.PracticeST);
 					billingZip=PrefC.GetString(PrefName.PracticeZip);
 				}
+				else if(clinic.BillingAddress!="") {//Clinic on claim and there is a billing address override for the clinic.
+					billingAddress1=clinic.BillingAddress;
+					billingAddress2=clinic.BillingAddress2;
+					billingCity=clinic.BillingCity;
+					billingState=clinic.BillingState;
+					billingZip=clinic.BillingZip;
+				}
 				else {
 					billingAddress1=clinic.Address;
 					billingAddress2=clinic.Address2;
@@ -335,10 +342,10 @@ namespace OpenDentBusiness
 					sw.Write(Sout(clinic.Phone,256));//PER04  1/256 Communication Number: Telephone number.
 				}
 				EndSegment(sw);//PER05 through PER08 are situational and PER09 is not used. We do not use.
-				if(PrefC.GetString(PrefName.PracticePayToAddress)!="") {
+				if(clinic!=null && clinic.PayToAddress!="") {//A clinic Pay To address override is present.
 					//2010AB NM1: 87 (medical,institutional,dental) Pay-To Address Name.
 					sw.Write("NM1"+
-						s+"87"+s);//NM101 2/3 Entity Identifier Code: 87=Pay-to Provider.
+					s+"87"+s);//NM101 2/3 Entity Identifier Code: 87=Pay-to Provider.
 					if(medType==EnumClaimMedType.Institutional) {
 						sw.Write("2");//NM102 1/1 Entity Type Qualifier: 2=Non-Person Entity.
 					}
@@ -347,16 +354,41 @@ namespace OpenDentBusiness
 					}
 					EndSegment(sw);//NM103 through NM112 are not used.
 					//2010AB N3: (medical,institutional,dental) Pay-To Address.
-					sw.Write("N3"+s+Sout(PrefC.GetString(PrefName.PracticePayToAddress),55));//N301 1/55 Address Information:
-					if(PrefC.GetString(PrefName.PracticePayToAddress2)!="") {
-						sw.Write(s+Sout(PrefC.GetString(PrefName.PracticePayToAddress2),55));//N302 1/55 Address Information:
+					sw.Write("N3"+s+Sout(clinic.PayToAddress),55);//N301 1/55 Address Information:
+					if(clinic.PayToAddress2!="") {
+						sw.Write(s+Sout(clinic.PayToAddress2,55));//N302 1/55 Address Information:
 					}
 					EndSegment(sw);
 					//2010AB N4: (medical,institutional,dental) Pay-To Address City, State, Zip Code.
-					sw.Write("N4"+s+Sout(PrefC.GetString(PrefName.PracticePayToCity),30)+s//N401 2/30 City Name: 
+					sw.Write("N4"+s+Sout(clinic.PayToCity,30)+s//N401 2/30 City Name: 
+					+Sout(clinic.PayToState,2,2)+s//N402 2/2 State or Province Code: 
+					+Sout(clinic.PayToZip.Replace("-",""),15));//N403 3/15 Postal Code: 
+					EndSegment(sw);//NM404 through NM407 are either situational with United States as default, or not used, so we don't specify any of them.
+				}
+				else { //Use the practice PayToAddress if clinic is null or the clinic's PayToAddress is blank.
+					if(PrefC.GetString(PrefName.PracticePayToAddress)!="") {
+						//2010AB NM1: 87 (medical,institutional,dental) Pay-To Address Name.
+						sw.Write("NM1"+
+						s+"87"+s);//NM101 2/3 Entity Identifier Code: 87=Pay-to Provider.
+						if(medType==EnumClaimMedType.Institutional) {
+							sw.Write("2");//NM102 1/1 Entity Type Qualifier: 2=Non-Person Entity.
+						}
+						else { //(medical,dental)
+							sw.Write((billProv.IsNotPerson?"2":"1"));//NM102 1/1 Entity Type Qualifier: 1=Person, 2=Non-Person Entity.
+						}
+						EndSegment(sw);//NM103 through NM112 are not used.
+						//2010AB N3: (medical,institutional,dental) Pay-To Address.
+						sw.Write("N3"+s+Sout(PrefC.GetString(PrefName.PracticePayToAddress),55));//N301 1/55 Address Information:
+						if(PrefC.GetString(PrefName.PracticePayToAddress2)!="") {
+							sw.Write(s+Sout(PrefC.GetString(PrefName.PracticePayToAddress2),55));//N302 1/55 Address Information:
+						}
+						EndSegment(sw);
+						//2010AB N4: (medical,institutional,dental) Pay-To Address City, State, Zip Code.
+						sw.Write("N4"+s+Sout(PrefC.GetString(PrefName.PracticePayToCity),30)+s//N401 2/30 City Name: 
 						+Sout(PrefC.GetString(PrefName.PracticePayToST),2,2)+s//N402 2/2 State or Province Code: 
 						+Sout(PrefC.GetString(PrefName.PracticePayToZip).Replace("-",""),15));//N403 3/15 Postal Code: 
-					EndSegment(sw);//NM404 through NM407 are either situational with United States as default, or not used, so we don't specify any of them.
+						EndSegment(sw);//NM404 through NM407 are either situational with United States as default, or not used, so we don't specify any of them.
+					}
 				}
 				//2010AC NM1: 98 (medical,institutional,dental) Pay-To Plan Name. We do not use.
 				//2010AC N3: (medical,institutional,dental) Pay-To Plan Address. We do not use.
@@ -2547,16 +2579,64 @@ namespace OpenDentBusiness
 					strb.Append("Practice address cannot be a P.O. BOX when used for e-claims.");
 				}
 			}
-			else {
+			else { //Using a clinic
 				X12Validate.Clinic(clinic,strb);//Tests for 5 or 9 digit zip.
-				string zip=clinic.Zip;
-				if(Regex.IsMatch(zip,"^[0-9]{5}\\-?$")) {//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
-					Comma(strb);
-					strb.Append("Clinic zip must contain nine digits");
+				if(clinic.BillingAddress!="") {//Clinic address billing override present.
+					if(Regex.IsMatch(clinic.BillingZip,"^[0-9]{5}\\-?$")) {
+						//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+						Comma(strb);
+						strb.Append("Clinic billing zip must contain nine digits.");
+					}
+					if(Regex.IsMatch(clinic.BillingAddress,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
+						Comma(strb);
+						strb.Append("Clinic billing address cannot be a P.O. BOX when used for e-claims.");
+					}
 				}
-				if(Regex.IsMatch(clinic.Address,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
+				else {
+					if(Regex.IsMatch(clinic.Zip,"^[0-9]{5}\\-?$")) {
+						//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+						Comma(strb);
+						strb.Append("Clinic zip must contain nine digits.");
+					}
+					if(Regex.IsMatch(clinic.Address,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
+						Comma(strb);
+						strb.Append("Clinic address cannot be a P.O. BOX when used for e-claims.");
+					}
+				}
+			}
+			if(clinic==null || (clinic!=null && clinic.PayToAddress=="")) {//No clinic Pay To address.
+				//If PayTo options exist, we're using them always for PayTo information, so always check them for validity.
+				//We don't check the PayToAddress for validation because simply not being blank is good enough.
+				if(PrefC.GetString(PrefName.PracticePayToAddress).Trim()!="") {
+					if(PrefC.GetString(PrefName.PracticePayToCity).Trim().Length<2) {
+						Comma(strb);
+						strb.Append("Practice Pay To City");
+					}
+					if(PrefC.GetString(PrefName.PracticePayToST).Trim().Length!=2) {
+						Comma(strb);
+						strb.Append("Practice Pay To State");
+					}
+					if(Regex.IsMatch(PrefC.GetString(PrefName.PracticePayToZip),"^[0-9]{5}\\-?$")) {
+						//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+						Comma(strb);
+						strb.Append("Practice Pay To zip must contain nine digits");
+					}
+				}
+			}
+			else {//Clinic Pay To address is present.
+				//If PayTo options exist, we're using them always for PayTo information, so always check them for validity.
+				if(clinic.PayToCity.Trim().Length<2) {
 					Comma(strb);
-					strb.Append("Clinic address cannot be a P.O. BOX when used for e-claims.");
+					strb.Append("Clinic Pay To City");
+				}
+				if(clinic.PayToState.Trim().Length!=2) {
+					Comma(strb);
+					strb.Append("Clinic Pay To State");
+				}
+				if(Regex.IsMatch(clinic.PayToZip.Trim(),"^[0-9]{5}\\-?$")) {
+					//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+					Comma(strb);
+					strb.Append("Clinic Pay To zip must contain nine digits");
 				}
 			}
 			//treatProv

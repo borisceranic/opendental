@@ -20,6 +20,26 @@ namespace OpenDentBusiness{
 		public string State;
 		///<summary>.</summary>
 		public string Zip;
+		///<summary>Overrides Address on claims if not blank.</summary>
+		public string BillingAddress;
+		///<summary>Second line of billing address.</summary>
+		public string BillingAddress2;
+		///<summary>Overrides City on claims if BillingAddress is not blank.</summary>
+		public string BillingCity;
+		///<summary>Overrides State on claims if BillingAddress is not blank.</summary>
+		public string BillingState;
+		///<summary>Overrides Zip on claims if BillingAddress is not blank.</summary>
+		public string BillingZip;
+		///<summary>Overrides practice PayTo address if not blank.</summary>
+		public string PayToAddress;
+		///<summary>Second line of PayTo address.</summary>
+		public string PayToAddress2;
+		///<summary>Overrides practice PayToCity if PayToAddress is not blank.</summary>
+		public string PayToCity;
+		///<summary>Overrides practice PayToState if PayToAddress is not blank.</summary>
+		public string PayToState;
+		///<summary>Overrides practice PayToZip if PayToAddress is not blank.</summary>
+		public string PayToZip;
 		///<summary>Does not include any punctuation.  Exactly 10 digits or blank in USA and Canada.</summary>
 		public string Phone;
 		///<summary>The account number for deposits.</summary>

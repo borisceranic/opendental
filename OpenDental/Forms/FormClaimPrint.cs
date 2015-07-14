@@ -1764,7 +1764,10 @@ namespace OpenDental{
 						}
 						break;
 					case "PayToDentistAddress": //Behaves just like the old BillingDentistAddress field, but is overridden by the Pay-To address if the Pay-To address has been specified.
-						if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
+						if(clinic!=null && clinic.PayToAddress!="") {
+							displayStrings[i]=clinic.PayToAddress;
+						}
+						else if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
 						  displayStrings[i]=PrefC.GetString(PrefName.PracticePayToAddress);
 						}
 						else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)){
@@ -1774,11 +1777,19 @@ namespace OpenDental{
 						  displayStrings[i]=PrefC.GetString(PrefName.PracticeAddress);
 						}
 						else {
-						  displayStrings[i]=clinic.Address;
+							if(clinic.BillingAddress!="") {
+								displayStrings[i]=clinic.BillingAddress;
+							}
+							else {
+								displayStrings[i]=clinic.Address;
+							}
 						}
 						break;
 					case "PayToDentistAddress2": //Behaves just like the old BillingDentistAddress2 field, but is overridden by the Pay-To address if the Pay-To address has been specified.
-						if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
+						if(clinic!=null && clinic.PayToAddress!="") {
+							displayStrings[i]=clinic.PayToAddress2;
+						}
+						else if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
 						  displayStrings[i]=PrefC.GetString(PrefName.PracticePayToAddress2);
 						}
 						else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)){
@@ -1788,11 +1799,19 @@ namespace OpenDental{
 						  displayStrings[i]=PrefC.GetString(PrefName.PracticeAddress2);
 						}
 						else {
-						  displayStrings[i]=clinic.Address2;
+							if(clinic.BillingAddress!="") {
+								displayStrings[i]=clinic.BillingAddress2;
+							}
+							else {
+								displayStrings[i]=clinic.Address2;
+							}
 						}
 						break;
 					case "PayToDentistCity": //Behaves just like the old BillingDentistCity field, but is overridden by the Pay-To address if the Pay-To address has been specified.
-						if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
+						if(clinic!=null && clinic.PayToAddress!="") {
+							displayStrings[i]=clinic.PayToCity;
+						}
+						else if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
 							displayStrings[i]=PrefC.GetString(PrefName.PracticePayToCity);
 						}
 						else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
@@ -1802,11 +1821,19 @@ namespace OpenDental{
 							displayStrings[i]=PrefC.GetString(PrefName.PracticeCity);
 						}
 						else {
-							displayStrings[i]=clinic.City;
+							if(clinic.BillingAddress!="") {
+								displayStrings[i]=clinic.BillingCity;
+							}
+							else {
+								displayStrings[i]=clinic.City;
+							}
 						}
 						break;
 					case "PayToDentistST": //Behaves just like the old BillingDentistST field, but is overridden by the Pay-To address if the Pay-To address has been specified.
-						if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
+						if(clinic!=null && clinic.PayToAddress!="") {
+							displayStrings[i]=clinic.PayToState;
+						}
+						else if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
 							displayStrings[i]=PrefC.GetString(PrefName.PracticePayToST);
 						}
 						else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
@@ -1816,11 +1843,19 @@ namespace OpenDental{
 							displayStrings[i]=PrefC.GetString(PrefName.PracticeST);
 						}
 						else {
-							displayStrings[i]=clinic.State;
+							if(clinic.BillingAddress!="") {
+								displayStrings[i]=clinic.BillingState;
+							}
+							else {
+								displayStrings[i]=clinic.State;
+							}
 						}
 						break;
 					case "PayToDentistZip": //Behaves just like the old BillingDentistZip field, but is overridden by the Pay-To address if the Pay-To address has been specified.
-						if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
+						if(clinic!=null && clinic.PayToAddress!="") {
+							displayStrings[i]=clinic.PayToZip;
+						}
+						else if(PrefC.GetString(PrefName.PracticePayToAddress)!="") { //All Pay-To address fields are used in 5010 eclaims when Pay-To address line 1 is not blank.
 							displayStrings[i]=PrefC.GetString(PrefName.PracticePayToZip);
 						}
 						else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
@@ -1830,7 +1865,12 @@ namespace OpenDental{
 							displayStrings[i]=PrefC.GetString(PrefName.PracticeZip);
 						}
 						else {
-							displayStrings[i]=clinic.Zip;
+							if(clinic.BillingAddress!="") {
+								displayStrings[i]=clinic.BillingZip;
+							}
+							else {
+								displayStrings[i]=clinic.Zip;
+							}
 						}
 						break;
 					case "TreatingDentistFName":

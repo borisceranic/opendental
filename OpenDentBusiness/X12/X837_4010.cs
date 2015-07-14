@@ -236,7 +236,12 @@ namespace OpenDentBusiness {
 						sw.Write("N3*"+Sout(PrefC.GetString(PrefName.PracticeAddress),55));//N301: Address
 					}
 					else {
-						sw.Write("N3*"+Sout(clinic.Address,55));//N301: Address
+						if(clinic.BillingAddress!="") {
+							sw.Write("N3*"+Sout(clinic.BillingAddress,55));//N301: Address
+						}
+						else {
+							sw.Write("N3*"+Sout(clinic.Address,55));//N301: Address
+						}
 					}
 					if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
 						if(PrefC.GetString(PrefName.PracticeBillingAddress2)=="") {
@@ -257,7 +262,15 @@ namespace OpenDentBusiness {
 						}
 					}
 					else {
-						if(clinic.Address2=="") {
+						if(clinic.BillingAddress!="") {
+							if(clinic.BillingAddress2!="") {
+								sw.WriteLine("*"+Sout(clinic.BillingAddress2,55)+"~");
+							}
+							else {
+								sw.WriteLine("~");
+							}
+						}
+						else if(clinic.Address2=="") {
 							sw.WriteLine("~");
 						}
 						else {
@@ -278,9 +291,16 @@ namespace OpenDentBusiness {
 							+Sout(PrefC.GetString(PrefName.PracticeZip).Replace("-",""),15)+"~");//N403: Zip
 					}
 					else {
-						sw.WriteLine("N4*"+Sout(clinic.City,30)+"*"//N401: City
+						if(clinic.BillingAddress!="") {
+							sw.WriteLine("N4*"+Sout(clinic.BillingCity,30)+"*"//N401: City
+								+Sout(clinic.BillingState,2)+"*"//N402: State
+								+Sout(clinic.BillingZip.Replace("-",""),15)+"~");//N403: Zip
+						}
+						else {
+							sw.WriteLine("N4*"+Sout(clinic.City,30)+"*"//N401: City
 							+Sout(clinic.State,2)+"*"//N402: State
 							+Sout(clinic.Zip.Replace("-",""),15)+"~");//N403: Zip
+						}
 					}
 					if(!isMedical) {
 						//2010AA REF: Office phone number. Required by WebMD.  Can possibly be removed now that we're using NPI.

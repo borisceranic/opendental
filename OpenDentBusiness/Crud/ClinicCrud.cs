@@ -53,6 +53,16 @@ namespace OpenDentBusiness.Crud{
 				clinic.City               = PIn.String(table.Rows[i]["City"].ToString());
 				clinic.State              = PIn.String(table.Rows[i]["State"].ToString());
 				clinic.Zip                = PIn.String(table.Rows[i]["Zip"].ToString());
+				clinic.BillingAddress     = PIn.String(table.Rows[i]["BillingAddress"].ToString());
+				clinic.BillingAddress2    = PIn.String(table.Rows[i]["BillingAddress2"].ToString());
+				clinic.BillingCity        = PIn.String(table.Rows[i]["BillingCity"].ToString());
+				clinic.BillingState       = PIn.String(table.Rows[i]["BillingState"].ToString());
+				clinic.BillingZip         = PIn.String(table.Rows[i]["BillingZip"].ToString());
+				clinic.PayToAddress       = PIn.String(table.Rows[i]["PayToAddress"].ToString());
+				clinic.PayToAddress2      = PIn.String(table.Rows[i]["PayToAddress2"].ToString());
+				clinic.PayToCity          = PIn.String(table.Rows[i]["PayToCity"].ToString());
+				clinic.PayToState         = PIn.String(table.Rows[i]["PayToState"].ToString());
+				clinic.PayToZip           = PIn.String(table.Rows[i]["PayToZip"].ToString());
 				clinic.Phone              = PIn.String(table.Rows[i]["Phone"].ToString());
 				clinic.BankNumber         = PIn.String(table.Rows[i]["BankNumber"].ToString());
 				clinic.DefaultPlaceService= (OpenDentBusiness.PlaceOfService)PIn.Int(table.Rows[i]["DefaultPlaceService"].ToString());
@@ -103,7 +113,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -114,6 +124,16 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(clinic.City)+"',"
 				+"'"+POut.String(clinic.State)+"',"
 				+"'"+POut.String(clinic.Zip)+"',"
+				+"'"+POut.String(clinic.BillingAddress)+"',"
+				+"'"+POut.String(clinic.BillingAddress2)+"',"
+				+"'"+POut.String(clinic.BillingCity)+"',"
+				+"'"+POut.String(clinic.BillingState)+"',"
+				+"'"+POut.String(clinic.BillingZip)+"',"
+				+"'"+POut.String(clinic.PayToAddress)+"',"
+				+"'"+POut.String(clinic.PayToAddress2)+"',"
+				+"'"+POut.String(clinic.PayToCity)+"',"
+				+"'"+POut.String(clinic.PayToState)+"',"
+				+"'"+POut.String(clinic.PayToZip)+"',"
 				+"'"+POut.String(clinic.Phone)+"',"
 				+"'"+POut.String(clinic.BankNumber)+"',"
 				+    POut.Int   ((int)clinic.DefaultPlaceService)+","
@@ -156,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -167,6 +187,16 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(clinic.City)+"',"
 				+"'"+POut.String(clinic.State)+"',"
 				+"'"+POut.String(clinic.Zip)+"',"
+				+"'"+POut.String(clinic.BillingAddress)+"',"
+				+"'"+POut.String(clinic.BillingAddress2)+"',"
+				+"'"+POut.String(clinic.BillingCity)+"',"
+				+"'"+POut.String(clinic.BillingState)+"',"
+				+"'"+POut.String(clinic.BillingZip)+"',"
+				+"'"+POut.String(clinic.PayToAddress)+"',"
+				+"'"+POut.String(clinic.PayToAddress2)+"',"
+				+"'"+POut.String(clinic.PayToCity)+"',"
+				+"'"+POut.String(clinic.PayToState)+"',"
+				+"'"+POut.String(clinic.PayToZip)+"',"
 				+"'"+POut.String(clinic.Phone)+"',"
 				+"'"+POut.String(clinic.BankNumber)+"',"
 				+    POut.Int   ((int)clinic.DefaultPlaceService)+","
@@ -195,6 +225,16 @@ namespace OpenDentBusiness.Crud{
 				+"City               = '"+POut.String(clinic.City)+"', "
 				+"State              = '"+POut.String(clinic.State)+"', "
 				+"Zip                = '"+POut.String(clinic.Zip)+"', "
+				+"BillingAddress     = '"+POut.String(clinic.BillingAddress)+"', "
+				+"BillingAddress2    = '"+POut.String(clinic.BillingAddress2)+"', "
+				+"BillingCity        = '"+POut.String(clinic.BillingCity)+"', "
+				+"BillingState       = '"+POut.String(clinic.BillingState)+"', "
+				+"BillingZip         = '"+POut.String(clinic.BillingZip)+"', "
+				+"PayToAddress       = '"+POut.String(clinic.PayToAddress)+"', "
+				+"PayToAddress2      = '"+POut.String(clinic.PayToAddress2)+"', "
+				+"PayToCity          = '"+POut.String(clinic.PayToCity)+"', "
+				+"PayToState         = '"+POut.String(clinic.PayToState)+"', "
+				+"PayToZip           = '"+POut.String(clinic.PayToZip)+"', "
 				+"Phone              = '"+POut.String(clinic.Phone)+"', "
 				+"BankNumber         = '"+POut.String(clinic.BankNumber)+"', "
 				+"DefaultPlaceService=  "+POut.Int   ((int)clinic.DefaultPlaceService)+", "
@@ -235,6 +275,46 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.Zip != oldClinic.Zip) {
 				if(command!=""){ command+=",";}
 				command+="Zip = '"+POut.String(clinic.Zip)+"'";
+			}
+			if(clinic.BillingAddress != oldClinic.BillingAddress) {
+				if(command!=""){ command+=",";}
+				command+="BillingAddress = '"+POut.String(clinic.BillingAddress)+"'";
+			}
+			if(clinic.BillingAddress2 != oldClinic.BillingAddress2) {
+				if(command!=""){ command+=",";}
+				command+="BillingAddress2 = '"+POut.String(clinic.BillingAddress2)+"'";
+			}
+			if(clinic.BillingCity != oldClinic.BillingCity) {
+				if(command!=""){ command+=",";}
+				command+="BillingCity = '"+POut.String(clinic.BillingCity)+"'";
+			}
+			if(clinic.BillingState != oldClinic.BillingState) {
+				if(command!=""){ command+=",";}
+				command+="BillingState = '"+POut.String(clinic.BillingState)+"'";
+			}
+			if(clinic.BillingZip != oldClinic.BillingZip) {
+				if(command!=""){ command+=",";}
+				command+="BillingZip = '"+POut.String(clinic.BillingZip)+"'";
+			}
+			if(clinic.PayToAddress != oldClinic.PayToAddress) {
+				if(command!=""){ command+=",";}
+				command+="PayToAddress = '"+POut.String(clinic.PayToAddress)+"'";
+			}
+			if(clinic.PayToAddress2 != oldClinic.PayToAddress2) {
+				if(command!=""){ command+=",";}
+				command+="PayToAddress2 = '"+POut.String(clinic.PayToAddress2)+"'";
+			}
+			if(clinic.PayToCity != oldClinic.PayToCity) {
+				if(command!=""){ command+=",";}
+				command+="PayToCity = '"+POut.String(clinic.PayToCity)+"'";
+			}
+			if(clinic.PayToState != oldClinic.PayToState) {
+				if(command!=""){ command+=",";}
+				command+="PayToState = '"+POut.String(clinic.PayToState)+"'";
+			}
+			if(clinic.PayToZip != oldClinic.PayToZip) {
+				if(command!=""){ command+=",";}
+				command+="PayToZip = '"+POut.String(clinic.PayToZip)+"'";
 			}
 			if(clinic.Phone != oldClinic.Phone) {
 				if(command!=""){ command+=",";}
