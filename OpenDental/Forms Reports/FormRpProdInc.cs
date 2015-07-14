@@ -576,7 +576,7 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			if(radioDaily.Checked){
+			if(radioDaily.Checked || radioProvider.Checked) {
 				textDateFrom.Text=dateFrom.AddDays(-1).ToShortDateString();
 				textDateTo.Text=dateTo.AddDays(-1).ToShortDateString();
 			}
@@ -609,7 +609,7 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			if(radioDaily.Checked){
+			if(radioDaily.Checked || radioProvider.Checked) {
 				textDateFrom.Text=dateFrom.AddDays(1).ToShortDateString();
 				textDateTo.Text=dateTo.AddDays(1).ToShortDateString();
 			}

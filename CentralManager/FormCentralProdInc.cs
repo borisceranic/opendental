@@ -120,7 +120,7 @@ namespace CentralManager {
 			}
 			_dateFrom=PIn.Date(textDateFrom.Text);
 			_dateTo=PIn.Date(textDateTo.Text);
-			if(radioDaily.Checked) {
+			if(radioDaily.Checked || radioProvider.Checked) {
 				textDateFrom.Text=_dateFrom.AddDays(-1).ToShortDateString();
 				textDateTo.Text=_dateTo.AddDays(-1).ToShortDateString();
 			}
@@ -153,7 +153,7 @@ namespace CentralManager {
 			}
 			_dateFrom=PIn.Date(textDateFrom.Text);
 			_dateTo=PIn.Date(textDateTo.Text);
-			if(radioDaily.Checked) {
+			if(radioDaily.Checked || radioProvider.Checked) {
 				textDateFrom.Text=_dateFrom.AddDays(1).ToShortDateString();
 				textDateTo.Text=_dateTo.AddDays(1).ToShortDateString();
 			}
