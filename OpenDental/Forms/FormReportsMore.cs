@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDentalWpf;
+using OpenDental.Bridges;
 
 namespace OpenDental {
 	/// <summary>
@@ -38,13 +39,13 @@ namespace OpenDental {
 		private OpenDental.UI.ListBoxClickable listMonthly;
 		private UI.Button butGraphicReports;
 		private MenuStrip menuMain;
-		private ToolStripMenuItem setupToolStripMenuItem;
 		private UI.Button butUDS;
 		private UI.Button butPatList;
 		private UI.Button butPatExport;
 		private GroupBox groupBox1;
 		private UI.ODPictureBox pictureDentalIntel;
 		private Label label7;
+		private ToolStripMenuItem setupToolStripMenuItem;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
 
@@ -102,6 +103,7 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
+			this.menuMain.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -171,6 +173,8 @@ namespace OpenDental {
 			// 
 			// menuMain
 			// 
+			this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setupToolStripMenuItem});
 			this.menuMain.Location = new System.Drawing.Point(0, 0);
 			this.menuMain.Name = "menuMain";
 			this.menuMain.Size = new System.Drawing.Size(680, 24);
@@ -441,6 +445,8 @@ namespace OpenDental {
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Reports";
 			this.Load += new System.EventHandler(this.FormReportsMore_Load);
+			this.menuMain.ResumeLayout(false);
+			this.menuMain.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -902,22 +908,7 @@ namespace OpenDental {
 		}
 
 		private void pictureDentalIntel_Click(object sender,EventArgs e) {
-			if(Programs.IsEnabled(ProgramName.DentalIntel)) {
-				try {
-					Process.Start("https://portal.dentalintel.com/");
-				}
-				catch {
-					MsgBox.Show(this,"Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
-				}
-			}
-			else {
-				try {
-					Process.Start("https://opendental.dentalintel.com/");
-				}
-				catch {
-					MsgBox.Show(this,"Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
-				}
-			}
+			DentalIntel.ShowPage();
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {

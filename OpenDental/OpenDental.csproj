@@ -248,6 +248,7 @@
     <Compile Include="Bridges\ClioSoft.cs" />
     <Compile Include="Bridges\AaTemplate.cs" />
     <Compile Include="Bridges\ClaimX_Statements.cs" />
+    <Compile Include="Bridges\DentalIntel.cs" />
     <Compile Include="Bridges\Podium.cs" />
     <Compile Include="Bridges\DentalTek.cs" />
     <Compile Include="Bridges\DemandForce.cs">
