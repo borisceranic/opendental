@@ -52,6 +52,7 @@ namespace OpenDental {
 		private List<SmsPhone> _listPhones;
 		private List<RecallType> _listRecallTypes;
 		private List<Operatory> _listWebSchedOps;
+		private List<Provider> _listProviders;
 		
 		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
 		public FormEServicesSetup(EService setTab=EService.PatientPortal) {
@@ -113,6 +114,13 @@ namespace OpenDental {
 				comboWebSchedClinic.Items.Add(_listAllClinics[i].Description);
 			}
 			comboWebSchedClinic.SelectedIndex=0;
+			_listProviders=ProviderC.GetListShort();
+			comboWebSchedProviders.Items.Clear();
+			comboWebSchedProviders.Items.Add(Lan.g(this,"All"));
+			for(int i=0;i<_listProviders.Count;i++) {
+				comboWebSchedProviders.Items.Add(_listProviders[i].GetLongDesc());
+			}
+			comboWebSchedProviders.SelectedIndex=0;
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				labelWebSchedClinic.Visible=false;
 				comboWebSchedClinic.Visible=false;
@@ -939,11 +947,18 @@ namespace OpenDental {
 			if(comboWebSchedClinic.SelectedIndex > 0) {
 				clinic=_listClinics[comboWebSchedClinic.SelectedIndex-1];//Add one for 'All'.
 			}
+			List<Provider> listProviders=new List<Provider>();
+			if(comboWebSchedProviders.SelectedIndex > 0) {
+				listProviders.Add(_listProviders[comboWebSchedProviders.SelectedIndex-1]);//-1 due to 'All'
+			}
+			else {
+				listProviders=_listProviders;//Use all providers.
+			}
 			Cursor=Cursors.WaitCursor;
 			DataTable tableTimeSlots=new DataTable();
 			try {
 				//Get the next 30 days of open time schedules with the current settings
-				tableTimeSlots=Recalls.GetAvailableWebSchedTimeSlots(recallType,clinic,dateStart,dateStart.AddDays(30));
+				tableTimeSlots=Recalls.GetAvailableWebSchedTimeSlots(recallType,listProviders,clinic,dateStart,dateStart.AddDays(30));
 			}
 			catch(Exception ex) {
 				//The user might not have Web Sched ops set up correctly.  Don't warn them here because it is just annoying.  They'll figure it out.
@@ -1005,6 +1020,10 @@ namespace OpenDental {
 		}
 
 		private void comboWebSchedRecallTypes_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGridWebSchedTimeSlots();
+		}
+
+		private void comboWebSchedProviders_SelectionChangeCommitted(object sender,EventArgs e) {
 			FillGridWebSchedTimeSlots();
 		}
 

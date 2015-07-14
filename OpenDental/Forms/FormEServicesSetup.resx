@@ -140,6 +140,12 @@ If Open Dental is hosting your Patient Portal:
 
 For more information, see our online manual.</value>
   </data>
+  <data name="labelWebSchedDesc.Text" xml:space="preserve">
+    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
+
+This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
+For more information, see our online manual.</value>
+  </data>
   <data name="label25.Text" xml:space="preserve">
     <value>The Listener Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the Listener Service again.  Make sure to install the Listener Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
 
@@ -158,12 +164,6 @@ Installing the Listener Service for the first time requires installing the OpenD
 - Only shows time slots for the patients primary provider
 - Only shows time slots for the patients secondary provider
 - Only shows time slots for the last hygienist the patient saw.</value>
-  </data>
-  <data name="labelWebSchedDesc.Text" xml:space="preserve">
-    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
-
-This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
-For more information, see our online manual.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="butBackMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

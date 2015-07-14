@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -570,6 +571,58 @@ namespace OpenDentBusiness{
 			return Db.GetTable(command);
 		}
 
+		///<summary>Returns the patient's last seen hygienist.  Returns null if no hygienist has been seen.</summary>
+		public static Provider GetLastSeenHygienistForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Provider>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			//Look at all completed appointments and get the most recent secondary provider on it.
+			string command=@"SELECT appointment.ProvHyg
+				FROM appointment
+				WHERE appointment.PatNum="+POut.Long(patNum)+@"
+				AND appointment.ProvHyg!=0
+				AND appointment.AptStatus="+POut.Int((int)ApptStatus.Complete)+@"
+				ORDER BY AptDateTime DESC";
+			List<long> listPatHygNums=Db.GetListLong(command);
+			//Now that we have all hygienists for this patient.  Lets find the last non-hidden hygienist and return that one.
+			List<Provider> listProviders=ProviderC.GetListShort();
+			List<long> listProvNums=listProviders.Select(x => x.ProvNum).Distinct().ToList();
+			long lastHygNum=listPatHygNums.FirstOrDefault(x => listProvNums.Contains(x));
+			return listProviders.FirstOrDefault(x => x.ProvNum==lastHygNum);
+		}
+
+		///<summary>Gets a list of providers based for the patient passed in based on the WebSchedProviderRule preference.</summary>
+		public static List<Provider> GetProvidersForWebSched(long patNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> listProviders=ProviderC.GetListShort();
+			WebSchedProviderRules providerRule=(WebSchedProviderRules)PrefC.GetInt(PrefName.WebSchedProviderRule);
+			switch(providerRule) {
+				case WebSchedProviderRules.PrimaryProvider:
+					Patient patPri=Patients.GetPat(patNum);
+					Provider patPriProv=listProviders.Find(x => x.ProvNum==patPri.PriProv);
+					if(patPriProv==null) {
+						return listProviders;//Use all providers (default behavior)
+					}
+					return new List<Provider>() { patPriProv };
+				case WebSchedProviderRules.SecondaryProvider:
+					Patient patSec=Patients.GetPat(patNum);
+					Provider patSecProv=listProviders.Find(x => x.ProvNum==patSec.SecProv);
+					if(patSecProv==null) {
+						return listProviders;//Use all providers (default behavior)
+					}
+					return new List<Provider>() { patSecProv };
+				case WebSchedProviderRules.LastSeenHygienist:
+					Provider lastHygProvider=GetLastSeenHygienistForPat(patNum);
+					if(lastHygProvider==null) {
+						return listProviders;//Use all providers (default behavior)
+					}
+					return new List<Provider>() { lastHygProvider };
+				case WebSchedProviderRules.FirstAvailable:
+				default:
+					return listProviders;
+			}
+		}
+
 		public static List<long> GetChangedSinceProvNums(DateTime changedSince) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),changedSince);
@@ -695,6 +748,7 @@ namespace OpenDentBusiness{
 			}
 			return false;
 		}
+
 
 
 	}

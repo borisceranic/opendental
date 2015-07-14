@@ -569,36 +569,38 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets a data table that contains all schedules and blockouts that meet our Web Sched requirements.  See comments inside for more detail.</summary>
-		public static DataTable GetSchedulesAndBlockoutsForWebSched(DateTime dateStart,DateTime dateEnd) {
+		public static DataTable GetSchedulesAndBlockoutsForWebSched(List<Provider> listProviders,DateTime dateStart,DateTime dateEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listProviders,dateStart,dateEnd);
 			}
-			//Get all the Operatories that are flagged for Web Sched.
-			List<Operatory> listWebSchedOps=Operatories.GetOpsForWebSched();
-			List<long> listWebSchedOpNums=listWebSchedOps.Select(x => x.OperatoryNum).Distinct().ToList();
-			if(listWebSchedOpNums.Count==0) {
-				//Make sure there is at least one item in the list so that we can return an empty DataTable with the correct structure.
-				listWebSchedOpNums.Add(0);//0 should NEVER be a PK in the operatory table.
+			List<long> listProvNums=new List<long>();
+			if(listProviders==null || listProviders.Count==0) {
+				listProvNums.Add(0);
+			}
+			else {
+				listProvNums=listProviders.Select(x => x.ProvNum).Distinct().ToList();
 			}
 			//Grab all schedules and blockouts within operatories flagged for Web Sched.
 			string command=@"-- First, get all schedules associated to operatories.
-				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder
+				(SELECT schedule.*,operatory.OperatoryNum,operatory.ItemOrder
 					FROM schedule 
 					INNER JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
 					INNER JOIN operatory ON operatory.OperatoryNum=scheduleop.OperatoryNum
-					AND operatory.OperatoryNum IN ("+String.Join(",",listWebSchedOpNums)+@")
+					WHERE operatory.IsWebSched=1
+					AND schedule.ProvNum IN ("+String.Join(",",listProvNums)+@")
 					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
 					AND "+DbHelper.DtimeToDate("schedule.SchedDate")+">="+POut.Date(dateStart)+" "
 					+"AND "+DbHelper.DtimeToDate("schedule.SchedDate")+"<="+POut.Date(dateEnd)+") "
 				+@"UNION -- Using UNION instead of UNION ALL because we want duplicate entries to be removed.
 				-- Next, get all schedules that are not associated to any operatories
-				(SELECT schedule.SchedDate,schedule.StartTime,schedule.StopTime,schedule.BlockoutType,operatory.OperatoryNum,operatory.ItemOrder 
+				(SELECT schedule.*,operatory.OperatoryNum,operatory.ItemOrder 
 					FROM schedule
 					INNER JOIN provider ON schedule.ProvNum=provider.ProvNum
 					INNER JOIN operatory ON schedule.ProvNum=operatory.ProvDentist OR schedule.ProvNum=operatory.ProvHygienist
 					LEFT JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum
 					WHERE provider.IsHidden!=1
-					AND operatory.OperatoryNum IN ("+String.Join(",",listWebSchedOpNums)+@")
+					AND provider.ProvNum IN ("+String.Join(",",listProvNums)+@")
+					AND operatory.IsWebSched=1
 					AND schedule.BlockoutType > -1 -- We need to include all blockouts and non-blockouts.
 					AND scheduleop.OperatoryNum IS NULL -- Only consider schedules that are NOT assigned to any operatories (dynamic schedules)
 					AND "+DbHelper.DtimeToDate("schedule.SchedDate")+">="+POut.Date(dateStart)+" "

@@ -1138,20 +1138,24 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			Clinic clinic=Clinics.GetClinicForRecall(recallNum);
 			Recall recall=Recalls.GetRecall(recallNum);
+			List<Provider> listProviders=Providers.GetProvidersForWebSched(recall.PatNum);
 			if(recall==null) {
 				throw new ODException(Lans.g("WebSched","The recall appointment you are trying to schedule is no longer available.")+"\r\n"
 					+Lans.g("WebSched","Please call us to schedule your appointment."));
 			}
 			List<RecallType> listRecallTypes=RecallTypeC.GetListt();
 			RecallType recallType=listRecallTypes.FirstOrDefault(x => x.RecallTypeNum==recall.RecallTypeNum);
-			return GetAvailableWebSchedTimeSlots(recallType,clinic,dateStart,dateEnd);
+			return GetAvailableWebSchedTimeSlots(recallType,listProviders,clinic,dateStart,dateEnd);
 		}
 
 		///<summary>Gets up to 30 days of open time slots based on the RecallType passed in.
 		///Open time slots are found by looping through operatories flagged for Web Sched and finding openings that can hold the RecallType.
-		///The RecallType passed in must be a valid recall type.  Passing in a null clinic will not filter ops by clinics.</summary>
+		///The RecallType passed in must be a valid recall type.
+		///Providers passed in will be the only providers considered when looking for available time slots.
+		///Passing in a null clinic will not filter ops by clinics.
+		///The timeslots on / or between the Start and End dates passed in will be considered.</summary>
 		///<returns>DataTable with 4 columns: SchedDate (date), TimeStart (DateTime), TimeStop (DateTime), OperatoryNum (long)</returns>
-		public static DataTable GetAvailableWebSchedTimeSlots(RecallType recallType,Clinic clinic,DateTime dateStart,DateTime dateEnd) {
+		public static DataTable GetAvailableWebSchedTimeSlots(RecallType recallType,List<Provider> listProviders,Clinic clinic,DateTime dateStart,DateTime dateEnd) {
 			//No need to check RemotingRole; no call to db.
 			if(recallType==null) {//Validate that recallType is not null.
 				throw new ODException(Lans.g("WebSched","The recall appointment you are trying to schedule is no longer available.")+"\r\n"
@@ -1164,20 +1168,16 @@ namespace OpenDentBusiness{
 				throw new ODException(Lans.g("WebSched","There are no operatories set up for Web Sched.")+"\r\n"
 					+Lans.g("WebSched","Please call us to schedule your appointment."));
 			}
-			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(dateStart,dateEnd);
-			//Make a table that will store all blockouts.
-			DataTable tableBlockouts=GetUniqueBlockoutsFromSchedule(tableSchedules);
-			List<Appointment> listApptsForOps=Appointments.GetAppointmentsForOpsByPeriod(listWebSchedOpNums,dateStart,dateEnd); 
-			DataTable tableAppts=new DataTable();
-			tableAppts.Columns.Add("Op");
-			tableAppts.Columns.Add("AptDateTime");
-			tableAppts.Columns.Add("AptDateTimeEnd");
-			//Loop through each appointment in the operatories and fill the custom data table we just created for ease of use.
-			for(int i=0;i<listApptsForOps.Count;i++) {
-				tableAppts.Rows.Add(listApptsForOps[i].Op
-					,listApptsForOps[i].AptDateTime
-					,listApptsForOps[i].AptDateTime.AddMinutes(listApptsForOps[i].Pattern.Length*5));
-			}
+			DataTable tableSchedules=Schedules.GetSchedulesAndBlockoutsForWebSched(listProviders,dateStart,dateEnd);
+			//Convert the custom data table (includes operatory info) into a list of schedules so that other methods can have access to the info.
+			List<Schedule> listAllSchedules=Crud.ScheduleCrud.TableToList(tableSchedules);//Does not call the db.
+			List<Schedule> listProviderSchedules=listAllSchedules.FindAll(x => x.BlockoutType==0);//Ignore blockouts.
+			DataTable tableBlockouts=GetBlockoutsFromSchedule(tableSchedules);//Make a custom table that will store all blockouts with op info.
+			List<Appointment> listApptsForOps=Appointments.GetAppointmentsForOpsByPeriod(listWebSchedOpNums,dateStart,dateEnd);
+			List<long> listProvNums=listProviders.Select(x => x.ProvNum).Distinct().ToList();
+			//We need to be conscious of double booking possibilities.  Go get provider schedule information for the date range passed in.
+			Dictionary<DateTime,List<ApptSearchProviderSchedule>> dictProvSchedules=Appointments.GetApptSearchProviderScheduleForProvidersAndDate(
+				listProvNums,dateStart,dateEnd,listProviderSchedules,listApptsForOps);
 			//Create the custom DataTable of available time slots which we will be returning.
 			DataTable tableAvailableTimes=new DataTable();
 			tableAvailableTimes.Columns.Add("SchedDate");
@@ -1255,11 +1255,12 @@ namespace OpenDentBusiness{
 					//Check to see if we've found an opening.
 					TimeSpan timeSpanCur=timeSlotStop-timeSlotStart;
 					if(timeSpanCur.Minutes==apptLengthMins) {
+						//We just found an opening.  Make sure we don't already have this time slot available.
 						DateTime dateTimeSlotStart=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStart.Hours,timeSlotStart.Minutes,0);
 						DateTime dateTimeSlotStop=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStop.Hours,timeSlotStop.Minutes,0);
 						TimeSlot timeSlot=new TimeSlot(dateTimeSlotStart,dateTimeSlotStop,PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString()));
-						//We just found an opening.  Make sure we don't already have this time slot available.
 						bool isTimeSlotAlreadyAvailable=false;
+						bool hasDoubleBookingConflict=false;
 						for(int j=0;j<listAvailableTimeSlots.Count;j++) {
 							if(listAvailableTimeSlots[j].DateTimeStart==dateTimeSlotStart
 								&& listAvailableTimeSlots[j].DateTimeStop==dateTimeSlotStop) 
@@ -1269,15 +1270,25 @@ namespace OpenDentBusiness{
 							}
 						}
 						if(!isTimeSlotAlreadyAvailable) {
-							//If the time slot doesn't already exist, add it to our list of available time slots.
-							listAvailableTimeSlots.Add(timeSlot);
+							//Check for double booking.
+							if(dictProvSchedules.ContainsKey(dateSched.Date)) {
+								long recallProvNum=PIn.Long(tableSchedules.Rows[i]["ProvNum"].ToString());
+								if(IsWebSchedDoubleBooked(dictProvSchedules[dateSched.Date],recallProvNum,RecallTypes.ConvertTimePattern(recallType.TimePattern),dateTimeSlotStart)) {
+									//There is a double booking conflict.  Do not add this time slot as a possibility and move on.
+									hasDoubleBookingConflict=true;
+								}
+							}
+							if(!hasDoubleBookingConflict) {
+								//There are no collisions with this provider's schedule, add it to our list of available time slots.
+								listAvailableTimeSlots.Add(timeSlot);
+							}
 						}
 						//Continue looking for more open slots starting at the end of this time slot.
 						//E.g. we just found 9:30 AM to 10:00 AM.  We need to continue from 10:00 AM.
 						timeSlotStart=timeSlotStop;
 						continue;
 					}
-					//Check to see if there is an appointment or a blockout that colides with this blockout.
+					//Check to see if there is an appointment or a blockout that collides with this blockout.
 					bool isOverlapping=false;
 					//First we'll look at blockouts because it should be quicker than looking at the appointments
 					for(int k=0;k<tableBlockouts.Rows.Count;k++) {
@@ -1305,17 +1316,16 @@ namespace OpenDentBusiness{
 						continue;
 					}
 					//Next we'll look for overlapping appointments
-					for(int k=0;k<tableAppts.Rows.Count;k++) {
-						if(schedOpNum!=PIn.Long(tableAppts.Rows[k]["Op"].ToString())) {
+					for(int k=0;k<listApptsForOps.Count;k++) {
+						if(schedOpNum!=listApptsForOps[k].Op) {
 							continue;
 						}
-						DateTime dateAppt=PIn.DateT(tableAppts.Rows[k]["AptDateTime"].ToString());
-						if(dateSched.Date!=dateAppt.Date) {
+						if(dateSched.Date!=listApptsForOps[k].AptDateTime.Date) {
 							continue;//Appt is not on the same day that we are looking at.
 						}
 						//Same operatory and day, check if the times overlap.
-						TimeSpan timeApptStart=dateAppt.TimeOfDay;
-						TimeSpan timeApptStop=PIn.DateT(tableAppts.Rows[k]["AptDateTimeEnd"].ToString()).TimeOfDay;
+						TimeSpan timeApptStart=listApptsForOps[k].AptDateTime.TimeOfDay;
+						TimeSpan timeApptStop=listApptsForOps[k].AptDateTime.AddMinutes(listApptsForOps[k].Pattern.Length*5).TimeOfDay;
 						if(IsTimeOverlapping(timeSlotStart,timeSlotStop,timeApptStart,timeApptStop)) {
 							isOverlapping=true;
 							break;
@@ -1336,6 +1346,9 @@ namespace OpenDentBusiness{
 					dateLastTimeSlot=dateSched;
 				}
 			}
+			//Order the entire list of available time slots so that they are displayed to the user in sequential order.
+			//We need to do this because we loop through each provider's schedule one at a time and add openings as we find them.
+			listAvailableTimeSlots=listAvailableTimeSlots.OrderBy(x => x.DateTimeStart).ToList();
 			//Turn the list of available times into a DataTable.
 			for(int i=0;i<listAvailableTimeSlots.Count;i++) {
 				tableAvailableTimes.Rows.Add(listAvailableTimeSlots[i].DateTimeStart.ToShortDateString()
@@ -1348,7 +1361,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a datatable that matches the structure of the table passed in where the column BlockoutType is > 0.
 		///Returns an empty DataTable if no blockouts found.</summary>
-		private static DataTable GetUniqueBlockoutsFromSchedule(DataTable tableSchedules) {
+		private static DataTable GetBlockoutsFromSchedule(DataTable tableSchedules) {
 			//No need to check RemotingRole; no call to db.
 			DataTable tableBlockouts=tableSchedules.Clone();
 			for(int i=0;i<tableSchedules.Rows.Count;i++) {
@@ -1358,6 +1371,23 @@ namespace OpenDentBusiness{
 				}
 			}
 			return tableBlockouts;
+		}
+
+		///<summary>Checks to see if the recallProvNum provider has any double booking issues with the recall pattern passed in.
+		///timePattern must be a time pattern in 5 minute increments.</summary>
+		private static bool IsWebSchedDoubleBooked(List<ApptSearchProviderSchedule> listProviderSchedules,long recallProvNum,string timePattern,DateTime dateTimeRecallStart) {
+			List<ApptSearchProviderSchedule> listProviderSchedulesForProv=listProviderSchedules.FindAll(x => x.ProviderNum==recallProvNum);
+			//Figure out what 5 min increment the dateTimeRecallStart passed in starts on.
+			int startingIncrement=(int)dateTimeRecallStart.TimeOfDay.TotalMinutes/5;
+			for(int i=0;i<listProviderSchedulesForProv.Count;i++) {//There should only be one.
+				//Check to make sure the ProvBar does not have any conflicts with the recallPattern passed in.
+				for(int j=0;j<timePattern.Length;j++) {
+					if(!listProviderSchedules[i].ProvBar[startingIncrement+j]) {//False means there is a collision in the providers schedule.
+						return true;
+					}
+				}
+			}
+			return false;//No double booking collision.
 		}
 
 		///<summary>Checks if the two times passed in overlap.</summary>

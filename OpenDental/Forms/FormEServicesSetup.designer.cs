@@ -136,6 +136,8 @@ namespace OpenDental{
 			this.butToday = new OpenDental.UI.Button();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
+			this.label22 = new System.Windows.Forms.Label();
+			this.comboWebSchedProviders = new System.Windows.Forms.ComboBox();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -953,6 +955,8 @@ namespace OpenDental{
 			// 
 			// groupWebSchedPreview
 			// 
+			this.groupWebSchedPreview.Controls.Add(this.label22);
+			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedProviders);
 			this.groupWebSchedPreview.Controls.Add(this.butWebSchedToday);
 			this.groupWebSchedPreview.Controls.Add(this.gridWebSchedTimeSlots);
 			this.groupWebSchedPreview.Controls.Add(this.label32);
@@ -1019,7 +1023,7 @@ namespace OpenDental{
 			// 
 			// labelWebSchedClinic
 			// 
-			this.labelWebSchedClinic.Location = new System.Drawing.Point(200, 101);
+			this.labelWebSchedClinic.Location = new System.Drawing.Point(200, 142);
 			this.labelWebSchedClinic.Name = "labelWebSchedClinic";
 			this.labelWebSchedClinic.Size = new System.Drawing.Size(182, 14);
 			this.labelWebSchedClinic.TabIndex = 264;
@@ -1040,7 +1044,7 @@ namespace OpenDental{
 			this.comboWebSchedClinic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboWebSchedClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboWebSchedClinic.Location = new System.Drawing.Point(200, 118);
+			this.comboWebSchedClinic.Location = new System.Drawing.Point(200, 159);
 			this.comboWebSchedClinic.MaxDropDownItems = 30;
 			this.comboWebSchedClinic.Name = "comboWebSchedClinic";
 			this.comboWebSchedClinic.Size = new System.Drawing.Size(205, 21);
@@ -1506,6 +1510,27 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// label22
+			// 
+			this.label22.Location = new System.Drawing.Point(200, 101);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(182, 14);
+			this.label22.TabIndex = 310;
+			this.label22.Text = "Provider";
+			this.label22.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// comboWebSchedProviders
+			// 
+			this.comboWebSchedProviders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboWebSchedProviders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboWebSchedProviders.Location = new System.Drawing.Point(200, 118);
+			this.comboWebSchedProviders.MaxDropDownItems = 30;
+			this.comboWebSchedProviders.Name = "comboWebSchedProviders";
+			this.comboWebSchedProviders.Size = new System.Drawing.Size(205, 21);
+			this.comboWebSchedProviders.TabIndex = 311;
+			this.comboWebSchedProviders.SelectionChangeCommitted += new System.EventHandler(this.comboWebSchedProviders_SelectionChangeCommitted);
+			// 
 			// FormEServicesSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1662,6 +1687,8 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label31;
 		private System.Windows.Forms.Label label21;
 		private System.Windows.Forms.ListBox listBoxWebSchedProviderPref;
+		private System.Windows.Forms.Label label22;
+		private System.Windows.Forms.ComboBox comboWebSchedProviders;
 
 	}
 }

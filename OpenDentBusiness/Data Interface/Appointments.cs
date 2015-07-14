@@ -2007,7 +2007,7 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
 
-		///<summary>Gets the ProvNum for the last completed appointment for a patient. If none, returns 0.</summary>
+		///<summary>Gets the ProvNum for the last completed or scheduled appointment for a patient. If none, returns 0.</summary>
 		public static long GetProvNumFromLastApptForPat(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod(),patNum);
@@ -2021,6 +2021,92 @@ namespace OpenDentBusiness{
 				return 0;
 			}
 			return PIn.Long(result);
+		}
+
+		///<summary>Uses the input parameters to construct a List&lt;ApptSearchProviderSchedule&gt;. It is written to reduce the number of queries to the database.</summary>
+		/// <param name="listProvNums">PrimaryKeys to Provider.</param>
+		/// <param name="dateScheduleStart">The date that will start looking for provider schedule information.</param>
+		/// <param name="dateScheduleStop">The date that will stop looking for provider schedule information.</param>
+		/// <param name="listSchedules">A List of Schedules containing all of the schedules for the given day, or possibly more. 
+		/// Intended to be all schedules between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
+		/// <param name="listAppointments">A List of Appointments containing all of the schedules for the given day, or possibly more. 
+		/// Intended to be all Appointments between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
+		public static Dictionary<DateTime,List<ApptSearchProviderSchedule>> GetApptSearchProviderScheduleForProvidersAndDate(List<long> listProvNums,DateTime dateScheduleStart,DateTime dateScheduleStop,List<Schedule> listSchedules,List<Appointment> listAppointments) {//Not working properly when scheduled but no ops are set.
+			//No need to check RemotingRole; no call to db.
+			Dictionary<DateTime,List<ApptSearchProviderSchedule>> dictProviderSchedulesByDate=new Dictionary<DateTime,List<ApptSearchProviderSchedule>>();
+			List<ApptSearchProviderSchedule> listProviderSchedules=new List<ApptSearchProviderSchedule>();
+			if(dateScheduleStart.Date<=dateScheduleStop.Date) {
+				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart,listSchedules,listAppointments);
+				dictProviderSchedulesByDate.Add(dateScheduleStart.Date,listProviderSchedules);
+				return dictProviderSchedulesByDate;
+			}
+			//Loop through all the days between the start and stop date and return the ApptSearchProviderSchedule's for all days.
+			for(int i=0;i<(dateScheduleStop-dateScheduleStart).Days;i++) {
+				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart.AddDays(i),listSchedules,listAppointments);
+				if(dictProviderSchedulesByDate.ContainsKey(dateScheduleStart.AddDays(i))) {//Just in case.
+					dictProviderSchedulesByDate[dateScheduleStart.AddDays(i)]=listProviderSchedules;
+				}
+				else {
+					dictProviderSchedulesByDate.Add(dateScheduleStart.AddDays(i),listProviderSchedules);
+				}
+			}
+			return dictProviderSchedulesByDate;
+		}
+
+		///<summary>Uses the input parameters to construct a List&lt;ApptSearchProviderSchedule&gt;. It is written to reduce the number of queries to the database.</summary>
+		/// <param name="ProviderNums">PrimaryKeys to Provider.</param>
+		/// <param name="ScheduleDate">The date to construct the schedule for.</param>
+		/// <param name="ScheduleList">A List of Schedules containing all of the schedules for the given day, or possibly more. 
+		/// Intended to be all schedules between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
+		/// <param name="AppointmentList">A List of Appointments containing all of the schedules for the given day, or possibly more. 
+		/// Intended to be all Appointments between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
+		public static List<ApptSearchProviderSchedule> GetApptSearchProviderScheduleForProvidersAndDate(List<long> ProviderNums,DateTime ScheduleDate,List<Schedule> ScheduleList,List<Appointment> AppointmentList) {//Not working properly when scheduled but no ops are set.
+			//No need to check RemotingRole; no call to db.
+			List<ApptSearchProviderSchedule> retVal=new List<ApptSearchProviderSchedule>();
+			ScheduleDate=ScheduleDate.Date;
+			for(int i=0;i<ProviderNums.Count;i++) {
+				retVal.Add(new ApptSearchProviderSchedule());
+				retVal[i].ProviderNum=ProviderNums[i];
+				retVal[i].SchedDate=ScheduleDate;
+			}
+			for(int s=0;s<ScheduleList.Count;s++) {
+				if(ScheduleList[s].SchedDate.Date!=ScheduleDate) {//ignore schedules for different dates.
+					continue;
+				}
+				if(ProviderNums.Contains(ScheduleList[s].ProvNum)) {//schedule applies to one of the selected providers
+					int indexOfProvider = ProviderNums.IndexOf(ScheduleList[s].ProvNum);//cache the provider index
+					int scheduleStartBlock = (int)ScheduleList[s].StartTime.TotalMinutes/5;//cache the start time of the schedule
+					int scheduleLengthInBlocks = (int)(ScheduleList[s].StopTime-ScheduleList[s].StartTime).TotalMinutes/5;//cache the length of the schedule
+					for(int i=0;i<scheduleLengthInBlocks;i++) {
+						retVal[indexOfProvider].ProvBar[scheduleStartBlock+i]=true;//provider may have an appointment here
+						retVal[indexOfProvider].ProvSchedule[scheduleStartBlock+i]=true;//provider is scheduled today
+					}
+				}
+			}
+			for(int a=0;a<AppointmentList.Count;a++) {
+				if(AppointmentList[a].AptDateTime.Date!=ScheduleDate) {
+					continue;
+				}
+				if(!AppointmentList[a].IsHygiene && ProviderNums.Contains(AppointmentList[a].ProvNum)) {//Not hygiene Modify provider bar based on ProvNum
+					int indexOfProvider = ProviderNums.IndexOf(AppointmentList[a].ProvNum);
+					int appointmentCurStartBlock = (int)AppointmentList[a].AptDateTime.TimeOfDay.TotalMinutes/5;
+					for(int i=0;i<AppointmentList[a].Pattern.Length;i++) {
+						if(AppointmentList[a].Pattern[i]=='X') {
+							retVal[indexOfProvider].ProvBar[appointmentCurStartBlock+i]=false;
+						}
+					}
+				}
+				else if(AppointmentList[a].IsHygiene && ProviderNums.Contains(AppointmentList[a].ProvHyg)) {//Modify provider bar based on ProvHyg
+					int indexOfProvider = ProviderNums.IndexOf(AppointmentList[a].ProvHyg);
+					int appointmentStartBlock = (int)AppointmentList[a].AptDateTime.TimeOfDay.TotalMinutes/5;
+					for(int i=0;i<AppointmentList[a].Pattern.Length;i++) {
+						if(AppointmentList[a].Pattern[i]=='X') {
+							retVal[indexOfProvider].ProvBar[appointmentStartBlock+i]=false;
+						}
+					}
+				}
+			}
+			return retVal;
 		}
 
 		///<summary>Returns true if the patient has any broken appointments, future appointments, unscheduled appointments, or unsched planned appointments.  This adds intelligence when user attempts to schedule an appointment by only showing the appointments for the patient when needed rather than always.</summary>
@@ -2265,6 +2351,37 @@ namespace OpenDentBusiness{
 			}
 			return listProcs;
 		}
+
+	}
+
+	///<summary>Holds information about a provider's Schedule. Not actual database table.</summary>
+	public class ApptSearchProviderSchedule {
+		///<summary>FK to Provider</summary>
+		public long ProviderNum;
+		///<summary>Date of the ProviderSchedule.</summary>
+		public DateTime SchedDate;
+		///<summary>This contains a bool for each 5 minute block throughout the day. True means provider is scheduled to work, False means provider is not scheduled to work.</summary>
+		public bool[] ProvSchedule;
+		///<summary>This contains a bool for each 5 minute block throughout the day. True means available, False means something is scheduled there or the provider is not scheduled to work.</summary>
+		public bool[] ProvBar;
+
+		///<summary>Constructor.</summary>
+		public ApptSearchProviderSchedule() {
+			ProvSchedule=new bool[288];
+			ProvBar=new bool[288];
+		}
+	}
+
+	///<summary>Holds information about a operatory's Schedule. Not actual database table.</summary>
+	public class ApptSearchOperatorySchedule {
+		///<summary>FK to Operatory</summary>
+		public long OperatoryNum;
+		///<summary>Date of the OperatorySchedule.</summary>
+		public DateTime SchedDate;
+		///<summary>This contains a bool for each 5 minute block throughout the day. True means operatory is open, False means operatory is in use.</summary>
+		public bool[] OperatorySched;
+		///<summary>List of providers 'allowed' to work in this operatory.</summary>
+		public List<long> ProviderNums;
 
 	}
 }

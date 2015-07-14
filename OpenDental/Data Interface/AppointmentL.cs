@@ -37,7 +37,7 @@ namespace OpenDental{
 				potentialOpAppointmentTime = new List<DateTime>();//clear or create
 				//Providers-------------------------------------------------------------------------------------------------------------------------------------
 				potentialProvAppointmentTime = new List<DateTime>();//clear or create
-				provScheds = GetForProvidersAndDate(providerNums,dayEvaluating,scheduleListAll,appointmentListAll);
+				provScheds = Appointments.GetApptSearchProviderScheduleForProvidersAndDate(providerNums,dayEvaluating,scheduleListAll,appointmentListAll);
 				for(int i=0;i<provScheds.Count;i++) {
 					for(int j=0;j<288;j++) {//search every 5 minute increment per day
 						if(j+appointmentToAdd.Pattern.Length>288) {
@@ -133,61 +133,6 @@ namespace OpenDental{
 						break;
 				}
 				dayEvaluating=dayEvaluating.AddDays(1);
-			}
-			return retVal;
-		}
-
-		///<summary>Uses the input parameters to construct a List&lt;ApptSearchProviderSchedule&gt;. It is written to reduce the number of queries to the database.</summary>
-		/// <param name="ProviderNums">PrimaryKeys to Provider.</param>
-		/// <param name="ScheduleDate">The date to construct the schedule for.</param>
-		/// <param name="ScheduleList">A List of Schedules containing all of the schedules for the given day, or possibly more. 
-		/// Intended to be all schedules between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
-		/// <param name="AppointmentList">A List of Appointments containing all of the schedules for the given day, or possibly more. 
-		/// Intended to be all Appointments between search start date and search start date plus 2 years. This is to reduce queries to DB.</param>
-		private static List<ApptSearchProviderSchedule> GetForProvidersAndDate(List<long> ProviderNums,DateTime ScheduleDate,List<Schedule> ScheduleList,List<Appointment> AppointmentList) {//Not working properly when scheduled but no ops are set.
-			List<ApptSearchProviderSchedule> retVal=new List<ApptSearchProviderSchedule>();
-			ScheduleDate=ScheduleDate.Date;
-			for(int i=0;i<ProviderNums.Count;i++) {
-				retVal.Add(new ApptSearchProviderSchedule());
-				retVal[i].ProviderNum=ProviderNums[i];
-				retVal[i].SchedDate=ScheduleDate;
-			}
-			for(int s=0;s<ScheduleList.Count;s++) {
-				if(ScheduleList[s].SchedDate.Date!=ScheduleDate) {//ignore schedules for different dates.
-					continue;
-				}
-				if(ProviderNums.Contains(ScheduleList[s].ProvNum)) {//schedule applies to one of the selected providers
-					int indexOfProvider = ProviderNums.IndexOf(ScheduleList[s].ProvNum);//cache the provider index
-					int scheduleStartBlock = (int)ScheduleList[s].StartTime.TotalMinutes/5;//cache the start time of the schedule
-					int scheduleLengthInBlocks = (int)(ScheduleList[s].StopTime-ScheduleList[s].StartTime).TotalMinutes/5;//cache the length of the schedule
-					for(int i=0;i<scheduleLengthInBlocks;i++) {
-						retVal[indexOfProvider].ProvBar[scheduleStartBlock+i]=true;//provider may have an appointment here
-						retVal[indexOfProvider].ProvSchedule[scheduleStartBlock+i]=true;//provider is scheduled today
-					}
-				}
-			}
-			for(int a=0;a<AppointmentList.Count;a++) {
-				if(AppointmentList[a].AptDateTime.Date!=ScheduleDate) {
-					continue;
-				}
-				if(!AppointmentList[a].IsHygiene && ProviderNums.Contains(AppointmentList[a].ProvNum)) {//Not hygiene Modify provider bar based on ProvNum
-					int indexOfProvider = ProviderNums.IndexOf(AppointmentList[a].ProvNum);
-					int appointmentCurStartBlock = (int)AppointmentList[a].AptDateTime.TimeOfDay.TotalMinutes/5;
-					for(int i=0;i<AppointmentList[a].Pattern.Length;i++) {
-						if(AppointmentList[a].Pattern[i]=='X') {
-							retVal[indexOfProvider].ProvBar[appointmentCurStartBlock+i]=false;
-						}
-					}
-				}
-				else if(AppointmentList[a].IsHygiene && ProviderNums.Contains(AppointmentList[a].ProvHyg)) {//Modify provider bar based on ProvHyg
-					int indexOfProvider = ProviderNums.IndexOf(AppointmentList[a].ProvHyg);
-					int appointmentStartBlock = (int)AppointmentList[a].AptDateTime.TimeOfDay.TotalMinutes/5;
-					for(int i=0;i<AppointmentList[a].Pattern.Length;i++) {
-						if(AppointmentList[a].Pattern[i]=='X') {
-							retVal[indexOfProvider].ProvBar[appointmentStartBlock+i]=false;
-						}
-					}
-				}
 			}
 			return retVal;
 		}
@@ -446,37 +391,6 @@ namespace OpenDental{
 			}
 			return retVal;
 		}
-	}
-
-	///<summary>Holds information about a provider's Schedule. Not actual database table.</summary>
-	public class ApptSearchProviderSchedule {
-		///<summary>FK to Provider</summary>
-		public long ProviderNum;
-		///<summary>Date of the ProviderSchedule.</summary>
-		public DateTime SchedDate;
-		///<summary>This contains a bool for each 5 minute block throughout the day. True means provider is scheduled to work, False means provider is not scheduled to work.</summary>
-		public bool[] ProvSchedule;
-		///<summary>This contains a bool for each 5 minute block throughout the day. True means available, False means something is scheduled there or the provider is not scheduled to work.</summary>
-		public bool[] ProvBar;
-
-		///<summary>Constructor.</summary>
-		public ApptSearchProviderSchedule() {
-			ProvSchedule=new bool[288];
-			ProvBar=new bool[288];
-		}
-	}
-
-	///<summary>Holds information about a operatory's Schedule. Not actual database table.</summary>
-	public class ApptSearchOperatorySchedule {
-		///<summary>FK to Operatory</summary>
-		public long OperatoryNum;
-		///<summary>Date of the OperatorySchedule.</summary>
-		public DateTime SchedDate;
-		///<summary>This contains a bool for each 5 minute block throughout the day. True means operatory is open, False means operatory is in use.</summary>
-		public bool[] OperatorySched;
-		///<summary>List of providers 'allowed' to work in this operatory.</summary>
-		public List<long> ProviderNums;
-
 	}
 
 
