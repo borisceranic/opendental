@@ -2196,6 +2196,7 @@ FROM insplan";
 
 		/// <summary>Result will be multiline.</summary>
 		public static string GetAddressFull(string address,string address2,string city,string state,string zip) {
+			//No need to check RemotingRole; no call to db.
 			string retVal=address;
 			if(address2!="") {
 				retVal+="\r\n"+address2;

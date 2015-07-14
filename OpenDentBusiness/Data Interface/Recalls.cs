@@ -1382,6 +1382,9 @@ namespace OpenDentBusiness{
 			for(int i=0;i<listProviderSchedulesForProv.Count;i++) {//There should only be one.
 				//Check to make sure the ProvBar does not have any conflicts with the recallPattern passed in.
 				for(int j=0;j<timePattern.Length;j++) {
+					if(timePattern[j]=='/') {//Don't worry about HYG conflicts.
+						continue;
+					}
 					if(!listProviderSchedules[i].ProvBar[startingIncrement+j]) {//False means there is a collision in the providers schedule.
 						return true;
 					}

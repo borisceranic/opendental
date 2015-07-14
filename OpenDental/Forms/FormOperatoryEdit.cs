@@ -275,7 +275,7 @@ namespace OpenDental{
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(384, 16);
 			this.label4.TabIndex = 120;
-			this.label4.Text = "When enabled, only operatories with this set will be available for Web Sched.";
+			this.label4.Text = "This operatory will be available for Web Sched.";
 			// 
 			// checkIsWebSched
 			// 
@@ -285,7 +285,7 @@ namespace OpenDental{
 			this.checkIsWebSched.Name = "checkIsWebSched";
 			this.checkIsWebSched.Size = new System.Drawing.Size(161, 16);
 			this.checkIsWebSched.TabIndex = 119;
-			this.checkIsWebSched.Text = "Web Sched Override";
+			this.checkIsWebSched.Text = "Is Web Sched";
 			this.checkIsWebSched.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormOperatoryEdit

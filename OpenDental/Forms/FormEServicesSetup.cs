@@ -175,6 +175,7 @@ namespace OpenDental {
 				butListenerServiceAck.Enabled=false;
 				butSaveListenerPort.Enabled=false;
 				butWebSchedEnable.Enabled=false;
+				listBoxWebSchedProviderPref.Enabled=false;
 				butRecallSchedSetup.Enabled=false;
 				((Control)tabMobileOld).Enabled=false;
 				return;
@@ -999,6 +1000,7 @@ namespace OpenDental {
 			FormRecallTypes FormRT=new FormRecallTypes();
 			FormRT.ShowDialog();
 			FillGridWebSchedRecallTypes();
+			FillGridWebSchedTimeSlots();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Types accessed via EServices Setup window.");
 		}
 
@@ -1009,6 +1011,7 @@ namespace OpenDental {
 			FormOperatories FormO=new FormOperatories();
 			FormO.ShowDialog();
 			FillGridWebSchedOperatories();
+			FillGridWebSchedTimeSlots();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Operatories accessed via EServices Setup window.");
 		}
 
@@ -1016,7 +1019,6 @@ namespace OpenDental {
 			if(Prefs.UpdateInt(PrefName.WebSchedProviderRule,listBoxWebSchedProviderPref.SelectedIndex)) {
 				_changed=true;
 			}
-			//FillGridWebSchedTimeSlots();
 		}
 
 		private void comboWebSchedRecallTypes_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -1029,6 +1031,13 @@ namespace OpenDental {
 
 		private void comboWebSchedClinic_SelectionChangeCommitted(object sender,EventArgs e) {
 			FillGridWebSchedTimeSlots();
+		}
+
+		private void textWebSchedDateStart_TextChanged(object sender,EventArgs e) {
+			//Only refresh the grid if the user has typed in a valid date.
+			if(textWebSchedDateStart.errorProvider1.GetError(textWebSchedDateStart)=="") {
+				FillGridWebSchedTimeSlots();
+			}
 		}
 
 		private void butWebSchedEnable_Click(object sender,EventArgs e) {
@@ -1117,13 +1126,6 @@ namespace OpenDental {
 		private void butWebSchedToday_Click(object sender,EventArgs e) {
 			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
 			FillGridWebSchedTimeSlots();
-		}
-
-		private void textWebSchedDateStart_TextChanged(object sender,EventArgs e) {
-			//Only refresh the grid if the user has typed in a valid date.
-			if(textWebSchedDateStart.errorProvider1.GetError(textWebSchedDateStart)=="") {
-				FillGridWebSchedTimeSlots();
-			}
 		}
 
 		private void butWebSchedRefresh_Click(object sender,EventArgs e) {

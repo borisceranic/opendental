@@ -574,11 +574,11 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),listProviders,dateStart,dateEnd);
 			}
 			List<long> listProvNums=new List<long>();
-			if(listProviders==null || listProviders.Count==0) {
-				listProvNums.Add(0);
-			}
-			else {
+			if(listProviders!=null) {
 				listProvNums=listProviders.Select(x => x.ProvNum).Distinct().ToList();
+			}
+			if(!listProvNums.Contains(0)) {
+				listProvNums.Add(0);//Always add 0 so that blockouts can be returned.
 			}
 			//Grab all schedules and blockouts within operatories flagged for Web Sched.
 			string command=@"-- First, get all schedules associated to operatories.
