@@ -42,10 +42,17 @@ namespace OpenDental {
 						comboPaymentPlans.SelectedIndex=i+1;
 					}
 				}
+				if(Prefs.IsODHQ()) {
+					groupProcedures.Visible=true;
+					FillProcs();
+				}
+				else {
+					this.ClientSize=new System.Drawing.Size(this.ClientSize.Width,this.ClientSize.Height-144);
+				}
 			}
 			else {//This will hide the recurring section and change the window size.
 				groupRecurringCharges.Visible=false;
-				this.ClientSize=new System.Drawing.Size(this.ClientSize.Width,this.ClientSize.Height-215);
+				this.ClientSize=new System.Drawing.Size(this.ClientSize.Width,this.ClientSize.Height-356);
 			}
 		}
 
@@ -69,6 +76,17 @@ namespace OpenDental {
 					}
 					textNote.Text=CreditCardCur.Note;
 				}
+			}
+		}
+
+		private void FillProcs() {
+			listProcs.Items.Clear();
+			if(String.IsNullOrEmpty(CreditCardCur.Procedures)) {
+				return;
+			}
+			string[] arrayProcCodes=CreditCardCur.Procedures.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
+			for(int i=0;i<arrayProcCodes.Length;i++) {
+				listProcs.Items.Add(arrayProcCodes[i]+"- "+ProcedureCodes.GetLaymanTerm(ProcedureCodes.GetProcCode(arrayProcCodes[i]).CodeNum));
 			}
 		}
 
@@ -129,6 +147,39 @@ namespace OpenDental {
 
 		private void butToday_Click(object sender,EventArgs e) {
 			textDateStart.Text=DateTime.Today.ToShortDateString();
+		}
+
+		private void butAddProc_Click(object sender,EventArgs e) {
+			FormProcCodes FormP=new FormProcCodes();
+			FormP.IsSelectionMode=true;
+			FormP.ShowDialog();
+			if(FormP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			string procCode=ProcedureCodes.GetStringProcCode(FormP.SelectedCodeNum);
+			if(CreditCards.ProcLinkedToCard(CreditCardCur.PatNum,procCode,CreditCardCur.CreditCardNum,CreditCardCur.Procedures)) {
+				bool response=MsgBox.Show(this,MsgBoxButtons.YesNo,"This procedure is already linked with a credit card on this patient's "
+					+"account. Adding the procedure to this card will result in the patient being charged twice for this procedure. Add this procedure?");
+				if(!response) {
+					return;
+				}
+			}
+			if(CreditCardCur.Procedures!="") {
+				CreditCardCur.Procedures+=",";
+			}
+			CreditCardCur.Procedures+=procCode;
+			FillProcs();
+		}
+
+		private void butRemoveProc_Click(object sender,EventArgs e) {
+			if(listProcs.SelectedIndex==-1) {
+				MsgBox.Show(this,"Please select a procedure first.");
+				return;
+			}
+			List<string> strList=new List<string>(CreditCardCur.Procedures.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries));
+			strList.RemoveAt(listProcs.SelectedIndex);
+			CreditCardCur.Procedures=string.Join(",",strList);
+			FillProcs();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {

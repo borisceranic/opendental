@@ -9004,6 +9004,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE supply MODIFY LevelOnHand NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard ADD Procedures varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard ADD Procedures varchar2(255)";
+					Db.NonQ(command);
+				}
 				//Insert Dental Intel Link
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"

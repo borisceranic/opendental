@@ -46,7 +46,7 @@ namespace OpenDental{
 			this.groupCounts.Controls.Add(this.labelCharged);
 			this.groupCounts.Controls.Add(this.labelSelected);
 			this.groupCounts.Controls.Add(this.labelTotal);
-			this.groupCounts.Location = new System.Drawing.Point(617, 196);
+			this.groupCounts.Location = new System.Drawing.Point(707, 196);
 			this.groupCounts.Name = "groupCounts";
 			this.groupCounts.Size = new System.Drawing.Size(96, 103);
 			this.groupCounts.TabIndex = 34;
@@ -127,7 +127,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(627, 12);
+			this.butRefresh.Location = new System.Drawing.Point(717, 12);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 40;
@@ -139,12 +139,13 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridMain.AutoScroll = true;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 12);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(592, 474);
+			this.gridMain.Size = new System.Drawing.Size(682, 474);
 			this.gridMain.TabIndex = 29;
 			this.gridMain.Title = "Recurring Charges";
 			this.gridMain.TranslationName = "TableRecurring";
@@ -159,7 +160,7 @@ namespace OpenDental{
 			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(627, 462);
+			this.butSend.Location = new System.Drawing.Point(717, 462);
 			this.butSend.Name = "butSend";
 			this.butSend.Size = new System.Drawing.Size(75, 24);
 			this.butSend.TabIndex = 3;
@@ -174,7 +175,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(627, 498);
+			this.butCancel.Location = new System.Drawing.Point(717, 498);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -201,7 +202,7 @@ namespace OpenDental{
 			// FormCreditRecurringCharges
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(725, 534);
+			this.ClientSize = new System.Drawing.Size(815, 534);
 			this.Controls.Add(this.butPrintList);
 			this.Controls.Add(this.butNone);
 			this.Controls.Add(this.butAll);

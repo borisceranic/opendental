@@ -69,26 +69,62 @@ namespace OpenDental {
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableRecurring","PatNum"),110);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","Name"),250);
+			col=new ODGridColumn(Lan.g("TableRecurring","Name"),270);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","Total Bal"),90,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableRecurring","Total Bal"),100,HorizontalAlignment.Right);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableRecurring","RptChrgAmt"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableRecurring","ChargeAmt"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
-			for(int i=0;i<table.Rows.Count;i++) {
+			Dictionary<long,double> dictPatBals=new Dictionary<long,double>();
+			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0
 				row=new OpenDental.UI.ODGridRow();
 				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
-				Double chargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				row.Cells.Add(table.Rows[i]["PatNum"].ToString());
+				Double rptChargeAmt;
+				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
+				string procedures=table.Rows[i]["Procedures"].ToString();
+				if(Prefs.IsODHQ()) {
+					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+						Patient patCur=Patients.GetPat(patNum);
+						if(patCur==null) {
+							table.Rows.RemoveAt(i);
+							continue;
+						}
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
+					}
+					else {
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
+					}
+					if(table.Rows[i]["PayOrder"].ToString()=="2") {
+						famBalTotal+=rptChargeAmt;
+						rptChargeAmt+=PIn.Long(table.Rows[i]["ChargeAmt"].ToString());
+					}
+				}
+				else {
+					rptChargeAmt=PIn.Long(table.Rows[i]["ChargeAmt"].ToString());
+				}
+				if(!dictPatBals.ContainsKey(patNum)) {
+					dictPatBals.Add(patNum,famBalTotal);
+				}
+				Double chargeAmt=Math.Min(dictPatBals[patNum],rptChargeAmt);
+				if(chargeAmt<=0) {
+					table.Rows.RemoveAt(i);
+					continue;
+				}
+				table.Rows[i]["ChargeAmt"]=chargeAmt;
+				dictPatBals[patNum]-=chargeAmt;
+				row.Cells.Add(patNum.ToString());
 				row.Cells.Add(table.Rows[i]["PatName"].ToString());
 				row.Cells.Add(famBalTotal.ToString("c"));
+				row.Cells.Add(rptChargeAmt.ToString("c"));
 				row.Cells.Add(chargeAmt.ToString("c"));
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			labelTotal.Text=Lan.g(this,"Total=")+table.Rows.Count.ToString();
+			labelTotal.Text=Lan.g(this,"Total=")+gridMain.Rows.Count.ToString();
 			labelSelected.Text=Lan.g(this,"Selected=")+gridMain.SelectedIndices.Length.ToString();
 		}
 

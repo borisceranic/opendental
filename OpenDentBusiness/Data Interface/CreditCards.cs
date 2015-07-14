@@ -80,14 +80,13 @@ namespace OpenDentBusiness{
 			DataTable table=new DataTable();
 			//This query will return patient information and the latest recurring payment whom:
 			//	-have recurring charges setup and today's date falls within the start and stop range.
-			//	-have a total balance >= recurring charge amount
 			//NOTE: Query will return patients with or without payments regardless of when that payment occurred, filtering is done below.
-			string command="SELECT PatNum,PatName,FamBalTotal,LatestPayment,DateStart,Address,AddressPat,Zip,ZipPat,XChargeToken,CCNumberMasked,CCExpiration,ChargeAmt,PayPlanNum,ProvNum,ClinicNum "
+			string command="SELECT PayOrder,PatNum,PatName,FamBalTotal,LatestPayment,DateStart,Address,AddressPat,Zip,ZipPat,XChargeToken,CCNumberMasked,CCExpiration,ChargeAmt,PayPlanNum,ProvNum,ClinicNum,Procedures "
 				+"FROM (";
 			#region Payments
-			command+="(SELECT 1,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,"//The 'SELECT 1' garuntees the UNION will not combine results with payment plans.
+			command+="(SELECT 1 AS PayOrder,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,"//The 'SELECT 1' garuntees the UNION will not combine results with payment plans.
 				+"guar.BalTotal-guar.InsEst FamBalTotal,CASE WHEN MAX(pay.PayDate) IS NULL THEN "+POut.Date(new DateTime(1,1,1))+" ELSE MAX(pay.PayDate) END LatestPayment,"
-				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop,0 ProvNum,pat.ClinicNum "
+				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop,0 ProvNum,pat.ClinicNum,cc.Procedures "
 				+"FROM (creditcard cc,patient pat,patient guar) "
 				+"LEFT JOIN payment pay ON cc.PatNum=pay.PatNum AND pay.IsRecurringCC=1 "
 				+"WHERE cc.PatNum=pat.PatNum "
@@ -103,7 +102,7 @@ namespace OpenDentBusiness{
 			#endregion
 			command+="UNION ";
 			#region Payment Plans
-			command+="(SELECT 2,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,";//The 'SELECT 2' garuntees the UNION will not combine results with payments.
+			command+="(SELECT 2 AS PayOrder,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,";//The 'SELECT 2' garuntees the UNION will not combine results with payments.
 			//Special select statement to figure out how much is owed on a particular payment plan.  This total amount will be Labeled as FamBalTotal for UNION purposes.
 			command+="ROUND((SELECT CASE WHEN SUM(ppc.Principal+ppc.Interest) IS NULL THEN 0 ELSE SUM(ppc.Principal+ppc.Interest) END "
 				+"FROM PayPlanCharge ppc "
@@ -112,7 +111,7 @@ namespace OpenDentBusiness{
 			command+="CASE WHEN MAX(ps.DatePay) IS NULL THEN "+POut.Date(new DateTime(1,1,1))+" ELSE MAX(pay.PayDate) END LatestPayment,"
 				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop,"
 				+"(SELECT ppc1.ProvNum FROM payplancharge ppc1 WHERE ppc1.PayPlanNum=cc.PayPlanNum LIMIT 1) ProvNum,"
-				+"(SELECT ppc2.ClinicNum FROM payplancharge ppc2 WHERE ppc2.PayPlanNum=cc.PayPlanNum LIMIT 1) ClinicNum "
+				+"(SELECT ppc2.ClinicNum FROM payplancharge ppc2 WHERE ppc2.PayPlanNum=cc.PayPlanNum LIMIT 1) ClinicNum,cc.Procedures "
 				+"FROM creditcard cc "
 				+"INNER JOIN patient pat ON pat.PatNum=cc.PatNum "
 				+"LEFT JOIN paysplit ps ON ps.PayPlanNum=cc.PayPlanNum AND ps.PayPlanNum<>0 "
@@ -128,13 +127,64 @@ namespace OpenDentBusiness{
 			#endregion
 			//Now we have all the results for payments and payment plans, so do an obvious filter. A more thorough filter happens later.
 			command+=") due "
-				+"WHERE FamBalTotal>=ChargeAmt "
-				+"AND ChargeAmt>0 "
-				+"AND DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ";
+				+"WHERE DateStart<="+DbHelper.Curdate()+" "
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
+				+"ORDER BY PatName DESC";
 			table=Db.GetTable(command);
 			FilterRecurringChargeList(table);
 			return table;
+		}
+
+		/// <summary>Adds up the total fees for the procedures passed in that have been completed since the last billing day.</summary>
+		public static double TotalRecurringCharges(long patNum,string procedures,int billingDay) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDouble(MethodBase.GetCurrentMethod(),patNum,procedures,billingDay);
+			}
+			DateTime startBillingCycle;
+			if(DateTime.Today.Day>billingDay) {//if today is 7/13/2015 and billingDay is 26, startBillingCycle will be 6/26/2015
+				startBillingCycle=new DateTime(DateTime.Today.Year,DateTime.Today.Month,billingDay);
+			}
+			else {
+				DateTime lastMonth=DateTime.Today.AddMonths(-1);
+				startBillingCycle=new DateTime(lastMonth.Year,lastMonth.Month,billingDay);
+			}
+			string procStr="'"+POut.String(procedures).Replace(",","','")+"'";
+			string command="SELECT SUM(pl.ProcFee) "
+				+"FROM procedurelog pl "
+				+"INNER JOIN procedurecode pc ON pl.CodeNum=pc.CodeNum "
+				+"WHERE pl.ProcStatus=2 "
+				+"AND pc.ProcCode IN ("+procStr+") "
+				+"AND pl.PatNum="+POut.Long(patNum)+" "
+				+"AND pl.ProcDate BETWEEN "+POut.Date(startBillingCycle)+" AND "+DbHelper.Curdate();
+			return PIn.Double(Db.GetScalar(command));
+		}
+
+		/// <summary>Returns true if the procedure passed in is linked to any other card on the patient's account.</summary>
+		public static bool ProcLinkedToCard(long patNum,string procCode,long cardNum,string curProcs) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum,procCode,cardNum,curProcs);
+			}
+			string command="SELECT CreditCardNum,Procedures "
+				+"FROM creditcard "
+				+"WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND DateStart<="+DbHelper.Curdate()+" "
+				+"AND (DateStop>"+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				string[] arrayProcs;
+				if(PIn.Long(table.Rows[i]["CreditCardNum"].ToString())==cardNum) {
+					arrayProcs=curProcs.Split(',');
+				}
+				else {
+					arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
+				}
+				for(int j=0;j<arrayProcs.Length;j++) {
+					if(arrayProcs[j]==procCode) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		///<summary>Talbe must include columns labeled LatestPayment and DateStart.</summary>

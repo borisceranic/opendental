@@ -38,6 +38,8 @@ namespace OpenDentBusiness {
 		public string PayConnectToken;
 		///<summary>Expiration for the PayConnect token.  Used with the PayConnect token instead of the actual credit card number and expiration.</summary>
 		public DateTime PayConnectTokenExp;
+		///<summary>What procedures will go on this card as a recurring charge.  Comma delimited list of ProcCodes.</summary>
+		public string Procedures;
 
 		///<summary></summary>
 		public CreditCard Clone() {
