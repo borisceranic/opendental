@@ -958,7 +958,7 @@ namespace OpenDental.ReportingComplex
 							displayText=fieldObject.GetSummaryValue(queryObj.ReportTable,queryObj.ArrDataFields.IndexOf(fieldObject.SummarizedField)).ToString(fieldObject.StringFormat);
 						}
 						g.DrawString(displayText,fieldObject.Font
-						,new SolidBrush(fieldObject.ForeColor),new RectangleF(layoutRect.X+1,layoutRect.Y+1,layoutRect.Width-1,layoutRect.Height-1),strFormat);
+						,new SolidBrush(fieldObject.ForeColor),new RectangleF(layoutRect.X+1,layoutRect.Y+1,layoutRect.Width,layoutRect.Height-1),strFormat);
 						yPosAdd=(int)layoutRect.Height;
 					}
 				}
