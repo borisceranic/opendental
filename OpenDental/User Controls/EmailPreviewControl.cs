@@ -179,12 +179,7 @@ namespace OpenDental {
 
 		private void menuItemRemove_Click(object sender,EventArgs e) {
 			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
-			for(int i=0;i<_emailMessage.Attachments.Count;i++) {
-				if(_emailMessage.Attachments[i].EmailAttachNum==emailAttach.EmailAttachNum) {
-					_emailMessage.Attachments.RemoveAt(i);
-					break;
-				}
-			}
+			_emailMessage.Attachments.Remove(emailAttach);
 			FillAttachments();
 		}
 
