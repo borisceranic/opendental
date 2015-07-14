@@ -16,6 +16,7 @@ using OpenDentBusiness.UI;
 using OpenDental.UI;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using OpenDental.Bridges;
 
 namespace OpenDental{
 	/// <summary>
@@ -861,6 +862,7 @@ namespace OpenDental{
 			this.gridPatient.TabIndex = 0;
 			this.gridPatient.Title = "Patient Info";
 			this.gridPatient.TranslationName = "TableApptPtInfo";
+			this.gridPatient.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPatient_CellClick);
 			this.gridPatient.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gridPatient_MouseMove);
 			// 
 			// gridComm
@@ -1527,6 +1529,10 @@ namespace OpenDental{
 				row=new ODGridRow();
 				row.Cells.Add(table.Rows[i]["field"].ToString());
 				row.Cells.Add(table.Rows[i]["value"].ToString());
+				if(table.Rows[i]["field"].ToString().EndsWith("Phone")  && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+					row.Cells[row.Cells.Count-1].ColorText=System.Drawing.Color.Blue;
+					row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+				}
 				gridPatient.Rows.Add(row);
 			}
 			//Add a UI managed row to display the total fee for the selected procedures in this appointment.
@@ -3366,6 +3372,14 @@ namespace OpenDental{
 			}
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
+		}
+
+		private void gridPatient_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridPatient.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined.
+			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
+			}
 		}
 		
 

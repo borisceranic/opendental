@@ -9142,6 +9142,43 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE clinic ADD PayToZip varchar2(255)";
 					Db.NonQ(command);
 				}
+				//Insert DentalTekSmartOfficePhone bridge-----------------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'DentalTekSmartOfficePhone', "
+						+"'DentalTekSmartOfficePhone from dentalsolutionsllc.com', "
+						+"'0', "//Disabled by default.
+						+"'"+POut.String(@"")+"', "//No Path needed
+						+"'"+POut.String(@"")+"', "//No command line needed
+						+"'No path or command line arguments needed.')";//Note
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"'"+POut.Long(programNum)+"', "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'DentalTekSmartOfficePhone')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'DentalTekSmartOfficePhone', "
+						+"'DentalTekSmartOfficePhone from dentalsolutionsllc.com', "
+						+"'0', "//Disabled by default.
+						+"'"+POut.String(@"")+"', "//No Path needed
+						+"'"+POut.String(@"")+"', "//No command line needed
+						+"'No path or command line arguments needed.')";//Note
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'DentalTekSmartOfficePhone')";
+					Db.NonQ(command);
+				}//end DentalTekSmartOfficePhone bridge
 
 
 				command="UPDATE preference SET ValueString = '15.3.0.0' WHERE PrefName = 'DataBaseVersion'";

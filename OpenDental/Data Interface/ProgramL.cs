@@ -106,6 +106,10 @@ namespace OpenDental{
 				return;
 			}
 #endif
+			else if(prog.ProgName==ProgramName.DentalTekSmartOfficePhone.ToString()) {
+				DentalTek.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.DentForms.ToString()) {
 				DentForms.SendData(prog,pat);
 				return;

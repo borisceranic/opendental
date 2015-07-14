@@ -21,6 +21,7 @@ using OpenDentBusiness;
 using OpenDentBusiness.UI;
 using OpenDentBusiness.HL7;
 using CodeBase;
+using OpenDental.Bridges;
 
 namespace OpenDental {
 
@@ -3032,12 +3033,27 @@ namespace OpenDental {
 				OnPatientSelected(PatCur);
 				//RefreshModulePatient(PIn.PInt(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
 				if(e.Button==MouseButtons.Right) {
-					//if(ApptDrawing.IsWeeklyView){
-					//	menuWeeklyApt.Show(ContrApptSheet2,new Point(e.X,e.Y));
-					//}
-					//else{
+					menuApt.MenuItems.RemoveByKey("Phone Div");
+					menuApt.MenuItems.RemoveByKey("Home Phone");
+					menuApt.MenuItems.RemoveByKey("Work Phone");
+					menuApt.MenuItems.RemoveByKey("Wireless Phone");
+					if(!String.IsNullOrEmpty(PatCur.HmPhone)||!String.IsNullOrEmpty(PatCur.WkPhone)||!String.IsNullOrEmpty(PatCur.WirelessPhone)) {
+						menuApt.MenuItems.Add("-");
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Phone Div";
+					}
+					if(!String.IsNullOrEmpty(PatCur.HmPhone)) {
+						menuApt.MenuItems.Add(Lan.g(this,"Call Home Phone")+" "+PatCur.HmPhone,new EventHandler(menuApt_Click));
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Home Phone";
+					}
+					if(!String.IsNullOrEmpty(PatCur.WkPhone)) {
+						menuApt.MenuItems.Add(Lan.g(this,"Call Work Phone")+" "+PatCur.WkPhone,new EventHandler(menuApt_Click));
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Work Phone";
+					}
+					if(!String.IsNullOrEmpty(PatCur.WirelessPhone)) {
+						menuApt.MenuItems.Add(Lan.g(this,"Call Wireless Phone")+" "+PatCur.WirelessPhone,new EventHandler(menuApt_Click));
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Wireless Phone";
+					}
 					menuApt.Show(ContrApptSheet2,new Point(e.X,e.Y));
-					//}
 				}
 				else {
 					TempApptSingle=new ContrApptSingle();
@@ -4792,6 +4808,45 @@ namespace OpenDental {
 					}
 					FormR.ShowDialog();
 					break;
+			}
+			//cannot use menu item index because some menu items may not exist
+			switch(((MenuItem)sender).Name){
+				case "Home Phone"://Call Home Phone
+					if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+						DentalTek.PlaceCall(PatCur.HmPhone);
+					}
+					else {
+						AutomaticCallDialingDisabledMessage();
+					}
+					break;
+				case "Work Phone"://Call Work Phone
+					if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+						DentalTek.PlaceCall(PatCur.WkPhone);
+					}
+					else {
+						AutomaticCallDialingDisabledMessage();
+					}
+					break;
+				case "Wireless Phone"://Call Wireless Phone
+					if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+						DentalTek.PlaceCall(PatCur.WirelessPhone);
+					}
+					else {
+						AutomaticCallDialingDisabledMessage();
+					}
+					break;
+			}
+		}
+
+		private void AutomaticCallDialingDisabledMessage() {
+			MessageBox.Show(Lan.g(this,"Automatic dialing of patient phone numbers requires an additional service")+".\r\n"
+							+Lan.g(this,"Contact Open Dental for more information")+".");
+			try {
+				Process.Start("http://www.opendental.com/manual/dentaltekinfo.html");
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/contact.html" + "\r\n"
+							+Lan.g(this,"Please set up a default web browser."));
 			}
 		}
 

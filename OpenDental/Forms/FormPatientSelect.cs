@@ -11,8 +11,10 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Data;
 using OpenDental.UI;
+using OpenDental.Bridges;
 using OpenDentBusiness;
 using CodeBase;
+using System.Text.RegularExpressions;
 
 namespace OpenDental{
 ///<summary>All this dialog does is set the patnum and it is up to the calling form to do an immediate refresh, or possibly just change the patnum back to what it was.  So the other patient fields must remain intact during all logic in this form, especially if SelectionModeOnly.</summary>
@@ -699,6 +701,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(3, 2);
 			this.gridMain.Name = "gridMain";
@@ -709,6 +712,7 @@ namespace OpenDental{
 			this.gridMain.TranslationName = "FormPatientSelect";
 			this.gridMain.WrapText = false;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			this.gridMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridMain_KeyDown);
 			// 
 			// contrKeyboard1
@@ -1186,9 +1190,17 @@ namespace OpenDental{
 							break;
 						case "Hm Phone":
 							row.Cells.Add(PtDataTable.Rows[i]["HmPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
 							break;
 						case "Wk Phone":
 							row.Cells.Add(PtDataTable.Rows[i]["WkPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
 							break;
 						case "PatNum":
 							row.Cells.Add(PtDataTable.Rows[i]["PatNum"].ToString());
@@ -1237,6 +1249,10 @@ namespace OpenDental{
 							break;
 						case "Wireless Ph":
 							row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
 							break;
 						case "Sec Prov":
 							row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
@@ -1257,6 +1273,14 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PatSelected();
+		}
+
+		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridMain.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined.
+			if(gridCellCur.ColorText==Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
+			}
 		}
 
 		private void OnArrowsUpDown(System.Windows.Forms.KeyEventArgs e){
@@ -1401,7 +1425,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 
 		
 

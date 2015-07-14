@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using OpenDental.Bridges;
 
 namespace OpenDental{
 	/// <summary>
@@ -134,6 +135,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(11, 29);
 			this.gridMain.Name = "gridMain";
@@ -144,6 +146,7 @@ namespace OpenDental{
 			this.gridMain.Title = "Carriers";
 			this.gridMain.TranslationName = "TableCarriers";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
 			// checkCDAnet
 			// 
@@ -356,6 +359,10 @@ namespace OpenDental{
 				else{*/
 				row.Cells.Add(table.Rows[i]["CarrierName"].ToString());
 				row.Cells.Add(table.Rows[i]["Phone"].ToString());
+				if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+					row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+					row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+				}
 				row.Cells.Add(table.Rows[i]["Address"].ToString());
 				//row.Cells.Add(table.Rows[i]["Address2"].ToString());
 				row.Cells.Add(table.Rows[i]["City"].ToString());
@@ -404,6 +411,14 @@ namespace OpenDental{
 			}
 			changed=true;
 			FillGrid();
+		}
+
+		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridMain.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined.
+			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
+			}
 		}
 
 		private void checkCDAnet_Click(object sender,EventArgs e) {

@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using CodeBase;
+using OpenDental.Bridges;
 
 namespace OpenDental{
 
@@ -187,6 +188,7 @@ namespace OpenDental{
 			this.gridPat.Title = "Patient Information";
 			this.gridPat.TranslationName = "TablePatient";
 			this.gridPat.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPat_CellDoubleClick);
+			this.gridPat.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPat_CellClick);
 			// 
 			// gridIns
 			// 
@@ -635,6 +637,15 @@ namespace OpenDental{
 			ModuleSelected(PatCur.PatNum);
 		}
 
+		private void gridPat_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridPat.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined. 
+			//If we support color and underline in the future, this might be changed to a regex of the cell text.
+			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
+			}
+		}
+
 		private void FillPatientData(){
 			if(PatCur==null){
 				gridPat.BeginUpdate();
@@ -779,17 +790,29 @@ namespace OpenDental{
 						if(PatCur.PreferContactMethod==ContactMethod.HmPhone || PatCur.PreferContactMethod==ContactMethod.None){
 							row.Bold=true;
 						}
+						if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+							row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+							row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+						}
 						break;
 					case "Wk Phone":
 						row.Cells.Add(PatCur.WkPhone);
 						if(PatCur.PreferContactMethod==ContactMethod.WkPhone) {
 							row.Bold=true;
 						}
+						if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+							row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+							row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+						}
 						break;
 					case "Wireless Ph":
 						row.Cells.Add(PatCur.WirelessPhone);
 						if(PatCur.PreferContactMethod==ContactMethod.WirelessPh) {
 							row.Bold=true;
+						}
+						if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+							row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+							row.Cells[row.Cells.Count-1].Underline=YN.Yes;
 						}
 						break;
 					case "E-mail":

@@ -593,7 +593,7 @@ namespace OpenDental.UI {
 					else {
 						//Determine if any cells in this row are bold.  If at least one cell is bold, then we need to calculate the row height using bold font.
 						for(int j=0;j<rows[i].Cells.Count;j++) {
-							if(rows[i].Cells[j].Bold==YN.Yes) {
+							if(rows[i].Cells[j].Bold==YN.Yes) {//We don't care if a cell is underlined because it does not affect the size of the row
 								cellFont=cellFontBold;
 								break;
 							}
@@ -999,6 +999,9 @@ namespace OpenDental.UI {
 						cellFont=new Font(cellFont,FontStyle.Regular);
 					}
 				}
+				if(rows[rowI].Cells[i].Underline==YN.Yes) {//Underline the current cell.  If it is already bold, make the cell bold and underlined.
+					cellFont=new Font(cellFont,(cellFont.Bold)?(FontStyle.Bold | FontStyle.Underline):FontStyle.Underline);
+				}
 				if(columns[i].ImageList==null) {
 					g.DrawString(rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,_format);
 				}
@@ -1371,6 +1374,9 @@ namespace OpenDental.UI {
 						tempFont=new Font(tempFont,FontStyle.Regular);
 					}
 				}
+				if(rows[rowI].Cells[i].Underline==YN.Yes) {//Underline the current cell.  If it is already bold, make the cell bold and underlined.
+					tempFont=new Font(tempFont,(tempFont.Bold)?(FontStyle.Bold | FontStyle.Underline):FontStyle.Underline);
+				}
 				if(columns[i].ImageList==null) {
 					g.DrawString(rows[rowI].Cells[i].Text,tempFont,textBrush,textRect,_format);
 				}
@@ -1584,6 +1590,10 @@ namespace OpenDental.UI {
 						cellFont=new XFont(tempFont.Name,tempFont.Size,XFontStyle.Regular);
 					}
 				}
+				//do not underline row if we are printing to PDF
+				//if(rows[rowI].Cells[i].Underline==YN.Yes) {//Underline the current cell.  If it is already bold, make the cell bold and underlined.
+				//	cellFont=new XFont(cellFont,(cellFont.Bold)?(XFontStyle.Bold | XFontStyle.Underline):XFontStyle.Underline);
+				//}
 				if(columns[i].ImageList==null) {
 					DrawStringX(g,rows[rowI].Cells[i].Text,cellFont,textBrush,textRect,_xAlign);
 				}
@@ -1928,6 +1938,10 @@ namespace OpenDental.UI {
 									cellFont=new Font(cellFont,FontStyle.Regular);
 								}
 							}
+							//Do not underline if printing grid
+							//if(rows[RowsPrinted].Cells[i].Underline==YN.Yes) {//Underline the current cell.  If it is already bold, make the cell bold and underlined.
+							//	cellFont=new Font(cellFont,(cellFont.Bold)?(FontStyle.Bold | FontStyle.Underline):FontStyle.Underline);
+							//}
 							//Some printers will malfunction (BSOD) if print bold colored fonts.  This prevents the error.
 							if(textBrush.Color!=Color.Black && cellFont.Bold) {
 								cellFont=new Font(cellFont,FontStyle.Regular);

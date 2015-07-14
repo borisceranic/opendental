@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using OpenDental.Bridges;
 
 namespace OpenDental{
 	/// <summary>
@@ -98,6 +99,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(17,12);
 			this.gridMain.Name = "gridMain";
@@ -107,6 +109,7 @@ namespace OpenDental{
 			this.gridMain.Title = "Pharmacies";
 			this.gridMain.TranslationName = "TablePharmacies";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
 			// butAdd
 			// 
@@ -156,8 +159,8 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Pharmacies";
-			this.Load += new System.EventHandler(this.FormPharmacies_Load);
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPharmacies_FormClosing);
+			this.Load += new System.EventHandler(this.FormPharmacies_Load);
 			this.ResumeLayout(false);
 
 		}
@@ -205,6 +208,10 @@ namespace OpenDental{
 				row=new ODGridRow();
 				row.Cells.Add(PharmacyC.Listt[i].StoreName);
 				row.Cells.Add(PharmacyC.Listt[i].Phone);
+				if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+					row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+					row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+				}
 				row.Cells.Add(PharmacyC.Listt[i].Fax);
 				txt=PharmacyC.Listt[i].Address;
 				if(PharmacyC.Listt[i].Address2!=""){
@@ -239,6 +246,14 @@ namespace OpenDental{
 				FormP.ShowDialog();
 				FillGrid();
 				changed=true;
+			}
+		}
+
+		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridMain.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined.
+			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
 			}
 		}
 
