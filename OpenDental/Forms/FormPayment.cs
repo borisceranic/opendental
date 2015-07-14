@@ -1796,7 +1796,11 @@ namespace OpenDental {
 			FormPSM.PaymentCur=PaymentCur;
 			FormPSM.PayDate=PIn.DateT(textDate.Text);
 			FormPSM.IsNew=IsNew;
-			FormPSM.ListSplitsCur=SplitList;
+			List<PaySplit> listSplits=new List<PaySplit>();
+			for(int i=0;i<SplitList.Count;i++) {
+				listSplits.Add(SplitList[i].Copy());
+			}
+			FormPSM.ListSplitsCur=listSplits;
 			FormPSM.ShowDialog();
 			if(FormPSM.DialogResult==DialogResult.OK) {
 				SplitList=FormPSM.ListSplitsCur;
