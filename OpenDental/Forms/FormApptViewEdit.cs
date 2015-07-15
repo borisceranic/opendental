@@ -672,6 +672,7 @@ namespace OpenDental{
 			elementsAll.Add("ASAP");
 			elementsAll.Add("ASAP[A]");
 			elementsAll.Add("AssistantAbbr");
+			elementsAll.Add("Birthdate");
 			elementsAll.Add("ChartNumAndName");
 			elementsAll.Add("ChartNumber");
 			elementsAll.Add("ConfirmedColor");

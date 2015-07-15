@@ -717,6 +717,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("Assistant");
 			table.Columns.Add("assistantAbbr");
 			table.Columns.Add("billingType");
+			table.Columns.Add("Birthdate");
 			table.Columns.Add("chartNumber");
 			table.Columns.Add("chartNumAndName");
 			table.Columns.Add("ColorOverride");
@@ -1037,6 +1038,7 @@ namespace OpenDentBusiness{
 				}
 				row["AppointmentTypeNum"]=raw.Rows[i]["AppointmentTypeNum"].ToString();
 				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(raw.Rows[i]["patBillingType"].ToString()));
+				row["Birthdate"]=DateTime.Parse(raw.Rows[i]["patBirthDate"].ToString()).ToShortDateString();
 				row["chartNumber"]=raw.Rows[i]["patChartNumber"].ToString();
 				row["chartNumAndName"]="";
 				if(raw.Rows[i]["apptIsNewPatient"].ToString()=="1") {

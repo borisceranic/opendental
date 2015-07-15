@@ -252,6 +252,14 @@ namespace OpenDentBusiness.UI {
 							text=dataRoww["assistantAbbr"].ToString();
 						}
 						break;
+					case "Birthdate":
+						if(isNote) {
+							text="";
+						}
+						else {
+							text=dataRoww["Birthdate"].ToString();
+						}
+						break;
 					case "ChartNumAndName":
 						text=dataRoww["chartNumAndName"].ToString();
 						break;
