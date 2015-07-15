@@ -29,6 +29,7 @@ namespace OpenDental{
 			this.checkReportsProcDate = new System.Windows.Forms.CheckBox();
 			this.checkReportProdWO = new System.Windows.Forms.CheckBox();
 			this.checkReportsShowPatNum = new System.Windows.Forms.CheckBox();
+			this.checkReportPIClinic = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -88,10 +89,20 @@ namespace OpenDental{
 			this.checkReportsShowPatNum.TabIndex = 200;
 			this.checkReportsShowPatNum.Text = "Show PatNum: Aging, OutstandingIns, ProcsNotBilled";
 			// 
+			// checkReportPIClinic
+			// 
+			this.checkReportPIClinic.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkReportPIClinic.Location = new System.Drawing.Point(20, 76);
+			this.checkReportPIClinic.Name = "checkReportPIClinic";
+			this.checkReportPIClinic.Size = new System.Drawing.Size(369, 17);
+			this.checkReportPIClinic.TabIndex = 202;
+			this.checkReportPIClinic.Text = "Default to not showing clinic breakdown on P&&I reports.";
+			// 
 			// FormReportSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(401, 148);
+			this.Controls.Add(this.checkReportPIClinic);
 			this.Controls.Add(this.checkReportsShowPatNum);
 			this.Controls.Add(this.checkReportProdWO);
 			this.Controls.Add(this.checkReportsProcDate);
@@ -113,5 +124,6 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkReportsProcDate;
 		private System.Windows.Forms.CheckBox checkReportProdWO;
 		private System.Windows.Forms.CheckBox checkReportsShowPatNum;
+		private System.Windows.Forms.CheckBox checkReportPIClinic;
 	}
 }

@@ -8296,6 +8296,25 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
+		private static void To15_2_12() {
+			if(FromVersion<new Version("15.2.12.0")) {
+				string command="";
+				//On by default to fall in line with our new patterns. This gives the user the option to turn off our new functionality for larger clinics.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ReportPandIhasClinicBreakdown','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ReportPandIhasClinicBreakdown','1')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.2.12.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_3_0();
+		}
+
+		///<summary></summary>
 		private static void To15_3_0() {
 			if(FromVersion<new Version("15.3.0.0")) {
 				string command="";

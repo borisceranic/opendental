@@ -17,15 +17,20 @@ namespace OpenDental {
 		}
 
 		private void FormReportSetup_Load(object sender,EventArgs e) {
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				checkReportPIClinic.Visible=false;
+			}
 			checkReportsProcDate.Checked=PrefC.GetBool(PrefName.ReportsPPOwriteoffDefaultToProcDate);
 			checkReportsShowPatNum.Checked=PrefC.GetBool(PrefName.ReportsShowPatNum);
 			checkReportProdWO.Checked=PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO);
+			checkReportPIClinic.Checked=PrefC.GetBool(PrefName.ReportPandIhasClinicBreakdown);
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			if(Prefs.UpdateBool(PrefName.ReportsPPOwriteoffDefaultToProcDate,checkReportsProcDate.Checked)
 				| Prefs.UpdateBool(PrefName.ReportsShowPatNum,checkReportsShowPatNum.Checked)
 				| Prefs.UpdateBool(PrefName.ReportPandIschedProdSubtractsWO,checkReportProdWO.Checked)
+				| Prefs.UpdateBool(PrefName.ReportPandIhasClinicBreakdown,checkReportPIClinic.Checked)
 				) {
 				changed=true;
 			}
