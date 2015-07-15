@@ -390,6 +390,13 @@ namespace OpenDental{
 		}
 
 		private void checkNoClinics_Click(object sender,EventArgs e) {
+			//Do not allow a change if any form of integrated texting is still enabled.
+			if(SmsPhones.IsIntegratedTextingEnabled()) {
+				MsgBox.Show(this,"Integrated texting still enabled. Unsign texting agreement(s) from eServices | Integrated Texting.");
+				//Change it back to what the db has.
+				checkNoClinics.Checked=!PrefC.GetBool(PrefName.EasyNoClinics);
+				return;
+			}
 			MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
 		}
 
@@ -419,7 +426,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"You will need to restart the program for the change to take effect.");
 			}
 		}
-
+		
 		private void butOK_Click(object sender, System.EventArgs e) {
 			Prefs.UpdateBool(PrefName.EasyHideCapitation,!checkCapitation.Checked);
 			Prefs.UpdateBool(PrefName.EasyHideMedicaid,!checkMedicaid.Checked);
