@@ -1,9 +1,6 @@
-using System;
-using System.Data;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -51,23 +48,6 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>Used in FormRepeatChargesUpdate to get a list of the dates of procedures that have the proccode and patnum specified.</summary>
-		public static ArrayList GetDates(long codeNum,long patNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<ArrayList>(MethodBase.GetCurrentMethod(),codeNum,patNum);
-			}
-			ArrayList retVal=new ArrayList();
-			string command="SELECT ProcDate FROM procedurelog "
-				+"WHERE PatNum="+POut.Long(patNum)
-				+" AND CodeNum="+POut.Long(codeNum)
-				+" AND ProcStatus=2";//complete
-			DataTable table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++){
-				retVal.Add(PIn.Date(table.Rows[i][0].ToString()));
-			}
-			return retVal;
-		}
-
 		///<summary>For internal use only.  Returns the eRx repeating charges on the specified customer account.  The NPI does not have its own field, it is stored in the repeating charge note.</summary>
 		public static List<RepeatCharge> GetForErx(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -80,11 +60,11 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Get the list of all RepeatCharge rows. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+		// ReSharper disable once UnusedMember.Global
 		public static List<RepeatCharge> GetAll() {
 			//No need to check RemotingRole; no call to db.
 			return Refresh(0).ToList();			
 		}
-		
 
 
 	}

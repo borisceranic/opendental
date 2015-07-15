@@ -121,9 +121,9 @@
     <value>Only used when Open Dental is hosting your patient portal.  This is a unique URL linked to your registration key that will route all traffic to your listener.  For more information, see our online manual.</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
-    <value>Every time secure web mail is sent to a patient, they will receive this email.
-The email will not contain the actual text of the secure web mail for HIPAA compliance purposes. 
-Rather, the email should contain a link to the patient portal login so that the patient can log in and view the secure web mail.</value>
+    <value>Every time secure web mail is sent to a patient, they will receive this emailIn.
+The emailIn will not contain the actual text of the secure web mail for HIPAA compliance purposes. 
+Rather, the emailIn should contain a link to the patient portal login so that the patient can log in and view the secure web mail.</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
     <value>This will be the link that patients will use to reach your office's patient portal. This is also the URL that will be on the printout given to patients. 
@@ -138,12 +138,6 @@ If Open Dental is hosting your Patient Portal:
 - Paste the 'Hosted URL' listed above into the 'Patient Facing URL'.
 - OR type your redirect into 'Patient Facing URL' that redirects to the 'Hosted URL' listed above.
 
-For more information, see our online manual.</value>
-  </data>
-  <data name="labelWebSchedDesc.Text" xml:space="preserve">
-    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emails with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
-
-This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
 For more information, see our online manual.</value>
   </data>
   <data name="label25.Text" xml:space="preserve">
@@ -165,6 +159,12 @@ Installing the Listener Service for the first time requires installing the OpenD
 - Only shows time slots for the patients secondary provider
 - Only shows time slots for the last hygienist the patient saw.</value>
   </data>
+  <data name="labelWebSchedDesc.Text" xml:space="preserve">
+    <value>Web Sched is a separate service that gives your patients an easy way to schedule their recall appointments within seconds.  Use the Patient Viewer Web Sched button in the Recall List window to send emailIns with a link that will allow patients to quickly schedule their recall appointment.  Appointments scheduled using Web Sched will instantly show up in the schedule.
+
+This separate service requires additional sign up and the OpenDentalCustListener.  Make sure to install the listener on a computer that will always be on.
+For more information, see our online manual.</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="butBackMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -174,7 +174,7 @@ Installing the Listener Service for the first time requires installing the OpenD
 </value>
   </data>
   <data name="label29.Text" xml:space="preserve">
-    <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
+    <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. If set up for automatic billing, access and usage charges will be charged using payment method on file. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
   </data>
   <data name="butFwdMonth.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -182,6 +182,23 @@ Installing the Listener Service for the first time requires installing the OpenD
         AAAFACwAAAAADQAPAAAITwALCBQIYKBBgwIAFDyIEACBhQYVSiTwsOGAixcpQkyIEaNGgRw7ZqwYUuQA
         jSVNFkzZcWHCADADYNwoUeFFiAUE6NQJYADOgwl/AhVaICAAOw==
 </value>
+  </data>
+  <data name="button1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        R0lGODlhDQAPAIIAAAAAAAAAeH9/fwAA/3V1/+Df4wAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQB
+        AAAFACwAAAAADQAPAAAITwALCBxYAADBgwIBABCAcCAAAgsbFiQAUaFCgg8JDNi4MeJEjRw7MswYkuNC
+        kiVFFkxpkuFKlh5fDghAM0DMlxYVunQ4YKGAnzsd3mx4MyAAOw==
+</value>
+  </data>
+  <data name="button2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        R0lGODlhDQAPAIIAAAAAAAAAeH9/fwAA/3V1/+Df4wAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQB
+        AAAFACwAAAAADQAPAAAITwALCBQIYKBBgwIAFDyIEACBhQYVSiTwsOGAixcpQkyIEaNGgRw7ZqwYUuQA
+        jSVNFkzZcWHCADADYNwoUeFFiAUE6NQJYADOgwl/AhVaICAAOw==
+</value>
+  </data>
+  <data name="label33.Text" xml:space="preserve">
+    <value>This feature will allow you to send text messages from within this program. Additional fees apply, rates may vary. See the manual for details. If set up for automatic billing, access and usage charges will be charged using payment method on file. By setting a monthly limit in U.S. dollars you agree to the terms and conditions of this service and this program will attempt to prevent charges that exceed the limit. You will still be responsible for all charges accrued, even if they exceed the designated monthly limit.</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

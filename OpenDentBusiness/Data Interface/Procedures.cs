@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
-using System.Text;
-using OpenDentBusiness.Crud;
 
 namespace OpenDentBusiness {
 	public class Procedures {
@@ -69,7 +67,7 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),procedure,oldProcedure);
 			}
-			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C && procedure.Discount!=0) {//Setting the procedure to complete
+			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C && !procedure.Discount.IsZero()) {//Setting the procedure to complete
 				Adjustments.CreateAdjustmentForDiscount(procedure);
 			}
 			if(oldProcedure.ProcStatus==ProcStat.C && procedure.ProcStatus!=ProcStat.C) {//Setting a completed procedure to TP
@@ -100,7 +98,7 @@ namespace OpenDentBusiness {
 				return;
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
-				Procedures.DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
+				DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
 			}
 			//Test to see if the procedure is attached to a claim
 			string command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
@@ -182,15 +180,15 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		public static void UpdatePlannedAptNum(long procNum,long newPlannedAptNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum,newPlannedAptNum);
-				return;
-			}
-			string command="UPDATE procedurelog SET PlannedAptNum = "+POut.Long(newPlannedAptNum)
-				+" WHERE ProcNum = "+POut.Long(procNum);
-			Db.NonQ(command);
-		}
+		//public static void UpdatePlannedAptNum(long procNum,long newPlannedAptNum) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum,newPlannedAptNum);
+		//		return;
+		//	}
+		//	string command="UPDATE procedurelog SET PlannedAptNum = "+POut.Long(newPlannedAptNum)
+		//		+" WHERE ProcNum = "+POut.Long(procNum);
+		//	Db.NonQ(command);
+		//}
 
 		public static void UpdatePriority(long procNum,long newPriority) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -217,14 +215,11 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Procedure>(MethodBase.GetCurrentMethod(),procNum,includeNote);
 			}
-			string command=
-				"SELECT * FROM procedurelog "
-				+"WHERE ProcNum="+procNum.ToString();
 			Procedure proc=Crud.ProcedureCrud.SelectOne(procNum);
 			if(proc==null){
 				return new Procedure();
 			}
-			command="SELECT * FROM procnote WHERE ProcNum="+POut.Long(procNum)+" ORDER BY EntryDateTime DESC";
+			string command="SELECT * FROM procnote WHERE ProcNum="+POut.Long(procNum)+" ORDER BY EntryDateTime DESC";
 			DbHelper.LimitOrderBy(command,1);
 			DataTable table=Db.GetTable(command);
 			if(table.Rows.Count==0) {
@@ -348,14 +343,8 @@ namespace OpenDentBusiness {
 			return Crud.ProcedureCrud.SelectOne(command);
 		}
 
-		///<summary>Gets a list (procsMultApts is a struct of type ProcDesc(aptNum, string[], and production) of all the procedures attached to the specified appointments.  Then, use GetProcsOneApt to pull procedures for one appointment from this list.  This process requires only one call to the database. "myAptNums" is the list of appointments to get procedures for.</summary>
-		public static List<Procedure> GetProcsMultApts(List<long> myAptNums) {
-			//No need to check RemotingRole; no call to db.
-			return GetProcsMultApts(myAptNums,false);
-		}
-
 		///<summary>Gets a list (procsMultApts is a struct of type ProcDesc(aptNum, string[], and production) of all the procedures attached to the specified appointments.  Then, use GetProcsOneApt to pull procedures for one appointment from this list or GetProductionOneApt.  This process requires only one call to the database.  "myAptNums" is the list of appointments to get procedures for.  isForNext gets procedures for a list of next appointments rather than regular appointments.</summary>
-		public static List<Procedure> GetProcsMultApts(List<long> myAptNums,bool isForPlanned) {
+		public static List<Procedure> GetProcsMultApts(List<long> myAptNums,bool isForPlanned=false) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),myAptNums,isForPlanned);
 			}
@@ -381,14 +370,14 @@ namespace OpenDentBusiness {
 		///<summary>Gets procedures for one appointment by looping through the procsMultApts which was filled previously from GetProcsMultApts.</summary>
 		public static Procedure[] GetProcsOneApt(long myAptNum,List<Procedure> procsMultApts) {
 			//No need to check RemotingRole; no call to db.
-			ArrayList AL=new ArrayList();
+			ArrayList al=new ArrayList();
 			for(int i=0;i<procsMultApts.Count;i++) {
 				if(procsMultApts[i].AptNum==myAptNum) {
-					AL.Add(procsMultApts[i].Copy());
+					al.Add(procsMultApts[i].Copy());
 				}
 			}
-			Procedure[] retVal=new Procedure[AL.Count];
-			AL.CopyTo(retVal);
+			Procedure[] retVal=new Procedure[al.Count];
+			al.CopyTo(retVal);
 			return retVal;
 		}
 
@@ -465,6 +454,21 @@ namespace OpenDentBusiness {
 			//MessageBox.Show(cmd.CommandText);
 			//dcon.NonQ(command);
 			Db.NonQ(command);
+		}
+
+		///<summary>Gets all completed procedures within a date range with optional ProcCodeNum and PatientNum filters. Date range is inclusive.</summary>
+		public static List<Procedure> GetCompletedForDateRange(DateTime dateStart,DateTime dateStop,List<long> listProcCodeNums=null,List<long> listPatNums=null) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),dateStart,dateStop,listProcCodeNums,listPatNums);
+			}
+			string command="SELECT * FROM procedurelog WHERE ProcStatus=2 AND ProcDate>="+POut.Date(dateStart)+" AND ProcDate<="+POut.Date(dateStop);
+			if (listProcCodeNums!=null && listProcCodeNums.Count > 0) {
+				command+=" AND CodeNum IN ("+string.Join(",", listProcCodeNums)+")";
+			}
+			if(listPatNums!=null && listPatNums.Count > 0) {
+				command+=" AND PatNum IN ("+string.Join(",",listPatNums)+")";
+			}
+			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
 		///<summary>Called from FormApptsOther when creating a new appointment.  Returns true if there are any procedures marked complete for this patient.  The result is that the NewPt box on the appointment won't be checked.</summary>
@@ -607,63 +611,6 @@ namespace OpenDentBusiness {
 			return retVal;
 		}*/
 
-		///<summary>WriteOff'Complete'. Only used in main Account module. Gets writeoff for this procedure based on supplied claimprocs. Only includes claimprocs with status of CapComplete,CapClaim,NotReceived,Received,or Supplemental. Used to ONLY include Writeoffs not attached to claims, because those would display on the claim line, but now they show on each procedure instead.  /*In practice, this means only writeoffs with CapComplete status get returned because they are to be subtracted from the patient portion on the proc line*/. The claimProc array typically includes all claimProcs for the patient, but must at least include all claimprocs for this proc.</summary>
-		public static double GetWriteOffC(Procedure proc,ClaimProc[] claimProcs) {
-			//No need to check RemotingRole; no call to db.
-			double retVal=0;
-			for(int i=0;i<claimProcs.Length;i++) {
-				if(claimProcs[i].ProcNum!=proc.ProcNum) {
-					continue;
-				}
-				//if(claimProcs[i].ClaimNum>0) {
-				//	continue;
-				//}
-				if(
-					//adj skipped
-					claimProcs[i].Status==ClaimProcStatus.CapClaim
-					|| claimProcs[i].Status==ClaimProcStatus.CapComplete
-					//capEstimate would never happen because procedure is C.
-					//estimate means not attached to claim, so don't count
-					//|| claimProcs[i].Status==ClaimProcStatus.NotReceived//see below
-					//preAuth -no
-					|| claimProcs[i].Status==ClaimProcStatus.Received
-					|| claimProcs[i].Status==ClaimProcStatus.Supplemental
-					) {
-					retVal+=claimProcs[i].WriteOff;
-				}
-				if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)//this is the typical situation
-					&& claimProcs[i].Status==ClaimProcStatus.NotReceived) {
-					//so, if user IS using "balances don't subtract ins", and a proc as been sent but not received,
-					//then we do not subtract the writeoff because it's considered part of the estimate.
-					retVal+=claimProcs[i].WriteOff;
-				}
-			}
-			return retVal;
-		}
-
-		///<summary>Used in deciding how to display procedures in Account. The claimProcList can be all claimProcs for the patient or only those attached to this proc. Will be true if any claimProcs at all are attached to this procedure.</summary>
-		public static bool IsCoveredIns(Procedure proc,ClaimProc[] List) {
-			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<List.Length;i++) {
-				if(List[i].ProcNum==proc.ProcNum) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		///<summary>Used in deciding how to display procedures in Account. The claimProcList can be all claimProcs for the patient or only those attached to this proc. Will be true if any claimProcs attached to this procedure are set NoBillIns.</summary>
-		public static bool NoBillIns(Procedure proc,List<ClaimProc> claimProcList) {
-			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<claimProcList.Count;i++) {
-				if(claimProcList[i].ProcNum==proc.ProcNum
-					&& claimProcList[i].NoBillIns) {
-					return true;
-				}
-			}
-			return false;
-		}
-
 		///<summary>Used in ContrAccount.CreateClaim when validating selected procedures. Returns true if there is any claimproc for this procedure and plan which is marked NoBillIns.  The claimProcList can be all claimProcs for the patient or only those attached to this proc. Will be true if any claimProcs attached to this procedure are set NoBillIns.</summary>
 		public static bool NoBillIns(Procedure proc,List<ClaimProc> claimProcList,long planNum) {
 			//No need to check RemotingRole; no call to db.
@@ -674,22 +621,6 @@ namespace OpenDentBusiness {
 				if(claimProcList[i].ProcNum==proc.ProcNum
 					&& claimProcList[i].PlanNum==planNum
 					&& claimProcList[i].NoBillIns) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		///<summary>Used in deciding how to display procedures in Account. The claimProcList can be all claimProcs for the patient or only those attached to this proc. Will be true if any claimProcs attached to this procedure are status estimate, which means they haven't been attached to a claim because their status would have been changed to NotReceived.  And if the patient doesn't have ins, then the estimates would have been deleted.</summary>
-		public static bool IsUnsent(Procedure proc,ClaimProc[] List) {
-			//No need to check RemotingRole; no call to db.
-			//unsent if no claimprocs with claimNums
-			for(int i=0;i<List.Length;i++) {
-				if(List[i].ProcNum==proc.ProcNum
-					&& List[i].Status==ClaimProcStatus.Estimate
-					//&& List[i].ClaimNum>0
-					//&& List[i].Status!=ClaimProcStatus.Preauth
-					) {
 					return true;
 				}
 			}
@@ -715,7 +646,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Only called from FormProcEdit.  When attached  to a claim and user clicks Edit Anyway, we need to know the oldest claim date for security reasons.  The claimProcsForProc should only be claimprocs for this procedure.</summary>
-		public static DateTime GetOldestClaimDate(long procNum,List<ClaimProc> claimProcsForProc) {
+		public static DateTime GetOldestClaimDate(List<ClaimProc> claimProcsForProc) {
 			//No need to check RemotingRole; no call to db.
 			Claim claim;
 			DateTime retVal=DateTime.Today;
@@ -895,7 +826,7 @@ namespace OpenDentBusiness {
 				if(procList[i].ProcStatus==ProcStat.TP) {
 					changedProc.ProcDate=apt.AptDateTime;
 				}
-				Procedures.Update(changedProc,procList[i]);//won't go to db unless a field has changed.
+				Update(changedProc,procList[i]);//won't go to db unless a field has changed.
 			}
 		}
 
@@ -962,7 +893,7 @@ namespace OpenDentBusiness {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),procNum);
 			}
 			string command="SELECT * FROM procedurelog WHERE ProcStatus<>"+POut.Int((int)ProcStat.D)+" AND ProcNumLab="+POut.Long(procNum);
-			return ProcedureCrud.SelectMany(command);
+			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
 		/*
@@ -1041,11 +972,11 @@ namespace OpenDentBusiness {
 					newFee=insfee;
 				}
 				oldFee=PIn.Double(table.Rows[i]["ProcFee"].ToString());
-				if(newFee==oldFee) {
+				if(newFee.IsEqual(oldFee)) {
 					continue;
 				}
 				command="UPDATE procedurelog SET ProcFee='"+POut.Double(newFee)+"' "
-					+"WHERE ProcNum="+table.Rows[i]["ProcNum"].ToString();
+					+"WHERE ProcNum="+POut.String(table.Rows[i]["ProcNum"].ToString());
 				rowsChanged+=Db.NonQ(command);
 			}
 			return rowsChanged;
@@ -1054,33 +985,33 @@ namespace OpenDentBusiness {
 		///<summary>Used from TP to get a list of all TP procs, ordered by priority, toothnum.</summary>
 		public static Procedure[] GetListTP(List<Procedure> procList) {
 			//No need to check RemotingRole; no call to db.
-			ArrayList AL=new ArrayList();
+			ArrayList al=new ArrayList();
 			for(int i=0;i<procList.Count;i++) {
 				if(procList[i].ProcStatus==ProcStat.TP) {
-					AL.Add(procList[i]);
+					al.Add(procList[i]);
 				}
 			}
 			IComparer myComparer=new ProcedureComparer();
-			AL.Sort(myComparer);
-			Procedure[] retVal=new Procedure[AL.Count];
-			AL.CopyTo(retVal);
+			al.Sort(myComparer);
+			Procedure[] retVal=new Procedure[al.Count];
+			al.CopyTo(retVal);
 			return retVal;
 		}
 
-		public static void ComputeEstimates(Procedure proc,long patNum,List<ClaimProc> claimProcs,bool isInitialEntry,List<InsPlan> PlanList,List<PatPlan> patPlans,List<Benefit> benefitList,int patientAge,List<InsSub> subList) {
+		public static void ComputeEstimates(Procedure proc,long patNum,List<ClaimProc> claimProcs,bool isInitialEntry,List<InsPlan> planList,List<PatPlan> patPlans,List<Benefit> benefitList,int patientAge,List<InsSub> subList) {
 			//This is a stub that needs revision.
-			ComputeEstimates(proc,patNum,ref claimProcs,isInitialEntry,PlanList,patPlans,benefitList,null,null,true,patientAge,subList);
+			ComputeEstimates(proc,patNum,ref claimProcs,isInitialEntry,planList,patPlans,benefitList,null,null,true,patientAge,subList);
 		}
 
 		///<summary>Used whenever a procedure changes or a plan changes.  All estimates for a given procedure must be updated. This frequently includes adding claimprocs, but can also just edit the appropriate existing claimprocs. Skips status=Adjustment,CapClaim,Preauth,Supplemental.  Also fixes date,status,and provnum if appropriate.  The claimProc list only needs to include claimprocs for this proc, although it can include more.  Only set isInitialEntry true from Chart module; it is for cap procs.  loopList only contains information about procedures that come before this one in a list such as TP or claim.</summary>
-		public static void ComputeEstimates(Procedure proc,long patNum,ref List<ClaimProc> claimProcs,bool isInitialEntry,List<InsPlan> PlanList,List<PatPlan> patPlans,List<Benefit> benefitList,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,bool saveToDb,int patientAge,List<InsSub> subList) {
+		public static void ComputeEstimates(Procedure proc,long patNum,ref List<ClaimProc> claimProcs,bool isInitialEntry,List<InsPlan> planList,List<PatPlan> patPlans,List<Benefit> benefitList,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,bool saveToDb,int patientAge,List<InsSub> subList) {
 			//No need to check RemotingRole; no call to db.
 			bool isHistorical=false;
 			if(proc.ProcDate<DateTime.Today && proc.ProcStatus==ProcStat.C) {
 				isHistorical=true;//Don't automatically create an estimate for completed procedures, especially if they are older than today.  Very important after a conversion from another software.
 				//Special logic in place only for capitation plans:
-				for(int i=0;i<PlanList.Count;i++) {
-					if(PlanList[i].PlanType!="c") {
+				for(int i=0;i<planList.Count;i++) {
+					if(planList[i].PlanType!="c") {
 						//11/19/2012 js We had a specific complaint where changing plan type to capitation automatically added WOs to historical procs.
 						continue;
 					}
@@ -1142,8 +1073,8 @@ namespace OpenDentBusiness {
 					}
 				}
 			}
-			InsPlan PlanCur;
-			InsSub SubCur;
+			InsPlan planCur;
+			InsSub subCur;
 			bool estExists;
 			bool cpAdded=false;
 			//loop through all patPlans (current coverage), and add any missing estimates
@@ -1182,12 +1113,12 @@ namespace OpenDentBusiness {
 				cp.ProcNum=proc.ProcNum;
 				cp.PatNum=patNum;
 				cp.ProvNum=proc.ProvNum;
-				SubCur=InsSubs.GetSub(patPlans[p].InsSubNum,subList);
-				PlanCur=InsPlans.GetPlan(SubCur.PlanNum,PlanList);
-				if(PlanCur==null || SubCur==null) {//??
+				subCur=InsSubs.GetSub(patPlans[p].InsSubNum,subList);
+				planCur=InsPlans.GetPlan(subCur.PlanNum,planList);
+				if(planCur==null){//subCur can never be null) {//??
 					continue;//??
 				}
-				if(PlanCur.PlanType=="c") {
+				if(planCur.PlanType=="c") {
 					if(proc.ProcStatus==ProcStat.C) {
 						cp.Status=ClaimProcStatus.CapComplete;
 					}
@@ -1198,8 +1129,8 @@ namespace OpenDentBusiness {
 				else {
 					cp.Status=ClaimProcStatus.Estimate;
 				}
-				cp.PlanNum=PlanCur.PlanNum;
-				cp.InsSubNum=SubCur.InsSubNum;
+				cp.PlanNum=planCur.PlanNum;
+				cp.InsSubNum=subCur.InsSubNum;
 				cp.DateCP=proc.ProcDate;
 				cp.AllowedOverride=-1;
 				cp.PercentOverride=-1;
@@ -1232,19 +1163,19 @@ namespace OpenDentBusiness {
 			double paidOtherInsBaseEst=0;
 			double writeOffEstOtherIns=0;
 			//because secondary claimproc might come before primary claimproc in the list, we cannot simply loop through the claimprocs
-			ComputeForOrdinal(1,claimProcs,proc,PlanList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
+			ComputeForOrdinal(1,claimProcs,proc,planList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
 				patPlans,benefitList,histList,loopList,saveToDb,patientAge);
-			ComputeForOrdinal(2,claimProcs,proc,PlanList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
+			ComputeForOrdinal(2,claimProcs,proc,planList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
 				patPlans,benefitList,histList,loopList,saveToDb,patientAge);
-			ComputeForOrdinal(3,claimProcs,proc,PlanList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
+			ComputeForOrdinal(3,claimProcs,proc,planList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
 				patPlans,benefitList,histList,loopList,saveToDb,patientAge);
-			ComputeForOrdinal(4,claimProcs,proc,PlanList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
+			ComputeForOrdinal(4,claimProcs,proc,planList,isInitialEntry,ref paidOtherInsEstTotal,ref paidOtherInsBaseEst,ref writeOffEstOtherIns,
 				patPlans,benefitList,histList,loopList,saveToDb,patientAge);
 			//At this point, for a PPO with secondary, the sum of all estimates plus primary writeoff might be greater than fee.
 			if(patPlans.Count>1){
-				SubCur=InsSubs.GetSub(patPlans[0].InsSubNum,subList);
-				PlanCur=InsPlans.GetPlan(SubCur.PlanNum,PlanList);
-				if(PlanCur.PlanType=="p") {
+				subCur=InsSubs.GetSub(patPlans[0].InsSubNum,subList);
+				planCur=InsPlans.GetPlan(subCur.PlanNum,planList);
+				if(planCur.PlanType=="p") {
 					//claimProcs=ClaimProcs.Refresh(patNum);
 					//ClaimProc priClaimProc=null;
 					int priClaimProcIdx=-1;
@@ -1261,7 +1192,7 @@ namespace OpenDentBusiness {
 						{
 							continue;
 						}
-						if(claimProcs[i].PlanNum==PlanCur.PlanNum && claimProcs[i].WriteOffEst>0){
+						if(claimProcs[i].PlanNum==planCur.PlanNum && claimProcs[i].WriteOffEst>0){
 							priClaimProcIdx=i;
 						}
 						if(claimProcs[i].Status==ClaimProcStatus.Received
@@ -1269,7 +1200,7 @@ namespace OpenDentBusiness {
 							sumPay+=claimProcs[i].InsPayAmt;
 						}
 						if(claimProcs[i].Status==ClaimProcStatus.Estimate){
-							if(claimProcs[i].InsEstTotalOverride!=-1){
+							if(!claimProcs[i].InsEstTotalOverride.IsEqual(-1)){
 								sumPay+=claimProcs[i].InsEstTotalOverride;
 							}
 							else{
@@ -1299,7 +1230,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Passing in 4 will compute for 4 as well as any other situation such as dropped plan.</summary>
-		private static void ComputeForOrdinal(int ordinal,List<ClaimProc> claimProcs,Procedure proc,List<InsPlan> PlanList,bool isInitialEntry,
+		private static void ComputeForOrdinal(int ordinal,List<ClaimProc> claimProcs,Procedure proc,List<InsPlan> planList,bool isInitialEntry,
 			ref double paidOtherInsEstTotal,ref double paidOtherInsBaseEst,ref double writeOffEstOtherIns,
 			List<PatPlan> patPlans,List<Benefit> benefitList,List<ClaimProcHist> histList,List<ClaimProcHist> loopList,bool saveToDb,int patientAge) {
 			//No need to check RemotingRole; no call to db.
@@ -1309,7 +1240,7 @@ namespace OpenDentBusiness {
 				if(claimProcs[i].ProcNum!=proc.ProcNum) {
 					continue;
 				}
-				PlanCur=InsPlans.GetPlan(claimProcs[i].PlanNum,PlanList);
+				PlanCur=InsPlans.GetPlan(claimProcs[i].PlanNum,planList);
 				if(PlanCur==null) {
 					continue;//in older versions it still did a couple of small things even if plan was null, but don't know why
 					//example:cap estimate changed to cap complete, and if estimate, then provnum set
@@ -1380,7 +1311,7 @@ namespace OpenDentBusiness {
 					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
 				}
-				//This was a longstanding bug. I hope there are not other consequences for commenting it out.
+				//This was a longstanding problem. I hope there are not other consequences for commenting it out.
 				//claimProcs[i].DateCP=proc.ProcDate;
 				claimProcs[i].ProcDate=proc.ProcDate;
 				claimProcs[i].ClinicNum=proc.ClinicNum;
@@ -1405,21 +1336,21 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>After changing important coverage plan info, this is called to recompute estimates for all procedures for this patient.</summary>
-		public static void ComputeEstimatesForAll(long patNum,List<ClaimProc> claimProcs,List<Procedure> procs,List<InsPlan> PlanList,List<PatPlan> patPlans,List<Benefit> benefitList,int patientAge,List<InsSub> subList) {
+		public static void ComputeEstimatesForAll(long patNum,List<ClaimProc> claimProcs,List<Procedure> procs,List<InsPlan> planList,List<PatPlan> patPlans,List<Benefit> benefitList,int patientAge,List<InsSub> subList) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<procs.Count;i++) {
-				ComputeEstimates(procs[i],patNum,claimProcs,false,PlanList,patPlans,benefitList,patientAge,subList);
+				ComputeEstimates(procs[i],patNum,claimProcs,false,planList,patPlans,benefitList,patientAge,subList);
 			}
 		}
 
 		///<summary>Loops through each proc. Does not add notes to a procedure that already has notes. Used three times, security checked in all three places before calling this.  Also sets provider for each proc and claimproc.</summary>
-		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,List<Procedure> procsInAppt,List<InsSub> subList) { 
+		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> planList,List<PatPlan> patPlans,long siteNum,int patientAge,List<Procedure> procsInAppt,List<InsSub> subList) { 
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),apt,PlanList,patPlans,siteNum,patientAge,procsInAppt,subList);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,procsInAppt,subList);
 				return;
 			}
-			List<Procedure> ProcList=Procedures.Refresh(apt.PatNum);
-			List<ClaimProc> ClaimProcList=ClaimProcs.Refresh(apt.PatNum);
+			List<Procedure> procList=Refresh(apt.PatNum);
+			List<ClaimProc> claimProcList=ClaimProcs.Refresh(apt.PatNum);
 			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
 			//this query could be improved slightly to only get notes of interest.
 			string command="SELECT * FROM procnote WHERE PatNum="+POut.Long(apt.PatNum)+" ORDER BY EntryDateTime";
@@ -1433,8 +1364,8 @@ namespace OpenDentBusiness {
 			//	siteNum=Patients.GetPat(apt.PatNum).SiteNum;
 			//}
 			List<long> encounterProvNums = new List<long>();  //for auto-inserting default encounters
-			for(int i=0;i<ProcList.Count;i++) {
-				if(ProcList[i].AptNum!=apt.AptNum) {
+			for(int i=0;i<procList.Count;i++) {
+				if(procList[i].AptNum!=apt.AptNum) {
 					continue;
 				}
 				//if(ProcList[i].ProcStatus==ProcStat.C) {//if the procedure is already complete, don't touch it.
@@ -1442,61 +1373,61 @@ namespace OpenDentBusiness {
 				//}
 				//attach the note, if it exists.
 				for(int n=rawNotes.Rows.Count-1;n>=0;n--) {//loop through each note, backwards.
-					if(ProcList[i].ProcNum.ToString()!=rawNotes.Rows[n]["ProcNum"].ToString()) {
+					if(procList[i].ProcNum.ToString()!=rawNotes.Rows[n]["ProcNum"].ToString()) {
 						continue;
 					}
-					ProcList[i].UserNum=PIn.Long(rawNotes.Rows[n]["UserNum"].ToString());
-					ProcList[i].Note=PIn.String(rawNotes.Rows[n]["Note"].ToString());
-					ProcList[i].SigIsTopaz=PIn.Bool(rawNotes.Rows[n]["SigIsTopaz"].ToString());
-					ProcList[i].Signature=PIn.String(rawNotes.Rows[n]["Signature"].ToString());
+					procList[i].UserNum=PIn.Long(rawNotes.Rows[n]["UserNum"].ToString());
+					procList[i].Note=PIn.String(rawNotes.Rows[n]["Note"].ToString());
+					procList[i].SigIsTopaz=PIn.Bool(rawNotes.Rows[n]["SigIsTopaz"].ToString());
+					procList[i].Signature=PIn.String(rawNotes.Rows[n]["Signature"].ToString());
 					break;//out of note loop.
 				}
-				oldProc=ProcList[i].Copy();
-				procCode=ProcedureCodes.GetProcCode(ProcList[i].CodeNum);
+				oldProc=procList[i].Copy();
+				procCode=ProcedureCodes.GetProcCode(procList[i].CodeNum);
 				if(procCode.PaintType==ToothPaintingType.Extraction) {//if an extraction, then mark previous procs hidden
 					//SetHideGraphical(ProcList[i]);//might not matter anymore
-					ToothInitials.SetValue(apt.PatNum,ProcList[i].ToothNum,ToothInitialType.Missing);
+					ToothInitials.SetValue(apt.PatNum,procList[i].ToothNum,ToothInitialType.Missing);
 				}
-				ProcList[i].ProcStatus=ProcStat.C;
+				procList[i].ProcStatus=ProcStat.C;
 				if(oldProc.ProcStatus!=ProcStat.C) {
-					ProcList[i].ProcDate=apt.AptDateTime.Date;//only change date to match appt if not already complete.
-					ProcList[i].DateEntryC=DateTime.Now;//this triggers it to set to server time NOW().
-					if(ProcList[i].DiagnosticCode=="") {
-						ProcList[i].DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+					procList[i].ProcDate=apt.AptDateTime.Date;//only change date to match appt if not already complete.
+					procList[i].DateEntryC=DateTime.Now;//this triggers it to set to server time NOW().
+					if(procList[i].DiagnosticCode=="") {
+						procList[i].DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 					}
 				}
-				ProcList[i].PlaceService=(PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
-				ProcList[i].ClinicNum=apt.ClinicNum;
-				ProcList[i].SiteNum=siteNum;
-				ProcList[i].PlaceService=Clinics.GetPlaceService(apt.ClinicNum);
+				procList[i].PlaceService=(PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
+				procList[i].ClinicNum=apt.ClinicNum;
+				procList[i].SiteNum=siteNum;
+				procList[i].PlaceService=Clinics.GetPlaceService(apt.ClinicNum);
 				if(apt.ProvHyg!=0) {//if the appointment has a hygiene provider
 					if(procCode.IsHygiene) {//hyg proc
-						ProcList[i].ProvNum=apt.ProvHyg;
+						procList[i].ProvNum=apt.ProvHyg;
 					}
 					else {//regular proc
-						ProcList[i].ProvNum=apt.ProvNum;
+						procList[i].ProvNum=apt.ProvNum;
 					}
 				}
 				else {//same provider for every procedure
-					ProcList[i].ProvNum=apt.ProvNum;
+					procList[i].ProvNum=apt.ProvNum;
 				}
 				if(procCode.ProvNumDefault!=0) {//Override provider for procedures with a default provider
-					ProcList[i].ProvNum=procCode.ProvNumDefault;
+					procList[i].ProvNum=procCode.ProvNumDefault;
 				}
 				//if procedure was already complete, then don't add more notes.
 				if(oldProc.ProcStatus!=ProcStat.C) {
-					ProcList[i].Note+=ProcCodeNotes.GetNote(ProcList[i].ProvNum,ProcList[i].CodeNum);
+					procList[i].Note+=ProcCodeNotes.GetNote(procList[i].ProvNum,procList[i].CodeNum);
 				}
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
-					Procedures.SetCanadianLabFeesCompleteForProc(ProcList[i]);
+					SetCanadianLabFeesCompleteForProc(procList[i]);
 				}
-				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",ProcList[i],oldProc);
-				Procedures.Update(ProcList[i],oldProc);
-				Procedures.ComputeEstimates(ProcList[i],apt.PatNum,ClaimProcList,false,PlanList,patPlans,benefitList,patientAge,subList);
-				ClaimProcs.SetProvForProc(ProcList[i],ClaimProcList);
+				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procList[i],oldProc);
+				Update(procList[i],oldProc);
+				ComputeEstimates(procList[i],apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
+				ClaimProcs.SetProvForProc(procList[i],claimProcList);
 				//Add provnum to list to create an encounter later. Done to limit calls to DB from Encounters.InsertDefaultEncounter().
-				if(oldProc.ProcStatus!=ProcStat.C && !encounterProvNums.Contains(ProcList[i].ProvNum)) {
-					encounterProvNums.Add(ProcList[i].ProvNum);
+				if(oldProc.ProcStatus!=ProcStat.C && !encounterProvNums.Contains(procList[i].ProvNum)) {
+					encounterProvNums.Add(procList[i].ProvNum);
 				}
 			}
 			//Auto-insert default encounters for the providers that did work on this appointment
@@ -1581,16 +1512,16 @@ namespace OpenDentBusiness {
 			return PIn.Long(Db.GetScalar(command));
 		}
 
-		public static bool IsUsingCode(long codeNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),codeNum);
-			}
-			string command="SELECT COUNT(*) FROM procedurelog WHERE CodeNum="+POut.Long(codeNum);
-			if(Db.GetCount(command)=="0") {
-				return false;
-			}
-			return true;
-		}
+		//public static bool IsUsingCode(long codeNum) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		return Meth.GetBool(MethodBase.GetCurrentMethod(),codeNum);
+		//	}
+		//	string command="SELECT COUNT(*) FROM procedurelog WHERE CodeNum="+POut.Long(codeNum);
+		//	if(Db.GetCount(command)=="0") {
+		//		return false;
+		//	}
+		//	return true;
+		//}
 
 		public static void SetCanadianLabFeesCompleteForProc(Procedure proc) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1599,7 +1530,7 @@ namespace OpenDentBusiness {
 			}
 			//If this gets run on a lab fee itself, nothing will happen because result will be zero procs.
 			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+proc.ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
-			List <Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
+			List<Procedure> labFeesForProc=Crud.ProcedureCrud.SelectMany(command);
 			if(proc.ProcNumLab==0) {//Regular procedure, not a lab.
 				for(int i=0;i<labFeesForProc.Count;i++) {
 					Procedure labFeeNew=labFeesForProc[i];
@@ -1614,7 +1545,7 @@ namespace OpenDentBusiness {
 					labFeeNew.ProvNum=proc.ProvNum;
 					labFeeNew.SiteNum=proc.SiteNum;
 					labFeeNew.UserNum=proc.UserNum;
-					Procedures.Update(labFeeNew,labFeeOld);
+					Update(labFeeNew,labFeeOld);
 				}
 			}
 			else {//Lab fee.  Set complete, set the parent procedure as well as any other lab fees complete.
@@ -1624,7 +1555,7 @@ namespace OpenDentBusiness {
 				Procedure parentProcNew=procParent;
 				Procedure parentProcOld=procParent.Copy();
 				parentProcNew.ProcStatus=ProcStat.C;
-				Procedures.Update(parentProcNew,parentProcOld);
+				Update(parentProcNew,parentProcOld);
 			}
 		}
 
@@ -1641,7 +1572,7 @@ namespace OpenDentBusiness {
 					Procedure labFeeNew=labFeesForProc[i];
 					Procedure labFeeOld=labFeeNew.Copy();
 					labFeeNew.ProcStatus=proc.ProcStatus;
-					Procedures.Update(labFeeNew,labFeeOld);
+					Update(labFeeNew,labFeeOld);
 				}
 			}
 			else {//Lab fee.  If lab is set back to any status other than complete, set the parent procedure as well as any other lab fees back to that status.
@@ -1651,30 +1582,30 @@ namespace OpenDentBusiness {
 				Procedure parentProcOld=procParent.Copy();
 				parentProcNew.ProcStatus=proc.ProcStatus;
 				SetCanadianLabFeesStatusForProc(parentProcNew);
-				Procedures.Update(parentProcNew,parentProcOld);
+				Update(parentProcNew,parentProcOld);
 			}
 		}
 
-		public static void DeleteCanadianLabFeesForProcCode(long ProcNum) {
-			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+ProcNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
+		public static void DeleteCanadianLabFeesForProcCode(long procNum) {
+			string command="SELECT * FROM procedurelog WHERE ProcNumLab="+procNum+" AND ProcStatus!="+POut.Int((int)ProcStat.D);
 			List<Procedure> labFeeProcs=Crud.ProcedureCrud.SelectMany(command);
 			for(int i=0;i<labFeeProcs.Count;i++) {
-				Procedures.Delete(labFeeProcs[i].ProcNum);
+				Delete(labFeeProcs[i].ProcNum);
 			}
 		}
 
-		///<summary>Gets the number of procedures attached to a claim.</summary>
-		public static int GetCountForClaim(long claimNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),claimNum);
-			}
-			string command=
-				"SELECT COUNT(*) FROM procedurelog "
-				+"WHERE ProcNum IN "
-				+"(SELECT claimproc.ProcNum FROM claimproc "
-				+" WHERE ClaimNum="+claimNum+")";
-			return PIn.Int(Db.GetCount(command));
-		}
+		/////<summary>Gets the number of procedures attached to a claim.</summary>
+		//public static int GetCountForClaim(long claimNum) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		return Meth.GetInt(MethodBase.GetCurrentMethod(),claimNum);
+		//	}
+		//	string command=
+		//		"SELECT COUNT(*) FROM procedurelog "
+		//		+"WHERE ProcNum IN "
+		//		+"(SELECT claimproc.ProcNum FROM claimproc "
+		//		+" WHERE ClaimNum="+claimNum+")";
+		//	return PIn.Int(Db.GetCount(command));
+		//}
 
 		///<summary>Gets a list of procedures for </summary>
 		public static DataTable GetReferred(DateTime dateFrom, DateTime dateTo, bool complete) {

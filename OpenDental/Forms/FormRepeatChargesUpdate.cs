@@ -1,24 +1,26 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using System.Globalization;
 
 namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRepeatChargesUpdate : System.Windows.Forms.Form{
-		private OpenDental.UI.Button butCancel;
-		private OpenDental.UI.Button butOK;
-		private System.Windows.Forms.TextBox textBox1;
+	public class FormRepeatChargesUpdate : Form{
+		// ReSharper disable once InconsistentNaming
+		private UI.Button butCancel;
+		// ReSharper disable once InconsistentNaming
+		private UI.Button butOK;
+		// ReSharper disable once InconsistentNaming
+		private TextBox textBox1;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.Container components = null;
+		private Container components = null;
 
 		///<summary></summary>
 		public FormRepeatChargesUpdate()
@@ -120,17 +122,15 @@ namespace OpenDental{
 		}
 		#endregion
 
-		private void FormRepeatChargesUpdate_Load(object sender, System.EventArgs e) {
+		private void FormRepeatChargesUpdate_Load(object sender, EventArgs e) {
 		
 		}
 
-		private Claim CreateClaim(string claimType,List<PatPlan> patPlanList,List<InsPlan> planList,List<ClaimProc> claimProcList,Procedure proc,List<InsSub> subList) {
+		private static Claim CreateClaim(string claimType,List<PatPlan> patPlanList,List<InsPlan> planList,List<ClaimProc> claimProcList,Procedure proc,List<InsSub> subList) {
 			long claimFormNum=0;
 			InsPlan planCur=new InsPlan();
 			InsSub subCur=new InsSub();
 			Relat relatOther=Relat.Self;
-			long clinicNum=proc.ClinicNum;
-			PlaceOfService placeService=proc.PlaceService;
 			switch(claimType) {
 				case "P":
 					subCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,patPlanList,planList,subList)),subList);
@@ -247,129 +247,258 @@ namespace OpenDental{
 					}
 				}
 			}
-			claimProcCur.LineNumber=(byte)1;
+			claimProcCur.LineNumber=1;
 			ClaimProcs.Update(claimProcCur);
 			return claimCur;
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			RepeatCharge[] chargeList=RepeatCharges.Refresh(0);//Gets all repeating charges for all patients, they may be disabled
-			int countAdded=0;
-			int claimsAdded=0;
-			DateTime startDate;
-			Procedure proc;
-			for(int i=0;i<chargeList.Length;i++){
-				if(!chargeList[i].IsEnabled) {//first make sure it is not disabled
+		///<summary>Do not call this until after determining if the repeate charge might generate a claim.  This function checks current insurance and may not add claims if no insurance is found.</summary>
+		private static List<Claim> AddClaimsHelper(RepeatCharge repeateCharge,Procedure proc) {
+			List<PatPlan> patPlanList=PatPlans.Refresh(repeateCharge.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(Patients.GetFamily(repeateCharge.PatNum));
+			List<InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);
+			List<Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
+			List<Claim> retVal=new List<Claim>();
+			Claim claimCur;
+			if(patPlanList.Count==0) {//no current insurance, do not create a claim
+				return retVal;
+			}
+			//create the claimprocs
+			Procedures.ComputeEstimates(proc,proc.PatNum,new List<ClaimProc>(),true,insPlanList,patPlanList,benefitList,
+				Patients.GetPat(proc.PatNum).Age,subList);
+			//get claimprocs for this proc, may be more than one
+			List<ClaimProc> claimProcList=ClaimProcs.GetForProc(ClaimProcs.Refresh(proc.PatNum),proc.ProcNum);
+			string claimType="P";
+			if(patPlanList.Count==1 && PatPlans.GetOrdinal(PriSecMed.Medical,patPlanList,insPlanList,subList)>0) {//if there's exactly one medical plan
+				claimType="Med";
+			}
+			claimCur=CreateClaim(claimType,patPlanList,insPlanList,claimProcList,proc,subList);
+			claimProcList=ClaimProcs.Refresh(proc.PatNum);
+			if(claimCur.ClaimNum==0) {
+				return retVal;
+			}
+			retVal.Add(claimCur);
+			ClaimL.CalculateAndUpdate(new List<Procedure> {proc},insPlanList,claimCur,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
+			if(PatPlans.GetOrdinal(PriSecMed.Secondary,patPlanList,insPlanList,subList)>0 //if there exists a secondary plan
+			   && !CultureInfo.CurrentCulture.Name.EndsWith("CA")) //and not canada (don't create secondary claim for canada)
+			{
+				claimCur=CreateClaim("S",patPlanList,insPlanList,claimProcList,proc,subList);
+				if(claimCur.ClaimNum==0) {
+					return retVal;
+				}
+				retVal.Add(claimCur);
+				ClaimProcs.Refresh(proc.PatNum);
+				claimCur.ClaimStatus="H";
+				ClaimL.CalculateAndUpdate(new List<Procedure> {proc},insPlanList,claimCur,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
+			}
+			return retVal;
+		}
+
+		///<summary>Returns 1 or 2 dates to be billed given the date range. Only filtering based on date range has been performed.</summary>
+		private static List<DateTime> GetBillingDatesHelper(DateTime dateStart, DateTime dateStop, int billingCycleDay=0) {
+			List<DateTime> retVal=new List<DateTime>();
+			if(!PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				billingCycleDay=dateStart.Day;
+			}
+			//Add dates on the first of each of the last three months
+			retVal.Add(new DateTime(DateTime.Today.AddMonths(-0).Year,DateTime.Today.AddMonths(-0).Month,1));//current month -0
+			retVal.Add(new DateTime(DateTime.Today.AddMonths(-1).Year,DateTime.Today.AddMonths(-1).Month,1));//current month -1
+			retVal.Add(new DateTime(DateTime.Today.AddMonths(-2).Year,DateTime.Today.AddMonths(-2).Month,1));//current month -2
+			//This loop fixes day of month, taking into account billing day past the end of the month.
+			for(int i=0;i<retVal.Count;i++) {
+				int billingDay=Math.Min(retVal[i].AddMonths(1).AddDays(-1).Day, billingCycleDay);
+				retVal[i]=new DateTime(retVal[i].Year, retVal[i].Month, billingDay);//This re-adds the billing date with the proper day of month.
+			}
+			//Remove billing dates that are calulated before repeat charge started.
+			retVal.RemoveAll(x => x < dateStart);
+			//Remove billing dates older than one month and 20 days ago.
+			retVal.RemoveAll(x => x < DateTime.Today.AddMonths(-1).AddDays(-20));
+			//Remove any dates after today
+			retVal.RemoveAll(x => x > DateTime.Today);
+			//Remove billing dates past the end of the dateStop
+			if(dateStop.Year>1880) {
+				retVal.RemoveAll(x => x >= dateStop.AddMonths(1));
+			}
+			return retVal;
+		}
+
+		private static Procedure AddRepeatingChargeHelper(RepeatCharge repeatCharge,DateTime billingDate) {
+			Procedure procedure=new Procedure();
+			procedure.CodeNum=ProcedureCodes.GetCodeNum(repeatCharge.ProcCode);
+			procedure.DateEntryC=DateTimeOD.Today;
+			procedure.PatNum=repeatCharge.PatNum;
+			procedure.ProcDate=billingDate;
+			procedure.DateTP=billingDate;
+			procedure.ProcFee=repeatCharge.ChargeAmt;
+			procedure.ProcStatus=ProcStat.C;
+			procedure.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+			procedure.MedicalCode=ProcedureCodes.GetProcCode(procedure.CodeNum).MedicalCode;
+			procedure.BaseUnits=ProcedureCodes.GetProcCode(procedure.CodeNum).BaseUnits;
+			procedure.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			procedure.BillingNote=ProcedureCodes.GetProcCode(repeatCharge.ProcCode).Descript+" charge for "
+				+billingDate.AddMonths(-1).ToString("MMMM yyyy")+".";//Possbly remove AddMonths(-1)
+			//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
+			if(repeatCharge.CopyNoteToProc && !String.IsNullOrEmpty(repeatCharge.Note)) {
+				procedure.BillingNote+="\r\n"+repeatCharge.Note;
+			}
+			Procedures.Insert(procedure); //no recall synch needed because dental offices don't use this feature
+			return procedure;
+		}
+
+		///<summary>Should only be called if ODHQ.</summary>
+		private static List<Procedure> AddSmsRepeatingChargesHelper() {
+			DateTime dateStart=new DateTime(DateTime.Today.AddMonths(-1).AddDays(-20).Year,DateTime.Today.AddMonths(-1).AddDays(-20).Month,1);
+			DateTime dateStop=DateTime.Today.AddDays(1);
+			List<SmsBilling> listSmsBilling=SmsBillings.GetByDateRange(dateStart,dateStop);
+			List<Patient> listPatients=Patients.GetMultPats(listSmsBilling.Select(x => x.CustPatNum).Distinct().ToList()).ToList(); //local cache
+			ProcedureCode procCodeAccess=ProcedureCodes.GetProcCode("038");
+			ProcedureCode procCodeUsage=ProcedureCodes.GetProcCode("039");
+			List<Procedure> listProcsAccess=Procedures.GetCompletedForDateRange(dateStart,dateStop,new List<long> {procCodeAccess.CodeNum});
+			List<Procedure> listProcsUsage=Procedures.GetCompletedForDateRange(dateStart,dateStop,new List<long> {procCodeUsage.CodeNum});
+			List<Procedure> retVal=new List<Procedure>();
+			foreach(SmsBilling smsBilling in listSmsBilling) {
+				Patient pat=listPatients.FirstOrDefault(x => x.PatNum==smsBilling.CustPatNum);
+				if(pat==null) {
+					EServiceSignal eSignal=new EServiceSignal {
+						ServiceCode=(int)eServiceCode.IntegratedTexting,
+						SigDateTime=DateTime.Now,
+						Severity=eServiceSignalSeverity.Error,
+						Description="Sms billing row found for non existant patient PatNum:"+smsBilling.CustPatNum
+					};
+					EServiceSignals.Insert(eSignal);
 					continue;
 				}
-				if(chargeList[i].DateStart>DateTime.Today){//not started yet
+				//Find the billing date based on the date usage.
+				DateTime billingDate=new DateTime(
+					smsBilling.DateUsage.Year,
+					smsBilling.DateUsage.Month,
+					Math.Min(pat.BillingCycleDay,smsBilling.DateUsage.AddMonths(1).AddDays(-1).Day));
+				if(billingDate>DateTime.Today || billingDate<DateTime.Today.AddMonths(-1).AddDays(-20)){
+					//One month and 20 day window. Bill regardless of presence of "038" repeat charge.
 					continue;
 				}
-				//if(chargeList[i].DateStop.Year>1880//not blank
-				//	&& chargeList[i].DateStop<DateTime.Today)//but already ended
-				//{
-				//	continue;
-				//}
-				//get a list dates of all completed procedures with this Code and patNum
-				ArrayList ALdates=RepeatCharges.GetDates(ProcedureCodes.GetCodeNum(chargeList[i].ProcCode),chargeList[i].PatNum);
-				startDate=chargeList[i].DateStart;
-				//This is the repeating date using the old methodology.  It is necessary for checking if the repeating procedure was already added using the old methodology.
-				DateTime possibleDateOld=startDate;
-				//This is a more accurate repeating date which will allow procedures to be added on the 28th and later.
-				DateTime possibleDateNew=startDate;
-				int countMonths=0;
-				//start looping through possible dates, beginning with the start date of the repeating charge
-				while(possibleDateNew<=DateTime.Today) {
-					//Only allow back dating up to one month and 20 days.
-					if(possibleDateNew<DateTime.Today.AddDays(-50)) {
-						possibleDateOld=possibleDateOld.AddMonths(1);
-						countMonths++;
-						possibleDateNew=startDate.AddMonths(countMonths);
-						continue;//don't go back more than one month and 20 days
-					}
-					//check to see if the possible date is present in the list
-					if(ALdates.Contains(possibleDateNew)
-						|| ALdates.Contains(possibleDateOld))
-					{
-						possibleDateOld=possibleDateOld.AddMonths(1);
-						countMonths++;
-						possibleDateNew=startDate.AddMonths(countMonths);
-						continue;
-					}
-					if(chargeList[i].DateStop.Year>1880//not blank
-						&& chargeList[i].DateStop < possibleDateNew)//but already ended
-					{
-						break;
-					}
-					//otherwise, insert a procedure to db
-					proc=new Procedure();
-					proc.CodeNum=ProcedureCodes.GetCodeNum(chargeList[i].ProcCode);
-					proc.DateEntryC=DateTimeOD.Today;
-					proc.PatNum=chargeList[i].PatNum;
-					proc.ProcDate=possibleDateNew;
-					proc.DateTP=possibleDateNew;
-					proc.ProcFee=chargeList[i].ChargeAmt;
-					proc.ProcStatus=ProcStat.C;
-					proc.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
-					proc.MedicalCode=ProcedureCodes.GetProcCode(proc.CodeNum).MedicalCode;
-					proc.BaseUnits = ProcedureCodes.GetProcCode(proc.CodeNum).BaseUnits;
-					proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-					//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
-					if(chargeList[i].CopyNoteToProc) {
-						proc.BillingNote=chargeList[i].Note;
-					}
-					Procedures.Insert(proc);//no recall synch needed because dental offices don't use this feature
-					countAdded++;
-					possibleDateOld=possibleDateOld.AddMonths(1);
-					countMonths++;
-					possibleDateNew=startDate.AddMonths(countMonths);
-					if(chargeList[i].CreatesClaim && !ProcedureCodes.GetProcCode(chargeList[i].ProcCode).NoBillIns) {
-						List<PatPlan> patPlanList=PatPlans.Refresh(chargeList[i].PatNum);
-						List<InsSub> subList=InsSubs.RefreshForFam(Patients.GetFamily(chargeList[i].PatNum));
-						List<InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);;
-						List<Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
-						Claim claimCur;
-						List<Procedure> procCurList=new List<Procedure>();
-						procCurList.Add(proc);
-						if(patPlanList.Count==0) {//no current insurance, do not create a claim
-							continue;
-						}
-						//create the claimprocs
-						Procedures.ComputeEstimates(proc,proc.PatNum,new List<ClaimProc>(),true,insPlanList,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
-						//get claimprocs for this proc, may be more than one
-						List<ClaimProc> claimProcList=ClaimProcs.GetForProc(ClaimProcs.Refresh(proc.PatNum),proc.ProcNum);
-						string claimType="P";
-						if(patPlanList.Count==1 && PatPlans.GetOrdinal(PriSecMed.Medical,patPlanList,insPlanList,subList)>0) {//if there's exactly one medical plan
-							claimType="Med";
-						}
-						claimCur=CreateClaim(claimType,patPlanList,insPlanList,claimProcList,proc,subList);
-						claimProcList=ClaimProcs.Refresh(proc.PatNum);
-						if(claimCur.ClaimNum==0) {
-							continue;
-						}
-						claimsAdded++;
-						ClaimL.CalculateAndUpdate(procCurList,insPlanList,claimCur,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
-						if(PatPlans.GetOrdinal(PriSecMed.Secondary,patPlanList,insPlanList,subList)>0 //if there exists a secondary plan
-							&& !CultureInfo.CurrentCulture.Name.EndsWith("CA"))//and not canada (don't create secondary claim for canada)
-						{
-							claimCur=CreateClaim("S",patPlanList,insPlanList,claimProcList,proc,subList);
-							if(claimCur.ClaimNum==0) {
-								continue;
-							}
-							claimsAdded++;
-							claimProcList=ClaimProcs.Refresh(proc.PatNum);
-							claimCur.ClaimStatus="H";
-							ClaimL.CalculateAndUpdate(procCurList,insPlanList,claimCur,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
-						}
-					}
+				//List<DateTime> listBillingDates=GetBillingDatesHelper(dateStart, dateStop, pat.BillingCycleDay);
+				if(smsBilling.AccessChargeTotalUSD>0
+				   && !listProcsAccess.Exists(x => x.PatNum==pat.PatNum && x.ProcDate.Year==billingDate.Year && x.ProcDate.Month==billingDate.Month)) {
+					//The calculated access charge was greater than 0 and there is not an existing "038" procedure on the account for that month.
+					Procedure procAccess=new Procedure();
+					procAccess.CodeNum=procCodeAccess.CodeNum;
+					procAccess.DateEntryC=DateTimeOD.Today;
+					procAccess.PatNum=pat.PatNum;
+					procAccess.ProcDate=billingDate;
+					procAccess.DateTP=billingDate;
+					procAccess.ProcFee=smsBilling.AccessChargeTotalUSD;
+					procAccess.ProcStatus=ProcStat.C;
+					procAccess.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+					procAccess.MedicalCode=procCodeAccess.MedicalCode;
+					procAccess.BaseUnits=procCodeAccess.BaseUnits;
+					procAccess.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+					procAccess.BillingNote="Texting Access charge for "+
+					                       billingDate.ToString("MMMM yyyy")+".";
+					Procedures.Insert(procAccess);
+					listProcsAccess.Add(procAccess);
+					retVal.Add(procAccess);
+				}
+				if(smsBilling.MsgChargeTotalUSD>0
+				   && !listProcsUsage.Exists(x => x.PatNum==pat.PatNum && x.ProcDate.Year==billingDate.Year && x.ProcDate.Month==billingDate.Month)) {
+					//Calculated Usage charge > 0 and not already billed, may exist without access charge
+					Procedure procUsage=new Procedure();
+					procUsage.CodeNum=procCodeUsage.CodeNum;
+					procUsage.DateEntryC=DateTimeOD.Today;
+					procUsage.PatNum=pat.PatNum;
+					procUsage.ProcDate=billingDate;
+					procUsage.DateTP=billingDate;
+					procUsage.ProcFee=smsBilling.MsgChargeTotalUSD;
+					procUsage.ProcStatus=ProcStat.C;
+					procUsage.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+					procUsage.MedicalCode=procCodeUsage.MedicalCode;
+					procUsage.BaseUnits=procCodeUsage.BaseUnits;
+					procUsage.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+					procUsage.BillingNote="Texting Usage charge for "+
+					                      billingDate.ToString("MMMM yyyy")+".";
+					Procedures.Insert(procUsage);
+					listProcsUsage.Add(procUsage);
+					retVal.Add(procUsage);
 				}
 			}
-			//MessageBox.Show(countAdded.ToString()+" "+Lan.g(this,"procedures added."));
-			MessageBox.Show(countAdded.ToString()+" "+Lan.g(this,"procedures added.")+"\r\n"+claimsAdded.ToString()+" "+Lan.g(this,"claims added."));
+			return retVal;
+		}
+
+		private void butOK_Click(object sender, EventArgs e) {
+			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
+			int proceduresAddedCount=0;
+			int claimsAddedCount=0;
+			if(Prefs.IsODHQ()) {
+				//If ODHQ, handle Integrated texting repeating charges differently.
+				listRepeatingCharges.RemoveAll(x => x.ProcCode=="038");
+				proceduresAddedCount+=AddSmsRepeatingChargesHelper().Count;
+			}
+			List<Procedure> listExistingProcs=Procedures.GetCompletedForDateRange(DateTime.Today.AddMonths(-2), DateTime.Today.AddDays(1),
+				listRepeatingCharges.Select(x => x.ProcCode).Distinct().Select(x => ProcedureCodes.GetProcCode(x).CodeNum).ToList()
+				//,listRepeatingCharges.Select(possibleBillingDate=>possibleBillingDate.PatNum).ToList() //Passing in PatNums may make query less efficient
+				);
+			foreach(RepeatCharge repeatCharge in listRepeatingCharges){
+				if(!repeatCharge.IsEnabled || (repeatCharge.DateStop.Year > 1880 && repeatCharge.DateStop.AddMonths(3) < DateTime.Today)) {
+					continue;//This repeating charge is too old to possibly create a new charge. Not precise but greatly reduces calls to DB.
+				}
+				List<DateTime> listBillingDates;
+				if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop,Patients.GetPat(repeatCharge.PatNum).BillingCycleDay);
+				}
+				else {
+					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop);
+				}
+				long codeNum=ProcedureCodes.GetCodeNum(repeatCharge.ProcCode);
+				listBillingDates.RemoveAll(x => 
+					listExistingProcs.Exists(y => 
+						y.PatNum==repeatCharge.PatNum 
+						&& y.CodeNum==codeNum 
+						&& x.Year==y.ProcDate.Year
+						&& x.Month==y.ProcDate.Month
+						&& IsRepeatDateHelper(repeatCharge,x,y.ProcDate)
+					)
+				);
+				foreach (DateTime billingDate in listBillingDates) {
+					Procedure procAdded=AddRepeatingChargeHelper(repeatCharge, billingDate);
+					List<Claim> listClaimsAdded=new List<Claim>();
+					if(repeatCharge.CreatesClaim && !ProcedureCodes.GetProcCode(repeatCharge.ProcCode).NoBillIns) {
+						listClaimsAdded=AddClaimsHelper(repeatCharge,procAdded);
+					}
+					proceduresAddedCount++;
+					claimsAddedCount+=listClaimsAdded.Count;
+				}
+			}
+			MessageBox.Show(proceduresAddedCount+" "+Lan.g(this,"procedures added.")+"\r\n"+claimsAddedCount+" "+Lan.g(this,"claims added."));
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
+		///<summary>Returns true if the existing procedure was for the possibleBillingDate.</summary>
+		private static bool IsRepeatDateHelper(RepeatCharge repeatCharge,DateTime possibleBillingDate,DateTime existingProcedureDate) {
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				//Only match month and year to be equal
+				return (possibleBillingDate.Month==existingProcedureDate.Month && possibleBillingDate.Year==existingProcedureDate.Year);
+			}
+			if(possibleBillingDate.Month!=existingProcedureDate.Month || possibleBillingDate.Year!=existingProcedureDate.Year) {
+				return false;
+			}
+			//Itterate through dates using new logic that takes repeatCharge.DateStart.AddMonths(n) to calculate dates
+			DateTime possibleDateNew=repeatCharge.DateStart;
+			int dateNewMonths=0;
+			//Itterate through dates using old logic that starts with repeatCharge.DateStart and adds one month at a time to calculate dates
+			DateTime possibleDateOld=repeatCharge.DateStart;
+			do {
+				if(existingProcedureDate==possibleDateNew || existingProcedureDate==possibleDateOld) {
+					return true;
+				}
+				dateNewMonths++;
+				possibleDateNew=repeatCharge.DateStart.AddMonths(dateNewMonths);
+				possibleDateOld=possibleDateOld.AddMonths(1);
+			} 
+			while(possibleDateNew<=existingProcedureDate);
+			return false;
+		}
+
+		private void butCancel_Click(object sender, EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
 

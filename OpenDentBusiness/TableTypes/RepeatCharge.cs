@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace OpenDentBusiness{
 
@@ -15,7 +14,9 @@ namespace OpenDentBusiness{
 		public string ProcCode;
 		///<summary>The amount that will be charged.  The amount from the procedurecode will not be used.  This way, a repeating charge cannot be accidentally altered.</summary>
 		public double ChargeAmt;
-		///<summary>The date of the first charge.  Charges will always be added on the same day of the month as the start date.  If more than one month goes by, then multiple charges will be added.</summary>
+		///<summary>The date of the first charge if UseBillingCycleDays is not enabled.  Charges will always be added on the same day of the month as the start date. 
+		/// If UseBillingCycleDays is enabled, repeat charges will be applied on billing cycle day instead. 
+		/// If more than one month goes by without applying repeating charges, then multiple procedures will be added.</summary>
 		public DateTime DateStart;
 		///<summary>The last date on which a charge is allowed.  So if you want 12 charges, and the start date is 8/1/05, then the stop date should be 7/1/05, not 8/1/05.  Can be blank (0001-01-01) to represent a perpetual repeating charge.</summary>
 		public DateTime DateStop;
@@ -30,7 +31,7 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public RepeatCharge Copy(){
-			return (RepeatCharge)this.MemberwiseClone();
+			return (RepeatCharge)MemberwiseClone();
 		}
 
 		

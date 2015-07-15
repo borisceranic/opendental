@@ -144,9 +144,6 @@ namespace OpenDental {
 			FillGridClinics();
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();
-#if DEBUG
-			butSmsTestData.Visible=true;
-#endif
 			#endregion
 			SetControlEnabledState();
 		}
@@ -1830,120 +1827,6 @@ namespace OpenDental {
 			FillGridSmsUsage();
 		}
 
-		private void butSmsTestData_Click(object sender,EventArgs e) {
-#if !DEBUG
-			//this button is not visible if not in debug anyways, this is just an extra precaution.
-#endif
-			string command="TRUNCATE TABLE smsphone";
-			DataCore.NonQ(command);
-			command="TRUNCATE TABLE smstomobile";
-			DataCore.NonQ(command);
-			command="TRUNCATE TABLE smsfrommobile";
-			DataCore.NonQ(command);
-			command="TRUNCATE TABLE clinic";
-			DataCore.NonQ(command);
-			for(int i=0;i<8;i++) {//setup 6 clinics
-				Clinic clinic=new Clinic();
-				clinic.Description="Clinic "+(i+1);
-				Clinics.Insert(clinic);
-			}
-			Clinics.RefreshCache();
-			List<Clinic> _listClinics=Clinics.GetList().ToList();
-			_listClinics.Add(new Clinic());//to simulate non-clinic
-			Random rand=new Random();
-			List<Snomed> listSnomed=Snomeds.GetByCodeOrDescription("p");//any snomeds containing the letter p in the description... 2632 of them.
-			List<Patient> listPatients=Patients.GetSimilarList("Patient","",DateTime.MinValue);
-			foreach(Patient p in listPatients) {//set patient phone numbers and clinics.
-				p.HmPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
-				p.WirelessPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
-				p.WkPhone="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
-				p.ClinicNum=_listClinics[rand.Next(_listClinics.Count-1)].ClinicNum;
-				Patients.Update(p,new Patient());
-			}
-			foreach(Clinic c in _listClinics) {
-				bool skipClinic=false;
-				if(c.ClinicNum==0) {//practice level
-					if(rand.Next(100)<25) {
-						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.MinValue);
-						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,0f);
-						skipClinic=true;
-					}
-					else {
-						Prefs.UpdateDateT(PrefName.SmsContractDate,DateTime.Now.AddDays(-rand.Next(365)));
-						Prefs.UpdateDouble(PrefName.SmsMonthlyLimit,rand.Next(5,50));
-					}
-				}
-				else {//clinic level
-					if(rand.Next(100)<25) {
-						c.SmsContractDate=DateTime.MinValue;
-						c.SmsMonthlyLimit=0f;
-						skipClinic=true;
-					}
-					else {
-						c.SmsContractDate=DateTime.Now.AddDays(-rand.Next(365));
-						c.SmsMonthlyLimit=rand.Next(5,50);
-					}
-					Clinics.Update(c);
-				}
-				if(skipClinic) {
-					continue;
-				}
-				int phoneCount=rand.Next(1,5);
-				List<SmsPhone> listPhones=new List<SmsPhone>();
-				for(int i=0;i<phoneCount;i++) {
-					SmsPhone phoneNew=new SmsPhone() {
-						ClinicNum=c.ClinicNum,
-						CountryCode="US",
-						PhoneNumber="1555123"+rand.Next(9999).ToString().PadLeft(4,'0'),
-						DateTimeActive=DateTime.Now
-					};
-					phoneNew.SmsPhoneNum=SmsPhones.Insert(phoneNew);
-					listPhones.Add(phoneNew);
-				}
-				foreach(SmsPhone phone in listPhones) {
-					int inMsgCount=rand.Next(500);
-					int outMsgCount=rand.Next(50);
-					for(int i=0;i<inMsgCount;i++) {
-						SmsToMobile msg=new SmsToMobile();
-						msg.ClinicNum=c.ClinicNum;
-						msg.DateTimeSent=DateTime.Now.AddDays(-rand.Next(365)).AddSeconds(rand.Next(86400));//some time within the last year, at any time of day
-						msg.DateTimeTerminated=msg.DateTimeSent.AddSeconds(259200);//within 3 days.
-						msg.GuidMessage=Guid.NewGuid().ToString();
-						msg.GuidBatch=msg.GuidMessage;
-						msg.IsHidden=rand.Next(100)<5;//5% change of hidden msg
-						msg.IsTimeSensitive=true;
-						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');
-						msg.MsgChargeUSD=.04f;
-						msg.MsgParts=1;
-						msg.MsgText="test";// listSnomed[rand.Next(listSnomed.Count-1)].Description;
-						msg.MsgType=SmsMessageSource.DirectSms;
-						msg.PatNum=rand.Next(1,5);
-						msg.SmsPhoneNumber=phone.PhoneNumber;
-						msg.SmsStatus=(SmsDeliveryStatus)rand.Next(0,5);
-						SmsToMobiles.Insert(msg);
-					}
-					List<SmsFromMobile> listMessagesIn=new List<SmsFromMobile>();
-					for(int i=0;i<outMsgCount;i++) {
-						SmsFromMobile msg=new SmsFromMobile();
-						msg.ClinicNum=c.ClinicNum;
-						msg.IsHidden=rand.Next(100)<5;//5% change of hidden msg
-						msg.MobilePhoneNumber="1503555"+rand.Next(9999).ToString().PadLeft(4,'0');//.03% change it is from one of the patients above.
-						msg.MsgPart=1;
-						msg.MsgRefID=Guid.NewGuid().ToString();
-						msg.MsgText="test";// listSnomed[rand.Next(listSnomed.Count-1)].Description;
-						msg.MsgTotal=1;
-						msg.SmsPhoneNumber=phone.PhoneNumber;
-						msg.SmsStatus=(SmsFromStatus)rand.Next(3);
-						listMessagesIn.Add(msg);
-					}
-					SmsFromMobiles.ProcessInboundSms(listMessagesIn);
-				}
-			}//end for each clinic
-			Clinics.RefreshCache();
-			FillGridClinics();
-			FillGridSmsUsage();
-			SetSmsServiceAgreement();
-		}
 
 		#endregion
 

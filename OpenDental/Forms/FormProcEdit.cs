@@ -4036,7 +4036,7 @@ namespace OpenDental{
 		}
 
 		private void butEditAnyway_Click(object sender, System.EventArgs e) {
-			DateTime dateOldestClaim=Procedures.GetOldestClaimDate(ProcCur.ProcNum,ClaimProcsForProc);
+			DateTime dateOldestClaim=Procedures.GetOldestClaimDate(ClaimProcsForProc);
 			if(!Security.IsAuthorized(Permissions.ClaimSentEdit,dateOldestClaim)) {
 				return;
 			}
