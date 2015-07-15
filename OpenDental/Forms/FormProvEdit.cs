@@ -1130,10 +1130,13 @@ namespace OpenDental{
 				listFeeSched.SelectedIndex=0;
 			}
 			listSpecialty.Items.Clear();
-			for(int i=0;i<Enum.GetNames(typeof(DentalSpecialty)).Length;i++){
-				listSpecialty.Items.Add(Lan.g("enumDentalSpecialty",Enum.GetNames(typeof(DentalSpecialty))[i]));
+			Def[] specDefs=DefC.GetList(DefCat.ProviderSpecialties);
+			for(int i=0;i<specDefs.Length;i++) {
+				listSpecialty.Items.Add(Lan.g("enumDentalSpecialty",specDefs[i].ItemName));
+				if(i==0 || ProvCur.Specialty==specDefs[i].DefNum) {//default to the first item in the list
+					listSpecialty.SelectedIndex=i;
+				}
 			}
-			listSpecialty.SelectedIndex=(int)ProvCur.Specialty;
 			textTaxonomyOverride.Text=ProvCur.TaxonomyCodeOverride;
 			FillProvIdent();
 			//These radio buttons are used to properly filter the provider dropdowns on FormAnetheticRecord
@@ -1359,7 +1362,8 @@ namespace OpenDental{
 			if(listFeeSched.SelectedIndex!=-1) {
 				ProvCur.FeeSched=FeeSchedC.ListShort[listFeeSched.SelectedIndex].FeeSchedNum;
 			}
-			ProvCur.Specialty=(DentalSpecialty)listSpecialty.SelectedIndex;
+			//default to first specialty in the list if it can't find the specialty by exact name
+			ProvCur.Specialty=DefC.GetByExactNameNeverZero(DefCat.ProviderSpecialties,listSpecialty.SelectedItem.ToString());//selected index defaults to 0
 			ProvCur.TaxonomyCodeOverride=textTaxonomyOverride.Text;
 			if(radAnesthSurg.Checked) {
 				ProvCur.AnesthProvType=1;

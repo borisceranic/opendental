@@ -452,8 +452,10 @@ namespace OpenDental{
    		  case "Specialty":
           setListBoxConditions();
           comboBox.Items.Clear();
-          foreach(string s in Enum.GetNames(typeof(DentalSpecialty)))
-            comboBox.Items.Add(s);
+					Def[] specDefs=DefC.GetList(DefCat.ProviderSpecialties);
+					for(int i=0;i<specDefs.Length;i++) {
+						comboBox.Items.Add(Lan.g("enumDentalSpecialty",specDefs[i].ItemName));
+					}
 					break;
    		  case "UsingTIN":
         case "IsHidden":

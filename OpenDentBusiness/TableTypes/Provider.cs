@@ -25,8 +25,8 @@ namespace OpenDentBusiness{
 		public string Suffix;
 		///<summary>FK to feesched.FeeSchedNum.</summary>
 		public long FeeSched;
-		///<summary>Enum:DentalSpecialty</summary>
-		public DentalSpecialty Specialty;
+		///<summary>FK to definition.DefNum.</summary>
+		public long Specialty;
 		///<summary>or TIN.  No punctuation</summary>
 		public string SSN;
 		///<summary>can include punctuation</summary>
@@ -115,7 +115,7 @@ namespace OpenDentBusiness{
 		}
 
 		public Provider(long provNum,string abbr,int itemOrder,string lName,string fName,string mI,string suffix,long feeSched,
-			DentalSpecialty specialty,string sSN,string stateLicense,string dEANum,bool isSecondary,Color provColor,bool isHidden,
+			long specialty,string sSN,string stateLicense,string dEANum,bool isSecondary,Color provColor,bool isHidden,
 			bool usingTIN,string blueCrossID,bool sigOnFile,string medicaidID,Color outlineColor,long schoolClassNum,
 			string nationalProvID,string canadianOfficeNum,long anesthProvType)
 		{

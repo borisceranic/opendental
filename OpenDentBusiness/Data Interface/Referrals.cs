@@ -203,7 +203,16 @@ namespace OpenDentBusiness{
 			return listRefs;
 		}
 
-
-
+		///<summary>Used to check if a specialty is in use when user is trying to hide it.</summary>
+		public static bool IsSpecialtyInUse(long defNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),defNum);
+			}
+			string command="SELECT COUNT(*) FROM referral WHERE Specialty="+POut.Long(defNum);
+			if(Db.GetCount(command)=="0") {
+				return false;
+			}
+			return true;
+		}
 	}
 }

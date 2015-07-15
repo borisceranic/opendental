@@ -54,7 +54,7 @@ namespace OpenDentBusiness.Crud{
 				provider.MI                    = PIn.String(table.Rows[i]["MI"].ToString());
 				provider.Suffix                = PIn.String(table.Rows[i]["Suffix"].ToString());
 				provider.FeeSched              = PIn.Long  (table.Rows[i]["FeeSched"].ToString());
-				provider.Specialty             = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				provider.Specialty             = PIn.Long  (table.Rows[i]["Specialty"].ToString());
 				provider.SSN                   = PIn.String(table.Rows[i]["SSN"].ToString());
 				provider.StateLicense          = PIn.String(table.Rows[i]["StateLicense"].ToString());
 				provider.DEANum                = PIn.String(table.Rows[i]["DEANum"].ToString());
@@ -133,7 +133,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(provider.MI)+"',"
 				+"'"+POut.String(provider.Suffix)+"',"
 				+    POut.Long  (provider.FeeSched)+","
-				+    POut.Int   ((int)provider.Specialty)+","
+				+    POut.Long  (provider.Specialty)+","
 				+"'"+POut.String(provider.SSN)+"',"
 				+"'"+POut.String(provider.StateLicense)+"',"
 				+"'"+POut.String(provider.DEANum)+"',"
@@ -204,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(provider.MI)+"',"
 				+"'"+POut.String(provider.Suffix)+"',"
 				+    POut.Long  (provider.FeeSched)+","
-				+    POut.Int   ((int)provider.Specialty)+","
+				+    POut.Long  (provider.Specialty)+","
 				+"'"+POut.String(provider.SSN)+"',"
 				+"'"+POut.String(provider.StateLicense)+"',"
 				+"'"+POut.String(provider.DEANum)+"',"
@@ -250,7 +250,7 @@ namespace OpenDentBusiness.Crud{
 				+"MI                    = '"+POut.String(provider.MI)+"', "
 				+"Suffix                = '"+POut.String(provider.Suffix)+"', "
 				+"FeeSched              =  "+POut.Long  (provider.FeeSched)+", "
-				+"Specialty             =  "+POut.Int   ((int)provider.Specialty)+", "
+				+"Specialty             =  "+POut.Long  (provider.Specialty)+", "
 				+"SSN                   = '"+POut.String(provider.SSN)+"', "
 				+"StateLicense          = '"+POut.String(provider.StateLicense)+"', "
 				+"DEANum                = '"+POut.String(provider.DEANum)+"', "
@@ -314,7 +314,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(provider.Specialty != oldProvider.Specialty) {
 				if(command!=""){ command+=",";}
-				command+="Specialty = "+POut.Int   ((int)provider.Specialty)+"";
+				command+="Specialty = "+POut.Long(provider.Specialty)+"";
 			}
 			if(provider.SSN != oldProvider.SSN) {
 				if(command!=""){ command+=",";}

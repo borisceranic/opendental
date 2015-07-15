@@ -19,8 +19,8 @@ namespace OpenDentBusiness{
 		public string SSN;
 		///<summary>Specificies if SSN is real SSN.</summary>
 		public bool UsingTIN;
-		///<summary>Enum:DentalSpecialty -1 is allowed to indicate no specialty.  -1 is what all non-professionals will be set to.</summary>
-		public DentalSpecialty Specialty;
+		///<summary>FK to definition.DefNum.</summary>
+		public long Specialty;
 		///<summary>State</summary>
 		public string ST;
 		///<summary>Primary phone, restrictive, must only be 10 digits and only numbers.</summary>

@@ -1012,7 +1012,7 @@ namespace OpenDental{
 							break;
 						case "specialty":
 							tableOut.Rows[i][j]
-								=((DentalSpecialty)PIn.Long(tableOut.Rows[i][j].ToString())).ToString();
+								=DefC.GetName(DefCat.ProviderSpecialties,PIn.Long(tableOut.Rows[i][j].ToString()));
 							break;
 						case "placeservice":
 							tableOut.Rows[i][j]

@@ -31,21 +31,25 @@ namespace OpenDentBusiness{
 				return provider.TaxonomyCodeOverride;
 			}
 			string spec="1223G0001X";//general
-			switch(provider.Specialty) {
-				case DentalSpecialty.General: spec="1223G0001X"; break;
-				case DentalSpecialty.Hygienist: spec="124Q00000X"; break;
-				case DentalSpecialty.PublicHealth: spec="1223D0001X"; break;
-				case DentalSpecialty.Endodontics: spec="1223E0200X"; break;
-				case DentalSpecialty.Pathology: spec="1223P0106X"; break;
-				case DentalSpecialty.Radiology: spec="1223X0008X"; break;
-				case DentalSpecialty.Surgery: spec="1223S0112X"; break;
-				case DentalSpecialty.Ortho: spec="1223X0400X"; break;
-				case DentalSpecialty.Pediatric: spec="1223P0221X"; break;
-				case DentalSpecialty.Perio: spec="1223P0300X"; break;
-				case DentalSpecialty.Prosth: spec="1223P0700X"; break;
-				case DentalSpecialty.Denturist: spec="122400000X"; break;
-				case DentalSpecialty.Assistant: spec="126800000X"; break;
-				case DentalSpecialty.LabTech: spec="126900000X"; break;
+			Def provSpec=DefC.GetDef(DefCat.ProviderSpecialties,provider.Specialty);
+			if(provSpec==null) {
+				return spec;
+			}
+			switch(provSpec.ItemName) {
+				case "General": spec="1223G0001X"; break;
+				case "Hygienist": spec="124Q00000X"; break;
+				case "PublicHealth": spec="1223D0001X"; break;
+				case "Endodontics": spec="1223E0200X"; break;
+				case "Pathology": spec="1223P0106X"; break;
+				case "Radiology": spec="1223X0008X"; break;
+				case "Surgery": spec="1223S0112X"; break;
+				case "Ortho": spec="1223X0400X"; break;
+				case "Pediatric": spec="1223P0221X"; break;
+				case "Perio": spec="1223P0300X"; break;
+				case "Prosth": spec="1223P0700X"; break;
+				case "Denturist": spec="122400000X"; break;
+				case "Assistant": spec="126800000X"; break;
+				case "LabTech": spec="126900000X"; break;
 			}
 			return spec;
 		}

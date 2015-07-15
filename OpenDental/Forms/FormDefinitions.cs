@@ -220,6 +220,7 @@ namespace OpenDental{
             "Proc Code Categories",
             "Prog Notes Colors",
             "Prognosis",
+            "Provider Specialties",
             "Recall/Unsch Status",
             "Supply Categories",
             "Task Priorities",
@@ -300,10 +301,11 @@ namespace OpenDental{
 			lookupCat[20]=DefCat.ProcCodeCats;
 			lookupCat[21]=DefCat.ProgNoteColors;
 			lookupCat[22]=DefCat.Prognosis;
-			lookupCat[23]=DefCat.RecallUnschedStatus;
-			lookupCat[24]=DefCat.SupplyCats;
-			lookupCat[25]=DefCat.TaskPriorities;
-			lookupCat[26]=DefCat.TxPriorities;			
+			lookupCat[23]=DefCat.ProviderSpecialties;
+			lookupCat[24]=DefCat.RecallUnschedStatus;
+			lookupCat[25]=DefCat.SupplyCats;
+			lookupCat[26]=DefCat.TaskPriorities;
+			lookupCat[27]=DefCat.TxPriorities;			
 			for(int i=0;i<listCategory.Items.Count;i++){
 				listCategory.Items[i]=Lan.g(this,(string)listCategory.Items[i]);
 				if((int)lookupCat[i]==SelectedCat){
@@ -470,19 +472,22 @@ namespace OpenDental{
 					//Nothing special. Might add HelpText later.
 					FormDefEdit.HelpText=Lan.g(this,"");
 					break;
-				case 23://"Recall/Unsch Status":
+				case 23://"Provider Specialties":
+					FormDefEdit.HelpText=Lan.g(this,"Provider specialties cannot be deleted.  Changes to provider specialties could affect e-claims.");
+					break;
+				case 24://"Recall/Unsch Status":
 					//SelectedCat=13;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Abbreviation");
 					FormDefEdit.HelpText=Lan.g(this,"Recall/Unsched Status.  Abbreviation must be 7 characters or less.  Changes affect all patients.");
 					break;
-				case 24://Supply Categories
+				case 25://Supply Categories
 					butHide.Visible=false;
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.HelpText=Lan.g(this,"The categories for inventory supplies.");
 					break;
-				case 25://Task Priorities
+				case 26://Task Priorities
 					FormDefEdit.CanDelete=false;
 					FormDefEdit.CanHide=true;
 					FormDefEdit.ValueText=Lan.g(this,"D = Default");
@@ -490,7 +495,7 @@ namespace OpenDental{
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection within the task edit window.  Task lists are sorted using the order of these priorities.  They can have any description and color.  At least one priority should be Default (D).  If more than one priority is flagged as the default, the last default in the list will be used.  If no default is set, the last priority will be used.  Changes affect all tasks where the definition is used.");
 					break;
-				case 26://"Treat' Plan Priorities":
+				case 27://"Treat' Plan Priorities":
 					//SelectedCat=20;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection in the Treatment Plan module.  They can be simple numbers or descriptive abbreviations 7 letters or less.  Changes affect all procedures where the definition is used.");
@@ -679,6 +684,13 @@ namespace OpenDental{
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: Billing type is currently in use by patients.")) {
 					return;
 				}
+			}
+			if(DefsList[DefsSelected].Category==DefCat.ProviderSpecialties
+				&& (Providers.IsSpecialtyInUse(DefsList[DefsSelected].DefNum)
+				|| Referrals.IsSpecialtyInUse(DefsList[DefsSelected].DefNum)))
+			{
+				MsgBox.Show(this,"You cannot hide a specialty if it is in use by a provider or a referral source.");
+				return;
 			}
 			//Stop users from hiding the last definition in categories that must have at least one def in them.
 			if(Defs.IsHidable(DefsList[DefsSelected].Category))	{

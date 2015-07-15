@@ -315,7 +315,8 @@ namespace OpenDental{
 				Referral tempReferralFrom = Referrals.GetReferralForPat(pat.PatNum);
 				if(Referrals.GetReferralForPat(pat.PatNum)!=null) {
 					if(tempReferralFrom.IsDoctor) {
-						referredFrom+=tempReferralFrom.FName+" "+tempReferralFrom.LName+" "+tempReferralFrom.Title+" : "+tempReferralFrom.Specialty.ToString();
+						referredFrom+=tempReferralFrom.FName+" "+tempReferralFrom.LName+" "+tempReferralFrom.Title+" : "
+							+DefC.GetName(DefCat.ProviderSpecialties,tempReferralFrom.Specialty);
 					}
 					else {
 						referredFrom+=tempReferralFrom.FName+" "+tempReferralFrom.LName;
@@ -327,7 +328,8 @@ namespace OpenDental{
 					}
 					Referral tempRef = Referrals.GetReferral(RefAttachList[i].ReferralNum);
 					if(tempRef.IsDoctor) {
-						referredTo+=tempRef.FName+" "+tempRef.LName+" "+tempRef.Title+" : "+tempRef.Specialty.ToString()+" "+RefAttachList[i].RefDate.ToShortDateString()+"\r\n";
+						referredTo+=tempRef.FName+" "+tempRef.LName+" "+tempRef.Title+" : "+DefC.GetName(DefCat.ProviderSpecialties,tempRef.Specialty)+" "
+							+RefAttachList[i].RefDate.ToShortDateString()+"\r\n";
 					}
 					else {
 						referredTo+=tempRef.FName+" "+tempRef.LName+" "+RefAttachList[i].RefDate.ToShortDateString()+"\r\n";

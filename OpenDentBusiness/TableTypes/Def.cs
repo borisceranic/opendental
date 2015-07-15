@@ -130,7 +130,9 @@ namespace OpenDentBusiness {
 		///<summary>33- Categories of priorities for tasks.</summary>
 		TaskPriorities,
 		///<summary>34- Categories for fee override colors.</summary>
-		FeeColors
+		FeeColors,
+		///<summary>35- Provider specialties.  General, Hygienist, Pediatric, Primary Care Physician, etc.</summary>
+		ProviderSpecialties
 	}
 
 	

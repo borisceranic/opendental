@@ -248,7 +248,7 @@ namespace OpenDental {
 				}
 				row.Cells.Add(listRef[i].Title);
 				if(listRef[i].IsDoctor){
-					row.Cells.Add(Lan.g("enumDentalSpecialty",((DentalSpecialty)(listRef[i].Specialty)).ToString()));
+					row.Cells.Add(Lan.g("enumDentalSpecialty",DefC.GetName(DefCat.ProviderSpecialties,listRef[i].Specialty)));
 				}
 				else {
 					row.Cells.Add("");

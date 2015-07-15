@@ -795,8 +795,9 @@ namespace OpenDental{
 
 		private void FormReferralEdit_Load(object sender, System.EventArgs e) {
 			listSpecialty.Items.Clear();
-			for(int i=0;i<Enum.GetNames(typeof(DentalSpecialty)).Length;i++){
-				listSpecialty.Items.Add(Lan.g("enumDentalSpecialty",Enum.GetNames(typeof(DentalSpecialty))[i]));
+			Def[] specDefs=DefC.GetList(DefCat.ProviderSpecialties);
+			for(int i=0;i<specDefs.Length;i++) {
+				listSpecialty.Items.Add(Lan.g("enumDentalSpecialty",specDefs[i].ItemName));
 			}
 			if(IsPatient){
 				if(IsNew){
@@ -848,9 +849,16 @@ namespace OpenDental{
 				if(IsNew){
 					this.Text=Lan.g(this,"Add Referral"); 
 					RefCur=new Referral();
-					RefCur.Specialty=DentalSpecialty.General;
+					RefCur.Specialty=DefC.GetByExactNameNeverZero(DefCat.ProviderSpecialties,"General");
 				}
-				listSpecialty.SelectedIndex=(int)RefCur.Specialty;
+				Def specDefCur=DefC.GetDef(DefCat.ProviderSpecialties,RefCur.Specialty);
+				if(specDefCur!=null) {
+					for(int i=0;i<specDefs.Length;i++) {
+						if(i==0 || specDefs[i].ItemName==specDefCur.ItemName) {//default to the first specialty in the list
+							listSpecialty.SelectedIndex=i;
+						}
+					}
+				}
 				textLName.Select();
 			}
 			checkIsDoctor.Checked=RefCur.IsDoctor;
@@ -996,7 +1004,7 @@ namespace OpenDental{
 			//RefCur.UsingTIN already taken care of
       if(!IsPatient){
 				RefCur.IsDoctor=checkIsDoctor.Checked;
-			  RefCur.Specialty=(DentalSpecialty)listSpecialty.SelectedIndex;
+				RefCur.Specialty=DefC.GetByExactNameNeverZero(DefCat.ProviderSpecialties,listSpecialty.SelectedItem.ToString());
       }
 			if(IsNew){
 				for(int i=0;i<Referrals.List.Length;i++){

@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				referral.MName          = PIn.String(table.Rows[i]["MName"].ToString());
 				referral.SSN            = PIn.String(table.Rows[i]["SSN"].ToString());
 				referral.UsingTIN       = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
-				referral.Specialty      = (OpenDentBusiness.DentalSpecialty)PIn.Int(table.Rows[i]["Specialty"].ToString());
+				referral.Specialty      = PIn.Long  (table.Rows[i]["Specialty"].ToString());
 				referral.ST             = PIn.String(table.Rows[i]["ST"].ToString());
 				referral.Telephone      = PIn.String(table.Rows[i]["Telephone"].ToString());
 				referral.Address        = PIn.String(table.Rows[i]["Address"].ToString());
@@ -120,7 +120,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(referral.MName)+"',"
 				+"'"+POut.String(referral.SSN)+"',"
 				+    POut.Bool  (referral.UsingTIN)+","
-				+    POut.Int   ((int)referral.Specialty)+","
+				+    POut.Long  (referral.Specialty)+","
 				+"'"+POut.String(referral.ST)+"',"
 				+"'"+POut.String(referral.Telephone)+"',"
 				+"'"+POut.String(referral.Address)+"',"
@@ -180,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(referral.MName)+"',"
 				+"'"+POut.String(referral.SSN)+"',"
 				+    POut.Bool  (referral.UsingTIN)+","
-				+    POut.Int   ((int)referral.Specialty)+","
+				+    POut.Long  (referral.Specialty)+","
 				+"'"+POut.String(referral.ST)+"',"
 				+"'"+POut.String(referral.Telephone)+"',"
 				+"'"+POut.String(referral.Address)+"',"
@@ -215,7 +215,7 @@ namespace OpenDentBusiness.Crud{
 				+"MName          = '"+POut.String(referral.MName)+"', "
 				+"SSN            = '"+POut.String(referral.SSN)+"', "
 				+"UsingTIN       =  "+POut.Bool  (referral.UsingTIN)+", "
-				+"Specialty      =  "+POut.Int   ((int)referral.Specialty)+", "
+				+"Specialty      =  "+POut.Long  (referral.Specialty)+", "
 				+"ST             = '"+POut.String(referral.ST)+"', "
 				+"Telephone      = '"+POut.String(referral.Telephone)+"', "
 				+"Address        = '"+POut.String(referral.Address)+"', "
@@ -262,7 +262,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(referral.Specialty != oldReferral.Specialty) {
 				if(command!=""){ command+=",";}
-				command+="Specialty = "+POut.Int   ((int)referral.Specialty)+"";
+				command+="Specialty = "+POut.Long(referral.Specialty)+"";
 			}
 			if(referral.ST != oldReferral.ST) {
 				if(command!=""){ command+=",";}

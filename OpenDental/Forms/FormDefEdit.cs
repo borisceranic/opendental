@@ -424,6 +424,16 @@ namespace OpenDental{
 						}
 					}
 					break;
+				case DefCat.ProviderSpecialties:
+					if(checkHidden.Checked
+						&& (Providers.IsSpecialtyInUse(DefCur.DefNum)
+						|| Referrals.IsSpecialtyInUse(DefCur.DefNum)))
+					{
+						MsgBox.Show(this,"You cannot hide a specialty if it is in use by a provider or a referral source.");
+						checkHidden.Checked=false;
+						return;
+					}
+					break;
 				/*case DefCat.FeeSchedNames:
 					if(textValue.Text=="C" || textValue.Text=="c") {
 						textValue.Text="C";

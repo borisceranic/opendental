@@ -114,7 +114,6 @@ namespace OpenDentBusiness {
 
 		///<summary></summary>
 		public static void HideDef(Def def) {
-
 			//No need to check RemotingRole; no call to db.
 			def.IsHidden=true;
 			Defs.Update(def);
@@ -146,6 +145,7 @@ namespace OpenDentBusiness {
 				|| category==DefCat.ProcButtonCats
 				|| category==DefCat.ProcCodeCats
 				|| category==DefCat.Prognosis
+				|| category==DefCat.ProviderSpecialties
 				|| category==DefCat.RecallUnschedStatus
 				|| category==DefCat.TaskPriorities
 				|| category==DefCat.TxPriorities) 

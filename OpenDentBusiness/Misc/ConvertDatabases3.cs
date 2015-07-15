@@ -9198,6 +9198,101 @@ namespace OpenDentBusiness {
 						+"'DentalTekSmartOfficePhone')";
 					Db.NonQ(command);
 				}//end DentalTekSmartOfficePhone bridge
+				//Convert DentalSpecialties from an enum to a custom definition
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider MODIFY Specialty bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE referral MODIFY Specialty bigint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider MODIFY Specialty number(20) NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE referral MODIFY Specialty number(20) NOT NULL";
+					Db.NonQ(command);
+				}
+				long[] defNums=new long[14];
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,0,'General','')";//35 is DefCat.ProviderSpecialties
+					defNums[0]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,1,'Hygienist','')";
+					defNums[1]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,2,'Endodontics','')";
+					defNums[2]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,3,'Pediatric','')";
+					defNums[3]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,4,'Perio','')";
+					defNums[4]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,5,'Prosth','')";
+					defNums[5]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,6,'Ortho','')";
+					defNums[6]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,7,'Denturist','')";
+					defNums[7]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,8,'Surgery','')";
+					defNums[8]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,9,'Assistant','')";
+					defNums[9]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,10,'LabTech','')";
+					defNums[10]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,11,'Pathology','')";
+					defNums[11]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,12,'PublicHealth','')";
+					defNums[12]=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue) VALUES(35,13,'Radiology','')";
+					defNums[13]=Db.NonQ(command,true);
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'General','')";
+					defNums[0]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Hygienist','')";
+					defNums[1]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Endodontics','')";
+					defNums[2]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Pediatric','')";
+					defNums[3]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Perio','')";
+					defNums[4]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Prosth','')";
+					defNums[5]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Ortho','')";
+					defNums[6]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Denturist','')";
+					defNums[7]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Surgery','')";
+					defNums[8]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Assistant','')";
+					defNums[9]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'LabTech','')";
+					defNums[10]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Pathology','')";
+					defNums[11]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'PublicHealth','')";
+					defNums[12]=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),35,0,'Radiology','')";
+					defNums[13]=Db.NonQ(command,true);
+				}
+				//This is safe because the db is guaranteed to have more defs than 14
+				for(int i=0;i<defNums.Length;i++) {
+					command="UPDATE provider SET Specialty="+POut.Long(defNums[i])+" WHERE Specialty="+POut.Int(i);
+					Db.NonQ(command);
+					command="UPDATE referral SET Specialty="+POut.Long(defNums[i])+" WHERE Specialty="+POut.Int(i);
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.3.0.0' WHERE PrefName = 'DataBaseVersion'";

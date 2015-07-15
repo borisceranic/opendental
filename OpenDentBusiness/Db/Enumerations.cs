@@ -290,37 +290,38 @@ namespace OpenDentBusiness{
 		ButPush,
 		///<summary></summary>
 		Text}*/
-	///<summary></summary>
-	public enum DentalSpecialty{
-		///<summary>0</summary>
-		General,
-		///<summary>1</summary>
-		Hygienist,
-		///<summary>2</summary>
-		Endodontics,
-		///<summary>3</summary>
-		Pediatric,
-		///<summary>4</summary>
-		Perio,
-		///<summary>5</summary>
-		Prosth,
-		///<summary>6</summary>
-		Ortho,
-		///<summary>7</summary>
-		Denturist,
-		///<summary>8</summary>
-		Surgery,
-		///<summary>9</summary>
-		Assistant,
-		///<summary>10</summary>
-		LabTech,
-		///<summary>11</summary>
-		Pathology,
-		///<summary>12</summary>
-		PublicHealth,
-		///<summary>13</summary>
-		Radiology
-	}
+	//DentalSpecialties are now a definition, user editable.
+	/////<summary></summary>
+	//public enum DentalSpecialty{
+	//	///<summary>0</summary>
+	//	General,
+	//	///<summary>1</summary>
+	//	Hygienist,
+	//	///<summary>2</summary>
+	//	Endodontics,
+	//	///<summary>3</summary>
+	//	Pediatric,
+	//	///<summary>4</summary>
+	//	Perio,
+	//	///<summary>5</summary>
+	//	Prosth,
+	//	///<summary>6</summary>
+	//	Ortho,
+	//	///<summary>7</summary>
+	//	Denturist,
+	//	///<summary>8</summary>
+	//	Surgery,
+	//	///<summary>9</summary>
+	//	Assistant,
+	//	///<summary>10</summary>
+	//	LabTech,
+	//	///<summary>11</summary>
+	//	Pathology,
+	//	///<summary>12</summary>
+	//	PublicHealth,
+	//	///<summary>13</summary>
+	//	Radiology
+	//}
 	///<summary>Appointment status.</summary>
 	public enum ApptStatus{
 		///<summary>0- No appointment should ever have this status.</summary>
