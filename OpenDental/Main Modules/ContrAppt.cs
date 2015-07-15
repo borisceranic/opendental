@@ -4273,7 +4273,8 @@ namespace OpenDental {
 		private void OnASAPList_Click() {
 			Cursor=Cursors.WaitCursor;
 			FormASAP FormA=new FormASAP();
-			FormA.ShowDialog();
+			FormA.PatientGoTo=PatientSelected;
+			FormA.Show(); 
 			if(FormA.PinClicked) {
 				SendToPinBoard(FormA.AptSelected);
 			}

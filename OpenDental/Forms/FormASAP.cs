@@ -37,6 +37,7 @@ namespace OpenDental{
 		private Label labelClinic;
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
+		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary></summary>
 		public FormASAP() {
@@ -338,6 +339,9 @@ namespace OpenDental{
 			int currentSelection=e.Row;
 			int currentScroll=grid.ScrollValue;
 			SelectedPatNum=ListASAP[e.Row].PatNum;
+			Patient pat=Patients.GetPat(SelectedPatNum);
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
 			FormApptEdit FormAE=new FormApptEdit(ListASAP[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();
