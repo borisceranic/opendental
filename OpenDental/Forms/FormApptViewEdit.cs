@@ -775,7 +775,7 @@ namespace OpenDental{
 				if(displayedElementsUR[i].ElementDesc=="MedOrPremed[+]"
 					|| displayedElementsUR[i].ElementDesc=="HasIns[I]"
 					|| displayedElementsUR[i].ElementDesc=="InsToSend[!]"
-					|| displayedElementsMain[i].ElementDesc=="LateColor")
+					|| displayedElementsUR[i].ElementDesc=="LateColor")
 				{
 					row.ColorBackG=displayedElementsUR[i].ElementColor;
 				}
@@ -805,7 +805,7 @@ namespace OpenDental{
 				if(displayedElementsLR[i].ElementDesc=="MedOrPremed[+]"
 					|| displayedElementsLR[i].ElementDesc=="HasIns[I]"
 					|| displayedElementsLR[i].ElementDesc=="InsToSend[!]"
-					|| displayedElementsMain[i].ElementDesc=="LateColor")
+					|| displayedElementsLR[i].ElementDesc=="LateColor")
 				{
 					row.ColorBackG=displayedElementsLR[i].ElementColor;
 				}
