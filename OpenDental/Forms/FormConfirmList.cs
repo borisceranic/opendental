@@ -56,6 +56,7 @@ namespace OpenDental{
 		///<summary>Only used if PinClicked=true</summary>
 		public long AptSelected;
 		private List<Clinic> _listUserClinics;
+		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary></summary>
 		public FormConfirmList(){
@@ -575,7 +576,9 @@ namespace OpenDental{
 			SelectedPatNum=PIn.Long(Table.Rows[e.Row]["PatNum"].ToString());
 			Cursor=Cursors.WaitCursor;
 			long selectedApt=PIn.Long(Table.Rows[e.Row]["AptNum"].ToString());
-			//Appointment apt=Appointments.GetOneApt(selectedApt);
+			Patient pat=Patients.GetPat(SelectedPatNum);
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
 			FormApptEdit FormA=new FormApptEdit(selectedApt);
 			FormA.PinIsVisible=true;
 			FormA.ShowDialog();

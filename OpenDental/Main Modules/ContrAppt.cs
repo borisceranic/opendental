@@ -4309,7 +4309,8 @@ namespace OpenDental {
 		private void OnConfirm_Click() {
 			Cursor=Cursors.WaitCursor;
 			FormConfirmList FormC=new FormConfirmList();
-			FormC.ShowDialog();
+			FormC.PatientGoTo=PatientSelected;
+			FormC.Show();
 			if(FormC.PinClicked) {
 				SendToPinBoard(FormC.AptSelected);
 			}
