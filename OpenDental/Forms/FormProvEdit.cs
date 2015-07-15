@@ -1324,7 +1324,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"E-claim Billing Prov Override cannot be a person.");
 				return;
 			}
-			if(_provNumSelected==ProvCur.ProvNum) {//Override is the same provider.
+			if(ProvCur.IsNew == false && _provNumSelected==ProvCur.ProvNum) {//Override is the same provider.
 				MsgBox.Show(this,"E-claim Billing Prov Override cannot be the same provider.");
 				return;
 			}
