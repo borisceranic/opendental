@@ -65,7 +65,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Get unique MedLab orders, grouped by PatNum, ProvNum, and SpecimenID.  Also returns the most recent DateTime the results
-		///were released from the lab, a list of test descriptions ordered, and the count of results for each test.
+		///were released from the lab and a list of test descriptions ordered.
 		///If includeNoPat==true, the lab orders not attached to a patient will be included.
 		///If groupBySpec==true, all tests for one specimen will be in one row of the grid with the most recent date reported.</summary>
 		public static DataTable GetOrdersForPatient(Patient pat,bool includeNoPat,bool groupBySpec,DateTime dateReportedStart,DateTime dateReportedEnd) {
@@ -87,10 +87,8 @@ namespace OpenDentBusiness{
 				groupByTestClause=",ObsTestID";
 			}
 			string command="SELECT PatNum,ProvNum,MAX(DateTimeReported) AS DateTimeReported,SpecimenID,SpecimenIDFiller,"
-				+DbHelper.GroupConcat("ObsTestDescript",distinct:true,separator:"\r\n")+" AS ObsTestDescript,"
-				+"COUNT(DISTINCT medlabresult.ObsID,medlabresult.ObsIDSub) AS ResultCount "
+				+DbHelper.GroupConcat("ObsTestDescript",distinct:true,separator:"\r\n")+" AS ObsTestDescript "
 				+"FROM medlab "
-				+"INNER JOIN medlabresult ON medlab.MedLabNum=medlabresult.MedLabNum "
 				+"WHERE ("+patNumClause+" "+noPatClause+") " //Ex: WHERE (PatNum>0 OR Patnum=0) 
 				+"AND "+DbHelper.DtimeToDate("DateTimeReported")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)+" "
 				+"GROUP BY PatNum,ProvNum,SpecimenID"+groupByTestClause+" "

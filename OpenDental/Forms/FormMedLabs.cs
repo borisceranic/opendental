@@ -41,16 +41,13 @@ namespace OpenDental {
 			col=new ODGridColumn("Date & Time Reported",150);//most recent date and time a result came in
 			col.SortingStrategy=GridSortingStrategy.DateParse;
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Patient",170);
+			col=new ODGridColumn("Patient",200);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Provider",120);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Specimen ID",100);//should be the ID sent on the specimen container to lab
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Test(s) Description",200);//description of the test ordered
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Result Count",110);//count of results received for this test
-			col.SortingStrategy=GridSortingStrategy.AmountParse;
+			col=new ODGridColumn("Test(s) Description",280);//description of the test ordered
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -79,7 +76,6 @@ namespace OpenDental {
 				row.Cells.Add(Providers.GetAbbr(provNum));
 				row.Cells.Add(_tableMedLabs.Rows[i]["SpecimenID"].ToString());
 				row.Cells.Add(_tableMedLabs.Rows[i]["ObsTestDescript"].ToString());
-				row.Cells.Add(_tableMedLabs.Rows[i]["ResultCount"].ToString());
 				row.Tag=_tableMedLabs.Rows[i]["PatNum"].ToString()+","+_tableMedLabs.Rows[i]["SpecimenID"].ToString()+","
 					+_tableMedLabs.Rows[i]["SpecimenIDFiller"].ToString();
 				gridMain.Rows.Add(row);

@@ -41,7 +41,6 @@ namespace OpenDental {
 			#region Patient and Patient Address Group Box
 			RefreshPatientData();
 			textSpecimenNumber.Text=_medLabCur.PatIDLab;
-			textPatAge.Text=_medLabCur.PatAge;
 			textFasting.Text=_medLabCur.PatFasting.ToString();
 			if(_medLabCur.PatFasting==YN.Unknown) {
 				textFasting.Text="";
@@ -51,27 +50,6 @@ namespace OpenDental {
 			textDateEntered.Text=_medLabCur.DateTimeEntered.ToShortDateString();
 			textDateTReport.Text=_medLabCur.DateTimeReported.ToString("MM/dd/yyyy hh:mm tt");
 			textTotVol.Text=_medLabCur.TotalVolume;
-			textClientAcc.Text=_medLabCur.SpecimenID;
-			textControlNum.Text=_medLabCur.SpecimenIDAlt;
-			textAccountNum.Text=_medLabCur.PatAccountNum;
-			textAccountPh.Text=PrefC.GetString(PrefName.PracticePhone);
-			#region Account Address Group Box
-			//use practice billing address information if stored, otherwise practice address information
-			if(PrefC.GetString(PrefName.PracticeBillingAddress)=="") {
-				textAcctAddr.Text=PrefC.GetString(PrefName.PracticeAddress);
-				textAcctAddr2.Text=PrefC.GetString(PrefName.PracticeAddress2);
-				textAcctCity.Text=PrefC.GetString(PrefName.PracticeCity);
-				textAcctState.Text=PrefC.GetString(PrefName.PracticeST);
-				textAcctZip.Text=PrefC.GetString(PrefName.PracticeZip);
-			}
-			else {
-				textAcctAddr.Text=PrefC.GetString(PrefName.PracticeBillingAddress);
-				textAcctAddr2.Text=PrefC.GetString(PrefName.PracticeBillingAddress2);
-				textAcctCity.Text=PrefC.GetString(PrefName.PracticeBillingCity);
-				textAcctState.Text=PrefC.GetString(PrefName.PracticeBillingST);
-				textAcctZip.Text=PrefC.GetString(PrefName.PracticeBillingZip);
-			}
-			#endregion Account Address Group Box
 			#region Odering Physician Group Box
 			textPhysicianName.Text=_medLabCur.OrderingProvLName;
 			if(_medLabCur.OrderingProvLName!="") {
@@ -299,13 +277,6 @@ namespace OpenDental {
 				textPatSSN.Text="";
 				textBirthdate.Text="";
 				textGender.Text="";
-				textAddress.Text="";
-				textAddress2.Text="";
-				textCity.Text="";
-				textState.Text="";
-				textZip.Text="";
-				textPatPhone.Text="";
-				textClientAltPatID.Text="";
 				return;
 			}
 			textPatID.Text=PatCur.PatNum.ToString();
@@ -318,13 +289,6 @@ namespace OpenDental {
 				textBirthdate.Text="";
 			}
 			textGender.Text=PatCur.Gender.ToString();
-			textAddress.Text=PatCur.Address;
-			textAddress2.Text=PatCur.Address2;
-			textCity.Text=PatCur.City;
-			textState.Text=PatCur.State;
-			textZip.Text=PatCur.Zip;
-			textPatPhone.Text=PatCur.HmPhone;
-			textClientAltPatID.Text=PatCur.PatNum.ToString();
 		}
 
 		private void butProvSelect_Click(object sender,EventArgs e) {
@@ -385,7 +349,7 @@ namespace OpenDental {
 			try {
 				docc=ImageStore.Import(tempPath,category,Patients.GetPat(_medLabCur.PatNum));
 			}
-			catch {
+			catch(Exception ex) {
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"Error saving document.");
 				return;
@@ -456,10 +420,11 @@ namespace OpenDental {
 		private bool ReprocessMessages() {
 			Dictionary<string,string> dictFileNameFileText=new Dictionary<string,string>();//Key=Full file path to message file, value=HL7 message content
 			for(int i=0;i<ListMedLabs.Count;i++) {
+				string filePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),ListMedLabs[i].FileName);
 				try { //File IO, surround with try catch
-					if(!dictFileNameFileText.ContainsKey(ListMedLabs[i].FileName)) {
-						string fileTextCur=File.ReadAllText(ListMedLabs[i].FileName);
-						dictFileNameFileText.Add(ListMedLabs[i].FileName,fileTextCur);
+					if(!dictFileNameFileText.ContainsKey(filePath)) {
+						string fileTextCur=File.ReadAllText(filePath);
+						dictFileNameFileText.Add(filePath,fileTextCur);
 					}
 				}
 				catch(Exception ex) {

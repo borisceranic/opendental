@@ -47,7 +47,7 @@
 			this.checkIncludeNoPat.Location = new System.Drawing.Point(534, 13);
 			this.checkIncludeNoPat.Name = "checkIncludeNoPat";
 			this.checkIncludeNoPat.Size = new System.Drawing.Size(215, 18);
-			this.checkIncludeNoPat.TabIndex = 336;
+			this.checkIncludeNoPat.TabIndex = 7;
 			this.checkIncludeNoPat.Text = "Include labs not attached to a patient";
 			this.checkIncludeNoPat.UseVisualStyleBackColor = true;
 			this.checkIncludeNoPat.Click += new System.EventHandler(this.checkIncludeNoPat_Click);
@@ -76,10 +76,12 @@
 			// 
 			// checkGroupBySpec
 			// 
+			this.checkGroupBySpec.Checked = true;
+			this.checkGroupBySpec.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkGroupBySpec.Location = new System.Drawing.Point(534, 38);
 			this.checkGroupBySpec.Name = "checkGroupBySpec";
 			this.checkGroupBySpec.Size = new System.Drawing.Size(215, 18);
-			this.checkGroupBySpec.TabIndex = 337;
+			this.checkGroupBySpec.TabIndex = 8;
 			this.checkGroupBySpec.Text = "One row per specimen";
 			this.checkGroupBySpec.UseVisualStyleBackColor = true;
 			this.checkGroupBySpec.Click += new System.EventHandler(this.checkGroupBySpec_Click);
@@ -94,7 +96,7 @@
 			this.butCurrent.Location = new System.Drawing.Point(266, 34);
 			this.butCurrent.Name = "butCurrent";
 			this.butCurrent.Size = new System.Drawing.Size(64, 24);
-			this.butCurrent.TabIndex = 2;
+			this.butCurrent.TabIndex = 4;
 			this.butCurrent.Text = "Current";
 			this.butCurrent.Click += new System.EventHandler(this.butCurrent_Click);
 			// 
@@ -108,7 +110,7 @@
 			this.butRefresh.Location = new System.Drawing.Point(779, 12);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
-			this.butRefresh.TabIndex = 6;
+			this.butRefresh.TabIndex = 9;
 			this.butRefresh.Text = "Refresh";
 			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
@@ -122,7 +124,7 @@
 			this.butAll.Location = new System.Drawing.Point(418, 34);
 			this.butAll.Name = "butAll";
 			this.butAll.Size = new System.Drawing.Size(64, 24);
-			this.butAll.TabIndex = 4;
+			this.butAll.TabIndex = 6;
 			this.butAll.Text = "All";
 			this.butAll.Click += new System.EventHandler(this.butAll_Click);
 			// 
@@ -136,7 +138,7 @@
 			this.butFind.Location = new System.Drawing.Point(342, 34);
 			this.butFind.Name = "butFind";
 			this.butFind.Size = new System.Drawing.Size(64, 24);
-			this.butFind.TabIndex = 3;
+			this.butFind.TabIndex = 5;
 			this.butFind.Text = "Find";
 			this.butFind.Click += new System.EventHandler(this.butFind_Click);
 			// 
@@ -145,14 +147,14 @@
 			this.textDateEnd.Location = new System.Drawing.Point(102, 35);
 			this.textDateEnd.Name = "textDateEnd";
 			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
-			this.textDateEnd.TabIndex = 1;
+			this.textDateEnd.TabIndex = 2;
 			// 
 			// textDateStart
 			// 
 			this.textDateStart.Location = new System.Drawing.Point(102, 12);
 			this.textDateStart.Name = "textDateStart";
 			this.textDateStart.Size = new System.Drawing.Size(77, 20);
-			this.textDateStart.TabIndex = 0;
+			this.textDateStart.TabIndex = 1;
 			// 
 			// labelEndDate
 			// 
@@ -170,7 +172,7 @@
 			this.textPatient.Name = "textPatient";
 			this.textPatient.ReadOnly = true;
 			this.textPatient.Size = new System.Drawing.Size(216, 20);
-			this.textPatient.TabIndex = 8;
+			this.textPatient.TabIndex = 3;
 			this.textPatient.TabStop = false;
 			// 
 			// labelPatient
@@ -202,7 +204,7 @@
 			this.butClose.Location = new System.Drawing.Point(797, 411);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
-			this.butClose.TabIndex = 335;
+			this.butClose.TabIndex = 0;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
@@ -212,6 +214,7 @@
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 80);
 			this.gridMain.Name = "gridMain";
