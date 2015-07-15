@@ -44,7 +44,7 @@ namespace OpenDental{
 		private Label label3;
 		private ComboBox comboSpecial;
 		private Label labelSpecial;
-		private Label label2;
+		private Label labelTriggerDisable;
 		public RecallType RecallTypeCur;
 		private OpenDental.UI.Button butDelete;
 		private Label label4;
@@ -118,7 +118,7 @@ namespace OpenDental{
 			this.butAddTrigger = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label2 = new System.Windows.Forms.Label();
+			this.labelTriggerDisable = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
@@ -431,13 +431,13 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// label2
+			// labelTriggerDisable
 			// 
-			this.label2.Location = new System.Drawing.Point(386, 90);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(263, 60);
-			this.label2.TabIndex = 132;
-			this.label2.Text = "A manual recall type will have no triggers.  To disable an automatic recall type," +
+			this.labelTriggerDisable.Location = new System.Drawing.Point(386, 90);
+			this.labelTriggerDisable.Name = "labelTriggerDisable";
+			this.labelTriggerDisable.Size = new System.Drawing.Size(263, 41);
+			this.labelTriggerDisable.TabIndex = 132;
+			this.labelTriggerDisable.Text = "A manual recall type will have no triggers.  To disable an automatic recall type," +
     " clear out the triggers.";
 			// 
 			// butDelete
@@ -526,7 +526,7 @@ namespace OpenDental{
 			this.Controls.Add(this.groupAgeLimit);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.labelTriggerDisable);
 			this.Controls.Add(this.labelSpecial);
 			this.Controls.Add(this.comboSpecial);
 			this.Controls.Add(this.label3);
@@ -575,9 +575,6 @@ namespace OpenDental{
 			if(PrefC.GetLong(PrefName.RecallTypeSpecialChildProphy)==RecallTypeCur.RecallTypeNum){
 				textRecallAgeAdult.Text=PrefC.GetInt(PrefName.RecallAgeAdult).ToString();
 			}
-			else{
-				groupAgeLimit.Visible=false;
-			}
 			textYears.Text=RecallTypeCur.DefaultInterval.Years.ToString();
 			textMonths.Text=RecallTypeCur.DefaultInterval.Months.ToString();
 			textWeeks.Text=RecallTypeCur.DefaultInterval.Weeks.ToString();
@@ -603,6 +600,30 @@ namespace OpenDental{
 			if(CountForType>0){
 				MessageBox.Show(Lan.g(this,"Cannot change Special Type. Patients using this recall type: ") + CountForType.ToString());
 				SetSpecialIdx();//sets back to what it was when form opened
+				return;
+			}
+			//cannot change a special type to one that is already in set for another recall type if that recall type is in use by patients
+			long recallTypeNumPrev=0;
+			switch(comboSpecial.SelectedIndex) {
+				case 1:
+					recallTypeNumPrev=PrefC.GetLong(PrefName.RecallTypeSpecialProphy);
+					break;
+				case 2:
+					recallTypeNumPrev=PrefC.GetLong(PrefName.RecallTypeSpecialChildProphy);
+					break;
+				case 3:
+					recallTypeNumPrev=PrefC.GetLong(PrefName.RecallTypeSpecialPerio);
+					break;
+			}
+			int countForTypePrev=0;
+			if(recallTypeNumPrev>0) {
+				countForTypePrev=Recalls.GetCountForType(recallTypeNumPrev);
+			}
+			if(countForTypePrev>0) {
+				MessageBox.Show(Lan.g(this,"Cannot change Special Type to one that is set for another recall type and in use by patients.  "
+					+"Patients using the other recall type: ")+countForTypePrev.ToString());
+				SetSpecialIdx();//sets back to what it was when form opened
+				return;
 			}
 			SetSpecialText();
 		}
@@ -612,47 +633,49 @@ namespace OpenDental{
 				labelSpecial.Text="";
 				listTriggers.Visible=true;
 				labelTriggers.Visible=true;
+				labelTriggerDisable.Visible=true;
 				butAddTrigger.Visible=true;
 				butRemoveTrigger.Visible=true;
 				groupInterval.Visible=true;
+				groupAgeLimit.Visible=false;
 			}
 			else if(comboSpecial.SelectedIndex==1){//prophy
 				labelSpecial.Text="Should include triggers for ChildProphy.";
 				listTriggers.Visible=true;
 				labelTriggers.Visible=true;
+				labelTriggerDisable.Visible=true;
 				butAddTrigger.Visible=true;
 				butRemoveTrigger.Visible=true;
 				groupInterval.Visible=true;
+				groupAgeLimit.Visible=false;
 			}
 			else if(comboSpecial.SelectedIndex==2){//childProphy
 				labelSpecial.Text="";//the description is now inside a special group box.
-				TriggerList.Clear();
-				listTriggers.Items.Clear();
-				textDays.Text="0";
-				textWeeks.Text="0";
-				textMonths.Text="0";
-				textYears.Text="0";
 				listTriggers.Visible=false;
 				labelTriggers.Visible=false;
+				labelTriggerDisable.Visible=false;
 				butAddTrigger.Visible=false;
 				butRemoveTrigger.Visible=false;
 				groupInterval.Visible=false;
+				groupAgeLimit.Visible=true;
 			}
 			else if(comboSpecial.SelectedIndex==3){//Perio
 				labelSpecial.Text="Should include triggers.";
 				listTriggers.Visible=true;
 				labelTriggers.Visible=true;
+				labelTriggerDisable.Visible=true;
 				butAddTrigger.Visible=true;
 				butRemoveTrigger.Visible=true;
 				groupInterval.Visible=true;
+				groupAgeLimit.Visible=false;
 			}
 		}
 
 		private void FillTriggers(){
-			listTriggers.Items.Clear();
-			if(TriggerList.Count==0){
+			if(TriggerList.Count==0 || comboSpecial.SelectedIndex==2) {//child prophy special type has no triggers, triggers from Prophy type are used
 				return;
 			}
+			listTriggers.Items.Clear();
 			string str;
 			for(int i=0;i<TriggerList.Count;i++){
 				str=ProcedureCodes.GetStringProcCode(TriggerList[i].CodeNum);
@@ -791,14 +814,17 @@ namespace OpenDental{
 				if(Prefs.UpdateInt(PrefName.RecallAgeAdult,PIn.Int(textRecallAgeAdult.Text))) {
 					changed=true;
 				}
+				TriggerList.Clear();//triggers for child prophy special type are handled by the prophy special type
+			}
+			else {//for child prophy, interval will default to 0, since this special type uses the Prophy default interval
+				Interval interval=new Interval(
+					PIn.Int(textDays.Text),
+					PIn.Int(textWeeks.Text),
+					PIn.Int(textMonths.Text),
+					PIn.Int(textYears.Text));
+				RecallTypeCur.DefaultInterval=interval;
 			}
 			RecallTypeCur.Description=textDescription.Text;
-			Interval interval=new Interval(
-				PIn.Int(textDays.Text),
-				PIn.Int(textWeeks.Text),
-				PIn.Int(textMonths.Text),
-				PIn.Int(textYears.Text));
-			RecallTypeCur.DefaultInterval=interval;
 			RecallTypeCur.TimePattern=textPattern.Text;
 			if(listProcs.Items.Count==0){
 				RecallTypeCur.Procedures="";
