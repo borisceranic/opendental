@@ -379,6 +379,8 @@ namespace OpenDentBusiness{
 					return "";
 				case Permissions.OrthoChartEdit:
 					return Lans.g("enumPermissions","Ortho Chart Edit");
+				case Permissions.PatientMerge:
+					return Lans.g("enumPermissions","Patient Merge");
 				case Permissions.PaymentCreate:
 					return Lans.g("enumPermissions","Payment Create");
 				case Permissions.PaymentEdit:

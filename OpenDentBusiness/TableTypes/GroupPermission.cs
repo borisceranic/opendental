@@ -214,7 +214,9 @@ namespace OpenDentBusiness{
 		///<summary>92- There is no user interface in the security window for this permission.  It is only used for tracking.  Tracks editing of fee schedule properties.</summary>
 		FeeSchedEdit,
 		///<summary>93- Allows user to edit and delete provider specific fees overrides.</summary>
-		ProviderFeeEdit
+		ProviderFeeEdit,
+		///<summary>94- Allows user to merge patients.</summary>
+		PatientMerge
 	}
 
 	

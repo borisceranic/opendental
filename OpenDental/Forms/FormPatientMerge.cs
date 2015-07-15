@@ -127,7 +127,7 @@ Merge the patient at the bottom into the patient shown at the top?"))
 						}
 						bool isCopied=true;
 						try {
-							File.Copy(fromFiles[i],destFilePath);//Will throw exception if file already exists.
+							File.Copy(fromFiles[i],destFilePath); //Will throw exception if file already exists.
 						}
 						catch {
 							isCopied=false;
@@ -148,7 +148,7 @@ Merge the patient at the bottom into the patient shown at the top?"))
 					}
 					if(fileCopyFailures>0) {
 						MessageBox.Show(Lan.g(this,"Some files belonging to the from patient were not copied.")+"\r\n"
-							+Lan.g(this,"Number of files not copied")+": "+fileCopyFailures);
+						                +Lan.g(this,"Number of files not copied")+": "+fileCopyFailures);
 					}
 					#endregion
 				}
@@ -157,6 +157,8 @@ Merge the patient at the bottom into the patient shown at the top?"))
 				this.textPatFromBirthdate.Text="";
 				CheckUIState();
 				MsgBox.Show(this,"Patients merged successfully.");
+				//Make log entry here not in parent form because we can merge multiple patients at a time.
+				SecurityLogs.MakeLogEntry(Permissions.PatientMerge,patientTo.PatNum,"Patient: "+patientFrom.GetNameFL()+"\r\nPatNum From: "+patientFrom.PatNum+"\r\nPatNum To: "+patientTo.PatNum);
 			}
 			this.Cursor=Cursors.Default;
 		}

@@ -5796,12 +5796,12 @@ namespace OpenDental{
 		}
 
 		private void menuItemMergePatients_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.Setup)) {
+			if(!Security.IsAuthorized(Permissions.PatientMerge)) {
 				return;
 			}
 			FormPatientMerge fpm=new FormPatientMerge();
 			fpm.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Merge Patients");
+			//Security log entries are made from within the form.
 		}
 
 		private void menuItemProcLockTool_Click(object sender,EventArgs e) {
