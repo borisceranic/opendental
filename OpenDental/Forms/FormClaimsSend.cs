@@ -65,6 +65,9 @@ namespace OpenDental{
 		private List<EtransType> _listCurEtransTypes;
 		//private ContextMenu contextMenuHist;
 		private List<Clinic> _listClinics;
+		private UI.Button butNextUnsent;
+		///<summary>Represents the number of unsent claims per clinic. This is a 1:1 list with _listClinics.</summary>
+		private List<int> _listNumberOfClaims;
 
 		///<summary></summary>
 		public FormClaimsSend(){
@@ -97,22 +100,23 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.panelSplitter = new System.Windows.Forms.Panel();
 			this.panelHistory = new System.Windows.Forms.Panel();
+			this.label4 = new System.Windows.Forms.Label();
+			this.comboHistoryType = new OpenDental.UI.ComboBoxMulti();
 			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.ToolBarHistory = new OpenDental.UI.ODToolBar();
+			this.butDropTo = new OpenDental.UI.Button();
+			this.butDropFrom = new OpenDental.UI.Button();
+			this.textDateFrom = new OpenDental.ValidDate();
+			this.textDateTo = new OpenDental.ValidDate();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.contextMenuEclaims = new System.Windows.Forms.ContextMenu();
 			this.comboCustomTracking = new System.Windows.Forms.ComboBox();
 			this.labelCustomTracking = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.comboHistoryType = new OpenDental.UI.ComboBoxMulti();
-			this.ToolBarHistory = new OpenDental.UI.ODToolBar();
-			this.butDropTo = new OpenDental.UI.Button();
-			this.butDropFrom = new OpenDental.UI.Button();
-			this.textDateFrom = new OpenDental.ValidDate();
-			this.textDateTo = new OpenDental.ValidDate();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.butNextUnsent = new OpenDental.UI.Button();
 			this.panelHistory.SuspendLayout();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
@@ -206,6 +210,27 @@ namespace OpenDental{
 			this.panelHistory.Size = new System.Drawing.Size(972, 286);
 			this.panelHistory.TabIndex = 51;
 			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(392, 5);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(72, 18);
+			this.label4.TabIndex = 47;
+			this.label4.Text = "Type";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
+			// comboHistoryType
+			// 
+			this.comboHistoryType.BackColor = System.Drawing.SystemColors.Window;
+			this.comboHistoryType.DroppedDown = false;
+			this.comboHistoryType.Items = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.Items")));
+			this.comboHistoryType.Location = new System.Drawing.Point(465, 6);
+			this.comboHistoryType.Name = "comboHistoryType";
+			this.comboHistoryType.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.SelectedIndices")));
+			this.comboHistoryType.Size = new System.Drawing.Size(100, 21);
+			this.comboHistoryType.TabIndex = 45;
+			this.comboHistoryType.UseCommas = false;
+			// 
 			// gridHistory
 			// 
 			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -228,80 +253,6 @@ namespace OpenDental{
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(376, 27);
 			this.panel1.TabIndex = 44;
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(74, 26);
-			this.comboClinic.MaxDropDownItems = 40;
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(160, 21);
-			this.comboClinic.TabIndex = 53;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
-			// 
-			// labelClinic
-			// 
-			this.labelClinic.Location = new System.Drawing.Point(7, 29);
-			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(65, 14);
-			this.labelClinic.TabIndex = 52;
-			this.labelClinic.Text = "Clinic Filter";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(4, 49);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(959, 350);
-			this.gridMain.TabIndex = 32;
-			this.gridMain.Title = "Claims Waiting to Send";
-			this.gridMain.TranslationName = "TableQueue";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
-			// comboCustomTracking
-			// 
-			this.comboCustomTracking.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboCustomTracking.Location = new System.Drawing.Point(384, 26);
-			this.comboCustomTracking.MaxDropDownItems = 40;
-			this.comboCustomTracking.Name = "comboCustomTracking";
-			this.comboCustomTracking.Size = new System.Drawing.Size(160, 21);
-			this.comboCustomTracking.TabIndex = 55;
-			this.comboCustomTracking.SelectionChangeCommitted += new System.EventHandler(this.comboCustomTracking_SelectionChangeCommitted);
-			// 
-			// labelCustomTracking
-			// 
-			this.labelCustomTracking.Location = new System.Drawing.Point(240, 29);
-			this.labelCustomTracking.Name = "labelCustomTracking";
-			this.labelCustomTracking.Size = new System.Drawing.Size(142, 14);
-			this.labelCustomTracking.TabIndex = 54;
-			this.labelCustomTracking.Text = "Custom Tracking Filter";
-			this.labelCustomTracking.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-			// 
-			// label4
-			// 
-			this.label4.Location = new System.Drawing.Point(392, 5);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(72, 18);
-			this.label4.TabIndex = 47;
-			this.label4.Text = "Type";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-			// 
-			// comboHistoryType
-			// 
-			this.comboHistoryType.BackColor = System.Drawing.SystemColors.Window;
-			this.comboHistoryType.DroppedDown = false;
-			this.comboHistoryType.Items = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.Items")));
-			this.comboHistoryType.Location = new System.Drawing.Point(465, 6);
-			this.comboHistoryType.Name = "comboHistoryType";
-			this.comboHistoryType.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.SelectedIndices")));
-			this.comboHistoryType.Size = new System.Drawing.Size(100, 21);
-			this.comboHistoryType.TabIndex = 45;
-			this.comboHistoryType.UseCommas = false;
 			// 
 			// ToolBarHistory
 			// 
@@ -360,6 +311,59 @@ namespace OpenDental{
 			this.textDateTo.Size = new System.Drawing.Size(81, 20);
 			this.textDateTo.TabIndex = 37;
 			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(74, 26);
+			this.comboClinic.MaxDropDownItems = 40;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(160, 21);
+			this.comboClinic.TabIndex = 53;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(7, 29);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(65, 14);
+			this.labelClinic.TabIndex = 52;
+			this.labelClinic.Text = "Clinic Filter";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(4, 49);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.Size = new System.Drawing.Size(959, 350);
+			this.gridMain.TabIndex = 32;
+			this.gridMain.Title = "Claims Waiting to Send";
+			this.gridMain.TranslationName = "TableQueue";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// comboCustomTracking
+			// 
+			this.comboCustomTracking.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboCustomTracking.Location = new System.Drawing.Point(514, 27);
+			this.comboCustomTracking.MaxDropDownItems = 40;
+			this.comboCustomTracking.Name = "comboCustomTracking";
+			this.comboCustomTracking.Size = new System.Drawing.Size(160, 21);
+			this.comboCustomTracking.TabIndex = 55;
+			this.comboCustomTracking.SelectionChangeCommitted += new System.EventHandler(this.comboCustomTracking_SelectionChangeCommitted);
+			// 
+			// labelCustomTracking
+			// 
+			this.labelCustomTracking.Location = new System.Drawing.Point(314, 30);
+			this.labelCustomTracking.Name = "labelCustomTracking";
+			this.labelCustomTracking.Size = new System.Drawing.Size(198, 14);
+			this.labelCustomTracking.TabIndex = 54;
+			this.labelCustomTracking.Text = "Custom Tracking Filter";
+			this.labelCustomTracking.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			// 
 			// ToolBarMain
 			// 
 			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
@@ -370,10 +374,26 @@ namespace OpenDental{
 			this.ToolBarMain.TabIndex = 31;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
+			// butNextUnsent
+			// 
+			this.butNextUnsent.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNextUnsent.Autosize = true;
+			this.butNextUnsent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNextUnsent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNextUnsent.CornerRadius = 4F;
+			this.butNextUnsent.Location = new System.Drawing.Point(234, 25);
+			this.butNextUnsent.Name = "butNextUnsent";
+			this.butNextUnsent.Size = new System.Drawing.Size(74, 23);
+			this.butNextUnsent.TabIndex = 57;
+			this.butNextUnsent.Text = "Next Unsent";
+			this.butNextUnsent.UseVisualStyleBackColor = true;
+			this.butNextUnsent.Click += new System.EventHandler(this.butNextUnsent_Click);
+			// 
 			// FormClaimsSend
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(971, 691);
+			this.Controls.Add(this.butNextUnsent);
 			this.Controls.Add(this.comboCustomTracking);
 			this.Controls.Add(this.labelCustomTracking);
 			this.Controls.Add(this.comboClinic);
@@ -402,6 +422,8 @@ namespace OpenDental{
 
 		private void FormClaimsSend_Load(object sender, System.EventArgs e) {
 			AdjustPanelSplit();
+			_arrayQueueAll=Claims.GetQueueList(0,0,0);
+			_listNumberOfClaims=new List<int>();
 			contextMenuStatus.MenuItems.Add(Lan.g(this,"Go to Account"),new EventHandler(GotoAccount_Clicked));
 			gridMain.ContextMenu=contextMenuStatus;
 			for(int i=0;i<Clearinghouses.Listt.Length;i++){
@@ -411,19 +433,10 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
+				butNextUnsent.Visible=false;
 			}
 			else {
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
-				if(!Security.CurUser.ClinicIsRestricted) {
-					comboClinic.Items.Add(Lan.g(this,"Unassigned"));
-					comboClinic.SelectedIndex=0;
-				}
-				for(int i=0;i<_listClinics.Count;i++) {
-					int curIndex=comboClinic.Items.Add(_listClinics[i].Description);
-					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
-						comboClinic.SelectedIndex=curIndex;
-					}
-				}
 			}
 			comboCustomTracking.Items.Add(Lan.g(this,"all"));
 			comboCustomTracking.SelectedIndex=0;
@@ -444,7 +457,6 @@ namespace OpenDental{
 				FormC.AutomaticMode=true;
 				FormC.ShowDialog();
 			}
-			_arrayQueueAll=new ClaimSendQueueItem[0];
 			FillGrid();
 			textDateFrom.Text=DateTime.Today.AddDays(-7).ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
@@ -476,6 +488,36 @@ namespace OpenDental{
 				comboHistoryType.SetSelected(i,true);
 			}
 			FillHistory();
+		}
+
+		public void FillClinicsList(long claimCustomTracking) {
+			int previousSelection=-1;
+			if(comboClinic.SelectedIndex!=-1) {//Only -1 the first time this method is run.
+				previousSelection=comboClinic.SelectedIndex;
+			}
+			comboClinic.Items.Clear();
+			_listNumberOfClaims.Clear();
+			if(!Security.CurUser.ClinicIsRestricted) {
+				comboClinic.Items.Add(Lan.g(this,"Unassigned"));
+				comboClinic.SelectedIndex=0;
+			}
+			for(int i=0;i<_listClinics.Count;i++) {
+				_listNumberOfClaims.Add(0);
+				for(int j=0;j<_arrayQueueAll.Length;j++) {
+					if(_arrayQueueAll[j].ClinicNum==_listClinics[i].ClinicNum) {
+						if(claimCustomTracking==0 || _arrayQueueAll[j].CustomTracking==claimCustomTracking) {
+							_listNumberOfClaims[i]=_listNumberOfClaims[i]+1;
+						}
+					}
+				}
+				int curIndex=comboClinic.Items.Add(_listClinics[i].Description+"  ("+_listNumberOfClaims[i]+")");
+				if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					comboClinic.SelectedIndex=curIndex;
+				}
+			}
+			if(previousSelection!=-1) {
+				comboClinic.SelectedIndex=previousSelection;
+			}
 		}
 
 		///<summary></summary>
@@ -555,6 +597,13 @@ namespace OpenDental{
 		}
 
 		private void FillGrid(bool rememberSelection){
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				long claimCustomTracking=0;
+				if(comboCustomTracking.SelectedIndex!=0) {
+					claimCustomTracking=DefC.GetList(DefCat.ClaimCustomTracking)[comboCustomTracking.SelectedIndex-1].DefNum;
+				}
+				FillClinicsList(claimCustomTracking);
+			}
 			int oldScrollValue=0;
 			List<long> listOldSelectedClaimNums=new List<long>();
 			if(rememberSelection) {
@@ -1027,6 +1076,33 @@ namespace OpenDental{
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
 			FillGrid();
+		}
+
+		private void butNextUnsent_Click(object sender,EventArgs e) {
+			int clinicSelectedAdjust=0;
+			if(!Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex!=0) {
+				clinicSelectedAdjust=1;
+			}
+			int newClinicSelected=-1;
+			for(int i=0;i<_listNumberOfClaims.Count;i++) {
+				//Ignore currently selected clinic
+				if(i==comboClinic.SelectedIndex-clinicSelectedAdjust) {
+					continue;
+				}
+				if(i>comboClinic.SelectedIndex-clinicSelectedAdjust && _listNumberOfClaims[i]>0) {
+					comboClinic.SelectedIndex=i+clinicSelectedAdjust;
+					FillGrid();
+					return;
+				}
+				if(_listNumberOfClaims[i]>0 && newClinicSelected==-1) {
+					newClinicSelected=i+clinicSelectedAdjust;
+				}
+			}
+			if(newClinicSelected>=0) {
+				comboClinic.SelectedIndex=newClinicSelected;
+				FillGrid();
+				return;
+			}
 		}
 
 		private void comboCustomTracking_SelectionChangeCommitted(object sender,EventArgs e) {
