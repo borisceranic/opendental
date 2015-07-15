@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -255,7 +256,7 @@ namespace OpenDentBusiness{
 				throw new Exception("An error has occured while attempting to sign contract.");
 			}
 			//Will always deletes old rows and inserts new rows because SmsPhoneNum is always 0 in new list.
-			SmsPhones.InsertNewFromList(listPhones,clinicNum);
+			SmsPhones.UpdateOrInsertFromList(listPhones,clinicNum);
 			return listPhones;
 		}
 
@@ -293,31 +294,30 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		public static void InsertNewFromList(List<SmsPhone> listPhones,long clinicNum) {
+		///<summary>Find all phones in the db (by PhoneNumber) and sync with listPhonesSync. If a given PhoneNumber does not already exist then insert the SmsPhone.
+		///Sets all ClinicNum(s) of phones in listPhonesSync to the given clinicNum.</summary>
+		public static void UpdateOrInsertFromList(List<SmsPhone> listPhonesSync,long clinicNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPhones,clinicNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPhonesSync,clinicNum);
 				return;
 			}
-			string command="SELECT * FROM smsphone WHERE clinicNum="+POut.Long(clinicNum);
-			List<SmsPhone> listPhonesBD=Crud.SmsPhoneCrud.SelectMany(command);
-			for(int i=0;i<listPhones.Count;i++) {
-				bool isNew=true;
-				for(int j=0;j<listPhonesBD.Count;j++) {
-					if(listPhones[i].PhoneNumber==listPhonesBD[j].PhoneNumber) {
-						////Do not reactivate the phone number if it is set incative, it can only be set inactive from HQ.
-						//if(listPhones[i].DateTimeActive.Year<1880) {
-						//	listPhones[i].DateTimeActive=DateTime.Now;
-						//}
-						//if(listPhones[i].DateTimeInactive.Year>1880) {
-						//	listPhones[i].DateTimeInactive=DateTime.MinValue;
-						//}
-						isNew=false; 
-						break;
-					}
+			//Get all phones so we can filter as needed below.
+			string command="SELECT * FROM smsphone";
+			List<SmsPhone> listPhonesDb=Crud.SmsPhoneCrud.SelectMany(command);
+			for(int i=0;i<listPhonesSync.Count;i++) {
+				SmsPhone phoneOld=listPhonesDb.FirstOrDefault(x => x.PhoneNumber==listPhonesSync[i].PhoneNumber);
+				//Upsert.
+				if(phoneOld!=null) { //This phone already exists. Update it to look like the phone we are trying to insert.
+					phoneOld.ClinicNum=clinicNum; //The clinic may have changed so set it to the new clinic.
+					phoneOld.CountryCode=listPhonesSync[i].CountryCode;
+					phoneOld.DateTimeActive=listPhonesSync[i].DateTimeActive;
+					phoneOld.DateTimeInactive=listPhonesSync[i].DateTimeInactive;
+					phoneOld.InactiveCode=listPhonesSync[i].InactiveCode;
+					Update(phoneOld);
 				}
-				if(isNew) {
-					Insert(listPhones[i]);
-				}
+				else { //This phone is new so insert it.
+					Insert(listPhonesSync[i]);
+				}			
 			}
 		}
 

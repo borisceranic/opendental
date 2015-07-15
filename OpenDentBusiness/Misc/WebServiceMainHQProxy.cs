@@ -11,9 +11,10 @@ namespace OpenDentBusiness {
 			service.Url=PrefC.GetString(PrefName.WebServiceHQServerURL);
 #if DEBUG
 			//Change arguments for debug only.
-			//service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//localhost
-			service.Url="http://10.10.2.18/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
-			service.Timeout=(int)TimeSpan.FromMinutes(20).TotalMilliseconds;
+			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//localhost
+			//service.Url="http://10.10.2.18:55018/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
+			//service.Url="http://server184:49999/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
+			service.Timeout=(int)TimeSpan.FromMinutes(60).TotalMilliseconds;
 #endif
 			return service;
 		}

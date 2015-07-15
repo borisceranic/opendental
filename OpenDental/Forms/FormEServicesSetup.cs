@@ -1435,9 +1435,10 @@ namespace OpenDental {
 				gridSmsSummary.EndUpdate();
 				return;
 			}
-			for(int i=0;i<_listClinics.Count || i==0;i++) {// Or i==0 allows us to use the same code for practice and clinics
+			//Only add 1 row if not using clinics. Otherwise add 1 row per clinic.
+			for(int i=0;(!PrefC.GetBool(PrefName.EasyNoClinics) && i<_listClinics.Count) || (PrefC.GetBool(PrefName.EasyNoClinics) && i==0);i++) {// Or i==0 allows us to use the same code for practice and clinics
 				ODGridRow row=new ODGridRow();
-				if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(PrefC.GetBool(PrefName.EasyNoClinics)) {					
 					row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle));
 				}
 				else {
@@ -1473,7 +1474,7 @@ namespace OpenDental {
 				}
 				gridSmsSummary.Rows.Add(row);
 			}
-			if(_listClinics.Count>1) {//Total row if there is more than one clinic (Will not display for practice because practice will have no clinics.
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && _listClinics.Count>1) {//Total row if there is more than one clinic (Will not display for practice because practice will have no clinics.
 				ODGridRow row=new ODGridRow();
 				//long totalSent=0;
 				long totalSentMonth=0;

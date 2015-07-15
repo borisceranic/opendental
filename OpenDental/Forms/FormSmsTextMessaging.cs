@@ -146,7 +146,20 @@ namespace OpenDental {
 					row.Tag=listSmsToMobile[i];
 					row.Cells.Add(listSmsToMobile[i].DateTimeSent.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Sent"));//Type
-					row.Cells.Add(listSmsToMobile[i].SmsStatus.ToString());//Status
+					string smsStatus=listSmsToMobile[i].SmsStatus.ToString(); //Default to the actual status.
+					switch(listSmsToMobile[i].SmsStatus) {
+						case SmsDeliveryStatus.DeliveryConf:
+						case SmsDeliveryStatus.DeliveryUnconf:
+							//Treated the same as far as the user is concerned.
+							smsStatus="Sent";
+							break;
+						case SmsDeliveryStatus.FailWithCharge:
+						case SmsDeliveryStatus.FailNoCharge:
+							//Treated the same as far as the user is concerned.
+							smsStatus="Failed";							
+							break;
+					}
+					row.Cells.Add(smsStatus);//Status
 					if(checkHidden.Checked) {
 						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
 					}
