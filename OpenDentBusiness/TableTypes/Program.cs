@@ -84,6 +84,7 @@ namespace OpenDentBusiness{
 		Patterson,
 		PerioPal,
 		Planmeca,
+		Podium,
 		PracticeWebReports,
 		Progeny,
 		PT,

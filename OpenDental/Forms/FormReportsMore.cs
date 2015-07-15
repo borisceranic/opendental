@@ -46,6 +46,7 @@ namespace OpenDental {
 		private UI.ODPictureBox pictureDentalIntel;
 		private Label label7;
 		private ToolStripMenuItem setupToolStripMenuItem;
+		private UI.ODPictureBox picturePodium;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
 
@@ -103,6 +104,7 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
+			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.menuMain.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -189,6 +191,7 @@ namespace OpenDental {
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.picturePodium);
 			this.groupBox1.Controls.Add(this.label7);
 			this.groupBox1.Controls.Add(this.pictureDentalIntel);
 			this.groupBox1.Location = new System.Drawing.Point(542, 182);
@@ -408,6 +411,17 @@ namespace OpenDental {
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
+			// 
+			// picturePodium
+			// 
+			this.picturePodium.HasBorder = false;
+			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
+			this.picturePodium.Location = new System.Drawing.Point(9, 51);
+			this.picturePodium.Name = "picturePodium";
+			this.picturePodium.Size = new System.Drawing.Size(95, 24);
+			this.picturePodium.TabIndex = 28;
+			this.picturePodium.TextNullImage = null;
+			this.picturePodium.Click += new System.EventHandler(this.picturePodium_Click);
 			// 
 			// FormReportsMore
 			// 
@@ -909,6 +923,10 @@ namespace OpenDental {
 
 		private void pictureDentalIntel_Click(object sender,EventArgs e) {
 			DentalIntel.ShowPage();
+		}
+
+		private void picturePodium_Click(object sender,EventArgs e) {
+			Podium.ShowPage();
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {

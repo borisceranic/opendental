@@ -9166,7 +9166,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 						+") VALUES("
 						+"'DentalTekSmartOfficePhone', "
-						+"'DentalTekSmartOfficePhone from dentalsolutionsllc.com', "
+						+"'DentalTekSmartOfficePhone from www.dentalsolutionsllc.com', "
 						+"'0', "//Disabled by default.
 						+"'"+POut.String(@"")+"', "//No Path needed
 						+"'"+POut.String(@"")+"', "//No command line needed
@@ -9184,7 +9184,7 @@ namespace OpenDentBusiness {
 						+") VALUES("
 						+"(SELECT MAX(ProgramNum)+1 FROM program),"
 						+"'DentalTekSmartOfficePhone', "
-						+"'DentalTekSmartOfficePhone from dentalsolutionsllc.com', "
+						+"'DentalTekSmartOfficePhone from www.dentalsolutionsllc.com', "
 						+"'0', "//Disabled by default.
 						+"'"+POut.String(@"")+"', "//No Path needed
 						+"'"+POut.String(@"")+"', "//No command line needed
@@ -9312,6 +9312,69 @@ namespace OpenDentBusiness {
 						Db.NonQ32(command);
 					}
 				}
+				//Insert Podium bridge-----------------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'Podium', "
+						+"'Podium from www.podium.co', "
+						+"'0', "//Disabled by default.
+						+"'"+POut.String(@"")+"', "
+						+"'"+POut.String(@"")+"', "
+						+"'No path or command line arguments needed.  The computer name or IP is the name or IP of the computer that will be sending Podium invitations. Get API Token and Location ID from Podium.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your computer name or IP (required)', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your API Token (required)', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your Location ID (required)', "
+						+"'')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'Podium', "
+						+"'Podium from www.podium.co', "
+						+"'0', "//Disabled by default.
+						+"'"+POut.String(@"")+"', "
+						+"'"+POut.String(@"")+"', "
+						+"'No path or command line arguments needed. The computer name or IP is the name or IP of the computer that will be sending Podium invitations. Get API Token and Location ID from Podium.')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your computer name or IP (required)', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your API Token (required)', "
+						+"'')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter your Location ID (required)', "
+						+"'')";
+					Db.NonQ(command);
+				}//end Podium bridge
 
 
 				command="UPDATE preference SET ValueString = '15.3.0.0' WHERE PrefName = 'DataBaseVersion'";

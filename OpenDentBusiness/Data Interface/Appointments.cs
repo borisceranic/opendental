@@ -1976,20 +1976,33 @@ namespace OpenDentBusiness{
 			return POut.Bitmap(Properties.Resources.ApptBackTest,ImageFormat.Gif);
 		}
 
-		///<summary>Returns a list of appointments that are scheduled between start date and end date. This takes into account the length of the appointments.</summary>
+		///<summary>Returns a list of appointments that are scheduled between start date and end datetime. 
+		///The end of the appointment must also be in the period.</summary>
 		public static List<Appointment> GetAppointmentsForPeriod(DateTime start,DateTime end) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),start,end);
 			}
-			string command="SELECT * FROM appointment WHERE ";
-			command+="AptDateTime >= "+POut.DateT(start.Date);//to check to see if an appointment scheduled beforehand overlaps this time segment
-			command+="AND AptDateTime <= "+POut.DateT(end);
-			List<Appointment> retVal = Crud.AppointmentCrud.TableToList(Db.GetTable(command));
+			//jsalmon - leaving start.Date even though this doesn't make much sense.
+			List<Appointment> retVal=GetAppointmentsStartingWithinPeriod(start.Date,end);
+			//Now that we have all appointments that start within our period, make sure that the entire appointment fits within.
 			for(int i=retVal.Count-1;i>=0;i--) {
 				if(retVal[i].AptDateTime.AddMinutes(retVal[i].Pattern.Length*PrefC.GetInt(PrefName.AppointmentTimeIncrement))>start) {
 					retVal.RemoveAt(i);
 				}
 			}
+			return retVal;
+		}
+
+		///<summary>Returns a list of appointments that are scheduled between start date and end date.
+		///This method only considers the AptDateTime and does not check to see if the appointment </summary>
+		public static List<Appointment> GetAppointmentsStartingWithinPeriod(DateTime start,DateTime end) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),start,end);
+			}
+			string command="SELECT * FROM appointment "
+				+"WHERE AptDateTime >= "+POut.DateT(start)+" "
+				+"AND AptDateTime <= "+POut.DateT(end);
+			List<Appointment> retVal=Crud.AppointmentCrud.TableToList(Db.GetTable(command));
 			return retVal;
 		}
 

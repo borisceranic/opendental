@@ -50,6 +50,7 @@ using SparksToothChart;
 using OpenDental.UI;
 using System.ServiceProcess;
 using System.Linq;
+using OpenDental.Bridges;
 #if EHRTEST
 using EHR;
 #endif
@@ -260,6 +261,11 @@ namespace OpenDental{
 		private UI.Button butMapPhones;
 		private ComboBox comboTriageCoordinator;
 		private Label labelFieldType;
+		///<summary>If the local computer is the computer where Podium invitations are sent, then this thread runs in the background and checks for 
+		///appointments that started 10-40 minutes ago (depending on in the patient is a new patient) at 10 minute intervals.  No preferences.
+		///In the future, some sort of identification should be made to tell if this thread is running on any computer.</summary>
+		private ODThread _threadPodium;
+		private int _podiumIntervalMS=(int)TimeSpan.FromMinutes(5).TotalMilliseconds;
 		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new messages 
 		///every x number of minutes (1 to 60) based on preference value.</summary>
 		private Thread ThreadEmailInbox;
@@ -2422,6 +2428,10 @@ namespace OpenDental{
 			timerReplicationMonitor.Enabled=true;
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
+			_threadPodium=new ODThread(_podiumIntervalMS,ThreadPodiumSendInvitations);
+			_threadPodium.AddExceptionHandler(PodiumMonitoringException);
+			_threadPodium.Name="Podium Thread";
+			_threadPodium.Start();
 			StartEServiceMonitoring();
 			Patient pat=Patients.GetPat(CurPatNum);
 			if(pat!=null && (_showForm=="popup" || _showForm=="popups") && myOutlookBar.SelectedIndex!=-1) {
@@ -4250,6 +4260,11 @@ namespace OpenDental{
 			//Implementing this delegate allows us to NOT litter ProcessEServiceSignals() with try catches.  
 		}
 
+		///<summary>The exception delegate for the Podium monitoring thread.</summary>
+		private void PodiumMonitoringException(Exception ex) {
+			//Currently we don't want to do anything if the Podium processing fails.  
+		}
+
 		///<summary>Worker method for _odThreadEServices.  Call StartEServiceMonitoring() to start monitoring eService signals instead of calling this method directly.</summary>
 		private void ProcessEServiceSignals(ODThread odThread) {
 			//--------------------------------------------------------------------------------------------------------------------------------------------
@@ -4626,6 +4641,31 @@ namespace OpenDental{
 				Computers.UpdateHeartBeat(Environment.MachineName,false);
 			}
 			catch { }
+		}
+
+		private void ThreadPodiumSendInvitations(ODThread worker) {
+			//Only send invitations if the program link is enabled and the computer name is set to this computer.
+			if(!Programs.IsEnabled(ProgramName.Podium)
+				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your computer name or IP (required)"))) 
+			{
+				return;
+			}
+			//Get the last 60 minutes of appointments in case there was a delay in the thread interval that would've prevented the appointment from being 
+			//found at exactly 40 minutes for new patients.
+			List<Appointment> listApptsCur=Appointments.GetAppointmentsStartingWithinPeriod(DateTime.Now.AddMinutes(-41).AddMilliseconds(-_podiumIntervalMS),DateTime.Now.AddMinutes(-10));
+			for(int i=0;i<listApptsCur.Count;i++) {
+				Appointment apptCur=listApptsCur[i];
+				if(apptCur.AptStatus==ApptStatus.Broken) {
+					continue;
+				}
+				Patient patCur=Patients.GetPat(apptCur.PatNum);
+				int podiumMinutes=apptCur.IsNewPatient?40:10;
+				if(apptCur.AptDateTime.AddMinutes(podiumMinutes)>=DateTime.Now 	//Appointment within this tick interval
+					&& apptCur.AptDateTime.AddMinutes(podiumMinutes)<DateTime.Now.AddMilliseconds(_podiumIntervalMS))	
+				{
+					Podium.SendInvitation(patCur,apptCur.IsNewPatient);
+				}
+			}
 		}
 
 		private void ThreadEmailInbox_Receive() {
