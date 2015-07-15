@@ -49,6 +49,7 @@ namespace OpenDental{
 		private CheckBox checkAllClin;
 		///<summary>If set externally, then this sets the date on startup.</summary>
 		public DateTime DateEnd;
+		private CheckBox checkClinicBreakdown;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -86,11 +87,6 @@ namespace OpenDental{
 			this.label4 = new System.Windows.Forms.Label();
 			this.textToday = new System.Windows.Forms.TextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.butRight = new OpenDental.UI.Button();
-			this.butThis = new OpenDental.UI.Button();
-			this.textDateFrom = new OpenDental.ValidDate();
-			this.textDateTo = new OpenDental.ValidDate();
-			this.butLeft = new OpenDental.UI.Button();
 			this.listClin = new System.Windows.Forms.ListBox();
 			this.labelClin = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -99,8 +95,14 @@ namespace OpenDental{
 			this.radioWriteoffPay = new System.Windows.Forms.RadioButton();
 			this.checkAllProv = new System.Windows.Forms.CheckBox();
 			this.checkAllClin = new System.Windows.Forms.CheckBox();
+			this.butRight = new OpenDental.UI.Button();
+			this.butThis = new OpenDental.UI.Button();
+			this.textDateFrom = new OpenDental.ValidDate();
+			this.textDateTo = new OpenDental.ValidDate();
+			this.butLeft = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkClinicBreakdown = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -221,62 +223,6 @@ namespace OpenDental{
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Date Range";
 			// 
-			// butRight
-			// 
-			this.butRight.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRight.Autosize = true;
-			this.butRight.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRight.CornerRadius = 4F;
-			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
-			this.butRight.Location = new System.Drawing.Point(205, 30);
-			this.butRight.Name = "butRight";
-			this.butRight.Size = new System.Drawing.Size(45, 26);
-			this.butRight.TabIndex = 46;
-			this.butRight.Click += new System.EventHandler(this.butRight_Click);
-			// 
-			// butThis
-			// 
-			this.butThis.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butThis.Autosize = true;
-			this.butThis.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butThis.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butThis.CornerRadius = 4F;
-			this.butThis.Location = new System.Drawing.Point(95, 30);
-			this.butThis.Name = "butThis";
-			this.butThis.Size = new System.Drawing.Size(101, 26);
-			this.butThis.TabIndex = 45;
-			this.butThis.Text = "This";
-			this.butThis.Click += new System.EventHandler(this.butThis_Click);
-			// 
-			// textDateFrom
-			// 
-			this.textDateFrom.Location = new System.Drawing.Point(95, 77);
-			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(100, 20);
-			this.textDateFrom.TabIndex = 43;
-			// 
-			// textDateTo
-			// 
-			this.textDateTo.Location = new System.Drawing.Point(95, 104);
-			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(100, 20);
-			this.textDateTo.TabIndex = 44;
-			// 
-			// butLeft
-			// 
-			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLeft.Autosize = true;
-			this.butLeft.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLeft.CornerRadius = 4F;
-			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
-			this.butLeft.Location = new System.Drawing.Point(41, 30);
-			this.butLeft.Name = "butLeft";
-			this.butLeft.Size = new System.Drawing.Size(45, 26);
-			this.butLeft.TabIndex = 44;
-			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
-			// 
 			// listClin
 			// 
 			this.listClin.Location = new System.Drawing.Point(215, 165);
@@ -361,6 +307,62 @@ namespace OpenDental{
 			this.checkAllClin.Text = "All";
 			this.checkAllClin.Click += new System.EventHandler(this.checkAllClin_Click);
 			// 
+			// butRight
+			// 
+			this.butRight.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRight.Autosize = true;
+			this.butRight.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRight.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRight.CornerRadius = 4F;
+			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
+			this.butRight.Location = new System.Drawing.Point(205, 30);
+			this.butRight.Name = "butRight";
+			this.butRight.Size = new System.Drawing.Size(45, 26);
+			this.butRight.TabIndex = 46;
+			this.butRight.Click += new System.EventHandler(this.butRight_Click);
+			// 
+			// butThis
+			// 
+			this.butThis.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butThis.Autosize = true;
+			this.butThis.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butThis.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butThis.CornerRadius = 4F;
+			this.butThis.Location = new System.Drawing.Point(95, 30);
+			this.butThis.Name = "butThis";
+			this.butThis.Size = new System.Drawing.Size(101, 26);
+			this.butThis.TabIndex = 45;
+			this.butThis.Text = "This";
+			this.butThis.Click += new System.EventHandler(this.butThis_Click);
+			// 
+			// textDateFrom
+			// 
+			this.textDateFrom.Location = new System.Drawing.Point(95, 77);
+			this.textDateFrom.Name = "textDateFrom";
+			this.textDateFrom.Size = new System.Drawing.Size(100, 20);
+			this.textDateFrom.TabIndex = 43;
+			// 
+			// textDateTo
+			// 
+			this.textDateTo.Location = new System.Drawing.Point(95, 104);
+			this.textDateTo.Name = "textDateTo";
+			this.textDateTo.Size = new System.Drawing.Size(100, 20);
+			this.textDateTo.TabIndex = 44;
+			// 
+			// butLeft
+			// 
+			this.butLeft.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLeft.Autosize = true;
+			this.butLeft.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLeft.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLeft.CornerRadius = 4F;
+			this.butLeft.Image = global::OpenDental.Properties.Resources.Left;
+			this.butLeft.Location = new System.Drawing.Point(41, 30);
+			this.butLeft.Name = "butLeft";
+			this.butLeft.Size = new System.Drawing.Size(45, 26);
+			this.butLeft.TabIndex = 44;
+			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
+			// 
 			// butCancel
 			// 
 			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -391,10 +393,20 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkClinicBreakdown
+			// 
+			this.checkClinicBreakdown.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkClinicBreakdown.Location = new System.Drawing.Point(215, 357);
+			this.checkClinicBreakdown.Name = "checkClinicBreakdown";
+			this.checkClinicBreakdown.Size = new System.Drawing.Size(191, 16);
+			this.checkClinicBreakdown.TabIndex = 50;
+			this.checkClinicBreakdown.Text = "Show Clinic Breakdown";
+			// 
 			// FormRpProdInc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(818, 417);
+			this.Controls.Add(this.checkClinicBreakdown);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.checkAllProv);
 			this.Controls.Add(this.groupBox3);
@@ -434,8 +446,10 @@ namespace OpenDental{
 				listClin.Visible=false;
 				labelClin.Visible=false;
 				checkAllClin.Visible=false;
+				checkClinicBreakdown.Visible=false;
 			}
-			else{
+			else {
+				checkClinicBreakdown.Checked=PrefC.GetBool(PrefName.ReportPandIhasClinicBreakdown);
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
 				if(!Security.CurUser.ClinicIsRestricted) {
 					listClin.Items.Add(Lan.g(this,"Unassigned"));
@@ -1749,7 +1763,7 @@ ORDER BY adjdate DESC
 			}
 			//setup query
 			QueryObject query;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && checkClinicBreakdown.Checked) {
 				query=report.AddQuery(dtClinic,"","Clinic",SplitByKind.Value,1,true);
 			}
 			else {
@@ -1764,7 +1778,7 @@ ORDER BY adjdate DESC
 			query.AddColumn("Pt Income",120,FieldValueType.Number);
 			query.AddColumn("Ins Income",120,FieldValueType.Number);
 			query.AddColumn("Total Income",120,FieldValueType.Number);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Month",75,FieldValueType.String);
