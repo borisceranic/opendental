@@ -1,49 +1,49 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using System.Collections.Generic;
+using Button=OpenDental.UI.Button;
 
 namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRepeatChargeEdit : System.Windows.Forms.Form{
-		private OpenDental.UI.Button butCancel;
-		private OpenDental.UI.Button butOK;
+	public class FormRepeatChargeEdit : Form{
+		private Button butCancel;
+		private Button butOK;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.Container components = null;
+		private Container components = null;
 		///<summary></summary>
 		public bool IsNew;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textCode;
-		private System.Windows.Forms.Label label2;
-		private OpenDental.ValidDouble textChargeAmt;
-		private OpenDental.ValidDate textDateStart;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label4;
-		private OpenDental.ValidDate textDateStop;
-		private System.Windows.Forms.TextBox textNote;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.TextBox textDesc;
-		private System.Windows.Forms.Label label6;
-		private OpenDental.UI.Button butDelete;
-		private System.Windows.Forms.Label label7;
+		private Label label1;
+		private TextBox textCode;
+		private Label label2;
+		private ValidDouble textChargeAmt;
+		private ValidDate textDateStart;
+		private Label label3;
+		private Label label4;
+		private ValidDate textDateStop;
+		private TextBox textNote;
+		private Label label5;
+		private TextBox textDesc;
+		private Label label6;
+		private Button butDelete;
+		private Label label7;
 		private CheckBox checkCopyNoteToProc;
 		private Label label8;
 		private Label label9;
-		private UI.Button butMaunal;
+		private Button butManual;
 		private CheckBox checkCreatesClaim;
 		private CheckBox checkIsEnabled;
 		private TextBox textTotalAmount;
 		private TextBox textNumOfCharges;
 		private Label label10;
 		private GroupBox groupBox1;
-		private UI.Button butCalculate;
+		private Button butCalculate;
+		private Label labelBillingCycleDay;
+		private ValidNumber textBillingDay;
 		private RepeatCharge RepeatCur;
 
 		///<summary></summary>
@@ -100,13 +100,15 @@ namespace OpenDental{
 			this.label10 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.butCalculate = new OpenDental.UI.Button();
-			this.butMaunal = new OpenDental.UI.Button();
+			this.butManual = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.textDateStop = new OpenDental.ValidDate();
 			this.textDateStart = new OpenDental.ValidDate();
 			this.textChargeAmt = new OpenDental.ValidDouble();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.labelBillingCycleDay = new System.Windows.Forms.Label();
+			this.textBillingDay = new OpenDental.ValidNumber();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -127,6 +129,7 @@ namespace OpenDental{
 			this.textCode.ReadOnly = true;
 			this.textCode.Size = new System.Drawing.Size(100, 20);
 			this.textCode.TabIndex = 3;
+			this.textCode.TabStop = false;
 			// 
 			// label2
 			// 
@@ -162,7 +165,7 @@ namespace OpenDental{
 			this.textNote.Multiline = true;
 			this.textNote.Name = "textNote";
 			this.textNote.Size = new System.Drawing.Size(424, 114);
-			this.textNote.TabIndex = 11;
+			this.textNote.TabIndex = 6;
 			// 
 			// label5
 			// 
@@ -180,6 +183,7 @@ namespace OpenDental{
 			this.textDesc.Name = "textDesc";
 			this.textDesc.Size = new System.Drawing.Size(241, 20);
 			this.textDesc.TabIndex = 40;
+			this.textDesc.TabStop = false;
 			// 
 			// label6
 			// 
@@ -206,7 +210,7 @@ namespace OpenDental{
 			this.checkCopyNoteToProc.Location = new System.Drawing.Point(162, 378);
 			this.checkCopyNoteToProc.Name = "checkCopyNoteToProc";
 			this.checkCopyNoteToProc.Size = new System.Drawing.Size(250, 18);
-			this.checkCopyNoteToProc.TabIndex = 43;
+			this.checkCopyNoteToProc.TabIndex = 7;
 			this.checkCopyNoteToProc.Text = "Copy note to procedure billing note.";
 			this.checkCopyNoteToProc.UseVisualStyleBackColor = true;
 			// 
@@ -234,7 +238,7 @@ namespace OpenDental{
 			this.checkCreatesClaim.Location = new System.Drawing.Point(7, 218);
 			this.checkCreatesClaim.Name = "checkCreatesClaim";
 			this.checkCreatesClaim.Size = new System.Drawing.Size(169, 18);
-			this.checkCreatesClaim.TabIndex = 49;
+			this.checkCreatesClaim.TabIndex = 4;
 			this.checkCreatesClaim.Text = "Creates Claim";
 			this.checkCreatesClaim.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkCreatesClaim.UseVisualStyleBackColor = true;
@@ -245,7 +249,7 @@ namespace OpenDental{
 			this.checkIsEnabled.Location = new System.Drawing.Point(7, 239);
 			this.checkIsEnabled.Name = "checkIsEnabled";
 			this.checkIsEnabled.Size = new System.Drawing.Size(169, 18);
-			this.checkIsEnabled.TabIndex = 50;
+			this.checkIsEnabled.TabIndex = 5;
 			this.checkIsEnabled.Text = "Enabled";
 			this.checkIsEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsEnabled.UseVisualStyleBackColor = true;
@@ -255,14 +259,14 @@ namespace OpenDental{
 			this.textTotalAmount.Location = new System.Drawing.Point(155, 19);
 			this.textTotalAmount.Name = "textTotalAmount";
 			this.textTotalAmount.Size = new System.Drawing.Size(100, 20);
-			this.textTotalAmount.TabIndex = 51;
+			this.textTotalAmount.TabIndex = 0;
 			// 
 			// textNumOfCharges
 			// 
 			this.textNumOfCharges.Location = new System.Drawing.Point(155, 45);
 			this.textNumOfCharges.Name = "textNumOfCharges";
 			this.textNumOfCharges.Size = new System.Drawing.Size(100, 20);
-			this.textNumOfCharges.TabIndex = 52;
+			this.textNumOfCharges.TabIndex = 1;
 			// 
 			// label10
 			// 
@@ -283,7 +287,7 @@ namespace OpenDental{
 			this.groupBox1.Location = new System.Drawing.Point(7, 48);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(359, 79);
-			this.groupBox1.TabIndex = 54;
+			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Calculate Charge Amount (optional)";
 			// 
@@ -297,23 +301,23 @@ namespace OpenDental{
 			this.butCalculate.Location = new System.Drawing.Point(261, 44);
 			this.butCalculate.Name = "butCalculate";
 			this.butCalculate.Size = new System.Drawing.Size(75, 24);
-			this.butCalculate.TabIndex = 53;
+			this.butCalculate.TabIndex = 2;
 			this.butCalculate.Text = "Calculate";
 			this.butCalculate.Click += new System.EventHandler(this.butCalculate_Click);
 			// 
-			// butMaunal
+			// butManual
 			// 
-			this.butMaunal.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMaunal.Autosize = true;
-			this.butMaunal.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMaunal.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMaunal.CornerRadius = 4F;
-			this.butMaunal.Location = new System.Drawing.Point(162, 421);
-			this.butMaunal.Name = "butMaunal";
-			this.butMaunal.Size = new System.Drawing.Size(75, 24);
-			this.butMaunal.TabIndex = 48;
-			this.butMaunal.Text = "Manual";
-			this.butMaunal.Click += new System.EventHandler(this.butMaunal_Click);
+			this.butManual.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butManual.Autosize = true;
+			this.butManual.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butManual.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butManual.CornerRadius = 4F;
+			this.butManual.Location = new System.Drawing.Point(162, 421);
+			this.butManual.Name = "butManual";
+			this.butManual.Size = new System.Drawing.Size(75, 24);
+			this.butManual.TabIndex = 12;
+			this.butManual.Text = "Manual";
+			this.butManual.Click += new System.EventHandler(this.butManual_Click);
 			// 
 			// butDelete
 			// 
@@ -328,7 +332,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(35, 493);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(83, 26);
-			this.butDelete.TabIndex = 41;
+			this.butDelete.TabIndex = 11;
 			this.butDelete.Text = "&Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -337,14 +341,14 @@ namespace OpenDental{
 			this.textDateStop.Location = new System.Drawing.Point(162, 194);
 			this.textDateStop.Name = "textDateStop";
 			this.textDateStop.Size = new System.Drawing.Size(100, 20);
-			this.textDateStop.TabIndex = 8;
+			this.textDateStop.TabIndex = 3;
 			// 
 			// textDateStart
 			// 
 			this.textDateStart.Location = new System.Drawing.Point(162, 165);
 			this.textDateStart.Name = "textDateStart";
 			this.textDateStart.Size = new System.Drawing.Size(100, 20);
-			this.textDateStart.TabIndex = 6;
+			this.textDateStart.TabIndex = 2;
 			// 
 			// textChargeAmt
 			// 
@@ -353,7 +357,7 @@ namespace OpenDental{
 			this.textChargeAmt.MinVal = -100000000D;
 			this.textChargeAmt.Name = "textChargeAmt";
 			this.textChargeAmt.Size = new System.Drawing.Size(100, 20);
-			this.textChargeAmt.TabIndex = 5;
+			this.textChargeAmt.TabIndex = 1;
 			// 
 			// butOK
 			// 
@@ -366,7 +370,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(595, 450);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 1;
+			this.butOK.TabIndex = 9;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -381,19 +385,40 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(595, 491);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 0;
+			this.butCancel.TabIndex = 10;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// labelBillingCycleDay
+			// 
+			this.labelBillingCycleDay.Location = new System.Drawing.Point(372, 50);
+			this.labelBillingCycleDay.Name = "labelBillingCycleDay";
+			this.labelBillingCycleDay.Size = new System.Drawing.Size(137, 16);
+			this.labelBillingCycleDay.TabIndex = 55;
+			this.labelBillingCycleDay.Text = "Billing Cycle Day";
+			this.labelBillingCycleDay.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelBillingCycleDay.Visible = false;
+			// 
+			// textBillingDay
+			// 
+			this.textBillingDay.Location = new System.Drawing.Point(511, 49);
+			this.textBillingDay.MaxVal = 31;
+			this.textBillingDay.MinVal = 1;
+			this.textBillingDay.Name = "textBillingDay";
+			this.textBillingDay.Size = new System.Drawing.Size(75, 20);
+			this.textBillingDay.TabIndex = 8;
 			// 
 			// FormRepeatChargeEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(705, 545);
+			this.Controls.Add(this.textBillingDay);
+			this.Controls.Add(this.labelBillingCycleDay);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label10);
 			this.Controls.Add(this.checkIsEnabled);
 			this.Controls.Add(this.checkCreatesClaim);
-			this.Controls.Add(this.butMaunal);
+			this.Controls.Add(this.butManual);
 			this.Controls.Add(this.checkCopyNoteToProc);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.butDelete);
@@ -427,9 +452,9 @@ namespace OpenDental{
 		}
 		#endregion
 
-		private void FormRepeatChargeEdit_Load(object sender,System.EventArgs e) {
+		private void FormRepeatChargeEdit_Load(object sender,EventArgs e) {
 			//Set the title bar to show the patient's name much like the main screen does.
-			this.Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
+			Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
 			if(IsNew){
 				FormProcCodes FormP=new FormProcCodes();
 				FormP.IsSelectionMode=true;
@@ -477,18 +502,24 @@ namespace OpenDental{
 				checkIsEnabled.AutoCheck=false;
 				checkCopyNoteToProc.AutoCheck=false;
 				butDelete.Enabled=false;
-				butMaunal.Enabled=false;
+				butManual.Enabled=false;
 				butCalculate.Enabled=false;
 				butOK.Enabled=false;
 				butCancel.Text=Lan.g(this,"Close");
 			}
+			Patient pat=Patients.GetPat(RepeatCur.PatNum);//pat should never be null. If it is, this will fail.
+			textBillingDay.Text=pat.BillingCycleDay.ToString();
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				labelBillingCycleDay.Visible=true;
+				textBillingDay.Visible=true;
+			}
 		}
 
-		private void butMaunal_Click(object sender,EventArgs e) {
+		private void butManual_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.ProcComplCreate)) {
 				return;
 			}
-			if(textChargeAmt.Text==null || textChargeAmt.Text=="") {
+			if(string.IsNullOrEmpty(textChargeAmt.Text)) {
 				MsgBox.Show(this,"You must first enter a charge amount.");
 				return;
 			}
@@ -523,19 +554,25 @@ namespace OpenDental{
 		}
 
 		private void butCalculate_Click(object sender,EventArgs e) {
-			if(PIn.Double(textNumOfCharges.Text)==0	|| PIn.Double(textTotalAmount.Text)==0) {
+			if(PIn.Double(textNumOfCharges.Text).IsZero()	|| PIn.Double(textTotalAmount.Text).IsZero()) {
 				textChargeAmt.Text=RepeatCur.ChargeAmt.ToString("F");
 				return;
 			}
 			textChargeAmt.Text=(PIn.Double(textTotalAmount.Text)/PIn.Double(textNumOfCharges.Text)).ToString("F");
 		}
 
-		private void butDelete_Click(object sender, System.EventArgs e) {
+		private void butDelete_Click(object sender, EventArgs e) {
 			RepeatCharges.Delete(RepeatCur);
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e){
+		private void butOK_Click(object sender, EventArgs e){
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				Patient patOld=Patients.GetPat(RepeatCur.PatNum);
+				Patient patNew=patOld.Copy();
+				patNew.BillingCycleDay=PIn.Int(textBillingDay.Text);
+				Patients.Update(patNew,patOld);
+			}
 			if( textChargeAmt.errorProvider1.GetError(textChargeAmt)!=""
 				|| textDateStart.errorProvider1.GetError(textDateStart)!=""
 				|| textDateStop.errorProvider1.GetError(textDateStop)!=""
@@ -576,7 +613,7 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
+		private void butCancel_Click(object sender, EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
 

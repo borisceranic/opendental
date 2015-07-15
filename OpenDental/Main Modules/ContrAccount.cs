@@ -217,6 +217,7 @@ namespace OpenDental {
 			this.menuItemRepeatEmail = new System.Windows.Forms.MenuItem();
 			this.menuItemRepeatMobile = new System.Windows.Forms.MenuItem();
 			this.menuItemRepeatCanada = new System.Windows.Forms.MenuItem();
+			this.menuItemRepeatWebSched = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes = new System.Windows.Forms.Panel();
 			this.butShowNone = new OpenDental.UI.Button();
 			this.butShowAll = new OpenDental.UI.Button();
@@ -317,7 +318,6 @@ namespace OpenDental {
 			this.gridComm = new OpenDental.UI.ODGrid();
 			this.gridPatInfo = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.menuItemRepeatWebSched = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -474,6 +474,12 @@ namespace OpenDental {
 			this.menuItemRepeatCanada.Index = 3;
 			this.menuItemRepeatCanada.Text = "Canada Monthly";
 			this.menuItemRepeatCanada.Click += new System.EventHandler(this.menuItemRepeatCanada_Click);
+			// 
+			// menuItemRepeatWebSched
+			// 
+			this.menuItemRepeatWebSched.Index = 4;
+			this.menuItemRepeatWebSched.Text = "WebSched Monthly";
+			this.menuItemRepeatWebSched.Click += new System.EventHandler(this.menuItemRepeatWebSched_Click);
 			// 
 			// panelProgNotes
 			// 
@@ -695,6 +701,7 @@ namespace OpenDental {
 			// 
 			// gridProg
 			// 
+			this.gridProg.HasMultilineHeaders = false;
 			this.gridProg.HScrollVisible = true;
 			this.gridProg.Location = new System.Drawing.Point(3, 0);
 			this.gridProg.Name = "gridProg";
@@ -1045,6 +1052,7 @@ namespace OpenDental {
 			// 
 			// gridAcctPat
 			// 
+			this.gridAcctPat.HasMultilineHeaders = false;
 			this.gridAcctPat.HScrollVisible = false;
 			this.gridAcctPat.Location = new System.Drawing.Point(0, 135);
 			this.gridAcctPat.Name = "gridAcctPat";
@@ -1537,6 +1545,7 @@ namespace OpenDental {
 			// 
 			// gridPayPlan
 			// 
+			this.gridPayPlan.HasMultilineHeaders = false;
 			this.gridPayPlan.HScrollVisible = false;
 			this.gridPayPlan.Location = new System.Drawing.Point(0, 144);
 			this.gridPayPlan.Name = "gridPayPlan";
@@ -1549,6 +1558,7 @@ namespace OpenDental {
 			// 
 			// gridRepeat
 			// 
+			this.gridRepeat.HasMultilineHeaders = false;
 			this.gridRepeat.HScrollVisible = false;
 			this.gridRepeat.Location = new System.Drawing.Point(0, 63);
 			this.gridRepeat.Name = "gridRepeat";
@@ -1561,6 +1571,7 @@ namespace OpenDental {
 			// 
 			// gridAccount
 			// 
+			this.gridAccount.HasMultilineHeaders = false;
 			this.gridAccount.HScrollVisible = true;
 			this.gridAccount.Location = new System.Drawing.Point(0, 243);
 			this.gridAccount.Name = "gridAccount";
@@ -1575,6 +1586,7 @@ namespace OpenDental {
 			// 
 			// gridComm
 			// 
+			this.gridComm.HasMultilineHeaders = false;
 			this.gridComm.HScrollVisible = false;
 			this.gridComm.Location = new System.Drawing.Point(0, 440);
 			this.gridComm.Name = "gridComm";
@@ -1587,6 +1599,7 @@ namespace OpenDental {
 			// 
 			// gridPatInfo
 			// 
+			this.gridPatInfo.HasMultilineHeaders = false;
 			this.gridPatInfo.HScrollVisible = false;
 			this.gridPatInfo.Location = new System.Drawing.Point(751, 526);
 			this.gridPatInfo.Name = "gridPatInfo";
@@ -1607,12 +1620,6 @@ namespace OpenDental {
 			this.ToolBarMain.Size = new System.Drawing.Size(939, 25);
 			this.ToolBarMain.TabIndex = 47;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
-			// 
-			// menuItemRepeatWebSched
-			// 
-			this.menuItemRepeatWebSched.Index = 4;
-			this.menuItemRepeatWebSched.Text = "WebSched Monthly";
-			this.menuItemRepeatWebSched.Click += new System.EventHandler(this.menuItemRepeatWebSched_Click);
 			// 
 			// ContrAccount
 			// 
@@ -2155,6 +2162,12 @@ namespace OpenDental {
 			if(RepeatChargeList.Length==0) {
 				gridRepeat.Visible=false;
 				return;
+			}
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				gridRepeat.Title=Lan.g(gridRepeat,"Repeat Charges")+" - Billing Day "+PatCur.BillingCycleDay;
+			}
+			else {
+				gridRepeat.Title=Lan.g(gridRepeat,"Repeat Charges");
 			}
 			gridRepeat.Visible=true;
 			gridRepeat.Height=92;//=140;
