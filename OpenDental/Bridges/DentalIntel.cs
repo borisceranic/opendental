@@ -18,21 +18,16 @@ namespace OpenDental.Bridges{
 
 		///<summary></summary>
 		public static void ShowPage() {
-			if(Programs.IsEnabled(ProgramName.DentalIntel)) {
-				try {
-					Process.Start("https://www.opendental.com/manual/portaldentalintel.html");
+			try {
+				if(Programs.IsEnabled(ProgramName.DentalIntel)) {
+					Process.Start("http://www.opendental.com/manual/portaldentalintel.html");
 				}
-				catch {
-					MsgBox.Show("DentalIntel","Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
+				else {
+					Process.Start("http://www.opendental.com/manual/dentalintel.html");
 				}
 			}
-			else {
-				try {
-					Process.Start("https://www.opendental.com/manual/dentalintel.html");
-				}
-				catch {
-					MsgBox.Show("DentalIntel","Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
-				}
+			catch {
+				MsgBox.Show("DentalIntel","Failed to open web browser.  Please make sure you have a default browser set and are connected to the internet then try again.");
 			}
 		}
 
