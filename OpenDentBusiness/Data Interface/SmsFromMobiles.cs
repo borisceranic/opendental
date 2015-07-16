@@ -181,11 +181,10 @@ namespace OpenDentBusiness{
 				sms.PatNum=listPatNums[0];
 				Commlog comm=new Commlog() {
 					 CommDateTime=sms.DateTimeReceived,
-					 DateTimeEnd=sms.DateTimeReceived.AddSeconds(1),
 					 Mode_= CommItemMode.Text,
 					 Note=sms.MsgText,
 					 PatNum=sms.PatNum,
-					 //CommType=??,
+					 CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
 					 SentOrReceived= CommSentOrReceived.Received
 				};
 				sms.CommlogNum=Commlogs.Insert(comm);
