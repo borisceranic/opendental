@@ -125,6 +125,7 @@ namespace OpenDental{
 		private Label label23;
 		private Button butColor;
 		private ColorDialog colorDialog;
+		private CheckBox checkClaimsSendWindowValidateOnLoad;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -272,6 +273,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkClaimsSendWindowValidateOnLoad = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -1366,6 +1368,7 @@ namespace OpenDental{
 			// tabManage
 			// 
 			this.tabManage.BackColor = System.Drawing.SystemColors.Window;
+			this.tabManage.Controls.Add(this.checkClaimsSendWindowValidateOnLoad);
 			this.tabManage.Controls.Add(this.checkTimeCardADP);
 			this.tabManage.Controls.Add(this.groupBox1);
 			this.tabManage.Controls.Add(this.comboTimeCardOvertimeFirstDayOfWeek);
@@ -1402,7 +1405,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label18);
 			this.groupBox1.Controls.Add(this.textStatementsCalcDueDate);
 			this.groupBox1.Controls.Add(this.textPayPlansBillInAdvanceDays);
-			this.groupBox1.Location = new System.Drawing.Point(38, 76);
+			this.groupBox1.Location = new System.Drawing.Point(38, 91);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(413, 216);
 			this.groupBox1.TabIndex = 197;
@@ -1585,6 +1588,17 @@ namespace OpenDental{
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
+			// checkClaimsSendWindowValidateOnLoad
+			// 
+			this.checkClaimsSendWindowValidateOnLoad.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkClaimsSendWindowValidateOnLoad.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkClaimsSendWindowValidateOnLoad.Location = new System.Drawing.Point(20, 74);
+			this.checkClaimsSendWindowValidateOnLoad.Name = "checkClaimsSendWindowValidateOnLoad";
+			this.checkClaimsSendWindowValidateOnLoad.Size = new System.Drawing.Size(421, 17);
+			this.checkClaimsSendWindowValidateOnLoad.TabIndex = 200;
+			this.checkClaimsSendWindowValidateOnLoad.Text = "Claims Send window validate on load (can cause slowness)";
+			this.checkClaimsSendWindowValidateOnLoad.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1800,6 +1814,7 @@ namespace OpenDental{
 			}
 			comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex=PrefC.GetInt(PrefName.TimeCardOvertimeFirstDayOfWeek);
 			checkTimeCardADP.Checked=PrefC.GetBool(PrefName.TimeCardADPExportIncludesName);
+			checkClaimsSendWindowValidateOnLoad.Checked=PrefC.GetBool(PrefName.ClaimsSendWindowValidatesOnLoad);
 			//Statements
 			checkStatementShowReturnAddress.Checked=PrefC.GetBool(PrefName.StatementShowReturnAddress);
 			checkShowCC.Checked=PrefC.GetBool(PrefName.StatementShowCreditCard);
@@ -2046,6 +2061,7 @@ namespace OpenDental{
 				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
 				| Prefs.UpdateInt(PrefName.TimeCardOvertimeFirstDayOfWeek,comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimsSendWindowValidatesOnLoad,checkClaimsSendWindowValidateOnLoad.Checked)
 				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)

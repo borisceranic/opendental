@@ -9,6 +9,7 @@ using System.Drawing.Printing;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -458,6 +459,11 @@ namespace OpenDental{
 				FormC.ShowDialog();
 			}
 			FillGrid();
+			//Validate all claims if the preference is enabled.
+			if(PrefC.GetBool(PrefName.ClaimsSendWindowValidatesOnLoad)) {
+				//This can be very slow if there are lots of claims to validate.
+				ValidateClaims(_arrayQueueAll.ToList());
+			}
 			textDateFrom.Text=DateTime.Today.AddDays(-7).ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
 			_listCurEtransTypes=new List<EtransType>();
@@ -947,24 +953,13 @@ namespace OpenDental{
 				}
 			}
 			//Now that all of the desired rows have been selected, we need to validate any rows that have not already been validated.
-			bool gridChanged=false;
-			Cursor.Current=Cursors.WaitCursor;
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				if(_arrayQueueFiltered[gridMain.SelectedIndices[i]].NoSendElect || _arrayQueueFiltered[gridMain.SelectedIndices[i]].IsValid) {
-					continue;//A printed claim or has already been validated.
+			if(!PrefC.GetBool(PrefName.ClaimsSendWindowValidatesOnLoad)) {
+				List<ClaimSendQueueItem> listClaimSendQueueItems=new List<ClaimSendQueueItem>();
+				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+					listClaimSendQueueItems.Add(_arrayQueueFiltered[gridMain.SelectedIndices[i]]);
 				}
-				//Validate the eclaim.
-				Eclaims.Eclaims.GetMissingData(_arrayQueueFiltered[gridMain.SelectedIndices[i]]);
-				gridMain.Rows[gridMain.SelectedIndices[i]].Cells[7].Text=_arrayQueueFiltered[gridMain.SelectedIndices[i]].MissingData;
-				if(_arrayQueueFiltered[gridMain.SelectedIndices[i]].MissingData=="") {
-					_arrayQueueFiltered[gridMain.SelectedIndices[i]].IsValid=true;
-				}
-				gridChanged=true;
+				ValidateClaims(listClaimSendQueueItems);
 			}
-			if(gridChanged) {
-				FillGrid(true);//Used here to display changes immediately
-			}
-			Cursor.Current=Cursors.Default;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics is in use
 				long clinicNum0=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).ClinicNum;
 				for(int i=1;i<gridMain.SelectedIndices.Length;i++){
@@ -1051,6 +1046,32 @@ namespace OpenDental{
 					}
 				}
 			}
+		}
+
+		///<summary>Validates all non-validated e-claims passed in.  Directly manipulates the corresponding ClaimSendQueueItem in _arrayQueueAll
+		///If any information has changed, the grid will be refreshed and the selected items will remain selected.</summary>
+		private void ValidateClaims(List<ClaimSendQueueItem> listClaimSendQueueItems) {
+			Cursor.Current=Cursors.WaitCursor;
+			//Only get a list of non-validated e-claims from the list passed in.
+			List<ClaimSendQueueItem> listClaimsToValidate=listClaimSendQueueItems.FindAll(x => !x.IsValid && !x.NoSendElect);
+			//Loop through and validate all claims.
+			for(int i=0;i<listClaimsToValidate.Count;i++) {
+				Eclaims.Eclaims.GetMissingData(listClaimsToValidate[i]);
+				if(listClaimsToValidate[i].MissingData=="") {
+					listClaimsToValidate[i].IsValid=true;
+				}
+			}
+			if(listClaimsToValidate.Count!=0) {
+				//Push any changes made to the ClaimSendQueueItems passed in to _arrayQueueAll 
+				for(int i=0;i<_arrayQueueAll.Length;i++) {
+					ClaimSendQueueItem validatedClaimSendQueueItem=listClaimsToValidate.Find(x => x.ClaimNum==_arrayQueueAll[i].ClaimNum);
+					if(validatedClaimSendQueueItem!=null) {
+						_arrayQueueAll[i]=validatedClaimSendQueueItem.Copy();
+					}
+				}
+				FillGrid(true);//Used here to display changes immediately
+			}
+			Cursor.Current=Cursors.Default;
 		}
 
 		private void toolBarButReports_Click(){
