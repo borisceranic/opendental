@@ -42,7 +42,7 @@ namespace OpenDentBusiness {
 						continue;
 					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 					row[1]=tableProduction.Rows[i]["namelf"].ToString();
 					row[2]=tableProduction.Rows[i]["Description"].ToString();
 					row[3]=tableProduction.Rows[i]["Production"].ToString();
@@ -58,7 +58,7 @@ namespace OpenDentBusiness {
 						continue;
 					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 					row[1]=tableAdj.Rows[i]["namelf"].ToString();
 					row[2]=tableAdj.Rows[i]["Description"].ToString();
 					row[3]=0;
@@ -74,7 +74,7 @@ namespace OpenDentBusiness {
 						continue;
 					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 					row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
 					row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
 					row[3]=0;
@@ -90,7 +90,7 @@ namespace OpenDentBusiness {
 						continue;
 					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 					row[1]=tablePay.Rows[i]["namelf"].ToString();
 					row[2]=tablePay.Rows[i]["Description"].ToString();
 					row[3]=0;
@@ -106,7 +106,7 @@ namespace OpenDentBusiness {
 						continue;
 					}
 					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+					row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 					row[1]=tableIns.Rows[i]["namelf"].ToString();
 					row[2]=tableIns.Rows[i]["Description"].ToString();
 					row[3]=0;
@@ -121,7 +121,7 @@ namespace OpenDentBusiness {
 			//Totals table now.
 			for(int i=0;i<tableProduction.Rows.Count;i++) {
 				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 				row[1]=tableProduction.Rows[i]["namelf"].ToString();
 				row[2]=tableProduction.Rows[i]["Description"].ToString();
 				row[3]=tableProduction.Rows[i]["Production"].ToString();
@@ -134,7 +134,7 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<tableAdj.Rows.Count;i++) {
 				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 				row[1]=tableAdj.Rows[i]["namelf"].ToString();
 				row[2]=tableAdj.Rows[i]["Description"].ToString();
 				row[3]=0;
@@ -147,7 +147,7 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
 				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 				row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
 				row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
 				row[3]=0;
@@ -160,7 +160,7 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<tablePay.Rows.Count;i++) {
 				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 				row[1]=tablePay.Rows[i]["namelf"].ToString();
 				row[2]=tablePay.Rows[i]["Description"].ToString();
 				row[3]=0;
@@ -173,7 +173,7 @@ namespace OpenDentBusiness {
 			}
 			for(int i=0;i<tableIns.Rows.Count;i++) {
 				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM");
+				row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
 				row[1]=tableIns.Rows[i]["namelf"].ToString();
 				row[2]=tableIns.Rows[i]["Description"].ToString();
 				row[3]=0;
@@ -414,6 +414,11 @@ namespace OpenDentBusiness {
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
 			DataTable tablePay=dataSet.Tables["tablePay"];
 			DataTable tableIns=dataSet.Tables["tableIns"];
+			DataTable tableSched=new DataTable();
+			if(!isAnnual) {
+				tableSched=dataSet.Tables["tableSched"];
+			}
+			decimal sched;
 			decimal production;
 			decimal adjust;
 			decimal inswriteoff;	//spk 5/19/05
@@ -423,7 +428,9 @@ namespace OpenDentBusiness {
 			decimal totalincome;
 			DataTable dt=new DataTable("Total");
 			dt.Columns.Add(new DataColumn("Month"));
+			dt.Columns.Add(new DataColumn("Weekday"));
 			dt.Columns.Add(new DataColumn("Production"));
+			dt.Columns.Add(new DataColumn("Sched"));
 			dt.Columns.Add(new DataColumn("Adjustments"));
 			dt.Columns.Add(new DataColumn("Writeoff"));
 			dt.Columns.Add(new DataColumn("Tot Prod"));
@@ -432,7 +439,9 @@ namespace OpenDentBusiness {
 			dt.Columns.Add(new DataColumn("Total Income"));
 			DataTable dtClinic=new DataTable("Clinic");
 			dtClinic.Columns.Add(new DataColumn("Month"));
+			dtClinic.Columns.Add(new DataColumn("Weekday"));
 			dtClinic.Columns.Add(new DataColumn("Production"));
+			dtClinic.Columns.Add(new DataColumn("Sched"));
 			dtClinic.Columns.Add(new DataColumn("Adjustments"));
 			dtClinic.Columns.Add(new DataColumn("Writeoff"));
 			dtClinic.Columns.Add(new DataColumn("Tot Prod"));
@@ -468,6 +477,10 @@ namespace OpenDentBusiness {
 					else {
 						row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
 					}
+					if(!isAnnual) {
+						row[1]=dates[i].DayOfWeek.ToString();
+					}
+					sched=0;
 					production=0;
 					adjust=0;
 					inswriteoff=0;	//spk 5/19/05
@@ -532,6 +545,18 @@ namespace OpenDentBusiness {
 							}
 						}
 					}
+					for(int j=0;j<tableSched.Rows.Count;j++) {
+						if(listClinicNums[it]==0 && tableSched.Rows[j]["ClinicNum"].ToString()!="0") {
+							continue;
+						}
+						else if(listClinicNums[it]!=0 && tableSched.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+							continue;
+						}
+						if(dates[i]==(PIn.Date(tableSched.Rows[j]["SchedDate"].ToString()))) {
+							sched+=PIn.Decimal(tableSched.Rows[j]["Amount"].ToString());
+							hasData=true;
+						}
+					}
 					for(int j=0;j<tablePay.Rows.Count;j++) {
 						if(listClinicNums[it]==0 && tablePay.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
@@ -571,16 +596,31 @@ namespace OpenDentBusiness {
 						}
 					}
 					totalproduction=production+adjust+inswriteoff;
+					if(!isAnnual) {
+						totalproduction+=sched;
+					}
 					totalincome=ptincome+insincome;
 					string clinicDesc=Clinics.GetDesc(listClinicNums[it]);
-					row[1]=production.ToString("n");
-					row[2]=adjust.ToString("n");
-					row[3]=inswriteoff.ToString("n");
-					row[4]=totalproduction.ToString("n");
-					row[5]=ptincome.ToString("n");
-					row[6]=insincome.ToString("n");
-					row[7]=totalincome.ToString("n");
-					row[8]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
+					if(!isAnnual) {
+						row[2]=production.ToString("n");
+						row[3]=sched.ToString("n");
+						row[4]=adjust.ToString("n");
+						row[5]=inswriteoff.ToString("n");
+						row[6]=totalproduction.ToString("n");
+						row[7]=ptincome.ToString("n");
+						row[8]=insincome.ToString("n");
+						row[9]=totalincome.ToString("n");
+						row[10]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
+					}
+					else {
+						row[1]=production.ToString("n");
+						row[2]=adjust.ToString("n");
+						row[3]=inswriteoff.ToString("n");
+						row[4]=totalproduction.ToString("n");
+						row[5]=ptincome.ToString("n");
+						row[6]=insincome.ToString("n");
+						row[7]=totalincome.ToString("n");
+					}
 					if(isAnnual) {
 						dtClinic.Rows.Add(row);  //adds row to table
 					}
@@ -604,6 +644,10 @@ namespace OpenDentBusiness {
 				else {
 					row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
 				}
+				if(!isAnnual) {
+					row[1]=dates[i].DayOfWeek.ToString();
+				}
+				sched=0;
 				production=0;
 				adjust=0;
 				inswriteoff=0;	//spk 5/19/05
@@ -645,9 +689,15 @@ namespace OpenDentBusiness {
 							inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
 						}
 						else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {
-							inswriteoff+=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
+							inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
 							hasData=true;
 						}
+					}
+				}
+				for(int j=0;j<tableSched.Rows.Count;j++) {
+					if(dates[i]==(PIn.Date(tableSched.Rows[j]["SchedDate"].ToString()))) {
+						sched+=PIn.Decimal(tableSched.Rows[j]["Amount"].ToString());
+						hasData=true;
 					}
 				}
 				for(int j=0;j<tablePay.Rows.Count;j++) {
@@ -677,14 +727,29 @@ namespace OpenDentBusiness {
 					}
 				}
 				totalproduction=production+adjust+inswriteoff;
+				if(!isAnnual) {
+					totalproduction+=sched;
+				}
 				totalincome=ptincome+insincome;
-				row[1]=production.ToString("n");
-				row[2]=adjust.ToString("n");
-				row[3]=inswriteoff.ToString("n");
-				row[4]=totalproduction.ToString("n");
-				row[5]=ptincome.ToString("n");
-				row[6]=insincome.ToString("n");
-				row[7]=totalincome.ToString("n");
+				if(!isAnnual) {
+					row[2]=production.ToString("n");
+					row[3]=sched.ToString("n");
+					row[4]=adjust.ToString("n");
+					row[5]=inswriteoff.ToString("n");
+					row[6]=totalproduction.ToString("n");
+					row[7]=ptincome.ToString("n");
+					row[8]=insincome.ToString("n");
+					row[9]=totalincome.ToString("n");
+				}
+				else {
+					row[1]=production.ToString("n");
+					row[2]=adjust.ToString("n");
+					row[3]=inswriteoff.ToString("n");
+					row[4]=totalproduction.ToString("n");
+					row[5]=ptincome.ToString("n");
+					row[6]=insincome.ToString("n");
+					row[7]=totalincome.ToString("n");
+				}
 				if(isAnnual) {
 					dt.Rows.Add(row);
 				}
@@ -998,6 +1063,39 @@ namespace OpenDentBusiness {
 			}
 			DataTable tableInsWriteoff=Db.GetTable(command);
 			tableInsWriteoff.TableName="tableInsWriteoff";
+			//TableSched------------------------------------------------------------------------------
+			DataTable tableSched=new DataTable();
+			if(!isAnnual) {
+				if(!hasAllProvs && listProvNums.Count>0) {
+					whereProv=" AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+				}
+				if(!hasAllClinics && listClinicNums.Count>0) {
+					whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+				}
+				command= "SELECT "+DbHelper.DtimeToDate("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) Amount,ClinicNum "
+				+"FROM (SELECT appointment.AptDateTime,IFNULL(procedurelog.ProcFee,0) Fee,appointment.ClinicNum,";
+				if(PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO)) {
+					command+="SUM(IFNULL(CASE WHEN WriteOffEstOverride != -1 THEN WriteOffEstOverride ELSE WriteOffEst END,0)) WriteoffEstimate ";
+				}
+				else {
+					command+="0 WriteoffEstimate ";
+				}
+				command+="FROM appointment "
+				+"LEFT JOIN procedurelog ON appointment.AptNum = procedurelog.AptNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" "
+				+"LEFT JOIN claimproc ON procedurelog.ProcNum = claimproc.ProcNum AND claimproc.Status="+POut.Int((int)ClaimProcStatus.Estimate)+" "
+					+" AND (WriteOffEst != -1 OR WriteOffEstOverride != -1) "
+				+"WHERE (appointment.AptStatus = "+POut.Int((int)ApptStatus.Scheduled)+" OR "
+					+"appointment.AptStatus = "+POut.Int((int)ApptStatus.ASAP)+") "
+				+"AND "+DbHelper.DtimeToDate("appointment.AptDateTime")+" >= "+POut.Date(dateFrom)+" "
+				+"AND "+DbHelper.DtimeToDate("appointment.AptDateTime")+" <= "+POut.Date(dateTo)+" "
+				+whereProv
+				+whereClin
+				+" GROUP BY procedurelog.ProcNum) t "//without this, there can be duplicate proc rows due to the claimproc join with dual insurance.
+				+"GROUP BY SchedDate "
+				+"ORDER BY SchedDate";
+				tableSched=Db.GetTable(command);
+				tableSched.TableName="tableSched";
+			}
 			//PtIncome--------------------------------------------------------------------------------
 			if(!hasAllProvs && listProvNums.Count>0) {
 				whereProv=" AND paysplit.ProvNum IN ("+String.Join(",",listProvNums)+") ";
@@ -1045,6 +1143,9 @@ namespace OpenDentBusiness {
 			dataSet.Tables.Add(tableInsWriteoff);
 			dataSet.Tables.Add(tablePay);
 			dataSet.Tables.Add(tableIns);
+			if(!isAnnual) {
+				dataSet.Tables.Add(tableSched);
+			}
 			return dataSet;
 		}
 

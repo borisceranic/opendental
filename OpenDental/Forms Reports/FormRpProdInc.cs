@@ -866,25 +866,29 @@ namespace OpenDental{
 				query=report.AddQuery(dt,"","",SplitByKind.None,1,true);
 			}
 			// add columns to report
-			query.AddColumn("Day",80,FieldValueType.String);
-			query.AddColumn("Production",120,FieldValueType.Number);
-			query.AddColumn("Adjustments",120,FieldValueType.Number);
-			query.AddColumn("Writeoff",120,FieldValueType.Number);
-			query.AddColumn("Tot Prod",120,FieldValueType.Number);
-			query.AddColumn("Pt Income",120,FieldValueType.Number);
-			query.AddColumn("Ins Income",120,FieldValueType.Number);
-			query.AddColumn("Total Income",120,FieldValueType.Number);
+			query.AddColumn("Date",80,FieldValueType.String);
+			query.AddColumn("Weekday",80,FieldValueType.String);
+			query.AddColumn("Production",100,FieldValueType.Number);
+			query.AddColumn("Scheduled",100,FieldValueType.Number);
+			query.AddColumn("Adjustments",100,FieldValueType.Number);
+			query.AddColumn("Writeoff",100,FieldValueType.Number);
+			query.AddColumn("Tot Prod",100,FieldValueType.Number);
+			query.AddColumn("Pt Income",100,FieldValueType.Number);
+			query.AddColumn("Ins Income",100,FieldValueType.Number);
+			query.AddColumn("Total Income",100,FieldValueType.Number);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
-				query.AddColumn("Day",80,FieldValueType.String);
-				query.AddColumn("Production",120,FieldValueType.Number);
-				query.AddColumn("Adjustments",120,FieldValueType.Number);
-				query.AddColumn("Writeoff",120,FieldValueType.Number);
-				query.AddColumn("Tot Prod",120,FieldValueType.Number);
-				query.AddColumn("Pt Income",120,FieldValueType.Number);
-				query.AddColumn("Ins Income",120,FieldValueType.Number);
-				query.AddColumn("Total Income",120,FieldValueType.Number);
+				query.AddColumn("Date",80,FieldValueType.String);
+				query.AddColumn("Weekday",80,FieldValueType.String);
+				query.AddColumn("Production",100,FieldValueType.Number);
+				query.AddColumn("Scheduled",100,FieldValueType.Number);
+				query.AddColumn("Adjustments",100,FieldValueType.Number);
+				query.AddColumn("Writeoff",100,FieldValueType.Number);
+				query.AddColumn("Tot Prod",100,FieldValueType.Number);
+				query.AddColumn("Pt Income",100,FieldValueType.Number);
+				query.AddColumn("Ins Income",100,FieldValueType.Number);
+				query.AddColumn("Total Income",100,FieldValueType.Number);
 			}
 			report.AddPageNum();
 			// execute query
@@ -1103,7 +1107,10 @@ namespace OpenDental{
 			}
 			//setup query
 			QueryObject query;
-			DataTable dtClinic=ds.Tables["Clinic"].Copy();
+			DataTable dtClinic=new DataTable();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				dtClinic=ds.Tables["Clinic"].Copy();
+			}
 			DataTable dt=ds.Tables["Total"].Copy();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && checkClinicBreakdown.Checked) {
 				query=report.AddQuery(dtClinic,"","Clinic",SplitByKind.Value,1,true);
