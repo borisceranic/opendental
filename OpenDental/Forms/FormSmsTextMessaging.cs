@@ -283,6 +283,8 @@ namespace OpenDental {
 					gridMessages.Rows[e.Row].Cells[_columnStatusIdx].Text=SmsFromMobiles.GetSmsFromStatusDescript(SmsFromStatus.ReceivedRead);
 					gridMessages.Rows[e.Row].Bold=false;
 					gridMessages.Invalidate();//To show the status changes in the grid.
+					UnreadMessageCount=PIn.Long(SmsFromMobiles.GetSmsNotification());
+					SmsNotifier(UnreadMessageCount.ToString(),true);
 				}
 			}
 			if(gridMessages.Rows[e.Row].Tag is SmsToMobile) {
@@ -339,6 +341,8 @@ namespace OpenDental {
 				}
 			}
 			gridMessages.Invalidate();//To show the status changes in the grid.
+			UnreadMessageCount=PIn.Long(SmsFromMobiles.GetSmsNotification());
+			SmsNotifier(UnreadMessageCount.ToString(),true);
 			Cursor=Cursors.Default;
 		}
 
@@ -357,7 +361,20 @@ namespace OpenDental {
 				SmsFromMobile oldSmsFromMobile=smsFromMobile.Copy();
 				smsFromMobile.PatNum=form.SelectedPatNum;
 				SmsFromMobiles.Update(smsFromMobile,oldSmsFromMobile);
-				if(smsFromMobile.CommlogNum!=0) {//Not sure if CommlogNum can be zero.
+				if(smsFromMobile.CommlogNum==0) {
+					//When a new sms comes in on the server, a corresponding commlog is inserted, unless the sms could not be matched to a patient by phone #.
+					//We need to insert a new commlog when the patient is selected, for the case when the message has not been asssigned to a patient yet.
+					//This way we can ensure that all sms with a patient attached have a corresponding commlog.
+					Commlog commlog=new Commlog();
+					commlog.CommDateTime=smsFromMobile.DateTimeReceived;
+					commlog.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC);
+					commlog.Mode_=CommItemMode.Text;
+					commlog.Note=smsFromMobile.MsgText;
+					commlog.PatNum=smsFromMobile.PatNum;
+					commlog.SentOrReceived=CommSentOrReceived.Received;
+					Commlogs.Insert(commlog);
+				}
+				else {
 					Commlog commlog=Commlogs.GetOne(smsFromMobile.CommlogNum);
 					Commlog oldCommlog=commlog.Copy();
 					commlog.PatNum=form.SelectedPatNum;
