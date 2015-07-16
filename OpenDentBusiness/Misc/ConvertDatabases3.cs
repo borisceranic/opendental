@@ -8308,6 +8308,16 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ReportPandIhasClinicBreakdown','1')";
 					Db.NonQ(command);
 				}
+				//Many customers have been complaining that they want the Send Claims window to validate their claims upon loading the window.
+				//Per conversation with Nathan - default this setting to off because only a few large offices will need it.  We'll enhance the window later.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimsSendWindowValidatesOnLoad','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimsSendWindowValidatesOnLoad','0')";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '15.2.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
