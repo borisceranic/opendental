@@ -248,7 +248,7 @@ namespace OpenDental{
 		private Label labelMsg;
 		///<summary>This thread fills labelMsg</summary>
 		private Thread ThreadVM;
-		private Thread ThreadHqMetrics;
+		private ODThread _odThreadHqMetrics;
 		private MenuItem menuItemWiki;
 		private MenuItem menuItemProcLockTool;
 		private MenuItem menuItemHL7;
@@ -2369,8 +2369,11 @@ namespace OpenDental{
 				#endif
 				ThreadVM=new Thread(new ThreadStart(this.ThreadVM_SetLabelMsg));
 				ThreadVM.Start();//It's done this way because the file activity tends to lock the UI on slow connections.
-				ThreadHqMetrics=new Thread(new ThreadStart(PhoneWebCamTickWorkerThread));
-				ThreadHqMetrics.Start();						
+				//Only run this thread every 1.6 seconds.
+				_odThreadHqMetrics=new ODThread(1600,ProcessHqMetrics);
+				_odThreadHqMetrics.AddExceptionHandler(new ODThread.ExceptionDelegate(OnThreadHqMetricsException));
+				_odThreadHqMetrics.Name="HQ Metrics Thread";
+				_odThreadHqMetrics.Start();						
 			}
 			#if !TRIALONLY
 				if(PrefC.GetDate(PrefName.BackupReminderLastDateRun).AddMonths(1)<DateTime.Today) {
@@ -3837,60 +3840,6 @@ namespace OpenDental{
 				sig.TaskNum=e.TaskNum;
 			}
 			Signalods.Insert(sig);
-		}
-
-		/// <summary>HQ Only. FillTriageLabelsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
-		private delegate void FillTriageLabelsArgs(DataTable phoneMetrics);
-
-		/// <summary>HQ Only. Digest results of FillTriageLabels and update form controls accordingly.</summary>
-		private void FillTriageLabelsResults(DataTable phoneMetrics) {
-			int countBlueTasks=PIn.Int(phoneMetrics.Rows[0]["CountBlueTasks"].ToString());
-			int countWhiteTasks=PIn.Int(phoneMetrics.Rows[0]["CountWhiteTasks"].ToString());
-			int countRedTasks=PIn.Int(phoneMetrics.Rows[0]["CountRedTasks"].ToString());
-			DateTime timeOfOldestBlueTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestBlueTaskNote"].ToString());
-			DateTime timeOfOldestRedTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestRedTaskNote"].ToString());
-			TimeSpan triageBehind=new TimeSpan(0);
-			if(timeOfOldestBlueTaskNote.Year>1880 && timeOfOldestRedTaskNote.Year>1880) {
-				if(timeOfOldestBlueTaskNote<timeOfOldestRedTaskNote){
-					triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
-				}
-				else {//triageBehind based off of older RedTask
-					triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
-				}
-			}
-			else if(timeOfOldestBlueTaskNote.Year>1880) {
-				triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
-			}
-			else if(timeOfOldestRedTaskNote.Year>1880) {
-				triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
-			}
-			string countStr="0";
-			if(countBlueTasks>0 || countRedTasks>0) {//Triage show red so users notice more.
-				countStr=(countBlueTasks+countRedTasks).ToString();
-				labelTriage.ForeColor=Color.Firebrick;
-			}
-			else {
-				if(countWhiteTasks>0) {
-					countStr="("+countWhiteTasks.ToString()+")";
-				}
-				labelTriage.ForeColor=Color.Black;
-			}
-			labelTriage.Text="T:"+countStr;
-			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
-			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
-				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind,countRedTasks);
-				TimeSpan urgentTriageBehind=new TimeSpan(0);
-				if(timeOfOldestRedTaskNote.Year>1880) {
-					urgentTriageBehind=DateTime.Now-timeOfOldestRedTaskNote;
-				}
-				formMapHQ.SetTriageUrgent(countRedTasks,urgentTriageBehind);
-			}
-		}
-
-		///<summary>HQ Only. This function is called from a thread. DO NOT access any form controls directly. Everything must be invoked back to the main thread.</summary>
-		private void FillTriageLabels() {
-			DataTable phoneMetrics=Phones.GetTriageMetrics();
-			this.Invoke(new FillTriageLabelsArgs(FillTriageLabelsResults),phoneMetrics);
 		}
 
 		private void GotoModule_ModuleSelected(ModuleEventArgs e){
@@ -6528,71 +6477,76 @@ namespace OpenDental{
 			}
 		}
 
-		private void PhoneWebCamTickWorkerThread() {
-			while(true) { //Run this thread for the entirety of the application instance. Close event will eventually throw ThreadAbortException which will kill this thread.
-				try {
-					//Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
-					if((formMapHQ!=null && !formMapHQ.IsDisposed) || 
-							//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
-							DateTime.Now.Subtract(_hqMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) {
-						FillTriageLabels();
-						//Reset the interval timer.
-						_hqMetricsLastRefreshed=DateTime.Now;
-					}
-					List<Phone> phoneList=Phones.GetPhoneList();
-					List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
-					//HQ Only - 'Office Down' TaskListNum = 2576.
-					List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
-					string ipaddressStr="";
-					IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
-					foreach(IPAddress ipaddress in iphostentry.AddressList) {
-						if(ipaddress.ToString().Contains("10.10.2")) {
-							ipaddressStr=ipaddress.ToString();
-							break;
-						}
-					}
-					//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
-					int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
-					//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
-					//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
-					//(EG... incoming call, outgoing call, hangup, etc).
-					Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
-					bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
-					//send the results back to the UI layer for action.
-					if(!this.IsDisposed) {
-						Invoke(new PhoneWebCamTickDisplayDelegate(PhoneWebCamTickDisplay),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
-					}
-					//Only run this thread every 1.6 seconds.
-					Thread.Sleep((int)TimeSpan.FromSeconds(1.6).TotalMilliseconds);
+		#region HQ only metrics
+				
+		///<summary>HQ only. ODThread wraps exception handling for us. Nothing to do here so we will just swallow any exceptions.</summary>
+		private void OnThreadHqMetricsException(Exception e) {			
+		}
+
+		///<summary>HQ only. Runs every 1.6 seconds. This method runs in a thread so any access to form controls must be invoked.</summary>
+		private void ProcessHqMetrics(ODThread odThread) {
+			ProcessHqMetricsPhones();
+			ProcessHqMetricsEServices();
+		}
+
+		///<summary>HQ only. Called from ProcessHqMetrics(). Deals with HQ phone panel. This method runs in a thread so any access to form controls must be invoked.</summary>
+		private void ProcessHqMetricsPhones() {
+#if DEBUG
+			new DataConnection().SetDbT("localhost","customers","root","","","",DatabaseType.MySql,true);
+#else
+			new DataConnection().SetDbT("server","customers","root","","","",DatabaseType.MySql,true);
+#endif
+			//Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
+			if((formMapHQ!=null && !formMapHQ.IsDisposed) || 
+					//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
+					DateTime.Now.Subtract(_hqMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) {
+				DataTable phoneMetrics=Phones.GetTriageMetrics();
+				this.Invoke(new FillTriageLabelsResultsArgs(OnFillTriageLabelsResults),phoneMetrics);
+				//Reset the interval timer.
+				_hqMetricsLastRefreshed=DateTime.Now;
+			}
+			List<Phone> phoneList=Phones.GetPhoneList();
+			List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
+			//HQ Only - 'Office Down' TaskListNum = 2576.
+			List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
+			string ipaddressStr="";
+			IPHostEntry iphostentry=Dns.GetHostEntry(Environment.MachineName);
+			foreach(IPAddress ipaddress in iphostentry.AddressList) {
+				if(ipaddress.ToString().Contains("10.10.2")) {
+					ipaddressStr=ipaddress.ToString();
+					break;
 				}
-				catch(ThreadAbortException) {//OnClosing will abort the thread.
-					return;//Exits the loop.
-				}
-				catch { //Any exception which is caught will be swallowed. We will try again next time.
-				}
+			}
+			//Get the extension linked to this machine or ip. Set in FormPhoneEmpDefaultEdit.
+			int extension=PhoneEmpDefaults.GetPhoneExtension(ipaddressStr,Environment.MachineName,listPED);
+			//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
+			//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
+			//(EG... incoming call, outgoing call, hangup, etc).
+			Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
+			bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
+			//send the results back to the UI layer for action.
+			if(!this.IsDisposed) {
+				Invoke(new ProcessHqMetricsResultsArgs(OnProcessHqMetricsResults),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
 			}
 		}
 
-		private void TryNonPatientPopup() {
-			Patient patCur=Patients.GetPat(CurPatNum);
-			if(patCur!=null && _previousPatNum!=patCur.PatNum) {
-				_datePopupDelay=DateTime.Now;
-				_previousPatNum=patCur.PatNum;
-			}
-			if(PrefC.GetBool(PrefName.ChartNonPatientWarn) 
-						&& patCur!=null 
-						&& patCur.PatStatus.ToString()=="NonPatient"
-						&& _datePopupDelay<=DateTime.Now) {
-				MsgBox.Show(this,"A patient with the status NonPatient is currently selected.");
-				_datePopupDelay=DateTime.Now.AddMinutes(5);
-			}
+		///<summary>HQ only. Called from ProcessHqMetrics(). Deals with HQ EServices. This method runs in a thread so any access to form controls must be invoked.</summary>
+		private void ProcessHqMetricsEServices() {
+#if DEBUG
+			new DataConnection().SetDbT("localhost","serviceshq","root","","","",DatabaseType.MySql,true);			
+#else
+			new DataConnection().SetDbT("server184","serviceshq","root","","","",DatabaseType.MySql,true);			
+#endif
+			//Get important metrics from serviceshq db.
+			//EServiceMetrics metricsToday=EServiceMetrics.GetMetricsForToday();
 		}
 
-		///<summary></summary>
-		protected delegate void PhoneWebCamTickDisplayDelegate(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator);
+		/// <summary>HQ Only. OnProcessHqMetricsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
+		protected delegate void ProcessHqMetricsResultsArgs(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator);
 
-		///<summary>phoneList is the list of all phone rows just pulled from the database.  phone is the one that we should display here, and it can be null.</summary>
-		public void PhoneWebCamTickDisplay(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator) {
+		///<summary>HQ Only. Digest results of ProcessHqMetrics and update form controls accordingly.
+		///phoneList is the list of all phone rows just pulled from the database.  phone is the one that we should display here, and it can be null.</summary>
+		public void OnProcessHqMetricsResults(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator) {
 			try {
 				//Send the phoneList to the 2 places where it's needed.
 				//1) Send to the small display in the main OD form (quick-glance).
@@ -6619,6 +6573,72 @@ namespace OpenDental{
 			}
 		}
 
+		/// <summary>HQ Only. OnFillTriageLabelsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
+		private delegate void FillTriageLabelsResultsArgs(DataTable phoneMetrics);
+
+		/// <summary>HQ Only. Digest results of Phones.GetTriageMetrics() in ProcessHqMetrics(). Fills the triage labels and update form controls accordingly.</summary>
+		private void OnFillTriageLabelsResults(DataTable phoneMetrics) {
+			int countBlueTasks=PIn.Int(phoneMetrics.Rows[0]["CountBlueTasks"].ToString());
+			int countWhiteTasks=PIn.Int(phoneMetrics.Rows[0]["CountWhiteTasks"].ToString());
+			int countRedTasks=PIn.Int(phoneMetrics.Rows[0]["CountRedTasks"].ToString());
+			DateTime timeOfOldestBlueTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestBlueTaskNote"].ToString());
+			DateTime timeOfOldestRedTaskNote=PIn.Date(phoneMetrics.Rows[0]["TimeOfOldestRedTaskNote"].ToString());
+			TimeSpan triageBehind=new TimeSpan(0);
+			if(timeOfOldestBlueTaskNote.Year>1880 && timeOfOldestRedTaskNote.Year>1880) {
+				if(timeOfOldestBlueTaskNote<timeOfOldestRedTaskNote) {
+					triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
+				}
+				else {//triageBehind based off of older RedTask
+					triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
+				}
+			}
+			else if(timeOfOldestBlueTaskNote.Year>1880) {
+				triageBehind=DateTime.Now-timeOfOldestBlueTaskNote;
+			}
+			else if(timeOfOldestRedTaskNote.Year>1880) {
+				triageBehind=DateTime.Now-timeOfOldestRedTaskNote;
+			}
+			string countStr="0";
+			if(countBlueTasks>0 || countRedTasks>0) {//Triage show red so users notice more.
+				countStr=(countBlueTasks+countRedTasks).ToString();
+				labelTriage.ForeColor=Color.Firebrick;
+			}
+			else {
+				if(countWhiteTasks>0) {
+					countStr="("+countWhiteTasks.ToString()+")";
+				}
+				labelTriage.ForeColor=Color.Black;
+			}
+			labelTriage.Text="T:"+countStr;
+			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
+			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
+				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind,countRedTasks);
+				TimeSpan urgentTriageBehind=new TimeSpan(0);
+				if(timeOfOldestRedTaskNote.Year>1880) {
+					urgentTriageBehind=DateTime.Now-timeOfOldestRedTaskNote;
+				}
+				formMapHQ.SetTriageUrgent(countRedTasks,urgentTriageBehind);
+			}
+		}
+		
+		#endregion
+
+		private void TryNonPatientPopup() {
+			Patient patCur=Patients.GetPat(CurPatNum);
+			if(patCur!=null && _previousPatNum!=patCur.PatNum) {
+				_datePopupDelay=DateTime.Now;
+				_previousPatNum=patCur.PatNum;
+			}
+			if(PrefC.GetBool(PrefName.ChartNonPatientWarn) 
+						&& patCur!=null 
+						&& patCur.PatStatus.ToString()=="NonPatient"
+						&& _datePopupDelay<=DateTime.Now) {
+				MsgBox.Show(this,"A patient with the status NonPatient is currently selected.");
+				_datePopupDelay=DateTime.Now.AddMinutes(5);
+			}
+		}
+
+		
 		/// <summary>This is set to 30 seconds</summary>
 		private void timerWebHostSynch_Tick(object sender,EventArgs e) {
 			if(_isStartingUp) {//If the program is starting up it may be updating and we do not want to synch yet.
@@ -6993,12 +7013,7 @@ namespace OpenDental{
 				ThreadVM.Abort();
 				ThreadVM.Join();
 				ThreadVM=null;
-			}
-			if(ThreadHqMetrics!=null) {
-				ThreadHqMetrics.Abort();
-				ThreadHqMetrics.Join();
-				ThreadHqMetrics=null;
-			}
+			}			
 			if(_isEmailThreadRunning) {
 				_isEmailThreadRunning=false;
 				_emailSleep.Set();//If the thread is just sitting around waiting for the next email check interval, then this will cause the thread to exit immediately.

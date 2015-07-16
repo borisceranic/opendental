@@ -402,6 +402,7 @@
     <Compile Include="Crud\SigElementDefCrud.cs" />
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
+    <Compile Include="InternalTools\EServices\EServiceMetrics.cs" />
     <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
     <Compile Include="Crud\SmsToMobileCrud.cs" />
