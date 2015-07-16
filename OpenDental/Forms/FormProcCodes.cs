@@ -1391,6 +1391,7 @@ namespace OpenDental{
 					Fees.RefreshCache();
 					_listFees=Fees.GetListt();
 					FillGrid();
+					changed=true;//Assuming they changed something if they clicked OK, without this if they change something it wont be reflected in the cache
 				}
 			}
 		}

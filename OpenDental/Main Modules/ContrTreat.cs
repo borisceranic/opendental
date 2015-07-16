@@ -1410,6 +1410,9 @@ namespace OpenDental{
 				{
 					col.TextAlign=HorizontalAlignment.Right;
 				}
+				if(fields[i].InternalName=="Sub") {
+					col.TextAlign=HorizontalAlignment.Center;
+				}
 				gridMain.Columns.Add(col);
 			}			
 			gridMain.Rows.Clear();
@@ -1457,6 +1460,15 @@ namespace OpenDental{
 						case "Code":
 							if(RowsMain[i].Code!=null) {
 								row.Cells.Add(RowsMain[i].Code.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Sub":
+							string subCode=ProcedureCodes.GetProcCode(RowsMain[i].Code).SubstitutionCode;
+							if(ProcedureCodes.IsValidCode(subCode)) {
+								row.Cells.Add("X");
 							}
 							else {
 								row.Cells.Add("");
@@ -1561,6 +1573,9 @@ namespace OpenDental{
 					|| fields[i].InternalName=="Pat") {
 					col.TextAlign=HorizontalAlignment.Right;
 				}
+				if(fields[i].InternalName=="Sub") {
+					col.TextAlign=HorizontalAlignment.Center;
+				}
 				gridPrint.Columns.Add(col);
 			}
 			gridPrint.Rows.Clear();
@@ -1608,6 +1623,15 @@ namespace OpenDental{
 						case "Code":
 							if(RowsMain[i].Code!=null) {
 								row.Cells.Add(RowsMain[i].Code.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Sub":
+							string subCode=ProcedureCodes.GetProcCode(RowsMain[i].Code).SubstitutionCode;
+							if(ProcedureCodes.IsValidCode(subCode)) {
+								row.Cells.Add("X");
 							}
 							else {
 								row.Cells.Add("");
