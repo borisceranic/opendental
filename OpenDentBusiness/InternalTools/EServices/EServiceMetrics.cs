@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 		///<summary>Count of messages received from patients in the given date range.</summary>
 		public int OutboundMessageCount;
 		///<summary>Total charges that will be billed to OD customers for the given outbound messages.</summary>
-		public double TotalChargedToCustomersUSD;
+		public float TotalChargedToCustomersUSD;
 
 		public delegate void EServiceMetricsArgs(EServiceMetrics eServiceMetrics);
 
@@ -54,7 +54,7 @@ namespace OpenDentBusiness {
 			}
 			table=GetSmsOutbound(dateTimeStart,dateTimeEnd);
 			ret.OutboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
-			ret.TotalChargedToCustomersUSD=PIn.Double(table.Rows[0]["MsgChargeUSDTotal"].ToString());
+			ret.TotalChargedToCustomersUSD=PIn.Float(table.Rows[0]["MsgChargeUSDTotal"].ToString());
 			table=GetSmsInbound(dateTimeStart,dateTimeEnd);
 			ret.InboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
 			return ret;
