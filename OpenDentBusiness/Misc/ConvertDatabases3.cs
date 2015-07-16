@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.3.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.0.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -8321,12 +8321,12 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.2.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To15_3_0();
+			To15_3_1();
 		}
 
 		///<summary></summary>
-		private static void To15_3_0() {
-			if(FromVersion<new Version("15.3.0.0")) {
+		private static void To15_3_1() {
+			if(FromVersion<new Version("15.3.1.0")) {
 				string command="";
 				//Column clinic.SmsContractName was never used.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -9447,10 +9447,24 @@ namespace OpenDentBusiness {
 					//eServices do not currently support Oracle.
 				}
 
-				command="UPDATE preference SET ValueString = '15.3.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '15.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To15_3_1();
+			To15_4_0();
+		}
+
+		private static void To15_4_0() {
+			if(FromVersion<new Version("15.4.0.0")) {
+				string command="";
+
+
+
+
+
+				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			//To15_4_1();
 		}
 		
 
