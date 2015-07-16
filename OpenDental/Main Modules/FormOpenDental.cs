@@ -337,6 +337,7 @@ namespace OpenDental{
 		private ContextMenu menuText;
 		private MenuItem menuItemTextMessagesReceived;
 		private MenuItem menuItemTextMessagesSent;
+		private MenuItem menuItemTextMessagesAll;
 		private MenuItem menuItemRemoteSupport;
 		///<summary>The background color used when the OpenDentalCustListener service is down.  Using Red was deemed too harsh.
 		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
@@ -642,6 +643,7 @@ namespace OpenDental{
 			this.menuText = new System.Windows.Forms.ContextMenu();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
+			this.menuItemTextMessagesAll= new System.Windows.Forms.MenuItem();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -1917,20 +1919,27 @@ namespace OpenDental{
 			// menuText
 			// 
 			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItemTextMessagesReceived,
+            this.menuItemTextMessagesAll,
+			this.menuItemTextMessagesReceived,
             this.menuItemTextMessagesSent});
 			// 
 			// menuItemTextMessagesReceived
 			// 
-			this.menuItemTextMessagesReceived.Index = 0;
+			this.menuItemTextMessagesReceived.Index = 1;
 			this.menuItemTextMessagesReceived.Text = "Text Messages Received";
 			this.menuItemTextMessagesReceived.Click += new System.EventHandler(this.menuItemTextMessagesReceived_Click);
 			// 
 			// menuItemTextMessagesSent
 			// 
-			this.menuItemTextMessagesSent.Index = 1;
+			this.menuItemTextMessagesSent.Index = 2;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
 			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
+			// 
+			// menuItemTextMessagesAll
+			// 
+			this.menuItemTextMessagesAll.Index = 0;
+			this.menuItemTextMessagesAll.Text = "Text Messages All";
+			this.menuItemTextMessagesAll.Click += new System.EventHandler(this.menuItemTextMessagesAll_Click);
 			// 
 			// lightSignalGrid1
 			// 
@@ -3515,6 +3524,7 @@ namespace OpenDental{
 		private void menuItemTextMessagesReceived_Click(object sender,EventArgs e) {
 			FormSmsTextMessaging form=new FormSmsTextMessaging();
 			form.IsSent=false;
+			form.IsReceived=true;
 			form.SmsNotifier=SetSmsNotificationText;
 			form.UnreadMessageCount=0;
 			form.CurPatNum=CurPatNum;
@@ -3527,6 +3537,20 @@ namespace OpenDental{
 		private void menuItemTextMessagesSent_Click(object sender,EventArgs e) {
 			FormSmsTextMessaging form=new FormSmsTextMessaging();
 			form.IsSent=true;
+			form.IsReceived=false;
+			form.SmsNotifier=SetSmsNotificationText;
+			form.UnreadMessageCount=0;
+			form.CurPatNum=CurPatNum;
+			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
+				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
+			}
+			form.ShowDialog();
+		}
+
+		private void menuItemTextMessagesAll_Click(object sender,EventArgs e) {
+			FormSmsTextMessaging form=new FormSmsTextMessaging();
+			form.IsSent=true;
+			form.IsReceived=true;			
 			form.SmsNotifier=SetSmsNotificationText;
 			form.UnreadMessageCount=0;
 			form.CurPatNum=CurPatNum;

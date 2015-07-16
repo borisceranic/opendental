@@ -10,8 +10,10 @@ namespace OpenDental {
 	public partial class FormSmsTextMessaging:Form {
 
 		private List<Clinic> _listClinics=null;
-		///<summary>Set before showing this form.  If true, will initially show sent messages.  Otherwise will initially show received messages.</summary>
+		///<summary>Set before showing this form.  If true, will initially show sent messages.</summary>
 		public bool IsSent=false;
+		///<summary>Set before showing this form.  If true, will initially show received messages.</summary>
+		public bool IsReceived=false;
 		///<summary>Allows FormSmsTextMessaging to update the unread SMS text message count in FormOpenDental as the user reads their messages.</summary>
 		public delegate void SmsNotificationDelegate(string smsNotificationText,bool isSignalNeeded);
 		///<summary>Set from FormOpenDental.  This can be null if the calling code does not wish to get dynamic unread message counts.</summary>
@@ -45,13 +47,9 @@ namespace OpenDental {
 				}
 			}
 			textDateFrom.Text=DateTimeOD.Today.AddDays(-7).ToShortDateString();
-			textDateTo.Text=DateTimeOD.Today.ToShortDateString();
-			if(IsSent) {
-				checkSent.Checked=true;
-			}
-			else {
-				checkRead.Checked=true;
-			}
+			textDateTo.Text=DateTimeOD.Today.ToShortDateString();			
+			checkSent.Checked=IsSent;			
+			checkRead.Checked=IsReceived;
 			FillGridTextMessages();
 		}
 
@@ -71,7 +69,7 @@ namespace OpenDental {
 			gridMessages.Columns.Clear();
 			gridMessages.Columns.Add(new UI.ODGridColumn("DateTime",140,HorizontalAlignment.Left));
 			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
-			gridMessages.Columns.Add(new UI.ODGridColumn("In or Out",80,HorizontalAlignment.Center));
+			gridMessages.Columns.Add(new UI.ODGridColumn("Sent\r\nReceived",80,HorizontalAlignment.Center));
 			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 			gridMessages.Columns.Add(new UI.ODGridColumn("Status",90,HorizontalAlignment.Center));
 			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
@@ -151,7 +149,7 @@ namespace OpenDental {
 						case SmsDeliveryStatus.DeliveryConf:
 						case SmsDeliveryStatus.DeliveryUnconf:
 							//Treated the same as far as the user is concerned.
-							smsStatus="Sent";
+							smsStatus="Delivered";
 							break;
 						case SmsDeliveryStatus.FailWithCharge:
 						case SmsDeliveryStatus.FailNoCharge:
@@ -203,7 +201,15 @@ namespace OpenDental {
 
 		private void FillGridMessageThread(long patNum) {
 			if(patNum==0) {
-				smsThreadView.ListSmsThreadMessages=null;
+				if(gridMessages.SelectedIndices.Length>0) {
+					List<SmsThreadMessage> listSmsThreadMessage=new List<SmsThreadMessage>();
+					SmsFromMobile smsFromMobile=(SmsFromMobile)gridMessages.Rows[gridMessages.SelectedIndices[0]].Tag;
+					listSmsThreadMessage.Add(new SmsThreadMessage(smsFromMobile.DateTimeReceived,smsFromMobile.MsgText,true,true,true));
+					smsThreadView.ListSmsThreadMessages=listSmsThreadMessage;
+				}
+				else {
+					smsThreadView.ListSmsThreadMessages=null;
+				}
 				return;
 			}
 			List<long> listClinicNums=new List<long>();//Leaving this blank will cause the clinic filter to be ignored in SmsFromMobiles.GetMessages().
@@ -232,8 +238,12 @@ namespace OpenDental {
 				if(selectedTag is SmsToMobile	&& ((SmsToMobile)selectedTag).SmsToMobileNum==listSmsToMobile[i].SmsToMobileNum) {
 					isHighlighted=true;
 				}
-				listSmsThreadMessages.Add(new SmsThreadMessage(listSmsToMobile[i].DateTimeSent,
-					listSmsToMobile[i].MsgText,false,listSmsToMobile[i].IsTimeSensitive,isHighlighted));
+				bool isImportant=false;
+				if(listSmsToMobile[i].SmsStatus==SmsDeliveryStatus.FailNoCharge || listSmsToMobile[i].SmsStatus==SmsDeliveryStatus.FailWithCharge) {
+					isImportant=true;
+				}
+				listSmsThreadMessages.Add(new SmsThreadMessage(listSmsToMobile[i].DateTimeSent,					
+					listSmsToMobile[i].MsgText,false,isImportant,isHighlighted));
 			}
 			listSmsThreadMessages.Sort(SmsThreadMessage.CompareMessages);
 			smsThreadView.ListSmsThreadMessages=listSmsThreadMessages;

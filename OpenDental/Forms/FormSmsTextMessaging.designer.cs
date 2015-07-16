@@ -162,7 +162,7 @@ namespace OpenDental{
 			this.checkRead.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkRead.Size = new System.Drawing.Size(80, 16);
 			this.checkRead.TabIndex = 162;
-			this.checkRead.Text = "Read";
+			this.checkRead.Text = "Received";
 			this.checkRead.UseVisualStyleBackColor = true;
 			// 
 			// gridMessages
@@ -171,14 +171,14 @@ namespace OpenDental{
 			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMessages.HasMultilineHeaders = false;
+			this.gridMessages.HasMultilineHeaders = true;
 			this.gridMessages.HScrollVisible = false;
 			this.gridMessages.Location = new System.Drawing.Point(12, 61);
 			this.gridMessages.Name = "gridMessages";
 			this.gridMessages.ScrollValue = 0;
 			this.gridMessages.Size = new System.Drawing.Size(698, 593);
 			this.gridMessages.TabIndex = 4;
-			this.gridMessages.Title = "Text Messages - Right click for options";
+			this.gridMessages.Title = "Text Messages - Right click for options - Unread messages always shown";
 			this.gridMessages.TranslationName = null;
 			this.gridMessages.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMessages_CellClick);
 			// 
