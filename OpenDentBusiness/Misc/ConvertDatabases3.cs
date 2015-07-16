@@ -8292,7 +8292,7 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To15_3_0();
+			To15_2_12();
 		}
 
 		///<summary></summary>
@@ -9375,7 +9375,67 @@ namespace OpenDentBusiness {
 						+"'')";
 					Db.NonQ(command);
 				}//end Podium bridge
-
+				//Drop and re-add the EServiceSignalTable. The content of the table does not matter at this point, 
+				//this allows us to alter columns to clobs and also presrve column order.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS eservicesignal";
+					Db.NonQ(command);
+					command=@"CREATE TABLE eservicesignal (
+						EServiceSignalNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ServiceCode int NOT NULL,
+						ReasonCategory int NOT NULL,
+						ReasonCode int NOT NULL,
+						Severity tinyint NOT NULL,
+						Description text NOT NULL,
+						SigDateTime datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						Tag text NOT NULL,
+						IsProcessed tinyint NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE eservicesignal'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE eservicesignal (
+						EServiceSignalNum number(20) NOT NULL,
+						ServiceCode number(11) NOT NULL,
+						ReasonCategory number(11) NOT NULL,
+						ReasonCode number(11) NOT NULL,
+						Severity number(3) NOT NULL,
+						Description clob,
+						SigDateTime date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						Tag clob,
+						IsProcessed number(3) NOT NULL,
+						CONSTRAINT eservicesignal_EServiceSignalN PRIMARY KEY (EServiceSignalNum)
+						)";
+					Db.NonQ(command);
+				}
+				//Code identical to convert script from version 15.2.1
+				//Listener Service monitoring.  As of right now the Patient Portal is the only important eService.  
+				//Turn on Listener Service monitoring for offices using the patient portal by inserting an eService signal of status 'Critical'
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//Patients with OnlinePasswords will be the indicator that an office is or has attempted to use the patient portal.
+					command="SELECT COUNT(*) FROM patient WHERE OnlinePassword!=''";
+					int countPatPortals=PIn.Int(Db.GetCount(command));
+					if(countPatPortals > 5) {//Check for more than 5 patient portal patients to avoid false positives.
+						//Insert a 'Critical' signal into the eservicesignal table to trigger Listener Service monitoring.
+						//Customers with active Listener Services will instantly have a 'Working' signal inserted and will not get notified of the service being down.
+						//However, if the customer does not know that their service is down (not tech savy) then this will alert them to that fact (our goal).
+						command="INSERT INTO eservicesignal (ServiceCode,ReasonCategory,ReasonCode,Severity,Description,SigDateTime,Tag,IsProcessed) VALUES("
+						+"1,"//ListenerService
+						+"0,"
+						+"0,"
+						+"5,"//Critical
+						+"'Patient Portal users detected.  Listener Service status set to critical to trigger monitoring.',"
+						+POut.DateT(DateTime.Now)+","
+						+"'',"
+						+"0)";
+						Db.NonQ(command);
+					}
+				}
+				else {//Oracle
+					//eServices do not currently support Oracle.
+				}
 
 				command="UPDATE preference SET ValueString = '15.3.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -9387,3 +9447,4 @@ namespace OpenDentBusiness {
 
 	}
 }
+

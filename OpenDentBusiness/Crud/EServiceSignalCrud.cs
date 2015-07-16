@@ -104,15 +104,23 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (eServiceSignal.ReasonCategory)+","
 				+    POut.Int   (eServiceSignal.ReasonCode)+","
 				+    POut.Int   ((int)eServiceSignal.Severity)+","
-				+"'"+POut.String(eServiceSignal.Description)+"',"
+				+    DbHelper.ParamChar+"paramDescription,"
 				+    POut.DateT (eServiceSignal.SigDateTime)+","
-				+"'"+POut.String(eServiceSignal.Tag)+"',"
+				+    DbHelper.ParamChar+"paramTag,"
 				+    POut.Bool  (eServiceSignal.IsProcessed)+")";
+			if(eServiceSignal.Description==null) {
+				eServiceSignal.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,eServiceSignal.Description);
+			if(eServiceSignal.Tag==null) {
+				eServiceSignal.Tag="";
+			}
+			OdSqlParameter paramTag=new OdSqlParameter("paramTag",OdDbType.Text,eServiceSignal.Tag);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription,paramTag);
 			}
 			else {
-				eServiceSignal.EServiceSignalNum=Db.NonQ(command,true);
+				eServiceSignal.EServiceSignalNum=Db.NonQ(command,true,paramDescription,paramTag);
 			}
 			return eServiceSignal.EServiceSignalNum;
 		}
@@ -149,15 +157,23 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (eServiceSignal.ReasonCategory)+","
 				+    POut.Int   (eServiceSignal.ReasonCode)+","
 				+    POut.Int   ((int)eServiceSignal.Severity)+","
-				+"'"+POut.String(eServiceSignal.Description)+"',"
+				+    DbHelper.ParamChar+"paramDescription,"
 				+    POut.DateT (eServiceSignal.SigDateTime)+","
-				+"'"+POut.String(eServiceSignal.Tag)+"',"
+				+    DbHelper.ParamChar+"paramTag,"
 				+    POut.Bool  (eServiceSignal.IsProcessed)+")";
+			if(eServiceSignal.Description==null) {
+				eServiceSignal.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,eServiceSignal.Description);
+			if(eServiceSignal.Tag==null) {
+				eServiceSignal.Tag="";
+			}
+			OdSqlParameter paramTag=new OdSqlParameter("paramTag",OdDbType.Text,eServiceSignal.Tag);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription,paramTag);
 			}
 			else {
-				eServiceSignal.EServiceSignalNum=Db.NonQ(command,true);
+				eServiceSignal.EServiceSignalNum=Db.NonQ(command,true,paramDescription,paramTag);
 			}
 			return eServiceSignal.EServiceSignalNum;
 		}
@@ -169,12 +185,20 @@ namespace OpenDentBusiness.Crud{
 				+"ReasonCategory   =  "+POut.Int   (eServiceSignal.ReasonCategory)+", "
 				+"ReasonCode       =  "+POut.Int   (eServiceSignal.ReasonCode)+", "
 				+"Severity         =  "+POut.Int   ((int)eServiceSignal.Severity)+", "
-				+"Description      = '"+POut.String(eServiceSignal.Description)+"', "
+				+"Description      =  "+DbHelper.ParamChar+"paramDescription, "
 				+"SigDateTime      =  "+POut.DateT (eServiceSignal.SigDateTime)+", "
-				+"Tag              = '"+POut.String(eServiceSignal.Tag)+"', "
+				+"Tag              =  "+DbHelper.ParamChar+"paramTag, "
 				+"IsProcessed      =  "+POut.Bool  (eServiceSignal.IsProcessed)+" "
 				+"WHERE EServiceSignalNum = "+POut.Long(eServiceSignal.EServiceSignalNum);
-			Db.NonQ(command);
+			if(eServiceSignal.Description==null) {
+				eServiceSignal.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,eServiceSignal.Description);
+			if(eServiceSignal.Tag==null) {
+				eServiceSignal.Tag="";
+			}
+			OdSqlParameter paramTag=new OdSqlParameter("paramTag",OdDbType.Text,eServiceSignal.Tag);
+			Db.NonQ(command,paramDescription,paramTag);
 		}
 
 		///<summary>Updates one EServiceSignal in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -198,7 +222,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(eServiceSignal.Description != oldEServiceSignal.Description) {
 				if(command!=""){ command+=",";}
-				command+="Description = '"+POut.String(eServiceSignal.Description)+"'";
+				command+="Description = "+DbHelper.ParamChar+"paramDescription";
 			}
 			if(eServiceSignal.SigDateTime != oldEServiceSignal.SigDateTime) {
 				if(command!=""){ command+=",";}
@@ -206,7 +230,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(eServiceSignal.Tag != oldEServiceSignal.Tag) {
 				if(command!=""){ command+=",";}
-				command+="Tag = '"+POut.String(eServiceSignal.Tag)+"'";
+				command+="Tag = "+DbHelper.ParamChar+"paramTag";
 			}
 			if(eServiceSignal.IsProcessed != oldEServiceSignal.IsProcessed) {
 				if(command!=""){ command+=",";}
@@ -215,9 +239,17 @@ namespace OpenDentBusiness.Crud{
 			if(command==""){
 				return false;
 			}
+			if(eServiceSignal.Description==null) {
+				eServiceSignal.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,eServiceSignal.Description);
+			if(eServiceSignal.Tag==null) {
+				eServiceSignal.Tag="";
+			}
+			OdSqlParameter paramTag=new OdSqlParameter("paramTag",OdDbType.Text,eServiceSignal.Tag);
 			command="UPDATE eservicesignal SET "+command
 				+" WHERE EServiceSignalNum = "+POut.Long(eServiceSignal.EServiceSignalNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramDescription,paramTag);
 			return true;
 		}
 
