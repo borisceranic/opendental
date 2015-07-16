@@ -2016,7 +2016,8 @@ namespace OpenDentBusiness{
 			if(opNums!=null && opNums.Count > 0) {
 				command+="AND Op IN("+String.Join(",",opNums)+") ";
 			}
-			command+="AND "+DbHelper.DtimeToDate("AptDateTime")+">="+POut.Date(dateStart)+" "
+			command+="AND AptStatus!="+POut.Int((int)ApptStatus.UnschedList)+" "
+				+"AND "+DbHelper.DtimeToDate("AptDateTime")+">="+POut.Date(dateStart)+" "
 				+"AND "+DbHelper.DtimeToDate("AptDateTime")+"<="+POut.Date(dateEnd)+" "
 				+"ORDER BY AptDateTime,Op";//Ordering by AptDateTime then Op is important for speed when checking for collisions in Web Sched.
 			return Crud.AppointmentCrud.SelectMany(command);
@@ -2050,7 +2051,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			Dictionary<DateTime,List<ApptSearchProviderSchedule>> dictProviderSchedulesByDate=new Dictionary<DateTime,List<ApptSearchProviderSchedule>>();
 			List<ApptSearchProviderSchedule> listProviderSchedules=new List<ApptSearchProviderSchedule>();
-			if(dateScheduleStart.Date<=dateScheduleStop.Date) {
+			if(dateScheduleStart.Date>=dateScheduleStop.Date) {
 				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart,listSchedules,listAppointments);
 				dictProviderSchedulesByDate.Add(dateScheduleStart.Date,listProviderSchedules);
 				return dictProviderSchedulesByDate;

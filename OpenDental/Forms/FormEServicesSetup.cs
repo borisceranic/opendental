@@ -47,12 +47,20 @@ namespace OpenDental {
 		///This variable should be treated as a constant which is why it is in all caps.  The type 'System.Drawing.Color' cannot be declared const.</summary>
 		private Color COLOR_ESERVICE_ERROR_TEXT=Color.OrangeRed;
 		private Clinic _clinicCur;
+		///<summary>A list of clinics that the user currently logged into has access to.</summary>
 		private List<Clinic> _listClinics;
+		///<summary>A list of all clinics.  This list could include clinics that the user should not have access to so be careful using it.</summary>
 		private List<Clinic> _listAllClinics;
 		private List<SmsPhone> _listPhones;
 		private List<RecallType> _listRecallTypes;
+		///<summary>A list of all operatories that have IsWebSched set to true.</summary>
 		private List<Operatory> _listWebSchedOps;
+		///<summary>A deep copy of ProviderC.GetListShort().  Use the cache instead of this list if you need an up to date list of providers.</summary>
 		private List<Provider> _listProviders;
+		///<summary>Provider number used to filter the Time Slots grid.  0 is treated as 'All'</summary>
+		private long _webSchedProvNum=0;
+		///<summary>Clinic number used to filter the Time Slots grid.  0 is treated as 'Unassigned'</summary>
+		private long _webSchedClinicNum=0;
 		
 		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
 		public FormEServicesSetup(EService setTab=EService.PatientPortal) {
@@ -108,7 +116,7 @@ namespace OpenDental {
 			}
 			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
 			comboWebSchedClinic.Items.Clear();
-			comboWebSchedClinic.Items.Add(Lan.g(this,"All"));
+			comboWebSchedClinic.Items.Add(Lan.g(this,"Unassigned"));
 			_listAllClinics=Clinics.GetList().ToList();
 			for(int i=0;i<_listAllClinics.Count;i++) {
 				comboWebSchedClinic.Items.Add(_listAllClinics[i].Description);
@@ -124,6 +132,7 @@ namespace OpenDental {
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				labelWebSchedClinic.Visible=false;
 				comboWebSchedClinic.Visible=false;
+				butWebSchedPickClinic.Visible=false;
 			}
 			FillGridWebSchedRecallTypes();
 			FillGridWebSchedOperatories();
@@ -935,22 +944,20 @@ namespace OpenDental {
 				//Don't bother warning the user.  It will just be annoying.  The red indecator should be sufficient.
 				return;
 			}
-			if(comboWebSchedRecallTypes.SelectedIndex < 0) {
-				//This should not be possible.  If it is, I cannot accurately show time slots without a default time length to search for.
+			if(comboWebSchedRecallTypes.SelectedIndex < 0
+				|| comboWebSchedClinic.SelectedIndex < 0
+				|| comboWebSchedProviders.SelectedIndex < 0) 
+			{
 				return;
 			}
 			DateTime dateStart=PIn.Date(textWebSchedDateStart.Text);
 			RecallType recallType=_listRecallTypes[comboWebSchedRecallTypes.SelectedIndex];
-			Clinic clinic=null;
-			if(comboWebSchedClinic.SelectedIndex > 0) {
-				clinic=_listClinics[comboWebSchedClinic.SelectedIndex-1];//Add one for 'All'.
-			}
-			List<Provider> listProviders=new List<Provider>();
-			if(comboWebSchedProviders.SelectedIndex > 0) {
-				listProviders.Add(_listProviders[comboWebSchedProviders.SelectedIndex-1]);//-1 due to 'All'
-			}
-			else {
-				listProviders=_listProviders;//Use all providers.
+			Clinic clinic=_listAllClinics.Find(x => x.ClinicNum==_webSchedClinicNum);//null clinic is treated as unassigned.
+			List<Provider> listProviders=new List<Provider>(_listProviders);//Use all providers by default.
+			Provider provider=_listProviders.Find(x => x.ProvNum==_webSchedProvNum);
+			if(provider!=null) {
+				//Only use the provider that the user picked from the provider picker.
+				listProviders=new List<Provider>() { provider };
 			}
 			Cursor=Cursors.WaitCursor;
 			DataTable tableTimeSlots=new DataTable();
@@ -960,7 +967,6 @@ namespace OpenDental {
 			}
 			catch(Exception ex) {
 				//The user might not have Web Sched ops set up correctly.  Don't warn them here because it is just annoying.  They'll figure it out.
-				Cursor=Cursors.Default;
 			}
 			Cursor=Cursors.Default;
 			gridWebSchedTimeSlots.BeginUpdate();
@@ -1023,10 +1029,18 @@ namespace OpenDental {
 		}
 
 		private void comboWebSchedProviders_SelectionChangeCommitted(object sender,EventArgs e) {
+			_webSchedProvNum=0;
+			if(comboWebSchedProviders.SelectedIndex > 0) {//Greater than 0 due to "All"
+				_webSchedProvNum=_listProviders[comboWebSchedProviders.SelectedIndex-1].ProvNum;//-1 for 'All'
+			}
 			FillGridWebSchedTimeSlots();
 		}
 
 		private void comboWebSchedClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			_webSchedClinicNum=0;
+			if(comboWebSchedClinic.SelectedIndex > 0) {//Greater than 0 due to "Unassigned"
+				_webSchedClinicNum=_listAllClinics[comboWebSchedClinic.SelectedIndex-1].ClinicNum;//-1 for 'Unassigned'
+			}
 			FillGridWebSchedTimeSlots();
 		}
 
@@ -1120,15 +1134,6 @@ namespace OpenDental {
 			}
 		}
 
-		private void butWebSchedToday_Click(object sender,EventArgs e) {
-			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
-			FillGridWebSchedTimeSlots();
-		}
-
-		private void butWebSchedRefresh_Click(object sender,EventArgs e) {
-			FillGridWebSchedTimeSlots();
-		}
-
 		private void butWebSchedSetup_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
@@ -1136,6 +1141,37 @@ namespace OpenDental {
 			FormRecallSetup FormRS=new FormRecallSetup();
 			FormRS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Recall Setup accessed via EServices Setup window.");
+		}
+
+		private void butWebSchedToday_Click(object sender,EventArgs e) {
+			textWebSchedDateStart.Text=DateTime.Today.ToShortDateString();
+			//Don't need to call FillTimeSlots because textChanged event already calls it.
+		}
+
+		private void butWebSchedPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP=new FormProviderPick();
+			if(comboWebSchedProviders.SelectedIndex>0) {
+				FormPP.SelectedProvNum=_webSchedProvNum;
+			}
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboWebSchedProviders.SelectedIndex=_listProviders.FindIndex(x => x.ProvNum==FormPP.SelectedProvNum)+1;//+1 for 'All'
+			_webSchedProvNum=FormPP.SelectedProvNum;
+			FillGridWebSchedTimeSlots();
+		}
+
+		private void butWebSchedPickClinic_Click(object sender,EventArgs e) {
+			FormClinics FormC=new FormClinics();
+			FormC.IsSelectionMode=true;
+			FormC.ShowDialog();
+			if(FormC.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			comboWebSchedClinic.SelectedIndex=_listAllClinics.FindIndex(x => x.ClinicNum==FormC.SelectedClinicNum)+1;//+1 for 'Unassigned'
+			_webSchedClinicNum=FormC.SelectedClinicNum;
+			FillGridWebSchedTimeSlots();
 		}
 		#endregion
 

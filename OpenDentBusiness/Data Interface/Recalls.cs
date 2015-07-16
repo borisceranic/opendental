@@ -1152,7 +1152,7 @@ namespace OpenDentBusiness{
 		///Open time slots are found by looping through operatories flagged for Web Sched and finding openings that can hold the RecallType.
 		///The RecallType passed in must be a valid recall type.
 		///Providers passed in will be the only providers considered when looking for available time slots.
-		///Passing in a null clinic will not filter ops by clinics.
+		///Passing in a null clinic will only consider clinics set to 0 (unassigned) if clinics are enabled.
 		///The timeslots on / or between the Start and End dates passed in will be considered.</summary>
 		///<returns>DataTable with 4 columns: SchedDate (date), TimeStart (DateTime), TimeStop (DateTime), OperatoryNum (long)</returns>
 		public static DataTable GetAvailableWebSchedTimeSlots(RecallType recallType,List<Provider> listProviders,Clinic clinic,DateTime dateStart,DateTime dateEnd) {
@@ -1208,10 +1208,17 @@ namespace OpenDentBusiness{
 				long schedOpNum=PIn.Long(tableSchedules.Rows[i]["OperatoryNum"].ToString());
 				TimeSpan timeSchedStart=PIn.Time(tableSchedules.Rows[i]["StartTime"].ToString());
 				TimeSpan timeSchedStop=PIn.Time(tableSchedules.Rows[i]["StopTime"].ToString());
-				if(clinic!=null) {
-					//Skip this schedule entry if the operatory's clinic does not match the patient's clinic.
-					Operatory op=Operatories.GetOperatory(schedOpNum);
-					if(op==null || op.ClinicNum!=clinic.ClinicNum) {
+				//Skip this schedule entry if the operatory's clinic does not match the patient's clinic.
+				Operatory op=listWebSchedOps.Find(x => x.OperatoryNum==schedOpNum);
+				if(op==null) {
+					continue;
+				}
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					//If a clinic was not passed in, ONLY consider unassigned operatories
+					//Also, if a valid clinic was passed in, make sure the operatory has a matching clinic.
+					if((clinic==null && op.ClinicNum!=0)
+						|| (clinic!=null && op.ClinicNum!=clinic.ClinicNum)) 
+					{
 						continue;
 					}
 				}
@@ -1242,19 +1249,19 @@ namespace OpenDentBusiness{
 				if(timeSchedStart>=timeSchedStop) {
 					continue;
 				}
-				//At this point, we know that timeSchedStart is set to a valid time that we need to start looking for openings 5 minutes at a time.
-				//Start going through this operatories schedule 5 minutes at a time looking for a gap that can handle apptLengthMins.
-				TimeSpan timeSlotStart=timeSchedStart;
+				//At this point, we know that timeSchedStart is set to a valid time that we need to start looking for openings.
+				//Start going through this operatories schedule according to the time increment, looking for a gap that can handle apptLengthMins.
+				TimeSpan timeSlotStart=new TimeSpan(timeSchedStart.Ticks);
 				//Start looking for collisions AFTER the start time.
 				//Stop as soon as the slots stop time meets or passes the sched stop time.
-				//Iteratre through the schedule via the time increment preference.
+				//Iterate through the schedule via the time increment preference.
 				for(TimeSpan timeSlotStop=timeSchedStart.Add(new TimeSpan(0,timeIncrement,0))
 					;timeSlotStop<=timeSchedStop
 					;timeSlotStop=timeSlotStop.Add(new TimeSpan(0,timeIncrement,0)))
 				{
 					//Check to see if we've found an opening.
 					TimeSpan timeSpanCur=timeSlotStop-timeSlotStart;
-					if(timeSpanCur.Minutes==apptLengthMins) {
+					if(timeSpanCur.TotalMinutes==apptLengthMins) {
 						//We just found an opening.  Make sure we don't already have this time slot available.
 						DateTime dateTimeSlotStart=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStart.Hours,timeSlotStart.Minutes,0);
 						DateTime dateTimeSlotStop=new DateTime(dateSched.Year,dateSched.Month,dateSched.Day,timeSlotStop.Hours,timeSlotStop.Minutes,0);
@@ -1334,11 +1341,6 @@ namespace OpenDentBusiness{
 					if(isOverlapping) {
 						//There was a collision, set the time slot start time to the stop time and continue from there.
 						timeSlotStart=timeSlotStop;
-						continue;
-					}
-					//We now know that there are no blockouts or appointments for this hour time slot.
-					//Lets double check that the time slot completely fits within our schedule.
-					if(timeSlotStart < timeSchedStart || timeSlotStop > timeSchedStop) {
 						continue;
 					}
 				}

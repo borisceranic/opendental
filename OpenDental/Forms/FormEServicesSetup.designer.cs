@@ -137,6 +137,8 @@ namespace OpenDental{
 			this.butToday = new OpenDental.UI.Button();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
+			this.butWebSchedPickProv = new OpenDental.UI.Button();
+			this.butWebSchedPickClinic = new OpenDental.UI.Button();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.button1 = new OpenDental.UI.Button();
 			this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
@@ -976,6 +978,8 @@ namespace OpenDental{
 			// 
 			// groupWebSchedPreview
 			// 
+			this.groupWebSchedPreview.Controls.Add(this.butWebSchedPickClinic);
+			this.groupWebSchedPreview.Controls.Add(this.butWebSchedPickProv);
 			this.groupWebSchedPreview.Controls.Add(this.label22);
 			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedProviders);
 			this.groupWebSchedPreview.Controls.Add(this.butWebSchedToday);
@@ -985,9 +989,9 @@ namespace OpenDental{
 			this.groupWebSchedPreview.Controls.Add(this.labelWebSchedRecallTypes);
 			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedClinic);
 			this.groupWebSchedPreview.Controls.Add(this.comboWebSchedRecallTypes);
-			this.groupWebSchedPreview.Location = new System.Drawing.Point(266, 387);
+			this.groupWebSchedPreview.Location = new System.Drawing.Point(253, 387);
 			this.groupWebSchedPreview.Name = "groupWebSchedPreview";
-			this.groupWebSchedPreview.Size = new System.Drawing.Size(412, 194);
+			this.groupWebSchedPreview.Size = new System.Drawing.Size(439, 194);
 			this.groupWebSchedPreview.TabIndex = 252;
 			this.groupWebSchedPreview.TabStop = false;
 			this.groupWebSchedPreview.Text = "Available Times For Patients";
@@ -1005,11 +1009,10 @@ namespace OpenDental{
 			// 
 			this.comboWebSchedProviders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.comboWebSchedProviders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboWebSchedProviders.Location = new System.Drawing.Point(200, 118);
 			this.comboWebSchedProviders.MaxDropDownItems = 30;
 			this.comboWebSchedProviders.Name = "comboWebSchedProviders";
-			this.comboWebSchedProviders.Size = new System.Drawing.Size(205, 21);
+			this.comboWebSchedProviders.Size = new System.Drawing.Size(209, 21);
 			this.comboWebSchedProviders.TabIndex = 311;
 			this.comboWebSchedProviders.SelectionChangeCommitted += new System.EventHandler(this.comboWebSchedProviders_SelectionChangeCommitted);
 			// 
@@ -1020,7 +1023,7 @@ namespace OpenDental{
 			this.butWebSchedToday.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butWebSchedToday.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butWebSchedToday.CornerRadius = 4F;
-			this.butWebSchedToday.Location = new System.Drawing.Point(313, 35);
+			this.butWebSchedToday.Location = new System.Drawing.Point(334, 36);
 			this.butWebSchedToday.Name = "butWebSchedToday";
 			this.butWebSchedToday.Size = new System.Drawing.Size(75, 21);
 			this.butWebSchedToday.TabIndex = 309;
@@ -1029,9 +1032,8 @@ namespace OpenDental{
 			// 
 			// gridWebSchedTimeSlots
 			// 
-			this.gridWebSchedTimeSlots.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridWebSchedTimeSlots.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridWebSchedTimeSlots.HasMultilineHeaders = false;
 			this.gridWebSchedTimeSlots.HScrollVisible = false;
 			this.gridWebSchedTimeSlots.Location = new System.Drawing.Point(18, 19);
@@ -1055,7 +1057,7 @@ namespace OpenDental{
 			// 
 			// textWebSchedDateStart
 			// 
-			this.textWebSchedDateStart.Location = new System.Drawing.Point(200, 36);
+			this.textWebSchedDateStart.Location = new System.Drawing.Point(203, 36);
 			this.textWebSchedDateStart.Name = "textWebSchedDateStart";
 			this.textWebSchedDateStart.Size = new System.Drawing.Size(90, 20);
 			this.textWebSchedDateStart.TabIndex = 303;
@@ -1084,11 +1086,10 @@ namespace OpenDental{
 			// 
 			this.comboWebSchedClinic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.comboWebSchedClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboWebSchedClinic.Location = new System.Drawing.Point(200, 159);
 			this.comboWebSchedClinic.MaxDropDownItems = 30;
 			this.comboWebSchedClinic.Name = "comboWebSchedClinic";
-			this.comboWebSchedClinic.Size = new System.Drawing.Size(205, 21);
+			this.comboWebSchedClinic.Size = new System.Drawing.Size(209, 21);
 			this.comboWebSchedClinic.TabIndex = 305;
 			this.comboWebSchedClinic.SelectionChangeCommitted += new System.EventHandler(this.comboWebSchedClinic_SelectionChangeCommitted);
 			// 
@@ -1100,7 +1101,7 @@ namespace OpenDental{
 			this.comboWebSchedRecallTypes.Location = new System.Drawing.Point(200, 77);
 			this.comboWebSchedRecallTypes.MaxDropDownItems = 30;
 			this.comboWebSchedRecallTypes.Name = "comboWebSchedRecallTypes";
-			this.comboWebSchedRecallTypes.Size = new System.Drawing.Size(205, 21);
+			this.comboWebSchedRecallTypes.Size = new System.Drawing.Size(209, 21);
 			this.comboWebSchedRecallTypes.TabIndex = 304;
 			this.comboWebSchedRecallTypes.SelectionChangeCommitted += new System.EventHandler(this.comboWebSchedRecallTypes_SelectionChangeCommitted);
 			// 
@@ -1533,6 +1534,20 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butWebSchedPickProv
+			// 
+			this.butWebSchedPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butWebSchedPickProv.Autosize = false;
+			this.butWebSchedPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butWebSchedPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butWebSchedPickProv.CornerRadius = 2F;
+			this.butWebSchedPickProv.Location = new System.Drawing.Point(414, 118);
+			this.butWebSchedPickProv.Name = "butWebSchedPickProv";
+			this.butWebSchedPickProv.Size = new System.Drawing.Size(18, 21);
+			this.butWebSchedPickProv.TabIndex = 312;
+			this.butWebSchedPickProv.Text = "...";
+			this.butWebSchedPickProv.Click += new System.EventHandler(this.butWebSchedPickProv_Click);
+			// 
 			// tabPage1
 			// 
 			this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
@@ -1550,6 +1565,20 @@ namespace OpenDental{
 			this.tabPage1.Size = new System.Drawing.Size(944, 588);
 			this.tabPage1.TabIndex = 7;
 			this.tabPage1.Text = "Texting Services";
+			// 
+			// butWebSchedPickClinic
+			// 
+			this.butWebSchedPickClinic.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butWebSchedPickClinic.Autosize = false;
+			this.butWebSchedPickClinic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butWebSchedPickClinic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butWebSchedPickClinic.CornerRadius = 2F;
+			this.butWebSchedPickClinic.Location = new System.Drawing.Point(414, 159);
+			this.butWebSchedPickClinic.Name = "butWebSchedPickClinic";
+			this.butWebSchedPickClinic.Size = new System.Drawing.Size(18, 21);
+			this.butWebSchedPickClinic.TabIndex = 313;
+			this.butWebSchedPickClinic.Text = "...";
+			this.butWebSchedPickClinic.Click += new System.EventHandler(this.butWebSchedPickClinic_Click);
 			// 
 			// button1
 			// 
@@ -1959,7 +1988,8 @@ namespace OpenDental{
 		private System.Windows.Forms.ListBox listBoxWebSchedProviderPref;
 		private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.ComboBox comboWebSchedProviders;
-//Ryan Code
+		private UI.Button butWebSchedPickClinic;
+		private UI.Button butWebSchedPickProv;
 		private System.Windows.Forms.TabPage tabPage1;
 		private UI.Button button1;
 		private System.Windows.Forms.DateTimePicker dateTimePicker1;
@@ -1980,7 +2010,6 @@ namespace OpenDental{
 		private UI.ODGrid odGrid2;
 		private UI.Button button6;
 		private UI.Button button7;
-//End Ryan Code
 
 	}
 }
