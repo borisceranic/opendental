@@ -903,6 +903,7 @@ namespace OpenDental {
 				}
 			}
 			CheckUIState();
+			Plugins.HookAddCode(this,"FormPayment.Load_end",PaymentCur,IsNew);
 		}
 
 		private void CheckUIState() {
@@ -2052,6 +2053,7 @@ namespace OpenDental {
 					+PaymentCur.PayAmt.ToString("c"));
 			}
 			DialogResult=DialogResult.OK;
+			Plugins.HookAddCode(this,"FormPayment.butOK_Click_end",PaymentCur,SplitList);
 		}
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
