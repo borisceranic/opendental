@@ -570,6 +570,12 @@ namespace OpenDentBusiness{
 		///If this task has an object type set, the log will show up under the corresponding patient for the selected object type.
 		///Used for both TaskEdit and TaskNoteEdit permissions.</summary>
 		public static void TaskEditCreateLog(Permissions perm,string logText,Task task) {
+			if(task==null) {  //Something went wrong before calling this function, and somehow task wasn't passed in
+				//Do nothing.  This was added because in very intermittent situations this function would throw a UE and crash OD.
+				//	this is just a simple securitylog entry so it is fine to skip it in this case.  We should try to solve the issues
+				//	causing null to be passed in, but we should not let this throw a UE.
+				return;
+			}
 			long patNum=0;//Task type of none defaults to 0.
 			if(task.KeyNum!=0) {  //Either no object attached, or object hasn't been commited to db yet (Changed the object but haven't clicked OK on TaskEdit).
 				if(task.ObjectType==TaskObjectType.Patient) {//Task type of patient we can use the task.KeyNum for patNum
