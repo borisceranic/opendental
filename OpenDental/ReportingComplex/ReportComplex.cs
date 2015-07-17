@@ -231,6 +231,18 @@ namespace OpenDental.ReportingComplex {
 			return queryObj;
 		}
 
+		public QueryObject AddQuery(DataTable query,string title) {
+			QueryObject queryObj=new QueryObject(query,title);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
+		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup) {
+			QueryObject queryObj=new QueryObject(query,title,queryGroup,columnNameToSplitOn,splitByKind);
+			_reportObjects.Add(queryObj);
+			return queryObj;
+		}
+
 		public QueryObject AddQuery(DataTable query,string title,string columnNameToSplitOn,SplitByKind splitByKind,int queryGroup,bool isCentered) {
 			QueryObject queryObj=new QueryObject(query,title,isCentered,queryGroup,columnNameToSplitOn,splitByKind);
 			_reportObjects.Add(queryObj);

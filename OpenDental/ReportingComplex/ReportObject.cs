@@ -420,7 +420,7 @@ namespace OpenDental.ReportingComplex {
 			_offSetY=offSetY;
 			_foreColor=color;
 			//defaults:
-			_contentAlignment=ContentAlignment.MiddleRight;
+			_contentAlignment=ContentAlignment.MiddleLeft;
 			_reportObjectKind=ReportObjectKind.TextObject;
 		}
 

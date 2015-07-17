@@ -88,6 +88,7 @@ namespace OpenDental {
 			this.menuMain = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
 			this.butPatExport = new OpenDental.UI.Button();
@@ -104,14 +105,13 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
-			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.menuMain.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(312, 289);
+			this.label1.Location = new System.Drawing.Point(312, 304);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(118, 18);
 			this.label1.TabIndex = 2;
@@ -166,7 +166,7 @@ namespace OpenDental {
 			// labelArizonaPrimaryCare
 			// 
 			this.labelArizonaPrimaryCare.AutoSize = true;
-			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(312, 349);
+			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(312, 364);
 			this.labelArizonaPrimaryCare.Name = "labelArizonaPrimaryCare";
 			this.labelArizonaPrimaryCare.Size = new System.Drawing.Size(104, 13);
 			this.labelArizonaPrimaryCare.TabIndex = 20;
@@ -200,6 +200,17 @@ namespace OpenDental {
 			this.groupBox1.TabIndex = 26;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Premium";
+			// 
+			// picturePodium
+			// 
+			this.picturePodium.HasBorder = false;
+			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
+			this.picturePodium.Location = new System.Drawing.Point(9, 51);
+			this.picturePodium.Name = "picturePodium";
+			this.picturePodium.Size = new System.Drawing.Size(95, 24);
+			this.picturePodium.TabIndex = 28;
+			this.picturePodium.TextNullImage = null;
+			this.picturePodium.Click += new System.EventHandler(this.picturePodium_Click);
 			// 
 			// label7
 			// 
@@ -270,7 +281,7 @@ namespace OpenDental {
 			this.listArizonaPrimaryCare.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listArizonaPrimaryCare.FormattingEnabled = true;
 			this.listArizonaPrimaryCare.ItemHeight = 15;
-			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(315, 367);
+			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(315, 382);
 			this.listArizonaPrimaryCare.Name = "listArizonaPrimaryCare";
 			this.listArizonaPrimaryCare.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listArizonaPrimaryCare.Size = new System.Drawing.Size(204, 34);
@@ -366,7 +377,7 @@ namespace OpenDental {
 			this.listPublicHealth.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listPublicHealth.FormattingEnabled = true;
 			this.listPublicHealth.ItemHeight = 15;
-			this.listPublicHealth.Location = new System.Drawing.Point(315, 310);
+			this.listPublicHealth.Location = new System.Drawing.Point(315, 325);
 			this.listPublicHealth.Name = "listPublicHealth";
 			this.listPublicHealth.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listPublicHealth.Size = new System.Drawing.Size(204, 34);
@@ -381,7 +392,7 @@ namespace OpenDental {
 			this.listLists.Location = new System.Drawing.Point(315, 87);
 			this.listLists.Name = "listLists";
 			this.listLists.SelectionMode = System.Windows.Forms.SelectionMode.None;
-			this.listLists.Size = new System.Drawing.Size(204, 199);
+			this.listLists.Size = new System.Drawing.Size(204, 214);
 			this.listLists.TabIndex = 9;
 			this.listLists.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listLists_MouseDown);
 			// 
@@ -411,17 +422,6 @@ namespace OpenDental {
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
-			// 
-			// picturePodium
-			// 
-			this.picturePodium.HasBorder = false;
-			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
-			this.picturePodium.Location = new System.Drawing.Point(9, 51);
-			this.picturePodium.Name = "picturePodium";
-			this.picturePodium.Size = new System.Drawing.Size(95, 24);
-			this.picturePodium.TabIndex = 28;
-			this.picturePodium.TextNullImage = null;
-			this.picturePodium.Click += new System.EventHandler(this.picturePodium_Click);
 			// 
 			// FormReportsMore
 			// 
@@ -504,6 +504,7 @@ namespace OpenDental {
 				Lan.g(this,"Insurance Overpaid"),
 			});
 			listLists.Items.AddRange(new string[] {
+				Lan.g(this,"Active Patients"),
 				Lan.g(this,"Appointments"),
 				Lan.g(this,"Birthdays"),
 				Lan.g(this,"Broken Appointments"),
@@ -753,32 +754,37 @@ namespace OpenDental {
 				return;
 			}
 			switch(selected) {
-				case 0://Appointments
+				case 0://Active Patients
+					FormRpActivePatients FormAP=new FormRpActivePatients();
+					FormAP.ShowDialog();
+					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Active Patients");
+					break;
+				case 1://Appointments
 					FormRpAppointments FormA=new FormRpAppointments();
 					FormA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Appointments");
 					break;
-				case 1://Birthdays
+				case 2://Birthdays
 					FormRpBirthday FormB=new FormRpBirthday();
 					FormB.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Birthdays");
 					break;
-				case 2://Broken Appointments
+				case 3://Broken Appointments
 					FormRpBrokenAppointments FormBroken=new FormRpBrokenAppointments();
 					FormBroken.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Broken Appointments");
 					break;
-				case 3://Insurance Plans
+				case 4://Insurance Plans
 					FormRpInsCo FormInsCo=new FormRpInsCo();
 					FormInsCo.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Insurance Plans");
 					break;
-				case 4://New Patients
+				case 5://New Patients
 					FormRpNewPatients FormNewPats=new FormRpNewPatients();
 					FormNewPats.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"New Patients");
 					break;
-				case 5://Patients - Raw
+				case 6://Patients - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -786,7 +792,7 @@ namespace OpenDental {
 					FormPatients.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patients - Raw");
 					break;
-				case 6://Patient Notes
+				case 7://Patient Notes
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -794,17 +800,17 @@ namespace OpenDental {
 					FormPN.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patient Notes");
 					break;
-				case 7://Prescriptions
+				case 8://Prescriptions
 					FormRpPrescriptions FormPrescript=new FormRpPrescriptions();
 					FormPrescript.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Rx");
 					break;
-				case 8://Procedure Codes
+				case 9://Procedure Codes
 					FormRpProcCodes FormProcCodes=new FormRpProcCodes();
 					FormProcCodes.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Procedure Codes");
 					break;
-				case 9://Referrals - Raw
+				case 10://Referrals - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -812,18 +818,18 @@ namespace OpenDental {
 					FormReferral.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referrals - Raw");
 					break;
-				case 10://Referral Analysis
+				case 11://Referral Analysis
 					FormRpReferralAnalysis FormRA=new FormRpReferralAnalysis();
 					FormRA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referral Analysis");
 					break;
-				case 11://Referred Proc Tracking
+				case 12://Referred Proc Tracking
 					FormReferralProcTrack FormRP=new FormReferralProcTrack();
 					FormRP.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"ReferredProcTracking");
 					Close();
 					break;
-				case 12://Treatment Finder
+				case 13://Treatment Finder
 					RpModalSelection=ReportModalSelection.TreatmentFinder;
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Treatment Finder");
 					Close();
