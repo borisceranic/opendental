@@ -307,7 +307,8 @@ namespace OpenDentBusiness{
 					}
 				}
 				if(fname.Length>0){
-					if(PrefC.GetBool(PrefName.DistributorKey)) {
+					if(PrefC.GetBool(PrefName.DistributorKey) || PrefC.GetBool(PrefName.PatientSelectUseFNameForPreferred)) {
+						//Nathan has approved the preferred name search for first name only. It is not intended to work with last name for our customers.
 						command+="AND (patient.FName LIKE '"+POut.String(fname)+"%' OR patient.Preferred LIKE '"+POut.String(fname)+"%') ";
 					}
 					else {
@@ -325,7 +326,12 @@ namespace OpenDentBusiness{
 					}
 				}
 				if(fname.Length>0) {
-					command+="AND LOWER(patient.FName) LIKE '"+POut.String(fname)+"%' ";
+					if(PrefC.GetBool(PrefName.PatientSelectUseFNameForPreferred)) {
+						command+="AND (LOWER(patient.FName) LIKE '"+POut.String(fname)+"%' OR LOWER(patient.Preferred) LIKE '"+POut.String(fname)+"%') ";
+					}
+					else {
+						command+="AND LOWER(patient.FName) LIKE '"+POut.String(fname)+"%' ";
+					}
 				}
 			}
 			if(regexp!="") {

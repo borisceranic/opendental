@@ -9456,7 +9456,15 @@ namespace OpenDentBusiness {
 		private static void To15_4_0() {
 			if(FromVersion<new Version("15.4.0.0")) {
 				string command="";
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PatientSelectUseFNameForPreferred','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),"+
+					"'PatientSelectUseFNameForPreferred','0')";
+					Db.NonQ(command);
+				}
 
 
 

@@ -328,6 +328,7 @@ namespace OpenDentBusiness {
 		///<summary>Free-form 'Subject' text of the notification sent by this practice when a new secure EmailMessage is sent to patient.</summary>
 		PatientPortalNotifySubject,
 		PatientPortalURL,
+		PatientSelectUseFNameForPreferred,
 		PatientSelectUsesSearchButton,
 		PayPlansBillInAdvanceDays,
 		PerioColorCAL,

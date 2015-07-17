@@ -66,7 +66,6 @@ namespace OpenDental{
 		private Label label2;
 		private ComboBox comboBillingType;
 		private OpenDental.UI.Button butGetAll;
-		private CheckBox checkRefresh;
 		private OpenDental.UI.Button butAddAll;
 		private ComboBox comboSite;
 		private Label labelSite;
@@ -157,7 +156,6 @@ namespace OpenDental{
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.checkRefresh = new System.Windows.Forms.CheckBox();
 			this.butGetAll = new OpenDental.UI.Button();
 			this.butSearch = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -194,9 +192,9 @@ namespace OpenDental{
 			this.groupAddPt.Controls.Add(this.butAddPt);
 			this.groupAddPt.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupAddPt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.groupAddPt.Location = new System.Drawing.Point(674, 607);
+			this.groupAddPt.Location = new System.Drawing.Point(674, 598);
 			this.groupAddPt.Name = "groupAddPt";
-			this.groupAddPt.Size = new System.Drawing.Size(262, 51);
+			this.groupAddPt.Size = new System.Drawing.Size(262, 55);
 			this.groupAddPt.TabIndex = 1;
 			this.groupAddPt.TabStop = false;
 			this.groupAddPt.Text = "Add New Family:";
@@ -302,7 +300,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.textLName);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(674, 100);
+			this.groupBox2.Location = new System.Drawing.Point(674, 102);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(262, 431);
 			this.groupBox2.TabIndex = 0;
@@ -647,26 +645,15 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox1.Controls.Add(this.checkRefresh);
 			this.groupBox1.Controls.Add(this.butGetAll);
 			this.groupBox1.Controls.Add(this.butSearch);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(674, 533);
+			this.groupBox1.Location = new System.Drawing.Point(674, 536);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(262, 70);
+			this.groupBox1.Size = new System.Drawing.Size(262, 56);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Search";
-			// 
-			// checkRefresh
-			// 
-			this.checkRefresh.Location = new System.Drawing.Point(11, 51);
-			this.checkRefresh.Name = "checkRefresh";
-			this.checkRefresh.Size = new System.Drawing.Size(245, 18);
-			this.checkRefresh.TabIndex = 71;
-			this.checkRefresh.Text = "Refresh while typing";
-			this.checkRefresh.UseVisualStyleBackColor = true;
-			this.checkRefresh.Click += new System.EventHandler(this.checkRefresh_Click);
 			// 
 			// butGetAll
 			// 
@@ -824,7 +811,6 @@ namespace OpenDental{
 					}
 				}
 			}
-			FillSearchOption();
 			SetGridCols();
 			if(InitialPatNum!=0){
 				Patient iPatient=Patients.GetLim(InitialPatNum);
@@ -849,17 +835,8 @@ namespace OpenDental{
 				}
 				return;
 			}
-			if(checkRefresh.Checked){
+			if(PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
 				FillGrid(true);
-			}
-		}
-
-		private void FillSearchOption(){
-			if(PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)){
-				checkRefresh.Checked=false;
-			}
-			else{
-				checkRefresh.Checked=true;
 			}
 		}
 
@@ -1110,16 +1087,6 @@ namespace OpenDental{
 			}
 		}
 
-		private void checkRefresh_Click(object sender,EventArgs e) {
-			Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked);
-			Cache.Refresh(InvalidType.Prefs);
-			//simply not important enough to send an update to the other computers.
-			FillSearchOption();
-			if(checkRefresh.Checked){
-				FillGrid(true);
-			}
-		}
-
 		private void butSearch_Click(object sender, System.EventArgs e) {
 			FillGrid(true);
 		}
@@ -1129,7 +1096,7 @@ namespace OpenDental{
 		}
 
 		private void OnDataEntered(){
-			if(checkRefresh.Checked){
+			if(PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
 				FillGrid(true);
 			}
 		}
