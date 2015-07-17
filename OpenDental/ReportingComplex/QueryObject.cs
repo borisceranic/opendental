@@ -854,7 +854,7 @@ namespace OpenDental.ReportingComplex {
 			Point location=GetObjectByName(columnName+"Header").Location;
 			Size labelSize=new Size((int)(grfx.MeasureString(staticText,font).Width/grfx.DpiX*100+2)
 				,(int)(grfx.MeasureString(staticText,font).Height/grfx.DpiY*100+2));
-			int i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleLeft,offSetX,offSetY));
+			int i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleRight,offSetX,offSetY));
 			_reportObjects[i].DataField=dataFieldName;
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			_sections["Group Footer"].Height+=(int)((grfx.MeasureString(staticText,font)).Height/grfx.DpiY*100+2)+offSetY;
