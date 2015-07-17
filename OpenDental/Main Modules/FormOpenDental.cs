@@ -330,7 +330,9 @@ namespace OpenDental{
 		private MenuItem menuItemListenerService;
 		private MenuItem menuItemMobileSync;
 		///<summary>HQ only. Keep track of last time triage task labels were filled. Too taxing on the server to perform every 1.6 seconds with the rest of the HQ thread metrics. Triage labels will be refreshed on ProcessSigsIntervalInSecs interval.</summary>
-		DateTime _hqMetricsLastRefreshed=DateTime.MinValue;
+		DateTime _hqTriageMetricsLastRefreshed=DateTime.MinValue;
+		///<summary>HQ only. Keep track of last time EServiceMetrics were filled. Server is only updating every 30 seconds so no need to go any faster than that.</summary>
+		DateTime _hqEServiceMetricsLastRefreshed=DateTime.MinValue;
 		///<summary>The current color of the eServices menu item in the main menu.</summary>
 		private Color _colorEServicesBackground=SystemColors.Control;
 		private ODThread _odThreadEServices;
@@ -6519,15 +6521,16 @@ namespace OpenDental{
 			new DataConnection().SetDbT("localhost","customers","root","","","",DatabaseType.MySql,true);
 #else
 			new DataConnection().SetDbT("server","customers","root","","","",DatabaseType.MySql,true);
-#endif
-			//Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
-			if((formMapHQ!=null && !formMapHQ.IsDisposed) || 
-					//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
-					DateTime.Now.Subtract(_hqMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) {
+#endif			
+			if( //Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
+				(formMapHQ!=null && !formMapHQ.IsDisposed) || 
+				//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
+				DateTime.Now.Subtract(_hqTriageMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) 
+			{
 				DataTable phoneMetrics=Phones.GetTriageMetrics();
 				this.Invoke(new FillTriageLabelsResultsArgs(OnFillTriageLabelsResults),phoneMetrics);
 				//Reset the interval timer.
-				_hqMetricsLastRefreshed=DateTime.Now;
+				_hqTriageMetricsLastRefreshed=DateTime.Now;
 			}
 			List<Phone> phoneList=Phones.GetPhoneList();
 			List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
@@ -6556,13 +6559,17 @@ namespace OpenDental{
 
 		///<summary>HQ only. Called from ProcessHqMetrics(). Deals with HQ EServices. This method runs in a thread so any access to form controls must be invoked.</summary>
 		private void ProcessHqMetricsEServices() {
+			if(DateTime.Now.Subtract(_hqEServiceMetricsLastRefreshed).TotalSeconds<30) {
+				return;
+			}
+			_hqEServiceMetricsLastRefreshed=DateTime.Now;
 #if DEBUG
 			new DataConnection().SetDbT("localhost","serviceshq","root","","","",DatabaseType.MySql,true);			
 #else
 			new DataConnection().SetDbT("server184","serviceshq","root","","","",DatabaseType.MySql,true);			
 #endif
 			//Get important metrics from serviceshq db.
-			//EServiceMetrics metricsToday=EServiceMetrics.GetMetricsForToday();
+			EServiceMetrics metricsToday=EServiceMetrics.GetEServiceMetricsFromSignalHQ();
 		}
 
 		/// <summary>HQ Only. OnProcessHqMetricsResults must be invoked from a worker thread. These are the arguments necessary.</summary>

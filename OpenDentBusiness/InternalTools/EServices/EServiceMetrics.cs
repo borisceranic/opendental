@@ -4,10 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness {
-	///<summary>HQ only.</summary>
+	///<summary>HQ only. This is NOT a table type. It is a class that is populated by the Broadcaster at a fairly frequenty interval (30 seconds or so).
+	///It is then serialized and saved as a ESerivceSignal via upsert. Each HQ workstation will then select that EServiceSignal very frequently and display the results.</summary>
 	public class EServiceMetrics {
+		///<summary>Time at which this data was generated. It past a certain threshold in the past then consider the data invalid.</summary>
+		public DateTime Timestamp=DateTime.MinValue;
 		///<summary>True if all Broadcaster heartbeats are current and not critical; otherwise false.</summary>
 		public bool IsBroadcasterHeartbeatOk;
 		///<summary>Count of unprocessed warnings issued by Broadcaster.</summary>
@@ -20,23 +25,77 @@ namespace OpenDentBusiness {
 		public int OutboundMessageCount;
 		///<summary>Total charges that will be billed to OD customers for the given outbound messages.</summary>
 		public float TotalChargedToCustomersUSD;
+		///<summary>Retreived from NexmoAPI.GetAccountBalance().</summary>
+		public float AccountBalanceEuro;
+		
+		///<summary>This is derived property. Do not serialize.</summary>
+		[XmlIgnore]
+		public eServiceSignalSeverity Severity {
+			get {
+				if(!IsValid) {
+					return eServiceSignalSeverity.Critical;
+				}
+				if(DateTime.Now.Subtract(Timestamp)>TimeSpan.FromMinutes(5)) {
+					return eServiceSignalSeverity.Critical;
+				}
+				if(!IsBroadcasterHeartbeatOk) {
+					return eServiceSignalSeverity.Critical;
+				}
+				if(Errors>0) {
+					return eServiceSignalSeverity.Error;
+				}
+				if(Warnings>0) {
+					return eServiceSignalSeverity.Warning;
+				}
+				return eServiceSignalSeverity.Working;
+			}
+		}
 
+		///<summary>If true then this data is valid and came from the Broadcaster AccountMaintThread; otherwise this data is not accurate.
+		///Will be set after deserialization to indicate that the data was found and deserialized correctly.</summary>
+		[XmlIgnore]
+		public bool IsValid;
+		
 		public delegate void EServiceMetricsArgs(EServiceMetrics eServiceMetrics);
 
-		///<summary>Get metrics from serviceshq.</summary>
-		public static EServiceMetrics GetMetricsForToday() {
-#if DEBUG
-			//Last 30 days.
-			return GetMetrics(DateTime.Today.Subtract(TimeSpan.FromDays(30)),DateTime.Today.AddDays(1));
-#endif
-			return GetMetrics(DateTime.Today,DateTime.Today.AddDays(1));
+		///<summary>Gets one EServiceSignalHQ from the db.</summary>
+		public static EServiceMetrics GetEServiceMetricsFromSignalHQ() {
+			//See EServiceSignalHQs.GetEServiceMetrics() for details.
+			string command=@"
+				SELECT 0 EServiceSignalNum, h.* FROM eservicesignalhq h 
+				WHERE 
+					h.ReasonCode=1023
+					AND h.ReasonCategory=1
+					AND h.ServiceCode=2
+					AND h.RegistrationKeyNum=-1
+				ORDER BY h.SigDateTime DESC 
+				LIMIT 1;";
+			EServiceSignal signal=Crud.EServiceSignalCrud.SelectOne(command);
+			EServiceMetrics ret=new EServiceMetrics();
+			if(signal!=null) {
+				using(XmlReader reader=XmlReader.Create(new System.IO.StringReader(signal.Tag))) {
+					ret=(EServiceMetrics)new XmlSerializer(typeof(EServiceMetrics)).Deserialize(reader);
+				}
+				ret.IsValid=true;
+			}
+			return ret;
 		}
+
+		#region Calculate metrics
+
+		///<summary>Get metrics from serviceshq.</summary>
+		public static EServiceMetrics CalculateMetricsForToday(float accountBalanceEuro) {
+			return CalculateMetricsForDateRange(DateTime.Today,DateTime.Today.AddDays(1),accountBalanceEuro);
+		}
+
 		///<summary>Get metrics from serviceshq.</summary>
 		/// <param name="dateTimeStart">Used for message counts.</param>
 		/// <param name="dateTimeEnd">Used for message counts.</param>
-		public static EServiceMetrics GetMetrics(DateTime dateTimeStart,DateTime dateTimeEnd) {
+		public static EServiceMetrics CalculateMetricsForDateRange(DateTime dateTimeStart,DateTime dateTimeEnd,float accountBalanceEuro) {
 			EServiceMetrics ret=new EServiceMetrics();
 			//No remoting role check, No call to database.
+			ret.Timestamp=DateTime.Now;
+			ret.AccountBalanceEuro=accountBalanceEuro;
 			ret.IsBroadcasterHeartbeatOk=GetIsBroadcasterHeartbeatOk();
 			ret.Warnings=0;
 			ret.Errors=0;
@@ -56,7 +115,7 @@ namespace OpenDentBusiness {
 			ret.OutboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
 			ret.TotalChargedToCustomersUSD=PIn.Float(table.Rows[0]["MsgChargeUSDTotal"].ToString());
 			table=GetSmsInbound(dateTimeStart,dateTimeEnd);
-			ret.InboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
+			ret.InboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());			
 			return ret;
 		}
 
@@ -155,7 +214,9 @@ namespace OpenDentBusiness {
 				GROUP BY
 				  e.Severity
 				;";
-			return Db.GetTable(command);		
+			return Db.GetTable(command);
 		}
+
+		#endregion
 	}	
 }
