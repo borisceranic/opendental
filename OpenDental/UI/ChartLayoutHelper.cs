@@ -71,7 +71,9 @@ namespace OpenDental {
 				return;
 			}
 			else {//the medical only logic to hide the tooth chart and dental buttons is not going to be used with eCW
-				SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
+				//jsalmon - Commenting out the following method call due to it using a preference which might not be present.
+				//  The main window of Open Dental could be resized at this point (thus resizing ContrChart) which will throw an exception.
+				//SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
 			}
 			if(Programs.UsingOrion) {//full width
 				gridProg.Width=ClientSize.Width-gridProg.Location.X-1;
