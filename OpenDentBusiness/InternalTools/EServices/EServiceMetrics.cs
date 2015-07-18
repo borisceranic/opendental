@@ -64,7 +64,7 @@ namespace OpenDentBusiness {
 			string command=@"
 				SELECT 0 EServiceSignalNum, h.* FROM eservicesignalhq h 
 				WHERE 
-					h.ReasonCode=1023
+					h.ReasonCode=1024
 					AND h.ReasonCategory=1
 					AND h.ServiceCode=2
 					AND h.RegistrationKeyNum=-1

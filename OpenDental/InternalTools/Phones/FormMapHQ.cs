@@ -47,6 +47,30 @@ namespace OpenDental {
 
 		#region Set label text and colors
 
+		public void SetEServiceMetrics(EServiceMetrics metricsToday) {
+			eServiceMetricsControl.AccountBalance=metricsToday.AccountBalanceEuro;
+			if(metricsToday.Severity==eServiceSignalSeverity.Critical || metricsToday.Severity==eServiceSignalSeverity.Error) {
+				eServiceMetricsControl.StartFlashing();
+			}
+			else {
+				eServiceMetricsControl.StopFlashing();
+			}
+			switch(metricsToday.Severity) {
+				case eServiceSignalSeverity.Working:
+					eServiceMetricsControl.AlertColor=Color.LimeGreen;
+					break;
+				case eServiceSignalSeverity.Warning:
+					eServiceMetricsControl.AlertColor=Color.Yellow;
+					break;
+				case eServiceSignalSeverity.Error:
+					eServiceMetricsControl.AlertColor=Color.Orange;
+					break;
+				case eServiceSignalSeverity.Critical:
+					eServiceMetricsControl.AlertColor=Color.Red;
+					break;
+			}
+		}
+
 		///<summary>Refresh the phone panel every X seconds after it has already been setup.  Make sure to call FillMapAreaPanel before calling this the first time.</summary>
 		public void SetPhoneList(List<PhoneEmpDefault> peds,List<Phone> phones) {
 			try {

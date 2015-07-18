@@ -6559,17 +6559,21 @@ namespace OpenDental{
 
 		///<summary>HQ only. Called from ProcessHqMetrics(). Deals with HQ EServices. This method runs in a thread so any access to form controls must be invoked.</summary>
 		private void ProcessHqMetricsEServices() {
-			if(DateTime.Now.Subtract(_hqEServiceMetricsLastRefreshed).TotalSeconds<30) {
+			if(DateTime.Now.Subtract(_hqEServiceMetricsLastRefreshed).TotalSeconds<10) {
+				return;
+			}
+			if(formMapHQ==null || formMapHQ.IsDisposed) { //Only run if the HQ map is open.
 				return;
 			}
 			_hqEServiceMetricsLastRefreshed=DateTime.Now;
 #if DEBUG
-			new DataConnection().SetDbT("localhost","serviceshq","root","","","",DatabaseType.MySql,true);			
+			new DataConnection().SetDbT("localhost","serviceshq","root","","","",DatabaseType.MySql,true);
 #else
 			new DataConnection().SetDbT("server184","serviceshq","root","","","",DatabaseType.MySql,true);			
 #endif
 			//Get important metrics from serviceshq db.
 			EServiceMetrics metricsToday=EServiceMetrics.GetEServiceMetricsFromSignalHQ();
+			formMapHQ.Invoke(new MethodInvoker(delegate { formMapHQ.SetEServiceMetrics(metricsToday); }));
 		}
 
 		/// <summary>HQ Only. OnProcessHqMetricsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
