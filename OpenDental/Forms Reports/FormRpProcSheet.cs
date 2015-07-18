@@ -603,14 +603,17 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				return Clinics.IsMedicalPracticeOrClinic(0);//Check if the practice is medical
 			}
+			if(Security.CurUser.ClinicIsRestricted) {//User can only view one clinic
+				return Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum);
+			}
 			for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-				if(!Security.CurUser.ClinicIsRestricted
-					&& listClin.SelectedIndices[i]==0
-					&& Clinics.IsMedicalPracticeOrClinic(0)) //Check if the practice is medical
+				if(listClin.SelectedIndices[i]==0 //The user selected 'Unassigned' 
+					&& Clinics.IsMedicalPracticeOrClinic(0)) //And the practice is medical
 				{
 					return true;
 				}
-				if(Clinics.IsMedicalPracticeOrClinic(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum)) {//Minus 1 from the selected index
+				//if(Clinics.IsMedicalPracticeOrClinic(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum)) {//Minus 1 from the selected index
+				if(listClin.SelectedIndices[i]!=0 && Clinics.IsMedicalPracticeOrClinic(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum)) {//Minus 1 from the selected index
 					return true;
 				}
 			}

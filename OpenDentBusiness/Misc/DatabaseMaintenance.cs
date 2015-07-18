@@ -913,6 +913,8 @@ namespace OpenDentBusiness {
 				"610202",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
 				//capitale
 				"600502",1,"04",claimTypes,canadianNetworkNumTelusB,
+				//carpenters and allied workers local
+				"000117",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//cdcs
 				"610129",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCDCS,
 				//claimsecure
@@ -945,6 +947,8 @@ namespace OpenDentBusiness {
 				"610218",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//groupsource
 				"605064",1,"04",claimTypes|reversalTypes|eligibilityTypes,canadianNetworkNumCSI,
+				//groupe premier medical
+				"610266",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//industrial alliance
 				"000060",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
 				//industrial alliance pacific insuarnce and financial
