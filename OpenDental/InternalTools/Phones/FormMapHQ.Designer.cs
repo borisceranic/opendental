@@ -50,6 +50,7 @@
 			this.mapAreaPanelHQ = new OpenDental.MapAreaPanel();
 			this.officesDownView = new OpenDental.EscalationViewControl();
 			this.label3 = new System.Windows.Forms.Label();
+			this.eServiceMetricsControl = new OpenDental.EServiceMetricsControl();
 			this.menuStrip.SuspendLayout();
 			this.groupPhoneMetrics.SuspendLayout();
 			this.SuspendLayout();
@@ -346,7 +347,7 @@
 			this.escalationView.MinAlpha = 60;
 			this.escalationView.Name = "escalationView";
 			this.escalationView.OuterColor = System.Drawing.Color.Black;
-			this.escalationView.Size = new System.Drawing.Size(317, 329);
+			this.escalationView.Size = new System.Drawing.Size(317, 306);
 			this.escalationView.StartFadeIndex = 0;
 			this.escalationView.TabIndex = 34;
 			// 
@@ -421,17 +422,17 @@
 			this.mapAreaPanelHQ.Size = new System.Drawing.Size(1374, 973);
 			this.mapAreaPanelHQ.TabIndex = 5;
 			// 
-			// officesDown
+			// officesDownView
 			// 
 			this.officesDownView.BackColor = System.Drawing.Color.White;
 			this.officesDownView.BorderThickness = 1;
 			this.officesDownView.FadeAlphaIncrement = 0;
 			this.officesDownView.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.officesDownView.Items = ((System.ComponentModel.BindingList<string>)(resources.GetObject("officesDown.Items")));
+			this.officesDownView.Items = ((System.ComponentModel.BindingList<string>)(resources.GetObject("officesDownView.Items")));
 			this.officesDownView.LinePadding = -6;
-			this.officesDownView.Location = new System.Drawing.Point(180, 860);
+			this.officesDownView.Location = new System.Drawing.Point(180, 835);
 			this.officesDownView.MinAlpha = 60;
-			this.officesDownView.Name = "officesDown";
+			this.officesDownView.Name = "officesDownView";
 			this.officesDownView.OuterColor = System.Drawing.Color.Black;
 			this.officesDownView.Size = new System.Drawing.Size(317, 140);
 			this.officesDownView.StartFadeIndex = 0;
@@ -440,17 +441,28 @@
 			// label3
 			// 
 			this.label3.Font = new System.Drawing.Font("Calibri", 28F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label3.Location = new System.Drawing.Point(-2, 860);
+			this.label3.Location = new System.Drawing.Point(-2, 835);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(176, 111);
 			this.label3.TabIndex = 35;
 			this.label3.Text = "Offices\r\nDown";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
+			// eServiceMetricsControl
+			// 
+			this.eServiceMetricsControl.AccountBalance = 562F;
+			this.eServiceMetricsControl.AlertColor = System.Drawing.Color.Blue;
+			this.eServiceMetricsControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.eServiceMetricsControl.Location = new System.Drawing.Point(180, 981);
+			this.eServiceMetricsControl.Name = "eServiceMetricsControl";
+			this.eServiceMetricsControl.Size = new System.Drawing.Size(317, 56);
+			this.eServiceMetricsControl.TabIndex = 37;
+			// 
 			// FormMapHQ
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1884, 1042);
+			this.Controls.Add(this.eServiceMetricsControl);
 			this.Controls.Add(this.officesDownView);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.escalationView);
@@ -505,5 +517,6 @@
 		private EscalationViewControl escalationView;
 		private EscalationViewControl officesDownView;
 		private System.Windows.Forms.Label label3;
+		private EServiceMetricsControl eServiceMetricsControl;
 	}
 }
