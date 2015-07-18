@@ -17,7 +17,7 @@ namespace UpdateFileCopier {
 				Application.Run(new FormMain(arguments[0],arguments[1],@"C:\Program Files\Open Dental"));
 			}
 			else {//just for rare debugging situations
-				Application.Run(new FormMain(@"\\SERVERFILES\Storage\AtoZforCustomerDB\UpdateFiles\","0",@"C:\Program Files\Open Dental"));
+				Application.Run(new FormMain(@"C:\OpenDentImages\UpdateFiles","0",@"C:\Program Files\Open Dental"));
 			}
 		}
 	}

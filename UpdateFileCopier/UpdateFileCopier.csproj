@@ -87,6 +87,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CodeBase\Utilities\ODFileUtils.cs">
+      <Link>ODFileUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeBase\Utilities\ODThread.cs">
+      <Link>ODThread.cs</Link>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,12 +148,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
-      <Project>{18f7bc78-4b99-48d3-a1f1-0d13a63e3cf9}</Project>
-      <Name>xCodeBase</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
