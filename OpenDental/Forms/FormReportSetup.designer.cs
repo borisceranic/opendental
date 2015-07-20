@@ -96,7 +96,7 @@ namespace OpenDental{
 			this.checkReportPIClinic.Name = "checkReportPIClinic";
 			this.checkReportPIClinic.Size = new System.Drawing.Size(369, 17);
 			this.checkReportPIClinic.TabIndex = 202;
-			this.checkReportPIClinic.Text = "Default to not showing clinic breakdown on P&&I reports.";
+			this.checkReportPIClinic.Text = "Default to showing clinic breakdown on P&&I reports.";
 			// 
 			// FormReportSetup
 			// 

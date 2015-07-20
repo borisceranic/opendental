@@ -428,9 +428,13 @@ namespace OpenDentBusiness {
 			decimal totalincome;
 			DataTable dt=new DataTable("Total");
 			dt.Columns.Add(new DataColumn("Month"));
-			dt.Columns.Add(new DataColumn("Weekday"));
+			if(!isAnnual) {
+				dt.Columns.Add(new DataColumn("Weekday"));
+			}
 			dt.Columns.Add(new DataColumn("Production"));
-			dt.Columns.Add(new DataColumn("Sched"));
+			if(!isAnnual) {
+				dt.Columns.Add(new DataColumn("Sched"));
+			}
 			dt.Columns.Add(new DataColumn("Adjustments"));
 			dt.Columns.Add(new DataColumn("Writeoff"));
 			dt.Columns.Add(new DataColumn("Tot Prod"));
@@ -439,9 +443,13 @@ namespace OpenDentBusiness {
 			dt.Columns.Add(new DataColumn("Total Income"));
 			DataTable dtClinic=new DataTable("Clinic");
 			dtClinic.Columns.Add(new DataColumn("Month"));
-			dtClinic.Columns.Add(new DataColumn("Weekday"));
+			if(!isAnnual) {
+				dtClinic.Columns.Add(new DataColumn("Weekday"));
+			}
 			dtClinic.Columns.Add(new DataColumn("Production"));
-			dtClinic.Columns.Add(new DataColumn("Sched"));
+			if(!isAnnual) {
+				dtClinic.Columns.Add(new DataColumn("Sched"));
+			}
 			dtClinic.Columns.Add(new DataColumn("Adjustments"));
 			dtClinic.Columns.Add(new DataColumn("Writeoff"));
 			dtClinic.Columns.Add(new DataColumn("Tot Prod"));
@@ -601,7 +609,7 @@ namespace OpenDentBusiness {
 					}
 					totalincome=ptincome+insincome;
 					string clinicDesc=Clinics.GetDesc(listClinicNums[it]);
-					if(!isAnnual) {
+					if(!isAnnual) {//Monthly
 						row[2]=production.ToString("n");
 						row[3]=sched.ToString("n");
 						row[4]=adjust.ToString("n");
@@ -620,6 +628,7 @@ namespace OpenDentBusiness {
 						row[5]=ptincome.ToString("n");
 						row[6]=insincome.ToString("n");
 						row[7]=totalincome.ToString("n");
+						row[8]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
 					}
 					if(isAnnual) {
 						dtClinic.Rows.Add(row);  //adds row to table
