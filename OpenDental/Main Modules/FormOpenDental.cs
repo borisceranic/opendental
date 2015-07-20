@@ -2983,6 +2983,7 @@ namespace OpenDental{
 			if(CurPatNum==0) {//Only on startup, I think.
 				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Email"].Enabled=false;
+					ToolBarMain.Buttons["WebMail"].Enabled=false;
 					ToolBarMain.Buttons["Text"].Enabled=false;
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
 					ToolBarMain.Buttons["Letter"].Enabled=false;
@@ -3012,6 +3013,7 @@ namespace OpenDental{
 							ToolBarMain.Buttons["Text"].Enabled=(pat.TxtMsgOk==YN.Yes);
 						}
 					}
+					ToolBarMain.Buttons["WebMail"].Enabled=true;
 					ToolBarMain.Buttons["Letter"].Enabled=true;
 					ToolBarMain.Buttons["Form"].Enabled=true;
 					ToolBarMain.Buttons["Tasklist"].Enabled=true;
@@ -6609,6 +6611,7 @@ namespace OpenDental{
 			SetModuleSelected();
 			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
 			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
+			FillPatientButton(pat);
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
