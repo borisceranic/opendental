@@ -117,8 +117,8 @@ namespace OpenDentBusiness {
 			if(Db.GetCount(command)!="0") {
 				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure with referrals attached."));
 			}
-			//delete adjustments
-			command="DELETE FROM adjustment WHERE ProcNum='"+POut.Long(procNum)+"'";
+			//delete adjustments, audit logs added from Adjustments.DeleteForProcedure()
+			Adjustments.DeleteForProcedure(procNum);		
 			Db.NonQ(command);
 			//delete claimprocs
 			command="DELETE from claimproc WHERE ProcNum = '"+POut.Long(procNum)+"'";
