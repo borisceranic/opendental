@@ -119,7 +119,17 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
 				return;
 			}
-			string command="DELETE FROM adjustment WHERE ProcNum = "+POut.Long(procNum);
+			//Create log for each adjustment that is going to be deleted.
+			string command="SELECT * FROM adjustment WHERE ProcNum = "+POut.Long(procNum); //query for all adjustments of a procedure 
+			List<Adjustment> listAdjustments=Crud.AdjustmentCrud.SelectMany(command);
+			for(int i=0;i<listAdjustments.Count;i++) { //loops through the rows
+				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,listAdjustments[i].PatNum, //and creates audit trail entry for every row to be deleted
+				"Delete adjustment for patient: "
+				+Patients.GetLim(listAdjustments[i].PatNum).GetNameLF()+", "
+				+(listAdjustments[i].AdjAmt).ToString("c"));
+			}
+			//Delete each adjustment for the procedure.
+			command="DELETE FROM adjustment WHERE ProcNum = "+POut.Long(procNum);
 			Db.NonQ(command);
 		}
 
@@ -156,7 +166,17 @@ namespace OpenDentBusiness{
 			command="SELECT ValueString FROM preference WHERE PrefName = 'FinanceChargeAdjustmentType'";
 			table=Db.GetTable(command);
 			numAdj=PIn.Long(table.Rows[0][0].ToString());
-			command="DELETE FROM adjustment WHERE AdjDate="+POut.Date(dateUndo)
+			command="SELECT * FROM adjustment WHERE AdjDate="+POut.Date(dateUndo)
+				+" AND AdjType="+POut.Long(numAdj);
+			//Similar to code in DeleteForProcedure, but uses a AdjDate instead of ProcNum
+			List<Adjustment> listAdjustments=Crud.AdjustmentCrud.SelectMany(command);
+			for(int i=0;i<listAdjustments.Count;i++) { //loops through the rows
+				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,listAdjustments[i].PatNum, //and creates audit trail entry for every row to be deleted
+				"Delete adjustment for patient, undo finance charges: "
+				+Patients.GetLim(listAdjustments[i].PatNum).GetNameLF()+", "
+				+(listAdjustments[i].AdjAmt).ToString("c"));
+			}
+			command="DELETE FROM adjustment WHERE AdjDate="+POut.Date(dateUndo) 
 				+" AND AdjType="+POut.Long(numAdj);
 			return Db.NonQ(command);
 		}
@@ -169,9 +189,20 @@ namespace OpenDentBusiness{
 			string command;
 			long numAdj;
 			DataTable table;
+			//Similar to code in DeleteForProcedure, but uses a AdjDate instead of ProcNum
 			command="SELECT ValueString FROM preference WHERE PrefName = 'BillingChargeAdjustmentType'";
 			table=Db.GetTable(command);
 			numAdj=PIn.Long(table.Rows[0][0].ToString());
+			command="SELECT * FROM adjustment WHERE AdjDate="+POut.Date(dateUndo)
+				+" AND AdjType="+POut.Long(numAdj);
+			//Similar to code in DeleteForProcedure, but uses a AdjDate instead of ProcNum
+			List<Adjustment> listAdjustments=Crud.AdjustmentCrud.SelectMany(command);
+			for(int i=0;i<listAdjustments.Count;i++) { //loops through the rows
+				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,listAdjustments[i].PatNum, //and creates audit trail entry for every row to be deleted
+				"Delete adjustment for patient, undo billing charges: "
+				+Patients.GetLim(listAdjustments[i].PatNum).GetNameLF()+", "
+				+(listAdjustments[i].AdjAmt).ToString("c"));
+			}
 			command="DELETE FROM adjustment WHERE AdjDate="+POut.Date(dateUndo)
 				+" AND AdjType="+POut.Long(numAdj);
 			return Db.NonQ(command);
