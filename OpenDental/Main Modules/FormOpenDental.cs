@@ -643,9 +643,9 @@ namespace OpenDental{
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.menuText = new System.Windows.Forms.ContextMenu();
+			this.menuItemTextMessagesAll = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
-			this.menuItemTextMessagesAll= new System.Windows.Forms.MenuItem();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -1922,8 +1922,14 @@ namespace OpenDental{
 			// 
 			this.menuText.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemTextMessagesAll,
-			this.menuItemTextMessagesReceived,
+            this.menuItemTextMessagesReceived,
             this.menuItemTextMessagesSent});
+			// 
+			// menuItemTextMessagesAll
+			// 
+			this.menuItemTextMessagesAll.Index = 0;
+			this.menuItemTextMessagesAll.Text = "Text Messages All";
+			this.menuItemTextMessagesAll.Click += new System.EventHandler(this.menuItemTextMessagesAll_Click);
 			// 
 			// menuItemTextMessagesReceived
 			// 
@@ -1936,12 +1942,6 @@ namespace OpenDental{
 			this.menuItemTextMessagesSent.Index = 2;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
 			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
-			// 
-			// menuItemTextMessagesAll
-			// 
-			this.menuItemTextMessagesAll.Index = 0;
-			this.menuItemTextMessagesAll.Text = "Text Messages All";
-			this.menuItemTextMessagesAll.Click += new System.EventHandler(this.menuItemTextMessagesAll_Click);
 			// 
 			// lightSignalGrid1
 			// 
@@ -3069,6 +3069,7 @@ namespace OpenDental{
 			if(CurPatNum==0) {//Only on startup, I think.
 				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Email"].Enabled=false;
+					ToolBarMain.Buttons["WebMail"].Enabled=false;
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
 					ToolBarMain.Buttons["Letter"].Enabled=false;
 					ToolBarMain.Buttons["Form"].Enabled=false;
@@ -3092,6 +3093,7 @@ namespace OpenDental{
 					else {
 						ToolBarMain.Buttons["Text"].Enabled=false;
 					}
+					ToolBarMain.Buttons["WebMail"].Enabled=true;
 					ToolBarMain.Buttons["Letter"].Enabled=true;
 					ToolBarMain.Buttons["Form"].Enabled=true;
 					ToolBarMain.Buttons["Tasklist"].Enabled=true;
@@ -6923,6 +6925,7 @@ namespace OpenDental{
 			SetModuleSelected();
 			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
 			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
+			FillPatientButton(pat);
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
 			}
