@@ -167,7 +167,9 @@ namespace OpenDental {
 				for(int i=0;i<_listClinics.Count;i++) {
 					comboClinicSms.Items.Add(_listClinics[i].Description);
 				}
-				comboClinicSms.SelectedIndex=0;
+				if(comboClinicSms.Items.Count>0) {
+					comboClinicSms.SelectedIndex=0;//select first clinic in list
+				}
 			}
 		}
 
@@ -1336,9 +1338,21 @@ namespace OpenDental {
 		private void SetSmsServiceAgreement(bool isTyping=false) {
 			double smsMonthlyLimit;
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				labelClinic.Text=Lans.g(this,"Practice Title");
 				smsMonthlyLimit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
 			}
+			else if(_listClinics.Count==0) {//clinics enabled, but no clinics are present;
+				labelClinic.Text=Lans.g(this,"Clinic");
+				textSmsLimit.Enabled=false;
+				checkSmsAgree.Enabled=false;
+				butSmsSubmit.Enabled=false;
+				butSmsCancel.Enabled=false;
+				butSmsUnsubscribe.Enabled=false;
+				comboClinicSms.Enabled=false;
+				smsMonthlyLimit=0;
+			}
 			else {
+				labelClinic.Text=Lans.g(this,"Clinic");
 				smsMonthlyLimit=_listClinics[comboClinicSms.SelectedIndex].SmsMonthlyLimit;
 			}
 			//fill text
@@ -1401,6 +1415,10 @@ namespace OpenDental {
 		}
 
 		private void comboClinicSms_SelectedIndexChanged(object sender,EventArgs e) {
+			if(_listClinics==null || _listClinics.Count==0) {
+				_clinicCur=null;
+				return;
+			}
 			_clinicCur=_listClinics[comboClinicSms.SelectedIndex];
 			textSmsLimit.Text="";
 			SetSmsServiceAgreement();
