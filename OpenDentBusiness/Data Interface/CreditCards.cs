@@ -146,6 +146,7 @@ namespace OpenDentBusiness{
 			}
 			else {
 				DateTime lastMonth=DateTime.Today.AddMonths(-1);
+				billingDay=Math.Min(new DateTime(lastMonth.Year,lastMonth.Month,1).AddMonths(1).AddDays(-1).Day,billingDay);
 				startBillingCycle=new DateTime(lastMonth.Year,lastMonth.Month,billingDay);
 			}
 			string procStr="'"+POut.String(procedures).Replace(",","','")+"'";
