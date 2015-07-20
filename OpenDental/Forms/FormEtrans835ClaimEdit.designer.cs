@@ -287,6 +287,7 @@ namespace OpenDental{
 			// 
 			this.gridClaimAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridClaimAdjustments.HasMultilineHeaders = false;
 			this.gridClaimAdjustments.HScrollVisible = false;
 			this.gridClaimAdjustments.Location = new System.Drawing.Point(9, 192);
 			this.gridClaimAdjustments.Name = "gridClaimAdjustments";
@@ -303,6 +304,7 @@ namespace OpenDental{
 			// 
 			this.gridAdjudicationInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAdjudicationInfo.HasMultilineHeaders = false;
 			this.gridAdjudicationInfo.HScrollVisible = false;
 			this.gridAdjudicationInfo.Location = new System.Drawing.Point(9, 472);
 			this.gridAdjudicationInfo.Name = "gridAdjudicationInfo";
@@ -320,6 +322,7 @@ namespace OpenDental{
 			this.gridProcedureBreakdown.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProcedureBreakdown.HasMultilineHeaders = false;
 			this.gridProcedureBreakdown.HScrollVisible = false;
 			this.gridProcedureBreakdown.Location = new System.Drawing.Point(9, 298);
 			this.gridProcedureBreakdown.Name = "gridProcedureBreakdown";
@@ -351,6 +354,7 @@ namespace OpenDental{
 			// 
 			this.gridSupplementalInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridSupplementalInfo.HasMultilineHeaders = false;
 			this.gridSupplementalInfo.HScrollVisible = false;
 			this.gridSupplementalInfo.Location = new System.Drawing.Point(9, 578);
 			this.gridSupplementalInfo.Name = "gridSupplementalInfo";
@@ -431,7 +435,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835ClaimEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Claim Paid";
+			this.Text = "EOB Claim Details";
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimEdit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835ClaimEdit_Resize);
 			this.groupBalancing.ResumeLayout(false);

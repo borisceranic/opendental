@@ -137,12 +137,13 @@ namespace OpenDental {
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(346, 658);
+			this.label2.Location = new System.Drawing.Point(496, 658);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(348, 39);
+			this.label2.Size = new System.Drawing.Size(311, 39);
 			this.label2.TabIndex = 122;
 			this.label2.Text = "Before you click OK, the Deductible and the Ins Pay amounts should exactly match " +
     "the insurance EOB.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label3
 			// 
@@ -168,6 +169,7 @@ namespace OpenDental {
 			// 
 			this.gridClaimAdjustments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridClaimAdjustments.HasMultilineHeaders = false;
 			this.gridClaimAdjustments.HScrollVisible = false;
 			this.gridClaimAdjustments.Location = new System.Drawing.Point(9, 12);
 			this.gridClaimAdjustments.Name = "gridClaimAdjustments";
@@ -184,6 +186,7 @@ namespace OpenDental {
 			// 
 			this.gridProcedureBreakdown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProcedureBreakdown.HasMultilineHeaders = false;
 			this.gridProcedureBreakdown.HScrollVisible = false;
 			this.gridProcedureBreakdown.Location = new System.Drawing.Point(9, 118);
 			this.gridProcedureBreakdown.Name = "gridProcedureBreakdown";
@@ -200,6 +203,7 @@ namespace OpenDental {
 			// 
 			this.gridPayments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPayments.HasMultilineHeaders = false;
 			this.gridPayments.HScrollVisible = false;
 			this.gridPayments.Location = new System.Drawing.Point(9, 345);
 			this.gridPayments.Name = "gridPayments";
@@ -242,11 +246,11 @@ namespace OpenDental {
 			this.butViewEobDetails.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butViewEobDetails.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butViewEobDetails.CornerRadius = 4F;
-			this.butViewEobDetails.Location = new System.Drawing.Point(703, 659);
+			this.butViewEobDetails.Location = new System.Drawing.Point(331, 659);
 			this.butViewEobDetails.Name = "butViewEobDetails";
-			this.butViewEobDetails.Size = new System.Drawing.Size(100, 25);
+			this.butViewEobDetails.Size = new System.Drawing.Size(135, 25);
 			this.butViewEobDetails.TabIndex = 201;
-			this.butViewEobDetails.Text = "EOB Details";
+			this.butViewEobDetails.Text = "EOB Claim Details";
 			this.butViewEobDetails.Click += new System.EventHandler(this.butViewEobDetails_Click);
 			// 
 			// butWriteOff
