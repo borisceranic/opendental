@@ -401,6 +401,9 @@ namespace DocumentationBuilder {
 				case "sigbutdefelement": return "SigButDefElement";
 				case "sigelement": return "SigElement";
 				case "sigelementdef": return "SigElementDef";
+				case "smsfrommobile": return "SmsFromMobile";
+				case "smsphone": return "SmsPhone";
+				case "smstomobile": return "SmsToMobile";
 				case "smsmo": return "SmsMO";
 				case "smsmt": return "SmsMT";
 				case "smsvln": return "SmsVln";
@@ -408,6 +411,7 @@ namespace DocumentationBuilder {
 				case "supplyorder": return "SupplyOrder";
 				case "supplyorderitem": return "SupplyOrderItem";
 				case "taskancestor": return "TaskAncestor";
+				case "taskhist": return "TaskHist";
 				case "tasklist": return "TaskList";
 				case "tasknote": return "TaskNote";
 				case "tasksubscription": return "TaskSubscription";
