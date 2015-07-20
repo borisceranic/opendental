@@ -3888,6 +3888,8 @@ namespace OpenDental{
 				butPayTotal.Visible=false;
 				butPaySupp.Visible=false;
 				butSplit.Visible=false;
+				butBatch.Visible=false;
+				labelBatch.Visible=false;
       }
 			if(PrefC.GetBool(PrefName.EasyNoClinics)){
 				labelClinic.Visible=false;
