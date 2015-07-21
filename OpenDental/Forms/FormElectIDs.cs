@@ -205,10 +205,13 @@ namespace OpenDental{
 			}
 		}
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			if(IsSelectMode && gridElectIDs.SelectedIndices.Length<1){
-				MessageBox.Show(Lan.g(this,"Please select an item first."));
-				return;
+		private void butOK_Click(object sender,System.EventArgs e) {
+			if(IsSelectMode) {
+				if(gridElectIDs.SelectedIndices.Length<1) {
+					MessageBox.Show(Lan.g(this,"Please select an item first."));
+					return;
+				}
+				selectedID=ElectIDs.List[gridElectIDs.SelectedIndices[0]];
 			}
 			selectedID=ElectIDs.List[gridElectIDs.SelectedIndices[0]];
 			DialogResult=DialogResult.OK;
