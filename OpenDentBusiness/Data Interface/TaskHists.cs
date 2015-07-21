@@ -17,7 +17,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static string GetChangesDescription(TaskHist taskOld,TaskHist taskCur) {
-			if(taskOld==null) {
+			if(taskOld.DateTimeEntry==DateTime.MinValue) {
 				return "New task.";
 			}
 			StringBuilder strb=new StringBuilder();
