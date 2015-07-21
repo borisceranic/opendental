@@ -355,6 +355,7 @@ namespace OpenDental{
 		private Color COLOR_ESERVICE_ERROR_TEXT=Color.OrangeRed;
 		///<summary>A specific reference to the "Text" button.  This special reference helps us preserve the notification text on the button after setup is modified.</summary>
 		private ODToolBarButton _butText;
+		private MenuItem menuItemMoveSubscribers;
 		private string _showForm="";
 
 		///<summary></summary>
@@ -575,6 +576,7 @@ namespace OpenDental{
 			this.menuItemCreateAtoZFolders = new System.Windows.Forms.MenuItem();
 			this.menuItemImportXML = new System.Windows.Forms.MenuItem();
 			this.menuItemMergePatients = new System.Windows.Forms.MenuItem();
+			this.menuItemMoveSubscribers = new System.Windows.Forms.MenuItem();
 			this.menuItemProcLockTool = new System.Windows.Forms.MenuItem();
 			this.menuItemShutdown = new System.Windows.Forms.MenuItem();
 			this.menuTelephone = new System.Windows.Forms.MenuItem();
@@ -1401,6 +1403,7 @@ namespace OpenDental{
             this.menuItemCreateAtoZFolders,
             this.menuItemImportXML,
             this.menuItemMergePatients,
+            this.menuItemMoveSubscribers,
             this.menuItemProcLockTool,
             this.menuItemShutdown,
             this.menuTelephone,
@@ -1432,33 +1435,39 @@ namespace OpenDental{
 			this.menuItemMergePatients.Text = "Merge Patients";
 			this.menuItemMergePatients.Click += new System.EventHandler(this.menuItemMergePatients_Click);
 			// 
+			// menuItemMoveSubscribers
+			// 
+			this.menuItemMoveSubscribers.Index = 4;
+			this.menuItemMoveSubscribers.Text = "Move Subscribers";
+			this.menuItemMoveSubscribers.Click += new System.EventHandler(this.menuItemMoveSubscribers_Click);
+			// 
 			// menuItemProcLockTool
 			// 
-			this.menuItemProcLockTool.Index = 4;
+			this.menuItemProcLockTool.Index = 5;
 			this.menuItemProcLockTool.Text = "Procedure Lock Tool";
 			this.menuItemProcLockTool.Click += new System.EventHandler(this.menuItemProcLockTool_Click);
 			// 
 			// menuItemShutdown
 			// 
-			this.menuItemShutdown.Index = 5;
+			this.menuItemShutdown.Index = 6;
 			this.menuItemShutdown.Text = "Shutdown All Workstations";
 			this.menuItemShutdown.Click += new System.EventHandler(this.menuItemShutdown_Click);
 			// 
 			// menuTelephone
 			// 
-			this.menuTelephone.Index = 6;
+			this.menuTelephone.Index = 7;
 			this.menuTelephone.Text = "Telephone Numbers";
 			this.menuTelephone.Click += new System.EventHandler(this.menuTelephone_Click);
 			// 
 			// menuItemTestLatency
 			// 
-			this.menuItemTestLatency.Index = 7;
+			this.menuItemTestLatency.Index = 8;
 			this.menuItemTestLatency.Text = "Test Latency";
 			this.menuItemTestLatency.Click += new System.EventHandler(this.menuItemTestLatency_Click);
 			// 
 			// menuItemXChargeReconcile
 			// 
-			this.menuItemXChargeReconcile.Index = 8;
+			this.menuItemXChargeReconcile.Index = 9;
 			this.menuItemXChargeReconcile.Text = "X-Charge Reconcile";
 			this.menuItemXChargeReconcile.Visible = false;
 			this.menuItemXChargeReconcile.Click += new System.EventHandler(this.menuItemXChargeReconcile_Click);
@@ -5821,6 +5830,15 @@ namespace OpenDental{
 			//Security log entries are made from within the form.
 		}
 
+		private void menuItemMoveSubscribers_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.InsPlanChangeSubsc)) {
+				return;
+			}
+			FormSubscriberMove formSM=new FormSubscriberMove();
+			formSM.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.InsPlanChangeSubsc,0,"Subscriber Move");
+		}
+
 		private void menuItemProcLockTool_Click(object sender,EventArgs e) {
 			FormProcLockTool FormT=new FormProcLockTool();
 			FormT.ShowDialog();
@@ -6657,7 +6675,6 @@ namespace OpenDental{
 				formMapHQ.SetTriageUrgent(countRedTasks,urgentTriageBehind);
 			}
 		}
-		
 		#endregion
 
 		private void TryNonPatientPopup() {
@@ -6675,7 +6692,6 @@ namespace OpenDental{
 			}
 		}
 
-		
 		/// <summary>This is set to 30 seconds</summary>
 		private void timerWebHostSynch_Tick(object sender,EventArgs e) {
 			if(_isStartingUp) {//If the program is starting up it may be updating and we do not want to synch yet.

@@ -426,6 +426,12 @@
     <Compile Include="Forms\FormProcCodeEditMore.designer.cs">
       <DependentUpon>FormProcCodeEditMore.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormSubscriberMove .cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSubscriberMove .designer.cs">
+      <DependentUpon>FormSubscriberMove .cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormTaskHist.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3730,6 +3736,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcCodeEditMore.resx">
       <DependentUpon>FormProcCodeEditMore.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSubscriberMove .resx">
+      <DependentUpon>FormSubscriberMove .cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTaskHist.resx">
       <DependentUpon>FormTaskHist.cs</DependentUpon>

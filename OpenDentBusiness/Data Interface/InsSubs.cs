@@ -185,6 +185,14 @@ namespace OpenDentBusiness{
 			return Crud.InsSubCrud.SelectMany(command);
 		}
 
+		public static List<InsSub> GetListForPlanNum(long planNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<InsSub>>(MethodBase.GetCurrentMethod(),planNum);
+			}
+			string command="SELECT * FROM inssub WHERE PlanNum="+POut.Long(planNum);
+			return Crud.InsSubCrud.SelectMany(command);
+		}
+
 		///<summary>Only used once.  Gets a list of subscriber names from the database that have the specified plan. Used to display in the insplan window.  The returned list never includes the inssub that we're viewing.</summary>
 		public static string[] GetSubscribersForPlan(long planNum,long excludeSub) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -253,7 +261,94 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-
+		///<summary>Returns the number of subscribers moved.</summary>
+		public static long MoveSubscribers(long insPlanNumFrom,long insPlanNumTo) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),insPlanNumFrom,insPlanNumTo);
+			}
+			List<InsSub> listInsSubsFrom=GetListForPlanNum(insPlanNumFrom);
+			List<long> listBlockedPatNums=new List<long>();
+			//Perform the same validation as when the user manually drops insplans from FormInsPlan using the Drop button.
+			for(int i=0;i<listInsSubsFrom.Count;i++){
+				InsSub insSubFrom=listInsSubsFrom[i];
+				List<PatPlan> listPatPlanFrom=PatPlans.Refresh(insSubFrom.Subscriber);
+				for(int j=0;j<listPatPlanFrom.Count;j++) {
+					PatPlan patPlanFrom=listPatPlanFrom[j];
+					//The following comments and logic are copied from the FormInsPlan Drop button...
+					//If they have a claim for this ins with today's date, don't let them drop.
+					//We already have code in place to delete claimprocs when we drop ins, but the claimprocs attached to claims are protected.
+					//The claim clearly needs to be deleted if they are dropping.  We need the user to delete the claim before they drop the plan.
+					//We also have code in place to add new claimprocs when they add the correct insurance.
+					List<Claim> listClaims=Claims.Refresh(patPlanFrom.PatNum);//Get all claims for patient.
+					for(int k=0;k<listClaims.Count;k++) {
+						if(listClaims[k].PlanNum!=insPlanNumFrom) {//Make sure the claim is for the insurance plan we are about to change, not any other plans the patient might have.
+							continue;
+						}
+						if(listClaims[k].DateService!=DateTime.Today) {//not today
+							continue;
+						}
+						//Patient currently has a claim for the insplan they are trying to drop.
+						if(!listBlockedPatNums.Contains(patPlanFrom.PatNum)) {
+							listBlockedPatNums.Add(patPlanFrom.PatNum);
+						}
+					}
+				}
+			}
+			if(listBlockedPatNums.Count>0) {
+				StringBuilder sb=new StringBuilder();
+				for(int i=0;i<listBlockedPatNums.Count;i++) {
+					sb.Append("\r\n");
+					Patient pat=Patients.GetPat(listBlockedPatNums[i]);
+					sb.Append("#"+listBlockedPatNums[i]+" "+pat.GetNameFLFormal());
+				}
+				throw new ApplicationException(Lans.g("InsSubs","Before changing the subscribers on the insurance plan being moved from, please delete all of today's claims related to the insurance plan being moved from for the following patients")+":"+sb.ToString());
+			}
+			//This loop mimics some of the logic in PatPlans.Delete().
+			int insSubMovedCount=0;
+			for(int i=0;i<listInsSubsFrom.Count;i++){
+				InsSub inssub=listInsSubsFrom[i];
+				long oldInsSubNum=inssub.InsSubNum;
+				inssub.InsSubNum=0;//This will allow us to insert a new record.
+				inssub.PlanNum=insPlanNumTo;
+				inssub.DateEffective=DateTime.MinValue;
+				inssub.BenefitNotes="";
+				inssub.SubscNote="";
+				long insSubNumNew=InsSubs.Insert(inssub);
+				string command="SELECT PatNum FROM patplan WHERE InsSubNum="+POut.Long(oldInsSubNum);
+				DataTable tablePatsForInsSub=Db.GetTable(command);
+				if(tablePatsForInsSub.Rows.Count==0) {
+					continue;
+				}
+				insSubMovedCount++;
+				for(int j=0;j<tablePatsForInsSub.Rows.Count;j++) {
+					long patNum=PIn.Long(tablePatsForInsSub.Rows[j]["PatNum"].ToString());
+					List<PatPlan> listPatPlans=PatPlans.Refresh(patNum);
+					for(int k=0;k<listPatPlans.Count;k++) {
+						PatPlan patPlan=listPatPlans[k];
+						if(patPlan.InsSubNum==oldInsSubNum) {
+							command="DELETE FROM benefit WHERE PatPlanNum=" +POut.Long(patPlan.PatPlanNum);//Delete patient specific benefits (rare).
+							Db.NonQ(command);
+							patPlan.InsSubNum=insSubNumNew;
+							PatPlans.Update(patPlan);
+						}
+					}
+					//Now that the plan has changed for the current subscriber, recalculate estimates.
+					Family fam=Patients.GetFamily(patNum);
+					Patient pat=fam.GetPatient(patNum);
+					List<ClaimProc> listClaimProcs=ClaimProcs.Refresh(patNum);
+					List<Procedure> listProcs=Procedures.Refresh(patNum);
+					listPatPlans=PatPlans.Refresh(patNum);
+					List<InsSub> listInsSubs=InsSubs.RefreshForFam(fam);
+					List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+					List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
+					Procedures.ComputeEstimatesForAll(patNum,listClaimProcs,listProcs,listInsPlans,listPatPlans,listBenefits,pat.Age,listInsSubs);
+				}
+			}
+			InsPlan insPlanFrom=InsPlans.RefreshOne(insPlanNumFrom);
+			insPlanFrom.IsHidden=true;
+			InsPlans.Update(insPlanFrom);
+			return insSubMovedCount;
+		}
 
 	}
 }
