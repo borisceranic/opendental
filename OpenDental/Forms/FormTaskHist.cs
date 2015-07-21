@@ -36,16 +36,18 @@ namespace OpenDental {
 			gridTaskHist.Columns.Add(col);
 			gridTaskHist.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listTaskAudit.Count;i++) {
+			for(int i=1;i<_listTaskAudit.Count;i++) {
 				TaskHist taskHistCur=_listTaskAudit[i];
-				TaskHist taskHistOld=null;
-				if(i>0){
-					taskHistOld=_listTaskAudit[i-1];
-				}
+				TaskHist taskHistOld=_listTaskAudit[i-1];
 				row=new ODGridRow();
-				row.Cells.Add(taskHistCur.DateTimeEntry.ToString());
-				row.Cells.Add(taskHistCur.DateTStamp.ToString());
-				row.Cells.Add(Userods.GetUser(taskHistCur.UserNum).UserName);
+				if(taskHistOld.DateTimeEntry==DateTime.MinValue) {
+					row.Cells.Add(_listTaskAudit[i].DateTimeEntry.ToString());
+				}
+				else {
+					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
+				}
+				row.Cells.Add(taskHistOld.DateTStamp.ToString());
+				row.Cells.Add(Userods.GetUser(taskHistOld.UserNum).UserName);
 				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
 				gridTaskHist.Rows.Add(row);
 			}
@@ -54,7 +56,12 @@ namespace OpenDental {
 				TaskHist taskHistOld=_listTaskAudit[_listTaskAudit.Count-1];
 				TaskHist taskHistCur=new TaskHist(Tasks.GetOne(TaskNumCur));
 				row=new ODGridRow();
-				row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
+				if(taskHistOld.DateTimeEntry==DateTime.MinValue) {
+					row.Cells.Add(taskHistCur.DateTimeEntry.ToString());
+				}
+				else {
+					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
+				}
 				row.Cells.Add(taskHistOld.DateTStamp.ToString());
 				row.Cells.Add(Userods.GetUser(taskHistOld.UserNum).UserName);
 				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
