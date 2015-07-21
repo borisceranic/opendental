@@ -1306,7 +1306,9 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Web References\WebServiceMainHQ\WebServiceMainHQ.wsdl" />
+    <None Include="Web References\WebServiceMainHQ\WebServiceMainHQ.wsdl">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferenceUrl Include="http://localhost/OpenDentalServer/ServiceMain.asmx">
@@ -1320,10 +1322,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OpenDentBusiness_OpenDentalServer_ServiceMain</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx">
+    <WebReferenceUrl Include="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\WebServiceMainHQ\</RelPath>
-      <UpdateFromURL>http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx</UpdateFromURL>
+      <UpdateFromURL>http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Results>
-    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.DiscoveryDocumentReference" url="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx?disco" filename="webservicemainhq.disco" />
-    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://www.patientviewer.com/opendentalwebservicehq/webservicemainhq.asmx?wsdl" filename="webservicemainhq.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx?wsdl" filename="webservicemainhq.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.DiscoveryDocumentReference" url="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx?disco" filename="webservicemainhq.disco" />
   </Results>
 </DiscoveryClientResultsFile>
