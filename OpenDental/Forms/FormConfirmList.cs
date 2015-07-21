@@ -23,7 +23,7 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
-		private System.ComponentModel.Container components = null;
+		private IContainer components;
 		///<summary>Will be set to true when form closes if user click Send to Pinboard.</summary>
 		public bool PinClicked=false;
 		private OpenDental.UI.Button butReport;
@@ -37,8 +37,6 @@ namespace OpenDental{
 		private OpenDental.ValidDate textDateFrom;
 		private OpenDental.ValidDate textDateTo;
 		private OpenDental.UI.ODGrid gridMain;
-		///<summary>When this form closes, this will be the patNum of the last patient viewed.  The calling form should then make use of this to refresh to that patient.  If 0, then calling form should not refresh.</summary>
-		public long SelectedPatNum;
 		///<summary>This list of appointments displayed</summary>
 		private DataTable Table;
 		private PrintDocument pd;
@@ -53,9 +51,8 @@ namespace OpenDental{
 		private Label labelClinic;
 		private ComboBox comboShowRecall;
 		private UI.Button butText;
-		///<summary>Only used if PinClicked=true</summary>
-		public long AptSelected;
 		private List<Clinic> _listUserClinics;
+		private ContextMenuStrip _menuRightClick;
 		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary></summary>
@@ -78,6 +75,7 @@ namespace OpenDental{
 
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormConfirmList));
 			this.butClose = new OpenDental.UI.Button();
 			this.butRefresh = new OpenDental.UI.Button();
@@ -100,6 +98,7 @@ namespace OpenDental{
 			this.butPrint = new OpenDental.UI.Button();
 			this.butEmail = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
+			this._menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.groupBox1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
@@ -164,7 +163,7 @@ namespace OpenDental{
             "All",
             "Recall Only",
             "Exclude Recall",
-						"Hygiene Prescheduled"});
+            "Hygiene Prescheduled"});
 			this.comboShowRecall.Location = new System.Drawing.Point(29, 38);
 			this.comboShowRecall.Name = "comboShowRecall";
 			this.comboShowRecall.Size = new System.Drawing.Size(121, 21);
@@ -309,11 +308,12 @@ namespace OpenDental{
 			this.butPostcards.Text = "Postcard Preview";
 			this.butPostcards.Click += new System.EventHandler(this.butPostcards_Click);
 			// 
-			// grid
+			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(4, 69);
-			this.gridMain.Name = "grid";
+			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
 			this.gridMain.Size = new System.Drawing.Size(963, 585);
@@ -323,6 +323,7 @@ namespace OpenDental{
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellClick);
 			this.gridMain.Click += new System.EventHandler(this.grid_Click);
+			this.gridMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridMain_MouseUp);
 			// 
 			// butPrint
 			// 
@@ -375,6 +376,11 @@ namespace OpenDental{
 			this.butText.Text = "Text";
 			this.butText.Click += new System.EventHandler(this.butText_Click);
 			// 
+			// _menuRightClick
+			// 
+			this._menuRightClick.Name = "_menuRightClick";
+			this._menuRightClick.Size = new System.Drawing.Size(61, 4);
+			// 
 			// FormConfirmList
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -392,9 +398,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimizeBox = false;
 			this.Name = "FormConfirmList";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Confirmation List";
 			this.Load += new System.EventHandler(this.FormConfirmList_Load);
@@ -407,6 +411,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormConfirmList_Load(object sender, System.EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			comboShowRecall.SelectedIndex=0;//Default to show all.
 			textDateFrom.Text=AddWorkDays(1,DateTime.Today).ToShortDateString();
 			textDateTo.Text=AddWorkDays(2,DateTime.Today).ToShortDateString();
@@ -444,7 +449,81 @@ namespace OpenDental{
 				butText.Enabled=false;
 			}
 			FillMain();
+			_menuRightClick.Items.Clear();
+			_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
+			Cursor=Cursors.Default;
 			Plugins.HookAddCode(this,"FormConfirmList.Load_End",butText);
+		}
+
+		private void menuRight_click(object sender,System.EventArgs e) {
+			switch(_menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
+				case 0:
+					SelectPatient_Click();
+					break;
+				case 1:
+					SeeChart_Click();
+					break;
+				case 2:
+					SendPinboard_Click();
+					break;
+				case 3:
+					Delete_Click();
+					break;
+			}
+		}
+
+		private void SelectPatient_Click() {
+			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			long patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]]["PatNum"].ToString());
+			Patient pat=Patients.GetPat(patNum);
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
+		}
+
+		private void gridMain_MouseUp(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right && gridMain.SelectedIndices.Length>0) {
+				_menuRightClick.Show(gridMain,new Point(e.X,e.Y));
+			}
+		}
+
+		///<summary>If multiple patients are selected in UnchedList, will select the last patient to remain consistent with sending to pinboard behavior.</summary>
+		private void SeeChart_Click() {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			long patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]]["PatNum"].ToString());
+			Patient pat=Patients.GetPat(patNum);
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
+			GotoModule.GotoChart(pat.PatNum);
+		}
+
+		private void SendPinboard_Click() {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			List<long> listAptSelected=new List<long>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listAptSelected.Add(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
+			}
+			//This will send all appointments in listAptSelected to the pinboard, and will select the patient attached to the last appointment.
+			GotoModule.PinToAppt(listAptSelected,0);
+		}
+
+		private void Delete_Click() {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete appointments?")) {
+				return;
+			}
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				Appointments.Delete(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
+			}
+			FillMain();
 		}
 
 		///<summary>Adds the specified number of work days, skipping saturday and sunday.</summary>
@@ -538,7 +617,6 @@ namespace OpenDental{
 
 		private void grid_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			//row selected before this event triggered
-			SelectedPatNum=PIn.Long(Table.Rows[e.Row]["PatNum"].ToString());
 			SetFamilyColors();
 			comboStatus.SelectedIndex=-1;
 		}
@@ -573,20 +651,17 @@ namespace OpenDental{
 		}
 
 		private void grid_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			SelectedPatNum=PIn.Long(Table.Rows[e.Row]["PatNum"].ToString());
 			Cursor=Cursors.WaitCursor;
 			long selectedApt=PIn.Long(Table.Rows[e.Row]["AptNum"].ToString());
-			Patient pat=Patients.GetPat(SelectedPatNum);
+			Patient pat=Patients.GetPat(PIn.Long(Table.Rows[e.Row]["PatNum"].ToString()));
 			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
 			PatientGoTo(this,eArgs);
 			FormApptEdit FormA=new FormApptEdit(selectedApt);
 			FormA.PinIsVisible=true;
 			FormA.ShowDialog();
-			if(FormA.PinClicked) {
-				PinClicked=true;
-				AptSelected=selectedApt;
+			if(FormA.PinClicked) {//set from inside form.
+				SendPinboard_Click();//Whatever they double clicked on will still be selected, just fire the event.
 				DialogResult=DialogResult.OK;
-				return;
 			}
 			else {
 				FillMain();

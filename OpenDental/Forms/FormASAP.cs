@@ -11,7 +11,7 @@ using OpenDental.UI;
 namespace OpenDental{
 ///<summary></summary>
 	public class FormASAP:System.Windows.Forms.Form {
-		private System.ComponentModel.Container components = null;
+		private IContainer components;
 		private OpenDental.UI.Button butClose;
 		///<summary></summary>
 		public bool PinClicked=false;		
@@ -37,6 +37,7 @@ namespace OpenDental{
 		private Label labelClinic;
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
+		private ContextMenuStrip _menuRightClick;
 		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary></summary>
@@ -62,6 +63,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormASAP));
 			this.butClose = new OpenDental.UI.Button();
 			this.grid = new OpenDental.UI.ODGrid();
@@ -73,6 +75,7 @@ namespace OpenDental{
 			this.labelSite = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this._menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -92,6 +95,7 @@ namespace OpenDental{
 			// 
 			// grid
 			// 
+			this.grid.HasMultilineHeaders = false;
 			this.grid.HScrollVisible = false;
 			this.grid.Location = new System.Drawing.Point(10, 57);
 			this.grid.Name = "grid";
@@ -101,6 +105,7 @@ namespace OpenDental{
 			this.grid.Title = "ASAP List";
 			this.grid.TranslationName = "TableASAP";
 			this.grid.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellDoubleClick);
+			this.grid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grid_MouseUp);
 			// 
 			// butPrint
 			// 
@@ -188,6 +193,11 @@ namespace OpenDental{
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// _menuRightClick
+			// 
+			this._menuRightClick.Name = "_menuRightClick";
+			this._menuRightClick.Size = new System.Drawing.Size(61, 4);
+			// 
 			// FormASAP
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -205,12 +215,9 @@ namespace OpenDental{
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
-			this.MinimizeBox = false;
 			this.Name = "FormASAP";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "ASAP List";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormASAP_FormClosing);
 			this.Load += new System.EventHandler(this.FormASAP_Load);
 			this.ResumeLayout(false);
 
@@ -218,6 +225,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormASAP_Load(object sender, System.EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			patientNames=Patients.GetAllPatientNames();
 			/*comboOrder.Items.Add(Lan.g(this,"Status"));
 			comboOrder.Items.Add(Lan.g(this,"Alphabetical"));
@@ -260,6 +268,36 @@ namespace OpenDental{
 				}
 			}
 			FillGrid();
+			_menuRightClick.Items.Clear();
+			//Menu items added dynamically so that we can translate each menu item.  We do not do Lan.F() here, and it would not help anyway.
+			_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
+			Cursor=Cursors.Default;
+		}
+
+		private void menuRight_click(object sender,System.EventArgs e) {
+			switch(_menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
+				case 0:
+					SelectPatient_Click();
+					break;
+				case 1:
+					SeeChart_Click();
+					break;
+				case 2:
+					SendPinboard_Click();
+					break;
+				case 3:
+					Delete_Click();
+					break;
+			}
+		}
+
+		private void SelectPatient_Click() {
+			Patient pat=Patients.GetPat(ListASAP[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs);
 		}
 
 		private void FillGrid(){
@@ -335,6 +373,46 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void grid_MouseUp(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right && grid.SelectedIndices.Length>0) {
+				_menuRightClick.Show(grid,new Point(e.X,e.Y));
+			}
+		}		
+
+		///<summary>If multiple patients are selected in the list, it will use the last patient to show the chart for.</summary>
+		private void SeeChart_Click() {
+			if(grid.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			Patient pat=Patients.GetPat(ListASAP[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum); //If multiple selected, just use the last one.
+			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
+			PatientGoTo(this,eArgs); //Selects the patient in OpenDental.
+			GotoModule.GotoChart(pat.PatNum);
+		}
+
+		private void Delete_Click() {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete appointments?")) {
+				return;
+			}
+			for(int i=0;i<grid.SelectedIndices.Length;i++) {
+				Appointments.Delete(ListASAP[grid.SelectedIndices[i]].AptNum);
+			}
+			FillGrid();
+		}
+
+		private void SendPinboard_Click() {
+			if(grid.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select an appointment first.");
+				return;
+			}
+			List<long> listAptSelected=new List<long>();
+			for(int i=0;i<grid.SelectedIndices.Length;i++) {
+				listAptSelected.Add(ListASAP[grid.SelectedIndices[i]].AptNum);
+			}
+			GotoModule.PinToAppt(listAptSelected,0); //Pins all appointments to the pinboard that were in listAptSelected.
+		}
+
 		private void grid_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			int currentSelection=e.Row;
 			int currentScroll=grid.ScrollValue;
@@ -349,8 +427,7 @@ namespace OpenDental{
 				return;
 			}
 			if(FormAE.PinClicked) {
-				PinClicked=true;
-				AptSelected=ListASAP[e.Row].AptNum;
+				SendPinboard_Click(); //Whatever they double clicked on will still be selected, just fire the event to send it to the pinboard.
 				DialogResult=DialogResult.OK;
 			}
 			else {
@@ -427,23 +504,6 @@ namespace OpenDental{
 		private void butClose_Click(object sender, System.EventArgs e) {
 			Close();
 		}
-
-		//private void FormASAP_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			
-		//}
-
-		private void FormASAP_FormClosing(object sender,FormClosingEventArgs e) {
-			//Patients.HList=null;
-			if(grid.SelectedIndices.Length==1) {
-				SelectedPatNum=ListASAP[grid.SelectedIndices[0]].PatNum;
-			}
-		}
-
-		
-
-		
-
-		
 
 	}
 }

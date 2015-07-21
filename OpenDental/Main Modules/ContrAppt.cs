@@ -149,6 +149,8 @@ namespace OpenDental {
 		private bool InitializedOnStartup;
 		private Patient PatCur;
 		private FormRecallList FormRecallL;
+		private FormASAP FormASAP;
+		private FormConfirmList FormConfirmL;
 		private OpenDental.UI.Button butGraph;
 		private Timer timerTests;
 		//private int stressCounter;
@@ -4271,23 +4273,18 @@ namespace OpenDental {
 		}
 
 		private void OnASAPList_Click() {
-			Cursor=Cursors.WaitCursor;
-			FormASAP FormA=new FormASAP();
-			FormA.PatientGoTo=PatientSelected;
-			FormA.Show(); 
-			if(FormA.PinClicked) {
-				SendToPinBoard(FormA.AptSelected);
+			if(FormASAP==null || FormASAP.IsDisposed) {
+				FormASAP=new FormASAP();
+				FormASAP.PatientGoTo=PatientSelected;
 			}
-			if(FormA.SelectedPatNum!=0) {
-				RefreshModuleDataPatient(FormA.SelectedPatNum);
-				OnPatientSelected(PatCur);
-				//RefreshModulePatient(FormA.SelectedPatNum);
+			FormASAP.Show();
+			if(FormASAP.WindowState==FormWindowState.Minimized) {
+				FormASAP.WindowState=FormWindowState.Normal;
 			}
-			Cursor=Cursors.Default;
+			FormASAP.BringToFront();
 		}
 
 		private void OnRecall_Click() {
-			//Cursor=Cursors.WaitCursor;
 			if(FormRecallL==null || FormRecallL.IsDisposed) {
 				FormRecallL=new FormRecallList();
 			}
@@ -4296,31 +4293,18 @@ namespace OpenDental {
 				FormRecallL.WindowState=FormWindowState.Normal;
 			}
 			FormRecallL.BringToFront();
-			//if(FormRL.PinClicked){
-			//	SendToPinBoard(FormRL.AptNumsSelected);
-			//}
-			//if(FormRL.SelectedPatNum!=0){
-			//	RefreshModuleDataPatient(FormRL.SelectedPatNum);
-			//	OnPatientSelected(PatCur.PatNum,PatCur.GetNameLF(),PatCur.Email!="",PatCur.ChartNumber);
-			//RefreshModulePatient(FormRL.SelectedPatNum);
-			//}
-			//Cursor=Cursors.Default;
 		}
 
 		private void OnConfirm_Click() {
-			Cursor=Cursors.WaitCursor;
-			FormConfirmList FormC=new FormConfirmList();
-			FormC.PatientGoTo=PatientSelected;
-			FormC.Show();
-			if(FormC.PinClicked) {
-				SendToPinBoard(FormC.AptSelected);
+			if(FormConfirmL==null || FormConfirmL.IsDisposed) {
+				FormConfirmL=new FormConfirmList();
+				FormConfirmL.PatientGoTo=PatientSelected;
 			}
-			if(FormC.SelectedPatNum!=0) {
-				RefreshModuleDataPatient(FormC.SelectedPatNum);
-				OnPatientSelected(PatCur);
-				//RefreshModulePatient(FormC.SelectedPatNum);
+			FormConfirmL.Show();
+			if(FormConfirmL.WindowState==FormWindowState.Minimized) {
+				FormConfirmL.WindowState=FormWindowState.Normal;
 			}
-			Cursor=Cursors.Default;
+			FormConfirmL.BringToFront();
 		}
 
 		private void OnTrack_Click() {
