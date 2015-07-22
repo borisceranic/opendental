@@ -1387,7 +1387,7 @@ namespace OpenDentBusiness{
 					if(timePattern[j]=='/') {//Don't worry about HYG conflicts.
 						continue;
 					}
-					if(!listProviderSchedules[i].ProvBar[startingIncrement+j]) {//False means there is a collision in the providers schedule.
+					if(!listProviderSchedulesForProv[i].ProvBar[startingIncrement+j]) {//False means there is a collision in the providers schedule.
 						return true;
 					}
 				}
