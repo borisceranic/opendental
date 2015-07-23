@@ -41,7 +41,7 @@ provider.Abbr, ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				queryIns+="clinic.Description clinicDesc, ";
 			}
-			queryIns+=@"claimpayment.CheckNum,FORMAT(SUM(claimproc.InsPayAmt),2) amt,claimproc.ClaimNum,claimpayment.PayType 
+			queryIns+=@"claimpayment.CheckNum,SUM(claimproc.InsPayAmt) amt,claimproc.ClaimNum,claimpayment.PayType 
 				FROM claimproc
 				LEFT JOIN insplan ON claimproc.PlanNum = insplan.PlanNum 
 				LEFT JOIN patient ON claimproc.PatNum = patient.PatNum
@@ -103,7 +103,7 @@ provider.Abbr, ";
 				queryPat+="clinic.Description clinicDesc, ";
 			}
 			queryPat+=@"payment.CheckNum,
-				FORMAT(SUM(paysplit.SplitAmt),2) amt, payment.PayNum,ItemName,payment.PayType 
+				SUM(paysplit.SplitAmt) amt, payment.PayNum,ItemName,payment.PayType 
 				FROM payment
 				LEFT JOIN paysplit ON payment.PayNum=paysplit.PayNum
 				LEFT JOIN patient ON payment.PatNum=patient.PatNum
