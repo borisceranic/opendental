@@ -251,7 +251,7 @@ namespace CentralManager {
 				for(int j=0;j<Clinics.List.Length;j++) {
 					listClinicNums.Add(Clinics.List[j].ClinicNum);
 				}
-				listProdData.Add(RpProdInc.GetAnnualDataForClinics(_dateFrom,_dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,true,true));
+                listProdData.Add(RpProdInc.GetAnnualData(_dateFrom, _dateTo, listProvNums, listClinicNums, radioWriteoffPay.Checked, true, true));
 				if(ConnList[i].ServiceURI!="") {
 					listServerNames.Add(ConnList[i].ServiceURI);
 				}
