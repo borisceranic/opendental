@@ -90,25 +90,11 @@ provider.Abbr, ";
 			//patient payments-----------------------------------------------------------------------------------------
 			string whereProv="";
 			if(!hasAllProvs) {
-				whereProv+=" AND paysplit.ProvNum IN(";
-				for(int i=0;i<listProvNums.Count;i++) {
-					if(i>0) {
-						whereProv+=",";
-					}
-					whereProv+=POut.Long(listProvNums[i]);
-				}
-				whereProv+=") ";
+				whereProv+=" AND paysplit.ProvNum IN("+string.Join(",",listProvNums)+") ";
 			}
 			string whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				whereClin+=" AND payment.ClinicNum IN(";
-				for(int i=0;i<listClinicNums.Count;i++) {
-					if(i>0) {
-						whereClin+=",";
-					}
-					whereClin+=POut.Long(listClinicNums[i]);
-				}
-				whereClin+=") ";
+				whereClin+=" AND paysplit.ClinicNum IN("+string.Join(",",listClinicNums)+") ";
 			}
 			string queryPat=
 				@"SELECT payment.PayDate DatePay,MAX("
@@ -143,7 +129,7 @@ provider.Abbr, ";
 			}
 			queryPat+=@"GROUP BY payment.PayNum,payment.PayDate,provider.ProvNum,";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				queryPat+="payment.ClinicNum,clinic.Description,";
+				queryPat+="paysplit.ClinicNum,clinic.Description,";
 			}
 			queryPat+="provider.Abbr,payment.CheckNum,definition.ItemName";
 			if(isGroupedByPatient) {
