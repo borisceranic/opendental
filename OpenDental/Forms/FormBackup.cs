@@ -543,7 +543,7 @@ namespace OpenDental{
 				return;
 			}
 			if(_errorMessage=="") {
-				SecurityLogs.MakeLogEntry(Permissions.Copy,0,"Database backup created at "+PrefC.GetString(PrefName.BackupToPath));
+				SecurityLogs.MakeLogEntry(Permissions.Backup,0,Lan.g(this,"Database backup created at ")+textBackupToPath.Text);
 				MessageBox.Show(Lan.g(this,"Backup complete."));
 			}
 			else {//Backup failed for some reason.

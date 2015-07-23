@@ -913,6 +913,7 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.Backup)){
 				return;
 			}
+			SecurityLogs.MakeLogEntry(Permissions.Backup,0,"FormBackup was accessed");
 			FormBackup FormB=new FormBackup();
 			FormB.ShowDialog();
 			if(FormB.DialogResult==DialogResult.Cancel){

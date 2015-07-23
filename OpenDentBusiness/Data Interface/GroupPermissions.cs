@@ -212,7 +212,7 @@ namespace OpenDentBusiness{
 				//case Permissions.AppointmentCreate:
 				//case Permissions.AppointmentMove:
 				//case Permissions.AppointmentEdit:
-				case Permissions.Backup:
+				//case Permissions.Backup:
 				case Permissions.TimecardsEditAll:
 				//case Permissions.DepositSlips:
 				//case Permissions.AccountingEdit:
