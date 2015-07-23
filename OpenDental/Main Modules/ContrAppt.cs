@@ -3960,6 +3960,11 @@ namespace OpenDental {
 					ModuleSelected(patnum);//apt.PatNum);//apt might be null if user deleted appt.
 					SetInvalid();
 				}
+				else if(FormAE.DialogResult==DialogResult.Cancel && FormAE.HasProcsChangedAndCancel) { //If user canceled but changed the procs on appt first
+					//Refresh the grid, don't need to check length because it didn't change.  Plus user might not want to change length.
+					ModuleSelected(patnum);
+					SetInvalid();
+				}
 			}
 			//not on apt, so trying to schedule an appointment---------------------------------------------------------------------
 			else {

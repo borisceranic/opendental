@@ -124,6 +124,12 @@ namespace OpenDental{
 		public bool IsInViewPatAppts;
 		///<summary>Matches list of appointments in comboAppointmentType. Does not include hidden types unless current appointment is of that type.</summary>
 		private List<AppointmentType> _listAppointmentType;
+		///<summary>If the appt IsNew and the delete button was clicked.
+		///Set on Delete button click, and used in Form_Closing so we don't delete again.</summary>
+		private bool _isNewApptDeleted;
+		///<summary>Procedure were attached/detached from appt and the user clicked cancel or closed the form.
+		///Used in ApptModule to tell if we need to refresh.</summary>
+		public bool HasProcsChangedAndCancel;
 
 		///<summary></summary>
 		public FormApptEdit(long aptNum)
@@ -1443,6 +1449,8 @@ namespace OpenDental{
 					comboApptType.SelectedIndex=_listAppointmentType.Count;//-1 for 0 index, +1 for adding none to list.
 				}
 			}
+			_isNewApptDeleted=false;
+			HasProcsChangedAndCancel=false;
 			FillProcedures();
 			SetProceduresForECW();
 			FillPatient();//Must be after FillProcedures(), so that the initial amount for the appointment can be calculated.
@@ -2610,57 +2618,7 @@ namespace OpenDental{
 			AptCur.DateTimeSeated=dateTimeSeated;
 			AptCur.DateTimeDismissed=dateTimeDismissed;
 			//AptCur.InsPlan1 and InsPlan2 already handled 
-			//The ApptProcDescript region is also in FormProcEdit.SaveAndClose() and FormDatabaseMaintenance.butApptProcs_Click()  Make any changes there as well.
-			#region ApptProcDescript
-			AptCur.ProcDescript="";
-			AptCur.ProcsColored="";
-			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				string procDescOne="";
-				string procCode=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString();
-				if(i>0){
-					AptCur.ProcDescript+=", ";
-				}
-				switch(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["TreatArea"].ToString()) {
-				  case "1"://TreatmentArea.Surf:
-				    procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-"
-				      +DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//""#12-MOD-"
-				    break;
-				  case "2"://TreatmentArea.Tooth:
-				    procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-";//"#12-"
-				    break;
-				  default://area 3 or 0 (mouth)
-				    break;
-				  case "4"://TreatmentArea.Quad:
-				    procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"UL-"
-				    break;
-				  case "5"://TreatmentArea.Sextant:
-				    procDescOne+="S"+DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"S2-"
-				    break;
-				  case "6"://TreatmentArea.Arch:
-				    procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"U-"
-				    break;
-				  case "7"://TreatmentArea.ToothRange:
-				    //strLine+=table.Rows[j][13].ToString()+" ";//don't show range
-				    break;
-				}
-				procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["AbbrDesc"].ToString();
-				AptCur.ProcDescript+=procDescOne;
-				//Color and previous date are determined by ProcApptColor object
-				ProcApptColor pac=ProcApptColors.GetMatch(procCode);
-				System.Drawing.Color pColor=System.Drawing.Color.Black;
-				string prevDateString="";
-				if(pac!=null){
-					pColor=pac.ColorText;
-					if(pac.ShowPreviousDate) {
-						prevDateString=Procedures.GetRecentProcDateString(AptCur.PatNum,AptCur.AptDateTime,pac.CodeRange);
-						if(prevDateString!="") {
-							prevDateString=" ("+prevDateString+")";
-						}
-					}
-				}
-				AptCur.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
-			}
-			#endregion
+			SetProcDescript();
 			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
 			if(comboApptType.SelectedIndex==0) {//0 index = none.
 				AptCur.AppointmentTypeNum=0;
@@ -2786,6 +2744,59 @@ namespace OpenDental{
 				AutomationL.Trigger(AutomationTrigger.BreakAppointment,null,pat.PatNum);
 			}
 			return true;
+		}
+
+		///<summary>This code is also in FormProcEdit.SaveAndClose() and FormDatabaseMaintenance.butApptProcs_Click().  Make any changes there as well.
+		///Consider moving all of this logic into Appointments.cs at some point, so we do not have to keep editing in multiple places.</summary>
+		private void SetProcDescript() {
+			AptCur.ProcDescript="";
+			AptCur.ProcsColored="";
+			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
+				string procDescOne="";
+				string procCode=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString();
+				if(i>0) {
+					AptCur.ProcDescript+=", ";
+				}
+				switch(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["TreatArea"].ToString()) {
+					case "1"://TreatmentArea.Surf:
+						procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-"
+				      +DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//""#12-MOD-"
+						break;
+					case "2"://TreatmentArea.Tooth:
+						procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-";//"#12-"
+						break;
+					default://area 3 or 0 (mouth)
+						break;
+					case "4"://TreatmentArea.Quad:
+						procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"UL-"
+						break;
+					case "5"://TreatmentArea.Sextant:
+						procDescOne+="S"+DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"S2-"
+						break;
+					case "6"://TreatmentArea.Arch:
+						procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"U-"
+						break;
+					case "7"://TreatmentArea.ToothRange:
+						//strLine+=table.Rows[j][13].ToString()+" ";//don't show range
+						break;
+				}
+				procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["AbbrDesc"].ToString();
+				AptCur.ProcDescript+=procDescOne;
+				//Color and previous date are determined by ProcApptColor object
+				ProcApptColor pac=ProcApptColors.GetMatch(procCode);
+				System.Drawing.Color pColor=System.Drawing.Color.Black;
+				string prevDateString="";
+				if(pac!=null) {
+					pColor=pac.ColorText;
+					if(pac.ShowPreviousDate) {
+						prevDateString=Procedures.GetRecentProcDateString(AptCur.PatNum,AptCur.AptDateTime,pac.CodeRange);
+						if(prevDateString!="") {
+							prevDateString=" ("+prevDateString+")";
+						}
+					}
+				}
+				AptCur.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
+			}
 		}
 
 		///<summary>Tests all appts for the day, even not visible, to make sure AptCur doesn't overlap others. Pass in the pattern for the appt being edited and the list of appts to test against.</summary>
@@ -3242,6 +3253,7 @@ namespace OpenDental{
 				"Delete for date/time: "+AptCur.AptDateTime.ToString(),
 				AptCur.AptNum);
 			if(IsNew){
+				_isNewApptDeleted=true;  //Appt was deleted, don't delete again in Form_Closing
 				//The dialog is considered cancelled when a new appointment is immediately deleted.
 			  DialogResult=DialogResult.Cancel;
 			}
@@ -3367,7 +3379,18 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,
 						"Create cancel for date/time: "+AptCur.AptDateTime.ToString(),
 						AptCur.AptNum);
-					Appointments.Delete(AptCur.AptNum);
+					if(!_isNewApptDeleted) {  //If the appt wasn't already deleted
+						Appointments.Delete(AptCur.AptNum);
+					}
+				}
+				else {  //User clicked cancel on an existing appt
+					//We need to update the Appointment.ProcDescript even though user clicked cancel.  Procedures could have been attached/detached.
+					AptCur=AptOld.Clone();  //We do not want to save any other changes made in this form.
+					SetProcDescript();
+					if(AptCur.ProcsColored!=AptOld.ProcsColored || AptCur.ProcDescript!=AptOld.ProcDescript) {
+						Appointments.Update(AptCur,AptOld);
+						HasProcsChangedAndCancel=true; //Let the Appt module know we need to refresh because the Appt.ProcDescript changed.
+					}
 				}
 			}
 			Recalls.Synch(AptCur.PatNum);
