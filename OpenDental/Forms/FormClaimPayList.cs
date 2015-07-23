@@ -64,7 +64,9 @@ namespace OpenDental {
 				col=new ODGridColumn(Lan.g(this,"Clinic"),100);
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g(this,"Note"),100);
+			col=new ODGridColumn(Lan.g(this,"Note"),180);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Scanned"),60,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);			
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -84,6 +86,7 @@ namespace OpenDental {
 					row.Cells.Add(Clinics.GetDesc(ListClaimPay[i].ClinicNum));
 				}
 				row.Cells.Add(ListClaimPay[i].Note);
+				row.Cells.Add(EobAttaches.Exists(ListClaimPay[i].ClaimPaymentNum)?"X":"");
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
