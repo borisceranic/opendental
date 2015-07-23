@@ -28,7 +28,7 @@ namespace OpenDental{
 		private CheckBox checkAllClin;
 		private ListBox listClin;
 		private Label labelClin;
-		private Label label2;
+		private Label labelSplits;
 		private ListBox listInsuranceTypes;
 		private CheckBox checkAllProv;
 		private List<Clinic> _listClinics;
@@ -64,7 +64,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkAllProv = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.label2 = new System.Windows.Forms.Label();
+			this.labelSplits = new System.Windows.Forms.Label();
 			this.radioPatient = new System.Windows.Forms.RadioButton();
 			this.radioCheck = new System.Windows.Forms.RadioButton();
 			this.checkPatientTypes = new System.Windows.Forms.CheckBox();
@@ -132,7 +132,7 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.label2);
+			this.groupBox1.Controls.Add(this.labelSplits);
 			this.groupBox1.Controls.Add(this.radioPatient);
 			this.groupBox1.Controls.Add(this.radioCheck);
 			this.groupBox1.Location = new System.Drawing.Point(31, 263);
@@ -142,13 +142,13 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Group By";
 			// 
-			// label2
+			// labelSplits
 			// 
-			this.label2.Location = new System.Drawing.Point(5, 60);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(163, 29);
-			this.label2.TabIndex = 55;
-			this.label2.Text = "Either way, provider splits will still show separately.";
+			this.labelSplits.Location = new System.Drawing.Point(5, 60);
+			this.labelSplits.Name = "labelSplits";
+			this.labelSplits.Size = new System.Drawing.Size(163, 29);
+			this.labelSplits.TabIndex = 55;
+			this.labelSplits.Text = "Either way, provider splits will still show separately.";
 			// 
 			// radioPatient
 			// 
@@ -330,6 +330,7 @@ namespace OpenDental{
 						listClin.SetSelected(curIndex,true);
 					}
 				}
+				labelSplits.Text=Lan.g(this,"Either way, provider and clinic splits will still show separately.");
 			}
 			for(int i=0;i<DefC.Short[(int)DefCat.PaymentTypes].Length;i++) {
 				listPatientTypes.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
@@ -530,7 +531,7 @@ namespace OpenDental{
 			query.AddColumn("Date",90,FieldValueType.Date,font);
 			//query.GetColumnDetail("Date").SuppressIfDuplicate = true;
 			query.GetColumnDetail("Date").StringFormat="d";
-			query.AddColumn("Patient Name",270,FieldValueType.String,font);
+			query.AddColumn("Paying Patient",270,FieldValueType.String,font);
 			query.AddColumn("Provider",90,FieldValueType.String,font);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				query.AddColumn("Clinic",120,FieldValueType.String,font);
