@@ -127,7 +127,6 @@ namespace OpenDental{
 			this.checkIsGlobal.Text = "Use Global Fees";
 			this.checkIsGlobal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsGlobal.UseVisualStyleBackColor = true;
-			this.checkIsGlobal.Visible = false;
 			this.checkIsGlobal.Click += new System.EventHandler(this.checkIsGlobal_Click);
 			// 
 			// butOK
@@ -205,11 +204,8 @@ namespace OpenDental{
 				}
 			}
 			checkIsHidden.Checked=FeeSchedCur.IsHidden;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)){//Not no clinics (Yes clinics)
-				checkIsGlobal.Visible=true;
-				if(FormOpenDental.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
-					checkIsGlobal.Enabled=true;
-				}
+			if(FormOpenDental.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
+				checkIsGlobal.Enabled=true;
 			}
 			checkIsGlobal.Checked=FeeSchedCur.IsGlobal;
 		}
