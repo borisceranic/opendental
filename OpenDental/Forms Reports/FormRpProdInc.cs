@@ -683,13 +683,13 @@ namespace OpenDental{
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetDailyDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetDailyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
 			DataTable dtClinic=new DataTable();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				dtClinic=ds.Tables["Clinic"];
 			}
-			ReportComplex report=new ReportComplex(true,true);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="DailyP&I";
 			report.AddTitle("Title",Lan.g(this,"Daily Production and Income"));
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
@@ -743,23 +743,23 @@ namespace OpenDental{
 			// add columns to report
 			query.AddColumn("Day",75,FieldValueType.String);
 			query.AddColumn("Name",120,FieldValueType.String);
-			query.AddColumn("Description",120,FieldValueType.String);
-			query.AddColumn("Production",120,FieldValueType.Number);
-			query.AddColumn("Adjustments",120,FieldValueType.Number);
-			query.AddColumn("Writeoffs",120,FieldValueType.Number);
-			query.AddColumn("Pat Payments",120,FieldValueType.Number);
-			query.AddColumn("Ins Payments",120,FieldValueType.Number);
+			query.AddColumn("Description",90,FieldValueType.String);
+			query.AddColumn("Production",90,FieldValueType.Number);
+			query.AddColumn("Adjustments",90,FieldValueType.Number);
+			query.AddColumn("Writeoffs",90,FieldValueType.Number);
+			query.AddColumn("Pat Payments",90,FieldValueType.Number);
+			query.AddColumn("Ins Payments",90,FieldValueType.Number);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Day",75,FieldValueType.String);
 				query.AddColumn("Name",120,FieldValueType.String);
-				query.AddColumn("Description",120,FieldValueType.String);
-				query.AddColumn("Production",120,FieldValueType.Number);
-				query.AddColumn("Adjustments",120,FieldValueType.Number);
-				query.AddColumn("Writeoffs",120,FieldValueType.Number);
-				query.AddColumn("Pat Payments",120,FieldValueType.Number);
-				query.AddColumn("Ins Payments",120,FieldValueType.Number);
+				query.AddColumn("Description",90,FieldValueType.String);
+				query.AddColumn("Production",90,FieldValueType.Number);
+				query.AddColumn("Adjustments",90,FieldValueType.Number);
+				query.AddColumn("Writeoffs",90,FieldValueType.Number);
+				query.AddColumn("Pat Payments",90,FieldValueType.Number);
+				query.AddColumn("Ins Payments",90,FieldValueType.Number);
 			}
 			report.AddPageNum();
 			// execute query
@@ -808,13 +808,13 @@ namespace OpenDental{
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetMonthlyDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetMonthlyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
 			DataTable dtClinic=new DataTable();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				dtClinic=ds.Tables["Clinic"];
 			}
-			ReportComplex report=new ReportComplex(true,true);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="MonthlyP&I";
 			report.AddTitle("Title",Lan.g(this,"Monthly Production and Income"));
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
@@ -866,29 +866,36 @@ namespace OpenDental{
 				query=report.AddQuery(dt,"","",SplitByKind.None,1,true);
 			}
 			// add columns to report
-			query.AddColumn("Date",80,FieldValueType.String);
-			query.AddColumn("Weekday",80,FieldValueType.String);
-			query.AddColumn("Production",100,FieldValueType.Number);
-			query.AddColumn("Scheduled",100,FieldValueType.Number);
-			query.AddColumn("Adjustments",100,FieldValueType.Number);
-			query.AddColumn("Writeoff",100,FieldValueType.Number);
-			query.AddColumn("Tot Prod",100,FieldValueType.Number);
-			query.AddColumn("Pt Income",100,FieldValueType.Number);
-			query.AddColumn("Ins Income",100,FieldValueType.Number);
-			query.AddColumn("Total Income",100,FieldValueType.Number);
+			Font font=new Font("Tahoma",8,FontStyle.Regular);
+			query.AddColumn("Date",70,FieldValueType.String,font);
+			query.AddColumn("Weekday",70,FieldValueType.String,font);
+			query.AddColumn("Production",80,FieldValueType.Number,font);
+			query.AddColumn("Scheduled",80,FieldValueType.Number,font);
+			query.AddColumn("Adjustments",80,FieldValueType.Number,font);
+			query.AddColumn("Writeoff",80,FieldValueType.Number,font);
+			query.AddColumn("Tot Prod",80,FieldValueType.Number,font);
+			query.AddColumn("Pt Income",80,FieldValueType.Number,font);
+			query.AddColumn("Ins Income",80,FieldValueType.Number,font);
+			query.AddColumn("Total Income",80,FieldValueType.Number,font);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
-				query.AddColumn("Date",80,FieldValueType.String);
-				query.AddColumn("Weekday",80,FieldValueType.String);
-				query.AddColumn("Production",100,FieldValueType.Number);
-				query.AddColumn("Scheduled",100,FieldValueType.Number);
-				query.AddColumn("Adjustments",100,FieldValueType.Number);
-				query.AddColumn("Writeoff",100,FieldValueType.Number);
-				query.AddColumn("Tot Prod",100,FieldValueType.Number);
-				query.AddColumn("Pt Income",100,FieldValueType.Number);
-				query.AddColumn("Ins Income",100,FieldValueType.Number);
-				query.AddColumn("Total Income",100,FieldValueType.Number);
+				query.AddColumn("Date",70,FieldValueType.String,font);
+				query.AddColumn("Weekday",70,FieldValueType.String,font);
+				query.AddColumn("Production",80,FieldValueType.Number,font);
+				query.AddColumn("Scheduled",80,FieldValueType.Number,font);
+				query.AddColumn("Adjustments",80,FieldValueType.Number,font);
+				query.AddColumn("Writeoff",80,FieldValueType.Number,font);
+				query.AddColumn("Tot Prod",80,FieldValueType.Number,font);
+				query.AddColumn("Pt Income",80,FieldValueType.Number,font);
+				query.AddColumn("Ins Income",80,FieldValueType.Number,font);
+				query.AddColumn("Total Income",80,FieldValueType.Number,font);
+				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
+				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
+			}
+			else {
+				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
+				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
 			}
 			report.AddPageNum();
 			// execute query
@@ -937,13 +944,13 @@ namespace OpenDental{
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetAnnualDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetAnnualData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
 			DataTable dtClinic=new DataTable();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				dtClinic=ds.Tables["Clinic"];
 			}
-			ReportComplex report=new ReportComplex(true,true);
+			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="AnnualP&I";
 			report.AddTitle("Title",Lan.g(this,"Annual Production and Income"));
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
@@ -996,24 +1003,30 @@ namespace OpenDental{
 			}
 			// add columns to report
 			query.AddColumn("Month",75,FieldValueType.String);
-			query.AddColumn("Production",120,FieldValueType.Number);
-			query.AddColumn("Adjustments",120,FieldValueType.Number);
-			query.AddColumn("Writeoff",120,FieldValueType.Number);
-			query.AddColumn("Tot Prod",120,FieldValueType.Number);
-			query.AddColumn("Pt Income",120,FieldValueType.Number);
-			query.AddColumn("Ins Income",120,FieldValueType.Number);
-			query.AddColumn("Total Income",120,FieldValueType.Number);
+			query.AddColumn("Production",90,FieldValueType.Number);
+			query.AddColumn("Adjustments",90,FieldValueType.Number);
+			query.AddColumn("Writeoff",90,FieldValueType.Number);
+			query.AddColumn("Tot Prod",90,FieldValueType.Number);
+			query.AddColumn("Pt Income",90,FieldValueType.Number);
+			query.AddColumn("Ins Income",90,FieldValueType.Number);
+			query.AddColumn("Total Income",90,FieldValueType.Number);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Month",75,FieldValueType.String);
-				query.AddColumn("Production",120,FieldValueType.Number);
-				query.AddColumn("Adjustments",120,FieldValueType.Number);
-				query.AddColumn("Writeoff",120,FieldValueType.Number);
-				query.AddColumn("Tot Prod",120,FieldValueType.Number);
-				query.AddColumn("Pt Income",120,FieldValueType.Number);
-				query.AddColumn("Ins Income",120,FieldValueType.Number);
-				query.AddColumn("Total Income",120,FieldValueType.Number);
+				query.AddColumn("Production",90,FieldValueType.Number);
+				query.AddColumn("Adjustments",90,FieldValueType.Number);
+				query.AddColumn("Writeoff",90,FieldValueType.Number);
+				query.AddColumn("Tot Prod",90,FieldValueType.Number);
+				query.AddColumn("Pt Income",90,FieldValueType.Number);
+				query.AddColumn("Ins Income",90,FieldValueType.Number);
+				query.AddColumn("Total Income",90,FieldValueType.Number);
+				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),106,20);
+				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,27);
+			}
+			else {
+				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),106,20);
+				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
 			}
 			report.AddPageNum();
 			// execute query

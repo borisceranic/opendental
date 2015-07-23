@@ -8,7 +8,7 @@ namespace OpenDentBusiness {
 	public class RpProdInc {
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P&I report</summary>
-		public static DataSet GetDailyDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
 			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
@@ -398,16 +398,16 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetMonthlyDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			return GetDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,false);
+		public static DataSet GetMonthlyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			return GetData(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,false);
 		}
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetAnnualDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			return GetDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,true);
+		public static DataSet GetAnnualData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			return GetData(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,true);
 		}
 
-		private static DataSet GetDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics, bool isAnnual) {
+		private static DataSet GetData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics, bool isAnnual) {
 			DataSet dataSet=GetProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
