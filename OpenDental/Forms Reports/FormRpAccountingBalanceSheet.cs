@@ -134,8 +134,8 @@ namespace OpenDental{
 			DataTable tableLiabilities=Accounts.GetLiabilityTable(date1.SelectionStart);
 			DataTable tableEquity=Accounts.GetEquityTable(date1.SelectionStart);
 			//Add two new rows to the equity data table to show Retained Earnings (Auto) and NetIncomeThisYear
-			tableEquity.LoadDataRow(new object[] { "Retained Earnings (Auto)",ODR.GetData.RetainedEarningsAuto(date1.SelectionStart) },LoadOption.OverwriteChanges);
-			tableEquity.LoadDataRow(new object[] { "NetIncomeThisYear",ODR.GetData.NetIncomeThisYear(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			tableEquity.LoadDataRow(new object[] { "Retained Earnings (Auto)",Accounts.RetainedEarningsAuto(date1.SelectionStart) },LoadOption.OverwriteChanges);
+			tableEquity.LoadDataRow(new object[] { "NetIncomeThisYear",Accounts.NetIncomeThisYear(date1.SelectionStart) },LoadOption.OverwriteChanges);
 			//create the report
 			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName="Balance Sheet";
