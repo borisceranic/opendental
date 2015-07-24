@@ -393,7 +393,8 @@ namespace OpenDental{
 			  +"AS plfname, procedurecode.ProcCode,"
 				+"procedurelog.ToothNum,procedurecode.Descript,provider.Abbr,"
 				+"procedurelog.ClinicNum,"
-				+"procedurelog.ProcFee-IFNULL(SUM(claimproc.WriteOff),0) ";//\"$fee\" "  //if no writeoff, then subtract 0
+				+"procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)"
+				+"-IFNULL(SUM(claimproc.WriteOff),0) ";//\"$fee\" "  //if no writeoff, then subtract 0
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					report.Query+="$fee ";
 				}
@@ -526,25 +527,29 @@ namespace OpenDental{
 		}
 
 		private void CreateGrouped(ReportSimpleGrid report) {
-			//this would require a temporary table to be able to handle capitation.
-			report.Query="SELECT definition.ItemName,procedurecode.ProcCode,procedurecode.Descript,";
+			report.Query="SELECT procs.ItemName,procs.ProcCode,procs.Descript,";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				report.Query+="Count(*),AVG(procedurelog.ProcFee) $AvgFee,SUM(procedurelog.ProcFee) AS $TotFee ";
+				report.Query+="Count(*),AVG(procs.fee) $AvgFee,SUM(procs.fee) AS $TotFee ";
 			}
 			else {//Oracle needs quotes.
-				report.Query+="Count(*),AVG(procedurelog.ProcFee) \"$AvgFee\",SUM(procedurelog.ProcFee) AS \"$TotFee\" ";
+				report.Query+="Count(*),AVG(procs.fee) \"$AvgFee\",SUM(procs.fee) AS \"$TotFee\" ";
 			}
-			report.Query+="FROM procedurelog,procedurecode,definition "
-				+"WHERE procedurelog.ProcStatus = '2' "
-				+"AND procedurelog.CodeNum=procedurecode.CodeNum "
-				+"AND definition.DefNum=procedurecode.ProcCat "
-				+whereProv
-				+whereClin
-				+"AND procedurecode.ProcCode LIKE '%"+POut.String(textCode.Text)+"%' "
-				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= '" + date1.SelectionStart.ToString("yyyy-MM-dd")+"' "
-				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= '" + date2.SelectionStart.ToString("yyyy-MM-dd")+"' "
-				+"GROUP BY procedurecode.ProcCode "
-				+"ORDER BY definition.ItemOrder,procedurecode.ProcCode";
+			report.Query+="FROM ( "
+					+"SELECT procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END) -IFNULL(SUM(claimproc.WriteOff),0) fee, "
+					+"procedurecode.ProcCode,	procedurecode.Descript,	definition.ItemName, definition.ItemOrder "
+					+"FROM procedurelog "
+					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+					+"INNER JOIN definition ON definition.DefNum=procedurecode.ProcCat "
+					+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum AND claimproc.Status='7' "
+					+"WHERE procedurelog.ProcStatus = '2' "
+					+whereProv
+					+whereClin
+					+"AND procedurecode.ProcCode LIKE '%"+POut.String(textCode.Text)+"%' "
+					+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= '" + date1.SelectionStart.ToString("yyyy-MM-dd")+"' "
+					+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= '" + date2.SelectionStart.ToString("yyyy-MM-dd")+"' "
+					+"GROUP BY procedurelog.ProcNum ) procs "
+				+"GROUP BY procs.ProcCode "
+				+"ORDER BY procs.ItemOrder,procs.ProcCode";
 			FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();			
