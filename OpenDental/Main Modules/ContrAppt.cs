@@ -3667,7 +3667,7 @@ namespace OpenDental {
 									out patPict);
 							PicturePat.Image=patPict;
 						}
-						catch { }
+						catch(ApplicationException ex) { }  //A customer called in and an exception got through.  Added exception parameter as attempted fix.
 					}
 				}
 				Font font=new Font(FontFamily.GenericSansSerif,9f);
