@@ -28,7 +28,7 @@ namespace OpenDental{
 		private CheckBox checkAllClin;
 		private ListBox listClin;
 		private Label labelClin;
-		private Label labelSplit;
+		private Label labelSplits;
 		private ListBox listInsuranceTypes;
 		private CheckBox checkAllProv;
 		private List<Clinic> _listClinics;
@@ -64,7 +64,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkAllProv = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.labelSplit = new System.Windows.Forms.Label();
+			this.labelSplits = new System.Windows.Forms.Label();
 			this.radioPatient = new System.Windows.Forms.RadioButton();
 			this.radioCheck = new System.Windows.Forms.RadioButton();
 			this.checkPatientTypes = new System.Windows.Forms.CheckBox();
@@ -132,7 +132,7 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.labelSplit);
+			this.groupBox1.Controls.Add(this.labelSplits);
 			this.groupBox1.Controls.Add(this.radioPatient);
 			this.groupBox1.Controls.Add(this.radioCheck);
 			this.groupBox1.Location = new System.Drawing.Point(31, 263);
@@ -142,13 +142,13 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Group By";
 			// 
-			// labelSplit
+			// labelSplits
 			// 
-			this.labelSplit.Location = new System.Drawing.Point(5, 60);
-			this.labelSplit.Name = "labelSplit";
-			this.labelSplit.Size = new System.Drawing.Size(163, 29);
-			this.labelSplit.TabIndex = 55;
-			this.labelSplit.Text = "Either way, provider splits will still show separately.";
+			this.labelSplits.Location = new System.Drawing.Point(5, 60);
+			this.labelSplits.Name = "labelSplits";
+			this.labelSplits.Size = new System.Drawing.Size(163, 29);
+			this.labelSplits.TabIndex = 55;
+			this.labelSplits.Text = "Either way, provider splits will still show separately.";
 			// 
 			// radioPatient
 			// 
