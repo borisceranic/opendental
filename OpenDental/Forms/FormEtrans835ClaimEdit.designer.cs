@@ -296,7 +296,7 @@ namespace OpenDental{
 			this.gridClaimAdjustments.Size = new System.Drawing.Size(956, 100);
 			this.gridClaimAdjustments.TabIndex = 198;
 			this.gridClaimAdjustments.TabStop = false;
-			this.gridClaimAdjustments.Title = "Claim Adjustments";
+			this.gridClaimAdjustments.Title = "EOB Claim Adjustments";
 			this.gridClaimAdjustments.TranslationName = "FormEtrans835Edit";
 			this.gridClaimAdjustments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridClaimAdjustments_CellDoubleClick);
 			// 
@@ -313,7 +313,7 @@ namespace OpenDental{
 			this.gridAdjudicationInfo.Size = new System.Drawing.Size(956, 100);
 			this.gridAdjudicationInfo.TabIndex = 197;
 			this.gridAdjudicationInfo.TabStop = false;
-			this.gridAdjudicationInfo.Title = "Claim Adjudication Info";
+			this.gridAdjudicationInfo.Title = "EOB Claim Adjudication Info";
 			this.gridAdjudicationInfo.TranslationName = "FormEtrans835Edit";
 			this.gridAdjudicationInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAdjudicationInfo_CellDoubleClick);
 			// 
@@ -331,7 +331,7 @@ namespace OpenDental{
 			this.gridProcedureBreakdown.Size = new System.Drawing.Size(956, 168);
 			this.gridProcedureBreakdown.TabIndex = 0;
 			this.gridProcedureBreakdown.TabStop = false;
-			this.gridProcedureBreakdown.Title = "Procedure Breakdown";
+			this.gridProcedureBreakdown.Title = "EOB Procedure Breakdown";
 			this.gridProcedureBreakdown.TranslationName = "FormEtrans835Edit";
 			this.gridProcedureBreakdown.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridProcedureBreakdown_CellDoubleClick);
 			// 
@@ -363,7 +363,7 @@ namespace OpenDental{
 			this.gridSupplementalInfo.Size = new System.Drawing.Size(956, 80);
 			this.gridSupplementalInfo.TabIndex = 211;
 			this.gridSupplementalInfo.TabStop = false;
-			this.gridSupplementalInfo.Title = "Supplemental Info";
+			this.gridSupplementalInfo.Title = "EOB Supplemental Info";
 			this.gridSupplementalInfo.TranslationName = "FormEtrans835Edit";
 			this.gridSupplementalInfo.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridSupplementalInfo_CellDoubleClick);
 			// 

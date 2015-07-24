@@ -419,7 +419,7 @@ namespace OpenDental {
 			this.Name = "FormEtrans835ClaimPay";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = " ";
+			this.Text = " Verify and Enter Payment";
 			this.Load += new System.EventHandler(this.FormEtrans835ClaimPay_Load);
 			this.Shown += new System.EventHandler(this.FormEtrans835ClaimPay_Shown);
 			this.ResumeLayout(false);
@@ -475,7 +475,7 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell((-adj.AdjAmt).ToString("f2")));//Ins Pay
 				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//Writeoff
 				row.Cells.Add(new ODGridCell(""));//Blank
-				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
+				row.Cells.Add(new ODGridCell(adj.AdjustRemarks));//Description
 				gridClaimAdjustments.Rows.Add(row);
 			}
 			gridClaimAdjustments.EndUpdate();
@@ -634,7 +634,7 @@ namespace OpenDental {
 
 		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridClaimAdjustments.Rows[e.Row].Tag;
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustDescript+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
 			msgbox.Show(this);
 		}
 

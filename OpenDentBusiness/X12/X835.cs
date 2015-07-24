@@ -322,7 +322,7 @@ namespace OpenDentBusiness {
 			for(int k=2;k<=17;k+=3) {
 				Hx835_Adj adj=new Hx835_Adj();
 				adj.AdjCode=adjCode;
-				adj.AdjustDescript=adjDescript;
+				adj.AdjustRemarks=adjDescript;
 				string strAdjReasonCode=segCAS.Get(k);
 				string strAmt=segCAS.Get(k+1);
 				if(strAdjReasonCode=="" && strAmt=="") {
@@ -3052,7 +3052,7 @@ namespace OpenDentBusiness {
 				if(i>0) {
 					sb.Append("\r\n");
 				}
-				sb.Append(ListClaimAdjustments[i].AdjustDescript);
+				sb.Append(ListClaimAdjustments[i].AdjustRemarks);
 			}
 			return sb.ToString();
 		}
@@ -3103,7 +3103,7 @@ namespace OpenDentBusiness {
 
 	///<summary>Corresponds to a CAS segment.  Both the claim level and procedure level include CAS segments.</summary>
 	public class Hx835_Adj {
-		public string AdjustDescript;
+		public string AdjustRemarks;
 		public string ReasonDescript;
 		public decimal AdjAmt;
 		///<summary>Will be one of these 4 values: CO=Contractual Obligations, PI=Payer Initiated Reduction, PR=Patient Responsibility, OA=Other Adjustment.</summary>

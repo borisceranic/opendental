@@ -83,21 +83,22 @@ namespace OpenDental {
 			}
 			gridClaimAdjustments.BeginUpdate();
 			gridClaimAdjustments.Columns.Clear();
-			const int colWidthDescription=200;
-			const int colWidthAdjAmt=80;
-			int colWidthVariable=gridClaimAdjustments.Width-10-colWidthDescription-colWidthAdjAmt;
-			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Description",colWidthDescription,HorizontalAlignment.Left));
-			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Reason",colWidthVariable,HorizontalAlignment.Left));
+			const int colWidthReason=507;
+			const int colWidthAdjAmt=62;
+			int colWidthVariable=gridClaimAdjustments.Width-10-colWidthReason-colWidthAdjAmt;
+			//The size and order of the columns here mimics the EOB Claim Adjustments grid in FormEtrans835ClaimPay as close as possible.
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Reason",colWidthReason,HorizontalAlignment.Left));
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("AdjAmt",colWidthAdjAmt,HorizontalAlignment.Right));
+			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Remarks",colWidthVariable,HorizontalAlignment.Left));
 			gridClaimAdjustments.Rows.Clear();
 			_claimAdjAmtSum=0;
 			for(int i=0;i<_claimPaid.ListClaimAdjustments.Count;i++) {
 				Hx835_Adj adj=_claimPaid.ListClaimAdjustments[i];
 				ODGridRow row=new ODGridRow();
 				row.Tag=adj;
-				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
 				row.Cells.Add(new ODGridCell(adj.ReasonDescript));//Reason
 				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//AdjAmt
+				row.Cells.Add(new ODGridCell(adj.AdjustRemarks));//Remarks
 				_claimAdjAmtSum+=_claimPaid.ListClaimAdjustments[i].AdjAmt;
 				gridClaimAdjustments.Rows.Add(row);
 			}
@@ -232,7 +233,7 @@ namespace OpenDental {
 
 		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridClaimAdjustments.Rows[e.Row].Tag;
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustDescript+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
 			msgbox.Show(this);
 		}
 

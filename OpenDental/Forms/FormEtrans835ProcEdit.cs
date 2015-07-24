@@ -91,7 +91,7 @@ namespace OpenDental {
 				Hx835_Adj adj=_proc.ListProcAdjustments[i];
 				ODGridRow row=new ODGridRow();
 				row.Tag=adj;
-				row.Cells.Add(new ODGridCell(adj.AdjustDescript));//Description
+				row.Cells.Add(new ODGridCell(adj.AdjustRemarks));//Remarks
 				row.Cells.Add(new ODGridCell(adj.ReasonDescript));//Reason
 				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//AdjAmt
 				if(adj.AdjCode=="PR") {//Patient Responsibility
@@ -162,7 +162,7 @@ namespace OpenDental {
 
 		private void gridProcedureAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridProcedureAdjustments.Rows[e.Row].Tag;
-			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustDescript+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
+			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
 			msgbox.Show(this);
 		}
 
