@@ -207,7 +207,12 @@ namespace OpenDental{
 			if(FormOpenDental.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
 				checkIsGlobal.Enabled=true;
 			}
-			checkIsGlobal.Checked=FeeSchedCur.IsGlobal;
+			if(FeeSchedCur.IsNew) {
+				checkIsGlobal.Checked=true;
+			}
+			else {
+				checkIsGlobal.Checked=FeeSchedCur.IsGlobal;
+			}
 		}
 
 		private void checkIsGlobal_Click(object sender,EventArgs e) {
@@ -257,6 +262,7 @@ namespace OpenDental{
 			bool isGlobalOld=FeeSchedCur.IsGlobal;
 			FeeSchedCur.IsGlobal=checkIsGlobal.Checked;
 			if(FeeSchedCur.IsNew) {
+				FeeSchedCur.IsNew=false;
 				ListFeeScheds.Add(FeeSchedCur);
 			}
 			if(isGlobalOld!=FeeSchedCur.IsGlobal) {
