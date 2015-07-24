@@ -942,8 +942,6 @@ namespace OpenDental{
 		}
 
 		private void textHmPhone_TextChanged(object sender, System.EventArgs e) {
-			textHmPhone.Text=TelephoneNumbers.AutoFormat(textHmPhone.Text);
-			textHmPhone.SelectionStart=textHmPhone.Text.Length;
 			OnDataEntered();
 		}
 
