@@ -753,6 +753,7 @@ namespace OpenDental {
 			this.labelInsRem.TabIndex = 0;
 			this.labelInsRem.Text = "Ins\r\nRem";
 			this.labelInsRem.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.labelInsRem.Click += new System.EventHandler(this.labelInsRem_Click);
 			this.labelInsRem.MouseEnter += new System.EventHandler(this.labelInsRem_MouseEnter);
 			this.labelInsRem.MouseLeave += new System.EventHandler(this.labelInsRem_MouseLeave);
 			// 
@@ -4712,6 +4713,19 @@ namespace OpenDental {
 		private void labelInsRem_MouseLeave(object sender,EventArgs e) {
 			groupBoxFamilyIns.Visible=false;
 			groupBoxIndIns.Visible=false;
+		}
+
+		private void labelInsRem_Click(object sender,EventArgs e) {
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				//Since the bonus information in FormInsRemain is currently only helpful in Canada,
+				//we have decided not to show the form for other countries at this time.
+				return;
+			}
+			if(PatCur==null) {
+				return;
+			}
+			FormInsRemain FormIR=new FormInsRemain(PatCur.PatNum);
+			FormIR.ShowDialog();
 		}
 
 	}

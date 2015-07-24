@@ -414,6 +414,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormInsRemain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormInsRemain.designer.cs">
+      <DependentUpon>FormInsRemain.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEncounterTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3730,6 +3736,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormInsRemain.resx">
+      <DependentUpon>FormInsRemain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEncounterTool.resx">
       <DependentUpon>FormEncounterTool.cs</DependentUpon>

@@ -138,6 +138,7 @@ namespace OpenDental{
 		private bool checkShowInsNotAutomatic;
 		private bool checkShowDiscountNotAutomatic;
 		private List<TpRow> RowsMain;
+		private UI.Button butInsRem;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
 
@@ -212,6 +213,7 @@ namespace OpenDental{
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.gridPreAuth = new OpenDental.UI.ODGrid();
 			this.gridPlans = new OpenDental.UI.ODGrid();
+			this.butInsRem = new OpenDental.UI.Button();
 			this.groupShow.SuspendLayout();
 			this.groupBoxFamilyIns.SuspendLayout();
 			this.groupBoxIndIns.SuspendLayout();
@@ -590,7 +592,7 @@ namespace OpenDental{
 			this.groupBoxFamilyIns.Controls.Add(this.label5);
 			this.groupBoxFamilyIns.Controls.Add(this.textFamSecDed);
 			this.groupBoxFamilyIns.Controls.Add(this.label2);
-			this.groupBoxFamilyIns.Location = new System.Drawing.Point(746, 405);
+			this.groupBoxFamilyIns.Location = new System.Drawing.Point(746, 411);
 			this.groupBoxFamilyIns.Name = "groupBoxFamilyIns";
 			this.groupBoxFamilyIns.Size = new System.Drawing.Size(193, 80);
 			this.groupBoxFamilyIns.TabIndex = 66;
@@ -666,7 +668,7 @@ namespace OpenDental{
 			this.groupBoxIndIns.Controls.Add(this.label16);
 			this.groupBoxIndIns.Controls.Add(this.textSecDed);
 			this.groupBoxIndIns.Controls.Add(this.textSecUsed);
-			this.groupBoxIndIns.Location = new System.Drawing.Point(746, 485);
+			this.groupBoxIndIns.Location = new System.Drawing.Point(746, 491);
 			this.groupBoxIndIns.Name = "groupBoxIndIns";
 			this.groupBoxIndIns.Size = new System.Drawing.Size(193, 160);
 			this.groupBoxIndIns.TabIndex = 67;
@@ -740,8 +742,24 @@ namespace OpenDental{
 			this.gridPlans.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPlans_CellDoubleClick);
 			this.gridPlans.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPlans_CellClick);
 			// 
+			// butInsRem
+			// 
+			this.butInsRem.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butInsRem.Autosize = true;
+			this.butInsRem.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butInsRem.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butInsRem.CornerRadius = 4F;
+			this.butInsRem.Location = new System.Drawing.Point(864, 400);
+			this.butInsRem.Name = "butInsRem";
+			this.butInsRem.Size = new System.Drawing.Size(75, 16);
+			this.butInsRem.TabIndex = 68;
+			this.butInsRem.Text = "Ins Rem";
+			this.butInsRem.Visible = false;
+			this.butInsRem.Click += new System.EventHandler(this.butInsRem_Click);
+			// 
 			// ContrTreat
 			// 
+			this.Controls.Add(this.butInsRem);
 			this.Controls.Add(this.groupBoxIndIns);
 			this.Controls.Add(this.groupBoxFamilyIns);
 			this.Controls.Add(this.gridMain);
@@ -939,6 +957,11 @@ namespace OpenDental{
 			}
 			else {
 				checkShowCompleted.Visible=true;
+			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				//Since the bonus information in FormInsRemain is currently only helpful in Canada,
+				//we have decided not to show this button in other countries for now.
+				butInsRem.Visible=true;
 			}
 		}
 
@@ -3243,6 +3266,14 @@ namespace OpenDental{
 			}
 		}
 
+		private void butInsRem_Click(object sender,EventArgs e) {
+			if(PatCur==null) {
+				MsgBox.Show(this,"Please select a patient before attempting to view insurance remaining.");
+				return;
+			}
+			FormInsRemain FormIR=new FormInsRemain(PatCur.PatNum);
+			FormIR.ShowDialog();
+		}
 
 	}
 

@@ -74,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.DrugNDC           = PIn.String(table.Rows[i]["DrugNDC"].ToString());
 				procedureCode.RevenueCodeDefault= PIn.String(table.Rows[i]["RevenueCodeDefault"].ToString());
 				procedureCode.ProvNumDefault    = PIn.Long  (table.Rows[i]["ProvNumDefault"].ToString());
+				procedureCode.CanadaTimeUnits   = PIn.Double(table.Rows[i]["CanadaTimeUnits"].ToString());
 				retVal.Add(procedureCode);
 			}
 			return retVal;
@@ -114,7 +115,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -145,7 +146,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (procedureCode.IsMultiVisit)+","
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
-				+    POut.Long  (procedureCode.ProvNumDefault)+")";
+				+    POut.Long  (procedureCode.ProvNumDefault)+","
+				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -178,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -209,7 +211,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (procedureCode.IsMultiVisit)+","
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
-				+    POut.Long  (procedureCode.ProvNumDefault)+")";
+				+    POut.Long  (procedureCode.ProvNumDefault)+","
+				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -248,7 +251,8 @@ namespace OpenDentBusiness.Crud{
 				+"IsMultiVisit      =  "+POut.Bool  (procedureCode.IsMultiVisit)+", "
 				+"DrugNDC           = '"+POut.String(procedureCode.DrugNDC)+"', "
 				+"RevenueCodeDefault= '"+POut.String(procedureCode.RevenueCodeDefault)+"', "
-				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+" "
+				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+", "
+				+"CanadaTimeUnits   = '"+POut.Double(procedureCode.CanadaTimeUnits)+"' "
 				+"WHERE CodeNum = "+POut.Long(procedureCode.CodeNum);
 			Db.NonQ(command);
 		}
@@ -357,6 +361,10 @@ namespace OpenDentBusiness.Crud{
 			if(procedureCode.ProvNumDefault != oldProcedureCode.ProvNumDefault) {
 				if(command!=""){ command+=",";}
 				command+="ProvNumDefault = "+POut.Long(procedureCode.ProvNumDefault)+"";
+			}
+			if(procedureCode.CanadaTimeUnits != oldProcedureCode.CanadaTimeUnits) {
+				if(command!=""){ command+=",";}
+				command+="CanadaTimeUnits = '"+POut.Double(procedureCode.CanadaTimeUnits)+"'";
 			}
 			if(command==""){
 				return false;

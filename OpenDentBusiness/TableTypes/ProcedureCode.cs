@@ -80,7 +80,8 @@ namespace OpenDentBusiness{
 		public string RevenueCodeDefault;
 		///<summary>FK to provider.ProvNum.  0 for none. Otherwise, this provider will be used for this code instead of the normal provider.</summary>
 		public long ProvNumDefault;
-		
+		///<summary>For Canadian customers, tracks scaling insurance and periodontal scaling units for patients depending on coverage.</summary>
+		public double CanadaTimeUnits;
 		///<summary>Not a database column.  Only used for xml import function.</summary>
 		private string procCatDescript;
 

@@ -9465,7 +9465,23 @@ namespace OpenDentBusiness {
 					"'PatientSelectUseFNameForPreferred','0')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurecode ADD CanadaTimeUnits double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurecode ADD CanadaTimeUnits number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE procedurecode SET CanadaTimeUnits = 0 WHERE CanadaTimeUnits IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurecode MODIFY CanadaTimeUnits NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE procedurecode SET CanadaTimeUnits=1";//This is the correct value for most Canadian procedure codes.
+				Db.NonQ(command);
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					//TODO: UPDATE queries for procedure codes where CanadaTimeUnits is not 1.
+				}
 
 
 
@@ -9479,4 +9495,6 @@ namespace OpenDentBusiness {
 
 	}
 }
+
+
 
