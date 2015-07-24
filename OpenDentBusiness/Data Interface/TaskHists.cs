@@ -63,7 +63,7 @@ namespace OpenDentBusiness{
 					+Lans.g("TaskHists"," to ")
 					+DefC.GetDef(DefCat.TaskPriorities,taskCur.PriorityDefNum).ItemName+".\r\n");
 			}
-			if(taskCur.IsNoteChange) {
+			if(taskOld.IsNoteChange) { //Using taskOld because the notes changed from the old one to the new one.
 				strb.Append(Lans.g("TaskHists","Task notes changed."));
 			}
 			return strb.ToString();
