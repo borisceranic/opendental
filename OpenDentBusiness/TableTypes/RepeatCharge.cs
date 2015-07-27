@@ -25,7 +25,7 @@ namespace OpenDentBusiness{
 		public bool CopyNoteToProc;
 		///<summary>Set to true to have a claim automatically created for the patient with the procedure that is attached to this repeating charge.</summary>
 		public bool CreatesClaim;
-		///<summary>Defaulted to true.  Set to false to disable the repeating charge.  This allows patients to have repeating charges in their history that are not active.  Used mainly for repeating charges with notes that should not be deleted.</summary>
+		///<summary>Set to false to disable the repeating charge.  This allows patients to have repeating charges in their history that are not active.  Used mainly for repeating charges with notes that should not be deleted.</summary>
 		public bool IsEnabled;
 
 		///<summary></summary>
