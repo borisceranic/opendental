@@ -205,11 +205,10 @@ namespace OpenDentBusiness{
 			return retList;
 		}
 
-		///<summary>For a given PayPlan, returns a table of PaySplits with additional payment information, plus the same paysplits in listPaySplits.
-		///Set listPaySplits to an empty list before calling.</summary>
-		public static DataTable GetForPayPlan(long payPlanNum,List<PaySplit> listPaySplits) {
+		///<summary>For a given PayPlan, returns a table of PaySplits with additional payment information.</summary>
+		public static DataTable GetForPayPlan(long payPlanNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum,listPaySplits);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),payPlanNum);
 			}
 			string command="SELECT paysplit.*,payment.CheckNum,SUM(payment.PayAmt) AS 'PayAmt',payment.PayType "
 					+"FROM paysplit "
@@ -218,9 +217,12 @@ namespace OpenDentBusiness{
 					+"GROUP BY paysplit.ProcDate,paysplit.PayNum,paysplit.ProvNum "
 					+"ORDER BY ProcDate"; 
 			DataTable tableSplits=Db.GetTable(command);
-			listPaySplits.Clear();
-			listPaySplits.AddRange(Crud.PaySplitCrud.TableToList(tableSplits));
 			return tableSplits;
+		}
+
+		///<summary>Gets paysplits from a provided datatable.  This was originally part of GetForPayPlan but can't be because it's passed through the Middle Tier.</summary>
+		public static List<PaySplit> GetFromBundled(DataTable dataTable) {
+			return Crud.PaySplitCrud.TableToList(dataTable);
 		}
 
 		///<summary>Used once in ContrAccount.  Usually returns 0 unless there is a payplan for this payment and patient.</summary>
