@@ -316,8 +316,12 @@ namespace OpenDental{
 			//Remove any dates after today
 			retVal.RemoveAll(x => x > DateTime.Today);
 			//Remove billing dates past the end of the dateStop
+			int monthAdd=0;
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				monthAdd=1;
+			}
 			if(dateStop.Year>1880) {
-				retVal.RemoveAll(x => x >= dateStop.AddMonths(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)?1:0));
+				retVal.RemoveAll(x => x >= dateStop.AddMonths(monthAdd));
 			}
 			return retVal;
 		}
