@@ -106,6 +106,7 @@ namespace OpenDental {
 			FormApptTypeEdit FormATE=new FormApptTypeEdit();
 			FormATE.AppointmentTypeCur=new AppointmentType();
 			FormATE.AppointmentTypeCur.ItemOrder=_listApptTypes.Count-1;
+			FormATE.AppointmentTypeCur.IsNew=true;
 			FormATE.ShowDialog();
 			if(FormATE.DialogResult!=DialogResult.OK) {
 				return;
