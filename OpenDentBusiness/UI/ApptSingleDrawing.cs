@@ -34,7 +34,7 @@ namespace OpenDentBusiness.UI {
 				provColor=Color.White;
 				penO=new Pen(Color.Black);
 			}
-			backColor=provColor;//Default the appointment to he primary provider's color.
+			backColor=provColor;//Default the appointment to the primary provider's color.
 			if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.Complete) {
 				backColor=arrayDefs[(int)DefCat.AppointmentColors][2].ItemColor;
 			}
@@ -43,6 +43,9 @@ namespace OpenDentBusiness.UI {
 			}
 			else if(PIn.Long(dataRoww["AptStatus"].ToString())==(int)ApptStatus.PtNoteCompleted) {
 				backColor=arrayDefs[(int)DefCat.AppointmentColors][6].ItemColor;
+			}
+			else if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
+				backColor=Color.FromArgb(PIn.Int(dataRoww["ColorOverride"].ToString()));
 			}
 			//Check to see if the patient is late for their appointment.  This 
 			DateTime aptDateTime=PIn.DateT(dataRoww["AptDateTime"].ToString());
@@ -61,10 +64,6 @@ namespace OpenDentBusiness.UI {
 						break;
 					}
 				}
-			}
-			//Always use the ColorOverride over any other appointment color.
-			if(PIn.Int(dataRoww["ColorOverride"].ToString()) != 0) {
-				backColor=Color.FromArgb(PIn.Int(dataRoww["ColorOverride"].ToString()));
 			}
 			//Do not use the code block below. We do not want to draw appt color based on appointment type. Logic for that is handled with the color override column.
 			//else if(PIn.Long(dataRoww["AppointmentTypeNum"].ToString()) != 0) {
