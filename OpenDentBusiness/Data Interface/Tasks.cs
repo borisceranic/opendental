@@ -200,8 +200,9 @@ namespace OpenDentBusiness{
 							+"LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum "
 							+"WHERE TaskListNum="+POut.Long(listNum);
 			if(showDone) {
-				command+=" AND (TaskStatus !="+POut.Long((int)TaskStatusEnum.Done)
-					+" OR DateTimeFinished > "+POut.Date(startDate)+")";//of if done, then restrict date
+				command+=" AND ((TaskStatus !="+POut.Long((int)TaskStatusEnum.Done)
+					+" OR DateTimeFinished > "+POut.Date(startDate)+")" //or if done, then restrict date
+					+" OR DateTimeFinished = '0001-01-01 00:00:00')"; //Include tasks that have a finished date time as MinValue so they can be edited.
 			}
 			else {
 				command+=" AND TaskStatus !="+POut.Long((int)TaskStatusEnum.Done);
