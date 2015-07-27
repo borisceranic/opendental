@@ -317,7 +317,7 @@ namespace OpenDental{
 			retVal.RemoveAll(x => x > DateTime.Today);
 			//Remove billing dates past the end of the dateStop
 			if(dateStop.Year>1880) {
-				retVal.RemoveAll(x => x >= dateStop.AddMonths(1));
+				retVal.RemoveAll(x => x >= dateStop.AddMonths(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)?1:0));
 			}
 			return retVal;
 		}
