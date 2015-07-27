@@ -1086,7 +1086,8 @@ namespace OpenDental{
 			}
 			if(PayPlanCur.PlanNum==0) {//Normal payplan
 				_listPaySplits=new List<PaySplit>();
-				DataTable bundledPayments=PaySplits.GetForPayPlan(PayPlanCur.PayPlanNum,_listPaySplits);
+				DataTable bundledPayments=PaySplits.GetForPayPlan(PayPlanCur.PayPlanNum);
+				_listPaySplits=PaySplits.GetFromBundled(bundledPayments);
 				for(int i=0;i<_listPaySplits.Count;i++) {
 					listPayPlanRows.Add(CreateRowForPaySplit(bundledPayments.Rows[i],_listPaySplits[i]));
 				}
