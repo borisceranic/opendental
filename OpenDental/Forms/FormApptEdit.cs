@@ -3045,40 +3045,23 @@ namespace OpenDental{
 					return;
 				}
 				if(ProgramProperties.GetPropVal(ProgramName.eClinicalWorks,"ProcNotesNoIncomplete")=="1") {
-					bool incompleteNotesPresent=false;
-					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
-						if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="0") {//not attached
-							continue;
+					for(int i=0;i<procs.Count;i++) {
+						Procedure proc=Procedures.GetOneProc(procs[i].ProcNum,true);//To get the most recent note for the proc
+						if(proc.Note!=null && proc.Note.Contains("\"\"")) {
+							MsgBox.Show(this,"This appointment cannot be sent because there are incomplete procedure notes.");
+							return;
 						}
-						long procNum=PIn.Long(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString());
-						Procedure proc=Procedures.GetOneProc(procNum,true);
-						if(proc.Note.Contains("\"\"")) {
-							incompleteNotesPresent=true;
-						}
-					}
-					if(incompleteNotesPresent) {
-						MsgBox.Show(this,"This appointment cannot be sent because there are incomplete procedure notes.");
-						return;
 					}
 				}
 				if(ProgramProperties.GetPropVal(ProgramName.eClinicalWorks,"ProcRequireSignature")=="1") {
-					bool unsignedNotesPresent=false;
-					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
-						if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="0") {//not attached
-							continue;
-						}
-						long procNum=PIn.Long(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString());
-						Procedure proc=Procedures.GetOneProc(procNum,true);
-						if(proc.Note!=""
-						&& proc.Signature=="") {
-							unsignedNotesPresent=true;
+					for(int i=0;i<procs.Count;i++) {
+						Procedure proc=Procedures.GetOneProc(procs[i].ProcNum,true);//To get the most recent note with signature for the proc
+						if(!string.IsNullOrEmpty(proc.Note)	&& string.IsNullOrEmpty(proc.Signature)) {
+							MsgBox.Show(this,"This appointment cannot be sent because there are unsigned procedure notes.");
+							return;
 						}
 					}
-					if(unsignedNotesPresent) {
-						MsgBox.Show(this,"This appointment cannot be sent because there are unsigned procedure notes.");
-						return;
-					}
-				}			
+				}
 				////check to make sure that the appointment and all attached procedures are marked complete as required.
 				//bool procsAreComplete=true;
 				//for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
