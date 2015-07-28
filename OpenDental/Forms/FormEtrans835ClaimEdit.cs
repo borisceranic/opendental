@@ -76,10 +76,10 @@ namespace OpenDental {
 
 		private void FillClaimAdjustments() {
 			if(_claimPaid.ListClaimAdjustments.Count==0) {
-				gridClaimAdjustments.Title="Claim Adjustments (None Reported)";
+				gridClaimAdjustments.Title="EOB Claim Adjustments (None Reported)";
 			}
 			else {
-				gridClaimAdjustments.Title="Claim Adjustments";
+				gridClaimAdjustments.Title="EOB Claim Adjustments";
 			}
 			gridClaimAdjustments.BeginUpdate();
 			gridClaimAdjustments.Columns.Clear();
@@ -108,10 +108,10 @@ namespace OpenDental {
 
 		private void FillProcedureBreakdown() {
 			if(_claimPaid.ListProcs.Count==0) {
-				gridProcedureBreakdown.Title="Procedure Breakdown (None Reported)";
+				gridProcedureBreakdown.Title="EOB Procedure Breakdown (None Reported)";
 			}
 			else {
-				gridProcedureBreakdown.Title="Procedure Breakdown";
+				gridProcedureBreakdown.Title="EOB Procedure Breakdown";
 			}
 			gridProcedureBreakdown.BeginUpdate();
 			const int colWidthProcNum=80;
@@ -124,7 +124,7 @@ namespace OpenDental {
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcNum",colWidthProcNum,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcCode",colWidthProcCode,HorizontalAlignment.Center));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcDescript",colWidthVariable,HorizontalAlignment.Left));
-			gridProcedureBreakdown.Columns.Add(new ODGridColumn("ProcFee",colWidthProcFee,HorizontalAlignment.Right));
+			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Fee Billed",colWidthProcFee,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PatPortion",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Contractual",colWidthAdjAmt,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("PayorReduct",colWidthAdjAmt,HorizontalAlignment.Right));
@@ -149,7 +149,7 @@ namespace OpenDental {
 					procDescript=procCode.AbbrDesc;
 				}
 				row.Cells.Add(new ODGridCell(procDescript));//ProcDescript
-				row.Cells.Add(new ODGridCell(proc.ProcFee.ToString("f2")));//ProcFee
+				row.Cells.Add(new ODGridCell(proc.ProcFee.ToString("f2")));//Fee Billed
 				decimal adjAmtForProc=0;
 				decimal patPortionForProc=0;
 				decimal contractualForProc=0;
@@ -185,10 +185,10 @@ namespace OpenDental {
 
 		private void FillAdjudicationInfo() {
 			if(_claimPaid.ListAdjudicationInfo.Count==0) {
-				gridAdjudicationInfo.Title="Claim Adjudication Info (None Reported)";
+				gridAdjudicationInfo.Title="EOB Claim Adjudication Info (None Reported)";
 			}
 			else {
-				gridAdjudicationInfo.Title="Claim Adjudication Info";
+				gridAdjudicationInfo.Title="EOB Claim Adjudication Info";
 			}
 			gridAdjudicationInfo.BeginUpdate();
 			gridAdjudicationInfo.Columns.Clear();
@@ -208,10 +208,10 @@ namespace OpenDental {
 
 		private void FillSupplementalInfo() {
 			if(_claimPaid.ListSupplementalInfo.Count==0) {
-				gridSupplementalInfo.Title="Supplemental Info (None Reported)";
+				gridSupplementalInfo.Title="EOB Supplemental Info (None Reported)";
 			}
 			else {
-				gridSupplementalInfo.Title="Supplemental Info";
+				gridSupplementalInfo.Title="EOB Supplemental Info";
 			}
 			gridSupplementalInfo.BeginUpdate();
 			gridSupplementalInfo.Columns.Clear();

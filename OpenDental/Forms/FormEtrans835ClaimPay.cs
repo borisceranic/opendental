@@ -40,7 +40,6 @@ namespace OpenDental {
 		private TextBox textInsPayAmt;
 		private TextBox textEobInsPayAmt;
 		private TextBox textEobDedApplied;
-		private ValidDouble textEobWriteOff;
 		private TextBox textEobInsPayAllowed;
 		private TextBox textEobClaimFee;
 		private Label label5;
@@ -89,18 +88,17 @@ namespace OpenDental {
 			this.gridPayments = new OpenDental.UI.ODGrid();
 			this.textDedApplied = new System.Windows.Forms.TextBox();
 			this.textInsPayAmt = new System.Windows.Forms.TextBox();
+			this.textEobInsPayAmt = new System.Windows.Forms.TextBox();
+			this.textEobDedApplied = new System.Windows.Forms.TextBox();
+			this.textEobInsPayAllowed = new System.Windows.Forms.TextBox();
+			this.textEobClaimFee = new System.Windows.Forms.TextBox();
+			this.label5 = new System.Windows.Forms.Label();
 			this.butViewEobDetails = new OpenDental.UI.Button();
 			this.butWriteOff = new OpenDental.UI.Button();
 			this.butDeductible = new OpenDental.UI.Button();
 			this.textWriteOff = new OpenDental.ValidDouble();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.textEobInsPayAmt = new System.Windows.Forms.TextBox();
-			this.textEobDedApplied = new System.Windows.Forms.TextBox();
-			this.textEobWriteOff = new OpenDental.ValidDouble();
-			this.textEobInsPayAllowed = new System.Windows.Forms.TextBox();
-			this.textEobClaimFee = new System.Windows.Forms.TextBox();
-			this.label5 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// textInsPayAllowed
@@ -238,6 +236,54 @@ namespace OpenDental {
 			this.textInsPayAmt.TabIndex = 203;
 			this.textInsPayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
+			// textEobInsPayAmt
+			// 
+			this.textEobInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textEobInsPayAmt.Location = new System.Drawing.Point(517, 292);
+			this.textEobInsPayAmt.Name = "textEobInsPayAmt";
+			this.textEobInsPayAmt.ReadOnly = true;
+			this.textEobInsPayAmt.Size = new System.Drawing.Size(62, 20);
+			this.textEobInsPayAmt.TabIndex = 209;
+			this.textEobInsPayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textEobDedApplied
+			// 
+			this.textEobDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textEobDedApplied.Location = new System.Drawing.Point(393, 292);
+			this.textEobDedApplied.Name = "textEobDedApplied";
+			this.textEobDedApplied.ReadOnly = true;
+			this.textEobDedApplied.Size = new System.Drawing.Size(62, 20);
+			this.textEobDedApplied.TabIndex = 208;
+			this.textEobDedApplied.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textEobInsPayAllowed
+			// 
+			this.textEobInsPayAllowed.Location = new System.Drawing.Point(455, 292);
+			this.textEobInsPayAllowed.Name = "textEobInsPayAllowed";
+			this.textEobInsPayAllowed.ReadOnly = true;
+			this.textEobInsPayAllowed.Size = new System.Drawing.Size(62, 20);
+			this.textEobInsPayAllowed.TabIndex = 204;
+			this.textEobInsPayAllowed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textEobClaimFee
+			// 
+			this.textEobClaimFee.Location = new System.Drawing.Point(331, 292);
+			this.textEobClaimFee.Name = "textEobClaimFee";
+			this.textEobClaimFee.ReadOnly = true;
+			this.textEobClaimFee.Size = new System.Drawing.Size(62, 20);
+			this.textEobClaimFee.TabIndex = 206;
+			this.textEobClaimFee.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label5
+			// 
+			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label5.Location = new System.Drawing.Point(177, 295);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(150, 16);
+			this.label5.TabIndex = 205;
+			this.label5.Text = "EOB Totals";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// butViewEobDetails
 			// 
 			this.butViewEobDetails.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -326,72 +372,12 @@ namespace OpenDental {
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// textEobInsPayAmt
-			// 
-			this.textEobInsPayAmt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textEobInsPayAmt.Location = new System.Drawing.Point(517, 292);
-			this.textEobInsPayAmt.Name = "textEobInsPayAmt";
-			this.textEobInsPayAmt.ReadOnly = true;
-			this.textEobInsPayAmt.Size = new System.Drawing.Size(62, 20);
-			this.textEobInsPayAmt.TabIndex = 209;
-			this.textEobInsPayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textEobDedApplied
-			// 
-			this.textEobDedApplied.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textEobDedApplied.Location = new System.Drawing.Point(393, 292);
-			this.textEobDedApplied.Name = "textEobDedApplied";
-			this.textEobDedApplied.ReadOnly = true;
-			this.textEobDedApplied.Size = new System.Drawing.Size(62, 20);
-			this.textEobDedApplied.TabIndex = 208;
-			this.textEobDedApplied.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textEobWriteOff
-			// 
-			this.textEobWriteOff.Location = new System.Drawing.Point(579, 292);
-			this.textEobWriteOff.MaxVal = 100000000D;
-			this.textEobWriteOff.MinVal = -100000000D;
-			this.textEobWriteOff.Name = "textEobWriteOff";
-			this.textEobWriteOff.ReadOnly = true;
-			this.textEobWriteOff.Size = new System.Drawing.Size(62, 20);
-			this.textEobWriteOff.TabIndex = 207;
-			this.textEobWriteOff.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textEobInsPayAllowed
-			// 
-			this.textEobInsPayAllowed.Location = new System.Drawing.Point(455, 292);
-			this.textEobInsPayAllowed.Name = "textEobInsPayAllowed";
-			this.textEobInsPayAllowed.ReadOnly = true;
-			this.textEobInsPayAllowed.Size = new System.Drawing.Size(62, 20);
-			this.textEobInsPayAllowed.TabIndex = 204;
-			this.textEobInsPayAllowed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textEobClaimFee
-			// 
-			this.textEobClaimFee.Location = new System.Drawing.Point(331, 292);
-			this.textEobClaimFee.Name = "textEobClaimFee";
-			this.textEobClaimFee.ReadOnly = true;
-			this.textEobClaimFee.Size = new System.Drawing.Size(62, 20);
-			this.textEobClaimFee.TabIndex = 206;
-			this.textEobClaimFee.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// label5
-			// 
-			this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label5.Location = new System.Drawing.Point(177, 295);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(150, 16);
-			this.label5.TabIndex = 205;
-			this.label5.Text = "EOB Totals";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
 			// FormEtrans835ClaimPay
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textEobInsPayAmt);
 			this.Controls.Add(this.textEobDedApplied);
-			this.Controls.Add(this.textEobWriteOff);
 			this.Controls.Add(this.textEobInsPayAllowed);
 			this.Controls.Add(this.textEobClaimFee);
 			this.Controls.Add(this.label5);
@@ -436,7 +422,6 @@ namespace OpenDental {
 			textEobDedApplied.Text=_claimPaid.PatientPortion.ToString("F");
 			textEobInsPayAllowed.Text=_claimPaid.AllowedAmt.ToString("F");
 			textEobInsPayAmt.Text=_claimPaid.InsPaid.ToString("F");
-			textEobWriteOff.Text=_claimPaid.Writeoff.ToString("F");
 			FillGridProcedures();
 		}
 
@@ -462,8 +447,6 @@ namespace OpenDental {
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Reason",445,HorizontalAlignment.Left));
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Allowed",62,HorizontalAlignment.Right));
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Ins Pay",62,HorizontalAlignment.Right));
-			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Writeoff",62,HorizontalAlignment.Right));
-			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("",80,HorizontalAlignment.Center));
 			gridClaimAdjustments.Columns.Add(new UI.ODGridColumn("Remarks",0,HorizontalAlignment.Left));
 			gridClaimAdjustments.Rows.Clear();
 			for(int i=0;i<_claimPaid.ListClaimAdjustments.Count;i++) {
@@ -473,9 +456,7 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell(adj.ReasonDescript));//Reason
 				row.Cells.Add(new ODGridCell((-adj.AdjAmt).ToString("f2")));//Allowed
 				row.Cells.Add(new ODGridCell((-adj.AdjAmt).ToString("f2")));//Ins Pay
-				row.Cells.Add(new ODGridCell(adj.AdjAmt.ToString("f2")));//Writeoff
-				row.Cells.Add(new ODGridCell(""));//Blank
-				row.Cells.Add(new ODGridCell(adj.AdjustRemarks));//Description
+				row.Cells.Add(new ODGridCell(adj.AdjustRemarks));//Remarks
 				gridClaimAdjustments.Rows.Add(row);
 			}
 			gridClaimAdjustments.EndUpdate();
@@ -498,8 +479,6 @@ namespace OpenDental {
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Deduct",62,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Allowed",62,HorizontalAlignment.Right));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("InsPay",62,HorizontalAlignment.Right));
-			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Writeoff",62,HorizontalAlignment.Right));
-			gridProcedureBreakdown.Columns.Add(new ODGridColumn("",80,HorizontalAlignment.Center));
 			gridProcedureBreakdown.Columns.Add(new ODGridColumn("Remarks",0,HorizontalAlignment.Left));
 			gridProcedureBreakdown.Rows.Clear();
 			for(int i=0;i<_claimPaid.ListProcs.Count;i++) {
@@ -524,8 +503,6 @@ namespace OpenDental {
 				row.Cells.Add(new ODGridCell(proc.PatientPortion.ToString("f2")));//Deduct
 				row.Cells.Add(new ODGridCell(proc.AllowedAmt.ToString("f2")));//Allowed
 				row.Cells.Add(new ODGridCell(proc.InsPaid.ToString("f2")));//InsPay
-				row.Cells.Add(new ODGridCell(proc.Writeoff.ToString("f2")));//Writeoff
-				row.Cells.Add(new ODGridCell(""));//Blank
 				row.Cells.Add(new ODGridCell(proc.GetRemarks()));//Remarks
 				gridProcedureBreakdown.Rows.Add(row);
 			}
@@ -911,9 +888,11 @@ namespace OpenDental {
 				return;
 			}
 			if(textEobClaimFee.Text!=textClaimFee.Text || textEobDedApplied.Text!=textDedApplied.Text || textEobInsPayAllowed.Text!=textInsPayAllowed.Text
-				|| textEobInsPayAmt.Text!=textInsPayAmt.Text || textEobWriteOff.Text!=textWriteOff.Text) 
+				|| textEobInsPayAmt.Text!=textInsPayAmt.Text) 
 			{
-				if(MessageBox.Show(Lan.g(this,"Some of the EOB totals do not match the totals entered")+".  "+Lan.g(this,"Continue")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+				if(MessageBox.Show(Lan.g(this,"Some of the EOB totals do not match the totals entered")+".  "+Lan.g(this,"Continue")+"?",
+					"",MessageBoxButtons.OKCancel)!=DialogResult.OK)
+				{
 					return;
 				}
 			}

@@ -488,7 +488,6 @@ namespace OpenDentBusiness {
 				}
 			}
 			retVal.SegmentCount=segNum-segNumCLP;
-			retVal.Writeoff=retVal.ClaimFee-retVal.InsPaid-retVal.PatientPortion;
 			retVal.AllowedAmt=retVal.InsPaid+retVal.PatientPortion;
 			return retVal;
 		}
@@ -902,7 +901,6 @@ namespace OpenDentBusiness {
 			}
 			proc.SegmentCount=segNum-segNumSVC;
 			proc.AllowedAmt=proc.InsPaid+proc.PatientPortion;
-			proc.Writeoff=proc.ProcFee-proc.InsPaid-proc.PatientPortion;
 			return proc;
 		}
 
@@ -2962,8 +2960,6 @@ namespace OpenDentBusiness {
 		public List<Hx835_Proc> ListProcs;
 		///<summary>The sum of all adjustment amounts in ListClaimAdjustments.</summary>
 		public decimal ClaimAdjustmentTotal;
-		///<summary>Writeoff = (ClaimFee)-(Claim AllowedAmt) = (ClaimFee)-(Claim InsPaid)-(Claim PatientPortion)</summary>
-		public decimal Writeoff;
 		///<summary>AllowedAmt = (Claim InsPaid)+(Claim PatientPortion)</summary>
 		public decimal AllowedAmt;
 		///<summary>True if remark code MA15 is used in either segment MIA or MOA (if present).
@@ -3082,8 +3078,6 @@ namespace OpenDentBusiness {
 		public List<string> ListRemarks;
 		///<summary>The sum of all adjustment amounts in ListProcAdjustments where CAS01=PR, including but not limited to deductibles.</summary>
 		public decimal PatientPortion;
-		///<summary>Writeoff = (ProcFee)-(AllowedAmt) = (ProcFee)-(InsPay)-(PatientPortion)</summary>
-		public decimal Writeoff;
 		///<summary>AllowedAmt = (InsPay)+(PatientPortion)</summary>
 		public decimal AllowedAmt;
 
