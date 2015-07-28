@@ -264,10 +264,10 @@ namespace OpenDental {
 			report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
 			QueryObject query;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Split the query up by clinics.
-				query=report.AddQuery(queryBrokenApts,Lan.g(this,"Broken Appointments"),"ClinicDesc",SplitByKind.Value,1,true);
+				query=report.AddQuery(queryBrokenApts,Lan.g(this,"Broken Appointments"),"ClinicDesc",SplitByKind.Value,0,true);
 			}
 			else {
-				query=report.AddQuery(queryBrokenApts,Lan.g(this,"Broken Appointments"),"",SplitByKind.None,1,true);
+				query=report.AddQuery(queryBrokenApts,Lan.g(this,"Broken Appointments"),"",SplitByKind.None,0,true);
 			}
 			//Add columns to report
 			if(_procCodeBrokenApt.CodeNum==0) {
