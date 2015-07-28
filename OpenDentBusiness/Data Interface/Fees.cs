@@ -9,6 +9,11 @@ namespace OpenDentBusiness{
 	public class Fees {
 		private static List<Fee> _listt;
 		private static object _lockObj=new object();
+		///<summary>Set this variable and the GetFee() method will use this list instead of GetListt() by default.
+		///Useful for when you don't want to call GetListt() repeatedly or when you have no use for the locking mechanism.
+		///Mostly for performance gains.  Eventually we could remove this variable if we can make our cache pattern work with threads better,
+		///but this is too much work right now.</summary>
+		public static List<Fee> ListFees;
 
 		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
 		public static List<Fee> Listt {
@@ -148,7 +153,12 @@ namespace OpenDentBusiness{
 		public static Fee GetFee(long codeNum,long feeSchedNum,long clinicNum,long provNum) {
 			//No need to check RemotingRole; no call to db.
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
-			return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,GetListt());
+			if(ListFees==null) {
+				return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,GetListt());
+			}
+			else {
+				return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,ListFees);
+			}
 		}
 
 		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.
