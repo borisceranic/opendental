@@ -70,22 +70,6 @@ namespace OpenDentBusiness{
       Crud.ConnectionGroupCrud.Sync(listNew,listDB);
     }
 
-		///<summary>Filters _listConns to only include connections that are associated to the selected connection group.</summary>
-		public static List<CentralConnection> FilterConnsByGroup(List<CentralConnection> listConns,ConnectionGroup connGroup) {
-			List<CentralConnection> retVal=new List<CentralConnection>();
-			//Get all ConnGroupAttaches for selected group.
-			List<ConnGroupAttach> listCentralConnGroupAttaches=ConnGroupAttaches.GetForGroup(connGroup.ConnectionGroupNum);
-			for(int i=0;i<listConns.Count;i++) {//Go through connections and return a subset of only those in listConnAttaches (only those in the selected group).
-				for(int j=0;j<listCentralConnGroupAttaches.Count;j++) {
-					if(listConns[i].CentralConnectionNum==listCentralConnGroupAttaches[j].CentralConnectionNum) {//Connection entry found for selected group, display connection.
-						retVal.Add(listConns[i]);
-						break;
-					}
-				}
-			}
-			return retVal;
-		}
-
 		///<summary>Gets one ConnectionGroup from the db based on the ConnectionGroupNum.</summary>
 		public static ConnectionGroup GetOne(long connectionGroupNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

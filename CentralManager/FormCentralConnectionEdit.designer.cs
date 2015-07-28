@@ -252,6 +252,7 @@ namespace CentralManager{
 			// 
 			// FormCentralConnectionEdit
 			// 
+			this.AcceptButton = this.butOK;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(688, 401);
 			this.Controls.Add(this.label10);

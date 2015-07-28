@@ -10,16 +10,28 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class CentralConnections{
 		///<summary></summary>
-		public static List<CentralConnection> Refresh(string searchString){
+		public static List<CentralConnection> GetConnections(){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<CentralConnection>>(MethodBase.GetCurrentMethod(),searchString);
+				return Meth.GetObject<List<CentralConnection>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM centralconnection "
-				+"WHERE ServiceURI LIKE '%"+POut.String(searchString)+"%' "
-				+"OR ServerName LIKE '%"+POut.String(searchString)+"%' "
-				+"OR DatabaseName LIKE '%"+POut.String(searchString)+"%' "
-				+"ORDER BY ItemOrder";
+			string command="SELECT * FROM centralconnection ORDER BY ItemOrder";
 			return Crud.CentralConnectionCrud.SelectMany(command);
+		}
+
+		///<summary>Filters _listConns to only include connections that are associated to the selected connection group.</summary>
+		public static List<CentralConnection> FilterConnections(List<CentralConnection> listConns,string filterText,ConnectionGroup connGroup) {
+			//Get all ConnGroupAttaches for selected group.
+			List<CentralConnection> retVal=listConns;
+			if(connGroup!=null) {
+				//Find all central connections that are in the group list
+				List<ConnGroupAttach> listCentralConnGroupAttaches=ConnGroupAttaches.GetForGroup(connGroup.ConnectionGroupNum);
+				retVal=retVal.FindAll(x => listCentralConnGroupAttaches.Exists(y => y.CentralConnectionNum==x.CentralConnectionNum));
+			}
+			//Find all central connections that meet the filterText criteria
+			retVal=retVal.FindAll(x => x.DatabaseName.ToLower().Contains(filterText.ToLower()) 
+																 || x.ServerName.ToLower().Contains(filterText.ToLower()) 
+																 || x.ServiceURI.ToLower().Contains(filterText.ToLower()));
+			return retVal;
 		}
 
 		///<summary></summary>
@@ -48,6 +60,20 @@ namespace OpenDentBusiness{
 			}
 			string command= "DELETE FROM centralconnection WHERE CentralConnectionNum = "+POut.Long(centralConnectionNum);
 			Db.NonQ(command);
+		}
+
+		public static void Sync(List<CentralConnection> listNew) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
+      }
+      List<CentralConnection> listDB=CentralConnections.GetConnections();
+      Crud.CentralConnectionCrud.Sync(listNew,listDB);
+		}
+
+		///<summary>Used as a central place to store validation error messages for connections.</summary>
+		public static string Validate(CentralConnection conn) {
+
+			return "";
 		}
 
 		///<summary>Encrypts signature text and returns a base 64 string so that it can go directly into the database.</summary>

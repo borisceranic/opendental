@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Text;
 
 namespace OpenDentBusiness {
@@ -120,6 +121,15 @@ namespace OpenDentBusiness {
 				throw new Exception(prefName+" is an invalid pref name.");
 			}
 			return dictPrefs[prefName.ToString()].ValueString;
+		}
+
+		///<summary>Gets a pref of type string without using the cache.</summary>
+		public static string GetStringNoCache(PrefName prefName) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),prefName);
+			}
+			string command="SELECT ValueString FROM preference WHERE PrefName='"+POut.String(prefName.ToString())+"'";
+			return Db.GetScalar(command);
 		}
 
 		///<summary>Gets a pref of type string.  Will not throw an exception if null or not found.</summary>

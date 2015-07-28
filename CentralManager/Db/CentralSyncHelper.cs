@@ -6,6 +6,7 @@ using OpenDentBusiness;
 using System.Windows.Forms;
 using CodeBase;
 using System.Threading;
+using OpenDental.UI;
 
 
 namespace CentralManager {
@@ -114,6 +115,7 @@ namespace CentralManager {
 				}
 				failedConns+=serverName+"\r\n";
 				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				connection.ConnectionStatus="OFFLINE";
 				return;
 			}
 			//Push the preferences to the server.
@@ -196,6 +198,7 @@ namespace CentralManager {
 				}
 				failedConns+=serverName+"\r\n";
 				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				connection.ConnectionStatus="OFFLINE";
 				return;
 			}
 			//Get remote users, usergroups, and associated permissions
@@ -271,6 +274,7 @@ namespace CentralManager {
 				}
 				failedConns+=serverName+"\r\n";
 				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				connection.ConnectionStatus="OFFLINE";
 				return;
 			}
 			//Push the preferences to the server.

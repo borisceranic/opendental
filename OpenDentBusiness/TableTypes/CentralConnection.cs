@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Used by the Central Manager.  Stores the information needed to establish a connection to a remote database.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class CentralConnection:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -29,6 +30,9 @@ namespace OpenDentBusiness{
 		public int ItemOrder;
 		///<summary>If set to true, the password hash is calculated differently.</summary>
 		public bool WebServiceIsEcw;
+		///<summary>Contains the most recent information about this connection.  OK if no problems, version information if version mismatch, 
+		///nothing for not checked, and OFFLINE if previously couldn't connect.</summary>
+		public string ConnectionStatus;
 
 		///<summary>Returns a copy.</summary>
 		public CentralConnection Copy() {

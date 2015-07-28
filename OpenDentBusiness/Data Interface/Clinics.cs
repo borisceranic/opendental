@@ -253,6 +253,15 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets a list of all clinics.  Doesn't use the cache.</summary>
+		public static List<Clinic> GetClinicsNoCache() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Clinic>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM clinic";
+			return Crud.ClinicCrud.SelectMany(command);
+		}
+
 		///<summary>Returns an empty string for invalid clinicNums.</summary>
 		public static string GetDesc(long clinicNum) {
 			//No need to check RemotingRole; no call to db.

@@ -19,7 +19,7 @@ namespace CentralManager {
 		}
 
 		private void FormCentralConnectionGroupEdit_Load(object sender,EventArgs e) {
-			_listConns=CentralConnections.Refresh("");
+			_listConns=CentralConnections.GetConnections();
 			_listConnsCur=new List<CentralConnection>();
 			if(IsNew) {
 				_listConnGroupAttaches=new List<ConnGroupAttach>();

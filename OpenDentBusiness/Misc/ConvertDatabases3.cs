@@ -9446,7 +9446,6 @@ namespace OpenDentBusiness {
 				else {//Oracle
 					//eServices do not currently support Oracle.
 				}
-
 				command="UPDATE preference SET ValueString = '15.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
@@ -9482,6 +9481,15 @@ namespace OpenDentBusiness {
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					//TODO: UPDATE queries for procedure codes where CanadaTimeUnits is not 1.
 				}
+				//Add ConnectionStatus column to centralconnections -------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE centralconnection ADD ConnectionStatus varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE centralconnection ADD ConnectionStatus varchar2(255)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -9495,6 +9503,4 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
 

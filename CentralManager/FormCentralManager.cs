@@ -15,12 +15,14 @@ using OpenDental.UI;
 using OpenDental;
 using CodeBase;
 using System.Globalization;
+using System.Threading;
 
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
 		public static byte[] EncryptionKey;
 		private List<CentralConnection> _listConns;
 		private List<ConnectionGroup> _listConnectionGroups;
+		private string _progVersion;
 
 		public FormCentralManager() {
 			InitializeComponent();
@@ -63,6 +65,12 @@ namespace CentralManager {
 					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
 				}
 			}
+			_listConns=CentralConnections.GetConnections();
+			if(_listConns==null) {
+				_listConns=new List<CentralConnection>(); //They don't have any connections set up yet.
+			}
+			_progVersion=PrefC.GetString(PrefName.ProgramVersion);
+			labelVersion.Text="Version: "+_progVersion;
 			FillGrid();
 		}
 
@@ -119,9 +127,17 @@ namespace CentralManager {
 		}
 
 		private void FillGrid() {
-			_listConns=CentralConnections.Refresh(textSearch.Text);
+			FillGrid(null);
+		}
+
+		///<summary>connNums is a list of CentralConnectionNums which is used primarily for filtering out connections through the Refresh button press.</summary>
+		private void FillGrid(List<long> connNums){
+			List<CentralConnection> listConnsFiltered=null;
 			if(comboConnectionGroups.SelectedIndex>0) {
-				_listConns=ConnectionGroups.FilterConnsByGroup(_listConns,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
+				listConnsFiltered=CentralConnections.FilterConnections(_listConns,textConnSearch.Text,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
+			}
+			else {
+				listConnsFiltered=CentralConnections.FilterConnections(_listConns,textConnSearch.Text,null);
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -132,25 +148,61 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Note",300);
 			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Status",100,HorizontalAlignment.Right);
+			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listConns.Count;i++) {
+			for(int i=0;i<listConnsFiltered.Count;i++) {
+				if(connNums!=null && !connNums.Contains(listConnsFiltered[i].CentralConnectionNum)) {
+					continue; //We only want certain connections showing up in the grid.
+				}
+				string status=listConnsFiltered[i].ConnectionStatus;
 				row=new ODGridRow();
-				row.Cells.Add(_listConns[i].ItemOrder.ToString());
-				if(_listConns[i].DatabaseName=="") {//uri
-					row.Cells.Add(_listConns[i].ServiceURI);
+				row.Cells.Add(listConnsFiltered[i].ItemOrder.ToString());
+				if(listConnsFiltered[i].DatabaseName=="") {//uri
+					row.Cells.Add(listConnsFiltered[i].ServiceURI);
 				}
 				else {
-					row.Cells.Add(_listConns[i].ServerName+", "+_listConns[i].DatabaseName);
+					row.Cells.Add(listConnsFiltered[i].ServerName+", "+listConnsFiltered[i].DatabaseName);
 				}
-				row.Cells.Add(_listConns[i].Note);
-				row.Tag=_listConns[i];
+				row.Cells.Add(listConnsFiltered[i].Note);
+				if(status=="") {
+					row.Cells.Add("Not checked");
+					row.Cells[3].ColorText=Color.DarkGoldenrod;
+				}
+				else if(status=="OK") {
+					row.Cells.Add(status);
+					row.Cells[3].ColorText=Color.Green;
+					row.Cells[3].Bold=YN.Yes;
+				}
+				else if(status=="OFFLINE") {
+					row.Cells.Add(status);
+					row.Bold=true;
+					row.ColorText=Color.Red;
+				}
+				else {
+					row.Cells.Add(status);
+					row.Cells[3].ColorText=Color.Red;
+				}
+				row.Tag=listConnsFiltered[i];
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(CentralConnections.Validate(_listConns[e.Row])!="OK"){
+				MsgBox.Show(this,CentralConnections.Validate(_listConns[e.Row]));
+				return;
+			}
+			if(_listConns[e.Row].ConnectionStatus=="OFFLINE") {
+				MsgBox.Show(this,"Server Offline.  Fix connection and check status again to connect.");
+				return;
+			}
+			if(_listConns[e.Row].ConnectionStatus!="OK") {
+				MsgBox.Show(this,"Version mismatch.  Either update your program or update the remote server's program and check status again to connect.");
+				return;
+			}
 			string args="";
 			if(_listConns[e.Row].DatabaseName!="") {
 				//ServerName=localhost DatabaseName=opendental MySqlUser=root MySqlPassword=
@@ -179,10 +231,6 @@ namespace CentralManager {
 			#else
 				Process.Start("OpenDental.exe",args);
 			#endif
-		}
-
-		private void textSearch_TextChanged(object sender,EventArgs e) {
-			FillGrid();
 		}
 		
 		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -298,7 +346,120 @@ namespace CentralManager {
 			FormCentralConnectionEdit FormCCE=new FormCentralConnectionEdit();
 			FormCCE.CentralConnectionCur=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;//No support for editing multiple.
 			FormCCE.ShowDialog();
+			_listConns=CentralConnections.GetConnections();
 			FillGrid();
+		}
+
+		private void butRefreshConns_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				CentralConnection conn=(CentralConnection)gridMain.Rows[i].Tag;
+				ODThread odThread=new ODThread(ConnectAndVerify,new object[] { conn,_progVersion });
+				odThread.GroupName="Verify";
+				odThread.Start();
+			}
+			ODThread.JoinThreadsByGroupName(Timeout.Infinite,"Verify");
+			List<ODThread> listComplThreads=ODThread.GetThreadsByGroupName("Verify");
+			for(int i=0;i<listComplThreads.Count;i++) {
+				object[] obj=(object[])listComplThreads[i].Tag;
+				CentralConnection conn=((CentralConnection)obj[0]);
+				string status=((string)obj[1]);
+				CentralConnection connection=_listConns.Find(x => x.CentralConnectionNum==conn.CentralConnectionNum);
+				connection.ConnectionStatus=status;
+			}
+			Cursor=Cursors.Default;
+			FillGrid();
+		}
+
+		private void ConnectAndVerify(ODThread odThread) {
+			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
+			string progVersion=(string)odThread.Parameters[1];
+			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {
+				odThread.Tag=new object[] { connection,"OFFLINE" };//Can't connect
+				return;
+			}
+			string progVersionRemote=PrefC.GetStringNoCache(PrefName.ProgramVersion);
+			string err="";
+			if(progVersionRemote!=progVersion) {
+				err=progVersionRemote;
+			}
+			else {
+				err="OK";
+			}
+			odThread.Tag=new object[] { connection,err };
+		}
+
+		private void butRefresh_Click(object sender,EventArgs e) {
+			if(textProviderSearch.Text=="" && textClinicSearch.Text=="") {
+				FillGrid();
+				return;
+			}
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				CentralConnection conn=(CentralConnection)gridMain.Rows[i].Tag;
+				if(conn.ConnectionStatus!="OK") {
+					continue;
+				}
+				ODThread odThread=new ODThread(ConnectAndSearch,new object[] { conn });
+				odThread.GroupName="Search";
+				odThread.Start();
+			}
+			ODThread.JoinThreadsByGroupName(Timeout.Infinite,"Search");
+			List<ODThread> listComplThreads=ODThread.GetThreadsByGroupName("Search");
+			List<long> connNums=new List<long>();
+			for(int i=0;i<listComplThreads.Count;i++) {
+				object[] obj=(object[])listComplThreads[i].Tag;
+				CentralConnection conn=((CentralConnection)obj[0]);
+				bool result=((bool)obj[1]);
+				if(result) {
+					connNums.Add(conn.CentralConnectionNum);
+				}
+				listComplThreads[i].QuitAsync();
+			}
+			FillGrid(connNums);
+		}
+
+		private void ConnectAndSearch(ODThread odThread) {
+			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
+			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {//No updating the cache since we're going to be connecting to multiple remote servers at the same time.
+				odThread.Tag=new object[] { connection,false };//Can't connect, just return false to not include the connection.
+				connection.ConnectionStatus="OFFLINE";
+				return;
+			}
+			List<Provider> listProvs=Providers.GetProvsNoCache();
+			//If clinic and provider are both entered is it good enough to find one match among the two?  I'm going to assume yes for now, and maybe later
+			//if we decide that if both boxes have something entered that both entries need to be in the db we're searching I can change it.
+			bool provMatch=false;
+			for(int i=0;i<listProvs.Count;i++) {
+				if(textProviderSearch.Text=="") {
+					provMatch=true;
+					break;
+				}
+				if(listProvs[i].Abbr.ToLower().Contains(textProviderSearch.Text.ToLower())
+					|| listProvs[i].LName.ToLower().Contains(textProviderSearch.Text.ToLower())
+					|| listProvs[i].FName.ToLower().Contains(textProviderSearch.Text.ToLower())) 
+				{
+					provMatch=true;
+					break;
+				}
+			}
+			List<Clinic> listClinics=Clinics.GetClinicsNoCache();
+			bool clinMatch=false;
+			for(int i=0;i<listClinics.Count;i++) {
+				if(textClinicSearch.Text=="") {
+					clinMatch=true;
+					break;
+				}
+				if(listClinics[i].Description.ToLower().Contains(textClinicSearch.Text.ToLower())) {
+					clinMatch=true;
+					break;
+				}
+			}
+			if(clinMatch && provMatch) {
+				odThread.Tag=new object[] { connection,true };//Match found
+			}
+			else {
+				odThread.Tag=new object[] { connection,false };//No match found
+			}
 		}
 
 		private void butSecurity_Click(object sender,EventArgs e) {
@@ -308,9 +469,13 @@ namespace CentralManager {
 			}
 			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ConnectionStatus!="OK") {
+					continue;
+				}
 				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 			}
 			CentralSyncHelper.SyncAll(listSelectedConns);
+			FillGrid();
 		}
 
 		private void butUsers_Click(object sender,EventArgs e) {
@@ -320,9 +485,13 @@ namespace CentralManager {
 			}
 			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ConnectionStatus!="OK") {
+					continue;
+				}
 				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 			}
 			CentralSyncHelper.SyncUsers(listSelectedConns);
+			FillGrid();
 		}
 
 		private void butLocks_Click(object sender,EventArgs e) {
@@ -332,9 +501,13 @@ namespace CentralManager {
 			}
 			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ConnectionStatus!="OK") {
+					continue;
+				}
 				listSelectedConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 			}
 			CentralSyncHelper.SyncLocks(listSelectedConns);
+			FillGrid();
 		}
 
 		private void butPtSearch_Click(object sender,EventArgs e) {
@@ -344,15 +517,22 @@ namespace CentralManager {
 			}
 			List<CentralConnection> listConns=new List<CentralConnection>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ConnectionStatus!="OK") {
+					continue;
+				}
 				listConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 			}
 			FormCentralPatientSearch FormCPS=new FormCentralPatientSearch();
 			FormCPS.ListConns=listConns;
 			FormCPS.ShowDialog();
+			FillGrid();
 		}
-
+		
 		private void FormCentralManager_FormClosing(object sender,FormClosingEventArgs e) {
 			ODThread.QuitSyncAllOdThreads();
+			if(_listConns!=null) {
+				CentralConnections.Sync(_listConns);
+			}
 		}
 
 		

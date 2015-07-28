@@ -57,6 +57,7 @@ namespace OpenDentBusiness.Crud{
 				centralConnection.Note                = PIn.String(table.Rows[i]["Note"].ToString());
 				centralConnection.ItemOrder           = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
 				centralConnection.WebServiceIsEcw     = PIn.Bool  (table.Rows[i]["WebServiceIsEcw"].ToString());
+				centralConnection.ConnectionStatus    = PIn.String(table.Rows[i]["ConnectionStatus"].ToString());
 				retVal.Add(centralConnection);
 			}
 			return retVal;
@@ -97,7 +98,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CentralConnectionNum,";
 			}
-			command+="ServerName,DatabaseName,MySqlUser,MySqlPassword,ServiceURI,OdUser,OdPassword,Note,ItemOrder,WebServiceIsEcw) VALUES(";
+			command+="ServerName,DatabaseName,MySqlUser,MySqlPassword,ServiceURI,OdUser,OdPassword,Note,ItemOrder,WebServiceIsEcw,ConnectionStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(centralConnection.CentralConnectionNum)+",";
 			}
@@ -111,7 +112,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(centralConnection.OdPassword)+"',"
 				+"'"+POut.String(centralConnection.Note)+"',"
 				+    POut.Int   (centralConnection.ItemOrder)+","
-				+    POut.Bool  (centralConnection.WebServiceIsEcw)+")";
+				+    POut.Bool  (centralConnection.WebServiceIsEcw)+","
+				+"'"+POut.String(centralConnection.ConnectionStatus)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -144,7 +146,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CentralConnectionNum,";
 			}
-			command+="ServerName,DatabaseName,MySqlUser,MySqlPassword,ServiceURI,OdUser,OdPassword,Note,ItemOrder,WebServiceIsEcw) VALUES(";
+			command+="ServerName,DatabaseName,MySqlUser,MySqlPassword,ServiceURI,OdUser,OdPassword,Note,ItemOrder,WebServiceIsEcw,ConnectionStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(centralConnection.CentralConnectionNum)+",";
 			}
@@ -158,7 +160,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(centralConnection.OdPassword)+"',"
 				+"'"+POut.String(centralConnection.Note)+"',"
 				+    POut.Int   (centralConnection.ItemOrder)+","
-				+    POut.Bool  (centralConnection.WebServiceIsEcw)+")";
+				+    POut.Bool  (centralConnection.WebServiceIsEcw)+","
+				+"'"+POut.String(centralConnection.ConnectionStatus)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -180,7 +183,8 @@ namespace OpenDentBusiness.Crud{
 				+"OdPassword          = '"+POut.String(centralConnection.OdPassword)+"', "
 				+"Note                = '"+POut.String(centralConnection.Note)+"', "
 				+"ItemOrder           =  "+POut.Int   (centralConnection.ItemOrder)+", "
-				+"WebServiceIsEcw     =  "+POut.Bool  (centralConnection.WebServiceIsEcw)+" "
+				+"WebServiceIsEcw     =  "+POut.Bool  (centralConnection.WebServiceIsEcw)+", "
+				+"ConnectionStatus    = '"+POut.String(centralConnection.ConnectionStatus)+"' "
 				+"WHERE CentralConnectionNum = "+POut.Long(centralConnection.CentralConnectionNum);
 			Db.NonQ(command);
 		}
@@ -228,6 +232,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="WebServiceIsEcw = "+POut.Bool(centralConnection.WebServiceIsEcw)+"";
 			}
+			if(centralConnection.ConnectionStatus != oldCentralConnection.ConnectionStatus) {
+				if(command!=""){ command+=",";}
+				command+="ConnectionStatus = '"+POut.String(centralConnection.ConnectionStatus)+"'";
+			}
 			if(command==""){
 				return false;
 			}
@@ -242,6 +250,69 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM centralconnection "
 				+"WHERE CentralConnectionNum = "+POut.Long(centralConnectionNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<CentralConnection> listNew,List<CentralConnection> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<CentralConnection> listIns    =new List<CentralConnection>();
+			List<CentralConnection> listUpdNew =new List<CentralConnection>();
+			List<CentralConnection> listUpdDB  =new List<CentralConnection>();
+			List<CentralConnection> listDel    =new List<CentralConnection>();
+			listNew.Sort((CentralConnection x,CentralConnection y) => { return x.CentralConnectionNum.CompareTo(y.CentralConnectionNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((CentralConnection x,CentralConnection y) => { return x.CentralConnectionNum.CompareTo(y.CentralConnectionNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			CentralConnection fieldNew;
+			CentralConnection fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.CentralConnectionNum<fieldDB.CentralConnectionNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.CentralConnectionNum>fieldDB.CentralConnectionNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				Update(listUpdNew[i],listUpdDB[i]);
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].CentralConnectionNum);
+			}
 		}
 
 	}

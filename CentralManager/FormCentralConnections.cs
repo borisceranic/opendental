@@ -32,9 +32,12 @@ namespace CentralManager {
 		}
 
 		private void FillGrid() {
-			_listConnsDisplay=CentralConnections.Refresh(textSearch.Text);
+			_listConnsDisplay=null;
 			if(comboConnectionGroups.SelectedIndex>0) {
-				_listConnsDisplay=ConnectionGroups.FilterConnsByGroup(_listConnsDisplay,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
+				_listConnsDisplay=CentralConnections.FilterConnections(ListConns,textSearch.Text,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
+			}
+			else {
+				_listConnsDisplay=CentralConnections.FilterConnections(ListConns,textSearch.Text,null);
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();

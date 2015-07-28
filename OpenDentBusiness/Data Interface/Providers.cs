@@ -354,6 +354,16 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Gets all providers from the database.  Doesn't use the cache.</summary>
+		public static List<Provider> GetProvsNoCache() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Provider>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM provider";
+			return Crud.ProviderCrud.SelectMany(command);
+
+		}
+
 		///<summary>Gets a provider from the List.  If EcwID is not found, then it returns null.</summary>
 		public static Provider GetProvByEcwID(string eID) {
 			//No need to check RemotingRole; no call to db.

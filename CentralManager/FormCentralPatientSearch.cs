@@ -83,6 +83,7 @@ namespace CentralManager {
 					_invalidConnsLog+="\r\n"+connName;
 					_complConnAmt++;
 				}
+				connection.ConnectionStatus="OFFLINE";
 				BeginInvoke(new FillGridDelegate(FillGrid));
 				return;
 			}
