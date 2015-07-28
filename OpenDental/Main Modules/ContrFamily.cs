@@ -424,12 +424,7 @@ namespace OpenDental{
 				button.DropDownMenu=menuInsurance;
 				ToolBarMain.Buttons.Add(button);
 			}
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.FamilyModule);
-			for(int i=0;i<toolButItems.Count;i++){
-				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-					,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.FamilyModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrFamily.LayoutToolBar_end",PatCur);
 		}

@@ -15,7 +15,6 @@ namespace OpenDentBusiness{
 		///<summary>The text to show on the toolbar button.</summary>
 		public string ButtonText;
 		//later include ComputerName.  If blank, then show on all computers.
-		//also later, include an image.
 	}
 
 	

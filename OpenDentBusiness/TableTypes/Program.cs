@@ -22,6 +22,9 @@ namespace OpenDentBusiness{
 		public string Note;
 		///<summary>If this is a Plugin, then this is the filename of the dll.  The dll must be located in the application directory.</summary>
 		public string PluginDllName;
+		///<summary>If no image, then will be an empty string.  In this case, the bitmap will be null when loaded from the database.
+		///Must be a 22 x 22 image, and thus needs (width) x (height) x (depth) = 22 x 22 x 4 = 1936 bytes.</summary>
+		public string ButtonImage;
 
 		public Program Copy(){
 			return (Program)this.MemberwiseClone();

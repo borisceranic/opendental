@@ -41,6 +41,10 @@ namespace OpenDental{
 		private TextBox textOverride;
 		private Label labelOverride;
 		private ArrayList ProgramPropertiesForProgram;
+		private UI.Button butClear;
+		private UI.Button butImport;
+		private Label label10;
+		private PictureBox pictureBox;
 		private string pathOverrideOld;
 
 		///<summary></summary>
@@ -99,6 +103,11 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.textOverride = new System.Windows.Forms.TextBox();
 			this.labelOverride = new System.Windows.Forms.Label();
+			this.butClear = new OpenDental.UI.Button();
+			this.butImport = new OpenDental.UI.Button();
+			this.label10 = new System.Windows.Forms.Label();
+			this.pictureBox = new System.Windows.Forms.PictureBox();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -153,7 +162,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(17, 514);
+			this.butDelete.Location = new System.Drawing.Point(15, 514);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 26);
 			this.butDelete.TabIndex = 43;
@@ -230,7 +239,7 @@ namespace OpenDental{
 			this.listToolBars.Location = new System.Drawing.Point(15, 281);
 			this.listToolBars.Name = "listToolBars";
 			this.listToolBars.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listToolBars.Size = new System.Drawing.Size(147, 108);
+			this.listToolBars.Size = new System.Drawing.Size(156, 108);
 			this.listToolBars.TabIndex = 53;
 			// 
 			// label6
@@ -288,6 +297,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(246, 247);
 			this.gridMain.Name = "gridMain";
@@ -330,11 +340,64 @@ namespace OpenDental{
 			this.labelOverride.Text = "Local path override.  Usually left blank.";
 			this.labelOverride.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// butClear
+			// 
+			this.butClear.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClear.Autosize = true;
+			this.butClear.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClear.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClear.CornerRadius = 4F;
+			this.butClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butClear.Location = new System.Drawing.Point(15, 436);
+			this.butClear.Name = "butClear";
+			this.butClear.Size = new System.Drawing.Size(75, 26);
+			this.butClear.TabIndex = 70;
+			this.butClear.Text = "Clear";
+			this.butClear.Click += new System.EventHandler(this.butClear_Click);
+			// 
+			// butImport
+			// 
+			this.butImport.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butImport.Autosize = true;
+			this.butImport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butImport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butImport.CornerRadius = 4F;
+			this.butImport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butImport.Location = new System.Drawing.Point(96, 436);
+			this.butImport.Name = "butImport";
+			this.butImport.Size = new System.Drawing.Size(75, 26);
+			this.butImport.TabIndex = 69;
+			this.butImport.Text = "Import";
+			this.butImport.Click += new System.EventHandler(this.butImport_Click);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(6, 403);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(138, 22);
+			this.label10.TabIndex = 68;
+			this.label10.Text = "Button Image (22x22)";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// pictureBox
+			// 
+			this.pictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pictureBox.Location = new System.Drawing.Point(149, 403);
+			this.pictureBox.Name = "pictureBox";
+			this.pictureBox.Size = new System.Drawing.Size(22, 22);
+			this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+			this.pictureBox.TabIndex = 72;
+			this.pictureBox.TabStop = false;
+			// 
 			// FormProgramLinkEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(797, 560);
+			this.Controls.Add(this.pictureBox);
+			this.Controls.Add(this.butClear);
+			this.Controls.Add(this.butImport);
+			this.Controls.Add(this.label10);
 			this.Controls.Add(this.textOverride);
 			this.Controls.Add(this.labelOverride);
 			this.Controls.Add(this.textPluginDllName);
@@ -368,6 +431,7 @@ namespace OpenDental{
 			this.Text = "Program Link";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormProgramLinkEdit_Closing);
 			this.Load += new System.EventHandler(this.FormProgramLinkEdit_Load);
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -397,6 +461,7 @@ namespace OpenDental{
 			textCommandLine.Text=ProgramCur.CommandLine;
 			textPluginDllName.Text=ProgramCur.PluginDllName;
 			textNote.Text=ProgramCur.Note;
+			pictureBox.Image=PIn.Bitmap(ProgramCur.ButtonImage);
 			List<ToolButItem> itemsForProgram=ToolButItems.GetForProgram(ProgramCur.ProgramNum);
 			listToolBars.Items.Clear();
 			for(int i=0;i<Enum.GetNames(typeof(ToolBarsAvail)).Length;i++){
@@ -456,6 +521,29 @@ namespace OpenDental{
 			FillGrid();
 		}
 
+		private void butImport_Click(object sender,EventArgs e) {
+			OpenFileDialog dlg=new OpenFileDialog();
+			if(dlg.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			try {
+				Image importedImg=Image.FromFile(dlg.FileName);
+				if(importedImg.Size!=new Size(22,22)) {
+					MessageBox.Show(Lan.g(this,"Required image dimensions are 22x22.")
+						+"\r\n"+Lan.g(this,"Selected image dimensions are")+": "+importedImg.Size.Width+"x"+importedImg.Size.Height);
+					return;
+				}
+				pictureBox.Image=importedImg;
+			}
+			catch {
+				MsgBox.Show(this,"Error loading file.");
+			}
+		}
+
+		private void butClear_Click(object sender,EventArgs e) {
+			pictureBox.Image=null;
+		}
+
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			if(ProgramCur.ProgName!=""){//prevent users from deleting program links that we included.
 				MsgBox.Show(this,"Not allowed to delete a program link with an internal name.");
@@ -499,6 +587,7 @@ namespace OpenDental{
 			ProgramCur.CommandLine=textCommandLine.Text;
 			ProgramCur.PluginDllName=textPluginDllName.Text;
 			ProgramCur.Note=textNote.Text;
+			ProgramCur.ButtonImage=POut.Bitmap((Bitmap)pictureBox.Image,System.Drawing.Imaging.ImageFormat.Png);
 			if(IsNew){
 				Programs.Insert(ProgramCur);
 			}

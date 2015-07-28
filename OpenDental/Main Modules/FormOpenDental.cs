@@ -2125,7 +2125,13 @@ namespace OpenDental{
 					//try/catch in case you are trying to convert from an older version of OD and need to update the DB.
 				}
 				this.Invalidate();//apply them at next repaint.
-				Plugins.LoadAllPlugins(this);//moved up from near RefreshLocalData(invalidTypes). New position might cause problems.
+				try {
+					Plugins.LoadAllPlugins(this);//moved up from near RefreshLocalData(invalidTypes). New position might cause problems.
+				}
+				catch {
+					//Do nothing since this will likely only fail if a column is added to the program table, 
+					//due to this method getting called before the update script.  If the plugins do not load, then the simple solution is to restart OD.
+				}
 				Splash=new FormSplash();
 				if(CommandLineArgs.Length==0) {
 					Splash.Show();
@@ -2967,12 +2973,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons.Add(button);
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Popups"),-1,Lan.g(this,"Edit popups for this patient"),"Popups"));
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.AllModules);
-			for(int i=0;i<toolButItems.Count;i++) {
-			  //ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-			  ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-			    ,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.AllModules);
 			Plugins.HookAddCode(this,"FormOpenDental.LayoutToolBar_end");
 			ToolBarMain.Invalidate();
 		}

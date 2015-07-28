@@ -615,12 +615,7 @@ namespace OpenDental {
 				button.Style=ODToolBarButtonStyle.ToggleButton;
 				ToolBarMain.Buttons.Add(button);
 				//Program links:
-				ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ImagesModule);
-				for(int i=0;i<toolButItems.Count;i++) {
-					ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-					ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-						,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-				}
+				ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.ImagesModule);
 			}
 			else {//claimpayment
 				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));

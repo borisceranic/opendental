@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using OpenDental.Bridges;
 using OpenDentBusiness;
+using OpenDental.UI;
+using System.Drawing;
 
 namespace OpenDental{
 	
@@ -327,6 +329,34 @@ namespace OpenDental{
 			catch{
 				MessageBox.Show(prog.ProgDesc+" is not available.");
 				return;
+			}
+		}
+
+		public static void LoadToolbar(ODToolBar ToolBarMain,ToolBarsAvail toolBarsAvail) {
+			ArrayList toolButItems=ToolButItems.GetForToolBar(toolBarsAvail);
+			for(int i=0;i<toolButItems.Count;i++) {
+				ToolButItem toolButItemCur=((ToolButItem)toolButItems[i]);
+				Program programCur=Programs.GetProgram(toolButItemCur.ProgramNum);
+				string key=programCur.ProgramNum.ToString()+programCur.ProgName.ToString();
+				if(ToolBarMain.ImageList.Images.ContainsKey(key)) {
+					//Dispose the existing image only if it already exists, because the image might have changed.
+					ToolBarMain.ImageList.Images[ToolBarMain.ImageList.Images.IndexOfKey(key)].Dispose();
+					ToolBarMain.ImageList.Images.RemoveByKey(key);
+				}
+				if(programCur.ButtonImage!="") {
+					Image image=PIn.Bitmap(programCur.ButtonImage);
+					ToolBarMain.ImageList.Images.Add(key,image);
+				}
+				if(toolBarsAvail!=ToolBarsAvail.AllModules) {
+					ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+				}
+				ToolBarMain.Buttons.Add(new ODToolBarButton(toolButItemCur.ButtonText,-1,"",key));
+			}
+			for(int i=0;i<ToolBarMain.Buttons.Count;i++) {//Reset the new index, because it might have changed due to removing/adding to the Images list.
+				string key=ToolBarMain.Buttons[i].Tag.ToString();
+				if(ToolBarMain.ImageList.Images.ContainsKey(key)) {
+					ToolBarMain.Buttons[i].ImageIndex=ToolBarMain.ImageList.Images.IndexOfKey(key);
+				}
 			}
 		}
 

@@ -90,6 +90,18 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		///<summary>Returns the Program of the passed in ProgramNum.  Will be null if a Program is not found.</summary>
+		public static Program GetProgram(long programNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Program> listPrograms=ProgramC.GetListt();
+			for(int i=0;i<listPrograms.Count;i++) {
+				if(listPrograms[i].ProgramNum==programNum) {
+					return listPrograms[i];
+				}
+			}
+			return null;
+		}
+
 		///<summary>Supply a valid program Name, and this will set Cur to be the corresponding Program object.</summary>
 		public static Program GetCur(ProgramName progName) {
 			//No need to check RemotingRole; no call to db.

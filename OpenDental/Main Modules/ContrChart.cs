@@ -3193,12 +3193,7 @@ namespace OpenDental{
 			if(hl7DefCur!=null) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(hl7DefCur.Description,-1,"","MedLab"));
 			}
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ChartModule);
-			for(int i=0;i<toolButItems.Count;i++){
-				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-					,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.ChartModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrChart.LayoutToolBar_end",PatCur);
 		}

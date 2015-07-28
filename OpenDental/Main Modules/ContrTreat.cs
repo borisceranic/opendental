@@ -850,12 +850,7 @@ namespace OpenDental{
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print TP"),2,"","Print"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Email TP"),-1,"","Email"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Sign TP"),-1,"","Sign"));
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.TreatmentPlanModule);
-			for(int i=0;i<toolButItems.Count;i++){
-				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-					,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.TreatmentPlanModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrTreat.LayoutToolBar_end",PatCur);
 		}

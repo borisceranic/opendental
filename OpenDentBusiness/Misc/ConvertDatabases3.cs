@@ -9490,6 +9490,15 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE centralconnection ADD ConnectionStatus varchar2(255)";
 					Db.NonQ(command);
 				}
+				//The ButtonImage must be a 22 x 22 image, and thus needs (width) x (height) x (depth) = 22 x 22 x 4 = 1936 bytes
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE program ADD ButtonImage text NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE program ADD ButtonImage varchar2";
+					Db.NonQ(command);
+				}
 
 
 

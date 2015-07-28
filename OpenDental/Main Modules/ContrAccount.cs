@@ -1750,12 +1750,7 @@ namespace OpenDental {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"TrojanCollect"),-1,"","TrojanCollect"));
 			}
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.AccountModule);
-			for(int i=0;i<toolButItems.Count;i++) {
-				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-					,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.AccountModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrAccount.LayoutToolBar_end",PatCur);
 		}

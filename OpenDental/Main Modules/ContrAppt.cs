@@ -1864,12 +1864,7 @@ namespace OpenDental {
 			//ToolBarMain.Buttons.Add(button);
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",2,Lan.g(this,"Appointment Lists"),"Lists"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",1,Lan.g(this,"Print Schedule"),"Print"));
-			ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ApptModule);
-			for(int i=0;i<toolButItems.Count;i++) {
-				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(((ToolButItem)toolButItems[i]).ButtonText
-					,-1,"",((ToolButItem)toolButItems[i]).ProgramNum));
-			}
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.ApptModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrAppt.LayoutToolBar_end",PatCur);
 		}
