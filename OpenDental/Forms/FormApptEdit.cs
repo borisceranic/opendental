@@ -256,6 +256,7 @@ namespace OpenDental{
 			this.comboConfirmed.Name = "comboConfirmed";
 			this.comboConfirmed.Size = new System.Drawing.Size(126, 21);
 			this.comboConfirmed.TabIndex = 84;
+			this.comboConfirmed.SelectionChangeCommitted += new System.EventHandler(this.comboConfirmed_SelectionChangeCommitted);
 			// 
 			// comboUnschedStatus
 			// 
@@ -2398,14 +2399,38 @@ namespace OpenDental{
 
 		private void menuItemArrivedNow_Click(object sender,EventArgs e) {
 			textTimeArrived.Text=DateTime.Now.ToShortTimeString();
+			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0) { //Using AppointmentTimeArrivedTrigger preference
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Arrived'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
+				}
+			}
 		}
 
 		private void menuItemSeatedNow_Click(object sender,EventArgs e) {
 			textTimeSeated.Text=DateTime.Now.ToShortTimeString();
+			if(PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)!=0) { //Using AppointmentTimeSeatedTrigger preference
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'In Room'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
+				}
+			}
 		}
 
 		private void menuItemDismissedNow_Click(object sender,EventArgs e) {
 			textTimeDismissed.Text=DateTime.Now.ToShortTimeString();
+			if(PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)!=0) { //Using AppointmentTimeDismissedTrigger preference
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Dismissed'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
+				}
+			}
 		}
 
 		private void gridFields_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -2473,13 +2498,6 @@ namespace OpenDental{
 				}
 			}
 			DateTime dateTimeArrived=AptCur.AptDateTime.Date;
-			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0 //Using appointmentTimeArrivedTrigger preference
-				&& comboConfirmed.SelectedIndex>-1 //Valid index selected
-				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger) //selected index matches pref
-				&& String.IsNullOrWhiteSpace(textTimeArrived.Text))//time not already set 
-			{
-				textTimeArrived.Text=DateTime.Now.ToShortTimeString();
-			}
 			if(textTimeArrived.Text!=""){
 				try{
 					dateTimeArrived=AptCur.AptDateTime.Date+DateTime.Parse(textTimeArrived.Text).TimeOfDay;
@@ -2505,8 +2523,41 @@ namespace OpenDental{
 					dateTimeDismissed=AptCur.AptDateTime.Date+DateTime.Parse(textTimeDismissed.Text).TimeOfDay;
 				}
 				catch{
-					MsgBox.Show(this,"Time Arrived invalid.");
+					MsgBox.Show(this,"Time Dismissed invalid.");
 					return false;
+				}
+			}
+			if(!String.IsNullOrWhiteSpace(textTimeArrived.Text) //only textTimeArrived has a value
+				&& String.IsNullOrWhiteSpace(textTimeSeated.Text)
+				&& String.IsNullOrWhiteSpace(textTimeDismissed.Text)
+				&& PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0) //Using AppointmentTimeArrivedTrigger preference
+			{
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Arrived'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
+				}
+			}
+			if(!String.IsNullOrWhiteSpace(textTimeSeated.Text) //textTimeSeated has a value but textTimeDismissed does not
+				&& String.IsNullOrWhiteSpace(textTimeDismissed.Text)
+				&& PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)!=0)//Using AppointmentTimeSeatedTrigger preference
+			{
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'In Room'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
+				}
+			}
+			if(!String.IsNullOrWhiteSpace(textTimeDismissed.Text)//textTimeDismissed has a value
+				&& PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)!=0)//Using AppointmentTimeDismissedTrigger preference
+			{
+				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Done'
+					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) { //index matches pref
+						comboConfirmed.SelectedIndex=i;
+						break;
+					}
 				}
 			}
 			//This change was just slightly too risky to make to 6.9, so 7.0 only
@@ -3174,6 +3225,27 @@ namespace OpenDental{
 			}
 		}
 
+		private void comboConfirmed_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0 //Using appointmentTimeArrivedTrigger preference
+				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger) //selected index matches pref
+				&& String.IsNullOrWhiteSpace(textTimeArrived.Text))//time not already set 
+			{
+				textTimeArrived.Text=DateTime.Now.ToShortTimeString();
+			}
+			if(PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)!=0 //Using AppointmentTimeSeatedTrigger preference
+				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger) //selected index matches pref
+				&& String.IsNullOrWhiteSpace(textTimeSeated.Text))//time not already set 
+			{
+				textTimeSeated.Text=DateTime.Now.ToShortTimeString();
+			}
+			if(PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)!=0 //Using AppointmentTimeDismissedTrigger preference
+				&& DefC.Short[(int)DefCat.ApptConfirmed][comboConfirmed.SelectedIndex].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger) //selected index matches pref
+				&& String.IsNullOrWhiteSpace(textTimeDismissed.Text))//time not already set 
+			{
+				textTimeDismissed.Text=DateTime.Now.ToShortTimeString();
+			}
+		}
+
 		private void butDelete_Click(object sender,EventArgs e) {
 			if (AptCur.AptStatus == ApptStatus.PtNote || AptCur.AptStatus == ApptStatus.PtNoteCompleted) {
 				if (!MsgBox.Show(this, true, "Delete Patient Note?")) {
@@ -3405,7 +3477,7 @@ namespace OpenDental{
 
 	
 
-	
+
 
 	}
 }

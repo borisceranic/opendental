@@ -3391,9 +3391,15 @@ namespace OpenDental {
 					}
 					else {
 						if(apt.DateTimeAskedToArrive.Year>1880) {
-							MessageBox.Show(Lan.g(this,"Time asked to arrive was ")+apt.DateTimeAskedToArrive.ToShortTimeString());//OK is only option
+							apt.DateTimeAskedToArrive=apt.AptDateTime-(aptOld.AptDateTime-aptOld.DateTimeAskedToArrive);
+							if(MessageBox.Show(Lan.g(this,"Ask patient to arrive")+" "+(aptOld.AptDateTime-aptOld.DateTimeAskedToArrive).TotalMinutes
+								+" "+Lan.g(this,"minutes early at")+" "+apt.DateTimeAskedToArrive.ToShortTimeString()+"?","",MessageBoxButtons.YesNo)==DialogResult.No) {
+									apt.DateTimeAskedToArrive=aptOld.DateTimeAskedToArrive;
+							}
 						}
-						apt.DateTimeAskedToArrive=DateTime.MinValue;
+						else {
+							apt.DateTimeAskedToArrive=DateTime.MinValue;
+						}
 					}
 				}
 				//if no dentist/hygenist is assigned to spot, then keep the original dentist/hygenist without prompt.  All appts must have prov.
