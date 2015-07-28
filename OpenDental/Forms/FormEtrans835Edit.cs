@@ -266,11 +266,23 @@ namespace OpenDental {
 			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
 			List<PatPlan> listPatPlans=PatPlans.Refresh(claim.PatNum);
 			List<ClaimProc> listClaimProcsForClaim=ClaimProcs.RefreshForClaim(claim.ClaimNum);
+			List<Procedure> listProcs=Procedures.GetProcsFromClaimProcs(listClaimProcsForClaim);
 			ClaimProc cpByTotal=new ClaimProc();
+			cpByTotal.FeeBilled=0;//All attached claimprocs will show in the grid and be used for the total sum.
 			cpByTotal.DedApplied=(double)claimPaid.PatientPortion;
 			cpByTotal.AllowedOverride=(double)claimPaid.AllowedAmt;
 			cpByTotal.InsPayAmt=(double)claimPaid.InsPaid;
-			cpByTotal.WriteOff=(double)claimPaid.Writeoff;
+			//Calculate the total claim writeoff by calculating the claim UCR total fee and subtracting the total allowed amount.
+			//Note that claim.ClaimFee is the total billed fee (sum of claimproc.FeeBilled), not the UCR total fee, so we need to sum up the proc fees here.
+			//Notice that this calculation does not rely on procedure matching, which makes the calculation more accurate.
+			double claimUcrFee=0;
+			for(int i=0;i<listClaimProcsForClaim.Count;i++) {
+				ClaimProc claimProc=listClaimProcsForClaim[i];
+				Procedure proc=Procedures.GetProcFromList(listProcs,claimProc.ProcNum);
+				claimUcrFee+=proc.ProcFee;
+			}
+			//Writeoff could be negative if the UCR fee schedule was incorrectly entered by the user.  If negative, then is fixed below.
+			cpByTotal.WriteOff=claimUcrFee-(double)claimPaid.AllowedAmt;
 			List<ClaimProc> listClaimProcsToEdit=new List<ClaimProc>();
 			//Automatically set PayPlanNum if there is a payplan with matching PatNum, PlanNum, and InsSubNum that has not been paid in full.
 			long insPayPlanNum=0;
@@ -335,11 +347,19 @@ namespace OpenDental {
 					claimProc.DedApplied+=(double)procPaidPartial.PatientPortion;
 					claimProc.AllowedOverride+=(double)procPaidPartial.AllowedAmt;
 					claimProc.InsPayAmt+=(double)procPaidPartial.InsPaid;
-					claimProc.WriteOff+=(double)procPaidPartial.Writeoff;
 					if(sb.Length>0) {
 						sb.Append("\r\n");
 					}
 					sb.Append(procPaidPartial.GetRemarks());
+				}
+				//Procedure writeoff is calculated with procedure UCR fee instead of fee billed, to avoid inflating the writeoff.
+				//Can only be done when a match was found, otherwise the the entire procedure fee would be written off due to allowed amount being unknown.
+				if(listProcsForProcNum.Count>0) {
+					Procedure proc=Procedures.GetProcFromList(listProcs,claimProc.ProcNum);
+					claimProc.WriteOff=proc.ProcFee-claimProc.AllowedOverride;//Might be negative if UCR fee schedule was entered incorrectly.
+					if(claimProc.WriteOff<0) {
+						claimProc.WriteOff=0;
+					}
 				}
 				claimProc.Remarks=sb.ToString();
 				if(claim.ClaimType=="PreAuth") {
@@ -362,7 +382,11 @@ namespace OpenDental {
 				cpByTotal.DedApplied-=claimProc.DedApplied;
 				cpByTotal.AllowedOverride-=claimProc.AllowedOverride;
 				cpByTotal.InsPayAmt-=claimProc.InsPayAmt;
-				cpByTotal.WriteOff-=claimProc.WriteOff;
+				cpByTotal.WriteOff-=claimProc.WriteOff;//May cause cpByTotal.Writeoff to go negative if the user typed in the value for claimProc.Writeoff.
+			}
+			//The writeoff may be negative if the user manually entered some payment amounts before loading this window or if UCR fee schedule incorrect.
+			if(cpByTotal.WriteOff<0) {
+				cpByTotal.WriteOff=0;
 			}
 			bool isByTotalIncluded=true;
 			//Do not create a total payment if the payment contains all zero amounts, because it would not be useful.  Written to account for potential rounding errors in the amounts.

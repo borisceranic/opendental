@@ -38,8 +38,7 @@ namespace OpenDental {
 			int colWidthDeduct=48;
 			int colWidthAllowed=56;
 			int colWidthInsPay=56;
-			int colWidthWriteoff=60;
-			int colWidthVariable=gridMain.Width-10-colWidthEnterBy-colWidthDate-colWidthCode-colWidthCodeBill-colWidthBilled-colWidthDeduct-colWidthAllowed-colWidthInsPay-colWidthWriteoff;
+			int colWidthVariable=gridMain.Width-10-colWidthEnterBy-colWidthDate-colWidthCode-colWidthCodeBill-colWidthBilled-colWidthDeduct-colWidthAllowed-colWidthInsPay;
 			if(gridMain.Columns.Count==0) {
 				gridMain.Columns.Add(new UI.ODGridColumn("EnterBy",colWidthEnterBy,HorizontalAlignment.Center));
 				gridMain.Columns.Add(new UI.ODGridColumn("Claim",colWidthVariable,HorizontalAlignment.Left));
@@ -50,7 +49,6 @@ namespace OpenDental {
 				gridMain.Columns.Add(new UI.ODGridColumn("Deduct",colWidthDeduct,HorizontalAlignment.Right));
 				gridMain.Columns.Add(new UI.ODGridColumn("Allowed",colWidthInsPay,HorizontalAlignment.Right));
 				gridMain.Columns.Add(new UI.ODGridColumn("InsPay",colWidthAllowed,HorizontalAlignment.Right));
-				gridMain.Columns.Add(new UI.ODGridColumn("Writeoff",colWidthAllowed,HorizontalAlignment.Right));
 			}
 			else {
 				gridMain.Columns[1].ColWidth=colWidthVariable;
@@ -104,7 +102,6 @@ namespace OpenDental {
 				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.PatientPortion.ToString("f2")));//Deduct
 				rowClaim.Cells.Add(new UI.ODGridCell(""));//Allowed
 				rowClaim.Cells.Add(new UI.ODGridCell(claimPaid.InsPaid.ToString("f2")));//InsPay
-				rowClaim.Cells.Add(new UI.ODGridCell(""));//Writeoff
 				gridMain.Rows.Add(rowClaim);
 				for(int j=0;j<claimPaid.ListProcs.Count;j++) {
 					Hx835_Proc proc=claimPaid.ListProcs[j];
@@ -122,7 +119,6 @@ namespace OpenDental {
 					rowProc.Cells.Add(new UI.ODGridCell(proc.PatientPortion.ToString("f2")));//Deduct
 					rowProc.Cells.Add(new UI.ODGridCell(proc.AllowedAmt.ToString("f2")));//Allowed
 					rowProc.Cells.Add(new UI.ODGridCell(proc.InsPaid.ToString("f2")));//InsPay
-					rowProc.Cells.Add(new UI.ODGridCell(proc.Writeoff.ToString("f2")));//Writeoff
 					gridMain.Rows.Add(rowProc);
 				}
 			}

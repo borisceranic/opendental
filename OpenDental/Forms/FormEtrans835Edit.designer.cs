@@ -390,6 +390,7 @@ namespace OpenDental{
 			// 
 			// gridProviderAdjustments
 			// 
+			this.gridProviderAdjustments.HasMultilineHeaders = false;
 			this.gridProviderAdjustments.HScrollVisible = false;
 			this.gridProviderAdjustments.Location = new System.Drawing.Point(9, 247);
 			this.gridProviderAdjustments.Name = "gridProviderAdjustments";
@@ -404,6 +405,7 @@ namespace OpenDental{
 			// 
 			// gridClaimDetails
 			// 
+			this.gridClaimDetails.HasMultilineHeaders = false;
 			this.gridClaimDetails.HScrollVisible = false;
 			this.gridClaimDetails.Location = new System.Drawing.Point(9, 348);
 			this.gridClaimDetails.Name = "gridClaimDetails";
@@ -473,9 +475,9 @@ namespace OpenDental{
 			this.butClaimDetails.CornerRadius = 4F;
 			this.butClaimDetails.Location = new System.Drawing.Point(9, 664);
 			this.butClaimDetails.Name = "butClaimDetails";
-			this.butClaimDetails.Size = new System.Drawing.Size(100, 25);
+			this.butClaimDetails.Size = new System.Drawing.Size(135, 25);
 			this.butClaimDetails.TabIndex = 213;
-			this.butClaimDetails.Text = "Claim Details";
+			this.butClaimDetails.Text = "EOB Claim Details";
 			this.butClaimDetails.Click += new System.EventHandler(this.butClaimDetails_Click);
 			// 
 			// butPrint
@@ -573,7 +575,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans835Edit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Electronic Remittance Advice (ERA) - Format X12 835";
+			this.Text = "Electronic Remittance Advice (ERA) - Electronic EOB - Format X12 835";
 			this.Load += new System.EventHandler(this.FormEtrans835Edit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835Edit_Resize);
 			this.groupBalancing.ResumeLayout(false);
