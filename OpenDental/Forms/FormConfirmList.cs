@@ -445,7 +445,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(!Programs.IsEnabled(ProgramName.CallFire)) {
+			if(!Programs.IsEnabled(ProgramName.CallFire) && !SmsPhones.IsIntegratedTextingEnabled()) {
 				butText.Enabled=false;
 			}
 			FillMain();
