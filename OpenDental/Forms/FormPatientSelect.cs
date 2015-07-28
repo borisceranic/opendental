@@ -835,7 +835,7 @@ namespace OpenDental{
 				}
 				return;
 			}
-			if(PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
+			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
 				FillGrid(true);
 			}
 		}
@@ -1094,7 +1094,7 @@ namespace OpenDental{
 		}
 
 		private void OnDataEntered(){
-			if(PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
+			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
 				FillGrid(true);
 			}
 		}

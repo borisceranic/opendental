@@ -548,7 +548,7 @@ namespace OpenDental{
 				textInactiveSignal.Text=PrefC.GetLong(PrefName.SignalInactiveMinutes).ToString();
 			}
 			checkColorTheme.Checked=PrefC.GetBool(PrefName.ColorTheme);
-			checkRefresh.Checked=PrefC.GetBool(PrefName.PatientSelectUsesSearchButton);
+			checkRefresh.Checked=!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton);
 			checkPrefFName.Checked=PrefC.GetBool(PrefName.PatientSelectUseFNameForPreferred);
 			textMainWindowTitle.Text=PrefC.GetString(PrefName.MainWindowTitle);
 			comboShowID.Items.Add(Lan.g(this,"None"));
@@ -640,7 +640,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TitleBarShowSite, checkTitleBarShowSite.Checked)
 				| Prefs.UpdateString(PrefName.WebServiceServerName,textWebServiceServerName.Text)
 				| Prefs.UpdateBool(PrefName.PatientSelectUseFNameForPreferred,checkPrefFName.Checked
-				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,checkRefresh.Checked))
+				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked))
 				)
 			{
 				changed=true;
