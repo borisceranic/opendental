@@ -24,7 +24,7 @@ namespace OpenDentBusiness {
 		///<summary>Date and time the message was sent. Automated at the UI level.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime MsgDateTime;
-		///<summary>0=neither, 1=sent, 2=received.</summary>
+		///<summary>Enum:EmailSentOrReceived Neither, Received, Read, WebMailReceived, WebMailRecdRead, WebMailSent, WebMailSentRead, SentDirect, ReceivedEncrypted, ReceivedDirect, ReadDirect, AckDirectProcessed, AckDirectNotSent</summary>
 		public EmailSentOrReceived SentOrReceived;
 		///<summary>Copied from the EmailAddress.EmailUsername field when a message is received into the inbox.
 		///Similar to the ToAddress, except the ToAddress could contain multiple recipient addresses
@@ -58,7 +58,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
-	///<summary>0=Neither, 1=Sent, 2=Receivedceived. 3=Read, 4=WebMailReceived, 5=WebMailRecdRead, 6=WebMailSent, 7=WebMailSentRead</summary>
+	///<summary>0=Neither, 1=Sent, 2=Received, 3=Read, 4=WebMailReceived, 5=WebMailRecdRead, 6=WebMailSent, 7=WebMailSentRead, 8=SentDirect, 9=ReceivedEncrypted, 10=ReceivedDirect, 11=ReadDirect, 12=AckDirectProcessed, 13=AckDirectNotSent</summary>
 	public enum EmailSentOrReceived {
 		///<summary>0 Unsent</summary>
 		Neither,
