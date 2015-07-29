@@ -2112,8 +2112,16 @@ namespace OpenDental {
 				}
 				if(DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString()!=((int)ApptStatus.Broken).ToString()
 					&& DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString()!=((int)ApptStatus.UnschedList).ToString()
-					&& DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString() != ((int)ApptStatus.PtNote).ToString()
-					&& DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString() != ((int)ApptStatus.PtNoteCompleted).ToString()) {
+					&& DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString()!=((int)ApptStatus.PtNote).ToString()
+					&& DS.Tables["Appointments"].Rows[i]["AptStatus"].ToString()!=((int)ApptStatus.PtNoteCompleted).ToString()) 
+				{
+					long clinicNum=PIn.Long(DS.Tables["Appointments"].Rows[i]["ClinicNum"].ToString());
+					//When the program is restricted to a specific clinic, only count up production for the corresponding clinic.
+					if(!PrefC.GetBool(PrefName.EasyNoClinics) 
+						&& FormOpenDental.ClinicNum!=0
+						&& FormOpenDental.ClinicNum!=clinicNum) {
+						continue;//This appointment is for a different clinic.  Do not include this production in the daily prod.
+					}
 					//In order to get production numbers split by provider, it would require generating total production numbers
 					//in another table from the business layer.  But that will only work if hyg procedures are appropriately assigned
 					//when setting appointments.
