@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
-	///<summary>A historical copy of a task.  These are generated as a result of a task being edited.  When creating for insertion it needs a passed in Task object.</summary>
+	///<summary>Inherits from task. A historical copy of a task.  These are generated as a result of a task being edited.  When creating for insertion it needs a passed in Task object.</summary>
 	//[IsHistTable=Task]
 	[Serializable]
 	public class TaskHist:Task {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long TaskHistNum;
-		///<summary>FKey to UserOd.UserNum  Identifies the user that changed this task from this state, not the person who originally wrote it.</summary>
+		///<summary>FK to UserOd.UserNum  Identifies the user that changed this task from this state, not the person who originally wrote it.</summary>
 		public long UserNumHist;
 		///<summary>The date and time that this task was edited and added to the Hist table.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]

@@ -1,4 +1,6 @@
 //How to format comments to trigger links:
+//Inherits from task. This is triggered by "Inherits from ".  It then looks for ".".  So anything can follow after.
+//and:
 //FK to definition.DefNum is triggered by "FK to ".  It then looks for ".".  So anything can follow after.
 //and:
 //"Enum:" Then, the enum name must follow.  It must then be followed by a space or by nothing at all.  NO PERIOD allowed.
@@ -33,6 +35,10 @@ namespace DocumentationBuilder {
 		}
 
 		private void butBuild_Click(object sender,EventArgs e) {
+			if(textVersion.Text=="") {
+				MessageBox.Show("Please enter the database version.");
+				return;
+			}
 			Cursor=Cursors.WaitCursor;
 			MissingTables=new List<string>();
 			//dcon=new DataConnection();
@@ -100,18 +106,25 @@ namespace DocumentationBuilder {
 			writer.WriteStartElement("table");
 			writer.WriteAttributeString("name",tableName);
 			//table summary
+			string summary=GetSummary("T:OpenDentBusiness."+GetTableName(tableName));
+			List<string> ancestorTables=GetAncestorTables(summary);
+			if(ancestorTables.Count>0) {
+				writer.WriteAttributeString("base",ancestorTables[0]);
+			}
 			writer.WriteStartElement("summary");
-			writer.WriteString(GetSummary("T:OpenDentBusiness."+GetTableName(tableName)));
+			writer.WriteString(summary);
 			writer.WriteEndElement();
 			command="SHOW COLUMNS FROM "+tableName;
 			DataTable table=dcon.GetTable(command);
+			int order=0;
 			for(int i=0;i<table.Rows.Count;i++) {
-				WriteColumn(writer,i,tableName,table.Rows[i][0].ToString(),table.Rows[i][1].ToString());
+				WriteColumn(writer,i,tableName,table.Rows[i][0].ToString(),table.Rows[i][1].ToString(),ancestorTables);
+				order++;
 			}
 			writer.WriteEndElement();
 		}
 
-		private void WriteColumn(XmlWriter writer,int order,string tableName,string colName,string sqlType){
+		private void WriteColumn(XmlWriter writer,int order,string tableName,string colName,string sqlType,List<string> ancestorTables) {
 			writer.WriteStartElement("column");
 			writer.WriteAttributeString("order",order.ToString());
 			writer.WriteAttributeString("name",colName);
@@ -135,6 +148,14 @@ namespace DocumentationBuilder {
 			if(summary==""){
 				//this deals with the situation where the new data access layer has public Properites instead of public Fields.
 				summary=GetSummary("P:OpenDentBusiness."+GetTableName(tableName)+"."+colName);
+			}
+			int i=0;
+			while(summary=="" && i<ancestorTables.Count) {//this deals with an inherited property
+				summary=GetSummary("F:OpenDentBusiness."+GetTableName(ancestorTables[i])+"."+colName);
+				if(summary=="Primary key.") {
+					summary="FK to "+ancestorTables[i]+"."+colName;
+				}
+				i++;
 			}
 			if(summary.StartsWith("FK to ")){//eg FK to definition.DefNum
 				int indexDot=summary.IndexOf(".");
@@ -501,6 +522,26 @@ namespace DocumentationBuilder {
 			//F:OpenDental.ReportParameter.DefaultValues']").Value;
 		}
 
+		/// <summary>Gets the names of all ancestors for this table</summary>
+		private List<string> GetAncestorTables(string summary) {
+			List<string> ancestors=new List<string>();
+			string baseTable;
+			bool keepSearching=true;
+			while(keepSearching) {
+				if(summary.StartsWith("Inherits from ")) {//inherited table
+					int indexDot=summary.IndexOf(".");
+					if(indexDot!=-1) {
+						baseTable=summary.Substring(14,indexDot-14);
+						ancestors.Add(baseTable);
+						summary=GetSummary("T:OpenDentBusiness."+GetTableName(baseTable));
+					}
+				}
+				else {
+					keepSearching=false;
+				}
+			}
+			return ancestors;
+		}
 		
 
 

@@ -39,7 +39,22 @@
           <td><b><xsl:value-of select="@name"/></b></td>
         </tr>
         <tr>
-          <td><xsl:value-of select="summary"/></td>
+          <td><xsl:choose>
+              <xsl:when test="@base">
+                Inherits from  
+                <a>
+                  <xsl:attribute name="href">
+                    #<xsl:value-of select="@base"/>
+                  </xsl:attribute>
+                  <xsl:value-of select="@base"/>
+                </a>
+                <xsl:value-of select="substring(summary,15 + string-length(@base))"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="summary"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </td>
         </tr>
       </table>
       <table width="650" border="1" cellpadding="1" cellspacing="0" bgcolor="#F1F4F8">
