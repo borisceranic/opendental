@@ -182,6 +182,14 @@ namespace OpenDentBusiness{
 			smsToMobile.MsgText=message;
 			smsToMobile.MsgType=SmsMessageSource.DirectSms;
 			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
+			Commlogs.Insert(new Commlog() {
+				CommDateTime=smsToMobile.DateTimeSent,
+				Mode_=CommItemMode.Text,
+				Note=smsToMobile.MsgText,
+				PatNum=smsToMobile.PatNum,
+				CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
+				SentOrReceived=CommSentOrReceived.Sent
+			});
 			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;
 			SmsToMobiles.Insert(smsToMobile);
@@ -197,8 +205,8 @@ namespace OpenDentBusiness{
 			Crud.SmsToMobileCrud.Update(smsToMobile,oldSmsToMobile);
 		}
 
-		///<summary>Surround with try/catch. Returns true is all messages succeded, throws exception if it failed. 
-		///All Integrated Testing should use this method, CallFire texting does not use this method.</summary>
+		///<summary>Surround with try/catch. Returns true if all messages succeded, throws exception if it failed. 
+		///All Integrated Texting should use this method, CallFire texting does not use this method.</summary>
 		public static bool SendSms(List<SmsToMobile> listMessages) {
 			if(listMessages==null || listMessages.Count==0) {
 				throw new Exception("No messages to send.");

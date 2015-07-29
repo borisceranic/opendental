@@ -219,11 +219,11 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
- 		///<summary>Only used for the Select Patient dialog.  Pass in a billing type of 0 for all billing types.</summary>
+		///<summary>Only used for the Select Patient dialog.  Pass in a billing type of 0 for all billing types.</summary>
 		public static DataTable GetPtDataTable(bool limit,string lname,string fname,string phone,
 			string address,bool hideInactive,string city,string state,string ssn,string patnum,string chartnumber,
 			long billingtype,bool guarOnly,bool showArchived,DateTime birthdate,
-			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums) 
+			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums,List<long> explicitPatNums=null) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums);
@@ -402,6 +402,11 @@ namespace OpenDentBusiness{
 			}
 			if(subscriberId!=""){
 				command+="AND inssub.SubscriberId LIKE '%"+POut.String(subscriberId)+"%' ";
+			}
+			//NOTE: This filter will superceed all filters set above.
+			if(explicitPatNums!=null && explicitPatNums.Count>0) {
+				command+="AND FALSE ";//negate all filters above and select patients based solely on being in explicitPatNums
+				command+="OR patient.PatNum IN ("+string.Join(",",explicitPatNums)+") ";
 			}
 			if(PrefC.GetBool(PrefName.DistributorKey)) { //if for OD HQ
 				command+="GROUP BY patient.PatNum ";

@@ -154,7 +154,7 @@ namespace OpenDentBusiness{
 			}
 			return Crud.SmsFromMobileCrud.SelectMany(command);
 		}
-		
+
 		///<summary>Attempts to find exact match for patient. If found, creates commlog, associates Patnum, and inserts into DB.
 		///Otherwise, it simply inserts SmsFromMobiles into the DB. ClinicNum should have already been set before calling this function.</summary>
 		public static void ProcessInboundSms(List<SmsFromMobile> listMessages) {
@@ -170,28 +170,33 @@ namespace OpenDentBusiness{
 					sms.ClinicNum=smsPhone.ClinicNum;
 					countryCode=smsPhone.CountryCode;
 				}
-				List<long> listPatNums=FindPatNums(sms.MobilePhoneNumber,countryCode);
-				//We could not find definitive match, either 0 matches found, or more than one match found
-				if(listPatNums.Count!=1) {
+				//Item1=PatNum; Item2=Guarantor
+				List<Tuple<long,long>> listPatNums=FindPatNums(sms.MobilePhoneNumber,countryCode);
+				sms.MatchCount=listPatNums.Count;
+				if(listPatNums.Count==0 || listPatNums.Select(x => x.Item2).Distinct().ToList().Count!=1){
+					//We could not find definitive match, either 0 matches found, or more than one match found with different garantors
 					Insert(sms);
 					continue;
 				}
-				//We found exactly one match
-				//associate patnum, create commlog, insert message
-				sms.PatNum=listPatNums[0];
+				if(listPatNums.Count==1) {
+					sms.PatNum=listPatNums[0].Item1;//PatNum
+				}
+				else {
+					sms.PatNum=listPatNums[0].Item2;//GuarantorNum;  more than one match, but all have the same garantor.
+				}
 				Commlog comm=new Commlog() {
-					 CommDateTime=sms.DateTimeReceived,
-					 Mode_= CommItemMode.Text,
-					 Note=sms.MsgText,
-					 PatNum=sms.PatNum,
-					 CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
-					 SentOrReceived= CommSentOrReceived.Received
+					CommDateTime=sms.DateTimeReceived,
+					Mode_= CommItemMode.Text,
+					Note=sms.MsgText,
+					PatNum=sms.PatNum,
+					CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
+					SentOrReceived= CommSentOrReceived.Received
 				};
 				sms.CommlogNum=Commlogs.Insert(comm);
 				Insert(sms);
 			}
 			Signalod sig=new Signalod();
-			sig.ITypes=((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString();		
+			sig.ITypes=((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString();
 			sig.DateViewing=DateTime.MinValue;
 			sig.SigType=SignalType.Invalid;
 			sig.SigText=GetSmsNotification();
@@ -218,23 +223,27 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
-		public static List<long> FindPatNums(string phonePat,string countryCode) {
+		public static List<Tuple<long,long>> FindPatNums(string phonePat,string countryCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),phonePat,countryCode);
+				return Meth.GetObject<List<Tuple<long,long>>>(MethodBase.GetCurrentMethod(),phonePat,countryCode);
 			}
+			List<Tuple<long,long>> retVal=new List<Tuple<long,long>>();
 			try {
 				string phoneRegexp=ConvertPhoneToRegexp(phonePat,countryCode);
 				//DO NOT POut THESE PHONE NUMBERS. They have been cleaned for use in this function by dirtyPhoneHelper.
-				string command="SELECT PatNum FROM patient WHERE "
+				string command="SELECT PatNum, Guarantor FROM patient WHERE "
 					+DbHelper.Regexp("HmPhone",phoneRegexp)+" "
 					+"OR "+DbHelper.Regexp("WkPhone",phoneRegexp)+" "
 					+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp);
-				return Db.GetListLong(command);
+				DataTable table=Db.GetTable(command);
+				foreach(DataRow row in table.Rows) {
+					retVal.Add(new Tuple<long,long>(PIn.Long(row["PatNum"].ToString()),PIn.Long(row["Guarantor"].ToString())));
+				}
 			}
 			catch {	
 				//should only happen if phone number is blank, if so, return empty list below.
 			}
-			return new List<long>();
+			return retVal;
 		}
 
 		///<summary>Expands a phone number into a string that can be used to ignore punctuation in a phone number.

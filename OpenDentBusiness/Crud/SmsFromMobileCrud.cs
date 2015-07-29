@@ -60,6 +60,7 @@ namespace OpenDentBusiness.Crud{
 				smsFromMobile.SmsStatus        = (OpenDentBusiness.SmsFromStatus)PIn.Int(table.Rows[i]["SmsStatus"].ToString());
 				smsFromMobile.Flags            = PIn.String(table.Rows[i]["Flags"].ToString());
 				smsFromMobile.IsHidden         = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				smsFromMobile.MatchCount       = PIn.Int   (table.Rows[i]["MatchCount"].ToString());
 				retVal.Add(smsFromMobile);
 			}
 			return retVal;
@@ -100,7 +101,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SmsFromMobileNum,";
 			}
-			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden) VALUES(";
+			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden,MatchCount) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(smsFromMobile.SmsFromMobileNum)+",";
 			}
@@ -117,7 +118,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(smsFromMobile.MsgRefID)+"',"
 				+    POut.Int   ((int)smsFromMobile.SmsStatus)+","
 				+"'"+POut.String(smsFromMobile.Flags)+"',"
-				+    POut.Bool  (smsFromMobile.IsHidden)+")";
+				+    POut.Bool  (smsFromMobile.IsHidden)+","
+				+    POut.Int   (smsFromMobile.MatchCount)+")";
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
 			}
@@ -154,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SmsFromMobileNum,";
 			}
-			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden) VALUES(";
+			command+="PatNum,ClinicNum,CommlogNum,MsgText,DateTimeReceived,SmsPhoneNumber,MobilePhoneNumber,MsgPart,MsgTotal,MsgRefID,SmsStatus,Flags,IsHidden,MatchCount) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(smsFromMobile.SmsFromMobileNum)+",";
 			}
@@ -171,7 +173,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(smsFromMobile.MsgRefID)+"',"
 				+    POut.Int   ((int)smsFromMobile.SmsStatus)+","
 				+"'"+POut.String(smsFromMobile.Flags)+"',"
-				+    POut.Bool  (smsFromMobile.IsHidden)+")";
+				+    POut.Bool  (smsFromMobile.IsHidden)+","
+				+    POut.Int   (smsFromMobile.MatchCount)+")";
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
 			}
@@ -200,7 +203,8 @@ namespace OpenDentBusiness.Crud{
 				+"MsgRefID         = '"+POut.String(smsFromMobile.MsgRefID)+"', "
 				+"SmsStatus        =  "+POut.Int   ((int)smsFromMobile.SmsStatus)+", "
 				+"Flags            = '"+POut.String(smsFromMobile.Flags)+"', "
-				+"IsHidden         =  "+POut.Bool  (smsFromMobile.IsHidden)+" "
+				+"IsHidden         =  "+POut.Bool  (smsFromMobile.IsHidden)+", "
+				+"MatchCount       =  "+POut.Int   (smsFromMobile.MatchCount)+" "
 				+"WHERE SmsFromMobileNum = "+POut.Long(smsFromMobile.SmsFromMobileNum);
 			if(smsFromMobile.MsgText==null) {
 				smsFromMobile.MsgText="";
@@ -263,6 +267,10 @@ namespace OpenDentBusiness.Crud{
 			if(smsFromMobile.IsHidden != oldSmsFromMobile.IsHidden) {
 				if(command!=""){ command+=",";}
 				command+="IsHidden = "+POut.Bool(smsFromMobile.IsHidden)+"";
+			}
+			if(smsFromMobile.MatchCount != oldSmsFromMobile.MatchCount) {
+				if(command!=""){ command+=",";}
+				command+="MatchCount = "+POut.Int(smsFromMobile.MatchCount)+"";
 			}
 			if(command==""){
 				return false;
