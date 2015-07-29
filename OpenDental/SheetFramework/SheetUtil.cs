@@ -158,7 +158,8 @@ namespace OpenDental{
 			string measureText="Any";
 			double calcHLine=lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,measureText,font,field.Width);//calcHLine is height of single line of text
 			//if the height of one line is greater than the printable height of the page, don't try to split between lines
-			if(Convert.ToInt32(Math.Ceiling(calcHLine))>(sheet.HeightPage-60-topMargin)) {
+			if(Convert.ToInt32(Math.Ceiling(calcHLine))>(sheet.HeightPage-60-topMargin)
+				|| field.FieldValue.Length==0) {
 				return;
 			}
 			if(Convert.ToInt32(Math.Ceiling(field.YPos+calcHLine))>bottomCurPage) {//if no lines of text will fit on current page, move the entire text box to the next page
@@ -171,6 +172,8 @@ namespace OpenDental{
 				CalculateHeightsPageBreak(field,sheet,g);
 				return;
 			}
+			//prepare to split the text box into two text boxes, one with the lines that will fit on the current page, the other with all other lines
+			//first figure out how many lines of text will fit on the current page, using the height of the word 'Any' for each line
 			calcH=0;
 			int fieldH=0;
 			measureText="";
@@ -184,6 +187,7 @@ namespace OpenDental{
 				calcH=lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,measureText,font,field.Width);
 			}
 			//get ready to copy text from the current field to a copy of the field that will be moved down.
+			//find the character in the text box that makes the text box taller than the calculated max line height and split the text box at that line
 			SheetField fieldNew=new SheetField();
 			fieldNew=field.Copy();
 			field.Height=fieldH;
