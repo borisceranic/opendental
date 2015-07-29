@@ -447,14 +447,21 @@ namespace OpenDentBusiness{
 		}
 
 		public static void SetPageMargin(Sheet sheet,System.Drawing.Printing.Margins m) {
+			m.Left=0;
+			m.Right=0;
 			if(SheetTypeIsSinglePage(sheet.SheetType)) {
-				m.Left=0;
-				m.Right=0;
 				m.Top=0;
 				m.Bottom=0;
 				//m=new System.Drawing.Printing.Margins(0,0,0,0); //does not work, creates new reference.
-				return;
 			}
+			else {
+				m.Top=40;
+				if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
+					m.Top=120;
+				}
+				m.Bottom=60;
+			}
+			return;
 		}
 
 		public static bool SheetTypeIsSinglePage(SheetTypeEnum sheetType) {

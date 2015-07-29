@@ -51,10 +51,7 @@ namespace OpenDental {
 		}
 
 		private void FormSheetFillEdit_Load(object sender,EventArgs e) {
-			_printMargin.Top=40;//default margin size
-			if(SheetCur.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;//includes space for header on MedLabResults
-			}
+			Sheets.SetPageMargin(SheetCur,_printMargin);
 			if(IsInTerminal) {
 				labelDateTime.Visible=false;
 				textDateTime.Visible=false;

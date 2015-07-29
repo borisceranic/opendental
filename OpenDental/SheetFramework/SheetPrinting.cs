@@ -202,10 +202,6 @@ namespace OpenDental {
 					sit= PrintSituation.Statement;
 					break;
 			}
-			_printMargin.Top=40;//default top margin
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
 			Sheets.SetPageMargin(sheet,_printMargin);
 			foreach(SheetField field in sheet.SheetFields) {//validate all signatures before modifying any of the text fields.
 				if(field.FieldType!= SheetFieldType.SigBox) {
@@ -262,10 +258,6 @@ namespace OpenDental {
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
 			Sheet sheet=_sheetList[_sheetsPrinted];
-			_printMargin.Top=40;//default top margin
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
 			Sheets.SetPageMargin(sheet,_printMargin);
 			//Begin drawing.
 			foreach(SheetField field in sheet.SheetFields) {
@@ -521,10 +513,7 @@ namespace OpenDental {
 		}
 
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,Statement stmt=null,MedLab medLab=null) {
-			_printMargin.Top=40;
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
+			Sheets.SetPageMargin(sheet,_printMargin);
 			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			int _yAdjCurRow=0;//used to adjust for Titles, Headers, Rows, and footers (all considered part of the same row).
@@ -705,16 +694,13 @@ namespace OpenDental {
 
 		///<summary>Calculates the bottom of the current page assuming a 40px top margin (except for MedLabResults sheets which have a 120 top margin) and 60px bottom margin.</summary>
 		public static int bottomCurPage(int yPos,Sheet sheet,out int pageCount) {
-			_printMargin.Top=40;
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
+			Sheets.SetPageMargin(sheet,_printMargin);
 			pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			if(pageCount==1 && sheet.SheetType!=SheetTypeEnum.MedLabResults) {
 				return sheet.HeightPage;
 			}
 			int retVal=sheet.HeightPage-_printMargin.Bottom;//First page bottom is not changed by top margin. Example: 1100px page height, 60px bottom, 1040px is first page bottom
-			pageCount=0;
+			pageCount=1;
 			while(retVal<yPos){
 				pageCount++;
 				//each page bottom after the first, 1040px is first page break+1100px page height-top margin-bottom margin=2040px if top is 40px, 1960 if top is 120px
@@ -1230,10 +1216,7 @@ namespace OpenDental {
 		#endregion
 
 		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt,MedLab medLab=null) {
-			_printMargin.Top=40;
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
+			Sheets.SetPageMargin(sheet,_printMargin);
 			_stmt=stmt;
 			_medLab=medLab;
 			_isPrinting=true;
@@ -1333,10 +1316,7 @@ namespace OpenDental {
 
 		///<summary>Draws all images from the sheet onto the graphic passed in.  Used when printing, exporting to pdfs, or rendering the sheet fill edit window.  graphic should be null for pdfs and xgraphic should be null for printing and rendering the sheet fill edit window.</summary>
 		private static void DrawImages(Sheet sheet,Graphics graphic,XGraphics xGraphic,bool drawAll=false) {
-			_printMargin.Top=40;
-			if(sheet.SheetType==SheetTypeEnum.MedLabResults) {
-				_printMargin.Top=120;
-			}
+			Sheets.SetPageMargin(sheet,_printMargin);
 			Bitmap bmpOriginal=null;
 			if(drawAll){// || _forceSinglePage) {//reset _yPosPrint because we are drawing all.
 				_yPosPrint=0;
