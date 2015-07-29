@@ -453,6 +453,9 @@ namespace OpenDentBusiness.UI {
 						break;
 				}
 			#endregion
+			object[] parameters={ dataRoww["PatNum"].ToString(),apptRows[elementI].PatFieldDefNum,text };
+			Plugins.HookAddCode(null,"ApptSingleDrawing.DrawElement_afterFillText",parameters);
+			text=(string)parameters[2];
 			if(text=="" && !isGraphic) {
 				return drawLoc;//next element will draw at the same position as this one would have.
 			}
