@@ -104,7 +104,7 @@ namespace OpenDental{
 					MoveAllDownBelowThis(sheet,field,amountOfGrowth);
 				}
 			}
-			if(isPrinting) {
+			if(isPrinting && !Sheets.SheetTypeIsSinglePage(sheet.SheetType)) {
 				//now break all text fields in between lines, not in the middle of actual text
 				sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 				int originalSheetFieldCount=sheet.SheetFields.Count;
