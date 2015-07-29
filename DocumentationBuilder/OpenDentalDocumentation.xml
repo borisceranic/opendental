@@ -1329,7 +1329,7 @@
             <summary>.</summary>
         </column>
         <column order="11" name="PayType" type="bigint(20)" fk="definition">
-            <summary>FK to definition.DefinitionNum.  0 if not attached to any definitions</summary>
+            <summary>FK to definition.DefNum.  0 if not attached to any definitions</summary>
         </column>
     </table>
     <table name="claimproc">

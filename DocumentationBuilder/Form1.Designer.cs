@@ -36,18 +36,18 @@ namespace DocumentationBuilder {
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(23,25);
+			this.label1.Location = new System.Drawing.Point(23, 25);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(558,41);
+			this.label1.Size = new System.Drawing.Size(558, 41);
 			this.label1.TabIndex = 0;
 			this.label1.Text = resources.GetString("label1.Text");
 			// 
 			// butBuild
 			// 
 			this.butBuild.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butBuild.Location = new System.Drawing.Point(477,279);
+			this.butBuild.Location = new System.Drawing.Point(477, 279);
 			this.butBuild.Name = "butBuild";
-			this.butBuild.Size = new System.Drawing.Size(75,24);
+			this.butBuild.Size = new System.Drawing.Size(75, 24);
 			this.butBuild.TabIndex = 1;
 			this.butBuild.Text = "Build";
 			this.butBuild.UseVisualStyleBackColor = true;
@@ -55,59 +55,58 @@ namespace DocumentationBuilder {
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(23,84);
+			this.label2.Location = new System.Drawing.Point(23, 84);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(558,41);
+			this.label2.Size = new System.Drawing.Size(558, 41);
 			this.label2.TabIndex = 2;
 			this.label2.Text = "Step 1: Build the release of OpenDental, which also generates OpenDentBusiness.xm" +
     "l which contains all the comments for each database column.";
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(23,129);
+			this.label3.Location = new System.Drawing.Point(23, 129);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(558,33);
+			this.label3.Size = new System.Drawing.Size(558, 33);
 			this.label3.TabIndex = 3;
 			this.label3.Text = "Step 2: Make sure you have run the exe so that the config file points to a runnin" +
     "g database of the same version as the program.  Connection string:";
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(23,224);
+			this.label4.Location = new System.Drawing.Point(23, 224);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(558,41);
+			this.label4.Size = new System.Drawing.Size(558, 41);
 			this.label4.TabIndex = 4;
 			this.label4.Text = resources.GetString("label4.Text");
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(23,194);
+			this.label6.Location = new System.Drawing.Point(23, 194);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(140,19);
+			this.label6.Size = new System.Drawing.Size(140, 19);
 			this.label6.TabIndex = 6;
 			this.label6.Text = "Step 3: Specify the version:";
 			// 
 			// textVersion
 			// 
-			this.textVersion.Location = new System.Drawing.Point(160,191);
+			this.textVersion.Location = new System.Drawing.Point(160, 191);
 			this.textVersion.Name = "textVersion";
-			this.textVersion.Size = new System.Drawing.Size(59,20);
+			this.textVersion.Size = new System.Drawing.Size(59, 20);
 			this.textVersion.TabIndex = 7;
-			this.textVersion.Text = "7.5.1";
 			// 
 			// textConnStr
 			// 
-			this.textConnStr.Location = new System.Drawing.Point(26,158);
+			this.textConnStr.Location = new System.Drawing.Point(26, 158);
 			this.textConnStr.Name = "textConnStr";
 			this.textConnStr.ReadOnly = true;
-			this.textConnStr.Size = new System.Drawing.Size(541,20);
+			this.textConnStr.Size = new System.Drawing.Size(541, 20);
 			this.textConnStr.TabIndex = 8;
 			// 
 			// Form1
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(612,332);
+			this.ClientSize = new System.Drawing.Size(612, 332);
 			this.Controls.Add(this.textConnStr);
 			this.Controls.Add(this.textVersion);
 			this.Controls.Add(this.label6);
