@@ -104,7 +104,7 @@ namespace OpenDental{
 					MoveAllDownBelowThis(sheet,field,amountOfGrowth);
 				}
 			}
-			if(isPrinting) {
+			if(isPrinting && !Sheets.SheetTypeIsSinglePage(sheet.SheetType)) {
 				//now break all text fields in between lines, not in the middle of actual text
 				sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 				int originalSheetFieldCount=sheet.SheetFields.Count;
@@ -112,7 +112,8 @@ namespace OpenDental{
 					SheetField fieldCur=sheet.SheetFields[i];
 					if(fieldCur.FieldType==SheetFieldType.StaticText
 						|| fieldCur.FieldType==SheetFieldType.OutputText
-						|| fieldCur.FieldType==SheetFieldType.InputField) {
+						|| fieldCur.FieldType==SheetFieldType.InputField)
+					{
 						//recursive function to split text boxes for page breaks in between lines of text, not in the middle of text
 						CalculateHeightsPageBreak(fieldCur,sheet,g);
 					}
@@ -123,6 +124,7 @@ namespace OpenDental{
 			//return sheetCopy;
 		}
 
+		///<summary>Recursive.</summary>
 		private static void CalculateHeightsPageBreak(SheetField field,Sheet sheet,Graphics g) {
 			double lineSpacingForPdf=1.01d;
 			FontStyle fontstyle=FontStyle.Regular;
