@@ -172,7 +172,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMessages.HasMultilineHeaders = true;
-			this.gridMessages.HScrollVisible = false;
+			this.gridMessages.HScrollVisible = true;
 			this.gridMessages.Location = new System.Drawing.Point(12, 61);
 			this.gridMessages.Name = "gridMessages";
 			this.gridMessages.ScrollValue = 0;

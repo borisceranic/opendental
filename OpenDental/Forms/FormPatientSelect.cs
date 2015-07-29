@@ -83,6 +83,8 @@ namespace OpenDental{
 		private Label labelRegKey;
 		///<summary>List of all the clinics this userod has access to.  When comboClinic.SelectedIndex=0 it refers to all clinics in this list.  Otherwise their selected clinic will always be _listClinics[comboClinic.SelectedIndex-1].</summary>
 		private List<Clinic> _listClinics;
+		///<summary>If set, initial patient list will be set to these patients.</summary>
+		public List<long> ExplicitPatNums;
 
 		///<summary></summary>
 		public FormPatientSelect(){
@@ -812,10 +814,13 @@ namespace OpenDental{
 				}
 			}
 			SetGridCols();
+			if(ExplicitPatNums!=null && ExplicitPatNums.Count>0) {
+				FillGrid(false,ExplicitPatNums);
+			}
 			if(InitialPatNum!=0){
 				Patient iPatient=Patients.GetLim(InitialPatNum);
 				textLName.Text=iPatient.LName;
-				FillGrid(false);
+				FillGrid(false,ExplicitPatNums);
 				/*if(grid2.CurrentRowIndex>-1){
 					grid2.UnSelect(grid2.CurrentRowIndex);
 				}
@@ -1099,7 +1104,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void FillGrid(bool limit){
+		private void FillGrid(bool limit,List<long> explicitPatNums=null){
 			long billingType=0;
 			if(comboBillingType.SelectedIndex!=0){
 				billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
@@ -1127,7 +1132,7 @@ namespace OpenDental{
 				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 				checkGuarantors.Checked,checkShowArchived.Checked,
-				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums);
+				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;

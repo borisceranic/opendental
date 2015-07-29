@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -67,25 +69,20 @@ namespace OpenDental {
 			gridMessages.BeginUpdate();
 			gridMessages.Rows.Clear();
 			gridMessages.Columns.Clear();
-			gridMessages.Columns.Add(new UI.ODGridColumn("DateTime",140,HorizontalAlignment.Left));
-			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.DateParse;
-			gridMessages.Columns.Add(new UI.ODGridColumn("Sent\r\nReceived",80,HorizontalAlignment.Center));
-			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-			gridMessages.Columns.Add(new UI.ODGridColumn("Status",90,HorizontalAlignment.Center));
-			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			gridMessages.Columns.Add(new UI.ODGridColumn("DateTime",140,HorizontalAlignment.Left) { SortingStrategy=UI.GridSortingStrategy.DateParse });
+			gridMessages.Columns.Add(new UI.ODGridColumn("Sent /\r\nReceived",80,HorizontalAlignment.Center){SortingStrategy=UI.GridSortingStrategy.StringCompare} );
+			gridMessages.Columns.Add(new UI.ODGridColumn("Status",70,HorizontalAlignment.Center) { SortingStrategy=UI.GridSortingStrategy.StringCompare });
 			_columnStatusIdx=gridMessages.Columns.Count-1;
-			if(checkHidden.Checked) {
-				gridMessages.Columns.Add(new UI.ODGridColumn("Hidden",44,HorizontalAlignment.Center));
-				gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-			}
-			gridMessages.Columns.Add(new UI.ODGridColumn("Cost",32,HorizontalAlignment.Right));
-			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.AmountParse;
+			gridMessages.Columns.Add(new UI.ODGridColumn("#Phone\r\nMatches",60,HorizontalAlignment.Center) { SortingStrategy=UI.GridSortingStrategy.AmountParse });
+			gridMessages.Columns.Add(new UI.ODGridColumn("Patient\r\nPhone",100,HorizontalAlignment.Center) { SortingStrategy=UI.GridSortingStrategy.StringCompare });
+			gridMessages.Columns.Add(new UI.ODGridColumn("Patient",150,HorizontalAlignment.Left) { SortingStrategy=UI.GridSortingStrategy.StringCompare });
+			gridMessages.Columns.Add(new UI.ODGridColumn("Cost",32,HorizontalAlignment.Right) { SortingStrategy=UI.GridSortingStrategy.AmountParse });
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-				gridMessages.Columns.Add(new UI.ODGridColumn("Clinic",130,HorizontalAlignment.Left));
-				gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+				gridMessages.Columns.Add(new UI.ODGridColumn("Clinic",130,HorizontalAlignment.Left) { SortingStrategy=UI.GridSortingStrategy.StringCompare });
 			}
-			gridMessages.Columns.Add(new UI.ODGridColumn("Patient",150,HorizontalAlignment.Left));
-			gridMessages.Columns[gridMessages.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+			if(checkHidden.Checked) {
+				gridMessages.Columns.Add(new UI.ODGridColumn("Hidden",46,HorizontalAlignment.Center){SortingStrategy=UI.GridSortingStrategy.StringCompare});
+			}
 			List<long> listClinicNums=new List<long>();//Leaving this blank will cause the clinic filter to be ignored in SmsFromMobiles.GetMessages().
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
 				for(int i=0;i<comboClinic.SelectedIndices.Count;i++) {
@@ -115,19 +112,16 @@ namespace OpenDental {
 					row.Cells.Add(listSmsFromMobile[i].DateTimeReceived.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Received"));//Type
 					row.Cells.Add(SmsFromMobiles.GetSmsFromStatusDescript(listSmsFromMobile[i].SmsStatus));//Status
-					if(checkHidden.Checked) {
-						row.Cells.Add(listSmsFromMobile[i].IsHidden?"X":"");//Hidden
-					}
+					row.Cells.Add(listSmsFromMobile[i].MatchCount.ToString());//#Phone Matches
+					row.Cells.Add(listSmsFromMobile[i].MobilePhoneNumber);//Patient Phone
+					row.Cells.Add(listSmsFromMobile[i].PatNum==0?"Unassigned":dictPatNames[listSmsFromMobile[i].PatNum]);//Patient
 					row.Cells.Add("0.00");//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
 						Clinic clinic=Clinics.GetClinic(listSmsFromMobile[i].ClinicNum);
 						row.Cells.Add(clinic.Description);//Clinic
 					}
-					if(listSmsFromMobile[i].PatNum==0) {
-						row.Cells.Add("");//Patient
-					}
-					else {
-						row.Cells.Add(dictPatNames[listSmsFromMobile[i].PatNum]);//Patient
+					if(checkHidden.Checked) {
+						row.Cells.Add(listSmsFromMobile[i].IsHidden?"X":"");//Hidden
 					}
 					gridMessages.Rows.Add(row);
 				}
@@ -158,19 +152,16 @@ namespace OpenDental {
 							break;
 					}
 					row.Cells.Add(smsStatus);//Status
-					if(checkHidden.Checked) {
-						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
-					}
+					row.Cells.Add("");//#Phone Matches, not applicable to outbound messages.
+					row.Cells.Add(listSmsToMobile[i].MobilePhoneNumber);//Patient Phone
+					row.Cells.Add(listSmsToMobile[i].PatNum==0?"":dictPatNames[listSmsToMobile[i].PatNum]);//Patient
 					row.Cells.Add(listSmsToMobile[i].MsgChargeUSD.ToString("f"));//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
 						Clinic clinic=Clinics.GetClinic(listSmsToMobile[i].ClinicNum);
 						row.Cells.Add(clinic.Description);//Clinic
 					}
-					if(listSmsToMobile[i].PatNum==0) {
-						row.Cells.Add("");//Patient
-					}
-					else {
-						row.Cells.Add(dictPatNames[listSmsToMobile[i].PatNum]);//Patient
+					if(checkHidden.Checked) {
+						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
 					}
 					gridMessages.Rows.Add(row);
 				}
@@ -361,6 +352,10 @@ namespace OpenDental {
 				return;
 			}
 			FormPatientSelect form=new FormPatientSelect();
+			form.ExplicitPatNums=SmsFromMobiles.FindPatNums(
+				gridMessages.SelectedIndices.Select(x => (SmsFromMobile)gridMessages.Rows[x].Tag).ToList()[0].MobilePhoneNumber,//find mobile number of first sms
+				CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2) //get country code of current environment
+				).Select(x=>x.Item1).ToList();//convert to a list of patnums.
 			if(form.ShowDialog()!=DialogResult.OK) {
 				return;
 			}

@@ -38,6 +38,7 @@ namespace OpenDentBusiness {
 		public string Flags;
 		///<summary>Messages are not deleted, they can only be hidden.</summary>
 		public bool IsHidden;
+		public int MatchCount;
 
 		///<summary></summary>
 		public SmsFromMobile Copy() {
@@ -56,6 +57,7 @@ namespace OpenDentBusiness {
 				}
 			}
 		}
+
 	}
 
 	///<summary>Status of an incoming message.</summary>

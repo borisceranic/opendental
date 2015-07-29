@@ -9449,6 +9449,27 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_6();
+		}
+
+		private static void To15_3_6() {
+			if(FromVersion<new Version("15.3.6.0")) {
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE smsfrommobile ADD MatchCount int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE smsfrommobile ADD MatchCount number(11)";
+					Db.NonQ(command);
+					command="UPDATE smsfrommobile SET MatchCount = 0 WHERE MatchCount IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE smsfrommobile MODIFY MatchCount NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.6.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 
@@ -9463,7 +9484,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),"+
 					"'PatientSelectUseFNameForPreferred','0')";
 					Db.NonQ(command);
-				}
+				} 
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE procedurecode ADD CanadaTimeUnits double NOT NULL";
 					Db.NonQ(command);
@@ -9498,7 +9519,7 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="ALTER TABLE program ADD ButtonImage varchar2";
 					Db.NonQ(command);
-				}
+				} 
 
 
 
@@ -9512,4 +9533,3 @@ namespace OpenDentBusiness {
 
 	}
 }
-
