@@ -105,10 +105,10 @@ namespace OpenDentBusiness {
 				OpenDentBusiness.eServiceSignalSeverity severity=(OpenDentBusiness.eServiceSignalSeverity)PIn.Int(row["Severity"].ToString());
 				int count=PIn.Int(row["CountOf"].ToString());
 				if(severity==eServiceSignalSeverity.Error) {
-					ret.Errors=count;
+					ret.Errors+=count;
 				}
 				else if(severity==eServiceSignalSeverity.Warning) {
-					ret.Warnings=count;
+					ret.Warnings+=count;
 				}
 			}
 			table=GetSmsOutbound(dateTimeStart,dateTimeEnd);
