@@ -718,6 +718,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("billingType");
 			table.Columns.Add("chartNumber");
 			table.Columns.Add("chartNumAndName");
+			table.Columns.Add("ClinicNum");
 			table.Columns.Add("ColorOverride");
 			table.Columns.Add("confirmed");
 			table.Columns.Add("Confirmed");
@@ -763,7 +764,7 @@ namespace OpenDentBusiness{
 			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
 				+"patient.ApptModNote patApptModNote,appointment.AppointmentTypeNum,appointment.AptDateTime apptAptDateTime,appointment.AptNum apptAptNum,appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
 				+"patient.BillingType patBillingType,patient.BirthDate patBirthDate,patient.DateTimeDeceased patDateTimeDeceased,"
-				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,"
+				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,appointment.ClinicNum,"
 				+"patient.ChartNumber patChartNumber,patient.City patCity,appointment.ColorOverride apptColorOverride,appointment.Confirmed apptConfirmed,"
 				+"patient.CreditType patCreditType,labcase.DateTimeChecked labcaseDateTimeChecked,"
 				+"labcase.DateTimeDue labcaseDateTimeDue,labcase.DateTimeRecd labcaseDateTimeRecd,labcase.DateTimeSent labcaseDateTimeSent,appointment.DateTimeAskedToArrive apptDateTimeAskedToArrive,"
@@ -800,7 +801,12 @@ namespace OpenDentBusiness{
 			if(aptNum==0){
 				command+="WHERE AptDateTime >= "+POut.Date(dateStart)+" "
 					+"AND AptDateTime < "+POut.Date(dateEnd.AddDays(1))+" "
-					+ "AND AptStatus IN (1, 2, 4, 5, 7, 8) ";
+					+ "AND AptStatus IN ("+POut.Int((int)ApptStatus.Scheduled)
+						+", "+POut.Int((int)ApptStatus.Complete)
+						+", "+POut.Int((int)ApptStatus.ASAP)
+						+", "+POut.Int((int)ApptStatus.Broken)
+						+", "+POut.Int((int)ApptStatus.PtNote)
+						+", "+POut.Int((int)ApptStatus.PtNoteCompleted)+") ";
 			}
 			else{
 				command+="WHERE appointment.AptNum="+POut.Long(aptNum);
@@ -812,7 +818,7 @@ namespace OpenDentBusiness{
 				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
 				+"patient.ApptModNote,appointment.AppointmentTypeNum,AptDateTime,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
 				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
-				+"carrier1.CarrierName,carrier2.CarrierName,"
+				+"carrier1.CarrierName,carrier2.CarrierName,appointment.ClinicNum,"
 				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
 				+"labcase.DateTimeChecked,labcase.DateTimeDue,labcase.DateTimeRecd,labcase.DateTimeSent,appointment.DateTimeAskedToArrive,"
 				+"patient.Email,guar.FamFinUrgNote,patient.FName,patient.Guarantor,patient.HmPhone,patient.ImageFolder,appointment.IsHygiene,appointment.IsNewPatient,"
@@ -1040,6 +1046,7 @@ namespace OpenDentBusiness{
 				row["chartNumAndName"]+=raw.Rows[i]["patChartNumber"].ToString()+" "
 					+PatientLogic.GetNameLF(raw.Rows[i]["patLName"].ToString(),raw.Rows[i]["patFName"].ToString(),
 					raw.Rows[i]["patPreferred"].ToString(),raw.Rows[i]["patMiddleI"].ToString());
+				row["ClinicNum"]=raw.Rows[i]["ClinicNum"].ToString();
 				row["ColorOverride"]=raw.Rows[i]["apptColorOverride"].ToString();
 				row["confirmed"]=DefC.GetName(DefCat.ApptConfirmed,PIn.Long(raw.Rows[i]["apptConfirmed"].ToString()));
 				row["Confirmed"]=raw.Rows[i]["apptConfirmed"].ToString();
