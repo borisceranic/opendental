@@ -66,34 +66,41 @@ namespace OpenDentBusiness{
 
 		///<summary>Get unique MedLab orders, grouped by PatNum, ProvNum, and SpecimenID.  Also returns the most recent DateTime the results
 		///were released from the lab and a list of test descriptions ordered.
-		///If includeNoPat==true, the lab orders not attached to a patient will be included.
-		///If groupBySpec==true, all tests for one specimen will be in one row of the grid with the most recent date reported.</summary>
-		public static DataTable GetOrdersForPatient(Patient pat,bool includeNoPat,bool groupBySpec,DateTime dateReportedStart,DateTime dateReportedEnd) {
+		///If includeNoPat==true, the lab orders not attached to a patient will be included.</summary>
+		public static List<MedLab> GetOrdersForPatient(Patient pat,bool includeNoPat,DateTime dateReportedStart,DateTime dateReportedEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),pat,includeNoPat,groupBySpec,dateReportedStart,dateReportedEnd);
+				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),pat,includeNoPat,dateReportedStart,dateReportedEnd);
 			}
 			//include all patients unless a patient is specified.
-			string patNumClause="PatNum>0";
+			string patNumClause="medlab.PatNum>0";
 			if(pat!=null) {
-				patNumClause="PatNum="+POut.Long(pat.PatNum);
+				patNumClause="medlab.PatNum="+POut.Long(pat.PatNum);
 			}
 			//do not include patnum=0 unless specified.
-			string noPatClause="";
 			if(includeNoPat) {
-				noPatClause="OR PatNum=0";
+				patNumClause+=" OR medlab.PatNum=0";
 			}
-			string groupByTestClause="";
-			if(!groupBySpec) {
-				groupByTestClause=",ObsTestID";
-			}
-			string command="SELECT PatNum,ProvNum,MAX(DateTimeReported) AS DateTimeReported,SpecimenID,SpecimenIDFiller,"
+			string command="SELECT ml.MedLabNum,SendingApp,SendingFacility,medlab.PatNum,medlab.ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,"
+				+"medlab.SpecimenID,SpecimenIDFiller,medlab.ObsTestID,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,"
+				+"MIN(DateTimeEntered) AS DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,"
+				+"ml.DateTimeReported,ml.ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,ml.OriginalPIDSegment,"
 				+DbHelper.GroupConcat("ObsTestDescript",distinct:true,separator:"\r\n")+" AS ObsTestDescript "
 				+"FROM medlab "
-				+"WHERE ("+patNumClause+" "+noPatClause+") " //Ex: WHERE (PatNum>0 OR Patnum=0) 
-				+"AND "+DbHelper.DtimeToDate("DateTimeReported")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)+" "
-				+"GROUP BY PatNum,ProvNum,SpecimenID"+groupByTestClause+" "
-				+"ORDER BY MAX(DateTimeReported) DESC,SpecimenID,medlab.MedLabNum";//most recently received lab on top, with all for a specific specimen together
-			return Db.GetTable(command);
+				+"INNER JOIN ("
+				+"SELECT MedLabNum,medlab.PatNum,medlab.ProvNum,medlab.SpecimenID,maxDate.DateTimeReported,ResultStatus,OriginalPIDSegment "
+				+"FROM medlab "
+				+"INNER JOIN ("
+				+"SELECT PatNum,ProvNum,SpecimenID,MAX(DateTimeReported) AS DateTimeReported "
+				+"FROM medlab "
+				+"GROUP BY PatNum,ProvNum,SpecimenID"
+				+") maxDate ON maxDate.PatNum=medlab.PatNum AND maxDate.ProvNum=medlab.ProvNum AND maxDate.SpecimenID=medlab.SpecimenID "
+				+"AND maxDate.DateTimeReported=medlab.DateTimeReported"
+				+") ml ON ml.PatNum=medlab.PatNum AND ml.ProvNum=medlab.ProvNum AND ml.SpecimenID=medlab.SpecimenID "
+				+"WHERE ("+patNumClause+") " //Ex: WHERE (medlab.PatNum>0 OR medlab.Patnum=0)
+				+"AND "+DbHelper.DtimeToDate("ml.DateTimeReported")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)+" "
+				+"GROUP BY medlab.PatNum,medlab.ProvNum,medlab.SpecimenID "
+				+"ORDER BY ml.DateTimeReported DESC,medlab.SpecimenID,MedLabNum";//most recently received lab on top, with all for a specific specimen together
+			return Crud.MedLabCrud.SelectMany(command);
 		}
 
 		///<summary>Get MedLabs for a specific patient and a specific SpecimenID, SpecimenIDFiller combination.
