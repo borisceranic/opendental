@@ -4048,10 +4048,12 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				//Add program property for Tigerview enchancement
+				command="SELECT ProgramNum FROM program WHERE ProgName='TigerView'";
+				string progNum=Db.GetScalar(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
 				    +") VALUES("
-				    +"'"+POut.Long(Programs.GetProgramNum(ProgramName.TigerView))+"', "
+				    +"'"+progNum+"', "
 				    +"'TigerView EMR folder path', "
 				    +"'')";
 					Db.NonQ(command);
@@ -4060,7 +4062,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
 				    +") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
-				    +"'"+POut.Long(Programs.GetProgramNum(ProgramName.TigerView))+"', "
+				    +"'"+progNum+"', "
 				    +"'TigerView EMR folder path', "
 				    +"'')";
 					Db.NonQ(command);
