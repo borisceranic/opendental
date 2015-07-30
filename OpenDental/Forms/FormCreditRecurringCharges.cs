@@ -100,11 +100,11 @@ namespace OpenDental {
 					}
 					if(table.Rows[i]["PayOrder"].ToString()=="2") {
 						famBalTotal+=rptChargeAmt;
-						rptChargeAmt+=PIn.Long(table.Rows[i]["ChargeAmt"].ToString());
+						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
 					}
 				}
 				else {
-					rptChargeAmt=PIn.Long(table.Rows[i]["ChargeAmt"].ToString());
+					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
 				}
 				if(!dictPatBals.ContainsKey(patNum)) {
 					dictPatBals.Add(patNum,famBalTotal);
