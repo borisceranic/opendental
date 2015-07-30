@@ -211,7 +211,13 @@ namespace OpenDental {
 				report.AddSubTitle("Clinics",subtitleClinics);
 			}
 			report.AddSubTitle("Billing",subtitleBilling);
-			QueryObject query=report.AddQuery(tablePats,"","clinic",SplitByKind.Value,0);
+			QueryObject query;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				query=report.AddQuery(tablePats,"","clinic",SplitByKind.Value,0);
+			}
+			else {
+				query=report.AddQuery(tablePats,"","",SplitByKind.None,0);
+			}
 			query.AddColumn("Name",150,FieldValueType.String);
 			query.AddColumn("Provider",80,FieldValueType.String);
 			query.AddColumn("Address",150,FieldValueType.String);
