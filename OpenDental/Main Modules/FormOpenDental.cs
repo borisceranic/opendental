@@ -7102,17 +7102,37 @@ namespace OpenDental{
 			string[] arrayFileNames=Directory.GetFiles(tempPath,"*.*",SearchOption.AllDirectories);//All files in the current directory plus all files in all subdirectories.
 			for(int i=0;i<arrayFileNames.Length;i++) {
 				try {
+					//All files related to updates need to stay.  They do not contain PHI information and will not harm anything if left around.
+					if(arrayFileNames[i].Contains("UpdateFileCopier.exe")) {
+						continue;//Skip any files related to updates.
+					}
+					//When an update is in progress, the binaries will be stored in a subfolder called UpdateFiles within the temp directory.
+					if(arrayFileNames[i].Contains("UpdateFiles")) {
+						continue;//Skip any files related to updates.
+					}
+					//The UpdateFileCopier will create temporary backups of source and destination setup files so that it can revert if copying fails.
+					if(arrayFileNames[i].Contains("updatefilecopier")) {
+						continue;//Skip any files related to updates.
+					}
 					File.Delete(arrayFileNames[i]);
 				}
 				catch {
 					//Do nothing because the file could have been in use or there were not sufficient permissions.
 					//This file will most likely get deleted next time a temp file is created.
 				}
-			}			
+			}
 			List <string> listDirectories=new List<string>(Directory.GetDirectories(tempPath,"*",SearchOption.AllDirectories));//All subdirectories.
 			listDirectories.Sort();//We need to sort so that we know for certain which directories are parent directories of other directories.
 			for(int i=listDirectories.Count-1;i>=0;i--) {//Easier than recursion.  Since the list is ordered ascending, then going backwards means we delete subdirectories before their parent directories.
 				try {
+					//When an update is in progress, the binaries will be stored in a subfolder called UpdateFiles within the temp directory.
+					if(listDirectories[i].Contains("UpdateFiles")) {
+						continue;//Skip any files related to updates.
+					}
+					//The UpdateFileCopier will create temporary backups of source and destination setup files so that it can revert if copying fails.
+					if(listDirectories[i].Contains("updatefilecopier")) {
+						continue;//Skip any files related to updates.
+					}
 					Directory.Delete(listDirectories[i]);
 				}
 				catch {
