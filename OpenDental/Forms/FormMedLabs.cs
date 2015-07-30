@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Data;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -8,7 +7,6 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormMedLabs:Form {
 		public Patient PatCur;
-		private DataTable _tableMedLabs;
 		///<summary>Used to show the labs for a specific patient.  May be the same as PatCur or a different selected patient or null for all patients.</summary>
 		private Patient _selectedPat;
 
@@ -38,16 +36,21 @@ namespace OpenDental {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			col=new ODGridColumn("Date & Time Reported",150);//most recent date and time a result came in
+			col=new ODGridColumn("Date & Time Reported",135);//most recent date and time a result came in
 			col.SortingStrategy=GridSortingStrategy.DateParse;
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Patient",200);
+			col=new ODGridColumn("Date & Time Entered",135);
+			col.SortingStrategy=GridSortingStrategy.DateParse;
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Provider",120);
+			col=new ODGridColumn("Status",75);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Patient",180);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Provider",70);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Specimen ID",100);//should be the ID sent on the specimen container to lab
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Test(s) Description",280);//description of the test ordered
+			col=new ODGridColumn("Test(s) Description",230);//description of the test ordered
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -55,47 +58,29 @@ namespace OpenDental {
 			if(dateEnd==DateTime.MinValue) {
 				dateEnd=DateTime.MaxValue;
 			}
-			_tableMedLabs=MedLabs.GetOrdersForPatient(_selectedPat,checkIncludeNoPat.Checked,checkGroupBySpec.Checked,PIn.Date(textDateStart.Text),dateEnd);
-			for(int i=0;i<_tableMedLabs.Rows.Count;i++) {
+			List<MedLab> listMedLabs=MedLabs.GetOrdersForPatient(_selectedPat,checkIncludeNoPat.Checked,PIn.Date(textDateStart.Text),dateEnd);
+			for(int i=0;i<listMedLabs.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_tableMedLabs.Rows[i]["DateTimeReported"].ToString());
-				long patNum=PIn.Long(_tableMedLabs.Rows[i]["PatNum"].ToString());
-				if(patNum>0) {
-					row.Cells.Add(Patients.GetLim(patNum).GetNameFL());
+				row.Cells.Add(listMedLabs[i].DateTimeReported.ToString("MM/dd/yyyy hh:mm tt"));
+				row.Cells.Add(listMedLabs[i].DateTimeEntered.ToString("MM/dd/yyyy hh:mm tt"));
+				if(listMedLabs[i].IsPreliminaryResult) {//check whether the test or any of the most recent results for the test is marked as preliminary
+					row.Cells.Add(MedLabs.GetStatusDescript(ResultStatus.P));
 				}
 				else {
-					row.Cells.Add("");
+					row.Cells.Add(MedLabs.GetStatusDescript(listMedLabs[i].ResultStatus));
 				}
-				long provNum=0;
-				try {
-					provNum=PIn.Long(_tableMedLabs.Rows[i]["ProvNum"].ToString());
+				string nameFL="";
+				if(listMedLabs[i].PatNum>0) {
+					nameFL=Patients.GetLim(listMedLabs[i].PatNum).GetNameFLnoPref();
 				}
-				catch(Exception ex) {
-					//do nothing, provNum will remain 0
-				}
-				row.Cells.Add(Providers.GetAbbr(provNum));
-				row.Cells.Add(_tableMedLabs.Rows[i]["SpecimenID"].ToString());
-				row.Cells.Add(_tableMedLabs.Rows[i]["ObsTestDescript"].ToString());
-				row.Tag=_tableMedLabs.Rows[i]["PatNum"].ToString()+","+_tableMedLabs.Rows[i]["SpecimenID"].ToString()+","
-					+_tableMedLabs.Rows[i]["SpecimenIDFiller"].ToString();
+				row.Cells.Add(nameFL);
+				row.Cells.Add(Providers.GetAbbr(listMedLabs[i].ProvNum));//will be blank if ProvNum=0
+				row.Cells.Add(listMedLabs[i].SpecimenID);
+				row.Cells.Add(listMedLabs[i].ObsTestDescript);
+				row.Tag=listMedLabs[i].PatNum.ToString()+","+listMedLabs[i].SpecimenID+","+listMedLabs[i].SpecimenIDFiller;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-		}
-
-		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
-			if(checkGroupBySpec.Checked) {
-				return;
-			}
-			for(int i=0;i<gridMain.Rows.Count;i++) {
-				if(gridMain.Rows[i].Tag.ToString()==gridMain.Rows[e.Row].Tag.ToString()) {
-					gridMain.Rows[i].ColorText=Color.Red;
-				}
-				else {
-					gridMain.Rows[i].ColorText=Color.Black;
-				}
-			}
-			gridMain.Invalidate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
