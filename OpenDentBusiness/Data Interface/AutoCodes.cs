@@ -434,218 +434,219 @@ namespace OpenDentBusiness{
 			long autoCodeNum;
 			long autoCodeItemNum;
 			//Amalgam-------------------------------------------------------------------------------------------------------
-			command="INSERT INTO autocode (Description,IsHidden,LessIntrusive) VALUES ('Amalgam',0,0)";
-			autoCodeNum=Db.NonQ(command,true);
-			//1SurfPrimary
-			if(ProcedureCodes.IsValidCode("21111")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21111")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.One_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Primary)+")";
-				Db.NonQ(command);
-			}
-			//2SurfPrimary
-			if(ProcedureCodes.IsValidCode("21112")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21112")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Two_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Primary)+")";
-				Db.NonQ(command);
-			}
-			//3SurfPrimary
-			if(ProcedureCodes.IsValidCode("21113")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21113")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Three_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Primary)+")";
-				Db.NonQ(command);
-			}
-			//4SurfPrimary
-			if(ProcedureCodes.IsValidCode("21114")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21114")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Four_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Primary)+")";
-				Db.NonQ(command);
-			}
-			//5SurfPrimary
-			if(ProcedureCodes.IsValidCode("21115")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21115")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Five_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Primary)+")";
-				Db.NonQ(command);
-			}
-			//1SurfPermanentPremolar
-			if(ProcedureCodes.IsValidCode("21211")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21211")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.One_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Premolar)+")";
-				Db.NonQ(command);
-			}
-			//2SurfPermanentPremolar
-			if(ProcedureCodes.IsValidCode("21212")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21212")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Two_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Premolar)+")";
-				Db.NonQ(command);
-			}
-			//3SurfPermanentPremolar
-			if(ProcedureCodes.IsValidCode("21213")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21213")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Three_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Premolar)+")";
-				Db.NonQ(command);
-			}
-			//4SurfPermanentPremolar
-			if(ProcedureCodes.IsValidCode("21214")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21214")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Four_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Premolar)+")";
-				Db.NonQ(command);
-			}
-			//5SurfPermanentPremolar
-			if(ProcedureCodes.IsValidCode("21215")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21215")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Five_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Premolar)+")";
-				Db.NonQ(command);
-			}
-			//1SurfPermanentMolar
-			if(ProcedureCodes.IsValidCode("21221")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21221")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.One_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Molar)+")";
-				Db.NonQ(command);
-			}
-			//2SurfPermanentMolar
-			if(ProcedureCodes.IsValidCode("21222")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21222")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Two_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Molar)+")";
-				Db.NonQ(command);
-			}
-			//3SurfPermanentMolar
-			if(ProcedureCodes.IsValidCode("21223")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21223")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Three_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Molar)+")";
-				Db.NonQ(command);
-			}
-			//4SurfPermanentMolar
-			if(ProcedureCodes.IsValidCode("21224")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21224")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Four_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Molar)+")";
-				Db.NonQ(command);
-			}
-			//5SurfPermanentMolar
-			if(ProcedureCodes.IsValidCode("21225")) {
-				command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
-					+ProcedureCodes.GetCodeNum("21225")+")";
-				autoCodeItemNum=Db.NonQ(command,true);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Five_Surf)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Permanent)+")";
-				Db.NonQ(command);
-				command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
-					+POut.Long((int)AutoCondition.Molar)+")";
-				Db.NonQ(command);
-			}
+			//These Amalgam auto codes are currently incorrect and we need a dentist to tell us how to set this up correctly.
+			//command="INSERT INTO autocode (Description,IsHidden,LessIntrusive) VALUES ('Amalgam',0,0)";
+			//autoCodeNum=Db.NonQ(command,true);
+			////1SurfPrimary
+			//if(ProcedureCodes.IsValidCode("21111")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21111")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.One_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Primary)+")";
+			//	Db.NonQ(command);
+			//}
+			////2SurfPrimary
+			//if(ProcedureCodes.IsValidCode("21112")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21112")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Two_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Primary)+")";
+			//	Db.NonQ(command);
+			//}
+			////3SurfPrimary
+			//if(ProcedureCodes.IsValidCode("21113")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21113")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Three_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Primary)+")";
+			//	Db.NonQ(command);
+			//}
+			////4SurfPrimary
+			//if(ProcedureCodes.IsValidCode("21114")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21114")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Four_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Primary)+")";
+			//	Db.NonQ(command);
+			//}
+			////5SurfPrimary
+			//if(ProcedureCodes.IsValidCode("21115")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21115")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Five_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Primary)+")";
+			//	Db.NonQ(command);
+			//}
+			////1SurfPermanentPremolar
+			//if(ProcedureCodes.IsValidCode("21211")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21211")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.One_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Premolar)+")";
+			//	Db.NonQ(command);
+			//}
+			////2SurfPermanentPremolar
+			//if(ProcedureCodes.IsValidCode("21212")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21212")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Two_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Premolar)+")";
+			//	Db.NonQ(command);
+			//}
+			////3SurfPermanentPremolar
+			//if(ProcedureCodes.IsValidCode("21213")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21213")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Three_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Premolar)+")";
+			//	Db.NonQ(command);
+			//}
+			////4SurfPermanentPremolar
+			//if(ProcedureCodes.IsValidCode("21214")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21214")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Four_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Premolar)+")";
+			//	Db.NonQ(command);
+			//}
+			////5SurfPermanentPremolar
+			//if(ProcedureCodes.IsValidCode("21215")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21215")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Five_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Premolar)+")";
+			//	Db.NonQ(command);
+			//}
+			////1SurfPermanentMolar
+			//if(ProcedureCodes.IsValidCode("21221")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21221")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.One_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Molar)+")";
+			//	Db.NonQ(command);
+			//}
+			////2SurfPermanentMolar
+			//if(ProcedureCodes.IsValidCode("21222")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21222")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Two_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Molar)+")";
+			//	Db.NonQ(command);
+			//}
+			////3SurfPermanentMolar
+			//if(ProcedureCodes.IsValidCode("21223")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21223")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Three_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Molar)+")";
+			//	Db.NonQ(command);
+			//}
+			////4SurfPermanentMolar
+			//if(ProcedureCodes.IsValidCode("21224")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21224")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Four_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Molar)+")";
+			//	Db.NonQ(command);
+			//}
+			////5SurfPermanentMolar
+			//if(ProcedureCodes.IsValidCode("21225")) {
+			//	command="INSERT INTO autocodeitem (AutoCodeNum,CodeNum) VALUES ("+POut.Long(autoCodeNum)+","
+			//		+ProcedureCodes.GetCodeNum("21225")+")";
+			//	autoCodeItemNum=Db.NonQ(command,true);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Five_Surf)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Permanent)+")";
+			//	Db.NonQ(command);
+			//	command="INSERT INTO autocodecond (AutoCodeItemNum,Cond) VALUES ("+POut.Long(autoCodeItemNum)+","
+			//		+POut.Long((int)AutoCondition.Molar)+")";
+			//	Db.NonQ(command);
+			//}
 			//Composite-------------------------------------------------------------------------------------------------------
 			command="INSERT INTO autocode (Description,IsHidden,LessIntrusive) VALUES ('Composite - Permanent',0,0)";
 			autoCodeNum=Db.NonQ(command,true);

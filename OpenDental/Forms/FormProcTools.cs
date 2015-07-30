@@ -231,7 +231,6 @@ namespace OpenDental{
 				//Tcodes remain enabled
 				//Ncodes remain enabled
 				checkDcodes.Text="CDA codes - Add any missing 2014 CDA codes.  This option does not work in the trial version.";
-				checkAutocodes.Enabled=false;
 				checkProcButtons.Enabled=false;
 				checkApptProcsQuickAdd.Enabled=false;
 				checkRecallTypes.Enabled=false;
