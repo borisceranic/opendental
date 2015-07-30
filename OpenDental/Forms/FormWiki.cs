@@ -419,7 +419,6 @@ namespace OpenDental {
 				//When there is more than one space in a row, WebBrowserNavigatingEventArgs will convert the spaces into '&nbsp'
 				//In order for our internal wiki page links to work, we need to always replace the '&nbsp' chars with spaces again.
 				LoadWikiPage(Regex.Replace(e.Url.ToString(),@"\u00A0"," ").Substring(5));
-				LoadWikiPage(e.Url.ToString().Substring(5));
 				e.Cancel=true;
 				return;
 			}
