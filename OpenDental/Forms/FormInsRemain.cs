@@ -23,7 +23,8 @@ namespace OpenDental {
 			FillSummary();
 		}
 
-		private void SetGridCols() { //sizes can be changed as needed
+		/// <summary>Column sizes can be changed as needed</summary>
+		private void SetGridCols() { 
 			ODGridColumn col;
 			gridRemainTimeUnits.BeginUpdate();
 			gridRemainTimeUnits.Columns.Clear();
@@ -46,54 +47,69 @@ namespace OpenDental {
 			List<Procedure> listProcs;
 			double amtUsed;
 			int monthRenew;
-			if(listPatBenefits.Count>0) {
+			if(listPatBenefits.Count > 0) {
 				for(int i=0;i<listPatBenefits.Count;i++) {
-					if(
-						listPatBenefits[i].CovCatNum==0 //no category
-						|| listPatBenefits[i].BenefitType!=InsBenefitType.Limitations //benefit type is not limitations
-						|| (listPatBenefits[i].TimePeriod!=BenefitTimePeriod.CalendarYear && listPatBenefits[i].TimePeriod!=BenefitTimePeriod.ServiceYear) //neither calendar year nor serviceyear
-						|| listPatBenefits[i].Quantity<=0 //quantity is 0 (maybe we should still show these benefits?)
-						|| listPatBenefits[i].QuantityQualifier != BenefitQuantity.NumberOfServices //qualifier us not the number of services
-						|| (listPatBenefits[i].CoverageLevel != BenefitCoverageLevel.Family && listPatBenefits[i].CoverageLevel != BenefitCoverageLevel.Individual)) //neither individual nor family coverage level
+					if(listPatBenefits[i].CovCatNum==0 //no category
+						|| listPatBenefits[i].BenefitType != InsBenefitType.Limitations //benefit type is not limitations
+						|| (listPatBenefits[i].TimePeriod != BenefitTimePeriod.CalendarYear //neither calendar year nor serviceyear
+							&& listPatBenefits[i].TimePeriod != BenefitTimePeriod.ServiceYear)
+						|| listPatBenefits[i].Quantity < 0//quantity is negative (negatives are allowed in FormBenefitEdit)
+						|| listPatBenefits[i].QuantityQualifier != BenefitQuantity.NumberOfServices//qualifier us not the number of services
+						|| (listPatBenefits[i].CoverageLevel != BenefitCoverageLevel.Family //neither individual nor family coverage level
+							&& listPatBenefits[i].CoverageLevel != BenefitCoverageLevel.Individual)) 
 					{
 						continue;
 					}
-					if(listPatBenefits[i].TimePeriod==BenefitTimePeriod.CalendarYear) { //for calendar year, get completed procs from January.01.CurYear ~ Curdate
-						listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTime.Today.Year,1,1),DateTime.Today); //01/01/CurYear. is there a better way?
+					//for calendar year, get completed procs from January.01.CurYear ~ Curdate
+					if(listPatBenefits[i].TimePeriod==BenefitTimePeriod.CalendarYear) {
+						//01/01/CurYear. is there a better way?
+						listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,1,1),DateTimeOD.Today); 
 					}
 					else { //if not calendar year, then it must be service year
 						monthRenew=InsPlans.RefreshOne(listPatBenefits[i].PlanNum).MonthRenew; //monthrenew only stores the month as an int.
-						//ternary op: if the current month >= month renew, use this year. otherwise, use last year. I can break this into another if-else if necessary.
-						listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTime.Today.Month>=monthRenew?DateTime.Today.Year:DateTime.Today.Year-1,monthRenew,1),DateTime.Today);
+						if(DateTimeOD.Today.Month >= monthRenew) {	//if the the current date is past the renewal month, use the current year
+							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,monthRenew,1),DateTimeOD.Today);
+						}
+						else { //otherwise use the previous year
+							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year-1,monthRenew,1),DateTimeOD.Today);
+						}
 					}
-					amtUsed=GetAmtUsedForCat(listProcs,CovCats.GetCovCat(listPatBenefits[i].CovCatNum)); //calculate the amount used for one benefit. this is slightly inefficient. O(n^2)
+					//Calculate the amount used for one benefit.
+					amtUsed=GetAmtUsedForCat(listProcs,CovCats.GetCovCat(listPatBenefits[i].CovCatNum)); 
 					gridRow=new ODGridRow();
 					gridRow.Cells.Add(CovCats.GetCovCat(listPatBenefits[i].CovCatNum).EbenefitCat.ToString()); //Coverage Category
 					gridRow.Cells.Add(listPatBenefits[i].Quantity.ToString()); //Quantity	
-					gridRow.Cells.Add(amtUsed.ToString()); //Used
-					gridRow.Cells.Add((listPatBenefits[i].Quantity-amtUsed>0?listPatBenefits[i].Quantity-amtUsed:0).ToString()); //Remaining: if (Quantity - Used) < 0, then 0. I can change this to a non-ternary op if need be
+					gridRow.Cells.Add(amtUsed.ToString("F")); //Used
+					double amtRemain=listPatBenefits[i].Quantity-amtUsed;
+					if(amtRemain > 0) {
+						gridRow.Cells.Add(amtRemain.ToString("F")); //quantity-used.
+					}
+					else { //if less then 0, just 0. 
+						gridRow.Cells.Add("0");
+					}
 					gridRemainTimeUnits.Rows.Add(gridRow);
 				}
 			}
 			gridRemainTimeUnits.EndUpdate();
 		}
 		
-		/// <summary>Pass in a list of procedures and a covCat, return the sum of all CanadaTimeUnits of the procedures in that covCat as a double. Iterates through the list of procedures to make a list of procedurecodes.</summary>
+		///<summary>Pass in list of procedures and covCat, return the sum of all CanadaTimeUnits of the procedures in that covCat as a double.</summary>
 		private double GetAmtUsedForCat(List<Procedure> listProcs,CovCat covCat) {
-			List<ProcedureCode> listProcCodes = new List<ProcedureCode>();
+			List<ProcedureCode> listProcCodes=new List<ProcedureCode>();
 			for(int i=0;i<listProcs.Count;i++) {
 				listProcCodes.Add(ProcedureCodes.GetProcCode(listProcs[i].CodeNum));	//turn list of procedures into list of procedurecodes.
 			}
 			double total=0;//CanadaTimeUnits can be decimal numbers, like 0.5.
 			for(int i=0;i<listProcCodes.Count;i++) { //for every procedurecode
-				if(CovCats.GetCovCat(CovSpans.GetCat(listProcCodes[i].ProcCode)).EbenefitCat==covCat.EbenefitCat) { //if the covCat of that code is the same as the passed-in covCat
+				//if the covCat of that code is the same as the passed-in covCat
+				if(CovCats.GetCovCat(CovSpans.GetCat(listProcCodes[i].ProcCode)).EbenefitCat==covCat.EbenefitCat) { 
 					total+=listProcCodes[i].CanadaTimeUnits; //add the Canada time units to the total.
 				}
 			}
 			return total;
 		}
 
-		//all of the code below is copied directly from the account module, ContrAccount.FillSummary(). line 2459
+		///<summary>All of the code from this method is copied directly from the account module, ContrAccount.FillSummary().</summary>
 		private void FillSummary() {
 			textFamPriMax.Text="";
 			textFamPriDed.Text="";
@@ -133,8 +149,10 @@ namespace OpenDental {
 			if(PatPlanList.Count>0) {
 				SubCur=InsSubs.GetSub(PatPlanList[0].InsSubNum,subList);
 				PlanCur=InsPlans.GetPlan(SubCur.PlanNum,InsPlanList);
-				pend=InsPlans.GetPendingDisplay(HistList,DateTime.Today,PlanCur,PatPlanList[0].PatPlanNum,-1,_patCur.PatNum,PatPlanList[0].InsSubNum,BenefitList);
-				used=InsPlans.GetInsUsedDisplay(HistList,DateTime.Today,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,-1,InsPlanList,BenefitList,_patCur.PatNum,PatPlanList[0].InsSubNum);
+				pend=InsPlans.GetPendingDisplay(HistList,DateTimeOD.Today,PlanCur,PatPlanList[0].PatPlanNum,
+					-1,_patCur.PatNum,PatPlanList[0].InsSubNum,BenefitList);
+				used=InsPlans.GetInsUsedDisplay(HistList,DateTimeOD.Today,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,
+					-1,InsPlanList,BenefitList,_patCur.PatNum,PatPlanList[0].InsSubNum);
 				textPriPend.Text=pend.ToString("F");
 				textPriUsed.Text=used.ToString("F");
 				maxFam=Benefits.GetAnnualMaxDisplay(BenefitList,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,true);
@@ -163,7 +181,8 @@ namespace OpenDental {
 				dedFam=Benefits.GetDeductGeneralDisplay(BenefitList,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,BenefitCoverageLevel.Family);
 				if(ded!=-1) {
 					textPriDed.Text=ded.ToString("F");
-					dedRem=InsPlans.GetDedRemainDisplay(HistList,DateTime.Today,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,-1,InsPlanList,_patCur.PatNum,ded,dedFam);
+					dedRem=InsPlans.GetDedRemainDisplay(HistList,DateTimeOD.Today,PlanCur.PlanNum,PatPlanList[0].PatPlanNum,
+						-1,InsPlanList,_patCur.PatNum,ded,dedFam);
 					textPriDedRem.Text=dedRem.ToString("F");
 				}
 				if(dedFam!=-1) {
@@ -173,9 +192,11 @@ namespace OpenDental {
 			if(PatPlanList.Count>1) {
 				SubCur=InsSubs.GetSub(PatPlanList[1].InsSubNum,subList);
 				PlanCur=InsPlans.GetPlan(SubCur.PlanNum,InsPlanList);
-				pend=InsPlans.GetPendingDisplay(HistList,DateTime.Today,PlanCur,PatPlanList[1].PatPlanNum,-1,_patCur.PatNum,PatPlanList[1].InsSubNum,BenefitList);
+				pend=InsPlans.GetPendingDisplay(HistList,DateTimeOD.Today,PlanCur,PatPlanList[1].PatPlanNum,
+					-1,_patCur.PatNum,PatPlanList[1].InsSubNum,BenefitList);
 				textSecPend.Text=pend.ToString("F");
-				used=InsPlans.GetInsUsedDisplay(HistList,DateTime.Today,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,-1,InsPlanList,BenefitList,_patCur.PatNum,PatPlanList[1].InsSubNum);
+				used=InsPlans.GetInsUsedDisplay(HistList,DateTimeOD.Today,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,
+					-1,InsPlanList,BenefitList,_patCur.PatNum,PatPlanList[1].InsSubNum);
 				textSecUsed.Text=used.ToString("F");
 				//max=Benefits.GetAnnualMaxDisplay(BenefitList,PlanCur.PlanNum,PatPlanList[1].PatPlanNum);
 				maxFam=Benefits.GetAnnualMaxDisplay(BenefitList,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,true);
@@ -204,7 +225,8 @@ namespace OpenDental {
 				dedFam=Benefits.GetDeductGeneralDisplay(BenefitList,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,BenefitCoverageLevel.Family);
 				if(ded!=-1) {
 					textSecDed.Text=ded.ToString("F");
-					dedRem=InsPlans.GetDedRemainDisplay(HistList,DateTime.Today,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,-1,InsPlanList,_patCur.PatNum,ded,dedFam);
+					dedRem=InsPlans.GetDedRemainDisplay(HistList,DateTimeOD.Today,PlanCur.PlanNum,PatPlanList[1].PatPlanNum,
+						-1,InsPlanList,_patCur.PatNum,ded,dedFam);
 					textSecDedRem.Text=dedRem.ToString("F");
 				}
 				if(dedFam!=-1) {
