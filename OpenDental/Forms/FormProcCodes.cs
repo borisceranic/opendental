@@ -254,7 +254,7 @@ namespace OpenDental{
 			// 
 			// groupFeeScheds
 			// 
-			this.groupFeeScheds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupFeeScheds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupFeeScheds.Controls.Add(this.butTools);
 			this.groupFeeScheds.Controls.Add(this.butEditFeeSched);
 			this.groupFeeScheds.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -435,7 +435,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label5.Location = new System.Drawing.Point(779, 9);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(199, 17);
@@ -523,6 +523,7 @@ namespace OpenDental{
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.butPickProv1);
 			this.groupBox2.Controls.Add(this.butPickClinic1);
 			this.groupBox2.Controls.Add(this.butPickSched1);
@@ -640,6 +641,7 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox3.Controls.Add(this.butPickProv2);
 			this.groupBox3.Controls.Add(this.butPickClinic2);
 			this.groupBox3.Controls.Add(this.butPickSched2);
@@ -757,6 +759,7 @@ namespace OpenDental{
 			// 
 			// groupBox4
 			// 
+			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox4.Controls.Add(this.butPickProv3);
 			this.groupBox4.Controls.Add(this.butPickClinic3);
 			this.groupBox4.Controls.Add(this.butPickSched3);
@@ -874,6 +877,7 @@ namespace OpenDental{
 			// 
 			// groupBox5
 			// 
+			this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox5.Controls.Add(this.butColorClinicProv);
 			this.groupBox5.Controls.Add(this.butColorProvider);
 			this.groupBox5.Controls.Add(this.butColorClinic);
