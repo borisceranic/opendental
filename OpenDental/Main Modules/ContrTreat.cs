@@ -1193,6 +1193,9 @@ namespace OpenDental{
 					if(ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum).TreatArea==TreatmentArea.Surf) {
 						row.Surf=(Tooth.SurfTidyFromDbToDisplay(ProcListTP[i].Surf,ProcListTP[i].ToothNum));
 					}
+					else if(ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum).TreatArea==TreatmentArea.Sextant) {
+						row.Surf=Tooth.GetSextant(ProcListTP[i].Surf,(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));						
+					}
 					else {
 						row.Surf=(ProcListTP[i].Surf);//I think this will properly allow UR, L, etc.
 					}
