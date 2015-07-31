@@ -250,6 +250,16 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets the labcase for an appointment. Used when creating routing slips.</summary>
+		public static LabCase GetForApt(long aptNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<LabCase>(MethodBase.GetCurrentMethod(),aptNum);
+			}
+			string command="SELECT * FROM labcase "
+				+"WHERE AptNum="+POut.Long(aptNum);
+			return Crud.LabCaseCrud.SelectOne(command);
+		}
+
 	}
 
 

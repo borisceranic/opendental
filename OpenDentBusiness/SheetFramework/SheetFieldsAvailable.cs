@@ -340,6 +340,9 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("appt.procedures"));
 				list.Add(NewOutput("appt.Note"));
 				list.Add(NewOutput("otherFamilyMembers"));
+				list.Add(NewOutput("labName"));
+				list.Add(NewOutput("dateLabSent"));
+				list.Add(NewOutput("dateLabReceived"));
 				//most fields turned out to work best as static text.
 			}
 			else if(outInCheck==OutInCheck.In) {
