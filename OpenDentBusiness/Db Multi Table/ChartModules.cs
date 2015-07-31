@@ -358,6 +358,10 @@ namespace OpenDentBusiness {
 					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Surf) {
 						row["surf"]=Tooth.SurfTidyFromDbToDisplay(rawProcs.Rows[i]["Surf"].ToString(),rawProcs.Rows[i]["ToothNum"].ToString());
 					}
+					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Sextant) {
+						row["surf"]=Tooth.GetSextant(rawProcs.Rows[i]["Surf"].ToString(),
+							(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
+					}
 					else {
 						row["surf"]=rawProcs.Rows[i]["Surf"].ToString();
 					}

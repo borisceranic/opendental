@@ -254,6 +254,37 @@ namespace OpenDentBusiness{
 			return "";
 		}
 
+		///<summary>For nomenclature, use pref UseInternationalToothNumbers, or a hard coded value.</summary>
+		public static string GetSextant(string surf,ToothNumberingNomenclature nomenclature) {
+			if(nomenclature==ToothNumberingNomenclature.Universal) {
+				return surf;
+			}
+			if(nomenclature==ToothNumberingNomenclature.FDI) {
+				if(surf=="1") {//Upper Right
+					return "03";
+				}
+				else if(surf=="2") {//Upper Anterior
+					return "04";
+				}
+				else if(surf=="3") {//Upper Left
+					return "05";
+				}
+				else if(surf=="4") {//Lower Left
+					return "06";
+				}
+				else if(surf=="5") {//Lower Anterior
+					return "07";
+				}
+				else if(surf=="6") {//Lower Right
+					return "08";
+				}
+				return "00";//Invalid or unspecified sextant.  This is also the number that represents "whole mouth" in Canada.
+			}
+			//All others, return the surface.
+			//Note to reviewer: I don't know what the numbering scheme is for the other nomenclatures but it'd be easy enough to implement.
+			return surf;
+		}
+
 		///<summary>Sometimes validated by IsValidDB before coming here, otherwise an invalid toothnum .  This should be run on all displayed tooth numbers. It will handle checking for whether user is using international tooth numbers.  All tooth numbers are passed in american values until the very last moment.  Just before display, the string is converted using this method.</summary>
 		public static string ToInternat(string toothNum){ // CWI: Left for compatibility
 			return GetToothLabel(toothNum,(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
