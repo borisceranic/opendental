@@ -49,6 +49,8 @@ namespace OpenDental{
 			this.comboClinic = new OpenDental.UI.ComboBoxMulti();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butSend = new OpenDental.UI.Button();
+			this.textReply = new OpenDental.ODtextBox();
 			this.SuspendLayout();
 			// 
 			// labelClinic
@@ -211,7 +213,7 @@ namespace OpenDental{
 			this.smsThreadView.ListSmsThreadMessages = null;
 			this.smsThreadView.Location = new System.Drawing.Point(712, 61);
 			this.smsThreadView.Name = "smsThreadView";
-			this.smsThreadView.Size = new System.Drawing.Size(250, 593);
+			this.smsThreadView.Size = new System.Drawing.Size(250, 493);
 			this.smsThreadView.TabIndex = 164;
 			// 
 			// butPatCurrent
@@ -299,10 +301,41 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butSend
+			// 
+			this.butSend.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butSend.Autosize = true;
+			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSend.CornerRadius = 4F;
+			this.butSend.Enabled = false;
+			this.butSend.Location = new System.Drawing.Point(919, 556);
+			this.butSend.Name = "butSend";
+			this.butSend.Size = new System.Drawing.Size(43, 98);
+			this.butSend.TabIndex = 168;
+			this.butSend.Text = "Send";
+			// 
+			// textReply
+			// 
+			this.textReply.AcceptsTab = true;
+			this.textReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.textReply.DetectUrls = false;
+			this.textReply.Enabled = false;
+			this.textReply.Location = new System.Drawing.Point(712, 556);
+			this.textReply.Name = "textReply";
+			this.textReply.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textReply.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textReply.Size = new System.Drawing.Size(201, 98);
+			this.textReply.TabIndex = 167;
+			this.textReply.Text = "";
+			// 
 			// FormSmsTextMessaging
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.butSend);
+			this.Controls.Add(this.textReply);
 			this.Controls.Add(this.smsThreadView);
 			this.Controls.Add(this.gridMessages);
 			this.Controls.Add(this.checkRead);
@@ -359,5 +392,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkRead;
 		private CallFireService.SMSService smsService1;
 		private SmsThreadView smsThreadView;
+		private UI.Button butSend;
+		private ODtextBox textReply;
 	}
 }

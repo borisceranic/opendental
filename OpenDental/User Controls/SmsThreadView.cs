@@ -58,9 +58,8 @@ namespace OpenDental {
 				panelScroll.Controls.Add(labelDateTime);
 				y+=labelDateTime.Height;
 				TextBox textBoxMessage=new TextBox();
-				textBoxMessage.BackColor=Color.White;
+				textBoxMessage.BackColor=_listSmsThreadMessages[i].BackColor;
 				if(_listSmsThreadMessages[i].IsHighlighted) {
-					textBoxMessage.BackColor=Color.Silver;//Same as ODGrid selection color.
 					controlHighlighted=textBoxMessage;
 				}
 				if(_listSmsThreadMessages[i].IsImportant) {
@@ -95,6 +94,9 @@ namespace OpenDental {
 			if(controlHighlighted==null) {
 				controlHighlighted=labelBottomSpacer;
 			}
+			if(panelScroll.VerticalScroll.Value!=panelScroll.VerticalScroll.Maximum) {
+				panelScroll.VerticalScroll.Value=panelScroll.VerticalScroll.Maximum; //scroll to the end first then scroll to control
+			}
 			panelScroll.ScrollControlIntoView(controlHighlighted);//Scroll to highlighted control, or if none highlighted, then scroll to the end.
 		}
 
@@ -112,6 +114,25 @@ namespace OpenDental {
 		///<summary>Causes the message text to show in red.</summary>
 		public bool IsImportant;
 		public bool IsHighlighted;
+
+		public Color BackColor {
+			get {
+				Color retVal;
+				if(IsAlignedLeft) {//From Customer
+					retVal=Color.FromArgb(244,255,244);
+					if(IsHighlighted) {
+						retVal=Color.FromArgb(220,255,220);
+					}
+				}
+				else {//Right aligned
+					retVal=Color.White;
+					if(IsHighlighted) {
+						retVal=Color.FromArgb(220,220,220);
+					}
+				}
+				return retVal;
+			}
+		}
 
 		public SmsThreadMessage(DateTime msgDateTime,string message,bool isAlignedLeft,bool isImportant,bool isHighlighted) {
 			MsgDateTime=msgDateTime;

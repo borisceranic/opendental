@@ -830,11 +830,12 @@ namespace OpenDental{
 			SetGridCols();
 			if(ExplicitPatNums!=null && ExplicitPatNums.Count>0) {
 				FillGrid(false,ExplicitPatNums);
+				return;
 			}
 			if(InitialPatNum!=0){
 				Patient iPatient=Patients.GetLim(InitialPatNum);
 				textLName.Text=iPatient.LName;
-				FillGrid(false,ExplicitPatNums);
+				FillGrid(false);
 				/*if(grid2.CurrentRowIndex>-1){
 					grid2.UnSelect(grid2.CurrentRowIndex);
 				}

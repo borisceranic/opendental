@@ -30,6 +30,9 @@ namespace OpenDental {
 		///<summary>The column index of the Status column within the Messages grid.
 		///This is a class-wide variable to prevent bugs if we decide to change the column order of the Messages grid.</summary>
 		private int _columnStatusIdx=0;
+		public PatientSelectedEventHandler PatientGoTo;
+		private List<SmsFromMobile> _listSmsFromMobile=new List<SmsFromMobile>();
+		private List<SmsToMobile> _listSmsToMobile=new List<SmsToMobile>();
 
 		public FormSmsTextMessaging() {
 			InitializeComponent();
@@ -55,7 +58,8 @@ namespace OpenDental {
 			FillGridTextMessages();
 		}
 
-		private void FillGridTextMessages() {
+		private void FillGridTextMessages(bool isRedrawOnly=false) {
+			Color colorSelect=Color.FromArgb(224,243,255);
 			int sortByColIdx=gridMessages.SortedByColumnIdx;
 			bool isSortAsc=gridMessages.SortedIsAscending;
 			if(sortByColIdx==-1) {
@@ -63,8 +67,15 @@ namespace OpenDental {
 				isSortAsc=false;
 			}
 			object selectedTag=null;
+			long selectedPatNum=0;
 			if(gridMessages.GetSelectedIndex()!=-1) {
 				selectedTag=gridMessages.Rows[gridMessages.GetSelectedIndex()].Tag;
+				if(selectedTag is SmsToMobile) {
+					selectedPatNum=((SmsToMobile)selectedTag).PatNum;
+				}
+				else if(selectedTag is SmsFromMobile) {
+					selectedPatNum=((SmsFromMobile)selectedTag).PatNum;
+				}
 			}
 			gridMessages.BeginUpdate();
 			gridMessages.Rows.Clear();
@@ -99,29 +110,34 @@ namespace OpenDental {
 			DateTime dateTo=PIn.Date(textDateTo.Text);
 			Dictionary<long,string> dictPatNames=Patients.GetAllPatientNames();
 			if(listSmsFromStatuses.Count>0) {
-				List<SmsFromMobile> listSmsFromMobile=SmsFromMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum,listSmsFromStatuses.ToArray());				
-				for(int i=0;i<listSmsFromMobile.Count;i++) {
-					if(!checkHidden.Checked && listSmsFromMobile[i].IsHidden) {
+				if(!isRedrawOnly) {
+					_listSmsFromMobile=SmsFromMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum,listSmsFromStatuses.ToArray());
+				}
+				for(int i=0;i<_listSmsFromMobile.Count;i++) {
+					if(!checkHidden.Checked && _listSmsFromMobile[i].IsHidden) {
 						continue;
 					}
 					UI.ODGridRow row=new UI.ODGridRow();
-					row.Tag=listSmsFromMobile[i];					
-					if(listSmsFromMobile[i].SmsStatus==SmsFromStatus.ReceivedUnread) {
+					row.Tag=_listSmsFromMobile[i];					
+					if(_listSmsFromMobile[i].SmsStatus==SmsFromStatus.ReceivedUnread) {
 						row.Bold=true;
 					}
-					row.Cells.Add(listSmsFromMobile[i].DateTimeReceived.ToString());//DateTime
+					row.Cells.Add(_listSmsFromMobile[i].DateTimeReceived.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Received"));//Type
-					row.Cells.Add(SmsFromMobiles.GetSmsFromStatusDescript(listSmsFromMobile[i].SmsStatus));//Status
-					row.Cells.Add(listSmsFromMobile[i].MatchCount.ToString());//#Phone Matches
-					row.Cells.Add(listSmsFromMobile[i].MobilePhoneNumber);//Patient Phone
-					row.Cells.Add(listSmsFromMobile[i].PatNum==0?"Unassigned":dictPatNames[listSmsFromMobile[i].PatNum]);//Patient
+					row.Cells.Add(SmsFromMobiles.GetSmsFromStatusDescript(_listSmsFromMobile[i].SmsStatus));//Status
+					row.Cells.Add(_listSmsFromMobile[i].MatchCount.ToString());//#Phone Matches
+					row.Cells.Add(_listSmsFromMobile[i].MobilePhoneNumber);//Patient Phone
+					row.Cells.Add(_listSmsFromMobile[i].PatNum==0?"Unassigned":dictPatNames[_listSmsFromMobile[i].PatNum]);//Patient
 					row.Cells.Add("0.00");//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-						Clinic clinic=Clinics.GetClinic(listSmsFromMobile[i].ClinicNum);
+						Clinic clinic=Clinics.GetClinic(_listSmsFromMobile[i].ClinicNum);
 						row.Cells.Add(clinic.Description);//Clinic
 					}
 					if(checkHidden.Checked) {
-						row.Cells.Add(listSmsFromMobile[i].IsHidden?"X":"");//Hidden
+						row.Cells.Add(_listSmsFromMobile[i].IsHidden?"X":"");//Hidden
+					}
+					if(selectedPatNum!=0 && _listSmsFromMobile[i].PatNum==selectedPatNum) {
+						row.ColorBackG=colorSelect;
 					}
 					gridMessages.Rows.Add(row);
 				}
@@ -129,17 +145,19 @@ namespace OpenDental {
 			UnreadMessageCount=PIn.Long(SmsFromMobiles.GetSmsNotification());
 			SmsNotifier(UnreadMessageCount.ToString(),true);
 			if(checkSent.Checked) {
-				List<SmsToMobile> listSmsToMobile=SmsToMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum);
-				for(int i=0;i<listSmsToMobile.Count;i++) {
-					if(!checkHidden.Checked && listSmsToMobile[i].IsHidden) {
+				if(!isRedrawOnly) {
+					_listSmsToMobile=SmsToMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum);
+				}
+				for(int i=0;i<_listSmsToMobile.Count;i++) {
+					if(!checkHidden.Checked && _listSmsToMobile[i].IsHidden) {
 						continue;
 					}
 					UI.ODGridRow row=new UI.ODGridRow();
-					row.Tag=listSmsToMobile[i];
-					row.Cells.Add(listSmsToMobile[i].DateTimeSent.ToString());//DateTime
+					row.Tag=_listSmsToMobile[i];
+					row.Cells.Add(_listSmsToMobile[i].DateTimeSent.ToString());//DateTime
 					row.Cells.Add(Lan.g(this,"Sent"));//Type
-					string smsStatus=listSmsToMobile[i].SmsStatus.ToString(); //Default to the actual status.
-					switch(listSmsToMobile[i].SmsStatus) {
+					string smsStatus=_listSmsToMobile[i].SmsStatus.ToString(); //Default to the actual status.
+					switch(_listSmsToMobile[i].SmsStatus) {
 						case SmsDeliveryStatus.DeliveryConf:
 						case SmsDeliveryStatus.DeliveryUnconf:
 							//Treated the same as far as the user is concerned.
@@ -152,16 +170,19 @@ namespace OpenDental {
 							break;
 					}
 					row.Cells.Add(smsStatus);//Status
-					row.Cells.Add("");//#Phone Matches, not applicable to outbound messages.
-					row.Cells.Add(listSmsToMobile[i].MobilePhoneNumber);//Patient Phone
-					row.Cells.Add(listSmsToMobile[i].PatNum==0?"":dictPatNames[listSmsToMobile[i].PatNum]);//Patient
-					row.Cells.Add(listSmsToMobile[i].MsgChargeUSD.ToString("f"));//Cost
+					row.Cells.Add("-");//#Phone Matches, not applicable to outbound messages.
+					row.Cells.Add(_listSmsToMobile[i].MobilePhoneNumber);//Patient Phone
+					row.Cells.Add(_listSmsToMobile[i].PatNum==0?"":dictPatNames[_listSmsToMobile[i].PatNum]);//Patient
+					row.Cells.Add(_listSmsToMobile[i].MsgChargeUSD.ToString("f"));//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-						Clinic clinic=Clinics.GetClinic(listSmsToMobile[i].ClinicNum);
+						Clinic clinic=Clinics.GetClinic(_listSmsToMobile[i].ClinicNum);
 						row.Cells.Add(clinic.Description);//Clinic
 					}
 					if(checkHidden.Checked) {
-						row.Cells.Add(listSmsToMobile[i].IsHidden?"X":"");//Hidden
+						row.Cells.Add(_listSmsToMobile[i].IsHidden?"X":"");//Hidden
+					}
+					if(selectedPatNum!=0 && _listSmsToMobile[i].PatNum==selectedPatNum) {
+						row.ColorBackG=colorSelect;
 					}
 					gridMessages.Rows.Add(row);
 				}
@@ -238,6 +259,18 @@ namespace OpenDental {
 			}
 			listSmsThreadMessages.Sort(SmsThreadMessage.CompareMessages);
 			smsThreadView.ListSmsThreadMessages=listSmsThreadMessages;
+			SetReplyHelper();
+		}
+
+		private void SetReplyHelper() {
+			if(gridMessages.GetSelectedIndex()==-1) {
+				butSend.Enabled=false;
+				textReply.Enabled=false;
+				textReply.Text="";
+				return;
+			}
+			butSend.Enabled=true;
+			textReply.Enabled=true;
 		}
 
 		private void butPatCurrent_Click(object sender,EventArgs e) {
@@ -275,7 +308,6 @@ namespace OpenDental {
 			if(gridMessages.Rows[e.Row].Tag is SmsFromMobile) {
 				//Update the message thread control to show the message thread for the currently selected message.
 				SmsFromMobile smsFromMobile=(SmsFromMobile)gridMessages.Rows[e.Row].Tag;
-				FillGridMessageThread(smsFromMobile.PatNum);
 				//If the clicked/selected message was a ReceivedUnread message, then mark the message ReceivedRead in the db as well as the grid.
 				if(smsFromMobile.SmsStatus==SmsFromStatus.ReceivedUnread) {
 					SmsFromMobile oldSmsFromMobile=smsFromMobile.Copy();
@@ -291,8 +323,8 @@ namespace OpenDental {
 			if(gridMessages.Rows[e.Row].Tag is SmsToMobile) {
 				//Update the message thread control to show the message thread for the currently selected message.
 				SmsToMobile smsToMobile=(SmsToMobile)gridMessages.Rows[e.Row].Tag;
-				FillGridMessageThread(smsToMobile.PatNum);
 			}
+			FillGridTextMessages(true);
 		}
 
 		///<summary>Unselects all sent messages.  Returns true if there is at least one received message selected.</summary>
@@ -464,8 +496,71 @@ namespace OpenDental {
 			MarkUnhidden();
 		}
 
+		private void menuItemSelectPatient_Click(object sender,EventArgs e) {
+			if(gridMessages.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a message first.");
+				return;
+			}
+			object selectedTag=gridMessages.Rows[gridMessages.GetSelectedIndex()].Tag;
+			long patNum=0;
+			if(selectedTag is SmsFromMobile) {
+				patNum=((SmsFromMobile)selectedTag).PatNum;//can be 0
+			}
+			else if(selectedTag is SmsToMobile) {
+				patNum=((SmsToMobile)selectedTag).PatNum;//can be 0
+			}
+			if(patNum==0) {
+				MsgBox.Show(this,"Please select a message with a valid patient attached.");
+				return;
+			}
+			PatientSelectedEventArgs psea=new PatientSelectedEventArgs(Patients.GetPat(patNum));
+			PatientGoTo(this,psea);
+		}
+
+		private void butReply_Click(object sender,EventArgs e) {
+			if(gridMessages.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a message thread to reply to.");
+				return;
+			}
+			if(textReply.Text=="") {
+				MsgBox.Show(this,"Please input reply text first.");
+				return;
+			}
+			object selectedTag=gridMessages.Rows[gridMessages.GetSelectedIndex()].Tag;
+			string mobileNumber="";
+			long patNum=0;
+			long clinicNum=0;
+			if(selectedTag is SmsFromMobile) {
+				mobileNumber=((SmsFromMobile)selectedTag).MobilePhoneNumber;
+				patNum=((SmsFromMobile)selectedTag).PatNum;//can be 0
+				clinicNum=((SmsFromMobile)selectedTag).ClinicNum;//can be 0
+			}
+			else if(selectedTag is SmsToMobile) {
+				mobileNumber=((SmsToMobile)selectedTag).MobilePhoneNumber;
+				patNum=((SmsToMobile)selectedTag).PatNum;//can be 0
+				clinicNum=((SmsToMobile)selectedTag).ClinicNum;//can be 0
+			}
+			else {
+				//should never happen.
+			}
+			if(mobileNumber=="") {
+				//should never happen.
+				MsgBox.Show(this,"Selected message does not have a valid phone number to send to.");
+				return;
+			}
+			try {
+				SmsToMobiles.SendSmsSingle(patNum,mobileNumber,textReply.Text,clinicNum);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+				return;
+			}
+			textReply.Text="";
+			FillGridMessageThread(patNum);
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 
 	}
