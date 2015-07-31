@@ -357,6 +357,7 @@ namespace OpenDental{
 		private ODToolBarButton _butText;
 		private MenuItem menuItemMoveSubscribers;
 		private string _showForm="";
+		private FormSmsTextMessaging _formSmsTextMessaging;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -3536,42 +3537,37 @@ namespace OpenDental{
 		}
 
 		private void menuItemTextMessagesReceived_Click(object sender,EventArgs e) {
-			FormSmsTextMessaging form=new FormSmsTextMessaging();
-			form.IsSent=false;
-			form.IsReceived=true;
-			form.SmsNotifier=SetSmsNotificationText;
-			form.UnreadMessageCount=0;
-			form.CurPatNum=CurPatNum;
-			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
-				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
-			}
-			form.ShowDialog();
+			ShowFormTextMessagingModeless(false,true);
 		}
 
 		private void menuItemTextMessagesSent_Click(object sender,EventArgs e) {
-			FormSmsTextMessaging form=new FormSmsTextMessaging();
-			form.IsSent=true;
-			form.IsReceived=false;
-			form.SmsNotifier=SetSmsNotificationText;
-			form.UnreadMessageCount=0;
-			form.CurPatNum=CurPatNum;
-			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
-				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
-			}
-			form.ShowDialog();
+			ShowFormTextMessagingModeless(true,false);
 		}
 
 		private void menuItemTextMessagesAll_Click(object sender,EventArgs e) {
-			FormSmsTextMessaging form=new FormSmsTextMessaging();
-			form.IsSent=true;
-			form.IsReceived=true;			
-			form.SmsNotifier=SetSmsNotificationText;
-			form.UnreadMessageCount=0;
-			form.CurPatNum=CurPatNum;
-			if(!String.IsNullOrEmpty(_butText.NotificationText)) {
-				form.UnreadMessageCount=PIn.Long(_butText.NotificationText);
+			ShowFormTextMessagingModeless(true,true);
+		}
+
+		private void ShowFormTextMessagingModeless(bool isSent, bool isReceived) {
+			if(_formSmsTextMessaging==null || _formSmsTextMessaging.IsDisposed) {
+				_formSmsTextMessaging=new FormSmsTextMessaging();
+				_formSmsTextMessaging.IsSent=isSent;
+				_formSmsTextMessaging.IsReceived=isReceived;
+				_formSmsTextMessaging.SmsNotifier=SetSmsNotificationText;
+				_formSmsTextMessaging.UnreadMessageCount=0;
+				_formSmsTextMessaging.CurPatNum=CurPatNum;
+				if(!String.IsNullOrEmpty(_butText.NotificationText)) {
+					_formSmsTextMessaging.UnreadMessageCount=PIn.Long(_butText.NotificationText);
+				}
+				_formSmsTextMessaging.PatientGoTo+=Contr_PatientSelected;
+				_formSmsTextMessaging.FormClosed+=FormSmsTextMessaging_FormClosed;
 			}
-			form.ShowDialog();
+			_formSmsTextMessaging.Show();
+			_formSmsTextMessaging.BringToFront();
+		}
+
+		void FormSmsTextMessaging_FormClosed(object sender,FormClosedEventArgs e) {
+			_formSmsTextMessaging=null;
 		}
 
 		///<summary>Set isSignalNeeded to true if a refresh signal should be sent out to the other workstations.</summary>
