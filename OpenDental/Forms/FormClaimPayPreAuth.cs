@@ -200,7 +200,7 @@ namespace OpenDental
 				//for pre-auths, there are no total payments, so ProcNum must be >0
 				ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
-				row.Cells.Add(ProcCur.ToothNum);
+				row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
 				row.Cells.Add(ClaimProcsToEdit[i].FeeBilled.ToString("F"));
 				row.Cells.Add(ClaimProcsToEdit[i].InsPayEst.ToString("F"));
