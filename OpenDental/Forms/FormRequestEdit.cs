@@ -262,7 +262,7 @@ namespace OpenDental {
 					textApproval.Text="Too broad. A request must be limited to one issue.";
 					break;
 				case ApprovalEnum.NotARequest:
-					textApproval.Text="Not a request. Most likely a training issue.";
+					textApproval.Text="Not a request.";
 					break;
 				case ApprovalEnum.AlreadyDone:
 					textApproval.Text="Already done. Feature already exists in the software.";
