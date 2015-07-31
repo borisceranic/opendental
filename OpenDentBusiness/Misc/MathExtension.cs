@@ -24,6 +24,11 @@ namespace OpenDentBusiness {
 			return IsZero(val-val2);
 		}
 
+		///<summary>Rounds the value using normal rounding rules, unless the value is exactly half a penny (ie. 0.005) in which case it will round down.</summary>
+		public static double RoundDownHalfPenny(double val) {
+			return Math.Round(val-0.0001,2);
+		}
+
 		//Example: 1/5+1/5-1/10-1/10-1/10-1/10 does not equal zero.
 	}
 }
