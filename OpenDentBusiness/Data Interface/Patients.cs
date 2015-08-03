@@ -226,7 +226,8 @@ namespace OpenDentBusiness{
 			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums,List<long> explicitPatNums=null) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,
+					guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums,explicitPatNums);
 			}
 			string billingsnippet=" ";
 			if(billingtype!=0){
