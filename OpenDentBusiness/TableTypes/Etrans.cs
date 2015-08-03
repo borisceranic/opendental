@@ -48,6 +48,10 @@ namespace OpenDentBusiness{
 		public long InsSubNum;
 		///<summary>X12 ST02 Transaction Set Identifier for an 835.  Specifies the unique transaction id within the 835 that this etrans record corresponds to.  This column will always be set for 835s imported in version 14.3 or greater.  For 835s imported in version 14.2, this column will alway be blank.  If blank, and there is more than one transaction id within the 835, then FormEtrans835PickEob will show and allow the user to select the desired EOB from a list.  The X12 guide states that there is only one transaction (EOB) allowed per 835, but ClaimConnect returns multiple transactions (EOBs) within a single 835 and other clearinghouses probably do as well.  When an 835 is imported, it is examined to determine the number of transactions within it.  One etrans entry is created for each EOB within the 835.  We may have a similar issue with multiple transactions within 277s as well, but we have not seen any evidence yet.  Our current 277 implementation expects a single transaction, just as the X12 standard specifies.</summary>
 		public string TranSetId835;
+		///<summary>Only used if the CarrierNum is 0.  If CarrierNum is not 0, the name associated to CarrierNum will override
+		///CarrierNameRaw in the FormClaimsSend history grid.  Added for 835s so that customer databases are not cluttered with dummy carriers and
+		///so there is no extra processing time when FormClaimsSend is loading.  Size is 60 bytes to match 835 carrier name length.</summary>
+		public string CarrierNameRaw;
 
 		///<summary></summary>
 		public Etrans Copy(){

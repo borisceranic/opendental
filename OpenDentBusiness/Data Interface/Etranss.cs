@@ -16,7 +16,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listEtransType);
 			}
-			string command="Select CONCAT(CONCAT(patient.LName,', '),patient.FName) AS PatName,carrier.CarrierName,"
+			string command="Select CONCAT(CONCAT(patient.LName,', '),patient.FName) AS PatName,"
+				+"(CASE WHEN etrans.carrierNum=0 THEN etrans.CarrierNameRaw ELSE carrier.CarrierName END) AS CarrierName,"
 				+"clearinghouse.Description AS Clearinghouse,DateTimeTrans,etrans.OfficeSequenceNumber,"
 				+"etrans.CarrierTransCounter,Etype,etrans.ClaimNum,etrans.EtransNum,etrans.AckCode,etrans.Note "
 				+"FROM etrans "
@@ -617,8 +618,9 @@ namespace OpenDentBusiness{
 						if(i>0) {
 							etrans.EtransNum=0;//To get a new record to insert.
 						}
-						Etranss.Insert(etrans);
-						X835 x835=new X835(messageText,etrans.TranSetId835);
+						X835 x835=new X835(messageText,etrans.TranSetId835);//parse
+						etrans.CarrierNameRaw=x835.PayerName;
+						Etranss.Insert(etrans);//insert
 						List<Hx835_Claim> listClaimEOBs=x835.ListClaimsPaid;
 						for(int j=0;j<listClaimEOBs.Count;j++) {
 							long claimNum=listClaimEOBs[j].ClaimNum;

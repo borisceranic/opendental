@@ -9832,7 +9832,15 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="ALTER TABLE program ADD ButtonImage varchar2";
 					Db.NonQ(command);
-				} 
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE etrans ADD CarrierNameRaw varchar(60) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE etrans ADD CarrierNameRaw varchar2(60)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -9845,4 +9853,4 @@ namespace OpenDentBusiness {
 
 
 	}
-}
+}			
