@@ -1976,15 +1976,15 @@ namespace OpenDental{
 						|| PatCur.Address2!=FamCur.ListPats[i].Address2
 						|| PatCur.City!=FamCur.ListPats[i].City
 						|| PatCur.State!=FamCur.ListPats[i].State
-						|| PatCur.Zip!=FamCur.ListPats[i].Zip
-						|| PatCur.CreditType!=FamCur.ListPats[i].CreditType
+						|| PatCur.Zip!=FamCur.ListPats[i].Zip)
+					{
+						checkSame.Checked=false;
+					}
+					if(PatCur.CreditType!=FamCur.ListPats[i].CreditType
 						|| PatCur.BillingType!=FamCur.ListPats[i].BillingType
 						|| PatCur.PriProv!=FamCur.ListPats[i].PriProv
 						|| PatCur.SecProv!=FamCur.ListPats[i].SecProv
 						|| PatCur.FeeSched!=FamCur.ListPats[i].FeeSched)
-					{
-						checkSame.Checked=false;
-					}
 					{
 						checkBillProvSame.Checked=false;
 					}
