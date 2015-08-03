@@ -836,7 +836,7 @@ namespace OpenDental{
 		}
 
 		private void butCopy_Click(object sender, System.EventArgs e) {
-			if(!MsgBox.Show(this,true,"This will overwrite all values of the current fee schedule showing in the main window.  Are you sure you want to continue?")){
+			if(!MsgBox.Show(this,true,"The \"Copy To\" fee schedule will be overritten by the \"Choose Settings\" fee schedule.  Are you sure you want to continue?")){
 				return;
 			}
 			//clear current
