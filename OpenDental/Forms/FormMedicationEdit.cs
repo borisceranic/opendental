@@ -429,6 +429,7 @@ namespace OpenDental{
 				MessageBox.Show(this,ex.Message);
 				return;
 			}
+			DataValid.SetInvalid(InvalidType.Medications);
 			DialogResult=DialogResult.OK;
 		}
 
@@ -448,6 +449,7 @@ namespace OpenDental{
 			//MedicationCur has its RxCui set when the butRxNormSelect button is pressed.
 			Medications.Update(MedicationCur);
 			MedicationPats.UpdateRxCuiForMedication(MedicationCur.MedicationNum,MedicationCur.RxCui);
+			DataValid.SetInvalid(InvalidType.Medications);
 			DialogResult=DialogResult.OK;
 		}
 
