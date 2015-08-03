@@ -94,11 +94,12 @@ namespace OpenDental{
 			this.tabWebSched = new System.Windows.Forms.TabPage();
 			this.butSignUp = new OpenDental.UI.Button();
 			this.groupWebSchedPreview = new System.Windows.Forms.GroupBox();
+			this.butWebSchedPickClinic = new OpenDental.UI.Button();
+			this.butWebSchedPickProv = new OpenDental.UI.Button();
 			this.label22 = new System.Windows.Forms.Label();
 			this.comboWebSchedProviders = new System.Windows.Forms.ComboBox();
 			this.butWebSchedToday = new OpenDental.UI.Button();
 			this.gridWebSchedTimeSlots = new OpenDental.UI.ODGrid();
-			this.label32 = new System.Windows.Forms.Label();
 			this.textWebSchedDateStart = new OpenDental.ValidDate();
 			this.labelWebSchedClinic = new System.Windows.Forms.Label();
 			this.labelWebSchedRecallTypes = new System.Windows.Forms.Label();
@@ -135,10 +136,9 @@ namespace OpenDental{
 			this.gridClinics = new OpenDental.UI.ODGrid();
 			this.butFwdMonth = new OpenDental.UI.Button();
 			this.butToday = new OpenDental.UI.Button();
+			this.label32 = new System.Windows.Forms.Label();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
-			this.butWebSchedPickProv = new OpenDental.UI.Button();
-			this.butWebSchedPickClinic = new OpenDental.UI.Button();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.button1 = new OpenDental.UI.Button();
 			this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
@@ -996,6 +996,34 @@ namespace OpenDental{
 			this.groupWebSchedPreview.TabStop = false;
 			this.groupWebSchedPreview.Text = "Available Times For Patients";
 			// 
+			// butWebSchedPickClinic
+			// 
+			this.butWebSchedPickClinic.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butWebSchedPickClinic.Autosize = false;
+			this.butWebSchedPickClinic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butWebSchedPickClinic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butWebSchedPickClinic.CornerRadius = 2F;
+			this.butWebSchedPickClinic.Location = new System.Drawing.Point(414, 159);
+			this.butWebSchedPickClinic.Name = "butWebSchedPickClinic";
+			this.butWebSchedPickClinic.Size = new System.Drawing.Size(18, 21);
+			this.butWebSchedPickClinic.TabIndex = 313;
+			this.butWebSchedPickClinic.Text = "...";
+			this.butWebSchedPickClinic.Click += new System.EventHandler(this.butWebSchedPickClinic_Click);
+			// 
+			// butWebSchedPickProv
+			// 
+			this.butWebSchedPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butWebSchedPickProv.Autosize = false;
+			this.butWebSchedPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butWebSchedPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butWebSchedPickProv.CornerRadius = 2F;
+			this.butWebSchedPickProv.Location = new System.Drawing.Point(414, 118);
+			this.butWebSchedPickProv.Name = "butWebSchedPickProv";
+			this.butWebSchedPickProv.Size = new System.Drawing.Size(18, 21);
+			this.butWebSchedPickProv.TabIndex = 312;
+			this.butWebSchedPickProv.Text = "...";
+			this.butWebSchedPickProv.Click += new System.EventHandler(this.butWebSchedPickProv_Click);
+			// 
 			// label22
 			// 
 			this.label22.Location = new System.Drawing.Point(200, 101);
@@ -1045,15 +1073,6 @@ namespace OpenDental{
 			this.gridWebSchedTimeSlots.Title = "Time Slots";
 			this.gridWebSchedTimeSlots.TranslationName = "FormEServicesSetup";
 			this.gridWebSchedTimeSlots.WrapText = false;
-			// 
-			// label32
-			// 
-			this.label32.Location = new System.Drawing.Point(10, 47);
-			this.label32.Name = "label32";
-			this.label32.Size = new System.Drawing.Size(89, 14);
-			this.label32.TabIndex = 260;
-			this.label32.Text = "Country Code";
-			this.label32.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textWebSchedDateStart
 			// 
@@ -1506,6 +1525,15 @@ namespace OpenDental{
 			this.butToday.Text = "Today";
 			this.butToday.Click += new System.EventHandler(this.butToday_Click);
 			// 
+			// label32
+			// 
+			this.label32.Location = new System.Drawing.Point(10, 47);
+			this.label32.Name = "label32";
+			this.label32.Size = new System.Drawing.Size(89, 14);
+			this.label32.TabIndex = 260;
+			this.label32.Text = "Country Code";
+			this.label32.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// label23
 			// 
 			this.label23.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -1534,20 +1562,6 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// butWebSchedPickProv
-			// 
-			this.butWebSchedPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butWebSchedPickProv.Autosize = false;
-			this.butWebSchedPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butWebSchedPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butWebSchedPickProv.CornerRadius = 2F;
-			this.butWebSchedPickProv.Location = new System.Drawing.Point(414, 118);
-			this.butWebSchedPickProv.Name = "butWebSchedPickProv";
-			this.butWebSchedPickProv.Size = new System.Drawing.Size(18, 21);
-			this.butWebSchedPickProv.TabIndex = 312;
-			this.butWebSchedPickProv.Text = "...";
-			this.butWebSchedPickProv.Click += new System.EventHandler(this.butWebSchedPickProv_Click);
-			// 
 			// tabPage1
 			// 
 			this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
@@ -1565,20 +1579,6 @@ namespace OpenDental{
 			this.tabPage1.Size = new System.Drawing.Size(944, 588);
 			this.tabPage1.TabIndex = 7;
 			this.tabPage1.Text = "Texting Services";
-			// 
-			// butWebSchedPickClinic
-			// 
-			this.butWebSchedPickClinic.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butWebSchedPickClinic.Autosize = false;
-			this.butWebSchedPickClinic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butWebSchedPickClinic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butWebSchedPickClinic.CornerRadius = 2F;
-			this.butWebSchedPickClinic.Location = new System.Drawing.Point(414, 159);
-			this.butWebSchedPickClinic.Name = "butWebSchedPickClinic";
-			this.butWebSchedPickClinic.Size = new System.Drawing.Size(18, 21);
-			this.butWebSchedPickClinic.TabIndex = 313;
-			this.butWebSchedPickClinic.Text = "...";
-			this.butWebSchedPickClinic.Click += new System.EventHandler(this.butWebSchedPickClinic_Click);
 			// 
 			// button1
 			// 
