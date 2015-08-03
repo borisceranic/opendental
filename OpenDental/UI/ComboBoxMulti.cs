@@ -28,6 +28,7 @@ namespace OpenDental.UI
 			InitializeComponent();
 			selectedIndices=new ArrayList();
 			items=new ArrayList();
+			UseCommas=true;//Required because we specified a default value of true for the designer.
 		}
 
 		#region Component Designer generated code
@@ -124,7 +125,8 @@ namespace OpenDental.UI
 		}
 
 		///<summary>Use commas instead of OR in the display when muliple selected.</summary>
-		[Category("Appearance"), Description("Use commas instead of OR in the display when muliple selected.")]
+		[Category("Appearance"),Description("Use commas instead of OR in the display when muliple selected.")]
+		[DefaultValue(true)]
 		public bool UseCommas{
 			get{
 				return useCommas;
@@ -186,12 +188,36 @@ namespace OpenDental.UI
 
 		private void MenuItem_Click(object sender, System.EventArgs e){
 			int index=((MenuItem)sender).Index;
-			if(selectedIndices.Contains(index)){
-				//this item was already selected
-				selectedIndices.Remove(index);
+			if(Control.ModifierKeys.HasFlag(Keys.Shift)) {//Extended Selection.  The user is holding the Shift key while clicking.
+				if(selectedIndices.Count==0) {
+					selectedIndices.Add(index);//Select only the item the user just clicked on.
+				}
+				else {
+					int prevIdx=(int)selectedIndices[selectedIndices.Count-1];//Index of the most recently selected item.
+					if(prevIdx < index) {//The previously selected index is before the current index.
+						for(int i=prevIdx+1;i<=index;i++) {
+							SetSelected(i,true);
+						}
+					}
+					else if(prevIdx > index) {//The previously selected index is after the current index.
+						for(int i=index;i<prevIdx;i++) {
+							SetSelected(i,true);
+						}
+					}
+				}
 			}
-			else{
-				selectedIndices.Add(index);
+			else if(Control.ModifierKeys.HasFlag(Keys.Control)) {//Extended Selection.  The user is holding the Ctrl key while clicking.
+				if(selectedIndices.Contains(index)){
+					//this item was already selected
+					selectedIndices.Remove(index);
+				}
+				else{
+					selectedIndices.Add(index);
+				}
+			}
+			else {//Single Selection.  The user is NOT holding the Ctrl key nor the Shift key while clicking.
+				selectedIndices.Clear();//Unselect any items already selected.
+				selectedIndices.Add(index);//Select only the item the user just clicked on.
 			}
 			FillText();
 			cMenu.Show(this,new Point(0,20));
@@ -257,7 +283,7 @@ namespace OpenDental.UI
 		///<summary></summary>
 		public void SetSelected(int index,bool setToValue){
 			if(setToValue) {
-				selectedIndices.Add(index);
+				selectedIndices.Add(index);//OK to add duplicates, because we need to know the last selection for extended selections.
 			}
 			else {
 				selectedIndices.Remove(index);

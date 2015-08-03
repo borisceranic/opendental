@@ -364,7 +364,7 @@ namespace OpenDental{
 			this.comboHistoryType.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.SelectedIndices")));
 			this.comboHistoryType.Size = new System.Drawing.Size(100, 21);
 			this.comboHistoryType.TabIndex = 45;
-			this.comboHistoryType.UseCommas = false;
+			this.comboHistoryType.UseCommas = true;
 			// 
 			// ToolBarHistory
 			// 
