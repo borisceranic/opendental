@@ -458,8 +458,9 @@ namespace OpenDental{
 			foreach(RepeatCharge repeatCharge in listRepeatingCharges){
 				if(!repeatCharge.IsEnabled || (repeatCharge.DateStop.Year > 1880 && repeatCharge.DateStop.AddMonths(3) < DateTime.Today)) {
 					continue;//This repeating charge is too old to possibly create a new charge. Not precise but greatly reduces calls to DB.
+									 //We will filter by more stringently on the DateStop later on.
 				}
-				List<DateTime> listBillingDates;
+				List<DateTime> listBillingDates;//This list will have 1 or 2 dates where a repeating charge might be added
 				if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop,Patients.GetPat(repeatCharge.PatNum).BillingCycleDay);
 				}
@@ -467,6 +468,7 @@ namespace OpenDental{
 					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop);
 				}
 				long codeNum=ProcedureCodes.GetCodeNum(repeatCharge.ProcCode);
+				//Remove billing dates if there is a procedure for that patient with that code for the same amount in that month and year
 				listBillingDates.RemoveAll(x => 
 					listExistingProcs.Exists(y => 
 						y.PatNum==repeatCharge.PatNum 
@@ -474,8 +476,17 @@ namespace OpenDental{
 						&& x.Year==y.ProcDate.Year
 						&& x.Month==y.ProcDate.Month
 						&& IsRepeatDateHelper(repeatCharge,x,y.ProcDate)
+						&& y.ProcFee==repeatCharge.ChargeAmt
 					)
 				);
+				//Remove the procedure so that if there is another repeat charge with the same ProcCode and ChargeAmt, it will be added in the next iteration
+				listExistingProcs.Remove(listExistingProcs.FirstOrDefault(y =>
+						y.PatNum==repeatCharge.PatNum 
+						&& y.CodeNum==codeNum 
+						&& y.ProcFee==repeatCharge.ChargeAmt
+						)
+				);
+				//If any billing dates have not been filtered out, add a repeating charge on those dates
 				foreach (DateTime billingDate in listBillingDates) {
 					Procedure procAdded=AddRepeatingChargeHelper(repeatCharge, billingDate);
 					List<Claim> listClaimsAdded=new List<Claim>();
