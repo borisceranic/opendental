@@ -52,6 +52,11 @@ namespace OpenDentBusiness{
 		///CarrierNameRaw in the FormClaimsSend history grid.  Added for 835s so that customer databases are not cluttered with dummy carriers and
 		///so there is no extra processing time when FormClaimsSend is loading.  Size is 60 bytes to match 835 carrier name length.</summary>
 		public string CarrierNameRaw;
+		///<summary>Only used if the PatNum is 0.  If PatNum is not 0, the name associated to PatNum will override PatientNameRaw
+		///in the FormClaimsSend history grid.  Added for 835s so that there is no extra processing time when FormClaimsSend is loading,
+		///and so text representing the patient count can be used instead of an actual patient name.  Size is 133 bytes to match X12 specs for 
+		///last name (60), first name (35), middle name (25), suffix (10), and spaces in between (3).</summary>
+		public string PatientNameRaw;
 
 		///<summary></summary>
 		public Etrans Copy(){

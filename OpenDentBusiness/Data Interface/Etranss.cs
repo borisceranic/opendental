@@ -16,7 +16,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listEtransType);
 			}
-			string command="Select CONCAT(CONCAT(patient.LName,', '),patient.FName) AS PatName,"
+			string command="SELECT (CASE WHEN etrans.PatNum=0 THEN etrans.PatientNameRaw "
+				+"ELSE CONCAT(CONCAT(patient.LName,', '),patient.FName) END) AS PatName,"
 				+"(CASE WHEN etrans.carrierNum=0 THEN etrans.CarrierNameRaw ELSE carrier.CarrierName END) AS CarrierName,"
 				+"clearinghouse.Description AS Clearinghouse,DateTimeTrans,etrans.OfficeSequenceNumber,"
 				+"etrans.CarrierTransCounter,Etype,etrans.ClaimNum,etrans.EtransNum,etrans.AckCode,etrans.Note "
@@ -620,6 +621,19 @@ namespace OpenDentBusiness{
 						}
 						X835 x835=new X835(messageText,etrans.TranSetId835);//parse
 						etrans.CarrierNameRaw=x835.PayerName;
+						List<string> listUniquePatientNames=new List<string>();
+						for(int j=0;j<x835.ListClaimsPaid.Count;j++) {
+							string patName=x835.ListClaimsPaid[j].PatientName.ToString(false);
+							if(!listUniquePatientNames.Contains(patName)) {
+								listUniquePatientNames.Add(patName);
+							}
+						}
+						if(listUniquePatientNames.Count==1) {
+							etrans.PatientNameRaw=listUniquePatientNames[0];
+						}
+						else {
+							etrans.PatientNameRaw="("+listUniquePatientNames.Count+" "+Lans.g("Etranss","patients")+")";
+						}
 						Etranss.Insert(etrans);//insert
 						List<Hx835_Claim> listClaimEOBs=x835.ListClaimsPaid;
 						for(int j=0;j<listClaimEOBs.Count;j++) {

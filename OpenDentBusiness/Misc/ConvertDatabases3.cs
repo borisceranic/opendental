@@ -9841,6 +9841,15 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE etrans ADD CarrierNameRaw varchar2(60)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE etrans ADD PatientNameRaw varchar(133) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE etrans ADD PatientNameRaw varchar2(133)";
+					Db.NonQ(command);
+				}
+				
 
 
 

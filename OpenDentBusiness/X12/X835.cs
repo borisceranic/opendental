@@ -3127,6 +3127,10 @@ namespace OpenDentBusiness {
 		public string SubscriberIdTypeDesc;
 
 		public override string ToString() {
+			return ToString(true);
+		}
+
+		public string ToString(bool isIdIncluded) {
 			string name=Fname;
 			if(Mname!="") {
 				if(name!="") {
@@ -3146,7 +3150,7 @@ namespace OpenDentBusiness {
 				}
 				name+=Suffix;
 			}
-			if(SubscriberId!="") {
+			if(isIdIncluded && SubscriberId!="") {
 				if(name!="") {
 					name+=" - ";
 				}
