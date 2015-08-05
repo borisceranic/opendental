@@ -895,6 +895,9 @@ namespace OpenDentBusiness{
 			else {
 				cp.WriteOffEst=-1;
 			}
+			//Round now to prevent the sum of the InsEstTotal and the Patient Portion from being 1 cent more than the Proc Fee
+			cp.BaseEst=Math.Round(cp.BaseEst,2);
+			cp.InsEstTotal=Math.Round(cp.InsEstTotal,2);
 		}
 
 		/*
