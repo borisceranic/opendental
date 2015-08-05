@@ -2477,6 +2477,21 @@ namespace OpenDental{
 				FormApptsOther FormA=new FormApptsOther(CurPatNum);
 				FormA.ShowDialog();
 			}
+			if(_showForm=="searchpatient") {
+				FormPatientSelect formPS=new FormPatientSelect();
+				formPS.ShowDialog();
+				if(formPS.DialogResult==DialogResult.OK) {
+					CurPatNum=formPS.SelectedPatNum;
+					pat=Patients.GetPat(CurPatNum);
+					if(ContrChart2.Visible) {//If currently in the chart module, then also refresh NewCrop prescription information on top of a regular refresh.
+						ContrChart2.ModuleSelectedNewCrop(CurPatNum);
+					}
+					else {
+						RefreshCurrentModule();
+					}
+					FillPatientButton(pat);
+				}
+			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -6369,7 +6384,7 @@ namespace OpenDental{
 					}
 				}
 				if(args[i].ToLower().StartsWith("show=") && args[i].Length>5) {
-					_showForm=args[i].Substring(5).Trim('"').ToLower();//Currently only looks for "Popup" and "ApptsForPatient"
+					_showForm=args[i].Substring(5).Trim('"').ToLower();//Currently only looks for "Popup", "ApptsForPatient", and "SearchPatient"
 				}
 			}
 			if(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsLBSessionIdExcluded")=="1" //if check box in Program Links is checked
