@@ -1045,9 +1045,11 @@ namespace OpenDentBusiness {
 			}
 			if(componentsToLoad.ShowSheets) {
 				#region sheet
-				command="SELECT PatNum,Description,SheetNum,DateTimeSheet,SheetType "
+				command="SELECT PatNum,Description,sheet.SheetNum,DateTimeSheet,SheetType,CASE WHEN FieldValue!='' AND sheet.SheetType=6 THEN 1 ELSE 0 END AS SigPresent "
 				+"FROM sheet "
-				+"WHERE (PatNum="+POut.Long(patNum);
+				+"LEFT JOIN sheetfield ON sheet.SheetNum=sheetfield.SheetNum "
+				+"AND sheetfield.FieldType=9 "
+				+"WHERE (sheet.PatNum="+POut.Long(patNum);
 				Patient patClone=null;
 				Patient patNonClone=null;
 				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
@@ -1140,6 +1142,9 @@ namespace OpenDentBusiness {
 					row["RxNum"]=0;
 					row["SheetNum"]=rawSheet.Rows[i]["SheetNum"].ToString();
 					row["signature"]="";
+					if(rawSheet.Rows[i]["SigPresent"].ToString()=="1") {
+						row["signature"]=Lans.g("ChartModule","Signed");
+					}
 					row["Surf"]="";
 					row["TaskNum"]=0;
 					row["toothNum"]="";
