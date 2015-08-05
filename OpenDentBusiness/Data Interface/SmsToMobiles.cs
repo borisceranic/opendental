@@ -182,6 +182,9 @@ namespace OpenDentBusiness{
 			smsToMobile.MsgText=message;
 			smsToMobile.MsgType=SmsMessageSource.DirectSms;
 			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
+			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
+			smsToMobile.DateTimeSent=DateTime.Now;
+			SmsToMobiles.Insert(smsToMobile);
 			Commlogs.Insert(new Commlog() {
 				CommDateTime=smsToMobile.DateTimeSent,
 				Mode_=CommItemMode.Text,
@@ -190,9 +193,6 @@ namespace OpenDentBusiness{
 				CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
 				SentOrReceived=CommSentOrReceived.Sent
 			});
-			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
-			smsToMobile.DateTimeSent=DateTime.Now;
-			SmsToMobiles.Insert(smsToMobile);
 			return true;
 		}
 
