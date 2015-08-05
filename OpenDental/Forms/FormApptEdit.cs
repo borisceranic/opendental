@@ -1423,7 +1423,7 @@ namespace OpenDental{
 				butPDF.Visible=false;
 			}
 			//Hide text message button sometimes
-			if(pat.WirelessPhone=="" || !Programs.IsEnabled(ProgramName.CallFire)) {
+			if(pat.WirelessPhone=="" || (!Programs.IsEnabled(ProgramName.CallFire) && !SmsPhones.IsIntegratedTextingEnabled())) {
 				butText.Enabled=false;
 			}
 			else {//Pat has a wireless phone number and CallFire is enabled
