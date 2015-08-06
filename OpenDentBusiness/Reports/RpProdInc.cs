@@ -8,209 +8,149 @@ namespace OpenDentBusiness {
 	public class RpProdInc {
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P&I report</summary>
-		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay
+			,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown) 
+		{
 			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
 			DataTable tablePay=dataSet.Tables["tablePay"];
 			DataTable tableIns=dataSet.Tables["tableIns"];
-			DataTable dt=new DataTable("Total");
-			dt.Columns.Add(new DataColumn("Date"));
-			dt.Columns.Add(new DataColumn("Name"));
-			dt.Columns.Add(new DataColumn("Description"));
-			dt.Columns.Add(new DataColumn("Production"));
-			dt.Columns.Add(new DataColumn("Adjust"));
-			dt.Columns.Add(new DataColumn("Writeoff"));
-			dt.Columns.Add(new DataColumn("Pt Income"));
-			dt.Columns.Add(new DataColumn("Ins Income"));
-			dt.Columns.Add(new DataColumn("Clinic"));
-			DataTable dtClinic=new DataTable("Clinic");
-			dtClinic.Columns.Add(new DataColumn("Date"));
-			dtClinic.Columns.Add(new DataColumn("Name"));
-			dtClinic.Columns.Add(new DataColumn("Description"));
-			dtClinic.Columns.Add(new DataColumn("Production"));
-			dtClinic.Columns.Add(new DataColumn("Adjust"));
-			dtClinic.Columns.Add(new DataColumn("Writeoff"));
-			dtClinic.Columns.Add(new DataColumn("Pt Income"));
-			dtClinic.Columns.Add(new DataColumn("Ins Income"));
-			dtClinic.Columns.Add(new DataColumn("Clinic"));
-			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
-			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
-				for(int i=0;i<tableProduction.Rows.Count;i++) {
-					if(PIn.Long(tableProduction.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
-						continue;
-					}
-					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-					row[1]=tableProduction.Rows[i]["namelf"].ToString();
-					row[2]=tableProduction.Rows[i]["Description"].ToString();
-					row[3]=tableProduction.Rows[i]["Production"].ToString();
-					row[4]=0;
-					row[5]=0;
-					row[6]=0;
-					row[7]=0;
-					row[8]=tableProduction.Rows[i]["Clinic"].ToString();
-					dtClinic.Rows.Add(row);
-				}
-				for(int i=0;i<tableAdj.Rows.Count;i++) {
-					if(PIn.Long(tableAdj.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
-						continue;
-					}
-					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-					row[1]=tableAdj.Rows[i]["namelf"].ToString();
-					row[2]=tableAdj.Rows[i]["Description"].ToString();
-					row[3]=0;
-					row[4]=tableAdj.Rows[i]["AdjAmt"].ToString();
-					row[5]=0;
-					row[6]=0;
-					row[7]=0;
-					row[8]=tableAdj.Rows[i]["Clinic"].ToString();
-					dtClinic.Rows.Add(row);
-				}
-				for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
-					if(PIn.Long(tableInsWriteoff.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
-						continue;
-					}
-					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-					row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
-					row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
-					row[3]=0;
-					row[4]=0;
-					row[5]=tableInsWriteoff.Rows[i]["WriteOff"].ToString();
-					row[6]=0;
-					row[7]=0;
-					row[8]=tableInsWriteoff.Rows[i]["Clinic"].ToString();
-					dtClinic.Rows.Add(row);
-				}
-				for(int i=0;i<tablePay.Rows.Count;i++) {
-					if(PIn.Long(tablePay.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
-						continue;
-					}
-					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-					row[1]=tablePay.Rows[i]["namelf"].ToString();
-					row[2]=tablePay.Rows[i]["Description"].ToString();
-					row[3]=0;
-					row[4]=0;
-					row[5]=0;
-					row[6]=tablePay.Rows[i]["PayAmt"].ToString();
-					row[7]=0;
-					row[8]=tablePay.Rows[i]["Clinic"].ToString();
-					dtClinic.Rows.Add(row);
-				}
-				for(int i=0;i<tableIns.Rows.Count;i++) {
-					if(PIn.Long(tableIns.Rows[i]["Clinic"].ToString())!=listClinicNums[it]) {
-						continue;
-					}
-					DataRow row=dtClinic.NewRow();
-					row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-					row[1]=tableIns.Rows[i]["namelf"].ToString();
-					row[2]=tableIns.Rows[i]["Description"].ToString();
-					row[3]=0;
-					row[4]=0;
-					row[5]=0;
-					row[6]=0;
-					row[7]=tableIns.Rows[i]["InsPayAmt"].ToString();
-					row[8]=tableIns.Rows[i]["Clinic"].ToString();
-					dtClinic.Rows.Add(row);
-				}
+			DataTable tableDailyProd=new DataTable("DailyProd");
+			tableDailyProd.Columns.Add(new DataColumn("Date"));
+			tableDailyProd.Columns.Add(new DataColumn("Name"));
+			tableDailyProd.Columns.Add(new DataColumn("Description"));
+			tableDailyProd.Columns.Add(new DataColumn("Provider"));
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				tableDailyProd.Columns.Add(new DataColumn("Clinic"));
 			}
-			//Totals table now.
+			tableDailyProd.Columns.Add(new DataColumn("Production"));
+			tableDailyProd.Columns.Add(new DataColumn("Adjust"));
+			tableDailyProd.Columns.Add(new DataColumn("Writeoff"));
+			tableDailyProd.Columns.Add(new DataColumn("Pt Income"));
+			tableDailyProd.Columns.Add(new DataColumn("Ins Income"));
+			tableDailyProd.Columns.Add(new DataColumn("ClinicSplit"));
 			for(int i=0;i<tableProduction.Rows.Count;i++) {
-				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-				row[1]=tableProduction.Rows[i]["namelf"].ToString();
-				row[2]=tableProduction.Rows[i]["Description"].ToString();
-				row[3]=tableProduction.Rows[i]["Production"].ToString();
-				row[4]=0;
-				row[5]=0;
-				row[6]=0;
-				row[7]=0;
-				row[8]="";
-				dt.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableProduction.Rows[i]["Clinic"].ToString()))) {
+					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
+				}
+				DataRow row=tableDailyProd.NewRow();
+				row["Date"]=PIn.Date(tableProduction.Rows[i]["Date"].ToString()).ToShortDateString();
+				row["Name"]=tableProduction.Rows[i]["namelf"].ToString();
+				row["Description"]=tableProduction.Rows[i]["Description"].ToString();
+				row["Provider"]=tableProduction.Rows[i]["Abbr"].ToString();
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					row["Clinic"]=tableProduction.Rows[i]["Clinic"].ToString();
+				}
+				row["Production"]=tableProduction.Rows[i]["Production"].ToString();
+				row["Adjust"]=0;
+				row["Writeoff"]=0;
+				row["Pt Income"]=0;
+				row["Ins Income"]=0;
+				row["ClinicSplit"]=hasBreakdown ? tableProduction.Rows[i]["Clinic"].ToString():"";
+				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableAdj.Rows.Count;i++) {
-				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-				row[1]=tableAdj.Rows[i]["namelf"].ToString();
-				row[2]=tableAdj.Rows[i]["Description"].ToString();
-				row[3]=0;
-				row[4]=tableAdj.Rows[i]["AdjAmt"].ToString();
-				row[5]=0;
-				row[6]=0;
-				row[7]=0;
-				row[8]="";
-				dt.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableAdj.Rows[i]["Clinic"].ToString()))) {
+					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
+				}
+				DataRow row=tableDailyProd.NewRow();
+				row["Date"]=PIn.Date(tableAdj.Rows[i]["Date"].ToString()).ToShortDateString();
+				row["Name"]=tableAdj.Rows[i]["namelf"].ToString();
+				row["Description"]=tableAdj.Rows[i]["Description"].ToString();
+				row["Provider"]=tableAdj.Rows[i]["Abbr"].ToString();
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					row["Clinic"]=tableAdj.Rows[i]["Clinic"].ToString();
+				}
+				row["Production"]=0;
+				row["Adjust"]=tableAdj.Rows[i]["AdjAmt"].ToString();
+				row["Writeoff"]=0;
+				row["Pt Income"]=0;
+				row["Ins Income"]=0;
+				row["ClinicSplit"]=hasBreakdown ? tableAdj.Rows[i]["Clinic"].ToString():"";
+				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
-				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-				row[1]=tableInsWriteoff.Rows[i]["namelf"].ToString();
-				row[2]=tableInsWriteoff.Rows[i]["Description"].ToString();
-				row[3]=0;
-				row[4]=0;
-				row[5]=tableInsWriteoff.Rows[i]["WriteOff"].ToString();
-				row[6]=0;
-				row[7]=0;
-				row[8]="";
-				dt.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableInsWriteoff.Rows[i]["Clinic"].ToString()))) {
+					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
+				}
+				DataRow row=tableDailyProd.NewRow();
+				row["Date"]=PIn.Date(tableInsWriteoff.Rows[i]["Date"].ToString()).ToShortDateString();
+				row["Name"]=tableInsWriteoff.Rows[i]["namelf"].ToString();
+				row["Description"]=tableInsWriteoff.Rows[i]["Description"].ToString();
+				row["Provider"]=tableInsWriteoff.Rows[i]["Abbr"].ToString();
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					row["Clinic"]=tableInsWriteoff.Rows[i]["Clinic"].ToString();
+				}
+				row["Production"]=0;
+				row["Adjust"]=0;
+				row["Writeoff"]=tableInsWriteoff.Rows[i]["WriteOff"].ToString();
+				row["Pt Income"]=0;
+				row["Ins Income"]=0;
+				row["ClinicSplit"]=hasBreakdown ? tableInsWriteoff.Rows[i]["Clinic"].ToString():"";
+				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tablePay.Rows.Count;i++) {
-				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-				row[1]=tablePay.Rows[i]["namelf"].ToString();
-				row[2]=tablePay.Rows[i]["Description"].ToString();
-				row[3]=0;
-				row[4]=0;
-				row[5]=0;
-				row[6]=tablePay.Rows[i]["PayAmt"].ToString();
-				row[7]=0;
-				row[8]="";
-				dt.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tablePay.Rows[i]["Clinic"].ToString()))) {
+					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
+				}
+				DataRow row=tableDailyProd.NewRow();
+				row["Date"]=PIn.Date(tablePay.Rows[i]["Date"].ToString()).ToShortDateString();
+				row["Name"]=tablePay.Rows[i]["namelf"].ToString();
+				row["Description"]=tablePay.Rows[i]["Description"].ToString();
+				row["Provider"]=tablePay.Rows[i]["Abbr"].ToString();
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					row["Clinic"]=tablePay.Rows[i]["Clinic"].ToString();
+				}
+				row["Production"]=0;
+				row["Adjust"]=0;
+				row["Writeoff"]=0;
+				row["Pt Income"]=tablePay.Rows[i]["PayAmt"].ToString();
+				row["Ins Income"]=0;
+				row["ClinicSplit"]=hasBreakdown ? tablePay.Rows[i]["Clinic"].ToString():"";
+				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableIns.Rows.Count;i++) {
-				DataRow row=dt.NewRow();
-				row[0]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToString("dd MMM yyyy");
-				row[1]=tableIns.Rows[i]["namelf"].ToString();
-				row[2]=tableIns.Rows[i]["Description"].ToString();
-				row[3]=0;
-				row[4]=0;
-				row[5]=0;
-				row[6]=0;
-				row[7]=tableIns.Rows[i]["InsPayAmt"].ToString();
-				row[8]="";
-				dt.Rows.Add(row);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableIns.Rows[i]["Clinic"].ToString()))) {
+					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
+				}
+				DataRow row=tableDailyProd.NewRow();
+				row["Date"]=PIn.Date(tableIns.Rows[i]["Date"].ToString()).ToShortDateString();
+				row["Name"]=tableIns.Rows[i]["namelf"].ToString();
+				row["Description"]=tableIns.Rows[i]["Description"].ToString();
+				row["Provider"]=tableIns.Rows[i]["Abbr"].ToString();
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					row["Clinic"]=tableIns.Rows[i]["Clinic"].ToString();
+				}
+				row["Production"]=0;
+				row["Adjust"]=0;
+				row["Writeoff"]=0;
+				row["Pt Income"]=0;
+				row["Ins Income"]=tableIns.Rows[i]["InsPayAmt"].ToString();
+				row["ClinicSplit"]=hasBreakdown ? tableIns.Rows[i]["Clinic"].ToString():"";
+				tableDailyProd.Rows.Add(row);
 			}
-			List<DataRow> listDtRows=new List<DataRow>();
-			for(int i=0;i<dt.Rows.Count;i++) {
-				listDtRows.Add(dt.Rows[i]);
+			List<DataRow> listTableDailyProdRows=new List<DataRow>();
+			for(int i=0;i<tableDailyProd.Rows.Count;i++) {
+				listTableDailyProdRows.Add(tableDailyProd.Rows[i]);
 			}
-			listDtRows.Sort(RowComparer);
-			DataTable tableSortedDt=dt.Clone();
-			tableSortedDt.Rows.Clear();
-			for(int i=0;i<listDtRows.Count;i++) {
-				tableSortedDt.Rows.Add(listDtRows[i].ItemArray);
-			}
-			List<DataRow> listDtClinicRows=new List<DataRow>();
-			for(int i=0;i<dtClinic.Rows.Count;i++) {
-				listDtClinicRows.Add(dtClinic.Rows[i]);
-			}
-			listDtClinicRows.Sort(RowComparer);
-			DataTable tableSortedDtClinic=dtClinic.Clone();
-			tableSortedDtClinic.Rows.Clear();
-			for(int i=0;i<listDtClinicRows.Count;i++) {
-				tableSortedDtClinic.Rows.Add(listDtClinicRows[i].ItemArray);
-				string clinicDesc=Clinics.GetDesc(PIn.Long(tableSortedDtClinic.Rows[i]["Clinic"].ToString()));
-				tableSortedDtClinic.Rows[i]["Clinic"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;//Replacing the ClinicNum with the actual desc.
+			listTableDailyProdRows.Sort(RowComparer);
+			DataTable tableDailyProdSorted=tableDailyProd.Clone();
+			tableDailyProdSorted.Rows.Clear();
+			for(int i=0;i<listTableDailyProdRows.Count;i++) {
+				tableDailyProdSorted.Rows.Add(listTableDailyProdRows[i].ItemArray);
+				//Replace the ClinicNum with the actual description of the clinic.
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+					string clinicDesc=Clinics.GetDesc(PIn.Long(tableDailyProdSorted.Rows[i]["Clinic"].ToString()));
+					tableDailyProdSorted.Rows[i]["Clinic"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
+					if(hasBreakdown) {
+						tableDailyProdSorted.Rows[i]["ClinicSplit"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
+					}
+				}
 			}
 			DataSet ds=new DataSet("DailyData");
-			ds.Tables.Add(tableSortedDt);
-			if(listClinicNums.Count!=0) {
-				ds.Tables.Add(tableSortedDtClinic);
-			}
+			ds.Tables.Add(tableDailyProdSorted);
 			return ds;
 		}
 
@@ -1159,10 +1099,12 @@ namespace OpenDentBusiness {
 		}
 
 		private static int RowComparer(DataRow x,DataRow y) {
-			string xClinic=x["Clinic"].ToString();
-			string yClinic=y["Clinic"].ToString();
-			if(xClinic!=yClinic) {//Sort by clinic first, if no clinic then they'll be the same empty string.
-				return String.Compare(xClinic,yClinic);
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				string xClinic=x["Clinic"].ToString();
+				string yClinic=y["Clinic"].ToString();
+				if(xClinic!=yClinic) {//Sort by clinic first, if no clinic then they'll be the same empty string.
+					return String.Compare(xClinic,yClinic);
+				}
 			}
 			DateTime xDate=PIn.Date(x["Date"].ToString());
 			DateTime yDate=PIn.Date(y["Date"].ToString());
@@ -1175,6 +1117,11 @@ namespace OpenDentBusiness {
 				return String.Compare(xName,yName);
 			}
 			//We might want to include transaction type here but procedures have all different kinds of descriptions.
+			string xProvider=x["Provider"].ToString();
+			string yProvider=y["Provider"].ToString();
+			if(xProvider!=yProvider) {//Then by provider (just for looks).
+				return String.Compare(xProvider,yProvider);
+			}
 			return 0;
 		}
 
