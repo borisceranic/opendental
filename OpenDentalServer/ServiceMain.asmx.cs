@@ -306,6 +306,7 @@ namespace OpenDentalServer {
 			}
 			catch(Exception e) {
 				DtoException exception = new DtoException();
+				exception.ExceptionType=e.GetType().BaseType.Name;//Since the exception was down converted to a regular exception, we need the BaseType.
 				if(e.InnerException==null) {
 					exception.Message = e.Message;
 				}

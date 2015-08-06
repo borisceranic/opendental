@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDentBusiness {
 	public class RemotingClient {
@@ -31,7 +32,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -42,7 +43,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -58,7 +59,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -70,7 +71,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -82,7 +83,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -94,7 +95,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -103,7 +104,7 @@ namespace OpenDentBusiness {
 			string result=SendAndReceive(dto);//this might throw an exception if server unavailable
 			if(result!="0"){
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -124,7 +125,7 @@ namespace OpenDentBusiness {
 			}
 			catch {
 				DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-				throw new Exception(exception.Message);
+				throw ThrowExceptionForDto(exception);
 			}
 		}
 
@@ -138,7 +139,7 @@ namespace OpenDentBusiness {
 			catch {
 				return result;
 			}
-			throw new Exception(exception.Message);
+			throw ThrowExceptionForDto(exception);
 		}
 
 		///<summary></summary>
@@ -151,7 +152,7 @@ namespace OpenDentBusiness {
 				return false;
 			}
 			DtoException exception=(DtoException)DataTransferObject.Deserialize(result);
-			throw new Exception(exception.Message);
+			throw ThrowExceptionForDto(exception);
 		}
 
 		internal static string SendAndReceive(DataTransferObject dto){
@@ -176,6 +177,24 @@ namespace OpenDentBusiness {
 			  result=result.Replace("\n","\r\n");
 			}
 			return result;
+		}
+
+		///<summary>Open Dental can require specific exceptions to be thrown.  This is a helper method that throws the correct exception type.
+		///Add this function directly into a throw statement, so that the calling code knows that the code path will not need to return a value.</summary>
+		private static Exception ThrowExceptionForDto(DtoException exception) {
+			switch(exception.ExceptionType) {
+				case "ApplicationException":
+					throw new ApplicationException(exception.Message);
+				case "InvalidProgramException":
+					throw new InvalidProgramException(exception.Message);
+				case "NotSupportedException":
+					throw new NotSupportedException(exception.Message);
+				case "ODException":
+					throw new ODException(exception.Message);
+				default:
+					//Throw a generic exception which follows the old functionality for any other Exception type that we weren't explicitly expecting.
+					throw new Exception(exception.Message);
+			}
 		}
 
 		
