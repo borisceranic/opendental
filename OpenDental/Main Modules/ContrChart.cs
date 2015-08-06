@@ -292,12 +292,17 @@ namespace OpenDental{
 		private ODButtonPanel panelQuickButtons;
 		private Label label1;
 		private UI.Button butClearAllMovements;
+		private CheckBox checkShowCompleted;
 		private bool IsDistributorKey;
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
 		private List<ProcButtonQuick> listProcButtonQuicks;
+		private List<DataRow> _listPlannedAppt;
+		private DataTable _tablePlannedAll;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
+		///<summary>Used to cache the selected AptNums of the items in the main grid, to reselect them after a refresh.</summary>
+		private List<long> SelectedGridItems=new List<long>();
 	
 		///<summary></summary>
 		public ContrChart(){
@@ -447,6 +452,7 @@ namespace OpenDental{
 			this.butAllPrimary = new OpenDental.UI.Button();
 			this.butAllPerm = new OpenDental.UI.Button();
 			this.tabPlanned = new System.Windows.Forms.TabPage();
+			this.checkShowCompleted = new System.Windows.Forms.CheckBox();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butPin = new OpenDental.UI.Button();
@@ -664,7 +670,7 @@ namespace OpenDental{
 			// checkDone
 			// 
 			this.checkDone.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkDone.Location = new System.Drawing.Point(413, 5);
+			this.checkDone.Location = new System.Drawing.Point(324, 5);
 			this.checkDone.Name = "checkDone";
 			this.checkDone.Size = new System.Drawing.Size(67, 16);
 			this.checkDone.TabIndex = 0;
@@ -1383,7 +1389,7 @@ namespace OpenDental{
 			this.tabMovements.Size = new System.Drawing.Size(516, 233);
 			this.tabMovements.TabIndex = 3;
 			this.tabMovements.Text = "Movements";
-			this.tabMovements.UseVisualStyleBackColor = true;	
+			this.tabMovements.UseVisualStyleBackColor = true;
 			// 
 			// label1
 			// 
@@ -1866,6 +1872,7 @@ namespace OpenDental{
 			// tabPlanned
 			// 
 			this.tabPlanned.BackColor = System.Drawing.Color.White;
+			this.tabPlanned.Controls.Add(this.checkShowCompleted);
 			this.tabPlanned.Controls.Add(this.butDown);
 			this.tabPlanned.Controls.Add(this.butUp);
 			this.tabPlanned.Controls.Add(this.butPin);
@@ -1880,6 +1887,16 @@ namespace OpenDental{
 			this.tabPlanned.Text = "Planned Appts";
 			this.tabPlanned.UseVisualStyleBackColor = true;
 			// 
+			// checkShowCompleted
+			// 
+			this.checkShowCompleted.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowCompleted.Location = new System.Drawing.Point(381, 5);
+			this.checkShowCompleted.Name = "checkShowCompleted";
+			this.checkShowCompleted.Size = new System.Drawing.Size(132, 16);
+			this.checkShowCompleted.TabIndex = 196;
+			this.checkShowCompleted.Text = "Show Completed";
+			this.checkShowCompleted.CheckedChanged += new System.EventHandler(this.checkShowCompleted_CheckedChanged);
+			// 
 			// butDown
 			// 
 			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1889,11 +1906,10 @@ namespace OpenDental{
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(325, 1);
+			this.butDown.Location = new System.Drawing.Point(283, 1);
 			this.butDown.Name = "butDown";
-			this.butDown.Size = new System.Drawing.Size(75, 23);
+			this.butDown.Size = new System.Drawing.Size(33, 23);
 			this.butDown.TabIndex = 195;
-			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// butUp
@@ -1907,9 +1923,8 @@ namespace OpenDental{
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butUp.Location = new System.Drawing.Point(244, 1);
 			this.butUp.Name = "butUp";
-			this.butUp.Size = new System.Drawing.Size(75, 23);
+			this.butUp.Size = new System.Drawing.Size(33, 23);
 			this.butUp.TabIndex = 194;
-			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
 			// butPin
@@ -1964,6 +1979,7 @@ namespace OpenDental{
 			this.gridPlanned.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPlanned.HasMultilineHeaders = false;
 			this.gridPlanned.HScrollVisible = false;
 			this.gridPlanned.Location = new System.Drawing.Point(0, 25);
 			this.gridPlanned.Name = "gridPlanned";
@@ -2245,6 +2261,7 @@ namespace OpenDental{
 			// 
 			// gridChartViews
 			// 
+			this.gridChartViews.HasMultilineHeaders = false;
 			this.gridChartViews.HScrollVisible = false;
 			this.gridChartViews.Location = new System.Drawing.Point(303, 8);
 			this.gridChartViews.Name = "gridChartViews";
@@ -2689,6 +2706,7 @@ namespace OpenDental{
 			// 
 			// gridCustomerViews
 			// 
+			this.gridCustomerViews.HasMultilineHeaders = false;
 			this.gridCustomerViews.HScrollVisible = false;
 			this.gridCustomerViews.Location = new System.Drawing.Point(6, 30);
 			this.gridCustomerViews.Name = "gridCustomerViews";
@@ -2813,6 +2831,7 @@ namespace OpenDental{
 			// gridProg
 			// 
 			this.gridProg.AllowSortingByColumn = true;
+			this.gridProg.HasMultilineHeaders = false;
 			this.gridProg.HScrollVisible = true;
 			this.gridProg.Location = new System.Drawing.Point(415, 291);
 			this.gridProg.Name = "gridProg";
@@ -2829,6 +2848,7 @@ namespace OpenDental{
 			// 
 			// gridPtInfo
 			// 
+			this.gridPtInfo.HasMultilineHeaders = false;
 			this.gridPtInfo.HScrollVisible = false;
 			this.gridPtInfo.Location = new System.Drawing.Point(0, 405);
 			this.gridPtInfo.Name = "gridPtInfo";
@@ -8098,7 +8118,7 @@ namespace OpenDental{
 			gridPlanned.Columns.Add(col);
 			gridPlanned.Rows.Clear();
 			ODGridRow row;
-			DataTable table=DataSetMain.Tables["Planned"];
+			_tablePlannedAll=DataSetMain.Tables["Planned"];
 			//This gets done in the business layer:
 			/*
 			bool iochanged=false;
@@ -8114,18 +8134,23 @@ namespace OpenDental{
 				DataSetMain=ChartModules.GetAll(PatCur.PatNum,checkAudit.Checked);
 				table=DataSetMain.Tables["Planned"];
 			}*/
-			for(int i=0;i<table.Rows.Count;i++){
+			_listPlannedAppt=new List<DataRow>();
+			for(int i=0;i<_tablePlannedAll.Rows.Count;i++){
+				if(_tablePlannedAll.Rows[i]["AptStatus"].ToString()=="2" && !checkShowCompleted.Checked) {
+					continue;
+				}
+				_listPlannedAppt.Add(_tablePlannedAll.Rows[i]);//List containing only rows we are showing, can be the same as _tablePlannedAll
 				row=new ODGridRow();
-				row.Cells.Add(table.Rows[i]["ItemOrder"].ToString());
-				row.Cells.Add(table.Rows[i]["minutes"].ToString());
-				row.Cells.Add(table.Rows[i]["ProcDescript"].ToString());
-				row.Cells.Add(table.Rows[i]["Note"].ToString());
+				row.Cells.Add((gridPlanned.Rows.Count+1).ToString());
+				row.Cells.Add(_tablePlannedAll.Rows[i]["minutes"].ToString());
+				row.Cells.Add(_tablePlannedAll.Rows[i]["ProcDescript"].ToString());
+				row.Cells.Add(_tablePlannedAll.Rows[i]["Note"].ToString());
 				if(Programs.UsingOrion) {
 					string text;
 					List<Procedure> procsList=Procedures.Refresh(PatCur.PatNum);
 					DateTime newDateSched=new DateTime();
 					for(int p=0;p<procsList.Count;p++) {
-						if(procsList[p].PlannedAptNum==PIn.Long(table.Rows[i]["AptNum"].ToString())) {
+						if(procsList[p].PlannedAptNum==PIn.Long(_tablePlannedAll.Rows[i]["AptNum"].ToString())) {
 							OrionProc op=OrionProcs.GetOneByProcNum(procsList[p].ProcNum);
 							if(op!=null && op.DateScheduleBy.Year>1880) {
 								if(newDateSched.Year<1880) {
@@ -8148,7 +8173,7 @@ namespace OpenDental{
 					row.Cells.Add(text);
 				}
 				else {//Not Orion
-					ApptStatus aptStatus=(ApptStatus)(PIn.Long(table.Rows[i]["AptStatus"].ToString()));
+					ApptStatus aptStatus=(ApptStatus)(PIn.Long(_tablePlannedAll.Rows[i]["AptStatus"].ToString()));
 					if(aptStatus==ApptStatus.UnschedList) {
 						row.Cells.Add(Lan.g(this,"Unsched"));
 					}
@@ -8156,14 +8181,20 @@ namespace OpenDental{
 						row.Cells.Add(Lan.g(this,"Broken"));
 					}
 					else {//scheduled, complete and ASAP
-						row.Cells.Add(table.Rows[i]["dateSched"].ToString());
+						row.Cells.Add(_tablePlannedAll.Rows[i]["dateSched"].ToString());
 					}
 				}
-				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
-				row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
+				row.ColorText=Color.FromArgb(PIn.Int(_tablePlannedAll.Rows[i]["colorText"].ToString()));
+				row.ColorBackG=Color.FromArgb(PIn.Int(_tablePlannedAll.Rows[i]["colorBackG"].ToString()));
+				row.Tag=PIn.Long(_tablePlannedAll.Rows[i]["AptNum"].ToString());
 				gridPlanned.Rows.Add(row);
 			}
 			gridPlanned.EndUpdate();
+			for(int i=0;i<_listPlannedAppt.Count;i++) {
+				if(SelectedGridItems.Contains(PIn.Long(_listPlannedAppt[i]["AptNum"].ToString()))) {
+					gridPlanned.SetSelected(i,true);
+				}
+			}
 		}
 
 		private void butNew_Click(object sender, System.EventArgs e) {
@@ -8284,13 +8315,11 @@ namespace OpenDental{
 			if(idx==0) {
 				return;
 			}
-			PlannedAppt planned;
-			planned=PlannedAppts.GetOne(PIn.Long(table.Rows[idx]["PlannedApptNum"].ToString()));
-			planned.ItemOrder=idx-1;
-			PlannedAppts.Update(planned);
-			planned=PlannedAppts.GetOne(PIn.Long(table.Rows[idx-1]["PlannedApptNum"].ToString()));
-			planned.ItemOrder=idx;
-			PlannedAppts.Update(planned);
+			DataRow selectedApptRow=_listPlannedAppt[idx];//Get selected data row
+			//Get data row above the selected, since we are moving up we are going to need it to adjust its item order
+			DataRow aboveSelectedApptRow=_listPlannedAppt[idx-1];//idx guaranteed to be >0
+			moveItemOrderHelper(selectedApptRow,PIn.Int(aboveSelectedApptRow["ItemOrder"].ToString()));//Sets the selected rows item order = the above rows and adjust everything inbetween
+			saveChangesToDBHelper();//Loops through list, gets PlannedAppt, sets the new ItemOrder and then updates if needed
 			DataSetMain=ChartModules.GetAll(PatCur.PatNum,checkAudit.Checked);
 			FillPlanned();
 			gridPlanned.SetSelected(idx-1,true);
@@ -8307,23 +8336,20 @@ namespace OpenDental{
 			}
 			DataTable table=DataSetMain.Tables["Planned"];
 			int idx=gridPlanned.SelectedIndices[0];
-			if(idx==table.Rows.Count-1) {
+			if(idx==_listPlannedAppt.Count-1) {
 				return;
 			}
-			PlannedAppt planned;
-			planned=PlannedAppts.GetOne(PIn.Long(table.Rows[idx]["PlannedApptNum"].ToString()));
-			planned.ItemOrder=idx+1;
-			PlannedAppts.Update(planned);
-			planned=PlannedAppts.GetOne(PIn.Long(table.Rows[idx+1]["PlannedApptNum"].ToString()));
-			planned.ItemOrder=idx;
-			PlannedAppts.Update(planned);
+			DataRow selectedApptRow=_listPlannedAppt[idx];//Get selected data row
+			DataRow belowSelectedApptRow=_listPlannedAppt[idx+1];//Get data row below the selected, since we are moving down we are going to need it to adjust its item order
+			moveItemOrderHelper(selectedApptRow,PIn.Int(belowSelectedApptRow["ItemOrder"].ToString()));//Sets the selected rows item order = the above rows and adjust everything inbetween
+			saveChangesToDBHelper();//Loops through list, gets PlannedAppt, sets the new ItemOrder and then updates if needed
 			DataSetMain=ChartModules.GetAll(PatCur.PatNum,checkAudit.Checked);
 			FillPlanned();
 			gridPlanned.SetSelected(idx+1,true);
 		}
 
 		private void gridPlanned_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			long aptnum=PIn.Long(DataSetMain.Tables["Planned"].Rows[e.Row]["AptNum"].ToString());
+			long aptnum=(long)gridPlanned.Rows[e.Row].Tag;
 			FormApptEdit FormAE=new FormApptEdit(aptnum);
 			FormAE.ShowDialog();
 			if(Programs.UsingOrion) {
@@ -8334,8 +8360,9 @@ namespace OpenDental{
 			else {
 				ModuleSelected(PatCur.PatNum);//if procs were added in appt, then this will display them*/
 			}
-			for(int i=0;i<DataSetMain.Tables["Planned"].Rows.Count;i++){
-				if(DataSetMain.Tables["Planned"].Rows[i]["AptNum"].ToString()==aptnum.ToString()){
+			gridPlanned.SetSelected(false);
+			for(int i=0;i<gridPlanned.Rows.Count;i++) {
+				if((long)gridPlanned.Rows[i].Tag==aptnum) {
 					gridPlanned.SetSelected(i,true);
 				}
 			}
@@ -8344,13 +8371,13 @@ namespace OpenDental{
 		private void checkDone_Click(object sender, System.EventArgs e) {
 			Patient oldPat=PatCur.Copy();
 			if(checkDone.Checked){
-				if(DataSetMain.Tables["Planned"].Rows.Count>0){
+				if(_tablePlannedAll.Rows.Count>0) {
 					if(!MsgBox.Show(this,true,"ALL planned appointment(s) will be deleted. Continue?")){
 						checkDone.Checked=false;
 						return; 
 					}
-					for(int i=0;i<DataSetMain.Tables["Planned"].Rows.Count;i++){
-						Appointments.Delete(PIn.Long(DataSetMain.Tables["Planned"].Rows[i]["AptNum"].ToString()));
+					for(int i=0;i<_tablePlannedAll.Rows.Count;i++) {
+						Appointments.Delete(PIn.Long(_tablePlannedAll.Rows[i]["AptNum"].ToString()));
 					}
 				}
 				PatCur.PlannedIsDone=true;
@@ -8361,6 +8388,77 @@ namespace OpenDental{
 				Patients.Update(PatCur,oldPat);
 			}
 			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void checkShowCompleted_CheckedChanged(object sender,EventArgs e) {
+			SelectedGridItems.Clear();
+			foreach(int index in gridPlanned.SelectedIndices) {
+				SelectedGridItems.Add(PIn.Long(_listPlannedAppt[index]["AptNum"].ToString()));
+			}
+			FillPlanned();
+		}
+
+		///<summary>Sets item orders appropriately. Does not reorder list, and does not repaint/refill grid.</summary>
+		private void moveItemOrderHelper(DataRow plannedAppt,int newItemOrder) {
+			int plannedApptItemOrder=PIn.Int(plannedAppt["ItemOrder"].ToString());
+			if(plannedApptItemOrder>newItemOrder) {//moving item up, itterate down through list
+				for(int i=0;i<_tablePlannedAll.Rows.Count;i++) {
+					int itemOrderCur=PIn.Int(_tablePlannedAll.Rows[i]["ItemOrder"].ToString());
+					if(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString()==plannedAppt["PlannedApptNum"].ToString()) {
+						_tablePlannedAll.Rows[i]["ItemOrder"]=newItemOrder;//set item order of this PlannedAppt.
+						continue;
+					}
+					if(itemOrderCur>=newItemOrder && itemOrderCur<plannedApptItemOrder) {//all items between newItemOrder and oldItemOrder
+						_tablePlannedAll.Rows[i]["ItemOrder"]=itemOrderCur+1;
+					}
+				}
+			}
+			else {//moving item down, itterate up through list
+				for(int i=_tablePlannedAll.Rows.Count-1;i>=0;i--) {
+					int itemOrderCur=PIn.Int(_tablePlannedAll.Rows[i]["ItemOrder"].ToString());
+					if(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString()==plannedAppt["PlannedApptNum"].ToString()) {
+						_tablePlannedAll.Rows[i]["ItemOrder"]=newItemOrder;//set item order of this PlannedAppt.
+						continue;
+					}
+					if(itemOrderCur<=newItemOrder && itemOrderCur>plannedApptItemOrder) {//all items between newItemOrder and oldItemOrder
+						_tablePlannedAll.Rows[i]["ItemOrder"]=itemOrderCur-1;
+					}
+				}
+			}
+			//tablePlannedAll has correct itemOrder values, which we need to copy to _listPlannedAppt without changing the actual order of _listPlannedAppt.
+			for(int i=0;i<_listPlannedAppt.Count;i++) {
+				for(int j=0;j<_tablePlannedAll.Rows.Count;j++) {
+					if(_listPlannedAppt[i]["PlannedApptNum"].ToString()!=_tablePlannedAll.Rows[j]["PlannedApptNum"].ToString()) {
+						continue;
+					}
+					_listPlannedAppt[i]=_tablePlannedAll.Rows[j];//update order.
+				}
+			}
+		}
+
+		///<summary>Updates database based on the values in tablePlannedAll.Rows.</summary>
+		private void saveChangesToDBHelper() {
+			////Get all PlannedAppts from DB to check for changes.-----------------------------------------------------------------
+			List<PlannedAppt> listSupplyAllDB=PlannedAppts.Refresh(PatCur.PatNum);
+			//Itterate through current PlannedAppts list in memory-----------------------------------------------------------------
+			for(int i=0;i<_tablePlannedAll.Rows.Count;i++) {
+				//find DB version of PlannedAppt to pass to UpdateOrInsertIfNeeded
+				PlannedAppt oldPlannedAppt=null;
+				PlannedAppt plannedAppt=null;
+				for(int j=0;j<listSupplyAllDB.Count;j++) {
+					if(PIn.Int(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString())!=listSupplyAllDB[j].PlannedApptNum) {
+						continue;//not the correct PlannedAppts
+					}
+					oldPlannedAppt=PlannedAppts.GetOne(PIn.Long(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString()));
+					plannedAppt=oldPlannedAppt.Copy();
+					plannedAppt.ItemOrder=PIn.Int(_tablePlannedAll.Rows[i]["ItemOrder"].ToString());
+					break;//found match
+				}
+				if(plannedAppt==null) {
+					continue;
+				}
+				PlannedAppts.Update(plannedAppt,oldPlannedAppt);
+			}
 		}
 		#endregion
 

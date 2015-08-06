@@ -54,7 +54,15 @@ namespace OpenDentBusiness{
 			}
 			Crud.PlannedApptCrud.Update(plannedAppt);
 		}
-		
+
+		///<summary></summary>
+		public static void Update(PlannedAppt plannedAppt,PlannedAppt oldPlannedAppt) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),plannedAppt,oldPlannedAppt);
+				return;
+			}
+			Crud.PlannedApptCrud.Update(plannedAppt,oldPlannedAppt);
+		}
 
 	}
 }
