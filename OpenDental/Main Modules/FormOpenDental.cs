@@ -2310,7 +2310,7 @@ namespace OpenDental{
 									string pw=odPassword;
 									//if(Programs.UsingEcwTight()) {//ecw requires hash, but non-ecw requires actual password
 									if(Programs.UsingEcwTightOrFullMode()) {//ecw requires hash, but non-ecw requires actual password
-										pw=Userods.EncryptPassword(pw,true);
+										pw=Userods.HashPassword(pw,true);
 									}
 									Security.PasswordTyped=pw;
 								}

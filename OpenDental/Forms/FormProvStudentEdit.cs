@@ -144,7 +144,7 @@ namespace OpenDental {
 					return;
 				}
 				newUser.UserName=_autoUserName.ToString();
-				newUser.Password=Userods.EncryptPassword(textPassword.Text);
+				newUser.Password=Userods.HashPassword(textPassword.Text);
 				newUser.ProvNum=provNum;
 				newUser.UserGroupNum=PrefC.GetLong(PrefName.SecurityGroupForStudents);
 				Userods.Insert(newUser);
@@ -163,7 +163,7 @@ namespace OpenDental {
 						Providers.Update(ProvStudent);
 						_existingUser.UserName=textUserName.Text;
 						if(textPassword.Text!="") {
-							_existingUser.Password=Userods.EncryptPassword(textPassword.Text);
+							_existingUser.Password=Userods.HashPassword(textPassword.Text);
 						}
 						Userods.Update(_existingUser);//Performs validation
 					}

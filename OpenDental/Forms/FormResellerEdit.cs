@@ -186,7 +186,7 @@ namespace OpenDental {
 			}
 			ResellerCur.UserName=textUserName.Text;
 			if(textPassword.Text!="********") {
-				ResellerCur.ResellerPassword=Userods.EncryptPassword(textPassword.Text,false);
+				ResellerCur.ResellerPassword=Userods.HashPassword(textPassword.Text,false);
 			}
 			Resellers.Update(ResellerCur);
 			DialogResult=DialogResult.OK;

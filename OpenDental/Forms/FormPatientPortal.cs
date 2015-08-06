@@ -63,7 +63,7 @@ namespace OpenDental {
 				textOnlinePassword.ReadOnly=false;
 				//3. Save password to db.
 				// We only save the hash of the generated password.
-				string passwordHashed=Userods.EncryptPassword(passwordGenerated,false);
+				string passwordHashed=Userods.HashPassword(passwordGenerated,false);
 				PatCur.OnlinePassword=passwordHashed;
 				Patients.Update(PatCur,PatOld);
 				PatOld.OnlinePassword=passwordHashed;//Update PatOld in case the user changes password manually.
@@ -116,7 +116,7 @@ namespace OpenDental {
 			string passwordGenerated=GenerateRandomPassword(8);
 			textOnlinePassword.Text=passwordGenerated;
 			// We only save the hash of the generated password.
-			string passwordHashed=Userods.EncryptPassword(passwordGenerated,false);
+			string passwordHashed=Userods.HashPassword(passwordGenerated,false);
 			PatCur.OnlinePassword=passwordHashed;
 			Patients.Update(PatCur,PatOld);
 			PatOld.OnlinePassword=passwordHashed;//Update PatOld in case the user changes password manually.
@@ -362,7 +362,7 @@ namespace OpenDental {
 						return;
 					}
 				}
-				PatCur.OnlinePassword=Userods.EncryptPassword(textOnlinePassword.Text,false);
+				PatCur.OnlinePassword=Userods.HashPassword(textOnlinePassword.Text,false);
 				Patients.Update(PatCur,PatOld);
 			}
 			DialogResult=DialogResult.OK;

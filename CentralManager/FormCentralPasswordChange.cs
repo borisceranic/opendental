@@ -23,7 +23,7 @@ namespace CentralManager {
 				MessageBox.Show("Access code is incorrect.");
 				return;
 			}
-			Prefs.UpdateString(PrefName.CentralManagerPassHash,Userods.EncryptPassword(textPassword.Text));
+			Prefs.UpdateString(PrefName.CentralManagerPassHash,Userods.HashPassword(textPassword.Text));
 			Prefs.RefreshCache();
 			DialogResult=DialogResult.OK;
 		}

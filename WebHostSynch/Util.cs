@@ -129,7 +129,7 @@ namespace WebHostSynch {
 				return Convert.ToBase64String(hashbytes2);
 		 */
 			String salt="saturn";
-			return Userods.EncryptPassword(inputPass+salt,false);
+			return Userods.HashPassword(inputPass+salt,false);
 		}
 
 	}

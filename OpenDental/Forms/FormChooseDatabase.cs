@@ -760,7 +760,7 @@ namespace OpenDental{
 						//this handles situation where an eCW user passes in an actual OdPassword
 						string password=OdPassHash;
 						if(OdPassword!="") {
-							password=Userods.EncryptPassword(OdPassword,true);
+							password=Userods.HashPassword(OdPassword,true);
 						}
 						Security.CurUser=Security.LogInWeb(textUser2.Text,password,"",Application.ProductVersion,true);
 						Security.PasswordTyped=password;//so we really store the encrypted pw if ecw user passes in their real password?
@@ -822,7 +822,7 @@ namespace OpenDental{
 				try{
 					string password=textPassword2.Text;
 					if(useEcwAlgorithm){
-						password=Userods.EncryptPassword(password,true);
+						password=Userods.HashPassword(password,true);
 					}
 					string username=textUser2.Text;
 					#if DEBUG

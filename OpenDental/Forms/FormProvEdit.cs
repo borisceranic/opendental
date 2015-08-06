@@ -1381,7 +1381,7 @@ namespace OpenDental{
 				if(ProvCur.IsInstructor) {
 					Userod user=new Userod();
 					user.UserName=textUserName.Text;
-					user.Password=Userods.EncryptPassword(textPassword.Text);
+					user.Password=Userods.HashPassword(textPassword.Text);
 					user.ProvNum=provNum;
 					user.UserGroupNum=PrefC.GetLong(PrefName.SecurityGroupForInstructors);
 					try {
@@ -1399,7 +1399,7 @@ namespace OpenDental{
 					if(_existingUser!=null && (ProvCur.IsInstructor || ProvCur.SchoolClassNum!=0)) {
 						_existingUser.UserName=textUserName.Text;
 						if(textPassword.Text!="") {
-							_existingUser.Password=Userods.EncryptPassword(textPassword.Text);
+							_existingUser.Password=Userods.HashPassword(textPassword.Text);
 						}
 						Userods.Update(_existingUser);
 					}

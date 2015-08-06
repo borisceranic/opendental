@@ -19,7 +19,7 @@ namespace CentralManager {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(PrefC.GetString(PrefName.CentralManagerPassHash)!=Userods.EncryptPassword(textPassword.Text)){
+			if(PrefC.GetString(PrefName.CentralManagerPassHash)!=Userods.HashPassword(textPassword.Text)){
 				MessageBox.Show("Bad password.");
 				return;
 			}

@@ -182,7 +182,7 @@ namespace OpenDentBusiness {
 					return user;
 				}
 			}
-			else if(user.Password==EncryptPassword(password)) {
+			else if(user.Password==HashPassword(password)) {
 				return user;
 			}
 			return null;
@@ -214,7 +214,7 @@ namespace OpenDentBusiness {
 					throw new ApplicationException("Invalid username or password.");
 				}
 			}
-			else if(userod.Password!=EncryptPassword(cred.Password)){
+			else if(userod.Password!=HashPassword(cred.Password)){
 				throw new ApplicationException("Invalid username or password.");
 			}
 		}
@@ -304,14 +304,14 @@ namespace OpenDentBusiness {
 		}*/
 
 		///<summary></summary>
-		public static string EncryptPassword(string inputPass) {
+		public static string HashPassword(string inputPass) {
 			//No need to check RemotingRole; no call to db.
 			bool useEcwAlgorithm=Programs.IsEnabled(ProgramName.eClinicalWorks);
-			return EncryptPassword(inputPass,useEcwAlgorithm);
+			return HashPassword(inputPass,useEcwAlgorithm);
 		}
 
-		///<summary>Creates a hash.</summary>
-		public static string EncryptPassword(string inputPass,bool useEcwAlgorithm) {
+		///<summary></summary>
+		public static string HashPassword(string inputPass,bool useEcwAlgorithm) {
 			//No need to check RemotingRole; no call to db.
 			if(inputPass=="") {
 				return "";
@@ -377,7 +377,7 @@ namespace OpenDentBusiness {
 			if(hashedPass=="") {
 				return inputPass=="";
 			}
-			string hashedInput=EncryptPassword(inputPass);
+			string hashedInput=HashPassword(inputPass);
 			//MessageBox.Show(
 			//Debug.WriteLine(hashedInput+","+hashedPass);
 			return hashedInput==hashedPass;

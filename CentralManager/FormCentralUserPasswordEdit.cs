@@ -38,7 +38,7 @@ namespace CentralManager {
 			if(!_isCreate) {
 				string userPassCur=Userods.GetUserByName(textUserName.Text,false).Password;
 				//If user's current password is blank we dont care what they put for the old one.
-				if(userPassCur!="" && Userods.EncryptPassword(textCurrent.Text)!=userPassCur)	{
+				if(userPassCur!="" && Userods.HashPassword(textCurrent.Text)!=userPassCur)	{
 					MessageBox.Show(this,"Current password incorrect.");
 					return;
 				}
@@ -48,7 +48,7 @@ namespace CentralManager {
 				return;
 			}
 			else{
-				HashedResult=Userods.EncryptPassword(textPassword.Text);
+				HashedResult=Userods.HashPassword(textPassword.Text);
 			}
 			DialogResult=DialogResult.OK;
 		}

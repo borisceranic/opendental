@@ -216,7 +216,7 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(!IsInSecurityWindow
-				&& Userods.EncryptPassword(textCurrent.Text)!=Security.CurUser.Password)
+				&& Userods.HashPassword(textCurrent.Text)!=Security.CurUser.Password)
 			{
 				MsgBox.Show(this,"Current password incorrect.");
 				return;
@@ -232,7 +232,7 @@ namespace OpenDental{
 				HashedResult="";
 			}
 			else{
-				HashedResult=Userods.EncryptPassword(textPassword.Text);
+				HashedResult=Userods.HashPassword(textPassword.Text);
 			}
 			//MessageBox.Show(hashedResult);
 			DialogResult=DialogResult.OK;
