@@ -303,7 +303,7 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			if(Defs.IsHidable(DefCur.Category)) {
+			if(Defs.IsHidable(DefCur.Category) && checkHidden.Checked) {
 				int countShowing=0;
 				for(int i=0;i<_defsList.Length;i++) {
 					if(_defsList[i].DefNum==DefCur.DefNum) {
