@@ -160,13 +160,29 @@ namespace OpenDental.ReportingComplex {
 			//FormR.Dispose();
 		}
 
-		///<summary>Adds a ReportObject, Tahoma font, 10-point and bold, at the bottom-center of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
+		///<summary>Adds a ReportObject, Tahoma font, 10-point and bold, at the bottom-center of the Report Header Section.
+		///Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
 		public void AddSubTitle(string name,string subTitle) {
 			AddSubTitle(name,subTitle,new Font("Tahoma",10,FontStyle.Bold));
 		}
 
-		///<summary>Adds a ReportObject with the given font, at the bottom-center of the Report Header Section.  Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
-		public void AddSubTitle(string name,string subTitle,Font font){
+		///<summary>Adds a ReportObject, Tahoma font, 10-point and bold, at the bottom-center of the Report Header Section.
+		///Should only be done after AddTitle.  You can add as many subtitles as you want.  Padding is added to the height only of the subtitle.</summary>
+		public void AddSubTitle(string name,string subTitle,int padding) {
+			AddSubTitle(name,subTitle,new Font("Tahoma",10,FontStyle.Bold),padding);
+		}
+
+		///<summary>Adds a ReportObject with the given font, at the bottom-center of the Report Header Section.
+		///Should only be done after AddTitle.  You can add as many subtitles as you want.</summary>
+		public void AddSubTitle(string name,string subTitle,Font font) {
+			//The original rendition of this subtitle method forced all subtitles with a padding of 5.
+			//This is simply here to keep that functionality around for the majority of the reports.
+			AddSubTitle(name,subTitle,font,0);
+		}
+
+		///<summary>Adds a ReportObject with the given font, at the bottom-center of the Report Header Section.
+		///Should only be done after AddTitle.  You can add as many subtitles as you want.  Padding is added to the height only of the subtitle.</summary>
+		public void AddSubTitle(string name,string subTitle,Font font,int padding) {
 			Size size=new Size((int)(_grfx.MeasureString(subTitle,font).Width/_grfx.DpiX*100+2)
 				,(int)(_grfx.MeasureString(subTitle,font).Height/_grfx.DpiY*100+2));
 			int xPos;
@@ -179,20 +195,19 @@ namespace OpenDental.ReportingComplex {
 				xPos-=30;
 			}
 			xPos-=(int)(size.Width/2);
-			if(_sections["Report Header"]==null){
-				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));	
+			if(_sections["Report Header"]==null) {
+				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
 			}
 			//find the yPos+Height of the last reportObject in the Report Header section
 			int yPos=0;
-			foreach(ReportObject reportObject in _reportObjects){
+			foreach(ReportObject reportObject in _reportObjects) {
 				if(reportObject.SectionName!="Report Header") continue;
-				if(reportObject.Location.Y+reportObject.Size.Height > yPos){
+				if(reportObject.Location.Y+reportObject.Size.Height > yPos) {
 					yPos=reportObject.Location.Y+reportObject.Size.Height;
 				}
 			}
-			_reportObjects.Add(
-				new ReportObject(name,"Report Header",new Point(xPos,yPos+5),size,subTitle,font,ContentAlignment.MiddleCenter));
-			_sections["Report Header"].Height+=(int)size.Height+5;
+			_reportObjects.Add(new ReportObject(name,"Report Header",new Point(xPos,yPos+padding),size,subTitle,font,ContentAlignment.MiddleCenter));
+			_sections["Report Header"].Height+=(int)size.Height+padding;
 		}
 
 		public QueryObject AddQuery(string query,string title) {
@@ -380,7 +395,14 @@ namespace OpenDental.ReportingComplex {
 						query.IsLastSplit=false;
 						QueryObject newQuery=null;
 						for(int j=0;j<query.ReportTable.Rows.Count;j++) {
-							if(query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString()!=lastCellValue) {
+							if(query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString()==lastCellValue) {
+								if(newQuery==null) {
+									newQuery=query.DeepCopyQueryObject();
+									newQuery.AddInitialHeader(newQuery.GetGroupTitle().StaticText,newQuery.GetGroupTitle().Font);
+								}
+								newQuery.ReportTable.ImportRow(query.ReportTable.Rows[j]);
+							}
+							else {
 								//Must happen the first time through
 								if(newQuery!=null) {
 									switch(newQuery.SplitByKind) {
@@ -430,9 +452,6 @@ namespace OpenDental.ReportingComplex {
 									newQuery=query.DeepCopyQueryObject();
 									newQuery.ReportTable.ImportRow(query.ReportTable.Rows[j]);
 								}
-							}
-							else {
-								newQuery.ReportTable.ImportRow(query.ReportTable.Rows[j]);
 							}
 							lastCellValue=query.ReportTable.Rows[j][query.ColumnNameToSplitOn].ToString();
 						}

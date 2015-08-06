@@ -647,7 +647,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void RunDaily(){
+		private void RunDaily() {
 			if(Plugins.HookMethod(this,"FormRpProdInc.RunDaily_Start",PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text))) {
 				return;
 			}
@@ -683,17 +683,46 @@ namespace OpenDental{
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetDailyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
-			DataTable dt=ds.Tables["Total"];
-			DataTable dtClinic=new DataTable();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				dtClinic=ds.Tables["Clinic"];
+			DataSet dataSetDailyProd=RpProdInc.GetDailyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked
+				,checkAllProv.Checked,checkAllClin.Checked,checkClinicBreakdown.Checked);
+			DataTable tableDailyProd=dataSetDailyProd.Tables["DailyProd"];//Includes multiple clinics that will get separated out later.
+			DataSet dataSetDailyProdSplitByClinic=new DataSet();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				//Split up each clinic into its own table and add that to the data set split up by clinics.
+				string lastClinic="";
+				DataTable dtClinic=tableDailyProd.Clone();//Clones the structure, not the data.
+				for(int i=0;i<tableDailyProd.Rows.Count;i++) {
+					string currentClinic=tableDailyProd.Rows[i]["Clinic"].ToString();
+					if(lastClinic=="") {
+						lastClinic=currentClinic;
+					}
+					//Check if we have successfully added all rows for the current clinic and add the datatable to the dataset if there is information present.
+					if(lastClinic!=currentClinic && dtClinic.Rows.Count>0) {
+						DataTable dtClinicTemp=dtClinic.Copy();
+						dtClinicTemp.TableName="Clinic"+i;//The name of the table does not matter but has to be unique in a DataSet.
+						dataSetDailyProdSplitByClinic.Tables.Add(dtClinicTemp);
+						dtClinic.Rows.Clear();//Clear out the data to start collecting the information for the next clinic.
+						lastClinic=currentClinic;
+					}
+					dtClinic.Rows.Add(tableDailyProd.Rows[i].ItemArray);
+					//If this is the last row, add dtClinic to the dataset.
+					if(i==tableDailyProd.Rows.Count-1) {
+						DataTable dtClinicTemp=dtClinic.Copy();
+						dtClinicTemp.TableName="Clinic"+i;//The name of the table does not matter but has to be unique in a DataSet.
+						dataSetDailyProdSplitByClinic.Tables.Add(dtClinicTemp);
+					}
+				}
 			}
-			ReportComplex report=new ReportComplex(true,false);
+			//The old daily prod and inc report (prior to report complex) had portait mode for non-clinic users and landscape for clinic users.
+			ReportComplex report=new ReportComplex(true,!PrefC.GetBool(PrefName.EasyNoClinics));
 			report.ReportName="DailyP&I";
 			report.AddTitle("Title",Lan.g(this,"Daily Production and Income"));
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
-			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
+			string dateRangeStr=dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString();
+			if(dateFrom.Date==dateTo.Date) {
+				dateRangeStr=dateFrom.ToShortDateString();//Do not show a date range for the same day...
+			}
+			report.AddSubTitle("Date",dateRangeStr);
 			if(checkAllProv.Checked) {
 				report.AddSubTitle("Providers",Lan.g(this,"All Providers"));
 			}
@@ -733,33 +762,71 @@ namespace OpenDental{
 				}
 			}
 			//setup query
-			QueryObject query;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && checkClinicBreakdown.Checked) {
-				query=report.AddQuery(dtClinic,"","Clinic",SplitByKind.Value,1,true);
+			QueryObject query=null;
+			int dateWidth=75;
+			int patientNameWidth=130;
+			int descriptionWidth=220;
+			int provWidth=65;
+			int adjustWidth=75;
+			int writeoffWidth=75;
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				//Trim some fat off for non-clinic users because this report shows in portait mode.
+				dateWidth=68;
+				patientNameWidth=120;
+				descriptionWidth=180;
+				provWidth=55;
+				adjustWidth=70;
+				writeoffWidth=70;
 			}
-			else {
-				query=report.AddQuery(dt,"","",SplitByKind.None,1,true);
+			query=report.AddQuery(tableDailyProd,Lan.g(this,"Date")+": "+DateTime.Today.ToShortDateString(),"ClinicSplit",SplitByKind.Value,1,true);
+			query.AddColumn("Date",dateWidth,FieldValueType.String,new Font("Tahoma",8));
+			query.AddColumn("Patient Name",patientNameWidth,FieldValueType.String,new Font("Tahoma",8));
+			query.AddColumn("Description",descriptionWidth,FieldValueType.String,new Font("Tahoma",8));
+			query.AddColumn("Prov",provWidth,FieldValueType.String,new Font("Tahoma",8));
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				query.AddColumn("Clinic",130,FieldValueType.String,new Font("Tahoma",8));
 			}
-			// add columns to report
-			query.AddColumn("Day",75,FieldValueType.String);
-			query.AddColumn("Name",120,FieldValueType.String);
-			query.AddColumn("Description",90,FieldValueType.String);
-			query.AddColumn("Production",90,FieldValueType.Number);
-			query.AddColumn("Adjustments",90,FieldValueType.Number);
-			query.AddColumn("Writeoffs",90,FieldValueType.Number);
-			query.AddColumn("Pat Payments",90,FieldValueType.Number);
-			query.AddColumn("Ins Payments",90,FieldValueType.Number);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
-				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
-				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
-				query.AddColumn("Day",75,FieldValueType.String);
-				query.AddColumn("Name",120,FieldValueType.String);
-				query.AddColumn("Description",90,FieldValueType.String);
-				query.AddColumn("Production",90,FieldValueType.Number);
-				query.AddColumn("Adjustments",90,FieldValueType.Number);
-				query.AddColumn("Writeoffs",90,FieldValueType.Number);
-				query.AddColumn("Pat Payments",90,FieldValueType.Number);
-				query.AddColumn("Ins Payments",90,FieldValueType.Number);
+			query.AddColumn("Production",75,FieldValueType.Number,new Font("Tahoma",8));
+			query.AddColumn("Adjust",adjustWidth,FieldValueType.Number,new Font("Tahoma",8));
+			query.AddColumn("Writeoff",writeoffWidth,FieldValueType.Number,new Font("Tahoma",8));
+			query.AddColumn("Pt Income",75,FieldValueType.Number,new Font("Tahoma",8));
+			query.AddColumn("Ins Income",75,FieldValueType.Number,new Font("Tahoma",8));
+			//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
+			//When only one clinic is showing , the "Summary" at the end of every daily report will suffice. (total prod and total income lines).
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClinicNums.Count > 1) {
+				DataTable tableClinicTotals=GetClinicTotals(dataSetDailyProdSplitByClinic);
+				query=report.AddQuery(tableClinicTotals,"Clinic Totals","",SplitByKind.None,2,true);
+				query.AddColumn("Clinic",410,FieldValueType.String,new Font("Tahoma",8));
+				query.AddColumn("Production",75,FieldValueType.Number,new Font("Tahoma",8));
+				query.AddColumn("Adjust",75,FieldValueType.Number,new Font("Tahoma",8));
+				query.AddColumn("Writeoff",75,FieldValueType.Number,new Font("Tahoma",8));
+				query.AddColumn("Pt Income",75,FieldValueType.Number,new Font("Tahoma",8));
+				query.AddColumn("Ins Income",75,FieldValueType.Number,new Font("Tahoma",8));
+			}
+			//Calculate the total production and total income and add them to the bottom of the report:
+			double totalProduction=0;
+			double totalIncome=0;
+			for(int i=0;i<tableDailyProd.Rows.Count;i++) {
+				//Total production is (Production + Adjustments - Writeoffs)
+				totalProduction+=PIn.Double(tableDailyProd.Rows[i]["Production"].ToString());
+				totalProduction+=PIn.Double(tableDailyProd.Rows[i]["Adjust"].ToString());
+				totalProduction+=PIn.Double(tableDailyProd.Rows[i]["Writeoff"].ToString());
+				//Total income is (Pt Income + Ins Income)
+				totalIncome+=PIn.Double(tableDailyProd.Rows[i]["Pt Income"].ToString());
+				totalIncome+=PIn.Double(tableDailyProd.Rows[i]["Ins Income"].ToString());
+			}
+			//Add the Total Production and Total Income to the bottom of the report if there were any rows present.
+			if(tableDailyProd.Rows.Count > 0) {
+				//Use a custom table and add it like it is a "query" to the report because using a group summary would be more complicated due
+				//to the need to add and subtract from multiple columns at the same time.
+				DataTable tableTotals=new DataTable("TotalProdAndInc");
+				tableTotals.Columns.Add("Summary");
+				tableTotals.Rows.Add(Lan.g(this,"Total Production (Production + Adjustments - Writeoffs):")+" "+totalProduction.ToString("c"));
+				tableTotals.Rows.Add(Lan.g(this,"Total Income (Pt Income + Ins Income):")+" "+totalIncome.ToString("c"));
+				//Add tableTotals to the report.
+				//No column name and no header because we want to display this table to NOT look like a table.
+				query=report.AddQuery(tableTotals,"","",SplitByKind.None,2,false);
+				query.AddColumn("",785,FieldValueType.String,new Font("Tahoma",8,FontStyle.Bold));
 			}
 			report.AddPageNum();
 			// execute query
@@ -770,6 +837,37 @@ namespace OpenDental{
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
+		}
+
+		private DataTable GetClinicTotals(DataSet dataSetDailyProdSplitByClinic) {
+			DataTable tableClinicTotals=new DataTable("ClinicTotals");
+			tableClinicTotals.Columns.Add(new DataColumn("Clinic"));
+			tableClinicTotals.Columns.Add(new DataColumn("Production"));
+			tableClinicTotals.Columns.Add(new DataColumn("Adjust"));
+			tableClinicTotals.Columns.Add(new DataColumn("Writeoff"));
+			tableClinicTotals.Columns.Add(new DataColumn("Pt Income"));
+			tableClinicTotals.Columns.Add(new DataColumn("Ins Income"));
+			for(int i=0;i<dataSetDailyProdSplitByClinic.Tables.Count;i++) {
+				string clinicDesc="";
+				if(dataSetDailyProdSplitByClinic.Tables[i].Rows.Count > 0) {
+					clinicDesc=dataSetDailyProdSplitByClinic.Tables[i].Rows[0]["Clinic"].ToString();//Take description of first row.
+				}
+				//Calculate the total production and total income for this clinic.
+				double production=0;
+				double adjust=0;
+				double writeoff=0;
+				double ptIncome=0;
+				double insIncome=0;
+				for(int j=0;j<dataSetDailyProdSplitByClinic.Tables[i].Rows.Count;j++) {
+					production+=PIn.Double(dataSetDailyProdSplitByClinic.Tables[i].Rows[j]["Production"].ToString());
+					adjust+=PIn.Double(dataSetDailyProdSplitByClinic.Tables[i].Rows[j]["Adjust"].ToString());
+					writeoff+=PIn.Double(dataSetDailyProdSplitByClinic.Tables[i].Rows[j]["Writeoff"].ToString());
+					ptIncome+=PIn.Double(dataSetDailyProdSplitByClinic.Tables[i].Rows[j]["Pt Income"].ToString());
+					insIncome+=PIn.Double(dataSetDailyProdSplitByClinic.Tables[i].Rows[j]["Ins Income"].ToString());
+				}
+				tableClinicTotals.Rows.Add(clinicDesc,production,adjust,writeoff,ptIncome,insIncome);
+			}
+			return tableClinicTotals;
 		}
 
 		private void RunMonthly(){
