@@ -234,25 +234,25 @@ namespace OpenDental {
 		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridClaimAdjustments.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridProcedureBreakdown_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Proc proc=(Hx835_Proc)gridProcedureBreakdown.Rows[e.Row].Tag;
 			FormEtrans835ProcEdit form=new FormEtrans835ProcEdit(proc);
-			form.Show();
+			form.Show(this);//This window is just used to display information.
 		}
 
 		private void gridAdjudicationInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Info info=(Hx835_Info)gridAdjudicationInfo.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridSupplementalInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Info info=(Hx835_Info)gridSupplementalInfo.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

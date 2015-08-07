@@ -612,13 +612,13 @@ namespace OpenDental {
 		private void gridClaimAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridClaimAdjustments.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridProcedureBreakdown_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Proc proc=(Hx835_Proc)gridProcedureBreakdown.Rows[e.Row].Tag;
 			FormEtrans835ProcEdit Form=new FormEtrans835ProcEdit(proc);
-			Form.Show();
+			Form.Show(this);//This window is just used to display information.
 		}
 
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
@@ -635,7 +635,7 @@ namespace OpenDental {
 			FormClaimProc FormCP=new FormClaimProc(claimProc,null,_famCur,_patCur,_listPlans,histList,ref loopList,_listPatPlans,false,_listInsSubs);
 			FormCP.IsInClaim=true;
 			//no need to worry about permissions here
-			FormCP.ShowDialog();
+			FormCP.ShowDialog();//Modal because this window can change information.
 			if(FormCP.DialogResult!=DialogResult.OK){
 				return;
 			}
@@ -853,7 +853,7 @@ namespace OpenDental {
 
 		private void butViewEobDetails_Click(object sender,EventArgs e) {
 			FormEtrans835ClaimEdit FormE=new FormEtrans835ClaimEdit(_claimPaid);
-			FormE.ShowDialog();
+			FormE.Show(this);//This window is just used to display information.
 		}
 
 		///<summary>Called when OK is clicked to receive the claim and to set the claim dates and totals properly.

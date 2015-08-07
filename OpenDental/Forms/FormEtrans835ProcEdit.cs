@@ -163,19 +163,19 @@ namespace OpenDental {
 		private void gridProcedureAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Adj adj=(Hx835_Adj)gridProcedureAdjustments.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(adj.AdjCode+" "+adj.AdjustRemarks+"\r\r"+adj.ReasonDescript+"\r\n"+adj.AdjAmt.ToString("f2"));
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridRemarks_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			string remark=(string)gridRemarks.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(remark);
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridSupplementalInfo_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Hx835_Info info=(Hx835_Info)gridSupplementalInfo.Rows[e.Row].Tag;
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(info.FieldName+"\r\n"+info.FieldValue);
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

@@ -576,6 +576,7 @@ namespace OpenDental{
 			this.Name = "FormEtrans835Edit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Electronic Remittance Advice (ERA) - Electronic EOB - Format X12 835";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormEtrans835Edit_FormClosing);
 			this.Load += new System.EventHandler(this.FormEtrans835Edit_Load);
 			this.Resize += new System.EventHandler(this.FormEtrans835Edit_Resize);
 			this.groupBalancing.ResumeLayout(false);

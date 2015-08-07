@@ -21,6 +21,7 @@ namespace OpenDental {
 		private X835 _x835;
 		private decimal _claimInsPaidSum;
 		private decimal _provAdjAmtSum;
+		private static FormEtrans835Edit _form835=null;
 
 		public FormEtrans835Edit() {
 			InitializeComponent();
@@ -28,6 +29,16 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans835Edit_Load(object sender,EventArgs e) {
+			if(_form835!=null && !_form835.IsDisposed) {
+				if(!MsgBox.Show(this,true,"Opening another ERA will close the current ERA you already have open.  Continue?")) {
+					//Form already exists and user wants to keep current instance.
+					TranSetId835=_form835.TranSetId835;
+					EtransCur=_form835.EtransCur;
+					MessageText835=_form835.MessageText835;
+				}
+				_form835.Close();//Always close old form and open new form, so the new copy will come to front, since BringToFront() does not always work.
+			}
+			_form835=this;//Set the static variable to this form because we're always going to show this form even if they're viewing old information.
 			_x835=new X835(MessageText835,TranSetId835);
 			FillAll();
 		}
@@ -200,7 +211,7 @@ namespace OpenDental {
 
 		private void butRawMessage_Click(object sender,EventArgs e) {
 			MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(MessageText835);
-			msgbox.ShowDialog();
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridProviderAdjustments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -211,7 +222,7 @@ namespace OpenDental {
 				+provAdj.ReasonCode+" "+provAdj.ReasonCodeDescript+"\r\n"
 				+provAdj.RefIdentification+"\r\n"
 				+provAdj.AdjAmt.ToString("f2"));
-			msgbox.Show(this);
+			msgbox.Show(this);//This window is just used to display information.
 		}
 
 		private void gridClaimDetails_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -235,7 +246,7 @@ namespace OpenDental {
 				Patient pat=Patients.GetPat(claim.PatNum);
 				Family fam=Patients.GetFamily(claim.PatNum);
 				FormClaimEdit formCE=new FormClaimEdit(claim,pat,fam);
-				formCE.ShowDialog();
+				formCE.ShowDialog();//Modal, because the user could edit information in this window.
 				isReadOnly=false;
 			}
 			else if(Security.IsAuthorized(Permissions.InsPayCreate)) {//Claim found and is not received.  Date not checked here, but it will be checked when actually creating the check.
@@ -244,7 +255,7 @@ namespace OpenDental {
 			}
 			if(isReadOnly) {
 				FormEtrans835ClaimEdit formC=new FormEtrans835ClaimEdit(claimPaid);
-				formC.ShowDialog(this);
+				formC.Show(this);//This window is just used to display information.
 			}
 			else {
 				claim=claimPaid.GetClaimFromDb();//Refresh the claim, since the claim status might have changed above.
@@ -296,7 +307,7 @@ namespace OpenDental {
 					//More than one valid PayPlan.  Cannot show this prompt when entering automatically, because it would disrupt workflow.
 					List<PayPlanCharge> listPayPlanCharges=PayPlanCharges.Refresh(claim.PatNum);
 					FormPayPlanSelect FormPPS=new FormPayPlanSelect(listPayPlans,listPayPlanCharges);
-					FormPPS.ShowDialog();
+					FormPPS.ShowDialog();//Modal because this form allows editing of information.
 					if(FormPPS.DialogResult==DialogResult.OK) {
 						insPayPlanNum=listPayPlans[FormPPS.IndexSelected].PayPlanNum;
 					}
@@ -426,7 +437,7 @@ namespace OpenDental {
 			if(isAutomatic) {
 				FormP.ReceivePayment();
 			}
-			else if(FormP.ShowDialog()!=DialogResult.OK) {
+			else if(FormP.ShowDialog()!=DialogResult.OK) {//Modal because this window can edit information
 				if(cpByTotal.ClaimProcNum!=0) {
 					ClaimProcs.Delete(cpByTotal);
 				}
@@ -440,12 +451,12 @@ namespace OpenDental {
 			}
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[gridClaimDetails.SelectedIndices[0]].Tag;
 			FormEtrans835ClaimEdit formE=new FormEtrans835ClaimEdit(claimPaid);
-			formE.ShowDialog();
+			formE.Show(this);//This window is just used to display information.
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
 			FormEtrans835Print form=new FormEtrans835Print(_x835);
-			form.ShowDialog();
+			form.Show(this);//This window is just used to display information.
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -471,6 +482,10 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 			Close();
+		}
+
+		private void FormEtrans835Edit_FormClosing(object sender,FormClosingEventArgs e) {
+			_form835=null;
 		}
 		
 	}

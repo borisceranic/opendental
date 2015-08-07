@@ -43,7 +43,7 @@ namespace OpenDental {
 			Form835.EtransCur=_etrans;
 			Form835.MessageText835=_messageText835;
 			Form835.TranSetId835=_listEobTranIds[gridEobs.SelectedIndices[0]];
-			Form835.Show();
+			Form835.Show();//Not attached to parent window because the user may have to close parent window to navigate other areas of the program.
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
