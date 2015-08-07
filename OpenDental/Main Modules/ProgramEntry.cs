@@ -11,6 +11,9 @@ namespace OpenDental {
 	static class ProgramEntry {
 		[STAThread]
 		static void Main(string[] args) {
+			//Application.EnableVisualStyles() uses version 6 of comctl32.dll instead of version 5. See https://support.microsoft.com/en-us/kb/2892345
+			//See also http://stackoverflow.com/questions/8335983/accessviolationexception-on-tooltip-that-faults-comctl32-dll-net-4-0
+			Application.EnableVisualStyles();//This line fixes rare AccessViolationExceptions for ToolTips on our ValidDate boxes, ValidDouble boxes, etc...
 			//Register an EventHandler which handles unhandled exceptions.
 			//AppDomain.CurrentDomain.UnhandledException+=new UnhandledExceptionEventHandler(OnUnhandeledExceptionPolicy);
 			bool isSecondInstance=false ;//or more.
