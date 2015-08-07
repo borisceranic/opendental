@@ -65,13 +65,13 @@ namespace OpenDental {
 				col.ImageList=imageListInfoButton;
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn("SNOMED CT",100);
+			col=new ODGridColumn(Lan.g(this,"SNOMED CT"),125);//column width of 125 holds the longest Snomed CT code as of 8/7/15 which is 900000000000002006
 			gridMain.Columns.Add(col);
 			//col=new ODGridColumn("Deprecated",75,HorizontalAlignment.Center);
 			//gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",500);
+			col=new ODGridColumn(Lan.g(this,"Description"),500);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Used By CQM's",75);
+			col=new ODGridColumn(Lan.g(this,"Used By CQM's"),185);//width 185 so all of our CQM measure nums as of 8/7/15 will fit 68,69,74,75,127,138,147,155,165
 			gridMain.Columns.Add(col);
 			//col=new ODGridColumn("Date Of Standard",100);
 			//gridMain.Columns.Add(col);

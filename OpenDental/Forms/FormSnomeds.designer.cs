@@ -45,7 +45,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(864, 625);
+			this.butOK.Location = new System.Drawing.Point(877, 625);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -60,7 +60,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(864, 655);
+			this.butClose.Location = new System.Drawing.Point(877, 655);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -73,7 +73,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textCode.Location = new System.Drawing.Point(180, 10);
 			this.textCode.Name = "textCode";
-			this.textCode.Size = new System.Drawing.Size(399, 20);
+			this.textCode.Size = new System.Drawing.Size(412, 20);
 			this.textCode.TabIndex = 17;
 			// 
 			// label1
@@ -93,7 +93,7 @@ namespace OpenDental{
 			this.butSearch.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSearch.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSearch.CornerRadius = 4F;
-			this.butSearch.Location = new System.Drawing.Point(585, 8);
+			this.butSearch.Location = new System.Drawing.Point(598, 8);
 			this.butSearch.Name = "butSearch";
 			this.butSearch.Size = new System.Drawing.Size(75, 24);
 			this.butSearch.TabIndex = 19;
@@ -105,15 +105,15 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(20, 38);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(817, 641);
+			this.gridMain.Size = new System.Drawing.Size(830, 641);
 			this.gridMain.TabIndex = 20;
 			this.gridMain.Title = "SNOMED CT Codes";
 			this.gridMain.TranslationName = "FormSnomedctCodes";
-			this.gridMain.WrapText = false;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
@@ -138,7 +138,7 @@ namespace OpenDental{
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.butMapICD9);
-			this.groupBox1.Location = new System.Drawing.Point(843, 33);
+			this.groupBox1.Location = new System.Drawing.Point(856, 33);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(115, 50);
 			this.groupBox1.TabIndex = 25;
@@ -155,7 +155,7 @@ namespace OpenDental{
 			// FormSnomeds
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(961, 691);
+			this.ClientSize = new System.Drawing.Size(974, 691);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butSearch);
