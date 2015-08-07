@@ -52,6 +52,10 @@ namespace OpenDental {
 				if(Security.IsAuthorized(Permissions.Setup)) {
 					FormXchargeSetup FormX=new FormXchargeSetup();
 					FormX.ShowDialog();
+					if(FormX.DialogResult==DialogResult.OK) {
+						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
+						prog=Programs.GetCur(ProgramName.Xcharge);
+					}
 				}
 				return;
 			}
@@ -60,11 +64,55 @@ namespace OpenDental {
 				if(Security.IsAuthorized(Permissions.Setup)){
 					FormXchargeSetup FormX=new FormXchargeSetup();
 					FormX.ShowDialog();
+					if(FormX.DialogResult==DialogResult.OK) {
+						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
+						prog=Programs.GetCur(ProgramName.Xcharge);
+					}
 				}
 				return;
 			}
 			#endregion
 			table=CreditCards.GetRecurringChargeList();
+			table.Columns.Add("RepeatChargeAmt");
+			Dictionary<long,double> dictFamBals=new Dictionary<long,double>();//Keeps track of the family balance for each patient
+			//Calculate the repeat charge amount and the amount to be charged for each credit card
+			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0 or patCur==null
+				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
+				Double rptChargeAmt;
+				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
+				string procedures=table.Rows[i]["Procedures"].ToString();
+				Patient patCur=Patients.GetPat(patNum);
+				if(patCur==null) {
+					table.Rows.RemoveAt(i);
+					continue;
+				}
+				if(Prefs.IsODHQ()) {//HQ calculates repeating charges based on the presence of procedures on the patient's account that are linked to the CC
+					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
+					}
+					else {
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
+					}
+					if(table.Rows[i]["PayOrder"].ToString()=="2") {//Repeat charge is from a payment plan
+						famBalTotal+=rptChargeAmt;
+						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+					}
+				}
+				else {//non-HQ calculates repeating charges by the ChargeAmt on the credit card
+					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+				}
+				if(!dictFamBals.ContainsKey(patCur.Guarantor)) {
+					dictFamBals.Add(patCur.Guarantor,famBalTotal);
+				}
+				Double chargeAmt=Math.Min(dictFamBals[patCur.Guarantor],rptChargeAmt);//Charges the lesser of the family balance and the repeat charge amount
+				if(chargeAmt<=0) {
+					table.Rows.RemoveAt(i);
+					continue;
+				}
+				table.Rows[i]["ChargeAmt"]=chargeAmt;
+				table.Rows[i]["RepeatChargeAmt"]=rptChargeAmt;
+				dictFamBals[patCur.Guarantor]-=chargeAmt;//Decrease so the sum of repeating charges on all cards is not greater than the family balance
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableRecurring","PatNum"),110);
@@ -73,50 +121,18 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableRecurring","Total Bal"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","RptChrgAmt"),100,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableRecurring","RepeatingAmt"),100,HorizontalAlignment.Right);//RptChrgAmt
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableRecurring","ChargeAmt"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
-			Dictionary<long,double> dictPatBals=new Dictionary<long,double>();
-			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0
+			for(int i=0;i<table.Rows.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
 				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
-				Double rptChargeAmt;
-				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
-				string procedures=table.Rows[i]["Procedures"].ToString();
-				if(Prefs.IsODHQ()) {
-					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-						Patient patCur=Patients.GetPat(patNum);
-						if(patCur==null) {
-							table.Rows.RemoveAt(i);
-							continue;
-						}
-						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
-					}
-					else {
-						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
-					}
-					if(table.Rows[i]["PayOrder"].ToString()=="2") {
-						famBalTotal+=rptChargeAmt;
-						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-					}
-				}
-				else {
-					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				}
-				if(!dictPatBals.ContainsKey(patNum)) {
-					dictPatBals.Add(patNum,famBalTotal);
-				}
-				Double chargeAmt=Math.Min(dictPatBals[patNum],rptChargeAmt);
-				if(chargeAmt<=0) {
-					table.Rows.RemoveAt(i);
-					continue;
-				}
-				table.Rows[i]["ChargeAmt"]=chargeAmt;
-				dictPatBals[patNum]-=chargeAmt;
-				row.Cells.Add(patNum.ToString());
+				Double chargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+				Double rptChargeAmt=PIn.Double(table.Rows[i]["RepeatChargeAmt"].ToString());
+				row.Cells.Add(table.Rows[i]["PatNum"].ToString());
 				row.Cells.Add(table.Rows[i]["PatName"].ToString());
 				row.Cells.Add(famBalTotal.ToString("c"));
 				row.Cells.Add(rptChargeAmt.ToString("c"));

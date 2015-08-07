@@ -129,7 +129,7 @@ namespace OpenDentBusiness{
 			command+=") due "
 				+"WHERE DateStart<="+DbHelper.Curdate()+" "
 				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
-				+"ORDER BY PatName DESC";
+				+"ORDER BY PatName";
 			table=Db.GetTable(command);
 			FilterRecurringChargeList(table);
 			return table;
