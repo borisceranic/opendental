@@ -1444,7 +1444,7 @@ namespace OpenDental{
 					Form835.EtransCur=et;
 					Form835.MessageText835=messageText835;
 					Form835.TranSetId835="";//Empty string will cause the first EOB in the 835 to display.
-					Form835.ShowDialog();
+					Form835.Show();//Non-modal
 				}
 			}
 			else {
