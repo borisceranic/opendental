@@ -431,8 +431,9 @@ namespace OpenDentBusiness{
 			}
 			command=@"SELECT appointment.PatNum,MIN(appointment.AptDateTime) AS NextVisit 
 				FROM appointment 
-				WHERE appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)+@"
-				AND appointment.AptDateTime>= "+DbHelper.Now();//query for next visits
+				WHERE (appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)
+				+" OR appointment.AptStatus="+POut.Int((int)ApptStatus.ASAP)
+				+") AND appointment.AptDateTime>= "+DbHelper.Now();//query for next visits
 			if(listPatNums.Count>0) {
 				command+=" AND appointment.PatNum IN ("+string.Join(",",listPatNums)+")";
 			}
