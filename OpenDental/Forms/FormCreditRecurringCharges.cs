@@ -20,7 +20,7 @@ namespace OpenDental {
 		private int headingPrintH;
 		private bool headingPrinted;
 		private bool insertPayment;
-		private Program prog;
+		private Program _program;
 		private DateTime nowDateTime;
 		private string xPath;
 
@@ -32,8 +32,8 @@ namespace OpenDental {
 
 		private void FormRecurringCharges_Load(object sender,EventArgs e) {
 			nowDateTime=MiscData.GetNowDateTime();
-			prog=Programs.GetCur(ProgramName.Xcharge);
-			xPath=Programs.GetProgramPath(prog);
+			_program=Programs.GetCur(ProgramName.Xcharge);
+			xPath=Programs.GetProgramPath(_program);
 			labelCharged.Text=Lan.g(this,"Charged=")+"0";
 			labelFailed.Text=Lan.g(this,"Failed=")+"0";
 			FillGrid();
@@ -44,14 +44,18 @@ namespace OpenDental {
 		private void FillGrid() {
 			//Currently only working for X-Charge. If more added then move this check out of FillGrid.
 			#region XCharge Check
-			if(prog==null){
+			if(_program==null){
 				MsgBox.Show(this,"X-Charge entry is missing from the database.");//should never happen
 				return;
 			}
-			if(!prog.Enabled) {
+			if(!_program.Enabled) {
 				if(Security.IsAuthorized(Permissions.Setup)) {
 					FormXchargeSetup FormX=new FormXchargeSetup();
 					FormX.ShowDialog();
+					if(FormX.DialogResult==DialogResult.OK) {
+						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
+						_program=Programs.GetCur(ProgramName.Xcharge);
+					}
 				}
 				return;
 			}
@@ -60,11 +64,55 @@ namespace OpenDental {
 				if(Security.IsAuthorized(Permissions.Setup)){
 					FormXchargeSetup FormX=new FormXchargeSetup();
 					FormX.ShowDialog();
+					if(FormX.DialogResult==DialogResult.OK) {
+						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
+						_program=Programs.GetCur(ProgramName.Xcharge);
+					}
 				}
 				return;
 			}
 			#endregion
 			table=CreditCards.GetRecurringChargeList();
+			table.Columns.Add("RepeatChargeAmt");
+			Dictionary<long,double> dictFamBals=new Dictionary<long,double>();//Keeps track of the family balance for each patient
+			//Calculate the repeat charge amount and the amount to be charged for each credit card
+			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0 or patCur==null
+				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
+				Double rptChargeAmt;
+				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
+				string procedures=table.Rows[i]["Procedures"].ToString();
+				Patient patCur=Patients.GetPat(patNum);
+				if(patCur==null) {
+					table.Rows.RemoveAt(i);
+					continue;
+				}
+				if(Prefs.IsODHQ()) {//HQ calculates repeating charges based on the presence of procedures on the patient's account that are linked to the CC
+					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
+					}
+					else {
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
+					}
+					if(table.Rows[i]["PayOrder"].ToString()=="2") {//Repeat charge is from a payment plan
+						famBalTotal+=rptChargeAmt;
+						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+					}
+				}
+				else {//non-HQ calculates repeating charges by the ChargeAmt on the credit card
+					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+				}
+				if(!dictFamBals.ContainsKey(patCur.Guarantor)) {
+					dictFamBals.Add(patCur.Guarantor,famBalTotal);
+				}
+				Double chargeAmt=Math.Min(dictFamBals[patCur.Guarantor],rptChargeAmt);//Charges the lesser of the family balance and the repeat charge amount
+				if(chargeAmt<=0) {
+					table.Rows.RemoveAt(i);
+					continue;
+				}
+				table.Rows[i]["ChargeAmt"]=chargeAmt;
+				table.Rows[i]["RepeatChargeAmt"]=rptChargeAmt;
+				dictFamBals[patCur.Guarantor]-=chargeAmt;//Decrease so the sum of repeating charges on all cards is not greater than the family balance
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableRecurring","PatNum"),110);
@@ -73,50 +121,18 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableRecurring","Total Bal"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","RptChrgAmt"),100,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableRecurring","RepeatingAmt"),100,HorizontalAlignment.Right);//RptChrgAmt
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableRecurring","ChargeAmt"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
-			Dictionary<long,double> dictPatBals=new Dictionary<long,double>();
-			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0
+			for(int i=0;i<table.Rows.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
 				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
-				Double rptChargeAmt;
-				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
-				string procedures=table.Rows[i]["Procedures"].ToString();
-				if(Prefs.IsODHQ()) {
-					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-						Patient patCur=Patients.GetPat(patNum);
-						if(patCur==null) {
-							table.Rows.RemoveAt(i);
-							continue;
-						}
-						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
-					}
-					else {
-						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
-					}
-					if(table.Rows[i]["PayOrder"].ToString()=="2") {
-						famBalTotal+=rptChargeAmt;
-						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-					}
-				}
-				else {
-					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				}
-				if(!dictPatBals.ContainsKey(patNum)) {
-					dictPatBals.Add(patNum,famBalTotal);
-				}
-				Double chargeAmt=Math.Min(dictPatBals[patNum],rptChargeAmt);
-				if(chargeAmt<=0) {
-					table.Rows.RemoveAt(i);
-					continue;
-				}
-				table.Rows[i]["ChargeAmt"]=chargeAmt;
-				dictPatBals[patNum]-=chargeAmt;
-				row.Cells.Add(patNum.ToString());
+				Double chargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
+				Double rptChargeAmt=PIn.Double(table.Rows[i]["RepeatChargeAmt"].ToString());
+				row.Cells.Add(table.Rows[i]["PatNum"].ToString());
 				row.Cells.Add(table.Rows[i]["PatName"].ToString());
 				row.Cells.Add(famBalTotal.ToString("c"));
 				row.Cells.Add(rptChargeAmt.ToString("c"));
@@ -278,7 +294,7 @@ namespace OpenDental {
 		private void butSend_Click(object sender,EventArgs e) {
 			//Assuming the use of XCharge.  If adding another vendor (PayConnect for example)
 			//make sure to move XCharge validation in FillGrid() to here.
-			if(prog==null) {//Gets filled in FillGrid()
+			if(_program==null) {//Gets filled in FillGrid()
 				return;
 			}
 			if(gridMain.SelectedIndices.Length<1) {
@@ -291,8 +307,8 @@ namespace OpenDental {
 			string recurringResultFile="Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString()+"\r\n\r\n";
 			int failed=0;
 			int success=0;
-			string user=ProgramProperties.GetPropVal(prog.ProgramNum,"Username");
-			string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
+			string user=ProgramProperties.GetPropVal(_program.ProgramNum,"Username");
+			string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(_program.ProgramNum,"Password"));
 			#region Card Charge Loop
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				#region X-Charge
@@ -404,7 +420,7 @@ namespace OpenDental {
 						PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["DateStart"].ToString()));
 					paymentCur.PatNum=patCur.PatNum;
 					paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
-					paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(prog.ProgramNum,"PaymentType"));
+					paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType"));
 					paymentCur.PayAmt=amt;
 					paymentCur.PayNote=resultText;
 					paymentCur.IsRecurringCC=true;
