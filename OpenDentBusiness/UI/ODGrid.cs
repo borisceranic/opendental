@@ -25,6 +25,9 @@ namespace OpenDental.UI {
 		[Category("Action"),Description("Occurs when a cell is double clicked.")]
 		public event ODGridClickEventHandler CellDoubleClick=null;
 		///<summary></summary>
+		[Category("Action"),Description("Occurs when a combo box item is selected.")]
+		public event ODGridClickEventHandler CellSelectionCommitted=null;
+		///<summary></summary>
 		[Category("Action"),Description("Occurs when a cell is single clicked.")]
 		public event ODGridClickEventHandler CellClick=null;
 		///<summary></summary>
@@ -78,6 +81,7 @@ namespace OpenDental.UI {
 		private int noteSpanStart;
 		private int noteSpanStop;
 		private TextBox editBox;
+		private ComboBox comboBox;
 		private MouseButtons lastButtonPressed;
 		private ArrayList selectedIndicesWhenMouseDown;
 		private bool allowSortingByColumn;
@@ -1151,6 +1155,13 @@ namespace OpenDental.UI {
 			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
 			if(CellDoubleClick!=null) {
 				CellDoubleClick(this,gArgs);
+			}
+		}
+
+		protected void OnCellSelectionChangeCommitted(int col,int row) {
+			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
+			if(CellSelectionCommitted!=null) {
+				CellSelectionCommitted(this,gArgs);
 			}
 		}
 
@@ -2491,6 +2502,11 @@ namespace OpenDental.UI {
 					if(editBox!=null) {
 						editBox.Dispose();//a lot happens right here, including a FillGrid() which sets selectedCell to -1,-1
 					}
+					if(comboBox!=null) {
+						//We can only show one combo box at a time because the grid does not limit the number of rows that it shows.
+						//If we were to always show every combo box in a column, we would most likely get a 'too many handles' exception.
+						comboBox.Dispose();
+					}
 					selectedCell=new Point(MouseDownCol,MouseDownRow);
 					if(Columns[selectedCell.X].IsEditable) {
 						CreateEditBox();
@@ -2498,7 +2514,9 @@ namespace OpenDental.UI {
 						//We can guarantee that the user did in fact click on a cell at this point in the mouse down event.
 						OnClick(e);
 					}
-					//}
+					else if(Columns[selectedCell.X].ListDisplayStrings!=null) {
+						CreateComboBox();
+					}
 					break;
 				case GridSelectionMode.MultiExtended:
 					if(ControlIsDown) {
@@ -2551,6 +2569,48 @@ namespace OpenDental.UI {
 			mouseIsDownInHeader=false;
 		}
 
+		///<summary>Creates combo boxes in the appropriate location of the grid so users can select and change them.</summary>
+		private void CreateComboBox() {
+			ODGridCell odGridCell=rows[selectedCell.Y].Cells[selectedCell.X];
+			ODGridColumn odGridColumn=Columns[selectedCell.X];
+			comboBox=new ComboBox();
+			comboBox.FlatStyle=FlatStyle.Popup;
+			comboBox.DropDownStyle=ComboBoxStyle.DropDownList;//Makes it non-editable
+			comboBox.Size=new Size(Columns[selectedCell.X].ColWidth+1,_rowHeights[selectedCell.Y]+1);
+			comboBox.Location=new Point(-hScroll.Value+1+ColPos[selectedCell.X],
+				-vScroll.Value+1+titleHeight+headerHeight+RowLocs[selectedCell.Y]+((_rowHeights[SelectedCell.Y]-comboBox.Size.Height)/2));//Centers the combo box vertically.
+			comboBox.Items.Clear();
+			for(int i=0;i<odGridColumn.ListDisplayStrings.Count;i++) {
+				comboBox.Items.Add(odGridColumn.ListDisplayStrings[i]);
+			}
+			comboBox.SelectedIndex=odGridCell.SelectedIndex;
+			comboBox.SelectionChangeCommitted+=new EventHandler(dropDownBox_SelectionChangeCommitted);
+			comboBox.GotFocus+=new EventHandler(dropDownBox_GotFocus);
+			comboBox.LostFocus+=new EventHandler(dropDownBox_LostFocus);
+			this.Controls.Add(comboBox); 
+			comboBox.Focus();
+			SelectedCellOld=new Point(selectedCell.X,selectedCell.Y);
+		}
+
+		void dropDownBox_GotFocus(object sender,EventArgs e) {
+			OnCellEnter(SelectedCellOld.X,SelectedCellOld.Y);
+		}
+
+		void dropDownBox_LostFocus(object sender,EventArgs e) {
+			ComboBox comboBox=(ComboBox)sender;
+			OnCellLeave(SelectedCellOld.X,SelectedCellOld.Y);
+			if(!comboBox.Disposing || !comboBox.IsDisposed) {
+				comboBox.Dispose();
+				comboBox=null;
+			}
+		}
+
+		void dropDownBox_SelectionChangeCommitted(object sender,EventArgs e) {
+			rows[SelectedCell.Y].Cells[selectedCell.X].Text=comboBox.Items[comboBox.SelectedIndex].ToString();
+			rows[SelectedCell.Y].Cells[selectedCell.X].SelectedIndex=comboBox.SelectedIndex;
+			OnCellSelectionChangeCommitted(SelectedCell.X,selectedCell.Y);
+		}
+
 		///<summary>When selection mode is OneCell, and user clicks in a column that isEditable, then this edit box will appear.  Pass in the location from the click event so that we can determine where to place the text cursor in the box.</summary>
 		private void CreateEditBox() {
 			if(-vScroll.Value+1+titleHeight+headerHeight+RowLocs[selectedCell.Y]+_rowHeights[selectedCell.Y]>this.DisplayRectangle.Bottom) {//If new edit box location is below the display screen
@@ -2594,7 +2654,7 @@ namespace OpenDental.UI {
 
 		void editBox_LostFocus(object sender,EventArgs e) {
 			//editBox_Leave wouldn't catch all scenarios
-			OnCellLeave(SelectedCellOld.X,SelectedCellOld.Y);//this is the only place where OnCellLeave gets called.
+			OnCellLeave(SelectedCellOld.X,SelectedCellOld.Y);
 			if(!editBox.Disposing || !editBox.IsDisposed) {
 				editBox.Dispose();
 				editBox=null;
@@ -2602,7 +2662,7 @@ namespace OpenDental.UI {
 		}
 
 		void editBox_GotFocus(object sender,EventArgs e) {
-			OnCellEnter(SelectedCellOld.X,SelectedCellOld.Y);//this is the only place where OnCellEnter gets called.
+			OnCellEnter(SelectedCellOld.X,SelectedCellOld.Y);
 		}
 
 		void editBox_KeyDown(object sender,KeyEventArgs e) {
