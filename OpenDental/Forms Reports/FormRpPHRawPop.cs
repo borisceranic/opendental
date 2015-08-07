@@ -174,70 +174,32 @@ namespace OpenDental{
 					+"' ";
 			}
 			types+=")";
-			report.Query=@"
-				CREATE TEMPORARY TABLE tempbroken(
-					PatNum bigint unsigned NOT NULL,
-					NumberBroken smallint NOT NULL,
-					PRIMARY KEY (PatNum)
-				);
-				INSERT INTO tempbroken SELECT PatNum,COUNT(*)
-				FROM adjustment WHERE "+types
-				+"AND AdjDate >= "+POut.Date(date1.SelectionStart)+" "
-				+"AND AdjDate <= " +POut.Date(date2.SelectionStart)+" "
-				+@"GROUP BY PatNum;
-				SELECT patient.PatNum,MIN(procedurelog.ProcDate) AS ProcDate,
+			report.Query=@"SELECT patient.PatNum,MIN(procedurelog.ProcDate) AS ProcDate,
 				CONCAT(CONCAT(provider.LName,', '),provider.FName) as ProvName,
 				County,county.CountyCode,
 				site.Description AS gradeschool,site.Note AS schoolCode,GradeLevel,Birthdate,"
 				+DbHelper.GroupConcat("patientrace.Race",true)//distinct races from the patient race table in a comma delimited list of ints
 				+@" Race,Gender,Urgency,BillingType,
-				patient.PlannedIsDone,tempbroken.NumberBroken
+				patient.PlannedIsDone,broken.NumberBroken
 				FROM patient
 				LEFT JOIN patientrace ON patient.PatNum=patientrace.PatNum
 				LEFT JOIN procedurelog ON procedurelog.PatNum=patient.PatNum
 				LEFT JOIN provider ON procedurelog.ProvNum=provider.ProvNum
 				LEFT JOIN site ON patient.SiteNum=site.SiteNum
 				LEFT JOIN county ON patient.County=county.CountyName
-				LEFT JOIN tempbroken ON tempbroken.PatNum=patient.PatNum
+				LEFT JOIN (
+						SELECT PatNum,COUNT(*) NumberBroken
+						FROM adjustment WHERE "+types
+						+"AND AdjDate >= "+POut.Date(date1.SelectionStart)+" "
+						+"AND AdjDate <= " +POut.Date(date2.SelectionStart)+" "
+						+@"GROUP BY PatNum
+				) broken ON broken.PatNum=patient.PatNum
 				WHERE	(procedurelog.ProcStatus='2'
 				AND procedurelog.ProcDate >= "+POut.Date(date1.SelectionStart)+" "
 				+"AND procedurelog.ProcDate <= " +POut.Date(date2.SelectionStart)+" )"
-				+"OR tempbroken.NumberBroken>0 "
+				+"OR broken.NumberBroken>0 "
 				+@"GROUP BY patient.PatNum
-				ORDER By ProcDate;
-				DROP TABLE tempbroken;";
-/*
-CREATE TEMPORARY TABLE tempbroken(
-  PatNum mediumint unsigned NOT NULL,
-  NumberBroken smallint NOT NULL,
-  PRIMARY KEY (PatNum)
-);
-INSERT INTO tempbroken
-SELECT PatNum,COUNT(*)
-FROM adjustment
-WHERE AdjType='14'
-&& AdjDate='2004-05-03'
-GROUP BY PatNum;
-SELECT MIN(procedurelog.ProcDate) AS ProcDate,
-CONCAT(provider.LName,', ',provider.FName) as ProvName,
-County,county.CountyCode,
-GradeSchool,school.SchoolCode,GradeLevel,Birthdate,Race,Gender,Urgency,BillingType,
-patient.NextAptNum='-1' AS Done,tempbroken.NumberBroken
-FROM patient,procedurelog,provider,tempbroken
-LEFT JOIN school ON patient.GradeSchool=school.SchoolName
-LEFT JOIN county ON patient.County=county.CountyName
-WHERE procedurelog.ProcStatus='2'
-&& patient.PatNum=procedurelog.PatNum
-&& procedurelog.ProvNum=provider.ProvNum
-&& tempbroken.PatNum=patient.PatNum
-&& procedurelog.ProcDate >= '2004-05-03'
-&& procedurelog.ProcDate <= '2004-05-03'
-GROUP BY procedurelog.PatNum
-ORDER By ProcDate;
-DROP TABLE tempbroken;
-
-
-*/
+				ORDER By ProcDate;";
 			FormQuery2=new FormQuery(report);
 			FormQuery2.textTitle.Text="RawPopulationData"+DateTime.Today.ToString("MMddyyyy");
 			//FormQuery2.IsReport=true;
