@@ -289,6 +289,7 @@ namespace OpenDental{
 					}
 				}
 			}
+			RefreshAptList();
 			FillGrid();
 			menuRightClick.Items.Clear();
 			menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
@@ -309,35 +310,6 @@ namespace OpenDental{
 
 		private void FillGrid(){
 			Cursor=Cursors.WaitCursor;
-			string order="";
-			switch(comboOrder.SelectedIndex){
-				case 0:
-					order="status";
-					break;
-				case 1:
-					order="alph";
-					break;
-				case 2:
-					order="date";
-					break;
-			}
-			long provNum=0;
-			if(comboProv.SelectedIndex!=0) {
-				provNum=ProviderC.ListShort[comboProv.SelectedIndex-1].ProvNum;
-			}
-			long siteNum=0;
-			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
-				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
-			}
-			long clinicNum=0;
-			//if clinics are not enabled, comboClinic.SelectedIndex will be -1, so clinicNum will be 0 and list will not be filtered by clinic
-			if(Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex>-1) {
-				clinicNum=_listUserClinics[comboClinic.SelectedIndex].ClinicNum;
-			}
-			else if(comboClinic.SelectedIndex > 0) {//if user is not restricted, clinicNum will be 0 and the query will get all clinic data
-				clinicNum=_listUserClinics[comboClinic.SelectedIndex-1].ClinicNum;//if user is not restricted, comboClinic will contain "All" so minus 1
-			}
-			AptList=Appointments.RefreshPlannedTracker(order,provNum,siteNum,clinicNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Patient"),140);
@@ -379,6 +351,38 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
+		private void RefreshAptList() {
+			string order="";
+			switch(comboOrder.SelectedIndex) {
+				case 0:
+					order="status";
+					break;
+				case 1:
+					order="alph";
+					break;
+				case 2:
+					order="date";
+					break;
+			}
+			long provNum=0;
+			if(comboProv.SelectedIndex!=0) {
+				provNum=ProviderC.ListShort[comboProv.SelectedIndex-1].ProvNum;
+			}
+			long siteNum=0;
+			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
+				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
+			}
+			long clinicNum=0;
+			//if clinics are not enabled, comboClinic.SelectedIndex will be -1, so clinicNum will be 0 and list will not be filtered by clinic
+			if(Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex>-1) {
+				clinicNum=_listUserClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			else if(comboClinic.SelectedIndex > 0) {//if user is not restricted, clinicNum will be 0 and the query will get all clinic data
+				clinicNum=_listUserClinics[comboClinic.SelectedIndex-1].ClinicNum;//if user is not restricted, comboClinic will contain "All" so minus 1
+			}
+			AptList=Appointments.RefreshPlannedTracker(order,provNum,siteNum,clinicNum);
+		}
+
 		private void grid_MouseUp(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right) {
 				if(gridMain.SelectedIndices.Length>0) {
@@ -407,8 +411,10 @@ namespace OpenDental{
 			List<long> listAppts=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				listAppts.Add(AptList[gridMain.SelectedIndices[i]].AptNum);//Will only be one unless multiselect is enabled in the future
+				AptList.RemoveAt(gridMain.SelectedIndices[i]);
 			}
 			GotoModule.PinToAppt(listAppts,0);//This will send all appointments in _listAptSelected to the pinboard, and will select the patient attached to the last appointment in _listAptSelected.
+			FillGrid();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -428,6 +434,7 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 			}
 			else {
+				RefreshAptList();
 				FillGrid();
 				gridMain.SetSelected(currentSelection,true);
 				gridMain.ScrollValue=currentScroll;
@@ -435,6 +442,7 @@ namespace OpenDental{
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
+			RefreshAptList();
 			FillGrid();
 		}
 
