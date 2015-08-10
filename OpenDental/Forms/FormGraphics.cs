@@ -32,7 +32,7 @@ namespace OpenDental{
 		private RadioButton radioSimpleChart;
 		private RadioButton radioOpenGLChart;
 		private GroupBox groupFilters;
-		private Label label1;
+		private Label label3DChart;
 		private Label label2;
 		private Label label4;
 		private TextBox textSelected;
@@ -84,7 +84,7 @@ namespace OpenDental{
 			this.textSelected = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
+			this.label3DChart = new System.Windows.Forms.Label();
 			this.groupFilters = new System.Windows.Forms.GroupBox();
 			this.checkAllFormats = new System.Windows.Forms.CheckBox();
 			this.gridFormats = new OpenDental.UI.ODGrid();
@@ -99,9 +99,9 @@ namespace OpenDental{
 			// 
 			// checkHardwareAccel
 			// 
-			this.checkHardwareAccel.Location = new System.Drawing.Point(6,19);
+			this.checkHardwareAccel.Location = new System.Drawing.Point(6, 19);
 			this.checkHardwareAccel.Name = "checkHardwareAccel";
-			this.checkHardwareAccel.Size = new System.Drawing.Size(282,18);
+			this.checkHardwareAccel.Size = new System.Drawing.Size(282, 18);
 			this.checkHardwareAccel.TabIndex = 2;
 			this.checkHardwareAccel.Text = "Hardware Acceleration (checked by default)";
 			this.checkHardwareAccel.UseVisualStyleBackColor = true;
@@ -109,9 +109,9 @@ namespace OpenDental{
 			// 
 			// checkDoubleBuffering
 			// 
-			this.checkDoubleBuffering.Location = new System.Drawing.Point(6,42);
+			this.checkDoubleBuffering.Location = new System.Drawing.Point(6, 42);
 			this.checkDoubleBuffering.Name = "checkDoubleBuffering";
-			this.checkDoubleBuffering.Size = new System.Drawing.Size(282,17);
+			this.checkDoubleBuffering.Size = new System.Drawing.Size(282, 17);
 			this.checkDoubleBuffering.TabIndex = 4;
 			this.checkDoubleBuffering.Text = "Use Double-Buffering";
 			this.checkDoubleBuffering.UseVisualStyleBackColor = true;
@@ -123,55 +123,55 @@ namespace OpenDental{
 			this.group3DToothChart.Controls.Add(this.textSelected);
 			this.group3DToothChart.Controls.Add(this.label3);
 			this.group3DToothChart.Controls.Add(this.label2);
-			this.group3DToothChart.Controls.Add(this.label1);
+			this.group3DToothChart.Controls.Add(this.label3DChart);
 			this.group3DToothChart.Controls.Add(this.groupFilters);
 			this.group3DToothChart.Controls.Add(this.gridFormats);
-			this.group3DToothChart.Location = new System.Drawing.Point(28,91);
+			this.group3DToothChart.Location = new System.Drawing.Point(28, 91);
 			this.group3DToothChart.Name = "group3DToothChart";
-			this.group3DToothChart.Size = new System.Drawing.Size(833,455);
+			this.group3DToothChart.Size = new System.Drawing.Size(833, 455);
 			this.group3DToothChart.TabIndex = 5;
 			this.group3DToothChart.TabStop = false;
 			this.group3DToothChart.Text = "Options For 3D Tooth Chart";
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(60,195);
+			this.label4.Location = new System.Drawing.Point(60, 195);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(608,16);
+			this.label4.Size = new System.Drawing.Size(608, 16);
 			this.label4.TabIndex = 15;
 			this.label4.Text = " Formats are listed from most recommended on top to least recommended on bottom.";
 			// 
 			// textSelected
 			// 
-			this.textSelected.Location = new System.Drawing.Point(6,192);
+			this.textSelected.Location = new System.Drawing.Point(6, 192);
 			this.textSelected.Name = "textSelected";
 			this.textSelected.ReadOnly = true;
-			this.textSelected.Size = new System.Drawing.Size(53,20);
+			this.textSelected.Size = new System.Drawing.Size(53, 20);
 			this.textSelected.TabIndex = 14;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(3,174);
+			this.label3.Location = new System.Drawing.Point(3, 174);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(159,16);
+			this.label3.Size = new System.Drawing.Size(159, 16);
 			this.label3.TabIndex = 13;
 			this.label3.Text = "Currently selected format number";
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(6,131);
+			this.label2.Location = new System.Drawing.Point(6, 131);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(818,45);
+			this.label2.Size = new System.Drawing.Size(818, 45);
 			this.label2.TabIndex = 12;
 			this.label2.Text = resources.GetString("label2.Text");
 			// 
-			// label1
+			// label3DChart
 			// 
-			this.label1.Location = new System.Drawing.Point(9,18);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(818,20);
-			this.label1.TabIndex = 11;
-			this.label1.Text = "Most users will never need to change any of these options.  These are only used w" +
+			this.label3DChart.Location = new System.Drawing.Point(9, 18);
+			this.label3DChart.Name = "label3DChart";
+			this.label3DChart.Size = new System.Drawing.Size(818, 20);
+			this.label3DChart.TabIndex = 11;
+			this.label3DChart.Text = "Most users will never need to change any of these options.  These are only used w" +
     "hen the 3D tooth chart is not working properly.";
 			// 
 			// groupFilters
@@ -179,18 +179,18 @@ namespace OpenDental{
 			this.groupFilters.Controls.Add(this.checkHardwareAccel);
 			this.groupFilters.Controls.Add(this.checkDoubleBuffering);
 			this.groupFilters.Controls.Add(this.checkAllFormats);
-			this.groupFilters.Location = new System.Drawing.Point(6,39);
+			this.groupFilters.Location = new System.Drawing.Point(6, 39);
 			this.groupFilters.Name = "groupFilters";
-			this.groupFilters.Size = new System.Drawing.Size(295,88);
+			this.groupFilters.Size = new System.Drawing.Size(295, 88);
 			this.groupFilters.TabIndex = 10;
 			this.groupFilters.TabStop = false;
 			this.groupFilters.Text = "OpenGL filters for list below";
 			// 
 			// checkAllFormats
 			// 
-			this.checkAllFormats.Location = new System.Drawing.Point(6,64);
+			this.checkAllFormats.Location = new System.Drawing.Point(6, 64);
 			this.checkAllFormats.Name = "checkAllFormats";
-			this.checkAllFormats.Size = new System.Drawing.Size(282,17);
+			this.checkAllFormats.Size = new System.Drawing.Size(282, 17);
 			this.checkAllFormats.TabIndex = 9;
 			this.checkAllFormats.Text = "Show All Formats";
 			this.checkAllFormats.UseVisualStyleBackColor = true;
@@ -198,11 +198,12 @@ namespace OpenDental{
 			// 
 			// gridFormats
 			// 
+			this.gridFormats.HasMultilineHeaders = false;
 			this.gridFormats.HScrollVisible = false;
-			this.gridFormats.Location = new System.Drawing.Point(6,226);
+			this.gridFormats.Location = new System.Drawing.Point(6, 226);
 			this.gridFormats.Name = "gridFormats";
 			this.gridFormats.ScrollValue = 0;
-			this.gridFormats.Size = new System.Drawing.Size(821,223);
+			this.gridFormats.Size = new System.Drawing.Size(821, 223);
 			this.gridFormats.TabIndex = 8;
 			this.gridFormats.Title = "Available Graphics Formats";
 			this.gridFormats.TranslationName = null;
@@ -210,9 +211,9 @@ namespace OpenDental{
 			// 
 			// radioSimpleChart
 			// 
-			this.radioSimpleChart.Location = new System.Drawing.Point(34,36);
+			this.radioSimpleChart.Location = new System.Drawing.Point(34, 36);
 			this.radioSimpleChart.Name = "radioSimpleChart";
-			this.radioSimpleChart.Size = new System.Drawing.Size(146,19);
+			this.radioSimpleChart.Size = new System.Drawing.Size(146, 19);
 			this.radioSimpleChart.TabIndex = 6;
 			this.radioSimpleChart.TabStop = true;
 			this.radioSimpleChart.Text = "Use Simple Tooth Chart";
@@ -221,9 +222,9 @@ namespace OpenDental{
 			// 
 			// radioOpenGLChart
 			// 
-			this.radioOpenGLChart.Location = new System.Drawing.Point(34,56);
+			this.radioOpenGLChart.Location = new System.Drawing.Point(34, 56);
 			this.radioOpenGLChart.Name = "radioOpenGLChart";
-			this.radioOpenGLChart.Size = new System.Drawing.Size(242,19);
+			this.radioOpenGLChart.Size = new System.Drawing.Size(242, 19);
 			this.radioOpenGLChart.TabIndex = 7;
 			this.radioOpenGLChart.TabStop = true;
 			this.radioOpenGLChart.Text = "Use OpenGL Tooth Chart";
@@ -232,9 +233,9 @@ namespace OpenDental{
 			// 
 			// radioDirectXChart
 			// 
-			this.radioDirectXChart.Location = new System.Drawing.Point(34,15);
+			this.radioDirectXChart.Location = new System.Drawing.Point(34, 15);
 			this.radioDirectXChart.Name = "radioDirectXChart";
-			this.radioDirectXChart.Size = new System.Drawing.Size(233,19);
+			this.radioDirectXChart.Size = new System.Drawing.Size(233, 19);
 			this.radioDirectXChart.TabIndex = 8;
 			this.radioDirectXChart.TabStop = true;
 			this.radioDirectXChart.Text = "Use DirectX Tooth Chart (recommended)";
@@ -243,38 +244,38 @@ namespace OpenDental{
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(684,557);
+			this.butOK.Location = new System.Drawing.Point(684, 557);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(786,557);
+			this.butCancel.Location = new System.Drawing.Point(786, 557);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// FormGraphics
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(892,594);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(892, 594);
 			this.Controls.Add(this.radioDirectXChart);
 			this.Controls.Add(this.radioOpenGLChart);
 			this.Controls.Add(this.radioSimpleChart);
@@ -324,6 +325,14 @@ namespace OpenDental{
 				radioOpenGLChart.Checked=true;
 				group3DToothChart.Enabled=true;
 				groupFilters.Enabled=true;
+			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				radioDirectXChart.Text="Use DirectX Graphics (recommended)";
+				radioSimpleChart.Text="Use Simple Graphics";
+				radioOpenGLChart.Text="Use OpenGL Graphics";
+				group3DToothChart.Text="Options For 3D Graphics";
+				label3DChart.Text="Most users will never need to change any of these options.  These are only used when the 3D graphics are not working "
+					+"properly.";
 			}
 			RefreshFormats();
 		}
