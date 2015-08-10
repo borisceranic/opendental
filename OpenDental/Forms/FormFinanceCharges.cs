@@ -34,6 +34,12 @@ namespace OpenDental{
 		private ValidDouble textBillingCharge;
 		private RadioButton radioBillingCharge;
 		private RadioButton radioFinanceCharge;
+		private Label label12;
+		private Label label11;
+		private ValidDouble textOver;
+		private ValidDouble textAtLeast;
+		private Label labelOver;
+		private Label labelAtLeast;
 		private Label label7;
 		//private int adjType;
 
@@ -78,10 +84,16 @@ namespace OpenDental{
 			this.listBillType = new System.Windows.Forms.ListBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textOver = new OpenDental.ValidDouble();
+			this.textAtLeast = new OpenDental.ValidDouble();
+			this.labelOver = new System.Windows.Forms.Label();
+			this.labelAtLeast = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
+			this.radioFinanceCharge = new System.Windows.Forms.RadioButton();
 			this.textBillingCharge = new OpenDental.ValidDouble();
 			this.radioBillingCharge = new System.Windows.Forms.RadioButton();
-			this.radioFinanceCharge = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.panel1.SuspendLayout();
@@ -109,7 +121,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.radio90);
 			this.groupBox1.Controls.Add(this.radio60);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(58, 154);
+			this.groupBox1.Location = new System.Drawing.Point(58, 205);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(167, 98);
 			this.groupBox1.TabIndex = 16;
@@ -178,7 +190,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(69, 14);
+			this.label2.Location = new System.Drawing.Point(67, 46);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(80, 14);
 			this.label2.TabIndex = 22;
@@ -187,7 +199,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(196, 14);
+			this.label3.Location = new System.Drawing.Point(194, 46);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(12, 14);
 			this.label3.TabIndex = 23;
@@ -196,7 +208,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(214, 14);
+			this.label4.Location = new System.Drawing.Point(212, 46);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(102, 14);
 			this.label4.TabIndex = 24;
@@ -204,7 +216,7 @@ namespace OpenDental{
 			// 
 			// textAPR
 			// 
-			this.textAPR.Location = new System.Drawing.Point(149, 11);
+			this.textAPR.Location = new System.Drawing.Point(147, 43);
 			this.textAPR.MaxVal = 255;
 			this.textAPR.MinVal = 0;
 			this.textAPR.Name = "textAPR";
@@ -289,32 +301,109 @@ namespace OpenDental{
 			// 
 			// panel1
 			// 
+			this.panel1.Controls.Add(this.label12);
+			this.panel1.Controls.Add(this.label11);
+			this.panel1.Controls.Add(this.textOver);
+			this.panel1.Controls.Add(this.textAtLeast);
+			this.panel1.Controls.Add(this.labelOver);
+			this.panel1.Controls.Add(this.labelAtLeast);
 			this.panel1.Controls.Add(this.label8);
-			this.panel1.Controls.Add(this.textBillingCharge);
-			this.panel1.Controls.Add(this.radioBillingCharge);
 			this.panel1.Controls.Add(this.radioFinanceCharge);
 			this.panel1.Controls.Add(this.label2);
+			this.panel1.Controls.Add(this.textBillingCharge);
 			this.panel1.Controls.Add(this.textAPR);
 			this.panel1.Controls.Add(this.label3);
+			this.panel1.Controls.Add(this.radioBillingCharge);
 			this.panel1.Controls.Add(this.label4);
 			this.panel1.Location = new System.Drawing.Point(58, 68);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(319, 70);
+			this.panel1.Size = new System.Drawing.Size(319, 131);
 			this.panel1.TabIndex = 34;
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(135, 73);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(12, 14);
+			this.label12.TabIndex = 38;
+			this.label12.Text = "$";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(135, 100);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(12, 14);
+			this.label11.TabIndex = 37;
+			this.label11.Text = "$";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textOver
+			// 
+			this.textOver.BackColor = System.Drawing.SystemColors.Window;
+			this.textOver.Location = new System.Drawing.Point(147, 97);
+			this.textOver.MaxVal = 100000000D;
+			this.textOver.MinVal = -100000000D;
+			this.textOver.Name = "textOver";
+			this.textOver.Size = new System.Drawing.Size(42, 20);
+			this.textOver.TabIndex = 36;
+			// 
+			// textAtLeast
+			// 
+			this.textAtLeast.BackColor = System.Drawing.SystemColors.Window;
+			this.textAtLeast.Location = new System.Drawing.Point(147, 70);
+			this.textAtLeast.MaxVal = 100000000D;
+			this.textAtLeast.MinVal = -100000000D;
+			this.textAtLeast.Name = "textAtLeast";
+			this.textAtLeast.Size = new System.Drawing.Size(42, 20);
+			this.textAtLeast.TabIndex = 35;
+			// 
+			// labelOver
+			// 
+			this.labelOver.Location = new System.Drawing.Point(28, 99);
+			this.labelOver.Name = "labelOver";
+			this.labelOver.Size = new System.Drawing.Size(95, 14);
+			this.labelOver.TabIndex = 33;
+			this.labelOver.Text = "Only if over";
+			this.labelOver.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// labelAtLeast
+			// 
+			this.labelAtLeast.Location = new System.Drawing.Point(28, 73);
+			this.labelAtLeast.Name = "labelAtLeast";
+			this.labelAtLeast.Size = new System.Drawing.Size(95, 14);
+			this.labelAtLeast.TabIndex = 34;
+			this.labelAtLeast.Text = "Charge at least";
+			this.labelAtLeast.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(136, 42);
+			this.label8.Location = new System.Drawing.Point(135, 14);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(12, 14);
 			this.label8.TabIndex = 28;
 			this.label8.Text = "$";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// radioFinanceCharge
+			// 
+			this.radioFinanceCharge.AutoSize = true;
+			this.radioFinanceCharge.Checked = true;
+			this.radioFinanceCharge.Location = new System.Drawing.Point(11, 44);
+			this.radioFinanceCharge.Name = "radioFinanceCharge";
+			this.radioFinanceCharge.Size = new System.Drawing.Size(100, 17);
+			this.radioFinanceCharge.TabIndex = 0;
+			this.radioFinanceCharge.TabStop = true;
+			this.radioFinanceCharge.Text = "Finance Charge";
+			this.radioFinanceCharge.UseVisualStyleBackColor = true;
+			this.radioFinanceCharge.CheckedChanged += new System.EventHandler(this.radioFinanceCharge_CheckedChanged);
+			// 
 			// textBillingCharge
 			// 
 			this.textBillingCharge.BackColor = System.Drawing.SystemColors.Window;
-			this.textBillingCharge.Location = new System.Drawing.Point(149, 39);
+			this.textBillingCharge.Location = new System.Drawing.Point(147, 12);
+			this.textBillingCharge.MaxVal = 100000000D;
+			this.textBillingCharge.MinVal = -100000000D;
 			this.textBillingCharge.Name = "textBillingCharge";
 			this.textBillingCharge.ReadOnly = true;
 			this.textBillingCharge.Size = new System.Drawing.Size(42, 20);
@@ -323,7 +412,7 @@ namespace OpenDental{
 			// radioBillingCharge
 			// 
 			this.radioBillingCharge.AutoSize = true;
-			this.radioBillingCharge.Location = new System.Drawing.Point(13, 40);
+			this.radioBillingCharge.Location = new System.Drawing.Point(11, 12);
 			this.radioBillingCharge.Name = "radioBillingCharge";
 			this.radioBillingCharge.Size = new System.Drawing.Size(89, 17);
 			this.radioBillingCharge.TabIndex = 1;
@@ -331,19 +420,6 @@ namespace OpenDental{
 			this.radioBillingCharge.Text = "Billing Charge";
 			this.radioBillingCharge.UseVisualStyleBackColor = true;
 			this.radioBillingCharge.CheckedChanged += new System.EventHandler(this.radioBillingCharge_CheckedChanged);
-			// 
-			// radioFinanceCharge
-			// 
-			this.radioFinanceCharge.AutoSize = true;
-			this.radioFinanceCharge.Checked = true;
-			this.radioFinanceCharge.Location = new System.Drawing.Point(13, 12);
-			this.radioFinanceCharge.Name = "radioFinanceCharge";
-			this.radioFinanceCharge.Size = new System.Drawing.Size(100, 17);
-			this.radioFinanceCharge.TabIndex = 0;
-			this.radioFinanceCharge.TabStop = true;
-			this.radioFinanceCharge.Text = "Finance Charge";
-			this.radioFinanceCharge.UseVisualStyleBackColor = true;
-			this.radioFinanceCharge.CheckedChanged += new System.EventHandler(this.radioFinanceCharge_CheckedChanged);
 			// 
 			// FormFinanceCharges
 			// 
@@ -412,19 +488,29 @@ namespace OpenDental{
 				radioFinanceCharge.Checked = true;
 				textDateLastRun.Text = PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
 				textDateUndo.Text = PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
+				textBillingCharge.ReadOnly=true;
+				textBillingCharge.BackColor=System.Drawing.SystemColors.Control;
 			}
 			else if (defaultChargeMethod == "Billing") {
 				radioBillingCharge.Checked = true;
 				textDateLastRun.Text = PrefC.GetDate(PrefName.BillingChargeLastRun).ToShortDateString();
 				textDateUndo.Text = PrefC.GetDate(PrefName.BillingChargeLastRun).ToShortDateString();
 			}
+			textAtLeast.Text=PrefC.GetString(PrefName.FinanceChargeAtLeast);
+			textOver.Text=PrefC.GetString(PrefName.FinanceChargeOnlyIfOver);
 		}
 
 		private void radioFinanceCharge_CheckedChanged(object sender, EventArgs e) {
-			textBillingCharge.ReadOnly = true;
-			textBillingCharge.BackColor = System.Drawing.SystemColors.Control;
 			textAPR.ReadOnly = false;
 			textAPR.BackColor = System.Drawing.SystemColors.Window;
+			textAtLeast.ReadOnly=false;
+			textAtLeast.BackColor = System.Drawing.SystemColors.Window;
+			labelAtLeast.Enabled=true;
+			textOver.ReadOnly=false;
+			textOver.BackColor = System.Drawing.SystemColors.Window;
+			labelOver.Enabled=true;
+			textBillingCharge.ReadOnly = true;
+			textBillingCharge.BackColor = System.Drawing.SystemColors.Control;
 			textDateLastRun.Text = PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
 			textDateUndo.Text = PrefC.GetDate(PrefName.FinanceChargeLastRun).ToShortDateString();
 		}
@@ -432,6 +518,12 @@ namespace OpenDental{
 		private void radioBillingCharge_CheckedChanged(object sender, EventArgs e) {
 			textAPR.ReadOnly = true;
 			textAPR.BackColor = System.Drawing.SystemColors.Control;
+			textAtLeast.ReadOnly=true;
+			textAtLeast.BackColor = System.Drawing.SystemColors.Control;
+			labelAtLeast.Enabled=false;
+			textOver.ReadOnly=true;
+			textOver.BackColor = System.Drawing.SystemColors.Control;
+			labelOver.Enabled=false;
 			textBillingCharge.ReadOnly = false;
 			textBillingCharge.BackColor = System.Drawing.SystemColors.Window;
 			textDateLastRun.Text = PrefC.GetDate(PrefName.BillingChargeLastRun).ToShortDateString();
@@ -465,7 +557,9 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,System.EventArgs e) {
 			if(textDate.errorProvider1.GetError(textDate)!=""
-				|| textAPR.errorProvider1.GetError(textAPR)!="") {
+				|| textAPR.errorProvider1.GetError(textAPR)!=""
+				|| textAtLeast.errorProvider1.GetError(textAtLeast)!=""
+				|| textOver.errorProvider1.GetError(textOver)!="") {
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
@@ -503,10 +597,10 @@ namespace OpenDental{
 				OverallBalance = 0;//this WILL NOT be the same as the patient's total balance
 				if(radio30.Checked) {
 					OverallBalance = AgingList[i].Bal_31_60 + AgingList[i].Bal_61_90 + AgingList[i].BalOver90;
-				} 
+				}
 				else if(radio60.Checked) {
 					OverallBalance = AgingList[i].Bal_61_90 + AgingList[i].BalOver90;
-				} 
+				}
 				else if(radio90.Checked) {
 					OverallBalance = AgingList[i].BalOver90;
 				}
@@ -524,8 +618,10 @@ namespace OpenDental{
 					continue;
 				}
 				if(radioFinanceCharge.Checked) {
-					AddFinanceCharge(AgingList[i].PatNum,date,textAPR.Text,OverallBalance,AgingList[i].PriProv);
-				} 
+					if(!AddFinanceCharge(AgingList[i].PatNum,date,textAPR.Text,textAtLeast.Text,textOver.Text,OverallBalance,AgingList[i].PriProv)) {
+						continue;
+					}
+				}
 				else if(radioBillingCharge.Checked) {
 					AddBillingCharge(AgingList[i].PatNum,date,textBillingCharge.Text,AgingList[i].PriProv);
 				}
@@ -533,7 +629,9 @@ namespace OpenDental{
 			}
 			if(radioFinanceCharge.Checked) {
 				if(Prefs.UpdateString(PrefName.FinanceChargeAPR,textAPR.Text) 
-					| Prefs.UpdateString(PrefName.FinanceChargeLastRun,POut.Date(date,false)))
+					| Prefs.UpdateString(PrefName.FinanceChargeLastRun,POut.Date(date,false))
+					| Prefs.UpdateString(PrefName.FinanceChargeAtLeast,textAtLeast.Text)
+					| Prefs.UpdateString(PrefName.FinanceChargeOnlyIfOver,textOver.Text))
 				{
 					DataValid.SetInvalid(InvalidType.Prefs);
 				}
@@ -559,7 +657,8 @@ namespace OpenDental{
 			}
 		}
 
-		private void AddFinanceCharge(long PatNum,DateTime date,string APR,double OverallBalance,long PriProv) {
+		/// <summary>Returns true if a finance charge is added, false if one is not added</summary>
+		private bool AddFinanceCharge(long PatNum,DateTime date,string APR,string atLeast,string ifOver,double OverallBalance,long PriProv) {
 			InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(PatNum);
 			if(installPlan!=null) {//Patient has an installment plan so use that APR instead.
 				APR=installPlan.APR.ToString();
@@ -572,8 +671,16 @@ namespace OpenDental{
 			AdjustmentCur.AdjType = PrefC.GetLong(PrefName.FinanceChargeAdjustmentType);
 			AdjustmentCur.AdjNote = "";//"Finance Charge";
 			AdjustmentCur.AdjAmt = Math.Round(((PIn.Double(APR) * .01d / 12d) * OverallBalance),2);
+			if(AdjustmentCur.AdjAmt<PIn.Double(ifOver)) {
+				//Don't add the charge if it is less than FinanceChargeOnlyIfOver; if the charge is exactly equal to FinanceChargeOnlyIfOver,
+				//the charge will be added. Ex., AdjAmt=2.00 and FinanceChargeOnlyIfOver=2.00, the charge will be added.
+				return false;
+			}							 
+			//Add an amount that is at least the amount of FinanceChargeAtLeast 
+			AdjustmentCur.AdjAmt=Math.Max(AdjustmentCur.AdjAmt,PIn.Double(atLeast));
 			AdjustmentCur.ProvNum = PriProv;
 			Adjustments.Insert(AdjustmentCur);
+			return true;
 		}
 
 		private void AddBillingCharge(long PatNum,DateTime date,string BillingChargeAmount,long PriProv) {
