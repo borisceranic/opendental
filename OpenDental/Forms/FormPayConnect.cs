@@ -23,6 +23,7 @@ namespace OpenDental {
 		private string receiptStr;
 		private PayConnectService.transType trantype=PayConnectService.transType.SALE;
 		private CreditCard CreditCardCur;
+		private PayConnectService.creditCardRequest _request;
 
 		///<summary>Can handle CreditCard being null.</summary>
 		public FormPayConnect(Payment payment,Patient pat,string amount,CreditCard creditCard) {
@@ -148,6 +149,12 @@ namespace OpenDental {
 		public PayConnectService.transResponse Response {
 			get{ return response; }
 		}
+
+		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
+		public PayConnectService.creditCardRequest Request {
+			get { return _request; }
+		}
+
 
 		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
 		public string ReceiptStr {
@@ -344,16 +351,16 @@ namespace OpenDental {
 				expYear=CreditCardCur.PayConnectTokenExp.Year;
 				expMonth=CreditCardCur.PayConnectTokenExp.Month;
 			}
-			PayConnectService.creditCardRequest request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
+			_request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
 				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,trantype,refNumber,checkSaveToken.Checked);
-			response=Bridges.PayConnect.ProcessCreditCard(request);
+			response=Bridges.PayConnect.ProcessCreditCard(_request);
 			if(response==null || response.Status.code!=0) {//error in transaction
 				Cursor=Cursors.Default;
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
 			if(trantype==PayConnectService.transType.SALE && response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
-				receiptStr=BuildReceiptString(request,response);
+				receiptStr=BuildReceiptString(_request,response);
 				PrintReceipt(receiptStr);
 			}
 			if(!PrefC.GetBool(PrefName.StoreCCnumbers) && !checkSaveToken.Checked) {//not storing the card number or the token

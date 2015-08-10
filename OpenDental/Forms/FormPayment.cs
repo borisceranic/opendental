@@ -93,12 +93,15 @@ namespace OpenDental {
 		private Program prog;
 		private ProgramProperty prop;
 		private CheckBox checkRecurring;
-		private bool payConnectWarn;
 		private List<CreditCard> creditCards;
 		private CheckBox checkBalanceGroupByProv;
 		private UI.Button butSplitManage;
 		///<summary>The local override path or normal path for X-Charge.</summary>
 		private string xPath;
+		///<summary>Set to true when X-Charge or PayConnect makes a successful transaction, except for voids.</summary>
+		private bool _wasCreditCardSuccessful;
+		private PayConnectService.creditCardRequest _payConnectRequest;
+		private Payment _paymentOld;
 
 		///<summary>PatCur and FamCur are not for the PatCur of the payment.  They are for the patient and family from which this window was accessed.</summary>
 		public FormPayment(Patient patCur,Family famCur,Payment paymentCur) {
@@ -109,6 +112,7 @@ namespace OpenDental {
 			Lan.F(this);
 			panelXcharge.ContextMenu=contextMenuXcharge;
 			butPayConnect.ContextMenu=contextMenuPayConnect;
+			_paymentOld=paymentCur.Clone();
 		}
 
 		///<summary></summary>
@@ -512,6 +516,7 @@ namespace OpenDental {
 			// 
 			// gridBal
 			// 
+			this.gridBal.HasMultilineHeaders = false;
 			this.gridBal.HScrollVisible = false;
 			this.gridBal.Location = new System.Drawing.Point(588, 234);
 			this.gridBal.Name = "gridBal";
@@ -525,6 +530,7 @@ namespace OpenDental {
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(7, 234);
 			this.gridMain.Name = "gridMain";
@@ -741,7 +747,6 @@ namespace OpenDental {
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment";
-			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormPayment_Closing);
 			this.Load += new System.EventHandler(this.FormPayment_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -1417,6 +1422,7 @@ namespace OpenDental {
 			string xChargeToken="";
 			string accountMasked="";
 			string expiration="";
+			_wasCreditCardSuccessful=false;
 			try {
 				using(TextReader reader=new StreamReader(resultfile)) {
 					line=reader.ReadLine();
@@ -1454,6 +1460,9 @@ namespace OpenDental {
 							}
 							if(tranType==7) {
 								xVoid=true;
+							}
+							else { //If the transaction is not a void transaction, we will void this transaction if the user hits Cancel
+								_wasCreditCardSuccessful=true;
 							}
 						}
 						if(line.StartsWith("APPROVEDAMOUNT=")) {
@@ -1511,26 +1520,28 @@ namespace OpenDental {
 				return;
 			}
 			if(showApprovedAmtNotice && !xVoid && !xAdjust && !xReturn) {
-				MessageBox.Show(Lan.g(this,"The amount you typed in: ")+amt.ToString("C")
-					+"\r\n"+Lan.g(this,"does not match the approved amount returned: ")+approvedAmt.ToString("C")
+				MessageBox.Show(Lan.g(this,"The amount you typed in")+": "+amt.ToString("C")
+					+"\r\n"+Lan.g(this,"does not match the approved amount returned")+": "+approvedAmt.ToString("C")
 					+"\r\n"+Lan.g(this,"The amount will be changed to reflect the approved amount charged."),"Alert",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
 					textAmount.Text=approvedAmt.ToString("F");
 			}
 			if(xAdjust) {
-				MessageBox.Show(Lan.g(this,"The amount will be changed to the X-Charge approved amount: ")+approvedAmt.ToString("C"));
+				MessageBox.Show(Lan.g(this,"The amount will be changed to the X-Charge approved amount")+": "+approvedAmt.ToString("C"));
 				textNote.Text="";
 				textAmount.Text=approvedAmt.ToString("F");
 			}
 			else if(xReturn) {
 				textAmount.Text="-"+approvedAmt.ToString("F");
 			}
-			else if(xVoid) {
-				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"The void was successful, remove this payment entry from Open Dental?")) {
-					butDeleteAll_Click(sender,e);
-				}
+			else if(xVoid) {//Close FormPayment window now so the user will not have the option to hit Cancel
+				textAmount.Text="-"+approvedAmt.ToString("F");
+				textNote.Text+=resulttext;
+				SavePaymentToDb();
+				DialogResult=DialogResult.OK;
+				return;
 			}
 			if(additionalFunds>0) {
-				MessageBox.Show(Lan.g(this,"Additional funds required: ")+additionalFunds.ToString("C"));
+				MessageBox.Show(Lan.g(this,"Additional funds required")+": "+additionalFunds.ToString("C"));
 			}
 			if(textNote.Text!="") {
 				textNote.Text+="\r\n";
@@ -1571,6 +1582,79 @@ namespace OpenDental {
 			}
 			Thread.Sleep(200);//Wait 2/10 second to give time for file to be created.
 			Cursor=Cursors.Default;
+			//Next, record the voided payment within Open Dental.  We use to delete the payment but Nathan wants us to negate voids with another payment.
+			string resulttext="";
+			string line="";
+			bool showApprovedAmtNotice=false;
+			double approvedAmt=0;
+			Payment voidPayment=PaymentCur.Clone();
+			voidPayment.PayAmt*=-1;//the negation of the original amount
+			try {
+				using(TextReader reader=new StreamReader(resultfile)) {
+					line=reader.ReadLine();
+					/*Example of successful void transaction:
+						RESULT=SUCCESS
+						TYPE=Void
+						APPROVALCODE=000000
+						SWIPED=F
+						CLERK=Admin
+						XCACCOUNTID=XAWpQPwLm7MXZ
+						XCTRANSACTIONID=15042616
+						ACCOUNT=XXXXXXXXXXXX6781
+						EXPIRATION=1215
+						ACCOUNTTYPE=VISA
+						APPROVEDAMOUNT=11.00
+					*/
+					while(line!=null) {
+						if(resulttext!="") {
+							resulttext+="\r\n";
+						}
+						resulttext+=line;
+						if(line.StartsWith("RESULT=")) {
+							if(line!="RESULT=SUCCESS") {
+								//Void was a failure and there might be a description as to why it failed. Continue to loop through line.
+								while(line!=null) {
+									line=reader.ReadLine();
+									resulttext+="\r\n"+line;
+								}
+								break;
+							}
+						}
+						if(line.StartsWith("APPROVEDAMOUNT=")) {
+							approvedAmt=PIn.Double(line.Substring(15));
+							if(approvedAmt != PaymentCur.PayAmt) {
+								showApprovedAmtNotice=true;
+							}
+						}
+						line=reader.ReadLine();
+					}
+				}
+			}
+			catch {
+				MessageBox.Show(Lan.g(this,"There was a problem voiding this transaction.")+"\r\n"
+					+Lan.g(this,"Please run the credit card report from inside X-Charge to verify that the transaction was voided.")+"\r\n"
+					+Lan.g(this,"If the transaction was not voided, please create a new payment to void the transaction."));
+				return;
+			}
+			if(showApprovedAmtNotice) {
+				MessageBox.Show(Lan.g(this,"The amount of the original transaction")+": "+PaymentCur.PayAmt.ToString("C")
+					+"\r\n"+Lan.g(this,"does not match the approved amount returned")+": "+approvedAmt.ToString("C")
+					+"\r\n"+Lan.g(this,"The amount will be changed to reflect the approved amount charged."),"Alert",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+				voidPayment.PayAmt=approvedAmt;
+			}
+			if(textNote.Text!="") {
+				textNote.Text+="\r\n";
+			}
+			voidPayment.PayNote=resulttext;
+			voidPayment.PayNum=Payments.Insert(voidPayment);
+			for(int i=0;i<SplitList.Count;i++) {//Modify the paysplits for the original transaction to work for the void transaction
+				PaySplit split=SplitList[i].Copy();
+				split.SplitAmt*=-1;
+				split.PayNum=voidPayment.PayNum;
+				PaySplits.Insert(split);
+			}
+			SecurityLogs.MakeLogEntry(Permissions.PaymentCreate,voidPayment.PatNum,
+				Patients.GetLim(voidPayment.PatNum).GetNameLF()+", "+voidPayment.PayAmt.ToString("c"));
 		}
 
 		private bool HasXCharge() {
@@ -1703,7 +1787,12 @@ namespace OpenDental {
 				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
 					Lan.g(this,"Status")+": "+FormP.Response.Status.description;
 				if(FormP.Response.Status.code==0) { //The transaction succeeded.
-					payConnectWarn=true;//Show a warning if user cancels out of window.
+					if(FormP.TranType!=PayConnectService.transType.VOID) {
+						_wasCreditCardSuccessful=true; //Will void the transaction if user cancels out of window.
+					}
+					else {
+						_wasCreditCardSuccessful=false;
+					}
 					textNote.Text+=Environment.NewLine
 						+Lan.g(this,"Amount")+": "+FormP.AmountCharged+Environment.NewLine
 						+Lan.g(this,"Auth Code")+": "+FormP.Response.AuthCode+Environment.NewLine
@@ -1720,12 +1809,56 @@ namespace OpenDental {
 						textAmount.Text=FormP.AmountCharged;
 						PaymentCur.Receipt=FormP.ReceiptStr; //There is only a receipt when a sale takes place.
 					}
+					if(FormP.TranType==PayConnectService.transType.VOID) {//Close FormPayment window now so the user will not have the option to hit Cancel
+						SavePaymentToDb();
+						DialogResult=DialogResult.OK;
+						return;
+					}
+					_payConnectRequest=FormP.Request;
 				}
+				_paymentOld.PayNote=textNote.Text;
+				Payments.Update(_paymentOld,true);
 			}
 			if(FormP.Response==null || FormP.Response.Status.code!=0) { //The transaction failed.
 				if(FormP.TranType==PayConnectService.transType.SALE || FormP.TranType==PayConnectService.transType.AUTH) {
 					textAmount.Text=FormP.AmountCharged;//Preserve the amount so the user can try the payment again more easily.
 				}
+			}
+		}
+
+		private void VoidPayConnectTransaction(string refNum,string amount) {
+			if(_payConnectRequest==null) {
+				MsgBox.Show(this,"This credit card payment has already been processed and will have to be voided manually through the web interface.");
+				return;
+			}
+			Cursor=Cursors.WaitCursor;
+			_payConnectRequest.TransType=PayConnectService.transType.VOID;
+			_payConnectRequest.RefNumber=refNum;
+			_payConnectRequest.Amount=PIn.Decimal(amount);
+			PayConnectService.transResponse response=Bridges.PayConnect.ProcessCreditCard(_payConnectRequest);
+			Cursor=Cursors.Default;
+			if(response==null || response.Status.code!=0) {//error in transaction
+				MsgBox.Show(this,"This credit card payment has already been processed and will have to be voided manually through the web interface.");
+				return;
+			}
+			else {//Record a new payment for the voided transaction
+				Payment voidPayment=PaymentCur.Clone();
+				voidPayment.PayAmt*=-1; //The negated amount of the original payment
+				voidPayment.Receipt=""; //Only SALE transactions have receipts
+				voidPayment.PayNote=Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),PayConnectService.transType.VOID)
+					+Environment.NewLine+Lan.g(this,"Status")+": "+response.Status.description+Environment.NewLine
+					+Lan.g(this,"Amount")+": "+voidPayment.PayAmt+Environment.NewLine
+					+Lan.g(this,"Auth Code")+": "+response.AuthCode+Environment.NewLine
+					+Lan.g(this,"Ref Number")+": "+response.RefNumber;
+				voidPayment.PayNum=Payments.Insert(voidPayment);
+				for(int i=0;i<SplitList.Count;i++) {//Modify the paysplits for the original transaction to work for the void transaction
+					PaySplit split=SplitList[i].Copy();
+					split.SplitAmt*=-1;
+					split.PayNum=voidPayment.PayNum;
+					PaySplits.Insert(split);
+				}
+				SecurityLogs.MakeLogEntry(Permissions.PaymentCreate,voidPayment.PatNum,
+					Patients.GetLim(voidPayment.PatNum).GetNameLF()+", "+voidPayment.PayAmt.ToString("c"));
 			}
 		}
 
@@ -1853,7 +1986,7 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
-		private void butOK_Click(object sender,System.EventArgs e) {
+		private void SavePaymentToDb() {
 			if(textDate.errorProvider1.GetError(textDate)!=""
 				|| textAmount.errorProvider1.GetError(textAmount)!="") {
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
@@ -2052,55 +2185,95 @@ namespace OpenDental {
 					Patients.GetLim(PaymentCur.PatNum).GetNameLF()+", "
 					+PaymentCur.PayAmt.ToString("c"));
 			}
+		}
+
+		private void butOK_Click(object sender,System.EventArgs e) {
+			SavePaymentToDb();
 			DialogResult=DialogResult.OK;
 			Plugins.HookAddCode(this,"FormPayment.butOK_Click_end",PaymentCur,SplitList);
 		}
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
-			DialogResult=DialogResult.Cancel;
-		}
-
-		private void FormPayment_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
-			if(DialogResult==DialogResult.OK) {
+			if(!IsNew) {
+				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(payConnectWarn) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"The credit card payment that was already processed will have to be voided manually through the web interface.  Continue anyway?")) {
-					e.Cancel=true;
-					return;
-				}
-			}
-			if(IsNew) {
+			//New payment
+			if(!_wasCreditCardSuccessful) {//not a credit card payment that has already been processed
 				Payments.Delete(PaymentCur);
-				//Void the transaction in X-Charge if there was one.
-				string transactionID="";
-				string amount="";
-				bool isDebit=false;
-				string[] noteSplit=Regex.Split(textNote.Text,"\r\n");
-				foreach(string XCTrans in noteSplit) {
-					if(XCTrans.StartsWith("XCTRANSACTIONID=")) {
-						transactionID=XCTrans.Substring(16);
-					}
-					if(XCTrans.StartsWith("APPROVEDAMOUNT=")) {
-						amount=XCTrans.Substring(15);
-					}
-					if(XCTrans.StartsWith("TYPE=")) {
-						if(XCTrans.Substring(5)=="Debit Purchase") {
-							isDebit=true;
-						}
-					}
+				DialogResult=DialogResult.Cancel;
+				return;
+			}
+			//New payment and a successful CC payment
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This will void the transaction that has just been completed. Are you sure you want to continue?")) {
+				DialogResult=DialogResult.None;
+				return;
+			}
+			//Save the credit card transaction as a new payment
+			PaymentCur.PayAmt=PIn.Double(textAmount.Text);//handles blank
+			PaymentCur.PayDate=PIn.Date(textDate.Text);
+			PaymentCur.CheckNum=textCheckNum.Text;
+			PaymentCur.BankBranch=textBankBranch.Text;
+			PaymentCur.IsRecurringCC=false;
+			PaymentCur.PayNote=textNote.Text;
+			if(checkPayTypeNone.Checked) {
+				PaymentCur.PayType=0;
+			}
+			else {
+				PaymentCur.PayType=DefC.Short[(int)DefCat.PaymentTypes][listPayType.SelectedIndex].DefNum;
+			}
+			if(SplitList.Count==0) {
+				AddOneSplit();
+			}
+			if(SplitList.Count>1) {
+				PaymentCur.IsSplit=true;
+			}
+			else {
+				PaymentCur.IsSplit=false;
+			}
+			try {
+				Payments.Update(PaymentCur,true);
+			}
+			catch(ApplicationException ex) {//this catches bad dates.
+				MessageBox.Show(ex.Message);
+				return;
+			}
+			//Set all DatePays the same.
+			for(int i=0;i<SplitList.Count;i++) {
+				SplitList[i].DatePay=PaymentCur.PayDate;
+			}
+			PaySplits.UpdateList(SplitListOld,SplitList);
+			SecurityLogs.MakeLogEntry(Permissions.PaymentCreate,PaymentCur.PatNum,
+				Patients.GetLim(PaymentCur.PatNum).GetNameLF()+", "+PaymentCur.PayAmt.ToString("c"));
+			string refNum="";
+			string amount="";
+			string transactionID="";
+			bool isDebit=false;
+			string[] arrayTrans=textNote.Text.Replace("\r\n","\n").Replace("\r","\n").Split(new string[] { "\n" },StringSplitOptions.RemoveEmptyEntries);
+			for(int i=0;i<arrayTrans.Length;i++) {
+				if(arrayTrans[i].StartsWith("Amount: ")) {
+					amount=arrayTrans[i].Substring(8);
 				}
-				if(transactionID!="") {
-					if(HasXCharge()) {
-						VoidXChargeTransaction(transactionID,amount,isDebit);
-					}
+				if(arrayTrans[i].StartsWith("Ref Number: ")) {
+					refNum=arrayTrans[i].Substring(12);
+				}
+				if(arrayTrans[i].StartsWith("XCTRANSACTIONID=")) {
+					transactionID=arrayTrans[i].Substring(16);
+				}
+				if(arrayTrans[i].StartsWith("APPROVEDAMOUNT=")) {
+					amount=arrayTrans[i].Substring(15);
+				}
+				if(arrayTrans[i].StartsWith("TYPE=") && arrayTrans[i].Substring(5)=="Debit Purchase") {
+					isDebit=true;
 				}
 			}
-			//else if(PaymentCur.PayAmt!=tot){
-			//	MessageBox.Show(Lan.g(this,"Splits have been altered.  Payment must match splits."));
-			//	e.Cancel=true;
-			//	return;
-			//}	
+			if(refNum!="") {//Void the PayConnect transaction if there is one
+				VoidPayConnectTransaction(refNum,amount);
+			}
+			else if(transactionID!="" && HasXCharge()) {//Void the X-Charge transaction if there is one
+				VoidXChargeTransaction(transactionID,amount,isDebit);
+			}
+			DialogResult=DialogResult.Cancel;
 		}
 
 

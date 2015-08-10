@@ -39,7 +39,9 @@ namespace OpenDentBusiness{
 		///<summary>True if this was an automatically added recurring CC charge rather then one entered by the user.  This was set to true for all historical entries before version 11.1, but will be accurate after that.</summary>
 		public bool IsRecurringCC;
 
-
+		public Payment Clone() {
+			return (Payment)this.MemberwiseClone();
+		}
 		
 
 	}
