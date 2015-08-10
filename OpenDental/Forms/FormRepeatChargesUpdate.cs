@@ -321,7 +321,7 @@ namespace OpenDental{
 				monthAdd=1;
 			}
 			if(dateStop.Year>1880) {
-				retVal.RemoveAll(x => x >= dateStop.AddMonths(monthAdd));
+				retVal.RemoveAll(x => x > dateStop.AddMonths(monthAdd));
 			}
 			return retVal;
 		}
