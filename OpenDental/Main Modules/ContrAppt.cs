@@ -57,7 +57,7 @@ namespace OpenDental {
 		public static long SheetClickedonOp;
 		///<summary></summary>
 		public static int SheetClickedonHour;
-		///<summary></summary>
+		///<summary>The exact minute the user clicked on within the hour.  E.g. 58</summary>
 		public static int SheetClickedonMin;
 		private System.Drawing.Printing.PrintDocument pd2;
 		private OpenDental.UI.Button butBack;
@@ -5472,6 +5472,10 @@ namespace OpenDental {
 			}
 			Schedule SchedCur=new Schedule();
 			SchedCur.SchedDate=AppointmentL.DateSelected;
+			//Get the closest time in regards to the Appt View Time Increment preference.  Round the time down.
+			int minutes=(int)((ContrAppt.SheetClickedonMin/ApptDrawing.MinPerIncr)*ApptDrawing.MinPerIncr);
+			SchedCur.StartTime=new TimeSpan(ContrAppt.SheetClickedonHour,minutes,0);
+			SchedCur.StopTime=new TimeSpan(ContrAppt.SheetClickedonHour,minutes,0);
 			if(ApptDrawing.IsWeeklyView) {
 				SchedCur.SchedDate=WeekStartDate.AddDays(SheetClickedonDay);
 			}
