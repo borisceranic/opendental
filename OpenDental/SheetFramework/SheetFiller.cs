@@ -1962,8 +1962,7 @@ namespace OpenDental{
 		private static void FillFieldsForStatement(Sheet sheet,Statement Stmt) {
 			Patient pat=Patients.GetPat(sheet.PatNum);
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
-			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
+			DataSet dataSet=AccountModules.GetStatementDataSet(Stmt);
 			DataTable tableAppt=dataSet.Tables["appts"];
 			if(tableAppt==null){
 				tableAppt=new DataTable();	
@@ -2015,13 +2014,13 @@ namespace OpenDental{
 						field.FieldValue=totInsBalLabsHelper(sheet,Stmt)[2];
 						break;
 					case "totalValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[0];
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[0];
 						break;
 					case "insEstValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[1];
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[1];
 						break;
 					case "balanceValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt)[2];
+						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[2];
 						break;
 					case "amountDueValue":
 						try {
@@ -2032,7 +2031,7 @@ namespace OpenDental{
 						}
 						break;
 					case "payPlanAmtDueValue":
-						DataTable tableMisc=AccountModules.GetStatementDataSet(Stmt).Tables["misc"];
+						DataTable tableMisc=dataSet.Tables["misc"];
 						if(tableMisc==null){
 							tableMisc=new DataTable();	
 						}
@@ -2639,12 +2638,12 @@ namespace OpenDental{
 		}
 
 		///<summary>Returns three value strings: Total, Insurance, Balance. These values change based on various settings.</summary>
-		private static string[] totInsBalValsHelper(Sheet sheet,Statement Stmt) {
+		private static string[] totInsBalValsHelper(Sheet sheet,Statement Stmt,DataSet stmtData) {
 			string sLine1="";//Total
 			string sLine2="";//InsExt
 			string sLine3="";//Balance
-			DataTable tableAcct; 
-			DataSet dataSet=AccountModules.GetAccount(Stmt.PatNum,Stmt.DateRangeFrom,Stmt.DateRangeTo,Stmt.Intermingled,Stmt.SinglePatient,Stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),Stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
+			DataTable tableAcct;
+			DataSet dataSet=stmtData;
 			DataTable tableMisc=dataSet.Tables["misc"];
 			if(tableMisc==null) {
 				tableMisc=new DataTable();
