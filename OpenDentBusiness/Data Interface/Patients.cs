@@ -2518,6 +2518,7 @@ FROM insplan";
 
 		///<summary>Validate password against strong password rules. Currently only used for patient portal passwords. Requirements: 8 characters, 1 uppercase character, 1 lowercase character, 1 number. Returns non-empty string if validation failed. Return string will be translated.</summary>
 		public static string IsPortalPasswordValid(string newPassword) {
+			//No need to check RemotingRole; no call to db.
 			if(newPassword.Length<8) {
 				return Lans.g("FormPatientPortal","Password must be at least 8 characters long.");
 			}
@@ -2535,6 +2536,9 @@ FROM insplan";
 
 		///<summary>Returns a distinct list of PatNums for guarantors that have any family member with passed in clinics, or have had work done at passed in clinics.</summary>
 		public static string GetClinicGuarantors(string clinicNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<string>(MethodBase.GetCurrentMethod(),clinicNums);
+			}
 			string clinicGuarantors="";
 			//Get guarantor of patients with clinic from comma delimited list
 			string command="SELECT DISTINCT Guarantor FROM patient WHERE ClinicNum IN ("+clinicNums+")";
@@ -2560,6 +2564,14 @@ FROM insplan";
 				clinicGuarantors+=PIn.String(table.Rows[i]["Guarantor"].ToString());
 			}
 			return clinicGuarantors;
+		}
+
+		public static List<Patient> GetPatsByEmailAddress(string emailAddress) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),emailAddress);
+			}
+			string command="SELECT * FROM patient WHERE Email LIKE '%"+POut.String(emailAddress)+"%'";
+			return Crud.PatientCrud.SelectMany(command);
 		}
 	}
 

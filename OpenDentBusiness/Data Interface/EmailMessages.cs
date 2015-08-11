@@ -845,18 +845,13 @@ namespace OpenDentBusiness{
 					}
 				}
 			}
-			//TODO:
-			//if(emailMessage.PatNum==0) {
-			//	string[] arrayEmailToAddresses=emailMessage.ToAddress.Split(',');
-			//	List <string> listEmailToAddresses=new List<string>();
-			//	for(int i=0;i<arrayEmailToAddresses.Length;i++) {
-			//		listEmailToAddresses.Add(GetAddressSimple(arrayEmailToAddresses[i]));
-			//	}
-			//	List <Patient> listPatsMatched=null;//=Patients.GetPatsByEmailAddresses(listEmailToAddresses);
-			//	if(listPatsMatched.Count==1) {
-			//		emailMessage.PatNum=listPatsMatched[0].PatNum;
-			//	}
-			//}
+			if(emailMessage.PatNum==0) {//If a patient match was not already found, try to locate patient based on the email address sent from.
+				string emailFromAddress=GetAddressSimple(emailMessage.FromAddress); 
+				List<Patient> listMatchedPats=Patients.GetPatsByEmailAddress(emailFromAddress);
+				if(listMatchedPats.Count==1) {//If multiple matches, then we do not want to mislead the user by assigning a patient.
+					emailMessage.PatNum=listMatchedPats[0].PatNum;
+				}
+			}
 			if(emailMessageNum==0) {
 				EmailMessages.Insert(emailMessage);//Also inserts all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
 			}
