@@ -63,11 +63,16 @@ namespace OpenDental{
 		private UI.Button butView;
 		private TextBox textEobIsScanned;
 		private UI.Button butAttach;
-		private TextBox textShow;
+		private TextBox textCarrier;
 		private Label label9;
 		private UI.Button butRefresh;
 		private Label label10;
 		private TextBox textPayType;
+		private TextBox textFName;
+		private TextBox textLName;
+		private Label label11;
+		private Label label12;
+		private GroupBox groupFilters;
 		///<summary>Set to true if the batch list was accessed originally by going through a claim.  This disables the GotoAccount feature.  It also causes OK/Cancel buttons to show so that user can cancel out of a brand new check creation.</summary>
 		public bool IsFromClaim;
 
@@ -103,17 +108,11 @@ namespace OpenDental{
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.textCarrierName = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
-			this.gridAttached = new OpenDental.UI.ODGrid();
 			this.labelDateIssued = new System.Windows.Forms.Label();
 			this.textClinic = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.textPayType = new System.Windows.Forms.TextBox();
-			this.textDateIssued = new OpenDental.ValidDate();
-			this.butClaimPayEdit = new OpenDental.UI.Button();
-			this.textAmount = new OpenDental.ValidDouble();
-			this.textDate = new OpenDental.ValidDate();
-			this.gridOut = new OpenDental.UI.ODGrid();
 			this.labelInstruct1 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
 			this.labelInstruct2 = new System.Windows.Forms.Label();
@@ -123,8 +122,13 @@ namespace OpenDental{
 			this.menuItemGotoOut = new System.Windows.Forms.MenuItem();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textEobIsScanned = new System.Windows.Forms.TextBox();
-			this.textShow = new System.Windows.Forms.TextBox();
+			this.textCarrier = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
+			this.textFName = new System.Windows.Forms.TextBox();
+			this.textLName = new System.Windows.Forms.TextBox();
+			this.label11 = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.groupFilters = new System.Windows.Forms.GroupBox();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
 			this.textTotal = new OpenDental.ValidDouble();
@@ -133,9 +137,16 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butDetach = new OpenDental.UI.Button();
+			this.gridOut = new OpenDental.UI.ODGrid();
+			this.textDateIssued = new OpenDental.ValidDate();
+			this.butClaimPayEdit = new OpenDental.UI.Button();
+			this.textAmount = new OpenDental.ValidDouble();
+			this.textDate = new OpenDental.ValidDate();
+			this.gridAttached = new OpenDental.UI.ODGrid();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
+			this.groupFilters.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textBankBranch
@@ -238,22 +249,6 @@ namespace OpenDental{
 			this.label7.Text = "Carrier Name";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// gridAttached
-			// 
-			this.gridAttached.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridAttached.HScrollVisible = false;
-			this.gridAttached.Location = new System.Drawing.Point(230, 125);
-			this.gridAttached.Name = "gridAttached";
-			this.gridAttached.ScrollValue = 0;
-			this.gridAttached.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridAttached.Size = new System.Drawing.Size(732, 226);
-			this.gridAttached.TabIndex = 95;
-			this.gridAttached.Title = "Attached to this Payment";
-			this.gridAttached.TranslationName = "TableClaimPaySplits";
-			this.gridAttached.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttached_CellDoubleClick);
-			this.gridAttached.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridAttached_MouseUp);
-			// 
 			// labelDateIssued
 			// 
 			this.labelDateIssued.Location = new System.Drawing.Point(12, 65);
@@ -318,65 +313,6 @@ namespace OpenDental{
 			this.textPayType.Size = new System.Drawing.Size(97, 20);
 			this.textPayType.TabIndex = 98;
 			// 
-			// textDateIssued
-			// 
-			this.textDateIssued.Location = new System.Drawing.Point(110, 61);
-			this.textDateIssued.Name = "textDateIssued";
-			this.textDateIssued.ReadOnly = true;
-			this.textDateIssued.Size = new System.Drawing.Size(68, 20);
-			this.textDateIssued.TabIndex = 96;
-			this.textDateIssued.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// butClaimPayEdit
-			// 
-			this.butClaimPayEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClaimPayEdit.Autosize = true;
-			this.butClaimPayEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClaimPayEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClaimPayEdit.CornerRadius = 4F;
-			this.butClaimPayEdit.Location = new System.Drawing.Point(650, 78);
-			this.butClaimPayEdit.Name = "butClaimPayEdit";
-			this.butClaimPayEdit.Size = new System.Drawing.Size(75, 24);
-			this.butClaimPayEdit.TabIndex = 6;
-			this.butClaimPayEdit.Text = "Edit";
-			this.butClaimPayEdit.Click += new System.EventHandler(this.butClaimPayEdit_Click);
-			// 
-			// textAmount
-			// 
-			this.textAmount.Location = new System.Drawing.Point(110, 82);
-			this.textAmount.MaxVal = 100000000D;
-			this.textAmount.MinVal = -100000000D;
-			this.textAmount.Name = "textAmount";
-			this.textAmount.ReadOnly = true;
-			this.textAmount.Size = new System.Drawing.Size(68, 20);
-			this.textAmount.TabIndex = 0;
-			this.textAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textDate
-			// 
-			this.textDate.Location = new System.Drawing.Point(110, 40);
-			this.textDate.Name = "textDate";
-			this.textDate.ReadOnly = true;
-			this.textDate.Size = new System.Drawing.Size(68, 20);
-			this.textDate.TabIndex = 3;
-			this.textDate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// gridOut
-			// 
-			this.gridOut.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridOut.HScrollVisible = false;
-			this.gridOut.Location = new System.Drawing.Point(230, 387);
-			this.gridOut.Name = "gridOut";
-			this.gridOut.ScrollValue = 0;
-			this.gridOut.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridOut.Size = new System.Drawing.Size(732, 243);
-			this.gridOut.TabIndex = 99;
-			this.gridOut.Title = "All Outstanding Claims";
-			this.gridOut.TranslationName = "TableClaimPaySplits";
-			this.gridOut.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridOut_CellDoubleClick);
-			this.gridOut.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridOut_MouseUp);
-			// 
 			// labelInstruct1
 			// 
 			this.labelInstruct1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -389,7 +325,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(701, 362);
+			this.label8.Location = new System.Drawing.Point(772, 347);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(92, 16);
 			this.label8.TabIndex = 36;
@@ -445,21 +381,68 @@ namespace OpenDental{
 			this.textEobIsScanned.Size = new System.Drawing.Size(72, 20);
 			this.textEobIsScanned.TabIndex = 110;
 			// 
-			// textShow
+			// textCarrier
 			// 
-			this.textShow.Location = new System.Drawing.Point(359, 359);
-			this.textShow.Name = "textShow";
-			this.textShow.Size = new System.Drawing.Size(132, 20);
-			this.textShow.TabIndex = 112;
+			this.textCarrier.Location = new System.Drawing.Point(101, 15);
+			this.textCarrier.Name = "textCarrier";
+			this.textCarrier.Size = new System.Drawing.Size(132, 20);
+			this.textCarrier.TabIndex = 112;
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(313, 361);
+			this.label9.Location = new System.Drawing.Point(6, 17);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(46, 16);
+			this.label9.Size = new System.Drawing.Size(95, 16);
 			this.label9.TabIndex = 113;
-			this.label9.Text = "Show";
+			this.label9.Text = "Carrier";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textFName
+			// 
+			this.textFName.Location = new System.Drawing.Point(582, 15);
+			this.textFName.Name = "textFName";
+			this.textFName.Size = new System.Drawing.Size(132, 20);
+			this.textFName.TabIndex = 114;
+			// 
+			// textLName
+			// 
+			this.textLName.Location = new System.Drawing.Point(341, 15);
+			this.textLName.Name = "textLName";
+			this.textLName.Size = new System.Drawing.Size(132, 20);
+			this.textLName.TabIndex = 113;
+			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(479, 16);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(103, 16);
+			this.label11.TabIndex = 117;
+			this.label11.Text = "First Name";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(235, 17);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(106, 16);
+			this.label12.TabIndex = 118;
+			this.label12.Text = "Last Name";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// groupFilters
+			// 
+			this.groupFilters.Controls.Add(this.textCarrier);
+			this.groupFilters.Controls.Add(this.label12);
+			this.groupFilters.Controls.Add(this.label9);
+			this.groupFilters.Controls.Add(this.label11);
+			this.groupFilters.Controls.Add(this.textLName);
+			this.groupFilters.Controls.Add(this.textFName);
+			this.groupFilters.Location = new System.Drawing.Point(230, 367);
+			this.groupFilters.Name = "groupFilters";
+			this.groupFilters.Size = new System.Drawing.Size(732, 45);
+			this.groupFilters.TabIndex = 119;
+			this.groupFilters.TabStop = false;
+			this.groupFilters.Text = "Filters";
 			// 
 			// butRefresh
 			// 
@@ -469,7 +452,7 @@ namespace OpenDental{
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
 			this.butRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butRefresh.Location = new System.Drawing.Point(494, 357);
+			this.butRefresh.Location = new System.Drawing.Point(487, 341);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(54, 24);
 			this.butRefresh.TabIndex = 114;
@@ -485,7 +468,7 @@ namespace OpenDental{
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(271, 357);
+			this.butDown.Location = new System.Drawing.Point(271, 341);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(39, 24);
 			this.butDown.TabIndex = 104;
@@ -494,7 +477,7 @@ namespace OpenDental{
 			// 
 			// textTotal
 			// 
-			this.textTotal.Location = new System.Drawing.Point(792, 359);
+			this.textTotal.Location = new System.Drawing.Point(863, 344);
 			this.textTotal.MaxVal = 100000000D;
 			this.textTotal.MinVal = -100000000D;
 			this.textTotal.Name = "textTotal";
@@ -512,7 +495,7 @@ namespace OpenDental{
 			this.butAttach.CornerRadius = 4F;
 			this.butAttach.Image = global::OpenDental.Properties.Resources.up;
 			this.butAttach.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAttach.Location = new System.Drawing.Point(554, 357);
+			this.butAttach.Location = new System.Drawing.Point(547, 341);
 			this.butAttach.Name = "butAttach";
 			this.butAttach.Size = new System.Drawing.Size(71, 24);
 			this.butAttach.TabIndex = 111;
@@ -558,7 +541,7 @@ namespace OpenDental{
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(230, 357);
+			this.butUp.Location = new System.Drawing.Point(230, 341);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(39, 24);
 			this.butUp.TabIndex = 103;
@@ -574,12 +557,89 @@ namespace OpenDental{
 			this.butDetach.CornerRadius = 4F;
 			this.butDetach.Image = global::OpenDental.Properties.Resources.down;
 			this.butDetach.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDetach.Location = new System.Drawing.Point(627, 357);
+			this.butDetach.Location = new System.Drawing.Point(620, 341);
 			this.butDetach.Name = "butDetach";
 			this.butDetach.Size = new System.Drawing.Size(71, 24);
 			this.butDetach.TabIndex = 101;
 			this.butDetach.Text = "Detach";
 			this.butDetach.Click += new System.EventHandler(this.butDetach_Click);
+			// 
+			// gridOut
+			// 
+			this.gridOut.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridOut.HasMultilineHeaders = false;
+			this.gridOut.HScrollVisible = false;
+			this.gridOut.Location = new System.Drawing.Point(230, 418);
+			this.gridOut.Name = "gridOut";
+			this.gridOut.ScrollValue = 0;
+			this.gridOut.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridOut.Size = new System.Drawing.Size(732, 212);
+			this.gridOut.TabIndex = 99;
+			this.gridOut.Title = "All Outstanding Claims";
+			this.gridOut.TranslationName = "TableClaimPaySplits";
+			this.gridOut.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridOut_CellDoubleClick);
+			this.gridOut.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridOut_MouseUp);
+			// 
+			// textDateIssued
+			// 
+			this.textDateIssued.Location = new System.Drawing.Point(110, 61);
+			this.textDateIssued.Name = "textDateIssued";
+			this.textDateIssued.ReadOnly = true;
+			this.textDateIssued.Size = new System.Drawing.Size(68, 20);
+			this.textDateIssued.TabIndex = 96;
+			this.textDateIssued.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// butClaimPayEdit
+			// 
+			this.butClaimPayEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClaimPayEdit.Autosize = true;
+			this.butClaimPayEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClaimPayEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClaimPayEdit.CornerRadius = 4F;
+			this.butClaimPayEdit.Location = new System.Drawing.Point(650, 78);
+			this.butClaimPayEdit.Name = "butClaimPayEdit";
+			this.butClaimPayEdit.Size = new System.Drawing.Size(75, 24);
+			this.butClaimPayEdit.TabIndex = 6;
+			this.butClaimPayEdit.Text = "Edit";
+			this.butClaimPayEdit.Click += new System.EventHandler(this.butClaimPayEdit_Click);
+			// 
+			// textAmount
+			// 
+			this.textAmount.Location = new System.Drawing.Point(110, 82);
+			this.textAmount.MaxVal = 100000000D;
+			this.textAmount.MinVal = -100000000D;
+			this.textAmount.Name = "textAmount";
+			this.textAmount.ReadOnly = true;
+			this.textAmount.Size = new System.Drawing.Size(68, 20);
+			this.textAmount.TabIndex = 0;
+			this.textAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textDate
+			// 
+			this.textDate.Location = new System.Drawing.Point(110, 40);
+			this.textDate.Name = "textDate";
+			this.textDate.ReadOnly = true;
+			this.textDate.Size = new System.Drawing.Size(68, 20);
+			this.textDate.TabIndex = 3;
+			this.textDate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// gridAttached
+			// 
+			this.gridAttached.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridAttached.HasMultilineHeaders = false;
+			this.gridAttached.HScrollVisible = false;
+			this.gridAttached.Location = new System.Drawing.Point(230, 125);
+			this.gridAttached.Name = "gridAttached";
+			this.gridAttached.ScrollValue = 0;
+			this.gridAttached.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridAttached.Size = new System.Drawing.Size(732, 209);
+			this.gridAttached.TabIndex = 95;
+			this.gridAttached.Title = "Attached to this Payment";
+			this.gridAttached.TranslationName = "TableClaimPaySplits";
+			this.gridAttached.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttached_CellDoubleClick);
+			this.gridAttached.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridAttached_MouseUp);
 			// 
 			// butDelete
 			// 
@@ -617,10 +677,9 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 676);
+			this.Controls.Add(this.groupFilters);
 			this.Controls.Add(this.butRefresh);
-			this.Controls.Add(this.textShow);
 			this.Controls.Add(this.butDown);
-			this.Controls.Add(this.label9);
 			this.Controls.Add(this.textTotal);
 			this.Controls.Add(this.butAttach);
 			this.Controls.Add(this.textEobIsScanned);
@@ -648,6 +707,8 @@ namespace OpenDental{
 			this.Load += new System.EventHandler(this.FormClaimPayEdit_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			this.groupFilters.ResumeLayout(false);
+			this.groupFilters.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -660,6 +721,7 @@ namespace OpenDental{
 				labelInstruct1.Visible=false;
 				labelInstruct2.Visible=false;
 				gridOut.Visible=false;
+				groupFilters.Visible=false;
 				butAttach.Visible=false;
 			}
 			else {
@@ -667,7 +729,7 @@ namespace OpenDental{
 				butClose.Text=Lan.g(this,"Close");
 			}
 			FillClaimPayment();
-			textShow.Text=textCarrierName.Text;
+			textCarrier.Text=textCarrierName.Text;
 			FillGrids();
 			if(ClaimPaymentCur.IsPartial){
 				//an incomplete payment that's not yet locked
@@ -683,6 +745,7 @@ namespace OpenDental{
 				//someone with permission can double click on the top grid to edit amounts and can edit the object fields as well.
 				butDetach.Visible=false;
 				gridOut.Visible=false;
+				groupFilters.Visible=false;
 				labelInstruct1.Visible=false;
 				labelInstruct2.Visible=false;
 				butAttach.Visible=false;
@@ -764,7 +827,7 @@ namespace OpenDental{
 			//gridOutstanding-------------------------------------------------------------------------------------------------
 			int scrollValue=gridOut.ScrollValue;
 			int selectedIdx=gridOut.GetSelectedIndex();
-			ClaimsOutstanding=Claims.GetOutstandingClaims(textShow.Text);
+			ClaimsOutstanding=Claims.GetOutstandingClaims(textCarrier.Text,textLName.Text,textFName.Text);
 			gridOut.BeginUpdate();
 			gridOut.Columns.Clear();
 			col=new ODGridColumn("",25);//so that it lines up with the grid above

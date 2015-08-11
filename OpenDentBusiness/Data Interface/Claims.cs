@@ -55,18 +55,20 @@ namespace OpenDentBusiness{
 		}
 
 		/// <summary>Gets all outstanding claims for the batch payment window.</summary>
-		public static List<ClaimPaySplit> GetOutstandingClaims(string carrierName) {
+		public static List<ClaimPaySplit> GetOutstandingClaims(string carrierName,string LName,string FName) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<ClaimPaySplit>>(MethodBase.GetCurrentMethod(),carrierName);
+				return Meth.GetObject<List<ClaimPaySplit>>(MethodBase.GetCurrentMethod(),carrierName,LName,FName);
 			}
 			string command="SELECT claim.DateService,claim.ProvTreat,"+DbHelper.Concat("patient.LName","', '","patient.FName")+" patName_,"
 				+"carrierA.CarrierName,ClaimFee feeBilled_,SUM(claimproc.InsPayAmt) insPayAmt_,claim.ClaimNum,"//SUM(claimproc.FeeBilled) feeBilled_ was low if inspay 0 on proc
 				+"claimproc.ClaimPaymentNum,clinic.Description,claim.PatNum,PaymentRow "
-				+"FROM (SELECT CarrierNum, CarrierName FROM carrier WHERE CarrierName LIKE '%"+POut.String(carrierName)+"%') carrierA "
+				+"FROM (SELECT CarrierNum, CarrierName FROM carrier WHERE CarrierName LIKE '"+POut.String(carrierName)+"%') carrierA "
 				+"INNER JOIN insplan ON insplan.CarrierNum = carrierA.CarrierNum "
 				+"INNER JOIN claim ON insplan.PlanNum = claim.PlanNum "
 				+"INNER JOIN claimproc ON claimproc.ClaimNum = claim.ClaimNum "
 				+"INNER JOIN patient ON patient.PatNum = claimproc.PatNum "
+					+"AND patient.LName LIKE '"+POut.String(LName)+"%'"
+					+"AND patient.FName LIKE '"+POut.String(FName)+"%'"
 				+"LEFT JOIN clinic ON clinic.ClinicNum = claimproc.ClinicNum "
 				+"WHERE (claim.ClaimStatus = 'S' "
 					+"OR (claim.ClaimStatus='R' AND claimproc.InsPayAmt!=0)) "//certain (very few) received claims will have payment amounts entered but not attached to payment
