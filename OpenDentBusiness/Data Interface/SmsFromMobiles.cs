@@ -116,12 +116,17 @@ namespace OpenDentBusiness{
 			return Crud.SmsFromMobileCrud.Insert(smsFromMobile);
 		}
 
-		///<summary>Gets all SMS incoming messages for the specified filters.  If dateStart is 01/01/0001 then no start date will be used.  If dateEnd is 01/01/0001 then no end date will be used.  If listClinicNums is empty then will not filter by clinic.  If patNum is non-zero, then only the messages for the specified patient will be returned, otherwise messages for all patients will be returned.  If arrayStatuses is empty then messages with all statuses will be returned.</summary>
-		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,long patNum,params SmsFromStatus[] arrayStatuses) {
+		///<summary><para>Gets all SMS incoming messages for the specified filters.</para>
+		///<para>If dateStart is 01/01/0001 then no start date will be used.</para>
+		///<para>If dateEnd is 01/01/0001 then no end date will be used.</para>
+		///<para>If listClinicNums is empty then will not filter by clinic.</para>
+		///<para>If patNum is non-zero, then only the messages for the specified patient will be returned, otherwise messages for all patients will be returned.</para>
+		///<para>If arrayStatuses is empty then messages with all statuses will be returned.</para></summary>
+		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List<long> listClinicNums,long patNum,params SmsFromStatus[] arrayStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,patNum,arrayStatuses);
 			}
-			List <string> listCommandFilters=new List<string>();
+			List<string> listCommandFilters=new List<string>();
 			if(dateStart>DateTime.MinValue) {
 				listCommandFilters.Add(DbHelper.DtimeToDate("DateTimeReceived")+">="+POut.Date(dateStart));
 			}
@@ -129,29 +134,19 @@ namespace OpenDentBusiness{
 				listCommandFilters.Add(DbHelper.DtimeToDate("DateTimeReceived")+"<="+POut.Date(dateEnd));
 			}
 			if(listClinicNums.Count>0) {
-				string[] arrayClinicNumStrs=new string[listClinicNums.Count];
-				for(int i=0;i<listClinicNums.Count;i++) {
-					arrayClinicNumStrs[i]=POut.Long(listClinicNums[i]);
-				}
-				listCommandFilters.Add("ClinicNum IN ("+String.Join(",",arrayClinicNumStrs)+")");
+				listCommandFilters.Add("ClinicNum IN ("+string.Join(",",listClinicNums.Select(x => POut.Long(x)))+")");
 			}
 			if(arrayStatuses.Length>0) {
-				string statuses="";
-				for(int i=0;i<arrayStatuses.Length;i++) {
-					if(i>0) {
-						statuses+=",";
-					}
-					statuses+=(int)arrayStatuses[i];
-				}
-				listCommandFilters.Add("SmsStatus IN ("+statuses+")");
+				listCommandFilters.Add("SmsStatus IN ("+string.Join(",",arrayStatuses.Select(x => POut.Int((int)x)))+")");
 			}
 			if(patNum!=0) {
 				listCommandFilters.Add("PatNum="+POut.Long(patNum));
 			}
 			string command="SELECT * FROM smsfrommobile";
 			if(listCommandFilters.Count>0) {
-				command+=" WHERE "+String.Join(" AND ",listCommandFilters);
+				command+=" WHERE "+string.Join(" AND ",listCommandFilters);
 			}
+			command +=" OR SmsStatus="+(int)SmsFromStatus.ReceivedUnread;//ALWAYS show unread messages.
 			return Crud.SmsFromMobileCrud.SelectMany(command);
 		}
 
