@@ -227,7 +227,7 @@ namespace OpenDental{
             "Treat\' Plan Priorities"});
 			this.listCategory.Location = new System.Drawing.Point(22, 36);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(147, 355);
+			this.listCategory.Size = new System.Drawing.Size(147, 368);
 			this.listCategory.TabIndex = 0;
 			this.listCategory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listCategory_MouseDown);
 			// 
@@ -416,7 +416,6 @@ namespace OpenDental{
 					FormDefEdit.HelpText=Lan.g(this,"The diagnosis list is shown when entering a procedure.  Ones that are less used should go lower on the list.  The abbreviation is shown in the progress notes.  BE VERY CAREFUL.  Changes affect all patients.");
 					break;
 				case 12://"Fee Colors":
-					groupEdit.Visible=false;
 					FormDefEdit.CanDelete=false;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.EnableColor=true;
