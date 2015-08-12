@@ -19,7 +19,9 @@ namespace OpenDental {
 			_selectedPat=PatCur;
 			if(_selectedPat==null) {
 				checkIncludeNoPat.Checked=true;
+				checkOnlyNoPat.Checked=true;
 			}
+			textDateStart.Text=DateTime.Today.AddMonths(-3).ToShortDateString();//default list to start with showing the last three months
 			FillGrid();
 		}
 
@@ -32,6 +34,7 @@ namespace OpenDental {
 			textPatient.Text="";
 			if(_selectedPat!=null) {
 				textPatient.Text=_selectedPat.GetNameLF();
+				checkOnlyNoPat.Checked=false;
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -58,7 +61,7 @@ namespace OpenDental {
 			if(dateEnd==DateTime.MinValue) {
 				dateEnd=DateTime.MaxValue;
 			}
-			List<MedLab> listMedLabs=MedLabs.GetOrdersForPatient(_selectedPat,checkIncludeNoPat.Checked,PIn.Date(textDateStart.Text),dateEnd);
+			List<MedLab> listMedLabs=MedLabs.GetOrdersForPatient(_selectedPat,checkIncludeNoPat.Checked,checkOnlyNoPat.Checked,PIn.Date(textDateStart.Text),dateEnd);
 			for(int i=0;i<listMedLabs.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(listMedLabs[i].DateTimeReported.ToString("MM/dd/yyyy hh:mm tt"));
@@ -105,10 +108,17 @@ namespace OpenDental {
 		}
 
 		private void checkIncludeNoPat_Click(object sender,EventArgs e) {
+			if(!checkIncludeNoPat.Checked) {
+				checkOnlyNoPat.Checked=false;
+			}
 			FillGrid();
 		}
 
-		private void checkGroupBySpec_Click(object sender,EventArgs e) {
+		private void checkOnlyNoPat_Click(object sender,EventArgs e) {
+			if(checkOnlyNoPat.Checked) {
+				checkIncludeNoPat.Checked=true;
+				_selectedPat=null;
+			}
 			FillGrid();
 		}
 

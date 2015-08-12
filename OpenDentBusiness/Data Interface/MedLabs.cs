@@ -67,9 +67,9 @@ namespace OpenDentBusiness{
 		///<summary>Get unique MedLab orders, grouped by PatNum, ProvNum, and SpecimenID.  Also returns the most recent DateTime the results
 		///were released from the lab and a list of test descriptions ordered.
 		///If includeNoPat==true, the lab orders not attached to a patient will be included.</summary>
-		public static List<MedLab> GetOrdersForPatient(Patient pat,bool includeNoPat,DateTime dateReportedStart,DateTime dateReportedEnd) {
+		public static List<MedLab> GetOrdersForPatient(Patient pat,bool includeNoPat,bool onlyNoPat,DateTime dateReportedStart,DateTime dateReportedEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),pat,includeNoPat,dateReportedStart,dateReportedEnd);
+				return Meth.GetObject<List<MedLab>>(MethodBase.GetCurrentMethod(),pat,includeNoPat,onlyNoPat,dateReportedStart,dateReportedEnd);
 			}
 			//include all patients unless a patient is specified.
 			string patNumClause="medlab.PatNum>0";
@@ -80,26 +80,27 @@ namespace OpenDentBusiness{
 			if(includeNoPat) {
 				patNumClause+=" OR medlab.PatNum=0";
 			}
-			string command="SELECT ml.MedLabNum,SendingApp,SendingFacility,medlab.PatNum,medlab.ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,"
-				+"medlab.SpecimenID,SpecimenIDFiller,medlab.ObsTestID,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,"
+			if(onlyNoPat) {
+				patNumClause="medlab.PatNum=0";
+			}
+			string command="SELECT MAX(CASE WHEN medlab.DateTimeReported=maxDate.DateTimeReported THEN MedLabNum ELSE 0 END) AS MedLabNum,"
+				+"SendingApp,SendingFacility,medlab.PatNum,medlab.ProvNum,PatIDLab,PatIDAlt,PatAge,PatAccountNum,PatFasting,medlab.SpecimenID,"
+				+"SpecimenIDFiller,ObsTestID,ObsTestLoinc,ObsTestLoincText,DateTimeCollected,TotalVolume,ActionCode,ClinicalInfo,"
 				+"MIN(DateTimeEntered) AS DateTimeEntered,OrderingProvNPI,OrderingProvLocalID,OrderingProvLName,OrderingProvFName,SpecimenIDAlt,"
-				+"ml.DateTimeReported,ml.ResultStatus,ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,ml.OriginalPIDSegment,"
-				+DbHelper.GroupConcat("ObsTestDescript",distinct :true,separator :"\r\n")+" AS ObsTestDescript "
+				+"maxdate.DateTimeReported,MIN(CASE WHEN medlab.DateTimeReported=maxDate.DateTimeReported THEN ResultStatus ELSE NULL END) AS ResultStatus,"
+				+"ParentObsID,ParentObsTestID,NotePat,NoteLab,FileName,"
+				+"MIN(CASE WHEN medlab.DateTimeReported=maxDate.DateTimeReported THEN OriginalPIDSegment ELSE NULL END) AS OriginalPIDSegment,"
+				+DbHelper.GroupConcat("ObsTestDescript",distinct:true,separator:"\r\n")+" AS ObsTestDescript "
 				+"FROM medlab "
 				+"INNER JOIN ("
-				+"SELECT MedLabNum,medlab.PatNum,medlab.ProvNum,medlab.SpecimenID,maxDate.DateTimeReported,ResultStatus,OriginalPIDSegment "
-				+"FROM medlab "
-				+"INNER JOIN ("
-				+"SELECT PatNum,ProvNum,SpecimenID,MAX(DateTimeReported) AS DateTimeReported "
-				+"FROM medlab "
-				+"GROUP BY PatNum,ProvNum,SpecimenID"
+					+"SELECT PatNum,ProvNum,SpecimenID,MAX(DateTimeReported) AS DateTimeReported "
+					+"FROM medlab "
+					+"WHERE ("+patNumClause+") " //Ex: WHERE (medlab.PatNum>0 OR medlab.Patnum=0)
+					+"GROUP BY PatNum,ProvNum,SpecimenID "
+					+"HAVING "+DbHelper.DtimeToDate("MAX(DateTimeReported)")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)
 				+") maxDate ON maxDate.PatNum=medlab.PatNum AND maxDate.ProvNum=medlab.ProvNum AND maxDate.SpecimenID=medlab.SpecimenID "
-				+"AND maxDate.DateTimeReported=medlab.DateTimeReported"
-				+") ml ON ml.PatNum=medlab.PatNum AND ml.ProvNum=medlab.ProvNum AND ml.SpecimenID=medlab.SpecimenID "
-				+"WHERE ("+patNumClause+") " //Ex: WHERE (medlab.PatNum>0 OR medlab.Patnum=0)
-				+"AND "+DbHelper.DtimeToDate("ml.DateTimeReported")+" BETWEEN "+POut.Date(dateReportedStart)+" AND "+POut.Date(dateReportedEnd)+" "
 				+"GROUP BY medlab.PatNum,medlab.ProvNum,medlab.SpecimenID "
-				+"ORDER BY ml.DateTimeReported DESC,medlab.SpecimenID,MedLabNum";//most recently received lab on top, with all for a specific specimen together
+				+"ORDER BY maxdate.DateTimeReported DESC,medlab.SpecimenID,MedLabNum";//most recently received lab on top, with all for a specific specimen together
 			return Crud.MedLabCrud.SelectMany(command);
 		}
 
