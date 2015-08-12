@@ -335,6 +335,7 @@ namespace CentralManager {
 			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
 			FormCCS.CentralConnectionCur=conn;
 			FormCCS.ShowDialog();//Will insert conn on OK.
+			_listConns=CentralConnections.GetConnections();
 			FillGrid();
 		}
 
