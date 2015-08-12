@@ -444,7 +444,7 @@ namespace OpenDentBusiness.HL7 {
 				switch(fieldDefCur.FieldName) {
 					case "patNote":
 						for(int j=0;j<listSegs.Count;j++) {
-							if(_medLabCur.NotePat.Length>0) {
+							if(!string.IsNullOrEmpty(_medLabCur.NotePat)) {
 								_medLabCur.NotePat+="\r\n";
 							}
 							_medLabCur.NotePat+=listSegs[j].GetFieldComponent(fieldDefCur.OrdinalPos);
@@ -452,7 +452,7 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					case "labNote":
 						for(int j=0;j<listSegs.Count;j++) {
-							if(_medLabCur.NoteLab.Length>0) {
+							if(!string.IsNullOrEmpty(_medLabCur.NoteLab)) {
 								_medLabCur.NoteLab+="\r\n";
 							}
 							_medLabCur.NoteLab+=listSegs[j].GetFieldComponent(fieldDefCur.OrdinalPos);
@@ -460,7 +460,7 @@ namespace OpenDentBusiness.HL7 {
 						continue;
 					case "obsNote":
 						for(int j=0;j<listSegs.Count;j++) {
-							if(_medLabResultCur.Note.Length>0) {
+							if(!string.IsNullOrEmpty(_medLabResultCur.Note)) {
 								_medLabResultCur.Note+="\r\n";
 							}
 							_medLabResultCur.Note+=listSegs[j].GetFieldComponent(fieldDefCur.OrdinalPos);
@@ -479,7 +479,8 @@ namespace OpenDentBusiness.HL7 {
 		///<summary></summary>
 		public static void ProcessOBR(HL7DefSegment segDef,SegmentHL7 obrSeg,MessageHL7 obrMsg) {
 			char subcompChar='&';
-			if(obrMsg.Delimiters.Length>3) {//it is possible they did not send all 4 of the delimiter chars, in which case we will use the default &
+			//it is possible they did not send all 4 of the delimiter chars, in which case we will use the default &
+			if(obrMsg.Delimiters!=null && obrMsg.Delimiters.Length>3) {
 				subcompChar=obrMsg.Delimiters[3];
 			}
 			for(int i=0;i<segDef.hl7DefFields.Count;i++) {
@@ -603,7 +604,7 @@ namespace OpenDentBusiness.HL7 {
 							continue;
 						}
 						string[] unitsSubComp=obrSeg.GetFieldComponent(fieldDefCur.OrdinalPos,1).Split(new char[] { subcompChar },StringSplitOptions.None);
-						if(unitsSubComp.Length==0 || unitsSubComp[0]=="") {
+						if(unitsSubComp==null || unitsSubComp.Length==0 || unitsSubComp[0]=="") {
 							_medLabCur.TotalVolume+=" ml";
 							continue;
 						}
@@ -772,7 +773,7 @@ namespace OpenDentBusiness.HL7 {
 						_medLabCur.PatAccountNum=pidSeg.GetFieldComponent(fieldDefCur.OrdinalPos);
 						string fastingStr=pidSeg.GetFieldComponent(fieldDefCur.OrdinalPos,6);
 						//if the component is blank or has a value other than "Y" or "N", the PatFasting field will be 0 - Unknown
-						if(fastingStr.Length>0) {
+						if(!string.IsNullOrEmpty(fastingStr)) {
 							fastingStr=fastingStr.ToLower().Substring(0,1);
 							if(fastingStr=="y") {
 								_medLabCur.PatFasting=YN.Yes;
