@@ -27,18 +27,19 @@
 			this.checkIncludeNoPat = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.labelEndDate = new System.Windows.Forms.Label();
-			this.textPatient = new System.Windows.Forms.TextBox();
-			this.labelPatient = new System.Windows.Forms.Label();
-			this.labelStartDate = new System.Windows.Forms.Label();
 			this.butCurrent = new OpenDental.UI.Button();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butAll = new OpenDental.UI.Button();
 			this.butFind = new OpenDental.UI.Button();
 			this.textDateEnd = new OpenDental.ValidDate();
 			this.textDateStart = new OpenDental.ValidDate();
+			this.labelEndDate = new System.Windows.Forms.Label();
+			this.textPatient = new System.Windows.Forms.TextBox();
+			this.labelPatient = new System.Windows.Forms.Label();
+			this.labelStartDate = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.checkOnlyNoPat = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -56,6 +57,7 @@
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.checkOnlyNoPat);
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.butCurrent);
 			this.groupBox1.Controls.Add(this.checkIncludeNoPat);
@@ -84,43 +86,6 @@
 			this.label1.TabIndex = 10;
 			this.label1.Text = "Filtered by most recent date and time reported.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// labelEndDate
-			// 
-			this.labelEndDate.Location = new System.Drawing.Point(5, 37);
-			this.labelEndDate.Name = "labelEndDate";
-			this.labelEndDate.Size = new System.Drawing.Size(80, 18);
-			this.labelEndDate.TabIndex = 8;
-			this.labelEndDate.Text = "End Date";
-			this.labelEndDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textPatient
-			// 
-			this.textPatient.BackColor = System.Drawing.SystemColors.Window;
-			this.textPatient.Location = new System.Drawing.Point(382, 13);
-			this.textPatient.Name = "textPatient";
-			this.textPatient.ReadOnly = true;
-			this.textPatient.Size = new System.Drawing.Size(216, 20);
-			this.textPatient.TabIndex = 3;
-			this.textPatient.TabStop = false;
-			// 
-			// labelPatient
-			// 
-			this.labelPatient.Location = new System.Drawing.Point(298, 13);
-			this.labelPatient.Name = "labelPatient";
-			this.labelPatient.Size = new System.Drawing.Size(83, 18);
-			this.labelPatient.TabIndex = 8;
-			this.labelPatient.Text = "Patient";
-			this.labelPatient.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelStartDate
-			// 
-			this.labelStartDate.Location = new System.Drawing.Point(5, 13);
-			this.labelStartDate.Name = "labelStartDate";
-			this.labelStartDate.Size = new System.Drawing.Size(80, 18);
-			this.labelStartDate.TabIndex = 8;
-			this.labelStartDate.Text = "Start Date";
-			this.labelStartDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butCurrent
 			// 
@@ -193,6 +158,43 @@
 			this.textDateStart.Size = new System.Drawing.Size(77, 20);
 			this.textDateStart.TabIndex = 1;
 			// 
+			// labelEndDate
+			// 
+			this.labelEndDate.Location = new System.Drawing.Point(5, 37);
+			this.labelEndDate.Name = "labelEndDate";
+			this.labelEndDate.Size = new System.Drawing.Size(80, 18);
+			this.labelEndDate.TabIndex = 8;
+			this.labelEndDate.Text = "End Date";
+			this.labelEndDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPatient
+			// 
+			this.textPatient.BackColor = System.Drawing.SystemColors.Window;
+			this.textPatient.Location = new System.Drawing.Point(382, 13);
+			this.textPatient.Name = "textPatient";
+			this.textPatient.ReadOnly = true;
+			this.textPatient.Size = new System.Drawing.Size(216, 20);
+			this.textPatient.TabIndex = 3;
+			this.textPatient.TabStop = false;
+			// 
+			// labelPatient
+			// 
+			this.labelPatient.Location = new System.Drawing.Point(298, 13);
+			this.labelPatient.Name = "labelPatient";
+			this.labelPatient.Size = new System.Drawing.Size(83, 18);
+			this.labelPatient.TabIndex = 8;
+			this.labelPatient.Text = "Patient";
+			this.labelPatient.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// labelStartDate
+			// 
+			this.labelStartDate.Location = new System.Drawing.Point(5, 13);
+			this.labelStartDate.Name = "labelStartDate";
+			this.labelStartDate.Size = new System.Drawing.Size(80, 18);
+			this.labelStartDate.TabIndex = 8;
+			this.labelStartDate.Text = "Start Date";
+			this.labelStartDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// butClose
 			// 
 			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -224,6 +226,16 @@
 			this.gridMain.Title = "Labs";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// checkOnlyNoPat
+			// 
+			this.checkOnlyNoPat.Location = new System.Drawing.Point(620, 37);
+			this.checkOnlyNoPat.Name = "checkOnlyNoPat";
+			this.checkOnlyNoPat.Size = new System.Drawing.Size(215, 18);
+			this.checkOnlyNoPat.TabIndex = 11;
+			this.checkOnlyNoPat.Text = "Only labs not attached to a patient";
+			this.checkOnlyNoPat.UseVisualStyleBackColor = true;
+			this.checkOnlyNoPat.Click += new System.EventHandler(this.checkOnlyNoPat_Click);
 			// 
 			// FormMedLabs
 			// 
@@ -262,5 +274,6 @@
 		private System.Windows.Forms.Label labelStartDate;
 		private UI.Button butRefresh;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.CheckBox checkOnlyNoPat;
 	}
 }
