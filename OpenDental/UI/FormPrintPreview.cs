@@ -156,11 +156,17 @@ namespace OpenDental.UI{
 			printPreviewControl2.Width=ClientSize.Width;	
 		}
 
+		private delegate void PrintClick();
+
 		private void ToolBarMain_ButtonClick(object sender, OpenDental.UI.ODToolBarButtonClickEventArgs e) {
 			//MessageBox.Show(e.Button.Tag.ToString());
 			switch(e.Button.Tag.ToString()){
 				case "Print":
-					OnPrint_Click();
+					//The reason we are using a delegate and BeginInvoke() is because of a Microsoft bug that causes the Print Dialog window to not be in focus			
+					//when it comes from a toolbar click.
+					//https://social.msdn.microsoft.com/Forums/windows/en-US/681a50b4-4ae3-407a-a747-87fb3eb427fd/first-mouse-click-after-showdialog-hits-the-parent-form?forum=winforms
+					PrintClick printClick=OnPrint_Click;
+					this.BeginInvoke(printClick);
 					break;
 				case "Back":
 					OnBack_Click();
