@@ -57,6 +57,13 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>This property is just a shortcut to the negative of the EasyNoClinics pref to make logic easier to follow.</summary>
+		public static bool HasClinicsEnabled {
+			get {
+				return !GetBool(PrefName.EasyNoClinics);
+			}
+		}
+
 		///<summary>Gets a pref of type long.</summary>
 		public static long GetLong(PrefName prefName) {
 			Dictionary<string,Pref> dictPrefs=GetDict();
