@@ -132,14 +132,14 @@ namespace OpenDentHL7 {
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks) && !HL7Defs.IsExistingHL7Enabled()) {//eCW enabled, and no HL7def enabled.
 				//prevent startup:
 				long progNum=Programs.GetProgramNum(ProgramName.eClinicalWorks);
-				string hl7Server=ProgramProperties.GetPropVal(progNum,"HL7Server");
-				string hl7ServiceName=ProgramProperties.GetPropVal(progNum,"HL7ServiceName");
+				string hl7Server=ProgramProperties.GetPropVal(progNum,"HL7Server");//this property will not exist if using Oracle, eCW will never use Oracle
+				string hl7ServiceName=ProgramProperties.GetPropVal(progNum,"HL7ServiceName");//this property will not exist if using Oracle, eCW will never use Oracle
 				if(hl7Server=="") {//for the first time run
-					ProgramProperties.SetProperty(progNum,"HL7Server",System.Environment.MachineName);
+					ProgramProperties.SetProperty(progNum,"HL7Server",System.Environment.MachineName);//this property will not exist if using Oracle, eCW will never use Oracle
 					hl7Server=System.Environment.MachineName;
 				}
 				if(hl7ServiceName=="") {//for the first time run
-					ProgramProperties.SetProperty(progNum,"HL7ServiceName",this.ServiceName);
+					ProgramProperties.SetProperty(progNum,"HL7ServiceName",this.ServiceName);//this property will not exist if using Oracle, eCW will never use Oracle
 					hl7ServiceName=this.ServiceName;
 				}
 				if(hl7Server.ToLower()!=System.Environment.MachineName.ToLower()) {

@@ -102,6 +102,7 @@ namespace OpenDentBusiness.HL7 {
 				else if(procCode.TreatArea==TreatmentArea.Surf){//probably not necessary
 					seg.SetField(26,Tooth.ToInternat(procs[i].ToothNum),Tooth.SurfTidyForClaims(procs[i].Surf,procs[i].ToothNum));
 				}
+				//this property will not exist if using Oracle, eCW will never use Oracle
 				else if(procCode.TreatArea==TreatmentArea.Quad && ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsQuadAsToothNum")=="1") {
 					seg.SetField(26,procs[i].Surf,"");
 				}

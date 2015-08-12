@@ -3401,6 +3401,7 @@ namespace OpenDental{
 							labelECWerror.Visible=true;
 						}
 						else {
+							//this property will not exist if using Oracle, eCW will never use Oracle
 							string uristring=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"MedicalPanelUrl");
 							string path="";
 							if(uristring=="") {

@@ -670,7 +670,7 @@ namespace OpenDental{
 			}
 			SetModeRadioButtons(GetProp("eClinicalWorksMode"));
 			SetModeVisibilities();
-			textECWServer.Text=GetProp("eCWServer");
+			textECWServer.Text=GetProp("eCWServer");//this property will not exist if using Oracle, eCW will never use Oracle
 			if(HL7Defs.IsExistingHL7Enabled()) {
 				HL7Def def=HL7Defs.GetOneDeepEnabled();
 				textHL7Server.Text=def.HL7Server;
@@ -680,11 +680,12 @@ namespace OpenDental{
 				checkQuadAsToothNum.Checked=def.IsQuadAsToothNum;
 			}
 			else {
-				textHL7Server.Text=GetProp("HL7Server");
-				textHL7ServiceName.Text=GetProp("HL7ServiceName");
+				textHL7Server.Text=GetProp("HL7Server");//this property will not exist if using Oracle, eCW will never use Oracle
+				textHL7ServiceName.Text=GetProp("HL7ServiceName");//this property will not exist if using Oracle, eCW will never use Oracle
 				textHL7FolderIn.Text=PrefC.GetString(PrefName.HL7FolderIn);
 				textHL7FolderOut.Text=PrefC.GetString(PrefName.HL7FolderOut);
-				checkQuadAsToothNum.Checked=GetProp("IsQuadAsToothNum")=="1";//if a def is enabled, the value associated with the def will override this setting
+				//if a def is enabled, the value associated with the def will override this setting
+				checkQuadAsToothNum.Checked=GetProp("IsQuadAsToothNum")=="1";//this property will not exist if using Oracle, eCW will never use Oracle
 			}
 			textODServer.Text=MiscData.GetODServer();
 			comboDefaultUserGroup.Items.Clear();
@@ -697,7 +698,7 @@ namespace OpenDental{
 			}
 			checkShowImages.Checked=GetProp("ShowImagesModule")=="1";
 			checkFeeSchedules.Checked=GetProp("FeeSchedulesSetManually")=="1";
-			textMedPanelURL.Text=GetProp("MedicalPanelUrl");
+			textMedPanelURL.Text=GetProp("MedicalPanelUrl");//this property will not exist if using Oracle, eCW will never use Oracle
 			checkLBSessionId.Checked=GetProp("IsLBSessionIdExcluded")=="1";
 		}
 
@@ -840,9 +841,9 @@ namespace OpenDental{
 			ProgramCur.Enabled=checkEnabled.Checked;
 			Programs.Update(ProgramCur);
 			Prefs.UpdateString(PrefName.HL7FolderOut,textHL7FolderOut.Text);
-			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7Server",textHL7Server.Text);
-			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7ServiceName",textHL7ServiceName.Text);
-			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"MedicalPanelUrl",textMedPanelURL.Text);
+			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7Server",textHL7Server.Text);//this property will not exist if using Oracle, eCW will never use Oracle
+			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HL7ServiceName",textHL7ServiceName.Text);//this property will not exist if using Oracle, eCW will never use Oracle
+			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"MedicalPanelUrl",textMedPanelURL.Text);//this property will not exist if using Oracle, eCW will never use Oracle
 			if(checkLBSessionId.Checked) {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsLBSessionIdExcluded","1");
 			}
@@ -850,16 +851,16 @@ namespace OpenDental{
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsLBSessionIdExcluded","0");
 			}
 			if(checkQuadAsToothNum.Checked) {
-				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","1");
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","1");//this property will not exist if using Oracle, eCW will never use Oracle
 			}
 			else {
-				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","0");
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"IsQuadAsToothNum","0");//this property will not exist if using Oracle, eCW will never use Oracle
 			}
 			if(checkHideButChartRx.Checked) {
-				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","1");
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","1");//this property will not exist if using Oracle, eCW will never use Oracle
 			}
 			else {
-				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","0");
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"HideChartRxButtons","0");//this property will not exist if using Oracle, eCW will never use Oracle
 			}
 			if(checkProcRequireSignature.Checked) {
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"ProcRequireSignature","1");
@@ -880,7 +881,7 @@ namespace OpenDental{
 				else {
 					ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eClinicalWorksMode","2");//Full
 				}
-				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eCWServer",textECWServer.Text);
+				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eCWServer",textECWServer.Text);//this property will not exist if using Oracle, eCW will never use Oracle
 				Prefs.UpdateString(PrefName.HL7FolderIn,textHL7FolderIn.Text);
 				ProgramProperties.SetProperty(ProgramCur.ProgramNum,"DefaultUserGroup",
 					_listUserGroups[comboDefaultUserGroup.SelectedIndex].UserGroupNum.ToString());
@@ -910,7 +911,7 @@ namespace OpenDental{
 
 		private void butDiagnostic_Click(object sender,EventArgs e) {
 			//no need to validate all the other fields on the page.
-			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eCWServer",textECWServer.Text);
+			ProgramProperties.SetProperty(ProgramCur.ProgramNum,"eCWServer",textECWServer.Text);//this property will not exist if using Oracle, eCW will never use Oracle
 			DataValid.SetInvalid(InvalidType.Programs);
 			FormEcwDiag FormECWD=new FormEcwDiag();
 			FormECWD.ShowDialog();
