@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDental.UI;
@@ -15,6 +16,7 @@ namespace OpenDental {
 		private List<OrthoChart> _listOrthoCharts;
 		private Patient _patCur;
 		private List<string> _listDisplayFieldNames;
+		///<summary>Set to true if any data changed within the grid.</summary>
 		private bool _hasChanged;
 		///<summary>Each row in this table has a date as the first cell.  There will be additional rows that are not yet in the db.  Each blank cell will be an empty string.  It will also store changes made by the user prior to closing the form.  When the form is closed, this table will be compared with the original listOrthoCharts and a synch process will take place to save to db.  An empty string in a cell will result in no db row or a deletion of existing db row.</summary>
 		DataTable table;
@@ -93,7 +95,13 @@ namespace OpenDental {
 			col=new ODGridColumn("Date",70);
 			gridMain.Columns.Add(col);
 			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
-				col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,true);
+				if(_listOrthDisplayFields[i].PickList!="") {
+					List<string> listComboOptions=_listOrthDisplayFields[i].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
+					col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,listComboOptions);
+				}
+				else {
+					col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,true);
+				}
 				gridMain.Columns.Add(col);
 			}
 			gridMain.Rows.Clear();
@@ -105,7 +113,15 @@ namespace OpenDental {
 				row.Cells.Add(tempDate.ToShortDateString());
 				row.Tag=tempDate;
 				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
-					row.Cells.Add(table.Rows[i][j+1].ToString());
+					string cellValue=table.Rows[i][j+1].ToString();
+					if(_listOrthDisplayFields[j].PickList!="") {
+						List<string> listComboOptions=_listOrthDisplayFields[j].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
+						int selectedIndex=listComboOptions.FindIndex(x => x==cellValue);
+						row.Cells.Add(cellValue,selectedIndex);
+					}
+					else {
+						row.Cells.Add(cellValue);
+					}
 				}
 				gridMain.Rows.Add(row);
 			}
@@ -174,53 +190,6 @@ namespace OpenDental {
 			return orthoChartNums;
 		}
 
-		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			/*
-			if(e.Col==0){//cannot edit a date
-				FormOrthoChartAddDate FormOCAD = new FormOrthoChartAddDate();
-				FormOCAD.ShowDialog();
-				if(FormOCAD.DialogResult!=DialogResult.OK) {
-					return;
-				}
-				for(int i=0;i<gridMain.Rows.Count;i++) {
-					if(FormOCAD.SelectedDate.ToShortDateString()==gridMain.Rows[i].Cells[0].Text) {
-						MsgBox.Show(this,"That date already exists.");
-						return;
-					}
-				}
-				listDatesAdditional.Add(FormOCAD.SelectedDate);
-				FillGrid();
-				return;
-			}
-			////create an orthoChart that has this date and this type
-			//FormOrthoChartEdit FormOCE = new FormOrthoChartEdit();
-			//if(gridMain.Rows[e.Row].Cells[e.Col].Text==" ") {//new ortho chart
-			//  FormOCE.OrthoCur.DateService = DateTime.Parse(gridMain.Rows[e.Row].Cells[0].Text);
-			//  FormOCE.OrthoCur.FieldName = gridMain.Columns[e.Col].Heading;
-			//  FormOCE.IsNew=true;
-			//}
-			//else {//existing ortho chart
-			//  for(int i=0;i<listOrthoCharts.Count;i++) {
-			//    if(listOrthoCharts[i].DateService.ToShortDateString()==gridMain.Rows[e.Row].Cells[0].Text
-			//    && listOrthoCharts[i].FieldName==gridMain.Columns[e.Col].Heading) {
-			//      FormOCE.OrthoCur=listOrthoCharts[i];
-			//      break;
-			//    }
-			//  }
-			//}
-			//FormOCE.ShowDialog();
-			//if(FormOCE.DialogResult!=DialogResult.OK) {
-			//  return;
-			//}
-			//if(FormOCE.IsNew) {
-			//  OrthoCharts.Insert(FormOCE.OrthoCur);
-			//}
-			//else {
-			//  OrthoCharts.Update(FormOCE.OrthoCur);
-			//}*/
-			//FillGrid();
-		}
-
 		private void gridMain_CellTextChanged(object sender,EventArgs e) {
 			_hasChanged=true;
 		}
@@ -228,11 +197,6 @@ namespace OpenDental {
 		private void gridMain_CellLeave(object sender,ODGridClickEventArgs e) {
 			//Get the the date for the ortho chart that was just edited.
 			DateTime orthoDate=PIn.Date(gridMain.Rows[e.Row].Cells[0].Text);//First column will always be the date.
-			//Suppress the security message because it's crazy annoying if the user is simply clicking around in cells.  They might be copying a cell and not changing it.
-			if(Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
-				return;//The user has permission.  No need to waste time doing logic below.
-			}
-			//User is not authorized to edit this cell.  Check if they changed the old value and if they did, put it back to the way it was and warn them about security.
 			string oldText="";//If the selected cell is not in listOrthoCharts then it started out blank.  This will put it back to an empty string.
 			for(int i=0;i<_listOrthoCharts.Count;i++) {
 				if(_listOrthoCharts[i].DateService!=orthoDate) {
@@ -245,6 +209,14 @@ namespace OpenDental {
 				oldText=_listOrthoCharts[i].FieldValue;
 				break;
 			}
+			//Suppress the security message because it's crazy annoying if the user is simply clicking around in cells.  They might be copying a cell and not changing it.
+			if(Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
+				if(gridMain.Rows[e.Row].Cells[e.Col].Text!=oldText) {
+					_hasChanged=true;//They had permission and they made a change.
+				}
+				return;//The user has permission.  No need to waste time doing logic below.
+			}
+			//User is not authorized to edit this cell.  Check if they changed the old value and if they did, put it back to the way it was and warn them about security.
 			if(gridMain.Rows[e.Row].Cells[e.Col].Text!=oldText) {
 				//The user actually changed the cell's value and we need to change it back and warn them that they don't have permission.
 				gridMain.Rows[e.Row].Cells[e.Col].Text=oldText;

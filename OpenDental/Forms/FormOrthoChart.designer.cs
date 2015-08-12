@@ -37,6 +37,7 @@ namespace OpenDental{
 			// 
 			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPat.HasMultilineHeaders = false;
 			this.gridPat.HScrollVisible = false;
 			this.gridPat.Location = new System.Drawing.Point(10, 9);
 			this.gridPat.Name = "gridPat";
@@ -52,6 +53,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(10, 209);
 			this.gridMain.Name = "gridMain";
@@ -61,7 +63,6 @@ namespace OpenDental{
 			this.gridMain.TabIndex = 5;
 			this.gridMain.Title = "Ortho Chart";
 			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellTextChanged += new System.EventHandler(this.gridMain_CellTextChanged);
 			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
 			// 

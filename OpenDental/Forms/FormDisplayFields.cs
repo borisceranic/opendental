@@ -371,13 +371,24 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormDisplayFieldEdit formD=new FormDisplayFieldEdit();
-			formD.FieldCur=ListShowing[e.Row];
 			DisplayField tempField=ListShowing[e.Row].Copy();
-			formD.ShowDialog();
-			if(formD.DialogResult!=DialogResult.OK) {
-				ListShowing[e.Row]=tempField.Copy();
-				return;
+			if(tempField.Category==DisplayFieldCategory.OrthoChart) {
+				FormDisplayFieldOrthoEdit FormDFOE=new FormDisplayFieldOrthoEdit();
+				FormDFOE.FieldCur=ListShowing[e.Row];
+				FormDFOE.ShowDialog();
+				if(FormDFOE.DialogResult!=DialogResult.OK) {
+					ListShowing[e.Row]=tempField.Copy();
+					return;
+				}
+			}
+			else {
+				FormDisplayFieldEdit formD=new FormDisplayFieldEdit();
+				formD.FieldCur=ListShowing[e.Row];
+				formD.ShowDialog();
+				if(formD.DialogResult!=DialogResult.OK) {
+					ListShowing[e.Row]=tempField.Copy();
+					return;
+				}
 			}
 			if(Category==DisplayFieldCategory.OrthoChart) {
 				if(ListShowing[e.Row].Description=="") {

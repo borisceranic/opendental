@@ -53,6 +53,7 @@ namespace OpenDentBusiness.Crud{
 				displayField.ColumnWidth    = PIn.Int   (table.Rows[i]["ColumnWidth"].ToString());
 				displayField.Category       = (OpenDentBusiness.DisplayFieldCategory)PIn.Int(table.Rows[i]["Category"].ToString());
 				displayField.ChartViewNum   = PIn.Long  (table.Rows[i]["ChartViewNum"].ToString());
+				displayField.PickList       = PIn.String(table.Rows[i]["PickList"].ToString());
 				retVal.Add(displayField);
 			}
 			return retVal;
@@ -93,7 +94,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="DisplayFieldNum,";
 			}
-			command+="InternalName,ItemOrder,Description,ColumnWidth,Category,ChartViewNum) VALUES(";
+			command+="InternalName,ItemOrder,Description,ColumnWidth,Category,ChartViewNum,PickList) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(displayField.DisplayFieldNum)+",";
 			}
@@ -103,12 +104,17 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(displayField.Description)+"',"
 				+    POut.Int   (displayField.ColumnWidth)+","
 				+    POut.Int   ((int)displayField.Category)+","
-				+    POut.Long  (displayField.ChartViewNum)+")";
+				+    POut.Long  (displayField.ChartViewNum)+","
+				+    DbHelper.ParamChar+"paramPickList)";
+			if(displayField.PickList==null) {
+				displayField.PickList="";
+			}
+			OdSqlParameter paramPickList=new OdSqlParameter("paramPickList",OdDbType.Text,displayField.PickList);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramPickList);
 			}
 			else {
-				displayField.DisplayFieldNum=Db.NonQ(command,true);
+				displayField.DisplayFieldNum=Db.NonQ(command,true,paramPickList);
 			}
 			return displayField.DisplayFieldNum;
 		}
@@ -136,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="DisplayFieldNum,";
 			}
-			command+="InternalName,ItemOrder,Description,ColumnWidth,Category,ChartViewNum) VALUES(";
+			command+="InternalName,ItemOrder,Description,ColumnWidth,Category,ChartViewNum,PickList) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(displayField.DisplayFieldNum)+",";
 			}
@@ -146,12 +152,17 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(displayField.Description)+"',"
 				+    POut.Int   (displayField.ColumnWidth)+","
 				+    POut.Int   ((int)displayField.Category)+","
-				+    POut.Long  (displayField.ChartViewNum)+")";
+				+    POut.Long  (displayField.ChartViewNum)+","
+				+    DbHelper.ParamChar+"paramPickList)";
+			if(displayField.PickList==null) {
+				displayField.PickList="";
+			}
+			OdSqlParameter paramPickList=new OdSqlParameter("paramPickList",OdDbType.Text,displayField.PickList);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramPickList);
 			}
 			else {
-				displayField.DisplayFieldNum=Db.NonQ(command,true);
+				displayField.DisplayFieldNum=Db.NonQ(command,true,paramPickList);
 			}
 			return displayField.DisplayFieldNum;
 		}
@@ -164,9 +175,14 @@ namespace OpenDentBusiness.Crud{
 				+"Description    = '"+POut.String(displayField.Description)+"', "
 				+"ColumnWidth    =  "+POut.Int   (displayField.ColumnWidth)+", "
 				+"Category       =  "+POut.Int   ((int)displayField.Category)+", "
-				+"ChartViewNum   =  "+POut.Long  (displayField.ChartViewNum)+" "
+				+"ChartViewNum   =  "+POut.Long  (displayField.ChartViewNum)+", "
+				+"PickList       =  "+DbHelper.ParamChar+"paramPickList "
 				+"WHERE DisplayFieldNum = "+POut.Long(displayField.DisplayFieldNum);
-			Db.NonQ(command);
+			if(displayField.PickList==null) {
+				displayField.PickList="";
+			}
+			OdSqlParameter paramPickList=new OdSqlParameter("paramPickList",OdDbType.Text,displayField.PickList);
+			Db.NonQ(command,paramPickList);
 		}
 
 		///<summary>Updates one DisplayField in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -196,12 +212,20 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ChartViewNum = "+POut.Long(displayField.ChartViewNum)+"";
 			}
+			if(displayField.PickList != oldDisplayField.PickList) {
+				if(command!=""){ command+=",";}
+				command+="PickList = "+DbHelper.ParamChar+"paramPickList";
+			}
 			if(command==""){
 				return false;
 			}
+			if(displayField.PickList==null) {
+				displayField.PickList="";
+			}
+			OdSqlParameter paramPickList=new OdSqlParameter("paramPickList",OdDbType.Text,displayField.PickList);
 			command="UPDATE displayfield SET "+command
 				+" WHERE DisplayFieldNum = "+POut.Long(displayField.DisplayFieldNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramPickList);
 			return true;
 		}
 

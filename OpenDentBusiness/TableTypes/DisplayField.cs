@@ -21,6 +21,9 @@ namespace OpenDentBusiness{
 		public DisplayFieldCategory Category;
 		///<summary>FK to chartview.ChartViewNum. 0 if attached to a category.</summary>
 		public long ChartViewNum;
+		///<summary>Newline delimited string which contains the selectable options in combo box dropdowns.  Specifically for the Ortho chart.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
+		public string PickList;
 
 
 		public DisplayField(){

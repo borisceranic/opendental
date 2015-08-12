@@ -24,9 +24,10 @@ namespace OpenDental{
 		private TextBox textPickList;
 		private ComboBox comboFieldType;
 		private Label label1;
+		private UI.Button butDown;
+		private UI.Button butUp;
 		private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
 
-		///<summary>Currently not referenced anywhere.  Form to be implemented for Ortho Chart Cell Dropdown Feature.  This form is very similar to form DisplayFieldEdit.  Commented many lines out for a save commit.</summary>
 		public FormDisplayFieldOrthoEdit()
 		{
 			//
@@ -69,6 +70,8 @@ namespace OpenDental{
 			this.textPickList = new System.Windows.Forms.TextBox();
 			this.comboFieldType = new System.Windows.Forms.ComboBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.butDown = new OpenDental.UI.Button();
+			this.butUp = new OpenDental.UI.Button();
 			this.textWidth = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -86,18 +89,18 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(-1, 16);
+			this.label2.Location = new System.Drawing.Point(5, 16);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(140, 17);
+			this.label2.Size = new System.Drawing.Size(134, 17);
 			this.label2.TabIndex = 4;
 			this.label2.Text = "Description";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(-1, 68);
+			this.label3.Location = new System.Drawing.Point(5, 68);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(140, 17);
+			this.label3.Size = new System.Drawing.Size(134, 17);
 			this.label3.TabIndex = 6;
 			this.label3.Text = "Column Width";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -112,9 +115,9 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(2, 42);
+			this.label4.Location = new System.Drawing.Point(8, 42);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(137, 17);
+			this.label4.Size = new System.Drawing.Size(131, 17);
 			this.label4.TabIndex = 8;
 			this.label4.Text = "Minimum Width";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -131,13 +134,12 @@ namespace OpenDental{
 			// labelWarning
 			// 
 			this.labelWarning.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelWarning.Location = new System.Drawing.Point(324, 96);
+			this.labelWarning.Location = new System.Drawing.Point(5, 122);
 			this.labelWarning.Name = "labelWarning";
-			this.labelWarning.Size = new System.Drawing.Size(101, 14);
+			this.labelWarning.Size = new System.Drawing.Size(130, 14);
 			this.labelWarning.TabIndex = 89;
-			this.labelWarning.Text = "One Per Line";
-			this.labelWarning.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			this.labelWarning.Visible = false;
+			this.labelWarning.Text = "One Entry Per Line";
+			this.labelWarning.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// textPickList
 			// 
@@ -145,6 +147,7 @@ namespace OpenDental{
 			this.textPickList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textPickList.HideSelection = false;
 			this.textPickList.Location = new System.Drawing.Point(141, 122);
 			this.textPickList.Multiline = true;
 			this.textPickList.Name = "textPickList";
@@ -162,16 +165,45 @@ namespace OpenDental{
 			this.comboFieldType.Name = "comboFieldType";
 			this.comboFieldType.Size = new System.Drawing.Size(177, 21);
 			this.comboFieldType.TabIndex = 86;
-			this.comboFieldType.SelectedIndexChanged += new System.EventHandler(this.comboFieldType_SelectedIndexChanged);
+			this.comboFieldType.Visible = false;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(-1, 94);
+			this.label1.Location = new System.Drawing.Point(5, 94);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(140, 17);
+			this.label1.Size = new System.Drawing.Size(134, 17);
 			this.label1.TabIndex = 90;
 			this.label1.Text = "Field Type";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.label1.Visible = false;
+			// 
+			// butDown
+			// 
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(1, 0);
+			this.butDown.Autosize = true;
+			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDown.CornerRadius = 4F;
+			this.butDown.Image = global::OpenDental.Properties.Resources.down;
+			this.butDown.Location = new System.Drawing.Point(440, 122);
+			this.butDown.Name = "butDown";
+			this.butDown.Size = new System.Drawing.Size(25, 24);
+			this.butDown.TabIndex = 128;
+			this.butDown.Click += new System.EventHandler(this.butDown_Click);
+			// 
+			// butUp
+			// 
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(1, 0);
+			this.butUp.Autosize = true;
+			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUp.CornerRadius = 4F;
+			this.butUp.Image = global::OpenDental.Properties.Resources.up;
+			this.butUp.Location = new System.Drawing.Point(414, 122);
+			this.butUp.Name = "butUp";
+			this.butUp.Size = new System.Drawing.Size(25, 24);
+			this.butUp.TabIndex = 127;
+			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
 			// textWidth
 			// 
@@ -190,7 +222,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(414, 365);
+			this.butOK.Location = new System.Drawing.Point(414, 362);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
@@ -216,6 +248,8 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(510, 448);
+			this.Controls.Add(this.butDown);
+			this.Controls.Add(this.butUp);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.labelWarning);
 			this.Controls.Add(this.textPickList);
@@ -236,7 +270,6 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Ortho Display Field";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDisplayFieldOrthoEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormDisplayFieldOrthoEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -245,19 +278,10 @@ namespace OpenDental{
 		#endregion
 
 		private void FormDisplayFieldOrthoEdit_Load(object sender,EventArgs e) {
-			//textDescription.Text=FieldCur.Description;
-			//textWidth.Text=FieldCur.ColumnWidth.ToString();
-			//FillWidth();
-			//textPickList.Visible=false;
-			//labelWarning.Visible=false;
-			//comboFieldType.Items.Clear();
-			//comboFieldType.Items.AddRange(Enum.GetNames(typeof(DisplayFieldType)));
-			//comboFieldType.SelectedIndex=(int)FieldCur.FieldType;
-			//if(comboFieldType.SelectedIndex==(int)DisplayFieldType.PickList) {
-			//	textPickList.Visible=true;
-			//	labelWarning.Visible=true;
-			//	textPickList.Text=FieldCur.PickList;
-			//}
+			textDescription.Text=FieldCur.Description;
+			textWidth.Text=FieldCur.ColumnWidth.ToString();
+			textPickList.Text=FieldCur.PickList;
+			FillWidth();
 		}
 
 		private void FillWidth(){
@@ -272,47 +296,134 @@ namespace OpenDental{
 			FillWidth();
 		}
 
-		private void comboFieldType_SelectedIndexChanged(object sender,EventArgs e) {
-			//if(comboFieldType.SelectedIndex==(int)DisplayFieldType.PickList) {
-			//	textPickList.Visible=true;
-			//	labelWarning.Visible=true;
-			//}
-			//else {
-			//	textPickList.Visible=false;
-			//	labelWarning.Visible=false;
-			//}
+		private void butUp_Click(object sender,EventArgs e) {
+			if(textPickList.Text==""){
+				return;
+			}
+			int selectionStart=textPickList.SelectionStart;
+			//calculate which row to highlight, based on selection start.
+			int selectedRow=0;
+			int sumPreviousLines=0;
+			string[] linesOrig=new string[textPickList.Lines.Length];
+			textPickList.Lines.CopyTo(linesOrig,0);
+			for(int i=0;i<textPickList.Lines.Length;i++) {
+				if(i>0) {
+					sumPreviousLines+=textPickList.Lines[i-1].Length+2;//the 2 is for \r\n
+				}
+				if(selectionStart < sumPreviousLines+textPickList.Lines[i].Length) {
+					selectedRow=i;
+					break;
+				}
+			}
+			//swap rows
+			int newSelectedRow;
+			if(selectedRow==0) {
+				newSelectedRow=0;//and no swap
+			}
+			else {
+				//doesn't allow me to directly set lines, so:
+				string newtext="";
+				for(int i=0;i<textPickList.Lines.Length;i++) {
+					if(i>0) {
+						newtext+="\r\n";
+					}
+					if(i==selectedRow) {
+						newtext+=linesOrig[selectedRow-1];
+					}
+					else if(i==selectedRow-1) {
+						newtext+=linesOrig[selectedRow];
+					}
+					else {
+						newtext+=linesOrig[i];
+					}
+				}
+				textPickList.Text=newtext;
+				newSelectedRow=selectedRow-1;
+			}
+			//highlight the newSelectedRow
+			sumPreviousLines=0;
+			for(int i=0;i<textPickList.Lines.Length;i++) {
+				if(i>0) {
+					sumPreviousLines+=textPickList.Lines[i-1].Length+2;//the 2 is for \r\n
+				}
+				if(newSelectedRow==i) {
+					textPickList.Select(sumPreviousLines,textPickList.Lines[i].Length);
+					break;
+				}
+			}
+		}
+
+		private void butDown_Click(object sender,EventArgs e) {
+			if(textPickList.Text=="") {
+				return;
+			}
+			int selectionStart=textPickList.SelectionStart;
+			//calculate which row to highlight, based on selection start.
+			int selectedRow=0;
+			int sumPreviousLines=0;
+			string[] linesOrig=new string[textPickList.Lines.Length];
+			textPickList.Lines.CopyTo(linesOrig,0);
+			for(int i=0;i<textPickList.Lines.Length;i++) {
+				if(i>0) {
+					sumPreviousLines+=textPickList.Lines[i-1].Length+2;//the 2 is for \r\n
+				}
+				if(selectionStart < sumPreviousLines+textPickList.Lines[i].Length) {
+					selectedRow=i;
+					break;
+				}
+			}
+			//swap rows
+			int newSelectedRow;
+			if(selectedRow==textPickList.Lines.Length-1) {
+				newSelectedRow=textPickList.Lines.Length-1;//and no swap
+			}
+			else {
+				//doesn't allow me to directly set lines, so:
+				string newtext="";
+				for(int i=0;i<textPickList.Lines.Length;i++) {
+					if(i>0) {
+						newtext+="\r\n";
+					}
+					if(i==selectedRow) {
+						newtext+=linesOrig[selectedRow+1];
+					}
+					else if(i==selectedRow+1) {
+						newtext+=linesOrig[selectedRow];
+					}
+					else {
+						newtext+=linesOrig[i];
+					}
+				}
+				textPickList.Text=newtext;
+				newSelectedRow=selectedRow+1;
+			}
+			//highlight the newSelectedRow
+			sumPreviousLines=0;
+			for(int i=0;i<textPickList.Lines.Length;i++) {
+				if(i>0) {
+					sumPreviousLines+=textPickList.Lines[i-1].Length+2;//the 2 is for \r\n
+				}
+				if(newSelectedRow==i) {
+					textPickList.Select(sumPreviousLines,textPickList.Lines[i].Length);
+					break;
+				}
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			//if(textWidth.errorProvider1.GetError(textWidth)!="") {
-			//	MsgBox.Show(this,"Please fix data entry errors first.");
-			//	return;
-			//}
-			//if(FieldCur.FieldType==DisplayFieldType.PickList) {
-			//	if(textPickList.Text=="") {
-			//		MsgBox.Show(this,"List cannot be blank.");
-			//		return;
-			//	}
-			//	FieldCur.PickList=textPickList.Text;
-			//}
-			//FieldCur.FieldType=(DisplayFieldType)comboFieldType.SelectedIndex;
-			//FieldCur.Description=textDescription.Text;
-			//FieldCur.ColumnWidth=PIn.Int(textWidth.Text);
-			//DialogResult=DialogResult.OK;
+			if(textWidth.errorProvider1.GetError(textWidth)!="") {
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			FieldCur.Description=textDescription.Text;
+			FieldCur.ColumnWidth=PIn.Int(textWidth.Text);
+			FieldCur.PickList=textPickList.Text;
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		private void FormDisplayFieldOrthoEdit_FormClosing(object sender,FormClosingEventArgs e) {
-
-		}
-
-		
-
-		
-
 
 	}
 }
