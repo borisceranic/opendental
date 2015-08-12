@@ -6,12 +6,21 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public class RpProdInc {
+		///<summary>Used in RowComparer to limit using the cache in the CEMT.</summary>
+		private static bool _hasClinics;
 
-		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P&I report</summary>
-		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay
-			,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown) 
+		//IMPORTANT NOTE FOR ANYBODY WHO CODES IN HERE:  This is used in the CEMT so everything MUST be coded in such a way that they don't use the 
+		//cache to look up information.  The CEMT does NOT keep copies of the remote database caches when this is used so things such as 
+		//PrefC.GetBool or Clinics.GetDesc will return incorrect results.
+
+		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report.</summary>
+		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown) 
 		{
-			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+			//No need to check RemotingRole; no call to db.
+			if(listClinics.Count>0) {
+				_hasClinics=true;
+			}
+			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -22,7 +31,7 @@ namespace OpenDentBusiness {
 			tableDailyProd.Columns.Add(new DataColumn("Name"));
 			tableDailyProd.Columns.Add(new DataColumn("Description"));
 			tableDailyProd.Columns.Add(new DataColumn("Provider"));
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+			if(_hasClinics) {
 				tableDailyProd.Columns.Add(new DataColumn("Clinic"));
 			}
 			tableDailyProd.Columns.Add(new DataColumn("Production"));
@@ -32,7 +41,7 @@ namespace OpenDentBusiness {
 			tableDailyProd.Columns.Add(new DataColumn("Ins Income"));
 			tableDailyProd.Columns.Add(new DataColumn("ClinicSplit"));
 			for(int i=0;i<tableProduction.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableProduction.Rows[i]["Clinic"].ToString()))) {
+				if(_hasClinics && !listClinics.Exists(x => x.ClinicNum==PIn.Long(tableProduction.Rows[i]["Clinic"].ToString()))) {
 					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
 				}
 				DataRow row=tableDailyProd.NewRow();
@@ -40,7 +49,7 @@ namespace OpenDentBusiness {
 				row["Name"]=tableProduction.Rows[i]["namelf"].ToString();
 				row["Description"]=tableProduction.Rows[i]["Description"].ToString();
 				row["Provider"]=tableProduction.Rows[i]["Abbr"].ToString();
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				if(_hasClinics) {
 					row["Clinic"]=tableProduction.Rows[i]["Clinic"].ToString();
 				}
 				row["Production"]=tableProduction.Rows[i]["Production"].ToString();
@@ -52,7 +61,7 @@ namespace OpenDentBusiness {
 				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableAdj.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableAdj.Rows[i]["Clinic"].ToString()))) {
+				if(_hasClinics && !listClinics.Exists(x => x.ClinicNum==PIn.Long(tableAdj.Rows[i]["Clinic"].ToString()))) {
 					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
 				}
 				DataRow row=tableDailyProd.NewRow();
@@ -60,7 +69,7 @@ namespace OpenDentBusiness {
 				row["Name"]=tableAdj.Rows[i]["namelf"].ToString();
 				row["Description"]=tableAdj.Rows[i]["Description"].ToString();
 				row["Provider"]=tableAdj.Rows[i]["Abbr"].ToString();
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				if(_hasClinics) {
 					row["Clinic"]=tableAdj.Rows[i]["Clinic"].ToString();
 				}
 				row["Production"]=0;
@@ -72,7 +81,7 @@ namespace OpenDentBusiness {
 				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableInsWriteoff.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableInsWriteoff.Rows[i]["Clinic"].ToString()))) {
+				if(_hasClinics && !listClinics.Exists(x => x.ClinicNum==PIn.Long(tableInsWriteoff.Rows[i]["Clinic"].ToString()))) {
 					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
 				}
 				DataRow row=tableDailyProd.NewRow();
@@ -80,7 +89,7 @@ namespace OpenDentBusiness {
 				row["Name"]=tableInsWriteoff.Rows[i]["namelf"].ToString();
 				row["Description"]=tableInsWriteoff.Rows[i]["Description"].ToString();
 				row["Provider"]=tableInsWriteoff.Rows[i]["Abbr"].ToString();
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				if(_hasClinics) {
 					row["Clinic"]=tableInsWriteoff.Rows[i]["Clinic"].ToString();
 				}
 				row["Production"]=0;
@@ -92,7 +101,7 @@ namespace OpenDentBusiness {
 				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tablePay.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tablePay.Rows[i]["Clinic"].ToString()))) {
+				if(_hasClinics && !listClinics.Exists(x => x.ClinicNum==PIn.Long(tablePay.Rows[i]["Clinic"].ToString()))) {
 					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
 				}
 				DataRow row=tableDailyProd.NewRow();
@@ -100,7 +109,7 @@ namespace OpenDentBusiness {
 				row["Name"]=tablePay.Rows[i]["namelf"].ToString();
 				row["Description"]=tablePay.Rows[i]["Description"].ToString();
 				row["Provider"]=tablePay.Rows[i]["Abbr"].ToString();
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				if(_hasClinics) {
 					row["Clinic"]=tablePay.Rows[i]["Clinic"].ToString();
 				}
 				row["Production"]=0;
@@ -112,7 +121,7 @@ namespace OpenDentBusiness {
 				tableDailyProd.Rows.Add(row);
 			}
 			for(int i=0;i<tableIns.Rows.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && !listClinicNums.Contains(PIn.Long(tableIns.Rows[i]["Clinic"].ToString()))) {
+				if(_hasClinics && !listClinics.Exists(x => x.ClinicNum==PIn.Long(tableIns.Rows[i]["Clinic"].ToString()))) {
 					continue;//Using clinics and the current row is for a clinic that is NOT in the list of clinics we care about.
 				}
 				DataRow row=tableDailyProd.NewRow();
@@ -120,7 +129,7 @@ namespace OpenDentBusiness {
 				row["Name"]=tableIns.Rows[i]["namelf"].ToString();
 				row["Description"]=tableIns.Rows[i]["Description"].ToString();
 				row["Provider"]=tableIns.Rows[i]["Abbr"].ToString();
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+				if(_hasClinics) {
 					row["Clinic"]=tableIns.Rows[i]["Clinic"].ToString();
 				}
 				row["Production"]=0;
@@ -141,8 +150,8 @@ namespace OpenDentBusiness {
 			for(int i=0;i<listTableDailyProdRows.Count;i++) {
 				tableDailyProdSorted.Rows.Add(listTableDailyProdRows[i].ItemArray);
 				//Replace the ClinicNum with the actual description of the clinic.
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
-					string clinicDesc=Clinics.GetDesc(PIn.Long(tableDailyProdSorted.Rows[i]["Clinic"].ToString()));
+				if(_hasClinics) {
+					string clinicDesc=listClinics.Find(x => x.ClinicNum==PIn.Long(tableDailyProdSorted.Rows[i]["Clinic"].ToString())).Description;
 					tableDailyProdSorted.Rows[i]["Clinic"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
 					if(hasBreakdown) {
 						tableDailyProdSorted.Rows[i]["ClinicSplit"]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
@@ -155,9 +164,18 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Returns a dataset that contains 5 tables used to generate the daily report.  If not using clinics then simply supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report</summary>
-		public static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) 
+		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+			}
+			List<long> listProvNums=new List<long>();
+			for(int i=0;i<listProvs.Count;i++) {
+				listProvNums.Add(listProvs[i].ProvNum);
+			}
+			List<long> listClinicNums=new List<long>();
+			for(int i=0;i<listClinics.Count;i++) {
+				listClinicNums.Add(listClinics[i].ClinicNum);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";
@@ -337,18 +355,24 @@ namespace OpenDentBusiness {
 			return dataSet;
 		}
 
-		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetMonthlyData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			return GetData(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,false);
+		///<summary>If not using clinics then supply an empty list of clinics.</summary>
+		public static DataSet GetMonthlyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			//No need to check RemotingRole; no call to db.
+			return GetData(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,false);
 		}
 
-		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetAnnualData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			return GetData(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,true);
+		///<summary>If not using clinics then supply an empty list of clinics.</summary>
+		public static DataSet GetAnnualData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			//No need to check RemotingRole; no call to db.
+			return GetData(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,true);
 		}
 
-		private static DataSet GetData(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics, bool isAnnual) {
-			DataSet dataSet=GetProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
+		private static DataSet GetData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics, bool isAnnual) {
+			//No need to check RemotingRole; no call to db.
+			if(listClinics.Count>0) {
+				_hasClinics=true;
+			}
+			DataSet dataSet=GetProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -407,9 +431,8 @@ namespace OpenDentBusiness {
 				dates=new DateTime[dateTo.Subtract(dateFrom).Days+1];//Make a DateTime array with one position for each day in the report.
 			}
 			//Get a list of clinics so that we have access to their descriptions for the report.
-			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
 			bool hasData;
-			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
+			for(int it=0;it<listClinics.Count;it++) {//For each clinic
 				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop for annual.  Loop through the DateTime array, each position represents one date in the report.
 					hasData=false;
 					if(isAnnual) {
@@ -423,7 +446,7 @@ namespace OpenDentBusiness {
 						row[0]=dates[i].ToString("MMM yyyy");//JAN 2014
 					}
 					else {
-						row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
+						row[0]=dates[i].ToShortDateString();
 					}
 					if(!isAnnual) {
 						row[1]=dates[i].DayOfWeek.ToString();
@@ -437,10 +460,10 @@ namespace OpenDentBusiness {
 					insincome=0;
 					totalincome=0;
 					for(int j=0;j<tableProduction.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableProduction.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableProduction.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;//Only counting unassigned this time around.
 						}
-						else if(listClinicNums[it]!=0 && tableProduction.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableProduction.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Year
@@ -456,10 +479,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableAdj.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableAdj.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableAdj.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableAdj.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableAdj.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Year
@@ -475,10 +498,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableInsWriteoff.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableInsWriteoff.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableInsWriteoff.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableInsWriteoff.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableInsWriteoff.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Year
@@ -494,10 +517,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableSched.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableSched.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableSched.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableSched.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableSched.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i]==(PIn.Date(tableSched.Rows[j]["SchedDate"].ToString()))) {
@@ -506,10 +529,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tablePay.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tablePay.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tablePay.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tablePay.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tablePay.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Year
@@ -525,10 +548,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableIns.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableIns.Rows[j]["ClinicNum"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableIns.Rows[j]["ClinicNum"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableIns.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableIns.Rows[j]["ClinicNum"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(dates[i].Year==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Year
@@ -548,7 +571,7 @@ namespace OpenDentBusiness {
 						totalproduction+=sched;
 					}
 					totalincome=ptincome+insincome;
-					string clinicDesc=Clinics.GetDesc(listClinicNums[it]);
+					string clinicDesc=listClinics[it].Description;
 					if(!isAnnual) {//Monthly
 						row[2]=production.ToString("n");
 						row[3]=sched.ToString("n");
@@ -591,7 +614,7 @@ namespace OpenDentBusiness {
 					row[0]=dates[i].ToString("MMM yyyy");//JAN 2014
 				}
 				else {
-					row[0]=dates[i].ToString("dd MMM yyyy");//01 JAN 2014
+					row[0]=dates[i].ToShortDateString();
 				}
 				if(!isAnnual) {
 					row[1]=dates[i].DayOfWeek.ToString();
@@ -714,15 +737,18 @@ namespace OpenDentBusiness {
 				ds=new DataSet("MonthlyData");
 			}
 			ds.Tables.Add(dt);
-			if(listClinicNums.Count!=0) {
+			if(listClinics.Count!=0) {
 				ds.Tables.Add(dtClinic);
 			}
 			return ds;
 		}
 
 		///<summary></summary>
-		public static DataSet GetProviderDataForClinics(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
-			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics);
+		public static DataSet GetProviderDataForClinics(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+			if(listClinics.Count>0) {
+				_hasClinics=true;
+			}
+			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -757,11 +783,10 @@ namespace OpenDentBusiness {
 			//length of array is number of months between the two dates plus one.
 			//The from date and to date will not be more than one year and must will be within the same year due to FormRpProdInc UI validation enforcement.
 			//Get a list of clinics so that we have access to their descriptions for the report.
-			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
 			bool hasData;
-			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
-				for(int i=0;i<listProvNums.Count;i++) {
-					Provider provCur=Providers.GetProv(listProvNums[i]);
+			for(int it=0;it<listClinics.Count;it++) {//For each clinic
+				for(int i=0;i<listProvs.Count;i++) {
+					Provider provCur=listProvs[i];
 					hasData=false;
 					DataRow row=dtClinic.NewRow();
 					row[0]=provCur.Abbr;
@@ -773,10 +798,10 @@ namespace OpenDentBusiness {
 					insincome=0;
 					totalincome=0;
 					for(int j=0;j<tableProduction.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableProduction.Rows[j]["Clinic"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableProduction.Rows[j]["Clinic"].ToString()!="0") {
 							continue;//Only counting unassigned this time around.
 						}
-						else if(listClinicNums[it]!=0 && tableProduction.Rows[j]["Clinic"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableProduction.Rows[j]["Clinic"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(provCur.Abbr==PIn.String(tableProduction.Rows[j]["Abbr"].ToString()))	{
@@ -785,10 +810,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableAdj.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableAdj.Rows[j]["Clinic"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableAdj.Rows[j]["Clinic"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableAdj.Rows[j]["Clinic"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableAdj.Rows[j]["Clinic"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(provCur.Abbr==PIn.String(tableAdj.Rows[j]["Abbr"].ToString())) {
@@ -797,10 +822,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableInsWriteoff.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableInsWriteoff.Rows[j]["Clinic"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableInsWriteoff.Rows[j]["Clinic"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableInsWriteoff.Rows[j]["Clinic"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableInsWriteoff.Rows[j]["Clinic"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(provCur.Abbr==PIn.String(tableInsWriteoff.Rows[j]["Abbr"].ToString())) {
@@ -809,10 +834,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tablePay.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tablePay.Rows[j]["Clinic"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tablePay.Rows[j]["Clinic"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tablePay.Rows[j]["Clinic"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tablePay.Rows[j]["Clinic"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(provCur.Abbr==PIn.String(tablePay.Rows[j]["Abbr"].ToString())) {
@@ -821,10 +846,10 @@ namespace OpenDentBusiness {
 						}
 					}
 					for(int j=0;j<tableIns.Rows.Count;j++) {
-						if(listClinicNums[it]==0 && tableIns.Rows[j]["Clinic"].ToString()!="0") {
+						if(listClinics[it].ClinicNum==0 && tableIns.Rows[j]["Clinic"].ToString()!="0") {
 							continue;
 						}
-						else if(listClinicNums[it]!=0 && tableIns.Rows[j]["Clinic"].ToString()!=POut.Long(listClinicNums[it])) {
+						else if(listClinics[it].ClinicNum!=0 && tableIns.Rows[j]["Clinic"].ToString()!=POut.Long(listClinics[it].ClinicNum)) {
 							continue;
 						}
 						if(provCur.Abbr==PIn.String(tableIns.Rows[j]["Abbr"].ToString())) {
@@ -834,7 +859,7 @@ namespace OpenDentBusiness {
 					}
 					totalproduction=production+adjust+inswriteoff;
 					totalincome=ptincome+insincome;
-					string clinicDesc=Clinics.GetDesc(listClinicNums[it]);
+					string clinicDesc=listClinics[it].Description;
 					row[1]=production.ToString("n");
 					row[2]=adjust.ToString("n");
 					row[3]=inswriteoff.ToString("n");
@@ -848,8 +873,8 @@ namespace OpenDentBusiness {
 					}
 				}
 			}
-			for(int i=0;i<listProvNums.Count;i++) {
-				Provider provCur=Providers.GetProv(listProvNums[i]);
+			for(int i=0;i<listProvs.Count;i++) {
+				Provider provCur=listProvs[i];
 				hasData=false;
 				DataRow row=dt.NewRow();
 				row[0]=provCur.Abbr;
@@ -906,16 +931,24 @@ namespace OpenDentBusiness {
 			DataSet ds=null;
 			ds=new DataSet("ProviderData");
 			ds.Tables.Add(dt);
-			if(listClinicNums.Count!=0) {
+			if(listClinics.Count!=0) {
 				ds.Tables.Add(dtClinic);
 			}
 			return ds;
 		}
 
-		///<summary>Returns a dataset that contains 5 tables used to generate the annual or monthly report. If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataSet GetProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool isAnnual) {
+		///<summary>Returns a dataset that contains 5 tables used to generate the annual or monthly report. If not using clinics then supply an empty list of clinics.</summary>
+		public static DataSet GetProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool isAnnual) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,isAnnual);
+			}
+			List<long> listClinicNums=new List<long>();
+			for(int i=0;i<listClinics.Count;i++) {
+				listClinicNums.Add(listClinics[i].ClinicNum);
+			}
+			List<long> listProvNums=new List<long>();
+			for(int i=0;i<listProvs.Count;i++) {
+				listProvNums.Add(listProvs[i].ProvNum);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";
@@ -1023,7 +1056,7 @@ namespace OpenDentBusiness {
 				}
 				command= "SELECT "+DbHelper.DtimeToDate("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) Amount,ClinicNum "
 				+"FROM (SELECT appointment.AptDateTime,IFNULL(procedurelog.ProcFee,0) Fee,appointment.ClinicNum,";
-				if(PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO)) {
+				if(Prefs.GetBoolNoCache(PrefName.ReportPandIschedProdSubtractsWO)) {
 					command+="SUM(IFNULL(CASE WHEN WriteOffEstOverride != -1 THEN WriteOffEstOverride ELSE WriteOffEst END,0)) WriteoffEstimate ";
 				}
 				else {
@@ -1099,7 +1132,7 @@ namespace OpenDentBusiness {
 		}
 
 		private static int RowComparer(DataRow x,DataRow y) {
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
+			if(_hasClinics) {
 				string xClinic=x["Clinic"].ToString();
 				string yClinic=y["Clinic"].ToString();
 				if(xClinic!=yClinic) {//Sort by clinic first, if no clinic then they'll be the same empty string.

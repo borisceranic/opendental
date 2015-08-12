@@ -270,7 +270,6 @@ namespace CentralManager {
 			// 
 			// radioDaily
 			// 
-			this.radioDaily.Enabled = false;
 			this.radioDaily.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioDaily.Location = new System.Drawing.Point(14, 21);
 			this.radioDaily.Name = "radioDaily";
@@ -281,7 +280,6 @@ namespace CentralManager {
 			// 
 			// radioMonthly
 			// 
-			this.radioMonthly.Enabled = false;
 			this.radioMonthly.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioMonthly.Location = new System.Drawing.Point(14, 40);
 			this.radioMonthly.Name = "radioMonthly";

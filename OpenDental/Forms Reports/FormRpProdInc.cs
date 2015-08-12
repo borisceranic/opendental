@@ -663,27 +663,30 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			List<long> listProvNums=new List<long>();
+			List<Provider> listProvs=new List<Provider>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+				listProvs.Add(ProviderC.ListShort[listProv.SelectedIndices[i]]);
 			}
-			List<long> listClinicNums=new List<long>();
+			List<Clinic> listClinics=new List<Clinic>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						listClinics.Add(_listClinics[listClin.SelectedIndices[i]]);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							listClinicNums.Add(0);
+							Clinic unassigned=new Clinic();
+							unassigned.ClinicNum=0;
+							unassigned.Description="Unassigned";
+							listClinics.Add(unassigned);
 						}
 						else {
-							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							listClinics.Add(_listClinics[listClin.SelectedIndices[i]-1]);//Minus 1 from the selected index
 						}
 					}
 				}
 			}
-			DataSet dataSetDailyProd=RpProdInc.GetDailyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked
+			DataSet dataSetDailyProd=RpProdInc.GetDailyData(dateFrom,dateTo,listProvs,listClinics,radioWriteoffPay.Checked
 				,checkAllProv.Checked,checkAllClin.Checked,checkClinicBreakdown.Checked);
 			DataTable tableDailyProd=dataSetDailyProd.Tables["DailyProd"];//Includes multiple clinics that will get separated out later.
 			DataSet dataSetDailyProdSplitByClinic=new DataSet();
@@ -793,7 +796,7 @@ namespace OpenDental{
 			query.AddColumn("Ins Income",75,FieldValueType.Number,new Font("Tahoma",8));
 			//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 			//When only one clinic is showing , the "Summary" at the end of every daily report will suffice. (total prod and total income lines).
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClinicNums.Count > 1) {
+			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClinics.Count > 1) {
 				DataTable tableClinicTotals=GetClinicTotals(dataSetDailyProdSplitByClinic);
 				query=report.AddQuery(tableClinicTotals,"Clinic Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Clinic",410,FieldValueType.String,new Font("Tahoma",8));
@@ -886,27 +889,30 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			List<long> listProvNums=new List<long>();
+			List<Provider> listProvs=new List<Provider>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+				listProvs.Add(ProviderC.ListShort[listProv.SelectedIndices[i]]);
 			}
-			List<long> listClinicNums=new List<long>();
+			List<Clinic> listClinics=new List<Clinic>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						listClinics.Add(_listClinics[listClin.SelectedIndices[i]]);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							listClinicNums.Add(0);
+							Clinic unassigned=new Clinic();
+							unassigned.ClinicNum=0;
+							unassigned.Description="Unassigned";
+							listClinics.Add(unassigned);//Will have ClinicNum of 0 for our "Unassigned" needs.
 						}
 						else {
-							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							listClinics.Add(_listClinics[listClin.SelectedIndices[i]-1]);//Minus 1 from the selected index
 						}
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetMonthlyData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetMonthlyData(dateFrom,dateTo,listProvs,listClinics,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
 			DataTable dtClinic=new DataTable();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
@@ -968,26 +974,26 @@ namespace OpenDental{
 			query.AddColumn("Date",70,FieldValueType.String,font);
 			query.AddColumn("Weekday",70,FieldValueType.String,font);
 			query.AddColumn("Production",80,FieldValueType.Number,font);
-			query.AddColumn("Scheduled",80,FieldValueType.Number,font);
-			query.AddColumn("Adjustments",80,FieldValueType.Number,font);
+			query.AddColumn("Sched",80,FieldValueType.Number,font);
+			query.AddColumn("Adj",80,FieldValueType.Number,font);
 			query.AddColumn("Writeoff",80,FieldValueType.Number,font);
 			query.AddColumn("Tot Prod",80,FieldValueType.Number,font);
 			query.AddColumn("Pt Income",80,FieldValueType.Number,font);
 			query.AddColumn("Ins Income",80,FieldValueType.Number,font);
-			query.AddColumn("Total Income",80,FieldValueType.Number,font);
+			query.AddColumn("Tot Income",80,FieldValueType.Number,font);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClin.SelectedIndices.Count>1 && checkClinicBreakdown.Checked) {
 				//If more than one clinic selected, we want to add a table to the end of the report that totals all the clinics together.
 				query=report.AddQuery(dt,"Totals","",SplitByKind.None,2,true);
 				query.AddColumn("Date",70,FieldValueType.String,font);
 				query.AddColumn("Weekday",70,FieldValueType.String,font);
 				query.AddColumn("Production",80,FieldValueType.Number,font);
-				query.AddColumn("Scheduled",80,FieldValueType.Number,font);
-				query.AddColumn("Adjustments",80,FieldValueType.Number,font);
+				query.AddColumn("Sched",80,FieldValueType.Number,font);
+				query.AddColumn("Adj",80,FieldValueType.Number,font);
 				query.AddColumn("Writeoff",80,FieldValueType.Number,font);
 				query.AddColumn("Tot Prod",80,FieldValueType.Number,font);
 				query.AddColumn("Pt Income",80,FieldValueType.Number,font);
 				query.AddColumn("Ins Income",80,FieldValueType.Number,font);
-				query.AddColumn("Total Income",80,FieldValueType.Number,font);
+				query.AddColumn("Tot Income",80,FieldValueType.Number,font);
 				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
 				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
 			}
@@ -1022,27 +1028,30 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			List<long> listProvNums=new List<long>();
+			List<Provider> listProvs=new List<Provider>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+				listProvs.Add(ProviderC.ListShort[listProv.SelectedIndices[i]]);
 			}
-			List<long> listClinicNums=new List<long>();
+			List<Clinic> listClinics=new List<Clinic>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						listClinics.Add(_listClinics[listClin.SelectedIndices[i]]);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							listClinicNums.Add(0);
+							Clinic unassigned=new Clinic();
+							unassigned.ClinicNum=0;
+							unassigned.Description="Unassigned";
+							listClinics.Add(unassigned);//Will have ClinicNum of 0 for our "Unassigned" needs.
 						}
 						else {
-							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							listClinics.Add(_listClinics[listClin.SelectedIndices[i]-1]);//Minus 1 from the selected index
 						}
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetAnnualData(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetAnnualData(dateFrom,dateTo,listProvs,listClinics,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			DataTable dt=ds.Tables["Total"];
 			DataTable dtClinic=new DataTable();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
@@ -1152,27 +1161,30 @@ namespace OpenDental{
 			}
 			dateFrom=PIn.Date(textDateFrom.Text);
 			dateTo=PIn.Date(textDateTo.Text);
-			List<long> listProvNums=new List<long>();
+			List<Provider> listProvs=new List<Provider>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				listProvNums.Add(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum);
+				listProvs.Add(ProviderC.ListShort[listProv.SelectedIndices[i]]);
 			}
-			List<long> listClinicNums=new List<long>();
+			List<Clinic> listClinics=new List<Clinic>();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
 					if(Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						listClinics.Add(_listClinics[listClin.SelectedIndices[i]]);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							listClinicNums.Add(0);
+							Clinic unassigned=new Clinic();
+							unassigned.ClinicNum=0;
+							unassigned.Description="Unassigned";
+							listClinics.Add(unassigned);
 						}
 						else {
-							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							listClinics.Add(_listClinics[listClin.SelectedIndices[i]-1]);//Minus 1 from the selected index
 						}
 					}
 				}
 			}
-			DataSet ds=RpProdInc.GetProviderDataForClinics(dateFrom,dateTo,listProvNums,listClinicNums,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
+			DataSet ds=RpProdInc.GetProviderDataForClinics(dateFrom,dateTo,listProvs,listClinics,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked);
 			ReportComplex report=new ReportComplex(true,true);
 			report.ReportName="Provider P&I";
 			report.AddTitle("Title",Lan.g(this,"Provider Production and Income"));

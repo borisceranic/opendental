@@ -164,6 +164,19 @@ namespace OpenDentBusiness{
 			return strHash.ToString();
 		}
 
+		///<summary>Supply a CentralConnection and this method will go through the logic to put together the connection string.</summary>
+		public static string GetConnectionString(CentralConnection conn) {
+			string connString="";
+			if(conn.DatabaseName!="") {
+				connString=conn.ServerName;
+				connString+=", "+conn.DatabaseName;
+			}
+			else if(conn.ServiceURI!="") {
+				connString=conn.ServiceURI;
+			}
+			return connString;
+		}
+
 		///<summary>The only valid input is a value between 0 and 15.  Text returned will be 1-9 or a-f.</summary>
 		private static string ByteToStr(Byte byteVal) {
 			//No need to check RemotingRole; no call to db.
