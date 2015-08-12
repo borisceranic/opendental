@@ -350,10 +350,14 @@ namespace OpenDental{
 				if(toolBarsAvail!=ToolBarsAvail.AllModules) {
 					ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 				}
-				ToolBarMain.Buttons.Add(new ODToolBarButton(toolButItemCur.ButtonText,-1,"",key));
+				ToolBarMain.Buttons.Add(new ODToolBarButton(toolButItemCur.ButtonText,-1,"",programCur));
 			}
 			for(int i=0;i<ToolBarMain.Buttons.Count;i++) {//Reset the new index, because it might have changed due to removing/adding to the Images list.
-				string key=ToolBarMain.Buttons[i].Tag.ToString();
+				if(ToolBarMain.Buttons[i].Tag.GetType()!=typeof(Program)) {
+					continue;
+				}
+				Program programCur=(Program)ToolBarMain.Buttons[i].Tag;
+				string key=programCur.ProgramNum.ToString()+programCur.ProgName.ToString();
 				if(ToolBarMain.ImageList.Images.ContainsKey(key)) {
 					ToolBarMain.Buttons[i].ImageIndex=ToolBarMain.ImageList.Images.IndexOfKey(key);
 				}

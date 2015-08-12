@@ -4255,10 +4255,10 @@ namespace OpenDental {
 						break;
 				}
 			}
-			else if(e.Button.Tag.GetType()==typeof(long)) {
+			else if(e.Button.Tag.GetType()==typeof(Program)) {
 				if(PatCur!=null) {
 					Patient pat=Patients.GetPat(PatCur.PatNum);
-					ProgramL.Execute((long)e.Button.Tag,pat);
+					ProgramL.Execute(((Program)e.Button.Tag).ProgramNum,pat);
 				}
 			}
 		}

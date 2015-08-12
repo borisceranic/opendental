@@ -1315,8 +1315,8 @@ namespace OpenDental {
 						break;
 				}
 			}
-			else if(e.Button.Tag.GetType()==typeof(long)) {
-				ProgramL.Execute((long)e.Button.Tag,PatCur);
+			else if(e.Button.Tag.GetType()==typeof(Program)) {
+				ProgramL.Execute(((Program)e.Button.Tag).ProgramNum,PatCur);
 			}
 		}
 
@@ -1349,8 +1349,8 @@ namespace OpenDental {
 						break;
 				}
 			}
-			else if(e.Button.Tag.GetType()==typeof(int)) {
-				ProgramL.Execute((int)e.Button.Tag,PatCur);
+			else if(e.Button.Tag.GetType()==typeof(Program)) {
+				ProgramL.Execute(((Program)e.Button.Tag).ProgramNum,PatCur);
 			}
 		}
 
