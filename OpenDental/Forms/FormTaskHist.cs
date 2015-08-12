@@ -47,7 +47,11 @@ namespace OpenDental {
 					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
 				}
 				row.Cells.Add(taskHistOld.DateTStamp.ToString());
-				row.Cells.Add(Userods.GetUser(taskHistOld.UserNum).UserName);
+				long usernum=taskHistOld.UserNumHist;
+				if(usernum==0) {
+					usernum=taskHistOld.UserNum;
+				}
+				row.Cells.Add(Userods.GetUser(usernum).UserName);
 				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
 				gridTaskHist.Rows.Add(row);
 			}
@@ -63,7 +67,11 @@ namespace OpenDental {
 					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
 				}
 				row.Cells.Add(taskHistOld.DateTStamp.ToString());
-				row.Cells.Add(Userods.GetUser(taskHistOld.UserNum).UserName);
+				long usernum=taskHistOld.UserNumHist;
+				if(usernum==0) {
+					usernum=taskHistOld.UserNum;
+				}
+				row.Cells.Add(Userods.GetUser(usernum).UserName);
 				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
 				gridTaskHist.Rows.Add(row);
 			}

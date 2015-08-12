@@ -1522,8 +1522,12 @@ namespace OpenDental {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
 			TaskHist taskHistory=new TaskHist(TaskOld);
+			if(TaskCur.PriorityDefNum!=TaskOld.PriorityDefNum) {
+				//because of the way we compair tasks, this is required to detect priority changes properly
+				taskHistory.PriorityDefNum=TaskCur.PriorityDefNum;
+			}
 			taskHistory.IsNoteChange=notesChanged;
-			taskHistory.UserNum=Security.CurUser.UserNum;
+			taskHistory.UserNumHist=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
