@@ -9876,6 +9876,17 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE displayfield ADD PickList varchar2";
 					Db.NonQ(command);
 				}
+				//Insert the company logo for DentalTek for all users.
+				command="UPDATE program "
+				+"SET ButtonImage='iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAACxEA"
+					+"AAsRAX9kX5EAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjExR/NCNwAAAeFJREFUSEtjYAjb8RSI/1MZnx41GIYRBmfPvfb/zadfROEXH37+P3Xnw//+LQ/+G5Yf+88Uj"
+					+"sfgksU3/pMDvv788z9n3jXqGwwCa068oL7Bn7//+e/RdoYyg//+/ff/959//3/8+vv/ydvv/xcefPrfvPoEOIx54naDMVaDv/z48//yo8//t5x99X/qjof/a1fe/l+06Mb/uKmXw"
+					+"Ni99cx/86rj/6XS94MN4E/Y81+76Mj/zDlX/199/Pl/QPc5TINV8w791yw88p8rFmIrb/wecIz7dp79nz7r6n/RlH1gsfb19/6vOPr8/5Eb7/7fefEVHBQwEDXpIqbBICyRtv9/z"
+					+"Yrb/y89/PT/779/UOX//5+79xHszfwF16Ei2AFWg+WyDoANRAcg81NnXvnPFbP7/2NguOIDbi2nMQ0uWog98h6+/g52LSit4gMfv/4GOw7DYFypogDofVAkXXr4GSqCHaw9+eI/S"
+					+"8RO4gy+9ezrf5Hkff8Tpl4GBwku8Oz9j/8ahYdhhuI3GGRQIdC1rJE7/5+5+xEqigr+ANP1wWvv/hsBUw+SoagGg3LPvP1P4HjS9of/uYFhK51x4P/cfQhxEJ668xE4iEwrj//nj"
+					+"NmFbiiqwVTGQ9Tg+UC8kbp4Ry8AAWMmQ44WLjkAAAAASUVORK5CYII=' "
+				+"WHERE ProgName='DentalTekSmartOfficePhone'";
+				Db.NonQ(command);
 				
 
 
