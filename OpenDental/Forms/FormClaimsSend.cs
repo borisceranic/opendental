@@ -71,6 +71,7 @@ namespace OpenDental{
 		private UI.Button butWeekNext;
 		///<summary>Represents the number of unsent claims per clinic. This is a 1:1 list with _listClinics.</summary>
 		private List<int> _listNumberOfClaims;
+		private delegate void ToolBarClick();
 
 		///<summary></summary>
 		public FormClaimsSend(){
@@ -781,18 +782,25 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMain_ButtonClick(object sender, OpenDental.UI.ODToolBarButtonClickEventArgs e) {
+			ToolBarClick toolClick;
 			switch(e.Button.Tag.ToString()){
 				case "Preview":
 					toolBarButPreview_Click();
 					break;
 				case "Blank":
-					toolBarButBlank_Click();
+					//The reason we are using a delegate and BeginInvoke() is because of a Microsoft bug that causes the Print Dialog window to not be in focus			
+					//when it comes from a toolbar click.
+					//https://social.msdn.microsoft.com/Forums/windows/en-US/681a50b4-4ae3-407a-a747-87fb3eb427fd/first-mouse-click-after-showdialog-hits-the-parent-form?forum=winforms
+					toolClick=toolBarButBlank_Click;
+					this.BeginInvoke(toolClick);
 					break;
 				case "Print":
-					toolBarButPrint_Click();
+					toolClick=toolBarButPrint_Click;
+					this.BeginInvoke(toolClick);
 					break;
 				case "Labels":
-					toolBarButLabels_Click();
+					toolClick=toolBarButLabels_Click;
+					this.BeginInvoke(toolClick);
 					break;
 				case "Eclaims":
 					SendEclaimsToClearinghouse(0);
@@ -1356,7 +1364,10 @@ namespace OpenDental{
 					Undo_Click();
 					break;
 				case "PrintList":
-					PrintHistory_Click();
+					//The reason we are using a delegate and BeginInvoke() is because of a Microsoft bug that causes the Print Dialog window to not be in focus
+					//when it comes from a toolbar click.
+					ToolBarClick toolClick=PrintHistory_Click;
+					this.BeginInvoke(toolClick);
 					break;
 				case "PrintItem":
 					PrintItem_Click();

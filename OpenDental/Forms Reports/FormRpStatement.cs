@@ -399,9 +399,12 @@ namespace OpenDental{
 				//Don't want to have print dialogue come up when not printing.
 			}
 			else {
+				Cursor=Cursors.Default;
 				if(!PrinterL.SetPrinter(pd,PrintSituation.Statement,pat.PatNum,"Statement from "+stmt.DateTStamp.ToShortDateString()+" printed")) {
+					Cursor=Cursors.WaitCursor;
 					return;
 				}
+				Cursor=Cursors.WaitCursor;
 			}
 			PrintStatement(stmt,previewOnly,pd,dataSet,fam,pat);
 		}
