@@ -188,13 +188,6 @@ namespace OpenDental {
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].FieldName);
 						break;
 				}//end switch
-				if(ListSheetFieldDefsCopyPaste!=null) {//reselect pasted controls
-					for(int cp=0;cp<ListSheetFieldDefsCopyPaste.Count;cp++) {
-						if(SheetDefCur.SheetFieldDefs[i].SheetFieldDefNum==ListSheetFieldDefsCopyPaste[cp].SheetFieldDefNum) {
-							listFields.SetSelected(i,true);//safe to run multiple times.
-						}
-					}
-				}
 			}
 		}
 
@@ -1491,6 +1484,16 @@ namespace OpenDental {
 
 			}
 			FillFieldList();
+			//used to be in FillFieldList but was causing these fields to be selected every time FillFieldList was called.
+			for(int i=0;i<SheetDefCur.SheetFieldDefs.Count;i++) {
+				if(ListSheetFieldDefsCopyPaste!=null) {//reselect pasted controls 
+					for(int cp=0;cp<ListSheetFieldDefsCopyPaste.Count;cp++) {
+						if(SheetDefCur.SheetFieldDefs[i].SheetFieldDefNum==ListSheetFieldDefsCopyPaste[cp].SheetFieldDefNum) {
+							listFields.SetSelected(i,true);//safe to run multiple times.
+						}
+					}
+				}
+			}
 			//for(int i=0;i<ListSheetFieldDefsCopyPaste.Count;i++) {//reselect newly added controls
 			//  listFields.SetSelected((listFields.Items.Count-1)-i,true);//Add to selected indicies, which will be the newest clipboard.count controls on the bottom of the list.
 			//}
