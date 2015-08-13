@@ -263,7 +263,6 @@ namespace OpenDental{
 			this.checkSaveToken.Size = new System.Drawing.Size(150, 17);
 			this.checkSaveToken.TabIndex = 8;
 			this.checkSaveToken.Text = "Save Token";
-			this.checkSaveToken.Click += new System.EventHandler(this.checkSaveToken_Click);
 			// 
 			// labelStoreCCNumWarning
 			// 

@@ -159,7 +159,9 @@ namespace OpenDental {
 					return;
 				}
 				else if(Programs.IsEnabled(ProgramName.PayConnect)) {
-
+					MsgBox.Show(this,"Storing credit card numbers is not allowed.  To store a PayConnect token for this card, "
+						+"enter the card information into the payment window and process a payment with the \"Save Token\" option selected.");
+					return;
 				}
 				else {
 					MsgBox.Show(this,"Not allowed to store credit cards.");
