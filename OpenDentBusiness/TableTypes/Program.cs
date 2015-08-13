@@ -93,6 +93,7 @@ namespace OpenDentBusiness{
 		PT,
 		PTupdate,
 		RayMage,
+		Scanora,
 		Schick,
 		Sirona,
 		Sopro,

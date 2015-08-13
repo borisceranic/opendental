@@ -258,6 +258,7 @@
     <Compile Include="Bridges\HandyDentist.cs" />
     <Compile Include="Bridges\Irys.cs" />
     <Compile Include="Bridges\PandaPerio.cs" />
+    <Compile Include="Bridges\Scanora.cs" />
     <Compile Include="Bridges\SmartDent.cs" />
     <Compile Include="Bridges\Triana.cs" />
     <Compile Include="Bridges\Visora.cs" />

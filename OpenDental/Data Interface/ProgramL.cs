@@ -222,6 +222,10 @@ namespace OpenDental{
 				RayMage.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.Scanora.ToString()) {
+				Scanora.SendData(prog,pat);
+				return;
+			}
 #if !DISABLE_WINDOWS_BRIDGES
 			else if(prog.ProgName==ProgramName.Schick.ToString()) {
 				Schick.SendData(prog,pat);
