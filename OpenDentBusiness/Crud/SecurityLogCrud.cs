@@ -55,6 +55,7 @@ namespace OpenDentBusiness.Crud{
 				securityLog.CompName      = PIn.String(table.Rows[i]["CompName"].ToString());
 				securityLog.FKey          = PIn.Long  (table.Rows[i]["FKey"].ToString());
 				securityLog.LogSource     = (OpenDentBusiness.LogSources)PIn.Int(table.Rows[i]["LogSource"].ToString());
+				securityLog.DefNum        = PIn.Long  (table.Rows[i]["DefNum"].ToString());
 				retVal.Add(securityLog);
 			}
 			return retVal;
@@ -95,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SecurityLogNum,";
 			}
-			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES(";
+			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource,DefNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(securityLog.SecurityLogNum)+",";
 			}
@@ -107,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (securityLog.PatNum)+","
 				+"'"+POut.String(securityLog.CompName)+"',"
 				+    POut.Long  (securityLog.FKey)+","
-				+    POut.Int   ((int)securityLog.LogSource)+")";
+				+    POut.Int   ((int)securityLog.LogSource)+","
+				+    POut.Long  (securityLog.DefNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -140,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SecurityLogNum,";
 			}
-			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource) VALUES(";
+			command+="PermType,UserNum,LogDateTime,LogText,PatNum,CompName,FKey,LogSource,DefNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(securityLog.SecurityLogNum)+",";
 			}
@@ -152,7 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (securityLog.PatNum)+","
 				+"'"+POut.String(securityLog.CompName)+"',"
 				+    POut.Long  (securityLog.FKey)+","
-				+    POut.Int   ((int)securityLog.LogSource)+")";
+				+    POut.Int   ((int)securityLog.LogSource)+","
+				+    POut.Long  (securityLog.DefNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +175,8 @@ namespace OpenDentBusiness.Crud{
 				+"PatNum        =  "+POut.Long  (securityLog.PatNum)+", "
 				+"CompName      = '"+POut.String(securityLog.CompName)+"', "
 				+"FKey          =  "+POut.Long  (securityLog.FKey)+", "
-				+"LogSource     =  "+POut.Int   ((int)securityLog.LogSource)+" "
+				+"LogSource     =  "+POut.Int   ((int)securityLog.LogSource)+", "
+				+"DefNum        =  "+POut.Long  (securityLog.DefNum)+" "
 				+"WHERE SecurityLogNum = "+POut.Long(securityLog.SecurityLogNum);
 			Db.NonQ(command);
 		}
@@ -208,6 +212,10 @@ namespace OpenDentBusiness.Crud{
 			if(securityLog.LogSource != oldSecurityLog.LogSource) {
 				if(command!=""){ command+=",";}
 				command+="LogSource = "+POut.Int   ((int)securityLog.LogSource)+"";
+			}
+			if(securityLog.DefNum != oldSecurityLog.DefNum) {
+				if(command!=""){ command+=",";}
+				command+="DefNum = "+POut.Long(securityLog.DefNum)+"";
 			}
 			if(command==""){
 				return false;

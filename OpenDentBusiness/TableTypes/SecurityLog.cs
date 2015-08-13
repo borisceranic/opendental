@@ -33,6 +33,8 @@ namespace OpenDentBusiness{
 		///<summary>Existing LogHash from SecurityLogHash table</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public string LogHash;
+		///<summary>Used in Claims for custom history edits.</summary>
+		public long DefNum;
 
 	}
 

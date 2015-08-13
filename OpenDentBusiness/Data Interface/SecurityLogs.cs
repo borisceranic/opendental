@@ -115,6 +115,11 @@ namespace OpenDentBusiness{
 
 		///<summary>Takes a foreign key to a table associated with that PermType.  PatNum can be 0.</summary>
 		public static void MakeLogEntry(Permissions permType,long patNum,string logText,long fKey,LogSources logSource) {
+			MakeLogEntry(permType,patNum,logText,fKey,LogSources.None,0);
+		}
+
+		///<summary>Takes a foreign key to a table associated with that PermType.  PatNum can be 0.</summary>
+		public static void MakeLogEntry(Permissions permType,long patNum,string logText,long fKey,LogSources logSource,long defNum) {
 			//No need to check RemotingRole; no call to db.
 			SecurityLog securityLog=new SecurityLog();
 			securityLog.PermType=permType;
@@ -126,6 +131,7 @@ namespace OpenDentBusiness{
 			securityLog.PatNum=patNum;
 			securityLog.FKey=fKey;
 			securityLog.LogSource=logSource;
+			securityLog.DefNum=defNum;
 			securityLog.SecurityLogNum=SecurityLogs.Insert(securityLog);
 			//Create a hash of the security log.
 			SecurityLogHashes.InsertSecurityLogHash(securityLog.SecurityLogNum);//uses db date/time

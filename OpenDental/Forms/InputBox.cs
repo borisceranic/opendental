@@ -154,6 +154,9 @@ namespace OpenDental{
 		}
 		#endregion
 
+		public void setTitle(string title) {
+			this.Text=title;
+		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.OK;

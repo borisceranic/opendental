@@ -216,7 +216,9 @@ namespace OpenDentBusiness{
 		///<summary>93- Allows user to edit and delete provider specific fees overrides.</summary>
 		ProviderFeeEdit,
 		///<summary>94- Allows user to merge patients.</summary>
-		PatientMerge
+		PatientMerge,
+		///<summary>95- Only used in Claim History Status Edit</summary>
+		ClaimHistoryEdit
 	}
 
 	

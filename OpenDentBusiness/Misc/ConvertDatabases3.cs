@@ -9887,7 +9887,22 @@ namespace OpenDentBusiness {
 					+"NmFbiiqwVTGQ9Tg+UC8kbp4Ry8AAWMmQ44WLjkAAAAASUVORK5CYII=' "
 				+"WHERE ProgName='DentalTekSmartOfficePhone'";
 				Db.NonQ(command);
-				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE securitylog ADD DefNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE securitylog ADD INDEX (DefNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE securitylog ADD DefNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE securitylog SET DefNum = 0 WHERE DefNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE securitylog MODIFY DefNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX securitylog_DefNum ON securitylog (DefNum)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -9896,7 +9911,6 @@ namespace OpenDentBusiness {
 			}
 			//To15_4_1();
 		}
-		
 
 
 	}

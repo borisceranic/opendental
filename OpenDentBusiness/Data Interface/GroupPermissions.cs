@@ -278,6 +278,7 @@ namespace OpenDentBusiness{
 				//case Permissions.EServicesSetup:
 				//case Permissions.FeeSchedEdit:
 				case Permissions.ProviderFeeEdit:
+				case Permissions.ClaimHistoryEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -335,6 +336,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Carrier Create");
 				case Permissions.ChooseDatabase:
 					return Lans.g("enumPermissions","Choose Database");
+				case Permissions.ClaimHistoryEdit:
+					return Lans.g("enumPermissions","Claim History Edit");
 				case Permissions.ClaimSentEdit:
 					return Lans.g("enumPermissions","Claim Sent Edit");
 				case Permissions.CommlogEdit:
