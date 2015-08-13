@@ -7,9 +7,11 @@ namespace OpenDentBusiness {
 	public class RpPayPlan {
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.</summary>
-		public static DataTable GetPayPlanTable(DateTime dateStart,DateTime dateEnd,List<long> listProvNums,List<long> listClinicNums,bool hasAllProvs,DisplayPayPlanType displayPayPlanType,bool hideCompletedPlans,bool showFamilyBalance) {
+		public static DataTable GetPayPlanTable(DateTime dateStart,DateTime dateEnd,List<long> listProvNums,List<long> listClinicNums,
+			bool hasAllProvs,DisplayPayPlanType displayPayPlanType,bool hideCompletedPlans,bool showFamilyBalance,bool hasDateRange) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listProvNums,listClinicNums,hasAllProvs,displayPayPlanType,hideCompletedPlans,showFamilyBalance);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listProvNums,listClinicNums,hasAllProvs,displayPayPlanType,
+					hideCompletedPlans,showFamilyBalance,hasDateRange);
 			}
 			string whereProv="";
 			if(!hasAllProvs) {
@@ -67,9 +69,12 @@ namespace OpenDentBusiness {
 			command+=" FROM payplan "
 				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
 				+"LEFT JOIN payplancharge ON payplan.PayPlanNum=payplancharge.PayPlanNum "
-				+"WHERE payplan.PayPlanDate >= "+POut.Date(dateStart)+" "
-				+"AND payplan.PayPlanDate <= "+POut.Date(dateEnd)+" "
-				+whereProv
+				+"WHERE TRUE ";//Always include true, so that the WHERE clause may always be present.
+			if(hasDateRange) {
+				command+="AND payplan.PayPlanDate >= "+POut.Date(dateStart)+" "
+				+"AND payplan.PayPlanDate <= "+POut.Date(dateEnd)+" ";
+			}
+			command+=whereProv
 				+whereClin;
 			if(displayPayPlanType==DisplayPayPlanType.Insurance) {
 				command+="AND payplan.PlanNum!=0 ";
