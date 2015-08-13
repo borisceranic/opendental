@@ -33,6 +33,7 @@ namespace OpenDentBusiness{
 
 		public static void To2_8_2() {
 			if(FromVersion < new Version("2.8.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.8.2"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE insplan DROP TemplateNum"
@@ -46,6 +47,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_8_3() {
 			if(FromVersion < new Version("2.8.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.8.3"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"INSERT INTO preference VALUES ('RenaissanceLastBatchNumber','0')"
@@ -59,6 +61,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_8_6() {
 			if(FromVersion < new Version("2.8.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.8.6"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE patient CHANGE City City VARCHAR(100) NOT NULL"
@@ -74,6 +77,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_8_10() {
 			if(FromVersion < new Version("2.8.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.8.10"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE employer ADD Address varchar(255) NOT NULL"
@@ -92,6 +96,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_8_14() {
 			if(FromVersion < new Version("2.8.14.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.8.14"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE adjustment CHANGE AdjType AdjType smallint unsigned NOT NULL"
@@ -109,6 +114,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_9_1() {
 			if(FromVersion < new Version("2.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.9.1"));//No translation in convert script.
 				ExecuteFile("convert_2_9_1.txt");//might throw an exception which we handle.
 				string[] commands=new string[]
 				{
@@ -121,6 +127,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_9_2() {
 			if(FromVersion < new Version("2.9.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.9.2"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE patient ADD PriPending tinyint(1) unsigned NOT NULL"
@@ -135,6 +142,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_9_5() {
 			if(FromVersion < new Version("2.9.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.9.5"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE autocode ADD LessIntrusive tinyint(1) unsigned NOT NULL"
@@ -147,6 +155,7 @@ namespace OpenDentBusiness{
 
 		private static void To2_9_8() {
 			if(FromVersion < new Version("2.9.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 2.9.8"));//No translation in convert script.
 				string claimFormNum;
 				//Change the PlaceNumericCode field for both HCFA forms
 				string command="SELECT ClaimFormNum FROM claimform WHERE UniqueID = '4'";
@@ -288,6 +297,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_0_1() {
 			if(FromVersion < new Version("3.0.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.0.1"));//No translation in convert script.
 				ExecuteFile("convert_3_0_1.txt");//might throw an exception which we handle.
 				//convert appointment patterns from ten minute to five minute intervals---------------------
 				string command="SELECT AptNum,Pattern FROM appointment";
@@ -648,6 +658,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_0_2() {
 			if(FromVersion < new Version("3.0.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.0.2"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"INSERT INTO preference VALUES('TreatPlanShowGraphics','1')"
@@ -662,6 +673,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_0_3() {
 			if(FromVersion < new Version("3.0.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.0.3"));//No translation in convert script.
 				string command="SELECT CONCAT(CONCAT(LName,', '),FName) FROM payplan,patient "
 					+"WHERE patient.PatNum=payplan.PatNum";
 				DataTable table=Db.GetTable(command);
@@ -694,6 +706,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_0_4() {
 			if(FromVersion < new Version("3.0.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.0.4"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE procedurelog ADD HideGraphical tinyint unsigned NOT NULL"
@@ -707,6 +720,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_0_5() {
 			if(FromVersion < new Version("3.0.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.0.5"));//No translation in convert script.
 				//Delete procedures for patients that have been deleted:
 				string command="SELECT patient.PatNum FROM patient,procedurelog "
 					+"WHERE patient.PatNum=procedurelog.PatNum "
@@ -748,6 +762,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_1_0() {
 			if(FromVersion < new Version("3.1.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.1.0"));//No translation in convert script.
 				ExecuteFile("convert_3_1_0.txt");//Might throw an exception which we handle
 				//add Sirona Sidexis:
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -842,6 +857,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_1_3() {
 			if(FromVersion < new Version("3.1.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.1.3"));//No translation in convert script.
 				//0 values in date fields are causing a lot of program slowdown
 				string[] commands=new string[]
 				{
@@ -915,6 +931,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_1_4() {
 			if(FromVersion < new Version("3.1.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.1.4"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER table clearinghouse ADD LoginID varchar(255) NOT NULL"
@@ -930,6 +947,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_1_13() {
 			if(FromVersion < new Version("3.1.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.1.13"));//No translation in convert script.
 				//get rid of any medication pats where medication no longer exists.
 				string command="SELECT medicationpat.MedicationPatNum FROM medicationpat "
 					+"LEFT JOIN medication ON medicationpat.MedicationNum=medication.MedicationNum "
@@ -956,6 +974,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_1_16() {
 			if(FromVersion < new Version("3.1.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.1.16"));//No translation in convert script.
 				//this functionality is all copied directly from the Check Database tool.
 				string command=@"SELECT PatNum FROM patient
 					LEFT JOIN insplan on patient.PriPlanNum=insplan.PlanNum
@@ -993,6 +1012,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_0() {
 			if(FromVersion < new Version("3.4.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.0"));//No translation in convert script.
 				ExecuteFile("convert_3_4_0.txt");//Might throw an exception which we handle.
 				//----------------Clone payment dates into paysplits--------------------------------------
 				string command="SELECT paysplit.SplitNum,payment.PayDate FROM payment,paysplit "
@@ -1100,6 +1120,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_7() {
 			if(FromVersion < new Version("3.4.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.7"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"INSERT INTO clearinghouse(Description,ExportPath,IsDefault,Payors,Eformat,ReceiverID,"
@@ -1116,6 +1137,7 @@ namespace OpenDentBusiness{
 		private static void To3_4_10() {
 			//the only purpose of this is to check the bug fix in conversions
 			if(FromVersion < new Version("3.4.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.10"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"UPDATE preference SET ValueString = '3.4.10.0' WHERE PrefName = 'DataBaseVersion'"
@@ -1127,6 +1149,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_11() {
 			if(FromVersion < new Version("3.4.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.11"));//No translation in convert script.
 				//Planmeca link-----------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -1158,6 +1181,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_16() {
 			if(FromVersion < new Version("3.4.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.16"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					@"UPDATE clearinghouse SET Description='ClaimConnect',ExportPath='C:\\ClaimConnect\\Upload\\' WHERE Description='WebClaim'"
@@ -1170,6 +1194,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_17() {
 			if(FromVersion < new Version("3.4.17.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.17"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"UPDATE patient SET DateFirstVisit='0001-01-01' WHERE DateFirstVisit='0000-00-00'"
@@ -1182,6 +1207,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_4_24() {
 			if(FromVersion < new Version("3.4.24.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.4.24"));//No translation in convert script.
 				//Delete program links for WebClaim and Renaissance--------------------------------------
 				string command="SELECT ProgramNum FROM program WHERE ProgName='WebClaim' OR ProgName='Renaissance'";
 				DataTable table=Db.GetTable(command);
@@ -1230,6 +1256,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_5_0() {
 			if(FromVersion < new Version("3.5.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.5.0"));//No translation in convert script.
 				ExecuteFile("convert_3_5_0.txt");//Might throw an exception which we handle.
 				//Add patient picture category to images
 				string command="SELECT MAX(ItemOrder) FROM definition WHERE Category=18";
@@ -1277,6 +1304,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_5_1() {
 			if(FromVersion < new Version("3.5.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.5.1"));//No translation in convert script.
 				string[] commands=new string[]
 				{
 					"ALTER TABLE schedule CHANGE Note Note TEXT NOT NULL"
@@ -1289,6 +1317,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_5_3() {
 			if(FromVersion < new Version("3.5.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.5.3"));//No translation in convert script.
 				//DentForms link-----------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -1324,6 +1353,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_6_0() {
 			if(FromVersion < new Version("3.6.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.6.0"));//No translation in convert script.
 				ExecuteFile("convert_3_6_0.txt");//Might throw an exception which we handle.
 				string command;
 				command=
@@ -1335,6 +1365,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_6_1() {
 			if(FromVersion < new Version("3.6.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.6.1"));//No translation in convert script.
 				string command;
 				//Not sure how some of the dates got out of synch:
 				command="UPDATE payment,paysplit SET paysplit.DatePay=payment.PayDate WHERE paysplit.PayNum=payment.PayNum";
@@ -1353,6 +1384,7 @@ namespace OpenDentBusiness{
 		private static void To3_6_4() {
 			//duplicate of To3_5_6 because we needed to fix for users who had already upgraded to 3.6
 			if(FromVersion < new Version("3.6.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.6.4"));//No translation in convert script.
 				string[] commands=new string[]
 					{
 						"ALTER TABLE procedurecode CHANGE ADACode ADACode varchar(15) character set utf8 collate utf8_bin NOT NULL"
@@ -1387,6 +1419,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_6_5() {
 			if(FromVersion < new Version("3.6.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.6.5"));//No translation in convert script.
 				//delete any unattached adjustments
 				string command="SELECT adjustment.AdjNum,procedurelog.ProcNum FROM adjustment "
 					+"LEFT JOIN procedurelog ON procedurelog.ProcNum=adjustment.ProcNum "
@@ -1405,6 +1438,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_0() {
 			if(FromVersion < new Version("3.7.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.0"));//No translation in convert script.
 				ExecuteFile("convert_3_7_0.txt");//Might throw an exception which we handle.
 				string command;
 				//Convert pay plans-----------------------------------------------------------------------------
@@ -1570,6 +1604,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_2() {
 			if(FromVersion < new Version("3.7.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.2"));//No translation in convert script.
 				//add the new permission types to each group
 				string command="SELECT UserGroupNum FROM usergroup";
 				DataTable table=Db.GetTable(command);
@@ -1597,6 +1632,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_3() {
 			if(FromVersion < new Version("3.7.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.3"));//No translation in convert script.
 				string command="ALTER TABLE securitylog ADD PatNum mediumint unsigned NOT NULL";
 				Db.NonQ32(command);
 				command="ALTER TABLE tasklist ADD DateTimeEntry datetime NOT NULL default '0001-01-01'";
@@ -1613,6 +1649,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_4() {
 			if(FromVersion < new Version("3.7.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.4"));//No translation in convert script.
 				//Easy Notes Pro link-----------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -1632,6 +1669,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_5() {
 			if(FromVersion < new Version("3.7.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.5"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('TimecardSecurityEnabled','0')";
 				Db.NonQ32(command);
 				command="INSERT INTO preference VALUES ('RecallCardsShowReturnAdd','1')";
@@ -1646,6 +1684,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_7_6() {
 			if(FromVersion < new Version("3.7.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.7.6"));//No translation in convert script.
 				string command="ALTER TABLE clinic ADD DefaultPlaceService tinyint unsigned NOT NULL";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '3.7.6.0' WHERE PrefName = 'DataBaseVersion'";
@@ -1656,6 +1695,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_8_0() {
 			if(FromVersion < new Version("3.8.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.8.0"));//No translation in convert script.
 				ExecuteFile("convert_3_8_0.txt");//Might throw an exception which we handle.
 				//add deposit slip permission to each group
 				string command="SELECT UserGroupNum FROM usergroup";
@@ -1687,6 +1727,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_8_5() {
 			if(FromVersion < new Version("3.8.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.8.5"));//No translation in convert script.
 				//Make a few changes to the paths in the ENP bridge
 				string command;//="SELECT ProgramNum FROM program WHERE ProgName='EasyNotesPro'";
 				//DataTable table=Db.GetTable(command);
@@ -1705,6 +1746,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_0() {
 			if(FromVersion < new Version("3.9.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.0"));//No translation in convert script.
 				ExecuteFile(Path.Combine("Version 3 9 0", "convert_3_9_0.txt"));//Might throw an exception which we handle.
 				//convert two letter languages to 5 char specific culture names-------------------------------------------------
 				string command="";
@@ -1830,6 +1872,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_1() {
 			if(FromVersion < new Version("3.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.1"));//No translation in convert script.
 				string command="UPDATE preference SET PrefName = 'BackupToPath' WHERE PrefName = 'BackupPath'";
 				Db.NonQ32(command);
 				command="INSERT INTO preference VALUES ('BackupFromPath', '"+POut.String(@"C:\mysql\data\")+"')";
@@ -1846,6 +1889,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_2() {
 			if(FromVersion < new Version("3.9.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.2"));//No translation in convert script.
 				//DBSWin link-----------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -1882,6 +1926,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_3() {
 			if(FromVersion < new Version("3.9.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.3"));//No translation in convert script.
 				string command="UPDATE preference SET ValueString = '-1' WHERE PrefName = 'InsBillingProv' AND ValueString='1'";
 				Db.NonQ32(command);
 				//Add diagnosis fields to HCFA-1500
@@ -1942,6 +1987,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_4() {
 			if(FromVersion < new Version("3.9.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.4"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('BillingIncludeChanged', '1')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '3.9.4.0' WHERE PrefName = 'DataBaseVersion'";
@@ -1952,6 +1998,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_5() {
 			if(FromVersion < new Version("3.9.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.5"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('BackupRestoreAtoZToPath', '"+POut.String(@"C:\OpenDentalData\")+"')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '3.9.5.0' WHERE PrefName = 'DataBaseVersion'";
@@ -1962,6 +2009,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_6() {
 			if(FromVersion < new Version("3.9.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.6"));//No translation in convert script.
 				string command="ALTER TABLE referral CHANGE PatNum PatNum int NOT NULL";
 				Db.NonQ32(command);
 				command="ALTER TABLE refattach CHANGE PatNum PatNum int NOT NULL";
@@ -1974,6 +2022,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_8() {
 			if(FromVersion < new Version("3.9.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.8"));//No translation in convert script.
 				//DentX link-----------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -2026,6 +2075,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_9() {
 			if(FromVersion < new Version("3.9.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.9"));//No translation in convert script.
 				//TrackNPost clearinghouse
 				string command="INSERT INTO clearinghouse(Description,ExportPath,IsDefault,Payors,Eformat,ReceiverID,"
 					+"SenderID,Password,ResponsePath,CommBridge,ClientProgram) "
@@ -2040,6 +2090,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_17() {
 			if(FromVersion < new Version("3.9.17.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.17"));//No translation in convert script.
 				//Rename VixWin to VixWinOld-----------------------------------------------------------------------
 				string command="UPDATE program SET ProgName='VixWinOld' WHERE ProgName='VixWin'";
 				Db.NonQ32(command);
@@ -2073,6 +2124,7 @@ namespace OpenDentBusiness{
 
 		private static void To3_9_18() {
 			if(FromVersion < new Version("3.9.18.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 3.9.18"));//No translation in convert script.
 				//fixes random keys problems:
 				string command="ALTER TABLE referral CHANGE ReferralNum ReferralNum mediumint unsigned NOT NULL auto_increment";
 				Db.NonQ32(command);
@@ -2087,6 +2139,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_0() {
 			if(FromVersion < new Version("4.0.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.0"));//No translation in convert script.
 				ExecuteFile(Path.Combine("Version 4 0 0", "convert_4_0_0.txt"));//Might throw an exception which we handle.
 				//first, get rid of a slight database inconsistency------------------------------------------------------------  
 				//In my database, I found 65 duplicate covpat entries for certain plans. Users would not notice.
@@ -2434,6 +2487,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_2() {
 			if(FromVersion < new Version("4.0.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.2"));//No translation in convert script.
 				string command="ALTER TABLE account ADD Inactive tinyint unsigned NOT NULL";
 				Db.NonQ32(command);
 				//add accounting permission to each admin group------------------------------------------------------
@@ -2466,6 +2520,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_3() {
 			if(FromVersion < new Version("4.0.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.3"));//No translation in convert script.
 				string command="ALTER TABLE account ADD AccountColor int NOT NULL";
 				Db.NonQ32(command);
 				command="UPDATE account SET AccountColor = -1";//white
@@ -2489,6 +2544,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_4() {
 			if(FromVersion < new Version("4.0.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.4"));//No translation in convert script.
 				string command=@"CREATE TABLE accountingautopay(
 					AccountingAutoPayNum mediumint unsigned NOT NULL auto_increment,
 					PayType smallint unsigned NOT NULL,
@@ -2510,6 +2566,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_5() {
 			if(FromVersion < new Version("4.0.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.5"));//No translation in convert script.
 				string command=@"CREATE TABLE reconcile(
 					ReconcileNum mediumint unsigned NOT NULL auto_increment,
 					AccountNum mediumint unsigned NOT NULL,
@@ -2530,6 +2587,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_9() {
 			if(FromVersion < new Version("4.0.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.9"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('SkipComputeAgingInAccount','0')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '4.0.9.0' WHERE PrefName = 'DataBaseVersion'";
@@ -2540,6 +2598,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_10() {
 			if(FromVersion < new Version("4.0.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.10"));//No translation in convert script.
 				//Add Trojan bridge----------------------------------------------------------------------------------------
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -2574,6 +2633,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_11() {
 			if(FromVersion < new Version("4.0.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.11"));//No translation in convert script.
 				//delete all percentages for medicaid and capitation plans
 				string command=@"SELECT BenefitNum
 					FROM insplan,benefit 
@@ -2593,6 +2653,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_0_13() {
 			if(FromVersion < new Version("4.0.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.0.13"));//No translation in convert script.
 				//Add sales tax fields. Even though we will not use them yet, some customers might make user of them. 
 				string command="INSERT INTO preference VALUES ('SalesTaxPercentage','0')";
 				Db.NonQ32(command);
@@ -2606,6 +2667,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_1_0() {
 			if(FromVersion < new Version("4.1.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.1.0"));//No translation in convert script.
 				string command;
 				if(CultureInfo.CurrentCulture.Name=="en-US"){
 					//Convert CovCats to new names and ranges----------------------------------------------------------------------
@@ -2724,6 +2786,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_1_2() {
 			if(FromVersion < new Version("4.1.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.1.2"));//No translation in convert script.
 				string command;
 				command="DELETE FROM preference WHERE PrefName= 'SkipComputeAgingInAccount'";
 				Db.NonQ32(command);
@@ -2739,6 +2802,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_2_0() {
 			if(FromVersion < new Version("4.2.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.2.0"));//No translation in convert script.
 				string command;
 				//string[] commands;//=new string[] {
 				command="ALTER TABLE procedurecode ADD PaintType tinyint NOT NULL";
@@ -2827,6 +2891,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_2_1() {
 			if(FromVersion < new Version("4.2.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.2.1"));//No translation in convert script.
 				string command="SELECT PatNum,PrimaryTeeth FROM patient WHERE PrimaryTeeth != ''";
 				DataTable table=Db.GetTable(command);
 				string[] priTeeth;
@@ -2850,6 +2915,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_2_8() {
 			if(FromVersion < new Version("4.2.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.2.8"));//No translation in convert script.
 				string command="UPDATE procedurecode SET PaintType=13, TreatArea=2 WHERE ADACode='D1351'";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '4.2.8.0' WHERE PrefName = 'DataBaseVersion'";
@@ -2860,6 +2926,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_2_9() {
 			if(FromVersion < new Version("4.2.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.2.9"));//No translation in convert script.
 				string command;
 				//Add Florida probe bridge----------------------------------------------------------------------------------------
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -2913,6 +2980,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_2_10() {
 			if(FromVersion < new Version("4.2.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.2.10"));//No translation in convert script.
 				string command="ALTER TABLE procedurecode ADD GraphicColor int NOT NULL";
 				Db.NonQ32(command);
 				command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemColor) VALUES(12,6,"
@@ -2926,6 +2994,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_3_0(){
 			if(FromVersion < new Version("4.3.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.3.0"));//No translation in convert script.
 				ExecuteFile(Path.Combine("Version 4 3 0","convert_4_3_0.txt"));//Might throw an exception which we handle.
 				string command;
 				//Add NewPatientForm bridge-----------------------------------------------------------------------------------
@@ -2952,6 +3021,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_3_3() {
 			if(FromVersion < new Version("4.3.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.3.3"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('ReportFolderName','Reports')";
 				Db.NonQ32(command);
 				string imagePath=PrefC.GetString(PrefName.DocPath);
@@ -2969,6 +3039,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_3_4() {
 			if(FromVersion < new Version("4.3.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.3.4"));//No translation in convert script.
 				//get rid of any leading ? in quickpastenote
 				string command="SELECT QuickPasteNoteNum,Abbreviation FROM quickpastenote";
 				DataTable table=Db.GetTable(command);
@@ -2990,6 +3061,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_4_0() {
 			if(FromVersion < new Version("4.4.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.4.0"));//No translation in convert script.
 				ExecuteFile(Path.Combine("Version 4 4 0", "convert_4_4_0.txt"));//Might throw an exception which we handle.
 				string command;
 				//add PerioPal bridge
@@ -3051,6 +3123,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_4_9() {
 			if(FromVersion < new Version("4.4.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.4.9"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('EasyHideHospitals','1')";
 				Db.NonQ32(command);
 				command="ALTER TABLE patient ADD Ward varchar(255) NOT NULL";
@@ -3065,6 +3138,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_4_10() {
 			if(FromVersion < new Version("4.4.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.4.10"));//No translation in convert script.
 				string command;
 				//EMS clearinghouse------------------------------------
 				command="INSERT INTO clearinghouse(Description,ExportPath,IsDefault,Payors,Eformat,ReceiverID,"
@@ -3080,6 +3154,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_5_0() {
 			if(FromVersion < new Version("4.5.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.5.0"));//No translation in convert script.
 				string command;
 				string[] commands=new string[]
 				{
@@ -3172,6 +3247,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_5_1() {
 			if(FromVersion<new Version("4.5.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.5.1"));//No translation in convert script.
 				string command="UPDATE procedurelog SET AptNum=0 WHERE ProcStatus=6";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString='' WHERE PrefName='BillingSelectBillingTypes'";
@@ -3184,6 +3260,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_5_14() {
 			if(FromVersion<new Version("4.5.14.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.5.14"));//No translation in convert script.
 				//add XDR bridge:
 				string command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+") VALUES("
@@ -3222,6 +3299,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_5_21() {
 			if(FromVersion<new Version("4.5.21.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.5.21"));//No translation in convert script.
 				//All 4 of these fields added on 12/21/06:
 				string command="ALTER TABLE patient ADD PreferConfirmMethod tinyint unsigned NOT NULL AFTER Ward";
 				Db.NonQ32(command);
@@ -3239,6 +3317,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_6_0() {
 			if(FromVersion<new Version("4.6.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.0"));//No translation in convert script.
 				string command;
 				command="DROP TABLE IF EXISTS formpat";
 				Db.NonQ32(command);
@@ -3378,6 +3457,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_6_2() {
 			if(FromVersion<new Version("4.6.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.2"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE carrier ADD CDAnetVersion varchar(100) NOT NULL";
 				Db.NonQ32(command);
@@ -3397,6 +3477,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_6_6() {
 			if(FromVersion<new Version("4.6.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.6"));//No translation in convert script.
 				string command="DROP TABLE IF EXISTS userod";
 				Db.NonQ32(command);
 				command="ALTER TABLE user RENAME TO userod";
@@ -3742,6 +3823,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_6_9() {
 			if(FromVersion<new Version("4.6.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.9"));//No translation in convert script.
 				string command="ALTER TABLE commlog CHANGE Mode Mode_ tinyint(3) unsigned NOT NULL default '0'";
 				Db.NonQ32(command);
 				command="ALTER TABLE patient ADD PreferContactMethod tinyint unsigned NOT NULL AFTER PreferConfirmMethod";
@@ -3756,6 +3838,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_6_11() {
 			if(FromVersion<new Version("4.6.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.11"));//No translation in convert script.
 				string command="INSERT INTO preference VALUES ('OracleInsertId','')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '4.6.11.0' WHERE PrefName = 'DataBaseVersion'";
@@ -3767,6 +3850,7 @@ namespace OpenDentBusiness{
 		///<summary>The following changes are to remove the NOT NULL from string fields for all tables in the database in order to become compatible with Oracle, since in Oracle null is the same as the empty string.</summary>
 		private static void To4_6_12() {
 			if(FromVersion<new Version("4.6.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.12"));//No translation in convert script.
 				string command="";
 				for(int i=0;i<removeNotNullFieldCommands.Length;i+=3) {
 					command="ALTER TABLE "+removeNotNullFieldCommands[i]+" MODIFY "+//table name
@@ -3790,6 +3874,7 @@ namespace OpenDentBusiness{
 		///<summary>Support for Oracle began with this version.</summary>
 		private static void To4_6_13() {
 			if(FromVersion<new Version("4.6.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.13"));//No translation in convert script.
 				string command="";
 				command="INSERT INTO preference VALUES ('RegistrationNumberClaim','')";
 				Db.NonQ32(command);
@@ -3802,6 +3887,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_6_19() {
 			if(FromVersion<new Version("4.6.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.19"));//No translation in convert script.
 				//Owandy X-ray Bridge created by SPK 10/06, added 2/22/07-----------------------------------------------------------
 				string command = "INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
 					+ ") VALUES("
@@ -3857,6 +3943,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_6_22() {
 			if(FromVersion<new Version("4.6.22.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.6.22"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql){
 					command="ALTER TABLE sigelementdef CHANGE Sound Sound mediumtext";
@@ -3871,6 +3958,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_7_1() {
 			if(FromVersion<new Version("4.7.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.7.1"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql){
 					command="ALTER TABLE document ADD CropX mediumint NOT NULL";
@@ -4018,6 +4106,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_7_4() {
 			if(FromVersion<new Version("4.7.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.7.4"));//No translation in convert script.
 				string command="";
 				command="UPDATE clearinghouse SET ReceiverID='113504607' WHERE ReceiverID='Tesia'";
 				Db.NonQ32(command);
@@ -4030,6 +4119,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_8_1() {
 			if(FromVersion<new Version("4.8.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.8.1"));//No translation in convert script.
 				string command="";
 				int practiceDefaultProv=PrefC.GetInt(PrefName.PracticeDefaultProv);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -4256,6 +4346,7 @@ namespace OpenDentBusiness{
 		///<summary>First version where individual computer preferences were introduced.</summary>
 		private static void To4_8_3() {
 			if(FromVersion<new Version("4.8.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.8.3"));//No translation in convert script.
 				//preferences should not be deleted since it causes bugs when upgrading.
 				//string command="DELETE FROM preference WHERE PrefName='ToothChartLowerQuality'";
 				//Db.NonQ32(command);
@@ -4289,6 +4380,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_8_8() {
 			if(FromVersion<new Version("4.8.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.8.8"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE quickpastenote CHANGE QuickPasteCatNum QuickPasteCatNum mediumint NOT NULL";
@@ -4309,6 +4401,7 @@ namespace OpenDentBusiness{
 		///<summary>This conversion converts all medium ints in the database to simple signed ints, because the medium int size restriction is causing some key duplication in random primary key generations, and because we want the integers in the database to be complatible with c# ints. Also, using the syntax with regular ints works for both MySQL and Oracle, whereas the mediumint keyword is invalid in Oracle.</summary>
 		private static void To4_8_9() {
 			if(FromVersion<new Version("4.8.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.8.9"));//No translation in convert script.
 				//The table and column names to change, plus a bool to decide weather to specify the NOT NULL condition and a bool to specify if the column is autoincrement. Table format is in groups (table name, column name, auto increment (a or yes, space for no))
 				string[] columns=new string[] {
 					//TABLE NAME											COLUMN NAME															AUTO-INCREMENT
@@ -4573,6 +4666,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_9_1() {
 			if(FromVersion<new Version("4.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.9.1"));//No translation in convert script.
 				string command;
 				DataTable table;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -5187,6 +5281,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_9_2() {
 			if(FromVersion<new Version("4.9.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.9.2"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE procedurelog DROP INDEX indexADACode";
@@ -5206,6 +5301,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To4_9_5() {
 			if(FromVersion<new Version("4.9.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.9.5"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//fix labcase.LaboratoryNum orphaned keys.
@@ -5232,6 +5328,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_9_7() {
 			if(FromVersion<new Version("4.9.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.9.7"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//This step was performed in an earlier conversion, but is required here again, for
@@ -5250,6 +5347,7 @@ namespace OpenDentBusiness{
 
 		private static void To4_9_11() {
 			if(FromVersion<new Version("4.9.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.9.11"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DELETE FROM appointment WHERE AptStatus=6 AND NOT EXISTS(SELECT * FROM patient WHERE patient.NextAptNum=appointment.AptNum)";
@@ -5267,6 +5365,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To5_0_0() {
 			if(FromVersion<new Version("5.0.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.0"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//after r318
@@ -5552,6 +5651,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To5_0_2() {
 			if(FromVersion<new Version("5.0.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.2"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DELETE FROM appointment WHERE AptStatus=6 AND NOT EXISTS(SELECT * FROM patient WHERE patient.NextAptNum=appointment.AptNum)";
@@ -5569,6 +5669,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		private static void To5_0_4() {
 			if(FromVersion<new Version("5.0.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.4"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref ADD SensorType varchar(255) default 'D'";
@@ -5598,6 +5699,7 @@ namespace OpenDentBusiness{
 		///<summary>Just ensures that the SensorType column in the computerpref table has length of 255 (since older code used a length of 256, which is invalid in MySQL version 4.1).</summary>
 		private static void To5_0_5() {
 			if(FromVersion<new Version("5.0.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.5"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref CHANGE SensorType SensorType varchar(255) default 'D'";
@@ -5614,6 +5716,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_0_6() {
 			if(FromVersion<new Version("5.0.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.6"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//Adjust the ada 2006 total fee location to fit be in box #33.
@@ -5632,6 +5735,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_0_7() {
 			if(FromVersion<new Version("5.0.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.7"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE clearinghouse SET ExportPath = '"+POut.String(@"C:\TesiaLink\OUT\")+"' WHERE ISA08='113504607'";
@@ -5656,6 +5760,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_0_10() {
 			if(FromVersion<new Version("5.0.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.10"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE preference SET ValueString = '0' WHERE PrefName = 'ShowProgressNotesInsteadofCommLog'";
@@ -5672,6 +5777,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_0_11() {
 			if(FromVersion<new Version("5.0.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.0.11"));//No translation in convert script.
 				string command;
 				//We can't actually run the reset tool here for two reasons:
 				//1. We can never use objects in conversions due to differences in object versions.
@@ -5692,6 +5798,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_1() {
 			if(FromVersion<new Version("5.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS claimvalcodelog";
@@ -5887,6 +5994,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_3() {
 			if(FromVersion<new Version("5.1.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.3"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref ADD GraphicsDoubleBuffering varchar(1) default '0'";
@@ -5907,6 +6015,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_4() {
 			if(FromVersion<new Version("5.1.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.4"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE etrans ADD TransSetNum INT NOT NULL";
@@ -5923,6 +6032,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_5() {
 			if(FromVersion<new Version("5.1.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.5"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE etrans ADD Note text";
@@ -5939,6 +6049,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_11() {
 			if(FromVersion<new Version("5.1.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.11"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE computerpref SET PreferredPixelFormatNum='0'";
@@ -5955,6 +6066,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_12() {
 			if(FromVersion<new Version("5.1.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.12"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE computerpref SET PreferredPixelFormatNum='0'";//again
@@ -5983,6 +6095,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_18() {
 			if(FromVersion<new Version("5.1.18.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.18"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE computerpref SET GraphicsDoubleBuffering=0, PreferredPixelFormatNum=0";//again
@@ -5999,6 +6112,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_1_19() {
 			if(FromVersion<new Version("5.1.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.1.19"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE computerpref SET GraphicsDoubleBuffering=0, PreferredPixelFormatNum=0";//again (last time, hopefully)
@@ -6015,6 +6129,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_2_0() {
 			if(FromVersion<new Version("5.2.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.2.0"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference VALUES('UseBillingAddressOnClaims','0')";
@@ -6095,6 +6210,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_3_0() {
 			if(FromVersion<new Version("5.3.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.3.0"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE procedurecode ADD BaseUnits int NOT NULL";
@@ -6330,6 +6446,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_3_1() {
 			if(FromVersion<new Version("5.3.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.3.1"));//No translation in convert script.
 				string command;
 				command="UPDATE preference SET ValueString = '5.3.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ32(command);
@@ -6339,6 +6456,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_3_9() {
 			if(FromVersion<new Version("5.3.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.3.9"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command=@"SELECT AptNum FROM appointment WHERE Pattern=''";
@@ -6369,6 +6487,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_3_11() {
 			if(FromVersion<new Version("5.3.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.3.11"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE appointment ADD INDEX indexProvNum (ProvNum)";
@@ -6421,6 +6540,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_4_0() {
 			if(FromVersion<new Version("5.4.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.4.0"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS files";
@@ -6650,6 +6770,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_4_1() {
 			if(FromVersion<new Version("5.4.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.4.1"));//No translation in convert script.
 				string command;
 				command="UPDATE preference SET ValueString = '5.4.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ32(command);
@@ -6659,6 +6780,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_4_7() {
 			if(FromVersion<new Version("5.4.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.4.7"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference VALUES('RegistrationKeyIsDisabled','0')";
@@ -6675,6 +6797,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_4_14() {
 			if(FromVersion<new Version("5.4.14.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.4.14"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command=@"UPDATE task SET ObjectType=2 WHERE ObjectType=1 AND task.KeyNum!=0
@@ -6693,6 +6816,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_5_1() {
 			if(FromVersion<new Version("5.5.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.5.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS claimattach";
@@ -6984,6 +7108,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_6_1() {
 			if(FromVersion<new Version("5.6.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.6.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref ADD TaskKeepListHidden tinyint(1) NOT NULL";
@@ -7212,6 +7337,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_6_18() {
 			if(FromVersion<new Version("5.6.18.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.6.18"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemColor,IsHidden) VALUES(0,7,'Insurance Payment',-16744448,0)";//Green
@@ -7233,6 +7359,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_6_22() {
 			if(FromVersion<new Version("5.6.22.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.6.22"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE paysplit ADD INDEX (ProcNum)";
@@ -7259,6 +7386,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_6_28() {
 			if(FromVersion<new Version("5.6.28.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.6.28"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//Digora Bridge---------------------------------------------------------------------------
@@ -7317,6 +7445,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_6_31() {
 			if(FromVersion<new Version("5.6.31.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.6.31"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES ('ClaimFormTreatDentSaysSigOnFile','0')";
@@ -7333,6 +7462,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_7_1() {
 			if(FromVersion<new Version("5.7.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.7.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES ('StatementSummaryShowInsInfo','1')";
@@ -7442,6 +7572,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_7_3() {
 			if(FromVersion<new Version("5.7.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.7.3"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES ('DockPhonePanelShow','0')";
@@ -7458,6 +7589,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_7_4() {
 			if(FromVersion<new Version("5.7.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.7.4"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES ('ClaimFormTreatDentSaysSigOnFile','0')";
@@ -7486,6 +7618,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_7_15() {
 			if(FromVersion<new Version("5.7.15.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.7.15"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql){
 					command="ALTER TABLE procedurelog ADD INDEX (PlannedAptNum)";
@@ -7506,6 +7639,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_8_1() {
 			if(FromVersion<new Version("5.8.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.8.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql){
 					command="DROP TABLE IF EXISTS site";
@@ -7652,6 +7786,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_8_2() {
 			if(FromVersion<new Version("5.8.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.8.2"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql){
 					command="ALTER TABLE fee ADD INDEX (CodeNum)";
@@ -7676,6 +7811,7 @@ namespace OpenDentBusiness{
 
 		private static void To5_9_1() {
 			if(FromVersion<new Version("5.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 5.9.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DELETE FROM preference WHERE PrefName='RxOrientVert'";
@@ -7817,6 +7953,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_0_1() {
 			if(FromVersion<new Version("6.0.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.0.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('RecallEmailSubject','Continuing Care Reminder','')";
@@ -8064,6 +8201,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_0_2() {
 			if(FromVersion<new Version("6.0.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.0.2"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('RecallTypesShowingInList','1,3','Comma-delimited list. FK to recalltype.RecallTypeNum.')";//1=prophy,3=perio
 				Db.NonQ32(command);
@@ -8075,6 +8213,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_1_1() {
 			if(FromVersion<new Version("6.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.1.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS plannedappt";
@@ -8396,6 +8535,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_1_8() {
 			if(FromVersion<new Version("6.1.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.1.8"));//No translation in convert script.
 				string command="UPDATE userod SET IsHidden=0 WHERE IsHidden=1 "
 					+"AND EXISTS(SELECT * FROM grouppermission "
 					+"WHERE PermType='"+POut.Long((int)Permissions.SecurityAdmin)+"' "//24
@@ -8409,6 +8549,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_2_1() {
 			if(FromVersion<new Version("6.2.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.2.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command = "DROP TABLE IF EXISTS anesthmedsintake";
@@ -8597,6 +8738,7 @@ namespace OpenDentBusiness{
 
 		private static void To6_2_2() {
 			if(FromVersion<new Version("6.2.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.2.2"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS phonenumber";

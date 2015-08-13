@@ -40,6 +40,8 @@ namespace OpenDentBusiness {
 				tableNames[i]=table.Rows[i][0].ToString();
 			}
 			for(int i=0;i<tableNames.Length;i++) {
+				//Alert anyone that cares that we are checking this table.
+				ODEvent.Fire(new ODEventArgs("CheckTableProgress",Lans.g("MiscData","Checking table")+": "+tableNames[i]));
 				command="CHECK TABLE "+tableNames[i];
 				table=Db.GetTable(command);
 				lastRow=table.Rows.Count-1;
@@ -62,18 +64,18 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		///<summary>If using MySQL, tries to make a backup of the database and then optimizes and repairs each table.  Returns true if a backup was made.
-		///We have to backup the database before running the repair commands because it has a tendency to delete data it cannot understand which is problematic.
+		///<summary>If using MySQL, tries to repair and then optimize each table.
+		///Developers must make a backup prior to calling this method because repairs have a tendency to delete data.
 		///Currently called whenever MySQL is upgraded and when users click Optimize in database maintenance.</summary>
-		public static string BackupRepairAndOptimize(bool isLogged=false) {
+		public static string RepairAndOptimize(bool isLogged=false) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),isLogged);
+			}
 			StringBuilder retVal=new StringBuilder();
 			DataTable tableLog=null;
 			if(DataConnection.DBtype!=DatabaseType.MySql) {
 				return "";
 			}
-			#if !DEBUG
-			MiscData.MakeABackup();
-			#endif
 			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE';";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
@@ -81,6 +83,8 @@ namespace OpenDentBusiness {
 				tableNames[i]=table.Rows[i][0].ToString();
 			}
 			for(int i=0;i<tableNames.Length;i++) {
+				//Alert anyone that cares that we are optimizing this table.
+				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress",Lans.g("MiscData","Optimizing table")+": "+tableNames[i]));
 				command="OPTIMIZE TABLE `"+tableNames[i]+"`";
 				if(!isLogged) {
 					Db.NonQ(command);
@@ -93,6 +97,8 @@ namespace OpenDentBusiness {
 				}
 			}
 			for(int i=0;i<tableNames.Length;i++) {
+				//Alert anyone that cares that we are optimizing this table.
+				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress",Lans.g("MiscData","Repairing table")+": "+tableNames[i]));
 				command="REPAIR TABLE `"+tableNames[i]+"`";
 				if(!isLogged) {
 					Db.NonQ(command);
@@ -5242,9 +5248,6 @@ HAVING cnt>1";
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				return; //Several issues need to be addressed before supporting Oracle.  E.g. backing up, creating temporary tables with globally unique identifiers, etc.
 			}
-			#if !DEBUG
-				MiscData.MakeABackup();//Does not work for Oracle, due to some MySQL specific commands inside.
-			#endif
 			//Unlink etrans records from their etransmessagetext records if older than 1 year.
 			string command="UPDATE etrans "
 				+"SET EtransMessageTextNum=0 "

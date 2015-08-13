@@ -15,6 +15,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental{
 
@@ -56,6 +57,88 @@ namespace OpenDental{
 					return str+"rd";
 			}
 			return "";//will never happen
+		}
+
+		///<summary>Returns false if the backup, repair, or the optimze failed.
+		///Set isSilent to true to suppress the failure message boxes.  However, progress windows will always be shown.</summary>
+		public static bool BackupRepairAndOptimize(bool isSilent) {
+			if(!MakeABackup(isSilent)) {
+				return false;
+			}
+			//Create a thread that will show a window and then stay open until the closing phrase is thrown from this form.
+			ODThread odThread=new ODThread(ShowRepairAndOptimizeProgress);
+			try {
+				odThread.Name="RepairAndOptimizeThread";
+				odThread.Start();
+				DatabaseMaintenance.RepairAndOptimize();
+				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
+			}
+			catch(Exception ex) {//MiscData.MakeABackup() could have thrown an exception.
+				//Close the progress window.
+				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
+				//Show the user that something what went wrong when not in silent mode.
+				if(!isSilent) {
+					if(ex.Message!="") {
+						MessageBox.Show(ex.Message);
+					}
+					MsgBox.Show("FormDatabaseMaintenance","Optimize and Repair failed.");
+				}
+				return false;
+			}
+			return true;
+		}
+
+		private static void ShowRepairAndOptimizeProgress(ODThread odThread) {
+			FormProgressStatus FormPS=new FormProgressStatus("RepairAndOptimizeProgress");
+			FormPS.TopMost=true;//Make this window show on top of ALL other windows.
+			FormPS.ShowDialog();
+		}
+
+		///<summary>This is a wrapper method for MiscData.MakeABackup() that will show a progress window so that the user can see progress.
+		///Returns false if making a backup failed.</summary>
+		public static bool MakeABackup() {
+			return MakeABackup(false);
+		}
+
+		///<summary>This is a wrapper method for MiscData.MakeABackup() that will show a progress window so that the user can see progress.
+		///Set isSilent to true to suppress the failure message boxes.  However, the progress window will always be shown.
+		///Returns false if making a backup failed.</summary>
+		public static bool MakeABackup(bool isSilent) {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return false;//Because MiscData.MakeABackup() is not yet Oracle compatible.
+			}
+			//Create a thread that will show a window and then stay open until the closing phrase is thrown from this form.
+			ODThread odThread=new ODThread(ShowBackupProgress);
+			try {
+				odThread.Name="BackupProgressThread";
+				odThread.Start();
+				MiscData.MakeABackup();
+				ODEvent.Fire(new ODEventArgs("BackupProgress","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
+			}
+			catch(Exception ex) {//MiscData.MakeABackup() could have thrown an exception.
+				//Close the progress window.
+				ODEvent.Fire(new ODEventArgs("BackupProgress","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
+				//Show the user that something what went wrong when not in silent mode.
+				if(!isSilent) {
+					if(ex.Message!="") {
+						MessageBox.Show(ex.Message);
+					}
+					//Reusing translation in ClassConvertDatabase, since it is most likely the only place a translation would have been performed previously.
+					MsgBox.Show("ClassConvertDatabase","Backup failed. Your database has not been altered.");
+				}
+				return false;
+			}
+			return true;
+		}
+
+		private static void ShowBackupProgress(ODThread odThread) {
+			FormProgressStatus FormPS=new FormProgressStatus("BackupProgress");
+			FormPS.TopMost=true;//Make this window show on top of ALL other windows.
+			FormPS.ShowDialog();
 		}
 
 

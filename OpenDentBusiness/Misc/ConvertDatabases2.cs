@@ -26,6 +26,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_2_9() {
 			if(FromVersion<new Version("6.2.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.2.9"));//No translation in convert script.
 				string command="ALTER TABLE fee CHANGE FeeSched FeeSched int NOT NULL";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '6.2.9.0' WHERE PrefName = 'DataBaseVersion'";
@@ -36,6 +37,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_3_1() {
 			if(FromVersion<new Version("6.3.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.3.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName, ValueString,Comments) VALUES ('MobileSyncPath','','')";
@@ -63,6 +65,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_3_3() {
 			if(FromVersion<new Version("6.3.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.3.3"));//No translation in convert script.
 				string command="INSERT INTO preference (PrefName, ValueString,Comments) VALUES ('CoPay_FeeSchedule_BlankLikeZero','1','1 to treat blank entries like zero copay.  0 to make patient responsible on blank entries.')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '6.3.3.0' WHERE PrefName = 'DataBaseVersion'";
@@ -73,6 +76,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_3_4() {
 			if(FromVersion<new Version("6.3.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.3.4"));//No translation in convert script.
 				string command="ALTER TABLE sheetfielddef CHANGE FieldValue FieldValue text NOT NULL";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '6.3.4.0' WHERE PrefName = 'DataBaseVersion'";
@@ -83,6 +87,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_4_1() {
 			if(FromVersion<new Version("6.4.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.4.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE preference SET Comments = '-1 indicates min for all dates' WHERE PrefName = 'RecallDaysPast'";
@@ -163,6 +168,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_4_4() {
 			if(FromVersion<new Version("6.4.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.4.4"));//No translation in convert script.
 				string command;
 				//Convert comma-delimited autonote controls to carriage-return delimited.
 				command="SELECT AutoNoteControlNum,ControlOptions FROM autonotecontrol";
@@ -184,6 +190,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_5_1() {
 			if(FromVersion<new Version("6.5.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.5.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('ShowFeatureMedicalInsurance','0','')";
@@ -265,6 +272,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_1() {
 			if(FromVersion<new Version("6.6.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.1"));//No translation in convert script.
 				string command;
 				DataTable table;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -353,6 +361,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_2() {
 			if(FromVersion<new Version("6.6.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.2"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('WebServiceServerName','','Blank if not using web service.')";
 				Db.NonQ32(command);
@@ -364,6 +373,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_3() {
 			if(FromVersion<new Version("6.6.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.3"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('UpdateInProgressOnComputerName','','Will be blank if update is complete.  If in the middle of an update, the named workstation is the only one allowed to startup OD.')";
 				Db.NonQ32(command);
@@ -375,6 +385,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_8() {
 			if(FromVersion<new Version("6.6.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.8"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('UpdateMultipleDatabases','','Comma delimited')";
 				Db.NonQ32(command);
@@ -386,6 +397,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_16() {
 			if(FromVersion<new Version("6.6.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.16"));//No translation in convert script.
 				string command;
 				command="SELECT ProgramNum FROM program WHERE ProgName='MediaDent'";
 				int programNum=PIn.Int(Db.GetScalar(command));
@@ -408,6 +420,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_6_19() {
 			if(FromVersion<new Version("6.6.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.6.19"));//No translation in convert script.
 				string command;
 				command="UPDATE employee SET LName='O' WHERE LName='' AND FName=''";
 				Db.NonQ32(command);
@@ -421,6 +434,7 @@ namespace OpenDentBusiness {
 
 		private static void To6_7_1() {
 			if(FromVersion<new Version("6.7.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.1"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE document ADD DateTStamp TimeStamp";
 				Db.NonQ32(command);
@@ -676,6 +690,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_7_3() {
 			if(FromVersion<new Version("6.7.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.3"));//No translation in convert script.
 				string command=@"UPDATE claimform,claimformitem SET claimformitem.FieldName='IsGroupHealthPlan'
 					WHERE claimformitem.FieldName='IsStandardClaim' AND claimform.ClaimFormNum=claimformitem.ClaimFormNum
 					AND claimform.UniqueID='OD9'";//1500
@@ -692,6 +707,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_7_4() {
 			if(FromVersion<new Version("6.7.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.4"));//No translation in convert script.
 				string command="DELETE FROM medicationpat WHERE EXISTS(SELECT * FROM patient WHERE medicationpat.PatNum=patient.PatNum AND patient.PatStatus=4)";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '6.7.4.0' WHERE PrefName = 'DataBaseVersion'";
@@ -702,6 +718,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_7_5() {
 			if(FromVersion<new Version("6.7.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.5"));//No translation in convert script.
 				string command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('ClaimsValidateACN','0','If set to 1, then any claim with a groupName containing ADDP will require an ACN number in the claim remarks.')";
 				Db.NonQ32(command);
 				command="UPDATE preference SET ValueString = '6.7.5.0' WHERE PrefName = 'DataBaseVersion'";
@@ -712,6 +729,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_7_12() {
 			if(FromVersion<new Version("6.7.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.12"));//No translation in convert script.
 				string command;
 				//Camsight Bridge---------------------------------------------------------------------------
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -766,6 +784,7 @@ DROP TABLE IF EXISTS etAck";
 		private static void To6_7_15() {
 			//duplicated in 6.6.26
 			if(FromVersion<new Version("6.7.15.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.15"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE insplan CHANGE FeeSched FeeSched int NOT NULL";
 				Db.NonQ32(command);
@@ -781,6 +800,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_7_22() {
 			if(FromVersion<new Version("6.7.22.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.7.22"));//No translation in convert script.
 				string command;
 				command="UPDATE preference SET ValueString ='http://opendentalsoft.com:1942/WebServiceCustomerUpdates/Service1.asmx' WHERE PrefName='UpdateServerAddress' AND ValueString LIKE '%70.90.133.65%'";
 				Db.NonQ(command);
@@ -811,6 +831,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_8_1() {
 			if(FromVersion<new Version("6.8.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.8.1"));//No translation in convert script.
 				string command;
 				//add TreatPlanEdit,ReportProdInc,TimecardDeleteEntry permissions to all groups------------------------------------------------------
 				command="SELECT UserGroupNum FROM usergroup";
@@ -1744,6 +1765,7 @@ DROP TABLE IF EXISTS etAck";
 		private static void To6_8_7() {
 			//duplicated in 6.7
 			if(FromVersion<new Version("6.8.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.8.7"));//No translation in convert script.
 				string command;
 				try {
 					command="ALTER TABLE claimpayment ADD INDEX (DepositNum)";
@@ -1763,6 +1785,7 @@ DROP TABLE IF EXISTS etAck";
 		private static void To6_8_11() {
 			//duplicated in 6.6 and 6.7
 			if(FromVersion<new Version("6.8.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.8.11"));//No translation in convert script.
 				string command;
 				//Mediadent version 4 and 5---------------------------------------
 				command="SELECT COUNT(*) FROM programproperty WHERE PropertyDesc='MediaDent Version 4 or 5'";
@@ -1791,6 +1814,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_8_12() {
 			if(FromVersion<new Version("6.8.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.8.12"));//No translation in convert script.
 				string command;
 				//Ewoo_EZDent bridge-------------------------------------------------------------------------
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -1822,6 +1846,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_8_24() {
 			if(FromVersion<new Version("6.8.24.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.8.24"));//No translation in convert script.
 				string command;
 				command="SELECT CodeNum FROM procedurecode WHERE ProcCode='D1204'";
 				string codeNum1204=Db.GetScalar(command);
@@ -1839,6 +1864,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_9_1() {
 			if(FromVersion<new Version("6.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.9.1"));//No translation in convert script.
 				string command;
 				//Mountainside Bridge---------------------------------------------------------------------------
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -1939,6 +1965,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_9_4() {
 			if(FromVersion<new Version("6.9.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.9.4"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE automation CHANGE SheetNum SheetDefNum bigint NOT NULL";
 				Db.NonQ(command);
@@ -1961,6 +1988,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To6_9_10() {
 			if(FromVersion<new Version("6.9.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 6.9.10"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE computerpref ADD COLUMN DirectXFormat VARCHAR(255) DEFAULT ''";
 				Db.NonQ(command);
@@ -1972,6 +2000,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To7_0_1() {
 			if(FromVersion<new Version("7.0.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.0.1"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference(PrefName,ValueString) VALUES('InsDefaultShowUCRonClaims','0')";
 				Db.NonQ(command);
@@ -2024,6 +2053,7 @@ DROP TABLE IF EXISTS etAck";
 
 		private static void To7_1_1() {
 			if(FromVersion<new Version("7.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.1.1"));//No translation in convert script.
 				string command;
 				try {
 					command="ALTER TABLE refattach ADD INDEX (PatNum)";
@@ -2165,6 +2195,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_1_2() {
 			if(FromVersion<new Version("7.1.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.1.2"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE provider ADD TaxonomyCodeOverride varchar(255) NOT NULL";
 				Db.NonQ(command);
@@ -2176,6 +2207,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_1_16() {
 			if(FromVersion<new Version("7.1.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.1.16"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE etransmessagetext CHANGE MessageText MessageText mediumtext NOT NULL";
 				Db.NonQ(command);
@@ -2187,6 +2219,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_1_18() {
 			if(FromVersion<new Version("7.1.18.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.1.18"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference(PrefName,ValueString) VALUES('ToothChartMoveMenuToRight','0')";
 				Db.NonQ(command);
@@ -2198,6 +2231,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_1_24() {
 			if(FromVersion<new Version("7.1.24.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.1.24"));//No translation in convert script.
 				string command;
 				command="UPDATE patient SET Guarantor=PatNum WHERE Guarantor=0;";
 				Db.NonQ(command);
@@ -2209,6 +2243,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_1() {
 			if(FromVersion<new Version("7.2.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.1"));//No translation in convert script.
 				string command;
 				//this column was a varchar holding currency amounts.
 				command="ALTER TABLE claimvalcodelog CHANGE ValAmount ValAmount double not null";
@@ -2317,6 +2352,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_3() {
 			if(FromVersion<new Version("7.2.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.3"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE apptviewitem ADD PatFieldDefNum bigint NOT NULL";
 				Db.NonQ(command);
@@ -2328,6 +2364,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_4() {
 			if(FromVersion<new Version("7.2.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.4"));//No translation in convert script.
 				string command;
 				command="UPDATE apptview SET StackBehavUR=1";//all horiz
 				Db.NonQ(command);
@@ -2387,6 +2424,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_7() {
 			if(FromVersion<new Version("7.2.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.7"));//No translation in convert script.
 				string command;
 				command="UPDATE apptviewitem SET ElementColor=-1 WHERE ElementDesc='"+POut.String("MedOrPremed[+]")+"'";//white
 				Db.NonQ(command);
@@ -2402,6 +2440,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_12() {
 			if(FromVersion<new Version("7.2.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.12"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallUseEmailIfHasEmailAddress','0')";
 				Db.NonQ(command);
@@ -2413,6 +2452,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_31() {
 			if(FromVersion<new Version("7.2.31.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.31"));//No translation in convert script.
 				string command;
 				//add Sopro bridge:
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -2446,6 +2486,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_36() {
 			if(FromVersion<new Version("7.2.36.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.36"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE hl7msg CHANGE MsgText MsgText MEDIUMTEXT";
 				Db.NonQ(command);
@@ -2457,6 +2498,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_2_38() {
 			if(FromVersion<new Version("7.2.38.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.2.38"));//No translation in convert script.
 				string command;
 				//add Progeny bridge:
 				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
@@ -2497,6 +2539,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_3_1() {
 			if(FromVersion<new Version("7.3.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.3.1"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE patient CHANGE SchoolName SchoolName varchar(255) NOT NULL";
 				Db.NonQ(command);
@@ -2686,6 +2729,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_4_1() {
 			if(FromVersion<new Version("7.4.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.4.1"));//No translation in convert script.
 				string command;
 				command="SELECT TimeAdjustNum,RegHours,OTimeHours FROM timeadjust";
 				DataTable table=Db.GetTable(command);
@@ -2763,6 +2807,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		
 		private static void To7_4_7() {
 			if(FromVersion<new Version("7.4.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.4.7"));//No translation in convert script.
 				string command;
 				try {
 					List<long> aptNums=new List<long>();
@@ -2831,6 +2876,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_5_1() {
 			if(FromVersion<new Version("7.5.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.5.1"));//No translation in convert script.
 				string command;
 				command="DROP TABLE IF EXISTS inssub";
 				Db.NonQ(command);
@@ -3104,6 +3150,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_5_4() {
 			if(FromVersion<new Version("7.5.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.5.4"));//No translation in convert script.
 				string command;
 				command="DELETE FROM toolbutitem WHERE ProgramNum=(SELECT p.ProgramNum FROM program p WHERE p.ProgName='PayConnect' LIMIT 1)";
 				Db.NonQ(command);
@@ -3115,6 +3162,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_5_7() {
 			if(FromVersion<new Version("7.5.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.5.7"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference(PrefName,ValueString) VALUES('SubscriberAllowChangeAlways','0')";
 				Db.NonQ(command);
@@ -3126,6 +3174,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_5_12() {
 			if(FromVersion<new Version("7.5.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.5.12"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE inssub CHANGE BenefitNotes BenefitNotes text NOT NULL";
 				Db.NonQ(command);
@@ -3139,6 +3188,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_5_16() {
 			if(FromVersion<new Version("7.5.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.5.16"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE orionproc ADD DPCpost tinyint NOT NULL";
 				Db.NonQ(command);
@@ -3150,6 +3200,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_6_1() {
 			if(FromVersion<new Version("7.6.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.6.1"));//No translation in convert script.
 				string command;
 				command="UPDATE program SET ProgDesc='PayConnect from www.dentalxchange.com' WHERE ProgName='PayConnect' LIMIT 1";
 				Db.NonQ(command);
@@ -3232,6 +3283,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_6_2() {
 			if(FromVersion<new Version("7.6.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.6.2"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE preference DROP COLUMN PrefNum";
 				Db.NonQ(command);
@@ -3245,6 +3297,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_6_4() {
 			if(FromVersion<new Version("7.6.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.6.4"));//No translation in convert script.
 				string command;
 				command="INSERT INTO preference(PrefName,ValueString) VALUES('ReportPandIschedProdSubtractsWO','0')";
 				Db.NonQ(command);
@@ -3256,6 +3309,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_6_10() {
 			if(FromVersion<new Version("7.6.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.6.10"));//No translation in convert script.
 				string command;
 				command="SELECT ProgramNum FROM program WHERE ProgName='Xcharge'";
 				long programNum=PIn.Long(Db.GetScalar(command));
@@ -3279,6 +3333,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_7_1() {
 			if(FromVersion<new Version("7.7.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.7.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE document ADD RawBase64 mediumtext NOT NULL";
@@ -3379,6 +3434,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_8_1() {
 			if(FromVersion<new Version("7.8.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.8.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS creditcard";
@@ -3575,6 +3631,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_8_3() {
 			if(FromVersion<new Version("7.8.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.8.3"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('MobileUserName','')";
@@ -3600,6 +3657,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_8_4() {
 			if(FromVersion<new Version("7.8.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.8.4."));//No translation in convert script.
 				string command;
 				//add Patterson Imaging bridge:
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -3674,6 +3732,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_8_5() {
 			if(FromVersion<new Version("7.8.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.8.5"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {//signal is a reserved word in mySQL 5.5
 					command="DROP TABLE IF EXISTS signalod";
@@ -3695,6 +3754,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_9_1() {
 			if(FromVersion<new Version("7.9.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.9.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claim ADD CanadaTransRefNum varchar(255) NOT NULL";
@@ -4484,6 +4544,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To7_9_2() {
 			if(FromVersion<new Version("7.9.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.9.2"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('MobileSynchNewTables79Done','0')";
@@ -4502,6 +4563,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 5/24/2011</summary>
 		private static void To7_9_8() {
 			if(FromVersion<new Version("7.9.8.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.9.8"));//No translation in convert script.
 				string command;
 				command=@"UPDATE clearinghouse SET ExportPath='C:\\Program Files\\Renaissance\\dotr\\upload\\' WHERE Description='Renaissance'";
 				Db.NonQ(command);
@@ -4514,6 +4576,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 7/7/2011</summary>
 		private static void To7_9_10() {
 			if(FromVersion<new Version("7.9.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 7.9.10"));//No translation in convert script.
 				string command;
 				command="UPDATE payment SET DateEntry=PayDate WHERE DateEntry < "+POut.Date(new DateTime(1880,1,1));
 				Db.NonQ(command);
@@ -4526,6 +4589,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 7/8/2011</summary>
 		private static void To11_0_1() {
 			if(FromVersion<new Version("11.0.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS labpanel";
@@ -5809,6 +5873,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_9() {
 			if(FromVersion<new Version("11.0.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.9"));//No translation in convert script.
 				string command;
 				//ClaimX Clearing House
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -5859,6 +5924,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_10() {
 			if(FromVersion<new Version("11.0.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.10"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD6' LIMIT 1";
@@ -6032,6 +6098,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_11() {
 			if(FromVersion<new Version("11.0.11.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.11"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					//Bug fix for disease column (depricated) being in use. This code is identical to the function run again in 11.0 and is safe to run more than once.
@@ -6074,6 +6141,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_13() {
 			if(FromVersion<new Version("11.0.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.13"));//No translation in convert script.
 				string command;
 				try {//most users will not have this table
 					command="ALTER TABLE phoneempdefault ADD PhoneExt int NOT NULL";
@@ -6099,6 +6167,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_15() {
 			if(FromVersion<new Version("11.0.15.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.15"));//No translation in convert script.
 				string command;
 				try {//most users will not have this table
 					command="ALTER TABLE phone ADD ScreenshotPath varchar(255) NOT NULL";
@@ -6124,6 +6193,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_0_24() {
 			if(FromVersion<new Version("11.0.24.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.24"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE allergydef DROP COLUMN RxCui";//both oracle and mysql
 				Db.NonQ(command);
@@ -6167,6 +6237,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To11_0_36() {
 			if(FromVersion<new Version("11.0.36.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.0.36"));//No translation in convert script.
 				string command;
 				try {
 					if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -6190,6 +6261,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 10/13/2011</summary>
 		private static void To11_1_1() {
 			if(FromVersion<new Version("11.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.1.1"));//No translation in convert script.
 				string command;
 				//Set default appt schedule printing preferences.  Was released when not finished so can't trust current values.
 				command="UPDATE preference SET ValueString="+POut.DateT(new DateTime(2011,1,1,0,0,0))+" WHERE PrefName='ApptPrintTimeStart'";
@@ -6713,6 +6785,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To11_1_6() {
 			if(FromVersion<new Version("11.1.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.1.6"));//No translation in convert script.
 				string command;
 				//We added an index in version 11.0.36 for this column, but some of our customers were already on version 11.1, so we had to add it here as well.
 				try {
@@ -6736,6 +6809,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 
 		private static void To11_1_7() {
 			if(FromVersion<new Version("11.1.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.1.7"));//No translation in convert script.
 				string command;
 				command="ALTER TABLE insplan DROP COLUMN DedBeforePerc";
 				Db.NonQ(command);
@@ -6752,6 +6826,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 11/17/2011</summary>
 		private static void To11_1_9() {
 			if(FromVersion<new Version("11.1.9.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 11.1.9"));//No translation in convert script.
 				//Update VixWin Bridge
 				string command="Select ProgramNum FROM program WHERE ProgName='VixWin'";
 				long programNum=PIn.Long(Db.GetScalar(command));
@@ -6831,6 +6906,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary></summary>
 		private static void To12_0_1() {
 			if(FromVersion<new Version("12.0.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.0.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('BillingEmailSubject','Statement for account [PatNum]')";
@@ -8263,6 +8339,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/04/2012</summary>
 		private static void To12_0_2() {
 			if(FromVersion<new Version("12.0.2.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.0.2"));//No translation in convert script.
 				string command;
 				//Insert MiPACS Imaging Bridge
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -8321,6 +8398,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 02/02/2012</summary>
 		private static void To12_0_5() {
 			if(FromVersion<new Version("12.0.5.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.0.5"));//No translation in convert script.
 				string command;
 				//Delete duplicate MiPACS Imaging Bridge
 				command="SELECT * FROM program WHERE ProgName='MiPACS'";
@@ -8379,6 +8457,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_0_6() {
 			if(FromVersion<new Version("12.0.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.0.6"));//No translation in convert script.
 				string command;
 				//EmdeonMedical clearinghouse.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -8404,6 +8483,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_1_0() {
 			if(FromVersion<new Version("12.1.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.1.0"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('MobileSynchNewTables121Done','0')";
@@ -8535,6 +8615,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_1_7() {
 			if(FromVersion<new Version("12.1.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.1.7"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claim ADD CustomTracking bigint NOT NULL";
@@ -8561,6 +8642,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_2_1() {
 			if(FromVersion<new Version("12.2.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.2.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS custrefentry";
@@ -9013,6 +9095,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_2_17() {
 			if(FromVersion<new Version("12.2.17.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.2.17"));//No translation in convert script.
 				string command="";
 				//Add the 1500 claim form field for prior authorization if it does not already exist. The unique ID is OD9.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -9040,6 +9123,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/08/2013</summary>
 		private static void To12_2_28() {
 			if(FromVersion<new Version("12.2.28.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.2.28"));//No translation in convert script.
 				string command="";
 				//Fix medical claim form 1500, P*Date fields printing issue. Fields were too narrow. The unique ID is OD9.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -9072,6 +9156,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_3_1() {
 			if(FromVersion<new Version("12.3.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.3.1"));//No translation in convert script.
 				string command;
 				//Removing Appointment Complete-Time bar, Patient Note Text and Completed Pt. Note Text.
 				command="DELETE FROM definition WHERE Category=17 AND ItemName='Appointment Complete-Time bar'";//Cat 17=AppointmentColors
@@ -9524,6 +9609,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_3_3() {
 			if(FromVersion<new Version("12.3.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.3.3"));//No translation in convert script.
 				string command="";
 				command="UPDATE claimformitem SET FieldName='PayToDentistAddress' WHERE FieldName='BillingDentistAddress'";
 				Db.NonQ(command);
@@ -9545,6 +9631,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_3_6() {
 			if(FromVersion<new Version("12.3.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.3.6"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="SELECT ProgramNum FROM program WHERE ProgName='eClinicalWorks'";
@@ -9580,6 +9667,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_3_12() {
 			if(FromVersion<new Version("12.3.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.3.12"));//No translation in convert script.
 				string command="";
 				//Sheets created in 12.3 with misc check boxes would have a trailing semicolon.  So we will remove the colon for the sheet field def.
 				command="UPDATE sheetfielddef set FieldName='misc' WHERE FieldType=8 AND FieldName='misc:'";//FieldType 8 = CheckBox.
@@ -9596,6 +9684,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_3_20() {
 			if(FromVersion<new Version("12.3.20.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.3.20"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('RecallExcludeIfAnyFutureAppt','0')";
@@ -9614,6 +9703,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_1() {
 			if(FromVersion<new Version("12.4.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS hl7def";
@@ -10477,6 +10567,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_12() {
 			if(FromVersion<new Version("12.4.12.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.12"));//No translation in convert script.
 				string command;
 				//Add the ADA2012 claim form. The unique ID is OD11.
 				long claimFormNum=0;
@@ -11207,6 +11298,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_14() {
 			if(FromVersion<new Version("12.4.14.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.14"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS erxlog";
@@ -11243,6 +11335,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_22() {
 			if(FromVersion<new Version("12.4.22.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.22"));//No translation in convert script.
 				string command;
 				//Claimstream clearinghouse.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -11266,6 +11359,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_28() {
 			if(FromVersion<new Version("12.4.28.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.28"));//No translation in convert script.
 				string command;
 				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					long codeNum=0;
@@ -11393,6 +11487,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_30() {
 			if(FromVersion<new Version("12.4.30.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.30"));//No translation in convert script.
 				string command;
 				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
@@ -11441,6 +11536,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 01/09/2013</summary>
 		private static void To12_4_32() {
 			if(FromVersion<new Version("12.4.32.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.32"));//No translation in convert script.
 				string command;
 				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					long codeNumD1203=0;
@@ -11492,6 +11588,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 02/23/2013</summary>
 		private static void To12_4_38() {
 			if(FromVersion<new Version("12.4.38.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.38"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
 					//skip.  Too hard for too little benefit.
@@ -11545,6 +11642,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 		///<summary>Oracle compatible: 02/23/2013</summary>
 		private static void To13_1_1() {
 			if(FromVersion<new Version("13.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.1"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE clockevent CHANGE AmountBonus AmountBonus double NOT NULL default -1";
@@ -11945,6 +12043,7 @@ a.PageNotExists:hover {
 		///<summary>Oracle compatible: 02/23/2013</summary>
 		private static void To13_1_3() {
 			if(FromVersion<new Version("13.1.3.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.3"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('SpellCheckIsEnabled','1')";
@@ -11963,6 +12062,7 @@ a.PageNotExists:hover {
 		///<summary>Oracle compatible: 05/16/2013</summary>
 		private static void To13_1_14() {
 			if(FromVersion<new Version("13.1.14.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.14"));//No translation in convert script.
 				string command;
 				command="UPDATE preference SET ValueString = "+DbHelper.Now()+" WHERE PrefName = 'ElectronicRxDateStartedUsing131'";
 				Db.NonQ(command);
@@ -11975,6 +12075,7 @@ a.PageNotExists:hover {
 		///<summary>Oracle compatible: 05/16/2013</summary>
 		private static void To13_1_19() {
 			if(FromVersion<new Version("13.1.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.19"));//No translation in convert script.
 				string command;
 				try {
 					if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -12032,6 +12133,7 @@ a.PageNotExists:hover {
 
 		private static void To13_1_32() {
 			if(FromVersion<new Version("13.1.32.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.32"));//No translation in convert script.
 				string command;
 				try {
 					if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -12052,6 +12154,7 @@ a.PageNotExists:hover {
 
 		private static void To13_1_33() {
 			if(FromVersion<new Version("13.1.33.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.33"));//No translation in convert script.
 				string command;
 				bool isNewCropEnabled=false;
 				command="SELECT ValueString FROM preference WHERE PrefName='NewCropAccountId'";
@@ -12090,6 +12193,7 @@ a.PageNotExists:hover {
 
 		private static void To13_1_38() {
 			if(FromVersion<new Version("13.1.38.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.1.38"));//No translation in convert script.
 				string command;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('BillingElectSaveHistory','0')";

@@ -1,3 +1,4 @@
+using CodeBase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,7 +64,8 @@ namespace OpenDentBusiness {
 			return false;
 		}
 
-		///<summary>Backs up the database to the same directory as the original just in case the user did not have sense enough to do a backup first.</summary>
+		///<summary>Backs up the database to the same directory as the original just in case the user did not have sense enough to do a backup first.
+		///Does not work for Oracle, due to some MySQL specific commands inside.</summary>
 		public static long MakeABackup() {
 			//This function should always make the backup on the server itself, and since no directories are
 			//referred to (all handled with MySQL), this function will always be referred to the server from
@@ -106,6 +108,8 @@ namespace OpenDentBusiness {
 			//switch to using the new database
 			DataConnection newDcon=new DataConnection(newDb);
 			for(int i=0;i<tableName.Length;i++) {
+				//Alert anyone that cares that we are backing up this table.
+				ODEvent.Fire(new ODEventArgs("BackupProgress",Lans.g("MiscData","Backing up table")+": "+tableName[i]));
 				command="SHOW CREATE TABLE "+oldDb+"."+tableName[i];//also works with views.
 				table=newDcon.GetTable(command);
 				command=PIn.ByteArray(table.Rows[0][1]);

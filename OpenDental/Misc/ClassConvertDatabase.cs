@@ -141,20 +141,12 @@ namespace OpenDental{
 					if(!isSilent) {
 						MessageBox.Show(Lan.g(this,"A mixture of database tables in InnoDB and MyISAM format were found.  A database backup will now be made, and then the following InnoDB tables will be converted to MyISAM format: ")+namesInnodb);
 					}
-					try {
-						MiscData.MakeABackup();//Does not work for Oracle, due to some MySQL specific commands inside.
-					}
-					catch(Exception e) {
+					if(!Shared.MakeABackup(isSilent)) {
 						Cursor.Current=Cursors.Default;
 						if(isSilent) {
 							FormOpenDental.ExitCode=101;//Database Backup failed
 							Application.Exit();
-							return false;
 						}
-						if(e.Message!="") {
-							MessageBox.Show(e.Message);
-						}
-						MsgBox.Show(this,"Backup failed. Your database has not been altered.");
 						return false;
 					}
 					if(!DatabaseMaintenance.ConvertTablesToMyisam()) {
@@ -204,6 +196,7 @@ namespace OpenDental{
 			}
 #endif
 			Cursor.Current=Cursors.WaitCursor;
+			ODThread odThread=new ODThread(ShowUpgradeProgress);//Prepare a thread that will show the progress of the upgrade.
 #if !DEBUG
 			if(!isSilent) {
 				if(DataConnection.DBtype!=DatabaseType.MySql
@@ -211,23 +204,15 @@ namespace OpenDental{
 					return false;
 				}
 			}
-			try{
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					MiscData.MakeABackup();//Does not work for Oracle, due to some MySQL specific commands inside.
-				}
-			}
-			catch(Exception e){
-				Cursor.Current=Cursors.Default;
-				if(isSilent) {
-					FormOpenDental.ExitCode=101;//Database Backup failed
-					Application.Exit();
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				if(!Shared.MakeABackup(isSilent)) {
+					Cursor.Current=Cursors.Default;
+					if(isSilent) {
+						FormOpenDental.ExitCode=101;//Database Backup failed
+						Application.Exit();
+					}
 					return false;
 				}
-				if(e.Message!=""){
-					MessageBox.Show(e.Message);
-				}
-				MsgBox.Show(this,"Backup failed. Your database has not been altered.");
-				return false;
 			}
 			//We've been getting an increasing number of phone calls with databases that have duplicate preferences which is impossible
 			//unless a user has gotten this far and another computer in the office is in the middle of an update as well.
@@ -262,60 +247,67 @@ namespace OpenDental{
 				MsgBox.Show(this,"The database has already been updated from another computer.");
 				return false;
 			}
-			try{
+			try {
 #endif
-			if(FromVersion < new Version("7.5.17")) {//Insurance Plan schema conversion
-				if(isSilent) {
-					FormOpenDental.ExitCode=139;//Update must be done manually to fix Insurance Plan Schema
-					Application.Exit();
-					return false;
-				}
-				Cursor.Current=Cursors.Default;
-				YN InsPlanConverstion_7_5_17_AutoMergeYN=YN.Unknown;
-				if(FromVersion < new Version("7.5.1")) {
-					FormInsPlanConvert_7_5_17 form=new FormInsPlanConvert_7_5_17();
-					if(PrefC.GetBoolSilent(PrefName.InsurancePlansShared,true)) {
-						form.InsPlanConverstion_7_5_17_AutoMergeYN=YN.Yes;
-					}
-					else {
-						form.InsPlanConverstion_7_5_17_AutoMergeYN=YN.No;
-					}
-					form.ShowDialog();
-					if(form.DialogResult==DialogResult.Cancel) {
-						MessageBox.Show("Your database has not been altered.");
+				if(FromVersion < new Version("7.5.17")) {//Insurance Plan schema conversion
+					if(isSilent) {
+						FormOpenDental.ExitCode=139;//Update must be done manually to fix Insurance Plan Schema
+						Application.Exit();
 						return false;
 					}
-					InsPlanConverstion_7_5_17_AutoMergeYN=form.InsPlanConverstion_7_5_17_AutoMergeYN;
+					Cursor.Current=Cursors.Default;
+					YN InsPlanConverstion_7_5_17_AutoMergeYN=YN.Unknown;
+					if(FromVersion < new Version("7.5.1")) {
+						FormInsPlanConvert_7_5_17 form=new FormInsPlanConvert_7_5_17();
+						if(PrefC.GetBoolSilent(PrefName.InsurancePlansShared,true)) {
+							form.InsPlanConverstion_7_5_17_AutoMergeYN=YN.Yes;
+						}
+						else {
+							form.InsPlanConverstion_7_5_17_AutoMergeYN=YN.No;
+						}
+						form.ShowDialog();
+						if(form.DialogResult==DialogResult.Cancel) {
+							MessageBox.Show("Your database has not been altered.");
+							return false;
+						}
+						InsPlanConverstion_7_5_17_AutoMergeYN=form.InsPlanConverstion_7_5_17_AutoMergeYN;
+					}
+					ConvertDatabases.Set_7_5_17_AutoMerge(InsPlanConverstion_7_5_17_AutoMergeYN);//does nothing if this pref is already present for some reason.
+					Cursor.Current=Cursors.WaitCursor;
 				}
-				ConvertDatabases.Set_7_5_17_AutoMerge(InsPlanConverstion_7_5_17_AutoMergeYN);//does nothing if this pref is already present for some reason.
-				Cursor.Current=Cursors.WaitCursor;
-			}
-			if(FromVersion>=new Version("3.4.0")){
-				Prefs.UpdateBool(PrefName.CorruptedDatabase,true);
-			}
-			ConvertDatabases.FromVersion=FromVersion;
+				if(FromVersion>=new Version("3.4.0")) {
+					Prefs.UpdateBool(PrefName.CorruptedDatabase,true);
+				}
+				ConvertDatabases.FromVersion=FromVersion;
 #if !DEBUG
-			//Typically the UpdateInProgressOnComputerName preference will have already been set within FormUpdate.
-			//However, the user could have cancelled out of FormUpdate after successfully downloading the Setup.exe
-			//OR the Setup.exe could have been manually sent to our customer (during troubleshooting with HQ).
-			//For those scenarios, the preference will be empty at this point and we need to let other computers know that an update going to start.
-			//Updating the string (again) here will guarantee that all computers know an update is in fact in progress from this machine.
-			Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,Environment.MachineName);
+				//Typically the UpdateInProgressOnComputerName preference will have already been set within FormUpdate.
+				//However, the user could have cancelled out of FormUpdate after successfully downloading the Setup.exe
+				//OR the Setup.exe could have been manually sent to our customer (during troubleshooting with HQ).
+				//For those scenarios, the preference will be empty at this point and we need to let other computers know that an update going to start.
+				//Updating the string (again) here will guarantee that all computers know an update is in fact in progress from this machine.
+				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,Environment.MachineName);
 #endif
-			ConvertDatabases.To2_8_2();//begins going through the chain of conversion steps
-			Cursor.Current=Cursors.Default;
-			if(FromVersion>=new Version("3.4.0")){
-				//CacheL.Refresh(InvalidType.Prefs);//or it won't know it has to update in the next line.
-				Prefs.UpdateBool(PrefName.CorruptedDatabase,false,true);//more forceful refresh in order to properly change flag
-			}
-			if(!isSilent) {
-				MsgBox.Show(this,"Database update successful");
-			}
-			Cache.Refresh(InvalidType.Prefs);
-			return true;
+				//Show a progress window that will indecate to the user that there is an active update in progress.  Currently okay to show during isSilent.
+				odThread.Name="ConvertDatabasesProgressThread";
+				odThread.Start();
+				ConvertDatabases.To2_8_2();//begins going through the chain of conversion steps
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
+				Cursor.Current=Cursors.Default;
+				if(FromVersion>=new Version("3.4.0")) {
+					//CacheL.Refresh(InvalidType.Prefs);//or it won't know it has to update in the next line.
+					Prefs.UpdateBool(PrefName.CorruptedDatabase,false,true);//more forceful refresh in order to properly change flag
+				}
+				if(!isSilent) {
+					MsgBox.Show(this,"Database update successful");
+				}
+				Cache.Refresh(InvalidType.Prefs);
+				return true;
 #if !DEBUG
 			}
-			catch(System.IO.FileNotFoundException e){
+			catch(System.IO.FileNotFoundException e) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
 				if(isSilent) {
 					FormOpenDental.ExitCode=160;//File not found exception
 					if(FromVersion>=new Version("3.4.0")) {
@@ -325,13 +317,15 @@ namespace OpenDental{
 					return false;
 				}
 				MessageBox.Show(e.FileName+" "+Lan.g(this,"could not be found. Your database has not been altered and is still usable if you uninstall this version, then reinstall the previous version."));
-				if(FromVersion>=new Version("3.4.0")){
+				if(FromVersion>=new Version("3.4.0")) {
 					Prefs.UpdateBool(PrefName.CorruptedDatabase,false);
 				}
 				//Prefs.Refresh();
 				return false;
 			}
-			catch(System.IO.DirectoryNotFoundException){
+			catch(System.IO.DirectoryNotFoundException) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
 				if(isSilent) {
 					FormOpenDental.ExitCode=160;//ConversionFiles folder could not be found
 					if(FromVersion>=new Version("3.4.0")) {
@@ -341,25 +335,33 @@ namespace OpenDental{
 					return false;
 				}
 				MessageBox.Show(Lan.g(this,"ConversionFiles folder could not be found. Your database has not been altered and is still usable if you uninstall this version, then reinstall the previous version."));
-				if(FromVersion>=new Version("3.4.0")){
+				if(FromVersion>=new Version("3.4.0")) {
 					Prefs.UpdateBool(PrefName.CorruptedDatabase,false);
 				}
 				//Prefs.Refresh();
 				return false;
 			}
-			catch(Exception ex){
+			catch(Exception ex) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","DEFCON 1"));//Send the phrase that closes the window.
+				odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
 				if(isSilent) {
 					FormOpenDental.ExitCode=201;//Database was corrupted due to an update failure
 					Application.Exit();
 					return false;
 				}
-			//	MessageBox.Show();
+				//	MessageBox.Show();
 				MessageBox.Show(ex.Message+"\r\n\r\n"
 					+Lan.g(this,"Conversion unsuccessful. Your database is now corrupted and you cannot use it.  Please contact us."));
 				//Then, application will exit, and database will remain tagged as corrupted.
 				return false;
 			}
 #endif
+		}
+
+		private static void ShowUpgradeProgress(ODThread odThread) {
+			FormProgressStatus FormPS=new FormProgressStatus("ConvertDatabases");
+			FormPS.TopMost=true;//Make this window show on top of ALL other windows.
+			FormPS.ShowDialog();
 		}
 
 	}

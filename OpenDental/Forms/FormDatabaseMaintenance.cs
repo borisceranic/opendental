@@ -579,24 +579,18 @@ namespace OpenDental {
 			}
 			Cursor=Cursors.WaitCursor;
 			string result="";
-			try {
-				result=DatabaseMaintenance.BackupRepairAndOptimize();
+			if(Shared.BackupRepairAndOptimize(true)) {
+				result=DateTime.Now.ToString()+"\r\n"+Lan.g("FormDatabaseMaintenance","Repair and Optimization Complete");
 			}
-			catch(Exception ex) {
+			else {
 				result=DateTime.Now.ToString()+"\r\n";
-				if(ex.Message!="") {
-					result+=ex.Message+"\r\n";
-				}
-				result+=Lan.g("FormDatabaseMaintenance","Backup failed.  Your database has not been altered.")+"\r\n";
+				result+=Lan.g("FormDatabaseMaintenance","Backup, repair, or optimize has failed.  Your database has not been altered.")+"\r\n";
 				result+=Lan.g("FormDatabaseMaintenance","Please call support for help, a manual backup of your data must be made before trying to fix your database.")+"\r\n";
 			}
-			if(result=="") {//No errors occurred.
-				result=DateTime.Now.ToString()+"\r\n"+Lan.g("FormDatabaseMaintenance","Optimization Done");
-			}
+			Cursor=Cursors.Default;
 			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);
 			msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.
 			SaveLogToFile(result);
-			Cursor=Cursors.Default;
 		}
 
 		private void butApptProcs_Click(object sender,EventArgs e) {
@@ -716,6 +710,12 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will clear out etrans message text entries over a year old.  An automatic backup of the database will be created before deleting any entries.  This process may take a while to run depending on the size of your database.  Continue?")) {
 				return;
 			}
+#if !DEBUG
+			if(!Shared.MakeABackup()) {
+				MsgBox.Show(this,"Etrans message text entries were not altered.  Please try again.");
+				return;
+			}
+#endif
 			DatabaseMaintenance.ClearOldEtransMessageText();
 			MsgBox.Show(this,"Etrans message text entries over a year old removed");
 		}
@@ -735,7 +735,13 @@ namespace OpenDental {
 			}
 			bool verbose=checkShow.Checked;
 			StringBuilder logText=new StringBuilder();
+			//Create a thread that will show a window and then stay open until the closing phrase is thrown from this form.
+			ODThread odThread=new ODThread(ShowCheckTableProgress);
+			odThread.Name="CheckTableProgressThread";
+			odThread.Start();
 			string result=DatabaseMaintenance.MySQLTables(verbose,isCheck);
+			ODEvent.Fire(new ODEventArgs("CheckTableProgress","DEFCON 1"));//Send the phrase that closes the window.
+			odThread.QuitSync(500);//Give the thread half of a second to gracefully close (should be instantaneous).
 			logText.Append(result);//No database maintenance checks should be run unless this passes.
 			if(!DatabaseMaintenance.GetSuccess()) {
 				Cursor=Cursors.Default;
@@ -769,6 +775,12 @@ namespace OpenDental {
 			gridMain.SetSelected(selectedIndices,true);//Reselect all rows that were originally selected.
 			SaveLogToFile(logText.ToString());
 			Cursor=Cursors.Default;
+		}
+
+		private static void ShowCheckTableProgress(ODThread odThread) {
+			FormProgressStatus FormPS=new FormProgressStatus("CheckTableProgress");
+			FormPS.TopMost=true;//Make this window show on top of ALL other windows.
+			FormPS.ShowDialog();
 		}
 
 		/// <summary>Updates the result column for the specified row in gridMain with the text passed in.</summary>

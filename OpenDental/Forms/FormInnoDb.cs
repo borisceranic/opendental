@@ -47,21 +47,14 @@ namespace OpenDental {
 				msgbox.ShowDialog();
 				return;
 			}
-			try {
-				MiscData.MakeABackup();
-			}
-			catch(Exception ex) {
-				if(ex.Message!="") {
-					MessageBox.Show(ex.Message);
-				}
-				MsgBox.Show("FormInnoDb","Backup failed. Your database has not been altered.");
-				return;
+			if(!Shared.MakeABackup()) {
+				return;//A message has already shown that the backup failed.
 			}
 			Cursor=Cursors.WaitCursor;
 			textBox1.Text+=Lans.g("FormInnoDb","Default Storage Engine: "+InnoDb.GetDefaultEngine().ToString()+"\r\n");
 			Application.DoEvents();
 			int numchanged=InnoDb.ConvertTables("InnoDB","MyISAM");
-			textBox1.Text+=Lan.g("FormInnoDb","Number of tables converted to MyIsam: ")+numchanged.ToString()+"\r\n";
+			textBox1.Text+=Lan.g("FormInnoDb","Number of tables converted to MyISAM: ")+numchanged.ToString()+"\r\n";
 			Application.DoEvents();
 			textBox1.Text+=InnoDb.GetEngineCount();
 			Application.DoEvents();
@@ -91,15 +84,8 @@ namespace OpenDental {
 				msgbox.ShowDialog();
 				return;
 			}
-			try {
-				MiscData.MakeABackup();
-			}
-			catch(Exception ex) {
-				if(ex.Message!="") {
-					MessageBox.Show(ex.Message);
-				}
-				MsgBox.Show("FormInnoDb","Backup failed. Your database has not been altered.");
-				return;
+			if(!Shared.MakeABackup()) {
+				return;//A message has already shown that the backup failed.
 			}
 			Cursor=Cursors.WaitCursor;
 			textBox1.Text+=Lans.g("FormInnoDb","Default Storage Engine: "+InnoDb.GetDefaultEngine().ToString()+"\r\n");
