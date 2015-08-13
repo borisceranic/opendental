@@ -1696,6 +1696,25 @@ namespace OpenDental {
 					break;
 				}
 			}
+			//If PayConnect response is not null, refresh comboCreditCards and select the index of the card used for this payment if the token was saved
+			creditCards=CreditCards.Refresh(PatCur.PatNum);
+			comboCreditCards.Items.Clear();
+			comboCreditCards.SelectedIndex=-1;
+			for(int i=0;i<creditCards.Count;i++) {
+				comboCreditCards.Items.Add(creditCards[i].CCNumberMasked);
+				if(FormP.Response==null || FormP.Response.PaymentToken==null) {
+					continue;
+				}
+				if(creditCards[i].PayConnectToken==FormP.Response.PaymentToken.TokenId
+					&& creditCards[i].PayConnectTokenExp.Year==FormP.Response.PaymentToken.Expiration.year
+					&& creditCards[i].PayConnectTokenExp.Month==FormP.Response.PaymentToken.Expiration.month) {
+					comboCreditCards.SelectedIndex=i;
+				}
+			}
+			comboCreditCards.Items.Add("New card");
+			if(comboCreditCards.SelectedIndex==-1) {
+				comboCreditCards.SelectedIndex=comboCreditCards.Items.Count-1;
+			}
 			//still need to add functionality for accountingAutoPay
 			listPayType.SelectedIndex=DefC.GetOrder(DefCat.PaymentTypes,PIn.Long(prop.PropertyValue));
 			SetComboDepositAccounts();

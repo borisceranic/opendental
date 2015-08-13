@@ -226,7 +226,7 @@ namespace OpenDental {
 			}
 			else {
 				#region X-Charge
-				//Special logic for had a token and changed number or expiration date
+				//Special logic for had a token and changed number or expiration date X-Charge
 				if(CreditCardCur.XChargeToken!="" && IsXCharge &&
 					(CreditCardOld.CCNumberMasked!=CreditCardCur.CCNumberMasked || CreditCardOld.CCExpiration!=CreditCardCur.CCExpiration)) 
 				{ 
@@ -320,6 +320,17 @@ namespace OpenDental {
 						return;
 					}
 				}//End of special token logic
+				#endregion
+				#region PayConnect
+				//Special logic for had a token and changed number or expiration date PayConnect
+				if(CreditCardCur.PayConnectToken!=""
+					&& Programs.IsEnabled(ProgramName.PayConnect)
+					&& (CreditCardOld.CCNumberMasked!=CreditCardCur.CCNumberMasked || CreditCardOld.CCExpiration!=CreditCardCur.CCExpiration)) {
+					//if the number or expiration is changed, the token is no longer valid, so clear the token and token expiration so a new one can be
+					//generated the next time a payment is processed using this card.
+					CreditCardCur.PayConnectToken="";
+					CreditCardCur.PayConnectTokenExp=DateTime.MinValue;
+				}
 				#endregion
 				CreditCards.Update(CreditCardCur);
 			}

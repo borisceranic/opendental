@@ -36,6 +36,13 @@ namespace OpenDental {
 		}
 
 		private void FormPayConnect_Load(object sender,EventArgs e) {
+			textZipCode.Text=PatCur.Zip;
+			textNameOnCard.Text=PatCur.GetNameFL();
+			textAmount.Text=amountInit;
+			checkSaveToken.Checked=PrefC.GetBool(PrefName.StoreCCtokens);
+			if(PrefC.GetBool(PrefName.StoreCCnumbers)) {
+				labelStoreCCNumWarning.Visible=true;
+			}
 			if(CreditCardCur!=null) {//User selected a credit card from drop down.
 				if(CreditCardCur.CCNumberMasked!="") {
 					textCardNumber.Text=CreditCardCur.CCNumberMasked;
@@ -46,18 +53,15 @@ namespace OpenDental {
 				if(CreditCardCur.Zip!="") {
 					textZipCode.Text=CreditCardCur.Zip;
 				}
-				else {
-					textZipCode.Text=PatCur.Zip;
+				textCardNumber.ReadOnly=true;
+				textExpDate.ReadOnly=true;
+				if(CreditCardCur.PayConnectToken!="" && CreditCardCur.PayConnectTokenExp>DateTime.MinValue) {
+					checkSaveToken.Checked=true;
+					checkSaveToken.Enabled=false;
+					textSecurityCode.ReadOnly=true;
+					textZipCode.ReadOnly=true;
+					textNameOnCard.ReadOnly=true;
 				}
-			}
-			else {
-				this.textZipCode.Text=PatCur.Zip;
-			}
-			this.textNameOnCard.Text=PatCur.GetNameFL();
-			this.textAmount.Text=amountInit;
-			checkSaveToken.Checked=PrefC.GetBool(PrefName.StoreCCtokens);
-			if(PrefC.GetBool(PrefName.StoreCCnumbers)) {
-				labelStoreCCNumWarning.Visible=true;
 			}
 		}
 
@@ -301,19 +305,6 @@ namespace OpenDental {
 					printdoc.Print();
 				}
 #endif
-		}
-
-		///<summary>If the user had previously chosen to save the PayConnect token and then unchecks the box, they will not have the original CC number to use in this transaction and will have to re-enter it.  If the box was checked and there was a stored token with a masked CC number and they uncheck the box, clear out the masked CC number and expiration date that is associated with the stored token.  If it was unchecked and they check it, and the original CC number associated with CreditCardCur was a masked CC number and there is a stored PayConnectToken and now textCardNumber.Text is the CC number the user has typed in, clear the PayConnectToken and PayConnectTokenExp fields to prepare to store the new token for the user entered card number.</summary>
-		private void checkSaveToken_Click(object sender,EventArgs e) {
-			if(checkSaveToken.Checked) {
-
-			}
-			else {
-				if(CreditCardCur.PayConnectToken!="") {//user unchecked the save token box and there was a token stored for this 
-					textCardNumber.Clear();
-					textExpDate.Clear();
-				}
-			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
