@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -510,11 +512,52 @@ namespace OpenDental{
 				butCancel.Text=Lan.g(this,"Close");
 			}
 			Patient pat=Patients.GetPat(RepeatCur.PatNum);//pat should never be null. If it is, this will fail.
-			textBillingDay.Text=pat.BillingCycleDay.ToString();
+			//If this is a new repeat charge and no other active repeat charges exist, set the billing cycle day to today
+			if(IsNew && !RepeatCharges.ActiveRepeatChargeExists(RepeatCur.PatNum)) {
+				textBillingDay.Text=DateTimeOD.Today.Day.ToString();
+			}
+			else {
+				textBillingDay.Text=pat.BillingCycleDay.ToString();
+			}
 			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 				labelBillingCycleDay.Visible=true;
 				textBillingDay.Visible=true;
 			}
+		}
+
+		///<summary>Adds the procedure code of the repeating charge to a credit card on the patient's account if the user okays it.</summary>
+		private void AddProcedureToCC() {
+			List<CreditCard> activeCards=CreditCards.GetActiveCards(RepeatCur.PatNum);
+			if(activeCards.Count==0) {
+				return;
+			}
+			CreditCard cardToAddProc=null;
+			if(activeCards.Count==1) { //Only one active card so ask the user to add the procedure to that one
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"There is one active credit card on this patient's account.\r\nDo you want to add this procedure to "+
+					"that card?")) {
+					cardToAddProc=activeCards[0];
+				}
+			}
+			else if(activeCards.FindAll(x => x.Procedures!="").Count==1) { //Only one card has procedures attached so ask the user to add to that card
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"There is one active credit card on this patient's account with authorized procedures attached.\r\n"
+					+"Do you want to add this procedure to that card?")) {
+					cardToAddProc=activeCards.FirstOrDefault(x => x.Procedures!="");
+				}
+			}
+			else { //At least two cards have procedures attached to them or there are multiple active cards and none have procedures attached
+				MsgBox.Show(this,"If you would like to add this procedure to a credit card, go to Credit Card Manage to choose the card.");
+			}
+			if(cardToAddProc==null) {
+				return;
+			}
+			//Check if the procedure is already attached to this card; CreditCard.Procedures is a comma delimited list.
+			List<string> procsOnCard=cardToAddProc.Procedures.Split(new string[] { "," },StringSplitOptions.RemoveEmptyEntries).ToList();
+			if(procsOnCard.Exists(x => x==RepeatCur.ProcCode)) {
+				return;
+			}
+			procsOnCard.Add(RepeatCur.ProcCode);
+			cardToAddProc.Procedures=String.Join(",",procsOnCard);
+			CreditCards.Update(cardToAddProc);
 		}
 
 		private void butManual_Click(object sender,EventArgs e) {
@@ -569,15 +612,10 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, EventArgs e){
-			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-				Patient patOld=Patients.GetPat(RepeatCur.PatNum);
-				Patient patNew=patOld.Copy();
-				patNew.BillingCycleDay=PIn.Int(textBillingDay.Text);
-				Patients.Update(patNew,patOld);
-			}
 			if( textChargeAmt.errorProvider1.GetError(textChargeAmt)!=""
 				|| textDateStart.errorProvider1.GetError(textDateStart)!=""
 				|| textDateStop.errorProvider1.GetError(textDateStop)!=""
+				|| textBillingDay.errorProvider1.GetError(textBillingDay)!=""
 				)
 			{
 				MsgBox.Show(this,"Please fix data entry errors first.");
@@ -598,6 +636,12 @@ namespace OpenDental{
 					return;
 				}
 			}
+			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay) && textBillingDay.Text!="") {
+				Patient patOld=Patients.GetPat(RepeatCur.PatNum);
+				Patient patNew=patOld.Copy();
+				patNew.BillingCycleDay=PIn.Int(textBillingDay.Text);
+				Patients.Update(patNew,patOld);
+			}
 			RepeatCur.ProcCode=textCode.Text;
 			RepeatCur.ChargeAmt=PIn.Double(textChargeAmt.Text);
 			RepeatCur.DateStart=PIn.Date(textDateStart.Text);
@@ -607,9 +651,20 @@ namespace OpenDental{
 			RepeatCur.IsEnabled=checkIsEnabled.Checked;
 			RepeatCur.CreatesClaim=checkCreatesClaim.Checked;
 			if(IsNew){
+				if(!RepeatCharges.ActiveRepeatChargeExists(RepeatCur.PatNum) 
+					&& (textBillingDay.Text=="" || textBillingDay.Text=="0"))
+				{
+					Patient patOld=Patients.GetPat(RepeatCur.PatNum);
+					Patient patNew=patOld.Copy();
+					patNew.BillingCycleDay=PIn.Date(textDateStart.Text).Day;
+					Patients.Update(patNew,patOld);
+				}
 				RepeatCharges.Insert(RepeatCur);
+				if(Prefs.IsODHQ()) {
+					AddProcedureToCC();
+				}
 			}
-			else{
+			else{ //not a new repeat charge
 				RepeatCharges.Update(RepeatCur);
 			}
 			DialogResult=DialogResult.OK;

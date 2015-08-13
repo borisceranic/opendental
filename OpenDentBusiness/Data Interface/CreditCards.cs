@@ -72,6 +72,17 @@ namespace OpenDentBusiness{
 			return result;
 		}
 
+		///<summary>Returns list of active credit cards.</summary>
+		public static List<CreditCard> GetActiveCards(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM creditcard WHERE PatNum="+POut.Long(patNum)
+				+" AND ("+DbHelper.Year("DateStop")+"<1880 OR DateStop>="+DbHelper.Curdate()+") "
+				+" AND ("+DbHelper.Year("DateStart")+">1880 AND DateStart<="+DbHelper.Curdate()+") ";//Recurring card is active.
+			return Crud.CreditCardCrud.SelectMany(command);
+		}
+
 		///<summary>Returns list of credit cards that are ready for a recurring charge.</summary>
 		public static DataTable GetRecurringChargeList() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -160,25 +171,20 @@ namespace OpenDentBusiness{
 			return PIn.Double(Db.GetScalar(command));
 		}
 
-		/// <summary>Returns true if the procedure passed in is linked to any other card on the patient's account.</summary>
-		public static bool ProcLinkedToCard(long patNum,string procCode,long cardNum,string curProcs) {
+		/// <summary>Returns true if the procedure passed in is linked to any other active card on the patient's account.</summary>
+		public static bool ProcLinkedToCard(long patNum,string procCode,long cardNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum,procCode,cardNum,curProcs);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum,procCode,cardNum);
 			}
 			string command="SELECT CreditCardNum,Procedures "
 				+"FROM creditcard "
 				+"WHERE PatNum="+POut.Long(patNum)+" "
 				+"AND DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>"+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ";
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
+				+"AND CreditCardNum!="+POut.Long(cardNum);
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
-				string[] arrayProcs;
-				if(PIn.Long(table.Rows[i]["CreditCardNum"].ToString())==cardNum) {
-					arrayProcs=curProcs.Split(',');
-				}
-				else {
-					arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
-				}
+				string[] arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
 				for(int j=0;j<arrayProcs.Length;j++) {
 					if(arrayProcs[j]==procCode) {
 						return true;
@@ -188,7 +194,7 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		///<summary>Talbe must include columns labeled LatestPayment and DateStart.</summary>
+		///<summary>Table must include columns labeled LatestPayment and DateStart.</summary>
 		public static void FilterRecurringChargeList(DataTable table) {
 			DateTime curDate=MiscData.GetNowDateTime();
 			//Loop through table and remove patients that do not need to be charged yet.
