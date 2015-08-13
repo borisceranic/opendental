@@ -292,7 +292,7 @@ namespace OpenDental{
 		private MenuItem menuItem20;
 		private MenuItem menuItemObsolete;
 		private MenuItem menuItemAdvancedSetup;
-		private MenuItem menuItemPreferencesAccount;
+		private MenuItem menuItemAccount;
 		private MenuItem menuItemPreferencesTreatPlan;
 		private MenuItem menuItemPreferencesImages;
 		private MenuItem menuItem2;
@@ -357,6 +357,9 @@ namespace OpenDental{
 		private ODToolBarButton _butText;
 		private MenuItem menuItemMoveSubscribers;
 		private string _showForm="";
+		private MenuItem menuItemPreferencesAccount;
+		private MenuItem menuItemCCProcs;
+		private MenuItem menuItem12;
 		private FormSmsTextMessaging _formSmsTextMessaging;
 
 		///<summary></summary>
@@ -500,7 +503,10 @@ namespace OpenDental{
 			this.menuItemInsFilingCodes = new System.Windows.Forms.MenuItem();
 			this.menuItemPatFieldDefs = new System.Windows.Forms.MenuItem();
 			this.menuItemPayerIDs = new System.Windows.Forms.MenuItem();
+			this.menuItemAccount = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesAccount = new System.Windows.Forms.MenuItem();
+			this.menuItem12 = new System.Windows.Forms.MenuItem();
+			this.menuItemCCProcs = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesTreatPlan = new System.Windows.Forms.MenuItem();
 			this.menuItemChart = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesChart = new System.Windows.Forms.MenuItem();
@@ -745,7 +751,7 @@ namespace OpenDental{
 			this.menuItemSettings.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemAppointments,
             this.menuItemFamily,
-            this.menuItemPreferencesAccount,
+            this.menuItemAccount,
             this.menuItemPreferencesTreatPlan,
             this.menuItemChart,
             this.menuItemImages,
@@ -904,11 +910,32 @@ namespace OpenDental{
 			this.menuItemPayerIDs.Text = "Payer IDs";
 			this.menuItemPayerIDs.Click += new System.EventHandler(this.menuItemPayerIDs_Click);
 			// 
+			// menuItemAccount
+			// 
+			this.menuItemAccount.Index = 2;
+			this.menuItemAccount.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemPreferencesAccount,
+            this.menuItem12,
+            this.menuItemCCProcs});
+			this.menuItemAccount.Text = "Account";
+			this.menuItemAccount.Click += new System.EventHandler(this.menuItemPreferencesAccount_Click);
+			// 
 			// menuItemPreferencesAccount
 			// 
-			this.menuItemPreferencesAccount.Index = 2;
-			this.menuItemPreferencesAccount.Text = "Account";
+			this.menuItemPreferencesAccount.Index = 0;
+			this.menuItemPreferencesAccount.Text = "Account Preferences";
 			this.menuItemPreferencesAccount.Click += new System.EventHandler(this.menuItemPreferencesAccount_Click);
+			// 
+			// menuItem12
+			// 
+			this.menuItem12.Index = 1;
+			this.menuItem12.Text = "-";
+			// 
+			// menuItemCCProcs
+			// 
+			this.menuItemCCProcs.Index = 2;
+			this.menuItemCCProcs.Text = "Default CC Procedures";
+			this.menuItemCCProcs.Click += new System.EventHandler(this.menuItemDefaultCCProcs_Click);
 			// 
 			// menuItemPreferencesTreatPlan
 			// 
@@ -2491,6 +2518,10 @@ namespace OpenDental{
 					}
 					FillPatientButton(pat);
 				}
+			}
+			if(!Prefs.IsODHQ()) {
+				//Remove the menu items that are only needed for HQ like Default CC Procedures
+				menuItemAccount.MenuItems.Clear();
 			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
@@ -5183,6 +5214,15 @@ namespace OpenDental{
 			CheckCustomReports();
 			this.RefreshCurrentModule();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Data Path");	
+		}
+
+		private void menuItemDefaultCCProcs_Click(object sender,System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormDefaultCCProcs FormD=new FormDefaultCCProcs();
+			FormD.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Default CC Procedures");
 		}
 
 		private void menuItemDefinitions_Click(object sender, System.EventArgs e) {

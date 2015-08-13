@@ -9911,6 +9911,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE etrans ADD PatientNameRaw varchar2(133)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('DefaultCCProcs','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DefaultCCProcs','')";
+					Db.NonQ(command);
+				}
 				//Adding picklist column to DisplayFields.  Specifically for Ortho Chart.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE displayfield ADD PickList text NOT NULL";

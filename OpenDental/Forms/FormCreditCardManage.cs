@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -60,6 +61,7 @@ namespace OpenDental {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
+			List<string> listDefaultProcs;
 			if(!PrefC.GetBool(PrefName.StoreCCnumbers)) {
 				if(Programs.IsEnabled(ProgramName.Xcharge)) {
 					Program prog=Programs.GetCur(ProgramName.Xcharge);
@@ -147,6 +149,14 @@ namespace OpenDental {
 								creditCardCur.CCNumberMasked=accountMasked;
 								creditCardCur.XChargeToken=xChargeToken;
 								creditCardCur.CCExpiration=new DateTime(Convert.ToInt32("20"+PIn.String(exp.Substring(2,2))),Convert.ToInt32(PIn.String(exp.Substring(0,2))),1);
+								//Add the default procedures to this card if those procedures are not attached to any other active card
+								listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
+								for(int i=listDefaultProcs.Count-1;i>=0;i--) {
+									if(CreditCards.ProcLinkedToCard(PatCur.PatNum,listDefaultProcs[i],0)) {
+										listDefaultProcs.RemoveAt(i);
+									}
+								}
+								creditCardCur.Procedures=String.Join(",",listDefaultProcs);
 								CreditCards.Insert(creditCardCur);
 							}
 						}
@@ -176,6 +186,14 @@ namespace OpenDental {
 			FormCreditCardEdit FormCCE=new FormCreditCardEdit(PatCur);
 			FormCCE.CreditCardCur=new CreditCard();
 			FormCCE.CreditCardCur.IsNew=true;
+			//Add the default procedures to this card if those procedures are not attached to any other active card
+			listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
+			for(int i=listDefaultProcs.Count-1;i>=0;i--) {
+				if(CreditCards.ProcLinkedToCard(PatCur.PatNum,listDefaultProcs[i],0)) {
+					listDefaultProcs.RemoveAt(i);
+				}
+			}
+			FormCCE.CreditCardCur.Procedures=String.Join(",",listDefaultProcs);
 			FormCCE.ShowDialog();
 			RefreshCardList();
 			if(remember) {//in case they canceled and had one selected
