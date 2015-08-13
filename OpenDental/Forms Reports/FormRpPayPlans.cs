@@ -35,6 +35,7 @@ namespace OpenDental
 		private ListBox listClin;
 		private Label labelClin;
 		private List<Clinic> _listClinics;
+		private CheckBox checkHasDateRange;
 		//private int pagesPrinted;
 		private ErrorProvider errorProvider1=new ErrorProvider();
 		//private DataTable BirthdayTable;
@@ -76,6 +77,7 @@ namespace OpenDental
 			this.checkAllClin = new System.Windows.Forms.CheckBox();
 			this.listClin = new System.Windows.Forms.ListBox();
 			this.labelClin = new System.Windows.Forms.Label();
+			this.checkHasDateRange = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -189,16 +191,16 @@ namespace OpenDental
 			this.radioInsurance.Text = "Insurance";
 			this.radioInsurance.UseVisualStyleBackColor = true;
 			// 
-			// date2
+			// dateEnd
 			// 
 			this.dateEnd.Location = new System.Drawing.Point(305, 18);
-			this.dateEnd.Name = "date2";
+			this.dateEnd.Name = "dateEnd";
 			this.dateEnd.TabIndex = 51;
 			// 
-			// date1
+			// dateStart
 			// 
 			this.dateStart.Location = new System.Drawing.Point(48, 18);
-			this.dateStart.Name = "date1";
+			this.dateStart.Name = "dateStart";
 			this.dateStart.TabIndex = 50;
 			// 
 			// checkShowFamilyBalance
@@ -239,12 +241,26 @@ namespace OpenDental
 			this.labelClin.Text = "Clinics";
 			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// checkHasDateRange
+			// 
+			this.checkHasDateRange.Checked = true;
+			this.checkHasDateRange.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkHasDateRange.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkHasDateRange.Location = new System.Drawing.Point(31, 318);
+			this.checkHasDateRange.Name = "checkHasDateRange";
+			this.checkHasDateRange.Size = new System.Drawing.Size(216, 18);
+			this.checkHasDateRange.TabIndex = 58;
+			this.checkHasDateRange.Text = "Use Date Range";
+			this.checkHasDateRange.UseVisualStyleBackColor = true;
+			this.checkHasDateRange.Click += new System.EventHandler(this.checkHasDateRange_Click);
+			// 
 			// FormRpPayPlans
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(586, 481);
+			this.Controls.Add(this.checkHasDateRange);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.listClin);
 			this.Controls.Add(this.labelClin);
@@ -333,6 +349,17 @@ namespace OpenDental
 			}
 		}
 
+		private void checkHasDateRange_Click(object sender,EventArgs e) {
+			if(checkHasDateRange.Checked) {
+				dateStart.Enabled=true;
+				dateEnd.Enabled=true;
+			}
+			else {
+				dateStart.Enabled=false;
+				dateEnd.Enabled=false;
+			}
+		}
+
 		private void listClin_Click(object sender,EventArgs e) {
 			if(listClin.SelectedIndices.Count>0) {
 				checkAllClin.Checked=false;
@@ -391,7 +418,7 @@ namespace OpenDental
 				displayPayPlanType=DisplayPayPlanType.Both;
 			}
 			DataTable table=RpPayPlan.GetPayPlanTable(dateStart.SelectionStart,dateEnd.SelectionStart,listProvNums,listClinicNums,checkAllProv.Checked
-				,displayPayPlanType,checkHideCompletePlans.Checked,checkShowFamilyBalance.Checked);
+					,displayPayPlanType,checkHideCompletePlans.Checked,checkShowFamilyBalance.Checked,checkHasDateRange.Checked);
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
@@ -399,7 +426,12 @@ namespace OpenDental
 			report.ReportName=Lan.g(this,"PaymentPlans");
 			report.AddTitle("Title",Lan.g(this,"Payment Plans"),fontTitle);
 			report.AddSubTitle("PracticeTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
-			report.AddSubTitle("Date SubTitle",dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString(),fontSubTitle);
+			if(checkHasDateRange.Checked) {
+				report.AddSubTitle("Date SubTitle",dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString(),fontSubTitle);
+			}
+			else{
+				report.AddSubTitle("Date SubTitle",DateTimeOD.Today.ToShortDateString(),fontSubTitle);
+			}
 			QueryObject query;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				query=report.AddQuery(table,"","clinicname",SplitByKind.Value,1,true);
