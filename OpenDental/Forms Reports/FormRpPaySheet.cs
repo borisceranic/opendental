@@ -509,6 +509,7 @@ namespace OpenDental{
 			for(int i=0;i<patDefs.Count;i++) {
 				dictPatDefNames.Add(patDefs[i].DefNum,patDefs[i].ItemName);
 			}
+			dictPatDefNames.Add(0,"Income Transfer");//Otherwise income transfers show up with a payment type of "Undefined"
 			int[] summaryGroups1= { 1 };
 			int[] summaryGroups2= { 2 };
 			int[] summaryGroups3= { 1,2 };
