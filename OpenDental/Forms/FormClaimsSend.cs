@@ -1443,20 +1443,7 @@ namespace OpenDental{
 				return;//No refresh needed because 277s are not editable, they are read only.
 			}
 			if(et.Etype==EtransType.ERA_835) {
-				string messageText835=EtransMessageTexts.GetMessageText(et.EtransMessageTextNum);
-				X12object x835=new X12object(messageText835);
-				List<string> listTranSetIds=x835.GetTranSetIds();
-				if(et.TranSetId835=="" && listTranSetIds.Count>=2) {
-					FormEtrans835PickEob formPickEob=new FormEtrans835PickEob(listTranSetIds,messageText835,et);
-					formPickEob.ShowDialog();
-				}
-				else {//Only one EOB in the 835.
-					FormEtrans835Edit Form835=new FormEtrans835Edit();
-					Form835.EtransCur=et;
-					Form835.MessageText835=messageText835;
-					Form835.TranSetId835="";//Empty string will cause the first EOB in the 835 to display.
-					Form835.Show();//Non-modal
-				}
+				FormEtrans835Edit.ShowEra(et);
 			}
 			else {
 				FormEtransEdit FormE=new FormEtransEdit();

@@ -5249,9 +5249,10 @@ HAVING cnt>1";
 				return; //Several issues need to be addressed before supporting Oracle.  E.g. backing up, creating temporary tables with globally unique identifiers, etc.
 			}
 			//Unlink etrans records from their etransmessagetext records if older than 1 year.
+			//We want to keep the 835's around, because they are financial documents which the user may want to reference from the claim edit window later.
 			string command="UPDATE etrans "
 				+"SET EtransMessageTextNum=0 "
-				+"WHERE DATE(DateTimeTrans)<ADDDATE(CURDATE(),INTERVAL -1 YEAR)";
+				+"WHERE DATE(DateTimeTrans)<ADDDATE(CURDATE(),INTERVAL -1 YEAR) AND Etype!="+POut.Long((int)EtransType.ERA_835);
 			Db.NonQ(command);
 			//Create a temporary table to hold all of the EtransMessageTextNum foreign keys which are sill in use within etrans.  The temporary table speeds up the next query.
 			string tableName="tempetransnomessage"+MiscUtils.CreateRandomAlphaNumericString(8);//max size for a table name in oracle is 30 chars.

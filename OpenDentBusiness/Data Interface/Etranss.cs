@@ -141,6 +141,45 @@ namespace OpenDentBusiness{
 			return Crud.EtransCrud.SelectOne(command);
 		}
 
+		///<summary>Gets all X12 835 etrans entries relating to a specific claim.</summary>
+		public static List<Etrans> GetErasOneClaim(string claimIdentifier,DateTime dateClaimService) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Etrans>>(MethodBase.GetCurrentMethod(),claimIdentifier,dateClaimService);
+			}
+			string claimId=claimIdentifier;
+			if(claimId.Length>16) {
+				//Our claim identifiers in the database can be longer than 20 characters (mostly when using replication).
+				//When the claim identifier is sent out on the claim, it is truncated to 20 characters.
+				//Therefore, if the claim identifier is longer than 20 characters,
+				//then it was truncated when sent out, so we have to look for claims beginning with the claim identifier given if there is not an exact match.
+				//We also send shorter identifiers for some clearinghouses.  For example, the maximum claim identifier length for Denti-Cal is 17 characters.
+				claimId=claimId.Substring(0,16);
+			}
+			string command="SELECT * FROM etrans"
+				+" INNER JOIN etransmessagetext ON etransmessagetext.EtransMessageTextNum=etrans.EtransMessageTextNum"
+					+" AND etransmessagetext.MessageText REGEXP 'CLP."+POut.String(claimId)+"'"
+					//CLP = match CLP, . = match any character, then up to 16 other chars after.
+				+" WHERE Etype="+POut.Int((int)EtransType.ERA_835)+" AND etrans.DateTimeTrans >= "+POut.Date(dateClaimService);
+			if(claimIdentifier.Length<16) {
+				DataTable tableEtrans=Db.GetTable(command);
+				List<Etrans> listEtrans=Crud.EtransCrud.TableToList(tableEtrans);
+				List<Etrans> retVal=new List<Etrans>();
+				for(int i=0;i<tableEtrans.Rows.Count;i++) {
+					string messageText=PIn.String(tableEtrans.Rows[i]["MessageText"].ToString());
+					string separator=messageText.Substring(3,1);//The character that is used as a separator is always at the third index of the message text.
+					if(messageText.Contains("CLP"+separator+claimId+separator)) {						
+						retVal.Add(listEtrans[i]);//This Etrans has an exact match for the claimIdentifier, it's an accurate search result.
+					}
+				}
+				return retVal;
+			}
+			else {
+				//If the claimIdentifier is > 16 we trust it's unique enough we don't need to do more searching.
+				//Plus, we cannot trust any characters after the 16th character, since the identifier might have been truncated at some point.
+				return Crud.EtransCrud.SelectMany(command);
+			}
+		}
+
 		///<summary>Gets a list of all 270's and Canadian eligibilities for this plan.</summary>
 		public static List<Etrans> GetList270ForPlan(long planNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

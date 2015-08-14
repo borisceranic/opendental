@@ -444,6 +444,23 @@ namespace OpenDental {
 			}
 		}
 
+		public static void ShowEra(Etrans etrans){
+			string messageText835=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
+			X12object x835=new X12object(messageText835);
+			List<string> listTranSetIds=x835.GetTranSetIds();
+			if(etrans.TranSetId835=="" && listTranSetIds.Count>=2) {
+				FormEtrans835PickEob formPickEob=new FormEtrans835PickEob(listTranSetIds,messageText835,etrans);
+				formPickEob.ShowDialog();
+			}
+			else {//Only one EOB in the 835.
+				FormEtrans835Edit Form835=new FormEtrans835Edit();
+				Form835.EtransCur=etrans;
+				Form835.MessageText835=messageText835;
+				Form835.TranSetId835="";//Empty string will cause the first EOB in the 835 to display.
+				Form835.Show();//Non-modal
+			}
+		}
+
 		private void butClaimDetails_Click(object sender,EventArgs e) {
 			if(gridClaimDetails.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"Choose a claim paid before viewing details.");

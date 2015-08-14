@@ -349,6 +349,7 @@ namespace OpenDental{
 		private Label labelCustomTracking;
 		private ComboBox comboCustomTracking;
 		private ODGrid gridStatusHistory;
+		private UI.Button butViewEra;
 		private long _provNumTreatSelected;
 
 		///<summary></summary>
@@ -672,6 +673,7 @@ namespace OpenDental{
 			this.butOtherNone = new OpenDental.UI.Button();
 			this.butOtherCovChange = new OpenDental.UI.Button();
 			this.gridStatusHistory = new OpenDental.UI.ODGrid();
+			this.butViewEra = new OpenDental.UI.Button();
 			this.groupProsth.SuspendLayout();
 			this.groupOrtho.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -3725,12 +3727,27 @@ namespace OpenDental{
 			this.gridStatusHistory.Title = "Status History";
 			this.gridStatusHistory.TranslationName = null;
 			// 
+			// butViewEra
+			// 
+			this.butViewEra.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butViewEra.Autosize = true;
+			this.butViewEra.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butViewEra.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butViewEra.CornerRadius = 4F;
+			this.butViewEra.Location = new System.Drawing.Point(2, 364);
+			this.butViewEra.Name = "butViewEra";
+			this.butViewEra.Size = new System.Drawing.Size(94, 24);
+			this.butViewEra.TabIndex = 263;
+			this.butViewEra.Text = "View ERA";
+			this.butViewEra.Click += new System.EventHandler(this.butViewEra_Click);
+			// 
 			// FormClaimEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.AutoScroll = true;
 			this.ClientSize = new System.Drawing.Size(984, 913);
 			this.ControlBox = false;
+			this.Controls.Add(this.butViewEra);
 			this.Controls.Add(this.butPickProvTreat);
 			this.Controls.Add(this.butPickProvBill);
 			this.Controls.Add(this.butResend);
@@ -5138,6 +5155,20 @@ namespace OpenDental{
 			FillGrids();
 		}
 
+		private void butViewEra_Click(object sender,EventArgs e) {
+			List<Etrans> listEtrans=Etranss.GetErasOneClaim(textClaimIdentifier.Text,ClaimCur.DateService);
+			if(listEtrans.Count==0){
+				MsgBox.Show(this,"No matching ERAs could be located based on the claim identifier.");
+			}
+			else if(listEtrans.Count==1){
+				FormEtrans835Edit.ShowEra(listEtrans[0]);
+			}
+			else{
+				FormEtrans835PickEra FormEPE=new FormEtrans835PickEra(listEtrans);
+				FormEPE.Show();
+			}
+		}
+
 		/*
 		///<summary>Creates insurance check</summary>
 		private void butCheckAdd_Click(object sender, System.EventArgs e) {
@@ -6455,8 +6486,6 @@ namespace OpenDental{
 
 	
 
-	
-
 		
 	
 
@@ -6505,6 +6534,7 @@ namespace OpenDental{
 		
 
 		
+
 
 	}
 }
