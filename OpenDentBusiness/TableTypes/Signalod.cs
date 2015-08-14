@@ -9,7 +9,8 @@ namespace OpenDentBusiness{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long SignalNum;
-		///<summary>Text version of 'user' this message was sent from, which can actually be any description of a group or individual.</summary>
+		///<summary>Text version of 'user' this message was sent from, which can actually be any description of a group or individual.
+		/// If SigType==InvalidType, then this is a ProcessID;FormID;ObjectType;ObjectID</summary>
 		public string FromUser;
 		///<summary>Enum:InvalidType List of InvalidType long values separated by commas.  Can be empty.  When Date or Tasks are used, they are used all alone with no other flags present.</summary>
 		public string ITypes;
@@ -32,6 +33,22 @@ namespace OpenDentBusiness{
 		///<summary>Not a database field.  The sounds and lights attached to the signal.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public SigElement[] ElementList;
+
+		public Signalod() {
+
+		}
+
+		public Signalod(Signalod sig) {
+			FromUser=sig.FromUser;
+			ITypes=sig.ITypes;
+			DateViewing=sig.DateViewing;
+			SigType=sig.SigType;
+			SigText=sig.SigText;
+			SigDateTime=sig.SigDateTime;
+			ToUser=sig.ToUser;
+			AckTime=sig.AckTime;
+			TaskNum=sig.TaskNum;
+		}
 
 		///<summary>IComparable.CompareTo implementation.  This is used to order signals.  This is needed because ordering signals is too complex to do with a query.</summary>
 		public int CompareTo(object obj) {

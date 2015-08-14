@@ -449,7 +449,6 @@ namespace OpenDental{
 			Logger.openlog.Log("Open Dental initialization complete.",Logger.Severity.INFO);
 			//Plugins.HookAddCode(this,"FormOpenDental.Constructor_end");//Can't do this because no plugins loaded.
 		}
-
 		///<summary></summary>
 		protected override void Dispose( bool disposing ){
 			if( disposing ){
@@ -3924,7 +3923,15 @@ namespace OpenDental{
 			if(e.ITypes.Contains((int)InvalidType.Task) || e.ITypes.Contains((int)InvalidType.TaskPopup)){
 				sig.TaskNum=e.TaskNum;
 			}
-			Signalods.Insert(sig);
+			if(e.DataTypes==null || e.DataTypes.Count==0) {
+				ProcessSignals(new List<Signalod> { sig });//without ProcessID or FormID
+				sig.FromUser=string.Format("{0};{1};;",e.ProcessID??"",e.FormID??"");
+				Signalods.Insert(sig);//insert with IDs
+			}
+			else {
+				e.DataTypes.ForEach(x => ProcessSignals(new List<Signalod> {new Signalod(sig) {FromUser=string.Format(";;{0};{1}",x.Item1,x.Item2.ToString())}}));//Post Messages without IDs to process locally
+				e.DataTypes.ForEach(x => Signalods.Insert(new Signalod(sig) { FromUser=string.Format("{0};{1};{2};{3}",e.ProcessID??"",e.FormID??"",x.Item1,x.Item2.ToString()) }));//Insert to DB with IDs
+			}
 		}
 
 		private void GotoModule_ModuleSelected(ModuleEventArgs e){
@@ -4118,13 +4125,16 @@ namespace OpenDental{
 		}
 
 		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.  Does not fire until one signal interval has passed (5-10 seconds after login).</summary>
-		public void ProcessSignals(){
+		public void ProcessSignals(List<Signalod> sigList=null) {
+			bool isForcedRefresh=sigList!=null;
 			if(Security.CurUser==null) {
 				//User must be at the log in screen, so no need to process signals.  We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
 				return;
 			}
 			try {
-				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs				
+				if(sigList==null) {
+					sigList=Signalods.RefreshTimed(signalLastRefreshed); //this also attaches all elements to their sigs				
+				}
 				if(_butText!=null){ //Not visible if eCW, and not enabled unless Text Messaging is enabled.					
 					//Check for the specific sms signal.
 					Signalod signal=sigList.OrderByDescending(x => x.SigDateTime)
@@ -4171,11 +4181,13 @@ namespace OpenDental{
 						return;
 					}
 				}
-				if(sigList[sigList.Count-1].AckTime.Year>1880) {
-					signalLastRefreshed=sigList[sigList.Count-1].AckTime;
-				}
-				else {
-					signalLastRefreshed=sigList[sigList.Count-1].SigDateTime;
+				if(!isForcedRefresh) {
+					if(sigList[sigList.Count-1].AckTime.Year>1880) {
+						signalLastRefreshed=sigList[sigList.Count-1].AckTime;
+					}
+					else {
+						signalLastRefreshed=sigList[sigList.Count-1].SigDateTime;
+					}
 				}
 				if(ContrAppt2.Visible && Signalods.ApptNeedsRefresh(sigList,AppointmentL.DateSelected.Date)) {
 					ContrAppt2.RefreshPeriod();
@@ -4247,13 +4259,15 @@ namespace OpenDental{
 				//Need to add a test to this: do not play messages that are over 2 minutes old.
 				Thread newThread=new Thread(new ParameterizedThreadStart(PlaySounds));
 				newThread.Start(sigListButs);
+				ODForm.ProcessAllSignals(sigList.FindAll(sigX => sigX!=null && sigX.SigType==SignalType.Invalid));
 				Plugins.HookAddCode(this,"FormOpenDental.ProcessSignals_end",sigList);
 			}
 			catch {
-				signalLastRefreshed=MiscData.GetNowDateTime();
+				if(!isForcedRefresh) {
+					signalLastRefreshed=MiscData.GetNowDateTime();
+				}
 			}
 		}
-
 		///<summary>Starts the eService monitoring thread that will run once a minute.  Only runs if the user currently logged in has the eServices permission.</summary>
 		private void StartEServiceMonitoring() {
 			//If the user currently logged in has permission to view eService settings, turn on the listener monitor.
