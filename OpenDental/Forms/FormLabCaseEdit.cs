@@ -612,6 +612,7 @@ namespace OpenDental{
 			else {
 				butSlip.Text=Lan.g(this,"Edit Slip");
 			}
+			Plugins.HookAddCode(this,"FormLabCaseEdit.Load_end",CaseCur,IsNew);
 		}
 
 		private void textDateDue_TextChanged(object sender,EventArgs e) {
