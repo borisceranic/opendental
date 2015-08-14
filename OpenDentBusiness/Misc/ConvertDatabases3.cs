@@ -9515,6 +9515,23 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.6.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_10();
+		}
+
+		private static void To15_3_10() {
+			if(FromVersion<new Version("15.3.10.0")) {
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('DefaultCCProcs','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DefaultCCProcs','')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.10.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 
@@ -9911,14 +9928,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE etrans ADD PatientNameRaw varchar2(133)";
 					Db.NonQ(command);
 				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('DefaultCCProcs','')";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DefaultCCProcs','')";
-					Db.NonQ(command);
-				}
+				//if(DataConnection.DBtype==DatabaseType.MySql) {
+				//	command="INSERT INTO preference(PrefName,ValueString) VALUES('DefaultCCProcs','')";
+				//	Db.NonQ(command);
+				//}
+				//else {//oracle
+				//	command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DefaultCCProcs','')";
+				//	Db.NonQ(command);
+				//}
 				//Adding picklist column to DisplayFields.  Specifically for Ortho Chart.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE displayfield ADD PickList text NOT NULL";
