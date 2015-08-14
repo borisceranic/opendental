@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -157,10 +158,15 @@ namespace OpenDental {
 				return;
 			}
 			string procCode=ProcedureCodes.GetStringProcCode(FormP.SelectedCodeNum);
-			if(CreditCards.ProcLinkedToCard(CreditCardCur.PatNum,procCode,CreditCardCur.CreditCardNum,CreditCardCur.Procedures)) {
-				bool response=MsgBox.Show(this,MsgBoxButtons.YesNo,"This procedure is already linked with a credit card on this patient's "
-					+"account. Adding the procedure to this card will result in the patient being charged twice for this procedure. Add this procedure?");
-				if(!response) {
+			List<string> procsOnCards=CreditCardCur.Procedures.Split(new string[] { "," },StringSplitOptions.RemoveEmptyEntries).ToList();
+			//If the procedure is already attached to this card, return without adding the procedure again
+			if(procsOnCards.Exists(x => x==procCode)) {
+				return;
+			}
+			//Warn if attached to a different active card for this patient
+			if(CreditCards.ProcLinkedToCard(CreditCardCur.PatNum,procCode,CreditCardCur.CreditCardNum)) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This procedure is already linked with another credit card on this patient's "
+					+"account. Adding the procedure to this card will result in the patient being charged twice for this procedure. Add this procedure?")) {
 					return;
 				}
 			}

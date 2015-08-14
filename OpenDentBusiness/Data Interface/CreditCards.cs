@@ -160,25 +160,20 @@ namespace OpenDentBusiness{
 			return PIn.Double(Db.GetScalar(command));
 		}
 
-		/// <summary>Returns true if the procedure passed in is linked to any other card on the patient's account.</summary>
-		public static bool ProcLinkedToCard(long patNum,string procCode,long cardNum,string curProcs) {
+		/// <summary>Returns true if the procedure passed in is linked to any other active card on the patient's account.</summary>
+		public static bool ProcLinkedToCard(long patNum,string procCode,long cardNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum,procCode,cardNum,curProcs);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum,procCode,cardNum);
 			}
 			string command="SELECT CreditCardNum,Procedures "
 				+"FROM creditcard "
 				+"WHERE PatNum="+POut.Long(patNum)+" "
 				+"AND DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>"+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ";
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
+				+"AND CreditCardNum!="+POut.Long(cardNum);
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
-				string[] arrayProcs;
-				if(PIn.Long(table.Rows[i]["CreditCardNum"].ToString())==cardNum) {
-					arrayProcs=curProcs.Split(',');
-				}
-				else {
-					arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
-				}
+				string[] arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
 				for(int j=0;j<arrayProcs.Length;j++) {
 					if(arrayProcs[j]==procCode) {
 						return true;

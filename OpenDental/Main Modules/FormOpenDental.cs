@@ -292,7 +292,7 @@ namespace OpenDental{
 		private MenuItem menuItem20;
 		private MenuItem menuItemObsolete;
 		private MenuItem menuItemAdvancedSetup;
-		private MenuItem menuItemPreferencesAccount;
+		private MenuItem menuItemAccount;
 		private MenuItem menuItemPreferencesTreatPlan;
 		private MenuItem menuItemPreferencesImages;
 		private MenuItem menuItem2;
@@ -356,6 +356,9 @@ namespace OpenDental{
 		///<summary>A specific reference to the "Text" button.  This special reference helps us preserve the notification text on the button after setup is modified.</summary>
 		private ODToolBarButton _butText;
 		private string _showForm="";
+		private MenuItem menuItemPreferencesAccount;
+		private MenuItem menuItem12;
+		private MenuItem menuItemCCProcs;
 		private FormSmsTextMessaging _formSmsTextMessaging;
 
 		///<summary></summary>
@@ -499,7 +502,10 @@ namespace OpenDental{
 			this.menuItemInsFilingCodes = new System.Windows.Forms.MenuItem();
 			this.menuItemPatFieldDefs = new System.Windows.Forms.MenuItem();
 			this.menuItemPayerIDs = new System.Windows.Forms.MenuItem();
+			this.menuItemAccount = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesAccount = new System.Windows.Forms.MenuItem();
+			this.menuItem12 = new System.Windows.Forms.MenuItem();
+			this.menuItemCCProcs = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesTreatPlan = new System.Windows.Forms.MenuItem();
 			this.menuItemChart = new System.Windows.Forms.MenuItem();
 			this.menuItemPreferencesChart = new System.Windows.Forms.MenuItem();
@@ -638,15 +644,15 @@ namespace OpenDental{
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();
 			this.labelMsg = new System.Windows.Forms.Label();
-			this.butMapPhones = new OpenDental.UI.Button();
-			this.butTriage = new OpenDental.UI.Button();
-			this.butBigPhones = new OpenDental.UI.Button();
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.menuText = new System.Windows.Forms.ContextMenu();
 			this.menuItemTextMessagesAll = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
+			this.butMapPhones = new OpenDental.UI.Button();
+			this.butTriage = new OpenDental.UI.Button();
+			this.butBigPhones = new OpenDental.UI.Button();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -743,7 +749,7 @@ namespace OpenDental{
 			this.menuItemSettings.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemAppointments,
             this.menuItemFamily,
-            this.menuItemPreferencesAccount,
+            this.menuItemAccount,
             this.menuItemPreferencesTreatPlan,
             this.menuItemChart,
             this.menuItemImages,
@@ -902,11 +908,32 @@ namespace OpenDental{
 			this.menuItemPayerIDs.Text = "Payer IDs";
 			this.menuItemPayerIDs.Click += new System.EventHandler(this.menuItemPayerIDs_Click);
 			// 
+			// menuItemAccount
+			// 
+			this.menuItemAccount.Index = 2;
+			this.menuItemAccount.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemPreferencesAccount,
+            this.menuItem12,
+            this.menuItemCCProcs});
+			this.menuItemAccount.Text = "Account";
+			this.menuItemAccount.Click += new System.EventHandler(this.menuItemPreferencesAccount_Click);
+			// 
 			// menuItemPreferencesAccount
 			// 
-			this.menuItemPreferencesAccount.Index = 2;
-			this.menuItemPreferencesAccount.Text = "Account";
+			this.menuItemPreferencesAccount.Index = 0;
+			this.menuItemPreferencesAccount.Text = "Account Preferences";
 			this.menuItemPreferencesAccount.Click += new System.EventHandler(this.menuItemPreferencesAccount_Click);
+			// 
+			// menuItem12
+			// 
+			this.menuItem12.Index = 1;
+			this.menuItem12.Text = "-";
+			// 
+			// menuItemCCProcs
+			// 
+			this.menuItemCCProcs.Index = 2;
+			this.menuItemCCProcs.Text = "Default CC Procedures";
+			this.menuItemCCProcs.Click += new System.EventHandler(this.menuItemDefaultCCProcs_Click);
 			// 
 			// menuItemPreferencesTreatPlan
 			// 
@@ -1855,48 +1882,6 @@ namespace OpenDental{
 			this.labelMsg.Text = "V:00";
 			this.labelMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// butMapPhones
-			// 
-			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMapPhones.Autosize = true;
-			this.butMapPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMapPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMapPhones.CornerRadius = 4F;
-			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
-			this.butMapPhones.Name = "butMapPhones";
-			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
-			this.butMapPhones.TabIndex = 54;
-			this.butMapPhones.Text = "P";
-			this.butMapPhones.Click += new System.EventHandler(this.butMapPhones_Click);
-			// 
-			// butTriage
-			// 
-			this.butTriage.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTriage.Autosize = true;
-			this.butTriage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTriage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTriage.CornerRadius = 4F;
-			this.butTriage.Location = new System.Drawing.Point(116, 0);
-			this.butTriage.Name = "butTriage";
-			this.butTriage.Size = new System.Drawing.Size(18, 24);
-			this.butTriage.TabIndex = 52;
-			this.butTriage.Text = "T";
-			this.butTriage.Click += new System.EventHandler(this.butTriage_Click);
-			// 
-			// butBigPhones
-			// 
-			this.butBigPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBigPhones.Autosize = true;
-			this.butBigPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBigPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBigPhones.CornerRadius = 4F;
-			this.butBigPhones.Location = new System.Drawing.Point(135, 0);
-			this.butBigPhones.Name = "butBigPhones";
-			this.butBigPhones.Size = new System.Drawing.Size(18, 24);
-			this.butBigPhones.TabIndex = 52;
-			this.butBigPhones.Text = "B";
-			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
-			// 
 			// labelWaitTime
 			// 
 			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1943,6 +1928,48 @@ namespace OpenDental{
 			this.menuItemTextMessagesSent.Index = 2;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
 			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
+			// 
+			// butMapPhones
+			// 
+			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMapPhones.Autosize = true;
+			this.butMapPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMapPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMapPhones.CornerRadius = 4F;
+			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
+			this.butMapPhones.Name = "butMapPhones";
+			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
+			this.butMapPhones.TabIndex = 54;
+			this.butMapPhones.Text = "P";
+			this.butMapPhones.Click += new System.EventHandler(this.butMapPhones_Click);
+			// 
+			// butTriage
+			// 
+			this.butTriage.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butTriage.Autosize = true;
+			this.butTriage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butTriage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butTriage.CornerRadius = 4F;
+			this.butTriage.Location = new System.Drawing.Point(116, 0);
+			this.butTriage.Name = "butTriage";
+			this.butTriage.Size = new System.Drawing.Size(18, 24);
+			this.butTriage.TabIndex = 52;
+			this.butTriage.Text = "T";
+			this.butTriage.Click += new System.EventHandler(this.butTriage_Click);
+			// 
+			// butBigPhones
+			// 
+			this.butBigPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butBigPhones.Autosize = true;
+			this.butBigPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butBigPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butBigPhones.CornerRadius = 4F;
+			this.butBigPhones.Location = new System.Drawing.Point(135, 0);
+			this.butBigPhones.Name = "butBigPhones";
+			this.butBigPhones.Size = new System.Drawing.Size(18, 24);
+			this.butBigPhones.TabIndex = 52;
+			this.butBigPhones.Text = "B";
+			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
 			// 
 			// lightSignalGrid1
 			// 
@@ -2461,6 +2488,10 @@ namespace OpenDental{
 			if(CurPatNum!=0 && _showForm=="apptsforpatient" && isApptModuleSelected) {
 				FormApptsOther FormA=new FormApptsOther(CurPatNum);
 				FormA.ShowDialog();
+			}
+			if(!Prefs.IsODHQ()) {
+				//Remove the menu items that are only needed for HQ like Default CC Procedures
+				menuItemAccount.MenuItems.Clear();
 			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
@@ -5158,6 +5189,15 @@ namespace OpenDental{
 			CheckCustomReports();
 			this.RefreshCurrentModule();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Data Path");	
+		}
+
+		private void menuItemDefaultCCProcs_Click(object sender,System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormDefaultCCProcs FormD=new FormDefaultCCProcs();
+			FormD.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Default CC Procedures");
 		}
 
 		private void menuItemDefinitions_Click(object sender, System.EventArgs e) {
