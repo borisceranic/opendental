@@ -72,6 +72,17 @@ namespace OpenDentBusiness{
 			return result;
 		}
 
+		///<summary>Returns list of active credit cards.</summary>
+		public static List<CreditCard> GetActiveCards(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM creditcard WHERE PatNum="+POut.Long(patNum)
+				+" AND ("+DbHelper.Year("DateStop")+"<1880 OR DateStop>="+DbHelper.Curdate()+") "
+				+" AND ("+DbHelper.Year("DateStart")+">1880 AND DateStart<="+DbHelper.Curdate()+") ";//Recurring card is active.
+			return Crud.CreditCardCrud.SelectMany(command);
+		}
+
 		///<summary>Returns list of credit cards that are ready for a recurring charge.</summary>
 		public static DataTable GetRecurringChargeList() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

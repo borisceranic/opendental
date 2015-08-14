@@ -66,6 +66,21 @@ namespace OpenDentBusiness{
 			return Refresh(0).ToList();			
 		}
 
+		///<summary>Returns true if there are any active repeating charges on the patient's account, false if there are not.</summary>
+		public static bool ActiveRepeatChargeExists(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum);
+			}
+			//Counts the number of repeat charges that a patient has with a valid start date in the past and no stop date or a stop date in the future
+			string command="SELECT COUNT(*) FROM repeatcharge "
+				+"WHERE PatNum="+POut.Long(patNum)+" AND DateStart BETWEEN '1880-01-01' AND "+DbHelper.Curdate()+" "
+				+"AND (DateStop='0001-01-01' OR DateStop>="+DbHelper.Curdate()+")";
+			if(Db.GetCount(command)=="0") {
+				return false;
+			}
+			return true;
+		}
+
 
 	}
 

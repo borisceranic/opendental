@@ -2650,6 +2650,21 @@ namespace OpenDental {
 			gridPatInfo.EndUpdate();
 		}
 
+		///<summary>Call this before inserting new repeat charge to update patient.BillingCycleDay if no other repeat charges exist.
+		///Changes the patient's BillingCycleDay to today if no other active repeat charges are on the patient's account</summary>
+		private void UpdatePatientBillingDay(long patNum) {
+			if(RepeatCharges.ActiveRepeatChargeExists(patNum)) {
+				return;
+			}
+			Patient patOld=Patients.GetPat(patNum);
+			if(patOld.BillingCycleDay==DateTimeOD.Today.Day) {
+				return;
+			}
+			Patient patNew=patOld.Copy();
+			patNew.BillingCycleDay=DateTimeOD.Today.Day;
+			Patients.Update(patNew,patOld);
+		}
+
 		private void gridAccount_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			DataTable table=DataSetMain.Tables["account"];
 			//this seems to fire after a doubleclick, so this prevents error:
@@ -3520,6 +3535,7 @@ namespace OpenDental {
 			if(!ProcedureCodeC.HList.ContainsKey("001")) {
 				return;
 			}
+			UpdatePatientBillingDay(PatCur.PatNum);
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="001";
@@ -3542,6 +3558,7 @@ namespace OpenDental {
 			if(!ProcedureCodeC.HList.ContainsKey("008")) {
 				return;
 			}
+			UpdatePatientBillingDay(PatCur.PatNum);
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="008";
@@ -3556,6 +3573,7 @@ namespace OpenDental {
 			if(!ProcedureCodeC.HList.ContainsKey("027")) {
 				return;
 			}
+			UpdatePatientBillingDay(PatCur.PatNum);
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="027";
@@ -3570,6 +3588,7 @@ namespace OpenDental {
 			if(!ProcedureCodeC.HList.ContainsKey("001")) {
 				return;
 			}
+			UpdatePatientBillingDay(PatCur.PatNum);
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="001";
@@ -3592,6 +3611,7 @@ namespace OpenDental {
 			if(!ProcedureCodeC.HList.ContainsKey("037")) {
 				return;
 			}
+			UpdatePatientBillingDay(PatCur.PatNum);
 			RepeatCharge repeat=new RepeatCharge();
 			repeat.PatNum=PatCur.PatNum;
 			repeat.ProcCode="037";
