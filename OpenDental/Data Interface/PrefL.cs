@@ -31,15 +31,17 @@ namespace OpenDental {
 			return ConvertDB(false,Application.ProductVersion);
 		}
 
-		///<summary>Copies the installation directory files into the database.</summary>
+		///<summary>Copies the installation directory files into the database as well as the AtoZ share.
+		///Currently only called from FormUpdateSetup.</summary>
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent) {
-			return CopyFromHereToUpdateFiles(versionCurrent,false);
+			//When we use the Recopy button we always want to save a copy into the AtoZ folder for backwards compatibility.
+			return CopyFromHereToUpdateFiles(versionCurrent,false,true);
 		}
 
-		///<summary>Copies the installation directory files into the database.</summary>
-		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent) {
+		///<summary>Copies the installation directory files into the database.  Set hasAtoZ to true to copy to the AtoZ share as well.</summary>
+		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent,bool hasAtoZ) {
 			string folderUpdate="";
-			if(PrefC.AtoZfolderUsed) {
+			if(PrefC.AtoZfolderUsed && hasAtoZ) {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
 			}
 			else {
@@ -74,57 +76,73 @@ namespace OpenDental {
 				}
 			}
 			//Copy the installation directory files to the UpdateFiles share or a temp dir that we just created which we will zip up and insert into the db.
-			//When PrefC.AtoZfolderUsed is true, this copy that we are about to make allows backwards compatibility for versions of OD that 
- 			// do not look at the database for their UpdateFiles.
-			Directory.CreateDirectory(folderUpdate);
-			DirectoryInfo dirInfo=new DirectoryInfo(Application.StartupPath);
-			FileInfo[] appfiles=dirInfo.GetFiles();
-			for(int i=0;i<appfiles.Length;i++) {
-				if(appfiles[i].Name=="FreeDentalConfig.xml") {
-					continue;//skip this one.
+			//When PrefC.AtoZfolderUsed is true and we're upgrading from a version prior to 15.3.10, this copy that we are about to make allows backwards 
+			//compatibility for versions of OD that do not look at the database for their UpdateFiles.
+			try {
+				Directory.CreateDirectory(folderUpdate);
+				DirectoryInfo dirInfo=new DirectoryInfo(Application.StartupPath);
+				FileInfo[] appfiles=dirInfo.GetFiles();
+				for(int i=0;i<appfiles.Length;i++) {
+					if(appfiles[i].Name=="FreeDentalConfig.xml") {
+						continue;//skip this one.
+					}
+					if(appfiles[i].Name=="OpenDentalServerConfig.xml") {
+						continue;//skip also
+					}
+					if(appfiles[i].Name.StartsWith("openlog")) {
+						continue;//these can be big and are irrelevant
+					}
+					if(appfiles[i].Name.Contains("__")) {//double underscore
+						continue;//So that plugin dlls can purposely skip the file copy.
+					}
+					//include UpdateFileCopier
+					File.Copy(appfiles[i].FullName,ODFileUtils.CombinePaths(folderUpdate,appfiles[i].Name));
 				}
-				if(appfiles[i].Name=="OpenDentalServerConfig.xml") {
-					continue;//skip also
-				}
-				if(appfiles[i].Name.StartsWith("openlog")) {
-					continue;//these can be big and are irrelevant
-				}
-				if(appfiles[i].Name.Contains("__")) {//double underscore
-					continue;//So that plugin dlls can purposely skip the file copy.
-				}
-				//include UpdateFileCopier
-				File.Copy(appfiles[i].FullName,ODFileUtils.CombinePaths(folderUpdate,appfiles[i].Name));
+				//Create a simple manifest file so that we know what version the files are for.
+				File.WriteAllText(ODFileUtils.CombinePaths(folderUpdate,"Manifest.txt"),versionCurrent.ToString(3));
 			}
-			//Create a simple manifest file so that we know what version the files are for.
-			File.WriteAllText(ODFileUtils.CombinePaths(folderUpdate,"Manifest.txt"),versionCurrent.ToString(3));
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g("Prefs","Failed copying the update files to the following directory")+":\r\n"
+					+folderUpdate+"\r\n"+"\r\n"
+					+Lan.g("Prefs","This could be due to a lack of permissions to create the above folder or the files in the installation directory are still in use."));
+				return false;
+			}
 			//Starting in v15.3, we always insert the UpdateFiles into the database.
 			ZipFile zipFile=new ZipFile();
-			zipFile.AddDirectory(folderUpdate);
 			MemoryStream memStream=new MemoryStream();
-			zipFile.Save(memStream);
-			zipFile.Dispose();
-			bool isFirst=true;
-			long docNum=0;
-			//Our installations of MySQL default the global property 'max_allowed_packet' to 40MB.
-			//The UpdateFiles folder will only get larger as time goes on.  Therefor, we want to break up the UpdateFiles folder into 30MB chunks.
-			//If the chunk size is to be changed, it must be changed to a size that is divisible by 3.
-			//Because we are converting the byte array into a Base64String, it needs to be in 3-byte chunks to perform the conversion without padding.
-			//Any incomplete 3-byte chunks will get padded with '=' to complete the 3-byte chunk.
-			//If this ever happens in the middle of inserting, the zip will be corrupted and we will not be able to extract the data later.
-			byte[] zipFileBytes=new byte[31457280]; //30MB
-			int readBytes=0;
-			memStream.Position=0;//Start at the beginning of the stream.
-			while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-				string zipFileBytesBase64=Convert.ToBase64String(zipFileBytes,0,readBytes);
-				if(isFirst) {
-					docNum=DocumentMiscs.SetUpdateFilesZip(zipFileBytesBase64);
-					isFirst=false;
+			try {
+				zipFile.AddDirectory(folderUpdate);
+				zipFile.Save(memStream);
+				bool isFirst=true;
+				long docNum=0;
+				//Our installations of MySQL defaults the global property 'max_allowed_packet' to 40MB.
+				//The UpdateFiles folder will only get larger as time goes on.  Therefore, we want to break up the UpdateFiles folder into 30MB chunks.
+				//If the chunk size is to be changed, it must be changed to a size that is divisible by 3.
+				//Because we are converting the byte array into a Base64String, it needs to be in 3-byte chunks to perform the conversion without padding.
+				//Any incomplete 3-byte chunks will get padded with '=' to complete the 3-byte chunk.
+				//If this ever happens in the middle of inserting, the zip will be corrupted and we will not be able to extract the data later.
+				byte[] zipFileBytes=new byte[31457280]; //30MB
+				int readBytes=0;
+				memStream.Position=0;//Start at the beginning of the stream.
+				while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
+					string zipFileBytesBase64=Convert.ToBase64String(zipFileBytes,0,readBytes);
+					if(isFirst) {
+						docNum=DocumentMiscs.SetUpdateFilesZip(zipFileBytesBase64);
+						isFirst=false;
+					}
+					else {
+						DocumentMiscs.AppendRawBase64ForDoc(zipFileBytesBase64,docNum); //Updates document by appending more of it into the DB (30MB increments)
+					}
 				}
-				else {
-					DocumentMiscs.AppendRawBase64ForDoc(zipFileBytesBase64,docNum); //Updates document by appending more of it into the DB (20MB increments)
-				}			
 			}
-			memStream.Dispose();
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g("Prefs","Failed inserting update files into the database."));
+				return false;
+			}
+			finally {
+				zipFile.Dispose();
+				memStream.Dispose();
+			}
 			return true;
 		}
 
@@ -202,7 +220,15 @@ namespace OpenDental {
 				//This computer just performed an update, but none of the other computers has updated yet.
 				//So attempt to stash all files that are in the Application directory.
 				//At this point we know that we are going to perform an update.
-				if(!CopyFromHereToUpdateFiles(currentVersion,isSilent)) {
+				bool hasAtoZ=false;
+				//Check to see if the version we are coming from is prior to v15.3.
+				//If we are coming from an older version, we need to put a copy of the Update Files into the AtoZ share for backwards compatibility.
+				if(storedVersion<new Version("15.3.10")) {
+					//In 15.3.10 we started to explicitly use the database for storing the Update Files folder.
+					//Any clients updating from a previous version still need the Update Files in the AtoZ because they look there instead of the db.
+					hasAtoZ=true;
+				}
+				if(!CopyFromHereToUpdateFiles(currentVersion,isSilent,hasAtoZ)) {
 					Application.Exit();
 					return false;
 				}
