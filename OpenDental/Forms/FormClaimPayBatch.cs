@@ -1104,7 +1104,7 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,EventArgs e) {
 			//only visible if IsFromClaim and IsNew
-			if(textAmount.Text!=textTotal.Text) {
+			if(!PIn.Double(textAmount.Text).IsEqual(PIn.Double(textTotal.Text))) { //PIn to fix amounts which are somehow sometimes different.
 				MsgBox.Show(this,"Amounts do not match.");
 				return;
 			}
@@ -1135,7 +1135,7 @@ namespace OpenDental{
 				return; //Leave the payment as partial so the user can come back and edit.
 			}
 			if(ClaimPaymentCur.IsPartial) {
-				if(textAmount.Text==textTotal.Text) {
+				if(PIn.Double(textAmount.Text).IsEqual(PIn.Double(textTotal.Text))) { //PIn to fix amounts which are somehow sometimes different.
 					if(ClaimsAttached.Count>0) {
 						ShowSecondaryClaims();//always continues after this dlg
 					}
@@ -1144,7 +1144,8 @@ namespace OpenDental{
 				}
 			}
 			else {//locked
-				if(textAmount.Text!=textTotal.Text) {//someone edited a locked payment
+				if(!PIn.Double(textAmount.Text).IsEqual(PIn.Double(textTotal.Text))) { //PIn to fix amounts which are somehow sometimes different.
+					//Someone edited a locked payment
 					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Amounts do not match.  Continue anyway?")) {
 						e.Cancel=true;
 						return;
