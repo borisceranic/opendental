@@ -711,7 +711,8 @@ namespace OpenDental{
 					//If this is the last row, add dtClinic to the dataset.
 					if(i==tableDailyProd.Rows.Count-1) {
 						DataTable dtClinicTemp=dtClinic.Copy();
-						dtClinicTemp.TableName="Clinic"+i;//The name of the table does not matter but has to be unique in a DataSet.
+						//Added 1 to guarantee unique tablename.
+						dtClinicTemp.TableName="Clinic"+(i+1);//The name of the table does not matter but has to be unique in a DataSet. 
 						dataSetDailyProdSplitByClinic.Tables.Add(dtClinicTemp);
 					}
 				}
