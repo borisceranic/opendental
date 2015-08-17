@@ -10035,6 +10035,14 @@ namespace OpenDentBusiness {
 						+"'Scanora')";
 					Db.NonQ(command);
 				}//end Scanora bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('UseProviderColorsInChart','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'UseProviderColorsInChart','0')";
+					Db.NonQ(command);
+				}
 
 
 

@@ -132,6 +132,7 @@ namespace OpenDental{
 		private CheckBox checkDxIcdVersion;
 		private UI.Button butDiagnosisCode;
 		private CheckBox checkClaimsSendWindowValidateOnLoad;
+		private CheckBox checkProvColorChart;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -243,6 +244,7 @@ namespace OpenDental{
 			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
 			this.label19 = new System.Windows.Forms.Label();
 			this.tabChart = new System.Windows.Forms.TabPage();
+			this.checkProvColorChart = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textMedDefaultStopDays = new System.Windows.Forms.TextBox();
 			this.checkDxIcdVersion = new System.Windows.Forms.CheckBox();
@@ -1177,6 +1179,7 @@ namespace OpenDental{
 			// tabChart
 			// 
 			this.tabChart.BackColor = System.Drawing.SystemColors.Window;
+			this.tabChart.Controls.Add(this.checkProvColorChart);
 			this.tabChart.Controls.Add(this.label11);
 			this.tabChart.Controls.Add(this.textMedDefaultStopDays);
 			this.tabChart.Controls.Add(this.butDiagnosisCode);
@@ -1205,6 +1208,18 @@ namespace OpenDental{
 			this.tabChart.Size = new System.Drawing.Size(466, 479);
 			this.tabChart.TabIndex = 4;
 			this.tabChart.Text = "Chart";
+			// 
+			// checkProvColorChart
+			// 
+			this.checkProvColorChart.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProvColorChart.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkProvColorChart.Location = new System.Drawing.Point(240, 287);
+			this.checkProvColorChart.Name = "checkProvColorChart";
+			this.checkProvColorChart.Size = new System.Drawing.Size(201, 15);
+			this.checkProvColorChart.TabIndex = 214;
+			this.checkProvColorChart.Text = "Use Provider Color in Chart";
+			this.checkProvColorChart.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkProvColorChart.UseVisualStyleBackColor = true;
 			// 
 			// label11
 			// 
@@ -1891,6 +1906,7 @@ namespace OpenDental{
 			checkChartNonPatientWarn.Checked=PrefC.GetBool(PrefName.ChartNonPatientWarn);
 			//checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);//Not implemented.  May revisit some day.
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
+			checkProvColorChart.Checked=PrefC.GetBool(PrefName.UseProviderColorsInChart);
 			if(PrefC.GetByte(PrefName.DxIcdVersion)==9) {
 				checkDxIcdVersion.Checked=false;
 			}
@@ -2198,6 +2214,7 @@ namespace OpenDental{
 				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
 				| Prefs.UpdateInt(PrefName.InsDefaultCobRule,comboCobRule.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.MedicalFeeUsedForNewProcs,checkMedicalFeeUsedForNewProcs.Checked)
+				| Prefs.UpdateBool(PrefName.UseProviderColorsInChart,checkProvColorChart.Checked)
 				| Prefs.UpdateByte(PrefName.DxIcdVersion,(byte)(checkDxIcdVersion.Checked?10:9))
 				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
 				| Prefs.UpdateInt(PrefName.TimeCardOvertimeFirstDayOfWeek,comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex)

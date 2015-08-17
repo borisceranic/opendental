@@ -556,6 +556,8 @@ namespace OpenDentBusiness {
 		UseInternationalToothNumbers,
 		///<summary>Boolean.  0 by default.  When enabled, users must enter their user name manually at the log on window.</summary>
 		UserNameManualEntry,
+		///<summary>Boolean. 0 by default. When enabled, chart module procedures that are complete will use the provider's color as row's background color</summary>
+		UseProviderColorsInChart,
 		WaitingRoomAlertColor,
 		///<summary>0 to disable.  When enabled, sets rows to alert color based on wait time.</summary>
 		WaitingRoomAlertTime,

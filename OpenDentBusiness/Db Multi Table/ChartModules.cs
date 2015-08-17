@@ -78,6 +78,7 @@ namespace OpenDentBusiness {
 			table.Columns.Add("procTimeEnd");
 			table.Columns.Add("prognosis");
 			table.Columns.Add("prov");
+			table.Columns.Add("ProvNum");
 			table.Columns.Add("quadrant");
 			table.Columns.Add("RxNum");
 			table.Columns.Add("SheetNum");
@@ -107,7 +108,7 @@ namespace OpenDentBusiness {
 				+"procedurelog.CodeNum,procedurelog.DateEntryC,orionproc.DateScheduleBy,orionproc.DateStopClock,procedurelog.DateTP,"
 				+"procedurecode.Descript,orionproc.DPC,orionproc.DPCpost,Dx,HideGraphics,orionproc.IsEffectiveComm,IsLocked,orionproc.IsOnCall,"
 				+"LaymanTerm,Priority,procedurecode.ProcCode,ProcDate,ProcFee,procedurelog.ProcNum,ProcNumLab,procedurelog.ProcTime,"
-				+"procedurelog.ProcTimeEnd,procedurelog.Prognosis,ProcStatus,orionproc.Status2,Surf,ToothNum,ToothRange,UnitQty "
+				+"procedurelog.ProcTimeEnd,procedurelog.Prognosis,provider.ProvNum,ProcStatus,orionproc.Status2,Surf,ToothNum,ToothRange,UnitQty "
 				+"FROM procedurelog "
 				+"LEFT JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum "
 				+"LEFT JOIN provider ON provider.ProvNum=procedurelog.ProvNum "
@@ -324,6 +325,7 @@ namespace OpenDentBusiness {
 					}
 					row["prognosis"]=DefC.GetName(DefCat.Prognosis,PIn.Long(rawProcs.Rows[i]["Prognosis"].ToString()));
 					row["prov"]=rawProcs.Rows[i]["Abbr"].ToString();
+					row["ProvNum"]=rawProcs.Rows[i]["ProvNum"].ToString();
 					row["quadrant"]="";
 					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Tooth) {
 						row["quadrant"]=Tooth.GetQuadrant(rawProcs.Rows[i]["ToothNum"].ToString());
@@ -451,6 +453,7 @@ namespace OpenDentBusiness {
 					row["procStatus"]="";
 					row["ProcStatus"]="";
 					row["prov"]="";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"]=0;
 					row["SheetNum"]=0;
@@ -527,6 +530,7 @@ namespace OpenDentBusiness {
 					row["procStatus"] = "";
 					row["ProcStatus"] = "";
 					row["prov"] = "";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"] = 0;
 					row["SheetNum"] = 0;
@@ -616,6 +620,7 @@ namespace OpenDentBusiness {
 					row["procTime"]="";
 					row["procTimeEnd"]="";
 					row["prov"]=Providers.GetAbbr(PIn.Long(rawRx.Rows[i]["ProvNum"].ToString()));
+					row["ProvNum"]=rawRx.Rows[i]["ProvNum"];
 					row["quadrant"]="";
 					row["RxNum"]=rawRx.Rows[i]["RxNum"].ToString();
 					row["SheetNum"]=0;
@@ -705,6 +710,7 @@ namespace OpenDentBusiness {
 					row["procStatus"]="";
 					row["ProcStatus"]="";
 					row["prov"]="";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"]=0;
 					row["SheetNum"]=0;
@@ -829,6 +835,7 @@ namespace OpenDentBusiness {
 					row["procStatus"]="";
 					row["ProcStatus"]="";
 					row["prov"]="";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"]=0;
 					row["SheetNum"]=0;
@@ -952,6 +959,7 @@ namespace OpenDentBusiness {
 				row["procStatus"]="";
 				row["ProcStatus"]="";
 				row["prov"]="";
+				row["ProvNum"]="";
 				row["quadrant"]="";
 				row["RxNum"]=0;
 				row["SheetNum"]=0;
@@ -1029,6 +1037,7 @@ namespace OpenDentBusiness {
 					row["procStatus"]="";
 					row["ProcStatus"]="";
 					row["prov"]="";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"]=0;
 					row["SheetNum"]=0;
@@ -1138,6 +1147,7 @@ namespace OpenDentBusiness {
 					row["procStatus"]="";
 					row["ProcStatus"]="";
 					row["prov"]="";
+					row["ProvNum"]="";
 					row["quadrant"]="";
 					row["RxNum"]=0;
 					row["SheetNum"]=rawSheet.Rows[i]["SheetNum"].ToString();

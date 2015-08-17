@@ -5745,7 +5745,17 @@ namespace OpenDental{
 					row.Note=table.Rows[i]["note"].ToString();
 				}
 				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
-				row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
+				long procNum=PIn.Long(table.Rows[i]["ProcNum"].ToString());
+				if(PrefC.GetBool(PrefName.UseProviderColorsInChart)
+						&& procNum!=0
+						&& Procedures.GetOneProc(procNum,false).ProcStatus==ProcStat.C
+						&& table.Rows[i]["ProvNum"].ToString()!="") 
+				{
+						row.ColorBackG=Providers.GetColor(PIn.Long(table.Rows[i]["ProvNum"].ToString()));
+				}
+				else {
+					row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
+				}
 				row.Tag=table.Rows[i];
 				gridProg.Rows.Add(row);
 			}
