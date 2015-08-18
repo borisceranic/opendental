@@ -1027,6 +1027,7 @@ namespace OpenDentBusiness {
 				row["ProcNum"]="0";
 				row["ProcNumLab"]="";
 				row["procsOnObj"]=PIn.ByteArray(rawPay.Rows[i]["ProcNums_"]);
+				//Odd that this shows only one provider on the payment when there could be multiple, but there is no easy way to fix this currently.
 				row["prov"]=Providers.GetAbbr(PIn.Long(rawPay.Rows[i]["ProvNum"].ToString()));
 				row["StatementNum"]="0";
 				row["ToothNum"]="";
