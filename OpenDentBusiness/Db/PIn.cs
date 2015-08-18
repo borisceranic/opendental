@@ -168,7 +168,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Saves the string representation of a sound into a .wav file.  The timing of this is different than with the other "P" functions, and is only used by the export button in FormSigElementDefEdit</summary>
 		public static void Sound(string sound,string filename) {
-			if(!filename.EndsWith(".wav")) {
+			if(!filename.ToLower().EndsWith(".wav")) {
 				throw new ApplicationException("Filename must end with .wav");
 			}
 			byte[] rawData=Convert.FromBase64String(sound);
