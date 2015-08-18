@@ -342,7 +342,7 @@ namespace OpenDental{
 			if(IsNew){
 				ScreenGroups.Insert(ScreenGroupCur);
 			}
-			if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
+			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
 				labelScreener.Visible=false;
 				textProvName.Visible=false;
 				labelProv.Visible=false;
@@ -350,10 +350,9 @@ namespace OpenDental{
 				ScreenList=new OpenDentBusiness.Screen[0];
 				FillGridScreenPat();
 			}
-			else {
-				ListPats=new List<Patient>();
-				FillGrid();
-			}
+			else {*/
+			ListPats=new List<Patient>();
+			FillGrid();
 			if(ScreenList.Length>0){
 				OpenDentBusiness.Screen ScreenCur=ScreenList[0];
 				ScreenGroupCur.SGDate=ScreenCur.ScreenDate;
@@ -387,6 +386,7 @@ namespace OpenDental{
 			comboPlaceService.SelectedIndex=(int)ScreenGroupCur.PlaceService;
 		}
 
+		/*
 		///<summary>This is never run.  It is only called when PrefName.PublicHealthScreeningUsePat is set to true.  The pref is set to 0 when added in convertdatabase and there is currently no UI to change it.  See note in Pref.cs pertaining to this.</summary>
 		private void FillGridScreenPat() {
 			ListScreenPats=ScreenPats.GetForScreenGroup(ScreenGroupCur.ScreenGroupNum);
@@ -398,7 +398,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Name"),300);
 			gridMain.Columns.Add(col);
-//todo: birthdate
+			//todo: birthdate
 			col=new ODGridColumn(Lan.g(this,"Age"),80);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Race"),105);
@@ -417,7 +417,7 @@ namespace OpenDental{
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-		}
+		}*/
 
 		private void FillGrid(){
 			ScreenList=Screens.Refresh(ScreenGroupCur.ScreenGroupNum);
@@ -483,7 +483,7 @@ namespace OpenDental{
 		}
 
 		private void listMain_DoubleClick(object sender, System.EventArgs e) {
-			if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
+			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
 				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
 				FormSPE.ShowDialog();
 				if(FormSPE.DialogResult!=DialogResult.OK) {
@@ -491,16 +491,15 @@ namespace OpenDental{
 				}
 				FillGridScreenPat();
 			}
-			else {
-				FormScreenEdit FormSE=new FormScreenEdit();
-				FormSE.ScreenCur=ScreenList[gridMain.SelectedIndices[0]];
-				FormSE.ScreenGroupCur=ScreenGroupCur;
-				FormSE.ShowDialog();
-				if(FormSE.DialogResult!=DialogResult.OK) {
-					return;
-				}
-				FillGrid();
+			else {*/
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenCur=ScreenList[gridMain.SelectedIndices[0]];
+			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.ShowDialog();
+			if(FormSE.DialogResult!=DialogResult.OK) {
+				return;
 			}
+			FillGrid();
 		}
 
 		private void textScreenDate_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -554,23 +553,7 @@ namespace OpenDental{
 		}
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
-			if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
-				/*
-				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
-				FormSPE.IsNew=true;
-				while(true) {
-					FormSPE.ScreenPatCur=new ScreenPat();
-					FormSPE.ScreenPatCur.ScreenGroupNum=ScreenGroupCur.ScreenGroupNum;
-					FormSPE.ScreenPatCur.SheetNum=PrefC.GetLong(PrefName.PublicHealthScreeningSheet);
-					FormSPE.ScreenGroupCur=ScreenGroupCur;
-					FormSPE.ScreenGroupCur.Description=textDescription.Text;
-					FormSPE.ShowDialog();
-					if(FormSPE.DialogResult!=DialogResult.OK) {
-						return;
-					}
-					FillGridScreenPat();
-				}
-				*/
+			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
 				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
 				while(true) {
 					FormPatientSelect FormPS=new FormPatientSelect();
@@ -589,49 +572,42 @@ namespace OpenDental{
 					FillGridScreenPat();
 				}
 			}
+			else {*/
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.IsNew=true;
+			if(ScreenList.Length==0) {
+				FormSE.ScreenCur=new OpenDentBusiness.Screen();
+				FormSE.ScreenCur.ScreenGroupOrder=1;
+			}
 			else {
-				FormScreenEdit FormSE=new FormScreenEdit();
-				FormSE.ScreenGroupCur=ScreenGroupCur;
-				FormSE.IsNew=true;
-				if(ScreenList.Length==0) {
-					FormSE.ScreenCur=new OpenDentBusiness.Screen();
-					FormSE.ScreenCur.ScreenGroupOrder=1;
+				FormSE.ScreenCur=ScreenList[ScreenList.Length-1];//'remembers' the last entry
+				FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
+			}
+			while(true) {
+				FormSE.ShowDialog();
+				if(FormSE.DialogResult!=DialogResult.OK) {
+					return;
 				}
-				else {
-					FormSE.ScreenCur=ScreenList[ScreenList.Length-1];//'remembers' the last entry
-					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
-				}
-				while(true) {
-					FormSE.ShowDialog();
-					if(FormSE.DialogResult!=DialogResult.OK) {
-						return;
-					}
-					FormSE.ScreenCur.ScreenGroupOrder++;
-					FillGrid();
-				}
+				FormSE.ScreenCur.ScreenGroupOrder++;
+				FillGrid();
 			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)){
-//todo: Bring up the attached sheet for this patient or create a new sheet for this patient.
+			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)){
+				//never implemented.  Supposedly, a sheet would come up for creation/editing, based on the sheetdef.
+				//But db fields couldn't even handle it yet.
 				
-				//FormScreenPatEdit FormSPE=new FormScreenPatEdit();
-				//FormSPE.ScreenGroupCur=ScreenGroupCur;
-				//FormSPE.ScreenGroupCur.Description=textDescription.Text;
-				//FormSPE.IsNew=false;
-				//FormSPE.ScreenPatCur=ListScreenPats[e.Row];
-				//FormSPE.ShowDialog();
 				//FillGrid();
 			}
-			else{
-				FormScreenEdit FormSE=new FormScreenEdit();
-				FormSE.ScreenGroupCur=ScreenGroupCur;
-				FormSE.IsNew=false;
-				FormSE.ScreenCur=ScreenList[e.Row];
-				FormSE.ShowDialog();
-				FillGrid();
-			}
+			else{*/
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.IsNew=false;
+			FormSE.ScreenCur=ScreenList[e.Row];
+			FormSE.ShowDialog();
+			FillGrid();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {

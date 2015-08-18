@@ -13,7 +13,7 @@ namespace OpenDentBusiness{
 		public long PatNum;
 		///<summary>FK to screengroup.ScreenGroupNum. Every screening is attached to a group (classroom)</summary>
 		public long ScreenGroupNum;
-		///<summary>FK to sheet.SheetNum. Starts out 0 to indicate a potential screening. Gets linked to an exam sheet once the screening is done.</summary>
+		///<summary>Was never used.  Was supposed to be FK to sheetdef.Sheet_DEF_Num, so not even named correctly.</summary>
 		public long SheetNum;
 
 		///<summary></summary>

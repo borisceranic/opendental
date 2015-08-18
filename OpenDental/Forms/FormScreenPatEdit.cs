@@ -8,12 +8,13 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
+	///<summary>Was never finished/implemented.  It's a mess.</summary>
 	public partial class FormScreenPatEdit:Form {
-		public ScreenPat ScreenPatCur;
-		private Patient PatCur;
-		public ScreenGroup ScreenGroupCur;
-		private SheetDef ExamSheetDefCur;
-		public bool IsNew;
+		//public ScreenPat ScreenPatCur;
+		//private Patient PatCur;
+		//public ScreenGroup ScreenGroupCur;
+		//private SheetDef ExamSheetDefCur;
+		//public bool IsNew;
 
 		public FormScreenPatEdit() {
 			InitializeComponent();
@@ -21,6 +22,7 @@ namespace OpenDental {
 		}
 
 		private void FormScreenPatEdit_Load(object sender,EventArgs e) {
+			/*
 			if(IsNew) {
 				ScreenPatCur.SheetNum=PrefC.GetLong(PrefName.PublicHealthScreeningSheet);
 			}
@@ -34,7 +36,7 @@ namespace OpenDental {
 			ExamSheetDefCur=SheetDefs.GetSheetDef(ScreenPatCur.SheetNum);
 			if(ExamSheetDefCur!=null) {
 				textSheet.Text=ExamSheetDefCur.Description;
-			}
+			}*/
 		}
 
 		/*private void butPatSelect_Click(object sender,EventArgs e) {
@@ -49,9 +51,9 @@ namespace OpenDental {
 		}*/
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(IsNew) {
-				ScreenPats.Insert(ScreenPatCur);
-			}
+			//if(IsNew) {
+			//	ScreenPats.Insert(ScreenPatCur);
+			//}
 			DialogResult=DialogResult.OK;
 		}
 

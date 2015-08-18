@@ -389,9 +389,9 @@ namespace OpenDentBusiness {
 		ProgramVersionLastUpdated,
 		ProgramVersion,
 		ProviderIncomeTransferShows,
-		///<summary>FK to sheet.SheetNum. Must be an exam sheet. Only makes sense if PublicHealthScreeningUsePat is true.</summary>
+		///<summary>Was never used.  Was supposed to indicate FK to sheet.Sheet_DEF_Num, so not even named correctly. Must be an exam sheet. Only makes sense if PublicHealthScreeningUsePat is true.</summary>
 		PublicHealthScreeningSheet,
-		///<summary>Boolean. For now this is forced to be a 0.  Work for attaching to patients stopped 11/30/2012, there is currently no access to change the value of this preference.    When in this mode, screenings will be attached to actual PatNums rather than just freeform text names.</summary>
+		///<summary>Was never used.  Always 0.  Boolean. Work for attaching to patients stopped 11/30/2012, there is currently no access to change the value of this preference.    When in this mode, screenings will be attached to actual PatNums rather than just freeform text names.</summary>
 		PublicHealthScreeningUsePat,
 		QuickBooksCompanyFile,
 		QuickBooksDepositAccounts,
