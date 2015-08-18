@@ -203,6 +203,8 @@ namespace OpenDentBusiness{
 					ClockEvents.Insert(clockEvent);//times handled
 				}
 			}
+			Employee emp=Employees.GetEmp(employeeNum);
+			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,emp.FName+" "+emp.LName+" "+"clocked in from "+clockEvent.ClockStatus.ToString()+".");
 		}
 
 		///<summary>Will throw an exception if already clocked out.</summary>
@@ -235,6 +237,8 @@ namespace OpenDentBusiness{
 					ClockOutForHQ(employeeNum);
 				}
 			}
+			Employee emp=Employees.GetEmp(employeeNum);
+			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,emp.FName+" "+emp.LName+" "+"clocked out for "+clockEvent.ClockStatus.ToString()+".");
 		}
 
 		///<summary>Special logic needs to be run for the phone system when users clock out.</summary>
