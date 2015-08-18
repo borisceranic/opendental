@@ -20,6 +20,8 @@ namespace OpenDental.UI
 		private System.Windows.Forms.ContextMenu cMenu;
 		private ArrayList selectedIndices;
 		private bool useCommas;
+		///<summary>Used to track user input for SelectionChangeCommitted.</summary>
+		private bool _isUserChange=false;
 
 		/// <summary></summary>
 		public ComboBoxMulti()
@@ -114,6 +116,10 @@ namespace OpenDental.UI
 			}
 			set{
 				selectedIndices=value;
+				if(SelectionChangeCommitted!=null && _isUserChange) {
+					_isUserChange=false; 
+					SelectionChangeCommitted(this,new EventArgs());
+				}
 			}
 		}
 
@@ -187,6 +193,7 @@ namespace OpenDental.UI
 		}
 
 		private void MenuItem_Click(object sender, System.EventArgs e){
+			ArrayList selectedIndicesOld=new ArrayList(selectedIndices);//Makes a complete shallow copy of selectedIndicies.
 			int index=((MenuItem)sender).Index;
 			if(Control.ModifierKeys.HasFlag(Keys.Shift)) {//Extended Selection.  The user is holding the Shift key while clicking.
 				if(selectedIndices.Count==0) {
@@ -218,6 +225,20 @@ namespace OpenDental.UI
 			else {//Single Selection.  The user is NOT holding the Ctrl key nor the Shift key while clicking.
 				selectedIndices.Clear();//Unselect any items already selected.
 				selectedIndices.Add(index);//Select only the item the user just clicked on.
+			}
+			if(selectedIndicesOld.Count!=selectedIndices.Count) {
+				_isUserChange=true;
+			}
+			else {
+				for(int i=0;i<selectedIndices.Count;i++) {
+					if(!selectedIndicesOld.Contains(selectedIndices[i])) {
+						_isUserChange=true;
+						break;
+					}
+				}
+			}
+			if(_isUserChange) {
+				SelectedIndices=selectedIndices;//To trigger the SelectedIndicesChanged event
 			}
 			FillText();
 			cMenu.Show(this,new Point(0,20));
@@ -282,17 +303,17 @@ namespace OpenDental.UI
 
 		///<summary></summary>
 		public void SetSelected(int index,bool setToValue){
+			selectedIndices.Remove(index);//Remove the index if it is already present in the list in order to avoid duplicates.
 			if(setToValue) {
-				selectedIndices.Add(index);//OK to add duplicates, because we need to know the last selection for extended selections.
-			}
-			else {
-				selectedIndices.Remove(index);
+				selectedIndices.Add(index);//The most recently added index must be last so that our Shift select will work.
 			}
 			FillText();//Since the selections probably changed, the text in the combobox display probably changed as well.
 		}
 
-		
+		public delegate void SelectionChangeCommittedHandler(object sender,EventArgs e);
 
+		///<summary>Occurs when one of the menu items is selected.  This line causes the event to show in the designer.</summary>
+		public event SelectionChangeCommittedHandler SelectionChangeCommitted;
 
 	}
 }

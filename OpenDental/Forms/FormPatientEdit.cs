@@ -1146,7 +1146,7 @@ namespace OpenDental{
 			this.comboBoxMultiRace.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiRace.SelectedIndices")));
 			this.comboBoxMultiRace.Size = new System.Drawing.Size(155, 21);
 			this.comboBoxMultiRace.TabIndex = 1;
-			this.comboBoxMultiRace.UseCommas = true;
+			this.comboBoxMultiRace.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiRace_SelectionChangeCommitted);
 			// 
 			// comboEthnicity
 			// 
@@ -3151,6 +3151,29 @@ namespace OpenDental{
 			comboSecProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum)+1;
 		}
 
+		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
+				return;
+			}
+			//The first selected is 'None', so unselect it.
+			if(comboBoxMultiRace.ListSelectedIndices[0]==0) {
+				comboBoxMultiRace.SelectedIndices.Remove(0);
+			}
+			//The first selected is 'DeclinedToSpecify', so unselect it.
+			if(comboBoxMultiRace.ListSelectedIndices[0]==4) {
+				comboBoxMultiRace.SelectedIndices.Remove(4);
+			}
+			//'None' is either the last one selected or in the middle of the items selected, so unselect all but 'None'.
+			if(comboBoxMultiRace.ListSelectedIndices.Contains(0)) {
+				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {0});
+				return;
+			}
+			//'DeclinedToSpecify' is either the last one selected or in the middle of the items selected, so unselect all but 'DeclinedToSpecify'.
+			if(comboBoxMultiRace.ListSelectedIndices.Contains(4)) {
+				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {4});
+			}
+		}	
+
 		///<summary>Gets an employerNum based on the name entered. Called from FillCur</summary>
 		private void GetEmployerNum(){
 			if(PatCur.EmployerNum==0){//no employer was previously entered.
@@ -3581,7 +3604,6 @@ namespace OpenDental{
 		}
 
 
-		
 
 		
 
