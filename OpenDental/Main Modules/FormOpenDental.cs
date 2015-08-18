@@ -3539,7 +3539,12 @@ namespace OpenDental{
 
 		private void OnTxtMsg_Click() {
 			if(CurPatNum==0) {
-				MsgBox.Show(this,"No patient selected.  Please select a patient before composing a text message.");
+				FormTxtMsgEdit FormTxtME=new FormTxtMsgEdit();
+				FormTxtME.PatNum=0;
+				FormTxtME.ShowDialog();
+				if(FormTxtME.DialogResult==DialogResult.OK) {
+					RefreshCurrentModule();
+				}
 				return;
 			}
 			Patient pat=Patients.GetPat(CurPatNum);

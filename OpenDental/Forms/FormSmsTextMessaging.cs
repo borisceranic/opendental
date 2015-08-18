@@ -214,10 +214,18 @@ namespace OpenDental {
 		private void FillGridMessageThread(long patNum) {
 			if(patNum==0) {
 				if(gridMessages.SelectedIndices.Length>0) {
-					List<SmsThreadMessage> listSmsThreadMessage=new List<SmsThreadMessage>();
-					SmsFromMobile smsFromMobile=(SmsFromMobile)gridMessages.Rows[gridMessages.SelectedIndices[0]].Tag;
-					listSmsThreadMessage.Add(new SmsThreadMessage(smsFromMobile.DateTimeReceived,smsFromMobile.MsgText,true,true,true));
-					smsThreadView.ListSmsThreadMessages=listSmsThreadMessage;
+					if((object)gridMessages.Rows[gridMessages.SelectedIndices[0]].Tag is SmsToMobile) {
+						List<SmsThreadMessage> listSmsThreadMessage=new List<SmsThreadMessage>();
+						SmsToMobile smsToMobile=(SmsToMobile)gridMessages.Rows[gridMessages.SelectedIndices[0]].Tag;
+						listSmsThreadMessage.Add(new SmsThreadMessage(smsToMobile.DateTimeSent,smsToMobile.MsgText,true,true,true));
+						smsThreadView.ListSmsThreadMessages=listSmsThreadMessage;
+					}
+					else {  //Tag is SmsFromMobile
+						List<SmsThreadMessage> listSmsThreadMessage=new List<SmsThreadMessage>();
+						SmsFromMobile smsFromMobile=(SmsFromMobile)gridMessages.Rows[gridMessages.SelectedIndices[0]].Tag;
+						listSmsThreadMessage.Add(new SmsThreadMessage(smsFromMobile.DateTimeReceived,smsFromMobile.MsgText,true,true,true));
+						smsThreadView.ListSmsThreadMessages=listSmsThreadMessage;
+					}
 				}
 				else {
 					smsThreadView.ListSmsThreadMessages=null;

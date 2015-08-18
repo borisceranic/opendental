@@ -9,9 +9,14 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormTxtMsgEdit:Form {
-		public long PatNum;
+		///<summary>PatNum of the patient selected.  Required if sending message without loading form or loading with patient selected.</summary>
+		public long PatNum=0;
+		///<summary>WirelessPhone of the patient selected.  Required if sending message without loading form.  
+		///Once form is loaded uses textWirelessPhone.Text instead.</summary>
 		public string WirelessPhone;
+		///<summary>Message text to be sent.  Required if sending message without loading form.  Once form is loaded uses textMessage.Text instead.</summary>
 		public string Message;
+		///<summary>TxtMsgOk status of the patient.  Required if sending message without loading form or loading with patient selected.</summary>
 		public YN TxtMsgOk;
 		
 		public FormTxtMsgEdit() {
@@ -22,6 +27,24 @@ namespace OpenDental {
 		private void FormTxtMsgEdit_Load(object sender,EventArgs e) {
 			textWirelessPhone.Text=WirelessPhone;
 			textMessage.Text=Message;
+			if(PatNum==0) {
+				radioPatient.Checked=false;
+				radioOther.Checked=true;
+				butPatFind.Enabled=false;
+				textPatient.Enabled=false;
+				textWirelessPhone.ReadOnly=false;
+				textPatient.Text="";
+				textWirelessPhone.Text="";
+			}
+			else {
+				radioPatient.Checked=true;
+				radioOther.Checked=false;
+				butPatFind.Enabled=true;
+				textPatient.Enabled=true;
+				textWirelessPhone.ReadOnly=true;
+				textPatient.Text=Patients.GetPat(PatNum).GetNameLF();
+				textWirelessPhone.Text=WirelessPhone;
+			}
 		}
 
 		/// <summary>May be called from other parts of the program without showing this form. You must still create an instance of this form though. 
@@ -54,11 +77,11 @@ namespace OpenDental {
 				MsgBox.Show(this,"CallFire Program Link must be enabled.");
 				return false;
 			}
-			if(txtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)){
+			if(patNum!=0 && txtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)){
 				MsgBox.Show(this,"It is not OK to text this patient.");
 				return false;
 			}
-			if(txtMsgOk==YN.No){
+			if(patNum!=0 && txtMsgOk==YN.No) {
 				MsgBox.Show(this,"It is not OK to text this patient.");
 				return false;
 			}
@@ -68,7 +91,7 @@ namespace OpenDental {
 			}
 			if(SmsPhones.IsIntegratedTextingEnabled()) {
 				try {
-					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);
+					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);  //Can pass in 0 as PatNum if no patient selected.
 				}
 				catch(Exception ex) {
 					MsgBox.Show(this,ex.Message);
@@ -76,10 +99,11 @@ namespace OpenDental {
 				}
 			}
 			else {
-				return SendCallFire(patNum,wirelessPhone,message);
+				return SendCallFire(patNum,wirelessPhone,message);  //Can pass in 0 as PatNum if no patient selected.
 			}
 		}
 
+		///<summary>Sends text message to callfire.  If patNum=0 will not create commlog entry.</summary>
 		private bool SendCallFire(long patNum,string wirelessPhone,string message) {
 			string key=ProgramProperties.GetPropVal(ProgramName.CallFire,"Key From CallFire");
 			string msg=wirelessPhone+","+message.Replace(",","");//ph#,msg Commas in msg cause error.
@@ -93,6 +117,9 @@ namespace OpenDental {
 			catch(Exception ex) {
 				MsgBox.Show(this,"Error sending text message.\r\n\r\n"+ex.Message);
 				return false;
+			}
+			if(patNum==0) {  //No patient selected, do not make commlog.
+				return true;
 			}
 			Commlog commlog=new Commlog();
 			commlog.CommDateTime=DateTime.Now;
@@ -109,19 +136,87 @@ namespace OpenDental {
 			return true;
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
+		private void butSend_Click(object sender,EventArgs e) {
 			if(textMessage.Text=="") {
 				MsgBox.Show(this,"Please enter a message first.");
 				return;
 			}
-			if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk,SmsPhones.GetClinicNumForTexting(PatNum))) {
-				return;//Allow the user to try again.  A message was already shown to the user inside SendText().
+			if(radioOther.Checked) {  //No patient selected
+				if(textWirelessPhone.Text=="") {
+					MsgBox.Show(this,"Please enter a phone number first.");
+					return;
+				}
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"You do not have a patient selected.  If you are sending a message to an existing "
+						+"patient you should choose the Patient option and use the find button.  If you proceed no commlog entry "
+						+"will be created and any replies to this message will not be automatically associated with any patient.  Continue?")) {
+					return;
+				}
+				long clinicNum=FormOpenDental.ClinicNum;
+				if(clinicNum==0) {  //If no clinic selected, follow logic from SmsPhones.GetClinicNumForTexting()
+					clinicNum=Clinics.List[0].ClinicNum;
+				}
+				if(!SendText(0,textWirelessPhone.Text,textMessage.Text,YN.Unknown,clinicNum)) {  //0 as PatNum to denote no pat specified
+					return;//Allow the user to try again.  A message was already shown to the user inside SendText().
+				}
+			}
+			else {  //Patient selected
+				if(PatNum==0) {
+					MsgBox.Show(this,"You must first select a patient with the find button, or use the Another Person option.");
+					return;
+				}
+				if(textWirelessPhone.Text=="") {
+					MsgBox.Show(this,"This patient has no wireless phone entered.  You must add a wireless phone number to their patient account first before "
+						+"you can send a text message.");
+					return;
+				}
+				if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk,SmsPhones.GetClinicNumForTexting(PatNum))) {
+					return;//Allow the user to try again.  A message was already shown to the user inside SendText().
+				}
 			}
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void butPatFind_Click(object sender,EventArgs e) {
+			FormPatientSelect formP=new FormPatientSelect();
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			Patient patCur=Patients.GetPat(formP.SelectedPatNum);
+			PatNum=patCur.PatNum;
+			TxtMsgOk=patCur.TxtMsgOk;
+			textPatient.Text=patCur.GetNameLF();
+			textWirelessPhone.Text=patCur.WirelessPhone;
+		}
+
+		private void radioOther_Click(object sender,EventArgs e) {
+			if(!textWirelessPhone.ReadOnly) {//The user clicked the "Another Person" radio button multiple times consecutively.
+				return;//Leave so that the phone number is not wiped out unnecessarily.
+			}
+			butPatFind.Enabled=false;
+			textPatient.Enabled=false;
+			textWirelessPhone.ReadOnly=false;
+			textPatient.Text="";
+			textWirelessPhone.Text="";
+			PatNum=0;
+			TxtMsgOk=YN.Unknown;
+		}
+
+		private void radioPatient_Click(object sender,EventArgs e) {
+			if(textWirelessPhone.ReadOnly) {//The user clicked the "Patient" radio button multiple times consecutively.
+				return;//Leave so that the phone number is not wiped out unnecessarily.
+			}
+			butPatFind.Enabled=true;
+			textPatient.Enabled=true;
+			textWirelessPhone.ReadOnly=true;
+			textPatient.Text="";
+			textWirelessPhone.Text="";
+			PatNum=0;
+			TxtMsgOk=YN.Unknown;
 		}
 
 
