@@ -167,7 +167,13 @@ namespace OpenDentBusiness{
 				+"WHERE pl.ProcStatus=2 "
 				+"AND pc.ProcCode IN ("+procStr+") "
 				+"AND pl.PatNum="+POut.Long(patNum)+" "
-				+"AND pl.ProcDate BETWEEN "+POut.Date(startBillingCycle)+" AND "+DbHelper.Curdate();
+				+"AND pl.ProcDate<="+DbHelper.Curdate()+" ";
+			if(billingDay==DateTime.Today.Day) {//So that the card is not charged for today's and last month's repeat charge
+				command+="AND pl.ProcDate>"+POut.Date(startBillingCycle);
+			}
+			else {
+				command+="AND pl.ProcDate>="+POut.Date(startBillingCycle);
+			}
 			return PIn.Double(Db.GetScalar(command));
 		}
 
