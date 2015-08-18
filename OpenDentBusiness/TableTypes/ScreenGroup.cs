@@ -2,7 +2,7 @@ using System;
 
 namespace OpenDentBusiness{
 
-	///<summary>Used in public health.  Programming note: There are many extra fields in common with the screen table, but they are only in this struct and not in the database itself, where that data is stored with the individual screen items. The data in this table is irrelevant in reports.  It is just used to help organize the user interface.</summary>
+	///<summary>Used in public health.  The database table only has 3 columns.  There are 5 additional columns in C# that are not in the databae.  These extra columns are used in the UI to organize input, and are transferred to the screen table as needed.</summary>
 	[Serializable]
 	public class ScreenGroup:TableBase {
 		///<summary>Primary key</summary>
