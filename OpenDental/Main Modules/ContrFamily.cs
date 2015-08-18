@@ -171,6 +171,7 @@ namespace OpenDental{
 			this.gridFamily.TabIndex = 31;
 			this.gridFamily.Title = "Family Members";
 			this.gridFamily.TranslationName = "TablePatient";
+			this.gridFamily.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFamily_CellDoubleClick);
 			this.gridFamily.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFamily_CellClick);
 			// 
 			// gridPat
@@ -1089,6 +1090,16 @@ namespace OpenDental{
 			//tbFamily.ColorRow(e.Row,Color.DarkSalmon);
 			OnPatientSelected(FamCur.ListPats[e.Row]);
 			ModuleSelected(FamCur.ListPats[e.Row].PatNum);
+		}
+
+		private void gridFamily_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			FormPatientEdit FormP=new FormPatientEdit(PatCur,FamCur);
+			FormP.IsNew=false;
+			FormP.ShowDialog();
+			if(FormP.DialogResult==DialogResult.OK) {
+				OnPatientSelected(PatCur);
+			}
+			ModuleSelected(PatCur.PatNum);
 		}
 
 		//private void butAddPt_Click(object sender, System.EventArgs e) {
