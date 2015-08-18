@@ -31,6 +31,13 @@ namespace OpenDentBusiness {
 		}
 
 		public static void SetRingGroups(int extension,AsteriskRingGroups ringGroups) {
+			#region Old Ring Group Code
+			//The following code is the old way of updating our ring groups where we would have each workstation send a query to the asterisk db and then
+			//insert a signal into the database that would notify the PhoneTrackingServer to send a 'reload' command to Asterisk.
+			//We believe that this is causing call quality loss and is also causing the 'reload' command to get called too much which 
+			//might be the reason that we have noticed more and more call events getting missed.  E.g. link and unlink (answer / hang up) events are missed.
+			//Also, Nathan mentioned to me that the column in the db that holds the ring group extensions is hitting its limit.
+			/***************************************************************************************************************
 			DataConnection dcon=new DataConnection(AsteriskServerIp,"asterisk","opendental","secret",DatabaseType.MySql);
 			string command="SELECT grpnum,grplist FROM ringgroups WHERE grpnum = '601' OR grpnum = '609'";
 			DataTable table=null;
@@ -96,9 +103,19 @@ namespace OpenDentBusiness {
 					AddToRingGroup("609",extension.ToString(),rawExtensions609);
 				}
 			}
-			Signalods.SetInvalid(InvalidType.PhoneAsteriskReload);
+			**************************************************************************************************************/
+			#endregion
+			//Create a custom signalod so that the queue system (new way of doing ring groups) knows how to handle this extension.
+			Signalod sig=new Signalod();
+			sig.ITypes=((int)InvalidType.PhoneAsteriskReload).ToString();
+			sig.DateViewing=DateTime.MinValue;
+			sig.SigType=SignalType.Invalid;
+			sig.TaskNum=0;
+			sig.SigText="Ext: "+POut.Int(extension)+",RingGroup: "+Enum.GetName(typeof(AsteriskRingGroups),ringGroups);
+			Signalods.Insert(sig);
 		}
 
+		///<summary>Deprecated</summary>
 		private static void AddToRingGroup(string ringGroup,string extension,string rawExtensions) {
 			string newExtensions=rawExtensions+"-"+extension;
 			string command="UPDATE ringgroups SET grplist='"+POut.String(newExtensions)+"' "
@@ -109,6 +126,7 @@ namespace OpenDentBusiness {
 			dcon.NonQ(command);
 		}
 
+		///<summary>Deprecated</summary>
 		private static void RemoveFromRingGroup(string ringGroup,string extension,List<string> listExtensions,string rawExtensions) {
 			string newExtensions="";
 			for(int i=0;i<listExtensions.Count;i++) {
@@ -127,7 +145,7 @@ namespace OpenDentBusiness {
 			dcon.NonQ(command);
 		}
 
-		///<summary>For a given date, gets a list of dateTimes of missed calls.  Gets directly from the Asterisk database, hard-coded.</summary>
+		///<summary>Deprecated.  For a given date, gets a list of dateTimes of missed calls.  Gets directly from the Asterisk database, hard-coded.</summary>
 		public static List<DateTime> GetMissedCalls(DateTime date) {
 			DataConnection dcon=new DataConnection(AsteriskServerIp,"asteriskcdrdb","opendental","secret",DatabaseType.MySql);
 			string command="SELECT calldate FROM cdr WHERE "+DbHelper.DtimeToDate("calldate")+" = "+POut.Date(date)+" "
