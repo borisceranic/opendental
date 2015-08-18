@@ -157,7 +157,8 @@ namespace OpenDentBusiness{
 			}
 			else {
 				DateTime lastMonth=DateTime.Today.AddMonths(-1);
-				billingDay=Math.Min(new DateTime(lastMonth.Year,lastMonth.Month,1).AddMonths(1).AddDays(-1).Day,billingDay);
+				//Make sure the billing day is not Febuary 30th or November 31st
+				billingDay=Math.Min(DateTime.DaysInMonth(lastMonth.Year,lastMonth.Month),billingDay);
 				startBillingCycle=new DateTime(lastMonth.Year,lastMonth.Month,billingDay);
 			}
 			string procStr="'"+POut.String(procedures).Replace(",","','")+"'";
@@ -167,7 +168,13 @@ namespace OpenDentBusiness{
 				+"WHERE pl.ProcStatus=2 "
 				+"AND pc.ProcCode IN ("+procStr+") "
 				+"AND pl.PatNum="+POut.Long(patNum)+" "
-				+"AND pl.ProcDate BETWEEN "+POut.Date(startBillingCycle)+" AND "+DbHelper.Curdate();
+				+"AND pl.ProcDate<="+DbHelper.Curdate()+" ";
+			if(billingDay==DateTime.Today.Day) {//So that the card is not charged for today's and last month's repeat charge
+				command+="AND pl.ProcDate>"+POut.Date(startBillingCycle);
+			}
+			else {
+				command+="AND pl.ProcDate>="+POut.Date(startBillingCycle);
+			}
 			return PIn.Double(Db.GetScalar(command));
 		}
 
