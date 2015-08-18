@@ -264,7 +264,7 @@ namespace OpenDentBusiness{
 			if(!File.Exists(filename)) {
 				throw new ApplicationException("File does not exist.");
 			}
-			if(!filename.EndsWith(".wav")){
+			if(!filename.ToLower().EndsWith(".wav")){
 				throw new ApplicationException("Filename must end with .wav");
 			}
 			FileStream stream=new FileStream(filename,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
