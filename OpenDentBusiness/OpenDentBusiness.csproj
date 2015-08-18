@@ -1057,9 +1057,6 @@
     <Compile Include="UI\ApptDrawing.cs" />
     <Compile Include="UI\ApptSingle.cs" />
     <Compile Include="UI\ApptSingleDrawing.cs" />
-    <Compile Include="UI\ODForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="UI\ODGrid.cs">
       <SubType>UserControl</SubType>
     </Compile>

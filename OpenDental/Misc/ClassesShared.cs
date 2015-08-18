@@ -160,16 +160,6 @@ namespace OpenDental{
 		}*/
 
 		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
-		public static void SetInvalid(string processID="",string formID="",List<Tuple<string,long>> valueTypes=null,params InvalidType[] itypes) {
-			List<int> itypeList=new List<int>();
-			for(int i=0;i<itypes.Length;i++) {
-				itypeList.Add((int)itypes[i]);
-			}
-			
-			OnBecameInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,0,processID,formID,valueTypes));
-		}
-
-		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
 		public static void SetInvalid(params InvalidType[] itypes){
 			List<int> itypeList=new List<int>();
 			for(int i=0;i<itypes.Length;i++){
@@ -218,58 +208,39 @@ namespace OpenDental{
 	public delegate void ValidEventHandler(ValidEventArgs e);
 
 	///<summary></summary>
-	public class ValidEventArgs:System.EventArgs {
-		private DateTime _dateViewing;
-		private List<int> _itypes;
-		private bool _onlyLocal;
-		private long _taskNum;
-		private string _processID;
-		private string _formID;
-		private List<Tuple<string,long>> _dataTypes;
-
+	public class ValidEventArgs : System.EventArgs{
+		private DateTime dateViewing;
+		private List<int> itypes;
+		private bool onlyLocal;
+		private long taskNum;
+		
 		///<summary></summary>
-		public ValidEventArgs(DateTime dateViewing,List<int> itypes,bool onlyLocal,long taskNum
-			,string processID="",string formID="",List<Tuple<string,long>> dataTypes=null)
+		public ValidEventArgs(DateTime dateViewing,List<int> itypes,bool onlyLocal,long taskNum)
 			: base() {
-			_dateViewing=dateViewing;
-			_itypes=itypes;
-			_onlyLocal=onlyLocal;
-			_taskNum=taskNum;
-			_processID=processID;
-			_formID=formID;
-			_dataTypes=dataTypes;
+			this.dateViewing=dateViewing;
+			this.itypes=itypes;
+			this.onlyLocal=onlyLocal;
+			this.taskNum=taskNum;
 		}
 
 		///<summary></summary>
-		public DateTime DateViewing {
-			get {return _dateViewing;}
+		public DateTime DateViewing{
+			get{return dateViewing;}
 		}
 
 		///<summary></summary>
-		public List<int> ITypes {
-			get {return _itypes;}
+		public List<int> ITypes{
+			get{return itypes;}
 		}
 
 		///<summary></summary>
-		public bool OnlyLocal {
-			get {return _onlyLocal;}
+		public bool OnlyLocal{
+			get{return onlyLocal;}
 		}
 
 		///<summary></summary>
 		public long TaskNum {
-			get {return _taskNum;}
-		}
-
-		public string ProcessID {
-			get {return _processID;}
-		}
-
-		public string FormID {
-			get {return _formID;}
-		}
-
-		public List<Tuple<string,long>> DataTypes {
-			get {return _dataTypes;}
+			get{return taskNum;}
 		}
 
 	}
