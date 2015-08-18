@@ -768,7 +768,7 @@ namespace OpenDentBusiness {
 						row["colorText"] = arrayDefs[(int)DefCat.ProgNoteColors][20].ItemColor.ToArgb().ToString();
 						row["colorBackG"] = arrayDefs[(int)DefCat.ProgNoteColors][21].ItemColor.ToArgb().ToString();
 					}
-					row["description"]=txt+Lans.g("ChartModule","Task - In List: ")+rawTask.Rows[i]["ListDisc"].ToString();
+					row["description"]=txt+Lans.g("ChartModule","Task - In List: ")+TaskLists.GetFullPath(PIn.Long(rawTask.Rows[i]["TaskListNum"].ToString()));
 					row["dx"]="";
 					row["Dx"]="";
 					row["EmailMessageNum"]=0;
