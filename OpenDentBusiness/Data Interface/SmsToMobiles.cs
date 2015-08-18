@@ -185,14 +185,16 @@ namespace OpenDentBusiness{
 			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;
 			SmsToMobiles.Insert(smsToMobile);
-			Commlogs.Insert(new Commlog() {
-				CommDateTime=smsToMobile.DateTimeSent,
-				Mode_=CommItemMode.Text,
-				Note=smsToMobile.MsgText,
-				PatNum=smsToMobile.PatNum,
-				CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
-				SentOrReceived=CommSentOrReceived.Sent
-			});
+			if(patNum !=0) {  //No patient specified, do not make commlog.
+				Commlogs.Insert(new Commlog() {
+					CommDateTime=smsToMobile.DateTimeSent,
+					Mode_=CommItemMode.Text,
+					Note=smsToMobile.MsgText,
+					PatNum=smsToMobile.PatNum,
+					CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
+					SentOrReceived=CommSentOrReceived.Sent
+				});
+			}
 			return true;
 		}
 

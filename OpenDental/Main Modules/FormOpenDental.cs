@@ -3563,7 +3563,12 @@ namespace OpenDental{
 
 		private void OnTxtMsg_Click() {
 			if(CurPatNum==0) {
-				MsgBox.Show(this,"No patient selected.  Please select a patient before composing a text message.");
+				FormTxtMsgEdit FormTxtME=new FormTxtMsgEdit();
+				FormTxtME.PatNum=0;
+				FormTxtME.ShowDialog();
+				if(FormTxtME.DialogResult==DialogResult.OK) {
+					RefreshCurrentModule();
+				}
 				return;
 			}
 			Patient pat=Patients.GetPat(CurPatNum);
@@ -3576,7 +3581,7 @@ namespace OpenDental{
 					+"Change Text OK in the Edit Patient Information window if the patient wants to receive text messages.");
 				return;
 			}
-			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();			
+			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();
 			FormTME.PatNum=CurPatNum;
 			FormTME.WirelessPhone=pat.WirelessPhone;
 			FormTME.TxtMsgOk=pat.TxtMsgOk;
