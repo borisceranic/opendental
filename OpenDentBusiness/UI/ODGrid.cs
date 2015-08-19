@@ -44,7 +44,7 @@ namespace OpenDental.UI {
 		//private Font cellFont=new Font(FontFamily.GenericSansSerif,8.5f);
 		public Font FontForSheets;
 		private float cellFontSize=8.5f;
-		private int titleHeight=18;
+		protected int titleHeight=18;
 		private int headerHeight=15;
 		private Color cGridLine=Color.FromArgb(180,180,180);
 		private System.Windows.Forms.VScrollBar vScroll;

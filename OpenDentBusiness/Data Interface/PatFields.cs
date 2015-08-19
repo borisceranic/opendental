@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Reflection;
@@ -14,6 +15,15 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT * FROM patfield WHERE PatNum="+POut.Long(patNum);
 			return Crud.PatFieldCrud.SelectMany(command).ToArray();
+		}
+
+		///<summary>Get all PatFields for the given fieldName which belong to patients who have a corresponding entry in the RegistrationKey table. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+		public static List<PatField> GetPatFieldsWithRegKeys(string fieldName) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PatField>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM patfield WHERE FieldName='"+POut.String(fieldName)+"' AND PatNum IN (SELECT PatNum FROM registrationkey)";
+			return Crud.PatFieldCrud.SelectMany(command);
 		}
 
 		///<summary></summary>

@@ -58,7 +58,9 @@ namespace OpenDentBusiness {
 		///<summary>2. Used when sending single or batch recall SMS.</summary>
 		Recall,
 		///<summary>3. Used when sending single or batch reminder SMS.</summary>
-		Reminder
+		Reminder,
+		///<summary>4. Used when sending a test message from HQ. Customer will not be charged for this message.</summary>
+		TestNoCharge
 	}
 
 	///<summary>None should never be used, the code should be re-written to not use it.</summary>
