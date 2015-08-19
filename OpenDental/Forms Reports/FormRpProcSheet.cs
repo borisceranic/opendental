@@ -1,11 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using System.Collections.Generic;
+using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -21,7 +20,6 @@ namespace OpenDental{
 		private System.Windows.Forms.RadioButton radioIndividual;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.RadioButton radioGrouped;
-	  private FormQuery FormQuery2;
 		private Label label2;
 		private TextBox textCode;
 		private CheckBox checkAllProv;
@@ -29,10 +27,8 @@ namespace OpenDental{
 		private ListBox listClin;
 		private Label labelClin;
 		private List<Clinic> _listClinics;
-
-		///<summary>The where clause for the providers.</summary>
-		private string whereProv;
-		private string whereClin;
+		private List<long> _listClinicNums;
+		private List<long> _listProvNums;
 
 		///<summary></summary>
 		public FormRpProcSheet(){
@@ -343,265 +339,164 @@ namespace OpenDental{
 					return;
 				}
 			}
-			whereProv="";
-			if(!checkAllProv.Checked) {
-				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-					if(i==0) {
-						whereProv+=" AND (";
-					}
-					else {
-						whereProv+="OR ";
-					}
-					whereProv+="procedurelog.ProvNum = "+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]].ProvNum)+" ";
-				}
-				whereProv+=") ";
+			_listProvNums=new List<long>();
+			_listClinicNums=new List<long>();
+			List<Provider> listProvs=ProviderC.GetListShort();
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				_listProvNums.Add(listProvs[listProv.SelectedIndices[i]].ProvNum);
 			}
-			whereClin="";
+			if(checkAllProv.Checked) {
+				for(int i=0;i<listProvs.Count;i++) {
+					_listProvNums.Add(listProvs[i].ProvNum);
+				}
+			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				whereClin+=" AND procedurelog.ClinicNum IN(";
 				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-					if(i>0) {
-						whereClin+=",";
-					}
 					if(Security.CurUser.ClinicIsRestricted) {
-						whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+						_listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
 					}
 					else {
 						if(listClin.SelectedIndices[i]==0) {
-							whereClin+="0";
+							_listClinicNums.Add(0);
 						}
 						else {
-							whereClin+=POut.Long(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+							_listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
 						}
 					}
 				}
-				whereClin+=") ";
 			}
-			ReportSimpleGrid report=new ReportSimpleGrid();
 			if(radioIndividual.Checked){
-				CreateIndividual(report);
+				CreateIndividual();
 			}
 			else{
-				CreateGrouped(report);
+				CreateGrouped();
 			}
 		}
 
-		private void CreateIndividual(ReportSimpleGrid report) {
-			//added Procnum to retrieve all codes
-			report.Query="SELECT procedurelog.ProcDate,"
-			  +DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI")+" "
-			  +"AS plfname, procedurecode.ProcCode,"
-				+"procedurelog.ToothNum,procedurecode.Descript,provider.Abbr,"
-				+"procedurelog.ClinicNum,"
-				+"procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)"
-				+"-IFNULL(SUM(claimproc.WriteOff),0) ";//\"$fee\" "  //if no writeoff, then subtract 0
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					report.Query+="$fee ";
-				}
-				else {//Oracle needs quotes.
-					report.Query+="\"$fee\" ";
-				}
-				report.Query+="FROM patient,procedurecode,provider,procedurelog "
-				+"LEFT JOIN claimproc ON procedurelog.ProcNum=claimproc.ProcNum "
-				+"AND claimproc.Status='7' "//only CapComplete writeoffs are subtracted here.
-				+"WHERE procedurelog.ProcStatus = '2' "
-				+"AND patient.PatNum=procedurelog.PatNum "
-				+"AND procedurelog.CodeNum=procedurecode.CodeNum "
-				+"AND provider.ProvNum=procedurelog.ProvNum "
-				+whereProv
-				+whereClin
-				+"AND procedurecode.ProcCode LIKE '%"+POut.String(textCode.Text)+"%' "
-				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= " +POut.Date(date1.SelectionStart)+" "
-				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= " +POut.Date(date2.SelectionStart)+" "
-				+"GROUP BY procedurelog.ProcNum "
-				+"ORDER BY "+DbHelper.DtimeToDate("procedurelog.ProcDate")+",plfname,procedurecode.ProcCode,ToothNum";
-			FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-			DataTable table=report.GetTempTable();
-			report.TableQ=new DataTable(null);
-			int colI=7;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				colI=8;
-			}
-			for(int i=0;i<colI;i++) { //add columns
-				report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
-			}
-			report.InitializeColumns();
-			DataRow row;
-			decimal dec=0;
-			decimal total=0;
-			int medicalIndexOffset=0;
+		private void CreateIndividual() {
+			bool isAnyClinicMedical=false;//Used to determine whether or not to display 'Tooth' column
 			if(AnyClinicSelectedIsMedical()) {
-				medicalIndexOffset=1;
+				isAnyClinicMedical=true;
 			}
-			for(int i=0;i<table.Rows.Count;i++) {
-				row = report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
-				row[0]=PIn.Date(table.Rows[i][0].ToString()).ToShortDateString();
-				row[1]=table.Rows[i][1].ToString();//name
-				row[2]=table.Rows[i][2].ToString();//adacode
-				if(medicalIndexOffset==0) {
-					row[3]=Tooth.ToInternat(table.Rows[i][3].ToString());//tooth
-				}
-				row[4-medicalIndexOffset]=table.Rows[i][4].ToString();//descript
-				row[5-medicalIndexOffset]=table.Rows[i][5].ToString();//prov
-				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-					row[6-medicalIndexOffset]=Clinics.GetDesc(PIn.Long(table.Rows[i][6].ToString()));//clinic
-					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[7-medicalIndexOffset]=dec.ToString("n");
-				}
-				else {
-					dec=PIn.Decimal(table.Rows[i][7].ToString());//fee
-					row[6-medicalIndexOffset]=dec.ToString("n");
-				}
-				total+=dec;
-				report.TableQ.Rows.Add(row);
-			}
+			DataTable table=RpProcSheet.GetIndividualTable(date1.SelectionStart,date2.SelectionStart,_listProvNums,_listClinicNums,textCode.Text,
+				isAnyClinicMedical);
+			string subtitleProvs=ConstructProviderSubtitle();
+			string subtitleClinics=ConstructClinicSubtitle();
+			Font font=new Font("Tahoma",9);
+			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
+			report.ReportName=Lan.g(this,"Daily Procedures");
+			report.AddTitle("Title",Lan.g(this,"Daily Procedures"),fontTitle);
+			report.AddSubTitle("Practice Title",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Dates of Report",date1.SelectionStart.ToString("d")+" - "+date2.SelectionStart.ToString("d"),fontSubTitle);
+			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.ColTotal[7-medicalIndexOffset]=total;
+				report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
+			}
+			QueryObject query=report.AddQuery(table,Lan.g(this,"Date")+": "+DateTimeOD.Today.ToString("d"));
+			query.AddColumn(Lan.g(this,"Date"),90,FieldValueType.Date,font);
+			query.GetColumnDetail(Lan.g(this,"Date")).StringFormat="d";
+			query.AddColumn(Lan.g(this,"Patient Name"),150,FieldValueType.String,font);
+			if(isAnyClinicMedical) {
+				query.AddColumn(Lan.g(this,"Code"),140,FieldValueType.String,font);
 			}
 			else {
-				report.ColTotal[6-medicalIndexOffset]=total;
+				query.AddColumn(Lan.g(this,"Code"),70,FieldValueType.String,font);
+				query.AddColumn("Tooth",40,FieldValueType.String,font);
 			}
-			FormQuery2.ResetGrid();			
-			report.Title="Daily Procedures";
-			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			report.SubTitle.Add(date1.SelectionStart.ToString("d")+" - "+date2.SelectionStart.ToString("d"));
-			if(checkAllProv.Checked) {
-				report.SubTitle.Add(Lan.g(this,"All Providers"));
-			}
-			else {
-				string provNames="";
-				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-					if(i>0) {
-						provNames+=", ";
-					}
-					provNames+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
-				}
-				report.SubTitle.Add(provNames);
-			}
+			query.AddColumn(Lan.g(this,"Description"),140,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Provider"),80,FieldValueType.String,font);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(checkAllClin.Checked) {
-					report.SubTitle.Add(Lan.g(this,"All Clinics"));
-				}
-				else {
-					string clinNames="";
-					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-						if(i>0) {
-							clinNames+=", ";
-						}
-						if(Security.CurUser.ClinicIsRestricted) {
-							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
-						}
-						else {
-							if(listClin.SelectedIndices[i]==0) {
-								clinNames+=Lan.g(this,"Unassigned");
-							}
-							else {
-								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
-							}
-						}
-					}
-					report.SubTitle.Add(clinNames);
-				}
+				query.AddColumn(Lan.g(this,"Clinic"),100,FieldValueType.String,font);
 			}
-			report.SetColumn(this,0,"Date",80);
-			report.SetColumn(this,1,"Patient Name",130);
-			if(medicalIndexOffset==1) {
-				report.SetColumn(this,2,"Code",140);
+			query.AddColumn(Lan.g(this,"Fee"),80,FieldValueType.Number,font);;
+			report.AddPageNum(font);
+			if(!report.SubmitQueries()) {
+				return;
 			}
-			else {
-				report.SetColumn(this,2,"Code",95);
-				report.SetColumn(this,3,"Tooth",45);
-			}
-			report.SetColumn(this,4-medicalIndexOffset,"Description",200);
-			report.SetColumn(this,5-medicalIndexOffset,"Provider",50);
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				report.SetColumn(this,6-medicalIndexOffset,"Clinic",70);
-				report.SetColumn(this,7-medicalIndexOffset,"Fee",70,HorizontalAlignment.Right);
-			}
-			else{
-				report.SetColumn(this,6-medicalIndexOffset,"Fee",70,HorizontalAlignment.Right);
-			}
-			FormQuery2.ShowDialog();
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
 
-		private void CreateGrouped(ReportSimpleGrid report) {
-			report.Query="SELECT procs.ItemName,procs.ProcCode,procs.Descript,";
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				report.Query+="Count(*),AVG(procs.fee) $AvgFee,SUM(procs.fee) AS $TotFee ";
-			}
-			else {//Oracle needs quotes.
-				report.Query+="Count(*),AVG(procs.fee) \"$AvgFee\",SUM(procs.fee) AS \"$TotFee\" ";
-			}
-			report.Query+="FROM ( "
-					+"SELECT procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END) -IFNULL(SUM(claimproc.WriteOff),0) fee, "
-					+"procedurecode.ProcCode,	procedurecode.Descript,	definition.ItemName, definition.ItemOrder "
-					+"FROM procedurelog "
-					+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"INNER JOIN definition ON definition.DefNum=procedurecode.ProcCat "
-					+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum AND claimproc.Status='7' "
-					+"WHERE procedurelog.ProcStatus = '2' "
-					+whereProv
-					+whereClin
-					+"AND procedurecode.ProcCode LIKE '%"+POut.String(textCode.Text)+"%' "
-					+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= '" + date1.SelectionStart.ToString("yyyy-MM-dd")+"' "
-					+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= '" + date2.SelectionStart.ToString("yyyy-MM-dd")+"' "
-					+"GROUP BY procedurelog.ProcNum ) procs "
-				+"GROUP BY procs.ProcCode "
-				+"ORDER BY procs.ItemOrder,procs.ProcCode";
-			FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-			FormQuery2.SubmitReportQuery();			
-			report.Title="Procedures By Procedure Code";
-			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			report.SubTitle.Add(date1.SelectionStart.ToString("d")+" - "+date2.SelectionStart.ToString("d"));
-			if(checkAllProv.Checked) {
-				report.SubTitle.Add(Lan.g(this,"All Providers"));
-			}
-			else {
-				string provNames="";
-				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-					if(i>0) {
-						provNames+=", ";
-					}
-					provNames+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
-				}
-				report.SubTitle.Add(provNames);
-			}
+		private void CreateGrouped() {
+			DataTable table=RpProcSheet.GetGroupedTable(date1.SelectionStart,date2.SelectionStart,_listProvNums,_listClinicNums,textCode.Text);
+			string subtitleProvs=ConstructProviderSubtitle();
+			string subtitleClinics=ConstructClinicSubtitle();
+			Font font=new Font("Tahoma",9);
+			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report=new ReportComplex(true,false);
+			report.ReportName=Lan.g(this,"Procedures By Procedure Code");
+			report.AddTitle("Title",Lan.g(this,"Procedures By Procedure Code"),fontTitle);
+			report.AddSubTitle("Practice Title",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Dates of Report",date1.SelectionStart.ToString("d")+" - "+date2.SelectionStart.ToString("d"),fontSubTitle);
+			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(checkAllClin.Checked) {
-					report.SubTitle.Add(Lan.g(this,"All Clinics"));
+				report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
+			}
+			QueryObject query=report.AddQuery(table,Lan.g(this,"Date")+": "+DateTimeOD.Today.ToString("d"));
+			query.AddColumn(Lan.g(this,"Category"),150,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Code"),130,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Description"),140,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Quantity"),60,FieldValueType.Integer,font);
+			query.GetColumnDetail(Lan.g(this,"Quantity")).ContentAlignment=ContentAlignment.MiddleRight;
+			query.AddColumn(Lan.g(this,"Average Fee"),110,FieldValueType.String,font);
+			query.GetColumnDetail(Lan.g(this,"Average Fee")).ContentAlignment=ContentAlignment.MiddleRight;
+			query.AddColumn(Lan.g(this,"Total Fees"),110,FieldValueType.Number,font);
+			report.AddPageNum(font);
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			DialogResult=DialogResult.OK;
+		}
+
+		///<summary>Returns 'All Providers' or comma separated string of clinics providers selected.</summary>
+		private string ConstructProviderSubtitle() {
+			string subtitleProvs="";
+			if(checkAllProv.Checked) {
+				return Lan.g(this,"All Providers");
+			}
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				if(i>0) {
+					subtitleProvs+=", ";
+				}
+				subtitleProvs+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
+			}
+			return subtitleProvs;
+		}
+
+		///<summary>Returns 'All Clinics' or comma separated string of clinics selected.</summary>
+		private string ConstructClinicSubtitle() {
+			string subtitleClinics="";
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				return subtitleClinics;
+			}
+			if(checkAllClin.Checked) {
+				return Lan.g(this,"All Clinics");
+			}
+			for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+				if(i>0) {
+					subtitleClinics+=", ";
+				}
+				if(Security.CurUser.ClinicIsRestricted) {
+					subtitleClinics+=_listClinics[listClin.SelectedIndices[i]].Description;
 				}
 				else {
-					string clinNames="";
-					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
-						if(i>0) {
-							clinNames+=", ";
-						}
-						if(Security.CurUser.ClinicIsRestricted) {
-							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
-						}
-						else {
-							if(listClin.SelectedIndices[i]==0) {
-								clinNames+=Lan.g(this,"Unassigned");
-							}
-							else {
-								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
-							}
-						}
+					if(listClin.SelectedIndices[i]==0) {
+						subtitleClinics+=Lan.g(this,"Unassigned");
 					}
-					report.SubTitle.Add(clinNames);
+					else {
+						subtitleClinics+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index to account for 'Unassigned' 
+					}
 				}
 			}
-			report.SetColumn(this,0,"Category",150);
-			report.SetColumn(this,1,"Code",130);
-			report.SetColumn(this,2,"Description",180);
-			report.SetColumn(this,3,"Quantity",60,HorizontalAlignment.Right);
-			report.SetColumn(this,4,"Average Fee",110,HorizontalAlignment.Right);
-			report.SetColumn(this,5,"Total Fees",100,HorizontalAlignment.Right);
-			FormQuery2.ShowDialog();
-			DialogResult=DialogResult.OK;
+			return subtitleClinics;
 		}
 
 		private bool AnyClinicSelectedIsMedical() {
@@ -627,19 +522,5 @@ namespace OpenDental{
 		
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
