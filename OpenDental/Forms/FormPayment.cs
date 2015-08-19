@@ -1958,7 +1958,7 @@ namespace OpenDental {
 			}
 			//PaymentCur.PatNum=PatCur.PatNum;//this is already done before opening this window.
 			//PaymentCur.ClinicNum already handled
-			if(IsNew && SplitList.Count==0) {
+			if(SplitList.Count==0 && PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit)) {
 				//The user has no splits and is trying to submit a payment.
 				//We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
 				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?")) {
@@ -1987,7 +1987,7 @@ namespace OpenDental {
 					AddOneSplit();
 				}
 			}
-			else {//Existing payment and/or has splits.
+			else {
 				if(SplitList.Count==0) {//Existing payment with no splits.
 					if(Payments.AllocationRequired(PaymentCur.PayAmt,PaymentCur.PatNum)
 						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {

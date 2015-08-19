@@ -126,6 +126,7 @@ namespace OpenDental{
 		private Button butColor;
 		private ColorDialog colorDialog;
 		private CheckBox checkClaimsSendWindowValidateOnLoad;
+		private CheckBox checkPromptAutoSplit;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -254,6 +255,7 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabImages = new System.Windows.Forms.TabPage();
 			this.tabManage = new System.Windows.Forms.TabPage();
+			this.checkClaimsSendWindowValidateOnLoad = new System.Windows.Forms.CheckBox();
 			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.checkStatementShowAdjNotes = new System.Windows.Forms.CheckBox();
@@ -273,7 +275,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkClaimsSendWindowValidateOnLoad = new System.Windows.Forms.CheckBox();
+			this.checkPromptAutoSplit = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -1025,6 +1027,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.checkPromptAutoSplit);
 			this.tabAccount.Controls.Add(this.checkStatementsUseSheets);
 			this.tabAccount.Controls.Add(this.checkStoreCCTokens);
 			this.tabAccount.Controls.Add(this.checkAccountShowPaymentNums);
@@ -1380,6 +1383,17 @@ namespace OpenDental{
 			this.tabManage.TabIndex = 6;
 			this.tabManage.Text = "Manage";
 			// 
+			// checkClaimsSendWindowValidateOnLoad
+			// 
+			this.checkClaimsSendWindowValidateOnLoad.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkClaimsSendWindowValidateOnLoad.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkClaimsSendWindowValidateOnLoad.Location = new System.Drawing.Point(20, 74);
+			this.checkClaimsSendWindowValidateOnLoad.Name = "checkClaimsSendWindowValidateOnLoad";
+			this.checkClaimsSendWindowValidateOnLoad.Size = new System.Drawing.Size(421, 17);
+			this.checkClaimsSendWindowValidateOnLoad.TabIndex = 200;
+			this.checkClaimsSendWindowValidateOnLoad.Text = "Claims Send window validate on load (can cause slowness)";
+			this.checkClaimsSendWindowValidateOnLoad.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkTimeCardADP
 			// 
 			this.checkTimeCardADP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1589,16 +1603,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkClaimsSendWindowValidateOnLoad
+			// checkPromptAutoSplit
 			// 
-			this.checkClaimsSendWindowValidateOnLoad.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkClaimsSendWindowValidateOnLoad.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkClaimsSendWindowValidateOnLoad.Location = new System.Drawing.Point(20, 74);
-			this.checkClaimsSendWindowValidateOnLoad.Name = "checkClaimsSendWindowValidateOnLoad";
-			this.checkClaimsSendWindowValidateOnLoad.Size = new System.Drawing.Size(421, 17);
-			this.checkClaimsSendWindowValidateOnLoad.TabIndex = 200;
-			this.checkClaimsSendWindowValidateOnLoad.Text = "Claims Send window validate on load (can cause slowness)";
-			this.checkClaimsSendWindowValidateOnLoad.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPromptAutoSplit.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPromptAutoSplit.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPromptAutoSplit.Location = new System.Drawing.Point(44, 282);
+			this.checkPromptAutoSplit.Name = "checkPromptAutoSplit";
+			this.checkPromptAutoSplit.Size = new System.Drawing.Size(396, 17);
+			this.checkPromptAutoSplit.TabIndex = 205;
+			this.checkPromptAutoSplit.Text = "Prompt for autosplits on Payments";
+			this.checkPromptAutoSplit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1773,6 +1787,7 @@ namespace OpenDental{
 			checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked=PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical);
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
 			checkStatementsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
+			checkPromptAutoSplit.Checked=PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -2073,6 +2088,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertTime,waitingRoomAlertTime)
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
+				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
 				)
 			{
 				_changed=true;
