@@ -741,7 +741,12 @@ namespace OpenDentBusiness {
 				row["ClaimNum"]="0";
 				row["ClaimPaymentNum"]="0";
 				row["clinic"]=Clinics.GetDesc(PIn.Long(rawProc.Rows[i]["ClinicNum"].ToString()));
-				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][0].ItemColor.ToArgb().ToString();
+				if(ProcedureCodes.GetStringProcCode(PIn.Long(rawProc.Rows[i]["CodeNum"].ToString()))=="D9986") {//Broken appointment procedure
+					row["colorText"]=DefC.GetDefByExactName(DefCat.AccountColors,"Adjustment").ItemColor.ToArgb().ToString();
+				}
+				else {//Not a broken appointment procedure.
+					row["colorText"]=DefC.GetDefByExactName(DefCat.AccountColors,"Default").ItemColor.ToArgb().ToString();
+				}
 				row["creditsDouble"]=0;
 				row["credits"]="";
 				dateT=PIn.DateT(rawProc.Rows[i]["procDate_"].ToString());

@@ -111,6 +111,12 @@ namespace OpenDentBusiness {
 			return null;
 		}
 
+		///<summary>Returns the Def with the exact itemName passed in.  Returns null if not found.
+		///If itemName is blank, then it returns the first def in the category.</summary>
+		public static Def GetDefByExactName(DefCat myCat,string itemName) {
+			return GetDef(myCat,GetByExactName(myCat,itemName));
+		}
+
 		///<summary></summary>
 		public static string GetName(DefCat myCat,long myDefNum) {
 			if(myDefNum==0){
