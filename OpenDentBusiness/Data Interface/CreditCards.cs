@@ -138,8 +138,8 @@ namespace OpenDentBusiness{
 			#endregion
 			//Now we have all the results for payments and payment plans, so do an obvious filter. A more thorough filter happens later.
 			command+=") due "
-				+"WHERE DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
+				+"WHERE DateStart<="+DbHelper.Curdate()+" AND "+DbHelper.Year("DateStart")+">1880 "
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR "+DbHelper.Year("DateStop")+"<1880) "
 				+"ORDER BY PatName";
 			table=Db.GetTable(command);
 			FilterRecurringChargeList(table);
@@ -186,8 +186,8 @@ namespace OpenDentBusiness{
 			string command="SELECT CreditCardNum,Procedures "
 				+"FROM creditcard "
 				+"WHERE PatNum="+POut.Long(patNum)+" "
-				+"AND DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) "
+				+"AND DateStart<="+DbHelper.Curdate()+" AND "+DbHelper.Year("DateStart")+">1880 "
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR "+DbHelper.Year("DateStop")+"<1880) "
 				+"AND CreditCardNum!="+POut.Long(cardNum);
 			DataTable table=Db.GetTable(command);
 			for(int i=0;i<table.Rows.Count;i++) {
