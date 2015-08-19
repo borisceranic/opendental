@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -362,89 +362,61 @@ namespace OpenDental{
 				MsgBox.Show(this,"To date cannot be before From date.");
 				return;
 			}
-			string whereProv="";
-			if(listProv.SelectedIndices[0]!=0){
-				for(int i=0;i<listProv.SelectedIndices.Count;i++){
-					if(i==0){
-						whereProv+=" WHERE (";
-					}
-					else{
-						whereProv+="OR ";
-					}
-					whereProv+="patient.PriProv = "
-						+POut.Long(ProviderC.ListShort[listProv.SelectedIndices[i]-1].ProvNum)+" ";
+			List<long> listProvNums=new List<long>();
+			List<Provider> listProvs=ProviderC.GetListShort();
+			string subtitleProvs="";
+			if(listProv.SelectedIndices[0]==0) {//'All' is selected
+				for(int i=0;i<listProvs.Count;i++) {
+					listProvNums.Add(listProvs[i].ProvNum);
+					subtitleProvs=Lan.g(this,"All Providers");
 				}
-				whereProv+=") ";
 			}
-			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query=@"SET @pos=0;
-SELECT @pos:=@pos+1 patCount,result.* FROM (SELECT dateFirstProc,patient.LName,patient.FName,"
-+DbHelper.Concat("referral.LName","IF(referral.FName='','',',')","referral.FName")+" refname,SUM(procedurelog.ProcFee) ";//\"$HowMuch\"";
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				report.Query+="$HowMuch";
+			else {
+				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+					listProvNums.Add(listProvs[listProv.SelectedIndices[i]-1].ProvNum);//Minus 1 from the selected index to account for 'All' option
+					if(i>0) {
+						subtitleProvs+=", ";
+					}
+					subtitleProvs+=listProvs[listProv.SelectedIndices[i]-1].Abbr;//Minus 1 from the selected index to account for 'All' option
+				}
 			}
-			else { //Oracle needs quotes.
-				report.Query+="\"$HowMuch\"";
-			}
-			if(checkAddress.Checked){
-				report.Query+=",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip";
-			}
-			report.Query+=@" FROM
-				(SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
-				WHERE ProcStatus=2 GROUP BY PatNum
-				HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
-				+"AND DATE(dateFirstProc) <= "+POut.Date(dateTo)+" ) table1 "
-				+@"INNER JOIN patient ON table1.PatNum=patient.PatNum 
-				LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum AND procedurelog.ProcStatus=2
-				LEFT JOIN refattach ON patient.PatNum=refattach.PatNum AND refattach.IsFrom=1
-				AND refattach.ItemOrder=(SELECT MIN(ra.ItemOrder) FROM refattach ra WHERE ra.PatNum=refattach.PatNum AND ra.IsFrom=1)
-				LEFT JOIN referral ON referral.ReferralNum=refattach.ReferralNum "
-				+whereProv;
-			report.Query+="GROUP BY patient.LName,patient.FName,patient.PatNum,"+DbHelper.Concat("referral.LName","IF(referral.FName='','',',')","referral.FName");
+			DataTable table=RpNewPatients.GetNewPatients(dateFrom,dateTo,listProvNums,checkAddress.Checked,checkProd.Checked);
+			Font font=new Font("Tahoma",9);
+			Font fontBold=new Font("Tahoma",9,FontStyle.Bold);
+			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
+			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
+			ReportComplex report;
 			if(checkAddress.Checked) {
-				report.Query+=",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip ";
+				report=new ReportComplex(true,true);
 			}
-			if(checkProd.Checked){
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					report.Query+="HAVING $HowMuch > 0 ";
-				}
-				else {//Oracle needs quotes.
-					report.Query+="HAVING \"$HowMuch\" > 0 ";
-				}
+			else {
+				report=new ReportComplex(true,false);
 			}
-			report.Query+="ORDER BY dateFirstProc,patient.LName,patient.FName) result";
-			FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-			FormQuery2.SubmitReportQuery();			
-			report.Title="New Patients";
-			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			if(listProv.SelectedIndices[0]==0){
-				report.SubTitle.Add(Lan.g(this,"All Providers"));
-				report.SubTitle.Add(dateFrom.ToString("d")+" - "+dateTo.ToString("d"));
-			}
-			else if(listProv.SelectedIndices.Count==1){
-				report.SubTitle.Add(Lan.g(this,"Prov: ")+ProviderC.ListShort[listProv.SelectedIndices[0]-1].GetLongDesc());
-				report.SubTitle.Add(dateFrom.ToString("d")+" - "+dateTo.ToString("d"));
-			}
-			else{
-				//I'm too lazy to build a description for multiple providers as well as ensure that it fits the space.
-				report.SubTitle.Add(dateFrom.ToString("d")+" - "+dateTo.ToString("d"));
-			}
-			report.SetColumnPos(this,0,"#",40);
-			report.SetColumnPos(this,1,"Date",120);
-			report.SetColumnPos(this,2,"Last Name",210);
-			report.SetColumnPos(this,3,"First Name",300);
-			report.SetColumnPos(this,4,"Referral",380);
-			report.SetColumnPos(this,5,"Production",450,HorizontalAlignment.Right);
+			report.ReportName=Lan.g(this,"New Patients");
+			report.AddTitle("Title",Lan.g(this,"New Patients"),fontTitle);
+			report.AddSubTitle("Practice Title",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
+			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
+			report.AddSubTitle("Dates of Report",dateFrom.ToString("d")+" - "+dateTo.ToString("d"),fontSubTitle);
+			QueryObject query=report.AddQuery(table,Lan.g(this,"Date")+": "+DateTimeOD.Today.ToString("d"));
+			query.AddColumn(Lan.g(this,"Date"),90,FieldValueType.Date,font);
+			query.AddColumn(Lan.g(this,"Last Name"),120,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"First Name"),120,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Referral"),160,FieldValueType.String,font);
+			query.AddColumn(Lan.g(this,"Production Fee"),90,FieldValueType.Number,font);
 			if(checkAddress.Checked){
-				report.SetColumnPos(this,6,"Pref'd",500);
-				report.SetColumnPos(this,7,"Address",570);
-				report.SetColumnPos(this,8,"Add2",630);
-				report.SetColumnPos(this,9,"City",680);
-				report.SetColumnPos(this,10,"ST",730);
-				report.SetColumnPos(this,11,"Zip",880);//off the right side
+				query.AddColumn(Lan.g(this,"Pref'd"),100,FieldValueType.String,font);
+				query.AddColumn(Lan.g(this,"Address"),100,FieldValueType.String,font);
+				query.AddColumn(Lan.g(this,"Add2"),80,FieldValueType.String,font);
+				query.AddColumn(Lan.g(this,"City"),100,FieldValueType.String,font); 
+				query.AddColumn(Lan.g(this,"ST"),30,FieldValueType.String,font);
+				query.AddColumn(Lan.g(this,"Zip"),60,FieldValueType.String,font);
 			}
-			FormQuery2.ShowDialog();
+			report.AddPageNum(font);
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
 		
