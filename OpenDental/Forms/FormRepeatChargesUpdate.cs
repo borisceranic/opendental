@@ -340,8 +340,7 @@ namespace OpenDental{
 			procedure.BaseUnits=ProcedureCodes.GetProcCode(procedure.CodeNum).BaseUnits;
 			procedure.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			if(Prefs.IsODHQ()) {
-				procedure.BillingNote=ProcedureCodes.GetProcCode(repeatCharge.ProcCode).Descript+" charge for "
-				                      +billingDate.AddMonths(GetBillingMonthHelper(repeatCharge.ProcCode)).ToString("MMMM yyyy")+".";
+				procedure.BillingNote=ProcedureCodes.GetProcCode(repeatCharge.ProcCode).Descript+" charge for "+billingDate.ToString("MMMM yyyy")+".";
 			}
 			//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
 			if(repeatCharge.CopyNoteToProc && !string.IsNullOrEmpty(repeatCharge.Note)) {
@@ -349,18 +348,6 @@ namespace OpenDental{
 			}
 			Procedures.Insert(procedure); //no recall synch needed because dental offices don't use this feature
 			return procedure;
-		}
-
-		///<summary>Some ProcCodes are billed in arrears and should have the description of</summary>
-		private static int GetBillingMonthHelper(string procCode) {
-			//Should not be called if not ODHQ.
-			if(!Prefs.IsODHQ()) {
-				return 0;
-			}
-			if(procCode.StartsWith("Z0")) {
-				return -1;//eRX codes should be billed for one month in arears.
-			}
-			return 0;
 		}
 
 		///<summary>Should only be called if ODHQ.</summary>
