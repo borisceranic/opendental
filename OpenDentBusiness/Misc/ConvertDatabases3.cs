@@ -8321,6 +8321,26 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.2.12.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_2_16();
+		}
+
+		///<summary></summary>
+		private static void To15_2_16() {
+			if(FromVersion<new Version("15.2.16.0")) {
+				string command="";
+				//Customers were complaining that the Payment window splitting behavior has changed (Which it has, preferring the auto splitter)
+				//This preference gives them the option of using the new hotness or to keep using the old and busted.  Defaulting on to use the new hotness.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PaymentsPromptForAutoSplit','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PaymentsPromptForAutoSplit','1')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.2.16.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_3_1();
 		}
 
@@ -9483,6 +9503,21 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'DefaultCCProcs','')";
 					Db.NonQ(command);
+				}
+				//PaymentsPromptForAutoSplit preference.  It was backported to 15.2, so we have to check for existence first.  Defaults to true.
+				command="SELECT COUNT(*) FROM preference WHERE PrefName='PaymentsPromptForAutoSplit'";
+				int results=PIn.Int(Db.GetCount(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					if(results==0) {//Preference doesn't exist, insert it.
+						command="INSERT INTO preference(PrefName,ValueString) VALUES('PaymentsPromptForAutoSplit','1')";
+						Db.NonQ(command);
+					}
+				}
+				else {///oracle
+					if(results==0) {//Preference doesn't exist, insert it.
+						command="INSERT INTO preference(PrefNumm,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PaymentsPromptForAutoSplit','1')";
+						Db.NonQ(command);
+					}
 				}
 				command="UPDATE preference SET ValueString = '15.3.10.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
