@@ -155,6 +155,7 @@ namespace OpenDentBusiness{
 			string ret=new string(phoneRaw.Where(x => char.IsDigit(x)).ToArray());			
 			switch(countryCode.ToUpper()) {
 				case "US":
+				case "CA":
 					if(!ret.StartsWith("1")) { //Add a "1" if US.
 						ret="1"+ret;
 					}
