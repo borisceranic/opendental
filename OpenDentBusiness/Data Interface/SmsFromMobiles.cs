@@ -250,6 +250,7 @@ namespace OpenDentBusiness{
 			string prefix="";
 			switch(countryCode.ToUpper()) {
 				case "US":
+				case "CA":
 					//Number prefixed with a country and not prefixed with a country code should both be prefixed with a country code.
 					//EG: Both of the following should yield the same 11-digit string... 80012345678, 180012345678 == 180012345678.
 					if(retVal.Length==11) { //We have an 11-digit number coming in.
