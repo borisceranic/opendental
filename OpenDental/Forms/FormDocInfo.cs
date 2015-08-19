@@ -349,7 +349,7 @@ namespace OpenDental{
 			listType.SelectedIndex=(int)DocCur.ImgType;
 			textToothNumbers.Text=Tooth.FormatRangeForDisplay(DocCur.ToothNumbers);
 			textDate.Text=DocCur.DateCreated.ToShortDateString();
-			textTime.Text=DocCur.DateCreated.ToShortTimeString();
+			textTime.Text=DocCur.DateCreated.ToLongTimeString();
 			textDescript.Text=DocCur.Description;
 			if(PrefC.AtoZfolderUsed) {
 				string patFolder=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
