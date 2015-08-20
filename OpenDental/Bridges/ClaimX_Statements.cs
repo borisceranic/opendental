@@ -144,6 +144,13 @@ namespace OpenDental.Bridges {
 			DateTime date;
 			int seq=0;
 			for(int i=0;i<tableAccount.Rows.Count;i++) {
+				date=(DateTime)tableAccount.Rows[i]["DateTime"];
+				//Cory Shields from Claim X called in on behalf of customer 23270 and told us that dates of 01/01/0001 are not acceptable.
+				//Currently 'Balance Forward' and payment plan summaries are the only rows with explicit dates of 01/01/0001.
+				//We feel it will be fine to skip those rows here in the 'DetailItems' segment because both information is handled separately above.
+				if(date.Year < 1880) {
+					continue;
+				}
 				procCode=tableAccount.Rows[i]["ProcCode"].ToString();
 				tth=tableAccount.Rows[i]["tth"].ToString();
 				descript=tableAccount.Rows[i]["description"].ToString();
@@ -171,7 +178,6 @@ namespace OpenDental.Bridges {
 					writer.WriteElementString("ProcCode",procCode);
 					writer.WriteStartElement("Item");
 					if(li==0) {
-						date=(DateTime)tableAccount.Rows[i]["DateTime"];
 						writer.WriteElementString("Date",date.ToString("MM/dd/yyyy"));
 						writer.WriteElementString("PatientName",tableAccount.Rows[i]["patient"].ToString());
 					}
