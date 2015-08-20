@@ -212,6 +212,7 @@ namespace OpenDentBusiness{
 				//case Permissions.AppointmentCreate:
 				//case Permissions.AppointmentMove:
 				//case Permissions.AppointmentEdit:
+				//case Permissions.AppointmentCompleteEdit:
 				//case Permissions.Backup:
 				case Permissions.TimecardsEditAll:
 				//case Permissions.DepositSlips:
@@ -324,6 +325,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Auto/Quick Note Edit");
 				case Permissions.EcwAppointmentRevise:
 					return Lans.g("enumPermissions","eCW Appointment Revise");
+				case Permissions.AppointmentCompleteEdit:
+					return Lans.g("enumPermissions","Completed Appointment Edit");
 				case Permissions.Backup:
 					return Lans.g("enumPermissions","Backup");
 				case Permissions.Billing:

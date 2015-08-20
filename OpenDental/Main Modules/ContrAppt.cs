@@ -3341,7 +3341,9 @@ namespace OpenDental {
 					}
 				}
 				else {
-					if(!Security.IsAuthorized(Permissions.AppointmentMove) || !MsgBox.Show(this,true,"Move Appointment?")) {
+					if(!Security.IsAuthorized(Permissions.AppointmentMove)
+						|| (apt.AptStatus==ApptStatus.Complete && (!Security.IsAuthorized(Permissions.AppointmentCompleteEdit)))
+						|| !MsgBox.Show(this,true,"Move Appointment?")) {
 						mouseIsDown = false;
 						boolAptMoved = false;
 						TempApptSingle.Dispose();
@@ -3550,9 +3552,16 @@ namespace OpenDental {
 				}
 				Procedures.SetProvidersInAppointment(apt,procsForSingleApt);
 			}
-			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,apt.PatNum,
-				apt.ProcDescript+" from "+aptOld.AptDateTime.ToString()+", to "+apt.AptDateTime.ToString(),
-				apt.AptNum);
+			if(apt.AptStatus!=ApptStatus.Complete) { //seperate log entry for editing completed appointments
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,apt.PatNum,
+					apt.ProcDescript+" from "+aptOld.AptDateTime.ToString()+", to "+apt.AptDateTime.ToString(),
+					apt.AptNum);
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,apt.PatNum,
+						"moved "+apt.ProcDescript+" from "+aptOld.AptDateTime.ToString()+", to "+apt.AptDateTime.ToString(),
+						apt.AptNum);
+			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {
 				//S13 - Appt Rescheduling
@@ -5020,7 +5029,8 @@ namespace OpenDental {
 				return;
 			}
 			Appointment apt = Appointments.GetOneApt(ContrApptSingle.SelectedAptNum);
-			if(!Security.IsAuthorized(Permissions.AppointmentMove)) {
+			if((apt.AptStatus!=ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentMove)) //seperate permissions for complete appts.
+				|| (apt.AptStatus==ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentCompleteEdit))) {
 				return;
 			}
 			if(apt.AptStatus == ApptStatus.PtNote | apt.AptStatus == ApptStatus.PtNoteCompleted) {
@@ -5037,9 +5047,16 @@ namespace OpenDental {
 			}
 			Appointments.SetAptStatus(ContrApptSingle.SelectedAptNum,ApptStatus.UnschedList);
 			Patient pat=Patients.GetPat(PIn.Long(ContrApptSingle3[thisI].DataRoww["PatNum"].ToString()));
-			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,
-				ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Sent to Unscheduled List",
-				PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			if(apt.AptStatus!=ApptStatus.Complete) { //seperate log entry for editing completed appts.
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum, 
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Sent to Unscheduled List",
+					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Sent to Unscheduled List",
+					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {
 				//S15 - Appt Cancellation event
@@ -5074,7 +5091,8 @@ namespace OpenDental {
 			}
 			Appointment apt = Appointments.GetOneApt(ContrApptSingle.SelectedAptNum);
 			Patient pat=Patients.GetPat(PIn.Long(ContrApptSingle3[thisI].DataRoww["PatNum"].ToString()));
-			if(!Security.IsAuthorized(Permissions.AppointmentEdit)) {
+			if((apt.AptStatus!=ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentEdit)) //seperate permissions for completed appts.
+				|| (apt.AptStatus==ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentCompleteEdit))) {
 				return;
 			}
 			if(apt.AptStatus == ApptStatus.PtNote || apt.AptStatus == ApptStatus.PtNoteCompleted) {
@@ -5087,9 +5105,16 @@ namespace OpenDental {
 				}
 			}
 			Appointments.SetAptStatus(ContrApptSingle.SelectedAptNum,ApptStatus.Broken);
-			SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,
-				ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
-				PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			if(apt.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments.
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,//why does this make an AppointmentMove entry when it requires AppointmentEdit permissions?
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
+					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
+					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {
 				//S15 - Appt Cancellation event
@@ -5215,9 +5240,16 @@ namespace OpenDental {
 				InsSub sub2=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,PlanList,SubList)),SubList);
 				Appointments.SetAptStatusComplete(apt.AptNum,sub1.PlanNum,sub2.PlanNum);
 				ProcedureL.SetCompleteInAppt(apt,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList);//loops through each proc
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,
-					ContrApptSingle3[GetIndex(apt.AptNum)].DataRoww["procs"].ToString()+", "+ apt.AptDateTime.ToString()+", Set Complete",
-					apt.AptNum);//Log showing the appt. is set complete
+				if(apt.AptStatus!=ApptStatus.Complete) { // seperate log entry for editing completed appointments.
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,
+						ContrApptSingle3[GetIndex(apt.AptNum)].DataRoww["procs"].ToString()+", "+ apt.AptDateTime.ToString()+", Set Complete",
+						apt.AptNum);//Log showing the appt. is set complete
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,apt.PatNum,
+						ContrApptSingle3[GetIndex(apt.AptNum)].DataRoww["procs"].ToString()+", "+ apt.AptDateTime.ToString()+", Set Complete",
+						apt.AptNum);//Log showing the appt. is set complete
+				}
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S14 - Appt Modification event
@@ -5244,7 +5276,9 @@ namespace OpenDental {
 		private void OnDelete_Click() {
 			long selectedAptNum=ContrApptSingle.SelectedAptNum;
 			Appointment apt = Appointments.GetOneApt(selectedAptNum);
-			if(!Security.IsAuthorized(Permissions.AppointmentEdit)) {
+			if((apt.AptStatus!=ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentEdit)) //seperate permission for completed appts.
+				|| (apt.AptStatus==ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentCompleteEdit))) 
+			{
 				return;
 			}
 			int thisI=GetIndex(selectedAptNum);
@@ -5293,9 +5327,16 @@ namespace OpenDental {
 						Commlogs.Insert(CommlogCur);
 					}
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,PatCur.PatNum,
-					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", "+"Deleted",
-					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+				if(apt.AptStatus!=ApptStatus.Complete) {// seperate log entry for editing completed appointments.
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,PatCur.PatNum,
+						ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", "+"Deleted",
+						PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,PatCur.PatNum,
+						ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", "+"Deleted",
+						PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+				}
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S17 - Appt Deletion event

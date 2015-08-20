@@ -1173,8 +1173,12 @@ namespace OpenDental{
 					return;
 				}
 			}
-			else{
-				if(!Security.IsAuthorized(Permissions.AppointmentEdit)){
+			else {
+				//The order of the conditional matters; C# will not evaluate the second part of the conditional if it is not needed. 
+				//Changing the order will cause unneeded Security MsgBoxes to pop up.
+				if (AptCur.AptStatus!=ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentEdit)
+					|| (AptCur.AptStatus==ApptStatus.Complete && !Security.IsAuthorized(Permissions.AppointmentCompleteEdit))) 
+				{//completed apts have their own perm.
 					butOK.Enabled=false;
 					butDelete.Enabled=false;
 					butPin.Enabled=false;
@@ -2701,17 +2705,29 @@ namespace OpenDental{
 					}
 					List <PatPlan> PatPlanList=PatPlans.Refresh(AptCur.PatNum);
 					ProcedureL.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList);
-					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
-						AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
+					if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
+						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
+					}
+					else {
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
+						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
+					}
 				}
 			}
-			else{
+			else {
 				Procedures.SetProvidersInAppointment(AptCur,Procedures.GetProcsForSingle(AptCur.AptNum,false));
 			}
 			//Do the appointment "break" automation for appointments that were just broken.
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
+				if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
 					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
+					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
+				}
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S15 - Appt Cancellation event
@@ -3181,6 +3197,7 @@ namespace OpenDental{
 			perms.Add(Permissions.AppointmentCreate);
 			perms.Add(Permissions.AppointmentEdit);
 			perms.Add(Permissions.AppointmentMove);
+			perms.Add(Permissions.AppointmentCompleteEdit);
 			FormAuditOneType FormA=new FormAuditOneType(pat.PatNum,perms,Lan.g(this,"Audit Trail for Appointment"),AptCur.AptNum);
 			FormA.ShowDialog();
 		}
@@ -3304,9 +3321,16 @@ namespace OpenDental{
 				}
 			}
 			Appointments.Delete(AptCur.AptNum);
-			SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
-				"Delete for date/time: "+AptCur.AptDateTime.ToString(),
-				AptCur.AptNum);
+			if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
+					AptCur.AptNum);
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
+					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
+					AptCur.AptNum);
+			}
 			if(IsNew){
 				_isNewApptDeleted=true;  //Appt was deleted, don't delete again in Form_Closing
 				//The dialog is considered cancelled when a new appointment is immediately deleted.
@@ -3369,7 +3393,14 @@ namespace OpenDental{
 						}
 					}
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
+				if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
+					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
+				}
 				sendHL7=true;
 			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
@@ -3423,6 +3454,9 @@ namespace OpenDental{
 					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
 						if(DS.Tables["Procedure"].Rows[i]["status"].ToString()!="TP"
 							|| DS.Tables["Procedure"].Rows[i]["attached"].ToString()!="1") {
+							continue;
+						}
+						if(!Security.IsAuthorized(Permissions.AppointmentCompleteEdit,true)) {
 							continue;
 						}
 						MsgBox.Show(this,"Detach treatment planned procedures or click OK in the appointment edit window to set them complete.");

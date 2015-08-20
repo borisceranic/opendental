@@ -218,7 +218,9 @@ namespace OpenDentBusiness{
 		///<summary>94- Allows user to merge patients.</summary>
 		PatientMerge,
 		///<summary>95- Only used in Claim History Status Edit</summary>
-		ClaimHistoryEdit
+		ClaimHistoryEdit,
+		///<summary>96- Allows user to edit a completed appointment.</summary>
+		AppointmentCompleteEdit
 	}
 
 	
