@@ -88,13 +88,13 @@ namespace OpenDental{
 			this.textOverride = new System.Windows.Forms.TextBox();
 			this.labelOverride = new System.Windows.Forms.Label();
 			this.groupXWeb = new System.Windows.Forms.GroupBox();
+			this.textTerminalID = new System.Windows.Forms.TextBox();
+			this.labelTerminalID = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.textAuthKey = new System.Windows.Forms.TextBox();
 			this.labelAuthKey = new System.Windows.Forms.Label();
 			this.textXWebID = new System.Windows.Forms.TextBox();
 			this.labelXWebID = new System.Windows.Forms.Label();
-			this.textTerminalID = new System.Windows.Forms.TextBox();
-			this.labelTerminalID = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.groupXWeb.SuspendLayout();
@@ -221,6 +221,23 @@ namespace OpenDental{
 			this.groupXWeb.TabIndex = 60;
 			this.groupXWeb.TabStop = false;
 			this.groupXWeb.Text = "X-Web";
+			this.groupXWeb.Visible = false;
+			// 
+			// textTerminalID
+			// 
+			this.textTerminalID.Location = new System.Drawing.Point(6, 164);
+			this.textTerminalID.Name = "textTerminalID";
+			this.textTerminalID.Size = new System.Drawing.Size(413, 20);
+			this.textTerminalID.TabIndex = 12;
+			// 
+			// labelTerminalID
+			// 
+			this.labelTerminalID.Location = new System.Drawing.Point(4, 143);
+			this.labelTerminalID.Name = "labelTerminalID";
+			this.labelTerminalID.Size = new System.Drawing.Size(413, 18);
+			this.labelTerminalID.TabIndex = 68;
+			this.labelTerminalID.Text = "Terminal ID";
+			this.labelTerminalID.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label6
 			// 
@@ -265,22 +282,6 @@ namespace OpenDental{
 			this.labelXWebID.TabIndex = 63;
 			this.labelXWebID.Text = "XWeb ID";
 			this.labelXWebID.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// textTerminalID
-			// 
-			this.textTerminalID.Location = new System.Drawing.Point(6, 164);
-			this.textTerminalID.Name = "textTerminalID";
-			this.textTerminalID.Size = new System.Drawing.Size(413, 20);
-			this.textTerminalID.TabIndex = 12;
-			// 
-			// labelTerminalID
-			// 
-			this.labelTerminalID.Location = new System.Drawing.Point(4, 143);
-			this.labelTerminalID.Name = "labelTerminalID";
-			this.labelTerminalID.Size = new System.Drawing.Size(413, 18);
-			this.labelTerminalID.TabIndex = 68;
-			this.labelTerminalID.Text = "Terminal ID";
-			this.labelTerminalID.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// butOK
 			// 
@@ -365,8 +366,9 @@ namespace OpenDental{
 					comboPaymentType.SelectedIndex=i;
 			}
 			textXWebID.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"XWebID");
-			string authKey=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"AuthKey"));
+			string authKey=ProgramProperties.GetPropVal(prog.ProgramNum,"AuthKey");
 			if(authKey.Length>0) {
+				authKey=CodeBase.MiscUtils.Decrypt(authKey);//Decrypt the password because we will be encrypting it again on OK click.
 				//X-Charge does not show the Auth Key within their server set up.  We shall do the same.
 				textAuthKey.UseSystemPasswordChar=true;
 				textAuthKey.Text=authKey;
