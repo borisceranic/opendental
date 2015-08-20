@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,6 +8,8 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using CodeBase;
+using OpenDental.Bridges;
 using OpenDental.UI;
 using OpenDentBusiness;
 
@@ -23,17 +24,50 @@ namespace OpenDental {
 		private Program _program;
 		private DateTime nowDateTime;
 		private string xPath;
+		private int _success;
+		private int _failed;
 
-		///<summary>Only works for XCharge so far.</summary>
+		///<summary>Only works for XCharge and PayConnect so far.</summary>
 		public FormCreditRecurringCharges() {
 			InitializeComponent();
 			Lan.F(this);
 		}
 
 		private void FormRecurringCharges_Load(object sender,EventArgs e) {
+			if(Programs.IsEnabled(ProgramName.PayConnect)) {
+				_program=Programs.GetCur(ProgramName.PayConnect);
+			}
+			else if(Programs.IsEnabled(ProgramName.Xcharge)) {
+				_program=Programs.GetCur(ProgramName.Xcharge);
+				xPath=Programs.GetProgramPath(_program);
+				if(!File.Exists(xPath)) {//program path is invalid
+					//if user has setup permission and they want to edit the program path, show the X-Charge setup window
+					if(Security.IsAuthorized(Permissions.Setup)
+						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"The X-Charge path is not valid.  Would you like to edit the path?"))
+					{
+						FormXchargeSetup FormX=new FormXchargeSetup();
+						FormX.ShowDialog();
+						if(FormX.DialogResult==DialogResult.OK) {
+							//The user could have correctly enabled the X-Charge bridge, we need to update our local _programCur and _xPath variable2
+							_program=Programs.GetCur(ProgramName.Xcharge);
+							xPath=Programs.GetProgramPath(_program);
+						}
+					}
+					//if the program path still does not exist, whether or not they attempted to edit the program link, tell them to edit and close the form
+					if(!File.Exists(xPath)) {
+						MsgBox.Show(this,"The X-Charge program path is not valid.  Edit the program link in order to use the CC Recurring Charges feature.");
+						Close();
+						return;
+					}
+				}
+			}
+			if(_program==null) {
+				MsgBox.Show(this,"The PayConnect or X-Charge program link must be enabled in order to use the CC Recurring Charges feature.");
+				Close();
+				return;
+			}
+			//X-Charge or PayConnect is enabled and if X-Charge is enabled the path to the X-Charge executable is valid
 			nowDateTime=MiscData.GetNowDateTime();
-			_program=Programs.GetCur(ProgramName.Xcharge);
-			xPath=Programs.GetProgramPath(_program);
 			labelCharged.Text=Lan.g(this,"Charged=")+"0";
 			labelFailed.Text=Lan.g(this,"Failed=")+"0";
 			FillGrid();
@@ -42,36 +76,6 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
-			//Currently only working for X-Charge. If more added then move this check out of FillGrid.
-			#region XCharge Check
-			if(_program==null){
-				MsgBox.Show(this,"X-Charge entry is missing from the database.");//should never happen
-				return;
-			}
-			if(!_program.Enabled) {
-				if(Security.IsAuthorized(Permissions.Setup)) {
-					FormXchargeSetup FormX=new FormXchargeSetup();
-					FormX.ShowDialog();
-					if(FormX.DialogResult==DialogResult.OK) {
-						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
-						_program=Programs.GetCur(ProgramName.Xcharge);
-					}
-				}
-				return;
-			}
-			if(!File.Exists(xPath)) {
-				MsgBox.Show(this,"Path is not valid.");
-				if(Security.IsAuthorized(Permissions.Setup)){
-					FormXchargeSetup FormX=new FormXchargeSetup();
-					FormX.ShowDialog();
-					if(FormX.DialogResult==DialogResult.OK) {
-						//The user could have correctly enabled the X-Charge bridge, we need to update our local prog variable.
-						_program=Programs.GetCur(ProgramName.Xcharge);
-					}
-				}
-				return;
-			}
-			#endregion
 			table=CreditCards.GetRecurringChargeList();
 			table.Columns.Add("RepeatChargeAmt");
 			Dictionary<long,double> dictFamBals=new Dictionary<long,double>();//Keeps track of the family balance for each patient
@@ -291,29 +295,16 @@ namespace OpenDental {
 			labelSelected.Text=Lan.g(this,"Selected=")+gridMain.SelectedIndices.Length.ToString();
 		}
 
-		private void butSend_Click(object sender,EventArgs e) {
-			//Assuming the use of XCharge.  If adding another vendor (PayConnect for example)
-			//make sure to move XCharge validation in FillGrid() to here.
-			if(_program==null) {//Gets filled in FillGrid()
-				return;
-			}
-			if(gridMain.SelectedIndices.Length<1) {
-				MsgBox.Show(this,"Must select at least one recurring charge.");
-				return;
-			}
-			if(!PaymentsWithinLockDate()) {
-				return;
-			}
-			string recurringResultFile="Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString()+"\r\n\r\n";
-			int failed=0;
-			int success=0;
+		private void SendXCharge() {
+			StringBuilder strBuilderResultFile=new StringBuilder();
+			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
+			strBuilderResultFile.AppendLine();
 			string user=ProgramProperties.GetPropVal(_program.ProgramNum,"Username");
 			string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(_program.ProgramNum,"Password"));
-			#region Card Charge Loop
+			string resultfile=ODFileUtils.CombinePaths(Path.GetDirectoryName(xPath),"XResult.txt");
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				#region X-Charge
 				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="" &&
-					CreditCards.IsDuplicateXChargeToken(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString())) 
+					CreditCards.IsDuplicateXChargeToken(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()))
 				{
 					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
 					continue;
@@ -321,7 +312,10 @@ namespace OpenDental {
 				insertPayment=false;
 				ProcessStartInfo info=new ProcessStartInfo(xPath);
 				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
-				string resultfile=Path.Combine(Path.GetDirectoryName(xPath),"XResult.txt");
+				Patient patCur=Patients.GetPat(patNum);
+				if(patCur==null) {
+					continue;
+				}
 				try {
 					File.Delete(resultfile);//delete the old result file.
 				}
@@ -382,92 +376,203 @@ namespace OpenDental {
 				Thread.Sleep(200);//Wait 2/10 second to give time for file to be created.
 				Cursor=Cursors.Default;
 				string line="";
-				string resultText="";
-				recurringResultFile+="PatNum: "+patNum+" Name: "+table.Rows[i]["PatName"].ToString()+"\r\n";
+				StringBuilder strBuilderResultText=new StringBuilder();
+				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+table.Rows[i]["PatName"].ToString());
 				try {
 					using(TextReader reader=new StreamReader(resultfile)) {
 						line=reader.ReadLine();
 						while(line!=null) {
-							if(resultText!="") {
-								resultText+="\r\n";
-							}
-							resultText+=line;
+							strBuilderResultText.AppendLine(line);
 							if(line.StartsWith("RESULT=")) {
 								if(line=="RESULT=SUCCESS") {
-									success++;
-									labelCharged.Text=Lan.g(this,"Charged=")+success;
+									_success++;
+									labelCharged.Text=Lan.g(this,"Charged=")+_success;
 									insertPayment=true;
 								}
 								else {
-									failed++;
-									labelFailed.Text=Lan.g(this,"Failed=")+failed;
+									_failed++;
+									labelFailed.Text=Lan.g(this,"Failed=")+_failed;
 								}
 							}
 							line=reader.ReadLine();
 						}
-						recurringResultFile+=resultText+"\r\n\r\n";
+						strBuilderResultFile.AppendLine(strBuilderResultText.ToString());
+						strBuilderResultFile.AppendLine();
 					}
 				}
 				catch {
 					continue;//Cards will still be in the list if something went wrong.
 				}
-				#endregion
 				if(insertPayment) {
-					Patient patCur=Patients.GetPat(patNum);
-					Payment paymentCur=new Payment();
-					paymentCur.DateEntry=nowDateTime.Date;
-					paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["LatestPayment"].ToString()),
-						PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["DateStart"].ToString()));
-					paymentCur.PatNum=patCur.PatNum;
-					paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
-					paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType"));
-					paymentCur.PayAmt=amt;
-					paymentCur.PayNote=resultText;
-					paymentCur.IsRecurringCC=true;
-					Payments.Insert(paymentCur);
-					long provNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ProvNum"].ToString());//for payment plans only
-					if(provNum==0) {//Regular payments need to apply to the provider that the family owes the most money to.
-						DataTable dt=Patients.GetPaymentStartingBalances(patCur.Guarantor,paymentCur.PayNum);
-						double highestAmt=0;
-						for(int j=0;j<dt.Rows.Count;j++) {
-							double afterIns=PIn.Double(dt.Rows[j]["AfterIns"].ToString());
-							if(highestAmt>=afterIns) {
-								continue;
-							}
-							highestAmt=afterIns;
-							provNum=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
-						}
-					}
-					PaySplit split=new PaySplit();
-					split.PatNum=paymentCur.PatNum;
-					split.ClinicNum=paymentCur.ClinicNum;
-					split.PayNum=paymentCur.PayNum;
-					split.ProcDate=paymentCur.PayDate;
-					split.DatePay=paymentCur.PayDate;
-					split.ProvNum=provNum;
-					split.SplitAmt=paymentCur.PayAmt;
-					split.PayPlanNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PayPlanNum"].ToString());
-					PaySplits.Insert(split);
-					if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily)) {
-						Ledgers.ComputeAging(patCur.Guarantor,PrefC.GetDate(PrefName.DateLastAging),false);
-					}
-					else {
-						Ledgers.ComputeAging(patCur.Guarantor,DateTimeOD.Today,false);
-						if(PrefC.GetDate(PrefName.DateLastAging) != DateTime.Today) {
-							Prefs.UpdateString(PrefName.DateLastAging,POut.Date(DateTime.Today,false));
-							//Since this is always called from UI, the above line works fine to keep the prefs cache current.
-						}
-					}
+					CreatePayment(patCur,i,strBuilderResultText.ToString());
 				}
 			}
-			#endregion
 			try {
-				File.WriteAllText(Path.Combine(Path.GetDirectoryName(xPath),"RecurringChargeResult.txt"),recurringResultFile);
+				File.WriteAllText(ODFileUtils.CombinePaths(Path.GetDirectoryName(xPath),"RecurringChargeResult.txt"),strBuilderResultFile.ToString());
 			}
 			catch { } //Do nothing cause this is just for internal use.
+		}
+
+		private void SendPayConnect() {
+			StringBuilder strBuilderResultFile=new StringBuilder();
+			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
+			strBuilderResultFile.AppendLine();
+			#region Card Charge Loop
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				string tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["PayConnectToken"].ToString();
+				if(tokenOrCCMasked!="" && CreditCards.IsDuplicatePayConnectToken(tokenOrCCMasked)) {
+					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
+					continue;
+				}
+				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				Patient patCur=Patients.GetPat(patNum);
+				if(patCur==null) {
+					continue;
+				}
+				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["PayConnectTokenExp"].ToString());
+				if(tokenOrCCMasked=="") {
+					tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["CCNumberMasked"].ToString();
+					exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
+				}
+				decimal amt=PIn.Decimal(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
+				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
+				//request a PayConnect token, if a token was already saved PayConnect will return the same token,
+				//otherwise replace CCNumberMasked with the returned token if the sale successful
+				PayConnectService.creditCardRequest payConnectRequest=PayConnect.BuildSaleRequest(amt,tokenOrCCMasked,exp.Year,exp.Month,
+					patCur.GetNameFLnoPref(),"",zip,null,PayConnectService.transType.SALE,"",true);
+				PayConnectService.transResponse payConnectResponse=PayConnect.ProcessCreditCard(payConnectRequest);
+				StringBuilder strBuilderResultText=new StringBuilder();//this payment's result text, used in payment note and then appended to file string builder
+				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+patCur.GetNameFLnoPref());
+				if(payConnectResponse==null) {
+					_failed++;
+					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					strBuilderResultText.AppendLine(Lan.g(this,"Transaction Failed, unkown error"));
+					strBuilderResultFile.AppendLine(strBuilderResultText.ToString());//add to the file string builder
+					continue;
+				}
+				else if(payConnectResponse.Status.code!=0) {//error in transaction
+					_failed++;
+					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					strBuilderResultText.AppendLine(Lan.g(this,"Transaction Type")+": "+PayConnectService.transType.SALE.ToString());
+					strBuilderResultText.AppendLine(Lan.g(this,"Status")+": "+payConnectResponse.Status.description);
+					strBuilderResultFile.AppendLine(strBuilderResultText.ToString());//add to the file string builder
+					continue;
+				}
+				//approved sale, update CC, add result to file string builder, and create payment
+				_success++;
+				labelCharged.Text=Lan.g(this,"Charged=")+_success;
+				//Update the credit card token values if sale approved
+				CreditCard ccCur=CreditCards.GetOne(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["CreditCardNum"].ToString()));
+				PayConnectService.expiration payConnectExp=payConnectResponse.PaymentToken.Expiration;
+				//if stored CC token or token expiration are different than those returned by PayConnect, update the stored CC
+				if(ccCur.PayConnectToken!=payConnectResponse.PaymentToken.TokenId
+					|| ccCur.PayConnectTokenExp.Year!=payConnectExp.year
+					|| ccCur.PayConnectTokenExp.Month!=payConnectExp.month)
+				{
+					ccCur.PayConnectToken=payConnectResponse.PaymentToken.TokenId;
+					ccCur.PayConnectTokenExp=new DateTime(payConnectExp.year,payConnectExp.month,DateTime.DaysInMonth(payConnectExp.year,payConnectExp.month));
+					ccCur.CCNumberMasked=ccCur.PayConnectToken.Substring(ccCur.PayConnectToken.Length-4).PadLeft(ccCur.PayConnectToken.Length,'X');
+					ccCur.CCExpiration=ccCur.PayConnectTokenExp;
+					CreditCards.Update(ccCur);
+				}
+				//add to strbuilder that will be written to txt file
+				strBuilderResultText.AppendLine("RESULT="+payConnectResponse.Status.description);
+				strBuilderResultText.AppendLine("TRANS TYPE="+PayConnectService.transType.SALE.ToString());
+				strBuilderResultText.AppendLine("AUTH CODE="+payConnectResponse.AuthCode);
+				strBuilderResultText.AppendLine("ENTRY=MANUAL");
+				strBuilderResultText.AppendLine("CLERK="+Security.CurUser.UserName);
+				strBuilderResultText.AppendLine("TRANSACTION NUMBER="+payConnectResponse.RefNumber);
+				strBuilderResultText.AppendLine("ACCOUNT="+ccCur.CCNumberMasked);//XXXXXXXXXXXX1234, all but last four numbers of the token replaced with X's
+				strBuilderResultText.AppendLine("EXPIRATION="+payConnectResponse.PaymentToken.Expiration.month.ToString().PadLeft(2,'0')
+					+(payConnectResponse.PaymentToken.Expiration.year%100));
+				strBuilderResultText.AppendLine("CARD TYPE="+PayConnect.GetCardType(tokenOrCCMasked).ToString());
+				strBuilderResultText.AppendLine("AMOUNT="+payConnectRequest.Amount.ToString("F2"));
+				CreatePayment(patCur,i,strBuilderResultText.ToString());
+				strBuilderResultFile.AppendLine(strBuilderResultText.ToString());
+			}
+			#endregion Card Charge Loop
+			if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
+				try {
+					string payConnectResultDir=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"PayConnect");
+					if(!Directory.Exists(payConnectResultDir)) {
+						Directory.CreateDirectory(payConnectResultDir);
+					}
+					File.WriteAllText(ODFileUtils.CombinePaths(payConnectResultDir,"RecurringChargeResult.txt"),strBuilderResultFile.ToString());
+				}
+				catch { } //Do nothing cause this is just for internal use.
+			}
+		}
+
+		///<summary>Inserts a payment and paysplit, called after processing a payment through either X-Charge or PayConnect. indexCur is the current index
+		///of the gridMain row this payment is for.</summary>
+		private void CreatePayment(Patient patCur,int indexCur,string note) {
+			Payment paymentCur=new Payment();
+			paymentCur.DateEntry=nowDateTime.Date;
+			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),
+				PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString()));
+			paymentCur.PatNum=patCur.PatNum;
+			paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
+			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType"));
+			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
+			paymentCur.PayNote=note;
+			paymentCur.IsRecurringCC=true;
+			Payments.Insert(paymentCur);
+			long provNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ProvNum"].ToString());//for payment plans only
+			if(provNum==0) {//Regular payments need to apply to the provider that the family owes the most money to.
+				DataTable dt=Patients.GetPaymentStartingBalances(patCur.Guarantor,paymentCur.PayNum);
+				double highestAmt=0;
+				for(int j=0;j<dt.Rows.Count;j++) {
+					double afterIns=PIn.Double(dt.Rows[j]["AfterIns"].ToString());
+					if(highestAmt>=afterIns) {
+						continue;
+					}
+					highestAmt=afterIns;
+					provNum=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
+				}
+			}
+			PaySplit split=new PaySplit();
+			split.PatNum=paymentCur.PatNum;
+			split.ClinicNum=paymentCur.ClinicNum;
+			split.PayNum=paymentCur.PayNum;
+			split.ProcDate=paymentCur.PayDate;
+			split.DatePay=paymentCur.PayDate;
+			split.ProvNum=provNum;
+			split.SplitAmt=paymentCur.PayAmt;
+			split.PayPlanNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanNum"].ToString());
+			PaySplits.Insert(split);
+			if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily)) {
+				Ledgers.ComputeAging(patCur.Guarantor,PrefC.GetDate(PrefName.DateLastAging),false);
+			}
+			else {
+				Ledgers.ComputeAging(patCur.Guarantor,DateTimeOD.Today,false);
+				if(PrefC.GetDate(PrefName.DateLastAging)!=DateTime.Today) {
+					Prefs.UpdateString(PrefName.DateLastAging,POut.Date(DateTime.Today,false));
+					//Since this is always called from UI, the above line works fine to keep the prefs cache current.
+				}
+			}
+		}
+
+		///<summary>Will process payments for all authorized charges for each CC stored and marked for recurring charges.  X-Charge or PayConnect must be
+		///enabled.  Program validation done on load and if properties are not valid the form will close and exit.</summary>
+		private void butSend_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length<1) {
+				MsgBox.Show(this,"Must select at least one recurring charge.");
+				return;
+			}
+			if(!PaymentsWithinLockDate()) {
+				return;
+			}
+			_success=0;
+			_failed=0;
+			if(_program.ProgName==ProgramName.Xcharge.ToString()) {
+				SendXCharge();
+			}
+			else if(_program.ProgName==ProgramName.PayConnect.ToString()) {
+				SendPayConnect();
+			}
 			FillGrid();
-			labelCharged.Text=Lan.g(this,"Charged=")+success;
-			labelFailed.Text=Lan.g(this,"Failed=")+failed;
+			labelCharged.Text=Lan.g(this,"Charged=")+_success;
+			labelFailed.Text=Lan.g(this,"Failed=")+_failed;
 			MsgBox.Show(this,"Done charging cards.\r\nIf there are any patients remaining in list, print the list and handle each one manually.");
 		}
 

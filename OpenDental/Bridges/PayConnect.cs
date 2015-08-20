@@ -76,5 +76,50 @@ namespace OpenDental.Bridges {
 			return null;
 		}
 
+		public static bool IsValidCardAndExp(string cardNumber,int expYear,int expMonth) {
+			bool isValid=false;
+			try {
+				PayConnectService.expiration pcExp=new PayConnectService.expiration();
+				pcExp.year=expYear;
+				pcExp.month=expMonth;
+				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+#if DEBUG
+				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
+#else
+				ms.Url="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl";
+#endif
+				isValid=(ms.isValidCard(cardNumber) && ms.isValidExpiration(pcExp));
+				ms.Dispose();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g("PayConnect","Credit Card validation failed")+". \r\n"+Lan.g("PayConnect","Error message from")
+					+" Open Dental: \""+ex.Message+"\"");
+			}
+			return isValid;
+		}
+
+		///<summary>Returns the card type string for the supplied CC number.  If any errors happen retrieving the card type, this will return an empty string.</summary>
+		public static string GetCardType(string cardNumber) {
+			PayConnectService.cardType pcCardType;
+			bool isTypeSpecified;//not sure what this bool is for
+			string retval="";
+			try {
+				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+#if DEBUG
+				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
+#else
+				ms.Url="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl";
+#endif
+				ms.getCardType(cardNumber,out pcCardType,out isTypeSpecified);
+				retval=pcCardType.ToString();
+				ms.Dispose();
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g("PayConnect","Call to get card type failed")+". \r\n"+Lan.g("PayConnect","Error message from")
+					+" Open Dental: \""+ex.Message+"\"");
+			}
+			return retval;
+		}
+
 	}
 }

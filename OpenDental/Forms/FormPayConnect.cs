@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Shapes;
-using MigraDoc.DocumentObjectModel.Tables;
+using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormPayConnect:Form {
@@ -195,6 +191,12 @@ namespace OpenDental {
 				MsgBox.Show(this,"Expiration format invalid.");
 				return false;
 			}
+			if(CreditCardCur==null) {//if the user selected a new CC, verify through PayConnect
+				if(!Bridges.PayConnect.IsValidCardAndExp(textCardNumber.Text,expYear,expMonth)) {//if exception happens, a message box will show with the error
+					MsgBox.Show(this,"Card number or expiration date failed validation with PayConnect.");
+					return false;
+				}
+			}
 			if(textNameOnCard.Text.Trim()==""){
 				MsgBox.Show(this,"Name On Card required.");
 				return false;
@@ -260,7 +262,7 @@ namespace OpenDental {
 			}
 			result+=request.CardNumber.Substring(request.CardNumber.Length-4)+Environment.NewLine;//last 4 digits of card number only.
 			result+="Exp Date".PadRight(xright-xleft,'.')+request.Expiration.month.ToString().PadLeft(2,'0')+(request.Expiration.year%100)+Environment.NewLine;
-			result+="Card Type".PadRight(xright-xleft,'.')+CreditCardUtils.GetType(request.CardNumber)+Environment.NewLine;
+			result+="Card Type".PadRight(xright-xleft,'.')+Bridges.PayConnect.GetCardType(request.CardNumber)+Environment.NewLine;
 			result+="Entry".PadRight(xright-xleft,'.')+(request.MagData==""?"Manual":"Swiped")+Environment.NewLine;
 			result+="Auth Code".PadRight(xright-xleft,'.')+response.AuthCode+Environment.NewLine;
 			result+="Result".PadRight(xright-xleft,'.')+response.Status.description+Environment.NewLine;			

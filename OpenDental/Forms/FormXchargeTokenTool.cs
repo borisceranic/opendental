@@ -21,7 +21,7 @@ namespace OpenDental {
 		}
 
 		private void FormXchargeTokenTool_Load(object sender,EventArgs e) {
-			CardList=CreditCards.GetCreditCardsWithTokens();
+			CardList=CreditCards.GetCardsWithXChargeTokens();
 			textTotal.Text=CardList.Count.ToString();
 			textVerified.Text="0";
 			textInvalid.Text="0";
