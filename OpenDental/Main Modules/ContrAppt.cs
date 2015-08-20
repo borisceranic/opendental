@@ -619,13 +619,11 @@ namespace OpenDental {
 			// 
 			// radioDay
 			// 
-			this.radioDay.Checked = true;
 			this.radioDay.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioDay.Location = new System.Drawing.Point(43, 218);
 			this.radioDay.Name = "radioDay";
 			this.radioDay.Size = new System.Drawing.Size(68, 16);
 			this.radioDay.TabIndex = 91;
-			this.radioDay.TabStop = true;
 			this.radioDay.Text = "Day";
 			this.radioDay.Click += new System.EventHandler(this.radioDay_Click);
 			// 
@@ -1636,6 +1634,7 @@ namespace OpenDental {
 				}
 				ContrApptSingle3=null;
 			}
+			SetWeeklyView(PrefC.GetBool(PrefName.ApptModuleDefaultToWeek));
 			Plugins.HookAddCode(this,"ContrAppt.ModuleUnselected_end");
 		}
 
@@ -1850,7 +1849,7 @@ namespace OpenDental {
 			if(PrefC.GetString(PrefName.RegistrationKey).StartsWith("UPR6J92T29")) {
 				butGraph.Visible=true;
 			}
-			SetWeeklyView(false);
+			SetWeeklyView(PrefC.GetBool(PrefName.ApptModuleDefaultToWeek));
 			InitializedOnStartup=true;//moved this down to prevent view setting from triggering ModuleSelected().
 		}
 

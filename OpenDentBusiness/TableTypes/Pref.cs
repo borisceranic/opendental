@@ -59,6 +59,8 @@ namespace OpenDentBusiness {
 		AppointmentTimeSeatedTrigger,
 		ApptBubbleDelay,
 		ApptExclamationShowForUnsentIns,
+		/// <summary>Boolean defaults to 0, when true appt module will default to week view</summary>
+		ApptModuleDefaultToWeek,
 		///<summary>Keeps the waiting room indicator times current.  Initially 1.</summary>
 		ApptModuleRefreshesEveryMinute,
 		///<summary>Integer</summary>
