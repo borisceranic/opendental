@@ -1634,7 +1634,6 @@ namespace OpenDental {
 				}
 				ContrApptSingle3=null;
 			}
-			SetWeeklyView(PrefC.GetBool(PrefName.ApptModuleDefaultToWeek));
 			Plugins.HookAddCode(this,"ContrAppt.ModuleUnselected_end");
 		}
 
