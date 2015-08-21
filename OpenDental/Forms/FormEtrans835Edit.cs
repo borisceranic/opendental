@@ -229,6 +229,8 @@ namespace OpenDental {
 			Hx835_Claim claimPaid=(Hx835_Claim)gridClaimDetails.Rows[e.Row].Tag;
 			Claim claim=claimPaid.GetClaimFromDb();
 			if(claimPaid.IsSplitClaim && (claim==null || claim.ClaimStatus!="R")) {
+				//TODO: Instead of showing this popup message, we could automatically split the claim for the user, which
+				//would allow us to import ERAs more silently and thus support full automation better.
 				if(MessageBox.Show(Lan.g(this,"The insurance carrier has split the claim")+". "
 						+Lan.g(this,"You must manually locate and split the claim before entering the payment information")+". "
 						+Lan.g(this,"Continue entering payment")+"?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
@@ -240,6 +242,9 @@ namespace OpenDental {
 				MessageBox.Show(Lan.g(this,"Original claim not found")+". "+Lan.g(this,"The claim details from the EOB will be displayed instead")+". "
 					+Lan.g(this,"Locate the Claim Identifier on the EOB and manually edit the Claim Identifier of the original claim to match, then try again")+".");
 			}
+			//TODO: Supplemental payments are currently blocked because the first payment marks the claim received.
+			//We need to somehow determine if the payment is supplemental (flag in the 835?), then create new Supplemental claimprocs for the claim
+			//so we can call EnterPayment() to enter the payment on the new supplemental procs.
 			else if(claim.ClaimStatus=="R") {//Claim found and is already received.
 				//If the claim is already received, then we do not allow the user to enter payments.
 				//The user can edit the claim to change the status from received if they wish to enter the payments again.
