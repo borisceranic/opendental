@@ -42,6 +42,7 @@ namespace OpenDental{
 		private Label label4;
 		private CheckBox checkUserNameManualEntry;
 		private Label labelGlobalDateLockDisabled;
+		private CheckBox checkDisableBackupReminder;
 		//private DataTable table;
 		private List<Userod> ListUser;
 
@@ -105,6 +106,7 @@ namespace OpenDental{
 			this.butAddUser = new OpenDental.UI.Button();
 			this.butAddGroup = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.checkDisableBackupReminder = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// treePermissions
@@ -296,6 +298,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(8, 29);
 			this.gridMain.Name = "gridMain";
@@ -405,10 +408,24 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// checkDisableBackupReminder
+			// 
+			this.checkDisableBackupReminder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkDisableBackupReminder.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDisableBackupReminder.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkDisableBackupReminder.Location = new System.Drawing.Point(8, 624);
+			this.checkDisableBackupReminder.Name = "checkDisableBackupReminder";
+			this.checkDisableBackupReminder.Size = new System.Drawing.Size(224, 16);
+			this.checkDisableBackupReminder.TabIndex = 105;
+			this.checkDisableBackupReminder.Text = "Disable Monthly Backup Reminder";
+			this.checkDisableBackupReminder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDisableBackupReminder.Click += new System.EventHandler(this.checkDisableBackupReminder_Click);
+			// 
 			// FormSecurity
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(894, 700);
+			this.Controls.Add(this.checkDisableBackupReminder);
 			this.Controls.Add(this.labelGlobalDateLockDisabled);
 			this.Controls.Add(this.checkUserNameManualEntry);
 			this.Controls.Add(this.textLogOffAfterMinutes);
@@ -471,6 +488,9 @@ namespace OpenDental{
 			checkCannotEditOwn.Enabled=checkTimecardSecurityEnabled.Checked;
 			checkLogOffWindows.Checked=PrefC.GetBool(PrefName.SecurityLogOffWithWindows);
 			checkUserNameManualEntry.Checked=PrefC.GetBool(PrefName.UserNameManualEntry);
+			if(PrefC.GetDate(PrefName.BackupReminderLastDateRun).ToShortDateString()==DateTime.MaxValue.AddMonths(-1).ToShortDateString()) {
+				checkDisableBackupReminder.Checked=true;
+			}
 			if(PrefC.GetInt(PrefName.SecurityLockDays)>0) {
 				textDaysLock.Text=PrefC.GetInt(PrefName.SecurityLockDays).ToString();
 			}
@@ -1026,6 +1046,21 @@ namespace OpenDental{
 			}
 		}
 
+		private void checkDisableBackupReminder_Click(object sender,EventArgs e) {
+			InputBox inputbox=new InputBox("Please enter password");
+			inputbox.setTitle("Change Backup Reminder Settings");
+			inputbox.ShowDialog();
+			if(inputbox.DialogResult!=DialogResult.OK) {
+				checkDisableBackupReminder.Checked=!checkDisableBackupReminder.Checked;
+				return;
+			}
+			if(inputbox.textResult.Text!="abracadabra") {
+				checkDisableBackupReminder.Checked=!checkDisableBackupReminder.Checked;
+				MsgBox.Show(this,"Wrong password");
+				return;
+			}
+		}
+
 		private void butChange_Click(object sender,EventArgs e) {
 			FormSecurityLock FormS=new FormSecurityLock();
 			FormS.ShowDialog();//prefs are set invalid within that form if needed.
@@ -1073,6 +1108,12 @@ namespace OpenDental{
 				)
 			{
 				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+			if(checkDisableBackupReminder.Checked) {
+				Prefs.UpdateDateT(PrefName.BackupReminderLastDateRun,DateTime.MaxValue.AddMonths(-1)); //if MaxValue, gives error on startup.
+			}
+			else {
+				Prefs.UpdateDateT(PrefName.BackupReminderLastDateRun,DateTimeOD.Today);
 			}
 		}
 
