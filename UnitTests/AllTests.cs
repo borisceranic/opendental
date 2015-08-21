@@ -2434,15 +2434,19 @@ namespace UnitTests {
 			FormPSM.Init(true);
 			string retVal="";
 			//Auto Splits will be in opposite order from least recent to most recent.
-			//ListSplitsCur should contain two paysplits, one for procedure1 for 40, and one for procedure2 for 30.
-			if(FormPSM.ListSplitsCur.Count!=2) {
-				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			//ListSplitsCur should contain three paysplits, one for procedure1 for 40, and one for procedure2 for 30,
+			//and an unallocated split for 10 with the remainder on the payment (40+30+10=80).
+			if(FormPSM.ListSplitsCur.Count!=3) {
+				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures or created too many/few splits. \r\n");
 			}
 			if(FormPSM.ListSplitsCur[0].SplitAmt!=30 || FormPSM.ListSplitsCur[0].ProcNum!=procedure2.ProcNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D0120 procedure. \r\n");
 			}
 			if(FormPSM.ListSplitsCur[1].SplitAmt!=40 || FormPSM.ListSplitsCur[1].ProcNum!=procedure1.ProcNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D0220 procedure. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[2].SplitAmt!=10 || FormPSM.ListSplitsCur[2].ProcNum!=0) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 10 for no procedure. \r\n");
 			}
 			retVal+="42: Passed.  PaySplitManager associated historical data to the proper procedures. \r\n";
 			return retVal;
@@ -2567,12 +2571,15 @@ namespace UnitTests {
 			FormPSM.Init(true);
 			string retVal="";
 			//Auto Splits will be in opposite order from least recent to most recent.
-			//ListSplitsCur should contain one paysplit worth 40 and not attached to the D1110 procedure.
-			if(FormPSM.ListSplitsCur.Count!=1) {
+			//ListSplitsCur should contain two paysplits, one worth 40 and attached to the D1110 proc and another for the remainder of 10 and not attached to any procedure.
+			if(FormPSM.ListSplitsCur.Count!=2) {
 				throw new Exception("PaySplitManager didn't create the correct number of paysplits. \r\n");
 			}
 			if(FormPSM.ListSplitsCur[0].SplitAmt!=40 || FormPSM.ListSplitsCur[0].ProcNum!=procedure1.ProcNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 40 for the D1110 procedure. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[1].SplitAmt!=10 || FormPSM.ListSplitsCur[1].ProcNum!=0) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 10 for no procedure. \r\n");
 			}
 			retVal+="45: Passed.  PaySplitManager made one split for the correct procedure with historical overpayments and adjustments. \r\n";
 			return retVal;
@@ -2686,9 +2693,9 @@ namespace UnitTests {
 			FormPSM.Init(true);
 			string retVal="";
 			//Auto Splits will be in opposite order from least recent to most recent.
-			//ListSplitsCur should contain three splits
-			if(FormPSM.ListSplitsCur.Count!=3) {
-				throw new Exception("PaySplitManager didn't create paysplits for the appropriate procedures. \r\n");
+			//ListSplitsCur should contain four splits, 30, 35, and 30, then one unallocated for the remainder of the payment 55.
+			if(FormPSM.ListSplitsCur.Count!=4) {
+				throw new Exception("PaySplitManager didn't create the correct number of paysplits. \r\n");
 			}
 			if(FormPSM.ListSplitsCur[0].SplitAmt!=30 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum || FormPSM.ListSplitsCur[0].PatNum!=patNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D0220 procedure attached to Pat1. \r\n");
@@ -2698,6 +2705,9 @@ namespace UnitTests {
 			}
 			if(FormPSM.ListSplitsCur[2].SplitAmt!=30 || FormPSM.ListSplitsCur[2].ProcNum!=procedure1.ProcNum || FormPSM.ListSplitsCur[2].PatNum!=patNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D1110 procedure attached to Pat1. \r\n");
+			}
+			if(FormPSM.ListSplitsCur[3].SplitAmt!=55 || FormPSM.ListSplitsCur[3].ProcNum!=0) {
+				throw new Exception("PaySplitManager should have returned a PaySplit of 55 with no attached procedure. \r\n");
 			}
 			retVal+="48: Passed.  PaySplitManager created paysplits for procedures partially paid by claimprocs. \r\n";
 			return retVal;
