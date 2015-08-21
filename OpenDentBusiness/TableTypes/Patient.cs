@@ -221,6 +221,10 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		public Patient() {
+			BillingCycleDay=1;
+		}
+
 		///<summary>Returns a copy of this Patient.</summary>
 		public Patient Copy(){
 			return (Patient)this.MemberwiseClone();
