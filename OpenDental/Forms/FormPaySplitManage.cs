@@ -17,6 +17,7 @@ namespace OpenDental {
 		public double PaymentAmt;
 		public Family FamCur;
 		public Patient PatCur;
+		///<summary>Payment from the Payment window, nothing gets modified in this form.</summary>		
 		public Payment PaymentCur;
 		public DateTime PayDate;
 		public bool IsNew;
@@ -46,15 +47,7 @@ namespace OpenDental {
 				splitTotal+=ListSplitsCur[i].SplitAmt;
 			}
 			textSplitTotal.Text=POut.Double(splitTotal);
-			if(Math.Abs(PaymentAmt)>Math.Abs(PaymentCur.PayAmt)) {//If they increased the amount of the old payment, they want to be able to use it. 
-				PaymentAmt=PaymentAmt-PaymentCur.PayAmt;
-			}
-			else if(splitTotal!=PaymentCur.PayAmt) {//If they deleted a paysplit from this payment in the Payment window.
-				PaymentAmt-=splitTotal;
-			}
-			else {//If they decreased (or did not change) the amount of the old payment.
-				PaymentAmt=0;//Don't let them assign any new charges to this payment (but they can certainly take some off).
-			}
+			PaymentAmt=PaymentAmt-splitTotal;
 			//We want to fill the charge table.
 			//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
 			ListSplitsCur.AddRange(AutoSplitForPayment(PaymentCur.PayNum,PayDate,isTest));
@@ -398,7 +391,21 @@ namespace OpenDental {
 				split.DatePay=date;
 				split.PatNum=PaymentCur.PatNum;
 				split.ProcDate=PaymentCur.PayDate;
-				split.ProvNum=0;
+				split.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+					split.ClinicNum=PaymentCur.ClinicNum;
+				}
+				split.PayNum=payNum;
+				listAutoSplits.Add(split);
+			}
+			if(PaymentAmt!=0) {//Create an unallocated split if there is any remaining payment amount.
+				split=new PaySplit();
+				split.SplitAmt=PaymentAmt;
+				PaymentAmt=0;
+				split.DatePay=date;
+				split.PatNum=PaymentCur.PatNum;
+				split.ProcDate=PaymentCur.PayDate;
+				split.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
 					split.ClinicNum=PaymentCur.ClinicNum;
 				}
@@ -629,10 +636,24 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(ListSplitsCur.Count>0) {
-				//If no splits entered, or the user deleted all of the existing splits, then do not change the payment amount.
-				//If there are splits, then we want to automatically set the payment amount to the total of the splits for convenience.
-				PaymentCur.PayAmt=PIn.Double(textSplitTotal.Text);
+			double payAmt=PIn.Double(textPayAmt.Text);
+			double splitTotal=PIn.Double(textSplitTotal.Text);
+			if(payAmt-splitTotal!=0) {//Create an unallocated split if there is any remaining payment amount.
+				PaySplit split=new PaySplit();
+				split.SplitAmt=payAmt-splitTotal;
+				PaymentAmt=0;
+				split.DatePay=PaymentCur.DateEntry;
+				split.PatNum=PaymentCur.PatNum;
+				split.ProcDate=PaymentCur.PayDate;
+				split.ProvNum=PrefC.GetLong(PrefName.PracticeDefaultProv);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
+					split.ClinicNum=PaymentCur.ClinicNum;
+				}
+				split.PayNum=PaymentCur.PayNum;
+				ListSplitsCur.Add(split);
+				MsgBox.Show(this,"Payment split total does not equal payment amount.  An unallocated payment split has been added, please check for correctness.");
+				FillGridSplits();
+				return;
 			}
 			DialogResult=DialogResult.OK;
 		}
