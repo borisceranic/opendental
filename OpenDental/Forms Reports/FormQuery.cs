@@ -20,7 +20,6 @@ namespace OpenDental{
 	public class FormQuery : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.DataGrid grid2;
-		private System.Windows.Forms.Panel panelTop;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private OpenDental.UI.Button butSubmit;
 		private System.Windows.Forms.RadioButton radioRaw;
@@ -68,6 +67,8 @@ namespace OpenDental{
 		private static Hashtable hListPlans;
 		private UserQuery UserQueryCur;//never gets used.  It's a holdover.
 		private static Dictionary<long,string> patientNames;
+		private SplitContainer splitContainerQuery;
+		private Panel panel1;
 		///<summary>Will be null if a query has not been ran.</summary>
 		private ReportSimpleGrid report;
 
@@ -102,7 +103,6 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormQuery));
 			this.butClose = new OpenDental.UI.Button();
 			this.grid2 = new System.Windows.Forms.DataGrid();
-			this.panelTop = new System.Windows.Forms.Panel();
 			this.textQuery = new OpenDental.ODtextBox();
 			this.butExportExcel = new OpenDental.UI.Button();
 			this.butPaste = new OpenDental.UI.Button();
@@ -129,10 +129,16 @@ namespace OpenDental{
 			this.butExport = new OpenDental.UI.Button();
 			this.butQView = new OpenDental.UI.Button();
 			this.butPrintPreview = new OpenDental.UI.Button();
+			this.splitContainerQuery = new System.Windows.Forms.SplitContainer();
+			this.panel1 = new System.Windows.Forms.Panel();
 			((System.ComponentModel.ISupportInitialize)(this.grid2)).BeginInit();
-			this.panelTop.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.panelZoom.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainerQuery)).BeginInit();
+			this.splitContainerQuery.Panel1.SuspendLayout();
+			this.splitContainerQuery.Panel2.SuspendLayout();
+			this.splitContainerQuery.SuspendLayout();
+			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -143,7 +149,7 @@ namespace OpenDental{
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(878, 755);
+			this.butClose.Location = new System.Drawing.Point(879, 753);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 27);
 			this.butClose.TabIndex = 5;
@@ -154,39 +160,26 @@ namespace OpenDental{
 			// 
 			this.grid2.DataMember = "";
 			this.grid2.HeaderForeColor = System.Drawing.SystemColors.ControlText;
-			this.grid2.Location = new System.Drawing.Point(0, 150);
+			this.grid2.Location = new System.Drawing.Point(3, 25);
 			this.grid2.Name = "grid2";
 			this.grid2.ReadOnly = true;
-			this.grid2.Size = new System.Drawing.Size(958, 590);
+			this.grid2.Size = new System.Drawing.Size(957, 599);
 			this.grid2.TabIndex = 1;
-			// 
-			// panelTop
-			// 
-			this.panelTop.Controls.Add(this.textQuery);
-			this.panelTop.Controls.Add(this.butExportExcel);
-			this.panelTop.Controls.Add(this.butPaste);
-			this.panelTop.Controls.Add(this.butCopy);
-			this.panelTop.Controls.Add(this.textTitle);
-			this.panelTop.Controls.Add(this.label1);
-			this.panelTop.Controls.Add(this.butAdd);
-			this.panelTop.Controls.Add(this.butFavorite);
-			this.panelTop.Controls.Add(this.groupBox1);
-			this.panelTop.Controls.Add(this.butSubmit);
-			this.panelTop.Location = new System.Drawing.Point(0, 0);
-			this.panelTop.Name = "panelTop";
-			this.panelTop.Size = new System.Drawing.Size(956, 104);
-			this.panelTop.TabIndex = 2;
 			// 
 			// textQuery
 			// 
 			this.textQuery.AcceptsTab = true;
+			this.textQuery.BackColor = System.Drawing.SystemColors.Window;
 			this.textQuery.DetectUrls = false;
+			this.textQuery.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textQuery.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textQuery.Location = new System.Drawing.Point(2, 3);
+			this.textQuery.Location = new System.Drawing.Point(0, 0);
+			this.textQuery.Margin = new System.Windows.Forms.Padding(3, 3, 3, 25);
+			this.textQuery.MaximumSize = new System.Drawing.Size(557, 900);
 			this.textQuery.Name = "textQuery";
 			this.textQuery.QuickPasteType = OpenDentBusiness.QuickPasteType.Query;
 			this.textQuery.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textQuery.Size = new System.Drawing.Size(551, 76);
+			this.textQuery.Size = new System.Drawing.Size(557, 103);
 			this.textQuery.SpellCheckIsEnabled = false;
 			this.textQuery.TabIndex = 16;
 			this.textQuery.Text = "";
@@ -200,7 +193,7 @@ namespace OpenDental{
 			this.butExportExcel.CornerRadius = 4F;
 			this.butExportExcel.Image = global::OpenDental.Properties.Resources.butExportExcel;
 			this.butExportExcel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butExportExcel.Location = new System.Drawing.Point(712, 69);
+			this.butExportExcel.Location = new System.Drawing.Point(159, 66);
 			this.butExportExcel.Name = "butExportExcel";
 			this.butExportExcel.Size = new System.Drawing.Size(79, 26);
 			this.butExportExcel.TabIndex = 15;
@@ -217,7 +210,7 @@ namespace OpenDental{
 			this.butPaste.CornerRadius = 4F;
 			this.butPaste.Image = global::OpenDental.Properties.Resources.butPaste;
 			this.butPaste.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPaste.Location = new System.Drawing.Point(631, 54);
+			this.butPaste.Location = new System.Drawing.Point(78, 51);
 			this.butPaste.Name = "butPaste";
 			this.butPaste.Size = new System.Drawing.Size(65, 23);
 			this.butPaste.TabIndex = 11;
@@ -233,7 +226,7 @@ namespace OpenDental{
 			this.butCopy.CornerRadius = 4F;
 			this.butCopy.Image = global::OpenDental.Properties.Resources.butCopy;
 			this.butCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCopy.Location = new System.Drawing.Point(556, 54);
+			this.butCopy.Location = new System.Drawing.Point(3, 51);
 			this.butCopy.Name = "butCopy";
 			this.butCopy.Size = new System.Drawing.Size(72, 23);
 			this.butCopy.TabIndex = 10;
@@ -242,14 +235,14 @@ namespace OpenDental{
 			// 
 			// textTitle
 			// 
-			this.textTitle.Location = new System.Drawing.Point(66, 82);
+			this.textTitle.Location = new System.Drawing.Point(63, 3);
 			this.textTitle.Name = "textTitle";
 			this.textTitle.Size = new System.Drawing.Size(219, 20);
 			this.textTitle.TabIndex = 1;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(7, 84);
+			this.label1.Location = new System.Drawing.Point(3, 5);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(54, 13);
 			this.label1.TabIndex = 9;
@@ -263,7 +256,7 @@ namespace OpenDental{
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(556, 30);
+			this.butAdd.Location = new System.Drawing.Point(3, 27);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(140, 23);
 			this.butAdd.TabIndex = 3;
@@ -277,7 +270,7 @@ namespace OpenDental{
 			this.butFavorite.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butFavorite.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butFavorite.CornerRadius = 4F;
-			this.butFavorite.Location = new System.Drawing.Point(556, 6);
+			this.butFavorite.Location = new System.Drawing.Point(3, 3);
 			this.butFavorite.Name = "butFavorite";
 			this.butFavorite.Size = new System.Drawing.Size(140, 23);
 			this.butFavorite.TabIndex = 2;
@@ -289,7 +282,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.radioHuman);
 			this.groupBox1.Controls.Add(this.radioRaw);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(715, 6);
+			this.groupBox1.Location = new System.Drawing.Point(162, 3);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(122, 58);
 			this.groupBox1.TabIndex = 7;
@@ -326,7 +319,7 @@ namespace OpenDental{
 			this.butSubmit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSubmit.CornerRadius = 4F;
 			this.butSubmit.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butSubmit.Location = new System.Drawing.Point(556, 78);
+			this.butSubmit.Location = new System.Drawing.Point(3, 75);
 			this.butSubmit.Name = "butSubmit";
 			this.butSubmit.Size = new System.Drawing.Size(102, 23);
 			this.butSubmit.TabIndex = 6;
@@ -346,9 +339,9 @@ namespace OpenDental{
 			// printPreviewControl2
 			// 
 			this.printPreviewControl2.AutoZoom = false;
-			this.printPreviewControl2.Location = new System.Drawing.Point(18, 136);
+			this.printPreviewControl2.Location = new System.Drawing.Point(6, 136);
 			this.printPreviewControl2.Name = "printPreviewControl2";
-			this.printPreviewControl2.Size = new System.Drawing.Size(842, 538);
+			this.printPreviewControl2.Size = new System.Drawing.Size(313, 636);
 			this.printPreviewControl2.TabIndex = 5;
 			this.printPreviewControl2.Zoom = 1D;
 			// 
@@ -374,7 +367,7 @@ namespace OpenDental{
 			this.panelZoom.Controls.Add(this.butZoomIn);
 			this.panelZoom.Controls.Add(this.butBack);
 			this.panelZoom.Controls.Add(this.butFwd);
-			this.panelZoom.Location = new System.Drawing.Point(336, 746);
+			this.panelZoom.Location = new System.Drawing.Point(337, 744);
 			this.panelZoom.Name = "panelZoom";
 			this.panelZoom.Size = new System.Drawing.Size(229, 37);
 			this.panelZoom.TabIndex = 0;
@@ -443,7 +436,7 @@ namespace OpenDental{
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(784, 755);
+			this.butPrint.Location = new System.Drawing.Point(785, 753);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(79, 26);
 			this.butPrint.TabIndex = 13;
@@ -459,7 +452,7 @@ namespace OpenDental{
 			this.butExport.CornerRadius = 4F;
 			this.butExport.Image = global::OpenDental.Properties.Resources.butExport;
 			this.butExport.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butExport.Location = new System.Drawing.Point(689, 755);
+			this.butExport.Location = new System.Drawing.Point(690, 753);
 			this.butExport.Name = "butExport";
 			this.butExport.Size = new System.Drawing.Size(79, 26);
 			this.butExport.TabIndex = 14;
@@ -475,7 +468,7 @@ namespace OpenDental{
 			this.butQView.CornerRadius = 4F;
 			this.butQView.Image = global::OpenDental.Properties.Resources.butQView;
 			this.butQView.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butQView.Location = new System.Drawing.Point(573, 741);
+			this.butQView.Location = new System.Drawing.Point(574, 739);
 			this.butQView.Name = "butQView";
 			this.butQView.Size = new System.Drawing.Size(104, 26);
 			this.butQView.TabIndex = 15;
@@ -491,28 +484,66 @@ namespace OpenDental{
 			this.butPrintPreview.CornerRadius = 4F;
 			this.butPrintPreview.Image = global::OpenDental.Properties.Resources.butPreview;
 			this.butPrintPreview.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrintPreview.Location = new System.Drawing.Point(572, 755);
+			this.butPrintPreview.Location = new System.Drawing.Point(573, 753);
 			this.butPrintPreview.Name = "butPrintPreview";
 			this.butPrintPreview.Size = new System.Drawing.Size(113, 26);
 			this.butPrintPreview.TabIndex = 16;
 			this.butPrintPreview.Text = "P&rint Preview";
 			this.butPrintPreview.Click += new System.EventHandler(this.butPrintPreview_Click);
 			// 
+			// splitContainerQuery
+			// 
+			this.splitContainerQuery.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.splitContainerQuery.Location = new System.Drawing.Point(0, 0);
+			this.splitContainerQuery.Name = "splitContainerQuery";
+			this.splitContainerQuery.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			// 
+			// splitContainerQuery.Panel1
+			// 
+			this.splitContainerQuery.Panel1.Controls.Add(this.panel1);
+			this.splitContainerQuery.Panel1.Controls.Add(this.textQuery);
+			this.splitContainerQuery.Panel1MinSize = 105;
+			// 
+			// splitContainerQuery.Panel2
+			// 
+			this.splitContainerQuery.Panel2.Controls.Add(this.grid2);
+			this.splitContainerQuery.Panel2.Controls.Add(this.label1);
+			this.splitContainerQuery.Panel2.Controls.Add(this.textTitle);
+			this.splitContainerQuery.Panel2MinSize = 200;
+			this.splitContainerQuery.Size = new System.Drawing.Size(963, 733);
+			this.splitContainerQuery.SplitterDistance = 105;
+			this.splitContainerQuery.TabIndex = 17;
+			this.splitContainerQuery.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
+			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.butFavorite);
+			this.panel1.Controls.Add(this.butExportExcel);
+			this.panel1.Controls.Add(this.butAdd);
+			this.panel1.Controls.Add(this.butPaste);
+			this.panel1.Controls.Add(this.groupBox1);
+			this.panel1.Controls.Add(this.butSubmit);
+			this.panel1.Controls.Add(this.butCopy);
+			this.panel1.Location = new System.Drawing.Point(560, 3);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(400, 105);
+			this.panel1.TabIndex = 17;
+			// 
 			// FormQuery
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(963, 788);
+			this.Controls.Add(this.splitContainerQuery);
 			this.Controls.Add(this.butPrintPreview);
-			this.Controls.Add(this.butQView);
-			this.Controls.Add(this.butExport);
-			this.Controls.Add(this.butPrint);
-			this.Controls.Add(this.butClose);
-			this.Controls.Add(this.panelZoom);
 			this.Controls.Add(this.printPreviewControl2);
-			this.Controls.Add(this.grid2);
-			this.Controls.Add(this.panelTop);
+			this.Controls.Add(this.panelZoom);
+			this.Controls.Add(this.butPrint);
+			this.Controls.Add(this.butExport);
+			this.Controls.Add(this.butQView);
+			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(894, 486);
 			this.Name = "FormQuery";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -522,10 +553,14 @@ namespace OpenDental{
 			this.Load += new System.EventHandler(this.FormQuery_Load);
 			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.FormQuery_Layout);
 			((System.ComponentModel.ISupportInitialize)(this.grid2)).EndInit();
-			this.panelTop.ResumeLayout(false);
-			this.panelTop.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
 			this.panelZoom.ResumeLayout(false);
+			this.splitContainerQuery.Panel1.ResumeLayout(false);
+			this.splitContainerQuery.Panel2.ResumeLayout(false);
+			this.splitContainerQuery.Panel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainerQuery)).EndInit();
+			this.splitContainerQuery.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -535,9 +570,7 @@ namespace OpenDental{
 			printPreviewControl2.Location=new System.Drawing.Point(0,0);
 			printPreviewControl2.Height=ClientSize.Height-39;
 			printPreviewControl2.Width=ClientSize.Width;	
-			panelTop.Width=ClientSize.Width;
-			grid2.Location=new System.Drawing.Point(2,panelTop.Height);
-			grid2.Height=ClientSize.Height-grid2.Location.Y-39;
+			grid2.Height=ClientSize.Height-grid2.Location.Y-150;
 			grid2.Width=ClientSize.Width-2;
 			butClose.Location=new System.Drawing.Point(ClientSize.Width-90,ClientSize.Height-34);
 			butExport.Location=new System.Drawing.Point(ClientSize.Width-180,ClientSize.Height-34);
@@ -545,11 +578,14 @@ namespace OpenDental{
 			butPrintPreview.Location=new System.Drawing.Point(ClientSize.Width-385,ClientSize.Height-34);
 			butQView.Location=new System.Drawing.Point(ClientSize.Width-385,ClientSize.Height-34);
 			panelZoom.Location=new System.Drawing.Point(ClientSize.Width-620,ClientSize.Height-38);
+			splitContainerQuery.Height=ClientSize.Height-39;
+			splitContainerQuery.Width=ClientSize.Width-2;
 		}
 
 		private void FormQuery_Load(object sender, System.EventArgs e) {
 			//report.TableQ=null;//this will crash the program
 			grid2.Font=bodyFont;
+			splitContainerQuery.SplitterDistance=105;
 			if(IsReport){
 				printPreviewControl2.Visible=true;
 				Text="Report";
@@ -591,15 +627,18 @@ namespace OpenDental{
 
 		///<summary>This is used internally instead of SubmitReportQuery.  Can also be called externally if we want to automate a userquery.  Column names will be handled automatically.</summary>
 		public void SubmitQuery(){
+			Cursor=Cursors.WaitCursor;
 			patientNames=Patients.GetAllPatientNames();
       //hListPlans=InsPlans.GetHListAll();
-			try{
+			try {
 				report.SubmitQuery();
 			}
-			catch(Exception ex){
-				MsgBox.Show(this,"Invalid query: "+ex.Message);
+			catch(Exception ex) {
+				Cursor=Cursors.Default;
+				MessageBox.Show(Lan.g(this,"Invalid query")+": "+ex.Message);
 				return;
 			}
+			Cursor=Cursors.Default;
 			/* (for later if more complex queries with loops:)
 			//SubmitQueryThread();
 			//Thread Thread2 = new Thread(new ThreadStart(SubmitQueryThread));
@@ -657,8 +696,10 @@ namespace OpenDental{
 		//}
 
 		///<summary>When used as a report, this is called externally. Used instead of SubmitQuery(). Column names can be handled manually by the external form calling this report.</summary>
-		public void SubmitReportQuery(){
+		public void SubmitReportQuery() {
+			Cursor=Cursors.WaitCursor;
 			report.SubmitQuery();
+			Cursor=Cursors.Default;
 			grid2.TableStyles.Clear();
 			grid2.SetDataBinding(report.TableQ,"");
 			myGridTS = new DataGridTableStyle();
@@ -1183,6 +1224,7 @@ namespace OpenDental{
 			butPrintPreview.Visible=false;
 			butQView.Visible=true;
 			panelZoom.Visible=true;
+			splitContainerQuery.Visible=false;
 			totalPages=0;
 			printPreviewControl2.Zoom=((double)printPreviewControl2.ClientSize.Height
 				/(double)pd2.DefaultPageSettings.PaperSize.Height);
@@ -1198,6 +1240,7 @@ namespace OpenDental{
 			panelZoom.Visible=false;
 			butPrintPreview.Visible=true;
 			butQView.Visible=false;
+			splitContainerQuery.Visible=true;
 		}
 
 		///<summary></summary>
@@ -1374,6 +1417,12 @@ namespace OpenDental{
 				totalsPrinted=false;
 				summaryPrinted=false;
 			}
+		}
+
+		private void splitContainer1_SplitterMoved(object sender,SplitterEventArgs e) {
+			//Dynamically set the height of the grid so that the bottom scrollbar does not disappear when the user resizes the splitter.
+			//Subtract 5 so that the grid's horizontal scroll bar does not get pushed off the screen.
+			grid2.Height=splitContainerQuery.Height-grid2.Location.Y-splitContainerQuery.SplitterDistance-5;
 		}
 
 		private void butZoomIn_Click(object sender, System.EventArgs e){
