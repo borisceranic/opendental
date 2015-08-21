@@ -1208,12 +1208,12 @@ namespace OpenDental{
 				descript+=" #"+rowBundlePayment["CheckNum"].ToString();
 			}
 			descript+=" "+paySplit.SplitAmt.ToString("c");//Not sure if we really want to convert from string to double then back to string.. maybe a better way to format this?
-			if(Convert.ToDouble(rowBundlePayment["PayAmt"].ToString())!=paySplit.SplitAmt) { 
+			if(PIn.Double(rowBundlePayment["PayAmt"].ToString())!=paySplit.SplitAmt) { 
 				descript+=Lans.g(this,"(split)");
 			}
 			ODGridRow row=new ODGridRow();
 			row.Cells.Add(paySplit.DatePay.ToShortDateString());//0 Date
-			row.Cells.Add(Providers.GetAbbr(Convert.ToInt32(rowBundlePayment["ProvNum"])));//1 Prov Abbr
+			row.Cells.Add(Providers.GetAbbr(PIn.Long(rowBundlePayment["ProvNum"].ToString())));//1 Prov Abbr
 			row.Cells.Add(descript);//2 Descript
 			row.Cells.Add("");//3 Principal
 			row.Cells.Add("");//4 Interest
