@@ -116,12 +116,14 @@ namespace OpenDental {
 				bool isFirst=true;
 				long docNum=0;
 				//Our installations of MySQL defaults the global property 'max_allowed_packet' to 40MB.
-				//The UpdateFiles folder will only get larger as time goes on.  Therefore, we want to break up the UpdateFiles folder into 30MB chunks.
+				//The UpdateFiles folder will only get larger as time goes on.  Therefore, we want to break up the UpdateFiles folder into 15MB chunks.
 				//If the chunk size is to be changed, it must be changed to a size that is divisible by 3.
 				//Because we are converting the byte array into a Base64String, it needs to be in 3-byte chunks to perform the conversion without padding.
 				//Any incomplete 3-byte chunks will get padded with '=' to complete the 3-byte chunk.
 				//If this ever happens in the middle of inserting, the zip will be corrupted and we will not be able to extract the data later.
-				byte[] zipFileBytes=new byte[31457280]; //30MB
+				//Converting the file to Base64String bloats the size by approximately 30% so we need to make sure that the chunk size is well below 
+				//the max_allowed_packet size.
+				byte[] zipFileBytes=new byte[15728640]; //15MB
 				int readBytes=0;
 				memStream.Position=0;//Start at the beginning of the stream.
 				while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
@@ -136,7 +138,8 @@ namespace OpenDental {
 				}
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g("Prefs","Failed inserting update files into the database."));
+				MessageBox.Show(Lan.g("Prefs","Failed inserting update files into the database."
+					+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file."));
 				return false;
 			}
 			finally {
