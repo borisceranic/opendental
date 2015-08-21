@@ -56,7 +56,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command= "DELETE from SigElement WHERE SignalNum NOT IN (SELECT SignalNum FROM signalod)";
+			string command= "DELETE FROM sigelement WHERE SignalNum NOT IN (SELECT SignalNum FROM signalod)";
 			Db.NonQ(command);
 		}
 
