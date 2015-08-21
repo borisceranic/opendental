@@ -1805,8 +1805,6 @@ namespace OpenDental {
 			FormPSM.ShowDialog();
 			if(FormPSM.DialogResult==DialogResult.OK) {
 				SplitList=FormPSM.ListSplitsCur;
-				PaymentCur=FormPSM.PaymentCur;
-				textAmount.Text=POut.Double(PaymentCur.PayAmt);
 			}
 			FillMain();
 		}
@@ -1966,21 +1964,18 @@ namespace OpenDental {
 					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
 					FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 					FormPSM.PatCur=PatCur;
-					PaymentCur.PayAmt=0;//Fix for PSM logic depending on new payments having 0 amount.
 					FormPSM.PaymentCur=PaymentCur;
 					FormPSM.PayDate=PIn.DateT(textDate.Text);
 					FormPSM.IsNew=IsNew;
-					FormPSM.ListSplitsCur=SplitList;
+					FormPSM.ListSplitsCur=new List<PaySplit>();
 					if(FormPSM.ShowDialog()==DialogResult.OK) {
 						SplitList=FormPSM.ListSplitsCur;
-						PaymentCur=FormPSM.PaymentCur;
 						if(SplitList.Count==0) {//If they clicked OK without any splits being added, add one split.
 							AddOneSplit();
 						}
 					}
 					else {//Cancel
-						SplitList.Clear();//This is OK, they got this far because it's new and had no splits to begin with.
-						AddOneSplit();
+						AddOneSplit();//Someone decided to add a split and call it good if the user cancels out of the manager window.
 					}
 				}
 				else {//Either no allocation required, or user does not want to allocate.  Just add one split.
