@@ -2721,7 +2721,7 @@ namespace OpenDental{
 			//Do the appointment "break" automation for appointments that were just broken.
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
 				if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
-					SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
 					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
 				}
 				else {

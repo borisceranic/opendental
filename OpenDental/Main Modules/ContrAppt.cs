@@ -5105,14 +5105,14 @@ namespace OpenDental {
 			}
 			Appointments.SetAptStatus(ContrApptSingle.SelectedAptNum,ApptStatus.Broken);
 			if(apt.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments.
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,//why does this make an AppointmentMove entry when it requires AppointmentEdit permissions?
-					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
-					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()
+					+", Broken from the Appts module.",PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
 			}
 			else {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
-					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()+", Broken from the Appts module.",
-					PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
+					ContrApptSingle3[thisI].DataRoww["procs"].ToString()+", "+ContrApptSingle3[thisI].DataRoww["AptDateTime"].ToString()
+					+", Broken from the Appts module.",PIn.Long(ContrApptSingle3[thisI].DataRoww["AptNum"].ToString()));
 			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {
