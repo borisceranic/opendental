@@ -2233,6 +2233,10 @@ namespace OpenDental{
 			//myOutlookBar.Buttons[4].Caption=Lan.g(this,"Chart");//??done in RefreshLocalData
 			myOutlookBar.Buttons[5].Caption=Lan.g(this,"Images");
 			myOutlookBar.Buttons[6].Caption=Lan.g(this,"Manage");
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+				myOutlookBar.Buttons[3].ImageIndex=7;
+				myOutlookBar.Buttons[4].ImageIndex=8;
+			}
 			foreach(MenuItem menuItem in mainMenu.MenuItems){
 				TranslateMenuItem(menuItem);
 			}
@@ -5480,6 +5484,17 @@ namespace OpenDental{
 			FormPractice FormPr=new FormPractice();
 			FormPr.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Practice Info");
+			if(FormPr.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+				myOutlookBar.Buttons[3].ImageIndex=7;
+				myOutlookBar.Buttons[4].ImageIndex=8;
+			}
+			else { //Change back to normal icons
+				myOutlookBar.Buttons[3].ImageIndex=3;
+				myOutlookBar.Buttons[4].ImageIndex=4;
+			}
 			RefreshCurrentModule();
 		}
 
