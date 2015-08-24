@@ -588,6 +588,7 @@ namespace OpenDental{
 			splitContainerQuery.SplitterDistance=105;
 			if(IsReport){
 				printPreviewControl2.Visible=true;
+				splitContainerQuery.Visible=false;
 				Text="Report";
 				butPrintPreview.Visible=false;
 				panelZoom.Visible=true;
