@@ -153,7 +153,12 @@ namespace OpenDental {
 				}
 				long clinicNum=FormOpenDental.ClinicNum;
 				if(clinicNum==0) {  //If no clinic selected, follow logic from SmsPhones.GetClinicNumForTexting()
-					clinicNum=Clinics.List[0].ClinicNum;
+					if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
+						clinicNum=0;//0 used for no clinics
+					}
+					else {
+						clinicNum=Clinics.List[0].ClinicNum;
+					}
 				}
 				if(!SendText(0,textWirelessPhone.Text,textMessage.Text,YN.Unknown,clinicNum)) {  //0 as PatNum to denote no pat specified
 					return;//Allow the user to try again.  A message was already shown to the user inside SendText().
