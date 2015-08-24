@@ -827,6 +827,11 @@ namespace OpenDental{
 				CaseCur.DateTimeDue=DateTime.Parse(textDateDue.Text);
 			}
 			CaseCur.Instructions=textInstructions.Text;
+			object[] parameters= { true };
+			Plugins.HookAddCode(this,"FormLabCaseEdit.SaveToDb_update",parameters);
+			if(!(bool)parameters[0]) {
+				return false;
+			}
 			try{
 				//if(IsNew){//No.  Always created ahead of time
 				LabCases.Update(CaseCur);
