@@ -679,7 +679,7 @@ namespace OpenDental {
 			//Invalid characters inside of various tags--------------------------------------------
 			matches=Regex.Matches(textContent.Text,@"\[\[.*?\]\]");
 			foreach(Match match in matches) {
-				if(match.Value.Contains("\"") && !match.Value.StartsWith("[[color:")) {//allow colored text to have quotes.
+				if(match.Value.Contains("\"") && !match.Value.StartsWith("[[color:") && !match.Value.StartsWith("[[font:")) {//allow colored text to have quotes.
 					MessageBox.Show(Lan.g(this,"Link cannot contain double quotes: ")+match.Value);
 					return false;
 				}
