@@ -1752,6 +1752,8 @@ namespace OpenDental{
 			this.imageList32.Images.SetKeyName(4, "chart32.gif");
 			this.imageList32.Images.SetKeyName(5, "Images32.gif");
 			this.imageList32.Images.SetKeyName(6, "Manage32.gif");
+			this.imageList32.Images.SetKeyName(7, "TreatPlanMed32.gif");
+			this.imageList32.Images.SetKeyName(8, "ChartMed32.gif");
 			// 
 			// timerSignals
 			// 
@@ -3686,6 +3688,15 @@ namespace OpenDental{
 			if(!ContrAppt2.Visible) {
 				RefreshCurrentModule();//calls ModuleSelected of the current module, don't do this if ContrAppt2 is visible since it was just done above
 			}
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+				myOutlookBar.Buttons[3].ImageIndex=7;
+				myOutlookBar.Buttons[4].ImageIndex=8;
+			}
+			else {//Change back to the normal Chart and Treatment Plan icons
+				myOutlookBar.Buttons[3].ImageIndex=3;
+				myOutlookBar.Buttons[4].ImageIndex=4;
+			}
+			myOutlookBar.Invalidate();
 		}
 
 		///<summary>This is used to set the private class wide variable _clinicNum and refreshes the current module.</summary>
