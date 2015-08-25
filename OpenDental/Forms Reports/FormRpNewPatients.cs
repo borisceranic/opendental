@@ -391,8 +391,10 @@ SELECT @pos:=@pos+1 patCount,result.* FROM (SELECT dateFirstProc,patient.LName,p
 			}
 			report.Query+=@" FROM
 				(SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
-				WHERE ProcStatus=2 GROUP BY PatNum
-				HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
+				INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum 
+				AND ProcCode NOT IN ('D9986','D9987') "/*Do not count missed or canceled appointments*/
+				+"WHERE ProcStatus=2 GROUP BY PatNum "
+				+"HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
 				+"AND DATE(dateFirstProc) <= "+POut.Date(dateTo)+" ) table1 "
 				+@"INNER JOIN patient ON table1.PatNum=patient.PatNum 
 				LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum AND procedurelog.ProcStatus=2
