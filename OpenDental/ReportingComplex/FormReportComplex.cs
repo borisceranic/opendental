@@ -766,9 +766,12 @@ namespace OpenDental.ReportingComplex
 				if(section.Name=="Detail" && rowsPrinted==queryObj.ReportTable.Rows.Count-1) {
 					int groupFooterHeight=0;
 					foreach(ReportObject reportObject in queryObj.ReportObjects) {
-						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryText")) {
+						//Find the height of the group footer
+						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel")) {
 							groupFooterHeight+=reportObject.Size.Height+reportObject.OffSetY;
 						}
+						//The GroupSummaryText hasn't been filled yet so we use GroupSummaryLabel again
+						//If it is North or South then we need to add its height a second time.
 						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel") 
 							&& (reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)) {
 							groupFooterHeight+=reportObject.Size.Height;
