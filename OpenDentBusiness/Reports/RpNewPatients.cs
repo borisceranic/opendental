@@ -22,30 +22,31 @@ namespace OpenDentBusiness {
 			if(includeAddress) {
 				query+=",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip";
 			}
-			query+=@" FROM
-				(SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog
-				WHERE ProcStatus="+POut.Int((int)ProcStat.C)+" GROUP BY PatNum "
-				+"HAVING dateFirstProc >= "+POut.Date(dateFrom)+" "
-				+"AND DATE(dateFirstProc) <= "+POut.Date(dateTo)+" ) table1 "
-				+@"INNER JOIN patient ON table1.PatNum=patient.PatNum 
-				LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
-				+@"LEFT JOIN refattach ON patient.PatNum=refattach.PatNum AND refattach.IsFrom=1
-				AND refattach.ItemOrder=(SELECT MIN(ra.ItemOrder) FROM refattach ra WHERE ra.PatNum=refattach.PatNum AND ra.IsFrom=1)
-				LEFT JOIN referral ON referral.ReferralNum=refattach.ReferralNum "
+			query+=" FROM "
+				+"(SELECT PatNum, MIN(ProcDate) dateFirstProc FROM procedurelog "
+				+"INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum "
+				+"AND ProcCode NOT IN ('D9986','D9987') "/*Do not count missed or canceled appointments*/
+				+"WHERE ProcStatus="+POut.Int((int)ProcStat.C)+" GROUP BY PatNum " 
+				+"HAVING dateFirstProc BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+") table1 "
+				+"INNER JOIN patient ON table1.PatNum=patient.PatNum "
+				+"LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+				+"LEFT JOIN refattach ON patient.PatNum=refattach.PatNum AND refattach.IsFrom=1 "
+				+"AND refattach.ItemOrder=(SELECT MIN(ra.ItemOrder) FROM refattach ra WHERE ra.PatNum=refattach.PatNum AND ra.IsFrom=1) "
+				+"LEFT JOIN referral ON referral.ReferralNum=refattach.ReferralNum "
 				+"WHERE patient.PriProv IN ("+String.Join(",",listProvNums)+") ";
 			query+="GROUP BY patient.LName,patient.FName,patient.PatNum,"+DbHelper.Concat("referral.LName","IF(referral.FName='','',',')","referral.FName");
 			if(includeAddress) {
-				query+=",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip ";
+				query+=",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip";
 			}
 			if(excludeNoProd) {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					query+="HAVING $HowMuch > 0 ";
+					query+=" HAVING $HowMuch > 0";
 				}
 				else {//Oracle needs quotes.
-					query+="HAVING \"$HowMuch\" > 0 ";
+					query+=" HAVING \"$HowMuch\" > 0";
 				}
 			}
-			query+="ORDER BY dateFirstProc,patient.LName,patient.FName) result";
+			query+=" ORDER BY dateFirstProc,patient.LName,patient.FName) result";
 			return Db.GetTable(query);
 		}
 	}
