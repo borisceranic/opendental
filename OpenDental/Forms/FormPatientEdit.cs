@@ -48,7 +48,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.TextBox textAge;
 		private System.Windows.Forms.Label label21;
-		private System.Windows.Forms.Label label22;
 		private System.Windows.Forms.TextBox textSalutation;
 		private System.Windows.Forms.TextBox textEmail;
 		private System.Windows.Forms.GroupBox groupBox2;
@@ -183,6 +182,8 @@ namespace OpenDental{
 		private ComboBox comboSecProv;
 		private TextBox textBox2;
 		private CheckBox checkBillProvSame;
+		private Label label30;
+		private Label label22;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -295,7 +296,6 @@ namespace OpenDental{
 			this.textSalutation = new System.Windows.Forms.TextBox();
 			this.label21 = new System.Windows.Forms.Label();
 			this.textEmail = new System.Windows.Forms.TextBox();
-			this.label22 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.labelCanadianEligibilityCode = new System.Windows.Forms.Label();
 			this.comboCanadianEligibilityCode = new System.Windows.Forms.ComboBox();
@@ -385,7 +385,9 @@ namespace OpenDental{
 			this.labelDeceased = new System.Windows.Forms.Label();
 			this.textDateDeceased = new System.Windows.Forms.TextBox();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.label30 = new System.Windows.Forms.Label();
 			this.checkEmailPhoneSame = new System.Windows.Forms.CheckBox();
+			this.label22 = new System.Windows.Forms.Label();
 			this.groupBillProv = new System.Windows.Forms.GroupBox();
 			this.textBox2 = new System.Windows.Forms.TextBox();
 			this.checkBillProvSame = new System.Windows.Forms.CheckBox();
@@ -742,15 +744,6 @@ namespace OpenDental{
 			this.textEmail.Name = "textEmail";
 			this.textEmail.Size = new System.Drawing.Size(255, 20);
 			this.textEmail.TabIndex = 4;
-			// 
-			// label22
-			// 
-			this.label22.Location = new System.Drawing.Point(6, 77);
-			this.label22.Name = "label22";
-			this.label22.Size = new System.Drawing.Size(153, 14);
-			this.label22.TabIndex = 0;
-			this.label22.Text = "E-mail";
-			this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// groupBox2
 			// 
@@ -1584,9 +1577,9 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(308, 33);
+			this.label10.Location = new System.Drawing.Point(312, 33);
 			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(68, 14);
+			this.label10.Size = new System.Drawing.Size(64, 14);
 			this.label10.TabIndex = 0;
 			this.label10.Text = "Text OK";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1665,6 +1658,7 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.label30);
 			this.groupBox3.Controls.Add(this.checkEmailPhoneSame);
 			this.groupBox3.Controls.Add(this.label18);
 			this.groupBox3.Controls.Add(this.label17);
@@ -1681,6 +1675,14 @@ namespace OpenDental{
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Email and Phone";
 			// 
+			// label30
+			// 
+			this.label30.Location = new System.Drawing.Point(417, 77);
+			this.label30.Name = "label30";
+			this.label30.Size = new System.Drawing.Size(50, 14);
+			this.label30.TabIndex = 7;
+			this.label30.Text = "(a,b,c...)";
+			// 
 			// checkEmailPhoneSame
 			// 
 			this.checkEmailPhoneSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -1689,6 +1691,15 @@ namespace OpenDental{
 			this.checkEmailPhoneSame.Size = new System.Drawing.Size(307, 18);
 			this.checkEmailPhoneSame.TabIndex = 1;
 			this.checkEmailPhoneSame.Text = "Same for entire family";
+			// 
+			// label22
+			// 
+			this.label22.Location = new System.Drawing.Point(6, 77);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(153, 14);
+			this.label22.TabIndex = 0;
+			this.label22.Text = "E-mail Addresses";
+			this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// groupBillProv
 			// 
