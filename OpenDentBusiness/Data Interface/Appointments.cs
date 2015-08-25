@@ -2251,7 +2251,6 @@ namespace OpenDentBusiness{
 					}
 				}
 			}
-			aptCur.Pattern=RecallTypes.ConvertTimePattern(recallPattern);
 			//Add films------------------------------------------------------------------------------------------------------
 			if(RecallTypes.IsSpecialRecallType(recallCur.RecallTypeNum)) {//if this is a prophy or perio
 				for(int i=0;i<listRecalls.Count;i++) {
@@ -2271,8 +2270,10 @@ namespace OpenDentBusiness{
 					}
 					//incomplete: exclude manual recall types
 					listProcStrs.AddRange(RecallTypes.GetProcs(listRecalls[i].RecallTypeNum));
+					recallPattern+=RecallTypes.GetTimePattern(listRecalls[i].RecallTypeNum);
 				}
 			}
+			aptCur.Pattern=RecallTypes.ConvertTimePattern(recallPattern);
 			aptCur.ProcDescript="";
 			aptCur.ProcsColored="";
 			for(int i=0;i<listProcStrs.Count;i++) {
