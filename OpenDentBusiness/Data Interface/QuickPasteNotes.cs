@@ -104,7 +104,14 @@ namespace OpenDentBusiness{
 				if(List[i].QuickPasteCatNum!=QuickPasteCats.List[typeIndex].QuickPasteCatNum){
 					continue;
 				}
-				text=Regex.Replace(text,@"\?"+List[i].Abbreviation,List[i].Note);
+				//We have to replace all $ chars with $$ because Regex.Replace allows "Substitutions" in the replacement parameter.
+				//The replacement parameter specifies the string that is to replace each match in input. replacement can consist of any combination of literal
+				//text and substitutions. For example, the replacement pattern a*${test}b inserts the string "a*" followed by the substring that is matched by
+				//the test capturing group, if any, followed by the string "b". 
+				//The * character is not recognized as a metacharacter within a replacement pattern.
+				//See https://msdn.microsoft.com/en-us/library/taz3ak2f(v=vs.110).aspx for more information.
+				string quicknote=List[i].Note.Replace("$","$$");
+				text=Regex.Replace(text,@"\?"+List[i].Abbreviation,quicknote);
 			}
 			return text;
 		}
