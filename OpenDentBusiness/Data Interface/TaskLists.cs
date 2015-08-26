@@ -21,19 +21,18 @@ namespace OpenDentBusiness{
 					LEFT JOIN tasklist t2 ON t2.TaskListNum=tasklist.Parent 
 					LEFT JOIN tasklist t3 ON t3.TaskListNum=t2.Parent 
 					LEFT JOIN (
-						SELECT taskancestor.TaskListNum, COUNT(*) 'Count'
-						FROM taskancestor,task
-						WHERE task.TaskNum=taskancestor.TaskNum";
+						SELECT taskancestor.TaskListNum,COUNT(*) 'Count'
+						FROM taskancestor
+						INNER JOIN task ON task.TaskNum=taskancestor.TaskNum ";
 			if(PrefC.GetBool(PrefName.TasksNewTrackedByUser)) {
 				command+=@"
-						AND EXISTS(SELECT * FROM taskunread 
-							WHERE taskunread.TaskNum=task.TaskNum 
-							AND taskunread.UserNum="+POut.Long(userNum)+@") 
+						INNER JOIN taskunread ON taskunread.TaskNum=task.TaskNum 
+						WHERE taskunread.UserNum = "+POut.Long(userNum)+@"
 						AND task.TaskStatus!="+POut.Int((int)TaskStatusEnum.Done);
 			}
 			else {
 				command+=@"
-						AND task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
+						WHERE task.TaskStatus="+POut.Int((int)TaskStatusEnum.New);
 			}
 			command+=@"
 						GROUP BY taskancestor.TaskListNum) unreadtasks ON unreadtasks.TaskListNum = tasklist.TaskListNum 
