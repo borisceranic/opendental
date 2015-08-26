@@ -2395,6 +2395,9 @@ namespace OpenDental {
 				{
 					align=HorizontalAlignment.Right;
 				}
+				if(fieldsForMainGrid[i].InternalName=="Signed") {
+					align=HorizontalAlignment.Center;
+				}
 				if(fieldsForMainGrid[i].Description=="") {
 					col=new ODGridColumn(fieldsForMainGrid[i].InternalName,fieldsForMainGrid[i].ColumnWidth,align);
 				}
@@ -2445,6 +2448,15 @@ namespace OpenDental {
 							break;
 						case "Balance":
 							row.Cells.Add(table.Rows[i]["balance"].ToString());
+							break;
+						case "Signed":
+							Procedure proc=Procedures.GetOneProc(PIn.Long(table.Rows[i]["ProcNum"].ToString()),true);
+							if(!proc.IsNew && !String.IsNullOrWhiteSpace(proc.Signature)) {
+								row.Cells.Add("Signed");
+							}
+							else {
+								row.Cells.Add("");
+							}
 							break;
 					}
 				}

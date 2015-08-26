@@ -206,6 +206,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Charges",60,category));
 				list.Add(new DisplayField("Credits",60,category));
 				list.Add(new DisplayField("Balance",60,category));
+				//list.Add(new DisplayField("Signed",60,category));
 			}
 			else if(category==DisplayFieldCategory.RecallList) {
 				list.Add(new DisplayField("Due Date",75,category));
@@ -465,6 +466,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Charges",60,category));
 				list.Add(new DisplayField("Credits",60,category));
 				list.Add(new DisplayField("Balance",60,category));
+				list.Add(new DisplayField("Signed",60,category));
 			}
 			else if(category==DisplayFieldCategory.RecallList) {
 				list.Add(new DisplayField("Due Date",75,category));
