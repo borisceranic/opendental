@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -349,10 +350,20 @@ namespace OpenDental {
 				else if(addressPat!="") {
 					info.Arguments+="\"/ADDRESS:"+addressPat+"\" ";
 				}
-				if(zip!="") {
+				//If ODHQ, do not add the zip code if the customer has an active foreign registration key
+				bool hasForeignKey=false;
+				if(Prefs.IsODHQ()) {
+					hasForeignKey=RegistrationKeys.GetForPatient(patNum)
+						.Where(x => x.IsForeign)
+						.Where(x => x.DateStarted<=DateTimeOD.Today)
+						.Where(x => x.DateEnded.Year<1880 || x.DateEnded>=DateTimeOD.Today)
+						.Where(x => x.DateDisabled.Year<1880 || x.DateDisabled>=DateTimeOD.Today)
+						.Count()>0;
+				}
+				if(zip!="" && !hasForeignKey) {
 					info.Arguments+="\"/ZIP:"+zip+"\" ";
 				}
-				else if(zipPat!="") {
+				else if(zipPat!="" && !hasForeignKey) {
 					info.Arguments+="\"/ZIP:"+zipPat+"\" ";
 				}
 				info.Arguments+="/RECEIPT:Pat"+patNum+" ";//aka invoice#
