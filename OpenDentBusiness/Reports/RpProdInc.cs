@@ -511,7 +511,7 @@ namespace OpenDentBusiness {
 								inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["WriteOff"].ToString());
 							}
 							else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {//If the claim is also on the day (Only monthly report)
-								inswriteoff+=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
+								inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
 								hasData=true;
 							}
 						}
