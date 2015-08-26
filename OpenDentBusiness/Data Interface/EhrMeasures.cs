@@ -1238,12 +1238,20 @@ namespace OpenDentBusiness{
 					#region Smoking
 					case EhrMeasureType.Smoking:
 						string smokeSnoMed=tableRaw.Rows[i]["SmokingSnoMed"].ToString();
-						if(smokeSnoMed=="") {//None
-							explanation+="Smoking status not entered.";
-						}
-						else{
+						if(smokeSnoMed=="449868002"//Current every day smoker
+							|| smokeSnoMed=="428041000124106"//Current some day smoker
+							|| smokeSnoMed=="8517006"//Former smoker
+							|| smokeSnoMed=="266919005"//Never smoker
+							|| smokeSnoMed=="77176002"//Smoker, current status unknown
+							|| smokeSnoMed=="266927001"//Unknown if ever smoked
+							|| smokeSnoMed=="428071000124103"//Heavy tobacco smoker
+							|| smokeSnoMed=="428061000124105")//Light tobacco smoker
+						{
 							explanation="Smoking status entered.";
 							row["met"]="X";
+						}
+						else{
+							explanation+="Smoking status not entered.";
 						}
 						break;
 					#endregion
@@ -3321,12 +3329,20 @@ namespace OpenDentBusiness{
 					#region Smoking
 					case EhrMeasureType.Smoking:
 						string smokeSnoMed=tableRaw.Rows[i]["SmokingSnoMed"].ToString();
-						if(smokeSnoMed=="") {//None
-							explanation+="Smoking status not entered.";
-						}
-						else {
+						if(smokeSnoMed=="449868002"//Current every day smoker
+							|| smokeSnoMed=="428041000124106"//Current some day smoker
+							|| smokeSnoMed=="8517006"//Former smoker
+							|| smokeSnoMed=="266919005"//Never smoker
+							|| smokeSnoMed=="77176002"//Smoker, current status unknown
+							|| smokeSnoMed=="266927001"//Unknown if ever smoked
+							|| smokeSnoMed=="428071000124103"//Heavy tobacco smoker
+							|| smokeSnoMed=="428061000124105")//Light tobacco smoker
+						{
 							explanation="Smoking status entered.";
 							row["met"]="X";
+						}
+						else {
+							explanation="Smoking status not entered.";
 						}
 						break;
 					#endregion
