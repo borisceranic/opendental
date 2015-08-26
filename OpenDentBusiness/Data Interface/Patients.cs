@@ -390,13 +390,14 @@ namespace OpenDentBusiness{
 				command+="AND patient.PatNum = patient.Guarantor ";
 			}
 			if(clinicNums!="") {
-				command+="AND patient.Guarantor IN ( "
-				+"SELECT DISTINCT Guarantor FROM patient "
-				+"LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "
-					+"AND (procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" OR procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+") "
-					+"AND procedurelog.ClinicNum IN ("+POut.String(clinicNums)+") "
-				+"WHERE patient.PatStatus !="+POut.Int((int)PatientStatus.Deleted)+" "
-				+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN (0,"+POut.String(clinicNums)+"))) "; //Includes patients that are not assigned to any clinic.  May need to restrict selection of these patients in the future.
+				//command+="AND patient.Guarantor IN ( "
+				//+"SELECT DISTINCT Guarantor FROM patient "
+				//+"LEFT JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "
+				//	+"AND (procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" OR procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+") "
+				//	+"AND procedurelog.ClinicNum IN ("+POut.String(clinicNums)+") "
+				//+"WHERE patient.PatStatus !="+POut.Int((int)PatientStatus.Deleted)+" "
+				//+"AND (procedurelog.PatNum IS NOT NULL OR patient.ClinicNum IN (0,"+POut.String(clinicNums)+"))) "; //Includes patients that are not assigned to any clinic.  May need to restrict selection of these patients in the future.
+				command+="AND patient.ClinicNum IN (0,"+POut.String(clinicNums)+") ";
 			}
 			if(siteNum>0) {
 				command+="AND patient.SiteNum="+POut.Long(siteNum)+" ";
