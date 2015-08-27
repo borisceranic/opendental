@@ -617,7 +617,11 @@ namespace OpenDentBusiness {
 					row["description"]+="\r\n"+Lans.g("AccountModule","Payment")+": "+amt.ToString("c");
 				}
 				if(writeoff!=0) {
-					row["description"]+="\r\n"+Lans.g("AccountModule","PPO Discount")+": "+writeoff.ToString("c");
+					string writeoffDescript=PrefC.GetString(PrefName.InsWriteoffDescript);
+					if(writeoffDescript=="") {
+						writeoffDescript=Lans.g("AccountModule","Writeoff");
+					}
+					row["description"]+="\r\n"+writeoffDescript+": "+writeoff.ToString("c");
 				}
 				if(amt!=0 && rawClaimPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {
 					//Not all claim payments have been finalized and are not yet attached to claim payments (checks).
@@ -818,8 +822,12 @@ namespace OpenDentBusiness {
 						extraDetail+=", ";
 					}
 					extraDetail+=Lans.g("AccountModule","Ins Paid: ")+insPayAmt.ToString("c");
-					if(writeOff>0){
-						extraDetail+=", "+Lans.g("AccountModule","PPO Discount: ")+writeOff.ToString("c");
+					if(writeOff>0) {
+						string writeoffDescript=PrefC.GetString(PrefName.InsWriteoffDescript);
+						if(writeoffDescript=="") {
+							writeoffDescript=Lans.g("AccountModule","Writeoff");
+						}
+						extraDetail+=", "+writeoffDescript+": "+writeOff.ToString("c");
 					}
 				}
 				if(insPayEst>0) {
@@ -1180,8 +1188,12 @@ namespace OpenDentBusiness {
 						row["description"]+="\r\n"+Lans.g("ContrAccount", "NO PAYMENT");
 					}
 				}
-				if(writeoff!=0){
-					row["description"]+="\r\n"+Lans.g("ContrAccount","PPO Discount:")+" "+writeoff.ToString("c");
+				if(writeoff!=0) {
+					string writeoffDesctipt=PrefC.GetString(PrefName.InsWriteoffDescript);
+					if(writeoffDesctipt=="") {
+						writeoffDesctipt=Lans.g("ContrAccount","Writeoff");
+					}
+					row["description"]+="\r\n"+writeoffDesctipt+": "+writeoff.ToString("c");
 				}
 				if(deductible!=0){
 					row["description"]+="\r\n"+Lans.g("ContrAccount","Deductible Applied:")+" "+deductible.ToString("c");

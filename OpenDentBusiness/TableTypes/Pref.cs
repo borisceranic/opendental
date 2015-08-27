@@ -277,6 +277,9 @@ namespace OpenDentBusiness {
 		///<summary>0 by default.  If false, secondary PPO writeoffs will always be zero (normal).  At least one customer wants to see secondary writeoffs.</summary>
 		InsPPOsecWriteoffs,
 		InsurancePlansShared,
+		///<summary>Writeoff description displayed in the Account Module and on statements.  If blank, the default is "Writeoff".
+		///We are using "Writeoff" since "PPO Discount" was only used for a brief time in 15.3 while it was Beta and no customer requested it</summary>
+		InsWriteoffDescript,
 		IntermingleFamilyDefault,
 		LabelPatientDefaultSheetDefNum,
 		///<summary>Initially set to Declined to Specify.  Indicates which language from the LanguagesUsedByPatients preference is the language that indicates the patient declined to specify.  Text must exactly match a language in the list of available languages.  Can be blank if the user deletes the language from the list of available languages.</summary>
