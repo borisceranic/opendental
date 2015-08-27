@@ -155,5 +155,99 @@ namespace OpenDentBusiness {
 			return false;
 		}
 
+		///<summary>Returns true if this definition is in use within the program. Consider enhancing this method if you add a definition category.
+		///Does not check patient billing type or provider specialty since those are handled in their S-class.</summary>
+		public static bool IsDefinitionInUse(Def def) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),def);
+			}
+			string command;
+			switch(def.Category) {
+				case DefCat.AdjTypes:
+					command="SELECT COUNT(*) FROM adjustment WHERE AdjType="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					if(def.DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)) {
+						return true;
+					}
+					break;
+				case DefCat.ApptConfirmed:
+					command="SELECT COUNT(*) FROM appointment WHERE Confirmed="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					if(def.DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)
+						|| def.DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)
+						|| def.DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) {
+						return true;
+					}
+					break;
+				case DefCat.ContactCategories:
+					command="SELECT COUNT(*) FROM contact WHERE Category="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.Diagnosis:
+					command="SELECT COUNT(*) FROM procedurelog WHERE Dx="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.ImageCats:
+					command="SELECT COUNT(*) FROM document WHERE DocCategory="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					command="SELECT COUNT(*) FROM sheetfielddef WHERE FieldType="+POut.Int((int)SheetFieldType.PatImage)+" AND FieldName="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.PaymentTypes:
+					command="SELECT COUNT(*) FROM payment WHERE PayType="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.PaySplitUnearnedType:
+					command="SELECT COUNT(*) FROM paysplit WHERE UnearnedType="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.Prognosis:
+					command="SELECT COUNT(*) FROM procedurelog WHERE Prognosis="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.RecallUnschedStatus:
+					command="SELECT COUNT(*) FROM appointment WHERE UnschedStatus="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					command="SELECT COUNT(*) FROM recall WHERE RecallStatus="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.TaskPriorities:
+					command="SELECT COUNT(*) FROM task WHERE PriorityDefNum="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+				case DefCat.TxPriorities:
+					command="SELECT COUNT(*) FROM procedurelog WHERE Priority="+POut.Long(def.DefNum);
+					if(Db.GetCount(command)!="0") {
+						return true;
+					}
+					break;
+			}
+			return false;
+		}
+
 	}
 }

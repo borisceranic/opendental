@@ -261,6 +261,13 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			if(checkHidden.Checked) {
+				if(Defs.IsDefinitionInUse(DefCur)) {
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: This definition is currently in use within the program.")) {
+						return;
+					}
+				}
+			}
 			if(textName.Text==""){
 				MsgBox.Show(this,"Name required.");
 				return;

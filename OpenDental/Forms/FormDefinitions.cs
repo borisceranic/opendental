@@ -691,6 +691,21 @@ namespace OpenDental{
 				MsgBox.Show(this,"You cannot hide a specialty if it is in use by a provider or a referral source.");
 				return;
 			}
+			if(Defs.IsDefinitionInUse(DefsList[DefsSelected])) {
+				if(DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) 
+				{
+					MsgBox.Show(this,"You cannot hide a definition if it is in use in Appointment preferences.");
+					return;
+				}
+				else {
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: This definition is currently in use within the program.")) {
+						return;
+					}
+				}
+			}
 			//Stop users from hiding the last definition in categories that must have at least one def in them.
 			if(Defs.IsHidable(DefsList[DefsSelected].Category))	{
 				int countShowing=0;

@@ -304,8 +304,23 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			//Stop users from hiding the last definition in categories that must have at least one def in them.
 			if(Defs.IsHidable(DefCur.Category) && checkHidden.Checked) {
+				if(Defs.IsDefinitionInUse(DefCur)) {
+					if(DefCur.DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)
+						|| DefCur.DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)
+						|| DefCur.DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)
+						|| DefCur.DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) 
+					{
+						MsgBox.Show(this,"You cannot hide a definition if it is in use in Appointment preferences.");
+						return;
+					}
+					else {
+						if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Warning: This definition is currently in use within the program.")) {
+							return;
+						}
+					}
+				}
+				//Stop users from hiding the last definition in categories that must have at least one def in them.
 				int countShowing=0;
 				for(int i=0;i<_defsList.Length;i++) {
 					if(_defsList[i].DefNum==DefCur.DefNum) {
