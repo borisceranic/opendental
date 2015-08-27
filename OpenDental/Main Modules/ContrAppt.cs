@@ -173,8 +173,9 @@ namespace OpenDental {
 		private Panel panelMakeButtons;
 		private int pageColumn;
 		private List<DisplayField> _aptBubbleDefs;
-		//This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are enabled.
-		//This list will contain the same number of items as comboView minus 1 for 'none'.
+		///<summary>This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are
+		///enabled.  This list will contain the same number of items as comboView minus 1 for 'none' and is filled at the same time as comboView.
+		///Use this list when accessing the view by comboView.SelectedIndex.</summary>
 		private List<ApptView> _listApptViews;
 		private FormTrackNext FormTN;
 		private FormUnsched FormUnsched2;
@@ -1383,9 +1384,9 @@ namespace OpenDental {
 			if(vScrollBar1.Value==0) {//ApptViewC.List seems to already be not null by this point.
 				int rowsPerHr=60/ApptDrawing.MinPerIncr*ApptDrawing.RowsPerIncr;
 				//use the row setting from the selected view.
-				if(ApptViewC.List.Length>0 && comboView.SelectedIndex>0) {
-					rowsPerHr=60/ApptDrawing.MinPerIncr*ApptViewC.List[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
-					TimeSpan apptTimeScrollStart=ApptViewC.List[comboView.SelectedIndex-1].ApptTimeScrollStart;
+				if(_listApptViews.Count>0 && comboView.SelectedIndex>0) {
+					rowsPerHr=60/ApptDrawing.MinPerIncr*_listApptViews[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
+					TimeSpan apptTimeScrollStart=_listApptViews[comboView.SelectedIndex-1].ApptTimeScrollStart;
 					double apptTimeHrs=((apptTimeScrollStart.Hours*60)+apptTimeScrollStart.Minutes)/60.0;
 					if(apptTimeHrs*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
 						vScrollBar1.Value=(int)(apptTimeHrs*rowsPerHr*ApptDrawing.LineH);
@@ -5539,7 +5540,7 @@ namespace OpenDental {
 				FormB.ApptViewNumCur=0;
 			}
 			else {
-				FormB.ApptViewNumCur=ApptViewC.List[comboView.SelectedIndex-1].ApptViewNum;
+				FormB.ApptViewNumCur=_listApptViews[comboView.SelectedIndex-1].ApptViewNum;
 			}
 			FormB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout cut copy paste.");
