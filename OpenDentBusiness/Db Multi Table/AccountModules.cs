@@ -66,7 +66,7 @@ namespace OpenDentBusiness {
 			}
 			GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
 				stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
-				PrefC.GetBool(PrefName.StatementShowAdjNotes));
+				PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			GetApptTable(fam,stmt.SinglePatient,patNum);//table= appts
 			GetMisc(fam,patNum);
 			return retVal;
@@ -623,7 +623,9 @@ namespace OpenDentBusiness {
 					}
 					row["description"]+="\r\n"+writeoffDescript+": "+writeoff.ToString("c");
 				}
-				if(amt!=0 && rawClaimPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") {
+				if(!isForStatementPrinting && amt!=0 
+					&& rawClaimPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") 
+				{
 					//Not all claim payments have been finalized and are not yet attached to claim payments (checks).
 					//Indicate to the user that they need to finalize this payment before reports will be accurate.
 					row["description"]+="\r\n"+Lans.g("AccountModule","PAYMENT NEEDS TO BE FINALIZED");
