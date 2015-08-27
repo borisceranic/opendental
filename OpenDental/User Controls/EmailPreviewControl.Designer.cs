@@ -35,21 +35,25 @@
 			this.menuItemRemove = new System.Windows.Forms.MenuItem();
 			this.textSentOrReceived = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
-			this.gridAttachments = new OpenDental.UI.ODGrid();
+			this.label4 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.textBccAddress = new OpenDental.ODtextBox();
+			this.textCcAddress = new OpenDental.ODtextBox();
+			this.butShowImages = new OpenDental.UI.Button();
 			this.textSubject = new OpenDental.ODtextBox();
 			this.textSignedBy = new OpenDental.ODtextBox();
 			this.textToAddress = new OpenDental.ODtextBox();
 			this.textFromAddress = new OpenDental.ODtextBox();
 			this.butAttach = new OpenDental.UI.Button();
+			this.gridAttachments = new OpenDental.UI.ODGrid();
 			this.butSig = new OpenDental.UI.Button();
 			this.webBrowser = new System.Windows.Forms.WebBrowser();
 			this.textBodyText = new OpenDental.ODtextBox();
-			this.butShowImages = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// labelSignedBy
 			// 
-			this.labelSignedBy.Location = new System.Drawing.Point(0, 83);
+			this.labelSignedBy.Location = new System.Drawing.Point(0, 125);
 			this.labelSignedBy.Name = "labelSignedBy";
 			this.labelSignedBy.Size = new System.Drawing.Size(88, 14);
 			this.labelSignedBy.TabIndex = 0;
@@ -99,7 +103,7 @@
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(0, 102);
+			this.label2.Location = new System.Drawing.Point(0, 144);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(88, 14);
 			this.label2.TabIndex = 0;
@@ -153,20 +157,72 @@
 			this.label5.Text = "Sent/Received:";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// gridAttachments
+			// label4
 			// 
-			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridAttachments.HScrollVisible = false;
-			this.gridAttachments.Location = new System.Drawing.Point(649, 22);
-			this.gridAttachments.Name = "gridAttachments";
-			this.gridAttachments.ScrollValue = 0;
-			this.gridAttachments.Size = new System.Drawing.Size(323, 98);
-			this.gridAttachments.TabIndex = 0;
-			this.gridAttachments.TabStop = false;
-			this.gridAttachments.Title = "Attachments";
-			this.gridAttachments.TranslationName = null;
-			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
-			this.gridAttachments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridAttachments_MouseDown);
+			this.label4.Location = new System.Drawing.Point(0, 83);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(88, 14);
+			this.label4.TabIndex = 8;
+			this.label4.Text = "CC:";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(0, 103);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(88, 14);
+			this.label6.TabIndex = 10;
+			this.label6.Text = "BCC:";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textBccAddress
+			// 
+			this.textBccAddress.AcceptsTab = true;
+			this.textBccAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBccAddress.DetectUrls = false;
+			this.textBccAddress.Location = new System.Drawing.Point(89, 100);
+			this.textBccAddress.Multiline = false;
+			this.textBccAddress.Name = "textBccAddress";
+			this.textBccAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textBccAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+			this.textBccAddress.Size = new System.Drawing.Size(559, 20);
+			this.textBccAddress.SpellCheckIsEnabled = false;
+			this.textBccAddress.TabIndex = 11;
+			this.textBccAddress.Text = "";
+			this.textBccAddress.WordWrap = false;
+			// 
+			// textCcAddress
+			// 
+			this.textCcAddress.AcceptsTab = true;
+			this.textCcAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textCcAddress.DetectUrls = false;
+			this.textCcAddress.Location = new System.Drawing.Point(89, 79);
+			this.textCcAddress.Multiline = false;
+			this.textCcAddress.Name = "textCcAddress";
+			this.textCcAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textCcAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+			this.textCcAddress.Size = new System.Drawing.Size(559, 20);
+			this.textCcAddress.SpellCheckIsEnabled = false;
+			this.textCcAddress.TabIndex = 9;
+			this.textCcAddress.Text = "";
+			this.textCcAddress.WordWrap = false;
+			// 
+			// butShowImages
+			// 
+			this.butShowImages.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowImages.Autosize = true;
+			this.butShowImages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowImages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowImages.CornerRadius = 4F;
+			this.butShowImages.Location = new System.Drawing.Point(8, 163);
+			this.butShowImages.Name = "butShowImages";
+			this.butShowImages.Size = new System.Drawing.Size(78, 22);
+			this.butShowImages.TabIndex = 7;
+			this.butShowImages.Text = "Show Images";
+			this.butShowImages.Visible = false;
+			this.butShowImages.Click += new System.EventHandler(this.butShowImages_Click);
 			// 
 			// textSubject
 			// 
@@ -174,7 +230,7 @@
 			this.textSubject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSubject.DetectUrls = false;
-			this.textSubject.Location = new System.Drawing.Point(89, 100);
+			this.textSubject.Location = new System.Drawing.Point(89, 142);
 			this.textSubject.Multiline = false;
 			this.textSubject.Name = "textSubject";
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -190,7 +246,7 @@
 			this.textSignedBy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSignedBy.DetectUrls = false;
-			this.textSignedBy.Location = new System.Drawing.Point(89, 79);
+			this.textSignedBy.Location = new System.Drawing.Point(89, 121);
 			this.textSignedBy.Multiline = false;
 			this.textSignedBy.Name = "textSignedBy";
 			this.textSignedBy.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -254,6 +310,22 @@
 			this.butAttach.Text = "Attach...";
 			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
 			// 
+			// gridAttachments
+			// 
+			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAttachments.HasMultilineHeaders = false;
+			this.gridAttachments.HScrollVisible = false;
+			this.gridAttachments.Location = new System.Drawing.Point(649, 22);
+			this.gridAttachments.Name = "gridAttachments";
+			this.gridAttachments.ScrollValue = 0;
+			this.gridAttachments.Size = new System.Drawing.Size(323, 140);
+			this.gridAttachments.TabIndex = 0;
+			this.gridAttachments.TabStop = false;
+			this.gridAttachments.Title = "Attachments";
+			this.gridAttachments.TranslationName = null;
+			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
+			this.gridAttachments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridAttachments_MouseDown);
+			// 
 			// butSig
 			// 
 			this.butSig.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -262,7 +334,7 @@
 			this.butSig.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSig.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSig.CornerRadius = 4F;
-			this.butSig.Location = new System.Drawing.Point(614, 79);
+			this.butSig.Location = new System.Drawing.Point(614, 121);
 			this.butSig.Name = "butSig";
 			this.butSig.Size = new System.Drawing.Size(33, 20);
 			this.butSig.TabIndex = 3;
@@ -291,34 +363,23 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBodyText.DetectUrls = false;
-			this.textBodyText.Location = new System.Drawing.Point(89, 121);
+			this.textBodyText.Location = new System.Drawing.Point(89, 163);
 			this.textBodyText.Name = "textBodyText";
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBodyText.Size = new System.Drawing.Size(884, 284);
+			this.textBodyText.Size = new System.Drawing.Size(884, 242);
 			this.textBodyText.TabIndex = 5;
 			this.textBodyText.Text = "";
 			this.textBodyText.TextChanged += new System.EventHandler(this.textBodyText_TextChanged);
-			// 
-			// butShowImages
-			// 
-			this.butShowImages.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butShowImages.Autosize = true;
-			this.butShowImages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butShowImages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butShowImages.CornerRadius = 4F;
-			this.butShowImages.Location = new System.Drawing.Point(8, 121);
-			this.butShowImages.Name = "butShowImages";
-			this.butShowImages.Size = new System.Drawing.Size(78, 22);
-			this.butShowImages.TabIndex = 7;
-			this.butShowImages.Text = "Show Images";
-			this.butShowImages.Visible = false;
-			this.butShowImages.Click += new System.EventHandler(this.butShowImages_Click);
 			// 
 			// EmailPreviewControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.textBccAddress);
+			this.Controls.Add(this.label6);
+			this.Controls.Add(this.textCcAddress);
+			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butShowImages);
 			this.Controls.Add(this.textSentOrReceived);
 			this.Controls.Add(this.label5);
@@ -368,6 +429,10 @@
 		private System.Windows.Forms.TextBox textSentOrReceived;
 		private System.Windows.Forms.Label label5;
 		private UI.Button butShowImages;
+		private ODtextBox textCcAddress;
+		private System.Windows.Forms.Label label4;
+		private ODtextBox textBccAddress;
+		private System.Windows.Forms.Label label6;
 
 	}
 }

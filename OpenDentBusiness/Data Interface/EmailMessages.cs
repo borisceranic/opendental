@@ -44,7 +44,8 @@ namespace OpenDentBusiness{
 			}
 			//We only pull the first 50 characters of the bodytext for preview purposes. We also do not pull the RawEmailIn, because it is not necessary for the inbox.
 			//After double-clicking an email in the inbox to view it, then the entire email contents are read from the database.
-			string command="SELECT EmailMessageNum,PatNum,ToAddress,FromAddress,Subject,SUBSTR(BodyText,1,50) BodyText,MsgDateTime,SentOrReceived,RecipientAddress,'' RawEmailIn,ProvNumWebMail,PatNumSubj "
+			string command="SELECT EmailMessageNum,PatNum,ToAddress,FromAddress,Subject,SUBSTR(BodyText,1,50) BodyText,MsgDateTime,SentOrReceived,"
+				+"RecipientAddress,'' RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress "
 				+"FROM emailmessage "
 				+"WHERE SentOrReceived IN ("
 					//must match one of these EmailSentOrReceived statuses
@@ -514,6 +515,8 @@ namespace OpenDentBusiness{
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpusessl","true");//false was also tested and does not work
 				message.From=emailMessage.FromAddress.Trim();
 				message.To=emailMessage.ToAddress.Trim();
+				message.Cc=emailMessage.CcAddress.Trim();
+				message.Bcc=emailMessage.BccAddress.Trim();
 				message.Subject=SubjectTidy(emailMessage.Subject);
 				message.Body=BodyTidy(emailMessage.BodyText);
 				//message.Cc=;
@@ -551,6 +554,8 @@ namespace OpenDentBusiness{
 				MailMessage message=new MailMessage();
 				message.From=new MailAddress(emailMessage.FromAddress.Trim());
 				message.To.Add(emailMessage.ToAddress.Trim());
+				message.CC.Add(emailMessage.CcAddress.Trim());
+				message.Bcc.Add(emailMessage.BccAddress.Trim());
 				message.Subject=SubjectTidy(emailMessage.Subject);
 				message.Body=BodyTidy(emailMessage.BodyText);
 				message.IsBodyHtml=false;
@@ -1312,12 +1317,9 @@ namespace OpenDentBusiness{
 				emailMessage.MsgDateTime=DateTime.Now;
 			}
 			emailMessage.Subject=SubjectTidy(message.SubjectValue);
-			if(message.ToValue==null) {//Sent by CC or BCC
-				emailMessage.ToAddress="";
-			}
-			else {
-				emailMessage.ToAddress=message.ToValue.Trim();
-			}
+			emailMessage.ToAddress=POut.String(message.ToValue).Trim();//ToValue can be null if recipients were CC or BCC only.
+			emailMessage.CcAddress=POut.String(message.CcValue).Trim();
+			emailMessage.BccAddress=POut.String(message.BccValue).Trim();
 			//Think of the mime structure as a tree.
 			//We want to treat one part and multi-part emails the same way below, so we make our own list of leaf node mime parts (mime parts which have no children, also know as single part).
 			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=GetMimeLeafNodes(message);
@@ -1408,6 +1410,8 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			//We need to use emailAddressFrom.Username instead of emailAddressFrom.SenderAddress, because of how strict encryption is for matching the name to the certificate.
 			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message(emailMessage.ToAddress.Trim(),emailMessage.FromAddress.Trim(),"","text/plain");//Body is set below.  Setting the default type helps with signing.
+			message.CcValue=emailMessage.CcAddress.Trim();//constructor does not accept cc and bcc values
+			message.BccValue=emailMessage.BccAddress.Trim();
 			string subject=SubjectTidy(emailMessage.Subject);
 			if(subject!="") {
 				Health.Direct.Common.Mime.Header headerSubject=new Health.Direct.Common.Mime.Header("Subject",subject);

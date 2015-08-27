@@ -242,7 +242,7 @@ namespace OpenDental{
 			this.buttonFuchsMailDMF.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.buttonFuchsMailDMF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.buttonFuchsMailDMF.CornerRadius = 4F;
-			this.buttonFuchsMailDMF.Location = new System.Drawing.Point(197, 177);
+			this.buttonFuchsMailDMF.Location = new System.Drawing.Point(197, 218);
 			this.buttonFuchsMailDMF.Name = "buttonFuchsMailDMF";
 			this.buttonFuchsMailDMF.Size = new System.Drawing.Size(78, 22);
 			this.buttonFuchsMailDMF.TabIndex = 30;
@@ -257,7 +257,7 @@ namespace OpenDental{
 			this.buttonFuchsMailDSF.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.buttonFuchsMailDSF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.buttonFuchsMailDSF.CornerRadius = 4F;
-			this.buttonFuchsMailDSF.Location = new System.Drawing.Point(197, 149);
+			this.buttonFuchsMailDSF.Location = new System.Drawing.Point(197, 191);
 			this.buttonFuchsMailDSF.Name = "buttonFuchsMailDSF";
 			this.buttonFuchsMailDSF.Size = new System.Drawing.Size(78, 22);
 			this.buttonFuchsMailDSF.TabIndex = 29;
@@ -333,7 +333,9 @@ namespace OpenDental{
 			this.emailPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.emailPreview.BccAddress = "";
 			this.emailPreview.BodyText = "";
+			this.emailPreview.CcAddress = "";
 			this.emailPreview.Location = new System.Drawing.Point(189, 1);
 			this.emailPreview.Name = "emailPreview";
 			this.emailPreview.Size = new System.Drawing.Size(771, 652);

@@ -30,6 +30,8 @@ namespace OpenDental {
 		public string BodyText { get { return textBodyText.Text; } set { textBodyText.Text=value; } }
 		public string FromAddress { get { return textFromAddress.Text; } }
 		public string ToAddress { get { return textToAddress.Text; } set { textToAddress.Text=value; } }
+		public string CcAddress { get { return textCcAddress.Text; } set { textCcAddress.Text=value; } }
+		public string BccAddress { get { return textBccAddress.Text; } set { textBccAddress.Text=value; } }
 		public bool IsSigned { get { return (_isSigningEnabled && _certSig!=null); } }
 		
 		public X509Certificate2 Signature {
@@ -73,6 +75,8 @@ namespace OpenDental {
 				butAttach.Enabled=false;
 				textFromAddress.ReadOnly=true;
 				textToAddress.ReadOnly=true;
+				textCcAddress.ReadOnly=true;
+				textBccAddress.ReadOnly=true;
 				textSubject.ReadOnly=true;
 				textSubject.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 				textBodyText.ReadOnly=true;
@@ -81,6 +85,8 @@ namespace OpenDental {
 			textSentOrReceived.Text=_emailMessage.SentOrReceived.ToString();
 			textFromAddress.Text=_emailMessage.FromAddress;
 			textToAddress.Text=_emailMessage.ToAddress;
+			textCcAddress.Text=_emailMessage.CcAddress;
+			textBccAddress.Text=_emailMessage.BccAddress; //if you send an email to yourself, you'll be able to see everyone in the bcc field.
 			textSubject.Text=_emailMessage.Subject;
 			textBodyText.Visible=true;
 			webBrowser.Visible=false;
@@ -380,6 +386,8 @@ namespace OpenDental {
 		public void SaveMsg(EmailMessage emailMessage) {
 			emailMessage.FromAddress=textFromAddress.Text;
 			emailMessage.ToAddress=textToAddress.Text;
+			emailMessage.CcAddress=textCcAddress.Text;
+			emailMessage.BccAddress=textBccAddress.Text;
 			emailMessage.Subject=textSubject.Text;
 			emailMessage.BodyText=textBodyText.Text;
 			emailMessage.MsgDateTime=DateTime.Now;
