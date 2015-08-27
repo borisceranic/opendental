@@ -9568,6 +9568,23 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.10.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_13();
+		}
+
+		private static void To15_3_13() {
+			if(FromVersion<new Version("15.3.13.0")) {
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsWriteoffDescript','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsWriteoffDescript','')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.13.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 

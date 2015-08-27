@@ -134,6 +134,8 @@ namespace OpenDental{
 		private CheckBox checkClaimsSendWindowValidateOnLoad;
 		private CheckBox checkProvColorChart;
 		private CheckBox checkPromptAutoSplit;
+		private TextBox textInsWriteoffDescript;
+		private Label label17;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -234,6 +236,9 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.textInsWriteoffDescript = new System.Windows.Forms.TextBox();
+			this.label17 = new System.Windows.Forms.Label();
+			this.checkPromptAutoSplit = new System.Windows.Forms.CheckBox();
 			this.checkStatementsUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkStoreCCTokens = new System.Windows.Forms.CheckBox();
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
@@ -248,21 +253,17 @@ namespace OpenDental{
 			this.checkProvColorChart = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textMedDefaultStopDays = new System.Windows.Forms.TextBox();
-			this.butDiagnosisCode = new OpenDental.UI.Button();
 			this.checkDxIcdVersion = new System.Windows.Forms.CheckBox();
 			this.checkChartNonPatientWarn = new System.Windows.Forms.CheckBox();
 			this.checkProcLockingIsAllowed = new System.Windows.Forms.CheckBox();
 			this.textICD9DefaultForNewProcs = new System.Windows.Forms.TextBox();
 			this.checkMedicalFeeUsedForNewProcs = new System.Windows.Forms.CheckBox();
 			this.checkProcGroupNoteDoesAggregate = new System.Windows.Forms.CheckBox();
-			this.butAllergiesIndicateNone = new OpenDental.UI.Button();
 			this.textAllergiesIndicateNone = new System.Windows.Forms.TextBox();
 			this.labelIcdCodeDefault = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
-			this.butMedicationsIndicateNone = new OpenDental.UI.Button();
 			this.textMedicationsIndicateNone = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
-			this.butProblemsIndicateNone = new OpenDental.UI.Button();
 			this.textProblemsIndicateNone = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabImages = new System.Windows.Forms.TabPage();
@@ -271,7 +272,6 @@ namespace OpenDental{
 			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label24 = new System.Windows.Forms.Label();
-			this.textBillingElectBatchMax = new OpenDental.ValidNum();
 			this.checkStatementShowAdjNotes = new System.Windows.Forms.CheckBox();
 			this.checkIntermingleDefault = new System.Windows.Forms.CheckBox();
 			this.checkStatementShowReturnAddress = new System.Windows.Forms.CheckBox();
@@ -282,14 +282,18 @@ namespace OpenDental{
 			this.comboUseChartNum = new System.Windows.Forms.ComboBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
-			this.textStatementsCalcDueDate = new OpenDental.ValidNumber();
-			this.textPayPlansBillInAdvanceDays = new OpenDental.ValidNum();
 			this.comboTimeCardOvertimeFirstDayOfWeek = new System.Windows.Forms.ComboBox();
 			this.label16 = new System.Windows.Forms.Label();
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
+			this.butDiagnosisCode = new OpenDental.UI.Button();
+			this.butAllergiesIndicateNone = new OpenDental.UI.Button();
+			this.butMedicationsIndicateNone = new OpenDental.UI.Button();
+			this.butProblemsIndicateNone = new OpenDental.UI.Button();
+			this.textBillingElectBatchMax = new OpenDental.ValidNum();
+			this.textStatementsCalcDueDate = new OpenDental.ValidNumber();
+			this.textPayPlansBillInAdvanceDays = new OpenDental.ValidNum();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkPromptAutoSplit = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -397,7 +401,7 @@ namespace OpenDental{
 			this.label20.Size = new System.Drawing.Size(188, 13);
 			this.label20.TabIndex = 190;
 			this.label20.Text = "Claim Attachment Export Path";
-			this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkShowFamilyCommByDefault
 			// 
@@ -1041,6 +1045,8 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.textInsWriteoffDescript);
+			this.tabAccount.Controls.Add(this.label17);
 			this.tabAccount.Controls.Add(this.checkPromptAutoSplit);
 			this.tabAccount.Controls.Add(this.checkStatementsUseSheets);
 			this.tabAccount.Controls.Add(this.checkStoreCCTokens);
@@ -1065,6 +1071,34 @@ namespace OpenDental{
 			this.tabAccount.Size = new System.Drawing.Size(466, 479);
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
+			// 
+			// textInsWriteoffDescript
+			// 
+			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 302);
+			this.textInsWriteoffDescript.Name = "textInsWriteoffDescript";
+			this.textInsWriteoffDescript.Size = new System.Drawing.Size(163, 20);
+			this.textInsWriteoffDescript.TabIndex = 207;
+			// 
+			// label17
+			// 
+			this.label17.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label17.Location = new System.Drawing.Point(16, 304);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(261, 16);
+			this.label17.TabIndex = 208;
+			this.label17.Text = "PPO writeoff description (blank for \"Writeoff\")";
+			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkPromptAutoSplit
+			// 
+			this.checkPromptAutoSplit.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPromptAutoSplit.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPromptAutoSplit.Location = new System.Drawing.Point(44, 282);
+			this.checkPromptAutoSplit.Name = "checkPromptAutoSplit";
+			this.checkPromptAutoSplit.Size = new System.Drawing.Size(396, 17);
+			this.checkPromptAutoSplit.TabIndex = 206;
+			this.checkPromptAutoSplit.Text = "Prompt for autosplits on Payments";
+			this.checkPromptAutoSplit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkStatementsUseSheets
 			// 
@@ -1131,16 +1165,15 @@ namespace OpenDental{
 			// 
 			// checkTreatPlanItemized
 			// 
-			this.checkTreatPlanItemized.AutoSize = true;
 			this.checkTreatPlanItemized.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkTreatPlanItemized.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkTreatPlanItemized.Location = new System.Drawing.Point(300, 152);
 			this.checkTreatPlanItemized.Name = "checkTreatPlanItemized";
-			this.checkTreatPlanItemized.Size = new System.Drawing.Size(140, 18);
+			this.checkTreatPlanItemized.Size = new System.Drawing.Size(140, 17);
 			this.checkTreatPlanItemized.TabIndex = 212;
 			this.checkTreatPlanItemized.Text = "Itemize Treatment Plan";
 			this.checkTreatPlanItemized.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTreatPlanItemized.UseVisualStyleBackColor = true;
+			this.checkTreatPlanItemized.UseVisualStyleBackColor = false;
 			this.checkTreatPlanItemized.Click += new System.EventHandler(this.checkTreatPlanItemized_Click);
 			// 
 			// textDiscountPercentage
@@ -1241,20 +1274,6 @@ namespace OpenDental{
 			this.textMedDefaultStopDays.Size = new System.Drawing.Size(39, 20);
 			this.textMedDefaultStopDays.TabIndex = 212;
 			// 
-			// butDiagnosisCode
-			// 
-			this.butDiagnosisCode.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDiagnosisCode.Autosize = true;
-			this.butDiagnosisCode.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDiagnosisCode.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDiagnosisCode.CornerRadius = 4F;
-			this.butDiagnosisCode.Location = new System.Drawing.Point(419, 198);
-			this.butDiagnosisCode.Name = "butDiagnosisCode";
-			this.butDiagnosisCode.Size = new System.Drawing.Size(22, 22);
-			this.butDiagnosisCode.TabIndex = 213;
-			this.butDiagnosisCode.Text = "...";
-			this.butDiagnosisCode.Click += new System.EventHandler(this.butDiagnosisCode_Click);
-			// 
 			// checkDxIcdVersion
 			// 
 			this.checkDxIcdVersion.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1325,20 +1344,6 @@ namespace OpenDental{
 			this.checkProcGroupNoteDoesAggregate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkProcGroupNoteDoesAggregate.UseVisualStyleBackColor = true;
 			// 
-			// butAllergiesIndicateNone
-			// 
-			this.butAllergiesIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAllergiesIndicateNone.Autosize = true;
-			this.butAllergiesIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAllergiesIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAllergiesIndicateNone.CornerRadius = 4F;
-			this.butAllergiesIndicateNone.Location = new System.Drawing.Point(419, 118);
-			this.butAllergiesIndicateNone.Name = "butAllergiesIndicateNone";
-			this.butAllergiesIndicateNone.Size = new System.Drawing.Size(22, 21);
-			this.butAllergiesIndicateNone.TabIndex = 205;
-			this.butAllergiesIndicateNone.Text = "...";
-			this.butAllergiesIndicateNone.Click += new System.EventHandler(this.butAllergiesIndicateNone_Click);
-			// 
 			// textAllergiesIndicateNone
 			// 
 			this.textAllergiesIndicateNone.Location = new System.Drawing.Point(270, 119);
@@ -1367,20 +1372,6 @@ namespace OpenDental{
 			this.label14.Text = "Indicator that patient has No Allergies";
 			this.label14.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// butMedicationsIndicateNone
-			// 
-			this.butMedicationsIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMedicationsIndicateNone.Autosize = true;
-			this.butMedicationsIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMedicationsIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMedicationsIndicateNone.CornerRadius = 4F;
-			this.butMedicationsIndicateNone.Location = new System.Drawing.Point(419, 95);
-			this.butMedicationsIndicateNone.Name = "butMedicationsIndicateNone";
-			this.butMedicationsIndicateNone.Size = new System.Drawing.Size(22, 21);
-			this.butMedicationsIndicateNone.TabIndex = 202;
-			this.butMedicationsIndicateNone.Text = "...";
-			this.butMedicationsIndicateNone.Click += new System.EventHandler(this.butMedicationsIndicateNone_Click);
-			// 
 			// textMedicationsIndicateNone
 			// 
 			this.textMedicationsIndicateNone.Location = new System.Drawing.Point(270, 96);
@@ -1398,20 +1389,6 @@ namespace OpenDental{
 			this.label9.TabIndex = 200;
 			this.label9.Text = "Indicator that patient has No Medications";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// butProblemsIndicateNone
-			// 
-			this.butProblemsIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butProblemsIndicateNone.Autosize = true;
-			this.butProblemsIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butProblemsIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butProblemsIndicateNone.CornerRadius = 4F;
-			this.butProblemsIndicateNone.Location = new System.Drawing.Point(419, 72);
-			this.butProblemsIndicateNone.Name = "butProblemsIndicateNone";
-			this.butProblemsIndicateNone.Size = new System.Drawing.Size(22, 21);
-			this.butProblemsIndicateNone.TabIndex = 199;
-			this.butProblemsIndicateNone.Text = "...";
-			this.butProblemsIndicateNone.Click += new System.EventHandler(this.butProblemsIndicateNone_Click);
 			// 
 			// textProblemsIndicateNone
 			// 
@@ -1509,16 +1486,6 @@ namespace OpenDental{
 			this.label24.TabIndex = 217;
 			this.label24.Text = "Max number of electronic statements per batch (0 for no limit)";
 			this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textBillingElectBatchMax
-			// 
-			this.textBillingElectBatchMax.Location = new System.Drawing.Point(342, 211);
-			this.textBillingElectBatchMax.MaxVal = 255;
-			this.textBillingElectBatchMax.MinVal = 0;
-			this.textBillingElectBatchMax.Name = "textBillingElectBatchMax";
-			this.textBillingElectBatchMax.Size = new System.Drawing.Size(60, 20);
-			this.textBillingElectBatchMax.TabIndex = 216;
-			this.textBillingElectBatchMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// checkStatementShowAdjNotes
 			// 
@@ -1626,26 +1593,6 @@ namespace OpenDental{
 			this.label18.Text = "Days in advance to bill payment plan amounts due.\r\nUsually 10 or 15.";
 			this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// textStatementsCalcDueDate
-			// 
-			this.textStatementsCalcDueDate.Location = new System.Drawing.Point(343, 130);
-			this.textStatementsCalcDueDate.MaxVal = 255;
-			this.textStatementsCalcDueDate.MinVal = 0;
-			this.textStatementsCalcDueDate.Name = "textStatementsCalcDueDate";
-			this.textStatementsCalcDueDate.Size = new System.Drawing.Size(60, 20);
-			this.textStatementsCalcDueDate.TabIndex = 205;
-			this.textStatementsCalcDueDate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// textPayPlansBillInAdvanceDays
-			// 
-			this.textPayPlansBillInAdvanceDays.Location = new System.Drawing.Point(343, 162);
-			this.textPayPlansBillInAdvanceDays.MaxVal = 255;
-			this.textPayPlansBillInAdvanceDays.MinVal = 0;
-			this.textPayPlansBillInAdvanceDays.Name = "textPayPlansBillInAdvanceDays";
-			this.textPayPlansBillInAdvanceDays.Size = new System.Drawing.Size(60, 20);
-			this.textPayPlansBillInAdvanceDays.TabIndex = 210;
-			this.textPayPlansBillInAdvanceDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
 			// comboTimeCardOvertimeFirstDayOfWeek
 			// 
 			this.comboTimeCardOvertimeFirstDayOfWeek.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1665,6 +1612,92 @@ namespace OpenDental{
 			this.label16.TabIndex = 196;
 			this.label16.Text = "Time Card first day of week for overtime";
 			this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// butDiagnosisCode
+			// 
+			this.butDiagnosisCode.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDiagnosisCode.Autosize = true;
+			this.butDiagnosisCode.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDiagnosisCode.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDiagnosisCode.CornerRadius = 4F;
+			this.butDiagnosisCode.Location = new System.Drawing.Point(419, 198);
+			this.butDiagnosisCode.Name = "butDiagnosisCode";
+			this.butDiagnosisCode.Size = new System.Drawing.Size(22, 22);
+			this.butDiagnosisCode.TabIndex = 213;
+			this.butDiagnosisCode.Text = "...";
+			this.butDiagnosisCode.Click += new System.EventHandler(this.butDiagnosisCode_Click);
+			// 
+			// butAllergiesIndicateNone
+			// 
+			this.butAllergiesIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAllergiesIndicateNone.Autosize = true;
+			this.butAllergiesIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAllergiesIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAllergiesIndicateNone.CornerRadius = 4F;
+			this.butAllergiesIndicateNone.Location = new System.Drawing.Point(419, 118);
+			this.butAllergiesIndicateNone.Name = "butAllergiesIndicateNone";
+			this.butAllergiesIndicateNone.Size = new System.Drawing.Size(22, 21);
+			this.butAllergiesIndicateNone.TabIndex = 205;
+			this.butAllergiesIndicateNone.Text = "...";
+			this.butAllergiesIndicateNone.Click += new System.EventHandler(this.butAllergiesIndicateNone_Click);
+			// 
+			// butMedicationsIndicateNone
+			// 
+			this.butMedicationsIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMedicationsIndicateNone.Autosize = true;
+			this.butMedicationsIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMedicationsIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMedicationsIndicateNone.CornerRadius = 4F;
+			this.butMedicationsIndicateNone.Location = new System.Drawing.Point(419, 95);
+			this.butMedicationsIndicateNone.Name = "butMedicationsIndicateNone";
+			this.butMedicationsIndicateNone.Size = new System.Drawing.Size(22, 21);
+			this.butMedicationsIndicateNone.TabIndex = 202;
+			this.butMedicationsIndicateNone.Text = "...";
+			this.butMedicationsIndicateNone.Click += new System.EventHandler(this.butMedicationsIndicateNone_Click);
+			// 
+			// butProblemsIndicateNone
+			// 
+			this.butProblemsIndicateNone.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butProblemsIndicateNone.Autosize = true;
+			this.butProblemsIndicateNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butProblemsIndicateNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butProblemsIndicateNone.CornerRadius = 4F;
+			this.butProblemsIndicateNone.Location = new System.Drawing.Point(419, 72);
+			this.butProblemsIndicateNone.Name = "butProblemsIndicateNone";
+			this.butProblemsIndicateNone.Size = new System.Drawing.Size(22, 21);
+			this.butProblemsIndicateNone.TabIndex = 199;
+			this.butProblemsIndicateNone.Text = "...";
+			this.butProblemsIndicateNone.Click += new System.EventHandler(this.butProblemsIndicateNone_Click);
+			// 
+			// textBillingElectBatchMax
+			// 
+			this.textBillingElectBatchMax.Location = new System.Drawing.Point(342, 211);
+			this.textBillingElectBatchMax.MaxVal = 255;
+			this.textBillingElectBatchMax.MinVal = 0;
+			this.textBillingElectBatchMax.Name = "textBillingElectBatchMax";
+			this.textBillingElectBatchMax.Size = new System.Drawing.Size(60, 20);
+			this.textBillingElectBatchMax.TabIndex = 216;
+			this.textBillingElectBatchMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textStatementsCalcDueDate
+			// 
+			this.textStatementsCalcDueDate.Location = new System.Drawing.Point(343, 130);
+			this.textStatementsCalcDueDate.MaxVal = 255;
+			this.textStatementsCalcDueDate.MinVal = 0;
+			this.textStatementsCalcDueDate.Name = "textStatementsCalcDueDate";
+			this.textStatementsCalcDueDate.Size = new System.Drawing.Size(60, 20);
+			this.textStatementsCalcDueDate.TabIndex = 205;
+			this.textStatementsCalcDueDate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// textPayPlansBillInAdvanceDays
+			// 
+			this.textPayPlansBillInAdvanceDays.Location = new System.Drawing.Point(343, 162);
+			this.textPayPlansBillInAdvanceDays.MaxVal = 255;
+			this.textPayPlansBillInAdvanceDays.MinVal = 0;
+			this.textPayPlansBillInAdvanceDays.Name = "textPayPlansBillInAdvanceDays";
+			this.textPayPlansBillInAdvanceDays.Size = new System.Drawing.Size(60, 20);
+			this.textPayPlansBillInAdvanceDays.TabIndex = 210;
+			this.textPayPlansBillInAdvanceDays.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// butCancel
 			// 
@@ -1696,17 +1729,6 @@ namespace OpenDental{
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// checkPromptAutoSplit
-			// 
-			this.checkPromptAutoSplit.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPromptAutoSplit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPromptAutoSplit.Location = new System.Drawing.Point(44, 282);
-			this.checkPromptAutoSplit.Name = "checkPromptAutoSplit";
-			this.checkPromptAutoSplit.Size = new System.Drawing.Size(396, 17);
-			this.checkPromptAutoSplit.TabIndex = 206;
-			this.checkPromptAutoSplit.Text = "Prompt for autosplits on Payments";
-			this.checkPromptAutoSplit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -1883,13 +1905,14 @@ namespace OpenDental{
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
 			checkStatementsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
 			checkPromptAutoSplit.Checked=PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit);
+			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
 			textTreatNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
 			checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
 			checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
-			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized); if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 				checkTreatPlanShowGraphics.Visible=false;
 				checkTreatPlanShowCompleted.Visible=false;
 			}
@@ -2176,81 +2199,97 @@ namespace OpenDental{
 				MsgBox.Show(this,"Days until medication order stop date cannot be a negative number.");
 				return;
 			}
-			if( Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)
+			if(
+				#region Appointment Module
+				Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled,checkAppointmentBubblesDisabled.Checked)
+				| Prefs.UpdateBool(PrefName.ApptBubbleDelay,checkApptBubbleDelay.Checked)
+				| Prefs.UpdateBool(PrefName.SolidBlockouts,checkSolidBlockouts.Checked)
+				| Prefs.UpdateBool(PrefName.BrokenApptCommLogNotAdjustment,checkBrokenApptNote.Checked)
+				| Prefs.UpdateBool(PrefName.BrokenApptCommLogWithProcedure,checkBrokenApptCommLogWithProcedure.Checked)
+				| Prefs.UpdateLong(PrefName.BrokenAppointmentAdjustmentType,listPosAdjTypes[comboBrokenApptAdjType.SelectedIndex].DefNum)
+				| Prefs.UpdateBool(PrefName.ApptExclamationShowForUnsentIns,checkApptExclamation.Checked)
+				| Prefs.UpdateBool(PrefName.ApptModuleRefreshesEveryMinute,checkApptRefreshEveryMinute.Checked)
+				| Prefs.UpdateInt(PrefName.AppointmentSearchBehavior,comboSearchBehavior.SelectedIndex)
+				| Prefs.UpdateBool(PrefName.AppointmentTimeIsLocked,checkAppointmentTimeIsLocked.Checked)
+				| Prefs.UpdateInt(PrefName.AppointmentBubblesNoteLength,noteLength)
+				| Prefs.UpdateBool(PrefName.WaitingRoomFilterByView,checkWaitingRoomFilterByView.Checked)
+				| Prefs.UpdateInt(PrefName.WaitingRoomAlertTime,waitingRoomAlertTime)
+				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
+				#endregion
+				#region Family Module
+				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
+				| Prefs.UpdateBool(PrefName.InsurancePlansShared,checkInsurancePlansShared.Checked)
+				| Prefs.UpdateBool(PrefName.InsDefaultPPOpercent,checkPPOpercentage.Checked)
+				| Prefs.UpdateBool(PrefName.AllowedFeeSchedsAutomate,checkAllowedFeeSchedsAutomate.Checked)
+				| Prefs.UpdateBool(PrefName.CoPay_FeeSchedule_BlankLikeZero,checkCoPayFeeScheduleBlankLikeZero.Checked)
+				| Prefs.UpdateBool(PrefName.InsDefaultShowUCRonClaims,checkInsDefaultShowUCRonClaims.Checked)
+				| Prefs.UpdateBool(PrefName.InsDefaultAssignBen,checkInsDefaultAssignmentOfBenefits.Checked)
+				| Prefs.UpdateInt(PrefName.InsDefaultCobRule,comboCobRule.SelectedIndex)
+				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
+				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
+				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
+				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
+				#endregion
+				#region Account Module
+				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)
+				| Prefs.UpdateBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily,checkAgingMonthly.Checked)
+				| Prefs.UpdateBool(PrefName.StoreCCnumbers,checkStoreCCnumbers.Checked)
+				| Prefs.UpdateBool(PrefName.StoreCCtokens,checkStoreCCTokens.Checked)
+				| Prefs.UpdateLong(PrefName.FinanceChargeAdjustmentType,listPosAdjTypes[comboFinanceChargeAdjType.SelectedIndex].DefNum)
+				| Prefs.UpdateLong(PrefName.BillingChargeAdjustmentType,listPosAdjTypes[comboBillingChargeAdjType.SelectedIndex].DefNum)
+				| Prefs.UpdateBool(PrefName.ProviderIncomeTransferShows,checkProviderIncomeShows.Checked)
+				| Prefs.UpdateBool(PrefName.ShowAccountFamilyCommEntries,checkShowFamilyCommByDefault.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimFormTreatDentSaysSigOnFile,checkClaimFormTreatDentSaysSigOnFile.Checked)
+				| Prefs.UpdateString(PrefName.ClaimAttachExportPath,textClaimAttachPath.Text)
+				| Prefs.UpdateBool(PrefName.EclaimsSeparateTreatProv,checkEclaimsSeparateTreatProv.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimsValidateACN,checkClaimsValidateACN.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical,checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked)
+				| Prefs.UpdateBool(PrefName.AccountShowPaymentNums,checkAccountShowPaymentNums.Checked)
+				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
+				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
+				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
+				#endregion
+				#region TP Module
+				| Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)
 				| Prefs.UpdateBool(PrefName.TreatPlanShowGraphics,checkTreatPlanShowGraphics.Checked)
 				| Prefs.UpdateBool(PrefName.TreatPlanShowCompleted,checkTreatPlanShowCompleted.Checked)
+				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,listNegAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
+				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
+				#endregion
+				#region Chart Module
+				| Prefs.UpdateBool(PrefName.AutoResetTPEntryStatus,checkAutoClearEntryStatus.Checked)
+				| Prefs.UpdateBool(PrefName.AllowSettingProcsComplete,checkAllowSettingProcsComplete.Checked)
+				| Prefs.UpdateLong(PrefName.UseInternationalToothNumbers,comboToothNomenclature.SelectedIndex)
+				| Prefs.UpdateBool(PrefName.ProcGroupNoteDoesAggregate,checkProcGroupNoteDoesAggregate.Checked)
+				| Prefs.UpdateBool(PrefName.MedicalFeeUsedForNewProcs,checkMedicalFeeUsedForNewProcs.Checked)
+				| Prefs.UpdateByte(PrefName.DxIcdVersion,(byte)(checkDxIcdVersion.Checked?10:9))
+				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
+				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
+				| Prefs.UpdateInt(PrefName.MedDefaultStopDays,daysStop)
+				| Prefs.UpdateBool(PrefName.UseProviderColorsInChart,checkProvColorChart.Checked)
+				//| Prefs.UpdateBool(PrefName.ToothChartMoveMenuToRight,checkToothChartMoveMenuToRight.Checked)
+				//| Prefs.UpdateBool(PrefName.ChartQuickAddHideAmalgam, checkChartQuickAddHideAmalgam.Checked) //Deprecated.
+				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
+				#endregion
+				#region Image Module
+				| Prefs.UpdateBool(PrefName.ImagesModuleTreeIsCollapsed,checkImagesModuleTreeIsCollapsed.Checked)
+				#endregion
+				#region Manage Module
+				| Prefs.UpdateBool(PrefName.RxSendNewToQueue,checkRxSendNewToQueue.Checked)
+				| Prefs.UpdateInt(PrefName.TimeCardOvertimeFirstDayOfWeek,comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex)
+				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimsSendWindowValidatesOnLoad,checkClaimsSendWindowValidateOnLoad.Checked)
 				| Prefs.UpdateBool(PrefName.StatementShowReturnAddress,checkStatementShowReturnAddress.Checked)
 				| Prefs.UpdateBool(PrefName.StatementShowCreditCard,checkShowCC.Checked)
 				| Prefs.UpdateBool(PrefName.StatementShowNotes,checkStatementShowNotes.Checked)
 				| Prefs.UpdateBool(PrefName.StatementShowAdjNotes,checkStatementShowAdjNotes.Checked)
 				| Prefs.UpdateBool(PrefName.StatementShowProcBreakdown,checkStatementShowProcBreakdown.Checked)
 				| Prefs.UpdateBool(PrefName.StatementAccountsUseChartNumber,comboUseChartNum.SelectedIndex==1)
-				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)
 				| Prefs.UpdateLong(PrefName.PayPlansBillInAdvanceDays,PIn.Long(textPayPlansBillInAdvanceDays.Text))
-				| Prefs.UpdateBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily,checkAgingMonthly.Checked)
-				| Prefs.UpdateBool(PrefName.EclaimsSeparateTreatProv,checkEclaimsSeparateTreatProv.Checked)
-				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
-				| Prefs.UpdateLong(PrefName.UseInternationalToothNumbers, comboToothNomenclature.SelectedIndex)
-				| Prefs.UpdateBool(PrefName.InsurancePlansShared,checkInsurancePlansShared.Checked)
-				| Prefs.UpdateBool(PrefName.SolidBlockouts, checkSolidBlockouts.Checked)
-				| Prefs.UpdateBool(PrefName.StoreCCnumbers, checkStoreCCnumbers.Checked)
-				| Prefs.UpdateBool(PrefName.StoreCCtokens, checkStoreCCTokens.Checked)
-				| Prefs.UpdateBool(PrefName.BrokenApptCommLogNotAdjustment, checkBrokenApptNote.Checked)
-				| Prefs.UpdateBool(PrefName.BrokenApptCommLogWithProcedure,checkBrokenApptCommLogWithProcedure.Checked)
-				| Prefs.UpdateBool(PrefName.ApptBubbleDelay, checkApptBubbleDelay.Checked)
-				| Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled, checkAppointmentBubblesDisabled.Checked)
-				| Prefs.UpdateLong(PrefName.FinanceChargeAdjustmentType,listPosAdjTypes[comboFinanceChargeAdjType.SelectedIndex].DefNum)
-				| Prefs.UpdateLong(PrefName.BillingChargeAdjustmentType,listPosAdjTypes[comboBillingChargeAdjType.SelectedIndex].DefNum)
-				| Prefs.UpdateLong(PrefName.BrokenAppointmentAdjustmentType,listPosAdjTypes[comboBrokenApptAdjType.SelectedIndex].DefNum)
-				| Prefs.UpdateBool(PrefName.ApptExclamationShowForUnsentIns, checkApptExclamation.Checked)
-				| Prefs.UpdateBool(PrefName.ProviderIncomeTransferShows, checkProviderIncomeShows.Checked)
-				| Prefs.UpdateString(PrefName.ClaimAttachExportPath,textClaimAttachPath.Text)
-				| Prefs.UpdateBool(PrefName.AutoResetTPEntryStatus,checkAutoClearEntryStatus.Checked)
-				| Prefs.UpdateBool(PrefName.AllowSettingProcsComplete,checkAllowSettingProcsComplete.Checked)
-				| Prefs.UpdateBool(PrefName.ShowAccountFamilyCommEntries,checkShowFamilyCommByDefault.Checked)
-				| Prefs.UpdateBool(PrefName.InsDefaultPPOpercent,checkPPOpercentage.Checked)
-				| Prefs.UpdateBool(PrefName.ClaimFormTreatDentSaysSigOnFile,checkClaimFormTreatDentSaysSigOnFile.Checked)
-				| Prefs.UpdateBool(PrefName.ApptModuleRefreshesEveryMinute, checkApptRefreshEveryMinute.Checked)
-				//| Prefs.UpdateBool(PrefName.ChartQuickAddHideAmalgam, checkChartQuickAddHideAmalgam.Checked) //Deprecated.
-				| Prefs.UpdateBool(PrefName.AllowedFeeSchedsAutomate,checkAllowedFeeSchedsAutomate.Checked)
 				| Prefs.UpdateBool(PrefName.IntermingleFamilyDefault,checkIntermingleDefault.Checked)
-				| Prefs.UpdateBool(PrefName.CoPay_FeeSchedule_BlankLikeZero,checkCoPayFeeScheduleBlankLikeZero.Checked)
-				| Prefs.UpdateBool(PrefName.InsDefaultShowUCRonClaims,checkInsDefaultShowUCRonClaims.Checked)
-				| Prefs.UpdateBool(PrefName.InsDefaultAssignBen,checkInsDefaultAssignmentOfBenefits.Checked)
-				| Prefs.UpdateBool(PrefName.ClaimsValidateACN,checkClaimsValidateACN.Checked)
-				| Prefs.UpdateBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical,checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked)
-				| Prefs.UpdateBool(PrefName.AccountShowPaymentNums,checkAccountShowPaymentNums.Checked)
-				//| Prefs.UpdateBool(PrefName.ToothChartMoveMenuToRight,checkToothChartMoveMenuToRight.Checked)
-				| Prefs.UpdateBool(PrefName.ImagesModuleTreeIsCollapsed,checkImagesModuleTreeIsCollapsed.Checked)
-				| Prefs.UpdateBool(PrefName.RxSendNewToQueue,checkRxSendNewToQueue.Checked)
-				| Prefs.UpdateInt(PrefName.AppointmentSearchBehavior,comboSearchBehavior.SelectedIndex)
-				| Prefs.UpdateBool(PrefName.AppointmentTimeIsLocked,checkAppointmentTimeIsLocked.Checked)
-				| Prefs.UpdateBool(PrefName.ProcGroupNoteDoesAggregate,checkProcGroupNoteDoesAggregate.Checked)
-				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
-				| Prefs.UpdateInt(PrefName.InsDefaultCobRule,comboCobRule.SelectedIndex)
-				| Prefs.UpdateBool(PrefName.MedicalFeeUsedForNewProcs,checkMedicalFeeUsedForNewProcs.Checked)
-				| Prefs.UpdateBool(PrefName.UseProviderColorsInChart,checkProvColorChart.Checked)
-				| Prefs.UpdateByte(PrefName.DxIcdVersion,(byte)(checkDxIcdVersion.Checked?10:9))
-				| Prefs.UpdateString(PrefName.ICD9DefaultForNewProcs,textICD9DefaultForNewProcs.Text)
-				| Prefs.UpdateInt(PrefName.TimeCardOvertimeFirstDayOfWeek,comboTimeCardOvertimeFirstDayOfWeek.SelectedIndex)
-				| Prefs.UpdateBool(PrefName.TimeCardADPExportIncludesName,checkTimeCardADP.Checked)
-				| Prefs.UpdateBool(PrefName.ClaimsSendWindowValidatesOnLoad,checkClaimsSendWindowValidateOnLoad.Checked)
-				| Prefs.UpdateBool(PrefName.TextMsgOkStatusTreatAsNo,checkTextMsgOkStatusTreatAsNo.Checked)
-				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
-				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
-				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,listNegAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
-				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
-				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
-				| Prefs.UpdateBool(PrefName.WaitingRoomFilterByView,checkWaitingRoomFilterByView.Checked)
-				| Prefs.UpdateInt(PrefName.AppointmentBubblesNoteLength,noteLength)
-				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
-				| Prefs.UpdateInt(PrefName.WaitingRoomAlertTime,waitingRoomAlertTime)
-				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
 				| Prefs.UpdateInt(PrefName.BillingElectBatchMax,PIn.Int(textBillingElectBatchMax.Text))
-				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
-				| Prefs.UpdateInt(PrefName.MedDefaultStopDays,daysStop)
-				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
-				)
+				#endregion
+				)//end big if statement
 			{
 				_changed=true;
 			}
