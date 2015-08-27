@@ -339,9 +339,6 @@ namespace OpenDental{
 			procedure.MedicalCode=ProcedureCodes.GetProcCode(procedure.CodeNum).MedicalCode;
 			procedure.BaseUnits=ProcedureCodes.GetProcCode(procedure.CodeNum).BaseUnits;
 			procedure.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-			if(Prefs.IsODHQ()) {
-				procedure.BillingNote=ProcedureCodes.GetProcCode(repeatCharge.ProcCode).Descript+" charge for "+billingDate.ToString("MMMM yyyy")+".";
-			}
 			//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
 			if(repeatCharge.CopyNoteToProc && !string.IsNullOrEmpty(repeatCharge.Note)) {
 				procedure.BillingNote+="\r\n"+repeatCharge.Note;
