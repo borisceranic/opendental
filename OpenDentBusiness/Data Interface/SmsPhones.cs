@@ -108,6 +108,20 @@ namespace OpenDentBusiness{
 			Crud.SmsPhoneCrud.Update(smsPhone);
 		}
 
+		///<summary>This will only be called by HQ via the listener in the event that this number has been cancelled.</summary>
+		public static void UpdateToInactive(string phoneNumber) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),phoneNumber);
+				return;
+			}
+			SmsPhone smsPhone=GetByPhone(phoneNumber);
+			if(smsPhone==null) {
+				return;
+			}
+			smsPhone.DateTimeInactive=DateTime.Now;
+			Crud.SmsPhoneCrud.Update(smsPhone);
+		}
+
 		///<summary>Gets sms phones when not using clinics.</summary>
 		public static List<SmsPhone> GetForPractice() {
 			//No remoting role check, No call to database.
