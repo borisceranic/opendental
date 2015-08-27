@@ -1461,7 +1461,7 @@ namespace OpenDental {
 				_listPhones=SmsPhones.GetForPractice();
 			}
 			else {
-				_listPhones=SmsPhones.GetForClinics(_listClinics); //new List<Clinic> { _clinicCur });
+				_listPhones=SmsPhones.GetForClinics(_listClinics.Select(x=>x.ClinicNum).ToList()); //new List<Clinic> { _clinicCur });
 			}
 			gridSmsSummary.BeginUpdate();
 			gridSmsSummary.Columns.Clear();
@@ -1484,7 +1484,7 @@ namespace OpenDental {
 			col=new ODGridColumn(Lan.g(this,"Recieved\r\nCharges"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
 			gridSmsSummary.Rows.Clear();
-			DataTable usage=SmsPhones.GetSmsUsageLocal(_listPhones,dateTimePickerSms.Value);
+			DataTable usage=SmsPhones.GetSmsUsageLocal(PrefC.GetBool(PrefName.EasyNoClinics)?new List<long>{0}:_listClinics.Select(x => x.ClinicNum).ToList(),dateTimePickerSms.Value);
 			if(usage==null || usage.Rows.Count==0) {
 				gridSmsSummary.EndUpdate();
 				return;
