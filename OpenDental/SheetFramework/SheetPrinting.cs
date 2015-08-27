@@ -1363,7 +1363,12 @@ namespace OpenDental {
 					bmpOriginal=OpenDentBusiness.Properties.Resources.Patient_Info;
 				}
 				else if(File.Exists(filePathAndName)) {
-					bmpOriginal=new Bitmap(filePathAndName);
+					try {
+						bmpOriginal=new Bitmap(filePathAndName);
+					}
+					catch {
+						continue;//If the image is not an actual image file, leave the image field blank.
+					}
 				}
 				else {
 					continue;
