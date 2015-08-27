@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 		///<summary>Date and time this phone number became active.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeActive;
-		///<summary>Date and time this phone number became inactive.</summary>
+		///<summary>Date and time this phone number became inactive. Once inactive, the phone is dead and cannot be reactivated. A new number will have to be purchased.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeInactive;
 		///<summary>Used to indicate why this phone number was made inactive.</summary>
