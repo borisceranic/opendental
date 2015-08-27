@@ -6605,7 +6605,12 @@ namespace OpenDental{
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
+				if(Security.CurUser.ClinicIsRestricted) {
+					ClinicNum=Security.CurUser.ClinicNum;
+				}
+				else {
+					ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
+				}
 				RefreshMenuClinics();
 			}
 			SetModuleSelected();
