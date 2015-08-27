@@ -126,64 +126,62 @@ namespace OpenDentBusiness{
 		public static List<SmsPhone> GetForPractice() {
 			//No remoting role check, No call to database.
 			//Get for practice is just getting for clinic num 0
-			return GetForClinics(new List<Clinic>() { new Clinic() });//clinic num 0
+			return GetForClinics(new List<long>() { 0 });//clinic num 0
 		}
 
-		public static List<SmsPhone> GetForClinics(List<Clinic> listClinics) {
-			if(listClinics.Count==0){
+		public static List<SmsPhone> GetForClinics(List<long> listClinicNums) {
+			if(listClinicNums.Count==0) {
 				return new List<SmsPhone>();
 			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsPhone>>(MethodBase.GetCurrentMethod(),listClinics);
-			}
-			List<long> listClinicNums=new List<long>();
-			for(int i=0;i<listClinics.Count;i++) {
-				listClinicNums.Add(listClinics[i].ClinicNum);
+				return Meth.GetObject<List<SmsPhone>>(MethodBase.GetCurrentMethod(),listClinicNums);
 			}
 			string command= "SELECT * FROM smsphone WHERE ClinicNum IN ("+String.Join(",",listClinicNums)+")";
 			return Crud.SmsPhoneCrud.SelectMany(command);
 		}
 
-		///<summary>Returns data table containing usage for supplied phones for the given month.  
-		///Pass in all phones for a given clinic, or a single phone for individual usage.  Returns null if no valid phones supplied.</summary>
-		public static DataTable GetSmsUsageLocal(List<SmsPhone> phones, DateTime DateMonth) {
+		public static DataTable GetSmsUsageLocal(List<long> listClinicNums, DateTime dateMonth) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),phones,DateMonth);
+				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),listClinicNums,dateMonth);
 			}
 			#region Initialize retVal DataTable
-			//Dictionary contains Clinic Num and the first SmsPhone (the main phone) for each account. Should have been passed in.
-			Dictionary<long,SmsPhone> ClinicNumInitialPhoneDate=new Dictionary<long,SmsPhone>();
-			for(int i=0;i<phones.Count;i++) {
-				if(!ClinicNumInitialPhoneDate.ContainsKey(phones[i].ClinicNum)){
-					ClinicNumInitialPhoneDate.Add(phones[i].ClinicNum,phones[i]);
-				}
-				else if(ClinicNumInitialPhoneDate[phones[i].ClinicNum].DateTimeActive>phones[i].DateTimeActive){
-					ClinicNumInitialPhoneDate[phones[i].ClinicNum]=phones[i];
-				}
-			}
-			List<long> listPhoneNums=new List<long>();
-			foreach(SmsPhone phone in ClinicNumInitialPhoneDate.Values) {
-				listPhoneNums.Add(phone.SmsPhoneNum);
-			}
-			if(listPhoneNums.Count==0) {
-				return null;//no valid phone nums supplied.
-			}
-			DateTime dateStart=DateMonth.Date.AddDays(1-DateMonth.Day);//remove time portion and day of month portion. Remainder should be midnight of the first of the month
+			List<SmsPhone> listSmsPhones=GetForClinics(listClinicNums);
+			DateTime dateStart=dateMonth.Date.AddDays(1-dateMonth.Day);//remove time portion and day of month portion. Remainder should be midnight of the first of the month
 			DateTime dateEnd=dateStart.AddMonths(1);//This should be midnight of the first of the following month.
 			//This query builds the data table that will be filled from several other queries, instead of writing one large complex query.
 			//It is written this way so that the queries are simple to write and understand, and makes Oracle compatibility easier to maintain.
 			string command=@"SELECT 
-							  ClinicNum,
-							  PhoneNumber,
-							  CountryCode,
+							  0 ClinicNum,
+							  ' ' PhoneNumber,
+							  ' ' CountryCode,
 							  0 SentMonth,
 							  0.0 SentCharge,
 							  0 ReceivedMonth,
 							  0.0 ReceivedCharge 
 							FROM
-							  SmsPhone 
-							WHERE SmsPhoneNum IN ("+String.Join(",",listPhoneNums)+")";
-			DataTable retVal=Db.GetTable(command);
+							  DUAL";//this is a simple way to get a data table with the correct layout without having to query any real data.
+			DataTable retVal=Db.GetTable(command).Clone();//use .Clone() to get schema only, with no rows.
+			for(int i=0;i<listClinicNums.Count;i++) {
+				DataRow row=retVal.NewRow();
+				row["ClinicNum"]=listClinicNums[i];
+				row["PhoneNumber"]="No Active Phones";
+				SmsPhone firstActivePhone=listSmsPhones
+					.Where(x => x.ClinicNum==listClinicNums[i])//phones for this clinic
+					.Where(x => x.DateTimeInactive.Year<1880)//that are active
+					.FirstOrDefault(x => x.DateTimeActive==listSmsPhones//and have the smallest active date (the oldest/first phones activated)
+						.Where(y => y.ClinicNum==x.ClinicNum)
+						.Where(y => y.DateTimeInactive.Year<1880)
+						.Min(y => y.DateTimeActive));
+				if(firstActivePhone!=null) {
+					row["PhoneNumber"]=firstActivePhone.PhoneNumber;
+					row["CountryCode"]=firstActivePhone.CountryCode;
+				}
+				row["SentMonth"]=0;
+				row["SentCharge"]=0.0;
+				row["ReceivedMonth"]=0;
+				row["ReceivedCharge"]=0.0;
+				retVal.Rows.Add(row);
+			}
 			#endregion
 			#region Fill retVal DataTable
 			//Sent Last Month
