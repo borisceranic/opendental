@@ -84,7 +84,7 @@ namespace OpenDental
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private double ProcPaidHere;
-
+		private double _remainAmt;
 
 		///<summary></summary>
 		public FormPaySplitEdit(Family famCur){//PaySplit paySplitCur,Family famCur){
@@ -950,7 +950,7 @@ namespace OpenDental
 				textProcPaidHere.Text=ProcPaidHere.ToString("F");
 			}
 			//most of these are negative values, so add
-			double remain=
+			_remainAmt=
 				ProcFee
 				+ProcWriteoff
 				+ProcInsPaid
@@ -958,7 +958,7 @@ namespace OpenDental
 				+ProcAdj
 				+ProcPrevPaid
 				+ProcPaidHere;
-			labelProcRemain.Text=remain.ToString("c");
+			labelProcRemain.Text=_remainAmt.ToString("c");
 		}
 
 		private void textAmount_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -1057,6 +1057,11 @@ namespace OpenDental
 			if(amount==0) {
 				MsgBox.Show(this,"Please enter an amount");
 				return;
+			}
+			if(_remainAmt<0) {
+				if(!MsgBox.Show(this,true,"Warning: Remaining amount is negative.  Continue?")) {
+					return;
+				}
 			}
 			if(checkPayPlan.Checked && checkPatOtherFam.Checked){
 				MessageBox.Show(Lan.g(this,"You cannot split outside of the family for a payment plan.")+"  "
