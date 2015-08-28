@@ -133,6 +133,16 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		/// <summary>Returns a DataTable of adjustments of a given adjustment type and for a given pat</summary>
+		public static List<Adjustment> GetAdjustForPatByType(long patNum,long adjType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Adjustment>>(MethodBase.GetCurrentMethod(),patNum,adjType);
+			}
+			string queryBrokenApts="SELECT * FROM adjustment WHERE PatNum="+POut.Long(patNum)
+				+" AND AdjType="+POut.Long(adjType);
+			return Crud.AdjustmentCrud.SelectMany(queryBrokenApts);
+		}
+
 		///<summary>Used from ContrAccount and ProcEdit to display and calculate adjustments attached to procs.</summary>
 		public static double GetTotForProc(long procNum,Adjustment[] List) {
 			//No need to check RemotingRole; no call to db.

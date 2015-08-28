@@ -5143,6 +5143,24 @@ namespace OpenDental{
 							}
 						}
 						break;
+					case "Broken Appts":
+						row.Tag="Broken Appts";
+						int count=0;
+						DataTable table=DataSetMain.Tables["ProgNotes"];
+						if(ProcedureCodes.IsValidCode("D9986")) {
+							for(int i=0;i<table.Rows.Count;i++) {
+								Procedure proc=Procedures.GetOneProc(PIn.Long(table.Rows[i]["ProcNum"].ToString()),false);
+								ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
+								if(procCode.ProcCode=="D9986") {
+									count++;
+								}
+							}
+						}
+						else {
+							count=Adjustments.GetAdjustForPatByType(PatCur.PatNum,PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)).Count;
+						}
+						row.Cells.Add(count.ToString());
+						break;
 				}
 				if(fields[f].InternalName=="PatFields"
 					|| fields[f].InternalName=="Premedicate"
