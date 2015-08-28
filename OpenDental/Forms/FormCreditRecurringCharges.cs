@@ -35,6 +35,9 @@ namespace OpenDental {
 		}
 
 		private void FormRecurringCharges_Load(object sender,EventArgs e) {
+			if(!Prefs.IsODHQ()) {
+				checkHideBold.Visible=false;
+			}
 			if(Programs.IsEnabled(ProgramName.PayConnect)) {
 				_program=Programs.GetCur(ProgramName.PayConnect);
 			}
@@ -84,64 +87,100 @@ namespace OpenDental {
 			for(int i=table.Rows.Count-1;i>-1;i--) {//loop through backwards since we may remove rows if the charge amount is <=0 or patCur==null
 				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
 				Double rptChargeAmt;
+				//will be 0 if this is not a payplan row, if negative don't subtract from the FamBalTotal
+				Double payPlanDue=Math.Max(PIn.Double(table.Rows[i]["PayPlanDue"].ToString()),0);
 				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
 				string procedures=table.Rows[i]["Procedures"].ToString();
-				Patient patCur=Patients.GetPat(patNum);
-				if(patCur==null) {
-					table.Rows.RemoveAt(i);
-					continue;
-				}
 				if(Prefs.IsODHQ()) {//HQ calculates repeating charges based on the presence of procedures on the patient's account that are linked to the CC
 					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,patCur.BillingCycleDay);
+						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Int(table.Rows[i]["BillingCycleDay"].ToString()));
 					}
 					else {
 						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Date(table.Rows[i]["DateStart"].ToString()).Day);
 					}
-					if(table.Rows[i]["PayOrder"].ToString()=="2") {//Repeat charge is from a payment plan
-						famBalTotal+=rptChargeAmt;
-						rptChargeAmt+=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-					}
+					rptChargeAmt+=payPlanDue;//payPlanDue will be 0 if this is not a payplan row.  If negative amount due on payplan, payPlanDue is set to 0 above
 				}
-				else {//non-HQ calculates repeating charges by the ChargeAmt on the credit card
+				else {//non-HQ calculates repeating charges by the ChargeAmt on the credit card which is the sum of repeat charge and payplan payment amount
 					rptChargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
 				}
-				if(!dictFamBals.ContainsKey(patCur.Guarantor)) {
-					dictFamBals.Add(patCur.Guarantor,famBalTotal);
+				//the Total Bal column should display the famBalTotal plus payPlanDue on the attached payplan if there is one with a positive amount due
+				//if the payplan has a negative amount due, it is set to 0 above and does not subtract from famBalTotal
+				//if the account balance is negative, the Total Bal column should still display the entire amount due on the payplan (if >0)
+				//if the account balance is negative and there is no payplan, the Total Bal column will be the negative account balance
+				if(payPlanDue>0) {//if there is a payplan attached to this repeatcharge and a positive amount due
+					famBalTotal=Math.Max(famBalTotal,0)+payPlanDue;//if famBalTotal<0 then famBalTotal=0+payPlanDue, else famBalTotal=famBalTotal+payPlanDue
 				}
-				Double chargeAmt=Math.Min(dictFamBals[patCur.Guarantor],rptChargeAmt);//Charges the lesser of the family balance and the repeat charge amount
+				long guarNum=PIn.Long(table.Rows[i]["Guarantor"].ToString());
+				//if guarantor is already in the dict and this is a payplan charge row, add the payPlanDue to fambal so the patient is charged
+				if(dictFamBals.ContainsKey(guarNum) && payPlanDue>0) {
+					dictFamBals[guarNum]=Math.Max(dictFamBals[guarNum],0)+payPlanDue;//this way the payplan charge will be charged even if the fam bal is < 0
+				}
+				if(!dictFamBals.ContainsKey(guarNum)) {
+					dictFamBals.Add(guarNum,famBalTotal);
+				}
+				//Charge the lesser of famBalTotal (includes payPlanDue) and the repeat charge amount (includes payPlanDue)
+				Double chargeAmt=Math.Min(dictFamBals[guarNum],rptChargeAmt);
 				if(chargeAmt<=0) {
 					table.Rows.RemoveAt(i);
 					continue;
 				}
 				table.Rows[i]["ChargeAmt"]=chargeAmt;
 				table.Rows[i]["RepeatChargeAmt"]=rptChargeAmt;
-				dictFamBals[patCur.Guarantor]-=chargeAmt;//Decrease so the sum of repeating charges on all cards is not greater than the family balance
+				dictFamBals[guarNum]-=chargeAmt;//Decrease so the sum of repeating charges on all cards is not greater than the family balance
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableRecurring","PatNum"),110);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableRecurring","PatNum"),55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","Name"),270);
+			col=new ODGridColumn(Lan.g("TableRecurring","Name"),255);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","Total Bal"),100,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableRecurring","Family Bal"),90,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","RepeatingAmt"),100,HorizontalAlignment.Right);//RptChrgAmt
+			col=new ODGridColumn(Lan.g("TableRecurring","PayPlan Due"),90,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecurring","ChargeAmt"),100,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableRecurring","Total Due"),90,HorizontalAlignment.Right);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableRecurring","Repeating Amt"),100,HorizontalAlignment.Right);//RptChrgAmt
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableRecurring","Charge Amt"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
-				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());
+				Double famBalTotal=PIn.Double(table.Rows[i]["FamBalTotal"].ToString());//pat bal+payplan due, but if pat bal<0 and payplan due>0 then just payplan due
+				Double payPlanDue=PIn.Double(table.Rows[i]["PayPlanDue"].ToString());
 				Double chargeAmt=PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				Double rptChargeAmt=PIn.Double(table.Rows[i]["RepeatChargeAmt"].ToString());
+				Double rptChargeAmt=PIn.Double(table.Rows[i]["RepeatChargeAmt"].ToString());//includes repeat charge (from procs if ODHQ) and attached payplan
 				row.Cells.Add(table.Rows[i]["PatNum"].ToString());
 				row.Cells.Add(table.Rows[i]["PatName"].ToString());
 				row.Cells.Add(famBalTotal.ToString("c"));
+				if(payPlanDue!=0) {
+					row.Cells.Add(payPlanDue.ToString("c"));
+					//negative family balance does not subtract from payplan amount due and negative payplan amount due does not subtract from family balance due
+					row.Cells.Add((Math.Max(famBalTotal,0)+Math.Max(payPlanDue,0)).ToString("c"));
+				}
+				else {
+					row.Cells.Add("");
+					row.Cells.Add(famBalTotal.ToString("c"));
+				}
 				row.Cells.Add(rptChargeAmt.ToString("c"));
 				row.Cells.Add(chargeAmt.ToString("c"));
+				if(!checkHideBold.Checked) {
+					double diff=(Math.Max(famBalTotal,0)+Math.Max(payPlanDue,0))-rptChargeAmt;
+					if(diff.IsZero()) {
+						//don't bold anything
+					}
+					else if(diff>0) {
+						row.Cells[5].Bold=YN.Yes;//"Repeating Amt"
+						row.Cells[6].Bold=YN.Yes;//"Charge Amt"
+					}
+					else if(diff<0) {
+						row.Cells[4].Bold=YN.Yes;//"Total Due"
+						row.Cells[6].Bold=YN.Yes;//"Charge Amt"
+					}
+				}
+				row.Tag=PIn.Long(table.Rows[i]["CreditCardNum"].ToString());
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -225,9 +264,39 @@ namespace OpenDental {
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
+			List<long> listSelectedCCNums=new List<long>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedCCNums.Add((long)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
 			FillGrid();
 			labelCharged.Text=Lan.g(this,"Charged=")+"0";
 			labelFailed.Text=Lan.g(this,"Failed=")+"0";
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if(listSelectedCCNums.Contains((long)gridMain.Rows[i].Tag)) {
+					gridMain.SetSelected(i,true);
+				}
+			}
+			labelSelected.Text=Lan.g(this,"Selected=")+gridMain.SelectedIndices.Length.ToString();
+			Cursor=Cursors.Default;
+		}
+
+		private void checkHideBold_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
+			List<long> listSelectedCCNums=new List<long>();
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				listSelectedCCNums.Add((long)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			}
+			FillGrid();
+			labelCharged.Text=Lan.g(this,"Charged=")+"0";
+			labelFailed.Text=Lan.g(this,"Failed=")+"0";
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if(listSelectedCCNums.Contains((long)gridMain.Rows[i].Tag)) {
+					gridMain.SetSelected(i,true);
+				}
+			}
+			labelSelected.Text=Lan.g(this,"Selected=")+gridMain.SelectedIndices.Length.ToString();
+			Cursor=Cursors.Default;
 		}
 
 		private void butPrintList_Click(object sender,EventArgs e) {
@@ -430,6 +499,7 @@ namespace OpenDental {
 			strBuilderResultFile.AppendLine();
 			#region Card Charge Loop
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				bool isPayConnectToken=true;
 				string tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["PayConnectToken"].ToString();
 				if(tokenOrCCMasked!="" && CreditCards.IsDuplicatePayConnectToken(tokenOrCCMasked)) {
 					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
@@ -442,6 +512,7 @@ namespace OpenDental {
 				}
 				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["PayConnectTokenExp"].ToString());
 				if(tokenOrCCMasked=="") {
+					isPayConnectToken=false;
 					tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["CCNumberMasked"].ToString();
 					exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
 				}
@@ -449,9 +520,11 @@ namespace OpenDental {
 				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
 				//request a PayConnect token, if a token was already saved PayConnect will return the same token,
 				//otherwise replace CCNumberMasked with the returned token if the sale successful
+				Cursor=Cursors.WaitCursor;
 				PayConnectService.creditCardRequest payConnectRequest=PayConnect.BuildSaleRequest(amt,tokenOrCCMasked,exp.Year,exp.Month,
 					patCur.GetNameFLnoPref(),"",zip,null,PayConnectService.transType.SALE,"",true);
 				PayConnectService.transResponse payConnectResponse=PayConnect.ProcessCreditCard(payConnectRequest);
+				Cursor=Cursors.Default;
 				StringBuilder strBuilderResultText=new StringBuilder();//this payment's result text, used in payment note and then appended to file string builder
 				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+patCur.GetNameFLnoPref());
 				if(payConnectResponse==null) {
@@ -496,7 +569,12 @@ namespace OpenDental {
 				strBuilderResultText.AppendLine("ACCOUNT="+ccCur.CCNumberMasked);//XXXXXXXXXXXX1234, all but last four numbers of the token replaced with X's
 				strBuilderResultText.AppendLine("EXPIRATION="+payConnectResponse.PaymentToken.Expiration.month.ToString().PadLeft(2,'0')
 					+(payConnectResponse.PaymentToken.Expiration.year%100));
-				strBuilderResultText.AppendLine("CARD TYPE="+PayConnect.GetCardType(tokenOrCCMasked).ToString());
+				if(isPayConnectToken) {
+					strBuilderResultText.AppendLine("CARD TYPE=PayConnect Token");
+				}
+				else {
+					strBuilderResultText.AppendLine("CARD TYPE="+PayConnect.GetCardType(tokenOrCCMasked).ToString());
+				}
 				strBuilderResultText.AppendLine("AMOUNT="+payConnectRequest.Amount.ToString("F2"));
 				CreatePayment(patCur,i,strBuilderResultText.ToString());
 				strBuilderResultFile.AppendLine(strBuilderResultText.ToString());
@@ -504,11 +582,13 @@ namespace OpenDental {
 			#endregion Card Charge Loop
 			if(PrefC.GetBool(PrefName.AtoZfolderUsed)) {
 				try {
+					Cursor=Cursors.WaitCursor;
 					string payConnectResultDir=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"PayConnect");
 					if(!Directory.Exists(payConnectResultDir)) {
 						Directory.CreateDirectory(payConnectResultDir);
 					}
 					File.WriteAllText(ODFileUtils.CombinePaths(payConnectResultDir,"RecurringChargeResult.txt"),strBuilderResultFile.ToString());
+					Cursor=Cursors.Default;
 				}
 				catch { } //Do nothing cause this is just for internal use.
 			}
@@ -519,17 +599,25 @@ namespace OpenDental {
 		private void CreatePayment(Patient patCur,int indexCur,string note) {
 			Payment paymentCur=new Payment();
 			paymentCur.DateEntry=nowDateTime.Date;
-			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),
-				PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString()));
+			DateTime dateStart=PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString());
+			if(Prefs.IsODHQ() && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+				dateStart=new DateTime(dateStart.Year,dateStart.Month,PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
+			}
+			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);
 			paymentCur.PatNum=patCur.PatNum;
 			paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
 			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType"));
 			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
+			double payPlanDue=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanDue"].ToString());
 			paymentCur.PayNote=note;
 			paymentCur.IsRecurringCC=true;
 			Payments.Insert(paymentCur);
-			long provNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ProvNum"].ToString());//for payment plans only
-			if(provNum==0) {//Regular payments need to apply to the provider that the family owes the most money to.
+			long provNumPayPlan=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ProvNum"].ToString());//for payment plans only
+			//Regular payments need to apply to the provider that the family owes the most money to.
+			//Also get provNum for provider owed the most if the card is for a payplan and for other repeating charges and they will be charged for both
+			//the payplan and regular repeating charges
+			long provNumRegPmts=0;
+			if(provNumPayPlan==0 || paymentCur.PayAmt-payPlanDue>0) {//provNum==0 for cards not attached to a payplan.
 				DataTable dt=Patients.GetPaymentStartingBalances(patCur.Guarantor,paymentCur.PayNum);
 				double highestAmt=0;
 				for(int j=0;j<dt.Rows.Count;j++) {
@@ -538,7 +626,7 @@ namespace OpenDental {
 						continue;
 					}
 					highestAmt=afterIns;
-					provNum=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
+					provNumRegPmts=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
 				}
 			}
 			PaySplit split=new PaySplit();
@@ -547,10 +635,32 @@ namespace OpenDental {
 			split.PayNum=paymentCur.PayNum;
 			split.ProcDate=paymentCur.PayDate;
 			split.DatePay=paymentCur.PayDate;
-			split.ProvNum=provNum;
-			split.SplitAmt=paymentCur.PayAmt;
 			split.PayPlanNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanNum"].ToString());
+			if(split.PayPlanNum==0) {//this row is not for a payplan
+				split.SplitAmt=paymentCur.PayAmt;
+				paymentCur.PayAmt-=split.SplitAmt;
+				split.ProvNum=provNumRegPmts;
+				split.ClinicNum=patCur.ClinicNum;
+			}
+			else {//row includes a payplan amount due, could also include a regular repeating pay amount as part of the total charge amount
+				split.SplitAmt=payPlanDue;
+				paymentCur.PayAmt-=split.SplitAmt;//subtract the payplan pay amount from the total payment amount and create another split not attached to payplan
+				split.ProvNum=provNumPayPlan;
+			}
 			PaySplits.Insert(split);
+			//if the above split was for a payment plan and there is still some PayAmt left, insert another split not attached to the payplan
+			if(paymentCur.PayAmt>0) {
+				split=new PaySplit();
+				split.PatNum=paymentCur.PatNum;
+				split.ClinicNum=patCur.ClinicNum;
+				split.PayNum=paymentCur.PayNum;
+				split.ProcDate=paymentCur.PayDate;
+				split.DatePay=paymentCur.PayDate;
+				split.ProvNum=provNumRegPmts;
+				split.SplitAmt=paymentCur.PayAmt;
+				split.PayPlanNum=0;
+				PaySplits.Insert(split);
+			}
 			if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily)) {
 				Ledgers.ComputeAging(patCur.Guarantor,PrefC.GetDate(PrefName.DateLastAging),false);
 			}
