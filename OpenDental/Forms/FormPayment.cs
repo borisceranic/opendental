@@ -1824,6 +1824,7 @@ namespace OpenDental {
 			FormPSM.ShowDialog();
 			if(FormPSM.DialogResult==DialogResult.OK) {
 				SplitList=FormPSM.ListSplitsCur;
+				textAmount.Text=FormPSM.AmtTotal.ToString("F");
 			}
 			FillMain();
 		}
@@ -1887,7 +1888,7 @@ namespace OpenDental {
 					MessageBox.Show(Lan.g(this,"Please enter an amount."));
 					return;
 				}
-				if(PIn.Double(textAmount.Text)==0) {
+				if(PIn.Double(textAmount.Text)==0 && !PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit)) {
 					MessageBox.Show(Lan.g(this,"Amount must not be zero unless this is a transfer."));
 					return;
 				}
@@ -1989,6 +1990,7 @@ namespace OpenDental {
 					FormPSM.ListSplitsCur=new List<PaySplit>();
 					if(FormPSM.ShowDialog()==DialogResult.OK) {
 						SplitList=FormPSM.ListSplitsCur;
+						PaymentCur.PayAmt=FormPSM.AmtTotal;
 						if(SplitList.Count==0) {//If they clicked OK without any splits being added, add one split.
 							AddOneSplit();
 						}
