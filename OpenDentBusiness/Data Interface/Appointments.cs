@@ -190,7 +190,7 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectOne(command);
 		}
 
-		///<summary></summary>
+		///<summary>Gets an appointment (of any status) from the db with this NextAptNum (FK to the AptNum of a planned appt).</summary>
 		public static Appointment GetScheduledPlannedApt(long nextAptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Appointment>(MethodBase.GetCurrentMethod(),nextAptNum);
@@ -397,7 +397,6 @@ namespace OpenDentBusiness{
 			}
 			return false;
 		}
-
 
 		///<summary>Used in FormConfirmList.  The assumption is made that showRecall and showNonRecall will not both be false.</summary>
 		public static DataTable GetConfirmList(DateTime dateFrom,DateTime dateTo,long provNum,long clinicNum,bool showRecall,bool showNonRecall,bool showHygPresched) {
@@ -1856,8 +1855,13 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
-		//private static DataRow GetRowFromTable(
-		///<summary></summary>
+		///<summary>Deletes the apt and cleans up objects pointing to this apt.  If the patient is new, sets DateFirstVisit.
+		///Updates procedurelog.PlannedAptNum (for planned apts) or procedurelog.AptNum (for all other AptStatuses); sets to 0.
+		///Updates labcase.PlannedAptNum (for planned apts) or labcase.AptNum (for all other AptStatuses); sets to 0.
+		///Deletes any rows in the plannedappt table with this AptNum.
+		///Updates appointment.NextAptNum (for planned apts) of any apt pointing to this planned apt; sets to 0;
+		///Deletes any rows in the apptfield table with this AptNum.
+		///Makes an entry in the deletedobject table.</summary>
 		public static void Delete(long aptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),aptNum);
@@ -1869,8 +1873,8 @@ namespace OpenDentBusiness{
 			if(table.Rows.Count<1){
 				return;//Already deleted or did not exist.
 			}
-			Patient pat=Patients.GetPat(PIn.Long(table.Rows[0]["PatNum"].ToString()));
 			if(table.Rows[0]["IsNewPatient"].ToString()=="1") {
+				Patient pat=Patients.GetPat(PIn.Long(table.Rows[0]["PatNum"].ToString()));
 				Procedures.SetDateFirstVisit(DateTime.MinValue,3,pat);
 			}
 			//procs
@@ -1892,11 +1896,16 @@ namespace OpenDentBusiness{
 			//plannedappt
 			command="DELETE FROM plannedappt WHERE AptNum="+POut.Long(aptNum);
 			Db.NonQ(command);
-			//we will not reset item orders here
-			command="DELETE FROM appointment WHERE AptNum = "+POut.Long(aptNum);
-			Db.NonQ(command);
+			//if deleting a planned appt, make sure there are no appts with NextAptNum (which should be named PlannedAptNum) pointing to this appt
+			if(table.Rows[0]["AptStatus"].ToString()=="6") {//planned
+				command="UPDATE appointment SET NextAptNum=0 WHERE NextAptNum="+POut.Long(aptNum);
+				Db.NonQ(command);
+			}
 			//apptfield
 			command="DELETE FROM apptfield WHERE AptNum = "+POut.Long(aptNum);
+			Db.NonQ(command);
+			//we will not reset item orders here
+			command="DELETE FROM appointment WHERE AptNum = "+POut.Long(aptNum);
 			Db.NonQ(command);
 			DeletedObjects.SetDeleted(DeletedObjectType.Appointment,aptNum);
 		}
