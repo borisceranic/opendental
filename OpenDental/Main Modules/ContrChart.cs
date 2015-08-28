@@ -8281,7 +8281,7 @@ namespace OpenDental{
 			ModuleSelected(PatCur.PatNum);//if procs were added in appt, then this will display them
 		}
 
-		///<summary></summary>
+		///<summary>This is the listener for the Delete button.</summary>
 		private void butClear_Click(object sender, System.EventArgs e) {
 			if(gridPlanned.SelectedIndices.Length==0){
 				MsgBox.Show(this,"Please select an item first");
@@ -8465,25 +8465,26 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Updates database based on the values in tablePlannedAll.Rows.</summary>
+		///<summary>Updates database based on the values in _tablePlannedAll.Rows.</summary>
 		private void saveChangesToDBHelper() {
-			////Get all PlannedAppts from DB to check for changes.-----------------------------------------------------------------
-			List<PlannedAppt> listSupplyAllDB=PlannedAppts.Refresh(PatCur.PatNum);
-			//Itterate through current PlannedAppts list in memory-----------------------------------------------------------------
+			//Get all PlannedAppts from db to check for changes
+			List<PlannedAppt> listPlannedAllDB=PlannedAppts.Refresh(PatCur.PatNum);
+			//Itterate through current PlannedAppts list in memory and compare to db list
 			for(int i=0;i<_tablePlannedAll.Rows.Count;i++) {
-				//find DB version of PlannedAppt to pass to UpdateOrInsertIfNeeded
+				//find db version of PlannedAppt to update
 				PlannedAppt oldPlannedAppt=null;
 				PlannedAppt plannedAppt=null;
-				for(int j=0;j<listSupplyAllDB.Count;j++) {
-					if(PIn.Int(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString())!=listSupplyAllDB[j].PlannedApptNum) {
-						continue;//not the correct PlannedAppts
+				for(int j=0;j<listPlannedAllDB.Count;j++) {
+					if(PIn.Long(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString())!=listPlannedAllDB[j].PlannedApptNum) {
+						continue;//not the correct PlannedAppt
 					}
+					//found the correct PlannedAppt
 					oldPlannedAppt=PlannedAppts.GetOne(PIn.Long(_tablePlannedAll.Rows[i]["PlannedApptNum"].ToString()));
 					plannedAppt=oldPlannedAppt.Copy();
 					plannedAppt.ItemOrder=PIn.Int(_tablePlannedAll.Rows[i]["ItemOrder"].ToString());
 					break;//found match
 				}
-				if(plannedAppt==null) {
+				if(plannedAppt==null) {//should never happen, this would mean a planned appt in our local list doesn't exist in the db
 					continue;
 				}
 				PlannedAppts.Update(plannedAppt,oldPlannedAppt);
