@@ -2186,6 +2186,14 @@ namespace OpenDental{
 			
 		}
 
+		private void gridPatient_CellClick(object sender,ODGridClickEventArgs e) {
+			ODGridCell gridCellCur=gridPatient.Rows[e.Row].Cells[e.Col];
+			//Only grid cells with phone numbers are blue and underlined.
+			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+				DentalTek.PlaceCall(gridCellCur.Text);
+			}
+		}
+
 		private void listQuickAdd_MouseDown(object sender,System.Windows.Forms.MouseEventArgs e) {
 			if(comboProvNum.SelectedIndex==-1){
 				MsgBox.Show(this,"Please select a provider.");
@@ -3484,14 +3492,6 @@ namespace OpenDental{
 			}
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
-		}
-
-		private void gridPatient_CellClick(object sender,ODGridClickEventArgs e) {
-			ODGridCell gridCellCur=gridPatient.Rows[e.Row].Cells[e.Col];
-			//Only grid cells with phone numbers are blue and underlined.
-			if(gridCellCur.ColorText==System.Drawing.Color.Blue && gridCellCur.Underline==YN.Yes && Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-				DentalTek.PlaceCall(gridCellCur.Text);
-			}
 		}
 		
 
