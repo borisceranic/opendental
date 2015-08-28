@@ -2015,11 +2015,6 @@ namespace OpenDental {
 				}
 				else {//A new or existing payment with splits.
 					if(SplitList.Count==1//if one split
-						&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
-					{
-						SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match
-					}
-					if(SplitList.Count==1//if one split
 						&& PaymentCur.PayDate != SplitList[0].ProcDate
 						&& SplitList[0].ProcNum==0)//not attached to procedure
 					{
@@ -2027,7 +2022,7 @@ namespace OpenDental {
 							SplitList[0].ProcDate=PaymentCur.PayDate;
 						}
 					}
-					if(SplitList.Count!=1 && PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
+					if(PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
 						MsgBox.Show(this,"Split totals must equal payment amount.");
 						//work on reallocation schemes here later
 						return;
