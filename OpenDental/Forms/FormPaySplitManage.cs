@@ -15,9 +15,13 @@ namespace OpenDental {
 		private List<AccountEntry> _listAccountCharges;
 		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.  May be changed in this window.</summary>
 		public double PaymentAmt;
+		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.
+		///If this value is zero, it will be set to the summation of the split amounts when OK is clicked.</summary>
+		public double AmtTotal;
 		public Family FamCur;
 		public Patient PatCur;
-		///<summary>Payment from the Payment window, nothing gets modified in this form.</summary>
+		///<summary>Payment from the Payment window, amount gets modified only in the case that the original paymentAmt is zero.  It gets increased to
+		///whatever the paysplit total is when the window is closed.</summary>
 		public Payment PaymentCur;
 		public DateTime PayDate;
 		public bool IsNew;
@@ -36,6 +40,7 @@ namespace OpenDental {
 		public void Init(bool isTest) {
 			_listAccountCharges=new List<AccountEntry>();
 			textPayAmt.Text=PaymentAmt.ToString("f");
+			AmtTotal=PaymentAmt;
 			listPatNums=new List<long>();
 			for(int i=0;i<FamCur.ListPats.Length;i++) {
 				listPatNums.Add(FamCur.ListPats[i].PatNum);
@@ -416,7 +421,8 @@ namespace OpenDental {
 			return listAutoSplits;
 		}
 
-		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.  If payAmt=0, pay charge in full.</summary>
+		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.
+		///If payAmt==0, attempt to pay charge in full.</summary>
 		private void CreateSplit(AccountEntry charge,double payAmt) {
 			PaySplit split=new PaySplit();
 			split.DatePay=DateTime.Today;
@@ -435,7 +441,7 @@ namespace OpenDental {
 				//Do nothing, nothing to link.
 			}
 			double chargeAmt=charge.AmountEnd;
-			if(Math.Abs(chargeAmt)<Math.Abs(payAmt) || payAmt==0) {//Full payment of charge
+			if(Math.Abs(chargeAmt)<Math.Abs(payAmt) || PIn.Double(textPayAmt.Text)==0) {//Full payment of charge
 				split.SplitAmt=chargeAmt;
 				charge.AmountEnd=0;//Reflect payment in underlying datastructure
 			}
@@ -446,6 +452,7 @@ namespace OpenDental {
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
 				split.ClinicNum=charge.ClinicNum;
 			}
+			PaymentAmt-=split.SplitAmt;
 			split.ProvNum=charge.ProvNum;
 			split.PatNum=charge.PatNum;
 			split.ProcDate=charge.Date;
@@ -474,6 +481,7 @@ namespace OpenDental {
 					charge.ListPaySplits.Remove(paySplit);
 				}
 				ListSplitsCur.Remove(paySplit);
+				PaymentAmt+=paySplit.SplitAmt;
 			}
 			FillGridSplits();
 		}
@@ -594,7 +602,7 @@ namespace OpenDental {
 		private void butAddSplit_Click(object sender,EventArgs e) {
 			for(int i=0;i<gridCharges.SelectedIndices.Length;i++) {
 				AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
-				CreateSplit(charge,0);
+				CreateSplit(charge,PaymentAmt);
 			}
 			FillGridSplits();//Fills charge grid too.
 		}
@@ -638,7 +646,9 @@ namespace OpenDental {
 		private void butOK_Click(object sender,EventArgs e) {
 			double payAmt=PIn.Double(textPayAmt.Text);
 			double splitTotal=PIn.Double(textSplitTotal.Text);
-			if(payAmt-splitTotal!=0) {//Create an unallocated split if there is any remaining payment amount.
+			//Create an unallocated split if there is any remaining in the payment amount.
+			//Only create the unallocated payment if the sum of the splits is less than the whole payment amount.
+			if(Math.Abs(payAmt)>Math.Abs(splitTotal) && payAmt!=0) {
 				PaySplit split=new PaySplit();
 				split.SplitAmt=payAmt-splitTotal;
 				PaymentAmt=0;
@@ -654,6 +664,18 @@ namespace OpenDental {
 				MsgBox.Show(this,"Payment split total does not equal payment amount.  An unallocated payment split has been added, please check for correctness.");
 				FillGridSplits();
 				return;
+			}
+			else if(payAmt==0) {//If they have a payment amount of 0 set the payment's PayAmt to what the split total is.
+				AmtTotal=splitTotal;
+			}
+			else {
+				MsgBox.Show(this,"Payment amount cannot be less than the total split value.");
+				return;
+			}
+			for(int i=ListSplitsCur.Count-1;i>=0;i--) {
+				if(ListSplitsCur[i].SplitAmt==0) {
+					ListSplitsCur.RemoveAt(i);//We don't want any zero splits.  They were there just for display purposes.
+				}
 			}
 			DialogResult=DialogResult.OK;
 		}
