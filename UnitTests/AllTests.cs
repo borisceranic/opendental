@@ -2697,7 +2697,7 @@ namespace UnitTests {
 			if(FormPSM.ListSplitsCur.Count!=4) {
 				throw new Exception("PaySplitManager didn't create the correct number of paysplits. \r\n");
 			}
-			if(FormPSM.ListSplitsCur[0].SplitAmt!=30 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum || FormPSM.ListSplitsCur[0].PatNum!=patNum) {
+			if(FormPSM.ListSplitsCur[0].SplitAmt!=40 || FormPSM.ListSplitsCur[0].ProcNum!=procedure3.ProcNum || FormPSM.ListSplitsCur[0].PatNum!=patNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D0220 procedure attached to Pat1. \r\n");
 			}
 			if(FormPSM.ListSplitsCur[1].SplitAmt!=35 || FormPSM.ListSplitsCur[1].ProcNum!=procedure2.ProcNum || FormPSM.ListSplitsCur[1].PatNum!=patNum) {
@@ -2706,7 +2706,7 @@ namespace UnitTests {
 			if(FormPSM.ListSplitsCur[2].SplitAmt!=30 || FormPSM.ListSplitsCur[2].ProcNum!=procedure1.ProcNum || FormPSM.ListSplitsCur[2].PatNum!=patNum) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 30 for the D1110 procedure attached to Pat1. \r\n");
 			}
-			if(FormPSM.ListSplitsCur[3].SplitAmt!=55 || FormPSM.ListSplitsCur[3].ProcNum!=0) {
+			if(FormPSM.ListSplitsCur[3].SplitAmt!=45 || FormPSM.ListSplitsCur[3].ProcNum!=0) {
 				throw new Exception("PaySplitManager should have returned a PaySplit of 55 with no attached procedure. \r\n");
 			}
 			retVal+="48: Passed.  PaySplitManager created paysplits for procedures partially paid by claimprocs. \r\n";
