@@ -36,6 +36,7 @@ namespace OpenDental{
 			this.butSend = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butPrintList = new OpenDental.UI.Button();
+			this.checkHideBold = new System.Windows.Forms.CheckBox();
 			this.groupCounts.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -46,7 +47,7 @@ namespace OpenDental{
 			this.groupCounts.Controls.Add(this.labelCharged);
 			this.groupCounts.Controls.Add(this.labelSelected);
 			this.groupCounts.Controls.Add(this.labelTotal);
-			this.groupCounts.Location = new System.Drawing.Point(707, 196);
+			this.groupCounts.Location = new System.Drawing.Point(807, 196);
 			this.groupCounts.Name = "groupCounts";
 			this.groupCounts.Size = new System.Drawing.Size(96, 103);
 			this.groupCounts.TabIndex = 34;
@@ -127,7 +128,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(717, 12);
+			this.butRefresh.Location = new System.Drawing.Point(817, 12);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 24);
 			this.butRefresh.TabIndex = 40;
@@ -136,8 +137,9 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.AutoScroll = true;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
@@ -145,7 +147,7 @@ namespace OpenDental{
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(682, 474);
+			this.gridMain.Size = new System.Drawing.Size(782, 474);
 			this.gridMain.TabIndex = 29;
 			this.gridMain.Title = "Recurring Charges";
 			this.gridMain.TranslationName = "TableRecurring";
@@ -160,7 +162,7 @@ namespace OpenDental{
 			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(717, 462);
+			this.butSend.Location = new System.Drawing.Point(817, 462);
 			this.butSend.Name = "butSend";
 			this.butSend.Size = new System.Drawing.Size(75, 24);
 			this.butSend.TabIndex = 3;
@@ -175,7 +177,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(717, 498);
+			this.butCancel.Location = new System.Drawing.Point(817, 498);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -199,10 +201,23 @@ namespace OpenDental{
 			this.butPrintList.Text = "Print List";
 			this.butPrintList.Click += new System.EventHandler(this.butPrintList_Click);
 			// 
+			// checkHideBold
+			// 
+			this.checkHideBold.Checked = true;
+			this.checkHideBold.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkHideBold.Location = new System.Drawing.Point(821, 53);
+			this.checkHideBold.Name = "checkHideBold";
+			this.checkHideBold.Size = new System.Drawing.Size(91, 18);
+			this.checkHideBold.TabIndex = 44;
+			this.checkHideBold.Text = "Hide Bold";
+			this.checkHideBold.UseVisualStyleBackColor = true;
+			this.checkHideBold.Click += new System.EventHandler(this.checkHideBold_Click);
+			// 
 			// FormCreditRecurringCharges
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(815, 534);
+			this.ClientSize = new System.Drawing.Size(915, 534);
+			this.Controls.Add(this.checkHideBold);
 			this.Controls.Add(this.butPrintList);
 			this.Controls.Add(this.butNone);
 			this.Controls.Add(this.butAll);
@@ -213,6 +228,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.KeyPreview = true;
+			this.MinimumSize = new System.Drawing.Size(542, 416);
 			this.Name = "FormCreditRecurringCharges";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Credit Card Recurring Charges";
@@ -236,5 +252,6 @@ namespace OpenDental{
 		private UI.Button butNone;
 		private UI.Button butAll;
 		private UI.Button butPrintList;
+		private System.Windows.Forms.CheckBox checkHideBold;
 	}
 }
