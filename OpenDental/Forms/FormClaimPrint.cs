@@ -2027,9 +2027,10 @@ namespace OpenDental{
 						break;
 					case "ICDindicator"://For the 1500_02_12 claim form.
 						byte icdVersion=0;
-						if(ListClaimProcs.Count>0) {
-							proc=Procedures.GetProcFromList(ListProc,ListClaimProcs[0].ProcNum);
-							icdVersion=proc.IcdVersion;
+						List<byte> listDxVersions=new List<byte>();
+						Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(ListClaimProcs),false,listDxVersions);
+						if(listDxVersions.Count>0) {
+							icdVersion=listDxVersions[0];
 						}
 						if(icdVersion==9) {
 							displayStrings[i]="9";
@@ -2040,9 +2041,10 @@ namespace OpenDental{
 						break;
 					case "ICDindicatorAB"://For the ADA 2012 claim form.
 						icdVersion=0;
-						if(ListClaimProcs.Count>0) {
-							proc=Procedures.GetProcFromList(ListProc,ListClaimProcs[0].ProcNum);
-							icdVersion=proc.IcdVersion;
+						listDxVersions=new List<byte>();
+						Procedures.GetUniqueDiagnosticCodes(Procedures.GetProcsFromClaimProcs(ListClaimProcs),false,listDxVersions);
+						if(listDxVersions.Count>0) {
+							icdVersion=listDxVersions[0];
 						}
 						if(icdVersion==9) {
 							displayStrings[i]="B";
