@@ -237,9 +237,19 @@ namespace OpenDentBusiness {
 				thumbCoreFileName+"_"+size+thumbFileExt} );
 			//Use the existing thumbnail if it already exists and it was created after the last document modification.
 			if(File.Exists(thumbFileName)) {
-				DateTime thumbModifiedTime=File.GetLastWriteTime(thumbFileName);
-				if(thumbModifiedTime>doc.DateTStamp){
-					return (Bitmap)Bitmap.FromFile(thumbFileName);
+				try {
+					DateTime thumbModifiedTime=File.GetLastWriteTime(thumbFileName);
+					if(thumbModifiedTime>doc.DateTStamp) {
+						return (Bitmap)Bitmap.FromFile(thumbFileName);
+					}
+				}
+				catch(Exception) {
+					try {
+						File.Delete(thumbFileName); //File may be invalid, corrupted, or unavailable. This was a bug in previous versions.
+					}
+					catch(Exception) {
+						//we tried our bust, and it just wasn't good enough
+					}
 				}
 			}
 			//Add thumbnail
