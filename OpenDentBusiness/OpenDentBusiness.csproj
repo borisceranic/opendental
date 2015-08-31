@@ -292,6 +292,12 @@
     <Compile Include="Crud\InsSubCrud.cs" />
     <Compile Include="Crud\InstallmentPlanCrud.cs" />
     <Compile Include="Crud\InterventionCrud.cs" />
+    <Compile Include="Crud\JobControlCrud.cs" />
+    <Compile Include="Crud\JobCrud.cs" />
+    <Compile Include="Crud\JobEventCrud.cs" />
+    <Compile Include="Crud\JobLinkCrud.cs" />
+    <Compile Include="Crud\JobProjectCrud.cs" />
+    <Compile Include="Crud\JobReviewCrud.cs" />
     <Compile Include="Crud\JournalEntryCrud.cs" />
     <Compile Include="Crud\LabCaseCrud.cs" />
     <Compile Include="Crud\LaboratoryCrud.cs" />
@@ -514,6 +520,18 @@
     <Compile Include="Data Interface\SmsPhones.cs" />
     <Compile Include="Data Interface\TaskHists.cs" />
     <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
+    <Compile Include="InternalTools\Job Manager\JobControls.cs" />
+    <Compile Include="InternalTools\Job Manager\JobEvents.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobControl.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobEvent.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobLink.cs" />
+    <Compile Include="InternalTools\Job Manager\JobLinks.cs" />
+    <Compile Include="InternalTools\Job Manager\JobProjects.cs" />
+    <Compile Include="InternalTools\Job Manager\JobReviews.cs" />
+    <Compile Include="InternalTools\Job Manager\Jobs.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\Job.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobProject.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobReview.cs" />
     <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />
@@ -921,7 +939,7 @@
     <Compile Include="Plugins\PluginContainer.cs" />
     <Compile Include="Plugins\Plugins.cs" />
     <Compile Include="Reports\RpActivePatients.cs" />
-	<Compile Include="Reports\RpNewPatients.cs" />
+    <Compile Include="Reports\RpNewPatients.cs" />
     <Compile Include="Reports\RpPayPlan.cs" />
     <Compile Include="Reports\ReportsComplex.cs" />
     <Compile Include="Reports\RpPaySheet.cs" />
@@ -1363,6 +1381,7 @@
   <ItemGroup>
     <None Include="Web References\WebServiceMainHQ\WebServiceMainHQ.disco" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
