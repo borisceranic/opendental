@@ -5138,18 +5138,40 @@ namespace OpenDental {
 				Procedure procedureCur=new Procedure();
 				procedureCur.PatNum=pat.PatNum;
 				procedureCur.ProvNum=provNum;
-				procedureCur.ProcFee=0;
 				procedureCur.CodeNum=procCodeBrokenApt.CodeNum;
 				procedureCur.ProcDate=DateTime.Today;
 				procedureCur.DateEntryC=DateTime.Now;
 				procedureCur.ProcStatus=ProcStat.C;
 				procedureCur.ClinicNum=pat.ClinicNum;
 				procedureCur.Note=Lan.g(this,"Appt BROKEN for ")+apt.ProcDescript+"  "+apt.AptDateTime.ToString();
-				Procedures.Insert(procedureCur);
-				//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
 				List<InsSub> listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(pat.PatNum));
 				List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
 				List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+				InsPlan insPlanPrimary=null;
+				InsSub insSubPrimary=null;
+				if(listPatPlans.Count>0) {
+					insSubPrimary=InsSubs.GetSub(listPatPlans[0].InsSubNum,listInsSubs);
+					insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,listInsPlans);
+				}
+				double procFee;
+				long feeSch;
+				if(insPlanPrimary==null || procCodeBrokenApt.NoBillIns) {
+					feeSch=Fees.GetFeeSched(0,pat.FeeSched,procedureCur.ProvNum);
+				}
+				else {//Only take into account the patient's insurance fee schedule if the D9986 procedure is not marked as NoBillIns
+					feeSch=Fees.GetFeeSched(insPlanPrimary.FeeSched,pat.FeeSched,procedureCur.ProvNum);
+				}
+				procFee=Fees.GetAmount0(procedureCur.CodeNum,feeSch,procedureCur.ClinicNum,procedureCur.ProvNum);//Will be 0 if no fee schedule was found.
+				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !insPlanPrimary.IsMedical) {//PPO
+					double provFee=Fees.GetAmount0(procedureCur.CodeNum,Providers.GetProv(procedureCur.ProvNum).FeeSched,procedureCur.ClinicNum,
+						procedureCur.ProvNum);
+					procedureCur.ProcFee=Math.Max(provFee,procFee);
+				}
+				else {
+					procedureCur.ProcFee=procFee;
+				}
+				Procedures.Insert(procedureCur);
+				//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
 				List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 				List<ClaimProc> listClaimProcsForProc=ClaimProcs.RefreshForProc(procedureCur.ProcNum);
 				Procedures.ComputeEstimates(procedureCur,pat.PatNum,listClaimProcsForProc,false,listInsPlans,listPatPlans,listBenefits,pat.Age,listInsSubs);
