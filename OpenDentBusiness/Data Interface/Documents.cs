@@ -247,7 +247,7 @@ namespace OpenDentBusiness {
 					try {
 						File.Delete(thumbFileName); //File may be invalid, corrupted, or unavailable. This was a bug in previous versions.
 					}catch(Exception) {
-						//we tried our bust, and it just wasn't good enough
+						//we tried our best, and it just wasn't good enough
 					}
 				}
 			}
