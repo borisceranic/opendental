@@ -13,6 +13,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
 using System.Diagnostics;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -161,6 +162,8 @@ namespace OpenDental{
 		private TextBox textMotherMaidenLname;
 		private Label labelMotherMaidenLname;
 		private List<Guardian> GuardianList;
+		///<summary>If the user presses cancel, use this list to revert any changes to the guardians for all family members.</summary>
+		private List<Guardian> _listGuardiansForFamOld;
 		private Label labelDeceased;
 		private TextBox textDateDeceased;
 		private EhrPatient _ehrPatientCur;
@@ -2061,6 +2064,7 @@ namespace OpenDental{
 				case PatientPosition.Widowed : listPosition.SelectedIndex=3; break;
 				case PatientPosition.Divorced : listPosition.SelectedIndex=4; break;}
 			FillGuardians();
+			_listGuardiansForFamOld=FamCur.ListPats.SelectMany(x => Guardians.Refresh(x.PatNum)).ToList();
 			if(PatCur.Birthdate.Year < 1880)
 				textBirthdate.Text="";
 			else
@@ -2699,6 +2703,37 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary>Validates there is still a last name entered and updates the last, first, middle and preferred name of PatCur to what is currently
+		///typed in the text boxes.  May not match what is in the database.  Does not save the changes to the database so user can safely cancel and
+		///revert the changes.</summary>
+		private void UpdateLocalNameHelper() {
+			if(textLName.Text=="") {
+				MsgBox.Show(this,"Last Name must be entered.");
+				return;
+			}
+			PatCur.LName=textLName.Text;
+			PatCur.FName=textFName.Text;
+			PatCur.MiddleI=textMiddleI.Text;
+			PatCur.Preferred=textPreferred.Text;
+			for(int i=0;i<FamCur.ListPats.Length;i++) {//update the Family object as well
+				if(FamCur.ListPats[i].PatNum==PatCur.PatNum) {
+					FamCur.ListPats[i]=PatCur.Copy();
+					break;
+				}
+			}
+			if(PatCur.ResponsParty==PatCur.PatNum) {
+				textResponsParty.Text=PatCur.GetNameLF();
+			}
+			for(int i=0;i<GuardianList.Count;i++) {
+				if(GuardianList[i].PatNumGuardian==PatCur.PatNum) {
+					listRelationships.Items[i]=Patients.GetNameFirst(PatCur.FName,PatCur.Preferred)+" "
+						+Guardians.GetGuardianRelationshipStr(GuardianList[i].Relationship);
+					//don't break out of loop since it is possible to add multiple relationships with this patient as the PatNumGuardian
+					//break;
+				}
+			}
+		}
+
 		#region Public Health
 		
 		private void textCounty_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e) {
@@ -2903,13 +2938,20 @@ namespace OpenDental{
 		}
 
 		private void butPickResponsParty_Click(object sender,EventArgs e) {
+			UpdateLocalNameHelper();
 			FormFamilyMemberSelect FormF=new FormFamilyMemberSelect(FamCur);
 			FormF.ShowDialog();
 			if(FormF.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			PatCur.ResponsParty=FormF.SelectedPatNum;
-			textResponsParty.Text=Patients.GetLim(PatCur.ResponsParty).GetNameLF();
+			//saves a call to the db if this pat's responsible party is self and name in db could be different than local PatCur name
+			if(PatCur.PatNum==PatCur.ResponsParty) {
+				textResponsParty.Text=PatCur.GetNameLF();
+			}
+			else {
+				textResponsParty.Text=Patients.GetLim(PatCur.ResponsParty).GetNameLF();
+			}
 		}
 
 		private void butClearResponsParty_Click(object sender,EventArgs e) {
@@ -3035,6 +3077,7 @@ namespace OpenDental{
 			if(listRelationships.SelectedIndex==-1) {
 				return;
 			}
+			UpdateLocalNameHelper();
 			FormGuardianEdit formG=new FormGuardianEdit(GuardianList[listRelationships.SelectedIndex],FamCur);
 			if(formG.ShowDialog()==DialogResult.OK) {
 				FillGuardians();
@@ -3042,6 +3085,7 @@ namespace OpenDental{
 		}
 
 		private void butAddGuardian_Click(object sender,EventArgs e) {
+			UpdateLocalNameHelper();
 			Guardian guardian=new Guardian();
 			guardian.IsNew=true;
 			guardian.PatNumChild=PatCur.PatNum;
@@ -3057,7 +3101,8 @@ namespace OpenDental{
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Replace existing relationships with default relationships for entire family?")) {
 					return;
 				}
-				Guardians.DeleteForFamily(PatCur.Guarantor);
+				//don't delete existing guardians for family until we are certain we can replace them with the defaults
+				//Guardians.DeleteForFamily(PatCur.Guarantor);
 			}
 			List<Patient> listAdults=new List<Patient>();
 			List<Patient> listChildren=new List<Patient>();
@@ -3092,16 +3137,20 @@ namespace OpenDental{
 				//Do not do anything for the other genders.
 			}
 			if(listAdults.Count<1) {
-				MsgBox.Show(this,"No adults found.");
+				MsgBox.Show(this,"No adults found.\r\nFamily relationships will not be changed.");
 				return;
 			}
 			if(listChildren.Count<1) {
-				MsgBox.Show(this,"No children found.");
+				MsgBox.Show(this,"No children found.\r\nFamily relationships will not be changed.");
 				return;
 			}
 			if(eldestFemaleAdult==null && eldestMaleAdult==null) {
-				MsgBox.Show(this,"No male or female adults found.");
+				MsgBox.Show(this,"No male or female adults found.\r\nFamily relationships will not be changed.");
 				return;
+			}
+			if(Guardians.ExistForFamily(PatCur.Guarantor)) {
+				//delete all guardians for the family, original family relationships are saved on load so this can be undone if the user presses cancel.
+				Guardians.DeleteForFamily(PatCur.Guarantor);
 			}
 			for(int i=0;i<listChildren.Count;i++) {
 				if(eldestFemaleAdult!=null) {
@@ -3612,6 +3661,8 @@ namespace OpenDental{
 				//}
 				Patients.Delete(PatCur);
 			}
+			//revert any changes to the guardian list for all family members
+			Guardians.Sync(_listGuardiansForFamOld,FamCur.ListPats.Select(x => x.PatNum).ToList());
 		}
 
 

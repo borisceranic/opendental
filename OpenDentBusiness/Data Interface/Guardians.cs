@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -97,6 +98,16 @@ namespace OpenDentBusiness{
 				case GuardianRelationship.Stepmother: return "(sm)";
 			}
 			return "";
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in the list of family PatNums.</summary>
+		public static void Sync(List<Guardian> listNew,List<long> listFamPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listFamPatNums);//never pass DB list through the web service
+				return;
+			}
+			List<Guardian> listDB=listFamPatNums.SelectMany(x => Guardians.Refresh(x)).ToList();
+			Crud.GuardianCrud.Sync(listNew,listDB);
 		}
 
 		/*
