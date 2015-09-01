@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -1736,6 +1737,10 @@ namespace OpenDentBusiness {
 			DataTable rawAmort;
 			long payPlanNum;
 			for(int i=0;i<rawPayPlan.Rows.Count;i++){//loop through the payment plans (usually zero or one)
+				//Do not include a payment plan in the payment plan grid if the guarantor is from another family
+				if(!fam.ListPats.Select(x => x.PatNum).ToList().Contains(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()))) {
+					continue;
+				}
 				princ=PIn.Decimal(rawPayPlan.Rows[i]["principal_"].ToString());
 				bal=princ;
 				for(int p=0;p<rawPay.Rows.Count;p++){
