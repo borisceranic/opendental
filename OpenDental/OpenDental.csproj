@@ -415,6 +415,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormProcBroken.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormProcBroken.designer.cs">
+      <DependentUpon>FormProcBroken.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormDefaultCCProcs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -433,7 +439,7 @@
     <Compile Include="Forms\FormEtrans835PickEra.designer.cs">
       <DependentUpon>FormEtrans835PickEra.cs</DependentUpon>
     </Compile>
-	<Compile Include="Forms\FormInsRemain.cs">
+    <Compile Include="Forms\FormInsRemain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormInsRemain.designer.cs">
@@ -3755,6 +3761,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormProcBroken.resx">
+      <DependentUpon>FormProcBroken.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefaultCCProcs.resx">
       <DependentUpon>FormDefaultCCProcs.cs</DependentUpon>

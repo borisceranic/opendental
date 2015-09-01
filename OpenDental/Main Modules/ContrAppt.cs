@@ -5142,7 +5142,8 @@ namespace OpenDental {
 				procedureCur.ProcDate=DateTime.Today;
 				procedureCur.DateEntryC=DateTime.Now;
 				procedureCur.ProcStatus=ProcStat.C;
-				procedureCur.ClinicNum=pat.ClinicNum;
+				procedureCur.ClinicNum=apt.ClinicNum;
+				procedureCur.UserNum=Security.CurUser.UserNum;
 				procedureCur.Note=Lan.g(this,"Appt BROKEN for ")+apt.ProcDescript+"  "+apt.AptDateTime.ToString();
 				List<InsSub> listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(pat.PatNum));
 				List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
@@ -5175,9 +5176,9 @@ namespace OpenDental {
 				List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 				List<ClaimProc> listClaimProcsForProc=ClaimProcs.RefreshForProc(procedureCur.ProcNum);
 				Procedures.ComputeEstimates(procedureCur,pat.PatNum,listClaimProcsForProc,false,listInsPlans,listPatPlans,listBenefits,pat.Age,listInsSubs);
-				FormProcEdit formP=new FormProcEdit(procedureCur,pat,Patients.GetFamily(pat.PatNum));
-				formP.IsNew=false;
-				formP.ShowDialog();
+				FormProcBroken FormPB=new FormProcBroken(procedureCur);
+				FormPB.IsNew=true;
+				FormPB.ShowDialog();
 				if(PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure)) {
 					Commlog CommlogCur=new Commlog();
 					CommlogCur.PatNum=pat.PatNum;
