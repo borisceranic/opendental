@@ -8384,6 +8384,18 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.2.16.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_2_20();
+		}
+
+		///<summary></summary>
+		private static void To15_2_20() {
+			if(FromVersion<new Version("15.2.20.0")) {
+				string command="";
+				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.2.20.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_3_1();
 		}
 
@@ -9585,6 +9597,17 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.13.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_12();
+		}
+
+		private static void To15_3_12() {
+			if(FromVersion<new Version("15.3.12.0")) {
+				string command="";
+				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.3.12.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 
@@ -10149,6 +10172,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE emailtemplate SET Description=emailtemplate.Subject";//Oracle compatible.
+				Db.NonQ(command);
+				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
 
 
