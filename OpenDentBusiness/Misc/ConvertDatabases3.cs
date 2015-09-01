@@ -8341,6 +8341,18 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.2.16.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_2_20();
+		}
+
+		///<summary></summary>
+		private static void To15_2_20() {
+			if(FromVersion<new Version("15.2.20.0")) {
+				string command="";
+				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.2.20.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_3_1();
 		}
 
@@ -9536,10 +9548,12 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsWriteoffDescript','')";
 					Db.NonQ(command);
 				}
+				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
+				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.3.13.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To15_3_14();
+			//To15_3_X();
 		}
 		
 
