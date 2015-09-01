@@ -10147,6 +10147,18 @@ namespace OpenDentBusiness {
 						Db.NonQ32(command);
 					}
 				}
+				command="SELECT ItemColor FROM definition WHERE Category=0 AND ItemName='Adjustment'";//Category 0 is account defs.
+				string adjAccountItemColor=Db.GetScalar(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition(ItemName,Category,ItemOrder,ItemColor) "
+						+"VALUES('Broken Appointment Procedure',0,10,"+POut.String(adjAccountItemColor)+")";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO definition(DefNum,ItemName,Category,ItemOrder,ItemColor) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),'Broken Appointment Procedure',0,10,"+POut.String(adjAccountItemColor)+")";
+					Db.NonQ(command);
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE emailmessage ADD CcAddress text NOT NULL";
 					Db.NonQ(command);
@@ -10175,6 +10187,9 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
+
+
+
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
