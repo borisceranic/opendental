@@ -10140,6 +10140,16 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE emailmessage ADD BccAddress clob";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE emailtemplate ADD Description text NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE emailtemplate ADD Description varchar2";
+					Db.NonQ(command);
+				}
+				command="UPDATE emailtemplate SET Description=emailtemplate.Subject";//Oracle compatible.
+				Db.NonQ(command);
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

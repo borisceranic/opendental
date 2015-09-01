@@ -49,6 +49,7 @@ namespace OpenDentBusiness.Crud{
 				emailTemplate.EmailTemplateNum= PIn.Long  (table.Rows[i]["EmailTemplateNum"].ToString());
 				emailTemplate.Subject         = PIn.String(table.Rows[i]["Subject"].ToString());
 				emailTemplate.BodyText        = PIn.String(table.Rows[i]["BodyText"].ToString());
+				emailTemplate.Description     = PIn.String(table.Rows[i]["Description"].ToString());
 				retVal.Add(emailTemplate);
 			}
 			return retVal;
@@ -89,13 +90,14 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EmailTemplateNum,";
 			}
-			command+="Subject,BodyText) VALUES(";
+			command+="Subject,BodyText,Description) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(emailTemplate.EmailTemplateNum)+",";
 			}
 			command+=
 				 "'"+POut.String(emailTemplate.Subject)+"',"
-				+"'"+POut.String(emailTemplate.BodyText)+"')";
+				+"'"+POut.String(emailTemplate.BodyText)+"',"
+				+"'"+POut.String(emailTemplate.Description)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -128,13 +130,14 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EmailTemplateNum,";
 			}
-			command+="Subject,BodyText) VALUES(";
+			command+="Subject,BodyText,Description) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(emailTemplate.EmailTemplateNum)+",";
 			}
 			command+=
 				 "'"+POut.String(emailTemplate.Subject)+"',"
-				+"'"+POut.String(emailTemplate.BodyText)+"')";
+				+"'"+POut.String(emailTemplate.BodyText)+"',"
+				+"'"+POut.String(emailTemplate.Description)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -148,7 +151,8 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(EmailTemplate emailTemplate){
 			string command="UPDATE emailtemplate SET "
 				+"Subject         = '"+POut.String(emailTemplate.Subject)+"', "
-				+"BodyText        = '"+POut.String(emailTemplate.BodyText)+"' "
+				+"BodyText        = '"+POut.String(emailTemplate.BodyText)+"', "
+				+"Description     = '"+POut.String(emailTemplate.Description)+"' "
 				+"WHERE EmailTemplateNum = "+POut.Long(emailTemplate.EmailTemplateNum);
 			Db.NonQ(command);
 		}
@@ -163,6 +167,10 @@ namespace OpenDentBusiness.Crud{
 			if(emailTemplate.BodyText != oldEmailTemplate.BodyText) {
 				if(command!=""){ command+=",";}
 				command+="BodyText = '"+POut.String(emailTemplate.BodyText)+"'";
+			}
+			if(emailTemplate.Description != oldEmailTemplate.Description) {
+				if(command!=""){ command+=",";}
+				command+="Description = '"+POut.String(emailTemplate.Description)+"'";
 			}
 			if(command==""){
 				return false;

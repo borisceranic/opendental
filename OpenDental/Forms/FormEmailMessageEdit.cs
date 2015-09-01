@@ -433,7 +433,7 @@ namespace OpenDental{
 		private void FillTemplates() {
 			listTemplates.Items.Clear();
 			for(int i=0;i<EmailTemplates.List.Length;i++) {
-				listTemplates.Items.Add(EmailTemplates.List[i].Subject);
+				listTemplates.Items.Add(EmailTemplates.List[i].Description);
 			}
 		}
 

@@ -13,7 +13,9 @@ namespace OpenDentBusiness{
 		public string Subject;
 		///<summary>Body of the email</summary>
 		public string BodyText;
-
+		///<summary>Different than Subject.  The description of the email template.  This is what the user sees in the list.</summary>
+		public string Description;
+		
 		///<summary>Returns a copy of this EmailTemplate.</summary>
 		public EmailTemplate Copy(){
 			return (EmailTemplate)this.MemberwiseClone();

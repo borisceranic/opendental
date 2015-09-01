@@ -20,6 +20,9 @@ namespace OpenDental{
 		private OpenDental.ODtextBox textBodyText;
 		///<summary></summary>
 		public bool IsNew;
+		private Label label1;
+		private TextBox textDescription;
+		private Label label3;
 		///<summary></summary>
 		public EmailTemplate ETcur;
 
@@ -61,6 +64,9 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.textSubject = new System.Windows.Forms.TextBox();
 			this.textBodyText = new OpenDental.ODtextBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.textDescription = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -72,10 +78,10 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(755, 505);
+			this.butCancel.Location = new System.Drawing.Point(883, 656);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 25);
-			this.butCancel.TabIndex = 3;
+			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -87,46 +93,82 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(755, 472);
+			this.butOK.Location = new System.Drawing.Point(802, 656);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 25);
-			this.butOK.TabIndex = 2;
+			this.butOK.TabIndex = 4;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(7, 12);
+			this.label2.Location = new System.Drawing.Point(8, 33);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(88, 14);
-			this.label2.TabIndex = 3;
-			this.label2.Text = "Subject:";
+			this.label2.Size = new System.Drawing.Size(88, 20);
+			this.label2.TabIndex = 0;
+			this.label2.Text = "Subject";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSubject
 			// 
-			this.textSubject.Location = new System.Drawing.Point(99, 7);
+			this.textSubject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textSubject.Location = new System.Drawing.Point(97, 33);
 			this.textSubject.MaxLength = 200;
 			this.textSubject.Name = "textSubject";
-			this.textSubject.Size = new System.Drawing.Size(741, 20);
-			this.textSubject.TabIndex = 0;
+			this.textSubject.Size = new System.Drawing.Size(861, 20);
+			this.textSubject.TabIndex = 2;
 			// 
 			// textBodyText
 			// 
 			this.textBodyText.AcceptsTab = true;
+			this.textBodyText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBodyText.DetectUrls = false;
-			this.textBodyText.Location = new System.Drawing.Point(99, 32);
+			this.textBodyText.Location = new System.Drawing.Point(97, 54);
 			this.textBodyText.Name = "textBodyText";
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBodyText.Size = new System.Drawing.Size(741, 426);
-			this.textBodyText.TabIndex = 4;
+			this.textBodyText.Size = new System.Drawing.Size(861, 596);
+			this.textBodyText.TabIndex = 3;
 			this.textBodyText.Text = "";
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(8, 54);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(88, 20);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Body";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDescription
+			// 
+			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textDescription.Location = new System.Drawing.Point(97, 12);
+			this.textDescription.MaxLength = 200;
+			this.textDescription.Name = "textDescription";
+			this.textDescription.Size = new System.Drawing.Size(861, 20);
+			this.textDescription.TabIndex = 1;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(8, 12);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(88, 20);
+			this.label3.TabIndex = 0;
+			this.label3.Text = "Description";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormEmailTemplateEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(844, 544);
+			this.ClientSize = new System.Drawing.Size(974, 695);
+			this.Controls.Add(this.textDescription);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textBodyText);
 			this.Controls.Add(this.textSubject);
 			this.Controls.Add(this.label2);
@@ -135,6 +177,7 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(200, 200);
 			this.Name = "FormEmailTemplateEdit";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -149,15 +192,21 @@ namespace OpenDental{
 		private void FormEmailTemplateEdit_Load(object sender, System.EventArgs e) {
 			textSubject.Text=ETcur.Subject;
 			textBodyText.Text=ETcur.BodyText;
+			textDescription.Text=ETcur.Description;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textSubject.Text=="" && textBodyText.Text==""){
-				MessageBox.Show(Lan.g(this,"Both can not be left blank."));
+				MsgBox.Show(this,"Both the subject and body of the template cannot be left blank.");
+				return;
+			}
+			if(textDescription.Text==""){
+				MsgBox.Show(this,"Please enter a description.");
 				return;
 			}
 			ETcur.Subject=textSubject.Text;
 			ETcur.BodyText=textBodyText.Text;
+			ETcur.Description=textDescription.Text;
 			if(IsNew){
 				EmailTemplates.Insert(ETcur);
 			}
