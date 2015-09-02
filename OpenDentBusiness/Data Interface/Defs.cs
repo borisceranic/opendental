@@ -168,7 +168,11 @@ namespace OpenDentBusiness {
 					if(Db.GetCount(command)!="0") {
 						return true;
 					}
-					if(def.DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)) {
+					if(def.DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)
+						|| def.DefNum==PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)
+						|| def.DefNum==PrefC.GetLong(PrefName.BillingChargeAdjustmentType)
+						|| def.DefNum==PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)) 
+					{
 						return true;
 					}
 					break;

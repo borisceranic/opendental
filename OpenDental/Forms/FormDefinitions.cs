@@ -695,9 +695,12 @@ namespace OpenDental{
 				if(DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)
 					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)
 					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)
-					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) 
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.BillingChargeAdjustmentType)
+					|| DefsList[DefsSelected].DefNum==PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)) 
 				{
-					MsgBox.Show(this,"You cannot hide a definition if it is in use in Appointment preferences.");
+					MsgBox.Show(this,"You cannot hide a definition if it is in use within Module Preferences.");
 					return;
 				}
 				else {
