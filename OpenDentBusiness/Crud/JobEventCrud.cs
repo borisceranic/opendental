@@ -46,12 +46,12 @@ namespace OpenDentBusiness.Crud{
 			JobEvent jobEvent;
 			for(int i=0;i<table.Rows.Count;i++) {
 				jobEvent=new JobEvent();
-				jobEvent.JobEventNum    = PIn.Long  (table.Rows[i]["JobEventNum"].ToString());
-				jobEvent.JobNum         = PIn.Long  (table.Rows[i]["JobNum"].ToString());
-				jobEvent.Owner          = PIn.Long  (table.Rows[i]["Owner"].ToString());
-				jobEvent.DateTimeEntry  = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				jobEvent.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				jobEvent.JobReviewStatus= (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["JobReviewStatus"].ToString());
+				jobEvent.JobEventNum  = PIn.Long  (table.Rows[i]["JobEventNum"].ToString());
+				jobEvent.JobNum       = PIn.Long  (table.Rows[i]["JobNum"].ToString());
+				jobEvent.Owner        = PIn.Long  (table.Rows[i]["Owner"].ToString());
+				jobEvent.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
+				jobEvent.Description  = PIn.String(table.Rows[i]["Description"].ToString());
+				jobEvent.JobStatus    = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["JobStatus"].ToString());
 				retVal.Add(jobEvent);
 			}
 			return retVal;
@@ -92,7 +92,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,Owner,DateTimeEntry,Description,JobReviewStatus) VALUES(";
+			command+="JobNum,Owner,DateTimeEntry,Description,JobStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
@@ -101,7 +101,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (jobEvent.Owner)+","
 				+    DbHelper.Now()+","
 				+"'"+POut.String(jobEvent.Description)+"',"
-				+    POut.Int   ((int)jobEvent.JobReviewStatus)+")";
+				+    POut.Int   ((int)jobEvent.JobStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -134,7 +134,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,Owner,DateTimeEntry,Description,JobReviewStatus) VALUES(";
+			command+="JobNum,Owner,DateTimeEntry,Description,JobStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
@@ -143,7 +143,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (jobEvent.Owner)+","
 				+    DbHelper.Now()+","
 				+"'"+POut.String(jobEvent.Description)+"',"
-				+    POut.Int   ((int)jobEvent.JobReviewStatus)+")";
+				+    POut.Int   ((int)jobEvent.JobStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -156,11 +156,11 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one JobEvent in the database.</summary>
 		public static void Update(JobEvent jobEvent){
 			string command="UPDATE jobevent SET "
-				+"JobNum         =  "+POut.Long  (jobEvent.JobNum)+", "
-				+"Owner          =  "+POut.Long  (jobEvent.Owner)+", "
+				+"JobNum       =  "+POut.Long  (jobEvent.JobNum)+", "
+				+"Owner        =  "+POut.Long  (jobEvent.Owner)+", "
 				//DateTimeEntry not allowed to change
-				+"Description    = '"+POut.String(jobEvent.Description)+"', "
-				+"JobReviewStatus=  "+POut.Int   ((int)jobEvent.JobReviewStatus)+" "
+				+"Description  = '"+POut.String(jobEvent.Description)+"', "
+				+"JobStatus    =  "+POut.Int   ((int)jobEvent.JobStatus)+" "
 				+"WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
 			Db.NonQ(command);
 		}
@@ -181,9 +181,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(jobEvent.Description)+"'";
 			}
-			if(jobEvent.JobReviewStatus != oldJobEvent.JobReviewStatus) {
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
 				if(command!=""){ command+=",";}
-				command+="JobReviewStatus = "+POut.Int   ((int)jobEvent.JobReviewStatus)+"";
+				command+="JobStatus = "+POut.Int   ((int)jobEvent.JobStatus)+"";
 			}
 			if(command==""){
 				return false;

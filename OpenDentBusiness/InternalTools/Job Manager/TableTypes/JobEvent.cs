@@ -25,7 +25,7 @@ namespace OpenDentBusiness {
 		///<summary>Copy of the job description at the time of the event creation.</summary>
 		public string Description;
 		///<summary>The status of the referenced job.</summary>
-		public JobStatus JobReviewStatus;
+		public JobStatus JobStatus;
 
 		///<summary></summary>
 		public JobEvent Copy() {
@@ -82,7 +82,7 @@ namespace OpenDentBusiness {
 						Owner bigint NOT NULL,
 						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						Description varchar(255) NOT NULL,
-						JobReviewStatus tinyint NOT NULL,
+						JobStatus tinyint NOT NULL,
 						INDEX(JobNum),
 						INDEX(Owner)
 						) DEFAULT CHARSET=utf8";
@@ -97,7 +97,7 @@ namespace OpenDentBusiness {
 						Owner number(20) NOT NULL,
 						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						Description varchar2(255),
-						JobReviewStatus number(3) NOT NULL,
+						JobStatus number(3) NOT NULL,
 						CONSTRAINT jobevent_JobEventNum PRIMARY KEY (JobEventNum)
 						)";
 					Db.NonQ(command);
