@@ -42,10 +42,10 @@ namespace OpenDental {
 		private UI.Button butUDS;
 		private UI.Button butPatList;
 		private UI.Button butPatExport;
-		private GroupBox groupBox1;
-		private UI.ODPictureBox pictureDentalIntel;
-		private Label label7;
 		private ToolStripMenuItem setupToolStripMenuItem;
+		private GroupBox groupBox2;
+		private UI.ODPictureBox odPictureBox2;
+		private GroupBox groupBox1;
 		private UI.ODPictureBox picturePodium;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
@@ -87,10 +87,6 @@ namespace OpenDental {
 			this.labelArizonaPrimaryCare = new System.Windows.Forms.Label();
 			this.menuMain = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.picturePodium = new OpenDental.UI.ODPictureBox();
-			this.label7 = new System.Windows.Forms.Label();
-			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
 			this.butPatExport = new OpenDental.UI.Button();
 			this.butPatList = new OpenDental.UI.Button();
 			this.butGraphicReports = new OpenDental.UI.Button();
@@ -105,13 +101,18 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.odPictureBox2 = new OpenDental.UI.ODPictureBox();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.menuMain.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(312, 304);
+			this.label1.Location = new System.Drawing.Point(291, 304);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(118, 18);
 			this.label1.TabIndex = 2;
@@ -120,7 +121,7 @@ namespace OpenDental {
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(312, 66);
+			this.label2.Location = new System.Drawing.Point(291, 66);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(118, 18);
 			this.label2.TabIndex = 4;
@@ -166,7 +167,7 @@ namespace OpenDental {
 			// labelArizonaPrimaryCare
 			// 
 			this.labelArizonaPrimaryCare.AutoSize = true;
-			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(312, 364);
+			this.labelArizonaPrimaryCare.Location = new System.Drawing.Point(291, 364);
 			this.labelArizonaPrimaryCare.Name = "labelArizonaPrimaryCare";
 			this.labelArizonaPrimaryCare.Size = new System.Drawing.Size(104, 13);
 			this.labelArizonaPrimaryCare.TabIndex = 20;
@@ -189,49 +190,6 @@ namespace OpenDental {
 			this.setupToolStripMenuItem.Text = "Setup";
 			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
 			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.picturePodium);
-			this.groupBox1.Controls.Add(this.label7);
-			this.groupBox1.Controls.Add(this.pictureDentalIntel);
-			this.groupBox1.Location = new System.Drawing.Point(542, 182);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(114, 307);
-			this.groupBox1.TabIndex = 26;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Premium";
-			// 
-			// picturePodium
-			// 
-			this.picturePodium.HasBorder = false;
-			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
-			this.picturePodium.Location = new System.Drawing.Point(9, 51);
-			this.picturePodium.Name = "picturePodium";
-			this.picturePodium.Size = new System.Drawing.Size(95, 24);
-			this.picturePodium.TabIndex = 28;
-			this.picturePodium.TextNullImage = null;
-			this.picturePodium.Click += new System.EventHandler(this.picturePodium_Click);
-			// 
-			// label7
-			// 
-			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label7.Location = new System.Drawing.Point(7, 235);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(101, 69);
-			this.label7.TabIndex = 27;
-			this.label7.Text = "There is no charge to click into premium reports without a subscription.";
-			// 
-			// pictureDentalIntel
-			// 
-			this.pictureDentalIntel.HasBorder = false;
-			this.pictureDentalIntel.Image = ((System.Drawing.Image)(resources.GetObject("pictureDentalIntel.Image")));
-			this.pictureDentalIntel.Location = new System.Drawing.Point(9, 21);
-			this.pictureDentalIntel.Name = "pictureDentalIntel";
-			this.pictureDentalIntel.Size = new System.Drawing.Size(95, 24);
-			this.pictureDentalIntel.TabIndex = 0;
-			this.pictureDentalIntel.TextNullImage = null;
-			this.pictureDentalIntel.Click += new System.EventHandler(this.pictureDentalIntel_Click);
-			// 
 			// butPatExport
 			// 
 			this.butPatExport.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -239,7 +197,7 @@ namespace OpenDental {
 			this.butPatExport.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatExport.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatExport.CornerRadius = 4F;
-			this.butPatExport.Location = new System.Drawing.Point(552, 117);
+			this.butPatExport.Location = new System.Drawing.Point(535, 275);
 			this.butPatExport.Name = "butPatExport";
 			this.butPatExport.Size = new System.Drawing.Size(100, 24);
 			this.butPatExport.TabIndex = 24;
@@ -254,7 +212,7 @@ namespace OpenDental {
 			this.butPatList.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatList.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPatList.CornerRadius = 4F;
-			this.butPatList.Location = new System.Drawing.Point(552, 87);
+			this.butPatList.Location = new System.Drawing.Point(535, 245);
 			this.butPatList.Name = "butPatList";
 			this.butPatList.Size = new System.Drawing.Size(100, 24);
 			this.butPatList.TabIndex = 23;
@@ -268,7 +226,7 @@ namespace OpenDental {
 			this.butGraphicReports.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butGraphicReports.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butGraphicReports.CornerRadius = 4F;
-			this.butGraphicReports.Location = new System.Drawing.Point(552, 35);
+			this.butGraphicReports.Location = new System.Drawing.Point(535, 35);
 			this.butGraphicReports.Name = "butGraphicReports";
 			this.butGraphicReports.Size = new System.Drawing.Size(101, 24);
 			this.butGraphicReports.TabIndex = 21;
@@ -281,7 +239,7 @@ namespace OpenDental {
 			this.listArizonaPrimaryCare.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listArizonaPrimaryCare.FormattingEnabled = true;
 			this.listArizonaPrimaryCare.ItemHeight = 15;
-			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(315, 382);
+			this.listArizonaPrimaryCare.Location = new System.Drawing.Point(294, 382);
 			this.listArizonaPrimaryCare.Name = "listArizonaPrimaryCare";
 			this.listArizonaPrimaryCare.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listArizonaPrimaryCare.Size = new System.Drawing.Size(204, 34);
@@ -296,7 +254,7 @@ namespace OpenDental {
 			this.butUDS.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUDS.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUDS.CornerRadius = 4F;
-			this.butUDS.Location = new System.Drawing.Point(427, 35);
+			this.butUDS.Location = new System.Drawing.Point(406, 35);
 			this.butUDS.Name = "butUDS";
 			this.butUDS.Size = new System.Drawing.Size(92, 24);
 			this.butUDS.TabIndex = 18;
@@ -312,7 +270,7 @@ namespace OpenDental {
 			this.butLaserLabels.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLaserLabels.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLaserLabels.CornerRadius = 4F;
-			this.butLaserLabels.Location = new System.Drawing.Point(315, 35);
+			this.butLaserLabels.Location = new System.Drawing.Point(294, 35);
 			this.butLaserLabels.Name = "butLaserLabels";
 			this.butLaserLabels.Size = new System.Drawing.Size(75, 24);
 			this.butLaserLabels.TabIndex = 18;
@@ -377,7 +335,7 @@ namespace OpenDental {
 			this.listPublicHealth.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listPublicHealth.FormattingEnabled = true;
 			this.listPublicHealth.ItemHeight = 15;
-			this.listPublicHealth.Location = new System.Drawing.Point(315, 325);
+			this.listPublicHealth.Location = new System.Drawing.Point(294, 325);
 			this.listPublicHealth.Name = "listPublicHealth";
 			this.listPublicHealth.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listPublicHealth.Size = new System.Drawing.Size(204, 34);
@@ -389,7 +347,7 @@ namespace OpenDental {
 			this.listLists.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.listLists.FormattingEnabled = true;
 			this.listLists.ItemHeight = 15;
-			this.listLists.Location = new System.Drawing.Point(315, 87);
+			this.listLists.Location = new System.Drawing.Point(294, 87);
 			this.listLists.Name = "listLists";
 			this.listLists.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listLists.Size = new System.Drawing.Size(204, 214);
@@ -416,17 +374,60 @@ namespace OpenDental {
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(558, 553);
+			this.butClose.Location = new System.Drawing.Point(578, 553);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.odPictureBox2);
+			this.groupBox2.Location = new System.Drawing.Point(529, 87);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(113, 53);
+			this.groupBox2.TabIndex = 30;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Business Analytics";
+			// 
+			// odPictureBox2
+			// 
+			this.odPictureBox2.HasBorder = false;
+			this.odPictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("odPictureBox2.Image")));
+			this.odPictureBox2.Location = new System.Drawing.Point(6, 19);
+			this.odPictureBox2.Name = "odPictureBox2";
+			this.odPictureBox2.Size = new System.Drawing.Size(95, 24);
+			this.odPictureBox2.TabIndex = 0;
+			this.odPictureBox2.TextNullImage = null;
+			this.odPictureBox2.Click += new System.EventHandler(this.pictureDentalIntel_Click);
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.picturePodium);
+			this.groupBox1.Location = new System.Drawing.Point(529, 146);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(113, 54);
+			this.groupBox1.TabIndex = 29;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Patient Reviews";
+			// 
+			// picturePodium
+			// 
+			this.picturePodium.HasBorder = false;
+			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
+			this.picturePodium.Location = new System.Drawing.Point(6, 19);
+			this.picturePodium.Name = "picturePodium";
+			this.picturePodium.Size = new System.Drawing.Size(95, 24);
+			this.picturePodium.TabIndex = 28;
+			this.picturePodium.TextNullImage = null;
+			this.picturePodium.Click += new System.EventHandler(this.picturePodium_Click);
+			// 
 			// FormReportsMore
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(680, 612);
+			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butPatExport);
 			this.Controls.Add(this.butPatList);
@@ -461,6 +462,7 @@ namespace OpenDental {
 			this.Load += new System.EventHandler(this.FormReportsMore_Load);
 			this.menuMain.ResumeLayout(false);
 			this.menuMain.PerformLayout();
+			this.groupBox2.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
