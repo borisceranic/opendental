@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.2.18.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.2.20.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
