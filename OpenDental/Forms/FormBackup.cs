@@ -634,7 +634,9 @@ namespace OpenDental{
 					if(ODFileUtils.GetDiskFreeSpace(textBackupToPath.Text,out driveFreeSpace)) {
 						if((ulong)(atozSize*1024*1024)>=driveFreeSpace) {//atozSize is in megabytes, cast to ulong in order to compare.  It will never be negative so it's safe.
 							//Not enough free space to perform the backup.
-							throw new ApplicationException(Lan.g(this,"Backing up A to Z images folder failed.  Not enough free disk space available on the destination drive."));
+							throw new ApplicationException(Lan.g(this,"Backing up A to Z images folder failed.  Not enough free disk space available on the destination drive.")
+								+"\r\n"+Lan.g(this,"AtoZ folder size:")+" "+atozSize*1024*1024+"B\r\n"
+								+Lan.g(this,"Destination available space:")+" "+driveFreeSpace+"B");
 						}
 					}
 					if(!Directory.Exists(ODFileUtils.CombinePaths(textBackupToPath.Text,atozDir))) {// D:\OpenDentalData
