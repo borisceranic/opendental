@@ -215,7 +215,7 @@ namespace OpenDentBusiness{
 				insPayAmt+=claimProc.InsPayAmt;
 				writeOff+=claimProc.WriteOff;
 			}
-			return proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty)-capWriteoff-insPayAmt-insPayEst-writeOff;
+			return Math.Round(proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty)-capWriteoff-insPayAmt-insPayEst-writeOff,2);
 		}
 
 		///<summary>Gets all ClaimProc bundles for the given PayPlanNum. Bundles claimprocs by Date and then by ClaimPaymentNum.</summary>

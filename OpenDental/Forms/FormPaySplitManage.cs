@@ -52,7 +52,7 @@ namespace OpenDental {
 				splitTotal+=ListSplitsCur[i].SplitAmt;
 			}
 			textSplitTotal.Text=POut.Double(splitTotal);
-			PaymentAmt=PaymentAmt-splitTotal;
+			PaymentAmt=Math.Round(PaymentAmt-splitTotal,2);
 			//We want to fill the charge table.
 			//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
 			ListSplitsCur.AddRange(AutoSplitForPayment(PaymentCur.PayNum,PayDate,isTest));
@@ -364,7 +364,7 @@ namespace OpenDental {
 				split=new PaySplit();
 				if(Math.Abs(charge.AmountEnd)<Math.Abs(PaymentAmt)) {//charge has "less" than the payment, use partial payment.
 					split.SplitAmt=charge.AmountEnd;
-					PaymentAmt-=charge.AmountEnd;
+					PaymentAmt=Math.Round(PaymentAmt-charge.AmountEnd,2);
 					charge.AmountEnd=0;
 				}
 				else {//Use full payment
@@ -452,7 +452,7 @@ namespace OpenDental {
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
 				split.ClinicNum=charge.ClinicNum;
 			}
-			PaymentAmt-=split.SplitAmt;
+			PaymentAmt=Math.Round(PaymentAmt-split.SplitAmt,2);
 			split.ProvNum=charge.ProvNum;
 			split.PatNum=charge.PatNum;
 			split.ProcDate=charge.Date;
@@ -481,7 +481,7 @@ namespace OpenDental {
 					charge.ListPaySplits.Remove(paySplit);
 				}
 				ListSplitsCur.Remove(paySplit);
-				PaymentAmt+=paySplit.SplitAmt;
+				PaymentAmt=Math.Round(PaymentAmt+paySplit.SplitAmt,2);
 			}
 			FillGridSplits();
 		}
@@ -667,6 +667,9 @@ namespace OpenDental {
 			}
 			else if(payAmt==0) {//If they have a payment amount of 0 set the payment's PayAmt to what the split total is.
 				AmtTotal=splitTotal;
+			}
+			else if(payAmt.IsEqual(splitTotal)) {
+				//Do nothing.
 			}
 			else {
 				MsgBox.Show(this,"Payment amount cannot be less than the total split value.");
