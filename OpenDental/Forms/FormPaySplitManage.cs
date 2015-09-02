@@ -668,7 +668,7 @@ namespace OpenDental {
 			else if(payAmt==0) {//If they have a payment amount of 0 set the payment's PayAmt to what the split total is.
 				AmtTotal=splitTotal;
 			}
-			else if(payAmt.IsEqual(splitTotal)) {
+			else if(payAmt==splitTotal) {
 				//Do nothing.
 			}
 			else {
