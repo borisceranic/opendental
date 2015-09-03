@@ -47,15 +47,10 @@ namespace OpenDental {
 					MsgBox.Show(this,"Cannot move students to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as a student.");
 					return;
 				}
-				Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
-				textStudents.Text=FormUGP.UserGroup.Description;
-				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			if(diag==DialogResult.No) {
-				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
-				textInstructors.Text=FormUGP.UserGroup.Description;
-				DataValid.SetInvalid(InvalidType.Prefs);
-			}
+			Prefs.UpdateLong(PrefName.SecurityGroupForStudents,FormUGP.UserGroup.UserGroupNum);
+			textStudents.Text=FormUGP.UserGroup.Description;
+			DataValid.SetInvalid(InvalidType.Prefs);
 		}
 
 		private void butInstructorPicker_Click(object sender,EventArgs e) {
@@ -81,15 +76,10 @@ namespace OpenDental {
 					MsgBox.Show(this,"Cannot move instructors to the new user group because it would leave no users with the SecurityAdmin permission.  Give the SecurityAdmin permission to at least one user that is in another group or is not flagged as an instructor.");
 					return;
 				}
-				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
-				textInstructors.Text=FormUGP.UserGroup.Description;
-				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			if(diag==DialogResult.No) {
-				Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
-				textInstructors.Text=FormUGP.UserGroup.Description;
-				DataValid.SetInvalid(InvalidType.Prefs);
-			}
+			Prefs.UpdateLong(PrefName.SecurityGroupForInstructors,FormUGP.UserGroup.UserGroupNum);
+			textInstructors.Text=FormUGP.UserGroup.Description;
+			DataValid.SetInvalid(InvalidType.Prefs);
 		}
 
 		private void butGradingScales_Click(object sender,EventArgs e) {
