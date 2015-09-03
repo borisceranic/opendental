@@ -371,10 +371,12 @@ namespace OpenDental{
 					continue;
 				}
 				//Find the billing date based on the date usage.
-				DateTime billingDate=new DateTime(
-					smsBilling.DateUsage.Year,
-					smsBilling.DateUsage.Month,
-					Math.Min(pat.BillingCycleDay,smsBilling.DateUsage.AddMonths(1).AddDays(-1).Day));
+				DateTime billingDate=smsBilling.DateUsage.AddMonths(1);//we always bill the month after usage posts. Example: all January usage = 01/01/2015
+				billingDate=new DateTime(
+					billingDate.Year,
+					billingDate.Month,
+					Math.Min(pat.BillingCycleDay,DateTime.DaysInMonth(billingDate.Year,billingDate.Month)));
+				//example: dateUsage=08/01/2015, billing cycle date=8/14/2012, billing date should be 9/14/2015.
 				if(billingDate>DateTime.Today || billingDate<DateTime.Today.AddMonths(-1).AddDays(-20)){
 					//One month and 20 day window. Bill regardless of presence of "038" repeat charge.
 					continue;
@@ -395,8 +397,7 @@ namespace OpenDental{
 					procAccess.MedicalCode=procCodeAccess.MedicalCode;
 					procAccess.BaseUnits=procCodeAccess.BaseUnits;
 					procAccess.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-					procAccess.BillingNote="Texting Access charge for "+
-					                       billingDate.ToString("MMMM yyyy")+".";
+					procAccess.BillingNote="Texting Access charge for "+smsBilling.DateUsage.ToString("MMMM yyyy")+".";
 					Procedures.Insert(procAccess);
 					listProcsAccess.Add(procAccess);
 					retVal.Add(procAccess);
@@ -416,8 +417,7 @@ namespace OpenDental{
 					procUsage.MedicalCode=procCodeUsage.MedicalCode;
 					procUsage.BaseUnits=procCodeUsage.BaseUnits;
 					procUsage.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-					procUsage.BillingNote="Texting Usage charge for "+
-					                      billingDate.ToString("MMMM yyyy")+".";
+					procUsage.BillingNote="Texting Usage charge for "+smsBilling.DateUsage.ToString("MMMM yyyy")+".";
 					Procedures.Insert(procUsage);
 					listProcsUsage.Add(procUsage);
 					retVal.Add(procUsage);
@@ -460,14 +460,14 @@ namespace OpenDental{
 						&& x.Year==y.ProcDate.Year
 						&& x.Month==y.ProcDate.Month
 						&& IsRepeatDateHelper(repeatCharge,x,y.ProcDate)
-						&& y.ProcFee==repeatCharge.ChargeAmt
+						&& y.ProcFee.IsEqual(repeatCharge.ChargeAmt) 
 					)
 				);
 				//Remove the procedure so that if there is another repeat charge with the same ProcCode and ChargeAmt, it will be added in the next iteration
-				listExistingProcs.Remove(listExistingProcs.FirstOrDefault(y =>
-						y.PatNum==repeatCharge.PatNum 
-						&& y.CodeNum==codeNum 
-						&& y.ProcFee==repeatCharge.ChargeAmt
+				listExistingProcs.Remove(listExistingProcs.FirstOrDefault(x =>
+						x.PatNum==repeatCharge.PatNum 
+						&& x.CodeNum==codeNum 
+						&& x.ProcFee.IsEqual(repeatCharge.ChargeAmt)
 						)
 				);
 				//If any billing dates have not been filtered out, add a repeating charge on those dates
