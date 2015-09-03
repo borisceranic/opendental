@@ -131,12 +131,23 @@ namespace OpenDental.UI {
 					//sigBox.SetSigCompressionMode(0);
 					//sigBox.SetEncryptionMode(0);
 					sigBox.SetKeyString("0000000000000000");
-					sigBox.SetAutoKeyData(keyData);
+					//Note.Replace("\r\n","\n") will only revert the changes Middle Tier made to the note back it's original form, 
+					//	which would invalidate this signature. No effect when not using Middle Tier.
+					sigBox.SetAutoKeyData(keyData.Replace("\r\n","\n"));
 					//sigBox.SetEncryptionMode(2);//high encryption
 					//sigBox.SetSigCompressionMode(2);//high compression
 					sigBox.SetSigString(signature);
-					if(sigBox.NumberOfTabletPoints()==0) {
-						labelInvalidSig.Visible=true;
+					if(sigBox.NumberOfTabletPoints()==0) {  //Signature invalid.
+						//At this point we think the signature is invalid.  We must now recheck signature without replacing \r\n with \n.  This is because old 
+						//	signatures were captured with \r\n instead of \n, and updating to a newer version would invalidate all valid signatures.
+						sigBox.SetAutoKeyData(keyData);
+						sigBox.SetSigString(signature);
+						if(sigBox.NumberOfTabletPoints()==0) {  //Both signature checks were invalid.
+							labelInvalidSig.Visible=true;
+						}
+						else { //The first signature check was invalid, but the second was valid.
+							labelInvalidSig.Visible=false;
+						}
 					}
 					sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
 				}
