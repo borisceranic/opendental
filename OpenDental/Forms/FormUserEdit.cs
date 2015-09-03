@@ -390,6 +390,7 @@ namespace OpenDental{
 			if(listProv.SelectedIndex==0) {
 				Provider prov=Providers.GetProv(UserCur.ProvNum);
 				if(prov!=null) {
+					prov.IsInstructor=false;//If there are more than 1 users associated to this provider, they will no longer be an instructor.
 					Providers.Update(prov);	
 				}
 				UserCur.ProvNum=0;
@@ -398,7 +399,7 @@ namespace OpenDental{
 				Provider prov=Providers.GetProv(UserCur.ProvNum);
 				if(prov!=null) {
 					if(prov.ProvNum!=ProviderC.ListShort[listProv.SelectedIndex-1].ProvNum) {
-						prov.IsInstructor=false;
+						prov.IsInstructor=false;//If there are more than 1 users associated to this provider, they will no longer be an instructor.
 					}
 					Providers.Update(prov);
 				}
