@@ -1040,7 +1040,7 @@ namespace OpenDentBusiness {
 				+whereProv
 				+whereClin
 				+" GROUP BY procedurelog.ProcNum) t "//without this, there can be duplicate proc rows due to the claimproc join with dual insurance.
-				+"GROUP BY SchedDate "
+				+"GROUP BY SchedDate,ClinicNum "
 				+"ORDER BY SchedDate";
 				tableSched=Db.GetTable(command);
 				tableSched.TableName="tableSched";
