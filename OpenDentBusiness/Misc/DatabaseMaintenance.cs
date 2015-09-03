@@ -1189,6 +1189,30 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string ClaimWithInvalidProvTreat(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM claim WHERE ProvTreat > 0 AND ProvTreat NOT IN (SELECT ProvNum FROM provider);";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Claims with invalid ProvTreat found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE claim SET ProvTreat = +"+POut.Long(PrefC.GetLong(PrefName.PracticeDefaultProv))+
+						" WHERE ProvTreat > 0 AND ProvTreat NOT IN (SELECT ProvNum FROM provider);";
+				long numFixed=Db.NonQ(command);
+				if(numFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Claims with invalid ProvTreat fixed")+": "+numFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ClaimWriteoffSum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1990,6 +2014,30 @@ namespace OpenDentBusiness {
 				if(numberFixed>0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with with invalid ClaimPaymentNumber fixed: ")+numberFixed.ToString()+"\r\n";
 					//Tell user what items to create ins checks for?
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string ClaimProcWithInvalidProvNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM claimproc WHERE ProvNum > 0 AND ProvNum NOT IN (SELECT ProvNum FROM provider);";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Claimprocs with invalid ProvNum found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE claimproc SET ProvNum = +"+POut.Long(PrefC.GetLong(PrefName.PracticeDefaultProv))+
+						" WHERE ProvNum > 0 AND ProvNum NOT IN (SELECT ProvNum FROM provider);";
+				long numFixed=Db.NonQ(command);
+				if(numFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Claimprocs with invalid ProvNum fixed")+": "+numFixed.ToString()+"\r\n";
 				}
 			}
 			return log;
@@ -4308,6 +4356,30 @@ namespace OpenDentBusiness {
 				long numberFixed=Db.NonQ(command);
 				if(numberFixed>0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","Procedures changed from UnitQty=0 to UnitQty=1: ")+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
+		public static string ProcedurelogWithInvalidProvNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM procedurelog WHERE ProvNum > 0 AND ProvNum NOT IN (SELECT ProvNum FROM provider);";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures with invalid ProvNum found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE procedurelog SET ProvNum = +"+POut.Long(PrefC.GetLong(PrefName.PracticeDefaultProv))+
+						" WHERE ProvNum > 0 AND ProvNum NOT IN (SELECT ProvNum FROM provider);";
+				long numFixed=Db.NonQ(command);
+				if(numFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures with invalid ProvNum fixed")+": "+numFixed.ToString()+"\r\n";
 				}
 			}
 			return log;
