@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using OpenDentBusiness.Crud;
 
 namespace OpenDentBusiness{
 ///<summary></summary>
@@ -53,9 +55,24 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		
-		
+		///<summary>Returns a list with all reqneeded entries in the database.</summary>
+		public static List<ReqNeeded> GetListFromDb() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<ReqNeeded>>(MethodBase.GetCurrentMethod());
+			}
+			string command ="SELECT * FROM reqneeded ORDER BY Descript";
+			return Crud.ReqNeededCrud.SelectMany(command);
+		}
 
+		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.</summary>
+		public static void Sync(List<ReqNeeded> listNew) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);//never pass DB list through the web service
+				return;
+			}
+			List<ReqNeeded> listDB=ReqNeededs.GetListFromDb();
+			Crud.ReqNeededCrud.Sync(listNew,listDB);
+		}
 
 
 

@@ -5,6 +5,7 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary>For Dental Schools.  Requirements needed in order to complete a course.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class ReqNeeded:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

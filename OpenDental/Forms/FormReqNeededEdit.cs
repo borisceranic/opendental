@@ -181,14 +181,8 @@ namespace OpenDental{
 				if(!MsgBox.Show(this,true,"Delete this Requirement?")){
 					return;
 				}
-				try{
-					ReqNeededs.Delete(ReqCur.ReqNeededNum);
-				}
-				catch(Exception ex){
-					MessageBox.Show(ex.Message);
-					return;
-				}
 			}
+			ReqCur=null;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -200,12 +194,6 @@ namespace OpenDental{
 			ReqCur.Descript=textDescript.Text;
 			//ReqCur.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex].SchoolClassNum;
 			//ReqCur.SchoolCourseNum=SchoolCourses.List[comboCourse.SelectedIndex].SchoolCourseNum;
-			if(IsNew){
-				ReqNeededs.Insert(ReqCur);
-			}
-			else{
-				ReqNeededs.Update(ReqCur);
-			}
 			DialogResult=DialogResult.OK;
 		}
 
