@@ -537,7 +537,9 @@ namespace OpenDental {
 			}
 			//Notify user if partial batch ins payments exist.
 			if(ClaimPayments.HasPartialPayments()) {
-				MsgBox.Show(this,"At least one insurance payment is not finalized.  Reports will be inaccurate until all payments are finalized.");
+				System.Windows.Forms.MessageBox.Show(Lan.g(this,"At least one insurance payment is not finalized")
+					+".  "+Lan.g(this,"Reports will be inaccurate until all payments are finalized")
+					+".\r\n"+Lan.g(this,"See query example in the online manual")+" #958, \"Claims with payments entered but no check, not finalized.\"");
 			}
 		}
 
