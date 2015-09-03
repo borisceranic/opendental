@@ -190,7 +190,7 @@ namespace OpenDentBusiness{
 				Commlogs.Insert(new Commlog() {
 					CommDateTime=smsToMobile.DateTimeSent,
 					Mode_=CommItemMode.Text,
-					Note=smsToMobile.MsgText,
+					Note="Text message sent: "+smsToMobile.MsgText,
 					PatNum=smsToMobile.PatNum,
 					CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
 					SentOrReceived=CommSentOrReceived.Sent
