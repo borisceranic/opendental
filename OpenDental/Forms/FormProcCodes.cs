@@ -1669,6 +1669,7 @@ namespace OpenDental{
 				if(procCode.ProcCode=="") {
 					continue;
 				}
+				procCode.ProvNumDefault=0;  //We do not want to export ProvNumDefault because the receiving DB will not have the same exact provNums.
 				listCodes.Add(procCode);
 			}
 			//ClaimForm ClaimFormCur=ClaimForms.ListLong[listClaimForms.SelectedIndex];
