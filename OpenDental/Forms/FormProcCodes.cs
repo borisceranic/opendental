@@ -823,7 +823,9 @@ namespace OpenDental{
 				if(ProcTable.Rows[i]["ProcCode"].ToString()=="") {
 					continue;
 				}
-				listCodes.Add(ProcedureCodes.GetProcCode(ProcTable.Rows[i]["ProcCode"].ToString()));
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(ProcTable.Rows[i]["ProcCode"].ToString());
+				procCode.ProvNumDefault=0;  //We do not want to export ProvNumDefault because the receiving DB will not have the same exact provNums.
+				listCodes.Add(procCode);
 			}
 			//ClaimForm ClaimFormCur=ClaimForms.ListLong[listClaimForms.SelectedIndex];
 			SaveFileDialog saveDlg=new SaveFileDialog();
@@ -909,6 +911,7 @@ namespace OpenDental{
 					Cache.Refresh(InvalidType.Defs);
 					listCodes[i].ProcCat=def.DefNum;
 				}
+				listCodes[i].ProvNumDefault=0;  //Always import procedure codes with no specific provider set.  The incoming prov might not exist.
 				ProcedureCodes.Insert(listCodes[i]);
 				retVal++;
 			}
