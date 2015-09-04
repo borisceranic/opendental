@@ -806,7 +806,12 @@ namespace OpenDentBusiness {
 				}
 				insPayAmt=PIn.Decimal(rawProc.Rows[i]["insPayAmt_"].ToString());
 				insPayEst=PIn.Decimal(rawProc.Rows[i]["insPayEst_"].ToString());
-				writeOff=PIn.Decimal(rawProc.Rows[i]["writeOff_"].ToString());
+				writeOff=0;
+				if(rawProc.Rows[i]["unsent_"].ToString()!="0") {
+					//If there's an attached claim, use the writeoff in the claimproc.
+					//Otherwise it's just an estimate and we don't want to use anything for the writeoff.
+					writeOff=PIn.Decimal(rawProc.Rows[i]["writeOff_"].ToString());
+				}
 				patPort=amt-insPayAmt-insPayEst-writeOff;
 				patPay=PIn.Decimal(rawProc.Rows[i]["patPay_"].ToString());
 				adjAmt=PIn.Decimal(rawProc.Rows[i]["adj_"].ToString());
