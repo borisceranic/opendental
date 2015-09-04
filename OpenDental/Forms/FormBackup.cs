@@ -626,7 +626,7 @@ namespace OpenDental{
 					Invoke(new PassProgressDelegate(PassProgressToDialog),new object[] { 0,
 					Lan.g(this,"Calculating size of files in A to Z folder."),
 					100,"" });//max of 100 keeps dlg from closing
-					int atozSize=GetFileSizes(ODFileUtils.CombinePaths(atozFull,""),
+					long atozSize=GetFileSizes(ODFileUtils.CombinePaths(atozFull,""),
 						ODFileUtils.CombinePaths(new string[] { textBackupToPath.Text,atozDir,"" }))/1024; 
 					driveFreeSpace=0;
 					//Attempt to get the free disk space on the drive or share of the destination folder.
@@ -668,7 +668,7 @@ namespace OpenDental{
 			Invoke(new PassProgressDelegate(PassProgressToDialog),new object [] { 0,
 				Lan.g(this,"Database restored.\r\nCalculating size of files in A to Z folder."),
 				100,"" });//max of 100 keeps dlg from closing
-			int atozSize=GetFileSizes(ODFileUtils.CombinePaths(new string[] {textBackupRestoreFromPath.Text,atozDir,""}),
+			long atozSize=GetFileSizes(ODFileUtils.CombinePaths(new string[] {textBackupRestoreFromPath.Text,atozDir,""}),
 				ODFileUtils.CombinePaths(atozFull,""))/1024;// C:\OpenDentalData\
 			if(!Directory.Exists(atozFull)){// C:\OpenDentalData\
 				Directory.CreateDirectory(atozFull);// C:\OpenDentalData\
@@ -695,8 +695,8 @@ namespace OpenDental{
 		}
 
 		///<summary>Counts the total KB of all files that will need to be copied from one directory to another.  Recursive.  Only includes missing files, not changed files.  Used to display the progress bar.  Supplied paths must end in \. toPath might not exist.</summary>
-		private int GetFileSizes(string fromPath,string toPath){
-			int retVal=0;
+		private long GetFileSizes(string fromPath,string toPath){
+			long retVal=0;
 			DirectoryInfo dirInfo=new DirectoryInfo(fromPath);
 			DirectoryInfo[] dirs=dirInfo.GetDirectories();
 			for(int i=0;i<dirs.Length;i++){
@@ -706,19 +706,19 @@ namespace OpenDental{
 			FileInfo[] files=dirInfo.GetFiles();//of fromPath
 			for(int i=0;i<files.Length;i++){
 				if(!File.Exists(ODFileUtils.CombinePaths(toPath,files[i].Name))){
-					retVal+=(int)(files[i].Length/1024);
+					retVal+=(long)(files[i].Length/1024);
 				}
 			}
 			return retVal;
 		}
 
 		///<summary>Counts the total KB of all files in the given directory.  Not recursive since it's just used for db files.  Used to display the progress bar.</summary>
-		private int GetFileSizes(string fromPath){
-			int retVal=0;
+		private long GetFileSizes(string fromPath) {
+			long retVal=0;
 			DirectoryInfo dirInfo=new DirectoryInfo(fromPath);
 			FileInfo[] files=dirInfo.GetFiles();
 			for(int i=0;i<files.Length;i++){
-				retVal+=(int)(files[i].Length/1024);
+				retVal+=(long)(files[i].Length/1024);
 			}
 			return retVal;
 		}
