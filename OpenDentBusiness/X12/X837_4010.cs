@@ -1668,9 +1668,10 @@ namespace OpenDentBusiness {
 			StringBuilder strb=new StringBuilder();
 			string warning="";
 			Clearinghouse clearhouse=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
-			for(int i=0;i<Clearinghouses.Listt.Length;i++) {
-				if(Clearinghouses.Listt[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
-					clearhouse= Clearinghouses.Listt[i];
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			for(int i=0;i<arrayClearinghouses.Length;i++) {
+				if(arrayClearinghouses[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
+					clearhouse=arrayClearinghouses[i];
 				}
 			}
 			if(clearhouse==null) {

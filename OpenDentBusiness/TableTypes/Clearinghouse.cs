@@ -65,6 +65,11 @@ namespace OpenDentBusiness{
 
 		}
 
+		///<summary></summary>
+		public Clearinghouse Copy() {
+			return (Clearinghouse)this.MemberwiseClone();
+		}
+
 	}
 
 	

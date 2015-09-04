@@ -19,6 +19,7 @@ namespace OpenDental.Eclaims
 	/// </summary>
 	public class ClaimConnect{
 		///<summary></summary>
+		public static string ErrorMessage="";
 		public ClaimConnect()
 		{
 			
@@ -94,7 +95,7 @@ namespace OpenDental.Eclaims
 				}
 				//Process response for errors:
 				if(alertmsg!=""){
-					MessageBox.Show(alertmsg);
+					ErrorMessage=alertmsg;
 				}
 				switch(status){
 					case "0":
@@ -188,7 +189,6 @@ namespace OpenDental.Eclaims
 				}
 				switch(status){
 					case "0":
-						MessageBox.Show("Upload successful.");
 						break;
 					case "1":
 						throw new Exception("Authentication failure.  Please verify your login ID and password by visiting\r\nSetup | Clearinghouses | ClaimConnect.  "
@@ -200,7 +200,7 @@ namespace OpenDental.Eclaims
 				File.Delete(fileName);
 			}
 			catch(Exception e){
-				MessageBox.Show(e.Message);
+				ErrorMessage=e.Message;
 				x837Controller.Rollback(clearhouse,batchNum);
 				return false;
 			}

@@ -148,6 +148,10 @@ namespace OpenDentBusiness {
 		ClaimAttachExportPath,
 		ClaimFormTreatDentSaysSigOnFile,
 		ClaimMedTypeIsInstWhenInsPlanIsMedical,
+		///<summary>Blank by default.  Computer name to receive reports from automatically.</summary>
+		ClaimReportComputerName,
+		///<summary>Report receive interval.  5 by default.</summary>
+		ClaimReportReceiveInterval,
 		///<summary>Boolean.  0 by default.  If enabled, the Send Claims window will automatically validate e-claims upon loading the window.
 		///Validating all claims on load was old behavior that was significantly slowing down the loading of the send claims window.
 		///Several offices complained that we took away the validation until they attempt sending the claim.</summary>

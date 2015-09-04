@@ -15,6 +15,7 @@ namespace OpenDental.Eclaims
 
 		private static string emdeonITSUrlTest="https://cert.its.emdeon.com/ITS/ITSWS.asmx";//test url
 		private static string emdeonITSUrl="https://its.emdeon.com/ITS/ITSWS.asmx";//production url
+		public static string ErrorMessage="";
 
 		///<summary></summary>
 		public EmdeonMedical()
@@ -74,7 +75,7 @@ namespace OpenDental.Eclaims
 				}
 			}
 			catch(Exception e) {
-				MessageBox.Show(e.Message);
+				ErrorMessage=e.Message;
 				x837Controller.Rollback(clearhouse,batchNum);
 				return false;
 			}
@@ -85,7 +86,7 @@ namespace OpenDental.Eclaims
 					}
 				}
 				catch {
-					MessageBox.Show("Failed to remove batch file "+batchFile+". Probably due to a permission issue. Check folder permissions and manually delete.");
+					ErrorMessage="Failed to remove batch file"+batchFile+". Probably due to a permission issue.  Check folder permissions and manually delete.";
 				}
 			}
 			return true;
@@ -152,11 +153,11 @@ namespace OpenDental.Eclaims
 					}
 				}
 				if(!reportsDownloaded) {
-					MessageBox.Show("Report mailbox is empty.");
+					ErrorMessage="Report mailbox is empty.";
 				}
 			}
 			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
+				ErrorMessage=ex.Message; 
 				return false;
 			}
 			return true;

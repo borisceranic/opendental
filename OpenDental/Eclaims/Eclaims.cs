@@ -54,13 +54,13 @@ namespace OpenDental.Eclaims
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.WebMD){
 				if(!WebMD.Launch(clearhouse,batchNum)){
-					MessageBox.Show(Lan.g("Eclaims","Error sending."));
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+WebMD.ErrorMessage);
 					return;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.BCBSGA){
 				if(!BCBSGA.Launch(clearhouse,batchNum)){
-					MessageBox.Show(Lan.g("Eclaims","Error sending."));
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+BCBSGA.ErrorMessage);
 					return;
 				}
 			}
@@ -68,26 +68,29 @@ namespace OpenDental.Eclaims
 				AttemptLaunch(clearhouse,batchNum);
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.ClaimConnect){
-				if(!ClaimConnect.Launch(clearhouse,batchNum)){
-					MessageBox.Show(Lan.g("Eclaims","Error sending."));
+				if(ClaimConnect.Launch(clearhouse,batchNum)){
+					MessageBox.Show("Upload successful.");
+				}
+				else {
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+ClaimConnect.ErrorMessage);
 					return;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.RECS){
 				if(!RECS.Launch(clearhouse,batchNum)){
-					MessageBox.Show("Claim file created, but could not launch RECS client.");
+					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch RECS client.")+"\r\n"+RECS.ErrorMessage);
 					//continue;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.Inmediata){
 				if(!Inmediata.Launch(clearhouse,batchNum)){
-					MessageBox.Show("Claim file created, but could not launch Inmediata client.");
+					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch Inmediata client.")+"\r\n"+Inmediata.ErrorMessage);
 					//continue;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.AOS){ // added by SPK 7/13/05
 				if(!AOS.Launch(clearhouse,batchNum)){
-					MessageBox.Show("Claim file created, but could not launch AOS Communicator.");
+					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch AOS Communicator.")+"\r\n"+AOS.ErrorMessage);
 					//continue;
 				}
 			}
@@ -96,29 +99,30 @@ namespace OpenDental.Eclaims
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.MercuryDE){
 				if(!MercuryDE.Launch(clearhouse,batchNum)){
-					MsgBox.Show("Eclaims","Error sending.");
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+MercuryDE.ErrorMessage);
 					return;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.ClaimX) {
 				if(!ClaimX.Launch(clearhouse,batchNum)) {
-					MessageBox.Show("Claim file created, but encountered an error while launching ClaimX Client.");
+					MessageBox.Show(Lan.g("Eclaims","Claim file created, but encountered an error while launching ClaimX Client.")+":\r\n"+ClaimX.ErrorMessage);
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.EmdeonMedical) {
 				if(!EmdeonMedical.Launch(clearhouse,batchNum,medType)) {
-					MessageBox.Show(Lan.g("Eclaims","Error sending."));
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+EmdeonMedical.ErrorMessage);
 					return;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.DentiCal) {
 				if(!DentiCal.Launch(clearhouse,batchNum)) {
-					return;//Error message was already shown inside of the DentiCal class.
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+DentiCal.ErrorMessage);
+					return;
 				}
 			}
 			else if(clearhouse.CommBridge==EclaimsCommBridge.NHS) {
 				if(!NHS.Launch(clearhouse,batchNum)) {
-					MessageBox.Show(Lan.g("Eclaims","Error sending."));
+					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+NHS.ErrorMessage);
 					return;
 				}
 			}

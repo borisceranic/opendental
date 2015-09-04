@@ -29,6 +29,7 @@ namespace OpenDental.Eclaims {
 
 		private static string remoteHost="ftp.delta.org";
 		private static Clearinghouse clearinghouse=null;
+		public static string ErrorMessage="";
 
 		///<summary></summary>
 		public DentiCal() {
@@ -61,7 +62,7 @@ namespace OpenDental.Eclaims {
 				ch=(ChannelSftp)channel;
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g("DentiCal","Connection Failed")+": "+ex.Message);
+				ErrorMessage=Lan.g("DentiCal","Connection Failed")+": "+ex.Message;
 				return false;
 			}
 			try {
@@ -134,8 +135,9 @@ namespace OpenDental.Eclaims {
 					}
 				}
 			}
-			catch {
+			catch(Exception ex) {
 				success=false;
+				ErrorMessage+=ex.Message;
 			}
 			finally {
 				//Disconnect from the Denti-Cal SFTP server.

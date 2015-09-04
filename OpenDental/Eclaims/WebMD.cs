@@ -15,6 +15,9 @@ namespace OpenDental.Eclaims
 	/// Summary description for WebMD.
 	/// </summary>
 	public class WebMD{
+
+		public static string ErrorMessage="";
+
 		///<summary></summary>
 		public WebMD()
 		{
@@ -59,7 +62,7 @@ namespace OpenDental.Eclaims
 				}
 			}
 			catch(Exception e){
-				MessageBox.Show(e.Message);//+"\r\n"+clearhouse.ClientProgram+" "+arguments);
+				ErrorMessage=e.Message;
 				if(batchNum!=0){
 					x837Controller.Rollback(clearhouse,batchNum);
 				}

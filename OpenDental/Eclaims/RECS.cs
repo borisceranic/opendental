@@ -9,6 +9,9 @@ namespace OpenDental.Eclaims
 	/// Summary description for RECS.
 	/// </summary>
 	public class RECS{
+
+		public static string ErrorMessage="";
+
 		///<summary></summary>
 		public RECS()
 		{
@@ -24,8 +27,9 @@ namespace OpenDental.Eclaims
 				//process.EnableRaisingEvents=true;
 				//process.WaitForExit();
 			}
-			catch{
+			catch (Exception ex) {
 				//X12.Rollback(clearhouse,batchNum);//doesn't actually do anything
+				ErrorMessage=ex.Message;
 				return false;
 			}
 			return true;

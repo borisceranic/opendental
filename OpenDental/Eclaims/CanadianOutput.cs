@@ -523,8 +523,14 @@ namespace OpenDental.Eclaims {
 			return etransAck.EtransNum;
 		}
 
-		///<summary>Returns the list of etrans requests. The etrans.AckEtransNum can be used to get the etrans ack. The following are the only possible formats that can be returned in the acks: 21 EOB Response, 11 Claim Ack, 14 Outstanding Transactions Response, 23 Predetermination EOB, 13 Predetermination Ack, 24 E-Mail Response. Set version2 to true if version 02 request and false for version 04 request. Set sendToItrans to true only when sending to carrier 999999 representing the entire ITRANS network. When version2 is false and sendToItrans is false then carrier must be set to a valid Canadian carrier (because the request implies that a version 04 request needs to be sent to the carrier), otherwise it can be set to null. Prov must be validated as a CDANet provider before calling this function.</summary>
-		public static List <Etrans> GetOutstandingTransactions(bool version2,bool sendToItrans,Carrier carrier,Provider prov) {
+		///<summary>Returns the list of etrans requests.  The etrans.AckEtransNum can be used to get the etrans ack.  The following are the only possible
+		///formats that can be returned in the acks: 21 EOB Response, 11 Claim Ack, 14 Outstanding Transactions Response, 23 Predetermination EOB, 
+		///13 Predetermination Ack, 24 E-Mail Response.  Set version2 to true if version 02 request and false for version 04 request.  Set sendToItrans 
+		///to true only when sending to carrier 999999 representing the entire ITRANS network.  When version2 is false and sendToItrans is false then 
+		///carrier must be set to a valid Canadian carrier (because the request implies that a version 04 request needs to be sent to the carrier), 
+		///otherwise it can be set to null.  Prov must be validated as a CDANet provider before calling this function.  Set isAutomatic to true
+		///to supress UI and printer output.</summary>
+		public static List <Etrans> GetOutstandingTransactions(bool version2,bool sendToItrans,Carrier carrier,Provider prov,bool isAutomatic) {
 			List<Etrans> etransAcks=new List<Etrans>();
 			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
 			if(clearhouse==null) {
@@ -682,8 +688,10 @@ namespace OpenDental.Eclaims {
 						if(fieldG05.valuestr=="R") { //We only expect the result to be 'R' or 'X' as specified in the documentation.
 							CCDField fieldG07=fieldInputter.GetFieldById("G07");//disposition message
 							CCDField fieldG08=fieldInputter.GetFieldById("G08");//error code
-							MessageBox.Show(Lan.g("","Failed to receive outstanding transactions. Messages from CDANet")+": "+Environment.NewLine+
-								fieldG07.valuestr.Trim()+Environment.NewLine+((fieldG08!=null)?CCDerror.message(Convert.ToInt32(fieldG08.valuestr),false):""));
+							if(!isAutomatic) {
+								MessageBox.Show(Lan.g("","Failed to receive outstanding transactions. Messages from CDANet")+": "+Environment.NewLine+
+									fieldG07.valuestr.Trim()+Environment.NewLine+((fieldG08!=null)?CCDerror.message(Convert.ToInt32(fieldG08.valuestr),false):""));
+							}
 						}
 						etransAck.Etype=EtransType.OutstandingAck_CA;
 						exit=true;
@@ -715,13 +723,15 @@ namespace OpenDental.Eclaims {
 								claim.ClaimStatus="S";
 							}
 							else if(etransAck.AckCode=="M") {
-								Canadian.PrintCdaClaimForm(claim);
+								if(!isAutomatic) {
+									Canadian.PrintCdaClaimForm(claim);
+								}
 							}
 							Claims.Update(claim);
 						}						
 					}
 				}
-				if(!exit) {
+				if(!exit && !isAutomatic) {
 					try {
 						new FormCCDPrint(etrans,result,true);//Physically print the form.
 					}

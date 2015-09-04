@@ -266,6 +266,11 @@ namespace OpenDental{
 		///In the future, some sort of identification should be made to tell if this thread is running on any computer.</summary>
 		private ODThread _threadPodium;
 		private int _podiumIntervalMS=(int)TimeSpan.FromMinutes(5).TotalMilliseconds;
+		///<summary>If the local computer is the computer where claim reports are retrieved then this thread runs in the background and will retrieve
+		///and import reports for the default clearinghouse or for clearinghouses where both the Payors field is not empty plus the Eformat matches the
+		///region the user is in.  If an error is returned from the importation, this thread will silently fail.</summary>
+		private ODThread _threadClaimReportRetrieve;
+		private int _claimReportRetrieveIntervalMS;
 		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new messages 
 		///every x number of minutes (1 to 60) based on preference value.</summary>
 		private Thread ThreadEmailInbox;
@@ -2490,6 +2495,10 @@ namespace OpenDental{
 			timerReplicationMonitor.Enabled=true;
 			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
 			ThreadEmailInbox.Start();
+			_claimReportRetrieveIntervalMS=(int)TimeSpan.FromMinutes(PrefC.GetInt(PrefName.ClaimReportReceiveInterval)).TotalMilliseconds;
+			_threadClaimReportRetrieve=new ODThread(_claimReportRetrieveIntervalMS,ThreadClaimReportRetrieve);
+			_threadClaimReportRetrieve.Name="Claim Report Thread";
+			_threadClaimReportRetrieve.Start();
 			_threadPodium=new ODThread(_podiumIntervalMS,ThreadPodiumSendInvitations);
 			_threadPodium.AddExceptionHandler(PodiumMonitoringException);
 			_threadPodium.Name="Podium Thread";
@@ -4694,6 +4703,62 @@ namespace OpenDental{
 				Computers.UpdateHeartBeat(Environment.MachineName,false);
 			}
 			catch { }
+		}
+
+		private void ThreadClaimReportRetrieve(ODThread worker) {
+			string claimReportComputer=PrefC.GetString(PrefName.ClaimReportComputerName);
+			if(claimReportComputer=="" || claimReportComputer!=Dns.GetHostName()) {
+				return;
+			}
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			long defaultClearingHouseNum=PrefC.GetLong(PrefName.ClearinghouseDefaultDent);
+			for(int i=0;i<arrayClearinghouses.Length;i++) {
+				if(arrayClearinghouses[i].CommBridge==EclaimsCommBridge.BCBSGA) {//Skip BCBSGA since it has a form that shows up.
+					continue;
+				}
+				if(!Directory.Exists(arrayClearinghouses[i].ResponsePath)) {
+					continue;
+				}
+				if(arrayClearinghouses[i].ClearinghouseNum==defaultClearingHouseNum) {//If it's the default dental clearinghouse
+					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				}
+				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.None) {//And the format is "None" (accessed from all regions)
+					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				}
+				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.Canadian && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+					//Or the Eformat is Canadian and the region is Canadian.  In Canada, the "Outstanding Reports" are received upon request.
+					//Canadian reports must be retrieved using an office num and valid provider number for the office,
+					//which will cause all reports for that office to be returned.
+					//Here we loop through all providers and find CDAnet providers with a valid provider number and office number, and we only send
+					//one report download request for one provider from each office.  For most offices, the loop will only send a single request.
+					List<Provider> listProvs=ProviderC.GetListShort();
+					List<string> listOfficeNums=new List<string>();
+					for(int j=0;j<listProvs.Count;j++) {//Get all unique office numbers from the providers.
+						if(!listProvs[j].IsCDAnet || listProvs[j].NationalProvID=="" || listProvs[j].CanadianOfficeNum=="") {
+							continue;
+						}
+						if(!listOfficeNums.Contains(listProvs[j].CanadianOfficeNum)) {//Ignore duplicate office numbers.
+							listOfficeNums.Add(listProvs[j].CanadianOfficeNum);
+							try {
+								Eclaims.CanadianOutput.GetOutstandingTransactions(false,true,null,listProvs[j],true);
+							}
+							catch {
+								//Supress errors importing reports.
+							}
+						}
+					}
+				}
+				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.Dutch && CultureInfo.CurrentCulture.Name.EndsWith("DE")) {
+					//Or the Eformat is German and the region is German
+					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				}
+				else if(arrayClearinghouses[i].Eformat!=ElectronicClaimFormat.Canadian 
+					&& arrayClearinghouses[i].Eformat!=ElectronicClaimFormat.Dutch
+					&& CultureInfo.CurrentCulture.Name.EndsWith("US")) //Or the Eformat is in any other format and the region is US
+				{
+					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				}
+			}
 		}
 
 		private void ThreadPodiumSendInvitations(ODThread worker) {

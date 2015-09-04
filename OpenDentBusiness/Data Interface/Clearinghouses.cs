@@ -7,21 +7,73 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Clearinghouses {
 		///<summary>List of all clearinghouses.</summary>
-		private static Clearinghouse[] listt;
+		private static Clearinghouse[] _listt;
 		///<summary>Key=PayorID. Value=ClearingHouseNum.</summary>
-		private static Hashtable HList;
+		private static Hashtable _hList;
+		private static object _lockObj=new object();
 
 		public static Clearinghouse[] Listt{
 			//No need to check RemotingRole; no call to db.
 			get{
-				if(listt==null){
-					RefreshCache();
-				}
-				return listt;
+				return GetListt();
 			}
 			set{
-				listt=value;
+				lock(_lockObj) {
+					_listt=value;
+				}
 			}
+		}
+
+		///<summary>key:PayorID, value:ClearingHouseNum</summary>
+		public static Hashtable HList {
+			get {
+				return GetHList();
+			}
+			set {
+				lock(_lockObj) {
+					_hList=value;
+				}
+			}
+		}
+
+		///<summary></summary>
+		public static Clearinghouse[] GetListt() {
+			bool isListNull=false;
+			lock(_lockObj) {
+				if(_listt==null) {
+					isListNull=true;
+				}
+			}
+			if(isListNull) {
+				RefreshCache();
+			}
+			Clearinghouse[] arrayClearinghouse=new Clearinghouse[_listt.Length];
+			lock(_lockObj) {
+				for(int i=0;i<_listt.Length;i++) {
+					arrayClearinghouse[i]=_listt[i].Copy();
+				}
+			}
+			return arrayClearinghouse;
+		}
+
+		///<summary>key:PayorID, value:ClearingHouseNum</summary>
+		public static Hashtable GetHList() {
+			bool isListNull=false;
+			lock(_lockObj) {
+				if(_hList==null) {
+					isListNull=true;
+				}
+			}
+			if(isListNull) {
+				RefreshCache();
+			}
+			Hashtable hashClearinghouses=new Hashtable();
+			lock(_lockObj) {
+				foreach(DictionaryEntry entry in _hList) {
+					hashClearinghouses.Add(entry.Key,((Clearinghouse)entry.Value).Copy());
+				}
+			}
+			return hashClearinghouses;
 		}
 
 		public static DataTable RefreshCache() {
@@ -36,14 +88,15 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			listt=Crud.ClearinghouseCrud.TableToList(table).ToArray();
+			_listt=Crud.ClearinghouseCrud.TableToList(table).ToArray();
 			HList=new Hashtable();
 			string[] payors;
-			for(int i=0;i<listt.Length;i++) {
-				payors=listt[i].Payors.Split(',');
+			Clearinghouse[] arrayClearinghouse=GetListt();
+			for(int i=0;i<arrayClearinghouse.Length;i++) {
+				payors=arrayClearinghouse[i].Payors.Split(',');
 				for(int j=0;j<payors.Length;j++) {
 					if(!HList.ContainsKey(payors[j])) {
-						HList.Add(payors[j],listt[i].ClearinghouseNum);
+						HList.Add(payors[j],arrayClearinghouse[i].ClearinghouseNum);
 					}
 				}
 			}
@@ -160,9 +213,10 @@ namespace OpenDentBusiness{
 		///<summary>Gets a clearinghouse from cache.  Will return null if invalid.</summary>
 		public static Clearinghouse GetClearinghouse(long clearinghouseNum){
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<Listt.Length;i++){
-				if(clearinghouseNum==Listt[i].ClearinghouseNum){
-					return Listt[i];
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			for(int i=0;i<arrayClearinghouses.Length;i++){
+				if(clearinghouseNum==arrayClearinghouses[i].ClearinghouseNum){
+					return arrayClearinghouses[i];
 				}
 			}
 			return null;

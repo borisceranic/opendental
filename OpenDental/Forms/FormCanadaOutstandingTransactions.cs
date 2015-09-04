@@ -82,13 +82,13 @@ namespace OpenDental {
 			}
 			try {
 				if(radioVersion2.Checked) {
-					CanadianOutput.GetOutstandingTransactions(true,false,null,prov);
+					CanadianOutput.GetOutstandingTransactions(true,false,null,prov,false);
 				}
 				else if(radioVersion4Itrans.Checked) {
-					CanadianOutput.GetOutstandingTransactions(false,true,null,prov);
+					CanadianOutput.GetOutstandingTransactions(false,true,null,prov,false);
 				}
 				else if(radioVersion4ToCarrier.Checked) {
-					CanadianOutput.GetOutstandingTransactions(false,false,carriers[listCarriers.SelectedIndex],prov);
+					CanadianOutput.GetOutstandingTransactions(false,false,carriers[listCarriers.SelectedIndex],prov,false);
 				}
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"Done.");

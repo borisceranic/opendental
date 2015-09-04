@@ -31,6 +31,7 @@ namespace OpenDental.Eclaims
 		private static string remoteHost="qaftp.mercurydataexchange.com";//Change to ftp.mercurydataexchange.com when released.
 		private static string rootFolderName="Testing";//Change to "Production" when released.
 		private static Clearinghouse clearinghouse=null;
+		public static string ErrorMessage="";
 
 		///<summary></summary>
 		public MercuryDE(){			
@@ -62,7 +63,7 @@ namespace OpenDental.Eclaims
 				channel.connect();
 				ch=(ChannelSftp)channel;
 			}catch(Exception ex){
-				MessageBox.Show(Lan.g("MercuryDE","Connection Failed")+": "+ex.Message);
+				ErrorMessage=Lan.g("MercuryDE","Connection Failed")+": "+ex.Message;
 				return false;
 			}
 			try{
@@ -94,7 +95,8 @@ namespace OpenDental.Eclaims
 								exportFileStream.Write(dataBytes,0,numBytes);
 								numBytes=fileStream.Read(dataBytes,0,dataBytes.Length);
 							}
-						}catch{
+						} catch(Exception ex) {
+							ErrorMessage=ex.Message;
 							success=false;
 						}finally{
 							if(exportFileStream!=null){
@@ -131,7 +133,11 @@ namespace OpenDental.Eclaims
 						File.Delete(files[i]);//Remove the processed file.
 					}
 				}
-			}catch{
+			}catch (Exception ex){
+				if(ErrorMessage!="") {
+					ErrorMessage+="\r\n";
+				}
+				ErrorMessage=ex.Message;
 				success=false;
 			}finally{
 				//Disconnect from the MDE SFTP server.

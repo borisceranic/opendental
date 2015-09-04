@@ -17,6 +17,9 @@ namespace OpenDental.Eclaims {
 	/// United Kindgdom National Health Service (NHS).
 	/// </summary>
 	public class NHS {
+
+		public static string ErrorMessage="";//Note for reviewer: I know this will never get used right now but just in case we enhance this later I thought it best to include it.
+
 		///<summary></summary>
 		public NHS() {
 

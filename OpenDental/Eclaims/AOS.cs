@@ -10,6 +10,7 @@ namespace OpenDental.Eclaims
 	/// </summary>
 	public class AOS{
 		///<summary></summary>
+		public static string ErrorMessage="";
 		public AOS()
 		{
 			
@@ -24,8 +25,9 @@ namespace OpenDental.Eclaims
 				//process.EnableRaisingEvents=true;
 				//process.WaitForExit();
 			}
-			catch{
+			catch(Exception ex){
 				//X12.Rollback(clearhouse,batchNum);//doesn't actually do anything
+				ErrorMessage=ex.Message;
 				return false;
 			}
 			return true;

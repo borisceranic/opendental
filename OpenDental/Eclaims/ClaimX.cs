@@ -8,6 +8,7 @@ namespace OpenDental.Eclaims
 	///<summary>ClaimX. added by RSM 7/27/11</summary>
 	public class ClaimX{
 		///<summary></summary>
+		public static string ErrorMessage="";
 		public ClaimX()
 		{
 			
@@ -22,8 +23,9 @@ namespace OpenDental.Eclaims
 				//process.EnableRaisingEvents=true;
 				//process.WaitForExit();
 			}
-			catch{
+			catch(Exception ex){
 				//X12.Rollback(clearhouse,batchNum);//doesn't actually do anything
+				ErrorMessage=ex.Message;
 				return false;
 			}
 			return true;

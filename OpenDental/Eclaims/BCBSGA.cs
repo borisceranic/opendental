@@ -12,6 +12,7 @@ namespace OpenDental.Eclaims
 	public class BCBSGA{
 
 		/// <summary></summary>
+		public static string ErrorMessage="";
 		public BCBSGA()
 		{
 			
@@ -76,7 +77,7 @@ namespace OpenDental.Eclaims
         FormT.Receive(5000);//this is displayed in the progress box so user can see.
 			}
 			catch(Exception ex){
-				MessageBox.Show(ex.Message);
+				ErrorMessage=ex.Message;
 				x837Controller.Rollback(clearhouse,batchNum);
 				retVal=false;
 			}
@@ -151,7 +152,7 @@ namespace OpenDental.Eclaims
 				}
 			}
 			catch(Exception ex){
-				MessageBox.Show(ex.Message);
+				ErrorMessage=ex.Message;
 				//FormT.Close();//Also closes connection
 				retVal=false;
 			}

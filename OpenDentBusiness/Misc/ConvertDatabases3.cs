@@ -10187,7 +10187,23 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimReportComputerName', '')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimReportComputerName','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimReportReceiveInterval', '5')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES "
+						+"((SELECT MAX(PrefNum)+1 FROM preference),'ClaimReportReceiveInterval','5')";
+					Db.NonQ(command);
+				}
 
 
 
@@ -10200,4 +10216,4 @@ namespace OpenDentBusiness {
 
 
 	}
-}			
+}
