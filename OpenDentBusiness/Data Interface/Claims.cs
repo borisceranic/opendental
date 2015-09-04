@@ -587,6 +587,68 @@ namespace OpenDentBusiness{
 			return PIn.Int(Db.GetCount(command));
 		}
 
+		///<summary>Returns a human readable ClaimStatus string.</summary>
+		public static string GetClaimStatusString(string claimStatus) {
+			string retVal="";
+			switch(claimStatus){
+				case "U":
+					retVal="Unsent";
+					break;
+				case "H":
+					retVal="Hold until Pri received";
+					break;
+				case "W":
+					retVal="Waiting to Send";
+					break;
+				case "P":
+					retVal="Probably Sent";
+					break;
+				case "S":
+					retVal="Sent - Verified";
+					break;
+				case "R":
+					retVal="Received";
+					break;
+			}
+			return retVal;
+		}
+
+		///<summary>Updates ClaimIdentifier for specified claim.</summary>
+		public static void UpdateClaimIdentifier(long claimNum,string claimIdentifier) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),claimNum,claimIdentifier);
+				return;
+			}
+			string command="UPDATE claim SET ClaimIdentifier="+POut.String(claimIdentifier)+" WHERE ClaimNum="+POut.Long(claimNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Returns the number of claims in the specified list that have been sent or received.</summary>
+		public static int GetSentOrReceivedCount(List<long> listClaimNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),listClaimNums);
+			}
+			string command;
+			command="SELECT COUNT(*) "
+				+"FROM claim "
+				+"WHERE claim.ClaimStatus IN ('S','P','R') " //Sent, Probably Sent, Recieved
+				+"AND claim.ClaimNum IN ("+string.Join(",",listClaimNums)+") ";
+			return PIn.Int(Db.GetCount(command));
+		}
+
+		///<summary>Checks to see that all claims in the specified list still exist in database.
+		///Returns true if any claims in the list were not found.</summary>
+		public static int ClaimsDeletedCount(List<long> listClaimNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),listClaimNums);
+			}
+			string command;
+			command="SELECT COUNT(*) "
+				+"FROM claim "
+				+"WHERE claim.ClaimNum IN ("+string.Join(",",listClaimNums)+") ";
+			return (listClaimNums.Count-PIn.Int(Db.GetCount(command)));
+		}
+
 	}//end class Claims
 
 	///<summary>This is an odd class.  It holds data for the X12 (4010 only) generation process.  It replaces an older multi-dimensional array, so the names are funny, but helpful to prevent bugs.  Not an actual database table.</summary>

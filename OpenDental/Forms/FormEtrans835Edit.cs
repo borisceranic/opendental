@@ -239,13 +239,32 @@ namespace OpenDental {
 			}
 			bool isReadOnly=true;
 			if(claim==null) {//Original claim not found.
-				MessageBox.Show(Lan.g(this,"Original claim not found")+". "+Lan.g(this,"The claim details from the EOB will be displayed instead")+". "
-					+Lan.g(this,"Locate the Claim Identifier on the EOB and manually edit the Claim Identifier of the original claim to match, then try again")+".");
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Original claim not found.  You can now attempt to locate the claim manually.")) {
+					return;
+				}
+				//Create partial patient object to pre-fill search text boxes in FormPatientSelect
+				Patient patCur=new Patient();
+				patCur.LName=claimPaid.PatientName.Lname;
+				patCur.FName=claimPaid.PatientName.Fname;
+				FormPatientSelect formP=new FormPatientSelect(patCur);
+				formP.PreFillSearchBoxes(patCur);
+				formP.ShowDialog();
+				if(formP.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				FormEtrans835ClaimSelect eTransClaimSelect=new FormEtrans835ClaimSelect(formP.SelectedPatNum,claimPaid);
+				eTransClaimSelect.ShowDialog();
+				if(eTransClaimSelect.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				claim=eTransClaimSelect.ClaimSelected; //Set claim so below we can act if a claim was already linked.
+				claim.ClaimIdentifier=claimPaid.ClaimTrackingNumber;//Already checked DOS and ClaimFee, update claim identifier to link claims.
+				Claims.UpdateClaimIdentifier(claim.ClaimNum,claim.ClaimIdentifier);//Update DB
 			}
 			//TODO: Supplemental payments are currently blocked because the first payment marks the claim received.
 			//We need to somehow determine if the payment is supplemental (flag in the 835?), then create new Supplemental claimprocs for the claim
 			//so we can call EnterPayment() to enter the payment on the new supplemental procs.
-			else if(claim.ClaimStatus=="R") {//Claim found and is already received.
+			if(claim!=null && claim.ClaimStatus=="R") {//Claim found and is already received.
 				//If the claim is already received, then we do not allow the user to enter payments.
 				//The user can edit the claim to change the status from received if they wish to enter the payments again.
 				Patient pat=Patients.GetPat(claim.PatNum);

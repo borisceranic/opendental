@@ -83,16 +83,27 @@ namespace OpenDental{
 		private Label labelRegKey;
 		///<summary>List of all the clinics this userod has access to.  When comboClinic.SelectedIndex=0 it refers to all clinics in this list.  Otherwise their selected clinic will always be _listClinics[comboClinic.SelectedIndex-1].</summary>
 		private List<Clinic> _listClinics;
+		///<summary>Set to true if constructor passed in patient object to prefill text boxes.  Used to make sure fillGrid is not called 
+		///before FormSelectPatient_Load.</summary>
+		private bool _isPreFillLoad=false;
 		///<summary>If set, initial patient list will be set to these patients.</summary>
 		public List<long> ExplicitPatNums;
 
 		///<summary></summary>
-		public FormPatientSelect(){
+		public FormPatientSelect():this(null) {
+		}
+
+		///<summary>This takes a partially built patient object and uses it to prefill textboxes to assist in searching.  
+		///Currently only implements FName,LName.</summary>
+		public FormPatientSelect(Patient pat){
 			InitializeComponent();//required first
 			//tb2.CellClicked += new OpenDental.ContrTable.CellEventHandler(tb2_CellClicked);
 			//tb2.CellDoubleClicked += new OpenDental.ContrTable.CellEventHandler(tb2_CellDoubleClicked);
 			Patients=new Patients();
 			Lan.F(this);
+			if(pat!=null) {
+				PreFillSearchBoxes(pat);
+			}
 		}
 
 		///<summary></summary>
@@ -841,8 +852,10 @@ namespace OpenDental{
 				}
 				return;
 			}
-			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
+			//Always fillGrid if _isPreFilledLoad.  Since the first name and last name are pre-filled, the results should be minimal.
+			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) || _isPreFillLoad) {
 				FillGrid(true);
+				_isPreFillLoad=false;
 			}
 		}
 
@@ -862,6 +875,18 @@ namespace OpenDental{
 				gridMain.Columns.Add(col);
 			}
 			gridMain.EndUpdate();
+		}
+
+		///<summary>The pat must not be null.  Takes a partially built patient object and uses it to fill the search by textboxes.
+		///Currently only implements FName,LName.</summary>
+		public void PreFillSearchBoxes(Patient pat) {
+			_isPreFillLoad=true; //Set to true to stop FillGrid from being called as a result of textChanged events
+			if(pat.LName != "") {
+				textLName.Text=pat.LName;
+			}
+			if(pat.FName != "") {
+				textFName.Text=pat.FName;
+			}
 		}
 
 		private void textBox_Enter(object sender,EventArgs e) {
@@ -1100,7 +1125,8 @@ namespace OpenDental{
 		}
 
 		private void OnDataEntered(){
-			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton)) {
+			//Do not call FillGrid unless _isPreFillLoad=false.  Since the first name and last name are pre-filled, the results should be minimal.
+			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) && !_isPreFillLoad) {
 				FillGrid(true);
 			}
 		}

@@ -427,6 +427,12 @@
     <Compile Include="Forms\FormDefaultCCProcs.designer.cs">
       <DependentUpon>FormDefaultCCProcs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEtrans835ClaimSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEtrans835ClaimSelect.designer.cs">
+      <DependentUpon>FormEtrans835ClaimSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormProgressStatus.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3767,6 +3773,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefaultCCProcs.resx">
       <DependentUpon>FormDefaultCCProcs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans835ClaimSelect.resx">
+      <DependentUpon>FormEtrans835ClaimSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans835PickEra.resx">
       <DependentUpon>FormEtrans835PickEra.cs</DependentUpon>
