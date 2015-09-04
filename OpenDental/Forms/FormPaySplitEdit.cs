@@ -1058,7 +1058,7 @@ namespace OpenDental
 				MsgBox.Show(this,"Please enter an amount");
 				return;
 			}
-			if(_remainAmt<0) {
+			if(_remainAmt<0 && PaySplitCur.ProcNum!=0) {
 				if(!MsgBox.Show(this,true,"Warning: Remaining amount is negative.  Continue?")) {
 					return;
 				}
