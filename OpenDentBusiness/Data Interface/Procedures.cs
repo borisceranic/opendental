@@ -948,6 +948,8 @@ namespace OpenDentBusiness {
 			double newFee;
 			double oldFee;
 			long rowsChanged=0;
+			Fees.ListFees=Fees.GetListt(); //If we don't do this here, Getlistt() gets called table.Rows.Count or more times below.  Used in GetAmount0(). 
+			//Customers with large databases were taking around 20 minutes for the below code to run without the above change.
 			for(int i=0;i<table.Rows.Count;i++) {
 				priPlanFeeSched=PIn.Long(table.Rows[i]["PlanFeeSched"].ToString());
 				patFeeSched=PIn.Long(table.Rows[i]["PatFeeSched"].ToString());
@@ -979,6 +981,7 @@ namespace OpenDentBusiness {
 					+"WHERE ProcNum="+POut.String(table.Rows[i]["ProcNum"].ToString());
 				rowsChanged+=Db.NonQ(command);
 			}
+			Fees.ListFees=null;//We set this above so we need to set this back.  Otherwise other places in the code would be using a stale list of fees.
 			return rowsChanged;
 		}
 
