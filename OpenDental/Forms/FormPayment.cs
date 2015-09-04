@@ -2005,43 +2005,43 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
-		private void SavePaymentToDb() {
+		private bool SavePaymentToDb() {
 			if(textDate.errorProvider1.GetError(textDate)!=""
 				|| textAmount.errorProvider1.GetError(textAmount)!="") {
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
-				return;
+				return false;
 			}
 			if(checkPayTypeNone.Checked) {
 				if(PIn.Double(textAmount.Text)!=0) {
 					MsgBox.Show(this,"Amount must be zero for a transfer.");
-					return;
+					return false;
 				}
 			}
 			else {
 				if(textAmount.Text=="") {
 					MessageBox.Show(Lan.g(this,"Please enter an amount."));
-					return;
+					return false;
 				}
 				if(PIn.Double(textAmount.Text)==0 && !PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit)) {
 					MessageBox.Show(Lan.g(this,"Amount must not be zero unless this is a transfer."));
-					return;
+					return false;
 				}
 				if(listPayType.SelectedIndex==-1) {
 					MsgBox.Show(this,"A payment type must be selected.");
-					return;
+					return false;
 				}
 			}
 			if(IsNew) {
 				//prevents backdating of initial payment
 				if(!Security.IsAuthorized(Permissions.PaymentCreate,PIn.Date(textDate.Text))) {
-					return;
+					return false;
 				}
 			}
 			else {
 				//Editing an old entry will already be blocked if the date was too old, and user will not be able to click OK button
 				//This catches it if user changed the date to be older.
 				if(!Security.IsAuthorized(Permissions.PaymentEdit,PIn.Date(textDate.Text))) {
-					return;
+					return false;
 				}
 			}
 			bool accountingSynchRequired=false;
@@ -2062,7 +2062,7 @@ namespace OpenDental {
 			}
 			catch(ApplicationException ex) {
 				MessageBox.Show(ex.Message);//not able to alter, so must not allow user to continue.
-				return;
+				return false;
 			}
 			PaymentCur.PayAmt=PIn.Double(textAmount.Text);//handles blank
 			PaymentCur.PayDate=PIn.Date(textDate.Text);
@@ -2074,28 +2074,28 @@ namespace OpenDental {
 					|| creditCards[comboCreditCards.SelectedIndex].DateStart.Year < 1880) 
 				{
 					MsgBox.Show(this,"The selected credit card has not been setup for recurring charges.");
-					return;
+					return false;
 				}
 				//Check if a stop date was set and if that date falls in on today or in the past.
 				if(creditCards[comboCreditCards.SelectedIndex].DateStop.Year > 1880
 					&& creditCards[comboCreditCards.SelectedIndex].DateStop<=DateTime.Now) 
 				{
 					MsgBox.Show(this,"This card is no longer accepting recurring charges based on the stop date.");
-					return;
+					return false;
 				}
 				//Have the user decide what month to apply the recurring charge towards.
 				FormCreditRecurringDateChoose formDateChoose=new FormCreditRecurringDateChoose(creditCards[comboCreditCards.SelectedIndex]);
 				formDateChoose.ShowDialog();
 				if(formDateChoose.DialogResult!=DialogResult.OK) {
 					MsgBox.Show(this,"Uncheck the \"Apply to Recurring Charge\" box.");
-					return;
+					return false;
 				}
 				//This will change the PayDate to work better with the recurring charge automation.  User was notified in previous window.
 				PaymentCur.PayDate=formDateChoose.PayDate;
 			}
 			else if(IsNew && checkRecurring.Checked && comboCreditCards.SelectedIndex==creditCards.Count) {
 				MsgBox.Show(this,"Cannot apply a recurring charge to a new card.");
-				return;
+				return false;
 			}
 			#endregion
 			PaymentCur.CheckNum=textCheckNum.Text;
@@ -2159,7 +2159,7 @@ namespace OpenDental {
 					if(PaymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
 						MsgBox.Show(this,"Split totals must equal payment amount.");
 						//work on reallocation schemes here later
-						return;
+						return false;
 					}
 				}
 			}
@@ -2174,7 +2174,7 @@ namespace OpenDental {
 			}
 			catch(ApplicationException ex) {//this catches bad dates.
 				MessageBox.Show(ex.Message);
-				return;
+				return false;
 			}
 			//Set all DatePays the same.
 			for(int i=0;i<SplitList.Count;i++) {
@@ -2197,10 +2197,13 @@ namespace OpenDental {
 					Patients.GetLim(PaymentCur.PatNum).GetNameLF()+", "
 					+PaymentCur.PayAmt.ToString("c"));
 			}
+			return true;
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			SavePaymentToDb();
+			if(!SavePaymentToDb()) {
+				return;
+			}
 			DialogResult=DialogResult.OK;
 			Plugins.HookAddCode(this,"FormPayment.butOK_Click_end",PaymentCur,SplitList);
 		}
