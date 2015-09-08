@@ -67,6 +67,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butSupply;
 		private Employee EmployeeCur;
 		private FormBilling FormB;
+		private FormClaimsSend FormCS;
 		private UI.Button butClaimPay;
 		private UI.Button butManage;
 		private long PatCurNum;
@@ -790,14 +791,17 @@ namespace OpenDental{
 		}
 
 		private void butSendClaims_Click(object sender, System.EventArgs e) {
-			Cursor=Cursors.WaitCursor;
-			FormClaimsSend FormCS=new FormClaimsSend();
-			FormCS.ShowDialog();
-			if(FormCS.GotoPatNum!=0 && FormCS.GotoClaimNum!=0) {
-				Patient pat=Patients.GetPat(FormCS.GotoPatNum);
-				OnPatientSelected(pat);
-				GotoModule.GotoClaim(FormCS.GotoClaimNum);
+			if(FormCS!=null && !FormCS.IsDisposed) {//Form is open
+				FormCS.Focus();//Don't open a new form.
+				//We may need to close and reopen the form in the future if the window is not being brought to the front.
+				//It is complicated to Close() and reopen the form, because the user might be in the middle of a task.
+				return;
 			}
+			Cursor=Cursors.WaitCursor;
+			FormCS=new FormClaimsSend();
+			ODEvent.Fired+=formClaimsSend_GoToChanged;
+			FormCS.Show();//FormClaimsSend has a GoTo option and is shown as a non-modal window.
+			FormCS.BringToFront();
 			Cursor=Cursors.Default;
 		}
 		
@@ -885,6 +889,16 @@ namespace OpenDental{
 		private void formBilling_GoToChanged(object sender,PatientSelectedEventArgs e) {
 			OnPatientSelected(e.Pat);
 			GotoModule.GotoAccount(0);
+		}
+
+		private void formClaimsSend_GoToChanged(ODEventArgs e) {
+			if(e.Name!="FormClaimSend_GoTo") {
+				return;
+			}
+			ClaimSendQueueItem claimSendQueueItem=(ClaimSendQueueItem)e.Tag;
+			Patient pat=Patients.GetPat(claimSendQueueItem.PatNum);
+			OnPatientSelected(pat);
+			GotoModule.GotoClaim(claimSendQueueItem.ClaimNum);
 		}
 
 		private void butDeposit_Click(object sender, System.EventArgs e) {

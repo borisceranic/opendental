@@ -332,8 +332,17 @@ namespace OpenDentBusiness{
 
 		///<summary>Called from claimsend window and from Claim edit window.  Use 0 to get all waiting claims, or an actual claimnum to get just one claim.</summary>
 		public static ClaimSendQueueItem[] GetQueueList(long claimNum,long clinicNum,long customTracking) {
+			List<long> listClaimNums=new List<long>();
+			if(claimNum!=0) {
+				listClaimNums.Add(claimNum);
+			}
+			return GetQueueList(listClaimNums,clinicNum,customTracking);
+		}
+
+		///<summary>Called from claimsend window and from Claim edit window.  Use an empty listClaimNums to get all waiting claims.</summary>
+		public static ClaimSendQueueItem[] GetQueueList(List<long> listClaimNums,long clinicNum,long customTracking) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<ClaimSendQueueItem[]>(MethodBase.GetCurrentMethod(),claimNum,clinicNum,customTracking);
+				return Meth.GetObject<ClaimSendQueueItem[]>(MethodBase.GetCurrentMethod(),listClaimNums,clinicNum,customTracking);
 			}
 			string command=
 				"SELECT claim.ClaimNum,carrier.NoSendElect"
@@ -343,11 +352,11 @@ namespace OpenDentBusiness{
 				+"Left join insplan on claim.PlanNum = insplan.PlanNum "
 				+"Left join carrier on insplan.CarrierNum = carrier.CarrierNum "
 				+"Left join patient on patient.PatNum = claim.PatNum ";
-			if(claimNum==0){
+			if(listClaimNums.Count==0){
 				command+="WHERE (claim.ClaimStatus = 'W' OR claim.ClaimStatus = 'P') ";
 			}
 			else{
-				command+="WHERE claim.ClaimNum="+POut.Long(claimNum)+" ";
+				command+="WHERE claim.ClaimNum IN("+string.Join(",",listClaimNums)+") ";
 			}
 			if(clinicNum>0) {
 				command+="AND claim.ClinicNum="+POut.Long(clinicNum)+" ";
@@ -621,32 +630,6 @@ namespace OpenDentBusiness{
 			}
 			string command="UPDATE claim SET ClaimIdentifier="+POut.String(claimIdentifier)+" WHERE ClaimNum="+POut.Long(claimNum);
 			Db.NonQ(command);
-		}
-
-		///<summary>Returns the number of claims in the specified list that have been sent or received.</summary>
-		public static int GetSentOrReceivedCount(List<long> listClaimNums) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),listClaimNums);
-			}
-			string command;
-			command="SELECT COUNT(*) "
-				+"FROM claim "
-				+"WHERE claim.ClaimStatus IN ('S','P','R') " //Sent, Probably Sent, Recieved
-				+"AND claim.ClaimNum IN ("+string.Join(",",listClaimNums)+") ";
-			return PIn.Int(Db.GetCount(command));
-		}
-
-		///<summary>Checks to see that all claims in the specified list still exist in database.
-		///Returns true if any claims in the list were not found.</summary>
-		public static int ClaimsDeletedCount(List<long> listClaimNums) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),listClaimNums);
-			}
-			string command;
-			command="SELECT COUNT(*) "
-				+"FROM claim "
-				+"WHERE claim.ClaimNum IN ("+string.Join(",",listClaimNums)+") ";
-			return (listClaimNums.Count-PIn.Int(Db.GetCount(command)));
 		}
 
 	}//end class Claims

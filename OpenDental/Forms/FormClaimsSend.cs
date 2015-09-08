@@ -111,12 +111,12 @@ namespace OpenDental{
 			this.contextMenuEclaims = new System.Windows.Forms.ContextMenu();
 			this.comboCustomTracking = new System.Windows.Forms.ComboBox();
 			this.labelCustomTracking = new System.Windows.Forms.Label();
-			this.gridMain = new OpenDental.UI.ODGrid();
-			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.butNextUnsent = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butWeekPrevious = new OpenDental.UI.Button();
 			this.butWeekNext = new OpenDental.UI.Button();
 			this.comboHistoryType = new OpenDental.UI.ComboBoxMulti();
+			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.ToolBarHistory = new OpenDental.UI.ODToolBar();
 			this.butDropTo = new OpenDental.UI.Button();
 			this.butDropFrom = new OpenDental.UI.Button();
@@ -274,6 +274,21 @@ namespace OpenDental{
 			this.labelCustomTracking.Text = "Custom Tracking Filter";
 			this.labelCustomTracking.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
+			// butNextUnsent
+			// 
+			this.butNextUnsent.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNextUnsent.Autosize = true;
+			this.butNextUnsent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNextUnsent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNextUnsent.CornerRadius = 4F;
+			this.butNextUnsent.Location = new System.Drawing.Point(234, 25);
+			this.butNextUnsent.Name = "butNextUnsent";
+			this.butNextUnsent.Size = new System.Drawing.Size(74, 23);
+			this.butNextUnsent.TabIndex = 56;
+			this.butNextUnsent.Text = "Next Unsent";
+			this.butNextUnsent.UseVisualStyleBackColor = true;
+			this.butNextUnsent.Click += new System.EventHandler(this.butNextUnsent_Click);
+			// 
 			// gridMain
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -289,36 +304,6 @@ namespace OpenDental{
 			this.gridMain.Title = "Claims Waiting to Send";
 			this.gridMain.TranslationName = "TableQueue";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
-			// gridHistory
-			// 
-			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridHistory.HasMultilineHeaders = false;
-			this.gridHistory.HScrollVisible = false;
-			this.gridHistory.Location = new System.Drawing.Point(4, 31);
-			this.gridHistory.Name = "gridHistory";
-			this.gridHistory.ScrollValue = 0;
-			this.gridHistory.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridHistory.Size = new System.Drawing.Size(959, 252);
-			this.gridHistory.TabIndex = 33;
-			this.gridHistory.Title = "History";
-			this.gridHistory.TranslationName = "TableClaimHistory";
-			this.gridHistory.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridHistory_CellDoubleClick);
-			// 
-			// butNextUnsent
-			// 
-			this.butNextUnsent.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butNextUnsent.Autosize = true;
-			this.butNextUnsent.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butNextUnsent.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butNextUnsent.CornerRadius = 4F;
-			this.butNextUnsent.Location = new System.Drawing.Point(234, 25);
-			this.butNextUnsent.Name = "butNextUnsent";
-			this.butNextUnsent.Size = new System.Drawing.Size(74, 23);
-			this.butNextUnsent.TabIndex = 56;
-			this.butNextUnsent.Text = "Next Unsent";
-			this.butNextUnsent.UseVisualStyleBackColor = true;
-			this.butNextUnsent.Click += new System.EventHandler(this.butNextUnsent_Click);
 			// 
 			// butWeekPrevious
 			// 
@@ -365,7 +350,21 @@ namespace OpenDental{
 			this.comboHistoryType.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboHistoryType.SelectedIndices")));
 			this.comboHistoryType.Size = new System.Drawing.Size(100, 21);
 			this.comboHistoryType.TabIndex = 45;
-			this.comboHistoryType.UseCommas = true;
+			// 
+			// gridHistory
+			// 
+			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridHistory.HasMultilineHeaders = false;
+			this.gridHistory.HScrollVisible = false;
+			this.gridHistory.Location = new System.Drawing.Point(4, 31);
+			this.gridHistory.Name = "gridHistory";
+			this.gridHistory.ScrollValue = 0;
+			this.gridHistory.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridHistory.Size = new System.Drawing.Size(959, 252);
+			this.gridHistory.TabIndex = 33;
+			this.gridHistory.Title = "History";
+			this.gridHistory.TranslationName = "TableClaimHistory";
+			this.gridHistory.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridHistory_CellDoubleClick);
 			// 
 			// ToolBarHistory
 			// 
@@ -453,7 +452,6 @@ namespace OpenDental{
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormClaimsSend";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Send Claims";
 			this.Load += new System.EventHandler(this.FormClaimsSend_Load);
@@ -589,6 +587,7 @@ namespace OpenDental{
 			button.Style=ODToolBarButtonStyle.DropDownButton;
 			button.DropDownMenu=contextMenuEclaims;
 			ToolBarMain.Buttons.Add(button);
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Validate Claims"),-1,Lan.g(this,"Refresh and Validate Selected Claims"),"Validate"));
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Outstanding"),-1,Lan.g(this,"Get Outstanding Transactions"),"Outstanding"));
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Payment Rec"),-1,Lan.g(this,"Get Payment Reconciliation Transactions"),"PayRec"));
@@ -597,6 +596,8 @@ namespace OpenDental{
 			else {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Get Reports"),5,Lan.g(this,"Get Reports from Other Clearinghouses"),"Reports"));
 			}
+			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Refresh"),-1,Lan.g(this,"Refresh the Grid"),"Refresh"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Close"),-1,"","Close"));
 			/*ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ClaimsSend);
@@ -634,9 +635,8 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select exactly one item first.");
 				return;
 			}
-			GotoPatNum=_arrayQueueFiltered[gridMain.SelectedIndices[0]].PatNum;
-			GotoClaimNum=_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum;
-			DialogResult=DialogResult.OK;
+			ODEvent.Fire(new ODEventArgs("FormClaimSend_GoTo",_arrayQueueFiltered[gridMain.SelectedIndices[0]]));
+			SendToBack();
 		}
 
 		private void menuItemClearinghouse_Click(object sender, System.EventArgs e){
@@ -807,6 +807,9 @@ namespace OpenDental{
 				case "Eclaims":
 					SendEclaimsToClearinghouse(0);
 					break;
+				case "Validate":
+					toolBarButValidate_Click();
+					break;
 				case "Reports":
 					toolBarButReports_Click();
 					break;
@@ -818,6 +821,9 @@ namespace OpenDental{
 					break;
 				case "SummaryRec":
 					toolBarButSummaryRec_Click();
+					break;
+				case "Refresh":
+					toolBarButRefresh_Click();
 					break;
 				case "Close":
 					Close();
@@ -909,6 +915,56 @@ namespace OpenDental{
 			LabelSingle.PrintCarriers(carrierNums);//,pd.PrinterSettings.PrinterName)){
 			//	return;
 			//}
+		}
+
+		private void toolBarButValidate_Click() {
+			if(gridMain.SelectedIndices.Length==0) {
+				MessageBox.Show(Lan.g(this,"Please select one or more claims first."));
+				return;
+			}
+			RefreshAndValidateSelections();
+		}
+
+		private void toolBarButRefresh_Click() {
+			FillGrid(true);
+		}
+
+		///<summary>Fills grid with updated information, unless all of the selected claims are marked NoBillIns and none of them were deleted.</summary>
+		private void RefreshAndValidateSelections() {
+			List<ClaimSendQueueItem> listQueueItems=new List<ClaimSendQueueItem>();//List of claims needing to be validated.
+			List<long> listQueueClaimNums=new List<long>();//List of claimNums to fetch new ClaimSendQuiteItems
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				//Create a list of claims so we only call one Claims.GetQueueList.
+				listQueueClaimNums.Add(_arrayQueueFiltered[gridMain.SelectedIndices[i]].ClaimNum);
+			}
+			ClaimSendQueueItem[] arrayRefreshQueueItems=Claims.GetQueueList(listQueueClaimNums,0,0);
+			int claimAlreadySentCount=0;
+			for(int j=0;j<arrayRefreshQueueItems.Length;j++) {//Loop through all the refreshed ClaimSendQueueItems
+				for(int k=0;k<_arrayQueueAll.Length;k++) {//Loop through all the ClaimSendQueueItems in the grid's main list
+					if(arrayRefreshQueueItems[j].ClaimNum==_arrayQueueAll[k].ClaimNum) {//If you found the matching ClaimSendQueueItem
+						if(_arrayQueueAll[k].ClaimStatus=="S" || _arrayQueueAll[k].ClaimStatus=="P" || _arrayQueueAll[k].ClaimStatus=="R") {
+							claimAlreadySentCount++;
+						}
+						else {
+							_arrayQueueAll[k]=arrayRefreshQueueItems[j];//Refresh the claim in the list
+							listQueueItems.Add(_arrayQueueAll[k]);//Add to list to be validated again
+						}
+						break;
+					}
+				}
+			}
+			if(claimAlreadySentCount>0) {
+				MsgBox.Show(this,"WARNING: Some of the selected claims have already been sent or received.  They will be removed from the grid.");
+			}
+			if(arrayRefreshQueueItems.Length!=gridMain.SelectedIndices.Length) {
+				MsgBox.Show(this,"WARNING: One or more claims were deleted from outside this window.  They will be removed from the grid.");
+			}
+			if(listQueueItems.Count>0) {//At least one claim still exists
+				ValidateClaims(listQueueItems);//Validate refeshed claims, also fills grid
+			}
+			else {
+				FillGrid(true);//Refresh the grid so that the deleted claims disapear.
+			}
 		}
 
 		///<Summary>Use clearinghouseNum of 0 to indicate automatic calculation of clearinghouses.</Summary>
@@ -1006,14 +1062,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			//Now that all of the desired rows have been selected, we need to validate any rows that have not already been validated.
-			if(!PrefC.GetBool(PrefName.ClaimsSendWindowValidatesOnLoad)) {
-				List<ClaimSendQueueItem> listClaimSendQueueItems=new List<ClaimSendQueueItem>();
-				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-					listClaimSendQueueItems.Add(_arrayQueueFiltered[gridMain.SelectedIndices[i]]);
-				}
-				ValidateClaims(listClaimSendQueueItems);
-			}
+			RefreshAndValidateSelections();
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics is in use
 				long clinicNum0=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).ClinicNum;
 				for(int i=1;i<gridMain.SelectedIndices.Length;i++){
