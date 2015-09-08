@@ -3132,7 +3132,7 @@ namespace OpenDental{
 				//OK if 0, because auto select first in list when open claim
 			}
 			ClaimCur.ProvBill=Providers.GetBillingProvNum(ClaimCur.ProvTreat,ClaimCur.ClinicNum);
-			Provider prov=Providers.GetProv(ClaimCur.ProvBill);
+			Provider prov=Providers.GetProv(ClaimCur.ProvTreat);
 			if(prov.ProvNumBillingOverride!=0) {
 				ClaimCur.ProvBill=prov.ProvNumBillingOverride;
 			}
