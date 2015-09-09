@@ -9288,6 +9288,9 @@ namespace OpenDental{
 					procCur.ProcDate=PIn.Date(textDate.Text);
 					procCur.PlaceService=(PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
 				}
+				if(procCur.ProcDate.Year<1880) {
+					procCur.ProcDate=MiscData.GetNowDateTime();
+				}
 				procCur.SiteNum=PatCur.SiteNum;
 				Procedures.SetDateFirstVisit(procCur.ProcDate,2,PatCur);
 				if(procCode.PaintType==ToothPaintingType.Extraction) {//if an extraction, then mark previous procs hidden
