@@ -209,6 +209,21 @@ namespace OpenDental {
 				if(components != null) {
 					components.Dispose();
 				}
+				for(int i=0;i<pinBoard.ApptList.Count;i++) {
+					DataRow row=pinBoard.ApptList[i].DataRoww;
+					if(row["AptStatus"].ToString()==((int)ApptStatus.UnschedList).ToString() && PIn.DateT(row["AptDateTime"].ToString()).Year<1880) {
+						Appointment aptCur=Appointments.GetOneApt(PIn.Long(row["AptNum"].ToString()));
+						if(aptCur.AptDateTime.Year<1880) {//if the date was not updated since put on the pinboard
+							Appointments.Delete(aptCur.AptNum);
+							string logText=Lan.g(this,"Deleted from pinboard while closing Open Dental")+": ";
+							if(aptCur.AptDateTime.Year>1880) {
+								logText+=aptCur.AptDateTime.ToString()+", ";
+							}
+							logText+=aptCur.ProcDescript;
+							SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,aptCur.PatNum,logText);
+						}
+					}
+				}
 			}
 			base.Dispose(disposing);
 		}
