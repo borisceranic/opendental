@@ -1394,6 +1394,9 @@ namespace OpenDentBusiness {
 				procList[i].ProcStatus=ProcStat.C;
 				if(oldProc.ProcStatus!=ProcStat.C) {
 					procList[i].ProcDate=apt.AptDateTime.Date;//only change date to match appt if not already complete.
+					if(procList[i].ProcDate.Year<1880) {
+						procList[i].ProcDate=MiscData.GetNowDateTime().Date;//Change procdate to today if the appointment date was invalid
+					}
 					procList[i].DateEntryC=DateTime.Now;//this triggers it to set to server time NOW().
 					if(procList[i].DiagnosticCode=="") {
 						procList[i].DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
