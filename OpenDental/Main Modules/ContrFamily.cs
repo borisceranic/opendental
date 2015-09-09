@@ -147,7 +147,7 @@ namespace OpenDental{
 			// gridRecall
 			// 
 			this.gridRecall.HasMultilineHeaders = false;
-			this.gridRecall.HScrollVisible = false;
+			this.gridRecall.HScrollVisible = true;
 			this.gridRecall.Location = new System.Drawing.Point(585, 27);
 			this.gridRecall.Name = "gridRecall";
 			this.gridRecall.ScrollValue = 0;
@@ -1847,14 +1847,17 @@ namespace OpenDental{
 				gridRecall.Width=354;
 			}
 			gridRecall.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableRecall","Type"),90);
-			gridRecall.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecall","Due Date"),80);
-			gridRecall.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecall","Sched Date"),80);
-			gridRecall.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableRecall","Notes"),80);
-			gridRecall.Columns.Add(col);
+			List<DisplayField> listRecallFields=DisplayFields.GetForCategory(DisplayFieldCategory.FamilyRecallGrid);
+			ODGridColumn col;
+			for(int i=0;i<listRecallFields.Count;i++) {
+				if(listRecallFields[i].Description=="") {
+					col=new ODGridColumn(listRecallFields[i].InternalName,listRecallFields[i].ColumnWidth);
+				}
+				else {
+					col=new ODGridColumn(listRecallFields[i].Description,listRecallFields[i].ColumnWidth);
+				}
+				gridRecall.Columns.Add(col);
+			}
 			gridRecall.Rows.Clear();
 			if(PatCur==null){
 				gridRecall.EndUpdate();
@@ -1871,65 +1874,84 @@ namespace OpenDental{
 			ODGridCell cell;
 			for(int i=0;i<recallListPat.Count;i++){
 				row=new ODGridRow();
-				//Type
-				string cellStr=RecallTypes.GetDescription(recallListPat[i].RecallTypeNum);
-				row.Cells.Add(cellStr);
-				//Due date
-				if(recallListPat[i].DateDue.Year<1880){
-					row.Cells.Add("");
-				}
-				else{
-					cell=new ODGridCell(recallListPat[i].DateDue.ToShortDateString());
-					if(recallListPat[i].DateDue<DateTime.Today){
-						cell.Bold=YN.Yes;
-						cell.ColorText=Color.Firebrick;
+				for(int j=0;j<listRecallFields.Count;j++) {
+					switch (listRecallFields[j].InternalName) {
+						case "Type":
+							string cellStr=RecallTypes.GetDescription(recallListPat[i].RecallTypeNum);
+							row.Cells.Add(cellStr);
+							break;
+						case "Due Date":
+							if(recallListPat[i].DateDue.Year<1880) {
+								row.Cells.Add("");
+							}
+							else {
+								cell=new ODGridCell(recallListPat[i].DateDue.ToShortDateString());
+								if(recallListPat[i].DateDue<DateTime.Today) {
+									cell.Bold=YN.Yes;
+									cell.ColorText=Color.Firebrick;
+								}
+								row.Cells.Add(cell);
+							}
+							break;
+						case "Sched Date":
+							if(recallListPat[i].DateScheduled.Year<1880) {
+								row.Cells.Add("");
+							}
+							else {
+								row.Cells.Add(recallListPat[i].DateScheduled.ToShortDateString());
+							}
+							break;
+						case "Notes":
+							cellStr="";
+							if(recallListPat[i].IsDisabled) {
+								cellStr+=Lan.g(this,"Disabled");
+								if(recallListPat[i].DatePrevious.Year>1800) {
+									cellStr+=Lan.g(this,". Previous: ")+recallListPat[i].DatePrevious.ToShortDateString();
+									if(recallListPat[i].RecallInterval!=new Interval(0,0,0,0)) {
+										DateTime duedate=recallListPat[i].DatePrevious+recallListPat[i].RecallInterval;
+										cellStr+=Lan.g(this,". (Due): ")+duedate.ToShortDateString();
+									}
+								}
+							}
+							if(recallListPat[i].DisableUntilDate.Year>1880) {
+								if(cellStr!="") {
+									cellStr+=", ";
+								}
+								cellStr+=Lan.g(this,"Disabled until ")+recallListPat[i].DisableUntilDate.ToShortDateString();
+							}
+							if(recallListPat[i].DisableUntilBalance>0) {
+								if(cellStr!="") {
+									cellStr+=", ";
+								}
+								cellStr+=Lan.g(this,"Disabled until balance ")+recallListPat[i].DisableUntilBalance.ToString("c");
+							}
+							if(recallListPat[i].RecallStatus!=0) {
+								if(cellStr!="") {
+									cellStr+=", ";
+								}
+								cellStr+=DefC.GetName(DefCat.RecallUnschedStatus,recallListPat[i].RecallStatus);
+							}
+							if(recallListPat[i].Note!="") {
+								if(cellStr!="") {
+									cellStr+=", ";
+								}
+								cellStr+=recallListPat[i].Note;
+							}
+							row.Cells.Add(cellStr);
+							break;
+						case "Previous Date":
+							if(recallListPat[i].DatePrevious.Year>1880) {
+								row.Cells.Add(recallListPat[i].DatePrevious.ToShortDateString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Interval":
+							row.Cells.Add(recallListPat[i].RecallInterval.ToString());
+							break;
 					}
-					row.Cells.Add(cell);
 				}
-				//Sched Date
-				if(recallListPat[i].DateScheduled.Year>1880){
-					row.Cells.Add(recallListPat[i].DateScheduled.ToShortDateString());
-				}
-				else{
-					row.Cells.Add("");
-				}
-				//Notes
-				cellStr="";
-				if(recallListPat[i].IsDisabled) {
-					cellStr+=Lan.g(this,"Disabled");
-					if(recallListPat[i].DatePrevious.Year>1800){
-						cellStr+=Lan.g(this,". Previous: ")+recallListPat[i].DatePrevious.ToShortDateString();
-						if(recallListPat[i].RecallInterval!=new Interval(0,0,0,0)){
-							DateTime duedate=recallListPat[i].DatePrevious+recallListPat[i].RecallInterval;
-							cellStr+=Lan.g(this,". (Due): ")+duedate.ToShortDateString();
-						}
-					}
-				}
-				if(recallListPat[i].DisableUntilDate.Year>1880) {
-					if(cellStr!="") {
-						cellStr+=", ";
-					}
-					cellStr+=Lan.g(this,"Disabled until ")+recallListPat[i].DisableUntilDate.ToShortDateString();
-				}
-				if(recallListPat[i].DisableUntilBalance>0) {
-					if(cellStr!="") {
-						cellStr+=", ";
-					}
-					cellStr+=Lan.g(this,"Disabled until balance ")+recallListPat[i].DisableUntilBalance.ToString("c");
-				}
-				if(recallListPat[i].RecallStatus!=0) {
-					if(cellStr!="") {
-						cellStr+=", ";
-					}
-					cellStr+=DefC.GetName(DefCat.RecallUnschedStatus,recallListPat[i].RecallStatus);
-				}
-				if(recallListPat[i].Note!="") {
-					if(cellStr!="") {
-						cellStr+=", ";
-					}
-					cellStr+=recallListPat[i].Note;
-				}
-				row.Cells.Add(cellStr);
 				gridRecall.Rows.Add(row);
 			}
 			gridRecall.EndUpdate();

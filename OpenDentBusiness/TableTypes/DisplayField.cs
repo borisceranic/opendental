@@ -76,7 +76,9 @@ namespace OpenDentBusiness{
 		///<summary>10- Account module patient information</summary>
 		AccountPatientInformation,
 		///<summary>11</summary>
-		StatementMainGrid
+		StatementMainGrid,
+		///<summary>12</summary>
+		FamilyRecallGrid
 	}
 	
 

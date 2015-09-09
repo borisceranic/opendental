@@ -340,6 +340,14 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField { Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
 				list.Add(new DisplayField { Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
 			}
+			else if(category==DisplayFieldCategory.FamilyRecallGrid) {
+				list.Add(new DisplayField("Type",90,category));
+				list.Add(new DisplayField("Due Date",80,category));
+				list.Add(new DisplayField("Sched Date",80,category));
+				list.Add(new DisplayField("Notes",255,category));
+				//list.Add(new DisplayField("Previous Date",90,category));
+				//list.Add(new DisplayField("Interval",80,category));
+			}
 			return list;
 		}
 
@@ -610,6 +618,14 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField { Category=category,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i });
 				list.Add(new DisplayField { Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
 				list.Add(new DisplayField { Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
+			}
+			else if(category==DisplayFieldCategory.FamilyRecallGrid) {
+				list.Add(new DisplayField("Type",90,category));
+				list.Add(new DisplayField("Due Date",80,category));
+				list.Add(new DisplayField("Sched Date",80,category));
+				list.Add(new DisplayField("Notes",255,category));
+				list.Add(new DisplayField("Previous Date",90,category));
+				list.Add(new DisplayField("Interval",80,category));
 			}
 			return list;
 		}
