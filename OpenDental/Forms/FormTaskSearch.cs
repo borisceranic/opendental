@@ -142,7 +142,8 @@ namespace OpenDental {
 			FormPatientSelect FormPS=new FormPatientSelect();
 			FormPS.SelectionModeOnly=true;
 			if(FormPS.ShowDialog()==DialogResult.OK) {
-				textPatNum.Text=FormPS.SelectedPatNum.ToString();
+				long patNum=FormPS.SelectedPatNum;
+				textPatNum.Text=patNum.ToString();
 			}
 		}
 
