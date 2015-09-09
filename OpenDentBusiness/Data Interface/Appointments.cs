@@ -1856,6 +1856,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Deletes the apt and cleans up objects pointing to this apt.  If the patient is new, sets DateFirstVisit.
+		///Updates procedurelog.ProcDate to today for procedures attached to the appointment if the ProcDate is invalid.
 		///Updates procedurelog.PlannedAptNum (for planned apts) or procedurelog.AptNum (for all other AptStatuses); sets to 0.
 		///Updates labcase.PlannedAptNum (for planned apts) or labcase.AptNum (for all other AptStatuses); sets to 0.
 		///Deletes any rows in the plannedappt table with this AptNum.
@@ -1878,6 +1879,9 @@ namespace OpenDentBusiness{
 				Procedures.SetDateFirstVisit(DateTime.MinValue,3,pat);
 			}
 			//procs
+			command="UPDATE procedurelog SET ProcDate="+DbHelper.Curdate()+" WHERE (AptNum="+POut.Long(aptNum)+" OR PlannedAptNum="
+				+POut.Long(aptNum)+") AND "+DbHelper.Year("ProcDate")+"<1880 AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP);//Only change procdate for TP procedures
+			Db.NonQ(command);
 			if(table.Rows[0]["AptStatus"].ToString()=="6") {//planned
 				command="UPDATE procedurelog SET PlannedAptNum =0 WHERE PlannedAptNum = "+POut.Long(aptNum);
 			}
