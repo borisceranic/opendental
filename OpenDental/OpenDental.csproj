@@ -421,6 +421,12 @@
     <Compile Include="Forms\FormProcBroken.designer.cs">
       <DependentUpon>FormProcBroken.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormTaskSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormTaskSearch.designer.cs">
+      <DependentUpon>FormTaskSearch.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormDefaultCCProcs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3770,6 +3776,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcBroken.resx">
       <DependentUpon>FormProcBroken.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormTaskSearch.resx">
+      <DependentUpon>FormTaskSearch.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefaultCCProcs.resx">
       <DependentUpon>FormDefaultCCProcs.cs</DependentUpon>

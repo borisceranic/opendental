@@ -1,0 +1,193 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using OpenDentBusiness;
+using OpenDental.UI;
+using System.ComponentModel;
+using System.Globalization;
+
+namespace OpenDental {
+	public partial class FormTaskSearch:Form {
+
+		private DataTable _tableTasks;
+		private List<Def> _listTaskPriorities;
+		private List<Userod> _listUsers;
+		public TaskObjectType GotoType;
+		public CancelEventHandler TaskGoToEvent;
+		public long UserNum;
+		public long GotoKeyNum;
+
+		public FormTaskSearch() {
+			InitializeComponent();
+			Lan.F(this);
+		}
+
+		private void FormTaskSearch_Load(object sender,EventArgs e) {
+			//Note: DateTime strings that are empty actually are " " due to how the empty datetime control behaves.
+			_listTaskPriorities=new List<Def>();
+			_listTaskPriorities.AddRange(DefC.GetArrayLong()[(int)DefCat.TaskPriorities]);
+			long userNum=0;
+			comboUsers.Items.Add("All");
+			comboUsers.SelectedIndex=0;
+			_listUsers=UserodC.GetListt();//List of all users for searching.  I figure we don't want to exclude hidden ones for searching.
+			for(int i=0;i<_listUsers.Count;i++) {
+				comboUsers.Items.Add(_listUsers[i].UserName);
+				if(_listUsers[i].UserNum==Security.CurUser.UserNum) {
+					comboUsers.SelectedIndex=i+1;
+					userNum=_listUsers[i].UserNum;
+				}
+			}
+			comboPriority.Items.Add("All");
+			for(int i=0;i<_listTaskPriorities.Count;i++) {
+				comboPriority.Items.Add(_listTaskPriorities[i].ItemName);
+			}
+			comboPriority.SelectedIndex=0;
+			checkLimit.Checked=true;
+			_tableTasks=Tasks.GetDataSet(userNum,new List<long>(),0," "," "," "," ",textDescription.Text,0,0,true);
+			FillGrid();
+		}
+
+		private void FillGrid() {
+			gridTasks.BeginUpdate();
+			gridTasks.Columns.Clear();
+			gridTasks.Rows.Clear();
+			ODGridColumn col=new ODGridColumn("Created",70,HorizontalAlignment.Left,false);
+			gridTasks.Columns.Add(col);
+			col=new ODGridColumn("Completed",70,HorizontalAlignment.Left,false);
+			gridTasks.Columns.Add(col);
+			col=new ODGridColumn("Description",0);
+			gridTasks.Columns.Add(col);
+			ODGridRow row;
+			for(int i=0;i<_tableTasks.Rows.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(_tableTasks.Rows[i]["dateCreate"].ToString());
+				row.Cells.Add(_tableTasks.Rows[i]["dateComplete"].ToString());
+				row.Cells.Add(_tableTasks.Rows[i]["description"].ToString());
+				row.Note=_tableTasks.Rows[i]["note"].ToString();
+				row.ColorLborder=Color.Black;
+				row.ColorText=Color.FromArgb(PIn.Int(_tableTasks.Rows[i]["color"].ToString()));
+				gridTasks.Rows.Add(row);
+				row.Tag=_tableTasks.Rows[i]["TaskNum"].ToString();
+			}
+			gridTasks.EndUpdate();
+		}
+
+		private void butRefresh_Click(object sender,EventArgs e) {
+			RefreshTable();
+			FillGrid();
+		}
+
+		public void RefreshGrid(object sender,CancelEventArgs e) {
+			FormTaskEdit FormTE=(FormTaskEdit)sender;
+			if(!this.IsDisposed && (FormTE.DialogResult==DialogResult.OK || FormTE.NotesChanged)) {
+				RefreshTable();
+				FillGrid();
+			}
+		}
+
+		private void RefreshTable() {
+			long priority=0;
+			if(comboPriority.SelectedIndex!=0) {
+				priority=_listTaskPriorities[comboPriority.SelectedIndex-1].DefNum;
+			}
+			long userNum=0;
+			if(comboUsers.SelectedIndex!=0) {
+				userNum=_listUsers[comboUsers.SelectedIndex-1].UserNum;
+			}
+			List<long> listTaskListNums=new List<long>();
+			if(textTaskList.Text!="") {
+				listTaskListNums=TaskLists.GetNumsByDescription(textTaskList.Text);
+				if(listTaskListNums.Count==0) {
+					MsgBox.Show(this,"Task List not found.");
+					return;
+				}
+			}
+			long taskNum=0;
+			if(textTaskNum.Text!="") {
+				try {
+					taskNum=PIn.Long(textTaskNum.Text);
+				}
+				catch {
+					MsgBox.Show(this,"Invalid Task Num format.");
+					return;
+				}
+			}
+			long patNum=0;
+			if(textPatNum.Text!="") {
+				try {
+					patNum=PIn.Long(textPatNum.Text);
+				}
+				catch {
+					MsgBox.Show(this,"Invalid PatNum format.");
+					return;
+				}
+			}
+			_tableTasks=Tasks.GetDataSet(userNum,listTaskListNums,taskNum,dateCreatedFrom.Text,dateCreatedTo.Text,dateCompletedFrom.Text,
+				dateCompletedTo.Text,textDescription.Text,priority,patNum,checkLimit.Checked);
+		}
+
+		private void gridTasks_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			long taskNum=PIn.Long(gridTasks.Rows[e.Row].Tag.ToString());
+			Task task=Tasks.GetOne(taskNum);
+			FormTaskEdit FormTE=new FormTaskEdit(task,task.Copy());
+			FormTE.Closing+=TaskGoToEvent;
+			FormTE.Closing+=RefreshGrid;
+			FormTE.Show();
+		}
+
+		private void butPatPicker_Click(object sender,EventArgs e) {
+			FormPatientSelect FormPS=new FormPatientSelect();
+			FormPS.SelectionModeOnly=true;
+			if(FormPS.ShowDialog()==DialogResult.OK) {
+				textPatNum.Text=FormPS.SelectedPatNum.ToString();
+			}
+		}
+
+		private void butUserPicker_Click(object sender,EventArgs e) {
+			FormUserPick FormUP=new FormUserPick();
+			FormUP.ListUser=UserodC.GetListt();
+			if(FormUP.ShowDialog()==DialogResult.OK) {
+				comboUsers.SelectedIndex=_listUsers.FindIndex(x => x.UserNum==FormUP.SelectedUserNum)+1;
+			}
+		}
+
+		private void dateCreatedFrom_ValueChanged(object sender,EventArgs e) {
+			dateCreatedFrom.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+		}
+
+		private void dateCreatedTo_ValueChanged(object sender,EventArgs e) {
+			dateCreatedTo.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+		}
+
+		private void dateCompletedFrom_ValueChanged(object sender,EventArgs e) {
+			dateCompletedFrom.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+		}
+
+		private void dateCompletedTo_ValueChanged(object sender,EventArgs e) {
+			dateCompletedTo.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+		}
+
+		private void butClearCreated_Click(object sender,EventArgs e) {
+			dateCreatedFrom.Value=DateTime.UtcNow;
+			dateCreatedTo.Value=DateTime.UtcNow;
+			dateCreatedFrom.CustomFormat=" ";
+			dateCreatedTo.CustomFormat=" ";
+		}
+
+		private void butClearCompleted_Click(object sender,EventArgs e) {
+			dateCompletedFrom.Value=DateTime.UtcNow;
+			dateCompletedTo.Value=DateTime.UtcNow;
+			dateCompletedFrom.CustomFormat=" ";
+			dateCompletedTo.CustomFormat=" ";			
+		}
+
+		private void butClose_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.OK;
+			Close();
+		}
+
+	}
+}

@@ -190,6 +190,15 @@ namespace OpenDentBusiness{
 			return Crud.TaskListCrud.SelectOne(command);
 		}
 
+		///<summary>Get TaskListNums based on description.</summary>
+		public static List<long> GetNumsByDescription(string descript) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),descript);
+			}
+			string command="SELECT TaskListNum FROM tasklist WHERE Descript LIKE '%"+POut.String(descript)+"%'";
+			return Db.GetListLong(command);
+		}
+
 		/*
 		///<Summary>Gets all task lists in the general tab with no heirarchy.  This allows us to loop through the list to grab useful heirarchy info.  Only used when viewing user tab.  Not guaranteed to get all tasklists, because we exclude those with a DateType.</Summary>
 		public static List<TaskList> GetAllGeneral(){

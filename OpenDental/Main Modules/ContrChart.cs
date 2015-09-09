@@ -6608,7 +6608,7 @@ namespace OpenDental{
 				{
 					//web mail uses special secure messaging portal
 					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,msg.EmailMessageNum);
-					if(FormWMME.ShowDialog()!=DialogResult.OK) {
+					if(FormWMME.ShowDialog()==DialogResult.Cancel) {//This will cause an unneccesary refresh in the cazse of a validation error with the webmail
 						return;
 					}
 				}

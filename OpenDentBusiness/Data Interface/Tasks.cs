@@ -64,6 +64,257 @@ namespace OpenDentBusiness{
 			return Crud.TaskCrud.SelectOne(command);
 		}
 
+		///<summary>Gets all tasks for the Task Search function, limited to 50 by default.</summary>
+		public static DataTable GetDataSet(long userNum,List<long> listTaskListNums,long taskNum,string taskDateCreatedFrom,string taskDateCreatedTo,string taskDateCompletedFrom,string taskDateCompletedTo,string taskDescription,long taskPriorityNum,long patNum,bool limit) {
+			string whereClause="";
+			string whereNoteClause="";
+			if(userNum!=0) {
+				whereClause+="task.UserNum="+POut.Long(userNum)+" ";
+				whereNoteClause+="tasknote.UserNum="+POut.Long(userNum)+" ";
+			}
+			if(listTaskListNums.Count!=0) {
+				if(listTaskListNums.Count>0) {
+					if(whereClause!="") {
+						whereClause+="AND ";
+					}
+					whereClause+="task.TaskListNum IN("+String.Join(",",listTaskListNums)+") ";
+				}
+			}
+			if(taskNum!=0) {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				if(whereNoteClause!="") {
+					whereNoteClause+="AND ";
+				}
+				whereClause+="task.TaskNum="+POut.Long(taskNum)+" ";
+				whereNoteClause+="tasknote.TaskNum="+POut.Long(taskNum)+" ";
+			}
+			//Note: DateTime strings that are empty actually are " " due to how the empty datetime control behaves.
+			if(taskDateCreatedFrom!=" " || taskDateCreatedTo!=" ") {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				if(whereNoteClause!="") {
+					whereNoteClause+="AND ";
+				}
+				if(taskDateCreatedFrom!=" " && taskDateCreatedTo!=" ") {//Needs to be a between statement
+					whereClause+="DATE(task.DateTimeEntry) BETWEEN "+POut.Date(PIn.Date(taskDateCreatedFrom))+" AND "+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
+					whereNoteClause+="DATE(tasknote.DateTimeNote) BETWEEN "+POut.Date(PIn.Date(taskDateCreatedFrom))+" AND "+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
+				}
+				else if(taskDateCreatedFrom!=" ") {
+					whereClause+="DATE(task.DateTimeEntry)>="+POut.Date(PIn.Date(taskDateCreatedFrom))+" ";
+					whereNoteClause+="DATE(tasknote.DateTimeNote)>="+POut.Date(PIn.Date(taskDateCreatedFrom))+" ";
+				}
+				else {//Only the To field was entered.
+					whereClause+="DATE(task.DateTimeEntry)<="+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
+					whereNoteClause+="DATE(tasknote.DateTimeNote)<="+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
+				}
+			}
+			if(taskDateCompletedFrom!=" " || taskDateCompletedTo!=" ") {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				if(whereNoteClause!="") {
+					whereNoteClause+="AND ";
+				}
+				if(taskDateCompletedFrom!=" " && taskDateCompletedTo!=" ") {//Needs to be a between statement
+					whereClause+="DATE(task.DateTimeFinished) BETWEEN "+POut.Date(PIn.Date(taskDateCompletedFrom))+" AND "+POut.Date(PIn.Date(taskDateCompletedTo))+" ";
+				}
+				else if(taskDateCompletedFrom!=" ") {
+					whereClause+="DATE(task.DateTimeFinished)>="+POut.Date(PIn.Date(taskDateCompletedFrom))+" ";
+				}
+				else {//Only the To field was entered.
+					whereClause+="DATE(task.DateTimeFinished)<="+POut.Date(PIn.Date(taskDateCompletedTo))+" ";
+				}
+				whereNoteClause="";
+			}
+			if(taskDescription!="") {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				if(whereNoteClause!="") {
+					whereNoteClause+="AND ";
+				}
+				whereClause+="task.Descript LIKE '%"+POut.String(taskDescription)+"%' ";
+				whereNoteClause+="tasknote.Note LIKE '%"+POut.String(taskDescription)+"%' ";
+			}
+			if(taskPriorityNum!=0) {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				whereClause+="task.PriorityDefNum="+POut.Long(taskPriorityNum)+" ";
+			}
+			if(patNum!=0) {
+				if(whereClause!="") {
+					whereClause+="AND ";
+				}
+				whereClause+="(task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" AND task.KeyNum="+POut.Long(patNum)+") ";
+			}
+			if(whereNoteClause!="") {
+				whereNoteClause="WHERE "+whereNoteClause;
+			}
+			if(whereClause!="") {
+				whereClause="WHERE "+whereClause;
+			}
+			string command="(SELECT task.TaskNum AS TaskNum "
+				+"FROM task "
+				+whereClause
+				+"ORDER BY task.DateTimeEntry DESC ";
+			if(limit) {
+				command+="LIMIT 50 ";
+			}
+			command+=") ";
+			if((whereClause!="" && whereNoteClause!="") || (whereClause=="" && whereNoteClause=="")) {
+				command+="UNION "
+				+"(SELECT taskNote.TaskNum AS TaskNum "
+				+"FROM tasknote "
+				+whereNoteClause
+				+"ORDER BY tasknote.DateTimeNote DESC ";
+				if(limit) {
+					command+="LIMIT 50 ";
+				}
+				command+=")";
+			}
+			DataTable rawTask=Db.GetTable(command);
+			List<long> listTaskNums=new List<long>();
+			for(int i=0;i<rawTask.Rows.Count;i++) {
+				listTaskNums.Add(PIn.Long(rawTask.Rows[i]["TaskNum"].ToString()));
+			}
+			DateTime dateCreate;
+			DateTime dateComplete;
+			DataRow row;
+			DataTable table=new DataTable();
+			table.Columns.Add(new DataColumn("description"));
+			table.Columns.Add(new DataColumn("note"));
+			table.Columns.Add(new DataColumn("PatNum"));
+			table.Columns.Add(new DataColumn("procTime"));
+			table.Columns.Add(new DataColumn("dateCreate"));
+			table.Columns.Add(new DataColumn("dateComplete"));
+			table.Columns.Add(new DataColumn("TaskNum"));
+			table.Columns.Add(new DataColumn("color"));
+			if(listTaskNums.Count!=0) {
+				List<Task> listTasks=Tasks.GetMany(listTaskNums);//All tasks for the notes and tasks.
+				//There are potentially too many tasks in listTasks at this point.  It contains all tasks that met the criteria for the task union but it
+				//also contains all tasks for task notes that met the note criteria in the note union.  The tasks obtained from the notes only had to have a  
+				//single note meet the note criteria, which is description, creation date, author, and task num.  There are an additional 4 criteria that the
+				//tasks themselves should meet which are priority, finished date, pat num, and task list.  Instead of doing a costly join on the task table
+				//from the tasknotes inside the query, we will instead remove tasks from listTasks that don't meet the task criteria (they were obtained from 
+				//notes which matched the note criteria).  In this way we then have a list of tasks that met all the criteria from the task union to begin with
+				//and also has tasks that were obtained from notes which also have the additional task criteria.
+				for(int i=listTasks.Count-1;i>=0;i--) {
+					if(listTaskListNums.Count>0 && !listTaskListNums.Contains(listTasks[i].TaskListNum)) {//The TaskListNum of this task isn't included in the search.
+						listTasks.RemoveAt(i);
+						continue;
+					}
+					if(taskPriorityNum!=0 && listTasks[i].PriorityDefNum!=taskPriorityNum) {//The task doesn't have a priority that matches what we are searching for.
+						listTasks.RemoveAt(i);
+						continue;
+					}
+					if(patNum!=0 && listTasks[i].ObjectType!=TaskObjectType.Patient && listTasks[i].KeyNum!=patNum) {//The task isn't associated with the correct patient we're searching for.
+						listTasks.RemoveAt(i);
+						continue;
+					}
+					if(taskDateCompletedFrom!=" " && taskDateCompletedTo!=" ") {
+						if(listTasks[i].DateTimeFinished.Date<PIn.DateT(taskDateCompletedFrom).Date && listTasks[i].DateTimeFinished.Date>PIn.DateT(taskDateCompletedTo).Date) {
+							//Task finished date is not in the specified date range.
+							listTasks.RemoveAt(i);
+							continue;
+						}
+					}
+					else if(taskDateCompletedFrom!=" ") {
+						if(listTasks[i].DateTimeFinished.Date<PIn.DateT(taskDateCompletedFrom).Date) {
+							//Task finished date is not in the specified date range.
+							listTasks.RemoveAt(i);
+							continue;
+						}
+					}
+					else if(taskDateCompletedTo!=" ") {
+						if(listTasks[i].DateTimeFinished.Date>PIn.DateT(taskDateCompletedTo).Date) {
+							//Task finished date is not in the specified date range.
+							listTasks.RemoveAt(i);
+							continue;
+						}
+					}
+				}
+				listTasks.Sort(CompareDateTimeEntry);
+				List<TaskNote> listTaskNotes=TaskNotes.RefreshForTasks(listTaskNums);//All notes for the tasks.
+				Def[] taskColors=DefC.GetList(DefCat.ProgNoteColors);
+				for(int i=0;i<listTasks.Count;i++) {
+					string txt="";
+					row=table.NewRow();
+					row["color"]=POut.Int(taskColors[18].ItemColor.ToArgb());
+					if(listTasks[i].TaskStatus==TaskStatusEnum.Done) {
+						row["color"]=POut.Int(taskColors[20].ItemColor.ToArgb());
+						txt+=Lans.g("TaskSearch","Completed ");
+					}
+					if(listTasks[i].TaskListNum!=0) {
+						row["description"]=txt+Lans.g("TaskSearch","In List: ")+TaskLists.GetFullPath(listTasks[i].TaskListNum);
+					}
+					else {
+						row["description"]=txt+Lans.g("TaskSearch","Not in list");
+					}
+					txt="";
+					if(!listTasks[i].Descript.StartsWith("==") && listTasks[i].UserNum!=0) {
+						txt+=Userods.GetName(PIn.Long(listTasks[i].UserNum.ToString()))+" - ";
+					}
+					txt+=listTasks[i].Descript;
+					long taskNumDs=listTasks[i].TaskNum;
+					for(int n=0;n<listTaskNotes.Count;n++) {
+						if(listTaskNotes[n].TaskNum!=taskNumDs) {
+							continue;
+						}
+						txt+="\r\n"//even on the first loop
+					+"=="+Userods.GetName(listTaskNotes[n].UserNum)+" - "
+					+listTaskNotes[n].DateTimeNote.ToShortDateString()+" "
+					+listTaskNotes[n].DateTimeNote.ToShortTimeString()
+					+" - "+listTaskNotes[n].Note;
+					}
+					row["note"]=txt;
+					row["PatNum"]=listTasks[i].KeyNum;
+					dateCreate=listTasks[i].DateTask;
+					dateComplete=listTasks[i].DateTimeFinished;
+					row["procTime"]="";
+					if(dateCreate.Year<1880) {//check if due date set for task or note
+						dateCreate=listTasks[i].DateTimeEntry;
+						if(dateCreate.Year<1880) {//since dateT was just redefined, check it now
+							row["dateCreate"]="";
+						}
+						else {
+							row["dateCreate"]=dateCreate.ToShortDateString();
+						}
+						if(dateCreate.TimeOfDay!=TimeSpan.Zero) {
+							row["procTime"]=dateCreate.ToString("h:mm")+dateCreate.ToString("%t").ToLower();
+						}
+					}
+					else {
+						row["dateCreate"]=dateCreate.ToString(Lans.GetShortDateTimeFormat());
+						if(dateCreate.TimeOfDay!=TimeSpan.Zero) {
+							row["procTime"]=dateCreate.ToString("h:mm") + dateCreate.ToString("%t").ToLower();
+						}
+					}
+					if(dateComplete.Year<1880) {
+						row["dateComplete"]="";
+					}
+					else {
+						row["dateComplete"]=dateComplete.ToString(Lans.GetShortDateTimeFormat());
+					}
+					row["TaskNum"]=listTasks[i].TaskNum;
+					table.Rows.Add(row);
+				}
+			}
+			return table;
+		}
+
+		///<summary>Gets all tasks for a supplied list of task nums.</summary>
+		public static List<Task> GetMany(List<long> listTaskNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Task>>(MethodBase.GetCurrentMethod(),listTaskNums);
+			}
+			string command="SELECT * FROM task WHERE TaskNum IN("+String.Join(",",listTaskNums)+") ORDER BY DateTimeEntry";
+			return Crud.TaskCrud.SelectMany(command);
+		}
+
 		///<summary>Gets all tasks for the main trunk.</summary>
 		public static List<Task> RefreshMainTrunk(bool showDone,DateTime startDate,long currentUserNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -593,9 +844,11 @@ namespace OpenDentBusiness{
 		///<summary>Sorted in Ascending order: Unread/Read, </summary>
 		public static int TaskComparer(DataRow x,DataRow y) {
 			//1)Sort by IsUnread status
-			if(x["IsUnread"].ToString()!=y["IsUnread"].ToString()) {
-				//Note: we are returning the negative of x.CompareTo(y)
-				return -(PIn.Long(x["IsUnread"].ToString()).CompareTo(PIn.Long(y["IsUnread"].ToString())));//sort unread to top.
+			if(PrefC.GetBool(PrefName.TasksNewTrackedByUser)) {
+				if(x["IsUnread"].ToString()!=y["IsUnread"].ToString()) {
+					//Note: we are returning the negative of x.CompareTo(y)
+					return -(PIn.Long(x["IsUnread"].ToString()).CompareTo(PIn.Long(y["IsUnread"].ToString())));//sort unread to top.
+				}
 			}
 			//2)Sort by Task Priority
 			if(x["PriorityDefNum"].ToString()!=y["PriorityDefNum"].ToString()) {//we only care about task priority if they are different
@@ -632,6 +885,10 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Compares the task DateTimeEntry to sort the list.</summary>
+		public static int CompareDateTimeEntry(Task x,Task y) {
+			return 0-(x.DateTimeEntry.CompareTo(y.DateTimeEntry));//Sorting most recent first.
+		}
 
 
 	}

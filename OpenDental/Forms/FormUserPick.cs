@@ -9,9 +9,10 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormUserPick:Form {
-		private List<Userod> shortList;
+		public List<Userod> ListUser;
 		///<summary>If this form closes with OK, then this value will be filled.</summary>
 		public long SelectedUserNum;
+		public bool IsSelectionmode;
 
 		public FormUserPick() {
 			InitializeComponent();
@@ -19,9 +20,11 @@ namespace OpenDental {
 		}
 
 		private void FormUserPick_Load(object sender,EventArgs e) {
-			shortList=UserodC.ShortList;
-			for(int i=0;i<shortList.Count;i++) {
-				listUser.Items.Add(shortList[i]);
+			if(ListUser==null) {
+				ListUser=UserodC.GetListShort();
+			}
+			for(int i=0;i<ListUser.Count;i++) {
+				listUser.Items.Add(ListUser[i]);
 			}
 		}
 
@@ -29,11 +32,11 @@ namespace OpenDental {
 			if(listUser.SelectedIndex==-1) {
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
+			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUser[listUser.SelectedIndex].UserNum)!=0 && !IsSelectionmode) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}
-			SelectedUserNum=shortList[listUser.SelectedIndex].UserNum;
+			SelectedUserNum=ListUser[listUser.SelectedIndex].UserNum;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -42,11 +45,11 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please pick a user first.");
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(shortList[listUser.SelectedIndex].UserNum)!=0) {
+			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUser[listUser.SelectedIndex].UserNum)!=0 && !IsSelectionmode) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}
-			SelectedUserNum=shortList[listUser.SelectedIndex].UserNum;
+			SelectedUserNum=ListUser[listUser.SelectedIndex].UserNum;
 			DialogResult=DialogResult.OK;
 		}
 

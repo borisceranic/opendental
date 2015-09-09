@@ -60,7 +60,7 @@ namespace OpenDental {
 		private TaskList TaskListCur;
 		private UI.ODGrid gridMain;
 		///<summary>Will be set to true if any note was added or an existing note changed. Does not track changes in the description.</summary>
-		private bool notesChanged;
+		public bool NotesChanged;
 		private UI.Button butAddNote;
 		private UI.Button butChangeUser;
 		private List<TaskNote> NoteList;
@@ -785,6 +785,11 @@ namespace OpenDental {
 				textTaskNum.Visible=true;
 				textTaskNum.Text=TaskCur.TaskNum.ToString();
 			#endif
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//If HQ
+				labelTaskNum.Visible=true;
+				textTaskNum.Visible=true;
+				textTaskNum.Text=TaskCur.TaskNum.ToString();
+			}
 			if(IsNew) {
 				//butDelete.Enabled always stays true
 				//textDescript always editable
@@ -1047,7 +1052,7 @@ namespace OpenDental {
 		}
 
 		private void OnNoteEditComplete_CellDoubleClick(object sender) {
-			notesChanged=true;
+			NotesChanged=true;
 			if(TaskOld.TaskStatus==TaskStatusEnum.Done) {//If task was marked Done when opened, we uncheck the Done checkbox so people can see the changes.
 				checkDone.Checked=false;
 			}
@@ -1070,7 +1075,7 @@ namespace OpenDental {
 		}
 
 		private void OnNoteEditComplete_Add(object sender) {
-			notesChanged=true;
+			NotesChanged=true;
 			if(TaskOld.TaskStatus==TaskStatusEnum.Done) {//If task was marked Done when opened, we uncheck the Done checkbox so people can see the changes.
 				checkDone.Checked=false;
 			}
@@ -1395,7 +1400,7 @@ namespace OpenDental {
 			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all four tables
 			DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			TaskHist taskHistory=new TaskHist(TaskOld);
-			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.IsNoteChange=NotesChanged;
 			taskHistory.UserNum=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
@@ -1415,7 +1420,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"No inbox has been set up for this user yet.");
 				return;
 			}
-			if(!notesChanged && textDescript.Text==TaskCur.Descript) {//nothing changed
+			if(!NotesChanged && textDescript.Text==TaskCur.Descript) {//nothing changed
 				FormTaskNoteEdit form=new FormTaskNoteEdit();
 				form.TaskNoteCur=new TaskNote();
 				form.TaskNoteCur.TaskNum=TaskCur.TaskNum;
@@ -1432,7 +1437,7 @@ namespace OpenDental {
 			}
 			DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			TaskHist taskHistory=new TaskHist(TaskOld);
-			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.IsNoteChange=NotesChanged;
 			taskHistory.UserNum=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
@@ -1488,11 +1493,11 @@ namespace OpenDental {
 				}
 			}
 			//Check for changes.  If something changed, send a signal.
-			if(notesChanged || !TaskCur.Equals(TaskOld) || StatusChanged) {
+			if(NotesChanged || !TaskCur.Equals(TaskOld) || StatusChanged) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
 			TaskHist taskHistory=new TaskHist(TaskOld);
-			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.IsNoteChange=NotesChanged;
 			taskHistory.UserNum=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
@@ -1507,7 +1512,7 @@ namespace OpenDental {
 			if(!SaveCur()) {//If user clicked OK without changing anything, then this will have no effect.
 				return;
 			}
-			if(!notesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
+			if(!NotesChanged && TaskCur.Equals(TaskOld) && !StatusChanged) {//if there were no changes, then don't bother with the signal
 				DialogResult=DialogResult.OK;
 				Close();
 				return;
@@ -1515,7 +1520,7 @@ namespace OpenDental {
 			if(IsNew) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
-			else if(notesChanged || textDescript.Text!=TaskCur.Descript) {//notes or descript changed
+			else if(NotesChanged || textDescript.Text!=TaskCur.Descript) {//notes or descript changed
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
 			else {
@@ -1526,7 +1531,7 @@ namespace OpenDental {
 				//because of the way we compair tasks, this is required to detect priority changes properly
 				taskHistory.PriorityDefNum=TaskCur.PriorityDefNum;
 			}
-			taskHistory.IsNoteChange=notesChanged;
+			taskHistory.IsNoteChange=NotesChanged;
 			taskHistory.UserNumHist=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
@@ -1563,7 +1568,7 @@ namespace OpenDental {
 				Tasks.Delete(TaskCur.TaskNum);
 			}
 			//If a note was added to a Done task and the user hits cancel, the task status is set to Viewed because the note is still there and the task didn't move lists.
-			if(notesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
+			if(NotesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
 				if(checkDone.Checked) {//Will only happen when the Done checkbox has been manually re-checked by the user.
 					return;
 				}

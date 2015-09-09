@@ -161,6 +161,7 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Setup"),-1,"","Setup"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add TaskList"),0,"","AddList"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Task"),1,"","AddTask"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Search"),-1,"","Search"));
 			ODToolBarButton button=new ODToolBarButton();
 			button.Style=ODToolBarButtonStyle.ToggleButton;
 			button.Text=Lan.g(this,"BlockSubsc");
@@ -632,6 +633,9 @@ namespace OpenDental {
 				case "AddTask":
 					AddTask_Clicked();
 					break;
+				case "Search":
+					Search_Clicked();
+					break;
 				case "BlockSubsc":
 					BlockSubsc_Clicked();
 					break;
@@ -736,6 +740,12 @@ namespace OpenDental {
 			FormT.IsNew=true;
 			FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 			FormT.Show();//non-modal
+		}
+
+		public void Search_Clicked() {
+			FormTaskSearch FormTS=new FormTaskSearch();
+			FormTS.TaskGoToEvent+=TaskGoToEvent;
+			FormTS.Show();
 		}
 
 		public void TaskGoToEvent(object sender,CancelEventArgs e) {
