@@ -10195,6 +10195,20 @@ namespace OpenDentBusiness {
 						+"((SELECT MAX(PrefNum)+1 FROM preference),'ClaimReportReceiveInterval','5')";
 					Db.NonQ(command);
 				}
+				command="SELECT COUNT(*) FROM medlab WHERE PatNum=0";
+				string isReconciled="0";
+				if(Db.GetCount(command)=="0") {
+					isReconciled="1";
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('MedLabReconcileDone','"+isReconciled+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'MedLabReconcileDone','"+isReconciled+"')";
+					Db.NonQ(command);
+				}
 
 
 
