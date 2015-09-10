@@ -839,7 +839,12 @@ namespace OpenDental{
 				}
 			}
 			else {//No unsent statements exist.  Have user create a billing list.
-				ShowBillingOptions(0);
+				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+					ShowBillingOptions(FormOpenDental.ClinicNum);
+				}
+				else {
+					ShowBillingOptions(0);
+				}
 			}
 			SecurityLogs.MakeLogEntry(Permissions.Billing,0,"");
 		}
