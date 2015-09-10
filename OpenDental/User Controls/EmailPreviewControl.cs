@@ -91,7 +91,8 @@ namespace OpenDental {
 			textBodyText.Visible=true;
 			webBrowser.Visible=false;
 			if(EmailMessages.IsReceived(_emailMessage.SentOrReceived)) {
-				List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,"text/html","text/plain","image/");
+				List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=
+					EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,GetEmailAddress(),"text/html","text/plain","image/");
 				List<Health.Direct.Common.Mime.MimeEntity> listHtmlParts=listMimeParts[0];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 				List<Health.Direct.Common.Mime.MimeEntity> listTextParts=listMimeParts[1];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 				_listImageParts=listMimeParts[2];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).

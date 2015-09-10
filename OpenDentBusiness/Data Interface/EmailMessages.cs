@@ -726,23 +726,39 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Parses a raw email into a usable object.</summary>
-		private static Health.Direct.Agent.IncomingMessage RawEmailToIncomingMessage(string strRawEmailIn) {
+		private static Health.Direct.Agent.IncomingMessage RawEmailToIncomingMessage(string strRawEmailIn,EmailAddress emailAddressInbox) {
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=null;
-			try {
-				inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmailIn);//Used to parse all email (encrypted or not).
-			}
-			catch(Exception ex) {
-				if(ex.Message=="Error=MissingHeaderValue") {
-					//The "Welcome to Email" message from GoDaddy has a blank CC field which causes the IncomingMessage() constructor to throw an exception.
-					//The TO header can be blank because it is not required, since the user could put all destination addresses in either CC or BCC alone.  We tested this.
-					strRawEmailIn=Regex.Replace(strRawEmailIn,@"TO:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the TO header if it is any number of spaces or tabs followed by exactly one newline.
-					strRawEmailIn=Regex.Replace(strRawEmailIn,@"CC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the CC header if it is any number of spaces or tabs followed by exactly one newline.
-					strRawEmailIn=Regex.Replace(strRawEmailIn,@"BCC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Probably overkill, but does not hurt.
-					inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmailIn);
+			string lastErrorMsg="";
+			for(int i=0;i<5;i++) {//We will exit if unknown error or if previous error was the same as current error.
+				try {
+					inMsg=new Health.Direct.Agent.IncomingMessage(strRawEmailIn);//Used to parse all email (encrypted or not).
 				}
-				else {
-					throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+				catch(Exception ex) {
+					if(ex.Message==lastErrorMsg) {//Our last attempt to fix the issue failed.
+						throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+					}
+					if(ex.Message=="Error=MissingHeaderValue") {
+						//The "Welcome to Email" message from GoDaddy has a blank CC field which causes the IncomingMessage() constructor to throw an exception.
+						//The TO header can be blank because it is not required, since the user could put all destination addresses in either CC or BCC alone.  We tested this.
+						strRawEmailIn=Regex.Replace(strRawEmailIn,@"TO:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the TO header if it is any number of spaces or tabs followed by exactly one newline.
+						strRawEmailIn=Regex.Replace(strRawEmailIn,@"CC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Remove the CC header if it is any number of spaces or tabs followed by exactly one newline.
+						strRawEmailIn=Regex.Replace(strRawEmailIn,@"BCC:[ \t]*\r\n","",RegexOptions.IgnoreCase);//Probably overkill, but does not hurt.
+					}
+					else if(ex.Message=="An invalid character was found in the mail header: ';'.") {
+						//When all recipients are in the bcc field, some clients (gmail) inputs "undisclosed-recipients:;" into the TO field, which causes an error to be thrown.
+						strRawEmailIn=Regex.Replace(strRawEmailIn,@"undisclosed-recipients:;","",RegexOptions.IgnoreCase);//Remove "undisclosed-recipients".
+					}
+					else if(ex.Message=="Error=NoRecipients") {
+						//When all recipients are in the bcc field, some clients (Apple mail) remove all address fields (To, cc, bcc) from the header, which causes an error to be thrown.
+						//the code below attempts to add a bcc field with the user's email into the header (seems to work for emails coming from Apple mail)
+						strRawEmailIn=Regex.Replace(strRawEmailIn,@"Subject: ",
+							"Bcc: "+emailAddressInbox.EmailUsername+"\r\nSubject: ",RegexOptions.IgnoreCase);
+					}
+					else {
+						throw new ApplicationException("Failed to parse raw email message.\r\n"+ex.Message);
+					}
+					lastErrorMsg=ex.Message;
 				}
 			}
 			return inMsg;
@@ -771,7 +787,7 @@ namespace OpenDentBusiness{
 		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
 		public static EmailMessage ProcessRawEmailMessageIn(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
 			//No need to check RemotingRole; no call to db.
-			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail);
+			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail,emailAddressReceiver);
 			bool isEncrypted=IsReceivedMessageEncrypted(inMsg);
 			EmailMessage emailMessage=null;
 			if(isEncrypted) {
@@ -876,11 +892,13 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Email bodies can have multiple parts.  Usually, for HTML email, there will be one HTML mime part plus one mime part for each image (in base64) which is part of the email message.  HTML messages usually also have one mime part for the text version of the email message, in case the email client does not have html capabilities.  This function extracts the text for all mime body parts which fully or partially match the specified mime content types.  For example, you could specify a mime content of "image/" to find images of all types, or you could specify a mime content type of "image/jpeg" to find only jpeg images.  Always returns one valid list for each specified mime content types, where the individual lists are always present but may be zero length.</summary>
-		public static List<List<Health.Direct.Common.Mime.MimeEntity>> GetMimePartsForMimeTypes(string strRawEmailIn,params string[] arrayMimeContentTypes) {
+		public static List<List<Health.Direct.Common.Mime.MimeEntity>> GetMimePartsForMimeTypes(string strRawEmailIn,EmailAddress emailAddressInbox,
+			params string[] arrayMimeContentTypes)
+		{
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=null;
 			try {
-				inMsg=RawEmailToIncomingMessage(strRawEmailIn);
+				inMsg=RawEmailToIncomingMessage(strRawEmailIn,emailAddressInbox);
 				if(IsReceivedMessageEncrypted(inMsg)) {
 					inMsg=DecryptIncomingMessage(inMsg);
 				}
