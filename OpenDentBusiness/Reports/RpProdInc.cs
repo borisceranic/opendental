@@ -1015,11 +1015,12 @@ namespace OpenDentBusiness {
 			//TableSched------------------------------------------------------------------------------
 			DataTable tableSched=new DataTable();
 			if(!isAnnual) {
+				//Reads from the procedurelog table instead of claimproc because we are looking for scheduled procedures.
 				if(!hasAllProvs && listProvNums.Count>0) {
-					whereProv=" AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+					whereProv=" AND procedurelog.ProvNum IN ("+String.Join(",",listProvNums)+") ";
 				}
 				if(!hasAllClinics && listClinicNums.Count>0) {
-					whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+					whereClin=" AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
 				}
 				command= "SELECT "+DbHelper.DtimeToDate("t.AptDateTime")+" SchedDate,SUM(t.Fee-t.WriteoffEstimate) Amount,ClinicNum "
 				+"FROM (SELECT appointment.AptDateTime,IFNULL(procedurelog.ProcFee,0) Fee,appointment.ClinicNum,";
