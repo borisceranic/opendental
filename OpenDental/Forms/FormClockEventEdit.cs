@@ -18,7 +18,6 @@ namespace OpenDental{
 		private System.Windows.Forms.ListBox listStatus;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox textNote;
 		private System.Windows.Forms.TextBox textTimeDisplayed1;
 		private OpenDental.UI.Button butDelete;
 		/// <summary>
@@ -57,6 +56,7 @@ namespace OpenDental{
 		private Label label17;
 		private GroupBox groupRate2;
 		private Label label18;
+		private ODtextBox textNote;
 		private ClockEvent ClockEventCur;
 
 		///<summary></summary>
@@ -100,7 +100,6 @@ namespace OpenDental{
 			this.listStatus = new System.Windows.Forms.ListBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.textNote = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.butNow1 = new OpenDental.UI.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -136,6 +135,7 @@ namespace OpenDental{
 			this.label17 = new System.Windows.Forms.Label();
 			this.groupRate2 = new System.Windows.Forms.GroupBox();
 			this.label18 = new System.Windows.Forms.Label();
+			this.textNote = new OpenDental.ODtextBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupTimeSpans.SuspendLayout();
@@ -200,14 +200,6 @@ namespace OpenDental{
 			this.label4.TabIndex = 10;
 			this.label4.Text = "Note";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textNote
-			// 
-			this.textNote.Location = new System.Drawing.Point(179, 308);
-			this.textNote.Multiline = true;
-			this.textNote.Name = "textNote";
-			this.textNote.Size = new System.Drawing.Size(317, 110);
-			this.textNote.TabIndex = 11;
 			// 
 			// groupBox1
 			// 
@@ -593,16 +585,28 @@ namespace OpenDental{
 			this.label18.Text = "Calculated";
 			this.label18.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
 			// 
+			// textNote
+			// 
+			this.textNote.AcceptsTab = true;
+			this.textNote.DetectUrls = false;
+			this.textNote.Location = new System.Drawing.Point(179, 309);
+			this.textNote.Name = "textNote";
+			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textNote.Size = new System.Drawing.Size(317, 110);
+			this.textNote.TabIndex = 32;
+			this.textNote.Text = "";
+			// 
 			// FormClockEventEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(669, 485);
+			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.groupRate2);
 			this.Controls.Add(this.groupTimeSpans);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.listStatus);
@@ -625,7 +629,6 @@ namespace OpenDental{
 			this.groupRate2.ResumeLayout(false);
 			this.groupRate2.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 		#endregion
