@@ -3,22 +3,16 @@ Open Dental GPL license Copyright (C) 2003  Jordan Sparks, DMD.  http://www.open
 See header in FormOpenDental.cs for complete text.  Redistributions must retain this text.
 ===============================================================================================================*/
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
-using System.Data;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
-using OpenDental.UI;
-using OpenDentBusiness;
 using CodeBase;
 using OpenDental.Bridges;
+using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental{
 
@@ -1134,6 +1128,15 @@ namespace OpenDental{
 			CustReference custRef=new CustReference();
 			custRef.PatNum=tempPat.PatNum;
 			CustReferences.Insert(custRef);
+			//add the tempPat to the FamCur list, but ModuleSelected below will refill the FamCur list in case the user cancels and tempPat is deleted
+			//This would be a faster way to add to the array, but since it is not a pattern that is used anywhere we will use the alternate method of
+			//creating a list, adding the patient, and converting back to an array
+			//Array.Resize(ref FamCur.ListPats,FamCur.ListPats.Length+1);
+			//FamCur.ListPats[FamCur.ListPats.Length-1]=tempPat;
+			//Adding the temp patient to the FamCur.ListPats without calling GetFamily which makes a call to the db
+			List<Patient> listPatsTemp=FamCur.ListPats.ToList();
+			listPatsTemp.Add(tempPat);
+			FamCur.ListPats=listPatsTemp.ToArray();
 			FormPatientEdit FormPE=new FormPatientEdit(tempPat,FamCur);
 			FormPE.IsNew=true;
 			FormPE.ShowDialog();
