@@ -608,6 +608,9 @@ namespace OpenDental {
 				Patient pat=Patients.GetPat(SheetCur.PatNum);
 				if(SheetCur.SheetType==SheetTypeEnum.LabSlip) {
 					FormS.IsForLab=true;//Changes label to "E-mail to Lab:"
+					SheetParameter _paramLabCaseNum=SheetParameter.GetParamByName(SheetCur.Parameters,"LabCaseNum");//auto populate lab email.
+					LabCase labCaseCur=LabCases.GetOne(PIn.Long(_paramLabCaseNum.ParamValue.ToString()));
+					FormS.EmailPatOrLabAddress=Laboratories.GetOne(labCaseCur.LaboratoryNum).Email;
 				}
 				else if(pat.Email!="") {
 					FormS.EmailPatOrLabAddress=pat.Email;
@@ -718,7 +721,7 @@ namespace OpenDental {
 			//g.Dispose();
 			DialogResult=DialogResult.OK;
 		}
-
+		 
 		private void butPDF_Click(object sender,EventArgs e) {
 			if(!IsStatement && !TryToSaveData()){
 				return;
