@@ -29,6 +29,7 @@ namespace OpenDental{
 		private CheckBox checkX;
 		private CheckBox checkF;
 		private CheckBox checkR;
+		private CheckBox checkL;
 		private GroupBox groupBox1;
 		
 		///<summary></summary>
@@ -69,6 +70,7 @@ namespace OpenDental{
 			this.checkS = new System.Windows.Forms.CheckBox();
 			this.checkP = new System.Windows.Forms.CheckBox();
 			this.checkX = new System.Windows.Forms.CheckBox();
+			this.checkL = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -100,7 +102,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(376, 159);
+			this.butOK.Location = new System.Drawing.Point(376, 181);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 25);
 			this.butOK.TabIndex = 4;
@@ -116,7 +118,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(471, 159);
+			this.butCancel.Location = new System.Drawing.Point(471, 181);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 25);
 			this.butCancel.TabIndex = 5;
@@ -134,6 +136,7 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.checkL);
 			this.groupBox1.Controls.Add(this.checkR);
 			this.groupBox1.Controls.Add(this.checkF);
 			this.groupBox1.Controls.Add(this.checkT);
@@ -142,7 +145,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.checkX);
 			this.groupBox1.Location = new System.Drawing.Point(228, 24);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(215, 129);
+			this.groupBox1.Size = new System.Drawing.Size(215, 151);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Usage";
@@ -151,7 +154,7 @@ namespace OpenDental{
 			// 
 			this.checkR.AutoSize = true;
 			this.checkR.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkR.Location = new System.Drawing.Point(8, 109);
+			this.checkR.Location = new System.Drawing.Point(8, 127);
 			this.checkR.Name = "checkR";
 			this.checkR.Size = new System.Drawing.Size(158, 18);
 			this.checkR.TabIndex = 9;
@@ -171,7 +174,7 @@ namespace OpenDental{
 			// checkT
 			// 
 			this.checkT.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkT.Location = new System.Drawing.Point(8, 91);
+			this.checkT.Location = new System.Drawing.Point(8, 109);
 			this.checkT.Name = "checkT";
 			this.checkT.Size = new System.Drawing.Size(201, 18);
 			this.checkT.TabIndex = 7;
@@ -181,7 +184,7 @@ namespace OpenDental{
 			// checkS
 			// 
 			this.checkS.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkS.Location = new System.Drawing.Point(8, 73);
+			this.checkS.Location = new System.Drawing.Point(8, 91);
 			this.checkS.Name = "checkS";
 			this.checkS.Size = new System.Drawing.Size(201, 18);
 			this.checkS.TabIndex = 6;
@@ -191,7 +194,7 @@ namespace OpenDental{
 			// checkP
 			// 
 			this.checkP.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkP.Location = new System.Drawing.Point(8, 55);
+			this.checkP.Location = new System.Drawing.Point(8, 73);
 			this.checkP.Name = "checkP";
 			this.checkP.Size = new System.Drawing.Size(201, 18);
 			this.checkP.TabIndex = 5;
@@ -207,12 +210,21 @@ namespace OpenDental{
 			this.checkX.TabIndex = 4;
 			this.checkX.Text = "Show in Chart module";
 			// 
+			// checkL
+			// 
+			this.checkL.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkL.Location = new System.Drawing.Point(8, 55);
+			this.checkL.Name = "checkL";
+			this.checkL.Size = new System.Drawing.Size(201, 18);
+			this.checkL.TabIndex = 10;
+			this.checkL.Text = "Show in Patient Portal";
+			// 
 			// FormDefEditImages
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(558, 196);
+			this.ClientSize = new System.Drawing.Size(558, 218);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.checkHidden);
 			this.Controls.Add(this.butCancel);
@@ -245,6 +257,9 @@ namespace OpenDental{
 			if(DefCur.ItemValue.Contains("F")) {
 				checkF.Checked=true;
 			}
+			if(DefCur.ItemValue.Contains("L")) {
+				checkL.Checked=true;
+			}
 			if(DefCur.ItemValue.Contains("P")) {
 				checkP.Checked=true;
 			}
@@ -259,7 +274,6 @@ namespace OpenDental{
 			}
 			checkHidden.Checked=DefCur.IsHidden;
 		}
-
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(checkHidden.Checked) {
 				if(Defs.IsDefinitionInUse(DefCur)) {
@@ -279,6 +293,9 @@ namespace OpenDental{
 			}
 			if(checkF.Checked) {
 				itemVal+="F";
+			}
+			if(checkL.Checked) {
+				itemVal+="L";
 			}
 			if(checkP.Checked) {
 				itemVal+="P";
