@@ -1438,7 +1438,7 @@ namespace OpenDental {
 			DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			TaskHist taskHistory=new TaskHist(TaskOld);
 			taskHistory.IsNoteChange=NotesChanged;
-			taskHistory.UserNum=Security.CurUser.UserNum;
+			taskHistory.UserNumHist=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
@@ -1498,7 +1498,7 @@ namespace OpenDental {
 			}
 			TaskHist taskHistory=new TaskHist(TaskOld);
 			taskHistory.IsNoteChange=NotesChanged;
-			taskHistory.UserNum=Security.CurUser.UserNum;
+			taskHistory.UserNumHist=Security.CurUser.UserNum;
 			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
