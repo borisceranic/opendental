@@ -24,8 +24,21 @@ namespace OpenDental {
 		private TextBox textSearch;
 		private Label label1;
 		private Label labelResultCount;
+		private GroupBox groupBox1;
+		private CheckBox checkShowOther;
+		private CheckBox checkShowDoctor;
+		private CheckBox checkShowPat;
 		///<summary>This will contain the referral that was selected.</summary>
 		public Referral SelectedReferral;
+		///<summary>True by default.  Set to false if the results should exclude patient referral sources.
+		///The show patient check box is set based on the value of this bool.</summary>
+		public bool IsShowPat=true;
+		///<summary>True by default.  Set to false if the results should exclude doctor referral sources.
+		///The show doctor check box is set based on the value of this bool.</summary>
+		public bool IsShowDoc=true;
+		///<summary>True by default.  Set to false if the results should exclude non-patient non-doctor referral sources.
+		///The show other check box is set based on the value of this bool.</summary>
+		public bool IsShowOther=true;
 
 		///<summary></summary>
 		public FormReferralSelect() {
@@ -58,18 +71,24 @@ namespace OpenDental {
 			this.butAdd = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.checkShowOther = new System.Windows.Forms.CheckBox();
+			this.checkShowDoctor = new System.Windows.Forms.CheckBox();
+			this.checkShowPat = new System.Windows.Forms.CheckBox();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// checkHidden
 			// 
 			this.checkHidden.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHidden.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHidden.Location = new System.Drawing.Point(844,6);
+			this.checkHidden.Location = new System.Drawing.Point(844, 16);
 			this.checkHidden.Name = "checkHidden";
-			this.checkHidden.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.checkHidden.Size = new System.Drawing.Size(104,24);
+			this.checkHidden.Size = new System.Drawing.Size(104, 16);
 			this.checkHidden.TabIndex = 11;
-			this.checkHidden.Text = "Show Hidden  ";
+			this.checkHidden.Text = "Show Hidden";
+			this.checkHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkHidden.Click += new System.EventHandler(this.checkHidden_Click);
 			// 
 			// gridMain
@@ -77,11 +96,12 @@ namespace OpenDental {
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(8,34);
+			this.gridMain.Location = new System.Drawing.Point(8, 42);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(940,618);
+			this.gridMain.Size = new System.Drawing.Size(940, 610);
 			this.gridMain.TabIndex = 15;
 			this.gridMain.Title = "Select Referral";
 			this.gridMain.TranslationName = "TableSelectReferral";
@@ -89,33 +109,33 @@ namespace OpenDental {
 			// 
 			// textSearch
 			// 
-			this.textSearch.Location = new System.Drawing.Point(106,8);
+			this.textSearch.Location = new System.Drawing.Point(106, 14);
 			this.textSearch.Name = "textSearch";
-			this.textSearch.Size = new System.Drawing.Size(201,20);
+			this.textSearch.Size = new System.Drawing.Size(201, 20);
 			this.textSearch.TabIndex = 0;
 			this.textSearch.TextChanged += new System.EventHandler(this.textSearch_TextChanged);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(5,10);
+			this.label1.Location = new System.Drawing.Point(5, 17);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(100,17);
+			this.label1.Size = new System.Drawing.Size(100, 14);
 			this.label1.TabIndex = 17;
 			this.label1.Text = "Search";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelResultCount
 			// 
-			this.labelResultCount.Location = new System.Drawing.Point(313,10);
+			this.labelResultCount.Location = new System.Drawing.Point(308, 17);
 			this.labelResultCount.Name = "labelResultCount";
-			this.labelResultCount.Size = new System.Drawing.Size(129,17);
+			this.labelResultCount.Size = new System.Drawing.Size(108, 14);
 			this.labelResultCount.TabIndex = 18;
 			this.labelResultCount.Text = "# results found";
 			this.labelResultCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -123,16 +143,16 @@ namespace OpenDental {
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(8,661);
+			this.butAdd.Location = new System.Drawing.Point(8, 661);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(80,24);
+			this.butAdd.Size = new System.Drawing.Size(80, 24);
 			this.butAdd.TabIndex = 12;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -140,32 +160,81 @@ namespace OpenDental {
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.butCancel.ImageAlign = System.Drawing.ContentAlignment.TopRight;
-			this.butCancel.Location = new System.Drawing.Point(873,661);
+			this.butCancel.Location = new System.Drawing.Point(873, 661);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 6;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(785,661);
+			this.butOK.Location = new System.Drawing.Point(785, 661);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.checkShowOther);
+			this.groupBox1.Controls.Add(this.checkShowDoctor);
+			this.groupBox1.Controls.Add(this.checkShowPat);
+			this.groupBox1.Location = new System.Drawing.Point(484, 3);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(282, 33);
+			this.groupBox1.TabIndex = 19;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Show Only";
+			// 
+			// checkShowOther
+			// 
+			this.checkShowOther.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowOther.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowOther.Location = new System.Drawing.Point(186, 13);
+			this.checkShowOther.Name = "checkShowOther";
+			this.checkShowOther.Size = new System.Drawing.Size(84, 16);
+			this.checkShowOther.TabIndex = 20;
+			this.checkShowOther.Text = "Other";
+			this.checkShowOther.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowOther.Click += new System.EventHandler(this.checkShowOther_Click);
+			// 
+			// checkShowDoctor
+			// 
+			this.checkShowDoctor.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowDoctor.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowDoctor.Location = new System.Drawing.Point(96, 13);
+			this.checkShowDoctor.Name = "checkShowDoctor";
+			this.checkShowDoctor.Size = new System.Drawing.Size(84, 16);
+			this.checkShowDoctor.TabIndex = 21;
+			this.checkShowDoctor.Text = "Doctor";
+			this.checkShowDoctor.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowDoctor.Click += new System.EventHandler(this.checkShowDoctor_Click);
+			// 
+			// checkShowPat
+			// 
+			this.checkShowPat.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowPat.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowPat.Location = new System.Drawing.Point(6, 13);
+			this.checkShowPat.Name = "checkShowPat";
+			this.checkShowPat.Size = new System.Drawing.Size(84, 16);
+			this.checkShowPat.TabIndex = 22;
+			this.checkShowPat.Text = "Patient";
+			this.checkShowPat.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkShowPat.Click += new System.EventHandler(this.checkShowPat_Click);
+			// 
 			// FormReferralSelect
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(962,696);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(962, 696);
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.labelResultCount);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textSearch);
@@ -183,6 +252,7 @@ namespace OpenDental {
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Referrals";
 			this.Load += new System.EventHandler(this.FormReferralSelect_Load);
+			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -193,6 +263,9 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.ReferralAdd,true)) {
 				butAdd.Enabled=false;
 			}
+			checkShowPat.Checked=IsShowPat;
+			checkShowDoctor.Checked=IsShowDoc;
+			checkShowOther.Checked=IsShowOther;
 			FillTable();
 			//labelResultCount.Text="";
 		}
@@ -201,15 +274,25 @@ namespace OpenDental {
 			Referrals.RefreshCache(); 
 			listRef=new List<Referral>();
 			for(int i=0;i<Referrals.List.Length;i++) {
-				if(!checkHidden.Checked) {//don't include hidden
-					if(Referrals.List[i].IsHidden) {//if hidden
-						continue;
-					}
+				//don't include hidden referral sources if !checkHidden.Checked
+				if(!checkHidden.Checked && Referrals.List[i].IsHidden) {
+					continue;
 				}
-				if(textSearch.Text != "") {
-					if(!Referrals.List[i].LName.ToLower().StartsWith(textSearch.Text.ToLower())) {//no match
-						continue;
-					}
+				//don't include patient referral sources if !checkShowPat.Checked
+				if(!checkShowPat.Checked && Referrals.List[i].PatNum>0) {
+					continue;
+				}
+				//don't include doctor referral sources if !checkShowDoctor.Checked
+				if(!checkShowDoctor.Checked && Referrals.List[i].IsDoctor) {
+					continue;
+				}
+				//don't include non-patient non-doctor referral sources if !checkShowOther.Checked
+				if(!checkShowOther.Checked && Referrals.List[i].PatNum==0 && !Referrals.List[i].IsDoctor) {
+					continue;
+				}
+				//don't include referral sources if the user has typed in the search box and the last name doesn't start with the user input
+				if(textSearch.Text!="" && !Referrals.List[i].LName.ToLower().StartsWith(textSearch.Text.ToLower())) {
+					continue;
 				}
 				listRef.Add(Referrals.List[i]);
 			}
@@ -296,8 +379,7 @@ namespace OpenDental {
 		private void butAdd_Click(object sender,System.EventArgs e) {
 			Referral refCur=new Referral();
 			bool referralIsNew=true;
-			if(MessageBox.Show(Lan.g(this,"Is the referral source an existing patient?"),""
-				,MessageBoxButtons.YesNo)==DialogResult.Yes) {
+			if(MessageBox.Show(Lan.g(this,"Is the referral source an existing patient?"),"",MessageBoxButtons.YesNo)==DialogResult.Yes)	{
 				FormPatientSelect FormPS=new FormPatientSelect();
 				FormPS.SelectionModeOnly=true;
 				FormPS.ShowDialog();
@@ -345,6 +427,18 @@ namespace OpenDental {
 		}
 
 		private void textSearch_TextChanged(object sender,EventArgs e) {
+			FillTable();
+		}
+
+		private void checkShowPat_Click(object sender,EventArgs e) {
+			FillTable();
+		}
+
+		private void checkShowDoctor_Click(object sender,EventArgs e) {
+			FillTable();
+		}
+
+		private void checkShowOther_Click(object sender,EventArgs e) {
 			FillTable();
 		}
 
