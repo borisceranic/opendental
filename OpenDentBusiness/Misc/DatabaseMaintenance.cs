@@ -2020,6 +2020,30 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string ClaimProcWithInvalidPayPlanNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck){
+				command=@"SELECT COUNT(*) FROM claimproc WHERE PayPlanNum>0 AND PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with with invalid PayPlanNum found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else{
+				//safe, if the user wants to attach the claimprocs to a payplan for tracking the ins payments they would just need to attach to a valid payplan
+				command=@"UPDATE claimproc SET PayPlanNum=0 WHERE PayPlanNum>0 AND PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan)";
+				long numFixed=Db.NonQ(command);
+				if(numFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","ClaimProcs with with invalid PayPlanNum fixed")+": "+numFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ClaimProcWithInvalidProvNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
