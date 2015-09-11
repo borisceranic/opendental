@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
@@ -60,7 +61,6 @@ namespace OpenDental{
 		public bool PinIsVisible;
 		public bool PinClicked;
 		public bool IsNew;
-		private DataSet DS;
 		private Appointment AptCur;
 		private Appointment AptOld;
 		///<summary>The string time pattern in the current increment. Not in the 5 minute increment.</summary>
@@ -124,12 +124,21 @@ namespace OpenDental{
 		public bool IsInViewPatAppts;
 		///<summary>Matches list of appointments in comboAppointmentType. Does not include hidden types unless current appointment is of that type.</summary>
 		private List<AppointmentType> _listAppointmentType;
-		///<summary>If the appt IsNew and the delete button was clicked.
-		///Set on Delete button click, and used in Form_Closing so we don't delete again.</summary>
-		private bool _isNewApptDeleted;
 		///<summary>Procedure were attached/detached from appt and the user clicked cancel or closed the form.
 		///Used in ApptModule to tell if we need to refresh.</summary>
 		public bool HasProcsChangedAndCancel;
+		///<summary>A list of all procs for this patient.  Enables the user to edit and attach procs from other appointments.</summary>
+		private List<Procedure> _listProcs;
+		///<summary>A list of all procs for this patient from the database.  Used for syncing and recovering information if appointment cancelled/deleted.</summary>
+		private List<Procedure> _listProcsFromDB;
+		///<summary>Lab for the current appointment.  It may be null if there is no lab.</summary>
+		private LabCase _labCur;
+		///<summary>A list of appointments for this patient that are either scheduled or planned.</summary>
+		private List<Appointment> _listAppointments;
+		private bool _isPlanned;
+		private DataTable _tableFields;
+		private DataTable _tableComms;
+		private List<ProcedureCode> _listProcCodes;
 
 		///<summary></summary>
 		public FormApptEdit(long aptNum)
@@ -139,9 +148,7 @@ namespace OpenDental{
 			//
 			InitializeComponent();
 			Lan.F(this);
-			DS=Appointments.GetApptEdit(aptNum);
-			AptCur=Appointments.TableToObject(DS.Tables["Appointment"]);
-			AptOld=AptCur.Clone();
+			AptCur=Appointments.GetOneApt(aptNum);//We need this query to get the PatNum for the appointment.
 		}
 
 		/// <summary>
@@ -1167,6 +1174,13 @@ namespace OpenDental{
 
 		private void FormApptEdit_Load(object sender, System.EventArgs e){
 			tbTime.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbTime_CellClicked);
+			_listAppointments=Appointments.GetListForPat(AptCur.PatNum);
+			for(int i=0;i<_listAppointments.Count;i++) {
+				if(_listAppointments[i].AptNum==AptCur.AptNum) {
+					AptCur=_listAppointments[i];//Changing the variable pointer so all changes are done on the element in the list.
+				}
+			}
+			AptOld=AptCur.Clone();
 			if(IsNew){
 				if(!Security.IsAuthorized(Permissions.AppointmentCreate)) { //Should have been checked before appointment was inserted into DB and this form was loaded.  Left here just in case.
 					DialogResult=DialogResult.Cancel;
@@ -1193,10 +1207,23 @@ namespace OpenDental{
 				}
 			}
 			//The four objects below are needed when adding procs to this appt.
+			_listProcCodes=ProcedureCodes.GetAllCodes();
 			fam=Patients.GetFamily(AptCur.PatNum);
 			pat=fam.GetPatient(AptCur.PatNum);
 			SubList=InsSubs.RefreshForFam(fam);
 			PlanList=InsPlans.RefreshForSubList(SubList);
+			_tableFields=Appointments.GetApptFields(AptCur.AptNum);
+			_tableComms=Appointments.GetCommTable(AptCur.PatNum.ToString());
+			_listProcs=Procedures.GetProcsForApptEdit(AptCur);
+			_listProcsFromDB=new List<Procedure>();
+			for(int i=0;i<_listProcs.Count;i++) {
+				_listProcsFromDB.Add(_listProcs[i].Copy());
+			}
+			_isPlanned=false;
+			if(AptCur.AptStatus==ApptStatus.Planned) {
+				_isPlanned=true;
+			}
+			_labCur=LabCases.GetForApt(AptCur);
 			if(PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 				butRequirement.Visible=false;
 				textRequirement.Visible=false;
@@ -1212,19 +1239,19 @@ namespace OpenDental{
 			if(!PinIsVisible){
 				butPin.Visible=false;
 			}
-			if(AptCur.AptStatus==ApptStatus.Planned) {
-				Text = Lan.g(this, "Edit Planned Appointment") + " - " + DS.Tables["Patient"].Rows[0]["value"].ToString(); 
+			if(_isPlanned) {
+				Text=Lan.g(this,"Edit Planned Appointment")+" - "+pat.GetNameFL(); 
 				labelStatus.Visible=false;
 				comboStatus.Visible=false;
 				butDelete.Visible=false;
 			}
-			else if (AptCur.AptStatus == ApptStatus.PtNote) {
+			else if(AptCur.AptStatus==ApptStatus.PtNote) {
 				labelApptNote.Text="Patient NOTE:";
-				Text = Lan.g(this, "Edit Patient Note") + " - " + DS.Tables["Patient"].Rows[0]["value"].ToString() + " on " + AptCur.AptDateTime.DayOfWeek + ", " + AptCur.AptDateTime;
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Patient Note"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Completed Pt. Note"));
-				comboStatus.SelectedIndex = (int)AptCur.AptStatus - 7;
-				labelQuickAdd.Visible = false;
+				Text=Lan.g(this,"Edit Patient Note")+" - "+pat.GetNameFL()+" on "+AptCur.AptDateTime.DayOfWeek+", "+AptCur.AptDateTime;
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Patient Note"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Completed Pt. Note"));
+				comboStatus.SelectedIndex=(int)AptCur.AptStatus-7;
+				labelQuickAdd.Visible=false;
 				labelStatus.Visible=false;
 				gridProc.Visible=false;
 				listQuickAdd.Visible=false;
@@ -1232,27 +1259,27 @@ namespace OpenDental{
 				butDeleteProc.Visible=false;
 				//textNote.Width = 400;
 			}
-			else if ( AptCur.AptStatus == ApptStatus.PtNoteCompleted) {
-				labelApptNote.Text = "Completed Patient NOTE:";
-				Text = Lan.g(this, "Edit Completed Patient Note") + " - " + DS.Tables["Patient"].Rows[0]["value"].ToString() + " on " + AptCur.AptDateTime.DayOfWeek + ", " + AptCur.AptDateTime;
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Patient Note"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Completed Pt. Note"));
-				comboStatus.SelectedIndex = (int)AptCur.AptStatus - 7;
-				labelQuickAdd.Visible = false;
-				labelStatus.Visible = false;
-				gridProc.Visible= false;
-				listQuickAdd.Visible = false;
+			else if(AptCur.AptStatus==ApptStatus.PtNoteCompleted) {
+				labelApptNote.Text="Completed Patient NOTE:";
+				Text=Lan.g(this,"Edit Completed Patient Note")+" - "+pat.GetNameFL()+" on "+AptCur.AptDateTime.DayOfWeek+", "+AptCur.AptDateTime;
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Patient Note"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Completed Pt. Note"));
+				comboStatus.SelectedIndex=(int)AptCur.AptStatus-7;
+				labelQuickAdd.Visible=false;
+				labelStatus.Visible=false;
+				gridProc.Visible=false;
+				listQuickAdd.Visible=false;
 				butAdd.Visible=false;
 				butDeleteProc.Visible=false;
 				//textNote.Width = 400;
 			}
 			else {
-				Text = Lan.g(this, "Edit Appointment") + " - " + DS.Tables["Patient"].Rows[0]["value"].ToString() + " on " + AptCur.AptDateTime.DayOfWeek + ", " + AptCur.AptDateTime ;
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Scheduled"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Complete"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "UnschedList"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "ASAP"));
-				comboStatus.Items.Add(Lan.g("enumApptStatus", "Broken"));
+				Text=Lan.g(this, "Edit Appointment")+" - "+pat.GetNameFL()+" on "+AptCur.AptDateTime.DayOfWeek+", "+AptCur.AptDateTime;
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Scheduled"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Complete"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","UnschedList"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","ASAP"));
+				comboStatus.Items.Add(Lan.g("enumApptStatus","Broken"));
 				comboStatus.SelectedIndex=(int)AptCur.AptStatus-1;
 			}
 			if(AptCur.AptStatus==ApptStatus.UnschedList) {
@@ -1329,7 +1356,32 @@ namespace OpenDental{
 				if(Employees.ListShort[i].EmployeeNum==AptCur.Assistant)
 					comboAssistant.SelectedIndex=i+1;
 			}
-			textLabCase.Text=DS.Tables["Misc"].Rows[0]["labDescript"].ToString();
+			string descript="";
+			if(_labCur!=null) {
+				descript=Laboratories.GetOne(_labCur.LaboratoryNum).Description;
+				if(_labCur.DateTimeChecked.Year>1880) {//Logic from Appointments.cs lines 1818 to 1840
+					descript+=", "+Lan.g(this,"Quality Checked");
+				}
+				else {
+					if(_labCur.DateTimeRecd.Year>1880) {
+						descript+=", "+Lan.g(this,"Received");
+					}
+					else {
+						if(_labCur.DateTimeSent.Year>1880) {
+							descript+=", "+Lan.g(this,"Sent");
+						}
+						else {
+							descript+=", "+Lan.g(this,"Not Sent");
+						}
+						if(_labCur.DateTimeDue.Year>1880) {
+							descript+=", "+Lan.g(this,"Due: ")+_labCur.DateTimeDue.ToString("ddd")+" "
+								+_labCur.DateTimeDue.ToShortDateString()+" "
+								+_labCur.DateTimeDue.ToShortTimeString();
+						}
+					}
+				}
+			}
+			textLabCase.Text=descript;
 			textTimeArrived.ContextMenu=contextMenuTimeArrived;
 			textTimeSeated.ContextMenu=contextMenuTimeSeated;
 			textTimeDismissed.ContextMenu=contextMenuTimeDismissed;
@@ -1364,7 +1416,18 @@ namespace OpenDental{
 				textInsPlan1.Text=InsPlans.GetCarrierName(AptCur.InsPlan1,PlanList);
 				textInsPlan2.Text=InsPlans.GetCarrierName(AptCur.InsPlan2,PlanList);
 			}
-			textRequirement.Text=DS.Tables["Misc"].Rows[0]["requirements"].ToString();
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				List<ReqStudent> listStudents=ReqStudents.GetForAppt(AptCur.AptNum);
+				string requirements="";
+				for(int i=0;i<listStudents.Count;i++) {
+					if(i > 0) {
+						requirements+="\r\n";
+					}
+					Provider student=Providers.GetProv(listStudents[i].ProvNum);
+					requirements+=student.LName+", "+student.FName+": "+listStudents[i].Descript;
+				}
+				textRequirement.Text=requirements;
+			}
 			//IsNewPatient is set well before opening this form.
 			checkIsNewPatient.Checked=AptCur.IsNewPatient;
 			butColor.BackColor=AptCur.ColorOverride;
@@ -1454,7 +1517,6 @@ namespace OpenDental{
 					comboApptType.SelectedIndex=_listAppointmentType.Count;//-1 for 0 index, +1 for adding none to list.
 				}
 			}
-			_isNewApptDeleted=false;
 			HasProcsChangedAndCancel=false;
 			FillProcedures();
 			SetProceduresForECW();
@@ -1476,21 +1538,23 @@ namespace OpenDental{
 			if(!Programs.UsingEcwTightOrFullMode()) {
 			  return;
 			}
-			List<long> procNums=new List<long>();
+			List<Procedure> listProcs=new List<Procedure>();
 			//this is a method that attaches very specific kinds of procedures to appt
-			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {//loop through procs
-				if(DS.Tables["Procedure"].Rows[i]["ProcStatus"].ToString()!=((int)ProcStat.C).ToString()){//must be complete proc
+			for(int i=0;i<_listProcs.Count;i++) {//loop through procs
+				if(_listProcs[i].ProcStatus != ProcStat.C) {//must be complete proc
 					continue;
 				}
-				if(PIn.DateT(DS.Tables["Procedure"].Rows[i]["ProcDate"].ToString()).Date!=AptCur.AptDateTime.Date) {//must have same date as appt
+				if(_listProcs[i].ProcDate.Date != AptCur.AptDateTime.Date) {//must have same date as appt
 					continue;
 				}
 				gridProc.SetSelected(i,true);//harmless if already selected.
-				procNums.Add(PIn.Long(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString()));
+				listProcs.Add(_listProcs[i]);
 			}
 			//Now attach the procedures to the appt in the database.
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
-			Procedures.AttachToApt(procNums,AptCur.AptNum,isPlanned);
+			for(int i=0;i<listProcs.Count;i++) {
+				Procedure proc=listProcs[i];
+				UpdateOtherApptDesc(proc);
+			}
 		}
 
 		private void butPickDentist_Click(object sender,EventArgs e) {
@@ -1529,7 +1593,7 @@ namespace OpenDental{
 		}
 
 		private void FillPatient(){
-			DataTable table=DS.Tables["Patient"];
+			DataTable table=Appointments.GetPatTable(AptCur.PatNum.ToString());
 			gridPatient.BeginUpdate();
 			gridPatient.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("",120);//Add 2 blank columns
@@ -1583,10 +1647,10 @@ namespace OpenDental{
 			gridFields.Columns.Add(col);
 			gridFields.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<DS.Tables["ApptFields"].Rows.Count;i++) {
+			for(int i=0;i<_tableFields.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(DS.Tables["ApptFields"].Rows[i]["FieldName"].ToString());
-				row.Cells.Add(DS.Tables["ApptFields"].Rows[i]["FieldValue"].ToString());
+				row.Cells.Add(_tableFields.Rows[i]["FieldName"].ToString());
+				row.Cells.Add(_tableFields.Rows[i]["FieldValue"].ToString());
 				gridFields.Rows.Add(row);
 			}
 			gridFields.EndUpdate();
@@ -1601,11 +1665,11 @@ namespace OpenDental{
 			gridComm.Columns.Add(col);
 			gridComm.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<DS.Tables["Comm"].Rows.Count;i++) {
+			for(int i=0;i<_tableComms.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(DS.Tables["Comm"].Rows[i]["commDateTime"].ToString());
-				row.Cells.Add(DS.Tables["Comm"].Rows[i]["Note"].ToString());
-				if(DS.Tables["Comm"].Rows[i]["CommType"].ToString()==Commlogs.GetTypeAuto(CommItemTypeAuto.APPT).ToString()){
+				row.Cells.Add(_tableComms.Rows[i]["commDateTime"].ToString());
+				row.Cells.Add(_tableComms.Rows[i]["Note"].ToString());
+				if(_tableComms.Rows[i]["CommType"].ToString()==Commlogs.GetTypeAuto(CommItemTypeAuto.APPT).ToString()){
 					row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][7].ItemColor;
 				}
 				gridComm.Rows.Add(row);
@@ -1615,12 +1679,10 @@ namespace OpenDental{
 		}
 
 		private void gridComm_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Commlog item=Commlogs.GetOne(PIn.Long(DS.Tables["Comm"].Rows[e.Row]["CommlogNum"].ToString()));
+			Commlog item=Commlogs.GetOne(PIn.Long(_tableComms.Rows[e.Row]["CommlogNum"].ToString()));
 			FormCommItem FormCI=new FormCommItem(item);
 			FormCI.ShowDialog();
-			DS.Tables.Remove("Comm");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Comm"].Copy());
-				//AppointmentL.GetApptEditComm(AptCur.AptNum));
+			_tableComms=Appointments.GetCommTable(AptCur.PatNum.ToString());
 			FillComm();
 		}
 
@@ -1649,22 +1711,44 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			gridProc.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++){
+			for(int i=0;i<_listProcs.Count;i++){
 				row=new ODGridRow();
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["status"].ToString());
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["priority"].ToString());
+				row.Cells.Add(_listProcs[i].ProcStatus.ToString());
+				row.Cells.Add(DefC.GetName(DefCat.TxPriorities,_listProcs[i].Priority));
 				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					row.Cells.Add(DS.Tables["Procedure"].Rows[i]["toothNum"].ToString());
-					row.Cells.Add(DS.Tables["Procedure"].Rows[i]["Surf"].ToString());
-				}		
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["ProcCode"].ToString());
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["descript"].ToString());
-				row.Cells.Add(DS.Tables["Procedure"].Rows[i]["fee"].ToString());
+					row.Cells.Add(Tooth.GetToothLabel(_listProcs[i].ToothNum));
+					row.Cells.Add(_listProcs[i].Surf);
+				}
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,_listProcs[i].CodeNum);
+				row.Cells.Add(procCode.ProcCode);
+				string descript="";
+				//This descript is gotten the same way it was in Appointments.GetProcTable()
+				if(_isPlanned && _listProcs[i].PlannedAptNum!=0 && _listProcs[i].PlannedAptNum!=AptCur.AptNum) {
+					descript+=Lan.g(this,"(other appt) ");
+				}
+				else if(!_isPlanned && _listProcs[i].AptNum!=0 && _listProcs[i].AptNum!=AptCur.AptNum){
+					descript+=Lan.g(this,"(other appt) ");
+				}
+				if(procCode.LaymanTerm=="") {
+					descript+=procCode.Descript;
+				}
+				else {
+					descript+=procCode.LaymanTerm;
+				}
+				if(_listProcs[i].ToothRange!="") {
+					descript+=" #"+Tooth.FormatRangeForDisplay(_listProcs[i].ToothRange);
+				}
+				row.Cells.Add(descript);
+				row.Cells.Add(_listProcs[i].ProcFee.ToString("F"));
+				row.Tag=_listProcs[i];
 				gridProc.Rows.Add(row);
 			}
 			gridProc.EndUpdate();
-			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++){
-				if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="1") {
+			for(int i=0;i<_listProcs.Count;i++){
+				if(_isPlanned && _listProcs[i].PlannedAptNum==AptCur.AptNum) {
+					gridProc.SetSelected(i,true);
+				}
+				else if(!_isPlanned && _listProcs[i].AptNum==AptCur.AptNum) {
 					gridProc.SetSelected(i,true);
 				}
 			}
@@ -1679,9 +1763,7 @@ namespace OpenDental{
 			FormCommItem FormCI=new FormCommItem(CommlogCur);
 			FormCI.IsNew=true;
 			FormCI.ShowDialog();
-			DS.Tables.Remove("Comm");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Comm"].Copy());
-				//AppointmentL.GetApptEditComm(AptCur.AptNum));
+			_tableComms=Appointments.GetCommTable(AptCur.PatNum.ToString());	
 			FillComm();
 		}
 
@@ -1710,25 +1792,29 @@ namespace OpenDental{
 					isSelected=true;
 				}
 			}
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
-			List<long> procNums=new List<long>();
-			procNums.Add(PIn.Long(DS.Tables["Procedure"].Rows[e.Row]["ProcNum"].ToString()));
-			if(isSelected){
-				//gridProc.SetSelected(e.Row,false);
-				Procedures.DetachFromApt(procNums,isPlanned);
+			Procedure proc=_listProcs[e.Row];
+			if(isSelected && _isPlanned) {//Detatching from this planned appointment.
+				proc.PlannedAptNum=0;
 			}
-			else{
-				//gridProc.SetSelected(e.Row,true);
-				Procedures.AttachToApt(procNums,AptCur.AptNum,isPlanned);
-				//if(!isPlanned) {
-				//	List<string> procCodes=new List<string>();
-				//	procCodes.Add(DS.Tables["Procedure"].Rows[e.Row]["ProcCode"].ToString());
-				//	Recalls.SynchScheduledApptLazy(AptCur.PatNum,AptCur.AptDateTime,procCodes);//moved to closing event
-				//}
+			else if(isSelected && !_isPlanned) {//Detatching from this appointment.
+				proc.AptNum=0;
 			}
-			//manually change existing table instead of refreshing from db?
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
+			else if(!isSelected && _isPlanned) {//Attaching to this planned appointment.
+				if(proc.PlannedAptNum != 0 && proc.PlannedAptNum != AptCur.AptNum) {
+					UpdateOtherApptDesc(proc);
+				}
+				else {
+					proc.PlannedAptNum=AptCur.AptNum;
+				}
+			}
+			else if(!isSelected && !_isPlanned) {//Attaching to this appointment.
+				if(proc.AptNum != 0 && proc.AptNum != AptCur.AptNum) {
+					UpdateOtherApptDesc(proc);	
+				}
+				else {//Proc's AptNum==0, we already know it's not on this appointment here.
+					proc.AptNum=AptCur.AptNum;
+				}
+			}
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -1736,54 +1822,39 @@ namespace OpenDental{
 		}
 
 		private void gridProc_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			long procNum=PIn.Long(DS.Tables["Procedure"].Rows[e.Row]["ProcNum"].ToString());
-			Procedure proc=Procedures.GetOneProc(procNum,true);
+			Procedure proc=_listProcs[e.Row].Copy();//Make a copy so if the user cancels we don't reflect changes.
 			FormProcEdit FormP=new FormProcEdit(proc,pat,fam);
 			FormP.ShowDialog();
 			if(FormP.DialogResult!=DialogResult.OK){
 				return;
 			}
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
+			if(Procedures.GetOneProc(proc.ProcNum,true).ProcStatus==ProcStat.D) {//User deleted the procedure.
+				_listProcs.RemoveAt(e.Row);
+			}
+			else {//User did not delete the procedure.
+				_listProcs[e.Row]=proc;//Replace the proc in the mem list with the edited proc.
+			}
 			FillProcedures();
 			CalculateTime();
 			FillTime();
-			//make sure the one we double clicked on is highlighted if found
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
-			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++){
-				if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="1"){
-					//if already attached, skip
-					continue;
-				}
-				if(DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString()==procNum.ToString()){
-					Procedures.AttachToApt(procNum,AptCur.AptNum,isPlanned);
-					DS.Tables.Remove("Procedure");
-					DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
-					FillProcedures();
-					CalculateTime();
-					FillTime();
-					break;
-				}
-			}
-			
 		}
 
-		/*private void butRemove_Click(object sender,EventArgs e) {
-			if(gridProc.SelectedIndices.Length==0){
-				MsgBox.Show(this,"Please select one or more procedures first.");
-				return;
+		///<summary>Updates the proc description of the both the old appointment this appointment.</summary>
+		private void UpdateOtherApptDesc(Procedure proc) {
+			string procCodeDescript=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc;
+			Appointment appt;
+			if(_isPlanned) {
+				appt=_listAppointments.FirstOrDefault(x => x.AptNum==proc.PlannedAptNum);
+				proc.PlannedAptNum=AptCur.AptNum;
 			}
-			List<int> procNums=new List<int>();
-			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				procNums.Add(PIn.PInt(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcNum"].ToString()));
+			else {
+				appt=_listAppointments.FirstOrDefault(x => x.AptNum==proc.AptNum);
+				proc.AptNum=AptCur.AptNum;
 			}
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
-			Procedures.DetachFromApt(procNums,isPlanned);
-			Recalls.Synch(AptCur.PatNum);//needs to be moved into Procedures.Delete
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Clone());
-			FillProcedures();
-		}*/
+			if(appt!=null) {
+				SetProcDescript(appt);
+			}
+		}
 
 		private void butDeleteProc_Click(object sender,EventArgs e) {
 			//this button will not be enabled if user does not have permission for AppointmentEdit
@@ -1797,8 +1868,8 @@ namespace OpenDental{
 			int skipped=0;
 			int skippedSecurity=0;
 			try{
-				for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-					Procedure proc=Procedures.GetOneProc(PIn.Long(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcNum"].ToString()),false);
+				for(int i=gridProc.SelectedIndices.Length-1;i>=0;i--) {
+					Procedure proc=_listProcs[gridProc.SelectedIndices[i]];
 					if(!Security.IsAuthorized(Permissions.ProcComplEdit,proc.DateEntryC,true)) {
 						if(proc.ProcStatus==ProcStat.C) {
 							skipped++;
@@ -1813,26 +1884,21 @@ namespace OpenDental{
 						skippedSecurity++;
 						continue;
 					}
-					//also deletes the claimProcs and adjustments. Might throw exception.
-					Procedures.Delete(PIn.Long(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcNum"].ToString()));
+					Procedures.ValidateDelete(proc.ProcNum);
+					_listProcs.Remove(proc);//Actual deletion will be done in the Sync at close.
 					if(proc.ProcStatus==ProcStat.C) {
-						SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,AptCur.PatNum,DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString()
-						+", "+proc.ProcFee.ToString("c")+", Deleted");
+						SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,AptCur.PatNum,ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum)
+							+", "+proc.ProcFee.ToString("c")+", Deleted");
 					}
 					else {
-						SecurityLogs.MakeLogEntry(Permissions.ProcDelete,AptCur.PatNum,DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString()
-						+", "+proc.ProcFee.ToString("c"));
+						SecurityLogs.MakeLogEntry(Permissions.ProcDelete,AptCur.PatNum,ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum)
+							+", "+proc.ProcFee.ToString("c"));
 					}
 				}
 			}
 			catch(Exception ex){
-				DS.Tables.Remove("Procedure");
-				DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
-				FillProcedures();
 				MessageBox.Show(ex.Message);
 			}
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -1855,48 +1921,37 @@ namespace OpenDental{
 			if(FormP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			Procedure ProcCur;
-			ProcCur=new Procedure();//going to be an insert, so no need to set Procedures.CurOld
-			ProcCur.CodeNum = FormP.SelectedCodeNum;
-			//procnum
-			ProcCur.PatNum=AptCur.PatNum;
-			//aptnum
-			//proccode
-			//ProcCur.CodeNum=ProcedureCodes.GetProcCode(ProcCur.OldCode).CodeNum;//already set
-			ProcCur.ProcDate=DateTimeOD.Today;
-			ProcCur.DateTP=ProcCur.ProcDate;
-			//int totUnits = ProcCur.BaseUnits + ProcCur.UnitQty;
-			InsPlan priplan=null;
-			InsSub prisub=null;
-			//Family fam=Patients.GetFamily(AptCur.PatNum);
-			//Patient pat=fam.GetPatient(AptCur.PatNum);
-			//InsPlan[] planList=InsPlans.Refresh(fam);
-			List<PatPlan> patPlanList=PatPlans.Refresh(pat.PatNum);
-			if(patPlanList.Count>0) {
-				prisub=InsSubs.GetSub(patPlanList[0].InsSubNum,SubList);
-				priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
+			Procedure proc;
+			proc=new Procedure();//going to be an insert, so no need to set Procedures.CurOld
+			proc.CodeNum=FormP.SelectedCodeNum;
+			proc.PatNum=AptCur.PatNum;
+			proc.ProcDate=DateTimeOD.Today;
+			proc.DateTP=proc.ProcDate;
+			InsPlan primaryPlan=null;
+			InsSub primarySub=null;
+			List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
+			if(listPatPlans.Count>0) {
+				primarySub=InsSubs.GetSub(listPatPlans[0].InsSubNum,SubList);
+				primaryPlan=InsPlans.GetPlan(primarySub.PlanNum,PlanList);
 			}
 			//Check if it's a medical procedure.
 			double insfee;
-			bool isMed = false;
-			ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
-			if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
-				isMed = true;
+			bool isMed=false;
+			proc.MedicalCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).MedicalCode;
+			if(proc.MedicalCode!=null && proc.MedicalCode!="") {
+				isMed=true;
 			}
 			//Get fee schedule for medical or dental.
 			long feeSch;
 			if(isMed) {
-				feeSch=Fees.GetMedFeeSched(pat,PlanList,patPlanList,SubList);
+				feeSch=Fees.GetMedFeeSched(pat,PlanList,listPatPlans,SubList);
 			}
 			else {
-				feeSch=Fees.GetFeeSched(pat,PlanList,patPlanList,SubList);
+				feeSch=Fees.GetFeeSched(pat,PlanList,listPatPlans,SubList);
 			}
 			//surf
-			//ToothNum
-			//Procedures.Cur.ToothRange
-			//ProcCur.NoBillIns=ProcedureCodes.GetProcCode(ProcCur.ProcCode).NoBillIns;
-			ProcCur.Priority=0;
-			ProcCur.ProcStatus=ProcStat.TP;
+			proc.Priority=0;
+			proc.ProcStatus=ProcStat.TP;
 			long aptProvNum=ProviderC.ListShort[0].ProvNum;
 			if(comboProvNum.SelectedIndex!=-1) {
 				aptProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
@@ -1905,48 +1960,47 @@ namespace OpenDental{
 			if(comboProvHyg.SelectedIndex>0) {
 				aptProvHyg=ProviderC.ListShort[comboProvHyg.SelectedIndex-1].ProvNum;
 			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene
-				&& aptProvHyg != 0) {
-				ProcCur.ProvNum=aptProvHyg;
+			if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).IsHygiene && aptProvHyg!=0) {
+				proc.ProvNum=aptProvHyg;
 			}
 			else {
-				ProcCur.ProvNum=aptProvNum;
+				proc.ProvNum=aptProvNum;
 			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//Override provider for procedures with a default provider
-				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
+			if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault!=0) {//Override provider for procedures with a default provider
+				proc.ProvNum=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault;
 			}
-			ProcCur.ClinicNum=pat.ClinicNum;
+			proc.ClinicNum=pat.ClinicNum;
 			//Get the fee amount for medical or dental.
 			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 			}
 			else {
-				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+				insfee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 			}
-			if(priplan!=null && priplan.PlanType=="p") {//PPO
-				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
+			if(primaryPlan!=null && primaryPlan.PlanType=="p") {//PPO
+				double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,proc.ClinicNum,proc.ProvNum);
 				if(standardfee>insfee) {
-					ProcCur.ProcFee=standardfee;
+					proc.ProcFee=standardfee;
 				}
 				else {
-					ProcCur.ProcFee=insfee;
+					proc.ProcFee=insfee;
 				}
 			}
 			else {
-				ProcCur.ProcFee=insfee;
+				proc.ProcFee=insfee;
 			}
-			ProcCur.Note="";
+			proc.Note="";
 			//dx
 			//nextaptnum
-			ProcCur.DateEntryC=DateTime.Now;
-			ProcCur.BaseUnits=ProcedureCodes.GetProcCode(ProcCur.CodeNum).BaseUnits;
-			ProcCur.SiteNum=pat.SiteNum;
-			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
-			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-			Procedures.Insert(ProcCur);
-			List<Benefit> benefitList=Benefits.Refresh(patPlanList,SubList);
-			Procedures.ComputeEstimates(ProcCur,pat.PatNum,new List<ClaimProc>(),true,PlanList,patPlanList,benefitList,pat.Age,SubList);
-			FormProcEdit FormPE=new FormProcEdit(ProcCur,pat.Copy(),fam);
+			proc.DateEntryC=DateTime.Now;
+			proc.BaseUnits=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).BaseUnits;
+			proc.SiteNum=pat.SiteNum;
+			proc.RevCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).RevenueCodeDefault;
+			proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			Procedures.Insert(proc);
+			List<Benefit> benefitList=Benefits.Refresh(listPatPlans,SubList);
+			Procedures.ComputeEstimates(proc,pat.PatNum,new List<ClaimProc>(),true,PlanList,listPatPlans,benefitList,pat.Age,SubList);
+			FormProcEdit FormPE=new FormProcEdit(proc,pat.Copy(),fam);
 			FormPE.IsNew=true;
 			if(Programs.UsingOrion) {
 				FormPE.OrionProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
@@ -1956,37 +2010,20 @@ namespace OpenDental{
 			if(FormPE.DialogResult==DialogResult.Cancel) {
 				//any created claimprocs are automatically deleted from within procEdit window.
 				try {
-					Procedures.Delete(ProcCur.ProcNum);//also deletes the claimprocs
+					Procedures.Delete(proc.ProcNum);//also deletes the claimprocs
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
 				}
 				return;
 			}
-			/*
-			FormApptProcs FormAP=new FormApptProcs();
-			FormAP.AptCur=AptCur.Clone();
-			//but we do need the status to be accurate:
-			if (AptCur.AptStatus == ApptStatus.Planned) {
-				;
-			}
-			else if(comboStatus.SelectedIndex==-1) {
-				FormAP.AptCur.AptStatus=ApptStatus.Scheduled;
-			}
-			else if (AptCur.AptStatus == ApptStatus.PtNote | AptCur.AptStatus == ApptStatus.PtNoteCompleted){
-				FormAP.AptCur.AptStatus = (ApptStatus)comboStatus.SelectedIndex + 7;
+			_listProcs.Add(proc);//In Appointments.cs there is no ORDER BY clause for getting the appointments...  We may want to think about ordering the list.
+			if(_isPlanned) {
+				proc.PlannedAptNum=AptCur.AptNum;
 			}
 			else {
-				FormAP.AptCur.AptStatus=(ApptStatus)comboStatus.SelectedIndex+1;
+				proc.AptNum=AptCur.AptNum;
 			}
-			FormAP.ShowDialog();
-			if(FormAP.DialogResult!=DialogResult.OK){
-				return;
-			}*/
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
-			Procedures.AttachToApt(ProcCur.ProcNum,AptCur.AptNum,isPlanned);
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -2119,7 +2156,7 @@ namespace OpenDental{
 			}
 			List<long> codeNums=new List<long>();
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				codeNums.Add(PIn.Long(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["CodeNum"].ToString()));
+				codeNums.Add(_listProcs[gridProc.SelectedIndices[i]].CodeNum);
 			}
 			strBTime=new StringBuilder(Appointments.CalculatePattern(provDent,provHyg,codeNums,false));
 			//Plugins.HookAddCode(this,"FormApptEdit.CalculateTime_end",strBTime,provDent,provHyg,codeNums);//set strBTime, but without using the 'new' keyword.--Hook removed.
@@ -2219,15 +2256,16 @@ namespace OpenDental{
 					return;
 				}
 			}
+			List<Procedure> listAddedProcs=new List<Procedure>();
 			for(int i=0;i<codes.Length;i++) {
-				Procedure ProcCur=new Procedure();
-				ProcCur.PatNum=AptCur.PatNum;
+				Procedure proc=new Procedure();
+				proc.PatNum=AptCur.PatNum;
 				if(AptCur.AptStatus!=ApptStatus.Planned) {
-					ProcCur.AptNum=AptCur.AptNum;
+					proc.AptNum=AptCur.AptNum;
 				}
-				ProcCur.CodeNum=ProcedureCodes.GetProcCode(codes[i]).CodeNum;
-				ProcCur.ProcDate=AptCur.AptDateTime.Date;
-				ProcCur.DateTP=DateTimeOD.Today;
+				proc.CodeNum=ProcedureCodes.GetProcCode(codes[i]).CodeNum;
+				proc.ProcDate=AptCur.AptDateTime.Date;
+				proc.DateTP=DateTimeOD.Today;
 				InsPlan priplan=null;
 				InsSub prisub=null;
 				if(PatPlanList.Count>0) {
@@ -2237,8 +2275,8 @@ namespace OpenDental{
 				//Check if it's a medical procedure.
 				double insfee;
 				bool isMed = false;
-				ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
-				if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
+				proc.MedicalCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).MedicalCode;
+				if(proc.MedicalCode != null && proc.MedicalCode != "") {
 					isMed = true;
 				}
 				//Get fee schedule for medical or dental.
@@ -2249,76 +2287,70 @@ namespace OpenDental{
 				else {
 					feeSch=Fees.GetFeeSched(pat,PlanList,PatPlanList,SubList);
 				}
-				if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault==0) {//Override ProvNum if there is a default provider for this proc
-					ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;//Normal behavior
+				if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault==0) {//Override ProvNum if there is a default provider for this proc
+					proc.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;//Normal behavior
 				}
 				else {
-					ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;//New behavior for procs with default provider
+					proc.ProvNum=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault;//New behavior for procs with default provider
 				}
-				ProcCur.ClinicNum=AptCur.ClinicNum;
+				proc.ClinicNum=AptCur.ClinicNum;
 				//Get the fee amount for medical or dental.
 				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(proc.MedicalCode).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 				}
 				else {
-					insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+					insfee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 				}
 				if(priplan!=null && priplan.PlanType=="p") {//PPO
-					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
+					double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,proc.ClinicNum,proc.ProvNum);
 					if(standardfee>insfee) {
-						ProcCur.ProcFee=standardfee;
+						proc.ProcFee=standardfee;
 					}
 					else {
-						ProcCur.ProcFee=insfee;
+						proc.ProcFee=insfee;
 					}
 				}
 				else {
-					ProcCur.ProcFee=insfee;
+					proc.ProcFee=insfee;
 				}
 				//surf
 				//toothnum
 				//toothrange
 				//priority
-				ProcCur.ProcStatus=ProcStat.TP;
+				proc.ProcStatus=ProcStat.TP;
 				//procnote
 				//Dx
-				ProcCur.SiteNum=pat.SiteNum;
-				ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
-				if(AptCur.AptStatus==ApptStatus.Planned) {
-					ProcCur.PlannedAptNum=AptCur.AptNum;
+				proc.SiteNum=pat.SiteNum;
+				proc.RevCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).RevenueCodeDefault;
+				if(_isPlanned) {
+					proc.PlannedAptNum=AptCur.AptNum;
 				}
-				ProcCur.BaseUnits=ProcedureCodes.GetProcCode(ProcCur.CodeNum).BaseUnits;
-				ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-				Procedures.Insert(ProcCur);//recall synch not required
+				proc.BaseUnits=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).BaseUnits;
+				proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+				Procedures.Insert(proc);//recall synch not required
 				if(Programs.UsingOrion){//Orion requires a DPC for every procedure. Force proc edit window open.
-					FormProcEdit FormP=new FormProcEdit(ProcCur,pat.Copy(),fam);
+					FormProcEdit FormP=new FormProcEdit(proc,pat.Copy(),fam);
 					FormP.IsNew=true;
 					FormP.OrionDentist=true;
 					FormP.ShowDialog();
 					if(FormP.DialogResult==DialogResult.Cancel) {
 						try {
-							Procedures.Delete(ProcCur.ProcNum);//also deletes the claimprocs
+							Procedures.Delete(proc.ProcNum);//also deletes the claimprocs
 						}
 						catch(Exception ex) {
 							MessageBox.Show(ex.Message);
 						}
 					}
 				}
-				Procedures.ComputeEstimates(ProcCur,pat.PatNum,ClaimProcList,false,PlanList,PatPlanList,benefitList,pat.Age,SubList);
+				Procedures.ComputeEstimates(proc,pat.PatNum,ClaimProcList,false,PlanList,PatPlanList,benefitList,pat.Age,SubList);
+				_listProcs.Add(proc);
+				listAddedProcs.Add(proc);
 			}
 			listQuickAdd.SelectedIndex=-1;
-			string[] selectedProcs=new string[gridProc.SelectedIndices.Length];
-			for(int i=0;i<selectedProcs.Length;i++) {
-				selectedProcs[i]=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcNum"].ToString();
-			}
-			DS.Tables.Remove("Procedure");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Procedure"].Copy());
 			FillProcedures();
 			for(int i=0;i<gridProc.Rows.Count;i++) {
-				for(int j=0;j<selectedProcs.Length;j++) {
-					if(selectedProcs[j]==DS.Tables["Procedure"].Rows[i]["ProcNum"].ToString()) {
-						gridProc.SetSelected(i,true);
-					}
+				if(listAddedProcs.Contains((Procedure)gridProc.Rows[i].Tag)) {
+					gridProc.SetSelected(i,true);//Select those that were just added.
 				}
 			}
 			CalculateTime();
@@ -2327,16 +2359,16 @@ namespace OpenDental{
 		}
 
 		private void butLab_Click(object sender,EventArgs e) {
-			if(DS.Tables["Misc"].Rows[0]["LabCaseNum"].ToString()=="0"){//no labcase
+			if(_labCur==null) {//no labcase
 				//so let user pick one to add
 				FormLabCaseSelect FormL=new FormLabCaseSelect();
 				FormL.PatNum=AptCur.PatNum;
-				FormL.IsPlanned=AptCur.AptStatus==ApptStatus.Planned;
+				FormL.IsPlanned=_isPlanned;
 				FormL.ShowDialog();
 				if(FormL.DialogResult!=DialogResult.OK){
 					return;
 				}
-				if(AptCur.AptStatus==ApptStatus.Planned){
+				if(_isPlanned) {
 					LabCases.AttachToPlannedAppt(FormL.SelectedLabCaseNum,AptCur.AptNum);
 				}
 				else{
@@ -2345,16 +2377,40 @@ namespace OpenDental{
 			}
 			else{//already a labcase attached
 				FormLabCaseEdit FormLCE=new FormLabCaseEdit();
-				FormLCE.CaseCur=LabCases.GetOne(PIn.Long(DS.Tables["Misc"].Rows[0]["LabCaseNum"].ToString()));
+				FormLCE.CaseCur=_labCur;
 				FormLCE.ShowDialog();
 				if(FormLCE.DialogResult!=DialogResult.OK){
 					return;
 				}
 				//Deleting or detaching labcase would have been done from in that window
 			}
-			DS.Tables.Remove("Misc");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Misc"].Copy());
-			textLabCase.Text=DS.Tables["Misc"].Rows[0]["labDescript"].ToString();
+			_labCur=LabCases.GetForApt(AptCur);
+			string descript="";
+			if(_labCur!=null) {
+				descript=Laboratories.GetOne(_labCur.LaboratoryNum).Description;
+				if(_labCur.DateTimeChecked.Year>1880) {//Logic from Appointments.cs lines 1818 to 1840
+					descript+=", "+Lan.g(this,"Quality Checked");
+				}
+				else {
+					if(_labCur.DateTimeRecd.Year>1880) {
+						descript+=", "+Lan.g(this,"Received");
+					}
+					else {
+						if(_labCur.DateTimeSent.Year>1880) {
+							descript+=", "+Lan.g(this,"Sent");
+						}
+						else {
+							descript+=", "+Lan.g(this,"Not Sent");
+						}
+						if(_labCur.DateTimeDue.Year>1880) {
+							descript+=", "+Lan.g(this,"Due: ")+_labCur.DateTimeDue.ToString("ddd")+" "
+							+_labCur.DateTimeDue.ToShortDateString()+" "
+							+_labCur.DateTimeDue.ToShortTimeString();
+						}
+					}
+				}
+			}
+			textLabCase.Text=descript;
 		}
 
 		private void butInsPlan1_Click(object sender,EventArgs e) {
@@ -2399,9 +2455,16 @@ namespace OpenDental{
 			if(FormR.DialogResult!=DialogResult.OK){
 				return;
 			}
-			DS.Tables.Remove("Misc");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["Misc"].Copy());
-			textRequirement.Text=DS.Tables["Misc"].Rows[0]["requirements"].ToString();
+			List<ReqStudent> listStudents=ReqStudents.GetForAppt(AptCur.AptNum);
+			string requirements="";
+			for(int i=0;i<listStudents.Count;i++) {
+				if(i!=0) {
+					requirements+="\r\n";
+				}
+				Provider student=Providers.GetProv(listStudents[i].ProvNum);
+				requirements+=student.LName+", "+student.FName+": "+listStudents[i].Descript;
+			}
+			textRequirement.Text=requirements;
 		}
 
 		private void butSyndromicObservations_Click(object sender,EventArgs e) {
@@ -2450,11 +2513,11 @@ namespace OpenDental{
 				MsgBox.Show(this,"There are duplicate appointment field defs, go rename or delete the duplicates.");
 				return;
 			}
-			ApptField field=ApptFields.GetOne(PIn.Long(DS.Tables["ApptFields"].Rows[e.Row]["ApptFieldNum"].ToString()));
+			ApptField field=ApptFields.GetOne(PIn.Long(_tableFields.Rows[e.Row]["ApptFieldNum"].ToString()));
 			if(field==null) {
 				field=new ApptField();
 				field.AptNum=AptCur.AptNum;
-				field.FieldName=DS.Tables["ApptFields"].Rows[e.Row]["FieldName"].ToString();
+				field.FieldName=_tableFields.Rows[e.Row]["FieldName"].ToString();
 				if(ApptFieldDefs.Listt[e.Row].FieldType==ApptFieldType.Text) {
 					FormApptFieldEdit formAF=new FormApptFieldEdit(field);
 					formAF.IsNew=true;
@@ -2476,8 +2539,7 @@ namespace OpenDental{
 					formAF.ShowDialog();
 				}
 			}
-			DS.Tables.Remove("ApptFields");
-			DS.Tables.Add(Appointments.GetApptEdit(AptCur.AptNum).Tables["ApptFields"].Copy());
+			_tableFields=Appointments.GetApptFields(AptCur.AptNum);
 			FillFields();
 		}
 
@@ -2627,11 +2689,11 @@ namespace OpenDental{
 			else if(comboStatus.SelectedIndex==-1) {
 				AptCur.AptStatus=ApptStatus.Scheduled;
 			}
-			else if (AptCur.AptStatus == ApptStatus.PtNote | AptCur.AptStatus == ApptStatus.PtNoteCompleted){
+			else if(AptCur.AptStatus == ApptStatus.PtNote | AptCur.AptStatus == ApptStatus.PtNoteCompleted){
 				AptCur.AptStatus = (ApptStatus)comboStatus.SelectedIndex + 7;
 			}
 			else {
-				AptCur.AptStatus=(ApptStatus)comboStatus.SelectedIndex+1;
+				AptCur.AptStatus=(ApptStatus)comboStatus.SelectedIndex+1;//The only place in the entire form where the AptStatus gets updated.
 			}
 			//set procs complete was moved further down
 			//convert from current increment into 5 minute increment
@@ -2681,8 +2743,7 @@ namespace OpenDental{
 			AptCur.DateTimeSeated=dateTimeSeated;
 			AptCur.DateTimeDismissed=dateTimeDismissed;
 			//AptCur.InsPlan1 and InsPlan2 already handled 
-			SetProcDescript();
-			bool isPlanned=AptCur.AptStatus==ApptStatus.Planned;
+			SetProcDescript(AptCur);
 			if(comboApptType.SelectedIndex==0) {//0 index = none.
 				AptCur.AppointmentTypeNum=0;
 			}
@@ -2699,10 +2760,15 @@ namespace OpenDental{
 			}
 			//if appointment is marked complete and any procedures are not,
 			//then set the remaining procedures complete
+			List<Procedure> listProcsInAppt=new List<Procedure>();
+			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
+				listProcsInAppt.Add(_listProcs[gridProc.SelectedIndices[i]]);
+			}
 			if(AptCur.AptStatus==ApptStatus.Complete) {
 				bool allProcsComplete=true;
-				for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-					if(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcStatus"].ToString()!="2") {//Complete
+				//We can use the SelectedIndices because we've been making sure only those on this appointment are selected.
+				for(int i=0;i<listProcsInAppt.Count;i++) {
+					if(listProcsInAppt[i].ProcStatus!=ProcStat.C) {
 						allProcsComplete=false;
 						break;
 					}
@@ -2711,7 +2777,7 @@ namespace OpenDental{
 					if(!Security.IsAuthorized(Permissions.ProcComplCreate,AptCur.AptDateTime)) {
 						return false;
 					}
-					List <PatPlan> PatPlanList=PatPlans.Refresh(AptCur.PatNum);
+					List<PatPlan> PatPlanList=PatPlans.Refresh(AptCur.PatNum);
 					ProcedureL.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList);
 					if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
@@ -2721,36 +2787,43 @@ namespace OpenDental{
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
 						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
 					}
+					Procedures.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,listProcsInAppt,SubList);
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+						AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
 				}
 			}
 			else {
-				Procedures.SetProvidersInAppointment(AptCur,Procedures.GetProcsForSingle(AptCur.AptNum,false));
+				Procedures.SetProvidersInAppointment(AptCur,listProcsInAppt);
 			}
 			//Do the appointment "break" automation for appointments that were just broken.
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
 				if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
 					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
-				}
-				else {
-					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
+					if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
 					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
-				}
-				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
-				if(HL7Defs.IsExistingHL7Enabled()) {
-					//S15 - Appt Cancellation event
-					MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S15,AptCur);
-					//Will be null if there is no outbound SIU message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=AptCur.AptNum;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=pat.PatNum;
-						HL7Msgs.Insert(hl7Msg);
+					}
+					else {
+						SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.ProcDescript+", "+AptCur.AptDateTime.ToString()
+					+", Broken by changing the Status in the Edit Appointment window.",AptCur.AptNum);
+					}
+					//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
+					if(HL7Defs.IsExistingHL7Enabled()) {
+						//S15 - Appt Cancellation event
+						MessageHL7 messageHL7=MessageConstructor.GenerateSIU(pat,fam.GetPatient(pat.Guarantor),EventTypeHL7.S15,AptCur);
+						//Will be null if there is no outbound SIU message defined, so do nothing
+						if(messageHL7!=null) {
+							HL7Msg hl7Msg=new HL7Msg();
+							hl7Msg.AptNum=AptCur.AptNum;
+							hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+							hl7Msg.MsgText=messageHL7.ToString();
+							hl7Msg.PatNum=pat.PatNum;
+							HL7Msgs.Insert(hl7Msg);
 #if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
+							MessageBox.Show(this,messageHL7.ToString());
 #endif
+						}
 					}
 				}
 				ProcedureCode procCodeBrokenApt=ProcedureCodes.GetProcCode("D9986");
@@ -2791,7 +2864,8 @@ namespace OpenDental{
 					else {
 						procedureCur.ProcFee=procFee;
 					}
-					Procedures.Insert(procedureCur);
+					_listProcs.Add(procedureCur);
+					//Procedures.Insert(procedureCur);
 					//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
 					List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 					List<ClaimProc> listClaimProcsForProc=ClaimProcs.RefreshForProc(procedureCur.ProcNum);
@@ -2811,32 +2885,32 @@ namespace OpenDental{
 						FormCI.IsNew=true;
 						FormCI.ShowDialog();
 					}
-				}
-				else {//No D9986 present
-					if(PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment)) {
-						Commlog CommlogCur=new Commlog();
-						CommlogCur.PatNum=pat.PatNum;
-						CommlogCur.CommDateTime=DateTime.Now;
-						CommlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
-						CommlogCur.Note=Lan.g(this,"Appt BROKEN for ")+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
-						CommlogCur.Mode_=CommItemMode.None;
-						CommlogCur.UserNum=Security.CurUser.UserNum;
-						FormCommItem FormCI=new FormCommItem(CommlogCur);
-						FormCI.IsNew=true;
-						FormCI.ShowDialog();
-					}
-					else {
-						Adjustment AdjustmentCur=new Adjustment();
-						AdjustmentCur.DateEntry=DateTime.Today;
-						AdjustmentCur.AdjDate=DateTime.Today;
-						AdjustmentCur.ProcDate=DateTime.Today;
-						AdjustmentCur.ProvNum=AptCur.ProvNum;
-						AdjustmentCur.PatNum=pat.PatNum;
-						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-						AdjustmentCur.ClinicNum=pat.ClinicNum;
-						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
-						FormA.IsNew=true;
-						FormA.ShowDialog();
+					else {//No D9986 present
+						if(PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment)) {
+							Commlog CommlogCur=new Commlog();
+							CommlogCur.PatNum=pat.PatNum;
+							CommlogCur.CommDateTime=DateTime.Now;
+							CommlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
+							CommlogCur.Note=Lan.g(this,"Appt BROKEN for ")+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
+							CommlogCur.Mode_=CommItemMode.None;
+							CommlogCur.UserNum=Security.CurUser.UserNum;
+							FormCommItem FormCI=new FormCommItem(CommlogCur);
+							FormCI.IsNew=true;
+							FormCI.ShowDialog();
+						}
+						else {
+							Adjustment AdjustmentCur=new Adjustment();
+							AdjustmentCur.DateEntry=DateTime.Today;
+							AdjustmentCur.AdjDate=DateTime.Today;
+							AdjustmentCur.ProcDate=DateTime.Today;
+							AdjustmentCur.ProvNum=AptCur.ProvNum;
+							AdjustmentCur.PatNum=pat.PatNum;
+							AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+							AdjustmentCur.ClinicNum=pat.ClinicNum;
+							FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
+							FormA.IsNew=true;
+							FormA.ShowDialog();
+						}
 					}
 				}
 				AutomationL.Trigger(AutomationTrigger.BreakAppointment,null,pat.PatNum);
@@ -2846,54 +2920,61 @@ namespace OpenDental{
 
 		///<summary>This code is also in FormProcEdit.SaveAndClose() and FormDatabaseMaintenance.butApptProcs_Click().  Make any changes there as well.
 		///Consider moving all of this logic into Appointments.cs at some point, so we do not have to keep editing in multiple places.</summary>
-		private void SetProcDescript() {
-			AptCur.ProcDescript="";
-			AptCur.ProcsColored="";
-			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				string procDescOne="";
-				string procCode=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ProcCode"].ToString();
-				if(i>0) {
-					AptCur.ProcDescript+=", ";
+		private void SetProcDescript(Appointment apt) {
+			apt.ProcDescript="";
+			apt.ProcsColored="";
+			for(int i=0;i<_listProcs.Count;i++) {
+				Procedure proc=_listProcs[i];
+				if(apt.AptStatus==ApptStatus.Planned && apt.AptNum != proc.PlannedAptNum) {
+					continue;
 				}
-				switch(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["TreatArea"].ToString()) {
-					case "1"://TreatmentArea.Surf:
-						procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-"
-				      +DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//""#12-MOD-"
+				if(apt.AptStatus != ApptStatus.Planned && apt.AptNum != proc.AptNum) {
+					continue;
+				}
+				string procDescOne="";
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
+				if(i>0) {
+					apt.ProcDescript+=", ";
+				}
+				switch(procCode.TreatArea) {
+					case TreatmentArea.Surf:
+						procDescOne+="#"+Tooth.GetToothLabel(proc.ToothNum)+"-"
+				      +proc.Surf+"-";//""#12-MOD-"
 						break;
-					case "2"://TreatmentArea.Tooth:
-						procDescOne+="#"+Tooth.GetToothLabel(DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["ToothNum"].ToString())+"-";//"#12-"
+					case TreatmentArea.Tooth:
+						procDescOne+="#"+Tooth.GetToothLabel(proc.ToothNum)+"-";//"#12-"
 						break;
 					default://area 3 or 0 (mouth)
 						break;
-					case "4"://TreatmentArea.Quad:
-						procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"UL-"
+					case TreatmentArea.Quad:
+						procDescOne+=proc.Surf+"-";//"UL-"
 						break;
-					case "5"://TreatmentArea.Sextant:
-						procDescOne+="S"+DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"S2-"
+					case TreatmentArea.Sextant:
+						procDescOne+="S"+proc.Surf+"-";//"S2-"
 						break;
-					case "6"://TreatmentArea.Arch:
-						procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["Surf"].ToString()+"-";//"U-"
+					case TreatmentArea.Arch:
+						procDescOne+=proc.Surf+"-";//"U-"
 						break;
-					case "7"://TreatmentArea.ToothRange:
+					case TreatmentArea.ToothRange:
 						//strLine+=table.Rows[j][13].ToString()+" ";//don't show range
 						break;
 				}
-				procDescOne+=DS.Tables["Procedure"].Rows[gridProc.SelectedIndices[i]]["AbbrDesc"].ToString();
-				AptCur.ProcDescript+=procDescOne;
+				procDescOne+=procCode.AbbrDesc;
+				apt.ProcDescript+=procDescOne;
 				//Color and previous date are determined by ProcApptColor object
-				ProcApptColor pac=ProcApptColors.GetMatch(procCode);
+				ProcApptColor pac=ProcApptColors.GetMatch(procCode.ProcCode);
 				System.Drawing.Color pColor=System.Drawing.Color.Black;
 				string prevDateString="";
 				if(pac!=null) {
 					pColor=pac.ColorText;
 					if(pac.ShowPreviousDate) {
-						prevDateString=Procedures.GetRecentProcDateString(AptCur.PatNum,AptCur.AptDateTime,pac.CodeRange);
+						prevDateString=Procedures.GetRecentProcDateString(apt.PatNum,apt.AptDateTime,pac.CodeRange);
 						if(prevDateString!="") {
 							prevDateString=" ("+prevDateString+")";
 						}
 					}
 				}
-				AptCur.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
+				apt.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
 			}
 		}
 
@@ -3033,7 +3114,7 @@ namespace OpenDental{
 			List <Procedure> procsForDay=Procedures.GetProcsForPatByDate(AptCur.PatNum,AptCur.AptDateTime);
 			for(int i=0;i<procsForDay.Count;i++){
 				Procedure proc=procsForDay[i];
-				ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
 				Provider prov=Providers.GetProv(proc.ProvNum);
 				Userod usr=Userods.GetUser(proc.UserNum);
 				ODGridRow row=new ODGridRow();
@@ -3351,7 +3432,19 @@ namespace OpenDental{
 					}
 				}
 			}
-			Appointments.Delete(AptCur.AptNum);
+			for(int i=0;i<_listAppointments.Count;i++) {
+				if(_listAppointments[i].AptNum==AptCur.AptNum) {
+					_listAppointments.RemoveAt(i);
+				}
+			}
+			for(int i=0;i<_listProcs.Count;i++) {
+				//Proc was attached to this apt.
+				if((_isPlanned && _listProcs[i].PlannedAptNum==AptCur.AptNum) || (!_isPlanned && _listProcs[i].AptNum==AptCur.AptNum)) {
+					//If it was attached to this appointment we want to un-attach it.  We may want to think about re-attaching it to the appt it used to be on.
+					_listProcs[i].PlannedAptNum=0;
+					_listProcs[i].AptNum=0;
+				}
+			}
 			if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
 					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
@@ -3362,20 +3455,61 @@ namespace OpenDental{
 					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
 					AptCur.AptNum);
 			}
-			if(IsNew){
-				_isNewApptDeleted=true;  //Appt was deleted, don't delete again in Form_Closing
-				//The dialog is considered cancelled when a new appointment is immediately deleted.
-			  DialogResult=DialogResult.Cancel;
-			}
-			else{
-				DialogResult=DialogResult.OK;
-			}
+			SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,
+				"Delete for date/time: "+AptCur.AptDateTime.ToString(),
+				AptCur.AptNum);
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(comboProvNum.SelectedIndex==-1) {
 				MsgBox.Show(this,"Please select a provider.");
 				return;
+			}
+			bool hasChanges=false;
+			for(int i=0;i<_listProcs.Count;i++) {
+				Procedure proc=_listProcs[i];
+				for(int j=0;j<_listProcsFromDB.Count;j++) {
+					Procedure procDB=_listProcsFromDB[j];
+					if(proc.ProcNum==procDB.ProcNum) {
+						if(_isPlanned && proc.PlannedAptNum != 0 && procDB.PlannedAptNum != 0 && proc.PlannedAptNum != procDB.PlannedAptNum) {
+							hasChanges=true;
+							break;
+						}
+						else if(!_isPlanned && proc.AptNum != 0 && procDB.AptNum != 0 && proc.AptNum != procDB.AptNum) {
+							hasChanges=true;
+							break;
+						}
+					}
+				}
+				if(hasChanges) {
+					break;
+				}
+			}
+			if(hasChanges) {
+				if(!MsgBox.Show(this,true,"Some procedures used to be attached to a different appointment.  Continue with these changes?")) {
+					return;
+				}
+				for(int i=0;i<_listProcs.Count;i++) {
+					Procedure proc=_listProcs[i];
+					for(int j=0;j<_listProcsFromDB.Count;j++) {
+						Procedure procDB=_listProcsFromDB[j];
+						if(proc.ProcNum==procDB.ProcNum) {
+							if(_isPlanned && proc.PlannedAptNum != 0 && procDB.PlannedAptNum != 0 && proc.PlannedAptNum != procDB.PlannedAptNum) {
+								Appointment apptOld=_listAppointments.FirstOrDefault(x => x.AptNum==procDB.PlannedAptNum);//I don't know if this will work...
+								SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure ")
+									+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+Lan.g(this," moved from planned appointment to appointment on ")
+									+AptCur.AptDateTime);
+							}
+							else if(!_isPlanned && proc.AptNum != 0 && procDB.AptNum != 0 && proc.AptNum != procDB.AptNum) {
+								Appointment apptOld=_listAppointments.FirstOrDefault(x => x.AptNum==procDB.AptNum);//I don't know if this will work...
+								SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure ")
+									+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+Lan.g(this," moved from appointment on ")+apptOld.AptDateTime
+									+Lan.g(this," to appointment on ")+AptCur.AptDateTime);
+							}
+						}
+					}
+				}
 			}
 			if(!UpdateToDB()){
 				return;
@@ -3432,6 +3566,7 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
 					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
 				}
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
 				sendHL7=true;
 			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
@@ -3457,20 +3592,6 @@ namespace OpenDental{
 #endif
 				}
 			}
-			List<string> procCodes=new List<string>();
-			for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
-				if(DS.Tables["Procedure"].Rows[i]["attached"].ToString()=="0") {//not attached
-					continue;
-				}
-				procCodes.Add(DS.Tables["Procedure"].Rows[i]["ProcCode"].ToString());
-			}
-			//if(AptOld.AptStatus!=ApptStatus.Complete && AptCur.AptStatus==ApptStatus.Complete) {//user set appt complete
-			//Recalls.SynchScheduledApptFull(AptCur.PatNum);
-			//}
-			//else {
-			//This was causing bugs.  For example, when clicking ok on a completed appointment
-			//	Recalls.SynchScheduledApptLazy(AptCur.PatNum,AptCur.AptDateTime,procCodes); //moved to closing event
-			//}
 			DialogResult=DialogResult.OK;
 		}
 
@@ -3482,9 +3603,15 @@ namespace OpenDental{
 			//Do not use pat.PatNum here.  Use AptCur.PatNum instead.  Pat will be null in the case that the user does not have the appt create permission.
 			if(DialogResult!=DialogResult.OK) {
 				if(AptCur.AptStatus==ApptStatus.Complete) {
-					for(int i=0;i<DS.Tables["Procedure"].Rows.Count;i++) {
-						if(DS.Tables["Procedure"].Rows[i]["status"].ToString()!="TP"
-							|| DS.Tables["Procedure"].Rows[i]["attached"].ToString()!="1") {
+					for(int i=0;i<_listProcs.Count;i++) {
+						bool attached=false;
+						if(AptCur.AptStatus==ApptStatus.Planned && _listProcs[i].PlannedAptNum==AptCur.AptNum) {
+							attached=true;
+						}
+						else if(_listProcs[i].AptNum==AptCur.AptNum) {
+							attached=true;
+						}
+						if(_listProcs[i].ProcStatus!=ProcStat.TP || !attached) {
 							continue;
 						}
 						if(!Security.IsAuthorized(Permissions.AppointmentCompleteEdit,true)) {
@@ -3499,22 +3626,25 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,
 						"Create cancel for date/time: "+AptCur.AptDateTime.ToString(),
 						AptCur.AptNum);
-					if(!_isNewApptDeleted) {  //If the appt wasn't already deleted
-						Appointments.Delete(AptCur.AptNum);
+					_listAppointments.Remove(AptCur);
+					for(int i=0;i<_listProcs.Count;i++) {
+						//Proc was attached to this apt.
+						if((_isPlanned && _listProcs[i].PlannedAptNum==AptCur.AptNum) || (!_isPlanned && _listProcs[i].AptNum==AptCur.AptNum)) {
+							//If it was attached to this appointment we want to un-attach it.  We may want to think about re-attaching it to the appt it used to be on.
+							_listProcs[i].PlannedAptNum=0;
+							_listProcs[i].AptNum=0;
+						}
 					}
 				}
 				else {  //User clicked cancel on an existing appt
-					//We need to update the Appointment.ProcDescript even though user clicked cancel.  Procedures could have been attached/detached.
 					AptCur=AptOld.Clone();  //We do not want to save any other changes made in this form.
-					SetProcDescript();
-					if(AptCur.ProcsColored!=AptOld.ProcsColored || AptCur.ProcDescript!=AptOld.ProcDescript) {
-						Appointments.Update(AptCur,AptOld);
-						HasProcsChangedAndCancel=true; //Let the Appt module know we need to refresh because the Appt.ProcDescript changed.
-					}
 				}
 			}
+			_listProcsFromDB=Procedures.GetProcsForApptEdit(AptCur);
+			Procedures.Sync(_listProcs,_listProcsFromDB);//Only sync procedures if ok or delete was pressed.(DialogResult.OK)??? maybe?  If cancel is pressed we could have changed proc appointments.  Should we attempt to "put them back" or just leave them as unattached?  Maybe we should treat them like deletes?
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
+			Appointments.Sync(_listAppointments,AptCur.PatNum);
 		}
 		
 

@@ -260,6 +260,21 @@ namespace OpenDentBusiness{
 			return Crud.LabCaseCrud.SelectOne(command);
 		}
 
+		///<summary>Gets the labcase for an appointment.  Used in the Appointment Edit window.</summary>
+		public static LabCase GetForApt(Appointment appt) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<LabCase>(MethodBase.GetCurrentMethod(),appt);
+			}
+			string command="SELECT * FROM labcase ";
+			if(appt.AptStatus==ApptStatus.Planned) {
+				command+="WHERE PlannedAptNum="+POut.Long(appt.AptNum);
+			}
+			else {
+				command+="WHERE AptNum="+POut.Long(appt.AptNum);
+			}
+			return Crud.LabCaseCrud.SelectOne(command);
+		}
+
 	}
 
 

@@ -172,7 +172,7 @@ namespace OpenDentBusiness{
 			}
 			string command=
 				"SELECT * FROM appointment "
-				+"WHERE patnum = '"+patNum.ToString()+"' "
+				+"WHERE patnum = '"+POut.Long(patNum)+"' "
 				+"ORDER BY AptDateTime";
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
@@ -2387,6 +2387,15 @@ namespace OpenDentBusiness{
 				listProcs.Add(procCur);
 			}
 			return listProcs;
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<Appointment> listNew,long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum);
+			}
+			List<Appointment> listDB=Appointments.GetListForPat(patNum);
+			Crud.AppointmentCrud.Sync(listNew,listDB);
 		}
 
 	}

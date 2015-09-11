@@ -91,15 +91,8 @@ namespace OpenDentBusiness {
 			return result;
 		}
 
-		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch.  Also deletes any claimProcs and adjustments.  This does not actually delete the procedure, but just changes the status to deleted.</summary>
-		public static void Delete(long procNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
-				return;
-			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
-				DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
-			}
+		///<summary>Throws an exception if the given procedure cannot be deleted safely.</summary>
+		public static void ValidateDelete(long procNum) {
 			//Test to see if the procedure is attached to a claim
 			string command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
 				+" AND ClaimNum > 0";
@@ -117,9 +110,21 @@ namespace OpenDentBusiness {
 			if(Db.GetCount(command)!="0") {
 				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure with referrals attached."));
 			}
+		}
+
+		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch.  Also deletes any claimProcs and adjustments.  This does not actually delete the procedure, but just changes the status to deleted.</summary>
+		public static void Delete(long procNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
+				return;
+			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
+			}
+			ValidateDelete(procNum);
 			//delete adjustments, audit logs added from Adjustments.DeleteForProcedure()
-			Adjustments.DeleteForProcedure(procNum);		
-			Db.NonQ(command);
+			Adjustments.DeleteForProcedure(procNum);
+			string command;
 			//delete claimprocs
 			command="DELETE from claimproc WHERE ProcNum = '"+POut.Long(procNum)+"'";
 			Db.NonQ(command);
@@ -244,6 +249,31 @@ namespace OpenDentBusiness {
 			else {
 				command = "SELECT * from procedurelog WHERE AptNum = '"+POut.Long(aptNum)+"'";
 			}
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
+		///<summary>Gets all Procedures that need to be displayed in FormApptEdit.</summary>
+		public static List<Procedure> GetProcsForApptEdit(Appointment appt) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),appt);
+			}
+			string command="SELECT procedurelog.* FROM procedurelog "
+				+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+				+"WHERE procedurelog.PatNum="+POut.Long(appt.PatNum)+" "
+				+"AND (procedurelog.ProcStatus="+POut.Long((int)ProcStat.TP)+" OR ";
+			if(appt.AptStatus==ApptStatus.Planned) {
+				command+="procedurelog.PlannedAptNum="+POut.Long(appt.AptNum)+" ";
+			}
+			else {//Scheduled
+				command+="procedurelog.AptNum="+POut.Long(appt.AptNum)+" ";
+			}
+			if(appt.AptStatus==ApptStatus.Scheduled || appt.AptStatus==ApptStatus.Complete 
+				|| appt.AptStatus==ApptStatus.ASAP || appt.AptStatus==ApptStatus.Broken)
+			{
+					command+="OR (procedurelog.AptNum=0 AND procedurelog.ProcStatus="+POut.Long((int)ProcStat.C)+" AND "
+						+DbHelper.DtimeToDate("procedurelog.ProcDate")+"="+POut.Date(appt.AptDateTime)+") ";
+			}
+			command+=") AND procedurelog.ProcStatus != "+POut.Long((int)ProcStat.D)+" AND procedurecode.IsCanadianLab=0";
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
@@ -1644,6 +1674,15 @@ namespace OpenDentBusiness {
 				+"AND ProcDate >= "+POut.Date(date1)+" "
 				+"AND ProcDate <= "+POut.Date(date2);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in two lists.</summary>
+		public static void Sync(List<Procedure> listNew,List<Procedure> listDB) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listDB);//Never pass DB list through the web service (Note: Why?  Our proc list is special, it doesn't contain all procs so we shouldn't code this method to always use our limited list of procs........)
+				return;
+			}
+			Crud.ProcedureCrud.Sync(listNew,listDB);
 		}
 
 	}

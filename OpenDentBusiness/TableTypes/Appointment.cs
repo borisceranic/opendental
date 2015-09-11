@@ -7,6 +7,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>Appointments can show in the Appointments module, or they can be on the unscheduled list.  An appointment object is also used to store the Planned appointment.  The planned appointment never gets scheduled, but instead gets copied.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class Appointment:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

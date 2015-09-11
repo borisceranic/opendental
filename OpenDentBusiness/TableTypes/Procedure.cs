@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace OpenDentBusiness {
 	///<summary>Database table is procedurelog.  A procedure for a patient.  Can be treatment planned or completed.  Once it's completed, it gets tracked more closely be the security portion of the program.  A procedure can NEVER be deleted.  Status can just be changed to "deleted".</summary>
 	[Serializable()]
-	[CrudTable(TableName="procedurelog",IsDeleteForbidden=true)]
+	[CrudTable(TableName="procedurelog",IsDeleteForbidden=true,IsSynchable=true)]
 	public class Procedure:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
