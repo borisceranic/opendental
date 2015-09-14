@@ -56,6 +56,10 @@ namespace OpenDentBusiness.Crud{
 				job.HoursActual  = PIn.Int   (table.Rows[i]["HoursActual"].ToString());
 				job.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				job.Description  = PIn.String(table.Rows[i]["Description"].ToString());
+				job.Title        = PIn.String(table.Rows[i]["Title"].ToString());
+				job.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
+				job.JobStatus    = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["JobStatus"].ToString());
+				job.Owner        = PIn.Long  (table.Rows[i]["Owner"].ToString());
 				retVal.Add(job);
 			}
 			return retVal;
@@ -96,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description) VALUES(";
+			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Notes,JobStatus,Owner) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(job.JobNum)+",";
 			}
@@ -109,7 +113,11 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(job.Description)+"')";
+				+"'"+POut.String(job.Description)+"',"
+				+"'"+POut.String(job.Title)+"',"
+				+"'"+POut.String(job.Notes)+"',"
+				+    POut.Int   ((int)job.JobStatus)+","
+				+    POut.Long  (job.Owner)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description) VALUES(";
+			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Notes,JobStatus,Owner) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(job.JobNum)+",";
 			}
@@ -155,7 +163,11 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(job.Description)+"')";
+				+"'"+POut.String(job.Description)+"',"
+				+"'"+POut.String(job.Title)+"',"
+				+"'"+POut.String(job.Notes)+"',"
+				+    POut.Int   ((int)job.JobStatus)+","
+				+    POut.Long  (job.Owner)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -176,7 +188,11 @@ namespace OpenDentBusiness.Crud{
 				+"HoursEstimate=  "+POut.Int   (job.HoursEstimate)+", "
 				+"HoursActual  =  "+POut.Int   (job.HoursActual)+", "
 				//DateTimeEntry not allowed to change
-				+"Description  = '"+POut.String(job.Description)+"' "
+				+"Description  = '"+POut.String(job.Description)+"', "
+				+"Title        = '"+POut.String(job.Title)+"', "
+				+"Notes        = '"+POut.String(job.Notes)+"', "
+				+"JobStatus    =  "+POut.Int   ((int)job.JobStatus)+", "
+				+"Owner        =  "+POut.Long  (job.Owner)+" "
 				+"WHERE JobNum = "+POut.Long(job.JobNum);
 			Db.NonQ(command);
 		}
@@ -216,6 +232,22 @@ namespace OpenDentBusiness.Crud{
 			if(job.Description != oldJob.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(job.Description)+"'";
+			}
+			if(job.Title != oldJob.Title) {
+				if(command!=""){ command+=",";}
+				command+="Title = '"+POut.String(job.Title)+"'";
+			}
+			if(job.Notes != oldJob.Notes) {
+				if(command!=""){ command+=",";}
+				command+="Notes = '"+POut.String(job.Notes)+"'";
+			}
+			if(job.JobStatus != oldJob.JobStatus) {
+				if(command!=""){ command+=",";}
+				command+="JobStatus = "+POut.Int   ((int)job.JobStatus)+"";
+			}
+			if(job.Owner != oldJob.Owner) {
+				if(command!=""){ command+=",";}
+				command+="Owner = "+POut.Long(job.Owner)+"";
 			}
 			if(command==""){
 				return false;

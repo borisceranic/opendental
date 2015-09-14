@@ -28,6 +28,14 @@ namespace OpenDentBusiness {
 		public DateTime DateTimeEntry;
 		///<summary>The description of the job.</summary>
 		public string Description;
+		///<summary>The short title of the job.</summary>
+		public string Title;
+		///<summary>Notes pertaining to the job.</summary>
+		public string Notes;
+		///<summary>The current status of the job.  Historical JobStatus data soted in JobEvent.JobStatus.</summary>
+		public JobStatus JobStatus;
+		///<summary>FK to userod.UserNum.  The current owner of the job.  Historical owner data stored in JobEvent.Owner.</summary>
+		public long Owner;
 
 		///<summary></summary>
 		public Job Copy() {
@@ -79,6 +87,10 @@ namespace OpenDentBusiness {
 						HoursActual int NOT NULL,
 						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						Description varchar(255) NOT NULL,
+						Title varchar(255) NOT NULL,
+						Notes varchar(255) NOT NULL,
+						JobStatus tinyint NOT NULL,
+						Owner bigint NOT NULL,
 						INDEX(Expert),
 						INDEX(ProjectNum)
 						) DEFAULT CHARSET=utf8";
@@ -98,6 +110,10 @@ namespace OpenDentBusiness {
 						HoursActual number(11) NOT NULL,
 						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
 						Description varchar2(255),
+						Title varchar2(255),
+						Notes varchar2(255),
+						JobStatus number(3) NOT NULL,
+						Owner number(20) NOT NULL,
 						CONSTRAINT job_JobNum PRIMARY KEY (JobNum)
 						)";
 					Db.NonQ(command);
@@ -107,3 +123,4 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				*/
+

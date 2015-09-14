@@ -17,14 +17,15 @@ namespace OpenDentBusiness {
 		public long JobEventNum;
 		///<summary>FK to job.JobNum.  Links this event to the source job.</summary>
 		public long JobNum;
-		///<summary>FK to customers' userod.UserNum.  Shows in the JobEdit window.</summary>
+		///<summary>FK to customers' userod.UserNum.  The owner of the job at the time the entry was made.  
+		///Stored for viewing changes made to a job.</summary>
 		public long Owner;
 		///<summary>Date/Time the event was created.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
 		///<summary>Copy of the job description at the time of the event creation.</summary>
 		public string Description;
-		///<summary>The status of the referenced job.</summary>
+		///<summary>The status of the referenced job at the time the entry was made.</summary>
 		public JobStatus JobStatus;
 
 		///<summary></summary>
