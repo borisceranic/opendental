@@ -813,6 +813,26 @@ namespace OpenDental{
 			printPreview=new FormPrintPreview(PrintSituation.Postcard,pd,
 				(int)Math.Ceiling((double)AddrTable.Rows.Count/(double)PrefC.GetLong(PrefName.RecallPostcardsPerSheet)),0,"Confirmation list postcards printed");
 			printPreview.ShowDialog();
+			if(printPreview.DialogResult==DialogResult.OK) { //dialog result was OK means that the postcards were sent to the printer.
+				for(int i=0;i<AddrTable.Rows.Count;i++) { //loop through the address table and create commlog entries for all selected.
+					Commlog postcardCommlog=new Commlog();
+					postcardCommlog.CommDateTime=DateTimeOD.Today;
+					postcardCommlog.Mode_=CommItemMode.Mail;
+					postcardCommlog.Note="Confirmation postcard printed for "+AddrTable.Rows[i]["LName"].ToString()
+								+", "+AddrTable.Rows[i]["FName"].ToString()+"\r\n"+AddrTable.Rows[i]["Address"].ToString()+"\r\n";
+					if(AddrTable.Rows[i]["Address2"].ToString()!="") {
+						postcardCommlog.Note+=AddrTable.Rows[i]["Address2"].ToString()+"\r\n";
+					}
+					postcardCommlog.Note+=AddrTable.Rows[i]["City"].ToString()+", "
+						+AddrTable.Rows[i]["State"].ToString()+"   "
+						+AddrTable.Rows[i]["Zip"].ToString()+"\r\n";
+					postcardCommlog.PatNum=PIn.Long(AddrTable.Rows[i]["PatNum"].ToString());
+					postcardCommlog.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC);
+					postcardCommlog.SentOrReceived=CommSentOrReceived.Sent;
+					postcardCommlog.UserNum=Security.CurUser.UserNum;
+					Commlogs.Insert(postcardCommlog);
+				}
+			}
 		}
 
 		///<summary>raised for each page to be printed.</summary>
