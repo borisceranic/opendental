@@ -939,7 +939,7 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND procedurelog.ProcDate >= " +POut.Date(dateFrom)+" "
 				+"AND procedurelog.ProcDate <= " +POut.Date(dateTo)+" "
-				+"GROUP BY ClinicNum,MONTH(procedurelog.ProcDate)";
+				+"GROUP BY ClinicNum,YEAR(procedurelog.ProcDate),MONTH(procedurelog.ProcDate)";
 			if(!isAnnual) {
 				command+=",DAY(procedurelog.ProcDate)";
 			}
@@ -962,7 +962,7 @@ namespace OpenDentBusiness {
 				+"AND adjustment.AdjDate <= "+POut.Date(dateTo)+" "
 				+whereProv
 				+whereClin
-				+"GROUP BY ClinicNum,MONTH(adjustment.AdjDate)";
+				+"GROUP BY ClinicNum,YEAR(adjustment.AdjDate),MONTH(adjustment.AdjDate)";
 			if(!isAnnual) {
 				command+=",DAY(adjustment.AdjDate)";
 			}
@@ -987,7 +987,7 @@ namespace OpenDentBusiness {
 					+whereProv
 					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4) "//Received or supplemental
-					+"GROUP BY ClinicNum,MONTH(claimproc.DateCP)";
+					+"GROUP BY ClinicNum,YEAR(claimproc.DateCP),MONTH(claimproc.DateCP)";
 				if(!isAnnual) {
 					command+=",DAY(claimproc.DateCP)";
 				}
@@ -1004,7 +1004,7 @@ namespace OpenDentBusiness {
 					+whereProv
 					+whereClin
 					+"AND (claimproc.Status=1 OR claimproc.Status=4 OR claimproc.Status=0) " //received or supplemental or notreceived
-					+"GROUP BY ClinicNum,MONTH(claimproc.ProcDate)";//
+					+"GROUP BY ClinicNum,YEAR(claimproc.ProcDate),MONTH(claimproc.ProcDate)";//
 				if(!isAnnual) {
 					command+=",DAY(claimproc.ProcDate)";
 				}
@@ -1063,7 +1063,7 @@ namespace OpenDentBusiness {
 				+whereClin
 				+"AND paysplit.DatePay >= "+POut.Date(dateFrom)+" "
 				+"AND paysplit.DatePay <= "+POut.Date(dateTo)+" "
-				+"GROUP BY ClinicNum,MONTH(paysplit.DatePay)";
+				+"GROUP BY ClinicNum,YEAR(paysplit.DatePay),MONTH(paysplit.DatePay)";
 				if(!isAnnual) {
 					command+=",DAY(paysplit.DatePay)";
 				}
