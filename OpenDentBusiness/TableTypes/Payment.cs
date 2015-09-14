@@ -33,7 +33,7 @@ namespace OpenDentBusiness{
 		///<summary>FK to deposit.DepositNum.  0 if not attached to any deposits.  Cash does not usually get attached to a deposit; only checks.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
 		public long DepositNum;
-		///<summary>Text of printed receipt if the payment was done electronically. Allows reprinting if needed. Only used for PayConnect at the moment, but plans to use for XCharge as well.</summary>
+		///<summary>Text of printed receipt if the payment was done electronically. Allows reprinting if needed.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Receipt;
 		///<summary>True if this was an automatically added recurring CC charge rather then one entered by the user.  This was set to true for all historical entries before version 11.1, but will be accurate after that.</summary>

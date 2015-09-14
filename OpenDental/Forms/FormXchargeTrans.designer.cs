@@ -31,6 +31,8 @@ namespace OpenDental{
 			this.textCashBackAmt = new ODR.ValidDouble();
 			this.listTransType = new System.Windows.Forms.ListBox();
 			this.checkSaveToken = new System.Windows.Forms.CheckBox();
+			this.checkSignature = new System.Windows.Forms.CheckBox();
+			this.checkPrintReceipt = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -41,7 +43,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(219, 197);
+			this.butOK.Location = new System.Drawing.Point(219, 221);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 2;
@@ -75,7 +77,7 @@ namespace OpenDental{
 			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.button1.CornerRadius = 4F;
-			this.button1.Location = new System.Drawing.Point(-226, -136);
+			this.button1.Location = new System.Drawing.Point(-226, -112);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(75, 26);
 			this.button1.TabIndex = 56;
@@ -107,10 +109,30 @@ namespace OpenDental{
 			this.checkSaveToken.TabIndex = 63;
 			this.checkSaveToken.Text = "Save Token";
 			// 
+			// checkSignature
+			// 
+			this.checkSignature.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSignature.Location = new System.Drawing.Point(52, 220);
+			this.checkSignature.Name = "checkSignature";
+			this.checkSignature.Size = new System.Drawing.Size(161, 17);
+			this.checkSignature.TabIndex = 64;
+			this.checkSignature.Text = "Prompt for Signature";
+			// 
+			// checkPrintReceipt
+			// 
+			this.checkPrintReceipt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPrintReceipt.Location = new System.Drawing.Point(52, 237);
+			this.checkPrintReceipt.Name = "checkPrintReceipt";
+			this.checkPrintReceipt.Size = new System.Drawing.Size(161, 17);
+			this.checkPrintReceipt.TabIndex = 65;
+			this.checkPrintReceipt.Text = "Print Receipt";
+			// 
 			// FormXchargeTrans
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(321, 246);
+			this.ClientSize = new System.Drawing.Size(321, 270);
+			this.Controls.Add(this.checkPrintReceipt);
+			this.Controls.Add(this.checkSignature);
 			this.Controls.Add(this.checkSaveToken);
 			this.Controls.Add(this.listTransType);
 			this.Controls.Add(this.textCashBackAmt);
@@ -137,5 +159,7 @@ namespace OpenDental{
 		private ODR.ValidDouble textCashBackAmt;
 		private System.Windows.Forms.ListBox listTransType;
 		private System.Windows.Forms.CheckBox checkSaveToken;
+		private System.Windows.Forms.CheckBox checkSignature;
+		private System.Windows.Forms.CheckBox checkPrintReceipt;
 	}
 }

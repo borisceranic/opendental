@@ -40,6 +40,8 @@ namespace OpenDental{
 		private Label labelXWebID;
 		private TextBox textTerminalID;
 		private Label labelTerminalID;
+		private CheckBox checkPrintReceipt;
+		private CheckBox checkPromptSig;
 		private string pathOverrideOld;
 
 		///<summary></summary>
@@ -97,6 +99,8 @@ namespace OpenDental{
 			this.labelXWebID = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.checkPrintReceipt = new System.Windows.Forms.CheckBox();
+			this.checkPromptSig = new System.Windows.Forms.CheckBox();
 			this.groupXWeb.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -215,7 +219,7 @@ namespace OpenDental{
 			this.groupXWeb.Controls.Add(this.labelAuthKey);
 			this.groupXWeb.Controls.Add(this.textXWebID);
 			this.groupXWeb.Controls.Add(this.labelXWebID);
-			this.groupXWeb.Location = new System.Drawing.Point(18, 301);
+			this.groupXWeb.Location = new System.Drawing.Point(20, 342);
 			this.groupXWeb.Name = "groupXWeb";
 			this.groupXWeb.Size = new System.Drawing.Size(427, 193);
 			this.groupXWeb.TabIndex = 60;
@@ -291,7 +295,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(273, 506);
+			this.butOK.Location = new System.Drawing.Point(273, 551);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 13;
@@ -306,17 +310,38 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(370, 506);
+			this.butCancel.Location = new System.Drawing.Point(370, 551);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 14;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// checkPrintReceipt
+			// 
+			this.checkPrintReceipt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPrintReceipt.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPrintReceipt.Location = new System.Drawing.Point(20, 318);
+			this.checkPrintReceipt.Name = "checkPrintReceipt";
+			this.checkPrintReceipt.Size = new System.Drawing.Size(396, 17);
+			this.checkPrintReceipt.TabIndex = 212;
+			this.checkPrintReceipt.Text = "Print receipts by default";
+			// 
+			// checkPromptSig
+			// 
+			this.checkPromptSig.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPromptSig.Location = new System.Drawing.Point(20, 301);
+			this.checkPromptSig.Name = "checkPromptSig";
+			this.checkPromptSig.Size = new System.Drawing.Size(396, 17);
+			this.checkPromptSig.TabIndex = 211;
+			this.checkPromptSig.Text = "Prompt for signature on credit card transactions by default";
+			// 
 			// FormXchargeSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(480, 544);
+			this.ClientSize = new System.Drawing.Size(480, 589);
+			this.Controls.Add(this.checkPrintReceipt);
+			this.Controls.Add(this.checkPromptSig);
 			this.Controls.Add(this.groupXWeb);
 			this.Controls.Add(this.textOverride);
 			this.Controls.Add(this.labelOverride);
@@ -374,6 +399,8 @@ namespace OpenDental{
 				textAuthKey.Text=authKey;
 			}
 			textTerminalID.Text=ProgramProperties.GetPropVal(prog.ProgramNum,"TerminalID");
+			checkPromptSig.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PromptSignature"));
+			checkPrintReceipt.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PrintReceipt"));
 		}
 
 		///<summary>Call to validate that the password typed in meets the X-Web password strength requirements.  Passwords must be between 8 and 15 characters in length, and must contain at least one letter, one number, and one of these special characters: $%^&+=</summary>
@@ -470,6 +497,8 @@ namespace OpenDental{
 			ProgramProperties.SetProperty(prog.ProgramNum,"XWebID",textXWebID.Text.Trim());
 			ProgramProperties.SetProperty(prog.ProgramNum,"AuthKey",CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim()));
 			ProgramProperties.SetProperty(prog.ProgramNum,"TerminalID",textTerminalID.Text.Trim());
+			ProgramProperties.SetProperty(prog.ProgramNum,"PromptSignature",POut.Bool(checkPromptSig.Checked));
+			ProgramProperties.SetProperty(prog.ProgramNum,"PrintReceipt",POut.Bool(checkPrintReceipt.Checked));
 			DataValid.SetInvalid(InvalidType.Programs);
 			DialogResult=DialogResult.OK;
 		}

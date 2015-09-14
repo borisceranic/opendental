@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using MigraDoc.DocumentObjectModel;
 using OpenDental.UI;
 using OpenDentBusiness;
 
@@ -101,7 +102,10 @@ namespace OpenDental {
 		///<summary>Set to true when X-Charge or PayConnect makes a successful transaction, except for voids.</summary>
 		private bool _wasCreditCardSuccessful;
 		private PayConnectService.creditCardRequest _payConnectRequest;
+		private System.Drawing.Printing.PrintDocument _pd2;
 		private Payment _paymentOld;
+		private bool _promptSignature;
+		private bool _printReceipt;
 
 		///<summary>PatCur and FamCur are not for the PatCur of the payment.  They are for the patient and family from which this window was accessed.</summary>
 		public FormPayment(Patient patCur,Family famCur,Payment paymentCur) {
@@ -183,6 +187,7 @@ namespace OpenDental {
 			this.butOK = new OpenDental.UI.Button();
 			this.butDeleteAll = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
+			this._pd2 = new System.Drawing.Printing.PrintDocument();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -1338,7 +1343,10 @@ namespace OpenDental {
 				return;
 			}
 			int tranType=FormXT.TransactionType;
-			string cashBack=FormXT.CashBackAmount.ToString("F2");
+			decimal cashAmt=FormXT.CashBackAmount;
+			string cashBack=cashAmt.ToString("F2");
+			_promptSignature=FormXT.PromptSignature;
+			_printReceipt=FormXT.PrintReceipt;
 			if(CCard!=null) {
 				//Have credit card on file
 				if(CCard.XChargeToken!="") {//Recurring charge
@@ -1422,6 +1430,9 @@ namespace OpenDental {
 			string xChargeToken="";
 			string accountMasked="";
 			string expiration="";
+			string signatureResult="";
+			string receipt="";
+			bool isDigitallySigned=false;
 			_wasCreditCardSuccessful=false;
 			try {
 				using(TextReader reader=new StreamReader(resultfile)) {
@@ -1437,16 +1448,20 @@ namespace OpenDental {
 						CVRESULT=M
 					*/
 					while(line!=null) {
-						if(resulttext!="") {
-							resulttext+="\r\n";
+						if(!line.StartsWith("RECEIPT=")) {//Don't include the receipt string in the PayNote
+							if(resulttext!="") {
+								resulttext+="\r\n";
+							}
+							resulttext+=line;
 						}
-						resulttext+=line;
 						if(line.StartsWith("RESULT=")) {
 							if(line!="RESULT=SUCCESS") {
 								//Charge was a failure and there might be a description as to why it failed. Continue to loop through line.
 								while(line!=null) {
 									line=reader.ReadLine();
-									resulttext+="\r\n"+line;
+									if(line!=null && !line.StartsWith("RECEIPT=")) {//Don't include the receipt string in the PayNote
+										resulttext+="\r\n"+line;
+									}
 								}
 								needToken=false;//Don't update CCard due to failure
 								newCard=false;//Don't insert CCard due to failure
@@ -1482,6 +1497,29 @@ namespace OpenDental {
 						}
 						if(line.StartsWith("ADDITIONALFUNDSREQUIRED=")) {
 							additionalFunds=PIn.Double(line.Substring(24));
+						}
+						if(line.StartsWith("SIGNATURE=") && line.Length>10) {
+							signatureResult=PIn.String(line.Substring(10));
+							//A successful digitally signed signature will say SIGNATURE=C:\Users\Folder\Where\The\Signature\Is\Stored.bmp
+							if(signatureResult!="NOT SUPPORTED" && signatureResult!="FAILED") {
+								isDigitallySigned=true;
+							}
+						}
+						if(line.StartsWith("RECEIPT=") && line.Length>16) {
+							receipt=PIn.String(line.Substring(16));//Strips off a few unnecessary characters at the beginning of the receipt string
+							receipt=receipt.Replace("\\n","\n");//The receipt from X-Charge escapes the newline characters
+							if(isDigitallySigned) {
+								//Replace X____________________________ with 'Electronically signed'
+								string[] arrayReceiptLines=receipt.Split('\n');
+								for(int i=0;i<arrayReceiptLines.Length;i++) {
+									if(arrayReceiptLines[i].Contains("X___")) {
+										arrayReceiptLines[i]="Electronically signed";
+										break;
+									}
+								}
+								receipt=String.Join("\n",arrayReceiptLines);
+							}
+							receipt=receipt.Replace("\n","\r\n");
 						}
 						line=reader.ReadLine();
 					}
@@ -1536,6 +1574,10 @@ namespace OpenDental {
 			else if(xVoid) {//Close FormPayment window now so the user will not have the option to hit Cancel
 				textAmount.Text="-"+approvedAmt.ToString("F");
 				textNote.Text+=resulttext;
+				PaymentCur.Receipt=receipt;
+				if(_printReceipt && receipt!="") {
+					PrintReceipt(receipt);
+				}
 				SavePaymentToDb();
 				DialogResult=DialogResult.OK;
 				return;
@@ -1547,8 +1589,52 @@ namespace OpenDental {
 				textNote.Text+="\r\n";
 			}
 			textNote.Text+=resulttext;
+			PaymentCur.Receipt=receipt;
+			if(_printReceipt && receipt!="") {
+				PrintReceipt(receipt);
+			}
 		}
 
+		private void PrintReceipt(string receiptStr) {
+			string[] receiptLines=receiptStr.Split(new string[] { "\r\n" },StringSplitOptions.None);
+			MigraDoc.DocumentObjectModel.Document doc=new MigraDoc.DocumentObjectModel.Document();
+			doc.DefaultPageSetup.PageWidth=Unit.FromInch(3.0);
+			doc.DefaultPageSetup.PageHeight=Unit.FromInch(0.181*receiptLines.Length+0.56);//enough to print text plus 9/16 in. (0.56) extra space at bottom.
+			doc.DefaultPageSetup.TopMargin=Unit.FromInch(0.25);
+			doc.DefaultPageSetup.LeftMargin=Unit.FromInch(0.25);
+			doc.DefaultPageSetup.RightMargin=Unit.FromInch(0.25);
+			MigraDoc.DocumentObjectModel.Font bodyFontx=MigraDocHelper.CreateFont(8,false);
+			bodyFontx.Name=FontFamily.GenericMonospace.Name;
+			MigraDoc.DocumentObjectModel.Section section=doc.AddSection();
+			Paragraph par=section.AddParagraph();
+			ParagraphFormat parformat=new ParagraphFormat();
+			parformat.Alignment=ParagraphAlignment.Left;
+			parformat.Font=bodyFontx;
+			par.Format=parformat;
+			par.AddFormattedText(receiptStr,bodyFontx);
+			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
+			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
+			renderer.PrepareDocument();
+			printdoc.Renderer=renderer;
+#if DEBUG
+			FormRpPrintPreview pView=new FormRpPrintPreview();
+			pView.printPreviewControl2.Document=printdoc;
+			pView.ShowDialog();
+#else
+				if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,PatCur.PatNum,"X-Charge receipt printed")){
+					printdoc.PrinterSettings=pd2.PrinterSettings;
+					try {
+						printdoc.Print();
+					}
+					catch(Exception ex) {
+						MessageBox.Show(Lan.g(this,"Unable to print receipt")+". "+ex.Message);
+					}
+				}
+#endif
+		}
+
+		/// <summary>Only used to void a transaction that has just been completed when the user hits Cancel. Uses the same Prompt Signature and Print
+		/// Receipt settings as the original transaction.</summary>
 		private void VoidXChargeTransaction(string transID,string amount,bool isDebit) {
 			ProcessStartInfo info=new ProcessStartInfo(prog.Path);
 			string resultfile=Path.Combine(Path.GetDirectoryName(prog.Path),"XResult.txt");
@@ -1572,6 +1658,8 @@ namespace OpenDental {
 			if(!isDebit) {
 				info.Arguments+="/AUTOPROCESS ";
 			}
+			info.Arguments+="/PROMPTSIGNATURE:F ";
+			info.Arguments+="/RECEIPTINRESULT ";
 			Cursor=Cursors.WaitCursor;
 			Process process=new Process();
 			process.StartInfo=info;
@@ -1587,6 +1675,7 @@ namespace OpenDental {
 			string line="";
 			bool showApprovedAmtNotice=false;
 			double approvedAmt=0;
+			string receipt="";
 			Payment voidPayment=PaymentCur.Clone();
 			voidPayment.PayAmt*=-1;//the negation of the original amount
 			try {
@@ -1606,10 +1695,12 @@ namespace OpenDental {
 						APPROVEDAMOUNT=11.00
 					*/
 					while(line!=null) {
-						if(resulttext!="") {
-							resulttext+="\r\n";
+						if(!line.StartsWith("RECEIPT=")) {//Don't include the receipt string in the PayNote
+							if(resulttext!="") {
+								resulttext+="\r\n";
+							}
+							resulttext+=line;
 						}
-						resulttext+=line;
 						if(line.StartsWith("RESULT=")) {
 							if(line!="RESULT=SUCCESS") {
 								//Void was a failure and there might be a description as to why it failed. Continue to loop through line.
@@ -1625,6 +1716,10 @@ namespace OpenDental {
 							if(approvedAmt != PaymentCur.PayAmt) {
 								showApprovedAmtNotice=true;
 							}
+						}
+						if(line.StartsWith("RECEIPT=") && line.Length>16) {
+							receipt=PIn.String(line.Substring(16));//Strips off a few unnecessary characters at the beginning of the receipt string
+							receipt=receipt.Replace("\\n","\r\n");//The receipt from X-Charge escapes the newline characters
 						}
 						line=reader.ReadLine();
 					}
@@ -1646,6 +1741,10 @@ namespace OpenDental {
 				textNote.Text+="\r\n";
 			}
 			voidPayment.PayNote=resulttext;
+			voidPayment.Receipt=receipt;
+			if(_printReceipt && receipt!="") {
+				PrintReceipt(receipt);
+			}
 			voidPayment.PayNum=Payments.Insert(voidPayment);
 			for(int i=0;i<SplitList.Count;i++) {//Modify the paysplits for the original transaction to work for the void transaction
 				PaySplit split=SplitList[i].Copy();
@@ -1746,6 +1845,13 @@ namespace OpenDental {
 					tranText+="/TRANSACTIONTYPE:VOID /LOCKTRANTYPE ";
 					break;
 			}
+			if(_promptSignature) {
+				tranText+="/PROMPTSIGNATURE:T /SAVESIGNATURE:T ";
+			}
+			else {
+				tranText+="/PROMPTSIGNATURE:F ";
+			}
+			tranText+="/RECEIPTINRESULT ";//So that we can make a few changes to the receipt ourselves
 			return tranText;
 		}
 

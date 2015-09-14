@@ -10179,6 +10179,28 @@ namespace OpenDentBusiness {
 				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty(ProgramNum,PropertyDesc,PropertyValue) VALUES((SELECT ProgramNum FROM program WHERE "
+						+"ProgName='Xcharge'),'PromptSignature','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty(ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) "
+						+"VALUES((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+						+"(SELECT ProgramNum FROM program WHERE ProgName='Xcharge'),'PromptSignature','1')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty(ProgramNum,PropertyDesc,PropertyValue) VALUES((SELECT ProgramNum FROM program WHERE "
+						+"ProgName='Xcharge'),'PrintReceipt','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty(ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) "
+						+"VALUES((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+						+"(SELECT ProgramNum FROM program WHERE ProgName='Xcharge'),'PrintReceipt','1')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimReportComputerName', '')";
 					Db.NonQ(command);
 				}

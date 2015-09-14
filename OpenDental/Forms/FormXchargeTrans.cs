@@ -12,6 +12,8 @@ namespace OpenDental {
 		public int TransactionType;
 		public decimal CashBackAmount;
 		public bool SaveToken;
+		public bool PromptSignature;
+		public bool PrintReceipt;
 
 		public FormXchargeTrans() {
 			InitializeComponent();
@@ -32,6 +34,12 @@ namespace OpenDental {
 			listTransType.Items.Add("Void");
 			listTransType.SelectedIndex=0;
 			checkSaveToken.Checked=PrefC.GetBool(PrefName.StoreCCtokens);
+			Program prog=Programs.GetCur(ProgramName.Xcharge);
+			if(prog==null) {
+				return;
+			}
+			checkSignature.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PromptSignature"));
+			checkPrintReceipt.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PrintReceipt"));
 		}
 
 		private void listTransType_MouseClick(object sender,MouseEventArgs e) {
@@ -55,6 +63,8 @@ namespace OpenDental {
 			}
 			TransactionType=listTransType.SelectedIndex;
 			SaveToken=checkSaveToken.Checked;
+			PromptSignature=checkSignature.Checked;
+			PrintReceipt=checkPrintReceipt.Checked;
 			DialogResult=DialogResult.OK;
 		}
 
