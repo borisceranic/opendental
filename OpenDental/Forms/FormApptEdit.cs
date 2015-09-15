@@ -2903,6 +2903,7 @@ namespace OpenDental{
 		private void SetProcDescript(Appointment apt) {
 			apt.ProcDescript="";
 			apt.ProcsColored="";
+			int numAptProcs=0;
 			for(int i=0;i<_listProcs.Count;i++) {
 				Procedure proc=_listProcs[i];
 				if(apt.AptStatus==ApptStatus.Planned && apt.AptNum != proc.PlannedAptNum) {
@@ -2913,7 +2914,7 @@ namespace OpenDental{
 				}
 				string procDescOne="";
 				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
-				if(i>0) {
+				if(numAptProcs > 0) {
 					apt.ProcDescript+=", ";
 				}
 				switch(procCode.TreatArea) {
@@ -2955,6 +2956,7 @@ namespace OpenDental{
 					}
 				}
 				apt.ProcsColored+="<span color=\""+pColor.ToArgb().ToString()+"\">"+procDescOne+prevDateString+"</span>";
+				numAptProcs++;
 			}
 		}
 
@@ -3436,7 +3438,7 @@ namespace OpenDental{
 				return;
 			}
 			if(_listProcsMoved.Count > 0) {
-				if(!MsgBox.Show(this,true,"Some procedures used to be attached to a different appointment.  Continue with these changes?")) {
+				if(!MsgBox.Show(this,true,"Some procedures were detached from a different appointment.  Continue with these changes?")) {
 					return;
 				}
 				for(int i=0;i<_listProcsMoved.Count;i++) {
@@ -3572,14 +3574,24 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,
 						"Create cancel for date/time: "+AptCur.AptDateTime.ToString(),
 						AptCur.AptNum);
-					_listAppointments.Remove(AptCur);
+					//If cancel was pressed we want to un-do any changes to other appointments that were done.
+					_listAppointments=Appointments.GetListForPat(AptCur.PatNum);
+					//Now we also have to remove the appointment that was pre-inserted and is in this list as well so it is deleted on sync.
+					for(int i=0;i<_listAppointments.Count;i++) {
+						if(_listAppointments[i].AptNum==AptCur.AptNum) {
+							_listAppointments.RemoveAt(i);
+							break;
+						}
+					}
 				}
 				else {  //User clicked cancel on an existing appt
 					AptCur=AptOld.Clone();  //We do not want to save any other changes made in this form.
 				}
 			}
-			_listProcsFromDB=Procedures.GetProcsForApptEdit(AptCur);
-			Procedures.Sync(_listProcs,_listProcsFromDB);//Only sync procedures if ok or delete was pressed.(DialogResult.OK)??? maybe?  If cancel is pressed we could have changed proc appointments.  Should we attempt to "put them back" or just leave them as unattached?  Maybe we should treat them like deletes?
+			else {//DialogResult==DialogResult.OK (User clicked OK or Delete)
+				_listProcsFromDB=Procedures.GetProcsForApptEdit(AptCur);
+				Procedures.Sync(_listProcs,_listProcsFromDB);
+			}
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 			Appointments.Sync(_listAppointments,AptCur.PatNum);//This line also detaches any attached procedures within Appointments.Delete().
