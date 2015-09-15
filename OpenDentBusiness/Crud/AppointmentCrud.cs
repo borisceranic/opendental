@@ -370,12 +370,10 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
-		///<summary>Deletes one Appointment from the database.</summary>
-		public static void Delete(long aptNum){
-			string command="DELETE FROM appointment "
-				+"WHERE AptNum = "+POut.Long(aptNum);
-			Db.NonQ(command);
-		}
+		//Delete not allowed for this table
+		//public static void Delete(long aptNum){
+		//
+		//}
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
 		public static void Sync(List<Appointment> listNew,List<Appointment> listDB) {
@@ -390,7 +388,7 @@ namespace OpenDentBusiness.Crud{
 			int idxDB=0;
 			Appointment fieldNew;
 			Appointment fieldDB;
-			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contains the next element.  The next element is determined by Primary Key.
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
 			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
 			while(idxNew<listNew.Count || idxDB<listDB.Count) {
 				fieldNew=null;
@@ -436,7 +434,7 @@ namespace OpenDentBusiness.Crud{
 				Update(listUpdNew[i],listUpdDB[i]);
 			}
 			for(int i=0;i<listDel.Count;i++) {
-				Delete(listDel[i].AptNum);
+				Appointments.Delete(listDel[i].AptNum);
 			}
 		}
 

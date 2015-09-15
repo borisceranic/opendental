@@ -1024,7 +1024,14 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t4+"Update(listUpdNew[i],listUpdDB[i]);");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"for(int i=0;i<listDel.Count;i++) {");
-				strb.Append(rn+t4+"Delete(listDel[i]."+priKey.Name+");");
+				if(CrudGenHelper.IsDeleteForbidden(typeClass)) {
+					//When Crud.Delete() is forbidden, the only way we could possibly delete a row is if the S class has a specific Delete() function defined.
+					//There are very few classes which are both Synchable and where Crud.Delete() is forbidden.
+					strb.Append(rn+t4+typeClass.Name+"s.Delete(listDel[i]."+priKey.Name+");");
+				}
+				else {
+					strb.Append(rn+t4+"Delete(listDel[i]."+priKey.Name+");");
+				}
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t2+"}");
 			}
