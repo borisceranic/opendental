@@ -9610,7 +9610,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE creditcard MODIFY (Procedures varchar2(4000) NOT NULL)";
+					command="ALTER TABLE creditcard MODIFY (Procedures varchar2(4000))";
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '15.3.16.0' WHERE PrefName = 'DataBaseVersion'";
