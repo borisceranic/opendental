@@ -25,6 +25,9 @@ namespace OpenDental.UI {
 		[Category("Action"),Description("Occurs when a cell is double clicked.")]
 		public event ODGridClickEventHandler CellDoubleClick=null;
 		///<summary></summary>
+		[Category("Action"),Description("Occurs when a combo box item is selected.")]
+		public event ODGridClickEventHandler CellSelectionCommitted=null;
+		///<summary></summary>
 		[Category("Action"),Description("Occurs when a cell is single clicked.")]
 		public event ODGridClickEventHandler CellClick=null;
 		///<summary></summary>
@@ -41,7 +44,7 @@ namespace OpenDental.UI {
 		//private Font cellFont=new Font(FontFamily.GenericSansSerif,8.5f);
 		public Font FontForSheets;
 		private float cellFontSize=8.5f;
-		private int titleHeight=18;
+		protected int titleHeight=18;
 		private int headerHeight=15;
 		private Color cGridLine=Color.FromArgb(180,180,180);
 		private System.Windows.Forms.VScrollBar vScroll;
@@ -78,6 +81,7 @@ namespace OpenDental.UI {
 		private int noteSpanStart;
 		private int noteSpanStop;
 		private TextBox editBox;
+		private ComboBox comboBox;
 		private MouseButtons lastButtonPressed;
 		private ArrayList selectedIndicesWhenMouseDown;
 		private bool allowSortingByColumn;
@@ -1151,6 +1155,13 @@ namespace OpenDental.UI {
 			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
 			if(CellDoubleClick!=null) {
 				CellDoubleClick(this,gArgs);
+			}
+		}
+
+		protected void OnCellSelectionChangeCommitted(int col,int row) {
+			ODGridClickEventArgs gArgs=new ODGridClickEventArgs(col,row,MouseButtons.Left);
+			if(CellSelectionCommitted!=null) {
+				CellSelectionCommitted(this,gArgs);
 			}
 		}
 
@@ -2320,6 +2331,9 @@ namespace OpenDental.UI {
 			else if(columns[sortedByColumnIdx].SortingStrategy==GridSortingStrategy.AmountParse) {
 				rowsSorted.Sort(SortAmountParse);
 			}
+			else if(columns[sortedByColumnIdx].SortingStrategy==GridSortingStrategy.TimeParse) {
+				rowsSorted.Sort(SortTimeParse);
+			}
 			BeginUpdate();
 			rows.Clear();
 			for(int i=0;i<rowsSorted.Count;i++) {
@@ -2357,6 +2371,9 @@ namespace OpenDental.UI {
 			else if(columns[sortedByColumnIdx].SortingStrategy==GridSortingStrategy.AmountParse) {
 				rowsSorted.Sort(SortAmountParse);
 			}
+			else if(columns[sortedByColumnIdx].SortingStrategy==GridSortingStrategy.TimeParse) {
+				rowsSorted.Sort(SortTimeParse);
+			}
 			BeginUpdate();
 			rows.Clear();
 			for(int i=0;i<rowsSorted.Count;i++) {
@@ -2379,6 +2396,21 @@ namespace OpenDental.UI {
 			if(DateTime.TryParse(raw1,out date1) &&
 				DateTime.TryParse(raw2,out date2)) {
 				return (sortedIsAscending?1:-1)*date1.CompareTo(date2);
+			}
+			else { //One of the inputs is not a date so default string compare.
+				return SortStringCompare(row1,row2);
+			}
+		}
+
+		private int SortTimeParse(ODGridRow row1,ODGridRow row2) {
+			string raw1=row1.Cells[sortedByColumnIdx].Text;
+			string raw2=row2.Cells[sortedByColumnIdx].Text;
+			TimeSpan time1;
+			TimeSpan time2;
+			//TryParse is a much faster operation than Parse in the event that the input won't parse to a date.
+			if(TimeSpan.TryParse(raw1,out time1) &&
+				TimeSpan.TryParse(raw2,out time2)) {
+				return (sortedIsAscending?1:-1)*time1.CompareTo(time2);
 			}
 			else { //One of the inputs is not a date so default string compare.
 				return SortStringCompare(row1,row2);

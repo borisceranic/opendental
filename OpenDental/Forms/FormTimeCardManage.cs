@@ -702,6 +702,11 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.TimecardsEditAll)) {
 				return;
 			}
+			string errorAllEmployees=TimeCardRules.ValidateOvertimeRules(new List<long>{0});//Validates the "all employees" timecard rules first.
+			if(errorAllEmployees.Length>0) {
+				MessageBox.Show(errorAllEmployees);
+				return;
+			}
 			if(gridMain.SelectedIndices.Length==0) {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"No employees selected. Would you like to run calculations for all employees?")) {
 					return;
