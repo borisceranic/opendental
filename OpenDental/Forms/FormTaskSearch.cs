@@ -155,6 +155,13 @@ namespace OpenDental {
 			}
 		}
 
+		private void butTaskListPicker_Click(object sender,EventArgs e) {
+			FormTaskListSelect FormTLS=new FormTaskListSelect(TaskObjectType.Patient);
+			if(FormTLS.ShowDialog()==DialogResult.OK) {
+				textTaskList.Text=FormTLS.TaskListDescription;
+			}
+		}
+
 		private void dateCreatedFrom_ValueChanged(object sender,EventArgs e) {
 			dateCreatedFrom.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 		}

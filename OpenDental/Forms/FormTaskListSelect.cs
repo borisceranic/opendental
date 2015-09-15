@@ -20,6 +20,7 @@ namespace OpenDental{
 		private TaskObjectType OType;
 		///<summary>If dialog result=ok, this will contain the TaskListNum that was selected.</summary>
 		private TaskList[] TaskListList;
+		public string TaskListDescription;
 		public long SelectedTaskListNum;
 
 		///<summary></summary>
@@ -131,6 +132,7 @@ namespace OpenDental{
 				return;
 			}
 			SelectedTaskListNum=TaskListList[listMain.SelectedIndex].TaskListNum;
+			TaskListDescription=TaskListList[listMain.SelectedIndex].Descript;
 			/*
 			Task task=new Task();
 			task.TaskListNum=-1;//don't show it in any list yet.
@@ -151,6 +153,7 @@ namespace OpenDental{
 				return;
 			}
 			SelectedTaskListNum=TaskListList[listMain.SelectedIndex].TaskListNum;
+			TaskListDescription=TaskListList[listMain.SelectedIndex].Descript;
 			/*
 			Task task=new Task();
 			task.TaskListNum=-1;//don't show it in any list yet.
