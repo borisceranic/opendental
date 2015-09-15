@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Collections;
 using System.Globalization;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -95,19 +96,19 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>will be deprecated with overhaul 9/13/2013. Validates pay period before making any adjustments.</summary>
-		public static string ValidatePayPeriod(Employee EmployeeCur, DateTime StartDate,DateTime StopDate) {
-			List<ClockEvent> breakList=ClockEvents.Refresh(EmployeeCur.EmployeeNum,StartDate,StopDate,true);
-			List<ClockEvent> ClockEventList=ClockEvents.Refresh(EmployeeCur.EmployeeNum,StartDate,StopDate,false);
+		///<summary>Validates pay period before making any adjustments.</summary>
+		public static string ValidatePayPeriod(Employee employeeCur,DateTime startDate,DateTime stopDate) {
+			List<ClockEvent> breakList=ClockEvents.Refresh(employeeCur.EmployeeNum,startDate,stopDate,true);
+			List<ClockEvent> clockEventList=ClockEvents.Refresh(employeeCur.EmployeeNum,startDate,stopDate,false);
 			bool errorFound=false;
-			string retVal="Timecard errors for employee : "+Employees.GetNameFL(EmployeeCur)+"\r\n";
+			string retVal="Timecard errors for employee : "+Employees.GetNameFL(employeeCur)+"\r\n";
 			//Validate clock events
-			foreach(ClockEvent cCur in ClockEventList){
-				if(cCur.TimeDisplayed2.Year < 1880){
+			foreach(ClockEvent cCur in clockEventList) {
+				if(cCur.TimeDisplayed2.Year<1880) {
 					retVal+="  "+cCur.TimeDisplayed1.ToShortDateString()+" : Employee not clocked out.\r\n";
 					errorFound=true;
 				}
-				else if(cCur.TimeDisplayed1.Date != cCur.TimeDisplayed2.Date){
+				else if(cCur.TimeDisplayed1.Date!=cCur.TimeDisplayed2.Date) {
 					retVal+="  "+cCur.TimeDisplayed1.ToShortDateString()+" : Clock entry spans multiple days.\r\n";
 					errorFound=true;
 				}
@@ -118,61 +119,55 @@ namespace OpenDentBusiness{
 					retVal+="  "+bCur.TimeDisplayed1.ToShortDateString()+" : Employee not clocked in from break.\r\n";
 					errorFound=true;
 				}
-				if(bCur.TimeDisplayed1.Date != bCur.TimeDisplayed2.Date) {
+				if(bCur.TimeDisplayed1.Date!=bCur.TimeDisplayed2.Date) {
 					retVal+="  "+bCur.TimeDisplayed1.ToShortDateString()+" : One break spans multiple days.\r\n";
 					errorFound=true;
 				}
-				for(int c=ClockEventList.Count-1;c>=0;c--) {
-					if(ClockEventList[c].TimeDisplayed1.Date==bCur.TimeDisplayed1.Date) {
+				for(int c=clockEventList.Count-1;c>=0;c--) {
+					if(clockEventList[c].TimeDisplayed1.Date==bCur.TimeDisplayed1.Date) {
 						break;
 					}
-					if(c==0) {//we never found a match
+					if(c==0) { //we never found a match
 						retVal+="  "+bCur.TimeDisplayed1.ToShortDateString()+" : Break found during non-working day.\r\n";
 						errorFound=true;
 					}
 				}
 			}
-			//Validate OT Rules
-			bool amRuleFound=false;
-			bool pmRuleFound=false;
-			bool hourRuleFound=false;
+			return (errorFound?retVal:"");
+		}
+
+		///<summary>Cannot have both AM/PM rules and OverHours rules defined. 
+		/// We no longer block having multiple rules defined. With a better interface we can improve some of this functionality. Per NS 09/15/2015.</summary>
+		public static string ValidateOvertimeRules(List<long> listEmployeeNums=null) {
+			StringBuilder sb=new StringBuilder();
 			TimeCardRules.RefreshCache();
-			foreach(TimeCardRule tcrCur in TimeCardRules.listt){
-				if(tcrCur.EmployeeNum!=EmployeeCur.EmployeeNum){
-					continue;//Does not apply to this employee.
-				}
-				if(tcrCur.AfterTimeOfDay > TimeSpan.Zero){
-					if(pmRuleFound){
-						retVal+="  Multiple timecard rules for after time of day found. Only one allowed.\r\n";
-						errorFound=true;
-					}
-					pmRuleFound=true;
-				}
-				if(tcrCur.BeforeTimeOfDay > TimeSpan.Zero){
-					if(amRuleFound){
-						retVal+="  Multiple timecard rules for before time of day found. Only one allowed.\r\n";
-						errorFound=true;
-					}
-					amRuleFound=true;
-				}
-				if(tcrCur.OverHoursPerDay > TimeSpan.Zero){
-					if(hourRuleFound){
-						retVal+="  Multiple timecard rules for hours per day found. Only one allowed.\r\n";
-						errorFound=true;
-					}
-					hourRuleFound=true;
-				}
-				if(pmRuleFound&&hourRuleFound){
-					retVal+="  Both an OverHoursPerDay and an AfterTimeOfDay found for this employee.  Only one or the other is allowed.\r\n";
-					errorFound=true;
-				}
-				if(amRuleFound&&hourRuleFound){
-					retVal+="  Both an OverHoursPerDay and an BeforeTimeOfDay found for this employee.  Only one or the other is allowed.\r\n";
-					errorFound=true;
+			List<TimeCardRule> listTimeCardRules=TimeCardRules.Listt;
+			if(listEmployeeNums!=null && listEmployeeNums.Count>0) {
+				listTimeCardRules=listTimeCardRules.FindAll(x => x.EmployeeNum==0 || listEmployeeNums.Contains(x.EmployeeNum));
+			}
+			//Generate error messages for "All Employees" timecard rules.
+			List<TimeCardRule> listTimeCardRulesAll=listTimeCardRules.FindAll(x => x.EmployeeNum==0);
+			if(listTimeCardRulesAll.Any(x => x.AfterTimeOfDay>TimeSpan.Zero || x.BeforeTimeOfDay>TimeSpan.Zero) //There exists an AM or PM rule
+				   && listTimeCardRulesAll.Any(x => x.OverHoursPerDay>TimeSpan.Zero)) //There also exists an Over hours rule.
+			{
+				sb.AppendLine("Timecard errors found for \"All Employees\":");
+				sb.AppendLine("  Both a time of day rule and an over hours per day rule found. Only one or the other is allowed.");
+				return sb.ToString();
+			}
+			listEmployeeNums=listTimeCardRules.Where(x=>x.EmployeeNum>0).Select(x=>x.EmployeeNum).Distinct().ToList();
+			//Generate Employee specific errors
+			for(int i=0;i<listEmployeeNums.Count;i++) {
+				long empNum=listEmployeeNums[i];
+				List<TimeCardRule> listTimeCardRulesEmp=listTimeCardRules.FindAll(x => x.EmployeeNum==0 || x.EmployeeNum==empNum);
+				if(listTimeCardRulesEmp.Any(x => x.AfterTimeOfDay>TimeSpan.Zero || x.BeforeTimeOfDay>TimeSpan.Zero) //There exists an AM or PM rule
+				   && listTimeCardRulesEmp.Any(x => x.OverHoursPerDay>TimeSpan.Zero)) //There also exists an Over hours rule.
+				{
+					string empName=Employees.GetNameFL(Employees.GetEmp(empNum));
+					sb.AppendLine("Timecard errors found for "+empName+":");
+					sb.AppendLine("  Both a time of day rule and an over hours per day rule found. Only one or the other is allowed.\r\n");
 				}
 			}
-			retVal+="\r\n";
-			return (errorFound?retVal:"");
+			return sb.ToString();
 		}
 
 		///<summary>Clears automatic adjustment/adjustOT values and deletes automatic TimeAdjusts for period.</summary>
@@ -210,47 +205,30 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Validates list and throws exceptions.  Gets a list of time card rules for a given employee.</summary>
-		public static List<TimeCardRule> GetValidList(Employee employeeCur) {
+		///<summary>Validates list and throws exceptions. Always returns a value. Creates a timecard rule based on all applicable timecard rules for a given employee.</summary>
+		public static TimeCardRule GetTimeCardRule(Employee employeeCur) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<TimeCardRule>>(MethodBase.GetCurrentMethod(),employeeCur);
-			}
-			List<TimeCardRule> retVal = new List<TimeCardRule>();
-			List<TimeSpan> listTimeSpansAM=new List<TimeSpan>();
-			List<TimeSpan> listTimeSpansPM=new List<TimeSpan>();
-			List<TimeSpan> listTimeSpansOver=new List<TimeSpan>();
-			RefreshCache();
-			string errors="";
-			//Fill Rules list and time span list-------------------------------------------------------------------------------------------
-			for(int i=0;i<listt.Count;i++) {
-				if(listt[i].EmployeeNum==employeeCur.EmployeeNum || listt[i].EmployeeNum==0) {//specific rule for employee or rules that apply to all employees.
-					retVal.Add(listt[i]);
-					if(listt[i].BeforeTimeOfDay>TimeSpan.FromHours(0)) {
-						listTimeSpansAM.Add(listt[i].BeforeTimeOfDay);
-					}
-					if(listt[i].AfterTimeOfDay>TimeSpan.FromHours(0)) {
-						listTimeSpansPM.Add(listt[i].AfterTimeOfDay);
-					}
-					if(listt[i].OverHoursPerDay>TimeSpan.FromHours(0)) {
-						listTimeSpansOver.Add(listt[i].OverHoursPerDay);
-					}
-				}
+				return Meth.GetObject<TimeCardRule>(MethodBase.GetCurrentMethod(),employeeCur);
 			}
 			//Validate Rules---------------------------------------------------------------------------------------------------------------
-			if(listTimeSpansAM.Count>1) {
-				errors+="Multiple matches of BeforeTimeOfDay found, only one allowed.\r\n";
+			string errors=TimeCardRules.ValidateOvertimeRules(new List<long> {employeeCur.EmployeeNum});
+			if(errors.Length>0) {
+				throw new Exception(errors);
 			}
-			if(listTimeSpansPM.Count>1) {
-				errors+="Multiple matches of AfterTimeOfDay found, only one allowed.\r\n";
+			//Build return value ----------------------------------------------------------------------------------------------------------
+			List<TimeCardRule> listTimeCardRulesEmp=Listt.FindAll(x => x.EmployeeNum==0 || x.EmployeeNum==employeeCur.EmployeeNum);
+			TimeCardRule amRule=listTimeCardRulesEmp.Where(x => x.BeforeTimeOfDay>TimeSpan.Zero).OrderByDescending(x => x.BeforeTimeOfDay).FirstOrDefault();
+			TimeCardRule pmRule=listTimeCardRulesEmp.Where(x => x.AfterTimeOfDay>TimeSpan.Zero).OrderBy(x => x.AfterTimeOfDay).FirstOrDefault();
+			TimeCardRule hoursRule=listTimeCardRulesEmp.Where(x => x.OverHoursPerDay>TimeSpan.Zero).OrderBy(x => x.OverHoursPerDay).FirstOrDefault();
+			TimeCardRule retVal=new TimeCardRule();
+			if(amRule!=null) {
+				retVal.BeforeTimeOfDay=amRule.BeforeTimeOfDay;
 			}
-			if(listTimeSpansOver.Count>1) {
-				errors+="Multiple matches of OverHoursPerDay found, only one allowed.\r\n";
+			if(pmRule!=null) {
+				retVal.AfterTimeOfDay=pmRule.AfterTimeOfDay;
 			}
-			if(listTimeSpansAM.Count+listTimeSpansPM.Count>0 && listTimeSpansOver.Count>0) {
-				errors+="Both OverHoursPerDay and Rate2 rules found.\r\n";
-			}
-			if(errors!=""){
-				throw new Exception("Time card rule errors:\r\n"+errors);
+			if(hoursRule!=null) {
+				retVal.OverHoursPerDay=hoursRule.OverHoursPerDay;
 			}
 			return retVal;
 		}
@@ -420,15 +398,30 @@ namespace OpenDentBusiness{
 			#region Fill Lists, validate data sets, generate error messages.
 			List<ClockEvent> listClockEvent=new List<ClockEvent>();
 			List<ClockEvent> listClockEventBreak=new List<ClockEvent>();
-			List<TimeCardRule> listTimeCardRule=new List<TimeCardRule>();
+			TimeCardRule timeCardRule=new TimeCardRule();
 			string errors="";
 			string clockErrors="";
 			string breakErrors="";
 			string ruleErrors="";
 			//Fill lists and catch validation error messages------------------------------------------------------------------------------------------------------------
-			try{ listClockEvent     =ClockEvents  .GetValidList(employee.EmployeeNum,dateStart,dateStop,false); } catch(Exception ex){clockErrors			+=ex.Message;}
-			try{ listClockEventBreak=ClockEvents  .GetValidList(employee.EmployeeNum,dateStart,dateStop,true);	} catch(Exception ex){breakErrors			+=ex.Message;}
-			try{ listTimeCardRule   =TimeCardRules.GetValidList(employee);										} catch(Exception ex){ruleErrors			+=ex.Message;}
+			try {
+				listClockEvent=ClockEvents.GetValidList(employee.EmployeeNum,dateStart,dateStop,false);
+			}
+			catch(Exception ex) {
+				clockErrors+=ex.Message;
+			}
+			try {
+				listClockEventBreak=ClockEvents.GetValidList(employee.EmployeeNum,dateStart,dateStop,true);
+			}
+			catch(Exception ex) {
+				breakErrors+=ex.Message;
+			}
+			try {
+				timeCardRule=TimeCardRules.GetTimeCardRule(employee);
+			}
+			catch(Exception ex) {
+				ruleErrors+=ex.Message;
+			}
 			//Validation between two or more lists above----------------------------------------------------------------------------------------------------------------
 			for(int b=0;b<listClockEventBreak.Count;b++) {
 				bool isValidBreak=false;
@@ -454,26 +447,25 @@ namespace OpenDentBusiness{
 			//Report Errors---------------------------------------------------------------------------------------------------------------------------------------------
 			errors=ruleErrors+clockErrors+breakErrors;
 			if(errors!="") {
-				throw new Exception(Employees.GetNameFL(employee)+" has the following errors:\r\n"+errors);
+				//throw new Exception(Employees.GetNameFL(employee)+" has the following errors:\r\n"+errors);
+				throw new Exception(errors);
 			}
 			#endregion
 			#region Fill time card rules
 			//Begin calculations=========================================================================================================================================
-			TimeSpan tsHoursWorkedTotal			=new TimeSpan()				;
-			TimeSpan tsOvertimeHoursRule		=new TimeSpan(24,0,0)	;//Example 10:00 for overtime rule after 10 hours per day.
-			TimeSpan tsDifferentialAMRule		=new TimeSpan()			;//Example 06:00 for differential rule before 6am.
-			TimeSpan tsDifferentialPMRule		=new TimeSpan(24,0,0)	;//Example 17:00 for differential rule after  5pm.
+			TimeSpan tsHoursWorkedTotal  =new TimeSpan()      ;
+			TimeSpan tsOvertimeHoursRule =new TimeSpan(24,0,0);//Example 10:00 for overtime rule after 10 hours per day.
+			TimeSpan tsDifferentialAMRule=new TimeSpan()      ;//Example 06:00 for differential rule before 6am.
+			TimeSpan tsDifferentialPMRule=new TimeSpan(24,0,0);//Example 17:00 for differential rule after  5pm.
 			//Fill over hours rule from list-------------------------------------------------------------------------------------
-			for(int i=0;i<listTimeCardRule.Count;i++){//loop through rules for this one employee, including any that apply to all emps.
-				if(listTimeCardRule[i].OverHoursPerDay!=TimeSpan.Zero) {//OverHours Rule
-					tsOvertimeHoursRule=listTimeCardRule[i].OverHoursPerDay;//at most, one non-zero OverHours rule available at this point.
-				}
-				if(listTimeCardRule[i].BeforeTimeOfDay!=TimeSpan.Zero) {//AM Rule
-					tsDifferentialAMRule=listTimeCardRule[i].BeforeTimeOfDay;//at most, one non-zero AM rule available at this point.
-				}
-				if(listTimeCardRule[i].AfterTimeOfDay!=TimeSpan.Zero) {//PM Rule
-					tsDifferentialPMRule=listTimeCardRule[i].AfterTimeOfDay;//at most, one non-zero PM rule available at this point.
-				}
+			if(timeCardRule.OverHoursPerDay!=TimeSpan.Zero) {//OverHours Rule
+				tsOvertimeHoursRule=timeCardRule.OverHoursPerDay;//at most, one non-zero OverHours rule available at this point.
+			}
+			if(timeCardRule.BeforeTimeOfDay!=TimeSpan.Zero) {//AM Rule
+				tsDifferentialAMRule=timeCardRule.BeforeTimeOfDay;//at most, one non-zero AM rule available at this point.
+			}
+			if(timeCardRule.AfterTimeOfDay!=TimeSpan.Zero) {//PM Rule
+				tsDifferentialPMRule=timeCardRule.AfterTimeOfDay;//at most, one non-zero PM rule available at this point.
 			}
 			#endregion
 			//Calculations: Regular Time, Overtime, Rate2 time---------------------------------------------------------------------------------------------------

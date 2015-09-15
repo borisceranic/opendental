@@ -1065,7 +1065,12 @@ namespace OpenDental{
 			if(!Security.IsAuthorized(Permissions.TimecardsEditAll)) {
 				return;
 			}
-			string errors = TimeCardRules.ValidatePayPeriod(EmployeeCur,PIn.Date(textDateStart.Text),PIn.Date(textDateStop.Text));
+			string errors=TimeCardRules.ValidateOvertimeRules(new List<long>{EmployeeCur.EmployeeNum});
+			if(errors != "") {
+				MessageBox.Show(this,"Please fix the following timecard rule errors first:\r\n"+errors);
+				return;
+			}
+			errors=TimeCardRules.ValidatePayPeriod(EmployeeCur,PIn.Date(textDateStart.Text),PIn.Date(textDateStop.Text));
 			if(errors != "") {
 				MessageBox.Show(this,errors);
 				return;

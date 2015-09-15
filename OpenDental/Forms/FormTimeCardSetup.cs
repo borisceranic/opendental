@@ -1,8 +1,11 @@
 using System;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
+using CodeBase;
 using OpenDental.UI;
 using OpenDentBusiness;
 
@@ -124,9 +127,11 @@ namespace OpenDental{
 			// 
 			// gridRules
 			// 
+			this.gridRules.AllowSortingByColumn = true;
 			this.gridRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridRules.HasMultilineHeaders = false;
 			this.gridRules.HScrollVisible = false;
 			this.gridRules.Location = new System.Drawing.Point(305, 12);
 			this.gridRules.Name = "gridRules";
@@ -141,6 +146,7 @@ namespace OpenDental{
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(19, 12);
 			this.gridMain.Name = "gridMain";
@@ -267,30 +273,33 @@ namespace OpenDental{
 
 		private void FillRules(){
 			TimeCardRules.RefreshCache();
+			//Start with a convenient sorting of all employees on top, followed by a last name sort.
+			List<TimeCardRule> listSorted=TimeCardRules.Listt.OrderBy(x => x.EmployeeNum!=0).ThenBy(x => (Employees.GetEmp(x.EmployeeNum)??new Employee()).LName).ToList();
 			gridRules.BeginUpdate();
 			gridRules.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("Employee",150);
+			ODGridColumn col=new ODGridColumn("Employee",150) {SortingStrategy=GridSortingStrategy.StringCompare};
 			gridRules.Columns.Add(col);
-			col=new ODGridColumn("OT before x Time",105);
+			col=new ODGridColumn("OT before x Time",105) { SortingStrategy=GridSortingStrategy.TimeParse };
 			gridRules.Columns.Add(col);
-			col=new ODGridColumn("OT after x Time",100);
+			col=new ODGridColumn("OT after x Time",100) { SortingStrategy=GridSortingStrategy.TimeParse };
 			gridRules.Columns.Add(col);
-			col=new ODGridColumn("OT after x Hours",110);
+			col=new ODGridColumn("OT after x Hours",110) { SortingStrategy=GridSortingStrategy.TimeParse };
 			gridRules.Columns.Add(col);
 			gridRules.Rows.Clear();
 			UI.ODGridRow row;
-			for(int i=0;i<TimeCardRules.Listt.Count;i++){
-				row=new OpenDental.UI.ODGridRow();
-				if(TimeCardRules.Listt[i].EmployeeNum==0){
+			for(int i=0;i<listSorted.Count;i++) {
+				row=new ODGridRow();
+				if(listSorted[i].EmployeeNum==0) {
 					row.Cells.Add(Lan.g(this,"All Employees"));
 				}
 				else{
-					Employee emp=Employees.GetEmp(TimeCardRules.Listt[i].EmployeeNum);
+					Employee emp=Employees.GetEmp(listSorted[i].EmployeeNum);
 					row.Cells.Add(emp.FName+" "+emp.LName);
 				}
-				row.Cells.Add(TimeCardRules.Listt[i].BeforeTimeOfDay.ToStringHmm());
-				row.Cells.Add(TimeCardRules.Listt[i].AfterTimeOfDay.ToStringHmm());
-				row.Cells.Add(TimeCardRules.Listt[i].OverHoursPerDay.ToStringHmm());
+				row.Cells.Add(listSorted[i].BeforeTimeOfDay.ToStringHmm());
+				row.Cells.Add(listSorted[i].AfterTimeOfDay.ToStringHmm());
+				row.Cells.Add(listSorted[i].OverHoursPerDay.ToStringHmm());
+				row.Tag=listSorted[i];
 				gridRules.Rows.Add(row);
 			}
 			gridRules.EndUpdate();
@@ -347,22 +356,20 @@ namespace OpenDental{
 
 		private void gridRules_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormTimeCardRuleEdit FormT=new FormTimeCardRuleEdit();
-			FormT.timeCardRule=TimeCardRules.Listt[e.Row];
+			FormT.timeCardRule=(TimeCardRule)gridRules.Rows[e.Row].Tag;
 			FormT.ShowDialog();
 			FillRules();
 			changed=true;
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {
-			//Pref pattern below is followed from FormMisc and allows additional prefs to be updated.
-			bool changed=false;
-			if(Prefs.UpdateString(PrefName.ADPCompanyCode,textADPCompanyCode.Text)
-				//| Prefs.UpdateString(PrefName.ADPCompanyCode,textADPCompanyCode.Text)
-				)
-			{
-				changed=true;
+			string errors=TimeCardRules.ValidateOvertimeRules();
+			if(!string.IsNullOrEmpty(errors)) {
+				errors="Fix the following erros:\r\n"+errors;
+				MessageBox.Show(errors);
+				return;
 			}
-			if(changed) {
+			if(Prefs.UpdateString(PrefName.ADPCompanyCode,textADPCompanyCode.Text)) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 			Close();

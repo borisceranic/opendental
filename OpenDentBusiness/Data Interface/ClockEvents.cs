@@ -66,7 +66,7 @@ namespace OpenDentBusiness{
 
 
 
-		///<summary>Validates list and throws exceptions.  Returns a list of clock events (not breaks) within the date range for employee. No option for breaks because this is just used in summing for time card report; use GetValidList instead.</summary>
+		///<summary>Validates list and throws exceptions.  Returns a list of clock events (not breaks) within the date range for employee. No option for breaks because this is just used in summing for time card report; use GetTimeCardRule instead.</summary>
 		public static List<ClockEvent> GetListForTimeCardManage(long empNum,DateTime fromDate,DateTime toDate) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ClockEvent>>(MethodBase.GetCurrentMethod(),empNum,fromDate,toDate);
