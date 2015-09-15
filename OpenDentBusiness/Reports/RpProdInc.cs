@@ -408,10 +408,8 @@ namespace OpenDentBusiness {
 			}
 			//Get a list of clinics so that we have access to their descriptions for the report.
 			List<Clinic> listClinics=Clinics.GetClinics(listClinicNums);
-			bool hasData;
 			for(int it=0;it<listClinicNums.Count;it++) {//For each clinic
 				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop for annual.  Loop through the DateTime array, each position represents one date in the report.
-					hasData=false;
 					if(isAnnual) {
 						dates[i]=dateFrom.AddMonths(i);//only the month and year are important.  For each month slot, add i to the dateFrom and put it in the array.
 					}
@@ -451,7 +449,6 @@ namespace OpenDentBusiness {
 							}
 							else if(dates[i].Day==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Day) {//If the proc is also on the day (Only monthly report)
 								production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
-								hasData=true;
 							}
 						}
 					}
@@ -470,7 +467,6 @@ namespace OpenDentBusiness {
 							}
 							else if(dates[i].Day==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Day) {//If the adjustment is also on the day (Only monthly report)
 								adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
-								hasData=true;
 							}
 						}
 					}
@@ -489,7 +485,6 @@ namespace OpenDentBusiness {
 							}
 							else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {//If the claim is also on the day (Only monthly report)
 								inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
-								hasData=true;
 							}
 						}
 					}
@@ -502,7 +497,6 @@ namespace OpenDentBusiness {
 						}
 						if(dates[i]==(PIn.Date(tableSched.Rows[j]["SchedDate"].ToString()))) {
 							sched+=PIn.Decimal(tableSched.Rows[j]["Amount"].ToString());
-							hasData=true;
 						}
 					}
 					for(int j=0;j<tablePay.Rows.Count;j++) {
@@ -520,7 +514,6 @@ namespace OpenDentBusiness {
 							}
 							else if(dates[i].Day==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Day) {//If the payment is also on the day (Only monthly report)
 								ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
-								hasData=true;
 							}
 						}
 					}
@@ -539,7 +532,6 @@ namespace OpenDentBusiness {
 							}
 							else if(dates[i].Day==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Day) {//If the ins payment is also on the day (Only monthly report)
 								insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
-								hasData=true;
 							}
 						}
 					}
@@ -570,16 +562,10 @@ namespace OpenDentBusiness {
 						row[7]=totalincome.ToString("n");
 						row[8]=clinicDesc=="" ? Lans.g("FormRpProdInc","Unassigned"):clinicDesc;
 					}
-					if(isAnnual) {
-						dtClinic.Rows.Add(row);  //adds row to table
-					}
-					else if(hasData) {
-						dtClinic.Rows.Add(row);//prevents adding row to monthly report if there is no data in it.
-					}
+					dtClinic.Rows.Add(row);
 				}
 			}
 			for(int i=0;i<dates.Length;i++) {//usually 12 months in loop
-				hasData=false;
 				if(isAnnual) {
 					dates[i]=dateFrom.AddMonths(i);//only the month and year are important
 				}
@@ -613,7 +599,6 @@ namespace OpenDentBusiness {
 						}
 						else if(dates[i].Day==PIn.Date(tableProduction.Rows[j]["ProcDate"].ToString()).Day) {//If the proc is also on the day (Only monthly report)
 							production+=PIn.Decimal(tableProduction.Rows[j]["Production"].ToString());
-							hasData=true;
 						}
 					}
 				}
@@ -626,7 +611,6 @@ namespace OpenDentBusiness {
 						}
 						else if(dates[i].Day==PIn.Date(tableAdj.Rows[j]["AdjDate"].ToString()).Day) {
 							adjust+=PIn.Decimal(tableAdj.Rows[j]["Adjustment"].ToString());
-							hasData=true;
 						}
 					}
 				}
@@ -639,14 +623,12 @@ namespace OpenDentBusiness {
 						}
 						else if(dates[i].Day==PIn.Date(tableInsWriteoff.Rows[j]["ClaimDate"].ToString()).Day) {
 							inswriteoff-=PIn.Decimal(tableInsWriteoff.Rows[j]["Writeoff"].ToString());
-							hasData=true;
 						}
 					}
 				}
 				for(int j=0;j<tableSched.Rows.Count;j++) {
 					if(dates[i]==(PIn.Date(tableSched.Rows[j]["SchedDate"].ToString()))) {
 						sched+=PIn.Decimal(tableSched.Rows[j]["Amount"].ToString());
-						hasData=true;
 					}
 				}
 				for(int j=0;j<tablePay.Rows.Count;j++) {
@@ -658,7 +640,6 @@ namespace OpenDentBusiness {
 						}
 						else if(dates[i].Day==PIn.Date(tablePay.Rows[j]["DatePay"].ToString()).Day) {
 							ptincome+=PIn.Decimal(tablePay.Rows[j]["Income"].ToString());
-							hasData=true;
 						}
 					}
 				}
@@ -671,7 +652,6 @@ namespace OpenDentBusiness {
 						}
 						else if(dates[i].Day==PIn.Date(tableIns.Rows[j]["CheckDate"].ToString()).Day) {
 							insincome+=PIn.Decimal(tableIns.Rows[j]["Ins"].ToString());
-							hasData=true;
 						}
 					}
 				}
@@ -699,12 +679,7 @@ namespace OpenDentBusiness {
 					row[6]=insincome.ToString("n");
 					row[7]=totalincome.ToString("n");
 				}
-				if(isAnnual) {
-					dt.Rows.Add(row);
-				}
-				else if(hasData) {
-					dt.Rows.Add(row);//prevents adding row if there is no data in the monthly report.
-				}
+				dt.Rows.Add(row);
 			}
 			DataSet ds=null;
 			if(isAnnual) {
