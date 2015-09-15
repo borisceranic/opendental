@@ -1621,8 +1621,8 @@ namespace OpenDental {
 			pView.printPreviewControl2.Document=printdoc;
 			pView.ShowDialog();
 #else
-				if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,PatCur.PatNum,"X-Charge receipt printed")){
-					printdoc.PrinterSettings=pd2.PrinterSettings;
+				if(PrinterL.SetPrinter(_pd2,PrintSituation.Receipt,PatCur.PatNum,"X-Charge receipt printed")){
+					printdoc.PrinterSettings=_pd2.PrinterSettings;
 					try {
 						printdoc.Print();
 					}
