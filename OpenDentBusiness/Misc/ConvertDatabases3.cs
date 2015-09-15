@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.3.13.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.3.16.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -9551,6 +9551,23 @@ namespace OpenDentBusiness {
 				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.3.13.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_3_16();
+		}
+
+		private static void To15_3_16() {
+			if(FromVersion<new Version("15.3.16.0")) {
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard CHANGE Procedures Procedures TEXT NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard MODIFY (Procedures varchar2(4000))";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.16.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_3_X();
