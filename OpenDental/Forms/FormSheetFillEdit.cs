@@ -741,19 +741,19 @@ namespace OpenDental {
 			butUnlock.Visible=false;
 		}
 
-		private bool TryToSaveData(){
+		private bool TryToSaveData() {
 			if(!butOK.Enabled) {//if the OK button is not enabled, user does not have permission.
 				return true;
 			}
-			if(textShowInTerminal.errorProvider1.GetError(textShowInTerminal)!=""){
+			if(textShowInTerminal.errorProvider1.GetError(textShowInTerminal)!="") {
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
 			DateTime dateTimeSheet=DateTime.MinValue;
-			try{
+			try {
 				dateTimeSheet=DateTime.Parse(textDateTime.Text);
 			}
-			catch{
+			catch(Exception ex) {
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
@@ -762,83 +762,51 @@ namespace OpenDental {
 			SheetCur.InternalNote=textNote.Text;
 			SheetCur.ShowInTerminal=PIn.Byte(textShowInTerminal.Text);
 			FillFieldsFromControls();//But SheetNums will still be 0 for a new sheet.
-			bool isNew=SheetCur.IsNew;
-			if(isNew) {
+			if(SheetCur.IsNew) {
 				Sheets.Insert(SheetCur);
+				Sheets.SaveParameters(SheetCur);
 			}
 			else {
 				Sheets.Update(SheetCur);
 			}
-			List<SheetField> drawingList=new List<SheetField>();
-			foreach(SheetField fld in SheetCur.SheetFields){
-				if(fld.FieldType==SheetFieldType.SigBox){
-					continue;//done in a separate step
-				}
-				if(fld.FieldType==SheetFieldType.Image
-					|| fld.FieldType==SheetFieldType.Rectangle
-					|| fld.FieldType==SheetFieldType.Line)
-				{
-					if(!fld.IsNew){
-						continue;//it only saves them when the sheet is first created because user can't edit anyway.
-					}
-				}
-				fld.SheetNum=SheetCur.SheetNum;//whether or not isnew
-				if(fld.FieldType==SheetFieldType.Drawing){
-					fld.IsNew=true;
-					drawingList.Add(fld);
-				}
-				else{
-					if(fld.IsNew) {
-						SheetFields.Insert(fld);
-					}
-					else {
-						SheetFields.Update(fld);
-					}
-				}
-			}
-			if(drawingsAltered){
-				//drawings get saved as a group rather than with the other fields.
-				SheetFields.SetDrawings(drawingList,SheetCur.SheetNum);
-			}
-			if(isNew) {
-				Sheets.SaveParameters(SheetCur);
-			}
+			SheetCur.SheetFields.ForEach(x => x.SheetNum=SheetCur.SheetNum);//Set all sheetfield.SheetNums
+			SheetFields.Sync(SheetCur.SheetFields.FindAll(x => x.FieldType!=SheetFieldType.SigBox),SheetCur.SheetNum,false);//Sync fields before sigBoxes
+			List<SheetField> listSheetFields=new List<SheetField>();
 			//SigBoxes must come after ALL other types in order for the keyData to be in the right order.
 			SheetField field;
-			foreach(Control control in panelMain.Controls){
-				if(control.GetType()!=typeof(OpenDental.UI.SignatureBoxWrapper)){
+			foreach(Control control in panelMain.Controls) {
+				if(control.GetType()!=typeof(OpenDental.UI.SignatureBoxWrapper)) {
 					continue;
 				}
-				if(control.Tag==null){
+				if(control.Tag==null) {
 					continue;
 				}
 				field=(SheetField)control.Tag;
 				OpenDental.UI.SignatureBoxWrapper sigBox=(OpenDental.UI.SignatureBoxWrapper)control;
-				if(sigBox.GetSigChanged()){
-					//refresh the fields so they are in the correct order
-					SheetFields.GetFieldsAndParameters(SheetCur);
-					bool sigIsTopaz=sigBox.GetSigIsTopaz();
-					string keyData=Sheets.GetSignatureKey(SheetCur);
-					string signature=sigBox.GetSignature(keyData);
-					field.FieldValue="";
-					if(signature!=""){
-						if(sigIsTopaz){
-							field.FieldValue+="1";
-						}
-						else{
-							field.FieldValue+="0";
-						}
-						field.FieldValue+=signature;
+				if(!sigBox.GetSigChanged()) {
+					//signature hasn't changed, add to the list of fields
+					listSheetFields.Add(field);
+					continue;
+				}
+				//signature changed so clear out the current field data from the control.Tag, get the new keyData, and get the signature string for the field
+				field.FieldValue="";
+				//refresh the fields so they are in the correct order
+				SheetFields.GetFieldsAndParameters(SheetCur);
+				string keyData=Sheets.GetSignatureKey(SheetCur);
+				string signature=sigBox.GetSignature(keyData);
+				if(signature!="") {
+					//This line of code is more readable, but uses ternary operator
+					//field.FieldValue=(sigBox.GetSigIsTopaz()?1:0)+signature;
+					field.FieldValue="0";
+					if(sigBox.GetSigIsTopaz()) {
+						field.FieldValue="1";
 					}
+					field.FieldValue+=signature;
 				}
-				field.SheetNum=SheetCur.SheetNum;//whether or not isnew
-				if(isNew) {//is this really testing the proper object?
-					SheetFields.Insert(field);
-				}
-				else {
-					SheetFields.Update(field);
-				}
+				listSheetFields.Add(field);
 			}
+			//now sync SigBoxes
+			SheetFields.Sync(listSheetFields,SheetCur.SheetNum,true);
 			return true;
 		}
 

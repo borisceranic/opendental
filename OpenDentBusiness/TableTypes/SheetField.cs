@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 namespace OpenDentBusiness{
 	///<summary>One field on a sheet.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class SheetField:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
