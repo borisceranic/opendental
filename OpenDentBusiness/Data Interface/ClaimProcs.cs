@@ -218,7 +218,9 @@ namespace OpenDentBusiness{
 				}
 				else {
 					if(claimProc.WriteOffEstOverride==-1) {
-						writeOff+=claimProc.WriteOffEst;
+						if(claimProc.WriteOffEst != -1) {//Make sure that WriteOffEst is set if we're trying to use it.
+							writeOff+=claimProc.WriteOffEst;
+						}
 					}
 					else {
 						writeOff+=claimProc.WriteOffEstOverride;
