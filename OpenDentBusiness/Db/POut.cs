@@ -141,6 +141,17 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Rounds input up to max of 2 decimal places. EG: .0047 will return "0.00"; .0051 will return "0.01".</summary>
+		public static string Decimal(decimal myDecimal){
+			try{
+				//because decimal is a comma in Europe, this sends it to db with period instead 
+				return myDecimal.ToString("f",CultureInfo.InvariantCulture);
+			}
+			catch{
+				return "0";
+			}
+		}
+
 		///<summary></summary>
 		public static string Long (long myLong){
 			return myLong.ToString();

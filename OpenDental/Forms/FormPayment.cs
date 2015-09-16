@@ -1791,7 +1791,7 @@ namespace OpenDental {
 
 		private void butSplitManage_Click(object sender,EventArgs e) {
 			FormPaySplitManage FormPSM=new FormPaySplitManage();
-			FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
+			FormPSM.PaymentAmt=PIn.Decimal(textAmount.Text);
 			FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 			FormPSM.PatCur=PatCur;
 			FormPSM.PaymentCur=PaymentCur;
@@ -1962,7 +1962,7 @@ namespace OpenDental {
 				//We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
 				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?")) {
 					FormPaySplitManage FormPSM=new FormPaySplitManage();
-					FormPSM.PaymentAmt=PIn.Double(textAmount.Text);
+					FormPSM.PaymentAmt=PIn.Decimal(textAmount.Text);
 					FormPSM.FamCur=Patients.GetFamily(PatCur.PatNum);
 					FormPSM.PatCur=PatCur;
 					FormPSM.PaymentCur=PaymentCur;
@@ -1971,7 +1971,7 @@ namespace OpenDental {
 					FormPSM.ListSplitsCur=new List<PaySplit>();
 					if(FormPSM.ShowDialog()==DialogResult.OK) {
 						SplitList=FormPSM.ListSplitsCur;
-						PaymentCur.PayAmt=FormPSM.AmtTotal;
+						PaymentCur.PayAmt=(double)FormPSM.AmtTotal;
 						if(SplitList.Count==0) {//If they clicked OK without any splits being added, add one split.
 							AddOneSplit();
 						}
