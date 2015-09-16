@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormAmountEdit:Form {
-		public double Amount;
+		public decimal Amount;
 		private string _text;
 
 		public FormAmountEdit(string text) {
@@ -19,13 +19,13 @@ namespace OpenDental {
 
 		private void FormAmountEdit_Load(object sender,EventArgs e) {
 			labelText.Text=_text;
-			textAmount.Text=POut.Double(Amount);
+			textAmount.Text=POut.Decimal(Amount);
 			textAmount.SelectionStart=0;
 			textAmount.SelectionLength=textAmount.Text.Length;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			Amount=PIn.Double(textAmount.Text);
+			Amount=PIn.Decimal(textAmount.Text);
 			DialogResult=DialogResult.OK;
 		}
 

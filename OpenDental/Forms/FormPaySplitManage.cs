@@ -14,10 +14,10 @@ namespace OpenDental {
 		///<summary>List of current account charges for the family.  Gets filled from AutoSplitForPayment</summary>
 		private List<AccountEntry> _listAccountCharges;
 		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.  May be changed in this window.</summary>
-		public double PaymentAmt;
+		public decimal PaymentAmt;
 		///<summary>The amount entered for the current payment.  Amount currently available for paying off charges.
 		///If this value is zero, it will be set to the summation of the split amounts when OK is clicked.</summary>
-		public double AmtTotal;
+		public decimal AmtTotal;
 		public Family FamCur;
 		public Patient PatCur;
 		///<summary>Payment from the Payment window, amount gets modified only in the case that the original paymentAmt is zero.  It gets increased to
@@ -47,11 +47,11 @@ namespace OpenDental {
 			}
 			//This logic will ensure that regardless of if it's a new, or old payment any created paysplits that haven't been saved, 
 			//such as if splits were made in this window then the window was closed and then reopened, will persist.
-			double splitTotal=0;
+			decimal splitTotal=0;
 			for(int i=0;i<ListSplitsCur.Count;i++) {
-				splitTotal+=ListSplitsCur[i].SplitAmt;
+				splitTotal+=(decimal)ListSplitsCur[i].SplitAmt;
 			}
-			textSplitTotal.Text=POut.Double(splitTotal);
+			textSplitTotal.Text=POut.Decimal(splitTotal);
 			PaymentAmt=Math.Round(PaymentAmt-splitTotal,2);
 			//We want to fill the charge table.
 			//AutoSplitForPayment will return new auto-splits if _payAvailableCur allows for some to be made.  Add these new splits to ListSplitsCur for display.
@@ -84,9 +84,9 @@ namespace OpenDental {
 			gridSplits.Columns.Add(col);
 			gridSplits.Rows.Clear();
 			ODGridRow row;
-			double splitTotal=0;
+			decimal splitTotal=0;
 			for(int i=0;i<ListSplitsCur.Count;i++) {
-				splitTotal+=ListSplitsCur[i].SplitAmt;
+				splitTotal+=(decimal)ListSplitsCur[i].SplitAmt;
 				row=new ODGridRow();
 				row.Tag=ListSplitsCur[i];
 				row.Cells.Add(ListSplitsCur[i].DatePay.ToShortDateString());//Date
@@ -115,7 +115,7 @@ namespace OpenDental {
 				row.Cells.Add(ListSplitsCur[i].SplitAmt.ToString("f"));//Amount
 				gridSplits.Rows.Add(row);
 			}
-			textSplitTotal.Text=POut.Double(splitTotal);
+			textSplitTotal.Text=POut.Decimal(splitTotal);
 			gridSplits.EndUpdate();
 			FillGridCharges();
 		}
@@ -252,29 +252,29 @@ namespace OpenDental {
 			#endregion Construct List of Charges
 			#region Construct List of Credits
 			//Getting a date-sorted list of all credits that haven't been attributed to anything.
-			double creditTotal=0;
+			decimal creditTotal=0;
 			for(int i=0;i<listAdjustments.Count;i++) {
 				if(listAdjustments[i].AdjAmt<0) {
-					creditTotal-=listAdjustments[i].AdjAmt;
+					creditTotal-=(decimal)listAdjustments[i].AdjAmt;
 				}
 			}
 			for(int i=0;i<listPaySplits.Count;i++) {
-				creditTotal+=listPaySplits[i].SplitAmt;
+				creditTotal+=(decimal)listPaySplits[i].SplitAmt;
 			}
 			for(int i=0;i<ListSplitsCur.Count;i++) {
 				if(ListSplitsCur[i].SplitNum==0) {
 					//If they created new splits on an old payment we need to add those to the credits list since they won't be over-written unlike a new payment.
-					creditTotal+=ListSplitsCur[i].SplitAmt;//Adding splits that haven't been entered into DB yet (re-opened split manager)
+					creditTotal+=(decimal)ListSplitsCur[i].SplitAmt;//Adding splits that haven't been entered into DB yet (re-opened split manager)
 				}
 			}
 			for(int i=0;i<listPayments.Count;i++) {
-				creditTotal+=listPayments[i].PayAmt;
+				creditTotal+=(decimal)listPayments[i].PayAmt;
 			}
 			for(int i=0;i<listInsPayAsTotal.Count;i++) {			
-				creditTotal+=listInsPayAsTotal[i].InsPayAmt;
+				creditTotal+=(decimal)listInsPayAsTotal[i].InsPayAmt;
 			}
 			for(int i=0;i<listPayPlans.Count;i++) {
-				creditTotal+=listPayPlans[i].CompletedAmt;
+				creditTotal+=(decimal)listPayPlans[i].CompletedAmt;
 			}
 			#endregion Construct List of Credits
 			#region Explicitly Link Credits
@@ -282,42 +282,46 @@ namespace OpenDental {
 				AccountEntry charge=_listAccountCharges[i];
 				for(int j=0;j<listPaySplits.Count;j++) {
 					PaySplit paySplit=listPaySplits[j];
+					decimal paySplitAmt=(decimal)paySplit.SplitAmt;
 					if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
 						charge.ListPaySplits.Add(paySplit);
-						charge.AmountEnd-=paySplit.SplitAmt;
-						creditTotal-=paySplit.SplitAmt;
+						charge.AmountEnd-=paySplitAmt;
+						creditTotal-=paySplitAmt;
 						if(paySplit.PayNum!=PaymentCur.PayNum) {//This will make it so the AmountOriginal will reflect only what this payment paid.
-							charge.AmountStart-=paySplit.SplitAmt;
+							charge.AmountStart-=paySplitAmt;
 						}
 					}
 					else if(charge.GetType()==typeof(PayPlanCharge) && ((PayPlanCharge)charge.Tag).PayPlanNum==paySplit.PayPlanNum && charge.AmountEnd>0 && paySplit.SplitAmt>0) {
-						charge.AmountEnd-=paySplit.SplitAmt;
-						creditTotal-=paySplit.SplitAmt;
+						charge.AmountEnd-=paySplitAmt;
+						creditTotal-=paySplitAmt;
 					}
 				}
 				for(int j=0;j<ListSplitsCur.Count;j++) {//Explicitly join paysplits in ListSplitsCur that haven't been entered into DB yet.
 					PaySplit paySplit=ListSplitsCur[j];
+					decimal paySplitAmt=(decimal)paySplit.SplitAmt;
 					if(paySplit.SplitNum!=0) {
 						continue;//Skip splits that are already in DB, they're taken care of in the previous loop
 					}
 					if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
 						charge.ListPaySplits.Add(paySplit);
-						charge.AmountEnd-=paySplit.SplitAmt;
-						creditTotal-=paySplit.SplitAmt;
+						charge.AmountEnd-=paySplitAmt;
+						creditTotal-=paySplitAmt;
 					}
 					else if(charge.GetType()==typeof(PayPlanCharge) && ((PayPlanCharge)charge.Tag).PayPlanNum==paySplit.PayPlanNum && charge.AmountEnd>0 && paySplit.SplitAmt>0) {
-						charge.AmountEnd-=paySplit.SplitAmt;
-						creditTotal-=paySplit.SplitAmt;
+						charge.AmountEnd-=paySplitAmt;
+						creditTotal-=paySplitAmt;
 					}
 				}
 				for(int j=0;j<listAdjustments.Count;j++) {
 					Adjustment adjustment=listAdjustments[j];
+					decimal adjustmentAmt=(decimal)adjustment.AdjAmt;
 					if(charge.GetType()==typeof(Procedure) && adjustment.ProcNum==charge.PriKey) {
-						charge.AmountEnd+=adjustment.AdjAmt;
+						charge.AmountEnd+=adjustmentAmt;
 						if(adjustment.AdjAmt<0) {
-							creditTotal+=adjustment.AdjAmt;
+							creditTotal+=adjustmentAmt;
 						}
-						charge.AmountStart+=adjustment.AdjAmt;//If the adjustment is attached to a procedure decrease the procedure's amountoriginal so we know what it was just prior to autosplitting.
+						charge.AmountStart+=adjustmentAmt;
+						//If the adjustment is attached to a procedure decrease the procedure's amountoriginal so we know what it was just prior to autosplitting.
 					}
 				}
 			}
@@ -335,7 +339,7 @@ namespace OpenDental {
 			//We need to go through each and pay them off in order until all we have left is the most recent unpaid charges.
 			for(int i=0;i<_listAccountCharges.Count && creditTotal>0;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				double amt=Math.Min(charge.AmountEnd,creditTotal);
+				decimal amt=Math.Min(charge.AmountEnd,creditTotal);
 				charge.AmountEnd-=amt;
 				creditTotal-=amt;
 				charge.AmountStart-=amt;//Decrease amount original for the charge so we know what it was just prior to when the autosplits were made.
@@ -347,11 +351,11 @@ namespace OpenDental {
 			List<PaySplit> listAutoSplits=new List<PaySplit>();
 			PaySplit split;
 			for(int i=0;i<_listAccountCharges.Count;i++) {
-				if(PaymentAmt.IsZero()) {
+				if(PaymentAmt==0) {
 					break;
 				}
 				AccountEntry charge=_listAccountCharges[i];
-				if(charge.AmountEnd.IsZero()) {
+				if(charge.AmountEnd==0) {
 					continue;//Skip charges which are already paid.
 				}
 				if(PaymentAmt<0 && charge.AmountEnd>0) {//If they're different signs, don't make any guesses.  
@@ -363,12 +367,12 @@ namespace OpenDental {
 				}
 				split=new PaySplit();
 				if(Math.Abs(charge.AmountEnd)<Math.Abs(PaymentAmt)) {//charge has "less" than the payment, use partial payment.
-					split.SplitAmt=charge.AmountEnd;
+					split.SplitAmt=(double)charge.AmountEnd;
 					PaymentAmt=Math.Round(PaymentAmt-charge.AmountEnd,2);
 					charge.AmountEnd=0;
 				}
 				else {//Use full payment
-					split.SplitAmt=PaymentAmt;
+					split.SplitAmt=(double)PaymentAmt;
 					charge.AmountEnd-=PaymentAmt;
 					PaymentAmt=0;
 				}
@@ -389,9 +393,9 @@ namespace OpenDental {
 				charge.ListPaySplits.Add(split);
 				listAutoSplits.Add(split);
 			}
-			if(listAutoSplits.Count==0 && ListSplitsCur.Count==0 && !PaymentAmt.IsZero()) {//Ensure there is at least one auto split if they entered a payAmt.
+			if(listAutoSplits.Count==0 && ListSplitsCur.Count==0 && PaymentAmt != 0) {//Ensure there is at least one auto split if they entered a payAmt.
 				split=new PaySplit();
-				split.SplitAmt=PaymentAmt;
+				split.SplitAmt=(double)PaymentAmt;
 				PaymentAmt=0;
 				split.DatePay=date;
 				split.PatNum=PaymentCur.PatNum;
@@ -403,9 +407,9 @@ namespace OpenDental {
 				split.PayNum=payNum;
 				listAutoSplits.Add(split);
 			}
-			if(!PaymentAmt.IsZero()) {//Create an unallocated split if there is any remaining payment amount.
+			if(PaymentAmt != 0) {//Create an unallocated split if there is any remaining payment amount.
 				split=new PaySplit();
-				split.SplitAmt=PaymentAmt;
+				split.SplitAmt=(double)PaymentAmt;
 				PaymentAmt=0;
 				split.DatePay=date;
 				split.PatNum=PaymentCur.PatNum;
@@ -423,7 +427,7 @@ namespace OpenDental {
 
 		///<summary>Creates a split similar to how CreateSplitsForPayment does it, but with selected rows of the grid.
 		///If payAmt==0, attempt to pay charge in full.</summary>
-		private void CreateSplit(AccountEntry charge,double payAmt) {
+		private void CreateSplit(AccountEntry charge,decimal payAmt) {
 			PaySplit split=new PaySplit();
 			split.DatePay=DateTime.Today;
 			if(charge.GetType()==typeof(Procedure)) {//Row selected is a Procedure.
@@ -440,19 +444,19 @@ namespace OpenDental {
 			else {//PaySplits and overpayment refunds.
 				//Do nothing, nothing to link.
 			}
-			double chargeAmt=charge.AmountEnd;
-			if(Math.Abs(chargeAmt)<Math.Abs(payAmt) || PIn.Double(textPayAmt.Text)==0) {//Full payment of charge
-				split.SplitAmt=chargeAmt;
+			decimal chargeAmt=charge.AmountEnd;
+			if(Math.Abs(chargeAmt)<Math.Abs(payAmt) || PIn.Decimal(textPayAmt.Text)==0) {//Full payment of charge
+				split.SplitAmt=(double)chargeAmt;
 				charge.AmountEnd=0;//Reflect payment in underlying datastructure
 			}
 			else {//Partial payment of charge
 				charge.AmountEnd-=payAmt;
-				split.SplitAmt=payAmt;
+				split.SplitAmt=(double)payAmt;
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Not no clinics
 				split.ClinicNum=charge.ClinicNum;
 			}
-			PaymentAmt=Math.Round(PaymentAmt-split.SplitAmt,2);
+			PaymentAmt=PaymentAmt-(decimal)split.SplitAmt;
 			split.ProvNum=charge.ProvNum;
 			split.PatNum=charge.PatNum;
 			split.ProcDate=charge.Date;
@@ -471,17 +475,17 @@ namespace OpenDental {
 					if(!charge.ListPaySplits.Contains(paySplit))	{
 						continue;
 					}
-					double chargeAmtNew=charge.AmountEnd+paySplit.SplitAmt;
+					decimal chargeAmtNew=charge.AmountEnd+(decimal)paySplit.SplitAmt;
 					if(Math.Abs(chargeAmtNew)>Math.Abs(charge.AmountStart)) {//Trying to delete an overpayment, just increase charge's amount to the max.
 						charge.AmountEnd=charge.AmountStart;
 					}
 					else {
-						charge.AmountEnd+=paySplit.SplitAmt;//Give the money back to the charge so it will display.
+						charge.AmountEnd+=(decimal)paySplit.SplitAmt;//Give the money back to the charge so it will display.
 					}
 					charge.ListPaySplits.Remove(paySplit);
 				}
 				ListSplitsCur.Remove(paySplit);
-				PaymentAmt=Math.Round(PaymentAmt+paySplit.SplitAmt,2);
+				PaymentAmt=PaymentAmt+(decimal)paySplit.SplitAmt;
 			}
 			FillGridSplits();
 		}
@@ -493,7 +497,6 @@ namespace OpenDental {
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
 			FormPSE.PaySplitCur=paySplit;
 			if(FormPSE.ShowDialog()==DialogResult.OK) {//paySplit contains all the info we want.  
-				double splitDiff=paySplit.SplitAmt-paySplitOld.SplitAmt;
 				//Delete paysplit from paysplit grid, credit the charge it's associated to.  Paysplit may be re-associated with a different charge and we wouldn't know, so we need to do this.
 				DeleteSelected();
 				if(FormPSE.PaySplitCur==null) {//Deleted the paysplit, just return here.
@@ -580,12 +583,12 @@ namespace OpenDental {
 					isMatchFound=true;
 				}				
 				if(isMatchFound) {
-					double amtOwed=charge.AmountEnd;
-					if(Math.Abs(amtOwed)<Math.Abs(paySplit.SplitAmt)) {//Partial payment
+					decimal amtOwed=charge.AmountEnd;
+					if(Math.Abs(amtOwed)<Math.Abs((decimal)paySplit.SplitAmt)) {//Partial payment
 						charge.AmountEnd=0;//Reflect payment in underlying datastructure
 					}
 					else {//Full payment
-						charge.AmountEnd=amtOwed-paySplit.SplitAmt;
+						charge.AmountEnd=amtOwed-(decimal)paySplit.SplitAmt;
 					}
 					charge.ListPaySplits.Add(paySplit);
 				}
@@ -619,10 +622,10 @@ namespace OpenDental {
 				}
 				FormAmountEdit FormAE=new FormAmountEdit(chargeDescript);
 				string remainingChargeAmt=gridCharges.Rows[gridCharges.SelectedIndices[i]].Cells[5].Text;
-				FormAE.Amount=PIn.Double(remainingChargeAmt);
+				FormAE.Amount=PIn.Decimal(remainingChargeAmt);
 				FormAE.ShowDialog();
 				if(FormAE.DialogResult==DialogResult.OK) {
-					double amount=FormAE.Amount;
+					decimal amount=FormAE.Amount;
 					if(amount!=0) {
 						AccountEntry charge=(AccountEntry)gridCharges.Rows[gridCharges.SelectedIndices[i]].Tag;
 						CreateSplit(charge,amount);
@@ -644,13 +647,13 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			double payAmt=PIn.Double(textPayAmt.Text);
-			double splitTotal=PIn.Double(textSplitTotal.Text);
+			decimal payAmt=PIn.Decimal(textPayAmt.Text);
+			decimal splitTotal=PIn.Decimal(textSplitTotal.Text);
 			//Create an unallocated split if there is any remaining in the payment amount.
 			//Only create the unallocated payment if the sum of the splits is less than the whole payment amount.
 			if(Math.Abs(payAmt)>Math.Abs(splitTotal) && payAmt!=0) {
 				PaySplit split=new PaySplit();
-				split.SplitAmt=payAmt-splitTotal;
+				split.SplitAmt=(double)(payAmt-splitTotal);
 				PaymentAmt=0;
 				split.DatePay=PaymentCur.DateEntry;
 				split.PatNum=PaymentCur.PatNum;
@@ -665,10 +668,10 @@ namespace OpenDental {
 				FillGridSplits();
 				return;
 			}
-			else if(payAmt.IsZero()) {//If they have a payment amount of 0 set the payment's PayAmt to what the split total is.
+			else if(payAmt==0) {//If they have a payment amount of 0 set the payment's PayAmt to what the split total is.
 				AmtTotal=splitTotal;
 			}
-			else if(payAmt.IsEqual(splitTotal)) {
+			else if(payAmt==splitTotal) {
 				//Do nothing.
 			}
 			else {
@@ -706,10 +709,10 @@ namespace OpenDental {
 			public long ProvNum;
 			public long ClinicNum;
 			public long PatNum;
-			public double AmountOriginal;
+			public decimal AmountOriginal;
 			//Variables below will be changed as needed.
-			public double AmountStart;
-			public double AmountEnd;
+			public decimal AmountStart;
+			public decimal AmountEnd;
 			public List<PaySplit> ListPaySplits=new List<PaySplit>();//List of paysplits for this charge.
 
 			public new Type GetType() {
@@ -720,7 +723,7 @@ namespace OpenDental {
 				Tag=payPlanCharge;
 				Date=payPlanCharge.ChargeDate;
 				PriKey=payPlanCharge.PayPlanChargeNum;
-				AmountOriginal=payPlanCharge.Principal+payPlanCharge.Interest;
+				AmountOriginal=(decimal)payPlanCharge.Principal+(decimal)payPlanCharge.Interest;
 				AmountStart=AmountOriginal;
 				AmountEnd=AmountOriginal;
 				ProvNum=payPlanCharge.ProvNum;
@@ -733,7 +736,7 @@ namespace OpenDental {
 				Tag=adjustment;
 				Date=adjustment.AdjDate;
 				PriKey=adjustment.AdjNum;
-				AmountOriginal=adjustment.AdjAmt;
+				AmountOriginal=(decimal)adjustment.AdjAmt;
 				AmountStart=AmountOriginal;
 				AmountEnd=AmountOriginal;
 				ProvNum=adjustment.ProvNum;
@@ -745,7 +748,7 @@ namespace OpenDental {
 				Tag=proc;
 				Date=proc.ProcDate;
 				PriKey=proc.ProcNum;
-				AmountOriginal=proc.ProcFee;
+				AmountOriginal=(decimal)proc.ProcFee;
 				AmountStart=AmountOriginal;
 				AmountEnd=AmountOriginal;
 				ProvNum=proc.ProvNum;
