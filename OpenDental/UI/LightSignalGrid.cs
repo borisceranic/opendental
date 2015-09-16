@@ -259,6 +259,10 @@ namespace OpenDental.UI {
 
 		///<summary>Returns the 0-based button index that contains these coordinates, or -1 if no hit.</summary>
 		private int HitTest(int x,int y) {
+			if(sigButStates==null) {
+				//This was causing a UE for HQ when hovering over the light signals when Open Dental first starts up during an update.
+				return -1;
+			}
 			for(int i=0;i<20;i++){
 				if(y<buttonH*i){
 					continue;
