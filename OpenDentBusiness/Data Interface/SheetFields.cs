@@ -137,6 +137,26 @@ namespace OpenDentBusiness{
 			return f1.SheetFieldNum.CompareTo(f2.SheetFieldNum);
 		}
 
+		///<summary>SigBoxes must be synced after all other fields have been synced for the keyData to be in the right order.
+		///So sync must be called first without SigBoxes, then the keyData for the signature(s) can be retrieved, then the SigBoxes can be synced.</summary>
+		public static void Sync(List<SheetField> listSheetFieldsNew,long sheetNum,bool isSigBoxOnly) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listSheetFieldsNew,sheetNum,isSigBoxOnly);
+				return;
+			}
+			List<SheetField> listSheetFieldsDB=SheetFields.GetListForSheet(sheetNum);
+			if(!isSigBoxOnly) {
+				List<SheetField> listNoSigNew=listSheetFieldsNew.FindAll(x => x.FieldType!=SheetFieldType.Parameter && x.FieldType!=SheetFieldType.SigBox);
+				List<SheetField> listNoSigDB=listSheetFieldsDB.FindAll(x => x.FieldType!=SheetFieldType.Parameter && x.FieldType!=SheetFieldType.SigBox);
+				Crud.SheetFieldCrud.Sync(listNoSigNew,listNoSigDB);
+			}
+			else {
+				//SigBoxes must come after ALL other types in order for the keyData to be in the right order.
+				List<SheetField> listSigOnlyNew=listSheetFieldsNew.FindAll(x => x.FieldType==SheetFieldType.SigBox);
+				List<SheetField> listSigOnlyDB=listSheetFieldsDB.FindAll(x => x.FieldType==SheetFieldType.SigBox);
+				Crud.SheetFieldCrud.Sync(listSigOnlyNew,listSigOnlyDB);
+			}
+		}
 
 
 	}

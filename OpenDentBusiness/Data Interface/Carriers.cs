@@ -491,6 +491,8 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>If carrierName is blank (empty string) this will throw an ApplicationException.  If a carrier is not found with the exact name,
+		///including capitalization, a new carrier is created, inserted in the database, and returned.</summary>
 		public static Carrier GetByNameAndPhone(string carrierName,string phone){
 			//No need to check RemotingRole; no call to db.
 			if(carrierName==""){
