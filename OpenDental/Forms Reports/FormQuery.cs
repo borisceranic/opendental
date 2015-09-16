@@ -614,7 +614,14 @@ namespace OpenDental{
 			if(!IsSafeSql()) {
 				return;
 			}
-			bool isCommand=IsCommandSql(textQuery.Text);
+			bool isCommand;
+			try {
+				isCommand=IsCommandSql(textQuery.Text);
+			}
+			catch {
+				MsgBox.Show(this,"Validation failed. Please remove mid-query comments and try again.");
+				return;
+			}
 			if(isCommand && !Security.IsAuthorized(Permissions.UserQueryAdmin)) {
 				return;
 			}
@@ -1594,10 +1601,16 @@ namespace OpenDental{
 			//SecurityLogs.MakeLogEntry("User Query","");
 		}
 
-		///<summary>Returns true if the given SQL script in strSql contains any commands (INSERT, UPDATE, DELETE, etc.)</summary>
+		///<summary>Returns true if the given SQL script in strSql contains any commands (INSERT, UPDATE, DELETE, etc.). Surround with a try/catch.</summary>
 		private bool IsCommandSql(string strSql) {
 			string trimmedSql=strSql.Trim();//If a line is completely a comment it may have only a trailing \n to make a subquery on. We need to keep it there.
 			string[] arraySqlExpressions=trimmedSql.ToUpper().Split(';');
+			//Because of the complexities of parsing through MySQL and the fact that we don't want to take the time to create a fully functional parser
+			//for our simple query runner we elected to err on the side of caution.  If there are comments in the middle of the query this section of
+			//code will fire a UE.  This is due to the fact that without massive work we cannot intelligently discern if a comment is in the middle of
+			//a string being used or if it is a legitimate comment.  Since we cannot know this we want to block more often than may be absolutely 
+			//necessary to catch people doing anything that could potentially lead to SQL injection attacks.  We thus want to inform the user that simply
+			//removing intra-query comments is the necessary fix for their problem.
 			for(int i=0;i<arraySqlExpressions.Length;i++) {
 				//Clean out any leading comments before we do anything else
 				while(arraySqlExpressions[i].Trim().StartsWith("#") || arraySqlExpressions[i].Trim().StartsWith("--") || arraySqlExpressions[i].Trim().StartsWith("/*")) {
@@ -1614,10 +1627,10 @@ namespace OpenDental{
 						}
 					}
 				}
-				if(String.IsNullOrWhiteSpace(arraySqlExpressions[i])){
+				if(String.IsNullOrWhiteSpace(arraySqlExpressions[i])) {
 					continue;//Ignore empty SQL statements.
 				}
-				if(arraySqlExpressions[i].Trim().StartsWith("SELECT")){//We don't care about select queries
+				if(arraySqlExpressions[i].Trim().StartsWith("SELECT")) {//We don't care about select queries
 					continue;
 				}
 				else if(arraySqlExpressions[i].Trim().StartsWith("SET")) {
@@ -1649,7 +1662,7 @@ namespace OpenDental{
 					}
 					else if(a!=-1 && b!=-1) {
 						keyword=arraySqlExpressions[i].Trim().Substring(Math.Min(a,b),5);//Get the keyword that is closest to the front of the string.
-					}					
+					}
 					if(keyword!="" && HasNonTempTable(keyword,arraySqlExpressions[i])) {
 						return true;
 					}
