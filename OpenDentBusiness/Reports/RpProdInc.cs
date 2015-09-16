@@ -1014,7 +1014,8 @@ namespace OpenDentBusiness {
 			//length of array is number of months between the two dates plus one.
 			//The from date and to date will not be more than one year and must will be within the same year due to FormRpProdInc UI validation enforcement.
 			DateTime[] dates=null;
-			dates=new DateTime[dateTo.Month-dateFrom.Month+1];//Make a DateTime array representing one position for each month in the report.  User can't specify different years in the report.
+			dates=new DateTime[(dateTo.Year-dateFrom.Year)*12+(dateTo.Month-dateFrom.Month)+1];
+			//Make a DateTime array representing one position for each month in the report.  User can't specify different years in the report.
 			//Get a list of clinics so that we have access to their descriptions for the report.
 			for(int it=0;it<listClinics.Count;it++) {//For each clinic
 				for(int i=0;i<dates.Length;i++) {//usually 12 months in loop for annual.  Loop through the DateTime array, each position represents one date in the report.

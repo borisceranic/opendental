@@ -1304,10 +1304,6 @@ namespace OpenDental{
 				RunMonthly();
 			}
 			else if(radioAnnual.Checked) {
-				if(dateFrom.AddYears(1) <= dateTo || dateFrom.Year != dateTo.Year) {
-					MsgBox.Show(this,"Date range for annual report cannot be greater than one year and must be within the same year.");
-					return;
-				}
 				RunAnnual();
 			}
 			else {//Provider
