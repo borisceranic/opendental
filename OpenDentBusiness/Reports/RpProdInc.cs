@@ -401,7 +401,8 @@ namespace OpenDentBusiness {
 			//The from date and to date will not be more than one year and must will be within the same year due to FormRpProdInc UI validation enforcement.
 			DateTime[] dates=null;
 			if(isAnnual) {
-				dates=new DateTime[dateTo.Month-dateFrom.Month+1];//Make a DateTime array representing one position for each month in the report.  User can't specify different years in the report.
+				dates=new DateTime[(dateTo.Year-dateFrom.Year)*12+(dateTo.Month-dateFrom.Month)+1];
+				//Make a DateTime array representing one position for each month in the report.  User can't specify different years in the report.
 			}
 			else {
 				dates=new DateTime[dateTo.Subtract(dateFrom).Days+1];//Make a DateTime array with one position for each day in the report.
