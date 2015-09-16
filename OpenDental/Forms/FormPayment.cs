@@ -1996,6 +1996,13 @@ namespace OpenDental {
 				}
 				else {//A new or existing payment with splits.
 					if(SplitList.Count==1//if one split
+						&& SplitList[0].PayPlanNum!=0//and split is on a payment plan
+						&& PIn.Double(textAmount.Text) != SplitList[0].SplitAmt)//and amount doesn't match payment
+					{
+						SplitList[0].SplitAmt=PIn.Double(textAmount.Text);//make amounts match automatically
+						textTotal.Text=textAmount.Text;
+					}
+					else if(SplitList.Count==1//if one split
 						&& PaymentCur.PayDate != SplitList[0].ProcDate
 						&& SplitList[0].ProcNum==0)//not attached to procedure
 					{
