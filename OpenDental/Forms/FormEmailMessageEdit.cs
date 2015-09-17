@@ -664,8 +664,12 @@ namespace OpenDental{
 		///<summary></summary>
 		private void butSend_Click(object sender, System.EventArgs e) {
 			//this will not be available if already sent.
-			if(emailPreview.FromAddress=="" || emailPreview.ToAddress=="") {
-				MsgBox.Show(this,"Addresses not allowed to be blank.");
+			if(emailPreview.FromAddress==""){ 
+				MsgBox.Show(this,"Please enter a sender address.");
+				return;
+			}
+			if(emailPreview.ToAddress=="" && emailPreview.CcAddress=="" && emailPreview.BccAddress=="") {
+				MsgBox.Show(this,"Please enter at least one recipient.");
 				return;
 			}
 			if(EhrCCD.HasCcdEmailAttachment(_emailMessage)) {
