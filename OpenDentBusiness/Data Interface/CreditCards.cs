@@ -92,20 +92,19 @@ namespace OpenDentBusiness{
 			//This query will return patient information and the latest recurring payment whom:
 			//	-have recurring charges setup and today's date falls within the start and stop range.
 			//NOTE: Query will return patients with or without payments regardless of when that payment occurred, filtering is done below.
-			string command="SELECT CreditCardNum,PatNum,PatName,FamBalTotal,PayPlanDue,LatestPayment,DateStart,Address,AddressPat,Zip,ZipPat,XChargeToken,"
-				+"CCNumberMasked,CCExpiration,ChargeAmt,PayPlanNum,ProvNum,ClinicNum,Procedures,BillingCycleDay,Guarantor,PayConnectToken,PayConnectTokenExp "
+			string command="SELECT CreditCardNum,PatNum,PatName,FamBalTotal,PayPlanDue,"+POut.Date(DateTime.MinValue)+" AS LatestPayment,DateStart,Address,"
+				+"AddressPat,Zip,ZipPat,XChargeToken,CCNumberMasked,CCExpiration,ChargeAmt,PayPlanNum,ProvNum,ClinicNum,Procedures,BillingCycleDay,Guarantor,"
+				+"PayConnectToken,PayConnectTokenExp "
 				+"FROM (";
 			#region Payments
 			//The PayOrder is used to differentiate rows attached to payment plans
 			command+="(SELECT 1 AS PayOrder,cc.CreditCardNum,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,"
 				+"guar.LName GuarLName,guar.FName GuarFName,guar.BalTotal-guar.InsEst FamBalTotal,0 AS PayPlanDue,"
-				+"COALESCE(MAX(pay.PayDate),"+POut.Date(DateTime.MinValue)+") LatestPayment,"
 				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,"
 				+"cc.PayPlanNum,cc.DateStop,0 ProvNum,pat.ClinicNum,cc.Procedures,pat.BillingCycleDay,pat.Guarantor,cc.PayConnectToken,cc.PayConnectTokenExp "
 				+"FROM creditcard cc "
 				+"INNER JOIN patient pat ON pat.PatNum=cc.PatNum "
 				+"INNER JOIN patient guar ON guar.PatNum=pat.Guarantor "
-				+"LEFT JOIN payment pay ON cc.PatNum=pay.PatNum AND pay.IsRecurringCC=1 "
 				+"WHERE cc.PayPlanNum=0 ";//Keeps card from showing up in case they have a balance AND is setup for payment plan. 
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY cc.CreditCardNum) ";
@@ -116,14 +115,13 @@ namespace OpenDentBusiness{
 					+"pat.ClinicNum,cc.Procedures,pat.BillingCycleDay,pat.Guarantor,cc.PayConnectToken,cc.PayConnectTokenExp) ";
 			}
 			#endregion
-			command+="UNION ALL";
+			command+="UNION ALL ";
 			#region Payment Plans
 			command+="(SELECT 2 AS PayOrder,cc.CreditCardNum,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+" PatName,"
 				+"guar.LName GuarLName,guar.FName GuarFName,guar.BalTotal-guar.InsEst FamBalTotal,"
 				//Special select statement to figure out how much is owed on a particular payment plan.
 				+"ROUND((SELECT COALESCE(SUM(ppc.Principal+ppc.Interest),0) FROM PayPlanCharge ppc WHERE ppc.PayPlanNum=cc.PayPlanNum "
 				+"AND ppc.ChargeDate<="+DbHelper.Curdate()+")-COALESCE(SUM(ps.SplitAmt),0),2) PayPlanDue,"
-				+"COALESCE(MAX(pay.PayDate),"+POut.Date(DateTime.MinValue)+") LatestPayment,"
 				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,"
 				+"cc.PayPlanNum,cc.DateStop,(SELECT ppc1.ProvNum FROM payplancharge ppc1 WHERE ppc1.PayPlanNum=cc.PayPlanNum "+DbHelper.LimitAnd(1)+") ProvNum,"
 				+"(SELECT ppc2.ClinicNum FROM payplancharge ppc2 WHERE ppc2.PayPlanNum=cc.PayPlanNum "+DbHelper.LimitAnd(1)+") ClinicNum,cc.Procedures,"
@@ -132,7 +130,6 @@ namespace OpenDentBusiness{
 				+"INNER JOIN patient pat ON pat.PatNum=cc.PatNum "
 				+"INNER JOIN patient guar ON guar.PatNum=pat.Guarantor "
 				+"LEFT JOIN paysplit ps ON ps.PayPlanNum=cc.PayPlanNum AND ps.PayPlanNum<>0 "
-				+"LEFT JOIN payment pay ON pay.PayNum=ps.PayNum AND pay.IsRecurringCC=1 "
 				+"WHERE cc.PayPlanNum<>0 ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY cc.CreditCardNum)";
@@ -149,6 +146,21 @@ namespace OpenDentBusiness{
 				+"AND (DateStop>="+DbHelper.Curdate()+" OR "+DbHelper.Year("DateStop")+"<1880) "
 				+"ORDER BY GuarLName,GuarFName,PatName,PayOrder DESC";
 			table=Db.GetTable(command);
+			//Query for latest payments seperately because this takes a very long time when run as a sub select
+			command="SELECT PatNum,MAX(PayDate) PayDate FROM payment WHERE IsRecurringCC=1 GROUP BY PatNum";
+			DataTable tableLatestPay=Db.GetTable(command);
+			Dictionary<long,string> dictPatNumDate=new Dictionary<long,string>();
+			for(int i=0;i<tableLatestPay.Rows.Count;i++) {
+				DataRow row=tableLatestPay.Rows[i];
+				dictPatNumDate[PIn.Long(row["PatNum"].ToString())]=row["PayDate"].ToString();
+			}
+			for(int i=0;i<table.Rows.Count;i++) {
+				DataRow row=table.Rows[i];
+				long patNum=PIn.Long(row["PatNum"].ToString());
+				if(dictPatNumDate.ContainsKey(patNum)) {
+					row["LatestPayment"]=dictPatNumDate[patNum];
+				}
+			}
 			FilterRecurringChargeList(table);
 			return table;
 		}
