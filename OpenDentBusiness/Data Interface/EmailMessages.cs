@@ -1119,7 +1119,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Sometimes an email From address will contain the person's name along with their email adress.  This function strips out the person's name if present.</summary>
 		public static string GetAddressSimple(string emailAddress) {
-			if(emailAddress.Contains("<")) {
+			if(emailAddress.Contains("<") && emailAddress.Contains(">")) {
 				int startIndex=emailAddress.IndexOf("<")+1;
 				int endIndex=emailAddress.IndexOf(">")-1;
 				return emailAddress.Substring(startIndex,endIndex-startIndex+1);
