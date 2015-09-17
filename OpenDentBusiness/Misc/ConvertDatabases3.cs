@@ -10248,6 +10248,45 @@ namespace OpenDentBusiness {
 						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'MedLabReconcileDone','"+isReconciled+"')";
 					Db.NonQ(command);
 				}
+				//Add ClinicNum to programproperty table for clinic specific PayConnect credentials
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE programproperty ADD ClinicNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE programproperty ADD INDEX (ClinicNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE programproperty ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE programproperty SET ClinicNum = 0 WHERE ClinicNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE programproperty MODIFY ClinicNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX programproperty_ClinicNum ON programproperty (ClinicNum)";
+					Db.NonQ(command);
+				}
+				//Now add the three programproperty rows, Username, Password, and PaymentType, for each clinic in the database
+				command="SELECT ClinicNum FROM clinic";
+				List<long> listClinicNums=Db.GetListLong(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<listClinicNums.Count;i++) {
+						command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"(SELECT programproperty.ProgramNum,PropertyDesc,PropertyValue,ComputerName,"+listClinicNums[i]+" "
+							+"FROM program INNER JOIN programproperty ON program.ProgramNum=programproperty.ProgramNum "
+							+"WHERE program.ProgName='PayConnect' AND programproperty.ClinicNum=0)";
+						Db.NonQ32(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<listClinicNums.Count;i++) {
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"(SELECT (SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),programproperty.ProgramNum,PropertyDesc,PropertyValue,"
+							+"ComputerName,"+listClinicNums[i]+" "
+							+"FROM program INNER JOIN programproperty ON program.ProgramNum=programproperty.ProgramNum "
+							+"WHERE program.ProgName='PayConnect' AND programproperty.ClinicNum=0)";
+						Db.NonQ32(command);
+					}
+				}
 
 
 

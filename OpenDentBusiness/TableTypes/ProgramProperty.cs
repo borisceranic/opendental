@@ -16,6 +16,8 @@ namespace OpenDentBusiness{
 		public string PropertyValue;
 		///<summary>The human-readable name of the computer on the network (not the IP address).  Only used when overriding program path.  Blank for typical Program Properties.</summary>
 		public string ComputerName;
+		///<summary>FK to clinic.ClinicNum</summary>
+		public long ClinicNum;
 
 		///<summary>Returns a copy of this program property.</summary>
 		public ProgramProperty Copy() {

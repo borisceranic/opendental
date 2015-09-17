@@ -51,6 +51,7 @@ namespace OpenDentBusiness.Crud{
 				programProperty.PropertyDesc      = PIn.String(table.Rows[i]["PropertyDesc"].ToString());
 				programProperty.PropertyValue     = PIn.String(table.Rows[i]["PropertyValue"].ToString());
 				programProperty.ComputerName      = PIn.String(table.Rows[i]["ComputerName"].ToString());
+				programProperty.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
 				retVal.Add(programProperty);
 			}
 			return retVal;
@@ -91,7 +92,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProgramPropertyNum,";
 			}
-			command+="ProgramNum,PropertyDesc,PropertyValue,ComputerName) VALUES(";
+			command+="ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(programProperty.ProgramPropertyNum)+",";
 			}
@@ -99,7 +100,8 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (programProperty.ProgramNum)+","
 				+"'"+POut.String(programProperty.PropertyDesc)+"',"
 				+"'"+POut.String(programProperty.PropertyValue)+"',"
-				+"'"+POut.String(programProperty.ComputerName)+"')";
+				+"'"+POut.String(programProperty.ComputerName)+"',"
+				+    POut.Long  (programProperty.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -132,7 +134,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProgramPropertyNum,";
 			}
-			command+="ProgramNum,PropertyDesc,PropertyValue,ComputerName) VALUES(";
+			command+="ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(programProperty.ProgramPropertyNum)+",";
 			}
@@ -140,7 +142,8 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (programProperty.ProgramNum)+","
 				+"'"+POut.String(programProperty.PropertyDesc)+"',"
 				+"'"+POut.String(programProperty.PropertyValue)+"',"
-				+"'"+POut.String(programProperty.ComputerName)+"')";
+				+"'"+POut.String(programProperty.ComputerName)+"',"
+				+    POut.Long  (programProperty.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -156,7 +159,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProgramNum        =  "+POut.Long  (programProperty.ProgramNum)+", "
 				+"PropertyDesc      = '"+POut.String(programProperty.PropertyDesc)+"', "
 				+"PropertyValue     = '"+POut.String(programProperty.PropertyValue)+"', "
-				+"ComputerName      = '"+POut.String(programProperty.ComputerName)+"' "
+				+"ComputerName      = '"+POut.String(programProperty.ComputerName)+"', "
+				+"ClinicNum         =  "+POut.Long  (programProperty.ClinicNum)+" "
 				+"WHERE ProgramPropertyNum = "+POut.Long(programProperty.ProgramPropertyNum);
 			Db.NonQ(command);
 		}
@@ -179,6 +183,10 @@ namespace OpenDentBusiness.Crud{
 			if(programProperty.ComputerName != oldProgramProperty.ComputerName) {
 				if(command!=""){ command+=",";}
 				command+="ComputerName = '"+POut.String(programProperty.ComputerName)+"'";
+			}
+			if(programProperty.ClinicNum != oldProgramProperty.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(programProperty.ClinicNum)+"";
 			}
 			if(command==""){
 				return false;
