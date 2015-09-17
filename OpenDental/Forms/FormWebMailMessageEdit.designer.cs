@@ -41,6 +41,7 @@ namespace OpenDental{
 			this.contextMenuAttachments = new System.Windows.Forms.ContextMenu();
 			this.menuItemAttachmentPreview = new System.Windows.Forms.MenuItem();
 			this.menuItemAttachmentRemove = new System.Windows.Forms.MenuItem();
+			this.butDelete = new OpenDental.UI.Button();
 			this.butAttach = new OpenDental.UI.Button();
 			this.butPreview = new OpenDental.UI.Button();
 			this.textBody = new OpenDental.ODtextBox();
@@ -114,7 +115,7 @@ namespace OpenDental{
 			this.labelNotification.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelNotification.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.labelNotification.Location = new System.Drawing.Point(12, 337);
+			this.labelNotification.Location = new System.Drawing.Point(92, 294);
 			this.labelNotification.Name = "labelNotification";
 			this.labelNotification.Size = new System.Drawing.Size(577, 14);
 			this.labelNotification.TabIndex = 17;
@@ -182,6 +183,23 @@ namespace OpenDental{
 			this.menuItemAttachmentRemove.Text = "Remove";
 			this.menuItemAttachmentRemove.Click += new System.EventHandler(this.menuItemAttachmentRemove_Click);
 			// 
+			// butDelete
+			// 
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(39, 311);
+			this.butDelete.Name = "butDelete";
+			this.butDelete.Size = new System.Drawing.Size(75, 24);
+			this.butDelete.TabIndex = 22;
+			this.butDelete.Text = "Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
+			// 
 			// butAttach
 			// 
 			this.butAttach.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -205,9 +223,9 @@ namespace OpenDental{
 			this.butPreview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPreview.CornerRadius = 4F;
 			this.butPreview.Image = global::OpenDental.Properties.Resources.butPreview;
-			this.butPreview.Location = new System.Drawing.Point(44, 288);
+			this.butPreview.Location = new System.Drawing.Point(39, 267);
 			this.butPreview.Name = "butPreview";
-			this.butPreview.Size = new System.Drawing.Size(69, 24);
+			this.butPreview.Size = new System.Drawing.Size(74, 24);
 			this.butPreview.TabIndex = 5;
 			this.butPreview.Text = "&Cancel";
 			this.butPreview.Click += new System.EventHandler(this.butPreview_Click);
@@ -223,7 +241,7 @@ namespace OpenDental{
 			this.textBody.Name = "textBody";
 			this.textBody.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBody.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBody.Size = new System.Drawing.Size(632, 199);
+			this.textBody.Size = new System.Drawing.Size(632, 178);
 			this.textBody.TabIndex = 4;
 			this.textBody.Text = "";
 			// 
@@ -235,7 +253,7 @@ namespace OpenDental{
 			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(595, 332);
+			this.butSend.Location = new System.Drawing.Point(595, 311);
 			this.butSend.Name = "butSend";
 			this.butSend.Size = new System.Drawing.Size(75, 24);
 			this.butSend.TabIndex = 6;
@@ -250,7 +268,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(676, 332);
+			this.butCancel.Location = new System.Drawing.Point(676, 311);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
@@ -260,7 +278,8 @@ namespace OpenDental{
 			// FormWebMailMessageEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(780, 368);
+			this.ClientSize = new System.Drawing.Size(780, 347);
+			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.listAttachments);
 			this.Controls.Add(this.butAttach);
 			this.Controls.Add(this.comboRegardingPatient);
@@ -311,5 +330,6 @@ namespace OpenDental{
 		private System.Windows.Forms.ContextMenu contextMenuAttachments;
 		private System.Windows.Forms.MenuItem menuItemAttachmentRemove;
 		private System.Windows.Forms.MenuItem menuItemAttachmentPreview;
+		private UI.Button butDelete;
 	}
 }

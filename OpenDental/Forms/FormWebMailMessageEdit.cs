@@ -19,6 +19,7 @@ namespace OpenDental {
 		private bool _allowSendSecureMessage=true;
 		private bool _allowSendNotificationMessage=true;
 		private List<Patient> _listPatients=null;
+		private EmailMessage _emailMessage;
 		///<summary>Attachment objects will be set right before inserting _secureMessage into db. Until then they will be held separate.</summary>
 		private List<EmailAttach> _listAttachments=new List<EmailAttach>();
 	
@@ -116,28 +117,28 @@ namespace OpenDental {
 			//We are replying to an existing message so verify that the provider linked to this message matches our currently logged in provider.  
 			//This is because web mail communications will be visible in the patients Chart Module.
 			if(_replyToEmailMessageNum>0) {
-				EmailMessage replyToEmailMessage=EmailMessages.GetOne(_replyToEmailMessageNum);
-				if(replyToEmailMessage==null) {
+				_emailMessage=EmailMessages.GetOne(_replyToEmailMessageNum);
+				if(_emailMessage==null) {
 					MsgBox.Show(this,"Invalid input email message");
 					DialogResult=DialogResult.Abort;  //nothing to show so abort, caller should be waiting for abort to determine if message should be marked read
 					return;
 				}				
-				textSubject.Text=replyToEmailMessage.Subject;
-				if(replyToEmailMessage.Subject.IndexOf("RE:")!=0) {
+				textSubject.Text=_emailMessage.Subject;
+				if(_emailMessage.Subject.IndexOf("RE:")!=0) {
 					textSubject.Text="RE: "+textSubject.Text;
 				}
-				patNumSubj=replyToEmailMessage.PatNumSubj;
+				patNumSubj=_emailMessage.PatNumSubj;
 				Patient patRegarding=Patients.GetOnePat(listPatsForFamily.ToArray(),patNumSubj);
 				if(patRegarding.PatNum==0) {
 					BlockSendNotificationMessage("Patient who sent this message cannot access PHI for regarding patient.");
 				}
 				textBody.Text="\r\n\r\n-----"+Lan.g(this,"Original Message")+"-----\r\n"
 					+(patRegarding.PatNum==0 ? "" : (Lan.g(this,"Regarding Patient")+": "+patRegarding.GetNameFL()+"\r\n"))
-					+Lan.g(this,"From")+": "+replyToEmailMessage.FromAddress+"\r\n"
-					+Lan.g(this,"Sent")+": "+replyToEmailMessage.MsgDateTime.ToShortDateString()+" "+replyToEmailMessage.MsgDateTime.ToShortTimeString()+"\r\n"
-					+Lan.g(this,"To")+": "+replyToEmailMessage.ToAddress+"\r\n"
-					+Lan.g(this,"Subject")+": "+replyToEmailMessage.Subject
-					+"\r\n\r\n"+replyToEmailMessage.BodyText;
+					+Lan.g(this,"From")+": "+_emailMessage.FromAddress+"\r\n"
+					+Lan.g(this,"Sent")+": "+_emailMessage.MsgDateTime.ToShortDateString()+" "+_emailMessage.MsgDateTime.ToShortTimeString()+"\r\n"
+					+Lan.g(this,"To")+": "+_emailMessage.ToAddress+"\r\n"
+					+Lan.g(this,"Subject")+": "+_emailMessage.Subject
+					+"\r\n\r\n"+_emailMessage.BodyText;
 			}
 			if(patCur==null || listPatsForFamily.Count==0) {
 				BlockSendSecureMessage("Patient's family not setup propertly. Make sure guarantor is valid.");
@@ -337,6 +338,36 @@ namespace OpenDental {
 				MessageBox.Show(ex.Message);
 			}
 			FillAttachments();
+		}
+
+		private void butDelete_Click(object sender,EventArgs e) {
+			if(_emailMessage==null) {
+				DialogResult=DialogResult.Abort;//Nothing to do the message doesn't exist.
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Are you sure you want to delete this webmail?")) {
+				return;
+			}
+			EmailMessages.Delete(_emailMessage);
+			string logText="";
+			logText+="\r\n"+Lan.g(this,"From")+": "+_emailMessage.FromAddress+". ";
+			logText+="\r\n"+Lan.g(this,"To")+": "+_emailMessage.ToAddress+". ";
+			if(!String.IsNullOrEmpty(_emailMessage.Subject)) {
+				logText+="\r\n"+Lan.g(this,"Subject")+": "+_emailMessage.Subject+". ";
+			}
+			if(!String.IsNullOrEmpty(_emailMessage.BodyText)) {
+				if(_emailMessage.BodyText.Length > 50) {
+					logText+="\r\n"+Lan.g(this,"Body Text")+": "+_emailMessage.BodyText.Substring(0,49)+"... ";
+				}
+				else {
+					logText+="\r\n"+Lan.g(this,"Body Text")+": "+_emailMessage.BodyText;
+				}
+			}
+			if(_emailMessage.MsgDateTime != DateTime.MinValue) {
+				logText+="\r\n"+Lan.g(this,"Date")+": "+_emailMessage.MsgDateTime.ToShortDateString()+". ";
+			}
+			SecurityLogs.MakeLogEntry(Permissions.WebmailDelete,_emailMessage.PatNum,Lan.g(this,"Webmail deleted.")+" "+logText);
+			DialogResult=DialogResult.Abort;//We want to abort here to avoid using the email in parent windows when it's been deleted.
 		}
 
 		private void butSend_Click(object sender,EventArgs e) {

@@ -287,6 +287,7 @@ namespace OpenDentBusiness{
 				//case Permissions.JobEdit:
 				//case Permissions.JobManager:
 				//case Permissions.JobReview:
+				//case Permissions.WebmailDelete:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -470,6 +471,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","User Query");
 				case Permissions.UserQueryAdmin:
 					return Lans.g("enumPermissions","Command Query");
+				case Permissions.WebmailDelete:
+					return Lans.g("enumPermissions","Webmail Delete");
 				case Permissions.WebmailSend:
 					return Lans.g("enumPermissions","Webmail Send");
 				case Permissions.WikiListSetup:

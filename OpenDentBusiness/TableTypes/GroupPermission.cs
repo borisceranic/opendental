@@ -234,7 +234,9 @@ namespace OpenDentBusiness{
 		///<summary>102- Allows user to add or edit documentation for a job.  HQ only.</summary>
 		JobDocumentation,
 		///<summary>103- Allows user to review a job.  HQ only.</summary>
-		JobReview
+		JobReview,
+		///<summary>104- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
+		WebmailDelete
 	}
 
 	

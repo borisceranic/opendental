@@ -1566,7 +1566,7 @@ namespace OpenDentBusiness{
 		public static bool IsSecureWebMail(EmailSentOrReceived sentOrReceived) {
 			//No need to check RemotingRole; no call to db.
 			return (sentOrReceived==EmailSentOrReceived.WebMailRecdRead || sentOrReceived==EmailSentOrReceived.WebMailReceived ||
-				sentOrReceived==EmailSentOrReceived.WebMailSent);
+				sentOrReceived==EmailSentOrReceived.WebMailSent || sentOrReceived==EmailSentOrReceived.WebMailSentRead);
 		}
 
 		public static bool IsUnsent(EmailSentOrReceived sentOrReceived) {

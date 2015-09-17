@@ -241,7 +241,8 @@ namespace OpenDental {
 			{
 				//web mail uses special secure messaging portal
 				FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(emailMessage.PatNum,emailMessage.EmailMessageNum);
-				if(FormWMME.ShowDialog()!=DialogResult.Abort) { //will only return Abort if validation fails on load, in which case the message will remain unread
+				//Will return Abort if validation fails on load or message was deleted, in which case do not set email as read.
+				if(FormWMME.ShowDialog() != DialogResult.Abort) {
 					EmailMessages.UpdateSentOrReceivedRead(emailMessage);//Mark the message read.
 				}				
 			}
@@ -314,16 +315,28 @@ namespace OpenDental {
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			int webMailCount=0;
 			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
 				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
-				//We currently don't allow deleting web mail messages.
-				if(emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived
-					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailRecdRead
-					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailSent
-					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
-				{
-					webMailCount++;
+				if(EmailMessages.IsSecureWebMail(emailMessage.SentOrReceived)) {
+						EmailMessages.Delete(emailMessage);
+						string logText="";
+						logText+="\r\n"+Lan.g(this,"From")+": "+emailMessage.FromAddress+". ";
+						logText+="\r\n"+Lan.g(this,"To")+": "+emailMessage.ToAddress+". ";
+						if(!String.IsNullOrEmpty(emailMessage.Subject)) {
+							logText+="\r\n"+Lan.g(this,"Subject")+": "+emailMessage.Subject+". ";
+						}
+						if(!String.IsNullOrEmpty(emailMessage.BodyText)) {
+							if(emailMessage.BodyText.Length > 50) {
+								logText+="\r\n"+Lan.g(this,"Body Text")+": "+emailMessage.BodyText.Substring(0,49)+"... ";
+							}
+							else {
+								logText+="\r\n"+Lan.g(this,"Body Text")+": "+emailMessage.BodyText;
+							}
+						}
+						if(emailMessage.MsgDateTime != DateTime.MinValue) {
+							logText+="\r\n"+Lan.g(this,"Date")+": "+emailMessage.MsgDateTime.ToShortDateString()+". ";
+						}
+						SecurityLogs.MakeLogEntry(Permissions.WebmailDelete,emailMessage.PatNum,Lan.g(this,"Webmail deleted.")+" "+logText);
 				}
 				else {//Not a web mail message.
 					EmailMessages.Delete(emailMessage);
@@ -331,9 +344,6 @@ namespace OpenDental {
 			}
 			FillGridEmailMessages();
 			Cursor=Cursors.Default;
-			if(webMailCount > 0) {
-				MsgBox.Show(this,"Not allowed to delete web mail messages.  Web mail messages skipped: "+webMailCount);
-			}
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
