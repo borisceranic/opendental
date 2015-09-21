@@ -291,45 +291,6 @@ namespace OpenDentBusiness{
 			return GetQueueList(0,0);
 		}*/
 
-		///<summary>Called from FormRpOutIns. Gets outstanding insurance claims. Requires all fields. provNumList may be empty (but will return null if isAllProv is false). dateMin and dateMax will not be used if they are set to DateTime.MinValue() (01/01/0001). If isPreauth is true only claims of type preauth will be returned.</summary>
-		public static DataTable GetOutInsClaims(bool isAllProv, List<long> provNumList, DateTime dateMin, DateTime dateMax, bool isPreauth){ 
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) { 
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),isAllProv,provNumList,dateMin,dateMax,isPreauth); 
-			} 
-			string command;
-			command = "SELECT carrier.CarrierName,carrier.Phone,claim.ClaimType,patient.FName,patient.LName,patient.MiddleI,patient.PatNum,claim.DateService,claim.DateSent,claim.ClaimFee,claim.ClaimNum "
-				+"FROM carrier,patient,claim,insplan "
-				+"WHERE carrier.CarrierNum = insplan.CarrierNum "
-				+"AND claim.PlanNum = insplan.PlanNum "
-				+"AND claim.PatNum = patient.PatNum "
-				+"AND claim.ClaimStatus='S' ";
-			if(dateMin!=DateTime.MinValue) {
-				command+="AND claim.DateSent <= "+POut.Date(dateMin)+" ";
-			}
-			if(dateMax!=DateTime.MinValue) {
-				command+="AND claim.DateSent >= "+POut.Date(dateMax)+" ";
-			}
-			if(!isAllProv) {
-				if(provNumList.Count>0) {
-					command+="AND claim.ProvTreat IN (";
-					command+=""+provNumList[0];
-					for(int i=1;i<provNumList.Count;i++) {
-						command+=","+provNumList[i];
-					}
-					command+=") ";
-				}
-			}
-			if(!isPreauth) {
-				command+="AND claim.ClaimType!='Preauth' ";
-			}
-			command+="ORDER BY carrier.Phone,insplan.PlanNum";
-			object[] parameters={command};
-			Plugins.HookAddCode(null,"Claims.GetOutInsClaims_beforequeryrun",parameters);
-			command=(string)parameters[0];
-			DataTable table=Db.GetTable(command);
-			return table;
-		}
-
 		///<summary>Called from claimsend window and from Claim edit window.  Use 0 to get all waiting claims, or an actual claimnum to get just one claim.</summary>
 		public static ClaimSendQueueItem[] GetQueueList(long claimNum,long clinicNum,long customTracking) {
 			List<long> listClaimNums=new List<long>();
