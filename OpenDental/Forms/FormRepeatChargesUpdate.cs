@@ -341,7 +341,7 @@ namespace OpenDental{
 			procedure.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
 			if(repeatCharge.CopyNoteToProc && !string.IsNullOrEmpty(repeatCharge.Note)) {
-				procedure.BillingNote+="\r\n"+repeatCharge.Note;
+				procedure.BillingNote=repeatCharge.Note;
 			}
 			Procedures.Insert(procedure); //no recall synch needed because dental offices don't use this feature
 			return procedure;
