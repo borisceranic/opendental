@@ -125,6 +125,7 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.Email) || isAll){
 				ds.Tables.Add(EmailAddresses.RefreshCache());
 				ds.Tables.Add(EmailTemplates.RefreshCache());
+				ds.Tables.Add(EmailAutographs.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.Employees) || isAll){
 				ds.Tables.Add(Employees.RefreshCache());

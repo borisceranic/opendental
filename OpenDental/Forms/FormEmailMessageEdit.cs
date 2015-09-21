@@ -29,6 +29,12 @@ namespace OpenDental{
 		private UI.Button butDecrypt;
 		private UI.Button butDirectMessage;
 		private UI.Button butRawMessage;
+		private Panel panelAutographs;
+		private UI.Button butInsertAutograph;
+		private UI.Button butDeleteAutograph;
+		private UI.Button butAddAutograph;
+		private Label label2;
+		private ListBox listAutographs;
 		private EmailPreviewControl emailPreview;
 
 		///<summary></summary>
@@ -68,6 +74,12 @@ namespace OpenDental{
 			this.butDeleteTemplate = new OpenDental.UI.Button();
 			this.butAddTemplate = new OpenDental.UI.Button();
 			this.labelDecrypt = new System.Windows.Forms.Label();
+			this.panelAutographs = new System.Windows.Forms.Panel();
+			this.butInsertAutograph = new OpenDental.UI.Button();
+			this.butDeleteAutograph = new OpenDental.UI.Button();
+			this.butAddAutograph = new OpenDental.UI.Button();
+			this.label2 = new System.Windows.Forms.Label();
+			this.listAutographs = new System.Windows.Forms.ListBox();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butRawMessage = new OpenDental.UI.Button();
 			this.butDirectMessage = new OpenDental.UI.Button();
@@ -80,6 +92,7 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.emailPreview = new OpenDental.EmailPreviewControl();
 			this.panelTemplates.SuspendLayout();
+			this.panelAutographs.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labelTemplate
@@ -95,7 +108,7 @@ namespace OpenDental{
 			// 
 			this.listTemplates.Location = new System.Drawing.Point(10, 26);
 			this.listTemplates.Name = "listTemplates";
-			this.listTemplates.Size = new System.Drawing.Size(164, 277);
+			this.listTemplates.Size = new System.Drawing.Size(164, 173);
 			this.listTemplates.TabIndex = 0;
 			this.listTemplates.TabStop = false;
 			this.listTemplates.DoubleClick += new System.EventHandler(this.listTemplates_DoubleClick);
@@ -109,7 +122,7 @@ namespace OpenDental{
 			this.panelTemplates.Controls.Add(this.listTemplates);
 			this.panelTemplates.Location = new System.Drawing.Point(8, 9);
 			this.panelTemplates.Name = "panelTemplates";
-			this.panelTemplates.Size = new System.Drawing.Size(180, 370);
+			this.panelTemplates.Size = new System.Drawing.Size(180, 268);
 			this.panelTemplates.TabIndex = 0;
 			// 
 			// butInsertTemplate
@@ -122,7 +135,7 @@ namespace OpenDental{
 			this.butInsertTemplate.CornerRadius = 4F;
 			this.butInsertTemplate.Image = global::OpenDental.Properties.Resources.Right;
 			this.butInsertTemplate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butInsertTemplate.Location = new System.Drawing.Point(102, 305);
+			this.butInsertTemplate.Location = new System.Drawing.Point(102, 202);
 			this.butInsertTemplate.Name = "butInsertTemplate";
 			this.butInsertTemplate.Size = new System.Drawing.Size(74, 26);
 			this.butInsertTemplate.TabIndex = 2;
@@ -138,7 +151,7 @@ namespace OpenDental{
 			this.butDeleteTemplate.CornerRadius = 4F;
 			this.butDeleteTemplate.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDeleteTemplate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDeleteTemplate.Location = new System.Drawing.Point(7, 339);
+			this.butDeleteTemplate.Location = new System.Drawing.Point(7, 236);
 			this.butDeleteTemplate.Name = "butDeleteTemplate";
 			this.butDeleteTemplate.Size = new System.Drawing.Size(75, 26);
 			this.butDeleteTemplate.TabIndex = 3;
@@ -154,7 +167,7 @@ namespace OpenDental{
 			this.butAddTemplate.CornerRadius = 4F;
 			this.butAddTemplate.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAddTemplate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddTemplate.Location = new System.Drawing.Point(7, 305);
+			this.butAddTemplate.Location = new System.Drawing.Point(7, 202);
 			this.butAddTemplate.Name = "butAddTemplate";
 			this.butAddTemplate.Size = new System.Drawing.Size(75, 26);
 			this.butAddTemplate.TabIndex = 1;
@@ -163,14 +176,94 @@ namespace OpenDental{
 			// 
 			// labelDecrypt
 			// 
-			this.labelDecrypt.Location = new System.Drawing.Point(5, 401);
+			this.labelDecrypt.Location = new System.Drawing.Point(5, 548);
 			this.labelDecrypt.Name = "labelDecrypt";
 			this.labelDecrypt.Size = new System.Drawing.Size(267, 59);
 			this.labelDecrypt.TabIndex = 31;
 			this.labelDecrypt.Text = "Previous attempts to decrypt this message have failed.\r\nDecryption usually fails " +
     "when your private decryption key is not installed on the local computer.\r\nUse th" +
     "e Decrypt button to try again.";
+			this.labelDecrypt.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			this.labelDecrypt.Visible = false;
+			// 
+			// panelAutographs
+			// 
+			this.panelAutographs.Controls.Add(this.butInsertAutograph);
+			this.panelAutographs.Controls.Add(this.butDeleteAutograph);
+			this.panelAutographs.Controls.Add(this.butAddAutograph);
+			this.panelAutographs.Controls.Add(this.label2);
+			this.panelAutographs.Controls.Add(this.listAutographs);
+			this.panelAutographs.Location = new System.Drawing.Point(8, 279);
+			this.panelAutographs.Name = "panelAutographs";
+			this.panelAutographs.Size = new System.Drawing.Size(180, 268);
+			this.panelAutographs.TabIndex = 19;
+			// 
+			// butInsertAutograph
+			// 
+			this.butInsertAutograph.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butInsertAutograph.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butInsertAutograph.Autosize = true;
+			this.butInsertAutograph.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butInsertAutograph.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butInsertAutograph.CornerRadius = 4F;
+			this.butInsertAutograph.Image = global::OpenDental.Properties.Resources.Right;
+			this.butInsertAutograph.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butInsertAutograph.Location = new System.Drawing.Point(102, 202);
+			this.butInsertAutograph.Name = "butInsertAutograph";
+			this.butInsertAutograph.Size = new System.Drawing.Size(74, 26);
+			this.butInsertAutograph.TabIndex = 2;
+			this.butInsertAutograph.Text = "Insert";
+			this.butInsertAutograph.Click += new System.EventHandler(this.butInsertAutograph_Click);
+			// 
+			// butDeleteAutograph
+			// 
+			this.butDeleteAutograph.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDeleteAutograph.Autosize = true;
+			this.butDeleteAutograph.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDeleteAutograph.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDeleteAutograph.CornerRadius = 4F;
+			this.butDeleteAutograph.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDeleteAutograph.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDeleteAutograph.Location = new System.Drawing.Point(7, 236);
+			this.butDeleteAutograph.Name = "butDeleteAutograph";
+			this.butDeleteAutograph.Size = new System.Drawing.Size(75, 26);
+			this.butDeleteAutograph.TabIndex = 3;
+			this.butDeleteAutograph.Text = "Delete";
+			this.butDeleteAutograph.Click += new System.EventHandler(this.butDeleteAutograph_Click);
+			// 
+			// butAddAutograph
+			// 
+			this.butAddAutograph.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddAutograph.Autosize = true;
+			this.butAddAutograph.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddAutograph.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddAutograph.CornerRadius = 4F;
+			this.butAddAutograph.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddAutograph.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAddAutograph.Location = new System.Drawing.Point(7, 202);
+			this.butAddAutograph.Name = "butAddAutograph";
+			this.butAddAutograph.Size = new System.Drawing.Size(75, 26);
+			this.butAddAutograph.TabIndex = 1;
+			this.butAddAutograph.Text = "&Add";
+			this.butAddAutograph.Click += new System.EventHandler(this.butAddAutograph_Click);
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(8, 7);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(166, 14);
+			this.label2.TabIndex = 18;
+			this.label2.Text = "E-mail Autograph";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// listAutographs
+			// 
+			this.listAutographs.Location = new System.Drawing.Point(10, 26);
+			this.listAutographs.Name = "listAutographs";
+			this.listAutographs.Size = new System.Drawing.Size(164, 173);
+			this.listAutographs.TabIndex = 0;
+			this.listAutographs.TabStop = false;
+			this.listAutographs.DoubleClick += new System.EventHandler(this.listAutographs_DoubleClick);
 			// 
 			// butRefresh
 			// 
@@ -227,7 +320,7 @@ namespace OpenDental{
 			this.butDecrypt.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDecrypt.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDecrypt.CornerRadius = 4F;
-			this.butDecrypt.Location = new System.Drawing.Point(8, 463);
+			this.butDecrypt.Location = new System.Drawing.Point(8, 610);
 			this.butDecrypt.Name = "butDecrypt";
 			this.butDecrypt.Size = new System.Drawing.Size(75, 25);
 			this.butDecrypt.TabIndex = 7;
@@ -347,6 +440,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.panelAutographs);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.butRawMessage);
 			this.Controls.Add(this.butDirectMessage);
@@ -371,6 +465,7 @@ namespace OpenDental{
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormEmailMessageEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormEmailMessageEdit_Load);
 			this.panelTemplates.ResumeLayout(false);
+			this.panelAutographs.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -386,6 +481,7 @@ namespace OpenDental{
 			}
 			Cursor=Cursors.WaitCursor;
 			RefreshAll();
+			SetDefaultAutograph();
 			Cursor=Cursors.Default;
 		}
 
@@ -393,6 +489,7 @@ namespace OpenDental{
 			emailPreview.LoadEmailMessage(_emailMessage);
 			if(!emailPreview.IsComposing) {
 				panelTemplates.Visible=false;
+				panelAutographs.Visible=false;
 				butDirectMessage.Enabled=false;//not allowed to send again.
 				butSend.Visible=false;//not allowed to send again.
 				butSave.Visible=false;//not allowed to save changes.
@@ -401,6 +498,7 @@ namespace OpenDental{
 				butCancel.Text="Close";
 			}
 			FillTemplates();
+			FillAutographs();
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				buttonFuchsMailDMF.Visible=true;
 				buttonFuchsMailDSF.Visible=true;
@@ -510,6 +608,80 @@ namespace OpenDental{
 		}
 
 		#endregion Templates
+
+		#region Autographs
+		/// <summary>Fills the autographs picklist.</summary>
+		private void FillAutographs() {
+			listAutographs.Items.Clear();
+			for(int i=0;i<EmailAutographs.Listt.Count;i++) {
+				listAutographs.Items.Add(EmailAutographs.Listt[i].Description);
+			}
+		}
+
+		///<summary>Sets the default autograph that shows in the message body. 
+		///The default autograph is determined to be the first autograph with an email that matches the email address of the sender.</summary>
+		private void SetDefaultAutograph() {
+			string fromAddress=EmailMessages.GetAddressSimple(emailPreview.FromAddress.Trim());
+			string autographEmail;
+			for(int i=0;i<EmailAutographs.Listt.Count;i++) {
+				autographEmail=EmailMessages.GetAddressSimple(EmailAutographs.Listt[i].EmailAddress.Trim());
+				//Use Contains() because an autograph can theoretically have multiple email addresses associated with it.
+				if(autographEmail.Contains(fromAddress)) {
+					InsertAutograph(EmailAutographs.Listt[i]);
+					break;
+				}
+			}
+		}
+		
+		///<summary>Currently just appends an autograph to the bottom of the email message.  When the functionality to reply to emails is implemented, 
+		///this will need to be modified so that it inserts the autograph text at the bottom of the new message being composed, but above the message
+		///history.</summary>
+		private void InsertAutograph(EmailAutograph emailAutograph) {
+			emailPreview.BodyText+="\r\n\r\n"+emailAutograph.AutographText;
+		}
+		
+		private void listAutographs_DoubleClick(object sender,EventArgs e) { //edit an autograph
+			FormEmailAutographEdit FormEAE=new FormEmailAutographEdit(EmailAutographs.Listt[listAutographs.SelectedIndex]);
+			FormEAE.ShowDialog();
+			if(FormEAE.DialogResult==DialogResult.OK) {
+				EmailAutographs.RefreshCache();
+				FillAutographs();
+			}
+		}
+
+		private void butAddAutograph_Click(object sender,EventArgs e) { //add a new autograph
+			EmailAutograph emailAutograph=new EmailAutograph();
+			FormEmailAutographEdit FormEAE=new FormEmailAutographEdit(emailAutograph);
+			FormEAE.IsNew=true;
+			FormEAE.ShowDialog();
+			if(FormEAE.DialogResult==DialogResult.OK) {
+				EmailAutographs.RefreshCache();
+				FillAutographs();
+			}
+		}
+
+		private void butInsertAutograph_Click(object sender,EventArgs e) {
+			if(listAutographs.SelectedIndex==-1) {
+				MessageBox.Show(Lan.g(this,"Please select an autograph before inserting."));
+				return;
+			}
+			InsertAutograph(EmailAutographs.Listt[listAutographs.SelectedIndex]);
+		}
+		
+		private void butDeleteAutograph_Click(object sender,EventArgs e) {
+			if(listAutographs.SelectedIndex==-1) {
+				MessageBox.Show(Lan.g(this,"Please select an item first."));
+				return;
+			}
+			if(MessageBox.Show(Lan.g(this,"Delete autograph?"),"",MessageBoxButtons.OKCancel) != DialogResult.OK) {
+				return;
+			}
+			EmailAutographs.Delete(EmailAutographs.Listt[listAutographs.SelectedIndex].EmailAutographNum);
+			EmailAutographs.RefreshCache();
+			FillAutographs();
+		}
+
+		#endregion
 
 		private void butDecrypt_Click(object sender,EventArgs e) {
 			if(!EmailMessages.IsAddressTrusted(_emailMessage.FromAddress)) {//Not trusted yet.

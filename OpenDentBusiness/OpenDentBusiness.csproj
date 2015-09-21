@@ -254,6 +254,7 @@
     <Compile Include="Crud\ElectIDCrud.cs" />
     <Compile Include="Crud\EmailAddressCrud.cs" />
     <Compile Include="Crud\EmailAttachCrud.cs" />
+    <Compile Include="Crud\EmailAutographCrud.cs" />
     <Compile Include="Crud\EmailMessageCrud.cs" />
     <Compile Include="Crud\EmailMessageUidCrud.cs" />
     <Compile Include="Crud\EmailTemplateCrud.cs" />
@@ -408,6 +409,7 @@
     <Compile Include="Crud\SigElementDefCrud.cs" />
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
+    <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="InternalTools\EServices\EServiceMetrics.cs" />
     <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
@@ -951,6 +953,7 @@
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
+    <Compile Include="TableTypes\EmailAutograph.cs" />
     <Compile Include="TableTypes\EServiceSignal.cs" />
     <Compile Include="TableTypes\SmsPhone.cs" />
     <Compile Include="TableTypes\SmsToMobile.cs" />
