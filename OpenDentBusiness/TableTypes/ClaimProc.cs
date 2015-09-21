@@ -90,6 +90,8 @@ namespace OpenDentBusiness{
 		public bool DoDelete;
 		///<summary>FK to payplan.PayPlanNum.  0 if not attached to a payplan.</summary>
 		public long PayPlanNum;
+		///<summary>FK to definition.DefNum.  Connected to the ClaimPaymentTracking DefCat.</summary>
+		public long ClaimPaymentTracking;
 		
 
 

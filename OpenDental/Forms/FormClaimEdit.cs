@@ -4551,6 +4551,8 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Pmt"),30,HorizontalAlignment.Center);
 			gridProc.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Pay Tracking"),75,HorizontalAlignment.Center);
+			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),0);
 			gridProc.Columns.Add(col);
 			gridProc.Rows.Clear();
@@ -4659,6 +4661,12 @@ namespace OpenDental{
 					row.Cells.Add("X");
 				}
 				else{
+					row.Cells.Add("");
+				}
+				if(ClaimProcsForClaim[i].ClaimPaymentTracking!=0) {
+					row.Cells.Add(DefC.GetDef(DefCat.ClaimPaymentTracking,ClaimProcsForClaim[i].ClaimPaymentTracking).ItemName);//EOB Code
+				}
+				else {
 					row.Cells.Add("");
 				}
 				row.Cells.Add(ClaimProcsForClaim[i].Remarks);

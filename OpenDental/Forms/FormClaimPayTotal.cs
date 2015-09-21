@@ -52,6 +52,8 @@ namespace OpenDental
 		private int _insPayIdx;
 		///<summary>The column index where writeoffs show in gridMain.</summary>
 		private int _writeoffIdx;
+		///<summary>A list of all non-hidden claim payment tracking definitions.</summary>
+		private List<Def> _listClaimPaymentTrackingDefs;
 
 		///<summary></summary>
 		public FormClaimPayTotal(Patient patCur,Family famCur,List <InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList){
@@ -264,12 +266,13 @@ namespace OpenDental
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(8, 12);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
-			this.gridMain.Size = new System.Drawing.Size(939, 257);
+			this.gridMain.Size = new System.Drawing.Size(954, 257);
 			this.gridMain.TabIndex = 125;
 			this.gridMain.Title = "Procedures";
 			this.gridMain.TranslationName = "TableClaimProc";
@@ -279,7 +282,7 @@ namespace OpenDental
 			// FormClaimPayTotal
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(948, 363);
+			this.ClientSize = new System.Drawing.Size(974, 363);
 			this.Controls.Add(this.textLabFees);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.label4);
@@ -336,6 +339,8 @@ namespace OpenDental
 				textInsPayAmt.Location=new Point(textInsPayAllowed.Right-1,textInsPayAllowed.Location.Y);
 				textWriteOff.Location=new Point(textInsPayAmt.Right-1,textInsPayAllowed.Location.Y);
 			}
+			_listClaimPaymentTrackingDefs=new List<Def>();
+			_listClaimPaymentTrackingDefs.AddRange(DefC.GetList(DefCat.ClaimPaymentTracking));
 			FillGrid();
 		}
 
@@ -356,6 +361,10 @@ namespace OpenDental
 			//the payment itself is imaginary and is simply the sum of the claimprocs on this form
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
+			List<string> listDefDescripts=new List<string>();
+			for(int i=0;i<_listClaimPaymentTrackingDefs.Count;i++){
+				listDefDescripts.Add(_listClaimPaymentTrackingDefs[i].ItemName);
+			}
 			ODGridColumn col=new ODGridColumn(Lan.g("TableClaimProc","Date"),66);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
@@ -389,6 +398,8 @@ namespace OpenDental
 			col=new ODGridColumn(Lan.g("TableClaimProc","Status"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Pmt"),30,HorizontalAlignment.Center);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Pay Tracking"),75,listDefDescripts);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Remarks"),0,true);
 			gridMain.Columns.Add(col);
@@ -463,6 +474,19 @@ namespace OpenDental
 				}
 				else{
 					row.Cells.Add("");
+				}
+				if(ClaimProcsToEdit[i].ClaimPaymentTracking!=0) {
+					for(int j=0;j<_listClaimPaymentTrackingDefs.Count;j++) {
+						if(ClaimProcsToEdit[i].ClaimPaymentTracking==_listClaimPaymentTrackingDefs[j].DefNum) {
+							row.Cells.Add(_listClaimPaymentTrackingDefs[j].ItemName);
+							row.Cells[row.Cells.Count-1].SelectedIndex=j;
+							break;
+						}
+					}
+				}
+				else {
+					row.Cells.Add(_listClaimPaymentTrackingDefs[0].ItemName);
+					row.Cells[row.Cells.Count-1].SelectedIndex=0;
 				}
 				row.Cells.Add(ClaimProcsToEdit[i].Remarks);
 				gridMain.Rows.Add(row);
@@ -575,12 +599,12 @@ namespace OpenDental
 					}
 				}
 			}
-			for(int i=0;i<ClaimProcsToEdit.Length;i++){
+			for(int i=0;i<ClaimProcsToEdit.Length;i++) {
 				ClaimProcsToEdit[i].DedApplied=PIn.Double(gridMain.Rows[i].Cells[_deductIdx].Text);
-				if(gridMain.Rows[i].Cells[_allowedIdx].Text==""){
+				if(gridMain.Rows[i].Cells[_allowedIdx].Text=="") {
 					ClaimProcsToEdit[i].AllowedOverride=-1;
 				}
-				else{
+				else {
 					ClaimProcsToEdit[i].AllowedOverride=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
 				}
 				ClaimProcsToEdit[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[_insPayIdx].Text);
@@ -589,7 +613,8 @@ namespace OpenDental
 				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 					toothIndexOffset=1;
 				}
-				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[12-toothIndexOffset].Text;
+				ClaimProcsToEdit[i].ClaimPaymentTracking=_listClaimPaymentTrackingDefs[gridMain.Rows[i].Cells[12-toothIndexOffset].SelectedIndex].DefNum;
+				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[13-toothIndexOffset].Text;
 			}
 		}
 

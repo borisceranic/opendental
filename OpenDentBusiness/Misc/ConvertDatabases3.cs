@@ -9573,7 +9573,7 @@ namespace OpenDentBusiness {
 				}
 				else {///oracle
 					if(results==0) {//Preference doesn't exist, insert it.
-						command="INSERT INTO preference(PrefNumm,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PaymentsPromptForAutoSplit','1')";
+						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PaymentsPromptForAutoSplit','1')";
 						Db.NonQ(command);
 					}
 				}
@@ -10287,7 +10287,31 @@ namespace OpenDentBusiness {
 						Db.NonQ32(command);
 					}
 				}
-
+				//Inserting new definition for task ClaimPaymentTracking defcat
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue,ItemColor) "
+						+"VALUES(36,0,'Default','',0)";//Inserting definition with category 36 (ClaimPaymentTracking) and default value
+				}
+				else {
+					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue,ItemColor) "
+						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),36,0,'Default','',0)";//36 (ClaimPaymentTracking) and default value
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimproc ADD ClaimPaymentTracking bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD INDEX (ClaimPaymentTracking)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimproc ADD ClaimPaymentTracking number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET ClaimPaymentTracking = 0 WHERE ClaimPaymentTracking IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc MODIFY ClaimPaymentTracking NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimproc_ClaimPaymentTracking ON claimproc (ClaimPaymentTracking)";
+					Db.NonQ(command);
+				}
 
 
 

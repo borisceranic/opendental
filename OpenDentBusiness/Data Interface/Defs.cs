@@ -135,6 +135,7 @@ namespace OpenDentBusiness {
 				|| category==DefCat.ApptProcsQuickAdd
 				|| category==DefCat.BillingTypes
 				|| category==DefCat.BlockoutTypes
+				|| category==DefCat.ClaimPaymentTracking
 				|| category==DefCat.CommLogTypes
 				|| category==DefCat.ContactCategories
 				|| category==DefCat.Diagnosis

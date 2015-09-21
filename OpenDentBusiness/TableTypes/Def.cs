@@ -132,7 +132,9 @@ namespace OpenDentBusiness {
 		///<summary>34- Categories for fee override colors.</summary>
 		FeeColors,
 		///<summary>35- Provider specialties.  General, Hygienist, Pediatric, Primary Care Physician, etc.</summary>
-		ProviderSpecialties
+		ProviderSpecialties,
+		///<summary>36- </summary>
+		ClaimPaymentTracking
 	}
 
 	

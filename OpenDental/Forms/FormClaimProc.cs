@@ -133,7 +133,10 @@ namespace OpenDental
 		private bool SaveToDb;
 		private Label label6;
 		private CheckBox checkPayPlan;
+		private ComboBox comboPayTracker;
+		private Label label12;
 		private List<InsSub> SubList;
+		private List<Def> _listPayTrackDefs;
 
 		///<summary>procCur can be null if not editing from within an actual procedure.  If the save is to happen within this window, then set saveToDb true.  If the object is to be altered here, but saved in a different window, then saveToDb=false.</summary>
 		public FormClaimProc(ClaimProc claimProcCur,Procedure procCur,Family famCur,Patient patCur,List<InsPlan> planList,List<ClaimProcHist> histList,ref List<ClaimProcHist> loopList,List<PatPlan> patPlanList,bool saveToDb,List<InsSub> subList) {
@@ -299,6 +302,8 @@ namespace OpenDental
 			this.comboStatus = new System.Windows.Forms.ComboBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.checkPayPlan = new System.Windows.Forms.CheckBox();
+			this.comboPayTracker = new System.Windows.Forms.ComboBox();
+			this.label12 = new System.Windows.Forms.Label();
 			this.groupClaim.SuspendLayout();
 			this.panelClaimExtras.SuspendLayout();
 			this.panelEstimateInfo.SuspendLayout();
@@ -447,7 +452,7 @@ namespace OpenDental
 			// 
 			// label28
 			// 
-			this.label28.Location = new System.Drawing.Point(6, 120);
+			this.label28.Location = new System.Drawing.Point(6, 144);
 			this.label28.Name = "label28";
 			this.label28.Size = new System.Drawing.Size(125, 17);
 			this.label28.TabIndex = 65;
@@ -456,7 +461,7 @@ namespace OpenDental
 			// 
 			// label29
 			// 
-			this.label29.Location = new System.Drawing.Point(9, 164);
+			this.label29.Location = new System.Drawing.Point(9, 188);
 			this.label29.Name = "label29";
 			this.label29.Size = new System.Drawing.Size(121, 17);
 			this.label29.TabIndex = 67;
@@ -465,7 +470,7 @@ namespace OpenDental
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(133, 160);
+			this.textDescription.Location = new System.Drawing.Point(133, 184);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.ReadOnly = true;
 			this.textDescription.Size = new System.Drawing.Size(203, 20);
@@ -473,7 +478,7 @@ namespace OpenDental
 			// 
 			// label30
 			// 
-			this.label30.Location = new System.Drawing.Point(58, 53);
+			this.label30.Location = new System.Drawing.Point(58, 77);
 			this.label30.Name = "label30";
 			this.label30.Size = new System.Drawing.Size(73, 17);
 			this.label30.TabIndex = 69;
@@ -531,7 +536,7 @@ namespace OpenDental
 			this.groupClaim.Controls.Add(this.radioEstimate);
 			this.groupClaim.Controls.Add(this.panelClaimExtras);
 			this.groupClaim.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupClaim.Location = new System.Drawing.Point(14, 188);
+			this.groupClaim.Location = new System.Drawing.Point(14, 212);
 			this.groupClaim.Name = "groupClaim";
 			this.groupClaim.Size = new System.Drawing.Size(460, 309);
 			this.groupClaim.TabIndex = 90;
@@ -584,6 +589,8 @@ namespace OpenDental
 			// textFeeBilled
 			// 
 			this.textFeeBilled.Location = new System.Drawing.Point(129, 28);
+			this.textFeeBilled.MaxVal = 100000000D;
+			this.textFeeBilled.MinVal = -100000000D;
 			this.textFeeBilled.Name = "textFeeBilled";
 			this.textFeeBilled.Size = new System.Drawing.Size(77, 20);
 			this.textFeeBilled.TabIndex = 72;
@@ -627,6 +634,8 @@ namespace OpenDental
 			// textWriteOffEstOverride
 			// 
 			this.textWriteOffEstOverride.Location = new System.Drawing.Point(240, 298);
+			this.textWriteOffEstOverride.MaxVal = 100000000D;
+			this.textWriteOffEstOverride.MinVal = -100000000D;
 			this.textWriteOffEstOverride.Name = "textWriteOffEstOverride";
 			this.textWriteOffEstOverride.Size = new System.Drawing.Size(70, 20);
 			this.textWriteOffEstOverride.TabIndex = 137;
@@ -636,6 +645,8 @@ namespace OpenDental
 			// textWriteOffEst
 			// 
 			this.textWriteOffEst.Location = new System.Drawing.Point(168, 298);
+			this.textWriteOffEst.MaxVal = 100000000D;
+			this.textWriteOffEst.MinVal = -100000000D;
 			this.textWriteOffEst.Name = "textWriteOffEst";
 			this.textWriteOffEst.ReadOnly = true;
 			this.textWriteOffEst.Size = new System.Drawing.Size(70, 20);
@@ -674,6 +685,8 @@ namespace OpenDental
 			// textBaseEst
 			// 
 			this.textBaseEst.Location = new System.Drawing.Point(168, 258);
+			this.textBaseEst.MaxVal = 100000000D;
+			this.textBaseEst.MinVal = -100000000D;
 			this.textBaseEst.Name = "textBaseEst";
 			this.textBaseEst.ReadOnly = true;
 			this.textBaseEst.Size = new System.Drawing.Size(70, 20);
@@ -692,6 +705,8 @@ namespace OpenDental
 			// textPatPortion1
 			// 
 			this.textPatPortion1.Location = new System.Drawing.Point(168, 318);
+			this.textPatPortion1.MaxVal = 100000000D;
+			this.textPatPortion1.MinVal = -100000000D;
 			this.textPatPortion1.Name = "textPatPortion1";
 			this.textPatPortion1.ReadOnly = true;
 			this.textPatPortion1.Size = new System.Drawing.Size(70, 20);
@@ -710,8 +725,8 @@ namespace OpenDental
 			// textPaidOtherInsOverride
 			// 
 			this.textPaidOtherInsOverride.Location = new System.Drawing.Point(240, 238);
-			this.textPaidOtherInsOverride.MaxVal = 255;
-			this.textPaidOtherInsOverride.MinVal = 0;
+			this.textPaidOtherInsOverride.MaxVal = 255D;
+			this.textPaidOtherInsOverride.MinVal = 0D;
 			this.textPaidOtherInsOverride.Name = "textPaidOtherInsOverride";
 			this.textPaidOtherInsOverride.Size = new System.Drawing.Size(70, 20);
 			this.textPaidOtherInsOverride.TabIndex = 128;
@@ -721,6 +736,8 @@ namespace OpenDental
 			// textInsEstTotalOverride
 			// 
 			this.textInsEstTotalOverride.Location = new System.Drawing.Point(240, 278);
+			this.textInsEstTotalOverride.MaxVal = 100000000D;
+			this.textInsEstTotalOverride.MinVal = -100000000D;
 			this.textInsEstTotalOverride.Name = "textInsEstTotalOverride";
 			this.textInsEstTotalOverride.Size = new System.Drawing.Size(70, 20);
 			this.textInsEstTotalOverride.TabIndex = 122;
@@ -730,6 +747,8 @@ namespace OpenDental
 			// textInsEstTotal
 			// 
 			this.textInsEstTotal.Location = new System.Drawing.Point(168, 278);
+			this.textInsEstTotal.MaxVal = 100000000D;
+			this.textInsEstTotal.MinVal = -100000000D;
 			this.textInsEstTotal.Name = "textInsEstTotal";
 			this.textInsEstTotal.ReadOnly = true;
 			this.textInsEstTotal.Size = new System.Drawing.Size(70, 20);
@@ -768,6 +787,8 @@ namespace OpenDental
 			// textAllowedOverride
 			// 
 			this.textAllowedOverride.Location = new System.Drawing.Point(235, 107);
+			this.textAllowedOverride.MaxVal = 100000000D;
+			this.textAllowedOverride.MinVal = -100000000D;
 			this.textAllowedOverride.Name = "textAllowedOverride";
 			this.textAllowedOverride.Size = new System.Drawing.Size(70, 20);
 			this.textAllowedOverride.TabIndex = 30;
@@ -869,6 +890,8 @@ namespace OpenDental
 			// textDedEst
 			// 
 			this.textDedEst.Location = new System.Drawing.Point(168, 198);
+			this.textDedEst.MaxVal = 100000000D;
+			this.textDedEst.MinVal = -100000000D;
 			this.textDedEst.Name = "textDedEst";
 			this.textDedEst.ReadOnly = true;
 			this.textDedEst.Size = new System.Drawing.Size(70, 20);
@@ -878,6 +901,8 @@ namespace OpenDental
 			// textPaidOtherIns
 			// 
 			this.textPaidOtherIns.Location = new System.Drawing.Point(168, 238);
+			this.textPaidOtherIns.MaxVal = 100000000D;
+			this.textPaidOtherIns.MinVal = -100000000D;
 			this.textPaidOtherIns.Name = "textPaidOtherIns";
 			this.textPaidOtherIns.ReadOnly = true;
 			this.textPaidOtherIns.Size = new System.Drawing.Size(70, 20);
@@ -904,6 +929,8 @@ namespace OpenDental
 			// textCopayOverride
 			// 
 			this.textCopayOverride.Location = new System.Drawing.Point(240, 178);
+			this.textCopayOverride.MaxVal = 100000000D;
+			this.textCopayOverride.MinVal = -100000000D;
 			this.textCopayOverride.Name = "textCopayOverride";
 			this.textCopayOverride.Size = new System.Drawing.Size(70, 20);
 			this.textCopayOverride.TabIndex = 98;
@@ -923,6 +950,8 @@ namespace OpenDental
 			// textCopayAmt
 			// 
 			this.textCopayAmt.Location = new System.Drawing.Point(168, 178);
+			this.textCopayAmt.MaxVal = 100000000D;
+			this.textCopayAmt.MinVal = -100000000D;
 			this.textCopayAmt.Name = "textCopayAmt";
 			this.textCopayAmt.ReadOnly = true;
 			this.textCopayAmt.Size = new System.Drawing.Size(70, 20);
@@ -932,6 +961,8 @@ namespace OpenDental
 			// textDedEstOverride
 			// 
 			this.textDedEstOverride.Location = new System.Drawing.Point(240, 198);
+			this.textDedEstOverride.MaxVal = 100000000D;
+			this.textDedEstOverride.MinVal = -100000000D;
 			this.textDedEstOverride.Name = "textDedEstOverride";
 			this.textDedEstOverride.Size = new System.Drawing.Size(70, 20);
 			this.textDedEstOverride.TabIndex = 116;
@@ -972,6 +1003,8 @@ namespace OpenDental
 			// textPatPortion2
 			// 
 			this.textPatPortion2.Location = new System.Drawing.Point(163, 93);
+			this.textPatPortion2.MaxVal = 100000000D;
+			this.textPatPortion2.MinVal = -100000000D;
 			this.textPatPortion2.Name = "textPatPortion2";
 			this.textPatPortion2.ReadOnly = true;
 			this.textPatPortion2.Size = new System.Drawing.Size(70, 20);
@@ -990,6 +1023,8 @@ namespace OpenDental
 			// textWriteOff
 			// 
 			this.textWriteOff.Location = new System.Drawing.Point(163, 73);
+			this.textWriteOff.MaxVal = 100000000D;
+			this.textWriteOff.MinVal = -100000000D;
 			this.textWriteOff.Name = "textWriteOff";
 			this.textWriteOff.Size = new System.Drawing.Size(70, 20);
 			this.textWriteOff.TabIndex = 18;
@@ -999,6 +1034,8 @@ namespace OpenDental
 			// textInsPayEst
 			// 
 			this.textInsPayEst.Location = new System.Drawing.Point(163, 33);
+			this.textInsPayEst.MaxVal = 100000000D;
+			this.textInsPayEst.MinVal = -100000000D;
 			this.textInsPayEst.Name = "textInsPayEst";
 			this.textInsPayEst.Size = new System.Drawing.Size(70, 20);
 			this.textInsPayEst.TabIndex = 20;
@@ -1008,6 +1045,8 @@ namespace OpenDental
 			// textInsPayAmt
 			// 
 			this.textInsPayAmt.Location = new System.Drawing.Point(163, 53);
+			this.textInsPayAmt.MaxVal = 100000000D;
+			this.textInsPayAmt.MinVal = -100000000D;
 			this.textInsPayAmt.Name = "textInsPayAmt";
 			this.textInsPayAmt.Size = new System.Drawing.Size(70, 20);
 			this.textInsPayAmt.TabIndex = 0;
@@ -1017,6 +1056,8 @@ namespace OpenDental
 			// textDedApplied
 			// 
 			this.textDedApplied.Location = new System.Drawing.Point(163, 13);
+			this.textDedApplied.MaxVal = 100000000D;
+			this.textDedApplied.MinVal = -100000000D;
 			this.textDedApplied.Name = "textDedApplied";
 			this.textDedApplied.Size = new System.Drawing.Size(70, 20);
 			this.textDedApplied.TabIndex = 75;
@@ -1025,7 +1066,7 @@ namespace OpenDental
 			// 
 			// labelProcDate
 			// 
-			this.labelProcDate.Location = new System.Drawing.Point(6, 142);
+			this.labelProcDate.Location = new System.Drawing.Point(6, 166);
 			this.labelProcDate.Name = "labelProcDate";
 			this.labelProcDate.Size = new System.Drawing.Size(126, 17);
 			this.labelProcDate.TabIndex = 96;
@@ -1034,7 +1075,7 @@ namespace OpenDental
 			// 
 			// labelDateEntry
 			// 
-			this.labelDateEntry.Location = new System.Drawing.Point(6, 99);
+			this.labelDateEntry.Location = new System.Drawing.Point(6, 123);
 			this.labelDateEntry.Name = "labelDateEntry";
 			this.labelDateEntry.Size = new System.Drawing.Size(125, 17);
 			this.labelDateEntry.TabIndex = 99;
@@ -1043,7 +1084,7 @@ namespace OpenDental
 			// 
 			// textDateEntry
 			// 
-			this.textDateEntry.Location = new System.Drawing.Point(133, 95);
+			this.textDateEntry.Location = new System.Drawing.Point(133, 119);
 			this.textDateEntry.Name = "textDateEntry";
 			this.textDateEntry.ReadOnly = true;
 			this.textDateEntry.Size = new System.Drawing.Size(83, 20);
@@ -1051,14 +1092,14 @@ namespace OpenDental
 			// 
 			// textProcDate
 			// 
-			this.textProcDate.Location = new System.Drawing.Point(133, 138);
+			this.textProcDate.Location = new System.Drawing.Point(133, 162);
 			this.textProcDate.Name = "textProcDate";
 			this.textProcDate.Size = new System.Drawing.Size(83, 20);
 			this.textProcDate.TabIndex = 97;
 			// 
 			// textDateCP
 			// 
-			this.textDateCP.Location = new System.Drawing.Point(133, 116);
+			this.textDateCP.Location = new System.Drawing.Point(133, 140);
 			this.textDateCP.Name = "textDateCP";
 			this.textDateCP.Size = new System.Drawing.Size(83, 20);
 			this.textDateCP.TabIndex = 66;
@@ -1113,7 +1154,7 @@ namespace OpenDental
 			// 
 			// textClinic
 			// 
-			this.textClinic.Location = new System.Drawing.Point(133, 73);
+			this.textClinic.Location = new System.Drawing.Point(133, 97);
 			this.textClinic.Name = "textClinic";
 			this.textClinic.ReadOnly = true;
 			this.textClinic.Size = new System.Drawing.Size(148, 20);
@@ -1121,7 +1162,7 @@ namespace OpenDental
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(9, 75);
+			this.labelClinic.Location = new System.Drawing.Point(9, 99);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(121, 14);
 			this.labelClinic.TabIndex = 101;
@@ -1135,7 +1176,7 @@ namespace OpenDental
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(280, 50);
+			this.butPickProv.Location = new System.Drawing.Point(280, 74);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 20);
 			this.butPickProv.TabIndex = 160;
@@ -1146,7 +1187,7 @@ namespace OpenDental
 			// 
 			this.comboProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvider.FormattingEnabled = true;
-			this.comboProvider.Location = new System.Drawing.Point(133, 50);
+			this.comboProvider.Location = new System.Drawing.Point(133, 74);
 			this.comboProvider.Name = "comboProvider";
 			this.comboProvider.Size = new System.Drawing.Size(145, 21);
 			this.comboProvider.TabIndex = 159;
@@ -1180,10 +1221,30 @@ namespace OpenDental
 			this.checkPayPlan.Text = "Attached to Insurance Payment Plan";
 			this.checkPayPlan.Click += new System.EventHandler(this.checkPayPlan_Click);
 			// 
+			// comboPayTracker
+			// 
+			this.comboPayTracker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboPayTracker.FormattingEnabled = true;
+			this.comboPayTracker.Location = new System.Drawing.Point(133, 50);
+			this.comboPayTracker.Name = "comboPayTracker";
+			this.comboPayTracker.Size = new System.Drawing.Size(145, 21);
+			this.comboPayTracker.TabIndex = 165;
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(12, 53);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(119, 17);
+			this.label12.TabIndex = 164;
+			this.label12.Text = "Payment Tracking";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormClaimProc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(889, 632);
+			this.Controls.Add(this.comboPayTracker);
+			this.Controls.Add(this.label12);
 			this.Controls.Add(this.checkPayPlan);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.comboStatus);
@@ -1428,6 +1489,17 @@ namespace OpenDental
 			}
 			else {
 				checkPayPlan.Checked=true;
+			}
+			_listPayTrackDefs=new List<Def>();
+			_listPayTrackDefs.AddRange(DefC.GetList(DefCat.ClaimPaymentTracking));
+			for(int i=0;i<_listPayTrackDefs.Count;i++) {
+				comboPayTracker.Items.Add(_listPayTrackDefs[i].ItemName);
+				if(_listPayTrackDefs[i].DefNum==ClaimProcCur.ClaimPaymentTracking) {
+					comboPayTracker.SelectedIndex=i;
+				}
+			}
+			if(comboPayTracker.SelectedIndex==-1) {
+				comboPayTracker.SelectedIndex=0;
 			}
 			FillInitialAmounts();
 			ComputeAmounts();
@@ -2051,6 +2123,7 @@ namespace OpenDental
 					ClaimProcCur.DateEntry=DateTime.Now;
 				}
 			}
+			ClaimProcCur.ClaimPaymentTracking=_listPayTrackDefs[comboPayTracker.SelectedIndex].DefNum;
 			if(SaveToDb) {
 				ClaimProcs.Update(ClaimProcCur);
 			}//otherwise, the change to db will be made by calling class
