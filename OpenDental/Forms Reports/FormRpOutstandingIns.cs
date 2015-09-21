@@ -37,8 +37,10 @@ namespace OpenDental {
 		private UI.Button butExport;
 		private int headingPrintH;
 		private UI.Button butRefresh;
+		private ComboBoxMulti comboBoxMultiClinics;
+		private Label labelClinic;
 		private decimal total;
-
+		private List<Clinic> _listClinics;
 
 		public FormRpOutstandingIns() {
 			InitializeComponent();
@@ -62,6 +64,8 @@ namespace OpenDental {
 			this.textDaysOldMin = new OpenDental.ValidNum();
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.comboBoxMultiClinics = new OpenDental.UI.ComboBoxMulti();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// checkPreauth
@@ -80,7 +84,7 @@ namespace OpenDental {
 			// 
 			// labelProv
 			// 
-			this.labelProv.Location = new System.Drawing.Point(412, 8);
+			this.labelProv.Location = new System.Drawing.Point(410, 8);
 			this.labelProv.Name = "labelProv";
 			this.labelProv.Size = new System.Drawing.Size(87, 16);
 			this.labelProv.TabIndex = 48;
@@ -117,7 +121,7 @@ namespace OpenDental {
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(520, 480);
+			this.label2.Location = new System.Drawing.Point(600, 480);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(69, 18);
 			this.label2.TabIndex = 46;
@@ -127,7 +131,7 @@ namespace OpenDental {
 			// textBox1
 			// 
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(595, 479);
+			this.textBox1.Location = new System.Drawing.Point(675, 479);
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(61, 20);
 			this.textBox1.TabIndex = 56;
@@ -140,7 +144,7 @@ namespace OpenDental {
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(670, 5);
+			this.butRefresh.Location = new System.Drawing.Point(750, 5);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(82, 24);
 			this.butRefresh.TabIndex = 58;
@@ -174,7 +178,6 @@ namespace OpenDental {
 			this.comboBoxMultiProv.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiProv.SelectedIndices")));
 			this.comboBoxMultiProv.Size = new System.Drawing.Size(160, 21);
 			this.comboBoxMultiProv.TabIndex = 53;
-			this.comboBoxMultiProv.UseCommas = true;
 			this.comboBoxMultiProv.Leave += new System.EventHandler(this.comboBoxMultiProv_Leave);
 			// 
 			// butPrint
@@ -224,7 +227,7 @@ namespace OpenDental {
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(670, 476);
+			this.butCancel.Location = new System.Drawing.Point(750, 476);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 45;
@@ -236,20 +239,45 @@ namespace OpenDental {
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 46);
+			this.gridMain.Location = new System.Drawing.Point(12, 56);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(740, 416);
+			this.gridMain.Size = new System.Drawing.Size(820, 406);
 			this.gridMain.TabIndex = 1;
 			this.gridMain.Title = null;
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
+			// comboBoxMultiClinics
+			// 
+			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
+			this.comboBoxMultiClinics.DroppedDown = false;
+			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(498, 29);
+			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
+			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
+			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
+			this.comboBoxMultiClinics.TabIndex = 59;
+			this.comboBoxMultiClinics.Visible = false;
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(410, 31);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(87, 16);
+			this.labelClinic.TabIndex = 60;
+			this.labelClinic.Text = "Clinics";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.labelClinic.Visible = false;
+			// 
 			// FormRpOutstandingIns
 			// 
-			this.ClientSize = new System.Drawing.Size(764, 512);
+			this.ClientSize = new System.Drawing.Size(844, 512);
+			this.Controls.Add(this.labelClinic);
+			this.Controls.Add(this.comboBoxMultiClinics);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.butExport);
 			this.Controls.Add(this.textBox1);
@@ -276,6 +304,11 @@ namespace OpenDental {
 
 		private void FormRpOutIns_Load(object sender,EventArgs e) {
 			FillProvs();
+			if(PrefC.HasClinicsEnabled) {
+				comboBoxMultiClinics.Visible=true;
+				labelClinic.Visible=true;
+				FillClinics();
+			}
 			FillGrid();
 		}
 
@@ -287,6 +320,25 @@ namespace OpenDental {
 			comboBoxMultiProv.SetSelected(0,true);
 			comboBoxMultiProv.RefreshText();
 			isAllProv=true;
+		}
+
+		private void FillClinics() {
+			_listClinics=Clinics.GetForUserod(Security.CurUser);
+			comboBoxMultiClinics.Items.Add(Lan.g(this,"All"));
+			if(!Security.CurUser.ClinicIsRestricted) {
+				comboBoxMultiClinics.Items.Add(Lan.g(this,"Unassigned"));
+				comboBoxMultiClinics.SetSelected(1,true);
+			}
+			for(int i=0;i<_listClinics.Count;i++) {
+				int curIndex=comboBoxMultiClinics.Items.Add(_listClinics[i].Description);
+				if(FormOpenDental.ClinicNum==0) {
+					comboBoxMultiClinics.SetSelected(curIndex,true);
+				}
+				if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					comboBoxMultiClinics.SelectedIndices.Clear();
+					comboBoxMultiClinics.SetSelected(curIndex,true);
+				}
+			}
 		}
 
 		private void FillGrid() {
@@ -312,8 +364,32 @@ namespace OpenDental {
 					provNumList.Add((long)ProviderC.ListShort[(int)comboBoxMultiProv.SelectedIndices[i]-1].ProvNum);
 				}
 			}
+			List<long> listClinicNums=new List<long>();
+			if(PrefC.HasClinicsEnabled) {
+				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {
+					for(int j=0;j<_listClinics.Count;j++) {
+						listClinicNums.Add(_listClinics[j].ClinicNum);//Add all clinics this person has access to.
+					}
+					if(!Security.CurUser.ClinicIsRestricted) {
+						listClinicNums.Add(0);
+					}
+				}
+				else {
+					for(int i=0;i<comboBoxMultiClinics.ListSelectedIndices.Count;i++) {
+						if(Security.CurUser.ClinicIsRestricted) {
+							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-1].ClinicNum);
+						}
+						else if(comboBoxMultiClinics.ListSelectedIndices[i]==1) {
+							listClinicNums.Add(0);
+						}
+						else {
+							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-2].ClinicNum);
+						}
+					}
+				}
+			}
 			isPreauth=checkPreauth.Checked;
-			Table=Claims.GetOutInsClaims(isAllProv,provNumList,dateMin,dateMax,isPreauth);
+			Table=RpOutstandingIns.GetOutInsClaims(isAllProv,provNumList,dateMin,dateMax,isPreauth,listClinicNums);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -325,6 +401,10 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Patient Name"),140);
 			gridMain.Columns.Add(col);
+			if(PrefC.HasClinicsEnabled) {
+				col=new ODGridColumn(Lan.g(this,"Clinic"),100);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g(this,"Date of Service"),93);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Date Sent"),70);
@@ -369,6 +449,14 @@ namespace OpenDental {
 				}
 				else {
 					row.Cells.Add(Table.Rows[i]["LName"].ToString()+", "+Table.Rows[i]["FName"].ToString()+" "+Table.Rows[i]["MiddleI"].ToString());
+				}
+				if(PrefC.HasClinicsEnabled) {
+					for(int j=0;j<_listClinics.Count;j++) {
+						if(_listClinics[j].ClinicNum==PIn.Long(Table.Rows[i]["ClinicNum"].ToString())) {
+							row.Cells.Add(_listClinics[j].Description);
+							break;
+						}
+					}
 				}
 				DateTime dateService=PIn.Date(Table.Rows[i]["DateService"].ToString());
 				if(dateService.Year<1880) {

@@ -940,6 +940,7 @@
     <Compile Include="Plugins\Plugins.cs" />
     <Compile Include="Reports\RpActivePatients.cs" />
     <Compile Include="Reports\RpNewPatients.cs" />
+    <Compile Include="Reports\RpOutstandingIns.cs" />
     <Compile Include="Reports\RpPayPlan.cs" />
     <Compile Include="Reports\ReportsComplex.cs" />
     <Compile Include="Reports\RpPaySheet.cs" />
