@@ -7,6 +7,7 @@ using System.Reflection;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Fees {
+		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
 		private static List<Fee> _listt;
 		private static object _lockObj=new object();
 		///<summary>Set this variable and the GetFee() method will use this list instead of GetListt() by default.
@@ -39,20 +40,9 @@ namespace OpenDentBusiness{
 				Fees.RefreshCache();
 			}
 			List<Fee> listFees=new List<Fee>();
-			//Get a deep copy of the visible fee schedules to help figure out which fees are 'hidden'.
-			List<FeeSched> listFeeSchedules=FeeSchedC.GetListShort();
 			lock(_lockObj) {
-				//This is not common at all.  Typically there will be a "GetListShort" that will return all cached items that are not hidden.
-				//However, there is no such thing as hiding a fee.  There is however such a thing as hiding a fee schedule.
-				//Hiding a fee schedule is just a good as hiding the fees it is associated to.
-				//For speed purposes, we need to grab deep copies of fees that are not associated to a hidden fee schedule.
-				//There are places in the program (e.g. computing estimates) that call GetListt many times in a loop.
-				//Those loops are extremely slow when getting a deep copy of the entire fee table (e.g. 359,421 fees) when only a portion of them are used.
-				//An example is when you change nothing and leave the Ins Plan Edit window by clicking OK.
-				//That window was taking an office several seconds to close.  By not grabbing a deep copy of hidden fees, the time was cut in half.
-				List<Fee> listNonHiddenFees=_listt.FindAll(x => listFeeSchedules.Exists(y => y.FeeSchedNum==x.FeeSched));//Get all non-hidden fees.
-				for(int i=0;i<listNonHiddenFees.Count;i++) {
-					listFees.Add(listNonHiddenFees[i].Copy());
+				for(int i=0;i<_listt.Count;i++) {
+					listFees.Add(_listt[i].Copy());
 				}
 			}
 			return listFees;
@@ -60,7 +50,7 @@ namespace OpenDentBusiness{
 
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM fee";
+			string command="SELECT * FROM fee INNER JOIN feesched ON feesched.FeeSchedNum=fee.FeeSched WHERE feesched.IsHidden=0";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="Fee";
 			FillCache(table);
@@ -71,20 +61,6 @@ namespace OpenDentBusiness{
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
 			Listt=Crud.FeeCrud.TableToList(table);
-			/*
-			Dict=new Dictionary<FeeKey,Fee>();
-			FeeKey key;
-			for(int i=0;i<Listt.Count;i++) {
-				key=new FeeKey();
-				key.codeNum=Listt[i].CodeNum;
-				key.feeSchedNum=Listt[i].FeeSched;
-				if(Dict.ContainsKey(key)) {
-					//Older versions used to delete duplicates here
-				}
-				else {
-					Dict.Add(key,Listt[i]);
-				}
-			}*/
 		}
 
 		///<summary></summary>
@@ -132,13 +108,12 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.</summary>
-		public static void Sync(List<Fee> listNew) {
+		public static bool Sync(List<Fee> listNew) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
-				return;
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
 			}
 			List<Fee> listDB=Fees.GetListt();
-			Crud.FeeCrud.Sync(listNew,listDB);
+			return Crud.FeeCrud.Sync(listNew,listDB);
 		}
 
 		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>

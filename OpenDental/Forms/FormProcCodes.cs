@@ -1385,8 +1385,9 @@ namespace OpenDental{
 				//Do nothing. All columns > 3 are editable (You cannot double click).
 			}
 			else {//not on a fee: Edit code instead
-				Fees.Sync(_listFees);
-				Fees.RefreshCache();
+				if(Fees.Sync(_listFees)) {
+					Fees.RefreshCache();
+				}
 				ProcedureCode procCode=(ProcedureCode)gridMain.Rows[e.Row].Tag;
 				FormProcCodeEdit FormPCE=new FormProcCodeEdit(procCode);
 				FormPCE.IsNew=false;
