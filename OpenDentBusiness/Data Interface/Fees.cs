@@ -107,7 +107,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.</summary>
+		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.  Returns true if db changes were made.</summary>
 		public static bool Sync(List<Fee> listNew) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
