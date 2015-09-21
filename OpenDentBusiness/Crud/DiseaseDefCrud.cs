@@ -217,8 +217,8 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Sync(List<DiseaseDef> listNew,List<DiseaseDef> listDB) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<DiseaseDef> listNew,List<DiseaseDef> listDB) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<DiseaseDef> listIns    =new List<DiseaseDef>();
 			List<DiseaseDef> listUpdNew =new List<DiseaseDef>();
@@ -228,6 +228,7 @@ namespace OpenDentBusiness.Crud{
 			listDB.Sort((DiseaseDef x,DiseaseDef y) => { return x.DiseaseDefNum.CompareTo(y.DiseaseDefNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
 			int idxNew=0;
 			int idxDB=0;
+			int rowsUpdatedCount=0;
 			DiseaseDef fieldNew;
 			DiseaseDef fieldDB;
 			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
@@ -273,11 +274,17 @@ namespace OpenDentBusiness.Crud{
 				Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {
-				Update(listUpdNew[i],listUpdDB[i]);
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
 			}
 			for(int i=0;i<listDel.Count;i++) {
 				Delete(listDel[i].DiseaseDefNum);
 			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

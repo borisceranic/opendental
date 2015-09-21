@@ -965,8 +965,8 @@ using System.Drawing;"+rn);
 			#region Sync
 			//Synch-----------------------------------------------------------------------------------------
 			if(CrudGenHelper.IsSynchable(typeClass)) {
-				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>");
-				strb.Append(rn+t2+"public static void Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
+				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>");
+				strb.Append(rn+t2+"public static bool Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
 				strb.Append(rn+t3+"//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listIns    =new List<"+typeClass.Name+">();");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdNew =new List<"+typeClass.Name+">();");
@@ -976,6 +976,7 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t3+"listDB.Sort(("+typeClass.Name+" x,"+typeClass.Name+" y) => { return x."+priKey.Name+".CompareTo(y."+priKey.Name+"); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.");
 				strb.Append(rn+t3+"int idxNew=0;");
 				strb.Append(rn+t3+"int idxDB=0;");
+				strb.Append(rn+t3+"int rowsUpdatedCount=0;");
 				strb.Append(rn+t3+""+typeClass.Name+" fieldNew;");
 				strb.Append(rn+t3+""+typeClass.Name+" fieldDB;");
 				strb.Append(rn+t3+"//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.");
@@ -1021,7 +1022,9 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t4+"Insert(listIns[i]);");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"for(int i=0;i<listUpdNew.Count;i++) {");
-				strb.Append(rn+t4+"Update(listUpdNew[i],listUpdDB[i]);");
+				strb.Append(rn+t4+"if(Update(listUpdNew[i],listUpdDB[i])){");
+				strb.Append(rn+t5+"rowsUpdatedCount++;");
+				strb.Append(rn+t4+"}");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"for(int i=0;i<listDel.Count;i++) {");
 				if(CrudGenHelper.IsDeleteForbidden(typeClass)) {
@@ -1033,6 +1036,10 @@ using System.Drawing;"+rn);
 					strb.Append(rn+t4+"Delete(listDel[i]."+priKey.Name+");");
 				}
 				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {");
+				strb.Append(rn+t4+"return true;");
+				strb.Append(rn+t3+"}");
+				strb.Append(rn+t3+"return false;");
 				strb.Append(rn+t2+"}");
 			}
 			#endregion
