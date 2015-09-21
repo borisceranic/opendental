@@ -10312,6 +10312,29 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX claimproc_ClaimPaymentTracking ON claimproc (ClaimPaymentTracking)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS emailautograph";
+					Db.NonQ(command);
+					command=@"CREATE TABLE emailautograph (
+						EmailAutographNum bigint NOT NULL auto_increment PRIMARY KEY,
+						Description text NOT NULL,
+						EmailAddress varchar(255) NOT NULL,
+						AutographText text NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE emailautograph'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE emailautograph (
+						EmailAutographNum number(20) NOT NULL,
+						Description clob,
+						EmailAddress varchar2(255),
+						AutographText clob,
+						CONSTRAINT emailautograph_EmailAutographN PRIMARY KEY (EmailAutographNum)
+						)";
+					Db.NonQ(command);
+				}
 
 
 
