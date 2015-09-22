@@ -31,6 +31,7 @@ namespace OpenDentBusiness {
 			else {
 				command+=" AND claim.DateService = '"+fromDate+"'";
 			}
+			command+=" ORDER BY claim.DateService";
 
 			DataTable _retVal=Db.GetTable(command);
 			return _retVal;
