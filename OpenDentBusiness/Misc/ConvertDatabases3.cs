@@ -7601,10 +7601,6 @@ namespace OpenDentBusiness {
 								+"'','','','','')";//CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode
 							Db.NonQ(command);
 						}
-						//Remove all adjustments that do not have an amount.
-						//Leaving adjustments with amounts is intended because the procedures we created will have a 0 fee which will not affect reports.
-						command="DELETE FROM adjustment WHERE AdjType="+brokenAdjType+" AND AdjAmt=0";
-						Db.NonQ(command);
 					}
 					else {//Oracle
 						//Not going to worry about Oracle automation for inserting procedures.
