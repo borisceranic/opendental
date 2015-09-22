@@ -485,6 +485,14 @@ namespace OpenDental{
 		#endregion
 
 		private void FormBilling_Load(object sender, System.EventArgs e) {
+			//NOTE: this form can be very slow and reloads all data every time it gains focus.All data is requeried from the DB.
+			//Suggestions on how to improve speed are:
+			//1) use form-level signal processing to set a bool on this form to determine if it needs to refresh the grid when it regains focus.
+			//2) add index to statement (IsSent, Patnum, DateSent)
+			//3) split the get billing table query into two smaller querries, one that gets everything except the LastStatement column, and one to select
+			//  the LastStatement, PatNum and then stitch them together in C#. 
+			//  In testing this improved execution time from 1.3 seconds to return ~2500 rows down to 0.08 for the main query and 0.05 for the LastStatement date
+			//  Stitching the data sets together was not tested but should be faster than MySQL.
 			labelPrinted.Text=Lan.g(this,"Printed=")+"0";
 			labelEmailed.Text=Lan.g(this,"E-mailed=")+"0";
 			labelSentElect.Text=Lan.g(this,"SentElect=")+"0";
@@ -593,6 +601,7 @@ namespace OpenDental{
 					row.Cells.Add(table.Rows[i]["amountDue"].ToString());
 				}
 				row.Cells.Add(table.Rows[i]["payPlanDue"].ToString());
+				row.Tag=PIn.Long(table.Rows[i]["StatementNum"].ToString());
 				gridBill.Rows.Add(row);
 			}
 			gridBill.EndUpdate();
@@ -600,19 +609,16 @@ namespace OpenDental{
 				gridBill.SetSelected(true);
 				isInitial=false;
 			}
-			else{
-				for(int i=0;i<selectedKeys.Count;i++){
-					for(int j=0;j<table.Rows.Count;j++){
-						if(table.Rows[j]["StatementNum"].ToString()==selectedKeys[i].ToString()){
-							gridBill.SetSelected(j,true);
-						}
+			else {
+				for(int i=0;i<gridBill.Rows.Count;i++) {
+					if(selectedKeys.Contains((long)gridBill.Rows[i].Tag)) {
+						gridBill.SetSelected(i,true);
 					}
 				}
 			}
 			gridBill.ScrollValue=scrollPos;
 			labelTotal.Text=Lan.g(this,"Total=")+table.Rows.Count.ToString();
 			labelSelected.Text=Lan.g(this,"Selected=")+gridBill.SelectedIndices.Length.ToString();
-			//labelSelected.Text=Lan.g(this,"Selected=")+"0";
 		}
 
 		private void butAll_Click(object sender, System.EventArgs e) {
