@@ -877,7 +877,7 @@ namespace OpenDental{
 					fldval=fldval.Replace("[genderhisher]",genderhisher);
 					fldval=fldval.Replace("[genderHisHers]",genderHisHers);
 					fldval=fldval.Replace("[genderhishers]",genderhishers);
-					fldval=fldval.Replace("[HmPhone]",StripPhoneBeyondSpace(pat.HmPhone));
+					fldval=fldval.Replace("[HmPhone]",pat.HmPhone);
 					fldval=fldval.Replace("[insAnnualMax]",insAnnualMax);
 					fldval=fldval.Replace("[insDeductible]",insDeductible);
 					fldval=fldval.Replace("[insDeductibleUsed]",insDeductibleUsed);
@@ -941,8 +941,8 @@ namespace OpenDental{
 					fldval=fldval.Replace("[treatmentNote]",treatmentNote);
 					fldval=fldval.Replace("[treatmentPlanProcs]",treatmentPlanProcs);
 					fldval=fldval.Replace("[treatmentPlanProcsPriority]",treatmentPlanProcsPriority);
-					fldval=fldval.Replace("[WirelessPhone]",StripPhoneBeyondSpace(pat.WirelessPhone));
-					fldval=fldval.Replace("[WkPhone]",StripPhoneBeyondSpace(pat.WkPhone));
+					fldval=fldval.Replace("[WirelessPhone]",pat.WirelessPhone);
+					fldval=fldval.Replace("[WkPhone]",pat.WkPhone);
 				}
 				fldval=fldval.Replace("[dateToday]",DateTime.Today.ToShortDateString());
 				fldval=fldval.Replace("[practiceTitle]",PrefC.GetString(PrefName.PracticeTitle));
