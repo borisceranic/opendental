@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormPatientAddAll:Form {
@@ -17,12 +18,6 @@ namespace OpenDental {
 		private string _fnameOld3="";
 		private string _fnameOld4="";
 		private string _fnameOld5="";
-		private List<Referral> similarReferrals;
-		private string referralOriginal;
-		private System.Windows.Forms.ListBox listReferral;
-		private bool mouseIsInListReferral;
-		private Referral selectedReferral;
-		//private int selectedSubscriberIndex1;
 		/// <summary>displayed from within code, not designer</summary>
 		private System.Windows.Forms.ListBox listEmps1;
 		private bool mouseIsInListEmps1;
@@ -44,21 +39,15 @@ namespace OpenDental {
 		///<summary>If user picks a plan from list, but then changes one of the critical fields, this will be ignored.  Keep in mind that the plan here is just a copy.  It can't be updated, but must instead be inserted.</summary>
 		private InsPlan selectedPlan1;
 		private InsPlan selectedPlan2;
+		private ToolTip _referredFromToolTip;
+		private Referral _refCur;
 
 		public FormPatientAddAll() {
 			InitializeComponent();
 			Lan.F(this);
-			listReferral=new ListBox();
-			listReferral.Location=new Point(textReferral.Left,textReferral.Bottom);
-			listReferral.Size=new Size(400,140);
-			listReferral.HorizontalScrollbar=true;
-			listReferral.Visible=false;
-			listReferral.Click += new System.EventHandler(listReferral_Click);
-			listReferral.DoubleClick += new System.EventHandler(listReferral_DoubleClick);
-			listReferral.MouseEnter += new System.EventHandler(listReferral_MouseEnter);
-			listReferral.MouseLeave += new System.EventHandler(listReferral_MouseLeave);
-			Controls.Add(listReferral);
-			listReferral.BringToFront();
+			_referredFromToolTip=new ToolTip();
+			_referredFromToolTip.InitialDelay=500;
+			_referredFromToolTip.ReshowDelay=100;
 			listEmps1=new ListBox();
 			listEmps1.Location=new Point(groupIns1.Left+textEmployer1.Left,
 				groupIns1.Top+textEmployer1.Bottom);
@@ -156,8 +145,8 @@ namespace OpenDental {
 			comboPriProv4.SelectedIndex=defaultindex;
 			comboPriProv5.SelectedIndex=defaultindex;
 			if(!Security.IsAuthorized(Permissions.RefAttachAdd,true)) {
-				textReferral.Enabled=false;
-				textReferralFName.Enabled=false;
+				butClearReferralSource.Enabled=false;
+				butReferredFrom.Enabled=false;
 			}
 			if(!PrefC.GetBool(PrefName.DockPhonePanelShow)) {
 				labelST.Text="ST";
@@ -543,117 +532,88 @@ namespace OpenDental {
 		#endregion AddressPhone
 
 		#region Referral
-		///<summary>Fills the referral fields based on the specified referralNum.</summary>
-		private void FillReferral(long referralNum) {
-			selectedReferral=Referrals.GetReferral(referralNum);
-			textReferral.Text=selectedReferral.LName;
-			textReferralFName.Text=selectedReferral.FName;
-		}
-
-		private void textReferral_KeyUp(object sender,System.Windows.Forms.KeyEventArgs e) {
-			if(e.KeyCode==Keys.Return) {
-				if(listReferral.SelectedIndex==-1) {
-					textReferralFName.Focus();
-				}
-				else {
-					FillReferral(similarReferrals[listReferral.SelectedIndex].ReferralNum);
-					textReferral.Focus();
-					textReferral.SelectionStart=textReferral.Text.Length;
-				}
-				listReferral.Visible=false;
-				return;
-			}
-			if(textReferral.Text=="") {
-				listReferral.Visible=false;
-				return;
-			}
-			if(e.KeyCode==Keys.Down) {
-				if(listReferral.Items.Count==0) {
+		private void butReferredFrom_Click(object sender,EventArgs e) {
+			Referral refCur=new Referral();
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Is the referral source an existing patient?")) {//patient referral
+				FormPatientSelect FormPS=new FormPatientSelect();
+				FormPS.SelectionModeOnly=true;
+				FormPS.ShowDialog();
+				if(FormPS.DialogResult!=DialogResult.OK) {
 					return;
 				}
-				if(listReferral.SelectedIndex==-1) {
-					listReferral.SelectedIndex=0;
-					textReferral.Text=similarReferrals[listReferral.SelectedIndex].LName;
+				refCur.PatNum=FormPS.SelectedPatNum;
+				bool referralIsNew=true;
+				if(Referrals.List.Any(x => x.PatNum==FormPS.SelectedPatNum)) {
+					refCur=Referrals.List.FirstOrDefault(x => x.PatNum==FormPS.SelectedPatNum).Copy();
+					referralIsNew=false;
 				}
-				else if(listReferral.SelectedIndex==listReferral.Items.Count-1) {
-					listReferral.SelectedIndex=-1;
-					textReferral.Text=referralOriginal;
-				}
-				else {
-					listReferral.SelectedIndex++;
-					textReferral.Text=similarReferrals[listReferral.SelectedIndex].LName;
-				}
-				textReferral.SelectionStart=textReferral.Text.Length;
-				return;
-			}
-			if(e.KeyCode==Keys.Up) {
-				if(listReferral.Items.Count==0) {
+				FormReferralEdit FormRefEdit=new FormReferralEdit(refCur);//the ReferralNum must be added here
+				FormRefEdit.IsNew=referralIsNew;
+				FormRefEdit.ShowDialog();
+				if(FormRefEdit.DialogResult!=DialogResult.OK) {
 					return;
 				}
-				if(listReferral.SelectedIndex==-1) {
-					listReferral.SelectedIndex=listReferral.Items.Count-1;
-					textReferral.Text=similarReferrals[listReferral.SelectedIndex].LName;
+				refCur=FormRefEdit.RefCur;//not needed, but it makes it clear that we are editing the ref in FormRefEdit
+			}
+			else {//not a patient referral, must be a doctor or marketing/other so show the referral select window with doctor and other check boxes checked
+				FormReferralSelect FormRS=new FormReferralSelect();
+				FormRS.IsSelectionMode=true;
+				FormRS.IsShowPat=false;
+				FormRS.ShowDialog();
+				if(FormRS.DialogResult!=DialogResult.OK) {
+					if(_refCur!=null && _refCur.ReferralNum>0) {
+						_refCur=Referrals.GetReferral(_refCur.ReferralNum);
+						FillReferredFrom();//the user may have edited a referral and then cancelled attaching to the patient, refill the text box to reflect any changes
+					}
+					return;
 				}
-				else if(listReferral.SelectedIndex==0) {
-					listReferral.SelectedIndex=-1;
-					textReferral.Text=referralOriginal;
-				}
-				else {
-					listReferral.SelectedIndex--;
-					textReferral.Text=similarReferrals[listReferral.SelectedIndex].LName;
-				}
-				textReferral.SelectionStart=textReferral.Text.Length;
+				refCur=FormRS.SelectedReferral;
+			}
+			//_refAttachCur=new RefAttach();
+			//_refAttachCur.ReferralNum=refCur.ReferralNum;
+			//_refAttachCur.IsFrom=true;
+			//_refAttachCur.RefDate=DateTimeOD.Today;
+			//if(refCur.IsDoctor) {//whether using ehr or not
+			//	_refAttachCur.IsTransitionOfCare=true;
+			//}
+			//_refAttachCur.ItemOrder=1;
+			_refCur=refCur;
+			FillReferredFrom();
+		}
+
+		private void butClearReferralSource_Click(object sender,EventArgs e) {
+			_refCur=null;
+			textReferredFrom.Clear();
+		}
+
+		///<summary>Fills the Referred From text box with the name and referral type from the private classwide variable _refCur.</summary>
+		private void FillReferredFrom() {
+			string firstRefNameTypeAbbr="";
+			string firstRefType="";
+			string firstRefFullName="";
+			if(_refCur==null) {
 				return;
 			}
-			if(textReferral.Text.Length==1) {
-				textReferral.Text=textReferral.Text.ToUpper();
-				textReferral.SelectionStart=1;
+			firstRefFullName=Referrals.GetNameLF(_refCur.ReferralNum);
+			if(_refCur.PatNum>0) {
+				firstRefType=" (patient)";
 			}
-			referralOriginal=textReferral.Text;//the original text is preserved when using up and down arrows
-			listReferral.Items.Clear();
-			similarReferrals=Referrals.GetSimilarNames(textReferral.Text);
-			for(int i=0;i<similarReferrals.Count;i++) {
-				listReferral.Items.Add(similarReferrals[i].LName+", "
-					+similarReferrals[i].FName+", "
-					+similarReferrals[i].Title+", "
-					+similarReferrals[i].Note);
+			else if(_refCur.IsDoctor) {
+				firstRefType=" (doctor)";
 			}
-			int h=13*similarReferrals.Count+5;
-			if(h > ClientSize.Height-listReferral.Top){
-				h=ClientSize.Height-listReferral.Top;
+			firstRefNameTypeAbbr=firstRefFullName;
+			for(int i=1;i<firstRefFullName.Length+1;i++) {//i is used as the length to substring, not an index, so i<firstRefName.Length+1 is safe
+				if(TextRenderer.MeasureText(firstRefFullName.Substring(0,i)+firstRefType,textReferredFrom.Font).Width<textReferredFrom.Width) {
+					continue;
+				}
+				firstRefNameTypeAbbr=firstRefFullName.Substring(0,i-1);
+				break;
 			}
-			listReferral.Size=new Size(listReferral.Width,h);
-			listReferral.Visible=true;
-		}
-
-		private void textReferral_Leave(object sender,System.EventArgs e) {
-			if(mouseIsInListReferral) {
-				return;
-			}
-			//or if user clicked on a different text box.
-			if(listReferral.SelectedIndex!=-1) {
-				FillReferral(similarReferrals[listReferral.SelectedIndex].ReferralNum);
-			}
-			listReferral.Visible=false;
-		}
-
-		private void listReferral_Click(object sender,System.EventArgs e) {
-			FillReferral(similarReferrals[listReferral.SelectedIndex].ReferralNum);
-			textReferral.Focus();
-			textReferral.SelectionStart=textReferral.Text.Length;
-			listReferral.Visible=false;
-		}
-
-		private void listReferral_DoubleClick(object sender,System.EventArgs e) {
-			//no longer used
-		}
-
-		private void listReferral_MouseEnter(object sender,System.EventArgs e) {
-			mouseIsInListReferral=true;
-		}
-
-		private void listReferral_MouseLeave(object sender,System.EventArgs e) {
-			mouseIsInListReferral=false;
+			firstRefNameTypeAbbr+=firstRefType;//firstRefType could be blank, but it will show regardless of the length of firstRefName
+			//Example: Schmidt, John Jacob Jingleheimer, DDS (doctor) (+5 more) 
+			//might be shortened to : Schmidt, John Jaco (doctor) (+5 more) 
+			textReferredFrom.Text=firstRefNameTypeAbbr;//text box might be something like: Schmidt, John Jaco (doctor) (+5 more)
+			_referredFromToolTip.SetToolTip(textReferredFrom,firstRefFullName+firstRefType);//tooltip will be: Schmidt, John Jacob Jingleheimer, DDS (doctor)
 		}
 		#endregion Referral
 
@@ -1185,6 +1145,7 @@ namespace OpenDental {
 		#endregion InsPlanPick
 
 		private void butOK_Click(object sender,EventArgs e) {
+			#region Validation
 			if(  textBirthdate1.errorProvider1.GetError(textBirthdate1)!=""
 				|| textBirthdate2.errorProvider1.GetError(textBirthdate2)!=""
 				|| textBirthdate3.errorProvider1.GetError(textBirthdate3)!=""
@@ -1199,24 +1160,25 @@ namespace OpenDental {
 				MsgBox.Show(this,"Guarantor name must be entered.");
 				return;
 			}
-			// Validate Insurance subscribers--------------------------------------------------------------------------------------------------------
-			if((comboSubscriber1.SelectedIndex==2 || comboSubscriber2.SelectedIndex==2) && (textFName2.Text=="" || textLName2.Text=="")){
+			#region Validate Insurance Subscribers
+			if((comboSubscriber1.SelectedIndex==2 || comboSubscriber2.SelectedIndex==2) && (textFName2.Text=="" || textLName2.Text=="")) {
 				MsgBox.Show(this,"Subscriber must have name entered.");
 				return;
 			}
-			if((comboSubscriber1.SelectedIndex==3 || comboSubscriber2.SelectedIndex==3) && (textFName3.Text=="" || textLName3.Text=="")){
+			if((comboSubscriber1.SelectedIndex==3 || comboSubscriber2.SelectedIndex==3) && (textFName3.Text=="" || textLName3.Text=="")) {
 				MsgBox.Show(this,"Subscriber must have name entered.");
 				return;
 			}
-			if((comboSubscriber1.SelectedIndex==4 || comboSubscriber2.SelectedIndex==4) && (textFName4.Text=="" || textLName4.Text=="")){
+			if((comboSubscriber1.SelectedIndex==4 || comboSubscriber2.SelectedIndex==4) && (textFName4.Text=="" || textLName4.Text=="")) {
 				MsgBox.Show(this,"Subscriber must have name entered.");
 				return;
 			}
-			if((comboSubscriber1.SelectedIndex==5 || comboSubscriber2.SelectedIndex==5) && (textFName5.Text=="" || textLName5.Text=="")){
+			if((comboSubscriber1.SelectedIndex==5 || comboSubscriber2.SelectedIndex==5) && (textFName5.Text=="" || textLName5.Text=="")) {
 				MsgBox.Show(this,"Subscriber must have name entered.");
 				return;
 			}
-			// Validate Insurance Plans--------------------------------------------------------------------------------------------------------------
+			#endregion Validate Insurance Subscribers
+			#region Validate Insurance Plans
 			bool insComplete1=false;
 			bool insComplete2=false;
 			if(comboSubscriber1.SelectedIndex>0
@@ -1236,7 +1198,7 @@ namespace OpenDental {
 				|| textSubscriberID1.Text!=""
 				|| textCarrier1.Text!="")
 			{
-				if(!insComplete1){
+				if(!insComplete1) {
 					MsgBox.Show(this,"Subscriber, Subscriber ID, and Carrier are all required fields if adding insurance.");
 					return;
 				}
@@ -1245,7 +1207,7 @@ namespace OpenDental {
 				|| textSubscriberID2.Text!=""
 				|| textCarrier2.Text!="")
 			{
-				if(!insComplete2){
+				if(!insComplete2) {
 					MsgBox.Show(this,"Subscriber, Subscriber ID, and Carrier are all required fields if adding insurance.");
 					return;
 				}
@@ -1256,7 +1218,7 @@ namespace OpenDental {
 				|| checkInsOne4.Checked
 				|| checkInsOne5.Checked)
 			{
-				if(!insComplete1){
+				if(!insComplete1) {
 					MsgBox.Show(this,"Subscriber, Subscriber ID, and Carrier are all required fields if adding insurance.");
 					return;
 				}
@@ -1267,13 +1229,14 @@ namespace OpenDental {
 				|| checkInsTwo4.Checked
 				|| checkInsTwo5.Checked)
 			{
-				if(!insComplete2){
+				if(!insComplete2) {
 					MsgBox.Show(this,"Subscriber, Subscriber ID, and Carrier are all required fields if adding insurance.");
 					return;
 				}
 			}
-			//Validate Insurance subscriptions---------------------------------------------------------------------------------------------------
-			if(insComplete1){
+			#endregion Validate Insurance Plans
+			#region Validate Insurance Subscriptions
+			if(insComplete1) {
 				if(!checkInsOne1.Checked
 					&& !checkInsOne2.Checked
 					&& !checkInsOne3.Checked
@@ -1293,13 +1256,12 @@ namespace OpenDental {
 					return;
 				}
 			}
-			if(insComplete2){
+			if(insComplete2) {
 				if(!checkInsTwo1.Checked
 					&& !checkInsTwo2.Checked
 					&& !checkInsTwo3.Checked
 					&& !checkInsTwo4.Checked
-					&& !checkInsTwo5.Checked)
-				{
+					&& !checkInsTwo5.Checked) {
 					MsgBox.Show(this,"Insurance information 2 has been filled in, but has not been assigned to any patients.");
 					return;
 				}
@@ -1313,261 +1275,132 @@ namespace OpenDental {
 					return;
 				}
 			}
-			//End of validation------------------------------------------------------------------------------------------
-			//Create Guarantor-------------------------------------------------------------------------------------------
-			Patient guar=new Patient();
-			guar.LName=textLName1.Text;
-			guar.FName=textFName1.Text;
-			if(listGender1.SelectedIndex==0){
-				guar.Gender=PatientGender.Male;
+			#endregion Validate Insurance Subscriptions
+			#endregion Validation
+			#region Create Family
+			Patient[] arrayPatsInFam=new Patient[5];
+			Patient pat=new Patient();
+			pat.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
+			pat.PatStatus=PatientStatus.Patient;
+			pat.HmPhone=textHmPhone.Text;
+			pat.Address=textAddress.Text;
+			pat.Address2=textAddress2.Text;
+			pat.City=textCity.Text;
+			pat.State=textState.Text;
+			pat.Country=textCountry.Text;
+			pat.Zip=textZip.Text;
+			pat.AddrNote=textAddrNotes.Text;
+			pat.ClinicNum=FormOpenDental.ClinicNum;
+			RefAttach refAttachCur=new RefAttach();
+			refAttachCur.ReferralNum=_refCur.ReferralNum;
+			refAttachCur.IsFrom=true;
+			refAttachCur.RefDate=DateTimeOD.Today;
+			if(_refCur.IsDoctor) {//whether using ehr or not
+				refAttachCur.IsTransitionOfCare=true;
 			}
-			else{
-				guar.Gender=PatientGender.Female;
-			}
-			if(listPosition1.SelectedIndex==0){
-				guar.Position=PatientPosition.Single;
-			}
-			else{
-				guar.Position=PatientPosition.Married;
-			}
-			guar.Birthdate=PIn.Date(textBirthdate1.Text);
-			guar.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-			guar.PatStatus=PatientStatus.Patient;
-			guar.PriProv=ProviderC.ListShort[comboPriProv1.SelectedIndex].ProvNum;
-			if(comboSecProv1.SelectedIndex>0){
-				guar.SecProv=ProviderC.ListShort[comboSecProv1.SelectedIndex-1].ProvNum;
-			}
-			guar.HmPhone=textHmPhone.Text;
-			guar.Address=textAddress.Text;
-			guar.Address2=textAddress2.Text;
-			guar.City=textCity.Text;
-			guar.State=textState.Text;
-			guar.Country=textCountry.Text;
-			guar.Zip=textZip.Text;
-			guar.AddrNote=textAddrNotes.Text;
-			guar.ClinicNum=FormOpenDental.ClinicNum;
-			Patients.Insert(guar,false);
-			CustReference custRef=new CustReference();
-			custRef.PatNum=guar.PatNum;
-			CustReferences.Insert(custRef);
-			Patient guarOld=guar.Copy();
-			guar.Guarantor=guar.PatNum;
-			Patients.Update(guar,guarOld);
-			RefAttach refAttach;
-			if(textReferral.Text!=""){
-				//selectedReferral will already be set if user picked from list.
-				//but, if selectedReferral doesn't match data in boxes, then clear it.
-				if(selectedReferral!=null
-					&& (selectedReferral.LName!=textReferral.Text
-					|| selectedReferral.FName!=textReferralFName.Text))
-				{
-					selectedReferral=null;
+			refAttachCur.ItemOrder=1;
+			for(int i=0;i<arrayPatsInFam.Length;i++) {
+				//this is just in case, since we are using the same Patient object for every family member inserted
+				//probably not necessary since inserting will assign a new PatNum
+				pat.PatNum=0;
+				switch(i) {
+					case 0://guarantor
+						pat.LName=textLName1.Text;
+						pat.FName=textFName1.Text;
+						pat.Gender=(PatientGender)listGender1.SelectedIndex;
+						pat.Position=(PatientPosition)listPosition1.SelectedIndex;
+						pat.Birthdate=PIn.Date(textBirthdate1.Text);
+						pat.PriProv=ProviderC.ListShort[comboPriProv1.SelectedIndex].ProvNum;
+						if(comboSecProv1.SelectedIndex>0) {
+							pat.SecProv=ProviderC.ListShort[comboSecProv1.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
+						}
+						break;
+					case 1://patient 2
+						if(textFName2.Text=="" || textLName2.Text=="") {
+							continue;
+						}
+						pat.PatNum=0;//may not be necessary, insert pat again with new values, insert will assign new PatNum
+						pat.LName=textLName2.Text;
+						pat.FName=textFName2.Text;
+						pat.Gender=(PatientGender)listGender2.SelectedIndex;
+						pat.Position=(PatientPosition)listPosition2.SelectedIndex;
+						pat.Birthdate=PIn.Date(textBirthdate2.Text);
+						pat.PriProv=ProviderC.ListShort[comboPriProv2.SelectedIndex].ProvNum;
+						if(comboSecProv2.SelectedIndex>0) {
+							pat.SecProv=ProviderC.ListShort[comboSecProv2.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
+						}
+						break;
+					case 2://patient 3
+						if(textFName3.Text=="" || textLName3.Text=="") {
+							continue;
+						}
+						pat.PatNum=0;//may not be necessary, insert pat again with new values, insert will assign new PatNum
+						pat.LName=textLName3.Text;
+						pat.FName=textFName3.Text;
+						pat.Gender=(PatientGender)listGender3.SelectedIndex;
+						pat.Position=PatientPosition.Child;
+						pat.Birthdate=PIn.Date(textBirthdate3.Text);
+						pat.PriProv=ProviderC.ListShort[comboPriProv3.SelectedIndex].ProvNum;
+						if(comboSecProv3.SelectedIndex>0) {
+							pat.SecProv=ProviderC.ListShort[comboSecProv3.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
+						}
+						break;
+					case 3://patient 4
+						if(textFName4.Text=="" || textLName4.Text=="") {
+							continue;
+						}
+						pat.PatNum=0;//may not be necessary, insert pat again with new values, insert will assign new PatNum
+						pat.LName=textLName4.Text;
+						pat.FName=textFName4.Text;
+						pat.Gender=(PatientGender)listGender4.SelectedIndex;
+						pat.Position=PatientPosition.Child;
+						pat.Birthdate=PIn.Date(textBirthdate4.Text);
+						pat.PriProv=ProviderC.ListShort[comboPriProv4.SelectedIndex].ProvNum;
+						if(comboSecProv4.SelectedIndex>0) {
+							pat.SecProv=ProviderC.ListShort[comboSecProv4.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
+						}
+						break;
+					case 4://patient 5
+						if(textFName5.Text=="" || textLName5.Text=="") {
+							continue;
+						}
+						pat.PatNum=0;//may not be necessary, insert pat again with new values, insert will assign new PatNum
+						pat.LName=textLName5.Text;
+						pat.FName=textFName5.Text;
+						pat.Gender=(PatientGender)listGender5.SelectedIndex;
+						pat.Position=PatientPosition.Child;
+						pat.Birthdate=PIn.Date(textBirthdate5.Text);
+						pat.PriProv=ProviderC.ListShort[comboPriProv5.SelectedIndex].ProvNum;
+						if(comboSecProv5.SelectedIndex>0) {
+							pat.SecProv=ProviderC.ListShort[comboSecProv5.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
+						}
+						break;
 				}
-				if(selectedReferral==null){
-					selectedReferral=new Referral();
-					selectedReferral.LName=textReferral.Text;
-					selectedReferral.FName=textReferralFName.Text;
-					Referrals.Insert(selectedReferral);
+				Patients.Insert(pat,false);
+				//if this is the first family member it is the guarantor, so set pat.Guarantor=pat.PatNum and update
+				//if this is not the first family member, the guarantor has been inserted and pat.Guarantor will already be set before inserting
+				if(i==0) {
+					Patient patOld=pat.Copy();
+					pat.Guarantor=pat.PatNum;
+					Patients.Update(pat,patOld);
 				}
-				//Now we will always have a valid referral to attach.  We will use it again for the other family members.
-				refAttach=new RefAttach();
-				refAttach.IsFrom=true;
-				refAttach.RefDate=DateTimeOD.Today;
-				refAttach.ReferralNum=selectedReferral.ReferralNum;
-				refAttach.PatNum=guar.PatNum;
-				RefAttaches.Insert(refAttach);
-				SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,refAttach.PatNum,"Referred From "+Referrals.GetNameFL(refAttach.ReferralNum));
-			}
-			//Patient #2-----------------------------------------------------------------------------------------------------
-			Patient pat2=null;
-			if(textFName2.Text!="" && textLName2.Text!=""){
-				pat2=new Patient();
-				pat2.LName=textLName2.Text;
-				pat2.FName=textFName2.Text;
-				if(listGender2.SelectedIndex==0){
-					pat2.Gender=PatientGender.Male;
+				arrayPatsInFam[i]=pat.Copy();//add patient to local patient array of family members, arrayPatsInFam[0] will be the guarantor
+				if(_refCur!=null) {
+					refAttachCur.PatNum=pat.PatNum;
+					RefAttaches.Insert(refAttachCur);
+					SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,pat.PatNum,"Referred From "+Referrals.GetNameFL(refAttachCur.ReferralNum));
 				}
-				else{
-					pat2.Gender=PatientGender.Female;
-				}
-				if(listPosition2.SelectedIndex==0){
-					pat2.Position=PatientPosition.Single;
-				}
-				else{
-					pat2.Position=PatientPosition.Married;
-				}
-				pat2.Birthdate=PIn.Date(textBirthdate2.Text);
-				pat2.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-				pat2.PatStatus=PatientStatus.Patient;
-				pat2.PriProv=ProviderC.ListShort[comboPriProv2.SelectedIndex].ProvNum;
-				if(comboSecProv2.SelectedIndex>0){
-					pat2.SecProv=ProviderC.ListShort[comboSecProv2.SelectedIndex-1].ProvNum;
-				}
-				pat2.HmPhone=textHmPhone.Text;
-				pat2.Address=textAddress.Text;
-				pat2.Address2=textAddress2.Text;
-				pat2.City=textCity.Text;
-				pat2.State=textState.Text;
-				pat2.Country=textCountry.Text;
-				pat2.Zip=textZip.Text;
-				pat2.AddrNote=textAddrNotes.Text;
-				pat2.ClinicNum=FormOpenDental.ClinicNum;;
-				pat2.Guarantor=guar.Guarantor;
-				Patients.Insert(pat2,false);
-				custRef=new CustReference();
-				custRef.PatNum=pat2.PatNum;
+				CustReference custRef=new CustReference();
+				custRef.PatNum=pat.PatNum;
 				CustReferences.Insert(custRef);
-				if(textReferral.Text!=""){
-					//selectedReferral will already have been set in the guarantor loop
-					refAttach=new RefAttach();
-					refAttach.IsFrom=true;
-					refAttach.RefDate=DateTimeOD.Today;
-					refAttach.ReferralNum=selectedReferral.ReferralNum;
-					refAttach.PatNum=pat2.PatNum;
-					RefAttaches.Insert(refAttach);
-					SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,refAttach.PatNum,"Referred From "+Referrals.GetNameFL(refAttach.ReferralNum));
-				}
 			}
-			//Patient #3-----------------------------------------------------------------------------------------------------
-			Patient pat3=null;
-			if(textFName3.Text!="" && textLName3.Text!=""){
-				pat3=new Patient();
-				pat3.LName=textLName3.Text;
-				pat3.FName=textFName3.Text;
-				if(listGender3.SelectedIndex==0){
-					pat3.Gender=PatientGender.Male;
-				}
-				else{
-					pat3.Gender=PatientGender.Female;
-				}
-				pat3.Position=PatientPosition.Child;
-				pat3.Birthdate=PIn.Date(textBirthdate3.Text);
-				pat3.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-				pat3.PatStatus=PatientStatus.Patient;
-				pat3.PriProv=ProviderC.ListShort[comboPriProv3.SelectedIndex].ProvNum;
-				if(comboSecProv3.SelectedIndex>0){
-					pat3.SecProv=ProviderC.ListShort[comboSecProv3.SelectedIndex-1].ProvNum;
-				}
-				pat3.HmPhone=textHmPhone.Text;
-				pat3.Address=textAddress.Text;
-				pat3.Address2=textAddress2.Text;
-				pat3.City=textCity.Text;
-				pat3.State=textState.Text;
-				pat3.Country=textCountry.Text;
-				pat3.Zip=textZip.Text;
-				pat3.AddrNote=textAddrNotes.Text;
-				pat3.ClinicNum=FormOpenDental.ClinicNum;
-				pat3.Guarantor=guar.Guarantor;
-				Patients.Insert(pat3,false);
-				custRef=new CustReference();
-				custRef.PatNum=pat3.PatNum;
-				CustReferences.Insert(custRef);
-				if(textReferral.Text!=""){
-					//selectedReferral will already have been set in the guarantor loop
-					refAttach=new RefAttach();
-					refAttach.IsFrom=true;
-					refAttach.RefDate=DateTimeOD.Today;
-					refAttach.ReferralNum=selectedReferral.ReferralNum;
-					refAttach.PatNum=pat3.PatNum;
-					RefAttaches.Insert(refAttach);
-					SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,refAttach.PatNum,"Referred From "+Referrals.GetNameFL(refAttach.ReferralNum));
-				}
-			}
-			//Patient #4-----------------------------------------------------------------------------------------------------
-			Patient pat4=null;
-			if(textFName4.Text!="" && textLName4.Text!=""){
-				pat4=new Patient();
-				pat4.LName=textLName4.Text;
-				pat4.FName=textFName4.Text;
-				if(listGender4.SelectedIndex==0){
-					pat4.Gender=PatientGender.Male;
-				}
-				else{
-					pat4.Gender=PatientGender.Female;
-				}
-				pat4.Position=PatientPosition.Child;
-				pat4.Birthdate=PIn.Date(textBirthdate4.Text);
-				pat4.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-				pat4.PatStatus=PatientStatus.Patient;
-				pat4.PriProv=ProviderC.ListShort[comboPriProv4.SelectedIndex].ProvNum;
-				if(comboSecProv4.SelectedIndex>0){
-					pat4.SecProv=ProviderC.ListShort[comboSecProv4.SelectedIndex-1].ProvNum;
-				}
-				pat4.HmPhone=textHmPhone.Text;
-				pat4.Address=textAddress.Text;
-				pat4.Address2=textAddress2.Text;
-				pat4.City=textCity.Text;
-				pat4.State=textState.Text;
-				pat4.Country=textCountry.Text;
-				pat4.Zip=textZip.Text;
-				pat4.AddrNote=textAddrNotes.Text;
-				pat4.ClinicNum=FormOpenDental.ClinicNum;
-				pat4.Guarantor=guar.Guarantor;
-				Patients.Insert(pat4,false);
-				custRef=new CustReference();
-				custRef.PatNum=pat4.PatNum;
-				CustReferences.Insert(custRef);
-				if(textReferral.Text!=""){
-					//selectedReferral will already have been set in the guarantor loop
-					refAttach=new RefAttach();
-					refAttach.IsFrom=true;
-					refAttach.RefDate=DateTimeOD.Today;
-					refAttach.ReferralNum=selectedReferral.ReferralNum;
-					refAttach.PatNum=pat4.PatNum;
-					RefAttaches.Insert(refAttach);
-					SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,refAttach.PatNum,"Referred From "+Referrals.GetNameFL(refAttach.ReferralNum));
-				}
-			}
-			//Patient #5-----------------------------------------------------------------------------------------------------
-			Patient pat5=null;
-			if(textFName5.Text!="" && textLName5.Text!=""){
-				pat5=new Patient();
-				pat5.LName=textLName5.Text;
-				pat5.FName=textFName5.Text;
-				if(listGender5.SelectedIndex==0){
-					pat5.Gender=PatientGender.Male;
-				}
-				else{
-					pat5.Gender=PatientGender.Female;
-				}
-				pat5.Position=PatientPosition.Child;
-				pat5.Birthdate=PIn.Date(textBirthdate5.Text);
-				pat5.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-				pat5.PatStatus=PatientStatus.Patient;
-				pat5.PriProv=ProviderC.ListShort[comboPriProv5.SelectedIndex].ProvNum;
-				if(comboSecProv5.SelectedIndex>0){
-					pat5.SecProv=ProviderC.ListShort[comboSecProv5.SelectedIndex-1].ProvNum;
-				}
-				pat5.HmPhone=textHmPhone.Text;
-				pat5.Address=textAddress.Text;
-				pat5.Address2=textAddress2.Text;
-				pat5.City=textCity.Text;
-				pat5.State=textState.Text;
-				pat5.Country=textCountry.Text;
-				pat5.Zip=textZip.Text;
-				pat5.AddrNote=textAddrNotes.Text;
-				pat5.ClinicNum=FormOpenDental.ClinicNum;
-				pat5.Guarantor=guar.Guarantor;
-				Patients.Insert(pat5,false);
-				custRef=new CustReference();
-				custRef.PatNum=pat5.PatNum;
-				CustReferences.Insert(custRef);
-				if(textReferral.Text!=""){
-					//selectedReferral will already have been set in the guarantor loop
-					refAttach=new RefAttach();
-					refAttach.IsFrom=true;
-					refAttach.RefDate=DateTimeOD.Today;
-					refAttach.ReferralNum=selectedReferral.ReferralNum;
-					refAttach.PatNum=pat5.PatNum;
-					RefAttaches.Insert(refAttach);
-					SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,refAttach.PatNum,"Referred From "+Referrals.GetNameFL(refAttach.ReferralNum));
-				}
-			}
-			//Insurance------------------------------------------------------------------------------------------------------------
+			#endregion Create Family
+			#region Insurance
 			InsSub sub1=null;
 			InsSub sub2=null;
-			if(selectedPlan1!=null){
-				//validate the ins fields.  If they don't match perfectly, then set it to null
+			#region Validate Plans
+			//validate the ins fields.  If they don't match perfectly, then set the selected plan to null
+			if(selectedPlan1!=null) {
 				if(Employers.GetName(selectedPlan1.EmployerNum)!=textEmployer1.Text
 					|| Carriers.GetName(selectedPlan1.CarrierNum)!=textCarrier1.Text
 					|| selectedPlan1.GroupName!=textGroupName1.Text
@@ -1576,7 +1409,7 @@ namespace OpenDental {
 					selectedPlan1=null;
 				}
 			}
-			if(selectedPlan2!=null){
+			if(selectedPlan2!=null) {
 				if(Employers.GetName(selectedPlan2.EmployerNum)!=textEmployer2.Text
 					|| Carriers.GetName(selectedPlan2.CarrierNum)!=textCarrier2.Text
 					|| selectedPlan2.GroupName!=textGroupName2.Text
@@ -1585,74 +1418,61 @@ namespace OpenDental {
 					selectedPlan2=null;
 				}
 			}
-			if(selectedCarrier1!=null){
-				//validate the carrier fields.  If they don't match perfectly, then set it to null
-				if(selectedCarrier1.CarrierName!=textCarrier1.Text
-					|| selectedCarrier1.Phone!=textPhone1.Text)
-				{
+			//validate the carrier fields.  If they don't match perfectly, then set the selected plan to null
+			if(selectedCarrier1!=null) {
+				if(selectedCarrier1.CarrierName!=textCarrier1.Text || selectedCarrier1.Phone!=textPhone1.Text) {
 					selectedCarrier1=null;
 				}
 			}
-			if(selectedCarrier2!=null){
-				if(selectedCarrier2.CarrierName!=textCarrier2.Text
-					|| selectedCarrier2.Phone!=textPhone2.Text)
-				{
+			if(selectedCarrier2!=null) {
+				if(selectedCarrier2.CarrierName!=textCarrier2.Text || selectedCarrier2.Phone!=textPhone2.Text) {
 					selectedCarrier2=null;
 				}
 			}
-			if(insComplete1){
-				if(selectedCarrier1==null){
+			#endregion Validate Plans
+			#region Insert InsPlans, Benefits, and InsSubs
+			#region Primary Ins
+			if(insComplete1) {
+				if(selectedCarrier1==null) {
 					//get a carrier, possibly creating a new one if needed.
 					selectedCarrier1=Carriers.GetByNameAndPhone(textCarrier1.Text,textPhone1.Text);
 				}
-				long empNum1=Employers.GetEmployerNum(textEmployer1.Text);
-				if(selectedPlan1==null){
+				if(selectedPlan1==null) {
 					//don't try to get a copy of an existing plan. Instead, start from scratch.
 					selectedPlan1=new InsPlan();
-					selectedPlan1.EmployerNum=empNum1;
+					selectedPlan1.EmployerNum=Employers.GetEmployerNum(textEmployer1.Text);
 					selectedPlan1.CarrierNum=selectedCarrier1.CarrierNum;
 					selectedPlan1.GroupName=textGroupName1.Text;
 					selectedPlan1.GroupNum=textGroupNum1.Text;
 					selectedPlan1.PlanType="";
 					InsPlans.Insert(selectedPlan1);
-					Benefit ben;
-					for(int i=0;i<CovCatC.ListShort.Count;i++){
-						if(CovCatC.ListShort[i].DefaultPercent==-1){
+					Benefit ben=new Benefit();
+					ben.PlanNum=selectedPlan1.PlanNum;//same for all benefits inserted
+					ben.BenefitType=InsBenefitType.CoInsurance;//same for all benefits inserted from CovCatC.ListShort
+					ben.MonetaryAmt=-1;//same for all benefits inserted from CovCatC.ListShort
+					ben.TimePeriod=BenefitTimePeriod.CalendarYear;//same for all benefits inserted
+					ben.CodeNum=0;//same for all benefits inserted
+					ben.CoverageLevel=BenefitCoverageLevel.None;//same for all benefits inserted from CovCatC.ListShort
+					for(int i=0;i<CovCatC.ListShort.Count;i++) {
+						if(CovCatC.ListShort[i].DefaultPercent==-1) {
 							continue;
 						}
-						ben=new Benefit();
-						ben.BenefitType=InsBenefitType.CoInsurance;
 						ben.CovCatNum=CovCatC.ListShort[i].CovCatNum;
-						ben.PlanNum=selectedPlan1.PlanNum;
 						ben.Percent=CovCatC.ListShort[i].DefaultPercent;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.CodeNum=0;
 						Benefits.Insert(ben);
 					}
+					ben.BenefitType=InsBenefitType.Deductible;//same for Diagnostic and RoutinePreventive
+					ben.Percent=-1;//same for Diagnostic and RoutinePreventive
+					ben.MonetaryAmt=0;//same for Diagnostic and RoutinePreventive
+					ben.CoverageLevel=BenefitCoverageLevel.Individual;//same for Diagnostic and RoutinePreventive
 					//Zero deductible diagnostic
 					if(CovCats.GetForEbenCat(EbenefitCategory.Diagnostic)!=null) {
-						ben=new Benefit();
-						ben.CodeNum=0;
-						ben.BenefitType=InsBenefitType.Deductible;
 						ben.CovCatNum=CovCats.GetForEbenCat(EbenefitCategory.Diagnostic).CovCatNum;
-						ben.PlanNum=selectedPlan1.PlanNum;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.MonetaryAmt=0;
-						ben.Percent=-1;
-						ben.CoverageLevel=BenefitCoverageLevel.Individual;
 						Benefits.Insert(ben);
 					}
 					//Zero deductible preventive
 					if(CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive)!=null) {
-						ben=new Benefit();
-						ben.CodeNum=0;
-						ben.BenefitType=InsBenefitType.Deductible;
 						ben.CovCatNum=CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive).CovCatNum;
-						ben.PlanNum=selectedPlan1.PlanNum;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.MonetaryAmt=0;
-						ben.Percent=-1;
-						ben.CoverageLevel=BenefitCoverageLevel.Individual;
 						Benefits.Insert(ben);
 					}
 				}
@@ -1662,76 +1482,54 @@ namespace OpenDental {
 				sub1.ReleaseInfo=true;
 				sub1.DateEffective=DateTime.MinValue;
 				sub1.DateTerm=DateTime.MinValue;
-				if(comboSubscriber1.SelectedIndex==1){
-					sub1.Subscriber=guar.PatNum;
-				}
-				if(comboSubscriber1.SelectedIndex==2){
-					sub1.Subscriber=pat2.PatNum;
-				}
-				if(comboSubscriber1.SelectedIndex==3){
-					sub1.Subscriber=pat3.PatNum;
-				}
-				if(comboSubscriber1.SelectedIndex==4){
-					sub1.Subscriber=pat4.PatNum;
-				}
-				if(comboSubscriber1.SelectedIndex==5){
-					sub1.Subscriber=pat5.PatNum;
+				if(comboSubscriber1.SelectedIndex>0) {//comboSubscriber has been validated to contain the same number of indexes as the family list
+					sub1.Subscriber=arrayPatsInFam[comboSubscriber1.SelectedIndex-1].PatNum;
 				}
 				sub1.SubscriberID=textSubscriberID1.Text;
 				InsSubs.Insert(sub1);
 			}
-			if(insComplete2){
-				if(selectedCarrier2==null){
+			#endregion Primary Ins
+			#region Secondary Ins
+			if(insComplete2) {
+				if(selectedCarrier2==null) {
 					selectedCarrier2=Carriers.GetByNameAndPhone(textCarrier2.Text,textPhone2.Text);
 				}
-				long empNum2=Employers.GetEmployerNum(textEmployer2.Text);
-				if(selectedPlan2==null){
+				if(selectedPlan2==null) {
 					//don't try to get a copy of an existing plan. Instead, start from scratch.
 					selectedPlan2=new InsPlan();
-					selectedPlan2.EmployerNum=empNum2;
+					selectedPlan2.EmployerNum=Employers.GetEmployerNum(textEmployer2.Text);
 					selectedPlan2.CarrierNum=selectedCarrier2.CarrierNum;
 					selectedPlan2.GroupName=textGroupName2.Text;
 					selectedPlan2.GroupNum=textGroupNum2.Text;
 					selectedPlan2.PlanType="";
 					InsPlans.Insert(selectedPlan2);
-					Benefit ben;
-					for(int i=0;i<CovCatC.ListShort.Count;i++){
-						if(CovCatC.ListShort[i].DefaultPercent==-1){
+					Benefit ben=new Benefit();
+					ben.PlanNum=selectedPlan2.PlanNum;//same for all benefits inserted
+					ben.BenefitType=InsBenefitType.CoInsurance;//same for all benefits inserted from CovCatC.ListShort
+					ben.MonetaryAmt=-1;//same for all benefits inserted from CovCatC.ListShort
+					ben.TimePeriod=BenefitTimePeriod.CalendarYear;//same for all benefits inserted
+					ben.CodeNum=0;//same for all benefits inserted
+					ben.CoverageLevel=BenefitCoverageLevel.None;//same for all benefits inserted from CovCatC.ListShort
+					for(int i=0;i<CovCatC.ListShort.Count;i++) {
+						if(CovCatC.ListShort[i].DefaultPercent==-1) {
 							continue;
 						}
-						ben=new Benefit();
-						ben.BenefitType=InsBenefitType.CoInsurance;
 						ben.CovCatNum=CovCatC.ListShort[i].CovCatNum;
-						ben.PlanNum=selectedPlan2.PlanNum;
 						ben.Percent=CovCatC.ListShort[i].DefaultPercent;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.CodeNum=0;
 						Benefits.Insert(ben);
 					}
+					ben.BenefitType=InsBenefitType.Deductible;//same for Diagnostic and RoutinePreventive
+					ben.Percent=-1;//same for Diagnostic and RoutinePreventive
+					ben.MonetaryAmt=0;//same for Diagnostic and RoutinePreventive
+					ben.CoverageLevel=BenefitCoverageLevel.Individual;//same for Diagnostic and RoutinePreventive
 					//Zero deductible diagnostic
 					if(CovCats.GetForEbenCat(EbenefitCategory.Diagnostic)!=null) {
-						ben=new Benefit();
-						ben.CodeNum=0;
-						ben.BenefitType=InsBenefitType.Deductible;
 						ben.CovCatNum=CovCats.GetForEbenCat(EbenefitCategory.Diagnostic).CovCatNum;
-						ben.PlanNum=selectedPlan2.PlanNum;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.MonetaryAmt=0;
-						ben.Percent=-1;
-						ben.CoverageLevel=BenefitCoverageLevel.Individual;
 						Benefits.Insert(ben);
 					}
 					//Zero deductible preventive
 					if(CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive)!=null) {
-						ben=new Benefit();
-						ben.CodeNum=0;
-						ben.BenefitType=InsBenefitType.Deductible;
 						ben.CovCatNum=CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive).CovCatNum;
-						ben.PlanNum=selectedPlan2.PlanNum;
-						ben.TimePeriod=BenefitTimePeriod.CalendarYear;
-						ben.MonetaryAmt=0;
-						ben.Percent=-1;
-						ben.CoverageLevel=BenefitCoverageLevel.Individual;
 						Benefits.Insert(ben);
 					}
 				}
@@ -1741,274 +1539,151 @@ namespace OpenDental {
 				sub2.ReleaseInfo=true;
 				sub2.DateEffective=DateTime.MinValue;
 				sub2.DateTerm=DateTime.MinValue;
-				if(comboSubscriber2.SelectedIndex==1){
-					sub2.Subscriber=guar.PatNum;
-				}
-				if(comboSubscriber2.SelectedIndex==2){
-					sub2.Subscriber=pat2.PatNum;
-				}
-				if(comboSubscriber2.SelectedIndex==3){
-					sub2.Subscriber=pat3.PatNum;
-				}
-				if(comboSubscriber2.SelectedIndex==4){
-					sub2.Subscriber=pat4.PatNum;
-				}
-				if(comboSubscriber2.SelectedIndex==5){
-					sub2.Subscriber=pat5.PatNum;
+				if(comboSubscriber2.SelectedIndex>0) {//comboSubscriber has been validated to contain the same number of indexes as the family list
+					sub2.Subscriber=arrayPatsInFam[comboSubscriber2.SelectedIndex-1].PatNum;
 				}
 				sub2.SubscriberID=textSubscriberID2.Text;
 				InsSubs.Insert(sub2);
 			}
-			PatPlan patplan;
-			//attach insurance to subscriber--------------------------------------------------------------------------------
-			if(checkInsOne1.Checked){
-				patplan=new PatPlan();
-				//the only situation where ordinal would be 2 is if ins2 has this patient as the subscriber.
-				if(comboSubscriber2.SelectedIndex==1){
-					patplan.Ordinal=2;
-				}
-				else{
-					patplan.Ordinal=1;
-				}
-				patplan.PatNum=guar.PatNum;
-				patplan.InsSubNum=sub1.InsSubNum;
-				if(comboSubscriber1.SelectedIndex==1){
-					patplan.Relationship=Relat.Self;
-				}
-				else if(comboSubscriber1.SelectedIndex==2){
-					patplan.Relationship=Relat.Spouse;
-				}
-				else{
-					//the subscriber would never be a child
-				}
-				PatPlans.Insert(patplan);
+			#endregion Secondary Ins
+			#endregion Insert InsPlans, Benefits, and InsSubs
+			#region Create PatPlans
+			PatPlan patplan1=new PatPlan();
+			if(insComplete1) {
+				patplan1.InsSubNum=sub1.InsSubNum;
 			}
-			if(checkInsTwo1.Checked){
-				patplan=new PatPlan();
-				//the only situations where ordinal would be 1 is if ins1 is not checked or if ins2 has this patient as subscriber.
-				if(comboSubscriber2.SelectedIndex==1){
-					patplan.Ordinal=1;
-				}
-				else if(!checkInsOne1.Checked){
-					patplan.Ordinal=1;
-				}
-				else{
-					patplan.Ordinal=2;
-				}
-				patplan.PatNum=guar.PatNum;
-				patplan.InsSubNum=sub2.InsSubNum;
-				if(comboSubscriber2.SelectedIndex==1){
-					patplan.Relationship=Relat.Self;
-				}
-				else if(comboSubscriber2.SelectedIndex==2){
-					patplan.Relationship=Relat.Spouse;
-				}
-				else{
-					//the subscriber would never be a child
-				}
-				PatPlans.Insert(patplan);
+			PatPlan patplan2=new PatPlan();
+			if(insComplete2) {
+				patplan2.InsSubNum=sub2.InsSubNum;
 			}
-			//attach insurance to patient 2, the other parent----------------------------------------------------------------------
-			if(checkInsOne2.Checked){
-				patplan=new PatPlan();
-				//the only situation where ordinal would be 2 is if ins2 has this patient as the subscriber.
-				if(comboSubscriber2.SelectedIndex==2){
-					patplan.Ordinal=2;
+			for(int i=0;i<arrayPatsInFam.Length;i++) {//loop for each possible family member. Position 0 is the guarantor and is required but all others could be null
+				if(!insComplete1 && !insComplete2) {
+					break;
 				}
-				else{
-					patplan.Ordinal=1;
+				if(arrayPatsInFam[i]==null) {
+					continue;
 				}
-				patplan.PatNum=pat2.PatNum;
-				patplan.InsSubNum=sub1.InsSubNum;
-				if(comboSubscriber1.SelectedIndex==2){
-					patplan.Relationship=Relat.Self;
+				patplan1.PatNum=arrayPatsInFam[i].PatNum;
+				patplan1.Ordinal=1;
+				patplan1.Relationship=Relat.Child;//default realtionship to child, will be set to Self or Spouse for the two adults in the family
+				patplan2.PatNum=arrayPatsInFam[i].PatNum;
+				patplan2.Ordinal=2;
+				patplan2.Relationship=Relat.Child;//default realtionship to child, will be set to Self or Spouse for the two adults in the family
+				switch(i) {
+					case 0://guarantor, 1st adult
+						if(insComplete1 && checkInsOne1.Checked) {
+							//the only situation where ordinal would be 2 is if ins2 is checked and ins1 does not have this pat as the subscriber and ins2 does
+							if(checkInsTwo1.Checked && comboSubscriber1.SelectedIndex!=1 && comboSubscriber2.SelectedIndex==1) {//both combo boxes contain 'none'
+								patplan1.Ordinal=2;
+							}
+							patplan1.Relationship=Relat.Self;//the subscriber would never be a child, so default to Self
+							if(comboSubscriber1.SelectedIndex==2) {
+								patplan1.Relationship=Relat.Spouse;
+							}
+							PatPlans.Insert(patplan1);
+						}
+						if(insComplete2 && checkInsTwo1.Checked) {
+							//the only situations where ordinal would be 1 is if ins1 is not checked or if ins2 has this patient as subscriber and ins1 does not.
+							if(!checkInsOne1.Checked || (comboSubscriber2.SelectedIndex==1 && comboSubscriber1.SelectedIndex!=1))	{
+								patplan2.Ordinal=1;
+							}
+							patplan2.Relationship=Relat.Self;//the subscriber would never be a child, so default to Self
+							if(comboSubscriber2.SelectedIndex==2) {
+								patplan2.Relationship=Relat.Spouse;
+							}
+							PatPlans.Insert(patplan2);
+						}
+						continue;
+					case 1://patient 1, 2nd adult
+						if(insComplete1 && checkInsOne2.Checked) {
+							//the only situation where ordinal would be 2 is if ins2 is checked and ins1 does not have this pat as the subscriber and ins2 does
+							if(checkInsTwo2.Checked && comboSubscriber1.SelectedIndex!=2 && comboSubscriber2.SelectedIndex==2) {
+								patplan1.Ordinal=2;
+							}
+							patplan1.Relationship=Relat.Self;//the subscriber would never be a child, so default to Self
+							if(comboSubscriber1.SelectedIndex==1) {
+								patplan1.Relationship=Relat.Spouse;
+							}
+							PatPlans.Insert(patplan1);
+						}
+						if(insComplete2 && checkInsTwo2.Checked) {
+							//the only situations where ordinal would be 1 is if ins1 is not checked or if ins2 has this patient as subscriber and ins1 does not.
+							if(!checkInsOne2.Checked || (comboSubscriber2.SelectedIndex==2 && comboSubscriber1.SelectedIndex!=2))	{
+								patplan2.Ordinal=1;
+							}
+							patplan2.Relationship=Relat.Self;//the subscriber would never be a child, so default to Self
+							if(comboSubscriber2.SelectedIndex==1) {
+								patplan2.Relationship=Relat.Spouse;
+							}
+							PatPlans.Insert(patplan2);
+						}
+						continue;
+					case 2://patient 2, 1st child
+						if(insComplete1 && checkInsOne3.Checked) {
+							PatPlans.Insert(patplan1);
+						}
+						if(insComplete2 && checkInsTwo3.Checked) {
+							//the only situation where ordinal would be 1 is if ins1 is not checked.
+							if(!checkInsOne3.Checked) {
+								patplan2.Ordinal=1;
+							}
+							PatPlans.Insert(patplan2);
+						}
+						continue;
+					case 3://patient 3, 2nd child
+						if(insComplete1 && checkInsOne4.Checked) {
+							PatPlans.Insert(patplan1);
+						}
+						if(insComplete2 && checkInsTwo4.Checked) {
+							//the only situation where ordinal would be 1 is if ins1 is not checked.
+							if(!checkInsOne4.Checked) {
+								patplan2.Ordinal=1;
+							}
+							PatPlans.Insert(patplan2);
+						}
+						continue;
+					case 4://patient 4, 3rd child
+						if(insComplete1 && checkInsOne5.Checked) {
+							PatPlans.Insert(patplan1);
+						}
+						if(insComplete2 && checkInsTwo5.Checked) {
+							//the only situation where ordinal would be 1 is if ins1 is not checked.
+							if(!checkInsOne5.Checked) {
+								patplan2.Ordinal=1;
+							}
+							PatPlans.Insert(patplan2);
+						}
+						continue;
 				}
-				else if(comboSubscriber1.SelectedIndex==1){
-					patplan.Relationship=Relat.Spouse;
-				}
-				else{
-					//the subscriber would never be a child
-				}
-				PatPlans.Insert(patplan);
 			}
-			if(checkInsTwo2.Checked){
-				patplan=new PatPlan();
-				//the only situations where ordinal would be 1 is if ins1 is not checked or if ins2 has this patient as subscriber.
-				if(comboSubscriber2.SelectedIndex==2){
-					patplan.Ordinal=1;
-				}
-				else if(!checkInsOne2.Checked){
-					patplan.Ordinal=1;
-				}
-				else{
-					patplan.Ordinal=2;
-				}
-				patplan.PatNum=pat2.PatNum;
-				patplan.InsSubNum=sub2.InsSubNum;
-				if(comboSubscriber2.SelectedIndex==2){
-					patplan.Relationship=Relat.Self;
-				}
-				else if(comboSubscriber2.SelectedIndex==1){
-					patplan.Relationship=Relat.Spouse;
-				}
-				else{
-					//the subscriber would never be a child
-				}
-				PatPlans.Insert(patplan);
-			}
-			//attach insurance to patient 3, a child----------------------------------------------------------------------
-			if(checkInsOne3.Checked){
-				patplan=new PatPlan();
-				patplan.Ordinal=1;
-				patplan.PatNum=pat3.PatNum;
-				patplan.InsSubNum=sub1.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			if(checkInsTwo3.Checked){
-				patplan=new PatPlan();
-				//the only situation where ordinal would be 1 is if ins1 is not checked.
-				if(!checkInsOne3.Checked){
-					patplan.Ordinal=1;
-				}
-				else{
-					patplan.Ordinal=2;
-				}
-				patplan.PatNum=pat3.PatNum;
-				patplan.InsSubNum=sub2.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			//attach insurance to patient 4, a child----------------------------------------------------------------------
-			if(checkInsOne4.Checked){
-				patplan=new PatPlan();
-				patplan.Ordinal=1;
-				patplan.PatNum=pat4.PatNum;
-				patplan.InsSubNum=sub1.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			if(checkInsTwo4.Checked){
-				patplan=new PatPlan();
-				//the only situation where ordinal would be 1 is if ins1 is not checked.
-				if(!checkInsOne4.Checked){
-					patplan.Ordinal=1;
-				}
-				else{
-					patplan.Ordinal=2;
-				}
-				patplan.PatNum=pat4.PatNum;
-				patplan.InsSubNum=sub2.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			//attach insurance to patient 5, a child----------------------------------------------------------------------
-			if(checkInsOne5.Checked){
-				patplan=new PatPlan();
-				patplan.Ordinal=1;
-				patplan.PatNum=pat5.PatNum;
-				patplan.InsSubNum=sub1.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			if(checkInsTwo5.Checked){
-				patplan=new PatPlan();
-				//the only situation where ordinal would be 1 is if ins1 is not checked.
-				if(!checkInsOne5.Checked){
-					patplan.Ordinal=1;
-				}
-				else{
-					patplan.Ordinal=2;
-				}
-				patplan.PatNum=pat5.PatNum;
-				patplan.InsSubNum=sub2.InsSubNum;
-				patplan.Relationship=Relat.Child;
-				PatPlans.Insert(patplan);
-			}
-			SelectedPatNum=guar.PatNum;
+			#endregion Create PatPlans
+			#endregion Insurance
+			SelectedPatNum=arrayPatsInFam[0].PatNum;
+			#region Send HL7 if Applicable
 			//If there is an existing HL7 def enabled, send an ADT message for each patient inserted if there is an outbound ADT message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {
-				if(guar!=null) {
-					//new patients get the A04 ADT, updating existing patients we send an A08
-					MessageHL7 messageHL7=MessageConstructor.GenerateADT(guar,guar,EventTypeHL7.A04);
-					//Will be null if there is no outbound ADT message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=0;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=guar.PatNum;
-						HL7Msgs.Insert(hl7Msg);
-#if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
-#endif
+				for(int i=0;i<5;i++) {
+					if(arrayPatsInFam[i]==null) {
+						continue;
 					}
-				}
-				if(pat2!=null) {
 					//new patients get the A04 ADT, updating existing patients we send an A08
-					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat2,guar,EventTypeHL7.A04);
+					MessageHL7 messageHL7=MessageConstructor.GenerateADT(arrayPatsInFam[i],arrayPatsInFam[0],EventTypeHL7.A04);//arrayPatsInFam[0] is guar, never null
 					//Will be null if there is no outbound ADT message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=0;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=pat2.PatNum;
-						HL7Msgs.Insert(hl7Msg);
-#if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
-#endif
+					if(messageHL7==null) {
+						continue;
 					}
-				}
-				if(pat3!=null) {
-					//new patients get the A04 ADT, updating existing patients we send an A08
-					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat3,guar,EventTypeHL7.A04);
-					//Will be null if there is no outbound ADT message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=0;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=pat3.PatNum;
-						HL7Msgs.Insert(hl7Msg);
+					HL7Msg hl7Msg=new HL7Msg();
+					hl7Msg.AptNum=0;
+					hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
+					hl7Msg.MsgText=messageHL7.ToString();
+					hl7Msg.PatNum=arrayPatsInFam[i].PatNum;
+					HL7Msgs.Insert(hl7Msg);
 #if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
+					MessageBox.Show(this,messageHL7.ToString());
 #endif
-					}
-				}
-				if(pat4!=null) {
-					//new patients get the A04 ADT, updating existing patients we send an A08
-					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat4,guar,EventTypeHL7.A04);
-					//Will be null if there is no outbound ADT message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=0;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=pat4.PatNum;
-						HL7Msgs.Insert(hl7Msg);
-#if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
-#endif
-					}
-				}
-				if(pat5!=null) {
-					//new patients get the A04 ADT, updating existing patients we send an A08
-					MessageHL7 messageHL7=MessageConstructor.GenerateADT(pat5,guar,EventTypeHL7.A04);
-					//Will be null if there is no outbound ADT message defined, so do nothing
-					if(messageHL7!=null) {
-						HL7Msg hl7Msg=new HL7Msg();
-						hl7Msg.AptNum=0;
-						hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
-						hl7Msg.MsgText=messageHL7.ToString();
-						hl7Msg.PatNum=pat5.PatNum;
-						HL7Msgs.Insert(hl7Msg);
-#if DEBUG
-						MessageBox.Show(this,messageHL7.ToString());
-#endif
-					}
 				}
 			}
+			#endregion Send HL7 if Applicable
 			MessageBox.Show("Done");
 			DialogResult=DialogResult.OK;
 		}

@@ -3329,8 +3329,7 @@ namespace OpenDental{
 			FillReferrals();
 		}
 
-		///<summary>Fills the Referred From text box with all referral sources marked IsFrom.  One referral source per line with the oldest referral
-		///source (based on item order not RefDate) at the top.</summary>
+		///<summary>Fills the Referred From text box with the oldest (lowest ItemOrder) referral source marked IsFrom.</summary>
 		private void FillReferrals() {
 			_listRefAttaches=RefAttaches.Refresh(PatCur.PatNum);
 			string firstRefNameTypeAbbr="";
