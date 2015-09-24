@@ -64,8 +64,6 @@ namespace OpenDental.UI {
 				sigBoxTopaz.Visible=false;
 				sigBoxTopaz.Leave+=new EventHandler(sigBoxTopaz_Leave);
 				Controls.Add(sigBoxTopaz);
-				//It starts out accepting input. It will be set to 0 if a sig is already present.  It will be set back to 1 if note changes or if user clicks Clear.
-				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,1);
 				butTopazSign.BringToFront();
 				butClearSig.BringToFront();
 			//}
@@ -270,7 +268,7 @@ namespace OpenDental.UI {
 		}
 
 		private void sigBoxTopaz_Leave(object sender,EventArgs e) {
-			if(sigBox.GetTabletState()==1) {//if accepting input.
+			if(CodeBase.TopazWrapper.GetTopazState(sigBoxTopaz)==1) {//if accepting input.
 				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
 			}
 		}

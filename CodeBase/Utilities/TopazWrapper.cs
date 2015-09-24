@@ -39,6 +39,10 @@ namespace CodeBase {
 			((Topaz.SigPlusNET)topaz).SetSigString(signature);
 		}
 
+		public static int GetTopazState(Control topaz) {
+			return ((Topaz.SigPlusNET)topaz).GetTabletState();
+		}
+
 		///<summary>0=disable signature capture.  1=enable.</summary>
 		public static void SetTopazState(Control topaz,int state) {
 			((Topaz.SigPlusNET)topaz).SetTabletState(state);

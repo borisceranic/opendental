@@ -296,6 +296,7 @@ namespace OpenDental{
 				sigBoxTopaz.TabIndex=92;
 				sigBoxTopaz.Text="sigPlusNET1";
 				sigBoxTopaz.Visible=false;
+				sigBoxTopaz.Leave+=new EventHandler(sigBoxTopaz_Leave);
 				Controls.Add(sigBoxTopaz);
 				//It starts out accepting input. It will be set to 0 if a sig is already present.  It will be set back to 1 if note changes or if user clicks Clear.
 				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,1);
@@ -3092,7 +3093,16 @@ namespace OpenDental{
 			//string retVal=ProcCur.Note+ProcCur.UserNum.ToString();
 			//MsgBoxCopyPaste msgb=new MsgBoxCopyPaste(retVal);
 			//msgb.ShowDialog();
-		}		
+		}
+
+		private void sigBoxTopaz_Leave(object sender,EventArgs e) {
+			//If the Topaz state does not get set to 0 before trying to accept input again (e.g. from another Topaz object), BSB Topaz signature pads 
+			//	will not be able to accept input from a new Topaz signature box instance.
+			//E.g. launching FormProcNoteAppend causes two Topaz signature boxes to be present.
+			if(CodeBase.TopazWrapper.GetTopazState(sigBoxTopaz)==1) {//if accepting input.
+				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
+			}
+		}
 
 		///<summary>ONLY run on startup. Fills the basic controls, except not the ones in the upper left panel which are handled in SetControlsUpperLeft.</summary>
 		private void FillControlsOnStartup(){
@@ -4347,6 +4357,7 @@ namespace OpenDental{
 		private void butTopazSign_Click(object sender,EventArgs e) {
 			sigBox.Visible=false;
 			sigBoxTopaz.Visible=true;
+			sigBoxTopaz.Focus();//If the Topaz signature box does not have focus, the leave event will not work correctly.
 			//if(allowTopaz){
 				CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz); 
 				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
