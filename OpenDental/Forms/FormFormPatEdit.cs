@@ -210,7 +210,7 @@ namespace OpenDental{
 		private void FormFormPatEdit_Shown(object sender,EventArgs e) {
 			if(IsNew){
 				if(QuestionDefList.Length==0){
-					MsgBox.Show(this,"Go to Setup | Questionniare to setup questions for all patients.");
+					MsgBox.Show(this,"Go to Setup | Obsolete | Questionnaire to setup questions for all patients.");
 				}
 			}
 		}
