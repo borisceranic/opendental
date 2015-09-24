@@ -51,16 +51,68 @@ namespace OpenDentBusiness{
 			Crud.JobCrud.Update(job);
 		}
 
-		///<summary></summary>
+		///<summary>You must surround with a try-catch when calling this method.  Deletes one job from the database.  
+		///Also deletes all JobLinks associated with the job.  Jobs that have reviews on them may not be deleted and will throw an exception.</summary>
 		public static void Delete(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
 				return;
 			}
-			Crud.JobCrud.Delete(jobNum);
+			List<JobLink> listJobLinks=JobLinks.GetByJobNum(jobNum);
+			for(int i=0;i<listJobLinks.Count;i++) { //look for reviews. Throw an exception if one is found.
+				if(listJobLinks[i].LinkType==JobLinkType.Review) {
+					throw new Exception(Lans.g("Jobs","Not allowed to delete a job that has attached reviews.  Set the status to deleted instead.")); //The exception is caught in FormJobEdit.
+				}
+			}
+			//if there are any reviews, any code below this will not be executed.
+			string command="DELETE FROM JobLink	WHERE JobNum="+jobNum;
+			Db.NonQ(command);//Delete all jobLinks with matching jobNum from the linker table.
+			command="DELETE FROM JobEvent WHERE JobNum="+jobNum;
+			Db.NonQ(command);//Delete all jobEvents with matching jobNum.
+			Crud.JobCrud.Delete(jobNum); //Finally, delete the job itself.
 		}
 
-
+		///<summary>Returns a table for use in UserControlJobs, filtered by the passed in params. 
+		///String params can be "", JobNum can be 0, and other long params can be -1 if you do not want to filter by those params.</summary>
+		public static DataTable GetJobDataTable(long jobNum,string expert,string owner,string version,
+			string project,string title,long status,long priority,long type,bool showHidden) {
+				if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+					return Meth.GetTable(MethodBase.GetCurrentMethod(),jobNum,expert,owner,version,project,title,status,priority,type,showHidden);
+				}
+				string command="SELECT JobNum, JobVersion, JobPriority, owner.UserName AS Owner, expert.UserName AS Expert, JobType, " 
+			+"JobStatus, ProjectNum, Description, Title FROM job "
+			+"LEFT JOIN userod owner ON owner.UserNum = job.Owner "
+			+"LEFT JOIN userod expert ON expert.UserNum = job.Expert WHERE TRUE ";
+			if(expert!="") {
+				command+=" AND expert.UserName LIKE '%"+expert+"%'";
+			} 
+			if(owner!="") {
+				command+=" AND owner.UserName LIKE '%"+owner+"%'";
+			}
+			if(version!=""){
+				command+=" AND JobVersion LIKE '%"+version+"%'";
+			}
+			if(title!="") {
+				command+=" AND Title LIKE '%"+title+"%'";
+			}
+			if(jobNum!=0) {
+				command+=" AND JobNum="+jobNum;
+			}
+			if(status!=-1) {
+				command+= " AND JobStatus="+status;			
+			}
+			if(priority!=-1) {
+				command+=" AND JobPriority="+priority;
+			}
+			if(type!=-1) {
+				command+=" AND JobType="+type;
+			}
+			if(!showHidden) {
+				command+=" AND JobStatus NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Done+","+(int)JobStatus.Rescinded+")";
+			}
+			DataTable table=Db.GetTable(command); //JobNum, JobVersion, JobPriority, Owner, Expert, JobType, JobStatus, ProjectNum, Description 
+			return table;
+		}
 
 	}
 }

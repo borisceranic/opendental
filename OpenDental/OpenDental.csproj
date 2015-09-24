@@ -430,6 +430,12 @@
     <Compile Include="Forms\FormTaskSearch.designer.cs">
       <DependentUpon>FormTaskSearch.cs</DependentUpon>
     </Compile>
+    <Compile Include="Job Manager\FormJobEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Job Manager\FormJobEdit.designer.cs">
+      <DependentUpon>FormJobEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormDefaultCCProcs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3664,6 +3670,12 @@
     <Compile Include="User Controls\ContrFamilyEcw.Designer.cs">
       <DependentUpon>ContrFamilyEcw.cs</DependentUpon>
     </Compile>
+    <Compile Include="Job Manager\UserControlJobs.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Job Manager\UserControlJobs.Designer.cs">
+      <DependentUpon>UserControlJobs.cs</DependentUpon>
+    </Compile>
     <Compile Include="User Controls\DraggableControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -3786,6 +3798,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTaskSearch.resx">
       <DependentUpon>FormTaskSearch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Job Manager\FormJobEdit.resx">
+      <DependentUpon>FormJobEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefaultCCProcs.resx">
       <DependentUpon>FormDefaultCCProcs.cs</DependentUpon>
@@ -6123,6 +6138,9 @@
     <EmbeddedResource Include="User Controls\ContrTeeth.resx">
       <DependentUpon>ContrTeeth.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Job Manager\UserControlJobs.resx">
+      <DependentUpon>UserControlJobs.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="User Controls\EmailPreviewControl.resx">
       <DependentUpon>EmailPreviewControl.cs</DependentUpon>

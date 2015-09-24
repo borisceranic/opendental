@@ -34,41 +34,6 @@ namespace OpenDentBusiness {
 		}
 	}
 
-	public enum JobStatus {
-		///<summary>0 -</summary>
-		Concept,
-		///<summary>1 -</summary>
-		NeedsExpertDefinition,
-		///<summary>2 -</summary>
-		UnderConstruction,
-		///<summary>3 -</summary>
-		NeedsApproval,
-		///<summary>4 -</summary>
-		ReadyToAssign,
-		///<summary>5 -</summary>
-		Assigned,
-		///<summary>6 -</summary>
-		InProgress,
-		///<summary>7 -</summary>
-		OnHold,
-		///<summary>8 -</summary>
-		Rescinded,
-		///<summary>9 -</summary>
-		ReadyForReview,
-		///<summary>10 -</summary>
-		Done,
-		///<summary>11 -</summary>
-		ReadyToBeDocumented,
-		///<summary>12 -</summary>
-		Documented,
-		///<summary>13 -</summary>
-		QuestionForManager,
-		///<summary>14 -</summary>
-		Deleted,
-		///<summary>15 -</summary>
-		QuestionForEngineers
-	}
-
 }
 
 

@@ -61,6 +61,15 @@ namespace OpenDentBusiness{
 			Crud.JobEventCrud.Delete(jobEventNum);
 		}
 
+		///<summary>Gets the most recent JobEvent of a job.</summary>
+		public static JobEvent GetMostRecent(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<JobEvent>(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			string command="SELECT * from jobevent WHERE JobNum="+jobNum
+				+" AND DateTimeEntry=(SELECT MAX(DateTimeEntry) FROM jobevent WHERE JobNum="+jobNum+")";
+			return Crud.JobEventCrud.SelectOne(command);
+		}
 
 
 	}
