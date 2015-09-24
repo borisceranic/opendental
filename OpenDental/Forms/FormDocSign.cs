@@ -58,6 +58,7 @@ namespace OpenDental{
 				sigBoxTopaz.TabIndex=92;
 				sigBoxTopaz.Text="sigPlusNET1";
 				sigBoxTopaz.Visible=false;
+				sigBoxTopaz.Leave+=new EventHandler(sigBoxTopaz_Leave);
 				Controls.Add(sigBoxTopaz);
 				sigBox.SetTabletState(1);//It starts out accepting input. It will be set to 0 if a sig is already present.  It will be set back to 1 if note changes or if user clicks Clear.
 			}
@@ -294,9 +295,18 @@ namespace OpenDental{
 			labelInvalidSig.Visible=false;
 		}
 
+		private void sigBoxTopaz_Leave(object sender,EventArgs e) {
+			//If the Topaz state does not get set to 0 before trying to accept input again (e.g. from another Topaz object), BSB Topaz signature pads 
+			//	will not be able to accept input from a new Topaz signature box instance.
+			if(sigBoxTopaz.GetTabletState()==1) {//if accepting input.
+				sigBoxTopaz.SetTabletState(0);
+			}
+		}
+
 		private void butTopazSign_Click(object sender,EventArgs e) {
 			sigBox.Visible=false;
 			sigBoxTopaz.Visible=true;
+			sigBoxTopaz.Focus();//If the Topaz signature box does not have focus, the leave event will not work correctly.
 			sigBoxTopaz.SetTabletState(1);
 			SigChanged=true;
 			labelInvalidSig.Visible=false;

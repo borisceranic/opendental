@@ -58,6 +58,7 @@ namespace OpenDental{
 				sigBoxTopaz.TabIndex=92;
 				sigBoxTopaz.Text="sigPlusNET1";
 				sigBoxTopaz.Visible=false;
+				sigBoxTopaz.Leave+=new EventHandler(sigBoxTopaz_Leave);
 				panelSig.Controls.Add(sigBoxTopaz);
 			//}
 		}
@@ -443,6 +444,14 @@ namespace OpenDental{
 			}
 		}
 
+		private void sigBoxTopaz_Leave(object sender,EventArgs e) {
+			//If the Topaz state does not get set to 0 before trying to accept input again (e.g. from another Topaz object), BSB Topaz signature pads 
+			//	will not be able to accept input from a new Topaz signature box instance.
+			if(CodeBase.TopazWrapper.GetTopazState(sigBoxTopaz)==1) {//if accepting input.
+				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
+			}
+		}
+
 		private void OnPrint_Click() {
 			if(!PrinterL.SetPrinter(Document,PrintSituation.TPPerio,TPcur.PatNum,"Signed treatment plan from "+TPcur.DateTP.ToShortDateString()+" printed")){
 				return;
@@ -509,6 +518,7 @@ namespace OpenDental{
 		private void butTopazSign_Click(object sender,EventArgs e) {
 			sigBox.Visible=false;
 			sigBoxTopaz.Visible=true;
+			sigBoxTopaz.Focus();//If the Topaz signature box does not have focus, the leave event will not work correctly.
 			//if(allowTopaz){
 				CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
 				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
