@@ -13,8 +13,8 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<Signalod>>(MethodBase.GetCurrentMethod(),sinceDateT);
 			}
 			string command="SELECT * FROM signalod "
-				+"WHERE SigDateTime>"+POut.DateT(sinceDateT)+" "
-				+"OR AckTime>"+POut.DateT(sinceDateT)+" "
+				+"WHERE (SigDateTime>"+POut.DateT(sinceDateT)+" AND SigDateTime< NOW()) "
+				+"OR (AckTime>"+POut.DateT(sinceDateT)+" AND AckTime< NOW()) "
 				+"ORDER BY SigDateTime";
 			//note: this might return an occasional row that has both times newer.
 			List<Signalod> sigList=new List<Signalod>();
