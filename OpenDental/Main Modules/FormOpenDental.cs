@@ -2537,6 +2537,7 @@ namespace OpenDental{
 				//Remove the menu items that are only needed for HQ like Default CC Procedures
 				menuItemAccount.MenuItems.Clear();
 			}
+			ContrAppt2.SendSmsClickDelegate=OnTxtMsg_Click;//used in the appointment right click context menu.
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -3064,7 +3065,7 @@ namespace OpenDental{
 						OnWebMail_Click();
 						break;
 					case "Text":
-						OnTxtMsg_Click();
+						OnTxtMsg_Click(CurPatNum);
 						break;
 					case "Letter":
 						OnLetter_Click();
@@ -3576,9 +3577,11 @@ namespace OpenDental{
 
 		#region SMS Text Messaging
 
-		private void OnTxtMsg_Click() {
-			if(CurPatNum==0) {
+		///<summary>Called from the text message button and the right click context menu for an appointment.</summary>
+		private void OnTxtMsg_Click(long patNum, string startingText="") {
+			if(patNum==0) {
 				FormTxtMsgEdit FormTxtME=new FormTxtMsgEdit();
+				FormTxtME.Message=startingText;
 				FormTxtME.PatNum=0;
 				FormTxtME.ShowDialog();
 				if(FormTxtME.DialogResult==DialogResult.OK) {
@@ -3586,18 +3589,36 @@ namespace OpenDental{
 				}
 				return;
 			}
-			Patient pat=Patients.GetPat(CurPatNum);
-			if(pat.TxtMsgOk==YN.No) {
-				MsgBox.Show(this,"This patient does not want to receive text messages.");
-				return;
+			Patient pat=Patients.GetPat(patNum);
+			bool updateTextYN=false;
+			if(pat.TxtMsgOk==YN.No){
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient is marked to not receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) 
+				{
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
 			}
-			if(pat.TxtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)) {
-				MsgBox.Show(this,"This patient might not want to receive text messages. "
-					+"Change Text OK in the Edit Patient Information window if the patient wants to receive text messages.");
-				return;
+			if(pat.TxtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)){
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient might not want to receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) 
+				{
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
+			}
+			if(updateTextYN) {
+				Patient patOld=pat.Copy();
+				pat.TxtMsgOk=YN.Yes;
+				Patients.Update(pat,patOld);
 			}
 			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();
-			FormTME.PatNum=CurPatNum;
+			FormTME.Message=startingText;
+			FormTME.PatNum=patNum;
 			FormTME.WirelessPhone=pat.WirelessPhone;
 			FormTME.TxtMsgOk=pat.TxtMsgOk;
 			FormTME.ShowDialog();

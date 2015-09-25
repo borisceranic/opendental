@@ -41,18 +41,20 @@ namespace OpenDental{
 			// 
 			// textWirelessPhone
 			// 
+			this.textWirelessPhone.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textWirelessPhone.Location = new System.Drawing.Point(219, 91);
 			this.textWirelessPhone.Name = "textWirelessPhone";
-			this.textWirelessPhone.Size = new System.Drawing.Size(128, 20);
+			this.textWirelessPhone.Size = new System.Drawing.Size(140, 20);
 			this.textWirelessPhone.TabIndex = 4;
 			// 
 			// label1
 			// 
 			this.label1.Location = new System.Drawing.Point(216, 68);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(89, 20);
+			this.label1.Size = new System.Drawing.Size(131, 20);
 			this.label1.TabIndex = 6;
-			this.label1.Text = "Phone Number";
+			this.label1.Text = "Wireless Phone Number";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label2
@@ -90,11 +92,13 @@ namespace OpenDental{
 			// 
 			// groupRecipient
 			// 
+			this.groupRecipient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupRecipient.Controls.Add(this.radioPatient);
 			this.groupRecipient.Controls.Add(this.radioOther);
 			this.groupRecipient.Location = new System.Drawing.Point(28, 13);
 			this.groupRecipient.Name = "groupRecipient";
-			this.groupRecipient.Size = new System.Drawing.Size(319, 43);
+			this.groupRecipient.Size = new System.Drawing.Size(331, 43);
 			this.groupRecipient.TabIndex = 9;
 			this.groupRecipient.TabStop = false;
 			this.groupRecipient.Text = "Choose one of the following options:";
@@ -133,12 +137,15 @@ namespace OpenDental{
 			// textMessage
 			// 
 			this.textMessage.AcceptsTab = true;
+			this.textMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textMessage.DetectUrls = false;
 			this.textMessage.Location = new System.Drawing.Point(28, 181);
 			this.textMessage.Name = "textMessage";
 			this.textMessage.QuickPasteType = OpenDentBusiness.QuickPasteType.TxtMsg;
 			this.textMessage.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textMessage.Size = new System.Drawing.Size(319, 113);
+			this.textMessage.Size = new System.Drawing.Size(331, 113);
 			this.textMessage.TabIndex = 6;
 			this.textMessage.Text = "";
 			// 
@@ -150,7 +157,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(197, 303);
+			this.butOK.Location = new System.Drawing.Point(209, 303);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
@@ -165,7 +172,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(278, 303);
+			this.butCancel.Location = new System.Drawing.Point(290, 303);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -175,7 +182,7 @@ namespace OpenDental{
 			// FormTxtMsgEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(365, 339);
+			this.ClientSize = new System.Drawing.Size(377, 339);
 			this.Controls.Add(this.butPatFind);
 			this.Controls.Add(this.groupRecipient);
 			this.Controls.Add(this.textPatient);
@@ -187,6 +194,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(393, 378);
 			this.Name = "FormTxtMsgEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Text Message";
