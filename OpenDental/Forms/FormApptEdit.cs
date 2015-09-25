@@ -1427,12 +1427,7 @@ namespace OpenDental{
 				butText.Enabled=false;
 			}
 			else {//Pat has a wireless phone number and CallFire is enabled
-				if(pat.TxtMsgOk==YN.Unknown) {
-					butText.Enabled=!PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);//Not enabled since TxtMsgOk is ?? and "Treat ?? As No" is true.
-				}
-				else {
-					butText.Enabled=(pat.TxtMsgOk==YN.Yes);
-				}
+				butText.Enabled=true;//TxtMsgOk checking performed on button click.
 			}
 			//AppointmentType
 			_listAppointmentType=new List<AppointmentType>();
@@ -1683,6 +1678,30 @@ namespace OpenDental{
 		private void butText_Click(object sender,EventArgs e) {
 			if(Plugins.HookMethod(this,"FormApptEdit.butText_Click_start",pat,AptCur,this)) {
 				return;
+			}
+			bool updateTextYN=false;
+			if(pat.TxtMsgOk==YN.No) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient is marked to not receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) {
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
+			}
+			if(pat.TxtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient might not want to receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) {
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
+			}
+			if(updateTextYN) {
+				Patient patOld=pat.Copy();
+				pat.TxtMsgOk=YN.Yes;
+				Patients.Update(pat,patOld);
 			}
 			string message;
 			message=PrefC.GetString(PrefName.ConfirmTextMessage);

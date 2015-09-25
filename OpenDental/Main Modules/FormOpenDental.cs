@@ -644,15 +644,15 @@ namespace OpenDental{
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();
 			this.labelMsg = new System.Windows.Forms.Label();
+			this.butMapPhones = new OpenDental.UI.Button();
+			this.butTriage = new OpenDental.UI.Button();
+			this.butBigPhones = new OpenDental.UI.Button();
 			this.labelWaitTime = new System.Windows.Forms.Label();
 			this.labelTriage = new System.Windows.Forms.Label();
 			this.menuText = new System.Windows.Forms.ContextMenu();
 			this.menuItemTextMessagesAll = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
-			this.butMapPhones = new OpenDental.UI.Button();
-			this.butTriage = new OpenDental.UI.Button();
-			this.butBigPhones = new OpenDental.UI.Button();
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -1882,6 +1882,48 @@ namespace OpenDental{
 			this.labelMsg.Text = "V:00";
 			this.labelMsg.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// butMapPhones
+			// 
+			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMapPhones.Autosize = true;
+			this.butMapPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMapPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMapPhones.CornerRadius = 4F;
+			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
+			this.butMapPhones.Name = "butMapPhones";
+			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
+			this.butMapPhones.TabIndex = 54;
+			this.butMapPhones.Text = "P";
+			this.butMapPhones.Click += new System.EventHandler(this.butMapPhones_Click);
+			// 
+			// butTriage
+			// 
+			this.butTriage.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butTriage.Autosize = true;
+			this.butTriage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butTriage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butTriage.CornerRadius = 4F;
+			this.butTriage.Location = new System.Drawing.Point(116, 0);
+			this.butTriage.Name = "butTriage";
+			this.butTriage.Size = new System.Drawing.Size(18, 24);
+			this.butTriage.TabIndex = 52;
+			this.butTriage.Text = "T";
+			this.butTriage.Click += new System.EventHandler(this.butTriage_Click);
+			// 
+			// butBigPhones
+			// 
+			this.butBigPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butBigPhones.Autosize = true;
+			this.butBigPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butBigPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butBigPhones.CornerRadius = 4F;
+			this.butBigPhones.Location = new System.Drawing.Point(135, 0);
+			this.butBigPhones.Name = "butBigPhones";
+			this.butBigPhones.Size = new System.Drawing.Size(18, 24);
+			this.butBigPhones.TabIndex = 52;
+			this.butBigPhones.Text = "B";
+			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
+			// 
 			// labelWaitTime
 			// 
 			this.labelWaitTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1928,48 +1970,6 @@ namespace OpenDental{
 			this.menuItemTextMessagesSent.Index = 2;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
 			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
-			// 
-			// butMapPhones
-			// 
-			this.butMapPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMapPhones.Autosize = true;
-			this.butMapPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butMapPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butMapPhones.CornerRadius = 4F;
-			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
-			this.butMapPhones.Name = "butMapPhones";
-			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
-			this.butMapPhones.TabIndex = 54;
-			this.butMapPhones.Text = "P";
-			this.butMapPhones.Click += new System.EventHandler(this.butMapPhones_Click);
-			// 
-			// butTriage
-			// 
-			this.butTriage.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTriage.Autosize = true;
-			this.butTriage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTriage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTriage.CornerRadius = 4F;
-			this.butTriage.Location = new System.Drawing.Point(116, 0);
-			this.butTriage.Name = "butTriage";
-			this.butTriage.Size = new System.Drawing.Size(18, 24);
-			this.butTriage.TabIndex = 52;
-			this.butTriage.Text = "T";
-			this.butTriage.Click += new System.EventHandler(this.butTriage_Click);
-			// 
-			// butBigPhones
-			// 
-			this.butBigPhones.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBigPhones.Autosize = true;
-			this.butBigPhones.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBigPhones.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBigPhones.CornerRadius = 4F;
-			this.butBigPhones.Location = new System.Drawing.Point(135, 0);
-			this.butBigPhones.Name = "butBigPhones";
-			this.butBigPhones.Size = new System.Drawing.Size(18, 24);
-			this.butBigPhones.TabIndex = 52;
-			this.butBigPhones.Text = "B";
-			this.butBigPhones.Click += new System.EventHandler(this.butBigPhones_Click);
 			// 
 			// lightSignalGrid1
 			// 
@@ -2493,6 +2493,7 @@ namespace OpenDental{
 				//Remove the menu items that are only needed for HQ like Default CC Procedures
 				menuItemAccount.MenuItems.Clear();
 			}
+			ContrAppt2.SendSmsClickDelegate=OnTxtMsg_Click;//used in the appointment right click context menu.
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -3025,7 +3026,7 @@ namespace OpenDental{
 						OnWebMail_Click();
 						break;
 					case "Text":
-						OnTxtMsg_Click();
+						OnTxtMsg_Click(CurPatNum);
 						break;
 					case "Letter":
 						OnLetter_Click();
@@ -3537,9 +3538,11 @@ namespace OpenDental{
 
 		#region SMS Text Messaging
 
-		private void OnTxtMsg_Click() {
-			if(CurPatNum==0) {
+		///<summary>Called from the text message button and the right click context menu for an appointment.</summary>
+		private void OnTxtMsg_Click(long patNum,string startingText="") {
+			if(patNum==0) {
 				FormTxtMsgEdit FormTxtME=new FormTxtMsgEdit();
+				FormTxtME.Message=startingText;
 				FormTxtME.PatNum=0;
 				FormTxtME.ShowDialog();
 				if(FormTxtME.DialogResult==DialogResult.OK) {
@@ -3547,18 +3550,34 @@ namespace OpenDental{
 				}
 				return;
 			}
-			Patient pat=Patients.GetPat(CurPatNum);
+			Patient pat=Patients.GetPat(patNum);
+			bool updateTextYN=false;
 			if(pat.TxtMsgOk==YN.No) {
-				MsgBox.Show(this,"This patient does not want to receive text messages.");
-				return;
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient is marked to not receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) {
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
 			}
 			if(pat.TxtMsgOk==YN.Unknown && PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo)) {
-				MsgBox.Show(this,"This patient might not want to receive text messages. "
-					+"Change Text OK in the Edit Patient Information window if the patient wants to receive text messages.");
-				return;
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This patient might not want to receive text messages. "
+					+"Would you like to mark this patient as okay to receive text messages?")) {
+					updateTextYN=true;
+				}
+				else {
+					return;
+				}
 			}
-			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();			
-			FormTME.PatNum=CurPatNum;
+			if(updateTextYN) {
+				Patient patOld=pat.Copy();
+				pat.TxtMsgOk=YN.Yes;
+				Patients.Update(pat,patOld);
+			}
+			FormTxtMsgEdit FormTME=new FormTxtMsgEdit();
+			FormTME.Message=startingText;
+			FormTME.PatNum=patNum;
 			FormTME.WirelessPhone=pat.WirelessPhone;
 			FormTME.TxtMsgOk=pat.TxtMsgOk;
 			FormTME.ShowDialog();

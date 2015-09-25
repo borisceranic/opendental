@@ -25,6 +25,8 @@ using OpenDental.Bridges;
 
 namespace OpenDental {
 
+	public delegate void SendSmsClick(long patNum,string defaultMessage);
+
 	///<summary></summary>
 	public class ContrAppt:System.Windows.Forms.UserControl {
 		private OpenDental.ContrApptSheet ContrApptSheet2;
@@ -179,6 +181,8 @@ namespace OpenDental {
 		private List<ApptView> _listApptViews;
 		private FormTrackNext FormTN;
 		private FormUnsched FormUnsched2;
+		///<summary>Should be set to FormOpenDental.OnTxtMsg_Click()</summary>
+		public SendSmsClick SendSmsClickDelegate;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -3063,6 +3067,10 @@ namespace OpenDental {
 					menuApt.MenuItems.RemoveByKey("Home Phone");
 					menuApt.MenuItems.RemoveByKey("Work Phone");
 					menuApt.MenuItems.RemoveByKey("Wireless Phone");
+					menuApt.MenuItems.RemoveByKey("Text Div");
+					menuApt.MenuItems.RemoveByKey("Send Text");
+					menuApt.MenuItems.RemoveByKey("Send Confirmation Text");
+					//Phone numbers
 					if(!String.IsNullOrEmpty(PatCur.HmPhone)||!String.IsNullOrEmpty(PatCur.WkPhone)||!String.IsNullOrEmpty(PatCur.WirelessPhone)) {
 						menuApt.MenuItems.Add("-");
 						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Phone Div";
@@ -3079,6 +3087,23 @@ namespace OpenDental {
 						menuApt.MenuItems.Add(Lan.g(this,"Call Wireless Phone")+" "+PatCur.WirelessPhone,new EventHandler(menuApt_Click));
 						menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Wireless Phone";
 					}
+					//Texting
+					menuApt.MenuItems.Add("-");
+					menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Text Div";
+					menuApt.MenuItems.Add(Lan.g(this,"Send Text"),menuApt_Click);
+					menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Send Text";
+					if(!SmsPhones.IsIntegratedTextingEnabled() && !Programs.IsEnabled(ProgramName.CallFire)) {
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Enabled=false;
+					}
+					menuApt.MenuItems.Add(Lan.g(this,"Send Confirmation Text"),menuApt_Click);
+					menuApt.MenuItems[menuApt.MenuItems.Count-1].Name="Send Confirmation Text";
+					if(!SmsPhones.IsIntegratedTextingEnabled() && !Programs.IsEnabled(ProgramName.CallFire)) {
+						menuApt.MenuItems[menuApt.MenuItems.Count-1].Enabled=false;
+					}
+					//menuApt.MenuItems.Add(Lan.g(this,"Send Reminder Text"),menuApt_Click);
+					//if(!SmsPhones.IsIntegratedTextingEnabled() && !Programs.IsEnabled(ProgramName.CallFire)) {
+					//	menuApt.MenuItems[menuApt.MenuItems.Count-1].Enabled=false;
+					//}
 					menuApt.Show(ContrApptSheet2,new Point(e.X,e.Y));
 				}
 				else {
@@ -4849,6 +4874,24 @@ namespace OpenDental {
 					else {
 						AutomaticCallDialingDisabledMessage();
 					}
+					break;
+				case "Send Text":
+					if(SendSmsClickDelegate!=null) {
+						SendSmsClickDelegate(Appointments.GetOneApt(ContrApptSingle.ClickedAptNum).PatNum,"");
+					}
+					break;
+				case "Send Confirmation Text":
+					if(SendSmsClickDelegate==null) {
+						break;
+					}
+					Appointment appt=Appointments.GetOneApt(ContrApptSingle.ClickedAptNum);
+					Patient pat=Patients.GetPat(appt.PatNum);
+					string message=PrefC.GetString(PrefName.ConfirmTextMessage);
+					message=message.Replace("[NameF]",pat.GetNameFirst());
+					message=message.Replace("[NameFL]",pat.GetNameFL());
+					message=message.Replace("[date]",appt.AptDateTime.ToShortDateString());
+					message=message.Replace("[time]",appt.AptDateTime.ToShortTimeString());
+					SendSmsClickDelegate(pat.PatNum,message);
 					break;
 			}
 		}
