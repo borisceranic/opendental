@@ -17,11 +17,14 @@ namespace OpenDentBusiness{
 			return Crud.JobCrud.SelectMany(command);
 		}
 
-		public static List<Job> GetForProject(long projectNum) {
+		public static List<Job> GetForProject(long projectNum,bool showFinished) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),projectNum);
 			}
 			string command="SELECT * FROM job WHERE ProjectNum = "+POut.Long(projectNum);
+			if(!showFinished) {
+				command+=" AND JobStatus != " + (int)JobStatus.Done;
+			}
 			return Crud.JobCrud.SelectMany(command);
 		}
 

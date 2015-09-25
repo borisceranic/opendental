@@ -18,11 +18,14 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static List<JobProject> GetByParentProject(long projectNum){
+		public static List<JobProject> GetByParentProject(long projectNum, bool showFinished){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobProject>>(MethodBase.GetCurrentMethod(),projectNum);
 			}
 			string command="SELECT * FROM jobproject WHERE ParentProjectNum = "+POut.Long(projectNum);
+			if(!showFinished) {
+				command+=" AND JobProjectStatus != " + POut.Int((int)JobProjectStatus.Done);
+			}
 			return Crud.JobProjectCrud.SelectMany(command);
 		}
 

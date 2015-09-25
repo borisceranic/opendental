@@ -418,6 +418,7 @@
     <Compile Include="Forms\FormEmailAutographEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\FormJobProjectEdit.cs" />
     <Compile Include="Forms\FormProcBroken.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3458,11 +3459,15 @@
     <Compile Include="InternalTools\EServices\EServiceMetricsControl.Designer.cs">
       <DependentUpon>EServiceMetricsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobEdit.cs" />
+    <Compile Include="InternalTools\Job Manager\FormJobEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobEdit.designer.cs">
       <DependentUpon>FormJobEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlJobs.cs" />
+    <Compile Include="InternalTools\Job Manager\UserControlJobs.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\UserControlJobs.Designer.cs">
       <DependentUpon>UserControlJobs.cs</DependentUpon>
     </Compile>
@@ -3788,6 +3793,9 @@
     <EmbeddedResource Include="Forms\FormEmailAutographEdit.resx">
       <DependentUpon>FormEmailAutographEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormJobProjectEdit.resx">
+      <DependentUpon>FormJobProjectEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcBroken.resx">
       <DependentUpon>FormProcBroken.cs</DependentUpon>
