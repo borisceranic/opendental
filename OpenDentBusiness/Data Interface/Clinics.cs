@@ -373,6 +373,40 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		///<summary>Returns a clinic object with ClinicNum=0, and values filled using practice level preferences. 
+		/// Caution: do not attempt to save the clinic back to the DB. This should be used for read only purposes.</summary>
+		public static Clinic GetPracticeAsClinicZero() {
+			return new Clinic {
+				ClinicNum=0,
+				Description=PrefC.GetString(PrefName.PracticeTitle),
+				Address=PrefC.GetString(PrefName.PracticeAddress),
+				Address2=PrefC.GetString(PrefName.PracticeAddress2),
+				City=PrefC.GetString(PrefName.PracticeCity),
+				State=PrefC.GetString(PrefName.PracticeST),
+				Zip=PrefC.GetString(PrefName.PracticeZip),
+				BillingAddress=PrefC.GetString(PrefName.PracticeBillingAddress),
+				BillingAddress2=PrefC.GetString(PrefName.PracticeBillingAddress2),
+				BillingCity=PrefC.GetString(PrefName.PracticeBillingCity),
+				BillingState=PrefC.GetString(PrefName.PracticeBillingST),
+				BillingZip=PrefC.GetString(PrefName.PracticeBillingZip),
+				PayToAddress=PrefC.GetString(PrefName.PracticePayToAddress),
+				PayToAddress2=PrefC.GetString(PrefName.PracticePayToAddress2),
+				PayToCity=PrefC.GetString(PrefName.PracticePayToCity),
+				PayToState=PrefC.GetString(PrefName.PracticePayToST),
+				PayToZip=PrefC.GetString(PrefName.PracticePayToZip),
+				Phone=PrefC.GetString(PrefName.PracticePhone),
+				BankNumber=PrefC.GetString(PrefName.PracticeBankNumber),
+				DefaultPlaceService=(PlaceOfService)PrefC.GetInt(PrefName.DefaultProcedurePlaceService),
+				InsBillingProv=PrefC.GetLong(PrefName.InsBillingProv),
+				Fax=PrefC.GetString(PrefName.PracticeFax),
+				EmailAddressNum=PrefC.GetLong(PrefName.EmailDefaultAddressNum),
+				DefaultProv=PrefC.GetLong(PrefName.PracticeDefaultProv),
+				SmsContractDate=PrefC.GetDate(PrefName.SmsContractDate),
+				SmsMonthlyLimit=PrefC.GetDouble(PrefName.SmsMonthlyLimit),
+				IsMedicalOnly=PrefC.GetBool(PrefName.PracticeIsMedicalOnly)
+			};
+		}
+
 	}
 	
 
