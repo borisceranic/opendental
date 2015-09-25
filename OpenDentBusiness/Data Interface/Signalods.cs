@@ -12,6 +12,9 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Signalod>>(MethodBase.GetCurrentMethod(),sinceDateT);
 			}
+			//This command was written to take into account the fact that MySQL truncates seconds to the the whole second on DateTime columns. (newer versions support fractional seconds)
+			//By selecting signals less than Now() we avoid missing signals the next time this function is called. Without the addition of Now() it was possible
+			//to miss up to ((N-1)/N)% of the signals generated in the worst case scenario.
 			string command="SELECT * FROM signalod "
 				+"WHERE (SigDateTime>"+POut.DateT(sinceDateT)+" AND SigDateTime< "+DbHelper.Now()+") "
 				+"OR (AckTime>"+POut.DateT(sinceDateT)+" AND AckTime< "+DbHelper.Now()+") "
