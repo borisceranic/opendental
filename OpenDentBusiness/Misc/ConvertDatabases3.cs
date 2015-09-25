@@ -10287,10 +10287,12 @@ namespace OpenDentBusiness {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO definition (Category,ItemOrder,ItemName,ItemValue,ItemColor) "
 						+"VALUES(36,0,'Default','',0)";//Inserting definition with category 36 (ClaimPaymentTracking) and default value
+					Db.NonQ(command);
 				}
 				else {
 					command="INSERT INTO definition (DefNum,Category,ItemOrder,ItemName,ItemValue,ItemColor) "
 						+"VALUES((SELECT MAX(DefNum)+1 FROM definition),36,0,'Default','',0)";//36 (ClaimPaymentTracking) and default value
+					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claimproc ADD ClaimPaymentTracking bigint NOT NULL";
