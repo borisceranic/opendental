@@ -9216,6 +9216,9 @@ namespace OpenDental{
 					Task taskCur=Tasks.GetOne(taskNum);
 					Task taskOld=taskCur.Copy();
 					taskCur.TaskStatus=TaskStatusEnum.Done;//global even if new status is tracked by user
+					if(taskOld.TaskStatus!=TaskStatusEnum.Done) {
+						taskCur.DateTimeFinished=DateTime.Now;
+					}
 					TaskUnreads.DeleteForTask(taskCur.TaskNum);//clear out taskunreads. We have too many tasks to read the done ones.
 					Tasks.Update(taskCur,taskOld);
 					ModuleSelected(PatCur.PatNum);
