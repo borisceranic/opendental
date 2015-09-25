@@ -492,6 +492,7 @@ namespace OpenDental{
 			else if(isDropDown){
 				if(DropListFilter.SelectedItem.ToString()=="Specialty"){
 					sItem="";
+					Def[] specDefs=DefC.GetList(DefCat.ProviderSpecialties);
 					for(int i=0;i<comboBox.SelectedIndices.Count;i++){
 						if(i==0){ 
               sItem="(";
@@ -500,12 +501,12 @@ namespace OpenDental{
               sItem="OR ";
             }
 						sItem+="Specialty "+ListConditions.SelectedItem.ToString()+" '"+
-							comboBox.SelectedIndices[i].ToString()+"'"; 
+							specDefs[comboBox.SelectedIndices[i]].DefNum.ToString()+"'"; 
 						if(i==comboBox.SelectedIndices.Count-1)
 							sItem+=")";
 						ListPrerequisites.Items.Add(sItem);
 					}
-        } 
+        }
 				else{
           for(int i=0;i<comboBox.SelectedItems.Count;i++){
 						if(ListConditions.SelectedIndex==0){ 
