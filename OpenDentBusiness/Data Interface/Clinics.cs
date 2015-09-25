@@ -95,7 +95,11 @@ namespace OpenDentBusiness{
 				string pats="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					pats+="\r";
-					pats+=table.Rows[i][0].ToString()+", "+table.Rows[i][1].ToString();
+					if(i==15) {
+						pats+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					pats+=table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because it is in use by the following patients:")+pats);
 			}
@@ -109,7 +113,11 @@ namespace OpenDentBusiness{
 				string pats="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					pats+="\r";
-					pats+=table.Rows[i][0].ToString()+", "+table.Rows[i][1].ToString();
+					if(i==15) {
+						pats+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					pats+=table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following patients have payments using it:")+pats);
 			}
@@ -125,7 +133,11 @@ namespace OpenDentBusiness{
 				string pats="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					pats+="\r";
-					pats+=table.Rows[i][0].ToString()+", "+table.Rows[i][1].ToString();
+					if(i==15) {
+						pats+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					pats+=table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following patients have claim payments using it:")+pats);
 			}
@@ -139,7 +151,11 @@ namespace OpenDentBusiness{
 				string pats="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					pats+="\r";
-					pats+=table.Rows[i][0].ToString()+", "+table.Rows[i][1].ToString();
+					if(i==15) {
+						pats+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					pats+=table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following patients have appointments using it:")+pats);
 			}
@@ -156,7 +172,11 @@ namespace OpenDentBusiness{
 				string pats="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					pats+="\r";
-					pats+=table.Rows[i][0].ToString()+", "+table.Rows[i][1].ToString();
+					if(i==15) {
+						pats+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					pats+=table.Rows[i]["LName"].ToString()+", "+table.Rows[i]["FName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following patients have procedures using it:")+pats);
 			}
@@ -169,7 +189,11 @@ namespace OpenDentBusiness{
 				string ops="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					ops+="\r";
-					ops+=table.Rows[i][0].ToString();
+					if(i==15) {
+						ops+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					ops+=table.Rows[i]["OpName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following operatories are using it:")+ops);
 			}
@@ -182,7 +206,11 @@ namespace OpenDentBusiness{
 				string userNames="";
 				for(int i=0;i<table.Rows.Count;i++) {
 					userNames+="\r";
-					userNames+=table.Rows[i][0].ToString();
+					if(i==15) {
+						userNames+=Lans.g("Clinics","And")+" "+(table.Rows.Count-i)+" "+Lans.g("Clinics","others");
+						break;
+					}
+					userNames+=table.Rows[i]["UserName"].ToString();
 				}
 				throw new Exception(Lans.g("Clinics","Cannot delete clinic because the following Open Dental users are using it:")+userNames);
 			}
