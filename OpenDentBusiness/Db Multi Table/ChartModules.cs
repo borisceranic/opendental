@@ -1054,11 +1054,12 @@ namespace OpenDentBusiness {
 			}
 			if(componentsToLoad.ShowSheets) {
 				#region sheet
-				command="SELECT PatNum,Description,sheet.SheetNum,DateTimeSheet,SheetType,CASE WHEN FieldValue!='' AND sheet.SheetType=6 THEN 1 ELSE 0 END AS SigPresent "
-				+"FROM sheet "
-				+"LEFT JOIN sheetfield ON sheet.SheetNum=sheetfield.SheetNum "
-				+"AND sheetfield.FieldType=9 "
-				+"WHERE (sheet.PatNum="+POut.Long(patNum);
+				command="SELECT PatNum,Description,sheet.SheetNum,DateTimeSheet,SheetType,"
+					+"AVG(CASE WHEN FieldValue!='' AND sheet.SheetType="+POut.Long((int)SheetTypeEnum.Consent)+" THEN 1 ELSE 0 END) AS SigPresent "
+					+"FROM sheet "
+					+"LEFT JOIN sheetfield ON sheet.SheetNum=sheetfield.SheetNum "
+					+"AND sheetfield.FieldType="+POut.Long((int)SheetFieldType.SigBox)+" "
+					+"WHERE (sheet.PatNum="+POut.Long(patNum);
 				Patient patClone=null;
 				Patient patNonClone=null;
 				if(PrefC.GetBool(PrefName.ShowFeaturePatientClone)) {
@@ -1073,9 +1074,10 @@ namespace OpenDentBusiness {
 						}
 					}
 				}
-				command+=") AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)//rx are only accesssible from within Rx edit window.
-				+" AND SheetType!="+POut.Long((int)SheetTypeEnum.LabSlip)//labslips are only accesssible from within the labslip edit window.
-				+" ORDER BY DateTimeSheet";
+				command+=") AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)+" "//rx are only accesssible from within Rx edit window.
+				+"AND SheetType!="+POut.Long((int)SheetTypeEnum.LabSlip)+" "//labslips are only accesssible from within the labslip edit window.
+				+"GROUP BY sheet.SheetNum,PatNum,Description,DateTimeSheet,SheetType "//Oracle compatible
+				+"ORDER BY DateTimeSheet";
 				DataTable rawSheet=dcon.GetTable(command);
 				//SheetTypeEnum sheetType;
 				for(int i=0;i<rawSheet.Rows.Count;i++) {
@@ -1152,8 +1154,14 @@ namespace OpenDentBusiness {
 					row["RxNum"]=0;
 					row["SheetNum"]=rawSheet.Rows[i]["SheetNum"].ToString();
 					row["signature"]="";
-					if(rawSheet.Rows[i]["SigPresent"].ToString()=="1") {
+					if(PIn.Double(rawSheet.Rows[i]["SigPresent"].ToString())==1) {
 						row["signature"]=Lans.g("ChartModule","Signed");
+					}
+					else if(PIn.Double(rawSheet.Rows[i]["SigPresent"].ToString())==0) {
+						row["signature"]="";
+					}
+					else {
+						row["signature"]=Lans.g("ChartModule","Partial");
 					}
 					row["Surf"]="";
 					row["TaskNum"]=0;
