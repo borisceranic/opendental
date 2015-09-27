@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental {
 	///<summary></summary>
@@ -106,6 +107,9 @@ namespace OpenDental {
 		private Payment _paymentOld;
 		private bool _promptSignature;
 		private bool _printReceipt;
+		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
+		///as comboClinic and is used to set payment.ClinicNum when saving.</summary>
+		private List<long> _listUserClinicNums;
 
 		///<summary>PatCur and FamCur are not for the PatCur of the payment.  They are for the patient and family from which this window was accessed.</summary>
 		public FormPayment(Patient patCur,Family famCur,Payment paymentCur) {
@@ -780,21 +784,25 @@ namespace OpenDental {
 					butSplitManage.Enabled=false;
 				}
 			}
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				comboClinic.Visible=false;
-				labelClinic.Visible=false;
-				checkBalanceGroupByProv.Visible=false;
-			}
-			else {
+			if(PrefC.HasClinicsEnabled) {
+				_listUserClinicNums=new List<long>();
+				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 				comboClinic.Items.Clear();
 				comboClinic.Items.Add(Lan.g(this,"none"));
+				_listUserClinicNums.Add(0);//this way both lists have the same number of items in it
 				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==PaymentCur.ClinicNum) {
+				for(int i=0;i<listClinics.Count;i++) {
+					comboClinic.Items.Add(listClinics[i].Description);
+					_listUserClinicNums.Add(listClinics[i].ClinicNum);
+					if(listClinics[i].ClinicNum==PaymentCur.ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
+			}
+			else {//clinics not enabled
+				comboClinic.Visible=false;
+				labelClinic.Visible=false;
+				checkBalanceGroupByProv.Visible=false;
 			}
 			creditCards=CreditCards.Refresh(PatCur.PatNum);
 			for(int i=0;i<creditCards.Count;i++) {
@@ -930,12 +938,20 @@ namespace OpenDental {
 				//show both so user can pick
 				panelXcharge.Visible=true;
 				butPayConnect.Visible=true;
+				return;
 			}
 			//show if enabled.  User could have both enabled.
 			if(progPayConnect.Enabled) {
-				butPayConnect.Visible=true;
+				string paymentType=ProgramProperties.GetPropVal(progPayConnect.ProgramNum,"PaymentType",PaymentCur.ClinicNum);
+				//PayConnect is visible if the username and password are set and the PaymentType is a valid DefNum
+				if(ProgramProperties.GetPropVal(progPayConnect.ProgramNum,"Username",PaymentCur.ClinicNum)!=""
+					&& ProgramProperties.GetPropVal(progPayConnect.ProgramNum,"Password",PaymentCur.ClinicNum)!=""
+					&& DefC.Short[(int)DefCat.PaymentTypes].Any(x => x.DefNum.ToString()==paymentType))
+				{
+					butPayConnect.Visible=true;
+				}
 			}
-			else if(progXcharge.Enabled) {
+			if(progXcharge.Enabled) {
 				panelXcharge.Visible=true;
 			}
 		}
@@ -1231,15 +1247,15 @@ namespace OpenDental {
 
 		/// <summary>Adds one split to work with.  Called when checkPayPlan click, or upon load if auto attaching to payplan, or upon OK click if no splits were created.</summary>
 		private void AddOneSplit() {
-			PaySplit PaySplitCur=new PaySplit();
-			PaySplitCur.PatNum=PatCur.PatNum;
-			PaySplitCur.PayNum=PaymentCur.PayNum;
-			PaySplitCur.ProcDate=PaymentCur.PayDate;//this may be updated upon closing
-			PaySplitCur.DatePay=PaymentCur.PayDate;//this may be updated upon closing
-			PaySplitCur.ProvNum=Patients.GetProvNum(PatCur);
-			PaySplitCur.ClinicNum=PaymentCur.ClinicNum;
-			PaySplitCur.SplitAmt=PIn.Double(textAmount.Text);
-			SplitList.Add(PaySplitCur);
+			PaySplit paySplitCur=new PaySplit();
+			paySplitCur.PatNum=PatCur.PatNum;
+			paySplitCur.PayNum=PaymentCur.PayNum;
+			paySplitCur.ProcDate=PaymentCur.PayDate;//this may be updated upon closing
+			paySplitCur.DatePay=PaymentCur.PayDate;//this may be updated upon closing
+			paySplitCur.ProvNum=Patients.GetProvNum(PatCur);
+			paySplitCur.ClinicNum=PaymentCur.ClinicNum;
+			paySplitCur.SplitAmt=PIn.Double(textAmount.Text);
+			SplitList.Add(paySplitCur);
 			PaymentCur.PayAmt=PIn.Double(textAmount.Text);
 		}
 
@@ -1872,20 +1888,11 @@ namespace OpenDental {
 			for(int i=0;i<creditCards.Count;i++) {
 				if(i==comboCreditCards.SelectedIndex) {
 					CCard=creditCards[i];
-				}
-			}
-			FormPayConnect FormP;
-			FormP=new FormPayConnect(PaymentCur,PatCur,textAmount.Text,CCard);
-			FormP.ShowDialog();
-			ArrayList props=ProgramProperties.GetForProgram(prog.ProgramNum);
-			ProgramProperty prop=null;
-			for(int i=0;i<props.Count;i++) {
-				ProgramProperty curProp=(ProgramProperty)props[i];
-				if(curProp.PropertyDesc=="PaymentType") {
-					prop=curProp;
 					break;
 				}
 			}
+			FormPayConnect FormP=new FormPayConnect(PaymentCur,PatCur,textAmount.Text,CCard);
+			FormP.ShowDialog();
 			//If PayConnect response is not null, refresh comboCreditCards and select the index of the card used for this payment if the token was saved
 			creditCards=CreditCards.Refresh(PatCur.PatNum);
 			comboCreditCards.Items.Clear();
@@ -1907,7 +1914,8 @@ namespace OpenDental {
 				comboCreditCards.SelectedIndex=comboCreditCards.Items.Count-1;
 			}
 			//still need to add functionality for accountingAutoPay
-			listPayType.SelectedIndex=DefC.GetOrder(DefCat.PaymentTypes,PIn.Long(prop.PropertyValue));
+			string paytype=ProgramProperties.GetPropVal(prog.ProgramNum,"PaymentType",PaymentCur.ClinicNum);//paytype could be an empty string
+			listPayType.SelectedIndex=DefC.GetOrder(DefCat.PaymentTypes,PIn.Long(paytype));
 			SetComboDepositAccounts();
 			if(FormP.Response!=null) {
 				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
@@ -1961,7 +1969,7 @@ namespace OpenDental {
 			_payConnectRequest.TransType=PayConnectService.transType.VOID;
 			_payConnectRequest.RefNumber=refNum;
 			_payConnectRequest.Amount=PIn.Decimal(amount);
-			PayConnectService.transResponse response=Bridges.PayConnect.ProcessCreditCard(_payConnectRequest);
+			PayConnectService.transResponse response=Bridges.PayConnect.ProcessCreditCard(_payConnectRequest,PaymentCur.ClinicNum);
 			Cursor=Cursors.Default;
 			if(response==null || response.Status.code!=0) {//error in transaction
 				MsgBox.Show(this,"This credit card payment has already been processed and will have to be voided manually through the web interface.");
@@ -2011,12 +2019,8 @@ namespace OpenDental {
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboClinic.SelectedIndex==0) {
-				PaymentCur.ClinicNum=0;
-			}
-			else {
-				PaymentCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			}
+			//_listUserClinicNums contains all clinics the user has access to as well as ClinicNum 0 for 'none'
+			PaymentCur.ClinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
 			if(SplitList.Count>0) {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Change clinic for all splits?")) {
 					return;
@@ -2026,6 +2030,7 @@ namespace OpenDental {
 				}
 				FillMain();
 			}
+			CheckUIState();
 		}
 
 		private void checkPayTypeNone_CheckedChanged(object sender,EventArgs e) {

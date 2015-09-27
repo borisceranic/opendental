@@ -7,52 +7,52 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormPayConnect:Form {
-
-		private Payment PaymentCur;
-		private Patient PatCur;
-		private string amountInit;
-		private PayConnectService.transResponse response;
-		private MagstripCardParser parser=null;
-		private string receiptStr;
-		private PayConnectService.transType trantype=PayConnectService.transType.SALE;
-		private CreditCard CreditCardCur;
+		private Payment _paymentCur;
+		private Patient _patCur;
+		private string _amountInit;
+		private PayConnectService.transResponse _response;
+		private MagstripCardParser _parser=null;
+		private string _receiptStr;
+		private PayConnectService.transType _trantype=PayConnectService.transType.SALE;
+		private CreditCard _creditCardCur;
 		private PayConnectService.creditCardRequest _request;
 
 		///<summary>Can handle CreditCard being null.</summary>
 		public FormPayConnect(Payment payment,Patient pat,string amount,CreditCard creditCard) {
 			InitializeComponent();
 			Lan.F(this);
-			PaymentCur=payment;
-			PatCur=pat;
-			amountInit=amount;
-			receiptStr="";
-			CreditCardCur=creditCard;
+			_paymentCur=payment;
+			_patCur=pat;
+			_amountInit=amount;
+			_receiptStr="";
+			_creditCardCur=creditCard;
 		}
 
 		private void FormPayConnect_Load(object sender,EventArgs e) {
-			textZipCode.Text=PatCur.Zip;
-			textNameOnCard.Text=PatCur.GetNameFL();
-			textAmount.Text=amountInit;
+			textZipCode.Text=_patCur.Zip;
+			textNameOnCard.Text=_patCur.GetNameFL();
+			textAmount.Text=_amountInit;
 			checkSaveToken.Checked=PrefC.GetBool(PrefName.StoreCCtokens);
 			if(PrefC.GetBool(PrefName.StoreCCnumbers)) {
 				labelStoreCCNumWarning.Visible=true;
 			}
-			if(CreditCardCur!=null) {//User selected a credit card from drop down.
-				if(CreditCardCur.CCNumberMasked!="") {
-					textCardNumber.Text=CreditCardCur.CCNumberMasked;
+			if(_creditCardCur!=null) {//User selected a credit card from drop down.
+				if(_creditCardCur.CCNumberMasked!="") {
+					textCardNumber.Text=_creditCardCur.CCNumberMasked;
 				}
-				if(CreditCardCur.CCExpiration!=null && CreditCardCur.CCExpiration.Year>2005) {
-					textExpDate.Text=CreditCardCur.CCExpiration.ToString("MMyy");
+				if(_creditCardCur.CCExpiration!=null && _creditCardCur.CCExpiration.Year>2005) {
+					textExpDate.Text=_creditCardCur.CCExpiration.ToString("MMyy");
 				}
-				if(CreditCardCur.Zip!="") {
-					textZipCode.Text=CreditCardCur.Zip;
+				if(_creditCardCur.Zip!="") {
+					textZipCode.Text=_creditCardCur.Zip;
 				}
 				textCardNumber.ReadOnly=true;
 				textExpDate.ReadOnly=true;
-				if(CreditCardCur.PayConnectToken!="" && CreditCardCur.PayConnectTokenExp>DateTime.MinValue) {
+				if(_creditCardCur.PayConnectToken!="" && _creditCardCur.PayConnectTokenExp>DateTime.MinValue) {
 					checkSaveToken.Checked=true;
 					checkSaveToken.Enabled=false;
 					textSecurityCode.ReadOnly=true;
@@ -69,7 +69,7 @@ namespace OpenDental {
 			radioReturn.Checked=false;
 			textRefNumber.Visible=false;
 			labelRefNumber.Visible=false;
-			trantype=PayConnectService.transType.SALE;
+			_trantype=PayConnectService.transType.SALE;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
 
@@ -80,7 +80,7 @@ namespace OpenDental {
 			radioReturn.Checked=false;
 			textRefNumber.Visible=false;
 			labelRefNumber.Visible=false;
-			trantype=PayConnectService.transType.AUTH;
+			_trantype=PayConnectService.transType.AUTH;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
 
@@ -91,7 +91,7 @@ namespace OpenDental {
 			radioReturn.Checked=false;
 			textRefNumber.Visible=true;
 			labelRefNumber.Visible=true;
-			trantype=PayConnectService.transType.VOID;
+			_trantype=PayConnectService.transType.VOID;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
 
@@ -102,7 +102,7 @@ namespace OpenDental {
 			radioReturn.Checked=true;
 			textRefNumber.Visible=true;
 			labelRefNumber.Visible=true;
-			trantype=PayConnectService.transType.RETURN;
+			_trantype=PayConnectService.transType.RETURN;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
 
@@ -119,15 +119,15 @@ namespace OpenDental {
 		private void ParseSwipedCard(string data) {
 			Clear();
 			try {
-				parser=new MagstripCardParser(data);
+				_parser=new MagstripCardParser(data);
 			}
 			catch(MagstripCardParseException) {
 				MessageBox.Show(this,"Could not read card, please try again.","Card Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
 			}
-			if(parser!=null) {
-				textCardNumber.Text=parser.AccountNumber;
-				textExpDate.Text=parser.ExpirationMonth.ToString().PadLeft(2,'0')+(parser.ExpirationYear%100).ToString().PadLeft(2,'0');
-				textNameOnCard.Text=parser.FirstName+" "+parser.LastName;
+			if(_parser!=null) {
+				textCardNumber.Text=_parser.AccountNumber;
+				textExpDate.Text=_parser.ExpirationMonth.ToString().PadLeft(2,'0')+(_parser.ExpirationYear%100).ToString().PadLeft(2,'0');
+				textNameOnCard.Text=_parser.FirstName+" "+_parser.LastName;
 				GetNextControl(textNameOnCard,true).Focus();//Move forward to the next control in the tab order.
 			}
 		}
@@ -147,7 +147,7 @@ namespace OpenDental {
 
 		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
 		public PayConnectService.transResponse Response {
-			get{ return response; }
+			get{ return _response; }
 		}
 
 		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
@@ -158,11 +158,11 @@ namespace OpenDental {
 
 		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
 		public string ReceiptStr {
-			get { return receiptStr; }
+			get { return _receiptStr; }
 		}
 
 		public PayConnectService.transType TranType {
-			get { return trantype; }
+			get { return _trantype; }
 		}
 
 		private bool VerifyData(out int expYear,out int expMonth){
@@ -191,7 +191,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Expiration format invalid.");
 				return false;
 			}
-			if(CreditCardCur==null) {//if the user selected a new CC, verify through PayConnect
+			if(_creditCardCur==null) {//if the user selected a new CC, verify through PayConnect
 				if(!Bridges.PayConnect.IsValidCardAndExp(textCardNumber.Text,expYear,expMonth)) {//if exception happens, a message box will show with the error
 					MsgBox.Show(this,"Card number or expiration date failed validation with PayConnect.");
 					return false;
@@ -205,8 +205,22 @@ namespace OpenDental {
 				MsgBox.Show(this,"Invalid amount.");
 				return false;
 			}
-			if((trantype==PayConnectService.transType.VOID || trantype==PayConnectService.transType.RETURN) && textRefNumber.Text=="") {
+			if((_trantype==PayConnectService.transType.VOID || _trantype==PayConnectService.transType.RETURN) && textRefNumber.Text=="") {
 				MsgBox.Show(this,"Ref Number required.");
+				return false;
+			}
+			//verify the selected clinic has a username, password, and payment type entered
+			Program progCur=Programs.GetCur(ProgramName.PayConnect);
+			if(progCur==null) {
+				MsgBox.Show(this,"PayConnect does not exist in the database.");
+				return false;
+			}
+			string paytype=ProgramProperties.GetPropVal(progCur.ProgramNum,"PaymentType",_paymentCur.ClinicNum);
+			if(ProgramProperties.GetPropVal(progCur.ProgramNum,"Username",_paymentCur.ClinicNum)==""
+				|| ProgramProperties.GetPropVal(progCur.ProgramNum,"Password",_paymentCur.ClinicNum)=="" //if username or password is blank
+				|| !DefC.Short[(int)DefCat.PaymentTypes].Any(x => x.DefNum.ToString()==paytype)) //or paytype is not a valid DefNum
+			{
+				MsgBox.Show(this,"The PayConnect username, password, or payment type has not been set.");
 				return false;
 			}
 			return true;
@@ -219,34 +233,38 @@ namespace OpenDental {
 			int xright=15;
 			int xmax=37;
 			result+=Environment.NewLine;
-			//Print header/Practice information
-			string practiceTitle=PrefC.GetString(PrefName.PracticeTitle);
-			if(practiceTitle.Length>0) {
-				result+=practiceTitle+Environment.NewLine;
+			Clinic clinicCur=null;
+			//_clinicNum will be 0 if clinics are not enabled or if the payment.ClinicNum=0, which will happen if the patient.ClinicNum=0 and the user
+			//does not change the clinic on the payment before sending to PayConnect or if the user decides to process the payment for 'Headquarters'
+			//and manually changes the clinic on the payment from the patient's clinic to 'none'
+			if(_paymentCur.ClinicNum==0) {
+				clinicCur=Clinics.GetPracticeAsClinicZero();
 			}
-			string practiceAddress=PrefC.GetString(PrefName.PracticeAddress);
-			if(practiceAddress.Length>0) {
-				result+=practiceAddress+Environment.NewLine;
+			else{
+				clinicCur=Clinics.GetClinic(_paymentCur.ClinicNum);
 			}
-			string practiceAddress2=PrefC.GetString(PrefName.PracticeAddress2);
-			if(practiceAddress2.Length>0) {
-				result+=practiceAddress2+Environment.NewLine;
-			}
-			string practiceCity=PrefC.GetString(PrefName.PracticeCity);
-			string practiceState=PrefC.GetString(PrefName.PracticeST);
-			string practiceZip=PrefC.GetString(PrefName.PracticeZip);
-			if(practiceCity.Length>0 || practiceState.Length>0 || practiceZip.Length>0) {
-				string cityStateZip=practiceCity+" "+practiceState+" "+practiceZip;
-				result+=cityStateZip+Environment.NewLine;
-			}
-			string practicePhone=PrefC.GetString(PrefName.PracticePhone);
-			if(practicePhone.Length==10 
-				&& (CultureInfo.CurrentCulture.Name=="en-US" || 
-				CultureInfo.CurrentCulture.Name.EndsWith("CA"))) {//Canadian. en-CA or fr-CA
-					result+="("+practicePhone.Substring(0,3)+")"+practicePhone.Substring(3,3)+"-"+practicePhone.Substring(6)+Environment.NewLine;
-			}
-			else if(practicePhone.Length>0) {
-				result+=practicePhone+Environment.NewLine;
+			if(clinicCur!=null) {
+				if(clinicCur.Description.Length>0) {
+					result+=clinicCur.Description+Environment.NewLine;
+				}
+				if(clinicCur.Address.Length>0) {
+					result+=clinicCur.Address+Environment.NewLine;
+				}
+				if(clinicCur.Address2.Length>0) {
+					result+=clinicCur.Address2+Environment.NewLine;
+				}
+				if(clinicCur.City.Length>0 || clinicCur.State.Length>0 || clinicCur.Zip.Length>0) {
+					result+=clinicCur.City+", "+clinicCur.State+" "+clinicCur.Zip+Environment.NewLine;
+				}
+				if(clinicCur.Phone.Length==10
+					&& (CultureInfo.CurrentCulture.Name=="en-US" ||
+					CultureInfo.CurrentCulture.Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
+				{
+					result+="("+clinicCur.Phone.Substring(0,3)+")"+clinicCur.Phone.Substring(3,3)+"-"+clinicCur.Phone.Substring(6)+Environment.NewLine;
+				}
+				else if(clinicCur.Phone.Length>0) {
+					result+=clinicCur.Phone+Environment.NewLine;
+				}
 			}
 			result+=Environment.NewLine;
 			//Print body
@@ -265,7 +283,7 @@ namespace OpenDental {
 			result+="Card Type".PadRight(xright-xleft,'.')+Bridges.PayConnect.GetCardType(request.CardNumber)+Environment.NewLine;
 			result+="Entry".PadRight(xright-xleft,'.')+(request.MagData==""?"Manual":"Swiped")+Environment.NewLine;
 			result+="Auth Code".PadRight(xright-xleft,'.')+response.AuthCode+Environment.NewLine;
-			result+="Result".PadRight(xright-xleft,'.')+response.Status.description+Environment.NewLine;			
+			result+="Result".PadRight(xright-xleft,'.')+response.Status.description+Environment.NewLine;
 			if(response.Messages!=null) {
 				string label="Message";
 				foreach(string m in response.Messages) {
@@ -309,10 +327,10 @@ namespace OpenDental {
 			pView.printPreviewControl2.Document=printdoc;
 			pView.ShowDialog();
 #else
-				if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,PatCur.PatNum,"PayConnect receipt printed")){
-					printdoc.PrinterSettings=pd2.PrinterSettings;
-					printdoc.Print();
-				}
+			if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,_patCur.PatNum,"PayConnect receipt printed")) {
+				printdoc.PrinterSettings=pd2.PrinterSettings;
+				printdoc.Print();
+			}
 #endif
 		}
 
@@ -325,36 +343,36 @@ namespace OpenDental {
 				return;
 			}
 			string refNumber="";
-			if(trantype==PayConnectService.transType.VOID || trantype==PayConnectService.transType.RETURN) {
+			if(_trantype==PayConnectService.transType.VOID || _trantype==PayConnectService.transType.RETURN) {
 				refNumber=textRefNumber.Text;
 			}
 			string magData=null;
-			if(parser!=null) {
-				magData=parser.Track2;
+			if(_parser!=null) {
+				magData=_parser.Track2;
 			}
 			string cardNumber=textCardNumber.Text;
 			//if the user has chosen to store CC tokens and the stored CC has a token and the token is not expired,
 			//then use it instead of the CC number and CC expiration.
 			if(checkSaveToken.Checked
-				&& CreditCardCur!=null //if the user selected a saved CC
-				&& CreditCardCur.PayConnectToken!="" //there is a stored token for this card
-				&& CreditCardCur.PayConnectTokenExp.Date>=DateTime.Today.Date) //the token is not expired
+				&& _creditCardCur!=null //if the user selected a saved CC
+				&& _creditCardCur.PayConnectToken!="" //there is a stored token for this card
+				&& _creditCardCur.PayConnectTokenExp.Date>=DateTime.Today.Date) //the token is not expired
 			{
-				cardNumber=CreditCardCur.PayConnectToken;
-				expYear=CreditCardCur.PayConnectTokenExp.Year;
-				expMonth=CreditCardCur.PayConnectTokenExp.Month;
+				cardNumber=_creditCardCur.PayConnectToken;
+				expYear=_creditCardCur.PayConnectTokenExp.Year;
+				expMonth=_creditCardCur.PayConnectTokenExp.Month;
 			}
 			_request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
-				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,trantype,refNumber,checkSaveToken.Checked);
-			response=Bridges.PayConnect.ProcessCreditCard(_request);
-			if(response==null || response.Status.code!=0) {//error in transaction
+				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,_trantype,refNumber,checkSaveToken.Checked);
+			_response=Bridges.PayConnect.ProcessCreditCard(_request,_paymentCur.ClinicNum);
+			if(_response==null || _response.Status.code!=0) {//error in transaction
 				Cursor=Cursors.Default;
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(trantype==PayConnectService.transType.SALE && response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
-				receiptStr=BuildReceiptString(_request,response);
-				PrintReceipt(receiptStr);
+			if(_trantype==PayConnectService.transType.SALE && _response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
+				_receiptStr=BuildReceiptString(_request,_response);
+				PrintReceipt(_receiptStr);
 			}
 			if(!PrefC.GetBool(PrefName.StoreCCnumbers) && !checkSaveToken.Checked) {//not storing the card number or the token
 				Cursor=Cursors.Default;
@@ -363,29 +381,29 @@ namespace OpenDental {
 			}
 			//response must be non-null and the status code must be 0=Approved
 			//also, the user must have the pref StoreCCnumbers enabled or they have the checkSaveTokens checked
-			if(CreditCardCur==null) {//user selected Add new card from the payment window, save it or its token depending on settings
-				CreditCardCur=new CreditCard();
-				CreditCardCur.IsNew=true;
-				CreditCardCur.PatNum=PatCur.PatNum;
-				List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
-				CreditCardCur.ItemOrder=itemOrderCount.Count;
+			if(_creditCardCur==null) {//user selected Add new card from the payment window, save it or its token depending on settings
+				_creditCardCur=new CreditCard();
+				_creditCardCur.IsNew=true;
+				_creditCardCur.PatNum=_patCur.PatNum;
+				List<CreditCard> itemOrderCount=CreditCards.Refresh(_patCur.PatNum);
+				_creditCardCur.ItemOrder=itemOrderCount.Count;
 			}
-			CreditCardCur.CCExpiration=new DateTime(expYear,expMonth,DateTime.DaysInMonth(expYear,expMonth));
-			CreditCardCur.Zip=textZipCode.Text;
-			CreditCardCur.CCNumberMasked=textCardNumber.Text;
-			CreditCardCur.PayConnectToken="";
-			CreditCardCur.PayConnectTokenExp=DateTime.MinValue;
+			_creditCardCur.CCExpiration=new DateTime(expYear,expMonth,DateTime.DaysInMonth(expYear,expMonth));
+			_creditCardCur.Zip=textZipCode.Text;
+			_creditCardCur.CCNumberMasked=textCardNumber.Text;
+			_creditCardCur.PayConnectToken="";
+			_creditCardCur.PayConnectTokenExp=DateTime.MinValue;
 			if(checkSaveToken.Checked) {//store the token and the masked CC number (only last four digits)
-				CreditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
-				CreditCardCur.PayConnectToken=response.PaymentToken.TokenId;
-				CreditCardCur.PayConnectTokenExp=new DateTime(response.PaymentToken.Expiration.year,response.PaymentToken.Expiration.month,
-					DateTime.DaysInMonth(response.PaymentToken.Expiration.year,response.PaymentToken.Expiration.month));
+				_creditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
+				_creditCardCur.PayConnectToken=_response.PaymentToken.TokenId;
+				_creditCardCur.PayConnectTokenExp=new DateTime(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month,
+					DateTime.DaysInMonth(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month));
 			}
-			if(CreditCardCur.IsNew) {
-				CreditCards.Insert(CreditCardCur);
+			if(_creditCardCur.IsNew) {
+				CreditCards.Insert(_creditCardCur);
 			}
 			else {
-				CreditCards.Update(CreditCardCur);
+				CreditCards.Update(_creditCardCur);
 			}
 			Cursor=Cursors.Default;
 			DialogResult=DialogResult.OK;

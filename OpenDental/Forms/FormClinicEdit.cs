@@ -1025,10 +1025,18 @@ namespace OpenDental{
 				ClinicCur.InsBillingProv=_provNumBillingSelected;
 			}
 			ClinicCur.DefaultProv=_provNumDefaultSelected;
-			if(IsNew){
+			if(IsNew) {
 				Clinics.Insert(ClinicCur);
+				//for every new clinic, insert a set of program properties for PayConnect with the values from
+				//the 'Headquarters' or ClinicNum=0 set of properties
+				List<ProgramProperty> listProps=ProgramProperties.GetListForProgramAndClinic(Programs.GetProgramNum(ProgramName.PayConnect),0);
+				for(int i=0;i<listProps.Count;i++) {
+					listProps[i].ClinicNum=ClinicCur.ClinicNum;
+					ProgramProperties.Insert(listProps[i]);//copy all values from the 0 clinic except ClinicNum and the primary key, insert will assign pri key
+				}
+				DataValid.SetInvalid(InvalidType.Programs);
 			}
-			else{
+			else {
 				Clinics.Update(ClinicCur);
 			}
 			DialogResult=DialogResult.OK;

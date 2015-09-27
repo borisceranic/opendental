@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.Linq;
 
 namespace OpenDentBusiness {
 
@@ -27,25 +28,26 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
-		public static void Update(ProgramProperty Cur){
+		public static void Update(ProgramProperty programProp){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),Cur);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),programProp);
 				return;
 			}
-			Crud.ProgramPropertyCrud.Update(Cur);
+			Crud.ProgramPropertyCrud.Update(programProp);
 		}
 
-		///<summary>This can only be called from ClassConversions. Users not allowed to add properties so there is no user interface.</summary>
-		public static long Insert(ProgramProperty Cur){
+		///<summary>This is called from FormClinicEdit and from InsertOrUpdateLocalOverridePath.  PayConnect can have clinic specific login credentials,
+		///so the ProgramProperties for PayConnect are duplicated for each clinic.  The properties duplicated are Username, Password, and PaymentType.
+		///There's also a 'Headquarters' or no clinic set of these props with ClinicNum 0, which is the set of props inserted with each new clinic.</summary>
+		public static long Insert(ProgramProperty programProp){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Cur.ProgramPropertyNum=Meth.GetLong(MethodBase.GetCurrentMethod(),Cur);
-				return Cur.ProgramPropertyNum;
+				programProp.ProgramPropertyNum=Meth.GetLong(MethodBase.GetCurrentMethod(),programProp);
+				return programProp.ProgramPropertyNum;
 			}
-			return Crud.ProgramPropertyCrud.Insert(Cur);
+			return Crud.ProgramPropertyCrud.Insert(programProp);
 		}
 
-		///<summary>Returns a List of programproperties attached to the specified programNum.  Does not include path overrides.
-		///DO NOT MODIFY the returned properties.  Read only.</summary>
+		///<summary>Returns a List of ProgramProperties attached to the specified programNum.  Does not include path overrides.</summary>
 		public static List<ProgramProperty> GetListForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
 			List<ProgramProperty> listProgPropsResult=new List<ProgramProperty>();
@@ -58,8 +60,18 @@ namespace OpenDentBusiness {
 			return listProgPropsResult;
 		}
 
-		///<summary>Returns an ArrayList of programproperties attached to the specified programNum.  Does not include path overrides.
-		///DO NOT MODIFY the returned properties.  Read only.</summary>
+		///<summary>Returns a list of ProgramProperties with the specified programNum and the specified clinicNum from the cache.
+		///To get properties when clinics are not enabled or properties for 'Headquarters' use clinicNum 0.
+		///Does not include path overrides.</summary>
+		public static List<ProgramProperty> GetListForProgramAndClinic(long programNum,long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			return ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum)
+				.FindAll(x => x.ClinicNum==clinicNum)
+				.FindAll(x => x.PropertyDesc!="");
+		}
+
+		///<summary>Returns an ArrayList of ProgramProperties attached to the specified programNum.  Does not include path overrides.
+		///Uses thread-safe caching pattern.  Each call to this method creates an copy of the entire ProgramProperty cache.</summary>
 		public static ArrayList GetForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
 			ArrayList ForProgram=new ArrayList();
@@ -84,11 +96,11 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>After GetForProgram has been run, this gets one of those properties.  DO NOT MODIFY the returned property.  Read only.</summary>
-		public static ProgramProperty GetCur(ArrayList ForProgram, string desc){
+		public static ProgramProperty GetCur(ArrayList arrayForProgram, string desc){
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<ForProgram.Count;i++){
-				if(((ProgramProperty)ForProgram[i]).PropertyDesc==desc){
-					return (ProgramProperty)ForProgram[i];
+			for(int i=0;i<arrayForProgram.Count;i++){
+				if(((ProgramProperty)arrayForProgram[i]).PropertyDesc==desc){
+					return (ProgramProperty)arrayForProgram[i];
 				}
 			}
 			return null;
@@ -109,10 +121,28 @@ namespace OpenDentBusiness {
 			throw new ApplicationException("Property not found: "+desc);
 		}
 
-		public static string GetPropVal(ProgramName progName,string desc) {
+		public static string GetPropVal(ProgramName programName,string desc) {
 			//No need to check RemotingRole; no call to db.
-			long programNum=Programs.GetProgramNum(progName);
+			long programNum=Programs.GetProgramNum(programName);
 			return GetPropVal(programNum,desc);
+		}
+
+		///<summary>Returns the PropertyVal for programNum and clinicNum specified with the description specified.  If the property doesn't exist,
+		///returns an empty string.  For the PropertyVal for 'Headquarters' or clincs not enabled, use clinicNum 0.</summary>
+		public static string GetPropVal(long programNum,string desc,long clinicNum) {
+			return GetPropValFromList(ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum),desc,clinicNum);
+		}
+
+		///<summary>Returns the PropertyVal from the list by PropertyDesc and ClinicNum.
+		///For the 'Headquarters' or for clinics not enabled, omit clinicNum or send clinicNum 0.  If not found returns an empty string.
+		///Primarily used when a local list has been copied from the cache and may differ from what's in the database.  Also possibly useful if dealing with a filtered list </summary>
+		public static string GetPropValFromList(List<ProgramProperty> listProps,string propertyDesc,long clinicNum=0) {
+			string retval="";
+			ProgramProperty prop=listProps.Where(x => x.ClinicNum==clinicNum).Where(x => x.PropertyDesc==propertyDesc).FirstOrDefault();
+			if(prop!=null) {
+				retval=prop.PropertyValue;
+			}
+			return retval;
 		}
 
 		///<summary>Returns the property with the matching description from the provided list.  Null if the property cannot be found by the description.</summary>
@@ -179,17 +209,24 @@ namespace OpenDentBusiness {
 			ProgramProperties.Insert(pp);
 		}
 
-
-
-
+		///<summary>Updates any ProgramProperty in listProgProps with a different PropertyValue than the database.
+		///listProgPropsNew will always have the same number of items as the database list, since ProgramProperties are never deleted and are only
+		///inserted during convert database or when a new clinic is created.  We can simply update the property using listProgPropsNew and the db list
+		///sorted by primary key.  Simple sync function that never inserts or deletes rows.  Updates if the PropertyValue has changed.</summary>
+		public static void SyncSimple(List<ProgramProperty> listProgPropsNew,long programNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listProgPropsNew,programNum);
+				return;
+			}
+			List<ProgramProperty> listPPDB=ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum && x.PropertyDesc!="");
+			for(int i=0;i<listProgPropsNew.Count;i++) {
+				ProgramProperty ppDB=listPPDB.FirstOrDefault(x => listProgPropsNew[i].ProgramPropertyNum==x.ProgramPropertyNum)??new ProgramProperty();
+				Crud.ProgramPropertyCrud.Update(listProgPropsNew[i],ppDB);
+			}
+		}
 		
+
 	}
-
-	
-
-	
-
-
 }
 
 

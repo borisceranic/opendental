@@ -85,6 +85,9 @@ namespace OpenDental
 		private Label labelClinic;
 		private double ProcPaidHere;
 		private double _remainAmt;
+		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
+		///as comboClinic and is used to set paysplit.ClinicNum when saving.</summary>
+		private List<long> _listUserClinicNums;
 
 
 		///<summary></summary>
@@ -772,19 +775,24 @@ namespace OpenDental
 					comboProvider.SelectedIndex=i;
 				}
 			}
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				labelClinic.Visible=false;
-				comboClinic.Visible=false;
-			}
-			else {
-				comboClinic.Items.Add("none");
+			_listUserClinicNums=new List<long>();
+			if(PrefC.HasClinicsEnabled) {
+				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
+				comboClinic.Items.Clear();
+				comboClinic.Items.Add(Lan.g(this,"none"));
+				_listUserClinicNums.Add(0);//this way both lists have the same number of items in it
 				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==PaySplitCur.ClinicNum) {
+				for(int i=0;i<listClinics.Count;i++) {
+					comboClinic.Items.Add(listClinics[i].Description);
+					_listUserClinicNums.Add(listClinics[i].ClinicNum);
+					if(listClinics[i].ClinicNum==PaySplitCur.ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
+			}
+			else {//clinics not enabled
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
 			}
 			if(PaySplitCur.ProvNum==0) {
 				comboProvider.SelectedIndex=0;
@@ -1081,13 +1089,9 @@ namespace OpenDental
 			else {
 				PaySplitCur.UnearnedType=DefC.Short[(int)DefCat.PaySplitUnearnedType][comboUnearnedTypes.SelectedIndex-1].DefNum;
 			}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex==0) {//none
-					PaySplitCur.ClinicNum=0;
-				}
-				else {
-					PaySplitCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-				}
+			if(PrefC.HasClinicsEnabled && comboClinic.SelectedIndex>0 && _listUserClinicNums.Count>comboClinic.SelectedIndex) {
+				//_listUserClinicNums contains all clinics the user has access to as well as ClinicNum 0 for 'none'
+				PaySplitCur.ClinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
 			}
 			//if(!checkPatOtherFam.Checked){
 				//This is still needed because it might be zero:

@@ -494,6 +494,11 @@ namespace OpenDental {
 		}
 
 		private void SendPayConnect() {
+			Dictionary<long,string> dictClinicNumDesc=new Dictionary<long,string>();
+			dictClinicNumDesc[0]=PrefC.GetString(PrefName.PracticeTitle);
+			if(PrefC.HasClinicsEnabled) {
+				dictClinicNumDesc=Clinics.GetClinicsNoCache().ToDictionary(x => x.ClinicNum,x => x.Description);
+			}
 			StringBuilder strBuilderResultFile=new StringBuilder();
 			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
 			strBuilderResultFile.AppendLine();
@@ -518,18 +523,23 @@ namespace OpenDental {
 				}
 				decimal amt=PIn.Decimal(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
 				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
+				long clinicNumCur=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
 				//request a PayConnect token, if a token was already saved PayConnect will return the same token,
 				//otherwise replace CCNumberMasked with the returned token if the sale successful
 				Cursor=Cursors.WaitCursor;
 				PayConnectService.creditCardRequest payConnectRequest=PayConnect.BuildSaleRequest(amt,tokenOrCCMasked,exp.Year,exp.Month,
 					patCur.GetNameFLnoPref(),"",zip,null,PayConnectService.transType.SALE,"",true);
-				PayConnectService.transResponse payConnectResponse=PayConnect.ProcessCreditCard(payConnectRequest);
+				//clinicNumCur could be 0, and the practice level or 'Headquarters' PayConnect credentials would be used for this charge
+				PayConnectService.transResponse payConnectResponse=PayConnect.ProcessCreditCard(payConnectRequest,clinicNumCur);
 				Cursor=Cursors.Default;
 				StringBuilder strBuilderResultText=new StringBuilder();//this payment's result text, used in payment note and then appended to file string builder
 				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+patCur.GetNameFLnoPref());
 				if(payConnectResponse==null) {
 					_failed++;
 					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					if(PrefC.HasClinicsEnabled && dictClinicNumDesc.ContainsKey(clinicNumCur)) {
+						strBuilderResultText.AppendLine("CLINIC="+dictClinicNumDesc[clinicNumCur]);
+					}
 					strBuilderResultText.AppendLine(Lan.g(this,"Transaction Failed, unkown error"));
 					strBuilderResultFile.AppendLine(strBuilderResultText.ToString());//add to the file string builder
 					continue;
@@ -537,6 +547,9 @@ namespace OpenDental {
 				else if(payConnectResponse.Status.code!=0) {//error in transaction
 					_failed++;
 					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					if(PrefC.HasClinicsEnabled && dictClinicNumDesc.ContainsKey(clinicNumCur)) {
+						strBuilderResultText.AppendLine("CLINIC="+dictClinicNumDesc[clinicNumCur]);
+					}
 					strBuilderResultText.AppendLine(Lan.g(this,"Transaction Type")+": "+PayConnectService.transType.SALE.ToString());
 					strBuilderResultText.AppendLine(Lan.g(this,"Status")+": "+payConnectResponse.Status.description);
 					strBuilderResultFile.AppendLine(strBuilderResultText.ToString());//add to the file string builder
@@ -560,6 +573,9 @@ namespace OpenDental {
 					CreditCards.Update(ccCur);
 				}
 				//add to strbuilder that will be written to txt file
+				if(PrefC.HasClinicsEnabled && dictClinicNumDesc.ContainsKey(clinicNumCur)) {
+					strBuilderResultText.AppendLine("CLINIC="+dictClinicNumDesc[clinicNumCur]);
+				}
 				strBuilderResultText.AppendLine("RESULT="+payConnectResponse.Status.description);
 				strBuilderResultText.AppendLine("TRANS TYPE="+PayConnectService.transType.SALE.ToString());
 				strBuilderResultText.AppendLine("AUTH CODE="+payConnectResponse.AuthCode);
@@ -606,7 +622,8 @@ namespace OpenDental {
 			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);
 			paymentCur.PatNum=patCur.PatNum;
 			paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
-			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType"));
+			//ClinicNum can be 0 for 'Headquarters' or clinics not enabled, PayType will be the 0 clinic or headquarters PayType if using PayConnect
+			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType",paymentCur.ClinicNum));
 			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
 			double payPlanDue=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanDue"].ToString());
 			paymentCur.PayNote=note;

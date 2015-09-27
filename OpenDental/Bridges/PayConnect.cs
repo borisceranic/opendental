@@ -9,19 +9,10 @@ using OpenDentBusiness;
 namespace OpenDental.Bridges {
 	public class PayConnect {
 
-		private static PayConnectService.Credentials GetCredentials(Program prog){
+		private static PayConnectService.Credentials GetCredentials(Program prog,long clinicNum){
 			PayConnectService.Credentials cred=new OpenDental.PayConnectService.Credentials();
-			ArrayList props=ProgramProperties.GetForProgram(prog.ProgramNum);
-			cred.Username="";
-			cred.Password="";
-			for(int i=0;i<props.Count;i++){
-				ProgramProperty prop=(ProgramProperty)props[i];
-				if(prop.PropertyDesc=="Username"){
-					cred.Username=prop.PropertyValue;
-				}else if(prop.PropertyDesc=="Password"){
-					cred.Password=prop.PropertyValue;
-				}
-			}
+			cred.Username=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",clinicNum);
+			cred.Password=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",clinicNum);
 			cred.Client="OpenDental2";
 #if DEBUG
 			cred.ServiceID="DCI Web Service ID: 002778";//Testing
@@ -53,10 +44,10 @@ namespace OpenDental.Bridges {
 		}
 
 		///<summary>Shows a message box on error.</summary>
-		public static PayConnectService.transResponse ProcessCreditCard(PayConnectService.creditCardRequest request) {
+		public static PayConnectService.transResponse ProcessCreditCard(PayConnectService.creditCardRequest request,long clinicNum) {
 			try {
 				Program prog=Programs.GetCur(ProgramName.PayConnect);
-				PayConnectService.Credentials cred=GetCredentials(prog);
+				PayConnectService.Credentials cred=GetCredentials(prog,clinicNum);
 				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
 #if DEBUG
 				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
