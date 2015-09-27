@@ -499,6 +499,7 @@ namespace OpenDental {
 			field.FontName="";
 			field.RadioButtonValue="";
 			SheetCur.SheetFields.Add(field);
+			FieldValueChanged(sender);
 			PointList.Clear();
 			RefreshPanel();
 		}
