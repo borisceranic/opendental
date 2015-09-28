@@ -318,7 +318,7 @@ namespace CentralManager {
 						if(dsTotal.Tables[j].Rows[k][0].ToString()==dates[i].ToString("MMM yyyy")) {
 							production+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Production"].ToString());
 							adjust+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Adjustments"].ToString());
-							inswriteoff-=PIn.Decimal(dsTotal.Tables[j].Rows[k]["WriteOff"].ToString());
+							inswriteoff+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["WriteOff"].ToString());//Writeoffs stored as negative number
 							ptincome+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Pt Income"].ToString());
 							insincome+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Ins Income"].ToString());
 						}
