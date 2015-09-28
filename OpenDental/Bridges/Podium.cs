@@ -36,6 +36,10 @@ namespace OpenDental.Bridges {
 			string firstName=pat.FName;
 			string lastName=pat.LName;
 			string emailIn=pat.Email;
+			string isTestString="false";
+			if(isTest) {
+				isTestString="true";
+			}
 			try {
 				for(int i=0;i<listPhoneNumbers.Count;i++) {
 					string apiUrl="https://podium.co/api/v1";
@@ -50,14 +54,13 @@ namespace OpenDental.Bridges {
 						{{
 							""location_id"": ""{0}"",
 							""phone_number"": ""{1}"",
-							""customer"": {2} 
-							{{
-								""first_name"": ""{3}"",
-								""last_name"": ""{4}"",
-								""emailIn"": ""{5}""
+							""customer"":  {{
+								""first_name"": ""{2}"",
+								""last_name"": ""{3}"",
+								""email"": ""{4}""
 							}},
-							""test"": {6}
-						}}",locationId,listPhoneNumbers[i],isNew?"\"new\"":"",firstName,lastName,emailIn,isTest);
+							""test"": {5}
+						}}",locationId,listPhoneNumbers[i],firstName,lastName,emailIn,isTestString);
 						//Post with Authorization headers and a body comprised of a JSON serialized anonymous type.
 						client.UploadString(apiUrl,"POST",bodyJson);
 						if(client.StatusCode==HttpStatusCode.OK) {
@@ -83,10 +86,11 @@ namespace OpenDental.Bridges {
 			//	"customer": {
 			//		"first_name": "Johnny",
 			//		"last_name": "Appleseed",
-			//		"emailIn": "johnny.appleseed@gmail.com"
+			//		"email": "johnny.appleseed@gmail.com"
 			//	},
 			//	"test": true
 			//}
+			//NOTE:  There will never be a value after "customer": although it was initially interpreted that there would be a "new" flag there.
 		}
 
 		private class WebClientEx:WebClient {
