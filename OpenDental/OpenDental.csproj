@@ -418,7 +418,9 @@
     <Compile Include="Forms\FormEmailAutographEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormJobProjectEdit.cs" />
+    <Compile Include="Forms\FormJobProjectEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FormProcBroken.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3731,6 +3733,12 @@
     <Compile Include="User Controls\TextBoxWiki.Designer.cs">
       <DependentUpon>TextBoxWiki.cs</DependentUpon>
     </Compile>
+    <Compile Include="User Controls\UserControlProjects.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="User Controls\UserControlProjects.Designer.cs">
+      <DependentUpon>UserControlProjects.cs</DependentUpon>
+    </Compile>
     <Compile Include="Web References\CallFireService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -6165,6 +6173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="User Controls\TextBoxWiki.resx">
       <DependentUpon>TextBoxWiki.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User Controls\UserControlProjects.resx">
+      <DependentUpon>UserControlProjects.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="User Controls\UserControlTasks.resx">
       <SubType>Designer</SubType>
