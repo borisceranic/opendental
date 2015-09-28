@@ -2524,8 +2524,7 @@ namespace OpenDental{
 				isApptModuleSelected=true;
 			}
 			if(CurPatNum!=0 && _showForm=="apptsforpatient" && isApptModuleSelected) {
-				FormApptsOther FormA=new FormApptsOther(CurPatNum);
-				FormA.ShowDialog();
+				ContrAppt2.DisplayOtherDlg(false);
 			}
 			if(_showForm=="searchpatient") {
 				FormPatientSelect formPS=new FormPatientSelect();

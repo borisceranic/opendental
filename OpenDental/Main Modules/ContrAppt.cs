@@ -4196,7 +4196,7 @@ namespace OpenDental {
 		}
 
 		///<summary>Displays the Other Appointments for the current patient, then refreshes screen as needed.  initialClick specifies whether the user doubleclicked on a blank time to get to this dialog.</summary>
-		private void DisplayOtherDlg(bool initialClick) {
+		public void DisplayOtherDlg(bool initialClick) {
 			if(PatCur==null) {
 				return;
 			}
