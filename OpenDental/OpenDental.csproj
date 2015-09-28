@@ -3473,9 +3473,6 @@
     <Compile Include="InternalTools\Job Manager\FormJobManager.Designer.cs">
       <DependentUpon>FormJobManager.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormTest.Designer.cs">
-      <DependentUpon>FormTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\JobContainerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
