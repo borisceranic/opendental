@@ -58,10 +58,8 @@ namespace OpenDental {
 		///<summary></summary>
 		public void LayoutToolBar() {
 			ToolBarMain.Buttons.Clear();
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Setup"),-1,"","Setup"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Project"),0,"","AddProject"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Job"),1,"","AddJob"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Search Job"),-1,"","SearchJob"));
 			ToolBarMain.Invalidate();
 		}
 
@@ -180,9 +178,6 @@ namespace OpenDental {
 			}
 		}
 
-		private void Setup_Clicked() {
-		}
-
 		private void AddJobProject_Clicked() {
 			JobProject cur=new JobProject();
 			if(_listJobProjectHistory.Count>0) {
@@ -280,9 +275,9 @@ namespace OpenDental {
 				}
 				Job jobCur=_listJobs[_clickedIdx-_listJobProjects.Count];
 				jobCur.JobStatus=JobStatus.Done;
-				if(jobCur.DateTimeFinished.Year<1880) {
-					jobCur.DateTimeFinished=DateTime.Now;
-				}
+				//if(jobCur.DateTimeFinished.Year<1880) {
+				//	jobCur.DateTimeFinished=DateTime.Now;
+				//}
 				try {
 					Jobs.Update(jobCur);
 				}

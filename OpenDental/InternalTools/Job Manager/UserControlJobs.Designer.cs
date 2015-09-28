@@ -54,7 +54,7 @@
 			// 
 			this.textJobNum.Location = new System.Drawing.Point(78, 18);
 			this.textJobNum.Name = "textJobNum";
-			this.textJobNum.Size = new System.Drawing.Size(171, 20);
+			this.textJobNum.Size = new System.Drawing.Size(89, 20);
 			this.textJobNum.TabIndex = 0;
 			this.textJobNum.TextChanged += new System.EventHandler(this.textJobNum_TextChanged);
 			// 
@@ -73,7 +73,7 @@
 			this.comboType.Location = new System.Drawing.Point(78, 188);
 			this.comboType.MaxDropDownItems = 40;
 			this.comboType.Name = "comboType";
-			this.comboType.Size = new System.Drawing.Size(171, 21);
+			this.comboType.Size = new System.Drawing.Size(89, 21);
 			this.comboType.TabIndex = 8;
 			this.comboType.SelectedIndexChanged += new System.EventHandler(this.comboType_SelectedIndexChanged);
 			// 
@@ -92,7 +92,7 @@
 			this.comboPriority.Location = new System.Drawing.Point(78, 166);
 			this.comboPriority.MaxDropDownItems = 40;
 			this.comboPriority.Name = "comboPriority";
-			this.comboPriority.Size = new System.Drawing.Size(171, 21);
+			this.comboPriority.Size = new System.Drawing.Size(89, 21);
 			this.comboPriority.TabIndex = 7;
 			this.comboPriority.SelectedIndexChanged += new System.EventHandler(this.comboPriority_SelectedIndexChanged);
 			// 
@@ -111,7 +111,7 @@
 			this.comboStatus.FormattingEnabled = true;
 			this.comboStatus.Location = new System.Drawing.Point(78, 144);
 			this.comboStatus.Name = "comboStatus";
-			this.comboStatus.Size = new System.Drawing.Size(171, 21);
+			this.comboStatus.Size = new System.Drawing.Size(89, 21);
 			this.comboStatus.TabIndex = 6;
 			this.comboStatus.SelectedIndexChanged += new System.EventHandler(this.comboStatus_SelectedIndexChanged);
 			// 
@@ -119,7 +119,7 @@
 			// 
 			this.textTitle.Location = new System.Drawing.Point(78, 123);
 			this.textTitle.Name = "textTitle";
-			this.textTitle.Size = new System.Drawing.Size(171, 20);
+			this.textTitle.Size = new System.Drawing.Size(89, 20);
 			this.textTitle.TabIndex = 5;
 			this.textTitle.TextChanged += new System.EventHandler(this.textTitle_TextChanged);
 			// 
@@ -155,7 +155,7 @@
 			// 
 			this.textProject.Location = new System.Drawing.Point(78, 102);
 			this.textProject.Name = "textProject";
-			this.textProject.Size = new System.Drawing.Size(171, 20);
+			this.textProject.Size = new System.Drawing.Size(89, 20);
 			this.textProject.TabIndex = 4;
 			this.textProject.TextChanged += new System.EventHandler(this.textProject_TextChanged);
 			// 
@@ -172,7 +172,7 @@
 			// 
 			this.textVersion.Location = new System.Drawing.Point(78, 81);
 			this.textVersion.Name = "textVersion";
-			this.textVersion.Size = new System.Drawing.Size(171, 20);
+			this.textVersion.Size = new System.Drawing.Size(89, 20);
 			this.textVersion.TabIndex = 3;
 			this.textVersion.TextChanged += new System.EventHandler(this.textVersion_TextChanged);
 			// 
@@ -189,7 +189,7 @@
 			// 
 			this.textOwner.Location = new System.Drawing.Point(78, 60);
 			this.textOwner.Name = "textOwner";
-			this.textOwner.Size = new System.Drawing.Size(171, 20);
+			this.textOwner.Size = new System.Drawing.Size(89, 20);
 			this.textOwner.TabIndex = 2;
 			this.textOwner.TextChanged += new System.EventHandler(this.textOwner_TextChanged);
 			// 
@@ -206,7 +206,7 @@
 			// 
 			this.textExpert.Location = new System.Drawing.Point(78, 39);
 			this.textExpert.Name = "textExpert";
-			this.textExpert.Size = new System.Drawing.Size(171, 20);
+			this.textExpert.Size = new System.Drawing.Size(89, 20);
 			this.textExpert.TabIndex = 1;
 			this.textExpert.TextChanged += new System.EventHandler(this.textExpert_TextChanged);
 			// 
@@ -242,9 +242,9 @@
 			this.groupBox2.Controls.Add(this.textExpert);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(532, 35);
+			this.groupBox2.Location = new System.Drawing.Point(263, 35);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(279, 240);
+			this.groupBox2.Size = new System.Drawing.Size(184, 240);
 			this.groupBox2.TabIndex = 13;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Search by:";
@@ -255,11 +255,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = false;
+			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(4, 5);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(522, 270);
+			this.gridMain.Size = new System.Drawing.Size(253, 270);
 			this.gridMain.TabIndex = 11;
 			this.gridMain.TabStop = false;
 			this.gridMain.Title = "Jobs";
@@ -279,7 +279,7 @@
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(532, 5);
+			this.butAdd.Location = new System.Drawing.Point(263, 5);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 15;
@@ -295,7 +295,7 @@
 			this.Controls.Add(this.gridMain);
 			this.MinimumSize = new System.Drawing.Size(450, 290);
 			this.Name = "UserControlJobs";
-			this.Size = new System.Drawing.Size(815, 290);
+			this.Size = new System.Drawing.Size(450, 290);
 			this.Load += new System.EventHandler(this.UserControlJob_Load);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();

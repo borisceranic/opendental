@@ -57,28 +57,28 @@ namespace OpenDental {
 				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("JobNum",60);
+			ODGridColumn col=new ODGridColumn("Title",100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Priority",55);
+			col=new ODGridColumn("Owner",55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Expert",80);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Owner",80);
+			col=new ODGridColumn("Expert",55);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Status",135);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Title",100);
+			col=new ODGridColumn("Priority",55);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn("JobNum",60);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_table.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_table.Rows[i]["JobNum"].ToString());
-				row.Cells.Add(Enum.GetName(typeof(JobPriority),_table.Rows[i]["JobPriority"])); //if null returns blank
-				row.Cells.Add(_table.Rows[i]["Expert"].ToString());
-				row.Cells.Add(_table.Rows[i]["Owner"].ToString());
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),_table.Rows[i]["JobStatus"])); //if null returns blank
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());
+				row.Cells.Add(_table.Rows[i]["Owner"].ToString());
+				row.Cells.Add(_table.Rows[i]["Expert"].ToString());
+				row.Cells.Add(Enum.GetName(typeof(JobStatus),_table.Rows[i]["JobStatus"])); //if null returns blank
+				row.Cells.Add(Enum.GetName(typeof(JobPriority),_table.Rows[i]["JobPriority"])); //if null returns blank
+				row.Cells.Add(_table.Rows[i]["JobNum"].ToString());				
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
