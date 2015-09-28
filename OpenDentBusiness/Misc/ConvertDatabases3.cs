@@ -10333,6 +10333,22 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
+				command="SELECT ClearinghouseNum FROM clearinghouse WHERE CommBridge=11";//MercuryDE
+				string mercuryClearinghouseNum=Db.GetScalar(command);
+				//Check to see if either dental or medical default clearinghouses are set to MercuryDE
+				command="SELECT ValueString FROM preference WHERE PrefName='ClearinghouseDefaultDent'";
+				string defaultDentClearinghouseNum=Db.GetScalar(command);
+				command="SELECT ValueString FROM preference WHERE PrefName='ClearinghouseDefaultMed'";
+				string defaultMedClearinghouseNum=Db.GetScalar(command);
+				//Clear out the default clearinghouses if either are set to MercuryDE because we are going to be hiding it.
+				if(mercuryClearinghouseNum==defaultDentClearinghouseNum) {
+					command="UPDATE preference SET ValueString='0' WHERE PrefName='ClearinghouseDefaultDent'";
+					Db.NonQ(command);
+				}
+				if(mercuryClearinghouseNum==defaultMedClearinghouseNum) {
+					command="UPDATE preference SET ValueString='0' WHERE PrefName='ClearinghouseDefaultMed'";
+					Db.NonQ(command);
+				}
 
 
 

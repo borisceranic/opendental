@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -100,6 +102,13 @@ namespace OpenDentBusiness{
 					}
 				}
 			}
+		}
+
+		///<summary>Returns a list of clearinghouses that filter out clearinghouses we no longer want to display.</summary>
+		public static List<Clearinghouse> GetListShort() {
+			List<Clearinghouse> listClearinghouses=new List<Clearinghouse>(GetListt());
+			listClearinghouses=listClearinghouses.Where(x => x.CommBridge!=EclaimsCommBridge.MercuryDE).ToList();
+			return listClearinghouses;
 		}
 
 		///<summary>Inserts this clearinghouse into database.</summary>

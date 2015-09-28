@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Net;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>
@@ -29,6 +30,7 @@ namespace OpenDental{
 		private Label labelReportCheckInterval;
 		private Label labelReportComputerName;
 		private bool listHasChanged;
+		private List<Clearinghouse> _listClearinghouses;
 
 		///<summary></summary>
 		public FormClearinghouses()
@@ -276,42 +278,46 @@ namespace OpenDental{
 		private void FormClearinghouses_Load(object sender, System.EventArgs e) {
 			textReportComputerName.Text=PrefC.GetString(PrefName.ClaimReportComputerName);
 			textReportCheckInterval.Text=POut.Int(PrefC.GetInt(PrefName.ClaimReportReceiveInterval));
+			_listClearinghouses=Clearinghouses.GetListShort();
 			FillGrid();
 		}
 
 		private void FillGrid(){
-			Clearinghouses.RefreshCache();
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			gridMain.ResetRows(arrayClearinghouses.Length);
+			gridMain.ResetRows(_listClearinghouses.Count);
 			gridMain.SetGridColor(Color.Gray);
 			gridMain.SetBackGColor(Color.White);
-			for(int i=0;i<arrayClearinghouses.Length;i++){
-				gridMain.Cell[0,i]=arrayClearinghouses[i].Description;
-				gridMain.Cell[1,i]=arrayClearinghouses[i].ExportPath;
-				gridMain.Cell[2,i]=arrayClearinghouses[i].Eformat.ToString();
+			for(int i=0;i<_listClearinghouses.Count;i++) {
+				gridMain.Cell[0,i]=_listClearinghouses[i].Description;
+				gridMain.Cell[1,i]=_listClearinghouses[i].ExportPath;
+				gridMain.Cell[2,i]=_listClearinghouses[i].Eformat.ToString();
 				string s="";
-				if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==arrayClearinghouses[i].ClearinghouseNum){
+				if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==_listClearinghouses[i].ClearinghouseNum) {
 					s+="Dent";
 				}
-				if(PrefC.GetLong(PrefName.ClearinghouseDefaultMed)==arrayClearinghouses[i].ClearinghouseNum){
+				if(PrefC.GetLong(PrefName.ClearinghouseDefaultMed)==_listClearinghouses[i].ClearinghouseNum) {
 					if(s!=""){
 						s+=",";
 					}
 					s+="Med";
 				}
 				gridMain.Cell[3,i]=s;
-				gridMain.Cell[4,i]=arrayClearinghouses[i].Payors;
+				gridMain.Cell[4,i]=_listClearinghouses[i].Payors;
 			}
 			gridMain.LayoutTables();
 		}
 
 		private void gridMain_CellDoubleClicked(object sender, OpenDental.CellEventArgs e) {
 			FormClearinghouseEdit FormCE=new FormClearinghouseEdit();
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			FormCE.ClearinghouseCur=arrayClearinghouses[e.Row];
+			FormCE.ClearinghouseCur=_listClearinghouses[e.Row];
 			FormCE.ShowDialog();
 			if(FormCE.DialogResult!=DialogResult.OK){
 				return;
+			}
+			if(FormCE.ClearinghouseCur==null) {//Clearinghouse was deleted.
+				_listClearinghouses.RemoveAt(e.Row);
+			}
+			else {
+				_listClearinghouses[e.Row]=FormCE.ClearinghouseCur.Copy();
 			}
 			listHasChanged=true;
 			FillGrid();
@@ -322,8 +328,12 @@ namespace OpenDental{
 			FormCE.ClearinghouseCur=new Clearinghouse();
 			FormCE.IsNew=true;
 			FormCE.ShowDialog();
-			if(FormCE.DialogResult!=DialogResult.OK)
+			if(FormCE.DialogResult!=DialogResult.OK) {
 				return;
+			}
+			if(FormCE.ClearinghouseCur!=null) {
+				_listClearinghouses.Add(FormCE.ClearinghouseCur.Copy());
+			}
 			listHasChanged=true;
 			FillGrid();
 		}
@@ -333,15 +343,15 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a row first.");
 				return;
 			}
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			Clearinghouse ch=arrayClearinghouses[gridMain.SelectedRow];
+			Clearinghouse ch=_listClearinghouses[gridMain.SelectedRow];
 			if(ch.Eformat==ElectronicClaimFormat.x837_5010_med_inst){//med/inst clearinghouse
 				MsgBox.Show(this,"The selected clearinghouse must first be set to a dental e-claim format.");
 				return;
 			}
-			Prefs.UpdateLong(PrefName.ClearinghouseDefaultDent,ch.ClearinghouseNum);
+			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultDent,ch.ClearinghouseNum)) {
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
 			FillGrid();
-			DataValid.SetInvalid(InvalidType.Prefs);
 		}
 
 		private void butDefaultMedical_Click(object sender,EventArgs e) {
@@ -349,15 +359,15 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a row first.");
 				return;
 			}
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			Clearinghouse clearhouse=arrayClearinghouses[gridMain.SelectedRow];
+			Clearinghouse clearhouse=_listClearinghouses[gridMain.SelectedRow];
 			if(clearhouse.Eformat!=ElectronicClaimFormat.x837_5010_med_inst){//anything except the med/inst format
 				MsgBox.Show(this,"The selected clearinghouse must first be set to the med/inst e-claim format.");
 				return;
 			}
-			Prefs.UpdateLong(PrefName.ClearinghouseDefaultMed,clearhouse.ClearinghouseNum);
+			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultMed,clearhouse.ClearinghouseNum)) {
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
 			FillGrid();
-			DataValid.SetInvalid(InvalidType.Prefs);
 		}
 
 		private void butThisComputer_Click(object sender,EventArgs e) {

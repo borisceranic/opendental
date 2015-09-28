@@ -89,7 +89,7 @@ namespace OpenDental{
 		private Label label37;
 		private TextBox textSeparatorSegment;
 		private Label label38;
-		///<summary>Set this externally before opening the form</summary>
+		///<summary>Set this externally before opening the form.  This will be null if the clearinghouse was deleted.</summary>
 		public Clearinghouse ClearinghouseCur;
 
 		///<summary></summary>
@@ -1013,6 +1013,7 @@ namespace OpenDental{
 				Prefs.UpdateLong(PrefName.ClearinghouseDefaultMed,0);
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
+			ClearinghouseCur=null;
 			DialogResult=DialogResult.OK;
 		}
 
