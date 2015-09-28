@@ -304,7 +304,7 @@ namespace CentralManager {
 				//Total production is (Production + Adjustments - Writeoffs)
 				totalProduction+=PIn.Double(connectionTotals.Rows[i]["Production"].ToString());
 				totalProduction+=PIn.Double(connectionTotals.Rows[i]["Adjust"].ToString());
-				totalProduction+=PIn.Double(connectionTotals.Rows[i]["Writeoff"].ToString());
+				totalProduction+=PIn.Double(connectionTotals.Rows[i]["Writeoff"].ToString());//Writeoffs stored as negative number
 				//Total income is (Pt Income + Ins Income)
 				totalIncome+=PIn.Double(connectionTotals.Rows[i]["Pt Income"].ToString());
 				totalIncome+=PIn.Double(connectionTotals.Rows[i]["Ins Income"].ToString());
@@ -430,7 +430,7 @@ namespace CentralManager {
 							production+=PIn.Double(dataRow["Production"].ToString());
 							sched+=PIn.Double(dataRow["Sched"].ToString());
 							adjust+=PIn.Double(dataRow["Adjustments"].ToString());
-							writeoff+=PIn.Double(dataRow["Writeoff"].ToString());
+							writeoff+=PIn.Double(dataRow["Writeoff"].ToString());//Writeoffs stored as negative number
 							totprod+=PIn.Double(dataRow["Tot Prod"].ToString());
 							ptincome+=PIn.Double(dataRow["Pt Income"].ToString());
 							insincome+=PIn.Double(dataRow["Ins Income"].ToString());
@@ -564,7 +564,7 @@ namespace CentralManager {
 						if(dsTotal.Tables[j].Rows[k][0].ToString()==dates[i].ToString("MMM yyyy")) {
 							production+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Production"].ToString());
 							adjust+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Adjustments"].ToString());
-							inswriteoff-=PIn.Decimal(dsTotal.Tables[j].Rows[k]["WriteOff"].ToString());
+							inswriteoff+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["WriteOff"].ToString());//Writeoffs stored as negative number
 							ptincome+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Pt Income"].ToString());
 							insincome+=PIn.Decimal(dsTotal.Tables[j].Rows[k]["Ins Income"].ToString());
 						}
