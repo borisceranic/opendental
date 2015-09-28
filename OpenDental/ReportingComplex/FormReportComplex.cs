@@ -784,19 +784,28 @@ namespace OpenDental.ReportingComplex
 				}
 				//Find the Group Footer height to see if printing the last row should happen on another page.
 				if(section.Name=="Detail" && rowsPrinted==queryObj.ReportTable.Rows.Count-1) {
-					int groupFooterHeight=0;
+					int groupSummaryLabelHeight=0;
+					int tallestTotalSummaryHeight=0;
 					foreach(ReportObject reportObject in queryObj.ReportObjects) {
-						//Find the height of the group footer
+						if(reportObject.SectionName=="Group Footer" 
+							&& (!reportObject.Name.Contains("GroupSummaryLabel") || !reportObject.Name.Contains("GroupSummaryText"))
+							&& tallestTotalSummaryHeight<reportObject.Size.Height+reportObject.OffSetY)
+						{
+							tallestTotalSummaryHeight=reportObject.Size.Height+reportObject.OffSetY;
+						}
+						//Find the height of the group footer using GroupSummaryLabel because GroupSummaryText has not been filled yet.
 						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel")) {
-							groupFooterHeight+=reportObject.Size.Height+reportObject.OffSetY;
+							groupSummaryLabelHeight+=reportObject.Size.Height+reportObject.OffSetY;
 						}
 						//The GroupSummaryText hasn't been filled yet so we use GroupSummaryLabel again
-						//If it is North or South then we need to add its height a second time.
+						//If it is North or South then we need to add its height a second time because the GroupSummaryLabel is located above or below the text.
 						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel") 
-							&& (reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)) {
-							groupFooterHeight+=reportObject.Size.Height;
+							&& (reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)) 
+						{
+							groupSummaryLabelHeight+=reportObject.Size.Height;
 						}
 					}
+					int groupFooterHeight=groupSummaryLabelHeight+tallestTotalSummaryHeight;
 					//See if we can print the Group Footer and the Last row
 					if(groupFooterHeight+queryObj.RowHeightValues[queryObj.ReportTable.Rows.Count-1]>_heightRemaining) {
 						_heightRemaining=0;
