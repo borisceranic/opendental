@@ -62,11 +62,16 @@ namespace OpenDentBusiness {
 					+") AND claimproc.PayPlanNum!=0),0) '_insPaid', ";
 			command+="COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal', "
 				+"patient.PatNum PatNum, "
-				+"payplancharge.ProvNum ProvNum";
+				+"payplancharge.ProvNum ProvNum ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				command+=", payplancharge.ClinicNum ClinicNum";
+				command+=", payplancharge.ClinicNum ClinicNum ";
 			}
-			command+=" FROM payplan "
+			//In order to determine if the patient has completely paid off their payment plan we need to get the total amount of interest as of today.
+			//Then, after the query has run, we'll add the interest up until today with the total principal for the entire payment plan.
+			//For this reason, we cannot use _accumDue which only gets the principle up until today and not the entire payment plan principle.
+			command+=",COALESCE((SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND ChargeDate <= "+datesql+@"),0) '_interest' "
+				+"FROM payplan "
 				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
 				+"LEFT JOIN payplancharge ON payplan.PayPlanNum=payplancharge.PayPlanNum "
 				+"WHERE TRUE ";//Always include true, so that the WHERE clause may always be present.
@@ -100,9 +105,11 @@ namespace OpenDentBusiness {
 			Patient pat;
 			double princ;
 			double paid;
+			double interest;
 			double accumDue;
 			for(int i=0;i<raw.Rows.Count;i++) {
 				princ=PIn.Double(raw.Rows[i]["_principal"].ToString());
+				interest=PIn.Double(raw.Rows[i]["_interest"].ToString());
 				if(raw.Rows[i]["PlanNum"].ToString()=="0") {//pat payplan
 					paid=PIn.Double(raw.Rows[i]["_paid"].ToString());
 				}
@@ -110,6 +117,16 @@ namespace OpenDentBusiness {
 					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
 				}
 				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
+				if(hideCompletedPlans) {
+					//We store all monetary amounts in our database as data type "double".  
+					//Doubles cannot do precision math so some payment plans that are already paid off will get returned.
+					//We need to skip any payment plans that are off by a fraction of a penny.
+					//We cannot use _accumDue (which is principle (up to today) + interest (up to today)) because we need principle for the entire payment plan.
+					double amountRemain=(princ+interest)-paid;
+					if(amountRemain < 0.005) {
+						continue;
+					}
+				}
 				row=table.NewRow();
 				//payplanDate=PIn.PDate(raw.Rows[i]["PayPlanDate"].ToString());
 				//row["date"]=raw.Rows[i]["PayPlanDate"].ToString();//payplanDate.ToShortDateString();
