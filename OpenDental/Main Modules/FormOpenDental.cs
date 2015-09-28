@@ -2486,8 +2486,7 @@ namespace OpenDental{
 				isApptModuleSelected=true;
 			}
 			if(CurPatNum!=0 && _showForm=="apptsforpatient" && isApptModuleSelected) {
-				FormApptsOther FormA=new FormApptsOther(CurPatNum);
-				FormA.ShowDialog();
+				ContrAppt2.DisplayOtherDlg(false);
 			}
 			if(!Prefs.IsODHQ()) {
 				//Remove the menu items that are only needed for HQ like Default CC Procedures
