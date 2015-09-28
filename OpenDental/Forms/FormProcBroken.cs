@@ -125,10 +125,8 @@ namespace OpenDental {
 		}
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
-			if(IsNew) {//We want to make an audit trail entry because we don't delete the pre-inserted procedure when the user hits cancel.
-				ProcedureCode procedureCode=ProcedureCodes.GetProcCode(_procOld.CodeNum);
-				string logText=procedureCode.ProcCode+", "+Lan.g(this,"Fee")+": "+_procOld.ProcFee.ToString("c")+", "+procedureCode.Descript;
-				SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,_procOld.PatNum,logText);
+			if(IsNew) {
+				Procedures.Delete(_procCur.ProcNum);
 			}
 			DialogResult=DialogResult.Cancel;
 		}

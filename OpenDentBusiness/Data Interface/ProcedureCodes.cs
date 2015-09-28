@@ -484,6 +484,15 @@ namespace OpenDentBusiness{
 			//don't forget to refresh procedurecodes.
 		}
 
+		///<summary>Returns true if the ADA broken appointment procedure code is in the database to identify how to track broken appointments.</summary>
+		public static bool HasBrokenApptCode() {
+			Hashtable hashProcedureCodes=ProcedureCodeC.GetHList();
+			if(hashProcedureCodes.Contains("D9986")) {
+				return true;
+			}
+			return false;
+		}
+
 		public static List<ProcedureCode> GetAllCodes() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ProcedureCode>>(MethodBase.GetCurrentMethod());

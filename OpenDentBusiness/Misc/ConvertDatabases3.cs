@@ -10349,6 +10349,15 @@ namespace OpenDentBusiness {
 					command="UPDATE preference SET ValueString='0' WHERE PrefName='ClearinghouseDefaultMed'";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('BrokenApptAdjustmentWithProcedure','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+					+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptAdjustmentWithProcedure','0')";
+					Db.NonQ(command);
+				}
 
 
 

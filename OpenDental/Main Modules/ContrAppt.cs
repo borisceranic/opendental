@@ -5192,8 +5192,8 @@ namespace OpenDental {
 				}
 			}
 			long provNum=PIn.Long(ContrApptSingle3[thisI].DataRoww["ProvNum"].ToString());//remember before ModuleSelected
-			ProcedureCode procCodeBrokenApt=ProcedureCodes.GetProcCode("D9986");
-			if(procCodeBrokenApt.CodeNum!=0) {//ADA proc code D9986 exists
+			if(ProcedureCodes.HasBrokenApptCode()) {//ADA proc code D9986 exists
+				ProcedureCode procCodeBrokenApt=ProcedureCodes.GetProcCode("D9986");
 				Procedure procedureCur=new Procedure();
 				procedureCur.PatNum=pat.PatNum;
 				procedureCur.ProvNum=provNum;
@@ -5238,6 +5238,19 @@ namespace OpenDental {
 				FormProcBroken FormPB=new FormProcBroken(procedureCur);
 				FormPB.IsNew=true;
 				FormPB.ShowDialog();
+				if(PrefC.GetBool(PrefName.BrokenApptAdjustmentWithProcedure)) {
+					Adjustment AdjustmentCur=new Adjustment();
+					AdjustmentCur.DateEntry=DateTime.Today;
+					AdjustmentCur.AdjDate=DateTime.Today;
+					AdjustmentCur.ProcDate=DateTime.Today;
+					AdjustmentCur.ProvNum=provNum;
+					AdjustmentCur.PatNum=pat.PatNum;
+					AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+					AdjustmentCur.ClinicNum=pat.ClinicNum;
+					FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
+					FormA.IsNew=true;
+					FormA.ShowDialog();
+				}
 				if(PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure)) {
 					Commlog CommlogCur=new Commlog();
 					CommlogCur.PatNum=pat.PatNum;
