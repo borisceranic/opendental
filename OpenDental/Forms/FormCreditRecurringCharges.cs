@@ -495,10 +495,10 @@ namespace OpenDental {
 
 		private void SendPayConnect() {
 			Dictionary<long,string> dictClinicNumDesc=new Dictionary<long,string>();
-			dictClinicNumDesc[0]=PrefC.GetString(PrefName.PracticeTitle);
 			if(PrefC.HasClinicsEnabled) {
 				dictClinicNumDesc=Clinics.GetClinicsNoCache().ToDictionary(x => x.ClinicNum,x => x.Description);
 			}
+			dictClinicNumDesc[0]=PrefC.GetString(PrefName.PracticeTitle);
 			StringBuilder strBuilderResultFile=new StringBuilder();
 			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
 			strBuilderResultFile.AppendLine();
