@@ -157,28 +157,75 @@ namespace OpenDentBusiness {
 			ncScript.LicensedPrescriber.LicensedPrescriberName.last=prov.LName.Trim();//Cannot be blank.
 			ncScript.LicensedPrescriber.LicensedPrescriberName.first=prov.FName.Trim();//Cannot be blank.
 			ncScript.LicensedPrescriber.LicensedPrescriberName.middle=prov.MI;//May be blank.
-			ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DDS;//There is no blank or none option, so we have to pick a default value. DDS=0, so would be default anyway.
-			string[] suffixes=prov.Suffix.ToUpper().Split(' ','.');
-			for(int i=0;i<suffixes.Length;i++) {
-				if(suffixes[i]=="I") {
-					ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.I;
-					break;
-				}
-				else if(suffixes[i]=="II") {
-					ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.II;
-					break;
-				}
-				else if(suffixes[i]=="III") {
-					ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.III;
-					break;
-				}
-				else if(suffixes[i]=="JR") {
-					ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Jr;
-					break;
-				}
-				else if(suffixes[i]=="SR") {
-					ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Sr;
-					break;
+			if(prov.Suffix!="") {
+				ncScript.LicensedPrescriber.LicensedPrescriberName.suffixSpecified=true;
+				ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DDS;
+				string[] suffixes=prov.Suffix.ToUpper().Split(' ','.');
+				for(int i=0;i<suffixes.Length;i++) {
+					if(suffixes[i]=="DDS") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DDS;
+						break;
+					}
+					else if(suffixes[i]=="DO") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DO;
+						break;
+					}
+					else if(suffixes[i]=="I") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.I;
+						break;
+					}
+					else if(suffixes[i]=="II") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.II;
+						break;
+					}
+					else if(suffixes[i]=="III") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.III;
+						break;
+					}
+					else if(suffixes[i]=="JR") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Jr;
+						break;
+					}
+					else if(suffixes[i]=="LVN") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.LVN;
+						break;
+					}
+					else if(suffixes[i]=="MA") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.MA;
+						break;
+					}
+					else if(suffixes[i]=="MD") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.MD;
+						break;
+					}
+					else if(suffixes[i]=="NP") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.NP;
+						break;
+					}
+					else if(suffixes[i]=="PA") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PA;
+						break;
+					}
+					else if(suffixes[i]=="PHARMD") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PharmD;
+						break;
+					}
+					else if(suffixes[i]=="PHD") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PhD;
+						break;
+					}
+					else if(suffixes[i]=="RN") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.RN;
+						break;
+					}
+					else if(suffixes[i]=="RPH") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.RPh;
+						break;
+					}
+					else if(suffixes[i]=="SR") {
+						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Sr;
+						break;
+					}
 				}
 			}
 			if(prov.DEANum.ToLower()=="none") {
