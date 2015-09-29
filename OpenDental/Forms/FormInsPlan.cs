@@ -4372,7 +4372,7 @@ namespace OpenDental{
 
 		private void FormInsPlan_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
 			if(DialogResult==DialogResult.OK) {
-				if(_hasDropped || _hasOrdinalChanged || _hasCarrierChanged || IsNewPatPlan || IsNewPlan) {
+				if(PatPlanCur!=null && (_hasDropped || _hasOrdinalChanged || _hasCarrierChanged || IsNewPatPlan || IsNewPlan)) {
 					List<PatPlan> listPatPlans=PatPlans.Refresh(PatPlanCur.PatNum);
 					InsSub sub1=new InsSub();
 					InsSub sub2=new InsSub();
