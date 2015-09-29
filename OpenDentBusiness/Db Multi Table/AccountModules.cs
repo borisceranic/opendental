@@ -520,6 +520,7 @@ namespace OpenDentBusiness {
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
 		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatmentPrinting,bool returnTable) {
+			//No need to check RemotingRole; no call to db.
 			retVal=new DataSet();
 			pat=Patients.GetPat(patNum);
 			fam=Patients.GetFamily(patNum);
@@ -529,9 +530,9 @@ namespace OpenDentBusiness {
 		}
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		private static void GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting=false) {
+		public static void GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting=false) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatementPrinting);
 				return;
 			}
 			bool isReseller=false;//Used to display data in the account module differently when patient is a reseller.
