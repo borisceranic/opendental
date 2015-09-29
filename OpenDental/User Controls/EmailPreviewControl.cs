@@ -338,8 +338,30 @@ namespace OpenDental {
 		#region Body
 
 		public void LoadTemplate(string subject,string bodyText) {
+			List<Appointment> listApts=Appointments.GetFutureSchedApts(_patCur.PatNum);
+			Appointment aptNext=null;
+			if(listApts.Count > 0){
+				aptNext=listApts[0]; //next sched appt. If none, null.
+			}
+			Clinic clinic=Clinics.GetClinic(_patCur.ClinicNum);
 			Subject=subject;
+			//patient information
+			Subject=FormMessageReplacements.ReplacePatient(Subject,_patCur);
+			//Next Scheduled Appointment Information
+			Subject=FormMessageReplacements.ReplaceAppointment(Subject,aptNext); //handles null nextApts.
+			//Currently Logged in User Information
+			Subject=FormMessageReplacements.ReplaceUser(Subject,Security.CurUser);
+			//Clinic Information
+			Subject=FormMessageReplacements.ReplaceOffice(Subject,clinic);
 			BodyText=bodyText;
+			//patient information
+			BodyText=FormMessageReplacements.ReplacePatient(BodyText,_patCur);
+			//Next Scheduled Appointment Information
+			BodyText=FormMessageReplacements.ReplaceAppointment(BodyText,aptNext); //handles null nextApts.
+			//Currently Logged in User Information
+			BodyText=FormMessageReplacements.ReplaceUser(BodyText,Security.CurUser);
+			//Clinic Information
+			BodyText=FormMessageReplacements.ReplaceOffice(BodyText,clinic);
 			_hasMessageChanged=false;
 		}
 

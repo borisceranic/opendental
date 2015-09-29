@@ -455,9 +455,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.emailPreview);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(875, 575);
+			this.MinimumSize = new System.Drawing.Size(875, 735);
 			this.Name = "FormEmailMessageEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Email Message";

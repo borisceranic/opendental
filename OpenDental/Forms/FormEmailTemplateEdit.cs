@@ -23,6 +23,8 @@ namespace OpenDental{
 		private Label label1;
 		private TextBox textDescription;
 		private Label label3;
+		private Label label9;
+		private UI.Button butReplacements;
 		///<summary></summary>
 		public EmailTemplate ETcur;
 
@@ -67,6 +69,8 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.textDescription = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.butReplacements = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -130,7 +134,7 @@ namespace OpenDental{
 			this.textBodyText.Name = "textBodyText";
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBodyText.Size = new System.Drawing.Size(861, 596);
+			this.textBodyText.Size = new System.Drawing.Size(861, 560);
 			this.textBodyText.TabIndex = 3;
 			this.textBodyText.Text = "";
 			// 
@@ -162,10 +166,36 @@ namespace OpenDental{
 			this.label3.Text = "Description";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// label9
+			// 
+			this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label9.Location = new System.Drawing.Point(94, 645);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(629, 46);
+			this.label9.TabIndex = 62;
+			this.label9.Text = resources.GetString("label9.Text");
+			// 
+			// butReplacements
+			// 
+			this.butReplacements.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butReplacements.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butReplacements.Autosize = true;
+			this.butReplacements.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butReplacements.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butReplacements.CornerRadius = 4F;
+			this.butReplacements.Location = new System.Drawing.Point(97, 617);
+			this.butReplacements.Name = "butReplacements";
+			this.butReplacements.Size = new System.Drawing.Size(82, 25);
+			this.butReplacements.TabIndex = 63;
+			this.butReplacements.Text = "Replacements";
+			this.butReplacements.Click += new System.EventHandler(this.butReplacements_Click);
+			// 
 			// FormEmailTemplateEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 695);
+			this.Controls.Add(this.butReplacements);
+			this.Controls.Add(this.label9);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label1);
@@ -175,9 +205,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(200, 200);
+			this.MinimumSize = new System.Drawing.Size(933, 200);
 			this.Name = "FormEmailTemplateEdit";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -218,6 +246,12 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void butReplacements_Click(object sender,EventArgs e) {
+			FormMessageReplacements FormMR=new FormMessageReplacements(
+				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
+			FormMR.Show();
 		}
 
 		
