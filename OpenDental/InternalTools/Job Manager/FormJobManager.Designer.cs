@@ -38,39 +38,41 @@
 			// 
 			// flowPanel
 			// 
-			this.flowPanel.AllowDrop = true;
-			this.flowPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.flowPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.flowPanel.AutoScroll = true;
 			this.flowPanel.Location = new System.Drawing.Point(0, 25);
 			this.flowPanel.Name = "flowPanel";
-			this.flowPanel.Size = new System.Drawing.Size(1885, 1000);
+			this.flowPanel.Size = new System.Drawing.Size(934, 637);
 			this.flowPanel.TabIndex = 1;
-			this.flowPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.flowPanel_DragDrop);
-			this.flowPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.flowPanel_DragEnter);
 			// 
 			// ToolBarMain
 			// 
+			this.ToolBarMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.ToolBarMain.AutoSize = true;
 			this.ToolBarMain.ImageList = null;
 			this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
 			this.ToolBarMain.Name = "ToolBarMain";
-			this.ToolBarMain.Size = new System.Drawing.Size(1885, 25);
+			this.ToolBarMain.Size = new System.Drawing.Size(934, 25);
 			this.ToolBarMain.TabIndex = 0;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
 			// FormJobManager
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(1884, 1042);
+			this.ClientSize = new System.Drawing.Size(934, 662);
 			this.Controls.Add(this.flowPanel);
 			this.Controls.Add(this.ToolBarMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormJobManager";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Job Manager";
+			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormJobManager_Load);
-			this.Resize += new System.EventHandler(this.FormJobManager_Resize);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 

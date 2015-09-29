@@ -48,12 +48,13 @@
 			// 
 			this.butMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butMerge.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.butMerge.Image = global::OpenDental.Properties.Resources.arrowUpTriangle;
+			this.butMerge.ImageList = this.imageList1;
 			this.butMerge.Location = new System.Drawing.Point(409, 3);
 			this.butMerge.Name = "butMerge";
 			this.butMerge.Size = new System.Drawing.Size(15, 15);
 			this.butMerge.TabIndex = 1;
 			this.butMerge.UseVisualStyleBackColor = true;
+			this.butMerge.Click += new System.EventHandler(this.butMerge_Click);
 			// 
 			// imageList1
 			// 
@@ -72,6 +73,7 @@
 			this.butRight.Size = new System.Drawing.Size(15, 15);
 			this.butRight.TabIndex = 2;
 			this.butRight.UseVisualStyleBackColor = true;
+			this.butRight.Click += new System.EventHandler(this.butRight_Click);
 			// 
 			// butLeft
 			// 
@@ -83,9 +85,12 @@
 			this.butLeft.Size = new System.Drawing.Size(15, 15);
 			this.butLeft.TabIndex = 3;
 			this.butLeft.UseVisualStyleBackColor = true;
+			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
 			// JobContainerControl
 			// 
+			this.AllowDragging = true;
+			this.AllowDrop = true;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.Controls.Add(this.butLeft);
@@ -95,6 +100,9 @@
 			this.DoubleBuffered = true;
 			this.Name = "JobContainerControl";
 			this.Size = new System.Drawing.Size(448, 298);
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.JobContainerControl_DragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.JobContainerControl_DragEnter);
+			this.DragLeave += new System.EventHandler(this.JobContainerControl_DragLeave);
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.JobContainerControl_MouseDown);
 			this.ResumeLayout(false);
 
@@ -104,7 +112,9 @@
 
 		private System.Windows.Forms.Button butClose;
 		private System.Windows.Forms.ImageList imageList1;
-
+		private System.Windows.Forms.Button butLeft;
+		private System.Windows.Forms.Button butRight;
+		private System.Windows.Forms.Button butMerge;
 
 	}
 }
