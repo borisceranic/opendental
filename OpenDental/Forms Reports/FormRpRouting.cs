@@ -360,7 +360,10 @@ namespace OpenDental {
 				MsgBox.Show(this,"You must select at least one provider.");
 				return;
 			}
-			if(listClin.SelectedIndices.Count==0 && !checkClinAll.Checked) {
+			if(PrefC.HasClinicsEnabled 
+				&& listClin.SelectedIndices.Count==0 
+				&& !checkClinAll.Checked) 
+			{
 				MsgBox.Show(this,"You must select at least one clinic.");
 				return;
 			}
