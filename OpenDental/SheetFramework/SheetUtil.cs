@@ -539,7 +539,8 @@ namespace OpenDental{
 		private static DataTable getTable_StatementMain(Statement stmt) {
 			DataTable retVal=null;
 			DataSet ds=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
+				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+				,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			foreach(DataTable t in ds.Tables) {
 				if(!t.TableName.StartsWith("account")) {
 					continue;
@@ -628,7 +629,9 @@ namespace OpenDental{
 
 		private static DataTable getTable_StatementPayPlan(Statement stmt) {
 			DataTable retVal=new DataTable();
-			DataSet ds=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,true);
+			DataSet ds=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum
+				,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice
+				,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			foreach(DataTable t in ds.Tables) {
 				if(!t.TableName.StartsWith("payplan")) {
 					continue;

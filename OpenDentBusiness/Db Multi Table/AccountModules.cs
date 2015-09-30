@@ -10,38 +10,39 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public class AccountModules {
-		//These static variables are only used on either client or server.  Should work fine as written.
-		///<summary>Class level static variable. Several function in the AccountModules class modify the retVal variable.</summary>
-		private static DataSet retVal;
-		private static Family fam;
-		private static Patient pat;
-		///<summary>Gets filled in GetPayPlansForStatement, then gets added to the misc table.</summary>
-		private static decimal payPlanDue;
-		///<summary>Value will be set toward the bottom of GetAccount.  It will then go into the misc table.</summary>
-		private static decimal balanceForward;
 
 		///<summary>If intermingled=true, the patnum of any family member will get entire family intermingled.</summary>
 		public static DataSet GetAll(long patNum,bool viewingInRecall,DateTime fromDate,DateTime toDate,bool intermingled,bool showProcBreakdown,bool showPayNotes,bool showAdjNotes) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),patNum,viewingInRecall,fromDate,toDate,intermingled,showProcBreakdown,showPayNotes,showAdjNotes);
 			} 
-			fam=Patients.GetFamily(patNum);
+			Family fam=Patients.GetFamily(patNum);
+			Patient pat=fam.GetPatient(patNum);
 			if(intermingled){
 				patNum=fam.ListPats[0].PatNum;//guarantor
 			}
-			pat=fam.GetPatient(patNum);
-			retVal=new DataSet();
-			if(viewingInRecall) {//always false
+			DataSet retVal=new DataSet();
+			if(viewingInRecall) {
 				retVal.Tables.Add(ChartModules.GetProgNotes(patNum,false,new ChartModuleComponentsToLoad()));
 			}
 			else {
-				GetCommLog(patNum);
+				retVal.Tables.Add(GetCommLog(patNum));
 			}
 			bool singlePatient=!intermingled;//so one or the other will be true
-			payPlanDue=0;
+			decimal payPlanDue=0;
+			decimal balanceForward=0;
 			//Gets 3 tables: account(or account###,account###,etc), patient, payplan.
-			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,0,showProcBreakdown,showPayNotes,false,showAdjNotes);
-			GetMisc(fam,patNum);//table = misc.  Just holds a few bits of info that we can't find anywhere else.
+			DataSet dataSetAccount=GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,0,showProcBreakdown,showPayNotes,false,showAdjNotes,false
+				,pat,fam,out payPlanDue,out balanceForward);
+			for(int i=0;i<dataSetAccount.Tables.Count;i++) {
+				DataTable table=new DataTable();
+				table=dataSetAccount.Tables[i].Clone();
+				for(int j=0;j<dataSetAccount.Tables[i].Rows.Count;j++) {
+					table.ImportRow(dataSetAccount.Tables[i].Rows[j]);
+				}
+				retVal.Tables.Add(table);
+			}
+			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward));//table = misc.  Just holds a few bits of info that we can't find anywhere else.
 			return retVal;
 		}
 
@@ -52,24 +53,19 @@ namespace OpenDentBusiness {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),stmt);
 			}
 			long patNum=stmt.PatNum;
-			fam=Patients.GetFamily(patNum);
+			Family fam=Patients.GetFamily(patNum);
 			if(stmt.Intermingled) {
 				patNum=fam.ListPats[0].PatNum;//guarantor
 			}
-			pat=fam.GetPatient(patNum);
-			retVal=new DataSet();
-			payPlanDue=0;
-			balanceForward=0;
+			Patient pat=fam.GetPatient(patNum);
 			//Gets 3 tables: account(or account###,account###,etc), patient, payplan.
 			bool showProcBreakdown=PrefC.GetBool(PrefName.StatementShowProcBreakdown);
 			if(stmt.IsInvoice) {
 				showProcBreakdown=false;
 			}
-			GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
+			DataSet retVal=GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
 				stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
 				PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
-			GetApptTable(fam,stmt.SinglePatient,patNum);//table= appts
-			GetMisc(fam,patNum);
 			return retVal;
 		}
 
@@ -78,7 +74,7 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),payPlanNum);
 			} 
-			retVal=new DataSet();
+			DataSet retVal=new DataSet();
 			DataTable table=GetPayPlanAmortTable(payPlanNum);
 			retVal.Tables.Add(table);
 			return retVal;
@@ -315,10 +311,9 @@ namespace OpenDentBusiness {
 			DataTable rawPayPlan=dcon.GetTable(command);
 		}*/
 
-		private static void GetCommLog(long patNum) {
+		public static DataTable GetCommLog(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum);
-				return;
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum);
 			}
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("Commlog");
@@ -480,8 +475,7 @@ namespace OpenDentBusiness {
 			DataView view = table.DefaultView;
 			view.Sort = "CommDateTime";
 			table = view.ToTable();
-			//return table;
-			retVal.Tables.Add(table);
+			return table;
 		}
 
 		private static void SetTableColumns(DataTable table){
@@ -518,24 +512,41 @@ namespace OpenDentBusiness {
 			table.Columns.Add("ToothRange");
 			table.Columns.Add("tth");
 		}
-		
-		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatmentPrinting,bool returnTable) {
-			//No need to check RemotingRole; no call to db.
-			retVal=new DataSet();
-			pat=Patients.GetPat(patNum);
-			fam=Patients.GetFamily(patNum);
-			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatmentPrinting);
-			GetApptTable(fam,singlePatient,patNum);
+
+		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
+		///If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
+		///If IsInvoice, this does some extra filtering.</summary>
+		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum
+			,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting) 
+		{
+			//This method does not call the database directly but still requires a remoting role check because it calls a method that uses out variables.
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes
+					,isInvoice,showAdjNotes,isForStatementPrinting);
+			}
+			Family fam=Patients.GetFamily(patNum);
+			Patient pat=fam.GetPatient(patNum);
+			decimal payPlanDue=0;
+			decimal balanceForward=0;
+			DataSet retVal=GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
+				,isForStatementPrinting,pat,fam,out payPlanDue,out balanceForward);
+			retVal.Tables.Add(GetApptTable(fam,singlePatient,patNum));
+			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward));//table = misc.  Just holds a few bits of info that we can't find anywhere else.
 			return retVal;
 		}
 		
-		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		public static void GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting=false) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatementPrinting);
-				return;
-			}
+		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
+		///If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
+		///If IsInvoice, this does some extra filtering.
+		///This method cannot be called from the Middle Tier as long as it uses out parameters.</summary>
+		private static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum
+			,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting
+			,Patient pat,Family fam,out decimal payPlanDue,out decimal balanceForward) 
+		{
+			//No need to check RemotingRole; this method contains out parameters.
+			DataSet retVal=new DataSet();
+			payPlanDue=0;
+			balanceForward=0;
 			bool isReseller=false;//Used to display data in the account module differently when patient is a reseller.
 			//HQ only, find out if this patient is a reseller.
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow) && Resellers.IsResellerFamily(fam.ListPats[0].PatNum)) {
@@ -1428,11 +1439,11 @@ namespace OpenDentBusiness {
 			}
 			DataTable rawInstall=Db.GetTable(command);
 			if(statementNum==0) {
-				GetPayPlans(rawPayPlan,rawPay,rawInstall,rawClaimPay);
+				retVal.Tables.Add(GetPayPlans(rawPayPlan,rawPay,rawInstall,rawClaimPay,fam));
 			}
 			else {
 				//Always includes the payment plan breakdown for statements, receipts, and invoices.
-				GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay);
+				retVal.Tables.Add(GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay,fam,pat,out payPlanDue));
 			}
 			#endregion Installment Plans
 			//Sorting-----------------------------------------------------------------------------------------
@@ -1453,7 +1464,7 @@ namespace OpenDentBusiness {
 			}
 			//rows.Sort(CompareCommRows);
 			//Pass off all the rows for the whole family in order to compute the patient balances----------------
-			GetPatientTable(fam,rows,isInvoice);
+			retVal.Tables.Add(GetPatientTable(fam,rows,isInvoice));
 			//Regroup rows by patient---------------------------------------------------------------------------
 			DataTable[] rowsByPat=null;//will only used if multiple patients not intermingled
 			if(singlePatient){//This is usually used for Account module grid.
@@ -1548,7 +1559,6 @@ namespace OpenDentBusiness {
 			}
 			else{
 				for(int p=0;p<rowsByPat.Length;p++){
-					balanceForward=0;
 					foundBalForward=false;
 					for(int i=rowsByPat[p].Rows.Count-1;i>=0;i--) {//go backwards and remove from end
 						if(((DateTime)rowsByPat[p].Rows[i]["DateTime"])>toDate){
@@ -1593,10 +1603,7 @@ namespace OpenDentBusiness {
 					retVal.Tables.Add(tablep);
 				}
 			}
-			//DataView view = table.DefaultView;
-			//view.Sort = "DateTime";
-			//table = view.ToTable();
-			//return table;
+			return retVal;
 		}
 
 		private static void SetBalForwardRow(DataRow row,decimal amt,long patNum){
@@ -1628,7 +1635,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case. </summary>
-		private static void GetPayPlans(DataTable rawPayPlan,DataTable rawPay,DataTable rawInstall,DataTable rawClaimPay) {
+		private static DataTable GetPayPlans(DataTable rawPayPlan,DataTable rawPay,DataTable rawInstall,DataTable rawClaimPay,Family fam) {
 			//No need to check RemotingRole; no call to db.
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("payplan");
@@ -1736,11 +1743,14 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rows.Count;i++) {
 				table.Rows.Add(rows[i]);
 			}
-			retVal.Tables.Add(table);
+			return table;
 		}
 
-		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case.  fromDate and toDate are only used if isForStatement.  From date lets us restrict how many amortization items to show.  toDate is typically 10 days in the future.</summary>
-		private static void GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient,DataTable rawClaimPay){
+		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case.  fromDate and toDate are only used if isForStatement.  From date lets us restrict how many amortization items to show.  toDate is typically 10 days in the future.
+		///This method cannot be called by the Middle Tier due to its use of an out parameter.</summary>
+		private static DataTable GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient
+			,DataTable rawClaimPay,Family fam,Patient pat,out decimal payPlanDue)
+		{
 			//No need to check RemotingRole; no call to db.
 			//We may need to add installment plans to this grid some day.  No time right now.
 			DataTable table=new DataTable("payplan");
@@ -1751,6 +1761,7 @@ namespace OpenDentBusiness {
 			decimal bal;
 			DataTable rawAmort;
 			long payPlanNum;
+			payPlanDue=0;
 			for(int i=0;i<rawPayPlan.Rows.Count;i++){//loop through the payment plans (usually zero or one)
 				//Do not include a payment plan in the payment plan grid if the guarantor is from another family
 				if(!fam.ListPats.Select(x => x.PatNum).ToList().Contains(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()))) {
@@ -1858,11 +1869,11 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rows.Count;i++) {
 				table.Rows.Add(rows[i]);
 			}
-			retVal.Tables.Add(table);
+			return table;
 		}
 
 		///<summary>All rows for the entire family are getting passed in here.  (Except Invoices)  The rows have already been sorted.  Balances have not been computed, and we will do that here, separately for each patient (except invoices).</summary>
-		private static void GetPatientTable(Family fam,List<DataRow> rows,bool isInvoice){
+		private static DataTable GetPatientTable(Family fam,List<DataRow> rows,bool isInvoice){
 			//No need to check RemotingRole; no call to db.
 			//DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("patient");
@@ -1910,14 +1921,13 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rowspat.Count;i++) {
 				table.Rows.Add(rowspat[i]);
 			}
-			retVal.Tables.Add(table);
+			return table;
 		}
 
 		///<summary>Future appointments.</summary>
-		private static void GetApptTable(Family fam,bool singlePatient,long patNum) {
+		private static DataTable GetApptTable(Family fam,bool singlePatient,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),fam,singlePatient,patNum);
-				return;
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),fam,singlePatient,patNum);
 			}
 			DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("appts");
@@ -1961,13 +1971,12 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rows.Count;i++) {
 				table.Rows.Add(rows[i]);
 			}
-			retVal.Tables.Add(table);
+			return table;
 		}
 
-		private static void GetMisc(Family fam,long patNum) {
+		public static DataTable GetMisc(Family fam,long patNum,decimal payPlanDue,decimal balanceForward) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),fam,patNum);
-				return;
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),fam,patNum,payPlanDue,balanceForward);
 			}
 			DataTable table=new DataTable("misc");
 			DataRow row;
@@ -1989,12 +1998,12 @@ namespace OpenDentBusiness {
 			//payPlanDue---------------------------
 			row=table.NewRow();
 			row["descript"]="payPlanDue";
-			row["value"]=POut.Double((double)payPlanDue);
+			row["value"]=POut.Decimal(payPlanDue);
 			rows.Add(row);
 			//balanceForward-----------------------
 			row=table.NewRow();
 			row["descript"]="balanceForward";
-			row["value"]=POut.Double((double)balanceForward);
+			row["value"]=POut.Decimal(balanceForward);
 			rows.Add(row);
 			//patInsEst----------------------------
 			command="SELECT SUM(inspayest+writeoff) FROM claimproc "
@@ -2024,7 +2033,7 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rows.Count;i++) {
 				table.Rows.Add(rows[i]);
 			}
-			retVal.Tables.Add(table);
+			return table;
 		}
 
 		///<summary>Used to resort data rows used for printing main account grid on statements.</summary>
