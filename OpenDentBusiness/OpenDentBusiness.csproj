@@ -950,6 +950,7 @@
     <Compile Include="Reports\RpProcCodes.cs" />
     <Compile Include="Reports\RpProcSheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
+    <Compile Include="Reports\RpRouting.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />

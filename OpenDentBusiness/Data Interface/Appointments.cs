@@ -217,34 +217,6 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
 
-		///<summary>Gets a list of aptNums for one day in the schedule for a given set of providers.</summary>
-		public static List<long> GetRouting(DateTime date,List<long> provNums) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),date,provNums);
-			}
-			string command=
-				"SELECT AptNum FROM appointment "
-				+"WHERE AptDateTime LIKE '"+POut.Date(date,false)+"%' "
-				+"AND aptstatus != '"+(int)ApptStatus.UnschedList+"' "
-				+"AND aptstatus != '"+(int)ApptStatus.Planned+"' "
-				+"AND (";
-			for(int i=0;i<provNums.Count;i++) {
-				if(i>0) {
-					command+=" OR";
-				}
-				command+=" ProvNum="+POut.Long(provNums[i])
-					+" OR ProvHyg="+POut.Long(provNums[i]);
-			}
-			command+=") ORDER BY AptDateTime";
-			DataTable table=Db.GetTable(command);
-			List<long> retVal=new List<long>();
-			for(int i=0;i<table.Rows.Count;i++) {
-				retVal.Add(PIn.Long(table.Rows[i][0].ToString()));
-			}
-			return retVal;
-			//return TableToObjects(table).ToArray();
-		}
-
 		public static List<Appointment> GetChangedSince(DateTime changedSince,DateTime excludeOlderThan) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),changedSince,excludeOlderThan);
