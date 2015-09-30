@@ -33,6 +33,7 @@ namespace OpenDental {
 
 		private void FormRecurringCharges_Load(object sender,EventArgs e) {
 			if(!Prefs.IsODHQ()) {
+				checkHideBold.Checked=true;
 				checkHideBold.Visible=false;
 			}
 			nowDateTime=MiscData.GetNowDateTime();

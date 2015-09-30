@@ -203,8 +203,6 @@ namespace OpenDental{
 			// 
 			// checkHideBold
 			// 
-			this.checkHideBold.Checked = true;
-			this.checkHideBold.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkHideBold.Location = new System.Drawing.Point(821, 53);
 			this.checkHideBold.Name = "checkHideBold";
 			this.checkHideBold.Size = new System.Drawing.Size(91, 18);
