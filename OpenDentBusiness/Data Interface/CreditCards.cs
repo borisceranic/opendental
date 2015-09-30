@@ -185,7 +185,12 @@ namespace OpenDentBusiness{
 				+"AND pc.ProcCode IN ("+procStr+") "
 				+"AND pl.PatNum="+POut.Long(patNum)+" "
 				+"AND pl.ProcDate<="+DbHelper.Curdate()+" ";
-			if(billingDay==DateTime.Today.Day) {//So that the card is not charged for today's and last month's repeat charge
+			//If today is the billingDay or today is the last day of the current month and the billingDay is greater than today
+			//i.e. billingDay=31 and today is the 30th which is the last day of the current month, only count procs with date after the 31st of last month
+			if(billingDay==DateTime.Today.Day
+				|| (billingDay>DateTime.Today.Day
+				&& DateTime.Today.Day==DateTime.DaysInMonth(DateTime.Today.Year,DateTime.Today.Month)))
+			{
 				command+="AND pl.ProcDate>"+POut.Date(startBillingCycle);
 			}
 			else {
