@@ -488,6 +488,7 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			//columns that start with lowercase are altered for display rather than being raw data.
 			table.Columns.Add("AdjNum");
+			table.Columns.Add("AbbrDesc");
 			table.Columns.Add("balance");
 			table.Columns.Add("balanceDouble",typeof(decimal));
 			table.Columns.Add("charges");
@@ -592,6 +593,7 @@ namespace OpenDentBusiness {
 					break;
 				}
 				row=table.NewRow();
+				row["AbbrDesc"]="";//fill this later
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -674,7 +676,7 @@ namespace OpenDentBusiness {
 				+"AND adjustment.ProcNum<>0 "//Prevents long load time in a patient with thousands of entries.  Example: customer was using a dummy patient.
 				+"AND adjustment.PatNum IN ("+familyPatNums+")"
 				+") adj_, "
-				+"procedurelog.BaseUnits,procedurelog.BillingNote,procedurelog.ClinicNum,procedurecode.CodeNum,Descript,"
+				+"procedurelog.BaseUnits,procedurelog.BillingNote,procedurelog.ClinicNum,procedurecode.CodeNum,procedurecode.AbbrDesc,Descript,"
 				+"(SELECT SUM(InsPayAmt) FROM claimproc cp5 WHERE procedurelog.ProcNum=cp5.ProcNum "
 				+"AND cp5.PatNum IN ("+familyPatNums+")"
 				+") insPayAmt_,"
@@ -734,6 +736,7 @@ namespace OpenDentBusiness {
 			List<DataRow> labRows=new List<DataRow>();//Canadian lab procs, which must be added in a loop at the very end.
 			for(int i=0;i<rawProc.Rows.Count;i++){
 				row=table.NewRow();
+				row["AbbrDesc"]=rawProc.Rows[i]["AbbrDesc"].ToString();
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -909,6 +912,7 @@ namespace OpenDentBusiness {
 			DataTable rawAdj=dcon.GetTable(command);
 			for(int i=0;i<rawAdj.Rows.Count;i++){
 				row=table.NewRow();
+				row["AbbrDesc"]="";
 				row["AdjNum"]=rawAdj.Rows[i]["AdjNum"].ToString();
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -986,6 +990,7 @@ namespace OpenDentBusiness {
 					continue;
 				}
 				row=table.NewRow();
+				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -1097,6 +1102,7 @@ namespace OpenDentBusiness {
 					break;
 				}
 				row=table.NewRow();
+				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -1262,6 +1268,7 @@ namespace OpenDentBusiness {
 					break;
 				}
 				row=table.NewRow();
+				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later
@@ -1364,6 +1371,7 @@ namespace OpenDentBusiness {
 					break;
 				}
 				row=table.NewRow();
+				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
 				row["balance"]="";//fill this later
 				row["balanceDouble"]=0;//fill this later

@@ -207,6 +207,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Credits",60,category));
 				list.Add(new DisplayField("Balance",60,category));
 				//list.Add(new DisplayField("Signed",60,category));
+				//list.Add(new DisplayField("Abbr",110,category));
 			}
 			else if(category==DisplayFieldCategory.RecallList) {
 				list.Add(new DisplayField("Due Date",75,category));
@@ -286,6 +287,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Pat",50,category));
 				//list.Add(new DisplayField("Prognosis",60,category));
 				//list.Add(new DisplayField("Dx",28,category));
+				//list.Add(new DisplayField("Abbr",110,category));
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				//Ortho chart has no default columns.  User must explicitly set up columns.
@@ -476,6 +478,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Credits",60,category));
 				list.Add(new DisplayField("Balance",60,category));
 				list.Add(new DisplayField("Signed",60,category));
+				list.Add(new DisplayField("Abbr",110,category));
 			}
 			else if(category==DisplayFieldCategory.RecallList) {
 				list.Add(new DisplayField("Due Date",75,category));
@@ -552,6 +555,7 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Pat",50,category));
 				list.Add(new DisplayField("Prognosis",60,category));
 				list.Add(new DisplayField("Dx",28,category));
+				list.Add(new DisplayField("Abbr",110,category));
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				list=GetForCategory(DisplayFieldCategory.OrthoChart);//The display fields that the user has already saved

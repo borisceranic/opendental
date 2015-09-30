@@ -26,6 +26,9 @@ namespace OpenDentBusiness {
 		///<summary>The date/time that the job was created.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
+		///<summary>The date/time that the job was created.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
+		public DateTime DateTimeFinished;
 		///<summary>The description of the job.</summary>
 		public string Description;
 		///<summary>The short title of the job.</summary>

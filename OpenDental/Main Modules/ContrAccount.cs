@@ -2458,6 +2458,14 @@ namespace OpenDental {
 								row.Cells.Add("");
 							}
 							break;
+						case "Abbr":
+							if(!String.IsNullOrEmpty(table.Rows[i]["AbbrDesc"].ToString())) {
+								row.Cells.Add(table.Rows[i]["AbbrDesc"].ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
 					}
 				}
 				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
