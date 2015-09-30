@@ -1118,6 +1118,7 @@ namespace OpenDental{
 					checkShowDiscount.Checked=false;
 				}
 				for(int i=0;i<ProcListTP.Length;i++) {
+					ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum);
 					if(!checkShowDiscountNotAutomatic 
 						&& !checkShowDiscount.Checked 
 						&& (ProcListTP[i].Discount!=0
@@ -1126,6 +1127,7 @@ namespace OpenDental{
 						checkShowDiscount.Checked=true;
 					}
 					row=new TpRow();
+					row.ProcAbbr=procCodeCur.AbbrDesc;
 					fee=(decimal)ProcListTP[i].ProcFee;
 					int qty=ProcListTP[i].BaseUnits + ProcListTP[i].UnitQty;
 					if(qty>0) {
@@ -1205,7 +1207,7 @@ namespace OpenDental{
 					else {
 						row.Surf=(ProcListTP[i].Surf);//I think this will properly allow UR, L, etc.
 					}
-					row.Code=(ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum).ProcCode);
+					row.Code=procCodeCur.ProcCode;
 					descript=ProcedureCodes.GetLaymanTerm(ProcListTP[i].CodeNum);
 					if(ProcListTP[i].ToothRange!="") {
 						descript+=" #"+Tooth.FormatRangeForDisplay(ProcListTP[i].ToothRange);
@@ -1547,6 +1549,14 @@ namespace OpenDental{
 						case "Dx":
 							if(RowsMain[i].Dx!=null) {
 								row.Cells.Add(RowsMain[i].Dx.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Abbr":
+							if(!String.IsNullOrEmpty(RowsMain[i].ProcAbbr)){
+								row.Cells.Add(RowsMain[i].ProcAbbr.ToString());
 							}
 							else {
 								row.Cells.Add("");
@@ -3295,6 +3305,7 @@ namespace OpenDental{
 		public string Description;
 		public string Prognosis;
 		public string Dx;
+		public string ProcAbbr;
 		public decimal Fee;
 		public decimal PriIns;
 		public decimal SecIns;
