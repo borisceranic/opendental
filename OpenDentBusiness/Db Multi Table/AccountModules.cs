@@ -519,11 +519,19 @@ namespace OpenDentBusiness {
 		}
 		
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  If IsInvoice, this does some extra filtering.</summary>
-		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatmentPrinting,bool returnTable) {
+		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum
+			,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting,bool returnTable) 
+		{
+			//This method does not call the database directly but still requires a remoting role check because it uses private static variables.
+			//It is bad to use private static variables in a Middle Tier environment due to race conditions.  The real fix is implemented in 15.4
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes
+					,isInvoice,showAdjNotes,isForStatementPrinting,returnTable);
+			}
 			retVal=new DataSet();
 			pat=Patients.GetPat(patNum);
 			fam=Patients.GetFamily(patNum);
-			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatmentPrinting);
+			GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes,isForStatementPrinting);
 			GetApptTable(fam,singlePatient,patNum);
 			return retVal;
 		}
