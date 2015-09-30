@@ -37,6 +37,24 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<Summary>Saves a list of sheets to the Database. Only saves new sheets, ignores sheets that are not new.</Summary>
+		public static void SaveNewSheetList(List<Sheet> listSheets) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listSheets);
+				return;
+			}
+			for(int i=0;i<listSheets.Count;i++) {
+				if(!listSheets[i].IsNew) {
+					continue;
+				}
+				Crud.SheetCrud.Insert(listSheets[i]);
+				foreach(SheetField fld in listSheets[i].SheetFields) {
+					fld.SheetNum=listSheets[i].SheetNum;
+					Crud.SheetFieldCrud.Insert(fld);
+				}
+			}
+		}
+
 		///<summary>Used in FormRefAttachEdit to show all referral slips for the patient/referral combo.  Usually 0 or 1 results.</summary>
 		public static List<Sheet> GetReferralSlips(long patNum,long referralNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

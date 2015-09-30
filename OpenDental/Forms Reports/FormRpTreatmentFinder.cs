@@ -675,6 +675,7 @@ namespace OpenDental{
 			}
 			SheetDef sheetDef;
 			Sheet sheet=null;
+			List<Sheet> listSheets=new List<Sheet>(); //for saving
 			for(int i=0;i<FormS.SelectedSheetDefs.Count;i++) {
 				PdfDocument document=new PdfDocument();
 				PdfPage page=new PdfPage();
@@ -692,11 +693,15 @@ namespace OpenDental{
 						page=document.AddPage();
 						SheetPrinting.CreatePdfPage(sheet,page);
 					}
+					listSheets.Add(sheet);
 				}
 				filePathAndName=PrefL.GetRandomTempFile(".pdf");
 				document.Save(filePathAndName);
 				Process.Start(filePathAndName);
 				DialogResult=DialogResult.OK;
+			}
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to save the sheets for the selected patients?")) {
+				Sheets.SaveNewSheetList(listSheets);
 			}
 		}
 
