@@ -293,6 +293,7 @@ namespace OpenDental{
 		private Label label1;
 		private UI.Button butClearAllMovements;
 		private CheckBox checkShowCompleted;
+		private UI.Button butErxAccess;
 		private bool IsDistributorKey;
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
@@ -539,6 +540,7 @@ namespace OpenDental{
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.button1 = new OpenDental.UI.Button();
 			this.textTreatmentNotes = new OpenDental.ODtextBox();
+			this.butErxAccess = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.tabControlImages.SuspendLayout();
 			this.panelImages.SuspendLayout();
@@ -2868,7 +2870,7 @@ namespace OpenDental{
 			this.butPhoneNums.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPhoneNums.CornerRadius = 4F;
 			this.butPhoneNums.Enabled = false;
-			this.butPhoneNums.Location = new System.Drawing.Point(172, 424);
+			this.butPhoneNums.Location = new System.Drawing.Point(169, 425);
 			this.butPhoneNums.Name = "butPhoneNums";
 			this.butPhoneNums.Size = new System.Drawing.Size(75, 14);
 			this.butPhoneNums.TabIndex = 198;
@@ -2884,7 +2886,7 @@ namespace OpenDental{
 			this.butForeignKey.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butForeignKey.CornerRadius = 4F;
 			this.butForeignKey.Enabled = false;
-			this.butForeignKey.Location = new System.Drawing.Point(253, 424);
+			this.butForeignKey.Location = new System.Drawing.Point(250, 425);
 			this.butForeignKey.Name = "butForeignKey";
 			this.butForeignKey.Size = new System.Drawing.Size(75, 14);
 			this.butForeignKey.TabIndex = 196;
@@ -2900,7 +2902,7 @@ namespace OpenDental{
 			this.butAddKey.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAddKey.CornerRadius = 4F;
 			this.butAddKey.Enabled = false;
-			this.butAddKey.Location = new System.Drawing.Point(334, 424);
+			this.butAddKey.Location = new System.Drawing.Point(331, 425);
 			this.butAddKey.Name = "butAddKey";
 			this.butAddKey.Size = new System.Drawing.Size(78, 14);
 			this.butAddKey.TabIndex = 195;
@@ -2947,8 +2949,25 @@ namespace OpenDental{
 			this.textTreatmentNotes.TextChanged += new System.EventHandler(this.textTreatmentNotes_TextChanged);
 			this.textTreatmentNotes.Leave += new System.EventHandler(this.textTreatmentNotes_Leave);
 			// 
+			// butErxAccess
+			// 
+			this.butErxAccess.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butErxAccess.Autosize = true;
+			this.butErxAccess.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butErxAccess.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butErxAccess.CornerRadius = 4F;
+			this.butErxAccess.Enabled = false;
+			this.butErxAccess.Location = new System.Drawing.Point(88, 425);
+			this.butErxAccess.Name = "butErxAccess";
+			this.butErxAccess.Size = new System.Drawing.Size(75, 14);
+			this.butErxAccess.TabIndex = 199;
+			this.butErxAccess.Text = "Erx Access";
+			this.butErxAccess.UseVisualStyleBackColor = true;
+			this.butErxAccess.Click += new System.EventHandler(this.butErxAccess_Click);
+			// 
 			// ContrChart
 			// 
+			this.Controls.Add(this.butErxAccess);
 			this.Controls.Add(this.butPhoneNums);
 			this.Controls.Add(this.panelEcw);
 			this.Controls.Add(this.butForeignKey);
@@ -3074,6 +3093,7 @@ namespace OpenDental{
 				butAddKey.Visible=false;
 				butForeignKey.Visible=false;
 				butPhoneNums.Visible=false;
+				butErxAccess.Visible=false;
 				tabProc.TabPages.Remove(tabCustomer);
 			}
 			//ComputerPref computerPref=ComputerPrefs.GetForLocalComputer();
@@ -3353,6 +3373,7 @@ namespace OpenDental{
 				butAddKey.Enabled=false;
 				butForeignKey.Enabled=false;
 				butPhoneNums.Enabled=false;
+				butErxAccess.Enabled=false;
 			}
 			else {
 				//groupShow.Enabled=true;
@@ -3478,6 +3499,7 @@ namespace OpenDental{
 				butAddKey.Enabled=true;
 				butForeignKey.Enabled=true;
 				butPhoneNums.Enabled=true;
+				butErxAccess.Enabled=true;
 				if(PrevPtNum != PatCur.PatNum) {//reset to TP status on every new patient selected
 					if(PrefC.GetBool(PrefName.AutoResetTPEntryStatus)) {
 						radioEntryTP.Select();
@@ -4157,6 +4179,7 @@ namespace OpenDental{
 					return;
 				}
 			}
+			#region Provider Validation
 			Provider prov=null;
 			if(Security.CurUser.ProvNum!=0) {
 				prov=Providers.GetProv(Security.CurUser.ProvNum);
@@ -4204,6 +4227,31 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Provider state where licensed invalid")+": "+prov.Abbr);
 				return;
 			}
+			UpdateErxAccess(npi);
+			ProviderErx provErx=ProviderErxs.GetOneForNpi(npi);
+			if(!PrefC.GetBool(PrefName.NewCropIsLegacy) && !provErx.IsIdentifyProofed) {
+				if(PrefC.GetString(PrefName.NewCropPartnerName)!="" || PrefC.GetString(PrefName.NewCropPassword)!="") {//Customer of a distributor
+					MessageBox.Show(Lan.g(this,"Provider")+" "+prov.Abbr+" "
+						+Lan.g(this,"must complete Identify Proofing (IDP) before using eRx.  Call support for details."));
+				}
+				else {//Customer of OD proper or customer of a reseller
+					if(MessageBox.Show(Lan.g(this,"Provider")+" "+prov.Abbr+" "
+						+Lan.g(this,"must complete Identify Proofing (IDP) before using eRx.  There is a one time setup fee for Identity Proofing.  "
+						+"Step-by-Step details on IDP process can be found in the Online Software Manual (search for 'Identity Proofing') or call support.  "
+						+"Click OK below to begin Identity Proofing process now, or click Cancel to go back to the Chart."),
+						"",MessageBoxButtons.OKCancel)==DialogResult.OK)
+					{
+						Process.Start(
+							"https://universalid.verizon.com/uid/index.php/issuanceservice/registration/individual/41511098-65c2-4cfb-8ee5-6e021671a669/ZFR");
+					}
+				}
+				return;
+			}
+			if(!provErx.IsEnabled) {
+				MessageBox.Show(Lan.g(this,"Contact support to enable eRx for provider")+" "+prov.Abbr);
+				return;
+			}
+			#endregion Provider Validation
 			Employee emp=null;
 			if(Security.CurUser.EmployeeNum!=0) {
 				emp=Employees.GetEmp(Security.CurUser.EmployeeNum);
@@ -4262,6 +4310,127 @@ namespace OpenDental{
 			erxLog.MsgText=clickThroughXml;
 			erxLog.ProvNum=prov.ProvNum;
 			ErxLogs.Insert(erxLog);
+		}
+
+		///<summary>Returns an error message upon error.  Otherwise returns empty string.</summary>
+		private void UpdateErxAccess(string npi) {
+			ProviderErx provErxCur=ProviderErxs.GetOneForNpi(npi);
+			if(provErxCur==null) {
+				//The provider is not yet part of the providererx table.  This extra refresh will only happen one time for each new provider.
+				//First refresh cache to verify the provider was not added within the last signal interval.  Prevents duplicates for long signal intervals.
+				ProviderErxs.RefreshCache();
+				provErxCur=ProviderErxs.GetOneForNpi(npi);
+			}
+			if(provErxCur==null) {
+				provErxCur=new ProviderErx();
+				provErxCur.PatNum=0;
+				provErxCur.NationalProviderID=npi;
+				provErxCur.IsEnabled=PrefC.GetBool(PrefName.NewCropIsLegacy);
+				provErxCur.IsIdentifyProofed=false;
+				provErxCur.IsSentToHq=false;
+				ProviderErxs.Insert(provErxCur);
+				DataValid.SetInvalid(InvalidType.ProviderErxs);
+			}
+			bool isDistributorCustomer=false;
+			if(PrefC.GetString(PrefName.NewCropPartnerName)!="" || PrefC.GetString(PrefName.NewCropPassword)!="") {
+				isDistributorCustomer=true;
+			}
+			bool isOdUpdateAddress=false;
+			if(PrefC.GetString(PrefName.UpdateServerAddress).ToLower().Contains("opendentalsoft.com") || 
+				PrefC.GetString(PrefName.UpdateServerAddress).ToLower().Contains("open-dent.com")) {
+				isOdUpdateAddress=true;
+			}
+			if(isDistributorCustomer && isOdUpdateAddress) {
+				//The distributor forgot to change the "Server Address for Updates" inside of the Update Setup window for this customer.
+				//Do not contact the OD web service.
+			}
+			else if(!provErxCur.IsEnabled || !provErxCur.IsSentToHq || PrefC.GetDate(PrefName.NewCropDateLastAccessCheck).Month < DateTimeOD.Today.Month) {
+				//An OD customer, or a Distributor customer if the distributor has a custom web service for updates.
+				//For distributors who implement this feature, you will be able to use FormErxAccess at your office to control individual provider access.
+				//We compare the last access date by month above, because eRx charges are based on monthly usage.  Avoid extra charges for disabled providers.
+				XmlWriterSettings settings=new XmlWriterSettings();
+				settings.Indent=true;
+				settings.IndentChars=("    ");
+				StringBuilder strbuild=new StringBuilder();
+				using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+					writer.WriteStartElement("ErxAccessRequest");
+						writer.WriteStartElement("RegistrationKey");
+						writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+						writer.WriteEndElement();//End reg key
+					List <ProviderErx> listUnsentProviders=ProviderErxs.GetAllUnsent();
+					for(int i=0;i<listUnsentProviders.Count;i++) {
+						writer.WriteStartElement("Prov");
+							writer.WriteAttributeString("NPI",listUnsentProviders[i].NationalProviderID);
+							writer.WriteAttributeString("IsEna",listUnsentProviders[i].IsEnabled?"1":"0");
+						writer.WriteEndElement();//End Prov
+					}
+					writer.WriteEndElement();//End ErxAccessRequest
+				}
+#if DEBUG
+				OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
+#else
+				OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
+					updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+				if(PrefC.GetString(PrefName.UpdateWebProxyAddress) != "") {
+					IWebProxy proxy=new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+					ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+					proxy.Credentials=cred;
+					updateService.Proxy=proxy;
+				}
+				try {
+					string result=updateService.GetErxAccess(strbuild.ToString());//may throw error
+					XmlDocument doc=new XmlDocument();
+					doc.LoadXml(result);
+					XmlNodeList listNodes=doc.SelectNodes("//Prov");
+					bool isCacheRefresNeeded=false;
+					for(int i=0;i<listNodes.Count;i++) {//Loop through providers.
+						XmlNode nodeProv=listNodes[i];
+						string provNpi="";
+						bool isProvEnabled=false;
+						bool isProvIdp=false;
+						for(int j=0;j<nodeProv.Attributes.Count;j++) {//Loop through the attributes for the current provider.
+							XmlAttribute attribute=nodeProv.Attributes[j];
+							if(attribute.Name=="NPI") {
+								provNpi=Regex.Replace(attribute.Value,"[^0-9]*","");//NPI with all non-numeric characters removed.
+								if(provNpi.Length!=10) {
+									provNpi="";
+									break;//Invalid NPI
+								}
+							}
+							else if(attribute.Name=="IsEna" && attribute.Value=="1") {
+								isProvEnabled=true;
+							}
+							else if(attribute.Name=="IsIdp" && attribute.Value=="1") {
+								isProvIdp=true;
+							}
+						}
+						if(provNpi=="") {
+							continue;
+						}
+						ProviderErx oldProvErx=ProviderErxs.GetOneForNpi(provNpi);
+						if(oldProvErx==null) {
+							continue;
+						}
+						ProviderErx provErx=oldProvErx.Clone();
+						provErx.IsEnabled=isProvEnabled;
+						provErx.IsIdentifyProofed=isProvIdp;
+						provErx.IsSentToHq=true;
+						if(ProviderErxs.Update(provErx,oldProvErx)) {
+							isCacheRefresNeeded=true;
+						}						
+					}
+					if(isCacheRefresNeeded) {
+						DataValid.SetInvalid(InvalidType.ProviderErxs);
+					}
+					if(Prefs.UpdateDateT(PrefName.NewCropDateLastAccessCheck,DateTimeOD.Today)) {
+						DataValid.SetInvalid(InvalidType.Prefs);
+					}
+				}
+				catch(Exception ex) {
+					//Failed to contact server and/or update provider IsEnabled statuses.  We will simply use what we already know in the local database.
+				}
+			}
 		}
 
 		private void Tool_LabCase_Click() {
@@ -10468,6 +10637,11 @@ namespace OpenDental{
 			FormPhoneNumbersManage FormM=new FormPhoneNumbersManage();
 			FormM.PatNum=FormOpenDental.CurPatNum;
 			FormM.ShowDialog();			
+		}
+
+		private void butErxAccess_Click(object sender,EventArgs e) {
+			FormErxAccess FormEA=new FormErxAccess(PatCur);
+			FormEA.ShowDialog();
 		}
 
 		private void butLoadDirectX_Click(object sender,EventArgs e) {

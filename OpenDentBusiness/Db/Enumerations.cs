@@ -281,8 +281,10 @@ namespace OpenDentBusiness{
 		AppointmentTypes,
 		///<summary>59. Caches the medication list to stop from over-refreshing and causing slowness.</summary>
 		Medications,
-		///<summary>This is a special InvalidType which indicates a refresh, but also includes the data to be refreshed inside of the signalod.SigText field.</summary>
+		///<summary>60. This is a special InvalidType which indicates a refresh, but also includes the data to be refreshed inside of the signalod.SigText field.</summary>
 		SmsTextMsgReceivedUnreadCount,
+		///<summary>61</summary>
+		ProviderErxs,
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

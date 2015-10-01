@@ -367,6 +367,7 @@
     <Compile Include="Crud\ProgramCrud.cs" />
     <Compile Include="Crud\ProgramPropertyCrud.cs" />
     <Compile Include="Crud\ProviderCrud.cs" />
+    <Compile Include="Crud\ProviderErxCrud.cs" />
     <Compile Include="Crud\ProviderIdentCrud.cs" />
     <Compile Include="Crud\QuestionCrud.cs" />
     <Compile Include="Crud\QuestionDefCrud.cs" />
@@ -410,6 +411,7 @@
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
+    <Compile Include="Data Interface\ProviderErxs.cs" />
     <Compile Include="InternalTools\EServices\EServiceMetrics.cs" />
     <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
@@ -957,6 +959,7 @@
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
     <Compile Include="TableTypes\EmailAutograph.cs" />
     <Compile Include="TableTypes\EServiceSignal.cs" />
+    <Compile Include="TableTypes\ProviderErx.cs" />
     <Compile Include="TableTypes\SmsPhone.cs" />
     <Compile Include="TableTypes\SmsToMobile.cs" />
     <Compile Include="TableTypes\SmsFromMobile.cs" />

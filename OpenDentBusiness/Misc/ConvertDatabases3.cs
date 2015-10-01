@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Security.Cryptography;
 using CodeBase;
@@ -10358,7 +10359,117 @@ namespace OpenDentBusiness {
 					+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptAdjustmentWithProcedure','0')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('NewCropDateLastAccessCheck','0001-01-01')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'NewCropDateLastAccessCheck','0001-01-01')";
+					Db.NonQ(command);
+				}
+				bool isLegacyErx=false;
+				command="SELECT ValueString FROM preference WHERE PrefName='NewCropAccountId'";
+				DataTable tableAccountId=Db.GetTable(command);
+				if(tableAccountId.Rows[0]["ValueString"].ToString()!="") {//NewCropAccountId is not blank.
+					isLegacyErx=true;
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('NewCropIsLegacy','"+(isLegacyErx?"1":"0")+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'NewCropIsLegacy','"+(isLegacyErx?"1":"0")+"')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS providererx";
+					Db.NonQ(command);
+					command=@"CREATE TABLE providererx (
+						ProviderErxNum bigint NOT NULL auto_increment PRIMARY KEY,
+						PatNum bigint NOT NULL,
+						NationalProviderID varchar(255) NOT NULL,
+						IsEnabled tinyint NOT NULL,
+						IsIdentifyProofed tinyint NOT NULL,
+						IsSentToHq tinyint NOT NULL,
+						INDEX(PatNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE providererx'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE providererx (
+						ProviderErxNum number(20) NOT NULL,
+						PatNum number(20) NOT NULL,
+						NationalProviderID varchar2(255),
+						IsEnabled number(3) NOT NULL,
+						IsIdentifyProofed number(3) NOT NULL,
+						IsSentToHq number(3) NOT NULL,
+						CONSTRAINT providererx_ProviderErxNum PRIMARY KEY (ProviderErxNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX providererx_PatNum ON providererx (PatNum)";
+					Db.NonQ(command);
+				}
+				//Copy NPIs from the provider table to the providererx table if the customer has already been using eRx.
+				//For other customers, records will be copied one-by-one as providers attempt to access eRx.
+				if(isLegacyErx) {
+					command="SELECT * FROM provider";
+					DataTable tableProviders=Db.GetTable(command);
+					//Copy provider NPIs from the provider table to the providererx table for providers who have likely accessed eRx in the past.
+					List<string> listNpis=new List<string>();
+					for(int i=0;i<tableProviders.Rows.Count;i++) {
+						bool isNotPerson=PIn.Bool(tableProviders.Rows[i]["IsNotPerson"].ToString());
+						if(isNotPerson) {
+							continue;
+						}
+						string fname=PIn.String(tableProviders.Rows[i]["FName"].ToString()).Trim();
+						if(fname=="") {
+							continue;
+						}
+						if(Regex.Replace(fname,"[^A-Za-z\\-]*","")!=fname) {
+							continue;
+						}
+						string lname=PIn.String(tableProviders.Rows[i]["LName"].ToString()).Trim();
+						if(lname=="") {
+							continue;
+						}
+						if(Regex.Replace(lname,"[^A-Za-z\\-]*","")!=lname) {
+							continue;
+						}
+						string deaNum=PIn.String(tableProviders.Rows[i]["DEANum"].ToString());
+						if(deaNum.ToLower()!="none" && !Regex.IsMatch(deaNum,"^[A-Za-z]{2}[0-9]{7}$")) {
+							continue;
+						}
+						string npi=PIn.String(tableProviders.Rows[i]["NationalProvID"].ToString());
+						npi=Regex.Replace(npi,"[^0-9]*","");//NPI with all non-numeric characters removed.
+						if(npi.Length!=10) {
+							continue;
+						}
+						string stateLicense=PIn.String(tableProviders.Rows[i]["StateLicense"].ToString());
+						if(stateLicense=="") {
+							continue;
+						}
+						if(!listNpis.Contains(npi)) {//Do not duplicate NPI in providererx table.
+							listNpis.Add(npi);
+						}
+					}
+					for(int i=0;i<listNpis.Count;i++) {
+						string npi=listNpis[i];
+						if(DataConnection.DBtype==DatabaseType.MySql) {
+							command="INSERT INTO providererx (PatNum,NationalProviderID,IsEnabled,IsIdentifyProofed,IsSentToHq) VALUES "
+								+"(0,'"+POut.String(npi)+"',1,0,0)";//All legacy providers are enabled by default.
+							Db.NonQ(command);
+						}
+						else {//oracle
+							command="INSERT INTO providererx (ProviderErxNum,PatNum,NationalProviderID,IsEnabled,IsIdentifyProofed,IsSentToHq) VALUES "
+								+"((SELECT MAX(ProviderErxNum)+1 FROM providererx),0,'"+POut.String(npi)+"',1,0,0)";//All legacy providers are enabled by default.
+							Db.NonQ(command);
+						}
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

@@ -332,11 +332,17 @@ namespace OpenDentBusiness {
 		MySqlVersion,
 		///<summary>There is no UI for user to change this.  Format, if OD customer, is PatNum-(RandomString)(CheckSum).  Example: 1234-W6c43.  Format for resellers is up to them.</summary>
 		NewCropAccountId,
+		///<summary>The date this customer last checked with HQ to determine which provider have access to eRx.</summary>
+		NewCropDateLastAccessCheck,
+		///<summary>True for customers who were using NewCrop before version 15.4.  True if NewCropAccountId was not blank when upgraded.</summary>
+		NewCropIsLegacy,
 		/// <summary>There is no UI for user to change this. For resellers, this is part of the credentials.  OD credentials are not stored here, but are hard-coded.</summary>
 		NewCropName,
-		/// <summary>There is no UI for user to change this. For resellers, this is part of the credentials.  OD credentials are not stored here, but are hard-coded.</summary>
+		///<summary>There is no UI for user to change this.  For distributors, this is part of the credentials.
+		///OD credentials are not stored here, but are hard-coded.</summary>
 		NewCropPartnerName,
-		/// <summary>There is no UI for user to change this. For resellers, this is part of the credentials.  OD credentials are not stored here, but are hard-coded.</summary>
+		///<summary>There is no UI for user to change this.  For distributors, this is part of the credentials.
+		///OD credentials are not stored here, but are hard-coded.</summary>
 		NewCropPassword,
 		///<summary>URL of the time server to use for EHR time synchronization.  Only used for EHR.  Example nist-time-server.eoni.com</summary>
 		NistTimeServerUrl,

@@ -40,6 +40,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RequestCustomerIDStrict">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RequestCustomerIDStrictResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestCustomerIDStrictResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestEmailVerificationCode">
         <s:complexType>
           <s:sequence>
@@ -218,6 +232,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="GetErxAccess">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetErxAccessResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetErxAccessResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="RequestPatientPortalURL">
         <s:complexType>
           <s:sequence>
@@ -308,6 +336,12 @@
   <wsdl:message name="RequestCustomerIDSoapOut">
     <wsdl:part name="parameters" element="tns:RequestCustomerIDResponse" />
   </wsdl:message>
+  <wsdl:message name="RequestCustomerIDStrictSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestCustomerIDStrict" />
+  </wsdl:message>
+  <wsdl:message name="RequestCustomerIDStrictSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestCustomerIDStrictResponse" />
+  </wsdl:message>
   <wsdl:message name="RequestEmailVerificationCodeSoapIn">
     <wsdl:part name="parameters" element="tns:RequestEmailVerificationCode" />
   </wsdl:message>
@@ -386,6 +420,12 @@
   <wsdl:message name="ValidateWebLanderSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateWebLanderResponse" />
   </wsdl:message>
+  <wsdl:message name="GetErxAccessSoapIn">
+    <wsdl:part name="parameters" element="tns:GetErxAccess" />
+  </wsdl:message>
+  <wsdl:message name="GetErxAccessSoapOut">
+    <wsdl:part name="parameters" element="tns:GetErxAccessResponse" />
+  </wsdl:message>
   <wsdl:message name="RequestPatientPortalURLSoapIn">
     <wsdl:part name="parameters" element="tns:RequestPatientPortalURL" />
   </wsdl:message>
@@ -428,6 +468,10 @@
     <wsdl:operation name="RequestCustomerID">
       <wsdl:input message="tns:RequestCustomerIDSoapIn" />
       <wsdl:output message="tns:RequestCustomerIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <wsdl:input message="tns:RequestCustomerIDStrictSoapIn" />
+      <wsdl:output message="tns:RequestCustomerIDStrictSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="RequestEmailVerificationCode">
       <wsdl:input message="tns:RequestEmailVerificationCodeSoapIn" />
@@ -481,6 +525,10 @@
       <wsdl:input message="tns:ValidateWebLanderSoapIn" />
       <wsdl:output message="tns:ValidateWebLanderSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="GetErxAccess">
+      <wsdl:input message="tns:GetErxAccessSoapIn" />
+      <wsdl:output message="tns:GetErxAccessSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <wsdl:input message="tns:RequestPatientPortalURLSoapIn" />
       <wsdl:output message="tns:RequestPatientPortalURLSoapOut" />
@@ -524,6 +572,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestCustomerID">
       <soap:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <soap:operation soapAction="http://open-dent.com/RequestCustomerIDStrict" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -648,6 +705,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetErxAccess">
+      <soap:operation soapAction="http://open-dent.com/GetErxAccess" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RequestPatientPortalURL">
       <soap:operation soapAction="http://open-dent.com/RequestPatientPortalURL" style="document" />
       <wsdl:input>
@@ -716,6 +782,15 @@
     </wsdl:operation>
     <wsdl:operation name="RequestCustomerID">
       <soap12:operation soapAction="http://open-dent.com/RequestCustomerID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestCustomerIDStrict">
+      <soap12:operation soapAction="http://open-dent.com/RequestCustomerIDStrict" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -833,6 +908,15 @@
     </wsdl:operation>
     <wsdl:operation name="ValidateWebLander">
       <soap12:operation soapAction="http://open-dent.com/ValidateWebLander" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetErxAccess">
+      <soap12:operation soapAction="http://open-dent.com/GetErxAccess" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
