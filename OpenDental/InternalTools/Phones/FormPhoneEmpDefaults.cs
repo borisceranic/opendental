@@ -136,7 +136,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("HasColor",60,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("RingGroup",65);
+			col=new ODGridColumn("Queue",65);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("PhoneExt",55);
 			gridMain.Columns.Add(col);

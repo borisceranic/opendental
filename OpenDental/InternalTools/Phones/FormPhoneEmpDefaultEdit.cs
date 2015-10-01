@@ -138,7 +138,7 @@ namespace OpenDental{
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(139, 20);
 			this.label2.TabIndex = 13;
-			this.label2.Text = "Default Ring Group";
+			this.label2.Text = "Default Queue";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// listRingGroup
@@ -278,9 +278,9 @@ namespace OpenDental{
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(359, 47);
 			this.label10.TabIndex = 37;
-			this.label10.Text = "The normal ring group for this employee when clocked in.  If you change this valu" +
-    "e, the change will not immediately show on each workstation, but will instead re" +
-    "quire a restart of OD.";
+			this.label10.Text = "The normal queue for this employee when clocked in.  If you change this value, th" +
+    "e change will not immediately show on each workstation, but will instead require" +
+    " a restart of OD.";
 			// 
 			// label11
 			// 

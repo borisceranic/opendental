@@ -77,7 +77,7 @@
             this.menuItemHome,
             this.menuItemBreak});
 			this.menuStatus.Name = "menuStatus";
-			this.menuStatus.Size = new System.Drawing.Size(215, 412);
+			this.menuStatus.Size = new System.Drawing.Size(215, 434);
 			// 
 			// menuItemStatusOnBehalf
 			// 
@@ -152,34 +152,34 @@
 			this.menuItemRingGroupOnBehalf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
 			this.menuItemRingGroupOnBehalf.Name = "menuItemRingGroupOnBehalf";
 			this.menuItemRingGroupOnBehalf.Size = new System.Drawing.Size(214, 22);
-			this.menuItemRingGroupOnBehalf.Text = "Ring Group On Behalf Of";
+			this.menuItemRingGroupOnBehalf.Text = "Queue On Behalf Of";
 			// 
 			// menuItemRinggroupAll
 			// 
 			this.menuItemRinggroupAll.Name = "menuItemRinggroupAll";
 			this.menuItemRinggroupAll.Size = new System.Drawing.Size(214, 22);
-			this.menuItemRinggroupAll.Text = "Ringgroups All";
+			this.menuItemRinggroupAll.Text = "Queues All";
 			this.menuItemRinggroupAll.Click += new System.EventHandler(this.menuItemRinggroupAll_Click);
 			// 
 			// menuItemRinggroupNone
 			// 
 			this.menuItemRinggroupNone.Name = "menuItemRinggroupNone";
 			this.menuItemRinggroupNone.Size = new System.Drawing.Size(214, 22);
-			this.menuItemRinggroupNone.Text = "Ringgroups None";
+			this.menuItemRinggroupNone.Text = "Queues None";
 			this.menuItemRinggroupNone.Click += new System.EventHandler(this.menuItemRinggroupNone_Click);
 			// 
 			// menuItemRinggroupsDefault
 			// 
 			this.menuItemRinggroupsDefault.Name = "menuItemRinggroupsDefault";
 			this.menuItemRinggroupsDefault.Size = new System.Drawing.Size(214, 22);
-			this.menuItemRinggroupsDefault.Text = "Ringgroups Default";
+			this.menuItemRinggroupsDefault.Text = "Queues Default";
 			this.menuItemRinggroupsDefault.Click += new System.EventHandler(this.menuItemRinggroupsDefault_Click);
 			// 
 			// menuItemRinggroupsBackup
 			// 
 			this.menuItemRinggroupsBackup.Name = "menuItemRinggroupsBackup";
 			this.menuItemRinggroupsBackup.Size = new System.Drawing.Size(214, 22);
-			this.menuItemRinggroupsBackup.Text = "Ringgroups Backup";
+			this.menuItemRinggroupsBackup.Text = "Queues Backup";
 			this.menuItemRinggroupsBackup.Click += new System.EventHandler(this.menuItemRinggroupsBackup_Click);
 			// 
 			// toolStripSeparatorClockEvents

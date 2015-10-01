@@ -255,7 +255,7 @@ namespace OpenDental {
 				allowSetSelfAvailable=true;
 			}
 			AddToolstripGroup("menuItemStatusOnBehalf","Status for: "+statusOnBehalfOf);
-			AddToolstripGroup("menuItemRingGroupOnBehalf","Ringgroup for ext: "+PhoneCur.Extension.ToString());
+			AddToolstripGroup("menuItemRingGroupOnBehalf","Queues for ext: "+PhoneCur.Extension.ToString());
 			AddToolstripGroup("menuItemClockOnBehalf","Clock event for: "+PhoneCur.EmployeeName);
 			SetToolstripItemText("menuItemAvailable",allowStatusEdit || allowSetSelfAvailable);
 			SetToolstripItemText("menuItemTraining",allowStatusEdit);
