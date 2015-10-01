@@ -361,19 +361,20 @@ namespace OpenDental{
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {
-			string errors=TimeCardRules.ValidateOvertimeRules();
-			if(!string.IsNullOrEmpty(errors)) {
-				errors="Fix the following erros:\r\n"+errors;
-				MessageBox.Show(errors);
-				return;
-			}
-			if(Prefs.UpdateString(PrefName.ADPCompanyCode,textADPCompanyCode.Text)) {
-				DataValid.SetInvalid(InvalidType.Prefs);
-			}
 			Close();
 		}
 
 		private void FormPayPeriods_FormClosing(object sender,FormClosingEventArgs e) {
+			//validation on Form_Closing to account for if the user doesn't use the close button to close the form.
+			string errors=TimeCardRules.ValidateOvertimeRules();
+			if(!string.IsNullOrEmpty(errors)) {
+				errors="Fix the following erros:\r\n"+errors;
+				MessageBox.Show(errors);
+				e.Cancel=true;
+			}
+			if(Prefs.UpdateString(PrefName.ADPCompanyCode,textADPCompanyCode.Text)) {
+				changed=true;
+			}
 			if(changed) {
 				DataValid.SetInvalid(InvalidType.Employees,InvalidType.Prefs,InvalidType.TimeCardRules);
 			}
