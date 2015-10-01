@@ -234,7 +234,6 @@ namespace OpenDental {
 			this.menuPrefs = new System.Windows.Forms.MenuItem();
 			this.panelNote = new System.Windows.Forms.Panel();
 			this.labelInvalidSig = new System.Windows.Forms.Label();
-			this.sigBox = new OpenDental.UI.SignatureBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textNote = new System.Windows.Forms.TextBox();
@@ -243,6 +242,7 @@ namespace OpenDental {
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.ToolBarPaint = new OpenDental.UI.ODToolBar();
 			this.sliderBrightnessContrast = new OpenDental.UI.ContrWindowingSlider();
+			this.sigBox = new OpenDental.UI.SignatureBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
 			this.panelNote.SuspendLayout();
 			this.SuspendLayout();
@@ -305,6 +305,7 @@ namespace OpenDental {
 			this.imageListTree.Images.SetKeyName(4, "");
 			this.imageListTree.Images.SetKeyName(5, "");
 			this.imageListTree.Images.SetKeyName(6, "");
+			this.imageListTree.Images.SetKeyName(7, "");
 			// 
 			// imageListTools2
 			// 
@@ -405,14 +406,6 @@ namespace OpenDental {
 			this.labelInvalidSig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.labelInvalidSig.DoubleClick += new System.EventHandler(this.labelInvalidSig_DoubleClick);
 			// 
-			// sigBox
-			// 
-			this.sigBox.Location = new System.Drawing.Point(308, 20);
-			this.sigBox.Name = "sigBox";
-			this.sigBox.Size = new System.Drawing.Size(362, 79);
-			this.sigBox.TabIndex = 90;
-			this.sigBox.DoubleClick += new System.EventHandler(this.sigBox_DoubleClick);
-			// 
 			// label15
 			// 
 			this.label15.Location = new System.Drawing.Point(305, 0);
@@ -492,6 +485,14 @@ namespace OpenDental {
 			this.sliderBrightnessContrast.Text = "contrWindowingSlider1";
 			this.sliderBrightnessContrast.Scroll += new System.EventHandler(this.brightnessContrastSlider_Scroll);
 			this.sliderBrightnessContrast.ScrollComplete += new System.EventHandler(this.brightnessContrastSlider_ScrollComplete);
+			// 
+			// sigBox
+			// 
+			this.sigBox.Location = new System.Drawing.Point(308, 20);
+			this.sigBox.Name = "sigBox";
+			this.sigBox.Size = new System.Drawing.Size(362, 79);
+			this.sigBox.TabIndex = 90;
+			this.sigBox.DoubleClick += new System.EventHandler(this.sigBox_DoubleClick);
 			// 
 			// ContrImages
 			// 
@@ -1213,8 +1214,14 @@ namespace OpenDental {
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 				treeDocuments.Nodes.Add(new TreeNode(DefC.Short[(int)DefCat.ImageCats][i].ItemName));
 				treeDocuments.Nodes[i].Tag=MakeIdDef(DefC.Short[(int)DefCat.ImageCats][i].DefNum);
-				treeDocuments.Nodes[i].SelectedImageIndex=1;
-				treeDocuments.Nodes[i].ImageIndex=1;
+				if(DefC.Short[(int)DefCat.ImageCats][i].ItemValue.Contains("L")) { //Patient Portal Folder
+					treeDocuments.Nodes[i].SelectedImageIndex=7;
+					treeDocuments.Nodes[i].ImageIndex=7;
+				}
+				else {
+					treeDocuments.Nodes[i].SelectedImageIndex=1;
+					treeDocuments.Nodes[i].ImageIndex=1;
+				}
 			}
 			//Add all relevant documents and mounts as stored in the database to the tree for the current patient.
 			DataSet ds=Documents.RefreshForPatient(new string[] { PatCur.PatNum.ToString() });
@@ -2394,6 +2401,9 @@ namespace OpenDental {
 				//These are the only types that can be dragged.
 				NodeIdentifierDown=nodeIdDown;
 				TimeMouseMoved=new DateTime(1,1,1);//For time delay. This will be set the moment the mouse actually starts moving
+			}
+			if(nodeIdDown.NodeType==ImageNodeType.Category) {
+				nodeOver.SelectedImageIndex=nodeOver.ImageIndex;
 			}
 			//Always select the node on a mouse-down press for either right or left buttons.
 			//If the left button is pressed, then the document is either being selected or dragged, so
