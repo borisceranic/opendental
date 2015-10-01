@@ -26,10 +26,11 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JobContainerControl));
 			this.butClose = new System.Windows.Forms.Button();
-			this.butMerge = new System.Windows.Forms.Button();
+			this.butDock = new System.Windows.Forms.Button();
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
 			this.butRight = new System.Windows.Forms.Button();
 			this.butLeft = new System.Windows.Forms.Button();
+			this.panelHighlight = new System.Windows.Forms.Panel();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -46,15 +47,15 @@
 			// 
 			// butMerge
 			// 
-			this.butMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butMerge.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.butMerge.ImageList = this.imageList1;
-			this.butMerge.Location = new System.Drawing.Point(409, 3);
-			this.butMerge.Name = "butMerge";
-			this.butMerge.Size = new System.Drawing.Size(15, 15);
-			this.butMerge.TabIndex = 1;
-			this.butMerge.UseVisualStyleBackColor = true;
-			this.butMerge.Click += new System.EventHandler(this.butMerge_Click);
+			this.butDock.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butDock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.butDock.ImageList = this.imageList1;
+			this.butDock.Location = new System.Drawing.Point(409, 3);
+			this.butDock.Name = "butMerge";
+			this.butDock.Size = new System.Drawing.Size(15, 15);
+			this.butDock.TabIndex = 1;
+			this.butDock.UseVisualStyleBackColor = true;
+			this.butDock.Click += new System.EventHandler(this.butDock_Click);
 			// 
 			// imageList1
 			// 
@@ -87,6 +88,15 @@
 			this.butLeft.UseVisualStyleBackColor = true;
 			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
+			// panelHighlight
+			// 
+			this.panelHighlight.BackColor = System.Drawing.SystemColors.Highlight;
+			this.panelHighlight.Location = new System.Drawing.Point(0, 0);
+			this.panelHighlight.Name = "panelHighlight";
+			this.panelHighlight.Size = new System.Drawing.Size(448, 298);
+			this.panelHighlight.TabIndex = 4;
+			this.panelHighlight.Visible = false;
+			// 
 			// JobContainerControl
 			// 
 			this.AllowDragging = true;
@@ -95,8 +105,9 @@
 			this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.Controls.Add(this.butLeft);
 			this.Controls.Add(this.butRight);
-			this.Controls.Add(this.butMerge);
+			this.Controls.Add(this.butDock);
 			this.Controls.Add(this.butClose);
+			this.Controls.Add(this.panelHighlight);
 			this.DoubleBuffered = true;
 			this.Name = "JobContainerControl";
 			this.Size = new System.Drawing.Size(448, 298);
@@ -114,7 +125,8 @@
 		private System.Windows.Forms.ImageList imageList1;
 		private System.Windows.Forms.Button butLeft;
 		private System.Windows.Forms.Button butRight;
-		private System.Windows.Forms.Button butMerge;
+		private System.Windows.Forms.Button butDock;
+		public System.Windows.Forms.Panel panelHighlight;
 
 	}
 }

@@ -285,6 +285,8 @@ namespace OpenDentBusiness{
 		SmsTextMsgReceivedUnreadCount,
 		///<summary>61</summary>
 		ProviderErxs,
+		///<summary>62. Used to refresh the jobs windows in the Job Manager.</summary>
+		Job
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class UserControlProjects:UserControl {
@@ -30,6 +31,7 @@ namespace OpenDental {
 				Lan.C(this,menuEdit.MenuItems[i]);
 			}
 			this.gridMain.ContextMenu=this.menuEdit;
+			ODEvent.Fired+=ODEvent_Fired;
 		}
 
 		///<summary>And resets the tabs if the user changes.</summary>
@@ -161,6 +163,14 @@ namespace OpenDental {
 			}
 		}
 
+		private void ODEvent_Fired(ODEventArgs e) {
+			//Make sure that this ODEvent is for the Job Manager and that the Tag is not null and is a string.
+			if(e.Name!="Job Manager" || e.Tag==null || e.Tag.GetType()!=typeof(string)) {
+				return;
+			}
+			FillGrid();
+		}
+
 		private void tabContr_Click(object sender,System.EventArgs e) {
 			_listJobProjectHistory=new List<JobProject>();//clear the tree no matter which tab clicked.
 			FillTree();
@@ -192,7 +202,7 @@ namespace OpenDental {
 			FormJPE.ShowDialog();
 			if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
 				FillGrid();
-			}
+			}			
 		}
 
 		private void AddJob_Clicked() {
@@ -262,6 +272,7 @@ namespace OpenDental {
 					JobProject jobProjectCur=_listJobProjects[_clickedIdx];
 					jobProjectCur.JobProjectStatus=JobProjectStatus.Done;
 					JobProjects.Update(jobProjectCur);
+					Signalods.SetInvalid(InvalidType.Job);
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
@@ -280,6 +291,7 @@ namespace OpenDental {
 				//}
 				try {
 					Jobs.Update(jobCur);
+					Signalods.SetInvalid(InvalidType.Job);
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
@@ -323,6 +335,7 @@ namespace OpenDental {
 				}
 				try {
 					JobProjects.Delete(_listJobProjects[_clickedIdx].JobProjectNum);
+					Signalods.SetInvalid(InvalidType.Job);
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);
@@ -335,6 +348,7 @@ namespace OpenDental {
 				}
 				try {
 					Jobs.Delete(_listJobs[_clickedIdx-_listJobProjects.Count].JobNum);
+					Signalods.SetInvalid(InvalidType.Job);
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);

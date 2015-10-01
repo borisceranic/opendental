@@ -1428,6 +1428,7 @@ namespace OpenDental{
 			// 
 			this.menuItemJobManager.Index = 0;
 			this.menuItemJobManager.Text = "Job Manager";
+			this.menuItemJobManager.Visible = false;
 			this.menuItemJobManager.Click += new System.EventHandler(this.menuItemJobManager_Click);
 			// 
 			// menuItemPrintScreen
@@ -2430,6 +2431,7 @@ namespace OpenDental{
 			Bridges.ICat.StartFileWatcher();
 			Bridges.TigerView.StartFileWatcher();
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				menuItemJobManager.Visible=true;
 				menuItemResellers.Visible=true;
 				menuItemXChargeReconcile.Visible=true;
 				#if !DEBUG
@@ -2681,6 +2683,9 @@ namespace OpenDental{
 		private void RefreshLocalData(params InvalidType[] itypes){
 			List<int> itypeList=new List<int>();
 			for(int i=0;i<itypes.Length;i++){
+				if(itypes[i]==InvalidType.Job) {
+					ODEvent.Fire(new ODEventArgs("Job Manager","Job Manager"));
+				}
 				itypeList.Add((int)itypes[i]);
 			}
 			string itypesStr="";

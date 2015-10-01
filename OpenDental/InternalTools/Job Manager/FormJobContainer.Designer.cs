@@ -1,5 +1,5 @@
 ﻿namespace OpenDental {
-	partial class FormTest {
+	partial class FormJobContainer {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTest));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormJobContainer));
 			this.SuspendLayout();
 			// 
 			// FormTest

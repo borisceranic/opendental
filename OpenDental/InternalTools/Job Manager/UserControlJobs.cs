@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using CodeBase;
 
 
 namespace OpenDental {
@@ -14,6 +15,7 @@ namespace OpenDental {
 		
 		public UserControlJobs() {
 			InitializeComponent();
+			ODEvent.Fired+=ODEvent_Fired;
 		}
 
 		private void UserControlJob_Load(object sender,EventArgs e) {
@@ -87,6 +89,14 @@ namespace OpenDental {
 					gridMain.SetSelected(i,true);
 				}
 			}
+		}
+
+		private void ODEvent_Fired(ODEventArgs e) {
+			//Make sure that this ODEvent is for the Job Manager and that the Tag is not null and is a string.
+			if(e.Name!="Job Manager" || e.Tag==null || e.Tag.GetType()!=typeof(string)) {
+				return;
+			}
+			FillGrid();
 		}
 
 		/// <summary>Lessen the number of calls to the database by only refreshing the grid when the user is done typing. 

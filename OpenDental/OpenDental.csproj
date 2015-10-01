@@ -3473,23 +3473,29 @@
     <Compile Include="InternalTools\EServices\EServiceMetricsControl.Designer.cs">
       <DependentUpon>EServiceMetricsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobEdit.designer.cs">
-      <DependentUpon>FormJobEdit.cs</DependentUpon>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobManager.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobManager.Designer.cs">
       <DependentUpon>FormJobManager.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormTest.cs">
+    <Compile Include="InternalTools\Job Manager\UserControlReviews.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\UserControlReviews.Designer.cs">
+      <DependentUpon>UserControlReviews.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormTest.Designer.cs">
-      <DependentUpon>FormTest.cs</DependentUpon>
+    <Compile Include="InternalTools\Job Manager\FormJobEdit.designer.cs">
+      <DependentUpon>FormJobEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobContainer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobContainer.Designer.cs">
+      <DependentUpon>FormJobContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="InternalTools\Job Manager\JobContainerControl.cs">
       <SubType>UserControl</SubType>
@@ -5948,11 +5954,14 @@
       <DependentUpon>FormJobManager.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\UserControlReviews.resx">
+      <DependentUpon>UserControlReviews.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobEdit.resx">
       <DependentUpon>FormJobEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormTest.resx">
-      <DependentUpon>FormTest.cs</DependentUpon>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobContainer.resx">
+      <DependentUpon>FormJobContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\JobContainerControl.resx">
       <DependentUpon>JobContainerControl.cs</DependentUpon>

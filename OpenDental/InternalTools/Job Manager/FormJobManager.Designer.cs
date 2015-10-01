@@ -70,6 +70,7 @@
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Job Manager";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormJobManager_FormClosing);
 			this.Load += new System.EventHandler(this.FormJobManager_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();

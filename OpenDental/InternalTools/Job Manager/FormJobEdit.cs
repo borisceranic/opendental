@@ -134,6 +134,7 @@ namespace OpenDental {
 				+" and pointers to other tasks, features, and bugs. Are you sure you want to continue?")) {
 				try { //Jobs.Delete will throw an application exception if there are any reviews associated with this job.
 					Jobs.Delete(_job.JobNum);
+					Signalods.SetInvalid(InvalidType.Job);
 					DialogResult=DialogResult.OK;
 				}
 				catch(Exception ex) {
@@ -174,6 +175,7 @@ namespace OpenDental {
 				JobEvents.Insert(_jobEventCur);
 			}
 			Jobs.Update(_job);
+			Signalods.SetInvalid(InvalidType.Job);
 			DialogResult=DialogResult.OK;
 		}
 

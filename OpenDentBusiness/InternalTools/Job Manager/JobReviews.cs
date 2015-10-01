@@ -25,6 +25,29 @@ namespace OpenDentBusiness{
 			return Crud.JobReviewCrud.SelectOne(jobReviewNum);
 		}
 
+
+		public static DataTable GetOutstandingForUser(long userNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),userNum);
+			}
+			string command="SELECT jobreview.*,job.JobNum,job.Owner,job.Title FROM jobreview "
+				+"INNER JOIN joblink ON jobreview.JobReviewNum=joblink.FKey "
+				+"INNER JOIN job ON joblink.JobNum=job.JobNum "
+			  +"WHERE jobreview.Reviewer="+POut.Long(userNum)+" "
+				+"AND jobreview.JobReviewStatus="+POut.Long((int)JobReviewStatus.Sent)+" "
+				+"AND joblink.LinkType="+POut.Long((int)JobLinkType.Review);
+			return Db.GetTable(command);
+		}
+
+		public static void SetSeen(long reviewNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),reviewNum);
+			}
+			string command="UPDATE jobreview SET JobReviewStatus="+POut.Long((int)JobReviewStatus.Seen)+" "
+				+"WHERE JobReviewNum="+POut.Long(reviewNum);
+			Db.NonQ(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(JobReview jobReview){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

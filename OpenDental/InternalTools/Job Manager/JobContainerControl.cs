@@ -16,13 +16,17 @@ namespace OpenDental {
 		private bool _isDocked=true;
 
 		///<summary>Creates a draggable control containing the control passed in that will be added to the flow panel passed in.</summary>
-		public JobContainerControl(Control jobControl,FlowLayoutPanel flowPanel) {
+		public JobContainerControl(Control controlJob,FlowLayoutPanel flowPanel) {
 			InitializeComponent();
-			butMerge.ImageIndex=1;
+			butDock.ImageIndex=1;
 			_flowPanel=flowPanel;
-			this.Controls.Add(jobControl);
-			jobControl.SetBounds(0,10,jobControl.Width,jobControl.Height);//10 height for the buttons at the top.
-			jobControl.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
+			this.Height=controlJob.Height+20;
+			this.Width=controlJob.Width;
+			panelHighlight.Height=this.Height;
+			panelHighlight.Width=this.Width;
+			this.Controls.Add(controlJob);
+			controlJob.SetBounds(0,20,controlJob.Width,controlJob.Height);//10 height for the buttons at the top.
+			controlJob.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
 			_flowPanel.Controls.Add(this);
 		}
 
@@ -35,28 +39,45 @@ namespace OpenDental {
 
 		private void JobContainerControl_DragEnter(object sender,DragEventArgs e) {
 			if(e.Data.GetDataPresent(typeof(JobContainerControl))) {
-				this.BackColor=Color.Blue;
+				panelHighlight.BringToFront();
+				panelHighlight.Visible=true;
 				e.Effect=DragDropEffects.Move;
 			}
 		}
 
 		private void JobContainerControl_DragLeave(object sender,EventArgs e) {
-			this.BackColor=Color.Transparent;
+			panelHighlight.SendToBack();
+			panelHighlight.Visible=false;
 		}
 
 		private void JobContainerControl_DragDrop(object sender,DragEventArgs e) {
-			JobContainerControl sourceControl=(JobContainerControl)e.Data.GetData(typeof(JobContainerControl));
-			JobContainerControl destControl=(JobContainerControl)_flowPanel.GetChildAtPoint(new Point(e.X,e.Y));
-			if(sourceControl==null || destControl==null) {
+			JobContainerControl controlSource=(JobContainerControl)e.Data.GetData(typeof(JobContainerControl));
+			//There was a glitch where the client point was different from the form point so PointToClient has to be used when detecting control locations.
+			JobContainerControl controlDest=(JobContainerControl)_flowPanel.GetChildAtPoint(_flowPanel.PointToClient(new Point(e.X,e.Y)));
+			if(controlSource==null || controlDest==null) {
 				return;
 			}
-			if(sourceControl==destControl){
-				sourceControl.BackColor=Color.Transparent;
+			if(controlSource==controlDest){
+				controlSource.panelHighlight.SendToBack();
+				controlSource.panelHighlight.Visible=false;
+				return;
 			}
-			sourceControl.BackColor=Color.Transparent;
-			destControl.BackColor=Color.Transparent;
-			int destIdx=_flowPanel.Controls.GetChildIndex(destControl);
-			_flowPanel.Controls.SetChildIndex(sourceControl,destIdx);
+			controlSource.panelHighlight.SendToBack();
+			controlSource.panelHighlight.Visible=false;
+			controlDest.panelHighlight.SendToBack();
+			controlDest.panelHighlight.Visible=false;
+			int destIdx=_flowPanel.Controls.GetChildIndex(controlDest);
+			_flowPanel.Controls.SetChildIndex(controlSource,destIdx);
+		}
+
+		///<summary>Closes the parent form of this control if it is currently showing in a separate form (not docked).</summary>
+		public void CloseForm() {
+			if(this.Parent.GetType()==typeof(FormJobContainer)) {
+				FormJobContainer FormJC=((FormJobContainer)this.Parent);
+				if(!FormJC.IsDisposed) {
+					FormJC.Close();
+				}
+			}
 		}
 
 		private void butLeft_Click(object sender,EventArgs e) {
@@ -68,7 +89,6 @@ namespace OpenDental {
 			JobContainerControl controlSecond=(JobContainerControl)_flowPanel.Controls[idxA-1];
 			int idxB=idxA-1;
 			_flowPanel.Controls.SetChildIndex(controlFirst,idxB);
-			_flowPanel.Controls.SetChildIndex(controlSecond,idxA);
 		}
 
 		private void butRight_Click(object sender,EventArgs e) {
@@ -80,27 +100,26 @@ namespace OpenDental {
 			JobContainerControl controlSecond=(JobContainerControl)_flowPanel.Controls[idxA+1];
 			int idxB=idxA+1;
 			_flowPanel.Controls.SetChildIndex(controlFirst,idxB);
-			_flowPanel.Controls.SetChildIndex(controlSecond,idxA);
 		}
 
-		private void butMerge_Click(object sender,EventArgs e) {
+		private void butDock_Click(object sender,EventArgs e) {
 			if(_isDocked) {
 				butLeft.Visible=false;
 				butRight.Visible=false;
-				butMerge.ImageIndex=0;
+				butDock.ImageIndex=0;
 				_flowPanel.Controls.Remove(this);
-				FormTest formT=new FormTest(this);
-				formT.Show(_flowPanel.Parent);
+				FormJobContainer FormJC=new FormJobContainer(this);
+				FormJC.Show();
 				_isDocked=false;
 			}
 			else {//Control is currently in its own form.
-				if(this.Parent.GetType()!=typeof(FormTest)) {
+				if(this.Parent.GetType()!=typeof(FormJobContainer)) {
 					return;//Should never happen...
 				}
-				FormTest parent=(FormTest)this.Parent;
+				FormJobContainer parent=(FormJobContainer)this.Parent;
 				this.Anchor=AnchorStyles.None;
 				_flowPanel.Controls.Add(this);
-				butMerge.ImageIndex=1;
+				butDock.ImageIndex=1;
 				butLeft.Visible=true;
 				butRight.Visible=true;
 				parent.Close();
