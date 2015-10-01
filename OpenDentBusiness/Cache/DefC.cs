@@ -263,6 +263,14 @@ namespace OpenDentBusiness {
 			return 0;
 		}
 
+		///<summary>Returns true if the passed-in def is deprecated.  This method must be updated whenever another def is deprecated.</summary>
+		public static bool IsDefDeprecated(Def def) {
+			if(def.Category==DefCat.AccountColors && def.ItemName=="Received Pre-Auth") {
+				return true;
+			}
+			return false;
+		}
+
 	}
 
 	///<summary></summary>

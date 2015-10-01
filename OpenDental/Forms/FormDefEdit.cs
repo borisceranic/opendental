@@ -229,8 +229,8 @@ namespace OpenDental{
 			}
 			if(!CanEditName){
 				textName.ReadOnly=true;
-				if(!DefCur.IsHidden){
-					checkHidden.Enabled=false;//prevent hiding these types of defs
+				if(!DefCur.IsHidden || DefC.IsDefDeprecated(DefCur)) {
+					checkHidden.Enabled=false;//prevent hiding defs that are hard-coded into OD. Prevent unhiding defs that are deprecated.
 				}
 			}
 			labelValue.Text=ValueText;

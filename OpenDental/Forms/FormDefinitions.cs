@@ -517,6 +517,9 @@ namespace OpenDental{
 			tbDefs.ResetRows(DefsList.Length);
 			tbDefs.SetBackGColor(Color.White);
 			for(int i=0;i<DefsList.Length;i++){
+				if(DefC.IsDefDeprecated(DefsList[i])) {
+					DefsList[i].IsHidden=true;
+				}
 				tbDefs.Cell[0,i]=DefsList[i].ItemName;
 				if(lookupCat[listCategory.SelectedIndex]==DefCat.ImageCats) {
 					tbDefs.Cell[1,i]=GetItemDescForImages(DefsList[i].ItemValue);
