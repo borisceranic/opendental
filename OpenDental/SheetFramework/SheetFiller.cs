@@ -2284,7 +2284,7 @@ namespace OpenDental{
 				}
 				else {
 					//Show the current family's balance without subtracting insurance estimates.
-					sLine1+=PatGuar.EstBalance.ToString("c");
+					sLine1+=PatGuar.BalTotal.ToString("c");
 				}
 			}
 			else {//more common
