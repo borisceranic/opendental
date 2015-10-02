@@ -950,6 +950,7 @@
     <Compile Include="Reports\ReportsComplex.cs" />
     <Compile Include="Reports\RpPaySheet.cs" />
     <Compile Include="Reports\RpProcCodes.cs" />
+    <Compile Include="Reports\RpProcNotBilledIns.cs" />
     <Compile Include="Reports\RpProcSheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="Reports\RpRouting.cs" />
