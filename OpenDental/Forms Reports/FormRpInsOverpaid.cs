@@ -1,8 +1,11 @@
 using System;
+using System.Data;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
+using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental{
@@ -13,14 +16,17 @@ namespace OpenDental{
 		private Label label1;
 		private RadioButton radioGroupByProc;
 		private RadioButton radioGroupByPat;
+		private CheckBox checkAllClin;
+		private ListBox listClin;
+		private Label labelClin;
 		private System.ComponentModel.Container components = null;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormRpInsOverpaid() {
 			InitializeComponent();
 			Lan.F(this);
 		}
-
 
 		///<summary></summary>
 		protected override void Dispose( bool disposing ){
@@ -41,6 +47,9 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.radioGroupByProc = new System.Windows.Forms.RadioButton();
 			this.radioGroupByPat = new System.Windows.Forms.RadioButton();
+			this.checkAllClin = new System.Windows.Forms.CheckBox();
+			this.listClin = new System.Windows.Forms.ListBox();
+			this.labelClin = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -52,7 +61,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(336, 131);
+			this.butCancel.Location = new System.Drawing.Point(336, 234);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 19;
@@ -66,7 +75,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(240, 131);
+			this.butOK.Location = new System.Drawing.Point(240, 234);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 18;
@@ -77,7 +86,7 @@ namespace OpenDental{
 			// 
 			this.label1.Location = new System.Drawing.Point(21, 20);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(390, 64);
+			this.label1.Size = new System.Drawing.Size(390, 48);
 			this.label1.TabIndex = 20;
 			this.label1.Text = "Helps find situations where the insurance payment plus any writeoff exceeds the f" +
     "ee.  See the manual for suggestions on how to handle the results.";
@@ -85,7 +94,7 @@ namespace OpenDental{
 			// radioGroupByProc
 			// 
 			this.radioGroupByProc.Checked = true;
-			this.radioGroupByProc.Location = new System.Drawing.Point(72, 71);
+			this.radioGroupByProc.Location = new System.Drawing.Point(197, 105);
 			this.radioGroupByProc.Name = "radioGroupByProc";
 			this.radioGroupByProc.Size = new System.Drawing.Size(160, 17);
 			this.radioGroupByProc.TabIndex = 21;
@@ -95,19 +104,50 @@ namespace OpenDental{
 			// 
 			// radioGroupByPat
 			// 
-			this.radioGroupByPat.Location = new System.Drawing.Point(72, 94);
+			this.radioGroupByPat.Location = new System.Drawing.Point(197, 128);
 			this.radioGroupByPat.Name = "radioGroupByPat";
 			this.radioGroupByPat.Size = new System.Drawing.Size(160, 17);
 			this.radioGroupByPat.TabIndex = 21;
 			this.radioGroupByPat.Text = "Group by patient and date";
 			this.radioGroupByPat.UseVisualStyleBackColor = true;
 			// 
+			// checkAllClin
+			// 
+			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkAllClin.Location = new System.Drawing.Point(24, 86);
+			this.checkAllClin.Name = "checkAllClin";
+			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
+			this.checkAllClin.TabIndex = 57;
+			this.checkAllClin.Text = "All";
+			this.checkAllClin.Click += new System.EventHandler(this.checkAllClin_Click);
+			// 
+			// listClin
+			// 
+			this.listClin.Location = new System.Drawing.Point(24, 105);
+			this.listClin.Name = "listClin";
+			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listClin.Size = new System.Drawing.Size(154, 147);
+			this.listClin.TabIndex = 56;
+			this.listClin.Click += new System.EventHandler(this.listClin_Click);
+			// 
+			// labelClin
+			// 
+			this.labelClin.Location = new System.Drawing.Point(21, 68);
+			this.labelClin.Name = "labelClin";
+			this.labelClin.Size = new System.Drawing.Size(104, 16);
+			this.labelClin.TabIndex = 55;
+			this.labelClin.Text = "Clinics";
+			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormRpInsOverpaid
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(436, 171);
+			this.ClientSize = new System.Drawing.Size(436, 274);
+			this.Controls.Add(this.checkAllClin);
+			this.Controls.Add(this.listClin);
+			this.Controls.Add(this.labelClin);
 			this.Controls.Add(this.radioGroupByPat);
 			this.Controls.Add(this.radioGroupByProc);
 			this.Controls.Add(this.label1);
@@ -127,45 +167,122 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRpInsOverpaid_Load(object sender, System.EventArgs e) {
-			
+			if(PrefC.HasClinicsEnabled) {
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted) {
+					listClin.Items.Add(Lan.g(this,"Unassigned"));
+					listClin.SetSelected(0,true);
+				}
+				for(int i=0;i<_listClinics.Count;i++) {
+					int curIndex=listClin.Items.Add(_listClinics[i].Description);
+					if(FormOpenDental.ClinicNum==0) {
+						listClin.SetSelected(curIndex,true);
+						checkAllClin.Checked=true;
+					}
+					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						listClin.SelectedIndices.Clear();
+						listClin.SetSelected(curIndex,true);
+					}
+				}
+			}
+			else {
+				listClin.Visible=false;
+				labelClin.Visible=false;
+				checkAllClin.Visible=false;
+				//Adjust the location of the radio buttons and the window size to make up for the clinic list being invisible
+				radioGroupByProc.Location=new Point(72,71);
+				radioGroupByPat.Location=new Point(72,94);
+				this.Height=210;
+				this.Width=452;
+			}
+		}
+
+		private void checkAllClin_Click(object sender,EventArgs e) {
+			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			else {
+				listClin.SelectedIndices.Clear();
+			}
+		}
+
+		private void listClin_Click(object sender,EventArgs e) {
+			if(listClin.SelectedIndices.Count>0) {
+				checkAllClin.Checked=false;
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			if(PrefC.HasClinicsEnabled) {
+				if(!checkAllClin.Checked && listClin.SelectedIndices.Count==0) {
+					MsgBox.Show(this,"At least one clinic must be selected.");
+					return;
+				}
+			}
 			Cursor=Cursors.WaitCursor;
-			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query=@"SELECT procedurelog.PatNum,"+DbHelper.Concat("patient.LName","', '","patient.FName")+@" patname,
-procedurelog.ProcDate,
-SUM(procedurelog.ProcFee) ""$sumfee"",
-SUM((SELECT SUM(claimproc.InsPayAmt + claimproc.Writeoff) FROM claimproc WHERE claimproc.ProcNum=procedurelog.ProcNum)) AS
-""$PaidAndWriteoff""
-FROM procedurelog
-LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum
-LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum
-WHERE procedurelog.ProcStatus=2/*complete*/
-AND procedurelog.ProcFee > 0";//Negative proc fees should not show up on this report.  We have one office that uses negative proc fees as internal adjustments.
-			if(radioGroupByProc.Checked){
-				report.Query+=@"
-GROUP BY procedurelog.ProcNum";
+			List<long> listClinicNums=new List<long>();
+			if(PrefC.HasClinicsEnabled) {
+				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+					if(Security.CurUser.ClinicIsRestricted) {
+						listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]].ClinicNum);//we know that the list is a 1:1 to _listClinics
+					}
+					else {
+						if(listClin.SelectedIndices[i]==0) {
+							listClinicNums.Add(0);
+						}
+						else {
+							listClinicNums.Add(_listClinics[listClin.SelectedIndices[i]-1].ClinicNum);//Minus 1 from the selected index
+						}
+					}
+				}
 			}
-			else if(radioGroupByPat.Checked){
-				report.Query+=@"
-GROUP BY procedurelog.PatNum,procedurelog.ProcDate";
-			}
-			report.Query+=@"
-HAVING ROUND($sumfee,3) < ROUND($PaidAndWriteoff,3)
-ORDER BY patname,ProcDate";
-			FormQuery FormQuery2=new FormQuery(report);
-			FormQuery2.IsReport=true;
-			FormQuery2.SubmitReportQuery();		
-			report.Title="INSURANCE OVERPAID REPORT";
-			report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			report.SetColumn(this,0,"PatNum",60);
-			report.SetColumn(this,1,"Pat Name",150);
-			report.SetColumn(this,2,"Date",80);
-			report.SetColumn(this,3,"Fee",80,HorizontalAlignment.Right);
-			report.SetColumn(this,4,"InsPd+W/O",90,HorizontalAlignment.Right);
+			DataTable tableOverpaid=RpInsOverpaid.GetInsuranceOverpaid(listClinicNums,radioGroupByProc.Checked);
 			Cursor=Cursors.Default;
-			FormQuery2.ShowDialog();		
+			string subtitleClinics="";
+			if(PrefC.HasClinicsEnabled) {
+				if(checkAllClin.Checked) {
+					subtitleClinics=Lan.g(this,"All Clinics");
+				}
+				else {
+					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+						if(i>0) {
+							subtitleClinics+=", ";
+						}
+						if(Security.CurUser.ClinicIsRestricted) {
+							subtitleClinics+=_listClinics[listClin.SelectedIndices[i]].Description;
+						}
+						else {
+							if(listClin.SelectedIndices[i]==0) {
+								subtitleClinics+=Lan.g(this,"Unassigned");
+							}
+							else {
+								subtitleClinics+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
+						}
+					}
+				}
+			}
+			ReportComplex report=new ReportComplex(true,false);
+			report.ReportName=Lan.g(this,"Insurance Overpaid");
+			report.AddTitle("Title",Lan.g(this,"Insurance Overpaid"));
+			report.AddSubTitle("Practice Name",PrefC.GetString(PrefName.PracticeTitle));
+			if(PrefC.HasClinicsEnabled) {
+				report.AddSubTitle("Clinics",subtitleClinics);
+			}
+			QueryObject query=report.AddQuery(tableOverpaid,DateTimeOD.Today.ToShortDateString());
+			query.AddColumn("Pat Name",200,FieldValueType.String);
+			query.AddColumn("Date",90,FieldValueType.Date);
+			query.GetColumnDetail("Date").StringFormat="d";
+			query.AddColumn("Fee",100,FieldValueType.Number);
+			query.AddColumn("InsPaid+W/O",120,FieldValueType.Number);
+			report.AddPageNum();
+			if(!report.SubmitQueries()) {
+				return;
+			}
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
 

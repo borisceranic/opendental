@@ -944,6 +944,9 @@
     <Compile Include="Plugins\Plugins.cs" />
     <Compile Include="Reports\RpClaimNotSent.cs" />
     <Compile Include="Reports\RpActivePatients.cs" />
+    <Compile Include="Reports\RpInsOverpaid.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Reports\RpNewPatients.cs" />
     <Compile Include="Reports\RpOutstandingIns.cs" />
     <Compile Include="Reports\RpPayPlan.cs" />
