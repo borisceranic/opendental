@@ -5939,26 +5939,53 @@ namespace OpenDental {
 			pd2.PrintPage+=new PrintPageEventHandler(this.pd2_PrintApptCard);
 			pd2.DefaultPageSettings.Margins=new Margins(0,0,0,0);
 			pd2.OriginAtMargins=true;//forces origin to upper left of actual page
+#if DEBUG
+			FormRpPrintPreview pView=new FormRpPrintPreview();
+			pView.printPreviewControl2.Document=pd2;
+			pView.ShowDialog();
+#else
 			if(PrinterL.SetPrinter(pd2,PrintSituation.Postcard,PatCur.PatNum,"Appointment reminder postcard printed")) {
 				pd2.Print();
 			}
+#endif
 		}
 
 		private void pd2_PrintApptCard(object sender,PrintPageEventArgs ev) {
 			Graphics g=ev.Graphics;
-			//Return Address--------------------------------------------------------------------------
-			string str=PrefC.GetString(PrefName.PracticeTitle)+"\r\n";
-			g.DrawString(str,new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold),Brushes.Black,60,60);
-			str=PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
-			if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
-				str+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
+			long apptClinicNum=0;
+			for(int i=0;i<DS.Tables["Appointments"].Rows.Count;i++) {
+				if(PIn.Long(DS.Tables["Appointments"].Rows[i]["AptNum"].ToString())==ContrApptSingle.SelectedAptNum) {
+					apptClinicNum=PIn.Long(DS.Tables["Appointments"].Rows[i]["ClinicNum"].ToString());
+					break;
+				}
 			}
-			str+=PrefC.GetString(PrefName.PracticeCity)+"  "
-				+PrefC.GetString(PrefName.PracticeST)+"  "
-				+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
-			string phone=PrefC.GetString(PrefName.PracticePhone);
-			if(CultureInfo.CurrentCulture.Name=="en-US"
-				&& phone.Length==10) {
+			Clinic clinic=Clinics.GetClinic(apptClinicNum);
+			//Return Address--------------------------------------------------------------------------
+			string str="";
+			string phone="";
+			if(PrefC.HasClinicsEnabled && clinic!=null) {//Use clinic on appointment if clinic exists and has clinics enabled
+				str=clinic.Description+"\r\n";
+				g.DrawString(str,new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold),Brushes.Black,60,60);
+				str=clinic.Address+"\r\n";
+				if(clinic.Address2!="") {
+					str+=clinic.Address2+"\r\n";
+				}
+				str+=clinic.City+"  "+clinic.State+"  "+clinic.Zip+"\r\n";
+				phone=clinic.Phone;
+			}
+			else {//Otherwise use practice information
+				str=PrefC.GetString(PrefName.PracticeTitle)+"\r\n";
+				g.DrawString(str,new Font(FontFamily.GenericSansSerif,9,FontStyle.Bold),Brushes.Black,60,60);
+				str=PrefC.GetString(PrefName.PracticeAddress)+"\r\n";
+				if(PrefC.GetString(PrefName.PracticeAddress2)!="") {
+					str+=PrefC.GetString(PrefName.PracticeAddress2)+"\r\n";
+				}
+				str+=PrefC.GetString(PrefName.PracticeCity)+"  "
+					+PrefC.GetString(PrefName.PracticeST)+"  "
+					+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
+				phone=PrefC.GetString(PrefName.PracticePhone);
+			}
+			if(CultureInfo.CurrentCulture.Name=="en-US" && phone.Length==10) {
 				str+="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 			}
 			else {//any other phone format
