@@ -570,6 +570,19 @@ namespace OpenDental{
 						continue;
 						//js Some additional features would be nice for receipts, such as hiding the bal column, the aging, and the amount due sections.
 					}
+					//The old way of printing "Single patient only" receipts would simply show all rows from the "account" table in one grid for foreign users.
+					//In order to keep this functionality for "Statements use Sheets" we need to force all rows to be associated to the stmt.PatNum.
+					if(CultureInfo.CurrentCulture.Name!="en-US"
+						&& !CultureInfo.CurrentCulture.Name.EndsWith("CA")
+						&& stmt.IsReceipt
+						&& stmt.SinglePatient) 
+					{
+						long patNumCur=PIn.Long(r["PatNum"].ToString());
+						//If the PatNum column is valid and is for a different patient then force it to be for this patient so that it shows up in the same grid.
+						if(patNumCur > 0 && patNumCur!=stmt.PatNum) {
+							r["PatNum"]=POut.Long(stmt.PatNum);
+						}
+					}
 					if(CultureInfo.CurrentCulture.Name=="en-AU" && r["prov"].ToString().Trim()!="") {//English (Australia)
 						r["description"]=r["prov"].ToString()+" - "+r["description"].ToString();
 					}
