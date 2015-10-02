@@ -1053,6 +1053,12 @@ namespace OpenDental{
 		}
 
 		private void FillMain() {
+			if(gridPlans.GetSelectedIndex() > 0 && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="") {
+				listSetPr.Enabled=false; //disable changing priorities for signed TPs
+			}
+			else {
+				listSetPr.Enabled=true;//allow changing priority for un-signed TPs
+			}
 			FillMainData();
 			FillMainDisplay();
 		}

@@ -274,6 +274,13 @@ namespace OpenDental{
 			if(PlanCur.ResponsParty!=0){
 				textResponsParty.Text=Patients.GetLim(PlanCur.ResponsParty).GetNameLF();
 			}
+			if(PlanCur.Signature!="") {//Per Nathan 01 OCT 2015: In addition to invalidating signature (old behavior) we will also block editing signed TPs.
+				textHeading.ReadOnly=true;
+				textDateTP.ReadOnly=true;
+				textNote.ReadOnly=true;
+				butClearResponsParty.Enabled=false;
+				butPickResponsParty.Enabled=false;
+			}
 		}
 
 		private void butPickResponsParty_Click(object sender,EventArgs e) {
