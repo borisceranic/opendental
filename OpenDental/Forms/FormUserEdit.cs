@@ -35,6 +35,8 @@ namespace OpenDental{
 		private CheckBox checkClinicIsRestricted;
 		///<summary></summary>
 		public Userod UserCur;
+		private TextBox textUserNum;
+		private Label label27;
 		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
@@ -87,6 +89,8 @@ namespace OpenDental{
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.checkIsHidden = new System.Windows.Forms.CheckBox();
 			this.checkClinicIsRestricted = new System.Windows.Forms.CheckBox();
+			this.textUserNum = new System.Windows.Forms.TextBox();
+			this.label27 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -97,7 +101,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(662, 381);
+			this.butCancel.Location = new System.Drawing.Point(662, 380);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
@@ -112,7 +116,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(581, 381);
+			this.butOK.Location = new System.Drawing.Point(581, 380);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
@@ -121,7 +125,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(5, 29);
+			this.label1.Location = new System.Drawing.Point(5, 59);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(88, 20);
 			this.label1.TabIndex = 2;
@@ -130,14 +134,14 @@ namespace OpenDental{
 			// 
 			// textUserName
 			// 
-			this.textUserName.Location = new System.Drawing.Point(95, 29);
+			this.textUserName.Location = new System.Drawing.Point(95, 59);
 			this.textUserName.Name = "textUserName";
 			this.textUserName.Size = new System.Drawing.Size(198, 20);
 			this.textUserName.TabIndex = 3;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(1, 63);
+			this.label3.Location = new System.Drawing.Point(1, 93);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(93, 60);
 			this.label3.TabIndex = 6;
@@ -146,7 +150,7 @@ namespace OpenDental{
 			// 
 			// listUserGroup
 			// 
-			this.listUserGroup.Location = new System.Drawing.Point(95, 61);
+			this.listUserGroup.Location = new System.Drawing.Point(95, 91);
 			this.listUserGroup.Name = "listUserGroup";
 			this.listUserGroup.Size = new System.Drawing.Size(197, 225);
 			this.listUserGroup.TabIndex = 7;
@@ -159,7 +163,7 @@ namespace OpenDental{
 			this.butPassword.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPassword.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPassword.CornerRadius = 4F;
-			this.butPassword.Location = new System.Drawing.Point(189, 381);
+			this.butPassword.Location = new System.Drawing.Point(189, 380);
 			this.butPassword.Name = "butPassword";
 			this.butPassword.Size = new System.Drawing.Size(103, 26);
 			this.butPassword.TabIndex = 8;
@@ -168,14 +172,14 @@ namespace OpenDental{
 			// 
 			// listEmployee
 			// 
-			this.listEmployee.Location = new System.Drawing.Point(317, 61);
+			this.listEmployee.Location = new System.Drawing.Point(317, 91);
 			this.listEmployee.Name = "listEmployee";
 			this.listEmployee.Size = new System.Drawing.Size(124, 225);
 			this.listEmployee.TabIndex = 11;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(316, 37);
+			this.label2.Location = new System.Drawing.Point(316, 67);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(152, 20);
 			this.label2.TabIndex = 10;
@@ -193,14 +197,14 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(465, 61);
+			this.listProv.Location = new System.Drawing.Point(465, 91);
 			this.listProv.Name = "listProv";
 			this.listProv.Size = new System.Drawing.Size(124, 225);
 			this.listProv.TabIndex = 14;
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(464, 37);
+			this.label5.Location = new System.Drawing.Point(464, 67);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(156, 20);
 			this.label5.TabIndex = 13;
@@ -209,7 +213,7 @@ namespace OpenDental{
 			// 
 			// listClinic
 			// 
-			this.listClinic.Location = new System.Drawing.Point(612, 61);
+			this.listClinic.Location = new System.Drawing.Point(612, 91);
 			this.listClinic.Name = "listClinic";
 			this.listClinic.Size = new System.Drawing.Size(124, 225);
 			this.listClinic.TabIndex = 16;
@@ -217,7 +221,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(611, 37);
+			this.labelClinic.Location = new System.Drawing.Point(611, 67);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(150, 20);
 			this.labelClinic.TabIndex = 15;
@@ -238,18 +242,38 @@ namespace OpenDental{
 			// checkClinicIsRestricted
 			// 
 			this.checkClinicIsRestricted.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-			this.checkClinicIsRestricted.Location = new System.Drawing.Point(612, 292);
+			this.checkClinicIsRestricted.Location = new System.Drawing.Point(612, 322);
 			this.checkClinicIsRestricted.Name = "checkClinicIsRestricted";
-			this.checkClinicIsRestricted.Size = new System.Drawing.Size(125, 83);
+			this.checkClinicIsRestricted.Size = new System.Drawing.Size(125, 52);
 			this.checkClinicIsRestricted.TabIndex = 18;
 			this.checkClinicIsRestricted.Text = "Restrict user to only see this clinic";
 			this.checkClinicIsRestricted.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.checkClinicIsRestricted.UseVisualStyleBackColor = true;
 			// 
+			// textUserNum
+			// 
+			this.textUserNum.BackColor = System.Drawing.SystemColors.Control;
+			this.textUserNum.Location = new System.Drawing.Point(95, 31);
+			this.textUserNum.Name = "textUserNum";
+			this.textUserNum.ReadOnly = true;
+			this.textUserNum.Size = new System.Drawing.Size(144, 20);
+			this.textUserNum.TabIndex = 146;
+			// 
+			// label27
+			// 
+			this.label27.Location = new System.Drawing.Point(5, 31);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(89, 17);
+			this.label27.TabIndex = 147;
+			this.label27.Text = "User ID";
+			this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormUserEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(773, 432);
+			this.ClientSize = new System.Drawing.Size(773, 431);
+			this.Controls.Add(this.textUserNum);
+			this.Controls.Add(this.label27);
 			this.Controls.Add(this.checkClinicIsRestricted);
 			this.Controls.Add(this.checkIsHidden);
 			this.Controls.Add(this.listClinic);
@@ -282,6 +306,9 @@ namespace OpenDental{
 
 		private void FormUserEdit_Load(object sender, System.EventArgs e) {
 			checkIsHidden.Checked=UserCur.IsHidden;
+			if(UserCur.UserNum!=0) {
+				textUserNum.Text=UserCur.UserNum.ToString();
+			}
 			textUserName.Text=UserCur.UserName;
 			_listUserGroups=UserGroups.GetList();
 			for(int i=0;i<_listUserGroups.Count;i++){
