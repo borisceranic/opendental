@@ -897,12 +897,14 @@ namespace OpenDentBusiness
 				#region Claim CN1 AMT
 				//2300 CN1: (medical,institutional,dental)Contract Information. Situational. We do not use this.
 				//2300 AMT: (institutional) Patient Estimated Amount Due.
-				//2300 AMT: (medical,dental) Patient Amount Paid. Situational. We do not use this.
+				//2300 AMT: (medical,dental) Patient Amount Paid.  Sum of all amounts paid specifically to this claim by the patient or family Situational.
 				if(medType==EnumClaimMedType.Medical || medType==EnumClaimMedType.Dental) {
-					//sw.Write("AMT"+s
-				  //  +"F5"+s//AMT01 1/3 Amount Qualifier Code: F5=Patient Paid Amount.
-				  //  +"0");//AMT02 1/18 Monetary Amount: We don't track this information very well so we always put zero.
-					//EndSegment(sw);//AMT03 is not used.
+					if(IsDentiCal(clearhouse)) {
+						sw.Write("AMT"+s
+						  +"F5"+s//AMT01 1/3 Amount Qualifier Code: F5=Patient Paid Amount.
+						  +"0");//AMT02 1/18 Monetary Amount: We don't track this information very well so we always put zero.
+						EndSegment(sw);//AMT03 is not used.
+					}
 				}
 				#endregion Claim CN1 AMT
 				#region Claim REF
