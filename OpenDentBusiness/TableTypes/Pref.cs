@@ -128,6 +128,8 @@ namespace OpenDentBusiness {
 		BrokenApptCommLogNotAdjustment,
 		///<summary>Boolean.  0 by default.  When true, makes a commlog in addition to an ADA D9986 procedure.</summary>
 		BrokenApptCommLogWithProcedure,
+		///<summary>Boolean.  0 by default.  When true, makes an adjustment in addition to an ADA D9986 procedure.</summary>
+		BrokenApptAdjustmentWithProcedure,
 		///<summary>For Ontario Dental Association fee schedules.</summary>
 		CanadaODAMemberNumber,
 		///<summary>For Ontario Dental Association fee schedules.</summary>

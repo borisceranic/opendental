@@ -5178,6 +5178,7 @@ namespace OpenDental {
 				procedureCur.DateEntryC=DateTime.Now;
 				procedureCur.ProcStatus=ProcStat.C;
 				procedureCur.ClinicNum=pat.ClinicNum;
+				procedureCur.UserNum=Security.CurUser.UserNum;
 				procedureCur.Note=Lan.g(this,"Appt BROKEN for ")+apt.ProcDescript+"  "+apt.AptDateTime.ToString();
 				Procedures.Insert(procedureCur);
 				//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
@@ -5187,9 +5188,22 @@ namespace OpenDental {
 				List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 				List<ClaimProc> listClaimProcsForProc=ClaimProcs.RefreshForProc(procedureCur.ProcNum);
 				Procedures.ComputeEstimates(procedureCur,pat.PatNum,listClaimProcsForProc,false,listInsPlans,listPatPlans,listBenefits,pat.Age,listInsSubs);
-				FormProcEdit formP=new FormProcEdit(procedureCur,pat,Patients.GetFamily(pat.PatNum));
-				formP.IsNew=false;
-				formP.ShowDialog();
+				FormProcBroken FormPB=new FormProcBroken(procedureCur);
+				FormPB.IsNew=true;
+				FormPB.ShowDialog();
+				if(PrefC.GetBool(PrefName.BrokenApptAdjustmentWithProcedure)) {
+					Adjustment AdjustmentCur=new Adjustment();
+					AdjustmentCur.DateEntry=DateTime.Today;
+					AdjustmentCur.AdjDate=DateTime.Today;
+					AdjustmentCur.ProcDate=DateTime.Today;
+					AdjustmentCur.ProvNum=apt.ProvNum;
+					AdjustmentCur.PatNum=pat.PatNum;
+					AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+					AdjustmentCur.ClinicNum=pat.ClinicNum;
+					FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
+					FormA.IsNew=true;
+					FormA.ShowDialog();
+				}
 				if(PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure)) {
 					Commlog CommlogCur=new Commlog();
 					CommlogCur.PatNum=pat.PatNum;

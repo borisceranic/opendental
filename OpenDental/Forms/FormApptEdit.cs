@@ -2717,9 +2717,22 @@ namespace OpenDental{
 					List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 					List<ClaimProc> listClaimProcsForProc=ClaimProcs.RefreshForProc(procedureCur.ProcNum);
 					Procedures.ComputeEstimates(procedureCur,pat.PatNum,listClaimProcsForProc,false,listInsPlans,listPatPlans,listBenefits,pat.Age,listInsSubs);
-					FormProcEdit FormP=new FormProcEdit(procedureCur,pat,Patients.GetFamily(pat.PatNum));
-					FormP.IsNew=false;
-					FormP.ShowDialog();
+					FormProcBroken FormPB=new FormProcBroken(procedureCur);
+					FormPB.IsNew=true;
+					FormPB.ShowDialog();
+					if(PrefC.GetBool(PrefName.BrokenApptAdjustmentWithProcedure)) {
+						Adjustment AdjustmentCur=new Adjustment();
+						AdjustmentCur.DateEntry=DateTime.Today;
+						AdjustmentCur.AdjDate=DateTime.Today;
+						AdjustmentCur.ProcDate=DateTime.Today;
+						AdjustmentCur.ProvNum=AptCur.ProvNum;
+						AdjustmentCur.PatNum=pat.PatNum;
+						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+						AdjustmentCur.ClinicNum=pat.ClinicNum;
+						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
+						FormA.IsNew=true;
+						FormA.ShowDialog();
+					}
 					if(PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure)) {
 						Commlog CommlogCur=new Commlog();
 						CommlogCur.PatNum=pat.PatNum;
