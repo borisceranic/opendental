@@ -8367,6 +8367,7 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		private static void To15_2_16() {
 			if(FromVersion<new Version("15.2.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.2.16"));//No translation in convert script.
 				string command="";
 				//Customers were complaining that the Payment window splitting behavior has changed (Which it has, preferring the auto splitter)
 				//This preference gives them the option of using the new hotness or to keep using the old and busted.  Defaulting on to use the new hotness.
@@ -8387,6 +8388,7 @@ namespace OpenDentBusiness {
 		///<summary></summary>
 		private static void To15_2_20() {
 			if(FromVersion<new Version("15.2.20.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.2.20"));//No translation in convert script.
 				string command="";
 				command="UPDATE procedurecode SET NoBillIns = 1 WHERE ProcCode='D9986' OR ProcCode='D9987'";
 				Db.NonQ(command);
@@ -9582,6 +9584,7 @@ namespace OpenDentBusiness {
 
 		private static void To15_3_13() {
 			if(FromVersion<new Version("15.3.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.3.13"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsWriteoffDescript','')";
@@ -9601,6 +9604,7 @@ namespace OpenDentBusiness {
 
 		private static void To15_3_16() {
 			if(FromVersion<new Version("15.3.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.3.16"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE creditcard CHANGE Procedures Procedures TEXT NOT NULL";
@@ -9611,6 +9615,25 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '15.3.16.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_3_19();
+		}
+
+		private static void To15_3_19() {
+			if(FromVersion<new Version("15.3.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.3.19"));//No translation in convert script.
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('BrokenApptAdjustmentWithProcedure','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+					+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptAdjustmentWithProcedure','0')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.19.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			To15_4_0();
@@ -10348,15 +10371,6 @@ namespace OpenDentBusiness {
 				}
 				if(mercuryClearinghouseNum==defaultMedClearinghouseNum) {
 					command="UPDATE preference SET ValueString='0' WHERE PrefName='ClearinghouseDefaultMed'";
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('BrokenApptAdjustmentWithProcedure','0')";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
-					+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptAdjustmentWithProcedure','0')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {

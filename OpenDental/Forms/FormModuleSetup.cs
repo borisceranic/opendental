@@ -1805,6 +1805,7 @@ namespace OpenDental{
 			else {
 				//Could be a foreign user.  Disable the new preference that makes it seem like a procedure will be created.
 				checkBrokenApptCommLogWithProcedure.Enabled=false;
+				checkBrokenApptAdjustmentWithProcedure.Enabled=false;
 			}
 			checkSolidBlockouts.Checked=PrefC.GetBool(PrefName.SolidBlockouts);
 			checkBrokenApptNote.Checked=PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment);
