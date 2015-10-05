@@ -32,7 +32,7 @@ namespace OpenDentBusiness {
 		public string Title;
 		///<summary>Notes pertaining to the job.</summary>
 		public string Notes;
-		///<summary>The current status of the job.  Historical JobStatus data soted in JobEvent.JobStatus.</summary>
+		///<summary>The current status of the job.  Historical statuses for this job can be found in the jobevent table.</summary>
 		public JobStatus JobStatus;
 		///<summary>FK to userod.UserNum.  The current owner of the job.  Historical owner data stored in JobEvent.Owner.</summary>
 		public long Owner;
@@ -82,24 +82,24 @@ namespace OpenDentBusiness {
 
 	public enum JobPriority {
 		///<summary>0 -</summary>
-		High,
-		///<summary>1 -</summary>
 		Medium,
+		///<summary>1 -</summary>
+		High,
 		///<summary>2 -</summary>
 		Low
 	}
 
 	public enum JobType {
 		///<summary>0 -</summary>
-		Bridge,
-		///<summary>1 -</summary>
 		Feature,
+		///<summary>1 -</summary>
+		Bug,
 		///<summary>2 -</summary>
 		Enhancement,
 		///<summary>3 -</summary>
-		Bug,
+		Query,
 		///<summary>4 -</summary>
-		Query
+		Bridge
 	}
 
 }

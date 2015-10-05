@@ -5868,8 +5868,10 @@ namespace OpenDental{
 		}
 
 		private void menuItemJobManager_Click(object sender,System.EventArgs e) {
-			FormJobManager FormJM=new FormJobManager();
-			FormJM.Show();
+			if(Security.IsAuthorized(Permissions.JobManager)) {
+				FormJobManager FormJM=new FormJobManager();
+				FormJM.Show();
+			}
 		}
 
 		private void menuItemLabCases_Click(object sender,EventArgs e) {

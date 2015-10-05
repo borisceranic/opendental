@@ -9,7 +9,7 @@ namespace OpenDentBusiness{
 	public class JobEvents{
 
 		///<summary></summary>
-		public static List<JobEvent> GetByJobNum(long jobNum){
+		public static List<JobEvent> GetForJob(long jobNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobEvent>>(MethodBase.GetCurrentMethod(),jobNum);
 			}
@@ -32,6 +32,16 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<JobEvent>(MethodBase.GetCurrentMethod(),jobEventNum);
 			}
 			return Crud.JobEventCrud.SelectOne(jobEventNum);
+		}
+
+		///<summary>Gets JobEvents for a specified JobNum.</summary>
+		public static List<JobEvent> GetJobEvents(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobEvent>>(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			string command="SELECT * FROM jobevent WHERE JobNum="+POut.Long(jobNum)
+				+" ORDER BY DateTimeEntry";
+			return Crud.JobEventCrud.SelectMany(command);
 		}
 
 		///<summary></summary>

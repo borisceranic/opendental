@@ -83,9 +83,11 @@ namespace OpenDentBusiness{
 					return Meth.GetTable(MethodBase.GetCurrentMethod(),jobNum,expert,owner,version,project,title,status,priority,type,showHidden);
 				}
 				string command="SELECT JobNum, JobVersion, JobPriority, owner.UserName AS Owner, expert.UserName AS Expert, JobType, " 
-			+"JobStatus, ProjectNum, Description, Title FROM job "
-			+"LEFT JOIN userod owner ON owner.UserNum = job.Owner "
-			+"LEFT JOIN userod expert ON expert.UserNum = job.Expert WHERE TRUE ";
+						+"JobStatus, ProjectNum, Description, Title "
+					+"FROM job "
+					+"LEFT JOIN userod owner ON owner.UserNum = job.Owner "
+					+"LEFT JOIN userod expert ON expert.UserNum = job.Expert "
+					+"WHERE TRUE ";
 			if(expert!="") {
 				command+=" AND expert.UserName LIKE '%"+expert+"%'";
 			} 
@@ -115,6 +117,44 @@ namespace OpenDentBusiness{
 			}
 			DataTable table=Db.GetTable(command); //JobNum, JobVersion, JobPriority, Owner, Expert, JobType, JobStatus, ProjectNum, Description 
 			return table;
+		}
+
+		///<summary>Sets a job as NeedsApproval and creates a JobEvent.  Set the new owner of the job prior to calling this method.</summary>
+		public static void SendForApproval(Job job) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),job);
+			}
+			job.JobStatus=JobStatus.NeedsApproval;
+			JobEvent jobEventRecent=JobEvents.GetMostRecent(job.JobNum);
+			if(job.IsNew || jobEventRecent==null || jobEventRecent.Owner!=job.Owner || jobEventRecent.JobStatus!=job.JobStatus) {
+				JobEvent jobEventCur=new JobEvent();
+				jobEventCur.Description=job.Description;
+				jobEventCur.JobNum=job.JobNum;
+				jobEventCur.JobStatus=job.JobStatus;
+				jobEventCur.Owner=job.Owner;
+				JobEvents.Insert(jobEventCur);
+			}
+			Jobs.Update(job);
+			Signalods.SetInvalid(InvalidType.Job);
+		}
+
+		///<summary>Sets a job's status and creates a JobEvent.  Does not set a new owner of the job.</summary>
+		public static void SetStatus(Job job,JobStatus jobStatus) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),job,jobStatus);
+			}
+			job.JobStatus=jobStatus;
+			JobEvent jobEventRecent=JobEvents.GetMostRecent(job.JobNum);
+			if(job.IsNew || jobEventRecent==null || jobEventRecent.Owner!=job.Owner || jobEventRecent.JobStatus!=job.JobStatus) {
+				JobEvent jobEventCur=new JobEvent();
+				jobEventCur.Description=job.Description;
+				jobEventCur.JobNum=job.JobNum;
+				jobEventCur.JobStatus=job.JobStatus;
+				jobEventCur.Owner=job.Owner;
+				JobEvents.Insert(jobEventCur);
+			}
+			Jobs.Update(job);
+			Signalods.SetInvalid(InvalidType.Job);
 		}
 
 	}

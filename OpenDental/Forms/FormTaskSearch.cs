@@ -19,6 +19,8 @@ namespace OpenDental {
 		public CancelEventHandler TaskGoToEvent;
 		public long UserNum;
 		public long GotoKeyNum;
+		public bool IsSelectionMode;
+		public long SelectedTaskNum;
 
 		public FormTaskSearch() {
 			InitializeComponent();
@@ -26,6 +28,9 @@ namespace OpenDental {
 		}
 
 		private void FormTaskSearch_Load(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				butClose.Text="Cancel";
+			}
 			//Note: DateTime strings that are empty actually are " " due to how the empty datetime control behaves.
 			_listTaskPriorities=new List<Def>();
 			_listTaskPriorities.AddRange(DefC.GetArrayLong()[(int)DefCat.TaskPriorities]);
@@ -131,6 +136,11 @@ namespace OpenDental {
 
 		private void gridTasks_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			long taskNum=PIn.Long(gridTasks.Rows[e.Row].Tag.ToString());
+			if(IsSelectionMode) {
+				SelectedTaskNum=taskNum;
+				DialogResult=DialogResult.OK;
+				return;
+			}
 			Task task=Tasks.GetOne(taskNum);
 			FormTaskEdit FormTE=new FormTaskEdit(task,task.Copy());
 			FormTE.Closing+=TaskGoToEvent;
@@ -193,7 +203,7 @@ namespace OpenDental {
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.OK;
+			DialogResult=DialogResult.Cancel;
 			Close();
 		}
 

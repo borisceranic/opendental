@@ -152,6 +152,25 @@ namespace OpenDentBusiness {
 			return listUserods;
 		}
 
+		///<summary>Returns all users that are associated to the permission passed in.  Returns empty list if no matches found.</summary>
+		public static List<Userod> GetUsersByPermission(Permissions permission,bool showHidden) {
+			//No need to check RemotingRole; no call to db.
+			List<Userod> listAllUsers=new List<Userod>();UserodC.GetListShort();
+			if(showHidden) {
+				listAllUsers=UserodC.GetListt();
+			}
+			else {
+				listAllUsers=UserodC.GetListShort();
+			}
+			List<Userod> listUserods=new List<Userod>();
+			for(int i=0;i<listAllUsers.Count;i++) {
+				if(GroupPermissions.HasPermission(listAllUsers[i].UserGroupNum,permission)) {
+					listUserods.Add(listAllUsers[i]);
+				}
+			}
+			return listUserods;
+		}
+
 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.</summary>
 		public static string GetName(long userNum){
 			//No need to check RemotingRole; no call to db.

@@ -153,10 +153,12 @@ namespace OpenDental {
 		}
 		
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormJobEdit FormJE=new FormJobEdit();
-			FormJE.ShowDialog();
-			if(FormJE.DialogResult==DialogResult.OK) {
-				FillGrid();
+			if(Security.IsAuthorized(Permissions.JobEdit)) {
+				FormJobEdit FormJE=new FormJobEdit();
+				FormJE.ShowDialog();
+				if(FormJE.DialogResult==DialogResult.OK) {
+					FillGrid();
+				}
 			}
 		}
 

@@ -10,7 +10,7 @@ namespace OpenDentBusiness {
 	public class JobLink:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long JobLinknum;
+		public long JobLinkNum;
 		///<summary>FK to job.JobNum.</summary>
 		public long JobNum;
 		///<summary>FK to table primary key based on LinkType.</summary>
@@ -44,7 +44,7 @@ namespace OpenDentBusiness {
 					command="DROP TABLE IF EXISTS joblink";
 					Db.NonQ(command);
 					command=@"CREATE TABLE joblink (
-						JobLinknum bigint NOT NULL auto_increment PRIMARY KEY,
+						JobLinkNum bigint NOT NULL auto_increment PRIMARY KEY,
 						JobNum bigint NOT NULL,
 						FKey bigint NOT NULL,
 						LinkType tinyint NOT NULL,
@@ -57,11 +57,11 @@ namespace OpenDentBusiness {
 					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE joblink'; EXCEPTION WHEN OTHERS THEN NULL; END;";
 					Db.NonQ(command);
 					command=@"CREATE TABLE joblink (
-						JobLinknum number(20) NOT NULL,
+						JobLinkNum number(20) NOT NULL,
 						JobNum number(20) NOT NULL,
 						FKey number(20) NOT NULL,
 						LinkType number(3) NOT NULL,
-						CONSTRAINT joblink_JobLinknum PRIMARY KEY (JobLinknum)
+						CONSTRAINT joblink_JobLinkNum PRIMARY KEY (JobLinkNum)
 						)";
 					Db.NonQ(command);
 					command=@"CREATE INDEX joblink_JobNum ON joblink (JobNum)";

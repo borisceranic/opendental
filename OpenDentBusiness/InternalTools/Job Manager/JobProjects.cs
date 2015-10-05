@@ -8,6 +8,18 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class JobProjects{
 
+		///<summary>Gets all projects, specify true to get all Done projects as well.</summary>
+		public static List<JobProject> GetAll(bool isDone) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobProject>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM jobproject";
+			if(!isDone) {
+				command+=" WHERE JobProjectStatus != "+POut.Int((int)JobProjectStatus.Done);
+			}
+			return Crud.JobProjectCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static List<JobProject> GetByRootProject(long projectNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

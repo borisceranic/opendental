@@ -748,6 +748,13 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="DELETE FROM taskunread WHERE TaskNum = "+POut.Long(taskNum);
 			Db.NonQ(command);
+			//Remove all references from the joblink table for HQ only.
+			if(Prefs.GetBoolNoCache(PrefName.DockPhonePanelShow)) {
+				command="DELETE FROM joblink "
+					+"WHERE FKey = "+POut.Long(taskNum)+" "
+					+"AND LinkType = "+POut.Int((int)JobLinkType.Task);
+				Db.NonQ(command);
+			}
 		}
 
 		///<summary>Gets a count of unread tasks to notify user when first logging in.</summary>

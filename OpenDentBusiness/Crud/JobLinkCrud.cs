@@ -46,7 +46,7 @@ namespace OpenDentBusiness.Crud{
 			JobLink jobLink;
 			for(int i=0;i<table.Rows.Count;i++) {
 				jobLink=new JobLink();
-				jobLink.JobLinknum= PIn.Long  (table.Rows[i]["JobLinknum"].ToString());
+				jobLink.JobLinkNum= PIn.Long  (table.Rows[i]["JobLinknum"].ToString());
 				jobLink.JobNum    = PIn.Long  (table.Rows[i]["JobNum"].ToString());
 				jobLink.FKey      = PIn.Long  (table.Rows[i]["FKey"].ToString());
 				jobLink.LinkType  = (OpenDentBusiness.JobLinkType)PIn.Int(table.Rows[i]["LinkType"].ToString());
@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Inserts one JobLink into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobLink jobLink){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				jobLink.JobLinknum=DbHelper.GetNextOracleKey("joblink","JobLinknum");
+				jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinknum");
 				int loopcount=0;
 				while(loopcount<100){
 					try {
@@ -66,7 +66,7 @@ namespace OpenDentBusiness.Crud{
 					}
 					catch(Oracle.DataAccess.Client.OracleException ex){
 						if(ex.Number==1 && ex.Message.ToLower().Contains("unique constraint") && ex.Message.ToLower().Contains("violated")){
-							jobLink.JobLinknum++;
+							jobLink.JobLinkNum++;
 							loopcount++;
 						}
 						else{
@@ -84,7 +84,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Inserts one JobLink into the database.  Provides option to use the existing priKey.</summary>
 		public static long Insert(JobLink jobLink,bool useExistingPK){
 			if(!useExistingPK && PrefC.RandomKeys) {
-				jobLink.JobLinknum=ReplicationServers.GetKey("joblink","JobLinknum");
+				jobLink.JobLinkNum=ReplicationServers.GetKey("joblink","JobLinknum");
 			}
 			string command="INSERT INTO joblink (";
 			if(useExistingPK || PrefC.RandomKeys) {
@@ -92,7 +92,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+="JobNum,FKey,LinkType) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
-				command+=POut.Long(jobLink.JobLinknum)+",";
+				command+=POut.Long(jobLink.JobLinkNum)+",";
 			}
 			command+=
 				     POut.Long  (jobLink.JobNum)+","
@@ -102,9 +102,9 @@ namespace OpenDentBusiness.Crud{
 				Db.NonQ(command);
 			}
 			else {
-				jobLink.JobLinknum=Db.NonQ(command,true);
+				jobLink.JobLinkNum=Db.NonQ(command,true);
 			}
-			return jobLink.JobLinknum;
+			return jobLink.JobLinkNum;
 		}
 
 		///<summary>Inserts one JobLink into the database.  Returns the new priKey.  Doesn't use the cache.</summary>
@@ -114,7 +114,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			else {
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					jobLink.JobLinknum=DbHelper.GetNextOracleKey("joblink","JobLinknum"); //Cacheless method
+					jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinknum"); //Cacheless method
 				}
 				return InsertNoCache(jobLink,true);
 			}
@@ -125,14 +125,14 @@ namespace OpenDentBusiness.Crud{
 			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
 			string command="INSERT INTO joblink (";
 			if(!useExistingPK && isRandomKeys) {
-				jobLink.JobLinknum=ReplicationServers.GetKeyNoCache("joblink","JobLinknum");
+				jobLink.JobLinkNum=ReplicationServers.GetKeyNoCache("joblink","JobLinknum");
 			}
 			if(isRandomKeys || useExistingPK) {
 				command+="JobLinknum,";
 			}
 			command+="JobNum,FKey,LinkType) VALUES(";
 			if(isRandomKeys || useExistingPK) {
-				command+=POut.Long(jobLink.JobLinknum)+",";
+				command+=POut.Long(jobLink.JobLinkNum)+",";
 			}
 			command+=
 				     POut.Long  (jobLink.JobNum)+","
@@ -142,9 +142,9 @@ namespace OpenDentBusiness.Crud{
 				Db.NonQ(command);
 			}
 			else {
-				jobLink.JobLinknum=Db.NonQ(command,true);
+				jobLink.JobLinkNum=Db.NonQ(command,true);
 			}
-			return jobLink.JobLinknum;
+			return jobLink.JobLinkNum;
 		}
 
 		///<summary>Updates one JobLink in the database.</summary>
@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"JobNum    =  "+POut.Long  (jobLink.JobNum)+", "
 				+"FKey      =  "+POut.Long  (jobLink.FKey)+", "
 				+"LinkType  =  "+POut.Int   ((int)jobLink.LinkType)+" "
-				+"WHERE JobLinknum = "+POut.Long(jobLink.JobLinknum);
+				+"WHERE JobLinknum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 		}
 
@@ -176,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 				return false;
 			}
 			command="UPDATE joblink SET "+command
-				+" WHERE JobLinknum = "+POut.Long(jobLink.JobLinknum);
+				+" WHERE JobLinknum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 			return true;
 		}

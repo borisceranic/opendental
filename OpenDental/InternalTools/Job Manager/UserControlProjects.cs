@@ -65,6 +65,11 @@ namespace OpenDental {
 			ToolBarMain.Invalidate();
 		}
 
+		///<summary>Refreshes the projects grid.</summary>
+		public void RefreshProjects() {
+			FillGrid();
+		}
+
 		private void FillTree() {
 			tree.Nodes.Clear();
 			TreeNode node;
@@ -206,18 +211,16 @@ namespace OpenDental {
 		}
 
 		private void AddJob_Clicked() {
-			Job cur=new Job();
-			if(_listJobProjectHistory.Count>0) {
-				cur.ProjectNum=_listJobProjectHistory[_listJobProjectHistory.Count-1].JobProjectNum;
-			}
-			else {
-				cur.ProjectNum=0;
-			}
-			cur.IsNew=true;
-			FormJobEdit FormJPE=new FormJobEdit(0);
-			FormJPE.ShowDialog();
-			if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
-				FillGrid();
+			if(Security.IsAuthorized(Permissions.JobEdit)) {
+				long projectNum=0;
+				if(_listJobProjectHistory.Count>0) {
+					projectNum=_listJobProjectHistory[_listJobProjectHistory.Count-1].JobProjectNum;
+				}
+				FormJobEdit FormJPE=new FormJobEdit(0,projectNum);
+				FormJPE.ShowDialog();
+				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
+					FillGrid();
+				}
 			}
 		}
 
