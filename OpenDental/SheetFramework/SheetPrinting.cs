@@ -32,6 +32,8 @@ namespace OpenDental {
 		private static bool _isPrinting=false;
 		private static Statement _stmt;
 		private static MedLab _medLab;
+		///<summary>Used when printing statements that use the Statements use Sheets feature.  Pdf printing does not use this variable.</summary>
+		private static DataSet _dataSet;
 
 		///<summary>The treatment finder needs to be able to clear out the pages printed variable before it prints a batch.</summary>
 		public static int PagesPrinted {
@@ -84,7 +86,7 @@ namespace OpenDental {
 		//}
 
 		///<summary>Surround with try/catch.</summary>
-		public static void PrintBatch(List<Sheet> sheetBatch,Statement stmt=null){
+		public static void PrintBatch(List<Sheet> sheetBatch){
 			//currently no validation for parameters in a batch because of the way it was created.
 			//could validate field names here later.
 			_sheetList=sheetBatch;
@@ -111,7 +113,7 @@ namespace OpenDental {
 			}
 			//Moved Calculate heights here because we need to caluclate height before printing, not while we are printing.
 			foreach(Sheet s in _sheetList) {
-				SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);
+				SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),null,_isPrinting,_printMargin.Top,_printMargin.Bottom);
 			}
 			//later: add a check here for print preview.
 			#if DEBUG
@@ -119,7 +121,7 @@ namespace OpenDental {
 				int pageCount=0;
 				foreach(Sheet s in _sheetList) {
 					//SetForceSinglePage(s);
-					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom);
+					SheetUtil.CalculateHeights(s,Graphics.FromImage(new Bitmap(s.WidthPage,s.HeightPage)),null,_isPrinting,_printMargin.Top,_printMargin.Bottom);
 					pageCount+=Sheets.CalculatePageCount(s,_printMargin);//(_forceSinglePage?1:Sheets.CalculatePageCount(s,_printMargin));
 				}
 				FormPrintPreview printPreview=new FormPrintPreview(sit,pd,pageCount,0,"Batch of "+sheetBatch[0].Description+" printed");
@@ -151,8 +153,22 @@ namespace OpenDental {
 			_yPosPrint=0;
 		}
 
-		///<Summary></Summary>
-		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null){
+		///<Summary>If printing a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
+		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null) {
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				_dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			Print(sheet,_dataSet,copies,isRxControlled,stmt,medLab);
+		}
+
+		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if printing a statement.</Summary>
+		public static void Print(Sheet sheet,DataSet dataSet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null) {
+			_dataSet=dataSet;
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
 			_stmt=stmt;
@@ -212,7 +228,7 @@ namespace OpenDental {
 			Graphics g=Graphics.FromImage(new Bitmap(sheet.WidthPage,sheet.HeightPage));
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
-			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
+			SheetUtil.CalculateHeights(sheet,g,_dataSet,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
 			_sheetList=new List<Sheet>();
 			for(int i=0;i<copies;i++) {
 				_sheetList.Add(sheet.Copy());
@@ -287,7 +303,7 @@ namespace OpenDental {
 						drawFieldLine(field,g,null);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,g,null,_stmt,_medLab);
+						drawFieldGrid(field,sheet,g,null,_dataSet,_stmt,_medLab);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:
@@ -512,7 +528,22 @@ namespace OpenDental {
 			}
 		}
 
+		///<summary>If drawing grids for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,Statement stmt=null,MedLab medLab=null) {
+			DataSet dataSet=null;
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			drawFieldGrid(field,sheet,g,gx,dataSet,stmt,medLab);
+		}
+
+		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if printing a statement.</Summary>
+		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,DataSet dataSet,Statement stmt,MedLab medLab) {
 			Sheets.SetPageMargin(sheet,_printMargin);
 			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
@@ -532,7 +563,7 @@ namespace OpenDental {
 			odGrid.TopMargin=_printMargin.Top;
 			odGrid.BottomMargin=_printMargin.Bottom;
 			odGrid.PageHeight=sheet.HeightPage;
-			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt,medLab);
+			DataTable Table=SheetUtil.GetDataTableForGridType(dataSet,field.FieldName,stmt,medLab);
 			#region  Fill Grid, Set Text Alignment
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
@@ -1215,7 +1246,21 @@ namespace OpenDental {
 
 		#endregion
 
+		///<summary>If making a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
 		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt,MedLab medLab=null) {
+			DataSet dataSet=null;
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			CreatePdf(sheet,fullFileName,stmt,dataSet,medLab);
+		}
+
+		public static void CreatePdf(Sheet sheet,string fullFileName,Statement stmt,DataSet dataSet,MedLab medLab) {
 			Sheets.SetPageMargin(sheet,_printMargin);
 			_stmt=stmt;
 			_medLab=medLab;
@@ -1232,20 +1277,21 @@ namespace OpenDental {
 				field.SigKey=Sheets.GetSignatureKey(sheet);
 			}
 			//this will set the page breaks as well as adjust for growth behavior
-			SheetUtil.CalculateHeights(sheet,g,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
+			SheetUtil.CalculateHeights(sheet,g,dataSet,_stmt,_isPrinting,_printMargin.Top,_printMargin.Bottom,_medLab);
 			int pageCount=Sheets.CalculatePageCount(sheet,_printMargin);
 			for(int i=0;i<pageCount;i++) {
 				_pagesPrinted=i;
 				PdfPage page=document.AddPage();
-				CreatePdfPage(sheet,page);
+				CreatePdfPage(sheet,page,dataSet);
 			}
 			document.Save(fullFileName);
 			_isPrinting=false;
 			GC.Collect();//We are done creating the pdf so we can forcefully clean up all the objects and controls that were used.
 		}
 
-		///<summary>Called for every page that is generated for a PDF docuemnt. Pages and yPos must be tracked outside of this function. See also pd_PrintPage.</summary>
-		public static void CreatePdfPage(Sheet sheet,PdfPage page) {
+		///<summary>Called for every page that is generated for a PDF docuemnt. Pages and yPos must be tracked outside of this function. See also pd_PrintPage.
+		///DataSet should be prefilled with AccountModules.GetAccount() before calling this method if making a statement.</Summary>
+		public static void CreatePdfPage(Sheet sheet,PdfPage page,DataSet dataSet) {
 			page.Width=p(sheet.Width);//XUnit.FromInch((double)sheet.Width/100);  //new XUnit((double)sheet.Width/100,XGraphicsUnit.Inch);
 			page.Height=p(sheet.Height);//new XUnit((double)sheet.Height/100,XGraphicsUnit.Inch);
 			if(sheet.IsLandscape){
@@ -1273,7 +1319,7 @@ namespace OpenDental {
 						drawFieldLine(field,null,gx);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,null,gx,_stmt,_medLab);
+						drawFieldGrid(field,sheet,null,gx,dataSet,_stmt,_medLab);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:

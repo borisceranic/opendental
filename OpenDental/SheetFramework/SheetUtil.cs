@@ -35,8 +35,28 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		///<summary>Just before printing or displaying the final sheet output, the heights and y positions of various fields are adjusted according to their growth behavior.  This also now gets run every time a user changes the value of a textbox while filling out a sheet.</summary>
-		public static void CalculateHeights(Sheet sheet,Graphics g,Statement stmt=null,bool isPrinting=false,int topMargin=40,int bottomMargin=60,MedLab medLab=null){
+		///<summary>Just before printing or displaying the final sheet output, the heights and y positions of various fields are adjusted according to
+		///their growth behavior.  This also now gets run every time a user changes the value of a textbox while filling out a sheet.
+		///If calculating for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
+		public static void CalculateHeights(Sheet sheet,Graphics g,Statement stmt=null,bool isPrinting=false,int topMargin=40,int bottomMargin=60,MedLab medLab=null) {
+			DataSet dataSet=null;
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			CalculateHeights(sheet,g,dataSet,stmt,isPrinting,topMargin,bottomMargin,medLab);
+		}
+
+		///<summary>Just before printing or displaying the final sheet output, the heights and y positions of various fields are adjusted according to 
+		///their growth behavior.  This also now gets run every time a user changes the value of a textbox while filling out a sheet.
+		///dataSet should be prefilled by calling AccountModules.GetAccount() before calling this method in order to calculate for statements.</summary>
+		public static void CalculateHeights(Sheet sheet,Graphics g,DataSet dataSet,Statement stmt=null
+			,bool isPrinting=false,int topMargin=40,int bottomMargin=60,MedLab medLab=null)
+		{
 			//Sheet sheetCopy=sheet.Clone();
 			int calcH;
 			Font font;
@@ -87,7 +107,7 @@ namespace OpenDental{
 					calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
 				}
 				else {//handle grid height calculation seperately.
-					calcH=CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab);
+					calcH=CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab,dataSet);
 				}
 				if(calcH<=field.Height //calc height is smaller
 					&& field.FieldName!="StatementPayPlan") 
@@ -250,8 +270,26 @@ namespace OpenDental{
 			CalculateHeightsPageBreak(fieldNew,sheet,g);
 		}
 
-		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.</summary>
+		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.
+		///If calculating for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
 		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin,MedLab medLab) {
+			DataSet dataSet=null;
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			return CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab,dataSet);
+		}
+
+		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.
+		///DataSet should be prefilled with AccountModules.GetAccount() before calling this method if calculating for a statement.</summary>
+		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin,MedLab medLab
+			,DataSet dataSet) 
+		{
 			UI.ODGrid odGrid=new UI.ODGrid();
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			odGrid.Width=field.Width;
@@ -264,7 +302,7 @@ namespace OpenDental{
 			if(stmt!=null) {
 				odGrid.Title+=(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
 			}
-			DataTable Table=SheetUtil.GetDataTableForGridType(field.FieldName,stmt,medLab);
+			DataTable Table=SheetUtil.GetDataTableForGridType(dataSet,field.FieldName,stmt,medLab);
 			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
 			#region  Fill Grid
 			odGrid.BeginUpdate();
@@ -511,20 +549,21 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		public static DataTable GetDataTableForGridType(string gridType,Statement stmt=null,MedLab medLab=null) {
+		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if getting a table for a statement.</Summary>
+		public static DataTable GetDataTableForGridType(DataSet dataSet,string gridType,Statement stmt,MedLab medLab) {
 			DataTable retVal=new DataTable();
 			switch(gridType) {
 				case "StatementMain":
-					retVal=getTable_StatementMain(stmt);
+					retVal=getTable_StatementMain(dataSet,stmt);
 					break;
 				case "StatementAging":
 					retVal=getTable_StatementAging(stmt);
 					break;
 				case "StatementPayPlan":
-					retVal=getTable_StatementPayPlan(stmt);
+					retVal=getTable_StatementPayPlan(dataSet,stmt);
 					break;
 				case "StatementEnclosed":
-					retVal=getTable_StatementEnclosed(stmt);
+					retVal=getTable_StatementEnclosed(dataSet,stmt);
 					break;
 				case "MedLabResults":
 					retVal=getTable_MedLabResults(medLab);
@@ -535,13 +574,11 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		///<summary>Gets account tables by calling AccountModules.GetAccount and then appends dataRows together into a single table. </summary>
-		private static DataTable getTable_StatementMain(Statement stmt) {
+		///<summary>Gets account tables by calling AccountModules.GetAccount and then appends dataRows together into a single table.
+		///DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</summary>
+		private static DataTable getTable_StatementMain(DataSet dataSet,Statement stmt) {
 			DataTable retVal=null;
-			DataSet ds=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum,
-				PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-				,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
-			foreach(DataTable t in ds.Tables) {
+			foreach(DataTable t in dataSet.Tables) {
 				if(!t.TableName.StartsWith("account")) {
 					continue;
 				}
@@ -640,12 +677,10 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		private static DataTable getTable_StatementPayPlan(Statement stmt) {
+		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
+		private static DataTable getTable_StatementPayPlan(DataSet dataSet,Statement stmt) {
 			DataTable retVal=new DataTable();
-			DataSet ds=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum
-				,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice
-				,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
-			foreach(DataTable t in ds.Tables) {
+			foreach(DataTable t in dataSet.Tables) {
 				if(!t.TableName.StartsWith("payplan")) {
 					continue;
 				}
@@ -657,8 +692,8 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		private static DataTable getTable_StatementEnclosed(Statement stmt) {
-			DataSet dataSet=AccountModules.GetStatementDataSet(stmt);
+		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
+		private static DataTable getTable_StatementEnclosed(DataSet dataSet,Statement stmt) {
 			DataTable tableMisc=dataSet.Tables["misc"];
 			string text="";
 			DataTable table=new DataTable();

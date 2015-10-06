@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
 using System.Drawing.Printing;
+using System.Data;
 
 namespace OpenDental {
 	public partial class FormSheetFillEdit:Form {
@@ -28,11 +29,18 @@ namespace OpenDental {
 		public bool IsStatement;//Used for statements, do not save a sheet version of the statement.
 		public Statement Stmt;
 		public MedLab MedLabCur;
+		///<summary>Statements use Sheets needs access to the entire Account data set for measuring grids.  See RefreshPanel()</summary>
+		private DataSet _dataSet;
 
-		public FormSheetFillEdit(Sheet sheet){
+		public FormSheetFillEdit(Sheet sheet):this(sheet,null) {
+		}
+
+		///<summary>Use this constructor when displaying a statement.  dataSet should be filled with the data set from AccountModules.GetAccount()</summary>
+		public FormSheetFillEdit(Sheet sheet,DataSet dataSet){
 			InitializeComponent();
 			Lan.F(this);
 			SheetCur=sheet;
+			_dataSet=dataSet;
 			if(sheet.IsLandscape){
 				Width=sheet.Height+190;
 				Height=sheet.Width+65;
@@ -552,7 +560,7 @@ namespace OpenDental {
 				if(SheetCur.SheetFields[f].FieldType!=SheetFieldType.Grid){
 					continue;
 				}
-				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,Stmt,MedLabCur);
+				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,_dataSet,Stmt,MedLabCur);
 			}
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);

@@ -336,10 +336,10 @@ namespace OpenDental{
 			Statement StmtCur=stmt;
 			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-			SheetFiller.FillFields(sheet,StmtCur);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
+			SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
+			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
 			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
-			SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
+			SheetPrinting.CreatePdf(sheet,tempPath,StmtCur,dataSet,null);
 			long category=0;
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 				if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {

@@ -691,7 +691,7 @@ namespace OpenDental{
 					int pageCount=Sheets.CalculatePageCount(sheet,SheetPrinting.PrintMargin);
 					for(int k=0;k<pageCount;k++) {
 						page=document.AddPage();
-						SheetPrinting.CreatePdfPage(sheet,page);
+						SheetPrinting.CreatePdfPage(sheet,page,null);
 					}
 					listSheets.Add(sheet);
 				}

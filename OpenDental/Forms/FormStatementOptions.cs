@@ -1009,10 +1009,13 @@ namespace OpenDental{
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				SheetFiller.FillFields(sheet,StmtCur);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
+				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
-				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
+				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur,dataSet,null);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
@@ -1067,9 +1070,9 @@ namespace OpenDental{
 				//Actually print the statement.
 				//NOTE: This is printing a "fresh" GDI+ version of the statment which is ever so slightly different than the PDFSharp statment that was saved to disk.
 				sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				SheetFiller.FillFields(sheet,StmtCur);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
-				SheetPrinting.Print(sheet,1,false,StmtCur);//use GDI+ printing, which is slightly different than the pdf.
+				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
+				SheetPrinting.Print(sheet,dataSet,1,false,StmtCur);//use GDI+ printing, which is slightly different than the pdf.
 				Cursor=Cursors.Default;
 			}
 			DialogResult=DialogResult.OK;
@@ -1138,10 +1141,13 @@ namespace OpenDental{
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				SheetFiller.FillFields(sheet,StmtCur);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur);
+				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
-				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur);
+				SheetPrinting.CreatePdf(sheet,tempPath,StmtCur,dataSet,null);
 				long category=0;
 				for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 					if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
@@ -1291,10 +1297,13 @@ namespace OpenDental{
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				SheetFiller.FillFields(sheet,StmtCur);
-				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),StmtCur,true,40,60);
+				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
+				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur,true,40,60);
 				//print directly to PDF here, and save it.
-				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet,dataSet);
 				FormSFE.Stmt=StmtCur;
 				FormSFE.IsStatement=true;
 				FormSFE.ShowDialog();

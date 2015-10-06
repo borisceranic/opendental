@@ -8,11 +8,27 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	public class SheetFiller {
-		///<summary>Gets the data from the database and fills the fields. Input should only be new sheets.</summary>
-		public static void FillFields(Sheet sheet,Statement stmt=null,MedLab medLab=null){
+		///<summary>Gets the data from the database and fills the fields. Input should only be new sheets.
+		///If filling fields for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
+		public static void FillFields(Sheet sheet,Statement stmt=null,MedLab medLab=null) {
+			DataSet dataSet=null;
+			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
+				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
+				//Worst case scenario we will end up calling the database a few extra times for the same data set.
+				//It use to call this method many, many times so anything is an improvement at this point.
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			FillFields(sheet,dataSet,stmt,medLab);
+		}
+
+		///<summary>Gets some data from the database and fills the fields. Input should only be new sheets.
+		///dataSet should be prefilled with AccountModules.GetAccount() prior to calling this method when filling fields for statements.</summary>
+		public static void FillFields(Sheet sheet,DataSet dataSet,Statement stmt,MedLab medLab){
 			foreach(SheetParameter param in sheet.Parameters){
 				if(param.IsRequired && param.ParamValue==null){
-					throw new ApplicationException(Lan.g("Sheet","Parameter not specified for sheet: ")+param.ParamName);
+					throw new ApplicationException(Lan.g("Sheet","Parameter not specified for sheet")+": "+param.ParamName);
 				}
 			}
 			Patient pat=null;
@@ -88,8 +104,7 @@ namespace OpenDental{
 					break;
 				case SheetTypeEnum.Statement:
 					pat=Patients.GetPat(sheet.PatNum);
-					//deposit=Deposits.GetOne((long)GetParamByName(sheet,"DepositNum").ParamValue);
-					FillFieldsForStatement(sheet,stmt);
+					FillFieldsForStatement(sheet,stmt,dataSet);
 					break;
 				case SheetTypeEnum.MedLabResults:
 					pat=Patients.GetPat(sheet.PatNum);
@@ -2123,10 +2138,9 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForStatement(Sheet sheet,Statement Stmt) {
+		private static void FillFieldsForStatement(Sheet sheet,Statement Stmt,DataSet dataSet) {
 			Patient pat=Patients.GetPat(sheet.PatNum);
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
-			DataSet dataSet=AccountModules.GetStatementDataSet(Stmt);
 			DataTable tableAppt=dataSet.Tables["appts"];
 			if(tableAppt==null){
 				tableAppt=new DataTable();	
@@ -2188,7 +2202,7 @@ namespace OpenDental{
 						break;
 					case "amountDueValue":
 						try {
-							field.FieldValue=PIn.Double(SheetUtil.GetDataTableForGridType("StatementEnclosed",Stmt).Rows[0][0].ToString()).ToString("C");
+							field.FieldValue=PIn.Double(SheetUtil.GetDataTableForGridType(dataSet,"StatementEnclosed",Stmt,null).Rows[0][0].ToString()).ToString("C");
 						}
 						catch {
 							field.FieldValue=0.ToString("C");

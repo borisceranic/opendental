@@ -3995,10 +3995,13 @@ namespace OpenDental {
 			Statements.Insert(stmt);
 			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
-			SheetFiller.FillFields(sheet,stmt);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),stmt);
+			DataSet dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+					,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+					,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			SheetFiller.FillFields(sheet,dataSet,stmt,null);
+			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,stmt);
 			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),stmt.PatNum.ToString()+".pdf");
-			SheetPrinting.CreatePdf(sheet,tempPath,stmt);//We don't delete this from temp folder
+			SheetPrinting.CreatePdf(sheet,tempPath,stmt,dataSet,null);
 			long category=0;
 			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
 				if(Regex.IsMatch(DefC.Short[(int)DefCat.ImageCats][i].ItemValue,@"S")) {
