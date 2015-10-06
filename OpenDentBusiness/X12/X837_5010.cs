@@ -970,7 +970,11 @@ namespace OpenDentBusiness
 				//2300 NTE: (medical,institutional,dental) Claim Note. Situational. A number of NTE01 codes other than 'ADD', which we don't support.
 				string note="";
 				if(claim.AttachmentID!="" && !claim.ClaimNote.StartsWith(claim.AttachmentID)) {
-					note=claim.AttachmentID+" ";
+					//The AttachmentID is sent in the PWK segment.  There is no longer a need to send this information in the NTE segment anymore.
+					//Denti-Cal has asked us to remove the AttachmentID from the NTE segment, since the segment is very short.
+					if(!IsDentiCal(clearhouse)) {
+						note=claim.AttachmentID+" ";
+					}
 				}
 				note+=claim.ClaimNote;
 				if(note!="") {
