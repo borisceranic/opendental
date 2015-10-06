@@ -68,11 +68,21 @@ namespace OpenDentBusiness {
 			ncScript.Credentials.productName=NewCropProductName;
 			ncScript.Credentials.productVersion=NewCropProductVersion;
 			ncScript.UserRole=new UserRoleType();
-			if(emp==null) {
-				ncScript.UserRole.user=UserType.LicensedPrescriber;
-				ncScript.UserRole.role=RoleType.doctor;
+			if(emp==null) {//Provider
+				if(prov.IsSecondary) {//Mid-level provider
+					//Secondary (HYG) providers go accross to NewCrop as midlevel providers for now to satisfy the Ohio prescriber requirements.
+					//HYG providers are not normally able to click through to NewCrop because they do not have an NPI number and an NPI is required.
+					//In the future, instead of using the IsSecondary flag as as workaround, we should instead create a new field on the provider table
+					//or perhaps the userod table to allow the user to select the type of provider.
+					ncScript.UserRole.user=UserType.MidlevelPrescriber;
+					ncScript.UserRole.role=RoleType.midlevelPrescriber;
+				}
+				else {//Fully licensed provider
+					ncScript.UserRole.user=UserType.LicensedPrescriber;
+					ncScript.UserRole.role=RoleType.doctor;
+				}
 			}
-			else {
+			else {//Employee
 				ncScript.UserRole.user=UserType.Staff;
 				ncScript.UserRole.role=RoleType.nurse;
 			}
