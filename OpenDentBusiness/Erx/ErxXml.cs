@@ -68,8 +68,10 @@ namespace OpenDentBusiness {
 			ncScript.Credentials.productName=NewCropProductName;
 			ncScript.Credentials.productVersion=NewCropProductVersion;
 			ncScript.UserRole=new UserRoleType();
+			bool isMidlevel=false;
 			if(emp==null) {//Provider
 				if(prov.IsSecondary) {//Mid-level provider
+					isMidlevel=true;
 					//Secondary (HYG) providers go accross to NewCrop as midlevel providers for now to satisfy the Ohio prescriber requirements.
 					//HYG providers are not normally able to click through to NewCrop because they do not have an NPI number and an NPI is required.
 					//In the future, instead of using the IsSecondary flag as as workaround, we should instead create a new field on the provider table
@@ -152,7 +154,6 @@ namespace OpenDentBusiness {
 				ncScript.Location.primaryFaxNumber=clinic.Fax;//Validated to be 10 digits within the chart.
 				ncScript.Location.pharmacyContactNumber=clinic.Phone;//Validated to be 10 digits within the chart.
 			}
-			ncScript.LicensedPrescriber=new LicensedPrescriberType();
 			//Each unique provider ID sent to NewCrop will cause a billing charge.
 			//Some customer databases have provider duplicates, because they have one provider record per clinic with matching NPIs.
 			//We send NPI as the ID to prevent extra NewCrop charges.
@@ -161,93 +162,37 @@ namespace OpenDentBusiness {
 			//          but with the same provider name and NPI, will Open Dental be billed twice or just one time for the NPI used?
 			//Answer:   "They would be billed twice. The IDs you send us should always be maintained and unique. 
 			//          Users are always identified by LicensedPrescriber ID, since their name or credentials could potentially change."
-			ncScript.LicensedPrescriber.ID=prov.NationalProvID;
-			//UPIN is obsolete
-			ncScript.LicensedPrescriber.LicensedPrescriberName=new PersonNameType();
-			ncScript.LicensedPrescriber.LicensedPrescriberName.last=prov.LName.Trim();//Cannot be blank.
-			ncScript.LicensedPrescriber.LicensedPrescriberName.first=prov.FName.Trim();//Cannot be blank.
-			ncScript.LicensedPrescriber.LicensedPrescriberName.middle=prov.MI;//May be blank.
-			if(prov.Suffix!="") {
-				ncScript.LicensedPrescriber.LicensedPrescriberName.suffixSpecified=true;
-				ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DDS;
-				string[] suffixes=prov.Suffix.ToUpper().Split(' ','.');
-				for(int i=0;i<suffixes.Length;i++) {
-					if(suffixes[i]=="DDS") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DDS;
-						break;
-					}
-					else if(suffixes[i]=="DO") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.DO;
-						break;
-					}
-					else if(suffixes[i]=="I") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.I;
-						break;
-					}
-					else if(suffixes[i]=="II") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.II;
-						break;
-					}
-					else if(suffixes[i]=="III") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.III;
-						break;
-					}
-					else if(suffixes[i]=="JR") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Jr;
-						break;
-					}
-					else if(suffixes[i]=="LVN") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.LVN;
-						break;
-					}
-					else if(suffixes[i]=="MA") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.MA;
-						break;
-					}
-					else if(suffixes[i]=="MD") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.MD;
-						break;
-					}
-					else if(suffixes[i]=="NP") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.NP;
-						break;
-					}
-					else if(suffixes[i]=="PA") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PA;
-						break;
-					}
-					else if(suffixes[i]=="PHARMD") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PharmD;
-						break;
-					}
-					else if(suffixes[i]=="PHD") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.PhD;
-						break;
-					}
-					else if(suffixes[i]=="RN") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.RN;
-						break;
-					}
-					else if(suffixes[i]=="RPH") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.RPh;
-						break;
-					}
-					else if(suffixes[i]=="SR") {
-						ncScript.LicensedPrescriber.LicensedPrescriberName.suffix=PersonNameSuffix.Sr;
-						break;
-					}
+			if(isMidlevel) {
+				ncScript.MidlevelPrescriber=new MidlevelPrescriberType();
+				ncScript.MidlevelPrescriber.ID=prov.NationalProvID;
+				//UPIN is obsolete
+				ncScript.MidlevelPrescriber.LicensedPrescriberName=GetPersonNameForProvider(prov);
+				if(prov.DEANum.ToLower()=="none") {
+					ncScript.MidlevelPrescriber.dea="NONE";
 				}
+				else {
+					ncScript.MidlevelPrescriber.dea=prov.DEANum;
+				}
+				ncScript.MidlevelPrescriber.licenseState=prov.StateWhereLicensed;//Validated to be a US state code in the chart.
+				ncScript.MidlevelPrescriber.licenseNumber=prov.StateLicense;//Validated to exist in chart.
+				ncScript.MidlevelPrescriber.npi=prov.NationalProvID;//Validated to be 10 digits in chart.
 			}
-			if(prov.DEANum.ToLower()=="none") {
-				ncScript.LicensedPrescriber.dea="NONE";
+			else {//Licensed presriber
+				ncScript.LicensedPrescriber=new LicensedPrescriberType();
+				ncScript.LicensedPrescriber.ID=prov.NationalProvID;
+				//UPIN is obsolete
+				ncScript.LicensedPrescriber.LicensedPrescriberName=GetPersonNameForProvider(prov);
+				if(prov.DEANum.ToLower()=="none") {
+					ncScript.LicensedPrescriber.dea="NONE";
+				}
+				else {
+					ncScript.LicensedPrescriber.dea=prov.DEANum;
+				}
+				ncScript.LicensedPrescriber.licenseState=prov.StateWhereLicensed;//Validated to be a US state code in the chart.
+				ncScript.LicensedPrescriber.licenseNumber=prov.StateLicense;//Validated to exist in chart.
+				ncScript.LicensedPrescriber.npi=prov.NationalProvID;//Validated to be 10 digits in chart.
+				//ncScript.LicensedPrescriber.freeformCredentials=;//This is where DDS and DMD should go, but we don't support this yet. Probably not necessary anyway.
 			}
-			else {
-				ncScript.LicensedPrescriber.dea=prov.DEANum;
-			}
-			ncScript.LicensedPrescriber.licenseState=prov.StateWhereLicensed;//Validated to be a US state code in the chart.
-			ncScript.LicensedPrescriber.licenseNumber=prov.StateLicense;//Validated to exist in chart.
-			ncScript.LicensedPrescriber.npi=prov.NationalProvID;//Validated to be 10 digits in chart.
-			//ncScript.LicensedPrescriber.freeformCredentials=;//This is where DDS and DMD should go, but we don't support this yet. Probably not necessary anyway.
 			if(emp!=null) {
 				ncScript.Staff=new StaffType();
 				ncScript.Staff.ID="emp"+emp.EmployeeNum.ToString();//A positive integer. Returned in the ExternalUserID field when retreiving prescriptions from NewCrop. Also, provider ID is returned in the same field if a provider created the prescription, so that we can create a distintion between employee IDs and provider IDs.
@@ -308,6 +253,85 @@ namespace OpenDentBusiness {
 			xmlSerializer.Serialize(memoryStream,ncScript);
 			byte[] memoryStreamInBytes=memoryStream.ToArray();
 			return Encoding.UTF8.GetString(memoryStreamInBytes,0,memoryStreamInBytes.Length);
+		}
+
+		public static PersonNameType GetPersonNameForProvider(Provider prov) {
+			PersonNameType personName=new PersonNameType();
+			personName.last=prov.LName.Trim();//Cannot be blank.
+			personName.first=prov.FName.Trim();//Cannot be blank.
+			personName.middle=prov.MI;//May be blank.
+			if(prov.Suffix!="") {
+				personName.suffixSpecified=true;
+				personName.suffix=PersonNameSuffix.DDS;
+				string[] suffixes=prov.Suffix.ToUpper().Split(' ','.');
+				for(int i=0;i<suffixes.Length;i++) {
+					if(suffixes[i]=="DDS") {
+						personName.suffix=PersonNameSuffix.DDS;
+						break;
+					}
+					else if(suffixes[i]=="DO") {
+						personName.suffix=PersonNameSuffix.DO;
+						break;
+					}
+					else if(suffixes[i]=="I") {
+						personName.suffix=PersonNameSuffix.I;
+						break;
+					}
+					else if(suffixes[i]=="II") {
+						personName.suffix=PersonNameSuffix.II;
+						break;
+					}
+					else if(suffixes[i]=="III") {
+						personName.suffix=PersonNameSuffix.III;
+						break;
+					}
+					else if(suffixes[i]=="JR") {
+						personName.suffix=PersonNameSuffix.Jr;
+						break;
+					}
+					else if(suffixes[i]=="LVN") {
+						personName.suffix=PersonNameSuffix.LVN;
+						break;
+					}
+					else if(suffixes[i]=="MA") {
+						personName.suffix=PersonNameSuffix.MA;
+						break;
+					}
+					else if(suffixes[i]=="MD") {
+						personName.suffix=PersonNameSuffix.MD;
+						break;
+					}
+					else if(suffixes[i]=="NP") {
+						personName.suffix=PersonNameSuffix.NP;
+						break;
+					}
+					else if(suffixes[i]=="PA") {
+						personName.suffix=PersonNameSuffix.PA;
+						break;
+					}
+					else if(suffixes[i]=="PHARMD") {
+						personName.suffix=PersonNameSuffix.PharmD;
+						break;
+					}
+					else if(suffixes[i]=="PHD") {
+						personName.suffix=PersonNameSuffix.PhD;
+						break;
+					}
+					else if(suffixes[i]=="RN") {
+						personName.suffix=PersonNameSuffix.RN;
+						break;
+					}
+					else if(suffixes[i]=="RPH") {
+						personName.suffix=PersonNameSuffix.RPh;
+						break;
+					}
+					else if(suffixes[i]=="SR") {
+						personName.suffix=PersonNameSuffix.Sr;
+						break;
+					}
+				}
+			}
+			return personName;
 		}
 
 		/// <summary>Cleans supplied string to conform to XML standards.</summary>
