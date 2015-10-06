@@ -1521,8 +1521,8 @@ namespace OpenDental {
 								isDigitallySigned=true;
 							}
 						}
-						if(line.StartsWith("RECEIPT=") && line.Length>16) {
-							receipt=PIn.String(line.Substring(16));//Strips off a few unnecessary characters at the beginning of the receipt string
+						if(line.StartsWith("RECEIPT=") && line.Length>8) {
+							receipt=PIn.String(line.Substring(8));
 							receipt=receipt.Replace("\\n","\n");//The receipt from X-Charge escapes the newline characters
 							if(isDigitallySigned) {
 								//Replace X____________________________ with 'Electronically signed'
@@ -1733,8 +1733,8 @@ namespace OpenDental {
 								showApprovedAmtNotice=true;
 							}
 						}
-						if(line.StartsWith("RECEIPT=") && line.Length>16) {
-							receipt=PIn.String(line.Substring(16));//Strips off a few unnecessary characters at the beginning of the receipt string
+						if(line.StartsWith("RECEIPT=") && line.Length>8) {
+							receipt=PIn.String(line.Substring(8));
 							receipt=receipt.Replace("\\n","\r\n");//The receipt from X-Charge escapes the newline characters
 						}
 						line=reader.ReadLine();
