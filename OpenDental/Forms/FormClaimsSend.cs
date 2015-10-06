@@ -942,7 +942,7 @@ namespace OpenDental{
 			for(int j=0;j<arrayRefreshQueueItems.Length;j++) {//Loop through all the refreshed ClaimSendQueueItems
 				for(int k=0;k<_arrayQueueAll.Length;k++) {//Loop through all the ClaimSendQueueItems in the grid's main list
 					if(arrayRefreshQueueItems[j].ClaimNum==_arrayQueueAll[k].ClaimNum) {//If you found the matching ClaimSendQueueItem
-						if(_arrayQueueAll[k].ClaimStatus=="S" || _arrayQueueAll[k].ClaimStatus=="P" || _arrayQueueAll[k].ClaimStatus=="R") {
+						if(_arrayQueueAll[k].ClaimStatus=="S" ||  _arrayQueueAll[k].ClaimStatus=="R") {
 							claimAlreadySentCount++;
 						}
 						else {
