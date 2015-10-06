@@ -190,8 +190,15 @@ namespace OpenDental{
 		private Label label44;
 		private List<Clinic> _listClinics;
 		private ToolTip _referredFromToolTip;
+		private TextBox textMedicaidState;
 		///<summary>Local cache of RefAttaches for the current patient.  Set in FillReferrals().</summary>
 		private List<RefAttach> _listRefAttaches;
+		private System.Windows.Forms.ListBox listMedicaidStates;//displayed from within code, not designer
+		private string _medicaidStateOriginal;//used in the medicaidState dropdown logic
+		private bool _mouseIsInListMedicaidStates;
+		private System.Windows.Forms.ListBox listStates;//displayed from within code, not designer
+		private string _stateOriginal;//used in the medicaidState dropdown logic
+		private bool _mouseIsInListStates;
 
 		///<summary></summary>
 		public FormPatientEdit(Patient patCur,Family famCur){
@@ -253,6 +260,24 @@ namespace OpenDental{
 			_referredFromToolTip=new ToolTip();
 			_referredFromToolTip.InitialDelay=500;
 			_referredFromToolTip.ReshowDelay=100;
+			listMedicaidStates=new ListBox();
+			listMedicaidStates.Location=new Point(textMedicaidState.Left,textMedicaidState.Bottom);
+			listMedicaidStates.Size=new Size(textMedicaidState.Width,100);
+			listMedicaidStates.Visible=false;
+			listMedicaidStates.Click += new System.EventHandler(listMedicaidStates_Click);
+			listMedicaidStates.MouseEnter += new System.EventHandler(listMedicaidStates_MouseEnter);
+			listMedicaidStates.MouseLeave += new System.EventHandler(listMedicaidStates_MouseLeave);
+			Controls.Add(listMedicaidStates);
+			listMedicaidStates.BringToFront();
+			listStates=new ListBox();
+			listStates.Location=new Point(textState.Left+groupBox1.Left,textState.Bottom+groupBox1.Top);
+			listStates.Size=new Size(textState.Width,100);
+			listStates.Visible=false;
+			listStates.Click += new System.EventHandler(listStates_Click);
+			listStates.MouseEnter += new System.EventHandler(listStates_MouseEnter);
+			listStates.MouseLeave += new System.EventHandler(listStates_MouseLeave);
+			Controls.Add(listStates);
+			listStates.BringToFront();
 		}
 
 		///<summary></summary>
@@ -413,6 +438,7 @@ namespace OpenDental{
 			this.textReferredFrom = new System.Windows.Forms.TextBox();
 			this.butReferredFrom = new OpenDental.UI.Button();
 			this.label44 = new System.Windows.Forms.Label();
+			this.textMedicaidState = new System.Windows.Forms.TextBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -654,6 +680,8 @@ namespace OpenDental{
 			this.textState.Size = new System.Drawing.Size(61, 20);
 			this.textState.TabIndex = 6;
 			this.textState.TextChanged += new System.EventHandler(this.textState_TextChanged);
+			this.textState.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textState_KeyUp);
+			this.textState.Leave += new System.EventHandler(this.textState_Leave);
 			// 
 			// textHmPhone
 			// 
@@ -1033,7 +1061,7 @@ namespace OpenDental{
 			this.butAuto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAuto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAuto.CornerRadius = 4F;
-			this.butAuto.Location = new System.Drawing.Point(258, 357);
+			this.butAuto.Location = new System.Drawing.Point(258, 358);
 			this.butAuto.Name = "butAuto";
 			this.butAuto.Size = new System.Drawing.Size(62, 22);
 			this.butAuto.TabIndex = 14;
@@ -1054,7 +1082,7 @@ namespace OpenDental{
 			this.label31.Name = "label31";
 			this.label31.Size = new System.Drawing.Size(154, 14);
 			this.label31.TabIndex = 0;
-			this.label31.Text = "Medicaid ID";
+			this.label31.Text = "Medicaid ID, State";
 			this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// listStatus
@@ -1322,9 +1350,9 @@ namespace OpenDental{
 			// 
 			// label37
 			// 
-			this.label37.Location = new System.Drawing.Point(256, 342);
+			this.label37.Location = new System.Drawing.Point(320, 342);
 			this.label37.Name = "label37";
-			this.label37.Size = new System.Drawing.Size(206, 14);
+			this.label37.Size = new System.Drawing.Size(165, 14);
 			this.label37.TabIndex = 0;
 			this.label37.Text = "(put in InsPlan too)";
 			// 
@@ -1890,11 +1918,23 @@ namespace OpenDental{
 			this.label44.Text = "Referred From";
 			this.label44.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// textMedicaidState
+			// 
+			this.textMedicaidState.Location = new System.Drawing.Point(257, 338);
+			this.textMedicaidState.MaxLength = 100;
+			this.textMedicaidState.Name = "textMedicaidState";
+			this.textMedicaidState.Size = new System.Drawing.Size(61, 20);
+			this.textMedicaidState.TabIndex = 51;
+			this.textMedicaidState.TextChanged += new System.EventHandler(this.textMedicaidState_TextChanged);
+			this.textMedicaidState.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textMedicaidState_KeyUp);
+			this.textMedicaidState.Leave += new System.EventHandler(this.textMedicaidState_Leave);
+			// 
 			// FormPatientEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.textMedicaidState);
 			this.Controls.Add(this.label44);
 			this.Controls.Add(this.butReferredFrom);
 			this.Controls.Add(this.textReferredFrom);
@@ -2260,6 +2300,7 @@ namespace OpenDental{
 				label31.Visible=false;
 				label37.Visible=false;
 				textMedicaidID.Visible=false;
+				textMedicaidState.Visible=false;
 			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)){
 				comboClinic.Visible=false;
@@ -2726,6 +2767,23 @@ namespace OpenDental{
 			}
 		}
 
+		private void textMedicaidState_TextChanged(object sender,EventArgs e) {
+			if(CultureInfo.CurrentCulture.Name=="en-US" //if USA or Canada, capitalize first 2 letters
+				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) //Canadian. en-CA or fr-CA
+			{
+				if(textMedicaidState.Text.Length==1 || textMedicaidState.Text.Length==2) {
+					textMedicaidState.Text=textMedicaidState.Text.ToUpper();
+					textMedicaidState.SelectionStart=2;
+				}
+			}
+			else {
+				if(textMedicaidState.Text.Length==1) {
+					textMedicaidState.Text=textMedicaidState.Text.ToUpper();
+					textMedicaidState.SelectionStart=1;
+				}
+			}
+		}
+
 		///<summary>Validates there is still a last name entered and updates the last, first, middle and preferred name of PatCur to what is currently
 		///typed in the text boxes.  May not match what is in the database.  Does not save the changes to the database so user can safely cancel and
 		///revert the changes.</summary>
@@ -3090,6 +3148,182 @@ namespace OpenDental{
 
 		private void listEmps_MouseLeave(object sender, System.EventArgs e){
 			mouseIsInListEmps=false;
+		}
+
+		private void textMedicaidState_KeyUp(object sender,System.Windows.Forms.KeyEventArgs e) {
+			//key up is used because that way it will trigger AFTER the textBox has been changed.
+			if(e.KeyCode==Keys.Return) {
+				listMedicaidStates.Visible=false;
+				return;
+			}
+			if(textMedicaidState.Text=="") {
+				listMedicaidStates.Visible=false;
+				return;
+			}
+			if(e.KeyCode==Keys.Down) {
+				if(listMedicaidStates.Items.Count==0) {
+					return;
+				}
+				if(listMedicaidStates.SelectedIndex==-1) {
+					listMedicaidStates.SelectedIndex=0;
+					textMedicaidState.Text=listMedicaidStates.SelectedItem.ToString();
+				}
+				else if(listMedicaidStates.SelectedIndex==listMedicaidStates.Items.Count-1) {
+					listMedicaidStates.SelectedIndex=-1;
+					textMedicaidState.Text=_medicaidStateOriginal;
+				}
+				else {
+					listMedicaidStates.SelectedIndex++;
+					textMedicaidState.Text=listMedicaidStates.SelectedItem.ToString();
+				}
+				textMedicaidState.SelectionStart=textMedicaidState.Text.Length;
+				return;
+			}
+			if(e.KeyCode==Keys.Up) {
+				if(listMedicaidStates.Items.Count==0) {
+					return;
+				}
+				if(listMedicaidStates.SelectedIndex==-1) {
+					listMedicaidStates.SelectedIndex=listMedicaidStates.Items.Count-1;
+					textMedicaidState.Text=listMedicaidStates.SelectedItem.ToString();
+				}
+				else if(listMedicaidStates.SelectedIndex==0) {
+					listMedicaidStates.SelectedIndex=-1;
+					textMedicaidState.Text=_medicaidStateOriginal;
+				}
+				else {
+					listMedicaidStates.SelectedIndex--;
+					textMedicaidState.Text=listMedicaidStates.SelectedItem.ToString();
+				}
+				textMedicaidState.SelectionStart=textMedicaidState.Text.Length;
+				return;
+			}
+			if(textMedicaidState.Text.Length==1) {
+				textMedicaidState.Text=textMedicaidState.Text.ToUpper();
+				textMedicaidState.SelectionStart=1;
+			}
+			_medicaidStateOriginal=textMedicaidState.Text;//the original text is preserved when using up and down arrows
+			listMedicaidStates.Items.Clear();
+			List<StateAbbr> similarAbbrs=StateAbbrs.GetSimilarAbbrs(textMedicaidState.Text);
+			for(int i=0;i<similarAbbrs.Count;i++) {
+				listMedicaidStates.Items.Add(similarAbbrs[i].Abbr);
+			}
+			int h=13*similarAbbrs.Count+5;
+			if(h > ClientSize.Height-listMedicaidStates.Top) {
+				h=ClientSize.Height-listMedicaidStates.Top;
+			}
+			listMedicaidStates.Size=new Size(textMedicaidState.Width,h);
+			listMedicaidStates.Visible=true;
+		}
+
+		private void textMedicaidState_Leave(object sender,System.EventArgs e) {
+			if(_mouseIsInListMedicaidStates) {
+				return;
+			}
+			listMedicaidStates.Visible=false;
+		}
+
+		private void listMedicaidStates_Click(object sender,System.EventArgs e) {
+			textMedicaidState.Text=listMedicaidStates.SelectedItem.ToString();
+			textMedicaidState.Focus();
+			textMedicaidState.SelectionStart=textMedicaidState.Text.Length;
+			listMedicaidStates.Visible=false;
+		}
+
+		private void listMedicaidStates_MouseEnter(object sender,System.EventArgs e) {
+			_mouseIsInListMedicaidStates=true;
+		}
+
+		private void listMedicaidStates_MouseLeave(object sender,System.EventArgs e) {
+			_mouseIsInListMedicaidStates=false;
+		}
+
+		private void textState_KeyUp(object sender,System.Windows.Forms.KeyEventArgs e) {
+			//key up is used because that way it will trigger AFTER the textBox has been changed.
+			if(e.KeyCode==Keys.Return) {
+				listStates.Visible=false;
+				return;
+			}
+			if(textState.Text=="") {
+				listStates.Visible=false;
+				return;
+			}
+			if(e.KeyCode==Keys.Down) {
+				if(listStates.Items.Count==0) {
+					return;
+				}
+				if(listStates.SelectedIndex==-1) {
+					listStates.SelectedIndex=0;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				else if(listStates.SelectedIndex==listStates.Items.Count-1) {
+					listStates.SelectedIndex=-1;
+					textState.Text=_stateOriginal;
+				}
+				else {
+					listStates.SelectedIndex++;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				textState.SelectionStart=textState.Text.Length;
+				return;
+			}
+			if(e.KeyCode==Keys.Up) {
+				if(listStates.Items.Count==0) {
+					return;
+				}
+				if(listStates.SelectedIndex==-1) {
+					listStates.SelectedIndex=listStates.Items.Count-1;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				else if(listStates.SelectedIndex==0) {
+					listStates.SelectedIndex=-1;
+					textState.Text=_stateOriginal;
+				}
+				else {
+					listStates.SelectedIndex--;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				textState.SelectionStart=textState.Text.Length;
+				return;
+			}
+			if(textState.Text.Length==1) {
+				textState.Text=textState.Text.ToUpper();
+				textState.SelectionStart=1;
+			}
+			_stateOriginal=textState.Text;//the original text is preserved when using up and down arrows
+			listStates.Items.Clear();
+			List<StateAbbr> similarAbbrs=StateAbbrs.GetSimilarAbbrs(textState.Text);
+			for(int i=0;i<similarAbbrs.Count;i++) {
+				listStates.Items.Add(similarAbbrs[i].Abbr);
+			}
+			int h=13*similarAbbrs.Count+5;
+			if(h > ClientSize.Height-listStates.Top) {
+				h=ClientSize.Height-listStates.Top;
+			}
+			listStates.Size=new Size(textState.Width,h);
+			listStates.Visible=true;
+		}
+
+		private void textState_Leave(object sender,System.EventArgs e) {
+			if(_mouseIsInListStates) {
+				return;
+			}
+			listStates.Visible=false;
+		}
+
+		private void listStates_Click(object sender,System.EventArgs e) {
+			textState.Text=listStates.SelectedItem.ToString();
+			textState.Focus();
+			textState.SelectionStart=textState.Text.Length;
+			listStates.Visible=false;
+		}
+
+		private void listStates_MouseEnter(object sender,System.EventArgs e) {
+			_mouseIsInListStates=true;
+		}
+
+		private void listStates_MouseLeave(object sender,System.EventArgs e) {
+			_mouseIsInListStates=false;
 		}
 
 		private void listPosition_SelectedIndexChanged(object sender,EventArgs e) {

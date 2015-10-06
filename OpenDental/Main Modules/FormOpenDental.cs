@@ -366,6 +366,7 @@ namespace OpenDental{
 		private MenuItem menuItemCCProcs;
 		private MenuItem menuItem12;
 		private MenuItem menuItemJobManager;
+		private MenuItem menuItemStateAbbrs;
 		private FormSmsTextMessaging _formSmsTextMessaging;
 
 		///<summary></summary>
@@ -578,6 +579,7 @@ namespace OpenDental{
 			this.menuItemPrescriptions = new System.Windows.Forms.MenuItem();
 			this.menuItemReferrals = new System.Windows.Forms.MenuItem();
 			this.menuItemSchools = new System.Windows.Forms.MenuItem();
+			this.menuItemStateAbbrs = new System.Windows.Forms.MenuItem();
 			this.menuItemZipCodes = new System.Windows.Forms.MenuItem();
 			this.menuItemReports = new System.Windows.Forms.MenuItem();
 			this.menuItemCustomReports = new System.Windows.Forms.MenuItem();
@@ -1251,6 +1253,7 @@ namespace OpenDental{
             this.menuItemPrescriptions,
             this.menuItemReferrals,
             this.menuItemSchools,
+            this.menuItemStateAbbrs,
             this.menuItemZipCodes});
 			this.menuItemLists.Shortcut = System.Windows.Forms.Shortcut.CtrlI;
 			this.menuItemLists.Text = "&Lists";
@@ -1376,9 +1379,15 @@ namespace OpenDental{
 			this.menuItemSchools.Text = "Sites";
 			this.menuItemSchools.Click += new System.EventHandler(this.menuItemSites_Click);
 			// 
+			// menuItemStateAbbrs
+			// 
+			this.menuItemStateAbbrs.Index = 20;
+			this.menuItemStateAbbrs.Text = "State Abbreviations";
+			this.menuItemStateAbbrs.Click += new System.EventHandler(this.menuItemStateAbbrs_Click);
+			// 
 			// menuItemZipCodes
 			// 
-			this.menuItemZipCodes.Index = 20;
+			this.menuItemZipCodes.Index = 21;
 			this.menuItemZipCodes.Text = "&Zip Codes";
 			this.menuItemZipCodes.Click += new System.EventHandler(this.menuItemZipCodes_Click);
 			// 
@@ -5933,6 +5942,16 @@ namespace OpenDental{
 			FormS.ShowDialog();
 			RefreshCurrentModule();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Sites");
+		}
+
+		private void menuItemStateAbbrs_Click(object sender,System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormStateAbbrs formSA=new FormStateAbbrs();
+			formSA.ShowDialog();
+			RefreshCurrentModule();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"StateAbbrs");
 		}
 
 		private void menuItemZipCodes_Click(object sender, System.EventArgs e) {

@@ -10484,6 +10484,40 @@ namespace OpenDentBusiness {
 						}
 					}
 				}
+				//New State Abbreviations table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS stateabbr";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stateabbr (
+						StateAbbrNum bigint NOT NULL auto_increment PRIMARY KEY,
+						Description varchar(50) NOT NULL,
+						Abbr varchar(50) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE stateabbr'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stateabbr (
+						StateAbbrNum number(20) NOT NULL,
+						Description varchar2(50),
+						Abbr varchar2(50),
+						CONSTRAINT stateabbr_StateAbbrNum PRIMARY KEY (StateAbbrNum)
+						)";
+					Db.NonQ(command);
+				}
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
+					//Insert all 50 US states and Washington DC
+					command="INSERT INTO stateabbr (Description,Abbr) VALUES('Alabama','AL'),('Alaska','AK'),('Arizona','AZ'),('Arkansas','AR'),"
+						+"('California','CA'),('Colorado','CO'),('Connecticut','CT'),('Delaware','DE'),('District of Columbia','DC'),('Florida','FL'),"
+						+"('Georgia','GA'),('Hawaii','HI'),('Idaho','ID'),('Illinois','IL'),('Indiana','IN'),('Iowa','IA'),('Kansas','KS'),('Kentucky','KY'),"
+						+"('Louisiana','LA'),('Maine','ME'),('Maryland','MD'),('Massachusetts','MA'),('Michigan','MI'),('Minnesota','MN'),('Mississippi','MS'),"
+						+"('Missouri','MO'),('Montana','MT'),('Nebraska','NE'),('Nevada','NV'),('New Hampshire','NH'),('New Jersey','NJ'),('New Mexico','NM'),"
+						+"('New York','NY'),('North Carolina','NC'),('North Dakota','ND'),('Ohio','OH'),('Oklahoma','OK'),('Oregon','OR'),('Pennsylvania','PA'),"
+						+"('Rhode Island','RI'),('South Carolina','SC'),('South Dakota','SD'),('Tennessee','TN'),('Texas','TX'),('Utah','UT'),('Vermont','VT'),"
+						+"('Virginia','VA'),('Washington','WA'),('West Virginia','WV'),('Wisconsin','WI'),('Wyoming','WY')";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

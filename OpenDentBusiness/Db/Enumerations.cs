@@ -286,7 +286,9 @@ namespace OpenDentBusiness{
 		///<summary>61</summary>
 		ProviderErxs,
 		///<summary>62. Used to refresh the jobs windows in the Job Manager.</summary>
-		Job
+		Job,
+		///<summary>63. Caches the StateAbbrs used for helping prefill state fields and for state validations.</summary>
+		StateAbbrs
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

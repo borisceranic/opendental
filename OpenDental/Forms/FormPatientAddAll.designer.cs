@@ -307,6 +307,8 @@ namespace OpenDental {
 			this.textState.TabIndex = 5;
 			this.textState.TabStop = false;
 			this.textState.TextChanged += new System.EventHandler(this.textState_TextChanged);
+			this.textState.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textState_KeyUp);
+			this.textState.Leave += new System.EventHandler(this.textState_Leave);
 			// 
 			// labelST
 			// 

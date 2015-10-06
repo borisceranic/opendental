@@ -41,6 +41,9 @@ namespace OpenDental {
 		private InsPlan selectedPlan2;
 		private ToolTip _referredFromToolTip;
 		private Referral _refCur;
+		private System.Windows.Forms.ListBox listStates;//displayed from within code, not designer
+		private string _stateOriginal;//used in the medicaidState dropdown logic
+		private bool _mouseIsInListStates;
 
 		public FormPatientAddAll() {
 			InitializeComponent();
@@ -94,6 +97,15 @@ namespace OpenDental {
 			listCars2.MouseLeave += new System.EventHandler(listCars2_MouseLeave);
 			Controls.Add(listCars2);
 			listCars2.BringToFront();
+			listStates=new ListBox();
+			listStates.Location=new Point(textState.Left+groupBox1.Left,textState.Bottom+groupBox1.Top);
+			listStates.Size=new Size(textState.Width,100);
+			listStates.Visible=false;
+			listStates.Click += new System.EventHandler(listStates_Click);
+			listStates.MouseEnter += new System.EventHandler(listStates_MouseEnter);
+			listStates.MouseLeave += new System.EventHandler(listStates_MouseLeave);
+			Controls.Add(listStates);
+			listStates.BringToFront();
 		}
 
 		private void FormPatientAddAll_Load(object sender,EventArgs e) {
@@ -528,6 +540,94 @@ namespace OpenDental {
 				comboZip.Items.Add(((ZipCode)ZipCodes.ALFrequent[i]).ZipCodeDigits
 					+"("+((ZipCode)ZipCodes.ALFrequent[i]).City+")");
 			}
+		}
+
+		private void textState_KeyUp(object sender,System.Windows.Forms.KeyEventArgs e) {
+			//key up is used because that way it will trigger AFTER the textBox has been changed.
+			if(e.KeyCode==Keys.Return) {
+				listStates.Visible=false;
+				return;
+			}
+			if(textState.Text=="") {
+				listStates.Visible=false;
+				return;
+			}
+			if(e.KeyCode==Keys.Down) {
+				if(listStates.Items.Count==0) {
+					return;
+				}
+				if(listStates.SelectedIndex==-1) {
+					listStates.SelectedIndex=0;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				else if(listStates.SelectedIndex==listStates.Items.Count-1) {
+					listStates.SelectedIndex=-1;
+					textState.Text=_stateOriginal;
+				}
+				else {
+					listStates.SelectedIndex++;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				textState.SelectionStart=textState.Text.Length;
+				return;
+			}
+			if(e.KeyCode==Keys.Up) {
+				if(listStates.Items.Count==0) {
+					return;
+				}
+				if(listStates.SelectedIndex==-1) {
+					listStates.SelectedIndex=listStates.Items.Count-1;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				else if(listStates.SelectedIndex==0) {
+					listStates.SelectedIndex=-1;
+					textState.Text=_stateOriginal;
+				}
+				else {
+					listStates.SelectedIndex--;
+					textState.Text=listStates.SelectedItem.ToString();
+				}
+				textState.SelectionStart=textState.Text.Length;
+				return;
+			}
+			if(textState.Text.Length==1) {
+				textState.Text=textState.Text.ToUpper();
+				textState.SelectionStart=1;
+			}
+			_stateOriginal=textState.Text;//the original text is preserved when using up and down arrows
+			listStates.Items.Clear();
+			List<StateAbbr> similarAbbrs=StateAbbrs.GetSimilarAbbrs(textState.Text);
+			for(int i=0;i<similarAbbrs.Count;i++) {
+				listStates.Items.Add(similarAbbrs[i].Abbr);
+			}
+			int h=13*similarAbbrs.Count+5;
+			if(h > ClientSize.Height-listStates.Top) {
+				h=ClientSize.Height-listStates.Top;
+			}
+			listStates.Size=new Size(textState.Width,h);
+			listStates.Visible=true;
+		}
+
+		private void textState_Leave(object sender,System.EventArgs e) {
+			if(_mouseIsInListStates) {
+				return;
+			}
+			listStates.Visible=false;
+		}
+
+		private void listStates_Click(object sender,System.EventArgs e) {
+			textState.Text=listStates.SelectedItem.ToString();
+			textState.Focus();
+			textState.SelectionStart=textState.Text.Length;
+			listStates.Visible=false;
+		}
+
+		private void listStates_MouseEnter(object sender,System.EventArgs e) {
+			_mouseIsInListStates=true;
+		}
+
+		private void listStates_MouseLeave(object sender,System.EventArgs e) {
+			_mouseIsInListStates=false;
 		}
 		#endregion AddressPhone
 

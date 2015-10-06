@@ -410,8 +410,10 @@
     <Compile Include="Crud\SigElementDefCrud.cs" />
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
+    <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
+    <Compile Include="Data Interface\StateAbbrs.cs" />
     <Compile Include="InternalTools\EServices\EServiceMetrics.cs" />
     <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
@@ -972,6 +974,7 @@
     <Compile Include="TableTypes\MedLabSpecimen.cs" />
     <Compile Include="TableTypes\MedLabResult.cs" />
     <Compile Include="TableTypes\MedLab.cs" />
+    <Compile Include="TableTypes\StateAbbr.cs" />
     <Compile Include="TableTypes\TaskHist.cs" />
     <Compile Include="TableTypes\UserodApptView.cs" />
     <Compile Include="TableTypes\WikiListHist.cs" />
