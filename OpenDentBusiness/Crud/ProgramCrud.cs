@@ -55,6 +55,8 @@ namespace OpenDentBusiness.Crud{
 				program.Note         = PIn.String(table.Rows[i]["Note"].ToString());
 				program.PluginDllName= PIn.String(table.Rows[i]["PluginDllName"].ToString());
 				program.ButtonImage  = PIn.String(table.Rows[i]["ButtonImage"].ToString());
+				program.FileTemplate = PIn.String(table.Rows[i]["FileTemplate"].ToString());
+				program.FilePath     = PIn.String(table.Rows[i]["FilePath"].ToString());
 				retVal.Add(program);
 			}
 			return retVal;
@@ -95,7 +97,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProgramNum,";
 			}
-			command+="ProgName,ProgDesc,Enabled,Path,CommandLine,Note,PluginDllName,ButtonImage) VALUES(";
+			command+="ProgName,ProgDesc,Enabled,Path,CommandLine,Note,PluginDllName,ButtonImage,FileTemplate,FilePath) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(program.ProgramNum)+",";
 			}
@@ -107,7 +109,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(program.CommandLine)+"',"
 				+"'"+POut.String(program.Note)+"',"
 				+"'"+POut.String(program.PluginDllName)+"',"
-				+"'"+POut.String(program.ButtonImage)+"')";
+				+"'"+POut.String(program.ButtonImage)+"',"
+				+"'"+POut.String(program.FileTemplate)+"',"
+				+"'"+POut.String(program.FilePath)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -140,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProgramNum,";
 			}
-			command+="ProgName,ProgDesc,Enabled,Path,CommandLine,Note,PluginDllName,ButtonImage) VALUES(";
+			command+="ProgName,ProgDesc,Enabled,Path,CommandLine,Note,PluginDllName,ButtonImage,FileTemplate,FilePath) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(program.ProgramNum)+",";
 			}
@@ -152,7 +156,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(program.CommandLine)+"',"
 				+"'"+POut.String(program.Note)+"',"
 				+"'"+POut.String(program.PluginDllName)+"',"
-				+"'"+POut.String(program.ButtonImage)+"')";
+				+"'"+POut.String(program.ButtonImage)+"',"
+				+"'"+POut.String(program.FileTemplate)+"',"
+				+"'"+POut.String(program.FilePath)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +178,9 @@ namespace OpenDentBusiness.Crud{
 				+"CommandLine  = '"+POut.String(program.CommandLine)+"', "
 				+"Note         = '"+POut.String(program.Note)+"', "
 				+"PluginDllName= '"+POut.String(program.PluginDllName)+"', "
-				+"ButtonImage  = '"+POut.String(program.ButtonImage)+"' "
+				+"ButtonImage  = '"+POut.String(program.ButtonImage)+"', "
+				+"FileTemplate = '"+POut.String(program.FileTemplate)+"', "
+				+"FilePath     = '"+POut.String(program.FilePath)+"' "
 				+"WHERE ProgramNum = "+POut.Long(program.ProgramNum);
 			Db.NonQ(command);
 		}
@@ -211,6 +219,14 @@ namespace OpenDentBusiness.Crud{
 			if(program.ButtonImage != oldProgram.ButtonImage) {
 				if(command!=""){ command+=",";}
 				command+="ButtonImage = '"+POut.String(program.ButtonImage)+"'";
+			}
+			if(program.FileTemplate != oldProgram.FileTemplate) {
+				if(command!=""){ command+=",";}
+				command+="FileTemplate = '"+POut.String(program.FileTemplate)+"'";
+			}
+			if(program.FilePath != oldProgram.FilePath) {
+				if(command!=""){ command+=",";}
+				command+="FilePath = '"+POut.String(program.FilePath)+"'";
 			}
 			if(command==""){
 				return false;

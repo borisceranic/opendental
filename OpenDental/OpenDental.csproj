@@ -421,6 +421,12 @@
     <Compile Include="Forms\FormTempLogOn.designer.cs">
       <DependentUpon>FormTempLogOn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormProgramLinkOutputFile .cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormProgramLinkOutputFile .designer.cs">
+      <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormMessageReplacements.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3878,6 +3884,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTempLogOn.resx">
       <DependentUpon>FormTempLogOn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormProgramLinkOutputFile .resx">
+      <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMessageReplacements.resx">
       <DependentUpon>FormMessageReplacements.cs</DependentUpon>

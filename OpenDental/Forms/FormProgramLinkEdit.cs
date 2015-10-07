@@ -45,6 +45,7 @@ namespace OpenDental{
 		private UI.Button butImport;
 		private Label label10;
 		private PictureBox pictureBox;
+		private UI.Button butOutputFile;
 		private string pathOverrideOld;
 
 		///<summary></summary>
@@ -107,6 +108,7 @@ namespace OpenDental{
 			this.butImport = new OpenDental.UI.Button();
 			this.label10 = new System.Windows.Forms.Label();
 			this.pictureBox = new System.Windows.Forms.PictureBox();
+			this.butOutputFile = new OpenDental.UI.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -389,11 +391,27 @@ namespace OpenDental{
 			this.pictureBox.TabIndex = 72;
 			this.pictureBox.TabStop = false;
 			// 
+			// butOutputFile
+			// 
+			this.butOutputFile.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOutputFile.Autosize = true;
+			this.butOutputFile.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOutputFile.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOutputFile.CornerRadius = 4F;
+			this.butOutputFile.Location = new System.Drawing.Point(246, 489);
+			this.butOutputFile.Name = "butOutputFile";
+			this.butOutputFile.Size = new System.Drawing.Size(75, 26);
+			this.butOutputFile.TabIndex = 73;
+			this.butOutputFile.Text = "Output File";
+			this.butOutputFile.Click += new System.EventHandler(this.butOutputFile_Click);
+			// 
 			// FormProgramLinkEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(797, 560);
+			this.Controls.Add(this.butOutputFile);
 			this.Controls.Add(this.pictureBox);
 			this.Controls.Add(this.butClear);
 			this.Controls.Add(this.butImport);
@@ -519,6 +537,12 @@ namespace OpenDental{
 			ProgramProperties.RefreshCache();
 			ProgramPropertiesForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			FillGrid();
+		}
+
+		private void butOutputFile_Click(object sender,EventArgs e) {
+			FormProgramLinkOutputFile formPLOF;
+			formPLOF=new FormProgramLinkOutputFile(ProgramCur);
+			formPLOF.ShowDialog();
 		}
 
 		private void butImport_Click(object sender,EventArgs e) {
