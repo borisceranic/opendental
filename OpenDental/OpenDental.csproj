@@ -415,17 +415,15 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormProgramLinkOutputFile .cs" />
+    <Compile Include="Forms\FormProgramLinkOutputFile .designer.cs">
+      <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormTempLogOn.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormTempLogOn.designer.cs">
       <DependentUpon>FormTempLogOn.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormProgramLinkOutputFile .cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormProgramLinkOutputFile .designer.cs">
-      <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormMessageReplacements.cs">
       <SubType>Form</SubType>
@@ -459,6 +457,12 @@
     </Compile>
     <Compile Include="Forms\FormStateAbbrs.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormRecordAudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormRecordAudio.designer.cs">
+      <DependentUpon>FormRecordAudio.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormTaskSearch.cs">
       <SubType>Form</SubType>
@@ -3882,11 +3886,11 @@
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormTempLogOn.resx">
-      <DependentUpon>FormTempLogOn.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProgramLinkOutputFile .resx">
       <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormTempLogOn.resx">
+      <DependentUpon>FormTempLogOn.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMessageReplacements.resx">
       <DependentUpon>FormMessageReplacements.cs</DependentUpon>
@@ -3909,6 +3913,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormStateAbbrs.resx">
       <DependentUpon>FormStateAbbrs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormRecordAudio.resx">
+      <DependentUpon>FormRecordAudio.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTaskSearch.resx">
       <DependentUpon>FormTaskSearch.cs</DependentUpon>
