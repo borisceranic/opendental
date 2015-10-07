@@ -17,6 +17,7 @@ using System.Drawing.Text;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using OpenDental.UI;
 using OpenDentBusiness.HL7;
@@ -28,6 +29,9 @@ using PdfSharp.Pdf;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Shapes;
 using MigraDoc.DocumentObjectModel.Tables;
+using MigraDoc.Rendering;
+using MigraDoc.Rendering.Printing;
+using Document=OpenDentBusiness.Document;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -2123,6 +2127,17 @@ namespace OpenDental{
 					}
 				}
 			}
+			if(gridPlans.SelectedIndices[0]>0
+				&& PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)
+			  && PlanList[gridPlans.SelectedIndices[0]-1].Signature!=""
+			  && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) 
+			{
+				//Open PDF and allow user to print from pdf software.
+				Cursor=Cursors.WaitCursor;
+				Documents.OpenDoc(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				Cursor=Cursors.Default;
+				return;
+			}
 			PrepImageForPrinting();
 			MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
 			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
@@ -2140,50 +2155,7 @@ namespace OpenDental{
 					printdoc.Print();
 				}
 			#endif
-			long category=0;
-			OpenDentBusiness.Document docSave = new OpenDentBusiness.Document();
-			MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
-			pdfRenderer.Document=CreateDocument();
-			pdfRenderer.RenderDocument();
-			//Check if there are any image category definitions with "TreatPlans"
-			for(int i=0;i<DefC.Short[(int)DefCat.ImageCats].Length;i++) {
-				if((DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="R" || DefC.Short[(int)DefCat.ImageCats][i].ItemValue=="XR") && PrefC.AtoZfolderUsed) {
-					long docNum=Documents.Insert(docSave);
-					category=DefC.Short[(int)DefCat.ImageCats][i].DefNum;
-					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
-					string fileName="TPArchive"+docSave.DocNum;
-					//Then create a PDF and save it to the AtoZ folder if AtoZ pref is on.
-					byte[] rawData= { };
-					if(PrefC.AtoZfolderUsed) {
-						if(filePath.EndsWith("\\")) {
-						}
-						else {
-							filePath+="\\";
-						}
-						pdfRenderer.Save(filePath+fileName+".pdf");
-					}
-					//Currently never going to get hit because of AtoZ folder check above. This is due to AxAcroPDF functionality.
-					else {//saving to db
-						using(MemoryStream stream=new MemoryStream()) {
-							pdfRenderer.Save(stream,false);
-							rawData=stream.ToArray();
-							stream.Close();
-						}
-					}
-					docSave.ImgType=ImageType.Document;
-					docSave.DateCreated=DateTime.Now;
-					docSave.PatNum=PatCur.PatNum;
-					docSave.DocCategory=category;
-					docSave.Description=fileName;
-					if(!PrefC.AtoZfolderUsed) {
-						docSave.RawBase64=Convert.ToBase64String(rawData);
-					}
-					else {
-						docSave.FileName=fileName+".pdf";
-					}
-					Documents.Update(docSave);//creates filename and saves to db
-				}
-			}
+			SaveTPAsDocument(false);
 		}
 
 		private void ToolBarMainEmail_Click() {
@@ -2204,10 +2176,21 @@ namespace OpenDental{
 			Random rnd=new Random();
 			string fileName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+".pdf";
 			string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
-			MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer=new MigraDoc.Rendering.PdfDocumentRenderer(true,PdfFontEmbedding.Always);
-			pdfRenderer.Document=CreateDocument();
-			pdfRenderer.RenderDocument();
-			pdfRenderer.PdfDocument.Save(filePathAndName);
+			if(gridPlans.SelectedIndices[0]>0 //not the default plan.
+				&& PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) //preference enabled
+			  && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="" //and document is signed
+			  && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) //and file exists
+			{
+				string filePathAndNameTemp=Documents.GetPath(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				//copy file to email attach folder so files will be where they are exptected to be.
+				File.Copy(filePathAndNameTemp,filePathAndName);
+			}
+			else {//generate and save a new document from scratch
+				MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer=new MigraDoc.Rendering.PdfDocumentRenderer(true,PdfFontEmbedding.Always);
+				pdfRenderer.Document=CreateDocument();
+				pdfRenderer.RenderDocument();
+				pdfRenderer.PdfDocument.Save(filePathAndName);
+			}
 			//Process.Start(filePathAndName);
 			EmailMessage message=new EmailMessage();
 			message.PatNum=PatCur.PatNum;
@@ -3059,19 +3042,36 @@ namespace OpenDental{
 				MsgBox.Show(this,"You may only sign a saved TP, not the default TP.");
 				return;
 			}
+			//string patFolder=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
+			if(PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) //preference enabled
+			   && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="" //and document is signed
+			   && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) //and file exists
+			{
+				MsgBox.Show(this,"Document already signed and saved to PDF. Unsign treatment plan from edit window to enable resigning.");
+				Cursor=Cursors.WaitCursor;
+				Documents.OpenDoc(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				Cursor=Cursors.Default;
+				return;//cannot re-sign document.
+			}
+			if(PlanList[gridPlans.SelectedIndices[0]-1].DocNum>0 && !Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Unable to open saved treatment plan. Would you like to recreate document using current information?")) {
+					return;
+				}
+			}
 			PrepImageForPrinting();
 			MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
-			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
-			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
+			MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
+			DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
 			renderer.PrepareDocument();
 			printdoc.Renderer=renderer;
 			FormTPsign FormT=new FormTPsign();
+			FormT.SaveDocDelegate=SaveTPAsDocument;
 			FormT.Document=printdoc;
 			FormT.TotalPages=renderer.FormattedDocument.PageCount;
 			FormT.TPcur=PlanList[gridPlans.SelectedIndices[0]-1];
 			FormT.ShowDialog();
 			long tpNum=PlanList[gridPlans.SelectedIndices[0]-1].TreatPlanNum;
-			ModuleSelected(PatCur.PatNum);
+			ModuleSelected(PatCur.PatNum);//refreshes TPs
 			for(int i=0;i<PlanList.Length;i++) {
 				if(PlanList[i].TreatPlanNum==tpNum) {
 					gridPlans.SetSelected(i+1,true);
@@ -3080,7 +3080,54 @@ namespace OpenDental{
 			FillMain();
 		}
 
-		///<summary>Similar method in Account</summary>
+		///<summary>Saves TP as PDF in each image category defined as TP category. 
+		/// If TreatPlanSaveSignedToPdf enabled, will default to first non-hidden category if no TP categories are explicitly defined.</summary>
+		private List<Document> SaveTPAsDocument(bool isSigSave) {
+			List<Document> retVal=new List<Document>();
+			List<long> categories=DefC.Short[(int)DefCat.ImageCats].Where(x => x.ItemValue=="R" || x.ItemValue=="XR").Select(x=>x.DefNum).ToList();
+			if(isSigSave && categories.Count==0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
+				//we must save at least one document, pick first non-hidden image category.
+				Def imgCat=DefC.Short[(int)DefCat.ImageCats].FirstOrDefault(x => !x.IsHidden);
+				if(imgCat==null) {
+					MsgBox.Show(this,"Unable to save treatment plan because all image categories are hidden.");
+					return new List<Document>();
+				}
+				categories.Add(imgCat.DefNum);
+			}
+			MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
+			pdfRenderer.Document=CreateDocument();
+			pdfRenderer.RenderDocument();
+			string rawBase64="";
+			if(!PrefC.AtoZfolderUsed) {
+				using(MemoryStream stream=new MemoryStream()) {
+					pdfRenderer.Save(stream,false);
+					rawBase64=Convert.ToBase64String(stream.ToArray());
+					stream.Close();
+				}
+			}
+			for(int i=0;i<categories.Count;i++) {//usually only one, but do allow them to be saved once per image category.
+				OpenDentBusiness.Document docSave=new Document();
+				docSave.DocNum=Documents.Insert(docSave);
+				string fileName="TPArchive"+docSave.DocNum;
+				docSave.ImgType=ImageType.Document;
+				docSave.DateCreated=DateTime.Now;
+				docSave.PatNum=PatCur.PatNum;
+				docSave.DocCategory=categories[i];
+				docSave.Description=fileName;//no extension.
+				docSave.RawBase64=rawBase64;//blank if using AtoZfolder
+				if(PrefC.AtoZfolderUsed) {
+					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
+					docSave.FileName=fileName;
+					pdfRenderer.Save(filePath+"\\"+fileName+".pdf");
+				}
+				docSave.FileName+=".pdf";//file extension used fo rboth DB images and AtoZ images
+				Documents.Update(docSave);
+				retVal.Add(docSave);
+			}
+			return retVal;
+		}
+
+	///<summary>Similar method in Account</summary>
 		private bool CheckClearinghouseDefaults() {
 			if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==0) {
 				MsgBox.Show(this,"No default dental clearinghouse defined.");

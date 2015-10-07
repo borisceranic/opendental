@@ -137,6 +137,7 @@ namespace OpenDental{
 		private TextBox textInsWriteoffDescript;
 		private Label label17;
 		private CheckBox checkBrokenApptAdjustmentWithProcedure;
+		private CheckBox checkTPSaveSigned;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -217,6 +218,7 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butColor = new System.Windows.Forms.Button();
 			this.textWaitRoomWarn = new System.Windows.Forms.TextBox();
@@ -295,7 +297,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
+			this.checkTPSaveSigned = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -836,6 +838,18 @@ namespace OpenDental{
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
+			// checkBrokenApptAdjustmentWithProcedure
+			// 
+			this.checkBrokenApptAdjustmentWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustmentWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBrokenApptAdjustmentWithProcedure.Location = new System.Drawing.Point(32, 92);
+			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
+			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
+			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 217;
+			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addtion to broken appt procedure";
+			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
+			// 
 			// label23
 			// 
 			this.label23.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -1151,6 +1165,7 @@ namespace OpenDental{
 			// tabTreatPlan
 			// 
 			this.tabTreatPlan.BackColor = System.Drawing.SystemColors.Window;
+			this.tabTreatPlan.Controls.Add(this.checkTPSaveSigned);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanItemized);
 			this.tabTreatPlan.Controls.Add(this.textDiscountPercentage);
 			this.tabTreatPlan.Controls.Add(this.labelDiscountPercentage);
@@ -1733,17 +1748,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkBrokenApptAdjustmentWithProcedure
+			// checkTPSaveSigned
 			// 
-			this.checkBrokenApptAdjustmentWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBrokenApptAdjustmentWithProcedure.Location = new System.Drawing.Point(32, 92);
-			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
-			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
-			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 217;
-			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addtion to broken appt procedure";
-			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
+			this.checkTPSaveSigned.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTPSaveSigned.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTPSaveSigned.Location = new System.Drawing.Point(138, 169);
+			this.checkTPSaveSigned.Name = "checkTPSaveSigned";
+			this.checkTPSaveSigned.Size = new System.Drawing.Size(302, 17);
+			this.checkTPSaveSigned.TabIndex = 213;
+			this.checkTPSaveSigned.Text = "Save Signed Treatment Plans to PDF";
+			this.checkTPSaveSigned.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTPSaveSigned.UseVisualStyleBackColor = false;
 			// 
 			// FormModuleSetup
 			// 
@@ -1938,6 +1953,7 @@ namespace OpenDental{
 				checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
 			}
 			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized);
+			checkTPSaveSigned.Checked=PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf);
 			#endregion
 			#region Chart Module
 			//Chart module-----------------------------------------------------------------------
@@ -2273,6 +2289,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TreatPlanShowCompleted,checkTreatPlanShowCompleted.Checked)
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,listNegAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
+				| Prefs.UpdateBool(PrefName.TreatPlanSaveSignedToPdf,checkTPSaveSigned.Checked)
 				#endregion
 				#region Chart Module
 				| Prefs.UpdateBool(PrefName.AutoResetTPEntryStatus,checkAutoClearEntryStatus.Checked)

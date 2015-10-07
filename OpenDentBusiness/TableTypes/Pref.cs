@@ -559,6 +559,8 @@ namespace OpenDentBusiness {
 		TreatPlanDiscountPercent,
 		TreatPlanItemized,
 		TreatPlanPriorityForDeclined,
+		///<summary>When a TP is signed a PDF will be generated and saved. If disabled, TPs will be redrawn with current data (pre 15.4 behavior).</summary>
+		TreatPlanSaveSignedToPdf,
 		TreatPlanShowCompleted,
 		TreatPlanShowGraphics,
 		TreatPlanShowIns,

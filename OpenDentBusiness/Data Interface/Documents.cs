@@ -4,10 +4,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDentBusiness {
@@ -578,6 +578,66 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
+		///<summary>Attempts to open the document using the default program. If not using AtoZfolder saves a local temp file and opens it.</summary>
+		public static void OpenDoc(long docNum) {
+			Document docCur=Documents.GetByNum(docNum);
+			if(docCur.DocNum==0) {
+				return;
+			}
+			Patient patCur=Patients.GetPat(docCur.PatNum);
+			if(patCur==null) {
+				return;
+			}
+			string docPath;
+			if(PrefC.AtoZfolderUsed) {
+				docPath=ImageStore.GetFilePath(docCur,ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath()));
+			}
+			else {
+				//Some programs require a file on disk and cannot open in memory files. Save to temp file from DB.
+				docPath=ODFileUtils.CreateRandomFile(ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental"),ImageStore.GetExtension(docCur));
+				File.WriteAllBytes(docPath,Convert.FromBase64String(docCur.RawBase64));
+			}
+			Process.Start(docPath);
+		}
+
+		//Checks to see if the document exists in the correct location, or checks DB for stored content.
+		public static bool DocExists(long docNum) {
+			Document docCur=Documents.GetByNum(docNum);
+			if(docCur.DocNum==0) {
+				return false;
+			}
+			Patient patCur=Patients.GetPat(docCur.PatNum);
+			if(patCur==null) {
+				return false;
+			}
+			if(PrefC.AtoZfolderUsed) {
+				return File.Exists(ImageStore.GetFilePath(docCur,ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath())));
+			}
+			return !string.IsNullOrEmpty(docCur.RawBase64);
+		}
+
+		///<summary>Returns the filepath of the document if using AtoZfolder. If storing files in DB, saves document to local temp file and returns filepath.
+		/// Empty string if not found.</summary>
+		public static string GetPath(long docNum) {
+			Document docCur=Documents.GetByNum(docNum);
+			if(docCur.DocNum==0) {
+				return "";
+			}
+			Patient patCur=Patients.GetPat(docCur.PatNum);
+			if(patCur==null) {
+				return "";
+			}
+			string docPath;
+			if(PrefC.AtoZfolderUsed) {
+				docPath=ImageStore.GetFilePath(docCur,ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath()));
+			}
+			else {
+				//Some programs require a file on disk and cannot open in memory files. Save to temp file from DB.
+				docPath=ODFileUtils.CreateRandomFile(ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental"),ImageStore.GetExtension(docCur));
+				File.WriteAllBytes(docPath,Convert.FromBase64String(docCur.RawBase64));
+			}
+			return docPath;
+		}
 	}	
   
 }

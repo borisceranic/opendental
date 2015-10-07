@@ -14,6 +14,8 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental{
+	public delegate List<Document> SaveFileAsDocDelegate(bool isSigSave);
+
 	///<summary></summary>
 	public class FormTPsign : System.Windows.Forms.Form{
 		private System.ComponentModel.IContainer components;
@@ -39,6 +41,8 @@ namespace OpenDental{
 		///<summary>Must be sorted by primary key.</summary>
 		private List<ProcTP> proctpList;
 				//private bool allowTopaz;
+		///<summary>Should be set to ContrTreat.SaveTPAsDocument(). Can save multiple copies if multiple TP image categories are defined.</summary>
+		public SaveFileAsDocDelegate SaveDocDelegate;
 
 		///<summary></summary>
 		public FormTPsign(){
@@ -539,43 +543,55 @@ namespace OpenDental{
 		}
 
 		private void SaveSignature() {
-			if(SigChanged) {
-				//This check short-circuits so that sigBoxTopaz.Visible will not be checked in MONO ever.
-				//if(allowTopaz && sigBoxTopaz.Visible) {
-				if(sigBoxTopaz.Visible) {
-					TPcur.SigIsTopaz=true;
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						TPcur.Signature="";
-						return;
-					}
-                    CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,TreatPlans.GetHashString(TPcur,proctpList));
-                    CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);
-					TPcur.Signature=CodeBase.TopazWrapper.GetTopazString(sigBoxTopaz);
+			if(!SigChanged) {
+				return;
+			}
+			//This check short-circuits so that sigBoxTopaz.Visible will not be checked in MONO ever.
+			//if(allowTopaz && sigBoxTopaz.Visible) {
+			if(sigBoxTopaz.Visible) {
+				TPcur.SigIsTopaz=true;
+				if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+					TPcur.Signature="";
+					return;
 				}
-				else {
-					TPcur.SigIsTopaz=false;
-					if(sigBox.NumberOfTabletPoints()==0) {
-						TPcur.Signature="";
-						return;
-					}
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString(TreatPlans.GetHashString(TPcur,proctpList));
-					//"0000000000000000");
-					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);
-					//sigBox.SetSigCompressionMode(2);
-					TPcur.Signature=sigBox.GetSigString();
+				CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
+				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
+				CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,TreatPlans.GetHashString(TPcur,proctpList));
+				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);
+				CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);
+				TPcur.Signature=CodeBase.TopazWrapper.GetTopazString(sigBoxTopaz);
+			}
+			else {
+				TPcur.SigIsTopaz=false;
+				if(sigBox.NumberOfTabletPoints()==0) {
+					TPcur.Signature="";
+					return;
 				}
+				//sigBox.SetSigCompressionMode(0);
+				//sigBox.SetEncryptionMode(0);
+				sigBox.SetKeyString(TreatPlans.GetHashString(TPcur,proctpList));
+				//"0000000000000000");
+				//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
+				//sigBox.SetEncryptionMode(2);
+				//sigBox.SetSigCompressionMode(2);
+				TPcur.Signature=sigBox.GetSigString();
 			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			SaveSignature();
-			TreatPlans.Update(TPcur);
+			SaveSignature();//"saves" signature to TPCur, does not save to DB.
+			TreatPlans.Update(TPcur);//save signature to DB.
+			if(TPcur.DocNum>0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) && !Documents.DocExists(TPcur.DocNum)) {
+				//Setting SigChanged to True will resave document below.
+				SigChanged=MsgBox.Show(this,MsgBoxButtons.YesNo,"Cannot find saved copy of signed PDF, would you like to resave the document?");
+			}
+			if(PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) && SaveDocDelegate!=null && SigChanged) {
+				List<Document> docs=SaveDocDelegate(true);
+				if(docs.Count>0) {
+					TPcur.DocNum=docs[0].DocNum;//attach first Doc to TP.
+					TreatPlans.Update(TPcur); //update docnum. must be called after signature is updated.
+				}
+			}
 			SecurityLogs.MakeLogEntry(Permissions.TreatPlanEdit,TPcur.PatNum,"Sign TP");
 			DialogResult=DialogResult.OK;
 		}

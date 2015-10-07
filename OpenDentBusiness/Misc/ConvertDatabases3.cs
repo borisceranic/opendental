@@ -10534,6 +10534,30 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE program ADD FilePath varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE treatplan ADD DocNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD INDEX (DocNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE treatplan ADD DocNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET DocNum = 0 WHERE DocNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan MODIFY DocNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX treatplan_DocNum ON treatplan (DocNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('TreatPlanSaveSignedToPdf','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanSaveSignedToPdf','0')";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -10545,3 +10569,7 @@ namespace OpenDentBusiness {
 
 	}
 }
+
+
+
+

@@ -22,6 +22,8 @@ namespace OpenDentBusiness{
 		public bool SigIsTopaz;
 		///<summary>FK to patient.PatNum. Can be 0.  The patient responsible for approving the treatment.  Public health field not visible to everyone else.</summary>
 		public long ResponsParty;
+		///<summary>FK to document.DocNum. Can be 0.  If signed, this is the pdf document of the TP at time of signing. See PrefName.TreatPlanSaveSignedToPdf</summary>
+		public long DocNum;
 		
 		///<summary></summary>
 		public TreatPlan Copy(){

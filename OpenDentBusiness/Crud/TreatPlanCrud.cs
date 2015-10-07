@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				treatPlan.Signature   = PIn.String(table.Rows[i]["Signature"].ToString());
 				treatPlan.SigIsTopaz  = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
 				treatPlan.ResponsParty= PIn.Long  (table.Rows[i]["ResponsParty"].ToString());
+				treatPlan.DocNum      = PIn.Long  (table.Rows[i]["DocNum"].ToString());
 				retVal.Add(treatPlan);
 			}
 			return retVal;
@@ -94,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -105,7 +106,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(treatPlan.Note)+"',"
 				+"'"+POut.String(treatPlan.Signature)+"',"
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
-				+    POut.Long  (treatPlan.ResponsParty)+")";
+				+    POut.Long  (treatPlan.ResponsParty)+","
+				+    POut.Long  (treatPlan.DocNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -138,7 +140,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -149,7 +151,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(treatPlan.Note)+"',"
 				+"'"+POut.String(treatPlan.Signature)+"',"
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
-				+    POut.Long  (treatPlan.ResponsParty)+")";
+				+    POut.Long  (treatPlan.ResponsParty)+","
+				+    POut.Long  (treatPlan.DocNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -168,7 +171,8 @@ namespace OpenDentBusiness.Crud{
 				+"Note        = '"+POut.String(treatPlan.Note)+"', "
 				+"Signature   = '"+POut.String(treatPlan.Signature)+"', "
 				+"SigIsTopaz  =  "+POut.Bool  (treatPlan.SigIsTopaz)+", "
-				+"ResponsParty=  "+POut.Long  (treatPlan.ResponsParty)+" "
+				+"ResponsParty=  "+POut.Long  (treatPlan.ResponsParty)+", "
+				+"DocNum      =  "+POut.Long  (treatPlan.DocNum)+" "
 				+"WHERE TreatPlanNum = "+POut.Long(treatPlan.TreatPlanNum);
 			Db.NonQ(command);
 		}
@@ -203,6 +207,10 @@ namespace OpenDentBusiness.Crud{
 			if(treatPlan.ResponsParty != oldTreatPlan.ResponsParty) {
 				if(command!=""){ command+=",";}
 				command+="ResponsParty = "+POut.Long(treatPlan.ResponsParty)+"";
+			}
+			if(treatPlan.DocNum != oldTreatPlan.DocNum) {
+				if(command!=""){ command+=",";}
+				command+="DocNum = "+POut.Long(treatPlan.DocNum)+"";
 			}
 			if(command==""){
 				return false;
