@@ -307,12 +307,9 @@ namespace OpenDentBusiness {
 
 		///<summary>Any filenames mentioned in the fileList which are not attached to the given patient are properly attached to that patient. Returns the total number of documents that were newly attached to the patient.</summary>
 		public static int InsertMissing(Patient patient,List<string> fileList) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),patient,fileList);
-			}
+			//No need to check RemotingRole; no call to db.
 			int countAdded=0;
-			string command="SELECT FileName FROM document WHERE PatNum='"+patient.PatNum+"' ORDER BY FileName";
-			DataTable table=Db.GetTable(command);
+			DataTable table=Documents.GetFileNamesForPatient(patient.PatNum);
 			for(int j=0;j<fileList.Count;j++){
 				string fileName=Path.GetFileName(fileList[j]);
 				if(!IsAcceptableFileName(fileName)){
@@ -336,6 +333,15 @@ namespace OpenDentBusiness {
 				}
 			}
 			return countAdded;
+		}
+
+		///<summary>Returns a datatable containing all filenames of the documents for the supplied patnum.</summary>
+		public static DataTable GetFileNamesForPatient(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT FileName FROM document WHERE PatNum='"+patNum+"' ORDER BY FileName";
+			return Db.GetTable(command);
 		}
 
 		///<Summary>Parameters: 1:PatNum</Summary>

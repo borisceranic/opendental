@@ -333,10 +333,16 @@ namespace OpenDentBusiness{
 
 		///<summary>Surround with try/catch.  Must supply the supposedly unaltered oldTask.  Will throw an exception if oldTask does not exactly match the database state.  Keeps users from overwriting each other's changes.</summary>
 		public static void Update(Task task,Task oldTask){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),task,oldTask);
-				return;
+			//No need to check RemotingRole; no call to db.
+			Validate(task,oldTask);//No try/catch here, we want the exception to be thrown back to the calling form.
+			Update(task);
+			if(task.TaskListNum!=oldTask.TaskListNum) {
+				TaskAncestors.Synch(task);
 			}
+		}
+
+		public static void Validate(Task task,Task oldTask) {
+			//No need to check RemotingRole; no call to db.
 			if(task.IsRepeating && task.DateTask.Year>1880) {
 				throw new Exception(Lans.g("Tasks","Task cannot be tagged repeating and also have a date."));
 			}
@@ -361,7 +367,7 @@ namespace OpenDentBusiness{
 					if(task.TaskStatus==TaskStatusEnum.New) {
 						TaskEditCreateLog(Lans.g("Tasks","Task marked new"),task);
 					}
-					//Nothinng for case when Not New and Not Done. Put here in future is wanted
+					//Nothing for case when Not New and Not Done. Put here in future is wanted
 				}
 				if(task.Descript!=oldTask.Descript) {
 					TaskEditCreateLog(Lans.g("Tasks","Task description edited"),task);
@@ -431,10 +437,15 @@ namespace OpenDentBusiness{
 					TaskEditCreateLog(Lans.g("Tasks","Task moved from")+" "+TaskLists.GetOne(oldTask.TaskListNum).Descript,task);
 				}
 			}
-			Crud.TaskCrud.Update(task);
-			if(task.TaskListNum!=oldTask.TaskListNum) {
-				TaskAncestors.Synch(task);
+		}
+
+		///<summary>This update method doesn't do any of the typical checks for the Task update.  Not used normally.</summary>
+		public static void Update(Task task) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),task);
+				return;
 			}
+			Crud.TaskCrud.Update(task);
 		}
 
 		///<summary></summary>
