@@ -3518,6 +3518,15 @@
     <Compile Include="InternalTools\Job Manager\FormJobManager.Designer.cs">
       <DependentUpon>FormJobManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobPicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\UserControlManage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\UserControlManage.Designer.cs">
+      <DependentUpon>UserControlManage.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobProjectSelect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -6028,6 +6037,13 @@
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobManager.resx">
       <DependentUpon>FormJobManager.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobPicker.resx">
+      <DependentUpon>FormJobPicker.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\UserControlManage.resx">
+      <DependentUpon>UserControlManage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobProjectSelect.resx">
       <DependentUpon>FormJobProjectSelect.cs</DependentUpon>

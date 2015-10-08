@@ -38,20 +38,20 @@
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.butClose.Image = global::OpenDental.Properties.Resources.deleteX10;
-			this.butClose.Location = new System.Drawing.Point(430, 3);
+			this.butClose.Location = new System.Drawing.Point(427, 3);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(15, 15);
 			this.butClose.TabIndex = 0;
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// butMerge
+			// butDock
 			// 
 			this.butDock.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butDock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.butDock.ImageList = this.imageList1;
-			this.butDock.Location = new System.Drawing.Point(409, 3);
-			this.butDock.Name = "butMerge";
+			this.butDock.Location = new System.Drawing.Point(407, 3);
+			this.butDock.Name = "butDock";
 			this.butDock.Size = new System.Drawing.Size(15, 15);
 			this.butDock.TabIndex = 1;
 			this.butDock.UseVisualStyleBackColor = true;
@@ -69,7 +69,7 @@
 			this.butRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.butRight.Image = global::OpenDental.Properties.Resources.Right;
-			this.butRight.Location = new System.Drawing.Point(388, 3);
+			this.butRight.Location = new System.Drawing.Point(387, 3);
 			this.butRight.Name = "butRight";
 			this.butRight.Size = new System.Drawing.Size(15, 15);
 			this.butRight.TabIndex = 2;

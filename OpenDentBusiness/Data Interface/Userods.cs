@@ -694,6 +694,21 @@ namespace OpenDentBusiness {
 			return 3;
 		}
 
+		public static List<Userod> GetUsersForJobs() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Userod>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM userod "
+				+"INNER JOIN grouppermission ON userod.UserGroupNum=grouppermission.UserGroupNum "
+				+"WHERE grouppermission.PermType=("+POut.Long((int)Permissions.JobApproval)+" "
+				+"OR "+POut.Long((int)Permissions.JobDocumentation)+" "
+				+"OR "+POut.Long((int)Permissions.JobEdit)+" "
+				+"OR "+POut.Long((int)Permissions.JobManager)+" "
+				+"OR "+POut.Long((int)Permissions.JobReview)+") "
+				+"AND IsHidden=0";
+			return Crud.UserodCrud.SelectMany(command);
+		}
+
 		///<summary>Returns empty string if password is strong enough.  Otherwise, returns explanation of why it's not strong enough.</summary>
 		public static string IsPasswordStrong(string pass) {
 			//No need to check RemotingRole; no call to db.

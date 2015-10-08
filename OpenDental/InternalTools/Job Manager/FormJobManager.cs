@@ -26,7 +26,7 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Project Window"),0,"","Add Project Window"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Job Window"),0,"","Add Job Window"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Review Window"),0,"","Add Review Window"));
-			//ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Manage Window"),0,"","Add Manage Window"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add Manage Window"),0,"","Add Manage Window"));
 		}
 
 		private void ToolBarMain_ButtonClick(object sender,ODToolBarButtonClickEventArgs e) {
@@ -40,9 +40,9 @@ namespace OpenDental {
 				case "Add Review Window":
 					AddJobControl(new UserControlReviews());
 					break;
-				//case "Add Manage Window":
-				//	AddJobControl(new UserControlManage());
-				//	break;
+				case "Add Manage Window":
+					AddJobControl(new UserControlManage());
+					break;
 			}
 		}
 
