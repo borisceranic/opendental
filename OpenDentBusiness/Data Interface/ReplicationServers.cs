@@ -84,7 +84,7 @@ namespace OpenDentBusiness{
 		///<summary>Gets the MySQL server_id variable for the current connection.</summary>
 		public static long GetServer_id() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod());
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
 			if(DataConnection.DBtype!=DatabaseType.MySql) {
 				return 0;
