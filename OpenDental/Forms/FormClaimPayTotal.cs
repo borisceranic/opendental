@@ -42,17 +42,6 @@ namespace OpenDental
 		private List<PatPlan> PatPlanList;
 		private ValidDouble textLabFees;
 		private List<InsSub> SubList;
-		///<summary>Canada only.  The column index where lab fees show in gridMain.</summary>
-		private int _labFeeIdx;
-		///<summary>The column index where deductibles show in gridMain.</summary>
-		private int _deductIdx;
-		///<summary>The column index where allowed amounts show in gridMain.</summary>
-		private int _allowedIdx;
-		///<summary>The column index where insurance paid amounts show in gridMain.</summary>
-		private int _insPayIdx;
-		///<summary>The column index where writeoffs show in gridMain.</summary>
-		private int _writeoffIdx;
-		///<summary>A list of all non-hidden claim payment tracking definitions.</summary>
 		private List<Def> _listClaimPaymentTrackingDefs;
 
 		///<summary></summary>
@@ -316,23 +305,7 @@ namespace OpenDental
 
 		private void FormClaimPayTotal_Load(object sender, System.EventArgs e) {
 			ProcList=Procedures.Refresh(PatCur.PatNum);
-			int toothIndexOffset=0;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				toothIndexOffset=1;
-			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-				_labFeeIdx=6-toothIndexOffset;
-				_deductIdx=7-toothIndexOffset;
-				_allowedIdx=8-toothIndexOffset;
-				_insPayIdx=9-toothIndexOffset;
-				_writeoffIdx=10-toothIndexOffset;
-			}
-			else {//United States
-				_labFeeIdx=-1;//Not used in United States.  Canada only.
-				_deductIdx=6-toothIndexOffset;
-				_allowedIdx=7-toothIndexOffset;
-				_insPayIdx=8-toothIndexOffset;
-				_writeoffIdx=9-toothIndexOffset;
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				textLabFees.Visible=false;
 				textDedApplied.Location=textLabFees.Location;
 				textInsPayAllowed.Location=new Point(textDedApplied.Right-1,textInsPayAllowed.Location.Y);
@@ -347,10 +320,10 @@ namespace OpenDental
 		private void FormClaimPayTotal_Shown(object sender,EventArgs e) {
 			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,PlanList);
 			if(plan.AllowedFeeSched!=0){//allowed fee sched
-				gridMain.SetSelected(new Point(_allowedIdx,0));//Allowed, first row.
+				gridMain.SetSelected(new Point(gridMain.Columns.GetIndex("Allowed"),0));//Allowed, first row.
 			}
 			else{
-				gridMain.SetSelected(new Point(_insPayIdx,0));//InsPay, first row.
+				gridMain.SetSelected(new Point(gridMain.Columns.GetIndex("Ins Pay"),0));//InsPay, first row.
 			}
 		}
 
@@ -496,11 +469,7 @@ namespace OpenDental
 		}
 
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
-			try{
-				SaveGridChanges();
-			}
-			catch(ApplicationException ex){
-				MessageBox.Show(ex.Message);
+			if(!SaveGridChanges()) {
 				return;
 			}
 			List<ClaimProcHist> histList=null;
@@ -532,23 +501,12 @@ namespace OpenDental
 			for(int i=0;i<gridMain.Rows.Count;i++){
 				claimFee+=ClaimProcsToEdit[i].FeeBilled;//5
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-					try {//lab fees
-						labFees+=Convert.ToDouble(gridMain.Rows[i].Cells[_labFeeIdx].Text);
-					}
-					catch{}
+					labFees+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Labs")].Text);
 				}
-				try{//deduct
-					dedApplied+=Convert.ToDouble(gridMain.Rows[i].Cells[_deductIdx].Text);
-				}catch{}
-				try{//allowed
-					insPayAmtAllowed+=Convert.ToDouble(gridMain.Rows[i].Cells[_allowedIdx].Text);
-				}catch{}
-				try{//inspayest
-					insPayAmt+=Convert.ToDouble(gridMain.Rows[i].Cells[_insPayIdx].Text);
-				}catch{}
-				try{//writeoff
-					writeOff+=Convert.ToDouble(gridMain.Rows[i].Cells[_writeoffIdx].Text);
-				}catch{}
+				dedApplied+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Deduct")].Text);
+				insPayAmtAllowed+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Allowed")].Text);
+				insPayAmt+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Ins Pay")].Text);
+				writeOff+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Writeoff")].Text);
 			}
 			textClaimFee.Text=claimFee.ToString("F");
 			textLabFees.Text=labFees.ToString("F");
@@ -558,76 +516,60 @@ namespace OpenDental
 			textWriteOff.Text=writeOff.ToString("F");
 		}
 
-		///<Summary>Surround with try-catch.</Summary>
-		private void SaveGridChanges(){
+		private bool SaveGridChanges(){
 			//validate all grid cells
-			double dbl;
+			double dbl=0;
+			int deductIdx=gridMain.Columns.GetIndex("Deduct");
+			int allowedIdx=gridMain.Columns.GetIndex("Allowed");
+			int insPayIdx=gridMain.Columns.GetIndex("Ins Pay");
+			int writeoffIdx=gridMain.Columns.GetIndex("Writeoff");
 			for(int i=0;i<gridMain.Rows.Count;i++){
-				if(gridMain.Rows[i].Cells[_deductIdx].Text!=""){//deduct
-					try{
-						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[_deductIdx].Text);
+				try{
+					//Check for invalid numbers being entered.
+					if(gridMain.Rows[i].Cells[deductIdx].Text != "") {
+						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[deductIdx].Text);
 					}
-					catch{
-						throw new ApplicationException(Lan.g(this,"Deductible not valid: ")+gridMain.Rows[i].Cells[_deductIdx].Text);
+					if(gridMain.Rows[i].Cells[allowedIdx].Text != "") {
+						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[allowedIdx].Text);
 					}
-				}
-				if(gridMain.Rows[i].Cells[_allowedIdx].Text!=""){//allowed
-					try{
-						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[_allowedIdx].Text);
+					if(gridMain.Rows[i].Cells[insPayIdx].Text != "") {
+						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[insPayIdx].Text);
 					}
-					catch{
-						throw new ApplicationException(Lan.g(this,"Allowed amt not valid: ")+gridMain.Rows[i].Cells[_allowedIdx].Text);
-					}
-				}
-				if(gridMain.Rows[i].Cells[_insPayIdx].Text!=""){//inspay
-					try{
-						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[_insPayIdx].Text);
-					}
-					catch{
-						throw new ApplicationException(Lan.g(this,"Ins Pay not valid: ")+gridMain.Rows[i].Cells[_insPayIdx].Text);
+					if(gridMain.Rows[i].Cells[writeoffIdx].Text != "") {
+						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[writeoffIdx].Text);
 					}
 				}
-				if(gridMain.Rows[i].Cells[_writeoffIdx].Text!=""){//writeoff
-					try{
-						dbl=Convert.ToDouble(gridMain.Rows[i].Cells[_writeoffIdx].Text);
-						if(dbl<0){
-							throw new ApplicationException(Lan.g(this,"Writeoff cannot be negative: ")+gridMain.Rows[i].Cells[_writeoffIdx].Text);
-						}
-					}
-					catch{
-						throw new ApplicationException(Lan.g(this,"Writeoff not valid: ")+gridMain.Rows[i].Cells[_writeoffIdx].Text);
-					}
+				catch{
+					MsgBox.Show(this,"Invalid number.  It needs to be in 0.00 form.");
+					return false;
+				}
+				if(dbl<0) {
+					MsgBox.Show(this,"Writeoff cannot be negative.");
+					return false;
 				}
 			}
 			for(int i=0;i<ClaimProcsToEdit.Length;i++) {
-				ClaimProcsToEdit[i].DedApplied=PIn.Double(gridMain.Rows[i].Cells[_deductIdx].Text);
-				if(gridMain.Rows[i].Cells[_allowedIdx].Text=="") {
+				ClaimProcsToEdit[i].DedApplied=PIn.Double(gridMain.Rows[i].Cells[deductIdx].Text);
+				if(gridMain.Rows[i].Cells[allowedIdx].Text=="") {
 					ClaimProcsToEdit[i].AllowedOverride=-1;
 				}
 				else {
-					ClaimProcsToEdit[i].AllowedOverride=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
+					ClaimProcsToEdit[i].AllowedOverride=PIn.Double(gridMain.Rows[i].Cells[allowedIdx].Text);
 				}
-				ClaimProcsToEdit[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[_insPayIdx].Text);
-				ClaimProcsToEdit[i].WriteOff=PIn.Double(gridMain.Rows[i].Cells[_writeoffIdx].Text);
-				int toothIndexOffset=0;
-				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					toothIndexOffset=1;
-				}
-				ClaimProcsToEdit[i].ClaimPaymentTracking=_listClaimPaymentTrackingDefs[gridMain.Rows[i].Cells[12-toothIndexOffset].SelectedIndex].DefNum;
-				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[13-toothIndexOffset].Text;
+				ClaimProcsToEdit[i].InsPayAmt=PIn.Double(gridMain.Rows[i].Cells[insPayIdx].Text);
+				ClaimProcsToEdit[i].WriteOff=PIn.Double(gridMain.Rows[i].Cells[writeoffIdx].Text);
+				ClaimProcsToEdit[i].ClaimPaymentTracking=_listClaimPaymentTrackingDefs[gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Pay Tracking")].SelectedIndex].DefNum;
+				ClaimProcsToEdit[i].Remarks=gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Remarks")].Text;
 			}
+			return true;
 		}
 
 		private void butDeductible_Click(object sender, System.EventArgs e) {
 			if(gridMain.SelectedCell.X==-1){
-				MessageBox.Show(Lan.g(this,"Please select one procedure.  Then click this button to assign the deductible to that procedure."));
+				MsgBox.Show(this,"Please select one procedure.  Then click this button to assign the deductible to that procedure.");
 				return;
 			}
-			try {
-				SaveGridChanges();
-			}
-			catch(ApplicationException ex) {
-				MessageBox.Show(ex.Message);
+			if(!SaveGridChanges()) {
 				return;
 			}
 			Double dedAmt=0;
@@ -641,7 +583,7 @@ namespace OpenDental
 				}
 			}
 			if(dedAmt==0){
-				MessageBox.Show(Lan.g(this,"There does not seem to be a deductible to apply.  You can still apply a deductible manually by double clicking on a procedure."));
+				MsgBox.Show(this,"There does not seem to be a deductible to apply.  You can still apply a deductible manually by double clicking on a procedure.");
 				return;
 			}
 			//then move dedAmt to the selected proc
@@ -667,11 +609,7 @@ namespace OpenDental
 					return;
 				}
 			}
-			try {
-				SaveGridChanges();
-			}
-			catch(ApplicationException ex) {
-				MessageBox.Show(ex.Message);
+			if(!SaveGridChanges()) {
 				return;
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && dresWriteoff==DialogResult.Yes) {//Canadian. en-CA or fr-CA
@@ -731,7 +669,7 @@ namespace OpenDental
 			//if no allowed fees entered, then nothing to do 
 			bool allowedFeesEntered=false;
 			for(int i=0;i<gridMain.Rows.Count;i++){
-				if(gridMain.Rows[i].Cells[_allowedIdx].Text!=""){
+				if(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Allowed")].Text!=""){
 					allowedFeesEntered=true;
 					break;
 				}
@@ -779,11 +717,11 @@ namespace OpenDental
 					FeeCur.CodeNum=codeNum;
 					FeeCur.ClinicNum=proc.ClinicNum;
 					FeeCur.ProvNum=proc.ProvNum;
-					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
+					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Allowed")].Text);
 					Fees.Insert(FeeCur);
 				}
 				else{
-					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
+					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Allowed")].Text);
 					Fees.Update(FeeCur);
 				}
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(FeeCur.CodeNum)
@@ -794,11 +732,7 @@ namespace OpenDental
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			try {
-				SaveGridChanges();
-			}
-			catch(ApplicationException ex) {
-				MessageBox.Show(ex.Message);
+			if(!SaveGridChanges()) {
 				return;
 			}
 			SaveAllowedFees();
