@@ -1810,6 +1810,7 @@ namespace OpenDental
 						patPortion=proc.ProcFee*(proc.BaseUnits+proc.UnitQty)-ClaimProcCur.InsPayAmt-ClaimProcCur.WriteOff;
 					}
 					textPatPortion2.Text=patPortion.ToString("f");
+					labelPatPortion1.Visible=false;
 					textPatPortion1.Visible=false;
 				}
 			}
