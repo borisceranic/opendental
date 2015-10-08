@@ -447,13 +447,21 @@ namespace OpenDental {
 					bmpOriginal.Dispose();
 					bmpOriginal=new Bitmap(ms);
 				}
-				// 10/07/2015 Task created by Brian for a customer stated that when creating a PDF of a sheet that is generated using an image as a background 
+				// 07/24/2015 Task created by Brian for a customer stated that when creating a PDF of a sheet that is generated using an image as a background 
 				// the PDF will sometimes distort the image beyond recognition.  This didn't happen in 14.3 and began happening in 15.1.  In versions 14.3 and 
 				// earlier this section of code would resize the image gotten from the specified file and put it into a new Bitmap object.  It was discovered 
 				// that the act of using the Bitmap created directly from the file would lead to the garbled image, so we decided to put the image Bitmap into
 				// a new Bitmap without resizing which fixes the issue without the quality loss that was present when we resized in 14.3.
-				Bitmap bmpDraw=new Bitmap(bmpOriginal);
-				XImage xI=XImage.FromGdiPlusImage(bmpDraw);
+				//Bitmap bmpDraw=new Bitmap(bmpOriginal);
+				//XImage xI=XImage.FromGdiPlusImage(bmpDraw);
+				// 10/07/2015 We cannot do the above fix for the distorted images because it forcefully changes all images to be BMPs.  
+				// Instead, we need to resave the image but in it's native "RawFormat" in order to preserve it's original format.
+				// Forcefully making all images on PDFs use BMP causes the PDFs to bloat in size significantly (harder to email).  E.g. 2MB turns into 22MBs. 
+				ms=new MemoryStream();
+				bmpOriginal.Save(ms,bmpOriginal.RawFormat);
+				bmpOriginal.Dispose();
+				bmpOriginal=new Bitmap(ms);
+				XImage xI=XImage.FromGdiPlusImage(bmpOriginal);
 				gx.DrawImage(xI,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
 				xI.Dispose();
 				xI=null;
