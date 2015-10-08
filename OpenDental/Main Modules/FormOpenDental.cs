@@ -2205,7 +2205,7 @@ namespace OpenDental{
 					Application.Exit();//Exits with ExitCode=0
 					return;
 				}
-				if(ReplicationServers.Server_id!=0 && ReplicationServers.Server_id==PrefC.GetInt(PrefName.ReplicationFailureAtServer_id)) {
+				if(ReplicationServers.Server_id!=0 && ReplicationServers.Server_id==PrefC.GetLong(PrefName.ReplicationFailureAtServer_id)) {
 					MsgBox.Show(this,"This database is temporarily unavailable.  Please connect instead to your alternate database at the other location.");
 					formChooseDb.NoShow=YN.No;//This ensures they will get a choose db window next time through the loop.
 					ReplicationServers.Server_id=-1;
@@ -6967,7 +6967,7 @@ namespace OpenDental{
 			}
 			//Shut down all copies of OD and set ReplicationFailureAtServer_id to this server_id
 			//No workstations will be able to connect to this single server while this flag is set.
-			Prefs.UpdateInt(PrefName.ReplicationFailureAtServer_id,ReplicationServers.Server_id);
+			Prefs.UpdateLong(PrefName.ReplicationFailureAtServer_id,ReplicationServers.Server_id);
 			//shut down all workstations on all servers
 			FormOpenDental.signalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
 			Signalod sig=new Signalod();

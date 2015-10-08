@@ -145,7 +145,7 @@ namespace OpenDental {
 		}
 
 		private void butTest_Click(object sender,EventArgs e) {
-			int server_id=ReplicationServers.Server_id;
+			long server_id=ReplicationServers.Server_id;
 			string msg="";
 			if(server_id==0) {
 				msg="server_id not set for this server.\r\n\r\n";
