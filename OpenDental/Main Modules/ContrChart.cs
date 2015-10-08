@@ -7111,7 +7111,9 @@ namespace OpenDental{
 						}
 					}
 				}
-				else if(row["RxNum"].ToString()!="0"){
+				else if(row["RxNum"].ToString()!="0") {
+					RxPat rxPat=RxPats.GetRx(PIn.Long(row["RxNum"].ToString()));
+					SecurityLogs.MakeLogEntry(Permissions.RxEdit,PatCur.PatNum,"FROM("+rxPat.RxDate.ToShortDateString()+","+rxPat.Drug+","+rxPat.ProvNum+","+rxPat.Disp+","+rxPat.Refills+")"+"\r\nTO('deleted')",rxPat.RxNum);
 					RxPats.Delete(PIn.Long(row["RxNum"].ToString()));
 				}
 				else if(row["CommlogNum"].ToString()!="0"){
