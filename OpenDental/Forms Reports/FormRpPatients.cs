@@ -1037,6 +1037,8 @@ namespace OpenDental{
 					ComboBox.Items.Add("Inactive");
 					ComboBox.Items.Add("Archived");
 					ComboBox.Items.Add("Deleted");
+					ComboBox.Items.Add("Deceased");
+					ComboBox.Items.Add("Prospective");
 					break;
    		  case "Gender":
           SetListBoxConditions();
