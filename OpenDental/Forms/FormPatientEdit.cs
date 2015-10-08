@@ -2652,8 +2652,11 @@ namespace OpenDental{
 				return;
 			}
 			TextBox textPhone=(TextBox)sender;
+			int phoneTextPosition=textPhone.SelectionStart;
+			int textLength=textPhone.Text.Length;
 			textPhone.Text=TelephoneNumbers.AutoFormat(textPhone.Text);
-			textPhone.SelectionStart=textPhone.Text.Length;
+			int diff=textPhone.Text.Length-textLength;
+			textPhone.SelectionStart=phoneTextPosition+diff;
 		}
 
 		private void butAuto_Click(object sender, System.EventArgs e) {
