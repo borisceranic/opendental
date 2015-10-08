@@ -11,13 +11,15 @@ namespace OpenDentBusiness{
 	public class ReplicationServers{
 		///<summary></summary>
 		private static List<ReplicationServer> listt;
-		///<summary>This value is only retrieved once upon startup.</summary>
-		private static int server_id=-1;
+		///<summary>This value is only retrieved once upon startup.  This variable is a long because Google's cloud services have server id's that
+		///are of a higher value than a signed int can contained.  Additionally, 0 is a valid server id based on MySQL so we need to use -1 and can't
+		///use a uint data type.</summary>
+		private static long server_id=-1;
 		///<summary>Class level variable because tick interval is long enough to result in frequent duplicate random numbers.</summary>
 		private static Random _random=new Random();
 
 		/// <summary>The first time this is accessed, the value is obtained using a query.  Will be 0 unless a server id was set in my.ini.</summary>
-		public static int Server_id {
+		public static long Server_id {
 			get{
 				if(server_id==-1) {
 					server_id=GetServer_id();
@@ -80,7 +82,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets the MySQL server_id variable for the current connection.</summary>
-		public static int GetServer_id() {
+		public static long GetServer_id() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetInt(MethodBase.GetCurrentMethod());
 			}
@@ -89,7 +91,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SHOW VARIABLES LIKE 'server_id'";
 			DataTable table=Db.GetTable(command);
-			return PIn.Int(table.Rows[0][1].ToString());
+			return PIn.Long(table.Rows[0][1].ToString());
 		}
 
 		///<summary>Generates a random primary key.  Tests to see if that key already exists before returning it for use.  The range of returned values is greater than 0, and less than or equal to 9223372036854775807.</summary>
@@ -202,7 +204,7 @@ namespace OpenDentBusiness{
 				//even though we are supposed to be guaranteed to not be a web client
 				return true;
 			}
-			string command="SELECT COUNT(*) FROM replicationserver WHERE ServerId="+POut.Int(Server_id)//does trigger another query if during startup
+			string command="SELECT COUNT(*) FROM replicationserver WHERE ServerId="+POut.Long(Server_id)//does trigger another query if during startup
 				+" AND UpdateBlocked=1";
 			try {
 				if(Db.GetScalar(command)=="0") {
