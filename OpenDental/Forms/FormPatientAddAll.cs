@@ -669,14 +669,6 @@ namespace OpenDental {
 				}
 				refCur=FormRS.SelectedReferral;
 			}
-			//_refAttachCur=new RefAttach();
-			//_refAttachCur.ReferralNum=refCur.ReferralNum;
-			//_refAttachCur.IsFrom=true;
-			//_refAttachCur.RefDate=DateTimeOD.Today;
-			//if(refCur.IsDoctor) {//whether using ehr or not
-			//	_refAttachCur.IsTransitionOfCare=true;
-			//}
-			//_refAttachCur.ItemOrder=1;
 			_refCur=refCur;
 			FillReferredFrom();
 		}
@@ -1392,13 +1384,15 @@ namespace OpenDental {
 			pat.AddrNote=textAddrNotes.Text;
 			pat.ClinicNum=FormOpenDental.ClinicNum;
 			RefAttach refAttachCur=new RefAttach();
-			refAttachCur.ReferralNum=_refCur.ReferralNum;
-			refAttachCur.IsFrom=true;
-			refAttachCur.RefDate=DateTimeOD.Today;
-			if(_refCur.IsDoctor) {//whether using ehr or not
-				refAttachCur.IsTransitionOfCare=true;
+			if(_refCur!=null) {
+				refAttachCur.ReferralNum=_refCur.ReferralNum;
+				refAttachCur.IsFrom=true;
+				refAttachCur.RefDate=DateTimeOD.Today;
+				if(_refCur.IsDoctor) {//whether using ehr or not
+					refAttachCur.IsTransitionOfCare=true;
+				}
+				refAttachCur.ItemOrder=1;
 			}
-			refAttachCur.ItemOrder=1;
 			for(int i=0;i<arrayPatsInFam.Length;i++) {
 				//this is just in case, since we are using the same Patient object for every family member inserted
 				//probably not necessary since inserting will assign a new PatNum
