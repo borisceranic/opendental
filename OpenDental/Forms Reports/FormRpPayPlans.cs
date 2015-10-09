@@ -28,14 +28,16 @@ namespace OpenDental
 		private RadioButton radioBoth;
 		private RadioButton radioPatient;
 		private RadioButton radioInsurance;
-		private MonthCalendar dateEnd;
-		private MonthCalendar dateStart;
 		private CheckBox checkShowFamilyBalance;
 		private CheckBox checkAllClin;
 		private ListBox listClin;
 		private Label labelClin;
 		private List<Clinic> _listClinics;
 		private CheckBox checkHasDateRange;
+		private DateTimePicker dateStart;
+		private DateTimePicker dateEnd;
+		private Label label2;
+		private Label label3;
 		//private int pagesPrinted;
 		private ErrorProvider errorProvider1=new ErrorProvider();
 		//private DataTable BirthdayTable;
@@ -71,13 +73,15 @@ namespace OpenDental
 			this.radioBoth = new System.Windows.Forms.RadioButton();
 			this.radioPatient = new System.Windows.Forms.RadioButton();
 			this.radioInsurance = new System.Windows.Forms.RadioButton();
-			this.dateEnd = new System.Windows.Forms.MonthCalendar();
-			this.dateStart = new System.Windows.Forms.MonthCalendar();
 			this.checkShowFamilyBalance = new System.Windows.Forms.CheckBox();
 			this.checkAllClin = new System.Windows.Forms.CheckBox();
 			this.listClin = new System.Windows.Forms.ListBox();
 			this.labelClin = new System.Windows.Forms.Label();
 			this.checkHasDateRange = new System.Windows.Forms.CheckBox();
+			this.dateStart = new System.Windows.Forms.DateTimePicker();
+			this.dateEnd = new System.Windows.Forms.DateTimePicker();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -90,7 +94,7 @@ namespace OpenDental
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(500, 445);
+			this.butCancel.Location = new System.Drawing.Point(499, 325);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 44;
@@ -105,7 +109,7 @@ namespace OpenDental
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(419, 445);
+			this.butOK.Location = new System.Drawing.Point(420, 325);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 43;
@@ -115,7 +119,7 @@ namespace OpenDental
 			// checkHideCompletePlans
 			// 
 			this.checkHideCompletePlans.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHideCompletePlans.Location = new System.Drawing.Point(31, 276);
+			this.checkHideCompletePlans.Location = new System.Drawing.Point(31, 168);
 			this.checkHideCompletePlans.Name = "checkHideCompletePlans";
 			this.checkHideCompletePlans.Size = new System.Drawing.Size(216, 18);
 			this.checkHideCompletePlans.TabIndex = 45;
@@ -125,7 +129,7 @@ namespace OpenDental
 			// checkAllProv
 			// 
 			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllProv.Location = new System.Drawing.Point(252, 201);
+			this.checkAllProv.Location = new System.Drawing.Point(252, 93);
 			this.checkAllProv.Name = "checkAllProv";
 			this.checkAllProv.Size = new System.Drawing.Size(95, 16);
 			this.checkAllProv.TabIndex = 48;
@@ -134,7 +138,7 @@ namespace OpenDental
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(251, 221);
+			this.listProv.Location = new System.Drawing.Point(251, 113);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listProv.Size = new System.Drawing.Size(163, 199);
@@ -143,7 +147,7 @@ namespace OpenDental
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(249, 182);
+			this.label1.Location = new System.Drawing.Point(249, 74);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(104, 16);
 			this.label1.TabIndex = 46;
@@ -155,7 +159,7 @@ namespace OpenDental
 			this.groupBox1.Controls.Add(this.radioBoth);
 			this.groupBox1.Controls.Add(this.radioPatient);
 			this.groupBox1.Controls.Add(this.radioInsurance);
-			this.groupBox1.Location = new System.Drawing.Point(23, 183);
+			this.groupBox1.Location = new System.Drawing.Point(23, 75);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(173, 87);
 			this.groupBox1.TabIndex = 49;
@@ -191,22 +195,10 @@ namespace OpenDental
 			this.radioInsurance.Text = "Insurance";
 			this.radioInsurance.UseVisualStyleBackColor = true;
 			// 
-			// dateEnd
-			// 
-			this.dateEnd.Location = new System.Drawing.Point(305, 18);
-			this.dateEnd.Name = "dateEnd";
-			this.dateEnd.TabIndex = 51;
-			// 
-			// dateStart
-			// 
-			this.dateStart.Location = new System.Drawing.Point(48, 18);
-			this.dateStart.Name = "dateStart";
-			this.dateStart.TabIndex = 50;
-			// 
 			// checkShowFamilyBalance
 			// 
 			this.checkShowFamilyBalance.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowFamilyBalance.Location = new System.Drawing.Point(31, 297);
+			this.checkShowFamilyBalance.Location = new System.Drawing.Point(31, 189);
 			this.checkShowFamilyBalance.Name = "checkShowFamilyBalance";
 			this.checkShowFamilyBalance.Size = new System.Drawing.Size(216, 18);
 			this.checkShowFamilyBalance.TabIndex = 52;
@@ -216,7 +208,7 @@ namespace OpenDental
 			// checkAllClin
 			// 
 			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllClin.Location = new System.Drawing.Point(420, 202);
+			this.checkAllClin.Location = new System.Drawing.Point(420, 94);
 			this.checkAllClin.Name = "checkAllClin";
 			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
 			this.checkAllClin.TabIndex = 57;
@@ -225,7 +217,7 @@ namespace OpenDental
 			// 
 			// listClin
 			// 
-			this.listClin.Location = new System.Drawing.Point(420, 221);
+			this.listClin.Location = new System.Drawing.Point(420, 113);
 			this.listClin.Name = "listClin";
 			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listClin.Size = new System.Drawing.Size(154, 199);
@@ -234,7 +226,7 @@ namespace OpenDental
 			// 
 			// labelClin
 			// 
-			this.labelClin.Location = new System.Drawing.Point(417, 184);
+			this.labelClin.Location = new System.Drawing.Point(417, 76);
 			this.labelClin.Name = "labelClin";
 			this.labelClin.Size = new System.Drawing.Size(104, 16);
 			this.labelClin.TabIndex = 55;
@@ -246,27 +238,61 @@ namespace OpenDental
 			this.checkHasDateRange.Checked = true;
 			this.checkHasDateRange.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkHasDateRange.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHasDateRange.Location = new System.Drawing.Point(31, 318);
+			this.checkHasDateRange.Location = new System.Drawing.Point(31, 210);
 			this.checkHasDateRange.Name = "checkHasDateRange";
 			this.checkHasDateRange.Size = new System.Drawing.Size(216, 18);
 			this.checkHasDateRange.TabIndex = 58;
-			this.checkHasDateRange.Text = "Use Date Range";
+			this.checkHasDateRange.Text = "Limit to Plans Created in Date Range";
 			this.checkHasDateRange.UseVisualStyleBackColor = true;
 			this.checkHasDateRange.Click += new System.EventHandler(this.checkHasDateRange_Click);
+			// 
+			// dateStart
+			// 
+			this.dateStart.Location = new System.Drawing.Point(47, 32);
+			this.dateStart.Name = "dateStart";
+			this.dateStart.Size = new System.Drawing.Size(224, 20);
+			this.dateStart.TabIndex = 59;
+			// 
+			// dateEnd
+			// 
+			this.dateEnd.Location = new System.Drawing.Point(315, 32);
+			this.dateEnd.Name = "dateEnd";
+			this.dateEnd.Size = new System.Drawing.Size(224, 20);
+			this.dateEnd.TabIndex = 60;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(47, 8);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(100, 23);
+			this.label2.TabIndex = 61;
+			this.label2.Text = "DateStart:";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(315, 8);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(100, 23);
+			this.label3.TabIndex = 62;
+			this.label3.Text = "Date End:";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// FormRpPayPlans
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(586, 481);
+			this.ClientSize = new System.Drawing.Size(586, 361);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.dateEnd);
+			this.Controls.Add(this.dateStart);
 			this.Controls.Add(this.checkHasDateRange);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.listClin);
 			this.Controls.Add(this.labelClin);
 			this.Controls.Add(this.checkShowFamilyBalance);
-			this.Controls.Add(this.dateEnd);
-			this.Controls.Add(this.dateStart);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.checkAllProv);
 			this.Controls.Add(this.listProv);
@@ -275,7 +301,7 @@ namespace OpenDental
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(602, 519);
+			this.MinimumSize = new System.Drawing.Size(602, 399);
 			this.Name = "FormRpPayPlans";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment Plans Report";
@@ -287,8 +313,8 @@ namespace OpenDental
 		#endregion
 
 		private void FormRpPayPlans_Load(object sender, System.EventArgs e){
-			dateStart.SelectionStart=DateTime.Today;
-			dateEnd.SelectionStart=DateTime.Today;
+			dateStart.Value=DateTime.Today;
+			dateEnd.Value=DateTime.Today;
 			checkHideCompletePlans.Checked=true;
 			List<Provider> listShort=ProviderC.GetListShort();
 			for(int i=0;i<listShort.Count;i++) {
@@ -377,7 +403,7 @@ namespace OpenDental
 					return;
 				}
 			}
-			if(dateStart.SelectionStart>dateEnd.SelectionStart) {
+			if(dateStart.Value>dateEnd.Value) {
 				MsgBox.Show(this,"Start date cannot be greater than the end date.");
 				return;
 			}
@@ -417,7 +443,7 @@ namespace OpenDental
 			else {
 				displayPayPlanType=DisplayPayPlanType.Both;
 			}
-			DataTable table=RpPayPlan.GetPayPlanTable(dateStart.SelectionStart,dateEnd.SelectionStart,listProvNums,listClinicNums,checkAllProv.Checked
+			DataTable table=RpPayPlan.GetPayPlanTable(dateStart.Value,dateEnd.Value,listProvNums,listClinicNums,checkAllProv.Checked
 					,displayPayPlanType,checkHideCompletePlans.Checked,checkShowFamilyBalance.Checked,checkHasDateRange.Checked);
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
@@ -427,7 +453,7 @@ namespace OpenDental
 			report.AddTitle("Title",Lan.g(this,"Payment Plans"),fontTitle);
 			report.AddSubTitle("PracticeTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			if(checkHasDateRange.Checked) {
-				report.AddSubTitle("Date SubTitle",dateStart.SelectionStart.ToShortDateString()+" - "+dateEnd.SelectionStart.ToShortDateString(),fontSubTitle);
+				report.AddSubTitle("Date SubTitle",dateStart.Value.ToShortDateString()+" - "+dateEnd.Value.ToShortDateString(),fontSubTitle);
 			}
 			else{
 				report.AddSubTitle("Date SubTitle",DateTimeOD.Today.ToShortDateString(),fontSubTitle);
