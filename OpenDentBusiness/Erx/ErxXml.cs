@@ -78,7 +78,7 @@ namespace OpenDentBusiness {
 			}
 			ncScript.Destination=new DestinationType();
 			ncScript.Destination.requestedPage=RequestedPageType.compose;//This is the tab that the user will want 90% of the time.
-			string practiceTitle=Tidy(PrefC.GetString(PrefName.PracticeTitle));//May be blank.
+			string practiceTitle=Tidy(PrefC.GetString(PrefName.PracticeTitle),50);//May be blank.
 			string practicePhone=PrefC.GetString(PrefName.PracticePhone);//Validated to be 10 digits within the chart.
 			string practiceFax=PrefC.GetString(PrefName.PracticeFax);//Validated to be 10 digits within the chart.
 			string practiceAddress=PrefC.GetString(PrefName.PracticeAddress);//Validated to exist in chart.
@@ -301,10 +301,12 @@ namespace OpenDentBusiness {
 		}
 
 		/// <summary>Cleans supplied string to conform to XML standards.</summary>
-		public static string Tidy(string input) {
+		public static string Tidy(string input,int length) {
 			string result=SecurityElement.Escape(input);//SecurityElement.Escape escapes characters into valid XML components
+			if(result.Length>length) {
+				result=result.Substring(0,length);
+			}
 			return result;
 		}
-
 	}
 }
