@@ -553,9 +553,15 @@ namespace OpenDentBusiness{
 				client.Timeout=180000;//3 minutes
 				MailMessage message=new MailMessage();
 				message.From=new MailAddress(emailMessage.FromAddress.Trim());
-				message.To.Add(emailMessage.ToAddress.Trim());
-				message.CC.Add(emailMessage.CcAddress.Trim());
-				message.Bcc.Add(emailMessage.BccAddress.Trim());
+				if(emailMessage.ToAddress.Trim()!="") {
+					message.To.Add(emailMessage.ToAddress.Trim());
+				}
+				if(emailMessage.CcAddress.Trim()!="") {
+					message.CC.Add(emailMessage.CcAddress.Trim());
+				}
+				if(emailMessage.BccAddress.Trim()!="") {
+					message.Bcc.Add(emailMessage.BccAddress.Trim());
+				}
 				message.Subject=SubjectTidy(emailMessage.Subject);
 				message.Body=BodyTidy(emailMessage.BodyText);
 				message.IsBodyHtml=false;
