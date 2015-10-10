@@ -4755,10 +4755,10 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=securityLogArray.Length-1;i>=0;i--) {//Loop through backwards so the list is sorted newest to oldest
 				row=new ODGridRow();
-				row.Cells.Add(POut.DateT(securityLogArray[i].LogDateTime));
+				row.Cells.Add(securityLogArray[i].LogDateTime.ToShortDateString()+" "+securityLogArray[i].LogDateTime.ToShortTimeString());
 				String defValue=DefC.GetName(DefCat.ClaimCustomTracking,securityLogArray[i].DefNum);//get definition Name
 				row.Cells.Add(defValue);
-				row.Cells.Add(POut.String(securityLogArray[i].LogText));
+				row.Cells.Add(securityLogArray[i].LogText);
 				string empFL=Employees.GetNameFL(securityLogArray[i].UserNum);//get employee first and last name
 				row.Cells.Add(empFL);
 				gridStatusHistory.Rows.Add(row);
