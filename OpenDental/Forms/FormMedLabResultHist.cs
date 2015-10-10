@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormMedLabResultHist:Form {
@@ -42,7 +42,11 @@ namespace OpenDental {
 			gridResultHist.Columns.Add(col);
 			gridResultHist.Rows.Clear();
 			ODGridRow row;
-			List<MedLabResult> listResults=MedLabResults.GetResultHist(ResultCur,PatCur.PatNum,medLabCur.SpecimenID,medLabCur.SpecimenIDFiller);
+			long patNum=0;
+			if(PatCur!=null) {
+				patNum=PatCur.PatNum;
+			}
+			List<MedLabResult> listResults=MedLabResults.GetResultHist(ResultCur,patNum,medLabCur.SpecimenID,medLabCur.SpecimenIDFiller);
 			for(int i=0;i<listResults.Count;i++) {
 				row=new ODGridRow();
 				string obsVal=listResults[i].ObsText;
