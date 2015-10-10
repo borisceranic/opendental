@@ -1,13 +1,13 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDentBusiness {
@@ -36,6 +36,14 @@ namespace OpenDentBusiness {
 			return doc;
 		}
 
+		public static List<Document> GetByNums(List<long> listDocNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Document>>(MethodBase.GetCurrentMethod(),listDocNums);
+			}
+			string command="SELECT * FROM document WHERE DocNum IN("+string.Join(",",listDocNums)+")";
+			return Crud.DocumentCrud.SelectMany(command);
+		}
+
 		public static Document[] Fill(DataTable table){
 			//No need to check RemotingRole; no call to db.
 			if(table==null){
@@ -50,6 +58,17 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			return Fill(Db.GetTable(command));
 		}*/
+
+		///<summary>Returns a unique filename for a previously inserted doc based on the pat's first and last name and docNum with the given extension.</summary>
+		public static string GetUniqueFileNameForPatient(Patient pat,long docNum,string fileExtension) {
+			string retval=new string((pat.LName+pat.FName).Where(x => Char.IsLetter(x)).ToArray())+docNum.ToString()+fileExtension;//ensures unique name
+			//there is still a slight chance that someone manually added a file with this name, so quick fix:
+			List<string> listUsedNames=GetAllWithPat(pat.PatNum).Select(x => x.FileName).ToList();
+			while(listUsedNames.Contains(retval)) {
+				retval="x"+retval;
+			}
+			return retval;
+		}
 
 		///<summary>Usually, set just the extension before passing in the doc.  Inserts a new document into db, creates a filename based on Cur.DocNum, and then updates the db with this filename.  Should always refresh the document after calling this method in order to get the correct filename for RemotingRole.ClientWeb.</summary>
 		public static long Insert(Document doc,Patient pat) {

@@ -299,6 +299,13 @@ namespace OpenDentBusiness {
 		MedicalFeeUsedForNewProcs,
 		///<summary>FK to medication.MedicationNum</summary>
 		MedicationsIndicateNone,
+		///<summary>If MedLabReconcileDone=="0", a one time reconciliation of the MedLab HL7 messages is needed. The reconcile will reprocess the original
+		///HL7 messages for any MedLabs with PatNum=0 in order to create the embedded PDF files from the base64 text in the ZEF segments. The old method
+		///of waiting to extract these files until the message is manually attached to a patient was very slow using the middle tier. The new method is to
+		///create the PDF files and save them in the image folder in a subdirectory called "MedLabEmbeddedFiles" if a pat is not located from the details
+		///in the PID segment of the message. Attaching the MedLabs to a patient is now just a matter of moving the files to the patient's image folder.
+		///All files will now be extracted and stored, either in a pat's folder or in the "MedLabEmbeddedFiles" folder, by the HL7 service.</summary>
+		MedLabReconcileDone,
 		MobileSyncDateTimeLastRun,
 		///<summary>Used one time after the conversion to 7.9 for initial synch of the provider table.</summary>
 		MobileSynchNewTables79Done,

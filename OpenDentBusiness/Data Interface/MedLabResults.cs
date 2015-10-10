@@ -132,6 +132,19 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Delete all of the MedLabResult objects by MedLabNum.</summary>
+		public static void DeleteAllForMedLabs(List<long> listMedLabNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listMedLabNums);
+				return;
+			}
+			if(listMedLabNums==null || listMedLabNums.Count<1) {
+				return;
+			}
+			string command= "DELETE FROM medlabresult WHERE MedLabNum IN("+String.Join(",",listMedLabNums)+")";
+			Db.NonQ(command);
+		}
+
 		public static string GetAbnormalFlagDescript(AbnormalFlag abnormalFlag) {
 			//No need to check RemotingRole; no call to db.
 			switch(abnormalFlag) {
