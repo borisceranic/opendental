@@ -2491,7 +2491,8 @@ namespace OpenDental {
 				string mountSourceCat=DefC.GetDef(DefCat.ImageCats,mount.DocCategory).ItemName;
 				string mountDestCat=DefC.GetDef(DefCat.ImageCats,nodeOverCategoryDefNum).ItemName;
 				mount.DocCategory=nodeOverCategoryDefNum;
-				SecurityLogs.MakeLogEntry(Permissions.ImageEdit,mount.PatNum,Lan.g(this,"Mount moved from")+" "+mountSourceCat+" "+Lan.g(this,"to")+" "+mountDestCat,mount.MountNum);
+				SecurityLogs.MakeLogEntry(Permissions.ImageEdit,mount.PatNum,Lan.g(this,"Mount moved from")+" "+mountSourceCat+" "
+					+Lan.g(this,"to")+" "+mountDestCat);
 				Mounts.Update(mount);
 			}
 			else if(NodeIdentifierDown.NodeType==ImageNodeType.Doc) {
