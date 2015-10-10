@@ -85,26 +85,27 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),def);
 				return;
 			}
-			if(def.Category!=DefCat.SupplyCats 
-				&& def.Category!=DefCat.ClaimCustomTracking
-				&& def.Category!=DefCat.InsurancePaymentType) 
-			{
-				throw new ApplicationException("NOT Allowed to delete this type of def.");
+			List<string> listCommands=new List<string>();
+			switch(def.Category) {
+				case DefCat.ClaimCustomTracking:
+					listCommands.Add("SELECT COUNT(*) FROM securitylog WHERE DefNum="+POut.Long(def.DefNum));
+					listCommands.Add("SELECT COUNT(*) FROM claim WHERE CustomTracking="+POut.Long(def.DefNum));
+					break;
+				case DefCat.InsurancePaymentType:
+					listCommands.Add("SELECT COUNT(*) FROM claimpayment WHERE PayType="+POut.Long(def.DefNum));
+					break;
+				case DefCat.SupplyCats:
+					listCommands.Add("SELECT COUNT(*) FROM supply WHERE Category="+POut.Long(def.DefNum));
+					break;
+				default:
+					throw new ApplicationException("NOT Allowed to delete this type of def.");
 			}
-			string command="";
-			if(def.Category==DefCat.SupplyCats) {
-				command="SELECT COUNT(*) FROM supply WHERE Category="+POut.Long(def.DefNum);
+			for(int i=0;i<listCommands.Count;i++) {
+				if(Db.GetCount(listCommands[i])!="0") {
+					throw new ApplicationException(Lans.g("Defs","Def is in use.  Not allowed to delete."));
+				}
 			}
-			else if(def.Category==DefCat.ClaimCustomTracking){
-				command="SELECT COUNT(*) FROM claim WHERE CustomTracking="+POut.Long(def.DefNum);
-			}
-			else if(def.Category==DefCat.InsurancePaymentType) {
-				command="SELECT COUNT(*) FROM claimpayment WHERE PayType="+POut.Long(def.DefNum);
-			}
-			if(Db.GetCount(command)!="0"){
-				throw new ApplicationException(Lans.g("Defs","Def is in use.  Not allowed to delete."));
-			}
-			command="DELETE FROM definition WHERE DefNum="+POut.Long(def.DefNum);
+			string command="DELETE FROM definition WHERE DefNum="+POut.Long(def.DefNum);
 			Db.NonQ(command);
 			command="UPDATE definition SET ItemOrder=ItemOrder-1 "
 				+"WHERE Category="+POut.Long((int)def.Category)
