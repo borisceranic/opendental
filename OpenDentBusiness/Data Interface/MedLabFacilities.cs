@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -74,6 +76,40 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<MedLabFacility>(MethodBase.GetCurrentMethod(),medLabFacilityNum);
 			}
 			return Crud.MedLabFacilityCrud.SelectOne(medLabFacilityNum);
+		}
+
+		///<summary>Returns a list of MedLabFacilityNums, the order in the list will be the facility ID on the report.  Basically a local re-numbering.
+		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
+		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
+		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
+		///So each ID could link to multiple facilities.  We will re-number the facilities so that each will have a unique number for this report.</summary>
+		public static List<MedLabFacility> GetFacilityList(List<MedLab> listMedLabs,out List<MedLabResult> listResults) {
+			//No need to check RemotingRole; no call to db.
+			listResults=listMedLabs.SelectMany(x => x.ListMedLabResults).ToList();
+			for(int i=listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
+				if(i==0) {
+					break;
+				}
+				if(listResults[i].ObsID==listResults[i-1].ObsID && listResults[i].ObsIDSub==listResults[i-1].ObsIDSub) {
+					listResults.RemoveAt(i);
+				}
+			}
+			listResults.OrderBy(x => x.MedLabNum).ThenBy(x => x.MedLabResultNum);
+			//listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
+			List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForResults(listResults.Select(x => x.MedLabResultNum).Distinct().ToList());
+			Dictionary<long,long> dictResultNumFacNum=listFacAttaches.ToDictionary(x => x.MedLabResultNum,x => x.MedLabFacilityNum);
+			List<MedLabFacility> listFacilities=new List<MedLabFacility>();
+			for(int i=0;i<listResults.Count;i++) {
+				if(!dictResultNumFacNum.ContainsKey(listResults[i].MedLabResultNum)) {
+					continue;
+				}
+				long facilityNumCur=dictResultNumFacNum[listResults[i].MedLabResultNum];
+				if(!listFacilities.Exists(x => x.MedLabFacilityNum==facilityNumCur)) {
+					listFacilities.Add(MedLabFacilities.GetOne(facilityNumCur));
+				}
+				listResults[i].FacilityID=(listFacilities.Select(x => x.MedLabFacilityNum).ToList().IndexOf(facilityNumCur)+1).ToString().PadLeft(2,'0');
+			}
+			return listFacilities;
 		}
 
 		/*

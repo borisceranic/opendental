@@ -130,6 +130,9 @@ namespace OpenDentBusiness {
 		public string FileName;
 		///<summary>The PID Segment from the HL7 message used to generate this MedLab object.</summary>
 		public string OriginalPIDSegment;
+		///<summary>This isn't a db column but is stored in the MedLabResult table.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		private List<MedLabResult> _listMedLabResults;
 
 		///<summary>Read-only property that indicates whether the test is marked as preliminary or any result returned for the test which is the most
 		///recent/up-to-date for that result is marked as preliminary.</summary>
@@ -167,6 +170,25 @@ namespace OpenDentBusiness {
 				return false;
 			}
 			//set { } Read only property.
+		}
+
+		///<summary>Only filled with MedLabResults when value is used.  To refresh ListMedLabResults, set it equal to null or explicitly reassign it using
+		///MedLabResults.GetForLab(MedLabNum).</summary>
+		public List<MedLabResult> ListMedLabResults {
+			get {
+				if(_listMedLabResults==null) {
+					if(MedLabNum==0) {
+						_listMedLabResults=new List<MedLabResult>();
+					}
+					else {
+						_listMedLabResults=MedLabResults.GetForLab(MedLabNum);
+					}
+				}
+				return _listMedLabResults;
+			}
+			set {
+				_listMedLabResults=value;
+			}
 		}
 
 		///<summary></summary>

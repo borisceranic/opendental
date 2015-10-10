@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using CodeBase;
+using OpenDentBusiness.HL7;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -62,6 +65,14 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM medlab WHERE PatNum="+POut.Long(patNum);
 			return Crud.MedLabCrud.SelectMany(command);
+		}
+
+		public static int GetCountForPatient(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT COUNT(*) FROM medlab WHERE PatNum="+POut.Long(patNum);
+			return PIn.Int(Db.GetCount(command));
 		}
 
 		///<summary>Get unique MedLab orders, grouped by PatNum, ProvNum, and SpecimenID.  Also returns the most recent DateTime the results
@@ -145,6 +156,112 @@ namespace OpenDentBusiness{
 			Crud.MedLabCrud.Update(medLab);
 		}
 
+		///<summary>Sets the PatNum column on MedLabs with MedLabNum in list.  Used when manually assigning/moving MedLabs to a patient.</summary>
+		public static void UpdateAllPatNums(List<long> listMedLabNums,long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listMedLabNums,patNum);
+				return;
+			}
+			if(listMedLabNums.Count<1) {
+				return;
+			}
+			string command="UPDATE medlab SET PatNum="+POut.Long(patNum)+" WHERE MedLabNum IN("+String.Join(",",listMedLabNums)+")";
+			Db.NonQ(command);
+		}
+
+		///<summary>Reprocess the original HL7 msgs for any MedLabs with PatNum 0, creates the embedded PDF files from the base64 text in the ZEF segments
+		///<para>The old method used when parsing MedLab HL7 msgs was to wait to extract these files until the msg was manually associated with a patient.
+		///Associating the MedLabs to a patient and reprocessing the HL7 messages using middle tier was very slow.</para>
+		///<para>The new method is to create the PDF files and save them in the image folder in a subdirectory called "MedLabEmbeddedFiles" if a patient
+		///isn't located from the details in the PID segment of the message.  Associating the MedLabs to a pat is now just a matter of moving the files to
+		///the pat's image folder and updating the PatNum columns.  All files are now extracted and stored, either in a pat's folder or in the
+		///"MedLabEmbeddedFiles" folder, by the HL7 service.</para>
+		///<para>This will reprocess all HL7 messages for MedLabs with PatNum=0 and replace the MedLab, MedLabResult, MedLabSpecimen, and MedLabFacAttach
+		///rows as well as create any embedded files and insert document table rows.  The document table rows will have PatNum=0, just like the MedLabs,
+		///if a pat is still not located with the details in the PID segment.  Once the user manually attaches the MedLab to a patient, all rows will be
+		///updated with the correct PatNum and the embedded PDFs will be moved to the pat's image folder.  The document.FileName column will contain the
+		///name of the file, regardless of where it is located.  The file name will be updated to a relevant name for the folder in which it is located.
+		///i.e. in the MedLabEmbeddedFiles directory it may be named 3YG8Z420150909100527.pdf, but once moved to a pat's folder it will be renamed to
+		///something like PatientAustin375.pdf and the document.FileName column will be the current name.</para>
+		///<para>If storing images in the db, the document table rows will contain the base64 text version of the PDFs with PatNum=0 and will be updated
+		///with the correct PatNum once associated.  The FileName will be just the extension ".pdf" until it is associated with a patient at which time it
+		///will be updated to something like PatientAustin375.pdf.</para></summary>
+		public static int Reconcile() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM medlab WHERE PatNum=0";
+			List<MedLab> listMedLabs=Crud.MedLabCrud.SelectMany(command);
+			if(listMedLabs.Count<1) {
+				return 0;
+			}
+			List<long> listMedLabNumsNew=new List<long>();//used to delete old MedLab objects after creating these new ones from the HL7 message text
+			int failedCount=0;
+			foreach(string relativePath in listMedLabs.Select(x => x.FileName).Distinct().ToList()) {
+				string filePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),relativePath);
+				string fileTextCur="";
+				try {
+					fileTextCur=File.ReadAllText(filePath);
+				}
+				catch(Exception ex) {
+					failedCount++;
+					continue;
+				}
+				MessageHL7 msg=new MessageHL7(fileTextCur);
+				List<long> listMedLabNumsCur=MessageParserMedLab.Process(msg,relativePath,false);//re-creates the documents from the ZEF segments
+				if(listMedLabNumsCur==null || listMedLabNumsCur.Count<1) {
+					failedCount++;
+					continue;//not sure what to do, just move on?
+				}
+				listMedLabNumsNew.AddRange(listMedLabNumsCur);
+				MedLabs.UpdateFileNames(listMedLabNumsCur,relativePath);
+			}
+			//Delete all MedLabs, MedLabResults, MedLabSpecimens, and MedLabFacAttaches except the ones just created
+			//Don't delete until we successfully process the messages and have valid new MedLab objects
+			foreach(MedLab medLab in listMedLabs) {
+				failedCount+=DeleteLabsAndResults(medLab,listMedLabNumsNew);
+			}
+			return failedCount;
+		}
+
+		///<summary>Cascading delete that deletes all MedLab, MedLabResult, MedLabSpecimen, and MedLabFacAttach.
+		///Also deletes any embedded PDFs that are linked to by the MedLabResults.
+		///The MedLabs and all associated results, specimens, and FacAttaches referenced by the MedLabNums in listExcludeMedLabNums will not be deleted.
+		///Used for deleting old entries and keeping new ones.  The list may be empty and then all will be deleted.</summary>
+		public static int DeleteLabsAndResults(MedLab medLab,List<long> listExcludeMedLabNums=null) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod());
+			}
+			List<MedLab> listLabsOld=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//patNum could be 0
+			if(listExcludeMedLabNums!=null) {
+				listLabsOld=listLabsOld.FindAll(x => !listExcludeMedLabNums.Contains(x.MedLabNum));
+			}
+			if(listLabsOld.Count<1) {
+				return 0;
+			}
+			int failedCount=0;
+			List<long> listLabNumsOld=listLabsOld.Select(x => x.MedLabNum).ToList();
+			List<MedLabResult> listResultsOld=listLabsOld.SelectMany(x => x.ListMedLabResults).ToList();//sends one query to the db per MedLab
+			MedLabFacAttaches.DeleteAllForLabsOrResults(listLabNumsOld,listResultsOld.Select(x => x.MedLabResultNum).ToList());
+			MedLabSpecimens.DeleteAllForLabs(listLabNumsOld);//MedLabSpecimens have a FK to MedLabNum
+			MedLabResults.DeleteAllForMedLabs(listLabNumsOld);//MedLabResults have a FK to MedLabNum
+			MedLabs.DeleteAll(listLabNumsOld);
+			foreach(Document doc in Documents.GetByNums(listResultsOld.Select(x => x.DocNum).ToList())) {
+				Patient docPat=Patients.GetPat(doc.PatNum);
+				if(docPat==null) {
+					Documents.Delete(doc);
+					continue;
+				}
+				try {
+					ImageStore.DeleteDocuments(new List<Document> { doc },ImageStore.GetPatientFolder(docPat,ImageStore.GetPreferredAtoZpath()));
+				}
+				catch(Exception ex) {
+					failedCount++;
+				}
+			}
+			return failedCount;
+		}
+
 		///<summary>Translates enum values into human readable strings.</summary>
 		public static string GetStatusDescript(ResultStatus resultStatus) {
 			//No need to check RemotingRole; no call to db.
@@ -172,46 +289,6 @@ namespace OpenDentBusiness{
 			}
 			string command= "DELETE FROM medlab WHERE MedLabNum IN("+String.Join(",",listLabNums)+")";
 			Db.NonQ(command);
-		}
-
-		///<summary>Returns a list of MedLabFacilityNums, the order in the list will be the facility ID on the report.  Basically a local re-numbering.
-		///Each message has a facility or facilities with footnote IDs, e.g. 01, 02, etc.  The results each link to the facility that performed the test.
-		///But if there are multiple messages for a test order, e.g. when there is a final result for a subset of the original test results,
-		///the additional message may have a facility with footnote ID of 01 that is different than the original message facility with ID 01.
-		///So each ID could link to multiple facilities.  We will re-number the facilities so that each will have a unique number for this report.</summary>
-		public static List<long> GetListFacNums(List<MedLab> listMedLabs,out List<MedLabResult> listResults) {
-			//No need to check RemotingRole; no call to db.
-			listResults=MedLabResults.GetAllForLabs(listMedLabs);//use the classwide variable so we can use the list to create the data table
-			for(int i=listResults.Count-1;i>-1;i--) {//loop through backward and only keep the most final/most recent result
-				if(i==0) {
-					break;
-				}
-				if(listResults[i].ObsID==listResults[i-1].ObsID && listResults[i].ObsIDSub==listResults[i-1].ObsIDSub) {
-					listResults.RemoveAt(i);
-				}
-			}
-			listResults.Sort(SortByMedLabNum);
-			//listResults will now only contain the most recent or most final/corrected results, sorted by the order inserted in the db
-			List<long> listMedLabFacilityNums=new List<long>();
-			for(int i=0;i<listResults.Count;i++) {
-				List<MedLabFacAttach> listFacAttaches=MedLabFacAttaches.GetAllForLabOrResult(0,listResults[i].MedLabResultNum);
-				if(listFacAttaches.Count==0) {
-					continue;
-				}
-				if(!listMedLabFacilityNums.Contains(listFacAttaches[0].MedLabFacilityNum)) {
-					listMedLabFacilityNums.Add(listFacAttaches[0].MedLabFacilityNum);
-				}
-				listResults[i].FacilityID=(listMedLabFacilityNums.IndexOf(listFacAttaches[0].MedLabFacilityNum)+1).ToString().PadLeft(2,'0');
-			}
-			return listMedLabFacilityNums;
-		}
-
-		///<summary>Sort by MedLabResult.MedLabResultNum.</summary>
-		private static int SortByMedLabNum(MedLabResult medLabResultX,MedLabResult medLabResultY) {
-			if(medLabResultX.MedLabNum!=medLabResultY.MedLabNum) {
-				return medLabResultX.MedLabNum.CompareTo(medLabResultY.MedLabNum);
-			}
-			return medLabResultX.MedLabResultNum.CompareTo(medLabResultY.MedLabResultNum);
 		}
 
 		/*

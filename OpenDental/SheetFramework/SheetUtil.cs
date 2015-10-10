@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using CodeBase;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -746,7 +747,7 @@ namespace OpenDental{
 			retval.Columns.Add(new DataColumn("obsRefRange"));
 			retval.Columns.Add(new DataColumn("facilityID"));
 			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
-			MedLabs.GetListFacNums(listMedLabs,out _listResults);//refreshes and sorts the classwide _listResults variable
+			MedLabFacilities.GetFacilityList(listMedLabs,out _listResults);//refreshes and sorts the classwide _listResults variable
 			string obsDescriptPrev="";
 			for(int i=0;i<_listResults.Count;i++) {
 				//LabCorp requested that these non-performance results not be displayed on the report
@@ -757,9 +758,9 @@ namespace OpenDental{
 					continue;
 				}
 				string obsDescript="";
-				MedLab medLabCur=MedLabs.GetOne(_listResults[i].MedLabNum);
+				MedLab medLabCur=listMedLabs.FirstOrDefault(x => x.MedLabNum==_listResults[i].MedLabNum);
 				if(i==0 || _listResults[i].MedLabNum!=_listResults[i-1].MedLabNum) {
-					if(medLabCur.ActionCode!=ResultAction.G) {
+					if(medLabCur!=null && medLabCur.ActionCode!=ResultAction.G) {
 						if(obsDescriptPrev==medLabCur.ObsTestDescript) {
 							obsDescript=".";
 						}
@@ -792,7 +793,7 @@ namespace OpenDental{
 				else if(_listResults[i].ObsText=="."
 					|| _listResults[i].ObsValue.Contains(":")
 					|| _listResults[i].ObsValue.Length>20
-					|| medLabCur.ActionCode==ResultAction.G)
+					|| (medLabCur!=null && medLabCur.ActionCode==ResultAction.G))
 				{
 					obsVal+=spaces+_listResults[i].ObsText+"\r\n"+spaces2+_listResults[i].ObsValue.Replace("\r\n","\r\n"+spaces2);
 					newLine+="\r\n";

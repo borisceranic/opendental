@@ -108,7 +108,7 @@ namespace OpenDental{
 					break;
 				case SheetTypeEnum.MedLabResults:
 					pat=Patients.GetPat(sheet.PatNum);
-					FillFieldsForMedLabResults(sheet,medLab);
+					FillFieldsForMedLabResults(sheet,medLab,pat);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -2393,12 +2393,11 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForMedLabResults(Sheet sheet,MedLab medLab) {
-			Patient pat=Patients.GetPat(sheet.PatNum);
+		private static void FillFieldsForMedLabResults(Sheet sheet,MedLab medLab,Patient pat) {
 			//pat might be null and sheet.PatNum might be invalid, that is ok.
-			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(sheet.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
+			List<MedLab> listMedLabs=MedLabs.GetForPatAndSpecimen(pat.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//should always be at least one MedLab
 			List<MedLabResult> listResults;
-			List<long> listFacNums=MedLabs.GetListFacNums(listMedLabs,out listResults);
+			List<MedLabFacility> listFacilities=MedLabFacilities.GetFacilityList(listMedLabs,out listResults);
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "medlab.ClinicalInfo":
@@ -2626,13 +2625,14 @@ namespace OpenDental{
 							break;
 						}
 						string fieldValAddr="";
-						for(int i=0;i<listFacNums.Count;i++) {
+						MedLabFacility facilityCur;
+						for(int i=0;i<listFacilities.Count;i++) {
 							if(fieldValAddr!="") {
 								fieldValAddr+="\r\n\r\n";
 							}
 							fieldValAddr+=(i+1).ToString().PadLeft(2,'0').PadRight(14,' ');
 							string spaces=new string(' ',16);
-							MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
+							facilityCur=listFacilities[i];
 							fieldValAddr+=facilityCur.FacilityName+"\r\n"+spaces+facilityCur.Address+"\r\n"+spaces+facilityCur.City+", "+facilityCur.State+"  ";
 							if(facilityCur.Zip.Length==9) {
 								fieldValAddr+=facilityCur.Zip.Substring(0,5)+"-"+facilityCur.Zip.Substring(5,4);
@@ -2648,17 +2648,18 @@ namespace OpenDental{
 							break;
 						}
 						string fieldValDir="";
-						for(int i=0;i<listFacNums.Count;i++) {
+						MedLabFacility facCur;
+						for(int i=0;i<listFacilities.Count;i++) {
 							if(fieldValDir!="") {
 								fieldValDir+="\r\n\r\n";
 							}
-							MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
-							fieldValDir+="Dir:  "+facilityCur.DirectorFName+" "+facilityCur.DirectorLName+", "+facilityCur.DirectorTitle+"\r\nPh:  ";
-							if(facilityCur.Phone.Length==10) {
-								fieldValDir+=facilityCur.Phone.Substring(0,3)+"-"+facilityCur.Phone.Substring(3,3)+"-"+facilityCur.Phone.Substring(6);
+							facCur=listFacilities[i];
+							fieldValDir+="Dir:  "+facCur.DirectorFName+" "+facCur.DirectorLName+", "+facCur.DirectorTitle+"\r\nPh:  ";
+							if(facCur.Phone.Length==10) {
+								fieldValDir+=facCur.Phone.Substring(0,3)+"-"+facCur.Phone.Substring(3,3)+"-"+facCur.Phone.Substring(6);
 							}
 							else {
-								fieldValDir+=facilityCur.Phone;
+								fieldValDir+=facCur.Phone;
 							}
 							fieldValDir+="\r\n";//blank line to keep it in line with the address
 						}

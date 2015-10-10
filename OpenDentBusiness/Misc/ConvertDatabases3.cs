@@ -9636,6 +9636,28 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.19.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_21();
+		}
+
+		private static void To15_3_21() {
+			if(FromVersion<new Version("15.3.21.0")) {
+				string command="SELECT COUNT(*) FROM medlab WHERE PatNum=0";
+				string isReconciled="0";
+				if(Db.GetCount(command)=="0") {
+					isReconciled="1";
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('MedLabReconcileDone','"+isReconciled+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'MedLabReconcileDone','"+isReconciled+"')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.3.21.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 
@@ -10252,20 +10274,6 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES "
 						+"((SELECT MAX(PrefNum)+1 FROM preference),'ClaimReportReceiveInterval','5')";
-					Db.NonQ(command);
-				}
-				command="SELECT COUNT(*) FROM medlab WHERE PatNum=0";
-				string isReconciled="0";
-				if(Db.GetCount(command)=="0") {
-					isReconciled="1";
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('MedLabReconcileDone','"+isReconciled+"')";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
-						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'MedLabReconcileDone','"+isReconciled+"')";
 					Db.NonQ(command);
 				}
 				//Add ClinicNum to programproperty table for clinic specific PayConnect credentials

@@ -22,10 +22,33 @@ namespace OpenDental {
 				checkOnlyNoPat.Checked=true;
 			}
 			textDateStart.Text=DateTime.Today.AddMonths(-3).ToShortDateString();//default list to start with showing the last three months
+			//One time reconcile may need to be run to create embedded PDFs for MedLabs that are not attached to a patient.
+			if(!PrefC.GetBool(PrefName.MedLabReconcileDone) && PrefC.AtoZfolderUsed) {
+				int countMedLabs=MedLabs.GetCountForPatient(0);
+				if(MessageBox.Show(this,Lan.g(this,"There are MedLabs in the database that have not been associated with a patient.\r\nA one time "
+					+"reconciliation must be performed that will reprocess the HL7 messages for these MedLabs.  This can take some time.\r\nDo you want to "
+					+"continue?\r\nNumber of MedLabs not associated with a patient")+": "+countMedLabs+".","",MessageBoxButtons.YesNo)==DialogResult.No)
+				{
+					Close();
+					return;
+				}
+				Cursor=Cursors.WaitCursor;
+				int reconcileFailedCount=MedLabs.Reconcile();
+				Cursor=Cursors.Default;
+				if(reconcileFailedCount>0) {
+					MessageBox.Show(this,Lan.g(this,"Some of the MedLab objects in the database could not be reconciled.\r\nThis may be due to an issue "
+						+"processing the original HL7 message text file.\r\nNumber failed")+": "+reconcileFailedCount);
+				}
+				Prefs.UpdateBool(PrefName.MedLabReconcileDone,true);
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
 			FillGrid();
 		}
 
 		private void FillGrid() {
+			if(IsDisposed) {//This can happen if an auto logoff happens with FormMedLabEdit open
+				return;
+			}
 			if(textDateStart.errorProvider1.GetError(textDateStart)!=""
 				|| textDateEnd.errorProvider1.GetError(textDateEnd)!="")
 			{
@@ -36,6 +59,7 @@ namespace OpenDental {
 				textPatient.Text=_selectedPat.GetNameLF();
 				checkOnlyNoPat.Checked=false;
 			}
+			Application.DoEvents();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -61,6 +85,7 @@ namespace OpenDental {
 			if(dateEnd==DateTime.MinValue) {
 				dateEnd=DateTime.MaxValue;
 			}
+			Cursor=Cursors.WaitCursor;
 			List<MedLab> listMedLabs=MedLabs.GetOrdersForPatient(_selectedPat,checkIncludeNoPat.Checked,checkOnlyNoPat.Checked,PIn.Date(textDateStart.Text),dateEnd);
 			for(int i=0;i<listMedLabs.Count;i++) {
 				row=new ODGridRow();
@@ -84,6 +109,7 @@ namespace OpenDental {
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			Cursor=Cursors.Default;
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {

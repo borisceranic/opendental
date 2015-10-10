@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDental.UI;
 using OpenDentBusiness;
-using OpenDentBusiness.HL7;
 
 namespace OpenDental {
 	public partial class FormMedLabEdit:Form {
@@ -18,12 +17,11 @@ namespace OpenDental {
 		public List<MedLab> ListMedLabs;
 		///<summary>Aggregated final results from all of the med lab orders in ListMedLabs.</summary>
 		private List<MedLabResult> _listResults;
-		///<summary>True when PatCur.PatNum is different than MedLab.PatNum</summary>
-		private bool _isNewPat;
 		///<summary>Usually the first MedLab in ListMedLabs. Used for convenience instead of continuously referencing ListMedLabs[0]. 
 		///Since all MedLabs in ListMedLabs have the same SpecimenID and SpecimenIDFiller, it is safe to assume all MedLab objects have
 		///the same value for some of the fields and we will just pull from the first MedLab in the list.</summary>
 		private MedLab _medLabCur;
+		private List<MedLabFacility> _listFacilities;
 
 		public FormMedLabEdit() {
 			InitializeComponent();
@@ -32,6 +30,13 @@ namespace OpenDental {
 
 		private void FormMedLabEdit_Load(object sender,EventArgs e) {
 			_medLabCur=ListMedLabs[0];
+			if(!PrefC.AtoZfolderUsed) {
+				butShowHL7.Visible=false;//messages are not archived if storing images in the database
+				labelShowHL7.Visible=false;
+			}
+			//list of MedLabFacilityNums used by all results, the position in the list will be the facility id
+			//also fills the classwide variable _listResults used in FillGridResults
+			_listFacilities=MedLabFacilities.GetFacilityList(ListMedLabs,out _listResults);
 			SetFields();
 		}
 
@@ -126,7 +131,6 @@ namespace OpenDental {
 			gridResults.Columns.Add(col);
 			gridResults.Rows.Clear();
 			ODGridRow row;
-			MedLabs.GetListFacNums(ListMedLabs,out _listResults);//fills the classwide variable _listResults as well as returning the list of lab facility nums
 			string obsDescriptPrev="";
 			for(int i=0;i<_listResults.Count;i++) {
 				//LabCorp requested that these non-performance results not be displayed on the report
@@ -218,10 +222,8 @@ namespace OpenDental {
 			gridFacilities.Columns.Add(col);
 			gridFacilities.Rows.Clear();
 			ODGridRow row;
-			//list of MedLabFacilityNums used by all results, the position in the list will be the facility id
-			List<long> listFacNums=MedLabs.GetListFacNums(ListMedLabs,out _listResults);
-			for(int i=0;i<listFacNums.Count;i++) {
-				MedLabFacility facilityCur=MedLabFacilities.GetOne(listFacNums[i]);
+			for(int i=0;i<_listFacilities.Count;i++) {
+				MedLabFacility facilityCur=_listFacilities[i];
 				row=new ODGridRow();
 				row.Cells.Add((i+1).ToString().PadLeft(2,'0'));//Actually more of a local renumbering of labs referenced by each Lab Result Row.
 				row.Cells.Add(facilityCur.FacilityName);
@@ -261,10 +263,7 @@ namespace OpenDental {
 			if(FormPS.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			if(PatCur==null || PatCur.PatNum!=FormPS.PatCur.PatNum) {
-				PatCur=FormPS.PatCur;
-				_isNewPat=true;//used to indicate that all MedLab objects need to be attached to the selected patient
-			}
+			PatCur=FormPS.PatCur;
 			RefreshPatientData();
 		}
 
@@ -328,14 +327,13 @@ namespace OpenDental {
 				MsgBox.Show(this,"The Medical Lab must be attached to a patient before the PDF can be saved.");
 				return;
 			}
-			if(_isNewPat) {//save the current patient attached to the MedLab if it has been changed
+			if(PatCur.PatNum>0 && _medLabCur.PatNum!=PatCur.PatNum) {//save the current patient attached to the MedLab if it has been changed
 				MoveLabsAndImagesHelper();
 			}
 			Cursor=Cursors.WaitCursor;
 			SheetDef sheetDef=SheetUtil.GetMedLabResultsSheetDef();
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,_medLabCur.PatNum);
 			SheetFiller.FillFields(sheet,null,_medLabCur);
-			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),null,true,120,60,_medLabCur);
 			//create the file in the temp folder location, then import so it works when storing images in the db
 			string tempPath=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),_medLabCur.PatNum.ToString()+".pdf");
 			SheetPrinting.CreatePdf(sheet,tempPath,null,_medLabCur);
@@ -379,7 +377,6 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
-
 		private void butShowHL7_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			List<string[]> listFileNamesDateMod=new List<string[]>();
@@ -410,159 +407,70 @@ namespace OpenDental {
 			FormMsgText.ShowDialog();
 		}
 
-		///<summary>Used to revert any changes made to the MedLab object 
-		///OR create embedded files attached to the currently selected patient.
-		///This will re-process the original HL7 message(s) from the archived file(s).
-		///Since there may be more than one HL7 message that comprises the information on the form, all messages for this specimen will be re-processed.
-		///The old MedLab object(s) and any MedLabResult, MedLabSpecimen, or MedLabFacAttach objects linked will be deleted and the form will fill with
-		///the new object based on the original file data.  Right now users are only allowed to change the patient and provider, but more changes may be
-		///possible in the future that will be reverted.</summary>
-		private bool ReprocessMessages() {
-			Dictionary<string,string> dictFileNameFileText=new Dictionary<string,string>();//Key=Full file path to message file, value=HL7 message content
-			for(int i=0;i<ListMedLabs.Count;i++) {
-				string filePath=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),ListMedLabs[i].FileName);
-				try { //File IO, surround with try catch
-					if(!dictFileNameFileText.ContainsKey(filePath)) {
-						string fileTextCur=File.ReadAllText(filePath);
-						dictFileNameFileText.Add(filePath,fileTextCur);
-					}
-				}
-				catch(Exception ex) {
-					MessageBox.Show(Lan.g(this,"Could not read the MedLab HL7 message text file located at")+" "+ListMedLabs[i].FileName+".");
-					return false;
-				}
-			}
-			List<long> listMedLabNumsNew=new List<long>();
-			foreach(KeyValuePair<string,string> fileCur in dictFileNameFileText) {
-				MessageHL7 msg=new MessageHL7(fileCur.Value);
-				List<long> listMedLabNumsCur=MessageParserMedLab.Process(msg,fileCur.Key,false,PatCur);//re-creates the documents from the ZEF segments
-				if(listMedLabNumsCur==null || listMedLabNumsCur.Count<1) {
-					MsgBox.Show(this,"The HL7 message processed did not produce any MedLab objects.");
-					return false;
-				}
-				listMedLabNumsNew.AddRange(listMedLabNumsCur);
-			}
-			//Delete all records except the ones just created
-			DeleteLabsAndResults(_medLabCur, listMedLabNumsNew);
-			ListMedLabs=MedLabs.GetForPatAndSpecimen(PatCur.PatNum,_medLabCur.SpecimenID,_medLabCur.SpecimenIDFiller);//handles PatNum=0
-			_medLabCur=ListMedLabs[0];
-			SetFields();
-			return true;
-		}
-
-		///<summary>Cascading delete that deletes all MedLab, MedLabResult, MedLabSpecimen, and MedLabFacAttach.
-		///Also deletes any embedded PDFs that are linked to by the MedLabResults.
-		///The MedLabs and all associated results, specimens, and FacAttaches referenced by the MedLabNums in listExcludeMedLabNums will not be deleted.
-		///Used for deleting old entries and keeping new ones.  The list may be empty and then all will be deleted.</summary>
-		private void DeleteLabsAndResults(MedLab medLab,List<long> listExcludeMedLabNums=null) {
-			List<MedLab> listLabsOld=MedLabs.GetForPatAndSpecimen(medLab.PatNum,medLab.SpecimenID,medLab.SpecimenIDFiller);//patNum could be 0
-			List<long> listLabNumsOld=new List<long>();
-			for(int i=listLabsOld.Count-1;i>-1;i--) {//backwards to remove any that are in the exclude list so it's filtered before filling the result list
-				if(listExcludeMedLabNums!=null && listExcludeMedLabNums.Contains(listLabsOld[i].MedLabNum)) {
-					listLabsOld.RemoveAt(i);
-					continue;
-				}
-				listLabNumsOld.Add(listLabsOld[i].MedLabNum);
-			}
-			List<MedLabResult> listResultsOld=MedLabResults.GetAllForLabs(listLabsOld);
-			List<long> listResultNumsOld=new List<long>();
-			List<Document> listDocs=new List<Document>();
-			for(int i=0;i<listResultsOld.Count;i++) {
-				listResultNumsOld.Add(listResultsOld[i].MedLabResultNum);
-				if(listResultsOld[i].DocNum==0) {
-					continue;
-				}
-				//if DocNum is invalid, a new document object will be added to the list, but it will be skipped when trying to delete since the file won't exist
-				listDocs.Add(Documents.GetByNum(listResultsOld[i].DocNum));
-			}
-			if(listDocs.Count>0) {
-				Patient labPat=Patients.GetPat(medLab.PatNum);
-				if(labPat!=null) {
-					try {
-						ImageStore.DeleteDocuments(listDocs,ImageStore.GetPatientFolder(labPat,ImageStore.GetPreferredAtoZpath()));
-					}
-					catch(Exception ex) {
-						MsgBox.Show(this,"Some images referenced by the MedLabResults could not be deleted and will have to be removed manually.");
-					}
-				}
-			}
-			MedLabSpecimens.DeleteAllForLabs(listLabNumsOld);
-			MedLabFacAttaches.DeleteAllForLabsOrResults(listLabNumsOld,listResultNumsOld);
-			MedLabResults.DeleteAll(listResultNumsOld);
-			MedLabs.DeleteAll(listLabNumsOld);
-		}
-
 		///<summary>Moves all MedLab objects and any embedded PDFs tied to the MedLabResults to the PatCur.
-		///Assumes PatCur and the MedLab.PatNum is not the same patient.
-		///If the MedLab objects were not originally attached to a patient, the message text will be re-processed so any embedded PDFs will be created.</summary>
+		///If the MedLab objects were not originally attached to a patient, any embedded PDFs will be in the image folder in a directory called
+		///"MedLabEmbeddedFiles" and will be moved to PatCur's image folder.
+		///If PatCur is null or the MedLabs are already attached to PatCur, does nothing.</summary>
 		private void MoveLabsAndImagesHelper() {
-			//if the MedLab object(s) were attached to a patient and they are being moved to another patient, move the associated documents
-			Patient patOld=Patients.GetPat(_medLabCur.PatNum);
-			if(patOld==null) {
-				//the MedLab objects were not originally attached to a patient due to the patient not being located when processing the message
-				//reprocess using PatCur so the MedLab objects will be attached to PatCur and the ZEF segments can be converted into the embedded PDF file(s) 
-				ReprocessMessages();
-				_isNewPat=false;
+			//if they have selected the same patient, nothing to do
+			if(PatCur==null || PatCur.PatNum==_medLabCur.PatNum) {
 				return;
 			}
-			for(int i=0;i<ListMedLabs.Count;i++) {
-				ListMedLabs[i].PatNum=PatCur.PatNum;
-				MedLabs.Update(ListMedLabs[i]);
-			}
-			List<MedLabResult> listResults=MedLabResults.GetAllForLabs(ListMedLabs);
-			string atozPath="";
+			//if the MedLab object(s) were attached to a patient and they are being moved to another patient, move the associated documents
+			Patient patOld=Patients.GetPat(_medLabCur.PatNum);
+			MedLabs.UpdateAllPatNums(ListMedLabs.Select(x => x.MedLabNum).ToList(),PatCur.PatNum);
 			string atozFrom="";
 			string atozTo="";
 			if(PrefC.AtoZfolderUsed) {
-				atozPath=ImageStore.GetPreferredAtoZpath();
-				atozFrom=ImageStore.GetPatientFolder(patOld,atozPath);
+				string atozPath=ImageStore.GetPreferredAtoZpath();
+				//if patOld is null, the file was placed into the image folder in a directory named MedLabEmbeddedFiles, not a patient's image folder
+				if(patOld==null) {
+					atozFrom=ODFileUtils.CombinePaths(atozPath,"MedLabEmbeddedFiles");
+				}
+				else {
+					atozFrom=ImageStore.GetPatientFolder(patOld,atozPath);
+				}
 				atozTo=ImageStore.GetPatientFolder(PatCur,atozPath);
 			}
+			//get list of all DocNums of files referenced by MedLabResults which were embedded in the MedLab HL7 message as base64 text
+			//in order to move the file (if not storing images in db) and assign (or reassign) the FileName
+			List<long> listDocNums=ListMedLabs
+				.SelectMany(x => x.ListMedLabResults
+					.Select(y => y.DocNum)
+					.Where(y => y>0))
+					.Distinct().ToList();
+			List<Document> listDocs=Documents.GetByNums(listDocNums);
 			int fileMoveFailures=0;
-			for(int i=0;i<listResults.Count;i++) {
-				if(listResults[i].DocNum==0) {
-					continue;
-				}
-				Document fromDoc=Documents.GetByNum(listResults[i].DocNum);
-				if(fromDoc.DocNum==0) {//DocNum could be 0 if document is not found, GetByNum returns a new doc, not null, if invalid DocNum
-					continue;
-				}
-				if(!PrefC.AtoZfolderUsed) {
-					//storing docs in the db, so simply update the PatNum, doc is stored in the RawBase64 column and file name doesn't need to be unique
-					fromDoc.PatNum=PatCur.PatNum;
-					Documents.Update(fromDoc);
-					continue;
-				}
-				string fromFilePath=ODFileUtils.CombinePaths(atozFrom,fromDoc.FileName);
-				if(!File.Exists(fromFilePath)) {
-					//the DocNum in the MedLabResults table is pointing to a file that either doesn't exist or is not accessible, can't move/copy it
-					fileMoveFailures++;
-					continue;
-				}
-				string destFileName=fromDoc.FileName;
-				string destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
-				if(File.Exists(destFilePath)) {
-					//The file being copied has the same name as a file that exists in the destination folder, use a unique file name and update document table
-					destFileName=patOld.PatNum.ToString()+"_"+fromDoc.FileName;//try to prepend patient's PatNum to the original file name
-					destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
-					while(File.Exists(destFilePath)) {
-						//if still not unique, try appending date/time to seconds precision until the file name is unique
-						destFileName=patOld.PatNum.ToString()+"_"+Path.GetFileNameWithoutExtension(fromDoc.FileName)
-							+"_"+DateTime.Now.ToString("yyyyMMddhhmmss")+Path.GetExtension(fromDoc.FileName);
-						destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
+			for(int i=0;i<listDocs.Count;i++) {
+				Document doc=listDocs[i];
+				string destFileName=Documents.GetUniqueFileNameForPatient(PatCur,doc.DocNum,Path.GetExtension(doc.FileName));
+				if(PrefC.AtoZfolderUsed) {
+					string fromFilePath=ODFileUtils.CombinePaths(atozFrom,doc.FileName);
+					if(!File.Exists(fromFilePath)) {
+						//the DocNum in the MedLabResults table is pointing to a file that either doesn't exist or is not accessible, can't move/copy it
+						fileMoveFailures++;
+						continue;
 					}
-				}
-				bool isCopied=true;
-				try {
-					File.Copy(fromFilePath,destFilePath);
-				}
-				catch(Exception ex) {
-					isCopied=false;
-					fileMoveFailures++;
-				}
-				if(isCopied) {//if the file is copied successfully, try to delete the original file
-					//Safe to update the document FileName and PatNum to PatCur and new file name
-					Documents.MergePatientDocument(patOld.PatNum,PatCur.PatNum,fromDoc.FileName,destFileName);
+					string destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
+					if(File.Exists(destFilePath)) {//should never happen, since we already got a unique file name, but just in case
+						//The file being copied has the same name as a file that exists in the destination folder, use a unique file name and update document table
+						destFileName=patOld.PatNum.ToString()+"_"+doc.FileName;//try to prepend patient's PatNum to the original file name
+						destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
+						while(File.Exists(destFilePath)) {
+							//if still not unique, try appending date/time to seconds precision until the file name is unique
+							destFileName=patOld.PatNum.ToString()+"_"+Path.GetFileNameWithoutExtension(doc.FileName)
+							+"_"+DateTime.Now.ToString("yyyyMMddhhmmss")+Path.GetExtension(doc.FileName);
+							destFilePath=ODFileUtils.CombinePaths(atozTo,destFileName);
+						}
+					}
+					try {
+						File.Copy(fromFilePath,destFilePath);
+					}
+					catch(Exception ex) {
+						fileMoveFailures++;
+						continue;
+					}
+					//try to delete the original file
 					try {
 						File.Delete(fromFilePath);
 					}
@@ -572,29 +480,41 @@ namespace OpenDental {
 						fileMoveFailures++;
 					}
 				}
+				//if we get here the file was copied successfully or not storing images in the database, so update the document row
+				//Safe to update the document FileName and PatNum to PatCur and new file name
+				doc.PatNum=PatCur.PatNum;
+				doc.FileName=destFileName;
+				Documents.Update(doc);
 			}
-			if(fileMoveFailures>0) {
+			ListMedLabs.ForEach(x => x.PatNum=PatCur.PatNum);//update local list, done after moving files
+			_medLabCur=ListMedLabs[0];
+			if(fileMoveFailures>0) {//will never be > 0 if storing images in the db
 				MessageBox.Show(Lan.g(this,"Some files attached to the MedLab objects could not be moved.")+"\r\n"
 					+Lan.g(this,"This could be due to a missing file, a file being open, or a permission issue on the file which is preventing the move.")+"\r\n"
 					+Lan.g(this,"The file(s) will have to be moved manually from the Image module.")+"\r\n"
-					+Lan.g(this,"Number of files not moved")+": "+fileMoveFailures);
+					+Lan.g(this,"Number of files not moved")+": "+fileMoveFailures.ToString());
 			}
-			_isNewPat=false;
 		}
 
 		///<summary>This will delete all MedLab objects for the specimen referenced by _medLabCur and all MedLabResult, MedLabSpecimen,
 		///and MedLabFacAttach objects, as well as any documents referenced by the results.  The original HL7 message will remain in the image folder,
 		///but this MedLab will not point to it.  We won't remove the HL7 message since there may be other MedLab rows that point to it.</summary>
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will delete all orders, results, and specimens for this MedLab as well as any associated pdf files.")) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will delete all orders, results, and specimens for this MedLab as well as "
+				+"any associated pdf files."))
+			{
 				return;
 			}
-			DeleteLabsAndResults(_medLabCur);
+			int failedCount=MedLabs.DeleteLabsAndResults(_medLabCur);
+			if(failedCount>0) {
+				MessageBox.Show(this,Lans.g(this,"Some images referenced by the MedLabResults could not be deleted and will have to be removed manually.")
+					+"\r\n"+Lans.g(this,"Number failed")+": "+failedCount);
+			}
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			if(_isNewPat && PatCur!=null) {
+			if(PatCur!=null && PatCur.PatNum>0 && _medLabCur.PatNum!=PatCur.PatNum) {
 				MoveLabsAndImagesHelper();
 			}
 			DialogResult=DialogResult.OK;

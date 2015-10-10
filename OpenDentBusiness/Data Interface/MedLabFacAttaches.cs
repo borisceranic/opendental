@@ -76,6 +76,14 @@ namespace OpenDentBusiness{
 			return Crud.MedLabFacAttachCrud.SelectMany(command);
 		}
 
+		public static List<MedLabFacAttach> GetAllForResults(List<long> listResultNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<MedLabFacAttach>>(MethodBase.GetCurrentMethod(),listResultNums);
+			}
+			string command="SELECT * FROM medlabfacattach WHERE MedLabResultNum IN("+String.Join(",",listResultNums)+")";
+			return Crud.MedLabFacAttachCrud.SelectMany(command);
+		}
+
 		///<summary>Delete all MedLabFacAttach objects for the list of MedLabNums and/or list of MedLabResultNums.  Supply either list or both lists and
 		///the MedLabFacAttach entries for either list will be deleted.  This could leave MedLabFacility entries not attached
 		///to any lab or result, but we won't worry about cleaning those up since the MedLabFacility table will likely always remain very small.</summary>
