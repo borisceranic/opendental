@@ -307,7 +307,7 @@ namespace OpenDentBusiness {
 				result=result.Substring(0,length);
 			}
 			return result;
-		}{
+		}
 
 	}
 }
