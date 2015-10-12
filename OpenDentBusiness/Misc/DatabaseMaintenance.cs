@@ -3370,6 +3370,49 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		///<summary>Shows payments that have a PaymentAmt that doesn't match the sum of all associated PaySplits.  
+		///Payments with no PaySplits are dealt with in PaymentMissingPaySplit()</summary>
+		[DbmMethod(HasBreakDown=true)]
+		public static string PaymentAmtNotMatchPaySplitTotal(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			//Note that this just returns info for a (seemingly) random patient that has a paysplit for the payment.
+			//This is because the payment only shows in the ledger for the patient with the paysplit, not the patient on the payment.
+			command="SELECT patient.PatNum, patient.LName, patient.FName, payment.PayDate "
+				+"FROM payment "
+				+"INNER JOIN ( "
+					+"SELECT paysplit.PayNum, SUM(paysplit.SplitAmt) totSplitAmt, MIN(paysplit.PatNum) PatNum "
+					+"FROM paysplit "
+					+"GROUP BY paysplit.PayNum "
+				+") pstotals ON pstotals.PayNum=payment.PayNum "
+				+"INNER JOIN patient ON patient.PatNum=pstotals.PatNum "
+				+"WHERE payment.PayAmt!=0 "
+				+"AND ROUND(payment.PayAmt,2)!=ROUND(pstotals.totSplitAmt,2) "
+				+"ORDER BY patient.LName, patient.FName, payment.PayDate";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.   
+			log+=Lans.g("FormDatabaseMaintenance","Payments with amounts that do not match the total split(s) amounts")+": "+table.Rows.Count;
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					log+="   "+table.Rows[i]["PatNum"].ToString();
+					log+="  "+Patients.GetNameLF(table.Rows[i]["LName"].ToString(),table.Rows[i]["FName"].ToString(),"","");
+					log+="  "+PIn.DateT(table.Rows[i]["PayDate"].ToString()).ToShortDateString();
+					log+="\r\n";
+				}
+				log+="   "+Lans.g("FormDatabaseMaintenance","They need to be fixed manually.")+"\r\n";
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		public static string PaymentDetachMissingDeposit(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
