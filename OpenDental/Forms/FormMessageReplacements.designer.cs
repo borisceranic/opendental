@@ -26,6 +26,7 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMessageReplacements));
 			this.label1 = new System.Windows.Forms.Label();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butOK = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
@@ -34,11 +35,11 @@ namespace OpenDental{
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label1.Location = new System.Drawing.Point(12, 658);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(682, 26);
+			this.label1.Size = new System.Drawing.Size(601, 26);
 			this.label1.TabIndex = 7;
-			this.label1.Text = "These replacements are used in various parts of the program.  Not all replacement" +
-    "s are always supported.\r\nReplacement tags are case-sensitive, and must be an exa" +
-    "ct match of what is shown here.";
+			this.label1.Text = "Replacement fields are case-sensitive, and must be an exact match of what is show" +
+    "n here.\r\nFields that are supported from this specific location are shown in blac" +
+    "k.  Fields in red are not supported.";
 			// 
 			// gridMain
 			// 
@@ -54,6 +55,23 @@ namespace OpenDental{
 			this.gridMain.TabIndex = 6;
 			this.gridMain.Title = null;
 			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(619, 660);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 24);
+			this.butOK.TabIndex = 21;
+			this.butOK.Text = "&OK";
+			this.butOK.Visible = false;
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butClose
 			// 
@@ -74,6 +92,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(787, 696);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
@@ -83,7 +102,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormMessageReplacements";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Message Replacements";
+			this.Text = "Message Replacement Fields";
 			this.Load += new System.EventHandler(this.FormMessageReplacements_Load);
 			this.ResumeLayout(false);
 
@@ -94,6 +113,7 @@ namespace OpenDental{
 		private UI.ODGrid gridMain;
 		private UI.Button butClose;
 		private System.Windows.Forms.Label label1;
+		private UI.Button butOK;
 
 	}
 }

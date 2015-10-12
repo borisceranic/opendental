@@ -8,9 +8,17 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
+	///<summary>If using selection mode, call FormMessageReplacements modally.  If not in selection mode, non-modal instances are fine.</summary>
 	public partial class FormMessageReplacements:Form {
 
 		private MessageReplaceType _replaceTypes;
+		public bool IsSelectionMode;
+
+		public string Replacement{
+			get {
+				return getReplacements(gridMain.GetSelectedIndex());
+			}
+		}
 
 		public FormMessageReplacements(MessageReplaceType replaceTypes) {
 			InitializeComponent();
@@ -19,6 +27,10 @@ namespace OpenDental {
 		}
 
 		private void FormMessageReplacements_Load(object sender,EventArgs e) {
+			if(IsSelectionMode) {
+				butClose.Text=Lans.g(this,"Cancel");
+				butOK.Visible=true;
+			}
 			FillGrid();
 		}
 
@@ -36,7 +48,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[FName]");
 			row.Cells.Add("The patient's first name.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -44,7 +56,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[LName]");
 			row.Cells.Add("The patient's last name.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -52,7 +64,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[LNameLetter]");
 			row.Cells.Add("The first letter of the patient's last name, capitalized.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -60,7 +72,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[NameF]");
 			row.Cells.Add("The patient's first name.  Same as FName.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -68,7 +80,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[NameFL]");
 			row.Cells.Add("The patient's first name, a space, then the patient's last name.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -76,7 +88,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[PatNum]");
 			row.Cells.Add("The patient's account number.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -84,7 +96,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[ChartNumber]");
 			row.Cells.Add("The patient's chart number.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -92,7 +104,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[WirelessPhone]");
 			row.Cells.Add("The patient's wireless phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -100,7 +112,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[HmPhone]");
 			row.Cells.Add("The patient's home phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -108,7 +120,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[WkPhone]");
 			row.Cells.Add("The patient's work phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -116,7 +128,7 @@ namespace OpenDental {
 			row.Cells.Add("Patient");
 			row.Cells.Add("[ReferredFromProvNameFL]");
 			row.Cells.Add("The first and last name of the provider that referred the patient.");
-			if((_replaceTypes & MessageReplaceType.Patient)==MessageReplaceType.Patient) {
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -124,7 +136,7 @@ namespace OpenDental {
 			row.Cells.Add("Family");
 			row.Cells.Add("[FamilyList]");
 			row.Cells.Add("List of the patient's family members, one per line.");
-			if((_replaceTypes & MessageReplaceType.Family)==MessageReplaceType.Family) {
+			if((_replaceTypes & MessageReplaceType.Family)!=MessageReplaceType.Family) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -132,7 +144,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[ApptDate]");
 			row.Cells.Add("The appointment date.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -140,7 +152,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[ApptTime]");
 			row.Cells.Add("The appointment time.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -148,7 +160,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[ApptDayOfWeek]");
 			row.Cells.Add("The day of the week the appointment falls on.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -156,7 +168,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[ApptProcsList]");
 			row.Cells.Add("The procedures attached to the appointment, one per line, including procedure date and layman's term.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -164,7 +176,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[date]");
 			row.Cells.Add("The appointment date.  Synonym of ApptDate.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -172,7 +184,7 @@ namespace OpenDental {
 			row.Cells.Add("Appointment");
 			row.Cells.Add("[time]");
 			row.Cells.Add("The appointment time.  Synonym of ApptTime.");
-			if((_replaceTypes & MessageReplaceType.Appointment)==MessageReplaceType.Appointment) {
+			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -180,7 +192,7 @@ namespace OpenDental {
 			row.Cells.Add("Recall");
 			row.Cells.Add("[DueDate]");
 			row.Cells.Add("Max selected recall date for the patient.");
-			if((_replaceTypes & MessageReplaceType.Recall)==MessageReplaceType.Recall) {
+			if((_replaceTypes & MessageReplaceType.Recall)!=MessageReplaceType.Recall) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -188,7 +200,7 @@ namespace OpenDental {
 			row.Cells.Add("Recall");
 			row.Cells.Add("[URL]");
 			row.Cells.Add("The link where a patient can go to schedule a recall from the web.");
-			if((_replaceTypes & MessageReplaceType.Recall)==MessageReplaceType.Recall) {
+			if((_replaceTypes & MessageReplaceType.Recall)!=MessageReplaceType.Recall) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -196,7 +208,7 @@ namespace OpenDental {
 			row.Cells.Add("User");
 			row.Cells.Add("[UserNameF]");
 			row.Cells.Add("The first name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)==MessageReplaceType.User) {
+			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -204,7 +216,7 @@ namespace OpenDental {
 			row.Cells.Add("User");
 			row.Cells.Add("[UserNameL]");
 			row.Cells.Add("The last name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)==MessageReplaceType.User) {
+			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -212,7 +224,7 @@ namespace OpenDental {
 			row.Cells.Add("User");
 			row.Cells.Add("[UserNameFL]");
 			row.Cells.Add("The first name, a space, then the last name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)==MessageReplaceType.User) {
+			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -220,7 +232,7 @@ namespace OpenDental {
 			row.Cells.Add("Office");
 			row.Cells.Add("[OfficePhone]");
 			row.Cells.Add("The practice or clinic phone number in standard format.");
-			if((_replaceTypes & MessageReplaceType.Office)==MessageReplaceType.Office) {
+			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -228,7 +240,7 @@ namespace OpenDental {
 			row.Cells.Add("Office");
 			row.Cells.Add("[OfficeFax]");
 			row.Cells.Add("The practice or clinic fax number in standard format.");
-			if((_replaceTypes & MessageReplaceType.Office)==MessageReplaceType.Office) {
+			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -236,7 +248,7 @@ namespace OpenDental {
 			row.Cells.Add("Office");
 			row.Cells.Add("[OfficeName]");
 			row.Cells.Add("The practice or clinic name.");
-			if((_replaceTypes & MessageReplaceType.Office)==MessageReplaceType.Office) {
+			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
 				row.ColorText=Color.Red;
 			}
 			gridMain.Rows.Add(row);
@@ -385,9 +397,31 @@ namespace OpenDental {
 			return retVal;
 		}
 
+		private string getReplacements(int selectedIndex) {
+			return gridMain.Rows[selectedIndex].Cells[1].Text;
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 			Close();//Because we want the option to open this window non-modal.
+		}
+
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			PressOK(e.Row);
+		}
+
+		///<summary>Only visible if IsSelectionMode is true.</summary>
+		private void butOK_Click(object sender,EventArgs e) {
+			PressOK(gridMain.GetSelectedIndex());
+		}
+
+		private void PressOK(int index) {
+			if(IsSelectionMode && gridMain.Rows[index].ColorText!=Color.Red) {
+				DialogResult=DialogResult.OK;
+			}
+			else {
+				MsgBox.Show(this,"The selected field is not supported.");
+			}
 		}
 
 	}
