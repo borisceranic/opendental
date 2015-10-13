@@ -400,11 +400,17 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		public static bool ClaimIdentifierInUse(string claimIdentifier,long claimNumExclude) {
+		public static bool IsClaimIdentifierInUse(string claimIdentifier,long claimNumExclude,string claimType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),claimIdentifier,claimNumExclude);
 			}
 			string command="SELECT COUNT(*) FROM claim WHERE ClaimIdentifier='"+POut.String(claimIdentifier)+"' AND ClaimNum<>"+POut.Long(claimNumExclude);
+			if(claimType=="PreAuth") {
+				command+=" AND ClaimType='PreAuth'";
+			}
+			else {
+				command+=" AND ClaimType!='PreAuth'";
+			}
 			return (Db.GetTable(command).Rows[0][0].ToString()!="0");
 		}
 

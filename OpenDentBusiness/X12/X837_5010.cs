@@ -2904,7 +2904,7 @@ namespace OpenDentBusiness
 				Comma(strb);
 				strb.Append("Claim identifier missing");
 			}
-			else if(Claims.ClaimIdentifierInUse(claim.ClaimIdentifier,claim.ClaimNum)) {
+			else if(Claims.IsClaimIdentifierInUse(claim.ClaimIdentifier,claim.ClaimNum,claim.ClaimType)) {
 				Comma(strb);
 				strb.Append("Claim identifier already in use for another claim");
 			}
