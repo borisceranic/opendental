@@ -257,7 +257,14 @@ namespace OpenDentBusiness
 				string billingCity="";
 				string billingState="";
 				string billingZip="";
-				if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
+				if(clinic!=null && clinic.UseBillAddrOnClaims) {
+					billingAddress1=clinic.BillingAddress;
+					billingAddress2=clinic.BillingAddress2;
+					billingCity=clinic.BillingCity;
+					billingState=clinic.BillingState;
+					billingZip=clinic.BillingZip;
+				}
+				else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
 					billingAddress1=PrefC.GetString(PrefName.PracticeBillingAddress);
 					billingAddress2=PrefC.GetString(PrefName.PracticeBillingAddress2);
 					billingCity=PrefC.GetString(PrefName.PracticeBillingCity);
@@ -270,13 +277,6 @@ namespace OpenDentBusiness
 					billingCity=PrefC.GetString(PrefName.PracticeCity);
 					billingState=PrefC.GetString(PrefName.PracticeST);
 					billingZip=PrefC.GetString(PrefName.PracticeZip);
-				}
-				else if(clinic.BillingAddress!="") {//Clinic on claim and there is a billing address override for the clinic.
-					billingAddress1=clinic.BillingAddress;
-					billingAddress2=clinic.BillingAddress2;
-					billingCity=clinic.BillingCity;
-					billingState=clinic.BillingState;
-					billingZip=clinic.BillingZip;
 				}
 				else {
 					billingAddress1=clinic.Address;
@@ -2562,7 +2562,19 @@ namespace OpenDentBusiness
 					strb.Append("Billing Prov Middle Name may contain letters spaces and apostrophes only");
 				}
 			}
-			if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
+			if(clinic!=null && clinic.UseBillAddrOnClaims) {
+				X12Validate.Clinic(clinic,strb);//Tests for 5 or 9 digit zip.
+				if(Regex.IsMatch(clinic.BillingZip,"^[0-9]{5}\\-?$")) {
+					//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+					Comma(strb);
+					strb.Append("Clinic billing zip must contain nine digits.");
+				}
+				if(Regex.IsMatch(clinic.BillingAddress,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
+					Comma(strb);
+					strb.Append("Clinic billing address cannot be a P.O. BOX when used for e-claims.");
+				}
+			}
+			else if(PrefC.GetBool(PrefName.UseBillingAddressOnClaims)) {
 				X12Validate.BillingAddress(strb);//Tests for 5 or 9 digit zip.
 				string zip=PrefC.GetString(PrefName.PracticeBillingZip);
 				if(Regex.IsMatch(zip,"^[0-9]{5}\\-?$")) {//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
@@ -2588,27 +2600,14 @@ namespace OpenDentBusiness
 			}
 			else { //Using a clinic
 				X12Validate.Clinic(clinic,strb);//Tests for 5 or 9 digit zip.
-				if(clinic.BillingAddress!="") {//Clinic address billing override present.
-					if(Regex.IsMatch(clinic.BillingZip,"^[0-9]{5}\\-?$")) {
-						//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
-						Comma(strb);
-						strb.Append("Clinic billing zip must contain nine digits.");
-					}
-					if(Regex.IsMatch(clinic.BillingAddress,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
-						Comma(strb);
-						strb.Append("Clinic billing address cannot be a P.O. BOX when used for e-claims.");
-					}
+				if(Regex.IsMatch(clinic.Zip,"^[0-9]{5}\\-?$")) {
+					//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
+					Comma(strb);
+					strb.Append("Clinic zip must contain nine digits.");
 				}
-				else {
-					if(Regex.IsMatch(clinic.Zip,"^[0-9]{5}\\-?$")) {
-						//If the zip is 5 digits in format ##### or #####-, then it passed the first test, but 9 digits zips are required.
-						Comma(strb);
-						strb.Append("Clinic zip must contain nine digits.");
-					}
-					if(Regex.IsMatch(clinic.Address,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
-						Comma(strb);
-						strb.Append("Clinic address cannot be a P.O. BOX when used for e-claims.");
-					}
+				if(Regex.IsMatch(clinic.Address,".*P\\.?O\\.? .*",RegexOptions.IgnoreCase)) {
+					Comma(strb);
+					strb.Append("Clinic address cannot be a P.O. BOX when used for e-claims.");
 				}
 			}
 			if(clinic==null || (clinic!=null && clinic.PayToAddress=="")) {//No clinic Pay To address.

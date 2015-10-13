@@ -9658,6 +9658,30 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.21.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_3_22();
+		}
+
+		private static void To15_3_22() {
+			if(FromVersion<new Version("15.3.22.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.3.22"));//No translation in convert script.
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD UseBillAddrOnClaims tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD UseBillAddrOnClaims number(3)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET UseBillAddrOnClaims = 0 WHERE UseBillAddrOnClaims IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY UseBillAddrOnClaims NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE clinic SET UseBillAddrOnClaims=CASE WHEN BillingAddress='' THEN 0 ELSE 1 END";//For backwards compatibility to version 15.3
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.3.22.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To15_4_0();
 		}
 
