@@ -42,7 +42,7 @@ namespace OpenDental.Bridges {
 			}
 			try {
 				for(int i=0;i<listPhoneNumbers.Count;i++) {
-					string apiUrl="https://podium.co/api/v1";
+					string apiUrl="https://podium.co/api/v1/review_invitations";
 					string apiToken=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your API Token (required)");
 					string locationId=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your Location ID (required)");
 					using(WebClientEx client=new WebClientEx()) {
