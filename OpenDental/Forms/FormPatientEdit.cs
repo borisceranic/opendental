@@ -2450,6 +2450,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureGoogleMaps)) {
 				butShowMap.Visible=true;
 			}
+			Plugins.HookAddCode(this,"FormPatientEdit.Load_end",PatCur);
 		}
 
 		private void FillComboZip(){
@@ -3614,6 +3615,12 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			bool isValid=true;
+			object[] parameters=new object[] { isValid,PatCur };
+			Plugins.HookAddCode(this,"FormPatientEdit.butOK_Click_beginning",parameters);
+			if((bool)parameters[0]==false) {//Didn't pass plug-in validation
+				return;
+			}
 			bool CDSinterventionCheckRequired=false;//checks selected values
 			if(  textBirthdate.errorProvider1.GetError(textBirthdate)!=""
 				|| textDateFirstVisit.errorProvider1.GetError(textDateFirstVisit)!=""
