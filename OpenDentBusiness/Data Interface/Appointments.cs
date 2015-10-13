@@ -1851,8 +1851,8 @@ namespace OpenDentBusiness{
 				Procedures.SetDateFirstVisit(DateTime.MinValue,3,pat);
 			}
 			//procs
-			command="UPDATE procedurelog SET ProcDate="+DbHelper.Curdate()+" WHERE (AptNum="+POut.Long(aptNum)+" OR PlannedAptNum="
-				+POut.Long(aptNum)+") AND "+DbHelper.Year("ProcDate")+"<1880 AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP);//Only change procdate for TP procedures
+			command="UPDATE procedurelog SET ProcDate="+DbHelper.Curdate()+" WHERE ProcDate<'1880-01-01' AND (AptNum="+POut.Long(aptNum)+" OR PlannedAptNum="
+			+POut.Long(aptNum)+") AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP);//Only change procdate for TP procedures
 			Db.NonQ(command);
 			if(table.Rows[0]["AptStatus"].ToString()=="6") {//planned
 				command="UPDATE procedurelog SET PlannedAptNum =0 WHERE PlannedAptNum = "+POut.Long(aptNum);
