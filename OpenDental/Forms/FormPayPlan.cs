@@ -1732,6 +1732,7 @@ namespace OpenDental{
 				return;
 			}
       DialogResult=DialogResult.OK;
+			Plugins.HookAddCode(this,"FormPaymentPlan.butOK_Click_end",PatCur,PayPlanCur,IsNew);
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
