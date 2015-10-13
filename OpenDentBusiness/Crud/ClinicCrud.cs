@@ -73,6 +73,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.SmsContractDate    = PIn.DateT (table.Rows[i]["SmsContractDate"].ToString());
 				clinic.SmsMonthlyLimit    = PIn.Double(table.Rows[i]["SmsMonthlyLimit"].ToString());
 				clinic.IsMedicalOnly      = PIn.Bool  (table.Rows[i]["IsMedicalOnly"].ToString());
+				clinic.UseBillAddrOnClaims= PIn.Bool  (table.Rows[i]["UseBillAddrOnClaims"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -113,7 +114,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -143,7 +144,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (clinic.DefaultProv)+","
 				+    POut.DateT (clinic.SmsContractDate)+","
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
-				+    POut.Bool  (clinic.IsMedicalOnly)+")";
+				+    POut.Bool  (clinic.IsMedicalOnly)+","
+				+    POut.Bool  (clinic.UseBillAddrOnClaims)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -176,7 +178,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -206,7 +208,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (clinic.DefaultProv)+","
 				+    POut.DateT (clinic.SmsContractDate)+","
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
-				+    POut.Bool  (clinic.IsMedicalOnly)+")";
+				+    POut.Bool  (clinic.IsMedicalOnly)+","
+				+    POut.Bool  (clinic.UseBillAddrOnClaims)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -244,7 +247,8 @@ namespace OpenDentBusiness.Crud{
 				+"DefaultProv        =  "+POut.Long  (clinic.DefaultProv)+", "
 				+"SmsContractDate    =  "+POut.DateT (clinic.SmsContractDate)+", "
 				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"', "
-				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+" "
+				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+", "
+				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -355,6 +359,10 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.IsMedicalOnly != oldClinic.IsMedicalOnly) {
 				if(command!=""){ command+=",";}
 				command+="IsMedicalOnly = "+POut.Bool(clinic.IsMedicalOnly)+"";
+			}
+			if(clinic.UseBillAddrOnClaims != oldClinic.UseBillAddrOnClaims) {
+				if(command!=""){ command+=",";}
+				command+="UseBillAddrOnClaims = "+POut.Bool(clinic.UseBillAddrOnClaims)+"";
 			}
 			if(command==""){
 				return false;

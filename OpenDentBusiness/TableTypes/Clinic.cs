@@ -62,6 +62,8 @@ namespace OpenDentBusiness{
 		///<summary>True if this clinic is a medical clinic.  Used to hide/change certain areas of Open Dental, like hiding the tooth chart and changing
 		///'dentist' to 'provider'.</summary>
 		public bool IsMedicalOnly;
+		///<summary>True if this clinic's billing address should be used on outgoing claims.</summary>
+		public bool UseBillAddrOnClaims;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){
