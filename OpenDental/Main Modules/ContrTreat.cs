@@ -3227,6 +3227,7 @@ namespace OpenDental{
 			Procedure ProcCur;
 			ClaimProc ClaimProcCur;
 			ClaimProc cpExisting;
+			List<ClaimProc> listClaimProcs=new List<ClaimProc>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
 					continue;//skip any highlighted subtotal lines
@@ -3262,9 +3263,13 @@ namespace OpenDental{
 						}
 					}
 				}
-				ClaimProcCur.LineNumber=(byte)(i+1);
-        ClaimProcs.Insert(ClaimProcCur);
+				listClaimProcs.Add(ClaimProcCur);
 				//ProcCur.Update(ProcOld);
+			}
+			listClaimProcs.Sort(ClaimProc.Compare);
+			for(int i=0;i<listClaimProcs.Count;i++) {
+				listClaimProcs[i].LineNumber=(byte)(i+1);
+				ClaimProcs.Insert(listClaimProcs[i]);
 			}
 			ProcList=Procedures.Refresh(PatCur.PatNum);
 			//ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);

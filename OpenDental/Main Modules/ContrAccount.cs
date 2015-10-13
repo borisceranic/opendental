@@ -3285,9 +3285,13 @@ namespace OpenDental {
 						}
 					}
 				}
-				claimProcs[i].LineNumber=(byte)(i+1);
-				ClaimProcs.Update(claimProcs[i]);
 			}//for claimProc
+			List <ClaimProc> listClaimProcs=new List<ClaimProc>(claimProcs);
+			listClaimProcs.Sort(ClaimProc.Compare);
+			for(int i=0;i<listClaimProcs.Count;i++) {
+				listClaimProcs[i].LineNumber=(byte)(i+1);
+				ClaimProcs.Update(listClaimProcs[i]);
+			}
 			return ClaimCur;
 			//return null;
 		}

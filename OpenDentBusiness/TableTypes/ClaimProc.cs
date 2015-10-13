@@ -61,7 +61,8 @@ namespace OpenDentBusiness{
 		public DateTime ProcDate;
 		///<summary>Date that it was changed to status received or supplemental.  It is usually attached to a claimPayment at that point, but not if user forgets.  This is still the date that it becomes important financial data.  Only applies if Received or Supplemental.  Otherwise, the date is disregarded.  User may never edit. Important in audit trail.</summary>
 		public DateTime DateEntry;
-		///<summary>Assigned when claim is created as a way to order the procs showing on a claim.  Really only used in Canadian claims for now as F07.</summary>
+		///<summary>Assigned when claim is created as a way to order the procs showing on a claim.  Indireclty goes out in X12 loop 2400.
+		///Used in Canadian eclaims (field F07).</summary>
 		public byte LineNumber;
 		///<summary>-1 if blank.  Not sure why we need to allow -1.  Calculated automatically.  User cannot edit, but can use DedEstOverride instead.</summary>
 		public double DedEst;
@@ -142,6 +143,29 @@ namespace OpenDentBusiness{
 				return false;
 			}
 			return true;
+		}
+
+		///<summary>Compares primarily by CodeSent.  When sorting using this function, the result will be sorted by CodeSent, then by other fields.
+		///This function was created to fulfill request #88, "Claim procedures ordered by procedure code on claim".
+		///Additionally, Denti-Cal requires the procedures to be in the same order on a preauth as they are on the corresponding claim.</summary>
+		public static int Compare(ClaimProc claimProc1,ClaimProc claimProc2) {
+			int retVal=claimProc1.CodeSent.CompareTo(claimProc2.CodeSent);
+			if(retVal!=0) {
+				return retVal;
+			}
+			if(claimProc1.ProcDate < claimProc2.ProcDate) {//A few offices submit dental claims with procedures spanning over multiple days.
+				return -1;
+			}
+			else if(claimProc1.ProcDate > claimProc2.ProcDate) {
+				return 1;
+			}
+			if(claimProc1.FeeBilled < claimProc2.FeeBilled) {//Fee Billed might only matter for a few codes, such as D0999 or D2999.
+				return -1;
+			}
+			else if(claimProc1.FeeBilled > claimProc2.FeeBilled) {
+				return 1;
+			}
+			return 0;
 		}
 
 		public override string ToString() {
