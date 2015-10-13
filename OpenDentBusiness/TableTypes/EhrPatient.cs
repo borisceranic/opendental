@@ -13,6 +13,9 @@ namespace OpenDentBusiness {
 		public string MotherMaidenLname;
 		///<summary>Enum:YN  Indicates whether or not the patient wants to share their vaccination information with other EHRs.  Used in immunization export.</summary>
 		public YN VacShareOk;
+		///<summary>The abbreviation for the state for the patient's MedicaidID.
+		///Displayed in patient information window, used to validate the length of the MedicaidID.</summary>
+		public string MedicaidState;
 
 		///<summary></summary>
 		public EhrPatient Clone() {

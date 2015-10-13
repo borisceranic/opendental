@@ -288,6 +288,7 @@ namespace OpenDentBusiness{
 				//case Permissions.JobManager:
 				//case Permissions.JobReview:
 				//case Permissions.WebmailDelete:
+				//case Permissions.MissingRequiredField:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -443,6 +444,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Reports - Dashboard");
 				case Permissions.ReportProdInc:
 					return Lans.g("enumPermissions","Reports - Production and Income, Aging");
+				case Permissions.RequiredFields:
+					return Lans.g("enumPermissions","Required Fields Missing");
 				case Permissions.RxCreate:
 					return Lans.g("enumPermissions","Rx Create");
 				case Permissions.RxEdit:

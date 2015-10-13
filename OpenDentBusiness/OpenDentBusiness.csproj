@@ -385,6 +385,8 @@
     <Compile Include="Crud\ReplicationServerCrud.cs" />
     <Compile Include="Crud\ReqNeededCrud.cs" />
     <Compile Include="Crud\ReqStudentCrud.cs" />
+    <Compile Include="Crud\RequiredFieldConditionCrud.cs" />
+    <Compile Include="Crud\RequiredFieldCrud.cs" />
     <Compile Include="Crud\ResellerCrud.cs" />
     <Compile Include="Crud\ResellerServiceCrud.cs" />
     <Compile Include="Crud\RxAlertCrud.cs" />
@@ -414,6 +416,8 @@
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
     <Compile Include="Data Interface\StateAbbrs.cs" />
+    <Compile Include="Data Interface\RequiredFieldConditions.cs" />
+    <Compile Include="Data Interface\RequiredFields.cs" />
     <Compile Include="InternalTools\EServices\EServiceMetrics.cs" />
     <Compile Include="InternalTools\IntegratedTexting\SmsBillingCrud.cs" />
     <Compile Include="Crud\SmsFromMobileCrud.cs" />
@@ -966,6 +970,8 @@
     <Compile Include="TableTypes\EmailAutograph.cs" />
     <Compile Include="TableTypes\EServiceSignal.cs" />
     <Compile Include="TableTypes\ProviderErx.cs" />
+    <Compile Include="TableTypes\RequiredField.cs" />
+    <Compile Include="TableTypes\RequiredFieldCondition.cs" />
     <Compile Include="TableTypes\SmsPhone.cs" />
     <Compile Include="TableTypes\SmsToMobile.cs" />
     <Compile Include="TableTypes\SmsFromMobile.cs" />

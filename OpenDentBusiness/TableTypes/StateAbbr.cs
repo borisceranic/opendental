@@ -12,6 +12,8 @@ namespace OpenDentBusiness {
 		public string Description;
 		///<summary>Short state abbreviation (usually 2 digit)</summary>
 		public string Abbr;
+		///<summary>The length that the Medicaid ID should be for this state. If 0, then the Medicaid length is not enforced for this state</summary>
+		public int MedicaidIDLength;
 
 		///<summary></summary>
 		public StateAbbr Clone() {

@@ -46,9 +46,10 @@ namespace OpenDentBusiness.Crud{
 			StateAbbr stateAbbr;
 			for(int i=0;i<table.Rows.Count;i++) {
 				stateAbbr=new StateAbbr();
-				stateAbbr.StateAbbrNum= PIn.Long  (table.Rows[i]["StateAbbrNum"].ToString());
-				stateAbbr.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				stateAbbr.Abbr        = PIn.String(table.Rows[i]["Abbr"].ToString());
+				stateAbbr.StateAbbrNum    = PIn.Long  (table.Rows[i]["StateAbbrNum"].ToString());
+				stateAbbr.Description     = PIn.String(table.Rows[i]["Description"].ToString());
+				stateAbbr.Abbr            = PIn.String(table.Rows[i]["Abbr"].ToString());
+				stateAbbr.MedicaidIDLength= PIn.Int   (table.Rows[i]["MedicaidIDLength"].ToString());
 				retVal.Add(stateAbbr);
 			}
 			return retVal;
@@ -89,13 +90,14 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="StateAbbrNum,";
 			}
-			command+="Description,Abbr) VALUES(";
+			command+="Description,Abbr,MedicaidIDLength) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(stateAbbr.StateAbbrNum)+",";
 			}
 			command+=
 				 "'"+POut.String(stateAbbr.Description)+"',"
-				+"'"+POut.String(stateAbbr.Abbr)+"')";
+				+"'"+POut.String(stateAbbr.Abbr)+"',"
+				+    POut.Int   (stateAbbr.MedicaidIDLength)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -128,13 +130,14 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="StateAbbrNum,";
 			}
-			command+="Description,Abbr) VALUES(";
+			command+="Description,Abbr,MedicaidIDLength) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(stateAbbr.StateAbbrNum)+",";
 			}
 			command+=
 				 "'"+POut.String(stateAbbr.Description)+"',"
-				+"'"+POut.String(stateAbbr.Abbr)+"')";
+				+"'"+POut.String(stateAbbr.Abbr)+"',"
+				+    POut.Int   (stateAbbr.MedicaidIDLength)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -147,8 +150,9 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one StateAbbr in the database.</summary>
 		public static void Update(StateAbbr stateAbbr){
 			string command="UPDATE stateabbr SET "
-				+"Description = '"+POut.String(stateAbbr.Description)+"', "
-				+"Abbr        = '"+POut.String(stateAbbr.Abbr)+"' "
+				+"Description     = '"+POut.String(stateAbbr.Description)+"', "
+				+"Abbr            = '"+POut.String(stateAbbr.Abbr)+"', "
+				+"MedicaidIDLength=  "+POut.Int   (stateAbbr.MedicaidIDLength)+" "
 				+"WHERE StateAbbrNum = "+POut.Long(stateAbbr.StateAbbrNum);
 			Db.NonQ(command);
 		}
@@ -163,6 +167,10 @@ namespace OpenDentBusiness.Crud{
 			if(stateAbbr.Abbr != oldStateAbbr.Abbr) {
 				if(command!=""){ command+=",";}
 				command+="Abbr = '"+POut.String(stateAbbr.Abbr)+"'";
+			}
+			if(stateAbbr.MedicaidIDLength != oldStateAbbr.MedicaidIDLength) {
+				if(command!=""){ command+=",";}
+				command+="MedicaidIDLength = "+POut.Int(stateAbbr.MedicaidIDLength)+"";
 			}
 			if(command==""){
 				return false;

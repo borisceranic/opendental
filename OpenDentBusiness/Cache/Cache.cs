@@ -216,6 +216,10 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.ReplicationServers) || isAll) {
 				ds.Tables.Add(ReplicationServers.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.RequiredFields) || isAll) {
+				ds.Tables.Add(RequiredFields.RefreshCache());
+				ds.Tables.Add(RequiredFieldConditions.RefreshCache());
+			}
 			if(itypes.Contains((int)InvalidType.Security) || isAll){
 				ds.Tables.Add(Userods.RefreshCache());
 				ds.Tables.Add(UserGroups.RefreshCache());
@@ -418,6 +422,9 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.ReplicationServers) || isAll) {
 				ReplicationServers.FillCache(ds.Tables["ReplicationServer"]);
 			}
+			//if(itypes.Contains((int)InvalidType.RequiredFields) || isAll) {
+			//	RequiredFields.FillCache(ds.Tables["RequiredField"]);
+			//}
 			if(itypes.Contains((int)InvalidType.Security) || isAll) {
 				Userods.FillCache(ds.Tables["Userod"]);
 				UserGroups.FillCache(ds.Tables["UserGroup"]);

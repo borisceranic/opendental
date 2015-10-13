@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -68,7 +67,7 @@ namespace OpenDentBusiness{
 			Crud.StateAbbrCrud.Delete(stateAbbrNum);
 		}
 
-		///<summary>Returns an list of StatesAbbrs with abbreviations similar to the supplied string.
+		///<summary>Returns a list of StatesAbbrs with abbreviations similar to the supplied string.
 		///Used in dropdown list from state field for faster entry.</summary>
 		public static List<StateAbbr> GetSimilarAbbrs(string abbr) {
 			//No need to check RemotingRole; no call to db.
@@ -82,6 +81,27 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Returns the Medicaid ID Length for a given abbreviation.</summary>
+		public static int GetMedicaidIDLength(string abbr) {
+			List<StateAbbr> stateAbbrs=StateAbbrs.Listt;
+			for(int i=0;i<stateAbbrs.Count;i++) {
+				if(stateAbbrs[i].Abbr.ToLower()==abbr.ToLower()) {
+					return stateAbbrs[i].MedicaidIDLength;
+				}
+			}
+			return 0;
+		}
+
+		///<summary>Returns true if the abbreviation exists in the stateabbr table.</summary>
+		public static bool IsValidAbbr(string abbr) {
+			List<StateAbbr> stateAbbrs=StateAbbrs.Listt;
+			for(int i=0;i<stateAbbrs.Count;i++) {
+				if(stateAbbrs[i].Abbr.ToLower()==abbr.ToLower()) {
+					return true;
+				}
+			}
+			return false;
+		}
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 

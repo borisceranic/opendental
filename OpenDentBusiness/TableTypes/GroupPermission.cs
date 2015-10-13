@@ -236,7 +236,10 @@ namespace OpenDentBusiness{
 		///<summary>103- Allows user to review a job.  HQ only.</summary>
 		JobReview,
 		///<summary>104- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
-		WebmailDelete
+		WebmailDelete,
+		///<summary>105- Audit trail for saving a patient with required fields missing.  There is no user interface in the security window for this 
+		///permission.</summary>
+		RequiredFields
 	}
 
 	

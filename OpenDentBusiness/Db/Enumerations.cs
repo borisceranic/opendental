@@ -288,7 +288,9 @@ namespace OpenDentBusiness{
 		///<summary>62. Used to refresh the jobs windows in the Job Manager.</summary>
 		Job,
 		///<summary>63. Caches the StateAbbrs used for helping prefill state fields and for state validations.</summary>
-		StateAbbrs
+		StateAbbrs,
+		///<summary>64</summary>
+		RequiredFields
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

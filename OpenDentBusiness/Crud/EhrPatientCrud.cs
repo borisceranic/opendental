@@ -50,6 +50,7 @@ namespace OpenDentBusiness.Crud{
 				ehrPatient.MotherMaidenFname= PIn.String(table.Rows[i]["MotherMaidenFname"].ToString());
 				ehrPatient.MotherMaidenLname= PIn.String(table.Rows[i]["MotherMaidenLname"].ToString());
 				ehrPatient.VacShareOk       = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["VacShareOk"].ToString());
+				ehrPatient.MedicaidState    = PIn.String(table.Rows[i]["MedicaidState"].ToString());
 				retVal.Add(ehrPatient);
 			}
 			return retVal;
@@ -90,14 +91,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PatNum,";
 			}
-			command+="MotherMaidenFname,MotherMaidenLname,VacShareOk) VALUES(";
+			command+="MotherMaidenFname,MotherMaidenLname,VacShareOk,MedicaidState) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(ehrPatient.PatNum)+",";
 			}
 			command+=
 				 "'"+POut.String(ehrPatient.MotherMaidenFname)+"',"
 				+"'"+POut.String(ehrPatient.MotherMaidenLname)+"',"
-				+    POut.Int   ((int)ehrPatient.VacShareOk)+")";
+				+    POut.Int   ((int)ehrPatient.VacShareOk)+","
+				+"'"+POut.String(ehrPatient.MedicaidState)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -130,14 +132,15 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PatNum,";
 			}
-			command+="MotherMaidenFname,MotherMaidenLname,VacShareOk) VALUES(";
+			command+="MotherMaidenFname,MotherMaidenLname,VacShareOk,MedicaidState) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(ehrPatient.PatNum)+",";
 			}
 			command+=
 				 "'"+POut.String(ehrPatient.MotherMaidenFname)+"',"
 				+"'"+POut.String(ehrPatient.MotherMaidenLname)+"',"
-				+    POut.Int   ((int)ehrPatient.VacShareOk)+")";
+				+    POut.Int   ((int)ehrPatient.VacShareOk)+","
+				+"'"+POut.String(ehrPatient.MedicaidState)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -152,7 +155,8 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE ehrpatient SET "
 				+"MotherMaidenFname= '"+POut.String(ehrPatient.MotherMaidenFname)+"', "
 				+"MotherMaidenLname= '"+POut.String(ehrPatient.MotherMaidenLname)+"', "
-				+"VacShareOk       =  "+POut.Int   ((int)ehrPatient.VacShareOk)+" "
+				+"VacShareOk       =  "+POut.Int   ((int)ehrPatient.VacShareOk)+", "
+				+"MedicaidState    = '"+POut.String(ehrPatient.MedicaidState)+"' "
 				+"WHERE PatNum = "+POut.Long(ehrPatient.PatNum);
 			Db.NonQ(command);
 		}
@@ -171,6 +175,10 @@ namespace OpenDentBusiness.Crud{
 			if(ehrPatient.VacShareOk != oldEhrPatient.VacShareOk) {
 				if(command!=""){ command+=",";}
 				command+="VacShareOk = "+POut.Int   ((int)ehrPatient.VacShareOk)+"";
+			}
+			if(ehrPatient.MedicaidState != oldEhrPatient.MedicaidState) {
+				if(command!=""){ command+=",";}
+				command+="MedicaidState = '"+POut.String(ehrPatient.MedicaidState)+"'";
 			}
 			if(command==""){
 				return false;

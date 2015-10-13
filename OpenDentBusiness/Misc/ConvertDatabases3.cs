@@ -10566,6 +10566,103 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TreatPlanSaveSignedToPdf','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS requiredfield";
+					Db.NonQ(command);
+					command=@"CREATE TABLE requiredfield (
+						RequiredFieldNum bigint NOT NULL auto_increment PRIMARY KEY,
+						FieldType tinyint NOT NULL,
+						FieldName varchar(50) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE requiredfield'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE requiredfield (
+						RequiredFieldNum number(20) NOT NULL,
+						FieldType number(3) NOT NULL,
+						FieldName varchar2(50),
+						CONSTRAINT requiredfield_RequiredFieldNum PRIMARY KEY (RequiredFieldNum)
+						)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS requiredfieldcondition";
+					Db.NonQ(command);
+					command=@"CREATE TABLE requiredfieldcondition (
+						RequiredFieldConditionNum bigint NOT NULL auto_increment PRIMARY KEY,
+						RequiredFieldNum bigint NOT NULL,
+						ConditionType varchar(50) NOT NULL,
+						Operator tinyint NOT NULL,
+						ConditionValue varchar(255) NOT NULL,
+						ConditionRelationship tinyint NOT NULL,
+						INDEX(RequiredFieldNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE requiredfieldcondition'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE requiredfieldcondition (
+						RequiredFieldConditionNum number(20) NOT NULL,
+						RequiredFieldNum number(20) NOT NULL,
+						ConditionType varchar2(50),
+						Operator number(3) NOT NULL,
+						ConditionValue varchar2(255),
+						ConditionRelationship number(3) NOT NULL,
+						CONSTRAINT requiredfieldcondition_Require PRIMARY KEY (RequiredFieldConditionNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX requiredfieldcondition_Require ON requiredfieldcondition (RequiredFieldNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('RequiredFieldColor','-86')";//Light yellow
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RequiredFieldColor','-86')";//Light yellow
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PriProvDefaultToSelectProv','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PriProvDefaultToSelectProv','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ehrpatient ADD MedicaidState varchar(50) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ehrpatient ADD MedicaidState varchar2(50)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE stateabbr ADD MedicaidIDLength int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE stateabbr ADD MedicaidIDLength number(11)";
+					Db.NonQ(command);
+					command="UPDATE stateabbr SET MedicaidIDLength = 0 WHERE MedicaidIDLength IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE stateabbr MODIFY MedicaidIDLength NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('EnforceMedicaidIDLength','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'EnforceMedicaidIDLength','0')";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
