@@ -326,7 +326,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPhoneTiles";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Phones";
+			this.Text = "Big Phones";
 			this.Load += new System.EventHandler(this.FormPhoneTiles_Load);
 			this.Shown += new System.EventHandler(this.FormPhoneTiles_Shown);
 			this.menuNumbers.ResumeLayout(false);

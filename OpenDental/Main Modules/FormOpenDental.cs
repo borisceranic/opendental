@@ -1925,9 +1925,9 @@ namespace OpenDental{
 			this.butMapPhones.CornerRadius = 4F;
 			this.butMapPhones.Location = new System.Drawing.Point(154, 0);
 			this.butMapPhones.Name = "butMapPhones";
-			this.butMapPhones.Size = new System.Drawing.Size(18, 24);
+			this.butMapPhones.Size = new System.Drawing.Size(19, 24);
 			this.butMapPhones.TabIndex = 54;
-			this.butMapPhones.Text = "P";
+			this.butMapPhones.Text = "M";
 			this.butMapPhones.Click += new System.EventHandler(this.butMapPhones_Click);
 			// 
 			// butTriage
