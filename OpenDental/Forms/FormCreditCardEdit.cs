@@ -54,6 +54,7 @@ namespace OpenDental {
 				groupRecurringCharges.Visible=false;
 				this.ClientSize=new System.Drawing.Size(this.ClientSize.Width,this.ClientSize.Height-356);
 			}
+			Plugins.HookAddCode(this,"FormCreditCardEdit.Load_end",PatCur);
 		}
 
 		private void FillData() {
