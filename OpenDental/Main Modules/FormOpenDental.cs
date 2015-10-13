@@ -4693,7 +4693,7 @@ namespace OpenDental{
 				Patient patCur=Patients.GetPat(apptCur.PatNum);
 				int podiumMinutes=apptCur.IsNewPatient?40:10;
 				if(apptCur.AptDateTime.AddMinutes(podiumMinutes)>=DateTime.Now 	//Appointment within this tick interval
-					&& apptCur.AptDateTime.AddMinutes(podiumMinutes)<DateTime.Now.AddMilliseconds(_podiumIntervalMS))	
+					&& apptCur.AptDateTime.AddMinutes(podiumMinutes)<=DateTime.Now.AddMilliseconds(_podiumIntervalMS))	
 				{
 					Podium.SendInvitation(patCur,apptCur.IsNewPatient);
 				}
