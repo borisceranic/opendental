@@ -42,6 +42,7 @@ namespace OpenDental {
 			if(_isReadOnly) {
 				textDescription.ReadOnly=true;
 				comboStatus.Enabled=false;
+				butDelete.Enabled=false;
 			}
 			if(comboStatus.SelectedIndex==(int)JobReviewStatus.Done 
 				|| comboStatus.SelectedIndex==(int)JobReviewStatus.NeedsAdditionalWork) 
@@ -52,7 +53,7 @@ namespace OpenDental {
 			if(!_jobReviewCur.IsNew) { //load Review information. Skip if Review is new.
 				textDateLastEdited.Text=_jobReviewCur.DateTStamp.ToShortDateString();
 				textDescription.Text=_jobReviewCur.Description;
-				comboStatus.SelectedIndex=(int)_jobReviewCur.JobReviewStatus;
+				comboStatus.SelectedIndex=(int)_jobReviewCur.ReviewStatus;
 			}
 		}
 
@@ -63,12 +64,13 @@ namespace OpenDental {
 			}
 			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the current job review. Are you sure?")) {
 				JobReviews.Delete(_jobReviewCur.JobReviewNum,JobLinkType.Review);
+				_jobReviewCur=null;
 				DialogResult=DialogResult.OK;
 			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			_jobReviewCur.JobReviewStatus=(JobReviewStatus)comboStatus.SelectedIndex;
+			_jobReviewCur.ReviewStatus=(JobReviewStatus)comboStatus.SelectedIndex;
 			_jobReviewCur.Description=textDescription.Text;
 			if(_jobReviewCur.IsNew) {
 				long jobReviewNum=JobReviews.Insert(_jobReviewCur);
@@ -81,7 +83,7 @@ namespace OpenDental {
 			else {
 				JobReviews.Update(_jobReviewCur);
 			}
-			Signalods.SetInvalid(InvalidType.Job);
+			DataValid.SetInvalid(InvalidType.Jobs);
 			DialogResult=DialogResult.OK;
 		}
 

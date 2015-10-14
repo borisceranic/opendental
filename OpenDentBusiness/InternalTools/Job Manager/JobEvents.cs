@@ -13,7 +13,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobEvent>>(MethodBase.GetCurrentMethod(),jobNum);
 			}
-			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum);
+			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum)
+				+" ORDER BY DateTimeEntry";
 			return Crud.JobEventCrud.SelectMany(command);
 		}
 
@@ -22,7 +23,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobEvent>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT * FROM jobevent WHERE Owner = "+POut.Long(userNum);
+			string command="SELECT * FROM jobevent WHERE Owner = "+POut.Long(userNum)
+				+" ORDER BY DateTimeEntry";
 			return Crud.JobEventCrud.SelectMany(command);
 		}
 
@@ -76,7 +78,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<JobEvent>(MethodBase.GetCurrentMethod(),jobNum);
 			}
-			string command="SELECT * from jobevent WHERE JobNum="+jobNum
+			string command="SELECT * FROM jobevent WHERE JobNum="+jobNum
 				+" AND DateTimeEntry=(SELECT MAX(DateTimeEntry) FROM jobevent WHERE JobNum="+jobNum+")";
 			return Crud.JobEventCrud.SelectOne(command);
 		}

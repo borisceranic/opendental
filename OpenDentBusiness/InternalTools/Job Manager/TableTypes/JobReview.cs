@@ -11,7 +11,7 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long JobReviewNum;
-		///<summary>FK to customers' userod.UserNum.  Links this project to the source project.</summary>
+		///<summary>FK to userod.UserNum.  Links this project to the source project.</summary>
 		public long Reviewer;
 		///<summary>Date/Time the review was created.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 		///<summary>The text in this review.</summary>
 		public string Description;
 		///<summary>The status of this review.</summary>
-		public JobReviewStatus JobReviewStatus;
+		public JobReviewStatus ReviewStatus;
 
 		///<summary></summary>
 		public JobReview Copy() {
@@ -45,33 +45,16 @@ namespace OpenDentBusiness {
 
 
 
-	/*
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="DROP TABLE IF EXISTS jobreview";
-					Db.NonQ(command);
-					command=@"CREATE TABLE jobreview (
-						JobReviewNum bigint NOT NULL auto_increment PRIMARY KEY,
-						Reviewer bigint NOT NULL,
-						DateTStamp timestamp,
-						Description varchar(255) NOT NULL,
-						JobReviewStatus tinyint NOT NULL,
-						INDEX(Reviewer)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE jobreview'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE jobreview (
-						JobReviewNum number(20) NOT NULL,
-						Reviewer number(20) NOT NULL,
-						DateTStamp timestamp,
-						Description varchar2(255),
-						JobReviewStatus number(3) NOT NULL,
-						CONSTRAINT jobreview_JobReviewNum PRIMARY KEY (JobReviewNum)
-						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX jobreview_Reviewer ON jobreview (Reviewer)";
-					Db.NonQ(command);
-				}
-				*/
+/*
+				command="DROP TABLE IF EXISTS jobreview";
+				Db.NonQ(command);
+				command=@"CREATE TABLE jobreview (
+					JobReviewNum bigint NOT NULL auto_increment PRIMARY KEY,
+					Reviewer bigint NOT NULL,
+					DateTStamp timestamp,
+					Description varchar(255) NOT NULL,
+					ReviewStatus tinyint NOT NULL,
+					INDEX(Reviewer)
+					) DEFAULT CHARSET=utf8";
+				Db.NonQ(command);
+			*/

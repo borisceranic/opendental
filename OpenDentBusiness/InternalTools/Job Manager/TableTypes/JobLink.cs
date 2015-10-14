@@ -40,7 +40,6 @@ namespace OpenDentBusiness {
 }
 	
 /*
-				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS joblink";
 					Db.NonQ(command);
 					command=@"CREATE TABLE joblink (
@@ -52,21 +51,4 @@ namespace OpenDentBusiness {
 						INDEX(FKey)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE joblink'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE joblink (
-						JobLinkNum number(20) NOT NULL,
-						JobNum number(20) NOT NULL,
-						FKey number(20) NOT NULL,
-						LinkType number(3) NOT NULL,
-						CONSTRAINT joblink_JobLinkNum PRIMARY KEY (JobLinkNum)
-						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX joblink_JobNum ON joblink (JobNum)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX joblink_FKey ON joblink (FKey)";
-					Db.NonQ(command);
-				}
 				*/

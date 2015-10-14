@@ -221,21 +221,7 @@ namespace OpenDentBusiness{
 		ClaimHistoryEdit,
 		///<summary>96- Allows user to edit a completed appointment.</summary>
 		AppointmentCompleteEdit,
-		///<summary>97- Allows user to edit a feature request.  HQ only.</summary>
-		FeatureRequestEdit,
-		///<summary>98- Allows user to edit a query request.  HQ only.</summary>
-		QueryRequestEdit,
-		///<summary>99- Allows user to manage jobs.  HQ only.</summary>
-		JobManager,
-		///<summary>100- Allows user to give approval to a job.  HQ only.</summary>
-		JobApproval,
-		///<summary>101- Allows user to edit a job.  HQ only.</summary>
-		JobEdit,
-		///<summary>102- Allows user to add or edit documentation for a job.  HQ only.</summary>
-		JobDocumentation,
-		///<summary>103- Allows user to review a job.  HQ only.</summary>
-		JobReview,
-		///<summary>104- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
+		///<summary>97- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
 		WebmailDelete,
 		///<summary>105- Audit trail for saving a patient with required fields missing.  There is no user interface in the security window for this 
 		///permission.</summary>

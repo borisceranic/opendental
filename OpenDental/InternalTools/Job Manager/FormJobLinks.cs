@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class FormJobLinks:Form {
@@ -17,6 +19,7 @@ namespace OpenDental {
 		///<summary>Opens with links to the passed in JobNum.</summary>
 		public FormJobLinks(long jobNum) {
 			_jobNum=jobNum;
+			JobHandler.JobFired+=ODEvent_Fired;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -27,6 +30,10 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
+			long selectedLinkNum=0;
+			if(gridMain.GetSelectedIndex()!=-1) {
+				selectedLinkNum=(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag;
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			gridMain.Rows.Clear();
@@ -40,6 +47,9 @@ namespace OpenDental {
 				row.Cells.Add(_jobLinks[i].LinkType.ToString());
 				if(_jobLinks[i].LinkType==JobLinkType.Task) {
 					Task task=Tasks.GetOne(_jobLinks[i].FKey);
+					if(task==null) {//task was deleted
+						continue;
+					}
 					if(task.Descript.Length>=80) {
 						row.Cells.Add(task.Descript.Substring(0,80)+"...");
 					}
@@ -57,6 +67,11 @@ namespace OpenDental {
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if((long)gridMain.Rows[i].Tag==selectedLinkNum) {
+					gridMain.SetSelected(i,true);
+				}
+			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -108,6 +123,15 @@ namespace OpenDental {
 			}
 			JobLinks.Delete((long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag);
 			_hasChanged=true;
+			_jobLinks.RemoveAt(gridMain.GetSelectedIndex());
+			FillGrid();
+		}
+
+		private void ODEvent_Fired(ODEventArgs e) {
+			//Make sure that this ODEvent is for the Job Manager and that the Tag is not null and is a string.
+			if(e.Name!="Job Manager" || e.Tag==null || e.Tag.GetType()!=typeof(string)) {
+				return;
+			}
 			_jobLinks=JobLinks.GetJobLinks(_jobNum);
 			FillGrid();
 		}
@@ -118,7 +142,7 @@ namespace OpenDental {
 
 		private void FormJobLinks_FormClosing(object sender,FormClosingEventArgs e) {
 			if(_hasChanged) {
-				Signalods.SetInvalid(InvalidType.Job);
+				DataValid.SetInvalid(InvalidType.Jobs);
 			}
 		}
 

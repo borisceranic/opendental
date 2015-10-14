@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 		public long JobEventNum;
 		///<summary>FK to job.JobNum.  Links this event to the source job.</summary>
 		public long JobNum;
-		///<summary>FK to customers' userod.UserNum.  The owner of the job at the time the entry was made.  
+		///<summary>FK to userod.UserNum.  The owner of the job at the time the entry was made.  
 		///Stored for viewing changes made to a job.</summary>
 		public long Owner;
 		///<summary>Date/Time the event was created.</summary>
@@ -26,7 +26,7 @@ namespace OpenDentBusiness {
 		///<summary>Copy of the job description at the time of the event creation.</summary>
 		public string Description;
 		///<summary>The status of the referenced job at the time the entry was made.</summary>
-		public JobStatus JobStatus;
+		public JobStatus Status;
 
 		///<summary></summary>
 		public JobEvent Copy() {
@@ -39,7 +39,6 @@ namespace OpenDentBusiness {
 
 
 /*
-				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS jobevent";
 					Db.NonQ(command);
 					command=@"CREATE TABLE jobevent (
@@ -48,28 +47,9 @@ namespace OpenDentBusiness {
 						Owner bigint NOT NULL,
 						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 						Description varchar(255) NOT NULL,
-						JobStatus tinyint NOT NULL,
+						Status tinyint NOT NULL,
 						INDEX(JobNum),
 						INDEX(Owner)
 						) DEFAULT CHARSET=utf8";
 					Db.NonQ(command);
-				}
-				else {//oracle
-					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE jobevent'; EXCEPTION WHEN OTHERS THEN NULL; END;";
-					Db.NonQ(command);
-					command=@"CREATE TABLE jobevent (
-						JobEventNum number(20) NOT NULL,
-						JobNum number(20) NOT NULL,
-						Owner number(20) NOT NULL,
-						DateTimeEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
-						Description varchar2(255),
-						JobStatus number(3) NOT NULL,
-						CONSTRAINT jobevent_JobEventNum PRIMARY KEY (JobEventNum)
-						)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX jobevent_JobNum ON jobevent (JobNum)";
-					Db.NonQ(command);
-					command=@"CREATE INDEX jobevent_Owner ON jobevent (Owner)";
-					Db.NonQ(command);
-				}
 				*/

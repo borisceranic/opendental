@@ -691,22 +691,6 @@ namespace OpenDental{
 				//node2=SetNode(Permissions.EhrShowCDS);
 				//	node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
-		if(Prefs.IsODHQ()) { 
-			node=SetNode(Permissions.JobManager);
-				node2=SetNode(Permissions.FeatureRequestEdit);
-				node.Nodes.Add(node2);
-				node2=SetNode(Permissions.QueryRequestEdit);
-				node.Nodes.Add(node2);
-				node2=SetNode(Permissions.JobApproval);
-				node.Nodes.Add(node2);
-				node2=SetNode(Permissions.JobEdit);
-				node.Nodes.Add(node2);
-				node2=SetNode(Permissions.JobDocumentation);
-				node.Nodes.Add(node2);
-				node2=SetNode(Permissions.JobReview);
-				node.Nodes.Add(node2);
-				treePermissions.Nodes.Add(node);
-			}
 			treePermissions.ExpandAll();
 		}
 

@@ -297,8 +297,10 @@
     <Compile Include="Crud\JobCrud.cs" />
     <Compile Include="Crud\JobEventCrud.cs" />
     <Compile Include="Crud\JobLinkCrud.cs" />
+    <Compile Include="Crud\JobNoteCrud.cs" />
     <Compile Include="Crud\JobProjectCrud.cs" />
     <Compile Include="Crud\JobReviewCrud.cs" />
+    <Compile Include="Crud\JobRoleCrud.cs" />
     <Compile Include="Crud\JournalEntryCrud.cs" />
     <Compile Include="Crud\LabCaseCrud.cs" />
     <Compile Include="Crud\LaboratoryCrud.cs" />
@@ -414,6 +416,8 @@
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
+    <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
+    <Compile Include="InternalTools\Job Manager\JobRoles.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
     <Compile Include="Data Interface\StateAbbrs.cs" />
     <Compile Include="Data Interface\RequiredFieldConditions.cs" />
@@ -532,6 +536,7 @@
     <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
     <Compile Include="InternalTools\Job Manager\JobControls.cs" />
     <Compile Include="InternalTools\Job Manager\JobEvents.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobRole.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobControl.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobEvent.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobLink.cs" />
@@ -542,6 +547,7 @@
     <Compile Include="InternalTools\Job Manager\TableTypes\Job.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobProject.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobReview.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobNote.cs" />
     <Compile Include="InternalTools\Phones\PhoneConfs.cs" />
     <Compile Include="Data Interface\ProcButtonQuicks.cs" />
     <Compile Include="Data Interface\Resellers.cs" />

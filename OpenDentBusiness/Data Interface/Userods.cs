@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Cryptography;
@@ -170,6 +171,28 @@ namespace OpenDentBusiness {
 			}
 			return listUserods;
 		}
+
+		///<summary>Returns all users that are associated to the permission passed in.  Returns empty list if no matches found.</summary>
+		public static List<Userod> GetUsersByJobRole(JobRoleType jobRoleType,bool showHidden) {
+			//No need to check RemotingRole; no call to db.
+			List<Userod> listAllUsers=new List<Userod>(); UserodC.GetListShort();
+			if(showHidden) {
+				listAllUsers=UserodC.GetListt();
+			}
+			else {
+				listAllUsers=UserodC.GetListShort();
+			}
+			List<Userod> listUserods=new List<Userod>();
+			List<JobRole> listJobRoles=JobRoles.GetList();
+			for(int i=0;i<listAllUsers.Count;i++) {
+				//Only add users that have the job role passed in.
+				if(listJobRoles.Count(x => x.UserNum==listAllUsers[i].UserNum && x.RoleType==jobRoleType) > 0) {
+					listUserods.Add(listAllUsers[i]);
+				}
+			}
+			return listUserods;
+		}
+
 
 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.</summary>
 		public static string GetName(long userNum){
@@ -699,12 +722,14 @@ namespace OpenDentBusiness {
 				return Meth.GetObject<List<Userod>>(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT * FROM userod "
-				+"INNER JOIN grouppermission ON userod.UserGroupNum=grouppermission.UserGroupNum "
-				+"WHERE grouppermission.PermType=("+POut.Long((int)Permissions.JobApproval)+" "
-				+"OR "+POut.Long((int)Permissions.JobDocumentation)+" "
-				+"OR "+POut.Long((int)Permissions.JobEdit)+" "
-				+"OR "+POut.Long((int)Permissions.JobManager)+" "
-				+"OR "+POut.Long((int)Permissions.JobReview)+") "
+				+"INNER JOIN jobrole ON userod.UserNum=jobrole.UserNum "
+				+"WHERE jobrole.RoleType=("+POut.Long((int)JobRoleType.Approval)+" "
+				+"OR "+POut.Long((int)JobRoleType.Documentation)+" "
+				+"OR "+POut.Long((int)JobRoleType.Writeup)+" "
+				+"OR "+POut.Long((int)JobRoleType.Engineer)+" "
+				+"OR "+POut.Long((int)JobRoleType.Concept)+" "
+				+"OR "+POut.Long((int)JobRoleType.Assignment)+" "
+				+"OR "+POut.Long((int)JobRoleType.Review)+") "
 				+"AND IsHidden=0";
 			return Crud.UserodCrud.SelectMany(command);
 		}

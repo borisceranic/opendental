@@ -31,7 +31,7 @@ namespace OpenDental {
 				Lan.C(this,menuEdit.MenuItems[i]);
 			}
 			this.gridMain.ContextMenu=this.menuEdit;
-			ODEvent.Fired+=ODEvent_Fired;
+			JobHandler.JobFired+=ODEvent_Fired;
 		}
 
 		///<summary>And resets the tabs if the user changes.</summary>
@@ -98,6 +98,10 @@ namespace OpenDental {
 		}
 
 		private void FillGrid(){
+			long selectedJobNum=0;
+			if(gridMain.GetSelectedIndex()!=-1) {
+				selectedJobNum=long.Parse(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
+			}
 			if(Security.CurUser==null) {
 				gridMain.BeginUpdate();
 				gridMain.Rows.Clear();
@@ -124,34 +128,59 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableJobProjects","Title"),90);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableJobProjects","Description"),200);//any width
+			col=new ODGridColumn(Lan.g("TableJobProjects","Owner"),80);//any width
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableJobProjects","Description"),300);//any width
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			int imageIdx;
 			for(int j=0;j<_listJobProjects.Count;j++) {
-				if(_listJobProjects[j].JobProjectStatus==JobProjectStatus.Done && !checkShowFinished.Checked) {
+				if(_listJobProjects[j].ProjectStatus==JobProjectStatus.Done && !checkShowFinished.Checked) {
 					continue;
 				}
 				row=new ODGridRow();
 				imageIdx=0;
 				row.Cells.Add(imageIdx.ToString());
 				row.Cells.Add(_listJobProjects[j].Title);
+				row.Cells.Add("");
 				row.Cells.Add(_listJobProjects[j].Description);
+				row.Tag=-1;//can't select projects
 				gridMain.Rows.Add(row);
 			}
 			for(int i=0;i<_listJobs.Count;i++) {
-				if(_listJobs[i].JobStatus==JobStatus.Done && !checkShowFinished.Checked) {
+				if(_listJobs[i].Status==JobStatus.Done && !checkShowFinished.Checked) {
 					continue;
 				}
 				row=new ODGridRow();
 				imageIdx=-1;
 				row.Cells.Add(imageIdx.ToString());
 				row.Cells.Add(_listJobs[i].Title);
-				row.Cells.Add(_listJobs[i].Description);
+				row.Cells.Add(Userods.GetName(_listJobs[i].Owner));
+				string[] arrayDescriptionLines=_listJobs[i].Description.Split('\n');
+				if(arrayDescriptionLines.Length>0) {
+					if(arrayDescriptionLines[0].Length>=40) {
+						row.Cells.Add(arrayDescriptionLines[0].Substring(0,40)+"...");//Description
+					}
+					else if(arrayDescriptionLines.Length>1) {
+						row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
+					}
+					else {
+						row.Cells.Add(arrayDescriptionLines[0]);
+					}
+				}
+				else {
+					row.Cells.Add("");
+				}
+				row.Tag=_listJobs[i].JobNum;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if(long.Parse(gridMain.Rows[i].Tag.ToString())==selectedJobNum) {
+					gridMain.SetSelected(i,true);
+				}
+			}
 			gridMain.ScrollValue=gridMain.ScrollValue;//this forces scroll value to reset if it's > allowed max.
 			Cursor=Cursors.Default;
 		}
@@ -211,7 +240,7 @@ namespace OpenDental {
 		}
 
 		private void AddJob_Clicked() {
-			if(Security.IsAuthorized(Permissions.JobEdit)) {
+			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
 				long projectNum=0;
 				if(_listJobProjectHistory.Count>0) {
 					projectNum=_listJobProjectHistory[_listJobProjectHistory.Count-1].JobProjectNum;
@@ -273,9 +302,9 @@ namespace OpenDental {
 				}
 				try {
 					JobProject jobProjectCur=_listJobProjects[_clickedIdx];
-					jobProjectCur.JobProjectStatus=JobProjectStatus.Done;
+					jobProjectCur.ProjectStatus=JobProjectStatus.Done;
 					JobProjects.Update(jobProjectCur);
-					Signalods.SetInvalid(InvalidType.Job);
+					DataValid.SetInvalid(InvalidType.Jobs);
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
@@ -283,18 +312,15 @@ namespace OpenDental {
 				}
 				FillGrid();
 			}
-			else {
+			else {//Clicked on a job.
 				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Are you sure you would like to mark this job as complete?")) {
 					return;
 				}
 				Job jobCur=_listJobs[_clickedIdx-_listJobProjects.Count];
-				jobCur.JobStatus=JobStatus.Done;
-				//if(jobCur.DateTimeFinished.Year<1880) {
-				//	jobCur.DateTimeFinished=DateTime.Now;
-				//}
+				jobCur.Status=JobStatus.Done;
 				try {
 					Jobs.Update(jobCur);
-					Signalods.SetInvalid(InvalidType.Job);
+					DataValid.SetInvalid(InvalidType.Jobs);
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
@@ -338,7 +364,7 @@ namespace OpenDental {
 				}
 				try {
 					JobProjects.Delete(_listJobProjects[_clickedIdx].JobProjectNum);
-					Signalods.SetInvalid(InvalidType.Job);
+					DataValid.SetInvalid(InvalidType.Jobs);
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);
@@ -351,7 +377,7 @@ namespace OpenDental {
 				}
 				try {
 					Jobs.Delete(_listJobs[_clickedIdx-_listJobProjects.Count].JobNum);
-					Signalods.SetInvalid(InvalidType.Job);
+					DataValid.SetInvalid(InvalidType.Jobs);
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);

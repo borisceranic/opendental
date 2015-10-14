@@ -16,7 +16,7 @@ namespace OpenDental {
 		///<summary>Opens with links to the passed in JobNum.</summary>
 		public FormJobHistory(long jobNum) {
 			_jobNum=jobNum;
-			ODEvent.Fired+=ODEvent_Fired;
+			JobHandler.JobFired+=ODEvent_Fired;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -27,33 +27,56 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
+			long selectedEventNum=0;
+			if(gridMain.GetSelectedIndex()!=-1) {
+				selectedEventNum=(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag;
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			gridMain.Rows.Clear();
-			ODGridColumn col=new ODGridColumn("Date",70);
+			ODGridColumn col=new ODGridColumn("Date",140);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Owner",200);
+			col=new ODGridColumn("Owner",100);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Status",200);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",200);
+			col=new ODGridColumn("Description",400);
 			gridMain.Columns.Add(col);
 			ODGridRow row;
 			for(int i=0;i<_jobEvents.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_jobEvents[i].DateTimeEntry.ToShortDateString());
+				row.Cells.Add(_jobEvents[i].DateTimeEntry.ToShortDateString()+" "+_jobEvents[i].DateTimeEntry.ToShortTimeString());
 				row.Cells.Add(Userods.GetName(_jobEvents[i].Owner));
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobEvents[i].JobStatus));
-				if(_jobEvents[i].Description.Length>=80) {
-					row.Cells.Add(_jobEvents[i].Description.Substring(0,80)+"...");
+				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobEvents[i].Status));
+				string[] arrayDescriptionLines=_jobEvents[i].Description.Split('\n');
+				if(arrayDescriptionLines.Length>0) {
+					if(arrayDescriptionLines[0].Length>=50) {
+						row.Cells.Add(arrayDescriptionLines[0].Substring(0,50)+"...");//Description
+					}
+					else if(arrayDescriptionLines.Length>1) {
+						row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
+					}
+					else {
+						row.Cells.Add(arrayDescriptionLines[0]);
+					}
 				}
 				else {
-					row.Cells.Add(_jobEvents[i].Description);
+					row.Cells.Add("");
 				}
 				row.Tag=_jobEvents[i].JobEventNum;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if((long)gridMain.Rows[i].Tag==selectedEventNum) {
+					gridMain.SetSelected(i,true);
+				}
+			}
+		}
+
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			FormJobHistoryView FormJHV=new FormJobHistoryView((long)gridMain.Rows[e.Row].Tag);
+			FormJHV.Show();
 		}
 
 		private void ODEvent_Fired(ODEventArgs e) {

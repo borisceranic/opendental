@@ -11,11 +11,20 @@ using CodeBase;
 
 namespace OpenDental {
 	public partial class UserControlJobs:UserControl {
-		private DataTable _table;
+		private List<Job> _jobList;
 		
 		public UserControlJobs() {
 			InitializeComponent();
-			ODEvent.Fired+=ODEvent_Fired;
+			long jobNum;
+			try {
+				jobNum=long.Parse(textJobNum.Text); //in case the user enters letters or symbols into the text box.
+			}
+			catch {
+				jobNum=0;
+			}
+			_jobList=Jobs.GetJobList(jobNum,textExpert.Text,textOwner.Text,textVersion.Text,textProject.Text,textTitle.Text,
+				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
+			JobHandler.JobFired+=ODEvent_Fired;
 		}
 
 		private void UserControlJob_Load(object sender,EventArgs e) {
@@ -29,8 +38,8 @@ namespace OpenDental {
 			for(int i=0;i<Enum.GetNames(typeof(JobPriority)).Length;i++) {
 				comboPriority.Items.Add(Lan.g("enumJobPriority",Enum.GetNames(typeof(JobPriority))[i]));
 			}
-			for(int i=0;i<Enum.GetNames(typeof(JobType)).Length;i++) {
-				comboType.Items.Add(Lan.g("enumJobType",Enum.GetNames(typeof(JobType))[i]));
+			for(int i=0;i<Enum.GetNames(typeof(JobCategory)).Length;i++) {
+				comboType.Items.Add(Lan.g("enumJobType",Enum.GetNames(typeof(JobCategory))[i]));
 			}
 			for(int i=0;i<Enum.GetNames(typeof(JobStatus)).Length;i++) {
 				comboStatus.Items.Add(Lan.g("enumJobStatus",Enum.GetNames(typeof(JobStatus))[i]));
@@ -39,29 +48,26 @@ namespace OpenDental {
 			comboPriority.SelectedIndex=0; //comboboxes have no filter to start with.
 			comboType.SelectedIndex=0;
 			comboStatus.SelectedIndex=0;
+			
 			FillGrid();
 		}
 
 		private void FillGrid() {
 			int selectedIndex=gridMain.GetSelectedIndex();
 			long selectedJobNum=0;
-			if(_table!=null && selectedIndex!=-1) {
-				selectedJobNum=PIn.Long(_table.Rows[gridMain.GetSelectedIndex()]["JobNum"].ToString());
+			if(_jobList.Count!=0 && selectedIndex!=-1) {
+				selectedJobNum=_jobList[gridMain.GetSelectedIndex()].JobNum;
 			}
-			long jobNum;
+			long jobNum=0;
 			try {									
-				jobNum=PIn.Long(textJobNum.Text); //in case the user enters letters or symbols into the text box.
+				jobNum=long.Parse(textJobNum.Text); //in case the user enters letters or symbols into the text box.
 			}
 			catch {
-				jobNum=0;
+				//do nothing
 			}
-			_table=Jobs.GetJobDataTable(jobNum,textExpert.Text,textOwner.Text,textVersion.Text,textProject.Text,textTitle.Text,
-				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("Title",100);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Owner",55);
+			ODGridColumn col=new ODGridColumn("Owner",55);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Expert",55);
 			gridMain.Columns.Add(col);
@@ -69,23 +75,40 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Priority",55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("JobNum",60);
+			col=new ODGridColumn("Title",120);
 			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Description",300);
+			gridMain.Columns.Add(col); 
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_table.Rows.Count;i++) {
+			for(int i=0;i<_jobList.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_table.Rows[i]["Title"].ToString());
-				row.Cells.Add(_table.Rows[i]["Owner"].ToString());
-				row.Cells.Add(_table.Rows[i]["Expert"].ToString());
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),_table.Rows[i]["JobStatus"])); //if null returns blank
-				row.Cells.Add(Enum.GetName(typeof(JobPriority),_table.Rows[i]["JobPriority"])); //if null returns blank
-				row.Cells.Add(_table.Rows[i]["JobNum"].ToString());				
+				row.Cells.Add(Userods.GetName(_jobList[i].Owner));
+				row.Cells.Add(Userods.GetName(_jobList[i].Expert));
+				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobList[i].Status)); //if null returns blank
+				row.Cells.Add(Enum.GetName(typeof(JobPriority),(int)_jobList[i].Priority)); //if null returns blank
+				row.Cells.Add(_jobList[i].Title);
+				string[] arrayDescriptionLines=_jobList[i].Description.Split('\n');
+				if(arrayDescriptionLines.Length>0) {
+					if(arrayDescriptionLines[0].Length>=40) {
+						row.Cells.Add(arrayDescriptionLines[0].Substring(0,40)+"...");//Description
+					}
+					else if(arrayDescriptionLines.Length>1) {
+						row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
+					}
+					else {
+						row.Cells.Add(arrayDescriptionLines[0]);
+					}
+				}
+				else {
+					row.Cells.Add("");
+				}
+				row.Tag=_jobList[i].JobNum;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			for(int i=0;i<_table.Rows.Count;i++) { //set index to the job that it was at before the update. 
-				if(selectedJobNum.ToString()==_table.Rows[i]["JobNum"].ToString()) {
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if((long)gridMain.Rows[i].Tag==selectedJobNum) {
 					gridMain.SetSelected(i,true);
 				}
 			}
@@ -96,6 +119,15 @@ namespace OpenDental {
 			if(e.Name!="Job Manager" || e.Tag==null || e.Tag.GetType()!=typeof(string)) {
 				return;
 			}
+			long jobNum;
+			try {
+				jobNum=long.Parse(textJobNum.Text); //in case the user enters letters or symbols into the text box.
+			}
+			catch {
+				jobNum=0;
+			}
+			_jobList=Jobs.GetJobList(jobNum,textExpert.Text,textOwner.Text,textVersion.Text,textProject.Text,textTitle.Text,
+				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
 			FillGrid();
 		}
 
@@ -103,6 +135,15 @@ namespace OpenDental {
 		/// (.5s after the last keystroke)</summary>
 		private void timerSearch_Tick(object sender,EventArgs e) {
 			timerSearch.Stop();
+			long jobNum;
+			try {
+				jobNum=long.Parse(textJobNum.Text); //in case the user enters letters or symbols into the text box.
+			}
+			catch {
+				jobNum=0;
+			}
+			_jobList=Jobs.GetJobList(jobNum,textExpert.Text,textOwner.Text,textVersion.Text,textProject.Text,textTitle.Text,
+				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
 			FillGrid();
 		}
 	
@@ -149,24 +190,40 @@ namespace OpenDental {
 		}
 
 		private void checkShowHidden_CheckedChanged(object sender,EventArgs e) {
+			long jobNum;
+			try {
+				jobNum=long.Parse(textJobNum.Text); //in case the user enters letters or symbols into the text box.
+			}
+			catch {
+				jobNum=0;
+			}
+			_jobList=Jobs.GetJobList(jobNum,textExpert.Text,textOwner.Text,textVersion.Text,textProject.Text,textTitle.Text,
+				comboStatus.SelectedIndex-1,comboPriority.SelectedIndex-1,comboType.SelectedIndex-1,checkShowHidden.Checked);
 			FillGrid();
 		}
 		
 		private void butAdd_Click(object sender,EventArgs e) {
-			if(Security.IsAuthorized(Permissions.JobEdit)) {
+			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
 				FormJobEdit FormJE=new FormJobEdit();
 				FormJE.ShowDialog();
 				if(FormJE.DialogResult==DialogResult.OK) {
+					_jobList.Add(FormJE.JobCur);
 					FillGrid();
 				}
 			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) { //open FormJobEdit
-			long jobNum=PIn.Long(_table.Rows[e.Row]["JobNum"].ToString()); //every job must have a jobNum associated with it, so no need for try-catch.
+			long jobNum=_jobList[e.Row].JobNum; //every job must have a jobNum associated with it, so no need for try-catch.
 			FormJobEdit FormJE=new FormJobEdit(jobNum);
 			FormJE.ShowDialog();
 			if(FormJE.DialogResult==DialogResult.OK) {
+				if(FormJE.JobCur==null) {
+					_jobList.RemoveAt(e.Row);
+				}
+				else {
+					_jobList[e.Row]=FormJE.JobCur;
+				}
 				FillGrid();
 			}
 		}

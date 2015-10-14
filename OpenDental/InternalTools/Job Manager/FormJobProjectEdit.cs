@@ -253,7 +253,7 @@ namespace OpenDental{
 				comboJobProjStatus.Items.Add(status.ToString());
 			}
 			if(!_jobProjCur.IsNew) {
-				comboJobProjStatus.SelectedIndex=(int)_jobProjCur.JobProjectStatus;
+				comboJobProjStatus.SelectedIndex=(int)_jobProjCur.ProjectStatus;
 				textJobProjName.Text=_jobProjCur.Title;
 				textJobProjDescrip.Text=_jobProjCur.Description;
 				labelParentProj.Text=JobProjects.GetOne(_jobProjCur.ParentProjectNum).Title;
@@ -279,10 +279,10 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			_jobProjCur.JobProjectStatus=(JobProjectStatus)comboJobProjStatus.SelectedIndex;
+			_jobProjCur.ProjectStatus=(JobProjectStatus)comboJobProjStatus.SelectedIndex;
 			_jobProjCur.Title=textJobProjName.Text;
 			_jobProjCur.Description=textJobProjDescrip.Text;
-			if(_jobProjCur.JobProjectStatus==JobProjectStatus.Done && !CheckDoneChildren()) {
+			if(_jobProjCur.ProjectStatus==JobProjectStatus.Done && !CheckDoneChildren()) {
 				return;
 			}
 			if(_jobProjCur.IsNew) {

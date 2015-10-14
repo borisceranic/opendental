@@ -146,7 +146,7 @@ namespace OpenDental{
 				row=new ODGridRow();
 				row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString())).UserName);//Expert
 				row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Owner"].ToString())).UserName);//Owner
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["JobStatus"].ToString())));//JobStatus
+				row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["Status"].ToString())));//JobStatus
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
 				gridMain.Rows.Add(row);
 			}

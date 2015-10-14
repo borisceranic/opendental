@@ -15,7 +15,7 @@ namespace OpenDental {
 		
 		public UserControlReviews() {
 			InitializeComponent();
-			ODEvent.Fired+=ODEvent_Fired;
+			JobHandler.JobFired+=ODEvent_Fired;
 		}
 
 		private void UserControlReviews_Load(object sender,EventArgs e) {
@@ -26,6 +26,10 @@ namespace OpenDental {
 		}
 
 		private void FillGrid() {
+			long selectedReviewNum=0;
+			if(gridMain.GetSelectedIndex()!=-1) {
+				selectedReviewNum=(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag;
+			}
 			_table=JobReviews.GetOutstandingForUser(Security.CurUser.UserNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -33,24 +37,30 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Date",70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",115);
+			col=new ODGridColumn("Status",75);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Job Title",115);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Status",75);
+			col=new ODGridColumn("Description",500);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_table.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Owner"].ToString())).UserName);
+				row.Cells.Add(Userods.GetName(PIn.Long(_table.Rows[i]["Owner"].ToString())));
 				row.Cells.Add(PIn.DateT(_table.Rows[i]["DateTStamp"].ToString()).ToShortDateString());
-				row.Cells.Add(_table.Rows[i]["Description"].ToString());
+				row.Cells.Add(Enum.GetName(typeof(JobReviewStatus),_table.Rows[i]["ReviewStatus"])); //if null returns blank
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());
-				row.Cells.Add(Enum.GetName(typeof(JobReviewStatus),_table.Rows[i]["JobReviewStatus"])); //if null returns blank
+				row.Cells.Add(_table.Rows[i]["Description"].ToString());
+				row.Tag=long.Parse(_table.Rows[i]["JobReviewNum"].ToString());
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if((long)gridMain.Rows[i].Tag==selectedReviewNum) {
+					gridMain.SetSelected(i,true);
+				}
+			}
 		}
 
 		private void ODEvent_Fired(ODEventArgs e) {
@@ -63,7 +73,7 @@ namespace OpenDental {
 
 		private void setSeenToolStripMenuItem_Click(object sender,EventArgs e) {
 			JobReviews.SetSeen(PIn.Long(_table.Rows[gridMain.GetSelectedIndex()]["JobReviewNum"].ToString()));
-			Signalods.SetInvalid(InvalidType.Job);
+			DataValid.SetInvalid(InvalidType.Jobs);
 			FillGrid();
 		}
 

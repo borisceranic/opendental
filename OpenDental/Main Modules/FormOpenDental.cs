@@ -2692,9 +2692,6 @@ namespace OpenDental{
 		private void RefreshLocalData(params InvalidType[] itypes){
 			List<int> itypeList=new List<int>();
 			for(int i=0;i<itypes.Length;i++){
-				if(itypes[i]==InvalidType.Job) {
-					ODEvent.Fire(new ODEventArgs("Job Manager","Job Manager"));
-				}
 				itypeList.Add((int)itypes[i]);
 			}
 			string itypesStr="";
@@ -4252,10 +4249,15 @@ namespace OpenDental{
 					ContrAppt2.RefreshPeriod();
 				}
 				bool areAnySignalsTasks=false;
+				bool hasJobSignal=false;
 				for(int i=0;i<sigList.Count;i++) {
 					if(sigList[i].ITypes==((int)InvalidType.Task).ToString()
-						|| sigList[i].ITypes==((int)InvalidType.TaskPopup).ToString()) {
+						|| sigList[i].ITypes==((int)InvalidType.TaskPopup).ToString()) 
+					{
 						areAnySignalsTasks=true;
+					}
+					if(sigList[i].ITypes==((int)InvalidType.Jobs).ToString()) {
+						hasJobSignal=true;
 					}
 				}
 				List<Task> tasksPopup=Signalods.GetNewTaskPopupsThisUser(sigList,Security.CurUser.UserNum);
@@ -4302,6 +4304,9 @@ namespace OpenDental{
 					if(ContrManage2!=null && ContrManage2.FormT!=null && !ContrManage2.FormT.IsDisposed) {
 						ContrManage2.FormT.RefreshUserControlTasks();
 					}
+				}
+				if(hasJobSignal) {
+					JobHandler.Fire(new ODEventArgs("Job Manager","Job Manager"));
 				}
 				List<int> itypes=Signalods.GetInvalidTypes(sigList);
 				InvalidType[] itypeArray=new InvalidType[itypes.Count];
@@ -5877,10 +5882,8 @@ namespace OpenDental{
 		}
 
 		private void menuItemJobManager_Click(object sender,System.EventArgs e) {
-			if(Security.IsAuthorized(Permissions.JobManager)) {
-				FormJobManager FormJM=new FormJobManager();
-				FormJM.Show();
-			}
+			FormJobManager FormJM=new FormJobManager();
+			FormJM.Show();
 		}
 
 		private void menuItemLabCases_Click(object sender,EventArgs e) {

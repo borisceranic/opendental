@@ -15,7 +15,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM jobproject";
 			if(!isDone) {
-				command+=" WHERE JobProjectStatus != "+POut.Int((int)JobProjectStatus.Done);
+				command+=" WHERE ProjectStatus != "+POut.Int((int)JobProjectStatus.Done);
 			}
 			return Crud.JobProjectCrud.SelectMany(command);
 		}
@@ -32,11 +32,11 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static List<JobProject> GetByParentProject(long projectNum, bool showFinished){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<JobProject>>(MethodBase.GetCurrentMethod(),projectNum);
+				return Meth.GetObject<List<JobProject>>(MethodBase.GetCurrentMethod(),projectNum,showFinished);
 			}
 			string command="SELECT * FROM jobproject WHERE ParentProjectNum = "+POut.Long(projectNum);
 			if(!showFinished) {
-				command+=" AND JobProjectStatus != " + POut.Int((int)JobProjectStatus.Done);
+				command+=" AND ProjectStatus != " + POut.Int((int)JobProjectStatus.Done);
 			}
 			return Crud.JobProjectCrud.SelectMany(command);
 		}

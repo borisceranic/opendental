@@ -117,7 +117,13 @@ namespace OpenDental {
 					groupCount=PIn.Int(_table.Rows[i]["countJobs"].ToString());
 				}
 				if(checkExpert.Checked || !isGroupBy || groupCount==1) {
-					row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString())).UserName);//Expert
+					Userod expert=Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString()));
+					if(expert!=null) {
+						row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString())).UserName);//Expert
+					}
+					else {
+						row.Cells.Add("");
+					}
 					//color yellow
 					if(groupCount!=1) {
 						row.ColorText=Color.OrangeRed;
@@ -137,7 +143,7 @@ namespace OpenDental {
 					row.Cells.Add(" - ");
 				}
 				if(checkStatus.Checked || !isGroupBy || groupCount==1) {
-					row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["JobStatus"].ToString())));//JobStatus
+					row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["Status"].ToString())));//JobStatus
 					//color blue
 					if(groupCount!=1) {
 						row.ColorText=Color.Blue;
@@ -158,7 +164,21 @@ namespace OpenDental {
 				}
 				if(!isGroupBy || groupCount==1) {
 					row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
-					row.Cells.Add(_table.Rows[i]["Description"].ToString());//Description
+					string[] arrayDescriptionLines=_table.Rows[i]["Description"].ToString().Split('\n');
+					if(arrayDescriptionLines.Length>0) {
+						if(arrayDescriptionLines[0].Length>=30) {
+							row.Cells.Add(arrayDescriptionLines[0].Substring(0,30)+"...");//Description
+						}
+						else if(arrayDescriptionLines.Length>1) {
+							row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
+						}
+						else {
+							row.Cells.Add(arrayDescriptionLines[0]);
+						}
+					}
+					else {
+						row.Cells.Add("");
+					}
 				}
 				else {
 					row.Cells.Add(" - ");
@@ -185,7 +205,7 @@ namespace OpenDental {
 
 		private void setSeenToolStripMenuItem_Click(object sender,EventArgs e) {
 			JobReviews.SetSeen(PIn.Long(_table.Rows[gridMain.GetSelectedIndex()]["JobNum"].ToString()));
-			Signalods.SetInvalid(InvalidType.Job);
+			DataValid.SetInvalid(InvalidType.Jobs);
 			FillGrid();
 		}
 

@@ -44,7 +44,8 @@ namespace OpenDentBusiness{
 				+"INNER JOIN joblink ON jobreview.JobReviewNum=joblink.FKey "
 				+"INNER JOIN job ON joblink.JobNum=job.JobNum "
 			  +"WHERE jobreview.Reviewer="+POut.Long(userNum)+" "
-				+"AND jobreview.JobReviewStatus="+POut.Long((int)JobReviewStatus.Sent)+" "
+				+"AND jobreview.ReviewStatus IN("+POut.Long((int)JobReviewStatus.Sent)
+				+","+POut.Long((int)JobReviewStatus.Seen)+","+POut.Long((int)JobReviewStatus.UnderReview)+") "
 				+"AND joblink.LinkType="+POut.Long((int)JobLinkType.Review);
 			return Db.GetTable(command);
 		}
@@ -53,7 +54,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),reviewNum);
 			}
-			string command="UPDATE jobreview SET JobReviewStatus="+POut.Long((int)JobReviewStatus.Seen)+" "
+			string command="UPDATE jobreview SET ReviewStatus="+POut.Long((int)JobReviewStatus.Seen)+" "
 				+"WHERE JobReviewNum="+POut.Long(reviewNum);
 			Db.NonQ(command);
 		}

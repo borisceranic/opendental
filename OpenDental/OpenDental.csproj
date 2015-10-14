@@ -421,12 +421,6 @@
     <Compile Include="Forms\FormProgramLinkOutputFile .designer.cs">
       <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormTempLogOn.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormTempLogOn.designer.cs">
-      <DependentUpon>FormTempLogOn.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormMessageReplacements.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -442,7 +436,13 @@
     <Compile Include="Forms\FormEmailAutographEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormJobProjectEdit.cs">
+    <Compile Include="InternalTools\Job Manager\FormJobHistoryView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobHistoryView.designer.cs">
+      <DependentUpon>FormJobHistoryView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobProjectEdit.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormProcBroken.cs">
@@ -3518,9 +3518,22 @@
     <Compile Include="InternalTools\Job Manager\FormJobManager.Designer.cs">
       <DependentUpon>FormJobManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobNoteEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobNoteEdit.designer.cs">
+      <DependentUpon>FormJobNoteEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobPicker.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobRoles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobRoles.designer.cs">
+      <DependentUpon>FormJobRoles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\JobHandler.cs" />
     <Compile Include="InternalTools\Job Manager\UserControlManage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -3900,9 +3913,6 @@
     <EmbeddedResource Include="Forms\FormProgramLinkOutputFile .resx">
       <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormTempLogOn.resx">
-      <DependentUpon>FormTempLogOn.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormMessageReplacements.resx">
       <DependentUpon>FormMessageReplacements.cs</DependentUpon>
     </EmbeddedResource>
@@ -3913,7 +3923,10 @@
       <DependentUpon>FormEmailAutographEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormJobProjectEdit.resx">
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistoryView.resx">
+      <DependentUpon>FormJobHistoryView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobProjectEdit.resx">
       <DependentUpon>FormJobProjectEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcBroken.resx">
@@ -6038,9 +6051,15 @@
       <DependentUpon>FormJobManager.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobNoteEdit.resx">
+      <DependentUpon>FormJobNoteEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobPicker.resx">
       <DependentUpon>FormJobPicker.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobRoles.resx">
+      <DependentUpon>FormJobRoles.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\UserControlManage.resx">
       <DependentUpon>UserControlManage.cs</DependentUpon>

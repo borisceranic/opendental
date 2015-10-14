@@ -374,8 +374,6 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","EServices Setup");
 				case Permissions.FamilyModule:
 					return Lans.g("enumPermissions","Family Module");
-				case Permissions.FeatureRequestEdit:
-					return Lans.g("enumPermissions","Feature Request Edit");
 				case Permissions.ImageDelete:
 					return Lans.g("enumPermissions","Image Delete");
 				case Permissions.ImageEdit:
@@ -390,16 +388,6 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Insurance Plan Change Assignment of Benefits");
 				case Permissions.InsPlanChangeSubsc:
 					return Lans.g("enumPermissions","Insurance Plan Change Subscriber");
-				case Permissions.JobApproval:
-					return Lans.g("enumPermissions","Job Approval");
-				case Permissions.JobDocumentation:
-					return Lans.g("enumPermissions","Job Documentation");
-				case Permissions.JobEdit:
-					return Lans.g("enumPermissions","Job Edit");
-				case Permissions.JobManager:
-					return Lans.g("enumPermissions","Job Manager");
-				case Permissions.JobReview:
-					return Lans.g("enumPermissions","Job Review");
 				case Permissions.ManageModule:
 					return Lans.g("enumPermissions","Manage Module");
 				case Permissions.None:
@@ -430,8 +418,6 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Providers");
 				case Permissions.ProviderFeeEdit:
 					return Lans.g("enumPermissions","Provider Fee Edit");
-				case Permissions.QueryRequestEdit:
-					return Lans.g("enumPermissions","Query Request Edit");
 				case Permissions.Reports:
 					return Lans.g("enumPermissions","Reports");
 				case Permissions.RefAttachAdd:

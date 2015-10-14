@@ -46,11 +46,11 @@ namespace OpenDentBusiness.Crud{
 			JobReview jobReview;
 			for(int i=0;i<table.Rows.Count;i++) {
 				jobReview=new JobReview();
-				jobReview.JobReviewNum   = PIn.Long  (table.Rows[i]["JobReviewNum"].ToString());
-				jobReview.Reviewer       = PIn.Long  (table.Rows[i]["Reviewer"].ToString());
-				jobReview.DateTStamp     = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				jobReview.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				jobReview.JobReviewStatus= (OpenDentBusiness.JobReviewStatus)PIn.Int(table.Rows[i]["JobReviewStatus"].ToString());
+				jobReview.JobReviewNum= PIn.Long  (table.Rows[i]["JobReviewNum"].ToString());
+				jobReview.Reviewer    = PIn.Long  (table.Rows[i]["Reviewer"].ToString());
+				jobReview.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
+				jobReview.Description = PIn.String(table.Rows[i]["Description"].ToString());
+				jobReview.ReviewStatus= (OpenDentBusiness.JobReviewStatus)PIn.Int(table.Rows[i]["ReviewStatus"].ToString());
 				retVal.Add(jobReview);
 			}
 			return retVal;
@@ -91,7 +91,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobReviewNum,";
 			}
-			command+="Reviewer,Description,JobReviewStatus) VALUES(";
+			command+="Reviewer,Description,ReviewStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobReview.JobReviewNum)+",";
 			}
@@ -99,7 +99,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobReview.Reviewer)+","
 				//DateTStamp can only be set by MySQL
 				+"'"+POut.String(jobReview.Description)+"',"
-				+    POut.Int   ((int)jobReview.JobReviewStatus)+")";
+				+    POut.Int   ((int)jobReview.ReviewStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -132,7 +132,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobReviewNum,";
 			}
-			command+="Reviewer,Description,JobReviewStatus) VALUES(";
+			command+="Reviewer,Description,ReviewStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobReview.JobReviewNum)+",";
 			}
@@ -140,7 +140,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobReview.Reviewer)+","
 				//DateTStamp can only be set by MySQL
 				+"'"+POut.String(jobReview.Description)+"',"
-				+    POut.Int   ((int)jobReview.JobReviewStatus)+")";
+				+    POut.Int   ((int)jobReview.ReviewStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -153,10 +153,10 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one JobReview in the database.</summary>
 		public static void Update(JobReview jobReview){
 			string command="UPDATE jobreview SET "
-				+"Reviewer       =  "+POut.Long  (jobReview.Reviewer)+", "
+				+"Reviewer    =  "+POut.Long  (jobReview.Reviewer)+", "
 				//DateTStamp can only be set by MySQL
-				+"Description    = '"+POut.String(jobReview.Description)+"', "
-				+"JobReviewStatus=  "+POut.Int   ((int)jobReview.JobReviewStatus)+" "
+				+"Description = '"+POut.String(jobReview.Description)+"', "
+				+"ReviewStatus=  "+POut.Int   ((int)jobReview.ReviewStatus)+" "
 				+"WHERE JobReviewNum = "+POut.Long(jobReview.JobReviewNum);
 			Db.NonQ(command);
 		}
@@ -173,9 +173,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(jobReview.Description)+"'";
 			}
-			if(jobReview.JobReviewStatus != oldJobReview.JobReviewStatus) {
+			if(jobReview.ReviewStatus != oldJobReview.ReviewStatus) {
 				if(command!=""){ command+=",";}
-				command+="JobReviewStatus = "+POut.Int   ((int)jobReview.JobReviewStatus)+"";
+				command+="ReviewStatus = "+POut.Int   ((int)jobReview.ReviewStatus)+"";
 			}
 			if(command==""){
 				return false;

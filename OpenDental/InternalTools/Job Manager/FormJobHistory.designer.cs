@@ -58,6 +58,7 @@ namespace OpenDental{
 			this.gridMain.TabStop = false;
 			this.gridMain.Title = "Events";
 			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// FormJobHistory
 			// 

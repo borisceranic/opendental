@@ -4,12 +4,12 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	///<summary></summary>
-	public class Jobs{
+	public class Jobs {
 
 		///<summary></summary>
-		public static List<Job> GetForExpert(long userNum){
+		public static List<Job> GetForExpert(long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),userNum);
 			}
@@ -19,26 +19,26 @@ namespace OpenDentBusiness{
 
 		public static List<Job> GetForProject(long projectNum,bool showFinished) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),projectNum);
+				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),projectNum,showFinished);
 			}
 			string command="SELECT * FROM job WHERE ProjectNum = "+POut.Long(projectNum);
 			if(!showFinished) {
-				command+=" AND JobStatus != " + (int)JobStatus.Done;
+				command+=" AND Status != " + (int)JobStatus.Done;
 			}
 			return Crud.JobCrud.SelectMany(command);
 		}
 
 		///<summary>Gets one Job from the db.</summary>
-		public static Job GetOne(long jobNum){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+		public static Job GetOne(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Job>(MethodBase.GetCurrentMethod(),jobNum);
 			}
 			return Crud.JobCrud.SelectOne(jobNum);
 		}
 
 		///<summary></summary>
-		public static long Insert(Job job){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+		public static long Insert(Job job) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				job.JobNum=Meth.GetLong(MethodBase.GetCurrentMethod(),job);
 				return job.JobNum;
 			}
@@ -46,8 +46,8 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void Update(Job job){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+		public static void Update(Job job) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),job);
 				return;
 			}
@@ -75,26 +75,25 @@ namespace OpenDentBusiness{
 			Crud.JobCrud.Delete(jobNum); //Finally, delete the job itself.
 		}
 
-		///<summary>Returns a table for use in UserControlJobs, filtered by the passed in params. 
+		///<summary>Returns a list for use in UserControlJobs, filtered by the passed in params. 
 		///String params can be "", JobNum can be 0, and other long params can be -1 if you do not want to filter by those params.</summary>
-		public static DataTable GetJobDataTable(long jobNum,string expert,string owner,string version,
-			string project,string title,long status,long priority,long type,bool showHidden) {
-				if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-					return Meth.GetTable(MethodBase.GetCurrentMethod(),jobNum,expert,owner,version,project,title,status,priority,type,showHidden);
-				}
-				string command="SELECT JobNum, JobVersion, JobPriority, owner.UserName AS Owner, expert.UserName AS Expert, JobType, " 
-						+"JobStatus, ProjectNum, Description, Title "
+		public static List<Job> GetJobList(long jobNum,string expert,string owner,string version,
+			string project,string title,long status,long priority,long category,bool showHidden) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),jobNum,expert,owner,version,project,title,status,priority,category,showHidden);
+			}
+			string command="SELECT job.*"
 					+"FROM job "
 					+"LEFT JOIN userod owner ON owner.UserNum = job.Owner "
 					+"LEFT JOIN userod expert ON expert.UserNum = job.Expert "
 					+"WHERE TRUE ";
 			if(expert!="") {
 				command+=" AND expert.UserName LIKE '%"+expert+"%'";
-			} 
+			}
 			if(owner!="") {
 				command+=" AND owner.UserName LIKE '%"+owner+"%'";
 			}
-			if(version!=""){
+			if(version!="") {
 				command+=" AND JobVersion LIKE '%"+version+"%'";
 			}
 			if(title!="") {
@@ -103,58 +102,37 @@ namespace OpenDentBusiness{
 			if(jobNum!=0) {
 				command+=" AND JobNum="+jobNum;
 			}
-			if(status!=-1) {
-				command+= " AND JobStatus="+status;			
+			if(status>-1) {
+				command+= " AND Status="+status;
 			}
-			if(priority!=-1) {
-				command+=" AND JobPriority="+priority;
+			if(priority>-1) {
+				command+=" AND Priority="+priority;
 			}
-			if(type!=-1) {
-				command+=" AND JobType="+type;
+			if(category>-1) {
+				command+=" AND Category="+category;
 			}
 			if(!showHidden) {
-				command+=" AND JobStatus NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Done+","+(int)JobStatus.Rescinded+")";
+				command+=" AND Status NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Done+","+(int)JobStatus.Rescinded+")";
 			}
-			DataTable table=Db.GetTable(command); //JobNum, JobVersion, JobPriority, Owner, Expert, JobType, JobStatus, ProjectNum, Description 
-			return table;
-		}
-
-		///<summary>Sets a job as NeedsApproval and creates a JobEvent.  Set the new owner of the job prior to calling this method.</summary>
-		public static void SendForApproval(Job job) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),job);
-			}
-			job.JobStatus=JobStatus.NeedsApproval;
-			JobEvent jobEventRecent=JobEvents.GetMostRecent(job.JobNum);
-			if(job.IsNew || jobEventRecent==null || jobEventRecent.Owner!=job.Owner || jobEventRecent.JobStatus!=job.JobStatus) {
-				JobEvent jobEventCur=new JobEvent();
-				jobEventCur.Description=job.Description;
-				jobEventCur.JobNum=job.JobNum;
-				jobEventCur.JobStatus=job.JobStatus;
-				jobEventCur.Owner=job.Owner;
-				JobEvents.Insert(jobEventCur);
-			}
-			Jobs.Update(job);
-			Signalods.SetInvalid(InvalidType.Job);
+			return Crud.JobCrud.SelectMany(command);
 		}
 
 		///<summary>Sets a job's status and creates a JobEvent.  Does not set a new owner of the job.</summary>
-		public static void SetStatus(Job job,JobStatus jobStatus) {
+		public static void SetStatus(Job job,JobStatus jobStatus,long jobOwner) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),job,jobStatus);
 			}
-			job.JobStatus=jobStatus;
-			JobEvent jobEventRecent=JobEvents.GetMostRecent(job.JobNum);
-			if(job.IsNew || jobEventRecent==null || jobEventRecent.Owner!=job.Owner || jobEventRecent.JobStatus!=job.JobStatus) {
+			if(job.IsNew || job.Owner!=jobOwner || job.Status!=jobStatus) {
 				JobEvent jobEventCur=new JobEvent();
 				jobEventCur.Description=job.Description;
 				jobEventCur.JobNum=job.JobNum;
-				jobEventCur.JobStatus=job.JobStatus;
+				jobEventCur.Status=job.Status;
 				jobEventCur.Owner=job.Owner;
 				JobEvents.Insert(jobEventCur);
 			}
+			job.Status=jobStatus;
+			job.Owner=jobOwner;
 			Jobs.Update(job);
-			Signalods.SetInvalid(InvalidType.Job);
 		}
 
 		///<summary>Returns a data table for the Job Manager control.  This data table will be optionally grouped by the booleans passed in and
@@ -183,7 +161,7 @@ namespace OpenDentBusiness{
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="JobStatus IN("+String.Join(",",listJobStatuses)+") ";
+				whereClause+="Status IN("+String.Join(",",listJobStatuses)+") ";
 			}
 			if(groupExpert) {
 				groupClause+="GROUP BY Expert";
@@ -198,10 +176,10 @@ namespace OpenDentBusiness{
 			}
 			if(groupEnums) {
 				if(groupClause!="") {
-					groupClause+=", JobStatus";
+					groupClause+=", Status";
 				}
 				else {
-					groupClause+="GROUP BY JobStatus";
+					groupClause+="GROUP BY Status";
 				}
 			}
 			if(groupDate){
@@ -222,7 +200,7 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),ownerNum);
 			}
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
-				+"WHERE Owner="+POut.Long(ownerNum)+" AND JobStatus IN("
+				+"WHERE Owner="+POut.Long(ownerNum)+" AND Status IN("
 				+POut.Long((int)JobStatus.Assigned)
 				+","+POut.Long((int)JobStatus.InProgress)
 				+","+POut.Long((int)JobStatus.ReadyForReview)
@@ -236,7 +214,7 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),expertNum);
 			}
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
-				+"WHERE Expert="+POut.Long(expertNum)+" AND JobStatus IN("
+				+"WHERE Expert="+POut.Long(expertNum)+" AND Status IN("
 				+POut.Long((int)JobStatus.Assigned)
 				+","+POut.Long((int)JobStatus.InProgress)
 				+","+POut.Long((int)JobStatus.ReadyForReview)
@@ -258,7 +236,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM job WHERE ";
 			string whereClause="";
-			if(groupExpert) {
+			if(groupExpert && rowExpert!="") {
 				whereClause+="Expert="+Userods.GetUserByName(rowExpert,false).UserNum+" ";
 			}
 			if(listExpertFilterNums.Count>0) {
@@ -283,13 +261,13 @@ namespace OpenDentBusiness{
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="JobStatus="+rowStatus+" ";
+				whereClause+="Status="+rowStatus+" ";
 			}
 			if(listJobStatusFilters.Count>0) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="JobStatus IN("+String.Join(",",listJobStatusFilters)+") ";
+				whereClause+="Status IN("+String.Join(",",listJobStatusFilters)+") ";
 			}
 			if(groupDate) {
 				if(whereClause!="") {

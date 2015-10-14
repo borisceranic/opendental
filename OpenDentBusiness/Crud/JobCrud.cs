@@ -49,16 +49,15 @@ namespace OpenDentBusiness.Crud{
 				job.JobNum       = PIn.Long  (table.Rows[i]["JobNum"].ToString());
 				job.Expert       = PIn.Long  (table.Rows[i]["Expert"].ToString());
 				job.ProjectNum   = PIn.Long  (table.Rows[i]["ProjectNum"].ToString());
-				job.JobPriority  = (OpenDentBusiness.JobPriority)PIn.Int(table.Rows[i]["JobPriority"].ToString());
-				job.JobType      = (OpenDentBusiness.JobType)PIn.Int(table.Rows[i]["JobType"].ToString());
+				job.Priority     = (OpenDentBusiness.JobPriority)PIn.Int(table.Rows[i]["Priority"].ToString());
+				job.Category     = (OpenDentBusiness.JobCategory)PIn.Int(table.Rows[i]["Category"].ToString());
 				job.JobVersion   = PIn.String(table.Rows[i]["JobVersion"].ToString());
 				job.HoursEstimate= PIn.Int   (table.Rows[i]["HoursEstimate"].ToString());
 				job.HoursActual  = PIn.Int   (table.Rows[i]["HoursActual"].ToString());
 				job.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
 				job.Description  = PIn.String(table.Rows[i]["Description"].ToString());
 				job.Title        = PIn.String(table.Rows[i]["Title"].ToString());
-				job.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
-				job.JobStatus    = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["JobStatus"].ToString());
+				job.Status       = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["Status"].ToString());
 				job.Owner        = PIn.Long  (table.Rows[i]["Owner"].ToString());
 				retVal.Add(job);
 			}
@@ -100,23 +99,22 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Notes,JobStatus,Owner) VALUES(";
+			command+="Expert,ProjectNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Status,Owner) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(job.JobNum)+",";
 			}
 			command+=
 				     POut.Long  (job.Expert)+","
 				+    POut.Long  (job.ProjectNum)+","
-				+    POut.Int   ((int)job.JobPriority)+","
-				+    POut.Int   ((int)job.JobType)+","
+				+    POut.Int   ((int)job.Priority)+","
+				+    POut.Int   ((int)job.Category)+","
 				+"'"+POut.String(job.JobVersion)+"',"
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
 				+"'"+POut.String(job.Description)+"',"
 				+"'"+POut.String(job.Title)+"',"
-				+"'"+POut.String(job.Notes)+"',"
-				+    POut.Int   ((int)job.JobStatus)+","
+				+    POut.Int   ((int)job.Status)+","
 				+    POut.Long  (job.Owner)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
@@ -150,23 +148,22 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,JobPriority,JobType,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Notes,JobStatus,Owner) VALUES(";
+			command+="Expert,ProjectNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Status,Owner) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(job.JobNum)+",";
 			}
 			command+=
 				     POut.Long  (job.Expert)+","
 				+    POut.Long  (job.ProjectNum)+","
-				+    POut.Int   ((int)job.JobPriority)+","
-				+    POut.Int   ((int)job.JobType)+","
+				+    POut.Int   ((int)job.Priority)+","
+				+    POut.Int   ((int)job.Category)+","
 				+"'"+POut.String(job.JobVersion)+"',"
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
 				+"'"+POut.String(job.Description)+"',"
 				+"'"+POut.String(job.Title)+"',"
-				+"'"+POut.String(job.Notes)+"',"
-				+    POut.Int   ((int)job.JobStatus)+","
+				+    POut.Int   ((int)job.Status)+","
 				+    POut.Long  (job.Owner)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
@@ -182,16 +179,15 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE job SET "
 				+"Expert       =  "+POut.Long  (job.Expert)+", "
 				+"ProjectNum   =  "+POut.Long  (job.ProjectNum)+", "
-				+"JobPriority  =  "+POut.Int   ((int)job.JobPriority)+", "
-				+"JobType      =  "+POut.Int   ((int)job.JobType)+", "
+				+"Priority     =  "+POut.Int   ((int)job.Priority)+", "
+				+"Category     =  "+POut.Int   ((int)job.Category)+", "
 				+"JobVersion   = '"+POut.String(job.JobVersion)+"', "
 				+"HoursEstimate=  "+POut.Int   (job.HoursEstimate)+", "
 				+"HoursActual  =  "+POut.Int   (job.HoursActual)+", "
 				//DateTimeEntry not allowed to change
 				+"Description  = '"+POut.String(job.Description)+"', "
 				+"Title        = '"+POut.String(job.Title)+"', "
-				+"Notes        = '"+POut.String(job.Notes)+"', "
-				+"JobStatus    =  "+POut.Int   ((int)job.JobStatus)+", "
+				+"Status       =  "+POut.Int   ((int)job.Status)+", "
 				+"Owner        =  "+POut.Long  (job.Owner)+" "
 				+"WHERE JobNum = "+POut.Long(job.JobNum);
 			Db.NonQ(command);
@@ -208,13 +204,13 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProjectNum = "+POut.Long(job.ProjectNum)+"";
 			}
-			if(job.JobPriority != oldJob.JobPriority) {
+			if(job.Priority != oldJob.Priority) {
 				if(command!=""){ command+=",";}
-				command+="JobPriority = "+POut.Int   ((int)job.JobPriority)+"";
+				command+="Priority = "+POut.Int   ((int)job.Priority)+"";
 			}
-			if(job.JobType != oldJob.JobType) {
+			if(job.Category != oldJob.Category) {
 				if(command!=""){ command+=",";}
-				command+="JobType = "+POut.Int   ((int)job.JobType)+"";
+				command+="Category = "+POut.Int   ((int)job.Category)+"";
 			}
 			if(job.JobVersion != oldJob.JobVersion) {
 				if(command!=""){ command+=",";}
@@ -237,13 +233,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Title = '"+POut.String(job.Title)+"'";
 			}
-			if(job.Notes != oldJob.Notes) {
+			if(job.Status != oldJob.Status) {
 				if(command!=""){ command+=",";}
-				command+="Notes = '"+POut.String(job.Notes)+"'";
-			}
-			if(job.JobStatus != oldJob.JobStatus) {
-				if(command!=""){ command+=",";}
-				command+="JobStatus = "+POut.Int   ((int)job.JobStatus)+"";
+				command+="Status = "+POut.Int   ((int)job.Status)+"";
 			}
 			if(job.Owner != oldJob.Owner) {
 				if(command!=""){ command+=",";}

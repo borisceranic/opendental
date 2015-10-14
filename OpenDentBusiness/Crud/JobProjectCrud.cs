@@ -51,7 +51,7 @@ namespace OpenDentBusiness.Crud{
 				jobProject.ParentProjectNum= PIn.Long  (table.Rows[i]["ParentProjectNum"].ToString());
 				jobProject.Title           = PIn.String(table.Rows[i]["Title"].ToString());
 				jobProject.Description     = PIn.String(table.Rows[i]["Description"].ToString());
-				jobProject.JobProjectStatus= (OpenDentBusiness.JobProjectStatus)PIn.Int(table.Rows[i]["JobProjectStatus"].ToString());
+				jobProject.ProjectStatus   = (OpenDentBusiness.JobProjectStatus)PIn.Int(table.Rows[i]["ProjectStatus"].ToString());
 				retVal.Add(jobProject);
 			}
 			return retVal;
@@ -92,7 +92,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobProjectNum,";
 			}
-			command+="RootProjectNum,ParentProjectNum,Title,Description,JobProjectStatus) VALUES(";
+			command+="RootProjectNum,ParentProjectNum,Title,Description,ProjectStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobProject.JobProjectNum)+",";
 			}
@@ -101,7 +101,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (jobProject.ParentProjectNum)+","
 				+"'"+POut.String(jobProject.Title)+"',"
 				+"'"+POut.String(jobProject.Description)+"',"
-				+    POut.Int   ((int)jobProject.JobProjectStatus)+")";
+				+    POut.Int   ((int)jobProject.ProjectStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -134,7 +134,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobProjectNum,";
 			}
-			command+="RootProjectNum,ParentProjectNum,Title,Description,JobProjectStatus) VALUES(";
+			command+="RootProjectNum,ParentProjectNum,Title,Description,ProjectStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobProject.JobProjectNum)+",";
 			}
@@ -143,7 +143,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (jobProject.ParentProjectNum)+","
 				+"'"+POut.String(jobProject.Title)+"',"
 				+"'"+POut.String(jobProject.Description)+"',"
-				+    POut.Int   ((int)jobProject.JobProjectStatus)+")";
+				+    POut.Int   ((int)jobProject.ProjectStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -160,7 +160,7 @@ namespace OpenDentBusiness.Crud{
 				+"ParentProjectNum=  "+POut.Long  (jobProject.ParentProjectNum)+", "
 				+"Title           = '"+POut.String(jobProject.Title)+"', "
 				+"Description     = '"+POut.String(jobProject.Description)+"', "
-				+"JobProjectStatus=  "+POut.Int   ((int)jobProject.JobProjectStatus)+" "
+				+"ProjectStatus   =  "+POut.Int   ((int)jobProject.ProjectStatus)+" "
 				+"WHERE JobProjectNum = "+POut.Long(jobProject.JobProjectNum);
 			Db.NonQ(command);
 		}
@@ -184,9 +184,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(jobProject.Description)+"'";
 			}
-			if(jobProject.JobProjectStatus != oldJobProject.JobProjectStatus) {
+			if(jobProject.ProjectStatus != oldJobProject.ProjectStatus) {
 				if(command!=""){ command+=",";}
-				command+="JobProjectStatus = "+POut.Int   ((int)jobProject.JobProjectStatus)+"";
+				command+="ProjectStatus = "+POut.Int   ((int)jobProject.ProjectStatus)+"";
 			}
 			if(command==""){
 				return false;

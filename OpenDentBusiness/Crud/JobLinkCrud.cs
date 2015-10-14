@@ -9,9 +9,9 @@ using System.Drawing;
 namespace OpenDentBusiness.Crud{
 	public class JobLinkCrud {
 		///<summary>Gets one JobLink object from the database using the primary key.  Returns null if not found.</summary>
-		public static JobLink SelectOne(long jobLinknum){
+		public static JobLink SelectOne(long jobLinkNum){
 			string command="SELECT * FROM joblink "
-				+"WHERE JobLinknum = "+POut.Long(jobLinknum);
+				+"WHERE JobLinkNum = "+POut.Long(jobLinkNum);
 			List<JobLink> list=TableToList(Db.GetTable(command));
 			if(list.Count==0) {
 				return null;
@@ -46,7 +46,7 @@ namespace OpenDentBusiness.Crud{
 			JobLink jobLink;
 			for(int i=0;i<table.Rows.Count;i++) {
 				jobLink=new JobLink();
-				jobLink.JobLinkNum= PIn.Long  (table.Rows[i]["JobLinknum"].ToString());
+				jobLink.JobLinkNum= PIn.Long  (table.Rows[i]["JobLinkNum"].ToString());
 				jobLink.JobNum    = PIn.Long  (table.Rows[i]["JobNum"].ToString());
 				jobLink.FKey      = PIn.Long  (table.Rows[i]["FKey"].ToString());
 				jobLink.LinkType  = (OpenDentBusiness.JobLinkType)PIn.Int(table.Rows[i]["LinkType"].ToString());
@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Inserts one JobLink into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobLink jobLink){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinknum");
+				jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinkNum");
 				int loopcount=0;
 				while(loopcount<100){
 					try {
@@ -84,11 +84,11 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Inserts one JobLink into the database.  Provides option to use the existing priKey.</summary>
 		public static long Insert(JobLink jobLink,bool useExistingPK){
 			if(!useExistingPK && PrefC.RandomKeys) {
-				jobLink.JobLinkNum=ReplicationServers.GetKey("joblink","JobLinknum");
+				jobLink.JobLinkNum=ReplicationServers.GetKey("joblink","JobLinkNum");
 			}
 			string command="INSERT INTO joblink (";
 			if(useExistingPK || PrefC.RandomKeys) {
-				command+="JobLinknum,";
+				command+="JobLinkNum,";
 			}
 			command+="JobNum,FKey,LinkType) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
@@ -114,7 +114,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			else {
 				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinknum"); //Cacheless method
+					jobLink.JobLinkNum=DbHelper.GetNextOracleKey("joblink","JobLinkNum"); //Cacheless method
 				}
 				return InsertNoCache(jobLink,true);
 			}
@@ -125,10 +125,10 @@ namespace OpenDentBusiness.Crud{
 			bool isRandomKeys=Prefs.GetBoolNoCache(PrefName.RandomPrimaryKeys);
 			string command="INSERT INTO joblink (";
 			if(!useExistingPK && isRandomKeys) {
-				jobLink.JobLinkNum=ReplicationServers.GetKeyNoCache("joblink","JobLinknum");
+				jobLink.JobLinkNum=ReplicationServers.GetKeyNoCache("joblink","JobLinkNum");
 			}
 			if(isRandomKeys || useExistingPK) {
-				command+="JobLinknum,";
+				command+="JobLinkNum,";
 			}
 			command+="JobNum,FKey,LinkType) VALUES(";
 			if(isRandomKeys || useExistingPK) {
@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"JobNum    =  "+POut.Long  (jobLink.JobNum)+", "
 				+"FKey      =  "+POut.Long  (jobLink.FKey)+", "
 				+"LinkType  =  "+POut.Int   ((int)jobLink.LinkType)+" "
-				+"WHERE JobLinknum = "+POut.Long(jobLink.JobLinkNum);
+				+"WHERE JobLinkNum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 		}
 
@@ -176,15 +176,15 @@ namespace OpenDentBusiness.Crud{
 				return false;
 			}
 			command="UPDATE joblink SET "+command
-				+" WHERE JobLinknum = "+POut.Long(jobLink.JobLinkNum);
+				+" WHERE JobLinkNum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 			return true;
 		}
 
 		///<summary>Deletes one JobLink from the database.</summary>
-		public static void Delete(long jobLinknum){
+		public static void Delete(long jobLinkNum){
 			string command="DELETE FROM joblink "
-				+"WHERE JobLinknum = "+POut.Long(jobLinknum);
+				+"WHERE JobLinkNum = "+POut.Long(jobLinkNum);
 			Db.NonQ(command);
 		}
 

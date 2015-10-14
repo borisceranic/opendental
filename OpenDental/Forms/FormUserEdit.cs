@@ -37,6 +37,7 @@ namespace OpenDental{
 		public Userod UserCur;
 		private TextBox textUserNum;
 		private Label label27;
+		private UI.Button butJobRoles;
 		private List<UserGroup> _listUserGroups;
 
 		///<summary></summary>
@@ -91,6 +92,7 @@ namespace OpenDental{
 			this.checkClinicIsRestricted = new System.Windows.Forms.CheckBox();
 			this.textUserNum = new System.Windows.Forms.TextBox();
 			this.label27 = new System.Windows.Forms.Label();
+			this.butJobRoles = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -268,10 +270,26 @@ namespace OpenDental{
 			this.label27.Text = "User ID";
 			this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// butJobRoles
+			// 
+			this.butJobRoles.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butJobRoles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butJobRoles.Autosize = true;
+			this.butJobRoles.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butJobRoles.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butJobRoles.CornerRadius = 4F;
+			this.butJobRoles.Location = new System.Drawing.Point(317, 380);
+			this.butJobRoles.Name = "butJobRoles";
+			this.butJobRoles.Size = new System.Drawing.Size(103, 26);
+			this.butJobRoles.TabIndex = 148;
+			this.butJobRoles.Text = "Set Job Roles";
+			this.butJobRoles.Click += new System.EventHandler(this.butJobRoles_Click);
+			// 
 			// FormUserEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(773, 431);
+			this.Controls.Add(this.butJobRoles);
 			this.Controls.Add(this.textUserNum);
 			this.Controls.Add(this.label27);
 			this.Controls.Add(this.checkClinicIsRestricted);
@@ -360,6 +378,9 @@ namespace OpenDental{
 			if(UserCur.Password==""){
 				butPassword.Text=Lan.g(this,"Create Password");
 			}
+			if(!Prefs.IsODHQ()) {
+				butJobRoles.Visible=false;
+			}
 		}
 
 		private void listClinic_MouseClick(object sender,MouseEventArgs e) {
@@ -396,6 +417,10 @@ namespace OpenDental{
 			}
 		}
 
+		private void butJobRoles_Click(object sender,EventArgs e) {
+			FormJobRoles FormJR=new FormJobRoles(UserCur.UserNum);
+			FormJR.ShowDialog();
+		}
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textUserName.Text==""){
 				MsgBox.Show(this,"Please enter a username.");
