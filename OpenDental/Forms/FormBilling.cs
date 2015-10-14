@@ -948,6 +948,7 @@ namespace OpenDental{
 					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
 						OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect);
 					}
+					int stmtCountCur=0;
 					//Generate the statements for each batch.
 					for(int j=listElectStmts.Count-1;j>=0;j--) {
 						Statement stmtCur=listElectStmts[j];
@@ -974,6 +975,10 @@ namespace OpenDental{
 						if(statementWritten) {
 							listElectStmtNums.Add(stmtCur.StatementNum);
 							sentElect++;
+							stmtCountCur++;
+						}
+						if(stmtCountCur==maxElectStmtsPerBatch) {
+							break;
 						}
 					}
 					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
