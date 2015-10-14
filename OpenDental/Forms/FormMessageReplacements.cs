@@ -126,6 +126,54 @@ namespace OpenDental {
 			gridMain.Rows.Add(row);
 			row=new ODGridRow();
 			row.Cells.Add("Patient");
+			row.Cells.Add("[Birthdate]");
+			row.Cells.Add("The patient's birthdate.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
+			row.Cells.Add("[SSN]");
+			row.Cells.Add("The patient's social security number.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
+			row.Cells.Add("[Address]");
+			row.Cells.Add("The patient's address.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
+			row.Cells.Add("[City]");
+			row.Cells.Add("The patient's city.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
+			row.Cells.Add("[State]");
+			row.Cells.Add("The patient's state.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
+			row.Cells.Add("[Zip]");
+			row.Cells.Add("The patient's zip code.");
+			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
+			row=new ODGridRow();
+			row.Cells.Add("Patient");
 			row.Cells.Add("[ReferredFromProvNameFL]");
 			row.Cells.Add("The first and last name of the provider that referred the patient.");
 			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
@@ -270,6 +318,12 @@ namespace OpenDental {
 			retVal=retVal.Replace("[HmPhone]",pat.HmPhone);
 			retVal=retVal.Replace("[WkPhone]",pat.WkPhone);
 			retVal=retVal.Replace("[WirelessPhone]",pat.WirelessPhone);
+			retVal=retVal.Replace("[Birthdate]",pat.Birthdate.ToShortDateString());
+			retVal=retVal.Replace("[SSN]",pat.SSN);
+			retVal=retVal.Replace("[Address]",pat.Address);
+			retVal=retVal.Replace("[City]",pat.City);
+			retVal=retVal.Replace("[State]",pat.State);
+			retVal=retVal.Replace("[Zip]",pat.Zip);
 			Referral patRef=Referrals.GetReferralForPat(pat.PatNum);
 			if(patRef!=null) {
 				retVal=retVal.Replace("[ReferredFromProvNameFL]",patRef.FName+" "+patRef.LName);

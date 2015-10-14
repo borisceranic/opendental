@@ -28,7 +28,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.listFields = new System.Windows.Forms.ListBox();
+			this.butReplacements = new OpenDental.UI.Button();
 			this.butOk = new OpenDental.UI.Button();
 			this.textTemplate = new OpenDental.ODtextBox();
 			this.butImport = new OpenDental.UI.Button();
@@ -72,16 +72,20 @@ namespace OpenDental{
 			this.label3.Text = "This form is for custom program links only.";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// listFields
+			// butReplacements
 			// 
-			this.listFields.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.listFields.FormattingEnabled = true;
-			this.listFields.Location = new System.Drawing.Point(559, 57);
-			this.listFields.Name = "listFields";
-			this.listFields.Size = new System.Drawing.Size(267, 238);
-			this.listFields.TabIndex = 12;
-			this.listFields.Click += new System.EventHandler(this.listBoxFields_Click);
+			this.butReplacements.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butReplacements.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butReplacements.Autosize = true;
+			this.butReplacements.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butReplacements.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butReplacements.CornerRadius = 4F;
+			this.butReplacements.Location = new System.Drawing.Point(114, 569);
+			this.butReplacements.Name = "butReplacements";
+			this.butReplacements.Size = new System.Drawing.Size(82, 24);
+			this.butReplacements.TabIndex = 14;
+			this.butReplacements.Text = "Replacements";
+			this.butReplacements.Click += new System.EventHandler(this.butReplacements_Click);
 			// 
 			// butOk
 			// 
@@ -148,8 +152,8 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(838, 636);
+			this.Controls.Add(this.butReplacements);
 			this.Controls.Add(this.butOk);
-			this.Controls.Add(this.listFields);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.textTemplate);
 			this.Controls.Add(this.label2);
@@ -177,7 +181,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label2;
 		private ODtextBox textTemplate;
 		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.ListBox listFields;
 		private UI.Button butOk;
+		private UI.Button butReplacements;
 	}
 }

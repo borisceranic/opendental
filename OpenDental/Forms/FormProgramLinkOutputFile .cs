@@ -20,20 +20,6 @@ namespace OpenDental {
 		private void FormProgramLinkOutputFile_Load(object sender,EventArgs e) {
 			textTemplate.Text=_curProg.FileTemplate;
 			textPath.Text=_curProg.FilePath;
-			listFields.Items.Add("[PatNum]");
-			listFields.Items.Add("[ChartNumber]");
-			listFields.Items.Add("[FName]");
-			listFields.Items.Add("[LName]");
-			listFields.Items.Add("[Birthdate]");
-			listFields.Items.Add("[SSN]");
-			listFields.Items.Add("[Gender]");
-			listFields.Items.Add("[Address]");
-			listFields.Items.Add("[City]");
-			listFields.Items.Add("[State]");
-			listFields.Items.Add("[Zip]");
-			listFields.Items.Add("[HmPhone]");
-			listFields.Items.Add("[WkPhone]");
-			listFields.Items.Add("[WirelessPhone]");
 		}
 
 		private void butImport_Click(object sender,EventArgs e) {
@@ -48,14 +34,6 @@ namespace OpenDental {
 			textPath.Text=fileNames[0];
 		}
 
-		private void listBoxFields_Click(object sender,EventArgs e) {
-			textTemplate.Focus();
-			string clickedFieldStr=listFields.GetItemText(listFields.SelectedItem);
-			int cursorIndex=textTemplate.SelectionStart;
-			textTemplate.Text=textTemplate.Text.Insert(cursorIndex,clickedFieldStr);
-			textTemplate.SelectionStart=cursorIndex+clickedFieldStr.Length;
-		}
-
 		private void butOK_Click(object sender,EventArgs e) {
 			_curProg.FilePath=textPath.Text;
 			_curProg.FileTemplate=textTemplate.Text;
@@ -64,6 +42,19 @@ namespace OpenDental {
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void butReplacements_Click(object sender,EventArgs e) {
+			FormMessageReplacements formMR=new FormMessageReplacements(MessageReplaceType.Patient);
+			formMR.IsSelectionMode=true;
+			formMR.ShowDialog();
+			if(formMR.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			textTemplate.Focus();
+			int cursorIndex=textTemplate.SelectionStart;
+			textTemplate.Text=textTemplate.Text.Insert(cursorIndex,formMR.Replacement);
+			textTemplate.SelectionStart=cursorIndex+formMR.Replacement.Length;
 		}
 
 	}

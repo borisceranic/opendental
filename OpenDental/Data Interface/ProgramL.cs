@@ -331,20 +331,7 @@ namespace OpenDental{
 					path=path.Replace("[WkPhone]",pat.WkPhone);
 					path=path.Replace("[LNameLetter]",pat.LName.Substring(0,1).ToUpper());
 					if(!String.IsNullOrEmpty(outputFilePath) && !String.IsNullOrEmpty(fileTemplate)) {
-						fileTemplate=fileTemplate.Replace("[PatNum]",POut.Long(pat.PatNum));
-						fileTemplate=fileTemplate.Replace("[ChartNumber]",pat.ChartNumber);
-						fileTemplate=fileTemplate.Replace("[FName]",pat.FName);
-						fileTemplate=fileTemplate.Replace("[LName]",pat.LName);
-						fileTemplate=fileTemplate.Replace("[Birthdate]",pat.Birthdate.ToShortDateString());
-						fileTemplate=fileTemplate.Replace("[SSN]",pat.SSN);
-						fileTemplate=fileTemplate.Replace("[Gender]",POut.Int((int)pat.Gender));
-						fileTemplate=fileTemplate.Replace("[Address]",pat.Address);
-						fileTemplate=fileTemplate.Replace("[City]",pat.City);
-						fileTemplate=fileTemplate.Replace("[State]",pat.State);
-						fileTemplate=fileTemplate.Replace("[Zip]",pat.Zip);
-						fileTemplate=fileTemplate.Replace("[HmPhone]",pat.HmPhone);
-						fileTemplate=fileTemplate.Replace("[WkPhone]",pat.WkPhone);
-						fileTemplate=fileTemplate.Replace("[WirelessPhone]",pat.WirelessPhone);
+						fileTemplate=FormMessageReplacements.ReplacePatient(fileTemplate,pat);
 						fileTemplate=fileTemplate.Replace("\n","\r\n");
 						File.WriteAllText(outputFilePath,fileTemplate);
 					}
