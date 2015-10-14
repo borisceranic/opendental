@@ -75,6 +75,7 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.RevenueCodeDefault= PIn.String(table.Rows[i]["RevenueCodeDefault"].ToString());
 				procedureCode.ProvNumDefault    = PIn.Long  (table.Rows[i]["ProvNumDefault"].ToString());
 				procedureCode.CanadaTimeUnits   = PIn.Double(table.Rows[i]["CanadaTimeUnits"].ToString());
+				procedureCode.IsRadiology       = PIn.Bool  (table.Rows[i]["IsRadiology"].ToString());
 				retVal.Add(procedureCode);
 			}
 			return retVal;
@@ -115,7 +116,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -147,7 +148,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
 				+    POut.Long  (procedureCode.ProvNumDefault)+","
-				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"')";
+				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"',"
+				+    POut.Bool  (procedureCode.IsRadiology)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -180,7 +182,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -212,7 +214,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
 				+    POut.Long  (procedureCode.ProvNumDefault)+","
-				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"')";
+				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"',"
+				+    POut.Bool  (procedureCode.IsRadiology)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -252,7 +255,8 @@ namespace OpenDentBusiness.Crud{
 				+"DrugNDC           = '"+POut.String(procedureCode.DrugNDC)+"', "
 				+"RevenueCodeDefault= '"+POut.String(procedureCode.RevenueCodeDefault)+"', "
 				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+", "
-				+"CanadaTimeUnits   = '"+POut.Double(procedureCode.CanadaTimeUnits)+"' "
+				+"CanadaTimeUnits   = '"+POut.Double(procedureCode.CanadaTimeUnits)+"', "
+				+"IsRadiology       =  "+POut.Bool  (procedureCode.IsRadiology)+" "
 				+"WHERE CodeNum = "+POut.Long(procedureCode.CodeNum);
 			Db.NonQ(command);
 		}
@@ -365,6 +369,10 @@ namespace OpenDentBusiness.Crud{
 			if(procedureCode.CanadaTimeUnits != oldProcedureCode.CanadaTimeUnits) {
 				if(command!=""){ command+=",";}
 				command+="CanadaTimeUnits = '"+POut.Double(procedureCode.CanadaTimeUnits)+"'";
+			}
+			if(procedureCode.IsRadiology != oldProcedureCode.IsRadiology) {
+				if(command!=""){ command+=",";}
+				command+="IsRadiology = "+POut.Bool(procedureCode.IsRadiology)+"";
 			}
 			if(command==""){
 				return false;

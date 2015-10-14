@@ -10687,6 +10687,30 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'EnforceMedicaidIDLength','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD IsCpoe tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD IsCpoe number(3)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET IsCpoe = 0 WHERE IsCpoe IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY IsCpoe NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurecode ADD IsRadiology tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurecode ADD IsRadiology number(3)";
+					Db.NonQ(command);
+					command="UPDATE procedurecode SET IsRadiology = 0 WHERE IsRadiology IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurecode MODIFY IsRadiology NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

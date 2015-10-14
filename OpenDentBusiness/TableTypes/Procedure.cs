@@ -134,6 +134,11 @@ namespace OpenDentBusiness {
 		///and DiagnosisCode4.  Value of 9 for ICD-9, 10 for ICD-10, etc.  Default value is 0.  This value is copied from the DxIcdVersion preference
 		///when a procedure is created.  The user can also manually change the IcdVersion on individual procedures.</summary>
 		public byte IcdVersion;
+		///<summary>Procedures will be flagged as CPOE (Computerized Provider Order Entry) if this procedure was created by a provider.
+		///If a provider views, edits, or has any interaction with this procedure after its creation, it will be flagged as IsCPOE.
+		///Also, there will be a helpful window where providers can go to to "approve" non-CPOE procedures and mark them as CPOE to help meet EHR measures.
+		///If a staff person is logged in and enters this procedure then this is non-CPOE, so false.</summary>
+		public bool IsCpoe;
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

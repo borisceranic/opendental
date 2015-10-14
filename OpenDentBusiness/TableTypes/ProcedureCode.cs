@@ -84,6 +84,8 @@ namespace OpenDentBusiness{
 		public double CanadaTimeUnits;
 		///<summary>Not a database column.  Only used for xml import function.</summary>
 		private string procCatDescript;
+		///<summary>Set to true for radiology procedures.  An EHR core measure uses this flag to help determine the denominator for rad orders.</summary>
+		public bool IsRadiology;
 
 		public ProcedureCode(){
 			ProcTime="/X/";
