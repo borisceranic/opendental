@@ -854,7 +854,7 @@ namespace OpenDental{
 			// menuItemRecallTypes
 			// 
 			this.menuItemRecallTypes.Index = 8;
-			this.menuItemRecallTypes.Text = "RecallTypes";
+			this.menuItemRecallTypes.Text = "Recall Types";
 			this.menuItemRecallTypes.Click += new System.EventHandler(this.menuItemRecallTypes_Click);
 			// 
 			// menuItemFamily

@@ -364,9 +364,10 @@ namespace OpenDental{
 			this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.label1.Location = new System.Drawing.Point(12, 9);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(410, 17);
+			this.label1.Size = new System.Drawing.Size(453, 17);
 			this.label1.TabIndex = 196;
-			this.label1.Text = "See Setup | Modules for setup options that were previously in this window.";
+			this.label1.Text = "See Setup | Module Preferences for setup options that were previously in this win" +
+    "dow.";
 			// 
 			// textWebServiceServerName
 			// 

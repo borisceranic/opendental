@@ -459,12 +459,12 @@ namespace OpenDental{
 
 		private void FormFinanceCharges_Load(object sender, System.EventArgs e) {
 			if(PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)==0){
-				MsgBox.Show(this,"No finance charge adjustment type has been set.  Please go to Setup | Modules to fix this.");
+				MsgBox.Show(this,"No finance charge adjustment type has been set.  Please go to Setup | Account to fix this.");
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
 			if(PrefC.GetLong(PrefName.BillingChargeAdjustmentType)==0){
-				MsgBox.Show(this,"No billing charge adjustment type has been set.  Please go to Setup | Modules to fix this.");
+				MsgBox.Show(this,"No billing charge adjustment type has been set.  Please go to Setup | Account to fix this.");
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
