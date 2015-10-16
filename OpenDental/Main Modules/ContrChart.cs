@@ -4962,12 +4962,20 @@ namespace OpenDental{
 						row.Tag=null;
 						break;
 					case "Prov. (Pri, Sec)":
-						if(PatCur.SecProv != 0) {
-							row.Cells.Add(Providers.GetAbbr(PatCur.PriProv) + ", " + Providers.GetAbbr(PatCur.SecProv));
+						string provText="";
+						if(PatCur.PriProv!=0) {
+							provText+=Providers.GetAbbr(PatCur.PriProv)+", ";							
 						}
 						else {
-							row.Cells.Add(Providers.GetAbbr(PatCur.PriProv) + ", " + Lan.g("TableChartPtInfo","None"));
+							provText+=Lan.g("TableChartPtInfo","None")+", ";
 						}
+						if(PatCur.SecProv != 0) {
+							provText+=Providers.GetAbbr(PatCur.SecProv);
+						}
+						else {
+							provText+=Lan.g("TableChartPtInfo","None");
+						}
+						row.Cells.Add(provText);
 						row.Tag = null;
 						break;
 					case "Pri Ins":

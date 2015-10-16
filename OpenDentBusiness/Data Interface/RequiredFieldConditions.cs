@@ -41,9 +41,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets the requiredfieldconditions for one required field.</summary>
 		public static List<RequiredFieldCondition> GetForRequiredField(long requiredFieldNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<RequiredFieldCondition>>(MethodBase.GetCurrentMethod(),requiredFieldNum);
-			}
+			//No need to check RemotingRole; no call to db.
 			return Listt.FindAll(x => x.RequiredFieldNum==requiredFieldNum);
 		}
 
@@ -65,6 +63,19 @@ namespace OpenDentBusiness{
 			Crud.RequiredFieldConditionCrud.Update(requiredFieldCondition);
 		}
 
+		public static void DeleteAll(List<long> listRequiredFieldCondNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listRequiredFieldCondNums);
+				return;
+			}
+			if(listRequiredFieldCondNums.Count<1) {
+				return;
+			}
+			string command="DELETE FROM requiredfieldcondition WHERE RequiredFieldConditionNum IN("+string.Join(",",listRequiredFieldCondNums)+")";
+			Db.NonQ(command);
+		}
+
+		/*
 		///<summary></summary>
 		public static void Delete(long requiredFieldConditionNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -73,9 +84,6 @@ namespace OpenDentBusiness{
 			}
 			Crud.RequiredFieldConditionCrud.Delete(requiredFieldConditionNum);
 		}
-
-		/*
-		
 
 		///<summary></summary>
 		public static List<RequiredFieldCondition> Refresh(long patNum){
