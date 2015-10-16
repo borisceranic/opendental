@@ -6,8 +6,18 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public class ProcedureL {
+		///<summary>Sets all procedures associated to the appointment passed in complete.  Flags procedures as CPOE as needed (when provider logged in).
+		///Makes a log entry for each completed procedure.  And then finally fires the "CompleteProcedure" automation trigger.</summary>
 		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,List<InsSub> subList) {
 			List<Procedure> procsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
+			//Flag all the procedures as CPOE if the provider of the procedure is currently logged in.  
+			//We have to do this here and not within SetCompleteInAppt() due to RemotingRole checks.
+			bool isUserCpoe=Userods.IsUserCpoe(Security.CurUser);
+			for(int i=0;i<procsInAppt.Count;i++) {
+				if(isUserCpoe) {//Only change the status of IsCpoe to true.  Never set it back to false for any reason.  Once true, always true.
+					procsInAppt[i].IsCpoe=true;
+				}
+			}
 			Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,procsInAppt,subList);
 			for(int i=0;i<procsInAppt.Count();i++) {
 				LogProcComplCreate(apt.PatNum,procsInAppt[i],procsInAppt[i].ToothNum);

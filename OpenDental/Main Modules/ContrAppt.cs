@@ -15,6 +15,7 @@ using System.Drawing.Design;
 using System.Drawing.Text;
 using System.Drawing.Printing;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -183,6 +184,9 @@ namespace OpenDental {
 		private FormUnsched FormUnsched2;
 		///<summary>Should be set to FormOpenDental.OnTxtMsg_Click()</summary>
 		public SendSmsClick SendSmsClickDelegate;
+		///<summary></summary>
+		[Category("Data"),Description("Occurs when a user has taken action on an item needing an action taken.")]
+		public event ActionNeededEventHandler ActionTaken=null;
 
 		///<summary></summary>
 		public ContrAppt() {
@@ -4347,6 +4351,23 @@ namespace OpenDental {
 			FormASAP.BringToFront();
 		}
 
+		private void OnRadiology_Click() {
+			List<FormRadOrderList> listFormROLs=Application.OpenForms.OfType<FormRadOrderList>().ToList();
+			if(listFormROLs.Count > 0) {
+				listFormROLs[0].RefreshRadOrdersForUser(Security.CurUser);
+				listFormROLs[0].BringToFront();
+			}
+			else {
+				FormRadOrderList FormPRL=new FormRadOrderList(Security.CurUser);
+				FormPRL.FormClosing+=FormPRL_FormClosing;
+				FormPRL.Show();
+			}
+		}
+
+		private void FormPRL_FormClosing(object sender,FormClosingEventArgs e) {
+			ActionTaken.Invoke(sender,new ActionNeededEventArgs(ActionNeededTypes.RadiologyProcedures));
+		}
+
 		private void OnRecall_Click() {
 			if(FormRecallL==null || FormRecallL.IsDisposed) {
 				FormRecallL=new FormRecallList();
@@ -4403,6 +4424,9 @@ namespace OpenDental {
 					break;
 				case ApptListSelection.ASAP:
 					OnASAPList_Click();
+					break;
+				case ApptListSelection.Radiology:
+					OnRadiology_Click();
 					break;
 			}
 		}

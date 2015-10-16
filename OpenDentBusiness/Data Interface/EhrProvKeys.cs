@@ -46,6 +46,15 @@ namespace OpenDentBusiness{
 			return Crud.EhrProvKeyCrud.SelectMany(command);
 		}
 
+		///<summary>Returns true if a provider with the same last and first name passed in has ever had an EHR prov key.</summary>
+		public static bool HasProvHadKey(string lName,string fName) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),lName,fName);
+			}
+			string command="SELECT COUNT(*) FROM ehrprovkey WHERE ehrprovkey.LName='"+POut.String(lName)+"' AND ehrprovkey.FName='"+POut.String(fName)+"'";
+			return Db.GetCount(command)!="0";
+		}
+
 		///<summary></summary>
 		public static long Insert(EhrProvKey ehrProvKey){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

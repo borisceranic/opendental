@@ -207,6 +207,19 @@ namespace OpenDentBusiness {
 			return user.UserName;
 		}
 
+		///<summary>Returns true if the user passed in is associated with a provider that has (or had) an EHR prov key.</summary>
+		public static bool IsUserCpoe(Userod user) {
+			//No need to check RemotingRole; no call to db.
+			if(user==null) {
+				return false;
+			}
+			Provider prov=Providers.GetProv(user.ProvNum);
+			if(prov==null) {
+				return false;
+			}
+			//Check to see if this provider has had a valid key at any point in history.
+			return EhrProvKeys.HasProvHadKey(prov.LName,prov.FName);
+		}
 
 		///<summary>Only used in one place on the server when first attempting to log on.  The password will be hashed and checked against the one in the database.  Password is required, so empty string will return null.  Returns a user object if user and password are valid.  Otherwise, returns null.  If usingEcw, password will actually be the hash.  If usingEcw, then the username is not case sensitive.</summary>
 		public static Userod CheckUserAndPassword(string username,string password,bool usingEcw) {

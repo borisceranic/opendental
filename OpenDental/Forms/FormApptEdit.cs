@@ -2028,6 +2028,10 @@ namespace OpenDental{
 			proc.SiteNum=pat.SiteNum;
 			proc.RevCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).RevenueCodeDefault;
 			proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			if(Userods.IsUserCpoe(Security.CurUser)) {
+				//This procedure is considered CPOE because the provider is the one that has added it.
+				proc.IsCpoe=true;
+			}
 			Procedures.Insert(proc);
 			List<Benefit> benefitList=Benefits.Refresh(listPatPlans,SubList);
 			Procedures.ComputeEstimates(proc,pat.PatNum,new List<ClaimProc>(),true,PlanList,listPatPlans,benefitList,pat.Age,SubList);
@@ -2358,6 +2362,10 @@ namespace OpenDental{
 				}
 				proc.BaseUnits=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).BaseUnits;
 				proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+				if(Userods.IsUserCpoe(Security.CurUser)) {
+					//This procedure is considered CPOE because the provider is the one that has added it.
+					proc.IsCpoe=true;
+				}
 				Procedures.Insert(proc);//recall synch not required
 				if(Programs.UsingOrion){//Orion requires a DPC for every procedure. Force proc edit window open.
 					FormProcEdit FormP=new FormProcEdit(proc,pat.Copy(),fam);

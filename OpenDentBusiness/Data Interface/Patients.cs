@@ -594,6 +594,35 @@ namespace OpenDentBusiness{
 			Lim.SSN        = PIn.String(table.Rows[0][8].ToString());
 			return Lim;
 		}
+
+		///<summary>Gets nine of the most useful fields from the db for the given PatNums.</summary>
+		public static List<Patient> GetLimForPats(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			List<Patient> retVal=new List<Patient>();
+			if(listPatNums==null || listPatNums.Count < 1) {
+				return new List<Patient>();
+			}
+			string command= "SELECT PatNum,LName,FName,MiddleI,Preferred,CreditType,Guarantor,HasIns,SSN " 
+				+"FROM patient "
+				+"WHERE PatNum IN ("+string.Join(",",listPatNums)+")";
+			DataTable table=Db.GetTable(command);
+			for(int i=0;i<table.Rows.Count;i++) {
+				Patient patLim=new Patient();
+				patLim.PatNum     = PIn.Long	(table.Rows[i]["PatNum"].ToString());
+				patLim.LName      = PIn.String(table.Rows[i]["LName"].ToString());
+				patLim.FName      = PIn.String(table.Rows[i]["FName"].ToString());
+				patLim.MiddleI    = PIn.String(table.Rows[i]["MiddleI"].ToString());
+				patLim.Preferred  = PIn.String(table.Rows[i]["Preferred"].ToString());
+				patLim.CreditType = PIn.String(table.Rows[i]["CreditType"].ToString());
+				patLim.Guarantor  = PIn.Long	(table.Rows[i]["Guarantor"].ToString());
+				patLim.HasIns     = PIn.String(table.Rows[i]["HasIns"].ToString());
+				patLim.SSN        = PIn.String(table.Rows[i]["SSN"].ToString());
+				retVal.Add(patLim);
+			}
+			return retVal;
+		}
 		
 		///<summary>Gets the patient and provider balances for all patients in the family.  Used from the payment window to help visualize and automate the family splits.</summary>
 		public static DataTable GetPaymentStartingBalances(long guarNum,long excludePayNum) {

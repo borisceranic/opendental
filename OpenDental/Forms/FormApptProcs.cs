@@ -193,6 +193,10 @@ namespace OpenDental {
 			ProcCur.SiteNum=pat.SiteNum;
 			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
 			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			if(Userods.IsUserCpoe(Security.CurUser)) {
+				//This procedure is considered CPOE because the provider is the one that has added it.
+				ProcCur.IsCpoe=true;
+			}
 			Procedures.Insert(ProcCur);
 			List <Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
 			Procedures.ComputeEstimates(ProcCur,pat.PatNum,new List<ClaimProc>(),true,planList,patPlanList,benefitList,pat.Age,subList);

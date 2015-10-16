@@ -246,26 +246,12 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),aptNums);
 			}
-			//MessageBox.Show(patNums.Length.ToString());
-			string strAptNums="";
-			DataTable table;
-			if(aptNums.Count>0) {
-				for(int i=0;i<aptNums.Count;i++) {
-					if(i>0) {
-						strAptNums+="OR ";
-					}
-					strAptNums+="AptNum='"+aptNums[i].ToString()+"' ";
-				}
-				string command="SELECT * FROM appointment WHERE "+strAptNums;
-				//MessageBox.Show(string command);
-				table=Db.GetTable(command);
+			if(aptNums.Count < 1) {
+				return new List<Appointment>();
 			}
-			else {
-				table=new DataTable();
-			}
-			Appointment[] multApts=Crud.AppointmentCrud.TableToList(table).ToArray();
-			List<Appointment> aptList=new List<Appointment>(multApts);
-			return aptList;
+			string command="";
+			command="SELECT * FROM appointment WHERE AptNum IN ("+string.Join(",",aptNums)+")";
+			return Crud.AppointmentCrud.SelectMany(command);
 		}
 
 		///<summary>A list of strings.  Each string corresponds to one appointment in the supplied list.  Each string is a comma delimited list of codenums of the procedures attached to the appointment.</summary>
@@ -2356,6 +2342,10 @@ namespace OpenDentBusiness{
 				//nextaptnum
 				procCur.BaseUnits = ProcedureCodes.GetProcCode(procCur.CodeNum).BaseUnits;
 				procCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+				if(Userods.IsUserCpoe(Security.CurUser)) {
+					//This procedure is considered CPOE because the provider is the one that has added it.
+					procCur.IsCpoe=true;
+				}
 				Procedures.Insert(procCur);//no recall synch required
 				Procedures.ComputeEstimates(procCur,patCur.PatNum,new List<ClaimProc>(),false,listPlans,listPatPlans,listBenifits,patCur.Age,listSubs);
 				listProcs.Add(procCur);

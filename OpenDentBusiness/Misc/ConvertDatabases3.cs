@@ -10711,6 +10711,16 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE procedurecode MODIFY IsRadiology NOT NULL";
 					Db.NonQ(command);
 				}
+				//Set D0210 - D0340 to "IsRadiology"
+				for(int i=210;i<=340;i++) {
+					command="UPDATE procedurecode SET IsRadiology=1 WHERE ProcCode='D0"+i.ToString()+"'";
+					Db.NonQ(command);
+				}
+				//Set D0364 - D0386 to "IsRadiology"
+				for(int i=364;i<=386;i++) {
+					command="UPDATE procedurecode SET IsRadiology=1 WHERE ProcCode='D0"+i.ToString()+"'";
+					Db.NonQ(command);
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE clearinghouse ADD ClinicNum bigint NOT NULL";
 					Db.NonQ(command);

@@ -215,6 +215,30 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
+		///<summary>Updates IsCpoe column in the procedurelog table with the passed in value for the corresponding procedure.
+		///This method explicitly used instead of the generic Update method because this (and only this) field can get updated when a user cancels out
+		///of the Procedure Edit window and no other changes should accidentally make their way to the database.</summary>
+		public static void UpdateCpoeForProc(long procNum,bool isCpoe) {
+			//No need to check RemotingRole; no call to db.
+			UpdateCpoeForProcs(new List<long>() { procNum },isCpoe);
+		}
+
+		///<summary>Updates IsCpoe column in the procedurelog table with the passed in value for the corresponding procedures.
+		///This method explicitly used instead of the generic Update method because this (and only this) field can get updated when a user cancels out
+		///of the Procedure Edit window and no other changes should accidentally make their way to the database.</summary>
+		public static void UpdateCpoeForProcs(List<long> listProcNums,bool isCpoe) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listProcNums,isCpoe);
+				return;
+			}
+			if(listProcNums==null || listProcNums.Count < 1) {
+				return;
+			}
+			string command="UPDATE procedurelog SET IsCpoe = "+POut.Bool(isCpoe)
+				+" WHERE ProcNum IN ("+string.Join(",",listProcNums)+")";
+			Db.NonQ(command);
+		}
+
 		///<summary>Gets one procedure directly from the db.  Option to include the note.  If the procNum is 0 or if the procNum does not exist in the database, this will return a new Procedure object with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
 		public static Procedure GetOneProc(long procNum,bool includeNote) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -318,6 +342,25 @@ namespace OpenDentBusiness {
 				command+=listClaimProc[i].ProcNum;
 			}
 			command+=")";
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
+		///<summary>Gets a list of TP procedures that are attached to scheduled appointments that are not flagged as CPOE.</summary>
+		public static List<Procedure> GetProcsNonCpoeAttachedToApptsForProv(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT procedurelog.* "
+				+"FROM procedurelog "
+				+"INNER JOIN appointment ON procedurelog.AptNum=appointment.AptNum "
+				+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+				+"WHERE procedurecode.IsRadiology=1 "
+				+"AND appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)+" "
+				+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP)+" "
+				+"AND procedurelog.IsCpoe=0 "
+				+"AND procedurelog.ProvNum="+POut.Long(provNum)+" "
+				+"AND "+DbHelper.DtimeToDate("appointment.AptDateTime")+" >= "+DbHelper.Curdate()+" "
+				+"ORDER BY appointment.AptDateTime";
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
@@ -1684,7 +1727,6 @@ namespace OpenDentBusiness {
 			}
 			Crud.ProcedureCrud.Sync(listNew,listDB);
 		}
-
 	}
 
 	/*================================================================================================================

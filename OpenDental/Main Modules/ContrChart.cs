@@ -6960,6 +6960,10 @@ namespace OpenDental{
 			ProcCur.SiteNum=PatCur.SiteNum;
 			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
 			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			if(Userods.IsUserCpoe(Security.CurUser)) {
+				//This procedure is considered CPOE because the provider is the one that has added it.
+				ProcCur.IsCpoe=true;
+			}
 			Procedures.Insert(ProcCur);
 			if((ProcCur.ProcStatus==ProcStat.C || ProcCur.ProcStatus==ProcStat.EC || ProcCur.ProcStatus==ProcStat.EO)
 				&& ProcedureCodes.GetProcCode(ProcCur.CodeNum).PaintType==ToothPaintingType.Extraction) {
@@ -7109,6 +7113,10 @@ namespace OpenDental{
 			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
 			//nextaptnum
 			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			if(Userods.IsUserCpoe(Security.CurUser)) {
+				//This procedure is considered CPOE because the provider is the one that has added it.
+				ProcCur.IsCpoe=true;
+			}
 			Procedures.Insert(ProcCur);
 			if((ProcCur.ProcStatus==ProcStat.C || ProcCur.ProcStatus==ProcStat.EC || ProcCur.ProcStatus==ProcStat.EO)
 				&& ProcedureCodes.GetProcCode(ProcCur.CodeNum).PaintType==ToothPaintingType.Extraction) {

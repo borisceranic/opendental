@@ -5889,11 +5889,11 @@ namespace OpenDental{
 		}
 
 		private void FormProcEdit_FormClosing(object sender,FormClosingEventArgs e) {
-			//if(allowTopaz){
-			//	if(sigBoxTopaz!=null) {
-			//		sigBoxTopaz.Dispose();
-			//	}
-			//}
+			//We need to update the CPOE status even if the user is cancelling out of the window.
+			if(Userods.IsUserCpoe(Security.CurUser) && !ProcOld.IsCpoe) {
+				//There's a possibility that we are making a second, unnecessary call to the database here but it is worth it to help meet EHR measures.
+				Procedures.UpdateCpoeForProc(ProcCur.ProcNum,true);
+			}
 			if(DialogResult==DialogResult.OK) {
 				//this catches date,prov,fee,status,etc for all claimProcs attached to this proc.
 				if(!StartedAttachedToClaim

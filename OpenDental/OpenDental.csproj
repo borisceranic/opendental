@@ -343,6 +343,7 @@
     <Compile Include="Bridges\VixWinOld.cs" />
     <Compile Include="Bridges\XVWeb.cs" />
     <Compile Include="Bridges\ZImage.cs" />
+    <Compile Include="Data Interface\ActionNeededL.cs" />
     <Compile Include="Data Interface\AutomationL.cs" />
     <Compile Include="Data Interface\ClaimL.cs" />
     <Compile Include="Data Interface\ClearinghouseL.cs" />
@@ -414,6 +415,18 @@
     </Compile>
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormRadOrderList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormRadOrderList.designer.cs">
+      <DependentUpon>FormRadOrderList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormActionNeeded.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormActionNeeded.designer.cs">
+      <DependentUpon>FormActionNeeded.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormProgramLinkOutputFile .cs">
       <SubType>Form</SubType>
@@ -3927,6 +3940,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormRadOrderList.resx">
+      <DependentUpon>FormRadOrderList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormActionNeeded.resx">
+      <DependentUpon>FormActionNeeded.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProgramLinkOutputFile .resx">
       <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>

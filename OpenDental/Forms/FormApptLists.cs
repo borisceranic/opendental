@@ -25,6 +25,8 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butASAP;
 		private Label label4;
+		private UI.Button butRadOrders;
+		private Label label7;
 		///<summary>After this window closes, if dialog result is OK, this will contain which list was selected.</summary>
 		public ApptListSelection SelectionResult;
 
@@ -73,31 +75,33 @@ namespace OpenDental{
 			this.butConfirm = new OpenDental.UI.Button();
 			this.butRecall = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.butRadOrders = new OpenDental.UI.Button();
+			this.label7 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(130,83);
+			this.label1.Location = new System.Drawing.Point(130, 83);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(458,34);
+			this.label1.Size = new System.Drawing.Size(458, 34);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "A list of due dates for patients who have previously been in for an exam or clean" +
     "ing";
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(130,142);
+			this.label2.Location = new System.Drawing.Point(130, 142);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(458,44);
+			this.label2.Size = new System.Drawing.Size(458, 44);
 			this.label2.TabIndex = 3;
 			this.label2.Text = "A list of scheduled appointments.  These patients need to be reminded about their" +
     " appointments.";
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(130,204);
+			this.label3.Location = new System.Drawing.Point(130, 204);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(458,47);
+			this.label3.Size = new System.Drawing.Size(458, 47);
 			this.label3.TabIndex = 4;
 			this.label3.Text = "Planned appointments are created in the Chart module.  Every patient should have " +
     "one or be marked done.  This list is work that has been planned but never schedu" +
@@ -105,9 +109,9 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(130,266);
+			this.label5.Location = new System.Drawing.Point(130, 266);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(458,47);
+			this.label5.Size = new System.Drawing.Size(458, 47);
 			this.label5.TabIndex = 6;
 			this.label5.Text = "A short list of appointments that need to be followed up on.   Keep this list sho" +
     "rt by deleting any that don\'t get scheduled quickly.  You would then track them " +
@@ -115,9 +119,9 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(27,19);
+			this.label6.Location = new System.Drawing.Point(27, 19);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(519,31);
+			this.label6.Size = new System.Drawing.Size(519, 31);
 			this.label6.TabIndex = 7;
 			this.label6.Text = "These lists may be used for calling patients, sending postcards, running reports," +
     " etc..  Make sure to make good Comm Log entries for everything.";
@@ -125,9 +129,9 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(130,328);
+			this.label4.Location = new System.Drawing.Point(130, 328);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(458,47);
+			this.label4.Size = new System.Drawing.Size(458, 47);
 			this.label4.TabIndex = 12;
 			this.label4.Text = "The short call list.  A list of appointments where the patient is available on sh" +
     "ort notice.  To show on this list, the status of the appointment needs to be ASA" +
@@ -135,93 +139,119 @@ namespace OpenDental{
 			// 
 			// butASAP
 			// 
-			this.butASAP.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butASAP.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butASAP.Autosize = true;
 			this.butASAP.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butASAP.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butASAP.CornerRadius = 4F;
-			this.butASAP.Location = new System.Drawing.Point(28,326);
+			this.butASAP.Location = new System.Drawing.Point(28, 326);
 			this.butASAP.Name = "butASAP";
-			this.butASAP.Size = new System.Drawing.Size(100,26);
+			this.butASAP.Size = new System.Drawing.Size(100, 26);
 			this.butASAP.TabIndex = 13;
 			this.butASAP.Text = "ASAP";
 			this.butASAP.Click += new System.EventHandler(this.butASAP_Click);
 			// 
 			// butUnsched
 			// 
-			this.butUnsched.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butUnsched.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butUnsched.Autosize = true;
 			this.butUnsched.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUnsched.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUnsched.CornerRadius = 4F;
-			this.butUnsched.Location = new System.Drawing.Point(28,264);
+			this.butUnsched.Location = new System.Drawing.Point(28, 264);
 			this.butUnsched.Name = "butUnsched";
-			this.butUnsched.Size = new System.Drawing.Size(100,26);
+			this.butUnsched.Size = new System.Drawing.Size(100, 26);
 			this.butUnsched.TabIndex = 11;
 			this.butUnsched.Text = "Unscheduled";
 			this.butUnsched.Click += new System.EventHandler(this.butUnsched_Click);
 			// 
 			// butPlanned
 			// 
-			this.butPlanned.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butPlanned.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butPlanned.Autosize = true;
 			this.butPlanned.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPlanned.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPlanned.CornerRadius = 4F;
-			this.butPlanned.Location = new System.Drawing.Point(28,202);
+			this.butPlanned.Location = new System.Drawing.Point(28, 202);
 			this.butPlanned.Name = "butPlanned";
-			this.butPlanned.Size = new System.Drawing.Size(100,26);
+			this.butPlanned.Size = new System.Drawing.Size(100, 26);
 			this.butPlanned.TabIndex = 10;
 			this.butPlanned.Text = "Planned Tracker";
 			this.butPlanned.Click += new System.EventHandler(this.butPlanned_Click);
 			// 
 			// butConfirm
 			// 
-			this.butConfirm.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butConfirm.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butConfirm.Autosize = true;
 			this.butConfirm.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butConfirm.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butConfirm.CornerRadius = 4F;
-			this.butConfirm.Location = new System.Drawing.Point(28,140);
+			this.butConfirm.Location = new System.Drawing.Point(28, 140);
 			this.butConfirm.Name = "butConfirm";
-			this.butConfirm.Size = new System.Drawing.Size(100,26);
+			this.butConfirm.Size = new System.Drawing.Size(100, 26);
 			this.butConfirm.TabIndex = 9;
 			this.butConfirm.Text = "Confirmations";
 			this.butConfirm.Click += new System.EventHandler(this.butConfirm_Click);
 			// 
 			// butRecall
 			// 
-			this.butRecall.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butRecall.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butRecall.Autosize = true;
 			this.butRecall.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRecall.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRecall.CornerRadius = 4F;
-			this.butRecall.Location = new System.Drawing.Point(28,78);
+			this.butRecall.Location = new System.Drawing.Point(28, 78);
 			this.butRecall.Name = "butRecall";
-			this.butRecall.Size = new System.Drawing.Size(100,26);
+			this.butRecall.Size = new System.Drawing.Size(100, 26);
 			this.butRecall.TabIndex = 8;
 			this.butRecall.Text = "Recall";
 			this.butRecall.Click += new System.EventHandler(this.butRecall_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(561,404);
+			this.butCancel.Location = new System.Drawing.Point(579, 456);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butRadOrders
+			// 
+			this.butRadOrders.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRadOrders.Autosize = true;
+			this.butRadOrders.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRadOrders.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRadOrders.CornerRadius = 4F;
+			this.butRadOrders.Location = new System.Drawing.Point(28, 385);
+			this.butRadOrders.Name = "butRadOrders";
+			this.butRadOrders.Size = new System.Drawing.Size(100, 26);
+			this.butRadOrders.TabIndex = 15;
+			this.butRadOrders.Text = "Radiology";
+			this.butRadOrders.Click += new System.EventHandler(this.butRadOrders_Click);
+			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(130, 387);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(458, 47);
+			this.label7.TabIndex = 14;
+			this.label7.Text = "A list of radiology orders associated to appointments that have not been marked a" +
+    "s CPOE.  This list allows providers to quickly approve radiology orders which wi" +
+    "ll help meet EHR measures.";
+			// 
 			// FormApptLists
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(666,455);
+			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+			this.ClientSize = new System.Drawing.Size(666, 494);
+			this.Controls.Add(this.butRadOrders);
+			this.Controls.Add(this.label7);
 			this.Controls.Add(this.butASAP);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butUnsched);
@@ -276,6 +306,11 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
+		private void butRadOrders_Click(object sender,EventArgs e) {
+			SelectionResult=ApptListSelection.Radiology;
+			DialogResult=DialogResult.OK;
+		}
+
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
@@ -300,7 +335,9 @@ namespace OpenDental{
 		///<summary></summary>
 		Unsched,
 		///<summary></summary>
-		ASAP
+		ASAP,
+		///<summary></summary>
+		Radiology
 	}
 
 }

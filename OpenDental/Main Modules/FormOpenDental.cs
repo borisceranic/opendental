@@ -367,7 +367,10 @@ namespace OpenDental{
 		private MenuItem menuItem12;
 		private MenuItem menuItemJobManager;
 		private MenuItem menuItemStateAbbrs;
+		private MenuItem menuItemActionNeeded;
 		private FormSmsTextMessaging _formSmsTextMessaging;
+		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
+		public event ActionNeededEventHandler ActionTaken=null;
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -399,6 +402,7 @@ namespace OpenDental{
 			ContrAppt2=new ContrAppt();
 			ContrAppt2.Visible=false;
 			ContrAppt2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrAppt2.ActionTaken+=ContrAppt2_ActionTaken;
 			this.Controls.Add(ContrAppt2);
 			//contrFamily
 			ContrFamily2=new ContrFamily();
@@ -455,6 +459,7 @@ namespace OpenDental{
 			//phonePanel.GoToChanged += new System.EventHandler(this.phonePanel_GoToChanged);
 			Logger.openlog.Log("Open Dental initialization complete.",Logger.Severity.INFO);
 			//Plugins.HookAddCode(this,"FormOpenDental.Constructor_end");//Can't do this because no plugins loaded.
+			ActionTaken+=FormOpenDental_ActionTaken;
 		}
 		///<summary></summary>
 		protected override void Dispose( bool disposing ){
@@ -634,6 +639,7 @@ namespace OpenDental{
 			this.menuItemRemoteSupport = new System.Windows.Forms.MenuItem();
 			this.menuItemRequestFeatures = new System.Windows.Forms.MenuItem();
 			this.menuItemUpdate = new System.Windows.Forms.MenuItem();
+			this.menuItemActionNeeded = new System.Windows.Forms.MenuItem();
 			this.imageList32 = new System.Windows.Forms.ImageList(this.components);
 			this.timerSignals = new System.Windows.Forms.Timer(this.components);
 			this.panelSplitter = new System.Windows.Forms.Panel();
@@ -684,7 +690,8 @@ namespace OpenDental{
             this.menuItemTools,
             this.menuClinics,
             this.menuItemEServices,
-            this.menuItemHelp});
+            this.menuItemHelp,
+            this.menuItemActionNeeded});
 			// 
 			// menuItemLogOff
 			// 
@@ -1765,6 +1772,16 @@ namespace OpenDental{
 			this.menuItemUpdate.Text = "&Update";
 			this.menuItemUpdate.Click += new System.EventHandler(this.menuItemUpdate_Click);
 			// 
+			// menuItemActionNeeded
+			// 
+			this.menuItemActionNeeded.Index = 10;
+			this.menuItemActionNeeded.OwnerDraw = true;
+			this.menuItemActionNeeded.Text = "Action Needed";
+			this.menuItemActionNeeded.Visible = false;
+			this.menuItemActionNeeded.Click += new System.EventHandler(this.menuItemActionNeeded_Click);
+			this.menuItemActionNeeded.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.menuItemActionNeeded_DrawItem);
+			this.menuItemActionNeeded.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.menuItemActionNeeded_MeasureItem);
+			// 
 			// imageList32
 			// 
 			this.imageList32.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList32.ImageStream")));
@@ -2524,6 +2541,7 @@ namespace OpenDental{
 			_threadPodium.Name="Podium Thread";
 			_threadPodium.Start();
 			StartEServiceMonitoring();
+			StartActionNeededThread();
 			Patient pat=Patients.GetPat(CurPatNum);
 			if(pat!=null && (_showForm=="popup" || _showForm=="popups") && myOutlookBar.SelectedIndex!=-1) {
 				FormPopupsForFam FormP=new FormPopupsForFam();
@@ -6453,6 +6471,107 @@ namespace OpenDental{
 
 		#endregion
 
+		#region Action Needed
+
+		private void menuItemActionNeeded_Click(object sender,EventArgs e) {
+			//For now, there is only one action that needs to be taken.  Once there is more types of "things" to take action on, use FormActionNeeded.
+			//FormActionNeeded FormAN=new FormActionNeeded();
+			//FormAN.ShowDialog();
+			//The only action right now is to show providers their radiology orders (procedures) that are not flagged as CPOE.
+			List<FormRadOrderList> listFormROLs=Application.OpenForms.OfType<FormRadOrderList>().ToList();
+			if(listFormROLs.Count > 0) {
+				listFormROLs[0].RefreshRadOrdersForUser(Security.CurUser);
+				listFormROLs[0].BringToFront();
+			}
+			else {
+				FormRadOrderList FormROL=new FormRadOrderList(Security.CurUser);
+				FormROL.FormClosing+=FormROL_FormClosing;
+				FormROL.Show();
+			}
+		}
+
+		private void FormROL_FormClosing(object sender,FormClosingEventArgs e) {
+			ActionTaken.Invoke(sender,new ActionNeededEventArgs(ActionNeededTypes.RadiologyProcedures));
+		}
+
+		///<summary>Starts a separate thread that will run only once.  Used when first starting up the program as to not hinder load time.</summary>
+		private void StartActionNeededThread() {
+			//If there is no user logged in, don't waste the time seeing if they require actions to be taken.
+			if(Security.CurUser==null) {
+				return;
+			}
+			ODThread odThreadActionNeeded=new ODThread(ActionNeededWorker);
+			odThreadActionNeeded.Name="Action Needed Thread";
+			odThreadActionNeeded.GroupName="ActionNeededThreads";
+			odThreadActionNeeded.Start();
+		}
+
+		///<summary>Updates the visiblity of the Action Needed main menu item and then quits.  This is threaded to not slow down startup time.</summary>
+		private void ActionNeededWorker(ODThread odThread) {
+			bool hasActionNeeded=false;
+			//Check for any non-CPOE radiology orders for the EHR provider that this user is associated to.
+			if(Security.CurUser!=null && Userods.IsUserCpoe(Security.CurUser)) {
+				List<Procedure> listNonCpoeProcs=Procedures.GetProcsNonCpoeAttachedToApptsForProv(Security.CurUser.ProvNum);
+				if(listNonCpoeProcs.Count > 0) {
+					hasActionNeeded=true;
+				}
+			}
+			UpdateActionNeededVisibility(hasActionNeeded);
+			odThread.QuitAsync();//Does not matter how long it takes this thread to quit.
+		}
+
+		///<summary>Checks the database to see if there are radiology procedures needing action and updates the menu item accordingly.</summary>
+		private void UpdateActionNeededVisibility(bool isVisible) {
+			if(this.InvokeRequired) {
+				this.BeginInvoke((Action)delegate() { UpdateActionNeededVisibility(isVisible); });
+				return;
+			}
+			menuItemActionNeeded.Visible=isVisible;
+		}
+
+		private void menuItemActionNeeded_DrawItem(object sender,DrawItemEventArgs e) {
+			//Get the text that is displaying from the menu item compenent.
+			MenuItem menuItem=(MenuItem)sender;
+			Color colorText=Color.Red;//Color.OrangeRed
+			Color backgroundColor=SystemColors.Control;
+			//Check if selected or hovering over.
+			if(e.State==(DrawItemState.NoAccelerator | DrawItemState.Selected) 
+				|| e.State==(DrawItemState.NoAccelerator | DrawItemState.HotLight)) 
+			{
+				colorText=SystemColors.HighlightText;
+				backgroundColor=SystemColors.Highlight;
+			}
+			using(SolidBrush brushBackground=new SolidBrush(backgroundColor))
+			using(SolidBrush brushFont=new SolidBrush(colorText)) {
+				//Get the text that is displaying from the menu item compenent.
+				string menuText=menuItem.Text;
+				//Create a string format to center the text to mimic the other menu items.
+				StringFormat stringFormat=new StringFormat();
+				stringFormat.Alignment=StringAlignment.Center;
+				e.Graphics.FillRectangle(brushBackground,e.Bounds);
+				//We use the standard menu font so that the font on this one menu item will match the rest of the menu.
+				e.Graphics.DrawString(menuText,SystemInformation.MenuFont,brushFont,e.Bounds,stringFormat);
+			}
+		}
+
+		private void menuItemActionNeeded_MeasureItem(object sender,MeasureItemEventArgs e) {
+			//Measure the text showing.
+			MenuItem menuItem=(MenuItem)sender;
+			Size sizeString=TextRenderer.MeasureText(menuItem.Text,SystemInformation.MenuFont);
+			e.ItemWidth=sizeString.Width;
+			e.ItemHeight=sizeString.Height;
+		}
+
+		private void FormOpenDental_ActionTaken(object sender,ActionNeededEventArgs e) {
+			StartActionNeededThread();
+		}
+
+		private void ContrAppt2_ActionTaken(object sender,ActionNeededEventArgs e) {
+			StartActionNeededThread();
+		}
+
+		#endregion
+
 		#endregion
 
 		//private void OnPatientCardInserted(object sender, PatientCardInsertedEventArgs e) {
@@ -7136,6 +7255,7 @@ namespace OpenDental{
 				Security.CurUser=oldUser;//so that the queries in FormLogOn() will work for the web service, since the web service requires a valid user to run queries.
 			}
 			StopEServiceMonitoring();
+			menuItemActionNeeded.Visible=false;
 			FormLogOn_=new FormLogOn();
 			FormLogOn_.ShowDialog(this);
 			if(FormLogOn_.DialogResult==DialogResult.Cancel) {
@@ -7168,6 +7288,7 @@ namespace OpenDental{
 				userControlTasks1.InitializeOnStartup();
 			}
 			StartEServiceMonitoring();
+			StartActionNeededThread();
 			//User logged back in so log on form is no longer the active window.
 			IsFormLogOnLastActive=false;
 			dateTimeLastActivity=DateTime.Now;
