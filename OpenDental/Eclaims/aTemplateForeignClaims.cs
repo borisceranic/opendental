@@ -19,7 +19,7 @@ namespace OpenDental {
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed.  If they failed, a rollback will happen automatically by deleting the previously created X12 file.  The batchNum is supplied for the possible rollback.  If batchNum is 0, then this function can either choose to retreive claim adjudication reports or to do nothing.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum) {
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//Make sure you use clinic-level clearinghouses.
 			//TODO: Implement.
 			return true;
 		}

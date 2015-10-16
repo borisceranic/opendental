@@ -14,22 +14,22 @@ namespace OpenDentBusiness {
 
 		}
 
-		public static void GenerateMessageText(StreamWriter sw,Clearinghouse clearhouse,int batchNum,List<ClaimSendQueueItem> functionalGroupDental) {
+		public static void GenerateMessageText(StreamWriter sw,Clearinghouse clearinghouseClin,int batchNum,List<ClaimSendQueueItem> functionalGroupDental) {
 			//Interchange Control Header (Interchange number tracked separately from transactionNum)
 			//We set it to between 1 and 999 for simplicity
 			sw.Write("ISA*00*          *"//ISA01,ISA02: 00 + 10 spaces
 				+"00*          *"//ISA03,ISA04: 00 + 10 spaces
-				+clearhouse.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
-				+X12Generator.GetISA06(clearhouse)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
-				+clearhouse.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
-				+Sout(clearhouse.ISA08,15,15)+"*"//ISA08: Receiver ID. Validated to make sure length is at least 2.
+				+clearinghouseClin.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
+				+X12Generator.GetISA06(clearinghouseClin)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
+				+clearinghouseClin.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
+				+Sout(clearinghouseClin.ISA08,15,15)+"*"//ISA08: Receiver ID. Validated to make sure length is at least 2.
 				+DateTime.Today.ToString("yyMMdd")+"*"//ISA09: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//ISA10: current time
 				+"U*00401*"//ISA11 and ISA12. 
 				//ISA13: interchange control number, right aligned:
 				+batchNum.ToString().PadLeft(9,'0')+"*"
 				+"0*"//ISA14: no acknowledgment requested
-				+clearhouse.ISA15+"*");//ISA15: T=Test P=Production. Validated.
+				+clearinghouseClin.ISA15+"*");//ISA15: T=Test P=Production. Validated.
 			sw.WriteLine(":~");//ISA16: use ':'
 			//Functional groups: one for dental and one for medical
 			//But we instead need to restrict file output to either medical OR dental, not both.
@@ -38,14 +38,14 @@ namespace OpenDentBusiness {
 			//	WriteFunctionalGroup(sw,functionalGroupMedical,batchNum,clearhouse);
 			//}
 			//if(functionalGroupDental.Count>0) {
-			WriteFunctionalGroup(sw,functionalGroupDental,batchNum,clearhouse);
+			WriteFunctionalGroup(sw,functionalGroupDental,batchNum,clearinghouseClin);
 			//}
 			//Interchange Control Trailer
 			sw.WriteLine("IEA*1*"//IEA01: number of functional groups
 					+batchNum.ToString().PadLeft(9,'0')+"~");//IEA02: Interchange control number
 		}
 
-		private static void WriteFunctionalGroup(StreamWriter sw,List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearhouse) {
+		private static void WriteFunctionalGroup(StreamWriter sw,List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearinghouseClin) {
 			int transactionNum=1;//Gets incremented for each carrier. Can be reused in other functional groups and interchanges, so not persisted
 			//Functional Group Header
 			string groupControlNumber=batchNum.ToString();//Must be unique within file.  We will use batchNum
@@ -65,8 +65,8 @@ namespace OpenDentBusiness {
 			else {//dental*/
 			//groupControlNumber="1";
 			sw.WriteLine("GS*HC*"//GS01: Health Care Claim
-				+X12Generator.GetGS02(clearhouse)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
-				+Sout(clearhouse.GS03,15,2)+"*"//GS03: Application Receiver's Code
+				+X12Generator.GetGS02(clearinghouseClin)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
+				+Sout(clearinghouseClin.GS03,15,2)+"*"//GS03: Application Receiver's Code
 				+DateTime.Today.ToString("yyyyMMdd")+"*"//GS04: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//GS05: current time
 				+groupControlNumber+"*"//GS06: Group control number. Max length 9. No padding necessary.
@@ -140,7 +140,7 @@ namespace OpenDentBusiness {
 						+"CH~");//BHT06: Type=Chargable
 					if(!isMedical) {
 						seg++;
-						if(clearhouse.ISA15=="T") {//validated
+						if(clearinghouseClin.ISA15=="T") {//validated
 							sw.WriteLine("REF*87*004010X097DA1~");
 						}
 						else {
@@ -152,19 +152,19 @@ namespace OpenDentBusiness {
 					//See 2010AA PER (after REF) for the new billing provider contact phone number
 					//1000A NM1: required
 					seg++;
-					Write1000A_NM1(sw,clearhouse);
+					Write1000A_NM1(sw,clearinghouseClin);
 					//1000A PER: required. Contact number.
 					seg++;//always one seg
-					Write1000A_PER(sw,clearhouse);
+					Write1000A_PER(sw,clearinghouseClin);
 					//1000B Receiver is always the Clearinghouse
 					//1000B NM1: required
 					seg++;
 					sw.WriteLine("NM1*40*"//NM101: 40=receiver
 						+"2*"//NM102: 2=nonperson
-						+Sout(clearhouse.Description,35,1)+"*"//NM103:Receiver Name
+						+Sout(clearinghouseClin.Description,35,1)+"*"//NM103:Receiver Name
 						+"****"//NM104-NM107 not used since not a person
 						+"46*"//NM108: 46 indicates ETIN
-						+Sout(clearhouse.ISA08,80,2)+"~");//NM109: Receiver ID Code. aka ETIN#.
+						+Sout(clearinghouseClin.ISA08,80,2)+"~");//NM109: Receiver ID Code. aka ETIN#.
 					HLcount=1;
 					parentProv=0;//the HL sequence # of the current provider.
 					parentSubsc=0;//the HL sequence # of the current subscriber.
@@ -300,7 +300,7 @@ namespace OpenDentBusiness {
 					}
 					if(!isMedical) {
 						//2010AA REF: Office phone number. Required by WebMD.  Can possibly be removed now that we're using NPI.
-						if(clearhouse.ISA08=="0135WCH00") {//if WebMD
+						if(clearinghouseClin.ISA08=="0135WCH00") {//if WebMD
 							seg++;
 							if(clinic==null) {
 								sw.WriteLine("REF*LU*"
@@ -504,7 +504,7 @@ namespace OpenDentBusiness {
 					seg++;
 					sw.Write("NM1*PR*"//NM101: PR=Payer
 						+"2*");//NM102: 2=Non person
-					if(clearhouse.ISA08=="EMS") {
+					if(clearinghouseClin.ISA08=="EMS") {
 						//This is a special situation requested by EMS.  This tacks the employer onto the end of the carrier.
 						sw.Write(Sout(carrier.CarrierName,17)+"|"+Sout(Employers.GetName(insPlan.EmployerNum),17)+"*");
 					}
@@ -513,7 +513,7 @@ namespace OpenDentBusiness {
 					}
 					sw.Write("****"//NM104-07 not used
 						+"PI*");//NM108: PI=PayorID
-					sw.WriteLine(Sout(GetCarrierElectID(carrier,clearhouse),80,2)+"~");//NM109: PayorID
+					sw.WriteLine(Sout(GetCarrierElectID(carrier,clearinghouseClin),80,2)+"~");//NM109: PayorID
 					//2010BB N3: Carrier Address
 					seg++;
 					sw.Write("N3*"+Sout(carrier.Address,55));//N301: address
@@ -1064,7 +1064,7 @@ namespace OpenDentBusiness {
 					seg++;
 					sw.Write("NM1*PR*"//NM101: PR=Payer
 						+"2*");//NM102: 2=non-person
-					if(clearhouse.ISA08=="EMS") {
+					if(clearinghouseClin.ISA08=="EMS") {
 						//This is a special situation requested by EMS.  This tacks the employer onto the end of the carrier.
 						sw.Write(Sout(otherCarrier.CarrierName,17)+"|"+Sout(Employers.GetName(otherPlan.EmployerNum),17)+"*");
 					}
@@ -1077,7 +1077,7 @@ namespace OpenDentBusiness {
 						+"*"//NM106: not used
 						+"*"//NM107: not used
 						+"PI*");//NM108: PI=Payor ID. XV must be used after national plan ID mandated.
-					sw.WriteLine(Sout(GetCarrierElectID(otherCarrier,clearhouse),80,2)+"~");//NM109: PayorID
+					sw.WriteLine(Sout(GetCarrierElectID(otherCarrier,clearinghouseClin),80,2)+"~");//NM109: PayorID
 					//2230B N3,N4: (medical) Other payer address. We don't support.
 					//2330B PER: Other payer contact info. Not needed.
 					//2330B DTP: Claim Paid date
@@ -1320,17 +1320,19 @@ namespace OpenDentBusiness {
 
 		}
 
+		///<sumarry>Pass in either a clinic or HG-level clearinghouse.</sumarry>
 		private static bool IsApex(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="99999");
 		}
 
+		///<sumarry>Pass in either a clinic or HG-level clearinghouse.</sumarry>
 		private static bool IsTesia(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="113504607");
 		}
 
 		///<summary>Sometimes writes the name information for Open Dental. Sometimes it writes practice info.</summary>
-		private static void Write1000A_NM1(StreamWriter sw,Clearinghouse clearhouse) {
-			if(clearhouse.SenderTIN=="") {//use OD
+		private static void Write1000A_NM1(StreamWriter sw,Clearinghouse clearinghouseClin) {
+			if(clearinghouseClin.SenderTIN=="") {//use OD
 				sw.WriteLine("NM1*41*"//NM101: 41=submitter
 					+"2*"//NM102: 2=nonperson
 					+"OPEN DENTAL SOFTWARE*"//NM103:Submitter Name
@@ -1340,15 +1342,15 @@ namespace OpenDentBusiness {
 			else {
 				sw.WriteLine("NM1*41*"//NM101: 41=submitter
 					+"2*"//NM102: 1=person,2=nonperson
-					+Sout(clearhouse.SenderName,35,1)+"*"//NM103:Submitter Name. Validated.
+					+Sout(clearinghouseClin.SenderName,35,1)+"*"//NM103:Submitter Name. Validated.
 					+"****46*"//NM108: 46 indicates ETIN
-					+Sout(clearhouse.SenderTIN,80,2)+"~");//NM109: ID Code. aka ETIN#. Validated to be at least 2.
+					+Sout(clearinghouseClin.SenderTIN,80,2)+"~");//NM109: ID Code. aka ETIN#. Validated to be at least 2.
 			}
 		}
 
 		///<summary>Usually writes the contact information for Open Dental. But for inmediata and AOS clearinghouses, it writes practice contact info.</summary>
-		private static void Write1000A_PER(StreamWriter sw,Clearinghouse clearhouse) {
-			if(clearhouse.SenderTIN=="") {//use OD
+		private static void Write1000A_PER(StreamWriter sw,Clearinghouse clearinghouseClin) {
+			if(clearinghouseClin.SenderTIN=="") {//use OD
 				sw.WriteLine("PER*IC*"//PER01:Function code: IC=Information Contact
 					+"JORDAN SPARKS*"//PER02:Name
 					+"TE*"//PER03:Comm Number Qualifier: TE=Telephone
@@ -1356,9 +1358,9 @@ namespace OpenDentBusiness {
 			}
 			else {
 				sw.WriteLine("PER*IC*"//PER01:Function code: IC=Information Contact
-					+Sout(clearhouse.SenderName,60,1)+"*"//PER02:Name. Validated.
+					+Sout(clearinghouseClin.SenderName,60,1)+"*"//PER02:Name. Validated.
 					+"TE*"//PER03:Comm Number Qualifier: TE=Telephone
-					+clearhouse.SenderTelephone+"~");//PER04:Comm Number. aka telephone number. Validated to be exactly 10 digits.
+					+clearinghouseClin.SenderTelephone+"~");//PER04:Comm Number. aka telephone number. Validated to be exactly 10 digits.
 			}
 		}
 
@@ -1404,12 +1406,13 @@ namespace OpenDentBusiness {
 			return "";
 		}
 
-		private static string GetCarrierElectID(Carrier carrier,Clearinghouse clearhouse) {
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
+		private static string GetCarrierElectID(Carrier carrier,Clearinghouse clearinghouse) {
 			string electid=carrier.ElectID;
-			if(electid=="" && IsApex(clearhouse)) {//only for Apex
+			if(electid=="" && IsApex(clearinghouse)) {//only for Apex
 				return "PAPRM";//paper claims
 			}
-			if(electid=="" && IsTesia(clearhouse)) {//only for Tesia
+			if(electid=="" && IsTesia(clearinghouse)) {//only for Tesia
 				return "00000";//paper claims
 			}
 			if(electid.Length<3) {
@@ -1659,25 +1662,28 @@ namespace OpenDentBusiness {
 			return Sout(str,-1,-1);
 		}
 
-		///<summary>Returns a string describing all missing data on this claim.  Claim will not be allowed to be sent electronically unless this string comes back empty.  There is also an out parameter containing any warnings.  Warnings will not block sending.</summary>
-		public static void Validate(ClaimSendQueueItem queueItem) {//,out string warning) {
+		///<summary>Returns a string describing all missing data on this claim.
+		///Claim will not be allowed to be sent electronically unless this string comes back empty.
+		///There is also an out parameter containing any warnings.  Warnings will not block sending.  clinicNum can be zero for HQ.</summary>
+		public static void Validate(ClaimSendQueueItem queueItem,long clinicNum) {//,out string warning) {
 			StringBuilder strb=new StringBuilder();
 			string warning="";
-			Clearinghouse clearhouse=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			for(int i=0;i<arrayClearinghouses.Length;i++) {
-				if(arrayClearinghouses[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
-					clearhouse=arrayClearinghouses[i];
+			Clearinghouse clearinghouseHq=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
+			Clearinghouse[] arrayClearinghousesHq=Clearinghouses.GetHqListt();
+			for(int i=0;i<arrayClearinghousesHq.Length;i++) {
+				if(arrayClearinghousesHq[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
+					clearinghouseHq=arrayClearinghousesHq[i];
 				}
 			}
-			if(clearhouse==null) {
+			if(clearinghouseHq==null) {
 				throw new ApplicationException("Error. Could not locate Clearinghouse.");
 			}
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,clinicNum));
 			Claim claim=Claims.GetClaim(queueItem.ClaimNum);
 			Clinic clinic=Clinics.GetClinic(claim.ClinicNum);
 			//if(clearhouse.Eformat==ElectronicClaimFormat.X12){//not needed since this is always true
-			X12Validate.ISA(clearhouse,strb);
-			if(clearhouse.GS03.Length<2) {
+			X12Validate.ISA(clearinghouseClin,strb);
+			if(clearinghouseClin.GS03.Length<2) {
 				if(strb.Length!=0) {
 					strb.Append(",");
 				}

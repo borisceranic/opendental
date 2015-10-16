@@ -30,7 +30,7 @@ namespace OpenDental.Eclaims
 
 		private static string remoteHost="qaftp.mercurydataexchange.com";//Change to ftp.mercurydataexchange.com when released.
 		private static string rootFolderName="Testing";//Change to "Production" when released.
-		private static Clearinghouse clearinghouse=null;
+		private static Clearinghouse _clearinghouseClin=null;
 		public static string ErrorMessage="";
 
 		///<summary></summary>
@@ -38,8 +38,8 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed. Both sends and retrieves.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum){
-			clearinghouse=clearhouse;
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//called from Eclaims and FormClaimReports.cs. Clinic-level clearinghouse passed in.
+			_clearinghouseClin=clearinghouseClin;
 			//Before this function is called, the X12 file for the current batch has already been generated in
 			//the clearinghouse export folder. The export folder will also contain batch files which have failed
 			//to upload from previous attempts and we must attempt to upload these older batch files again if
@@ -53,8 +53,8 @@ namespace OpenDental.Eclaims
 			ChannelSftp ch=null;
 			JSch jsch=new JSch();
 			try{
-				session=jsch.getSession(clearinghouse.LoginID,remoteHost,22);
-				session.setPassword(clearinghouse.Password);
+				session=jsch.getSession(_clearinghouseClin.LoginID,remoteHost,22);
+				session.setPassword(_clearinghouseClin.Password);
 				Hashtable config=new Hashtable();
 				config.Add("StrictHostKeyChecking", "no");
 				session.setConfig(config);
@@ -69,7 +69,7 @@ namespace OpenDental.Eclaims
 			try{
 				//At this point we are connected to the MDE SFTP server.
 				if(batchNum==0){
-					if(!Directory.Exists(clearhouse.ResponsePath)){
+					if(!Directory.Exists(clearinghouseClin.ResponsePath)){
 						throw new Exception("Clearinghouse response path is invalid.");
 					}
 					//Only retrieving reports so do not send new claims.
@@ -83,7 +83,7 @@ namespace OpenDental.Eclaims
 						Match fileNameMatch=Regex.Match(listItem,".*\\s+(.*)$");
 						string getFileName=fileNameMatch.Result("$1");
 						string getFilePath=retrievePath+getFileName;
-						string exportFilePath=CodeBase.ODFileUtils.CombinePaths(clearhouse.ResponsePath,getFileName);						
+						string exportFilePath=CodeBase.ODFileUtils.CombinePaths(clearinghouseClin.ResponsePath,getFileName);						
 						Tamir.SharpSsh.java.io.InputStream fileStream=null;
 						FileStream exportFileStream=null;
 						try{
@@ -115,13 +115,13 @@ namespace OpenDental.Eclaims
 						ch.rename(getFilePath,archiveFilePath);
 					}
 				}else{
-					if(!Directory.Exists(clearhouse.ExportPath)){
+					if(!Directory.Exists(clearinghouseClin.ExportPath)){
 						throw new Exception("Clearinghouse export path is invalid.");
 					}
 					//First upload the batch to the temporary directory.
-					string[] files=Directory.GetFiles(clearhouse.ExportPath);
+					string[] files=Directory.GetFiles(clearinghouseClin.ExportPath);
 					for(int i=0;i<files.Length;i++){
-						string accountNumber=clearinghouse.ISA08;
+						string accountNumber=_clearinghouseClin.ISA08;
 						string dateTimeStr=DateTime.Now.ToString("yyyyMMddhhmmss");
 						string remoteFileName=accountNumber+dateTimeStr+i.ToString().PadLeft(3,'0')+".837D.txt";
 						string remoteTempFilePath="/"+rootFolderName+"/In/837D/Temp/"+remoteFileName;

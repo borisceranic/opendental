@@ -470,7 +470,7 @@ namespace OpenDental{
 			_listNumberOfClaims=new List<int>();
 			contextMenuStatus.MenuItems.Add(Lan.g(this,"Go to Account"),new EventHandler(GotoAccount_Clicked));
 			gridMain.ContextMenu=contextMenuStatus;
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			for(int i=0;i<arrayClearinghouses.Length;i++){
 				contextMenuEclaims.MenuItems.Add(arrayClearinghouses[i].Description,new EventHandler(menuItemClearinghouse_Click));
 			}
@@ -548,7 +548,7 @@ namespace OpenDental{
 			comboClinic.Items.Clear();
 			_listNumberOfClaims.Clear();
 			if(!Security.CurUser.ClinicIsRestricted) {
-				comboClinic.Items.Add(Lan.g(this,"Unassigned"));
+				comboClinic.Items.Add(Lan.g(this,"Unassigned/Default"));
 				comboClinic.SelectedIndex=0;
 			}
 			for(int i=0;i<_listClinics.Count;i++) {
@@ -641,7 +641,7 @@ namespace OpenDental{
 
 		private void menuItemClearinghouse_Click(object sender, System.EventArgs e){
 			MenuItem menuitem=(MenuItem)sender;
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			SendEclaimsToClearinghouse(arrayClearinghouses[menuitem.Index].ClearinghouseNum);
 		}
 
@@ -980,7 +980,7 @@ namespace OpenDental{
 				clearDefault=Clearinghouses.GetDefaultDental();
 			}
 			else{
-				clearDefault=ClearinghouseL.GetClearinghouse(clearinghouseNum);
+				clearDefault=ClearinghouseL.GetClearinghouseHq(clearinghouseNum);
 			}
 			if(clearDefault!=null && clearDefault.ISA08=="113504607" && Process.GetProcessesByName("TesiaLink").Length==0){
 				#if DEBUG
@@ -1033,7 +1033,7 @@ namespace OpenDental{
 					for(int i=0;i<selectedindices.Length;i++) {
 						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
 						if(clearDefault.Eformat!=clearRow.Eformat) {
-							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearhouse.");
+							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearinghouse.");
 							return;
 						}
 						if(!_arrayQueueFiltered[selectedindices[i]].NoSendElect) {//Only change the text to the clearing house name for electronic claims.
@@ -1053,7 +1053,7 @@ namespace OpenDental{
 					for(int i=0;i<selectedindices.Length;i++) {
 						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
 						if(clearDefault.Eformat!=clearRow.Eformat) {
-							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearhouse.");
+							MsgBox.Show(this,"The default clearinghouse format does not match the format of the selected clearinghouse.  You may need to change the clearinghouse format.  Or, you may need to add a Payor ID into a clearinghouse.");
 							return;
 						}
 						if(!_arrayQueueFiltered[selectedindices[i]].NoSendElect) {//Only change the text to the clearing house name for electronic claims.
@@ -1119,12 +1119,12 @@ namespace OpenDental{
 				}
 				queueItems.Add(queueitem);
 			}
-			Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItems[0].ClearinghouseNum);
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItems[0].ClearinghouseNum);
 			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
 			Cursor=Cursors.WaitCursor;
-			Eclaims.Eclaims.SendBatch(queueItems,clearhouse,medType);
+			Eclaims.Eclaims.SendBatch(queueItems,clearinghouseHq,medType);
 			Cursor=Cursors.Default;
 			//Loop through _listQueueAll and remove all items that were sent.
 			List<ClaimSendQueueItem> listTempQueueItem=new List<ClaimSendQueueItem>(_arrayQueueAll);

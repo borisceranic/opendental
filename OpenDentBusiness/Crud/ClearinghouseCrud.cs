@@ -46,31 +46,33 @@ namespace OpenDentBusiness.Crud{
 			Clearinghouse clearinghouse;
 			for(int i=0;i<table.Rows.Count;i++) {
 				clearinghouse=new Clearinghouse();
-				clearinghouse.ClearinghouseNum= PIn.Long  (table.Rows[i]["ClearinghouseNum"].ToString());
-				clearinghouse.Description     = PIn.String(table.Rows[i]["Description"].ToString());
-				clearinghouse.ExportPath      = PIn.String(table.Rows[i]["ExportPath"].ToString());
-				clearinghouse.Payors          = PIn.String(table.Rows[i]["Payors"].ToString());
-				clearinghouse.Eformat         = (OpenDentBusiness.ElectronicClaimFormat)PIn.Int(table.Rows[i]["Eformat"].ToString());
-				clearinghouse.ISA05           = PIn.String(table.Rows[i]["ISA05"].ToString());
-				clearinghouse.SenderTIN       = PIn.String(table.Rows[i]["SenderTIN"].ToString());
-				clearinghouse.ISA07           = PIn.String(table.Rows[i]["ISA07"].ToString());
-				clearinghouse.ISA08           = PIn.String(table.Rows[i]["ISA08"].ToString());
-				clearinghouse.ISA15           = PIn.String(table.Rows[i]["ISA15"].ToString());
-				clearinghouse.Password        = PIn.String(table.Rows[i]["Password"].ToString());
-				clearinghouse.ResponsePath    = PIn.String(table.Rows[i]["ResponsePath"].ToString());
-				clearinghouse.CommBridge      = (OpenDentBusiness.EclaimsCommBridge)PIn.Int(table.Rows[i]["CommBridge"].ToString());
-				clearinghouse.ClientProgram   = PIn.String(table.Rows[i]["ClientProgram"].ToString());
-				clearinghouse.LastBatchNumber = PIn.Int   (table.Rows[i]["LastBatchNumber"].ToString());
-				clearinghouse.ModemPort       = PIn.Byte  (table.Rows[i]["ModemPort"].ToString());
-				clearinghouse.LoginID         = PIn.String(table.Rows[i]["LoginID"].ToString());
-				clearinghouse.SenderName      = PIn.String(table.Rows[i]["SenderName"].ToString());
-				clearinghouse.SenderTelephone = PIn.String(table.Rows[i]["SenderTelephone"].ToString());
-				clearinghouse.GS03            = PIn.String(table.Rows[i]["GS03"].ToString());
-				clearinghouse.ISA02           = PIn.String(table.Rows[i]["ISA02"].ToString());
-				clearinghouse.ISA04           = PIn.String(table.Rows[i]["ISA04"].ToString());
-				clearinghouse.ISA16           = PIn.String(table.Rows[i]["ISA16"].ToString());
-				clearinghouse.SeparatorData   = PIn.String(table.Rows[i]["SeparatorData"].ToString());
-				clearinghouse.SeparatorSegment= PIn.String(table.Rows[i]["SeparatorSegment"].ToString());
+				clearinghouse.ClearinghouseNum  = PIn.Long  (table.Rows[i]["ClearinghouseNum"].ToString());
+				clearinghouse.Description       = PIn.String(table.Rows[i]["Description"].ToString());
+				clearinghouse.ExportPath        = PIn.String(table.Rows[i]["ExportPath"].ToString());
+				clearinghouse.Payors            = PIn.String(table.Rows[i]["Payors"].ToString());
+				clearinghouse.Eformat           = (OpenDentBusiness.ElectronicClaimFormat)PIn.Int(table.Rows[i]["Eformat"].ToString());
+				clearinghouse.ISA05             = PIn.String(table.Rows[i]["ISA05"].ToString());
+				clearinghouse.SenderTIN         = PIn.String(table.Rows[i]["SenderTIN"].ToString());
+				clearinghouse.ISA07             = PIn.String(table.Rows[i]["ISA07"].ToString());
+				clearinghouse.ISA08             = PIn.String(table.Rows[i]["ISA08"].ToString());
+				clearinghouse.ISA15             = PIn.String(table.Rows[i]["ISA15"].ToString());
+				clearinghouse.Password          = PIn.String(table.Rows[i]["Password"].ToString());
+				clearinghouse.ResponsePath      = PIn.String(table.Rows[i]["ResponsePath"].ToString());
+				clearinghouse.CommBridge        = (OpenDentBusiness.EclaimsCommBridge)PIn.Int(table.Rows[i]["CommBridge"].ToString());
+				clearinghouse.ClientProgram     = PIn.String(table.Rows[i]["ClientProgram"].ToString());
+				clearinghouse.LastBatchNumber   = PIn.Int   (table.Rows[i]["LastBatchNumber"].ToString());
+				clearinghouse.ModemPort         = PIn.Byte  (table.Rows[i]["ModemPort"].ToString());
+				clearinghouse.LoginID           = PIn.String(table.Rows[i]["LoginID"].ToString());
+				clearinghouse.SenderName        = PIn.String(table.Rows[i]["SenderName"].ToString());
+				clearinghouse.SenderTelephone   = PIn.String(table.Rows[i]["SenderTelephone"].ToString());
+				clearinghouse.GS03              = PIn.String(table.Rows[i]["GS03"].ToString());
+				clearinghouse.ISA02             = PIn.String(table.Rows[i]["ISA02"].ToString());
+				clearinghouse.ISA04             = PIn.String(table.Rows[i]["ISA04"].ToString());
+				clearinghouse.ISA16             = PIn.String(table.Rows[i]["ISA16"].ToString());
+				clearinghouse.SeparatorData     = PIn.String(table.Rows[i]["SeparatorData"].ToString());
+				clearinghouse.SeparatorSegment  = PIn.String(table.Rows[i]["SeparatorSegment"].ToString());
+				clearinghouse.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				clearinghouse.HqClearinghouseNum= PIn.Long  (table.Rows[i]["HqClearinghouseNum"].ToString());
 				retVal.Add(clearinghouse);
 			}
 			return retVal;
@@ -111,7 +113,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClearinghouseNum,";
 			}
-			command+="Description,ExportPath,Payors,Eformat,ISA05,SenderTIN,ISA07,ISA08,ISA15,Password,ResponsePath,CommBridge,ClientProgram,LastBatchNumber,ModemPort,LoginID,SenderName,SenderTelephone,GS03,ISA02,ISA04,ISA16,SeparatorData,SeparatorSegment) VALUES(";
+			command+="Description,ExportPath,Payors,Eformat,ISA05,SenderTIN,ISA07,ISA08,ISA15,Password,ResponsePath,CommBridge,ClientProgram,LastBatchNumber,ModemPort,LoginID,SenderName,SenderTelephone,GS03,ISA02,ISA04,ISA16,SeparatorData,SeparatorSegment,ClinicNum,HqClearinghouseNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clearinghouse.ClearinghouseNum)+",";
 			}
@@ -139,7 +141,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(clearinghouse.ISA04)+"',"
 				+"'"+POut.String(clearinghouse.ISA16)+"',"
 				+"'"+POut.String(clearinghouse.SeparatorData)+"',"
-				+"'"+POut.String(clearinghouse.SeparatorSegment)+"')";
+				+"'"+POut.String(clearinghouse.SeparatorSegment)+"',"
+				+    POut.Long  (clearinghouse.ClinicNum)+","
+				+    POut.Long  (clearinghouse.HqClearinghouseNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClearinghouseNum,";
 			}
-			command+="Description,ExportPath,Payors,Eformat,ISA05,SenderTIN,ISA07,ISA08,ISA15,Password,ResponsePath,CommBridge,ClientProgram,LastBatchNumber,ModemPort,LoginID,SenderName,SenderTelephone,GS03,ISA02,ISA04,ISA16,SeparatorData,SeparatorSegment) VALUES(";
+			command+="Description,ExportPath,Payors,Eformat,ISA05,SenderTIN,ISA07,ISA08,ISA15,Password,ResponsePath,CommBridge,ClientProgram,LastBatchNumber,ModemPort,LoginID,SenderName,SenderTelephone,GS03,ISA02,ISA04,ISA16,SeparatorData,SeparatorSegment,ClinicNum,HqClearinghouseNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clearinghouse.ClearinghouseNum)+",";
 			}
@@ -200,7 +204,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(clearinghouse.ISA04)+"',"
 				+"'"+POut.String(clearinghouse.ISA16)+"',"
 				+"'"+POut.String(clearinghouse.SeparatorData)+"',"
-				+"'"+POut.String(clearinghouse.SeparatorSegment)+"')";
+				+"'"+POut.String(clearinghouse.SeparatorSegment)+"',"
+				+    POut.Long  (clearinghouse.ClinicNum)+","
+				+    POut.Long  (clearinghouse.HqClearinghouseNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -213,30 +219,32 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Clearinghouse in the database.</summary>
 		public static void Update(Clearinghouse clearinghouse){
 			string command="UPDATE clearinghouse SET "
-				+"Description     = '"+POut.String(clearinghouse.Description)+"', "
-				+"ExportPath      = '"+POut.String(clearinghouse.ExportPath)+"', "
-				+"Payors          = '"+POut.String(clearinghouse.Payors)+"', "
-				+"Eformat         =  "+POut.Int   ((int)clearinghouse.Eformat)+", "
-				+"ISA05           = '"+POut.String(clearinghouse.ISA05)+"', "
-				+"SenderTIN       = '"+POut.String(clearinghouse.SenderTIN)+"', "
-				+"ISA07           = '"+POut.String(clearinghouse.ISA07)+"', "
-				+"ISA08           = '"+POut.String(clearinghouse.ISA08)+"', "
-				+"ISA15           = '"+POut.String(clearinghouse.ISA15)+"', "
-				+"Password        = '"+POut.String(clearinghouse.Password)+"', "
-				+"ResponsePath    = '"+POut.String(clearinghouse.ResponsePath)+"', "
-				+"CommBridge      =  "+POut.Int   ((int)clearinghouse.CommBridge)+", "
-				+"ClientProgram   = '"+POut.String(clearinghouse.ClientProgram)+"', "
+				+"Description       = '"+POut.String(clearinghouse.Description)+"', "
+				+"ExportPath        = '"+POut.String(clearinghouse.ExportPath)+"', "
+				+"Payors            = '"+POut.String(clearinghouse.Payors)+"', "
+				+"Eformat           =  "+POut.Int   ((int)clearinghouse.Eformat)+", "
+				+"ISA05             = '"+POut.String(clearinghouse.ISA05)+"', "
+				+"SenderTIN         = '"+POut.String(clearinghouse.SenderTIN)+"', "
+				+"ISA07             = '"+POut.String(clearinghouse.ISA07)+"', "
+				+"ISA08             = '"+POut.String(clearinghouse.ISA08)+"', "
+				+"ISA15             = '"+POut.String(clearinghouse.ISA15)+"', "
+				+"Password          = '"+POut.String(clearinghouse.Password)+"', "
+				+"ResponsePath      = '"+POut.String(clearinghouse.ResponsePath)+"', "
+				+"CommBridge        =  "+POut.Int   ((int)clearinghouse.CommBridge)+", "
+				+"ClientProgram     = '"+POut.String(clearinghouse.ClientProgram)+"', "
 				//LastBatchNumber excluded from update
-				+"ModemPort       =  "+POut.Byte  (clearinghouse.ModemPort)+", "
-				+"LoginID         = '"+POut.String(clearinghouse.LoginID)+"', "
-				+"SenderName      = '"+POut.String(clearinghouse.SenderName)+"', "
-				+"SenderTelephone = '"+POut.String(clearinghouse.SenderTelephone)+"', "
-				+"GS03            = '"+POut.String(clearinghouse.GS03)+"', "
-				+"ISA02           = '"+POut.String(clearinghouse.ISA02)+"', "
-				+"ISA04           = '"+POut.String(clearinghouse.ISA04)+"', "
-				+"ISA16           = '"+POut.String(clearinghouse.ISA16)+"', "
-				+"SeparatorData   = '"+POut.String(clearinghouse.SeparatorData)+"', "
-				+"SeparatorSegment= '"+POut.String(clearinghouse.SeparatorSegment)+"' "
+				+"ModemPort         =  "+POut.Byte  (clearinghouse.ModemPort)+", "
+				+"LoginID           = '"+POut.String(clearinghouse.LoginID)+"', "
+				+"SenderName        = '"+POut.String(clearinghouse.SenderName)+"', "
+				+"SenderTelephone   = '"+POut.String(clearinghouse.SenderTelephone)+"', "
+				+"GS03              = '"+POut.String(clearinghouse.GS03)+"', "
+				+"ISA02             = '"+POut.String(clearinghouse.ISA02)+"', "
+				+"ISA04             = '"+POut.String(clearinghouse.ISA04)+"', "
+				+"ISA16             = '"+POut.String(clearinghouse.ISA16)+"', "
+				+"SeparatorData     = '"+POut.String(clearinghouse.SeparatorData)+"', "
+				+"SeparatorSegment  = '"+POut.String(clearinghouse.SeparatorSegment)+"', "
+				+"ClinicNum         =  "+POut.Long  (clearinghouse.ClinicNum)+", "
+				+"HqClearinghouseNum=  "+POut.Long  (clearinghouse.HqClearinghouseNum)+" "
 				+"WHERE ClearinghouseNum = "+POut.Long(clearinghouse.ClearinghouseNum);
 			Db.NonQ(command);
 		}
@@ -336,6 +344,14 @@ namespace OpenDentBusiness.Crud{
 			if(clearinghouse.SeparatorSegment != oldClearinghouse.SeparatorSegment) {
 				if(command!=""){ command+=",";}
 				command+="SeparatorSegment = '"+POut.String(clearinghouse.SeparatorSegment)+"'";
+			}
+			if(clearinghouse.ClinicNum != oldClearinghouse.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(clearinghouse.ClinicNum)+"";
+			}
+			if(clearinghouse.HqClearinghouseNum != oldClearinghouse.HqClearinghouseNum) {
+				if(command!=""){ command+=",";}
+				command+="HqClearinghouseNum = "+POut.Long(clearinghouse.HqClearinghouseNum)+"";
 			}
 			if(command==""){
 				return false;

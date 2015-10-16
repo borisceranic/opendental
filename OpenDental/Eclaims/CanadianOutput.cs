@@ -28,11 +28,12 @@ namespace OpenDental.Eclaims {
 			Patient patient=Patients.GetPat(patNum);
 			Patient subscriber=Patients.GetPat(insSub.Subscriber);
 			Provider provDefaultTreat=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
-			if(clearhouse==null){
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum)); 
+			if(clearinghouseClin==null){
 				throw new ApplicationException("Canadian clearinghouse not found.");
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				throw new ApplicationException(saveFolder+" not found.");
 			}
@@ -105,7 +106,7 @@ namespace OpenDental.Eclaims {
 				throw new ApplicationException(error);
 			}
 			Etrans etrans=Etranss.CreateCanadianOutput(patNum,carrier.CarrierNum,0,
-				clearhouse.ClearinghouseNum,EtransType.Eligibility_CA,plan.PlanNum,insSub.InsSubNum);
+				clearinghouseHq.ClearinghouseNum,EtransType.Eligibility_CA,plan.PlanNum,insSub.InsSubNum);//use HQ clearinghousenum
 			StringBuilder strb=new StringBuilder();
 			//create message----------------------------------------------------------------------------------------------
 			//A01 transaction prefix 12 AN
@@ -243,7 +244,7 @@ namespace OpenDental.Eclaims {
 			string result="";
 			bool resultIsError=false;
 			try {
-				result=Canadian.PassToIca(strb.ToString(),clearhouse);
+				result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 			}
 			catch(ApplicationException ex) {
 				result=ex.Message;
@@ -320,11 +321,12 @@ namespace OpenDental.Eclaims {
 		public static long SendClaimReversal(Claim claim,InsPlan plan,InsSub insSub) {
 			StringBuilder strb=new StringBuilder();
 			Carrier carrier=Carriers.GetCarrier(plan.CarrierNum);
-			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
-			if(clearhouse==null) {
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));  
+			if(clearinghouseClin==null) {
 				throw new ApplicationException(Lan.g("CanadianOutput","Canadian clearinghouse not found."));
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				throw new ApplicationException(saveFolder+" not found.");
 			}
@@ -336,7 +338,7 @@ namespace OpenDental.Eclaims {
 			}
 			CanadianNetwork network=CanadianNetworks.GetNetwork(carrier.CanadianNetworkNum);
 			Etrans etrans=Etranss.CreateCanadianOutput(claim.PatNum,carrier.CarrierNum,carrier.CanadianNetworkNum,
-				clearhouse.ClearinghouseNum,EtransType.ClaimReversal_CA,plan.PlanNum,insSub.InsSubNum);
+				clearinghouseHq.ClearinghouseNum,EtransType.ClaimReversal_CA,plan.PlanNum,insSub.InsSubNum);//use HQ clearinghousenum
 			etrans.ClaimNum=claim.ClaimNum;//We don't normally use a claim number with Etranss.CreateCanadianOutput(), but here we need the claim number so that we can show the claim reversal in the claim history.
 			Etranss.Update(etrans);
 			Patient patient=Patients.GetPat(claim.PatNum);
@@ -473,7 +475,7 @@ namespace OpenDental.Eclaims {
 			string result="";
 			bool resultIsError=false;
 			try {
-			  result=Canadian.PassToIca(strb.ToString(),clearhouse);
+			  result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 			}
 			catch(ApplicationException ex) {
 			  result=ex.Message;
@@ -532,11 +534,12 @@ namespace OpenDental.Eclaims {
 		///to supress UI and printer output.</summary>
 		public static List <Etrans> GetOutstandingTransactions(bool version2,bool sendToItrans,Carrier carrier,Provider prov,bool isAutomatic) {
 			List<Etrans> etransAcks=new List<Etrans>();
-			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
-			if(clearhouse==null) {
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum)); 
+			if(clearinghouseClin==null) {
 				throw new ApplicationException("Canadian clearinghouse not found.");
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				throw new ApplicationException(saveFolder+" not found.");
 			}
@@ -547,14 +550,14 @@ namespace OpenDental.Eclaims {
 				StringBuilder strb=new StringBuilder();
 				Etrans etrans=null;
 				if(version2 || sendToItrans) {
-					etrans=Etranss.CreateCanadianOutput(0,0,0,clearhouse.ClearinghouseNum,EtransType.RequestOutstand_CA,0,0);
+					etrans=Etranss.CreateCanadianOutput(0,0,0,clearinghouseHq.ClearinghouseNum,EtransType.RequestOutstand_CA,0,0);//use HQ clearinghousenum
 				}
 				else {
 					if((carrier.CanadianSupportedTypes&CanSupTransTypes.RequestForOutstandingTrans_04)!=CanSupTransTypes.RequestForOutstandingTrans_04) {
 						throw new ApplicationException("The carrier does not support request for outstanding transactions.");
 					}
 					etrans=Etranss.CreateCanadianOutput(0,carrier.CarrierNum,carrier.CanadianNetworkNum,
-						clearhouse.ClearinghouseNum,EtransType.RequestOutstand_CA,0,0);
+						clearinghouseHq.ClearinghouseNum,EtransType.RequestOutstand_CA,0,0);//use HQ clearinghousenum
 				}
 				//A01 transaction prefix 12 AN
 				if(version2 || sendToItrans) {
@@ -624,7 +627,7 @@ namespace OpenDental.Eclaims {
 				string result="";
 				bool resultIsError=false;
 				try {
-					result=Canadian.PassToIca(strb.ToString(),clearhouse);
+					result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 				}
 				catch(ApplicationException ex) {
 					result=ex.Message;
@@ -745,11 +748,12 @@ namespace OpenDental.Eclaims {
 
 		///<summary>Each payment reconciliation request can return up to 9 pages. Each request is to one carrier only, so carrier cannot be null. This function will return one etrans ack for each page in the result, since each page must be requested individually. Only for version 04, no such transaction exists for version 02. The provTreat and provBilling must be validated as CDANet providers before calling this function.</summary>
 		public static List<Etrans> GetPaymentReconciliations(Carrier carrier,Provider provTreat,Provider provBilling,DateTime reconciliationDate) {
-			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
-			if(clearhouse==null) {
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum)); 
+			if(clearinghouseClin==null) {
 				throw new ApplicationException("Canadian clearinghouse not found.");
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				throw new ApplicationException(saveFolder+" not found.");
 			}
@@ -765,7 +769,7 @@ namespace OpenDental.Eclaims {
 					throw new ApplicationException("Carrier network not set.");
 				}
 				CanadianNetwork network=CanadianNetworks.GetNetwork(carrier.CanadianNetworkNum);
-				Etrans etrans=Etranss.CreateCanadianOutput(0,carrier.CarrierNum,carrier.CanadianNetworkNum,clearhouse.ClearinghouseNum,EtransType.RequestPay_CA,0,0);
+				Etrans etrans=Etranss.CreateCanadianOutput(0,carrier.CarrierNum,carrier.CanadianNetworkNum,clearinghouseHq.ClearinghouseNum,EtransType.RequestPay_CA,0,0);//use HQ clearhousenum
 				//A01 transaction prefix 12 AN
 				strb.Append(Canadian.TidyAN(network.CanadianTransactionPrefix,12));
 				//A02 office sequence number 6 N
@@ -811,7 +815,7 @@ namespace OpenDental.Eclaims {
 				string result="";
 				bool resultIsError=false;
 				try {
-					result=Canadian.PassToIca(strb.ToString(),clearhouse);
+					result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 				}
 				catch(ApplicationException ex) {
 					result=ex.Message;
@@ -859,11 +863,12 @@ namespace OpenDental.Eclaims {
 		//THIS TRANSACTION TYPE IS NOT USED BY ANY CANADIAN CARRIERS, AND IS NOT PART OF CERTIFICATION, EVEN THOUGH IT IS IN THE SPECIFICATIONS. WE NEED TO FIX BELOW COMMENTS AND MAKE THIS CODE FUNCTION MORE LIKE THE GetPaymentReconciliations() FUNCTION ABOVE.
 		///<summary>Does not exist in version 02 so only supported for version 04. Returns the request Etrans record. Usually pass in a carrier with network null.  If sending to a network, carrier will be null and we still don't see anywhere in the message format to specify network.  We expect to get clarification on this issue later. Validate provTreat as a CDANet provider before calling this function.</summary>
 		public static Etrans GetSummaryReconciliation(Carrier carrier,CanadianNetwork network,Provider provTreat,DateTime reconciliationDate) {
-			Clearinghouse clearhouse=Canadian.GetCanadianClearinghouse(carrier);
-			if(clearhouse==null) {
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum)); 
+			if(clearinghouseClin==null) {
 				throw new ApplicationException("Canadian clearinghouse not found.");
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				throw new ApplicationException(saveFolder+" not found.");
 			}
@@ -874,11 +879,11 @@ namespace OpenDental.Eclaims {
 					throw new ApplicationException("The carrier does not support summary reconciliation transactions.");
 				}
 				etrans=Etranss.CreateCanadianOutput(0,carrier.CarrierNum,carrier.CanadianNetworkNum,
-					clearhouse.ClearinghouseNum,EtransType.RequestSumm_CA,0,0);
+					clearinghouseHq.ClearinghouseNum,EtransType.RequestSumm_CA,0,0);//use HQ clearinghousenum
 			}
 			else {//Assume network!=null
 				etrans=Etranss.CreateCanadianOutput(0,0,network.CanadianNetworkNum,
-					clearhouse.ClearinghouseNum,EtransType.RequestSumm_CA,0,0);
+					clearinghouseHq.ClearinghouseNum,EtransType.RequestSumm_CA,0,0);//use HQ clearinghousenum
 			}
 			//A01 transaction prefix 12 AN
 			strb.Append(Canadian.TidyAN(network.CanadianTransactionPrefix,12));
@@ -919,10 +924,10 @@ namespace OpenDental.Eclaims {
 			bool resultIsError=false;
 			try {
 				if(carrier!=null) {
-					result=Canadian.PassToIca(strb.ToString(),clearhouse);
+					result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 				}
 				else { //Assume network!=null
-					result=Canadian.PassToIca(strb.ToString(),clearhouse);
+					result=Canadian.PassToIca(strb.ToString(),clearinghouseClin);
 				}
 			}
 			catch(ApplicationException ex) {

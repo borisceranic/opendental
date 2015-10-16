@@ -26,7 +26,7 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed. If they failed, a rollback will happen automatically by deleting the previously created X12 file. The batchnum is supplied for the possible rollback.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum){
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//called from Eclaims.cs. Clinic-level clearinghouse passed in.
 			try{
 				//Step 1: Post authentication request:
 				Version myVersion=new Version(Application.ProductVersion);
@@ -48,8 +48,8 @@ namespace OpenDental.Eclaims
 				string postData=
 					"Function=Auth"//CONSTANT; signifies that this is an authentication request
 					+"&Source=EDI"//CONSTANT; file format
-					+"&Username="+clearhouse.LoginID
-					+"&Password="+clearhouse.Password
+					+"&Username="+clearinghouseClin.LoginID
+					+"&Password="+clearinghouseClin.Password
 					+"&UploaderName=OpenDental"//CONSTANT
 					+"&UploaderVersion="+myVersion.Major.ToString()+"."+myVersion.Minor.ToString()+"."+myVersion.Build.ToString();//eg 12.3.24
 				webReq.KeepAlive=false;
@@ -115,7 +115,7 @@ namespace OpenDental.Eclaims
 						throw new Exception("No customer contract. "+errormsg);
 				}
 				//Step 2: Post upload request:
-				string[] fileNames=Directory.GetFiles(clearhouse.ExportPath);
+				string[] fileNames=Directory.GetFiles(clearinghouseClin.ExportPath);
 				if(fileNames.Length>1){
 					for(int f=0;f<fileNames.Length;f++) {
 						File.Delete(fileNames[f]);
@@ -203,7 +203,7 @@ namespace OpenDental.Eclaims
 			}
 			catch(Exception e){
 				ErrorMessage=e.Message;
-				x837Controller.Rollback(clearhouse,batchNum);
+				x837Controller.Rollback(clearinghouseClin,batchNum);
 				return false;
 			}
 			return true;
@@ -233,7 +233,7 @@ namespace OpenDental.Eclaims
 			return pair[1];
 		}
 
-		public static string Benefits270(Clearinghouse clearhouse,string x12message) {
+		public static string Benefits270(Clearinghouse clearinghouseClin,string x12message) {
 			com.dentalxchange.webservices.Credentials cred = new com.dentalxchange.webservices.Credentials();
 			if(PrefC.GetBool(PrefName.CustomizedForPracticeWeb)) {//even though they currently use code from a different part of the program.
 				cred.client="Practice-Web";
@@ -244,8 +244,8 @@ namespace OpenDental.Eclaims
 				cred.serviceID="DCI Web Service ID: 002778";
 			}
 			cred.version=Application.ProductVersion;
-			cred.username=clearhouse.LoginID;
-			cred.password=clearhouse.Password;
+			cred.username=clearinghouseClin.LoginID;
+			cred.password=clearinghouseClin.Password;
 			com.dentalxchange.webservices.Request request=new com.dentalxchange.webservices.Request();
 			request.content=HttpUtility.HtmlEncode(x12message);//get rid of ampersands, etc.
 			com.dentalxchange.webservices.WebServiceService service = new com.dentalxchange.webservices.WebServiceService();

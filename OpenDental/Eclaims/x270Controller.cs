@@ -10,25 +10,26 @@ namespace OpenDental.Eclaims {
 	public class x270Controller {
 
 		///<summary>The insplan that's passed in need not be properly updated to the database first.</summary>
-		public static void RequestBenefits(Clearinghouse clearhouse,InsPlan plan,long patNum,Carrier carrier,List<Benefit> benList,long patPlanNum,InsSub insSub) {
+		public static void RequestBenefits(Clearinghouse clearinghouseHq,InsPlan plan,long patNum,Carrier carrier,List<Benefit> benList,long patPlanNum,InsSub insSub) {
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			Patient pat=Patients.GetPat(patNum);
 			Patient subsc=Patients.GetPat(insSub.Subscriber);
 			Clinic clinic=Clinics.GetClinic(pat.ClinicNum);
 			Provider billProv=Providers.GetProv(Providers.GetBillingProvNum(pat.PriProv,pat.ClinicNum));
 			//validation.  Throw exception if missing info----------------------------------------
-			string validationResult=X270.Validate(clearhouse,carrier,billProv,clinic,plan,subsc,insSub);
+			string validationResult=X270.Validate(clearinghouseClin,carrier,billProv,clinic,plan,subsc,insSub);
 			if(validationResult != "") {
 				throw new Exception(Lan.g("FormInsPlan","Please fix the following errors first:")+"\r\n"+validationResult);
 			}
 			//create a 270 message---------------------------------------------------------------
-			string x12message=X270.GenerateMessageText(clearhouse,carrier,billProv,clinic,plan,subsc,insSub);
+			string x12message=X270.GenerateMessageText(clearinghouseClin,carrier,billProv,clinic,plan,subsc,insSub);
 			EtransMessageText etransMessageText=new EtransMessageText();
 			etransMessageText.MessageText=x12message;
 			EtransMessageTexts.Insert(etransMessageText);
 			//attach it to an etrans-------------------------------------------------------------
 			Etrans etrans=new Etrans();
 			etrans.DateTimeTrans=DateTime.Now;
-			etrans.ClearingHouseNum=clearhouse.ClearinghouseNum;
+			etrans.ClearingHouseNum=clearinghouseHq.ClearinghouseNum;//use HQ clearinghousenum
 			etrans.Etype=EtransType.BenefitInquiry270;
 			etrans.PlanNum=plan.PlanNum;
 			etrans.InsSubNum=insSub.InsSubNum;
@@ -38,11 +39,11 @@ namespace OpenDental.Eclaims {
 			string x12response="";
 			//a connection error here needs to bubble up
 			try {
-				if(clearhouse.CommBridge==EclaimsCommBridge.ClaimConnect) {
-					x12response=ClaimConnect.Benefits270(clearhouse,x12message);
+				if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimConnect) {
+					x12response=ClaimConnect.Benefits270(clearinghouseClin,x12message);
 				}
-				if(clearhouse.CommBridge==EclaimsCommBridge.EDS) {
-					x12response=EDS.Benefits270(clearhouse,x12message);
+				if(clearinghouseClin.CommBridge==EclaimsCommBridge.EDS) {
+					x12response=EDS.Benefits270(clearinghouseClin,x12message);
 				}
 			}
 			catch(Exception ex) {
@@ -84,7 +85,7 @@ namespace OpenDental.Eclaims {
 			EtransMessageTexts.Insert(etransMessageText);
 			Etrans etrans271=new Etrans();
 			etrans271.DateTimeTrans=DateTime.Now;
-			etrans271.ClearingHouseNum=clearhouse.ClearinghouseNum;
+			etrans271.ClearingHouseNum=clearinghouseHq.ClearinghouseNum;//use HQ clearinghousenum
 			etrans271.Etype=EtransType.TextReport;
 			if(X12object.IsX12(x12response)) {//this shouldn't need to be tested because it was tested above.
 				if(x271==null){

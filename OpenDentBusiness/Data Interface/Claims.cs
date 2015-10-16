@@ -338,7 +338,7 @@ namespace OpenDentBusiness{
 				listQueue[i].PatNum          = PIn.Long  (table.Rows[i][5].ToString());
 				string payorID=PIn.String(table.Rows[i]["ElectID"].ToString());
 				EnumClaimMedType medType=(EnumClaimMedType)PIn.Int(table.Rows[i]["MedType"].ToString());
-				listQueue[i].ClearinghouseNum=Clearinghouses.AutomateClearinghouseSelection(payorID,medType);
+				listQueue[i].ClearinghouseNum=Clearinghouses.AutomateClearinghouseHqSelection(payorID,medType);
 				listQueue[i].MedType=medType;
 				listQueue[i].DateService     = PIn.Date  (table.Rows[i]["DateService"].ToString());
 				listQueue[i].ClinicNum		 = PIn.Long	 (table.Rows[i]["ClinicNum"].ToString());
@@ -625,7 +625,7 @@ namespace OpenDentBusiness{
 		public string Carrier;
 		///<summary></summary>
 		public long PatNum;
-		///<summary></summary>
+		///<summary>ClearinghouseNum of HQ.</summary>
 		public long ClearinghouseNum;
 		///<summary></summary>
 		public long ClinicNum;

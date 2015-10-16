@@ -52,12 +52,12 @@ namespace OpenDental {
 		protected bool isValidCredentials() {
 			Progress("Validate Clearing House Setup..");
 			// Make Sure Clearing House is ClaimConnect
-			Clearinghouse clearhouse = Clearinghouses.GetDefaultDental();
-			if(clearhouse == null) {
+			Clearinghouse clearinghouseHq = Clearinghouses.GetDefaultDental();
+			if(clearinghouseHq == null) {
 				Error("No clearinghouse is set as default.");
 				return false;
 			}
-			if(clearhouse.CommBridge != EclaimsCommBridge.ClaimConnect) {
+			if(clearinghouseHq.CommBridge != EclaimsCommBridge.ClaimConnect) {
 				Error("Your Clearinghouse does not offer Patient eBill functionality.");
 				return false;
 			}
@@ -68,10 +68,11 @@ namespace OpenDental {
 			string passWord;
 
 			// Get Login / Password
-			Clearinghouse dch=Clearinghouses.GetDefaultDental();
-			if(dch!=null) {
-				loginID = dch.LoginID;
-				passWord = dch.Password;
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,
+				Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+			if(clearinghouseClin!=null) {
+				loginID = clearinghouseClin.LoginID;
+				passWord = clearinghouseClin.Password;
 			}
 			else {
 				loginID = "";

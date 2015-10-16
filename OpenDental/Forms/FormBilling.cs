@@ -1088,22 +1088,22 @@ namespace OpenDental{
 			Close();
 		}
 
-		/// <summary></summary>
-		private void butSendEbill_Click(object sender,EventArgs e) {
-			if (gridBill.SelectedIndices.Length == 0){
-				MessageBox.Show(Lan.g(this, "Please select items first."));
-				return;
-			}
-			Cursor.Current = Cursors.WaitCursor;
-			// Populate Array And Open eBill Form
-			ArrayList PatientList = new ArrayList();
-			for (int i = 0; i < gridBill.SelectedIndices.Length; i++)
-					PatientList.Add(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["PatNum"].ToString()));
-			// Open eBill form
-			FormPatienteBill FormPatienteBill = new FormPatienteBill(PatientList); 
-			FormPatienteBill.ShowDialog();
-			Cursor.Current = Cursors.Default;
-		}
+		///// <summary></summary>
+		//private void butSendEbill_Click(object sender,EventArgs e) {
+		//	if (gridBill.SelectedIndices.Length == 0){
+		//		MessageBox.Show(Lan.g(this, "Please select items first."));
+		//		return;
+		//	}
+		//	Cursor.Current = Cursors.WaitCursor;
+		//	// Populate Array And Open eBill Form
+		//	ArrayList PatientList = new ArrayList();
+		//	for (int i = 0; i < gridBill.SelectedIndices.Length; i++)
+		//			PatientList.Add(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["PatNum"].ToString()));
+		//	// Open eBill form
+		//	FormPatienteBill FormPatienteBill = new FormPatienteBill(PatientList); 
+		//	FormPatienteBill.ShowDialog();
+		//	Cursor.Current = Cursors.Default;
+		//}
 
 		
 

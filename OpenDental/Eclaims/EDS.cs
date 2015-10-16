@@ -22,7 +22,7 @@ namespace OpenDental.Eclaims {
 		}
 
 		///<summary>Sends an X12 270 request and returns X12 271 response or an error message.</summary>
-		public static string Benefits270(Clearinghouse clearhouse,string x12message) {
+		public static string Benefits270(Clearinghouse clearinghouseClin,string x12message) {//called from x270Controller. Clinic-level clearinghouse passed in.
 			string retVal="";
 			try {
 				HttpWebRequest webReq;
@@ -36,8 +36,8 @@ namespace OpenDental.Eclaims {
 				string postDataXml="<?xml version=\"1.0\" encoding=\"us-ascii\"?>"
 					+"<content>"
 						+"<header>"
-							+"<userId>"+clearhouse.LoginID+"</userId>"
-							+"<pass>"+clearhouse.Password+"</pass>"
+							+"<userId>"+clearinghouseClin.LoginID+"</userId>"
+							+"<pass>"+clearinghouseClin.Password+"</pass>"
 							+"<process>transmitEligibility</process>"
 							+"<version>1</version>"
 						+"</header>"

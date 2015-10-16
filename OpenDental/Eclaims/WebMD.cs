@@ -25,35 +25,35 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed. If they failed, a rollback will happen automatically by deleting the previously created X12 file. The batchnum is supplied for the possible rollback.  Also used for mail retrieval.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum){
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//called from Eclaims and FormClaimReports.cs. Clinic-level clearinghouse passed in.
 			string arguments="";
 			try{
-				if(!Directory.Exists(clearhouse.ExportPath)){
+				if(!Directory.Exists(clearinghouseClin.ExportPath)){
 					throw new Exception("Clearinghouse export path is invalid.");
 				}
-				if(!Directory.Exists(clearhouse.ResponsePath)){
+				if(!Directory.Exists(clearinghouseClin.ResponsePath)){
 					throw new Exception("Clearinghouse response path is invalid.");
 				}
-				if(!File.Exists(clearhouse.ClientProgram)) {
+				if(!File.Exists(clearinghouseClin.ClientProgram)) {
 					throw new Exception("Client program not installed properly.");
 				}
-				arguments="\""+ODFileUtils.RemoveTrailingSeparators(clearhouse.ExportPath)+"\\"+"*.*\" "//upload claims path
-					+"\""+ODFileUtils.RemoveTrailingSeparators(clearhouse.ResponsePath)+"\" "//Mail path
+				arguments="\""+ODFileUtils.RemoveTrailingSeparators(clearinghouseClin.ExportPath)+"\\"+"*.*\" "//upload claims path
+					+"\""+ODFileUtils.RemoveTrailingSeparators(clearinghouseClin.ResponsePath)+"\" "//Mail path
 					+"316 "//vendor number.  
-					+clearhouse.LoginID+" "//Client number. Assigned by us, and we have to coordinate for all other 'vendors' of Open Dental, because there is only one vendor number for OD for now.
-					+clearhouse.Password;
+					+clearinghouseClin.LoginID+" "//Client number. Assigned by us, and we have to coordinate for all other 'vendors' of Open Dental, because there is only one vendor number for OD for now.
+					+clearinghouseClin.Password;
 				//call the WebMD client program
-				Process process=Process.Start(clearhouse.ClientProgram,arguments);
+				Process process=Process.Start(clearinghouseClin.ClientProgram,arguments);
 				process.EnableRaisingEvents=true;
 				process.WaitForExit();
 				//delete the uploaded claims
-				string[] files=Directory.GetFiles(clearhouse.ExportPath);
+				string[] files=Directory.GetFiles(clearinghouseClin.ExportPath);
 				for(int i=0;i<files.Length;i++){
 					//string t=files[i];
 					File.Delete(files[i]);
 				}
 				//rename the downloaded mail files to end with txt
-				files=Directory.GetFiles(clearhouse.ResponsePath);
+				files=Directory.GetFiles(clearinghouseClin.ResponsePath);
 				for(int i=0;i<files.Length;i++){
 					//string t=files[i];
 					if(Path.GetExtension(files[i])!=".txt"){
@@ -64,7 +64,7 @@ namespace OpenDental.Eclaims
 			catch(Exception e){
 				ErrorMessage=e.Message;
 				if(batchNum!=0){
-					x837Controller.Rollback(clearhouse,batchNum);
+					x837Controller.Rollback(clearinghouseClin,batchNum);
 				}
 				return false;
 			}
@@ -89,8 +89,9 @@ namespace OpenDental.Eclaims
 		private const string testMode="true";//TODO: Set to 'false' on release.
 		private const string emdeonServerUrl="";//TODO: Get from Emdeon!
 
-		private static void SubmitBatch(Clearinghouse clearhouse,int batchNum){
-			string[] files=Directory.GetFiles(clearhouse.ExportPath);
+		///<summary>If you call this, make sure you pass in a clinic-level clearinghouse if one exists. </summary>
+		private static void SubmitBatch(Clearinghouse clearinghouseClin,int batchNum){//not called from anywhere currently.
+			string[] files=Directory.GetFiles(clearinghouseClin.ExportPath);
 			for(int i=0;i<files.Length;i++){
 				ZipFile zip=null;
 				try{
@@ -104,8 +105,8 @@ namespace OpenDental.Eclaims
 						+"<claim_submission_api xmlns=\"Emdeon_claim_submission_api\" revision=\"001\">"
 							+"<authentication>"
 								+"<vendor_id>"+vendorId+"</vendor_id>"
-								+"<user_id>"+clearhouse.LoginID+"</user_id>"
-								+"<password>"+clearhouse.Password+"</password>"
+								+"<user_id>"+clearinghouseClin.LoginID+"</user_id>"
+								+"<password>"+clearinghouseClin.Password+"</password>"
 							+"</authentication>"
 							+"<transaction>"
 							+"<trace_id>"+batchNum+"</trace_id>"//TODO: Is this the right number to use?

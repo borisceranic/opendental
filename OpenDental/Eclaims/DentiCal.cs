@@ -28,7 +28,7 @@ namespace OpenDental.Eclaims {
 	public class DentiCal {
 
 		private static string remoteHost="ftp.delta.org";
-		private static Clearinghouse clearinghouse=null;
+		private static Clearinghouse _clearinghouseClin=null;
 		public static string ErrorMessage="";
 
 		///<summary></summary>
@@ -36,8 +36,8 @@ namespace OpenDental.Eclaims {
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed. Both sends and retrieves.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum) {
-			clearinghouse=clearhouse;
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) { //called from FormClaimReports and Eclaims.cs. clinic-level clearinghouse passed in.
+			_clearinghouseClin=clearinghouseClin;
 			//Before this function is called, the X12 file for the current batch has already been generated in
 			//the clearinghouse export folder. The export folder will also contain batch files which have failed
 			//to upload from previous attempts and we must attempt to upload these older batch files again if
@@ -51,8 +51,8 @@ namespace OpenDental.Eclaims {
 			ChannelSftp ch=null;
 			JSch jsch=new JSch();
 			try {
-				session=jsch.getSession(clearinghouse.LoginID,remoteHost);
-				session.setPassword(clearinghouse.Password);
+				session=jsch.getSession(_clearinghouseClin.LoginID,remoteHost);
+				session.setPassword(_clearinghouseClin.Password);
 				Hashtable config=new Hashtable();
 				config.Add("StrictHostKeyChecking","no");
 				session.setConfig(config);
@@ -66,10 +66,10 @@ namespace OpenDental.Eclaims {
 				return false;
 			}
 			try {
-				string homeDir="/Home/"+clearhouse.LoginID+"/";
+				string homeDir="/Home/"+clearinghouseClin.LoginID+"/";
 				//At this point we are connected to the Denti-Cal SFTP server.
 				if(batchNum==0) { //Retrieve reports.
-					if(!Directory.Exists(clearhouse.ResponsePath)) {
+					if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 						throw new Exception("Clearinghouse response path is invalid.");
 					}
 					//Only retrieving reports so do not send new claims.
@@ -83,7 +83,7 @@ namespace OpenDental.Eclaims {
 						Match fileNameMatch=Regex.Match(listItem,".*\\s+(.*)$");
 						string getFileName=fileNameMatch.Result("$1");
 						string getFilePath=retrievePath+getFileName;
-						string exportFilePath=CodeBase.ODFileUtils.CombinePaths(clearhouse.ResponsePath,getFileName);
+						string exportFilePath=CodeBase.ODFileUtils.CombinePaths(clearinghouseClin.ResponsePath,getFileName);
 						Tamir.SharpSsh.java.io.InputStream fileStream=null;
 						FileStream exportFileStream=null;
 						try {
@@ -118,10 +118,10 @@ namespace OpenDental.Eclaims {
 					}
 				}
 				else { //Send batch of claims.
-					if(!Directory.Exists(clearhouse.ExportPath)) {
+					if(!Directory.Exists(clearinghouseClin.ExportPath)) {
 						throw new Exception("Clearinghouse export path is invalid.");
 					}
-					string[] files=Directory.GetFiles(clearhouse.ExportPath);
+					string[] files=Directory.GetFiles(clearinghouseClin.ExportPath);
 					for(int i=0;i<files.Length;i++) {
 						//First upload the batch file to a temporary file name. Denti-Cal does not process file names unless they start with the Login ID.
 						//Uploading to a temporary file and then renaming the file allows us to avoid partial file uploads if there is connection loss.
@@ -129,7 +129,7 @@ namespace OpenDental.Eclaims {
 						ch.put(files[i],tempRemoteFilePath);
 						//Denti-Cal requires the file name to start with the Login ID followed by a period and end with a .txt extension.
 						//The middle part of the file name can be anything.
-						string remoteFilePath=homeDir+"in/"+clearhouse.LoginID+"."+Path.GetFileName(files[i]);
+						string remoteFilePath=homeDir+"in/"+clearinghouseClin.LoginID+"."+Path.GetFileName(files[i]);
 						ch.rename(tempRemoteFilePath,remoteFilePath);
 						File.Delete(files[i]);//Remove the processed file.
 					}

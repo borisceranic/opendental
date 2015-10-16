@@ -3502,19 +3502,19 @@ namespace OpenDental{
 				return;
 			}
 			//Visible for everyone.
-			Clearinghouse clearhouse=Clearinghouses.GetDefaultDental();
-			if(clearhouse==null){
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			if(clearinghouseHq==null){
 				MsgBox.Show(this,"No clearinghouse is set as default.");
 				return;
 			}
-			if((clearhouse.CommBridge!=EclaimsCommBridge.ClaimConnect 
-				&& clearhouse.CommBridge!=EclaimsCommBridge.EDS)
-				&& clearhouse.Eformat!=ElectronicClaimFormat.Canadian)
+			if((clearinghouseHq.CommBridge!=EclaimsCommBridge.ClaimConnect 
+				&& clearinghouseHq.CommBridge!=EclaimsCommBridge.EDS)
+				&& clearinghouseHq.Eformat!=ElectronicClaimFormat.Canadian)
 			{
 				MsgBox.Show(this,"So far, eligibility checks only work with ClaimConnect, EDS, and CDAnet.");
 				return;
 			}
-			if(clearhouse.Eformat==ElectronicClaimFormat.Canadian) {
+			if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian) {
 				EligibilityCheckCanada();
 				return;
 			}
@@ -3530,7 +3530,7 @@ namespace OpenDental{
 			}
 			Cursor=Cursors.WaitCursor;
 			try {
-				Eclaims.x270Controller.RequestBenefits(clearhouse,PlanCur,PatPlanCur.PatNum,CarrierCur,benefitList,PatPlanCur.PatPlanNum,_subCur);
+				Eclaims.x270Controller.RequestBenefits(clearinghouseHq,PlanCur,PatPlanCur.PatNum,CarrierCur,benefitList,PatPlanCur.PatPlanNum,_subCur);
 			}
 			catch(Exception ex) {//although many errors will be caught and result in a response etrans.
 				//this also catches validation errors such as missing info.
@@ -3583,10 +3583,12 @@ namespace OpenDental{
 			string loginID;
 			string passWord;
 			// Get Login / Password
-			Clearinghouse dch=Clearinghouses.GetDefaultDental();
-			if(dch!=null) {
-				loginID = dch.LoginID;
-				passWord = dch.Password;
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,
+				Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+			if(clearinghouseHq!=null) {
+				loginID=clearinghouseClin.LoginID;
+				passWord=clearinghouseClin.Password;
 			}
 			else {
 				loginID = "";

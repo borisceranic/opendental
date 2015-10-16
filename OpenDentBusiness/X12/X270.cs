@@ -13,30 +13,30 @@ namespace OpenDentBusiness
 		}
 
 		///<summary>In progress.  Probably needs a different name.  Info must be validated first.</summary>
-		public static string GenerateMessageText(Clearinghouse clearhouse,Carrier carrier,Provider billProv,Clinic clinic,InsPlan insPlan,Patient subscriber,InsSub insSub) {
-			int batchNum=Clearinghouses.GetNextBatchNumber(clearhouse);
+		public static string GenerateMessageText(Clearinghouse clearinghouseClin,Carrier carrier,Provider billProv,Clinic clinic,InsPlan insPlan,Patient subscriber,InsSub insSub) {
+			int batchNum=Clearinghouses.GetNextBatchNumber(clearinghouseClin);
 			string groupControlNumber=batchNum.ToString();//Must be unique within file.  We will use batchNum
 			int transactionNum=1;
 			StringBuilder strb=new StringBuilder();
 			//Interchange Control Header
 			strb.AppendLine("ISA*00*          *"//ISA01,ISA02: 00 + 10 spaces
 				+"00*          *"//ISA03,ISA04: 00 + 10 spaces
-				+clearhouse.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
-				+X12Generator.GetISA06(clearhouse)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
-				+clearhouse.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
-				+Sout(clearhouse.ISA08,15,15)+"*"//ISA08: Receiver ID. Validated to make sure length is at least 2.
+				+clearinghouseClin.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
+				+X12Generator.GetISA06(clearinghouseClin)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
+				+clearinghouseClin.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
+				+Sout(clearinghouseClin.ISA08,15,15)+"*"//ISA08: Receiver ID. Validated to make sure length is at least 2.
 				+DateTime.Today.ToString("yyMMdd")+"*"//ISA09: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//ISA10: current time
 				+"U*00401*"//ISA11 and ISA12. 
 				//ISA13: interchange control number, right aligned:
 				+batchNum.ToString().PadLeft(9,'0')+"*"
 				+"0*"//ISA14: no acknowledgment requested
-				+clearhouse.ISA15+"*"//ISA15: T=Test P=Production. Validated.
+				+clearinghouseClin.ISA15+"*"//ISA15: T=Test P=Production. Validated.
 				+":~");//ISA16: use ':'
 			//Functional Group Header
 			strb.AppendLine("GS*HS*"//GS01: HS for 270 benefit inquiry
-				+X12Generator.GetGS02(clearhouse)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
-				+Sout(clearhouse.GS03,15,2)+"*"//GS03: Application Receiver's Code
+				+X12Generator.GetGS02(clearinghouseClin)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
+				+Sout(clearinghouseClin.GS03,15,2)+"*"//GS03: Application Receiver's Code
 				+DateTime.Today.ToString("yyyyMMdd")+"*"//GS04: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//GS05: current time
 				+groupControlNumber+"*"//GS06: Group control number. Max length 9. No padding necessary.
@@ -296,9 +296,9 @@ IEA*1*000012145~";
 			return X12Generator.Sout(str,-1,-1);
 		}
 
-		public static string Validate(Clearinghouse clearhouse,Carrier carrier,Provider billProv,Clinic clinic,InsPlan insPlan,Patient subscriber,InsSub insSub) {
+		public static string Validate(Clearinghouse clearinghouseClin,Carrier carrier,Provider billProv,Clinic clinic,InsPlan insPlan,Patient subscriber,InsSub insSub) {
 			StringBuilder strb=new StringBuilder();
-			X12Validate.ISA(clearhouse,strb);
+			X12Validate.ISA(clearinghouseClin,strb);
 			X12Validate.Carrier(carrier,strb);
 			if(carrier.ElectID.Length<2) {
 				if(strb.Length!=0) {

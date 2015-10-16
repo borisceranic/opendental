@@ -92,7 +92,7 @@ namespace OpenDentBusiness {
 				ds.Tables.Add(ClaimForms.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.ClearHouses) || isAll){
-				ds.Tables.Add(Clearinghouses.RefreshCache());//kh wants to add an EasyHideClearHouses to disable this
+				ds.Tables.Add(Clearinghouses.RefreshCacheHq());//kh wants to add an EasyHideClearHouses to disable this
 			}
 			//InvalidType.Clinics see InvalidType.Providers
 			if(itypes.Contains((int)InvalidType.Computers) || isAll){
@@ -311,7 +311,7 @@ namespace OpenDentBusiness {
 				ClaimForms.FillCache(ds.Tables["ClaimForm"]);
 			}
 			if(itypes.Contains((int)InvalidType.ClearHouses) || isAll) {
-				Clearinghouses.FillCache(ds.Tables["Clearinghouse"]);//kh wants to add an EasyHideClearHouses to disable this
+				Clearinghouses.FillCacheHq(ds.Tables["Clearinghouse"]);//kh wants to add an EasyHideClearHouses to disable this
 			}
 			if(itypes.Contains((int)InvalidType.Computers) || isAll) {
 				Computers.FillCache(ds.Tables["Computer"]);

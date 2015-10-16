@@ -26,7 +26,8 @@ namespace OpenDental.Eclaims {
 			StringBuilder strb=new StringBuilder();
 			string t="\t";
 			strb.Append("110\t111\t112\t118\t203/403\tF108/204/404\t205/405\t206\t207\t208\t209\t210\t211\t212\t215\t217\t219\t406\t408\t409\t410\t411\t413\t414\t415\t416\t418\t419\t420\t421\t422\t423\t424\t425\t426\t428\t429\t430\t432\t433\r\n");
-			Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItem.ClearinghouseNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			Claim claim=Claims.GetClaim(queueItem.ClaimNum);
 			Provider provBill=Providers.GetProv(claim.ProvBill);
 			Patient pat=Patients.GetPat(claim.PatNum);
@@ -102,7 +103,7 @@ namespace OpenDental.Eclaims {
 				strb.Append(t);
 				strb.Append("\r\n");
 			}
-			string saveFolder=clearhouse.ExportPath;
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				MessageBox.Show(saveFolder+" "+Lan.g("Dutch","not found."));
 				return false;

@@ -26,7 +26,7 @@ namespace OpenDental.Eclaims {
 		}
 
 		///<summary>Returns true if the communications were successful, and false if they failed. If they failed, a rollback will happen automatically by deleting the previously created FP17 file. The batchnum is supplied for the possible rollback.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum) {
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//called from Eclaims.cs. Clinic-level clearinghouse passed in.
 			bool retVal=true;
 
 

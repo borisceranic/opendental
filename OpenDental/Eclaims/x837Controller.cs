@@ -21,13 +21,13 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Gets the filename for this batch. Used when saving or when rolling back.</summary>
-		private static string GetFileName(Clearinghouse clearhouse,int batchNum){
-			string saveFolder=clearhouse.ExportPath;
+		private static string GetFileName(Clearinghouse clearinghouseClin,int batchNum) { //called from this.SendBatch. Clinic-level clearinghouse passed in.
+			string saveFolder=clearinghouseClin.ExportPath;
 			if(!Directory.Exists(saveFolder)) {
 				MessageBox.Show(saveFolder+" not found.");
 				return "";
 			}
-			if(clearhouse.CommBridge==EclaimsCommBridge.RECS){
+			if(clearinghouseClin.CommBridge==EclaimsCommBridge.RECS){
 				if(File.Exists(ODFileUtils.CombinePaths(saveFolder,"ecs.txt"))){
 					MsgBox.Show("FormClaimsSend","You must send your existing claims from the RECS program before you can create another batch.");
 					return "";//prevents overwriting an existing ecs.txt.
@@ -40,33 +40,33 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>If file creation was successful but communications failed, then this deletes the X12 file.  This is not used in the Tesia bridge because of the unique filenaming.</summary>
-		public static void Rollback(Clearinghouse clearhouse,int batchNum){
-			if(clearhouse.CommBridge==EclaimsCommBridge.RECS){
+		public static void Rollback(Clearinghouse clearinghouseClin,int batchNum) {//called from various eclaims classes. Clinic-level clearinghouse passed in.
+			if(clearinghouseClin.CommBridge==EclaimsCommBridge.RECS){
 				//A RECS rollback never deletes the file, because there is only one
 			}
 			else{
 				//This is a Windows extension, so we do not need to worry about Unix path separator characters.
-				File.Delete(ODFileUtils.CombinePaths(clearhouse.ExportPath,"claims"+batchNum.ToString()+".txt"));
+				File.Delete(ODFileUtils.CombinePaths(clearinghouseClin.ExportPath,"claims"+batchNum.ToString()+".txt"));
 			}
 		}
 
 		///<summary>Called from Eclaims and includes multiple claims.  Returns the string that was sent.  The string needs to be parsed to determine the transaction numbers used for each claim.</summary>
-		public static string SendBatch(List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearhouse,EnumClaimMedType medType){
+		public static string SendBatch(List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearinghouseClin,EnumClaimMedType medType) { //called from Eclaims.cs. Clinic-level clearinghouse passed in.
 			//each batch is already guaranteed to be specific to one clearinghouse, one clinic, and one EnumClaimMedType
 			//Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItems[0].ClearinghouseNum);
-			string saveFile=GetFileName(clearhouse,batchNum);
+			string saveFile=GetFileName(clearinghouseClin,batchNum);
 			if(saveFile==""){
 				return "";
 			}
 			using(StreamWriter sw=new StreamWriter(saveFile,false,Encoding.ASCII)){
-				if(clearhouse.Eformat==ElectronicClaimFormat.x837D_4010) {
-					X837_4010.GenerateMessageText(sw,clearhouse,batchNum,queueItems);
+				if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_4010) {
+					X837_4010.GenerateMessageText(sw,clearinghouseClin,batchNum,queueItems);
 				}
 				else {//Any of the 3 kinds of 5010
-					X837_5010.GenerateMessageText(sw,clearhouse,batchNum,queueItems,medType);
+					X837_5010.GenerateMessageText(sw,clearinghouseClin,batchNum,queueItems,medType);
 				}
 			}
-			if(clearhouse.CommBridge==EclaimsCommBridge.PostnTrack){
+			if(clearinghouseClin.CommBridge==EclaimsCommBridge.PostnTrack){
 				//need to clear out all CRLF from entire file
 				string strFile="";
 				using(StreamReader sr=new StreamReader(saveFile,Encoding.ASCII)){

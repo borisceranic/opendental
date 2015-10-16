@@ -12,7 +12,7 @@ namespace OpenDentBusiness{
 		public long ClearinghouseNum;
 		///<summary>Description of this clearinghouse</summary>
 		public string Description;
-		///<summary>The path to export the X12 file to. \ is now optional.</summary>
+		///<summary>The path to export the X12 file to. \ is now optional.  Can be overridden by clinic-level clearinghouses.</summary>
 		public string ExportPath;
 		///<summary>A list of all payors which should have claims sent to this clearinghouse. Comma delimited with no spaces.  Not necessary if IsDefault.</summary>
 		public string Payors;
@@ -20,7 +20,8 @@ namespace OpenDentBusiness{
 		public ElectronicClaimFormat Eformat;
 		///<summary>Sender ID Qualifier. Usually ZZ, sometimes 30. Seven other values are allowed as specified in X12 document, but probably never used.</summary>
 		public string ISA05;
-		///<summary>Used in ISA06, GS02, 1000A NM1, and 1000A PER.  If blank, then 810624427 is used to indicate Open Dental.</summary>
+		///<summary>Used in ISA06, GS02, 1000A NM1, and 1000A PER.  If blank, then 810624427 is used to indicate Open Dental.
+		///Can be overridden by clinic-level clearinghouses.</summary>
 		public string SenderTIN;
 		///<summary>Receiver ID Qualifier.  Usually ZZ, sometimes 30. Seven other values are allowed as specified in X12 document, but probably never used.</summary>
 		public string ISA07;
@@ -28,24 +29,29 @@ namespace OpenDentBusiness{
 		public string ISA08;
 		///<summary>"P" for Production or "T" for Test.</summary>
 		public string ISA15;
-		///<summary>Password is usually combined with the login ID for user validation.</summary>
+		///<summary>Password is usually combined with the login ID for user validation.  Can be overridden by clinic-level clearinghouses.</summary>
 		public string Password;
-		///<summary>The path that all incoming response files will be saved to. \ is now optional.</summary>
+		///<summary>The path that all incoming response files will be saved to. \ is now optional.
+		///Can be overridden by clinic-level clearinghouses.</summary>
 		public string ResponsePath;
 		///<summary>Enum:EclaimsCommBridge  One of the included hard-coded communications briges.  Or none to just create the claim files without uploading.</summary>
 		public EclaimsCommBridge CommBridge;
-		///<summary>If applicable, this is the name of the client program to launch.  It is even used by the hard-coded comm bridges, because the user may have changed the installation directory or exe name.</summary>
+		///<summary>If applicable, this is the name of the client program to launch.  It is even used by the hard-coded comm bridges,
+		///because the user may have changed the installation directory or exe name.  Can be overridden by clinic-level clearinghouses.</summary>
 		public string ClientProgram;
 		///<summary>Each clearinghouse increments their batch numbers by one each time a claim file is sent.  User never sees this number.  Maxes out at 999, then loops back to 1.  This field must NOT be cached and must be ignored in the code except where it explicitly retrieves it from the db.  Defaults to 0 for brand new clearinghouses, which causes the first batch to go out as #1.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
 		public int LastBatchNumber;
 		///<summary>Was not used.  1,2,3,or 4. The port that the modem is connected to if applicable. Always uses 9600 baud and standard settings. Will crash if port or modem not valid.</summary>
 		public byte ModemPort;
-		///<summary>A clearinghouse usually has a login ID that is used with the password in order to access the remote server.  This value is not usualy used within the actual claim.</summary>
+		///<summary>A clearinghouse usually has a login ID that is used with the password in order to access the remote server.
+		///This value is not usualy used within the actual claim.  Can be overridden by clinic-level clearinghouses.</summary>
 		public string LoginID;
-		///<summary>Used in 1000A NM1 and 1000A PER.  But if SenderTIN is blank, then OPEN DENTAL SOFTWARE is used instead.</summary>
+		///<summary>Used in 1000A NM1 and 1000A PER.  But if SenderTIN is blank, then OPEN DENTAL SOFTWARE is used instead.
+		///Can be overridden by clinic-level clearinghouses.</summary>
 		public string SenderName;
-		///<summary>Used in 1000A PER.  But if SenderTIN is blank, then 8776861248 is used instead.  10 digit phone is required by WebMD and is universally assumed, so for now, this must be either blank or 10 digits.</summary>
+		///<summary>Used in 1000A PER.  But if SenderTIN is blank, then 8776861248 is used instead.  10 digit phone is required by WebMD and is 
+		///universally assumed, so for now, this must be either blank or 10 digits.  Can be overridden by clinic-level clearinghouses.</summary>
 		public string SenderTelephone;
 		///<summary>Usually the same as ISA08, but at least one clearinghouse uses a different number here.</summary>
 		public string GS03;
@@ -59,6 +65,10 @@ namespace OpenDentBusiness{
 		public string SeparatorData;
 		///<summary>X12 segment terminator. Two digit hexadecimal string representing an ASCII character or blank. Usually blank, implying 7E which represents '~'. For Denti-Cal, hexadecimal value 1C must be used, corresponding to the "file separator" character which has no visual representation.</summary>
 		public string SeparatorSegment;
+		///<summary>FK to clinic.ClinicNum.  ClinicNum=0 for HQ.</summary>
+		public long ClinicNum;
+		///<summary>FK to ClearinghouseNum.  Will be 0 when ClinicNum is 0 (for HQ), otherwise it will point to the HQ copy.</summary>
+		public long HqClearinghouseNum;
 
 
 		public Clearinghouse() {

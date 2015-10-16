@@ -19,26 +19,27 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Supply a list of ClaimSendQueueItems. Called from FormClaimSend.  Can only send to one clearinghouse at a time.  Able to send just send one claim.  Cannot include Canadian.</summary>
-		public static void SendBatch(List<ClaimSendQueueItem> queueItems,Clearinghouse clearhouse,EnumClaimMedType medType){
+		public static void SendBatch(List<ClaimSendQueueItem> queueItems,Clearinghouse clearinghouseHq,EnumClaimMedType medType){
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			string messageText="";
-			if(clearhouse.Eformat==ElectronicClaimFormat.Canadian){
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.Canadian){
 				MsgBox.Show("Eclaims","Cannot send Canadian claims as part of Eclaims.SendBatch.");
 				return;
 			}
 			//get next batch number for this clearinghouse
-			int batchNum=Clearinghouses.GetNextBatchNumber(clearhouse);
+			int batchNum=Clearinghouses.GetNextBatchNumber(clearinghouseClin);
 			//---------------------------------------------------------------------------------------
 			//Create the claim file for this clearinghouse
-			if(clearhouse.Eformat==ElectronicClaimFormat.x837D_4010
-				|| clearhouse.Eformat==ElectronicClaimFormat.x837D_5010_dental
-				|| clearhouse.Eformat==ElectronicClaimFormat.x837_5010_med_inst) 
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_4010
+				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_5010_dental
+				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837_5010_med_inst) 
 			{
-				messageText=x837Controller.SendBatch(queueItems,batchNum,clearhouse,medType);
+				messageText=x837Controller.SendBatch(queueItems,batchNum,clearinghouseClin,medType);
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.Renaissance){
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance){
 				messageText=Renaissance.SendBatch(queueItems,batchNum);
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.Dutch) {
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Dutch) {
 				messageText=Dutch.SendBatch(queueItems,batchNum);
 			}
 			else{
@@ -49,26 +50,26 @@ namespace OpenDental.Eclaims
 			}
 			//----------------------------------------------------------------------------------------
 			//Launch Client Program for this clearinghouse if applicable
-			if(clearhouse.CommBridge==EclaimsCommBridge.None){
-				AttemptLaunch(clearhouse,batchNum);
+			if(clearinghouseClin.CommBridge==EclaimsCommBridge.None){
+				AttemptLaunch(clearinghouseClin,batchNum);
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.WebMD){
-				if(!WebMD.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.WebMD){
+				if(!WebMD.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+WebMD.ErrorMessage);
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.BCBSGA){
-				if(!BCBSGA.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.BCBSGA){
+				if(!BCBSGA.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+BCBSGA.ErrorMessage);
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.Renaissance){
-				AttemptLaunch(clearhouse,batchNum);
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.Renaissance){
+				AttemptLaunch(clearinghouseClin,batchNum);
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.ClaimConnect){
-				if(ClaimConnect.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimConnect){
+				if(ClaimConnect.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show("Upload successful.");
 				}
 				else {
@@ -76,52 +77,52 @@ namespace OpenDental.Eclaims
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.RECS){
-				if(!RECS.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.RECS){
+				if(!RECS.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch RECS client.")+"\r\n"+RECS.ErrorMessage);
 					//continue;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.Inmediata){
-				if(!Inmediata.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.Inmediata){
+				if(!Inmediata.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch Inmediata client.")+"\r\n"+Inmediata.ErrorMessage);
 					//continue;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.AOS){ // added by SPK 7/13/05
-				if(!AOS.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.AOS){ // added by SPK 7/13/05
+				if(!AOS.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Claim file created, but could not launch AOS Communicator.")+"\r\n"+AOS.ErrorMessage);
 					//continue;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.PostnTrack){
-				AttemptLaunch(clearhouse,batchNum);
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.PostnTrack){
+				AttemptLaunch(clearinghouseClin,batchNum);
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.MercuryDE){
-				if(!MercuryDE.Launch(clearhouse,batchNum)){
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.MercuryDE){
+				if(!MercuryDE.Launch(clearinghouseClin,batchNum)){
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+MercuryDE.ErrorMessage);
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.ClaimX) {
-				if(!ClaimX.Launch(clearhouse,batchNum)) {
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimX) {
+				if(!ClaimX.Launch(clearinghouseClin,batchNum)) {
 					MessageBox.Show(Lan.g("Eclaims","Claim file created, but encountered an error while launching ClaimX Client.")+":\r\n"+ClaimX.ErrorMessage);
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.EmdeonMedical) {
-				if(!EmdeonMedical.Launch(clearhouse,batchNum,medType)) {
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.EmdeonMedical) {
+				if(!EmdeonMedical.Launch(clearinghouseClin,batchNum,medType)) {
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+EmdeonMedical.ErrorMessage);
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.DentiCal) {
-				if(!DentiCal.Launch(clearhouse,batchNum)) {
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.DentiCal) {
+				if(!DentiCal.Launch(clearinghouseClin,batchNum)) {
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+DentiCal.ErrorMessage);
 					return;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.NHS) {
-				if(!NHS.Launch(clearhouse,batchNum)) {
+			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.NHS) {
+				if(!NHS.Launch(clearinghouseClin,batchNum)) {
 					MessageBox.Show(Lan.g("Eclaims","Error sending.")+"\r\n"+NHS.ErrorMessage);
 					return;
 				}
@@ -129,16 +130,16 @@ namespace OpenDental.Eclaims
 			//----------------------------------------------------------------------------------------
 			//finally, mark the claims sent. (only if not Canadian)
 			EtransType etype=EtransType.ClaimSent;
-			if(clearhouse.Eformat==ElectronicClaimFormat.Renaissance){
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance){
 				etype=EtransType.Claim_Ren;
 			}
-			if(clearhouse.Eformat!=ElectronicClaimFormat.Canadian) {
+			if(clearinghouseClin.Eformat!=ElectronicClaimFormat.Canadian) {
 				//Create the etransmessagetext that all claims in the batch will point to.
 				EtransMessageText etransMsgText=new EtransMessageText();
 				etransMsgText.MessageText=messageText;
 				EtransMessageTexts.Insert(etransMsgText);
 				for(int j=0;j<queueItems.Count;j++) {
-					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,clearhouse.ClearinghouseNum,etype,batchNum);
+					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,clearinghouseHq.ClearinghouseNum,etype,batchNum);//use HQ clearinghousenum
 					etrans.EtransMessageTextNum=etransMsgText.EtransMessageTextNum;
 					Etranss.Update(etrans);
 					//Now we need to update our cache of claims to reflect the change that took place in the database above in Etranss.SetClaimSentOrPrinted()
@@ -148,16 +149,16 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>If no comm bridge is selected for a clearinghouse, this launches any client program the user has entered.  We do not want to cause a rollback, so no return value.</summary>
-		private static void AttemptLaunch(Clearinghouse clearhouse,int batchNum){
-			if(clearhouse.ClientProgram==""){
+		private static void AttemptLaunch(Clearinghouse clearinghouseClin,int batchNum){ //called from Eclaims.cs. clinic-level clearinghouse passed in.
+			if(clearinghouseClin.ClientProgram==""){
 				return;
 			}
-			if(!File.Exists(clearhouse.ClientProgram)){
-				MessageBox.Show(clearhouse.ClientProgram+" "+Lan.g("Eclaims","does not exist."));
+			if(!File.Exists(clearinghouseClin.ClientProgram)){
+				MessageBox.Show(clearinghouseClin.ClientProgram+" "+Lan.g("Eclaims","does not exist."));
 				return;
 			}
 			try{
-				Process.Start(clearhouse.ClientProgram);
+				Process.Start(clearinghouseClin.ClientProgram);
 			}
 			catch{
 				MessageBox.Show(Lan.g("Eclaims","Client program could not be started.  It may already be running. You must open your client program to finish sending claims."));
@@ -168,9 +169,10 @@ namespace OpenDental.Eclaims
 		public static void GetMissingData(ClaimSendQueueItem queueItem){//, out string warnings){
 			queueItem.Warnings="";
 			queueItem.MissingData="";
-			Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum,true);//Suppress error message in case no default medical clearinghouse set.
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum,true);//Suppress error message in case no default medical clearinghouse set.
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			//this is usually just the default clearinghouse or the clearinghouse for the PayorID.
-			if(clearhouse==null){
+			if(clearinghouseClin==null){
 				if(queueItem.MedType==EnumClaimMedType.Dental) {
 					queueItem.MissingData+="No default dental clearinghouse set.";
 				}
@@ -200,25 +202,25 @@ namespace OpenDental.Eclaims
 				}
 			}
 			#endregion Data Sanity Checking (for Replication)
-			if(clearhouse.Eformat==ElectronicClaimFormat.x837D_4010){
-				X837_4010.Validate(queueItem);//,out warnings);
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_4010){
+				X837_4010.Validate(queueItem,FormOpenDental.ClinicNum);//,out warnings);
 				//return;
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.x837D_5010_dental
-				|| clearhouse.Eformat==ElectronicClaimFormat.x837_5010_med_inst)
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_5010_dental
+				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837_5010_med_inst)
 			{
-				X837_5010.Validate(queueItem);//,out warnings);
+				X837_5010.Validate(queueItem,FormOpenDental.ClinicNum);//,out warnings);
 				//return;
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.Renaissance){
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance){
 				queueItem.MissingData=Renaissance.GetMissingData(queueItem);
 				//return;
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.Canadian) {
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Canadian) {
 				queueItem.MissingData=Canadian.GetMissingData(queueItem);
 				//return;
 			}
-			else if(clearhouse.Eformat==ElectronicClaimFormat.Dutch) {
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Dutch) {
 				Dutch.GetMissingData(queueItem);//,out warnings);
 				//return;
 			}

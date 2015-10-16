@@ -10,6 +10,7 @@ using OpenDental.Eclaims;
 using OpenDentBusiness;
 using CodeBase;
 using System.Net;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>
@@ -136,7 +137,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormClaimReports_Load(object sender, System.EventArgs e) {
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			for(int i=0;i<arrayClearinghouses.Length;i++){
 				comboClearhouse.Items.Add(arrayClearinghouses[i].Description);
 				if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==arrayClearinghouses[i].ClearinghouseNum){
@@ -152,8 +153,8 @@ namespace OpenDental{
 			if(AutomaticMode) {
 				labelRetrieving.Visible=true;
 				Cursor=Cursors.WaitCursor;
-				Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-				string errorMessage=RetrieveAndImport(arrayClearinghouses[comboClearhouse.SelectedIndex],AutomaticMode);
+				Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
+				string errorMessage=RetrieveAndImport(arrayClearinghouses[comboClearhouse.SelectedIndex],AutomaticMode); //pass in the HQ clearinghouse.
 				if(errorMessage!="") {
 					MessageBox.Show(errorMessage);
 				}
@@ -167,18 +168,21 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a clearinghouse first.");
 				return;
 			}
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			if(!Directory.Exists(arrayClearinghouses[comboClearhouse.SelectedIndex].ResponsePath)) {
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
+			Clearinghouse selectedClearhouseHq=arrayClearinghouses[comboClearhouse.SelectedIndex];
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(selectedClearhouseHq,Clearinghouses.GetForClinic(selectedClearhouseHq,FormOpenDental.ClinicNum));
+
+			if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 				MsgBox.Show(this,"Clearinghouse does not have a valid Report Path set.");
 				return;
 			}
 			//For Tesia, user wouldn't normally manually retrieve.
-			if(arrayClearinghouses[comboClearhouse.SelectedIndex].ISA08=="113504607") {
+			if(selectedClearhouseHq.ISA08=="113504607") {
 				if((PrefC.RandomKeys && !PrefC.GetBool(PrefName.EasyNoClinics))//See FormClaimsSend_Load
-					|| PrefC.GetLong(PrefName.ClearinghouseDefaultDent)!=arrayClearinghouses[comboClearhouse.SelectedIndex].ClearinghouseNum) 
+					|| PrefC.GetLong(PrefName.ClearinghouseDefaultDent)!=selectedClearhouseHq.ClearinghouseNum) //default
 				{
 					//But they might need to in these situations.
-					string errorMessage=RetrieveAndImport(arrayClearinghouses[comboClearhouse.SelectedIndex],false);
+					string errorMessage=RetrieveAndImport(selectedClearhouseHq,false);
 					if(errorMessage=="") {
 						MsgBox.Show("FormClaimReports","Retrieval successful");
 					}
@@ -192,9 +196,9 @@ namespace OpenDental{
 				}
 				return;
 			}
-			if(arrayClearinghouses[comboClearhouse.SelectedIndex].CommBridge==EclaimsCommBridge.None
-				|| arrayClearinghouses[comboClearhouse.SelectedIndex].CommBridge==EclaimsCommBridge.Renaissance
-				|| arrayClearinghouses[comboClearhouse.SelectedIndex].CommBridge==EclaimsCommBridge.RECS) {
+			if(selectedClearhouseHq.CommBridge==EclaimsCommBridge.None
+				|| selectedClearhouseHq.CommBridge==EclaimsCommBridge.Renaissance
+				|| selectedClearhouseHq.CommBridge==EclaimsCommBridge.RECS) {
 				MsgBox.Show(this,"No built-in functionality for retrieving reports from this clearinghouse.");
 				return;
 			}
@@ -203,7 +207,7 @@ namespace OpenDental{
 			}
 			labelRetrieving.Visible=true;
 			Cursor=Cursors.WaitCursor;
-			string errorMesssage=RetrieveAndImport(arrayClearinghouses[comboClearhouse.SelectedIndex],false);
+			string errorMesssage=RetrieveAndImport(selectedClearhouseHq,false);
 			if(errorMesssage=="") {
 				MsgBox.Show("FormClaimReports","Retrieval successful");
 			}
@@ -215,28 +219,29 @@ namespace OpenDental{
 			MsgBox.Show(this,"Done");
 		}
 
-		private static string RetrieveReports(Clearinghouse clearhouse,bool isAutomaticMode) {
-			if(clearhouse.ISA08=="113504607") {//TesiaLink
+		private static string RetrieveReports(Clearinghouse clearinghouseHq,bool isAutomaticMode) { //uses Clinic-level clearinghouse where necessary. always sends clinic-level clearinghouses to files in the Eclaims folder.
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+			if(clearinghouseClin.ISA08=="113504607") {//TesiaLink
 				//But the import will still happen
 				return "";
 			}
-			if(clearhouse.CommBridge==EclaimsCommBridge.None
-				|| clearhouse.CommBridge==EclaimsCommBridge.Renaissance
-				|| clearhouse.CommBridge==EclaimsCommBridge.RECS)
+			if(clearinghouseHq.CommBridge==EclaimsCommBridge.None
+				|| clearinghouseHq.CommBridge==EclaimsCommBridge.Renaissance
+				|| clearinghouseHq.CommBridge==EclaimsCommBridge.RECS)
 			{
 				return "";
 			}
-			if(clearhouse.CommBridge==EclaimsCommBridge.WebMD){
-				if(!WebMD.Launch(clearhouse,0)){
+			if(clearinghouseHq.CommBridge==EclaimsCommBridge.WebMD){
+				if(!WebMD.Launch(clearinghouseClin,0)){
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+WebMD.ErrorMessage;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.BCBSGA){
-				if(!BCBSGA.Retrieve(clearhouse)){
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.BCBSGA){
+				if(!BCBSGA.Retrieve(clearinghouseClin)){
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+BCBSGA.ErrorMessage;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.ClaimConnect){
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.ClaimConnect){
 				if(isAutomaticMode){
 					return "";
 				}
@@ -248,7 +253,7 @@ namespace OpenDental{
 				}
 				return "";
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.AOS){
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.AOS){
 				try{
 					//his path would never exist on Unix, so no need to handle back slashes.
 					Process.Start(@"C:\Program files\AOS\AOSCommunicator\AOSCommunicator.exe");
@@ -257,18 +262,18 @@ namespace OpenDental{
 					return "Could not locate the file.";
 				}
 			} 
-			else if(clearhouse.CommBridge==EclaimsCommBridge.MercuryDE){
-				if(!MercuryDE.Launch(clearhouse,0)) {
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.MercuryDE){
+				if(!MercuryDE.Launch(clearinghouseClin,0)) {
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+MercuryDE.ErrorMessage;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.EmdeonMedical) {
-				if(!EmdeonMedical.Retrieve(clearhouse)) {
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.EmdeonMedical) {
+				if(!EmdeonMedical.Retrieve(clearinghouseClin)) {
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+EmdeonMedical.ErrorMessage;
 				}
 			}
-			else if(clearhouse.CommBridge==EclaimsCommBridge.DentiCal) {
-				if(!DentiCal.Launch(clearhouse,0)) {
+			else if(clearinghouseHq.CommBridge==EclaimsCommBridge.DentiCal) {
+				if(!DentiCal.Launch(clearinghouseClin,0)) {
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+DentiCal.ErrorMessage;
 				}
 			}
@@ -277,23 +282,24 @@ namespace OpenDental{
 
 		///<summary>Takes any files found in the reports folder for the clearinghouse, and imports them into the database.  Deletes the original files.
 		///No longer any such thing as archive.</summary>
-		private static void ImportReportFiles(Clearinghouse clearhouse) {
-			if(!Directory.Exists(clearhouse.ResponsePath)) {
+		private static void ImportReportFiles(Clearinghouse clearinghouseHq) { //uses clinic-level clearinghouse where necessary.
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+			if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 				return;
 			}
-			if(clearhouse.Eformat==ElectronicClaimFormat.Canadian) {
+			if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian) {
 				//the report path is shared with many other important files.  Do not process anything.  Comm is synchronous only.
 				return;
 			}
-			string[] files=Directory.GetFiles(clearhouse.ResponsePath);
-			string archiveDir=ODFileUtils.CombinePaths(clearhouse.ResponsePath,"Archive");
+			string[] files=Directory.GetFiles(clearinghouseClin.ResponsePath);
+			string archiveDir=ODFileUtils.CombinePaths(clearinghouseClin.ResponsePath,"Archive");
 			if(!Directory.Exists(archiveDir)){
 				Directory.CreateDirectory(archiveDir);
 			}
 			for(int i=0;i<files.Length;i++) {
 				Etranss.ProcessIncomingReport(
 					File.GetCreationTime(files[i]),
-					clearhouse.ClearinghouseNum,
+					clearinghouseHq.ClearinghouseNum,
 					File.ReadAllText(files[i]));
 				try{
 					File.Copy(files[i],ODFileUtils.CombinePaths(archiveDir,Path.GetFileName(files[i])));
@@ -304,12 +310,12 @@ namespace OpenDental{
 		}
 
 		///<summary></summary>
-		public static string RetrieveAndImport(Clearinghouse clearhouse,bool isAutomaticMode) {
-			string errorMessage=RetrieveReports(clearhouse,isAutomaticMode);
+		public static string RetrieveAndImport(Clearinghouse clearinghouseHq,bool isAutomaticMode) { //HQ clearinghouse
+			string errorMessage=RetrieveReports(clearinghouseHq,isAutomaticMode);
 			if(errorMessage!="") {
 				return errorMessage;
 			}
-			ImportReportFiles(clearhouse);
+			ImportReportFiles(clearinghouseHq);
 			return "";
 		}
 

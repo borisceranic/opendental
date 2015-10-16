@@ -5639,8 +5639,8 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(listQueue[0].ClearinghouseNum);
-			if(clearhouse.Eformat==ElectronicClaimFormat.Canadian) {
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
+			if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian) {
 				try {
 					Eclaims.Canadian.SendClaim(listQueue[0],true);//Ignore the etransNum result. Physically print the form.
 				}
@@ -5667,7 +5667,7 @@ namespace OpenDental{
 				List<ClaimSendQueueItem> queueItems=new List<ClaimSendQueueItem>();
 				queueItems.Add(listQueue[0]);
 				EnumClaimMedType medType=listQueue[0].MedType;
-				Eclaims.Eclaims.SendBatch(queueItems,clearhouse,medType);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
+				Eclaims.Eclaims.SendBatch(queueItems,clearinghouseHq,medType);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
 			}
 			Cursor=Cursors.Default;
 			DialogResult=DialogResult.OK;

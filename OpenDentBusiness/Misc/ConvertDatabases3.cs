@@ -10711,6 +10711,38 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE procedurecode MODIFY IsRadiology NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clearinghouse ADD ClinicNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clearinghouse ADD INDEX (ClinicNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clearinghouse ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE clearinghouse SET ClinicNum = 0 WHERE ClinicNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clearinghouse MODIFY ClinicNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX clearinghouse_ClinicNum ON clearinghouse (ClinicNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clearinghouse ADD HqClearinghouseNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clearinghouse ADD INDEX (HqClearinghouseNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clearinghouse ADD HqClearinghouseNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE clearinghouse SET HqClearinghouseNum = 0 WHERE HqClearinghouseNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clearinghouse MODIFY HqClearinghouseNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX clearinghouse_HqClearinghouseN ON clearinghouse (HqClearinghouseNum)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

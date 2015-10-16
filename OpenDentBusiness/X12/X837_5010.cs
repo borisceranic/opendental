@@ -23,47 +23,47 @@ namespace OpenDentBusiness
 		
 		}
 		
-		public static void GenerateMessageText(StreamWriter sw,Clearinghouse clearhouse,int batchNum,List<ClaimSendQueueItem> listQueueItems,EnumClaimMedType medType) {
-			if(clearhouse.SeparatorData=="") {
+		public static void GenerateMessageText(StreamWriter sw,Clearinghouse clearinghouseClin,int batchNum,List<ClaimSendQueueItem> listQueueItems,EnumClaimMedType medType) {
+			if(clearinghouseClin.SeparatorData=="") {
 				s="*";
 			}
 			else {
-				s=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearhouse.SeparatorData,16) })[0]; //Validated to be a 2 digit hexadecimal number in UI.
+				s=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearinghouseClin.SeparatorData,16) })[0]; //Validated to be a 2 digit hexadecimal number in UI.
 			}
-			if(clearhouse.ISA16=="") {
+			if(clearinghouseClin.ISA16=="") {
 				isa16=":";
 			}
 			else {
-				isa16=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearhouse.ISA16,16) })[0]; //Validated to be a 2 digit hexadecimal number in UI.
+				isa16=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearinghouseClin.ISA16,16) })[0]; //Validated to be a 2 digit hexadecimal number in UI.
 			}
-			if(clearhouse.SeparatorSegment=="") {
+			if(clearinghouseClin.SeparatorSegment=="") {
 				endSegment="~"+Environment.NewLine;
 			}
 			else {
-				endSegment=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearhouse.SeparatorSegment,16) })[0]+Environment.NewLine; //Validated to be a 2 digit hexadecimal number in UI.
+				endSegment=""+Encoding.ASCII.GetChars(new byte[] { Convert.ToByte(clearinghouseClin.SeparatorSegment,16) })[0]+Environment.NewLine; //Validated to be a 2 digit hexadecimal number in UI.
 			}
 			//Interchange Control Header (Interchange number tracked separately from transactionNum)
 			//We set it to between 1 and 999 for simplicity
 			sw.Write("ISA"+s
 				+"00"+s//ISA01 2/2 Authorization Information Qualifier: 00=No Authorization Information Present (No meaningful information in ISA02).
-				+Sout(clearhouse.ISA02,10,10)+s//ISA02 10/10 Authorization Information: Blank
+				+Sout(clearinghouseClin.ISA02,10,10)+s//ISA02 10/10 Authorization Information: Blank
 				+"00"+s//ISA03 2/2 Security Information Qualifier: 00=No Security Information Present (No meaningful information in ISA04).
-				+Sout(clearhouse.ISA04,10,10)+s//ISA04 10/10 Security Information: Blank
-				+clearhouse.ISA05+s//ISA05 2/2 Interchange ID Qualifier: ZZ=mutually defined. 30=TIN. Validated
-				+X12Generator.GetISA06(clearhouse)+s//ISA06 15/15 Interchange Sender ID: Sender ID(TIN) Or might be TIN of Open Dental.
-				+clearhouse.ISA07+s//ISA07 2/2 Interchange ID Qualifier: ZZ=mutually defined. 30=TIN. Validated
-				+Sout(clearhouse.ISA08,15,15)+s//ISA08 15/15 Interchange Receiver ID: Validated to make sure length is at least 2.
+				+Sout(clearinghouseClin.ISA04,10,10)+s//ISA04 10/10 Security Information: Blank
+				+clearinghouseClin.ISA05+s//ISA05 2/2 Interchange ID Qualifier: ZZ=mutually defined. 30=TIN. Validated
+				+X12Generator.GetISA06(clearinghouseClin)+s//ISA06 15/15 Interchange Sender ID: Sender ID(TIN) Or might be TIN of Open Dental.
+				+clearinghouseClin.ISA07+s//ISA07 2/2 Interchange ID Qualifier: ZZ=mutually defined. 30=TIN. Validated
+				+Sout(clearinghouseClin.ISA08,15,15)+s//ISA08 15/15 Interchange Receiver ID: Validated to make sure length is at least 2.
 				+DateTime.Today.ToString("yyMMdd")+s//ISA09 6/6 Interchange Date: today's date.
 				+DateTime.Now.ToString("HHmm")+s//ISA10 4/4 Interchange Time: current time
 				+"^"+s//ISA11 1/1 Repetition Separator:
 				+"00501"+s//ISA12 5/5 Interchange Control Version Number:
 				+batchNum.ToString().PadLeft(9,'0')+s//ISA13 9/9 Interchange Control Number:
 				+"0"+s//ISA14 1/1 Acknowledgement Requested: 0=No Interchange Acknowledgment Requested.
-				+clearhouse.ISA15+s//ISA15 1/1 Interchange Usage Indicator: T=Test, P=Production. Validated.
+				+clearinghouseClin.ISA15+s//ISA15 1/1 Interchange Usage Indicator: T=Test, P=Production. Validated.
 				+isa16//ISA16 1/1 Component Element Separator:
 				+endSegment);
 			//Just one functional group.
-			WriteFunctionalGroup(sw,listQueueItems,batchNum,clearhouse,medType);
+			WriteFunctionalGroup(sw,listQueueItems,batchNum,clearinghouseClin,medType);
 			//Interchange Control Trailer
 			sw.Write("IEA"+s
 				+"1"+s//IEA01 1/5 Number of Included Functional Groups:
@@ -71,7 +71,9 @@ namespace OpenDentBusiness
 				+endSegment);
 		}
 
-		private static void WriteFunctionalGroup(StreamWriter sw,List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearhouse,EnumClaimMedType medType) {
+		private static void WriteFunctionalGroup(StreamWriter sw,List<ClaimSendQueueItem> queueItems,int batchNum,
+			Clearinghouse clearinghouseClin,EnumClaimMedType medType)
+		{
 			#region Functional Group Header
 			int transactionNum=1;//Gets incremented for each carrier. Can be reused in other functional groups and interchanges, so not persisted
 			//Functional Group Header
@@ -88,8 +90,8 @@ namespace OpenDentBusiness
 			}
 			sw.Write("GS"+s
 				+"HC"+s//GS01 2/2 Functional Identifier Code: Health Care Claim.
-				+X12Generator.GetGS02(clearhouse)+s//GS02 2/15 Application Sender's Code: Sometimes Jordan Sparks.  Sometimes the sending clinic.
-				+Sout(clearhouse.GS03,15,2)+s//GS03 2/15 Application Receiver's Code:
+				+X12Generator.GetGS02(clearinghouseClin)+s//GS02 2/15 Application Sender's Code: Sometimes Jordan Sparks.  Sometimes the sending clinic.
+				+Sout(clearinghouseClin.GS03,15,2)+s//GS03 2/15 Application Receiver's Code:
 				+DateTime.Today.ToString("yyyyMMdd")+s//GS04 8/8 Date: today's date.
 				+DateTime.Now.ToString("HHmm")+s//GS05 4/8 TIME: current time.
 				+groupControlNumber+s//GS06 1/9 Group Control Number: No padding necessary.
@@ -154,38 +156,38 @@ namespace OpenDentBusiness
 			//(depends on clearinghouse and Partnership agreements)
 			//See 2010AA PER (after REF) for the new billing provider contact phone number
 			//1000A NM1: 41 (medical,institutional,dental) Submitter Name.
-			Write1000A_NM1(sw,clearhouse);
+			Write1000A_NM1(sw,clearinghouseClin);
 			//1000A PER: IC (medical,institutional,dental) Submitter EDI Contact Information. Contact number.
-			Write1000A_PER(sw,clearhouse);
+			Write1000A_PER(sw,clearinghouseClin);
 			//1000B NM1: 40 (medical,institutional,dental) Receiver Name. Always the Clearinghouse.
 			sw.Write("NM1"+s
 				+"40"+s//NM101 2/3 Entity Identifier Code: 40=Receiver.
 				+"2"+s);//NM102 1/1 Entity Type Qualifier: 2=Non-Person Entity.
-			if(IsClaimConnect(clearhouse)) {
+			if(IsClaimConnect(clearinghouseClin)) {
 				sw.Write("CLAIMCONNECT"+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
-			else if(IsDentiCal(clearhouse)) {
+			else if(IsDentiCal(clearinghouseClin)) {
 				sw.Write("DENTICAL"+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
-			else if(IsETACTICS(clearhouse)) {
+			else if(IsETACTICS(clearinghouseClin)) {
 				sw.Write("ETACTICSINC"+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
 			else {
-				sw.Write(Sout(clearhouse.Description,60)+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
+				sw.Write(Sout(clearinghouseClin.Description,60)+s);//NM103 1/60 Name Last or Organization Name: Receiver Name.
 			}
 			sw.Write(s//NM104 1/35 Name First: Not Used.
 				+s//NM105 1/25 Name Middle: Not Used.
 				+s//NM106 1/10 Name Prefix: Not Used.
 				+s//NM107 1/10 Name Suffix: Not Used.
 				+"46"+s);//NM108 1/2 Identification Code Qualifier: 46=Electronic Transmitter Identification Number (ETIN).
-			if(IsDentiCal(clearhouse)) {
+			if(IsDentiCal(clearinghouseClin)) {
 				sw.Write("1941461312");//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
 			}
-			else if(IsETACTICS(clearhouse)) {
+			else if(IsETACTICS(clearinghouseClin)) {
 				sw.Write("ETACTICSINC");//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
 			}
 			else {
-				sw.Write(Sout(clearhouse.ISA08,80,2));//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
+				sw.Write(Sout(clearinghouseClin.ISA08,80,2));//NM109 2/80 Identification Code: Receiver ID Code. aka ETIN#.
 			}
 			EndSegment(sw);//NM110 through NM112 are not used.
 			HLcount=1;
@@ -235,7 +237,7 @@ namespace OpenDentBusiness
 				if(claim.ProvBill==claim.ProvTreat) {
 					usePrvBilling=true;
 				}
-				if(IsPassportHealthMedicaid(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
+				if(IsPassportHealthMedicaid(clearinghouseClin) || IsWashingtonMedicaid(clearinghouseClin,carrier)) {
 					usePrvBilling=true;
 				}
 				if(usePrvBilling) {
@@ -314,7 +316,7 @@ namespace OpenDentBusiness
 				if(medType==EnumClaimMedType.Dental) {
 					//2010AA REF: (dental) State License Number: Required by RECS and Emdeon clearinghouses. We do NOT validate that it's entered because sending it with non-persons causes problems.
 					//if(IsEmdeonDental(clearhouse) || clearhouse.CommBridge==EclaimsCommBridge.RECS) {
-					if(!IsDentiCal(clearhouse)) { //Denti-Cal never wants this.
+					if(!IsDentiCal(clearinghouseClin)) { //Denti-Cal never wants this.
 						if(billProv.StateLicense!="") {
 							sw.Write("REF"+s
 								+"0B"+s//REF01 2/3 Reference Identification Qualifier: 0B=State License Number.
@@ -323,7 +325,7 @@ namespace OpenDentBusiness
 						}
 					}
 					//2010AA REF G5 (dental) Site Identification Number: NOT IN X12 5010 STANDARD DOCUMENTATION. Only required by Emdeon.
-					if(IsEmdeonDental(clearhouse)) {
+					if(IsEmdeonDental(clearinghouseClin)) {
 						Write2010AASiteIDforEmdeon(sw,billProv,carrier.ElectID);
 					}
 				}
@@ -492,7 +494,7 @@ namespace OpenDentBusiness
 				//Apex, ClaimConnect, EmdeonMed, EmdeonDent, LindsayTechnicalConsultants, OfficeAlly: Always include.
 				//PostNTrack, BCBSIdaho: Only include when subscriber=patient.
 				bool subscIncludeAddressAndGender=false;
-				if(IsApex(clearhouse) || IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse) || IsEmdeonMedical(clearhouse) || IsLindsayTechnicalConsultants(clearhouse) || IsOfficeAlly(clearhouse)) {
+				if(IsApex(clearinghouseClin) || IsClaimConnect(clearinghouseClin) || IsEmdeonDental(clearinghouseClin) || IsEmdeonMedical(clearinghouseClin) || IsLindsayTechnicalConsultants(clearinghouseClin) || IsOfficeAlly(clearinghouseClin)) {
 					subscIncludeAddressAndGender=true;
 				}
 				else {//X12 standard behavior for everyone else, including: BCBSIdaho, ColoradoMedicaid, Denti-Cal, PostNTrack, WashingtonMedicaid.
@@ -530,11 +532,11 @@ namespace OpenDentBusiness
 					+"PR"+s//NM101 2/3 Entity Identifier Code: PR=Payer.
 					+"2"+s);//NM102 1/1 Entity Type Qualifier: 2=Non-Person Entity.
 				//NM103 1/60 Name Last or Organization Name:
-				if(IsEMS(clearhouse)) {
+				if(IsEMS(clearinghouseClin)) {
 					//This is a special situation requested by EMS.  This tacks the employer onto the end of the carrier.
 					sw.Write(Sout(carrier.CarrierName,30)+"|"+Sout(Employers.GetName(insPlan.EmployerNum),30)+s);
 				}
-				else if(IsDentiCal(clearhouse)) {
+				else if(IsDentiCal(clearinghouseClin)) {
 					sw.Write("DENTICAL"+s);
 				}
 				else {
@@ -545,7 +547,7 @@ namespace OpenDentBusiness
 					+s//NM106 1/10 Name Prefix: Not used.
 					+s//NM107 1/10 Name Suffix: Not used.
 					+"PI"+s);//NM108 1/2 Identification Code Qualifier: PI=Payor Identification.
-				sw.Write(Sout(GetCarrierElectID(carrier,clearhouse),80,2));//NM109 2/80 Identification Code: PayorID.
+				sw.Write(Sout(GetCarrierElectID(carrier,clearinghouseClin),80,2));//NM109 2/80 Identification Code: PayorID.
 				EndSegment(sw);//NM110 through NM112 Not Used.
 				//2010BB N3: (medical,institutional,dental) Payer Address.
 				sw.Write("N3"+s+Sout(carrier.Address,55));//N301 1/55 Address Information:
@@ -561,7 +563,7 @@ namespace OpenDentBusiness
 				EndSegment(sw);//N404 through N407 are either not used or are for addresses outside of the United States.
 				//2010BB REF 2U,EI,FY,NF (dental) Payer Secondary Identificaiton. Situational.
 				//2010BB REF G2,LU Billing Provider Secondary Identification. Situational. Not required because we always send NPI.
-				if(!IsDentiCal(clearhouse)){//DentiCal complained that they don't usually want this (except for non-subparted NPIs, which we don't handle).  So far, nobody else has complained.
+				if(!IsDentiCal(clearinghouseClin)){//DentiCal complained that they don't usually want this (except for non-subparted NPIs, which we don't handle).  So far, nobody else has complained.
 					//Always required by Emdeon Dental.
 					WriteProv_REFG2orLU(sw,billProv,carrier.ElectID);
 				}
@@ -577,7 +579,7 @@ namespace OpenDentBusiness
 						+"0");//HL04 1/1 Hierarchical Child Code: 0=No subordinate HL segment in this hierarchical structure.
 					EndSegment(sw);
 					//2000C PAT: (medical,institutional,dental) Patient Information.
-					if(IsEmdeonDental(clearhouse)) {
+					if(IsEmdeonDental(clearinghouseClin)) {
 						sw.Write("PAT"+s
 							+GetRelat(claim.PatRelat)+s//PAT01 2/2 Individual Relationship Code:
 							+s//PAT02 1/1 Patient Location Code: Not used.
@@ -629,10 +631,10 @@ namespace OpenDentBusiness
 				#region Claim CLM
 				//2300 CLM: (medical,institutional,dental) Claim Information.
 				string clm01=claim.ClaimIdentifier;//Typically PatNum/ClaimNum. Check for uniqueness is performed in UI.
-				if(IsDentiCal(clearhouse)) {
+				if(IsDentiCal(clearinghouseClin)) {
 					clm01=Sout(clm01,17);//Denti-Cal has a maximum of 17 chars here. This field is what Denti-Cal refers to as the PDCN.
 				}
-				else if(IsEmdeonMedical(clearhouse)) {
+				else if(IsEmdeonMedical(clearinghouseClin)) {
 					clm01=clm01.Replace('/','-');//Emdeon Medical only allows letters, numbers, dashes, periods, spaces and asterisks. The claim identifier will contain / inside the claim edit window still.
 				}
 				string claimFrequencyTypeCode="1";
@@ -868,7 +870,7 @@ namespace OpenDentBusiness
 					pwk01="DA";//Dental Models
 				}
 				string pwk02="  ";
-				if(IsDentiCal(clearhouse)) {
+				if(IsDentiCal(clearinghouseClin)) {
 					pwk02="FT";//"File Transfer". Might be electronic or mail, but Denti-Cal requires a value of FT here.
 				}
 				else {
@@ -899,7 +901,7 @@ namespace OpenDentBusiness
 				//2300 AMT: (institutional) Patient Estimated Amount Due.
 				//2300 AMT: (medical,dental) Patient Amount Paid.  Sum of all amounts paid specifically to this claim by the patient or family Situational.
 				if(medType==EnumClaimMedType.Medical || medType==EnumClaimMedType.Dental) {
-					if(IsDentiCal(clearhouse)) {
+					if(IsDentiCal(clearinghouseClin)) {
 						sw.Write("AMT"+s
 						  +"F5"+s//AMT01 1/3 Amount Qualifier Code: F5=Patient Paid Amount.
 						  +"0");//AMT02 1/18 Monetary Amount: We don't track this information very well so we always put zero.
@@ -951,7 +953,7 @@ namespace OpenDentBusiness
 				//2300 REF: 9A (medical,institutional,dental) Repriced Claim Number. Situational. We do not use. 
 				//2300 REF: 9C (medical,institutional,dental) Adjusted Repriced Claim Number. Situational. We do not use.
 				//2300 REF: D9 (medical,institutional,dental) Claim Identifier For Transmission Intermediaries. Situational.
-				if(IsClaimConnect(clearhouse)) { //Since this information has only been requested by ClaimConnect and is optional in the specification, we should only add specific clearinghouses here when requested.
+				if(IsClaimConnect(clearinghouseClin)) { //Since this information has only been requested by ClaimConnect and is optional in the specification, we should only add specific clearinghouses here when requested.
 					sw.Write("REF"+s
 						+"D9"+s//REF01 2/3 Reference Identification Qualifier: D9=Claim Number.
 						+Sout(claim.ClaimIdentifier,20));//REF02 1/50 Reference Identification: Value Added Network Trace Number. From specification, maximum of 20 characters even though there is space for 50.
@@ -972,7 +974,7 @@ namespace OpenDentBusiness
 				if(claim.AttachmentID!="" && !claim.ClaimNote.StartsWith(claim.AttachmentID)) {
 					//The AttachmentID is sent in the PWK segment.  There is no longer a need to send this information in the NTE segment anymore.
 					//Denti-Cal has asked us to remove the AttachmentID from the NTE segment, since the segment is very short.
-					if(!IsDentiCal(clearhouse)) {
+					if(!IsDentiCal(clearinghouseClin)) {
 						note=claim.AttachmentID+" ";
 					}
 				}
@@ -1063,7 +1065,7 @@ namespace OpenDentBusiness
 				}
 				else if(medType==EnumClaimMedType.Dental) {
 					if(claim.PlaceService!=PlaceOfService.Office) {
-						if(IsClaimConnect(clearhouse) || IsDentiCal(clearhouse)) {
+						if(IsClaimConnect(clearinghouseClin) || IsDentiCal(clearinghouseClin)) {
 							//Osvaldo Ferrer, VIP account manager for DentalXChange, says we need the segment whenever the place of service is not office.
 							//Denti-Cal now requires the ability to send facility information, as of the last round of testing for a customer on 05/11/2015.
 							sendFacilityNameAndAddress=true;
@@ -1200,7 +1202,7 @@ namespace OpenDentBusiness
 						sendClaimTreatProv=true;//Standard X12 behavior to only include the treating provider if it is different than the billing provider.
 					}
 					//The following clearinghouses always want the claim treating provider, even if it is the same as the billing provider.
-					if(IsOfficeAlly(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
+					if(IsOfficeAlly(clearinghouseClin) || IsWashingtonMedicaid(clearinghouseClin,carrier)) {
 						sendClaimTreatProv=true;
 					}
 					if(sendClaimTreatProv) {
@@ -1209,7 +1211,7 @@ namespace OpenDentBusiness
 						//2310B PRV: PE (dental) Rendering Provider Specialty Information.
 						WritePRV_PE(sw,provTreat);
 						//2310B REF: (dental) Rendering Provider Secondary Identification. Situational. Not required because we always send NPI. Max repeat of 4.
-						if(IsClaimConnect(clearhouse) || IsEmdeonDental(clearhouse) || IsTesia(clearhouse)) {
+						if(IsClaimConnect(clearinghouseClin) || IsEmdeonDental(clearinghouseClin) || IsTesia(clearinghouseClin)) {
 							//The state licence number can be anywhere between 4 and 14 characters depending on state, and most states have more than one state license format. 
 							//Therefore, we only validate that the state license is present or not.
 							if(provTreat.StateLicense!="") { 
@@ -1219,7 +1221,7 @@ namespace OpenDentBusiness
 								EndSegment(sw);//REF03 and REF04 are not used.
 							}
 						}
-						if(IsEmdeonDental(clearhouse)) { //Always required by Emdeon Dental.
+						if(IsEmdeonDental(clearinghouseClin)) { //Always required by Emdeon Dental.
 							WriteProv_REFG2orLU(sw,provTreat,carrier.ElectID);
 						}
 					}
@@ -1349,7 +1351,7 @@ namespace OpenDentBusiness
 						EndSegment(sw);//AMT03 Not used.
 						//2320 AMT: A8 (medical,institutional,dental) COB Total Non-Covered Amount. Situational. Can be set when primary claim was not adjudicated. We do not use.
 					}
-					if(IsClaimConnect(clearhouse)) {
+					if(IsClaimConnect(clearinghouseClin)) {
 						//2320 DMG: Other subscriber demographics. This segment is not allowed in X12. ClaimConnect requires this information anyway. They will fix their validator later.
 						sw.Write("DMG"+s
 							+"D8"+s//DMG01 2/3 Date Time Period Format Qualifier: D8=Date Expressed in Format CCYYMMDD.
@@ -1402,7 +1404,7 @@ namespace OpenDentBusiness
 						+"PR"+s//NM101 2/3 Entity Code Identifier: PR=Payer.
 						+"2"+s);//NM102 1/1 Entity Type Qualifier: 2=Non-Person.
 					//NM103 1/60 Name Last or Organization Name:
-					if(IsEMS(clearhouse)) {
+					if(IsEMS(clearinghouseClin)) {
 						long employerNum=0;
 						if(otherPlan!=null) {
 							employerNum=otherPlan.EmployerNum;
@@ -1410,7 +1412,7 @@ namespace OpenDentBusiness
 						//This is a special situation requested by EMS.  This tacks the employer onto the end of the carrier.
 						sw.Write(Sout(otherCarrier.CarrierName,30)+"|"+Sout(Employers.GetName(employerNum),30)+s);
 					}
-					else if(IsDentiCal(clearhouse)) {
+					else if(IsDentiCal(clearinghouseClin)) {
 						sw.Write("DENTICAL"+s);
 					}
 					else {
@@ -1421,7 +1423,7 @@ namespace OpenDentBusiness
 						+s//NM106 1/10 Name Prefix: Not used.
 						+s//NM107 1/10 Name Suffix: Not used.
 						+"PI"+s);//NM108 1/2 Identification Code Qualifier: PI=Payor Identification. XV must be used after national plan ID mandated.
-					sw.Write(Sout(GetCarrierElectID(otherCarrier,clearhouse),80,2));//NM109 2/80 Identification Code:
+					sw.Write(Sout(GetCarrierElectID(otherCarrier,clearinghouseClin),80,2));//NM109 2/80 Identification Code:
 					EndSegment(sw);//NM110 through NM112 not used.
 					//2230B N3: (medical,institutional,dental) Other Payer Address. Situational. We don't support.
 					//2330B N4: (medical,institutional,dental) Other Payer City, State, Zip Code. Situational. We don't support.
@@ -1622,7 +1624,7 @@ namespace OpenDentBusiness
 							includeUnits=true;
 						}
 						//The following carriers always want to see the unit quantity, even if it is only 1.
-						if(IsColoradoMedicaid(clearhouse) || IsWashingtonMedicaid(clearhouse,carrier)) {
+						if(IsColoradoMedicaid(clearinghouseClin) || IsWashingtonMedicaid(clearinghouseClin,carrier)) {
 							includeUnits=true;
 						}
 						bool isDiagnosisIncluded=false;
@@ -1724,7 +1726,7 @@ namespace OpenDentBusiness
 							}
 						}
 						//The following clearinghouses always want this segment no matter what: Apex, Inmediata.
-						if(IsApex(clearhouse) || IsInmediata(clearhouse)) {
+						if(IsApex(clearinghouseClin) || IsInmediata(clearinghouseClin)) {
 							useProcDateService=true;
 						}
 						if(useProcDateService) {
@@ -1926,7 +1928,7 @@ namespace OpenDentBusiness
 								+X12Generator.GetTaxonomy(provTreatProc));//PRV03 1/50 Reference Identification: Taxonomy Code.
 							EndSegment(sw);//PRV04 through PRV06 not used.
 							//2420A REF: (dental) Rendering Provider Secondary Identification. Never required because we always send NPI (validated).
-							if(!IsDentiCal(clearhouse)) { //Denti-Cal never wants this.
+							if(!IsDentiCal(clearinghouseClin)) { //Denti-Cal never wants this.
 								if(provTreatProc.StateLicense!="") {
 									sw.Write("REF"+s
 										+"0B"+s//REF01 2/3 Reference Identification Qualifier: 0B=State License Number.
@@ -1950,7 +1952,7 @@ namespace OpenDentBusiness
 					//2430 CAS: (medical,institutional,dental) Line Adjustment. Situational. Required when the payer identified in Loop 2330B made line level adjustments which caused the amount paid to differ from the amount originally charged.
 					//These CAS segments at the procedure level should add up to their respective claim level 2320 CAS segments.
 					//Claim Adjustment Reason Codes can be found on the Washington Publishing Company website at: http://www.wpc-edi.com/reference/codelists/healthcare/claim-adjustment-reason-codes/
-					if(hasAdjForOtherPlans && IsApex(clearhouse)) {//This section of code might work for other clearinghouses, but has not yet been tested, and nobody else has requested this information yet.
+					if(hasAdjForOtherPlans && IsApex(clearinghouseClin)) {//This section of code might work for other clearinghouses, but has not yet been tested, and nobody else has requested this information yet.
 						double procPatientPortionAmt=Math.Max(0,claimProcs[j].FeeBilled-listProcWriteoffAmts[j]-listProcDeductibleAmts[j]-listProcPaidOtherInsAmts[j]);
 						if(listProcWriteoffAmts[j]>0) {
 							sw.Write("CAS"+s
@@ -1995,75 +1997,88 @@ namespace OpenDentBusiness
 			#endregion Trailers
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsApex(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="99999");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsClaimConnect(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="330989922");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsColoradoMedicaid(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="100000" && clearinghouse.GS03=="77016");
 		}
 
-		///<summary>DentiCal is a carrier.</summary>
+		///<summary>DentiCal is a carrier.  Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsDentiCal(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="DENTICAL");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsEmdeonDental(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="0135WCH00");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsEmdeonMedical(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="133052274");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsEMS(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="EMS");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsETACTICS(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="ETACTICSINC");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsInmediata(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="660610220");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsLindsayTechnicalConsultants(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="LTC");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsOfficeAlly(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="330897513");
 		}
 
-		///<summary>Contact information for this carrier is: (800)578-0775, P.O. BOX 7114 London Kentucky 40742-7114.</summary>
+		///<summary>Contact information for this carrier is: (800)578-0775, P.O. BOX 7114 London Kentucky 40742-7114.
+		///Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsPassportHealthMedicaid(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="61129");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsTesia(Clearinghouse clearinghouse) {
 			return (clearinghouse.ISA08=="113504607");
 		}
 
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
 		private static bool IsWashingtonMedicaid(Clearinghouse clearinghouse,Carrier carrier) {
 			return ((clearinghouse.ISA08=="77045" && clearinghouse.ISA02=="00") || carrier.ElectID=="CKWA1" || carrier.ElectID=="77045");
 		}
 
 		///<summary>Sometimes writes the name information for Open Dental. Sometimes it writes practice info.</summary>
-		private static void Write1000A_NM1(StreamWriter sw,Clearinghouse clearhouse) {
+		private static void Write1000A_NM1(StreamWriter sw,Clearinghouse clearinghouseClin) {
 			string name="OPEN DENTAL SOFTWARE";
 			string idCode="810624427";
-			if(IsEmdeonMedical(clearhouse)) {
+			if(IsEmdeonMedical(clearinghouseClin)) {
 				name="Open Dental Software Inc.";
 				idCode="204944520";
 			}
-			if(clearhouse.SenderTIN!="") {
-				name=clearhouse.SenderName;
-				idCode=clearhouse.SenderTIN;
+			if(clearinghouseClin.SenderTIN!="") {
+				name=clearinghouseClin.SenderName;
+				idCode=clearinghouseClin.SenderTIN;
 			}
 			sw.Write("NM1"+s
 				+"41"+s//NM101 2/3 Entity Indentifier Code: 41=submitter
@@ -2079,21 +2094,21 @@ namespace OpenDentBusiness
 		}
 
 		///<summary>Usually writes the contact information for Open Dental. But for inmediata and AOS clearinghouses, it writes practice contact info.</summary>
-		private static void Write1000A_PER(StreamWriter sw,Clearinghouse clearhouse) {
+		private static void Write1000A_PER(StreamWriter sw,Clearinghouse clearinghouseClin) {
 			string name="OPEN DENTAL SOFTWARE";
 			string phone="8776861248";
-			if(IsEmdeonMedical(clearhouse)) {
+			if(IsEmdeonMedical(clearinghouseClin)) {
 				name="Open Dental Software Inc.";
 				phone="8662390469";
 			}
-			if(clearhouse.SenderTIN!="") {
-				name=clearhouse.SenderName;
-				phone=clearhouse.SenderTelephone;
+			if(clearinghouseClin.SenderTIN!="") {
+				name=clearinghouseClin.SenderName;
+				phone=clearinghouseClin.SenderTelephone;
 			}
 			sw.Write("PER"+s
 				+"IC"+s);//PER01 2/2 Contact Function Code: IC=Information Contact.
 			//The following clearinghouses always want PER02, even though the X12 speficiation says not to send if same as NM103 of loop 1000A. They don't seem to care if the value is the same as NM103.
-			if(IsClaimConnect(clearhouse) || IsEmdeonMedical(clearhouse)) {
+			if(IsClaimConnect(clearinghouseClin) || IsEmdeonMedical(clearinghouseClin)) {
 				sw.Write(Sout(name,60)+s);//PER02 1/60 Name: Situational.
 			}
 			else {
@@ -2200,12 +2215,13 @@ namespace OpenDentBusiness
 			seg++;
 		}
 
-		private static string GetCarrierElectID(Carrier carrier,Clearinghouse clearhouse) {
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
+		private static string GetCarrierElectID(Carrier carrier,Clearinghouse clearinghouse) {
 			string electid=carrier.ElectID;
-			if(electid=="" && IsApex(clearhouse)) {//only for Apex
+			if(electid=="" && IsApex(clearinghouse)) {//only for Apex
 				return "PAPRM";//paper claims
 			}
-			if(electid=="" && IsTesia(clearhouse)) {//only for Tesia
+			if(electid=="" && IsTesia(clearinghouse)) {//only for Tesia
 				return "00000";//paper claims
 			}
 			if(electid.Length<3) {
@@ -2494,25 +2510,28 @@ namespace OpenDentBusiness
 			return Sout(str,-1,-1);
 		}
 
-		///<summary>Returns a string describing all missing data on this claim.  Claim will not be allowed to be sent electronically unless this string comes back empty.  There is also an out parameter containing any warnings.  Warnings will not block sending.</summary>
-		public static void Validate(ClaimSendQueueItem queueItem){//,out string warning) {
+		///<summary>Returns a string describing all missing data on this claim.
+		///Claim will not be allowed to be sent electronically unless this string comes back empty.
+		///There is also an out parameter containing any warnings.  Warnings will not block sending.  clinicNum can be zero for HQ.</summary>
+		public static void Validate(ClaimSendQueueItem queueItem,long clinicNum){//,out string warning) {
 			StringBuilder strb=new StringBuilder();
 			string warning="";
-			Clearinghouse clearhouse=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
-			for(int i=0;i<arrayClearinghouses.Length;i++) {
-				if(arrayClearinghouses[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
-					clearhouse=arrayClearinghouses[i];
+			Clearinghouse clearinghouseHq=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
+			Clearinghouse[] arrayClearinghousesHq=Clearinghouses.GetHqListt();
+			for(int i=0;i<arrayClearinghousesHq.Length;i++) {
+				if(arrayClearinghousesHq[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
+					clearinghouseHq=arrayClearinghousesHq[i];
 				}
 			}
-			if(clearhouse==null) {
+			if(clearinghouseHq==null) {
 				throw new ApplicationException("Error. Could not locate Clearinghouse.");
 			}
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,clinicNum));
 			Claim claim=Claims.GetClaim(queueItem.ClaimNum);
 			Clinic clinic=Clinics.GetClinic(claim.ClinicNum);
 			//if(clearhouse.Eformat==ElectronicClaimFormat.X12){//not needed since this is always true
-			X12Validate.ISA(clearhouse,strb);
-			if(clearhouse.GS03.Length<2) {
+			X12Validate.ISA(clearinghouseClin,strb);
+			if(clearinghouseClin.GS03.Length<2) {
 				Comma(strb);
 				strb.Append("Clearinghouse GS03");
 			}
@@ -2548,7 +2567,7 @@ namespace OpenDentBusiness
 			}
 			//billProv
 			X12Validate.BillProv(billProv,strb);
-			if(IsEmdeonMedical(clearhouse)) {//The X12 standard has a basic character set, but Emdeon Medical only allows a subset of the basic character set, as seen in error messages within their interface.
+			if(IsEmdeonMedical(clearinghouseClin)) {//The X12 standard has a basic character set, but Emdeon Medical only allows a subset of the basic character set, as seen in error messages within their interface.
 				if(!billProv.IsNotPerson && !Regex.IsMatch(billProv.FName,"^[A-Za-z ']+$")) {//If not a person, then X12 generation will leave this blank, regardless of what user entered.
 					Comma(strb);
 					strb.Append("Billing Prov FName may contain letters spaces and apostrophes only");
@@ -2672,7 +2691,7 @@ namespace OpenDentBusiness
 			if(claim.MedType==EnumClaimMedType.Dental) {
 				if(claim.PlaceService!=PlaceOfService.Office) {
 					//Only specific clearinghouses want the facility information.
-					if(IsClaimConnect(clearhouse)) {
+					if(IsClaimConnect(clearinghouseClin)) {
 						if(!facilityProv.IsNotPerson) {//In medical, institutional and dental, the facility provider must be a non-person.
 							Comma(strb);
 							strb.Append("Billing/Facility Prov cannot be a person when claim Place of Service is not Office");
@@ -2695,7 +2714,7 @@ namespace OpenDentBusiness
 				Comma(strb);
 				strb.Append("Create a new insurance plan instead of using the optional patient ID");
 			}
-			if(IsDentiCal(clearhouse)) {
+			if(IsDentiCal(clearinghouseClin)) {
 				if(GetFilingCode(insPlan)!="MC") {
 					Comma(strb);
 					strb.Append("InsPlan Filing Code must be Medicaid for Denti-Cal");

@@ -4758,22 +4758,24 @@ namespace OpenDental{
 			if(claimReportComputer=="" || claimReportComputer!=Dns.GetHostName()) {
 				return;
 			}
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			Clearinghouse[] arrayClearinghousesHq=Clearinghouses.GetHqListt();
 			long defaultClearingHouseNum=PrefC.GetLong(PrefName.ClearinghouseDefaultDent);
-			for(int i=0;i<arrayClearinghouses.Length;i++) {
-				if(arrayClearinghouses[i].CommBridge==EclaimsCommBridge.BCBSGA) {//Skip BCBSGA since it has a form that shows up.
+			for(int i=0;i<arrayClearinghousesHq.Length;i++) {
+				Clearinghouse clearinghouseHq=arrayClearinghousesHq[i];
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,ClinicNum));
+				if(clearinghouseHq.CommBridge==EclaimsCommBridge.BCBSGA) {//Skip BCBSGA since it has a form that shows up.
 					continue;
 				}
-				if(!Directory.Exists(arrayClearinghouses[i].ResponsePath)) {
+				if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 					continue;
 				}
-				if(arrayClearinghouses[i].ClearinghouseNum==defaultClearingHouseNum) {//If it's the default dental clearinghouse
-					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				if(clearinghouseHq.ClearinghouseNum==defaultClearingHouseNum) {//If it's the default dental clearinghouse
+					FormClaimReports.RetrieveAndImport(clearinghouseHq,true);
 				}
-				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.None) {//And the format is "None" (accessed from all regions)
-					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.None) {//And the format is "None" (accessed from all regions)
+					FormClaimReports.RetrieveAndImport(clearinghouseHq,true);
 				}
-				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.Canadian && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
 					//Or the Eformat is Canadian and the region is Canadian.  In Canada, the "Outstanding Reports" are received upon request.
 					//Canadian reports must be retrieved using an office num and valid provider number for the office,
 					//which will cause all reports for that office to be returned.
@@ -4796,15 +4798,15 @@ namespace OpenDental{
 						}
 					}
 				}
-				else if(arrayClearinghouses[i].Eformat==ElectronicClaimFormat.Dutch && CultureInfo.CurrentCulture.Name.EndsWith("DE")) {
+				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Dutch && CultureInfo.CurrentCulture.Name.EndsWith("DE")) {
 					//Or the Eformat is German and the region is German
-					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+					FormClaimReports.RetrieveAndImport(clearinghouseHq,true);
 				}
-				else if(arrayClearinghouses[i].Eformat!=ElectronicClaimFormat.Canadian 
-					&& arrayClearinghouses[i].Eformat!=ElectronicClaimFormat.Dutch
+				else if(clearinghouseHq.Eformat!=ElectronicClaimFormat.Canadian 
+					&& clearinghouseHq.Eformat!=ElectronicClaimFormat.Dutch
 					&& CultureInfo.CurrentCulture.Name.EndsWith("US")) //Or the Eformat is in any other format and the region is US
 				{
-					FormClaimReports.RetrieveAndImport(arrayClearinghouses[i],true);
+					FormClaimReports.RetrieveAndImport(clearinghouseHq,true);
 				}
 			}
 		}

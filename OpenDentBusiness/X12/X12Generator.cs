@@ -5,23 +5,23 @@ using System.Text.RegularExpressions;
 
 namespace OpenDentBusiness{
 	public class X12Generator {
-		///<summary>If clearhouse.SenderTIN is blank, then 810624427 will be used to indicate Open Dental.</summary>
-		public static string GetISA06(Clearinghouse clearhouse) {
-			if(clearhouse.SenderTIN=="") {
+		///<summary>If clearinghouseClin.SenderTIN is blank, then 810624427 will be used to indicate Open Dental.</summary>
+		public static string GetISA06(Clearinghouse clearinghouseClin) {
+			if(clearinghouseClin.SenderTIN=="") {
 				return Sout("810624427",15,15);//TIN of OD.
 			}
 			else {
-				return Sout(clearhouse.SenderTIN,15,15);//already validated to be length at least 2.
+				return Sout(clearinghouseClin.SenderTIN,15,15);//already validated to be length at least 2.
 			}
 		}
 
 		/// <summary>Sometimes SenderTIN, sometimes OD's TIN.</summary>
-		public static string GetGS02(Clearinghouse clearhouse) {
-			if(clearhouse.SenderTIN=="") {
+		public static string GetGS02(Clearinghouse clearinghouseClin) {
+			if(clearinghouseClin.SenderTIN=="") {
 				return Sout("810624427",15,2);
 			}
 			else {
-				return Sout(clearhouse.SenderTIN,15,2);//already validated to be length at least 2.
+				return Sout(clearinghouseClin.SenderTIN,15,2);//already validated to be length at least 2.
 			}
 		}
 

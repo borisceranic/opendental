@@ -6,40 +6,40 @@ using System.Text.RegularExpressions;
 namespace OpenDentBusiness {
 	public class X12Validate {
 		///<summary>StringBuilder does not get altered if no invalid data.</summary>
-		public static void ISA(Clearinghouse clearhouse,StringBuilder strb) {
-			if(clearhouse.ISA05!="01" && clearhouse.ISA05!="14" && clearhouse.ISA05!="20" && clearhouse.ISA05!="27" 
-				&& clearhouse.ISA05!="28"	&& clearhouse.ISA05!="29" && clearhouse.ISA05!="30" && clearhouse.ISA05!="33"
-				&& clearhouse.ISA05!="ZZ")
+		public static void ISA(Clearinghouse clearinghouseClin,StringBuilder strb) {
+			if(clearinghouseClin.ISA05!="01" && clearinghouseClin.ISA05!="14" && clearinghouseClin.ISA05!="20" && clearinghouseClin.ISA05!="27" 
+				&& clearinghouseClin.ISA05!="28"	&& clearinghouseClin.ISA05!="29" && clearinghouseClin.ISA05!="30" && clearinghouseClin.ISA05!="33"
+				&& clearinghouseClin.ISA05!="ZZ")
 			{
 				Comma(strb);
 				strb.Append("Clearinghouse ISA05");
 			}
-			if(clearhouse.SenderTIN!="") {//if it IS blank, then we'll be using OD's info as the sender, so no need to validate the rest
-				if(clearhouse.SenderTIN.Length<2) {
+			if(clearinghouseClin.SenderTIN!="") {//if it IS blank, then we'll be using OD's info as the sender, so no need to validate the rest
+				if(clearinghouseClin.SenderTIN.Length<2) {
 					Comma(strb);
 					strb.Append("Clearinghouse SenderTIN");
 				}
-				if(clearhouse.SenderName=="") {//1000A NM103 min length=1
+				if(clearinghouseClin.SenderName=="") {//1000A NM103 min length=1
 					Comma(strb);
 					strb.Append("Clearinghouse Sender Name");
 				}
-				if(!Regex.IsMatch(clearhouse.SenderTelephone,@"^\d{10}$")) {//1000A PER04 min length=1
+				if(!Regex.IsMatch(clearinghouseClin.SenderTelephone,@"^\d{10}$")) {//1000A PER04 min length=1
 					Comma(strb);
 					strb.Append("Clearinghouse Sender Phone");
 				}
 			}
-			if(clearhouse.ISA07!="01" && clearhouse.ISA07!="14" && clearhouse.ISA07!="20" && clearhouse.ISA07!="27" 
-				&& clearhouse.ISA07!="28"	&& clearhouse.ISA07!="29" && clearhouse.ISA07!="30" && clearhouse.ISA07!="33"
-				&& clearhouse.ISA07!="ZZ") 
+			if(clearinghouseClin.ISA07!="01" && clearinghouseClin.ISA07!="14" && clearinghouseClin.ISA07!="20" && clearinghouseClin.ISA07!="27" 
+				&& clearinghouseClin.ISA07!="28"	&& clearinghouseClin.ISA07!="29" && clearinghouseClin.ISA07!="30" && clearinghouseClin.ISA07!="33"
+				&& clearinghouseClin.ISA07!="ZZ") 
 			{
 				Comma(strb);
 				strb.Append("Clearinghouse ISA07");
 			}
-			if(clearhouse.ISA08.Length<2) {
+			if(clearinghouseClin.ISA08.Length<2) {
 				Comma(strb);
 				strb.Append("Clearinghouse ISA08");
 			}
-			if(clearhouse.ISA15!="T" && clearhouse.ISA15!="P") {
+			if(clearinghouseClin.ISA15!="T" && clearinghouseClin.ISA15!="P") {
 				Comma(strb);
 				strb.Append("Clearinghouse ISA15");
 			}

@@ -11,7 +11,7 @@ namespace OpenDental.Eclaims{
 		private static ClaimFormItem[] items;
 		private static FormClaimFormItemEdit FormCFI;
 		private static string[][] DisplayStrings;
-		private static Clearinghouse clearinghouse;
+		private static Clearinghouse _clearinghouseClin;
 
 		///<summary>Summary description for Renaissance.</summary>
 		public Renaissance(){
@@ -23,7 +23,8 @@ namespace OpenDental.Eclaims{
 			for(int i=0;i<queueItems.Count;i++) {
 				//A setting for the clearinghouse could have changed so we need to always refresh the clearinghouse variable before sending any batches.
 				if(i==0) {
-					clearinghouse=Clearinghouses.GetClearinghouse(queueItems[i].ClearinghouseNum);
+					Clearinghouse clearinghouseHq=Clearinghouses.GetClearinghouse(queueItems[i].ClearinghouseNum);
+					_clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 				}
 				if(!CreateClaim(queueItems[i].PatNum,queueItems[i].ClaimNum,batchNum)) {
 					return "";
@@ -325,7 +326,7 @@ namespace OpenDental.Eclaims{
 			//this actually gets the current batch number since it was already incremented
 			//int batchNum=PIn.PInt(((Pref)PrefC.HList["RenaissanceLastBatchNumber"]).ValueString);
 			for(int i=0;i<DisplayStrings.GetLength(0);i++){//usually 1, but sometimes 2 or 3
-				string uploadPath=clearinghouse.ExportPath;//@"C:\Program Files\Renaissance\dotr\upload\";
+				string uploadPath=_clearinghouseClin.ExportPath;//@"C:\Program Files\Renaissance\dotr\upload\";
 				if(!Directory.Exists(uploadPath)){
 					MessageBox.Show("Error. Renaissance not installed.  "+uploadPath+" not valid");
 					return;

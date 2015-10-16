@@ -21,12 +21,12 @@ namespace OpenDental.Eclaims
 	
 
 		///<summary>Returns true if the communications were successful, and false if they failed. If they failed, a rollback will happen automatically by deleting the previously created X12 file. The batchnum is supplied for the possible rollback.</summary>
-		public static bool Launch(Clearinghouse clearhouse,int batchNum){
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum){ //called from Eclaims.cs. Clinic-level clearinghouse passed in.
 			bool retVal=true;
 			FormTerminal FormT=new FormTerminal();
 			try{
 				FormT.Show();
-				FormT.OpenConnection(clearhouse.ModemPort);
+				FormT.OpenConnection(clearinghouseClin.ModemPort);
 				//1. Dial
 				FormT.Dial("17065713158");
 				//2. Wait for connect, then pause 3 seconds
@@ -37,8 +37,8 @@ namespace OpenDental.Eclaims
 				string submitterLogin=
 					//position,length indicated for each
 					"/SLRON"//1,6 /SLRON=Submitter login
-					+FormT.Sout(clearhouse.LoginID,12,12)//7,12 Submitter ID
-					+FormT.Sout(clearhouse.Password,8,8)//19,8 submitter password
+					+FormT.Sout(clearinghouseClin.LoginID,12,12)//7,12 Submitter ID
+					+FormT.Sout(clearinghouseClin.Password,8,8)//19,8 submitter password
 					+"NAT"//27,3 use NAT
 						//30,8 suggested 8-BYTE CRC of the file for unique ID. No spaces.
 						//But I used the batch number instead
@@ -61,14 +61,14 @@ namespace OpenDental.Eclaims
 				}
 				//7. Send file using X-modem or Z-modem
 //slash not handled properly if missing:
-				FormT.UploadXmodem(clearhouse.ExportPath+"claims"+batchNum.ToString()+".txt");
+				FormT.UploadXmodem(clearinghouseClin.ExportPath+"claims"+batchNum.ToString()+".txt");
 				//8. After transmitting, pause for 1 second.
 				FormT.Pause(1000);
 				FormT.ClearRxBuff();
 				//9. Send submitter logout record
 				string submitterLogout=
 					"/SLROFF"//1,7 /SLROFF=Submitter logout
-					+FormT.Sout(clearhouse.LoginID,12,12)//8,12 Submitter ID
+					+FormT.Sout(clearinghouseClin.LoginID,12,12)//8,12 Submitter ID
 					+batchNum.ToString().PadLeft(8,'0')//20,8 matches field in submitter Login
 					+"!"//28,1 use ! to retrieve transmission acknowledgement record
 					+"\r\n";
@@ -78,7 +78,7 @@ namespace OpenDental.Eclaims
 			}
 			catch(Exception ex){
 				ErrorMessage=ex.Message;
-				x837Controller.Rollback(clearhouse,batchNum);
+				x837Controller.Rollback(clearinghouseClin,batchNum);
 				retVal=false;
 			}
 			finally{
@@ -88,12 +88,12 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Retrieves any waiting reports from this clearinghouse. Returns true if the communications were successful, and false if they failed.</summary>
-		public static bool Retrieve(Clearinghouse clearhouse){
+		public static bool Retrieve(Clearinghouse clearinghouseClin) { //Called from FormClaimReports. Clinic-level Clearinghouse passed in.
 			bool retVal=true;
 			FormTerminal FormT=new FormTerminal();
 			try{
 				FormT.Show();
-				FormT.OpenConnection(clearhouse.ModemPort);
+				FormT.OpenConnection(clearinghouseClin.ModemPort);
 				FormT.Dial("17065713158");
 				//2. Wait for connect, then pause 3 seconds
 				FormT.WaitFor("CONNECT 9600",50000);
@@ -102,8 +102,8 @@ namespace OpenDental.Eclaims
 				//1. Send submitter login record
 				string submitterLogin=
 					"/SLRON"//1,6 /SLRON=Submitter login
-					+FormT.Sout(clearhouse.LoginID,12,12)//7,12 Submitter ID
-					+FormT.Sout(clearhouse.Password,8,8)//19,8 submitter password
+					+FormT.Sout(clearinghouseClin.LoginID,12,12)//7,12 Submitter ID
+					+FormT.Sout(clearinghouseClin.Password,8,8)//19,8 submitter password
 					+"   "//27,3 use 3 spaces
 	//Possible issue with Trans ID
 					+"12345678"//30,8. they did not explain this field very well in documentation
@@ -145,7 +145,7 @@ namespace OpenDental.Eclaims
 					FormT.Pause(200);
 					//7. Receive file using Xmodem
 	//path must include trailing slash for now.
-					FormT.DownloadXmodem(clearhouse.ResponsePath+retrieveFile);
+					FormT.DownloadXmodem(clearinghouseClin.ResponsePath+retrieveFile);
 					//8. Pause for 5 seconds.
 					FormT.Pause(5000);
 					//9. Repeat all steps including login until a Z is returned.

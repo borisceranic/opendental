@@ -8,16 +8,18 @@ namespace OpenDental{
 	///<summary></summary>
 	public class ClearinghouseL {
 
-		///<summary>Returns the clearinghouse specified by the given num.</summary>
-		public static Clearinghouse GetClearinghouse(long clearinghouseNum) {
-			return GetClearinghouse(clearinghouseNum,false);
+		///<summary>Returns the clearinghouse specified by the given num.  Will only return an HQ-level clearinghouse.
+		///Do not attempt to pass in a clinic-level clearinghouseNum.</summary>
+		public static Clearinghouse GetClearinghouseHq(long hqClearinghouseNum) {
+			return GetClearinghouse(hqClearinghouseNum,false);
 		}
 
-		///<summary>Returns the clearinghouse specified by the given num.</summary>
-		public static Clearinghouse GetClearinghouse(long clearinghouseNum,bool suppressError) {
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+		///<summary>Returns the clearinghouse specified by the given num.  Will only return an HQ-level clearinghouse.
+		///Do not attempt to pass in a clinic-level clearinghouseNum.</summary>
+		public static Clearinghouse GetClearinghouse(long hqClearinghouseNum,bool suppressError) {
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			for(int i=0;i<arrayClearinghouses.Length;i++){
-				if(arrayClearinghouses[i].ClearinghouseNum==clearinghouseNum) {
+				if(arrayClearinghouses[i].ClearinghouseNum==hqClearinghouseNum) {
 					return arrayClearinghouses[i];
 				}
 			}
@@ -29,7 +31,7 @@ namespace OpenDental{
 
 		///<summary>Gets the index of this clearinghouse within List</summary>
 		public static int GetIndex(long clearinghouseNum) {
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetListt();
+			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			for(int i=0;i<arrayClearinghouses.Length;i++) {
 				if(arrayClearinghouses[i].ClearinghouseNum==clearinghouseNum) {
 					return i;
@@ -44,7 +46,7 @@ namespace OpenDental{
 			if(clearinghouseNum==0) {
 				return "";
 			}
-			return GetClearinghouse(clearinghouseNum).Description;
+			return GetClearinghouseHq(clearinghouseNum).Description;
 		}
 
 	}
