@@ -94,13 +94,13 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Owner",55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Status",130);
+			col=new ODGridColumn("Status",230);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Date",70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Job Title",150);
+			col=new ODGridColumn("Job Title",470);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",220);
+			col=new ODGridColumn("Description",580);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Count",50);
 			gridMain.Columns.Add(col);
@@ -117,12 +117,12 @@ namespace OpenDental {
 					groupCount=PIn.Int(_table.Rows[i]["countJobs"].ToString());
 				}
 				if(checkExpert.Checked || !isGroupBy || groupCount==1) {
-					Userod expert=Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString()));
-					if(expert!=null) {
+					long expertNum=PIn.Long(_table.Rows[i]["Expert"].ToString());
+					if(expertNum!=0) {
 						row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString())).UserName);//Expert
 					}
 					else {
-						row.Cells.Add("");
+						row.Cells.Add("None");
 					}
 					//color yellow
 					if(groupCount!=1) {
@@ -133,7 +133,13 @@ namespace OpenDental {
 					row.Cells.Add(" - ");
 				}
 				if(checkOwner.Checked || !isGroupBy || groupCount==1) {
-					row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Owner"].ToString())).UserName);//Owner
+					long ownerNum=PIn.Long(_table.Rows[i]["Owner"].ToString());
+					if(ownerNum!=0) {
+						row.Cells.Add(Userods.GetUser(ownerNum).UserName);//Owner
+					}
+					else {
+						row.Cells.Add("None");
+					}
 					//color brown
 					if(groupCount!=1) {
 						row.ColorText=Color.Brown;
@@ -166,8 +172,8 @@ namespace OpenDental {
 					row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
 					string[] arrayDescriptionLines=_table.Rows[i]["Description"].ToString().Split('\n');
 					if(arrayDescriptionLines.Length>0) {
-						if(arrayDescriptionLines[0].Length>=30) {
-							row.Cells.Add(arrayDescriptionLines[0].Substring(0,30)+"...");//Description
+						if(arrayDescriptionLines[0].Length>=120) {
+							row.Cells.Add(arrayDescriptionLines[0].Substring(0,120)+"...");//Description
 						}
 						else if(arrayDescriptionLines.Length>1) {
 							row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
@@ -258,6 +264,24 @@ namespace OpenDental {
 			labelOwnerJobs.Text=PIn.Int(ownerSummaryText.Rows[0]["numJobs"].ToString()).ToString();
 			labelEstHrs.Text=PIn.Int(_table.Rows[e.Row]["HoursEstimate"].ToString()).ToString();
 			labelActualHrs.Text=PIn.Int(_table.Rows[e.Row]["HoursActual"].ToString()).ToString();
+		}
+
+		private void comboBoxMultiExpert_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboBoxMultiExpert.SelectedIndices.Count==0) {
+				comboBoxMultiExpert.SetSelected(0,true);
+			}
+		}
+
+		private void comboBoxMultiStatus_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboBoxMultiStatus.SelectedIndices.Count==0) {
+				comboBoxMultiStatus.SetSelected(0,true);
+			}
+		}
+
+		private void comboBoxMultiOwner_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboBoxMultiOwner.SelectedIndices.Count==0) {
+				comboBoxMultiOwner.SetSelected(0,true);
+			}
 		}
 
 	}

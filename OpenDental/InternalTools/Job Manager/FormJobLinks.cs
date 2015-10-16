@@ -63,6 +63,18 @@ namespace OpenDental {
 				else if(_jobLinks[i].LinkType==JobLinkType.Request) {
 					row.Cells.Add("Under Construction");
 				}
+				else if(_jobLinks[i].LinkType==JobLinkType.Quote) {
+					JobQuote quote=JobQuotes.GetOne(_jobLinks[i].FKey);
+					string quoteText="Amount: "+quote.Amount;
+					if(quote.PatNum!=0) {
+						Patient pat=Patients.GetPat(quote.PatNum);
+						quoteText+="\r\nCustomer: "+pat.LName+", "+pat.FName;
+					}
+					if(quote.Note!="") {
+						quoteText+="\r\nNote: "+quote.Note;
+					}
+					row.Cells.Add(quoteText);
+				}
 				row.Tag=_jobLinks[i].JobLinkNum;
 				gridMain.Rows.Add(row);
 			}
@@ -85,6 +97,14 @@ namespace OpenDental {
 				case JobLinkType.Request:
 					break;
 				case JobLinkType.Bug:
+					break;
+				case JobLinkType.Quote:
+					JobQuote quote=JobQuotes.GetOne(_jobLinks[gridMain.SelectedIndices[0]].FKey);
+					FormJobQuoteEdit FormJQE=new FormJobQuoteEdit(quote);
+					FormJQE.JobLinkNum=_jobLinks[gridMain.SelectedIndices[0]].JobLinkNum;//Allows deletion of the link if the quote is deleted.
+					FormJQE.ShowDialog();
+					_jobLinks=JobLinks.GetJobLinks(_jobNum);
+					FillGrid();
 					break;
 			}
 		}
@@ -111,6 +131,22 @@ namespace OpenDental {
 		private void butLinkFeatReq_Click(object sender,EventArgs e) {
 			//FormFeatureRequest FormFR=new FormFeatureRequest();
 			MsgBox.Show(this,"This functionality is not yet implemented. Stay tuned for updates.");
+		}
+
+		private void butLinkQuote_Click(object sender,EventArgs e) {
+			JobQuote jobQuote=new JobQuote();
+			jobQuote.IsNew=true;
+			FormJobQuoteEdit FormJQE=new FormJobQuoteEdit(jobQuote);
+			if(FormJQE.ShowDialog()==DialogResult.OK) {
+				JobLink jobLink=new JobLink();
+				jobLink.JobNum=_jobNum;
+				jobLink.FKey=FormJQE.JobQuoteCur.JobQuoteNum;
+				jobLink.LinkType=JobLinkType.Quote;
+				JobLinks.Insert(jobLink);
+				_jobLinks=JobLinks.GetJobLinks(_jobNum);
+				_hasChanged=true;
+				FillGrid();
+			}
 		}
 
 		private void butRemove_Click(object sender,EventArgs e) {

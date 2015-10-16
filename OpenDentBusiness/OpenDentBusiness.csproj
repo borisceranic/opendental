@@ -299,6 +299,7 @@
     <Compile Include="Crud\JobLinkCrud.cs" />
     <Compile Include="Crud\JobNoteCrud.cs" />
     <Compile Include="Crud\JobProjectCrud.cs" />
+    <Compile Include="Crud\JobQuoteCrud.cs" />
     <Compile Include="Crud\JobReviewCrud.cs" />
     <Compile Include="Crud\JobRoleCrud.cs" />
     <Compile Include="Crud\JournalEntryCrud.cs" />
@@ -417,6 +418,7 @@
     <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
+    <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobRoles.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
     <Compile Include="Data Interface\StateAbbrs.cs" />
@@ -536,6 +538,7 @@
     <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
     <Compile Include="InternalTools\Job Manager\JobControls.cs" />
     <Compile Include="InternalTools\Job Manager\JobEvents.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobQuote.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobRole.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobControl.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobEvent.cs" />

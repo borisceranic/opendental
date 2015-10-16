@@ -144,8 +144,20 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=0;i<_table.Rows.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Expert"].ToString())).UserName);//Expert
-				row.Cells.Add(Userods.GetUser(PIn.Long(_table.Rows[i]["Owner"].ToString())).UserName);//Owner
+				long expertNum=PIn.Long(_table.Rows[i]["Expert"].ToString());
+				if(expertNum!=0) {
+					row.Cells.Add(Userods.GetUser(expertNum).UserName);//Expert
+				}
+				else {
+					row.Cells.Add("None");
+				}
+				long ownerNum=PIn.Long(_table.Rows[i]["Owner"].ToString());
+				if(ownerNum!=0) {
+					row.Cells.Add(Userods.GetUser(ownerNum).UserName);//Owner
+				}
+				else {
+					row.Cells.Add("None");
+				}
 				row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["Status"].ToString())));//JobStatus
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
 				gridMain.Rows.Add(row);

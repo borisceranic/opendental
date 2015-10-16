@@ -32,7 +32,7 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM joblink"
 				+" WHERE JobNum="+POut.Long(jobNum)
-				+" AND LinkType IN ("+(int)JobLinkType.Bug+","+(int)JobLinkType.Request+","+(int)JobLinkType.Task+")"
+				+" AND LinkType IN ("+(int)JobLinkType.Bug+","+(int)JobLinkType.Request+","+(int)JobLinkType.Task+","+(int)JobLinkType.Quote+")"
 				+" ORDER BY LinkType";
 			return Crud.JobLinkCrud.SelectMany(command);
 		}

@@ -3512,6 +3512,12 @@
     <Compile Include="InternalTools\EServices\EServiceMetricsControl.Designer.cs">
       <DependentUpon>EServiceMetricsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobQuoteEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormJobQuoteEdit.designer.cs">
+      <DependentUpon>FormJobQuoteEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobHistory.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -6058,6 +6064,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\EServices\EServiceMetricsControl.resx">
       <DependentUpon>EServiceMetricsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormJobQuoteEdit.resx">
+      <DependentUpon>FormJobQuoteEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistory.resx">
       <DependentUpon>FormJobHistory.cs</DependentUpon>

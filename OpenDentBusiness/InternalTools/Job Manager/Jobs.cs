@@ -149,13 +149,13 @@ namespace OpenDentBusiness {
 			string whereClause="";
 			string groupClause="";
 			if(listExpertNums.Count>0) {
-				whereClause+="Expert IN("+String.Join(",",listExpertNums)+") ";
+				whereClause+="Expert IN("+String.Join(",",listExpertNums)+") OR Expert=0 ";
 			}
 			if(listOwnerNums.Count>0) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Owner IN("+String.Join(",",listOwnerNums)+") ";
+				whereClause+="Owner IN("+String.Join(",",listOwnerNums)+") OR Owner=0 ";
 			}
 			if(listJobStatuses.Count>0) {
 				if(whereClause!="") {
@@ -237,25 +237,45 @@ namespace OpenDentBusiness {
 			string command="SELECT * FROM job WHERE ";
 			string whereClause="";
 			if(groupExpert && rowExpert!="") {
-				whereClause+="Expert="+Userods.GetUserByName(rowExpert,false).UserNum+" ";
+				if(rowExpert!="None") {
+					whereClause+="Expert="+Userods.GetUserByName(rowExpert,false).UserNum+" ";
+				}
+				else {
+					whereClause+="Expert=0 ";
+				}
 			}
 			if(listExpertFilterNums.Count>0) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Expert IN("+String.Join(",",listExpertFilterNums)+") ";
+				if(rowExpert!="None") {
+					whereClause+="Expert IN("+String.Join(",",listExpertFilterNums)+") ";
+				}
+				else {
+					whereClause+="Expert=0 ";
+				}
 			}
 			if(groupOwner) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Owner="+Userods.GetUserByName(rowOwner,false).UserNum+" ";
+				if(rowOwner!="None") {
+					whereClause+="Owner="+Userods.GetUserByName(rowOwner,false).UserNum+" ";
+				}
+				else {
+					whereClause+="Owner=0 ";
+				}
 			}
 			if(listOwnerFilterNums.Count>0) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Owner IN("+String.Join(",",listExpertFilterNums)+") ";
+				if(rowOwner!="None") {
+					whereClause+="Owner IN("+String.Join(",",listExpertFilterNums)+") ";
+				}
+				else {
+					whereClause+="Owner=0 ";
+				}
 			}
 			if(groupStatus) {
 				if(whereClause!="") {

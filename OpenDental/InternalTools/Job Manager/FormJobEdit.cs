@@ -691,7 +691,7 @@ namespace OpenDental {
 			Jobs.Update(_job);
 			if(_isOverridden) {
 				JobEvent jobEventCur=new JobEvent();
-				jobEventCur.Description="THIS JOB WAS MANUALLY OVERRIDDEN:\r\n"+_job.Description;
+				jobEventCur.Description="THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n"+_job.Description;
 				jobEventCur.JobNum=_job.JobNum;
 				jobEventCur.Status=_job.Status;
 				jobEventCur.Owner=_job.Owner;

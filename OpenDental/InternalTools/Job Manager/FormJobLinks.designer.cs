@@ -31,6 +31,7 @@ namespace OpenDental{
 			this.butLinkBug = new OpenDental.UI.Button();
 			this.groupAddLink = new System.Windows.Forms.GroupBox();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butLinkQuote = new OpenDental.UI.Button();
 			this.groupAddLink.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -109,12 +110,13 @@ namespace OpenDental{
 			// 
 			// groupAddLink
 			// 
+			this.groupAddLink.Controls.Add(this.butLinkQuote);
 			this.groupAddLink.Controls.Add(this.butLinkTask);
 			this.groupAddLink.Controls.Add(this.butLinkFeatReq);
 			this.groupAddLink.Controls.Add(this.butLinkBug);
 			this.groupAddLink.Location = new System.Drawing.Point(359, 12);
 			this.groupAddLink.Name = "groupAddLink";
-			this.groupAddLink.Size = new System.Drawing.Size(88, 106);
+			this.groupAddLink.Size = new System.Drawing.Size(88, 133);
 			this.groupAddLink.TabIndex = 13;
 			this.groupAddLink.TabStop = false;
 			this.groupAddLink.Text = "Add Link";
@@ -135,6 +137,20 @@ namespace OpenDental{
 			this.gridMain.Title = "Links";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butLinkQuote
+			// 
+			this.butLinkQuote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkQuote.Autosize = true;
+			this.butLinkQuote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkQuote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkQuote.CornerRadius = 4F;
+			this.butLinkQuote.Location = new System.Drawing.Point(6, 103);
+			this.butLinkQuote.Name = "butLinkQuote";
+			this.butLinkQuote.Size = new System.Drawing.Size(77, 22);
+			this.butLinkQuote.TabIndex = 3;
+			this.butLinkQuote.Text = "Quote";
+			this.butLinkQuote.Click += new System.EventHandler(this.butLinkQuote_Click);
 			// 
 			// FormJobLinks
 			// 
@@ -164,5 +180,6 @@ namespace OpenDental{
 		private UI.Button butLinkBug;
 		private System.Windows.Forms.GroupBox groupAddLink;
 		private UI.ODGrid gridMain;
+		private UI.Button butLinkQuote;
 	}
 }

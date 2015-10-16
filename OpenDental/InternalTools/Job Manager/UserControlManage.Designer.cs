@@ -273,6 +273,7 @@
 			this.comboBoxMultiOwner.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiOwner.SelectedIndices")));
 			this.comboBoxMultiOwner.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxMultiOwner.TabIndex = 2;
+			this.comboBoxMultiOwner.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiOwner_SelectionChangeCommitted);
 			// 
 			// comboBoxMultiStatus
 			// 
@@ -284,6 +285,7 @@
 			this.comboBoxMultiStatus.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiStatus.SelectedIndices")));
 			this.comboBoxMultiStatus.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxMultiStatus.TabIndex = 1;
+			this.comboBoxMultiStatus.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiStatus_SelectionChangeCommitted);
 			// 
 			// comboBoxMultiExpert
 			// 
@@ -295,6 +297,7 @@
 			this.comboBoxMultiExpert.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiExpert.SelectedIndices")));
 			this.comboBoxMultiExpert.Size = new System.Drawing.Size(120, 21);
 			this.comboBoxMultiExpert.TabIndex = 0;
+			this.comboBoxMultiExpert.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiExpert_SelectionChangeCommitted);
 			// 
 			// groupBox3
 			// 

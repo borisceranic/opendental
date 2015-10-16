@@ -18,16 +18,32 @@ namespace OpenDental {
 		///<summary>Creates a draggable control containing the control passed in that will be added to the flow panel passed in.</summary>
 		public JobContainerControl(Control controlJob,FlowLayoutPanel flowPanel) {
 			InitializeComponent();
-			butDock.ImageIndex=1;
 			_flowPanel=flowPanel;
-			this.Height=controlJob.Height+20;
-			this.Width=controlJob.Width;
-			panelHighlight.Height=this.Height;
-			panelHighlight.Width=this.Width;
 			this.Controls.Add(controlJob);
-			controlJob.SetBounds(0,20,controlJob.Width,controlJob.Height);//10 height for the buttons at the top.
-			controlJob.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
-			_flowPanel.Controls.Add(this);
+			if(controlJob.GetType()==typeof(UserControlManage)) {
+				this.Height=flowPanel.Height-10;
+				this.Width=flowPanel.Width-20;
+				controlJob.SetBounds(0,20,this.Width,this.Height-20);
+				controlJob.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
+				butDock.ImageIndex=1;
+				panelHighlight.Height=this.Height;
+				panelHighlight.Width=this.Width;
+				_flowPanel.Controls.Add(this);
+			}
+			else {
+				this.Height=controlJob.Height+20;
+				this.Width=controlJob.Width;
+				panelHighlight.Height=this.Height;
+				panelHighlight.Width=this.Width;
+				butLeft.Visible=false;
+				butRight.Visible=false;
+				butDock.ImageIndex=0;
+				controlJob.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
+				FormJobContainer FormJC=new FormJobContainer(this);
+				FormJC.Show();
+				_isDocked=false;
+				AllowDragging=false;
+			}
 		}
 
 		private void JobContainerControl_MouseDown(object sender,MouseEventArgs e) {
@@ -109,8 +125,10 @@ namespace OpenDental {
 				butDock.ImageIndex=0;
 				_flowPanel.Controls.Remove(this);
 				FormJobContainer FormJC=new FormJobContainer(this);
+				this.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
 				FormJC.Show();
 				_isDocked=false;
+				AllowDragging=false;
 			}
 			else {//Control is currently in its own form.
 				if(this.Parent.GetType()!=typeof(FormJobContainer)) {
@@ -124,6 +142,7 @@ namespace OpenDental {
 				butRight.Visible=true;
 				parent.Close();
 				_isDocked=true;
+				AllowDragging=true;
 			}
 		}
 

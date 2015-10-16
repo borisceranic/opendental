@@ -18,6 +18,7 @@ namespace OpenDental {
 
 		private void FormJobManager_Load(object sender,EventArgs e) {
 			LayoutToolBar();
+			AddJobControl(new UserControlManage());
 		}
 
 		///<summary>Causes the toolbar to be laid out.</summary>

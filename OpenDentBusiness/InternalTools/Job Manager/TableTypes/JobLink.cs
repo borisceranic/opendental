@@ -34,7 +34,9 @@ namespace OpenDentBusiness {
 		///<summary>3 -</summary>
 		Review,
 		///<summary>4 -</summary>
-		QueryRequest
+		QueryRequest,
+		///<summary>5 -</summary>
+		Quote
 	}
 
 }
