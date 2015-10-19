@@ -106,6 +106,8 @@ namespace OpenDental{
 		///<summary>This must be set externally before opening the form.  This is the clearinghouse used to display, with properly overridden fields.
 		///This may not be null.  Assign a new clearinghouse object to this if creating a new clearinghouse.</summary>
 		public Clearinghouse ClearinghouseCur;
+		///<summary>Set this outside of the form. 0 for HQ.</summary>
+		public long clinicNum;
 
 		///<summary></summary>
 		public FormClearinghouseEdit()
@@ -911,9 +913,10 @@ namespace OpenDental{
 			this.labelClinic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelClinic.Location = new System.Drawing.Point(248, 6);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(307, 17);
+			this.labelClinic.Size = new System.Drawing.Size(698, 17);
 			this.labelClinic.TabIndex = 123;
-			this.labelClinic.Text = "Bolded fields are unique for each clinic.";
+			this.labelClinic.Text = "Bolded fields are unique for each clinic.  Other fields are not editable unless u" +
+    "nassigned/default is selected.";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.labelClinic.Visible = false;
 			// 
@@ -1063,6 +1066,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.labelExportPath);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -1159,6 +1163,23 @@ namespace OpenDental{
 				labelExportPath.Font=new System.Drawing.Font(labelExportPath.Font,FontStyle.Bold);
 				labelReportPath.Font=new System.Drawing.Font(labelReportPath.Font,FontStyle.Bold);
 				labelClientProgram.Font=new System.Drawing.Font(labelClientProgram.Font,FontStyle.Bold);
+			}
+			if(clinicNum!=0) {
+				textDescription.ReadOnly=true;
+				textISA02.ReadOnly=true;
+				textISA04.ReadOnly=true;
+				textISA05.ReadOnly=true;
+				textSeparatorData.ReadOnly=true;
+				textISA16.ReadOnly=true; ;
+				textSeparatorSegment.ReadOnly=true;
+				textISA07.ReadOnly=true;
+				textISA08.ReadOnly=true;
+				textGS03.ReadOnly=true;
+				textISA15.ReadOnly=true;				
+				comboFormat.Enabled=false;
+				comboCommBridge.Enabled=false;
+				textModemPort.ReadOnly=true;
+				textPayors.ReadOnly=true;
 			}
 		}
 
@@ -1347,13 +1368,13 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			else if(FormOpenDental.ClinicNum==0) { //if HQ is selected and the user doubleclicked a row, update.
+			else if(clinicNum==0) { //if HQ is selected and the user doubleclicked a row, update.
 				Clearinghouses.Update(ClearinghouseCur);
 				DialogResult=DialogResult.OK;
 				return;
 			}
 			else if(ClearinghouseClin==null) { //if a clinic is selected and a clinic-level Clearinghouse doesn't exist, set up for insert.
-				ClearinghouseCur.ClinicNum=FormOpenDental.ClinicNum; //must be set manually for insert.
+				ClearinghouseCur.ClinicNum=clinicNum; //must be set manually for insert.
 				ClearinghouseCur.ClearinghouseNum=0;
 			}
 			Clearinghouses.InsertOrUpdateForClinic(ClearinghouseHq,ClearinghouseCur);

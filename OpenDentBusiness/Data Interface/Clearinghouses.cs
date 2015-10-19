@@ -78,17 +78,13 @@ namespace OpenDentBusiness{
 			return hashClearinghouses;
 		}
 
-
 		///<summary>Gets all clearinghouses for the specified clinic.  Returns an empty list if clinicNum=0.  
 		///Use the cache if you want all HQ Clearinghouses.</summary>
-		public static List<Clearinghouse> GetListForClinic(long clinicNum) {
+		public static List<Clearinghouse> GetAllNonHq() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Clearinghouse>>(MethodBase.GetCurrentMethod(),clinicNum);
+				return Meth.GetObject<List<Clearinghouse>>(MethodBase.GetCurrentMethod());
 			}
-			if(clinicNum==0) {
-				return new List<Clearinghouse>();
-			}
-			string command="SELECT * FROM clearinghouse WHERE ClinicNum="+clinicNum;
+			string command="SELECT * FROM clearinghouse WHERE ClinicNum!=0";
 			return Crud.ClearinghouseCrud.SelectMany(command);
 		}
 

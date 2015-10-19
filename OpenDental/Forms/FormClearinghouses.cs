@@ -12,8 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormClearinghouses : System.Windows.Forms.Form{
-		private System.Windows.Forms.TextBox textBox1;
+	public class FormClearinghouses:System.Windows.Forms.Form {
 		private OpenDental.UI.Button butClose;
 		/// <summary>
 		/// Required designer variable.
@@ -32,7 +31,13 @@ namespace OpenDental{
 		private bool listHasChanged;
 		private UI.ODGrid gridMain;
 		private List<Clearinghouse> _listClearinghousesHq;
+		private Label labelClinic;
+		private ComboBox comboClinic;
 		private List<Clearinghouse> _listClearinghousesClinicCur;
+		private List<Clearinghouse> _listClearinghousesClinicAll;
+		private long _selectedClinicNum;
+		private Label labelGuide;
+		private List<Clinic> _listClinics;
 
 		///<summary></summary>
 		public FormClearinghouses()
@@ -43,7 +48,7 @@ namespace OpenDental{
 			InitializeComponent();
 			Lan.C(this, new System.Windows.Forms.Control[]
 			{
-				textBox1
+				labelGuide
 			});
 			Lan.F(this);
 		}
@@ -71,7 +76,6 @@ namespace OpenDental{
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormClearinghouses));
-			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.butDefaultMedical = new OpenDental.UI.Button();
 			this.butDefaultDental = new OpenDental.UI.Button();
@@ -84,22 +88,15 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.labelClinic = new System.Windows.Forms.Label();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelGuide = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// textBox1
-			// 
-			this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.textBox1.Location = new System.Drawing.Point(10, 8);
-			this.textBox1.Multiline = true;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.ReadOnly = true;
-			this.textBox1.Size = new System.Drawing.Size(597, 50);
-			this.textBox1.TabIndex = 3;
-			this.textBox1.Text = resources.GetString("textBox1.Text");
-			// 
 			// groupBox1
 			// 
+			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupBox1.Controls.Add(this.butDefaultMedical);
 			this.groupBox1.Controls.Add(this.butDefaultDental);
 			this.groupBox1.Location = new System.Drawing.Point(6, 387);
@@ -190,7 +187,7 @@ namespace OpenDental{
 			// butThisComputer
 			// 
 			this.butThisComputer.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butThisComputer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butThisComputer.Autosize = true;
 			this.butThisComputer.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butThisComputer.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -205,7 +202,7 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -236,21 +233,58 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(6, 61);
+			this.gridMain.Location = new System.Drawing.Point(6, 39);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(879, 318);
+			this.gridMain.Size = new System.Drawing.Size(879, 340);
 			this.gridMain.TabIndex = 17;
 			this.gridMain.Title = "Clearinghouses";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// labelClinic
+			// 
+			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelClinic.Location = new System.Drawing.Point(616, 18);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(101, 18);
+			this.labelClinic.TabIndex = 21;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Visible = false;
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(720, 17);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(165, 21);
+			this.comboClinic.TabIndex = 20;
+			this.comboClinic.Visible = false;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// labelGuide
+			// 
+			this.labelGuide.Location = new System.Drawing.Point(6, -1);
+			this.labelGuide.Name = "labelGuide";
+			this.labelGuide.Size = new System.Drawing.Size(595, 36);
+			this.labelGuide.TabIndex = 22;
+			this.labelGuide.Text = resources.GetString("labelGuide.Text");
+			this.labelGuide.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormClearinghouses
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(891, 503);
+			this.Controls.Add(this.labelGuide);
+			this.Controls.Add(this.labelClinic);
+			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.textReportCheckInterval);
 			this.Controls.Add(this.textReportComputerName);
@@ -260,11 +294,9 @@ namespace OpenDental{
 			this.Controls.Add(this.labelReportComputerName);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butAdd);
-			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(850, 500);
 			this.Name = "FormClearinghouses";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -282,11 +314,24 @@ namespace OpenDental{
 			textReportComputerName.Text=PrefC.GetString(PrefName.ClaimReportComputerName);
 			textReportCheckInterval.Text=POut.Int(PrefC.GetInt(PrefName.ClaimReportReceiveInterval));
 			_listClearinghousesHq=Clearinghouses.GetHqListShort();
-			_listClearinghousesClinicCur=Clearinghouses.GetListForClinic(FormOpenDental.ClinicNum);
+			_listClearinghousesClinicAll=Clearinghouses.GetAllNonHq();
+			_listClearinghousesClinicCur=new List<Clearinghouse>();
+			_selectedClinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				comboClinic.Visible=true;
+				labelClinic.Visible=true;
+				FillClinics();
+			}
 			FillGrid();
 		}
 
 		private void FillGrid(){
+			_listClearinghousesClinicCur.Clear();
+			for(int i=0;i<_listClearinghousesClinicAll.Count;i++) {
+				if(_listClearinghousesClinicAll[i].ClinicNum==_selectedClinicNum) {
+					_listClearinghousesClinicCur.Add(_listClearinghousesClinicAll[i]);
+				}
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Description"),150);
@@ -335,6 +380,26 @@ namespace OpenDental{
 			gridMain.EndUpdate();
 		}
 
+		private void FillClinics() {
+			_listClinics=Clinics.GetForUserod(Security.CurUser);
+			if(!Security.CurUser.ClinicIsRestricted) {
+				Clinic clinicHq=new Clinic();
+				clinicHq.ClinicNum=0;
+				clinicHq.Description="Unassigned/Default";
+				_listClinics.Insert(0,clinicHq);//Insert at top.
+			}
+			for(int i=0;i<_listClinics.Count;i++) {
+				comboClinic.Items.Add(_listClinics[i].Description);
+				if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					comboClinic.SelectedIndex=i;
+				}
+			}
+			if(comboClinic.SelectedIndex==-1) {//This should not happen, but just in case.
+				comboClinic.SelectedIndex=0;
+			}
+			_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+		}
+
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormClearinghouseEdit FormCE=new FormClearinghouseEdit();
 			FormCE.ClearinghouseHq=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[0].Copy(); //cannot be null
@@ -342,6 +407,7 @@ namespace OpenDental{
 				FormCE.ClearinghouseClin=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[1].Copy(); //can be null
 			}
 			FormCE.ClearinghouseCur=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[2].Copy(); //cannot be null
+			FormCE.clinicNum=_selectedClinicNum;
 			FormCE.ShowDialog();
 			if(FormCE.DialogResult!=DialogResult.OK) {
 				return;
@@ -349,18 +415,18 @@ namespace OpenDental{
 			if(FormCE.ClearinghouseCur==null) {//Clearinghouse was deleted.
 				_listClearinghousesHq.RemoveAt(e.Row); //no need to update the nonHq list.
 			}
-			else if(FormOpenDental.ClinicNum==0) { //if at HQ, just update the HQ list.
+			else if(_selectedClinicNum==0) { //if at HQ, just update the HQ list.
 				_listClearinghousesHq[e.Row]=FormCE.ClearinghouseCur.Copy();
 			}
 			else { //if not at HQ, both the non-HQ and HQ lists need to be updated.
 				_listClearinghousesHq[e.Row]=FormCE.ClearinghouseHq.Copy();
 				Clearinghouse clearhouseReplace=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[1];
-				int indexReplace=_listClearinghousesClinicCur.IndexOf(clearhouseReplace); //clearhouseReplace can be null (in which case -1 index)
+				int indexReplace=_listClearinghousesClinicAll.IndexOf(clearhouseReplace); //clearhouseReplace can be null (in which case -1 index)
 				if(indexReplace==-1) {//A new clearinghouse clinic override.
-					_listClearinghousesClinicCur.Add(FormCE.ClearinghouseCur.Copy());
+					_listClearinghousesClinicAll.Add(FormCE.ClearinghouseCur.Copy());
 				}
 				else {//Editing an existing clearinghouse clinic override.  Maintain list position.
-					_listClearinghousesClinicCur[indexReplace]=FormCE.ClearinghouseCur.Copy();
+					_listClearinghousesClinicAll[indexReplace]=FormCE.ClearinghouseCur.Copy();
 				}
 			}
 			listHasChanged=true;
@@ -476,6 +542,11 @@ namespace OpenDental{
 				//update all computers including this one:
 				DataValid.SetInvalid(InvalidType.ClearHouses);
 			}
+		}
+
+		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			FillGrid();
 		}
 
 
