@@ -655,6 +655,7 @@ namespace OpenDentBusiness{
 			command=@"SELECT recalltrigger.RecallTypeNum,MIN("+DbHelper.DtimeToDate("appointment.AptDateTime")+@") AS AptDateTime
 				FROM appointment,procedurelog,recalltrigger,recall
 				WHERE appointment.AptNum=procedurelog.AptNum 
+				AND procedurelog.PatNum="+POut.Long(patNum)+@"
 				AND appointment.PatNum="+POut.Long(patNum)+@" 
 				AND procedurelog.CodeNum=recalltrigger.CodeNum 
 				AND recall.PatNum=appointment.PatNum 
