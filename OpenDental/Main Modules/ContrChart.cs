@@ -3786,7 +3786,7 @@ namespace OpenDental{
 			accountRequest.AccountId=newCropAccountId;
 			accountRequest.SiteId="1";//Accounts are always created with SiteId=1.
 			patientRequest.PatientId=POut.Long(PatCur.PatNum);
-			patNumLastErx=PatCur.PatNum;
+			_patNumLastErx=PatCur.PatNum;
 			prescriptionHistoryRequest.StartHistory=new DateTime(2012,11,2);//Only used for archived prescriptions. This is the date of first release for NewCrop integration.
 			prescriptionHistoryRequest.EndHistory=DateTime.Now;//Only used for archived prescriptions.
 			//Prescription Archive Status Values:
