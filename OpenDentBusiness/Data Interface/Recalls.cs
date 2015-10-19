@@ -652,16 +652,16 @@ namespace OpenDentBusiness{
 				+"WHERE recall.PatNum="+POut.Long(patNum);
 			Db.NonQ(command);
 			//Get table of future appointments dates with recall type for this patient, where a procedure is attached that is a recall trigger procedure
-			command=@"SELECT recalltrigger.RecallTypeNum,MIN("+DbHelper.DtimeToDate("appointment.AptDateTime")+@") AS AptDateTime
-				FROM appointment,procedurelog,recalltrigger,recall
-				WHERE appointment.AptNum=procedurelog.AptNum 
-				AND appointment.PatNum="+POut.Long(patNum)+@" 
-				AND procedurelog.CodeNum=recalltrigger.CodeNum 
-				AND recall.PatNum=appointment.PatNum 
-				AND recalltrigger.RecallTypeNum=recall.RecallTypeNum 
-				AND (appointment.AptStatus=1 "//Scheduled
-				+"OR appointment.AptStatus=4) "//ASAP
-				+"AND appointment.AptDateTime > "+DbHelper.Curdate()+" "//early this morning
+			command="SELECT recalltrigger.RecallTypeNum,MIN("+DbHelper.DtimeToDate("appointment.AptDateTime")+") AS AptDateTime "
+				+"FROM procedurelog "
+				+"INNER JOIN recalltrigger ON procedurelog.CodeNum=recalltrigger.CodeNum "
+				+"INNER JOIN recall ON recalltrigger.RecallTypeNum=recall.RecallTypeNum "
+					+"AND recall.PatNum="+POut.Long(patNum)+" "
+				+"INNER JOIN appointment ON appointment.AptNum=procedurelog.AptNum "
+					+"AND appointment.PatNum="+POut.Long(patNum)+" "
+					+"AND (appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)+" OR appointment.AptStatus="+POut.Int((int)ApptStatus.ASAP)+") "
+					+"AND appointment.AptDateTime > "+DbHelper.Curdate()+" "//early this morning
+				+"WHERE procedurelog.PatNum="+POut.Long(patNum)+" "
 				+"GROUP BY recalltrigger.RecallTypeNum";
 			DataTable table=Db.GetTable(command);
 			//Update the recalls for this patient with DATE(AptDateTime) where there is a future appointment with recall proc on it
