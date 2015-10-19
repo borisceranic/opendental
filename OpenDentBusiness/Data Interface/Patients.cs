@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -2200,12 +2201,7 @@ FROM insplan";
 		///<summary>Title FName M LName</summary>
 		public static string GetNameFLFormal(string LName,string FName,string MiddleI,string Title) {
 			//No need to check RemotingRole; no call to db.
-			string retVal="";
-			if(Title!="") {
-				retVal+=Title+" ";
-			}
-			retVal+=FName+" "+MiddleI+" "+LName;
-			return retVal;
+			return string.Join(" ",new[] {Title,FName,MiddleI,LName}.Where(x => !string.IsNullOrEmpty(x)));//returns "" if all strings are null or empty.
 		}
 
 		///<summary>Includes preferred.</summary>
