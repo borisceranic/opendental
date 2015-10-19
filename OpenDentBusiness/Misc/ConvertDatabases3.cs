@@ -10753,6 +10753,27 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX clearinghouse_HqClearinghouseN ON clearinghouse (HqClearinghouseNum)";
 					Db.NonQ(command);
 				}
+				command="SELECT ProgramNum FROM program WHERE ProgName='DentalTekSmartOfficePhone'";
+				long programNumCur=PIn.Long(Db.GetScalar(command));
+				if(programNumCur!=0) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"'"+POut.Long(programNumCur)+"', "
+				    +"'Enter your API Token', "
+				    +"'')";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+				    +") VALUES("
+				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+				    +"'"+POut.Long(programNumCur)+"', "
+				    +"'Enter your API Token', "
+				    +"'')";
+						Db.NonQ(command);
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

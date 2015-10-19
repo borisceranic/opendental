@@ -22,19 +22,25 @@ namespace OpenDental.Bridges {
 
 		///<summary>Attempt to send a phone number to place a call using DentalTek.  Already surrounded in try-catch. 
 		///Returns false if unsuccessful or a phone number wasn't passed in.</summary>
-		public static bool PlaceCall(string phoneNumber,bool IsTest=false) {
+		public static bool PlaceCall(string phoneNumber) {
 			phoneNumber=new string(phoneNumber.Where(x => char.IsDigit(x)).ToArray());
+			string apiToken=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.DentalTekSmartOfficePhone),"Enter your API Token");
+			string request="";
 			if(phoneNumber=="") {
 				return false;
 			}
-			string testStr=IsTest?"&test=true":"";
 			using(WebClient client = new WebClient()) {
 				string response="";
 				try {
-					client.Headers[HttpRequestHeader.ContentType] = "application/json";
+					client.Headers[HttpRequestHeader.ContentType]="application/json";
 					client.Encoding=UnicodeEncoding.UTF8;
-					string domainUser=System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-					string request="https://ivlrest.voiceelements.com/clicktocall?DomainUser="+domainUser+"&phonenumber="+phoneNumber+testStr;
+					if(apiToken=="") {
+						string domainUser=System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+						request="https://extapi.dentaltek.com/v1/pbx/rest/ClickToCall?domainUser="+domainUser+"&phoneNumber="+phoneNumber;
+					}
+					else {
+						request="https://extapi.dentaltek.com/v1/pbx/rest/ClickToCall?phoneNumber="+phoneNumber+"&token="+apiToken;
+					}
 					response=client.DownloadString(request);//GET
 				}
 				catch {
