@@ -23,52 +23,60 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormErx));
 			this.browser = new System.Windows.Forms.WebBrowser();
-			this.butCancel = new OpenDental.UI.Button();
+			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.SuspendLayout();
 			// 
 			// browser
 			// 
+			this.browser.AllowWebBrowserDrop = false;
 			this.browser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.browser.Location = new System.Drawing.Point(0,0);
-			this.browser.MinimumSize = new System.Drawing.Size(20,20);
+			this.browser.IsWebBrowserContextMenuEnabled = false;
+			this.browser.Location = new System.Drawing.Point(0, 26);
+			this.browser.MinimumSize = new System.Drawing.Size(300, 300);
 			this.browser.Name = "browser";
-			this.browser.Size = new System.Drawing.Size(973,658);
-			this.browser.TabIndex = 4;
-			this.browser.Url = new System.Uri("",System.UriKind.Relative);
+			this.browser.ScriptErrorsSuppressed = true;
+			this.browser.Size = new System.Drawing.Size(974, 669);
+			this.browser.TabIndex = 1;
 			this.browser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.browser_DocumentCompleted);
 			this.browser.NewWindow += new System.ComponentModel.CancelEventHandler(this.browser_NewWindow);
 			// 
-			// butCancel
+			// imageList1
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Autosize = true;
-			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(891,666);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
-			this.butCancel.TabIndex = 2;
-			this.butCancel.Text = "&Close";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+			this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+			this.imageList1.Images.SetKeyName(0, "arrowLeft22.gif");
+			this.imageList1.Images.SetKeyName(1, "arrowRight22.gif");
+			// 
+			// ToolBarMain
+			// 
+			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
+			this.ToolBarMain.ImageList = this.imageList1;
+			this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
+			this.ToolBarMain.Name = "ToolBarMain";
+			this.ToolBarMain.Size = new System.Drawing.Size(974, 25);
+			this.ToolBarMain.TabIndex = 32;
+			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
 			// FormErx
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(974,696);
+			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.ToolBarMain);
 			this.Controls.Add(this.browser);
-			this.Controls.Add(this.butCancel);
 			this.Cursor = System.Windows.Forms.Cursors.Default;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(400, 400);
 			this.Name = "FormErx";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "ERx";
+			this.Text = "eRx";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormErx_FormClosed);
 			this.Load += new System.EventHandler(this.FormErx_Load);
 			this.ResumeLayout(false);
 
@@ -76,7 +84,8 @@ namespace OpenDental{
 
 		#endregion
 
-		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.WebBrowser browser;
+		private UI.ODToolBar ToolBarMain;
+		private System.Windows.Forms.ImageList imageList1;
 	}
 }
