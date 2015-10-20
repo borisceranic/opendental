@@ -266,7 +266,7 @@ namespace OpenDental
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(100, 23);
 			this.label2.TabIndex = 61;
-			this.label2.Text = "DateStart:";
+			this.label2.Text = "Date Start:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label3
