@@ -19,6 +19,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 using CodeBase;
 using OpenDental.Bridges;
+using OpenDental.Eclaims;
 
 namespace OpenDental{
 
@@ -2415,9 +2416,26 @@ namespace OpenDental{
 					{
 						desc+="BW frequency ";
 					}
+					//Canada BW
+					else if(benMatrix[x,y].BenefitType==InsBenefitType.Limitations
+						&& benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02144")//4BW in Quebec and also the rest of Canada.
+						&& benMatrix[x,y].Quantity !=0
+						&& CultureInfo.CurrentCulture.Name.EndsWith("CA"))
+					{
+						desc+="BW frequency ";
+					}
 					else if(benMatrix[x,y].BenefitType==InsBenefitType.Limitations
 						&& benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("D0330")//Pano
 						&& benMatrix[x,y].Quantity !=0)
+					{
+						desc+="Pano/FMX frequency ";
+					}
+					//Canada Pano
+					else if(benMatrix[x,y].BenefitType==InsBenefitType.Limitations
+						&& ((Canadian.IsQuebec() && benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02600"))//Different code for Quebec,
+							|| (!Canadian.IsQuebec() && benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02601")))//than for the rest of Canada.
+						&& benMatrix[x,y].Quantity !=0
+						&& CultureInfo.CurrentCulture.Name.EndsWith("CA"))
 					{
 						desc+="Pano/FMX frequency ";
 					}

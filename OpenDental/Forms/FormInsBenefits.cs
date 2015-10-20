@@ -3,8 +3,10 @@ using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Forms;
 using OpenDental.UI;
+using OpenDental.Eclaims;
 using OpenDentBusiness;
 
 namespace OpenDental{
@@ -1266,6 +1268,19 @@ namespace OpenDental{
 				{
 					textFlo.Text=ben.Quantity.ToString();
 				}
+				//Canadian Flo
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && 
+					((Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="12400")//The proc code is different for Quebec!
+					|| (!Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="12101"))//The rest of Canada conforms to a standard.
+					&& ben.BenefitType==InsBenefitType.Limitations
+					//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
+					&& ben.MonetaryAmt==-1
+					&& ben.PatPlanNum==0
+					&& ben.Percent==-1
+					&& ben.QuantityQualifier==BenefitQuantity.AgeLimit)
+				{
+					textFlo.Text=ben.Quantity.ToString();
+				}
 				//BWs
 				else if(ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D0274"//4BW
 					&& ben.BenefitType==InsBenefitType.Limitations
@@ -1289,6 +1304,29 @@ namespace OpenDental{
 						comboBW.SelectedIndex=1;//# per year
 					}
 				}
+				//Canadian BWs
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA")//All of Canada, including Quebec (the proc codes are the same in this instance).
+					&& ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02144"//4BW
+					&& ben.BenefitType==InsBenefitType.Limitations
+					//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
+					&& ben.MonetaryAmt==-1
+					&& ben.PatPlanNum==0
+					&& ben.Percent==-1
+					&& (ben.QuantityQualifier==BenefitQuantity.Months 
+						|| ben.QuantityQualifier==BenefitQuantity.Years
+						|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices)) 
+				{
+					textBW.Text=ben.Quantity.ToString();
+					if(ben.QuantityQualifier==BenefitQuantity.Months){
+						comboBW.SelectedIndex=2;
+					}
+					else if(ben.QuantityQualifier==BenefitQuantity.Years){
+						comboBW.SelectedIndex=0;
+					}
+					else{
+						comboBW.SelectedIndex=1;//# per year
+					}
+				}
 				//Pano
 				else if(ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D0330"//Pano
 					&& ben.BenefitType==InsBenefitType.Limitations
@@ -1299,6 +1337,31 @@ namespace OpenDental{
 					&& (ben.QuantityQualifier==BenefitQuantity.Months 
 						|| ben.QuantityQualifier==BenefitQuantity.Years
 						|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices))
+				//&& ben.TimePeriod might be none, or calYear, or ServiceYear, or Years.
+				{
+					textPano.Text=ben.Quantity.ToString();
+					if(ben.QuantityQualifier==BenefitQuantity.Months) {
+						comboPano.SelectedIndex=2;
+					}
+					else if(ben.QuantityQualifier==BenefitQuantity.Years) {
+						comboPano.SelectedIndex=0;
+					}
+					else {
+						comboPano.SelectedIndex=1;//# per year
+					}
+				}
+				//Canadian Pano
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && 
+					((Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02600")//The proc code is different for Quebec!
+					|| (!Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02601"))//The rest of Canada conforms to a standard.
+					&& ben.BenefitType==InsBenefitType.Limitations
+					//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
+					&& ben.MonetaryAmt==-1
+					&& ben.PatPlanNum==0
+					&& ben.Percent==-1
+					&& (ben.QuantityQualifier==BenefitQuantity.Months 
+						|| ben.QuantityQualifier==BenefitQuantity.Years
+						|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices)) 
 				//&& ben.TimePeriod might be none, or calYear, or ServiceYear, or Years.
 				{
 					textPano.Text=ben.Quantity.ToString();
@@ -1943,7 +2006,17 @@ namespace OpenDental{
 			//Flo
 			if(textFlo.Text !=""){
 				ben=new Benefit();
-				ben.CodeNum=ProcedureCodes.GetCodeNum("D1208");
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(Canadian.IsQuebec()) {//Quebec
+						ben.CodeNum=ProcedureCodes.GetCodeNum("12400");
+					}
+					else {//The rest of Canada use the same procedure codes.
+						ben.CodeNum=ProcedureCodes.GetCodeNum("12101");
+					}
+				}
+				else{//USA
+					ben.CodeNum=ProcedureCodes.GetCodeNum("D1208");
+				}
 				ben.BenefitType=InsBenefitType.Limitations;
 				ben.CovCatNum=0;
 				ben.PlanNum=PlanNum;
@@ -1954,7 +2027,12 @@ namespace OpenDental{
 			//frequency BW
 			if(textBW.Text !="") {
 				ben=new Benefit();
-				ben.CodeNum=ProcedureCodes.GetCodeNum("D0274");//4BW
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					ben.CodeNum=ProcedureCodes.GetCodeNum("02144");//4BW The same code for Quebec as well as the rest of Canada.
+				}
+				else {//USA
+					ben.CodeNum=ProcedureCodes.GetCodeNum("D0274");//4BW
+				}
 				ben.BenefitType=InsBenefitType.Limitations;
 				ben.CovCatNum=0;
 				ben.PlanNum=PlanNum;
@@ -1980,7 +2058,18 @@ namespace OpenDental{
 			//Frequency pano
 			if(textPano.Text !="") {
 				ben=new Benefit();
-				ben.CodeNum=ProcedureCodes.GetCodeNum("D0330");//Pano
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(Canadian.IsQuebec()) {
+						ben.CodeNum=ProcedureCodes.GetCodeNum("02600");
+					}
+					else {//The rest of Canada use the same procedure codes.
+						ben.CodeNum=ProcedureCodes.GetCodeNum("02601");
+					}
+				}
+				else {//USA
+					ben.CodeNum=ProcedureCodes.GetCodeNum("D0330");//Pano
+				}
+			
 				ben.BenefitType=InsBenefitType.Limitations;
 				ben.CovCatNum=0;
 				ben.PlanNum=PlanNum;
