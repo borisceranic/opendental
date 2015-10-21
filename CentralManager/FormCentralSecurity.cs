@@ -53,6 +53,12 @@ namespace CentralManager {
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Schedules);
 					node.Nodes.Add(node2);
+				node2=SetNode("Merge Tools");
+					node3=SetNode(Permissions.PatientMerge);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ReferralMerge);
+						node2.Nodes.Add(node3);
+					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.Providers);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.ProviderFeeEdit);

@@ -289,6 +289,7 @@ namespace OpenDentBusiness{
 				//case Permissions.JobReview:
 				//case Permissions.WebmailDelete:
 				//case Permissions.MissingRequiredField:
+				//case Permissions.ReferralMerge:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -426,6 +427,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Referral, Delete from Patient");
 				case Permissions.ReferralAdd:
 					return Lans.g("enumPermissions","Referral Add");
+				case Permissions.ReferralMerge:
+					return Lans.g("enumPermissions","Referral Merge");
 				case Permissions.ReportDashboard:
 					return Lans.g("enumPermissions","Reports - Dashboard");
 				case Permissions.ReportProdInc:

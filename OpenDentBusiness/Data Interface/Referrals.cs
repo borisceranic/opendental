@@ -106,7 +106,10 @@ namespace OpenDentBusiness{
 			}
 			string retVal=referral.LName;
 			if(referral.FName!="") {
-				retVal+=", "+referral.FName+" "+referral.MName;
+				retVal+=", "+referral.FName;
+			}
+			if(referral.MName!="") {
+				retVal+=" "+referral.MName;
 			}
 			if(referral.Title !="") {
 				retVal+=", "+referral.Title;
@@ -201,6 +204,34 @@ namespace OpenDentBusiness{
 				}
 			}
 			return listRefs;
+		}
+
+		///<summary>Merges two referrals into a single referral. Returns false if both referrals are the same.</summary>
+		public static bool MergeReferrals(long refNumInto,long refNumFrom) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),refNumInto,refNumFrom);
+			}
+			if(refNumInto==refNumFrom) {
+				//Do not merge the same referral onto itself.
+				return false;
+			}
+			string command="UPDATE claim "
+				+"SET ReferringProv="+POut.Long(refNumInto)+" "
+				+"WHERE ReferringProv="+POut.Long(refNumFrom);
+			Db.NonQ(command);
+			command="UPDATE refattach "
+				+"SET ReferralNum="+POut.Long(refNumInto)+" "
+				+"WHERE ReferralNum="+POut.Long(refNumFrom);
+			Db.NonQ(command);
+			Crud.ReferralCrud.Delete(refNumFrom);
+			return true;
+		}
+
+		///<summary>Returns the number of refattaches that this referral has.</summary>
+		public static int CountReferralAttach(long referralNum) {
+			string command="SELECT COUNT(*) FROM refattach "
+				+"WHERE ReferralNum="+POut.Long(referralNum);
+			return PIn.Int(Db.GetCount(command));
 		}
 
 		///<summary>Used to check if a specialty is in use when user is trying to hide it.</summary>

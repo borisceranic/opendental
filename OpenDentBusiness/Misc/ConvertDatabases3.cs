@@ -10774,6 +10774,25 @@ namespace OpenDentBusiness {
 						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ImeCompositionCompatibility','0')";
 					Db.NonQ(command);
 				}
+				//Add permission to groups with existing permission PatientMerge
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=94";//PatientMerge
+				table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",99)";//ReferralMerge
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",99)";//ReferralMerge
+						Db.NonQ(command);
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

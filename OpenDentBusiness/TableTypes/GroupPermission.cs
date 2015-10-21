@@ -223,9 +223,11 @@ namespace OpenDentBusiness{
 		AppointmentCompleteEdit,
 		///<summary>97- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
 		WebmailDelete,
-		///<summary>105- Audit trail for saving a patient with required fields missing.  There is no user interface in the security window for this 
+		///<summary>98- Audit trail for saving a patient with required fields missing.  There is no user interface in the security window for this 
 		///permission.</summary>
-		RequiredFields
+		RequiredFields,
+		///<summary>99- Allows user to merge referrals.</summary>
+		ReferralMerge
 	}
 
 	

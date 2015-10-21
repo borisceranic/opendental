@@ -368,6 +368,7 @@ namespace OpenDental{
 		private MenuItem menuItemRequiredFields;
 		private MenuItem menuItemJobManager;
 		private MenuItem menuItemStateAbbrs;
+		private MenuItem menuItemMergeReferrals;
 		private MenuItem menuItemActionNeeded;
 		private FormSmsTextMessaging _formSmsTextMessaging;
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
@@ -598,6 +599,7 @@ namespace OpenDental{
 			this.menuItemCreateAtoZFolders = new System.Windows.Forms.MenuItem();
 			this.menuItemImportXML = new System.Windows.Forms.MenuItem();
 			this.menuItemMergePatients = new System.Windows.Forms.MenuItem();
+			this.menuItemMergeReferrals = new System.Windows.Forms.MenuItem();
 			this.menuItemMoveSubscribers = new System.Windows.Forms.MenuItem();
 			this.menuItemProcLockTool = new System.Windows.Forms.MenuItem();
 			this.menuItemShutdown = new System.Windows.Forms.MenuItem();
@@ -1470,6 +1472,7 @@ namespace OpenDental{
             this.menuItemCreateAtoZFolders,
             this.menuItemImportXML,
             this.menuItemMergePatients,
+            this.menuItemMergeReferrals,
             this.menuItemMoveSubscribers,
             this.menuItemProcLockTool,
             this.menuItemShutdown,
@@ -1502,39 +1505,45 @@ namespace OpenDental{
 			this.menuItemMergePatients.Text = "Merge Patients";
 			this.menuItemMergePatients.Click += new System.EventHandler(this.menuItemMergePatients_Click);
 			// 
+			// menuItemMergeReferrals
+			// 
+			this.menuItemMergeReferrals.Index = 4;
+			this.menuItemMergeReferrals.Text = "Merge Referrals";
+			this.menuItemMergeReferrals.Click += new System.EventHandler(this.menuItemMergeReferrals_Click);
+			// 
 			// menuItemMoveSubscribers
 			// 
-			this.menuItemMoveSubscribers.Index = 4;
+			this.menuItemMoveSubscribers.Index = 5;
 			this.menuItemMoveSubscribers.Text = "Move Subscribers";
 			this.menuItemMoveSubscribers.Click += new System.EventHandler(this.menuItemMoveSubscribers_Click);
 			// 
 			// menuItemProcLockTool
 			// 
-			this.menuItemProcLockTool.Index = 5;
+			this.menuItemProcLockTool.Index = 6;
 			this.menuItemProcLockTool.Text = "Procedure Lock Tool";
 			this.menuItemProcLockTool.Click += new System.EventHandler(this.menuItemProcLockTool_Click);
 			// 
 			// menuItemShutdown
 			// 
-			this.menuItemShutdown.Index = 6;
+			this.menuItemShutdown.Index = 7;
 			this.menuItemShutdown.Text = "Shutdown All Workstations";
 			this.menuItemShutdown.Click += new System.EventHandler(this.menuItemShutdown_Click);
 			// 
 			// menuTelephone
 			// 
-			this.menuTelephone.Index = 7;
+			this.menuTelephone.Index = 8;
 			this.menuTelephone.Text = "Telephone Numbers";
 			this.menuTelephone.Click += new System.EventHandler(this.menuTelephone_Click);
 			// 
 			// menuItemTestLatency
 			// 
-			this.menuItemTestLatency.Index = 8;
+			this.menuItemTestLatency.Index = 9;
 			this.menuItemTestLatency.Text = "Test Latency";
 			this.menuItemTestLatency.Click += new System.EventHandler(this.menuItemTestLatency_Click);
 			// 
 			// menuItemXChargeReconcile
 			// 
-			this.menuItemXChargeReconcile.Index = 9;
+			this.menuItemXChargeReconcile.Index = 10;
 			this.menuItemXChargeReconcile.Text = "X-Charge Reconcile";
 			this.menuItemXChargeReconcile.Visible = false;
 			this.menuItemXChargeReconcile.Click += new System.EventHandler(this.menuItemXChargeReconcile_Click);
@@ -6080,6 +6089,15 @@ namespace OpenDental{
 			}
 			FormPatientMerge fpm=new FormPatientMerge();
 			fpm.ShowDialog();
+			//Security log entries are made from within the form.
+		}
+
+		private void menuItemMergeReferrals_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ReferralMerge)) {
+				return;
+			}
+			FormReferralMerge FormRM=new FormReferralMerge();
+			FormRM.ShowDialog();
 			//Security log entries are made from within the form.
 		}
 
