@@ -24,8 +24,6 @@ namespace OpenDental {
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormRequiredFields));
-			this.butColor = new System.Windows.Forms.Button();
-			this.label6 = new System.Windows.Forms.Label();
 			this.listAvailableFields = new System.Windows.Forms.ListBox();
 			this.labelExplanation = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
@@ -41,25 +39,6 @@ namespace OpenDental {
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
-			// 
-			// butColor
-			// 
-			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Location = new System.Drawing.Point(481, 496);
-			this.butColor.Name = "butColor";
-			this.butColor.Size = new System.Drawing.Size(30, 20);
-			this.butColor.TabIndex = 13;
-			this.butColor.Click += new System.EventHandler(this.butColor_Click);
-			// 
-			// label6
-			// 
-			this.label6.ImageAlign = System.Drawing.ContentAlignment.TopRight;
-			this.label6.Location = new System.Drawing.Point(515, 496);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(144, 20);
-			this.label6.TabIndex = 12;
-			this.label6.Text = "Required Field Color";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// listAvailableFields
 			// 
@@ -246,8 +225,6 @@ namespace OpenDental {
 			this.Controls.Add(this.butRight);
 			this.Controls.Add(this.listAvailableFields);
 			this.Controls.Add(this.gridMain);
-			this.Controls.Add(this.butColor);
-			this.Controls.Add(this.label6);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(899, 594);
@@ -263,8 +240,6 @@ namespace OpenDental {
 		#endregion
 
 		private UI.Button butClose;
-		private System.Windows.Forms.Button butColor;
-		private System.Windows.Forms.Label label6;
 		private UI.Button butRight;
 		private System.Windows.Forms.ListBox listAvailableFields;
 		private UI.ODGrid gridMain;

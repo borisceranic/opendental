@@ -18,19 +18,19 @@ using System.Linq;
 namespace OpenDental{
 ///<summary></summary>
 	public class FormPatientEdit : System.Windows.Forms.Form{
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.Label label12;
-		private System.Windows.Forms.Label label16;
-		private System.Windows.Forms.Label label17;
-		private System.Windows.Forms.Label label18;
+		private System.Windows.Forms.Label labelLName;
+		private System.Windows.Forms.Label labelFName;
+		private System.Windows.Forms.Label labelMiddleI;
+		private System.Windows.Forms.Label labelPreferred;
+		private System.Windows.Forms.Label labelStatus;
+		private System.Windows.Forms.Label labelGender;
+		private System.Windows.Forms.Label labelPosition;
+		private System.Windows.Forms.Label labelBirthdate;
+		private System.Windows.Forms.Label labelAddress;
+		private System.Windows.Forms.Label labelAddress2;
+		private System.Windows.Forms.Label labelHmPhone;
+		private System.Windows.Forms.Label labelWkPhone;
+		private System.Windows.Forms.Label labelWirelessPhone;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private IContainer components;// Required designer variable.
@@ -48,7 +48,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textWirelessPhone;
 		private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.TextBox textAge;
-		private System.Windows.Forms.Label label21;
+		private System.Windows.Forms.Label labelSalutation;
 		private System.Windows.Forms.TextBox textSalutation;
 		private System.Windows.Forms.TextBox textEmail;
 		private System.Windows.Forms.GroupBox groupBox2;
@@ -57,7 +57,7 @@ namespace OpenDental{
 		private System.Windows.Forms.RadioButton radioStudentP;
 		private System.Windows.Forms.RadioButton radioStudentF;
 		private System.Windows.Forms.Label labelSchoolName;
-		private System.Windows.Forms.Label label29;
+		private System.Windows.Forms.Label labelChartNumber;
 		private System.Windows.Forms.TextBox textChartNumber;
 		//private OpenDental.ValidDate textBirthdate2;
 		private OpenDental.ValidDate textBirthdate;
@@ -71,25 +71,25 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label19;
 		private System.Windows.Forms.Label label32;
 		private OpenDental.UI.Button butAuto;
-		private System.Windows.Forms.Label label31;
+		private System.Windows.Forms.Label labelMedicaidID;
 		private System.Windows.Forms.TextBox textMedicaidID;
 		private System.Windows.Forms.ListBox listStatus;
 		private System.Windows.Forms.ListBox listGender;
 		private System.Windows.Forms.ListBox listPosition;
 		private System.Windows.Forms.TextBox textEmployer;
-		private System.Windows.Forms.Label label33;
+		private System.Windows.Forms.Label labelEmployer;
 		private System.Windows.Forms.Label labelSSN;
 		private System.Windows.Forms.Label labelZip;
 		private System.Windows.Forms.Label labelST;
 		private OpenDental.UI.Button butEditZip;
 		private System.Windows.Forms.Label labelCity;
 		private System.Windows.Forms.Label labelRaceEthnicity;
-		private System.Windows.Forms.Label label13;
-		private System.Windows.Forms.Label label14;
-		private System.Windows.Forms.Label label15;
+		private System.Windows.Forms.Label labelCounty;
+		private System.Windows.Forms.Label labelSite;
+		private System.Windows.Forms.Label labelGradeLevel;
 		private System.Windows.Forms.GroupBox groupPH;
 		private System.Windows.Forms.TextBox textCounty;
-		private System.Windows.Forms.Label label35;
+		private System.Windows.Forms.Label labelUrgency;
 		private System.Windows.Forms.TextBox textSite;
 		private System.Windows.Forms.ComboBox comboGradeLevel;
 		private System.Windows.Forms.ComboBox comboUrgency;
@@ -102,11 +102,11 @@ namespace OpenDental{
 		private System.Windows.Forms.ListBox listCounties;//displays dropdown for GradeSchools
 		private string countyOriginal;
 		private OpenDental.ValidDate textDateFirstVisit;
-		private System.Windows.Forms.Label label36;
+		private System.Windows.Forms.Label labelDateFirstVisit;
 		private bool mouseIsInListCounties;
 		private County[] CountiesList;
 		private OpenDental.ODtextBox textAddrNotes;
-		private System.Windows.Forms.Label label37;
+		private System.Windows.Forms.Label labelPutInInsPlan;
 		private System.Windows.Forms.ListBox listEmps;//displayed from within code, not designer
 		private string empOriginal;//used in the emp dropdown logic
 		private bool mouseIsInListEmps;
@@ -120,23 +120,23 @@ namespace OpenDental{
 		private Label labelTrophyFolder;
 		private TextBox textWard;
 		private Label labelWard;
-		private Label label28;
+		private Label labelLanguage;
 		private ComboBox comboLanguage;
 		private Patient PatOld;
 		private ComboBox comboContact;
-		private Label label23;
+		private Label labelContact;
 		private ComboBox comboConfirm;
-		private Label label24;
+		private Label labelConfirm;
 		private ComboBox comboRecall;
-		private Label label25;
+		private Label labelRecall;
 		private ValidDate textAdmitDate;
 		private Label labelAdmitDate;
 		private TextBox textTitle;
-		private Label label26;
+		private Label labelTitle;
 		private OpenDental.UI.Button butPickSite;
 		private OpenDental.UI.Button butPickResponsParty;
 		private TextBox textResponsParty;
-		private Label label34;
+		private Label labelResponsParty;
 		private OpenDental.UI.Button butClearResponsParty;
 		private Label labelCanadianEligibilityCode;
 		private ComboBox comboCanadianEligibilityCode;
@@ -147,10 +147,10 @@ namespace OpenDental{
 		private List<string> languageList;
 		private OpenDental.UI.Button butGuardianDefaults;
 		private TextBox textAskToArriveEarly;
-		private Label label42;
+		private Label labelAskToArriveEarly;
 		private CheckBox checkArriveEarlySame;
 		private Label label43;
-		private Label label10;
+		private Label labelTextOk;
 		private ListBox listTextOk;
 		private ComboBoxMulti comboBoxMultiRace;
 		private ComboBox comboEthnicity;
@@ -173,32 +173,38 @@ namespace OpenDental{
 		private UI.Button butPickSecondary;
 		private ComboBox comboBillType;
 		private UI.Button butPickPrimary;
-		private Label label1;
-		private Label label40;
+		private Label labelBillType;
+		private Label labelFeeSched;
 		private TextBox textCreditType;
-		private Label label39;
-		private Label label27;
-		private Label label38;
+		private Label labelSecProv;
+		private Label labelCreditType;
+		private Label labelPriProv;
 		private ComboBox comboPriProv;
 		private ComboBox comboFeeSched;
 		private ComboBox comboSecProv;
 		private CheckBox checkBillProvSame;
 		private Label label30;
-		private Label label22;
+		private Label labelEmail;
 		private TextBox textReferredFrom;
 		private UI.Button butReferredFrom;
-		private Label label44;
+		private Label labelReferredFrom;
 		private List<Clinic> _listClinics;
 		private ToolTip _referredFromToolTip;
 		private TextBox textMedicaidState;
+		private Label labelRequiredField;
 		///<summary>Local cache of RefAttaches for the current patient.  Set in FillReferrals().</summary>
 		private List<RefAttach> _listRefAttaches;
 		private System.Windows.Forms.ListBox listMedicaidStates;//displayed from within code, not designer
+		private List<RequiredField> _listRequiredFields;
 		private string _medicaidStateOriginal;//used in the medicaidState dropdown logic
 		private bool _mouseIsInListMedicaidStates;
 		private System.Windows.Forms.ListBox listStates;//displayed from within code, not designer
 		private string _stateOriginal;//used in the medicaidState dropdown logic
 		private bool _mouseIsInListStates;
+		private bool _isMissingRequiredFields;
+		private bool _isLoad;//To keep track if ListBoxes' selected index is changed by the user
+		private ErrorProvider _errorProv=new ErrorProvider();
+		private bool _isValidating=false;
 
 		///<summary></summary>
 		public FormPatientEdit(Patient patCur,Family famCur){
@@ -294,23 +300,23 @@ namespace OpenDental{
 
 		private void InitializeComponent(){
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPatientEdit));
-			this.label2 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.label7 = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
-			this.label9 = new System.Windows.Forms.Label();
+			this.labelLName = new System.Windows.Forms.Label();
+			this.labelFName = new System.Windows.Forms.Label();
+			this.labelMiddleI = new System.Windows.Forms.Label();
+			this.labelPreferred = new System.Windows.Forms.Label();
+			this.labelStatus = new System.Windows.Forms.Label();
+			this.labelGender = new System.Windows.Forms.Label();
+			this.labelPosition = new System.Windows.Forms.Label();
+			this.labelBirthdate = new System.Windows.Forms.Label();
 			this.labelSSN = new System.Windows.Forms.Label();
-			this.label11 = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
+			this.labelAddress = new System.Windows.Forms.Label();
+			this.labelAddress2 = new System.Windows.Forms.Label();
 			this.labelCity = new System.Windows.Forms.Label();
 			this.labelST = new System.Windows.Forms.Label();
 			this.labelZip = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
-			this.label17 = new System.Windows.Forms.Label();
-			this.label18 = new System.Windows.Forms.Label();
+			this.labelHmPhone = new System.Windows.Forms.Label();
+			this.labelWkPhone = new System.Windows.Forms.Label();
+			this.labelWirelessPhone = new System.Windows.Forms.Label();
 			this.textLName = new System.Windows.Forms.TextBox();
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.textMiddleI = new System.Windows.Forms.TextBox();
@@ -328,7 +334,7 @@ namespace OpenDental{
 			this.label20 = new System.Windows.Forms.Label();
 			this.textAge = new System.Windows.Forms.TextBox();
 			this.textSalutation = new System.Windows.Forms.TextBox();
-			this.label21 = new System.Windows.Forms.Label();
+			this.labelSalutation = new System.Windows.Forms.Label();
 			this.textEmail = new System.Windows.Forms.TextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.labelCanadianEligibilityCode = new System.Windows.Forms.Label();
@@ -338,7 +344,7 @@ namespace OpenDental{
 			this.radioStudentP = new System.Windows.Forms.RadioButton();
 			this.radioStudentF = new System.Windows.Forms.RadioButton();
 			this.labelSchoolName = new System.Windows.Forms.Label();
-			this.label29 = new System.Windows.Forms.Label();
+			this.labelChartNumber = new System.Windows.Forms.Label();
 			this.textChartNumber = new System.Windows.Forms.TextBox();
 			this.textBirthdate = new OpenDental.ValidDate();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -356,12 +362,12 @@ namespace OpenDental{
 			this.label32 = new System.Windows.Forms.Label();
 			this.butAuto = new OpenDental.UI.Button();
 			this.textMedicaidID = new System.Windows.Forms.TextBox();
-			this.label31 = new System.Windows.Forms.Label();
+			this.labelMedicaidID = new System.Windows.Forms.Label();
 			this.listStatus = new System.Windows.Forms.ListBox();
 			this.listGender = new System.Windows.Forms.ListBox();
 			this.listPosition = new System.Windows.Forms.ListBox();
 			this.textEmployer = new System.Windows.Forms.TextBox();
-			this.label33 = new System.Windows.Forms.Label();
+			this.labelEmployer = new System.Windows.Forms.Label();
 			this.groupPH = new System.Windows.Forms.GroupBox();
 			this.comboBoxMultiRace = new OpenDental.UI.ComboBoxMulti();
 			this.comboEthnicity = new System.Windows.Forms.ComboBox();
@@ -369,47 +375,47 @@ namespace OpenDental{
 			this.butClearResponsParty = new OpenDental.UI.Button();
 			this.butPickResponsParty = new OpenDental.UI.Button();
 			this.textResponsParty = new System.Windows.Forms.TextBox();
-			this.label34 = new System.Windows.Forms.Label();
+			this.labelResponsParty = new System.Windows.Forms.Label();
 			this.butPickSite = new OpenDental.UI.Button();
 			this.comboUrgency = new System.Windows.Forms.ComboBox();
 			this.comboGradeLevel = new System.Windows.Forms.ComboBox();
 			this.textSite = new System.Windows.Forms.TextBox();
-			this.label35 = new System.Windows.Forms.Label();
+			this.labelUrgency = new System.Windows.Forms.Label();
 			this.textCounty = new System.Windows.Forms.TextBox();
-			this.label15 = new System.Windows.Forms.Label();
-			this.label14 = new System.Windows.Forms.Label();
-			this.label13 = new System.Windows.Forms.Label();
+			this.labelGradeLevel = new System.Windows.Forms.Label();
+			this.labelSite = new System.Windows.Forms.Label();
+			this.labelCounty = new System.Windows.Forms.Label();
 			this.labelRaceEthnicity = new System.Windows.Forms.Label();
 			this.textDateFirstVisit = new OpenDental.ValidDate();
-			this.label36 = new System.Windows.Forms.Label();
-			this.label37 = new System.Windows.Forms.Label();
+			this.labelDateFirstVisit = new System.Windows.Forms.Label();
+			this.labelPutInInsPlan = new System.Windows.Forms.Label();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.textTrophyFolder = new System.Windows.Forms.TextBox();
 			this.labelTrophyFolder = new System.Windows.Forms.Label();
 			this.textWard = new System.Windows.Forms.TextBox();
 			this.labelWard = new System.Windows.Forms.Label();
-			this.label28 = new System.Windows.Forms.Label();
+			this.labelLanguage = new System.Windows.Forms.Label();
 			this.comboLanguage = new System.Windows.Forms.ComboBox();
 			this.comboContact = new System.Windows.Forms.ComboBox();
-			this.label23 = new System.Windows.Forms.Label();
+			this.labelContact = new System.Windows.Forms.Label();
 			this.comboConfirm = new System.Windows.Forms.ComboBox();
-			this.label24 = new System.Windows.Forms.Label();
+			this.labelConfirm = new System.Windows.Forms.Label();
 			this.comboRecall = new System.Windows.Forms.ComboBox();
-			this.label25 = new System.Windows.Forms.Label();
+			this.labelRecall = new System.Windows.Forms.Label();
 			this.textAdmitDate = new OpenDental.ValidDate();
 			this.labelAdmitDate = new System.Windows.Forms.Label();
 			this.textTitle = new System.Windows.Forms.TextBox();
-			this.label26 = new System.Windows.Forms.Label();
+			this.labelTitle = new System.Windows.Forms.Label();
 			this.label41 = new System.Windows.Forms.Label();
 			this.listRelationships = new System.Windows.Forms.ListBox();
 			this.butAddGuardian = new OpenDental.UI.Button();
 			this.butGuardianDefaults = new OpenDental.UI.Button();
 			this.textAskToArriveEarly = new System.Windows.Forms.TextBox();
-			this.label42 = new System.Windows.Forms.Label();
+			this.labelAskToArriveEarly = new System.Windows.Forms.Label();
 			this.checkArriveEarlySame = new System.Windows.Forms.CheckBox();
 			this.label43 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
+			this.labelTextOk = new System.Windows.Forms.Label();
 			this.listTextOk = new System.Windows.Forms.ListBox();
 			this.textMotherMaidenFname = new System.Windows.Forms.TextBox();
 			this.labelMotherMaidenFname = new System.Windows.Forms.Label();
@@ -420,25 +426,26 @@ namespace OpenDental{
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.label30 = new System.Windows.Forms.Label();
 			this.checkEmailPhoneSame = new System.Windows.Forms.CheckBox();
-			this.label22 = new System.Windows.Forms.Label();
+			this.labelEmail = new System.Windows.Forms.Label();
 			this.groupBillProv = new System.Windows.Forms.GroupBox();
 			this.checkBillProvSame = new System.Windows.Forms.CheckBox();
 			this.butPickSecondary = new OpenDental.UI.Button();
 			this.comboBillType = new System.Windows.Forms.ComboBox();
 			this.butPickPrimary = new OpenDental.UI.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label40 = new System.Windows.Forms.Label();
+			this.labelBillType = new System.Windows.Forms.Label();
+			this.labelFeeSched = new System.Windows.Forms.Label();
 			this.textCreditType = new System.Windows.Forms.TextBox();
-			this.label39 = new System.Windows.Forms.Label();
-			this.label27 = new System.Windows.Forms.Label();
-			this.label38 = new System.Windows.Forms.Label();
+			this.labelSecProv = new System.Windows.Forms.Label();
+			this.labelCreditType = new System.Windows.Forms.Label();
+			this.labelPriProv = new System.Windows.Forms.Label();
 			this.comboPriProv = new System.Windows.Forms.ComboBox();
 			this.comboFeeSched = new System.Windows.Forms.ComboBox();
 			this.comboSecProv = new System.Windows.Forms.ComboBox();
 			this.textReferredFrom = new System.Windows.Forms.TextBox();
 			this.butReferredFrom = new OpenDental.UI.Button();
-			this.label44 = new System.Windows.Forms.Label();
+			this.labelReferredFrom = new System.Windows.Forms.Label();
 			this.textMedicaidState = new System.Windows.Forms.TextBox();
+			this.labelRequiredField = new System.Windows.Forms.Label();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -447,77 +454,77 @@ namespace OpenDental{
 			this.groupBillProv.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label2
+			// labelLName
 			// 
-			this.label2.Location = new System.Drawing.Point(5, 32);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(154, 14);
-			this.label2.TabIndex = 0;
-			this.label2.Text = "Last Name";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelLName.Location = new System.Drawing.Point(5, 32);
+			this.labelLName.Name = "labelLName";
+			this.labelLName.Size = new System.Drawing.Size(154, 14);
+			this.labelLName.TabIndex = 0;
+			this.labelLName.Text = "Last Name";
+			this.labelLName.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label3
+			// labelFName
 			// 
-			this.label3.Location = new System.Drawing.Point(5, 52);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(154, 14);
-			this.label3.TabIndex = 0;
-			this.label3.Text = "First Name";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelFName.Location = new System.Drawing.Point(5, 52);
+			this.labelFName.Name = "labelFName";
+			this.labelFName.Size = new System.Drawing.Size(154, 14);
+			this.labelFName.TabIndex = 0;
+			this.labelFName.Text = "First Name";
+			this.labelFName.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label4
+			// labelMiddleI
 			// 
-			this.label4.Location = new System.Drawing.Point(5, 72);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(154, 14);
-			this.label4.TabIndex = 0;
-			this.label4.Text = "Middle Initial";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelMiddleI.Location = new System.Drawing.Point(5, 72);
+			this.labelMiddleI.Name = "labelMiddleI";
+			this.labelMiddleI.Size = new System.Drawing.Size(154, 14);
+			this.labelMiddleI.TabIndex = 0;
+			this.labelMiddleI.Text = "Middle Initial";
+			this.labelMiddleI.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label5
+			// labelPreferred
 			// 
-			this.label5.Location = new System.Drawing.Point(5, 92);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(154, 14);
-			this.label5.TabIndex = 0;
-			this.label5.Text = "Preferred Name";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelPreferred.Location = new System.Drawing.Point(5, 92);
+			this.labelPreferred.Name = "labelPreferred";
+			this.labelPreferred.Size = new System.Drawing.Size(154, 14);
+			this.labelPreferred.TabIndex = 0;
+			this.labelPreferred.Text = "Preferred Name";
+			this.labelPreferred.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label6
+			// labelStatus
 			// 
-			this.label6.Location = new System.Drawing.Point(19, 191);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(105, 14);
-			this.label6.TabIndex = 0;
-			this.label6.Text = "Status";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelStatus.Location = new System.Drawing.Point(19, 191);
+			this.labelStatus.Name = "labelStatus";
+			this.labelStatus.Size = new System.Drawing.Size(105, 14);
+			this.labelStatus.TabIndex = 0;
+			this.labelStatus.Text = "Status";
+			this.labelStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// label7
+			// labelGender
 			// 
-			this.label7.Location = new System.Drawing.Point(134, 191);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(105, 14);
-			this.label7.TabIndex = 0;
-			this.label7.Text = "Gender";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelGender.Location = new System.Drawing.Point(134, 191);
+			this.labelGender.Name = "labelGender";
+			this.labelGender.Size = new System.Drawing.Size(105, 14);
+			this.labelGender.TabIndex = 0;
+			this.labelGender.Text = "Gender";
+			this.labelGender.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// label8
+			// labelPosition
 			// 
-			this.label8.Location = new System.Drawing.Point(249, 191);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(105, 14);
-			this.label8.TabIndex = 0;
-			this.label8.Text = "Position";
-			this.label8.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.labelPosition.Location = new System.Drawing.Point(249, 191);
+			this.labelPosition.Name = "labelPosition";
+			this.labelPosition.Size = new System.Drawing.Size(105, 14);
+			this.labelPosition.TabIndex = 0;
+			this.labelPosition.Text = "Position";
+			this.labelPosition.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// label9
+			// labelBirthdate
 			// 
-			this.label9.Location = new System.Drawing.Point(2, 282);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(156, 14);
-			this.label9.TabIndex = 0;
-			this.label9.Text = "Birthdate";
-			this.label9.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelBirthdate.Location = new System.Drawing.Point(2, 282);
+			this.labelBirthdate.Name = "labelBirthdate";
+			this.labelBirthdate.Size = new System.Drawing.Size(156, 14);
+			this.labelBirthdate.TabIndex = 0;
+			this.labelBirthdate.Text = "Birthdate";
+			this.labelBirthdate.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// labelSSN
 			// 
@@ -528,23 +535,23 @@ namespace OpenDental{
 			this.labelSSN.Text = "SS#";
 			this.labelSSN.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label11
+			// labelAddress
 			// 
-			this.label11.Location = new System.Drawing.Point(8, 56);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(152, 14);
-			this.label11.TabIndex = 0;
-			this.label11.Text = "Address";
-			this.label11.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelAddress.Location = new System.Drawing.Point(8, 56);
+			this.labelAddress.Name = "labelAddress";
+			this.labelAddress.Size = new System.Drawing.Size(152, 14);
+			this.labelAddress.TabIndex = 0;
+			this.labelAddress.Text = "Address";
+			this.labelAddress.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label12
+			// labelAddress2
 			// 
-			this.label12.Location = new System.Drawing.Point(8, 76);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(152, 14);
-			this.label12.TabIndex = 0;
-			this.label12.Text = "Address2";
-			this.label12.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelAddress2.Location = new System.Drawing.Point(8, 76);
+			this.labelAddress2.Name = "labelAddress2";
+			this.labelAddress2.Size = new System.Drawing.Size(152, 14);
+			this.labelAddress2.TabIndex = 0;
+			this.labelAddress2.Text = "Address2";
+			this.labelAddress2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// labelCity
 			// 
@@ -573,32 +580,32 @@ namespace OpenDental{
 			this.labelZip.Text = "Zip";
 			this.labelZip.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label16
+			// labelHmPhone
 			// 
-			this.label16.Location = new System.Drawing.Point(8, 36);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(152, 14);
-			this.label16.TabIndex = 0;
-			this.label16.Text = "Home Phone";
-			this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelHmPhone.Location = new System.Drawing.Point(8, 36);
+			this.labelHmPhone.Name = "labelHmPhone";
+			this.labelHmPhone.Size = new System.Drawing.Size(152, 14);
+			this.labelHmPhone.TabIndex = 0;
+			this.labelHmPhone.Text = "Home Phone";
+			this.labelHmPhone.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label17
+			// labelWkPhone
 			// 
-			this.label17.Location = new System.Drawing.Point(8, 56);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(152, 14);
-			this.label17.TabIndex = 0;
-			this.label17.Text = "Work Phone";
-			this.label17.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelWkPhone.Location = new System.Drawing.Point(8, 56);
+			this.labelWkPhone.Name = "labelWkPhone";
+			this.labelWkPhone.Size = new System.Drawing.Size(152, 14);
+			this.labelWkPhone.TabIndex = 0;
+			this.labelWkPhone.Text = "Work Phone";
+			this.labelWkPhone.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label18
+			// labelWirelessPhone
 			// 
-			this.label18.Location = new System.Drawing.Point(8, 36);
-			this.label18.Name = "label18";
-			this.label18.Size = new System.Drawing.Size(152, 14);
-			this.label18.TabIndex = 0;
-			this.label18.Text = "Wireless Phone";
-			this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelWirelessPhone.Location = new System.Drawing.Point(8, 36);
+			this.labelWirelessPhone.Name = "labelWirelessPhone";
+			this.labelWirelessPhone.Size = new System.Drawing.Size(152, 14);
+			this.labelWirelessPhone.TabIndex = 0;
+			this.labelWirelessPhone.Text = "Wireless Phone";
+			this.labelWirelessPhone.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textLName
 			// 
@@ -608,6 +615,7 @@ namespace OpenDental{
 			this.textLName.Size = new System.Drawing.Size(228, 20);
 			this.textLName.TabIndex = 1;
 			this.textLName.TextChanged += new System.EventHandler(this.textLName_TextChanged);
+			this.textLName.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textFName
 			// 
@@ -617,6 +625,7 @@ namespace OpenDental{
 			this.textFName.Size = new System.Drawing.Size(228, 20);
 			this.textFName.TabIndex = 2;
 			this.textFName.TextChanged += new System.EventHandler(this.textFName_TextChanged);
+			this.textFName.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textMiddleI
 			// 
@@ -626,6 +635,7 @@ namespace OpenDental{
 			this.textMiddleI.Size = new System.Drawing.Size(96, 20);
 			this.textMiddleI.TabIndex = 3;
 			this.textMiddleI.TextChanged += new System.EventHandler(this.textMiddleI_TextChanged);
+			this.textMiddleI.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textPreferred
 			// 
@@ -635,6 +645,7 @@ namespace OpenDental{
 			this.textPreferred.Size = new System.Drawing.Size(228, 20);
 			this.textPreferred.TabIndex = 4;
 			this.textPreferred.TextChanged += new System.EventHandler(this.textPreferred_TextChanged);
+			this.textPreferred.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textSSN
 			// 
@@ -643,6 +654,7 @@ namespace OpenDental{
 			this.textSSN.Name = "textSSN";
 			this.textSSN.Size = new System.Drawing.Size(96, 20);
 			this.textSSN.TabIndex = 11;
+			this.textSSN.Leave += new System.EventHandler(this.textBox_Leave);
 			this.textSSN.Validating += new System.ComponentModel.CancelEventHandler(this.textSSN_Validating);
 			// 
 			// textAddress
@@ -653,15 +665,17 @@ namespace OpenDental{
 			this.textAddress.Size = new System.Drawing.Size(254, 20);
 			this.textAddress.TabIndex = 3;
 			this.textAddress.TextChanged += new System.EventHandler(this.textAddress_TextChanged);
+			this.textAddress.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textAddress2
 			// 
 			this.textAddress2.Location = new System.Drawing.Point(161, 72);
 			this.textAddress2.MaxLength = 100;
 			this.textAddress2.Name = "textAddress2";
-			this.textAddress2.Size = new System.Drawing.Size(253, 20);
+			this.textAddress2.Size = new System.Drawing.Size(254, 20);
 			this.textAddress2.TabIndex = 4;
 			this.textAddress2.TextChanged += new System.EventHandler(this.textAddress2_TextChanged);
+			this.textAddress2.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textCity
 			// 
@@ -671,6 +685,7 @@ namespace OpenDental{
 			this.textCity.Size = new System.Drawing.Size(198, 20);
 			this.textCity.TabIndex = 5;
 			this.textCity.TextChanged += new System.EventHandler(this.textCity_TextChanged);
+			this.textCity.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textState
 			// 
@@ -691,24 +706,27 @@ namespace OpenDental{
 			this.textHmPhone.Size = new System.Drawing.Size(198, 20);
 			this.textHmPhone.TabIndex = 2;
 			this.textHmPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
+			this.textHmPhone.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textWkPhone
 			// 
 			this.textWkPhone.Location = new System.Drawing.Point(161, 52);
 			this.textWkPhone.MaxLength = 30;
 			this.textWkPhone.Name = "textWkPhone";
-			this.textWkPhone.Size = new System.Drawing.Size(150, 20);
+			this.textWkPhone.Size = new System.Drawing.Size(135, 20);
 			this.textWkPhone.TabIndex = 3;
 			this.textWkPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
+			this.textWkPhone.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textWirelessPhone
 			// 
 			this.textWirelessPhone.Location = new System.Drawing.Point(161, 32);
 			this.textWirelessPhone.MaxLength = 30;
 			this.textWirelessPhone.Name = "textWirelessPhone";
-			this.textWirelessPhone.Size = new System.Drawing.Size(150, 20);
+			this.textWirelessPhone.Size = new System.Drawing.Size(135, 20);
 			this.textWirelessPhone.TabIndex = 2;
 			this.textWirelessPhone.TextChanged += new System.EventHandler(this.textAnyPhoneNumber_TextChanged);
+			this.textWirelessPhone.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// butOK
 			// 
@@ -720,7 +738,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(801, 665);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 32;
+			this.butOK.TabIndex = 34;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -735,7 +753,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(887, 665);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 33;
+			this.butCancel.TabIndex = 35;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -765,15 +783,16 @@ namespace OpenDental{
 			this.textSalutation.Size = new System.Drawing.Size(228, 20);
 			this.textSalutation.TabIndex = 6;
 			this.textSalutation.TextChanged += new System.EventHandler(this.textSalutation_TextChanged);
+			this.textSalutation.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label21
+			// labelSalutation
 			// 
-			this.label21.Location = new System.Drawing.Point(5, 132);
-			this.label21.Name = "label21";
-			this.label21.Size = new System.Drawing.Size(154, 14);
-			this.label21.TabIndex = 0;
-			this.label21.Text = "Salutation (Dear __)";
-			this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelSalutation.Location = new System.Drawing.Point(5, 132);
+			this.labelSalutation.Name = "labelSalutation";
+			this.labelSalutation.Size = new System.Drawing.Size(154, 14);
+			this.labelSalutation.TabIndex = 0;
+			this.labelSalutation.Text = "Salutation (Dear __)";
+			this.labelSalutation.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textEmail
 			// 
@@ -782,6 +801,7 @@ namespace OpenDental{
 			this.textEmail.Name = "textEmail";
 			this.textEmail.Size = new System.Drawing.Size(254, 20);
 			this.textEmail.TabIndex = 4;
+			this.textEmail.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// groupBox2
 			// 
@@ -796,7 +816,7 @@ namespace OpenDental{
 			this.groupBox2.Location = new System.Drawing.Point(12, 606);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(439, 84);
-			this.groupBox2.TabIndex = 27;
+			this.groupBox2.TabIndex = 28;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Student Status if Dependent Over 19 (for Ins)";
 			// 
@@ -814,11 +834,12 @@ namespace OpenDental{
 			// 
 			this.comboCanadianEligibilityCode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboCanadianEligibilityCode.FormattingEnabled = true;
-			this.comboCanadianEligibilityCode.Location = new System.Drawing.Point(195, 57);
+			this.comboCanadianEligibilityCode.Location = new System.Drawing.Point(194, 57);
 			this.comboCanadianEligibilityCode.Name = "comboCanadianEligibilityCode";
-			this.comboCanadianEligibilityCode.Size = new System.Drawing.Size(223, 21);
+			this.comboCanadianEligibilityCode.Size = new System.Drawing.Size(224, 21);
 			this.comboCanadianEligibilityCode.TabIndex = 5;
 			this.comboCanadianEligibilityCode.Visible = false;
+			this.comboCanadianEligibilityCode.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textSchool
 			// 
@@ -827,13 +848,13 @@ namespace OpenDental{
 			this.textSchool.Name = "textSchool";
 			this.textSchool.Size = new System.Drawing.Size(224, 20);
 			this.textSchool.TabIndex = 4;
+			this.textSchool.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// radioStudentN
 			// 
-			this.radioStudentN.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioStudentN.Location = new System.Drawing.Point(122, 18);
 			this.radioStudentN.Name = "radioStudentN";
-			this.radioStudentN.Size = new System.Drawing.Size(105, 16);
+			this.radioStudentN.Size = new System.Drawing.Size(117, 16);
 			this.radioStudentN.TabIndex = 1;
 			this.radioStudentN.TabStop = true;
 			this.radioStudentN.Text = "Nonstudent";
@@ -841,10 +862,9 @@ namespace OpenDental{
 			// 
 			// radioStudentP
 			// 
-			this.radioStudentP.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioStudentP.Location = new System.Drawing.Point(332, 18);
 			this.radioStudentP.Name = "radioStudentP";
-			this.radioStudentP.Size = new System.Drawing.Size(100, 16);
+			this.radioStudentP.Size = new System.Drawing.Size(86, 16);
 			this.radioStudentP.TabIndex = 3;
 			this.radioStudentP.TabStop = true;
 			this.radioStudentP.Text = "Parttime";
@@ -852,10 +872,9 @@ namespace OpenDental{
 			// 
 			// radioStudentF
 			// 
-			this.radioStudentF.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioStudentF.Location = new System.Drawing.Point(239, 18);
 			this.radioStudentF.Name = "radioStudentF";
-			this.radioStudentF.Size = new System.Drawing.Size(90, 16);
+			this.radioStudentF.Size = new System.Drawing.Size(93, 16);
 			this.radioStudentF.TabIndex = 2;
 			this.radioStudentF.TabStop = true;
 			this.radioStudentF.Text = "Fulltime";
@@ -870,14 +889,14 @@ namespace OpenDental{
 			this.labelSchoolName.Text = "College Name";
 			this.labelSchoolName.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label29
+			// labelChartNumber
 			// 
-			this.label29.Location = new System.Drawing.Point(5, 362);
-			this.label29.Name = "label29";
-			this.label29.Size = new System.Drawing.Size(154, 16);
-			this.label29.TabIndex = 0;
-			this.label29.Text = "ChartNumber";
-			this.label29.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelChartNumber.Location = new System.Drawing.Point(5, 362);
+			this.labelChartNumber.Name = "labelChartNumber";
+			this.labelChartNumber.Size = new System.Drawing.Size(154, 16);
+			this.labelChartNumber.TabIndex = 0;
+			this.labelChartNumber.Text = "ChartNumber";
+			this.labelChartNumber.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textChartNumber
 			// 
@@ -885,7 +904,8 @@ namespace OpenDental{
 			this.textChartNumber.MaxLength = 20;
 			this.textChartNumber.Name = "textChartNumber";
 			this.textChartNumber.Size = new System.Drawing.Size(96, 20);
-			this.textChartNumber.TabIndex = 13;
+			this.textChartNumber.TabIndex = 14;
+			this.textChartNumber.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// textBirthdate
 			// 
@@ -907,18 +927,18 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.textState);
 			this.groupBox1.Controls.Add(this.labelST);
 			this.groupBox1.Controls.Add(this.textAddress);
-			this.groupBox1.Controls.Add(this.label12);
+			this.groupBox1.Controls.Add(this.labelAddress2);
 			this.groupBox1.Controls.Add(this.labelCity);
 			this.groupBox1.Controls.Add(this.textAddress2);
 			this.groupBox1.Controls.Add(this.labelZip);
-			this.groupBox1.Controls.Add(this.label16);
+			this.groupBox1.Controls.Add(this.labelHmPhone);
 			this.groupBox1.Controls.Add(this.textCity);
-			this.groupBox1.Controls.Add(this.label11);
+			this.groupBox1.Controls.Add(this.labelAddress);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(488, 3);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(474, 160);
-			this.groupBox1.TabIndex = 28;
+			this.groupBox1.TabIndex = 29;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Address and Phone";
 			// 
@@ -959,6 +979,7 @@ namespace OpenDental{
 			this.textZip.Size = new System.Drawing.Size(87, 20);
 			this.textZip.TabIndex = 8;
 			this.textZip.TextChanged += new System.EventHandler(this.textZip_TextChanged);
+			this.textZip.Leave += new System.EventHandler(this.textBox_Leave);
 			this.textZip.Validating += new System.ComponentModel.CancelEventHandler(this.textZip_Validating);
 			// 
 			// comboZip
@@ -1000,7 +1021,7 @@ namespace OpenDental{
 			this.groupNotes.Location = new System.Drawing.Point(488, 164);
 			this.groupNotes.Name = "groupNotes";
 			this.groupNotes.Size = new System.Drawing.Size(474, 84);
-			this.groupNotes.TabIndex = 29;
+			this.groupNotes.TabIndex = 30;
 			this.groupNotes.TabStop = false;
 			this.groupNotes.Text = "Address and Phone Notes";
 			// 
@@ -1012,10 +1033,11 @@ namespace OpenDental{
 			this.textAddrNotes.Name = "textAddrNotes";
 			this.textAddrNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.PatAddressNote;
 			this.textAddrNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textAddrNotes.Size = new System.Drawing.Size(224, 46);
+			this.textAddrNotes.Size = new System.Drawing.Size(224, 52);
 			this.textAddrNotes.TabIndex = 0;
 			this.textAddrNotes.TabStop = false;
 			this.textAddrNotes.Text = "";
+			this.textAddrNotes.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// checkNotesSame
 			// 
@@ -1064,7 +1086,7 @@ namespace OpenDental{
 			this.butAuto.Location = new System.Drawing.Point(258, 358);
 			this.butAuto.Name = "butAuto";
 			this.butAuto.Size = new System.Drawing.Size(62, 22);
-			this.butAuto.TabIndex = 14;
+			this.butAuto.TabIndex = 15;
 			this.butAuto.Text = "Auto";
 			this.butAuto.Click += new System.EventHandler(this.butAuto_Click);
 			// 
@@ -1075,15 +1097,16 @@ namespace OpenDental{
 			this.textMedicaidID.Name = "textMedicaidID";
 			this.textMedicaidID.Size = new System.Drawing.Size(96, 20);
 			this.textMedicaidID.TabIndex = 12;
+			this.textMedicaidID.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label31
+			// labelMedicaidID
 			// 
-			this.label31.Location = new System.Drawing.Point(5, 342);
-			this.label31.Name = "label31";
-			this.label31.Size = new System.Drawing.Size(154, 14);
-			this.label31.TabIndex = 0;
-			this.label31.Text = "Medicaid ID, State";
-			this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelMedicaidID.Location = new System.Drawing.Point(5, 342);
+			this.labelMedicaidID.Name = "labelMedicaidID";
+			this.labelMedicaidID.Size = new System.Drawing.Size(154, 14);
+			this.labelMedicaidID.TabIndex = 0;
+			this.labelMedicaidID.Text = "Medicaid ID, State";
+			this.labelMedicaidID.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// listStatus
 			// 
@@ -1092,6 +1115,7 @@ namespace OpenDental{
 			this.listStatus.Size = new System.Drawing.Size(105, 69);
 			this.listStatus.TabIndex = 0;
 			this.listStatus.TabStop = false;
+			this.listStatus.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
 			// listGender
 			// 
@@ -1100,6 +1124,7 @@ namespace OpenDental{
 			this.listGender.Size = new System.Drawing.Size(105, 43);
 			this.listGender.TabIndex = 0;
 			this.listGender.TabStop = false;
+			this.listGender.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
 			// listPosition
 			// 
@@ -1120,14 +1145,14 @@ namespace OpenDental{
 			this.textEmployer.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textEmployer_KeyUp);
 			this.textEmployer.Leave += new System.EventHandler(this.textEmployer_Leave);
 			// 
-			// label33
+			// labelEmployer
 			// 
-			this.label33.Location = new System.Drawing.Point(5, 422);
-			this.label33.Name = "label33";
-			this.label33.Size = new System.Drawing.Size(154, 14);
-			this.label33.TabIndex = 0;
-			this.label33.Text = "Employer";
-			this.label33.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelEmployer.Location = new System.Drawing.Point(5, 422);
+			this.labelEmployer.Name = "labelEmployer";
+			this.labelEmployer.Size = new System.Drawing.Size(154, 14);
+			this.labelEmployer.TabIndex = 0;
+			this.labelEmployer.Text = "Employer";
+			this.labelEmployer.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// groupPH
 			// 
@@ -1137,22 +1162,22 @@ namespace OpenDental{
 			this.groupPH.Controls.Add(this.butClearResponsParty);
 			this.groupPH.Controls.Add(this.butPickResponsParty);
 			this.groupPH.Controls.Add(this.textResponsParty);
-			this.groupPH.Controls.Add(this.label34);
+			this.groupPH.Controls.Add(this.labelResponsParty);
 			this.groupPH.Controls.Add(this.butPickSite);
 			this.groupPH.Controls.Add(this.comboUrgency);
 			this.groupPH.Controls.Add(this.comboGradeLevel);
 			this.groupPH.Controls.Add(this.textSite);
-			this.groupPH.Controls.Add(this.label35);
+			this.groupPH.Controls.Add(this.labelUrgency);
 			this.groupPH.Controls.Add(this.textCounty);
-			this.groupPH.Controls.Add(this.label15);
-			this.groupPH.Controls.Add(this.label14);
-			this.groupPH.Controls.Add(this.label13);
+			this.groupPH.Controls.Add(this.labelGradeLevel);
+			this.groupPH.Controls.Add(this.labelSite);
+			this.groupPH.Controls.Add(this.labelCounty);
 			this.groupPH.Controls.Add(this.labelRaceEthnicity);
 			this.groupPH.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupPH.Location = new System.Drawing.Point(488, 491);
 			this.groupPH.Name = "groupPH";
 			this.groupPH.Size = new System.Drawing.Size(474, 166);
-			this.groupPH.TabIndex = 31;
+			this.groupPH.TabIndex = 33;
 			this.groupPH.TabStop = false;
 			this.groupPH.Text = "Public Health";
 			// 
@@ -1176,6 +1201,7 @@ namespace OpenDental{
 			this.comboEthnicity.Name = "comboEthnicity";
 			this.comboEthnicity.Size = new System.Drawing.Size(198, 21);
 			this.comboEthnicity.TabIndex = 2;
+			this.comboEthnicity.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// labelEthnicity
 			// 
@@ -1224,15 +1250,16 @@ namespace OpenDental{
 			this.textResponsParty.Size = new System.Drawing.Size(198, 20);
 			this.textResponsParty.TabIndex = 0;
 			this.textResponsParty.TabStop = false;
+			this.textResponsParty.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label34
+			// labelResponsParty
 			// 
-			this.label34.Location = new System.Drawing.Point(8, 143);
-			this.label34.Name = "label34";
-			this.label34.Size = new System.Drawing.Size(152, 14);
-			this.label34.TabIndex = 0;
-			this.label34.Text = "Responsible Party";
-			this.label34.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelResponsParty.Location = new System.Drawing.Point(8, 143);
+			this.labelResponsParty.Name = "labelResponsParty";
+			this.labelResponsParty.Size = new System.Drawing.Size(152, 14);
+			this.labelResponsParty.TabIndex = 0;
+			this.labelResponsParty.Text = "Responsible Party";
+			this.labelResponsParty.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// butPickSite
 			// 
@@ -1256,6 +1283,7 @@ namespace OpenDental{
 			this.comboUrgency.Name = "comboUrgency";
 			this.comboUrgency.Size = new System.Drawing.Size(198, 21);
 			this.comboUrgency.TabIndex = 7;
+			this.comboUrgency.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// comboGradeLevel
 			// 
@@ -1266,6 +1294,7 @@ namespace OpenDental{
 			this.comboGradeLevel.Name = "comboGradeLevel";
 			this.comboGradeLevel.Size = new System.Drawing.Size(198, 21);
 			this.comboGradeLevel.TabIndex = 6;
+			this.comboGradeLevel.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textSite
 			// 
@@ -1277,14 +1306,14 @@ namespace OpenDental{
 			this.textSite.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textSite_KeyUp);
 			this.textSite.Leave += new System.EventHandler(this.textSite_Leave);
 			// 
-			// label35
+			// labelUrgency
 			// 
-			this.label35.Location = new System.Drawing.Point(8, 122);
-			this.label35.Name = "label35";
-			this.label35.Size = new System.Drawing.Size(152, 14);
-			this.label35.TabIndex = 0;
-			this.label35.Text = "Treatment Urgency";
-			this.label35.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelUrgency.Location = new System.Drawing.Point(8, 122);
+			this.labelUrgency.Name = "labelUrgency";
+			this.labelUrgency.Size = new System.Drawing.Size(152, 14);
+			this.labelUrgency.TabIndex = 0;
+			this.labelUrgency.Text = "Treatment Urgency";
+			this.labelUrgency.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textCounty
 			// 
@@ -1296,32 +1325,32 @@ namespace OpenDental{
 			this.textCounty.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textCounty_KeyUp);
 			this.textCounty.Leave += new System.EventHandler(this.textCounty_Leave);
 			// 
-			// label15
+			// labelGradeLevel
 			// 
-			this.label15.Location = new System.Drawing.Point(8, 101);
-			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(152, 14);
-			this.label15.TabIndex = 0;
-			this.label15.Text = "Grade Level";
-			this.label15.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelGradeLevel.Location = new System.Drawing.Point(8, 101);
+			this.labelGradeLevel.Name = "labelGradeLevel";
+			this.labelGradeLevel.Size = new System.Drawing.Size(152, 14);
+			this.labelGradeLevel.TabIndex = 0;
+			this.labelGradeLevel.Text = "Grade Level";
+			this.labelGradeLevel.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label14
+			// labelSite
 			// 
-			this.label14.Location = new System.Drawing.Point(8, 81);
-			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(152, 14);
-			this.label14.TabIndex = 0;
-			this.label14.Text = "Site (or Grade School)";
-			this.label14.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelSite.Location = new System.Drawing.Point(8, 81);
+			this.labelSite.Name = "labelSite";
+			this.labelSite.Size = new System.Drawing.Size(152, 14);
+			this.labelSite.TabIndex = 0;
+			this.labelSite.Text = "Site (or Grade School)";
+			this.labelSite.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label13
+			// labelCounty
 			// 
-			this.label13.Location = new System.Drawing.Point(8, 61);
-			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(152, 14);
-			this.label13.TabIndex = 0;
-			this.label13.Text = "County";
-			this.label13.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelCounty.Location = new System.Drawing.Point(8, 61);
+			this.labelCounty.Name = "labelCounty";
+			this.labelCounty.Size = new System.Drawing.Size(152, 14);
+			this.labelCounty.TabIndex = 0;
+			this.labelCounty.Text = "County";
+			this.labelCounty.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// labelRaceEthnicity
 			// 
@@ -1337,24 +1366,25 @@ namespace OpenDental{
 			this.textDateFirstVisit.Location = new System.Drawing.Point(160, 378);
 			this.textDateFirstVisit.Name = "textDateFirstVisit";
 			this.textDateFirstVisit.Size = new System.Drawing.Size(96, 20);
-			this.textDateFirstVisit.TabIndex = 15;
+			this.textDateFirstVisit.TabIndex = 16;
+			this.textDateFirstVisit.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label36
+			// labelDateFirstVisit
 			// 
-			this.label36.Location = new System.Drawing.Point(5, 382);
-			this.label36.Name = "label36";
-			this.label36.Size = new System.Drawing.Size(153, 14);
-			this.label36.TabIndex = 0;
-			this.label36.Text = "Date of First Visit";
-			this.label36.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelDateFirstVisit.Location = new System.Drawing.Point(5, 382);
+			this.labelDateFirstVisit.Name = "labelDateFirstVisit";
+			this.labelDateFirstVisit.Size = new System.Drawing.Size(153, 14);
+			this.labelDateFirstVisit.TabIndex = 0;
+			this.labelDateFirstVisit.Text = "Date of First Visit";
+			this.labelDateFirstVisit.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label37
+			// labelPutInInsPlan
 			// 
-			this.label37.Location = new System.Drawing.Point(320, 342);
-			this.label37.Name = "label37";
-			this.label37.Size = new System.Drawing.Size(165, 14);
-			this.label37.TabIndex = 0;
-			this.label37.Text = "(put in InsPlan too)";
+			this.labelPutInInsPlan.Location = new System.Drawing.Point(320, 342);
+			this.labelPutInInsPlan.Name = "labelPutInInsPlan";
+			this.labelPutInInsPlan.Size = new System.Drawing.Size(165, 14);
+			this.labelPutInInsPlan.TabIndex = 0;
+			this.labelPutInInsPlan.Text = "(put in InsPlan too)";
 			// 
 			// labelClinic
 			// 
@@ -1373,6 +1403,7 @@ namespace OpenDental{
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(226, 21);
 			this.comboClinic.TabIndex = 24;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textTrophyFolder
 			// 
@@ -1381,6 +1412,7 @@ namespace OpenDental{
 			this.textTrophyFolder.Name = "textTrophyFolder";
 			this.textTrophyFolder.Size = new System.Drawing.Size(226, 20);
 			this.textTrophyFolder.TabIndex = 22;
+			this.textTrophyFolder.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// labelTrophyFolder
 			// 
@@ -1398,6 +1430,7 @@ namespace OpenDental{
 			this.textWard.Name = "textWard";
 			this.textWard.Size = new System.Drawing.Size(50, 20);
 			this.textWard.TabIndex = 25;
+			this.textWard.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// labelWard
 			// 
@@ -1408,14 +1441,14 @@ namespace OpenDental{
 			this.labelWard.Text = "Ward";
 			this.labelWard.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label28
+			// labelLanguage
 			// 
-			this.label28.Location = new System.Drawing.Point(5, 525);
-			this.label28.Name = "label28";
-			this.label28.Size = new System.Drawing.Size(153, 14);
-			this.label28.TabIndex = 0;
-			this.label28.Text = "Language";
-			this.label28.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelLanguage.Location = new System.Drawing.Point(5, 525);
+			this.labelLanguage.Name = "labelLanguage";
+			this.labelLanguage.Size = new System.Drawing.Size(153, 14);
+			this.labelLanguage.TabIndex = 0;
+			this.labelLanguage.Text = "Language";
+			this.labelLanguage.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// comboLanguage
 			// 
@@ -1426,6 +1459,7 @@ namespace OpenDental{
 			this.comboLanguage.Name = "comboLanguage";
 			this.comboLanguage.Size = new System.Drawing.Size(226, 21);
 			this.comboLanguage.TabIndex = 23;
+			this.comboLanguage.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// comboContact
 			// 
@@ -1436,15 +1470,16 @@ namespace OpenDental{
 			this.comboContact.Name = "comboContact";
 			this.comboContact.Size = new System.Drawing.Size(226, 21);
 			this.comboContact.TabIndex = 19;
+			this.comboContact.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
-			// label23
+			// labelContact
 			// 
-			this.label23.Location = new System.Drawing.Point(5, 442);
-			this.label23.Name = "label23";
-			this.label23.Size = new System.Drawing.Size(153, 14);
-			this.label23.TabIndex = 0;
-			this.label23.Text = "Prefer Contact Method";
-			this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelContact.Location = new System.Drawing.Point(5, 442);
+			this.labelContact.Name = "labelContact";
+			this.labelContact.Size = new System.Drawing.Size(153, 14);
+			this.labelContact.TabIndex = 0;
+			this.labelContact.Text = "Prefer Contact Method";
+			this.labelContact.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboConfirm
 			// 
@@ -1455,15 +1490,16 @@ namespace OpenDental{
 			this.comboConfirm.Name = "comboConfirm";
 			this.comboConfirm.Size = new System.Drawing.Size(226, 21);
 			this.comboConfirm.TabIndex = 20;
+			this.comboConfirm.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
-			// label24
+			// labelConfirm
 			// 
-			this.label24.Location = new System.Drawing.Point(5, 463);
-			this.label24.Name = "label24";
-			this.label24.Size = new System.Drawing.Size(153, 14);
-			this.label24.TabIndex = 0;
-			this.label24.Text = "Prefer Confirm Method";
-			this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelConfirm.Location = new System.Drawing.Point(5, 463);
+			this.labelConfirm.Name = "labelConfirm";
+			this.labelConfirm.Size = new System.Drawing.Size(153, 14);
+			this.labelConfirm.TabIndex = 0;
+			this.labelConfirm.Text = "Prefer Confirm Method";
+			this.labelConfirm.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboRecall
 			// 
@@ -1474,15 +1510,16 @@ namespace OpenDental{
 			this.comboRecall.Name = "comboRecall";
 			this.comboRecall.Size = new System.Drawing.Size(226, 21);
 			this.comboRecall.TabIndex = 21;
+			this.comboRecall.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
-			// label25
+			// labelRecall
 			// 
-			this.label25.Location = new System.Drawing.Point(5, 484);
-			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(153, 14);
-			this.label25.TabIndex = 0;
-			this.label25.Text = "Prefer Recall Method";
-			this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelRecall.Location = new System.Drawing.Point(5, 484);
+			this.labelRecall.Name = "labelRecall";
+			this.labelRecall.Size = new System.Drawing.Size(153, 14);
+			this.labelRecall.TabIndex = 0;
+			this.labelRecall.Text = "Prefer Recall Method";
+			this.labelRecall.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textAdmitDate
 			// 
@@ -1490,6 +1527,7 @@ namespace OpenDental{
 			this.textAdmitDate.Name = "textAdmitDate";
 			this.textAdmitDate.Size = new System.Drawing.Size(96, 20);
 			this.textAdmitDate.TabIndex = 26;
+			this.textAdmitDate.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// labelAdmitDate
 			// 
@@ -1507,15 +1545,16 @@ namespace OpenDental{
 			this.textTitle.Name = "textTitle";
 			this.textTitle.Size = new System.Drawing.Size(96, 20);
 			this.textTitle.TabIndex = 5;
+			this.textTitle.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label26
+			// labelTitle
 			// 
-			this.label26.Location = new System.Drawing.Point(5, 112);
-			this.label26.Name = "label26";
-			this.label26.Size = new System.Drawing.Size(154, 14);
-			this.label26.TabIndex = 0;
-			this.label26.Text = "Title (Mr., Ms.)";
-			this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelTitle.Location = new System.Drawing.Point(5, 112);
+			this.labelTitle.Name = "labelTitle";
+			this.labelTitle.Size = new System.Drawing.Size(154, 14);
+			this.labelTitle.TabIndex = 0;
+			this.labelTitle.Text = "Title (Mr., Ms.)";
+			this.labelTitle.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label41
 			// 
@@ -1572,16 +1611,17 @@ namespace OpenDental{
 			this.textAskToArriveEarly.MaxLength = 100;
 			this.textAskToArriveEarly.Name = "textAskToArriveEarly";
 			this.textAskToArriveEarly.Size = new System.Drawing.Size(36, 20);
-			this.textAskToArriveEarly.TabIndex = 16;
+			this.textAskToArriveEarly.TabIndex = 17;
+			this.textAskToArriveEarly.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label42
+			// labelAskToArriveEarly
 			// 
-			this.label42.Location = new System.Drawing.Point(5, 402);
-			this.label42.Name = "label42";
-			this.label42.Size = new System.Drawing.Size(154, 14);
-			this.label42.TabIndex = 0;
-			this.label42.Text = "Ask To Arrive Early";
-			this.label42.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelAskToArriveEarly.Location = new System.Drawing.Point(5, 402);
+			this.labelAskToArriveEarly.Name = "labelAskToArriveEarly";
+			this.labelAskToArriveEarly.Size = new System.Drawing.Size(154, 14);
+			this.labelAskToArriveEarly.TabIndex = 0;
+			this.labelAskToArriveEarly.Text = "Ask To Arrive Early";
+			this.labelAskToArriveEarly.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// checkArriveEarlySame
 			// 
@@ -1601,14 +1641,14 @@ namespace OpenDental{
 			this.label43.TabIndex = 0;
 			this.label43.Text = "(minutes)";
 			// 
-			// label10
+			// labelTextOk
 			// 
-			this.label10.Location = new System.Drawing.Point(312, 35);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(64, 14);
-			this.label10.TabIndex = 0;
-			this.label10.Text = "Text OK";
-			this.label10.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelTextOk.Location = new System.Drawing.Point(297, 35);
+			this.labelTextOk.Name = "labelTextOk";
+			this.labelTextOk.Size = new System.Drawing.Size(64, 14);
+			this.labelTextOk.TabIndex = 0;
+			this.labelTextOk.Text = "Text OK";
+			this.labelTextOk.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// listTextOk
 			// 
@@ -1617,12 +1657,13 @@ namespace OpenDental{
             "??",
             "Yes",
             "No"});
-			this.listTextOk.Location = new System.Drawing.Point(376, 33);
+			this.listTextOk.Location = new System.Drawing.Point(361, 33);
 			this.listTextOk.MultiColumn = true;
 			this.listTextOk.Name = "listTextOk";
 			this.listTextOk.Size = new System.Drawing.Size(95, 17);
 			this.listTextOk.TabIndex = 0;
 			this.listTextOk.TabStop = false;
+			this.listTextOk.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
 			// textMotherMaidenFname
 			// 
@@ -1632,6 +1673,7 @@ namespace OpenDental{
 			this.textMotherMaidenFname.Size = new System.Drawing.Size(228, 20);
 			this.textMotherMaidenFname.TabIndex = 7;
 			this.textMotherMaidenFname.Visible = false;
+			this.textMotherMaidenFname.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// labelMotherMaidenFname
 			// 
@@ -1651,6 +1693,7 @@ namespace OpenDental{
 			this.textMotherMaidenLname.Size = new System.Drawing.Size(228, 20);
 			this.textMotherMaidenLname.TabIndex = 8;
 			this.textMotherMaidenLname.Visible = false;
+			this.textMotherMaidenLname.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
 			// labelMotherMaidenLname
 			// 
@@ -1680,24 +1723,25 @@ namespace OpenDental{
 			this.textDateDeceased.Size = new System.Drawing.Size(195, 20);
 			this.textDateDeceased.TabIndex = 10;
 			this.textDateDeceased.Visible = false;
+			this.textDateDeceased.Leave += new System.EventHandler(this.textBox_Leave);
 			this.textDateDeceased.Validated += new System.EventHandler(this.textDateDeceased_Validated);
 			// 
 			// groupBox3
 			// 
 			this.groupBox3.Controls.Add(this.label30);
 			this.groupBox3.Controls.Add(this.checkEmailPhoneSame);
-			this.groupBox3.Controls.Add(this.label18);
-			this.groupBox3.Controls.Add(this.label17);
+			this.groupBox3.Controls.Add(this.labelWirelessPhone);
+			this.groupBox3.Controls.Add(this.labelWkPhone);
 			this.groupBox3.Controls.Add(this.textWkPhone);
-			this.groupBox3.Controls.Add(this.label10);
+			this.groupBox3.Controls.Add(this.labelTextOk);
 			this.groupBox3.Controls.Add(this.listTextOk);
 			this.groupBox3.Controls.Add(this.textWirelessPhone);
 			this.groupBox3.Controls.Add(this.textEmail);
-			this.groupBox3.Controls.Add(this.label22);
+			this.groupBox3.Controls.Add(this.labelEmail);
 			this.groupBox3.Location = new System.Drawing.Point(488, 392);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(474, 98);
-			this.groupBox3.TabIndex = 30;
+			this.groupBox3.TabIndex = 32;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Email and Phone";
 			// 
@@ -1719,14 +1763,14 @@ namespace OpenDental{
 			this.checkEmailPhoneSame.TabStop = false;
 			this.checkEmailPhoneSame.Text = "Same for entire family";
 			// 
-			// label22
+			// labelEmail
 			// 
-			this.label22.Location = new System.Drawing.Point(8, 76);
-			this.label22.Name = "label22";
-			this.label22.Size = new System.Drawing.Size(152, 14);
-			this.label22.TabIndex = 0;
-			this.label22.Text = "E-mail Addresses";
-			this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelEmail.Location = new System.Drawing.Point(8, 76);
+			this.labelEmail.Name = "labelEmail";
+			this.labelEmail.Size = new System.Drawing.Size(152, 14);
+			this.labelEmail.TabIndex = 0;
+			this.labelEmail.Text = "E-mail Addresses";
+			this.labelEmail.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// groupBillProv
 			// 
@@ -1734,19 +1778,19 @@ namespace OpenDental{
 			this.groupBillProv.Controls.Add(this.butPickSecondary);
 			this.groupBillProv.Controls.Add(this.comboBillType);
 			this.groupBillProv.Controls.Add(this.butPickPrimary);
-			this.groupBillProv.Controls.Add(this.label1);
-			this.groupBillProv.Controls.Add(this.label40);
+			this.groupBillProv.Controls.Add(this.labelBillType);
+			this.groupBillProv.Controls.Add(this.labelFeeSched);
 			this.groupBillProv.Controls.Add(this.textCreditType);
-			this.groupBillProv.Controls.Add(this.label39);
-			this.groupBillProv.Controls.Add(this.label27);
-			this.groupBillProv.Controls.Add(this.label38);
+			this.groupBillProv.Controls.Add(this.labelSecProv);
+			this.groupBillProv.Controls.Add(this.labelCreditType);
+			this.groupBillProv.Controls.Add(this.labelPriProv);
 			this.groupBillProv.Controls.Add(this.comboPriProv);
 			this.groupBillProv.Controls.Add(this.comboFeeSched);
 			this.groupBillProv.Controls.Add(this.comboSecProv);
 			this.groupBillProv.Location = new System.Drawing.Point(488, 249);
 			this.groupBillProv.Name = "groupBillProv";
 			this.groupBillProv.Size = new System.Drawing.Size(474, 142);
-			this.groupBillProv.TabIndex = 34;
+			this.groupBillProv.TabIndex = 31;
 			this.groupBillProv.TabStop = false;
 			this.groupBillProv.Text = "Billing and Provider(s)";
 			// 
@@ -1783,6 +1827,7 @@ namespace OpenDental{
 			this.comboBillType.Name = "comboBillType";
 			this.comboBillType.Size = new System.Drawing.Size(198, 21);
 			this.comboBillType.TabIndex = 41;
+			this.comboBillType.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// butPickPrimary
 			// 
@@ -1798,23 +1843,23 @@ namespace OpenDental{
 			this.butPickPrimary.Text = "...";
 			this.butPickPrimary.Click += new System.EventHandler(this.butPickPrimary_Click);
 			// 
-			// label1
+			// labelBillType
 			// 
-			this.label1.Location = new System.Drawing.Point(8, 56);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(152, 14);
-			this.label1.TabIndex = 39;
-			this.label1.Text = "Billing Type";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelBillType.Location = new System.Drawing.Point(8, 56);
+			this.labelBillType.Name = "labelBillType";
+			this.labelBillType.Size = new System.Drawing.Size(152, 14);
+			this.labelBillType.TabIndex = 39;
+			this.labelBillType.Text = "Billing Type";
+			this.labelBillType.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label40
+			// labelFeeSched
 			// 
-			this.label40.Location = new System.Drawing.Point(8, 119);
-			this.label40.Name = "label40";
-			this.label40.Size = new System.Drawing.Size(152, 14);
-			this.label40.TabIndex = 35;
-			this.label40.Text = "Fee Schedule (rarely used)";
-			this.label40.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelFeeSched.Location = new System.Drawing.Point(8, 119);
+			this.labelFeeSched.Name = "labelFeeSched";
+			this.labelFeeSched.Size = new System.Drawing.Size(152, 14);
+			this.labelFeeSched.TabIndex = 35;
+			this.labelFeeSched.Text = "Fee Schedule (rarely used)";
+			this.labelFeeSched.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textCreditType
 			// 
@@ -1823,33 +1868,34 @@ namespace OpenDental{
 			this.textCreditType.Name = "textCreditType";
 			this.textCreditType.Size = new System.Drawing.Size(18, 20);
 			this.textCreditType.TabIndex = 40;
+			this.textCreditType.Leave += new System.EventHandler(this.textBox_Leave);
 			// 
-			// label39
+			// labelSecProv
 			// 
-			this.label39.Location = new System.Drawing.Point(8, 98);
-			this.label39.Name = "label39";
-			this.label39.Size = new System.Drawing.Size(152, 14);
-			this.label39.TabIndex = 36;
-			this.label39.Text = "Secondary Provider";
-			this.label39.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelSecProv.Location = new System.Drawing.Point(8, 98);
+			this.labelSecProv.Name = "labelSecProv";
+			this.labelSecProv.Size = new System.Drawing.Size(152, 14);
+			this.labelSecProv.TabIndex = 36;
+			this.labelSecProv.Text = "Secondary Provider";
+			this.labelSecProv.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label27
+			// labelCreditType
 			// 
-			this.label27.Location = new System.Drawing.Point(8, 36);
-			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(152, 14);
-			this.label27.TabIndex = 38;
-			this.label27.Text = "Credit Type";
-			this.label27.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelCreditType.Location = new System.Drawing.Point(8, 36);
+			this.labelCreditType.Name = "labelCreditType";
+			this.labelCreditType.Size = new System.Drawing.Size(152, 14);
+			this.labelCreditType.TabIndex = 38;
+			this.labelCreditType.Text = "Credit Type";
+			this.labelCreditType.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// label38
+			// labelPriProv
 			// 
-			this.label38.Location = new System.Drawing.Point(8, 77);
-			this.label38.Name = "label38";
-			this.label38.Size = new System.Drawing.Size(152, 14);
-			this.label38.TabIndex = 37;
-			this.label38.Text = "Primary Provider";
-			this.label38.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelPriProv.Location = new System.Drawing.Point(8, 77);
+			this.labelPriProv.Name = "labelPriProv";
+			this.labelPriProv.Size = new System.Drawing.Size(152, 14);
+			this.labelPriProv.TabIndex = 37;
+			this.labelPriProv.Text = "Primary Provider";
+			this.labelPriProv.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// comboPriProv
 			// 
@@ -1860,6 +1906,7 @@ namespace OpenDental{
 			this.comboPriProv.Name = "comboPriProv";
 			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
 			this.comboPriProv.TabIndex = 42;
+			this.comboPriProv.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// comboFeeSched
 			// 
@@ -1871,6 +1918,7 @@ namespace OpenDental{
 			this.comboFeeSched.Name = "comboFeeSched";
 			this.comboFeeSched.Size = new System.Drawing.Size(198, 21);
 			this.comboFeeSched.TabIndex = 46;
+			this.comboFeeSched.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// comboSecProv
 			// 
@@ -1882,6 +1930,7 @@ namespace OpenDental{
 			this.comboSecProv.Name = "comboSecProv";
 			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
 			this.comboSecProv.TabIndex = 44;
+			this.comboSecProv.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textReferredFrom
 			// 
@@ -1892,6 +1941,7 @@ namespace OpenDental{
 			this.textReferredFrom.ReadOnly = true;
 			this.textReferredFrom.Size = new System.Drawing.Size(226, 20);
 			this.textReferredFrom.TabIndex = 36;
+			this.textReferredFrom.TabStop = false;
 			this.textReferredFrom.WordWrap = false;
 			this.textReferredFrom.DoubleClick += new System.EventHandler(this.textReferredFrom_DoubleClick);
 			// 
@@ -1905,18 +1955,18 @@ namespace OpenDental{
 			this.butReferredFrom.Location = new System.Drawing.Point(388, 583);
 			this.butReferredFrom.Name = "butReferredFrom";
 			this.butReferredFrom.Size = new System.Drawing.Size(23, 20);
-			this.butReferredFrom.TabIndex = 49;
+			this.butReferredFrom.TabIndex = 27;
 			this.butReferredFrom.Text = "...";
 			this.butReferredFrom.Click += new System.EventHandler(this.butReferredFrom_Click);
 			// 
-			// label44
+			// labelReferredFrom
 			// 
-			this.label44.Location = new System.Drawing.Point(5, 587);
-			this.label44.Name = "label44";
-			this.label44.Size = new System.Drawing.Size(154, 14);
-			this.label44.TabIndex = 50;
-			this.label44.Text = "Referred From";
-			this.label44.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelReferredFrom.Location = new System.Drawing.Point(5, 587);
+			this.labelReferredFrom.Name = "labelReferredFrom";
+			this.labelReferredFrom.Size = new System.Drawing.Size(154, 14);
+			this.labelReferredFrom.TabIndex = 50;
+			this.labelReferredFrom.Text = "Referred From";
+			this.labelReferredFrom.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// textMedicaidState
 			// 
@@ -1924,10 +1974,20 @@ namespace OpenDental{
 			this.textMedicaidState.MaxLength = 100;
 			this.textMedicaidState.Name = "textMedicaidState";
 			this.textMedicaidState.Size = new System.Drawing.Size(61, 20);
-			this.textMedicaidState.TabIndex = 51;
+			this.textMedicaidState.TabIndex = 13;
 			this.textMedicaidState.TextChanged += new System.EventHandler(this.textMedicaidState_TextChanged);
 			this.textMedicaidState.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textMedicaidState_KeyUp);
 			this.textMedicaidState.Leave += new System.EventHandler(this.textMedicaidState_Leave);
+			// 
+			// labelRequiredField
+			// 
+			this.labelRequiredField.Location = new System.Drawing.Point(604, 672);
+			this.labelRequiredField.Name = "labelRequiredField";
+			this.labelRequiredField.Size = new System.Drawing.Size(180, 14);
+			this.labelRequiredField.TabIndex = 9;
+			this.labelRequiredField.Text = "* Indicates Required Field";
+			this.labelRequiredField.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelRequiredField.Visible = false;
 			// 
 			// FormPatientEdit
 			// 
@@ -1935,7 +1995,8 @@ namespace OpenDental{
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textMedicaidState);
-			this.Controls.Add(this.label44);
+			this.Controls.Add(this.labelRequiredField);
+			this.Controls.Add(this.labelReferredFrom);
 			this.Controls.Add(this.butReferredFrom);
 			this.Controls.Add(this.textReferredFrom);
 			this.Controls.Add(this.groupBillProv);
@@ -1949,30 +2010,30 @@ namespace OpenDental{
 			this.Controls.Add(this.checkArriveEarlySame);
 			this.Controls.Add(this.label43);
 			this.Controls.Add(this.textAskToArriveEarly);
-			this.Controls.Add(this.label42);
+			this.Controls.Add(this.labelAskToArriveEarly);
 			this.Controls.Add(this.butGuardianDefaults);
 			this.Controls.Add(this.butAddGuardian);
 			this.Controls.Add(this.listRelationships);
 			this.Controls.Add(this.label41);
 			this.Controls.Add(this.textTitle);
-			this.Controls.Add(this.label26);
+			this.Controls.Add(this.labelTitle);
 			this.Controls.Add(this.textAdmitDate);
 			this.Controls.Add(this.labelAdmitDate);
 			this.Controls.Add(this.comboRecall);
-			this.Controls.Add(this.label25);
+			this.Controls.Add(this.labelRecall);
 			this.Controls.Add(this.comboConfirm);
-			this.Controls.Add(this.label24);
+			this.Controls.Add(this.labelConfirm);
 			this.Controls.Add(this.comboContact);
-			this.Controls.Add(this.label23);
+			this.Controls.Add(this.labelContact);
 			this.Controls.Add(this.comboLanguage);
-			this.Controls.Add(this.label28);
+			this.Controls.Add(this.labelLanguage);
 			this.Controls.Add(this.textWard);
 			this.Controls.Add(this.labelWard);
 			this.Controls.Add(this.textTrophyFolder);
 			this.Controls.Add(this.labelTrophyFolder);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
-			this.Controls.Add(this.label37);
+			this.Controls.Add(this.labelPutInInsPlan);
 			this.Controls.Add(this.textDateFirstVisit);
 			this.Controls.Add(this.textEmployer);
 			this.Controls.Add(this.textMedicaidID);
@@ -1989,30 +2050,30 @@ namespace OpenDental{
 			this.Controls.Add(this.butAuto);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
-			this.Controls.Add(this.label36);
+			this.Controls.Add(this.labelDateFirstVisit);
 			this.Controls.Add(this.groupPH);
-			this.Controls.Add(this.label33);
-			this.Controls.Add(this.label7);
+			this.Controls.Add(this.labelEmployer);
+			this.Controls.Add(this.labelGender);
 			this.Controls.Add(this.listPosition);
 			this.Controls.Add(this.listGender);
 			this.Controls.Add(this.listStatus);
-			this.Controls.Add(this.label31);
+			this.Controls.Add(this.labelMedicaidID);
 			this.Controls.Add(this.label32);
 			this.Controls.Add(this.label19);
 			this.Controls.Add(this.groupNotes);
 			this.Controls.Add(this.groupBox1);
-			this.Controls.Add(this.label29);
+			this.Controls.Add(this.labelChartNumber);
 			this.Controls.Add(this.groupBox2);
-			this.Controls.Add(this.label6);
-			this.Controls.Add(this.label21);
+			this.Controls.Add(this.labelStatus);
+			this.Controls.Add(this.labelSalutation);
 			this.Controls.Add(this.label20);
 			this.Controls.Add(this.labelSSN);
-			this.Controls.Add(this.label9);
-			this.Controls.Add(this.label8);
-			this.Controls.Add(this.label5);
-			this.Controls.Add(this.label4);
-			this.Controls.Add(this.label3);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.labelBirthdate);
+			this.Controls.Add(this.labelPosition);
+			this.Controls.Add(this.labelPreferred);
+			this.Controls.Add(this.labelMiddleI);
+			this.Controls.Add(this.labelFName);
+			this.Controls.Add(this.labelLName);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -2040,6 +2101,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPatientEdit_Load(object sender, System.EventArgs e) {
+			_isLoad=true;
 			FillComboZip();
 			checkSame.Checked=true;
 			checkBillProvSame.Checked=true;
@@ -2149,6 +2211,7 @@ namespace OpenDental{
 				textSSN.Text=PatCur.SSN;
 			}
 			textMedicaidID.Text=PatCur.MedicaidID;
+			textMedicaidState.Text=_ehrPatientCur.MedicaidState;
 			textAddress.Text=PatCur.Address;
 			textAddress2.Text=PatCur.Address2;
 			textCity.Text=PatCur.City;
@@ -2203,6 +2266,10 @@ namespace OpenDental{
 					comboLanguage.SelectedIndex=i+1;
 				}
 			}
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				comboPriProv.Items.Add(Lan.g(this,"Select Provider"));
+				comboPriProv.SelectedIndex=0;//"Select Provider'
+			}
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 					comboPriProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
@@ -2212,6 +2279,9 @@ namespace OpenDental{
 				}
 				if(ProviderC.ListShort[i].ProvNum==PatCur.PriProv) {
 					comboPriProv.SelectedIndex=i;
+					if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+						comboPriProv.SelectedIndex++;//Plus 1 to account for 'Select Provider'
+					}
 				}
 			}
 			/*Provider should not automatically change.  So may end up with no provider selected.
@@ -2297,8 +2367,8 @@ namespace OpenDental{
 				groupPH.Visible=false;
 			}
 			if(PrefC.GetBool(PrefName.EasyHideMedicaid)){
-				label31.Visible=false;
-				label37.Visible=false;
+				labelMedicaidID.Visible=false;
+				labelPutInInsPlan.Visible=false;
 				textMedicaidID.Visible=false;
 				textMedicaidState.Visible=false;
 			}
@@ -2450,6 +2520,35 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureGoogleMaps)) {
 				butShowMap.Visible=true;
 			}
+			_listRequiredFields=RequiredFields.Listt.FindAll(x => x.FieldType==RequiredFieldType.PatientInfo);
+			//Remove the RequiredFields that are only on the Add Family window
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.InsuranceSubscriber);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.InsuranceSubscriberID);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Carrier);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.InsurancePhone);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.GroupName);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.GroupNum);
+			if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MothersMaidenFirstName);
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MothersMaidenLastName);
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.DateTimeDeceased);
+			}
+			if(!Programs.IsEnabled(Programs.GetProgramNum(ProgramName.TrophyEnhanced))) {
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.TrophyFolder);
+			}
+			if(PrefC.GetBool(PrefName.EasyHideHospitals)) {
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Ward);
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.AdmitDate);
+			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.StudentStatus);
+			}
+			else {//Not Canadian
+				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.EligibilityExceptCode);
+			}
+			_errorProv.BlinkStyle=ErrorBlinkStyle.NeverBlink;
+			SetRequiredFields();
+			_isLoad=false;
 			Plugins.HookAddCode(this,"FormPatientEdit.Load_end",PatCur);
 		}
 
@@ -2469,6 +2568,575 @@ namespace OpenDental{
 				listRelationships.Items.Add(FamCur.GetNameInFamFirst(GuardianList[i].PatNumGuardian)+" "
 					+Guardians.GetGuardianRelationshipStr(GuardianList[i].Relationship));
 			}
+		}
+
+		///<summary>Puts an asterisk next to the label and highlights the textbox/listbox/combobox/radiobutton background for all RequiredFields that
+		///have their conditions met.</summary>
+		private void SetRequiredFields() {
+			_isMissingRequiredFields=false;
+			bool areConditionsMet;
+			for(int i=0;i<_listRequiredFields.Count;i++) {
+				areConditionsMet=ConditionsAreMet(_listRequiredFields[i]);
+				if(areConditionsMet) {
+					labelRequiredField.Visible=true;
+				}
+				switch(_listRequiredFields[i].FieldName) {
+					case RequiredFieldName.Address:
+						SetRequiredTextBox(labelAddress,textAddress,areConditionsMet);
+						break;
+					case RequiredFieldName.Address2:
+						SetRequiredTextBox(labelAddress2,textAddress2,areConditionsMet);
+						break;
+					case RequiredFieldName.AddressPhoneNotes:
+						if(areConditionsMet) {
+							if(!groupNotes.Text.Contains("*")) {
+								groupNotes.Text+="*";
+							}
+							if(textAddrNotes.Text=="") {
+								_isMissingRequiredFields=true;
+								if(_isValidating) {
+									_errorProv.SetError(textAddrNotes,Lan.g(this,"Text box cannot be blank"));
+								}
+							}
+							else {
+								_errorProv.SetError(textAddrNotes,"");
+							}
+						}
+						else {
+							if(groupNotes.Text.Contains("*")) {
+								groupNotes.Text=groupNotes.Text.Replace("*","");
+							}
+							_errorProv.SetError(textAddrNotes,"");
+						}
+						break;
+					case RequiredFieldName.AdmitDate:
+						SetRequiredTextBox(labelAdmitDate,textAdmitDate,areConditionsMet);
+						break;
+					case RequiredFieldName.AskArriveEarly:
+						SetRequiredTextBox(labelAskToArriveEarly,textAskToArriveEarly,areConditionsMet);
+						break;
+					case RequiredFieldName.BillingType:
+						SetRequiredComboBox(labelBillType,comboBillType,areConditionsMet,-1,"A billing type must be selected.");
+						break;
+					case RequiredFieldName.Birthdate:
+						SetRequiredTextBox(labelBirthdate,textBirthdate,areConditionsMet);
+						break;
+					case RequiredFieldName.ChartNumber:
+						SetRequiredTextBox(labelChartNumber,textChartNumber,areConditionsMet);
+						break;
+					case RequiredFieldName.City:
+						SetRequiredTextBox(labelCity,textCity,areConditionsMet);
+						break;
+					case RequiredFieldName.Clinic:
+						SetRequiredComboBox(labelClinic,comboClinic,areConditionsMet,0,"Selection cannot be 'Unassigned'.");
+						break;
+					case RequiredFieldName.CollegeName:
+						SetRequiredTextBox(labelSchoolName,textSchool,areConditionsMet);
+						break;
+					case RequiredFieldName.County:
+						SetRequiredTextBox(labelCounty,textCounty,areConditionsMet);
+						break;
+					case RequiredFieldName.CreditType:
+						SetRequiredTextBox(labelCreditType,textCreditType,areConditionsMet);
+						break;
+					case RequiredFieldName.DateFirstVisit:
+						SetRequiredTextBox(labelDateFirstVisit,textDateFirstVisit,areConditionsMet);
+						break;
+					case RequiredFieldName.DateTimeDeceased:
+						SetRequiredTextBox(labelDeceased,textDateDeceased,areConditionsMet);
+						break;
+					case RequiredFieldName.EligibilityExceptCode:
+						SetRequiredComboBox(labelCanadianEligibilityCode,comboCanadianEligibilityCode,areConditionsMet,0,
+							"Selection cannot be '0 - Please Choose'.");
+						break;
+					case RequiredFieldName.EmailAddress:
+						SetRequiredTextBox(labelEmail,textEmail,areConditionsMet);
+						break;
+					case RequiredFieldName.Employer:
+						SetRequiredTextBox(labelEmployer,textEmployer,areConditionsMet);
+						break;
+					case RequiredFieldName.Ethnicity:
+						SetRequiredComboBox(labelEthnicity,comboEthnicity,areConditionsMet,0,"Selection cannot be 'none'.");
+						break;
+					case RequiredFieldName.FeeSchedule:
+						SetRequiredComboBox(labelFeeSched,comboFeeSched,areConditionsMet,0,"Selection cannot be 'none'.");
+						break;
+					case RequiredFieldName.FirstName:
+						SetRequiredTextBox(labelFName,textFName,areConditionsMet);
+						break;
+					case RequiredFieldName.Gender:
+						labelGender.Text=labelGender.Text.Replace("*","");
+						if(areConditionsMet) {
+							labelGender.Text=labelGender.Text+"*";
+							if(listGender.Items[listGender.SelectedIndex].ToString()==Lan.g(this,"Unknown")) {
+								if(_isValidating) {
+									_errorProv.SetError(listGender,Lan.g(this,"Gender cannot be 'Unknown'."));
+									_errorProv.SetIconAlignment(listGender,ErrorIconAlignment.BottomRight);
+								}
+								_isMissingRequiredFields=true;
+							}
+							else {
+								_errorProv.SetError(listGender,"");
+							}
+						}
+						else {
+							_errorProv.SetError(listGender,"");
+						}
+						break;
+					case RequiredFieldName.GradeLevel:
+						SetRequiredComboBox(labelGradeLevel,comboGradeLevel,areConditionsMet,0,"Selection cannot be 'Unknown'.");
+						break;
+					case RequiredFieldName.HomePhone:
+						SetRequiredTextBox(labelHmPhone,textHmPhone,areConditionsMet);
+						break;
+					case RequiredFieldName.Language:
+						SetRequiredComboBox(labelLanguage,comboLanguage,areConditionsMet,0,"Selection cannot be 'none'.");
+						break;
+					case RequiredFieldName.LastName:
+						SetRequiredTextBox(labelLName,textLName,areConditionsMet);
+						break;
+					case RequiredFieldName.MedicaidID:
+						SetRequiredTextBox(labelMedicaidID,textMedicaidID,areConditionsMet);						
+						break;
+					case RequiredFieldName.MedicaidState:
+						SetRequiredTextBox(labelMedicaidID,textMedicaidState,areConditionsMet);
+						if(textMedicaidState.Text!=""	&& !StateAbbrs.IsValidAbbr(textMedicaidState.Text)) {
+							_isMissingRequiredFields=true;
+							if(_isValidating) {
+								_errorProv.SetError(textMedicaidState,Lan.g(this,"Invalid state abbreviation"));
+							}
+						}
+						CheckMedicaidIDLength();						
+						break;
+					case RequiredFieldName.MiddleInitial:
+						SetRequiredTextBox(labelMiddleI,textMiddleI,areConditionsMet);
+						break;
+					case RequiredFieldName.MothersMaidenFirstName:
+						SetRequiredTextBox(labelMotherMaidenFname,textMotherMaidenFname,areConditionsMet);
+						break;
+					case RequiredFieldName.MothersMaidenLastName:
+						SetRequiredTextBox(labelMotherMaidenLname,textMotherMaidenLname,areConditionsMet);
+						break;
+					case RequiredFieldName.PreferConfirmMethod:
+						SetRequiredComboBox(labelConfirm,comboConfirm,areConditionsMet,0,"Selection cannot be 'None'.");
+						break;
+					case RequiredFieldName.PreferContactMethod:
+						SetRequiredComboBox(labelContact,comboContact,areConditionsMet,0,"Selection cannot be 'None'.");
+						break;
+					case RequiredFieldName.PreferRecallMethod:
+						SetRequiredComboBox(labelRecall,comboRecall,areConditionsMet,0,"Selection cannot be 'None'.");
+						break;
+					case RequiredFieldName.PreferredName:
+						SetRequiredTextBox(labelPreferred,textPreferred,areConditionsMet);
+						break;
+					case RequiredFieldName.PrimaryProvider:
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							SetRequiredComboBox(labelPriProv,comboPriProv,areConditionsMet,0,"Selection cannot be 'Select Provider'.");
+						}
+						break;
+					case RequiredFieldName.Race:
+						labelRaceEthnicity.Text=labelRaceEthnicity.Text.Replace("*","");
+						if(areConditionsMet) {
+							labelRaceEthnicity.Text=labelRaceEthnicity.Text+"*";
+							if(comboBoxMultiRace.SelectedIndices.Contains(0)  //'None' is not allowed
+								|| comboBoxMultiRace.SelectedIndices.Count==0) 
+							{
+								_isMissingRequiredFields=true;
+								if(_isValidating) {
+									_errorProv.SetError(comboBoxMultiRace,Lan.g(this,"Selection cannot be 'none' or blank."));
+								}
+							}
+							else {
+								_errorProv.SetError(comboBoxMultiRace,"");
+							}
+						}
+						else {
+							_errorProv.SetError(comboBoxMultiRace,"");
+						}
+						break;
+					case RequiredFieldName.ReferredFrom:
+						SetRequiredTextBox(labelReferredFrom,textReferredFrom,areConditionsMet);
+						break;
+					case RequiredFieldName.ResponsibleParty:
+						SetRequiredTextBox(labelResponsParty,textResponsParty,areConditionsMet);
+						break;
+					case RequiredFieldName.Salutation:
+						SetRequiredTextBox(labelSalutation,textSalutation,areConditionsMet);
+						break;
+					case RequiredFieldName.SecondaryProvider:
+						SetRequiredComboBox(labelSecProv,comboSecProv,areConditionsMet,0,"Selection cannot be 'none'.");
+						break;
+					case RequiredFieldName.Site:
+						SetRequiredTextBox(labelSite,textSite,areConditionsMet);
+						break;
+					case RequiredFieldName.SocialSecurityNumber:
+						SetRequiredTextBox(labelSSN,textSSN,areConditionsMet);
+						break;
+					case RequiredFieldName.State:
+						SetRequiredTextBox(labelST,textState,areConditionsMet);
+						break;
+					case RequiredFieldName.StudentStatus:
+						radioStudentN.Text=radioStudentN.Text.Replace("*","");
+						radioStudentF.Text=radioStudentF.Text.Replace("*","");
+						radioStudentP.Text=radioStudentP.Text.Replace("*","");
+						if(areConditionsMet) {
+							radioStudentN.Text=radioStudentN.Text+"*";
+							radioStudentF.Text=radioStudentF.Text+"*";
+							radioStudentP.Text=radioStudentP.Text+"*";
+							if(!radioStudentN.Checked && !radioStudentF.Checked && !radioStudentP.Checked) {
+								_isMissingRequiredFields=true;
+								if(_isValidating) {
+									_errorProv.SetError(radioStudentP,"A student status must be selected.");
+								}
+							}
+							else {
+								_errorProv.SetError(radioStudentP,"");
+							}
+						}
+						else {
+							_errorProv.SetError(radioStudentP,"");
+						}
+						break;
+					case RequiredFieldName.TextOK:
+						labelTextOk.Text=labelTextOk.Text.Replace("*","");						
+						if(areConditionsMet) {
+							labelTextOk.Text=labelTextOk.Text+"*";
+							if(listTextOk.Items[listTextOk.SelectedIndex].ToString()==Lan.g(this,"??")) {
+								_isMissingRequiredFields=true;
+								if(_isValidating) {
+									_errorProv.SetError(listTextOk,Lan.g(this,"Selection cannot be '??'."));
+								}
+							}
+							else {
+								_errorProv.SetError(listTextOk,"");
+							}
+						}
+						else {
+							_errorProv.SetError(listTextOk,"");
+						}
+						break;
+					case RequiredFieldName.Title:
+						SetRequiredTextBox(labelTitle,textTitle,areConditionsMet);
+						break;
+					case RequiredFieldName.TreatmentUrgency:
+						SetRequiredComboBox(labelUrgency,comboUrgency,areConditionsMet,0,"Selection cannot be 'Unknown'.");
+						break;
+					case RequiredFieldName.TrophyFolder:
+						SetRequiredTextBox(labelTrophyFolder,textTrophyFolder,areConditionsMet);
+						break;
+					case RequiredFieldName.Ward:
+						SetRequiredTextBox(labelWard,textWard,areConditionsMet);
+						break;
+					case RequiredFieldName.WirelessPhone:
+						SetRequiredTextBox(labelWirelessPhone,textWirelessPhone,areConditionsMet);
+						break;
+					case RequiredFieldName.WorkPhone:
+						SetRequiredTextBox(labelWkPhone,textWkPhone,areConditionsMet);
+						break;
+					case RequiredFieldName.Zip:
+						SetRequiredTextBox(labelZip,textZip,areConditionsMet);
+						break;
+				}
+			}
+		}
+
+		///<summary>Returns true if all the conditions for the RequiredField are met.</summary>
+		private bool ConditionsAreMet(RequiredField reqField) {
+			List<RequiredFieldCondition> listConditions=reqField.ListRequiredFieldConditions;
+			if(listConditions.Count==0) {//This RequiredField is always required
+				return true;
+			}
+			bool areConditionsMet=false;
+			int previousFieldName=-1;
+			for(int i=0;i<listConditions.Count;i++) {
+				if(areConditionsMet && (int)listConditions[i].ConditionType==previousFieldName) {
+					continue;//A condition of this type has already been met
+				}
+				if(!areConditionsMet && previousFieldName!=-1
+					&& (int)listConditions[i].ConditionType!=previousFieldName) 
+				{
+					return false;//None of the conditions of the previous type were met
+				}
+				areConditionsMet=false;
+				switch(listConditions[i].ConditionType) {
+					case RequiredFieldName.AdmitDate:
+						if(PrefC.GetBool(PrefName.EasyHideHospitals)) {
+							areConditionsMet=true;
+							break;
+						}
+						areConditionsMet=CheckDateConditions(textAdmitDate.Text,i,listConditions);
+						break;
+					case RequiredFieldName.BillingType:
+						//Conditions of type BillingType store the DefNum as the ConditionValue.
+						long defNumber=DefC.Short[(int)DefCat.BillingTypes][comboBillType.SelectedIndex].DefNum;
+						areConditionsMet=ConditionComparerHelper(defNumber.ToString(),i,listConditions);
+						break;
+					case RequiredFieldName.Birthdate://But actually using Age for calculations						
+						if(textAge.Text=="" || textBirthdate.errorProvider1.GetError(textBirthdate)!="") {
+							areConditionsMet=false;
+							break;
+						}
+						DateTime birthdate=PIn.Date(textBirthdate.Text);
+						if(birthdate>DateTime.Today) {
+							birthdate=birthdate.AddYears(-100);
+						}
+						int ageEntered=DateTime.Today.Year-birthdate.Year;
+						if(birthdate>DateTime.Today.AddYears(-ageEntered)) {
+							ageEntered--;
+						}
+						List<RequiredFieldCondition> listAgeConditions=listConditions.FindAll(x => x.ConditionType==RequiredFieldName.Birthdate);
+						//There should be no more than 2 conditions of type Birthdate
+						List<bool> listAreCondsMet=new List<bool>();
+						for(int j=0;j<listAgeConditions.Count;j++) {
+							listAreCondsMet.Add(CondOpComparer(ageEntered,listAgeConditions[j].Operator,PIn.Int(listAgeConditions[j].ConditionValue)));
+						}
+						if(listAreCondsMet.Count<2 || listAgeConditions[1].ConditionRelationship==LogicalOperator.And) {
+							areConditionsMet=!listAreCondsMet.Contains(false);
+							break;
+						}
+						areConditionsMet=listAreCondsMet.Contains(true);
+						break;
+					case RequiredFieldName.Clinic:
+						if(!PrefC.HasClinicsEnabled) {
+							areConditionsMet=true;
+							break;
+						}
+						//Conditions of type Clinic store the ClinicNum as the ConditionValue. If that value is "0", it represents 'Unassigned'.
+						if(comboClinic.SelectedIndex==0) {
+							areConditionsMet=ConditionComparerHelper("0",i,listConditions);//"0" for 'Unassigned'
+						}
+						else {
+							areConditionsMet=ConditionComparerHelper(_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString(),//Minus 1 for 'Unassigned'
+								i,listConditions);
+						}		
+						break;								
+					case RequiredFieldName.DateTimeDeceased:
+						if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+							areConditionsMet=true;
+							break;
+						}
+						areConditionsMet=CheckDateConditions(textDateDeceased.Text,i,listConditions);
+						break;
+					case RequiredFieldName.Gender:
+						areConditionsMet=ConditionComparerHelper(listGender.Items[listGender.SelectedIndex].ToString(),i,listConditions);
+						break;
+					case RequiredFieldName.Language:
+						areConditionsMet=ConditionComparerHelper(comboLanguage.Items[comboLanguage.SelectedIndex].ToString(),i,listConditions);
+						break;
+					case RequiredFieldName.MedicaidID:
+						if(PrefC.GetBool(PrefName.EasyHideMedicaid)) {
+							areConditionsMet=true;
+							break;
+						}
+						//The only possible value for ConditionValue is 'Blank'
+						if((listConditions[i].Operator==ConditionOperator.Equals && textMedicaidID.Text=="")
+							|| (listConditions[i].Operator==ConditionOperator.NotEquals && textMedicaidID.Text!="")) {
+							areConditionsMet=true;
+						}
+						break;
+					case RequiredFieldName.MedicaidState:
+						if(PrefC.GetBool(PrefName.EasyHideMedicaid)) {
+							areConditionsMet=true;
+							break;
+						}
+						//The only possible value for ConditionValue is 'Blank'
+						if((listConditions[i].Operator==ConditionOperator.Equals && textMedicaidState.Text=="")
+							|| (listConditions[i].Operator==ConditionOperator.NotEquals && textMedicaidState.Text!="")) {
+							areConditionsMet=true;
+						}
+						break;
+					case RequiredFieldName.PatientStatus:
+						areConditionsMet=ConditionComparerHelper(listStatus.Items[listStatus.SelectedIndex].ToString(),i,listConditions);
+						break;
+					case RequiredFieldName.Position:
+						areConditionsMet=ConditionComparerHelper(listPosition.Items[listPosition.SelectedIndex].ToString(),i,listConditions);
+						break;
+					case RequiredFieldName.PrimaryProvider:
+						//Conditions of type PrimaryProvider store the ProvNum as the ConditionValue.
+						int provIdx=comboPriProv.SelectedIndex;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							provIdx--;//To account for 'Select Provider'
+						}
+						if(provIdx<0) {
+							break;
+						}
+						areConditionsMet=ConditionComparerHelper(ProviderC.ListShort[provIdx].ProvNum.ToString(),i,listConditions);
+						break;							
+					case RequiredFieldName.StudentStatus:
+						areConditionsMet=CheckStudentStatusConditions(i,listConditions);
+						break;
+				}
+				previousFieldName=(int)listConditions[i].ConditionType;
+			}
+			return areConditionsMet;
+		}
+
+		///<summary>Returns true if the operator is Equals and the value is in the list of conditions or if the operator is NotEquals and the value is 
+		///not in the list of conditions.</summary>
+		private bool ConditionComparerHelper(string val,int condCurIndex,List<RequiredFieldCondition> listConds) {
+			if(listConds[condCurIndex].Operator==ConditionOperator.Equals 
+				&& listConds.FindAll(x => x.ConditionType==listConds[condCurIndex].ConditionType)
+						.Any(x => x.ConditionValue==val)) 
+			{
+				return true;
+			}
+			if(listConds[condCurIndex].Operator==ConditionOperator.NotEquals 
+				&& !listConds.FindAll(x => x.ConditionType==listConds[condCurIndex].ConditionType)
+						 .Any(x => x.ConditionValue==val)) 
+			{
+				return true;
+			}
+			return false;
+		}
+
+		///<summary>Returns true if the conditions for this date condition are true.</summary>
+		private bool CheckDateConditions(string dateStr,int condCurIndex,List<RequiredFieldCondition> listConds) {
+			DateTime dateCur=DateTime.MinValue;
+			if(dateStr=="" || !DateTime.TryParse(dateStr,out dateCur)) {
+				return false;
+			}
+			List<RequiredFieldCondition> listDateConditions=listConds.FindAll(x => x.ConditionType==listConds[condCurIndex].ConditionType);
+			if(listDateConditions.Count<1) {
+				return false;
+			}
+			//There should be no more than 2 conditions of a date type
+			List<bool> listAreCondsMet=new List<bool>();
+			for(int i=0;i<listDateConditions.Count;i++) {
+				listAreCondsMet.Add(CondOpComparer(dateCur,listDateConditions[i].Operator,PIn.Date(listDateConditions[i].ConditionValue)));
+			}
+			if(listAreCondsMet.Count<2 || listDateConditions[1].ConditionRelationship==LogicalOperator.And) {
+				return !listAreCondsMet.Contains(false);
+			}
+			return listAreCondsMet.Contains(true);
+		}
+
+		///<summary>Returns true if the conditions for StudentStatus are true.</summary>
+		private bool CheckStudentStatusConditions(int condCurIndex,List<RequiredFieldCondition> listConds) {
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
+				return true;
+			}
+			if(listConds[condCurIndex].Operator==ConditionOperator.Equals) {
+				if((radioStudentN.Checked && listConds[condCurIndex].ConditionValue==Lan.g(this,"Nonstudent"))
+					|| (radioStudentF.Checked && listConds[condCurIndex].ConditionValue==Lan.g(this,"Fulltime"))
+					|| (radioStudentP.Checked && listConds[condCurIndex].ConditionValue==Lan.g(this,"Parttime")))
+				{
+					return true;
+				}
+				return false;
+			}
+			else { //condCur.Operator==ConditionOperator.NotEquals
+				List<RequiredFieldCondition> listStudentConds=listConds.FindAll(x => x.ConditionType==RequiredFieldName.StudentStatus);
+				if((radioStudentN.Checked && listStudentConds.Any(x => x.ConditionValue==Lan.g(this,"Nonstudent")))
+					|| (radioStudentF.Checked && listStudentConds.Any(x => x.ConditionValue==Lan.g(this,"Fulltime")))
+					|| (radioStudentP.Checked && listStudentConds.Any(x => x.ConditionValue==Lan.g(this,"Parttime"))))
+				{
+					return false;
+				}
+				return true;
+			}
+		}
+
+		///<summary>Evaluates two dates using the provided operator.</summary>
+		private bool CondOpComparer(DateTime date1,ConditionOperator oper,DateTime date2) {
+			return CondOpComparer(DateTime.Compare(date1,date2),oper,0);
+		}
+
+		///<summary>Evaluates two integers using the provided operator.</summary>
+		private bool CondOpComparer(int value1,ConditionOperator oper,int value2) {
+			switch(oper) {
+				case ConditionOperator.Equals:
+					return value1==value2;
+				case ConditionOperator.NotEquals:
+					return value1!=value2;
+				case ConditionOperator.GreaterThan:
+					return value1>value2;
+				case ConditionOperator.GreaterThanOrEqual:
+					return value1>=value2;
+				case ConditionOperator.LessThan:
+					return value1<value2;
+				case ConditionOperator.LessThanOrEqual:
+					return value1<=value2;
+			}
+			return false;
+		}
+
+		///<summary>Checks to see if the Medicaid ID is the proper number of digits for the Medicaid State.</summary>
+		private void CheckMedicaidIDLength() {
+			int reqLength=StateAbbrs.GetMedicaidIDLength(textMedicaidState.Text);
+			if(reqLength==0 || reqLength==textMedicaidID.Text.Length) {
+				return;
+			}
+			_isMissingRequiredFields=true;
+			if(_isValidating) {
+				_errorProv.SetError(textMedicaidID,Lan.g(this,"Medicaid ID length must be ")+reqLength.ToString()+Lan.g(this," digits for the state of ")
+					+textMedicaidState.Text+".");
+			}
+		}
+
+		///<summary>Puts an asterisk next to the label if the field is required and the conditions are met. If it also blank, sets the error provider.
+		///</summary>
+		private void SetRequiredTextBox(Label labelCur,TextBox textBoxCur,bool areConditionsMet) {
+			if(areConditionsMet) {
+				labelCur.Text=labelCur.Text.Replace("*","")+"*";
+				if(textBoxCur.Text=="") {
+					_isMissingRequiredFields=true;
+					if(_isValidating) {
+						_errorProv.SetError(textBoxCur,"Text box cannot be blank.");
+					}
+				}
+				else {
+					_errorProv.SetError(textBoxCur,"");
+				}
+			}
+			else {
+				labelCur.Text=labelCur.Text.Replace("*","");
+				_errorProv.SetError(textBoxCur,"");
+			}
+			if(textBoxCur.Name==textSite.Name || textBoxCur.Name==textReferredFrom.Name) {
+				_errorProv.SetIconPadding(textBoxCur,25);//Width of the pick button
+			}
+			else if(textBoxCur.Name==textResponsParty.Name) {
+				_errorProv.SetIconPadding(textBoxCur,50);//Width of the pick and remove buttons
+			}
+		}
+
+		///<summary>Puts an asterisk next to the label if the field is required and the conditions are met. If the disallowedIdx is also selected, 
+		///ets the error provider.</summary>
+		private void SetRequiredComboBox(Label labelCur,ComboBox comboCur,bool areConditionsMet,int disallowedIdx,string errorMsg) {
+			if(areConditionsMet) {
+				labelCur.Text=labelCur.Text.Replace("*","")+"*";
+				if(comboCur.SelectedIndex==disallowedIdx) {
+					_isMissingRequiredFields=true;
+					if(_isValidating) {
+						_errorProv.SetError(comboCur,Lan.g(this,errorMsg));
+					}
+				}
+				else {
+					_errorProv.SetError(comboCur,"");
+				}
+			}
+			else {
+				labelCur.Text=labelCur.Text.Replace("*","");
+				_errorProv.SetError(comboCur,"");
+			} 
+			if(comboCur.Name==comboPriProv.Name || comboCur.Name==comboSecProv.Name) {
+				_errorProv.SetIconPadding(comboCur,25);//Width of the pick button
+			}
+		}			
+
+		private void textBox_Leave(object sender,System.EventArgs e) {
+			SetRequiredFields();
+		}
+		
+		private void ListBox_SelectedIndexChanged(object sender,System.EventArgs e) {
+			if(_isLoad) {
+				return;
+			}
+			SetRequiredFields();
+		}
+
+		private void ComboBox_SelectionChangeCommited(object sender,System.EventArgs e) {
+			SetRequiredFields();
 		}
 
 		//private void butSecClear_Click(object sender, System.EventArgs e) {
@@ -2530,14 +3198,17 @@ namespace OpenDental{
 
 		private void radioStudentN_Click(object sender, System.EventArgs e) {
 			PatCur.StudentStatus="N";
+			SetRequiredFields();
 		}
 
 		private void radioStudentF_Click(object sender, System.EventArgs e) {
 			PatCur.StudentStatus="F";
+			SetRequiredFields();
 		}
 
 		private void radioStudentP_Click(object sender, System.EventArgs e) {
 			PatCur.StudentStatus="P";
+			SetRequiredFields();
 		}
 
 		private void textSSN_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -2601,6 +3272,7 @@ namespace OpenDental{
 				}
 			}
 			textAge.Text=PatientLogic.DateToAgeString(birthdate,dateTimeTo);
+			SetRequiredFields();
 		}
 
 		private void textZip_TextChanged(object sender, System.EventArgs e) {
@@ -2613,6 +3285,7 @@ namespace OpenDental{
 			textCity.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).City;
 			textState.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).State;
 			textZip.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).ZipCodeDigits;
+			SetRequiredFields();
 		}
 
 		private void textZip_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -2672,6 +3345,7 @@ namespace OpenDental{
 				textState.Text=FormZS.ZipSelected.State;
 				textZip.Text=FormZS.ZipSelected.ZipCodeDigits;
 			}
+			SetRequiredFields();
 		}
 
 		private void butEditZip_Click(object sender, System.EventArgs e) {
@@ -2742,6 +3416,7 @@ namespace OpenDental{
 		private void butAuto_Click(object sender, System.EventArgs e) {
 			try {
 				textChartNumber.Text=Patients.GetNextChartNum();
+				_errorProv.SetError(textChartNumber,"");
 			}
 			catch(ApplicationException ex) {
 				MessageBox.Show(ex.Message);
@@ -2897,6 +3572,7 @@ namespace OpenDental{
 				textCounty.Text=CountiesList[listCounties.SelectedIndex].CountyName;
 			}
 			listCounties.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listCounties_Click(object sender, System.EventArgs e){
@@ -2992,6 +3668,7 @@ namespace OpenDental{
 				PatCur.SiteNum=listSitesFiltered[listSites.SelectedIndex].SiteNum;
 			}
 			listSites.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listSites_Click(object sender,System.EventArgs e) {
@@ -3020,6 +3697,7 @@ namespace OpenDental{
 			}
 			PatCur.SiteNum=FormS.SelectedSiteNum;
 			textSite.Text=Sites.GetDescription(PatCur.SiteNum);
+			SetRequiredFields();
 		}
 
 		private void butPickResponsParty_Click(object sender,EventArgs e) {
@@ -3037,11 +3715,13 @@ namespace OpenDental{
 			else {
 				textResponsParty.Text=Patients.GetLim(PatCur.ResponsParty).GetNameLF();
 			}
+			_errorProv.SetError(textResponsParty,"");
 		}
 
 		private void butClearResponsParty_Click(object sender,EventArgs e) {
 			PatCur.ResponsParty=0;
 			textResponsParty.Text="";
+			SetRequiredFields();
 		}
 		#endregion
 
@@ -3129,6 +3809,7 @@ namespace OpenDental{
 				return;
 			}
 			listEmps.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listEmps_Click(object sender, System.EventArgs e){
@@ -3225,6 +3906,7 @@ namespace OpenDental{
 				return;
 			}
 			listMedicaidStates.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listMedicaidStates_Click(object sender,System.EventArgs e) {
@@ -3313,6 +3995,7 @@ namespace OpenDental{
 				return;
 			}
 			listStates.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listStates_Click(object sender,System.EventArgs e) {
@@ -3331,6 +4014,9 @@ namespace OpenDental{
 		}
 
 		private void listPosition_SelectedIndexChanged(object sender,EventArgs e) {
+			if(!_isLoad) {
+				SetRequiredFields();
+			}
 			//CheckGuardianUiState();
 		}
 
@@ -3450,14 +4136,25 @@ namespace OpenDental{
 
 		private void butPickPrimary_Click(object sender,EventArgs e) {
 			FormProviderPick formp=new FormProviderPick();
-			if(comboPriProv.SelectedIndex>-1) {
-				formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex].ProvNum;
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				if(comboPriProv.SelectedIndex>0) {
+					formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex-1].ProvNum;//Minus 1 to account for 'Select Provider'
+				}
+			}
+			else {
+				if(comboPriProv.SelectedIndex>-1) {
+					formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex].ProvNum;
+				}
 			}
 			formp.ShowDialog();
 			if(formp.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			comboPriProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum);
+			int indexOffset=Providers.GetIndex(formp.SelectedProvNum);
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				indexOffset++;//Plus 1 to account for 'Select Provider'
+			}
+			comboPriProv.SelectedIndex=indexOffset;
 		}
 
 		private void butPickSecondary_Click(object sender,EventArgs e) {
@@ -3472,8 +4169,9 @@ namespace OpenDental{
 			comboSecProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum)+1;
 		}
 
-		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {
+		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {			
 			if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
+				SetRequiredFields();
 				return;
 			}
 			//The first selected is 'None', so unselect it.
@@ -3487,12 +4185,14 @@ namespace OpenDental{
 			//'None' is either the last one selected or in the middle of the items selected, so unselect all but 'None'.
 			if(comboBoxMultiRace.ListSelectedIndices.Contains(0)) {
 				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {0});
+				SetRequiredFields();
 				return;
 			}
 			//'DeclinedToSpecify' is either the last one selected or in the middle of the items selected, so unselect all but 'DeclinedToSpecify'.
 			if(comboBoxMultiRace.ListSelectedIndices.Contains(4)) {
 				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {4});
 			}
+			SetRequiredFields();
 		}	
 
 		///<summary>Gets an employerNum based on the name entered. Called from FillCur</summary>
@@ -3569,6 +4269,7 @@ namespace OpenDental{
 
 		///<summary>Fills the Referred From text box with the oldest (lowest ItemOrder) referral source marked IsFrom.</summary>
 		private void FillReferrals() {
+			textReferredFrom.Clear();
 			_listRefAttaches=RefAttaches.Refresh(PatCur.PatNum);
 			string firstRefNameTypeAbbr="";
 			string firstRefType="";
@@ -3605,6 +4306,7 @@ namespace OpenDental{
 			_referredFromToolTip.SetToolTip(textReferredFrom,firstRefFullName+firstRefType+suffix);
 			//Example: Schmidt, John Jacob Jingleheimer, DDS (doctor) (+5 more) 
 			//might be shortened to : Schmidt, John Jaco (doctor) (+5 more) 
+			_errorProv.SetError(textReferredFrom,"");
 		}
 
 		private void textReferredFrom_DoubleClick(object sender,EventArgs e) {
@@ -3612,6 +4314,7 @@ namespace OpenDental{
 			FormRE.PatNum=PatCur.PatNum;
 			FormRE.ShowDialog();
 			FillReferrals();
+			SetRequiredFields();
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -3692,6 +4395,29 @@ namespace OpenDental{
 				MsgBox.Show(this,"Cannot change the status of a patient in a reseller family.");
 				return;
 			}
+			int selectedProvIndex=comboPriProv.SelectedIndex;
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				selectedProvIndex--;//Minus 1 to account for 'Select Provider'
+			}
+			if(selectedProvIndex<0) {
+				if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv) || PatCur.PriProv==0) {//selected index could be -1 if the provider was selected and then hidden
+					MsgBox.Show(this,"Primary provider must be set.");
+					_isValidating=true;
+					SetRequiredFields();
+					return;
+				}
+			}
+			else {
+				PatCur.PriProv=ProviderC.ListShort[selectedProvIndex].ProvNum;
+			}
+			if(_isMissingRequiredFields) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Required Fields are missing. Do you want to return and finish entering patient information?")) {
+					_isValidating=true;
+					SetRequiredFields();
+					return;
+				}
+				SecurityLogs.MakeLogEntry(Permissions.RequiredFields,PatCur.PatNum,"Saved patient with required fields missing.");
+			}
 			PatCur.LName=textLName.Text;
 			PatCur.FName=textFName.Text;
 			PatCur.MiddleI=textMiddleI.Text;
@@ -3701,7 +4427,6 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {//Mother's maiden name UI is only used when EHR is enabled.
 				_ehrPatientCur.MotherMaidenFname=textMotherMaidenFname.Text;
 				_ehrPatientCur.MotherMaidenLname=textMotherMaidenLname.Text;
-				EhrPatients.Update(_ehrPatientCur);
 			}
 			switch(listStatus.SelectedIndex){
 				case 0: PatCur.PatStatus=PatientStatus.Patient; break;
@@ -3752,6 +4477,8 @@ namespace OpenDental{
 				}
 			}
 			PatCur.MedicaidID=textMedicaidID.Text;
+			_ehrPatientCur.MedicaidState=textMedicaidState.Text;
+			EhrPatients.Update(_ehrPatientCur);
 			PatCur.WkPhone=textWkPhone.Text;
 			PatCur.WirelessPhone=textWirelessPhone.Text;
 			PatCur.TxtMsgOk=(YN)listTextOk.SelectedIndex;
@@ -3779,9 +4506,6 @@ namespace OpenDental{
 			PatCur.AddrNote=textAddrNotes.Text;
 			PatCur.DateFirstVisit=PIn.Date(textDateFirstVisit.Text);
 			PatCur.AskToArriveEarly=PIn.Int(textAskToArriveEarly.Text);
-			if(comboPriProv.SelectedIndex!=-1) {
-				PatCur.PriProv=ProviderC.ListShort[comboPriProv.SelectedIndex].ProvNum;
-			}
 			if(comboSecProv.SelectedIndex==0){
 				PatCur.SecProv=0;
 			}
@@ -4031,7 +4755,6 @@ namespace OpenDental{
 		}
 
 
-
 		
 
 		
@@ -4069,6 +4792,7 @@ namespace OpenDental{
 		
 
 		
+
 	}
 }
 

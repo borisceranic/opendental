@@ -374,9 +374,9 @@ namespace OpenDental {
 					}
 					condition1.ConditionValue=textConditionValue1.Text;
 					condition1.Operator=(ConditionOperator)(comboOperator1.SelectedIndex+2);//Plus 2 because Equals and NotEquals are not in the combo box
-					RequiredFieldConditions.DeleteAll(_listReqFieldConds.Select(x => x.RequiredFieldConditionNum).ToList());
-					RequiredFieldConditions.Insert(condition1);
+					RequiredFieldConditions.DeleteAll(_listReqFieldConds.Select(x => x.RequiredFieldConditionNum).ToList());					
 					if(textConditionValue2.Text=="") {
+						RequiredFieldConditions.Insert(condition1);
 						break;
 					}
 					//Construct the second condition if it is not blank
@@ -411,6 +411,7 @@ namespace OpenDental {
 						condition1.ConditionRelationship=LogicalOperator.Or;
 						condition2.ConditionRelationship=LogicalOperator.Or;
 					}
+					RequiredFieldConditions.Insert(condition1);
 					RequiredFieldConditions.Insert(condition2);
 					break;
 				//Types that store the foreign key of the value

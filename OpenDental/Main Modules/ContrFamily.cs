@@ -834,14 +834,19 @@ namespace OpenDental{
 						row.Cells.Add(PatCur.AdmitDate.ToShortDateString());
 						break;
 					case "Primary Provider":
-						row.Cells.Add(Providers.GetLongDesc(Patients.GetProvNum(PatCur)));
+						if(PatCur.PriProv!=0) {
+							row.Cells.Add(Providers.GetLongDesc(Patients.GetProvNum(PatCur)));
+						}
+						else {
+							row.Cells.Add(Lan.g("TablePatient","None"));
+						}
 						break;
 					case "Sec. Provider":
 						if(PatCur.SecProv != 0){
 							row.Cells.Add(Providers.GetLongDesc(PatCur.SecProv));
 						}
 						else{
-							row.Cells.Add("None");
+							row.Cells.Add(Lan.g("TablePatient","None"));
 						}
 						break;
 					case "Payor Types":
@@ -1115,7 +1120,9 @@ namespace OpenDental{
 			tempPat.HmPhone    =PatCur.HmPhone;
 			tempPat.Guarantor  =PatCur.Guarantor;
 			tempPat.CreditType =PatCur.CreditType;
-			tempPat.PriProv    =PatCur.PriProv;
+			if(!PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				tempPat.PriProv  =PatCur.PriProv;
+			}
 			tempPat.SecProv    =PatCur.SecProv;
 			tempPat.FeeSched   =PatCur.FeeSched;
 			tempPat.BillingType=PatCur.BillingType;

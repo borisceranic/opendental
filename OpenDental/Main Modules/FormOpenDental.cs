@@ -365,6 +365,7 @@ namespace OpenDental{
 		private MenuItem menuItemPreferencesAccount;
 		private MenuItem menuItemCCProcs;
 		private MenuItem menuItem12;
+		private MenuItem menuItemRequiredFields;
 		private MenuItem menuItemJobManager;
 		private MenuItem menuItemStateAbbrs;
 		private MenuItem menuItemActionNeeded;
@@ -554,6 +555,7 @@ namespace OpenDental{
 			this.menuItemModules = new System.Windows.Forms.MenuItem();
 			this.menuItemPractice = new System.Windows.Forms.MenuItem();
 			this.menuItemLinks = new System.Windows.Forms.MenuItem();
+			this.menuItemRequiredFields = new System.Windows.Forms.MenuItem();
 			this.menuItemRequirementsNeeded = new System.Windows.Forms.MenuItem();
 			this.menuItemSched = new System.Windows.Forms.MenuItem();
 			this.menuItemSecurity = new System.Windows.Forms.MenuItem();
@@ -786,6 +788,7 @@ namespace OpenDental{
             this.menuItemModules,
             this.menuItemPractice,
             this.menuItemLinks,
+            this.menuItemRequiredFields,
             this.menuItemRequirementsNeeded,
             this.menuItemSched,
             this.menuItemSecurity,
@@ -1181,44 +1184,50 @@ namespace OpenDental{
 			this.menuItemLinks.Text = "Program Links";
 			this.menuItemLinks.Click += new System.EventHandler(this.menuItemLinks_Click);
 			// 
+			// menuItemRequiredFields
+			// 
+			this.menuItemRequiredFields.Index = 22;
+			this.menuItemRequiredFields.Text = "Required Fields";
+			this.menuItemRequiredFields.Click += new System.EventHandler(this.menuItemRequiredFields_Click);
+			// 
 			// menuItemRequirementsNeeded
 			// 
-			this.menuItemRequirementsNeeded.Index = 22;
+			this.menuItemRequirementsNeeded.Index = 23;
 			this.menuItemRequirementsNeeded.Text = "Requirements Needed";
 			this.menuItemRequirementsNeeded.Click += new System.EventHandler(this.menuItemRequirementsNeeded_Click);
 			// 
 			// menuItemSched
 			// 
-			this.menuItemSched.Index = 23;
+			this.menuItemSched.Index = 24;
 			this.menuItemSched.Text = "Schedules";
 			this.menuItemSched.Click += new System.EventHandler(this.menuItemSched_Click);
 			// 
 			// menuItemSecurity
 			// 
-			this.menuItemSecurity.Index = 24;
+			this.menuItemSecurity.Index = 25;
 			this.menuItemSecurity.Text = "Security";
 			this.menuItemSecurity.Click += new System.EventHandler(this.menuItemSecurity_Click);
 			// 
 			// menuItemSheets
 			// 
-			this.menuItemSheets.Index = 25;
+			this.menuItemSheets.Index = 26;
 			this.menuItemSheets.Text = "Sheets";
 			this.menuItemSheets.Click += new System.EventHandler(this.menuItemSheets_Click);
 			// 
 			// menuItemSpellCheck
 			// 
-			this.menuItemSpellCheck.Index = 26;
+			this.menuItemSpellCheck.Index = 27;
 			this.menuItemSpellCheck.Text = "Spell Check";
 			this.menuItemSpellCheck.Click += new System.EventHandler(this.menuItemSpellCheck_Click);
 			// 
 			// menuItem20
 			// 
-			this.menuItem20.Index = 27;
+			this.menuItem20.Index = 28;
 			this.menuItem20.Text = "-";
 			// 
 			// menuItemObsolete
 			// 
-			this.menuItemObsolete.Index = 28;
+			this.menuItemObsolete.Index = 29;
 			this.menuItemObsolete.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemLetters,
             this.menuItemQuestions});
@@ -5714,6 +5723,15 @@ namespace OpenDental{
 			FormReplicationSetup FormRS=new FormReplicationSetup();
 			FormRS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.SecurityAdmin,0,"Replication setup.");
+		}
+
+		private void menuItemRequiredFields_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormRequiredFields FormRF=new FormRequiredFields();
+			FormRF.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Required Fields");
 		}
 
 		private void menuItemRequirementsNeeded_Click(object sender,EventArgs e) {

@@ -21,7 +21,6 @@ namespace OpenDental {
 
 		private void FormRequiredFields_Load(object sender,EventArgs e) {
 			labelExplanation.Text="";//This will be filled later, but blank will function as Visible=false
-			butColor.BackColor=PrefC.GetColor(PrefName.RequiredFieldColor);
 			_listReqFields=RequiredFields.Listt;
 			FillAvailable();
 			FillMain();
@@ -353,14 +352,6 @@ namespace OpenDental {
 			checkMedicaidLength.Visible=false;
 		}
 
-		private void butColor_Click(object sender,EventArgs e) {
-			ColorDialog colDialog=new ColorDialog();
-			colDialog.Color=butColor.BackColor;
-			colDialog.FullOpen=true;
-			colDialog.ShowDialog();
-			butColor.BackColor=colDialog.Color;
-		}
-
 		private void butAdd_Click(object sender,EventArgs e) {
 			if(gridMain.SelectedIndices.Length!=1) {
 				MsgBox.Show(this,"Please select one required field first.");
@@ -409,9 +400,7 @@ namespace OpenDental {
 		}
 
 		private void FormRequiredFields_FormClosing(object sender,FormClosingEventArgs e) {
-			if(Prefs.UpdateBool(PrefName.EnforceMedicaidIDLength,checkMedicaidLength.Checked)
-				| Prefs.UpdateInt(PrefName.RequiredFieldColor,butColor.BackColor.ToArgb()))
-			{
+			if(Prefs.UpdateBool(PrefName.EnforceMedicaidIDLength,checkMedicaidLength.Checked)) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 			DataValid.SetInvalid(InvalidType.RequiredFields);

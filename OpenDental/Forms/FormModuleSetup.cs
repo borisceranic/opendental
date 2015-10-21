@@ -138,6 +138,7 @@ namespace OpenDental{
 		private Label label17;
 		private CheckBox checkBrokenApptAdjustmentWithProcedure;
 		private CheckBox checkTPSaveSigned;
+		private CheckBox checkSelectProv;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -231,6 +232,7 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.checkSelectProv = new System.Windows.Forms.CheckBox();
 			this.checkGoogleAddress = new System.Windows.Forms.CheckBox();
 			this.checkInsPPOsecWriteoffs = new System.Windows.Forms.CheckBox();
 			this.checkFamPhiAccess = new System.Windows.Forms.CheckBox();
@@ -247,6 +249,7 @@ namespace OpenDental{
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
 			this.tabTreatPlan = new System.Windows.Forms.TabPage();
+			this.checkTPSaveSigned = new System.Windows.Forms.CheckBox();
 			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
 			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
 			this.labelDiscountPercentage = new System.Windows.Forms.Label();
@@ -297,7 +300,6 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkTPSaveSigned = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -961,6 +963,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkSelectProv);
 			this.tabFamily.Controls.Add(this.checkGoogleAddress);
 			this.tabFamily.Controls.Add(this.checkInsPPOsecWriteoffs);
 			this.tabFamily.Controls.Add(this.checkFamPhiAccess);
@@ -981,13 +984,24 @@ namespace OpenDental{
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
 			// 
+			// checkSelectProv
+			// 
+			this.checkSelectProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSelectProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSelectProv.Location = new System.Drawing.Point(6, 218);
+			this.checkSelectProv.Name = "checkSelectProv";
+			this.checkSelectProv.Size = new System.Drawing.Size(434, 17);
+			this.checkSelectProv.TabIndex = 216;
+			this.checkSelectProv.Text = "Primary Provider defaults to \'Select Provider\' in patient edit and add family";
+			this.checkSelectProv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkGoogleAddress
 			// 
 			this.checkGoogleAddress.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkGoogleAddress.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkGoogleAddress.Location = new System.Drawing.Point(58, 200);
+			this.checkGoogleAddress.Location = new System.Drawing.Point(58, 201);
 			this.checkGoogleAddress.Name = "checkGoogleAddress";
-			this.checkGoogleAddress.Size = new System.Drawing.Size(382, 18);
+			this.checkGoogleAddress.Size = new System.Drawing.Size(382, 17);
 			this.checkGoogleAddress.TabIndex = 215;
 			this.checkGoogleAddress.Text = "Show Google Maps in patient edit";
 			this.checkGoogleAddress.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -998,7 +1012,7 @@ namespace OpenDental{
 			this.checkInsPPOsecWriteoffs.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkInsPPOsecWriteoffs.Location = new System.Drawing.Point(58, 184);
 			this.checkInsPPOsecWriteoffs.Name = "checkInsPPOsecWriteoffs";
-			this.checkInsPPOsecWriteoffs.Size = new System.Drawing.Size(382, 18);
+			this.checkInsPPOsecWriteoffs.Size = new System.Drawing.Size(382, 17);
 			this.checkInsPPOsecWriteoffs.TabIndex = 214;
 			this.checkInsPPOsecWriteoffs.Text = "Calculate secondary insurance PPO writeoffs (not recommended, see manual)";
 			this.checkInsPPOsecWriteoffs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1180,6 +1194,18 @@ namespace OpenDental{
 			this.tabTreatPlan.Size = new System.Drawing.Size(466, 479);
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
+			// 
+			// checkTPSaveSigned
+			// 
+			this.checkTPSaveSigned.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTPSaveSigned.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTPSaveSigned.Location = new System.Drawing.Point(138, 169);
+			this.checkTPSaveSigned.Name = "checkTPSaveSigned";
+			this.checkTPSaveSigned.Size = new System.Drawing.Size(302, 17);
+			this.checkTPSaveSigned.TabIndex = 213;
+			this.checkTPSaveSigned.Text = "Save Signed Treatment Plans to PDF";
+			this.checkTPSaveSigned.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTPSaveSigned.UseVisualStyleBackColor = false;
 			// 
 			// checkTreatPlanItemized
 			// 
@@ -1748,18 +1774,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkTPSaveSigned
-			// 
-			this.checkTPSaveSigned.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTPSaveSigned.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTPSaveSigned.Location = new System.Drawing.Point(138, 169);
-			this.checkTPSaveSigned.Name = "checkTPSaveSigned";
-			this.checkTPSaveSigned.Size = new System.Drawing.Size(302, 17);
-			this.checkTPSaveSigned.TabIndex = 213;
-			this.checkTPSaveSigned.Text = "Save Signed Treatment Plans to PDF";
-			this.checkTPSaveSigned.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkTPSaveSigned.UseVisualStyleBackColor = false;
-			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1920,6 +1934,7 @@ namespace OpenDental{
 			checkTextMsgOkStatusTreatAsNo.Checked=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
 			checkFamPhiAccess.Checked=PrefC.GetBool(PrefName.FamPhiAccess);
 			checkGoogleAddress.Checked=PrefC.GetBool(PrefName.ShowFeatureGoogleMaps);
+			checkSelectProv.Checked=PrefC.GetBool(PrefName.PriProvDefaultToSelectProv);
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -2263,6 +2278,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.FamPhiAccess,checkFamPhiAccess.Checked)
 				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
 				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
+				| Prefs.UpdateBool(PrefName.PriProvDefaultToSelectProv,checkSelectProv.Checked)
 				#endregion
 				#region Account Module
 				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)

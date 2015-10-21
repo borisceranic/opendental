@@ -10642,15 +10642,6 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('RequiredFieldColor','-86')";//Light yellow
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
-						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RequiredFieldColor','-86')";//Light yellow
-					Db.NonQ(command);
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('PriProvDefaultToSelectProv','0')";
 					Db.NonQ(command);
 				}
