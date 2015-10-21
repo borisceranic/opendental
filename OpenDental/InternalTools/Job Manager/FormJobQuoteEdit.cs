@@ -26,6 +26,9 @@ namespace OpenDental {
 		}
 
 		private void FormJobQuoteEdit_Load(object sender,EventArgs e) {
+			if(!JobRoles.IsAuthorized(JobRoleType.Quote,true)) {
+				butOK.Enabled=false;
+			}
 			if(_jobQuote.PatNum!=0) {
 				_patCur=Patients.GetPat(_jobQuote.PatNum);
 				textPatient.Text=_patCur.LName+", "+_patCur.FName;

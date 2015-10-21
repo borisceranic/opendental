@@ -100,6 +100,7 @@ namespace OpenDental {
 			}
 			FormJobReviewEdit FormJRE=new FormJobReviewEdit(_jobNum,FormUP.SelectedUserNum);
 			if(FormJRE.ShowDialog()==DialogResult.OK) {
+				FormJRE.JobReviewCur.IsNew=false;
 				_jobReviews.Add(FormJRE.JobReviewCur);
 				FillGrid();
 			}

@@ -345,7 +345,7 @@ namespace OpenDental {
 
 		private void butProjectPick_Click(object sender,EventArgs e) {
 			FormJobProjectSelect FormJPS=new FormJobProjectSelect();
-			if(FormJPS.DialogResult==DialogResult.OK) {
+			if(FormJPS.ShowDialog()==DialogResult.OK) {
 				_job.ProjectNum=FormJPS.SelectedProject.JobProjectNum; //project 
 				textProject.Text=FormJPS.SelectedProject.Title; //project 
 			}

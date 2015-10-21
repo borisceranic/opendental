@@ -73,6 +73,7 @@ namespace OpenDental {
 			_jobReviewCur.ReviewStatus=(JobReviewStatus)comboStatus.SelectedIndex;
 			_jobReviewCur.Description=textDescription.Text;
 			if(_jobReviewCur.IsNew) {
+				_jobReviewCur.DateTStamp=DateTime.Now;
 				long jobReviewNum=JobReviews.Insert(_jobReviewCur);
 				JobLink jobLink=new JobLink();
 				jobLink.JobNum=_jobNum;

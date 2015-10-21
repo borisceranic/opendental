@@ -134,6 +134,9 @@ namespace OpenDental {
 		}
 
 		private void butLinkQuote_Click(object sender,EventArgs e) {
+			if(!JobRoles.IsAuthorized(JobRoleType.Quote)) {
+				return;
+			}
 			JobQuote jobQuote=new JobQuote();
 			jobQuote.IsNew=true;
 			FormJobQuoteEdit FormJQE=new FormJobQuoteEdit(jobQuote);
