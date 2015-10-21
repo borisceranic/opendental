@@ -45,6 +45,7 @@ namespace OpenDental{
 		private Label label5;
 		private CheckBox checkPrefFName;
 		private CheckBox checkRefresh;
+		private CheckBox checkImeCompositionCompatibility;
 		private Label label1;
 		//private List<Def> posAdjTypes;
 
@@ -85,8 +86,6 @@ namespace OpenDental{
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkShowOpenTickets = new System.Windows.Forms.CheckBox();
 			this.groupBoxTaskDefaults = new System.Windows.Forms.GroupBox();
-			this.validNumY = new OpenDental.ValidNumber();
-			this.validNumX = new OpenDental.ValidNumber();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -96,13 +95,16 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.checkColorTheme = new System.Windows.Forms.CheckBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.checkPrefFName = new System.Windows.Forms.CheckBox();
+			this.checkRefresh = new System.Windows.Forms.CheckBox();
+			this.checkImeCompositionCompatibility = new System.Windows.Forms.CheckBox();
 			this.textInactiveSignal = new OpenDental.ValidNumber();
+			this.validNumY = new OpenDental.ValidNumber();
+			this.validNumX = new OpenDental.ValidNumber();
 			this.butLanguages = new OpenDental.UI.Button();
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkPrefFName = new System.Windows.Forms.CheckBox();
-			this.checkRefresh = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBoxTaskDefaults.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -129,7 +131,7 @@ namespace OpenDental{
 			// label4
 			// 
 			this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label4.Location = new System.Drawing.Point(59, 268);
+			this.label4.Location = new System.Drawing.Point(59, 266);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(298, 17);
 			this.label4.TabIndex = 64;
@@ -253,7 +255,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.checkTaskListAlwaysShow);
 			this.groupBox2.Controls.Add(this.checkTasksCheckOnStartup);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(101, 325);
+			this.groupBox2.Location = new System.Drawing.Point(101, 343);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(364, 184);
 			this.groupBox2.TabIndex = 188;
@@ -288,30 +290,6 @@ namespace OpenDental{
 			this.groupBoxTaskDefaults.TabIndex = 76;
 			this.groupBoxTaskDefaults.TabStop = false;
 			this.groupBoxTaskDefaults.Text = "Local Computer Default Settings";
-			// 
-			// validNumY
-			// 
-			this.validNumY.Location = new System.Drawing.Point(235, 59);
-			this.validNumY.MaxLength = 4;
-			this.validNumY.MaxVal = 1200;
-			this.validNumY.MinVal = 300;
-			this.validNumY.Name = "validNumY";
-			this.validNumY.Size = new System.Drawing.Size(47, 20);
-			this.validNumY.TabIndex = 188;
-			this.validNumY.Text = "542";
-			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// validNumX
-			// 
-			this.validNumX.Location = new System.Drawing.Point(115, 59);
-			this.validNumX.MaxLength = 4;
-			this.validNumX.MaxVal = 2000;
-			this.validNumX.MinVal = 300;
-			this.validNumX.Name = "validNumX";
-			this.validNumX.Size = new System.Drawing.Size(47, 20);
-			this.validNumX.TabIndex = 186;
-			this.validNumX.Text = "542";
-			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// label15
 			// 
@@ -371,7 +349,7 @@ namespace OpenDental{
 			// 
 			// textWebServiceServerName
 			// 
-			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 297);
+			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 315);
 			this.textWebServiceServerName.Name = "textWebServiceServerName";
 			this.textWebServiceServerName.Size = new System.Drawing.Size(165, 20);
 			this.textWebServiceServerName.TabIndex = 197;
@@ -379,7 +357,7 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(4, 298);
+			this.label2.Location = new System.Drawing.Point(4, 318);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(279, 17);
 			this.label2.TabIndex = 198;
@@ -408,6 +386,40 @@ namespace OpenDental{
     "to disable.";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// checkPrefFName
+			// 
+			this.checkPrefFName.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPrefFName.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPrefFName.Location = new System.Drawing.Point(15, 168);
+			this.checkPrefFName.Name = "checkPrefFName";
+			this.checkPrefFName.Size = new System.Drawing.Size(434, 19);
+			this.checkPrefFName.TabIndex = 79;
+			this.checkPrefFName.Text = "Search for preferred name in first name field in Select Patient window";
+			this.checkPrefFName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkRefresh
+			// 
+			this.checkRefresh.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkRefresh.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkRefresh.Location = new System.Drawing.Point(14, 151);
+			this.checkRefresh.Name = "checkRefresh";
+			this.checkRefresh.Size = new System.Drawing.Size(435, 18);
+			this.checkRefresh.TabIndex = 202;
+			this.checkRefresh.Text = "Refresh while typing in Select Patient window";
+			this.checkRefresh.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkRefresh.UseVisualStyleBackColor = true;
+			// 
+			// checkImeCompositionCompatibility
+			// 
+			this.checkImeCompositionCompatibility.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkImeCompositionCompatibility.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkImeCompositionCompatibility.Location = new System.Drawing.Point(15, 290);
+			this.checkImeCompositionCompatibility.Name = "checkImeCompositionCompatibility";
+			this.checkImeCompositionCompatibility.Size = new System.Drawing.Size(434, 19);
+			this.checkImeCompositionCompatibility.TabIndex = 203;
+			this.checkImeCompositionCompatibility.Text = "Text boxes use foreign language Input Method Editor (IME) composition";
+			this.checkImeCompositionCompatibility.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// textInactiveSignal
 			// 
 			this.textInactiveSignal.Location = new System.Drawing.Point(375, 231);
@@ -418,6 +430,30 @@ namespace OpenDental{
 			this.textInactiveSignal.TabIndex = 201;
 			this.textInactiveSignal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
+			// validNumY
+			// 
+			this.validNumY.Location = new System.Drawing.Point(235, 59);
+			this.validNumY.MaxLength = 4;
+			this.validNumY.MaxVal = 1200;
+			this.validNumY.MinVal = 300;
+			this.validNumY.Name = "validNumY";
+			this.validNumY.Size = new System.Drawing.Size(47, 20);
+			this.validNumY.TabIndex = 188;
+			this.validNumY.Text = "542";
+			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumX
+			// 
+			this.validNumX.Location = new System.Drawing.Point(115, 59);
+			this.validNumX.MaxLength = 4;
+			this.validNumX.MaxVal = 2000;
+			this.validNumX.MinVal = 300;
+			this.validNumX.Name = "validNumX";
+			this.validNumX.Size = new System.Drawing.Size(47, 20);
+			this.validNumX.TabIndex = 186;
+			this.validNumX.Text = "542";
+			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
 			// butLanguages
 			// 
 			this.butLanguages.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -425,7 +461,7 @@ namespace OpenDental{
 			this.butLanguages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLanguages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLanguages.CornerRadius = 4F;
-			this.butLanguages.Location = new System.Drawing.Point(360, 263);
+			this.butLanguages.Location = new System.Drawing.Point(360, 261);
 			this.butLanguages.Name = "butLanguages";
 			this.butLanguages.Size = new System.Drawing.Size(88, 24);
 			this.butLanguages.TabIndex = 63;
@@ -451,7 +487,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(487, 487);
+			this.butCancel.Location = new System.Drawing.Point(487, 507);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -466,40 +502,18 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(487, 449);
+			this.butOK.Location = new System.Drawing.Point(487, 469);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkPrefFName
-			// 
-			this.checkPrefFName.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPrefFName.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPrefFName.Location = new System.Drawing.Point(15, 168);
-			this.checkPrefFName.Name = "checkPrefFName";
-			this.checkPrefFName.Size = new System.Drawing.Size(434, 19);
-			this.checkPrefFName.TabIndex = 79;
-			this.checkPrefFName.Text = "Search for preferred name in first name field in Select Patient window";
-			this.checkPrefFName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// checkRefresh
-			// 
-			this.checkRefresh.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkRefresh.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRefresh.Location = new System.Drawing.Point(14, 151);
-			this.checkRefresh.Name = "checkRefresh";
-			this.checkRefresh.Size = new System.Drawing.Size(435, 18);
-			this.checkRefresh.TabIndex = 202;
-			this.checkRefresh.Text = "Refresh while typing in Select Patient window";
-			this.checkRefresh.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkRefresh.UseVisualStyleBackColor = true;
-			// 
 			// FormMisc
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(579, 524);
+			this.ClientSize = new System.Drawing.Size(579, 544);
+			this.Controls.Add(this.checkImeCompositionCompatibility);
 			this.Controls.Add(this.checkRefresh);
 			this.Controls.Add(this.checkPrefFName);
 			this.Controls.Add(this.textInactiveSignal);
@@ -559,6 +573,7 @@ namespace OpenDental{
 			comboShowID.SelectedIndex=PrefC.GetInt(PrefName.ShowIDinTitleBar);
 			checkTasksCheckOnStartup.Checked=PrefC.GetBool(PrefName.TasksCheckOnStartup);
 			checkTaskListAlwaysShow.Checked=PrefC.GetBool(PrefName.TaskListAlwaysShowsAtBottom);
+			checkImeCompositionCompatibility.Checked=PrefC.GetBool(PrefName.ImeCompositionCompatibility);
 			if(checkTaskListAlwaysShow.Checked) {
 				groupBoxTaskDefaults.Enabled=true;
 			}
@@ -642,6 +657,7 @@ namespace OpenDental{
 				| Prefs.UpdateString(PrefName.WebServiceServerName,textWebServiceServerName.Text)
 				| Prefs.UpdateBool(PrefName.PatientSelectUseFNameForPreferred,checkPrefFName.Checked
 				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked))
+				| Prefs.UpdateBool(PrefName.ImeCompositionCompatibility,checkImeCompositionCompatibility.Checked)
 				)
 			{
 				changed=true;

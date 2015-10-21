@@ -129,6 +129,9 @@ the option below to hide the list on individual computers.</value>
     <value>This will hide the task list from this particular computer. You may still access it normally through the Manage module.
 This is helpful on computers with limited screen space (e.g. 15" &amp; 17") to customize the always show task list option. </value>
   </data>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>50</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

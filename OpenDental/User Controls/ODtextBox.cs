@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,10 +10,27 @@ using System.Text.RegularExpressions;
 using OpenDental.UI;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace OpenDental {
 	/// <summary>This is used instead of a regular textbox when quickpaste functionality is needed.</summary>
 	public class ODtextBox:RichTextBox {//System.ComponentModel.Component
+
+		#region IMM (Input Method Manager) dll import for IME mid composition bug (Korea and east Asian languages)
+
+		//See post by Jon Burchel - Microsoft: https://goo.gl/d1ehJb  (an MSDN forum post shortened using google url shortener)
+
+		[DllImport("imm32.dll",CharSet = CharSet.Unicode)]
+		public static extern IntPtr ImmReleaseContext(IntPtr hWnd,IntPtr context);
+
+		[DllImport("imm32.dll",CharSet = CharSet.Unicode)]
+		private static extern int ImmGetCompositionString(IntPtr hIMC,uint dwIndex,byte[] lpBuf,int dwBufLen);
+
+		[DllImport("imm32.dll",CharSet = CharSet.Unicode)]
+		private static extern IntPtr ImmGetContext(IntPtr hWnd);
+
+		#endregion
+
 		private System.Windows.Forms.ContextMenu contextMenu;
 		private IContainer components;// Required designer variable.
 		private static Hunspell HunspellGlobal;//We create this object one time for every instance of this textbox control within the entire program.
@@ -21,11 +38,24 @@ namespace OpenDental {
 		private List<string> ListCorrect;
 		private List<string> ListIncorrect;
 		private Graphics BufferGraphics;
-		private Timer timer1;
+		private Timer timerSpellCheck;
 		private Point PositionOfClick;
 		private MatchOD ReplWord;
 		private bool spellCheckIsEnabled;//set to true in constructor
 		private Point textEndPoint;
+		///<summary>Only used when ImeCompositionCompatibility is enabled.  Set to true when the user presses the space bar.
+		///This will cause the cursor to move to the next position and no longer have composition affect the current character.
+		///E.g. the Korean symbol '역' (dur) will display.  However, typing '여' (du) and then space will cause that char to no longer be affected.
+		///This will allow the char 'ㄱ' (r) to appear after '여' instead of '역'.</summary>
+		private bool _skipImeComposition=false;
+		///<summary>Only used when ImeCompositionCompatibility is enabled.  Set to true when the user is in the middle of composing a symbol.
+		///This will cause the cursor to stay over the current character and not move on (or separate) the current symbol being constructed.
+		///E.g. the Korean symbol '역' (dur) will not display correctly without this set to true.  
+		///When false, it will be broken apart into each character that comprizes it: 'ㅇ ㅕ ㄱ ' (d u r)</summary>
+		private bool _imeComposing=false;
+		///<summary>Always contains the text that should be displayed in the rich text box.  
+		///Also used to store the UNICODE representation of the RichTextBox.Text property (which we override) due to a Korean bug.</summary>
+		private string _msgText="";
 
 		///<summary>Set true to enable spell checking in this control.</summary>
 		[Category("Behavior"),Description("Set true to enable spell checking.")]
@@ -111,7 +141,7 @@ namespace OpenDental {
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.contextMenu = new System.Windows.Forms.ContextMenu();
-			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.timerSpellCheck = new System.Windows.Forms.Timer(this.components);
 			this.SuspendLayout();
 			// 
 			// contextMenu
@@ -120,8 +150,8 @@ namespace OpenDental {
 			// 
 			// timer1
 			// 
-			this.timer1.Interval = 500;
-			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+			this.timerSpellCheck.Interval = 500;
+			this.timerSpellCheck.Tick += new System.EventHandler(this.timerSpellCheck_Tick);
 			// 
 			// ODtextBox
 			// 
@@ -133,6 +163,84 @@ namespace OpenDental {
 
 		}
 		#endregion
+
+		///<summary>Statuses sent to an application when IME is doing 'composition' for a symbol.
+		///See post by Jon Burchel - Microsoft: https://goo.gl/d1ehJb  (an MSDN forum post shortened using google url shortener)</summary>
+		private enum WM_IME {
+			GCS_RESULTSTR=0x800,
+			EM_STREAMOUT=0x044A,
+			WM_IME_COMPOSITION=0x10F,
+			WM_IME_ENDCOMPOSITION=0x10E,
+			WM_IME_STARTCOMPOSITION=0x10D
+		}
+
+		protected override void WndProc(ref Message m) {
+			bool isImeComposition=false;
+			//We have to try catch this just in case an ODTextBox is shown before upgrading to a version that already has this preference.
+			try {
+				isImeComposition=PrefC.GetBool(PrefName.ImeCompositionCompatibility);
+			}
+			catch(Exception) {
+				//Do nothing.  Just treat the ODTextBox like it always has (no composition support).
+			}
+			//The following code fixes a bug deep down in RichTextBox for foreign users that have a language that needs to use composition symbols.
+			//See post by Jon Burchel - Microsoft: https://goo.gl/d1ehJb  (an MSDN forum post shortened using google url shortener)
+			if(isImeComposition) {
+				switch(m.Msg) {
+					case (int)WM_IME.EM_STREAMOUT:
+						if(_imeComposing) {
+							_skipImeComposition=true;
+						}
+						base.WndProc(ref m);
+						break;
+					case (int)WM_IME.WM_IME_COMPOSITION:
+						if(m.LParam.ToInt32()==(int)WM_IME.GCS_RESULTSTR) {
+							IntPtr hImm=ImmGetContext(this.Handle);
+							int dwSize=ImmGetCompositionString(hImm,(int)WM_IME.GCS_RESULTSTR,null,0);
+							byte[] outstr=new byte[dwSize];
+							ImmGetCompositionString(hImm,(int)WM_IME.GCS_RESULTSTR,outstr,dwSize);
+							_msgText+=Encoding.Unicode.GetString(outstr).ToString();
+							ImmReleaseContext(this.Handle,hImm);
+						}
+						if(_skipImeComposition) {
+							_skipImeComposition=false;
+							break;
+						}
+						base.WndProc(ref m);
+						break;
+					case (int)WM_IME.WM_IME_STARTCOMPOSITION:
+						_imeComposing=true;
+						base.WndProc(ref m);
+						break;
+					case (int)WM_IME.WM_IME_ENDCOMPOSITION:
+						_imeComposing=false;
+						base.WndProc(ref m);
+						break;
+					default:
+						base.WndProc(ref m);
+						break;
+				}
+			}
+			else {//End IME check.
+				base.WndProc(ref m);
+			}
+		}
+
+		public override string Text {
+			get {
+				if(!_imeComposing) {
+					_msgText=base.Text;
+					return base.Text;
+				}
+				else {
+					return _msgText;
+				}
+			}
+			set {
+				_msgText=value;
+				base.Text=value;
+			}
+		}
 
 		///<summary></summary>
 		[Category("Behavior"),Description("This will determine which category of Quick Paste notes opens first.")]
@@ -294,7 +402,7 @@ namespace OpenDental {
 					else {
 						this.SelectionStart=originalCaret;
 					}
-					timer1.Start();
+					timerSpellCheck.Start();
 					break;
 				//case 5 is separator
 				case 6://Add to dict
@@ -309,7 +417,7 @@ namespace OpenDental {
 					DataValid.SetInvalid(InvalidType.DictCustoms);
 					ListIncorrect.Remove(ReplWord.Value);
 					ListCorrect.Add(ReplWord.Value);
-					timer1.Start();
+					timerSpellCheck.Start();
 					break;
 				case 7://Disable spell check
 					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will disable spell checking.  To re-enable, go to Setup | Spell Check and check the \"Spell Check Enabled\" box.")) {
@@ -364,11 +472,11 @@ namespace OpenDental {
 			}
 		}
 
-		private void timer1_Tick(object sender,EventArgs e) {
+		private void timerSpellCheck_Tick(object sender,EventArgs e) {
 			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 				return;
 			}
-			timer1.Stop();
+			timerSpellCheck.Stop();
 			SpellCheck();
 		}
 
@@ -376,8 +484,8 @@ namespace OpenDental {
 			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 				return;
 			}
-			timer1.Stop();
-			timer1.Start();
+			timerSpellCheck.Stop();
+			timerSpellCheck.Start();
 		}
 
 		protected override void OnKeyDown(KeyEventArgs e) {
@@ -418,13 +526,13 @@ namespace OpenDental {
 		protected override void OnKeyUp(KeyEventArgs e) {
 			base.OnKeyUp(e);
 			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
-				timer1.Stop();
+				timerSpellCheck.Stop();
 			}
-			int originalLength=base.Text.Length;
+			int originalLength=Text.Length;
 			int originalCaret=base.SelectionStart;
 			string newText=QuickPasteNotes.Substitute(Text,quickPasteType);
-			if(base.Text!=newText) {
-				base.Text=newText;
+			if(Text!=newText) {
+				Text=newText;
 				SelectionStart=originalCaret+Text.Length-originalLength;
 			}
 			//then CtrlQ
@@ -432,7 +540,7 @@ namespace OpenDental {
 				ShowFullDialog();
 			}
 			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
-				timer1.Start();
+				timerSpellCheck.Start();
 			}
 		}
 
@@ -514,7 +622,13 @@ namespace OpenDental {
 
 		///<summary>Performs spell checking against indiviudal words against the English USA dictionary.</summary>
 		private void SpellCheck() {
-			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
+			//Only spell check if enabled
+			if(!this.spellCheckIsEnabled 
+				|| !PrefC.GetBool(PrefName.SpellCheckIsEnabled)
+				|| PrefC.GetBool(PrefName.ImeCompositionCompatibility))
+			{
+				//Do not spell check languages that use composition.  If needed in the future, fix the bug where the first char disapears in the box.
+				//E.g. go into an ODTextBox, set language input to Korean, and simply type the letter 'ㅇ' (d) and wait.  It will disapear.
 				return;
 			}
 			ClearWavyLines();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -278,6 +278,10 @@ namespace OpenDentBusiness {
 		ImagesModuleTreeIsCollapsed,
 		ImageWindowingMax,
 		ImageWindowingMin,
+		///<summary>Boolean.  False by default.  When enabled a fix is enabled within ODTextBox (RichTextBox) for foreign users that use 
+		///a different language input methodology that requires the composition of symbols in order to display their language correctly.
+		///E.g. the Korean symbol '역' (dur) will not display correctly inside ODTextBoxes without this set to true.</summary>
+		ImeCompositionCompatibility,
 		///<summary>0=Default practice provider, -1=Treating Provider. Otherwise, FK to provider.ProvNum.</summary>
 		InsBillingProv,
 		InsDefaultCobRule,
