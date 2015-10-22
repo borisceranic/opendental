@@ -6,6 +6,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Since we can send e-claims to multiple clearinghouses, this table keeps track of each clearinghouse.  Will eventually be used for individual carriers as well if they accept </summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class Clearinghouse:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

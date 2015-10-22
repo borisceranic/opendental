@@ -144,106 +144,114 @@ namespace OpenDentBusiness{
 			Crud.ClearinghouseCrud.Update(clearinghouse);
 		}
 
+		public static void Update(Clearinghouse clearinghouse,Clearinghouse oldClearinghouse) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),clearinghouse,oldClearinghouse);
+				return;
+			}
+			Crud.ClearinghouseCrud.Update(clearinghouse,oldClearinghouse);
+		}
+
 		///<summary>Inserts a clinic as HQ if the passed-in clearinghouseClin.ClearinghouseNum==0, otherwise updates.
 		///Only certain fields get updated in the clinic-level clearinghouse. All other fields are updated as HQ.
 		///clearinghouseClin.ClinicNum must be set to the correct clinic before this method is called.   
 		///The passed-in clearinghouses are set to the values that are put into the database for caching purposes.</summary>
-		public static void InsertOrUpdateForClinic(Clearinghouse clearinghouseHq,Clearinghouse clearinghouseClin) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),clearinghouseHq,clearinghouseClin);
-				return;
-			}
-			//HQ unconditional values.  Copies values the user typed in from the clinic and overrides HQ values.  This maintains old behavior.
-			clearinghouseHq.Description=clearinghouseClin.Description;
-			clearinghouseClin.Description="";
-			clearinghouseHq.Payors=clearinghouseClin.Payors;
-			clearinghouseClin.Payors="";
-			clearinghouseHq.Eformat=clearinghouseClin.Eformat;
-			clearinghouseClin.Eformat=ElectronicClaimFormat.None;
-			clearinghouseHq.ISA05=clearinghouseClin.ISA05;
-			clearinghouseClin.ISA05="";
-			clearinghouseHq.ISA07=clearinghouseClin.ISA07;
-			clearinghouseClin.ISA07="";
-			clearinghouseHq.ISA08=clearinghouseClin.ISA08;
-			clearinghouseClin.ISA08="";
-			clearinghouseHq.ISA15=clearinghouseClin.ISA15;
-			clearinghouseClin.ISA15="";
-			clearinghouseHq.CommBridge=clearinghouseClin.CommBridge;
-			clearinghouseClin.CommBridge=EclaimsCommBridge.None;
-			//clearinghouseHq.LastBatchNumber=;//Not editable is UI and should not be updated here.  See GetNextBatchNumber() above.
-			clearinghouseHq.ModemPort=clearinghouseClin.ModemPort;
-			clearinghouseClin.ModemPort=0;
-			clearinghouseHq.GS03=clearinghouseClin.GS03;
-			clearinghouseClin.GS03="";
-			clearinghouseHq.ISA02=clearinghouseClin.ISA02;
-			clearinghouseClin.ISA02="";
-			clearinghouseHq.ISA04=clearinghouseClin.ISA04;
-			clearinghouseClin.ISA04="";
-			clearinghouseHq.ISA16=clearinghouseClin.ISA16;
-			clearinghouseClin.ISA16="";
-			clearinghouseHq.SeparatorData=clearinghouseClin.SeparatorData;
-			clearinghouseClin.SeparatorData="";
-			clearinghouseHq.SeparatorSegment=clearinghouseClin.SeparatorSegment;
-			clearinghouseClin.SeparatorSegment="";
-			//Clinic unconditional values
-			clearinghouseClin.HqClearinghouseNum=clearinghouseHq.ClearinghouseNum;
-			//Clinic override values
-			if(clearinghouseClin.ExportPath==clearinghouseHq.ExportPath) {
-				clearinghouseClin.ExportPath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.SenderTIN==clearinghouseHq.SenderTIN) {
-				clearinghouseClin.SenderTIN="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.Password==clearinghouseHq.Password) {
-				clearinghouseClin.Password="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.ResponsePath==clearinghouseHq.ResponsePath) {
-				clearinghouseClin.ResponsePath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.ClientProgram==clearinghouseHq.ClientProgram) {
-				clearinghouseClin.ClientProgram="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.LoginID==clearinghouseHq.LoginID) {
-				clearinghouseClin.LoginID="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.SenderName==clearinghouseHq.SenderName) {
-				clearinghouseClin.SenderName="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.SenderTelephone==clearinghouseHq.SenderTelephone) {
-				clearinghouseClin.SenderTelephone="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-			}
-			else {
-				//Maintain the override value that the user typed.
-			}
-			if(clearinghouseClin.ClearinghouseNum==0) {
-				Crud.ClearinghouseCrud.Insert(clearinghouseClin);
-			}
-			else {
-				Crud.ClearinghouseCrud.Update(clearinghouseClin);
-			}
-			Crud.ClearinghouseCrud.Update(clearinghouseHq);
-		}
+		//public static void InsertOrUpdateForClinic(Clearinghouse clearinghouseHq,Clearinghouse clearinghouseClin) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		Meth.GetVoid(MethodBase.GetCurrentMethod(),clearinghouseHq,clearinghouseClin);
+		//		return;
+		//	}
+		//	//HQ unconditional values.  Copies values the user typed in from the clinic and overrides HQ values.  This maintains old behavior.
+		//	clearinghouseHq.Description=clearinghouseClin.Description;
+		//	clearinghouseClin.Description="";
+		//	clearinghouseHq.Payors=clearinghouseClin.Payors;
+		//	clearinghouseClin.Payors="";
+		//	clearinghouseHq.Eformat=clearinghouseClin.Eformat;
+		//	clearinghouseClin.Eformat=ElectronicClaimFormat.None;
+		//	clearinghouseHq.ISA05=clearinghouseClin.ISA05;
+		//	clearinghouseClin.ISA05="";
+		//	clearinghouseHq.ISA07=clearinghouseClin.ISA07;
+		//	clearinghouseClin.ISA07="";
+		//	clearinghouseHq.ISA08=clearinghouseClin.ISA08;
+		//	clearinghouseClin.ISA08="";
+		//	clearinghouseHq.ISA15=clearinghouseClin.ISA15;
+		//	clearinghouseClin.ISA15="";
+		//	clearinghouseHq.CommBridge=clearinghouseClin.CommBridge;
+		//	clearinghouseClin.CommBridge=EclaimsCommBridge.None;
+		//	//clearinghouseHq.LastBatchNumber=;//Not editable is UI and should not be updated here.  See GetNextBatchNumber() above.
+		//	clearinghouseHq.ModemPort=clearinghouseClin.ModemPort;
+		//	clearinghouseClin.ModemPort=0;
+		//	clearinghouseHq.GS03=clearinghouseClin.GS03;
+		//	clearinghouseClin.GS03="";
+		//	clearinghouseHq.ISA02=clearinghouseClin.ISA02;
+		//	clearinghouseClin.ISA02="";
+		//	clearinghouseHq.ISA04=clearinghouseClin.ISA04;
+		//	clearinghouseClin.ISA04="";
+		//	clearinghouseHq.ISA16=clearinghouseClin.ISA16;
+		//	clearinghouseClin.ISA16="";
+		//	clearinghouseHq.SeparatorData=clearinghouseClin.SeparatorData;
+		//	clearinghouseClin.SeparatorData="";
+		//	clearinghouseHq.SeparatorSegment=clearinghouseClin.SeparatorSegment;
+		//	clearinghouseClin.SeparatorSegment="";
+		//	//Clinic unconditional values
+		//	clearinghouseClin.HqClearinghouseNum=clearinghouseHq.ClearinghouseNum;
+		//	//Clinic override values
+		//	if(clearinghouseClin.ExportPath==clearinghouseHq.ExportPath) {
+		//		clearinghouseClin.ExportPath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.SenderTIN==clearinghouseHq.SenderTIN) {
+		//		clearinghouseClin.SenderTIN="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.Password==clearinghouseHq.Password) {
+		//		clearinghouseClin.Password="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.ResponsePath==clearinghouseHq.ResponsePath) {
+		//		clearinghouseClin.ResponsePath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.ClientProgram==clearinghouseHq.ClientProgram) {
+		//		clearinghouseClin.ClientProgram="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.LoginID==clearinghouseHq.LoginID) {
+		//		clearinghouseClin.LoginID="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.SenderName==clearinghouseHq.SenderName) {
+		//		clearinghouseClin.SenderName="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.SenderTelephone==clearinghouseHq.SenderTelephone) {
+		//		clearinghouseClin.SenderTelephone="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
+		//	}
+		//	else {
+		//		//Maintain the override value that the user typed.
+		//	}
+		//	if(clearinghouseClin.ClearinghouseNum==0) {
+		//		Crud.ClearinghouseCrud.Insert(clearinghouseClin);
+		//	}
+		//	else {
+		//		Crud.ClearinghouseCrud.Update(clearinghouseClin);
+		//	}
+		//	Crud.ClearinghouseCrud.Update(clearinghouseHq);
+		//}
 
 		///<summary>Deletes the passed-in Hq clearinghouse for all clinics.  Only pass in clearinghouses with ClinicNum==0.</summary>
 		public static void Delete(Clearinghouse clearinghouseHq){
@@ -458,6 +466,14 @@ namespace OpenDentBusiness{
 			return clearinghouseRetVal;
 		}
 
+		///<summary>Syncs a given list of clinic-level clearinghouses to a list of old clinic-level clearinghouses.</summary>
+		public static void Sync(List<Clearinghouse> listClearinghouseNew,List<Clearinghouse> listClearinghouseOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listClearinghouseNew,listClearinghouseOld);
+				return;
+			}
+			Crud.ClearinghouseCrud.Sync(listClearinghouseNew,listClearinghouseOld);
+		}
 
 	}
 }

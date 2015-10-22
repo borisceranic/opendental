@@ -33,7 +33,9 @@ namespace OpenDental{
 		private List<Clearinghouse> _listClearinghousesHq;
 		private Label labelClinic;
 		private ComboBox comboClinic;
+		/// <summary>List of all clinic-level clearinghouses for the current clinic.</summary>
 		private List<Clearinghouse> _listClearinghousesClinicCur;
+		///<summary>List of all clinic-level clearinghouses.</summary>
 		private List<Clearinghouse> _listClearinghousesClinicAll;
 		private long _selectedClinicNum;
 		private Label labelGuide;
@@ -401,33 +403,33 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Clearinghouse clearinghouseHq=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[0].Copy();//cannot be null
 			FormClearinghouseEdit FormCE=new FormClearinghouseEdit();
-			FormCE.ClearinghouseHq=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[0].Copy(); //cannot be null
-			if(((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[1]!=null){
-				FormCE.ClearinghouseClin=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[1].Copy(); //can be null
+			FormCE.ClearinghouseHq=clearinghouseHq;
+			FormCE.ClearinghouseHqOld=clearinghouseHq.Copy(); //cannot be null
+			FormCE.ClinicNum=_selectedClinicNum;
+			FormCE.ListClinics=_listClinics;
+			FormCE.ListClearinghousesClinCur=new List<Clearinghouse>();
+			FormCE.ListClearinghousesClinOld=new List<Clearinghouse>();
+			for(int i=0;i<_listClearinghousesClinicAll.Count;i++) {
+				if(_listClearinghousesClinicAll[i].HqClearinghouseNum==clearinghouseHq.ClearinghouseNum) {
+					FormCE.ListClearinghousesClinCur.Add(_listClearinghousesClinicAll[i].Copy());
+					FormCE.ListClearinghousesClinOld.Add(_listClearinghousesClinicAll[i].Copy());
+				}
 			}
-			FormCE.ClearinghouseCur=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[2].Copy(); //cannot be null
-			FormCE.clinicNum=_selectedClinicNum;
 			FormCE.ShowDialog();
 			if(FormCE.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			if(FormCE.ClearinghouseCur==null) {//Clearinghouse was deleted.
+			if(FormCE.ClearinghouseCur==null) {//Clearinghouse was deleted.  Can only be deleted when HQ selected.
 				_listClearinghousesHq.RemoveAt(e.Row); //no need to update the nonHq list.
 			}
-			else if(_selectedClinicNum==0) { //if at HQ, just update the HQ list.
-				_listClearinghousesHq[e.Row]=FormCE.ClearinghouseCur.Copy();
-			}
-			else { //if not at HQ, both the non-HQ and HQ lists need to be updated.
-				_listClearinghousesHq[e.Row]=FormCE.ClearinghouseHq.Copy();
-				Clearinghouse clearhouseReplace=((Clearinghouse[])(gridMain.Rows[e.Row].Tag))[1];
-				int indexReplace=_listClearinghousesClinicAll.IndexOf(clearhouseReplace); //clearhouseReplace can be null (in which case -1 index)
-				if(indexReplace==-1) {//A new clearinghouse clinic override.
-					_listClearinghousesClinicAll.Add(FormCE.ClearinghouseCur.Copy());
-				}
-				else {//Editing an existing clearinghouse clinic override.  Maintain list position.
-					_listClearinghousesClinicAll[indexReplace]=FormCE.ClearinghouseCur.Copy();
-				}
+			else { //Not deleted.  Both the non-HQ and HQ lists need to be updated.
+				_listClearinghousesHq[e.Row]=FormCE.ClearinghouseHq; //update Hq Clearinghouse.
+				//Update the clinical clearinghouse list by deleting all of the entries for the selected clearinghouse,
+				_listClearinghousesClinicAll.RemoveAll(x => x.HqClearinghouseNum==clearinghouseHq.ClearinghouseNum);
+				//then adding the updated versions back to the list.
+				_listClearinghousesClinicAll.AddRange(FormCE.ListClearinghousesClinCur);
 			}
 			listHasChanged=true;
 			FillGrid();
@@ -436,14 +438,19 @@ namespace OpenDental{
 		private void butAdd_Click(object sender, System.EventArgs e) {
 			FormClearinghouseEdit FormCE=new FormClearinghouseEdit();
 			FormCE.ClearinghouseHq=new Clearinghouse();
-			FormCE.ClearinghouseCur=new Clearinghouse();
+			FormCE.ClearinghouseHqOld=new Clearinghouse();
+			FormCE.ListClinics=_listClinics;
+			FormCE.ClinicNum=0;
+			FormCE.ListClearinghousesClinCur=new List<Clearinghouse>();
+			FormCE.ListClearinghousesClinOld=new List<Clearinghouse>();
 			FormCE.IsNew=true;
 			FormCE.ShowDialog();
 			if(FormCE.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			if(FormCE.ClearinghouseCur!=null) {
-				_listClearinghousesHq.Add(FormCE.ClearinghouseCur.Copy());
+			if(FormCE.ClearinghouseCur!=null) { //clearinghouse was not deleted
+				_listClearinghousesHq.Add(FormCE.ClearinghouseHq.Copy());
+				_listClearinghousesClinicAll.AddRange(FormCE.ListClearinghousesClinCur);
 			}
 			listHasChanged=true;
 			FillGrid();
