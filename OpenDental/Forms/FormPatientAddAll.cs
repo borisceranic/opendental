@@ -44,6 +44,11 @@ namespace OpenDental {
 		private System.Windows.Forms.ListBox listStates;//displayed from within code, not designer
 		private string _stateOriginal;//used in the medicaidState dropdown logic
 		private bool _mouseIsInListStates;
+		private List<RequiredField> _listRequiredFields;
+		private bool _isMissingRequiredFields;
+		private bool _isLoad;//To keep track if ListBoxes' selected index is changed by the user
+		private ErrorProvider _errorProv=new ErrorProvider();
+		private bool _isValidating=false;
 
 		public FormPatientAddAll() {
 			InitializeComponent();
@@ -109,6 +114,7 @@ namespace OpenDental {
 		}
 
 		private void FormPatientAddAll_Load(object sender,EventArgs e) {
+			_isLoad=true;
 			textLName1.Text=LName;
 			textFName1.Text=FName;
 			if(Birthdate.Year<1880) {
@@ -125,6 +131,13 @@ namespace OpenDental {
 			listGender5.SelectedIndex=0;
 			listPosition1.SelectedIndex=1;
 			listPosition2.SelectedIndex=1;
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				comboPriProv1.Items.Add(Lan.g(this,"Select Provider"));
+				comboPriProv2.Items.Add(Lan.g(this,"Select Provider"));
+				comboPriProv3.Items.Add(Lan.g(this,"Select Provider"));
+				comboPriProv4.Items.Add(Lan.g(this,"Select Provider"));
+				comboPriProv5.Items.Add(Lan.g(this,"Select Provider"));
+			}
 			comboSecProv1.Items.Add(Lan.g(this,"none"));
 			comboSecProv1.SelectedIndex=0;
 			comboSecProv2.Items.Add(Lan.g(this,"none"));
@@ -147,9 +160,12 @@ namespace OpenDental {
 				comboPriProv5.Items.Add(ProviderC.ListShort[i].GetLongDesc());
 				comboSecProv5.Items.Add(ProviderC.ListShort[i].GetLongDesc());
 			}
-			int defaultindex=Providers.GetIndex(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			if(defaultindex==-1) {//default provider hidden
-				defaultindex=0;
+			int defaultindex=0;
+			if(!PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				defaultindex=Providers.GetIndex(PrefC.GetLong(PrefName.PracticeDefaultProv));
+				if(defaultindex==-1) {//default provider hidden
+					defaultindex=0;
+				}
 			}
 			comboPriProv1.SelectedIndex=defaultindex;
 			comboPriProv2.SelectedIndex=defaultindex;
@@ -166,12 +182,472 @@ namespace OpenDental {
 			}
 			FillComboZip();
 			ResetSubscriberLists();
+			_listRequiredFields=RequiredFields.Listt.FindAll(x => x.FieldType==RequiredFieldType.PatientInfo);
+			//Remove the ones that are only on the Edit Patient Information window
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.AdmitDate);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.AskArriveEarly);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.BillingType);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.ChartNumber);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Clinic);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.CollegeName);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.County);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.CreditType);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.DateFirstVisit);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.DateTimeDeceased);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.EligibilityExceptCode);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.EmailAddress);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Ethnicity);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.FeeSchedule);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Gender);//There is no 'Unknown' option on this form.
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.GradeLevel);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Language);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MedicaidID);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MedicaidState);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MiddleInitial);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MothersMaidenFirstName);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.MothersMaidenLastName);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.PreferConfirmMethod);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.PreferContactMethod);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.PreferRecallMethod);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.PreferredName);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Race);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.ResponsibleParty);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Salutation);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Site);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.SocialSecurityNumber);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.StudentStatus);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.TextOK);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Title);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.TreatmentUrgency);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.TrophyFolder);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Ward);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.WirelessPhone);
+			_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.WorkPhone);
+			_errorProv.BlinkStyle=ErrorBlinkStyle.NeverBlink;
+			SetRequiredFields();
+			_isLoad=false;
 		}
 
 		private void FormPatientAddAll_Shown(object sender,EventArgs e) {
 			
 		}
 
+		//<summary>Puts an asterisk next to the label and highlights the textbox/listbox/combobox/radiobutton background for all RequiredFields that
+		///have their conditions met.</summary>
+		private void SetRequiredFields() {
+			_isMissingRequiredFields=false;
+			bool areConditionsMet;
+			for(int i=0;i<_listRequiredFields.Count;i++) {
+				areConditionsMet=ConditionsAreMet(_listRequiredFields[i]);
+				if(areConditionsMet) {
+					labelRequiredFields.Visible=true;
+				}
+				switch(_listRequiredFields[i].FieldName) {
+					case RequiredFieldName.Address:
+						SetRequiredTextBox(labelAddress,textAddress,areConditionsMet);
+						break;
+					case RequiredFieldName.Address2:
+						SetRequiredTextBox(labelAddress2,textAddress2,areConditionsMet);
+						break;
+					case RequiredFieldName.AddressPhoneNotes:
+						if(areConditionsMet) {
+							if(!labelAddrNotes.Text.Contains("*")) {
+								labelAddrNotes.Text+="*";
+							}
+							if(textAddrNotes.Text=="") {
+								_isMissingRequiredFields=true;
+								if(_isValidating) {
+									_errorProv.SetError(textAddrNotes,Lan.g(this,"Text box cannot be blank"));
+								}
+							}
+							else {
+								_errorProv.SetError(textAddrNotes,"");
+							}
+						}
+						else {
+							if(labelAddrNotes.Text.Contains("*")) {
+								labelAddrNotes.Text=labelAddrNotes.Text.Replace("*","");
+							}
+							_errorProv.SetError(textAddrNotes,"");
+						}
+						break;
+					case RequiredFieldName.Birthdate:
+						SetRequiredTextBox(labelBirthAge,textBirthdate1,areConditionsMet);
+						if(textLName2.Text!="" || textFName2.Text!="") {
+							SetRequiredTextBox(labelBirthAge,textBirthdate2,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textBirthdate2,"");
+						}
+						if(textLName3.Text!="" || textFName3.Text!="") {
+							SetRequiredTextBox(labelBirthAge,textBirthdate3,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textBirthdate3,"");
+						}
+						if(textLName4.Text!="" || textFName4.Text!="") {
+							SetRequiredTextBox(labelBirthAge,textBirthdate4,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textBirthdate4,"");
+						}
+						if(textLName5.Text!="" || textFName5.Text!="") {
+							SetRequiredTextBox(labelBirthAge,textBirthdate5,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textBirthdate5,"");
+						}
+						break;
+					case RequiredFieldName.Carrier:
+						SetRequiredTextBox(labelCarrier1,textCarrier1,areConditionsMet);
+						break;
+					case RequiredFieldName.City:
+						SetRequiredTextBox(labelCity,textCity,areConditionsMet);
+						break;
+					case RequiredFieldName.Employer:
+						SetRequiredTextBox(labelEmployer1,textEmployer1,areConditionsMet);
+						break;
+					case RequiredFieldName.FirstName:
+						SetRequiredTextBox(labelFName,textFName1,areConditionsMet);
+						if(textLName2.Text!="") {
+							SetRequiredTextBox(labelFName,textFName2,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textFName2,"");
+						}
+						if(textLName3.Text!="") {
+							SetRequiredTextBox(labelFName,textFName3,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textFName3,"");
+						}
+						if(textLName4.Text!="") {
+							SetRequiredTextBox(labelFName,textFName4,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textFName4,"");
+						}
+						if(textLName5.Text!="") {
+							SetRequiredTextBox(labelFName,textFName5,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textFName5,"");
+						}
+						break;
+					case RequiredFieldName.GroupName:
+						SetRequiredTextBox(labelGroupName1,textGroupName1,areConditionsMet);
+						break;
+					case RequiredFieldName.GroupNum:
+						SetRequiredTextBox(labelGroupNum1,textGroupNum1,areConditionsMet);
+						break;
+					case RequiredFieldName.HomePhone:
+						SetRequiredTextBox(labelHmPhone,textHmPhone,areConditionsMet);
+						break;
+					case RequiredFieldName.InsurancePhone:
+						SetRequiredTextBox(labelPhone1,textPhone1,areConditionsMet);
+						break;
+					case RequiredFieldName.InsuranceSubscriber:
+						SetRequiredComboBox(labelSubscriber1,comboSubscriber1,areConditionsMet,0,"Selection cannot be 'none'");
+						break;
+					case RequiredFieldName.InsuranceSubscriberID:
+						SetRequiredTextBox(labelSubscriberID1,textSubscriberID1,areConditionsMet);
+						break;
+					case RequiredFieldName.LastName:
+						SetRequiredTextBox(labelLName,textLName1,areConditionsMet);
+						if(textFName2.Text!="") {
+							SetRequiredTextBox(labelLName,textLName2,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textLName2,"");
+						}
+						if(textFName3.Text!="") {
+							SetRequiredTextBox(labelLName,textLName3,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textLName3,"");
+						}
+						if(textFName4.Text!="") {
+							SetRequiredTextBox(labelLName,textLName4,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textLName4,"");
+						}
+						if(textFName5.Text!="") {
+							SetRequiredTextBox(labelLName,textLName5,areConditionsMet);
+						}
+						else {
+							_errorProv.SetError(textLName5,"");
+						}
+						break;
+					case RequiredFieldName.PrimaryProvider:
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							SetRequiredComboBox(labelPriProv,comboPriProv1,areConditionsMet,0,"Selection cannot be 'Select Provider'");
+							if(textLName2.Text!="" || textFName2.Text!="") {
+								SetRequiredComboBox(labelPriProv,comboPriProv2,areConditionsMet,0,"Selection cannot be 'Select Provider'");
+							}
+							else {
+								_errorProv.SetError(comboPriProv2,"");
+							}
+							if(textLName3.Text!="" || textFName3.Text!="") {
+								SetRequiredComboBox(labelPriProv,comboPriProv3,areConditionsMet,0,"Selection cannot be 'Select Provider'");
+							}
+							else {
+								_errorProv.SetError(comboPriProv3,"");
+							}
+							if(textLName4.Text!="" || textFName4.Text!="") {
+								SetRequiredComboBox(labelPriProv,comboPriProv4,areConditionsMet,0,"Selection cannot be 'Select Provider'");
+							}
+							else {
+								_errorProv.SetError(comboPriProv4,"");
+							}
+							if(textLName5.Text!="" || textFName5.Text!="") {
+								SetRequiredComboBox(labelPriProv,comboPriProv5,areConditionsMet,0,"Selection cannot be 'Select Provider'");
+							}
+							else {
+								_errorProv.SetError(comboPriProv5,"");
+							}
+						}
+						break;
+					case RequiredFieldName.ReferredFrom:
+						SetRequiredTextBox(labelReferred,textReferredFrom,areConditionsMet);
+						break;
+					case RequiredFieldName.SecondaryProvider:
+						SetRequiredComboBox(labelSecProv,comboSecProv1,areConditionsMet,0,"Selection cannot be 'none'");
+						if(textLName2.Text!="" || textFName2.Text!="") {
+							SetRequiredComboBox(labelSecProv,comboSecProv2,areConditionsMet,0,"Selection cannot be 'none'");
+						}
+						else {
+							_errorProv.SetError(comboSecProv2,"");
+						}
+						if(textLName3.Text!="" || textFName3.Text!="") {
+							SetRequiredComboBox(labelSecProv,comboSecProv3,areConditionsMet,0,"Selection cannot be 'none'");
+						}
+						else {
+							_errorProv.SetError(comboSecProv3,"");
+						}
+						if(textLName4.Text!="" || textFName4.Text!="") {
+							SetRequiredComboBox(labelSecProv,comboSecProv4,areConditionsMet,0,"Selection cannot be 'none'");
+						}
+						else {
+							_errorProv.SetError(comboSecProv4,"");
+						}
+						if(textLName5.Text!="" || textFName5.Text!="") {
+							SetRequiredComboBox(labelSecProv,comboSecProv5,areConditionsMet,0,"Selection cannot be 'none'");
+						}
+						else {
+							_errorProv.SetError(comboSecProv5,"");
+						}
+						break;
+					case RequiredFieldName.State:
+						SetRequiredTextBox(labelST,textState,areConditionsMet);
+						break;
+					case RequiredFieldName.Zip:
+						SetRequiredTextBox(labelZip,textZip,areConditionsMet);
+						break;
+				}
+			}
+		}
+
+		///<summary>Returns true if all the conditions for the RequiredField are met.</summary>
+		private bool ConditionsAreMet(RequiredField reqField) {
+			List<RequiredFieldCondition> listConditions=reqField.ListRequiredFieldConditions;
+			if(listConditions.Count==0) {//This RequiredField is always required
+				return true;
+			}
+			bool areConditionsMet=false;
+			int previousFieldName=-1;
+			for(int i=0;i<listConditions.Count;i++) {
+				if(areConditionsMet && (int)listConditions[i].ConditionType==previousFieldName) {
+					continue;//A condition of this type has already been met
+				}
+				if(!areConditionsMet && previousFieldName!=-1
+					&& (int)listConditions[i].ConditionType!=previousFieldName)
+				{
+					return false;//None of the conditions of the previous type were met
+				}
+				areConditionsMet=false;
+				switch(listConditions[i].ConditionType) {
+					case RequiredFieldName.Birthdate://But actually using Age for calculations	
+						//All Birthdate conditions will be true if any of the ages meet the conditions.
+						List<ValidDate> listTextBirthdates=new List<ValidDate>();
+						listTextBirthdates.Add(textBirthdate1);
+						listTextBirthdates.Add(textBirthdate2);
+						listTextBirthdates.Add(textBirthdate3);
+						listTextBirthdates.Add(textBirthdate4);
+						listTextBirthdates.Add(textBirthdate5);
+						for(int j=0;j<listTextBirthdates.Count;j++) {
+							if(listTextBirthdates[j].Text=="" || listTextBirthdates[j].errorProvider1.GetError(listTextBirthdates[j])!="") {
+								continue;
+							}
+							DateTime birthdate=PIn.Date(listTextBirthdates[j].Text);
+							if(birthdate>DateTime.Today) {
+								birthdate=birthdate.AddYears(-100);
+							}
+							int ageEntered=DateTime.Today.Year-birthdate.Year;
+							if(birthdate>DateTime.Today.AddYears(-ageEntered)) {
+								ageEntered--;
+							}
+							List<RequiredFieldCondition> listAgeConditions=listConditions.FindAll(x => x.ConditionType==RequiredFieldName.Birthdate);
+							List<bool> listAreCondsMet=new List<bool>();
+							for(int k=0;k<listAgeConditions.Count;k++) {
+								listAreCondsMet.Add(CondOpComparer(ageEntered,listAgeConditions[k].Operator,PIn.Int(listAgeConditions[k].ConditionValue)));
+							}
+							if(listAreCondsMet.Count<2 || listAgeConditions[1].ConditionRelationship==LogicalOperator.And) {
+								areConditionsMet=!listAreCondsMet.Contains(false);
+							}
+							else {
+								areConditionsMet=listAreCondsMet.Contains(true);
+							}
+							if(areConditionsMet) {
+								break;//From the for loop
+							}
+						}
+						break;
+					case RequiredFieldName.Gender:
+						//All gender conditions will be true if any gender list box meets the condition.
+						List<ListBox> listBoxesGender=new List<ListBox>();
+						listBoxesGender.Add(listGender1);
+						listBoxesGender.Add(listGender2);
+						listBoxesGender.Add(listGender3);
+						listBoxesGender.Add(listGender4);
+						listBoxesGender.Add(listGender5);
+						for(int j=0;j<listBoxesGender.Count;j++) {
+							if(listConditions[i].Operator==ConditionOperator.Equals
+								&& listConditions[i].ConditionValue==listBoxesGender[j].Items[listBoxesGender[j].SelectedIndex].ToString()) 
+							{
+								areConditionsMet=true;
+							}
+							if(listConditions[i].Operator==ConditionOperator.NotEquals
+								&& !listConditions.FindAll(x => x.ConditionType==RequiredFieldName.Gender)
+										.Any(x => x.ConditionValue==listBoxesGender[j].Items[listBoxesGender[j].SelectedIndex].ToString()))
+							{
+								areConditionsMet=true;
+							}
+						}
+						break;
+					case RequiredFieldName.PrimaryProvider:
+						//Conditions of type PrimaryProvider store the ProvNum as the ConditionValue.
+						//All Primary Provider conditions will be true if any of the Primary Providers meet the condition.
+						List<ComboBox> listProviderCombos=new List<ComboBox>();
+						listProviderCombos.Add(comboPriProv1);
+						listProviderCombos.Add(comboPriProv2);
+						listProviderCombos.Add(comboPriProv3);
+						listProviderCombos.Add(comboPriProv4);
+						listProviderCombos.Add(comboPriProv5);
+						for(int j=0;j<listProviderCombos.Count;j++) {
+							int provIdx=listProviderCombos[j].SelectedIndex;
+							if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+								provIdx--;//To account for 'Select Provider'
+							}
+							if(provIdx<0) {
+								continue;
+							}
+							if(listConditions[i].Operator==ConditionOperator.Equals
+								&& PIn.Long(listConditions[i].ConditionValue)==ProviderC.ListShort[provIdx].ProvNum) 
+							{
+								areConditionsMet=true;
+								break;//From the for loop
+							}
+							if(listConditions[i].Operator==ConditionOperator.NotEquals
+								&& !listConditions.FindAll(x => x.ConditionType==RequiredFieldName.PrimaryProvider)
+										.Any(x => x.ConditionValue==ProviderC.ListShort[provIdx].ProvNum.ToString())) 
+							{
+								areConditionsMet=true;
+								break;//From the for loop
+							}
+						}
+						break;
+					default://The field is not on this form
+						areConditionsMet=true;
+						break;
+				}
+				previousFieldName=(int)listConditions[i].ConditionType;
+			}
+			return areConditionsMet;
+		}
+
+		///<summary>Puts an asterisk next to the label if the field is required and the conditions are met. If it also blank, highlights the textbox
+		///background.</summary>
+		private void SetRequiredTextBox(Label labelCur,TextBox textBoxCur,bool areConditionsMet) {
+			if(areConditionsMet) {
+				labelCur.Text=labelCur.Text.Replace("*","")+"*";
+				if(textBoxCur.Text=="") {
+					_isMissingRequiredFields=true;
+					if(_isValidating) {
+						_errorProv.SetError(textBoxCur,"Text box cannot be blank.");
+					}
+				}
+				else {
+					_errorProv.SetError(textBoxCur,"");
+				}
+			}
+			else {
+				labelCur.Text=labelCur.Text.Replace("*","");
+				_errorProv.SetError(textBoxCur,"");
+			}
+			if(textBoxCur.Name==textReferredFrom.Name) {
+				_errorProv.SetIconPadding(textBoxCur,44);//Width of the pick and remove buttons
+			}
+			else if(textBoxCur.Name==textZip.Name) {
+				_errorProv.SetIconPadding(textBoxCur,21);//Width of the drop down button
+			}
+		}
+
+		///<summary>Puts an asterisk next to the label if the field is required and the conditions are met. If the disallowedIdx is also selected, 
+		///highlights the combobox background.</summary>
+		private void SetRequiredComboBox(Label labelCur,ComboBox comboCur,bool areConditionsMet,int disallowedIdx,string errorMsg) {
+			if(areConditionsMet) {
+				labelCur.Text=labelCur.Text.Replace("*","")+"*";
+				if(comboCur.SelectedIndex==disallowedIdx) {
+					_isMissingRequiredFields=true;
+					if(_isValidating) {
+						_errorProv.SetError(comboCur,Lan.g(this,errorMsg));
+					}
+				}
+				else {
+					_errorProv.SetError(comboCur,"");
+				}
+			}
+			else {
+				labelCur.Text=labelCur.Text.Replace("*","");
+				_errorProv.SetError(comboCur,"");
+			} 
+		}
+
+		///<summary>Evaluates two integers using the provided operator.</summary>
+		private bool CondOpComparer(int value1,ConditionOperator oper,int value2) {
+			switch(oper) {
+				case ConditionOperator.Equals:
+					return value1==value2;
+				case ConditionOperator.NotEquals:
+					return value1!=value2;
+				case ConditionOperator.GreaterThan:
+					return value1>value2;
+				case ConditionOperator.GreaterThanOrEqual:
+					return value1>=value2;
+				case ConditionOperator.LessThan:
+					return value1<value2;
+				case ConditionOperator.LessThanOrEqual:
+					return value1<=value2;
+			}
+			return false;
+		}
+		
+		private void textBox_Leave(object sender,System.EventArgs e) {
+			SetRequiredFields();
+		}
+		
+		private void ListBox_SelectedIndexChanged(object sender,System.EventArgs e) {
+			if(_isLoad) {
+				return;
+			}
+			SetRequiredFields();
+		}
+
+		private void ComboBox_SelectionChangeCommited(object sender,System.EventArgs e) {
+			SetRequiredFields();
+		}
+		
 		#region Names
 		private void textLName1_TextChanged(object sender,EventArgs e) {
 			if(textLName1.Text.Length==1){
@@ -405,6 +881,7 @@ namespace OpenDental {
 			comboPriProv3.SelectedIndex=comboPriProv1.SelectedIndex;
 			comboPriProv4.SelectedIndex=comboPriProv1.SelectedIndex;
 			comboPriProv5.SelectedIndex=comboPriProv1.SelectedIndex;
+			SetRequiredFields();
 		}
 
 		private void comboSecProv1_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -412,6 +889,7 @@ namespace OpenDental {
 			comboSecProv3.SelectedIndex=comboSecProv1.SelectedIndex;
 			comboSecProv4.SelectedIndex=comboSecProv1.SelectedIndex;
 			comboSecProv5.SelectedIndex=comboSecProv1.SelectedIndex;
+			SetRequiredFields();
 		}
 		#endregion InsCheckProvAutomation
 
@@ -473,6 +951,7 @@ namespace OpenDental {
 			textCity.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).City;
 			textState.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).State;
 			textZip.Text=((ZipCode)ZipCodes.ALFrequent[comboZip.SelectedIndex]).ZipCodeDigits;
+			SetRequiredFields();
 		}
 
 		private void textZip_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -613,6 +1092,7 @@ namespace OpenDental {
 				return;
 			}
 			listStates.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listStates_Click(object sender,System.EventArgs e) {
@@ -662,8 +1142,9 @@ namespace OpenDental {
 				FormRS.ShowDialog();
 				if(FormRS.DialogResult!=DialogResult.OK) {
 					if(_refCur!=null && _refCur.ReferralNum>0) {
-						_refCur=Referrals.GetReferral(_refCur.ReferralNum);
-						FillReferredFrom();//the user may have edited a referral and then cancelled attaching to the patient, refill the text box to reflect any changes
+						//_refCur.ReferralNum could be invalid if user deleted from FormReferralSelect, _refCur will be null
+						_refCur=Referrals.GetFromList(_refCur.ReferralNum);
+						FillReferredFrom();//may have edited a referral and then cancelled attaching to the patient, refill the text box to reflect any changes
 					}
 					return;
 				}
@@ -676,6 +1157,7 @@ namespace OpenDental {
 		private void butClearReferralSource_Click(object sender,EventArgs e) {
 			_refCur=null;
 			textReferredFrom.Clear();
+			SetRequiredFields();
 		}
 
 		///<summary>Fills the Referred From text box with the name and referral type from the private classwide variable _refCur.</summary>
@@ -684,6 +1166,8 @@ namespace OpenDental {
 			string firstRefType="";
 			string firstRefFullName="";
 			if(_refCur==null) {
+				textReferredFrom.Clear();
+				SetRequiredFields();
 				return;
 			}
 			firstRefFullName=Referrals.GetNameLF(_refCur.ReferralNum);
@@ -706,6 +1190,7 @@ namespace OpenDental {
 			//might be shortened to : Schmidt, John Jaco (doctor) (+5 more) 
 			textReferredFrom.Text=firstRefNameTypeAbbr;//text box might be something like: Schmidt, John Jaco (doctor) (+5 more)
 			_referredFromToolTip.SetToolTip(textReferredFrom,firstRefFullName+firstRefType);//tooltip will be: Schmidt, John Jacob Jingleheimer, DDS (doctor)
+			_errorProv.SetError(textReferredFrom,"");
 		}
 		#endregion Referral
 
@@ -829,6 +1314,7 @@ namespace OpenDental {
 				return;
 			}
 			listEmps1.Visible=false;
+			SetRequiredFields();
 		}
 
 		private void listEmps1_Click(object sender,System.EventArgs e) {
@@ -1209,6 +1695,7 @@ namespace OpenDental {
 			FillCarrier1(selectedPlan1.CarrierNum);
 			textGroupName1.Text=selectedPlan1.GroupName;
 			textGroupNum1.Text=selectedPlan1.GroupNum;
+			SetRequiredFields();
 		}
 
 		private void butPick2_Click(object sender,EventArgs e) {
@@ -1237,7 +1724,7 @@ namespace OpenDental {
 		#endregion InsPlanPick
 
 		private void butOK_Click(object sender,EventArgs e) {
-			#region Validation
+			#region Validation		
 			if(  textBirthdate1.errorProvider1.GetError(textBirthdate1)!=""
 				|| textBirthdate2.errorProvider1.GetError(textBirthdate2)!=""
 				|| textBirthdate3.errorProvider1.GetError(textBirthdate3)!=""
@@ -1368,6 +1855,29 @@ namespace OpenDental {
 				}
 			}
 			#endregion Validate Insurance Subscriptions
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				if((comboPriProv1.SelectedIndex==0 && textLName1.Text!="" && textFName1.Text!="")//Patient has 'Select Provider' as Primary Provider
+					|| (comboPriProv2.SelectedIndex==0 && textLName2.Text!="" && textFName2.Text!="")
+					|| (comboPriProv3.SelectedIndex==0 && textLName3.Text!="" && textFName3.Text!="")
+					|| (comboPriProv4.SelectedIndex==0 && textLName4.Text!="" && textFName4.Text!="")
+					|| (comboPriProv5.SelectedIndex==0 && textLName5.Text!="" && textFName5.Text!="")) 
+				{
+					MsgBox.Show(this,"Primary provider must be set.");
+					return;
+				}
+			}
+			bool hasSavedMissingFields=false;
+			if(_isMissingRequiredFields) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Required Fields are missing. Do you want to go back and finish entering patient information?")) {
+					_isValidating=true;
+					SetRequiredFields();
+					return;
+				}
+				else {
+					hasSavedMissingFields=true;
+					//Will make an audit trail further down once we know the guarantor's PatNum
+				}
+			}
 			#endregion Validation
 			#region Create Family
 			Patient[] arrayPatsInFam=new Patient[5];
@@ -1404,7 +1914,14 @@ namespace OpenDental {
 						pat.Gender=(PatientGender)listGender1.SelectedIndex;
 						pat.Position=(PatientPosition)listPosition1.SelectedIndex;
 						pat.Birthdate=PIn.Date(textBirthdate1.Text);
-						pat.PriProv=ProviderC.ListShort[comboPriProv1.SelectedIndex].ProvNum;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							if(comboPriProv1.SelectedIndex>0) {//'Select Provider'
+								pat.PriProv=ProviderC.ListShort[comboPriProv1.SelectedIndex-1].ProvNum;
+							}
+						}
+						else {
+							pat.PriProv=ProviderC.ListShort[comboPriProv1.SelectedIndex].ProvNum;
+						}
 						if(comboSecProv1.SelectedIndex>0) {
 							pat.SecProv=ProviderC.ListShort[comboSecProv1.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
 						}
@@ -1419,7 +1936,14 @@ namespace OpenDental {
 						pat.Gender=(PatientGender)listGender2.SelectedIndex;
 						pat.Position=(PatientPosition)listPosition2.SelectedIndex;
 						pat.Birthdate=PIn.Date(textBirthdate2.Text);
-						pat.PriProv=ProviderC.ListShort[comboPriProv2.SelectedIndex].ProvNum;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							if(comboPriProv2.SelectedIndex>0) {//'Select Provider'
+								pat.PriProv=ProviderC.ListShort[comboPriProv2.SelectedIndex-1].ProvNum;
+							}
+						}
+						else {
+							pat.PriProv=ProviderC.ListShort[comboPriProv2.SelectedIndex].ProvNum;
+						}
 						if(comboSecProv2.SelectedIndex>0) {
 							pat.SecProv=ProviderC.ListShort[comboSecProv2.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
 						}
@@ -1434,7 +1958,14 @@ namespace OpenDental {
 						pat.Gender=(PatientGender)listGender3.SelectedIndex;
 						pat.Position=PatientPosition.Child;
 						pat.Birthdate=PIn.Date(textBirthdate3.Text);
-						pat.PriProv=ProviderC.ListShort[comboPriProv3.SelectedIndex].ProvNum;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							if(comboPriProv3.SelectedIndex>0) {//'Select Provider'
+								pat.PriProv=ProviderC.ListShort[comboPriProv3.SelectedIndex-1].ProvNum;
+							}
+						}
+						else {
+							pat.PriProv=ProviderC.ListShort[comboPriProv3.SelectedIndex].ProvNum;
+						}
 						if(comboSecProv3.SelectedIndex>0) {
 							pat.SecProv=ProviderC.ListShort[comboSecProv3.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
 						}
@@ -1449,7 +1980,14 @@ namespace OpenDental {
 						pat.Gender=(PatientGender)listGender4.SelectedIndex;
 						pat.Position=PatientPosition.Child;
 						pat.Birthdate=PIn.Date(textBirthdate4.Text);
-						pat.PriProv=ProviderC.ListShort[comboPriProv4.SelectedIndex].ProvNum;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							if(comboPriProv4.SelectedIndex>0) {//'Select Provider'
+								pat.PriProv=ProviderC.ListShort[comboPriProv4.SelectedIndex-1].ProvNum;
+							}
+						}
+						else {
+							pat.PriProv=ProviderC.ListShort[comboPriProv4.SelectedIndex].ProvNum;
+						}
 						if(comboSecProv4.SelectedIndex>0) {
 							pat.SecProv=ProviderC.ListShort[comboSecProv4.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
 						}
@@ -1464,7 +2002,14 @@ namespace OpenDental {
 						pat.Gender=(PatientGender)listGender5.SelectedIndex;
 						pat.Position=PatientPosition.Child;
 						pat.Birthdate=PIn.Date(textBirthdate5.Text);
-						pat.PriProv=ProviderC.ListShort[comboPriProv5.SelectedIndex].ProvNum;
+						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							if(comboPriProv5.SelectedIndex>0) {//'Select Provider'
+								pat.PriProv=ProviderC.ListShort[comboPriProv5.SelectedIndex-1].ProvNum;
+							}
+						}
+						else {
+							pat.PriProv=ProviderC.ListShort[comboPriProv5.SelectedIndex].ProvNum;
+						}
 						if(comboSecProv5.SelectedIndex>0) {
 							pat.SecProv=ProviderC.ListShort[comboSecProv5.SelectedIndex-1].ProvNum;//comboSecProv# contains 'none' so selected index -1
 						}
@@ -1752,7 +2297,10 @@ namespace OpenDental {
 			}
 			#endregion Create PatPlans
 			#endregion Insurance
-			SelectedPatNum=arrayPatsInFam[0].PatNum;
+			SelectedPatNum=arrayPatsInFam[0].PatNum;//Guarantor
+			if(hasSavedMissingFields) {
+				SecurityLogs.MakeLogEntry(Permissions.RequiredFields,SelectedPatNum,"Saved patient with required fields missing.");
+			}
 			#region Send HL7 if Applicable
 			//If there is an existing HL7 def enabled, send an ADT message for each patient inserted if there is an outbound ADT message defined
 			if(HL7Defs.IsExistingHL7Enabled()) {

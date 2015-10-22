@@ -77,18 +77,18 @@ namespace OpenDentBusiness{
 			return Crud.ReferralCrud.SelectMany(command);
 		}
 
-		private static Referral GetFromList(long referralNum) {
+		public static Referral GetFromList(long referralNum) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<List.Length;i++) {
 				if(List[i].ReferralNum==referralNum) {
-					return List[i];
+					return List[i].Copy();
 				}
 			}
 			//couldn't find it, so refresh list and try again
-			Referrals.RefreshCache();
+			RefreshCache();
 			for(int i=0;i<List.Length;i++) {
 				if(List[i].ReferralNum==referralNum) {
-					return List[i];
+					return List[i].Copy();
 				}
 			}
 			return null;
