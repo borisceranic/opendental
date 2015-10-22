@@ -440,6 +440,12 @@ namespace OpenDental {
 						break;
 					case RequiredFieldName.State:
 						SetRequiredTextBox(labelST,textState,areConditionsMet);
+						if(textState.Text!=""	&& !StateAbbrs.IsValidAbbr(textState.Text)) {
+							_isMissingRequiredFields=true;
+							if(_isValidating) {
+								_errorProv.SetError(textState,Lan.g(this,"Invalid state abbreviation"));
+							}
+						}
 						break;
 					case RequiredFieldName.Zip:
 						SetRequiredTextBox(labelZip,textZip,areConditionsMet);

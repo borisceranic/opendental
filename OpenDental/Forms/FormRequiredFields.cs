@@ -286,6 +286,9 @@ namespace OpenDental {
 					checkMedicaidLength.Visible=true;
 					labelExplanation.Text+=Lan.g(this,"cannot be blank and must be a valid state abbreviation.");
 					break;
+				case RequiredFieldName.State:
+					labelExplanation.Text+=Lan.g(this,"cannot be blank and must be a valid state abbreviation.");
+					break;
 				default:
 					labelExplanation.Text+=Lan.g(this,"cannot be blank.");
 					break;

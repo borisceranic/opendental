@@ -2145,8 +2145,8 @@ namespace OpenDental{
 			textPreferred.Text=PatCur.Preferred;
 			textTitle.Text=PatCur.Title;
 			textSalutation.Text=PatCur.Salutation;
+			_ehrPatientCur=EhrPatients.Refresh(PatCur.PatNum);
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {//Show mother's maiden name UI if using EHR.
-				_ehrPatientCur=EhrPatients.Refresh(PatCur.PatNum);
 				labelMotherMaidenFname.Visible=true;
 				textMotherMaidenFname.Visible=true;
 				textMotherMaidenFname.Text=_ehrPatientCur.MotherMaidenFname;
@@ -2774,6 +2774,12 @@ namespace OpenDental{
 						break;
 					case RequiredFieldName.State:
 						SetRequiredTextBox(labelST,textState,areConditionsMet);
+						if(textState.Text!=""	&& !StateAbbrs.IsValidAbbr(textState.Text)) {
+							_isMissingRequiredFields=true;
+							if(_isValidating) {
+								_errorProv.SetError(textState,Lan.g(this,"Invalid state abbreviation"));
+							}
+						}
 						break;
 					case RequiredFieldName.StudentStatus:
 						radioStudentN.Text=radioStudentN.Text.Replace("*","");
