@@ -5351,6 +5351,7 @@ namespace OpenDental{
 				textRefProv.Text="";
 				ClaimCur.ReferringProv=0;
 				butReferralEdit.Enabled=false;
+				return;
 			}
 			FormReferralEdit FormR=new FormReferralEdit(refer);
 			FormR.ShowDialog();
