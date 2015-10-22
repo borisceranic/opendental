@@ -364,6 +364,24 @@ namespace OpenDentBusiness {
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
+		///<summary>Gets a list of TP or C procedures starting a year into the past that are flagged as IsRadiology and IsCpoe for the specified patient.
+		///Primarily used for showing patient specific MU data in the EHR dashboard.</summary>
+		public static List<Procedure> GetProcsRadiologyForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			DateTime dateStart=new DateTime(DateTime.Now.Year,1,1);//January first of this year.
+			DateTime dateEnd=dateStart.AddYears(1).AddDays(-1);//Last day in December of this year.
+			string command="SELECT procedurelog.* "
+				+"FROM procedurelog "
+				+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
+				+"WHERE procedurelog.ProcStatus IN ("+POut.Int((int)ProcStat.C)+","+POut.Int((int)ProcStat.TP)+") "
+				+"AND procedurelog.PatNum="+POut.Long(patNum)+" "
+				+"AND procedurelog.IsCpoe=1 "
+				+"AND procedurelog.DateEntryC BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
 		///<summary>Gets a string in M/yy format for the most recent completed procedure in the specified code range.  Gets directly from the database.</summary>
 		public static string GetRecentProcDateString(long patNum,DateTime aptDate,string procCodeRange) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

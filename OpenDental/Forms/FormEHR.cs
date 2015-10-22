@@ -350,9 +350,13 @@ namespace OpenDental {
 							MsgBox.Show(this,"Labs not supported with Oracle");
 							break;
 						}
-						FormEhrLabOrders FormRad=new FormEhrLabOrders();
-						FormRad.PatCur=PatCur;
-						FormRad.ShowDialog();
+						//As of v15.4 we started storing radiology orders at the procedure level by flagging the procedure itself as IsCpoe.
+						//Show the radiology order window which will be the best way for the provider to mark "radiology orders" as CPOE.
+						FormRadOrderList FormROL=new FormRadOrderList(Security.CurUser);
+						FormROL.ShowDialog();//Do not use a non-modal window in this case due to needing to refresh the grid after closing.
+						//FormEhrLabOrders FormRad=new FormEhrLabOrders();
+						//FormRad.PatCur=PatCur;
+						//FormRad.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.LabImages:
