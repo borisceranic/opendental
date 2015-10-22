@@ -116,17 +116,17 @@ namespace OpenDental.ReportingComplex {
 			if(hasGridLines) {
 				AddGridLines();
 			}
-			if(_sections["Report Header"]==null) {
-				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
+			if(_sections[AreaSectionType.ReportHeader]==null) {
+				_sections.Add(new Section(AreaSectionType.ReportHeader,0));
 			}
-			if(_sections["Page Header"]==null) {
-				_sections.Add(new Section(AreaSectionKind.PageHeader,0));
+			if(_sections[AreaSectionType.PageHeader]==null) {
+				_sections.Add(new Section(AreaSectionType.PageHeader,0));
 			}
-			if(_sections["Page Footer"]==null) {
-				_sections.Add(new Section(AreaSectionKind.PageFooter,0));
+			if(_sections[AreaSectionType.PageFooter]==null) {
+				_sections.Add(new Section(AreaSectionType.PageFooter,0));
 			}
-			if(_sections["Report Footer"]==null) {
-				_sections.Add(new Section(AreaSectionKind.ReportFooter,0));
+			if(_sections[AreaSectionType.ReportFooter]==null) {
+				_sections.Add(new Section(AreaSectionType.ReportFooter,0));
 			}
 		}
 
@@ -149,13 +149,13 @@ namespace OpenDental.ReportingComplex {
 				xPos-=30;
 			}
 			xPos-=(int)(size.Width/2);
-			if(_sections["Report Header"]==null) {
-				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
+			if(_sections[AreaSectionType.ReportHeader]==null) {
+				_sections.Add(new Section(AreaSectionType.ReportHeader,0));
 			}
 			_reportObjects.Add(
-				new ReportObject(name,"Report Header",new Point(xPos,0),size,title,font,ContentAlignment.MiddleCenter));
+				new ReportObject(name,AreaSectionType.ReportHeader,new Point(xPos,0),size,title,font,ContentAlignment.MiddleCenter));
 			//this is the only place a white buffer is added to a header.
-			_sections["Report Header"].Height=(int)size.Height+20;
+			_sections[AreaSectionType.ReportHeader].Height=(int)size.Height+20;
 			//grfx.Dispose();
 			//FormR.Dispose();
 		}
@@ -195,19 +195,19 @@ namespace OpenDental.ReportingComplex {
 				xPos-=30;
 			}
 			xPos-=(int)(size.Width/2);
-			if(_sections["Report Header"]==null) {
-				_sections.Add(new Section(AreaSectionKind.ReportHeader,0));
+			if(_sections[AreaSectionType.ReportHeader]==null) {
+				_sections.Add(new Section(AreaSectionType.ReportHeader,0));
 			}
 			//find the yPos+Height of the last reportObject in the Report Header section
 			int yPos=0;
 			foreach(ReportObject reportObject in _reportObjects) {
-				if(reportObject.SectionName!="Report Header") continue;
+				if(reportObject.SectionType!=AreaSectionType.ReportHeader) continue;
 				if(reportObject.Location.Y+reportObject.Size.Height > yPos) {
 					yPos=reportObject.Location.Y+reportObject.Size.Height;
 				}
 			}
-			_reportObjects.Add(new ReportObject(name,"Report Header",new Point(xPos,yPos+padding),size,subTitle,font,ContentAlignment.MiddleCenter));
-			_sections["Report Header"].Height+=(int)size.Height+padding;
+			_reportObjects.Add(new ReportObject(name,AreaSectionType.ReportHeader,new Point(xPos,yPos+padding),size,subTitle,font,ContentAlignment.MiddleCenter));
+			_sections[AreaSectionType.ReportHeader].Height+=(int)size.Height+padding;
 		}
 
 		public QueryObject AddQuery(string query,string title) {
@@ -277,13 +277,13 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		/// <summary></summary>
-		public void AddLine(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
-			_reportObjects.Add(new ReportObject(name,sectionName,color,lineThickness,lineOrientation,linePosition,linePercent,offSetX,offSetY));
+		public void AddLine(string name,AreaSectionType sectionType,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
+			_reportObjects.Add(new ReportObject(name,sectionType,color,lineThickness,lineOrientation,linePosition,linePercent,offSetX,offSetY));
 		}
 
 		/// <summary></summary>
-		public void AddBox(string name,string sectionName,Color color,float lineThickness,int offSetX,int offSetY) {
-			_reportObjects.Add(new ReportObject(name,sectionName,color,lineThickness,offSetX,offSetY));
+		public void AddBox(string name,AreaSectionType sectionType,Color color,float lineThickness,int offSetX,int offSetY) {
+			_reportObjects.Add(new ReportObject(name,sectionType,color,lineThickness,offSetX,offSetY));
 		}
 
 		public ReportObject GetObjectByName(string name){
@@ -325,13 +325,13 @@ namespace OpenDental.ReportingComplex {
 		public void AddPageNum(Font font){
 			//add page number
 			Size size=new Size(150,(int)(_grfx.MeasureString("anytext",font).Height/_grfx.DpiY*100+2));
-			if(_sections["Page Footer"]==null){
-				_sections.Add(new Section(AreaSectionKind.PageFooter,0));	
+			if(_sections[AreaSectionType.PageFooter]==null) {
+				_sections.Add(new Section(AreaSectionType.PageFooter,0));	
 			}
-			if(_sections["Page Footer"].Height==0){
-				_sections["Page Footer"].Height=size.Height;
+			if(_sections[AreaSectionType.PageFooter].Height==0) {
+				_sections[AreaSectionType.PageFooter].Height=size.Height;
 			}
-			_reportObjects.Add(new ReportObject("PageNum","Page Footer"
+			_reportObjects.Add(new ReportObject("PageNum",AreaSectionType.PageFooter
 				,new Point(0,0),size
 				,FieldValueType.String,SpecialFieldType.PageNumber
 				,font,ContentAlignment.MiddleLeft,""));
@@ -376,9 +376,9 @@ namespace OpenDental.ReportingComplex {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			string displayText;
 			ReportObjectCollection newReportObjects=new ReportObjectCollection();
-			_sections.Add(new Section(AreaSectionKind.Query,0));
+			_sections.Add(new Section(AreaSectionType.Query,0));
 			for(int i=0;i<_reportObjects.Count;i++) {
-				if(_reportObjects[i].ReportObjectKind==ReportObjectKind.QueryObject) {
+				if(_reportObjects[i].ObjectType==ReportObjectType.QueryObject) {
 					QueryObject query=(QueryObject)_reportObjects[i];
 					if(!query.SubmitQuery()) {
 						return false;
@@ -507,11 +507,11 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>If the specified section exists, then this returns its height. Otherwise it returns 0.</summary>
-		public int GetSectionHeight(string sectionName) {
-			if(!_sections.Contains(sectionName)) {
+		public int GetSectionHeight(AreaSectionType sectionType) {
+			if(!_sections.Contains(sectionType)) {
 				return 0;
 			}
-			return _sections[sectionName].Height;
+			return _sections[sectionType].Height;
 		}
 
 		public bool HasGridLines() {

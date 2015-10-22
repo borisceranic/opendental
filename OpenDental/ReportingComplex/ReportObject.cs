@@ -8,11 +8,11 @@ using System.Collections.Generic;
 namespace OpenDental.ReportingComplex {
 	///<summary>There is one ReportObject for each element of an ODReport that gets printed on the page.  There are many different kinds of reportObjects.</summary>
 	public class ReportObject{
-		private string _sectionName;
+		private AreaSectionType _sectionType;
 		private Point _location;
 		private Size _size;
 		private string _name;
-		private ReportObjectKind _reportObjectKind;
+		private ReportObjectType _reportObjectType;
 		private Font _font;
 		private ContentAlignment _contentAlignment;
 		private Color _foreColor;
@@ -38,13 +38,13 @@ namespace OpenDental.ReportingComplex {
 
 #region Properties
 
-		///<summary>The name of the section to which this object is attached.  For lines and boxes that span multiple sections, this is the section in which the upper part of the object resides.</summary>
-		public string SectionName{
+		///<summary>The section to which this object is attached.  For lines and boxes that span multiple sections, this is the section in which the upper part of the object resides.</summary>
+		public AreaSectionType SectionType {
 			get{
-				return _sectionName;
+				return _sectionType;
 			}
 			set{
-				_sectionName=value;
+				_sectionType=value;
 			}
 		}
 
@@ -79,12 +79,12 @@ namespace OpenDental.ReportingComplex {
 		}
 
 		///<summary>For instance, FieldObject, or TextObject.</summary>
-		public ReportObjectKind ReportObjectKind{
+		public ReportObjectType ObjectType{
 			get{
-				return _reportObjectKind;
+				return _reportObjectType;
 			}
 			set{
-				_reportObjectKind=value;
+				_reportObjectType=value;
 			}
 		}
 
@@ -310,15 +310,15 @@ namespace OpenDental.ReportingComplex {
 
 		#region ReportObject Polymorphisms
 		///<summary>Creates a TextObject with the specified name, section, location and size.  The staticText and font will determine what and how it displays, while the contentAlignment will determine the relative location in the text area.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment)
-			: this(name,sectionName,location,size,staticText,font,contentAlignment,0,0) {
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment)
+			: this(name,sectionType,location,size,staticText,font,contentAlignment,0,0) {
 
 		}
 
 		///<summary>Creates a TextObject with the specified name, section, location and size.  The staticText and font will determine what and how it displays, while the contentAlignment will determine the relative location in the text area.  The text will be offset of its position in pixels according to the given X/Y values.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment,int offSetX,int offSetY){
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size,string staticText,Font font,ContentAlignment contentAlignment,int offSetX,int offSetY) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_location=location;
 			_size=size;
 			_staticText=staticText;
@@ -327,36 +327,36 @@ namespace OpenDental.ReportingComplex {
 			_offSetX=offSetX;
 			_offSetY=offSetY;
 			_foreColor=Color.Black;
-			_reportObjectKind=ReportObjectKind.TextObject;
+			_reportObjectType=ReportObjectType.TextObject;
 		}
 
 		///<summary>Creates a BoxObject with the specified name, section, color and line thickness.</summary>
-		public ReportObject(string name,string sectionName,Color color,float lineThickness)
-			: this(name,sectionName,color,lineThickness,0,0) {
+		public ReportObject(string name,AreaSectionType sectionType,Color color,float lineThickness)
+			: this(name,sectionType,color,lineThickness,0,0) {
 
 		}
 
 		///<summary>Creates a BoxObject with the specified name, section, color and line thickness.  The box will be offset of its position in pixels according to the given X/Y values.</summary>
-		public ReportObject(string name,string sectionName,Color color,float lineThickness,int offSetX,int offSetY) {
+		public ReportObject(string name,AreaSectionType sectionType,Color color,float lineThickness,int offSetX,int offSetY) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_foreColor=color;
 			_floatLineThickness=lineThickness;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
-			_reportObjectKind=ReportObjectKind.BoxObject;
+			_reportObjectType=ReportObjectType.BoxObject;
 		}
 
 		///<summary>Creates a LineObject with the specified name, section, color, line thickness, line orientation, line position and percent.  Orientation determines whether the line is horizontal or vertical.  Position determines which side of the section the line draws on.  Percent determines how much of available space the line will take up.</summary>
-		public ReportObject(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent)
-			: this(name,sectionName,color,lineThickness,lineOrientation,linePosition,linePercent,0,0) {
+		public ReportObject(string name,AreaSectionType sectionType,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent)
+			: this(name,sectionType,color,lineThickness,lineOrientation,linePosition,linePercent,0,0) {
 
 		}
 
 		///<summary>Creates a LineObject with the specified name, section, color, line thickness, line orientation, line position and percent.  Orientation determines whether the line is horizontal or vertical.  Position determines which side of the section the line draws on.  Percent determines how much of available space the line will take up.  The line will be offset of its position in pixels according to the given X/Y values.</summary>
-		public ReportObject(string name,string sectionName,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
+		public ReportObject(string name,AreaSectionType sectionType,Color color,float lineThickness,LineOrientation lineOrientation,LinePosition linePosition,int linePercent,int offSetX,int offSetY) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_foreColor=color;
 			_floatLineThickness=lineThickness;
 			_lineOrientation=lineOrientation;
@@ -364,15 +364,15 @@ namespace OpenDental.ReportingComplex {
 			_intLinePercent=linePercent;
 			_offSetX=offSetX;
 			_offSetY=offSetY;
-			_reportObjectKind=ReportObjectKind.LineObject;
+			_reportObjectType=ReportObjectType.LineObject;
 		}
 
 		///<summary>Mainly used from inside QueryObject.  Creates a DataTableFieldObject with the specified name, section, location, size, dataFieldName, fieldValueType, font, contentAlignment and stringFormat.  DataFieldName determines what the field will be filled with from the table.  FieldValueType determines how the field will be filled with data (i.e Number will be formatted as a number and have a summary added to the bottom of a column).  ContentAlignment determines where the text will be drawn in the box.  StringFormat is used to determined how a ToString() method call will format the field text.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size
 			,string dataFieldName,FieldValueType fieldValueType
 			,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_location=location;
 			_size=size;
 			_font=font;
@@ -383,13 +383,13 @@ namespace OpenDental.ReportingComplex {
 			_fieldValueType=fieldValueType;
 			//defaults:
 			_foreColor=Color.Black;
-			_reportObjectKind=ReportObjectKind.FieldObject;
+			_reportObjectType=ReportObjectType.FieldObject;
 		}
 
 		///<summary>Mainly used from inside QueryObject.  Creates a SummaryFieldObject with the specified name, section, location, size, summaryOperation, summarizedFieldName, font, contentAlignment and stringFormat.  SummaryOperation determines what calculation will be used when summarizing the column.  SummarizedFieldName determines the field that will be summarized at the bottom of the column.  ContentAlignment determines where the text will be drawn in the box.  StringFormat is used to determined how a ToString() method call will format the field text.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,SummaryOperation summaryOperation,string summarizedFieldName,Font font,ContentAlignment contentAlignment,string stringFormat) {
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size,SummaryOperation summaryOperation,string summarizedFieldName,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_location=location;
 			_size=size;
 			_font=font;
@@ -401,13 +401,13 @@ namespace OpenDental.ReportingComplex {
 			_summarizedFieldName=summarizedFieldName;
 			//defaults:
 			_foreColor=Color.Black;
-			_reportObjectKind=ReportObjectKind.FieldObject;
+			_reportObjectType=ReportObjectType.FieldObject;
 		}
 
 		///<summary>Mainly used from inside QueryObject.  Creates a GroupSummaryObject with the specified name, section, location, size, color, summaryOperation, summarizedFieldName, font, datafield, and offsets.  SummaryOperation determines what calculation will be used when summarizing the group of column.  SummarizedFieldName determines the field that will be summarized and must be the same in each of the queries.  Datafield determines which column the summary will draw under.  The summary will be offset of its position in pixels according to the given X/Y values.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,Color color,SummaryOperation summaryOperation,string summarizedFieldName,Font font,string datafield,int offSetX,int offSetY) {
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size,Color color,SummaryOperation summaryOperation,string summarizedFieldName,Font font,ContentAlignment contentAlignment,string datafield,int offSetX,int offSetY) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_location=location;
 			_size=size;
 			_dataFieldName=datafield;
@@ -420,14 +420,14 @@ namespace OpenDental.ReportingComplex {
 			_offSetY=offSetY;
 			_foreColor=color;
 			//defaults:
-			_contentAlignment=ContentAlignment.MiddleLeft;
-			_reportObjectKind=ReportObjectKind.TextObject;
+			_contentAlignment=contentAlignment;
+			_reportObjectType=ReportObjectType.TextObject;
 		}
 
 		///<summary>Currently only used for page numbers.</summary>
-		public ReportObject(string name,string sectionName,Point location,Size size,FieldValueType fieldValueType,SpecialFieldType specialType,Font font,ContentAlignment contentAlignment,string stringFormat) {
+		public ReportObject(string name,AreaSectionType sectionType,Point location,Size size,FieldValueType fieldValueType,SpecialFieldType specialType,Font font,ContentAlignment contentAlignment,string stringFormat) {
 			_name=name;
-			_sectionName=sectionName;
+			_sectionType=sectionType;
 			_location=location;
 			_size=size;
 			_font=font;
@@ -438,7 +438,7 @@ namespace OpenDental.ReportingComplex {
 			_specialFieldType=specialType;
 			//defaults:
 			_foreColor=Color.Black;
-			_reportObjectKind=ReportObjectKind.FieldObject;
+			_reportObjectType=ReportObjectType.FieldObject;
 		}
 		#endregion
 
@@ -492,11 +492,11 @@ namespace OpenDental.ReportingComplex {
 		///<summary>Used to copy a report object when creating new QueryObjects.</summary>
 		public ReportObject DeepCopyReportObject() {
 			ReportObject reportObj=new ReportObject();
-			reportObj._sectionName=this._sectionName;
+			reportObj._sectionType=this._sectionType;
 			reportObj._location=new Point(this._location.X,this._location.Y);
 			reportObj._size=new Size(this._size.Width,this._size.Height);
 			reportObj._name=this._name;
-			reportObj._reportObjectKind=this._reportObjectKind;
+			reportObj._reportObjectType=this._reportObjectType;
 			reportObj._font=(Font)this._font.Clone();
 			reportObj._contentAlignment=this._contentAlignment;
 			reportObj._foreColor=this._foreColor;
@@ -545,13 +545,13 @@ namespace OpenDental.ReportingComplex {
 		private Size CalculateNewSize(string text,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			Size size;
-			if(_sectionName=="Group Header" || _sectionName=="Group Footer" || _sectionName=="Detail") {
+			if(_sectionType==AreaSectionType.GroupHeader || _sectionType==AreaSectionType.GroupFooter || _sectionType==AreaSectionType.Detail) {
 				size=new Size(_size.Width,(int)(grfx.MeasureString(text,font).Height/grfx.DpiY*100+2));
 			}
 			else {
 				size=new Size((int)(grfx.MeasureString(text,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(text,font).Height/grfx.DpiY*100+2));
 			}
-			if(_sectionName=="Report Header") {
+			if(_sectionType==AreaSectionType.ReportHeader) {
 				_location.X+=(_size.Width/2);
 				_location.X-=(size.Width/2);
 			}
@@ -575,7 +575,7 @@ namespace OpenDental.ReportingComplex {
 	}
 
 	///<summary>Used in the Kind field of each ReportObject to provide a quick way to tell what kind of reportObject.</summary>
-	public enum ReportObjectKind{
+	public enum ReportObjectType{
 		///<summary>Object is a box and will draw a rectangle with the specified parameters.</summary>
 		BoxObject,
 		///<summary>Object is a field object and will be used in drawing datatables.</summary>

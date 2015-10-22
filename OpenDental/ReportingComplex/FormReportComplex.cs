@@ -23,30 +23,30 @@ namespace OpenDental.ReportingComplex
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butPrint;
 		private System.Drawing.Printing.PrintDocument pd2;
-		///<summary>The report to display.</summary>
-		private ReportComplex MyReport;
 		private OpenDental.UI.Button butSetup;
 		private System.Windows.Forms.PageSetupDialog setupDialog2;
 		///<summary>The y position printed through so far in the current section.</summary>
 		//private int printedThroughYPos; For now, assume all sections must remain together.
 		private OpenDental.UI.Button button1;
 		private System.Windows.Forms.Label labelTotPages;
-		private OpenDental.UI.Button butBack;
-		private OpenDental.UI.Button butFwd;
-		///<summary>The name of the last section printed. It really only keeps track of whether the details section and the reportfooter have finished printing. This variable will be refined when groups are implemented.</summary>
-		private string lastSectionPrinted;
-		private int rowsPrinted;
-		private int totalPages;
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private System.Windows.Forms.ImageList imageListMain;
 		private System.Windows.Forms.PrintPreviewControl printPreviewControl2;
-		private int pagesPrinted;
+		private OpenDental.UI.Button butBack;
+		private OpenDental.UI.Button butFwd;
+		///<summary>The report to display.</summary>
+		private ReportComplex _myReport;
+		///<summary>The name of the last section printed. It really only keeps track of whether the details section and the reportfooter have finished printing. This variable will be refined when groups are implemented.</summary>
+		private AreaSectionType _lastSectionPrinted;
+		private int _rowsPrinted;
+		private int _totalPages;
+		private int _pagesPrinted;
 		private int _heightRemaining=0;
 
 		///<summary></summary>
 		public FormReportComplex(ReportComplex myReport){
 			InitializeComponent();// Required for Windows Form Designer support
-			MyReport=myReport;
+			_myReport=myReport;
 		}
 
 		/// <summary>Clean up any resources being used.</summary>
@@ -247,7 +247,7 @@ namespace OpenDental.ReportingComplex
 		private void FormReport_Load(object sender, System.EventArgs e) {
 			LayoutToolBar();
 			ResetPd2();
-			labelTotPages.Text="/ "+totalPages.ToString();
+			labelTotPages.Text="/ "+_totalPages.ToString();
 			SetDefaultZoom();
 			printPreviewControl2.Document=pd2;
 		}
@@ -274,7 +274,7 @@ namespace OpenDental.ReportingComplex
 
 		///<summary>Sets the default zoom factor based on the reports orientation.</summary>
 		private void SetDefaultZoom() {
-			if(MyReport.IsLandscape) {
+			if(_myReport.IsLandscape) {
 				printPreviewControl2.Zoom=((double)printPreviewControl2.ClientSize.Height
 					/(double)pd2.DefaultPageSettings.PaperSize.Width);
 			}
@@ -293,10 +293,10 @@ namespace OpenDental.ReportingComplex
 		private void ResetPd2(){
 			pd2=new PrintDocument();
 			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
-			lastSectionPrinted="";
-			rowsPrinted=0;
-			pagesPrinted=0;
-			if(MyReport.IsLandscape){
+			_lastSectionPrinted=AreaSectionType.None;
+			_rowsPrinted=0;
+			_pagesPrinted=0;
+			if(_myReport.IsLandscape){
 				pd2.DefaultPageSettings.Landscape=true;
 			}
 			pd2.DefaultPageSettings.Margins=new Margins(0,0,0,0);
@@ -304,8 +304,8 @@ namespace OpenDental.ReportingComplex
 			if(pd2.DefaultPageSettings.PrintableArea.Height==0) {
 				pd2.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
 			}
-			foreach(ReportObject reportObject in MyReport.ReportObjects) {
-				if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
+			foreach(ReportObject reportObject in _myReport.ReportObjects) {
+				if(reportObject.ObjectType==ReportObjectType.QueryObject) {
 					QueryObject queryObject=(QueryObject)reportObject;
 					if(queryObject.IsPrinted==true) {
 						queryObject.IsPrinted=false;
@@ -317,7 +317,6 @@ namespace OpenDental.ReportingComplex
 		private void ToolBarMain_ButtonClick(object sender, OpenDental.UI.ODToolBarButtonClickEventArgs e) {
 			//MessageBox.Show(e.Button.Tag.ToString());
 			switch(e.Button.Tag.ToString()){
-					
 				case "Print":
 					OnPrint_Click();
 					break;
@@ -348,7 +347,7 @@ namespace OpenDental.ReportingComplex
 		///<summary></summary>
 		private void PrintReport(){
 			try{
-				if(PrinterL.SetPrinter(pd2,PrintSituation.Default,0,"Report printed "+MyReport.ReportName)){
+				if(PrinterL.SetPrinter(pd2,PrintSituation.Default,0,"Report printed "+_myReport.ReportName)){
 					pd2.Print();
 				}
 			}
@@ -365,13 +364,13 @@ namespace OpenDental.ReportingComplex
 			//All reportObjects are then placed relative to this origin.
 			Margins currentMargins=null;
 			Size paperSize;
-			if(MyReport.IsLandscape) {
+			if(_myReport.IsLandscape) {
 				paperSize=new Size(1100,850);
 			}
 			else {
 				paperSize=new Size(850,1100);
 			}
-			if(MyReport.IsLandscape) {
+			if(_myReport.IsLandscape) {
 				currentMargins=new Margins(50,0,30,30);
 			}
 			else {
@@ -385,79 +384,79 @@ namespace OpenDental.ReportingComplex
 			Section section;
 			while(true){//will break out if no more room on page
 				//if no sections have been printed yet, print a report header.
-				if(lastSectionPrinted==""){
-					if(MyReport.Sections.Contains("Report Header")){
-						section=MyReport.Sections["Report Header"];
+				if(_lastSectionPrinted==AreaSectionType.None) {
+					if(_myReport.Sections.Contains(AreaSectionType.ReportHeader)) {
+						section=_myReport.Sections[AreaSectionType.ReportHeader];
 						PrintSection(grfx,section,xPos,yPos);
 						yPos+=section.Height;
 						if(section.Height>printableHeight){//this can happen if the reportHeader takes up the full page
 							//if there are no other sections to print
 							//this will keep the second page from printing:
-							lastSectionPrinted="Report Footer";
+							_lastSectionPrinted=AreaSectionType.ReportFooter;
 							break;
 						}
 					}
 					else{//no report header
 						//it will still be marked as printed on the next line
 					}
-					lastSectionPrinted="Report Header";
+					_lastSectionPrinted=AreaSectionType.ReportHeader;
 				}
 				//If the size of pageheader+one detail+pagefooter is taller than page, then we might later display an error. But for now, they will all still be laid out, and whatever goes off the bottom edge will just not show.  This will not be an issue for normal reports:
-				if(MyReport.GetSectionHeight("Page Header")
-					+MyReport.GetSectionHeight("Query")
-					+MyReport.GetSectionHeight("Page Footer")
+				if(_myReport.GetSectionHeight(AreaSectionType.PageHeader)
+					+_myReport.GetSectionHeight(AreaSectionType.Query)
+					+_myReport.GetSectionHeight(AreaSectionType.PageFooter)
 					>printableHeight){
 					//nothing for now.
 				}
 				//If this is first page and not enough room to print reportheader+pageheader+detail+pagefooter.
-				if(pagesPrinted==0
-					&& MyReport.GetSectionHeight("Report Header")
-					+MyReport.GetSectionHeight("Page Header")
-					+MyReport.GetSectionHeight("Query")
-					+MyReport.GetSectionHeight("Page Footer")
+				if(_pagesPrinted==0
+					&& _myReport.GetSectionHeight(AreaSectionType.ReportHeader)
+					+_myReport.GetSectionHeight(AreaSectionType.PageHeader)
+					+_myReport.GetSectionHeight(AreaSectionType.Query)
+					+_myReport.GetSectionHeight(AreaSectionType.PageFooter)
 					>printableHeight)
 				{
 					break;
 				}
 				//always print a page header if it exists
-				if(MyReport.Sections.Contains("Page Header")){
-					section=MyReport.Sections["Page Header"];
+				if(_myReport.Sections.Contains(AreaSectionType.PageHeader)) {
+					section=_myReport.Sections[AreaSectionType.PageHeader];
 					PrintSection(grfx,section,xPos,yPos);
 					yPos+=section.Height;
 				}
-				_heightRemaining=yLimit-yPos-MyReport.GetSectionHeight("Page Footer");
-				section=MyReport.Sections["Query"];
+				_heightRemaining=yLimit-yPos-_myReport.GetSectionHeight(AreaSectionType.PageFooter);
+				section=_myReport.Sections[AreaSectionType.Query];
 				PrintQuerySection(grfx,section,xPos,yPos);
 				yPos+=section.Height;
 				bool isRoomForReportFooter=true;
-				if(_heightRemaining-MyReport.GetSectionHeight("Report Footer")<=0) {
+				if(_heightRemaining-_myReport.GetSectionHeight(AreaSectionType.ReportFooter)<=0) {
 					isRoomForReportFooter=false;
 				}
 				//print the reportfooter section if there is room
 				if(isRoomForReportFooter){
-					if(MyReport.Sections.Contains("Report Footer")){
-						section=MyReport.Sections["Report Footer"];
+					if(_myReport.Sections.Contains(AreaSectionType.ReportFooter)) {
+						section=_myReport.Sections[AreaSectionType.ReportFooter];
 						PrintSection(grfx,section,xPos,yPos);
 						yPos+=section.Height;
 					}
 					//mark the reportfooter as printed. This will prevent another loop.
-					lastSectionPrinted="Report Footer";
+					_lastSectionPrinted=AreaSectionType.ReportFooter;
 				}
 				//print the pagefooter
-				if(MyReport.Sections.Contains("Page Footer")){
-					section=MyReport.Sections["Page Footer"];
+				if(_myReport.Sections.Contains(AreaSectionType.PageFooter)) {
+					section=_myReport.Sections[AreaSectionType.PageFooter];
 					yPos=yLimit-section.Height;
 					PrintSection(grfx,section,xPos,yPos);
 					yPos+=section.Height;
 				}
 				break;
 			}//while			
-			pagesPrinted++;
+			_pagesPrinted++;
 			//if the reportfooter has been printed, then there are no more pages.
-			if(lastSectionPrinted=="Report Footer"){
+			if(_lastSectionPrinted==AreaSectionType.ReportFooter) {
 				ev.HasMorePages=false;
-				totalPages=pagesPrinted;
-				ToolBarMain.Buttons["PageNum"].Text="1 / "+totalPages.ToString();
+				_totalPages=_pagesPrinted;
+				ToolBarMain.Buttons["PageNum"].Text="1 / "+_totalPages.ToString();
 				ToolBarMain.Invalidate();
 				//labelTotPages.Text="1 / "+totalPages.ToString();
 			}
@@ -474,17 +473,17 @@ namespace OpenDental.ReportingComplex
 			ReportObject boxObject;
 			StringFormat strFormat;//used each time text is drawn to handle alignment issues
 			string displayText="";//The formatted text to print
-			foreach(ReportObject reportObject in MyReport.ReportObjects){
-				if(reportObject.SectionName!=section.Name){
+			foreach(ReportObject reportObject in _myReport.ReportObjects){
+				if(reportObject.SectionType!=section.SectionType){
 					continue;
 				}
-				if(reportObject.ReportObjectKind==ReportObjectKind.TextObject){
+				if(reportObject.ObjectType==ReportObjectType.TextObject){
 					textObject=reportObject;
 					Font newFont=textObject.Font;
 					strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
-					if(section.Name=="Report Footer") {
+					if(section.SectionType==AreaSectionType.ReportFooter) {
 						if(textObject.Name=="ReportSummaryText") {
-							xPos+=MyReport.ReportObjects["ReportSummaryLabel"].Size.Width;
+							xPos+=_myReport.ReportObjects["ReportSummaryLabel"].Size.Width;
 							if(textObject.IsUnderlined) {
 								newFont=new Font(textObject.Font.FontFamily,textObject.Font.Size,FontStyle.Bold|FontStyle.Underline);
 							}
@@ -519,7 +518,7 @@ namespace OpenDental.ReportingComplex
 						}
 					}
 				}
-				else if(reportObject.ReportObjectKind==ReportObjectKind.FieldObject){
+				else if(reportObject.ObjectType==ReportObjectType.FieldObject){
 					fieldObject=reportObject;
 					strFormat=ReportObject.GetStringFormatAlignment(fieldObject.ContentAlignment);
 					RectangleF layoutRect=new RectangleF(xPos+fieldObject.Location.X
@@ -538,44 +537,44 @@ namespace OpenDental.ReportingComplex
 							//	+Lan.g(
 						}
 						else if(fieldObject.SpecialFieldType==SpecialFieldType.PageNumber){
-							displayText=Lan.g(this,"Page")+" "+(pagesPrinted+1).ToString();
+							displayText=Lan.g(this,"Page")+" "+(_pagesPrinted+1).ToString();
 						}
 					}
 					g.DrawString(displayText,fieldObject.Font,Brushes.Black,layoutRect,strFormat);
 				}
-				else if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
+				else if(reportObject.ObjectType==ReportObjectType.BoxObject) {
 					boxObject=reportObject;
 					int x1=xPos+boxObject.OffSetX;
 					int x2=xPos-boxObject.OffSetX;
 					int y1=yPos+boxObject.OffSetY;
 					int y2=yPos-boxObject.OffSetY;
 					int maxHorizontalLength=1100;
-					if(!MyReport.IsLandscape) {
+					if(!_myReport.IsLandscape) {
 						maxHorizontalLength=850;
 					}
 					x2+=maxHorizontalLength;
-					y2+=MyReport.GetSectionHeight(boxObject.SectionName);
+					y2+=_myReport.GetSectionHeight(boxObject.SectionType);
 					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 				}
-				else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
+				else if(reportObject.ObjectType==ReportObjectType.LineObject) {
 					lineObject=reportObject;
 					int length;
 					int x=lineObject.OffSetX;
 					int y=yPos+lineObject.OffSetY;
 					int maxHorizontalLength=1100;
-					if(!MyReport.IsLandscape) {
+					if(!_myReport.IsLandscape) {
 						maxHorizontalLength=850;
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 						length=maxHorizontalLength*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.South) {
-							y+=MyReport.GetSectionHeight(lineObject.SectionName);
+							y+=_myReport.GetSectionHeight(lineObject.SectionType);
 						}
 						else if(lineObject.LinePosition==LinePosition.North) {
 							//Do Nothing Here
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
-							y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2);
+							y+=(_myReport.GetSectionHeight(lineObject.SectionType)/2);
 						}
 						else {
 							continue;
@@ -584,7 +583,7 @@ namespace OpenDental.ReportingComplex
 						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
+						length=_myReport.GetSectionHeight(lineObject.SectionType)*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.West) {
 							//Do Nothing Here
 						}
@@ -597,7 +596,7 @@ namespace OpenDental.ReportingComplex
 						else {
 							continue;
 						}
-						y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+						y+=(_myReport.GetSectionHeight(lineObject.SectionType)/2)-(length/2);
 						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 					}
 				}
@@ -613,45 +612,45 @@ namespace OpenDental.ReportingComplex
 			QueryObject queryObject;
 			StringFormat strFormat;//used each time text is drawn to handle alignment issues
 			#region Lines And Boxes
-			foreach(ReportObject reportObject in MyReport.ReportObjects) {
-				if(reportObject.SectionName!=section.Name) {
+			foreach(ReportObject reportObject in _myReport.ReportObjects) {
+				if(reportObject.SectionType!=section.SectionType) {
 					//skip any reportObjects that are not in this section
 					continue;
 				}
 
-				if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
+				if(reportObject.ObjectType==ReportObjectType.BoxObject) {
 					boxObject=reportObject;
 					int x1=xPos+boxObject.OffSetX;
 					int x2=xPos-boxObject.OffSetX;
 					int y1=yPos+boxObject.OffSetY;
 					int y2=yPos-boxObject.OffSetY;
 					int maxHorizontalLength=1100;
-					if(!MyReport.IsLandscape) {
+					if(!_myReport.IsLandscape) {
 						maxHorizontalLength=850;
 					}
 					x2+=maxHorizontalLength-xPos;
-					y2+=_heightRemaining*MyReport.GetSectionHeight(boxObject.SectionName);
+					y2+=_heightRemaining*_myReport.GetSectionHeight(boxObject.SectionType);
 					g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 				}
-				else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
+				else if(reportObject.ObjectType==ReportObjectType.LineObject) {
 					lineObject=reportObject;
 					int length;
 					int x=lineObject.OffSetX;
 					int y=yPos+lineObject.OffSetY;
 					int maxHorizontalLength=1100;
-					if(!MyReport.IsLandscape) {
+					if(!_myReport.IsLandscape) {
 						maxHorizontalLength=850;
 					}
 					if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 						length=maxHorizontalLength*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.South) {
-							y+=MyReport.GetSectionHeight(lineObject.SectionName);
+							y+=_myReport.GetSectionHeight(lineObject.SectionType);
 						}
 						else if(lineObject.LinePosition==LinePosition.North) {
 							//Do Nothing Here
 						}
 						else if(lineObject.LinePosition==LinePosition.Center) {
-							y+=(MyReport.GetSectionHeight(lineObject.SectionName)/2);
+							y+=(_myReport.GetSectionHeight(lineObject.SectionType)/2);
 						}
 						else {
 							continue;
@@ -660,7 +659,7 @@ namespace OpenDental.ReportingComplex
 						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 					}
 					else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-						length=MyReport.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
+						length=_myReport.GetSectionHeight(lineObject.SectionType)*lineObject.IntLinePercent/100;
 						if(lineObject.LinePosition==LinePosition.West) {
 							//Do Nothing Here
 						}
@@ -673,7 +672,7 @@ namespace OpenDental.ReportingComplex
 						else {
 							continue;
 						}
-						y=y+(MyReport.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+						y=y+(_myReport.GetSectionHeight(lineObject.SectionType)/2)-(length/2);
 						g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 					}
 					else {
@@ -682,12 +681,12 @@ namespace OpenDental.ReportingComplex
 				}
 			}
 			#endregion
-			foreach(ReportObject reportObject in MyReport.ReportObjects) {
-				if(reportObject.SectionName!=section.Name) {
+			foreach(ReportObject reportObject in _myReport.ReportObjects) {
+				if(reportObject.SectionType!=section.SectionType) {
 					//skip any reportObjects that are not in this section
 					continue;
 				}
-				if(reportObject.ReportObjectKind==ReportObjectKind.TextObject) {
+				if(reportObject.ObjectType==ReportObjectType.TextObject) {
 					//not typical to print textobject in details section, but allowed
 					textObject=reportObject;
 					strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
@@ -700,13 +699,13 @@ namespace OpenDental.ReportingComplex
 						g.DrawLine(new Pen(textObject.ForeColor),xPos+textObject.Location.X,yPos+textObject.Location.Y+textObject.Size.Height,xPos+textObject.Location.X+textObject.Size.Width,yPos+textObject.Location.Y+textObject.Size.Height);
 					}
 				}
-				else if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
+				else if(reportObject.ObjectType==ReportObjectType.QueryObject) {
 					queryObject=(QueryObject)reportObject;
 					if(queryObject.IsPrinted==true) {
 						continue;
 					}
 					if(queryObject.IsCentered) {
-						if(MyReport.IsLandscape) {
+						if(_myReport.IsLandscape) {
 							xPos=1100/2-(queryObject.QueryWidth/2);
 						}
 						else {
@@ -714,24 +713,24 @@ namespace OpenDental.ReportingComplex
 						}
 					}
 					if(_heightRemaining>0) {
-						PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Title"],xPos,yPos);
-						yPos+=queryObject.Sections["Group Title"].Height;
-						section.Height+=queryObject.Sections["Group Title"].Height;
+						PrintQueryObjectSection(queryObject,g,queryObject.Sections[AreaSectionType.GroupTitle],xPos,yPos);
+						yPos+=queryObject.Sections[AreaSectionType.GroupTitle].Height;
+						section.Height+=queryObject.Sections[AreaSectionType.GroupTitle].Height;
 					}
 					if(_heightRemaining>0) {
-						PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Header"],xPos,yPos);
-						yPos+=queryObject.Sections["Group Header"].Height;
-						section.Height+=queryObject.Sections["Group Header"].Height;
+						PrintQueryObjectSection(queryObject,g,queryObject.Sections[AreaSectionType.GroupHeader],xPos,yPos);
+						yPos+=queryObject.Sections[AreaSectionType.GroupHeader].Height;
+						section.Height+=queryObject.Sections[AreaSectionType.GroupHeader].Height;
 					}
 					if(_heightRemaining>0) {
-						PrintQueryObjectSection(queryObject,g,queryObject.Sections["Detail"],xPos,yPos);
-						yPos+=queryObject.Sections["Detail"].Height;
-						section.Height+=queryObject.Sections["Detail"].Height;
+						PrintQueryObjectSection(queryObject,g,queryObject.Sections[AreaSectionType.Detail],xPos,yPos);
+						yPos+=queryObject.Sections[AreaSectionType.Detail].Height;
+						section.Height+=queryObject.Sections[AreaSectionType.Detail].Height;
 					}
 					if(_heightRemaining>0) {
-						PrintQueryObjectSection(queryObject,g,queryObject.Sections["Group Footer"],xPos,yPos);
-						yPos+=queryObject.Sections["Group Footer"].Height;
-						section.Height+=queryObject.Sections["Group Footer"].Height;
+						PrintQueryObjectSection(queryObject,g,queryObject.Sections[AreaSectionType.GroupFooter],xPos,yPos);
+						yPos+=queryObject.Sections[AreaSectionType.GroupFooter].Height;
+						section.Height+=queryObject.Sections[AreaSectionType.GroupFooter].Height;
 					}
 					if(_heightRemaining<=0) {
 						return;
@@ -753,26 +752,26 @@ namespace OpenDental.ReportingComplex
 			StringFormat strFormat;//used each time text is drawn to handle alignment issues
 			int yPosAdd=0;
 			if(queryObj.SuppressIfDuplicate
-				&& section.Kind==AreaSectionKind.GroupTitle && rowsPrinted>0) 
+				&& section.SectionType==AreaSectionType.GroupTitle && _rowsPrinted>0) 
 			{
 				return;//Only print the group title for each query object once.
 			}
 			//loop through each row in the table and make sure that the row can fit.  If it can fit, print it.  Otherwise go to next page.
-			for(int i=rowsPrinted;i<queryObj.ReportTable.Rows.Count;i++) {
+			for(int i=_rowsPrinted;i<queryObj.ReportTable.Rows.Count;i++) {
 				//Figure out the current row height
-				if(section.Name=="Detail" && queryObj.RowHeightValues[i]>_heightRemaining) {
+				if(section.SectionType==AreaSectionType.Detail && queryObj.RowHeightValues[i]>_heightRemaining) {
 					_heightRemaining=0;
 					return;
 				}
 				//Find the Group Header height to see if printing at least one row is possible.
-				if(section.Name=="Group Title") {
+				if(section.SectionType==AreaSectionType.GroupTitle) {
 					int titleHeight=0;
 					int headerHeight=0;
 					foreach(ReportObject reportObject in queryObj.ReportObjects) {
-						if(reportObject.SectionName=="Group Title") {
+						if(reportObject.SectionType==AreaSectionType.GroupTitle) {
 							titleHeight+=reportObject.Size.Height;
 						}
-						else if(reportObject.SectionName=="Group Header" && reportObject.Size.Height>headerHeight) {
+						else if(reportObject.SectionType==AreaSectionType.GroupHeader && reportObject.Size.Height>headerHeight) {
 							headerHeight=reportObject.Size.Height;
 						}
 					}
@@ -783,23 +782,23 @@ namespace OpenDental.ReportingComplex
 					}
 				}
 				//Find the Group Footer height to see if printing the last row should happen on another page.
-				if(section.Name=="Detail" && rowsPrinted==queryObj.ReportTable.Rows.Count-1) {
+				if(section.SectionType==AreaSectionType.Detail && _rowsPrinted==queryObj.ReportTable.Rows.Count-1) {
 					int groupSummaryLabelHeight=0;
 					int tallestTotalSummaryHeight=0;
 					foreach(ReportObject reportObject in queryObj.ReportObjects) {
-						if(reportObject.SectionName=="Group Footer" 
+						if(reportObject.SectionType==AreaSectionType.GroupFooter 
 							&& (!reportObject.Name.Contains("GroupSummaryLabel") || !reportObject.Name.Contains("GroupSummaryText"))
 							&& tallestTotalSummaryHeight<reportObject.Size.Height+reportObject.OffSetY)
 						{
 							tallestTotalSummaryHeight=reportObject.Size.Height+reportObject.OffSetY;
 						}
 						//Find the height of the group footer using GroupSummaryLabel because GroupSummaryText has not been filled yet.
-						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel")) {
+						if(reportObject.SectionType==AreaSectionType.GroupFooter && reportObject.Name.Contains("GroupSummaryLabel")) {
 							groupSummaryLabelHeight+=reportObject.Size.Height+reportObject.OffSetY;
 						}
 						//The GroupSummaryText hasn't been filled yet so we use GroupSummaryLabel again
 						//If it is North or South then we need to add its height a second time because the GroupSummaryLabel is located above or below the text.
-						if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummaryLabel") 
+						if(reportObject.SectionType==AreaSectionType.GroupFooter && reportObject.Name.Contains("GroupSummaryLabel") 
 							&& (reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)) 
 						{
 							groupSummaryLabelHeight+=reportObject.Size.Height;
@@ -816,14 +815,14 @@ namespace OpenDental.ReportingComplex
 				int groupTitleHeight=0;
 				//Now figure out if anything in the header, footer, or title sections can still fit on the page
 				foreach(ReportObject reportObject in queryObj.ReportObjects) {
-					if(reportObject.SectionName!=section.Name) {
+					if(reportObject.SectionType!=section.SectionType) {
 						continue;
 					}
 					if(reportObject.Size.Height>_heightRemaining) {
 						_heightRemaining=0;
 						return;
 					}
-					if(reportObject.SectionName=="Group Footer" && reportObject.Name.Contains("GroupSummary")) {
+					if(reportObject.SectionType==AreaSectionType.GroupFooter && reportObject.Name.Contains("GroupSummary")) {
 						if(!queryObj.IsLastSplit) {
 							continue;
 						}
@@ -845,14 +844,14 @@ namespace OpenDental.ReportingComplex
 							reportObject.Size=new Size(width,height);
 						}
 					}
-					if(section.Name=="Group Title" && rowsPrinted>0 && reportObject.Name=="Initial Group Title") {
+					if(section.SectionType==AreaSectionType.GroupTitle && _rowsPrinted>0 && reportObject.Name=="Initial Group Title") {
 						continue;
 					}
-					if(section.Name=="Group Footer" && reportObject.SummaryOrientation==SummaryOrientation.South) {
+					if(section.SectionType==AreaSectionType.GroupFooter && reportObject.SummaryOrientation==SummaryOrientation.South) {
 						ReportObject summaryField=queryObj.GetObjectByName(reportObject.DataField+"Footer");
 						yPos+=summaryField.Size.Height;
 					}
-					if(reportObject.ReportObjectKind==ReportObjectKind.TextObject) {
+					if(reportObject.ObjectType==ReportObjectType.TextObject) {
 						textObject=reportObject;
 						strFormat=ReportObject.GetStringFormatAlignment(textObject.ContentAlignment);
 						RectangleF layoutRect=new RectangleF(xPos+textObject.Location.X+textObject.OffSetX
@@ -868,10 +867,10 @@ namespace OpenDental.ReportingComplex
 							greatestObjectHeight=textObject.Size.Height;
 						}
 						groupTitleHeight+=textObject.Size.Height;
-						if(section.Name=="Group Title") {
+						if(section.SectionType==AreaSectionType.GroupTitle) {
 							yPos+=textObject.Size.Height;
 						}
-						if(section.Name=="Group Footer" 
+						if(section.SectionType==AreaSectionType.GroupFooter 
 							&& ((reportObject.SummaryOrientation==SummaryOrientation.North || reportObject.SummaryOrientation==SummaryOrientation.South)
 								|| (reportObject.Name.Contains("GroupSummaryText")))) 
 						{
@@ -879,43 +878,43 @@ namespace OpenDental.ReportingComplex
 							yPos+=textObject.Size.Height;
 						}
 					}
-					else if(reportObject.ReportObjectKind==ReportObjectKind.BoxObject) {
+					else if(reportObject.ObjectType==ReportObjectType.BoxObject) {
 						boxObject=reportObject;
 						int x1=xPos+boxObject.OffSetX;
 						int x2=xPos-boxObject.OffSetX;
 						int y1=yPos+boxObject.OffSetY;
 						int y2=yPos-boxObject.OffSetY;
 						int maxHorizontalLength=1100;
-						if(!MyReport.IsLandscape) {
+						if(!_myReport.IsLandscape) {
 							maxHorizontalLength=850;
 						}
 						x2+=maxHorizontalLength;
-						y2+=queryObj.GetSectionHeight(boxObject.SectionName);
+						y2+=queryObj.GetSectionHeight(boxObject.SectionType);
 						g.DrawRectangle(new Pen(boxObject.ForeColor,boxObject.FloatLineThickness),x1,y1,x2-x1,y2-y1);
 						if(greatestObjectHeight<boxObject.Size.Height) {
 							greatestObjectHeight=boxObject.Size.Height;
 						}
 						groupTitleHeight+=boxObject.Size.Height;
 					}
-					else if(reportObject.ReportObjectKind==ReportObjectKind.LineObject) {
+					else if(reportObject.ObjectType==ReportObjectType.LineObject) {
 						lineObject=reportObject;
 						int length;
 						int x=lineObject.OffSetX;
 						int y=yPos+lineObject.OffSetY;
 						int maxHorizontalLength=1100;
-						if(!MyReport.IsLandscape) {
+						if(!_myReport.IsLandscape) {
 							maxHorizontalLength=850;
 						}
 						if(lineObject.LineOrientation==LineOrientation.Horizontal) {
 							length=maxHorizontalLength*lineObject.IntLinePercent/100;
 							if(lineObject.LinePosition==LinePosition.South) {
-								y+=queryObj.GetSectionHeight(lineObject.SectionName);
+								y+=queryObj.GetSectionHeight(lineObject.SectionType);
 							}
 							else if(lineObject.LinePosition==LinePosition.North) {
 								//Do Nothing Here
 							}
 							else if(lineObject.LinePosition==LinePosition.Center) {
-								y+=(queryObj.GetSectionHeight(lineObject.SectionName)/2);
+								y+=(queryObj.GetSectionHeight(lineObject.SectionType)/2);
 							}
 							else {
 								continue;
@@ -924,7 +923,7 @@ namespace OpenDental.ReportingComplex
 							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x+length,y);
 						}
 						else if(lineObject.LineOrientation==LineOrientation.Vertical) {
-							length=queryObj.GetSectionHeight(lineObject.SectionName)*lineObject.IntLinePercent/100;
+							length=queryObj.GetSectionHeight(lineObject.SectionType)*lineObject.IntLinePercent/100;
 							if(lineObject.LinePosition==LinePosition.West) {
 								//Do Nothing Here
 							}
@@ -937,7 +936,7 @@ namespace OpenDental.ReportingComplex
 							else {
 								continue;
 							}
-							y+=(queryObj.GetSectionHeight(lineObject.SectionName)/2)-(length/2);
+							y+=(queryObj.GetSectionHeight(lineObject.SectionType)/2)-(length/2);
 							g.DrawLine(new Pen(reportObject.ForeColor,reportObject.FloatLineThickness),x,y,x,y+length);
 						}
 						if(greatestObjectHeight<lineObject.Size.Height) {
@@ -945,13 +944,13 @@ namespace OpenDental.ReportingComplex
 						}
 						groupTitleHeight+=lineObject.Size.Height;
 					}
-					else if(reportObject.ReportObjectKind==ReportObjectKind.FieldObject) {
+					else if(reportObject.ObjectType==ReportObjectType.FieldObject) {
 						fieldObject=reportObject;
 						RectangleF layoutRect;
 						strFormat=ReportObject.GetStringFormatAlignment(fieldObject.ContentAlignment);
 						if(fieldObject.FieldDefKind==FieldDefKind.DataTableField) {
 							layoutRect=new RectangleF(xPos+fieldObject.Location.X,yPos+fieldObject.Location.Y,fieldObject.Size.Width,queryObj.RowHeightValues[i]);
-							if(MyReport.HasGridLines()) {
+							if(_myReport.HasGridLines()) {
 								g.DrawRectangle(new Pen(Brushes.LightGray),Rectangle.Round(layoutRect));
 							}
 							rawText=queryObj.ReportTable.Rows
@@ -974,43 +973,43 @@ namespace OpenDental.ReportingComplex
 						yPosAdd=(int)layoutRect.Height;
 					}
 				}
-				if(section.Kind==AreaSectionKind.GroupFooter) {
+				if(section.SectionType==AreaSectionType.GroupFooter) {
 					yPosAdd+=20;//Added to give a buffer between split tables.
 					section.Height+=yPosAdd;
 					_heightRemaining-=section.Height;
 					yPos+=yPosAdd;
 					break;
 				}
-				else if(section.Kind==AreaSectionKind.GroupTitle) {
+				else if(section.SectionType==AreaSectionType.GroupTitle) {
 					section.Height+=groupTitleHeight;
 					_heightRemaining-=section.Height;
 					break;
 				}
-				else if(section.Kind==AreaSectionKind.GroupHeader) {
+				else if(section.SectionType==AreaSectionType.GroupHeader) {
 					section.Height=greatestObjectHeight;
 					_heightRemaining-=section.Height;
 					break;
 				}
-				if(section.Kind==AreaSectionKind.Detail) {
-					rowsPrinted++;
+				if(section.SectionType==AreaSectionType.Detail) {
+					_rowsPrinted++;
 					yPos+=yPosAdd;
 					_heightRemaining-=yPosAdd;
 					section.Height+=yPosAdd;
 				}
 			}
-			if(rowsPrinted==queryObj.ReportTable.Rows.Count) {
-				rowsPrinted=0;
+			if(_rowsPrinted==queryObj.ReportTable.Rows.Count) {
+				_rowsPrinted=0;
 				queryObj.IsPrinted=true;
 			}
 		}
 
 		private double GetGroupSummaryValue(string columnName,List<int> summaryGroups,SummaryOperation operation) {
 			double retVal=0;
-			for(int i=0;i<MyReport.ReportObjects.Count;i++) {
-				if(MyReport.ReportObjects[i].ReportObjectKind!=ReportObjectKind.QueryObject) {
+			for(int i=0;i<_myReport.ReportObjects.Count;i++) {
+				if(_myReport.ReportObjects[i].ObjectType!=ReportObjectType.QueryObject) {
 					continue;
 				}
-				QueryObject queryObj=(QueryObject)MyReport.ReportObjects[i];
+				QueryObject queryObj=(QueryObject)_myReport.ReportObjects[i];
 				if(!summaryGroups.Contains(queryObj.QueryGroupValue)) {
 					continue;
 				}
@@ -1126,15 +1125,15 @@ namespace OpenDental.ReportingComplex
 			if(printPreviewControl2.StartPage==0) return;
 			printPreviewControl2.StartPage--;
 			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
-				+" / "+totalPages.ToString();
+				+" / "+_totalPages.ToString();
 			ToolBarMain.Invalidate();
 		}
 
 		private void NextPage() {
-			if(printPreviewControl2.StartPage==totalPages-1) return;
+			if(printPreviewControl2.StartPage==_totalPages-1) return;
 			printPreviewControl2.StartPage++;
 			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
-				+" / "+totalPages.ToString();
+				+" / "+_totalPages.ToString();
 			ToolBarMain.Invalidate();
 		}
 
@@ -1142,7 +1141,7 @@ namespace OpenDental.ReportingComplex
 			SaveFileDialog saveFileDialog2=new SaveFileDialog();
 			saveFileDialog2.AddExtension=true;
 			//saveFileDialog2.Title=Lan.g(this,"Select Folder to Save File To");
-			saveFileDialog2.FileName=MyReport.ReportName+".txt";
+			saveFileDialog2.FileName=_myReport.ReportName+".txt";
 			if(!Directory.Exists(PrefC.GetString(PrefName.ExportPath))) {
 				try {
 					Directory.CreateDirectory(PrefC.GetString(PrefName.ExportPath));
@@ -1164,8 +1163,8 @@ namespace OpenDental.ReportingComplex
 			try {
 				using(StreamWriter sw=new StreamWriter(saveFileDialog2.FileName,false)) {
 					String line="";
-					foreach(ReportObject reportObject in MyReport.ReportObjects) {
-						if(reportObject.ReportObjectKind==ReportObjectKind.QueryObject) {
+					foreach(ReportObject reportObject in _myReport.ReportObjects) {
+						if(reportObject.ObjectType==ReportObjectType.QueryObject) {
 							QueryObject query=(QueryObject)reportObject;
 							line=query.GetGroupTitle().StaticText;
 							sw.WriteLine(line);
@@ -1182,11 +1181,11 @@ namespace OpenDental.ReportingComplex
 								line="";
 								string displayText="";
 								foreach(ReportObject reportObj in query.ReportObjects) {
-									if(reportObj.SectionName!="Detail") {
+									if(reportObj.SectionType!=AreaSectionType.Detail) {
 										continue;
 									}
 									string rawText="";
-									if(reportObj.ReportObjectKind==ReportObjectKind.FieldObject) {
+									if(reportObj.ObjectType==ReportObjectType.FieldObject) {
 										rawText=query.ExportTable.Rows[i][query.ArrDataFields.IndexOf(reportObj.DataField)].ToString();
 										if(String.IsNullOrWhiteSpace(rawText)) {
 											line+="\t";
@@ -1210,7 +1209,7 @@ namespace OpenDental.ReportingComplex
 							int columnValue=-1;
 							line="";
 							foreach(ReportObject reportObjQuery in query.ReportObjects) {
-								if(reportObjQuery.SectionName=="Group Footer" && reportObjQuery.Name.Contains("Footer")) {
+								if(reportObjQuery.SectionType==AreaSectionType.GroupFooter && reportObjQuery.Name.Contains("Footer")) {
 									if(columnValue==-1) {
 										columnValue=query.ArrDataFields.IndexOf(reportObjQuery.SummarizedField);
 										for(int i=0;i<columnValue;i++) {

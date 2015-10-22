@@ -150,7 +150,7 @@ namespace OpenDental{
 			report.AddTitle("Title","Detail of General Ledger",fontTitle);
 			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			report.AddSubTitle("Date",date1.SelectionStart.ToShortDateString()+" - "+date2.SelectionStart.ToShortDateString(),fontSubTitle);
-			report.Sections["Report Header"].Height-=20;
+			report.Sections[AreaSectionType.ReportHeader].Height-=20;
 			//setup query
 			QueryObject query;
 			query=report.AddQuery(data,"Accounts","Description",SplitByKind.Value,1,true);

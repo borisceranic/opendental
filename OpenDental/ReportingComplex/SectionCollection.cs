@@ -17,11 +17,11 @@ namespace OpenDental.ReportingComplex
       //}
 		}*/
 
-		///<summary>Returns the Section with the given name.</summary>
-		public Section this[string name]{
+		///<summary>Returns the Section with the given type.</summary>
+		public Section this[AreaSectionType kind]{
       get{
 				foreach(Section section in List){
-					if(section.Name==name)
+					if(section.SectionType==kind)
 						return section;
 				}
 				return null;
@@ -45,7 +45,7 @@ namespace OpenDental.ReportingComplex
 					List.Insert(i,value);
 					return i;
 				}
-				if((int)value.Kind < (int)((Section)List[i]).Kind){
+				if((int)value.SectionType < (int)((Section)List[i]).SectionType){
 					List.Insert(i,value);
 					return i;
 				}
@@ -59,18 +59,18 @@ namespace OpenDental.ReportingComplex
 		}
 
 		///<summary></summary>
-		public int IndexOf(string name){
+		public int IndexOf(AreaSectionType kind) {
 			foreach(Section section in List){
-				if(section.Name==name)
+				if(section.SectionType==kind)
 					return IndexOf(section);
 			}
 			return -1;
 		}
 
 		///<summary></summary>
-		public bool Contains(string name){
+		public bool Contains(AreaSectionType kind) {
 			foreach(Section section in List){
-				if(section.Name==name)
+				if(section.SectionType==kind)
 					return true;
 			}
 			return false;

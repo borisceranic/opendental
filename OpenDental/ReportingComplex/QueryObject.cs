@@ -340,20 +340,20 @@ namespace OpenDental.ReportingComplex {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_stringQuery=stringQuery;
-			SectionName="Query";
+			SectionType=AreaSectionType.Query;
 			Name="Query";
 			_splitByKind=splitByKind;
 			_listEnumNames=listEnumNames;
 			_dictDefNames=dictDefNames;
 			_queryGroupValue=queryGroupValue;
 			_isCentered=isCentered;
-			ReportObjectKind=ReportObjectKind.QueryObject;
-			_sections.Add(new Section(AreaSectionKind.GroupTitle,0));
-			_reportObjects.Add(new ReportObject("Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,font).Height/grfx.DpiY*100+2)),title,font,ContentAlignment.MiddleLeft,0,0));
+			ObjectType=ReportObjectType.QueryObject;
+			_sections.Add(new Section(AreaSectionType.GroupTitle,0));
+			_reportObjects.Add(new ReportObject("Group Title",AreaSectionType.GroupTitle,new Point(0,0),new Size((int)(grfx.MeasureString(title,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,font).Height/grfx.DpiY*100+2)),title,font,ContentAlignment.MiddleLeft,0,0));
 			_reportObjects["Group Title"].IsUnderlined=true;
-			_sections.Add(new Section(AreaSectionKind.GroupHeader,0));
-			_sections.Add(new Section(AreaSectionKind.Detail,0));
-			_sections.Add(new Section(AreaSectionKind.GroupFooter,0));
+			_sections.Add(new Section(AreaSectionType.GroupHeader,0));
+			_sections.Add(new Section(AreaSectionType.Detail,0));
+			_sections.Add(new Section(AreaSectionType.GroupFooter,0));
 			_queryWidth=0;
 			_suppressHeaders=true;
 			_isLastSplit=true;
@@ -536,20 +536,20 @@ namespace OpenDental.ReportingComplex {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			_columnNameToSplitOn=columnNameToSplitOn;
 			_reportTable=tableQuery;
-			SectionName="Query";
+			SectionType=AreaSectionType.Query;
 			Name="Query";
 			_splitByKind=splitByKind;
 			_listEnumNames=listEnumNames;
 			_dictDefNames=dictDefNames;
 			_queryGroupValue=queryGroupValue;
 			_isCentered=isCentered;
-			ReportObjectKind=ReportObjectKind.QueryObject;
-			_sections.Add(new Section(AreaSectionKind.GroupTitle,0));
-			_reportObjects.Add(new ReportObject("Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,font).Height/grfx.DpiY*100+2)),title,font,ContentAlignment.MiddleLeft));
+			ObjectType=ReportObjectType.QueryObject;
+			_sections.Add(new Section(AreaSectionType.GroupTitle,0));
+			_reportObjects.Add(new ReportObject("Group Title",AreaSectionType.GroupTitle,new Point(0,0),new Size((int)(grfx.MeasureString(title,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,font).Height/grfx.DpiY*100+2)),title,font,ContentAlignment.MiddleLeft));
 			_reportObjects["Group Title"].IsUnderlined=true;
-			_sections.Add(new Section(AreaSectionKind.GroupHeader,0));
-			_sections.Add(new Section(AreaSectionKind.Detail,0));
-			_sections.Add(new Section(AreaSectionKind.GroupFooter,0));
+			_sections.Add(new Section(AreaSectionType.GroupHeader,0));
+			_sections.Add(new Section(AreaSectionType.Detail,0));
+			_sections.Add(new Section(AreaSectionType.GroupFooter,0));
 			_queryWidth=0;
 			_suppressHeaders=true;
 			_isLastSplit=true;
@@ -602,24 +602,24 @@ namespace OpenDental.ReportingComplex {
 			int xPos=0;
 			//find next available xPos
 			foreach(ReportObject reportObject in _reportObjects) {
-				if(reportObject.SectionName!="Group Header") {
+				if(reportObject.SectionType!=AreaSectionType.GroupHeader) {
 					continue;
 				}
 				if(reportObject.Location.X+reportObject.Size.Width > xPos) {
 					xPos=reportObject.Location.X+reportObject.Size.Width;
 				}
 			}
-			_reportObjects.Add(new ReportObject(dataField+"Header","Group Header"
+			_reportObjects.Add(new ReportObject(dataField+"Header",AreaSectionType.GroupHeader
 				,new Point(xPos,0),new Size(width,sizeHeader.Height),dataField,fontHeader,textAlign));
 			//add fieldObject for rows in details section
-			_reportObjects.Add(new ReportObject(dataField+"Detail","Detail"
+			_reportObjects.Add(new ReportObject(dataField+"Detail",AreaSectionType.Detail
 				,new Point(xPos,0),new Size(width,sizeDetail.Height)
 				,dataField,fieldValueType
 				,font,textAlign,formatString));
 			//add fieldObject for total in ReportFooter
 			if(fieldValueType==FieldValueType.Number) {
 				//use same size as already set for otherFieldObjects above
-				_reportObjects.Add(new ReportObject(dataField+"Footer","Group Footer"
+				_reportObjects.Add(new ReportObject(dataField+"Footer",AreaSectionType.GroupFooter
 					,new Point(xPos,0),new Size(width,sizeFooter.Height)
 					,SummaryOperation.Sum,dataField
 					,fontFooter,textAlign,formatString));
@@ -678,7 +678,7 @@ namespace OpenDental.ReportingComplex {
 				size=new Size((int)(grfx.MeasureString(summaryText,font).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(summaryText,font).Height/grfx.DpiY*100+2));
 			}
 			if(summaryOrientation==SummaryOrientation.North) {
-				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label","Group Footer"
+				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label",AreaSectionType.GroupFooter
 						,summaryField.Location
 						,size
 						,summaryText
@@ -689,7 +689,7 @@ namespace OpenDental.ReportingComplex {
 				_reportObjects.Insert(_reportObjects.IndexOf(summaryField),summaryLabel);
 			}
 			else if(summaryOrientation==SummaryOrientation.South) {
-				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label","Group Footer"
+				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label",AreaSectionType.GroupFooter
 						,summaryField.Location
 						,size
 						,summaryText
@@ -700,7 +700,7 @@ namespace OpenDental.ReportingComplex {
 				_reportObjects.Add(summaryLabel);
 			}
 			else if(summaryOrientation==SummaryOrientation.West) {
-				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label","Group Footer"
+				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label",AreaSectionType.GroupFooter
 						,new Point(summaryField.Location.X-size.Width)
 						,size
 						,summaryText
@@ -711,7 +711,7 @@ namespace OpenDental.ReportingComplex {
 				_reportObjects.Insert(_reportObjects.IndexOf(summaryField),summaryLabel);
 			}
 			else {
-				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label","Group Footer"
+				ReportObject summaryLabel=new ReportObject(dataFieldName+"Label",AreaSectionType.GroupFooter
 						,new Point(summaryField.Location.X+size.Width+summaryField.Size.Width)
 						,size
 						,summaryText
@@ -727,48 +727,48 @@ namespace OpenDental.ReportingComplex {
 
 		#region AddLine Polymorphisms
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space, black in color and in 2pt size.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition) {
-			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,2,50,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition) {
+			AddLine(name,sectionType,lineOrientation,linePosition,Color.Black,2,50,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space and in 2pt size.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color) {
-			AddLine(name,sectionName,lineOrientation,linePosition,color,2,50,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,Color color) {
+			AddLine(name,sectionType,lineOrientation,linePosition,color,2,50,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space and black in color.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness) {
-			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,floatLineThickness,50,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness) {
+			AddLine(name,sectionType,lineOrientation,linePosition,Color.Black,floatLineThickness,50,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is black in color and in 2pt size.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,int linePercentValue) {
-			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,2,linePercentValue,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,int linePercentValue) {
+			AddLine(name,sectionType,lineOrientation,linePosition,Color.Black,2,linePercentValue,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is drawn in 50% of the available space.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness) {
-			AddLine(name,sectionName,lineOrientation,linePosition,color,floatLineThickness,50,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness) {
+			AddLine(name,sectionType,lineOrientation,linePosition,color,floatLineThickness,50,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is in 2pt size.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,int linePercentValue) {
-			AddLine(name,sectionName,lineOrientation,linePosition,color,2,linePercentValue,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,Color color,int linePercentValue) {
+			AddLine(name,sectionType,lineOrientation,linePosition,color,2,linePercentValue,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  By default, the line is black in color.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness,int linePercentValue) {
-			AddLine(name,sectionName,lineOrientation,linePosition,Color.Black,floatLineThickness,linePercentValue,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,float floatLineThickness,int linePercentValue) {
+			AddLine(name,sectionType,lineOrientation,linePosition,Color.Black,floatLineThickness,linePercentValue,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue) {
-			AddLine(name,sectionName,lineOrientation,linePosition,color,floatLineThickness,linePercentValue,0,0);
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue) {
+			AddLine(name,sectionType,lineOrientation,linePosition,color,floatLineThickness,linePercentValue,0,0);
 		}
 
 		///<summary>Adds a line to the specified section with the specified orientation and position.  The line will be offset of its position in pixels according to the given X/Y values.</summary>
-		public void AddLine(string name,string sectionName,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue,int offSetX,int offSetY) {
-			_reportObjects.Add(new ReportObject(name,sectionName,color,floatLineThickness,lineOrientation,linePosition,linePercentValue,offSetX,offSetY));
+		public void AddLine(string name,AreaSectionType sectionType,LineOrientation lineOrientation,LinePosition linePosition,Color color,float floatLineThickness,int linePercentValue,int offSetX,int offSetY) {
+			_reportObjects.Add(new ReportObject(name,sectionType,color,floatLineThickness,lineOrientation,linePosition,linePercentValue,offSetX,offSetY));
 		}
 		#endregion
 
@@ -854,11 +854,11 @@ namespace OpenDental.ReportingComplex {
 			Point location=GetObjectByName(columnName+"Header").Location;
 			Size labelSize=new Size((int)(grfx.MeasureString(staticText,font).Width/grfx.DpiX*100+2)
 				,(int)(grfx.MeasureString(staticText,font).Height/grfx.DpiY*100+2));
-			int i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryLabel","Group Footer",new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleRight,offSetX,offSetY));
+			int i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryLabel",AreaSectionType.GroupFooter,new Point(location.X-labelSize.Width,0),labelSize,staticText,font,ContentAlignment.MiddleRight,offSetX,offSetY));
 			_reportObjects[i].DataField=dataFieldName;
 			_reportObjects[i].SummaryGroups=queryGroupValues;
-			_sections["Group Footer"].Height+=(int)((grfx.MeasureString(staticText,font)).Height/grfx.DpiY*100+2)+offSetY;
-			i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryText","Group Footer",location,new Size(0,0),color,summaryOperation,columnName,font,dataFieldName,offSetX,offSetY));
+			_sections[AreaSectionType.GroupFooter].Height+=(int)((grfx.MeasureString(staticText,font)).Height/grfx.DpiY*100+2)+offSetY;
+			i=_reportObjects.Add(new ReportObject(columnName+"GroupSummaryText",AreaSectionType.GroupFooter,location,new Size(0,0),color,summaryOperation,columnName,font,ContentAlignment.MiddleLeft,dataFieldName,offSetX,offSetY));
 			_reportObjects[i].SummaryGroups=queryGroupValues;
 			grfx.Dispose();
 		}
@@ -868,7 +868,7 @@ namespace OpenDental.ReportingComplex {
 		public void AddInitialHeader(string title,Font font) {
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			Font newFont=new Font(font.FontFamily,font.Size+2,font.Style);
-			_reportObjects.Insert(0,new ReportObject("Initial Group Title","Group Title",new Point(0,0),new Size((int)(grfx.MeasureString(title,newFont).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,newFont).Height/grfx.DpiY*100+2)),title,newFont,ContentAlignment.MiddleLeft));
+			_reportObjects.Insert(0,new ReportObject("Initial Group Title",AreaSectionType.GroupTitle,new Point(0,0),new Size((int)(grfx.MeasureString(title,newFont).Width/grfx.DpiX*100+2),(int)(grfx.MeasureString(title,newFont).Height/grfx.DpiY*100+2)),title,newFont,ContentAlignment.MiddleLeft));
 			_reportObjects["Initial Group Title"].IsUnderlined=true;
 			grfx.Dispose();
 		}
@@ -894,10 +894,10 @@ namespace OpenDental.ReportingComplex {
 				string prevDisplayText="";
 				int rowHeight=0;
 				foreach(ReportObject reportObject in _reportObjects) {
-					if(reportObject.SectionName!="Detail") {
+					if(reportObject.SectionType!=AreaSectionType.Detail) {
 						continue;
 					}
-					if(reportObject.ReportObjectKind==ReportObjectKind.FieldObject) {
+					if(reportObject.ObjectType==ReportObjectType.FieldObject) {
 						rawText=_reportTable.Rows[i][_arrDataFields.IndexOf(reportObject.DataField)].ToString();
 						if(String.IsNullOrWhiteSpace(rawText)) {
 							continue;
@@ -994,23 +994,23 @@ namespace OpenDental.ReportingComplex {
 
 		public int GetTotalHeight() {
 			int height=0;
-			height+=_sections["Group Title"].Height;
-			height+=_sections["Group Header"].Height;
-			height+=_sections["Detail"].Height;
-			height+=_sections["Group Footer"].Height;
+			height+=_sections[AreaSectionType.GroupTitle].Height;
+			height+=_sections[AreaSectionType.GroupHeader].Height;
+			height+=_sections[AreaSectionType.Detail].Height;
+			height+=_sections[AreaSectionType.GroupFooter].Height;
 			return height;
 		}
 
 		///<summary>If the specified section exists, then this returns its height. Otherwise it returns 0.</summary>
-		public int GetSectionHeight(string sectionName) {
-			return _sections[sectionName].Height;
+		public int GetSectionHeight(AreaSectionType sectionType) {
+			return _sections[sectionType].Height;
 		}
 
 		public QueryObject DeepCopyQueryObject() {
 			QueryObject queryObj=new QueryObject();
 			queryObj.Name=this.Name;//Doesn't need to be a deep copy.
-			queryObj.SectionName=this.SectionName;//Doesn't need to be a deep copy.
-			queryObj.ReportObjectKind=this.ReportObjectKind;//Doesn't need to be a deep copy.
+			queryObj.SectionType=this.SectionType;//Doesn't need to be a deep copy.
+			queryObj.ObjectType=this.ObjectType;//Doesn't need to be a deep copy.
 			queryObj._sections=this._sections;//Doesn't need to be a deep copy.
 			queryObj._arrDataFields=this._arrDataFields;//Doesn't need to be a deep copy.
 			queryObj._queryGroupValue=this._queryGroupValue;//Doesn't need to be a deep copy.

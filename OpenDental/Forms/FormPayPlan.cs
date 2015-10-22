@@ -1554,8 +1554,8 @@ namespace OpenDental{
 			report.AddTitle("Title",Lan.g(this,"Payment Plan Terms"),fontTitle);
 			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			report.AddSubTitle("Date SubTitle",DateTime.Today.ToShortDateString(),fontSubTitle);
-			string sectName="Report Header";
-			Section section=report.Sections["Report Header"];
+			AreaSectionType sectType=AreaSectionType.ReportHeader;
+			Section section=report.Sections[AreaSectionType.ReportHeader];
 			//int sectIndex=report.Sections.GetIndexOfKind(AreaSectionKind.ReportHeader);
 			Size size=new Size(300,20);//big enough for any text
 			ContentAlignment alignL=ContentAlignment.MiddleLeft;
@@ -1565,39 +1565,39 @@ namespace OpenDental{
 			int x1=175;
 			int x2=275;
 			report.ReportObjects.Add(new ReportObject
-				("Patient Title",sectName,new Point(x1,yPos),size,"Patient",font,alignL));
+				("Patient Title",sectType,new Point(x1,yPos),size,"Patient",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Patient Detail",sectName,new Point(x2,yPos),size,textPatient.Text,font,alignR));
+				("Patient Detail",sectType,new Point(x2,yPos),size,textPatient.Text,font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Guarantor Title",sectName,new Point(x1,yPos),size,"Guarantor",font,alignL));
+				("Guarantor Title",sectType,new Point(x1,yPos),size,"Guarantor",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Guarantor Detail",sectName,new Point(x2,yPos),size,textGuarantor.Text,font,alignR));
+				("Guarantor Detail",sectType,new Point(x2,yPos),size,textGuarantor.Text,font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Date of Agreement Title",sectName,new Point(x1,yPos),size,"Date of Agreement",font,alignL));
+				("Date of Agreement Title",sectType,new Point(x1,yPos),size,"Date of Agreement",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Date of Agreement Detail",sectName,new Point(x2,yPos),size,PayPlanCur.PayPlanDate.ToString("d"),font,alignR));
+				("Date of Agreement Detail",sectType,new Point(x2,yPos),size,PayPlanCur.PayPlanDate.ToString("d"),font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Principal Title",sectName,new Point(x1,yPos),size,"Principal",font,alignL));
+				("Principal Title",sectType,new Point(x1,yPos),size,"Principal",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Principal Detail",sectName,new Point(x2,yPos),size,TotPrinc.ToString("n"),font,alignR));
+				("Principal Detail",sectType,new Point(x2,yPos),size,TotPrinc.ToString("n"),font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Annual Percentage Rate Title",sectName,new Point(x1,yPos),size,"Annual Percentage Rate",font,alignL));
+				("Annual Percentage Rate Title",sectType,new Point(x1,yPos),size,"Annual Percentage Rate",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Annual Percentage Rate Detail",sectName,new Point(x2,yPos),size,PayPlanCur.APR.ToString("f1"),font,alignR));
+				("Annual Percentage Rate Detail",sectType,new Point(x2,yPos),size,PayPlanCur.APR.ToString("f1"),font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Total Finance Charges Title",sectName,new Point(x1,yPos),size,"Total Finance Charges",font,alignL));
+				("Total Finance Charges Title",sectType,new Point(x1,yPos),size,"Total Finance Charges",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Total Finance Charges Detail",sectName,new Point(x2,yPos),size,TotInt.ToString("n"),font,alignR));
+				("Total Finance Charges Detail",sectType,new Point(x2,yPos),size,TotInt.ToString("n"),font,alignR));
 			yPos+=space;
 			report.ReportObjects.Add(new ReportObject
-				("Total Cost of Loan Title",sectName,new Point(x1,yPos),size,"Total Cost of Loan",font,alignL));
+				("Total Cost of Loan Title",sectType,new Point(x1,yPos),size,"Total Cost of Loan",font,alignL));
 			report.ReportObjects.Add(new ReportObject
-				("Total Cost of Loan Detail",sectName,new Point(x2,yPos),size,TotPrincInt.ToString("n"),font,alignR));
+				("Total Cost of Loan Detail",sectType,new Point(x2,yPos),size,TotPrincInt.ToString("n"),font,alignR));
 			yPos+=space;
 			section.Height=yPos+30;
 			DataTable tbl=new DataTable();
@@ -1634,8 +1634,8 @@ namespace OpenDental{
 			query.AddColumn("Balance",60,FieldValueType.String,font);
 			query.GetColumnHeader("Balance").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("Balance").ContentAlignment=ContentAlignment.MiddleRight;
-			report.ReportObjects.Add(new ReportObject("Note","Report Footer",new Point(x1,20),new Size(500,200),textNote.Text,font,ContentAlignment.TopLeft));
-			report.ReportObjects.Add(new ReportObject("Signature","Report Footer",new Point(x1,220),new Size(500,20),"Signature of Guarantor: ____________________________________________",font,alignL));
+			report.ReportObjects.Add(new ReportObject("Note",AreaSectionType.ReportFooter,new Point(x1,20),new Size(500,200),textNote.Text,font,ContentAlignment.TopLeft));
+			report.ReportObjects.Add(new ReportObject("Signature",AreaSectionType.ReportFooter,new Point(x1,220),new Size(500,20),"Signature of Guarantor: ____________________________________________",font,alignL));
 			if(!report.SubmitQueries()) {
 				return;
 			}
