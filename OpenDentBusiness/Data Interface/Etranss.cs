@@ -525,14 +525,14 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Etrans type will be figured out by this class.  Either TextReport, Acknowledge_997, Acknowledge_999, or StatusNotify_277.</summary>
-		public static void ProcessIncomingReport(DateTime dateTimeTrans,long clearinghouseNum,string messageText) {
+		public static void ProcessIncomingReport(DateTime dateTimeTrans,long hqClearinghouseNum,string messageText) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),dateTimeTrans,clearinghouseNum,messageText);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),dateTimeTrans,hqClearinghouseNum,messageText);
 				return;
 			}
 			Etrans etrans=new Etrans();
 			etrans.DateTimeTrans=dateTimeTrans;
-			etrans.ClearingHouseNum=clearinghouseNum;
+			etrans.ClearingHouseNum=hqClearinghouseNum;
 			EtransMessageText etransMessageText=new EtransMessageText();
 			etransMessageText.MessageText=messageText;
 			EtransMessageTexts.Insert(etransMessageText);
@@ -556,7 +556,7 @@ namespace OpenDentBusiness{
 						command="UPDATE etrans SET AckCode='"+batchack+"', "
 							+"AckEtransNum="+POut.Long(etrans.EtransNum)
 							+" WHERE BatchNumber="+POut.Long(etrans.BatchNumber)
-							+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+							+" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 							+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1))
 							+" AND AckEtransNum=0";
@@ -572,7 +572,7 @@ namespace OpenDentBusiness{
 									+"AckEtransNum="+POut.Long(etrans.EtransNum)
 									+" WHERE BatchNumber="+POut.Long(etrans.BatchNumber)
 									+" AND TransSetNum="+POut.Long(transNums[i])
-									+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+									+" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 									+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 									+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1))
 									+" AND AckEtransNum=0";
@@ -592,7 +592,7 @@ namespace OpenDentBusiness{
 					  command="UPDATE etrans SET AckCode='"+batchack+"', "
 					    +"AckEtransNum="+POut.Long(etrans.EtransNum)
 					    +" WHERE BatchNumber="+POut.Long(etrans.BatchNumber)
-					    +" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+					    +" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 					    +" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 					    +" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1))
 					    +" AND AckEtransNum=0";
@@ -608,7 +608,7 @@ namespace OpenDentBusiness{
 					        +"AckEtransNum="+POut.Long(etrans.EtransNum)
 					        +" WHERE BatchNumber="+POut.Long(etrans.BatchNumber)
 					        +" AND TransSetNum="+POut.Long(transNums[i])
-					        +" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+					        +" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 					        +" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 					        +" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1))
 					        +" AND AckEtransNum=0";
@@ -643,7 +643,7 @@ namespace OpenDentBusiness{
 							+"AckEtransNum="+POut.Long(etrans.EtransNum)
 							+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
 							+" AND ClaimNum="+POut.Long(claim.ClaimNum)
-							+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+							+" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 							+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 							+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
 						Db.NonQ(command);
@@ -683,7 +683,7 @@ namespace OpenDentBusiness{
 								+"AckEtransNum="+POut.Long(etrans.EtransNum)
 								+" WHERE EType IN (0,3) "//ClaimSent and Claim_Ren
 								+" AND ClaimNum="+POut.Long(claimNum)
-								+" AND ClearinghouseNum="+POut.Long(clearinghouseNum)
+								+" AND ClearinghouseNum="+POut.Long(hqClearinghouseNum)
 								+" AND DateTimeTrans > "+POut.DateT(dateTimeTrans.AddDays(-14))
 								+" AND DateTimeTrans < "+POut.DateT(dateTimeTrans.AddDays(1));
 							Db.NonQ(command);

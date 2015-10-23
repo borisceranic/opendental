@@ -19,13 +19,9 @@ namespace OpenDental.Eclaims{
 		}
 
 		///<summary>Called from Eclaims and includes multiple claims.</summary>
-		public static string SendBatch(List<ClaimSendQueueItem> queueItems,int batchNum) {
+		public static string SendBatch(Clearinghouse clearinghouseClin,List<ClaimSendQueueItem> queueItems,int batchNum) {
 			for(int i=0;i<queueItems.Count;i++) {
-				//A setting for the clearinghouse could have changed so we need to always refresh the clearinghouse variable before sending any batches.
-				if(i==0) {
-					Clearinghouse clearinghouseHq=Clearinghouses.GetClearinghouse(queueItems[i].ClearinghouseNum);
-					_clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
-				}
+				_clearinghouseClin=clearinghouseClin;
 				if(!CreateClaim(queueItems[i].PatNum,queueItems[i].ClaimNum,batchNum)) {
 					return "";
 				}

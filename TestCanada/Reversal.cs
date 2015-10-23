@@ -13,7 +13,11 @@ namespace TestCanada {
 			string retVal="";
 			InsPlan insPlan=InsPlans.GetPlan(claim.PlanNum,null);
 			InsSub insSub=InsSubs.GetOne(claim.InsSubNum);
-			long etransNum=CanadianOutput.SendClaimReversal(claim,insPlan,insSub);
+			Carrier carrier=Carriers.GetCarrier(insPlan.CarrierNum);
+			Clearinghouse clearinghouseHq=
+				Clearinghouses.GetClearinghouse(Clearinghouses.AutomateClearinghouseHqSelection(carrier.ElectID,claim.MedType));
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,claim.ClinicNum);
+			long etransNum=CanadianOutput.SendClaimReversal(clearinghouseClin,claim,insPlan,insSub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);

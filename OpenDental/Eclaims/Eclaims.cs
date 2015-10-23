@@ -18,9 +18,9 @@ namespace OpenDental.Eclaims
 			
 		}
 
-		///<summary>Supply a list of ClaimSendQueueItems. Called from FormClaimSend.  Can only send to one clearinghouse at a time.  Able to send just send one claim.  Cannot include Canadian.</summary>
-		public static void SendBatch(List<ClaimSendQueueItem> queueItems,Clearinghouse clearinghouseHq,EnumClaimMedType medType){
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+		///<summary>Supply a list of ClaimSendQueueItems.  Called from FormClaimSend.  Can only send to one clearinghouse at a time.
+		///The queueItems must contain at least one item.  Each item in queueItems must have the same ClinicNum.  Cannot include Canadian.</summary>
+		public static void SendBatch(Clearinghouse clearinghouseClin,List<ClaimSendQueueItem> queueItems,EnumClaimMedType medType){
 			string messageText="";
 			if(clearinghouseClin.Eformat==ElectronicClaimFormat.Canadian){
 				MsgBox.Show("Eclaims","Cannot send Canadian claims as part of Eclaims.SendBatch.");
@@ -34,13 +34,13 @@ namespace OpenDental.Eclaims
 				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_5010_dental
 				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837_5010_med_inst) 
 			{
-				messageText=x837Controller.SendBatch(queueItems,batchNum,clearinghouseClin,medType);
+				messageText=x837Controller.SendBatch(clearinghouseClin,queueItems,batchNum,medType);
 			}
 			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance){
-				messageText=Renaissance.SendBatch(queueItems,batchNum);
+				messageText=Renaissance.SendBatch(clearinghouseClin,queueItems,batchNum);
 			}
 			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Dutch) {
-				messageText=Dutch.SendBatch(queueItems,batchNum);
+				messageText=Dutch.SendBatch(clearinghouseClin,queueItems,batchNum);
 			}
 			else{
 				messageText="";//(ElectronicClaimFormat.None does not get sent)
@@ -139,7 +139,8 @@ namespace OpenDental.Eclaims
 				etransMsgText.MessageText=messageText;
 				EtransMessageTexts.Insert(etransMsgText);
 				for(int j=0;j<queueItems.Count;j++) {
-					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,clearinghouseHq.ClearinghouseNum,etype,batchNum);//use HQ clearinghousenum
+					Etrans etrans=Etranss.SetClaimSentOrPrinted(queueItems[j].ClaimNum,queueItems[j].PatNum,
+						clearinghouseClin.HqClearinghouseNum,etype,batchNum);
 					etrans.EtransMessageTextNum=etransMsgText.EtransMessageTextNum;
 					Etranss.Update(etrans);
 					//Now we need to update our cache of claims to reflect the change that took place in the database above in Etranss.SetClaimSentOrPrinted()
@@ -166,19 +167,17 @@ namespace OpenDental.Eclaims
 		}
 
 		///<summary>Fills the missing data field on the queueItem that was passed in.  This contains all missing data on this claim.  Claim will not be allowed to be sent electronically unless this string comes back empty.</summary>
-		public static void GetMissingData(ClaimSendQueueItem queueItem){//, out string warnings){
+		public static void GetMissingData(Clearinghouse clearinghouseClin,ClaimSendQueueItem queueItem) {//, out string warnings){
 			queueItem.Warnings="";
 			queueItem.MissingData="";
-			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum,true);//Suppress error message in case no default medical clearinghouse set.
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			//this is usually just the default clearinghouse or the clearinghouse for the PayorID.
-			if(clearinghouseClin==null){
+			if(clearinghouseClin==null) {
 				if(queueItem.MedType==EnumClaimMedType.Dental) {
 					queueItem.MissingData+="No default dental clearinghouse set.";
 				}
 				else {
 					queueItem.MissingData+="No default medical/institutional clearinghouse set.";
-				}				
+				}
 				return;
 			}
 			#region Data Sanity Checking (for Replication)
@@ -202,17 +201,16 @@ namespace OpenDental.Eclaims
 				}
 			}
 			#endregion Data Sanity Checking (for Replication)
-			if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_4010){
-				X837_4010.Validate(queueItem,FormOpenDental.ClinicNum);//,out warnings);
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_4010) {
+				X837_4010.Validate(clearinghouseClin,queueItem);//,out warnings);
 				//return;
 			}
 			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.x837D_5010_dental
-				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837_5010_med_inst)
-			{
-				X837_5010.Validate(queueItem,FormOpenDental.ClinicNum);//,out warnings);
+				|| clearinghouseClin.Eformat==ElectronicClaimFormat.x837_5010_med_inst) {
+				X837_5010.Validate(clearinghouseClin,queueItem);//,out warnings);
 				//return;
 			}
-			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance){
+			else if(clearinghouseClin.Eformat==ElectronicClaimFormat.Renaissance) {
 				queueItem.MissingData=Renaissance.GetMissingData(queueItem);
 				//return;
 			}

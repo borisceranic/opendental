@@ -21,7 +21,9 @@ namespace TestCanada {
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
 			//the UI would block this due to carrier not supporting this transaction type.
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);
@@ -45,7 +47,9 @@ namespace TestCanada {
 			PatPlan patplan=PatPlans.GetPatPlan(pat.PatNum,1);
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			//should print Eligibility response on Dentaide Form
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
@@ -70,7 +74,9 @@ namespace TestCanada {
 			PatPlan patplan=PatPlans.GetPatPlan(pat.PatNum,2);
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);
@@ -94,7 +100,9 @@ namespace TestCanada {
 			PatPlan patplan=PatPlans.GetPatPlan(pat.PatNum,1);
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);
@@ -118,7 +126,9 @@ namespace TestCanada {
 			PatPlan patplan=PatPlans.GetPatPlan(pat.PatNum,1);
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);
@@ -142,7 +152,9 @@ namespace TestCanada {
 			PatPlan patplan=PatPlans.GetPatPlan(pat.PatNum,1);
 			InsSub sub=InsSubs.GetOne(patplan.InsSubNum);
 			InsPlan plan=InsPlans.GetPlan(sub.PlanNum,new List<InsPlan>());
-			long etransNum=CanadianOutput.SendElegibility(pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,pat.ClinicNum);
+			long etransNum=CanadianOutput.SendElegibility(clearinghouseClin,pat.PatNum,plan,new DateTime(1999,1,1),patplan.Relationship,patplan.PatID,showForms,sub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);

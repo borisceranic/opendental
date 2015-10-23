@@ -12,8 +12,10 @@ namespace OpenDental {
 	public partial class FormCanadaPaymentReconciliation:Form {
 
 		List<Carrier> carriers=new List<Carrier>();
+		long _clinicNum;
 
-		public FormCanadaPaymentReconciliation() {
+		public FormCanadaPaymentReconciliation(long clinicNum) {
+			_clinicNum=clinicNum;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -73,8 +75,11 @@ namespace OpenDental {
 			}
 			Cursor=Cursors.WaitCursor;
 			try {
-				CanadianOutput.GetPaymentReconciliations(carriers[listCarriers.SelectedIndex],ProviderC.ListShort[listTreatingProvider.SelectedIndex],
-					ProviderC.ListShort[listBillingProvider.SelectedIndex],reconciliationDate);
+				Carrier carrier=carriers[listCarriers.SelectedIndex];
+				Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum); 
+				CanadianOutput.GetPaymentReconciliations(clearinghouseClin,carrier,ProviderC.ListShort[listTreatingProvider.SelectedIndex],
+					ProviderC.ListShort[listBillingProvider.SelectedIndex],reconciliationDate,_clinicNum);
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"Done.");
 			}

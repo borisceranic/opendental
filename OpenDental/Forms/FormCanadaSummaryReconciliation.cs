@@ -12,8 +12,10 @@ namespace OpenDental {
 	public partial class FormCanadaSummaryReconciliation:Form {
 
 		List<Carrier> carriers=new List<Carrier>();
+		long _clinicNum;
 
-		public FormCanadaSummaryReconciliation() {
+		public FormCanadaSummaryReconciliation(long clinicNum) {
+			_clinicNum=clinicNum;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -77,14 +79,24 @@ namespace OpenDental {
 					carrier.CDAnetVersion="04";
 					carrier.ElectID="999999";//The whole ITRANS network.
 					carrier.CanadianEncryptionMethod=1;//No encryption.
-					CanadianOutput.GetSummaryReconciliation(carrier,null,ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
+					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+					CanadianOutput.GetSummaryReconciliation(clearinghouseClin,carrier,null,
+						ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
 				}
 				else {
 					if(listCarriers.SelectedIndex>=0) {
-						CanadianOutput.GetSummaryReconciliation(carriers[listCarriers.SelectedIndex],null,ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
+						Carrier carrier=carriers[listCarriers.SelectedIndex];
+						Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+						Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+						CanadianOutput.GetSummaryReconciliation(clearinghouseClin,carrier,null,
+							ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
 					}
 					else {
-						CanadianOutput.GetSummaryReconciliation(null,CanadianNetworks.Listt[listNetworks.SelectedIndex],ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
+						Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(null);
+						Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+						CanadianOutput.GetSummaryReconciliation(clearinghouseClin,null,CanadianNetworks.Listt[listNetworks.SelectedIndex],
+							ProviderC.ListShort[listTreatingProvider.SelectedIndex],reconciliationDate);
 					}
 				}
 				Cursor=Cursors.Default;

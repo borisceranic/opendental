@@ -441,14 +441,16 @@ namespace TestCanada {
 		public static string Run(int scriptNum,string responseExpected,string responseTypeExpected,Claim claim,bool showForms) {
 			string retVal="";
 			ClaimSendQueueItem queueItem=Claims.GetQueueList(claim.ClaimNum,claim.ClinicNum,0)[0];
-			Eclaims.GetMissingData(queueItem);//,out warnings);
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItem.ClearinghouseNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,queueItem.ClinicNum);
+			Eclaims.GetMissingData(clearinghouseClin,queueItem);//,out warnings);
 			if(queueItem.MissingData!="") {
 				return "Cannot send claim until missing data is fixed:\r\n"+queueItem.MissingData+"\r\n";
 			}
 #if DEBUG
 			Canadian.testNumber=scriptNum;
 #endif
-			long etransNum=Canadian.SendClaim(queueItem,showForms);
+			long etransNum=Canadian.SendClaim(clearinghouseClin,queueItem,showForms);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);
 			CCDFieldInputter formData=new CCDFieldInputter(message);

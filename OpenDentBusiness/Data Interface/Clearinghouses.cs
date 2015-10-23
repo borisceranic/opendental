@@ -123,8 +123,8 @@ namespace OpenDentBusiness{
 			return listClearinghouses;
 		}
 
-		///<summary>Inserts this clearinghouse into database.  You may use this if you know that your clearinghouse will be inserted at the HQ-level,
-		///or if you alreayd have a well-defined clinic-level clearinghouse.  Otherwise, you should use InsertOrUpdateForClinic instead.</summary>
+		///<summary>Inserts one clearinghouse into the database.  Use this if you know that your clearinghouse will be inserted at the HQ-level,
+		///or if you already have a well-defined clinic-level clearinghouse.  For lists of clearinghouses, use the Sync method instead.</summary>
 		public static long Insert(Clearinghouse clearinghouse){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				clearinghouse.ClearinghouseNum=Meth.GetLong(MethodBase.GetCurrentMethod(),clearinghouse);
@@ -134,8 +134,8 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Updates the clearinghouse in the database that has the same primary key as the passed-in clearinghouse.   
-		///You may use this if you know that your clearinghouse will be updated at the HQ-level, 
-		///or if you alreayd have a well-defined clinic-level clearinghouse.  Otherwise, you should use InsertOrUpdateForClinic instead. </summary>
+		///Use this if you know that your clearinghouse will be updated at the HQ-level, 
+		///or if you already have a well-defined clinic-level clearinghouse.  For lists of clearinghouses, use the Sync method instead.</summary>
 		public static void Update(Clearinghouse clearinghouse){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),clearinghouse);
@@ -152,107 +152,6 @@ namespace OpenDentBusiness{
 			Crud.ClearinghouseCrud.Update(clearinghouse,oldClearinghouse);
 		}
 
-		///<summary>Inserts a clinic as HQ if the passed-in clearinghouseClin.ClearinghouseNum==0, otherwise updates.
-		///Only certain fields get updated in the clinic-level clearinghouse. All other fields are updated as HQ.
-		///clearinghouseClin.ClinicNum must be set to the correct clinic before this method is called.   
-		///The passed-in clearinghouses are set to the values that are put into the database for caching purposes.</summary>
-		//public static void InsertOrUpdateForClinic(Clearinghouse clearinghouseHq,Clearinghouse clearinghouseClin) {
-		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-		//		Meth.GetVoid(MethodBase.GetCurrentMethod(),clearinghouseHq,clearinghouseClin);
-		//		return;
-		//	}
-		//	//HQ unconditional values.  Copies values the user typed in from the clinic and overrides HQ values.  This maintains old behavior.
-		//	clearinghouseHq.Description=clearinghouseClin.Description;
-		//	clearinghouseClin.Description="";
-		//	clearinghouseHq.Payors=clearinghouseClin.Payors;
-		//	clearinghouseClin.Payors="";
-		//	clearinghouseHq.Eformat=clearinghouseClin.Eformat;
-		//	clearinghouseClin.Eformat=ElectronicClaimFormat.None;
-		//	clearinghouseHq.ISA05=clearinghouseClin.ISA05;
-		//	clearinghouseClin.ISA05="";
-		//	clearinghouseHq.ISA07=clearinghouseClin.ISA07;
-		//	clearinghouseClin.ISA07="";
-		//	clearinghouseHq.ISA08=clearinghouseClin.ISA08;
-		//	clearinghouseClin.ISA08="";
-		//	clearinghouseHq.ISA15=clearinghouseClin.ISA15;
-		//	clearinghouseClin.ISA15="";
-		//	clearinghouseHq.CommBridge=clearinghouseClin.CommBridge;
-		//	clearinghouseClin.CommBridge=EclaimsCommBridge.None;
-		//	//clearinghouseHq.LastBatchNumber=;//Not editable is UI and should not be updated here.  See GetNextBatchNumber() above.
-		//	clearinghouseHq.ModemPort=clearinghouseClin.ModemPort;
-		//	clearinghouseClin.ModemPort=0;
-		//	clearinghouseHq.GS03=clearinghouseClin.GS03;
-		//	clearinghouseClin.GS03="";
-		//	clearinghouseHq.ISA02=clearinghouseClin.ISA02;
-		//	clearinghouseClin.ISA02="";
-		//	clearinghouseHq.ISA04=clearinghouseClin.ISA04;
-		//	clearinghouseClin.ISA04="";
-		//	clearinghouseHq.ISA16=clearinghouseClin.ISA16;
-		//	clearinghouseClin.ISA16="";
-		//	clearinghouseHq.SeparatorData=clearinghouseClin.SeparatorData;
-		//	clearinghouseClin.SeparatorData="";
-		//	clearinghouseHq.SeparatorSegment=clearinghouseClin.SeparatorSegment;
-		//	clearinghouseClin.SeparatorSegment="";
-		//	//Clinic unconditional values
-		//	clearinghouseClin.HqClearinghouseNum=clearinghouseHq.ClearinghouseNum;
-		//	//Clinic override values
-		//	if(clearinghouseClin.ExportPath==clearinghouseHq.ExportPath) {
-		//		clearinghouseClin.ExportPath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.SenderTIN==clearinghouseHq.SenderTIN) {
-		//		clearinghouseClin.SenderTIN="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.Password==clearinghouseHq.Password) {
-		//		clearinghouseClin.Password="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.ResponsePath==clearinghouseHq.ResponsePath) {
-		//		clearinghouseClin.ResponsePath="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.ClientProgram==clearinghouseHq.ClientProgram) {
-		//		clearinghouseClin.ClientProgram="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.LoginID==clearinghouseHq.LoginID) {
-		//		clearinghouseClin.LoginID="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.SenderName==clearinghouseHq.SenderName) {
-		//		clearinghouseClin.SenderName="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.SenderTelephone==clearinghouseHq.SenderTelephone) {
-		//		clearinghouseClin.SenderTelephone="";//The value is the same as the default.  Save blank so that default can be updated dynamically.
-		//	}
-		//	else {
-		//		//Maintain the override value that the user typed.
-		//	}
-		//	if(clearinghouseClin.ClearinghouseNum==0) {
-		//		Crud.ClearinghouseCrud.Insert(clearinghouseClin);
-		//	}
-		//	else {
-		//		Crud.ClearinghouseCrud.Update(clearinghouseClin);
-		//	}
-		//	Crud.ClearinghouseCrud.Update(clearinghouseHq);
-		//}
-
 		///<summary>Deletes the passed-in Hq clearinghouse for all clinics.  Only pass in clearinghouses with ClinicNum==0.</summary>
 		public static void Delete(Clearinghouse clearinghouseHq){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -265,23 +164,20 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>Gets the last batch number for this clearinghouse and increments it by one.  Saves the new value, then returns it.
-		///So even if the new value is not used for some reason, it will have already been incremented.
-		///Remember that LastBatchNumber is never accurate with local data in memory.  The clearinghouse can be HQ or clinic level.</summary>
-		public static int GetNextBatchNumber(Clearinghouse clearinghouse){
+		///<summary>Gets the last batch number from db for the HQ version of this clearinghouseClin and increments it by one.
+		///Then saves the new value to db and returns it.  So even if the new value is not used for some reason, it will have already been incremented.
+		///Remember that LastBatchNumber is never accurate with local data in memory.</summary>
+		public static int GetNextBatchNumber(Clearinghouse clearinghouseClin){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),clearinghouse);
-			}
-			if(clearinghouse.HqClearinghouseNum!=0) {//Clinic level clearinghouse.
-				clearinghouse=Clearinghouses.GetClearinghouse(clearinghouse.HqClearinghouseNum);//Use the HQ clearinghouse instead.  Gets from cache.
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),clearinghouseClin);
 			}
 			//get last batch number
 			string command="SELECT LastBatchNumber FROM clearinghouse "
-				+"WHERE ClearinghouseNum = "+POut.Long(clearinghouse.ClearinghouseNum);
+				+"WHERE ClearinghouseNum = "+POut.Long(clearinghouseClin.HqClearinghouseNum);
  			DataTable table=Db.GetTable(command);
 			int batchNum=PIn.Int(table.Rows[0][0].ToString());
 			//and increment it by one
-			if(clearinghouse.Eformat==ElectronicClaimFormat.Canadian){
+			if(clearinghouseClin.Eformat==ElectronicClaimFormat.Canadian){
 				if(batchNum==999999){
 					batchNum=1;
 				}
@@ -299,7 +195,7 @@ namespace OpenDentBusiness{
 			}
 			//save the new batch number. Even if user cancels, it will have incremented.
 			command="UPDATE clearinghouse SET LastBatchNumber="+batchNum.ToString()
-				+" WHERE ClearinghouseNum = "+POut.Long(clearinghouse.ClearinghouseNum);
+				+" WHERE ClearinghouseNum = "+POut.Long(clearinghouseClin.HqClearinghouseNum);
 			Db.NonQ(command);
 			return batchNum;
 		}
@@ -373,6 +269,14 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM clearinghouse WHERE HqClearinghouseNum="+clearinghouseHq.ClearinghouseNum+" AND ClinicNum="+clinicNum;
 			return Crud.ClearinghouseCrud.SelectOne(command);
+		}
+
+		///<summary>Replaces all clinic-level fields in ClearinghouseHq with non-blank fields 
+		///from the clinic-level clearinghouse for the passed-in clinicNum. Non clinic-level fields are not replaced.</summary>
+		public static Clearinghouse OverrideFields(Clearinghouse clearinghouseHq,long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			Clearinghouse clearinghouseClin=Clearinghouses.GetForClinic(clearinghouseHq,clinicNum);
+			return OverrideFields(clearinghouseHq,clearinghouseClin);
 		}
 
 		///<summary>Replaces all clinic-level fields in ClearinghouseHq with non-blank fields in clearinghouseClin.

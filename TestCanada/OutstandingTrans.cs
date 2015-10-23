@@ -11,7 +11,9 @@ namespace TestCanada {
 		private static string Run(int scriptNum,bool version2,bool sendToItrans,Carrier carrier,out List <Etrans> etransRequests) { 
 			string retVal="";
 			Provider prov=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-			etransRequests=CanadianOutput.GetOutstandingTransactions(version2,sendToItrans,carrier,prov,false);
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,OpenDental.FormOpenDental.ClinicNum);
+			etransRequests=CanadianOutput.GetOutstandingTransactions(clearinghouseClin,version2,sendToItrans,carrier,prov,false);
 			retVal+="Outstanding Transactions#"+scriptNum.ToString()+" successful.\r\n";
 			return retVal;
 		}

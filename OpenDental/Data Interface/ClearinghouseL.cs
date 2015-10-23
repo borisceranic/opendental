@@ -11,12 +11,12 @@ namespace OpenDental{
 		///<summary>Returns the clearinghouse specified by the given num.  Will only return an HQ-level clearinghouse.
 		///Do not attempt to pass in a clinic-level clearinghouseNum.</summary>
 		public static Clearinghouse GetClearinghouseHq(long hqClearinghouseNum) {
-			return GetClearinghouse(hqClearinghouseNum,false);
+			return GetClearinghouseHq(hqClearinghouseNum,false);
 		}
 
 		///<summary>Returns the clearinghouse specified by the given num.  Will only return an HQ-level clearinghouse.
 		///Do not attempt to pass in a clinic-level clearinghouseNum.</summary>
-		public static Clearinghouse GetClearinghouse(long hqClearinghouseNum,bool suppressError) {
+		public static Clearinghouse GetClearinghouseHq(long hqClearinghouseNum,bool suppressError) {
 			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			for(int i=0;i<arrayClearinghouses.Length;i++){
 				if(arrayClearinghouses[i].ClearinghouseNum==hqClearinghouseNum) {

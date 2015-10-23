@@ -2512,21 +2512,13 @@ namespace OpenDentBusiness
 
 		///<summary>Returns a string describing all missing data on this claim.
 		///Claim will not be allowed to be sent electronically unless this string comes back empty.
-		///There is also an out parameter containing any warnings.  Warnings will not block sending.  clinicNum can be zero for HQ.</summary>
-		public static void Validate(ClaimSendQueueItem queueItem,long clinicNum){//,out string warning) {
+		///There is also an out parameter containing any warnings.  Warnings will not block sending.</summary>
+		public static void Validate(Clearinghouse clearinghouseClin,ClaimSendQueueItem queueItem){//,out string warning) {
 			StringBuilder strb=new StringBuilder();
 			string warning="";
-			Clearinghouse clearinghouseHq=null;//ClearinghouseL.GetClearinghouse(queueItem.ClearinghouseNum);
-			Clearinghouse[] arrayClearinghousesHq=Clearinghouses.GetHqListt();
-			for(int i=0;i<arrayClearinghousesHq.Length;i++) {
-				if(arrayClearinghousesHq[i].ClearinghouseNum==queueItem.ClearinghouseNum) {
-					clearinghouseHq=arrayClearinghousesHq[i];
-				}
-			}
-			if(clearinghouseHq==null) {
+			if(clearinghouseClin==null) {
 				throw new ApplicationException("Error. Could not locate Clearinghouse.");
 			}
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,clinicNum));
 			Claim claim=Claims.GetClaim(queueItem.ClaimNum);
 			Clinic clinic=Clinics.GetClinic(claim.ClinicNum);
 			//if(clearhouse.Eformat==ElectronicClaimFormat.X12){//not needed since this is always true

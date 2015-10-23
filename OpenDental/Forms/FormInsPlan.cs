@@ -3170,6 +3170,8 @@ namespace OpenDental{
 				MsgBox.Show(this,"Eligibility not supported by this carrier.");
 				return;
 			}
+			Clearinghouse clearinghouseHq=Eclaims.Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			Cursor=Cursors.WaitCursor;
 			//string result="";
 			DateTime date=DateTime.Today;
@@ -3179,7 +3181,7 @@ namespace OpenDental{
 			Relat relat=(Relat)comboRelationship.SelectedIndex;
 			string patID=textPatID.Text;
 			try {
-				Eclaims.CanadianOutput.SendElegibility(PatPlanCur.PatNum,PlanCur,date,relat,patID,true,_subCur);//   textElectID.Text,PatPlanCur.PatNum,textGroupNum.Text,textDivisionNo.Text,
+				Eclaims.CanadianOutput.SendElegibility(clearinghouseClin,PatPlanCur.PatNum,PlanCur,date,relat,patID,true,_subCur);
 				//textSubscriberID.Text,textPatID.Text,(Relat)comboRelationship.SelectedIndex,PlanCur.Subscriber,textDentaide.Text);
 				//printout will happen in the line above.
 			}
@@ -3530,7 +3532,8 @@ namespace OpenDental{
 			}
 			Cursor=Cursors.WaitCursor;
 			try {
-				Eclaims.x270Controller.RequestBenefits(clearinghouseHq,PlanCur,PatPlanCur.PatNum,CarrierCur,benefitList,PatPlanCur.PatPlanNum,_subCur);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+				Eclaims.x270Controller.RequestBenefits(clearinghouseClin,PlanCur,PatPlanCur.PatNum,CarrierCur,benefitList,PatPlanCur.PatPlanNum,_subCur);
 			}
 			catch(Exception ex) {//although many errors will be caught and result in a response etrans.
 				//this also catches validation errors such as missing info.
@@ -3584,8 +3587,7 @@ namespace OpenDental{
 			string passWord;
 			// Get Login / Password
 			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,
-				Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			if(clearinghouseHq!=null) {
 				loginID=clearinghouseClin.LoginID;
 				passWord=clearinghouseClin.Password;

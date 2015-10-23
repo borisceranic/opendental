@@ -50,8 +50,9 @@ namespace OpenDental.Eclaims
 			}
 		}
 
-		///<summary>Called from Eclaims and includes multiple claims.  Returns the string that was sent.  The string needs to be parsed to determine the transaction numbers used for each claim.</summary>
-		public static string SendBatch(List<ClaimSendQueueItem> queueItems,int batchNum,Clearinghouse clearinghouseClin,EnumClaimMedType medType) { //called from Eclaims.cs. Clinic-level clearinghouse passed in.
+		///<summary>Called from Eclaims and includes multiple claims.  Returns the string that was sent.  
+		///The string needs to be parsed to determine the transaction numbers used for each claim.</summary>
+		public static string SendBatch(Clearinghouse clearinghouseClin,List<ClaimSendQueueItem> queueItems,int batchNum,EnumClaimMedType medType) {
 			//each batch is already guaranteed to be specific to one clearinghouse, one clinic, and one EnumClaimMedType
 			//Clearinghouse clearhouse=ClearinghouseL.GetClearinghouse(queueItems[0].ClearinghouseNum);
 			string saveFile=GetFileName(clearinghouseClin,batchNum);

@@ -10,8 +10,7 @@ namespace OpenDental.Eclaims {
 	public class x270Controller {
 
 		///<summary>The insplan that's passed in need not be properly updated to the database first.</summary>
-		public static void RequestBenefits(Clearinghouse clearinghouseHq,InsPlan plan,long patNum,Carrier carrier,List<Benefit> benList,long patPlanNum,InsSub insSub) {
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
+		public static void RequestBenefits(Clearinghouse clearinghouseClin,InsPlan plan,long patNum,Carrier carrier,List<Benefit> benList,long patPlanNum,InsSub insSub) {
 			Patient pat=Patients.GetPat(patNum);
 			Patient subsc=Patients.GetPat(insSub.Subscriber);
 			Clinic clinic=Clinics.GetClinic(pat.ClinicNum);
@@ -29,7 +28,7 @@ namespace OpenDental.Eclaims {
 			//attach it to an etrans-------------------------------------------------------------
 			Etrans etrans=new Etrans();
 			etrans.DateTimeTrans=DateTime.Now;
-			etrans.ClearingHouseNum=clearinghouseHq.ClearinghouseNum;//use HQ clearinghousenum
+			etrans.ClearingHouseNum=clearinghouseClin.HqClearinghouseNum;
 			etrans.Etype=EtransType.BenefitInquiry270;
 			etrans.PlanNum=plan.PlanNum;
 			etrans.InsSubNum=insSub.InsSubNum;
@@ -85,7 +84,7 @@ namespace OpenDental.Eclaims {
 			EtransMessageTexts.Insert(etransMessageText);
 			Etrans etrans271=new Etrans();
 			etrans271.DateTimeTrans=DateTime.Now;
-			etrans271.ClearingHouseNum=clearinghouseHq.ClearinghouseNum;//use HQ clearinghousenum
+			etrans271.ClearingHouseNum=clearinghouseClin.HqClearinghouseNum;
 			etrans271.Etype=EtransType.TextReport;
 			if(X12object.IsX12(x12response)) {//this shouldn't need to be tested because it was tested above.
 				if(x271==null){

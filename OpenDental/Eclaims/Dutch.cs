@@ -10,24 +10,24 @@ using CodeBase;
 namespace OpenDental.Eclaims {
 	public class Dutch {
 
-		///<summary>Called from Eclaims and includes multiple claims.  This should return the text of the file that was sent so that it can be saved inthe db.  If this returns an empty result, then claims won't be marked as sent.  The problem is that we create multiple files here.</summary>
-		public static string SendBatch(List<ClaimSendQueueItem> queueItems,int batchNum) {
+		///<summary>Called from Eclaims and includes multiple claims.  This should return the text of the file that was sent so that it can be saved in 
+		///the db.  If this returns an empty result, then claims won't be marked as sent.  The problem is that we create multiple files here.</summary>
+		public static string SendBatch(Clearinghouse clearinghouseClin,List<ClaimSendQueueItem> queueItems,int batchNum) {
 			//We assume for now one file per claim.
 			for(int i=0;i<queueItems.Count;i++) {
-				if(!CreateClaim(queueItems[i],batchNum)) {
+				if(!CreateClaim(clearinghouseClin,queueItems[i],batchNum)) {
 					return "";
 				}
 			}
 			return "Sent";//no need to translate.  User will not see.
 		}
 
-		///<summary>Called once for each claim to be created.  For claims with a lot of procedures, this may actually create multiple claims.  Normally returns empty string unless something went wrong.</summary>
-		public static bool CreateClaim(ClaimSendQueueItem queueItem,int batchNum) {
+		///<summary>Called once for each claim to be created.  For claims with a lot of procedures, this may actually create multiple claims.  
+		///Normally returns empty string unless something went wrong.</summary>
+		public static bool CreateClaim(Clearinghouse clearinghouseClin,ClaimSendQueueItem queueItem,int batchNum) {
 			StringBuilder strb=new StringBuilder();
 			string t="\t";
 			strb.Append("110\t111\t112\t118\t203/403\tF108/204/404\t205/405\t206\t207\t208\t209\t210\t211\t212\t215\t217\t219\t406\t408\t409\t410\t411\t413\t414\t415\t416\t418\t419\t420\t421\t422\t423\t424\t425\t426\t428\t429\t430\t432\t433\r\n");
-			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItem.ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clearinghouses.GetForClinic(clearinghouseHq,FormOpenDental.ClinicNum));
 			Claim claim=Claims.GetClaim(queueItem.ClaimNum);
 			Provider provBill=Providers.GetProv(claim.ProvBill);
 			Patient pat=Patients.GetPat(claim.PatNum);

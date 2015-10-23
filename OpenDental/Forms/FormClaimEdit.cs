@@ -5632,18 +5632,19 @@ namespace OpenDental{
 				//Later: we need to let user send anyway, using all 0's for electronic id.
 				return;
 			}
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			//string warnings;
 			//string missingData=
-			Eclaims.Eclaims.GetMissingData(listQueue[0]);//,out warnings);
+			Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
 			if(listQueue[0].MissingData!=""){
 				MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData);
 				return;
 			}
-			Cursor=Cursors.WaitCursor;
-			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
+			Cursor=Cursors.WaitCursor;			
 			if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian) {
 				try {
-					Eclaims.Canadian.SendClaim(listQueue[0],true);//Ignore the etransNum result. Physically print the form.
+					Eclaims.Canadian.SendClaim(clearinghouseClin,listQueue[0],true);//Ignore the etransNum result. Physically print the form.
 				}
 				catch(ApplicationException ex){
 					//Custom error messages are thrown as ApplicationExceptions in SendClaim().
@@ -5668,7 +5669,7 @@ namespace OpenDental{
 				List<ClaimSendQueueItem> queueItems=new List<ClaimSendQueueItem>();
 				queueItems.Add(listQueue[0]);
 				EnumClaimMedType medType=listQueue[0].MedType;
-				Eclaims.Eclaims.SendBatch(queueItems,clearinghouseHq,medType);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
+				Eclaims.Eclaims.SendBatch(clearinghouseClin,queueItems,medType);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
 			}
 			Cursor=Cursors.Default;
 			DialogResult=DialogResult.OK;
@@ -5704,8 +5705,11 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			InsPlan insPlan=InsPlans.GetPlan(ClaimCur.PlanNum,null);
 			InsSub insSub=InsSubs.GetOne(ClaimCur.InsSubNum);
+			Carrier carrier=Carriers.GetCarrier(insPlan.CarrierNum);
+			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			try {
-				long etransNumAck=CanadianOutput.SendClaimReversal(ClaimCur,insPlan,insSub);
+				long etransNumAck=CanadianOutput.SendClaimReversal(clearinghouseClin,ClaimCur,insPlan,insSub);
 				Etrans etransAck=Etranss.GetEtrans(etransNumAck);
 				if(etransAck.AckCode!="R") {
 					//If the claim was successfully reversed, clear the claim transaction reference number so the user can resend the claim if desired.
@@ -5912,7 +5916,9 @@ namespace OpenDental{
 				}
 				//string warnings;
 				//string missingData=
-				Eclaims.Eclaims.GetMissingData(listQueue[0]);//,out warnings);
+				Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,ClaimCur.ClinicNum);
+				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
 				if(listQueue[0].MissingData!="") {
 					if(MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData+"\r\n\r\nContinue anyway?",
 						"",MessageBoxButtons.OKCancel)==DialogResult.OK)

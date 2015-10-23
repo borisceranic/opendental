@@ -498,7 +498,7 @@ namespace OpenDental{
 				//Does not pull in reports automatically, because they could easily get assigned to the wrong clearinghouse
 			}
 			else{
-				FormClaimReports FormC=new FormClaimReports();
+				FormClaimReports FormC=new FormClaimReports(FormOpenDental.ClinicNum); //the currently selected clinic is what the combobox defaults to.
 				FormC.AutomaticMode=true;
 				FormC.ShowDialog();
 			}
@@ -641,8 +641,8 @@ namespace OpenDental{
 
 		private void menuItemClearinghouse_Click(object sender, System.EventArgs e){
 			MenuItem menuitem=(MenuItem)sender;
-			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
-			SendEclaimsToClearinghouse(arrayClearinghouses[menuitem.Index].ClearinghouseNum);
+			Clearinghouse[] arrayHqClearinghouses=Clearinghouses.GetHqListt();
+			SendEclaimsToClearinghouse(arrayHqClearinghouses[menuitem.Index].ClearinghouseNum);
 		}
 
 		private void FillGrid() {
@@ -968,19 +968,19 @@ namespace OpenDental{
 		}
 
 		///<Summary>Use clearinghouseNum of 0 to indicate automatic calculation of clearinghouses.</Summary>
-		private void SendEclaimsToClearinghouse(long clearinghouseNum) {
+		private void SendEclaimsToClearinghouse(long hqClearinghouseNum) {
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics is in use
-				if(clearinghouseNum==0){
+				if(hqClearinghouseNum==0){
 					MsgBox.Show(this,"When the Clinics option is enabled, you must use the dropdown list to select the clearinghouse to send to.");
 					return;
 				}
 			}
 			Clearinghouse clearDefault;
-			if(clearinghouseNum==0){
+			if(hqClearinghouseNum==0){
 				clearDefault=Clearinghouses.GetDefaultDental();
 			}
 			else{
-				clearDefault=ClearinghouseL.GetClearinghouseHq(clearinghouseNum);
+				clearDefault=ClearinghouseL.GetClearinghouseHq(hqClearinghouseNum);
 			}
 			if(clearDefault!=null && clearDefault.ISA08=="113504607" && Process.GetProcessesByName("TesiaLink").Length==0){
 				#if DEBUG
@@ -995,14 +995,14 @@ namespace OpenDental{
 			if(gridMain.SelectedIndices.Length==0){//if none are selected
 				for(int i=0;i<_arrayQueueFiltered.Length;i++) {//loop through all rows
 					if(!_arrayQueueFiltered[i].NoSendElect) {
-						if(clearinghouseNum==0) {//they did not use the dropdown list for specific clearinghouse
+						if(hqClearinghouseNum==0) {//they did not use the dropdown list for specific clearinghouse
 							//If clearinghouse is zero because they just pushed the button instead of using the dropdown list,
 							//then don't check the clearinghouse of each claim.  Just select them if they are electronic.
 							gridMain.SetSelected(i,true);
 						}
 						else {//if they used the dropdown list,
 							//then first, try to only select items in the list that match the clearinghouse.
-							if(_arrayQueueFiltered[i].ClearinghouseNum==clearinghouseNum) {
+							if(_arrayQueueFiltered[i].ClearinghouseNum==hqClearinghouseNum) {
 								gridMain.SetSelected(i,true);
 							}
 						}
@@ -1010,7 +1010,7 @@ namespace OpenDental{
 				}
 				//If they used the dropdown list, and there still aren't any in the list that match the selected clearinghouse
 				//then ask user if they want to send all of the electronic ones through this clearinghouse.
-				if(clearinghouseNum!=0 && gridMain.SelectedIndices.Length==0) {
+				if(hqClearinghouseNum!=0 && gridMain.SelectedIndices.Length==0) {
 					if(comboClinic.SelectedIndex==0) {
 						MsgBox.Show(this,"Please filter by clinic first.");
 						return;
@@ -1028,7 +1028,7 @@ namespace OpenDental{
 					MsgBox.Show(this,"No claims to send.");
 					return;
 				}
-				if(clearinghouseNum!=0){//if they used the dropdown list to specify clearinghouse
+				if(hqClearinghouseNum!=0){//if they used the dropdown list to specify clearinghouse
 					int[] selectedindices=(int[])gridMain.SelectedIndices.Clone();
 					for(int i=0;i<selectedindices.Length;i++) {
 						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
@@ -1048,7 +1048,7 @@ namespace OpenDental{
 				}
 			}
 			else {//some rows were manually selected by the user
-				if(clearinghouseNum!=0) {//if they used the dropdown list to specify clearinghouse
+				if(hqClearinghouseNum!=0) {//if they used the dropdown list to specify clearinghouse
 					int[] selectedindices=(int[])gridMain.SelectedIndices.Clone();
 					for(int i=0;i<selectedindices.Length;i++) {
 						Clearinghouse clearRow=Clearinghouses.GetClearinghouse(_arrayQueueFiltered[selectedindices[i]].ClearinghouseNum);
@@ -1114,17 +1114,18 @@ namespace OpenDental{
 			ClaimSendQueueItem queueitem;
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				queueitem=_arrayQueueFiltered[gridMain.SelectedIndices[i]].Copy();
-				if(clearinghouseNum!=0) {
-					queueitem.ClearinghouseNum=clearinghouseNum;
+				if(hqClearinghouseNum!=0) {
+					queueitem.ClearinghouseNum=hqClearinghouseNum;
 				}
 				queueItems.Add(queueitem);
 			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItems[0].ClearinghouseNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,queueItems[0].ClinicNum);
 			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
 			Cursor=Cursors.WaitCursor;
-			Eclaims.Eclaims.SendBatch(queueItems,clearinghouseHq,medType);
+			Eclaims.Eclaims.SendBatch(clearinghouseClin,queueItems,medType);
 			Cursor=Cursors.Default;
 			//Loop through _listQueueAll and remove all items that were sent.
 			List<ClaimSendQueueItem> listTempQueueItem=new List<ClaimSendQueueItem>(_arrayQueueAll);
@@ -1158,8 +1159,10 @@ namespace OpenDental{
 			//Only get a list of non-validated e-claims from the list passed in.
 			List<ClaimSendQueueItem> listClaimsToValidate=listClaimSendQueueItems.FindAll(x => !x.IsValid && !x.NoSendElect);
 			//Loop through and validate all claims.
+			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listClaimsToValidate[0].ClearinghouseNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,listClaimsToValidate[0].ClinicNum);
 			for(int i=0;i<listClaimsToValidate.Count;i++) {
-				Eclaims.Eclaims.GetMissingData(listClaimsToValidate[i]);
+				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listClaimsToValidate[i]);
 				if(listClaimsToValidate[i].MissingData=="") {
 					listClaimsToValidate[i].IsValid=true;
 				}
@@ -1177,24 +1180,60 @@ namespace OpenDental{
 			Cursor.Current=Cursors.Default;
 		}
 
-		private void toolBarButReports_Click(){
-			FormClaimReports FormC=new FormClaimReports();
+		private void toolBarButReports_Click() {
+			long clinicNum=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex!=0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
+				}
+				else if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+			}
+			FormClaimReports FormC=new FormClaimReports(clinicNum);
 			FormC.ShowDialog();
 			FillHistory();//To show 277s after imported.
 		}
 
 		private void toolBarButOutstanding_Click() {
-			FormCanadaOutstandingTransactions fcot=new FormCanadaOutstandingTransactions();
+			long clinicNum=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex!=0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
+				}
+				else if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+			}
+			FormCanadaOutstandingTransactions fcot=new FormCanadaOutstandingTransactions(clinicNum);
 			fcot.ShowDialog();
 		}
 
 		private void toolBarButPayRec_Click() {
-			FormCanadaPaymentReconciliation fcpr=new FormCanadaPaymentReconciliation();
+			long clinicNum=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex!=0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
+				}
+				else if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+			}
+			FormCanadaPaymentReconciliation fcpr=new FormCanadaPaymentReconciliation(clinicNum);
 			fcpr.ShowDialog();
 		}
 
 		private void toolBarButSummaryRec_Click() {
-			FormCanadaSummaryReconciliation fcsr=new FormCanadaSummaryReconciliation();
+			long clinicNum=0;
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex!=0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
+				}
+				else if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+			}
+			FormCanadaSummaryReconciliation fcsr=new FormCanadaSummaryReconciliation(clinicNum);
 			fcsr.ShowDialog();
 		}
 

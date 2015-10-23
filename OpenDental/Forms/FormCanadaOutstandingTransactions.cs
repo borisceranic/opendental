@@ -12,8 +12,10 @@ namespace OpenDental {
 	public partial class FormCanadaOutstandingTransactions:Form {
 
 		List<Carrier> carriers=new List<Carrier>();
+		private long _clinicNum;
 
-		public FormCanadaOutstandingTransactions() {
+		public FormCanadaOutstandingTransactions(long clinicNum) {
+			_clinicNum=clinicNum;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -82,13 +84,20 @@ namespace OpenDental {
 			}
 			try {
 				if(radioVersion2.Checked) {
-					CanadianOutput.GetOutstandingTransactions(true,false,null,prov,false);
+					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(null);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,true,false,null,prov,false);
 				}
 				else if(radioVersion4Itrans.Checked) {
-					CanadianOutput.GetOutstandingTransactions(false,true,null,prov,false);
+					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(null);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,false,true,null,prov,false);
 				}
 				else if(radioVersion4ToCarrier.Checked) {
-					CanadianOutput.GetOutstandingTransactions(false,false,carriers[listCarriers.SelectedIndex],prov,false);
+					Carrier carrier=carriers[listCarriers.SelectedIndex];
+					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,false,false,carrier,prov,false);
 				}
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"Done.");
