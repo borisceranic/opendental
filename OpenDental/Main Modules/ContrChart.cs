@@ -3985,6 +3985,7 @@ namespace OpenDental{
 				}
 				if(rxOld==null) {
 					rx.IsNew=true;//Might not be necessary, but does not hurt.
+					SecurityLogs.MakeLogEntry(Permissions.RxCreate,rx.PatNum,"eRx automatically created: "+rx.Drug);
 					RxPats.Insert(rx);
 				}
 				else {//The prescription was already in our database. Update it.
