@@ -181,6 +181,7 @@
     <Compile Include="Crud\AutoNoteControlCrud.cs" />
     <Compile Include="Crud\AutoNoteCrud.cs" />
     <Compile Include="Crud\CDSPermissionCrud.cs" />
+    <Compile Include="Crud\ClaimSnapshotCrud.cs" />
     <Compile Include="Crud\ConnectionGroupCrud.cs" />
     <Compile Include="Crud\ConnGroupAttachCrud.cs" />
     <Compile Include="Crud\DispSupplyCrud.cs" />
@@ -417,6 +418,7 @@
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
+    <Compile Include="Data Interface\ClaimSnapshots.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
@@ -978,6 +980,7 @@
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
+    <Compile Include="TableTypes\ClaimSnapshot.cs" />
     <Compile Include="TableTypes\Ebill.cs" />
     <Compile Include="TableTypes\EmailAutograph.cs" />
     <Compile Include="TableTypes\EServiceSignal.cs" />

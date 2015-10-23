@@ -10828,6 +10828,46 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX ebill_ClinicNum ON ebill (ClinicNum)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS claimsnapshot";
+					Db.NonQ(command);
+					command=@"CREATE TABLE claimsnapshot (
+						ClaimSnapshotNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ProcNum bigint NOT NULL,
+						ClaimType varchar(255) NOT NULL,
+						Writeoff double NOT NULL,
+						InsPayEst double NOT NULL,
+						Fee double NOT NULL,
+						DateTEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						INDEX(ProcNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE claimsnapshot'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE claimsnapshot (
+						ClaimSnapshotNum number(20) NOT NULL,
+						ProcNum number(20) NOT NULL,
+						ClaimType varchar2(255),
+						Writeoff number(38,8) NOT NULL,
+						InsPayEst number(38,8) NOT NULL,
+						Fee number(38,8) NOT NULL,
+						DateTEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CONSTRAINT claimsnapshot_ClaimSnapshotNum PRIMARY KEY (ClaimSnapshotNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimsnapshot_ProcNum ON claimsnapshot (ProcNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimSnapshotEnabled','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimSnapshotEnabled','0')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

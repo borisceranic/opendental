@@ -3050,7 +3050,11 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>The only validation that's been done is just to make sure that only procedures are selected.  All validation on the procedures selected is done here.  Creates and saves claim initially, attaching all selected procedures.  But it does not refresh any data. Does not do a final update of the new claim.  Does not enter fee amounts.  claimType=P,S,Med,or Other</summary>
+		///<summary>The only validation that's been done is just to make sure that only procedures are selected.  
+		///All validation on the procedures selected is done here.  Creates and saves claim initially, attaching all selected procedures.  
+		///But it does not refresh any data. Does not do a final update of the new claim.  Does not enter fee amounts.
+		///claimType=P,S,Med,or Other
+		///Returns a 'new' claim object (ClaimNum=0) to indicate that the user does not want to create the claim or there are validation issues.</summary>
 		private Claim CreateClaim(string claimType,List <PatPlan> PatPlanList,List <InsPlan> planList,List<ClaimProc> ClaimProcList,List<Procedure> procsForPat,List<InsSub> subList){
 			long claimFormNum = 0;
 			InsPlan PlanCur=new InsPlan();
@@ -3246,10 +3250,9 @@ namespace OpenDental {
 			ClaimCur.EmployRelated=YN.No;
 			ClaimCur.ClaimForm=PlanCur.ClaimFormNum;
 			//attach procedures
-			Procedure ProcCur;
 			//for(int i=0;i<tbAccount.SelectedIndices.Length;i++){
 			for(int i=0;i<claimProcs.Length;i++){
-				ProcCur=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));//1:1
+				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));//1:1
 				//ClaimProc ClaimProcCur=new ClaimProc();
 				//ClaimProcCur.ProcNum=ProcCur.ProcNum;
 				claimProcs[i].ClaimNum=ClaimCur.ClaimNum;
@@ -3268,14 +3271,14 @@ namespace OpenDental {
 				//ClaimProcCur.PlanNum=Claims.Cur.PlanNum;
 				//ClaimProcCur.DateCP=ProcCur.ProcDate;
 				//writeoff handled in ClaimL.CalculateAndUpdate()
-				if(PlanCur.UseAltCode && (ProcedureCodes.GetProcCode(ProcCur.CodeNum).AlternateCode1!="")){
-					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(ProcCur.CodeNum).AlternateCode1;
+				if(PlanCur.UseAltCode && (ProcedureCodes.GetProcCode(proc.CodeNum).AlternateCode1!="")){
+					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(proc.CodeNum).AlternateCode1;
 				}
-				else if(PlanCur.IsMedical && ProcCur.MedicalCode!=""){
-					claimProcs[i].CodeSent=ProcCur.MedicalCode;
+				else if(PlanCur.IsMedical && proc.MedicalCode!=""){
+					claimProcs[i].CodeSent=proc.MedicalCode;
 				}
 				else{
-					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode;
+					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(proc.CodeNum).ProcCode;
 					if(claimProcs[i].CodeSent.Length>5 && claimProcs[i].CodeSent.Substring(0,1)=="D"){
 						claimProcs[i].CodeSent=claimProcs[i].CodeSent.Substring(0,5);
 					}
@@ -3292,8 +3295,35 @@ namespace OpenDental {
 				listClaimProcs[i].LineNumber=(byte)(i+1);
 				ClaimProcs.Update(listClaimProcs[i]);
 			}
+			//Insert claim snapshots for historical reporting purposes.
+			CreateClaimSnapshot(claimType,listClaimProcs);//,procsForPat
 			return ClaimCur;
 			//return null;
+		}
+
+		///<summary>Creates a snapshot for the claimprocs passed in.  Used for reporting purposes.  claimType=P,S
+		///Only creates snapshots if the feature is enabled and if the claimproc is of certain statuses.</summary>
+		private void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs) {//,List<Procedure> listPatProcs
+			if(!PrefC.GetBool(PrefName.ClaimSnapshotEnabled) || (claimType!="P" && claimType!="S")) {
+				return;
+			}
+			//Loop through all the claimprocs and create a claimsnapshot entry for each.
+			for(int i=0;i<listClaimProcs.Count;i++) {
+				if(listClaimProcs[i].Status==ClaimProcStatus.CapClaim
+					|| listClaimProcs[i].Status==ClaimProcStatus.CapComplete
+					|| listClaimProcs[i].Status==ClaimProcStatus.CapEstimate
+					|| listClaimProcs[i].Status==ClaimProcStatus.Preauth) 
+				{
+					continue;
+				}
+				ClaimSnapshot snapshot=new ClaimSnapshot();
+				snapshot.ProcNum=listClaimProcs[i].ProcNum;
+				snapshot.Writeoff=listClaimProcs[i].WriteOff;
+				snapshot.InsPayEst=listClaimProcs[i].InsPayEst;
+				snapshot.Fee=listClaimProcs[i].FeeBilled;
+				snapshot.ClaimType=claimType;				
+				ClaimSnapshots.Insert(snapshot);
+			}
 		}
 
 		private void menuInsPri_Click(object sender, System.EventArgs e) {

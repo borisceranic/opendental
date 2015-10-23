@@ -158,6 +158,8 @@ namespace OpenDentBusiness {
 		///Validating all claims on load was old behavior that was significantly slowing down the loading of the send claims window.
 		///Several offices complained that we took away the validation until they attempt sending the claim.</summary>
 		ClaimsSendWindowValidatesOnLoad,
+		///<summary>Boolean.  0 by default.  If enabled, snapshots of claimprocs are created when claims are created.  There is currently no UI for this preference.</summary>
+		ClaimSnapshotEnabled,
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
 		ClearinghouseDefaultMed,
