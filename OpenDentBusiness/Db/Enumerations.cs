@@ -291,8 +291,10 @@ namespace OpenDentBusiness{
 		JobRoles,
 ///<summary>64. Caches the StateAbbrs used for helping prefill state fields and for state validations.</summary>
 		StateAbbrs,
-		///<summary>64</summary>
-		RequiredFields
+		///<summary>65</summary>
+		RequiredFields,
+		///<summary>66</summary>
+		Ebills
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

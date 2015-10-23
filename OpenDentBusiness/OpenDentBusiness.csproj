@@ -184,6 +184,7 @@
     <Compile Include="Crud\ConnectionGroupCrud.cs" />
     <Compile Include="Crud\ConnGroupAttachCrud.cs" />
     <Compile Include="Crud\DispSupplyCrud.cs" />
+    <Compile Include="Crud\EbillCrud.cs" />
     <Compile Include="Crud\EhrAptObsCrud.cs" />
     <Compile Include="Crud\EhrCarePlanCrud.cs" />
     <Compile Include="Crud\EhrLabClinicalInfoCrud.cs" />
@@ -416,6 +417,7 @@
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
+    <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
@@ -976,6 +978,7 @@
     <Compile Include="TableTypes\AppointmentType.cs" />
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
+    <Compile Include="TableTypes\Ebill.cs" />
     <Compile Include="TableTypes\EmailAutograph.cs" />
     <Compile Include="TableTypes\EServiceSignal.cs" />
     <Compile Include="TableTypes\ProviderErx.cs" />

@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental.Bridges {
+	///<summary>No longer used.</summary>
 	public class Tesia_statements {
 
 		///<summary>Generates all the xml up to the point where the first statement would go.</summary>

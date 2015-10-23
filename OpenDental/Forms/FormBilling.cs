@@ -559,10 +559,7 @@ namespace OpenDental{
 					clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
 				}
 				else {//User has selected 'All', so add 0 and any clinics that the user has access to.
-					clinicNums.Add(0);
-					for(int i=0;i<ListClinics.Count;i++) {
-						clinicNums.Add(ListClinics[i].ClinicNum);
-					}
+					//An empty list indicates to Statements.GetBilling() to get bills for all clinics.
 				}
 			}
 			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,clinicNums);
@@ -771,7 +768,7 @@ namespace OpenDental{
 			g.Dispose();
 		}
 
-		private void butSend_Click(object sender, System.EventArgs e) {
+		private void butSend_Click(object sender,System.EventArgs e) {
 			if(gridBill.SelectedIndices.Length==0){
 				MessageBox.Show(Lan.g(this,"Please select items first."));
 				return;
@@ -815,7 +812,8 @@ namespace OpenDental{
 			string savedPdfPath;
 			PrintDocument pd=null;
 			DataSet dataSet;
-			List<Statement> listElectStmts= new List<Statement>();
+			//Dictionary with key of clinicNum and a corresponding list of EbillStatements
+			Dictionary<long,List<EbillStatement>> dictEbills=new Dictionary<long,List<EbillStatement>>();
 			//TODO: Query the database to get an updated list of unsent bills and compare them to the local list to make sure that we do not resend statements that have already been sent by another user.
 			for(int i=0;i<gridBill.SelectedIndices.Length;i++){
 				stmt=Statements.CreateObject(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
@@ -903,7 +901,13 @@ namespace OpenDental{
 						skippedElect++;
 						continue;
 					}
-					listElectStmts.Add(stmt);//Add the electronic statements to a list to batch them later.
+					EbillStatement ebillStatement=new EbillStatement();
+					ebillStatement.family=fam;
+					ebillStatement.statement=stmt;
+					if(!dictEbills.ContainsKey(fam.ListPats[0].ClinicNum)) {
+						dictEbills.Add(fam.ListPats[0].ClinicNum,new List<EbillStatement>());
+					}
+					dictEbills[fam.ListPats[0].ClinicNum].Add(ebillStatement);
 				}
 			}
 			//now print-------------------------------------------------------------------------------------
@@ -919,7 +923,9 @@ namespace OpenDental{
 			}
 			//Attempt to send electronic bills if needed------------------------------------------------------------
 			int sentElect=0;
-			if(listElectStmts.Count>0) {
+			string errorMsg="";
+			foreach(KeyValuePair<long,List<EbillStatement>> entryForClinic in dictEbills) {//Go through the dictionary entries
+				List<EbillStatement> listElectStmts=entryForClinic.Value;
 				int maxNumOfBatches=listElectStmts.Count;
 				int maxElectStmtsPerBatch=PrefC.GetInt(PrefName.BillingElectBatchMax);
 				if(maxElectStmtsPerBatch==0) {
@@ -933,14 +939,14 @@ namespace OpenDental{
 				//Loop through all electronic bills and try to send them in batches.  Each batch size will be dictated via electBatchMaxNum.
 				//At this point we know we will have at least one batch to send so we start batchNum to 1.
 				for(int batchNum=1;batchNum<=maxNumOfBatches;batchNum++) {
-					if(listElectStmts.Count==0) {//All statements have been sent.  Nothing more to do.
+					if(listElectStmts.Count==0) {//All statements have been sent for the current clinic.  Nothing more to do.
 						break;
-					}
+					}					
 					StringBuilder strBuildElect=new StringBuilder();
 					XmlWriter writerElect=XmlWriter.Create(strBuildElect,xmlSettings);
 					List<long> listElectStmtNums=new List<long>();
 					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {
-						OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect);
+						OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect,entryForClinic.Key);
 					}
 					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
 						OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect);
@@ -950,10 +956,10 @@ namespace OpenDental{
 					}
 					int stmtCountCur=0;
 					//Generate the statements for each batch.
-					for(int j=listElectStmts.Count-1;j>=0;j--) {
-						Statement stmtCur=listElectStmts[j];
+					for(int j=listElectStmts.Count-1;j>=0;j--) {//Construct the string for sending this clinic's ebills
+						Statement stmtCur=listElectStmts[j].statement;
+						fam=listElectStmts[j].family;
 						listElectStmts.RemoveAt(j);//Remove the statement from our list so that we do not send it again in the next batch.
-						fam=Patients.GetFamily(stmtCur.PatNum);
 						pat=fam.GetPatient(stmtCur.PatNum);
 						dataSet=AccountModules.GetStatementDataSet(stmtCur);
 						bool statementWritten=true;
@@ -962,7 +968,7 @@ namespace OpenDental{
 								OpenDental.Bridges.EHG_statements.GenerateOneStatement(writerElect,stmtCur,pat,fam,dataSet);
 							}
 							catch(Exception ex) {
-								MessageBox.Show(Lan.g(this,"Error sending statement")+": "+Environment.NewLine+ex.ToString());
+								errorMsg+=Lan.g(this,"Error sending statement")+": "+Environment.NewLine+ex.ToString();
 								statementWritten=false;
 							}
 						}
@@ -985,7 +991,7 @@ namespace OpenDental{
 						writerElect.Close();
 						for(int attempts=0;attempts<3;attempts++) {
 							try {
-								OpenDental.Bridges.EHG_statements.Send(strBuildElect.ToString());
+								OpenDental.Bridges.EHG_statements.Send(strBuildElect.ToString(),entryForClinic.Key);
 								//loop through all statements in the batch and mark them sent
 								for(int i=0;i<listElectStmtNums.Count;i++) {
 									Statements.MarkSent(listElectStmtNums[i],DateTimeOD.Today);
@@ -997,15 +1003,13 @@ namespace OpenDental{
 									continue;//The only thing skipped besides the error message is evaluating if the statement was written, which is wasn't.
 								}
 								sentElect-=listElectStmtNums.Count;
-								string errorMsg=ex.Message;
+								errorMsg+=ex.Message;
 								if(ex.Message.Contains("(404) Not Found")) {
 									//The full error is "The remote server returned an error: (404) Not Found."  We convert the message into a more user friendly message.
-									errorMsg=Lan.g(this,"The connection to the server could not be established or was lost, or the upload timed out.  "
-										+"Ensure your internet connection is working and that your firewall is not blocking this application.  "
-										+"If the upload timed out after 10 minutes, try sending 25 statements or less in each batch to reduce upload time.");
+									errorMsg+=Lan.g(this,"The connection to the server could not be established or was lost, or the upload timed out.  "
+									+"Ensure your internet connection is working and that your firewall is not blocking this application.  "
+									+"If the upload timed out after 10 minutes, try sending 25 statements or less in each batch to reduce upload time.");
 								}
-								MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
-								msgbox.ShowDialog();
 							}
 						}
 					}
@@ -1043,6 +1047,10 @@ namespace OpenDental{
 					labelSentElect.Text=Lan.g(this,"SentElect=")+sentElect.ToString();
 					Application.DoEvents();
 				}
+			}//end foreach
+			if(errorMsg!="") {
+				MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(errorMsg);
+				msgbox.ShowDialog();
 			}
 			string msg="";
 			if(skipped>0){
@@ -1120,6 +1128,14 @@ namespace OpenDental{
 		
 
 	}
+
+	public struct EbillStatement {
+
+		public Statement statement;
+		public Family family;
+
+	}
+
 }
 
 

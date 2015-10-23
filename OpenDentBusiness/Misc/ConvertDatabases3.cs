@@ -10792,8 +10792,7 @@ namespace OpenDentBusiness {
 							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",99)";//ReferralMerge
 						Db.NonQ(command);
 					}
-				}
-				if(DataConnection.DBtype==DatabaseType.MySql) {
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('TimeCardShowSeconds','0')";
 					Db.NonQ(command);
 				}
@@ -10801,7 +10800,34 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TimeCardShowSeconds','0')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS ebill";
+					Db.NonQ(command);
+					command=@"CREATE TABLE ebill (
+						EbillNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ClinicNum bigint NOT NULL,
+						ClientAcctNumber varchar(255) NOT NULL,
+						ElectUserName varchar(255) NOT NULL,
+						ElectPassword varchar(255) NOT NULL,
+						INDEX(ClinicNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE ebill'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE ebill (
+						EbillNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						ClientAcctNumber varchar2(255),
+						ElectUserName varchar2(255),
+						ElectPassword varchar2(255),
+						CONSTRAINT ebill_EbillNum PRIMARY KEY (EbillNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX ebill_ClinicNum ON ebill (ClinicNum)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

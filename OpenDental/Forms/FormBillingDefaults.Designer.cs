@@ -29,6 +29,8 @@ namespace OpenDental{
 			this.label4 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.labelClinic = new System.Windows.Forms.Label();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.listElectBilling = new System.Windows.Forms.ListBox();
 			this.textPassword = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
@@ -52,11 +54,11 @@ namespace OpenDental{
 			this.textBillingEmailBody = new OpenDental.ODtextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
+			this.textInvoiceNote = new OpenDental.ODtextBox();
 			this.textDays = new OpenDental.ValidNum();
 			this.textNote = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.textInvoiceNote = new OpenDental.ODtextBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -102,6 +104,8 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.labelClinic);
+			this.groupBox1.Controls.Add(this.comboClinic);
 			this.groupBox1.Controls.Add(this.listElectBilling);
 			this.groupBox1.Controls.Add(this.textPassword);
 			this.groupBox1.Controls.Add(this.label6);
@@ -120,6 +124,27 @@ namespace OpenDental{
 			this.groupBox1.TabIndex = 247;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Electronic Billing";
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(12, 80);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(120, 16);
+			this.labelClinic.TabIndex = 256;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelClinic.Visible = false;
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.FormattingEnabled = true;
+			this.comboClinic.Location = new System.Drawing.Point(12, 97);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(120, 21);
+			this.comboClinic.TabIndex = 255;
+			this.comboClinic.Visible = false;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
 			// 
 			// listElectBilling
 			// 
@@ -334,6 +359,18 @@ namespace OpenDental{
 			this.label11.Text = "Invoice Note";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// textInvoiceNote
+			// 
+			this.textInvoiceNote.AcceptsTab = true;
+			this.textInvoiceNote.DetectUrls = false;
+			this.textInvoiceNote.Location = new System.Drawing.Point(24, 571);
+			this.textInvoiceNote.Name = "textInvoiceNote";
+			this.textInvoiceNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Statement;
+			this.textInvoiceNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textInvoiceNote.Size = new System.Drawing.Size(616, 90);
+			this.textInvoiceNote.TabIndex = 251;
+			this.textInvoiceNote.Text = "";
+			// 
 			// textDays
 			// 
 			this.textDays.Location = new System.Drawing.Point(165, 7);
@@ -384,18 +421,6 @@ namespace OpenDental{
 			this.butCancel.TabIndex = 4;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// textInvoiceNote
-			// 
-			this.textInvoiceNote.AcceptsTab = true;
-			this.textInvoiceNote.DetectUrls = false;
-			this.textInvoiceNote.Location = new System.Drawing.Point(24, 571);
-			this.textInvoiceNote.Name = "textInvoiceNote";
-			this.textInvoiceNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Statement;
-			this.textInvoiceNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textInvoiceNote.Size = new System.Drawing.Size(616, 90);
-			this.textInvoiceNote.TabIndex = 251;
-			this.textInvoiceNote.Text = "";
 			// 
 			// FormBillingDefaults
 			// 
@@ -463,5 +488,7 @@ namespace OpenDental{
 		private System.Windows.Forms.ListBox listElectBilling;
 		private System.Windows.Forms.Label label11;
 		private ODtextBox textInvoiceNote;
+		private System.Windows.Forms.Label labelClinic;
+		private System.Windows.Forms.ComboBox comboClinic;
 	}
 }

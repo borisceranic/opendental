@@ -24,7 +24,7 @@ namespace OpenDental.Bridges {
 		//private static string password="";
 
 		///<summary>Generates all the xml up to the point where the first statement would go.</summary>
-		public static void GeneratePracticeInfo(XmlWriter writer) {
+		public static void GeneratePracticeInfo(XmlWriter writer,long clinicNum) {
 			writer.WriteProcessingInstruction("xml","version = \"1.0\" standalone=\"yes\"");
 			writer.WriteStartElement("EISStatementFile");
 			writer.WriteAttributeString("VendorID",PrefC.GetString(PrefName.BillingElectVendorId));
@@ -34,7 +34,12 @@ namespace OpenDental.Bridges {
 			writer.WriteElementString("PrimarySubmitter",PrefC.GetString(PrefName.BillingElectVendorPMSCode));
 			writer.WriteElementString("Transmitter","EHG");
 			writer.WriteStartElement("Practice");
-			writer.WriteAttributeString("AccountNumber",PrefC.GetString(PrefName.BillingElectClientAcctNumber));
+			string billingClientAccountNumber=PrefC.GetString(PrefName.BillingElectClientAcctNumber);
+			Ebill eBill=Ebills.GetForClinic(clinicNum);
+			if(eBill!=null && eBill.ClientAcctNumber!="") {//eBill entry exists, check the fields for overrides
+				billingClientAccountNumber=eBill.ClientAcctNumber;
+			}
+			writer.WriteAttributeString("AccountNumber",billingClientAccountNumber);
 			//sender address----------------------------------------------------------
 			writer.WriteStartElement("SenderAddress");
 			writer.WriteElementString("Name",PrefC.GetString(PrefName.PracticeTitle));
@@ -300,7 +305,7 @@ namespace OpenDental.Bridges {
 		}
 
 		///<summary>Surround with try catch.  The "data" is the previously constructed xml.  If the internet connection is lost or unavailable, then the exception thrown will be a 404 error similar to the following: "The remote server returned an error: (404) Not Found"</summary>
-		public static void Send(string data) {
+		public static void Send(string data,long clinicNum) {
 			//Validate the structure of the XML before sending.
 			StringReader sr=new StringReader(data);
 			try {
@@ -340,13 +345,24 @@ namespace OpenDental.Bridges {
 			string serverName=//"https://prelive.dentalxchange.com/dci/upload.svl";
 				"https://claimconnect.dentalxchange.com/dci/upload.svl";
 			webReq=(HttpWebRequest)WebRequest.Create(serverName);
+			string billingUserName=PrefC.GetString(PrefName.BillingElectUserName);
+			string billingPassword=PrefC.GetString(PrefName.BillingElectPassword);
+			Ebill eBill=Ebills.GetForClinic(clinicNum);
+			if(eBill!=null) {//eBill entry exists, check the fields for overrides.
+				if(eBill.ElectUserName!=""){
+					billingUserName=eBill.ElectUserName;
+				}
+				if(eBill.ElectPassword!=""){
+					billingPassword=eBill.ElectPassword;
+				}
+			}
 			string postData=
 				"Function=Auth"//CONSTANT; signifies that this is an authentication request
 				+"&Source=STM"//CONSTANT; file format
 				+"&UploaderName=OpenDental"//CONSTANT
-				+"&UploaderVersion="+myVersion.Major.ToString()+"."+myVersion.Minor.ToString()+"."+myVersion.Build.ToString()//eg 12.3.24
-				+"&Username="+PrefC.GetString(PrefName.BillingElectUserName)
-				+"&Password="+PrefC.GetString(PrefName.BillingElectPassword);
+				+"&UploaderVersion="+myVersion.Major.ToString()+"."+myVersion.Minor.ToString()+"."+myVersion.Build.ToString()//eg 12.3.24			
+				+"&Username="+billingUserName
+				+"&Password="+billingPassword;
 			webReq.KeepAlive=false;
 			webReq.Method="POST";
 			webReq.ContentType="application/x-www-form-urlencoded";
