@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)apptViewItem.ElementAlignment)+","
 				+    POut.Long  (apptViewItem.ApptFieldDefNum)+","
 				+    POut.Long  (apptViewItem.PatFieldDefNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -179,7 +179,7 @@ namespace OpenDentBusiness.Crud{
 				equipment.DispenseNote="";
 			}
 			OdSqlParameter paramDispenseNote=new OdSqlParameter("paramDispenseNote",OdDbType.Text,POut.StringNote(equipment.DispenseNote));
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramDispenseNote);
 			}
 			else {

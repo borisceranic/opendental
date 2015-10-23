@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(providerIdent.PayorID)+"',"
 				+    POut.Int   ((int)providerIdent.SuppIDType)+","
 				+"'"+POut.String(providerIdent.IDNumber)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

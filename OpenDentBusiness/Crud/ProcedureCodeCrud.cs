@@ -210,7 +210,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedureCode.DrugNDC)+"',"
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
 				+    POut.Long  (procedureCode.ProvNumDefault)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

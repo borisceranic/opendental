@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(treatPlan.Signature)+"',"
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

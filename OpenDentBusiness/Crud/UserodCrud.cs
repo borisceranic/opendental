@@ -171,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (userod.ClinicIsRestricted)+","
 				+    POut.Bool  (userod.InboxHidePopups)+","
 				+    POut.Long  (userod.UserNumCEMT)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

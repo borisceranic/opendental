@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Time  (timeCardRule.OverHoursPerDay)+","
 				+    POut.Time  (timeCardRule.AfterTimeOfDay)+","
 				+    POut.Time  (timeCardRule.BeforeTimeOfDay)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

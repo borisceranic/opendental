@@ -135,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (connGroupAttach.ConnectionGroupNum)+","
 				+    POut.Long  (connGroupAttach.CentralConnectionNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (covCat.CovOrder)+","
 				+    POut.Bool  (covCat.IsHidden)+","
 				+    POut.Int   ((int)covCat.EbenefitCat)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Date  (payPeriod.DateStart)+","
 				+    POut.Date  (payPeriod.DateStop)+","
 				+    POut.Date  (payPeriod.DatePaycheck)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

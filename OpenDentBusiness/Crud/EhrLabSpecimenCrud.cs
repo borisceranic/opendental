@@ -163,7 +163,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrLabSpecimen.SpecimenTypeTextOriginal)+"',"
 				+"'"+POut.String(ehrLabSpecimen.CollectionDateTimeStart)+"',"
 				+"'"+POut.String(ehrLabSpecimen.CollectionDateTimeEnd)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

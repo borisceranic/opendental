@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(vaccineObs.UcumCode)+"',"
 				+    POut.Date  (vaccineObs.DateObs)+","
 				+"'"+POut.String(vaccineObs.MethodCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

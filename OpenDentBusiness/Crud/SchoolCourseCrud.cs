@@ -135,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				 "'"+POut.String(schoolCourse.CourseID)+"',"
 				+"'"+POut.String(schoolCourse.Descript)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

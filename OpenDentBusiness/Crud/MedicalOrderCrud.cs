@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medicalOrder.Description)+"',"
 				+    POut.Bool  (medicalOrder.IsDiscontinued)+","
 				+    POut.Long  (medicalOrder.ProvNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

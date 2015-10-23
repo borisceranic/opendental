@@ -188,7 +188,7 @@ namespace OpenDentBusiness.Crud{
 				taskHist.Descript="";
 			}
 			OdSqlParameter paramDescript=new OdSqlParameter("paramDescript",OdDbType.Text,taskHist.Descript);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramDescript);
 			}
 			else {

@@ -183,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (vitalsign.EhrNotPerformedNum)+","
 				+    POut.Long  (vitalsign.PregDiseaseNum)+","
 				+    POut.Int   (vitalsign.BMIPercentile)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

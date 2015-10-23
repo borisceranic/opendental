@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (toolButItem.ProgramNum)+","
 				+    POut.Int   ((int)toolButItem.ToolBar)+","
 				+"'"+POut.String(toolButItem.ButtonText)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

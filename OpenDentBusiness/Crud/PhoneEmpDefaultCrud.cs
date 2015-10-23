@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (phoneEmpDefault.IsPrivateScreen)+","
 				+    POut.Bool  (phoneEmpDefault.IsTriageOperator)+","
 				+    POut.Int   (phoneEmpDefault.EscalationOrder)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

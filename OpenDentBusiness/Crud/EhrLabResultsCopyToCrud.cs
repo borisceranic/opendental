@@ -184,7 +184,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType)+"',"
 				+"'"+POut.String(ehrLabResultsCopyTo.CopyToNameTypeCode.ToString())+"',"
 				+"'"+POut.String(ehrLabResultsCopyTo.CopyToIdentifierTypeCode.ToString())+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

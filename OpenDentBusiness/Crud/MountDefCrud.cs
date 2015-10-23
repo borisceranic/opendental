@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (mountDef.IsRadiograph)+","
 				+    POut.Int   (mountDef.Width)+","
 				+    POut.Int   (mountDef.Height)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (perioExam.PatNum)+","
 				+    POut.Date  (perioExam.ExamDate)+","
 				+    POut.Long  (perioExam.ProvNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

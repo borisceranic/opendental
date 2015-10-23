@@ -174,7 +174,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(creditCard.PayConnectToken)+"',"
 				+    POut.Date  (creditCard.PayConnectTokenExp)+","
 				+"'"+POut.String(creditCard.Procedures)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (feeSched.ItemOrder)+","
 				+    POut.Bool  (feeSched.IsHidden)+","
 				+    POut.Bool  (feeSched.IsGlobal)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

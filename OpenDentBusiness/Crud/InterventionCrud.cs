@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(intervention.Note)+"',"
 				+    POut.Date  (intervention.DateEntry)+","
 				+    POut.Int   ((int)intervention.CodeSet)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

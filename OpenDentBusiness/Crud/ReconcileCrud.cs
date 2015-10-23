@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(reconcile.EndingBal)+"',"
 				+    POut.Date  (reconcile.DateReconcile)+","
 				+    POut.Bool  (reconcile.IsLocked)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

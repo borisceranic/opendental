@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (resellerService.ResellerNum)+","
 				+    POut.Long  (resellerService.CodeNum)+","
 				+"'"+POut.Double(resellerService.Fee)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

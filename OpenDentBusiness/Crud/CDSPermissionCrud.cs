@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (cDSPermission.DemographicCDS)+","
 				+    POut.Bool  (cDSPermission.LabTestCDS)+","
 				+    POut.Bool  (cDSPermission.VitalCDS)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

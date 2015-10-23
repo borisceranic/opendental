@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (reminderRule.CriterionFK)+","
 				+"'"+POut.String(reminderRule.CriterionValue)+"',"
 				+"'"+POut.String(reminderRule.Message)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

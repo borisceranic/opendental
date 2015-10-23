@@ -149,7 +149,7 @@ namespace OpenDentBusiness.Crud{
 				documentMisc.RawBase64="";
 			}
 			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,documentMisc.RawBase64);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramRawBase64);
 			}
 			else {

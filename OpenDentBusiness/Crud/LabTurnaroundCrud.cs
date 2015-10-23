@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(labTurnaround.Description)+"',"
 				+    POut.Int   (labTurnaround.DaysPublished)+","
 				+    POut.Int   (labTurnaround.DaysActual)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

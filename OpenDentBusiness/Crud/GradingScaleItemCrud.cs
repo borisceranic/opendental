@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(gradingScaleItem.GradeShowing)+"',"
 				+    POut.Float (gradingScaleItem.GradeNumber)+","
 				+"'"+POut.String(gradingScaleItem.Description)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

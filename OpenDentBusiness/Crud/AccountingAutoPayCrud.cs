@@ -135,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (accountingAutoPay.PayType)+","
 				+"'"+POut.String(accountingAutoPay.PickList)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

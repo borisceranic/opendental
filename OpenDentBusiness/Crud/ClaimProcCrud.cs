@@ -243,7 +243,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (claimProc.InsSubNum)+","
 				+    POut.Int   (claimProc.PaymentRow)+","
 				+    POut.Long  (claimProc.PayPlanNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

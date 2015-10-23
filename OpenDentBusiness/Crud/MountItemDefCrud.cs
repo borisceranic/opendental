@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (mountItemDef.Ypos)+","
 				+    POut.Int   (mountItemDef.Width)+","
 				+    POut.Int   (mountItemDef.Height)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

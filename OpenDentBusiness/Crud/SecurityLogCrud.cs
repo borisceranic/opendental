@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(securityLog.CompName)+"',"
 				+    POut.Long  (securityLog.FKey)+","
 				+    POut.Int   ((int)securityLog.LogSource)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

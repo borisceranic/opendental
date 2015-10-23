@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(iCD9.ICD9Code)+"',"
 				+"'"+POut.String(iCD9.Description)+"')";
 				//DateTStamp can only be set by MySQL
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -169,7 +169,7 @@ namespace OpenDentBusiness.Crud{
 				eServiceSignal.Tag="";
 			}
 			OdSqlParameter paramTag=new OdSqlParameter("paramTag",OdDbType.Text,eServiceSignal.Tag);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramDescription,paramTag);
 			}
 			else {

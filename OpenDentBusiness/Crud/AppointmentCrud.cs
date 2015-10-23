@@ -210,7 +210,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(appointment.ProcsColored)+"',"
 				+    POut.Int   (appointment.ColorOverride.ToArgb())+","
 				+    POut.Long  (appointment.AppointmentTypeNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

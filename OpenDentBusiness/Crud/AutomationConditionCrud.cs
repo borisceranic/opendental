@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)automationCondition.CompareField)+","
 				+    POut.Int   ((int)automationCondition.Comparison)+","
 				+"'"+POut.String(automationCondition.CompareString)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

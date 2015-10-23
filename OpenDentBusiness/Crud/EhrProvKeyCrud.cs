@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Float (ehrProvKey.FullTimeEquiv)+","
 				+"'"+POut.String(ehrProvKey.Notes)+"',"
 				+    POut.Int   (ehrProvKey.YearValue)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -342,7 +342,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claim.OrigRefNum)+"',"
 				+    POut.Long  (claim.ProvOrderOverride)+","
 				+    POut.Byte  (claim.OrthoTotalM)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -132,7 +132,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			command+=
 				 "'"+POut.String(connectionGroup.Description)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

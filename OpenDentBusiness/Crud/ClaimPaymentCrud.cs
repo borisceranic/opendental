@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Date  (claimPayment.DateIssued)+","
 				+    POut.Bool  (claimPayment.IsPartial)+","
 				+    POut.Long  (claimPayment.PayType)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -198,7 +198,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (referral.Slip)+","
 				+    POut.Bool  (referral.IsDoctor)+","
 				+    POut.Bool  (referral.IsTrustedDirect)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

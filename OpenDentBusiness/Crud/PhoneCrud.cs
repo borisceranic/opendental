@@ -186,7 +186,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(phone.ScreenshotImage)+"',"
 				+"'"+POut.String(phone.CustomerNumberRaw)+"',"
 				+    POut.DateT (phone.LastCallTimeStart)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

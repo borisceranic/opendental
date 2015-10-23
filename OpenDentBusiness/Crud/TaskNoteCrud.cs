@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (taskNote.UserNum)+","
 				+    DbHelper.Now()+","
 				+"'"+POut.String(taskNote.Note)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

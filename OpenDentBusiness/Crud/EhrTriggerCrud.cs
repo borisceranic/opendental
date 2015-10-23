@@ -174,7 +174,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrTrigger.Instructions)+"',"
 				+"'"+POut.String(ehrTrigger.Bibliography)+"',"
 				+    POut.Int   ((int)ehrTrigger.Cardinality)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

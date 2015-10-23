@@ -135,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (autoCodeCond.AutoCodeItemNum)+","
 				+    POut.Int   ((int)autoCodeCond.Cond)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)mount.ImgType)+","
 				+    POut.Int   (mount.Width)+","
 				+    POut.Int   (mount.Height)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

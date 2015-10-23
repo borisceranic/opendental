@@ -176,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 				payment.Receipt="";
 			}
 			OdSqlParameter paramReceipt=new OdSqlParameter("paramReceipt",OdDbType.Text,payment.Receipt);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramReceipt);
 			}
 			else {

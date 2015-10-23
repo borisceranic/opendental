@@ -135,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (recallTrigger.RecallTypeNum)+","
 				+    POut.Long  (recallTrigger.CodeNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

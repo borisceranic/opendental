@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (operatory.ClinicNum)+","
 				+    POut.Bool  (operatory.SetProspective)+","
 				+    POut.Bool  (operatory.IsWebSched)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (reqStudent.PatNum)+","
 				+    POut.Long  (reqStudent.InstructorNum)+","
 				+    POut.Date  (reqStudent.DateCompleted)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

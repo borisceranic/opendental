@@ -158,7 +158,7 @@ namespace OpenDentBusiness.Crud{
 				dunning.EmailBody="";
 			}
 			OdSqlParameter paramEmailBody=new OdSqlParameter("paramEmailBody",OdDbType.Text,dunning.EmailBody);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramEmailBody);
 			}
 			else {

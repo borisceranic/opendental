@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrAptObs.ValReported)+"',"
 				+"'"+POut.String(ehrAptObs.UcumCode)+"',"
 				+"'"+POut.String(ehrAptObs.ValCodeSystem)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

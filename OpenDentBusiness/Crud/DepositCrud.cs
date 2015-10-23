@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(deposit.BankAccountInfo)+"',"
 				+"'"+POut.Double(deposit.Amount)+"',"
 				+"'"+POut.String(deposit.Memo)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

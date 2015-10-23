@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (procButtonQuick.YPos)+","
 				+    POut.Int   (procButtonQuick.ItemOrder)+","
 				+    POut.Bool  (procButtonQuick.IsLabel)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(journalEntry.Splits)+"',"
 				+"'"+POut.String(journalEntry.CheckNumber)+"',"
 				+    POut.Long  (journalEntry.ReconcileNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

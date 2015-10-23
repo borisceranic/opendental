@@ -186,7 +186,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (etrans.PlanNum)+","
 				+    POut.Long  (etrans.InsSubNum)+","
 				+"'"+POut.String(etrans.TranSetId835)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

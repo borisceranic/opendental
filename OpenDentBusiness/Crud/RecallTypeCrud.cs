@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (recallType.DefaultInterval.ToInt())+","
 				+"'"+POut.String(recallType.TimePattern)+"',"
 				+"'"+POut.String(recallType.Procedures)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

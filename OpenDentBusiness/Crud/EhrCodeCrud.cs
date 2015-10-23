@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrCode.CodeSystem)+"',"
 				+"'"+POut.String(ehrCode.CodeSystemOID)+"',"
 				+    POut.Bool  (ehrCode.IsInDb)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

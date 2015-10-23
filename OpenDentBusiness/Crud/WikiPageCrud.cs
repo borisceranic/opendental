@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(wikiPage.KeyWords)+"',"
 				+"'"+POut.String(wikiPage.PageContent)+"',"
 				+    DbHelper.Now()+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

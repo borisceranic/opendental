@@ -201,7 +201,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(clearinghouse.ISA16)+"',"
 				+"'"+POut.String(clearinghouse.SeparatorData)+"',"
 				+"'"+POut.String(clearinghouse.SeparatorSegment)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

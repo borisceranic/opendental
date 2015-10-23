@@ -211,7 +211,7 @@ namespace OpenDentBusiness.Crud{
 				document.Thumbnail="";
 			}
 			OdSqlParameter paramThumbnail=new OdSqlParameter("paramThumbnail",OdDbType.Text,document.Thumbnail);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramRawBase64,paramThumbnail);
 			}
 			else {

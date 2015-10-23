@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (appointmentType.AppointmentTypeColor.ToArgb())+","
 				+    POut.Int   (appointmentType.ItemOrder)+","
 				+    POut.Bool  (appointmentType.IsHidden)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

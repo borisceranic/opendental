@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(replicationServer.AtoZpath)+"',"
 				+    POut.Bool  (replicationServer.UpdateBlocked)+","
 				+"'"+POut.String(replicationServer.SlaveMonitor)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

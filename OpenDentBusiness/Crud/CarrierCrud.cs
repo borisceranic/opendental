@@ -174,7 +174,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (carrier.IsHidden)+","
 				+    POut.Byte  (carrier.CanadianEncryptionMethod)+","
 				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

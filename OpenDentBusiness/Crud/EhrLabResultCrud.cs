@@ -382,7 +382,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrLabResult.MedicalDirectorAssigningAuthorityIDType)+"',"
 				+"'"+POut.String(ehrLabResult.MedicalDirectorNameTypeCode.ToString())+"',"
 				+"'"+POut.String(ehrLabResult.MedicalDirectorIdentifierTypeCode.ToString())+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

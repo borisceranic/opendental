@@ -165,7 +165,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (labCase.ProvNum)+","
 				+"'"+POut.String(labCase.Instructions)+"',"
 				+"'"+POut.Double(labCase.LabFee)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

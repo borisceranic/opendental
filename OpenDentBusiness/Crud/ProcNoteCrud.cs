@@ -158,7 +158,7 @@ namespace OpenDentBusiness.Crud{
 				procNote.Note="";
 			}
 			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,procNote.Note);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramNote);
 			}
 			else {

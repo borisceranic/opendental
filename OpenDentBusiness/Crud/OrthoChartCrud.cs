@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Date  (orthoChart.DateService)+","
 				+"'"+POut.String(orthoChart.FieldName)+"',"
 				+"'"+POut.String(orthoChart.FieldValue)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

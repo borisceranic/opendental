@@ -177,7 +177,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(procTP.Discount)+"',"
 				+"'"+POut.String(procTP.Prognosis)+"',"
 				+"'"+POut.String(procTP.Dx)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

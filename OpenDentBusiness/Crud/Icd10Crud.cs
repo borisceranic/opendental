@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(icd10.Icd10Code)+"',"
 				+"'"+POut.String(icd10.Description)+"',"
 				+"'"+POut.String(icd10.IsCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(ehrPatient.MotherMaidenFname)+"',"
 				+"'"+POut.String(ehrPatient.MotherMaidenLname)+"',"
 				+    POut.Int   ((int)ehrPatient.VacShareOk)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

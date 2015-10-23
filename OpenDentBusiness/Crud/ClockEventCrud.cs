@@ -171,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (clockEvent.AdjustIsOverridden)+","
 				+"'"+POut.TSpan (clockEvent.Rate2Hours)+"',"
 				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

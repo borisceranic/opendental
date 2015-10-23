@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(emailAddress.SenderAddress)+"',"
 				+"'"+POut.String(emailAddress.Pop3ServerIncoming)+"',"
 				+    POut.Int   (emailAddress.ServerPortIncoming)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

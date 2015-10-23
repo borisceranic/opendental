@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (medLabFacAttach.MedLabNum)+","
 				+    POut.Long  (medLabFacAttach.MedLabResultNum)+","
 				+    POut.Long  (medLabFacAttach.MedLabFacilityNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (deletedObject.ObjectNum)+","
 				+    POut.Int   ((int)deletedObject.ObjectType)+")";
 				//DateTStamp can only be set by MySQL
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

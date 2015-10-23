@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (perioMeasure.MLvalue)+","
 				+    POut.Int   (perioMeasure.Lvalue)+","
 				+    POut.Int   (perioMeasure.DLvalue)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

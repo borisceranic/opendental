@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(account.BankNumber)+"',"
 				+    POut.Bool  (account.Inactive)+","
 				+    POut.Int   (account.AccountColor.ToArgb())+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

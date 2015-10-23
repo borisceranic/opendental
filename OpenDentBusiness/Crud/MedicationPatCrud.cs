@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (medicationPat.RxCui)+","
 				+"'"+POut.String(medicationPat.NewCropGuid)+"',"
 				+    POut.Bool  (medicationPat.IsCpoe)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

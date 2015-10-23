@@ -165,7 +165,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (payPlan.NumberOfPayments)+","
 				+"'"+POut.Double(payPlan.PayAmt)+"',"
 				+"'"+POut.Double(payPlan.DownPayment)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {
