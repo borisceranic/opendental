@@ -84,7 +84,7 @@ namespace OpenDental
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private double ProcPaidHere;
-		private double _remainAmt;
+		private decimal _remainAmt;
 		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
 		///as comboClinic and is used to set paysplit.ClinicNum when saving.</summary>
 		private List<long> _listUserClinicNums;
@@ -960,13 +960,13 @@ namespace OpenDental
 			}
 			//most of these are negative values, so add
 			_remainAmt=
-				ProcFee
-				+ProcWriteoff
-				+ProcInsPaid
-				+ProcInsEst
-				+ProcAdj
-				+ProcPrevPaid
-				+ProcPaidHere;
+				(decimal)ProcFee
+				+(decimal)ProcWriteoff
+				+(decimal)ProcInsPaid
+				+(decimal)ProcInsEst
+				+(decimal)ProcAdj
+				+(decimal)ProcPrevPaid
+				+(decimal)ProcPaidHere;
 			labelProcRemain.Text=_remainAmt.ToString("c");
 		}
 
