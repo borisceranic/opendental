@@ -84,7 +84,7 @@ namespace OpenDental
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private double ProcPaidHere;
-		private double _remainAmt;
+		private decimal _remainAmt;
 
 		///<summary></summary>
 		public FormPaySplitEdit(Family famCur){//PaySplit paySplitCur,Family famCur){
@@ -951,13 +951,13 @@ namespace OpenDental
 			}
 			//most of these are negative values, so add
 			_remainAmt=
-				ProcFee
-				+ProcWriteoff
-				+ProcInsPaid
-				+ProcInsEst
-				+ProcAdj
-				+ProcPrevPaid
-				+ProcPaidHere;
+				(decimal)ProcFee
+				+(decimal)ProcWriteoff
+				+(decimal)ProcInsPaid
+				+(decimal)ProcInsEst
+				+(decimal)ProcAdj
+				+(decimal)ProcPrevPaid
+				+(decimal)ProcPaidHere;
 			labelProcRemain.Text=_remainAmt.ToString("c");
 		}
 
