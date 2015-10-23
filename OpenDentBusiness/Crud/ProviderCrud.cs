@@ -231,7 +231,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (provider.IsInstructor)+","
 				+    POut.Int   (provider.EhrMuStage)+","
 				+    POut.Long  (provider.ProvNumBillingOverride)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

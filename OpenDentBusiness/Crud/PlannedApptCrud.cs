@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (plannedAppt.PatNum)+","
 				+    POut.Long  (plannedAppt.AptNum)+","
 				+    POut.Int   (plannedAppt.ItemOrder)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

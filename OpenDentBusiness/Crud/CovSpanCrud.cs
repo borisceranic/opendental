@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (covSpan.CovCatNum)+","
 				+"'"+POut.String(covSpan.FromCode)+"',"
 				+"'"+POut.String(covSpan.ToCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

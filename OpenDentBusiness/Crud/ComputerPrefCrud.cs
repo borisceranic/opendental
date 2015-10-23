@@ -201,7 +201,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (computerPref.ClinicNum)+","
 				+    POut.Long  (computerPref.ApptViewNum)+","
 				+    POut.Byte  (computerPref.RecentApptView)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.TSpan (timeAdjust.OTimeHours)+"',"
 				+"'"+POut.String(timeAdjust.Note)+"',"
 				+    POut.Bool  (timeAdjust.IsAuto)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

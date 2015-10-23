@@ -365,7 +365,7 @@ namespace OpenDentBusiness.Crud{
 				patient.FamFinUrgNote="";
 			}
 			OdSqlParameter paramFamFinUrgNote=new OdSqlParameter("paramFamFinUrgNote",OdDbType.Text,POut.StringNote(patient.FamFinUrgNote));
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramFamFinUrgNote);
 			}
 			else {

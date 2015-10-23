@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(canadianNetwork.Descript)+"',"
 				+"'"+POut.String(canadianNetwork.CanadianTransactionPrefix)+"',"
 				+    POut.Bool  (canadianNetwork.CanadianIsRprHandler)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

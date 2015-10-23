@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(zipCode.City)+"',"
 				+"'"+POut.String(zipCode.State)+"',"
 				+    POut.Bool  (zipCode.IsFrequent)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

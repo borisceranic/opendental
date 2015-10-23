@@ -174,7 +174,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (rxPat.RxCui)+","
 				+"'"+POut.String(rxPat.DosageCode)+"',"
 				+"'"+POut.String(rxPat.NewCropGuid)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

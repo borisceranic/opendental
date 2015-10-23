@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(etrans.TranSetId835)+"',"
 				+"'"+POut.String(etrans.CarrierNameRaw)+"',"
 				+"'"+POut.String(etrans.PatientNameRaw)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

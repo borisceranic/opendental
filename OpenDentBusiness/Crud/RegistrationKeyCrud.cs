@@ -165,7 +165,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (registrationKey.IsOnlyForTesting)+","
 				+    POut.Int   (registrationKey.VotesAllotted)+","
 				+    POut.Bool  (registrationKey.IsResellerCustomer)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

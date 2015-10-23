@@ -149,7 +149,7 @@ namespace OpenDentBusiness.Crud{
 				procButton.ButtonImage="";
 			}
 			OdSqlParameter paramButtonImage=new OdSqlParameter("paramButtonImage",OdDbType.Text,procButton.ButtonImage);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramButtonImage);
 			}
 			else {

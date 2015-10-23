@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(contact.Fax)+"',"
 				+    POut.Long  (contact.Category)+","
 				+"'"+POut.String(contact.Notes)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

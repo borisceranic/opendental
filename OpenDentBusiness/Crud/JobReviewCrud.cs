@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				//DateTStamp can only be set by MySQL
 				+"'"+POut.String(jobReview.Description)+"',"
 				+    POut.Int   ((int)jobReview.ReviewStatus)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

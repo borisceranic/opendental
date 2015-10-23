@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				ehrLabNote.Comments="";
 			}
 			OdSqlParameter paramComments=new OdSqlParameter("paramComments",OdDbType.Text,ehrLabNote.Comments);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramComments);
 			}
 			else {

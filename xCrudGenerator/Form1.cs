@@ -688,7 +688,7 @@ using System.Drawing;"+rn);
 				//Not supported.
 			}
 			else {
-				strb.Append(rn+t3+"if(useExistingPK || PrefC.RandomKeys) {");
+				strb.Append(rn+t3+"if(useExistingPK || isRandomKeys) {");
 				strb.Append(rn+t4+"Db.NonQ(command"+paramsString+");");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"else {");

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Date  (dashboardAR.DateCalc)+","
 				+"'"+POut.Double(dashboardAR.BalTotal)+"',"
 				+"'"+POut.Double(dashboardAR.InsEst)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

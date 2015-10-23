@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(terminalActive.ComputerName)+"',"
 				+    POut.Int   ((int)terminalActive.TerminalStatus)+","
 				+    POut.Long  (terminalActive.PatNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

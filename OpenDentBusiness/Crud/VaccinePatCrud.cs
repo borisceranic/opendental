@@ -189,7 +189,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)vaccinePat.ActionCode)+","
 				+    POut.Int   ((int)vaccinePat.AdministrationRoute)+","
 				+    POut.Int   ((int)vaccinePat.AdministrationSite)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

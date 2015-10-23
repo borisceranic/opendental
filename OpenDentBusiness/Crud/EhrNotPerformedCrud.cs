@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrNotPerformed.CodeSystemReason)+"',"
 				+"'"+POut.String(ehrNotPerformed.Note)+"',"
 				+    POut.Date  (ehrNotPerformed.DateEntry)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

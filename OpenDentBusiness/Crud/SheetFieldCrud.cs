@@ -194,7 +194,7 @@ namespace OpenDentBusiness.Crud{
 				sheetField.FieldValue="";
 			}
 			OdSqlParameter paramFieldValue=new OdSqlParameter("paramFieldValue",OdDbType.Text,sheetField.FieldValue);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramFieldValue);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobQuote.PatNum)+","
 				+"'"+POut.String(jobQuote.Amount)+"',"
 				+"'"+POut.String(jobQuote.Note)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

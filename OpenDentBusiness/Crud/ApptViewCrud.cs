@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)apptView.StackBehavLR)+","
 				+    POut.Long  (apptView.ClinicNum)+","
 				+    POut.Time  (apptView.ApptTimeScrollStart)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

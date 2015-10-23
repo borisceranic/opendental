@@ -171,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(xChargeTransaction.ItemNum)+"',"
 				+"'"+POut.String(xChargeTransaction.ApprCode)+"',"
 				+    POut.DateT (xChargeTransaction.TransactionDateTime)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -149,7 +149,7 @@ namespace OpenDentBusiness.Crud{
 				erxLog.MsgText="";
 			}
 			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,erxLog.MsgText);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramMsgText);
 			}
 			else {

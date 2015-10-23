@@ -210,7 +210,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

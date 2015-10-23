@@ -136,7 +136,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Long  (ehrLabImage.EhrLabNum)+","
 				+    POut.Long  (ehrLabImage.DocNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

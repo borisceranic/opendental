@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Float (toothInitial.Movement)+","
 				+"'"+POut.String(toothInitial.DrawingSegment)+"',"
 				+    POut.Int   (toothInitial.ColorDraw.ToArgb())+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

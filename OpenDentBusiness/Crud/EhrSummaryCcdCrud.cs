@@ -149,7 +149,7 @@ namespace OpenDentBusiness.Crud{
 				ehrSummaryCcd.ContentSummary="";
 			}
 			OdSqlParameter paramContentSummary=new OdSqlParameter("paramContentSummary",OdDbType.Text,ehrSummaryCcd.ContentSummary);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramContentSummary);
 			}
 			else {

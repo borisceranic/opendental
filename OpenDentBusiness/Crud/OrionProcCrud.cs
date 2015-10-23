@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (orionProc.IsOnCall)+","
 				+    POut.Bool  (orionProc.IsEffectiveComm)+","
 				+    POut.Bool  (orionProc.IsRepair)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

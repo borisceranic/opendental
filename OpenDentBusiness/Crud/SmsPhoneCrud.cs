@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (smsPhone.DateTimeInactive)+","
 				+"'"+POut.String(smsPhone.InactiveCode)+"',"
 				+"'"+POut.String(smsPhone.CountryCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

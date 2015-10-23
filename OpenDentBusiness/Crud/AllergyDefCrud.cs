@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)allergyDef.SnomedType)+","
 				+    POut.Long  (allergyDef.MedicationNum)+","
 				+"'"+POut.String(allergyDef.UniiCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

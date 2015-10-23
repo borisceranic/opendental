@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(diseaseDef.ICD9Code)+"',"
 				+"'"+POut.String(diseaseDef.SnomedCode)+"',"
 				+"'"+POut.String(diseaseDef.Icd10Code)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

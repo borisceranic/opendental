@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+","
 				+    POut.Long  (treatPlan.DocNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

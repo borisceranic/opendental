@@ -154,7 +154,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoTextAlt)+"',"
 				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt)+"',"
 				+"'"+POut.String(ehrLabClinicalInfo.ClinicalInfoTextOriginal)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

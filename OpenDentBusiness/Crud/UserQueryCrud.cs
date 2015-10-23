@@ -146,7 +146,7 @@ namespace OpenDentBusiness.Crud{
 				userQuery.QueryText="";
 			}
 			OdSqlParameter paramQueryText=new OdSqlParameter("paramQueryText",OdDbType.Text,userQuery.QueryText);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramQueryText);
 			}
 			else {

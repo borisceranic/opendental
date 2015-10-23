@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLabFacility.DirectorTitle)+"',"
 				+"'"+POut.String(medLabFacility.DirectorLName)+"',"
 				+"'"+POut.String(medLabFacility.DirectorFName)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

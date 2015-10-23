@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (claimForm.PrintImages)+","
 				+    POut.Int   (claimForm.OffsetX)+","
 				+    POut.Int   (claimForm.OffsetY)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

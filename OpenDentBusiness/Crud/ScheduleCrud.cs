@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)schedule.Status)+","
 				+    POut.Long  (schedule.EmployeeNum)+")";
 				//DateTStamp can only be set by MySQL
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

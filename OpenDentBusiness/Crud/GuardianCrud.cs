@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (guardian.PatNumGuardian)+","
 				+    POut.Int   ((int)guardian.Relationship)+","
 				+    POut.Bool  (guardian.IsGuardian)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

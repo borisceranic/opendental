@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)printer.PrintSit)+","
 				+"'"+POut.String(printer.PrinterName)+"',"
 				+    POut.Bool  (printer.DisplayPrompt)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

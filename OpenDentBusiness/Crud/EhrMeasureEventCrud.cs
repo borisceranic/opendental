@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrMeasureEvent.CodeValueResult)+"',"
 				+"'"+POut.String(ehrMeasureEvent.CodeSystemResult)+"',"
 				+    POut.Long  (ehrMeasureEvent.FKey)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

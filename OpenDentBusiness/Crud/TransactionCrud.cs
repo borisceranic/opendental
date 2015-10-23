@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (transaction.UserNum)+","
 				+    POut.Long  (transaction.DepositNum)+","
 				+    POut.Long  (transaction.PayNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

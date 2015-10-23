@@ -155,7 +155,7 @@ namespace OpenDentBusiness.Crud{
 				hL7Msg.MsgText="";
 			}
 			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,hL7Msg.MsgText);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramMsgText);
 			}
 			else {

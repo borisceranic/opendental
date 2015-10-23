@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Date  (supplyOrder.DatePlaced)+","
 				+"'"+POut.String(supplyOrder.Note)+"',"
 				+"'"+POut.Double(supplyOrder.AmountTotal)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

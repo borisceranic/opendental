@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (screen.ScreenGroupNum)+","
 				+    POut.Int   (screen.ScreenGroupOrder)+","
 				+"'"+POut.String(screen.Comments)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

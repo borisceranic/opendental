@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(emailAutograph.Description)+"',"
 				+"'"+POut.String(emailAutograph.EmailAddress)+"',"
 				+"'"+POut.String(emailAutograph.AutographText)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

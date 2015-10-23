@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (chartView.SelectedTeethOnly)+","
 				+    POut.Int   ((int)chartView.OrionStatusFlags)+","
 				+    POut.Int   ((int)chartView.DatesShowing)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

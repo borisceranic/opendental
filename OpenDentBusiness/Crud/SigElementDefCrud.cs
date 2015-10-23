@@ -155,7 +155,7 @@ namespace OpenDentBusiness.Crud{
 				sigElementDef.Sound="";
 			}
 			OdSqlParameter paramSound=new OdSqlParameter("paramSound",OdDbType.Text,sigElementDef.Sound);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramSound);
 			}
 			else {

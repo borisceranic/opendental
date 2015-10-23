@@ -159,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(laboratory.Zip)+"',"
 				+"'"+POut.String(laboratory.Email)+"',"
 				+"'"+POut.String(laboratory.WirelessPhone)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

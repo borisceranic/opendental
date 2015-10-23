@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(procApptColor.CodeRange)+"',"
 				+    POut.Bool  (procApptColor.ShowPreviousDate)+","
 				+    POut.Int   (procApptColor.ColorText.ToArgb())+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

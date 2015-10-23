@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (phoneMetric.VoiceMails)+","
 				+    POut.Int   (phoneMetric.Triages)+","
 				+    POut.Int   (phoneMetric.MinutesBehind)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

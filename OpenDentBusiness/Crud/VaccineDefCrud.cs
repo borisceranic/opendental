@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(vaccineDef.CVXCode)+"',"
 				+"'"+POut.String(vaccineDef.VaccineName)+"',"
 				+    POut.Long  (vaccineDef.DrugManufacturerNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

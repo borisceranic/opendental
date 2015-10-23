@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(quickPasteCat.Description)+"',"
 				+    POut.Int   (quickPasteCat.ItemOrder)+","
 				+"'"+POut.String(quickPasteCat.DefaultForTypes)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

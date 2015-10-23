@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Int   ((int)ehrMeasure.MeasureType)+","
 				+    POut.Int   (ehrMeasure.Numerator)+","
 				+    POut.Int   (ehrMeasure.Denominator)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

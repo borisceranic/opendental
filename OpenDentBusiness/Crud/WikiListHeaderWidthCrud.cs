@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				 "'"+POut.String(wikiListHeaderWidth.ListName)+"',"
 				+"'"+POut.String(wikiListHeaderWidth.ColName)+"',"
 				+    POut.Int   (wikiListHeaderWidth.ColWidth)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(hL7DefField.DataType.ToString())+"',"
 				+"'"+POut.String(hL7DefField.FieldName)+"',"
 				+"'"+POut.String(hL7DefField.FixedText)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

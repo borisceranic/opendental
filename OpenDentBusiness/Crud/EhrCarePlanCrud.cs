@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrCarePlan.SnomedEducation)+"',"
 				+"'"+POut.String(ehrCarePlan.Instructions)+"',"
 				+    POut.Date  (ehrCarePlan.DatePlanned)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

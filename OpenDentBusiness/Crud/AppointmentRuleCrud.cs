@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(appointmentRule.CodeStart)+"',"
 				+"'"+POut.String(appointmentRule.CodeEnd)+"',"
 				+    POut.Bool  (appointmentRule.IsEnabled)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

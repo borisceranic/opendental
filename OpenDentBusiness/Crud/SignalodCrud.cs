@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(signalod.ToUser)+"',"
 				+    POut.DateT (signalod.AckTime)+","
 				+    POut.Long  (signalod.TaskNum)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)familyHealth.Relationship)+","
 				+    POut.Long  (familyHealth.DiseaseDefNum)+","
 				+"'"+POut.String(familyHealth.PersonName)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

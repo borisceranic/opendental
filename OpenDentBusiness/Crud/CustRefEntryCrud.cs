@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (custRefEntry.PatNumRef)+","
 				+    POut.Date  (custRefEntry.DateEntry)+","
 				+"'"+POut.String(custRefEntry.Note)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (phoneGraph.EmployeeNum)+","
 				+    POut.Bool  (phoneGraph.IsGraphed)+","
 				+    POut.Date  (phoneGraph.DateEntry)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

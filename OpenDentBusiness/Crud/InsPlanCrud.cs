@@ -213,7 +213,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(insPlan.RxBIN)+"',"
 				+    POut.Int   ((int)insPlan.CobRule)+","
 				+"'"+POut.String(insPlan.SopCode)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

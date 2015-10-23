@@ -155,7 +155,7 @@ namespace OpenDentBusiness.Crud{
 				patientNote.MedicalComp="";
 			}
 			OdSqlParameter paramMedicalComp=new OdSqlParameter("paramMedicalComp",OdDbType.Text,patientNote.MedicalComp);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramMedicalComp);
 			}
 			else {

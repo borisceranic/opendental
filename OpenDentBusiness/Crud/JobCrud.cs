@@ -165,7 +165,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(job.Title)+"',"
 				+    POut.Int   ((int)job.Status)+","
 				+    POut.Long  (job.Owner)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

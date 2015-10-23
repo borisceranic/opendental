@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ebill.ClientAcctNumber)+"',"
 				+"'"+POut.String(ebill.ElectUserName)+"',"
 				+"'"+POut.String(ebill.ElectPassword)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

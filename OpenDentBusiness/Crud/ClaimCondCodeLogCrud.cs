@@ -165,7 +165,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claimCondCodeLog.Code8)+"',"
 				+"'"+POut.String(claimCondCodeLog.Code9)+"',"
 				+"'"+POut.String(claimCondCodeLog.Code10)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

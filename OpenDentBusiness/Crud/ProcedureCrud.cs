@@ -306,7 +306,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (procedure.IsDateProsthEst)+","
 				+    POut.Byte  (procedure.IcdVersion)+","
 				+    POut.Bool  (procedure.IsCpoe)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

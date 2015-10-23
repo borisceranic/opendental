@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 				insSub.BenefitNotes="";
 			}
 			OdSqlParameter paramBenefitNotes=new OdSqlParameter("paramBenefitNotes",OdDbType.Text,insSub.BenefitNotes);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramBenefitNotes);
 			}
 			else {

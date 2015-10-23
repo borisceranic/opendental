@@ -216,7 +216,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (procedureCode.ProvNumDefault)+","
 				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"',"
 				+    POut.Bool  (procedureCode.IsRadiology)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

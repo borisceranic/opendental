@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (groupPermission.NewerDays)+","
 				+    POut.Long  (groupPermission.UserGroupNum)+","
 				+    POut.Int   ((int)groupPermission.PermType)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

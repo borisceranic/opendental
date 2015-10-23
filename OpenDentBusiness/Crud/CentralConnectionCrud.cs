@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (centralConnection.ItemOrder)+","
 				+    POut.Bool  (centralConnection.WebServiceIsEcw)+","
 				+"'"+POut.String(centralConnection.ConnectionStatus)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -262,7 +262,7 @@ namespace OpenDentBusiness.Crud{
 				medLab.NoteLab="";
 			}
 			OdSqlParameter paramNoteLab=new OdSqlParameter("paramNoteLab",OdDbType.Text,medLab.NoteLab);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramNotePat,paramNoteLab);
 			}
 			else {

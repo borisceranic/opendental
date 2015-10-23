@@ -153,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)requiredFieldCondition.Operator)+","
 				+"'"+POut.String(requiredFieldCondition.ConditionValue)+"',"
 				+    POut.Int   ((int)requiredFieldCondition.ConditionRelationship)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(employee.ClockStatus)+"',"
 				+    POut.Int   (employee.PhoneExt)+","
 				+"'"+POut.String(employee.PayrollID)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

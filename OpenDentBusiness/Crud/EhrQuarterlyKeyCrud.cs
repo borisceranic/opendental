@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrQuarterlyKey.KeyValue)+"',"
 				+    POut.Long  (ehrQuarterlyKey.PatNum)+","
 				+"'"+POut.String(ehrQuarterlyKey.Notes)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

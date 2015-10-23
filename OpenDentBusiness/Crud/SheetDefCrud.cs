@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (sheetDef.IsLandscape)+","
 				+    POut.Int   (sheetDef.PageCount)+","
 				+    POut.Bool  (sheetDef.IsMultiPage)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

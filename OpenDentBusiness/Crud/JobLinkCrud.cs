@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobLink.JobNum)+","
 				+    POut.Long  (jobLink.FKey)+","
 				+    POut.Int   ((int)jobLink.LinkType)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

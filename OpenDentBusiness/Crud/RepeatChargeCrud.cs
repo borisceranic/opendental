@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (repeatCharge.CopyNoteToProc)+","
 				+    POut.Bool  (repeatCharge.CreatesClaim)+","
 				+    POut.Bool  (repeatCharge.IsEnabled)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

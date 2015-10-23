@@ -150,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 				//DateTStamp can only be set by MySQL
 				+    POut.Date  (allergy.DateAdverseReaction)+","
 				+"'"+POut.String(allergy.SnomedReaction)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

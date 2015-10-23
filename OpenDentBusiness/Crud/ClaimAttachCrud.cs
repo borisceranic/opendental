@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (claimAttach.ClaimNum)+","
 				+"'"+POut.String(claimAttach.DisplayedFileName)+"',"
 				+"'"+POut.String(claimAttach.ActualFileName)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

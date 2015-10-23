@@ -358,7 +358,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrLab.TQ1DateTimeEnd)+"',"
 				+    POut.Bool  (ehrLab.IsCpoe)+","
 				+"'"+POut.String(ehrLab.OriginalPIDSegment)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

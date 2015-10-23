@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			command+=
 				     POut.Int   ((int)requiredField.FieldType)+","
 				+"'"+POut.String(requiredField.FieldName.ToString())+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (sheet.ShowInTerminal)+","
 				+    POut.Bool  (sheet.IsWebForm)+","
 				+    POut.Bool  (sheet.IsMultiPage)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

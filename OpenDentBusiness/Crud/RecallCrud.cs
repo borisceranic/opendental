@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(recall.DisableUntilBalance)+"',"
 				+    POut.Date  (recall.DisableUntilDate)+","
 				+    POut.Date  (recall.DateScheduled)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

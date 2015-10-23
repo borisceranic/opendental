@@ -158,7 +158,7 @@ namespace OpenDentBusiness.Crud{
 				displayField.PickList="";
 			}
 			OdSqlParameter paramPickList=new OdSqlParameter("paramPickList",OdDbType.Text,displayField.PickList);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramPickList);
 			}
 			else {

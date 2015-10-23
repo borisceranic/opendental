@@ -156,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Date  (disease.DateStop)+","
 				+"'"+POut.String(disease.SnomedProblemType)+"',"
 				+    POut.Int   ((int)disease.FunctionStatus)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

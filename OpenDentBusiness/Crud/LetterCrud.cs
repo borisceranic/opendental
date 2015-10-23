@@ -143,7 +143,7 @@ namespace OpenDentBusiness.Crud{
 				letter.BodyText="";
 			}
 			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,letter.BodyText);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramBodyText);
 			}
 			else {

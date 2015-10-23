@@ -147,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(eduResource.LabResultName)+"',"
 				+"'"+POut.String(eduResource.LabResultCompare)+"',"
 				+"'"+POut.String(eduResource.ResourceUrl)+"')";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

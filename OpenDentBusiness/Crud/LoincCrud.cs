@@ -183,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(loinc.UnitsUCUM)+"',"
 				+    POut.Int   (loinc.RankCommonTests)+","
 				+    POut.Int   (loinc.RankCommonOrders)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

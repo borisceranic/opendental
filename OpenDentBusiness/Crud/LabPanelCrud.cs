@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 				labPanel.RawMessage="";
 			}
 			OdSqlParameter paramRawMessage=new OdSqlParameter("paramRawMessage",OdDbType.Text,labPanel.RawMessage);
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramRawMessage);
 			}
 			else {

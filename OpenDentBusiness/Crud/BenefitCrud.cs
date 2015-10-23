@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (benefit.Quantity)+","
 				+    POut.Long  (benefit.CodeNum)+","
 				+    POut.Int   ((int)benefit.CoverageLevel)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

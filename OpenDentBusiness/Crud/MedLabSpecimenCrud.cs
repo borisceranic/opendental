@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(medLabSpecimen.SpecimenID)+"',"
 				+"'"+POut.String(medLabSpecimen.SpecimenDescript)+"',"
 				+    POut.DateT (medLabSpecimen.DateTimeCollected)+")";
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
 			else {

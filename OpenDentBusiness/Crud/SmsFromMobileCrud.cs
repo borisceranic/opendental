@@ -179,7 +179,7 @@ namespace OpenDentBusiness.Crud{
 				smsFromMobile.MsgText="";
 			}
 			OdSqlParameter paramMsgText=new OdSqlParameter("paramMsgText",OdDbType.Text,POut.StringNote(smsFromMobile.MsgText));
-			if(useExistingPK || PrefC.RandomKeys) {
+			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command,paramMsgText);
 			}
 			else {
