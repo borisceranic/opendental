@@ -1775,6 +1775,8 @@ namespace OpenDental{
 			if(FormP.Changed) {
 				changed=true;
 				FillCats();
+				ProcedureCodes.RefreshCache();
+				_listProcCodes=ProcedureCodeC.GetListLong();
 				FillGrid();
 			}
 		}
