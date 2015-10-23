@@ -28,6 +28,7 @@ namespace OpenDental{
 		private CheckBox checkAdjOverBreaks;
 		private Label label2;
 		private TextBox textADPCompanyCode;
+		private CheckBox checkShowSeconds;
 		private bool changed;
 
 		///<summary></summary>
@@ -65,6 +66,7 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTimeCardSetup));
 			this.checkUseDecimal = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.checkShowSeconds = new System.Windows.Forms.CheckBox();
 			this.checkAdjOverBreaks = new System.Windows.Forms.CheckBox();
 			this.butAddRule = new OpenDental.UI.Button();
 			this.gridRules = new OpenDental.UI.ODGrid();
@@ -80,7 +82,7 @@ namespace OpenDental{
 			// 
 			this.checkUseDecimal.Location = new System.Drawing.Point(12, 19);
 			this.checkUseDecimal.Name = "checkUseDecimal";
-			this.checkUseDecimal.Size = new System.Drawing.Size(295, 18);
+			this.checkUseDecimal.Size = new System.Drawing.Size(362, 18);
 			this.checkUseDecimal.TabIndex = 12;
 			this.checkUseDecimal.Text = "Use decimal format rather than colon format";
 			this.checkUseDecimal.UseVisualStyleBackColor = true;
@@ -89,20 +91,31 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupBox1.Controls.Add(this.checkShowSeconds);
 			this.groupBox1.Controls.Add(this.checkAdjOverBreaks);
 			this.groupBox1.Controls.Add(this.checkUseDecimal);
 			this.groupBox1.Location = new System.Drawing.Point(19, 526);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(391, 74);
+			this.groupBox1.Size = new System.Drawing.Size(380, 74);
 			this.groupBox1.TabIndex = 14;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Options";
 			// 
+			// checkShowSeconds
+			// 
+			this.checkShowSeconds.Location = new System.Drawing.Point(12, 51);
+			this.checkShowSeconds.Name = "checkShowSeconds";
+			this.checkShowSeconds.Size = new System.Drawing.Size(362, 18);
+			this.checkShowSeconds.TabIndex = 14;
+			this.checkShowSeconds.Text = "Use seconds on time card when using colon format";
+			this.checkShowSeconds.UseVisualStyleBackColor = true;
+			this.checkShowSeconds.Click += new System.EventHandler(this.checkShowSeconds_Click);
+			// 
 			// checkAdjOverBreaks
 			// 
-			this.checkAdjOverBreaks.Location = new System.Drawing.Point(12, 43);
+			this.checkAdjOverBreaks.Location = new System.Drawing.Point(12, 35);
 			this.checkAdjOverBreaks.Name = "checkAdjOverBreaks";
-			this.checkAdjOverBreaks.Size = new System.Drawing.Size(354, 18);
+			this.checkAdjOverBreaks.Size = new System.Drawing.Size(362, 18);
 			this.checkAdjOverBreaks.TabIndex = 13;
 			this.checkAdjOverBreaks.Text = "Calc Daily button makes adjustments if breaks over 30 minutes.";
 			this.checkAdjOverBreaks.UseVisualStyleBackColor = true;
@@ -238,6 +251,7 @@ namespace OpenDental{
 		private void FormPayPeriods_Load(object sender, System.EventArgs e) {
 			checkUseDecimal.Checked=PrefC.GetBool(PrefName.TimeCardsUseDecimalInsteadOfColon);
 			checkAdjOverBreaks.Checked=PrefC.GetBool(PrefName.TimeCardsMakesAdjustmentsForOverBreaks);
+			checkShowSeconds.Checked=PrefC.GetBool(PrefName.TimeCardShowSeconds);
 			Employees.RefreshCache();
 			FillGrid();
 			FillRules();
@@ -340,6 +354,12 @@ namespace OpenDental{
 
 		private void checkAdjOverBreaks_Click(object sender,EventArgs e) {
 			if(Prefs.UpdateBool(PrefName.TimeCardsMakesAdjustmentsForOverBreaks,checkAdjOverBreaks.Checked)){
+				changed=true;
+			}
+		}
+
+		private void checkShowSeconds_Click(object sender,EventArgs e) {
+			if(Prefs.UpdateBool(PrefName.TimeCardShowSeconds,checkShowSeconds.Checked)) {
 				changed=true;
 			}
 		}

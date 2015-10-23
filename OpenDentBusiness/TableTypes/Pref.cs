@@ -555,6 +555,8 @@ namespace OpenDentBusiness {
 		///<summary>0=Sun,1=Mon...6=Sat</summary>
 		TimeCardOvertimeFirstDayOfWeek,
 		TimecardSecurityEnabled,
+		///<summary>Boolean.  0 by default.  When enabled, FormTimeCard and FormTimeCardMange display H:mm:ss instead of HH:mm</summary>
+		TimeCardShowSeconds,
 		TimeCardsMakesAdjustmentsForOverBreaks,
 		///<summary>bool</summary>
 		TimeCardsUseDecimalInsteadOfColon,

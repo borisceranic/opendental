@@ -142,16 +142,19 @@ namespace OpenDental {
 					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["TimeAdjustRegAdj"].ToString()).TotalHours.ToString("n"));
 					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["TimeAdjustOTAdj"].ToString()).TotalHours.ToString("n"));
 				}
-				else {
+				else if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {//Colon format with seconds
+					row.Cells.Add(PIn.Time(MainTable.Rows[i]["totalHours"].ToString()).ToStringHmmss());
+					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate1Hours"].ToString()).ToStringHmmss());
+					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate1OTHours"].ToString()).ToStringHmmss());
+					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate2Hours"].ToString()).ToStringHmmss());
+					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate2OTHours"].ToString()).ToStringHmmss());
+				}
+				else {//Colon format without seconds
 					row.Cells.Add(PIn.Time(MainTable.Rows[i]["totalHours"].ToString()).ToStringHmm());
 					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate1Hours"].ToString()).ToStringHmm());
 					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate1OTHours"].ToString()).ToStringHmm());
 					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate2Hours"].ToString()).ToStringHmm());
 					row.Cells.Add(PIn.Time(MainTable.Rows[i]["rate2OTHours"].ToString()).ToStringHmm());
-					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["BreakTime"].ToString()).ToStringHmm());
-					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["ClockEventRegAdj"].ToString()).ToStringHmm());
-					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["TimeAdjustRegAdj"].ToString()).ToStringHmm());
-					//row.Cells.Add(PIn.Time(MainTable.Rows[i]["TimeAdjustOTAdj"].ToString()).ToStringHmm());
 				}
 				row.Cells.Add(MainTable.Rows[i]["Note"].ToString());
 				gridMain.Rows.Add(row);
@@ -925,7 +928,10 @@ namespace OpenDental {
 							if(PrefC.GetBool(PrefName.TimeCardsUseDecimalInsteadOfColon)) {
 								row+=PIn.Time(MainTable.Rows[i][c].ToString()).TotalHours.ToString("n");
 							}
-							else {
+							else if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {//Colon format with seconds
+								row+=PIn.Time(MainTable.Rows[i][c].ToString()).ToStringHmmss();
+							}
+							else {//Colon format without seconds
 								row+=PIn.Time(MainTable.Rows[i][c].ToString()).ToStringHmm();
 							}
 							break;

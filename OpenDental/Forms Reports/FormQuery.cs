@@ -894,7 +894,10 @@ namespace OpenDental{
 							if(PrefC.GetBool(PrefName.TimeCardsUseDecimalInsteadOfColon)) {
 								tableOut.Rows[i][j]=PIn.Time(tableOut.Rows[i][j].ToString()).TotalHours.ToString("n");
 							}
-							else {
+							else if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {//Colon format with seconds
+								tableOut.Rows[i][j]=PIn.Time(tableOut.Rows[i][j].ToString()).ToStringHmmss();
+							}
+							else {//Colon format without seconds
 								tableOut.Rows[i][j]=PIn.Time(tableOut.Rows[i][j].ToString()).ToStringHmm();
 							}
 							break;

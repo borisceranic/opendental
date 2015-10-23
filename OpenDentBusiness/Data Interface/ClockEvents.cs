@@ -354,7 +354,7 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>-hh:mm or -hh.mm, depending on the pref.TimeCardsUseDecimalInsteadOfColon.  Blank if zero.</summary>
+		///<summary>-hh:mm or -hh.mm.ss or -hh.mm, depending on the pref.TimeCardsUseDecimalInsteadOfColon and pref.TimeCardShowSeconds.  Blank if zero.</summary>
 		public static string Format(TimeSpan span) {
 			if(PrefC.GetBool(PrefName.TimeCardsUseDecimalInsteadOfColon)){
 				if(span==TimeSpan.Zero){
@@ -362,7 +362,10 @@ namespace OpenDentBusiness{
 				}
 				return span.TotalHours.ToString("n");
 			}
-			else{
+			else if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {//Colon format with seconds
+				return span.ToStringHmmss();
+			}
+			else {//Colon format without seconds
 				return span.ToStringHmm();//blank if zero
 			}
 		}

@@ -684,15 +684,15 @@ namespace OpenDental{
 			//col=new ODGridColumn(Lan.g(this,"Altered"),50,HorizontalAlignment.Center);//use red now instead of separate col
 			//gridMain.Columns.Add(col);
 			if(IsBreaks){
-				col=new ODGridColumn(Lan.g(this,"Out"),60,HorizontalAlignment.Right);
+				col=new ODGridColumn(Lan.g(this,"Out"),64,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"In"),60,HorizontalAlignment.Right);
+				col=new ODGridColumn(Lan.g(this,"In"),64,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
 			}
 			else{
-				col=new ODGridColumn(Lan.g(this,"In"),60,HorizontalAlignment.Right);
+				col=new ODGridColumn(Lan.g(this,"In"),64,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"Out"),60,HorizontalAlignment.Right);
+				col=new ODGridColumn(Lan.g(this,"Out"),64,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
 			}
 			col=new ODGridColumn(Lan.g(this,"Total"),50,HorizontalAlignment.Right);
@@ -779,7 +779,12 @@ namespace OpenDental{
 					//status--------------------------------------
 					//row.Cells.Add(clock.ClockStatus.ToString());
 					//in------------------------------------------
-					row.Cells.Add(clock.TimeDisplayed1.ToShortTimeString());
+					if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {
+						row.Cells.Add(clock.TimeDisplayed1.ToLongTimeString());
+					}
+					else {
+						row.Cells.Add(clock.TimeDisplayed1.ToShortTimeString());
+					}
 					if (clock.TimeEntered1!=clock.TimeDisplayed1){
 						row.Cells[row.Cells.Count-1].ColorText = Color.Red;
 					}
@@ -788,7 +793,12 @@ namespace OpenDental{
 						row.Cells.Add("");//not clocked out yet
 					}
 					else{
-						row.Cells.Add(clock.TimeDisplayed2.ToShortTimeString());
+						if(PrefC.GetBool(PrefName.TimeCardShowSeconds)) {
+							row.Cells.Add(clock.TimeDisplayed2.ToLongTimeString());
+						}
+						else {
+							row.Cells.Add(clock.TimeDisplayed2.ToShortTimeString());
+						}
 						if (clock.TimeEntered2!=clock.TimeDisplayed2){
 							row.Cells[row.Cells.Count-1].ColorText = Color.Red;
 						}
