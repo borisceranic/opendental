@@ -107,6 +107,7 @@ namespace OpenDental {
 		private Payment _paymentOld;
 		private bool _promptSignature;
 		private bool _printReceipt;
+		private UI.Button butPrintReceipt;
 		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
 		///as comboClinic and is used to set payment.ClinicNum when saving.</summary>
 		private List<long> _listUserClinicNums;
@@ -180,6 +181,8 @@ namespace OpenDental {
 			this.checkBalanceGroupByProv = new System.Windows.Forms.CheckBox();
 			this.gridBal = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this._pd2 = new System.Drawing.Printing.PrintDocument();
+			this.butPrintReceipt = new OpenDental.UI.Button();
 			this.butSplitManage = new OpenDental.UI.Button();
 			this.butPayConnect = new OpenDental.UI.Button();
 			this.butPay = new OpenDental.UI.Button();
@@ -191,7 +194,6 @@ namespace OpenDental {
 			this.butOK = new OpenDental.UI.Button();
 			this.butDeleteAll = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
-			this._pd2 = new System.Drawing.Printing.PrintDocument();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -550,6 +552,25 @@ namespace OpenDental {
 			this.gridMain.TranslationName = "TablePaySplits";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// butPrintReceipt
+			// 
+			this.butPrintReceipt.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrintReceipt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butPrintReceipt.Autosize = true;
+			this.butPrintReceipt.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPrintReceipt.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPrintReceipt.CornerRadius = 4F;
+			this.butPrintReceipt.Image = global::OpenDental.Properties.Resources.butPrintSmall;
+			this.butPrintReceipt.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butPrintReceipt.Location = new System.Drawing.Point(407, 525);
+			this.butPrintReceipt.Name = "butPrintReceipt";
+			this.butPrintReceipt.Size = new System.Drawing.Size(101, 24);
+			this.butPrintReceipt.TabIndex = 135;
+			this.butPrintReceipt.TabStop = false;
+			this.butPrintReceipt.Text = "&Print Receipt";
+			this.butPrintReceipt.Visible = false;
+			this.butPrintReceipt.Click += new System.EventHandler(this.butPrintReceipt_Click);
+			// 
 			// butSplitManage
 			// 
 			this.butSplitManage.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -569,7 +590,6 @@ namespace OpenDental {
 			// butPayConnect
 			// 
 			this.butPayConnect.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPayConnect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butPayConnect.Autosize = false;
 			this.butPayConnect.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPayConnect.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -702,6 +722,7 @@ namespace OpenDental {
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 562);
+			this.Controls.Add(this.butPrintReceipt);
 			this.Controls.Add(this.checkBalanceGroupByProv);
 			this.Controls.Add(this.butSplitManage);
 			this.Controls.Add(this.checkRecurring);
@@ -752,6 +773,7 @@ namespace OpenDental {
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(988, 559);
 			this.Name = "FormPayment";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -919,6 +941,9 @@ namespace OpenDental {
 						}
 					}
 				}
+			}
+			if(PaymentCur.Receipt!="") {
+				butPrintReceipt.Visible=true;
 			}
 			CheckUIState();
 			Plugins.HookAddCode(this,"FormPayment.Load_end",PaymentCur,IsNew);
@@ -1606,8 +1631,11 @@ namespace OpenDental {
 			}
 			textNote.Text+=resulttext;
 			PaymentCur.Receipt=receipt;
-			if(_printReceipt && receipt!="") {
-				PrintReceipt(receipt);
+			if(receipt!="") {
+				butPrintReceipt.Visible=true;
+				if(_printReceipt) {
+					PrintReceipt(receipt);
+				}
 			}
 		}
 
@@ -1953,6 +1981,9 @@ namespace OpenDental {
 				_paymentOld.PayNote=textNote.Text;
 				Payments.Update(_paymentOld,true);
 			}
+			if(PaymentCur.Receipt!="") {
+				butPrintReceipt.Visible=true;
+			}
 			if(FormP.Response==null || FormP.Response.Status.code!=0) { //The transaction failed.
 				if(FormP.TranType==PayConnectService.transType.SALE || FormP.TranType==PayConnectService.transType.AUTH) {
 					textAmount.Text=FormP.AmountCharged;//Preserve the amount so the user can try the payment again more easily.
@@ -2114,6 +2145,10 @@ namespace OpenDental {
 				+Patients.GetLim(PaymentCur.PatNum).GetNameLF()+", "
 				+PaymentCur.PayAmt.ToString("c"));
 			DialogResult=DialogResult.OK;
+		}
+
+		private void butPrintReceipt_Click(object sender,EventArgs e) {
+			PrintReceipt(PaymentCur.Receipt);
 		}
 
 		private bool SavePaymentToDb() {
