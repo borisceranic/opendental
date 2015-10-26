@@ -3588,7 +3588,7 @@ namespace OpenDental{
 			// Get Login / Password
 			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
 			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
-			if(clearinghouseHq!=null) {
+			if(clearinghouseClin!=null) {
 				loginID=clearinghouseClin.LoginID;
 				passWord=clearinghouseClin.Password;
 			}

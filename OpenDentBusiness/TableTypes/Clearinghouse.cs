@@ -68,9 +68,9 @@ namespace OpenDentBusiness{
 		public string SeparatorSegment;
 		///<summary>FK to clinic.ClinicNum.  ClinicNum=0 for HQ.</summary>
 		public long ClinicNum;
-		///<summary>FK to ClearinghouseNum.  Will be 0 when ClinicNum is 0 (for HQ), otherwise it will point to the HQ copy.</summary>
+		///<summary>FK to ClearinghouseNum.  Never 0.  Points to the HQ copy of this clearinghouse.
+		///If this copy is the HQ copy, then HqClearinghouseNum=ClearinghouseNum.</summary>
 		public long HqClearinghouseNum;
-
 
 		public Clearinghouse() {
 

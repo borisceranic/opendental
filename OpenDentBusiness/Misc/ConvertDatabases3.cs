@@ -10744,6 +10744,8 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX clearinghouse_HqClearinghouseN ON clearinghouse (HqClearinghouseNum)";
 					Db.NonQ(command);
 				}
+				command="UPDATE clearinghouse SET HqClearinghouseNum=ClearinghouseNum";
+				Db.NonQ(command);
 				command="SELECT ProgramNum FROM program WHERE ProgName='DentalTekSmartOfficePhone'";
 				long programNumCur=PIn.Long(Db.GetScalar(command));
 				if(programNumCur!=0) {

@@ -113,6 +113,7 @@ namespace OpenDental{
 		///<summary>This is never edited from within this form.  Set externally for reference to use in the Sync() method.
 		///May not be null.  Assign a new list of clearinghouse objects to this if creating a new clearinghouse.</summary>
 		public List<Clearinghouse> ListClearinghousesClinOld;
+		private int clinicSelectionLastIndex=-1;
 
 		///<summary></summary>
 		public FormClearinghouseEdit()
@@ -877,8 +878,8 @@ namespace OpenDental{
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(698, 17);
 			this.labelClinic.TabIndex = 0;
-			this.labelClinic.Text = "Bolded fields are unique for each clinic.  Other fields are not editable unless u" +
-    "nassigned/default is selected.";
+			this.labelClinic.Text = "Bolded fields are unique for each clinic.  Other fields are not editable unless U" +
+    "nassigned/Default is selected.";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.labelClinic.Visible = false;
 			// 
@@ -1125,11 +1126,12 @@ namespace OpenDental{
 			if(comboClinic.SelectedIndex==-1) {//This should not happen, but just in case.
 				comboClinic.SelectedIndex=0;
 			}
+			clinicSelectionLastIndex=comboClinic.SelectedIndex;
 		}
 
-		private void SaveToCache() {
+		private bool SaveToCache() {
 			if(!ValidateFields()) {
-				return;
+				return false;
 			}
 			if(ClinicNum==0) {
 				ClearinghouseHq.Description=textDescription.Text;
@@ -1223,7 +1225,7 @@ namespace OpenDental{
 					ListClearinghousesClinCur[index]=ClearinghouseClin;
 				}
 			}
-
+			return true;
 		}
 
 		private bool ValidateFields() {
@@ -1361,8 +1363,15 @@ namespace OpenDental{
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			SaveToCache();
-			ClinicNum=ListClinics[comboClinic.SelectedIndex].ClinicNum;
+			if(clinicSelectionLastIndex==comboClinic.SelectedIndex) {
+				return;//Selection did not change.
+			}
+			if(!SaveToCache()) {//Validation failed.
+				comboClinic.SelectedIndex=clinicSelectionLastIndex;//Revert selection.
+				return;
+			}
+			clinicSelectionLastIndex=comboClinic.SelectedIndex;
+			ClinicNum=ListClinics[clinicSelectionLastIndex].ClinicNum;
 			FillFields();
 		}
 
@@ -1397,7 +1406,9 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			SaveToCache();
+			if(!SaveToCache()) {//Validation failed.
+				return;//Block user from leaving.
+			}
 			if(IsNew) {
 				long clearinghouseNumNew=Clearinghouses.Insert(ClearinghouseHq);
 				for(int i=0;i<ListClearinghousesClinCur.Count;i++) {

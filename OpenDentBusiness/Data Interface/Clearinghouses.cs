@@ -84,14 +84,14 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Clearinghouse>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM clearinghouse WHERE ClinicNum!=0";
+			string command="SELECT * FROM clearinghouse WHERE ClinicNum!=0 ORDER BY Description";
 			return Crud.ClearinghouseCrud.SelectMany(command);
 		}
 
 		///<summary>Refreshes the cache, which only contains HQ-level clearinghouses.</summary>
 		public static DataTable RefreshCacheHq() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM clearinghouse WHERE ClinicNum=0";
+			string command="SELECT * FROM clearinghouse WHERE ClinicNum=0 ORDER BY Description";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="Clearinghouse";
 			FillCacheHq(table);
@@ -123,14 +123,16 @@ namespace OpenDentBusiness{
 			return listClearinghouses;
 		}
 
-		///<summary>Inserts one clearinghouse into the database.  Use this if you know that your clearinghouse will be inserted at the HQ-level,
-		///or if you already have a well-defined clinic-level clearinghouse.  For lists of clearinghouses, use the Sync method instead.</summary>
+		///<summary>Inserts one clearinghouse into the database.  Use this if you know that your clearinghouse will be inserted at the HQ-level.</summary>
 		public static long Insert(Clearinghouse clearinghouse){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				clearinghouse.ClearinghouseNum=Meth.GetLong(MethodBase.GetCurrentMethod(),clearinghouse);
 				return clearinghouse.ClearinghouseNum;
 			}
-			return Crud.ClearinghouseCrud.Insert(clearinghouse);
+			long clearinghouseNum=Crud.ClearinghouseCrud.Insert(clearinghouse);
+			clearinghouse.HqClearinghouseNum=clearinghouseNum;
+			Crud.ClearinghouseCrud.Update(clearinghouse);
+			return clearinghouseNum;
 		}
 
 		///<summary>Updates the clearinghouse in the database that has the same primary key as the passed-in clearinghouse.   
@@ -265,7 +267,7 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<Clearinghouse>(MethodBase.GetCurrentMethod(),clearinghouseHq,clinicNum);
 			}
 			if(clinicNum==0) { //HQ
-				return clearinghouseHq.Copy();
+				return null;
 			}
 			string command="SELECT * FROM clearinghouse WHERE HqClearinghouseNum="+clearinghouseHq.ClearinghouseNum+" AND ClinicNum="+clinicNum;
 			return Crud.ClearinghouseCrud.SelectOne(command);
