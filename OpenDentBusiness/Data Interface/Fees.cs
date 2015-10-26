@@ -50,7 +50,7 @@ namespace OpenDentBusiness{
 
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM fee INNER JOIN feesched ON feesched.FeeSchedNum=fee.FeeSched WHERE feesched.IsHidden=0";
+			string command="SELECT fee.* FROM fee INNER JOIN feesched ON feesched.FeeSchedNum=fee.FeeSched WHERE feesched.IsHidden=0";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="Fee";
 			FillCache(table);
