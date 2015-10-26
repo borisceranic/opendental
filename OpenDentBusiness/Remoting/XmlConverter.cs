@@ -222,9 +222,9 @@ namespace OpenDentBusiness {
 				table.Columns.Add(col);
 			}
 			XmlNodeList nodeListY=doc.SelectSingleNode("//Cells").ChildNodes;
-			for(int y=0;y<nodeListY.Count;y++) {//loop y rows
+			foreach(XmlNode node in nodeListY) {//loop y rows
 				DataRow row=table.NewRow();
-				XmlNodeList nodeListX=nodeListY[y].ChildNodes;//should only be one child node of cells separated by pipes
+				XmlNodeList nodeListX=node.ChildNodes;//should only be one child node of cells separated by pipes
 				//we replace \| here before splitting by | but the &#124; is not part of the serialization
 				string cellxml=nodeListX[0].InnerXml;
 				string cellText=nodeListX[0].InnerText.Replace(@"\|","&#124;");
