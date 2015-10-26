@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 			return service;
 		}
 
-		///<summary>Any calls to WebServiceMainHQ must go through this method. They paload created here will be digested and extracted to OpenDentalWebServiceHQ.PayloadArgs.</summary>
+		///<summary>Any calls to WebServiceMainHQ must go through this method. The payload created here will be digested and extracted to OpenDentalWebServiceHQ.PayloadArgs.</summary>
 		/// <param name="payloadContentxAsXml">Use CreateXmlWriterSettings(true) to create your payload xml. Outer-most xml element MUST be labeled 'Payload'.</param>
 		/// <param name="serviceCode">Used on case by case basis to validate that customer is registered for the given service.</param>
 		public static string CreateWebServiceHQPayload(string payloadContentxAsXml,eServiceCode serviceCode) {

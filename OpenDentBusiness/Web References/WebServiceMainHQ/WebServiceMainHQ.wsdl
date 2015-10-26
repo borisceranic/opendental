@@ -44,6 +44,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="RequestListenerProxyPrefs">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RequestListenerProxyPrefsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RequestListenerProxyPrefsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="string" nillable="true" type="s:string" />
     </s:schema>
   </wsdl:types>
@@ -65,6 +79,12 @@
   <wsdl:message name="SmsCancelServiceSoapOut">
     <wsdl:part name="parameters" element="tns:SmsCancelServiceResponse" />
   </wsdl:message>
+  <wsdl:message name="RequestListenerProxyPrefsSoapIn">
+    <wsdl:part name="parameters" element="tns:RequestListenerProxyPrefs" />
+  </wsdl:message>
+  <wsdl:message name="RequestListenerProxyPrefsSoapOut">
+    <wsdl:part name="parameters" element="tns:RequestListenerProxyPrefsResponse" />
+  </wsdl:message>
   <wsdl:message name="SmsSendHttpPostIn">
     <wsdl:part name="officeData" type="s:string" />
   </wsdl:message>
@@ -83,6 +103,12 @@
   <wsdl:message name="SmsCancelServiceHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
+  <wsdl:message name="RequestListenerProxyPrefsHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="RequestListenerProxyPrefsHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
   <wsdl:portType name="WebServiceMainHQSoap">
     <wsdl:operation name="SmsSend">
       <wsdl:input message="tns:SmsSendSoapIn" />
@@ -95,6 +121,10 @@
     <wsdl:operation name="SmsCancelService">
       <wsdl:input message="tns:SmsCancelServiceSoapIn" />
       <wsdl:output message="tns:SmsCancelServiceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RequestListenerProxyPrefs">
+      <wsdl:input message="tns:RequestListenerProxyPrefsSoapIn" />
+      <wsdl:output message="tns:RequestListenerProxyPrefsSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="WebServiceMainHQHttpPost">
@@ -109,6 +139,10 @@
     <wsdl:operation name="SmsCancelService">
       <wsdl:input message="tns:SmsCancelServiceHttpPostIn" />
       <wsdl:output message="tns:SmsCancelServiceHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RequestListenerProxyPrefs">
+      <wsdl:input message="tns:RequestListenerProxyPrefsHttpPostIn" />
+      <wsdl:output message="tns:RequestListenerProxyPrefsHttpPostOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WebServiceMainHQSoap" type="tns:WebServiceMainHQSoap">
@@ -133,6 +167,15 @@
     </wsdl:operation>
     <wsdl:operation name="SmsCancelService">
       <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SmsCancelService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RequestListenerProxyPrefs">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/RequestListenerProxyPrefs" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -170,6 +213,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="RequestListenerProxyPrefs">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/RequestListenerProxyPrefs" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQHttpPost" type="tns:WebServiceMainHQHttpPost">
     <http:binding verb="POST" />
@@ -200,16 +252,25 @@
         <mime:mimeXml part="Body" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="RequestListenerProxyPrefs">
+      <http:operation location="/RequestListenerProxyPrefs" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="WebServiceMainHQ">
     <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
-      <soap:address location="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx" />
+      <soap:address location="http://localhost:54461/WebServiceMainHQ.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
-      <soap12:address location="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx" />
+      <soap12:address location="http://localhost:54461/WebServiceMainHQ.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
-      <http:address location="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx" />
+      <http:address location="http://localhost:54461/WebServiceMainHQ.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
