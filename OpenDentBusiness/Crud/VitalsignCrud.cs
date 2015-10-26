@@ -44,27 +44,27 @@ namespace OpenDentBusiness.Crud{
 		public static List<Vitalsign> TableToList(DataTable table){
 			List<Vitalsign> retVal=new List<Vitalsign>();
 			Vitalsign vitalsign;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				vitalsign=new Vitalsign();
-				vitalsign.VitalsignNum      = PIn.Long  (table.Rows[i]["VitalsignNum"].ToString());
-				vitalsign.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				vitalsign.Height            = PIn.Float (table.Rows[i]["Height"].ToString());
-				vitalsign.Weight            = PIn.Float (table.Rows[i]["Weight"].ToString());
-				vitalsign.BpSystolic        = PIn.Int   (table.Rows[i]["BpSystolic"].ToString());
-				vitalsign.BpDiastolic       = PIn.Int   (table.Rows[i]["BpDiastolic"].ToString());
-				vitalsign.DateTaken         = PIn.Date  (table.Rows[i]["DateTaken"].ToString());
-				vitalsign.HasFollowupPlan   = PIn.Bool  (table.Rows[i]["HasFollowupPlan"].ToString());
-				vitalsign.IsIneligible      = PIn.Bool  (table.Rows[i]["IsIneligible"].ToString());
-				vitalsign.Documentation     = PIn.String(table.Rows[i]["Documentation"].ToString());
-				vitalsign.ChildGotNutrition = PIn.Bool  (table.Rows[i]["ChildGotNutrition"].ToString());
-				vitalsign.ChildGotPhysCouns = PIn.Bool  (table.Rows[i]["ChildGotPhysCouns"].ToString());
-				vitalsign.WeightCode        = PIn.String(table.Rows[i]["WeightCode"].ToString());
-				vitalsign.HeightExamCode    = PIn.String(table.Rows[i]["HeightExamCode"].ToString());
-				vitalsign.WeightExamCode    = PIn.String(table.Rows[i]["WeightExamCode"].ToString());
-				vitalsign.BMIExamCode       = PIn.String(table.Rows[i]["BMIExamCode"].ToString());
-				vitalsign.EhrNotPerformedNum= PIn.Long  (table.Rows[i]["EhrNotPerformedNum"].ToString());
-				vitalsign.PregDiseaseNum    = PIn.Long  (table.Rows[i]["PregDiseaseNum"].ToString());
-				vitalsign.BMIPercentile     = PIn.Int   (table.Rows[i]["BMIPercentile"].ToString());
+				vitalsign.VitalsignNum      = PIn.Long  (row["VitalsignNum"].ToString());
+				vitalsign.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				vitalsign.Height            = PIn.Float (row["Height"].ToString());
+				vitalsign.Weight            = PIn.Float (row["Weight"].ToString());
+				vitalsign.BpSystolic        = PIn.Int   (row["BpSystolic"].ToString());
+				vitalsign.BpDiastolic       = PIn.Int   (row["BpDiastolic"].ToString());
+				vitalsign.DateTaken         = PIn.Date  (row["DateTaken"].ToString());
+				vitalsign.HasFollowupPlan   = PIn.Bool  (row["HasFollowupPlan"].ToString());
+				vitalsign.IsIneligible      = PIn.Bool  (row["IsIneligible"].ToString());
+				vitalsign.Documentation     = PIn.String(row["Documentation"].ToString());
+				vitalsign.ChildGotNutrition = PIn.Bool  (row["ChildGotNutrition"].ToString());
+				vitalsign.ChildGotPhysCouns = PIn.Bool  (row["ChildGotPhysCouns"].ToString());
+				vitalsign.WeightCode        = PIn.String(row["WeightCode"].ToString());
+				vitalsign.HeightExamCode    = PIn.String(row["HeightExamCode"].ToString());
+				vitalsign.WeightExamCode    = PIn.String(row["WeightExamCode"].ToString());
+				vitalsign.BMIExamCode       = PIn.String(row["BMIExamCode"].ToString());
+				vitalsign.EhrNotPerformedNum= PIn.Long  (row["EhrNotPerformedNum"].ToString());
+				vitalsign.PregDiseaseNum    = PIn.Long  (row["PregDiseaseNum"].ToString());
+				vitalsign.BMIPercentile     = PIn.Int   (row["BMIPercentile"].ToString());
 				retVal.Add(vitalsign);
 			}
 			return retVal;

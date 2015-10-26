@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ToothGridCell> TableToList(DataTable table){
 			List<ToothGridCell> retVal=new List<ToothGridCell>();
 			ToothGridCell toothGridCell;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				toothGridCell=new ToothGridCell();
-				toothGridCell.ToothGridCellNum= PIn.Long  (table.Rows[i]["ToothGridCellNum"].ToString());
-				toothGridCell.SheetFieldNum   = PIn.Long  (table.Rows[i]["SheetFieldNum"].ToString());
-				toothGridCell.ToothGridColNum = PIn.Long  (table.Rows[i]["ToothGridColNum"].ToString());
-				toothGridCell.ValueEntered    = PIn.String(table.Rows[i]["ValueEntered"].ToString());
-				toothGridCell.ToothNum        = PIn.String(table.Rows[i]["ToothNum"].ToString());
+				toothGridCell.ToothGridCellNum= PIn.Long  (row["ToothGridCellNum"].ToString());
+				toothGridCell.SheetFieldNum   = PIn.Long  (row["SheetFieldNum"].ToString());
+				toothGridCell.ToothGridColNum = PIn.Long  (row["ToothGridColNum"].ToString());
+				toothGridCell.ValueEntered    = PIn.String(row["ValueEntered"].ToString());
+				toothGridCell.ToothNum        = PIn.String(row["ToothNum"].ToString());
 				retVal.Add(toothGridCell);
 			}
 			return retVal;

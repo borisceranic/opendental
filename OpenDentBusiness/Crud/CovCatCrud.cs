@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<CovCat> TableToList(DataTable table){
 			List<CovCat> retVal=new List<CovCat>();
 			CovCat covCat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				covCat=new CovCat();
-				covCat.CovCatNum     = PIn.Long  (table.Rows[i]["CovCatNum"].ToString());
-				covCat.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				covCat.DefaultPercent= PIn.Int   (table.Rows[i]["DefaultPercent"].ToString());
-				covCat.CovOrder      = PIn.Byte  (table.Rows[i]["CovOrder"].ToString());
-				covCat.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				covCat.EbenefitCat   = (OpenDentBusiness.EbenefitCategory)PIn.Int(table.Rows[i]["EbenefitCat"].ToString());
+				covCat.CovCatNum     = PIn.Long  (row["CovCatNum"].ToString());
+				covCat.Description   = PIn.String(row["Description"].ToString());
+				covCat.DefaultPercent= PIn.Int   (row["DefaultPercent"].ToString());
+				covCat.CovOrder      = PIn.Byte  (row["CovOrder"].ToString());
+				covCat.IsHidden      = PIn.Bool  (row["IsHidden"].ToString());
+				covCat.EbenefitCat   = (OpenDentBusiness.EbenefitCategory)PIn.Int(row["EbenefitCat"].ToString());
 				retVal.Add(covCat);
 			}
 			return retVal;

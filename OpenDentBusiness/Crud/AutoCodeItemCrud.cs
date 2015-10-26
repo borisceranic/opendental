@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<AutoCodeItem> TableToList(DataTable table){
 			List<AutoCodeItem> retVal=new List<AutoCodeItem>();
 			AutoCodeItem autoCodeItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				autoCodeItem=new AutoCodeItem();
-				autoCodeItem.AutoCodeItemNum= PIn.Long  (table.Rows[i]["AutoCodeItemNum"].ToString());
-				autoCodeItem.AutoCodeNum    = PIn.Long  (table.Rows[i]["AutoCodeNum"].ToString());
-				autoCodeItem.OldCode        = PIn.String(table.Rows[i]["OldCode"].ToString());
-				autoCodeItem.CodeNum        = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
+				autoCodeItem.AutoCodeItemNum= PIn.Long  (row["AutoCodeItemNum"].ToString());
+				autoCodeItem.AutoCodeNum    = PIn.Long  (row["AutoCodeNum"].ToString());
+				autoCodeItem.OldCode        = PIn.String(row["OldCode"].ToString());
+				autoCodeItem.CodeNum        = PIn.Long  (row["CodeNum"].ToString());
 				retVal.Add(autoCodeItem);
 			}
 			return retVal;

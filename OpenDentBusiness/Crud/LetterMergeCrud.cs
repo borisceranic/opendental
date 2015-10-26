@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<LetterMerge> TableToList(DataTable table){
 			List<LetterMerge> retVal=new List<LetterMerge>();
 			LetterMerge letterMerge;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				letterMerge=new LetterMerge();
-				letterMerge.LetterMergeNum= PIn.Long  (table.Rows[i]["LetterMergeNum"].ToString());
-				letterMerge.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				letterMerge.TemplateName  = PIn.String(table.Rows[i]["TemplateName"].ToString());
-				letterMerge.DataFileName  = PIn.String(table.Rows[i]["DataFileName"].ToString());
-				letterMerge.Category      = PIn.Long  (table.Rows[i]["Category"].ToString());
+				letterMerge.LetterMergeNum= PIn.Long  (row["LetterMergeNum"].ToString());
+				letterMerge.Description   = PIn.String(row["Description"].ToString());
+				letterMerge.TemplateName  = PIn.String(row["TemplateName"].ToString());
+				letterMerge.DataFileName  = PIn.String(row["DataFileName"].ToString());
+				letterMerge.Category      = PIn.Long  (row["Category"].ToString());
 				retVal.Add(letterMerge);
 			}
 			return retVal;

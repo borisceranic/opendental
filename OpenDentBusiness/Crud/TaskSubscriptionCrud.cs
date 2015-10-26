@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskSubscription> TableToList(DataTable table){
 			List<TaskSubscription> retVal=new List<TaskSubscription>();
 			TaskSubscription taskSubscription;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskSubscription=new TaskSubscription();
-				taskSubscription.TaskSubscriptionNum= PIn.Long  (table.Rows[i]["TaskSubscriptionNum"].ToString());
-				taskSubscription.UserNum            = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				taskSubscription.TaskListNum        = PIn.Long  (table.Rows[i]["TaskListNum"].ToString());
+				taskSubscription.TaskSubscriptionNum= PIn.Long  (row["TaskSubscriptionNum"].ToString());
+				taskSubscription.UserNum            = PIn.Long  (row["UserNum"].ToString());
+				taskSubscription.TaskListNum        = PIn.Long  (row["TaskListNum"].ToString());
 				retVal.Add(taskSubscription);
 			}
 			return retVal;

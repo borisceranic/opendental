@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<AutoCodeCond> TableToList(DataTable table){
 			List<AutoCodeCond> retVal=new List<AutoCodeCond>();
 			AutoCodeCond autoCodeCond;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				autoCodeCond=new AutoCodeCond();
-				autoCodeCond.AutoCodeCondNum= PIn.Long  (table.Rows[i]["AutoCodeCondNum"].ToString());
-				autoCodeCond.AutoCodeItemNum= PIn.Long  (table.Rows[i]["AutoCodeItemNum"].ToString());
-				autoCodeCond.Cond           = (OpenDentBusiness.AutoCondition)PIn.Int(table.Rows[i]["Cond"].ToString());
+				autoCodeCond.AutoCodeCondNum= PIn.Long  (row["AutoCodeCondNum"].ToString());
+				autoCodeCond.AutoCodeItemNum= PIn.Long  (row["AutoCodeItemNum"].ToString());
+				autoCodeCond.Cond           = (OpenDentBusiness.AutoCondition)PIn.Int(row["Cond"].ToString());
 				retVal.Add(autoCodeCond);
 			}
 			return retVal;

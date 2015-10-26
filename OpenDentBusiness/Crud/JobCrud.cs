@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<Job> TableToList(DataTable table){
 			List<Job> retVal=new List<Job>();
 			Job job;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				job=new Job();
-				job.JobNum       = PIn.Long  (table.Rows[i]["JobNum"].ToString());
-				job.Expert       = PIn.Long  (table.Rows[i]["Expert"].ToString());
-				job.ProjectNum   = PIn.Long  (table.Rows[i]["ProjectNum"].ToString());
-				job.Priority     = (OpenDentBusiness.JobPriority)PIn.Int(table.Rows[i]["Priority"].ToString());
-				job.Category     = (OpenDentBusiness.JobCategory)PIn.Int(table.Rows[i]["Category"].ToString());
-				job.JobVersion   = PIn.String(table.Rows[i]["JobVersion"].ToString());
-				job.HoursEstimate= PIn.Int   (table.Rows[i]["HoursEstimate"].ToString());
-				job.HoursActual  = PIn.Int   (table.Rows[i]["HoursActual"].ToString());
-				job.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				job.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				job.Title        = PIn.String(table.Rows[i]["Title"].ToString());
-				job.Status       = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["Status"].ToString());
-				job.Owner        = PIn.Long  (table.Rows[i]["Owner"].ToString());
+				job.JobNum       = PIn.Long  (row["JobNum"].ToString());
+				job.Expert       = PIn.Long  (row["Expert"].ToString());
+				job.ProjectNum   = PIn.Long  (row["ProjectNum"].ToString());
+				job.Priority     = (OpenDentBusiness.JobPriority)PIn.Int(row["Priority"].ToString());
+				job.Category     = (OpenDentBusiness.JobCategory)PIn.Int(row["Category"].ToString());
+				job.JobVersion   = PIn.String(row["JobVersion"].ToString());
+				job.HoursEstimate= PIn.Int   (row["HoursEstimate"].ToString());
+				job.HoursActual  = PIn.Int   (row["HoursActual"].ToString());
+				job.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
+				job.Description  = PIn.String(row["Description"].ToString());
+				job.Title        = PIn.String(row["Title"].ToString());
+				job.Status       = (OpenDentBusiness.JobStatus)PIn.Int(row["Status"].ToString());
+				job.Owner        = PIn.Long  (row["Owner"].ToString());
 				retVal.Add(job);
 			}
 			return retVal;

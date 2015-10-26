@@ -45,20 +45,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabResultsCopyTo> TableToList(DataTable table){
 			List<EhrLabResultsCopyTo> retVal=new List<EhrLabResultsCopyTo>();
 			EhrLabResultsCopyTo ehrLabResultsCopyTo;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabResultsCopyTo=new EhrLabResultsCopyTo();
-				ehrLabResultsCopyTo.EhrLabResultsCopyToNum             = PIn.Long  (table.Rows[i]["EhrLabResultsCopyToNum"].ToString());
-				ehrLabResultsCopyTo.EhrLabNum                          = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabResultsCopyTo.CopyToID                           = PIn.String(table.Rows[i]["CopyToID"].ToString());
-				ehrLabResultsCopyTo.CopyToLName                        = PIn.String(table.Rows[i]["CopyToLName"].ToString());
-				ehrLabResultsCopyTo.CopyToFName                        = PIn.String(table.Rows[i]["CopyToFName"].ToString());
-				ehrLabResultsCopyTo.CopyToMiddleNames                  = PIn.String(table.Rows[i]["CopyToMiddleNames"].ToString());
-				ehrLabResultsCopyTo.CopyToSuffix                       = PIn.String(table.Rows[i]["CopyToSuffix"].ToString());
-				ehrLabResultsCopyTo.CopyToPrefix                       = PIn.String(table.Rows[i]["CopyToPrefix"].ToString());
-				ehrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID= PIn.String(table.Rows[i]["CopyToAssigningAuthorityNamespaceID"].ToString());
-				ehrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID= PIn.String(table.Rows[i]["CopyToAssigningAuthorityUniversalID"].ToString());
-				ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType     = PIn.String(table.Rows[i]["CopyToAssigningAuthorityIDType"].ToString());
-				string copyToNameTypeCode=table.Rows[i]["CopyToNameTypeCode"].ToString();
+				ehrLabResultsCopyTo.EhrLabResultsCopyToNum             = PIn.Long  (row["EhrLabResultsCopyToNum"].ToString());
+				ehrLabResultsCopyTo.EhrLabNum                          = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabResultsCopyTo.CopyToID                           = PIn.String(row["CopyToID"].ToString());
+				ehrLabResultsCopyTo.CopyToLName                        = PIn.String(row["CopyToLName"].ToString());
+				ehrLabResultsCopyTo.CopyToFName                        = PIn.String(row["CopyToFName"].ToString());
+				ehrLabResultsCopyTo.CopyToMiddleNames                  = PIn.String(row["CopyToMiddleNames"].ToString());
+				ehrLabResultsCopyTo.CopyToSuffix                       = PIn.String(row["CopyToSuffix"].ToString());
+				ehrLabResultsCopyTo.CopyToPrefix                       = PIn.String(row["CopyToPrefix"].ToString());
+				ehrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID= PIn.String(row["CopyToAssigningAuthorityNamespaceID"].ToString());
+				ehrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID= PIn.String(row["CopyToAssigningAuthorityUniversalID"].ToString());
+				ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType     = PIn.String(row["CopyToAssigningAuthorityIDType"].ToString());
+				string copyToNameTypeCode=row["CopyToNameTypeCode"].ToString();
 				if(copyToNameTypeCode==""){
 					ehrLabResultsCopyTo.CopyToNameTypeCode               =(HL70200)0;
 				}
@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResultsCopyTo.CopyToNameTypeCode               =(HL70200)0;
 				}
-				string copyToIdentifierTypeCode=table.Rows[i]["CopyToIdentifierTypeCode"].ToString();
+				string copyToIdentifierTypeCode=row["CopyToIdentifierTypeCode"].ToString();
 				if(copyToIdentifierTypeCode==""){
 					ehrLabResultsCopyTo.CopyToIdentifierTypeCode         =(HL70203)0;
 				}

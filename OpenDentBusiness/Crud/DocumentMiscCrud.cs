@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<DocumentMisc> TableToList(DataTable table){
 			List<DocumentMisc> retVal=new List<DocumentMisc>();
 			DocumentMisc documentMisc;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				documentMisc=new DocumentMisc();
-				documentMisc.DocMiscNum = PIn.Long  (table.Rows[i]["DocMiscNum"].ToString());
-				documentMisc.DateCreated= PIn.Date  (table.Rows[i]["DateCreated"].ToString());
-				documentMisc.FileName   = PIn.String(table.Rows[i]["FileName"].ToString());
-				documentMisc.DocMiscType= (OpenDentBusiness.DocumentMiscType)PIn.Int(table.Rows[i]["DocMiscType"].ToString());
-				documentMisc.RawBase64  = PIn.String(table.Rows[i]["RawBase64"].ToString());
+				documentMisc.DocMiscNum = PIn.Long  (row["DocMiscNum"].ToString());
+				documentMisc.DateCreated= PIn.Date  (row["DateCreated"].ToString());
+				documentMisc.FileName   = PIn.String(row["FileName"].ToString());
+				documentMisc.DocMiscType= (OpenDentBusiness.DocumentMiscType)PIn.Int(row["DocMiscType"].ToString());
+				documentMisc.RawBase64  = PIn.String(row["RawBase64"].ToString());
 				retVal.Add(documentMisc);
 			}
 			return retVal;

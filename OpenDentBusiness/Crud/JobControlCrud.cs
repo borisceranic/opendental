@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobControl> TableToList(DataTable table){
 			List<JobControl> retVal=new List<JobControl>();
 			JobControl jobControl;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobControl=new JobControl();
-				jobControl.JobControlNum = PIn.Long  (table.Rows[i]["JobControlNum"].ToString());
-				jobControl.UserNum       = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				jobControl.JobControlType= (OpenDentBusiness.JobControlType)PIn.Int(table.Rows[i]["JobControlType"].ToString());
-				jobControl.ControlData   = PIn.String(table.Rows[i]["ControlData"].ToString());
-				jobControl.XPos          = PIn.Int   (table.Rows[i]["XPos"].ToString());
-				jobControl.YPos          = PIn.Int   (table.Rows[i]["YPos"].ToString());
-				jobControl.Width         = PIn.Int   (table.Rows[i]["Width"].ToString());
-				jobControl.Height        = PIn.Int   (table.Rows[i]["Height"].ToString());
+				jobControl.JobControlNum = PIn.Long  (row["JobControlNum"].ToString());
+				jobControl.UserNum       = PIn.Long  (row["UserNum"].ToString());
+				jobControl.JobControlType= (OpenDentBusiness.JobControlType)PIn.Int(row["JobControlType"].ToString());
+				jobControl.ControlData   = PIn.String(row["ControlData"].ToString());
+				jobControl.XPos          = PIn.Int   (row["XPos"].ToString());
+				jobControl.YPos          = PIn.Int   (row["YPos"].ToString());
+				jobControl.Width         = PIn.Int   (row["Width"].ToString());
+				jobControl.Height        = PIn.Int   (row["Height"].ToString());
 				retVal.Add(jobControl);
 			}
 			return retVal;

@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PhoneConf> TableToList(DataTable table){
 			List<PhoneConf> retVal=new List<PhoneConf>();
 			PhoneConf phoneConf;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phoneConf=new PhoneConf();
-				phoneConf.PhoneConfNum= PIn.Long  (table.Rows[i]["PhoneConfNum"].ToString());
-				phoneConf.ButtonIndex = PIn.Int   (table.Rows[i]["ButtonIndex"].ToString());
-				phoneConf.Occupants   = PIn.Int   (table.Rows[i]["Occupants"].ToString());
-				phoneConf.Extension   = PIn.Int   (table.Rows[i]["Extension"].ToString());
+				phoneConf.PhoneConfNum= PIn.Long  (row["PhoneConfNum"].ToString());
+				phoneConf.ButtonIndex = PIn.Int   (row["ButtonIndex"].ToString());
+				phoneConf.Occupants   = PIn.Int   (row["Occupants"].ToString());
+				phoneConf.Extension   = PIn.Int   (row["Extension"].ToString());
 				retVal.Add(phoneConf);
 			}
 			return retVal;

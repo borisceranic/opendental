@@ -45,11 +45,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLab> TableToList(DataTable table){
 			List<EhrLab> retVal=new List<EhrLab>();
 			EhrLab ehrLab;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLab=new EhrLab();
-				ehrLab.EhrLabNum                                    = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLab.PatNum                                       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				string orderControlCode=table.Rows[i]["OrderControlCode"].ToString();
+				ehrLab.EhrLabNum                                    = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLab.PatNum                                       = PIn.Long  (row["PatNum"].ToString());
+				string orderControlCode=row["OrderControlCode"].ToString();
 				if(orderControlCode==""){
 					ehrLab.OrderControlCode                           =(HL70119)0;
 				}
@@ -59,28 +59,28 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLab.OrderControlCode                           =(HL70119)0;
 				}
-				ehrLab.PlacerOrderNum                               = PIn.String(table.Rows[i]["PlacerOrderNum"].ToString());
-				ehrLab.PlacerOrderNamespace                         = PIn.String(table.Rows[i]["PlacerOrderNamespace"].ToString());
-				ehrLab.PlacerOrderUniversalID                       = PIn.String(table.Rows[i]["PlacerOrderUniversalID"].ToString());
-				ehrLab.PlacerOrderUniversalIDType                   = PIn.String(table.Rows[i]["PlacerOrderUniversalIDType"].ToString());
-				ehrLab.FillerOrderNum                               = PIn.String(table.Rows[i]["FillerOrderNum"].ToString());
-				ehrLab.FillerOrderNamespace                         = PIn.String(table.Rows[i]["FillerOrderNamespace"].ToString());
-				ehrLab.FillerOrderUniversalID                       = PIn.String(table.Rows[i]["FillerOrderUniversalID"].ToString());
-				ehrLab.FillerOrderUniversalIDType                   = PIn.String(table.Rows[i]["FillerOrderUniversalIDType"].ToString());
-				ehrLab.PlacerGroupNum                               = PIn.String(table.Rows[i]["PlacerGroupNum"].ToString());
-				ehrLab.PlacerGroupNamespace                         = PIn.String(table.Rows[i]["PlacerGroupNamespace"].ToString());
-				ehrLab.PlacerGroupUniversalID                       = PIn.String(table.Rows[i]["PlacerGroupUniversalID"].ToString());
-				ehrLab.PlacerGroupUniversalIDType                   = PIn.String(table.Rows[i]["PlacerGroupUniversalIDType"].ToString());
-				ehrLab.OrderingProviderID                           = PIn.String(table.Rows[i]["OrderingProviderID"].ToString());
-				ehrLab.OrderingProviderLName                        = PIn.String(table.Rows[i]["OrderingProviderLName"].ToString());
-				ehrLab.OrderingProviderFName                        = PIn.String(table.Rows[i]["OrderingProviderFName"].ToString());
-				ehrLab.OrderingProviderMiddleNames                  = PIn.String(table.Rows[i]["OrderingProviderMiddleNames"].ToString());
-				ehrLab.OrderingProviderSuffix                       = PIn.String(table.Rows[i]["OrderingProviderSuffix"].ToString());
-				ehrLab.OrderingProviderPrefix                       = PIn.String(table.Rows[i]["OrderingProviderPrefix"].ToString());
-				ehrLab.OrderingProviderAssigningAuthorityNamespaceID= PIn.String(table.Rows[i]["OrderingProviderAssigningAuthorityNamespaceID"].ToString());
-				ehrLab.OrderingProviderAssigningAuthorityUniversalID= PIn.String(table.Rows[i]["OrderingProviderAssigningAuthorityUniversalID"].ToString());
-				ehrLab.OrderingProviderAssigningAuthorityIDType     = PIn.String(table.Rows[i]["OrderingProviderAssigningAuthorityIDType"].ToString());
-				string orderingProviderNameTypeCode=table.Rows[i]["OrderingProviderNameTypeCode"].ToString();
+				ehrLab.PlacerOrderNum                               = PIn.String(row["PlacerOrderNum"].ToString());
+				ehrLab.PlacerOrderNamespace                         = PIn.String(row["PlacerOrderNamespace"].ToString());
+				ehrLab.PlacerOrderUniversalID                       = PIn.String(row["PlacerOrderUniversalID"].ToString());
+				ehrLab.PlacerOrderUniversalIDType                   = PIn.String(row["PlacerOrderUniversalIDType"].ToString());
+				ehrLab.FillerOrderNum                               = PIn.String(row["FillerOrderNum"].ToString());
+				ehrLab.FillerOrderNamespace                         = PIn.String(row["FillerOrderNamespace"].ToString());
+				ehrLab.FillerOrderUniversalID                       = PIn.String(row["FillerOrderUniversalID"].ToString());
+				ehrLab.FillerOrderUniversalIDType                   = PIn.String(row["FillerOrderUniversalIDType"].ToString());
+				ehrLab.PlacerGroupNum                               = PIn.String(row["PlacerGroupNum"].ToString());
+				ehrLab.PlacerGroupNamespace                         = PIn.String(row["PlacerGroupNamespace"].ToString());
+				ehrLab.PlacerGroupUniversalID                       = PIn.String(row["PlacerGroupUniversalID"].ToString());
+				ehrLab.PlacerGroupUniversalIDType                   = PIn.String(row["PlacerGroupUniversalIDType"].ToString());
+				ehrLab.OrderingProviderID                           = PIn.String(row["OrderingProviderID"].ToString());
+				ehrLab.OrderingProviderLName                        = PIn.String(row["OrderingProviderLName"].ToString());
+				ehrLab.OrderingProviderFName                        = PIn.String(row["OrderingProviderFName"].ToString());
+				ehrLab.OrderingProviderMiddleNames                  = PIn.String(row["OrderingProviderMiddleNames"].ToString());
+				ehrLab.OrderingProviderSuffix                       = PIn.String(row["OrderingProviderSuffix"].ToString());
+				ehrLab.OrderingProviderPrefix                       = PIn.String(row["OrderingProviderPrefix"].ToString());
+				ehrLab.OrderingProviderAssigningAuthorityNamespaceID= PIn.String(row["OrderingProviderAssigningAuthorityNamespaceID"].ToString());
+				ehrLab.OrderingProviderAssigningAuthorityUniversalID= PIn.String(row["OrderingProviderAssigningAuthorityUniversalID"].ToString());
+				ehrLab.OrderingProviderAssigningAuthorityIDType     = PIn.String(row["OrderingProviderAssigningAuthorityIDType"].ToString());
+				string orderingProviderNameTypeCode=row["OrderingProviderNameTypeCode"].ToString();
 				if(orderingProviderNameTypeCode==""){
 					ehrLab.OrderingProviderNameTypeCode               =(HL70200)0;
 				}
@@ -90,7 +90,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLab.OrderingProviderNameTypeCode               =(HL70200)0;
 				}
-				string orderingProviderIdentifierTypeCode=table.Rows[i]["OrderingProviderIdentifierTypeCode"].ToString();
+				string orderingProviderIdentifierTypeCode=row["OrderingProviderIdentifierTypeCode"].ToString();
 				if(orderingProviderIdentifierTypeCode==""){
 					ehrLab.OrderingProviderIdentifierTypeCode         =(HL70203)0;
 				}
@@ -100,17 +100,17 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLab.OrderingProviderIdentifierTypeCode         =(HL70203)0;
 				}
-				ehrLab.SetIdOBR                                     = PIn.Long  (table.Rows[i]["SetIdOBR"].ToString());
-				ehrLab.UsiID                                        = PIn.String(table.Rows[i]["UsiID"].ToString());
-				ehrLab.UsiText                                      = PIn.String(table.Rows[i]["UsiText"].ToString());
-				ehrLab.UsiCodeSystemName                            = PIn.String(table.Rows[i]["UsiCodeSystemName"].ToString());
-				ehrLab.UsiIDAlt                                     = PIn.String(table.Rows[i]["UsiIDAlt"].ToString());
-				ehrLab.UsiTextAlt                                   = PIn.String(table.Rows[i]["UsiTextAlt"].ToString());
-				ehrLab.UsiCodeSystemNameAlt                         = PIn.String(table.Rows[i]["UsiCodeSystemNameAlt"].ToString());
-				ehrLab.UsiTextOriginal                              = PIn.String(table.Rows[i]["UsiTextOriginal"].ToString());
-				ehrLab.ObservationDateTimeStart                     = PIn.String(table.Rows[i]["ObservationDateTimeStart"].ToString());
-				ehrLab.ObservationDateTimeEnd                       = PIn.String(table.Rows[i]["ObservationDateTimeEnd"].ToString());
-				string specimenActionCode=table.Rows[i]["SpecimenActionCode"].ToString();
+				ehrLab.SetIdOBR                                     = PIn.Long  (row["SetIdOBR"].ToString());
+				ehrLab.UsiID                                        = PIn.String(row["UsiID"].ToString());
+				ehrLab.UsiText                                      = PIn.String(row["UsiText"].ToString());
+				ehrLab.UsiCodeSystemName                            = PIn.String(row["UsiCodeSystemName"].ToString());
+				ehrLab.UsiIDAlt                                     = PIn.String(row["UsiIDAlt"].ToString());
+				ehrLab.UsiTextAlt                                   = PIn.String(row["UsiTextAlt"].ToString());
+				ehrLab.UsiCodeSystemNameAlt                         = PIn.String(row["UsiCodeSystemNameAlt"].ToString());
+				ehrLab.UsiTextOriginal                              = PIn.String(row["UsiTextOriginal"].ToString());
+				ehrLab.ObservationDateTimeStart                     = PIn.String(row["ObservationDateTimeStart"].ToString());
+				ehrLab.ObservationDateTimeEnd                       = PIn.String(row["ObservationDateTimeEnd"].ToString());
+				string specimenActionCode=row["SpecimenActionCode"].ToString();
 				if(specimenActionCode==""){
 					ehrLab.SpecimenActionCode                         =(HL70065)0;
 				}
@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLab.SpecimenActionCode                         =(HL70065)0;
 				}
-				ehrLab.ResultDateTime                               = PIn.String(table.Rows[i]["ResultDateTime"].ToString());
-				string resultStatus=table.Rows[i]["ResultStatus"].ToString();
+				ehrLab.ResultDateTime                               = PIn.String(row["ResultDateTime"].ToString());
+				string resultStatus=row["ResultStatus"].ToString();
 				if(resultStatus==""){
 					ehrLab.ResultStatus                               =(HL70123)0;
 				}
@@ -131,29 +131,29 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLab.ResultStatus                               =(HL70123)0;
 				}
-				ehrLab.ParentObservationID                          = PIn.String(table.Rows[i]["ParentObservationID"].ToString());
-				ehrLab.ParentObservationText                        = PIn.String(table.Rows[i]["ParentObservationText"].ToString());
-				ehrLab.ParentObservationCodeSystemName              = PIn.String(table.Rows[i]["ParentObservationCodeSystemName"].ToString());
-				ehrLab.ParentObservationIDAlt                       = PIn.String(table.Rows[i]["ParentObservationIDAlt"].ToString());
-				ehrLab.ParentObservationTextAlt                     = PIn.String(table.Rows[i]["ParentObservationTextAlt"].ToString());
-				ehrLab.ParentObservationCodeSystemNameAlt           = PIn.String(table.Rows[i]["ParentObservationCodeSystemNameAlt"].ToString());
-				ehrLab.ParentObservationTextOriginal                = PIn.String(table.Rows[i]["ParentObservationTextOriginal"].ToString());
-				ehrLab.ParentObservationSubID                       = PIn.String(table.Rows[i]["ParentObservationSubID"].ToString());
-				ehrLab.ParentPlacerOrderNum                         = PIn.String(table.Rows[i]["ParentPlacerOrderNum"].ToString());
-				ehrLab.ParentPlacerOrderNamespace                   = PIn.String(table.Rows[i]["ParentPlacerOrderNamespace"].ToString());
-				ehrLab.ParentPlacerOrderUniversalID                 = PIn.String(table.Rows[i]["ParentPlacerOrderUniversalID"].ToString());
-				ehrLab.ParentPlacerOrderUniversalIDType             = PIn.String(table.Rows[i]["ParentPlacerOrderUniversalIDType"].ToString());
-				ehrLab.ParentFillerOrderNum                         = PIn.String(table.Rows[i]["ParentFillerOrderNum"].ToString());
-				ehrLab.ParentFillerOrderNamespace                   = PIn.String(table.Rows[i]["ParentFillerOrderNamespace"].ToString());
-				ehrLab.ParentFillerOrderUniversalID                 = PIn.String(table.Rows[i]["ParentFillerOrderUniversalID"].ToString());
-				ehrLab.ParentFillerOrderUniversalIDType             = PIn.String(table.Rows[i]["ParentFillerOrderUniversalIDType"].ToString());
-				ehrLab.ListEhrLabResultsHandlingF                   = PIn.Bool  (table.Rows[i]["ListEhrLabResultsHandlingF"].ToString());
-				ehrLab.ListEhrLabResultsHandlingN                   = PIn.Bool  (table.Rows[i]["ListEhrLabResultsHandlingN"].ToString());
-				ehrLab.TQ1SetId                                     = PIn.Long  (table.Rows[i]["TQ1SetId"].ToString());
-				ehrLab.TQ1DateTimeStart                             = PIn.String(table.Rows[i]["TQ1DateTimeStart"].ToString());
-				ehrLab.TQ1DateTimeEnd                               = PIn.String(table.Rows[i]["TQ1DateTimeEnd"].ToString());
-				ehrLab.IsCpoe                                       = PIn.Bool  (table.Rows[i]["IsCpoe"].ToString());
-				ehrLab.OriginalPIDSegment                           = PIn.String(table.Rows[i]["OriginalPIDSegment"].ToString());
+				ehrLab.ParentObservationID                          = PIn.String(row["ParentObservationID"].ToString());
+				ehrLab.ParentObservationText                        = PIn.String(row["ParentObservationText"].ToString());
+				ehrLab.ParentObservationCodeSystemName              = PIn.String(row["ParentObservationCodeSystemName"].ToString());
+				ehrLab.ParentObservationIDAlt                       = PIn.String(row["ParentObservationIDAlt"].ToString());
+				ehrLab.ParentObservationTextAlt                     = PIn.String(row["ParentObservationTextAlt"].ToString());
+				ehrLab.ParentObservationCodeSystemNameAlt           = PIn.String(row["ParentObservationCodeSystemNameAlt"].ToString());
+				ehrLab.ParentObservationTextOriginal                = PIn.String(row["ParentObservationTextOriginal"].ToString());
+				ehrLab.ParentObservationSubID                       = PIn.String(row["ParentObservationSubID"].ToString());
+				ehrLab.ParentPlacerOrderNum                         = PIn.String(row["ParentPlacerOrderNum"].ToString());
+				ehrLab.ParentPlacerOrderNamespace                   = PIn.String(row["ParentPlacerOrderNamespace"].ToString());
+				ehrLab.ParentPlacerOrderUniversalID                 = PIn.String(row["ParentPlacerOrderUniversalID"].ToString());
+				ehrLab.ParentPlacerOrderUniversalIDType             = PIn.String(row["ParentPlacerOrderUniversalIDType"].ToString());
+				ehrLab.ParentFillerOrderNum                         = PIn.String(row["ParentFillerOrderNum"].ToString());
+				ehrLab.ParentFillerOrderNamespace                   = PIn.String(row["ParentFillerOrderNamespace"].ToString());
+				ehrLab.ParentFillerOrderUniversalID                 = PIn.String(row["ParentFillerOrderUniversalID"].ToString());
+				ehrLab.ParentFillerOrderUniversalIDType             = PIn.String(row["ParentFillerOrderUniversalIDType"].ToString());
+				ehrLab.ListEhrLabResultsHandlingF                   = PIn.Bool  (row["ListEhrLabResultsHandlingF"].ToString());
+				ehrLab.ListEhrLabResultsHandlingN                   = PIn.Bool  (row["ListEhrLabResultsHandlingN"].ToString());
+				ehrLab.TQ1SetId                                     = PIn.Long  (row["TQ1SetId"].ToString());
+				ehrLab.TQ1DateTimeStart                             = PIn.String(row["TQ1DateTimeStart"].ToString());
+				ehrLab.TQ1DateTimeEnd                               = PIn.String(row["TQ1DateTimeEnd"].ToString());
+				ehrLab.IsCpoe                                       = PIn.Bool  (row["IsCpoe"].ToString());
+				ehrLab.OriginalPIDSegment                           = PIn.String(row["OriginalPIDSegment"].ToString());
 				retVal.Add(ehrLab);
 			}
 			return retVal;

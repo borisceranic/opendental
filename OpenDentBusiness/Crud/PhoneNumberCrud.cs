@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<PhoneNumber> TableToList(DataTable table){
 			List<PhoneNumber> retVal=new List<PhoneNumber>();
 			PhoneNumber phoneNumber;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phoneNumber=new PhoneNumber();
-				phoneNumber.PhoneNumberNum= PIn.Long  (table.Rows[i]["PhoneNumberNum"].ToString());
-				phoneNumber.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				phoneNumber.PhoneNumberVal= PIn.String(table.Rows[i]["PhoneNumberVal"].ToString());
+				phoneNumber.PhoneNumberNum= PIn.Long  (row["PhoneNumberNum"].ToString());
+				phoneNumber.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				phoneNumber.PhoneNumberVal= PIn.String(row["PhoneNumberVal"].ToString());
 				retVal.Add(phoneNumber);
 			}
 			return retVal;

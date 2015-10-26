@@ -44,23 +44,23 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClockEvent> TableToList(DataTable table){
 			List<ClockEvent> retVal=new List<ClockEvent>();
 			ClockEvent clockEvent;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				clockEvent=new ClockEvent();
-				clockEvent.ClockEventNum     = PIn.Long  (table.Rows[i]["ClockEventNum"].ToString());
-				clockEvent.EmployeeNum       = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				clockEvent.TimeEntered1      = PIn.DateT (table.Rows[i]["TimeEntered1"].ToString());
-				clockEvent.TimeDisplayed1    = PIn.DateT (table.Rows[i]["TimeDisplayed1"].ToString());
-				clockEvent.ClockStatus       = (OpenDentBusiness.TimeClockStatus)PIn.Int(table.Rows[i]["ClockStatus"].ToString());
-				clockEvent.Note              = PIn.String(table.Rows[i]["Note"].ToString());
-				clockEvent.TimeEntered2      = PIn.DateT (table.Rows[i]["TimeEntered2"].ToString());
-				clockEvent.TimeDisplayed2    = PIn.DateT (table.Rows[i]["TimeDisplayed2"].ToString());
-				clockEvent.OTimeHours        = PIn.TSpan (table.Rows[i]["OTimeHours"].ToString());
-				clockEvent.OTimeAuto         = PIn.TSpan (table.Rows[i]["OTimeAuto"].ToString());
-				clockEvent.Adjust            = PIn.TSpan (table.Rows[i]["Adjust"].ToString());
-				clockEvent.AdjustAuto        = PIn.TSpan (table.Rows[i]["AdjustAuto"].ToString());
-				clockEvent.AdjustIsOverridden= PIn.Bool  (table.Rows[i]["AdjustIsOverridden"].ToString());
-				clockEvent.Rate2Hours        = PIn.TSpan (table.Rows[i]["Rate2Hours"].ToString());
-				clockEvent.Rate2Auto         = PIn.TSpan (table.Rows[i]["Rate2Auto"].ToString());
+				clockEvent.ClockEventNum     = PIn.Long  (row["ClockEventNum"].ToString());
+				clockEvent.EmployeeNum       = PIn.Long  (row["EmployeeNum"].ToString());
+				clockEvent.TimeEntered1      = PIn.DateT (row["TimeEntered1"].ToString());
+				clockEvent.TimeDisplayed1    = PIn.DateT (row["TimeDisplayed1"].ToString());
+				clockEvent.ClockStatus       = (OpenDentBusiness.TimeClockStatus)PIn.Int(row["ClockStatus"].ToString());
+				clockEvent.Note              = PIn.String(row["Note"].ToString());
+				clockEvent.TimeEntered2      = PIn.DateT (row["TimeEntered2"].ToString());
+				clockEvent.TimeDisplayed2    = PIn.DateT (row["TimeDisplayed2"].ToString());
+				clockEvent.OTimeHours        = PIn.TSpan (row["OTimeHours"].ToString());
+				clockEvent.OTimeAuto         = PIn.TSpan (row["OTimeAuto"].ToString());
+				clockEvent.Adjust            = PIn.TSpan (row["Adjust"].ToString());
+				clockEvent.AdjustAuto        = PIn.TSpan (row["AdjustAuto"].ToString());
+				clockEvent.AdjustIsOverridden= PIn.Bool  (row["AdjustIsOverridden"].ToString());
+				clockEvent.Rate2Hours        = PIn.TSpan (row["Rate2Hours"].ToString());
+				clockEvent.Rate2Auto         = PIn.TSpan (row["Rate2Auto"].ToString());
 				retVal.Add(clockEvent);
 			}
 			return retVal;

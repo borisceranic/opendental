@@ -45,17 +45,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabClinicalInfo> TableToList(DataTable table){
 			List<EhrLabClinicalInfo> retVal=new List<EhrLabClinicalInfo>();
 			EhrLabClinicalInfo ehrLabClinicalInfo;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabClinicalInfo=new EhrLabClinicalInfo();
-				ehrLabClinicalInfo.EhrLabClinicalInfoNum        = PIn.Long  (table.Rows[i]["EhrLabClinicalInfoNum"].ToString());
-				ehrLabClinicalInfo.EhrLabNum                    = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoID               = PIn.String(table.Rows[i]["ClinicalInfoID"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoText             = PIn.String(table.Rows[i]["ClinicalInfoText"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoCodeSystemName   = PIn.String(table.Rows[i]["ClinicalInfoCodeSystemName"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoIDAlt            = PIn.String(table.Rows[i]["ClinicalInfoIDAlt"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoTextAlt          = PIn.String(table.Rows[i]["ClinicalInfoTextAlt"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt= PIn.String(table.Rows[i]["ClinicalInfoCodeSystemNameAlt"].ToString());
-				ehrLabClinicalInfo.ClinicalInfoTextOriginal     = PIn.String(table.Rows[i]["ClinicalInfoTextOriginal"].ToString());
+				ehrLabClinicalInfo.EhrLabClinicalInfoNum        = PIn.Long  (row["EhrLabClinicalInfoNum"].ToString());
+				ehrLabClinicalInfo.EhrLabNum                    = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoID               = PIn.String(row["ClinicalInfoID"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoText             = PIn.String(row["ClinicalInfoText"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoCodeSystemName   = PIn.String(row["ClinicalInfoCodeSystemName"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoIDAlt            = PIn.String(row["ClinicalInfoIDAlt"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoTextAlt          = PIn.String(row["ClinicalInfoTextAlt"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt= PIn.String(row["ClinicalInfoCodeSystemNameAlt"].ToString());
+				ehrLabClinicalInfo.ClinicalInfoTextOriginal     = PIn.String(row["ClinicalInfoTextOriginal"].ToString());
 				retVal.Add(ehrLabClinicalInfo);
 			}
 			return retVal;

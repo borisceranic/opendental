@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimSnapshot> TableToList(DataTable table){
 			List<ClaimSnapshot> retVal=new List<ClaimSnapshot>();
 			ClaimSnapshot claimSnapshot;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimSnapshot=new ClaimSnapshot();
-				claimSnapshot.ClaimSnapshotNum= PIn.Long  (table.Rows[i]["ClaimSnapshotNum"].ToString());
-				claimSnapshot.ProcNum         = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				claimSnapshot.ClaimType       = PIn.String(table.Rows[i]["ClaimType"].ToString());
-				claimSnapshot.Writeoff        = PIn.Double(table.Rows[i]["Writeoff"].ToString());
-				claimSnapshot.InsPayEst  = PIn.Double(table.Rows[i]["InsPayEst"].ToString());
-				claimSnapshot.Fee             = PIn.Double(table.Rows[i]["Fee"].ToString());
-				claimSnapshot.DateTEntry      = PIn.DateT (table.Rows[i]["DateTEntry"].ToString());
+				claimSnapshot.ClaimSnapshotNum= PIn.Long  (row["ClaimSnapshotNum"].ToString());
+				claimSnapshot.ProcNum         = PIn.Long  (row["ProcNum"].ToString());
+				claimSnapshot.ClaimType       = PIn.String(row["ClaimType"].ToString());
+				claimSnapshot.Writeoff        = PIn.Double(row["Writeoff"].ToString());
+				claimSnapshot.InsPayEst       = PIn.Double(row["InsPayEst"].ToString());
+				claimSnapshot.Fee             = PIn.Double(row["Fee"].ToString());
+				claimSnapshot.DateTEntry      = PIn.DateT (row["DateTEntry"].ToString());
 				retVal.Add(claimSnapshot);
 			}
 			return retVal;
@@ -162,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 				+"ProcNum         =  "+POut.Long  (claimSnapshot.ProcNum)+", "
 				+"ClaimType       = '"+POut.String(claimSnapshot.ClaimType)+"', "
 				+"Writeoff        = '"+POut.Double(claimSnapshot.Writeoff)+"', "
-				+"InsPayEst  = '"+POut.Double(claimSnapshot.InsPayEst)+"', "
+				+"InsPayEst       = '"+POut.Double(claimSnapshot.InsPayEst)+"', "
 				+"Fee             = '"+POut.Double(claimSnapshot.Fee)+"', "
 				//DateTEntry not allowed to change
 				+"WHERE ClaimSnapshotNum = "+POut.Long(claimSnapshot.ClaimSnapshotNum);

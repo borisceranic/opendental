@@ -45,17 +45,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabSpecimenRejectReason> TableToList(DataTable table){
 			List<EhrLabSpecimenRejectReason> retVal=new List<EhrLabSpecimenRejectReason>();
 			EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabSpecimenRejectReason=new EhrLabSpecimenRejectReason();
-				ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum        = PIn.Long  (table.Rows[i]["EhrLabSpecimenRejectReasonNum"].ToString());
-				ehrLabSpecimenRejectReason.EhrLabSpecimenNum                    = PIn.Long  (table.Rows[i]["EhrLabSpecimenNum"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonID               = PIn.String(table.Rows[i]["SpecimenRejectReasonID"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonText             = PIn.String(table.Rows[i]["SpecimenRejectReasonText"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName   = PIn.String(table.Rows[i]["SpecimenRejectReasonCodeSystemName"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt            = PIn.String(table.Rows[i]["SpecimenRejectReasonIDAlt"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt          = PIn.String(table.Rows[i]["SpecimenRejectReasonTextAlt"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt= PIn.String(table.Rows[i]["SpecimenRejectReasonCodeSystemNameAlt"].ToString());
-				ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal     = PIn.String(table.Rows[i]["SpecimenRejectReasonTextOriginal"].ToString());
+				ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum        = PIn.Long  (row["EhrLabSpecimenRejectReasonNum"].ToString());
+				ehrLabSpecimenRejectReason.EhrLabSpecimenNum                    = PIn.Long  (row["EhrLabSpecimenNum"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonID               = PIn.String(row["SpecimenRejectReasonID"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonText             = PIn.String(row["SpecimenRejectReasonText"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName   = PIn.String(row["SpecimenRejectReasonCodeSystemName"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt            = PIn.String(row["SpecimenRejectReasonIDAlt"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt          = PIn.String(row["SpecimenRejectReasonTextAlt"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt= PIn.String(row["SpecimenRejectReasonCodeSystemNameAlt"].ToString());
+				ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal     = PIn.String(row["SpecimenRejectReasonTextOriginal"].ToString());
 				retVal.Add(ehrLabSpecimenRejectReason);
 			}
 			return retVal;

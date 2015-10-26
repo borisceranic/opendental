@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<ApptFieldDef> TableToList(DataTable table){
 			List<ApptFieldDef> retVal=new List<ApptFieldDef>();
 			ApptFieldDef apptFieldDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				apptFieldDef=new ApptFieldDef();
-				apptFieldDef.ApptFieldDefNum= PIn.Long  (table.Rows[i]["ApptFieldDefNum"].ToString());
-				apptFieldDef.FieldName      = PIn.String(table.Rows[i]["FieldName"].ToString());
-				apptFieldDef.FieldType      = (OpenDentBusiness.ApptFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
-				apptFieldDef.PickList       = PIn.String(table.Rows[i]["PickList"].ToString());
+				apptFieldDef.ApptFieldDefNum= PIn.Long  (row["ApptFieldDefNum"].ToString());
+				apptFieldDef.FieldName      = PIn.String(row["FieldName"].ToString());
+				apptFieldDef.FieldType      = (OpenDentBusiness.ApptFieldType)PIn.Int(row["FieldType"].ToString());
+				apptFieldDef.PickList       = PIn.String(row["PickList"].ToString());
 				retVal.Add(apptFieldDef);
 			}
 			return retVal;

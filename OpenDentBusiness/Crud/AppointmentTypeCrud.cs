@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<AppointmentType> TableToList(DataTable table){
 			List<AppointmentType> retVal=new List<AppointmentType>();
 			AppointmentType appointmentType;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				appointmentType=new AppointmentType();
-				appointmentType.AppointmentTypeNum  = PIn.Long  (table.Rows[i]["AppointmentTypeNum"].ToString());
-				appointmentType.AppointmentTypeName = PIn.String(table.Rows[i]["AppointmentTypeName"].ToString());
-				appointmentType.AppointmentTypeColor= Color.FromArgb(PIn.Int(table.Rows[i]["AppointmentTypeColor"].ToString()));
-				appointmentType.ItemOrder           = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				appointmentType.IsHidden            = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				appointmentType.AppointmentTypeNum  = PIn.Long  (row["AppointmentTypeNum"].ToString());
+				appointmentType.AppointmentTypeName = PIn.String(row["AppointmentTypeName"].ToString());
+				appointmentType.AppointmentTypeColor= Color.FromArgb(PIn.Int(row["AppointmentTypeColor"].ToString()));
+				appointmentType.ItemOrder           = PIn.Int   (row["ItemOrder"].ToString());
+				appointmentType.IsHidden            = PIn.Bool  (row["IsHidden"].ToString());
 				retVal.Add(appointmentType);
 			}
 			return retVal;

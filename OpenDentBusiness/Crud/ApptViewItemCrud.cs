@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<ApptViewItem> TableToList(DataTable table){
 			List<ApptViewItem> retVal=new List<ApptViewItem>();
 			ApptViewItem apptViewItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				apptViewItem=new ApptViewItem();
-				apptViewItem.ApptViewItemNum = PIn.Long  (table.Rows[i]["ApptViewItemNum"].ToString());
-				apptViewItem.ApptViewNum     = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
-				apptViewItem.OpNum           = PIn.Long  (table.Rows[i]["OpNum"].ToString());
-				apptViewItem.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				apptViewItem.ElementDesc     = PIn.String(table.Rows[i]["ElementDesc"].ToString());
-				apptViewItem.ElementOrder    = PIn.Byte  (table.Rows[i]["ElementOrder"].ToString());
-				apptViewItem.ElementColor    = Color.FromArgb(PIn.Int(table.Rows[i]["ElementColor"].ToString()));
-				apptViewItem.ElementAlignment= (OpenDentBusiness.ApptViewAlignment)PIn.Int(table.Rows[i]["ElementAlignment"].ToString());
-				apptViewItem.ApptFieldDefNum = PIn.Long  (table.Rows[i]["ApptFieldDefNum"].ToString());
-				apptViewItem.PatFieldDefNum  = PIn.Long  (table.Rows[i]["PatFieldDefNum"].ToString());
+				apptViewItem.ApptViewItemNum = PIn.Long  (row["ApptViewItemNum"].ToString());
+				apptViewItem.ApptViewNum     = PIn.Long  (row["ApptViewNum"].ToString());
+				apptViewItem.OpNum           = PIn.Long  (row["OpNum"].ToString());
+				apptViewItem.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
+				apptViewItem.ElementDesc     = PIn.String(row["ElementDesc"].ToString());
+				apptViewItem.ElementOrder    = PIn.Byte  (row["ElementOrder"].ToString());
+				apptViewItem.ElementColor    = Color.FromArgb(PIn.Int(row["ElementColor"].ToString()));
+				apptViewItem.ElementAlignment= (OpenDentBusiness.ApptViewAlignment)PIn.Int(row["ElementAlignment"].ToString());
+				apptViewItem.ApptFieldDefNum = PIn.Long  (row["ApptFieldDefNum"].ToString());
+				apptViewItem.PatFieldDefNum  = PIn.Long  (row["PatFieldDefNum"].ToString());
 				retVal.Add(apptViewItem);
 			}
 			return retVal;

@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<Task> TableToList(DataTable table){
 			List<Task> retVal=new List<Task>();
 			Task task;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				task=new Task();
-				task.TaskNum         = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
-				task.TaskListNum     = PIn.Long  (table.Rows[i]["TaskListNum"].ToString());
-				task.DateTask        = PIn.Date  (table.Rows[i]["DateTask"].ToString());
-				task.KeyNum          = PIn.Long  (table.Rows[i]["KeyNum"].ToString());
-				task.Descript        = PIn.String(table.Rows[i]["Descript"].ToString());
-				task.TaskStatus      = (OpenDentBusiness.TaskStatusEnum)PIn.Int(table.Rows[i]["TaskStatus"].ToString());
-				task.IsRepeating     = PIn.Bool  (table.Rows[i]["IsRepeating"].ToString());
-				task.DateType        = (OpenDentBusiness.TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
-				task.FromNum         = PIn.Long  (table.Rows[i]["FromNum"].ToString());
-				task.ObjectType      = (OpenDentBusiness.TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
-				task.DateTimeEntry   = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				task.UserNum         = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				task.DateTimeFinished= PIn.DateT (table.Rows[i]["DateTimeFinished"].ToString());
-				task.PriorityDefNum  = PIn.Long  (table.Rows[i]["PriorityDefNum"].ToString());
+				task.TaskNum         = PIn.Long  (row["TaskNum"].ToString());
+				task.TaskListNum     = PIn.Long  (row["TaskListNum"].ToString());
+				task.DateTask        = PIn.Date  (row["DateTask"].ToString());
+				task.KeyNum          = PIn.Long  (row["KeyNum"].ToString());
+				task.Descript        = PIn.String(row["Descript"].ToString());
+				task.TaskStatus      = (OpenDentBusiness.TaskStatusEnum)PIn.Int(row["TaskStatus"].ToString());
+				task.IsRepeating     = PIn.Bool  (row["IsRepeating"].ToString());
+				task.DateType        = (OpenDentBusiness.TaskDateType)PIn.Int(row["DateType"].ToString());
+				task.FromNum         = PIn.Long  (row["FromNum"].ToString());
+				task.ObjectType      = (OpenDentBusiness.TaskObjectType)PIn.Int(row["ObjectType"].ToString());
+				task.DateTimeEntry   = PIn.DateT (row["DateTimeEntry"].ToString());
+				task.UserNum         = PIn.Long  (row["UserNum"].ToString());
+				task.DateTimeFinished= PIn.DateT (row["DateTimeFinished"].ToString());
+				task.PriorityDefNum  = PIn.Long  (row["PriorityDefNum"].ToString());
 				retVal.Add(task);
 			}
 			return retVal;

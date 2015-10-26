@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedLabResult> TableToList(DataTable table){
 			List<MedLabResult> retVal=new List<MedLabResult>();
 			MedLabResult medLabResult;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medLabResult=new MedLabResult();
-				medLabResult.MedLabResultNum= PIn.Long  (table.Rows[i]["MedLabResultNum"].ToString());
-				medLabResult.MedLabNum      = PIn.Long  (table.Rows[i]["MedLabNum"].ToString());
-				medLabResult.ObsID          = PIn.String(table.Rows[i]["ObsID"].ToString());
-				medLabResult.ObsText        = PIn.String(table.Rows[i]["ObsText"].ToString());
-				medLabResult.ObsLoinc       = PIn.String(table.Rows[i]["ObsLoinc"].ToString());
-				medLabResult.ObsLoincText   = PIn.String(table.Rows[i]["ObsLoincText"].ToString());
-				medLabResult.ObsIDSub       = PIn.String(table.Rows[i]["ObsIDSub"].ToString());
-				medLabResult.ObsValue       = PIn.String(table.Rows[i]["ObsValue"].ToString());
-				string obsSubType=table.Rows[i]["ObsSubType"].ToString();
+				medLabResult.MedLabResultNum= PIn.Long  (row["MedLabResultNum"].ToString());
+				medLabResult.MedLabNum      = PIn.Long  (row["MedLabNum"].ToString());
+				medLabResult.ObsID          = PIn.String(row["ObsID"].ToString());
+				medLabResult.ObsText        = PIn.String(row["ObsText"].ToString());
+				medLabResult.ObsLoinc       = PIn.String(row["ObsLoinc"].ToString());
+				medLabResult.ObsLoincText   = PIn.String(row["ObsLoincText"].ToString());
+				medLabResult.ObsIDSub       = PIn.String(row["ObsIDSub"].ToString());
+				medLabResult.ObsValue       = PIn.String(row["ObsValue"].ToString());
+				string obsSubType=row["ObsSubType"].ToString();
 				if(obsSubType==""){
 					medLabResult.ObsSubType   =(DataSubtype)0;
 				}
@@ -64,9 +64,9 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					medLabResult.ObsSubType   =(DataSubtype)0;
 				}
-				medLabResult.ObsUnits       = PIn.String(table.Rows[i]["ObsUnits"].ToString());
-				medLabResult.ReferenceRange = PIn.String(table.Rows[i]["ReferenceRange"].ToString());
-				string abnormalFlag=table.Rows[i]["AbnormalFlag"].ToString();
+				medLabResult.ObsUnits       = PIn.String(row["ObsUnits"].ToString());
+				medLabResult.ReferenceRange = PIn.String(row["ReferenceRange"].ToString());
+				string abnormalFlag=row["AbnormalFlag"].ToString();
 				if(abnormalFlag==""){
 					medLabResult.AbnormalFlag =(AbnormalFlag)0;
 				}
@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					medLabResult.AbnormalFlag =(AbnormalFlag)0;
 				}
-				string resultStatus=table.Rows[i]["ResultStatus"].ToString();
+				string resultStatus=row["ResultStatus"].ToString();
 				if(resultStatus==""){
 					medLabResult.ResultStatus =(ResultStatus)0;
 				}
@@ -86,10 +86,10 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					medLabResult.ResultStatus =(ResultStatus)0;
 				}
-				medLabResult.DateTimeObs    = PIn.DateT (table.Rows[i]["DateTimeObs"].ToString());
-				medLabResult.FacilityID     = PIn.String(table.Rows[i]["FacilityID"].ToString());
-				medLabResult.DocNum         = PIn.Long  (table.Rows[i]["DocNum"].ToString());
-				medLabResult.Note           = PIn.String(table.Rows[i]["Note"].ToString());
+				medLabResult.DateTimeObs    = PIn.DateT (row["DateTimeObs"].ToString());
+				medLabResult.FacilityID     = PIn.String(row["FacilityID"].ToString());
+				medLabResult.DocNum         = PIn.Long  (row["DocNum"].ToString());
+				medLabResult.Note           = PIn.String(row["Note"].ToString());
 				retVal.Add(medLabResult);
 			}
 			return retVal;

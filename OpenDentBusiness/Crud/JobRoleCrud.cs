@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobRole> TableToList(DataTable table){
 			List<JobRole> retVal=new List<JobRole>();
 			JobRole jobRole;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobRole=new JobRole();
-				jobRole.JobRoleNum= PIn.Long  (table.Rows[i]["JobRoleNum"].ToString());
-				jobRole.UserNum   = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				jobRole.RoleType  = (OpenDentBusiness.JobRoleType)PIn.Int(table.Rows[i]["RoleType"].ToString());
+				jobRole.JobRoleNum= PIn.Long  (row["JobRoleNum"].ToString());
+				jobRole.UserNum   = PIn.Long  (row["UserNum"].ToString());
+				jobRole.RoleType  = (OpenDentBusiness.JobRoleType)PIn.Int(row["RoleType"].ToString());
 				retVal.Add(jobRole);
 			}
 			return retVal;

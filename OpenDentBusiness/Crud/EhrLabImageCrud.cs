@@ -45,11 +45,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabImage> TableToList(DataTable table){
 			List<EhrLabImage> retVal=new List<EhrLabImage>();
 			EhrLabImage ehrLabImage;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabImage=new EhrLabImage();
-				ehrLabImage.EhrLabImageNum= PIn.Long  (table.Rows[i]["EhrLabImageNum"].ToString());
-				ehrLabImage.EhrLabNum     = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabImage.DocNum        = PIn.Long  (table.Rows[i]["DocNum"].ToString());
+				ehrLabImage.EhrLabImageNum= PIn.Long  (row["EhrLabImageNum"].ToString());
+				ehrLabImage.EhrLabNum     = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabImage.DocNum        = PIn.Long  (row["DocNum"].ToString());
 				retVal.Add(ehrLabImage);
 			}
 			return retVal;

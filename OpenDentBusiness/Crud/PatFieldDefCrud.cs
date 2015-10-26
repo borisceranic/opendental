@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<PatFieldDef> TableToList(DataTable table){
 			List<PatFieldDef> retVal=new List<PatFieldDef>();
 			PatFieldDef patFieldDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				patFieldDef=new PatFieldDef();
-				patFieldDef.PatFieldDefNum= PIn.Long  (table.Rows[i]["PatFieldDefNum"].ToString());
-				patFieldDef.FieldName     = PIn.String(table.Rows[i]["FieldName"].ToString());
-				patFieldDef.FieldType     = (OpenDentBusiness.PatFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
-				patFieldDef.PickList      = PIn.String(table.Rows[i]["PickList"].ToString());
-				patFieldDef.ItemOrder     = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				patFieldDef.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				patFieldDef.PatFieldDefNum= PIn.Long  (row["PatFieldDefNum"].ToString());
+				patFieldDef.FieldName     = PIn.String(row["FieldName"].ToString());
+				patFieldDef.FieldType     = (OpenDentBusiness.PatFieldType)PIn.Int(row["FieldType"].ToString());
+				patFieldDef.PickList      = PIn.String(row["PickList"].ToString());
+				patFieldDef.ItemOrder     = PIn.Int   (row["ItemOrder"].ToString());
+				patFieldDef.IsHidden      = PIn.Bool  (row["IsHidden"].ToString());
 				retVal.Add(patFieldDef);
 			}
 			return retVal;

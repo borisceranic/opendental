@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<Contact> TableToList(DataTable table){
 			List<Contact> retVal=new List<Contact>();
 			Contact contact;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				contact=new Contact();
-				contact.ContactNum= PIn.Long  (table.Rows[i]["ContactNum"].ToString());
-				contact.LName     = PIn.String(table.Rows[i]["LName"].ToString());
-				contact.FName     = PIn.String(table.Rows[i]["FName"].ToString());
-				contact.WkPhone   = PIn.String(table.Rows[i]["WkPhone"].ToString());
-				contact.Fax       = PIn.String(table.Rows[i]["Fax"].ToString());
-				contact.Category  = PIn.Long  (table.Rows[i]["Category"].ToString());
-				contact.Notes     = PIn.String(table.Rows[i]["Notes"].ToString());
+				contact.ContactNum= PIn.Long  (row["ContactNum"].ToString());
+				contact.LName     = PIn.String(row["LName"].ToString());
+				contact.FName     = PIn.String(row["FName"].ToString());
+				contact.WkPhone   = PIn.String(row["WkPhone"].ToString());
+				contact.Fax       = PIn.String(row["Fax"].ToString());
+				contact.Category  = PIn.Long  (row["Category"].ToString());
+				contact.Notes     = PIn.String(row["Notes"].ToString());
 				retVal.Add(contact);
 			}
 			return retVal;

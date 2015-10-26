@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<RequiredFieldCondition> TableToList(DataTable table){
 			List<RequiredFieldCondition> retVal=new List<RequiredFieldCondition>();
 			RequiredFieldCondition requiredFieldCondition;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				requiredFieldCondition=new RequiredFieldCondition();
-				requiredFieldCondition.RequiredFieldConditionNum= PIn.Long  (table.Rows[i]["RequiredFieldConditionNum"].ToString());
-				requiredFieldCondition.RequiredFieldNum         = PIn.Long  (table.Rows[i]["RequiredFieldNum"].ToString());
-				string conditionType=table.Rows[i]["ConditionType"].ToString();
+				requiredFieldCondition.RequiredFieldConditionNum= PIn.Long  (row["RequiredFieldConditionNum"].ToString());
+				requiredFieldCondition.RequiredFieldNum         = PIn.Long  (row["RequiredFieldNum"].ToString());
+				string conditionType=row["ConditionType"].ToString();
 				if(conditionType==""){
 					requiredFieldCondition.ConditionType          =(RequiredFieldName)0;
 				}
@@ -58,9 +58,9 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					requiredFieldCondition.ConditionType          =(RequiredFieldName)0;
 				}
-				requiredFieldCondition.Operator                 = (OpenDentBusiness.ConditionOperator)PIn.Int(table.Rows[i]["Operator"].ToString());
-				requiredFieldCondition.ConditionValue           = PIn.String(table.Rows[i]["ConditionValue"].ToString());
-				requiredFieldCondition.ConditionRelationship    = (OpenDentBusiness.LogicalOperator)PIn.Int(table.Rows[i]["ConditionRelationship"].ToString());
+				requiredFieldCondition.Operator                 = (OpenDentBusiness.ConditionOperator)PIn.Int(row["Operator"].ToString());
+				requiredFieldCondition.ConditionValue           = PIn.String(row["ConditionValue"].ToString());
+				requiredFieldCondition.ConditionRelationship    = (OpenDentBusiness.LogicalOperator)PIn.Int(row["ConditionRelationship"].ToString());
 				retVal.Add(requiredFieldCondition);
 			}
 			return retVal;

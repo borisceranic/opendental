@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<QuickPasteCat> TableToList(DataTable table){
 			List<QuickPasteCat> retVal=new List<QuickPasteCat>();
 			QuickPasteCat quickPasteCat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				quickPasteCat=new QuickPasteCat();
-				quickPasteCat.QuickPasteCatNum= PIn.Long  (table.Rows[i]["QuickPasteCatNum"].ToString());
-				quickPasteCat.Description     = PIn.String(table.Rows[i]["Description"].ToString());
-				quickPasteCat.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				quickPasteCat.DefaultForTypes = PIn.String(table.Rows[i]["DefaultForTypes"].ToString());
+				quickPasteCat.QuickPasteCatNum= PIn.Long  (row["QuickPasteCatNum"].ToString());
+				quickPasteCat.Description     = PIn.String(row["Description"].ToString());
+				quickPasteCat.ItemOrder       = PIn.Int   (row["ItemOrder"].ToString());
+				quickPasteCat.DefaultForTypes = PIn.String(row["DefaultForTypes"].ToString());
 				retVal.Add(quickPasteCat);
 			}
 			return retVal;

@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<MountItem> TableToList(DataTable table){
 			List<MountItem> retVal=new List<MountItem>();
 			MountItem mountItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				mountItem=new MountItem();
-				mountItem.MountItemNum= PIn.Long  (table.Rows[i]["MountItemNum"].ToString());
-				mountItem.MountNum    = PIn.Long  (table.Rows[i]["MountNum"].ToString());
-				mountItem.Xpos        = PIn.Int   (table.Rows[i]["Xpos"].ToString());
-				mountItem.Ypos        = PIn.Int   (table.Rows[i]["Ypos"].ToString());
-				mountItem.OrdinalPos  = PIn.Int   (table.Rows[i]["OrdinalPos"].ToString());
-				mountItem.Width       = PIn.Int   (table.Rows[i]["Width"].ToString());
-				mountItem.Height      = PIn.Int   (table.Rows[i]["Height"].ToString());
+				mountItem.MountItemNum= PIn.Long  (row["MountItemNum"].ToString());
+				mountItem.MountNum    = PIn.Long  (row["MountNum"].ToString());
+				mountItem.Xpos        = PIn.Int   (row["Xpos"].ToString());
+				mountItem.Ypos        = PIn.Int   (row["Ypos"].ToString());
+				mountItem.OrdinalPos  = PIn.Int   (row["OrdinalPos"].ToString());
+				mountItem.Width       = PIn.Int   (row["Width"].ToString());
+				mountItem.Height      = PIn.Int   (row["Height"].ToString());
 				retVal.Add(mountItem);
 			}
 			return retVal;

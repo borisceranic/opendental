@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<DispSupply> TableToList(DataTable table){
 			List<DispSupply> retVal=new List<DispSupply>();
 			DispSupply dispSupply;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				dispSupply=new DispSupply();
-				dispSupply.DispSupplyNum= PIn.Long  (table.Rows[i]["DispSupplyNum"].ToString());
-				dispSupply.SupplyNum    = PIn.Long  (table.Rows[i]["SupplyNum"].ToString());
-				dispSupply.ProvNum      = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				dispSupply.DateDispensed= PIn.Date  (table.Rows[i]["DateDispensed"].ToString());
-				dispSupply.DispQuantity = PIn.Float (table.Rows[i]["DispQuantity"].ToString());
-				dispSupply.Note         = PIn.String(table.Rows[i]["Note"].ToString());
+				dispSupply.DispSupplyNum= PIn.Long  (row["DispSupplyNum"].ToString());
+				dispSupply.SupplyNum    = PIn.Long  (row["SupplyNum"].ToString());
+				dispSupply.ProvNum      = PIn.Long  (row["ProvNum"].ToString());
+				dispSupply.DateDispensed= PIn.Date  (row["DateDispensed"].ToString());
+				dispSupply.DispQuantity = PIn.Float (row["DispQuantity"].ToString());
+				dispSupply.Note         = PIn.String(row["Note"].ToString());
 				retVal.Add(dispSupply);
 			}
 			return retVal;

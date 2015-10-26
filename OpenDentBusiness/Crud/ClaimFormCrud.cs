@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimForm> TableToList(DataTable table){
 			List<ClaimForm> retVal=new List<ClaimForm>();
 			ClaimForm claimForm;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimForm=new ClaimForm();
-				claimForm.ClaimFormNum= PIn.Long  (table.Rows[i]["ClaimFormNum"].ToString());
-				claimForm.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				claimForm.IsHidden    = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				claimForm.FontName    = PIn.String(table.Rows[i]["FontName"].ToString());
-				claimForm.FontSize    = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				claimForm.UniqueID    = PIn.String(table.Rows[i]["UniqueID"].ToString());
-				claimForm.PrintImages = PIn.Bool  (table.Rows[i]["PrintImages"].ToString());
-				claimForm.OffsetX     = PIn.Int   (table.Rows[i]["OffsetX"].ToString());
-				claimForm.OffsetY     = PIn.Int   (table.Rows[i]["OffsetY"].ToString());
+				claimForm.ClaimFormNum= PIn.Long  (row["ClaimFormNum"].ToString());
+				claimForm.Description = PIn.String(row["Description"].ToString());
+				claimForm.IsHidden    = PIn.Bool  (row["IsHidden"].ToString());
+				claimForm.FontName    = PIn.String(row["FontName"].ToString());
+				claimForm.FontSize    = PIn.Float (row["FontSize"].ToString());
+				claimForm.UniqueID    = PIn.String(row["UniqueID"].ToString());
+				claimForm.PrintImages = PIn.Bool  (row["PrintImages"].ToString());
+				claimForm.OffsetX     = PIn.Int   (row["OffsetX"].ToString());
+				claimForm.OffsetY     = PIn.Int   (row["OffsetY"].ToString());
 				retVal.Add(claimForm);
 			}
 			return retVal;

@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<ToothInitial> TableToList(DataTable table){
 			List<ToothInitial> retVal=new List<ToothInitial>();
 			ToothInitial toothInitial;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				toothInitial=new ToothInitial();
-				toothInitial.ToothInitialNum= PIn.Long  (table.Rows[i]["ToothInitialNum"].ToString());
-				toothInitial.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				toothInitial.ToothNum       = PIn.String(table.Rows[i]["ToothNum"].ToString());
-				toothInitial.InitialType    = (OpenDentBusiness.ToothInitialType)PIn.Int(table.Rows[i]["InitialType"].ToString());
-				toothInitial.Movement       = PIn.Float (table.Rows[i]["Movement"].ToString());
-				toothInitial.DrawingSegment = PIn.String(table.Rows[i]["DrawingSegment"].ToString());
-				toothInitial.ColorDraw      = Color.FromArgb(PIn.Int(table.Rows[i]["ColorDraw"].ToString()));
+				toothInitial.ToothInitialNum= PIn.Long  (row["ToothInitialNum"].ToString());
+				toothInitial.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				toothInitial.ToothNum       = PIn.String(row["ToothNum"].ToString());
+				toothInitial.InitialType    = (OpenDentBusiness.ToothInitialType)PIn.Int(row["InitialType"].ToString());
+				toothInitial.Movement       = PIn.Float (row["Movement"].ToString());
+				toothInitial.DrawingSegment = PIn.String(row["DrawingSegment"].ToString());
+				toothInitial.ColorDraw      = Color.FromArgb(PIn.Int(row["ColorDraw"].ToString()));
 				retVal.Add(toothInitial);
 			}
 			return retVal;

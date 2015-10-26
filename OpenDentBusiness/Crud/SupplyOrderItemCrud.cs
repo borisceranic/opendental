@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<SupplyOrderItem> TableToList(DataTable table){
 			List<SupplyOrderItem> retVal=new List<SupplyOrderItem>();
 			SupplyOrderItem supplyOrderItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				supplyOrderItem=new SupplyOrderItem();
-				supplyOrderItem.SupplyOrderItemNum= PIn.Long  (table.Rows[i]["SupplyOrderItemNum"].ToString());
-				supplyOrderItem.SupplyOrderNum    = PIn.Long  (table.Rows[i]["SupplyOrderNum"].ToString());
-				supplyOrderItem.SupplyNum         = PIn.Long  (table.Rows[i]["SupplyNum"].ToString());
-				supplyOrderItem.Qty               = PIn.Int   (table.Rows[i]["Qty"].ToString());
-				supplyOrderItem.Price             = PIn.Double(table.Rows[i]["Price"].ToString());
+				supplyOrderItem.SupplyOrderItemNum= PIn.Long  (row["SupplyOrderItemNum"].ToString());
+				supplyOrderItem.SupplyOrderNum    = PIn.Long  (row["SupplyOrderNum"].ToString());
+				supplyOrderItem.SupplyNum         = PIn.Long  (row["SupplyNum"].ToString());
+				supplyOrderItem.Qty               = PIn.Int   (row["Qty"].ToString());
+				supplyOrderItem.Price             = PIn.Double(row["Price"].ToString());
 				retVal.Add(supplyOrderItem);
 			}
 			return retVal;

@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<SchoolCourse> TableToList(DataTable table){
 			List<SchoolCourse> retVal=new List<SchoolCourse>();
 			SchoolCourse schoolCourse;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				schoolCourse=new SchoolCourse();
-				schoolCourse.SchoolCourseNum= PIn.Long  (table.Rows[i]["SchoolCourseNum"].ToString());
-				schoolCourse.CourseID       = PIn.String(table.Rows[i]["CourseID"].ToString());
-				schoolCourse.Descript       = PIn.String(table.Rows[i]["Descript"].ToString());
+				schoolCourse.SchoolCourseNum= PIn.Long  (row["SchoolCourseNum"].ToString());
+				schoolCourse.CourseID       = PIn.String(row["CourseID"].ToString());
+				schoolCourse.Descript       = PIn.String(row["Descript"].ToString());
 				retVal.Add(schoolCourse);
 			}
 			return retVal;

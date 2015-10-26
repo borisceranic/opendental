@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Dunning> TableToList(DataTable table){
 			List<Dunning> retVal=new List<Dunning>();
 			Dunning dunning;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				dunning=new Dunning();
-				dunning.DunningNum  = PIn.Long  (table.Rows[i]["DunningNum"].ToString());
-				dunning.DunMessage  = PIn.String(table.Rows[i]["DunMessage"].ToString());
-				dunning.BillingType = PIn.Long  (table.Rows[i]["BillingType"].ToString());
-				dunning.AgeAccount  = PIn.Byte  (table.Rows[i]["AgeAccount"].ToString());
-				dunning.InsIsPending= (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["InsIsPending"].ToString());
-				dunning.MessageBold = PIn.String(table.Rows[i]["MessageBold"].ToString());
-				dunning.EmailSubject= PIn.String(table.Rows[i]["EmailSubject"].ToString());
-				dunning.EmailBody   = PIn.String(table.Rows[i]["EmailBody"].ToString());
+				dunning.DunningNum  = PIn.Long  (row["DunningNum"].ToString());
+				dunning.DunMessage  = PIn.String(row["DunMessage"].ToString());
+				dunning.BillingType = PIn.Long  (row["BillingType"].ToString());
+				dunning.AgeAccount  = PIn.Byte  (row["AgeAccount"].ToString());
+				dunning.InsIsPending= (OpenDentBusiness.YN)PIn.Int(row["InsIsPending"].ToString());
+				dunning.MessageBold = PIn.String(row["MessageBold"].ToString());
+				dunning.EmailSubject= PIn.String(row["EmailSubject"].ToString());
+				dunning.EmailBody   = PIn.String(row["EmailBody"].ToString());
 				retVal.Add(dunning);
 			}
 			return retVal;

@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<FamilyHealth> TableToList(DataTable table){
 			List<FamilyHealth> retVal=new List<FamilyHealth>();
 			FamilyHealth familyHealth;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				familyHealth=new FamilyHealth();
-				familyHealth.FamilyHealthNum= PIn.Long  (table.Rows[i]["FamilyHealthNum"].ToString());
-				familyHealth.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				familyHealth.Relationship   = (OpenDentBusiness.FamilyRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
-				familyHealth.DiseaseDefNum  = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
-				familyHealth.PersonName     = PIn.String(table.Rows[i]["PersonName"].ToString());
+				familyHealth.FamilyHealthNum= PIn.Long  (row["FamilyHealthNum"].ToString());
+				familyHealth.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				familyHealth.Relationship   = (OpenDentBusiness.FamilyRelationship)PIn.Int(row["Relationship"].ToString());
+				familyHealth.DiseaseDefNum  = PIn.Long  (row["DiseaseDefNum"].ToString());
+				familyHealth.PersonName     = PIn.String(row["PersonName"].ToString());
 				retVal.Add(familyHealth);
 			}
 			return retVal;

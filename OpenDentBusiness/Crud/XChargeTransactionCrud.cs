@@ -44,23 +44,23 @@ namespace OpenDentBusiness.Crud{
 		public static List<XChargeTransaction> TableToList(DataTable table){
 			List<XChargeTransaction> retVal=new List<XChargeTransaction>();
 			XChargeTransaction xChargeTransaction;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				xChargeTransaction=new XChargeTransaction();
-				xChargeTransaction.XChargeTransactionNum= PIn.Long  (table.Rows[i]["XChargeTransactionNum"].ToString());
-				xChargeTransaction.TransType            = PIn.String(table.Rows[i]["TransType"].ToString());
-				xChargeTransaction.Amount               = PIn.Double(table.Rows[i]["Amount"].ToString());
-				xChargeTransaction.CCEntry              = PIn.String(table.Rows[i]["CCEntry"].ToString());
-				xChargeTransaction.PatNum               = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				xChargeTransaction.Result               = PIn.String(table.Rows[i]["Result"].ToString());
-				xChargeTransaction.ClerkID              = PIn.String(table.Rows[i]["ClerkID"].ToString());
-				xChargeTransaction.ResultCode           = PIn.String(table.Rows[i]["ResultCode"].ToString());
-				xChargeTransaction.Expiration           = PIn.String(table.Rows[i]["Expiration"].ToString());
-				xChargeTransaction.CCType               = PIn.String(table.Rows[i]["CCType"].ToString());
-				xChargeTransaction.CreditCardNum        = PIn.String(table.Rows[i]["CreditCardNum"].ToString());
-				xChargeTransaction.BatchNum             = PIn.String(table.Rows[i]["BatchNum"].ToString());
-				xChargeTransaction.ItemNum              = PIn.String(table.Rows[i]["ItemNum"].ToString());
-				xChargeTransaction.ApprCode             = PIn.String(table.Rows[i]["ApprCode"].ToString());
-				xChargeTransaction.TransactionDateTime  = PIn.DateT (table.Rows[i]["TransactionDateTime"].ToString());
+				xChargeTransaction.XChargeTransactionNum= PIn.Long  (row["XChargeTransactionNum"].ToString());
+				xChargeTransaction.TransType            = PIn.String(row["TransType"].ToString());
+				xChargeTransaction.Amount               = PIn.Double(row["Amount"].ToString());
+				xChargeTransaction.CCEntry              = PIn.String(row["CCEntry"].ToString());
+				xChargeTransaction.PatNum               = PIn.Long  (row["PatNum"].ToString());
+				xChargeTransaction.Result               = PIn.String(row["Result"].ToString());
+				xChargeTransaction.ClerkID              = PIn.String(row["ClerkID"].ToString());
+				xChargeTransaction.ResultCode           = PIn.String(row["ResultCode"].ToString());
+				xChargeTransaction.Expiration           = PIn.String(row["Expiration"].ToString());
+				xChargeTransaction.CCType               = PIn.String(row["CCType"].ToString());
+				xChargeTransaction.CreditCardNum        = PIn.String(row["CreditCardNum"].ToString());
+				xChargeTransaction.BatchNum             = PIn.String(row["BatchNum"].ToString());
+				xChargeTransaction.ItemNum              = PIn.String(row["ItemNum"].ToString());
+				xChargeTransaction.ApprCode             = PIn.String(row["ApprCode"].ToString());
+				xChargeTransaction.TransactionDateTime  = PIn.DateT (row["TransactionDateTime"].ToString());
 				retVal.Add(xChargeTransaction);
 			}
 			return retVal;

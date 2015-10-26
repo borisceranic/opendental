@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<LabResult> TableToList(DataTable table){
 			List<LabResult> retVal=new List<LabResult>();
 			LabResult labResult;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				labResult=new LabResult();
-				labResult.LabResultNum= PIn.Long  (table.Rows[i]["LabResultNum"].ToString());
-				labResult.LabPanelNum = PIn.Long  (table.Rows[i]["LabPanelNum"].ToString());
-				labResult.DateTimeTest= PIn.DateT (table.Rows[i]["DateTimeTest"].ToString());
-				labResult.TestName    = PIn.String(table.Rows[i]["TestName"].ToString());
-				labResult.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				labResult.TestID      = PIn.String(table.Rows[i]["TestID"].ToString());
-				labResult.ObsValue    = PIn.String(table.Rows[i]["ObsValue"].ToString());
-				labResult.ObsUnits    = PIn.String(table.Rows[i]["ObsUnits"].ToString());
-				labResult.ObsRange    = PIn.String(table.Rows[i]["ObsRange"].ToString());
-				labResult.AbnormalFlag= (OpenDentBusiness.LabAbnormalFlag)PIn.Int(table.Rows[i]["AbnormalFlag"].ToString());
+				labResult.LabResultNum= PIn.Long  (row["LabResultNum"].ToString());
+				labResult.LabPanelNum = PIn.Long  (row["LabPanelNum"].ToString());
+				labResult.DateTimeTest= PIn.DateT (row["DateTimeTest"].ToString());
+				labResult.TestName    = PIn.String(row["TestName"].ToString());
+				labResult.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
+				labResult.TestID      = PIn.String(row["TestID"].ToString());
+				labResult.ObsValue    = PIn.String(row["ObsValue"].ToString());
+				labResult.ObsUnits    = PIn.String(row["ObsUnits"].ToString());
+				labResult.ObsRange    = PIn.String(row["ObsRange"].ToString());
+				labResult.AbnormalFlag= (OpenDentBusiness.LabAbnormalFlag)PIn.Int(row["AbnormalFlag"].ToString());
 				retVal.Add(labResult);
 			}
 			return retVal;

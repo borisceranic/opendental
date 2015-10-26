@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrPatient> TableToList(DataTable table){
 			List<EhrPatient> retVal=new List<EhrPatient>();
 			EhrPatient ehrPatient;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrPatient=new EhrPatient();
-				ehrPatient.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrPatient.MotherMaidenFname= PIn.String(table.Rows[i]["MotherMaidenFname"].ToString());
-				ehrPatient.MotherMaidenLname= PIn.String(table.Rows[i]["MotherMaidenLname"].ToString());
-				ehrPatient.VacShareOk       = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["VacShareOk"].ToString());
-				ehrPatient.MedicaidState    = PIn.String(table.Rows[i]["MedicaidState"].ToString());
+				ehrPatient.PatNum           = PIn.Long  (row["PatNum"].ToString());
+				ehrPatient.MotherMaidenFname= PIn.String(row["MotherMaidenFname"].ToString());
+				ehrPatient.MotherMaidenLname= PIn.String(row["MotherMaidenLname"].ToString());
+				ehrPatient.VacShareOk       = (OpenDentBusiness.YN)PIn.Int(row["VacShareOk"].ToString());
+				ehrPatient.MedicaidState    = PIn.String(row["MedicaidState"].ToString());
 				retVal.Add(ehrPatient);
 			}
 			return retVal;

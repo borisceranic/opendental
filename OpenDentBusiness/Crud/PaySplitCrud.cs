@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<PaySplit> TableToList(DataTable table){
 			List<PaySplit> retVal=new List<PaySplit>();
 			PaySplit paySplit;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				paySplit=new PaySplit();
-				paySplit.SplitNum    = PIn.Long  (table.Rows[i]["SplitNum"].ToString());
-				paySplit.SplitAmt    = PIn.Double(table.Rows[i]["SplitAmt"].ToString());
-				paySplit.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				paySplit.ProcDate    = PIn.Date  (table.Rows[i]["ProcDate"].ToString());
-				paySplit.PayNum      = PIn.Long  (table.Rows[i]["PayNum"].ToString());
-				paySplit.IsDiscount  = PIn.Bool  (table.Rows[i]["IsDiscount"].ToString());
-				paySplit.DiscountType= PIn.Byte  (table.Rows[i]["DiscountType"].ToString());
-				paySplit.ProvNum     = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				paySplit.PayPlanNum  = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
-				paySplit.DatePay     = PIn.Date  (table.Rows[i]["DatePay"].ToString());
-				paySplit.ProcNum     = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				paySplit.DateEntry   = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				paySplit.UnearnedType= PIn.Long  (table.Rows[i]["UnearnedType"].ToString());
-				paySplit.ClinicNum   = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				paySplit.SplitNum    = PIn.Long  (row["SplitNum"].ToString());
+				paySplit.SplitAmt    = PIn.Double(row["SplitAmt"].ToString());
+				paySplit.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				paySplit.ProcDate    = PIn.Date  (row["ProcDate"].ToString());
+				paySplit.PayNum      = PIn.Long  (row["PayNum"].ToString());
+				paySplit.IsDiscount  = PIn.Bool  (row["IsDiscount"].ToString());
+				paySplit.DiscountType= PIn.Byte  (row["DiscountType"].ToString());
+				paySplit.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
+				paySplit.PayPlanNum  = PIn.Long  (row["PayPlanNum"].ToString());
+				paySplit.DatePay     = PIn.Date  (row["DatePay"].ToString());
+				paySplit.ProcNum     = PIn.Long  (row["ProcNum"].ToString());
+				paySplit.DateEntry   = PIn.Date  (row["DateEntry"].ToString());
+				paySplit.UnearnedType= PIn.Long  (row["UnearnedType"].ToString());
+				paySplit.ClinicNum   = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(paySplit);
 			}
 			return retVal;

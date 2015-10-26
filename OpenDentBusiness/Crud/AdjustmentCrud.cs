@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<Adjustment> TableToList(DataTable table){
 			List<Adjustment> retVal=new List<Adjustment>();
 			Adjustment adjustment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				adjustment=new Adjustment();
-				adjustment.AdjNum      = PIn.Long  (table.Rows[i]["AdjNum"].ToString());
-				adjustment.AdjDate     = PIn.Date  (table.Rows[i]["AdjDate"].ToString());
-				adjustment.AdjAmt      = PIn.Double(table.Rows[i]["AdjAmt"].ToString());
-				adjustment.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				adjustment.AdjType     = PIn.Long  (table.Rows[i]["AdjType"].ToString());
-				adjustment.ProvNum     = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				adjustment.AdjNote     = PIn.String(table.Rows[i]["AdjNote"].ToString());
-				adjustment.ProcDate    = PIn.Date  (table.Rows[i]["ProcDate"].ToString());
-				adjustment.ProcNum     = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				adjustment.DateEntry   = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				adjustment.ClinicNum   = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				adjustment.StatementNum= PIn.Long  (table.Rows[i]["StatementNum"].ToString());
+				adjustment.AdjNum      = PIn.Long  (row["AdjNum"].ToString());
+				adjustment.AdjDate     = PIn.Date  (row["AdjDate"].ToString());
+				adjustment.AdjAmt      = PIn.Double(row["AdjAmt"].ToString());
+				adjustment.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				adjustment.AdjType     = PIn.Long  (row["AdjType"].ToString());
+				adjustment.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
+				adjustment.AdjNote     = PIn.String(row["AdjNote"].ToString());
+				adjustment.ProcDate    = PIn.Date  (row["ProcDate"].ToString());
+				adjustment.ProcNum     = PIn.Long  (row["ProcNum"].ToString());
+				adjustment.DateEntry   = PIn.Date  (row["DateEntry"].ToString());
+				adjustment.ClinicNum   = PIn.Long  (row["ClinicNum"].ToString());
+				adjustment.StatementNum= PIn.Long  (row["StatementNum"].ToString());
 				retVal.Add(adjustment);
 			}
 			return retVal;

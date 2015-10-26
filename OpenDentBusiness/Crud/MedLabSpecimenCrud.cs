@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedLabSpecimen> TableToList(DataTable table){
 			List<MedLabSpecimen> retVal=new List<MedLabSpecimen>();
 			MedLabSpecimen medLabSpecimen;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medLabSpecimen=new MedLabSpecimen();
-				medLabSpecimen.MedLabSpecimenNum= PIn.Long  (table.Rows[i]["MedLabSpecimenNum"].ToString());
-				medLabSpecimen.MedLabNum        = PIn.Long  (table.Rows[i]["MedLabNum"].ToString());
-				medLabSpecimen.SpecimenID       = PIn.String(table.Rows[i]["SpecimenID"].ToString());
-				medLabSpecimen.SpecimenDescript = PIn.String(table.Rows[i]["SpecimenDescript"].ToString());
-				medLabSpecimen.DateTimeCollected= PIn.DateT (table.Rows[i]["DateTimeCollected"].ToString());
+				medLabSpecimen.MedLabSpecimenNum= PIn.Long  (row["MedLabSpecimenNum"].ToString());
+				medLabSpecimen.MedLabNum        = PIn.Long  (row["MedLabNum"].ToString());
+				medLabSpecimen.SpecimenID       = PIn.String(row["SpecimenID"].ToString());
+				medLabSpecimen.SpecimenDescript = PIn.String(row["SpecimenDescript"].ToString());
+				medLabSpecimen.DateTimeCollected= PIn.DateT (row["DateTimeCollected"].ToString());
 				retVal.Add(medLabSpecimen);
 			}
 			return retVal;

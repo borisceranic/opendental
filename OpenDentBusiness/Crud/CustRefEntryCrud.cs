@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<CustRefEntry> TableToList(DataTable table){
 			List<CustRefEntry> retVal=new List<CustRefEntry>();
 			CustRefEntry custRefEntry;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				custRefEntry=new CustRefEntry();
-				custRefEntry.CustRefEntryNum= PIn.Long  (table.Rows[i]["CustRefEntryNum"].ToString());
-				custRefEntry.PatNumCust     = PIn.Long  (table.Rows[i]["PatNumCust"].ToString());
-				custRefEntry.PatNumRef      = PIn.Long  (table.Rows[i]["PatNumRef"].ToString());
-				custRefEntry.DateEntry      = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				custRefEntry.Note           = PIn.String(table.Rows[i]["Note"].ToString());
+				custRefEntry.CustRefEntryNum= PIn.Long  (row["CustRefEntryNum"].ToString());
+				custRefEntry.PatNumCust     = PIn.Long  (row["PatNumCust"].ToString());
+				custRefEntry.PatNumRef      = PIn.Long  (row["PatNumRef"].ToString());
+				custRefEntry.DateEntry      = PIn.Date  (row["DateEntry"].ToString());
+				custRefEntry.Note           = PIn.String(row["Note"].ToString());
 				retVal.Add(custRefEntry);
 			}
 			return retVal;

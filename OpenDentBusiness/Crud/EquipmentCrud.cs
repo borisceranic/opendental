@@ -44,23 +44,23 @@ namespace OpenDentBusiness.Crud{
 		public static List<Equipment> TableToList(DataTable table){
 			List<Equipment> retVal=new List<Equipment>();
 			Equipment equipment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				equipment=new Equipment();
-				equipment.EquipmentNum     = PIn.Long  (table.Rows[i]["EquipmentNum"].ToString());
-				equipment.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				equipment.SerialNumber     = PIn.String(table.Rows[i]["SerialNumber"].ToString());
-				equipment.ModelYear        = PIn.String(table.Rows[i]["ModelYear"].ToString());
-				equipment.DatePurchased    = PIn.Date  (table.Rows[i]["DatePurchased"].ToString());
-				equipment.DateSold         = PIn.Date  (table.Rows[i]["DateSold"].ToString());
-				equipment.PurchaseCost     = PIn.Double(table.Rows[i]["PurchaseCost"].ToString());
-				equipment.MarketValue      = PIn.Double(table.Rows[i]["MarketValue"].ToString());
-				equipment.Location         = PIn.String(table.Rows[i]["Location"].ToString());
-				equipment.DateEntry        = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				equipment.ProvNumCheckedOut= PIn.Long  (table.Rows[i]["ProvNumCheckedOut"].ToString());
-				equipment.DateCheckedOut   = PIn.Date  (table.Rows[i]["DateCheckedOut"].ToString());
-				equipment.DateExpectedBack = PIn.Date  (table.Rows[i]["DateExpectedBack"].ToString());
-				equipment.DispenseNote     = PIn.String(table.Rows[i]["DispenseNote"].ToString());
-				equipment.Status           = PIn.String(table.Rows[i]["Status"].ToString());
+				equipment.EquipmentNum     = PIn.Long  (row["EquipmentNum"].ToString());
+				equipment.Description      = PIn.String(row["Description"].ToString());
+				equipment.SerialNumber     = PIn.String(row["SerialNumber"].ToString());
+				equipment.ModelYear        = PIn.String(row["ModelYear"].ToString());
+				equipment.DatePurchased    = PIn.Date  (row["DatePurchased"].ToString());
+				equipment.DateSold         = PIn.Date  (row["DateSold"].ToString());
+				equipment.PurchaseCost     = PIn.Double(row["PurchaseCost"].ToString());
+				equipment.MarketValue      = PIn.Double(row["MarketValue"].ToString());
+				equipment.Location         = PIn.String(row["Location"].ToString());
+				equipment.DateEntry        = PIn.Date  (row["DateEntry"].ToString());
+				equipment.ProvNumCheckedOut= PIn.Long  (row["ProvNumCheckedOut"].ToString());
+				equipment.DateCheckedOut   = PIn.Date  (row["DateCheckedOut"].ToString());
+				equipment.DateExpectedBack = PIn.Date  (row["DateExpectedBack"].ToString());
+				equipment.DispenseNote     = PIn.String(row["DispenseNote"].ToString());
+				equipment.Status           = PIn.String(row["Status"].ToString());
 				retVal.Add(equipment);
 			}
 			return retVal;

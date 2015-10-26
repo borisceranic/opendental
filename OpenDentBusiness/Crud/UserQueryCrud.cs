@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<UserQuery> TableToList(DataTable table){
 			List<UserQuery> retVal=new List<UserQuery>();
 			UserQuery userQuery;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				userQuery=new UserQuery();
-				userQuery.QueryNum   = PIn.Long  (table.Rows[i]["QueryNum"].ToString());
-				userQuery.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				userQuery.FileName   = PIn.String(table.Rows[i]["FileName"].ToString());
-				userQuery.QueryText  = PIn.String(table.Rows[i]["QueryText"].ToString());
+				userQuery.QueryNum   = PIn.Long  (row["QueryNum"].ToString());
+				userQuery.Description= PIn.String(row["Description"].ToString());
+				userQuery.FileName   = PIn.String(row["FileName"].ToString());
+				userQuery.QueryText  = PIn.String(row["QueryText"].ToString());
 				retVal.Add(userQuery);
 			}
 			return retVal;

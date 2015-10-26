@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<AccountingAutoPay> TableToList(DataTable table){
 			List<AccountingAutoPay> retVal=new List<AccountingAutoPay>();
 			AccountingAutoPay accountingAutoPay;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				accountingAutoPay=new AccountingAutoPay();
-				accountingAutoPay.AccountingAutoPayNum= PIn.Long  (table.Rows[i]["AccountingAutoPayNum"].ToString());
-				accountingAutoPay.PayType             = PIn.Long  (table.Rows[i]["PayType"].ToString());
-				accountingAutoPay.PickList            = PIn.String(table.Rows[i]["PickList"].ToString());
+				accountingAutoPay.AccountingAutoPayNum= PIn.Long  (row["AccountingAutoPayNum"].ToString());
+				accountingAutoPay.PayType             = PIn.Long  (row["PayType"].ToString());
+				accountingAutoPay.PickList            = PIn.String(row["PickList"].ToString());
 				retVal.Add(accountingAutoPay);
 			}
 			return retVal;

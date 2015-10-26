@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<Cvx> TableToList(DataTable table){
 			List<Cvx> retVal=new List<Cvx>();
 			Cvx cvx;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				cvx=new Cvx();
-				cvx.CvxNum     = PIn.Long  (table.Rows[i]["CvxNum"].ToString());
-				cvx.CvxCode    = PIn.String(table.Rows[i]["CvxCode"].ToString());
-				cvx.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				cvx.IsActive   = PIn.String(table.Rows[i]["IsActive"].ToString());
+				cvx.CvxNum     = PIn.Long  (row["CvxNum"].ToString());
+				cvx.CvxCode    = PIn.String(row["CvxCode"].ToString());
+				cvx.Description= PIn.String(row["Description"].ToString());
+				cvx.IsActive   = PIn.String(row["IsActive"].ToString());
 				retVal.Add(cvx);
 			}
 			return retVal;

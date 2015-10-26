@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<PayorType> TableToList(DataTable table){
 			List<PayorType> retVal=new List<PayorType>();
 			PayorType payorType;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				payorType=new PayorType();
-				payorType.PayorTypeNum= PIn.Long  (table.Rows[i]["PayorTypeNum"].ToString());
-				payorType.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				payorType.DateStart   = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				payorType.SopCode     = PIn.String(table.Rows[i]["SopCode"].ToString());
-				payorType.Note        = PIn.String(table.Rows[i]["Note"].ToString());
+				payorType.PayorTypeNum= PIn.Long  (row["PayorTypeNum"].ToString());
+				payorType.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				payorType.DateStart   = PIn.Date  (row["DateStart"].ToString());
+				payorType.SopCode     = PIn.String(row["SopCode"].ToString());
+				payorType.Note        = PIn.String(row["Note"].ToString());
 				retVal.Add(payorType);
 			}
 			return retVal;

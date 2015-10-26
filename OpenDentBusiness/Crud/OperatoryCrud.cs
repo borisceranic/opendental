@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<Operatory> TableToList(DataTable table){
 			List<Operatory> retVal=new List<Operatory>();
 			Operatory operatory;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				operatory=new Operatory();
-				operatory.OperatoryNum  = PIn.Long  (table.Rows[i]["OperatoryNum"].ToString());
-				operatory.OpName        = PIn.String(table.Rows[i]["OpName"].ToString());
-				operatory.Abbrev        = PIn.String(table.Rows[i]["Abbrev"].ToString());
-				operatory.ItemOrder     = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				operatory.IsHidden      = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				operatory.ProvDentist   = PIn.Long  (table.Rows[i]["ProvDentist"].ToString());
-				operatory.ProvHygienist = PIn.Long  (table.Rows[i]["ProvHygienist"].ToString());
-				operatory.IsHygiene     = PIn.Bool  (table.Rows[i]["IsHygiene"].ToString());
-				operatory.ClinicNum     = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				operatory.SetProspective= PIn.Bool  (table.Rows[i]["SetProspective"].ToString());
-				operatory.IsWebSched    = PIn.Bool  (table.Rows[i]["IsWebSched"].ToString());
+				operatory.OperatoryNum  = PIn.Long  (row["OperatoryNum"].ToString());
+				operatory.OpName        = PIn.String(row["OpName"].ToString());
+				operatory.Abbrev        = PIn.String(row["Abbrev"].ToString());
+				operatory.ItemOrder     = PIn.Int   (row["ItemOrder"].ToString());
+				operatory.IsHidden      = PIn.Bool  (row["IsHidden"].ToString());
+				operatory.ProvDentist   = PIn.Long  (row["ProvDentist"].ToString());
+				operatory.ProvHygienist = PIn.Long  (row["ProvHygienist"].ToString());
+				operatory.IsHygiene     = PIn.Bool  (row["IsHygiene"].ToString());
+				operatory.ClinicNum     = PIn.Long  (row["ClinicNum"].ToString());
+				operatory.SetProspective= PIn.Bool  (row["SetProspective"].ToString());
+				operatory.IsWebSched    = PIn.Bool  (row["IsWebSched"].ToString());
 				retVal.Add(operatory);
 			}
 			return retVal;

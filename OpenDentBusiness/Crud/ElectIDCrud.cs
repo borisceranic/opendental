@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<ElectID> TableToList(DataTable table){
 			List<ElectID> retVal=new List<ElectID>();
 			ElectID electID;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				electID=new ElectID();
-				electID.ElectIDNum   = PIn.Long  (table.Rows[i]["ElectIDNum"].ToString());
-				electID.PayorID      = PIn.String(table.Rows[i]["PayorID"].ToString());
-				electID.CarrierName  = PIn.String(table.Rows[i]["CarrierName"].ToString());
-				electID.IsMedicaid   = PIn.Bool  (table.Rows[i]["IsMedicaid"].ToString());
-				electID.ProviderTypes= PIn.String(table.Rows[i]["ProviderTypes"].ToString());
-				electID.Comments     = PIn.String(table.Rows[i]["Comments"].ToString());
+				electID.ElectIDNum   = PIn.Long  (row["ElectIDNum"].ToString());
+				electID.PayorID      = PIn.String(row["PayorID"].ToString());
+				electID.CarrierName  = PIn.String(row["CarrierName"].ToString());
+				electID.IsMedicaid   = PIn.Bool  (row["IsMedicaid"].ToString());
+				electID.ProviderTypes= PIn.String(row["ProviderTypes"].ToString());
+				electID.Comments     = PIn.String(row["Comments"].ToString());
 				retVal.Add(electID);
 			}
 			return retVal;

@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<Pharmacy> TableToList(DataTable table){
 			List<Pharmacy> retVal=new List<Pharmacy>();
 			Pharmacy pharmacy;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				pharmacy=new Pharmacy();
-				pharmacy.PharmacyNum= PIn.Long  (table.Rows[i]["PharmacyNum"].ToString());
-				pharmacy.PharmID    = PIn.String(table.Rows[i]["PharmID"].ToString());
-				pharmacy.StoreName  = PIn.String(table.Rows[i]["StoreName"].ToString());
-				pharmacy.Phone      = PIn.String(table.Rows[i]["Phone"].ToString());
-				pharmacy.Fax        = PIn.String(table.Rows[i]["Fax"].ToString());
-				pharmacy.Address    = PIn.String(table.Rows[i]["Address"].ToString());
-				pharmacy.Address2   = PIn.String(table.Rows[i]["Address2"].ToString());
-				pharmacy.City       = PIn.String(table.Rows[i]["City"].ToString());
-				pharmacy.State      = PIn.String(table.Rows[i]["State"].ToString());
-				pharmacy.Zip        = PIn.String(table.Rows[i]["Zip"].ToString());
-				pharmacy.Note       = PIn.String(table.Rows[i]["Note"].ToString());
-				pharmacy.DateTStamp = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
+				pharmacy.PharmacyNum= PIn.Long  (row["PharmacyNum"].ToString());
+				pharmacy.PharmID    = PIn.String(row["PharmID"].ToString());
+				pharmacy.StoreName  = PIn.String(row["StoreName"].ToString());
+				pharmacy.Phone      = PIn.String(row["Phone"].ToString());
+				pharmacy.Fax        = PIn.String(row["Fax"].ToString());
+				pharmacy.Address    = PIn.String(row["Address"].ToString());
+				pharmacy.Address2   = PIn.String(row["Address2"].ToString());
+				pharmacy.City       = PIn.String(row["City"].ToString());
+				pharmacy.State      = PIn.String(row["State"].ToString());
+				pharmacy.Zip        = PIn.String(row["Zip"].ToString());
+				pharmacy.Note       = PIn.String(row["Note"].ToString());
+				pharmacy.DateTStamp = PIn.DateT (row["DateTStamp"].ToString());
 				retVal.Add(pharmacy);
 			}
 			return retVal;

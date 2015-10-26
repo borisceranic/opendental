@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobProject> TableToList(DataTable table){
 			List<JobProject> retVal=new List<JobProject>();
 			JobProject jobProject;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobProject=new JobProject();
-				jobProject.JobProjectNum   = PIn.Long  (table.Rows[i]["JobProjectNum"].ToString());
-				jobProject.RootProjectNum  = PIn.Long  (table.Rows[i]["RootProjectNum"].ToString());
-				jobProject.ParentProjectNum= PIn.Long  (table.Rows[i]["ParentProjectNum"].ToString());
-				jobProject.Title           = PIn.String(table.Rows[i]["Title"].ToString());
-				jobProject.Description     = PIn.String(table.Rows[i]["Description"].ToString());
-				jobProject.ProjectStatus   = (OpenDentBusiness.JobProjectStatus)PIn.Int(table.Rows[i]["ProjectStatus"].ToString());
+				jobProject.JobProjectNum   = PIn.Long  (row["JobProjectNum"].ToString());
+				jobProject.RootProjectNum  = PIn.Long  (row["RootProjectNum"].ToString());
+				jobProject.ParentProjectNum= PIn.Long  (row["ParentProjectNum"].ToString());
+				jobProject.Title           = PIn.String(row["Title"].ToString());
+				jobProject.Description     = PIn.String(row["Description"].ToString());
+				jobProject.ProjectStatus   = (OpenDentBusiness.JobProjectStatus)PIn.Int(row["ProjectStatus"].ToString());
 				retVal.Add(jobProject);
 			}
 			return retVal;

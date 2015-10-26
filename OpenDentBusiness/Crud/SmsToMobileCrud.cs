@@ -44,25 +44,25 @@ namespace OpenDentBusiness.Crud{
 		public static List<SmsToMobile> TableToList(DataTable table){
 			List<SmsToMobile> retVal=new List<SmsToMobile>();
 			SmsToMobile smsToMobile;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				smsToMobile=new SmsToMobile();
-				smsToMobile.SmsToMobileNum    = PIn.Long  (table.Rows[i]["SmsToMobileNum"].ToString());
-				smsToMobile.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				smsToMobile.GuidMessage       = PIn.String(table.Rows[i]["GuidMessage"].ToString());
-				smsToMobile.GuidBatch         = PIn.String(table.Rows[i]["GuidBatch"].ToString());
-				smsToMobile.SmsPhoneNumber    = PIn.String(table.Rows[i]["SmsPhoneNumber"].ToString());
-				smsToMobile.MobilePhoneNumber = PIn.String(table.Rows[i]["MobilePhoneNumber"].ToString());
-				smsToMobile.IsTimeSensitive   = PIn.Bool  (table.Rows[i]["IsTimeSensitive"].ToString());
-				smsToMobile.MsgType           = (OpenDentBusiness.SmsMessageSource)PIn.Int(table.Rows[i]["MsgType"].ToString());
-				smsToMobile.MsgText           = PIn.String(table.Rows[i]["MsgText"].ToString());
-				smsToMobile.SmsStatus         = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(table.Rows[i]["SmsStatus"].ToString());
-				smsToMobile.MsgParts          = PIn.Int   (table.Rows[i]["MsgParts"].ToString());
-				smsToMobile.MsgChargeUSD      = PIn.Float (table.Rows[i]["MsgChargeUSD"].ToString());
-				smsToMobile.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				smsToMobile.CustErrorText     = PIn.String(table.Rows[i]["CustErrorText"].ToString());
-				smsToMobile.DateTimeSent      = PIn.DateT (table.Rows[i]["DateTimeSent"].ToString());
-				smsToMobile.DateTimeTerminated= PIn.DateT (table.Rows[i]["DateTimeTerminated"].ToString());
-				smsToMobile.IsHidden          = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				smsToMobile.SmsToMobileNum    = PIn.Long  (row["SmsToMobileNum"].ToString());
+				smsToMobile.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				smsToMobile.GuidMessage       = PIn.String(row["GuidMessage"].ToString());
+				smsToMobile.GuidBatch         = PIn.String(row["GuidBatch"].ToString());
+				smsToMobile.SmsPhoneNumber    = PIn.String(row["SmsPhoneNumber"].ToString());
+				smsToMobile.MobilePhoneNumber = PIn.String(row["MobilePhoneNumber"].ToString());
+				smsToMobile.IsTimeSensitive   = PIn.Bool  (row["IsTimeSensitive"].ToString());
+				smsToMobile.MsgType           = (OpenDentBusiness.SmsMessageSource)PIn.Int(row["MsgType"].ToString());
+				smsToMobile.MsgText           = PIn.String(row["MsgText"].ToString());
+				smsToMobile.SmsStatus         = (OpenDentBusiness.SmsDeliveryStatus)PIn.Int(row["SmsStatus"].ToString());
+				smsToMobile.MsgParts          = PIn.Int   (row["MsgParts"].ToString());
+				smsToMobile.MsgChargeUSD      = PIn.Float (row["MsgChargeUSD"].ToString());
+				smsToMobile.ClinicNum         = PIn.Long  (row["ClinicNum"].ToString());
+				smsToMobile.CustErrorText     = PIn.String(row["CustErrorText"].ToString());
+				smsToMobile.DateTimeSent      = PIn.DateT (row["DateTimeSent"].ToString());
+				smsToMobile.DateTimeTerminated= PIn.DateT (row["DateTimeTerminated"].ToString());
+				smsToMobile.IsHidden          = PIn.Bool  (row["IsHidden"].ToString());
 				retVal.Add(smsToMobile);
 			}
 			return retVal;

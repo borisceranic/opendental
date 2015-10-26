@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<Reconcile> TableToList(DataTable table){
 			List<Reconcile> retVal=new List<Reconcile>();
 			Reconcile reconcile;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				reconcile=new Reconcile();
-				reconcile.ReconcileNum = PIn.Long  (table.Rows[i]["ReconcileNum"].ToString());
-				reconcile.AccountNum   = PIn.Long  (table.Rows[i]["AccountNum"].ToString());
-				reconcile.StartingBal  = PIn.Double(table.Rows[i]["StartingBal"].ToString());
-				reconcile.EndingBal    = PIn.Double(table.Rows[i]["EndingBal"].ToString());
-				reconcile.DateReconcile= PIn.Date  (table.Rows[i]["DateReconcile"].ToString());
-				reconcile.IsLocked     = PIn.Bool  (table.Rows[i]["IsLocked"].ToString());
+				reconcile.ReconcileNum = PIn.Long  (row["ReconcileNum"].ToString());
+				reconcile.AccountNum   = PIn.Long  (row["AccountNum"].ToString());
+				reconcile.StartingBal  = PIn.Double(row["StartingBal"].ToString());
+				reconcile.EndingBal    = PIn.Double(row["EndingBal"].ToString());
+				reconcile.DateReconcile= PIn.Date  (row["DateReconcile"].ToString());
+				reconcile.IsLocked     = PIn.Bool  (row["IsLocked"].ToString());
 				retVal.Add(reconcile);
 			}
 			return retVal;

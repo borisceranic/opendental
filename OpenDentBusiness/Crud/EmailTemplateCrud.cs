@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EmailTemplate> TableToList(DataTable table){
 			List<EmailTemplate> retVal=new List<EmailTemplate>();
 			EmailTemplate emailTemplate;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				emailTemplate=new EmailTemplate();
-				emailTemplate.EmailTemplateNum= PIn.Long  (table.Rows[i]["EmailTemplateNum"].ToString());
-				emailTemplate.Subject         = PIn.String(table.Rows[i]["Subject"].ToString());
-				emailTemplate.BodyText        = PIn.String(table.Rows[i]["BodyText"].ToString());
-				emailTemplate.Description     = PIn.String(table.Rows[i]["Description"].ToString());
+				emailTemplate.EmailTemplateNum= PIn.Long  (row["EmailTemplateNum"].ToString());
+				emailTemplate.Subject         = PIn.String(row["Subject"].ToString());
+				emailTemplate.BodyText        = PIn.String(row["BodyText"].ToString());
+				emailTemplate.Description     = PIn.String(row["Description"].ToString());
 				retVal.Add(emailTemplate);
 			}
 			return retVal;

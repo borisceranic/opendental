@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EmailAddress> TableToList(DataTable table){
 			List<EmailAddress> retVal=new List<EmailAddress>();
 			EmailAddress emailAddress;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				emailAddress=new EmailAddress();
-				emailAddress.EmailAddressNum   = PIn.Long  (table.Rows[i]["EmailAddressNum"].ToString());
-				emailAddress.SMTPserver        = PIn.String(table.Rows[i]["SMTPserver"].ToString());
-				emailAddress.EmailUsername     = PIn.String(table.Rows[i]["EmailUsername"].ToString());
-				emailAddress.EmailPassword     = PIn.String(table.Rows[i]["EmailPassword"].ToString());
-				emailAddress.ServerPort        = PIn.Int   (table.Rows[i]["ServerPort"].ToString());
-				emailAddress.UseSSL            = PIn.Bool  (table.Rows[i]["UseSSL"].ToString());
-				emailAddress.SenderAddress     = PIn.String(table.Rows[i]["SenderAddress"].ToString());
-				emailAddress.Pop3ServerIncoming= PIn.String(table.Rows[i]["Pop3ServerIncoming"].ToString());
-				emailAddress.ServerPortIncoming= PIn.Int   (table.Rows[i]["ServerPortIncoming"].ToString());
+				emailAddress.EmailAddressNum   = PIn.Long  (row["EmailAddressNum"].ToString());
+				emailAddress.SMTPserver        = PIn.String(row["SMTPserver"].ToString());
+				emailAddress.EmailUsername     = PIn.String(row["EmailUsername"].ToString());
+				emailAddress.EmailPassword     = PIn.String(row["EmailPassword"].ToString());
+				emailAddress.ServerPort        = PIn.Int   (row["ServerPort"].ToString());
+				emailAddress.UseSSL            = PIn.Bool  (row["UseSSL"].ToString());
+				emailAddress.SenderAddress     = PIn.String(row["SenderAddress"].ToString());
+				emailAddress.Pop3ServerIncoming= PIn.String(row["Pop3ServerIncoming"].ToString());
+				emailAddress.ServerPortIncoming= PIn.Int   (row["ServerPortIncoming"].ToString());
 				retVal.Add(emailAddress);
 			}
 			return retVal;

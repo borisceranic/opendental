@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<QuickPasteNote> TableToList(DataTable table){
 			List<QuickPasteNote> retVal=new List<QuickPasteNote>();
 			QuickPasteNote quickPasteNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				quickPasteNote=new QuickPasteNote();
-				quickPasteNote.QuickPasteNoteNum= PIn.Long  (table.Rows[i]["QuickPasteNoteNum"].ToString());
-				quickPasteNote.QuickPasteCatNum = PIn.Long  (table.Rows[i]["QuickPasteCatNum"].ToString());
-				quickPasteNote.ItemOrder        = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				quickPasteNote.Note             = PIn.String(table.Rows[i]["Note"].ToString());
-				quickPasteNote.Abbreviation     = PIn.String(table.Rows[i]["Abbreviation"].ToString());
+				quickPasteNote.QuickPasteNoteNum= PIn.Long  (row["QuickPasteNoteNum"].ToString());
+				quickPasteNote.QuickPasteCatNum = PIn.Long  (row["QuickPasteCatNum"].ToString());
+				quickPasteNote.ItemOrder        = PIn.Int   (row["ItemOrder"].ToString());
+				quickPasteNote.Note             = PIn.String(row["Note"].ToString());
+				quickPasteNote.Abbreviation     = PIn.String(row["Abbreviation"].ToString());
 				retVal.Add(quickPasteNote);
 			}
 			return retVal;

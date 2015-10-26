@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<Sheet> TableToList(DataTable table){
 			List<Sheet> retVal=new List<Sheet>();
 			Sheet sheet;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sheet=new Sheet();
-				sheet.SheetNum      = PIn.Long  (table.Rows[i]["SheetNum"].ToString());
-				sheet.SheetType     = (OpenDentBusiness.SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
-				sheet.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				sheet.DateTimeSheet = PIn.DateT (table.Rows[i]["DateTimeSheet"].ToString());
-				sheet.FontSize      = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				sheet.FontName      = PIn.String(table.Rows[i]["FontName"].ToString());
-				sheet.Width         = PIn.Int   (table.Rows[i]["Width"].ToString());
-				sheet.Height        = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheet.IsLandscape   = PIn.Bool  (table.Rows[i]["IsLandscape"].ToString());
-				sheet.InternalNote  = PIn.String(table.Rows[i]["InternalNote"].ToString());
-				sheet.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				sheet.ShowInTerminal= PIn.Byte  (table.Rows[i]["ShowInTerminal"].ToString());
-				sheet.IsWebForm     = PIn.Bool  (table.Rows[i]["IsWebForm"].ToString());
-				sheet.IsMultiPage   = PIn.Bool  (table.Rows[i]["IsMultiPage"].ToString());
+				sheet.SheetNum      = PIn.Long  (row["SheetNum"].ToString());
+				sheet.SheetType     = (OpenDentBusiness.SheetTypeEnum)PIn.Int(row["SheetType"].ToString());
+				sheet.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				sheet.DateTimeSheet = PIn.DateT (row["DateTimeSheet"].ToString());
+				sheet.FontSize      = PIn.Float (row["FontSize"].ToString());
+				sheet.FontName      = PIn.String(row["FontName"].ToString());
+				sheet.Width         = PIn.Int   (row["Width"].ToString());
+				sheet.Height        = PIn.Int   (row["Height"].ToString());
+				sheet.IsLandscape   = PIn.Bool  (row["IsLandscape"].ToString());
+				sheet.InternalNote  = PIn.String(row["InternalNote"].ToString());
+				sheet.Description   = PIn.String(row["Description"].ToString());
+				sheet.ShowInTerminal= PIn.Byte  (row["ShowInTerminal"].ToString());
+				sheet.IsWebForm     = PIn.Bool  (row["IsWebForm"].ToString());
+				sheet.IsMultiPage   = PIn.Bool  (row["IsMultiPage"].ToString());
 				retVal.Add(sheet);
 			}
 			return retVal;

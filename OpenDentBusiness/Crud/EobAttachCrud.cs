@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<EobAttach> TableToList(DataTable table){
 			List<EobAttach> retVal=new List<EobAttach>();
 			EobAttach eobAttach;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				eobAttach=new EobAttach();
-				eobAttach.EobAttachNum   = PIn.Long  (table.Rows[i]["EobAttachNum"].ToString());
-				eobAttach.ClaimPaymentNum= PIn.Long  (table.Rows[i]["ClaimPaymentNum"].ToString());
-				eobAttach.DateTCreated   = PIn.DateT (table.Rows[i]["DateTCreated"].ToString());
-				eobAttach.FileName       = PIn.String(table.Rows[i]["FileName"].ToString());
-				eobAttach.RawBase64      = PIn.String(table.Rows[i]["RawBase64"].ToString());
+				eobAttach.EobAttachNum   = PIn.Long  (row["EobAttachNum"].ToString());
+				eobAttach.ClaimPaymentNum= PIn.Long  (row["ClaimPaymentNum"].ToString());
+				eobAttach.DateTCreated   = PIn.DateT (row["DateTCreated"].ToString());
+				eobAttach.FileName       = PIn.String(row["FileName"].ToString());
+				eobAttach.RawBase64      = PIn.String(row["RawBase64"].ToString());
 				retVal.Add(eobAttach);
 			}
 			return retVal;

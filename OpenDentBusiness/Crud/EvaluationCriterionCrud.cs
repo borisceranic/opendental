@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<EvaluationCriterion> TableToList(DataTable table){
 			List<EvaluationCriterion> retVal=new List<EvaluationCriterion>();
 			EvaluationCriterion evaluationCriterion;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				evaluationCriterion=new EvaluationCriterion();
-				evaluationCriterion.EvaluationCriterionNum= PIn.Long  (table.Rows[i]["EvaluationCriterionNum"].ToString());
-				evaluationCriterion.EvaluationNum         = PIn.Long  (table.Rows[i]["EvaluationNum"].ToString());
-				evaluationCriterion.CriterionDescript     = PIn.String(table.Rows[i]["CriterionDescript"].ToString());
-				evaluationCriterion.IsCategoryName        = PIn.Bool  (table.Rows[i]["IsCategoryName"].ToString());
-				evaluationCriterion.GradingScaleNum       = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				evaluationCriterion.GradeShowing          = PIn.String(table.Rows[i]["GradeShowing"].ToString());
-				evaluationCriterion.GradeNumber           = PIn.Float (table.Rows[i]["GradeNumber"].ToString());
-				evaluationCriterion.Notes                 = PIn.String(table.Rows[i]["Notes"].ToString());
-				evaluationCriterion.ItemOrder             = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				evaluationCriterion.MaxPointsPoss         = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
+				evaluationCriterion.EvaluationCriterionNum= PIn.Long  (row["EvaluationCriterionNum"].ToString());
+				evaluationCriterion.EvaluationNum         = PIn.Long  (row["EvaluationNum"].ToString());
+				evaluationCriterion.CriterionDescript     = PIn.String(row["CriterionDescript"].ToString());
+				evaluationCriterion.IsCategoryName        = PIn.Bool  (row["IsCategoryName"].ToString());
+				evaluationCriterion.GradingScaleNum       = PIn.Long  (row["GradingScaleNum"].ToString());
+				evaluationCriterion.GradeShowing          = PIn.String(row["GradeShowing"].ToString());
+				evaluationCriterion.GradeNumber           = PIn.Float (row["GradeNumber"].ToString());
+				evaluationCriterion.Notes                 = PIn.String(row["Notes"].ToString());
+				evaluationCriterion.ItemOrder             = PIn.Int   (row["ItemOrder"].ToString());
+				evaluationCriterion.MaxPointsPoss         = PIn.Float (row["MaxPointsPoss"].ToString());
 				retVal.Add(evaluationCriterion);
 			}
 			return retVal;

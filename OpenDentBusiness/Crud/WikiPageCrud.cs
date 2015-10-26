@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<WikiPage> TableToList(DataTable table){
 			List<WikiPage> retVal=new List<WikiPage>();
 			WikiPage wikiPage;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				wikiPage=new WikiPage();
-				wikiPage.WikiPageNum  = PIn.Long  (table.Rows[i]["WikiPageNum"].ToString());
-				wikiPage.UserNum      = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				wikiPage.PageTitle    = PIn.String(table.Rows[i]["PageTitle"].ToString());
-				wikiPage.KeyWords     = PIn.String(table.Rows[i]["KeyWords"].ToString());
-				wikiPage.PageContent  = PIn.String(table.Rows[i]["PageContent"].ToString());
-				wikiPage.DateTimeSaved= PIn.DateT (table.Rows[i]["DateTimeSaved"].ToString());
+				wikiPage.WikiPageNum  = PIn.Long  (row["WikiPageNum"].ToString());
+				wikiPage.UserNum      = PIn.Long  (row["UserNum"].ToString());
+				wikiPage.PageTitle    = PIn.String(row["PageTitle"].ToString());
+				wikiPage.KeyWords     = PIn.String(row["KeyWords"].ToString());
+				wikiPage.PageContent  = PIn.String(row["PageContent"].ToString());
+				wikiPage.DateTimeSaved= PIn.DateT (row["DateTimeSaved"].ToString());
 				retVal.Add(wikiPage);
 			}
 			return retVal;

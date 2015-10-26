@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<PayPlanCharge> TableToList(DataTable table){
 			List<PayPlanCharge> retVal=new List<PayPlanCharge>();
 			PayPlanCharge payPlanCharge;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				payPlanCharge=new PayPlanCharge();
-				payPlanCharge.PayPlanChargeNum= PIn.Long  (table.Rows[i]["PayPlanChargeNum"].ToString());
-				payPlanCharge.PayPlanNum      = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
-				payPlanCharge.Guarantor       = PIn.Long  (table.Rows[i]["Guarantor"].ToString());
-				payPlanCharge.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				payPlanCharge.ChargeDate      = PIn.Date  (table.Rows[i]["ChargeDate"].ToString());
-				payPlanCharge.Principal       = PIn.Double(table.Rows[i]["Principal"].ToString());
-				payPlanCharge.Interest        = PIn.Double(table.Rows[i]["Interest"].ToString());
-				payPlanCharge.Note            = PIn.String(table.Rows[i]["Note"].ToString());
-				payPlanCharge.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				payPlanCharge.ClinicNum       = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				payPlanCharge.PayPlanChargeNum= PIn.Long  (row["PayPlanChargeNum"].ToString());
+				payPlanCharge.PayPlanNum      = PIn.Long  (row["PayPlanNum"].ToString());
+				payPlanCharge.Guarantor       = PIn.Long  (row["Guarantor"].ToString());
+				payPlanCharge.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				payPlanCharge.ChargeDate      = PIn.Date  (row["ChargeDate"].ToString());
+				payPlanCharge.Principal       = PIn.Double(row["Principal"].ToString());
+				payPlanCharge.Interest        = PIn.Double(row["Interest"].ToString());
+				payPlanCharge.Note            = PIn.String(row["Note"].ToString());
+				payPlanCharge.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
+				payPlanCharge.ClinicNum       = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(payPlanCharge);
 			}
 			return retVal;

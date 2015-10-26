@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<LabTurnaround> TableToList(DataTable table){
 			List<LabTurnaround> retVal=new List<LabTurnaround>();
 			LabTurnaround labTurnaround;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				labTurnaround=new LabTurnaround();
-				labTurnaround.LabTurnaroundNum= PIn.Long  (table.Rows[i]["LabTurnaroundNum"].ToString());
-				labTurnaround.LaboratoryNum   = PIn.Long  (table.Rows[i]["LaboratoryNum"].ToString());
-				labTurnaround.Description     = PIn.String(table.Rows[i]["Description"].ToString());
-				labTurnaround.DaysPublished   = PIn.Int   (table.Rows[i]["DaysPublished"].ToString());
-				labTurnaround.DaysActual      = PIn.Int   (table.Rows[i]["DaysActual"].ToString());
+				labTurnaround.LabTurnaroundNum= PIn.Long  (row["LabTurnaroundNum"].ToString());
+				labTurnaround.LaboratoryNum   = PIn.Long  (row["LaboratoryNum"].ToString());
+				labTurnaround.Description     = PIn.String(row["Description"].ToString());
+				labTurnaround.DaysPublished   = PIn.Int   (row["DaysPublished"].ToString());
+				labTurnaround.DaysActual      = PIn.Int   (row["DaysActual"].ToString());
 				retVal.Add(labTurnaround);
 			}
 			return retVal;

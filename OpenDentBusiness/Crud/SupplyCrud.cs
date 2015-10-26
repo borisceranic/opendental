@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<Supply> TableToList(DataTable table){
 			List<Supply> retVal=new List<Supply>();
 			Supply supply;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				supply=new Supply();
-				supply.SupplyNum       = PIn.Long  (table.Rows[i]["SupplyNum"].ToString());
-				supply.SupplierNum     = PIn.Long  (table.Rows[i]["SupplierNum"].ToString());
-				supply.CatalogNumber   = PIn.String(table.Rows[i]["CatalogNumber"].ToString());
-				supply.Descript        = PIn.String(table.Rows[i]["Descript"].ToString());
-				supply.Category        = PIn.Long  (table.Rows[i]["Category"].ToString());
-				supply.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				supply.LevelDesired    = PIn.Float (table.Rows[i]["LevelDesired"].ToString());
-				supply.IsHidden        = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				supply.Price           = PIn.Double(table.Rows[i]["Price"].ToString());
-				supply.BarCodeOrID     = PIn.String(table.Rows[i]["BarCodeOrID"].ToString());
-				supply.DispDefaultQuant= PIn.Float (table.Rows[i]["DispDefaultQuant"].ToString());
-				supply.DispUnitsCount  = PIn.Int   (table.Rows[i]["DispUnitsCount"].ToString());
-				supply.DispUnitDesc    = PIn.String(table.Rows[i]["DispUnitDesc"].ToString());
-				supply.LevelOnHand     = PIn.Float (table.Rows[i]["LevelOnHand"].ToString());
+				supply.SupplyNum       = PIn.Long  (row["SupplyNum"].ToString());
+				supply.SupplierNum     = PIn.Long  (row["SupplierNum"].ToString());
+				supply.CatalogNumber   = PIn.String(row["CatalogNumber"].ToString());
+				supply.Descript        = PIn.String(row["Descript"].ToString());
+				supply.Category        = PIn.Long  (row["Category"].ToString());
+				supply.ItemOrder       = PIn.Int   (row["ItemOrder"].ToString());
+				supply.LevelDesired    = PIn.Float (row["LevelDesired"].ToString());
+				supply.IsHidden        = PIn.Bool  (row["IsHidden"].ToString());
+				supply.Price           = PIn.Double(row["Price"].ToString());
+				supply.BarCodeOrID     = PIn.String(row["BarCodeOrID"].ToString());
+				supply.DispDefaultQuant= PIn.Float (row["DispDefaultQuant"].ToString());
+				supply.DispUnitsCount  = PIn.Int   (row["DispUnitsCount"].ToString());
+				supply.DispUnitDesc    = PIn.String(row["DispUnitDesc"].ToString());
+				supply.LevelOnHand     = PIn.Float (row["LevelOnHand"].ToString());
 				retVal.Add(supply);
 			}
 			return retVal;

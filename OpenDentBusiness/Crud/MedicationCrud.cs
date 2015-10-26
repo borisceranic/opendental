@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<Medication> TableToList(DataTable table){
 			List<Medication> retVal=new List<Medication>();
 			Medication medication;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medication=new Medication();
-				medication.MedicationNum= PIn.Long  (table.Rows[i]["MedicationNum"].ToString());
-				medication.MedName      = PIn.String(table.Rows[i]["MedName"].ToString());
-				medication.GenericNum   = PIn.Long  (table.Rows[i]["GenericNum"].ToString());
-				medication.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
-				medication.DateTStamp   = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				medication.RxCui        = PIn.Long  (table.Rows[i]["RxCui"].ToString());
+				medication.MedicationNum= PIn.Long  (row["MedicationNum"].ToString());
+				medication.MedName      = PIn.String(row["MedName"].ToString());
+				medication.GenericNum   = PIn.Long  (row["GenericNum"].ToString());
+				medication.Notes        = PIn.String(row["Notes"].ToString());
+				medication.DateTStamp   = PIn.DateT (row["DateTStamp"].ToString());
+				medication.RxCui        = PIn.Long  (row["RxCui"].ToString());
 				retVal.Add(medication);
 			}
 			return retVal;

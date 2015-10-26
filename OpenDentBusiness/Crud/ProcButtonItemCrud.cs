@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcButtonItem> TableToList(DataTable table){
 			List<ProcButtonItem> retVal=new List<ProcButtonItem>();
 			ProcButtonItem procButtonItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procButtonItem=new ProcButtonItem();
-				procButtonItem.ProcButtonItemNum= PIn.Long  (table.Rows[i]["ProcButtonItemNum"].ToString());
-				procButtonItem.ProcButtonNum    = PIn.Long  (table.Rows[i]["ProcButtonNum"].ToString());
-				procButtonItem.OldCode          = PIn.String(table.Rows[i]["OldCode"].ToString());
-				procButtonItem.AutoCodeNum      = PIn.Long  (table.Rows[i]["AutoCodeNum"].ToString());
-				procButtonItem.CodeNum          = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
+				procButtonItem.ProcButtonItemNum= PIn.Long  (row["ProcButtonItemNum"].ToString());
+				procButtonItem.ProcButtonNum    = PIn.Long  (row["ProcButtonNum"].ToString());
+				procButtonItem.OldCode          = PIn.String(row["OldCode"].ToString());
+				procButtonItem.AutoCodeNum      = PIn.Long  (row["AutoCodeNum"].ToString());
+				procButtonItem.CodeNum          = PIn.Long  (row["CodeNum"].ToString());
 				retVal.Add(procButtonItem);
 			}
 			return retVal;

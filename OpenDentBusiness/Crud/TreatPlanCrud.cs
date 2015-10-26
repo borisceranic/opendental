@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<TreatPlan> TableToList(DataTable table){
 			List<TreatPlan> retVal=new List<TreatPlan>();
 			TreatPlan treatPlan;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				treatPlan=new TreatPlan();
-				treatPlan.TreatPlanNum= PIn.Long  (table.Rows[i]["TreatPlanNum"].ToString());
-				treatPlan.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				treatPlan.DateTP      = PIn.Date  (table.Rows[i]["DateTP"].ToString());
-				treatPlan.Heading     = PIn.String(table.Rows[i]["Heading"].ToString());
-				treatPlan.Note        = PIn.String(table.Rows[i]["Note"].ToString());
-				treatPlan.Signature   = PIn.String(table.Rows[i]["Signature"].ToString());
-				treatPlan.SigIsTopaz  = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
-				treatPlan.ResponsParty= PIn.Long  (table.Rows[i]["ResponsParty"].ToString());
-				treatPlan.DocNum      = PIn.Long  (table.Rows[i]["DocNum"].ToString());
+				treatPlan.TreatPlanNum= PIn.Long  (row["TreatPlanNum"].ToString());
+				treatPlan.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				treatPlan.DateTP      = PIn.Date  (row["DateTP"].ToString());
+				treatPlan.Heading     = PIn.String(row["Heading"].ToString());
+				treatPlan.Note        = PIn.String(row["Note"].ToString());
+				treatPlan.Signature   = PIn.String(row["Signature"].ToString());
+				treatPlan.SigIsTopaz  = PIn.Bool  (row["SigIsTopaz"].ToString());
+				treatPlan.ResponsParty= PIn.Long  (row["ResponsParty"].ToString());
+				treatPlan.DocNum      = PIn.Long  (row["DocNum"].ToString());
 				retVal.Add(treatPlan);
 			}
 			return retVal;

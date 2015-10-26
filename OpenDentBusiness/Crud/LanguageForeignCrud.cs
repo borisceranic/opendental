@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<LanguageForeign> TableToList(DataTable table){
 			List<LanguageForeign> retVal=new List<LanguageForeign>();
 			LanguageForeign languageForeign;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				languageForeign=new LanguageForeign();
-				languageForeign.LanguageForeignNum= PIn.Long  (table.Rows[i]["LanguageForeignNum"].ToString());
-				languageForeign.ClassType         = PIn.String(table.Rows[i]["ClassType"].ToString());
-				languageForeign.English           = PIn.String(table.Rows[i]["English"].ToString());
-				languageForeign.Culture           = PIn.String(table.Rows[i]["Culture"].ToString());
-				languageForeign.Translation       = PIn.String(table.Rows[i]["Translation"].ToString());
-				languageForeign.Comments          = PIn.String(table.Rows[i]["Comments"].ToString());
+				languageForeign.LanguageForeignNum= PIn.Long  (row["LanguageForeignNum"].ToString());
+				languageForeign.ClassType         = PIn.String(row["ClassType"].ToString());
+				languageForeign.English           = PIn.String(row["English"].ToString());
+				languageForeign.Culture           = PIn.String(row["Culture"].ToString());
+				languageForeign.Translation       = PIn.String(row["Translation"].ToString());
+				languageForeign.Comments          = PIn.String(row["Comments"].ToString());
 				retVal.Add(languageForeign);
 			}
 			return retVal;

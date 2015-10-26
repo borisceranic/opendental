@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<ReplicationServer> TableToList(DataTable table){
 			List<ReplicationServer> retVal=new List<ReplicationServer>();
 			ReplicationServer replicationServer;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				replicationServer=new ReplicationServer();
-				replicationServer.ReplicationServerNum= PIn.Long  (table.Rows[i]["ReplicationServerNum"].ToString());
-				replicationServer.Descript            = PIn.String(table.Rows[i]["Descript"].ToString());
-				replicationServer.ServerId            = PIn.Int   (table.Rows[i]["ServerId"].ToString());
-				replicationServer.RangeStart          = PIn.Long  (table.Rows[i]["RangeStart"].ToString());
-				replicationServer.RangeEnd            = PIn.Long  (table.Rows[i]["RangeEnd"].ToString());
-				replicationServer.AtoZpath            = PIn.String(table.Rows[i]["AtoZpath"].ToString());
-				replicationServer.UpdateBlocked       = PIn.Bool  (table.Rows[i]["UpdateBlocked"].ToString());
-				replicationServer.SlaveMonitor        = PIn.String(table.Rows[i]["SlaveMonitor"].ToString());
+				replicationServer.ReplicationServerNum= PIn.Long  (row["ReplicationServerNum"].ToString());
+				replicationServer.Descript            = PIn.String(row["Descript"].ToString());
+				replicationServer.ServerId            = PIn.Int   (row["ServerId"].ToString());
+				replicationServer.RangeStart          = PIn.Long  (row["RangeStart"].ToString());
+				replicationServer.RangeEnd            = PIn.Long  (row["RangeEnd"].ToString());
+				replicationServer.AtoZpath            = PIn.String(row["AtoZpath"].ToString());
+				replicationServer.UpdateBlocked       = PIn.Bool  (row["UpdateBlocked"].ToString());
+				replicationServer.SlaveMonitor        = PIn.String(row["SlaveMonitor"].ToString());
 				retVal.Add(replicationServer);
 			}
 			return retVal;

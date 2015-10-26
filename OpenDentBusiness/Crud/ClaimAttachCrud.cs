@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimAttach> TableToList(DataTable table){
 			List<ClaimAttach> retVal=new List<ClaimAttach>();
 			ClaimAttach claimAttach;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimAttach=new ClaimAttach();
-				claimAttach.ClaimAttachNum   = PIn.Long  (table.Rows[i]["ClaimAttachNum"].ToString());
-				claimAttach.ClaimNum         = PIn.Long  (table.Rows[i]["ClaimNum"].ToString());
-				claimAttach.DisplayedFileName= PIn.String(table.Rows[i]["DisplayedFileName"].ToString());
-				claimAttach.ActualFileName   = PIn.String(table.Rows[i]["ActualFileName"].ToString());
+				claimAttach.ClaimAttachNum   = PIn.Long  (row["ClaimAttachNum"].ToString());
+				claimAttach.ClaimNum         = PIn.Long  (row["ClaimNum"].ToString());
+				claimAttach.DisplayedFileName= PIn.String(row["DisplayedFileName"].ToString());
+				claimAttach.ActualFileName   = PIn.String(row["ActualFileName"].ToString());
 				retVal.Add(claimAttach);
 			}
 			return retVal;

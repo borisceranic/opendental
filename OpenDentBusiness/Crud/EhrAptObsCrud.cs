@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrAptObs> TableToList(DataTable table){
 			List<EhrAptObs> retVal=new List<EhrAptObs>();
 			EhrAptObs ehrAptObs;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrAptObs=new EhrAptObs();
-				ehrAptObs.EhrAptObsNum   = PIn.Long  (table.Rows[i]["EhrAptObsNum"].ToString());
-				ehrAptObs.AptNum         = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				ehrAptObs.IdentifyingCode= (OpenDentBusiness.EhrAptObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
-				ehrAptObs.ValType        = (OpenDentBusiness.EhrAptObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
-				ehrAptObs.ValReported    = PIn.String(table.Rows[i]["ValReported"].ToString());
-				ehrAptObs.UcumCode       = PIn.String(table.Rows[i]["UcumCode"].ToString());
-				ehrAptObs.ValCodeSystem  = PIn.String(table.Rows[i]["ValCodeSystem"].ToString());
+				ehrAptObs.EhrAptObsNum   = PIn.Long  (row["EhrAptObsNum"].ToString());
+				ehrAptObs.AptNum         = PIn.Long  (row["AptNum"].ToString());
+				ehrAptObs.IdentifyingCode= (OpenDentBusiness.EhrAptObsIdentifier)PIn.Int(row["IdentifyingCode"].ToString());
+				ehrAptObs.ValType        = (OpenDentBusiness.EhrAptObsType)PIn.Int(row["ValType"].ToString());
+				ehrAptObs.ValReported    = PIn.String(row["ValReported"].ToString());
+				ehrAptObs.UcumCode       = PIn.String(row["UcumCode"].ToString());
+				ehrAptObs.ValCodeSystem  = PIn.String(row["ValCodeSystem"].ToString());
 				retVal.Add(ehrAptObs);
 			}
 			return retVal;

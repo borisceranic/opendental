@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProviderErx> TableToList(DataTable table){
 			List<ProviderErx> retVal=new List<ProviderErx>();
 			ProviderErx providerErx;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				providerErx=new ProviderErx();
-				providerErx.ProviderErxNum    = PIn.Long  (table.Rows[i]["ProviderErxNum"].ToString());
-				providerErx.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				providerErx.NationalProviderID= PIn.String(table.Rows[i]["NationalProviderID"].ToString());
-				providerErx.IsEnabled         = PIn.Bool  (table.Rows[i]["IsEnabled"].ToString());
-				providerErx.IsIdentifyProofed = PIn.Bool  (table.Rows[i]["IsIdentifyProofed"].ToString());
-				providerErx.IsSentToHq        = PIn.Bool  (table.Rows[i]["IsSentToHq"].ToString());
+				providerErx.ProviderErxNum    = PIn.Long  (row["ProviderErxNum"].ToString());
+				providerErx.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				providerErx.NationalProviderID= PIn.String(row["NationalProviderID"].ToString());
+				providerErx.IsEnabled         = PIn.Bool  (row["IsEnabled"].ToString());
+				providerErx.IsIdentifyProofed = PIn.Bool  (row["IsIdentifyProofed"].ToString());
+				providerErx.IsSentToHq        = PIn.Bool  (row["IsSentToHq"].ToString());
 				retVal.Add(providerErx);
 			}
 			return retVal;

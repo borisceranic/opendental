@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Automation> TableToList(DataTable table){
 			List<Automation> retVal=new List<Automation>();
 			Automation automation;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				automation=new Automation();
-				automation.AutomationNum = PIn.Long  (table.Rows[i]["AutomationNum"].ToString());
-				automation.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				automation.Autotrigger   = (OpenDentBusiness.AutomationTrigger)PIn.Int(table.Rows[i]["Autotrigger"].ToString());
-				automation.ProcCodes     = PIn.String(table.Rows[i]["ProcCodes"].ToString());
-				automation.AutoAction    = (OpenDentBusiness.AutomationAction)PIn.Int(table.Rows[i]["AutoAction"].ToString());
-				automation.SheetDefNum   = PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
-				automation.CommType      = PIn.Long  (table.Rows[i]["CommType"].ToString());
-				automation.MessageContent= PIn.String(table.Rows[i]["MessageContent"].ToString());
+				automation.AutomationNum = PIn.Long  (row["AutomationNum"].ToString());
+				automation.Description   = PIn.String(row["Description"].ToString());
+				automation.Autotrigger   = (OpenDentBusiness.AutomationTrigger)PIn.Int(row["Autotrigger"].ToString());
+				automation.ProcCodes     = PIn.String(row["ProcCodes"].ToString());
+				automation.AutoAction    = (OpenDentBusiness.AutomationAction)PIn.Int(row["AutoAction"].ToString());
+				automation.SheetDefNum   = PIn.Long  (row["SheetDefNum"].ToString());
+				automation.CommType      = PIn.Long  (row["CommType"].ToString());
+				automation.MessageContent= PIn.String(row["MessageContent"].ToString());
 				retVal.Add(automation);
 			}
 			return retVal;

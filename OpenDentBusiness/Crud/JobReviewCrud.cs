@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobReview> TableToList(DataTable table){
 			List<JobReview> retVal=new List<JobReview>();
 			JobReview jobReview;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobReview=new JobReview();
-				jobReview.JobReviewNum= PIn.Long  (table.Rows[i]["JobReviewNum"].ToString());
-				jobReview.Reviewer    = PIn.Long  (table.Rows[i]["Reviewer"].ToString());
-				jobReview.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				jobReview.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				jobReview.ReviewStatus= (OpenDentBusiness.JobReviewStatus)PIn.Int(table.Rows[i]["ReviewStatus"].ToString());
+				jobReview.JobReviewNum= PIn.Long  (row["JobReviewNum"].ToString());
+				jobReview.Reviewer    = PIn.Long  (row["Reviewer"].ToString());
+				jobReview.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
+				jobReview.Description = PIn.String(row["Description"].ToString());
+				jobReview.ReviewStatus= (OpenDentBusiness.JobReviewStatus)PIn.Int(row["ReviewStatus"].ToString());
 				retVal.Add(jobReview);
 			}
 			return retVal;

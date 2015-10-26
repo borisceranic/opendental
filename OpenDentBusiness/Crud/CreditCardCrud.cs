@@ -44,24 +44,24 @@ namespace OpenDentBusiness.Crud{
 		public static List<CreditCard> TableToList(DataTable table){
 			List<CreditCard> retVal=new List<CreditCard>();
 			CreditCard creditCard;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				creditCard=new CreditCard();
-				creditCard.CreditCardNum     = PIn.Long  (table.Rows[i]["CreditCardNum"].ToString());
-				creditCard.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				creditCard.Address           = PIn.String(table.Rows[i]["Address"].ToString());
-				creditCard.Zip               = PIn.String(table.Rows[i]["Zip"].ToString());
-				creditCard.XChargeToken      = PIn.String(table.Rows[i]["XChargeToken"].ToString());
-				creditCard.CCNumberMasked    = PIn.String(table.Rows[i]["CCNumberMasked"].ToString());
-				creditCard.CCExpiration      = PIn.Date  (table.Rows[i]["CCExpiration"].ToString());
-				creditCard.ItemOrder         = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				creditCard.ChargeAmt         = PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				creditCard.DateStart         = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				creditCard.DateStop          = PIn.Date  (table.Rows[i]["DateStop"].ToString());
-				creditCard.Note              = PIn.String(table.Rows[i]["Note"].ToString());
-				creditCard.PayPlanNum        = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
-				creditCard.PayConnectToken   = PIn.String(table.Rows[i]["PayConnectToken"].ToString());
-				creditCard.PayConnectTokenExp= PIn.Date  (table.Rows[i]["PayConnectTokenExp"].ToString());
-				creditCard.Procedures        = PIn.String(table.Rows[i]["Procedures"].ToString());
+				creditCard.CreditCardNum     = PIn.Long  (row["CreditCardNum"].ToString());
+				creditCard.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				creditCard.Address           = PIn.String(row["Address"].ToString());
+				creditCard.Zip               = PIn.String(row["Zip"].ToString());
+				creditCard.XChargeToken      = PIn.String(row["XChargeToken"].ToString());
+				creditCard.CCNumberMasked    = PIn.String(row["CCNumberMasked"].ToString());
+				creditCard.CCExpiration      = PIn.Date  (row["CCExpiration"].ToString());
+				creditCard.ItemOrder         = PIn.Int   (row["ItemOrder"].ToString());
+				creditCard.ChargeAmt         = PIn.Double(row["ChargeAmt"].ToString());
+				creditCard.DateStart         = PIn.Date  (row["DateStart"].ToString());
+				creditCard.DateStop          = PIn.Date  (row["DateStop"].ToString());
+				creditCard.Note              = PIn.String(row["Note"].ToString());
+				creditCard.PayPlanNum        = PIn.Long  (row["PayPlanNum"].ToString());
+				creditCard.PayConnectToken   = PIn.String(row["PayConnectToken"].ToString());
+				creditCard.PayConnectTokenExp= PIn.Date  (row["PayConnectTokenExp"].ToString());
+				creditCard.Procedures        = PIn.String(row["Procedures"].ToString());
 				retVal.Add(creditCard);
 			}
 			return retVal;

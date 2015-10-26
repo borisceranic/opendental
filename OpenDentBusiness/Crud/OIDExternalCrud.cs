@@ -44,10 +44,10 @@ namespace OpenDentBusiness.Crud{
 		public static List<OIDExternal> TableToList(DataTable table){
 			List<OIDExternal> retVal=new List<OIDExternal>();
 			OIDExternal oIDExternal;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				oIDExternal=new OIDExternal();
-				oIDExternal.OIDExternalNum= PIn.Long  (table.Rows[i]["OIDExternalNum"].ToString());
-				string iDType=table.Rows[i]["IDType"].ToString();
+				oIDExternal.OIDExternalNum= PIn.Long  (row["OIDExternalNum"].ToString());
+				string iDType=row["IDType"].ToString();
 				if(iDType==""){
 					oIDExternal.IDType      =(IdentifierType)0;
 				}
@@ -57,9 +57,9 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					oIDExternal.IDType      =(IdentifierType)0;
 				}
-				oIDExternal.IDInternal    = PIn.Long  (table.Rows[i]["IDInternal"].ToString());
-				oIDExternal.IDExternal    = PIn.String(table.Rows[i]["IDExternal"].ToString());
-				oIDExternal.rootExternal  = PIn.String(table.Rows[i]["rootExternal"].ToString());
+				oIDExternal.IDInternal    = PIn.Long  (row["IDInternal"].ToString());
+				oIDExternal.IDExternal    = PIn.String(row["IDExternal"].ToString());
+				oIDExternal.rootExternal  = PIn.String(row["rootExternal"].ToString());
 				retVal.Add(oIDExternal);
 			}
 			return retVal;

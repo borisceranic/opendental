@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<Schedule> TableToList(DataTable table){
 			List<Schedule> retVal=new List<Schedule>();
 			Schedule schedule;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				schedule=new Schedule();
-				schedule.ScheduleNum = PIn.Long  (table.Rows[i]["ScheduleNum"].ToString());
-				schedule.SchedDate   = PIn.Date  (table.Rows[i]["SchedDate"].ToString());
-				schedule.StartTime   = PIn.Time(table.Rows[i]["StartTime"].ToString());
-				schedule.StopTime    = PIn.Time(table.Rows[i]["StopTime"].ToString());
-				schedule.SchedType   = (OpenDentBusiness.ScheduleType)PIn.Int(table.Rows[i]["SchedType"].ToString());
-				schedule.ProvNum     = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				schedule.BlockoutType= PIn.Long  (table.Rows[i]["BlockoutType"].ToString());
-				schedule.Note        = PIn.String(table.Rows[i]["Note"].ToString());
-				schedule.Status      = (OpenDentBusiness.SchedStatus)PIn.Int(table.Rows[i]["Status"].ToString());
-				schedule.EmployeeNum = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				schedule.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
+				schedule.ScheduleNum = PIn.Long  (row["ScheduleNum"].ToString());
+				schedule.SchedDate   = PIn.Date  (row["SchedDate"].ToString());
+				schedule.StartTime   = PIn.Time(row["StartTime"].ToString());
+				schedule.StopTime    = PIn.Time(row["StopTime"].ToString());
+				schedule.SchedType   = (OpenDentBusiness.ScheduleType)PIn.Int(row["SchedType"].ToString());
+				schedule.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
+				schedule.BlockoutType= PIn.Long  (row["BlockoutType"].ToString());
+				schedule.Note        = PIn.String(row["Note"].ToString());
+				schedule.Status      = (OpenDentBusiness.SchedStatus)PIn.Int(row["Status"].ToString());
+				schedule.EmployeeNum = PIn.Long  (row["EmployeeNum"].ToString());
+				schedule.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
 				retVal.Add(schedule);
 			}
 			return retVal;

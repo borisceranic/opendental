@@ -45,17 +45,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabSpecimenCondition> TableToList(DataTable table){
 			List<EhrLabSpecimenCondition> retVal=new List<EhrLabSpecimenCondition>();
 			EhrLabSpecimenCondition ehrLabSpecimenCondition;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabSpecimenCondition=new EhrLabSpecimenCondition();
-				ehrLabSpecimenCondition.EhrLabSpecimenConditionNum        = PIn.Long  (table.Rows[i]["EhrLabSpecimenConditionNum"].ToString());
-				ehrLabSpecimenCondition.EhrLabSpecimenNum                 = PIn.Long  (table.Rows[i]["EhrLabSpecimenNum"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionID               = PIn.String(table.Rows[i]["SpecimenConditionID"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionText             = PIn.String(table.Rows[i]["SpecimenConditionText"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionCodeSystemName   = PIn.String(table.Rows[i]["SpecimenConditionCodeSystemName"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionIDAlt            = PIn.String(table.Rows[i]["SpecimenConditionIDAlt"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionTextAlt          = PIn.String(table.Rows[i]["SpecimenConditionTextAlt"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt= PIn.String(table.Rows[i]["SpecimenConditionCodeSystemNameAlt"].ToString());
-				ehrLabSpecimenCondition.SpecimenConditionTextOriginal     = PIn.String(table.Rows[i]["SpecimenConditionTextOriginal"].ToString());
+				ehrLabSpecimenCondition.EhrLabSpecimenConditionNum        = PIn.Long  (row["EhrLabSpecimenConditionNum"].ToString());
+				ehrLabSpecimenCondition.EhrLabSpecimenNum                 = PIn.Long  (row["EhrLabSpecimenNum"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionID               = PIn.String(row["SpecimenConditionID"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionText             = PIn.String(row["SpecimenConditionText"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionCodeSystemName   = PIn.String(row["SpecimenConditionCodeSystemName"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionIDAlt            = PIn.String(row["SpecimenConditionIDAlt"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionTextAlt          = PIn.String(row["SpecimenConditionTextAlt"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt= PIn.String(row["SpecimenConditionCodeSystemNameAlt"].ToString());
+				ehrLabSpecimenCondition.SpecimenConditionTextOriginal     = PIn.String(row["SpecimenConditionTextOriginal"].ToString());
 				retVal.Add(ehrLabSpecimenCondition);
 			}
 			return retVal;

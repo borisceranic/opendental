@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<AutoNote> TableToList(DataTable table){
 			List<AutoNote> retVal=new List<AutoNote>();
 			AutoNote autoNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				autoNote=new AutoNote();
-				autoNote.AutoNoteNum = PIn.Long  (table.Rows[i]["AutoNoteNum"].ToString());
-				autoNote.AutoNoteName= PIn.String(table.Rows[i]["AutoNoteName"].ToString());
-				autoNote.MainText    = PIn.String(table.Rows[i]["MainText"].ToString());
+				autoNote.AutoNoteNum = PIn.Long  (row["AutoNoteNum"].ToString());
+				autoNote.AutoNoteName= PIn.String(row["AutoNoteName"].ToString());
+				autoNote.MainText    = PIn.String(row["MainText"].ToString());
 				retVal.Add(autoNote);
 			}
 			return retVal;

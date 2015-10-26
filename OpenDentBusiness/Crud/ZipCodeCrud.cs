@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ZipCode> TableToList(DataTable table){
 			List<ZipCode> retVal=new List<ZipCode>();
 			ZipCode zipCode;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				zipCode=new ZipCode();
-				zipCode.ZipCodeNum   = PIn.Long  (table.Rows[i]["ZipCodeNum"].ToString());
-				zipCode.ZipCodeDigits= PIn.String(table.Rows[i]["ZipCodeDigits"].ToString());
-				zipCode.City         = PIn.String(table.Rows[i]["City"].ToString());
-				zipCode.State        = PIn.String(table.Rows[i]["State"].ToString());
-				zipCode.IsFrequent   = PIn.Bool  (table.Rows[i]["IsFrequent"].ToString());
+				zipCode.ZipCodeNum   = PIn.Long  (row["ZipCodeNum"].ToString());
+				zipCode.ZipCodeDigits= PIn.String(row["ZipCodeDigits"].ToString());
+				zipCode.City         = PIn.String(row["City"].ToString());
+				zipCode.State        = PIn.String(row["State"].ToString());
+				zipCode.IsFrequent   = PIn.Bool  (row["IsFrequent"].ToString());
 				retVal.Add(zipCode);
 			}
 			return retVal;

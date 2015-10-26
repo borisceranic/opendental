@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EmailAutograph> TableToList(DataTable table){
 			List<EmailAutograph> retVal=new List<EmailAutograph>();
 			EmailAutograph emailAutograph;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				emailAutograph=new EmailAutograph();
-				emailAutograph.EmailAutographNum= PIn.Long  (table.Rows[i]["EmailAutographNum"].ToString());
-				emailAutograph.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				emailAutograph.EmailAddress     = PIn.String(table.Rows[i]["EmailAddress"].ToString());
-				emailAutograph.AutographText    = PIn.String(table.Rows[i]["AutographText"].ToString());
+				emailAutograph.EmailAutographNum= PIn.Long  (row["EmailAutographNum"].ToString());
+				emailAutograph.Description      = PIn.String(row["Description"].ToString());
+				emailAutograph.EmailAddress     = PIn.String(row["EmailAddress"].ToString());
+				emailAutograph.AutographText    = PIn.String(row["AutographText"].ToString());
 				retVal.Add(emailAutograph);
 			}
 			return retVal;

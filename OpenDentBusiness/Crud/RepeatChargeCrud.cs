@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<RepeatCharge> TableToList(DataTable table){
 			List<RepeatCharge> retVal=new List<RepeatCharge>();
 			RepeatCharge repeatCharge;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				repeatCharge=new RepeatCharge();
-				repeatCharge.RepeatChargeNum= PIn.Long  (table.Rows[i]["RepeatChargeNum"].ToString());
-				repeatCharge.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				repeatCharge.ProcCode       = PIn.String(table.Rows[i]["ProcCode"].ToString());
-				repeatCharge.ChargeAmt      = PIn.Double(table.Rows[i]["ChargeAmt"].ToString());
-				repeatCharge.DateStart      = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				repeatCharge.DateStop       = PIn.Date  (table.Rows[i]["DateStop"].ToString());
-				repeatCharge.Note           = PIn.String(table.Rows[i]["Note"].ToString());
-				repeatCharge.CopyNoteToProc = PIn.Bool  (table.Rows[i]["CopyNoteToProc"].ToString());
-				repeatCharge.CreatesClaim   = PIn.Bool  (table.Rows[i]["CreatesClaim"].ToString());
-				repeatCharge.IsEnabled      = PIn.Bool  (table.Rows[i]["IsEnabled"].ToString());
+				repeatCharge.RepeatChargeNum= PIn.Long  (row["RepeatChargeNum"].ToString());
+				repeatCharge.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				repeatCharge.ProcCode       = PIn.String(row["ProcCode"].ToString());
+				repeatCharge.ChargeAmt      = PIn.Double(row["ChargeAmt"].ToString());
+				repeatCharge.DateStart      = PIn.Date  (row["DateStart"].ToString());
+				repeatCharge.DateStop       = PIn.Date  (row["DateStop"].ToString());
+				repeatCharge.Note           = PIn.String(row["Note"].ToString());
+				repeatCharge.CopyNoteToProc = PIn.Bool  (row["CopyNoteToProc"].ToString());
+				repeatCharge.CreatesClaim   = PIn.Bool  (row["CreatesClaim"].ToString());
+				repeatCharge.IsEnabled      = PIn.Bool  (row["IsEnabled"].ToString());
 				retVal.Add(repeatCharge);
 			}
 			return retVal;

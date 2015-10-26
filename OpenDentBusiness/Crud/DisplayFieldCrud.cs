@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<DisplayField> TableToList(DataTable table){
 			List<DisplayField> retVal=new List<DisplayField>();
 			DisplayField displayField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				displayField=new DisplayField();
-				displayField.DisplayFieldNum= PIn.Long  (table.Rows[i]["DisplayFieldNum"].ToString());
-				displayField.InternalName   = PIn.String(table.Rows[i]["InternalName"].ToString());
-				displayField.ItemOrder      = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				displayField.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				displayField.ColumnWidth    = PIn.Int   (table.Rows[i]["ColumnWidth"].ToString());
-				displayField.Category       = (OpenDentBusiness.DisplayFieldCategory)PIn.Int(table.Rows[i]["Category"].ToString());
-				displayField.ChartViewNum   = PIn.Long  (table.Rows[i]["ChartViewNum"].ToString());
-				displayField.PickList       = PIn.String(table.Rows[i]["PickList"].ToString());
+				displayField.DisplayFieldNum= PIn.Long  (row["DisplayFieldNum"].ToString());
+				displayField.InternalName   = PIn.String(row["InternalName"].ToString());
+				displayField.ItemOrder      = PIn.Int   (row["ItemOrder"].ToString());
+				displayField.Description    = PIn.String(row["Description"].ToString());
+				displayField.ColumnWidth    = PIn.Int   (row["ColumnWidth"].ToString());
+				displayField.Category       = (OpenDentBusiness.DisplayFieldCategory)PIn.Int(row["Category"].ToString());
+				displayField.ChartViewNum   = PIn.Long  (row["ChartViewNum"].ToString());
+				displayField.PickList       = PIn.String(row["PickList"].ToString());
 				retVal.Add(displayField);
 			}
 			return retVal;

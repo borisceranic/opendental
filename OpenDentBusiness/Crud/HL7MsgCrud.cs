@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<HL7Msg> TableToList(DataTable table){
 			List<HL7Msg> retVal=new List<HL7Msg>();
 			HL7Msg hL7Msg;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				hL7Msg=new HL7Msg();
-				hL7Msg.HL7MsgNum = PIn.Long  (table.Rows[i]["HL7MsgNum"].ToString());
-				hL7Msg.HL7Status = (OpenDentBusiness.HL7MessageStatus)PIn.Int(table.Rows[i]["HL7Status"].ToString());
-				hL7Msg.MsgText   = PIn.String(table.Rows[i]["MsgText"].ToString());
-				hL7Msg.AptNum    = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				hL7Msg.DateTStamp= PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				hL7Msg.PatNum    = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				hL7Msg.Note      = PIn.String(table.Rows[i]["Note"].ToString());
+				hL7Msg.HL7MsgNum = PIn.Long  (row["HL7MsgNum"].ToString());
+				hL7Msg.HL7Status = (OpenDentBusiness.HL7MessageStatus)PIn.Int(row["HL7Status"].ToString());
+				hL7Msg.MsgText   = PIn.String(row["MsgText"].ToString());
+				hL7Msg.AptNum    = PIn.Long  (row["AptNum"].ToString());
+				hL7Msg.DateTStamp= PIn.DateT (row["DateTStamp"].ToString());
+				hL7Msg.PatNum    = PIn.Long  (row["PatNum"].ToString());
+				hL7Msg.Note      = PIn.String(row["Note"].ToString());
 				retVal.Add(hL7Msg);
 			}
 			return retVal;

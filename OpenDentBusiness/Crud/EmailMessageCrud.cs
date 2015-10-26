@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<EmailMessage> TableToList(DataTable table){
 			List<EmailMessage> retVal=new List<EmailMessage>();
 			EmailMessage emailMessage;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				emailMessage=new EmailMessage();
-				emailMessage.EmailMessageNum = PIn.Long  (table.Rows[i]["EmailMessageNum"].ToString());
-				emailMessage.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				emailMessage.ToAddress       = PIn.String(table.Rows[i]["ToAddress"].ToString());
-				emailMessage.FromAddress     = PIn.String(table.Rows[i]["FromAddress"].ToString());
-				emailMessage.Subject         = PIn.String(table.Rows[i]["Subject"].ToString());
-				emailMessage.BodyText        = PIn.String(table.Rows[i]["BodyText"].ToString());
-				emailMessage.MsgDateTime     = PIn.DateT (table.Rows[i]["MsgDateTime"].ToString());
-				emailMessage.SentOrReceived  = (OpenDentBusiness.EmailSentOrReceived)PIn.Int(table.Rows[i]["SentOrReceived"].ToString());
-				emailMessage.RecipientAddress= PIn.String(table.Rows[i]["RecipientAddress"].ToString());
-				emailMessage.RawEmailIn      = PIn.String(table.Rows[i]["RawEmailIn"].ToString());
-				emailMessage.ProvNumWebMail  = PIn.Long  (table.Rows[i]["ProvNumWebMail"].ToString());
-				emailMessage.PatNumSubj      = PIn.Long  (table.Rows[i]["PatNumSubj"].ToString());
-				emailMessage.CcAddress       = PIn.String(table.Rows[i]["CcAddress"].ToString());
-				emailMessage.BccAddress      = PIn.String(table.Rows[i]["BccAddress"].ToString());
+				emailMessage.EmailMessageNum = PIn.Long  (row["EmailMessageNum"].ToString());
+				emailMessage.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				emailMessage.ToAddress       = PIn.String(row["ToAddress"].ToString());
+				emailMessage.FromAddress     = PIn.String(row["FromAddress"].ToString());
+				emailMessage.Subject         = PIn.String(row["Subject"].ToString());
+				emailMessage.BodyText        = PIn.String(row["BodyText"].ToString());
+				emailMessage.MsgDateTime     = PIn.DateT (row["MsgDateTime"].ToString());
+				emailMessage.SentOrReceived  = (OpenDentBusiness.EmailSentOrReceived)PIn.Int(row["SentOrReceived"].ToString());
+				emailMessage.RecipientAddress= PIn.String(row["RecipientAddress"].ToString());
+				emailMessage.RawEmailIn      = PIn.String(row["RawEmailIn"].ToString());
+				emailMessage.ProvNumWebMail  = PIn.Long  (row["ProvNumWebMail"].ToString());
+				emailMessage.PatNumSubj      = PIn.Long  (row["PatNumSubj"].ToString());
+				emailMessage.CcAddress       = PIn.String(row["CcAddress"].ToString());
+				emailMessage.BccAddress      = PIn.String(row["BccAddress"].ToString());
 				retVal.Add(emailMessage);
 			}
 			return retVal;

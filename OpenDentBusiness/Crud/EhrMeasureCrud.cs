@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrMeasure> TableToList(DataTable table){
 			List<EhrMeasure> retVal=new List<EhrMeasure>();
 			EhrMeasure ehrMeasure;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrMeasure=new EhrMeasure();
-				ehrMeasure.EhrMeasureNum= PIn.Long  (table.Rows[i]["EhrMeasureNum"].ToString());
-				ehrMeasure.MeasureType  = (OpenDentBusiness.EhrMeasureType)PIn.Int(table.Rows[i]["MeasureType"].ToString());
-				ehrMeasure.Numerator    = PIn.Int   (table.Rows[i]["Numerator"].ToString());
-				ehrMeasure.Denominator  = PIn.Int   (table.Rows[i]["Denominator"].ToString());
+				ehrMeasure.EhrMeasureNum= PIn.Long  (row["EhrMeasureNum"].ToString());
+				ehrMeasure.MeasureType  = (OpenDentBusiness.EhrMeasureType)PIn.Int(row["MeasureType"].ToString());
+				ehrMeasure.Numerator    = PIn.Int   (row["Numerator"].ToString());
+				ehrMeasure.Denominator  = PIn.Int   (row["Denominator"].ToString());
 				retVal.Add(ehrMeasure);
 			}
 			return retVal;

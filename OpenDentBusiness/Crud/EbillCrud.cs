@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Ebill> TableToList(DataTable table){
 			List<Ebill> retVal=new List<Ebill>();
 			Ebill ebill;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ebill=new Ebill();
-				ebill.EbillNum        = PIn.Long  (table.Rows[i]["EbillNum"].ToString());
-				ebill.ClinicNum       = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				ebill.ClientAcctNumber= PIn.String(table.Rows[i]["ClientAcctNumber"].ToString());
-				ebill.ElectUserName   = PIn.String(table.Rows[i]["ElectUserName"].ToString());
-				ebill.ElectPassword   = PIn.String(table.Rows[i]["ElectPassword"].ToString());
+				ebill.EbillNum        = PIn.Long  (row["EbillNum"].ToString());
+				ebill.ClinicNum       = PIn.Long  (row["ClinicNum"].ToString());
+				ebill.ClientAcctNumber= PIn.String(row["ClientAcctNumber"].ToString());
+				ebill.ElectUserName   = PIn.String(row["ElectUserName"].ToString());
+				ebill.ElectPassword   = PIn.String(row["ElectPassword"].ToString());
 				retVal.Add(ebill);
 			}
 			return retVal;

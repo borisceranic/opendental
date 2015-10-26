@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<ApptView> TableToList(DataTable table){
 			List<ApptView> retVal=new List<ApptView>();
 			ApptView apptView;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				apptView=new ApptView();
-				apptView.ApptViewNum        = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
-				apptView.Description        = PIn.String(table.Rows[i]["Description"].ToString());
-				apptView.ItemOrder          = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				apptView.RowsPerIncr        = PIn.Byte  (table.Rows[i]["RowsPerIncr"].ToString());
-				apptView.OnlyScheduledProvs = PIn.Bool  (table.Rows[i]["OnlyScheduledProvs"].ToString());
-				apptView.OnlySchedBeforeTime= PIn.Time(table.Rows[i]["OnlySchedBeforeTime"].ToString());
-				apptView.OnlySchedAfterTime = PIn.Time(table.Rows[i]["OnlySchedAfterTime"].ToString());
-				apptView.StackBehavUR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavUR"].ToString());
-				apptView.StackBehavLR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(table.Rows[i]["StackBehavLR"].ToString());
-				apptView.ClinicNum          = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				apptView.ApptTimeScrollStart= PIn.Time(table.Rows[i]["ApptTimeScrollStart"].ToString());
+				apptView.ApptViewNum        = PIn.Long  (row["ApptViewNum"].ToString());
+				apptView.Description        = PIn.String(row["Description"].ToString());
+				apptView.ItemOrder          = PIn.Int   (row["ItemOrder"].ToString());
+				apptView.RowsPerIncr        = PIn.Byte  (row["RowsPerIncr"].ToString());
+				apptView.OnlyScheduledProvs = PIn.Bool  (row["OnlyScheduledProvs"].ToString());
+				apptView.OnlySchedBeforeTime= PIn.Time(row["OnlySchedBeforeTime"].ToString());
+				apptView.OnlySchedAfterTime = PIn.Time(row["OnlySchedAfterTime"].ToString());
+				apptView.StackBehavUR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavUR"].ToString());
+				apptView.StackBehavLR       = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavLR"].ToString());
+				apptView.ClinicNum          = PIn.Long  (row["ClinicNum"].ToString());
+				apptView.ApptTimeScrollStart= PIn.Time(row["ApptTimeScrollStart"].ToString());
 				retVal.Add(apptView);
 			}
 			return retVal;

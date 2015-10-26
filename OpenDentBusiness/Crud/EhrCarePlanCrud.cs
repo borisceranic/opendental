@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrCarePlan> TableToList(DataTable table){
 			List<EhrCarePlan> retVal=new List<EhrCarePlan>();
 			EhrCarePlan ehrCarePlan;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrCarePlan=new EhrCarePlan();
-				ehrCarePlan.EhrCarePlanNum = PIn.Long  (table.Rows[i]["EhrCarePlanNum"].ToString());
-				ehrCarePlan.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrCarePlan.SnomedEducation= PIn.String(table.Rows[i]["SnomedEducation"].ToString());
-				ehrCarePlan.Instructions   = PIn.String(table.Rows[i]["Instructions"].ToString());
-				ehrCarePlan.DatePlanned    = PIn.Date  (table.Rows[i]["DatePlanned"].ToString());
+				ehrCarePlan.EhrCarePlanNum = PIn.Long  (row["EhrCarePlanNum"].ToString());
+				ehrCarePlan.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				ehrCarePlan.SnomedEducation= PIn.String(row["SnomedEducation"].ToString());
+				ehrCarePlan.Instructions   = PIn.String(row["Instructions"].ToString());
+				ehrCarePlan.DatePlanned    = PIn.Date  (row["DatePlanned"].ToString());
 				retVal.Add(ehrCarePlan);
 			}
 			return retVal;

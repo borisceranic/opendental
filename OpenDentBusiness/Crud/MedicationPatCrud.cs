@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedicationPat> TableToList(DataTable table){
 			List<MedicationPat> retVal=new List<MedicationPat>();
 			MedicationPat medicationPat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medicationPat=new MedicationPat();
-				medicationPat.MedicationPatNum= PIn.Long  (table.Rows[i]["MedicationPatNum"].ToString());
-				medicationPat.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				medicationPat.MedicationNum   = PIn.Long  (table.Rows[i]["MedicationNum"].ToString());
-				medicationPat.PatNote         = PIn.String(table.Rows[i]["PatNote"].ToString());
-				medicationPat.DateTStamp      = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				medicationPat.DateStart       = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				medicationPat.DateStop        = PIn.Date  (table.Rows[i]["DateStop"].ToString());
-				medicationPat.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				medicationPat.MedDescript     = PIn.String(table.Rows[i]["MedDescript"].ToString());
-				medicationPat.RxCui           = PIn.Long  (table.Rows[i]["RxCui"].ToString());
-				medicationPat.NewCropGuid     = PIn.String(table.Rows[i]["NewCropGuid"].ToString());
-				medicationPat.IsCpoe          = PIn.Bool  (table.Rows[i]["IsCpoe"].ToString());
+				medicationPat.MedicationPatNum= PIn.Long  (row["MedicationPatNum"].ToString());
+				medicationPat.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				medicationPat.MedicationNum   = PIn.Long  (row["MedicationNum"].ToString());
+				medicationPat.PatNote         = PIn.String(row["PatNote"].ToString());
+				medicationPat.DateTStamp      = PIn.DateT (row["DateTStamp"].ToString());
+				medicationPat.DateStart       = PIn.Date  (row["DateStart"].ToString());
+				medicationPat.DateStop        = PIn.Date  (row["DateStop"].ToString());
+				medicationPat.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
+				medicationPat.MedDescript     = PIn.String(row["MedDescript"].ToString());
+				medicationPat.RxCui           = PIn.Long  (row["RxCui"].ToString());
+				medicationPat.NewCropGuid     = PIn.String(row["NewCropGuid"].ToString());
+				medicationPat.IsCpoe          = PIn.Bool  (row["IsCpoe"].ToString());
 				retVal.Add(medicationPat);
 			}
 			return retVal;

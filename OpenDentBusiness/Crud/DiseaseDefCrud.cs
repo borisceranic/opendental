@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<DiseaseDef> TableToList(DataTable table){
 			List<DiseaseDef> retVal=new List<DiseaseDef>();
 			DiseaseDef diseaseDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				diseaseDef=new DiseaseDef();
-				diseaseDef.DiseaseDefNum= PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
-				diseaseDef.DiseaseName  = PIn.String(table.Rows[i]["DiseaseName"].ToString());
-				diseaseDef.ItemOrder    = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				diseaseDef.IsHidden     = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				diseaseDef.DateTStamp   = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				diseaseDef.ICD9Code     = PIn.String(table.Rows[i]["ICD9Code"].ToString());
-				diseaseDef.SnomedCode   = PIn.String(table.Rows[i]["SnomedCode"].ToString());
-				diseaseDef.Icd10Code    = PIn.String(table.Rows[i]["Icd10Code"].ToString());
+				diseaseDef.DiseaseDefNum= PIn.Long  (row["DiseaseDefNum"].ToString());
+				diseaseDef.DiseaseName  = PIn.String(row["DiseaseName"].ToString());
+				diseaseDef.ItemOrder    = PIn.Int   (row["ItemOrder"].ToString());
+				diseaseDef.IsHidden     = PIn.Bool  (row["IsHidden"].ToString());
+				diseaseDef.DateTStamp   = PIn.DateT (row["DateTStamp"].ToString());
+				diseaseDef.ICD9Code     = PIn.String(row["ICD9Code"].ToString());
+				diseaseDef.SnomedCode   = PIn.String(row["SnomedCode"].ToString());
+				diseaseDef.Icd10Code    = PIn.String(row["Icd10Code"].ToString());
 				retVal.Add(diseaseDef);
 			}
 			return retVal;

@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<ToothGridCol> TableToList(DataTable table){
 			List<ToothGridCol> retVal=new List<ToothGridCol>();
 			ToothGridCol toothGridCol;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				toothGridCol=new ToothGridCol();
-				toothGridCol.ToothGridColNum= PIn.Long  (table.Rows[i]["ToothGridColNum"].ToString());
-				toothGridCol.SheetFieldNum  = PIn.Long  (table.Rows[i]["SheetFieldNum"].ToString());
-				toothGridCol.NameItem       = PIn.String(table.Rows[i]["NameItem"].ToString());
-				toothGridCol.CellType       = (OpenDentBusiness.ToothGridCellType)PIn.Int(table.Rows[i]["CellType"].ToString());
-				toothGridCol.ItemOrder      = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				toothGridCol.ColumnWidth    = PIn.Int   (table.Rows[i]["ColumnWidth"].ToString());
-				toothGridCol.CodeNum        = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
-				toothGridCol.ProcStatus     = (OpenDentBusiness.ProcStat)PIn.Int(table.Rows[i]["ProcStatus"].ToString());
+				toothGridCol.ToothGridColNum= PIn.Long  (row["ToothGridColNum"].ToString());
+				toothGridCol.SheetFieldNum  = PIn.Long  (row["SheetFieldNum"].ToString());
+				toothGridCol.NameItem       = PIn.String(row["NameItem"].ToString());
+				toothGridCol.CellType       = (OpenDentBusiness.ToothGridCellType)PIn.Int(row["CellType"].ToString());
+				toothGridCol.ItemOrder      = PIn.Int   (row["ItemOrder"].ToString());
+				toothGridCol.ColumnWidth    = PIn.Int   (row["ColumnWidth"].ToString());
+				toothGridCol.CodeNum        = PIn.Long  (row["CodeNum"].ToString());
+				toothGridCol.ProcStatus     = (OpenDentBusiness.ProcStat)PIn.Int(row["ProcStatus"].ToString());
 				retVal.Add(toothGridCol);
 			}
 			return retVal;

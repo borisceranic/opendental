@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<EduResource> TableToList(DataTable table){
 			List<EduResource> retVal=new List<EduResource>();
 			EduResource eduResource;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				eduResource=new EduResource();
-				eduResource.EduResourceNum  = PIn.Long  (table.Rows[i]["EduResourceNum"].ToString());
-				eduResource.DiseaseDefNum   = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
-				eduResource.MedicationNum   = PIn.Long  (table.Rows[i]["MedicationNum"].ToString());
-				eduResource.LabResultID     = PIn.String(table.Rows[i]["LabResultID"].ToString());
-				eduResource.LabResultName   = PIn.String(table.Rows[i]["LabResultName"].ToString());
-				eduResource.LabResultCompare= PIn.String(table.Rows[i]["LabResultCompare"].ToString());
-				eduResource.ResourceUrl     = PIn.String(table.Rows[i]["ResourceUrl"].ToString());
+				eduResource.EduResourceNum  = PIn.Long  (row["EduResourceNum"].ToString());
+				eduResource.DiseaseDefNum   = PIn.Long  (row["DiseaseDefNum"].ToString());
+				eduResource.MedicationNum   = PIn.Long  (row["MedicationNum"].ToString());
+				eduResource.LabResultID     = PIn.String(row["LabResultID"].ToString());
+				eduResource.LabResultName   = PIn.String(row["LabResultName"].ToString());
+				eduResource.LabResultCompare= PIn.String(row["LabResultCompare"].ToString());
+				eduResource.ResourceUrl     = PIn.String(row["ResourceUrl"].ToString());
 				retVal.Add(eduResource);
 			}
 			return retVal;

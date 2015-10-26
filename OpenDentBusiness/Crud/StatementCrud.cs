@@ -44,27 +44,27 @@ namespace OpenDentBusiness.Crud{
 		public static List<Statement> TableToList(DataTable table){
 			List<Statement> retVal=new List<Statement>();
 			Statement statement;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				statement=new Statement();
-				statement.StatementNum = PIn.Long  (table.Rows[i]["StatementNum"].ToString());
-				statement.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				statement.DateSent     = PIn.Date  (table.Rows[i]["DateSent"].ToString());
-				statement.DateRangeFrom= PIn.Date  (table.Rows[i]["DateRangeFrom"].ToString());
-				statement.DateRangeTo  = PIn.Date  (table.Rows[i]["DateRangeTo"].ToString());
-				statement.Note         = PIn.String(table.Rows[i]["Note"].ToString());
-				statement.NoteBold     = PIn.String(table.Rows[i]["NoteBold"].ToString());
-				statement.Mode_        = (OpenDentBusiness.StatementMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
-				statement.HidePayment  = PIn.Bool  (table.Rows[i]["HidePayment"].ToString());
-				statement.SinglePatient= PIn.Bool  (table.Rows[i]["SinglePatient"].ToString());
-				statement.Intermingled = PIn.Bool  (table.Rows[i]["Intermingled"].ToString());
-				statement.IsSent       = PIn.Bool  (table.Rows[i]["IsSent"].ToString());
-				statement.DocNum       = PIn.Long  (table.Rows[i]["DocNum"].ToString());
-				statement.DateTStamp   = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				statement.IsReceipt    = PIn.Bool  (table.Rows[i]["IsReceipt"].ToString());
-				statement.IsInvoice    = PIn.Bool  (table.Rows[i]["IsInvoice"].ToString());
-				statement.IsInvoiceCopy= PIn.Bool  (table.Rows[i]["IsInvoiceCopy"].ToString());
-				statement.EmailSubject = PIn.String(table.Rows[i]["EmailSubject"].ToString());
-				statement.EmailBody    = PIn.String(table.Rows[i]["EmailBody"].ToString());
+				statement.StatementNum = PIn.Long  (row["StatementNum"].ToString());
+				statement.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				statement.DateSent     = PIn.Date  (row["DateSent"].ToString());
+				statement.DateRangeFrom= PIn.Date  (row["DateRangeFrom"].ToString());
+				statement.DateRangeTo  = PIn.Date  (row["DateRangeTo"].ToString());
+				statement.Note         = PIn.String(row["Note"].ToString());
+				statement.NoteBold     = PIn.String(row["NoteBold"].ToString());
+				statement.Mode_        = (OpenDentBusiness.StatementMode)PIn.Int(row["Mode_"].ToString());
+				statement.HidePayment  = PIn.Bool  (row["HidePayment"].ToString());
+				statement.SinglePatient= PIn.Bool  (row["SinglePatient"].ToString());
+				statement.Intermingled = PIn.Bool  (row["Intermingled"].ToString());
+				statement.IsSent       = PIn.Bool  (row["IsSent"].ToString());
+				statement.DocNum       = PIn.Long  (row["DocNum"].ToString());
+				statement.DateTStamp   = PIn.DateT (row["DateTStamp"].ToString());
+				statement.IsReceipt    = PIn.Bool  (row["IsReceipt"].ToString());
+				statement.IsInvoice    = PIn.Bool  (row["IsInvoice"].ToString());
+				statement.IsInvoiceCopy= PIn.Bool  (row["IsInvoiceCopy"].ToString());
+				statement.EmailSubject = PIn.String(row["EmailSubject"].ToString());
+				statement.EmailBody    = PIn.String(row["EmailBody"].ToString());
 				retVal.Add(statement);
 			}
 			return retVal;

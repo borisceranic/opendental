@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProgramProperty> TableToList(DataTable table){
 			List<ProgramProperty> retVal=new List<ProgramProperty>();
 			ProgramProperty programProperty;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				programProperty=new ProgramProperty();
-				programProperty.ProgramPropertyNum= PIn.Long  (table.Rows[i]["ProgramPropertyNum"].ToString());
-				programProperty.ProgramNum        = PIn.Long  (table.Rows[i]["ProgramNum"].ToString());
-				programProperty.PropertyDesc      = PIn.String(table.Rows[i]["PropertyDesc"].ToString());
-				programProperty.PropertyValue     = PIn.String(table.Rows[i]["PropertyValue"].ToString());
-				programProperty.ComputerName      = PIn.String(table.Rows[i]["ComputerName"].ToString());
-				programProperty.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
+				programProperty.ProgramPropertyNum= PIn.Long  (row["ProgramPropertyNum"].ToString());
+				programProperty.ProgramNum        = PIn.Long  (row["ProgramNum"].ToString());
+				programProperty.PropertyDesc      = PIn.String(row["PropertyDesc"].ToString());
+				programProperty.PropertyValue     = PIn.String(row["PropertyValue"].ToString());
+				programProperty.ComputerName      = PIn.String(row["ComputerName"].ToString());
+				programProperty.ClinicNum         = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(programProperty);
 			}
 			return retVal;

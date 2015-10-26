@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<LabCase> TableToList(DataTable table){
 			List<LabCase> retVal=new List<LabCase>();
 			LabCase labCase;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				labCase=new LabCase();
-				labCase.LabCaseNum     = PIn.Long  (table.Rows[i]["LabCaseNum"].ToString());
-				labCase.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				labCase.LaboratoryNum  = PIn.Long  (table.Rows[i]["LaboratoryNum"].ToString());
-				labCase.AptNum         = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				labCase.PlannedAptNum  = PIn.Long  (table.Rows[i]["PlannedAptNum"].ToString());
-				labCase.DateTimeDue    = PIn.DateT (table.Rows[i]["DateTimeDue"].ToString());
-				labCase.DateTimeCreated= PIn.DateT (table.Rows[i]["DateTimeCreated"].ToString());
-				labCase.DateTimeSent   = PIn.DateT (table.Rows[i]["DateTimeSent"].ToString());
-				labCase.DateTimeRecd   = PIn.DateT (table.Rows[i]["DateTimeRecd"].ToString());
-				labCase.DateTimeChecked= PIn.DateT (table.Rows[i]["DateTimeChecked"].ToString());
-				labCase.ProvNum        = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				labCase.Instructions   = PIn.String(table.Rows[i]["Instructions"].ToString());
-				labCase.LabFee         = PIn.Double(table.Rows[i]["LabFee"].ToString());
+				labCase.LabCaseNum     = PIn.Long  (row["LabCaseNum"].ToString());
+				labCase.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				labCase.LaboratoryNum  = PIn.Long  (row["LaboratoryNum"].ToString());
+				labCase.AptNum         = PIn.Long  (row["AptNum"].ToString());
+				labCase.PlannedAptNum  = PIn.Long  (row["PlannedAptNum"].ToString());
+				labCase.DateTimeDue    = PIn.DateT (row["DateTimeDue"].ToString());
+				labCase.DateTimeCreated= PIn.DateT (row["DateTimeCreated"].ToString());
+				labCase.DateTimeSent   = PIn.DateT (row["DateTimeSent"].ToString());
+				labCase.DateTimeRecd   = PIn.DateT (row["DateTimeRecd"].ToString());
+				labCase.DateTimeChecked= PIn.DateT (row["DateTimeChecked"].ToString());
+				labCase.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
+				labCase.Instructions   = PIn.String(row["Instructions"].ToString());
+				labCase.LabFee         = PIn.Double(row["LabFee"].ToString());
 				retVal.Add(labCase);
 			}
 			return retVal;

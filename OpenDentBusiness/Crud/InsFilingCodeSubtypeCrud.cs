@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<InsFilingCodeSubtype> TableToList(DataTable table){
 			List<InsFilingCodeSubtype> retVal=new List<InsFilingCodeSubtype>();
 			InsFilingCodeSubtype insFilingCodeSubtype;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				insFilingCodeSubtype=new InsFilingCodeSubtype();
-				insFilingCodeSubtype.InsFilingCodeSubtypeNum= PIn.Long  (table.Rows[i]["InsFilingCodeSubtypeNum"].ToString());
-				insFilingCodeSubtype.InsFilingCodeNum       = PIn.Long  (table.Rows[i]["InsFilingCodeNum"].ToString());
-				insFilingCodeSubtype.Descript               = PIn.String(table.Rows[i]["Descript"].ToString());
+				insFilingCodeSubtype.InsFilingCodeSubtypeNum= PIn.Long  (row["InsFilingCodeSubtypeNum"].ToString());
+				insFilingCodeSubtype.InsFilingCodeNum       = PIn.Long  (row["InsFilingCodeNum"].ToString());
+				insFilingCodeSubtype.Descript               = PIn.String(row["Descript"].ToString());
 				retVal.Add(insFilingCodeSubtype);
 			}
 			return retVal;

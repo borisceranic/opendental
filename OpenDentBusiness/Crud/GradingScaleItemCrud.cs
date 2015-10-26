@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<GradingScaleItem> TableToList(DataTable table){
 			List<GradingScaleItem> retVal=new List<GradingScaleItem>();
 			GradingScaleItem gradingScaleItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				gradingScaleItem=new GradingScaleItem();
-				gradingScaleItem.GradingScaleItemNum= PIn.Long  (table.Rows[i]["GradingScaleItemNum"].ToString());
-				gradingScaleItem.GradingScaleNum    = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				gradingScaleItem.GradeShowing       = PIn.String(table.Rows[i]["GradeShowing"].ToString());
-				gradingScaleItem.GradeNumber        = PIn.Float (table.Rows[i]["GradeNumber"].ToString());
-				gradingScaleItem.Description        = PIn.String(table.Rows[i]["Description"].ToString());
+				gradingScaleItem.GradingScaleItemNum= PIn.Long  (row["GradingScaleItemNum"].ToString());
+				gradingScaleItem.GradingScaleNum    = PIn.Long  (row["GradingScaleNum"].ToString());
+				gradingScaleItem.GradeShowing       = PIn.String(row["GradeShowing"].ToString());
+				gradingScaleItem.GradeNumber        = PIn.Float (row["GradeNumber"].ToString());
+				gradingScaleItem.Description        = PIn.String(row["Description"].ToString());
 				retVal.Add(gradingScaleItem);
 			}
 			return retVal;

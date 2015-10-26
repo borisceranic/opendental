@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EvaluationDef> TableToList(DataTable table){
 			List<EvaluationDef> retVal=new List<EvaluationDef>();
 			EvaluationDef evaluationDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				evaluationDef=new EvaluationDef();
-				evaluationDef.EvaluationDefNum= PIn.Long  (table.Rows[i]["EvaluationDefNum"].ToString());
-				evaluationDef.SchoolCourseNum = PIn.Long  (table.Rows[i]["SchoolCourseNum"].ToString());
-				evaluationDef.EvalTitle       = PIn.String(table.Rows[i]["EvalTitle"].ToString());
-				evaluationDef.GradingScaleNum = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
+				evaluationDef.EvaluationDefNum= PIn.Long  (row["EvaluationDefNum"].ToString());
+				evaluationDef.SchoolCourseNum = PIn.Long  (row["SchoolCourseNum"].ToString());
+				evaluationDef.EvalTitle       = PIn.String(row["EvalTitle"].ToString());
+				evaluationDef.GradingScaleNum = PIn.Long  (row["GradingScaleNum"].ToString());
 				retVal.Add(evaluationDef);
 			}
 			return retVal;

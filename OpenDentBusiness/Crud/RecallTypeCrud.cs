@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<RecallType> TableToList(DataTable table){
 			List<RecallType> retVal=new List<RecallType>();
 			RecallType recallType;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				recallType=new RecallType();
-				recallType.RecallTypeNum  = PIn.Long  (table.Rows[i]["RecallTypeNum"].ToString());
-				recallType.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				recallType.DefaultInterval= new Interval(PIn.Int(table.Rows[i]["DefaultInterval"].ToString()));
-				recallType.TimePattern    = PIn.String(table.Rows[i]["TimePattern"].ToString());
-				recallType.Procedures     = PIn.String(table.Rows[i]["Procedures"].ToString());
+				recallType.RecallTypeNum  = PIn.Long  (row["RecallTypeNum"].ToString());
+				recallType.Description    = PIn.String(row["Description"].ToString());
+				recallType.DefaultInterval= new Interval(PIn.Int(row["DefaultInterval"].ToString()));
+				recallType.TimePattern    = PIn.String(row["TimePattern"].ToString());
+				recallType.Procedures     = PIn.String(row["Procedures"].ToString());
 				retVal.Add(recallType);
 			}
 			return retVal;

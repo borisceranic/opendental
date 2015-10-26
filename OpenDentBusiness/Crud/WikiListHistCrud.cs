@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<WikiListHist> TableToList(DataTable table){
 			List<WikiListHist> retVal=new List<WikiListHist>();
 			WikiListHist wikiListHist;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				wikiListHist=new WikiListHist();
-				wikiListHist.WikiListHistNum= PIn.Long  (table.Rows[i]["WikiListHistNum"].ToString());
-				wikiListHist.UserNum        = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				wikiListHist.ListName       = PIn.String(table.Rows[i]["ListName"].ToString());
-				wikiListHist.ListHeaders    = PIn.String(table.Rows[i]["ListHeaders"].ToString());
-				wikiListHist.ListContent    = PIn.String(table.Rows[i]["ListContent"].ToString());
-				wikiListHist.DateTimeSaved  = PIn.DateT (table.Rows[i]["DateTimeSaved"].ToString());
+				wikiListHist.WikiListHistNum= PIn.Long  (row["WikiListHistNum"].ToString());
+				wikiListHist.UserNum        = PIn.Long  (row["UserNum"].ToString());
+				wikiListHist.ListName       = PIn.String(row["ListName"].ToString());
+				wikiListHist.ListHeaders    = PIn.String(row["ListHeaders"].ToString());
+				wikiListHist.ListContent    = PIn.String(row["ListContent"].ToString());
+				wikiListHist.DateTimeSaved  = PIn.DateT (row["DateTimeSaved"].ToString());
 				retVal.Add(wikiListHist);
 			}
 			return retVal;

@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<HL7DefSegment> TableToList(DataTable table){
 			List<HL7DefSegment> retVal=new List<HL7DefSegment>();
 			HL7DefSegment hL7DefSegment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				hL7DefSegment=new HL7DefSegment();
-				hL7DefSegment.HL7DefSegmentNum= PIn.Long  (table.Rows[i]["HL7DefSegmentNum"].ToString());
-				hL7DefSegment.HL7DefMessageNum= PIn.Long  (table.Rows[i]["HL7DefMessageNum"].ToString());
-				hL7DefSegment.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				hL7DefSegment.CanRepeat       = PIn.Bool  (table.Rows[i]["CanRepeat"].ToString());
-				hL7DefSegment.IsOptional      = PIn.Bool  (table.Rows[i]["IsOptional"].ToString());
-				string segmentName=table.Rows[i]["SegmentName"].ToString();
+				hL7DefSegment.HL7DefSegmentNum= PIn.Long  (row["HL7DefSegmentNum"].ToString());
+				hL7DefSegment.HL7DefMessageNum= PIn.Long  (row["HL7DefMessageNum"].ToString());
+				hL7DefSegment.ItemOrder       = PIn.Int   (row["ItemOrder"].ToString());
+				hL7DefSegment.CanRepeat       = PIn.Bool  (row["CanRepeat"].ToString());
+				hL7DefSegment.IsOptional      = PIn.Bool  (row["IsOptional"].ToString());
+				string segmentName=row["SegmentName"].ToString();
 				if(segmentName==""){
 					hL7DefSegment.SegmentName   =(SegmentNameHL7)0;
 				}
@@ -61,7 +61,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7DefSegment.SegmentName   =(SegmentNameHL7)0;
 				}
-				hL7DefSegment.Note            = PIn.String(table.Rows[i]["Note"].ToString());
+				hL7DefSegment.Note            = PIn.String(row["Note"].ToString());
 				retVal.Add(hL7DefSegment);
 			}
 			return retVal;

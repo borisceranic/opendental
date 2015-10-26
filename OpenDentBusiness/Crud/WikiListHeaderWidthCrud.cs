@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<WikiListHeaderWidth> TableToList(DataTable table){
 			List<WikiListHeaderWidth> retVal=new List<WikiListHeaderWidth>();
 			WikiListHeaderWidth wikiListHeaderWidth;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				wikiListHeaderWidth=new WikiListHeaderWidth();
-				wikiListHeaderWidth.WikiListHeaderWidthNum= PIn.Long  (table.Rows[i]["WikiListHeaderWidthNum"].ToString());
-				wikiListHeaderWidth.ListName              = PIn.String(table.Rows[i]["ListName"].ToString());
-				wikiListHeaderWidth.ColName               = PIn.String(table.Rows[i]["ColName"].ToString());
-				wikiListHeaderWidth.ColWidth              = PIn.Int   (table.Rows[i]["ColWidth"].ToString());
+				wikiListHeaderWidth.WikiListHeaderWidthNum= PIn.Long  (row["WikiListHeaderWidthNum"].ToString());
+				wikiListHeaderWidth.ListName              = PIn.String(row["ListName"].ToString());
+				wikiListHeaderWidth.ColName               = PIn.String(row["ColName"].ToString());
+				wikiListHeaderWidth.ColWidth              = PIn.Int   (row["ColWidth"].ToString());
 				retVal.Add(wikiListHeaderWidth);
 			}
 			return retVal;

@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<HL7DefField> TableToList(DataTable table){
 			List<HL7DefField> retVal=new List<HL7DefField>();
 			HL7DefField hL7DefField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				hL7DefField=new HL7DefField();
-				hL7DefField.HL7DefFieldNum  = PIn.Long  (table.Rows[i]["HL7DefFieldNum"].ToString());
-				hL7DefField.HL7DefSegmentNum= PIn.Long  (table.Rows[i]["HL7DefSegmentNum"].ToString());
-				hL7DefField.OrdinalPos      = PIn.Int   (table.Rows[i]["OrdinalPos"].ToString());
-				hL7DefField.TableId         = PIn.String(table.Rows[i]["TableId"].ToString());
-				string dataType=table.Rows[i]["DataType"].ToString();
+				hL7DefField.HL7DefFieldNum  = PIn.Long  (row["HL7DefFieldNum"].ToString());
+				hL7DefField.HL7DefSegmentNum= PIn.Long  (row["HL7DefSegmentNum"].ToString());
+				hL7DefField.OrdinalPos      = PIn.Int   (row["OrdinalPos"].ToString());
+				hL7DefField.TableId         = PIn.String(row["TableId"].ToString());
+				string dataType=row["DataType"].ToString();
 				if(dataType==""){
 					hL7DefField.DataType      =(DataTypeHL7)0;
 				}
@@ -60,8 +60,8 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7DefField.DataType      =(DataTypeHL7)0;
 				}
-				hL7DefField.FieldName       = PIn.String(table.Rows[i]["FieldName"].ToString());
-				hL7DefField.FixedText       = PIn.String(table.Rows[i]["FixedText"].ToString());
+				hL7DefField.FieldName       = PIn.String(row["FieldName"].ToString());
+				hL7DefField.FixedText       = PIn.String(row["FixedText"].ToString());
 				retVal.Add(hL7DefField);
 			}
 			return retVal;

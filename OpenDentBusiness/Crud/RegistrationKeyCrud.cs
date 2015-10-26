@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<RegistrationKey> TableToList(DataTable table){
 			List<RegistrationKey> retVal=new List<RegistrationKey>();
 			RegistrationKey registrationKey;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				registrationKey=new RegistrationKey();
-				registrationKey.RegistrationKeyNum= PIn.Long  (table.Rows[i]["RegistrationKeyNum"].ToString());
-				registrationKey.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				registrationKey.RegKey            = PIn.String(table.Rows[i]["RegKey"].ToString());
-				registrationKey.Note              = PIn.String(table.Rows[i]["Note"].ToString());
-				registrationKey.DateStarted       = PIn.Date  (table.Rows[i]["DateStarted"].ToString());
-				registrationKey.DateDisabled      = PIn.Date  (table.Rows[i]["DateDisabled"].ToString());
-				registrationKey.DateEnded         = PIn.Date  (table.Rows[i]["DateEnded"].ToString());
-				registrationKey.IsForeign         = PIn.Bool  (table.Rows[i]["IsForeign"].ToString());
-				registrationKey.UsesServerVersion = PIn.Bool  (table.Rows[i]["UsesServerVersion"].ToString());
-				registrationKey.IsFreeVersion     = PIn.Bool  (table.Rows[i]["IsFreeVersion"].ToString());
-				registrationKey.IsOnlyForTesting  = PIn.Bool  (table.Rows[i]["IsOnlyForTesting"].ToString());
-				registrationKey.VotesAllotted     = PIn.Int   (table.Rows[i]["VotesAllotted"].ToString());
-				registrationKey.IsResellerCustomer= PIn.Bool  (table.Rows[i]["IsResellerCustomer"].ToString());
+				registrationKey.RegistrationKeyNum= PIn.Long  (row["RegistrationKeyNum"].ToString());
+				registrationKey.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				registrationKey.RegKey            = PIn.String(row["RegKey"].ToString());
+				registrationKey.Note              = PIn.String(row["Note"].ToString());
+				registrationKey.DateStarted       = PIn.Date  (row["DateStarted"].ToString());
+				registrationKey.DateDisabled      = PIn.Date  (row["DateDisabled"].ToString());
+				registrationKey.DateEnded         = PIn.Date  (row["DateEnded"].ToString());
+				registrationKey.IsForeign         = PIn.Bool  (row["IsForeign"].ToString());
+				registrationKey.UsesServerVersion = PIn.Bool  (row["UsesServerVersion"].ToString());
+				registrationKey.IsFreeVersion     = PIn.Bool  (row["IsFreeVersion"].ToString());
+				registrationKey.IsOnlyForTesting  = PIn.Bool  (row["IsOnlyForTesting"].ToString());
+				registrationKey.VotesAllotted     = PIn.Int   (row["VotesAllotted"].ToString());
+				registrationKey.IsResellerCustomer= PIn.Bool  (row["IsResellerCustomer"].ToString());
 				retVal.Add(registrationKey);
 			}
 			return retVal;

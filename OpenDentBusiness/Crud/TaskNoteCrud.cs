@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskNote> TableToList(DataTable table){
 			List<TaskNote> retVal=new List<TaskNote>();
 			TaskNote taskNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskNote=new TaskNote();
-				taskNote.TaskNoteNum = PIn.Long  (table.Rows[i]["TaskNoteNum"].ToString());
-				taskNote.TaskNum     = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
-				taskNote.UserNum     = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				taskNote.DateTimeNote= PIn.DateT (table.Rows[i]["DateTimeNote"].ToString());
-				taskNote.Note        = PIn.String(table.Rows[i]["Note"].ToString());
+				taskNote.TaskNoteNum = PIn.Long  (row["TaskNoteNum"].ToString());
+				taskNote.TaskNum     = PIn.Long  (row["TaskNum"].ToString());
+				taskNote.UserNum     = PIn.Long  (row["UserNum"].ToString());
+				taskNote.DateTimeNote= PIn.DateT (row["DateTimeNote"].ToString());
+				taskNote.Note        = PIn.String(row["Note"].ToString());
 				retVal.Add(taskNote);
 			}
 			return retVal;

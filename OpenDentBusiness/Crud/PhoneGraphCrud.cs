@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PhoneGraph> TableToList(DataTable table){
 			List<PhoneGraph> retVal=new List<PhoneGraph>();
 			PhoneGraph phoneGraph;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phoneGraph=new PhoneGraph();
-				phoneGraph.PhoneGraphNum= PIn.Long  (table.Rows[i]["PhoneGraphNum"].ToString());
-				phoneGraph.EmployeeNum  = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				phoneGraph.IsGraphed    = PIn.Bool  (table.Rows[i]["IsGraphed"].ToString());
-				phoneGraph.DateEntry    = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
+				phoneGraph.PhoneGraphNum= PIn.Long  (row["PhoneGraphNum"].ToString());
+				phoneGraph.EmployeeNum  = PIn.Long  (row["EmployeeNum"].ToString());
+				phoneGraph.IsGraphed    = PIn.Bool  (row["IsGraphed"].ToString());
+				phoneGraph.DateEntry    = PIn.Date  (row["DateEntry"].ToString());
 				retVal.Add(phoneGraph);
 			}
 			return retVal;

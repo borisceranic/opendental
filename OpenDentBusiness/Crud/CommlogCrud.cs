@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<Commlog> TableToList(DataTable table){
 			List<Commlog> retVal=new List<Commlog>();
 			Commlog commlog;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				commlog=new Commlog();
-				commlog.CommlogNum    = PIn.Long  (table.Rows[i]["CommlogNum"].ToString());
-				commlog.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				commlog.CommDateTime  = PIn.DateT (table.Rows[i]["CommDateTime"].ToString());
-				commlog.CommType      = PIn.Long  (table.Rows[i]["CommType"].ToString());
-				commlog.Note          = PIn.String(table.Rows[i]["Note"].ToString());
-				commlog.Mode_         = (OpenDentBusiness.CommItemMode)PIn.Int(table.Rows[i]["Mode_"].ToString());
-				commlog.SentOrReceived= (OpenDentBusiness.CommSentOrReceived)PIn.Int(table.Rows[i]["SentOrReceived"].ToString());
-				commlog.UserNum       = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				commlog.Signature     = PIn.String(table.Rows[i]["Signature"].ToString());
-				commlog.SigIsTopaz    = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
-				commlog.DateTStamp    = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				commlog.DateTimeEnd   = PIn.DateT (table.Rows[i]["DateTimeEnd"].ToString());
-				commlog.IsWebSched    = PIn.Bool  (table.Rows[i]["IsWebSched"].ToString());
+				commlog.CommlogNum    = PIn.Long  (row["CommlogNum"].ToString());
+				commlog.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				commlog.CommDateTime  = PIn.DateT (row["CommDateTime"].ToString());
+				commlog.CommType      = PIn.Long  (row["CommType"].ToString());
+				commlog.Note          = PIn.String(row["Note"].ToString());
+				commlog.Mode_         = (OpenDentBusiness.CommItemMode)PIn.Int(row["Mode_"].ToString());
+				commlog.SentOrReceived= (OpenDentBusiness.CommSentOrReceived)PIn.Int(row["SentOrReceived"].ToString());
+				commlog.UserNum       = PIn.Long  (row["UserNum"].ToString());
+				commlog.Signature     = PIn.String(row["Signature"].ToString());
+				commlog.SigIsTopaz    = PIn.Bool  (row["SigIsTopaz"].ToString());
+				commlog.DateTStamp    = PIn.DateT (row["DateTStamp"].ToString());
+				commlog.DateTimeEnd   = PIn.DateT (row["DateTimeEnd"].ToString());
+				commlog.IsWebSched    = PIn.Bool  (row["IsWebSched"].ToString());
 				retVal.Add(commlog);
 			}
 			return retVal;

@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<RequiredField> TableToList(DataTable table){
 			List<RequiredField> retVal=new List<RequiredField>();
 			RequiredField requiredField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				requiredField=new RequiredField();
-				requiredField.RequiredFieldNum= PIn.Long  (table.Rows[i]["RequiredFieldNum"].ToString());
-				requiredField.FieldType       = (OpenDentBusiness.RequiredFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
-				string fieldName=table.Rows[i]["FieldName"].ToString();
+				requiredField.RequiredFieldNum= PIn.Long  (row["RequiredFieldNum"].ToString());
+				requiredField.FieldType       = (OpenDentBusiness.RequiredFieldType)PIn.Int(row["FieldType"].ToString());
+				string fieldName=row["FieldName"].ToString();
 				if(fieldName==""){
 					requiredField.FieldName     =(RequiredFieldName)0;
 				}

@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ReminderRule> TableToList(DataTable table){
 			List<ReminderRule> retVal=new List<ReminderRule>();
 			ReminderRule reminderRule;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				reminderRule=new ReminderRule();
-				reminderRule.ReminderRuleNum  = PIn.Long  (table.Rows[i]["ReminderRuleNum"].ToString());
-				reminderRule.ReminderCriterion= (OpenDentBusiness.EhrCriterion)PIn.Int(table.Rows[i]["ReminderCriterion"].ToString());
-				reminderRule.CriterionFK      = PIn.Long  (table.Rows[i]["CriterionFK"].ToString());
-				reminderRule.CriterionValue   = PIn.String(table.Rows[i]["CriterionValue"].ToString());
-				reminderRule.Message          = PIn.String(table.Rows[i]["Message"].ToString());
+				reminderRule.ReminderRuleNum  = PIn.Long  (row["ReminderRuleNum"].ToString());
+				reminderRule.ReminderCriterion= (OpenDentBusiness.EhrCriterion)PIn.Int(row["ReminderCriterion"].ToString());
+				reminderRule.CriterionFK      = PIn.Long  (row["CriterionFK"].ToString());
+				reminderRule.CriterionValue   = PIn.String(row["CriterionValue"].ToString());
+				reminderRule.Message          = PIn.String(row["Message"].ToString());
 				retVal.Add(reminderRule);
 			}
 			return retVal;

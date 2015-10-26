@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<RecallTrigger> TableToList(DataTable table){
 			List<RecallTrigger> retVal=new List<RecallTrigger>();
 			RecallTrigger recallTrigger;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				recallTrigger=new RecallTrigger();
-				recallTrigger.RecallTriggerNum= PIn.Long  (table.Rows[i]["RecallTriggerNum"].ToString());
-				recallTrigger.RecallTypeNum   = PIn.Long  (table.Rows[i]["RecallTypeNum"].ToString());
-				recallTrigger.CodeNum         = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
+				recallTrigger.RecallTriggerNum= PIn.Long  (row["RecallTriggerNum"].ToString());
+				recallTrigger.RecallTypeNum   = PIn.Long  (row["RecallTypeNum"].ToString());
+				recallTrigger.CodeNum         = PIn.Long  (row["CodeNum"].ToString());
 				retVal.Add(recallTrigger);
 			}
 			return retVal;

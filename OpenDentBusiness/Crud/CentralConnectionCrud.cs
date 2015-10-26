@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<CentralConnection> TableToList(DataTable table){
 			List<CentralConnection> retVal=new List<CentralConnection>();
 			CentralConnection centralConnection;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				centralConnection=new CentralConnection();
-				centralConnection.CentralConnectionNum= PIn.Long  (table.Rows[i]["CentralConnectionNum"].ToString());
-				centralConnection.ServerName          = PIn.String(table.Rows[i]["ServerName"].ToString());
-				centralConnection.DatabaseName        = PIn.String(table.Rows[i]["DatabaseName"].ToString());
-				centralConnection.MySqlUser           = PIn.String(table.Rows[i]["MySqlUser"].ToString());
-				centralConnection.MySqlPassword       = PIn.String(table.Rows[i]["MySqlPassword"].ToString());
-				centralConnection.ServiceURI          = PIn.String(table.Rows[i]["ServiceURI"].ToString());
-				centralConnection.OdUser              = PIn.String(table.Rows[i]["OdUser"].ToString());
-				centralConnection.OdPassword          = PIn.String(table.Rows[i]["OdPassword"].ToString());
-				centralConnection.Note                = PIn.String(table.Rows[i]["Note"].ToString());
-				centralConnection.ItemOrder           = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				centralConnection.WebServiceIsEcw     = PIn.Bool  (table.Rows[i]["WebServiceIsEcw"].ToString());
-				centralConnection.ConnectionStatus    = PIn.String(table.Rows[i]["ConnectionStatus"].ToString());
+				centralConnection.CentralConnectionNum= PIn.Long  (row["CentralConnectionNum"].ToString());
+				centralConnection.ServerName          = PIn.String(row["ServerName"].ToString());
+				centralConnection.DatabaseName        = PIn.String(row["DatabaseName"].ToString());
+				centralConnection.MySqlUser           = PIn.String(row["MySqlUser"].ToString());
+				centralConnection.MySqlPassword       = PIn.String(row["MySqlPassword"].ToString());
+				centralConnection.ServiceURI          = PIn.String(row["ServiceURI"].ToString());
+				centralConnection.OdUser              = PIn.String(row["OdUser"].ToString());
+				centralConnection.OdPassword          = PIn.String(row["OdPassword"].ToString());
+				centralConnection.Note                = PIn.String(row["Note"].ToString());
+				centralConnection.ItemOrder           = PIn.Int   (row["ItemOrder"].ToString());
+				centralConnection.WebServiceIsEcw     = PIn.Bool  (row["WebServiceIsEcw"].ToString());
+				centralConnection.ConnectionStatus    = PIn.String(row["ConnectionStatus"].ToString());
 				retVal.Add(centralConnection);
 			}
 			return retVal;

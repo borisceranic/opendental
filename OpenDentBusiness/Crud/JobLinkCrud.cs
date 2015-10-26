@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobLink> TableToList(DataTable table){
 			List<JobLink> retVal=new List<JobLink>();
 			JobLink jobLink;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobLink=new JobLink();
-				jobLink.JobLinkNum= PIn.Long  (table.Rows[i]["JobLinkNum"].ToString());
-				jobLink.JobNum    = PIn.Long  (table.Rows[i]["JobNum"].ToString());
-				jobLink.FKey      = PIn.Long  (table.Rows[i]["FKey"].ToString());
-				jobLink.LinkType  = (OpenDentBusiness.JobLinkType)PIn.Int(table.Rows[i]["LinkType"].ToString());
+				jobLink.JobLinkNum= PIn.Long  (row["JobLinkNum"].ToString());
+				jobLink.JobNum    = PIn.Long  (row["JobNum"].ToString());
+				jobLink.FKey      = PIn.Long  (row["FKey"].ToString());
+				jobLink.LinkType  = (OpenDentBusiness.JobLinkType)PIn.Int(row["LinkType"].ToString());
 				retVal.Add(jobLink);
 			}
 			return retVal;

@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<JobEvent> TableToList(DataTable table){
 			List<JobEvent> retVal=new List<JobEvent>();
 			JobEvent jobEvent;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				jobEvent=new JobEvent();
-				jobEvent.JobEventNum  = PIn.Long  (table.Rows[i]["JobEventNum"].ToString());
-				jobEvent.JobNum       = PIn.Long  (table.Rows[i]["JobNum"].ToString());
-				jobEvent.Owner        = PIn.Long  (table.Rows[i]["Owner"].ToString());
-				jobEvent.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				jobEvent.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				jobEvent.Status       = (OpenDentBusiness.JobStatus)PIn.Int(table.Rows[i]["Status"].ToString());
+				jobEvent.JobEventNum  = PIn.Long  (row["JobEventNum"].ToString());
+				jobEvent.JobNum       = PIn.Long  (row["JobNum"].ToString());
+				jobEvent.Owner        = PIn.Long  (row["Owner"].ToString());
+				jobEvent.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
+				jobEvent.Description  = PIn.String(row["Description"].ToString());
+				jobEvent.Status       = (OpenDentBusiness.JobStatus)PIn.Int(row["Status"].ToString());
 				retVal.Add(jobEvent);
 			}
 			return retVal;

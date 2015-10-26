@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Guardian> TableToList(DataTable table){
 			List<Guardian> retVal=new List<Guardian>();
 			Guardian guardian;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				guardian=new Guardian();
-				guardian.GuardianNum   = PIn.Long  (table.Rows[i]["GuardianNum"].ToString());
-				guardian.PatNumChild   = PIn.Long  (table.Rows[i]["PatNumChild"].ToString());
-				guardian.PatNumGuardian= PIn.Long  (table.Rows[i]["PatNumGuardian"].ToString());
-				guardian.Relationship  = (OpenDentBusiness.GuardianRelationship)PIn.Int(table.Rows[i]["Relationship"].ToString());
-				guardian.IsGuardian    = PIn.Bool  (table.Rows[i]["IsGuardian"].ToString());
+				guardian.GuardianNum   = PIn.Long  (row["GuardianNum"].ToString());
+				guardian.PatNumChild   = PIn.Long  (row["PatNumChild"].ToString());
+				guardian.PatNumGuardian= PIn.Long  (row["PatNumGuardian"].ToString());
+				guardian.Relationship  = (OpenDentBusiness.GuardianRelationship)PIn.Int(row["Relationship"].ToString());
+				guardian.IsGuardian    = PIn.Bool  (row["IsGuardian"].ToString());
 				retVal.Add(guardian);
 			}
 			return retVal;

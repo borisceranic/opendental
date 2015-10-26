@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrProvKey> TableToList(DataTable table){
 			List<EhrProvKey> retVal=new List<EhrProvKey>();
 			EhrProvKey ehrProvKey;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrProvKey=new EhrProvKey();
-				ehrProvKey.EhrProvKeyNum= PIn.Long  (table.Rows[i]["EhrProvKeyNum"].ToString());
-				ehrProvKey.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrProvKey.LName        = PIn.String(table.Rows[i]["LName"].ToString());
-				ehrProvKey.FName        = PIn.String(table.Rows[i]["FName"].ToString());
-				ehrProvKey.ProvKey      = PIn.String(table.Rows[i]["ProvKey"].ToString());
-				ehrProvKey.FullTimeEquiv= PIn.Float (table.Rows[i]["FullTimeEquiv"].ToString());
-				ehrProvKey.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
-				ehrProvKey.YearValue    = PIn.Int   (table.Rows[i]["YearValue"].ToString());
+				ehrProvKey.EhrProvKeyNum= PIn.Long  (row["EhrProvKeyNum"].ToString());
+				ehrProvKey.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				ehrProvKey.LName        = PIn.String(row["LName"].ToString());
+				ehrProvKey.FName        = PIn.String(row["FName"].ToString());
+				ehrProvKey.ProvKey      = PIn.String(row["ProvKey"].ToString());
+				ehrProvKey.FullTimeEquiv= PIn.Float (row["FullTimeEquiv"].ToString());
+				ehrProvKey.Notes        = PIn.String(row["Notes"].ToString());
+				ehrProvKey.YearValue    = PIn.Int   (row["YearValue"].ToString());
 				retVal.Add(ehrProvKey);
 			}
 			return retVal;

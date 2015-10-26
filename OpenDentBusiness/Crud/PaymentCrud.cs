@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<Payment> TableToList(DataTable table){
 			List<Payment> retVal=new List<Payment>();
 			Payment payment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				payment=new Payment();
-				payment.PayNum       = PIn.Long  (table.Rows[i]["PayNum"].ToString());
-				payment.PayType      = PIn.Long  (table.Rows[i]["PayType"].ToString());
-				payment.PayDate      = PIn.Date  (table.Rows[i]["PayDate"].ToString());
-				payment.PayAmt       = PIn.Double(table.Rows[i]["PayAmt"].ToString());
-				payment.CheckNum     = PIn.String(table.Rows[i]["CheckNum"].ToString());
-				payment.BankBranch   = PIn.String(table.Rows[i]["BankBranch"].ToString());
-				payment.PayNote      = PIn.String(table.Rows[i]["PayNote"].ToString());
-				payment.IsSplit      = PIn.Bool  (table.Rows[i]["IsSplit"].ToString());
-				payment.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				payment.ClinicNum    = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				payment.DateEntry    = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				payment.DepositNum   = PIn.Long  (table.Rows[i]["DepositNum"].ToString());
-				payment.Receipt      = PIn.String(table.Rows[i]["Receipt"].ToString());
-				payment.IsRecurringCC= PIn.Bool  (table.Rows[i]["IsRecurringCC"].ToString());
+				payment.PayNum       = PIn.Long  (row["PayNum"].ToString());
+				payment.PayType      = PIn.Long  (row["PayType"].ToString());
+				payment.PayDate      = PIn.Date  (row["PayDate"].ToString());
+				payment.PayAmt       = PIn.Double(row["PayAmt"].ToString());
+				payment.CheckNum     = PIn.String(row["CheckNum"].ToString());
+				payment.BankBranch   = PIn.String(row["BankBranch"].ToString());
+				payment.PayNote      = PIn.String(row["PayNote"].ToString());
+				payment.IsSplit      = PIn.Bool  (row["IsSplit"].ToString());
+				payment.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				payment.ClinicNum    = PIn.Long  (row["ClinicNum"].ToString());
+				payment.DateEntry    = PIn.Date  (row["DateEntry"].ToString());
+				payment.DepositNum   = PIn.Long  (row["DepositNum"].ToString());
+				payment.Receipt      = PIn.String(row["Receipt"].ToString());
+				payment.IsRecurringCC= PIn.Bool  (row["IsRecurringCC"].ToString());
 				retVal.Add(payment);
 			}
 			return retVal;
