@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<PatientNote> TableToList(DataTable table){
 			List<PatientNote> retVal=new List<PatientNote>();
 			PatientNote patientNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				patientNote=new PatientNote();
-				patientNote.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				patientNote.FamFinancial= PIn.String(table.Rows[i]["FamFinancial"].ToString());
-				patientNote.ApptPhone   = PIn.String(table.Rows[i]["ApptPhone"].ToString());
-				patientNote.Medical     = PIn.String(table.Rows[i]["Medical"].ToString());
-				patientNote.Service     = PIn.String(table.Rows[i]["Service"].ToString());
-				patientNote.MedicalComp = PIn.String(table.Rows[i]["MedicalComp"].ToString());
-				patientNote.Treatment   = PIn.String(table.Rows[i]["Treatment"].ToString());
+				patientNote.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				patientNote.FamFinancial= PIn.String(row["FamFinancial"].ToString());
+				patientNote.ApptPhone   = PIn.String(row["ApptPhone"].ToString());
+				patientNote.Medical     = PIn.String(row["Medical"].ToString());
+				patientNote.Service     = PIn.String(row["Service"].ToString());
+				patientNote.MedicalComp = PIn.String(row["MedicalComp"].ToString());
+				patientNote.Treatment   = PIn.String(row["Treatment"].ToString());
 				retVal.Add(patientNote);
 			}
 			return retVal;

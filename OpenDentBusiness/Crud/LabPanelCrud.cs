@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<LabPanel> TableToList(DataTable table){
 			List<LabPanel> retVal=new List<LabPanel>();
 			LabPanel labPanel;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				labPanel=new LabPanel();
-				labPanel.LabPanelNum      = PIn.Long  (table.Rows[i]["LabPanelNum"].ToString());
-				labPanel.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				labPanel.RawMessage       = PIn.String(table.Rows[i]["RawMessage"].ToString());
-				labPanel.LabNameAddress   = PIn.String(table.Rows[i]["LabNameAddress"].ToString());
-				labPanel.DateTStamp       = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				labPanel.SpecimenCondition= PIn.String(table.Rows[i]["SpecimenCondition"].ToString());
-				labPanel.SpecimenSource   = PIn.String(table.Rows[i]["SpecimenSource"].ToString());
-				labPanel.ServiceId        = PIn.String(table.Rows[i]["ServiceId"].ToString());
-				labPanel.ServiceName      = PIn.String(table.Rows[i]["ServiceName"].ToString());
-				labPanel.MedicalOrderNum  = PIn.Long  (table.Rows[i]["MedicalOrderNum"].ToString());
+				labPanel.LabPanelNum      = PIn.Long  (row["LabPanelNum"].ToString());
+				labPanel.PatNum           = PIn.Long  (row["PatNum"].ToString());
+				labPanel.RawMessage       = PIn.String(row["RawMessage"].ToString());
+				labPanel.LabNameAddress   = PIn.String(row["LabNameAddress"].ToString());
+				labPanel.DateTStamp       = PIn.DateT (row["DateTStamp"].ToString());
+				labPanel.SpecimenCondition= PIn.String(row["SpecimenCondition"].ToString());
+				labPanel.SpecimenSource   = PIn.String(row["SpecimenSource"].ToString());
+				labPanel.ServiceId        = PIn.String(row["ServiceId"].ToString());
+				labPanel.ServiceName      = PIn.String(row["ServiceName"].ToString());
+				labPanel.MedicalOrderNum  = PIn.Long  (row["MedicalOrderNum"].ToString());
 				retVal.Add(labPanel);
 			}
 			return retVal;

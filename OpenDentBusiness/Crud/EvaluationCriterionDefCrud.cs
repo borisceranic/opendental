@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<EvaluationCriterionDef> TableToList(DataTable table){
 			List<EvaluationCriterionDef> retVal=new List<EvaluationCriterionDef>();
 			EvaluationCriterionDef evaluationCriterionDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				evaluationCriterionDef=new EvaluationCriterionDef();
-				evaluationCriterionDef.EvaluationCriterionDefNum= PIn.Long  (table.Rows[i]["EvaluationCriterionDefNum"].ToString());
-				evaluationCriterionDef.EvaluationDefNum         = PIn.Long  (table.Rows[i]["EvaluationDefNum"].ToString());
-				evaluationCriterionDef.CriterionDescript        = PIn.String(table.Rows[i]["CriterionDescript"].ToString());
-				evaluationCriterionDef.IsCategoryName           = PIn.Bool  (table.Rows[i]["IsCategoryName"].ToString());
-				evaluationCriterionDef.GradingScaleNum          = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				evaluationCriterionDef.ItemOrder                = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				evaluationCriterionDef.MaxPointsPoss            = PIn.Float (table.Rows[i]["MaxPointsPoss"].ToString());
+				evaluationCriterionDef.EvaluationCriterionDefNum= PIn.Long  (row["EvaluationCriterionDefNum"].ToString());
+				evaluationCriterionDef.EvaluationDefNum         = PIn.Long  (row["EvaluationDefNum"].ToString());
+				evaluationCriterionDef.CriterionDescript        = PIn.String(row["CriterionDescript"].ToString());
+				evaluationCriterionDef.IsCategoryName           = PIn.Bool  (row["IsCategoryName"].ToString());
+				evaluationCriterionDef.GradingScaleNum          = PIn.Long  (row["GradingScaleNum"].ToString());
+				evaluationCriterionDef.ItemOrder                = PIn.Int   (row["ItemOrder"].ToString());
+				evaluationCriterionDef.MaxPointsPoss            = PIn.Float (row["MaxPointsPoss"].ToString());
 				retVal.Add(evaluationCriterionDef);
 			}
 			return retVal;

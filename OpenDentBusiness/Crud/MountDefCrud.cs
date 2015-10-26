@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<MountDef> TableToList(DataTable table){
 			List<MountDef> retVal=new List<MountDef>();
 			MountDef mountDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				mountDef=new MountDef();
-				mountDef.MountDefNum = PIn.Long  (table.Rows[i]["MountDefNum"].ToString());
-				mountDef.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				mountDef.ItemOrder   = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				mountDef.IsRadiograph= PIn.Bool  (table.Rows[i]["IsRadiograph"].ToString());
-				mountDef.Width       = PIn.Int   (table.Rows[i]["Width"].ToString());
-				mountDef.Height      = PIn.Int   (table.Rows[i]["Height"].ToString());
+				mountDef.MountDefNum = PIn.Long  (row["MountDefNum"].ToString());
+				mountDef.Description = PIn.String(row["Description"].ToString());
+				mountDef.ItemOrder   = PIn.Int   (row["ItemOrder"].ToString());
+				mountDef.IsRadiograph= PIn.Bool  (row["IsRadiograph"].ToString());
+				mountDef.Width       = PIn.Int   (row["Width"].ToString());
+				mountDef.Height      = PIn.Int   (row["Height"].ToString());
 				retVal.Add(mountDef);
 			}
 			return retVal;

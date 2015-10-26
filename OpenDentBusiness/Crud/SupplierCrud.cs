@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Supplier> TableToList(DataTable table){
 			List<Supplier> retVal=new List<Supplier>();
 			Supplier supplier;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				supplier=new Supplier();
-				supplier.SupplierNum= PIn.Long  (table.Rows[i]["SupplierNum"].ToString());
-				supplier.Name       = PIn.String(table.Rows[i]["Name"].ToString());
-				supplier.Phone      = PIn.String(table.Rows[i]["Phone"].ToString());
-				supplier.CustomerId = PIn.String(table.Rows[i]["CustomerId"].ToString());
-				supplier.Website    = PIn.String(table.Rows[i]["Website"].ToString());
-				supplier.UserName   = PIn.String(table.Rows[i]["UserName"].ToString());
-				supplier.Password   = PIn.String(table.Rows[i]["Password"].ToString());
-				supplier.Note       = PIn.String(table.Rows[i]["Note"].ToString());
+				supplier.SupplierNum= PIn.Long  (row["SupplierNum"].ToString());
+				supplier.Name       = PIn.String(row["Name"].ToString());
+				supplier.Phone      = PIn.String(row["Phone"].ToString());
+				supplier.CustomerId = PIn.String(row["CustomerId"].ToString());
+				supplier.Website    = PIn.String(row["Website"].ToString());
+				supplier.UserName   = PIn.String(row["UserName"].ToString());
+				supplier.Password   = PIn.String(row["Password"].ToString());
+				supplier.Note       = PIn.String(row["Note"].ToString());
 				retVal.Add(supplier);
 			}
 			return retVal;

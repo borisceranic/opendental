@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Printer> TableToList(DataTable table){
 			List<Printer> retVal=new List<Printer>();
 			Printer printer;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				printer=new Printer();
-				printer.PrinterNum   = PIn.Long  (table.Rows[i]["PrinterNum"].ToString());
-				printer.ComputerNum  = PIn.Long  (table.Rows[i]["ComputerNum"].ToString());
-				printer.PrintSit     = (OpenDentBusiness.PrintSituation)PIn.Int(table.Rows[i]["PrintSit"].ToString());
-				printer.PrinterName  = PIn.String(table.Rows[i]["PrinterName"].ToString());
-				printer.DisplayPrompt= PIn.Bool  (table.Rows[i]["DisplayPrompt"].ToString());
+				printer.PrinterNum   = PIn.Long  (row["PrinterNum"].ToString());
+				printer.ComputerNum  = PIn.Long  (row["ComputerNum"].ToString());
+				printer.PrintSit     = (OpenDentBusiness.PrintSituation)PIn.Int(row["PrintSit"].ToString());
+				printer.PrinterName  = PIn.String(row["PrinterName"].ToString());
+				printer.DisplayPrompt= PIn.Bool  (row["DisplayPrompt"].ToString());
 				retVal.Add(printer);
 			}
 			return retVal;

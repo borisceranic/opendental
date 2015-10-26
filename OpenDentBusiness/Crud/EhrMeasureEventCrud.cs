@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrMeasureEvent> TableToList(DataTable table){
 			List<EhrMeasureEvent> retVal=new List<EhrMeasureEvent>();
 			EhrMeasureEvent ehrMeasureEvent;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrMeasureEvent=new EhrMeasureEvent();
-				ehrMeasureEvent.EhrMeasureEventNum= PIn.Long  (table.Rows[i]["EhrMeasureEventNum"].ToString());
-				ehrMeasureEvent.DateTEvent        = PIn.DateT (table.Rows[i]["DateTEvent"].ToString());
-				ehrMeasureEvent.EventType         = (OpenDentBusiness.EhrMeasureEventType)PIn.Int(table.Rows[i]["EventType"].ToString());
-				ehrMeasureEvent.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrMeasureEvent.MoreInfo          = PIn.String(table.Rows[i]["MoreInfo"].ToString());
-				ehrMeasureEvent.CodeValueEvent    = PIn.String(table.Rows[i]["CodeValueEvent"].ToString());
-				ehrMeasureEvent.CodeSystemEvent   = PIn.String(table.Rows[i]["CodeSystemEvent"].ToString());
-				ehrMeasureEvent.CodeValueResult   = PIn.String(table.Rows[i]["CodeValueResult"].ToString());
-				ehrMeasureEvent.CodeSystemResult  = PIn.String(table.Rows[i]["CodeSystemResult"].ToString());
-				ehrMeasureEvent.FKey              = PIn.Long  (table.Rows[i]["FKey"].ToString());
+				ehrMeasureEvent.EhrMeasureEventNum= PIn.Long  (row["EhrMeasureEventNum"].ToString());
+				ehrMeasureEvent.DateTEvent        = PIn.DateT (row["DateTEvent"].ToString());
+				ehrMeasureEvent.EventType         = (OpenDentBusiness.EhrMeasureEventType)PIn.Int(row["EventType"].ToString());
+				ehrMeasureEvent.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				ehrMeasureEvent.MoreInfo          = PIn.String(row["MoreInfo"].ToString());
+				ehrMeasureEvent.CodeValueEvent    = PIn.String(row["CodeValueEvent"].ToString());
+				ehrMeasureEvent.CodeSystemEvent   = PIn.String(row["CodeSystemEvent"].ToString());
+				ehrMeasureEvent.CodeValueResult   = PIn.String(row["CodeValueResult"].ToString());
+				ehrMeasureEvent.CodeSystemResult  = PIn.String(row["CodeSystemResult"].ToString());
+				ehrMeasureEvent.FKey              = PIn.Long  (row["FKey"].ToString());
 				retVal.Add(ehrMeasureEvent);
 			}
 			return retVal;

@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<AllergyDef> TableToList(DataTable table){
 			List<AllergyDef> retVal=new List<AllergyDef>();
 			AllergyDef allergyDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				allergyDef=new AllergyDef();
-				allergyDef.AllergyDefNum= PIn.Long  (table.Rows[i]["AllergyDefNum"].ToString());
-				allergyDef.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				allergyDef.IsHidden     = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				allergyDef.DateTStamp   = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				allergyDef.SnomedType   = (OpenDentBusiness.SnomedAllergy)PIn.Int(table.Rows[i]["SnomedType"].ToString());
-				allergyDef.MedicationNum= PIn.Long  (table.Rows[i]["MedicationNum"].ToString());
-				allergyDef.UniiCode     = PIn.String(table.Rows[i]["UniiCode"].ToString());
+				allergyDef.AllergyDefNum= PIn.Long  (row["AllergyDefNum"].ToString());
+				allergyDef.Description  = PIn.String(row["Description"].ToString());
+				allergyDef.IsHidden     = PIn.Bool  (row["IsHidden"].ToString());
+				allergyDef.DateTStamp   = PIn.DateT (row["DateTStamp"].ToString());
+				allergyDef.SnomedType   = (OpenDentBusiness.SnomedAllergy)PIn.Int(row["SnomedType"].ToString());
+				allergyDef.MedicationNum= PIn.Long  (row["MedicationNum"].ToString());
+				allergyDef.UniiCode     = PIn.String(row["UniiCode"].ToString());
 				retVal.Add(allergyDef);
 			}
 			return retVal;

@@ -44,27 +44,27 @@ namespace OpenDentBusiness.Crud{
 		public static List<Loinc> TableToList(DataTable table){
 			List<Loinc> retVal=new List<Loinc>();
 			Loinc loinc;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				loinc=new Loinc();
-				loinc.LoincNum               = PIn.Long  (table.Rows[i]["LoincNum"].ToString());
-				loinc.LoincCode              = PIn.String(table.Rows[i]["LoincCode"].ToString());
-				loinc.Component              = PIn.String(table.Rows[i]["Component"].ToString());
-				loinc.PropertyObserved       = PIn.String(table.Rows[i]["PropertyObserved"].ToString());
-				loinc.TimeAspct              = PIn.String(table.Rows[i]["TimeAspct"].ToString());
-				loinc.SystemMeasured         = PIn.String(table.Rows[i]["SystemMeasured"].ToString());
-				loinc.ScaleType              = PIn.String(table.Rows[i]["ScaleType"].ToString());
-				loinc.MethodType             = PIn.String(table.Rows[i]["MethodType"].ToString());
-				loinc.StatusOfCode           = PIn.String(table.Rows[i]["StatusOfCode"].ToString());
-				loinc.NameShort              = PIn.String(table.Rows[i]["NameShort"].ToString());
-				loinc.ClassType              = PIn.String(table.Rows[i]["ClassType"].ToString());
-				loinc.UnitsRequired          = PIn.Bool  (table.Rows[i]["UnitsRequired"].ToString());
-				loinc.OrderObs               = PIn.String(table.Rows[i]["OrderObs"].ToString());
-				loinc.HL7FieldSubfieldID     = PIn.String(table.Rows[i]["HL7FieldSubfieldID"].ToString());
-				loinc.ExternalCopyrightNotice= PIn.String(table.Rows[i]["ExternalCopyrightNotice"].ToString());
-				loinc.NameLongCommon         = PIn.String(table.Rows[i]["NameLongCommon"].ToString());
-				loinc.UnitsUCUM              = PIn.String(table.Rows[i]["UnitsUCUM"].ToString());
-				loinc.RankCommonTests        = PIn.Int   (table.Rows[i]["RankCommonTests"].ToString());
-				loinc.RankCommonOrders       = PIn.Int   (table.Rows[i]["RankCommonOrders"].ToString());
+				loinc.LoincNum               = PIn.Long  (row["LoincNum"].ToString());
+				loinc.LoincCode              = PIn.String(row["LoincCode"].ToString());
+				loinc.Component              = PIn.String(row["Component"].ToString());
+				loinc.PropertyObserved       = PIn.String(row["PropertyObserved"].ToString());
+				loinc.TimeAspct              = PIn.String(row["TimeAspct"].ToString());
+				loinc.SystemMeasured         = PIn.String(row["SystemMeasured"].ToString());
+				loinc.ScaleType              = PIn.String(row["ScaleType"].ToString());
+				loinc.MethodType             = PIn.String(row["MethodType"].ToString());
+				loinc.StatusOfCode           = PIn.String(row["StatusOfCode"].ToString());
+				loinc.NameShort              = PIn.String(row["NameShort"].ToString());
+				loinc.ClassType              = PIn.String(row["ClassType"].ToString());
+				loinc.UnitsRequired          = PIn.Bool  (row["UnitsRequired"].ToString());
+				loinc.OrderObs               = PIn.String(row["OrderObs"].ToString());
+				loinc.HL7FieldSubfieldID     = PIn.String(row["HL7FieldSubfieldID"].ToString());
+				loinc.ExternalCopyrightNotice= PIn.String(row["ExternalCopyrightNotice"].ToString());
+				loinc.NameLongCommon         = PIn.String(row["NameLongCommon"].ToString());
+				loinc.UnitsUCUM              = PIn.String(row["UnitsUCUM"].ToString());
+				loinc.RankCommonTests        = PIn.Int   (row["RankCommonTests"].ToString());
+				loinc.RankCommonOrders       = PIn.Int   (row["RankCommonOrders"].ToString());
 				retVal.Add(loinc);
 			}
 			return retVal;

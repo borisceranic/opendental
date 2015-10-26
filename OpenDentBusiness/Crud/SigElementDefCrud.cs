@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<SigElementDef> TableToList(DataTable table){
 			List<SigElementDef> retVal=new List<SigElementDef>();
 			SigElementDef sigElementDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sigElementDef=new SigElementDef();
-				sigElementDef.SigElementDefNum= PIn.Long  (table.Rows[i]["SigElementDefNum"].ToString());
-				sigElementDef.LightRow        = PIn.Byte  (table.Rows[i]["LightRow"].ToString());
-				sigElementDef.LightColor      = Color.FromArgb(PIn.Int(table.Rows[i]["LightColor"].ToString()));
-				sigElementDef.SigElementType  = (OpenDentBusiness.SignalElementType)PIn.Int(table.Rows[i]["SigElementType"].ToString());
-				sigElementDef.SigText         = PIn.String(table.Rows[i]["SigText"].ToString());
-				sigElementDef.Sound           = PIn.String(table.Rows[i]["Sound"].ToString());
-				sigElementDef.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				sigElementDef.SigElementDefNum= PIn.Long  (row["SigElementDefNum"].ToString());
+				sigElementDef.LightRow        = PIn.Byte  (row["LightRow"].ToString());
+				sigElementDef.LightColor      = Color.FromArgb(PIn.Int(row["LightColor"].ToString()));
+				sigElementDef.SigElementType  = (OpenDentBusiness.SignalElementType)PIn.Int(row["SigElementType"].ToString());
+				sigElementDef.SigText         = PIn.String(row["SigText"].ToString());
+				sigElementDef.Sound           = PIn.String(row["Sound"].ToString());
+				sigElementDef.ItemOrder       = PIn.Int   (row["ItemOrder"].ToString());
 				retVal.Add(sigElementDef);
 			}
 			return retVal;

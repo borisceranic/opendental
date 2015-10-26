@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<Phone> TableToList(DataTable table){
 			List<Phone> retVal=new List<Phone>();
 			Phone phone;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phone=new Phone();
-				phone.PhoneNum         = PIn.Long  (table.Rows[i]["PhoneNum"].ToString());
-				phone.Extension        = PIn.Int   (table.Rows[i]["Extension"].ToString());
-				phone.EmployeeName     = PIn.String(table.Rows[i]["EmployeeName"].ToString());
-				string clockStatus=table.Rows[i]["ClockStatus"].ToString();
+				phone.PhoneNum         = PIn.Long  (row["PhoneNum"].ToString());
+				phone.Extension        = PIn.Int   (row["Extension"].ToString());
+				phone.EmployeeName     = PIn.String(row["EmployeeName"].ToString());
+				string clockStatus=row["ClockStatus"].ToString();
 				if(clockStatus==""){
 					phone.ClockStatus    =(ClockStatusEnum)0;
 				}
@@ -59,19 +59,19 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					phone.ClockStatus    =(ClockStatusEnum)0;
 				}
-				phone.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				phone.ColorBar         = Color.FromArgb(PIn.Int(table.Rows[i]["ColorBar"].ToString()));
-				phone.ColorText        = Color.FromArgb(PIn.Int(table.Rows[i]["ColorText"].ToString()));
-				phone.EmployeeNum      = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				phone.CustomerNumber   = PIn.String(table.Rows[i]["CustomerNumber"].ToString());
-				phone.InOrOut          = PIn.String(table.Rows[i]["InOrOut"].ToString());
-				phone.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				phone.DateTimeStart    = PIn.DateT (table.Rows[i]["DateTimeStart"].ToString());
-				phone.WebCamImage      = PIn.String(table.Rows[i]["WebCamImage"].ToString());
-				phone.ScreenshotPath   = PIn.String(table.Rows[i]["ScreenshotPath"].ToString());
-				phone.ScreenshotImage  = PIn.String(table.Rows[i]["ScreenshotImage"].ToString());
-				phone.CustomerNumberRaw= PIn.String(table.Rows[i]["CustomerNumberRaw"].ToString());
-				phone.LastCallTimeStart= PIn.DateT (table.Rows[i]["LastCallTimeStart"].ToString());
+				phone.Description      = PIn.String(row["Description"].ToString());
+				phone.ColorBar         = Color.FromArgb(PIn.Int(row["ColorBar"].ToString()));
+				phone.ColorText        = Color.FromArgb(PIn.Int(row["ColorText"].ToString()));
+				phone.EmployeeNum      = PIn.Long  (row["EmployeeNum"].ToString());
+				phone.CustomerNumber   = PIn.String(row["CustomerNumber"].ToString());
+				phone.InOrOut          = PIn.String(row["InOrOut"].ToString());
+				phone.PatNum           = PIn.Long  (row["PatNum"].ToString());
+				phone.DateTimeStart    = PIn.DateT (row["DateTimeStart"].ToString());
+				phone.WebCamImage      = PIn.String(row["WebCamImage"].ToString());
+				phone.ScreenshotPath   = PIn.String(row["ScreenshotPath"].ToString());
+				phone.ScreenshotImage  = PIn.String(row["ScreenshotImage"].ToString());
+				phone.CustomerNumberRaw= PIn.String(row["CustomerNumberRaw"].ToString());
+				phone.LastCallTimeStart= PIn.DateT (row["LastCallTimeStart"].ToString());
 				retVal.Add(phone);
 			}
 			return retVal;

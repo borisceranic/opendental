@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<UserodApptView> TableToList(DataTable table){
 			List<UserodApptView> retVal=new List<UserodApptView>();
 			UserodApptView userodApptView;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				userodApptView=new UserodApptView();
-				userodApptView.UserodApptViewNum= PIn.Long  (table.Rows[i]["UserodApptViewNum"].ToString());
-				userodApptView.UserNum          = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				userodApptView.ClinicNum        = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				userodApptView.ApptViewNum      = PIn.Long  (table.Rows[i]["ApptViewNum"].ToString());
+				userodApptView.UserodApptViewNum= PIn.Long  (row["UserodApptViewNum"].ToString());
+				userodApptView.UserNum          = PIn.Long  (row["UserNum"].ToString());
+				userodApptView.ClinicNum        = PIn.Long  (row["ClinicNum"].ToString());
+				userodApptView.ApptViewNum      = PIn.Long  (row["ApptViewNum"].ToString());
 				retVal.Add(userodApptView);
 			}
 			return retVal;

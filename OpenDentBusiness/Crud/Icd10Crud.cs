@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<Icd10> TableToList(DataTable table){
 			List<Icd10> retVal=new List<Icd10>();
 			Icd10 icd10;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				icd10=new Icd10();
-				icd10.Icd10Num   = PIn.Long  (table.Rows[i]["Icd10Num"].ToString());
-				icd10.Icd10Code  = PIn.String(table.Rows[i]["Icd10Code"].ToString());
-				icd10.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				icd10.IsCode     = PIn.String(table.Rows[i]["IsCode"].ToString());
+				icd10.Icd10Num   = PIn.Long  (row["Icd10Num"].ToString());
+				icd10.Icd10Code  = PIn.String(row["Icd10Code"].ToString());
+				icd10.Description= PIn.String(row["Description"].ToString());
+				icd10.IsCode     = PIn.String(row["IsCode"].ToString());
 				retVal.Add(icd10);
 			}
 			return retVal;

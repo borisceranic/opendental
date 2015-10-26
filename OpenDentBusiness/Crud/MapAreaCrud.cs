@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<MapArea> TableToList(DataTable table){
 			List<MapArea> retVal=new List<MapArea>();
 			MapArea mapArea;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				mapArea=new MapArea();
-				mapArea.MapAreaNum = PIn.Long  (table.Rows[i]["MapAreaNum"].ToString());
-				mapArea.Extension  = PIn.Int   (table.Rows[i]["Extension"].ToString());
-				mapArea.XPos       = PIn.Double(table.Rows[i]["XPos"].ToString());
-				mapArea.YPos       = PIn.Double(table.Rows[i]["YPos"].ToString());
-				mapArea.Width      = PIn.Double(table.Rows[i]["Width"].ToString());
-				mapArea.Height     = PIn.Double(table.Rows[i]["Height"].ToString());
-				mapArea.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				mapArea.ItemType   = (OpenDentBusiness.MapItemType)PIn.Int(table.Rows[i]["ItemType"].ToString());
+				mapArea.MapAreaNum = PIn.Long  (row["MapAreaNum"].ToString());
+				mapArea.Extension  = PIn.Int   (row["Extension"].ToString());
+				mapArea.XPos       = PIn.Double(row["XPos"].ToString());
+				mapArea.YPos       = PIn.Double(row["YPos"].ToString());
+				mapArea.Width      = PIn.Double(row["Width"].ToString());
+				mapArea.Height     = PIn.Double(row["Height"].ToString());
+				mapArea.Description= PIn.String(row["Description"].ToString());
+				mapArea.ItemType   = (OpenDentBusiness.MapItemType)PIn.Int(row["ItemType"].ToString());
 				retVal.Add(mapArea);
 			}
 			return retVal;

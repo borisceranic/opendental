@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<Mount> TableToList(DataTable table){
 			List<Mount> retVal=new List<Mount>();
 			Mount mount;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				mount=new Mount();
-				mount.MountNum   = PIn.Long  (table.Rows[i]["MountNum"].ToString());
-				mount.PatNum     = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				mount.DocCategory= PIn.Long  (table.Rows[i]["DocCategory"].ToString());
-				mount.DateCreated= PIn.Date  (table.Rows[i]["DateCreated"].ToString());
-				mount.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				mount.Note       = PIn.String(table.Rows[i]["Note"].ToString());
-				mount.ImgType    = (OpenDentBusiness.ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
-				mount.Width      = PIn.Int   (table.Rows[i]["Width"].ToString());
-				mount.Height     = PIn.Int   (table.Rows[i]["Height"].ToString());
+				mount.MountNum   = PIn.Long  (row["MountNum"].ToString());
+				mount.PatNum     = PIn.Long  (row["PatNum"].ToString());
+				mount.DocCategory= PIn.Long  (row["DocCategory"].ToString());
+				mount.DateCreated= PIn.Date  (row["DateCreated"].ToString());
+				mount.Description= PIn.String(row["Description"].ToString());
+				mount.Note       = PIn.String(row["Note"].ToString());
+				mount.ImgType    = (OpenDentBusiness.ImageType)PIn.Int(row["ImgType"].ToString());
+				mount.Width      = PIn.Int   (row["Width"].ToString());
+				mount.Height     = PIn.Int   (row["Height"].ToString());
 				retVal.Add(mount);
 			}
 			return retVal;

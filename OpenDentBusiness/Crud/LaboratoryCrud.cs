@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<Laboratory> TableToList(DataTable table){
 			List<Laboratory> retVal=new List<Laboratory>();
 			Laboratory laboratory;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				laboratory=new Laboratory();
-				laboratory.LaboratoryNum= PIn.Long  (table.Rows[i]["LaboratoryNum"].ToString());
-				laboratory.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				laboratory.Phone        = PIn.String(table.Rows[i]["Phone"].ToString());
-				laboratory.Notes        = PIn.String(table.Rows[i]["Notes"].ToString());
-				laboratory.Slip         = PIn.Long  (table.Rows[i]["Slip"].ToString());
-				laboratory.Address      = PIn.String(table.Rows[i]["Address"].ToString());
-				laboratory.City         = PIn.String(table.Rows[i]["City"].ToString());
-				laboratory.State        = PIn.String(table.Rows[i]["State"].ToString());
-				laboratory.Zip          = PIn.String(table.Rows[i]["Zip"].ToString());
-				laboratory.Email        = PIn.String(table.Rows[i]["Email"].ToString());
-				laboratory.WirelessPhone= PIn.String(table.Rows[i]["WirelessPhone"].ToString());
+				laboratory.LaboratoryNum= PIn.Long  (row["LaboratoryNum"].ToString());
+				laboratory.Description  = PIn.String(row["Description"].ToString());
+				laboratory.Phone        = PIn.String(row["Phone"].ToString());
+				laboratory.Notes        = PIn.String(row["Notes"].ToString());
+				laboratory.Slip         = PIn.Long  (row["Slip"].ToString());
+				laboratory.Address      = PIn.String(row["Address"].ToString());
+				laboratory.City         = PIn.String(row["City"].ToString());
+				laboratory.State        = PIn.String(row["State"].ToString());
+				laboratory.Zip          = PIn.String(row["Zip"].ToString());
+				laboratory.Email        = PIn.String(row["Email"].ToString());
+				laboratory.WirelessPhone= PIn.String(row["WirelessPhone"].ToString());
 				retVal.Add(laboratory);
 			}
 			return retVal;

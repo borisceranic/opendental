@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<TimeCardRule> TableToList(DataTable table){
 			List<TimeCardRule> retVal=new List<TimeCardRule>();
 			TimeCardRule timeCardRule;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				timeCardRule=new TimeCardRule();
-				timeCardRule.TimeCardRuleNum= PIn.Long  (table.Rows[i]["TimeCardRuleNum"].ToString());
-				timeCardRule.EmployeeNum    = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				timeCardRule.OverHoursPerDay= PIn.Time(table.Rows[i]["OverHoursPerDay"].ToString());
-				timeCardRule.AfterTimeOfDay = PIn.Time(table.Rows[i]["AfterTimeOfDay"].ToString());
-				timeCardRule.BeforeTimeOfDay= PIn.Time(table.Rows[i]["BeforeTimeOfDay"].ToString());
+				timeCardRule.TimeCardRuleNum= PIn.Long  (row["TimeCardRuleNum"].ToString());
+				timeCardRule.EmployeeNum    = PIn.Long  (row["EmployeeNum"].ToString());
+				timeCardRule.OverHoursPerDay= PIn.Time(row["OverHoursPerDay"].ToString());
+				timeCardRule.AfterTimeOfDay = PIn.Time(row["AfterTimeOfDay"].ToString());
+				timeCardRule.BeforeTimeOfDay= PIn.Time(row["BeforeTimeOfDay"].ToString());
 				retVal.Add(timeCardRule);
 			}
 			return retVal;

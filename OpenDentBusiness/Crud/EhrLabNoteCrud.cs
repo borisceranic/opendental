@@ -45,12 +45,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabNote> TableToList(DataTable table){
 			List<EhrLabNote> retVal=new List<EhrLabNote>();
 			EhrLabNote ehrLabNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabNote=new EhrLabNote();
-				ehrLabNote.EhrLabNoteNum  = PIn.Long  (table.Rows[i]["EhrLabNoteNum"].ToString());
-				ehrLabNote.EhrLabNum      = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabNote.EhrLabResultNum= PIn.Long  (table.Rows[i]["EhrLabResultNum"].ToString());
-				ehrLabNote.Comments       = PIn.String(table.Rows[i]["Comments"].ToString());
+				ehrLabNote.EhrLabNoteNum  = PIn.Long  (row["EhrLabNoteNum"].ToString());
+				ehrLabNote.EhrLabNum      = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabNote.EhrLabResultNum= PIn.Long  (row["EhrLabResultNum"].ToString());
+				ehrLabNote.Comments       = PIn.String(row["Comments"].ToString());
 				retVal.Add(ehrLabNote);
 			}
 			return retVal;

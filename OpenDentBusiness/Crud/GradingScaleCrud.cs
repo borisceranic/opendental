@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<GradingScale> TableToList(DataTable table){
 			List<GradingScale> retVal=new List<GradingScale>();
 			GradingScale gradingScale;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				gradingScale=new GradingScale();
-				gradingScale.GradingScaleNum= PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				gradingScale.ScaleType      = (OpenDentBusiness.EnumScaleType)PIn.Int(table.Rows[i]["ScaleType"].ToString());
-				gradingScale.Description    = PIn.String(table.Rows[i]["Description"].ToString());
+				gradingScale.GradingScaleNum= PIn.Long  (row["GradingScaleNum"].ToString());
+				gradingScale.ScaleType      = (OpenDentBusiness.EnumScaleType)PIn.Int(row["ScaleType"].ToString());
+				gradingScale.Description    = PIn.String(row["Description"].ToString());
 				retVal.Add(gradingScale);
 			}
 			return retVal;

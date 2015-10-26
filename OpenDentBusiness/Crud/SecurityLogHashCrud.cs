@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<SecurityLogHash> TableToList(DataTable table){
 			List<SecurityLogHash> retVal=new List<SecurityLogHash>();
 			SecurityLogHash securityLogHash;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				securityLogHash=new SecurityLogHash();
-				securityLogHash.SecurityLogHashNum= PIn.Long  (table.Rows[i]["SecurityLogHashNum"].ToString());
-				securityLogHash.SecurityLogNum    = PIn.Long  (table.Rows[i]["SecurityLogNum"].ToString());
-				securityLogHash.LogHash           = PIn.String(table.Rows[i]["LogHash"].ToString());
+				securityLogHash.SecurityLogHashNum= PIn.Long  (row["SecurityLogHashNum"].ToString());
+				securityLogHash.SecurityLogNum    = PIn.Long  (row["SecurityLogNum"].ToString());
+				securityLogHash.LogHash           = PIn.String(row["LogHash"].ToString());
 				retVal.Add(securityLogHash);
 			}
 			return retVal;

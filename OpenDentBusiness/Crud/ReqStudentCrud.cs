@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<ReqStudent> TableToList(DataTable table){
 			List<ReqStudent> retVal=new List<ReqStudent>();
 			ReqStudent reqStudent;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				reqStudent=new ReqStudent();
-				reqStudent.ReqStudentNum  = PIn.Long  (table.Rows[i]["ReqStudentNum"].ToString());
-				reqStudent.ReqNeededNum   = PIn.Long  (table.Rows[i]["ReqNeededNum"].ToString());
-				reqStudent.Descript       = PIn.String(table.Rows[i]["Descript"].ToString());
-				reqStudent.SchoolCourseNum= PIn.Long  (table.Rows[i]["SchoolCourseNum"].ToString());
-				reqStudent.ProvNum        = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				reqStudent.AptNum         = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				reqStudent.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				reqStudent.InstructorNum  = PIn.Long  (table.Rows[i]["InstructorNum"].ToString());
-				reqStudent.DateCompleted  = PIn.Date  (table.Rows[i]["DateCompleted"].ToString());
+				reqStudent.ReqStudentNum  = PIn.Long  (row["ReqStudentNum"].ToString());
+				reqStudent.ReqNeededNum   = PIn.Long  (row["ReqNeededNum"].ToString());
+				reqStudent.Descript       = PIn.String(row["Descript"].ToString());
+				reqStudent.SchoolCourseNum= PIn.Long  (row["SchoolCourseNum"].ToString());
+				reqStudent.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
+				reqStudent.AptNum         = PIn.Long  (row["AptNum"].ToString());
+				reqStudent.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				reqStudent.InstructorNum  = PIn.Long  (row["InstructorNum"].ToString());
+				reqStudent.DateCompleted  = PIn.Date  (row["DateCompleted"].ToString());
 				retVal.Add(reqStudent);
 			}
 			return retVal;

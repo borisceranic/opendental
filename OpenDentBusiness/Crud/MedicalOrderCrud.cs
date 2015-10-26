@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedicalOrder> TableToList(DataTable table){
 			List<MedicalOrder> retVal=new List<MedicalOrder>();
 			MedicalOrder medicalOrder;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medicalOrder=new MedicalOrder();
-				medicalOrder.MedicalOrderNum= PIn.Long  (table.Rows[i]["MedicalOrderNum"].ToString());
-				medicalOrder.MedOrderType   = (OpenDentBusiness.MedicalOrderType)PIn.Int(table.Rows[i]["MedOrderType"].ToString());
-				medicalOrder.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				medicalOrder.DateTimeOrder  = PIn.DateT (table.Rows[i]["DateTimeOrder"].ToString());
-				medicalOrder.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				medicalOrder.IsDiscontinued = PIn.Bool  (table.Rows[i]["IsDiscontinued"].ToString());
-				medicalOrder.ProvNum        = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				medicalOrder.MedicalOrderNum= PIn.Long  (row["MedicalOrderNum"].ToString());
+				medicalOrder.MedOrderType   = (OpenDentBusiness.MedicalOrderType)PIn.Int(row["MedOrderType"].ToString());
+				medicalOrder.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				medicalOrder.DateTimeOrder  = PIn.DateT (row["DateTimeOrder"].ToString());
+				medicalOrder.Description    = PIn.String(row["Description"].ToString());
+				medicalOrder.IsDiscontinued = PIn.Bool  (row["IsDiscontinued"].ToString());
+				medicalOrder.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
 				retVal.Add(medicalOrder);
 			}
 			return retVal;

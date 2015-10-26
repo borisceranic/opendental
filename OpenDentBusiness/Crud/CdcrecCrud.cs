@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<Cdcrec> TableToList(DataTable table){
 			List<Cdcrec> retVal=new List<Cdcrec>();
 			Cdcrec cdcrec;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				cdcrec=new Cdcrec();
-				cdcrec.CdcrecNum       = PIn.Long  (table.Rows[i]["CdcrecNum"].ToString());
-				cdcrec.CdcrecCode      = PIn.String(table.Rows[i]["CdcrecCode"].ToString());
-				cdcrec.HeirarchicalCode= PIn.String(table.Rows[i]["HeirarchicalCode"].ToString());
-				cdcrec.Description     = PIn.String(table.Rows[i]["Description"].ToString());
+				cdcrec.CdcrecNum       = PIn.Long  (row["CdcrecNum"].ToString());
+				cdcrec.CdcrecCode      = PIn.String(row["CdcrecCode"].ToString());
+				cdcrec.HeirarchicalCode= PIn.String(row["HeirarchicalCode"].ToString());
+				cdcrec.Description     = PIn.String(row["Description"].ToString());
 				retVal.Add(cdcrec);
 			}
 			return retVal;

@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimValCodeLog> TableToList(DataTable table){
 			List<ClaimValCodeLog> retVal=new List<ClaimValCodeLog>();
 			ClaimValCodeLog claimValCodeLog;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimValCodeLog=new ClaimValCodeLog();
-				claimValCodeLog.ClaimValCodeLogNum= PIn.Long  (table.Rows[i]["ClaimValCodeLogNum"].ToString());
-				claimValCodeLog.ClaimNum          = PIn.Long  (table.Rows[i]["ClaimNum"].ToString());
-				claimValCodeLog.ClaimField        = PIn.String(table.Rows[i]["ClaimField"].ToString());
-				claimValCodeLog.ValCode           = PIn.String(table.Rows[i]["ValCode"].ToString());
-				claimValCodeLog.ValAmount         = PIn.Double(table.Rows[i]["ValAmount"].ToString());
-				claimValCodeLog.Ordinal           = PIn.Int   (table.Rows[i]["Ordinal"].ToString());
+				claimValCodeLog.ClaimValCodeLogNum= PIn.Long  (row["ClaimValCodeLogNum"].ToString());
+				claimValCodeLog.ClaimNum          = PIn.Long  (row["ClaimNum"].ToString());
+				claimValCodeLog.ClaimField        = PIn.String(row["ClaimField"].ToString());
+				claimValCodeLog.ValCode           = PIn.String(row["ValCode"].ToString());
+				claimValCodeLog.ValAmount         = PIn.Double(row["ValAmount"].ToString());
+				claimValCodeLog.Ordinal           = PIn.Int   (row["Ordinal"].ToString());
 				retVal.Add(claimValCodeLog);
 			}
 			return retVal;

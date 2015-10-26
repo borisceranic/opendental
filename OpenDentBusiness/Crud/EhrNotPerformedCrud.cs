@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrNotPerformed> TableToList(DataTable table){
 			List<EhrNotPerformed> retVal=new List<EhrNotPerformed>();
 			EhrNotPerformed ehrNotPerformed;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrNotPerformed=new EhrNotPerformed();
-				ehrNotPerformed.EhrNotPerformedNum= PIn.Long  (table.Rows[i]["EhrNotPerformedNum"].ToString());
-				ehrNotPerformed.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrNotPerformed.ProvNum           = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				ehrNotPerformed.CodeValue         = PIn.String(table.Rows[i]["CodeValue"].ToString());
-				ehrNotPerformed.CodeSystem        = PIn.String(table.Rows[i]["CodeSystem"].ToString());
-				ehrNotPerformed.CodeValueReason   = PIn.String(table.Rows[i]["CodeValueReason"].ToString());
-				ehrNotPerformed.CodeSystemReason  = PIn.String(table.Rows[i]["CodeSystemReason"].ToString());
-				ehrNotPerformed.Note              = PIn.String(table.Rows[i]["Note"].ToString());
-				ehrNotPerformed.DateEntry         = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
+				ehrNotPerformed.EhrNotPerformedNum= PIn.Long  (row["EhrNotPerformedNum"].ToString());
+				ehrNotPerformed.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				ehrNotPerformed.ProvNum           = PIn.Long  (row["ProvNum"].ToString());
+				ehrNotPerformed.CodeValue         = PIn.String(row["CodeValue"].ToString());
+				ehrNotPerformed.CodeSystem        = PIn.String(row["CodeSystem"].ToString());
+				ehrNotPerformed.CodeValueReason   = PIn.String(row["CodeValueReason"].ToString());
+				ehrNotPerformed.CodeSystemReason  = PIn.String(row["CodeSystemReason"].ToString());
+				ehrNotPerformed.Note              = PIn.String(row["Note"].ToString());
+				ehrNotPerformed.DateEntry         = PIn.Date  (row["DateEntry"].ToString());
 				retVal.Add(ehrNotPerformed);
 			}
 			return retVal;

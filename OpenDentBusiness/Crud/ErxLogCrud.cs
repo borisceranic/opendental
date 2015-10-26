@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ErxLog> TableToList(DataTable table){
 			List<ErxLog> retVal=new List<ErxLog>();
 			ErxLog erxLog;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				erxLog=new ErxLog();
-				erxLog.ErxLogNum = PIn.Long  (table.Rows[i]["ErxLogNum"].ToString());
-				erxLog.PatNum    = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				erxLog.MsgText   = PIn.String(table.Rows[i]["MsgText"].ToString());
-				erxLog.DateTStamp= PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				erxLog.ProvNum   = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				erxLog.ErxLogNum = PIn.Long  (row["ErxLogNum"].ToString());
+				erxLog.PatNum    = PIn.Long  (row["PatNum"].ToString());
+				erxLog.MsgText   = PIn.String(row["MsgText"].ToString());
+				erxLog.DateTStamp= PIn.DateT (row["DateTStamp"].ToString());
+				erxLog.ProvNum   = PIn.Long  (row["ProvNum"].ToString());
 				retVal.Add(erxLog);
 			}
 			return retVal;

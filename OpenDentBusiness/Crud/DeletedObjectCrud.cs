@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<DeletedObject> TableToList(DataTable table){
 			List<DeletedObject> retVal=new List<DeletedObject>();
 			DeletedObject deletedObject;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				deletedObject=new DeletedObject();
-				deletedObject.DeletedObjectNum= PIn.Long  (table.Rows[i]["DeletedObjectNum"].ToString());
-				deletedObject.ObjectNum       = PIn.Long  (table.Rows[i]["ObjectNum"].ToString());
-				deletedObject.ObjectType      = (OpenDentBusiness.DeletedObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
-				deletedObject.DateTStamp      = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
+				deletedObject.DeletedObjectNum= PIn.Long  (row["DeletedObjectNum"].ToString());
+				deletedObject.ObjectNum       = PIn.Long  (row["ObjectNum"].ToString());
+				deletedObject.ObjectType      = (OpenDentBusiness.DeletedObjectType)PIn.Int(row["ObjectType"].ToString());
+				deletedObject.DateTStamp      = PIn.DateT (row["DateTStamp"].ToString());
 				retVal.Add(deletedObject);
 			}
 			return retVal;

@@ -44,30 +44,30 @@ namespace OpenDentBusiness.Crud{
 		public static List<Screen> TableToList(DataTable table){
 			List<Screen> retVal=new List<Screen>();
 			Screen screen;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				screen=new Screen();
-				screen.ScreenNum       = PIn.Long  (table.Rows[i]["ScreenNum"].ToString());
-				screen.ScreenDate      = PIn.Date  (table.Rows[i]["ScreenDate"].ToString());
-				screen.GradeSchool     = PIn.String(table.Rows[i]["GradeSchool"].ToString());
-				screen.County          = PIn.String(table.Rows[i]["County"].ToString());
-				screen.PlaceService    = (OpenDentBusiness.PlaceOfService)PIn.Int(table.Rows[i]["PlaceService"].ToString());
-				screen.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				screen.ProvName        = PIn.String(table.Rows[i]["ProvName"].ToString());
-				screen.Gender          = (OpenDentBusiness.PatientGender)PIn.Int(table.Rows[i]["Gender"].ToString());
-				screen.RaceOld         = (OpenDentBusiness.PatientRaceOld)PIn.Int(table.Rows[i]["RaceOld"].ToString());
-				screen.GradeLevel      = (OpenDentBusiness.PatientGrade)PIn.Int(table.Rows[i]["GradeLevel"].ToString());
-				screen.Age             = PIn.Byte  (table.Rows[i]["Age"].ToString());
-				screen.Urgency         = (OpenDentBusiness.TreatmentUrgency)PIn.Int(table.Rows[i]["Urgency"].ToString());
-				screen.HasCaries       = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["HasCaries"].ToString());
-				screen.NeedsSealants   = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["NeedsSealants"].ToString());
-				screen.CariesExperience= (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["CariesExperience"].ToString());
-				screen.EarlyChildCaries= (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["EarlyChildCaries"].ToString());
-				screen.ExistingSealants= (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["ExistingSealants"].ToString());
-				screen.MissingAllTeeth = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["MissingAllTeeth"].ToString());
-				screen.Birthdate       = PIn.Date  (table.Rows[i]["Birthdate"].ToString());
-				screen.ScreenGroupNum  = PIn.Long  (table.Rows[i]["ScreenGroupNum"].ToString());
-				screen.ScreenGroupOrder= PIn.Int   (table.Rows[i]["ScreenGroupOrder"].ToString());
-				screen.Comments        = PIn.String(table.Rows[i]["Comments"].ToString());
+				screen.ScreenNum       = PIn.Long  (row["ScreenNum"].ToString());
+				screen.ScreenDate      = PIn.Date  (row["ScreenDate"].ToString());
+				screen.GradeSchool     = PIn.String(row["GradeSchool"].ToString());
+				screen.County          = PIn.String(row["County"].ToString());
+				screen.PlaceService    = (OpenDentBusiness.PlaceOfService)PIn.Int(row["PlaceService"].ToString());
+				screen.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
+				screen.ProvName        = PIn.String(row["ProvName"].ToString());
+				screen.Gender          = (OpenDentBusiness.PatientGender)PIn.Int(row["Gender"].ToString());
+				screen.RaceOld         = (OpenDentBusiness.PatientRaceOld)PIn.Int(row["RaceOld"].ToString());
+				screen.GradeLevel      = (OpenDentBusiness.PatientGrade)PIn.Int(row["GradeLevel"].ToString());
+				screen.Age             = PIn.Byte  (row["Age"].ToString());
+				screen.Urgency         = (OpenDentBusiness.TreatmentUrgency)PIn.Int(row["Urgency"].ToString());
+				screen.HasCaries       = (OpenDentBusiness.YN)PIn.Int(row["HasCaries"].ToString());
+				screen.NeedsSealants   = (OpenDentBusiness.YN)PIn.Int(row["NeedsSealants"].ToString());
+				screen.CariesExperience= (OpenDentBusiness.YN)PIn.Int(row["CariesExperience"].ToString());
+				screen.EarlyChildCaries= (OpenDentBusiness.YN)PIn.Int(row["EarlyChildCaries"].ToString());
+				screen.ExistingSealants= (OpenDentBusiness.YN)PIn.Int(row["ExistingSealants"].ToString());
+				screen.MissingAllTeeth = (OpenDentBusiness.YN)PIn.Int(row["MissingAllTeeth"].ToString());
+				screen.Birthdate       = PIn.Date  (row["Birthdate"].ToString());
+				screen.ScreenGroupNum  = PIn.Long  (row["ScreenGroupNum"].ToString());
+				screen.ScreenGroupOrder= PIn.Int   (row["ScreenGroupOrder"].ToString());
+				screen.Comments        = PIn.String(row["Comments"].ToString());
 				retVal.Add(screen);
 			}
 			return retVal;

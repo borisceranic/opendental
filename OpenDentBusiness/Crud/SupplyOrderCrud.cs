@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<SupplyOrder> TableToList(DataTable table){
 			List<SupplyOrder> retVal=new List<SupplyOrder>();
 			SupplyOrder supplyOrder;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				supplyOrder=new SupplyOrder();
-				supplyOrder.SupplyOrderNum= PIn.Long  (table.Rows[i]["SupplyOrderNum"].ToString());
-				supplyOrder.SupplierNum   = PIn.Long  (table.Rows[i]["SupplierNum"].ToString());
-				supplyOrder.DatePlaced    = PIn.Date  (table.Rows[i]["DatePlaced"].ToString());
-				supplyOrder.Note          = PIn.String(table.Rows[i]["Note"].ToString());
-				supplyOrder.AmountTotal   = PIn.Double(table.Rows[i]["AmountTotal"].ToString());
+				supplyOrder.SupplyOrderNum= PIn.Long  (row["SupplyOrderNum"].ToString());
+				supplyOrder.SupplierNum   = PIn.Long  (row["SupplierNum"].ToString());
+				supplyOrder.DatePlaced    = PIn.Date  (row["DatePlaced"].ToString());
+				supplyOrder.Note          = PIn.String(row["Note"].ToString());
+				supplyOrder.AmountTotal   = PIn.Double(row["AmountTotal"].ToString());
 				retVal.Add(supplyOrder);
 			}
 			return retVal;

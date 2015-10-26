@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskUnread> TableToList(DataTable table){
 			List<TaskUnread> retVal=new List<TaskUnread>();
 			TaskUnread taskUnread;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskUnread=new TaskUnread();
-				taskUnread.TaskUnreadNum= PIn.Long  (table.Rows[i]["TaskUnreadNum"].ToString());
-				taskUnread.TaskNum      = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
-				taskUnread.UserNum      = PIn.Long  (table.Rows[i]["UserNum"].ToString());
+				taskUnread.TaskUnreadNum= PIn.Long  (row["TaskUnreadNum"].ToString());
+				taskUnread.TaskNum      = PIn.Long  (row["TaskNum"].ToString());
+				taskUnread.UserNum      = PIn.Long  (row["UserNum"].ToString());
 				retVal.Add(taskUnread);
 			}
 			return retVal;

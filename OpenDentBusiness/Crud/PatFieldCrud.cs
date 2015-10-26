@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PatField> TableToList(DataTable table){
 			List<PatField> retVal=new List<PatField>();
 			PatField patField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				patField=new PatField();
-				patField.PatFieldNum= PIn.Long  (table.Rows[i]["PatFieldNum"].ToString());
-				patField.PatNum     = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				patField.FieldName  = PIn.String(table.Rows[i]["FieldName"].ToString());
-				patField.FieldValue = PIn.String(table.Rows[i]["FieldValue"].ToString());
+				patField.PatFieldNum= PIn.Long  (row["PatFieldNum"].ToString());
+				patField.PatNum     = PIn.Long  (row["PatNum"].ToString());
+				patField.FieldName  = PIn.String(row["FieldName"].ToString());
+				patField.FieldValue = PIn.String(row["FieldValue"].ToString());
 				retVal.Add(patField);
 			}
 			return retVal;

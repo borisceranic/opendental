@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimCondCodeLog> TableToList(DataTable table){
 			List<ClaimCondCodeLog> retVal=new List<ClaimCondCodeLog>();
 			ClaimCondCodeLog claimCondCodeLog;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimCondCodeLog=new ClaimCondCodeLog();
-				claimCondCodeLog.ClaimCondCodeLogNum= PIn.Long  (table.Rows[i]["ClaimCondCodeLogNum"].ToString());
-				claimCondCodeLog.ClaimNum           = PIn.Long  (table.Rows[i]["ClaimNum"].ToString());
-				claimCondCodeLog.Code0              = PIn.String(table.Rows[i]["Code0"].ToString());
-				claimCondCodeLog.Code1              = PIn.String(table.Rows[i]["Code1"].ToString());
-				claimCondCodeLog.Code2              = PIn.String(table.Rows[i]["Code2"].ToString());
-				claimCondCodeLog.Code3              = PIn.String(table.Rows[i]["Code3"].ToString());
-				claimCondCodeLog.Code4              = PIn.String(table.Rows[i]["Code4"].ToString());
-				claimCondCodeLog.Code5              = PIn.String(table.Rows[i]["Code5"].ToString());
-				claimCondCodeLog.Code6              = PIn.String(table.Rows[i]["Code6"].ToString());
-				claimCondCodeLog.Code7              = PIn.String(table.Rows[i]["Code7"].ToString());
-				claimCondCodeLog.Code8              = PIn.String(table.Rows[i]["Code8"].ToString());
-				claimCondCodeLog.Code9              = PIn.String(table.Rows[i]["Code9"].ToString());
-				claimCondCodeLog.Code10             = PIn.String(table.Rows[i]["Code10"].ToString());
+				claimCondCodeLog.ClaimCondCodeLogNum= PIn.Long  (row["ClaimCondCodeLogNum"].ToString());
+				claimCondCodeLog.ClaimNum           = PIn.Long  (row["ClaimNum"].ToString());
+				claimCondCodeLog.Code0              = PIn.String(row["Code0"].ToString());
+				claimCondCodeLog.Code1              = PIn.String(row["Code1"].ToString());
+				claimCondCodeLog.Code2              = PIn.String(row["Code2"].ToString());
+				claimCondCodeLog.Code3              = PIn.String(row["Code3"].ToString());
+				claimCondCodeLog.Code4              = PIn.String(row["Code4"].ToString());
+				claimCondCodeLog.Code5              = PIn.String(row["Code5"].ToString());
+				claimCondCodeLog.Code6              = PIn.String(row["Code6"].ToString());
+				claimCondCodeLog.Code7              = PIn.String(row["Code7"].ToString());
+				claimCondCodeLog.Code8              = PIn.String(row["Code8"].ToString());
+				claimCondCodeLog.Code9              = PIn.String(row["Code9"].ToString());
+				claimCondCodeLog.Code10             = PIn.String(row["Code10"].ToString());
 				retVal.Add(claimCondCodeLog);
 			}
 			return retVal;

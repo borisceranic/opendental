@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<Fee> TableToList(DataTable table){
 			List<Fee> retVal=new List<Fee>();
 			Fee fee;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				fee=new Fee();
-				fee.FeeNum       = PIn.Long  (table.Rows[i]["FeeNum"].ToString());
-				fee.Amount       = PIn.Double(table.Rows[i]["Amount"].ToString());
-				fee.OldCode      = PIn.String(table.Rows[i]["OldCode"].ToString());
-				fee.FeeSched     = PIn.Long  (table.Rows[i]["FeeSched"].ToString());
-				fee.UseDefaultFee= PIn.Bool  (table.Rows[i]["UseDefaultFee"].ToString());
-				fee.UseDefaultCov= PIn.Bool  (table.Rows[i]["UseDefaultCov"].ToString());
-				fee.CodeNum      = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
-				fee.ClinicNum    = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				fee.ProvNum      = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				fee.FeeNum       = PIn.Long  (row["FeeNum"].ToString());
+				fee.Amount       = PIn.Double(row["Amount"].ToString());
+				fee.OldCode      = PIn.String(row["OldCode"].ToString());
+				fee.FeeSched     = PIn.Long  (row["FeeSched"].ToString());
+				fee.UseDefaultFee= PIn.Bool  (row["UseDefaultFee"].ToString());
+				fee.UseDefaultCov= PIn.Bool  (row["UseDefaultCov"].ToString());
+				fee.CodeNum      = PIn.Long  (row["CodeNum"].ToString());
+				fee.ClinicNum    = PIn.Long  (row["ClinicNum"].ToString());
+				fee.ProvNum      = PIn.Long  (row["ProvNum"].ToString());
 				retVal.Add(fee);
 			}
 			return retVal;

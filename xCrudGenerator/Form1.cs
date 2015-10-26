@@ -216,7 +216,7 @@ using System.Drawing;"+rn);
 			strb.Append(rn+t2+"public static List<"+typeClass.Name+"> TableToList(DataTable table){");
 			strb.Append(rn+t3+"List<"+typeClass.Name+"> retVal=new List<"+typeClass.Name+">();");
 			strb.Append(rn+t3+typeClass.Name+" "+obj+";");
-			strb.Append(rn+t3+"for(int i=0;i<table.Rows.Count;i++) {");
+			strb.Append(rn+t3+"foreach(DataRow row in table.Rows) {");
 			strb.Append(rn+t4+obj+"=new "+typeClass.Name+"();");
 			List<FieldInfo> fieldsInDb=CrudGenHelper.GetFieldsExceptNotDb(fields);
 			//get the longest fieldname for alignment purposes
@@ -232,7 +232,7 @@ using System.Drawing;"+rn);
 				specialType=CrudGenHelper.GetSpecialType(fieldsInDb[f]);
 				if(specialType==CrudSpecialColType.EnumAsString) {
 					string fieldLower=fieldsInDb[f].Name.Substring(0,1).ToLower()+fieldsInDb[f].Name.Substring(1);//lowercase initial letter.  Example clockStatus
-					strb.Append(rn+t4+"string "+fieldLower+"=table.Rows[i][\""+fieldsInDb[f].Name+"\"].ToString();");
+					strb.Append(rn+t4+"string "+fieldLower+"=row[\""+fieldsInDb[f].Name+"\"].ToString();");
 					strb.Append(rn+t4+"if("+fieldLower+"==\"\"){");
 					strb.Append(rn+t5+obj+"."+fieldsInDb[f].Name.PadRight(longestField-2,' ')+"="
 						+"("+fieldsInDb[f].FieldType.Name+")0;");
@@ -304,7 +304,7 @@ using System.Drawing;"+rn);
 						strb.Append("PIn.Time(");
 						break;
 				}
-				strb.Append("table.Rows[i][\""+fieldsInDb[f].Name+"\"].ToString())");
+				strb.Append("row[\""+fieldsInDb[f].Name+"\"].ToString())");
 				if(fieldsInDb[f].FieldType.Name=="Color" || fieldsInDb[f].FieldType.Name=="Interval") {
 					strb.Append(")");
 				}

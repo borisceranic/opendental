@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<RefAttach> TableToList(DataTable table){
 			List<RefAttach> retVal=new List<RefAttach>();
 			RefAttach refAttach;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				refAttach=new RefAttach();
-				refAttach.RefAttachNum      = PIn.Long  (table.Rows[i]["RefAttachNum"].ToString());
-				refAttach.ReferralNum       = PIn.Long  (table.Rows[i]["ReferralNum"].ToString());
-				refAttach.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				refAttach.ItemOrder         = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				refAttach.RefDate           = PIn.Date  (table.Rows[i]["RefDate"].ToString());
-				refAttach.IsFrom            = PIn.Bool  (table.Rows[i]["IsFrom"].ToString());
-				refAttach.RefToStatus       = (OpenDentBusiness.ReferralToStatus)PIn.Int(table.Rows[i]["RefToStatus"].ToString());
-				refAttach.Note              = PIn.String(table.Rows[i]["Note"].ToString());
-				refAttach.IsTransitionOfCare= PIn.Bool  (table.Rows[i]["IsTransitionOfCare"].ToString());
-				refAttach.ProcNum           = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				refAttach.DateProcComplete  = PIn.Date  (table.Rows[i]["DateProcComplete"].ToString());
-				refAttach.ProvNum           = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				refAttach.RefAttachNum      = PIn.Long  (row["RefAttachNum"].ToString());
+				refAttach.ReferralNum       = PIn.Long  (row["ReferralNum"].ToString());
+				refAttach.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				refAttach.ItemOrder         = PIn.Int   (row["ItemOrder"].ToString());
+				refAttach.RefDate           = PIn.Date  (row["RefDate"].ToString());
+				refAttach.IsFrom            = PIn.Bool  (row["IsFrom"].ToString());
+				refAttach.RefToStatus       = (OpenDentBusiness.ReferralToStatus)PIn.Int(row["RefToStatus"].ToString());
+				refAttach.Note              = PIn.String(row["Note"].ToString());
+				refAttach.IsTransitionOfCare= PIn.Bool  (row["IsTransitionOfCare"].ToString());
+				refAttach.ProcNum           = PIn.Long  (row["ProcNum"].ToString());
+				refAttach.DateProcComplete  = PIn.Date  (row["DateProcComplete"].ToString());
+				refAttach.ProvNum           = PIn.Long  (row["ProvNum"].ToString());
 				retVal.Add(refAttach);
 			}
 			return retVal;

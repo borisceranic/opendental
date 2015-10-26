@@ -44,29 +44,29 @@ namespace OpenDentBusiness.Crud{
 		public static List<SheetFieldDef> TableToList(DataTable table){
 			List<SheetFieldDef> retVal=new List<SheetFieldDef>();
 			SheetFieldDef sheetFieldDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sheetFieldDef=new SheetFieldDef();
-				sheetFieldDef.SheetFieldDefNum= PIn.Long  (table.Rows[i]["SheetFieldDefNum"].ToString());
-				sheetFieldDef.SheetDefNum     = PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
-				sheetFieldDef.FieldType       = (OpenDentBusiness.SheetFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
-				sheetFieldDef.FieldName       = PIn.String(table.Rows[i]["FieldName"].ToString());
-				sheetFieldDef.FieldValue      = PIn.String(table.Rows[i]["FieldValue"].ToString());
-				sheetFieldDef.FontSize        = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				sheetFieldDef.FontName        = PIn.String(table.Rows[i]["FontName"].ToString());
-				sheetFieldDef.FontIsBold      = PIn.Bool  (table.Rows[i]["FontIsBold"].ToString());
-				sheetFieldDef.XPos            = PIn.Int   (table.Rows[i]["XPos"].ToString());
-				sheetFieldDef.YPos            = PIn.Int   (table.Rows[i]["YPos"].ToString());
-				sheetFieldDef.Width           = PIn.Int   (table.Rows[i]["Width"].ToString());
-				sheetFieldDef.Height          = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheetFieldDef.GrowthBehavior  = (OpenDentBusiness.GrowthBehaviorEnum)PIn.Int(table.Rows[i]["GrowthBehavior"].ToString());
-				sheetFieldDef.RadioButtonValue= PIn.String(table.Rows[i]["RadioButtonValue"].ToString());
-				sheetFieldDef.RadioButtonGroup= PIn.String(table.Rows[i]["RadioButtonGroup"].ToString());
-				sheetFieldDef.IsRequired      = PIn.Bool  (table.Rows[i]["IsRequired"].ToString());
-				sheetFieldDef.TabOrder        = PIn.Int   (table.Rows[i]["TabOrder"].ToString());
-				sheetFieldDef.ReportableName  = PIn.String(table.Rows[i]["ReportableName"].ToString());
-				sheetFieldDef.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(table.Rows[i]["TextAlign"].ToString());
-				sheetFieldDef.IsPaymentOption = PIn.Bool  (table.Rows[i]["IsPaymentOption"].ToString());
-				sheetFieldDef.ItemColor       = Color.FromArgb(PIn.Int(table.Rows[i]["ItemColor"].ToString()));
+				sheetFieldDef.SheetFieldDefNum= PIn.Long  (row["SheetFieldDefNum"].ToString());
+				sheetFieldDef.SheetDefNum     = PIn.Long  (row["SheetDefNum"].ToString());
+				sheetFieldDef.FieldType       = (OpenDentBusiness.SheetFieldType)PIn.Int(row["FieldType"].ToString());
+				sheetFieldDef.FieldName       = PIn.String(row["FieldName"].ToString());
+				sheetFieldDef.FieldValue      = PIn.String(row["FieldValue"].ToString());
+				sheetFieldDef.FontSize        = PIn.Float (row["FontSize"].ToString());
+				sheetFieldDef.FontName        = PIn.String(row["FontName"].ToString());
+				sheetFieldDef.FontIsBold      = PIn.Bool  (row["FontIsBold"].ToString());
+				sheetFieldDef.XPos            = PIn.Int   (row["XPos"].ToString());
+				sheetFieldDef.YPos            = PIn.Int   (row["YPos"].ToString());
+				sheetFieldDef.Width           = PIn.Int   (row["Width"].ToString());
+				sheetFieldDef.Height          = PIn.Int   (row["Height"].ToString());
+				sheetFieldDef.GrowthBehavior  = (OpenDentBusiness.GrowthBehaviorEnum)PIn.Int(row["GrowthBehavior"].ToString());
+				sheetFieldDef.RadioButtonValue= PIn.String(row["RadioButtonValue"].ToString());
+				sheetFieldDef.RadioButtonGroup= PIn.String(row["RadioButtonGroup"].ToString());
+				sheetFieldDef.IsRequired      = PIn.Bool  (row["IsRequired"].ToString());
+				sheetFieldDef.TabOrder        = PIn.Int   (row["TabOrder"].ToString());
+				sheetFieldDef.ReportableName  = PIn.String(row["ReportableName"].ToString());
+				sheetFieldDef.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(row["TextAlign"].ToString());
+				sheetFieldDef.IsPaymentOption = PIn.Bool  (row["IsPaymentOption"].ToString());
+				sheetFieldDef.ItemColor       = Color.FromArgb(PIn.Int(row["ItemColor"].ToString()));
 				retVal.Add(sheetFieldDef);
 			}
 			return retVal;

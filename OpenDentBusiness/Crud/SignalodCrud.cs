@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<Signalod> TableToList(DataTable table){
 			List<Signalod> retVal=new List<Signalod>();
 			Signalod signalod;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				signalod=new Signalod();
-				signalod.SignalNum  = PIn.Long  (table.Rows[i]["SignalNum"].ToString());
-				signalod.FromUser   = PIn.String(table.Rows[i]["FromUser"].ToString());
-				signalod.ITypes     = PIn.String(table.Rows[i]["ITypes"].ToString());
-				signalod.DateViewing= PIn.Date  (table.Rows[i]["DateViewing"].ToString());
-				signalod.SigType    = (OpenDentBusiness.SignalType)PIn.Int(table.Rows[i]["SigType"].ToString());
-				signalod.SigText    = PIn.String(table.Rows[i]["SigText"].ToString());
-				signalod.SigDateTime= PIn.DateT (table.Rows[i]["SigDateTime"].ToString());
-				signalod.ToUser     = PIn.String(table.Rows[i]["ToUser"].ToString());
-				signalod.AckTime    = PIn.DateT (table.Rows[i]["AckTime"].ToString());
-				signalod.TaskNum    = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
+				signalod.SignalNum  = PIn.Long  (row["SignalNum"].ToString());
+				signalod.FromUser   = PIn.String(row["FromUser"].ToString());
+				signalod.ITypes     = PIn.String(row["ITypes"].ToString());
+				signalod.DateViewing= PIn.Date  (row["DateViewing"].ToString());
+				signalod.SigType    = (OpenDentBusiness.SignalType)PIn.Int(row["SigType"].ToString());
+				signalod.SigText    = PIn.String(row["SigText"].ToString());
+				signalod.SigDateTime= PIn.DateT (row["SigDateTime"].ToString());
+				signalod.ToUser     = PIn.String(row["ToUser"].ToString());
+				signalod.AckTime    = PIn.DateT (row["AckTime"].ToString());
+				signalod.TaskNum    = PIn.Long  (row["TaskNum"].ToString());
 				retVal.Add(signalod);
 			}
 			return retVal;

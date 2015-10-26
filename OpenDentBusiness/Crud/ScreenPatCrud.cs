@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<ScreenPat> TableToList(DataTable table){
 			List<ScreenPat> retVal=new List<ScreenPat>();
 			ScreenPat screenPat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				screenPat=new ScreenPat();
-				screenPat.ScreenPatNum  = PIn.Long  (table.Rows[i]["ScreenPatNum"].ToString());
-				screenPat.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				screenPat.ScreenGroupNum= PIn.Long  (table.Rows[i]["ScreenGroupNum"].ToString());
-				screenPat.SheetNum      = PIn.Long  (table.Rows[i]["SheetNum"].ToString());
+				screenPat.ScreenPatNum  = PIn.Long  (row["ScreenPatNum"].ToString());
+				screenPat.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				screenPat.ScreenGroupNum= PIn.Long  (row["ScreenGroupNum"].ToString());
+				screenPat.SheetNum      = PIn.Long  (row["SheetNum"].ToString());
 				retVal.Add(screenPat);
 			}
 			return retVal;

@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<Ucum> TableToList(DataTable table){
 			List<Ucum> retVal=new List<Ucum>();
 			Ucum ucum;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ucum=new Ucum();
-				ucum.UcumNum    = PIn.Long  (table.Rows[i]["UcumNum"].ToString());
-				ucum.UcumCode   = PIn.String(table.Rows[i]["UcumCode"].ToString());
-				ucum.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				ucum.IsInUse    = PIn.Bool  (table.Rows[i]["IsInUse"].ToString());
+				ucum.UcumNum    = PIn.Long  (row["UcumNum"].ToString());
+				ucum.UcumCode   = PIn.String(row["UcumCode"].ToString());
+				ucum.Description= PIn.String(row["Description"].ToString());
+				ucum.IsInUse    = PIn.Bool  (row["IsInUse"].ToString());
 				retVal.Add(ucum);
 			}
 			return retVal;

@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<Benefit> TableToList(DataTable table){
 			List<Benefit> retVal=new List<Benefit>();
 			Benefit benefit;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				benefit=new Benefit();
-				benefit.BenefitNum       = PIn.Long  (table.Rows[i]["BenefitNum"].ToString());
-				benefit.PlanNum          = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
-				benefit.PatPlanNum       = PIn.Long  (table.Rows[i]["PatPlanNum"].ToString());
-				benefit.CovCatNum        = PIn.Long  (table.Rows[i]["CovCatNum"].ToString());
-				benefit.BenefitType      = (OpenDentBusiness.InsBenefitType)PIn.Int(table.Rows[i]["BenefitType"].ToString());
-				benefit.Percent          = PIn.Int   (table.Rows[i]["Percent"].ToString());
-				benefit.MonetaryAmt      = PIn.Double(table.Rows[i]["MonetaryAmt"].ToString());
-				benefit.TimePeriod       = (OpenDentBusiness.BenefitTimePeriod)PIn.Int(table.Rows[i]["TimePeriod"].ToString());
-				benefit.QuantityQualifier= (OpenDentBusiness.BenefitQuantity)PIn.Int(table.Rows[i]["QuantityQualifier"].ToString());
-				benefit.Quantity         = PIn.Byte  (table.Rows[i]["Quantity"].ToString());
-				benefit.CodeNum          = PIn.Long  (table.Rows[i]["CodeNum"].ToString());
-				benefit.CoverageLevel    = (OpenDentBusiness.BenefitCoverageLevel)PIn.Int(table.Rows[i]["CoverageLevel"].ToString());
+				benefit.BenefitNum       = PIn.Long  (row["BenefitNum"].ToString());
+				benefit.PlanNum          = PIn.Long  (row["PlanNum"].ToString());
+				benefit.PatPlanNum       = PIn.Long  (row["PatPlanNum"].ToString());
+				benefit.CovCatNum        = PIn.Long  (row["CovCatNum"].ToString());
+				benefit.BenefitType      = (OpenDentBusiness.InsBenefitType)PIn.Int(row["BenefitType"].ToString());
+				benefit.Percent          = PIn.Int   (row["Percent"].ToString());
+				benefit.MonetaryAmt      = PIn.Double(row["MonetaryAmt"].ToString());
+				benefit.TimePeriod       = (OpenDentBusiness.BenefitTimePeriod)PIn.Int(row["TimePeriod"].ToString());
+				benefit.QuantityQualifier= (OpenDentBusiness.BenefitQuantity)PIn.Int(row["QuantityQualifier"].ToString());
+				benefit.Quantity         = PIn.Byte  (row["Quantity"].ToString());
+				benefit.CodeNum          = PIn.Long  (row["CodeNum"].ToString());
+				benefit.CoverageLevel    = (OpenDentBusiness.BenefitCoverageLevel)PIn.Int(row["CoverageLevel"].ToString());
 				retVal.Add(benefit);
 			}
 			return retVal;

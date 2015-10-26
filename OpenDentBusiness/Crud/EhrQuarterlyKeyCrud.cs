@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrQuarterlyKey> TableToList(DataTable table){
 			List<EhrQuarterlyKey> retVal=new List<EhrQuarterlyKey>();
 			EhrQuarterlyKey ehrQuarterlyKey;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrQuarterlyKey=new EhrQuarterlyKey();
-				ehrQuarterlyKey.EhrQuarterlyKeyNum= PIn.Long  (table.Rows[i]["EhrQuarterlyKeyNum"].ToString());
-				ehrQuarterlyKey.YearValue         = PIn.Int   (table.Rows[i]["YearValue"].ToString());
-				ehrQuarterlyKey.QuarterValue      = PIn.Int   (table.Rows[i]["QuarterValue"].ToString());
-				ehrQuarterlyKey.PracticeName      = PIn.String(table.Rows[i]["PracticeName"].ToString());
-				ehrQuarterlyKey.KeyValue          = PIn.String(table.Rows[i]["KeyValue"].ToString());
-				ehrQuarterlyKey.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrQuarterlyKey.Notes             = PIn.String(table.Rows[i]["Notes"].ToString());
+				ehrQuarterlyKey.EhrQuarterlyKeyNum= PIn.Long  (row["EhrQuarterlyKeyNum"].ToString());
+				ehrQuarterlyKey.YearValue         = PIn.Int   (row["YearValue"].ToString());
+				ehrQuarterlyKey.QuarterValue      = PIn.Int   (row["QuarterValue"].ToString());
+				ehrQuarterlyKey.PracticeName      = PIn.String(row["PracticeName"].ToString());
+				ehrQuarterlyKey.KeyValue          = PIn.String(row["KeyValue"].ToString());
+				ehrQuarterlyKey.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				ehrQuarterlyKey.Notes             = PIn.String(row["Notes"].ToString());
 				retVal.Add(ehrQuarterlyKey);
 			}
 			return retVal;

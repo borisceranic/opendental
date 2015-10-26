@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<EmailMessageUid> TableToList(DataTable table){
 			List<EmailMessageUid> retVal=new List<EmailMessageUid>();
 			EmailMessageUid emailMessageUid;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				emailMessageUid=new EmailMessageUid();
-				emailMessageUid.EmailMessageUidNum= PIn.Long  (table.Rows[i]["EmailMessageUidNum"].ToString());
-				emailMessageUid.MsgId             = PIn.String(table.Rows[i]["MsgId"].ToString());
-				emailMessageUid.RecipientAddress  = PIn.String(table.Rows[i]["RecipientAddress"].ToString());
+				emailMessageUid.EmailMessageUidNum= PIn.Long  (row["EmailMessageUidNum"].ToString());
+				emailMessageUid.MsgId             = PIn.String(row["MsgId"].ToString());
+				emailMessageUid.RecipientAddress  = PIn.String(row["RecipientAddress"].ToString());
 				retVal.Add(emailMessageUid);
 			}
 			return retVal;

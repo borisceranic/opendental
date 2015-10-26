@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PlannedAppt> TableToList(DataTable table){
 			List<PlannedAppt> retVal=new List<PlannedAppt>();
 			PlannedAppt plannedAppt;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				plannedAppt=new PlannedAppt();
-				plannedAppt.PlannedApptNum= PIn.Long  (table.Rows[i]["PlannedApptNum"].ToString());
-				plannedAppt.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				plannedAppt.AptNum        = PIn.Long  (table.Rows[i]["AptNum"].ToString());
-				plannedAppt.ItemOrder     = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
+				plannedAppt.PlannedApptNum= PIn.Long  (row["PlannedApptNum"].ToString());
+				plannedAppt.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				plannedAppt.AptNum        = PIn.Long  (row["AptNum"].ToString());
+				plannedAppt.ItemOrder     = PIn.Int   (row["ItemOrder"].ToString());
 				retVal.Add(plannedAppt);
 			}
 			return retVal;

@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PayPeriod> TableToList(DataTable table){
 			List<PayPeriod> retVal=new List<PayPeriod>();
 			PayPeriod payPeriod;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				payPeriod=new PayPeriod();
-				payPeriod.PayPeriodNum= PIn.Long  (table.Rows[i]["PayPeriodNum"].ToString());
-				payPeriod.DateStart   = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				payPeriod.DateStop    = PIn.Date  (table.Rows[i]["DateStop"].ToString());
-				payPeriod.DatePaycheck= PIn.Date  (table.Rows[i]["DatePaycheck"].ToString());
+				payPeriod.PayPeriodNum= PIn.Long  (row["PayPeriodNum"].ToString());
+				payPeriod.DateStart   = PIn.Date  (row["DateStart"].ToString());
+				payPeriod.DateStop    = PIn.Date  (row["DateStop"].ToString());
+				payPeriod.DatePaycheck= PIn.Date  (row["DatePaycheck"].ToString());
 				retVal.Add(payPeriod);
 			}
 			return retVal;

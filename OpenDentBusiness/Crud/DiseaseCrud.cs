@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<Disease> TableToList(DataTable table){
 			List<Disease> retVal=new List<Disease>();
 			Disease disease;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				disease=new Disease();
-				disease.DiseaseNum       = PIn.Long  (table.Rows[i]["DiseaseNum"].ToString());
-				disease.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				disease.DiseaseDefNum    = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
-				disease.PatNote          = PIn.String(table.Rows[i]["PatNote"].ToString());
-				disease.DateTStamp       = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				disease.ProbStatus       = (OpenDentBusiness.ProblemStatus)PIn.Int(table.Rows[i]["ProbStatus"].ToString());
-				disease.DateStart        = PIn.Date  (table.Rows[i]["DateStart"].ToString());
-				disease.DateStop         = PIn.Date  (table.Rows[i]["DateStop"].ToString());
-				disease.SnomedProblemType= PIn.String(table.Rows[i]["SnomedProblemType"].ToString());
-				disease.FunctionStatus   = (OpenDentBusiness.FunctionalStatus)PIn.Int(table.Rows[i]["FunctionStatus"].ToString());
+				disease.DiseaseNum       = PIn.Long  (row["DiseaseNum"].ToString());
+				disease.PatNum           = PIn.Long  (row["PatNum"].ToString());
+				disease.DiseaseDefNum    = PIn.Long  (row["DiseaseDefNum"].ToString());
+				disease.PatNote          = PIn.String(row["PatNote"].ToString());
+				disease.DateTStamp       = PIn.DateT (row["DateTStamp"].ToString());
+				disease.ProbStatus       = (OpenDentBusiness.ProblemStatus)PIn.Int(row["ProbStatus"].ToString());
+				disease.DateStart        = PIn.Date  (row["DateStart"].ToString());
+				disease.DateStop         = PIn.Date  (row["DateStop"].ToString());
+				disease.SnomedProblemType= PIn.String(row["SnomedProblemType"].ToString());
+				disease.FunctionStatus   = (OpenDentBusiness.FunctionalStatus)PIn.Int(row["FunctionStatus"].ToString());
 				retVal.Add(disease);
 			}
 			return retVal;

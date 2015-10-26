@@ -44,28 +44,28 @@ namespace OpenDentBusiness.Crud{
 		public static List<SheetField> TableToList(DataTable table){
 			List<SheetField> retVal=new List<SheetField>();
 			SheetField sheetField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sheetField=new SheetField();
-				sheetField.SheetFieldNum   = PIn.Long  (table.Rows[i]["SheetFieldNum"].ToString());
-				sheetField.SheetNum        = PIn.Long  (table.Rows[i]["SheetNum"].ToString());
-				sheetField.FieldType       = (OpenDentBusiness.SheetFieldType)PIn.Int(table.Rows[i]["FieldType"].ToString());
-				sheetField.FieldName       = PIn.String(table.Rows[i]["FieldName"].ToString());
-				sheetField.FieldValue      = PIn.String(table.Rows[i]["FieldValue"].ToString());
-				sheetField.FontSize        = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				sheetField.FontName        = PIn.String(table.Rows[i]["FontName"].ToString());
-				sheetField.FontIsBold      = PIn.Bool  (table.Rows[i]["FontIsBold"].ToString());
-				sheetField.XPos            = PIn.Int   (table.Rows[i]["XPos"].ToString());
-				sheetField.YPos            = PIn.Int   (table.Rows[i]["YPos"].ToString());
-				sheetField.Width           = PIn.Int   (table.Rows[i]["Width"].ToString());
-				sheetField.Height          = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheetField.GrowthBehavior  = (OpenDentBusiness.GrowthBehaviorEnum)PIn.Int(table.Rows[i]["GrowthBehavior"].ToString());
-				sheetField.RadioButtonValue= PIn.String(table.Rows[i]["RadioButtonValue"].ToString());
-				sheetField.RadioButtonGroup= PIn.String(table.Rows[i]["RadioButtonGroup"].ToString());
-				sheetField.IsRequired      = PIn.Bool  (table.Rows[i]["IsRequired"].ToString());
-				sheetField.TabOrder        = PIn.Int   (table.Rows[i]["TabOrder"].ToString());
-				sheetField.ReportableName  = PIn.String(table.Rows[i]["ReportableName"].ToString());
-				sheetField.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(table.Rows[i]["TextAlign"].ToString());
-				sheetField.ItemColor       = Color.FromArgb(PIn.Int(table.Rows[i]["ItemColor"].ToString()));
+				sheetField.SheetFieldNum   = PIn.Long  (row["SheetFieldNum"].ToString());
+				sheetField.SheetNum        = PIn.Long  (row["SheetNum"].ToString());
+				sheetField.FieldType       = (OpenDentBusiness.SheetFieldType)PIn.Int(row["FieldType"].ToString());
+				sheetField.FieldName       = PIn.String(row["FieldName"].ToString());
+				sheetField.FieldValue      = PIn.String(row["FieldValue"].ToString());
+				sheetField.FontSize        = PIn.Float (row["FontSize"].ToString());
+				sheetField.FontName        = PIn.String(row["FontName"].ToString());
+				sheetField.FontIsBold      = PIn.Bool  (row["FontIsBold"].ToString());
+				sheetField.XPos            = PIn.Int   (row["XPos"].ToString());
+				sheetField.YPos            = PIn.Int   (row["YPos"].ToString());
+				sheetField.Width           = PIn.Int   (row["Width"].ToString());
+				sheetField.Height          = PIn.Int   (row["Height"].ToString());
+				sheetField.GrowthBehavior  = (OpenDentBusiness.GrowthBehaviorEnum)PIn.Int(row["GrowthBehavior"].ToString());
+				sheetField.RadioButtonValue= PIn.String(row["RadioButtonValue"].ToString());
+				sheetField.RadioButtonGroup= PIn.String(row["RadioButtonGroup"].ToString());
+				sheetField.IsRequired      = PIn.Bool  (row["IsRequired"].ToString());
+				sheetField.TabOrder        = PIn.Int   (row["TabOrder"].ToString());
+				sheetField.ReportableName  = PIn.String(row["ReportableName"].ToString());
+				sheetField.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(row["TextAlign"].ToString());
+				sheetField.ItemColor       = Color.FromArgb(PIn.Int(row["ItemColor"].ToString()));
 				retVal.Add(sheetField);
 			}
 			return retVal;

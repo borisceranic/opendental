@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<PhoneEmpDefault> TableToList(DataTable table){
 			List<PhoneEmpDefault> retVal=new List<PhoneEmpDefault>();
 			PhoneEmpDefault phoneEmpDefault;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phoneEmpDefault=new PhoneEmpDefault();
-				phoneEmpDefault.EmployeeNum     = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				phoneEmpDefault.IsGraphed       = PIn.Bool  (table.Rows[i]["IsGraphed"].ToString());
-				phoneEmpDefault.HasColor        = PIn.Bool  (table.Rows[i]["HasColor"].ToString());
-				phoneEmpDefault.RingGroups      = (OpenDentBusiness.AsteriskRingGroups)PIn.Int(table.Rows[i]["RingGroups"].ToString());
-				phoneEmpDefault.EmpName         = PIn.String(table.Rows[i]["EmpName"].ToString());
-				phoneEmpDefault.PhoneExt        = PIn.Int   (table.Rows[i]["PhoneExt"].ToString());
-				phoneEmpDefault.StatusOverride  = (OpenDentBusiness.PhoneEmpStatusOverride)PIn.Int(table.Rows[i]["StatusOverride"].ToString());
-				phoneEmpDefault.Notes           = PIn.String(table.Rows[i]["Notes"].ToString());
-				phoneEmpDefault.ComputerName    = PIn.String(table.Rows[i]["ComputerName"].ToString());
-				phoneEmpDefault.IsPrivateScreen = PIn.Bool  (table.Rows[i]["IsPrivateScreen"].ToString());
-				phoneEmpDefault.IsTriageOperator= PIn.Bool  (table.Rows[i]["IsTriageOperator"].ToString());
-				phoneEmpDefault.EscalationOrder = PIn.Int   (table.Rows[i]["EscalationOrder"].ToString());
+				phoneEmpDefault.EmployeeNum     = PIn.Long  (row["EmployeeNum"].ToString());
+				phoneEmpDefault.IsGraphed       = PIn.Bool  (row["IsGraphed"].ToString());
+				phoneEmpDefault.HasColor        = PIn.Bool  (row["HasColor"].ToString());
+				phoneEmpDefault.RingGroups      = (OpenDentBusiness.AsteriskRingGroups)PIn.Int(row["RingGroups"].ToString());
+				phoneEmpDefault.EmpName         = PIn.String(row["EmpName"].ToString());
+				phoneEmpDefault.PhoneExt        = PIn.Int   (row["PhoneExt"].ToString());
+				phoneEmpDefault.StatusOverride  = (OpenDentBusiness.PhoneEmpStatusOverride)PIn.Int(row["StatusOverride"].ToString());
+				phoneEmpDefault.Notes           = PIn.String(row["Notes"].ToString());
+				phoneEmpDefault.ComputerName    = PIn.String(row["ComputerName"].ToString());
+				phoneEmpDefault.IsPrivateScreen = PIn.Bool  (row["IsPrivateScreen"].ToString());
+				phoneEmpDefault.IsTriageOperator= PIn.Bool  (row["IsTriageOperator"].ToString());
+				phoneEmpDefault.EscalationOrder = PIn.Int   (row["EscalationOrder"].ToString());
 				retVal.Add(phoneEmpDefault);
 			}
 			return retVal;

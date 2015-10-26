@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<CodeSystem> TableToList(DataTable table){
 			List<CodeSystem> retVal=new List<CodeSystem>();
 			CodeSystem codeSystem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				codeSystem=new CodeSystem();
-				codeSystem.CodeSystemNum = PIn.Long  (table.Rows[i]["CodeSystemNum"].ToString());
-				codeSystem.CodeSystemName= PIn.String(table.Rows[i]["CodeSystemName"].ToString());
-				codeSystem.VersionCur    = PIn.String(table.Rows[i]["VersionCur"].ToString());
-				codeSystem.VersionAvail  = PIn.String(table.Rows[i]["VersionAvail"].ToString());
-				codeSystem.HL7OID        = PIn.String(table.Rows[i]["HL7OID"].ToString());
-				codeSystem.Note          = PIn.String(table.Rows[i]["Note"].ToString());
+				codeSystem.CodeSystemNum = PIn.Long  (row["CodeSystemNum"].ToString());
+				codeSystem.CodeSystemName= PIn.String(row["CodeSystemName"].ToString());
+				codeSystem.VersionCur    = PIn.String(row["VersionCur"].ToString());
+				codeSystem.VersionAvail  = PIn.String(row["VersionAvail"].ToString());
+				codeSystem.HL7OID        = PIn.String(row["HL7OID"].ToString());
+				codeSystem.Note          = PIn.String(row["Note"].ToString());
 				retVal.Add(codeSystem);
 			}
 			return retVal;

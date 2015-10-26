@@ -44,31 +44,31 @@ namespace OpenDentBusiness.Crud{
 		public static List<Document> TableToList(DataTable table){
 			List<Document> retVal=new List<Document>();
 			Document document;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				document=new Document();
-				document.DocNum        = PIn.Long  (table.Rows[i]["DocNum"].ToString());
-				document.Description   = PIn.String(table.Rows[i]["Description"].ToString());
-				document.DateCreated   = PIn.DateT (table.Rows[i]["DateCreated"].ToString());
-				document.DocCategory   = PIn.Long  (table.Rows[i]["DocCategory"].ToString());
-				document.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				document.FileName      = PIn.String(table.Rows[i]["FileName"].ToString());
-				document.ImgType       = (OpenDentBusiness.ImageType)PIn.Int(table.Rows[i]["ImgType"].ToString());
-				document.IsFlipped     = PIn.Bool  (table.Rows[i]["IsFlipped"].ToString());
-				document.DegreesRotated= PIn.Int   (table.Rows[i]["DegreesRotated"].ToString());
-				document.ToothNumbers  = PIn.String(table.Rows[i]["ToothNumbers"].ToString());
-				document.Note          = PIn.String(table.Rows[i]["Note"].ToString());
-				document.SigIsTopaz    = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
-				document.Signature     = PIn.String(table.Rows[i]["Signature"].ToString());
-				document.CropX         = PIn.Int   (table.Rows[i]["CropX"].ToString());
-				document.CropY         = PIn.Int   (table.Rows[i]["CropY"].ToString());
-				document.CropW         = PIn.Int   (table.Rows[i]["CropW"].ToString());
-				document.CropH         = PIn.Int   (table.Rows[i]["CropH"].ToString());
-				document.WindowingMin  = PIn.Int   (table.Rows[i]["WindowingMin"].ToString());
-				document.WindowingMax  = PIn.Int   (table.Rows[i]["WindowingMax"].ToString());
-				document.MountItemNum  = PIn.Long  (table.Rows[i]["MountItemNum"].ToString());
-				document.DateTStamp    = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				document.RawBase64     = PIn.String(table.Rows[i]["RawBase64"].ToString());
-				document.Thumbnail     = PIn.String(table.Rows[i]["Thumbnail"].ToString());
+				document.DocNum        = PIn.Long  (row["DocNum"].ToString());
+				document.Description   = PIn.String(row["Description"].ToString());
+				document.DateCreated   = PIn.DateT (row["DateCreated"].ToString());
+				document.DocCategory   = PIn.Long  (row["DocCategory"].ToString());
+				document.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				document.FileName      = PIn.String(row["FileName"].ToString());
+				document.ImgType       = (OpenDentBusiness.ImageType)PIn.Int(row["ImgType"].ToString());
+				document.IsFlipped     = PIn.Bool  (row["IsFlipped"].ToString());
+				document.DegreesRotated= PIn.Int   (row["DegreesRotated"].ToString());
+				document.ToothNumbers  = PIn.String(row["ToothNumbers"].ToString());
+				document.Note          = PIn.String(row["Note"].ToString());
+				document.SigIsTopaz    = PIn.Bool  (row["SigIsTopaz"].ToString());
+				document.Signature     = PIn.String(row["Signature"].ToString());
+				document.CropX         = PIn.Int   (row["CropX"].ToString());
+				document.CropY         = PIn.Int   (row["CropY"].ToString());
+				document.CropW         = PIn.Int   (row["CropW"].ToString());
+				document.CropH         = PIn.Int   (row["CropH"].ToString());
+				document.WindowingMin  = PIn.Int   (row["WindowingMin"].ToString());
+				document.WindowingMax  = PIn.Int   (row["WindowingMax"].ToString());
+				document.MountItemNum  = PIn.Long  (row["MountItemNum"].ToString());
+				document.DateTStamp    = PIn.DateT (row["DateTStamp"].ToString());
+				document.RawBase64     = PIn.String(row["RawBase64"].ToString());
+				document.Thumbnail     = PIn.String(row["Thumbnail"].ToString());
 				retVal.Add(document);
 			}
 			return retVal;

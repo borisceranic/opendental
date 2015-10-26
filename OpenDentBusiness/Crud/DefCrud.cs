@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<Def> TableToList(DataTable table){
 			List<Def> retVal=new List<Def>();
 			Def def;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				def=new Def();
-				def.DefNum   = PIn.Long  (table.Rows[i]["DefNum"].ToString());
-				def.Category = (OpenDentBusiness.DefCat)PIn.Int(table.Rows[i]["Category"].ToString());
-				def.ItemOrder= PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				def.ItemName = PIn.String(table.Rows[i]["ItemName"].ToString());
-				def.ItemValue= PIn.String(table.Rows[i]["ItemValue"].ToString());
-				def.ItemColor= Color.FromArgb(PIn.Int(table.Rows[i]["ItemColor"].ToString()));
-				def.IsHidden = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
+				def.DefNum   = PIn.Long  (row["DefNum"].ToString());
+				def.Category = (OpenDentBusiness.DefCat)PIn.Int(row["Category"].ToString());
+				def.ItemOrder= PIn.Int   (row["ItemOrder"].ToString());
+				def.ItemName = PIn.String(row["ItemName"].ToString());
+				def.ItemValue= PIn.String(row["ItemValue"].ToString());
+				def.ItemColor= Color.FromArgb(PIn.Int(row["ItemColor"].ToString()));
+				def.IsHidden = PIn.Bool  (row["IsHidden"].ToString());
 				retVal.Add(def);
 			}
 			return retVal;

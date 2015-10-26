@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskList> TableToList(DataTable table){
 			List<TaskList> retVal=new List<TaskList>();
 			TaskList taskList;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskList=new TaskList();
-				taskList.TaskListNum  = PIn.Long  (table.Rows[i]["TaskListNum"].ToString());
-				taskList.Descript     = PIn.String(table.Rows[i]["Descript"].ToString());
-				taskList.Parent       = PIn.Long  (table.Rows[i]["Parent"].ToString());
-				taskList.DateTL       = PIn.Date  (table.Rows[i]["DateTL"].ToString());
-				taskList.IsRepeating  = PIn.Bool  (table.Rows[i]["IsRepeating"].ToString());
-				taskList.DateType     = (OpenDentBusiness.TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
-				taskList.FromNum      = PIn.Long  (table.Rows[i]["FromNum"].ToString());
-				taskList.ObjectType   = (OpenDentBusiness.TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
-				taskList.DateTimeEntry= PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
+				taskList.TaskListNum  = PIn.Long  (row["TaskListNum"].ToString());
+				taskList.Descript     = PIn.String(row["Descript"].ToString());
+				taskList.Parent       = PIn.Long  (row["Parent"].ToString());
+				taskList.DateTL       = PIn.Date  (row["DateTL"].ToString());
+				taskList.IsRepeating  = PIn.Bool  (row["IsRepeating"].ToString());
+				taskList.DateType     = (OpenDentBusiness.TaskDateType)PIn.Int(row["DateType"].ToString());
+				taskList.FromNum      = PIn.Long  (row["FromNum"].ToString());
+				taskList.ObjectType   = (OpenDentBusiness.TaskObjectType)PIn.Int(row["ObjectType"].ToString());
+				taskList.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
 				retVal.Add(taskList);
 			}
 			return retVal;

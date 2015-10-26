@@ -44,21 +44,21 @@ namespace OpenDentBusiness.Crud{
 		public static List<PayPlan> TableToList(DataTable table){
 			List<PayPlan> retVal=new List<PayPlan>();
 			PayPlan payPlan;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				payPlan=new PayPlan();
-				payPlan.PayPlanNum      = PIn.Long  (table.Rows[i]["PayPlanNum"].ToString());
-				payPlan.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				payPlan.Guarantor       = PIn.Long  (table.Rows[i]["Guarantor"].ToString());
-				payPlan.PayPlanDate     = PIn.Date  (table.Rows[i]["PayPlanDate"].ToString());
-				payPlan.APR             = PIn.Double(table.Rows[i]["APR"].ToString());
-				payPlan.Note            = PIn.String(table.Rows[i]["Note"].ToString());
-				payPlan.PlanNum         = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
-				payPlan.CompletedAmt    = PIn.Double(table.Rows[i]["CompletedAmt"].ToString());
-				payPlan.InsSubNum       = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
-				payPlan.PaySchedule     = (OpenDentBusiness.PaymentSchedule)PIn.Int(table.Rows[i]["PaySchedule"].ToString());
-				payPlan.NumberOfPayments= PIn.Int   (table.Rows[i]["NumberOfPayments"].ToString());
-				payPlan.PayAmt          = PIn.Double(table.Rows[i]["PayAmt"].ToString());
-				payPlan.DownPayment     = PIn.Double(table.Rows[i]["DownPayment"].ToString());
+				payPlan.PayPlanNum      = PIn.Long  (row["PayPlanNum"].ToString());
+				payPlan.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				payPlan.Guarantor       = PIn.Long  (row["Guarantor"].ToString());
+				payPlan.PayPlanDate     = PIn.Date  (row["PayPlanDate"].ToString());
+				payPlan.APR             = PIn.Double(row["APR"].ToString());
+				payPlan.Note            = PIn.String(row["Note"].ToString());
+				payPlan.PlanNum         = PIn.Long  (row["PlanNum"].ToString());
+				payPlan.CompletedAmt    = PIn.Double(row["CompletedAmt"].ToString());
+				payPlan.InsSubNum       = PIn.Long  (row["InsSubNum"].ToString());
+				payPlan.PaySchedule     = (OpenDentBusiness.PaymentSchedule)PIn.Int(row["PaySchedule"].ToString());
+				payPlan.NumberOfPayments= PIn.Int   (row["NumberOfPayments"].ToString());
+				payPlan.PayAmt          = PIn.Double(row["PayAmt"].ToString());
+				payPlan.DownPayment     = PIn.Double(row["DownPayment"].ToString());
 				retVal.Add(payPlan);
 			}
 			return retVal;

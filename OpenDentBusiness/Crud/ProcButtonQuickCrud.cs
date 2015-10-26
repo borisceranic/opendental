@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcButtonQuick> TableToList(DataTable table){
 			List<ProcButtonQuick> retVal=new List<ProcButtonQuick>();
 			ProcButtonQuick procButtonQuick;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procButtonQuick=new ProcButtonQuick();
-				procButtonQuick.ProcButtonQuickNum= PIn.Long  (table.Rows[i]["ProcButtonQuickNum"].ToString());
-				procButtonQuick.Description       = PIn.String(table.Rows[i]["Description"].ToString());
-				procButtonQuick.CodeValue         = PIn.String(table.Rows[i]["CodeValue"].ToString());
-				procButtonQuick.Surf              = PIn.String(table.Rows[i]["Surf"].ToString());
-				procButtonQuick.YPos              = PIn.Int   (table.Rows[i]["YPos"].ToString());
-				procButtonQuick.ItemOrder         = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				procButtonQuick.IsLabel           = PIn.Bool  (table.Rows[i]["IsLabel"].ToString());
+				procButtonQuick.ProcButtonQuickNum= PIn.Long  (row["ProcButtonQuickNum"].ToString());
+				procButtonQuick.Description       = PIn.String(row["Description"].ToString());
+				procButtonQuick.CodeValue         = PIn.String(row["CodeValue"].ToString());
+				procButtonQuick.Surf              = PIn.String(row["Surf"].ToString());
+				procButtonQuick.YPos              = PIn.Int   (row["YPos"].ToString());
+				procButtonQuick.ItemOrder         = PIn.Int   (row["ItemOrder"].ToString());
+				procButtonQuick.IsLabel           = PIn.Bool  (row["IsLabel"].ToString());
 				retVal.Add(procButtonQuick);
 			}
 			return retVal;

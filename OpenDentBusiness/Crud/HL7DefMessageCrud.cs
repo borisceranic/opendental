@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<HL7DefMessage> TableToList(DataTable table){
 			List<HL7DefMessage> retVal=new List<HL7DefMessage>();
 			HL7DefMessage hL7DefMessage;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				hL7DefMessage=new HL7DefMessage();
-				hL7DefMessage.HL7DefMessageNum= PIn.Long  (table.Rows[i]["HL7DefMessageNum"].ToString());
-				hL7DefMessage.HL7DefNum       = PIn.Long  (table.Rows[i]["HL7DefNum"].ToString());
-				string messageType=table.Rows[i]["MessageType"].ToString();
+				hL7DefMessage.HL7DefMessageNum= PIn.Long  (row["HL7DefMessageNum"].ToString());
+				hL7DefMessage.HL7DefNum       = PIn.Long  (row["HL7DefNum"].ToString());
+				string messageType=row["MessageType"].ToString();
 				if(messageType==""){
 					hL7DefMessage.MessageType   =(MessageTypeHL7)0;
 				}
@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7DefMessage.MessageType   =(MessageTypeHL7)0;
 				}
-				string eventType=table.Rows[i]["EventType"].ToString();
+				string eventType=row["EventType"].ToString();
 				if(eventType==""){
 					hL7DefMessage.EventType     =(EventTypeHL7)0;
 				}
@@ -68,10 +68,10 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7DefMessage.EventType     =(EventTypeHL7)0;
 				}
-				hL7DefMessage.InOrOut         = (OpenDentBusiness.InOutHL7)PIn.Int(table.Rows[i]["InOrOut"].ToString());
-				hL7DefMessage.ItemOrder       = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				hL7DefMessage.Note            = PIn.String(table.Rows[i]["Note"].ToString());
-				string messageStructure=table.Rows[i]["MessageStructure"].ToString();
+				hL7DefMessage.InOrOut         = (OpenDentBusiness.InOutHL7)PIn.Int(row["InOrOut"].ToString());
+				hL7DefMessage.ItemOrder       = PIn.Int   (row["ItemOrder"].ToString());
+				hL7DefMessage.Note            = PIn.String(row["Note"].ToString());
+				string messageStructure=row["MessageStructure"].ToString();
 				if(messageStructure==""){
 					hL7DefMessage.MessageStructure=(MessageStructureHL7)0;
 				}

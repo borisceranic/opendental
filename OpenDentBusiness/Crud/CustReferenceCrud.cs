@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<CustReference> TableToList(DataTable table){
 			List<CustReference> retVal=new List<CustReference>();
 			CustReference custReference;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				custReference=new CustReference();
-				custReference.CustReferenceNum= PIn.Long  (table.Rows[i]["CustReferenceNum"].ToString());
-				custReference.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				custReference.DateMostRecent  = PIn.Date  (table.Rows[i]["DateMostRecent"].ToString());
-				custReference.Note            = PIn.String(table.Rows[i]["Note"].ToString());
-				custReference.IsBadRef        = PIn.Bool  (table.Rows[i]["IsBadRef"].ToString());
+				custReference.CustReferenceNum= PIn.Long  (row["CustReferenceNum"].ToString());
+				custReference.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				custReference.DateMostRecent  = PIn.Date  (row["DateMostRecent"].ToString());
+				custReference.Note            = PIn.String(row["Note"].ToString());
+				custReference.IsBadRef        = PIn.Bool  (row["IsBadRef"].ToString());
 				retVal.Add(custReference);
 			}
 			return retVal;

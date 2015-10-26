@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<LetterMergeField> TableToList(DataTable table){
 			List<LetterMergeField> retVal=new List<LetterMergeField>();
 			LetterMergeField letterMergeField;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				letterMergeField=new LetterMergeField();
-				letterMergeField.FieldNum      = PIn.Long  (table.Rows[i]["FieldNum"].ToString());
-				letterMergeField.LetterMergeNum= PIn.Long  (table.Rows[i]["LetterMergeNum"].ToString());
-				letterMergeField.FieldName     = PIn.String(table.Rows[i]["FieldName"].ToString());
+				letterMergeField.FieldNum      = PIn.Long  (row["FieldNum"].ToString());
+				letterMergeField.LetterMergeNum= PIn.Long  (row["LetterMergeNum"].ToString());
+				letterMergeField.FieldName     = PIn.String(row["FieldName"].ToString());
 				retVal.Add(letterMergeField);
 			}
 			return retVal;

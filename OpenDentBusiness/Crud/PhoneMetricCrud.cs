@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<PhoneMetric> TableToList(DataTable table){
 			List<PhoneMetric> retVal=new List<PhoneMetric>();
 			PhoneMetric phoneMetric;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				phoneMetric=new PhoneMetric();
-				phoneMetric.PhoneMetricNum= PIn.Long  (table.Rows[i]["PhoneMetricNum"].ToString());
-				phoneMetric.DateTimeEntry = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				phoneMetric.VoiceMails    = PIn.Int   (table.Rows[i]["VoiceMails"].ToString());
-				phoneMetric.Triages       = PIn.Int   (table.Rows[i]["Triages"].ToString());
-				phoneMetric.MinutesBehind = PIn.Int   (table.Rows[i]["MinutesBehind"].ToString());
+				phoneMetric.PhoneMetricNum= PIn.Long  (row["PhoneMetricNum"].ToString());
+				phoneMetric.DateTimeEntry = PIn.DateT (row["DateTimeEntry"].ToString());
+				phoneMetric.VoiceMails    = PIn.Int   (row["VoiceMails"].ToString());
+				phoneMetric.Triages       = PIn.Int   (row["Triages"].ToString());
+				phoneMetric.MinutesBehind = PIn.Int   (row["MinutesBehind"].ToString());
 				retVal.Add(phoneMetric);
 			}
 			return retVal;

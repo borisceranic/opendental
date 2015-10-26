@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Employer> TableToList(DataTable table){
 			List<Employer> retVal=new List<Employer>();
 			Employer employer;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				employer=new Employer();
-				employer.EmployerNum= PIn.Long  (table.Rows[i]["EmployerNum"].ToString());
-				employer.EmpName    = PIn.String(table.Rows[i]["EmpName"].ToString());
-				employer.Address    = PIn.String(table.Rows[i]["Address"].ToString());
-				employer.Address2   = PIn.String(table.Rows[i]["Address2"].ToString());
-				employer.City       = PIn.String(table.Rows[i]["City"].ToString());
-				employer.State      = PIn.String(table.Rows[i]["State"].ToString());
-				employer.Zip        = PIn.String(table.Rows[i]["Zip"].ToString());
-				employer.Phone      = PIn.String(table.Rows[i]["Phone"].ToString());
+				employer.EmployerNum= PIn.Long  (row["EmployerNum"].ToString());
+				employer.EmpName    = PIn.String(row["EmpName"].ToString());
+				employer.Address    = PIn.String(row["Address"].ToString());
+				employer.Address2   = PIn.String(row["Address2"].ToString());
+				employer.City       = PIn.String(row["City"].ToString());
+				employer.State      = PIn.String(row["State"].ToString());
+				employer.Zip        = PIn.String(row["Zip"].ToString());
+				employer.Phone      = PIn.String(row["Phone"].ToString());
 				retVal.Add(employer);
 			}
 			return retVal;

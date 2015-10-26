@@ -44,10 +44,10 @@ namespace OpenDentBusiness.Crud{
 		public static List<DictCustom> TableToList(DataTable table){
 			List<DictCustom> retVal=new List<DictCustom>();
 			DictCustom dictCustom;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				dictCustom=new DictCustom();
-				dictCustom.DictCustomNum= PIn.Long  (table.Rows[i]["DictCustomNum"].ToString());
-				dictCustom.WordText     = PIn.String(table.Rows[i]["WordText"].ToString());
+				dictCustom.DictCustomNum= PIn.Long  (row["DictCustomNum"].ToString());
+				dictCustom.WordText     = PIn.String(row["WordText"].ToString());
 				retVal.Add(dictCustom);
 			}
 			return retVal;

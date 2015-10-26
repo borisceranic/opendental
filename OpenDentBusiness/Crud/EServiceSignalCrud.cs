@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<EServiceSignal> TableToList(DataTable table){
 			List<EServiceSignal> retVal=new List<EServiceSignal>();
 			EServiceSignal eServiceSignal;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				eServiceSignal=new EServiceSignal();
-				eServiceSignal.EServiceSignalNum= PIn.Long  (table.Rows[i]["EServiceSignalNum"].ToString());
-				eServiceSignal.ServiceCode      = PIn.Int   (table.Rows[i]["ServiceCode"].ToString());
-				eServiceSignal.ReasonCategory   = PIn.Int   (table.Rows[i]["ReasonCategory"].ToString());
-				eServiceSignal.ReasonCode       = PIn.Int   (table.Rows[i]["ReasonCode"].ToString());
-				eServiceSignal.Severity         = (OpenDentBusiness.eServiceSignalSeverity)PIn.Int(table.Rows[i]["Severity"].ToString());
-				eServiceSignal.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				eServiceSignal.SigDateTime      = PIn.DateT (table.Rows[i]["SigDateTime"].ToString());
-				eServiceSignal.Tag              = PIn.String(table.Rows[i]["Tag"].ToString());
-				eServiceSignal.IsProcessed      = PIn.Bool  (table.Rows[i]["IsProcessed"].ToString());
+				eServiceSignal.EServiceSignalNum= PIn.Long  (row["EServiceSignalNum"].ToString());
+				eServiceSignal.ServiceCode      = PIn.Int   (row["ServiceCode"].ToString());
+				eServiceSignal.ReasonCategory   = PIn.Int   (row["ReasonCategory"].ToString());
+				eServiceSignal.ReasonCode       = PIn.Int   (row["ReasonCode"].ToString());
+				eServiceSignal.Severity         = (OpenDentBusiness.eServiceSignalSeverity)PIn.Int(row["Severity"].ToString());
+				eServiceSignal.Description      = PIn.String(row["Description"].ToString());
+				eServiceSignal.SigDateTime      = PIn.DateT (row["SigDateTime"].ToString());
+				eServiceSignal.Tag              = PIn.String(row["Tag"].ToString());
+				eServiceSignal.IsProcessed      = PIn.Bool  (row["IsProcessed"].ToString());
 				retVal.Add(eServiceSignal);
 			}
 			return retVal;

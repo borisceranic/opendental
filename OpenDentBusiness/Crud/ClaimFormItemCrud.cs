@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimFormItem> TableToList(DataTable table){
 			List<ClaimFormItem> retVal=new List<ClaimFormItem>();
 			ClaimFormItem claimFormItem;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimFormItem=new ClaimFormItem();
-				claimFormItem.ClaimFormItemNum= PIn.Long  (table.Rows[i]["ClaimFormItemNum"].ToString());
-				claimFormItem.ClaimFormNum    = PIn.Long  (table.Rows[i]["ClaimFormNum"].ToString());
-				claimFormItem.ImageFileName   = PIn.String(table.Rows[i]["ImageFileName"].ToString());
-				claimFormItem.FieldName       = PIn.String(table.Rows[i]["FieldName"].ToString());
-				claimFormItem.FormatString    = PIn.String(table.Rows[i]["FormatString"].ToString());
-				claimFormItem.XPos            = PIn.Float (table.Rows[i]["XPos"].ToString());
-				claimFormItem.YPos            = PIn.Float (table.Rows[i]["YPos"].ToString());
-				claimFormItem.Width           = PIn.Float (table.Rows[i]["Width"].ToString());
-				claimFormItem.Height          = PIn.Float (table.Rows[i]["Height"].ToString());
+				claimFormItem.ClaimFormItemNum= PIn.Long  (row["ClaimFormItemNum"].ToString());
+				claimFormItem.ClaimFormNum    = PIn.Long  (row["ClaimFormNum"].ToString());
+				claimFormItem.ImageFileName   = PIn.String(row["ImageFileName"].ToString());
+				claimFormItem.FieldName       = PIn.String(row["FieldName"].ToString());
+				claimFormItem.FormatString    = PIn.String(row["FormatString"].ToString());
+				claimFormItem.XPos            = PIn.Float (row["XPos"].ToString());
+				claimFormItem.YPos            = PIn.Float (row["YPos"].ToString());
+				claimFormItem.Width           = PIn.Float (row["Width"].ToString());
+				claimFormItem.Height          = PIn.Float (row["Height"].ToString());
 				retVal.Add(claimFormItem);
 			}
 			return retVal;

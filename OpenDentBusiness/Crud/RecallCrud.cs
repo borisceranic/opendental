@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<Recall> TableToList(DataTable table){
 			List<Recall> retVal=new List<Recall>();
 			Recall recall;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				recall=new Recall();
-				recall.RecallNum          = PIn.Long  (table.Rows[i]["RecallNum"].ToString());
-				recall.PatNum             = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				recall.DateDueCalc        = PIn.Date  (table.Rows[i]["DateDueCalc"].ToString());
-				recall.DateDue            = PIn.Date  (table.Rows[i]["DateDue"].ToString());
-				recall.DatePrevious       = PIn.Date  (table.Rows[i]["DatePrevious"].ToString());
-				recall.RecallInterval     = new Interval(PIn.Int(table.Rows[i]["RecallInterval"].ToString()));
-				recall.RecallStatus       = PIn.Long  (table.Rows[i]["RecallStatus"].ToString());
-				recall.Note               = PIn.String(table.Rows[i]["Note"].ToString());
-				recall.IsDisabled         = PIn.Bool  (table.Rows[i]["IsDisabled"].ToString());
-				recall.DateTStamp         = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				recall.RecallTypeNum      = PIn.Long  (table.Rows[i]["RecallTypeNum"].ToString());
-				recall.DisableUntilBalance= PIn.Double(table.Rows[i]["DisableUntilBalance"].ToString());
-				recall.DisableUntilDate   = PIn.Date  (table.Rows[i]["DisableUntilDate"].ToString());
-				recall.DateScheduled      = PIn.Date  (table.Rows[i]["DateScheduled"].ToString());
+				recall.RecallNum          = PIn.Long  (row["RecallNum"].ToString());
+				recall.PatNum             = PIn.Long  (row["PatNum"].ToString());
+				recall.DateDueCalc        = PIn.Date  (row["DateDueCalc"].ToString());
+				recall.DateDue            = PIn.Date  (row["DateDue"].ToString());
+				recall.DatePrevious       = PIn.Date  (row["DatePrevious"].ToString());
+				recall.RecallInterval     = new Interval(PIn.Int(row["RecallInterval"].ToString()));
+				recall.RecallStatus       = PIn.Long  (row["RecallStatus"].ToString());
+				recall.Note               = PIn.String(row["Note"].ToString());
+				recall.IsDisabled         = PIn.Bool  (row["IsDisabled"].ToString());
+				recall.DateTStamp         = PIn.DateT (row["DateTStamp"].ToString());
+				recall.RecallTypeNum      = PIn.Long  (row["RecallTypeNum"].ToString());
+				recall.DisableUntilBalance= PIn.Double(row["DisableUntilBalance"].ToString());
+				recall.DisableUntilDate   = PIn.Date  (row["DisableUntilDate"].ToString());
+				recall.DateScheduled      = PIn.Date  (row["DateScheduled"].ToString());
 				retVal.Add(recall);
 			}
 			return retVal;

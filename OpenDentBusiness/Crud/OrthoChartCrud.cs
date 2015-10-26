@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<OrthoChart> TableToList(DataTable table){
 			List<OrthoChart> retVal=new List<OrthoChart>();
 			OrthoChart orthoChart;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				orthoChart=new OrthoChart();
-				orthoChart.OrthoChartNum= PIn.Long  (table.Rows[i]["OrthoChartNum"].ToString());
-				orthoChart.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				orthoChart.DateService  = PIn.Date  (table.Rows[i]["DateService"].ToString());
-				orthoChart.FieldName    = PIn.String(table.Rows[i]["FieldName"].ToString());
-				orthoChart.FieldValue   = PIn.String(table.Rows[i]["FieldValue"].ToString());
+				orthoChart.OrthoChartNum= PIn.Long  (row["OrthoChartNum"].ToString());
+				orthoChart.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				orthoChart.DateService  = PIn.Date  (row["DateService"].ToString());
+				orthoChart.FieldName    = PIn.String(row["FieldName"].ToString());
+				orthoChart.FieldValue   = PIn.String(row["FieldValue"].ToString());
 				retVal.Add(orthoChart);
 			}
 			return retVal;

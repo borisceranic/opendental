@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<SigButDefElement> TableToList(DataTable table){
 			List<SigButDefElement> retVal=new List<SigButDefElement>();
 			SigButDefElement sigButDefElement;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sigButDefElement=new SigButDefElement();
-				sigButDefElement.ElementNum      = PIn.Long  (table.Rows[i]["ElementNum"].ToString());
-				sigButDefElement.SigButDefNum    = PIn.Long  (table.Rows[i]["SigButDefNum"].ToString());
-				sigButDefElement.SigElementDefNum= PIn.Long  (table.Rows[i]["SigElementDefNum"].ToString());
+				sigButDefElement.ElementNum      = PIn.Long  (row["ElementNum"].ToString());
+				sigButDefElement.SigButDefNum    = PIn.Long  (row["SigButDefNum"].ToString());
+				sigButDefElement.SigElementDefNum= PIn.Long  (row["SigElementDefNum"].ToString());
 				retVal.Add(sigButDefElement);
 			}
 			return retVal;

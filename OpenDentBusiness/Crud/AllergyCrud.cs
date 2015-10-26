@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Allergy> TableToList(DataTable table){
 			List<Allergy> retVal=new List<Allergy>();
 			Allergy allergy;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				allergy=new Allergy();
-				allergy.AllergyNum         = PIn.Long  (table.Rows[i]["AllergyNum"].ToString());
-				allergy.AllergyDefNum      = PIn.Long  (table.Rows[i]["AllergyDefNum"].ToString());
-				allergy.PatNum             = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				allergy.Reaction           = PIn.String(table.Rows[i]["Reaction"].ToString());
-				allergy.StatusIsActive     = PIn.Bool  (table.Rows[i]["StatusIsActive"].ToString());
-				allergy.DateTStamp         = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				allergy.DateAdverseReaction= PIn.Date  (table.Rows[i]["DateAdverseReaction"].ToString());
-				allergy.SnomedReaction     = PIn.String(table.Rows[i]["SnomedReaction"].ToString());
+				allergy.AllergyNum         = PIn.Long  (row["AllergyNum"].ToString());
+				allergy.AllergyDefNum      = PIn.Long  (row["AllergyDefNum"].ToString());
+				allergy.PatNum             = PIn.Long  (row["PatNum"].ToString());
+				allergy.Reaction           = PIn.String(row["Reaction"].ToString());
+				allergy.StatusIsActive     = PIn.Bool  (row["StatusIsActive"].ToString());
+				allergy.DateTStamp         = PIn.DateT (row["DateTStamp"].ToString());
+				allergy.DateAdverseReaction= PIn.Date  (row["DateAdverseReaction"].ToString());
+				allergy.SnomedReaction     = PIn.String(row["SnomedReaction"].ToString());
 				retVal.Add(allergy);
 			}
 			return retVal;

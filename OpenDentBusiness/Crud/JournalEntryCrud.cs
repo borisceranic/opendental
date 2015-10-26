@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<JournalEntry> TableToList(DataTable table){
 			List<JournalEntry> retVal=new List<JournalEntry>();
 			JournalEntry journalEntry;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				journalEntry=new JournalEntry();
-				journalEntry.JournalEntryNum= PIn.Long  (table.Rows[i]["JournalEntryNum"].ToString());
-				journalEntry.TransactionNum = PIn.Long  (table.Rows[i]["TransactionNum"].ToString());
-				journalEntry.AccountNum     = PIn.Long  (table.Rows[i]["AccountNum"].ToString());
-				journalEntry.DateDisplayed  = PIn.Date  (table.Rows[i]["DateDisplayed"].ToString());
-				journalEntry.DebitAmt       = PIn.Double(table.Rows[i]["DebitAmt"].ToString());
-				journalEntry.CreditAmt      = PIn.Double(table.Rows[i]["CreditAmt"].ToString());
-				journalEntry.Memo           = PIn.String(table.Rows[i]["Memo"].ToString());
-				journalEntry.Splits         = PIn.String(table.Rows[i]["Splits"].ToString());
-				journalEntry.CheckNumber    = PIn.String(table.Rows[i]["CheckNumber"].ToString());
-				journalEntry.ReconcileNum   = PIn.Long  (table.Rows[i]["ReconcileNum"].ToString());
+				journalEntry.JournalEntryNum= PIn.Long  (row["JournalEntryNum"].ToString());
+				journalEntry.TransactionNum = PIn.Long  (row["TransactionNum"].ToString());
+				journalEntry.AccountNum     = PIn.Long  (row["AccountNum"].ToString());
+				journalEntry.DateDisplayed  = PIn.Date  (row["DateDisplayed"].ToString());
+				journalEntry.DebitAmt       = PIn.Double(row["DebitAmt"].ToString());
+				journalEntry.CreditAmt      = PIn.Double(row["CreditAmt"].ToString());
+				journalEntry.Memo           = PIn.String(row["Memo"].ToString());
+				journalEntry.Splits         = PIn.String(row["Splits"].ToString());
+				journalEntry.CheckNumber    = PIn.String(row["CheckNumber"].ToString());
+				journalEntry.ReconcileNum   = PIn.Long  (row["ReconcileNum"].ToString());
 				retVal.Add(journalEntry);
 			}
 			return retVal;

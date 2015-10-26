@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Intervention> TableToList(DataTable table){
 			List<Intervention> retVal=new List<Intervention>();
 			Intervention intervention;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				intervention=new Intervention();
-				intervention.InterventionNum= PIn.Long  (table.Rows[i]["InterventionNum"].ToString());
-				intervention.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				intervention.ProvNum        = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				intervention.CodeValue      = PIn.String(table.Rows[i]["CodeValue"].ToString());
-				intervention.CodeSystem     = PIn.String(table.Rows[i]["CodeSystem"].ToString());
-				intervention.Note           = PIn.String(table.Rows[i]["Note"].ToString());
-				intervention.DateEntry      = PIn.Date  (table.Rows[i]["DateEntry"].ToString());
-				intervention.CodeSet        = (OpenDentBusiness.InterventionCodeSet)PIn.Int(table.Rows[i]["CodeSet"].ToString());
+				intervention.InterventionNum= PIn.Long  (row["InterventionNum"].ToString());
+				intervention.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				intervention.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
+				intervention.CodeValue      = PIn.String(row["CodeValue"].ToString());
+				intervention.CodeSystem     = PIn.String(row["CodeSystem"].ToString());
+				intervention.Note           = PIn.String(row["Note"].ToString());
+				intervention.DateEntry      = PIn.Date  (row["DateEntry"].ToString());
+				intervention.CodeSet        = (OpenDentBusiness.InterventionCodeSet)PIn.Int(row["CodeSet"].ToString());
 				retVal.Add(intervention);
 			}
 			return retVal;

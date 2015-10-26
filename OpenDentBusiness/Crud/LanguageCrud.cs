@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Language> TableToList(DataTable table){
 			List<Language> retVal=new List<Language>();
 			Language language;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				language=new Language();
-				language.LanguageNum    = PIn.Long  (table.Rows[i]["LanguageNum"].ToString());
-				language.EnglishComments= PIn.String(table.Rows[i]["EnglishComments"].ToString());
-				language.ClassType      = PIn.String(table.Rows[i]["ClassType"].ToString());
-				language.English        = PIn.String(table.Rows[i]["English"].ToString());
-				language.IsObsolete     = PIn.Bool  (table.Rows[i]["IsObsolete"].ToString());
+				language.LanguageNum    = PIn.Long  (row["LanguageNum"].ToString());
+				language.EnglishComments= PIn.String(row["EnglishComments"].ToString());
+				language.ClassType      = PIn.String(row["ClassType"].ToString());
+				language.English        = PIn.String(row["English"].ToString());
+				language.IsObsolete     = PIn.Bool  (row["IsObsolete"].ToString());
 				retVal.Add(language);
 			}
 			return retVal;

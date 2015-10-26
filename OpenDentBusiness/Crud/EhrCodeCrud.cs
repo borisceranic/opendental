@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrCode> TableToList(DataTable table){
 			List<EhrCode> retVal=new List<EhrCode>();
 			EhrCode ehrCode;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrCode=new EhrCode();
-				ehrCode.EhrCodeNum   = PIn.Long  (table.Rows[i]["EhrCodeNum"].ToString());
-				ehrCode.MeasureIds   = PIn.String(table.Rows[i]["MeasureIds"].ToString());
-				ehrCode.ValueSetName = PIn.String(table.Rows[i]["ValueSetName"].ToString());
-				ehrCode.ValueSetOID  = PIn.String(table.Rows[i]["ValueSetOID"].ToString());
-				ehrCode.QDMCategory  = PIn.String(table.Rows[i]["QDMCategory"].ToString());
-				ehrCode.CodeValue    = PIn.String(table.Rows[i]["CodeValue"].ToString());
-				ehrCode.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				ehrCode.CodeSystem   = PIn.String(table.Rows[i]["CodeSystem"].ToString());
-				ehrCode.CodeSystemOID= PIn.String(table.Rows[i]["CodeSystemOID"].ToString());
-				ehrCode.IsInDb       = PIn.Bool  (table.Rows[i]["IsInDb"].ToString());
+				ehrCode.EhrCodeNum   = PIn.Long  (row["EhrCodeNum"].ToString());
+				ehrCode.MeasureIds   = PIn.String(row["MeasureIds"].ToString());
+				ehrCode.ValueSetName = PIn.String(row["ValueSetName"].ToString());
+				ehrCode.ValueSetOID  = PIn.String(row["ValueSetOID"].ToString());
+				ehrCode.QDMCategory  = PIn.String(row["QDMCategory"].ToString());
+				ehrCode.CodeValue    = PIn.String(row["CodeValue"].ToString());
+				ehrCode.Description  = PIn.String(row["Description"].ToString());
+				ehrCode.CodeSystem   = PIn.String(row["CodeSystem"].ToString());
+				ehrCode.CodeSystemOID= PIn.String(row["CodeSystemOID"].ToString());
+				ehrCode.IsInDb       = PIn.Bool  (row["IsInDb"].ToString());
 				retVal.Add(ehrCode);
 			}
 			return retVal;

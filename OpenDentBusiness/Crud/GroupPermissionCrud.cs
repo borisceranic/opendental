@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<GroupPermission> TableToList(DataTable table){
 			List<GroupPermission> retVal=new List<GroupPermission>();
 			GroupPermission groupPermission;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				groupPermission=new GroupPermission();
-				groupPermission.GroupPermNum= PIn.Long  (table.Rows[i]["GroupPermNum"].ToString());
-				groupPermission.NewerDate   = PIn.Date  (table.Rows[i]["NewerDate"].ToString());
-				groupPermission.NewerDays   = PIn.Int   (table.Rows[i]["NewerDays"].ToString());
-				groupPermission.UserGroupNum= PIn.Long  (table.Rows[i]["UserGroupNum"].ToString());
-				groupPermission.PermType    = (OpenDentBusiness.Permissions)PIn.Int(table.Rows[i]["PermType"].ToString());
+				groupPermission.GroupPermNum= PIn.Long  (row["GroupPermNum"].ToString());
+				groupPermission.NewerDate   = PIn.Date  (row["NewerDate"].ToString());
+				groupPermission.NewerDays   = PIn.Int   (row["NewerDays"].ToString());
+				groupPermission.UserGroupNum= PIn.Long  (row["UserGroupNum"].ToString());
+				groupPermission.PermType    = (OpenDentBusiness.Permissions)PIn.Int(row["PermType"].ToString());
 				retVal.Add(groupPermission);
 			}
 			return retVal;

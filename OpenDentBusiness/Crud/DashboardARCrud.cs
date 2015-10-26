@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<DashboardAR> TableToList(DataTable table){
 			List<DashboardAR> retVal=new List<DashboardAR>();
 			DashboardAR dashboardAR;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				dashboardAR=new DashboardAR();
-				dashboardAR.DashboardARNum= PIn.Long  (table.Rows[i]["DashboardARNum"].ToString());
-				dashboardAR.DateCalc      = PIn.Date  (table.Rows[i]["DateCalc"].ToString());
-				dashboardAR.BalTotal      = PIn.Double(table.Rows[i]["BalTotal"].ToString());
-				dashboardAR.InsEst        = PIn.Double(table.Rows[i]["InsEst"].ToString());
+				dashboardAR.DashboardARNum= PIn.Long  (row["DashboardARNum"].ToString());
+				dashboardAR.DateCalc      = PIn.Date  (row["DateCalc"].ToString());
+				dashboardAR.BalTotal      = PIn.Double(row["BalTotal"].ToString());
+				dashboardAR.InsEst        = PIn.Double(row["InsEst"].ToString());
 				retVal.Add(dashboardAR);
 			}
 			return retVal;

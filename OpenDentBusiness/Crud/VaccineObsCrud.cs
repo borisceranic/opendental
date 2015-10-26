@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<VaccineObs> TableToList(DataTable table){
 			List<VaccineObs> retVal=new List<VaccineObs>();
 			VaccineObs vaccineObs;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				vaccineObs=new VaccineObs();
-				vaccineObs.VaccineObsNum     = PIn.Long  (table.Rows[i]["VaccineObsNum"].ToString());
-				vaccineObs.VaccinePatNum     = PIn.Long  (table.Rows[i]["VaccinePatNum"].ToString());
-				vaccineObs.ValType           = (OpenDentBusiness.VaccineObsType)PIn.Int(table.Rows[i]["ValType"].ToString());
-				vaccineObs.IdentifyingCode   = (OpenDentBusiness.VaccineObsIdentifier)PIn.Int(table.Rows[i]["IdentifyingCode"].ToString());
-				vaccineObs.ValReported       = PIn.String(table.Rows[i]["ValReported"].ToString());
-				vaccineObs.ValCodeSystem     = (OpenDentBusiness.VaccineObsValCodeSystem)PIn.Int(table.Rows[i]["ValCodeSystem"].ToString());
-				vaccineObs.VaccineObsNumGroup= PIn.Long  (table.Rows[i]["VaccineObsNumGroup"].ToString());
-				vaccineObs.UcumCode          = PIn.String(table.Rows[i]["UcumCode"].ToString());
-				vaccineObs.DateObs           = PIn.Date  (table.Rows[i]["DateObs"].ToString());
-				vaccineObs.MethodCode        = PIn.String(table.Rows[i]["MethodCode"].ToString());
+				vaccineObs.VaccineObsNum     = PIn.Long  (row["VaccineObsNum"].ToString());
+				vaccineObs.VaccinePatNum     = PIn.Long  (row["VaccinePatNum"].ToString());
+				vaccineObs.ValType           = (OpenDentBusiness.VaccineObsType)PIn.Int(row["ValType"].ToString());
+				vaccineObs.IdentifyingCode   = (OpenDentBusiness.VaccineObsIdentifier)PIn.Int(row["IdentifyingCode"].ToString());
+				vaccineObs.ValReported       = PIn.String(row["ValReported"].ToString());
+				vaccineObs.ValCodeSystem     = (OpenDentBusiness.VaccineObsValCodeSystem)PIn.Int(row["ValCodeSystem"].ToString());
+				vaccineObs.VaccineObsNumGroup= PIn.Long  (row["VaccineObsNumGroup"].ToString());
+				vaccineObs.UcumCode          = PIn.String(row["UcumCode"].ToString());
+				vaccineObs.DateObs           = PIn.Date  (row["DateObs"].ToString());
+				vaccineObs.MethodCode        = PIn.String(row["MethodCode"].ToString());
 				retVal.Add(vaccineObs);
 			}
 			return retVal;

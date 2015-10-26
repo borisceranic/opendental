@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<RxDef> TableToList(DataTable table){
 			List<RxDef> retVal=new List<RxDef>();
 			RxDef rxDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				rxDef=new RxDef();
-				rxDef.RxDefNum    = PIn.Long  (table.Rows[i]["RxDefNum"].ToString());
-				rxDef.Drug        = PIn.String(table.Rows[i]["Drug"].ToString());
-				rxDef.Sig         = PIn.String(table.Rows[i]["Sig"].ToString());
-				rxDef.Disp        = PIn.String(table.Rows[i]["Disp"].ToString());
-				rxDef.Refills     = PIn.String(table.Rows[i]["Refills"].ToString());
-				rxDef.Notes       = PIn.String(table.Rows[i]["Notes"].ToString());
-				rxDef.IsControlled= PIn.Bool  (table.Rows[i]["IsControlled"].ToString());
-				rxDef.RxCui       = PIn.Long  (table.Rows[i]["RxCui"].ToString());
+				rxDef.RxDefNum    = PIn.Long  (row["RxDefNum"].ToString());
+				rxDef.Drug        = PIn.String(row["Drug"].ToString());
+				rxDef.Sig         = PIn.String(row["Sig"].ToString());
+				rxDef.Disp        = PIn.String(row["Disp"].ToString());
+				rxDef.Refills     = PIn.String(row["Refills"].ToString());
+				rxDef.Notes       = PIn.String(row["Notes"].ToString());
+				rxDef.IsControlled= PIn.Bool  (row["IsControlled"].ToString());
+				rxDef.RxCui       = PIn.Long  (row["RxCui"].ToString());
 				retVal.Add(rxDef);
 			}
 			return retVal;

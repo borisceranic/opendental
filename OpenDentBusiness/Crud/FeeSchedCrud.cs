@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<FeeSched> TableToList(DataTable table){
 			List<FeeSched> retVal=new List<FeeSched>();
 			FeeSched feeSched;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				feeSched=new FeeSched();
-				feeSched.FeeSchedNum = PIn.Long  (table.Rows[i]["FeeSchedNum"].ToString());
-				feeSched.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				feeSched.FeeSchedType= (OpenDentBusiness.FeeScheduleType)PIn.Int(table.Rows[i]["FeeSchedType"].ToString());
-				feeSched.ItemOrder   = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				feeSched.IsHidden    = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				feeSched.IsGlobal    = PIn.Bool  (table.Rows[i]["IsGlobal"].ToString());
+				feeSched.FeeSchedNum = PIn.Long  (row["FeeSchedNum"].ToString());
+				feeSched.Description = PIn.String(row["Description"].ToString());
+				feeSched.FeeSchedType= (OpenDentBusiness.FeeScheduleType)PIn.Int(row["FeeSchedType"].ToString());
+				feeSched.ItemOrder   = PIn.Int   (row["ItemOrder"].ToString());
+				feeSched.IsHidden    = PIn.Bool  (row["IsHidden"].ToString());
+				feeSched.IsGlobal    = PIn.Bool  (row["IsGlobal"].ToString());
 				retVal.Add(feeSched);
 			}
 			return retVal;

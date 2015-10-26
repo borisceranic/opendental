@@ -44,24 +44,24 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrTrigger> TableToList(DataTable table){
 			List<EhrTrigger> retVal=new List<EhrTrigger>();
 			EhrTrigger ehrTrigger;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrTrigger=new EhrTrigger();
-				ehrTrigger.EhrTriggerNum    = PIn.Long  (table.Rows[i]["EhrTriggerNum"].ToString());
-				ehrTrigger.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				ehrTrigger.ProblemSnomedList= PIn.String(table.Rows[i]["ProblemSnomedList"].ToString());
-				ehrTrigger.ProblemIcd9List  = PIn.String(table.Rows[i]["ProblemIcd9List"].ToString());
-				ehrTrigger.ProblemIcd10List = PIn.String(table.Rows[i]["ProblemIcd10List"].ToString());
-				ehrTrigger.ProblemDefNumList= PIn.String(table.Rows[i]["ProblemDefNumList"].ToString());
-				ehrTrigger.MedicationNumList= PIn.String(table.Rows[i]["MedicationNumList"].ToString());
-				ehrTrigger.RxCuiList        = PIn.String(table.Rows[i]["RxCuiList"].ToString());
-				ehrTrigger.CvxList          = PIn.String(table.Rows[i]["CvxList"].ToString());
-				ehrTrigger.AllergyDefNumList= PIn.String(table.Rows[i]["AllergyDefNumList"].ToString());
-				ehrTrigger.DemographicsList = PIn.String(table.Rows[i]["DemographicsList"].ToString());
-				ehrTrigger.LabLoincList     = PIn.String(table.Rows[i]["LabLoincList"].ToString());
-				ehrTrigger.VitalLoincList   = PIn.String(table.Rows[i]["VitalLoincList"].ToString());
-				ehrTrigger.Instructions     = PIn.String(table.Rows[i]["Instructions"].ToString());
-				ehrTrigger.Bibliography     = PIn.String(table.Rows[i]["Bibliography"].ToString());
-				ehrTrigger.Cardinality      = (OpenDentBusiness.MatchCardinality)PIn.Int(table.Rows[i]["Cardinality"].ToString());
+				ehrTrigger.EhrTriggerNum    = PIn.Long  (row["EhrTriggerNum"].ToString());
+				ehrTrigger.Description      = PIn.String(row["Description"].ToString());
+				ehrTrigger.ProblemSnomedList= PIn.String(row["ProblemSnomedList"].ToString());
+				ehrTrigger.ProblemIcd9List  = PIn.String(row["ProblemIcd9List"].ToString());
+				ehrTrigger.ProblemIcd10List = PIn.String(row["ProblemIcd10List"].ToString());
+				ehrTrigger.ProblemDefNumList= PIn.String(row["ProblemDefNumList"].ToString());
+				ehrTrigger.MedicationNumList= PIn.String(row["MedicationNumList"].ToString());
+				ehrTrigger.RxCuiList        = PIn.String(row["RxCuiList"].ToString());
+				ehrTrigger.CvxList          = PIn.String(row["CvxList"].ToString());
+				ehrTrigger.AllergyDefNumList= PIn.String(row["AllergyDefNumList"].ToString());
+				ehrTrigger.DemographicsList = PIn.String(row["DemographicsList"].ToString());
+				ehrTrigger.LabLoincList     = PIn.String(row["LabLoincList"].ToString());
+				ehrTrigger.VitalLoincList   = PIn.String(row["VitalLoincList"].ToString());
+				ehrTrigger.Instructions     = PIn.String(row["Instructions"].ToString());
+				ehrTrigger.Bibliography     = PIn.String(row["Bibliography"].ToString());
+				ehrTrigger.Cardinality      = (OpenDentBusiness.MatchCardinality)PIn.Int(row["Cardinality"].ToString());
 				retVal.Add(ehrTrigger);
 			}
 			return retVal;

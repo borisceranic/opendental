@@ -44,10 +44,10 @@ namespace OpenDentBusiness.Crud{
 		public static List<OIDInternal> TableToList(DataTable table){
 			List<OIDInternal> retVal=new List<OIDInternal>();
 			OIDInternal oIDInternal;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				oIDInternal=new OIDInternal();
-				oIDInternal.OIDInternalNum= PIn.Long  (table.Rows[i]["OIDInternalNum"].ToString());
-				string iDType=table.Rows[i]["IDType"].ToString();
+				oIDInternal.OIDInternalNum= PIn.Long  (row["OIDInternalNum"].ToString());
+				string iDType=row["IDType"].ToString();
 				if(iDType==""){
 					oIDInternal.IDType      =(IdentifierType)0;
 				}
@@ -57,7 +57,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					oIDInternal.IDType      =(IdentifierType)0;
 				}
-				oIDInternal.IDRoot        = PIn.String(table.Rows[i]["IDRoot"].ToString());
+				oIDInternal.IDRoot        = PIn.String(row["IDRoot"].ToString());
 				retVal.Add(oIDInternal);
 			}
 			return retVal;

@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<ScheduleOp> TableToList(DataTable table){
 			List<ScheduleOp> retVal=new List<ScheduleOp>();
 			ScheduleOp scheduleOp;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				scheduleOp=new ScheduleOp();
-				scheduleOp.ScheduleOpNum= PIn.Long  (table.Rows[i]["ScheduleOpNum"].ToString());
-				scheduleOp.ScheduleNum  = PIn.Long  (table.Rows[i]["ScheduleNum"].ToString());
-				scheduleOp.OperatoryNum = PIn.Long  (table.Rows[i]["OperatoryNum"].ToString());
+				scheduleOp.ScheduleOpNum= PIn.Long  (row["ScheduleOpNum"].ToString());
+				scheduleOp.ScheduleNum  = PIn.Long  (row["ScheduleNum"].ToString());
+				scheduleOp.OperatoryNum = PIn.Long  (row["OperatoryNum"].ToString());
 				retVal.Add(scheduleOp);
 			}
 			return retVal;

@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<PerioExam> TableToList(DataTable table){
 			List<PerioExam> retVal=new List<PerioExam>();
 			PerioExam perioExam;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				perioExam=new PerioExam();
-				perioExam.PerioExamNum= PIn.Long  (table.Rows[i]["PerioExamNum"].ToString());
-				perioExam.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				perioExam.ExamDate    = PIn.Date  (table.Rows[i]["ExamDate"].ToString());
-				perioExam.ProvNum     = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
+				perioExam.PerioExamNum= PIn.Long  (row["PerioExamNum"].ToString());
+				perioExam.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				perioExam.ExamDate    = PIn.Date  (row["ExamDate"].ToString());
+				perioExam.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
 				retVal.Add(perioExam);
 			}
 			return retVal;

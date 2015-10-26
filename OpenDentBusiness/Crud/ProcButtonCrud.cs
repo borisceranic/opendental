@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcButton> TableToList(DataTable table){
 			List<ProcButton> retVal=new List<ProcButton>();
 			ProcButton procButton;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procButton=new ProcButton();
-				procButton.ProcButtonNum= PIn.Long  (table.Rows[i]["ProcButtonNum"].ToString());
-				procButton.Description  = PIn.String(table.Rows[i]["Description"].ToString());
-				procButton.ItemOrder    = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				procButton.Category     = PIn.Long  (table.Rows[i]["Category"].ToString());
-				procButton.ButtonImage  = PIn.String(table.Rows[i]["ButtonImage"].ToString());
+				procButton.ProcButtonNum= PIn.Long  (row["ProcButtonNum"].ToString());
+				procButton.Description  = PIn.String(row["Description"].ToString());
+				procButton.ItemOrder    = PIn.Int   (row["ItemOrder"].ToString());
+				procButton.Category     = PIn.Long  (row["Category"].ToString());
+				procButton.ButtonImage  = PIn.String(row["ButtonImage"].ToString());
 				retVal.Add(procButton);
 			}
 			return retVal;

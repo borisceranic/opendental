@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<Evaluation> TableToList(DataTable table){
 			List<Evaluation> retVal=new List<Evaluation>();
 			Evaluation evaluation;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				evaluation=new Evaluation();
-				evaluation.EvaluationNum      = PIn.Long  (table.Rows[i]["EvaluationNum"].ToString());
-				evaluation.InstructNum        = PIn.Long  (table.Rows[i]["InstructNum"].ToString());
-				evaluation.StudentNum         = PIn.Long  (table.Rows[i]["StudentNum"].ToString());
-				evaluation.SchoolCourseNum    = PIn.Long  (table.Rows[i]["SchoolCourseNum"].ToString());
-				evaluation.EvalTitle          = PIn.String(table.Rows[i]["EvalTitle"].ToString());
-				evaluation.DateEval           = PIn.Date  (table.Rows[i]["DateEval"].ToString());
-				evaluation.GradingScaleNum    = PIn.Long  (table.Rows[i]["GradingScaleNum"].ToString());
-				evaluation.OverallGradeShowing= PIn.String(table.Rows[i]["OverallGradeShowing"].ToString());
-				evaluation.OverallGradeNumber = PIn.Float (table.Rows[i]["OverallGradeNumber"].ToString());
-				evaluation.Notes              = PIn.String(table.Rows[i]["Notes"].ToString());
+				evaluation.EvaluationNum      = PIn.Long  (row["EvaluationNum"].ToString());
+				evaluation.InstructNum        = PIn.Long  (row["InstructNum"].ToString());
+				evaluation.StudentNum         = PIn.Long  (row["StudentNum"].ToString());
+				evaluation.SchoolCourseNum    = PIn.Long  (row["SchoolCourseNum"].ToString());
+				evaluation.EvalTitle          = PIn.String(row["EvalTitle"].ToString());
+				evaluation.DateEval           = PIn.Date  (row["DateEval"].ToString());
+				evaluation.GradingScaleNum    = PIn.Long  (row["GradingScaleNum"].ToString());
+				evaluation.OverallGradeShowing= PIn.String(row["OverallGradeShowing"].ToString());
+				evaluation.OverallGradeNumber = PIn.Float (row["OverallGradeNumber"].ToString());
+				evaluation.Notes              = PIn.String(row["Notes"].ToString());
 				retVal.Add(evaluation);
 			}
 			return retVal;

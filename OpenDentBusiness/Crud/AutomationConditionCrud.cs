@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<AutomationCondition> TableToList(DataTable table){
 			List<AutomationCondition> retVal=new List<AutomationCondition>();
 			AutomationCondition automationCondition;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				automationCondition=new AutomationCondition();
-				automationCondition.AutomationConditionNum= PIn.Long  (table.Rows[i]["AutomationConditionNum"].ToString());
-				automationCondition.AutomationNum         = PIn.Long  (table.Rows[i]["AutomationNum"].ToString());
-				automationCondition.CompareField          = (OpenDentBusiness.AutoCondField)PIn.Int(table.Rows[i]["CompareField"].ToString());
-				automationCondition.Comparison            = (OpenDentBusiness.AutoCondComparison)PIn.Int(table.Rows[i]["Comparison"].ToString());
-				automationCondition.CompareString         = PIn.String(table.Rows[i]["CompareString"].ToString());
+				automationCondition.AutomationConditionNum= PIn.Long  (row["AutomationConditionNum"].ToString());
+				automationCondition.AutomationNum         = PIn.Long  (row["AutomationNum"].ToString());
+				automationCondition.CompareField          = (OpenDentBusiness.AutoCondField)PIn.Int(row["CompareField"].ToString());
+				automationCondition.Comparison            = (OpenDentBusiness.AutoCondComparison)PIn.Int(row["Comparison"].ToString());
+				automationCondition.CompareString         = PIn.String(row["CompareString"].ToString());
 				retVal.Add(automationCondition);
 			}
 			return retVal;

@@ -44,24 +44,24 @@ namespace OpenDentBusiness.Crud{
 		public static List<RxPat> TableToList(DataTable table){
 			List<RxPat> retVal=new List<RxPat>();
 			RxPat rxPat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				rxPat=new RxPat();
-				rxPat.RxNum       = PIn.Long  (table.Rows[i]["RxNum"].ToString());
-				rxPat.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				rxPat.RxDate      = PIn.Date  (table.Rows[i]["RxDate"].ToString());
-				rxPat.Drug        = PIn.String(table.Rows[i]["Drug"].ToString());
-				rxPat.Sig         = PIn.String(table.Rows[i]["Sig"].ToString());
-				rxPat.Disp        = PIn.String(table.Rows[i]["Disp"].ToString());
-				rxPat.Refills     = PIn.String(table.Rows[i]["Refills"].ToString());
-				rxPat.ProvNum     = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				rxPat.Notes       = PIn.String(table.Rows[i]["Notes"].ToString());
-				rxPat.PharmacyNum = PIn.Long  (table.Rows[i]["PharmacyNum"].ToString());
-				rxPat.IsControlled= PIn.Bool  (table.Rows[i]["IsControlled"].ToString());
-				rxPat.DateTStamp  = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				rxPat.SendStatus  = (OpenDentBusiness.RxSendStatus)PIn.Int(table.Rows[i]["SendStatus"].ToString());
-				rxPat.RxCui       = PIn.Long  (table.Rows[i]["RxCui"].ToString());
-				rxPat.DosageCode  = PIn.String(table.Rows[i]["DosageCode"].ToString());
-				rxPat.NewCropGuid = PIn.String(table.Rows[i]["NewCropGuid"].ToString());
+				rxPat.RxNum       = PIn.Long  (row["RxNum"].ToString());
+				rxPat.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				rxPat.RxDate      = PIn.Date  (row["RxDate"].ToString());
+				rxPat.Drug        = PIn.String(row["Drug"].ToString());
+				rxPat.Sig         = PIn.String(row["Sig"].ToString());
+				rxPat.Disp        = PIn.String(row["Disp"].ToString());
+				rxPat.Refills     = PIn.String(row["Refills"].ToString());
+				rxPat.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
+				rxPat.Notes       = PIn.String(row["Notes"].ToString());
+				rxPat.PharmacyNum = PIn.Long  (row["PharmacyNum"].ToString());
+				rxPat.IsControlled= PIn.Bool  (row["IsControlled"].ToString());
+				rxPat.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
+				rxPat.SendStatus  = (OpenDentBusiness.RxSendStatus)PIn.Int(row["SendStatus"].ToString());
+				rxPat.RxCui       = PIn.Long  (row["RxCui"].ToString());
+				rxPat.DosageCode  = PIn.String(row["DosageCode"].ToString());
+				rxPat.NewCropGuid = PIn.String(row["NewCropGuid"].ToString());
 				retVal.Add(rxPat);
 			}
 			return retVal;

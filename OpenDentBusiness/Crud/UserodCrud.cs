@@ -44,23 +44,23 @@ namespace OpenDentBusiness.Crud{
 		public static List<Userod> TableToList(DataTable table){
 			List<Userod> retVal=new List<Userod>();
 			Userod userod;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				userod=new Userod();
-				userod.UserNum           = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				userod.UserName          = PIn.String(table.Rows[i]["UserName"].ToString());
-				userod.Password          = PIn.String(table.Rows[i]["Password"].ToString());
-				userod.UserGroupNum      = PIn.Long  (table.Rows[i]["UserGroupNum"].ToString());
-				userod.EmployeeNum       = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				userod.ClinicNum         = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				userod.ProvNum           = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				userod.IsHidden          = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				userod.TaskListInBox     = PIn.Long  (table.Rows[i]["TaskListInBox"].ToString());
-				userod.AnesthProvType    = PIn.Int   (table.Rows[i]["AnesthProvType"].ToString());
-				userod.DefaultHidePopups = PIn.Bool  (table.Rows[i]["DefaultHidePopups"].ToString());
-				userod.PasswordIsStrong  = PIn.Bool  (table.Rows[i]["PasswordIsStrong"].ToString());
-				userod.ClinicIsRestricted= PIn.Bool  (table.Rows[i]["ClinicIsRestricted"].ToString());
-				userod.InboxHidePopups   = PIn.Bool  (table.Rows[i]["InboxHidePopups"].ToString());
-				userod.UserNumCEMT       = PIn.Long  (table.Rows[i]["UserNumCEMT"].ToString());
+				userod.UserNum           = PIn.Long  (row["UserNum"].ToString());
+				userod.UserName          = PIn.String(row["UserName"].ToString());
+				userod.Password          = PIn.String(row["Password"].ToString());
+				userod.UserGroupNum      = PIn.Long  (row["UserGroupNum"].ToString());
+				userod.EmployeeNum       = PIn.Long  (row["EmployeeNum"].ToString());
+				userod.ClinicNum         = PIn.Long  (row["ClinicNum"].ToString());
+				userod.ProvNum           = PIn.Long  (row["ProvNum"].ToString());
+				userod.IsHidden          = PIn.Bool  (row["IsHidden"].ToString());
+				userod.TaskListInBox     = PIn.Long  (row["TaskListInBox"].ToString());
+				userod.AnesthProvType    = PIn.Int   (row["AnesthProvType"].ToString());
+				userod.DefaultHidePopups = PIn.Bool  (row["DefaultHidePopups"].ToString());
+				userod.PasswordIsStrong  = PIn.Bool  (row["PasswordIsStrong"].ToString());
+				userod.ClinicIsRestricted= PIn.Bool  (row["ClinicIsRestricted"].ToString());
+				userod.InboxHidePopups   = PIn.Bool  (row["InboxHidePopups"].ToString());
+				userod.UserNumCEMT       = PIn.Long  (row["UserNumCEMT"].ToString());
 				retVal.Add(userod);
 			}
 			return retVal;

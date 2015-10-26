@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<SecurityLog> TableToList(DataTable table){
 			List<SecurityLog> retVal=new List<SecurityLog>();
 			SecurityLog securityLog;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				securityLog=new SecurityLog();
-				securityLog.SecurityLogNum= PIn.Long  (table.Rows[i]["SecurityLogNum"].ToString());
-				securityLog.PermType      = (OpenDentBusiness.Permissions)PIn.Int(table.Rows[i]["PermType"].ToString());
-				securityLog.UserNum       = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				securityLog.LogDateTime   = PIn.DateT (table.Rows[i]["LogDateTime"].ToString());
-				securityLog.LogText       = PIn.String(table.Rows[i]["LogText"].ToString());
-				securityLog.PatNum        = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				securityLog.CompName      = PIn.String(table.Rows[i]["CompName"].ToString());
-				securityLog.FKey          = PIn.Long  (table.Rows[i]["FKey"].ToString());
-				securityLog.LogSource     = (OpenDentBusiness.LogSources)PIn.Int(table.Rows[i]["LogSource"].ToString());
+				securityLog.SecurityLogNum= PIn.Long  (row["SecurityLogNum"].ToString());
+				securityLog.PermType      = (OpenDentBusiness.Permissions)PIn.Int(row["PermType"].ToString());
+				securityLog.UserNum       = PIn.Long  (row["UserNum"].ToString());
+				securityLog.LogDateTime   = PIn.DateT (row["LogDateTime"].ToString());
+				securityLog.LogText       = PIn.String(row["LogText"].ToString());
+				securityLog.PatNum        = PIn.Long  (row["PatNum"].ToString());
+				securityLog.CompName      = PIn.String(row["CompName"].ToString());
+				securityLog.FKey          = PIn.Long  (row["FKey"].ToString());
+				securityLog.LogSource     = (OpenDentBusiness.LogSources)PIn.Int(row["LogSource"].ToString());
 				retVal.Add(securityLog);
 			}
 			return retVal;

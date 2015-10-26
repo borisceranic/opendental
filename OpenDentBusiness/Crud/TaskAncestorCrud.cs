@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskAncestor> TableToList(DataTable table){
 			List<TaskAncestor> retVal=new List<TaskAncestor>();
 			TaskAncestor taskAncestor;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskAncestor=new TaskAncestor();
-				taskAncestor.TaskAncestorNum= PIn.Long  (table.Rows[i]["TaskAncestorNum"].ToString());
-				taskAncestor.TaskNum        = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
-				taskAncestor.TaskListNum    = PIn.Long  (table.Rows[i]["TaskListNum"].ToString());
+				taskAncestor.TaskAncestorNum= PIn.Long  (row["TaskAncestorNum"].ToString());
+				taskAncestor.TaskNum        = PIn.Long  (row["TaskNum"].ToString());
+				taskAncestor.TaskListNum    = PIn.Long  (row["TaskListNum"].ToString());
 				retVal.Add(taskAncestor);
 			}
 			return retVal;

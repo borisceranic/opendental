@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Employee> TableToList(DataTable table){
 			List<Employee> retVal=new List<Employee>();
 			Employee employee;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				employee=new Employee();
-				employee.EmployeeNum= PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				employee.LName      = PIn.String(table.Rows[i]["LName"].ToString());
-				employee.FName      = PIn.String(table.Rows[i]["FName"].ToString());
-				employee.MiddleI    = PIn.String(table.Rows[i]["MiddleI"].ToString());
-				employee.IsHidden   = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				employee.ClockStatus= PIn.String(table.Rows[i]["ClockStatus"].ToString());
-				employee.PhoneExt   = PIn.Int   (table.Rows[i]["PhoneExt"].ToString());
-				employee.PayrollID  = PIn.String(table.Rows[i]["PayrollID"].ToString());
+				employee.EmployeeNum= PIn.Long  (row["EmployeeNum"].ToString());
+				employee.LName      = PIn.String(row["LName"].ToString());
+				employee.FName      = PIn.String(row["FName"].ToString());
+				employee.MiddleI    = PIn.String(row["MiddleI"].ToString());
+				employee.IsHidden   = PIn.Bool  (row["IsHidden"].ToString());
+				employee.ClockStatus= PIn.String(row["ClockStatus"].ToString());
+				employee.PhoneExt   = PIn.Int   (row["PhoneExt"].ToString());
+				employee.PayrollID  = PIn.String(row["PayrollID"].ToString());
 				retVal.Add(employee);
 			}
 			return retVal;

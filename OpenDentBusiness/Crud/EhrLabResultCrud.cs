@@ -45,12 +45,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabResult> TableToList(DataTable table){
 			List<EhrLabResult> retVal=new List<EhrLabResult>();
 			EhrLabResult ehrLabResult;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabResult=new EhrLabResult();
-				ehrLabResult.EhrLabResultNum                                            = PIn.Long  (table.Rows[i]["EhrLabResultNum"].ToString());
-				ehrLabResult.EhrLabNum                                                  = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabResult.SetIdOBX                                                   = PIn.Long  (table.Rows[i]["SetIdOBX"].ToString());
-				string valueType=table.Rows[i]["ValueType"].ToString();
+				ehrLabResult.EhrLabResultNum                                            = PIn.Long  (row["EhrLabResultNum"].ToString());
+				ehrLabResult.EhrLabNum                                                  = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabResult.SetIdOBX                                                   = PIn.Long  (row["SetIdOBX"].ToString());
+				string valueType=row["ValueType"].ToString();
 				if(valueType==""){
 					ehrLabResult.ValueType                                                =(HL70125)0;
 				}
@@ -60,39 +60,39 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.ValueType                                                =(HL70125)0;
 				}
-				ehrLabResult.ObservationIdentifierID                                    = PIn.String(table.Rows[i]["ObservationIdentifierID"].ToString());
-				ehrLabResult.ObservationIdentifierText                                  = PIn.String(table.Rows[i]["ObservationIdentifierText"].ToString());
-				ehrLabResult.ObservationIdentifierCodeSystemName                        = PIn.String(table.Rows[i]["ObservationIdentifierCodeSystemName"].ToString());
-				ehrLabResult.ObservationIdentifierIDAlt                                 = PIn.String(table.Rows[i]["ObservationIdentifierIDAlt"].ToString());
-				ehrLabResult.ObservationIdentifierTextAlt                               = PIn.String(table.Rows[i]["ObservationIdentifierTextAlt"].ToString());
-				ehrLabResult.ObservationIdentifierCodeSystemNameAlt                     = PIn.String(table.Rows[i]["ObservationIdentifierCodeSystemNameAlt"].ToString());
-				ehrLabResult.ObservationIdentifierTextOriginal                          = PIn.String(table.Rows[i]["ObservationIdentifierTextOriginal"].ToString());
-				ehrLabResult.ObservationIdentifierSub                                   = PIn.String(table.Rows[i]["ObservationIdentifierSub"].ToString());
-				ehrLabResult.ObservationValueCodedElementID                             = PIn.String(table.Rows[i]["ObservationValueCodedElementID"].ToString());
-				ehrLabResult.ObservationValueCodedElementText                           = PIn.String(table.Rows[i]["ObservationValueCodedElementText"].ToString());
-				ehrLabResult.ObservationValueCodedElementCodeSystemName                 = PIn.String(table.Rows[i]["ObservationValueCodedElementCodeSystemName"].ToString());
-				ehrLabResult.ObservationValueCodedElementIDAlt                          = PIn.String(table.Rows[i]["ObservationValueCodedElementIDAlt"].ToString());
-				ehrLabResult.ObservationValueCodedElementTextAlt                        = PIn.String(table.Rows[i]["ObservationValueCodedElementTextAlt"].ToString());
-				ehrLabResult.ObservationValueCodedElementCodeSystemNameAlt              = PIn.String(table.Rows[i]["ObservationValueCodedElementCodeSystemNameAlt"].ToString());
-				ehrLabResult.ObservationValueCodedElementTextOriginal                   = PIn.String(table.Rows[i]["ObservationValueCodedElementTextOriginal"].ToString());
-				ehrLabResult.ObservationValueDateTime                                   = PIn.String(table.Rows[i]["ObservationValueDateTime"].ToString());
-				ehrLabResult.ObservationValueTime                                       = PIn.Time(table.Rows[i]["ObservationValueTime"].ToString());
-				ehrLabResult.ObservationValueComparator                                 = PIn.String(table.Rows[i]["ObservationValueComparator"].ToString());
-				ehrLabResult.ObservationValueNumber1                                    = PIn.Double(table.Rows[i]["ObservationValueNumber1"].ToString());
-				ehrLabResult.ObservationValueSeparatorOrSuffix                          = PIn.String(table.Rows[i]["ObservationValueSeparatorOrSuffix"].ToString());
-				ehrLabResult.ObservationValueNumber2                                    = PIn.Double(table.Rows[i]["ObservationValueNumber2"].ToString());
-				ehrLabResult.ObservationValueNumeric                                    = PIn.Double(table.Rows[i]["ObservationValueNumeric"].ToString());
-				ehrLabResult.ObservationValueText                                       = PIn.String(table.Rows[i]["ObservationValueText"].ToString());
-				ehrLabResult.UnitsID                                                    = PIn.String(table.Rows[i]["UnitsID"].ToString());
-				ehrLabResult.UnitsText                                                  = PIn.String(table.Rows[i]["UnitsText"].ToString());
-				ehrLabResult.UnitsCodeSystemName                                        = PIn.String(table.Rows[i]["UnitsCodeSystemName"].ToString());
-				ehrLabResult.UnitsIDAlt                                                 = PIn.String(table.Rows[i]["UnitsIDAlt"].ToString());
-				ehrLabResult.UnitsTextAlt                                               = PIn.String(table.Rows[i]["UnitsTextAlt"].ToString());
-				ehrLabResult.UnitsCodeSystemNameAlt                                     = PIn.String(table.Rows[i]["UnitsCodeSystemNameAlt"].ToString());
-				ehrLabResult.UnitsTextOriginal                                          = PIn.String(table.Rows[i]["UnitsTextOriginal"].ToString());
-				ehrLabResult.referenceRange                                             = PIn.String(table.Rows[i]["referenceRange"].ToString());
-				ehrLabResult.AbnormalFlags                                              = PIn.String(table.Rows[i]["AbnormalFlags"].ToString());
-				string observationResultStatus=table.Rows[i]["ObservationResultStatus"].ToString();
+				ehrLabResult.ObservationIdentifierID                                    = PIn.String(row["ObservationIdentifierID"].ToString());
+				ehrLabResult.ObservationIdentifierText                                  = PIn.String(row["ObservationIdentifierText"].ToString());
+				ehrLabResult.ObservationIdentifierCodeSystemName                        = PIn.String(row["ObservationIdentifierCodeSystemName"].ToString());
+				ehrLabResult.ObservationIdentifierIDAlt                                 = PIn.String(row["ObservationIdentifierIDAlt"].ToString());
+				ehrLabResult.ObservationIdentifierTextAlt                               = PIn.String(row["ObservationIdentifierTextAlt"].ToString());
+				ehrLabResult.ObservationIdentifierCodeSystemNameAlt                     = PIn.String(row["ObservationIdentifierCodeSystemNameAlt"].ToString());
+				ehrLabResult.ObservationIdentifierTextOriginal                          = PIn.String(row["ObservationIdentifierTextOriginal"].ToString());
+				ehrLabResult.ObservationIdentifierSub                                   = PIn.String(row["ObservationIdentifierSub"].ToString());
+				ehrLabResult.ObservationValueCodedElementID                             = PIn.String(row["ObservationValueCodedElementID"].ToString());
+				ehrLabResult.ObservationValueCodedElementText                           = PIn.String(row["ObservationValueCodedElementText"].ToString());
+				ehrLabResult.ObservationValueCodedElementCodeSystemName                 = PIn.String(row["ObservationValueCodedElementCodeSystemName"].ToString());
+				ehrLabResult.ObservationValueCodedElementIDAlt                          = PIn.String(row["ObservationValueCodedElementIDAlt"].ToString());
+				ehrLabResult.ObservationValueCodedElementTextAlt                        = PIn.String(row["ObservationValueCodedElementTextAlt"].ToString());
+				ehrLabResult.ObservationValueCodedElementCodeSystemNameAlt              = PIn.String(row["ObservationValueCodedElementCodeSystemNameAlt"].ToString());
+				ehrLabResult.ObservationValueCodedElementTextOriginal                   = PIn.String(row["ObservationValueCodedElementTextOriginal"].ToString());
+				ehrLabResult.ObservationValueDateTime                                   = PIn.String(row["ObservationValueDateTime"].ToString());
+				ehrLabResult.ObservationValueTime                                       = PIn.Time(row["ObservationValueTime"].ToString());
+				ehrLabResult.ObservationValueComparator                                 = PIn.String(row["ObservationValueComparator"].ToString());
+				ehrLabResult.ObservationValueNumber1                                    = PIn.Double(row["ObservationValueNumber1"].ToString());
+				ehrLabResult.ObservationValueSeparatorOrSuffix                          = PIn.String(row["ObservationValueSeparatorOrSuffix"].ToString());
+				ehrLabResult.ObservationValueNumber2                                    = PIn.Double(row["ObservationValueNumber2"].ToString());
+				ehrLabResult.ObservationValueNumeric                                    = PIn.Double(row["ObservationValueNumeric"].ToString());
+				ehrLabResult.ObservationValueText                                       = PIn.String(row["ObservationValueText"].ToString());
+				ehrLabResult.UnitsID                                                    = PIn.String(row["UnitsID"].ToString());
+				ehrLabResult.UnitsText                                                  = PIn.String(row["UnitsText"].ToString());
+				ehrLabResult.UnitsCodeSystemName                                        = PIn.String(row["UnitsCodeSystemName"].ToString());
+				ehrLabResult.UnitsIDAlt                                                 = PIn.String(row["UnitsIDAlt"].ToString());
+				ehrLabResult.UnitsTextAlt                                               = PIn.String(row["UnitsTextAlt"].ToString());
+				ehrLabResult.UnitsCodeSystemNameAlt                                     = PIn.String(row["UnitsCodeSystemNameAlt"].ToString());
+				ehrLabResult.UnitsTextOriginal                                          = PIn.String(row["UnitsTextOriginal"].ToString());
+				ehrLabResult.referenceRange                                             = PIn.String(row["referenceRange"].ToString());
+				ehrLabResult.AbnormalFlags                                              = PIn.String(row["AbnormalFlags"].ToString());
+				string observationResultStatus=row["ObservationResultStatus"].ToString();
 				if(observationResultStatus==""){
 					ehrLabResult.ObservationResultStatus                                  =(HL70085)0;
 				}
@@ -102,13 +102,13 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.ObservationResultStatus                                  =(HL70085)0;
 				}
-				ehrLabResult.ObservationDateTime                                        = PIn.String(table.Rows[i]["ObservationDateTime"].ToString());
-				ehrLabResult.AnalysisDateTime                                           = PIn.String(table.Rows[i]["AnalysisDateTime"].ToString());
-				ehrLabResult.PerformingOrganizationName                                 = PIn.String(table.Rows[i]["PerformingOrganizationName"].ToString());
-				ehrLabResult.PerformingOrganizationNameAssigningAuthorityNamespaceId    = PIn.String(table.Rows[i]["PerformingOrganizationNameAssigningAuthorityNamespaceId"].ToString());
-				ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalId    = PIn.String(table.Rows[i]["PerformingOrganizationNameAssigningAuthorityUniversalId"].ToString());
-				ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalIdType= PIn.String(table.Rows[i]["PerformingOrganizationNameAssigningAuthorityUniversalIdType"].ToString());
-				string performingOrganizationIdentifierTypeCode=table.Rows[i]["PerformingOrganizationIdentifierTypeCode"].ToString();
+				ehrLabResult.ObservationDateTime                                        = PIn.String(row["ObservationDateTime"].ToString());
+				ehrLabResult.AnalysisDateTime                                           = PIn.String(row["AnalysisDateTime"].ToString());
+				ehrLabResult.PerformingOrganizationName                                 = PIn.String(row["PerformingOrganizationName"].ToString());
+				ehrLabResult.PerformingOrganizationNameAssigningAuthorityNamespaceId    = PIn.String(row["PerformingOrganizationNameAssigningAuthorityNamespaceId"].ToString());
+				ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalId    = PIn.String(row["PerformingOrganizationNameAssigningAuthorityUniversalId"].ToString());
+				ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalIdType= PIn.String(row["PerformingOrganizationNameAssigningAuthorityUniversalIdType"].ToString());
+				string performingOrganizationIdentifierTypeCode=row["PerformingOrganizationIdentifierTypeCode"].ToString();
 				if(performingOrganizationIdentifierTypeCode==""){
 					ehrLabResult.PerformingOrganizationIdentifierTypeCode                 =(HL70203)0;
 				}
@@ -118,11 +118,11 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.PerformingOrganizationIdentifierTypeCode                 =(HL70203)0;
 				}
-				ehrLabResult.PerformingOrganizationIdentifier                           = PIn.String(table.Rows[i]["PerformingOrganizationIdentifier"].ToString());
-				ehrLabResult.PerformingOrganizationAddressStreet                        = PIn.String(table.Rows[i]["PerformingOrganizationAddressStreet"].ToString());
-				ehrLabResult.PerformingOrganizationAddressOtherDesignation              = PIn.String(table.Rows[i]["PerformingOrganizationAddressOtherDesignation"].ToString());
-				ehrLabResult.PerformingOrganizationAddressCity                          = PIn.String(table.Rows[i]["PerformingOrganizationAddressCity"].ToString());
-				string performingOrganizationAddressStateOrProvince=table.Rows[i]["PerformingOrganizationAddressStateOrProvince"].ToString();
+				ehrLabResult.PerformingOrganizationIdentifier                           = PIn.String(row["PerformingOrganizationIdentifier"].ToString());
+				ehrLabResult.PerformingOrganizationAddressStreet                        = PIn.String(row["PerformingOrganizationAddressStreet"].ToString());
+				ehrLabResult.PerformingOrganizationAddressOtherDesignation              = PIn.String(row["PerformingOrganizationAddressOtherDesignation"].ToString());
+				ehrLabResult.PerformingOrganizationAddressCity                          = PIn.String(row["PerformingOrganizationAddressCity"].ToString());
+				string performingOrganizationAddressStateOrProvince=row["PerformingOrganizationAddressStateOrProvince"].ToString();
 				if(performingOrganizationAddressStateOrProvince==""){
 					ehrLabResult.PerformingOrganizationAddressStateOrProvince             =(USPSAlphaStateCode)0;
 				}
@@ -132,9 +132,9 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.PerformingOrganizationAddressStateOrProvince             =(USPSAlphaStateCode)0;
 				}
-				ehrLabResult.PerformingOrganizationAddressZipOrPostalCode               = PIn.String(table.Rows[i]["PerformingOrganizationAddressZipOrPostalCode"].ToString());
-				ehrLabResult.PerformingOrganizationAddressCountryCode                   = PIn.String(table.Rows[i]["PerformingOrganizationAddressCountryCode"].ToString());
-				string performingOrganizationAddressAddressType=table.Rows[i]["PerformingOrganizationAddressAddressType"].ToString();
+				ehrLabResult.PerformingOrganizationAddressZipOrPostalCode               = PIn.String(row["PerformingOrganizationAddressZipOrPostalCode"].ToString());
+				ehrLabResult.PerformingOrganizationAddressCountryCode                   = PIn.String(row["PerformingOrganizationAddressCountryCode"].ToString());
+				string performingOrganizationAddressAddressType=row["PerformingOrganizationAddressAddressType"].ToString();
 				if(performingOrganizationAddressAddressType==""){
 					ehrLabResult.PerformingOrganizationAddressAddressType                 =(HL70190)0;
 				}
@@ -144,17 +144,17 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.PerformingOrganizationAddressAddressType                 =(HL70190)0;
 				}
-				ehrLabResult.PerformingOrganizationAddressCountyOrParishCode            = PIn.String(table.Rows[i]["PerformingOrganizationAddressCountyOrParishCode"].ToString());
-				ehrLabResult.MedicalDirectorID                                          = PIn.String(table.Rows[i]["MedicalDirectorID"].ToString());
-				ehrLabResult.MedicalDirectorLName                                       = PIn.String(table.Rows[i]["MedicalDirectorLName"].ToString());
-				ehrLabResult.MedicalDirectorFName                                       = PIn.String(table.Rows[i]["MedicalDirectorFName"].ToString());
-				ehrLabResult.MedicalDirectorMiddleNames                                 = PIn.String(table.Rows[i]["MedicalDirectorMiddleNames"].ToString());
-				ehrLabResult.MedicalDirectorSuffix                                      = PIn.String(table.Rows[i]["MedicalDirectorSuffix"].ToString());
-				ehrLabResult.MedicalDirectorPrefix                                      = PIn.String(table.Rows[i]["MedicalDirectorPrefix"].ToString());
-				ehrLabResult.MedicalDirectorAssigningAuthorityNamespaceID               = PIn.String(table.Rows[i]["MedicalDirectorAssigningAuthorityNamespaceID"].ToString());
-				ehrLabResult.MedicalDirectorAssigningAuthorityUniversalID               = PIn.String(table.Rows[i]["MedicalDirectorAssigningAuthorityUniversalID"].ToString());
-				ehrLabResult.MedicalDirectorAssigningAuthorityIDType                    = PIn.String(table.Rows[i]["MedicalDirectorAssigningAuthorityIDType"].ToString());
-				string medicalDirectorNameTypeCode=table.Rows[i]["MedicalDirectorNameTypeCode"].ToString();
+				ehrLabResult.PerformingOrganizationAddressCountyOrParishCode            = PIn.String(row["PerformingOrganizationAddressCountyOrParishCode"].ToString());
+				ehrLabResult.MedicalDirectorID                                          = PIn.String(row["MedicalDirectorID"].ToString());
+				ehrLabResult.MedicalDirectorLName                                       = PIn.String(row["MedicalDirectorLName"].ToString());
+				ehrLabResult.MedicalDirectorFName                                       = PIn.String(row["MedicalDirectorFName"].ToString());
+				ehrLabResult.MedicalDirectorMiddleNames                                 = PIn.String(row["MedicalDirectorMiddleNames"].ToString());
+				ehrLabResult.MedicalDirectorSuffix                                      = PIn.String(row["MedicalDirectorSuffix"].ToString());
+				ehrLabResult.MedicalDirectorPrefix                                      = PIn.String(row["MedicalDirectorPrefix"].ToString());
+				ehrLabResult.MedicalDirectorAssigningAuthorityNamespaceID               = PIn.String(row["MedicalDirectorAssigningAuthorityNamespaceID"].ToString());
+				ehrLabResult.MedicalDirectorAssigningAuthorityUniversalID               = PIn.String(row["MedicalDirectorAssigningAuthorityUniversalID"].ToString());
+				ehrLabResult.MedicalDirectorAssigningAuthorityIDType                    = PIn.String(row["MedicalDirectorAssigningAuthorityIDType"].ToString());
+				string medicalDirectorNameTypeCode=row["MedicalDirectorNameTypeCode"].ToString();
 				if(medicalDirectorNameTypeCode==""){
 					ehrLabResult.MedicalDirectorNameTypeCode                              =(HL70200)0;
 				}
@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					ehrLabResult.MedicalDirectorNameTypeCode                              =(HL70200)0;
 				}
-				string medicalDirectorIdentifierTypeCode=table.Rows[i]["MedicalDirectorIdentifierTypeCode"].ToString();
+				string medicalDirectorIdentifierTypeCode=row["MedicalDirectorIdentifierTypeCode"].ToString();
 				if(medicalDirectorIdentifierTypeCode==""){
 					ehrLabResult.MedicalDirectorIdentifierTypeCode                        =(HL70203)0;
 				}

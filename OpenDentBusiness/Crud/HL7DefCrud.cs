@@ -44,22 +44,22 @@ namespace OpenDentBusiness.Crud{
 		public static List<HL7Def> TableToList(DataTable table){
 			List<HL7Def> retVal=new List<HL7Def>();
 			HL7Def hL7Def;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				hL7Def=new HL7Def();
-				hL7Def.HL7DefNum            = PIn.Long  (table.Rows[i]["HL7DefNum"].ToString());
-				hL7Def.Description          = PIn.String(table.Rows[i]["Description"].ToString());
-				hL7Def.ModeTx               = (OpenDentBusiness.ModeTxHL7)PIn.Int(table.Rows[i]["ModeTx"].ToString());
-				hL7Def.IncomingFolder       = PIn.String(table.Rows[i]["IncomingFolder"].ToString());
-				hL7Def.OutgoingFolder       = PIn.String(table.Rows[i]["OutgoingFolder"].ToString());
-				hL7Def.IncomingPort         = PIn.String(table.Rows[i]["IncomingPort"].ToString());
-				hL7Def.OutgoingIpPort       = PIn.String(table.Rows[i]["OutgoingIpPort"].ToString());
-				hL7Def.FieldSeparator       = PIn.String(table.Rows[i]["FieldSeparator"].ToString());
-				hL7Def.ComponentSeparator   = PIn.String(table.Rows[i]["ComponentSeparator"].ToString());
-				hL7Def.SubcomponentSeparator= PIn.String(table.Rows[i]["SubcomponentSeparator"].ToString());
-				hL7Def.RepetitionSeparator  = PIn.String(table.Rows[i]["RepetitionSeparator"].ToString());
-				hL7Def.EscapeCharacter      = PIn.String(table.Rows[i]["EscapeCharacter"].ToString());
-				hL7Def.IsInternal           = PIn.Bool  (table.Rows[i]["IsInternal"].ToString());
-				string internalType=table.Rows[i]["InternalType"].ToString();
+				hL7Def.HL7DefNum            = PIn.Long  (row["HL7DefNum"].ToString());
+				hL7Def.Description          = PIn.String(row["Description"].ToString());
+				hL7Def.ModeTx               = (OpenDentBusiness.ModeTxHL7)PIn.Int(row["ModeTx"].ToString());
+				hL7Def.IncomingFolder       = PIn.String(row["IncomingFolder"].ToString());
+				hL7Def.OutgoingFolder       = PIn.String(row["OutgoingFolder"].ToString());
+				hL7Def.IncomingPort         = PIn.String(row["IncomingPort"].ToString());
+				hL7Def.OutgoingIpPort       = PIn.String(row["OutgoingIpPort"].ToString());
+				hL7Def.FieldSeparator       = PIn.String(row["FieldSeparator"].ToString());
+				hL7Def.ComponentSeparator   = PIn.String(row["ComponentSeparator"].ToString());
+				hL7Def.SubcomponentSeparator= PIn.String(row["SubcomponentSeparator"].ToString());
+				hL7Def.RepetitionSeparator  = PIn.String(row["RepetitionSeparator"].ToString());
+				hL7Def.EscapeCharacter      = PIn.String(row["EscapeCharacter"].ToString());
+				hL7Def.IsInternal           = PIn.Bool  (row["IsInternal"].ToString());
+				string internalType=row["InternalType"].ToString();
 				if(internalType==""){
 					hL7Def.InternalType       =(HL7InternalType)0;
 				}
@@ -69,20 +69,20 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					hL7Def.InternalType       =(HL7InternalType)0;
 				}
-				hL7Def.InternalTypeVersion  = PIn.String(table.Rows[i]["InternalTypeVersion"].ToString());
-				hL7Def.IsEnabled            = PIn.Bool  (table.Rows[i]["IsEnabled"].ToString());
-				hL7Def.Note                 = PIn.String(table.Rows[i]["Note"].ToString());
-				hL7Def.HL7Server            = PIn.String(table.Rows[i]["HL7Server"].ToString());
-				hL7Def.HL7ServiceName       = PIn.String(table.Rows[i]["HL7ServiceName"].ToString());
-				hL7Def.ShowDemographics     = (OpenDentBusiness.HL7ShowDemographics)PIn.Int(table.Rows[i]["ShowDemographics"].ToString());
-				hL7Def.ShowAppts            = PIn.Bool  (table.Rows[i]["ShowAppts"].ToString());
-				hL7Def.ShowAccount          = PIn.Bool  (table.Rows[i]["ShowAccount"].ToString());
-				hL7Def.IsQuadAsToothNum     = PIn.Bool  (table.Rows[i]["IsQuadAsToothNum"].ToString());
-				hL7Def.LabResultImageCat    = PIn.Long  (table.Rows[i]["LabResultImageCat"].ToString());
-				hL7Def.SftpUsername         = PIn.String(table.Rows[i]["SftpUsername"].ToString());
-				hL7Def.SftpPassword         = PIn.String(table.Rows[i]["SftpPassword"].ToString());
-				hL7Def.SftpInSocket         = PIn.String(table.Rows[i]["SftpInSocket"].ToString());
-				hL7Def.HasLongDCodes        = PIn.Bool  (table.Rows[i]["HasLongDCodes"].ToString());
+				hL7Def.InternalTypeVersion  = PIn.String(row["InternalTypeVersion"].ToString());
+				hL7Def.IsEnabled            = PIn.Bool  (row["IsEnabled"].ToString());
+				hL7Def.Note                 = PIn.String(row["Note"].ToString());
+				hL7Def.HL7Server            = PIn.String(row["HL7Server"].ToString());
+				hL7Def.HL7ServiceName       = PIn.String(row["HL7ServiceName"].ToString());
+				hL7Def.ShowDemographics     = (OpenDentBusiness.HL7ShowDemographics)PIn.Int(row["ShowDemographics"].ToString());
+				hL7Def.ShowAppts            = PIn.Bool  (row["ShowAppts"].ToString());
+				hL7Def.ShowAccount          = PIn.Bool  (row["ShowAccount"].ToString());
+				hL7Def.IsQuadAsToothNum     = PIn.Bool  (row["IsQuadAsToothNum"].ToString());
+				hL7Def.LabResultImageCat    = PIn.Long  (row["LabResultImageCat"].ToString());
+				hL7Def.SftpUsername         = PIn.String(row["SftpUsername"].ToString());
+				hL7Def.SftpPassword         = PIn.String(row["SftpPassword"].ToString());
+				hL7Def.SftpInSocket         = PIn.String(row["SftpInSocket"].ToString());
+				hL7Def.HasLongDCodes        = PIn.Bool  (row["HasLongDCodes"].ToString());
 				retVal.Add(hL7Def);
 			}
 			return retVal;

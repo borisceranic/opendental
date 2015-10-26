@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Deposit> TableToList(DataTable table){
 			List<Deposit> retVal=new List<Deposit>();
 			Deposit deposit;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				deposit=new Deposit();
-				deposit.DepositNum     = PIn.Long  (table.Rows[i]["DepositNum"].ToString());
-				deposit.DateDeposit    = PIn.Date  (table.Rows[i]["DateDeposit"].ToString());
-				deposit.BankAccountInfo= PIn.String(table.Rows[i]["BankAccountInfo"].ToString());
-				deposit.Amount         = PIn.Double(table.Rows[i]["Amount"].ToString());
-				deposit.Memo           = PIn.String(table.Rows[i]["Memo"].ToString());
+				deposit.DepositNum     = PIn.Long  (row["DepositNum"].ToString());
+				deposit.DateDeposit    = PIn.Date  (row["DateDeposit"].ToString());
+				deposit.BankAccountInfo= PIn.String(row["BankAccountInfo"].ToString());
+				deposit.Amount         = PIn.Double(row["Amount"].ToString());
+				deposit.Memo           = PIn.String(row["Memo"].ToString());
 				retVal.Add(deposit);
 			}
 			return retVal;

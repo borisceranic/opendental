@@ -44,27 +44,27 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedLab> TableToList(DataTable table){
 			List<MedLab> retVal=new List<MedLab>();
 			MedLab medLab;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medLab=new MedLab();
-				medLab.MedLabNum          = PIn.Long  (table.Rows[i]["MedLabNum"].ToString());
-				medLab.ProvNum            = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				medLab.SendingApp         = PIn.String(table.Rows[i]["SendingApp"].ToString());
-				medLab.SendingFacility    = PIn.String(table.Rows[i]["SendingFacility"].ToString());
-				medLab.PatNum             = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				medLab.PatIDLab           = PIn.String(table.Rows[i]["PatIDLab"].ToString());
-				medLab.PatIDAlt           = PIn.String(table.Rows[i]["PatIDAlt"].ToString());
-				medLab.PatAge             = PIn.String(table.Rows[i]["PatAge"].ToString());
-				medLab.PatAccountNum      = PIn.String(table.Rows[i]["PatAccountNum"].ToString());
-				medLab.PatFasting         = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["PatFasting"].ToString());
-				medLab.SpecimenID         = PIn.String(table.Rows[i]["SpecimenID"].ToString());
-				medLab.SpecimenIDFiller   = PIn.String(table.Rows[i]["SpecimenIDFiller"].ToString());
-				medLab.ObsTestID          = PIn.String(table.Rows[i]["ObsTestID"].ToString());
-				medLab.ObsTestDescript    = PIn.String(table.Rows[i]["ObsTestDescript"].ToString());
-				medLab.ObsTestLoinc       = PIn.String(table.Rows[i]["ObsTestLoinc"].ToString());
-				medLab.ObsTestLoincText   = PIn.String(table.Rows[i]["ObsTestLoincText"].ToString());
-				medLab.DateTimeCollected  = PIn.DateT (table.Rows[i]["DateTimeCollected"].ToString());
-				medLab.TotalVolume        = PIn.String(table.Rows[i]["TotalVolume"].ToString());
-				string actionCode=table.Rows[i]["ActionCode"].ToString();
+				medLab.MedLabNum          = PIn.Long  (row["MedLabNum"].ToString());
+				medLab.ProvNum            = PIn.Long  (row["ProvNum"].ToString());
+				medLab.SendingApp         = PIn.String(row["SendingApp"].ToString());
+				medLab.SendingFacility    = PIn.String(row["SendingFacility"].ToString());
+				medLab.PatNum             = PIn.Long  (row["PatNum"].ToString());
+				medLab.PatIDLab           = PIn.String(row["PatIDLab"].ToString());
+				medLab.PatIDAlt           = PIn.String(row["PatIDAlt"].ToString());
+				medLab.PatAge             = PIn.String(row["PatAge"].ToString());
+				medLab.PatAccountNum      = PIn.String(row["PatAccountNum"].ToString());
+				medLab.PatFasting         = (OpenDentBusiness.YN)PIn.Int(row["PatFasting"].ToString());
+				medLab.SpecimenID         = PIn.String(row["SpecimenID"].ToString());
+				medLab.SpecimenIDFiller   = PIn.String(row["SpecimenIDFiller"].ToString());
+				medLab.ObsTestID          = PIn.String(row["ObsTestID"].ToString());
+				medLab.ObsTestDescript    = PIn.String(row["ObsTestDescript"].ToString());
+				medLab.ObsTestLoinc       = PIn.String(row["ObsTestLoinc"].ToString());
+				medLab.ObsTestLoincText   = PIn.String(row["ObsTestLoincText"].ToString());
+				medLab.DateTimeCollected  = PIn.DateT (row["DateTimeCollected"].ToString());
+				medLab.TotalVolume        = PIn.String(row["TotalVolume"].ToString());
+				string actionCode=row["ActionCode"].ToString();
 				if(actionCode==""){
 					medLab.ActionCode       =(ResultAction)0;
 				}
@@ -74,15 +74,15 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					medLab.ActionCode       =(ResultAction)0;
 				}
-				medLab.ClinicalInfo       = PIn.String(table.Rows[i]["ClinicalInfo"].ToString());
-				medLab.DateTimeEntered    = PIn.DateT (table.Rows[i]["DateTimeEntered"].ToString());
-				medLab.OrderingProvNPI    = PIn.String(table.Rows[i]["OrderingProvNPI"].ToString());
-				medLab.OrderingProvLocalID= PIn.String(table.Rows[i]["OrderingProvLocalID"].ToString());
-				medLab.OrderingProvLName  = PIn.String(table.Rows[i]["OrderingProvLName"].ToString());
-				medLab.OrderingProvFName  = PIn.String(table.Rows[i]["OrderingProvFName"].ToString());
-				medLab.SpecimenIDAlt      = PIn.String(table.Rows[i]["SpecimenIDAlt"].ToString());
-				medLab.DateTimeReported   = PIn.DateT (table.Rows[i]["DateTimeReported"].ToString());
-				string resultStatus=table.Rows[i]["ResultStatus"].ToString();
+				medLab.ClinicalInfo       = PIn.String(row["ClinicalInfo"].ToString());
+				medLab.DateTimeEntered    = PIn.DateT (row["DateTimeEntered"].ToString());
+				medLab.OrderingProvNPI    = PIn.String(row["OrderingProvNPI"].ToString());
+				medLab.OrderingProvLocalID= PIn.String(row["OrderingProvLocalID"].ToString());
+				medLab.OrderingProvLName  = PIn.String(row["OrderingProvLName"].ToString());
+				medLab.OrderingProvFName  = PIn.String(row["OrderingProvFName"].ToString());
+				medLab.SpecimenIDAlt      = PIn.String(row["SpecimenIDAlt"].ToString());
+				medLab.DateTimeReported   = PIn.DateT (row["DateTimeReported"].ToString());
+				string resultStatus=row["ResultStatus"].ToString();
 				if(resultStatus==""){
 					medLab.ResultStatus     =(ResultStatus)0;
 				}
@@ -92,12 +92,12 @@ namespace OpenDentBusiness.Crud{
 				catch{
 					medLab.ResultStatus     =(ResultStatus)0;
 				}
-				medLab.ParentObsID        = PIn.String(table.Rows[i]["ParentObsID"].ToString());
-				medLab.ParentObsTestID    = PIn.String(table.Rows[i]["ParentObsTestID"].ToString());
-				medLab.NotePat            = PIn.String(table.Rows[i]["NotePat"].ToString());
-				medLab.NoteLab            = PIn.String(table.Rows[i]["NoteLab"].ToString());
-				medLab.FileName           = PIn.String(table.Rows[i]["FileName"].ToString());
-				medLab.OriginalPIDSegment = PIn.String(table.Rows[i]["OriginalPIDSegment"].ToString());
+				medLab.ParentObsID        = PIn.String(row["ParentObsID"].ToString());
+				medLab.ParentObsTestID    = PIn.String(row["ParentObsTestID"].ToString());
+				medLab.NotePat            = PIn.String(row["NotePat"].ToString());
+				medLab.NoteLab            = PIn.String(row["NoteLab"].ToString());
+				medLab.FileName           = PIn.String(row["FileName"].ToString());
+				medLab.OriginalPIDSegment = PIn.String(row["OriginalPIDSegment"].ToString());
 				retVal.Add(medLab);
 			}
 			return retVal;

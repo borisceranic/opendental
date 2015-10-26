@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<ConnGroupAttach> TableToList(DataTable table){
 			List<ConnGroupAttach> retVal=new List<ConnGroupAttach>();
 			ConnGroupAttach connGroupAttach;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				connGroupAttach=new ConnGroupAttach();
-				connGroupAttach.ConnGroupAttachNum  = PIn.Long  (table.Rows[i]["ConnGroupAttachNum"].ToString());
-				connGroupAttach.ConnectionGroupNum  = PIn.Long  (table.Rows[i]["ConnectionGroupNum"].ToString());
-				connGroupAttach.CentralConnectionNum= PIn.Long  (table.Rows[i]["CentralConnectionNum"].ToString());
+				connGroupAttach.ConnGroupAttachNum  = PIn.Long  (row["ConnGroupAttachNum"].ToString());
+				connGroupAttach.ConnectionGroupNum  = PIn.Long  (row["ConnectionGroupNum"].ToString());
+				connGroupAttach.CentralConnectionNum= PIn.Long  (row["CentralConnectionNum"].ToString());
 				retVal.Add(connGroupAttach);
 			}
 			return retVal;

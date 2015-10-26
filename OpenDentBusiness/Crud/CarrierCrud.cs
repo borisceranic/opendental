@@ -44,24 +44,24 @@ namespace OpenDentBusiness.Crud{
 		public static List<Carrier> TableToList(DataTable table){
 			List<Carrier> retVal=new List<Carrier>();
 			Carrier carrier;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				carrier=new Carrier();
-				carrier.CarrierNum              = PIn.Long  (table.Rows[i]["CarrierNum"].ToString());
-				carrier.CarrierName             = PIn.String(table.Rows[i]["CarrierName"].ToString());
-				carrier.Address                 = PIn.String(table.Rows[i]["Address"].ToString());
-				carrier.Address2                = PIn.String(table.Rows[i]["Address2"].ToString());
-				carrier.City                    = PIn.String(table.Rows[i]["City"].ToString());
-				carrier.State                   = PIn.String(table.Rows[i]["State"].ToString());
-				carrier.Zip                     = PIn.String(table.Rows[i]["Zip"].ToString());
-				carrier.Phone                   = PIn.String(table.Rows[i]["Phone"].ToString());
-				carrier.ElectID                 = PIn.String(table.Rows[i]["ElectID"].ToString());
-				carrier.NoSendElect             = PIn.Bool  (table.Rows[i]["NoSendElect"].ToString());
-				carrier.IsCDA                   = PIn.Bool  (table.Rows[i]["IsCDA"].ToString());
-				carrier.CDAnetVersion           = PIn.String(table.Rows[i]["CDAnetVersion"].ToString());
-				carrier.CanadianNetworkNum      = PIn.Long  (table.Rows[i]["CanadianNetworkNum"].ToString());
-				carrier.IsHidden                = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				carrier.CanadianEncryptionMethod= PIn.Byte  (table.Rows[i]["CanadianEncryptionMethod"].ToString());
-				carrier.CanadianSupportedTypes  = (OpenDentBusiness.CanSupTransTypes)PIn.Int(table.Rows[i]["CanadianSupportedTypes"].ToString());
+				carrier.CarrierNum              = PIn.Long  (row["CarrierNum"].ToString());
+				carrier.CarrierName             = PIn.String(row["CarrierName"].ToString());
+				carrier.Address                 = PIn.String(row["Address"].ToString());
+				carrier.Address2                = PIn.String(row["Address2"].ToString());
+				carrier.City                    = PIn.String(row["City"].ToString());
+				carrier.State                   = PIn.String(row["State"].ToString());
+				carrier.Zip                     = PIn.String(row["Zip"].ToString());
+				carrier.Phone                   = PIn.String(row["Phone"].ToString());
+				carrier.ElectID                 = PIn.String(row["ElectID"].ToString());
+				carrier.NoSendElect             = PIn.Bool  (row["NoSendElect"].ToString());
+				carrier.IsCDA                   = PIn.Bool  (row["IsCDA"].ToString());
+				carrier.CDAnetVersion           = PIn.String(row["CDAnetVersion"].ToString());
+				carrier.CanadianNetworkNum      = PIn.Long  (row["CanadianNetworkNum"].ToString());
+				carrier.IsHidden                = PIn.Bool  (row["IsHidden"].ToString());
+				carrier.CanadianEncryptionMethod= PIn.Byte  (row["CanadianEncryptionMethod"].ToString());
+				carrier.CanadianSupportedTypes  = (OpenDentBusiness.CanSupTransTypes)PIn.Int(row["CanadianSupportedTypes"].ToString());
 				retVal.Add(carrier);
 			}
 			return retVal;

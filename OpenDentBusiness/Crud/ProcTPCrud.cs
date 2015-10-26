@@ -44,25 +44,25 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcTP> TableToList(DataTable table){
 			List<ProcTP> retVal=new List<ProcTP>();
 			ProcTP procTP;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procTP=new ProcTP();
-				procTP.ProcTPNum   = PIn.Long  (table.Rows[i]["ProcTPNum"].ToString());
-				procTP.TreatPlanNum= PIn.Long  (table.Rows[i]["TreatPlanNum"].ToString());
-				procTP.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				procTP.ProcNumOrig = PIn.Long  (table.Rows[i]["ProcNumOrig"].ToString());
-				procTP.ItemOrder   = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				procTP.Priority    = PIn.Long  (table.Rows[i]["Priority"].ToString());
-				procTP.ToothNumTP  = PIn.String(table.Rows[i]["ToothNumTP"].ToString());
-				procTP.Surf        = PIn.String(table.Rows[i]["Surf"].ToString());
-				procTP.ProcCode    = PIn.String(table.Rows[i]["ProcCode"].ToString());
-				procTP.Descript    = PIn.String(table.Rows[i]["Descript"].ToString());
-				procTP.FeeAmt      = PIn.Double(table.Rows[i]["FeeAmt"].ToString());
-				procTP.PriInsAmt   = PIn.Double(table.Rows[i]["PriInsAmt"].ToString());
-				procTP.SecInsAmt   = PIn.Double(table.Rows[i]["SecInsAmt"].ToString());
-				procTP.PatAmt      = PIn.Double(table.Rows[i]["PatAmt"].ToString());
-				procTP.Discount    = PIn.Double(table.Rows[i]["Discount"].ToString());
-				procTP.Prognosis   = PIn.String(table.Rows[i]["Prognosis"].ToString());
-				procTP.Dx          = PIn.String(table.Rows[i]["Dx"].ToString());
+				procTP.ProcTPNum   = PIn.Long  (row["ProcTPNum"].ToString());
+				procTP.TreatPlanNum= PIn.Long  (row["TreatPlanNum"].ToString());
+				procTP.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				procTP.ProcNumOrig = PIn.Long  (row["ProcNumOrig"].ToString());
+				procTP.ItemOrder   = PIn.Int   (row["ItemOrder"].ToString());
+				procTP.Priority    = PIn.Long  (row["Priority"].ToString());
+				procTP.ToothNumTP  = PIn.String(row["ToothNumTP"].ToString());
+				procTP.Surf        = PIn.String(row["Surf"].ToString());
+				procTP.ProcCode    = PIn.String(row["ProcCode"].ToString());
+				procTP.Descript    = PIn.String(row["Descript"].ToString());
+				procTP.FeeAmt      = PIn.Double(row["FeeAmt"].ToString());
+				procTP.PriInsAmt   = PIn.Double(row["PriInsAmt"].ToString());
+				procTP.SecInsAmt   = PIn.Double(row["SecInsAmt"].ToString());
+				procTP.PatAmt      = PIn.Double(row["PatAmt"].ToString());
+				procTP.Discount    = PIn.Double(row["Discount"].ToString());
+				procTP.Prognosis   = PIn.String(row["Prognosis"].ToString());
+				procTP.Dx          = PIn.String(row["Dx"].ToString());
 				retVal.Add(procTP);
 			}
 			return retVal;

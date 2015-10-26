@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<OrionProc> TableToList(DataTable table){
 			List<OrionProc> retVal=new List<OrionProc>();
 			OrionProc orionProc;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				orionProc=new OrionProc();
-				orionProc.OrionProcNum   = PIn.Long  (table.Rows[i]["OrionProcNum"].ToString());
-				orionProc.ProcNum        = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				orionProc.DPC            = (OpenDentBusiness.OrionDPC)PIn.Int(table.Rows[i]["DPC"].ToString());
-				orionProc.DPCpost        = (OpenDentBusiness.OrionDPC)PIn.Int(table.Rows[i]["DPCpost"].ToString());
-				orionProc.DateScheduleBy = PIn.Date  (table.Rows[i]["DateScheduleBy"].ToString());
-				orionProc.DateStopClock  = PIn.Date  (table.Rows[i]["DateStopClock"].ToString());
-				orionProc.Status2        = (OpenDentBusiness.OrionStatus)PIn.Int(table.Rows[i]["Status2"].ToString());
-				orionProc.IsOnCall       = PIn.Bool  (table.Rows[i]["IsOnCall"].ToString());
-				orionProc.IsEffectiveComm= PIn.Bool  (table.Rows[i]["IsEffectiveComm"].ToString());
-				orionProc.IsRepair       = PIn.Bool  (table.Rows[i]["IsRepair"].ToString());
+				orionProc.OrionProcNum   = PIn.Long  (row["OrionProcNum"].ToString());
+				orionProc.ProcNum        = PIn.Long  (row["ProcNum"].ToString());
+				orionProc.DPC            = (OpenDentBusiness.OrionDPC)PIn.Int(row["DPC"].ToString());
+				orionProc.DPCpost        = (OpenDentBusiness.OrionDPC)PIn.Int(row["DPCpost"].ToString());
+				orionProc.DateScheduleBy = PIn.Date  (row["DateScheduleBy"].ToString());
+				orionProc.DateStopClock  = PIn.Date  (row["DateStopClock"].ToString());
+				orionProc.Status2        = (OpenDentBusiness.OrionStatus)PIn.Int(row["Status2"].ToString());
+				orionProc.IsOnCall       = PIn.Bool  (row["IsOnCall"].ToString());
+				orionProc.IsEffectiveComm= PIn.Bool  (row["IsEffectiveComm"].ToString());
+				orionProc.IsRepair       = PIn.Bool  (row["IsRepair"].ToString());
 				retVal.Add(orionProc);
 			}
 			return retVal;

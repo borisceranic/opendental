@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<ClaimPayment> TableToList(DataTable table){
 			List<ClaimPayment> retVal=new List<ClaimPayment>();
 			ClaimPayment claimPayment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				claimPayment=new ClaimPayment();
-				claimPayment.ClaimPaymentNum= PIn.Long  (table.Rows[i]["ClaimPaymentNum"].ToString());
-				claimPayment.CheckDate      = PIn.Date  (table.Rows[i]["CheckDate"].ToString());
-				claimPayment.CheckAmt       = PIn.Double(table.Rows[i]["CheckAmt"].ToString());
-				claimPayment.CheckNum       = PIn.String(table.Rows[i]["CheckNum"].ToString());
-				claimPayment.BankBranch     = PIn.String(table.Rows[i]["BankBranch"].ToString());
-				claimPayment.Note           = PIn.String(table.Rows[i]["Note"].ToString());
-				claimPayment.ClinicNum      = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				claimPayment.DepositNum     = PIn.Long  (table.Rows[i]["DepositNum"].ToString());
-				claimPayment.CarrierName    = PIn.String(table.Rows[i]["CarrierName"].ToString());
-				claimPayment.DateIssued     = PIn.Date  (table.Rows[i]["DateIssued"].ToString());
-				claimPayment.IsPartial      = PIn.Bool  (table.Rows[i]["IsPartial"].ToString());
-				claimPayment.PayType        = PIn.Long  (table.Rows[i]["PayType"].ToString());
+				claimPayment.ClaimPaymentNum= PIn.Long  (row["ClaimPaymentNum"].ToString());
+				claimPayment.CheckDate      = PIn.Date  (row["CheckDate"].ToString());
+				claimPayment.CheckAmt       = PIn.Double(row["CheckAmt"].ToString());
+				claimPayment.CheckNum       = PIn.String(row["CheckNum"].ToString());
+				claimPayment.BankBranch     = PIn.String(row["BankBranch"].ToString());
+				claimPayment.Note           = PIn.String(row["Note"].ToString());
+				claimPayment.ClinicNum      = PIn.Long  (row["ClinicNum"].ToString());
+				claimPayment.DepositNum     = PIn.Long  (row["DepositNum"].ToString());
+				claimPayment.CarrierName    = PIn.String(row["CarrierName"].ToString());
+				claimPayment.DateIssued     = PIn.Date  (row["DateIssued"].ToString());
+				claimPayment.IsPartial      = PIn.Bool  (row["IsPartial"].ToString());
+				claimPayment.PayType        = PIn.Long  (row["PayType"].ToString());
 				retVal.Add(claimPayment);
 			}
 			return retVal;

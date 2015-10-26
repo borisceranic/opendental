@@ -44,11 +44,11 @@ namespace OpenDentBusiness.Crud{
 		public static List<FormPat> TableToList(DataTable table){
 			List<FormPat> retVal=new List<FormPat>();
 			FormPat formPat;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				formPat=new FormPat();
-				formPat.FormPatNum  = PIn.Long  (table.Rows[i]["FormPatNum"].ToString());
-				formPat.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				formPat.FormDateTime= PIn.DateT (table.Rows[i]["FormDateTime"].ToString());
+				formPat.FormPatNum  = PIn.Long  (row["FormPatNum"].ToString());
+				formPat.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				formPat.FormDateTime= PIn.DateT (row["FormDateTime"].ToString());
 				retVal.Add(formPat);
 			}
 			return retVal;

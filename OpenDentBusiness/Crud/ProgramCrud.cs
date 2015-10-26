@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<Program> TableToList(DataTable table){
 			List<Program> retVal=new List<Program>();
 			Program program;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				program=new Program();
-				program.ProgramNum   = PIn.Long  (table.Rows[i]["ProgramNum"].ToString());
-				program.ProgName     = PIn.String(table.Rows[i]["ProgName"].ToString());
-				program.ProgDesc     = PIn.String(table.Rows[i]["ProgDesc"].ToString());
-				program.Enabled      = PIn.Bool  (table.Rows[i]["Enabled"].ToString());
-				program.Path         = PIn.String(table.Rows[i]["Path"].ToString());
-				program.CommandLine  = PIn.String(table.Rows[i]["CommandLine"].ToString());
-				program.Note         = PIn.String(table.Rows[i]["Note"].ToString());
-				program.PluginDllName= PIn.String(table.Rows[i]["PluginDllName"].ToString());
+				program.ProgramNum   = PIn.Long  (row["ProgramNum"].ToString());
+				program.ProgName     = PIn.String(row["ProgName"].ToString());
+				program.ProgDesc     = PIn.String(row["ProgDesc"].ToString());
+				program.Enabled      = PIn.Bool  (row["Enabled"].ToString());
+				program.Path         = PIn.String(row["Path"].ToString());
+				program.CommandLine  = PIn.String(row["CommandLine"].ToString());
+				program.Note         = PIn.String(row["Note"].ToString());
+				program.PluginDllName= PIn.String(row["PluginDllName"].ToString());
 				retVal.Add(program);
 			}
 			return retVal;

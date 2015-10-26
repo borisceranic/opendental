@@ -44,32 +44,32 @@ namespace OpenDentBusiness.Crud{
 		public static List<Referral> TableToList(DataTable table){
 			List<Referral> retVal=new List<Referral>();
 			Referral referral;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				referral=new Referral();
-				referral.ReferralNum    = PIn.Long  (table.Rows[i]["ReferralNum"].ToString());
-				referral.LName          = PIn.String(table.Rows[i]["LName"].ToString());
-				referral.FName          = PIn.String(table.Rows[i]["FName"].ToString());
-				referral.MName          = PIn.String(table.Rows[i]["MName"].ToString());
-				referral.SSN            = PIn.String(table.Rows[i]["SSN"].ToString());
-				referral.UsingTIN       = PIn.Bool  (table.Rows[i]["UsingTIN"].ToString());
-				referral.Specialty      = PIn.Long  (table.Rows[i]["Specialty"].ToString());
-				referral.ST             = PIn.String(table.Rows[i]["ST"].ToString());
-				referral.Telephone      = PIn.String(table.Rows[i]["Telephone"].ToString());
-				referral.Address        = PIn.String(table.Rows[i]["Address"].ToString());
-				referral.Address2       = PIn.String(table.Rows[i]["Address2"].ToString());
-				referral.City           = PIn.String(table.Rows[i]["City"].ToString());
-				referral.Zip            = PIn.String(table.Rows[i]["Zip"].ToString());
-				referral.Note           = PIn.String(table.Rows[i]["Note"].ToString());
-				referral.Phone2         = PIn.String(table.Rows[i]["Phone2"].ToString());
-				referral.IsHidden       = PIn.Bool  (table.Rows[i]["IsHidden"].ToString());
-				referral.NotPerson      = PIn.Bool  (table.Rows[i]["NotPerson"].ToString());
-				referral.Title          = PIn.String(table.Rows[i]["Title"].ToString());
-				referral.EMail          = PIn.String(table.Rows[i]["EMail"].ToString());
-				referral.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				referral.NationalProvID = PIn.String(table.Rows[i]["NationalProvID"].ToString());
-				referral.Slip           = PIn.Long  (table.Rows[i]["Slip"].ToString());
-				referral.IsDoctor       = PIn.Bool  (table.Rows[i]["IsDoctor"].ToString());
-				referral.IsTrustedDirect= PIn.Bool  (table.Rows[i]["IsTrustedDirect"].ToString());
+				referral.ReferralNum    = PIn.Long  (row["ReferralNum"].ToString());
+				referral.LName          = PIn.String(row["LName"].ToString());
+				referral.FName          = PIn.String(row["FName"].ToString());
+				referral.MName          = PIn.String(row["MName"].ToString());
+				referral.SSN            = PIn.String(row["SSN"].ToString());
+				referral.UsingTIN       = PIn.Bool  (row["UsingTIN"].ToString());
+				referral.Specialty      = PIn.Long  (row["Specialty"].ToString());
+				referral.ST             = PIn.String(row["ST"].ToString());
+				referral.Telephone      = PIn.String(row["Telephone"].ToString());
+				referral.Address        = PIn.String(row["Address"].ToString());
+				referral.Address2       = PIn.String(row["Address2"].ToString());
+				referral.City           = PIn.String(row["City"].ToString());
+				referral.Zip            = PIn.String(row["Zip"].ToString());
+				referral.Note           = PIn.String(row["Note"].ToString());
+				referral.Phone2         = PIn.String(row["Phone2"].ToString());
+				referral.IsHidden       = PIn.Bool  (row["IsHidden"].ToString());
+				referral.NotPerson      = PIn.Bool  (row["NotPerson"].ToString());
+				referral.Title          = PIn.String(row["Title"].ToString());
+				referral.EMail          = PIn.String(row["EMail"].ToString());
+				referral.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				referral.NationalProvID = PIn.String(row["NationalProvID"].ToString());
+				referral.Slip           = PIn.Long  (row["Slip"].ToString());
+				referral.IsDoctor       = PIn.Bool  (row["IsDoctor"].ToString());
+				referral.IsTrustedDirect= PIn.Bool  (row["IsTrustedDirect"].ToString());
 				retVal.Add(referral);
 			}
 			return retVal;

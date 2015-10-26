@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<TimeAdjust> TableToList(DataTable table){
 			List<TimeAdjust> retVal=new List<TimeAdjust>();
 			TimeAdjust timeAdjust;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				timeAdjust=new TimeAdjust();
-				timeAdjust.TimeAdjustNum= PIn.Long  (table.Rows[i]["TimeAdjustNum"].ToString());
-				timeAdjust.EmployeeNum  = PIn.Long  (table.Rows[i]["EmployeeNum"].ToString());
-				timeAdjust.TimeEntry    = PIn.DateT (table.Rows[i]["TimeEntry"].ToString());
-				timeAdjust.RegHours     = PIn.TSpan (table.Rows[i]["RegHours"].ToString());
-				timeAdjust.OTimeHours   = PIn.TSpan (table.Rows[i]["OTimeHours"].ToString());
-				timeAdjust.Note         = PIn.String(table.Rows[i]["Note"].ToString());
-				timeAdjust.IsAuto       = PIn.Bool  (table.Rows[i]["IsAuto"].ToString());
+				timeAdjust.TimeAdjustNum= PIn.Long  (row["TimeAdjustNum"].ToString());
+				timeAdjust.EmployeeNum  = PIn.Long  (row["EmployeeNum"].ToString());
+				timeAdjust.TimeEntry    = PIn.DateT (row["TimeEntry"].ToString());
+				timeAdjust.RegHours     = PIn.TSpan (row["RegHours"].ToString());
+				timeAdjust.OTimeHours   = PIn.TSpan (row["OTimeHours"].ToString());
+				timeAdjust.Note         = PIn.String(row["Note"].ToString());
+				timeAdjust.IsAuto       = PIn.Bool  (row["IsAuto"].ToString());
 				retVal.Add(timeAdjust);
 			}
 			return retVal;

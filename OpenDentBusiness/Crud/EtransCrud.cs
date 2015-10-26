@@ -44,28 +44,28 @@ namespace OpenDentBusiness.Crud{
 		public static List<Etrans> TableToList(DataTable table){
 			List<Etrans> retVal=new List<Etrans>();
 			Etrans etrans;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				etrans=new Etrans();
-				etrans.EtransNum           = PIn.Long  (table.Rows[i]["EtransNum"].ToString());
-				etrans.DateTimeTrans       = PIn.DateT (table.Rows[i]["DateTimeTrans"].ToString());
-				etrans.ClearingHouseNum    = PIn.Long  (table.Rows[i]["ClearingHouseNum"].ToString());
-				etrans.Etype               = (OpenDentBusiness.EtransType)PIn.Int(table.Rows[i]["Etype"].ToString());
-				etrans.ClaimNum            = PIn.Long  (table.Rows[i]["ClaimNum"].ToString());
-				etrans.OfficeSequenceNumber= PIn.Int   (table.Rows[i]["OfficeSequenceNumber"].ToString());
-				etrans.CarrierTransCounter = PIn.Int   (table.Rows[i]["CarrierTransCounter"].ToString());
-				etrans.CarrierTransCounter2= PIn.Int   (table.Rows[i]["CarrierTransCounter2"].ToString());
-				etrans.CarrierNum          = PIn.Long  (table.Rows[i]["CarrierNum"].ToString());
-				etrans.CarrierNum2         = PIn.Long  (table.Rows[i]["CarrierNum2"].ToString());
-				etrans.PatNum              = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				etrans.BatchNumber         = PIn.Int   (table.Rows[i]["BatchNumber"].ToString());
-				etrans.AckCode             = PIn.String(table.Rows[i]["AckCode"].ToString());
-				etrans.TransSetNum         = PIn.Int   (table.Rows[i]["TransSetNum"].ToString());
-				etrans.Note                = PIn.String(table.Rows[i]["Note"].ToString());
-				etrans.EtransMessageTextNum= PIn.Long  (table.Rows[i]["EtransMessageTextNum"].ToString());
-				etrans.AckEtransNum        = PIn.Long  (table.Rows[i]["AckEtransNum"].ToString());
-				etrans.PlanNum             = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
-				etrans.InsSubNum           = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
-				etrans.TranSetId835        = PIn.String(table.Rows[i]["TranSetId835"].ToString());
+				etrans.EtransNum           = PIn.Long  (row["EtransNum"].ToString());
+				etrans.DateTimeTrans       = PIn.DateT (row["DateTimeTrans"].ToString());
+				etrans.ClearingHouseNum    = PIn.Long  (row["ClearingHouseNum"].ToString());
+				etrans.Etype               = (OpenDentBusiness.EtransType)PIn.Int(row["Etype"].ToString());
+				etrans.ClaimNum            = PIn.Long  (row["ClaimNum"].ToString());
+				etrans.OfficeSequenceNumber= PIn.Int   (row["OfficeSequenceNumber"].ToString());
+				etrans.CarrierTransCounter = PIn.Int   (row["CarrierTransCounter"].ToString());
+				etrans.CarrierTransCounter2= PIn.Int   (row["CarrierTransCounter2"].ToString());
+				etrans.CarrierNum          = PIn.Long  (row["CarrierNum"].ToString());
+				etrans.CarrierNum2         = PIn.Long  (row["CarrierNum2"].ToString());
+				etrans.PatNum              = PIn.Long  (row["PatNum"].ToString());
+				etrans.BatchNumber         = PIn.Int   (row["BatchNumber"].ToString());
+				etrans.AckCode             = PIn.String(row["AckCode"].ToString());
+				etrans.TransSetNum         = PIn.Int   (row["TransSetNum"].ToString());
+				etrans.Note                = PIn.String(row["Note"].ToString());
+				etrans.EtransMessageTextNum= PIn.Long  (row["EtransMessageTextNum"].ToString());
+				etrans.AckEtransNum        = PIn.Long  (row["AckEtransNum"].ToString());
+				etrans.PlanNum             = PIn.Long  (row["PlanNum"].ToString());
+				etrans.InsSubNum           = PIn.Long  (row["InsSubNum"].ToString());
+				etrans.TranSetId835        = PIn.String(row["TranSetId835"].ToString());
 				retVal.Add(etrans);
 			}
 			return retVal;

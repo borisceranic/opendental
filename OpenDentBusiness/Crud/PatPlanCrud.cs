@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<PatPlan> TableToList(DataTable table){
 			List<PatPlan> retVal=new List<PatPlan>();
 			PatPlan patPlan;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				patPlan=new PatPlan();
-				patPlan.PatPlanNum  = PIn.Long  (table.Rows[i]["PatPlanNum"].ToString());
-				patPlan.PatNum      = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				patPlan.Ordinal     = PIn.Byte  (table.Rows[i]["Ordinal"].ToString());
-				patPlan.IsPending   = PIn.Bool  (table.Rows[i]["IsPending"].ToString());
-				patPlan.Relationship= (OpenDentBusiness.Relat)PIn.Int(table.Rows[i]["Relationship"].ToString());
-				patPlan.PatID       = PIn.String(table.Rows[i]["PatID"].ToString());
-				patPlan.InsSubNum   = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
+				patPlan.PatPlanNum  = PIn.Long  (row["PatPlanNum"].ToString());
+				patPlan.PatNum      = PIn.Long  (row["PatNum"].ToString());
+				patPlan.Ordinal     = PIn.Byte  (row["Ordinal"].ToString());
+				patPlan.IsPending   = PIn.Bool  (row["IsPending"].ToString());
+				patPlan.Relationship= (OpenDentBusiness.Relat)PIn.Int(row["Relationship"].ToString());
+				patPlan.PatID       = PIn.String(row["PatID"].ToString());
+				patPlan.InsSubNum   = PIn.Long  (row["InsSubNum"].ToString());
 				retVal.Add(patPlan);
 			}
 			return retVal;

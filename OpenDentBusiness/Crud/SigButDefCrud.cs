@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<SigButDef> TableToList(DataTable table){
 			List<SigButDef> retVal=new List<SigButDef>();
 			SigButDef sigButDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sigButDef=new SigButDef();
-				sigButDef.SigButDefNum= PIn.Long  (table.Rows[i]["SigButDefNum"].ToString());
-				sigButDef.ButtonText  = PIn.String(table.Rows[i]["ButtonText"].ToString());
-				sigButDef.ButtonIndex = PIn.Int   (table.Rows[i]["ButtonIndex"].ToString());
-				sigButDef.SynchIcon   = PIn.Byte  (table.Rows[i]["SynchIcon"].ToString());
-				sigButDef.ComputerName= PIn.String(table.Rows[i]["ComputerName"].ToString());
+				sigButDef.SigButDefNum= PIn.Long  (row["SigButDefNum"].ToString());
+				sigButDef.ButtonText  = PIn.String(row["ButtonText"].ToString());
+				sigButDef.ButtonIndex = PIn.Int   (row["ButtonIndex"].ToString());
+				sigButDef.SynchIcon   = PIn.Byte  (row["SynchIcon"].ToString());
+				sigButDef.ComputerName= PIn.String(row["ComputerName"].ToString());
 				retVal.Add(sigButDef);
 			}
 			return retVal;

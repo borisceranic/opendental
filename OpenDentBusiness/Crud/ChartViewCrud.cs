@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<ChartView> TableToList(DataTable table){
 			List<ChartView> retVal=new List<ChartView>();
 			ChartView chartView;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				chartView=new ChartView();
-				chartView.ChartViewNum     = PIn.Long  (table.Rows[i]["ChartViewNum"].ToString());
-				chartView.Description      = PIn.String(table.Rows[i]["Description"].ToString());
-				chartView.ItemOrder        = PIn.Int   (table.Rows[i]["ItemOrder"].ToString());
-				chartView.ProcStatuses     = (OpenDentBusiness.ChartViewProcStat)PIn.Int(table.Rows[i]["ProcStatuses"].ToString());
-				chartView.ObjectTypes      = (OpenDentBusiness.ChartViewObjs)PIn.Int(table.Rows[i]["ObjectTypes"].ToString());
-				chartView.ShowProcNotes    = PIn.Bool  (table.Rows[i]["ShowProcNotes"].ToString());
-				chartView.IsAudit          = PIn.Bool  (table.Rows[i]["IsAudit"].ToString());
-				chartView.SelectedTeethOnly= PIn.Bool  (table.Rows[i]["SelectedTeethOnly"].ToString());
-				chartView.OrionStatusFlags = (OpenDentBusiness.OrionStatus)PIn.Int(table.Rows[i]["OrionStatusFlags"].ToString());
-				chartView.DatesShowing     = (OpenDentBusiness.ChartViewDates)PIn.Int(table.Rows[i]["DatesShowing"].ToString());
+				chartView.ChartViewNum     = PIn.Long  (row["ChartViewNum"].ToString());
+				chartView.Description      = PIn.String(row["Description"].ToString());
+				chartView.ItemOrder        = PIn.Int   (row["ItemOrder"].ToString());
+				chartView.ProcStatuses     = (OpenDentBusiness.ChartViewProcStat)PIn.Int(row["ProcStatuses"].ToString());
+				chartView.ObjectTypes      = (OpenDentBusiness.ChartViewObjs)PIn.Int(row["ObjectTypes"].ToString());
+				chartView.ShowProcNotes    = PIn.Bool  (row["ShowProcNotes"].ToString());
+				chartView.IsAudit          = PIn.Bool  (row["IsAudit"].ToString());
+				chartView.SelectedTeethOnly= PIn.Bool  (row["SelectedTeethOnly"].ToString());
+				chartView.OrionStatusFlags = (OpenDentBusiness.OrionStatus)PIn.Int(row["OrionStatusFlags"].ToString());
+				chartView.DatesShowing     = (OpenDentBusiness.ChartViewDates)PIn.Int(row["DatesShowing"].ToString());
 				retVal.Add(chartView);
 			}
 			return retVal;

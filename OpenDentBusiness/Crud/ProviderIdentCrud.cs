@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProviderIdent> TableToList(DataTable table){
 			List<ProviderIdent> retVal=new List<ProviderIdent>();
 			ProviderIdent providerIdent;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				providerIdent=new ProviderIdent();
-				providerIdent.ProviderIdentNum= PIn.Long  (table.Rows[i]["ProviderIdentNum"].ToString());
-				providerIdent.ProvNum         = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				providerIdent.PayorID         = PIn.String(table.Rows[i]["PayorID"].ToString());
-				providerIdent.SuppIDType      = (OpenDentBusiness.ProviderSupplementalID)PIn.Int(table.Rows[i]["SuppIDType"].ToString());
-				providerIdent.IDNumber        = PIn.String(table.Rows[i]["IDNumber"].ToString());
+				providerIdent.ProviderIdentNum= PIn.Long  (row["ProviderIdentNum"].ToString());
+				providerIdent.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
+				providerIdent.PayorID         = PIn.String(row["PayorID"].ToString());
+				providerIdent.SuppIDType      = (OpenDentBusiness.ProviderSupplementalID)PIn.Int(row["SuppIDType"].ToString());
+				providerIdent.IDNumber        = PIn.String(row["IDNumber"].ToString());
 				retVal.Add(providerIdent);
 			}
 			return retVal;

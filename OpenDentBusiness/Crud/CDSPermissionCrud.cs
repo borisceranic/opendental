@@ -44,20 +44,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<CDSPermission> TableToList(DataTable table){
 			List<CDSPermission> retVal=new List<CDSPermission>();
 			CDSPermission cDSPermission;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				cDSPermission=new CDSPermission();
-				cDSPermission.CDSPermissionNum= PIn.Long  (table.Rows[i]["CDSPermissionNum"].ToString());
-				cDSPermission.UserNum         = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				cDSPermission.SetupCDS        = PIn.Bool  (table.Rows[i]["SetupCDS"].ToString());
-				cDSPermission.ShowCDS         = PIn.Bool  (table.Rows[i]["ShowCDS"].ToString());
-				cDSPermission.ShowInfobutton  = PIn.Bool  (table.Rows[i]["ShowInfobutton"].ToString());
-				cDSPermission.EditBibliography= PIn.Bool  (table.Rows[i]["EditBibliography"].ToString());
-				cDSPermission.ProblemCDS      = PIn.Bool  (table.Rows[i]["ProblemCDS"].ToString());
-				cDSPermission.MedicationCDS   = PIn.Bool  (table.Rows[i]["MedicationCDS"].ToString());
-				cDSPermission.AllergyCDS      = PIn.Bool  (table.Rows[i]["AllergyCDS"].ToString());
-				cDSPermission.DemographicCDS  = PIn.Bool  (table.Rows[i]["DemographicCDS"].ToString());
-				cDSPermission.LabTestCDS      = PIn.Bool  (table.Rows[i]["LabTestCDS"].ToString());
-				cDSPermission.VitalCDS        = PIn.Bool  (table.Rows[i]["VitalCDS"].ToString());
+				cDSPermission.CDSPermissionNum= PIn.Long  (row["CDSPermissionNum"].ToString());
+				cDSPermission.UserNum         = PIn.Long  (row["UserNum"].ToString());
+				cDSPermission.SetupCDS        = PIn.Bool  (row["SetupCDS"].ToString());
+				cDSPermission.ShowCDS         = PIn.Bool  (row["ShowCDS"].ToString());
+				cDSPermission.ShowInfobutton  = PIn.Bool  (row["ShowInfobutton"].ToString());
+				cDSPermission.EditBibliography= PIn.Bool  (row["EditBibliography"].ToString());
+				cDSPermission.ProblemCDS      = PIn.Bool  (row["ProblemCDS"].ToString());
+				cDSPermission.MedicationCDS   = PIn.Bool  (row["MedicationCDS"].ToString());
+				cDSPermission.AllergyCDS      = PIn.Bool  (row["AllergyCDS"].ToString());
+				cDSPermission.DemographicCDS  = PIn.Bool  (row["DemographicCDS"].ToString());
+				cDSPermission.LabTestCDS      = PIn.Bool  (row["LabTestCDS"].ToString());
+				cDSPermission.VitalCDS        = PIn.Bool  (row["VitalCDS"].ToString());
 				retVal.Add(cDSPermission);
 			}
 			return retVal;

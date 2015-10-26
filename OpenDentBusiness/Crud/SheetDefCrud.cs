@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<SheetDef> TableToList(DataTable table){
 			List<SheetDef> retVal=new List<SheetDef>();
 			SheetDef sheetDef;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				sheetDef=new SheetDef();
-				sheetDef.SheetDefNum= PIn.Long  (table.Rows[i]["SheetDefNum"].ToString());
-				sheetDef.Description= PIn.String(table.Rows[i]["Description"].ToString());
-				sheetDef.SheetType  = (OpenDentBusiness.SheetTypeEnum)PIn.Int(table.Rows[i]["SheetType"].ToString());
-				sheetDef.FontSize   = PIn.Float (table.Rows[i]["FontSize"].ToString());
-				sheetDef.FontName   = PIn.String(table.Rows[i]["FontName"].ToString());
-				sheetDef.Width      = PIn.Int   (table.Rows[i]["Width"].ToString());
-				sheetDef.Height     = PIn.Int   (table.Rows[i]["Height"].ToString());
-				sheetDef.IsLandscape= PIn.Bool  (table.Rows[i]["IsLandscape"].ToString());
-				sheetDef.PageCount  = PIn.Int   (table.Rows[i]["PageCount"].ToString());
-				sheetDef.IsMultiPage= PIn.Bool  (table.Rows[i]["IsMultiPage"].ToString());
+				sheetDef.SheetDefNum= PIn.Long  (row["SheetDefNum"].ToString());
+				sheetDef.Description= PIn.String(row["Description"].ToString());
+				sheetDef.SheetType  = (OpenDentBusiness.SheetTypeEnum)PIn.Int(row["SheetType"].ToString());
+				sheetDef.FontSize   = PIn.Float (row["FontSize"].ToString());
+				sheetDef.FontName   = PIn.String(row["FontName"].ToString());
+				sheetDef.Width      = PIn.Int   (row["Width"].ToString());
+				sheetDef.Height     = PIn.Int   (row["Height"].ToString());
+				sheetDef.IsLandscape= PIn.Bool  (row["IsLandscape"].ToString());
+				sheetDef.PageCount  = PIn.Int   (row["PageCount"].ToString());
+				sheetDef.IsMultiPage= PIn.Bool  (row["IsMultiPage"].ToString());
 				retVal.Add(sheetDef);
 			}
 			return retVal;

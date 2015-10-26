@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<InsSub> TableToList(DataTable table){
 			List<InsSub> retVal=new List<InsSub>();
 			InsSub insSub;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				insSub=new InsSub();
-				insSub.InsSubNum    = PIn.Long  (table.Rows[i]["InsSubNum"].ToString());
-				insSub.PlanNum      = PIn.Long  (table.Rows[i]["PlanNum"].ToString());
-				insSub.Subscriber   = PIn.Long  (table.Rows[i]["Subscriber"].ToString());
-				insSub.DateEffective= PIn.Date  (table.Rows[i]["DateEffective"].ToString());
-				insSub.DateTerm     = PIn.Date  (table.Rows[i]["DateTerm"].ToString());
-				insSub.ReleaseInfo  = PIn.Bool  (table.Rows[i]["ReleaseInfo"].ToString());
-				insSub.AssignBen    = PIn.Bool  (table.Rows[i]["AssignBen"].ToString());
-				insSub.SubscriberID = PIn.String(table.Rows[i]["SubscriberID"].ToString());
-				insSub.BenefitNotes = PIn.String(table.Rows[i]["BenefitNotes"].ToString());
-				insSub.SubscNote    = PIn.String(table.Rows[i]["SubscNote"].ToString());
+				insSub.InsSubNum    = PIn.Long  (row["InsSubNum"].ToString());
+				insSub.PlanNum      = PIn.Long  (row["PlanNum"].ToString());
+				insSub.Subscriber   = PIn.Long  (row["Subscriber"].ToString());
+				insSub.DateEffective= PIn.Date  (row["DateEffective"].ToString());
+				insSub.DateTerm     = PIn.Date  (row["DateTerm"].ToString());
+				insSub.ReleaseInfo  = PIn.Bool  (row["ReleaseInfo"].ToString());
+				insSub.AssignBen    = PIn.Bool  (row["AssignBen"].ToString());
+				insSub.SubscriberID = PIn.String(row["SubscriberID"].ToString());
+				insSub.BenefitNotes = PIn.String(row["BenefitNotes"].ToString());
+				insSub.SubscNote    = PIn.String(row["SubscNote"].ToString());
 				retVal.Add(insSub);
 			}
 			return retVal;

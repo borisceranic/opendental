@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<CanadianNetwork> TableToList(DataTable table){
 			List<CanadianNetwork> retVal=new List<CanadianNetwork>();
 			CanadianNetwork canadianNetwork;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				canadianNetwork=new CanadianNetwork();
-				canadianNetwork.CanadianNetworkNum       = PIn.Long  (table.Rows[i]["CanadianNetworkNum"].ToString());
-				canadianNetwork.Abbrev                   = PIn.String(table.Rows[i]["Abbrev"].ToString());
-				canadianNetwork.Descript                 = PIn.String(table.Rows[i]["Descript"].ToString());
-				canadianNetwork.CanadianTransactionPrefix= PIn.String(table.Rows[i]["CanadianTransactionPrefix"].ToString());
-				canadianNetwork.CanadianIsRprHandler     = PIn.Bool  (table.Rows[i]["CanadianIsRprHandler"].ToString());
+				canadianNetwork.CanadianNetworkNum       = PIn.Long  (row["CanadianNetworkNum"].ToString());
+				canadianNetwork.Abbrev                   = PIn.String(row["Abbrev"].ToString());
+				canadianNetwork.Descript                 = PIn.String(row["Descript"].ToString());
+				canadianNetwork.CanadianTransactionPrefix= PIn.String(row["CanadianTransactionPrefix"].ToString());
+				canadianNetwork.CanadianIsRprHandler     = PIn.Bool  (row["CanadianIsRprHandler"].ToString());
 				retVal.Add(canadianNetwork);
 			}
 			return retVal;

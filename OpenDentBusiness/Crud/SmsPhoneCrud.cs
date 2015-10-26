@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<SmsPhone> TableToList(DataTable table){
 			List<SmsPhone> retVal=new List<SmsPhone>();
 			SmsPhone smsPhone;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				smsPhone=new SmsPhone();
-				smsPhone.SmsPhoneNum     = PIn.Long  (table.Rows[i]["SmsPhoneNum"].ToString());
-				smsPhone.ClinicNum       = PIn.Long  (table.Rows[i]["ClinicNum"].ToString());
-				smsPhone.PhoneNumber     = PIn.String(table.Rows[i]["PhoneNumber"].ToString());
-				smsPhone.DateTimeActive  = PIn.DateT (table.Rows[i]["DateTimeActive"].ToString());
-				smsPhone.DateTimeInactive= PIn.DateT (table.Rows[i]["DateTimeInactive"].ToString());
-				smsPhone.InactiveCode    = PIn.String(table.Rows[i]["InactiveCode"].ToString());
-				smsPhone.CountryCode     = PIn.String(table.Rows[i]["CountryCode"].ToString());
+				smsPhone.SmsPhoneNum     = PIn.Long  (row["SmsPhoneNum"].ToString());
+				smsPhone.ClinicNum       = PIn.Long  (row["ClinicNum"].ToString());
+				smsPhone.PhoneNumber     = PIn.String(row["PhoneNumber"].ToString());
+				smsPhone.DateTimeActive  = PIn.DateT (row["DateTimeActive"].ToString());
+				smsPhone.DateTimeInactive= PIn.DateT (row["DateTimeInactive"].ToString());
+				smsPhone.InactiveCode    = PIn.String(row["InactiveCode"].ToString());
+				smsPhone.CountryCode     = PIn.String(row["CountryCode"].ToString());
 				retVal.Add(smsPhone);
 			}
 			return retVal;

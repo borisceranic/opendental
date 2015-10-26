@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<RxAlert> TableToList(DataTable table){
 			List<RxAlert> retVal=new List<RxAlert>();
 			RxAlert rxAlert;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				rxAlert=new RxAlert();
-				rxAlert.RxAlertNum        = PIn.Long  (table.Rows[i]["RxAlertNum"].ToString());
-				rxAlert.RxDefNum          = PIn.Long  (table.Rows[i]["RxDefNum"].ToString());
-				rxAlert.DiseaseDefNum     = PIn.Long  (table.Rows[i]["DiseaseDefNum"].ToString());
-				rxAlert.AllergyDefNum     = PIn.Long  (table.Rows[i]["AllergyDefNum"].ToString());
-				rxAlert.MedicationNum     = PIn.Long  (table.Rows[i]["MedicationNum"].ToString());
-				rxAlert.NotificationMsg   = PIn.String(table.Rows[i]["NotificationMsg"].ToString());
-				rxAlert.IsHighSignificance= PIn.Bool  (table.Rows[i]["IsHighSignificance"].ToString());
+				rxAlert.RxAlertNum        = PIn.Long  (row["RxAlertNum"].ToString());
+				rxAlert.RxDefNum          = PIn.Long  (row["RxDefNum"].ToString());
+				rxAlert.DiseaseDefNum     = PIn.Long  (row["DiseaseDefNum"].ToString());
+				rxAlert.AllergyDefNum     = PIn.Long  (row["AllergyDefNum"].ToString());
+				rxAlert.MedicationNum     = PIn.Long  (row["MedicationNum"].ToString());
+				rxAlert.NotificationMsg   = PIn.String(row["NotificationMsg"].ToString());
+				rxAlert.IsHighSignificance= PIn.Bool  (row["IsHighSignificance"].ToString());
 				retVal.Add(rxAlert);
 			}
 			return retVal;

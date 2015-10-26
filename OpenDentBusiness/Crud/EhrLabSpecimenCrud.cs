@@ -45,20 +45,20 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrLabSpecimen> TableToList(DataTable table){
 			List<EhrLabSpecimen> retVal=new List<EhrLabSpecimen>();
 			EhrLabSpecimen ehrLabSpecimen;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrLabSpecimen=new EhrLabSpecimen();
-				ehrLabSpecimen.EhrLabSpecimenNum            = PIn.Long  (table.Rows[i]["EhrLabSpecimenNum"].ToString());
-				ehrLabSpecimen.EhrLabNum                    = PIn.Long  (table.Rows[i]["EhrLabNum"].ToString());
-				ehrLabSpecimen.SetIdSPM                     = PIn.Long  (table.Rows[i]["SetIdSPM"].ToString());
-				ehrLabSpecimen.SpecimenTypeID               = PIn.String(table.Rows[i]["SpecimenTypeID"].ToString());
-				ehrLabSpecimen.SpecimenTypeText             = PIn.String(table.Rows[i]["SpecimenTypeText"].ToString());
-				ehrLabSpecimen.SpecimenTypeCodeSystemName   = PIn.String(table.Rows[i]["SpecimenTypeCodeSystemName"].ToString());
-				ehrLabSpecimen.SpecimenTypeIDAlt            = PIn.String(table.Rows[i]["SpecimenTypeIDAlt"].ToString());
-				ehrLabSpecimen.SpecimenTypeTextAlt          = PIn.String(table.Rows[i]["SpecimenTypeTextAlt"].ToString());
-				ehrLabSpecimen.SpecimenTypeCodeSystemNameAlt= PIn.String(table.Rows[i]["SpecimenTypeCodeSystemNameAlt"].ToString());
-				ehrLabSpecimen.SpecimenTypeTextOriginal     = PIn.String(table.Rows[i]["SpecimenTypeTextOriginal"].ToString());
-				ehrLabSpecimen.CollectionDateTimeStart      = PIn.String(table.Rows[i]["CollectionDateTimeStart"].ToString());
-				ehrLabSpecimen.CollectionDateTimeEnd        = PIn.String(table.Rows[i]["CollectionDateTimeEnd"].ToString());
+				ehrLabSpecimen.EhrLabSpecimenNum            = PIn.Long  (row["EhrLabSpecimenNum"].ToString());
+				ehrLabSpecimen.EhrLabNum                    = PIn.Long  (row["EhrLabNum"].ToString());
+				ehrLabSpecimen.SetIdSPM                     = PIn.Long  (row["SetIdSPM"].ToString());
+				ehrLabSpecimen.SpecimenTypeID               = PIn.String(row["SpecimenTypeID"].ToString());
+				ehrLabSpecimen.SpecimenTypeText             = PIn.String(row["SpecimenTypeText"].ToString());
+				ehrLabSpecimen.SpecimenTypeCodeSystemName   = PIn.String(row["SpecimenTypeCodeSystemName"].ToString());
+				ehrLabSpecimen.SpecimenTypeIDAlt            = PIn.String(row["SpecimenTypeIDAlt"].ToString());
+				ehrLabSpecimen.SpecimenTypeTextAlt          = PIn.String(row["SpecimenTypeTextAlt"].ToString());
+				ehrLabSpecimen.SpecimenTypeCodeSystemNameAlt= PIn.String(row["SpecimenTypeCodeSystemNameAlt"].ToString());
+				ehrLabSpecimen.SpecimenTypeTextOriginal     = PIn.String(row["SpecimenTypeTextOriginal"].ToString());
+				ehrLabSpecimen.CollectionDateTimeStart      = PIn.String(row["CollectionDateTimeStart"].ToString());
+				ehrLabSpecimen.CollectionDateTimeEnd        = PIn.String(row["CollectionDateTimeEnd"].ToString());
 				retVal.Add(ehrLabSpecimen);
 			}
 			return retVal;

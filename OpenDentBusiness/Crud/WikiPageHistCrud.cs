@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<WikiPageHist> TableToList(DataTable table){
 			List<WikiPageHist> retVal=new List<WikiPageHist>();
 			WikiPageHist wikiPageHist;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				wikiPageHist=new WikiPageHist();
-				wikiPageHist.WikiPageNum  = PIn.Long  (table.Rows[i]["WikiPageNum"].ToString());
-				wikiPageHist.UserNum      = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				wikiPageHist.PageTitle    = PIn.String(table.Rows[i]["PageTitle"].ToString());
-				wikiPageHist.PageContent  = PIn.String(table.Rows[i]["PageContent"].ToString());
-				wikiPageHist.DateTimeSaved= PIn.DateT (table.Rows[i]["DateTimeSaved"].ToString());
-				wikiPageHist.IsDeleted    = PIn.Bool  (table.Rows[i]["IsDeleted"].ToString());
+				wikiPageHist.WikiPageNum  = PIn.Long  (row["WikiPageNum"].ToString());
+				wikiPageHist.UserNum      = PIn.Long  (row["UserNum"].ToString());
+				wikiPageHist.PageTitle    = PIn.String(row["PageTitle"].ToString());
+				wikiPageHist.PageContent  = PIn.String(row["PageContent"].ToString());
+				wikiPageHist.DateTimeSaved= PIn.DateT (row["DateTimeSaved"].ToString());
+				wikiPageHist.IsDeleted    = PIn.Bool  (row["IsDeleted"].ToString());
 				retVal.Add(wikiPageHist);
 			}
 			return retVal;

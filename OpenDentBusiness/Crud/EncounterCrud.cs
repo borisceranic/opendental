@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<Encounter> TableToList(DataTable table){
 			List<Encounter> retVal=new List<Encounter>();
 			Encounter encounter;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				encounter=new Encounter();
-				encounter.EncounterNum = PIn.Long  (table.Rows[i]["EncounterNum"].ToString());
-				encounter.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				encounter.ProvNum      = PIn.Long  (table.Rows[i]["ProvNum"].ToString());
-				encounter.CodeValue    = PIn.String(table.Rows[i]["CodeValue"].ToString());
-				encounter.CodeSystem   = PIn.String(table.Rows[i]["CodeSystem"].ToString());
-				encounter.Note         = PIn.String(table.Rows[i]["Note"].ToString());
-				encounter.DateEncounter= PIn.Date  (table.Rows[i]["DateEncounter"].ToString());
+				encounter.EncounterNum = PIn.Long  (row["EncounterNum"].ToString());
+				encounter.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				encounter.ProvNum      = PIn.Long  (row["ProvNum"].ToString());
+				encounter.CodeValue    = PIn.String(row["CodeValue"].ToString());
+				encounter.CodeSystem   = PIn.String(row["CodeSystem"].ToString());
+				encounter.Note         = PIn.String(row["Note"].ToString());
+				encounter.DateEncounter= PIn.Date  (row["DateEncounter"].ToString());
 				retVal.Add(encounter);
 			}
 			return retVal;

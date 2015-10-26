@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrSummaryCcd> TableToList(DataTable table){
 			List<EhrSummaryCcd> retVal=new List<EhrSummaryCcd>();
 			EhrSummaryCcd ehrSummaryCcd;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrSummaryCcd=new EhrSummaryCcd();
-				ehrSummaryCcd.EhrSummaryCcdNum= PIn.Long  (table.Rows[i]["EhrSummaryCcdNum"].ToString());
-				ehrSummaryCcd.PatNum          = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrSummaryCcd.DateSummary     = PIn.Date  (table.Rows[i]["DateSummary"].ToString());
-				ehrSummaryCcd.ContentSummary  = PIn.String(table.Rows[i]["ContentSummary"].ToString());
-				ehrSummaryCcd.EmailAttachNum  = PIn.Long  (table.Rows[i]["EmailAttachNum"].ToString());
+				ehrSummaryCcd.EhrSummaryCcdNum= PIn.Long  (row["EhrSummaryCcdNum"].ToString());
+				ehrSummaryCcd.PatNum          = PIn.Long  (row["PatNum"].ToString());
+				ehrSummaryCcd.DateSummary     = PIn.Date  (row["DateSummary"].ToString());
+				ehrSummaryCcd.ContentSummary  = PIn.String(row["ContentSummary"].ToString());
+				ehrSummaryCcd.EmailAttachNum  = PIn.Long  (row["EmailAttachNum"].ToString());
 				retVal.Add(ehrSummaryCcd);
 			}
 			return retVal;

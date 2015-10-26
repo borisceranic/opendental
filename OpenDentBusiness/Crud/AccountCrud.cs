@@ -44,14 +44,14 @@ namespace OpenDentBusiness.Crud{
 		public static List<Account> TableToList(DataTable table){
 			List<Account> retVal=new List<Account>();
 			Account account;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				account=new Account();
-				account.AccountNum  = PIn.Long  (table.Rows[i]["AccountNum"].ToString());
-				account.Description = PIn.String(table.Rows[i]["Description"].ToString());
-				account.AcctType    = (OpenDentBusiness.AccountType)PIn.Int(table.Rows[i]["AcctType"].ToString());
-				account.BankNumber  = PIn.String(table.Rows[i]["BankNumber"].ToString());
-				account.Inactive    = PIn.Bool  (table.Rows[i]["Inactive"].ToString());
-				account.AccountColor= Color.FromArgb(PIn.Int(table.Rows[i]["AccountColor"].ToString()));
+				account.AccountNum  = PIn.Long  (row["AccountNum"].ToString());
+				account.Description = PIn.String(row["Description"].ToString());
+				account.AcctType    = (OpenDentBusiness.AccountType)PIn.Int(row["AcctType"].ToString());
+				account.BankNumber  = PIn.String(row["BankNumber"].ToString());
+				account.Inactive    = PIn.Bool  (row["Inactive"].ToString());
+				account.AccountColor= Color.FromArgb(PIn.Int(row["AccountColor"].ToString()));
 				retVal.Add(account);
 			}
 			return retVal;

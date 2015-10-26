@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<PerioMeasure> TableToList(DataTable table){
 			List<PerioMeasure> retVal=new List<PerioMeasure>();
 			PerioMeasure perioMeasure;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				perioMeasure=new PerioMeasure();
-				perioMeasure.PerioMeasureNum= PIn.Long  (table.Rows[i]["PerioMeasureNum"].ToString());
-				perioMeasure.PerioExamNum   = PIn.Long  (table.Rows[i]["PerioExamNum"].ToString());
-				perioMeasure.SequenceType   = (OpenDentBusiness.PerioSequenceType)PIn.Int(table.Rows[i]["SequenceType"].ToString());
-				perioMeasure.IntTooth       = PIn.Int   (table.Rows[i]["IntTooth"].ToString());
-				perioMeasure.ToothValue     = PIn.Int   (table.Rows[i]["ToothValue"].ToString());
-				perioMeasure.MBvalue        = PIn.Int   (table.Rows[i]["MBvalue"].ToString());
-				perioMeasure.Bvalue         = PIn.Int   (table.Rows[i]["Bvalue"].ToString());
-				perioMeasure.DBvalue        = PIn.Int   (table.Rows[i]["DBvalue"].ToString());
-				perioMeasure.MLvalue        = PIn.Int   (table.Rows[i]["MLvalue"].ToString());
-				perioMeasure.Lvalue         = PIn.Int   (table.Rows[i]["Lvalue"].ToString());
-				perioMeasure.DLvalue        = PIn.Int   (table.Rows[i]["DLvalue"].ToString());
+				perioMeasure.PerioMeasureNum= PIn.Long  (row["PerioMeasureNum"].ToString());
+				perioMeasure.PerioExamNum   = PIn.Long  (row["PerioExamNum"].ToString());
+				perioMeasure.SequenceType   = (OpenDentBusiness.PerioSequenceType)PIn.Int(row["SequenceType"].ToString());
+				perioMeasure.IntTooth       = PIn.Int   (row["IntTooth"].ToString());
+				perioMeasure.ToothValue     = PIn.Int   (row["ToothValue"].ToString());
+				perioMeasure.MBvalue        = PIn.Int   (row["MBvalue"].ToString());
+				perioMeasure.Bvalue         = PIn.Int   (row["Bvalue"].ToString());
+				perioMeasure.DBvalue        = PIn.Int   (row["DBvalue"].ToString());
+				perioMeasure.MLvalue        = PIn.Int   (row["MLvalue"].ToString());
+				perioMeasure.Lvalue         = PIn.Int   (row["Lvalue"].ToString());
+				perioMeasure.DLvalue        = PIn.Int   (row["DLvalue"].ToString());
 				retVal.Add(perioMeasure);
 			}
 			return retVal;

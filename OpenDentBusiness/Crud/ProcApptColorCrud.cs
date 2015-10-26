@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcApptColor> TableToList(DataTable table){
 			List<ProcApptColor> retVal=new List<ProcApptColor>();
 			ProcApptColor procApptColor;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procApptColor=new ProcApptColor();
-				procApptColor.ProcApptColorNum= PIn.Long  (table.Rows[i]["ProcApptColorNum"].ToString());
-				procApptColor.CodeRange       = PIn.String(table.Rows[i]["CodeRange"].ToString());
-				procApptColor.ShowPreviousDate= PIn.Bool  (table.Rows[i]["ShowPreviousDate"].ToString());
-				procApptColor.ColorText       = Color.FromArgb(PIn.Int(table.Rows[i]["ColorText"].ToString()));
+				procApptColor.ProcApptColorNum= PIn.Long  (row["ProcApptColorNum"].ToString());
+				procApptColor.CodeRange       = PIn.String(row["CodeRange"].ToString());
+				procApptColor.ShowPreviousDate= PIn.Bool  (row["ShowPreviousDate"].ToString());
+				procApptColor.ColorText       = Color.FromArgb(PIn.Int(row["ColorText"].ToString()));
 				retVal.Add(procApptColor);
 			}
 			return retVal;

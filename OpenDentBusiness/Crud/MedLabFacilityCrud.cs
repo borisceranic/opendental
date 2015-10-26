@@ -44,18 +44,18 @@ namespace OpenDentBusiness.Crud{
 		public static List<MedLabFacility> TableToList(DataTable table){
 			List<MedLabFacility> retVal=new List<MedLabFacility>();
 			MedLabFacility medLabFacility;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				medLabFacility=new MedLabFacility();
-				medLabFacility.MedLabFacilityNum= PIn.Long  (table.Rows[i]["MedLabFacilityNum"].ToString());
-				medLabFacility.FacilityName     = PIn.String(table.Rows[i]["FacilityName"].ToString());
-				medLabFacility.Address          = PIn.String(table.Rows[i]["Address"].ToString());
-				medLabFacility.City             = PIn.String(table.Rows[i]["City"].ToString());
-				medLabFacility.State            = PIn.String(table.Rows[i]["State"].ToString());
-				medLabFacility.Zip              = PIn.String(table.Rows[i]["Zip"].ToString());
-				medLabFacility.Phone            = PIn.String(table.Rows[i]["Phone"].ToString());
-				medLabFacility.DirectorTitle    = PIn.String(table.Rows[i]["DirectorTitle"].ToString());
-				medLabFacility.DirectorLName    = PIn.String(table.Rows[i]["DirectorLName"].ToString());
-				medLabFacility.DirectorFName    = PIn.String(table.Rows[i]["DirectorFName"].ToString());
+				medLabFacility.MedLabFacilityNum= PIn.Long  (row["MedLabFacilityNum"].ToString());
+				medLabFacility.FacilityName     = PIn.String(row["FacilityName"].ToString());
+				medLabFacility.Address          = PIn.String(row["Address"].ToString());
+				medLabFacility.City             = PIn.String(row["City"].ToString());
+				medLabFacility.State            = PIn.String(row["State"].ToString());
+				medLabFacility.Zip              = PIn.String(row["Zip"].ToString());
+				medLabFacility.Phone            = PIn.String(row["Phone"].ToString());
+				medLabFacility.DirectorTitle    = PIn.String(row["DirectorTitle"].ToString());
+				medLabFacility.DirectorLName    = PIn.String(row["DirectorLName"].ToString());
+				medLabFacility.DirectorFName    = PIn.String(row["DirectorFName"].ToString());
 				retVal.Add(medLabFacility);
 			}
 			return retVal;

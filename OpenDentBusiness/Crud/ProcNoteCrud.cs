@@ -44,16 +44,16 @@ namespace OpenDentBusiness.Crud{
 		public static List<ProcNote> TableToList(DataTable table){
 			List<ProcNote> retVal=new List<ProcNote>();
 			ProcNote procNote;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				procNote=new ProcNote();
-				procNote.ProcNoteNum  = PIn.Long  (table.Rows[i]["ProcNoteNum"].ToString());
-				procNote.PatNum       = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				procNote.ProcNum      = PIn.Long  (table.Rows[i]["ProcNum"].ToString());
-				procNote.EntryDateTime= PIn.DateT (table.Rows[i]["EntryDateTime"].ToString());
-				procNote.UserNum      = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				procNote.Note         = PIn.String(table.Rows[i]["Note"].ToString());
-				procNote.SigIsTopaz   = PIn.Bool  (table.Rows[i]["SigIsTopaz"].ToString());
-				procNote.Signature    = PIn.String(table.Rows[i]["Signature"].ToString());
+				procNote.ProcNoteNum  = PIn.Long  (row["ProcNoteNum"].ToString());
+				procNote.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				procNote.ProcNum      = PIn.Long  (row["ProcNum"].ToString());
+				procNote.EntryDateTime= PIn.DateT (row["EntryDateTime"].ToString());
+				procNote.UserNum      = PIn.Long  (row["UserNum"].ToString());
+				procNote.Note         = PIn.String(row["Note"].ToString());
+				procNote.SigIsTopaz   = PIn.Bool  (row["SigIsTopaz"].ToString());
+				procNote.Signature    = PIn.String(row["Signature"].ToString());
 				retVal.Add(procNote);
 			}
 			return retVal;

@@ -44,12 +44,12 @@ namespace OpenDentBusiness.Crud{
 		public static List<TerminalActive> TableToList(DataTable table){
 			List<TerminalActive> retVal=new List<TerminalActive>();
 			TerminalActive terminalActive;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				terminalActive=new TerminalActive();
-				terminalActive.TerminalActiveNum= PIn.Long  (table.Rows[i]["TerminalActiveNum"].ToString());
-				terminalActive.ComputerName     = PIn.String(table.Rows[i]["ComputerName"].ToString());
-				terminalActive.TerminalStatus   = (OpenDentBusiness.TerminalStatusEnum)PIn.Int(table.Rows[i]["TerminalStatus"].ToString());
-				terminalActive.PatNum           = PIn.Long  (table.Rows[i]["PatNum"].ToString());
+				terminalActive.TerminalActiveNum= PIn.Long  (row["TerminalActiveNum"].ToString());
+				terminalActive.ComputerName     = PIn.String(row["ComputerName"].ToString());
+				terminalActive.TerminalStatus   = (OpenDentBusiness.TerminalStatusEnum)PIn.Int(row["TerminalStatus"].ToString());
+				terminalActive.PatNum           = PIn.Long  (row["PatNum"].ToString());
 				retVal.Add(terminalActive);
 			}
 			return retVal;

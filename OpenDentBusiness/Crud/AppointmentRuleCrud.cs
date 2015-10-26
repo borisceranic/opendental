@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<AppointmentRule> TableToList(DataTable table){
 			List<AppointmentRule> retVal=new List<AppointmentRule>();
 			AppointmentRule appointmentRule;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				appointmentRule=new AppointmentRule();
-				appointmentRule.AppointmentRuleNum= PIn.Long  (table.Rows[i]["AppointmentRuleNum"].ToString());
-				appointmentRule.RuleDesc          = PIn.String(table.Rows[i]["RuleDesc"].ToString());
-				appointmentRule.CodeStart         = PIn.String(table.Rows[i]["CodeStart"].ToString());
-				appointmentRule.CodeEnd           = PIn.String(table.Rows[i]["CodeEnd"].ToString());
-				appointmentRule.IsEnabled         = PIn.Bool  (table.Rows[i]["IsEnabled"].ToString());
+				appointmentRule.AppointmentRuleNum= PIn.Long  (row["AppointmentRuleNum"].ToString());
+				appointmentRule.RuleDesc          = PIn.String(row["RuleDesc"].ToString());
+				appointmentRule.CodeStart         = PIn.String(row["CodeStart"].ToString());
+				appointmentRule.CodeEnd           = PIn.String(row["CodeEnd"].ToString());
+				appointmentRule.IsEnabled         = PIn.Bool  (row["IsEnabled"].ToString());
 				retVal.Add(appointmentRule);
 			}
 			return retVal;

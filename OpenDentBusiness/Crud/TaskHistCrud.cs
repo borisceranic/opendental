@@ -44,26 +44,26 @@ namespace OpenDentBusiness.Crud{
 		public static List<TaskHist> TableToList(DataTable table){
 			List<TaskHist> retVal=new List<TaskHist>();
 			TaskHist taskHist;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				taskHist=new TaskHist();
-				taskHist.TaskHistNum     = PIn.Long  (table.Rows[i]["TaskHistNum"].ToString());
-				taskHist.UserNumHist     = PIn.Long  (table.Rows[i]["UserNumHist"].ToString());
-				taskHist.DateTStamp      = PIn.DateT (table.Rows[i]["DateTStamp"].ToString());
-				taskHist.IsNoteChange    = PIn.Bool  (table.Rows[i]["IsNoteChange"].ToString());
-				taskHist.TaskNum         = PIn.Long  (table.Rows[i]["TaskNum"].ToString());
-				taskHist.TaskListNum     = PIn.Long  (table.Rows[i]["TaskListNum"].ToString());
-				taskHist.DateTask        = PIn.Date  (table.Rows[i]["DateTask"].ToString());
-				taskHist.KeyNum          = PIn.Long  (table.Rows[i]["KeyNum"].ToString());
-				taskHist.Descript        = PIn.String(table.Rows[i]["Descript"].ToString());
-				taskHist.TaskStatus      = (OpenDentBusiness.TaskStatusEnum)PIn.Int(table.Rows[i]["TaskStatus"].ToString());
-				taskHist.IsRepeating     = PIn.Bool  (table.Rows[i]["IsRepeating"].ToString());
-				taskHist.DateType        = (OpenDentBusiness.TaskDateType)PIn.Int(table.Rows[i]["DateType"].ToString());
-				taskHist.FromNum         = PIn.Long  (table.Rows[i]["FromNum"].ToString());
-				taskHist.ObjectType      = (OpenDentBusiness.TaskObjectType)PIn.Int(table.Rows[i]["ObjectType"].ToString());
-				taskHist.DateTimeEntry   = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				taskHist.UserNum         = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				taskHist.DateTimeFinished= PIn.DateT (table.Rows[i]["DateTimeFinished"].ToString());
-				taskHist.PriorityDefNum  = PIn.Long  (table.Rows[i]["PriorityDefNum"].ToString());
+				taskHist.TaskHistNum     = PIn.Long  (row["TaskHistNum"].ToString());
+				taskHist.UserNumHist     = PIn.Long  (row["UserNumHist"].ToString());
+				taskHist.DateTStamp      = PIn.DateT (row["DateTStamp"].ToString());
+				taskHist.IsNoteChange    = PIn.Bool  (row["IsNoteChange"].ToString());
+				taskHist.TaskNum         = PIn.Long  (row["TaskNum"].ToString());
+				taskHist.TaskListNum     = PIn.Long  (row["TaskListNum"].ToString());
+				taskHist.DateTask        = PIn.Date  (row["DateTask"].ToString());
+				taskHist.KeyNum          = PIn.Long  (row["KeyNum"].ToString());
+				taskHist.Descript        = PIn.String(row["Descript"].ToString());
+				taskHist.TaskStatus      = (OpenDentBusiness.TaskStatusEnum)PIn.Int(row["TaskStatus"].ToString());
+				taskHist.IsRepeating     = PIn.Bool  (row["IsRepeating"].ToString());
+				taskHist.DateType        = (OpenDentBusiness.TaskDateType)PIn.Int(row["DateType"].ToString());
+				taskHist.FromNum         = PIn.Long  (row["FromNum"].ToString());
+				taskHist.ObjectType      = (OpenDentBusiness.TaskObjectType)PIn.Int(row["ObjectType"].ToString());
+				taskHist.DateTimeEntry   = PIn.DateT (row["DateTimeEntry"].ToString());
+				taskHist.UserNum         = PIn.Long  (row["UserNum"].ToString());
+				taskHist.DateTimeFinished= PIn.DateT (row["DateTimeFinished"].ToString());
+				taskHist.PriorityDefNum  = PIn.Long  (row["PriorityDefNum"].ToString());
 				retVal.Add(taskHist);
 			}
 			return retVal;

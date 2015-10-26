@@ -44,10 +44,10 @@ namespace OpenDentBusiness.Crud{
 		public static List<EtransMessageText> TableToList(DataTable table){
 			List<EtransMessageText> retVal=new List<EtransMessageText>();
 			EtransMessageText etransMessageText;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				etransMessageText=new EtransMessageText();
-				etransMessageText.EtransMessageTextNum= PIn.Long  (table.Rows[i]["EtransMessageTextNum"].ToString());
-				etransMessageText.MessageText         = PIn.String(table.Rows[i]["MessageText"].ToString());
+				etransMessageText.EtransMessageTextNum= PIn.Long  (row["EtransMessageTextNum"].ToString());
+				etransMessageText.MessageText         = PIn.String(row["MessageText"].ToString());
 				retVal.Add(etransMessageText);
 			}
 			return retVal;

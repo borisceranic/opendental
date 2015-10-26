@@ -44,19 +44,19 @@ namespace OpenDentBusiness.Crud{
 		public static List<EhrAmendment> TableToList(DataTable table){
 			List<EhrAmendment> retVal=new List<EhrAmendment>();
 			EhrAmendment ehrAmendment;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				ehrAmendment=new EhrAmendment();
-				ehrAmendment.EhrAmendmentNum= PIn.Long  (table.Rows[i]["EhrAmendmentNum"].ToString());
-				ehrAmendment.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				ehrAmendment.IsAccepted     = (OpenDentBusiness.YN)PIn.Int(table.Rows[i]["IsAccepted"].ToString());
-				ehrAmendment.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				ehrAmendment.Source         = (OpenDentBusiness.AmendmentSource)PIn.Int(table.Rows[i]["Source"].ToString());
-				ehrAmendment.SourceName     = PIn.String(table.Rows[i]["SourceName"].ToString());
-				ehrAmendment.FileName       = PIn.String(table.Rows[i]["FileName"].ToString());
-				ehrAmendment.RawBase64      = PIn.String(table.Rows[i]["RawBase64"].ToString());
-				ehrAmendment.DateTRequest   = PIn.DateT (table.Rows[i]["DateTRequest"].ToString());
-				ehrAmendment.DateTAcceptDeny= PIn.DateT (table.Rows[i]["DateTAcceptDeny"].ToString());
-				ehrAmendment.DateTAppend    = PIn.DateT (table.Rows[i]["DateTAppend"].ToString());
+				ehrAmendment.EhrAmendmentNum= PIn.Long  (row["EhrAmendmentNum"].ToString());
+				ehrAmendment.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				ehrAmendment.IsAccepted     = (OpenDentBusiness.YN)PIn.Int(row["IsAccepted"].ToString());
+				ehrAmendment.Description    = PIn.String(row["Description"].ToString());
+				ehrAmendment.Source         = (OpenDentBusiness.AmendmentSource)PIn.Int(row["Source"].ToString());
+				ehrAmendment.SourceName     = PIn.String(row["SourceName"].ToString());
+				ehrAmendment.FileName       = PIn.String(row["FileName"].ToString());
+				ehrAmendment.RawBase64      = PIn.String(row["RawBase64"].ToString());
+				ehrAmendment.DateTRequest   = PIn.DateT (row["DateTRequest"].ToString());
+				ehrAmendment.DateTAcceptDeny= PIn.DateT (row["DateTAcceptDeny"].ToString());
+				ehrAmendment.DateTAppend    = PIn.DateT (row["DateTAppend"].ToString());
 				retVal.Add(ehrAmendment);
 			}
 			return retVal;

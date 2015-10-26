@@ -44,13 +44,13 @@ namespace OpenDentBusiness.Crud{
 		public static List<Transaction> TableToList(DataTable table){
 			List<Transaction> retVal=new List<Transaction>();
 			Transaction transaction;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				transaction=new Transaction();
-				transaction.TransactionNum= PIn.Long  (table.Rows[i]["TransactionNum"].ToString());
-				transaction.DateTimeEntry = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				transaction.UserNum       = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				transaction.DepositNum    = PIn.Long  (table.Rows[i]["DepositNum"].ToString());
-				transaction.PayNum        = PIn.Long  (table.Rows[i]["PayNum"].ToString());
+				transaction.TransactionNum= PIn.Long  (row["TransactionNum"].ToString());
+				transaction.DateTimeEntry = PIn.DateT (row["DateTimeEntry"].ToString());
+				transaction.UserNum       = PIn.Long  (row["UserNum"].ToString());
+				transaction.DepositNum    = PIn.Long  (row["DepositNum"].ToString());
+				transaction.PayNum        = PIn.Long  (row["PayNum"].ToString());
 				retVal.Add(transaction);
 			}
 			return retVal;

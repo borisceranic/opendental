@@ -44,15 +44,15 @@ namespace OpenDentBusiness.Crud{
 		public static List<InstallmentPlan> TableToList(DataTable table){
 			List<InstallmentPlan> retVal=new List<InstallmentPlan>();
 			InstallmentPlan installmentPlan;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				installmentPlan=new InstallmentPlan();
-				installmentPlan.InstallmentPlanNum= PIn.Long  (table.Rows[i]["InstallmentPlanNum"].ToString());
-				installmentPlan.PatNum            = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				installmentPlan.DateAgreement     = PIn.Date  (table.Rows[i]["DateAgreement"].ToString());
-				installmentPlan.DateFirstPayment  = PIn.Date  (table.Rows[i]["DateFirstPayment"].ToString());
-				installmentPlan.MonthlyPayment    = PIn.Double(table.Rows[i]["MonthlyPayment"].ToString());
-				installmentPlan.APR               = PIn.Float (table.Rows[i]["APR"].ToString());
-				installmentPlan.Note              = PIn.String(table.Rows[i]["Note"].ToString());
+				installmentPlan.InstallmentPlanNum= PIn.Long  (row["InstallmentPlanNum"].ToString());
+				installmentPlan.PatNum            = PIn.Long  (row["PatNum"].ToString());
+				installmentPlan.DateAgreement     = PIn.Date  (row["DateAgreement"].ToString());
+				installmentPlan.DateFirstPayment  = PIn.Date  (row["DateFirstPayment"].ToString());
+				installmentPlan.MonthlyPayment    = PIn.Double(row["MonthlyPayment"].ToString());
+				installmentPlan.APR               = PIn.Float (row["APR"].ToString());
+				installmentPlan.Note              = PIn.String(row["Note"].ToString());
 				retVal.Add(installmentPlan);
 			}
 			return retVal;

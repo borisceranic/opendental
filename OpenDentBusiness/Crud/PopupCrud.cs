@@ -44,17 +44,17 @@ namespace OpenDentBusiness.Crud{
 		public static List<Popup> TableToList(DataTable table){
 			List<Popup> retVal=new List<Popup>();
 			Popup popup;
-			for(int i=0;i<table.Rows.Count;i++) {
+			foreach(DataRow row in table.Rows) {
 				popup=new Popup();
-				popup.PopupNum       = PIn.Long  (table.Rows[i]["PopupNum"].ToString());
-				popup.PatNum         = PIn.Long  (table.Rows[i]["PatNum"].ToString());
-				popup.Description    = PIn.String(table.Rows[i]["Description"].ToString());
-				popup.IsDisabled     = PIn.Bool  (table.Rows[i]["IsDisabled"].ToString());
-				popup.PopupLevel     = (OpenDentBusiness.EnumPopupLevel)PIn.Int(table.Rows[i]["PopupLevel"].ToString());
-				popup.UserNum        = PIn.Long  (table.Rows[i]["UserNum"].ToString());
-				popup.DateTimeEntry  = PIn.DateT (table.Rows[i]["DateTimeEntry"].ToString());
-				popup.IsArchived     = PIn.Bool  (table.Rows[i]["IsArchived"].ToString());
-				popup.PopupNumArchive= PIn.Long  (table.Rows[i]["PopupNumArchive"].ToString());
+				popup.PopupNum       = PIn.Long  (row["PopupNum"].ToString());
+				popup.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				popup.Description    = PIn.String(row["Description"].ToString());
+				popup.IsDisabled     = PIn.Bool  (row["IsDisabled"].ToString());
+				popup.PopupLevel     = (OpenDentBusiness.EnumPopupLevel)PIn.Int(row["PopupLevel"].ToString());
+				popup.UserNum        = PIn.Long  (row["UserNum"].ToString());
+				popup.DateTimeEntry  = PIn.DateT (row["DateTimeEntry"].ToString());
+				popup.IsArchived     = PIn.Bool  (row["IsArchived"].ToString());
+				popup.PopupNumArchive= PIn.Long  (row["PopupNumArchive"].ToString());
 				retVal.Add(popup);
 			}
 			return retVal;
