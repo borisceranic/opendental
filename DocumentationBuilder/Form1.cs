@@ -307,6 +307,7 @@ namespace DocumentationBuilder {
 				case "electid": return "ElectID";
 				case "emailaddress": return "EmailAddress";
 				case "emailattach": return "EmailAttach";
+				case "emailautograph": return "EmailAutograph";
 				case "emailmessage": return "EmailMessage";
 				case "emailmessageuid": return "EmailMessageUid";
 				case "emailtemplate": return "EmailTemplate";
@@ -390,6 +391,7 @@ namespace DocumentationBuilder {
 				case "procnote": return "ProcNote";
 				case "proctp": return "ProcTP";
 				case "programproperty": return "ProgramProperty";
+				case "providererx": return "ProviderErx";
 				case "providerident": return "ProviderIdent";
 				case "questiondef": return "QuestionDef";
 				case "quickpastecat": return "QuickPasteCat";
@@ -403,6 +405,8 @@ namespace DocumentationBuilder {
 				case "replicationserver": return "ReplicationServer";
 				case "reqneeded": return "ReqNeeded";
 				case "reqstudent": return "ReqStudent";
+				case "requiredfield": return "RequiredField";
+				case "requiredfieldcondition": return "RequiredFieldCondition";
 				case "rxalert": return "RxAlert";
 				case "rxdef": return "RxDef";
 				case "rxnorm": return "RxNorm";
@@ -428,6 +432,7 @@ namespace DocumentationBuilder {
 				case "smsmo": return "SmsMO";
 				case "smsmt": return "SmsMT";
 				case "smsvln": return "SmsVln";
+				case "stateabbr": return "StateAbbr";
 				case "supplyneeded": return "SupplyNeeded";
 				case "supplyorder": return "SupplyOrder";
 				case "supplyorderitem": return "SupplyOrderItem";

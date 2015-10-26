@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 		public string PracticeName;
 		///<summary>The calculated key value, tied to year, quarter, and practice name.</summary>
 		public string KeyValue;
-		///<summary>Always zero for customer databases.  When used by OD customer support, this is the customer num.</summary>
+		///<summary>FK to patient.PatNum.  Always zero for customer databases.  When used by OD customer support, this is the customer num.</summary>
 		public long PatNum;
 		///<summary>Any notes that the tech wishes to include regarding this situation.</summary>
 		public string Notes;

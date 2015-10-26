@@ -9,7 +9,7 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long PayorTypeNum;
-		///<summary>FK to Patient. </summary>
+		///<summary>FK to patient.PatNum.</summary>
 		public long PatNum;
 		///<summary>Date of the beginning of new payor type.  End date is the DateStart of the next payor type entry.</summary>
 		public DateTime DateStart;

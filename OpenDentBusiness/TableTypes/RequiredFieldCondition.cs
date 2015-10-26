@@ -9,10 +9,10 @@ namespace OpenDentBusiness {
 		public long RequiredFieldConditionNum;
 		///<summary>FK to requiredfield.RequiredFieldNum.</summary>
 		public long RequiredFieldNum;
-		///<summary>Enum:RequiredFieldName.</summary>
+		///<summary>Enum:RequiredFieldName </summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public RequiredFieldName ConditionType;
-		///<summary>Enum:ConditionOperator. The operator that is being applied to the ConditionType.</summary>
+		///<summary>Enum:ConditionOperator . The operator that is being applied to the ConditionType.</summary>
 		public ConditionOperator Operator;
 		///<summary>The value that the condition is being compared against. Could be 18, Fulltime, Male, etc.</summary>
 		public string ConditionValue;

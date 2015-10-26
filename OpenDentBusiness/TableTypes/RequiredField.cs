@@ -8,9 +8,9 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long RequiredFieldNum;
-		///<summary>Enum:RequiredFieldType. The area of the program that uses this field.</summary>
+		///<summary>Enum:RequiredFieldType . The area of the program that uses this field.</summary>
 		public RequiredFieldType FieldType;
-		///<summary>Enum:RequiredFieldName.</summary>
+		///<summary>Enum:RequiredFieldName </summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public RequiredFieldName FieldName;
 		///<summary>This is not a data column but is stored in a seperate table named RequiredFieldCondition.</summary>
@@ -52,66 +52,127 @@ namespace OpenDentBusiness {
 	}
 
 	public enum RequiredFieldName {
+		///<summary></summary>
 		Address,
+		///<summary></summary>
 		Address2,
+		///<summary></summary>
 		AddressPhoneNotes,
+		///<summary></summary>
 		AdmitDate,
+		///<summary></summary>
 		AskArriveEarly,
+		///<summary></summary>
 		BillingType,
+		///<summary></summary>
 		Birthdate,
+		///<summary></summary>
 		Carrier,
+		///<summary></summary>
 		ChartNumber,
+		///<summary></summary>
 		City,
+		///<summary></summary>
 		Clinic,
+		///<summary></summary>
 		CollegeName,
+		///<summary></summary>
 		County,
+		///<summary></summary>
 		CreditType,
+		///<summary></summary>
 		DateFirstVisit,
+		///<summary></summary>
 		DateTimeDeceased,
+		///<summary></summary>
 		EligibilityExceptCode,
+		///<summary></summary>
 		EmailAddress,
+		///<summary></summary>
 		Employer,
+		///<summary></summary>
 		Ethnicity,
+		///<summary></summary>
 		FeeSchedule,
+		///<summary></summary>
 		FirstName,
+		///<summary></summary>
 		Gender,
+		///<summary></summary>
 		GradeLevel,
+		///<summary></summary>
 		GroupName,
+		///<summary></summary>
 		GroupNum,
+		///<summary></summary>
 		HomePhone,
+		///<summary></summary>
 		InsurancePhone,
+		///<summary></summary>
 		InsuranceSubscriber,
+		///<summary></summary>
 		InsuranceSubscriberID,
+		///<summary></summary>
 		Language,
+		///<summary></summary>
 		LastName,
+		///<summary></summary>
 		Position,
+		///<summary></summary>
 		MedicaidID,
+		///<summary></summary>
 		MedicaidState,
+		///<summary></summary>
 		MiddleInitial,
+		///<summary></summary>
 		MothersMaidenFirstName,
+		///<summary></summary>
 		MothersMaidenLastName,
+		///<summary></summary>
 		PatientStatus,
+		///<summary></summary>
 		PreferConfirmMethod,
+		///<summary></summary>
 		PreferContactMethod,
+		///<summary></summary>
 		PreferRecallMethod,
+		///<summary></summary>
 		PreferredName,
+		///<summary></summary>
 		PrimaryProvider,
+		///<summary></summary>
 		Race,
+		///<summary></summary>
 		ReferredFrom,
+		///<summary></summary>
 		ResponsibleParty,
+		///<summary></summary>
 		Salutation,
+		///<summary></summary>
 		SecondaryProvider,
+		///<summary></summary>
 		Site,
+		///<summary></summary>
 		SocialSecurityNumber,
+		///<summary></summary>
 		State,
+		///<summary></summary>
 		StudentStatus,
+		///<summary></summary>
 		TextOK,
+		///<summary></summary>
 		Title,
+		///<summary></summary>
 		TreatmentUrgency,
+		///<summary></summary>
 		TrophyFolder,
+		///<summary></summary>
 		Ward,
+		///<summary></summary>
 		WirelessPhone,
+		///<summary></summary>
 		WorkPhone,
+		///<summary></summary>
 		Zip
 	}
 }

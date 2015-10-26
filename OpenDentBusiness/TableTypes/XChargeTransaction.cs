@@ -17,7 +17,7 @@ namespace OpenDentBusiness {
 		public double Amount;
 		///<summary>Credit card entry method. Usually "Keyed".</summary>
 		public string CCEntry;
-		///<summary>PatNum.</summary>
+		///<summary>FK to patient.PatNum.</summary>
 		public long PatNum;
 		///<summary>Result: AP for approved, DECLINE for declined.</summary>
 		public string Result;
