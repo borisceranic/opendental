@@ -5917,7 +5917,7 @@ namespace OpenDental{
 				//string warnings;
 				//string missingData=
 				Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,ClaimCur.ClinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
 				if(listQueue[0].MissingData!="") {
 					if(MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData+"\r\n\r\nContinue anyway?",

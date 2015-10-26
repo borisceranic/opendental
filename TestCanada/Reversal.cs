@@ -16,7 +16,7 @@ namespace TestCanada {
 			Carrier carrier=Carriers.GetCarrier(insPlan.CarrierNum);
 			Clearinghouse clearinghouseHq=
 				Clearinghouses.GetClearinghouse(Clearinghouses.AutomateClearinghouseHqSelection(carrier.ElectID,claim.MedType));
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,claim.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,OpenDental.FormOpenDental.ClinicNum);
 			long etransNum=CanadianOutput.SendClaimReversal(clearinghouseClin,claim,insPlan,insSub);
 			Etrans etrans=Etranss.GetEtrans(etransNum);
 			string message=EtransMessageTexts.GetMessageText(etrans.EtransMessageTextNum);

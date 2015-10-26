@@ -27,15 +27,13 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		///<summary>If true, then reports will be automatically retrieved for default clearinghouse.  Then this form will close.</summary>
 		public bool AutomaticMode;
-		private long _clinicNum;
 
 		///<summary></summary>
-		public FormClaimReports(long clinicNum)
+		public FormClaimReports()
 		{
 			//
 			// Required for Windows Form Designer support
 			//
-			_clinicNum=clinicNum;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -157,7 +155,7 @@ namespace OpenDental{
 				Cursor=Cursors.WaitCursor;
 				Clearinghouse[] arrayHqClearinghouses=Clearinghouses.GetHqListt();
 				Clearinghouse clearinghouseHq=arrayHqClearinghouses[comboClearhouse.SelectedIndex];
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 				string errorMessage=RetrieveAndImport(clearinghouseClin,AutomaticMode);
 				if(errorMessage!="") {
 					MessageBox.Show(errorMessage);
@@ -174,7 +172,7 @@ namespace OpenDental{
 			}
 			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			Clearinghouse clearhouseHq=arrayClearinghouses[comboClearhouse.SelectedIndex];
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearhouseHq,_clinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearhouseHq,FormOpenDental.ClinicNum);
 
 			if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 				MsgBox.Show(this,"Clearinghouse does not have a valid Report Path set.");

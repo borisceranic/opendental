@@ -498,7 +498,7 @@ namespace OpenDental{
 				//Does not pull in reports automatically, because they could easily get assigned to the wrong clearinghouse
 			}
 			else{
-				FormClaimReports FormC=new FormClaimReports(FormOpenDental.ClinicNum); //the currently selected clinic is what the combobox defaults to.
+				FormClaimReports FormC=new FormClaimReports(); //the currently selected clinic is what the combobox defaults to.
 				FormC.AutomaticMode=true;
 				FormC.ShowDialog();
 			}
@@ -1120,7 +1120,7 @@ namespace OpenDental{
 				queueItems.Add(queueitem);
 			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItems[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,queueItems[0].ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
@@ -1160,7 +1160,7 @@ namespace OpenDental{
 			List<ClaimSendQueueItem> listClaimsToValidate=listClaimSendQueueItems.FindAll(x => !x.IsValid && !x.NoSendElect);
 			//Loop through and validate all claims.
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listClaimsToValidate[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,listClaimsToValidate[0].ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
 			for(int i=0;i<listClaimsToValidate.Count;i++) {
 				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listClaimsToValidate[i]);
 				if(listClaimsToValidate[i].MissingData=="") {
@@ -1181,59 +1181,23 @@ namespace OpenDental{
 		}
 
 		private void toolBarButReports_Click() {
-			long clinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex!=0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-				else if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-			}
-			FormClaimReports FormC=new FormClaimReports(clinicNum);
+			FormClaimReports FormC=new FormClaimReports();
 			FormC.ShowDialog();
 			FillHistory();//To show 277s after imported.
 		}
 
 		private void toolBarButOutstanding_Click() {
-			long clinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex!=0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-				else if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-			}
-			FormCanadaOutstandingTransactions fcot=new FormCanadaOutstandingTransactions(clinicNum);
+			FormCanadaOutstandingTransactions fcot=new FormCanadaOutstandingTransactions();
 			fcot.ShowDialog();
 		}
 
 		private void toolBarButPayRec_Click() {
-			long clinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex!=0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-				else if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-			}
-			FormCanadaPaymentReconciliation fcpr=new FormCanadaPaymentReconciliation(clinicNum);
+			FormCanadaPaymentReconciliation fcpr=new FormCanadaPaymentReconciliation();
 			fcpr.ShowDialog();
 		}
 
 		private void toolBarButSummaryRec_Click() {
-			long clinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex!=0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-				else if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-			}
-			FormCanadaSummaryReconciliation fcsr=new FormCanadaSummaryReconciliation(clinicNum);
+			FormCanadaSummaryReconciliation fcsr=new FormCanadaSummaryReconciliation();
 			fcsr.ShowDialog();
 		}
 

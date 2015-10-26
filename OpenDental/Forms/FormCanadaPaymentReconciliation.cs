@@ -12,10 +12,8 @@ namespace OpenDental {
 	public partial class FormCanadaPaymentReconciliation:Form {
 
 		List<Carrier> carriers=new List<Carrier>();
-		long _clinicNum;
 
-		public FormCanadaPaymentReconciliation(long clinicNum) {
-			_clinicNum=clinicNum;
+		public FormCanadaPaymentReconciliation() {
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -77,9 +75,9 @@ namespace OpenDental {
 			try {
 				Carrier carrier=carriers[listCarriers.SelectedIndex];
 				Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,_clinicNum); 
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum); 
 				CanadianOutput.GetPaymentReconciliations(clearinghouseClin,carrier,ProviderC.ListShort[listTreatingProvider.SelectedIndex],
-					ProviderC.ListShort[listBillingProvider.SelectedIndex],reconciliationDate,_clinicNum);
+					ProviderC.ListShort[listBillingProvider.SelectedIndex],reconciliationDate,FormOpenDental.ClinicNum);
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"Done.");
 			}
