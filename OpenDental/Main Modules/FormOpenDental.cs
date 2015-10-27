@@ -4850,28 +4850,35 @@ namespace OpenDental{
 		}
 
 		private void ThreadPodiumSendInvitations(ODThread worker) {
+			//consider blocking re-entrance if this hasn't finished.
 			//Only send invitations if the program link is enabled and the computer name is set to this computer.
 			if(!Programs.IsEnabled(ProgramName.Podium)
 				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your computer name or IP (required)"))) 
 			{
 				return;
 			}
-			//Get the last 60 minutes of appointments in case there was a delay in the thread interval that would've prevented the appointment from being 
-			//found at exactly 40 minutes for new patients.
-			List<Appointment> listApptsCur=Appointments.GetAppointmentsStartingWithinPeriod(DateTime.Now.AddMinutes(-41).AddMilliseconds(-_podiumIntervalMS),DateTime.Now.AddMinutes(-10));
+			//Keep a consistant "Now" timestamp throughout this method.
+			DateTime nowDT=MiscData.GetNowDateTime();
+			if(Podium.DateTimeLastRan==DateTime.MinValue) {
+				Podium.DateTimeLastRan=nowDT.AddMilliseconds(-_podiumIntervalMS);
+			}
+			List<Appointment> listApptsCur=Appointments.GetAppointmentsStartingWithinPeriod(Podium.DateTimeLastRan.AddMinutes(-40).AddMilliseconds(_podiumIntervalMS),nowDT.AddMilliseconds(-_podiumIntervalMS));
 			for(int i=0;i<listApptsCur.Count;i++) {
 				Appointment apptCur=listApptsCur[i];
 				if(apptCur.AptStatus==ApptStatus.Broken) {
 					continue;
 				}
 				Patient patCur=Patients.GetPat(apptCur.PatNum);
-				int podiumMinutes=apptCur.IsNewPatient?40:10;
-				if(apptCur.AptDateTime.AddMinutes(podiumMinutes)>=DateTime.Now 	//Appointment within this tick interval
-					&& apptCur.AptDateTime.AddMinutes(podiumMinutes)<=DateTime.Now.AddMilliseconds(_podiumIntervalMS))	
+				int podiumMinutes=(apptCur.IsNewPatient?40:10);
+				if(apptCur.AptDateTime>=Podium.DateTimeLastRan.AddMinutes(-podiumMinutes).AddMilliseconds(_podiumIntervalMS)//Appointment between tick interval of last run and now
+					&& apptCur.AptDateTime<nowDT.AddMinutes(-podiumMinutes).AddMilliseconds(_podiumIntervalMS)) 
 				{
+					//appointments should be newer than DateTimeLastRan-(40 or 10)+lag minutes
+					//appointments should be older than Now-(35 or 5) minutes.
 					Podium.SendInvitation(patCur,apptCur.IsNewPatient);
 				}
 			}
+			Podium.DateTimeLastRan=nowDT;
 		}
 
 		private void ThreadEmailInbox_Receive() {
