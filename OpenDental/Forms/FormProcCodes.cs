@@ -66,8 +66,6 @@ namespace OpenDental{
 		private List<FeeSched> _listFeeScheds; //Note to reviewer: I'm doing these to avoid using calls like FeeSchedC.ListShort[idx] later.
 		private Clinic[] _arrayClinics;
 		private List<Provider> _listProviders;
-		///<summary>List of all fees, stored in memory for easy access and editing.  Synced on form close.</summary>
-		private List<Fee> _listFees;
 		private Label labelSched1;
 		private Label labelClinic1;
 		private Label labelProvider1;
@@ -100,6 +98,8 @@ namespace OpenDental{
 		private System.Windows.Forms.Button butColorProvider;
 		private System.Windows.Forms.Button butColorClinic;
 		private System.Windows.Forms.Button butColorDefault;
+		///<summary>Local copy of a dictionary of all fees, stored in memory for easy access and editing.  Synced on form close.</summary>
+		Dictionary<long,Dictionary<long,List<Fee>>> _dictFeesByFeeSchedNumsAndCodeNums;
 
 		///<summary></summary>
 		public FormProcCodes() {
@@ -1022,7 +1022,7 @@ namespace OpenDental{
 			}
 			_arrayClinics=Clinics.GetList();
 			_listProviders=ProviderC.GetListShort();
-			_listFees=Fees.GetListt();
+			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
 			_listProcCodes=ProcedureCodeC.GetListLong();
 			_colorProv=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider"));
 			_colorProvClinic=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider and Clinic"));
@@ -1041,7 +1041,6 @@ namespace OpenDental{
 			labelProvider1.ForeColor=_colorProv;
 			labelProvider2.ForeColor=_colorProv;
 			labelProvider3.ForeColor=_colorProv;
-
 			FillComboBoxes();
 			//Try to select the currently set Clinic.
 			for(int i=0;i<_arrayClinics.Length;i++) {
@@ -1322,14 +1321,14 @@ namespace OpenDental{
 				row.Cells.Add(listProcsForCats[i].Descript);
 				row.Cells.Add(listProcsForCats[i].AbbrDesc);
 				row.Cells.Add(listProcsForCats[i].ProcCode);
-				Fee fee1=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched1,clinic1Num,provider1Num,_listFees);
+				Fee fee1=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched1,clinic1Num,provider1Num,_dictFeesByFeeSchedNumsAndCodeNums);
 				Fee fee2=null;
 				if(feeSched2!=null) {
-					fee2=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched2,clinic2Num,provider2Num,_listFees);
+					fee2=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched2,clinic2Num,provider2Num,_dictFeesByFeeSchedNumsAndCodeNums);
 				}
 				Fee fee3=null;
 				if(feeSched3!=null) {
-					fee3=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched3,clinic3Num,provider3Num,_listFees);
+					fee3=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched3,clinic3Num,provider3Num,_dictFeesByFeeSchedNumsAndCodeNums);
 				}
 				if(fee1==null || fee1.Amount==-1) {
 					row.Cells.Add("");
@@ -1383,21 +1382,20 @@ namespace OpenDental{
 			}
 			if(e.Col>3) {
 				//Do nothing. All columns > 3 are editable (You cannot double click).
+				return;
 			}
-			else {//not on a fee: Edit code instead
-				Fees.Sync(_listFees);
-				Fees.RefreshCache();
-				ProcedureCode procCode=(ProcedureCode)gridMain.Rows[e.Row].Tag;
-				FormProcCodeEdit FormPCE=new FormProcCodeEdit(procCode);
-				FormPCE.IsNew=false;
-				FormPCE.ShowDialog();
-				if(FormPCE.DialogResult==DialogResult.OK) {
-					Fees.RefreshCache();
-					_listFees=Fees.GetListt();
-					FillGrid();
-					changed=true;//Assuming they changed something, doing this because as code is if you change for example a sub code it wont be reflected in cache
-				}
-			}
+			//not on a fee: Edit code instead
+			List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
+			Fees.Sync(listFees);//This is done better in v15.4...
+			Fees.RefreshCache();
+			ProcedureCode procCode=(ProcedureCode)gridMain.Rows[e.Row].Tag;
+			FormProcCodeEdit FormPCE=new FormProcCodeEdit(procCode);
+			FormPCE.IsNew=false;
+			FormPCE.ShowDialog();
+			//The user could have edited a fee within the Procedure Code Edit window or within one of it's children so we need to refresh our cache.
+			//Yes, it could have even changed if the user Canceled out of the Proc Code Edit window (e.g. use FormProcCodeEditMore.cs)
+			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
+			FillGrid();
 		}
 
 		///<summary>Takes care of individual cell edits.  Calls FillGrid to refresh other columns using the same data.</summary>
@@ -1443,7 +1441,7 @@ namespace OpenDental{
 					clinicNum=_arrayClinics[comboClinic3.SelectedIndex-1].ClinicNum;
 				}
 			}
-			Fee fee=Fees.GetFee(codeNum,feeSched,clinicNum,provNum,_listFees);
+			Fee fee=Fees.GetFee(codeNum,feeSched,clinicNum,provNum,_dictFeesByFeeSchedNumsAndCodeNums);
 			string feeAmtOld="";
 			if(fee!=null){
 				feeAmtOld=fee.Amount.ToString("n");
@@ -1483,11 +1481,11 @@ namespace OpenDental{
 					fee.Amount=feeAmtNew;
 					fee.ClinicNum=0;
 					fee.ProvNum=0;
-					_listFees.Add(fee);
+					Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
 				}
 				else { //Fee does exist, update or delete.
 					if(feeAmtNewStr=="") { //They want to delete the fee
-						_listFees.Remove(fee);
+						Fees.RemoveFeeFromDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
 					}
 					else { //They want to update the fee
 						fee.Amount=feeAmtNew;
@@ -1508,10 +1506,10 @@ namespace OpenDental{
 						fee.Amount=-1.0;
 						fee.ClinicNum=clinicNum;
 						fee.ProvNum=provNum;
-						_listFees.Add(fee);
+						Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
 					}
 					else {//They want to delete a fee for their current settings.
-						_listFees.Remove(fee);
+						Fees.RemoveFeeFromDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
 					}
 				}
 				//The fee did not previously exist, or the fee found isn't for the currently set settings.
@@ -1522,7 +1520,7 @@ namespace OpenDental{
 					fee.Amount=feeAmtNew;
 					fee.ClinicNum=clinicNum;
 					fee.ProvNum=provNum;
-					_listFees.Add(fee);
+					Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
 				}
 				else { //Fee isn't null, is for our current clinic, is for the selected provider, and they don't want to delete it.  Just update.
 					fee.Amount=feeAmtNew;
@@ -1636,18 +1634,16 @@ namespace OpenDental{
 		}
 
 		private void butTools_Click(object sender,System.EventArgs e) {
-			//Fees.Sync(_listFees); //Save any changes that were made so we don't lose any data 
+			List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
 			long schedNum=_listFeeScheds[comboFeeSched1.SelectedIndex].FeeSchedNum;
-			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,_listFees,_listProviders,_arrayClinics);
+			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,listFees,_listProviders,_arrayClinics);
 			FormF.ShowDialog();
 			if(FormF.DialogResult==DialogResult.Cancel) {
 				return;
 			}
-
-			//Fees.RefreshCache();
-			//ProcedureCodes.RefreshCache();
-			//_listFees=Fees.GetListt(); //Get any changes that were made from within feeSchedTools window.
-			changed=true;
+			//Fees could have changed from within the FeeSchedTools window.  Refresh our local dictionary to match the cache.
+			changed=false;
+			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				FillComboBoxes();//To show possible added fee schedule.
 			}
@@ -1704,8 +1700,7 @@ namespace OpenDental{
 				return;
 			}
 			MessageBox.Show(Lan.g(this,"Procedure codes inserted")+": "+rowsInserted);
-			DataValid.SetInvalid(InvalidType.Defs,InvalidType.ProcCodes,InvalidType.Fees);
-			changed=true;
+			DataValid.SetInvalid(InvalidType.Defs,InvalidType.ProcCodes);
 			ProcedureCodes.RefreshCache();
 			_listProcCodes=ProcedureCodeC.GetListLong();
 			FillCats();
@@ -1908,7 +1903,8 @@ namespace OpenDental{
 
 		private void FormProcedures_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
 			if(changed) {
-				Fees.Sync(_listFees);
+				List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
+				Fees.Sync(listFees);
 				DataValid.SetInvalid(InvalidType.ProcCodes,InvalidType.Fees);
 			}
 		}

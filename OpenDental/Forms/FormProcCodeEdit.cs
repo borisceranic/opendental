@@ -48,7 +48,6 @@ namespace OpenDental{
 		private OpenDental.ODtextBox textNote;
 		private System.Windows.Forms.CheckBox checkIsProsth;
 		private System.Windows.Forms.Label label14;
-		private bool FeeChanged;
 		private System.Windows.Forms.TextBox textMedicalCode;
 		private OpenDental.UI.ODGrid gridFees;
 		private Label label15;
@@ -835,7 +834,6 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Procedure Code";
-			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormProcCodeEdit_Closing);
 			this.Load += new System.EventHandler(this.FormProcCodeEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -935,8 +933,6 @@ namespace OpenDental{
 		}
 
 		private void FillFees(){
-			//This line will be added later for speed:
-			//DataTable feeList=Fees.GetListForCode(ProcCode.Code);
 			gridFees.BeginUpdate();
 			gridFees.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableProcFee","Sched"),120);
@@ -976,11 +972,6 @@ namespace OpenDental{
 			}
 			FormFE.FeeCur=FeeCur;
 			FormFE.ShowDialog();
-			if(FormFE.DialogResult==DialogResult.OK) {
-				FeeChanged=true;
-			}
-			Fees.RefreshCache();
-			//tbFees.SelectedRow=-1;
 			FillFees();
 		}
 
@@ -1077,6 +1068,19 @@ namespace OpenDental{
 			FillNotes();
 		}
 
+		private void butMore_Click(object sender,EventArgs e) {
+			FormProcCodeEditMore FormPCEM=new FormProcCodeEditMore(ProcCode);
+			FormPCEM.ShowDialog();
+			FillFees();//Refresh our list of fees cause the user may have changed something.
+		}
+
+		private void butAuditTrail_Click(object sender,EventArgs e) {
+			List<Permissions> perms=new List<Permissions>();
+			perms.Add(Permissions.ProcFeeEdit);
+			FormAuditOneType FormA=new FormAuditOneType(0,perms,Lan.g(this,"All changes for")+" "+ProcCode.AbbrDesc+" - "+ProcCode.ProcCode,ProcCode.CodeNum);
+			FormA.ShowDialog();
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textMedicalCode.Text!="" && !ProcedureCodeC.HList.Contains(textMedicalCode.Text)){
 				MsgBox.Show(this,"Invalid medical code.  It must refer to an existing procedure code entered separately");
@@ -1138,30 +1142,6 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}
-
-		private void FormProcCodeEdit_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(DialogResult==DialogResult.OK){
-				return;
-			}
-			if(FeeChanged){
-				DataValid.SetInvalid(InvalidType.Fees);
-				DialogResult=DialogResult.OK;
-			}
-		}
-
-		private void butMore_Click(object sender,EventArgs e) {
-			FormProcCodeEditMore FormPCEM=new FormProcCodeEditMore(ProcCode);
-			FormPCEM.ShowDialog();
-			Fees.RefreshCache();//User may have changed something.
-			FillFees();
-		}
-
-		private void butAuditTrail_Click(object sender,EventArgs e) {
-			List<Permissions> perms=new List<Permissions>();
-			perms.Add(Permissions.ProcFeeEdit);
-			FormAuditOneType FormA=new FormAuditOneType(0,perms,Lan.g(this,"All changes for")+" "+ProcCode.AbbrDesc+" - "+ProcCode.ProcCode,ProcCode.CodeNum);
-			FormA.ShowDialog();
 		}
 
 		

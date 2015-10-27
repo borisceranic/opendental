@@ -2,60 +2,49 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Fees {
-		private static List<Fee> _listt;
+		///<summary></summary>
 		private static object _lockObj=new object();
-		///<summary>Set this variable and the GetFee() method will use this list instead of GetListt() by default.
-		///Useful for when you don't want to call GetListt() repeatedly or when you have no use for the locking mechanism.
-		///Mostly for performance gains.  Eventually we could remove this variable if we can make our cache pattern work with threads better,
-		///but this is too much work right now.</summary>
-		public static List<Fee> ListFees;
+		///<summary>This is a dictionary of FeeSchedNums that are linked to a dictionary of CodeNums linked to a list of Fees.
+		///This methodology is in place because there are offices with an astronomical amount of fees (e.g. 490K) which takes too long to loop through.
+		///The typical cache pattern is to use lists of objects.  See ProviderC.cs for the typical cache pattern.</summary>
+		private static Dictionary<long,Dictionary<long,List<Fee>>> _dictFeesByFeeSchedNumsAndCodeNums;
 
-		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
-		public static List<Fee> Listt {
-			get {
-				return GetListt();
-			}
-			set {
-				lock(_lockObj) {
-					_listt=value;
-				}
-			}
-		}
+		//The entire dictionary cache section is very rare.  
+		//It is only present because there are several large offices that have called in complaining about slowness.
+		//The slowness is caused by our new thread safe cache pattern coupled with an old looping pattern throughout the Open Dental project.
+		//The slowness only shows its face when there is an astronomical (e.g. 490K) amount of fees present.
+		//This new dictionary will break up the fees first by a dictionary keyed on FeeSchedNum and then by a dictionary keyed on CodeNum.
 
-		///<summary>A list of non-hidden Fees.  A hidden fee is considered a fee that is associated to a hidden fee schedule.</summary>
-		public static List<Fee> GetListt() {
-			bool isListNull=false;
+		///<summary>Returns a deep copy of the global dictionary of all fees.</summary>
+		public static Dictionary<long,Dictionary<long,List<Fee>>> GetDict() {
+			//No need to check RemotingRole; no call to db.
+			bool isDictNull=false;
 			lock(_lockObj) {
-				if(_listt==null) {
-					isListNull=true;
+				if(_dictFeesByFeeSchedNumsAndCodeNums==null) {
+					isDictNull=true;
 				}
 			}
-			if(isListNull) {
+			if(isDictNull) {
 				Fees.RefreshCache();
 			}
-			List<Fee> listFees=new List<Fee>();
-			//Get a deep copy of the visible fee schedules to help figure out which fees are 'hidden'.
-			List<FeeSched> listFeeSchedules=FeeSchedC.GetListShort();
+			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=new Dictionary<long,Dictionary<long,List<Fee>>>();
 			lock(_lockObj) {
-				//This is not common at all.  Typically there will be a "GetListShort" that will return all cached items that are not hidden.
-				//However, there is no such thing as hiding a fee.  There is however such a thing as hiding a fee schedule.
-				//Hiding a fee schedule is just a good as hiding the fees it is associated to.
-				//For speed purposes, we need to grab deep copies of fees that are not associated to a hidden fee schedule.
-				//There are places in the program (e.g. computing estimates) that call GetListt many times in a loop.
-				//Those loops are extremely slow when getting a deep copy of the entire fee table (e.g. 359,421 fees) when only a portion of them are used.
-				//An example is when you change nothing and leave the Ins Plan Edit window by clicking OK.
-				//That window was taking an office several seconds to close.  By not grabbing a deep copy of hidden fees, the time was cut in half.
-				List<Fee> listNonHiddenFees=_listt.FindAll(x => listFeeSchedules.Exists(y => y.FeeSchedNum==x.FeeSched));//Get all non-hidden fees.
-				for(int i=0;i<listNonHiddenFees.Count;i++) {
-					listFees.Add(listNonHiddenFees[i].Copy());
+				foreach(KeyValuePair<long,Dictionary<long,List<Fee>>> dictByFeeSchedNum in _dictFeesByFeeSchedNumsAndCodeNums) {
+					Dictionary<long,List<Fee>> dictFeesByCodeNums=new Dictionary<long,List<Fee>>();
+					foreach(KeyValuePair<long,List<Fee>> kv in dictByFeeSchedNum.Value) {
+						List<Fee> listFees=((List<Fee>)kv.Value).Select(x => x.Copy()).ToList();
+						dictFeesByCodeNums[kv.Key]=listFees;
+					}
+					dictFeesByFeeSchedNumsAndCodeNums[dictByFeeSchedNum.Key]=dictFeesByCodeNums;
 				}
 			}
-			return listFees;
+			return dictFeesByFeeSchedNumsAndCodeNums;
 		}
 
 		public static DataTable RefreshCache() {
@@ -70,21 +59,119 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			Listt=Crud.FeeCrud.TableToList(table);
-			/*
-			Dict=new Dictionary<FeeKey,Fee>();
-			FeeKey key;
-			for(int i=0;i<Listt.Count;i++) {
-				key=new FeeKey();
-				key.codeNum=Listt[i].CodeNum;
-				key.feeSchedNum=Listt[i].FeeSched;
-				if(Dict.ContainsKey(key)) {
-					//Older versions used to delete duplicates here
+			List<Fee> listFees=Crud.FeeCrud.TableToList(table);
+			//Organize the list of fees into a complex dictionary by fee schedules then by codes.
+			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesBySchedNumsAndCodeNums=GetDictForList(listFees);
+			//Add the fees by code nums dictionary to the dictionary of fee schedules but use a lock for thread safety.
+			lock(_lockObj) {
+				_dictFeesByFeeSchedNumsAndCodeNums=dictFeesBySchedNumsAndCodeNums;
+			}
+		}
+
+		///<summary>Returns a complex dictionary that is separated exactly like the cached dictionary of fees except with the fees passed in.</summary>
+		public static Dictionary<long,Dictionary<long,List<Fee>>> GetDictForList(List<Fee> listFees) {
+			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesBySchedNumsAndCodeNums=new Dictionary<long,Dictionary<long,List<Fee>>>();
+			//Fill the complex dictionary of fees that is first broken up by fee schedules and then by procedure codes.
+			Dictionary<long,List<Fee>> dictFeesForSchedNums=listFees.GroupBy(x => x.FeeSched)
+				.ToDictionary(x => x.Key,y => y.ToList());
+			//Break up all the fees within each fee schedule into a sub dictionary that is keyed off of CodeNum.
+			foreach(KeyValuePair<long,List<Fee>> dictFeesBySchedNum in dictFeesForSchedNums) {
+				//Get all fees associated to this fee schedule.
+				List<Fee> listFeesForSched;
+				if(!dictFeesForSchedNums.TryGetValue(dictFeesBySchedNum.Key,out listFeesForSched)) {
+					continue;
 				}
-				else {
-					Dict.Add(key,Listt[i]);
+				//Create a dictionary of Fees associated to this fee schedule for each unique procedure code.
+				Dictionary<long,List<Fee>> dictFeesByCodeNums=new Dictionary<long,List<Fee>>();
+				//The following linq statement is three times faster than using a for loop.
+				dictFeesByCodeNums=listFeesForSched.GroupBy(x => x.CodeNum)
+					.ToDictionary(x => x.Key,y => y.ToList());
+				//Set the dictionary of all fees for this fee schedule broken up by code num to the outer dictionary's key value (FeeSchedNum).
+				dictFeesBySchedNumsAndCodeNums[dictFeesBySchedNum.Key]=dictFeesByCodeNums;
+			}
+			return dictFeesBySchedNumsAndCodeNums;
+		}
+
+		///<summary>Returns a list of all fees in the given dictionary.</summary>
+		public static List<Fee> GetFeesAll(Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
+			//No need to check RemotingRole; no call to db.
+			List<Fee> listFees=new List<Fee>();
+			foreach(KeyValuePair<long,Dictionary<long,List<Fee>>> dictByFeeSchedNums in dictFeesByFeeSchedNumsAndCodeNums) {
+				foreach(KeyValuePair<long,List<Fee>> dictFeesByCodeNums in dictByFeeSchedNums.Value) {
+					listFees.AddRange((List<Fee>)dictFeesByCodeNums.Value);
 				}
-			}*/
+			}
+			return listFees;
+		}
+
+		///<summary>Returns all fees associated to the procedure code passed in.</summary>
+		public static List<Fee> GetFeesForCode(long codeNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Fee> listFees=new List<Fee>();
+			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=GetDict();
+			//Loop through each fee schedule and get all fees associated to the passed in procedure code.
+			foreach(KeyValuePair<long,Dictionary<long,List<Fee>>> dictByFeeSchedNums in dictFeesByFeeSchedNumsAndCodeNums) {
+				Dictionary<long,List<Fee>> dictFeesByCodeNums=dictByFeeSchedNums.Value;
+				List<Fee> listFeesForCodeNum;
+				if(dictFeesByCodeNums.TryGetValue(codeNum,out listFeesForCodeNum)) {
+					//Add all fees to our return value that are associated to this code num.
+					listFees.AddRange(listFeesForCodeNum);
+				}
+			}
+			return listFees;
+		}
+
+		///<summary>Gets a deep copy of the list of fees associated to the fee schedule and procedure code passed in.
+		///Uses the passed dictionary passed in instead of the globally static dictionary.</summary>
+		public static List<Fee> GetFeesBySchedAndCode(long feeSchedNum,long codeNum
+			,Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) 
+		{
+			//No need to check RemotingRole; no call to db.
+			//Use the dictionary to find a small list of fees associated to this fee schedule and code num.
+			Dictionary<long,List<Fee>> dictFeesByCodeNum;
+			if(!dictFeesByFeeSchedNumsAndCodeNums.TryGetValue(feeSchedNum,out dictFeesByCodeNum)) {
+				return new List<Fee>();
+			}
+			List<Fee> listFees;
+			if(!dictFeesByCodeNum.TryGetValue(codeNum,out listFees)) {
+				return new List<Fee>();
+			}
+			return listFees;
+		}
+
+		public static void AddFeeToDict(Fee fee,Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
+			//No need to check RemotingRole; no call to db.
+			if(fee==null || fee.FeeSched==0 || fee.CodeNum==0) {
+				return;
+			}
+			Dictionary<long,List<Fee>> dictFeesByCodeNum;
+			if(!dictFeesByFeeSchedNumsAndCodeNums.TryGetValue(fee.FeeSched,out dictFeesByCodeNum)) {
+				dictFeesByCodeNum=new Dictionary<long,List<Fee>>();
+				dictFeesByFeeSchedNumsAndCodeNums[fee.FeeSched]=dictFeesByCodeNum;
+			}
+			List<Fee> listFees;
+			if(!dictFeesByCodeNum.TryGetValue(fee.CodeNum,out listFees)) {
+				listFees=new List<Fee>();
+			}
+			listFees.Add(fee);
+			dictFeesByCodeNum[fee.CodeNum]=listFees;
+		}
+
+		public static void RemoveFeeFromDict(Fee fee,Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
+			//No need to check RemotingRole; no call to db.
+			if(fee==null || fee.FeeSched==0 || fee.CodeNum==0) {
+				return;
+			}
+			Dictionary<long,List<Fee>> dictFeesByCodeNum;
+			if(!dictFeesByFeeSchedNumsAndCodeNums.TryGetValue(fee.FeeSched,out dictFeesByCodeNum)) {
+				return;
+			}
+			List<Fee> listFees;
+			if(!dictFeesByCodeNum.TryGetValue(fee.CodeNum,out listFees)) {
+				return;
+			}
+			listFees.Remove(fee);
+			dictFeesByCodeNum[fee.CodeNum]=listFees;
 		}
 
 		///<summary></summary>
@@ -137,32 +224,58 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
 				return;
 			}
-			List<Fee> listDB=Fees.GetListt();
+			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
+			List<Fee> listDB=Fees.GetFeesAll(dictFeesByFeeSchedNumsAndCodeNums);
 			Crud.FeeCrud.Sync(listNew,listDB);
 		}
 
 		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>
 		public static Fee GetFee(long codeNum,long feeSchedNum) {
 			//No need to check RemotingRole; no call to db.
-			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
-			return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),0,0,GetListt());
+			return GetFee(codeNum,feeSchedNum,0,0);
 		}
 
-		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.
-		///Attempts to find the most accurate fee based on the clinic and provider passed in.</summary>
+		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>
 		public static Fee GetFee(long codeNum,long feeSchedNum,long clinicNum,long provNum) {
 			//No need to check RemotingRole; no call to db.
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
-			if(ListFees==null) {
-				return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,GetListt());
+			return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum);
+		}
+
+		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.</summary>
+		public static Fee GetFee(long codeNum,FeeSched feeSched,long clinicNum,long provNum) {
+			//No need to check RemotingRole; no call to db.
+			List<Fee> listFees=new List<Fee>();
+			//We do not want to make a deep copy here because that takes a lot of time if the calling method is calling this method in a loop.
+			//Locking this next helper method call will guard against the dictionary itself (not its content) from being modified.
+			lock(_lockObj) {
+				listFees=GetFeesBySchedAndCode(feeSched.FeeSchedNum,codeNum,_dictFeesByFeeSchedNumsAndCodeNums);
 			}
-			else {
-				return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,ListFees);
-			}
+			return GetFee(codeNum,feeSched,clinicNum,provNum,listFees);
+		}
+
+		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.
+		///Uses the dictionary of fees passed in instead of the cached dictionary.</summary>
+		public static Fee GetFee(long codeNum,FeeSched feeSched,long clinicNum,long provNum
+			,Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) 
+		{
+			//No need to check RemotingRole; no call to db.
+			List<Fee> listFees=GetFeesBySchedAndCode(feeSched.FeeSchedNum,codeNum,dictFeesByFeeSchedNumsAndCodeNums);
+			return GetFee(codeNum,feeSched,clinicNum,provNum,listFees);
 		}
 
 		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.
-		///Attempts to find the most accurate fee based on the clinic and provider passed in.</summary>
+		///Attempts to find the most accurate fee based on the clinic and provider passed in.
+		///Uses the passed in list of fees instead of the cached fees.</summary>
+		public static Fee GetFee(long codeNum,long feeSchedNum,long clinicNum,long provNum,List<Fee> listFees) {
+			//No need to check RemotingRole; no call to db.
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
+			return GetFee(codeNum,FeeScheds.GetOne(feeSchedNum,listFeeScheds),clinicNum,provNum,listFees);
+		}
+
+		///<summary>Returns null if no fee exists, returns a fee based on feeSched and fee localization settings.
+		///Attempts to find the most accurate fee based on the clinic and provider passed in.
+		///Uses the passed in list of fees instead of the cached fees.</summary>
 		public static Fee GetFee(long codeNum,FeeSched feeSched,long clinicNum,long provNum,List<Fee> listFees) {
 			//No need to check RemotingRole; no call to db.
 			if(codeNum==0) {
@@ -198,7 +311,9 @@ namespace OpenDentBusiness{
 			return null; //No match found at all for HQ fee.
 		}
 
-		///<summary>Returns null if there is no perfect match, returns a fee if there is.  Used when you need to be more specific about matching search criteria.</summary>
+		///<summary>Returns null if there is no perfect match, returns a fee if there is.  
+		///Used when you need to be more specific about matching search criteria.
+		///Uses the list of fees passed in instead of the cached list of fees.</summary>
 		public static Fee GetMatch(long codeNum,long feeSchedNum,long clinicNum,long provNum,List<Fee> listFees) {
 			for(int i=0;i<listFees.Count;i++) {
 				if(listFees[i].CodeNum==codeNum 
@@ -225,6 +340,20 @@ namespace OpenDentBusiness{
 			return fee.Amount;
 		}
 
+		///<summary>Returns an amount if a fee has been entered.  Prefers local clinic fees over HQ fees.  Otherwise returns -1.  Not usually used directly.
+		///Uses the list of fees passed in instead of the cached list of fees.</summary>
+		public static double GetAmount(long codeNum,long feeSchedNum,long clinicNum,long provNum,List<Fee> listFees) {
+			//No need to check RemotingRole; no call to db.
+			if(FeeScheds.GetIsHidden(feeSchedNum)) {
+				return -1;//you cannot obtain fees for hidden fee schedules
+			}
+			Fee fee=GetFee(codeNum,feeSchedNum,clinicNum,provNum,listFees);
+			if(fee==null) {
+				return -1;
+			}
+			return fee.Amount;
+		}
+
 		public static double GetAmount0(long codeNum,long feeSched) {
 			//No need to check RemotingRole; no call to db.
 			return GetAmount0(codeNum,feeSched,0,0);													 
@@ -240,6 +369,19 @@ namespace OpenDentBusiness{
 				return 0;
 			}
 			return retVal;															 
+		}
+
+		///<summary>Almost the same as GetAmount.  But never returns -1;  Returns an amount if a fee has been entered.  
+		///Prefers local clinic fees over HQ fees.  
+		///Returns 0 if code can't be found.
+		///Uses the list of fees passed in instead of the cached list of fees.</summary>
+		public static double GetAmount0(long codeNum,long feeSched,long clinicNum,long provNum,List<Fee> listFees) {
+			//No need to check RemotingRole; no call to db.
+			double retVal=GetAmount(codeNum,feeSched,clinicNum,provNum,listFees);
+			if(retVal==-1) {
+				return 0;
+			}
+			return retVal;
 		}
 
 		///<summary>Gets the fee schedule from the first insplan, the patient, or the provider in that order.  Either returns a fee schedule (fk to definition.DefNum) or 0.</summary>
@@ -332,7 +474,8 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>Clears all fees from one fee schedule.  Supply the list of all fees for all fee schedules.</summary>
+		///<summary>Removes (clears) all fees matching the schedule, clinic, and provider passed in from the provided list of fees.
+		///Returns the list that has had the corresponding fees removed from it.</summary>
 		public static List<Fee> ClearFeeSched(long schedNum,long clinicNum,long provNum,List<Fee> listFees) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=listFees.Count-1;i>=0;i--) {
@@ -351,17 +494,10 @@ namespace OpenDentBusiness{
 			Fee fee;
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			FeeSched toSched=FeeScheds.GetOne(toFeeSched,listFeeScheds);
-			for(int i=0;i<listFees.Count;i++){
-				if(listFees[i].FeeSched!=fromFeeSched){
-					continue;
-				}
-				if(listFees[i].ClinicNum!=fromClinicNum) {
-					continue;
-				}
-				if(listFees[i].ProvNum!=fromProvNum) {
-					continue;
-				}
-				fee=listFees[i].Copy();
+			List<Fee> listFeesForSched=listFees.FindAll(x => x.FeeSched==fromFeeSched);
+			foreach(Fee feeCur in listFeesForSched) {
+				Fee feeBestMatch=GetFee(feeCur.CodeNum,fromFeeSched,fromClinicNum,fromProvNum,listFeesForSched);
+				fee=feeBestMatch.Copy();
 				fee.ProvNum=toProvNum;
 				fee.ClinicNum=toClinicNum;
 				fee.FeeNum=0;//Set 0 to insert
@@ -372,19 +508,20 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Increases the fee schedule by percent.  Round should be the number of decimal places, either 0,1,or 2.
-		///Supply the list of all fees for all fee schedules.
 		///Returns listFees back after increasing the fees from the passed in fee schedule information.</summary>
 		public static List<Fee> Increase(long feeSchedNum,int percent,int round,List<Fee> listFees,long clinicNum,long provNum) {
 			//No need to check RemotingRole; no call to db.
+			//Get all fees associated to the fee schedule passed in.
+			List<Fee> listFeesForSched=listFees.FindAll(x => x.FeeSched==feeSchedNum);
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			FeeSched feeSched=FeeScheds.GetOne(feeSchedNum,listFeeScheds);
 			List<long> listCodeNums=new List<long>(); //Contains only the fee codeNums that have been increased.  Used for keeping track.
-			for(int i=0;i<listFees.Count;i++) { //Contains all fees for all scheds.
-				Fee feeCur=listFees[i];
+			foreach(Fee feeCur in listFeesForSched) {
 				if(listCodeNums.Contains(feeCur.CodeNum)) {
 					continue; //Skip the fee if it's already been increased.
 				}
-				Fee feeForCode=GetFee(feeCur.CodeNum,feeSched,clinicNum,provNum,listFees);
+				//Find the fee with the best match for this procedure code with the additional settings passed in.
+				Fee feeForCode=GetFee(feeCur.CodeNum,feeSched,clinicNum,provNum,listFeesForSched);
 				//The best match isn't 0, and we haven't already done this CodeNum
 				if(feeForCode!=null && feeForCode.Amount!=0) {
 					double newVal=(double)feeForCode.Amount*(1+(double)percent/100);
@@ -395,6 +532,8 @@ namespace OpenDentBusiness{
 						newVal=Math.Round(newVal,MidpointRounding.AwayFromZero);
 					}
 					//The fee showing in the fee schedule is not a perfect match.  Make a new one that is.
+					//E.g. We are increasing all fees for clinicNum of 1 and provNum of 5 and the best match found was for clinicNum of 3 and provNum of 7.
+					//We would then need to make a copy of that fee, increase it, and then associate it to the clinicNum and provNum passed in (1 and 5).
 					if(!feeSched.IsGlobal && (feeForCode.ClinicNum!=clinicNum || feeForCode.ProvNum!=provNum)) {
 						Fee fee=new Fee();
 						fee.Amount=newVal;

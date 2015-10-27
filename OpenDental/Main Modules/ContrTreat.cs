@@ -844,7 +844,6 @@ namespace OpenDental{
 
 		///<summary></summary>
 		public void ModuleSelected(long patNum) {
-			Fees.ListFees=Fees.GetListt();
 			RefreshModuleData(patNum);
 			RefreshModuleScreen();
 			Plugins.HookAddCode(this,"ContrTreat.ModuleSelected_end",patNum);
@@ -852,7 +851,6 @@ namespace OpenDental{
 
 		///<summary></summary>
 		public void ModuleUnselected(){
-			Fees.ListFees=null;//To prevent the local copy from being used in other modules.
 			FamCur=null;
 			PatCur=null;
 			InsPlanList=null;
@@ -2825,7 +2823,6 @@ namespace OpenDental{
 			if(!MsgBox.Show(this,true,"Update all fees and insurance estimates on this treatment plan to the current fees for this patient?")) {
 				return;
 			}
-			Fees.ListFees=Fees.GetListt();//Get a new copy of the fees, since it might have been changed via the main menu while inside this module.
 			Procedure procCur;
 			//Procedure procOld
 			//Find the primary plan------------------------------------------------------------------

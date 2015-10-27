@@ -72,8 +72,11 @@ namespace OpenDental{
 		private UI.Button butPickClinicTo;
 		private ComboBox comboClinicTo;
 		private UI.Button butPickSchedTo;
-		///<summary>Currently accurate list of fees from the ProcCodes window.  Used to pass back a potentially modified list of fees when this window is closed.</summary>
+		///<summary>Currently accurate list of fees from the ProcCodes window.
+		///This list will get synced to the database if DialogResult==DialogResult.OK and _changed==true</summary>
 		private List<Fee> _listFees;
+		///<summary>Set to true if _listFees ever changes and needs to get synced to the database.</summary>
+		private bool _changed=false;
 
 		///<summary>Supply the fee schedule num(DefNum) to which all these changes will apply</summary>
 		public FormFeeSchedTools(long schedNum,List<FeeSched> listFeeScheds,List<Fee> listFees,List<Provider> listProvs,Clinic[] arrayClinics) {
@@ -672,6 +675,7 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Fee Tools";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormFeeSchedTools_FormClosing);
 			this.Load += new System.EventHandler(this.FormFeeSchedTools_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
@@ -832,6 +836,7 @@ namespace OpenDental{
 			}
 			logText+=" "+Lan.g(this,"were all cleared.");
 			SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText);
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -891,6 +896,7 @@ namespace OpenDental{
 				logText+=". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(_listFeeScheds[comboFeeSched.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools.");
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,_listFees[i].CodeNum);
 			}
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -961,6 +967,7 @@ namespace OpenDental{
 				logText+=". "+Lan.g(this,"Fee increased by")+" "+((float)percent/100.0f).ToString("p")+" "+Lan.g(this," using the increase button in the Fee Tools window.");
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,_listFees[i].CodeNum);
 			}
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -993,10 +1000,11 @@ namespace OpenDental{
 				//Get every single procedure code from the cache which will already be ordered by ProcCat and then ProcCode.
 				//Even if the code does not have a fee, include it in the export because that will trigger a 'deletion' when importing over other schedules.
 				List<ProcedureCode> listCodes=ProcedureCodeC.GetListLong();
-				//Now that we have all the best matches, 
+				//Make a complex dictionary out of the list of fees we have to quickly search through for the best fees.
+				Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDictForList(_listFees);
 				for(int i=0;i<listCodes.Count;i++) {
 					//Get the best matching fee for the current selections. 
-					Fee fee=Fees.GetFee(listCodes[i].CodeNum,feeSched,clinicNum,provNum,_listFees);
+					Fee fee=Fees.GetFee(listCodes[i].CodeNum,feeSched,clinicNum,provNum,dictFeesByFeeSchedNumsAndCodeNums);
 					ProcedureCode procCode=ProcedureCodes.GetProcCode(listCodes[i].CodeNum);
 					sr.Write(procCode.ProcCode+"\t");
 					if(fee!=null && fee.Amount!=-1) {
@@ -1065,6 +1073,7 @@ namespace OpenDental{
 			}
 			Cursor=Cursors.Default;
 			MsgBox.Show(this,"Fee schedule imported.");
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -1218,7 +1227,6 @@ namespace OpenDental{
 					imported++;
 				}
 			}
-			DataValid.SetInvalid(InvalidType.Fees);
 			Cursor=Cursors.Default;
 			string displayMsg="Import complete.\r\nCodes imported: "+imported.ToString();
 			if(skippedCode>0) {
@@ -1228,6 +1236,7 @@ namespace OpenDental{
 				displayMsg+="\r\nCodes skipped because malformed line in text file: "+skippedMalformed.ToString();
 			}
 			MessageBox.Show(displayMsg);
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -1371,8 +1380,8 @@ namespace OpenDental{
 					}
 				}
 			}
-			DataValid.SetInvalid(InvalidType.Fees);
 			Cursor=Cursors.Default;
+			_changed=true;
 			DialogResult=DialogResult.OK;
 			string outputMessage=Lan.g(this,"Done. Number imported")+": "+numImported;
 			if(numSkipped>0) {
@@ -1386,10 +1395,10 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
-			Fees.Sync(_listFees);//Sync what fees we currently have because we're about to call a method that uses the database.
-			long rowsChanged=Procedures.GlobalUpdateFees();
+			long rowsChanged=Procedures.GlobalUpdateFees(_listFees);
 			Cursor=Cursors.Default;
 			MessageBox.Show(Lan.g(this,"Fees changed: ")+rowsChanged.ToString());
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -1477,6 +1486,15 @@ namespace OpenDental{
 
 		private void butClose_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void FormFeeSchedTools_FormClosing(object sender,FormClosingEventArgs e) {
+			if(DialogResult==DialogResult.OK && _changed) {
+				Cursor=Cursors.WaitCursor;
+				Fees.Sync(_listFees);//Sync any changes made in this window to the database.
+				DataValid.SetInvalid(InvalidType.Fees);//Notify all other workstations about the changes made to the Fees.
+				Cursor=Cursors.Default;
+			}
 		}
 		
 

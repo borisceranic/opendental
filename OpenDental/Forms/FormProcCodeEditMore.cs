@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenDental {
 	public partial class FormProcCodeEditMore:Form {
-		public List<Fee> ListFees;
+		private List<Fee> _listFees;
 		private ProcedureCode _procCode;
 		private List<FeeSched> _listFeeScheds;
 
@@ -21,11 +21,24 @@ namespace OpenDental {
 		}
 
 		private void FormProcCodeEditMore_Load(object sender,EventArgs e) {
-			if(ListFees==null) {
-				ListFees=Fees.GetListt();
-			}
 			_listFeeScheds=FeeSchedC.GetListShort();
+			FillAndSortListFees();
 			FillGrid();
+		}
+
+		///<summary>It's unnecessary to continuously re-fill the list of fees that this window uses to display.
+		///This method is a helper method that can be manually called when it is known that the fees for this code have changed.
+		///This removes the need to have it within FillGrid().</summary>
+		private void FillAndSortListFees() {
+			_listFees=Fees.GetFeesForCode(_procCode.CodeNum);
+			//Create a temporary list that will be used to keep track of the Fees after they've been sorted within each fee schedule.
+			List<Fee> listFees=new List<Fee>();
+			for(int i=0;i<_listFeeScheds.Count;i++) {
+				listFees.AddRange(_listFees.FindAll(fee => fee.FeeSched==_listFeeScheds[i].FeeSchedNum && fee.CodeNum==_procCode.CodeNum)
+					.OrderBy(fee => fee.ClinicNum)
+					.ThenBy(fee => fee.ProvNum));
+			}
+			_listFees=new List<Fee>(listFees);//Update the class-wide list that FillGrid() uses so the fees are displayed correctly.
 		}
 
 		private void FillGrid() {
@@ -49,29 +62,23 @@ namespace OpenDental {
 			col=new ODGridColumn(Lan.g("TableProcCodeEditMore","Amount"),100,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
-			List<Fee> listFees=new List<Fee>();
-			for(int i=0;i<_listFeeScheds.Count;i++) {
-				listFees.AddRange(ListFees.FindAll(fee => fee.FeeSched==_listFeeScheds[i].FeeSchedNum && fee.CodeNum==_procCode.CodeNum)
-								.OrderBy(fee => fee.ClinicNum)
-								.ThenBy(fee => fee.ProvNum));
-			}
 			ODGridRow row;
 			long lastFeeSched=0;
-			for(int i=0;i<listFees.Count;i++) {
+			for(int i=0;i<_listFees.Count;i++) {
 				row=new ODGridRow();
-				if(listFees[i].FeeSched!=lastFeeSched) {
-					row.Cells.Add(FeeScheds.GetDescription(listFees[i].FeeSched));
+				if(_listFees[i].FeeSched!=lastFeeSched) {
+					row.Cells.Add(FeeScheds.GetDescription(_listFees[i].FeeSched));
 					row.Bold=true;
-					lastFeeSched=listFees[i].FeeSched;
+					lastFeeSched=_listFees[i].FeeSched;
 					row.ColorBackG=Color.LightBlue;
-					if(listFees[i].ClinicNum!=0 || listFees[i].ProvNum!=0) { //FeeSched change, but not with a default fee. Insert placeholder row.
+					if(_listFees[i].ClinicNum!=0 || _listFees[i].ProvNum!=0) { //FeeSched change, but not with a default fee. Insert placeholder row.
 						if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 							row.Cells.Add("");
 						}
 						row.Cells.Add("");
 						row.Cells.Add("");
 						Fee fee=new Fee();
-						fee.FeeSched=listFees[i].FeeSched;
+						fee.FeeSched=_listFees[i].FeeSched;
 						row.Tag=fee;
 						gridMain.Rows.Add(row);
 						//Now that we have a placeholder for the default fee (none was found), go about adding the next row (non-default fee).
@@ -82,12 +89,12 @@ namespace OpenDental {
 				else {
 					row.Cells.Add("");
 				}
-				row.Tag=listFees[i];
+				row.Tag=_listFees[i];
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) { //Using clinics
-					row.Cells.Add(Clinics.GetDesc(listFees[i].ClinicNum)); //Returns "" if invalid clinicnum (ie. 0)
+					row.Cells.Add(Clinics.GetDesc(_listFees[i].ClinicNum)); //Returns "" if invalid clinicnum (ie. 0)
 				}
-				row.Cells.Add(Providers.GetAbbr(listFees[i].ProvNum)); //Returns "" if invalid provnum (ie. 0)
-				row.Cells.Add(listFees[i].Amount.ToString("n"));
+				row.Cells.Add(Providers.GetAbbr(_listFees[i].ProvNum)); //Returns "" if invalid provnum (ie. 0)
+				row.Cells.Add(_listFees[i].Amount.ToString("n"));
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -103,10 +110,11 @@ namespace OpenDental {
 			}
 			FormFE.FeeCur=fee;
 			FormFE.ShowDialog();
-			//FormFE could have updated or deleted the fee.  Refresh our cache regardless of what happened in the edit window.
-			Fees.RefreshCache();
-			ListFees=Fees.GetListt();
-			FillGrid();
+			if(FormFE.DialogResult==DialogResult.OK) {
+				//FormFE could have manipulated the fee.  Refresh our local cache and grids to reflect the changes.
+				FillAndSortListFees();
+				FillGrid();
+			}
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
