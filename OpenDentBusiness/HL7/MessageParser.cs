@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Globalization;
-using System.Text;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace OpenDentBusiness.HL7 {
 	///<summary>This is the engine that will parse our incoming HL7 messages.</summary>
@@ -37,6 +36,7 @@ namespace OpenDentBusiness.HL7 {
 			}
 			_isVerboseLogging=isVerboseLogging;
 			_isNewPat=false;
+			#region Get and Validate Message Definition for This Message
 			HL7Def def=HL7Defs.GetOneDeepEnabled();
 			if(def==null) {
 				_hl7MsgCur.Note="Could not process HL7 message.  No HL7 definition is enabled.";
@@ -61,6 +61,7 @@ namespace OpenDentBusiness.HL7 {
 				HL7Msgs.Update(_hl7MsgCur);
 				throw new Exception("Could not process HL7 message.  No definition for this type of message in the enabled HL7Def.");
 			}
+			#endregion Get and Validate Message Definition for This Message
 			string chartNum=null;
 			long patNum=0;
 			long patNumFromIds=0;
@@ -230,7 +231,7 @@ namespace OpenDentBusiness.HL7 {
 				}
 				#endregion patientIdList
 			}
-			if(_isEcwHL7Def &&  (patLName=="" || patFName=="")) {
+			if(_isEcwHL7Def &&  (string.IsNullOrEmpty(patLName) || string.IsNullOrEmpty(patFName))) {
 				EventLog.WriteEntry("OpenDentHL7","Message not processed due to missing first or last name. PatNum:"+patNum.ToString()
 					,EventLogEntryType.Information);
 				_hl7MsgCur.Note="Message not processed due to missing first or last name. PatNum:"+patNum.ToString();
@@ -239,6 +240,8 @@ namespace OpenDentBusiness.HL7 {
 			}
 			#endregion PID fieldsLoop
 			#endregion GetPatientIDs
+			#region Locate Patient Using PID Segment Details
+			#region Locate Patient Using PatNum, ChartNumber, or Name and Birthday
 			//We now have patnum, chartnum, patname, and/or birthdate so locate pat
 			Patient pat=null;
 			Patient patOld=null;
@@ -267,6 +270,8 @@ namespace OpenDentBusiness.HL7 {
 					}
 				}
 			}
+			#endregion Locate Patient Using PatNum, ChartNumber, or Name and Birthday
+			#region Locate Patient Using External OIDs
 			//Use the external OIDs stored in the oidexternal table to find the patient
 			//Only trust the external IDs if all OIDs refer to the same patient
 			long patNumFromExtIds=0;
@@ -288,7 +293,10 @@ namespace OpenDentBusiness.HL7 {
 					pat=Patients.GetPat(patNumFromExtIds);
 				}
 			}
+			#endregion Locate Patient Using External OIDs
 			_isNewPat=pat==null;
+			#endregion Locate Patient Using PID Segment Details
+			#region SRM Segment for OD as Filler Application
 			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM && _isNewPat) {//SRM messages must refer to existing appointments, so there must be an existing patient as well
 				MessageHL7 hl7SRR=MessageConstructor.GenerateSRR(pat,null,msg.EventType,msg.ControlId,false,msg.AckEvent);//use false to indicate AE - Application Error in SRR.MSA segment
 				HL7Msg hl7Msg=new HL7Msg();
@@ -298,6 +306,8 @@ namespace OpenDentBusiness.HL7 {
 				HL7Msgs.Insert(hl7Msg);
 				throw new Exception("Could not process HL7 SRM message due to an invalid or missing patient ID in the PID segment.");
 			}
+			#endregion SRM Segment for OD as Filler Application
+			#region Set pat for New Patient or patOld for Existing Patient
 			if(_isNewPat) {
 				pat=new Patient();
 				if(chartNum!=null) {
@@ -321,6 +331,8 @@ namespace OpenDentBusiness.HL7 {
 			else {
 				patOld=pat.Copy();
 			}
+			#endregion Set pat for New Patient or patOld for Existing Patient
+			#region Get Appointment if Necessary
 			long aptNum=0;
 			//If this is a message that contains an ARQ or SCH segment, loop through the fields to find the AptNum.  Pass it to other segment parsing methods that require it.
 			//If this is an SRM message, and an AptNum is not included or no appointment with this AptNum is in the OD db, do not process the message.
@@ -350,6 +362,8 @@ namespace OpenDentBusiness.HL7 {
 				}
 			}
 			Appointment aptCur=Appointments.GetOneApt(aptNum);//if aptNum=0, aptCur will be null
+			#endregion Get Appointment if Necessary
+			#region SRM Segment for OD as Filler Application
 			//SRM messages are only for interfaces where OD is considered the 'filler' application
 			//Not valid for eCW where OD is considered an 'auxiliary' application and we receive SIU messages instead.
 			if(!_isEcwHL7Def && msg.MsgType==MessageTypeHL7.SRM) {
@@ -381,6 +395,8 @@ namespace OpenDentBusiness.HL7 {
 						+"Appointment PatNum: "+aptCur.PatNum.ToString()+".  PID segment PatNum: "+pat.PatNum.ToString()+".");
 				}
 			}
+			#endregion SRM Segment for OD as Filler Application
+			#region Insert New Patient
 			//We now have a patient object , either loaded from the db or new, and an appointment (could be null) so process this message for this patient
 			//We need to insert the pat to get a patnum so we can compare to guar patnum to see if relationship to guar is self
 			if(_isNewPat) {
@@ -395,12 +411,14 @@ namespace OpenDentBusiness.HL7 {
 				}
 				patOld=pat.Copy();
 			}
+			#endregion Insert New Patient
 			//Update hl7msg table with correct PatNum for this message
 			_hl7MsgCur.PatNum=pat.PatNum;
 			HL7Msgs.Update(_hl7MsgCur);
 			if(aptCur!=null && pat.PatNum!=aptCur.PatNum) {
 				throw new Exception("Appointment does not match patient "+pat.GetNameFLnoPref()+", apt.PatNum: "+aptCur.PatNum.ToString()+", pat.PatNum: "+pat.PatNum.ToString());
 			}
+			#region Process Segments
 			for(int i=0;i<hl7defmsg.hl7DefSegments.Count;i++) {
 				try {
 					List<SegmentHL7> listSegments=new List<SegmentHL7>();
@@ -440,6 +458,7 @@ namespace OpenDentBusiness.HL7 {
 					throw new Exception("Could not process an HL7 message.  "+ex);
 				}
 			}
+			#endregion Process Segments
 			//We have processed the message so now update the patient
 			if(pat.FName=="" || pat.LName=="") {
 				EventLog.WriteEntry("OpenDentHL7","Patient demographics not processed due to missing first or last name. PatNum:"+pat.PatNum.ToString()
@@ -458,6 +477,7 @@ namespace OpenDentBusiness.HL7 {
 				_hl7MsgCur.HL7Status=HL7MessageStatus.InProcessed;
 				HL7Msgs.Update(_hl7MsgCur);
 			}
+			#region SRM Segment for OD as Filler Application
 			//Schedule Request Messages require a Schedule Request Response if the data requested to be changed was successful
 			//We only allow changing the appt note, setting the dentist and hygienist, updating the confirmation status, and changing the ClinicNum.
 			//We also allow setting the appt status to broken if the EventType is S04 - Request Appointment Cancellation.
@@ -481,6 +501,7 @@ namespace OpenDentBusiness.HL7 {
 				hl7Msg.PatNum=pat.PatNum;
 				HL7Msgs.Insert(hl7Msg);
 			}
+			#endregion SRM Segment for OD as Filler Application
 		}
 
 		public static void ProcessAck(MessageHL7 msg,bool isVerboseLogging) {
