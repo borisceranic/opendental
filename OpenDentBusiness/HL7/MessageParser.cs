@@ -230,7 +230,7 @@ namespace OpenDentBusiness.HL7 {
 				}
 				#endregion patientIdList
 			}
-			if(_isEcwHL7Def &&  (patLName=="" || patFName=="")) {
+			if(_isEcwHL7Def &&  (string.IsNullOrEmpty(patLName) || string.IsNullOrEmpty(patFName))) {
 				EventLog.WriteEntry("OpenDentHL7","Message not processed due to missing first or last name. PatNum:"+patNum.ToString()
 					,EventLogEntryType.Information);
 				_hl7MsgCur.Note="Message not processed due to missing first or last name. PatNum:"+patNum.ToString();
