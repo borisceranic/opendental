@@ -2,19 +2,23 @@ using System;
 using System.Collections;
 
 namespace OpenDentBusiness{
-	/// <summary>Corresponds to the benefit table in the database which replaces the old covpat table.  A benefit is usually a percentage, deductible, limitation, max, or similar. Each row represents a single benefit.  A benefit can have a value in EITHER PlanNum OR PatPlanNum.  If it is for a PlanNum, the most common, then the benefit is attached to an insurance plan.  If it is for a PatPlanNum, then it overrides the plan benefit, usually a percentage, for a single patient.  Benefits we can't handle yet include posterior composites, COB duplication, amounts used, in/out of plan network, authorization required, missing tooth exclusion, and any date related limitations like waiting periods.<br/>
-	/// Here are examples of typical usage which parallel X12 usage.<br/>
-	/// Example fields shown in this order:<br/>
-	/// CovCat, ProcCode(- indicates blank), BenefitType, Percent, MonetaryAmt, TimePeriod, QuantityQualifier, Quantity, CoverageLevel<br/>
-	/// Annual Max Indiv $1000: None/General,-,Limitations,-1,1000,CalendarYear,None,0,Individual<br/>
-	/// Restorative 80%: Restorative,-,CoInsurance,80,-1,CalendarYear,None,0,None<br/>
-	/// $50 deductible: None/General,-,Deductible,-1,50,CalendarYear,None,0,Individual<br/>
-	/// Deductible waived on preventive: Preventive,-,Deductible,-1,0,CalendarYear,None,0,Individual<br/>
-	/// 1 pano every 5 years: None,D0330,Limitations,-1,-1,Years?,Years,5,None<br/>
-	/// 2 exams per year: Preventive(or Diagnostic),-,Limitations,-1,-1,BenefitYear,NumberOfServices,2,None<br/>
-	/// Fluoride limit 18yo: None, D1204, Limitations, -1, -1, CalendarYear/None, AgeLimit, 18,None (might require a second identical entry for D1205)<br/>
-	/// 4BW every 6 months: None, D0274, Limitations, -1, -1, None, Months, 6,None.
-	/// The text above might be difficult to read.  We are trying to improve the white spacing.</summary>
+	/// <summary>Corresponds to the benefit table in the database which replaces the old covpat table.  A benefit is usually a percentage, deductible, 
+	/// limitation, max, or similar. Each row represents a single benefit.  A benefit can have a value in EITHER PlanNum OR PatPlanNum.  If it is for a 
+	/// PlanNum, the most common, then the benefit is attached to an insurance plan.  If it is for a PatPlanNum, then it overrides the plan benefit, 
+	/// usually a percentage, for a single patient.  Benefits we can't handle yet include posterior composites, COB duplication, amounts used, in/out 
+	/// of plan network, authorization required, missing tooth exclusion, and any date related limitations like waiting periods.<br/>
+	/// <para>Here are examples of typical usage which parallel X12 usage.</para>
+	/// <para>Example fields shown in this order:</para>
+	/// <para>CovCat, ProcCode(- indicates blank), BenefitType, Percent, MonetaryAmt, TimePeriod, QuantityQualifier, Quantity, CoverageLevel</para>
+	/// <para>Annual Max Indiv $1000: None/General,-,Limitations,-1,1000,CalendarYear,None,0,Individual</para>
+	/// <para>Restorative 80%: Restorative,-,CoInsurance,80,-1,CalendarYear,None,0,None</para>
+	/// <para>$50 deductible: None/General,-,Deductible,-1,50,CalendarYear,None,0,Individual</para>
+	/// <para>Deductible waived on preventive: Preventive,-,Deductible,-1,0,CalendarYear,None,0,Individual</para>
+	/// <para>1 pano every 5 years: None,D0330,Limitations,-1,-1,Years?,Years,5,None</para>
+	/// <para>2 exams per year: Preventive(or Diagnostic),-,Limitations,-1,-1,BenefitYear,NumberOfServices,2,None</para>
+	/// <para>Fluoride limit 18yo: None, D1204, Limitations, -1, -1, CalendarYear/None, AgeLimit, 18,None (might require a second identical entry for D1205)</para>
+	/// <para>4BW every 6 months: None, D0274, Limitations, -1, -1, None, Months, 6,None.</para>
+	/// <para>The text above might be difficult to read.  We are trying to improve the white spacing.</para></summary>
 	[Serializable()]
 	public class Benefit:TableBase, IComparable {
 		///<summary>Primary key.</summary>

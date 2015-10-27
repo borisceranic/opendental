@@ -36,17 +36,17 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
-			this.label3 = new System.Windows.Forms.Label();
-			this.butSetup = new OpenDental.UI.Button();
+			this.labelSpecialInfo = new System.Windows.Forms.Label();
+			this.listBoxAvailable = new System.Windows.Forms.ListBox();
 			this.SuspendLayout();
 			// 
 			// label2
 			// 
 			this.label2.Location = new System.Drawing.Point(13, 23);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(108, 36);
+			this.label2.Size = new System.Drawing.Size(123, 15);
 			this.label2.TabIndex = 86;
-			this.label2.Text = "FieldName:\r\nToothGrid";
+			this.label2.Text = "FieldName:\r\n";
 			// 
 			// label5
 			// 
@@ -167,36 +167,29 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
-			// label3
+			// labelSpecialInfo
 			// 
-			this.label3.Location = new System.Drawing.Point(175, 22);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(207, 65);
-			this.label3.TabIndex = 101;
-			this.label3.Text = "A tooth grid has 32 rows, one for each tooth.  Columns are customizable.  Recomme" +
-    "nded size is 500 x 300.";
+			this.labelSpecialInfo.Location = new System.Drawing.Point(175, 22);
+			this.labelSpecialInfo.Name = "labelSpecialInfo";
+			this.labelSpecialInfo.Size = new System.Drawing.Size(207, 65);
+			this.labelSpecialInfo.TabIndex = 101;
+			this.labelSpecialInfo.Text = "Will contain information pertaining to the type of special field selected.";
 			// 
-			// butSetup
+			// listBoxAvailable
 			// 
-			this.butSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSetup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butSetup.Autosize = true;
-			this.butSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSetup.CornerRadius = 4F;
-			this.butSetup.Location = new System.Drawing.Point(391, 23);
-			this.butSetup.Name = "butSetup";
-			this.butSetup.Size = new System.Drawing.Size(75, 24);
-			this.butSetup.TabIndex = 102;
-			this.butSetup.Text = "Setup";
-			this.butSetup.Click += new System.EventHandler(this.butSetup_Click);
+			this.listBoxAvailable.FormattingEnabled = true;
+			this.listBoxAvailable.Location = new System.Drawing.Point(16, 41);
+			this.listBoxAvailable.Name = "listBoxAvailable";
+			this.listBoxAvailable.Size = new System.Drawing.Size(153, 173);
+			this.listBoxAvailable.TabIndex = 103;
+			this.listBoxAvailable.SelectedIndexChanged += new System.EventHandler(this.listBoxAvailable_SelectedIndexChanged);
 			// 
 			// FormSheetFieldSpecial
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(478, 271);
-			this.Controls.Add(this.butSetup);
-			this.Controls.Add(this.label3);
+			this.Controls.Add(this.listBoxAvailable);
+			this.Controls.Add(this.labelSpecialInfo);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textHeight);
 			this.Controls.Add(this.label8);
@@ -233,7 +226,7 @@ namespace OpenDental{
 		private ValidNum textHeight;
 		private System.Windows.Forms.Label label8;
 		private OpenDental.UI.Button butDelete;
-		private System.Windows.Forms.Label label3;
-		private UI.Button butSetup;
+		private System.Windows.Forms.Label labelSpecialInfo;
+		private System.Windows.Forms.ListBox listBoxAvailable;
 	}
 }

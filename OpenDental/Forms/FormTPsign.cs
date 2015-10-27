@@ -14,7 +14,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental{
-	public delegate List<Document> SaveFileAsDocDelegate(bool isSigSave);
+	public delegate List<Document> SaveFileAsDocDelegate(bool isSigSave,Sheet sheetTP);
 
 	///<summary></summary>
 	public class FormTPsign : System.Windows.Forms.Form{
@@ -43,6 +43,7 @@ namespace OpenDental{
 				//private bool allowTopaz;
 		///<summary>Should be set to ContrTreat.SaveTPAsDocument(). Can save multiple copies if multiple TP image categories are defined.</summary>
 		public SaveFileAsDocDelegate SaveDocDelegate;
+		public Sheet SheetTP;
 
 		///<summary></summary>
 		public FormTPsign(){
@@ -581,12 +582,17 @@ namespace OpenDental{
 		private void butOK_Click(object sender,EventArgs e) {
 			SaveSignature();//"saves" signature to TPCur, does not save to DB.
 			TreatPlans.Update(TPcur);//save signature to DB.
-			if(TPcur.DocNum>0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) && !Documents.DocExists(TPcur.DocNum)) {
+			TPcur.ListProcTPs=ProcTPs.RefreshForTP(TPcur.TreatPlanNum);
+			SheetParameter.SetParameter(SheetTP,"TreatPlan",TPcur);//update TP on sheet to have new signature for generating pdfs
+			if(TPcur.Signature.Length>0 && TPcur.DocNum==0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
+				SigChanged=true;
+			}
+			else if(TPcur.DocNum>0 && !Documents.DocExists(TPcur.DocNum) && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
 				//Setting SigChanged to True will resave document below.
 				SigChanged=MsgBox.Show(this,MsgBoxButtons.YesNo,"Cannot find saved copy of signed PDF, would you like to resave the document?");
 			}
-			if(PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) && SaveDocDelegate!=null && SigChanged) {
-				List<Document> docs=SaveDocDelegate(true);
+			if(PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) && SaveDocDelegate!=null && SigChanged && TPcur.Signature.Length>0) {
+				List<Document> docs=SaveDocDelegate(true,SheetTP);
 				if(docs.Count>0) {
 					TPcur.DocNum=docs[0].DocNum;//attach first Doc to TP.
 					TreatPlans.Update(TPcur); //update docnum. must be called after signature is updated.

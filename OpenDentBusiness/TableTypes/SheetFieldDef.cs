@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using PdfSharp.Drawing;
 
 namespace OpenDentBusiness{
 	///<summary>One field on a sheetDef.</summary>
@@ -17,8 +18,19 @@ namespace OpenDentBusiness{
 		public long SheetDefNum;
 		///<summary>Enum:SheetFieldType  OutputText, InputField, StaticText,Parameter(only used for SheetField, not SheetFieldDef),Image,Drawing,Line,Rectangle,CheckBox,SigBox,PatImage.</summary>
 		public SheetFieldType FieldType;
-		///<summary>Mostly for OutputText, InputField, and CheckBox types.  Each sheet typically has a main datatable type.  For OutputText types, FieldName is usually the string representation of the database column for the main table.  For other tables, it can be of the form table.Column.  There may also be extra fields available that are not strictly pulled from the database.  Extra fields will start with lowercase to indicate that they are not pure database fields.  The list of available fields for each type in SheetFieldsAvailable.  Users can pick from that list.  Likewise, InputField types are internally tied to actions to persist the data.  So they are also hard coded and are available in SheetFieldsAvailable.  For static images, this is the full file name including extension, but without path.  Static images paths are reconstructed by looking in the AtoZ folder, SheetImages folder.  For PatImages, this is the name of the DocCategory.</summary>
-		public string FieldName;
+		/// <summary>FieldName is used differently for different FieldTypes. 
+		/// <para>For OutputText, each sheet typically has a main datatable type. For example statements correspond to the statment table. See SheetFieldsAvailable.GetList() for available values.</para>
+		/// <para>     If the output field exactly matches a column from the main table this will be the &lt;ColumnName>. For example, "FName" on patient Forms.</para>
+		/// <para>     If the output field exactly matches a column from a different table this will be the &lt;tablename>.&lt;ColumnName>. For example, appt.Note on Routing Slips.</para>
+		/// <para>     If the output field is not a database column it must start with a lowercase letter. For example, "statementReceiptInvoice" on Statements.</para>
+		/// <para>For InputField, these are hardcoded to correspond to DB fields, for example "FName" corresponsds to patient.FName. See SheetFieldsAvailable.GetList() for available values.</para>
+		/// <para>For Image, this file name with extention, for example "image1.jpg". Some image names are handled specially, for example "Patient Info.gif". Images are stored in &lt;imagefolder>\SheetImages\image1.jpg.</para>
+		/// <para>For CheckBox, this groups checkboxes together so that only one per group can be checked.</para>
+		/// <para>For PatImage, this is the name of the DocCategory.</para>
+		/// <para>For Special, identifies the type of special field. Currently only ToothChart and ToothChartLegend.</para>
+		/// <para>For Grid, this is the specific type of grid. See SheetUtil.GetDataTableForGridType() for values. For example "StatementPayPlan".</para>
+		/// <para>For all other fieldtypes, FieldName is blank or irrelevant.</para></summary>
+		public string FieldName; //note, the indenting in the summary above is a non-breaking space. Alt + 255.
 		///<summary>For StaticText, this text can include bracketed fields, like [nameLF].
 		///<para>For OutputText and InputField, this will be blank.  </para>
 		///<para>For CheckBoxes, either X or blank.  Even if the checkbox is set to behave like a radio button.  </para>
@@ -77,7 +89,25 @@ namespace OpenDentBusiness{
 			RadioButtonGroup="";
 			ImageData="";
 		}
-	
+
+		///<summary>Simple constructor, useful in conjunction with initializer.</summary>
+		public SheetFieldDef(SheetFieldType fieldType,int x,int y,int width,int height,Font font=null,string fieldValue="") {
+			this.RadioButtonGroup="";
+			this.ImageData="";
+			this.FieldType=fieldType;
+			this.XPos=x;
+			this.YPos=y;
+			this.Width=width;
+			this.Height=height;
+			if(font!=null) {
+				this.FontName=font.Name;
+				this.FontSize=font.SizeInPoints;
+				this.FontIsBold=font.Bold;
+			}
+			this.FieldValue=fieldValue;
+			this.ItemColor=Color.Black;
+		}
+
 		public SheetFieldDef(SheetFieldType fieldType,string fieldName,string fieldValue,
 			float fontSize,string fontName,bool fontIsBold,
 			int xPos,int yPos,int width,int height,

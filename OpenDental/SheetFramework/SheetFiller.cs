@@ -110,9 +110,55 @@ namespace OpenDental{
 					pat=Patients.GetPat(sheet.PatNum);
 					FillFieldsForMedLabResults(sheet,medLab,pat);
 					break;
+				case SheetTypeEnum.TreatmentPlan:
+					FillFieldsForTreatPlan(sheet);
+					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
 			FillPatientImages(sheet,pat);
+		}
+
+		private static void FillFieldsForTreatPlan(Sheet sheet) {
+			Patient pat=Patients.GetPat(sheet.PatNum);
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			foreach(SheetField field in sheet.SheetFields) {
+				switch(field.FieldName) {
+					case "Heading":
+						field.FieldValue=treatPlan.Heading;
+						break;
+					case "defaultHeading":
+						string value="";
+						Clinic clinic;
+						if(pat.ClinicNum==0) {
+							clinic=Clinics.GetPracticeAsClinicZero();
+						}
+						else {
+							clinic=Clinics.GetClinic(pat.ClinicNum);
+						}
+						value=clinic.Description;
+						if(clinic.Phone.Length==10 && CultureInfo.CurrentCulture.Name=="en-US") {
+							value+="\r\n"+"("+clinic.Phone.Substring(0,3)+")"+clinic.Phone.Substring(3,3)+"-"+clinic.Phone.Substring(6);
+						}
+						else {
+							value+="\r\n"+clinic.Phone;
+						}
+						value+=pat.GetNameFLFormal()+", DOB "+pat.Birthdate.ToShortDateString();
+						if(treatPlan.ResponsParty!=0) {
+							value+="\r\n"+Lan.g("ContrTreat","Responsible Party")+": "+Patients.GetLim(treatPlan.ResponsParty).GetNameFL();
+						}
+						if(treatPlan.TreatPlanNum==0) {//default TP
+							value+="\r\n"+DateTime.Today.ToShortDateString();
+						}
+						else {
+							value+="\r\n"+treatPlan.DateTP.ToShortDateString();
+						}
+						field.FieldValue=value;
+						break;
+					case "Note":
+						field.FieldValue=treatPlan.Note;
+						break;
+				}
+			}
 		}
 
 		private static SheetParameter GetParamByName(Sheet sheet,string paramName){
@@ -1022,7 +1068,6 @@ namespace OpenDental{
 			int idx=phone.IndexOf(" ");
 			return phone.Substring(0,idx);
 		}
-
 
 		///<summary>For new sheets only. Sets sheetField.FieldValue=DocumentNum(FK) based on documentCategoryNum (stored in SheetField.FieldName) and pat.PatNum.
 		///<para>Example: if DocCategory=132 (PatImages) then FieldValue would be set equal to the DocNum of the most recent PatImage in the patient's image folder.  
@@ -2202,7 +2247,7 @@ namespace OpenDental{
 						break;
 					case "amountDueValue":
 						try {
-							field.FieldValue=PIn.Double(SheetUtil.GetDataTableForGridType(dataSet,"StatementEnclosed",Stmt,null).Rows[0][0].ToString()).ToString("C");
+							field.FieldValue=PIn.Double(SheetUtil.GetDataTableForGridType(sheet,dataSet,"StatementEnclosed",Stmt,null).Rows[0][0].ToString()).ToString("C");
 						}
 						catch {
 							field.FieldValue=0.ToString("C");

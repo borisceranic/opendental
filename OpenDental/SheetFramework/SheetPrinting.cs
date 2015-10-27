@@ -12,6 +12,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace OpenDental {
@@ -51,7 +52,6 @@ namespace OpenDental {
 				return _printMargin;
 			}
 		}
-
 
 		/////<summary>Not used. This code is copied and pasted in several locations. Easiest to find by searching for "info.Verb="print";"</summary>
 		//public static void PrintStatement(object parameters) {
@@ -153,8 +153,8 @@ namespace OpenDental {
 			_yPosPrint=0;
 		}
 
-		///<Summary>If printing a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
-		public static void Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null) {
+		///<summary>If printing a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
+		public static PrintDocument Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=false) {
 			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
@@ -163,11 +163,11 @@ namespace OpenDental {
 						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
 						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
 			}
-			Print(sheet,_dataSet,copies,isRxControlled,stmt,medLab);
+			return Print(sheet,_dataSet,copies,isRxControlled,stmt,medLab,isPrintDocument);
 		}
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if printing a statement.</Summary>
-		public static void Print(Sheet sheet,DataSet dataSet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null) {
+		public static PrintDocument Print(Sheet sheet,DataSet dataSet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=false) {
 			_dataSet=dataSet;
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
@@ -240,32 +240,37 @@ namespace OpenDental {
 			foreach(Sheet s in _sheetList) {
 				pageCount+=Sheets.CalculatePageCount(s,_printMargin);
 			}
-			printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
-			printPreview.ShowDialog();
-		#else
+			if(!isPrintDocument) {
+				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
+				printPreview.ShowDialog();
+			}
+			#else
 				try {
 					if(sheet.PatNum!=null){
 						if(!PrinterL.SetPrinter(pd,sit,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
-							return;
+							return null;
 						}
 					}
 					else{
 						if(!PrinterL.SetPrinter(pd,sit,0,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
-							return;
+							return null;
 						}
 					}
 					pd.DefaultPageSettings.Margins=new Margins(0,0,0,0);
-					pd.Print();
+					if(!isPrintDocument){
+						pd.Print();
+					}
 				}
 				catch(Exception ex){
 					throw ex;
 					//MessageBox.Show(Lan.g("Sheet","Printer not available"));
 				}
-		#endif
+#endif
 			_isPrinting=false;
 			g.Dispose();
 			g=null;
 			GC.Collect();//We are done with printing so we can forcefully clean up all the objects and controls that were used in printing.
+			return pd;
 		}
 
 		///<summary>This gets called for every page to be printed when sending to a printer.  Will stop printing when e.HasMorePages==false.  See also CreatePdfPage.</summary>
@@ -301,6 +306,9 @@ namespace OpenDental {
 						break;
 					case SheetFieldType.Line:
 						drawFieldLine(field,g,null);
+						break;
+					case SheetFieldType.Special:
+						drawFieldSpecial(sheet,field,g,null);
 						break;
 					case SheetFieldType.Grid:
 						drawFieldGrid(field,sheet,g,null,_dataSet,_stmt,_medLab);
@@ -365,43 +373,49 @@ namespace OpenDental {
 		#region Drawing Helpers. One for almost every field type. =====================================================================================
 
 		///<summary>Draws the image to the graphics object passed in.  Can throw an OutOfMemoryException when printing that will have a message that should be displayed and the print job should be cancelled.</summary>
-		public static void drawFieldImage(SheetField field,Graphics g, XGraphics gx) {
+		public static void drawFieldImage(SheetField field,Graphics g,XGraphics gx,Bitmap image=null) {
 			Bitmap bmpOriginal=null;
 			string filePathAndName="";
-			#region Get the path for the image
-			switch(field.FieldType) {
-				case SheetFieldType.Image:
-					filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
-					break;
-				case SheetFieldType.PatImage:
-					if(field.FieldValue=="") {
-						//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
-						filePathAndName="";
-						break;
-					}
-					Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
-					List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
-					if(paths.Count < 1) {//No path was found so we cannot draw the image.
-						return;
-					}
-					filePathAndName=paths[0];
-					break;
-				default:
-					//not an image field
-					return;
-			}
-			#endregion
-			#region Load the image into bmpOriginal
-			if(field.FieldName=="Patient Info.gif") {
-				bmpOriginal=OpenDentBusiness.Properties.Resources.Patient_Info;
-			}
-			else if(File.Exists(filePathAndName)) {
-				bmpOriginal=new Bitmap(filePathAndName);
+			if(image!=null) {
+				bmpOriginal=image;
+				filePathAndName="image Parameter";
 			}
 			else {
-				return;
+				#region Get the path for the image
+				switch(field.FieldType) {
+					case SheetFieldType.Image:
+						filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+						break;
+					case SheetFieldType.PatImage:
+						if(field.FieldValue=="") {
+							//There is no document object to use for display, but there may be a baked in image and that situation is dealt with below.
+							filePathAndName="";
+							break;
+						}
+						Document patDoc=Documents.GetByNum(PIn.Long(field.FieldValue));
+						List<string> paths=Documents.GetPaths(new List<long> { patDoc.DocNum },ImageStore.GetPreferredAtoZpath());
+						if(paths.Count < 1) {//No path was found so we cannot draw the image.
+							return;
+						}
+						filePathAndName=paths[0];
+						break;
+					default:
+						//not an image field
+						return;
+				}
+				#endregion
+				#region Load the image into bmpOriginal
+				if(field.FieldName=="Patient Info.gif") {
+					bmpOriginal=OpenDentBusiness.Properties.Resources.Patient_Info;
+				}
+				else if(File.Exists(filePathAndName)) {
+					bmpOriginal=new Bitmap(filePathAndName);
+				}
+				else {
+					return;
+				}
+				#endregion
 			}
-			#endregion
 			#region Calculate the image ratio and location, set values for imgDrawWidth and imgDrawHeight
 			//inscribe image in field while maintaining aspect ratio.
 			float imgRatio=(float)bmpOriginal.Width/(float)bmpOriginal.Height;
@@ -536,6 +550,395 @@ namespace OpenDental {
 			}
 		}
 
+		public static void drawFieldSpecial(Sheet sheet,SheetField field,Graphics g, XGraphics gx) {
+			switch(field.FieldName) {
+				case "toothChart":
+					TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+					Image toothChart=(Image)SheetParameter.GetParamByName(sheet.Parameters,"toothChartImg").ParamValue;
+					//Image toothChart=GetToothChartHelper(sheet.PatNum,treatPlan,true);
+					Rectangle boundingBox=new Rectangle(field.XPos,field.YPos,field.Width,field.Height);
+					float widthFactor=(float)boundingBox.Width/(float)toothChart.Width;
+					float heightFactor=(float)boundingBox.Height/(float)toothChart.Height;
+					int x,y,width,height;
+					if(widthFactor<heightFactor) {
+						//use width factor
+						//img width will equal box width
+						//offset height.
+						x=field.XPos;
+						y=field.YPos+(field.Height-(int)(toothChart.Height*widthFactor))/2;
+						height=(int)(toothChart.Height*widthFactor);
+						width=field.Width+1; //+1 to include the pixels
+					}
+					else {
+						//use height factor
+						//img height will equal box height
+						//offset width
+						x=field.XPos+(field.Width-(int)(toothChart.Width*heightFactor))/2;
+						y=field.YPos;
+						height=field.Height+1;
+						width=(int)(toothChart.Width*heightFactor);
+					}
+					if(gx==null) {
+						g.DrawImage(toothChart,new Rectangle(x,y,width,height));
+						//g.DrawRectangle(Pens.LightGray,x,y,width,height); //outline tooth grid so user can see how much wasted space there is.
+					}
+					else {
+						gx.DrawImage(XImage.FromGdiPlusImage(toothChart),new Rectangle((int)p(x),(int)p(y),(int)p(width),(int)p(height)));
+					}
+					break;
+				case "toothChartLegend":
+						using(Brush brushEx=new SolidBrush(DefC.Short[(int)DefCat.ChartGraphicColors][3].ItemColor))
+						using(Brush brushEc=new SolidBrush(DefC.Short[(int)DefCat.ChartGraphicColors][2].ItemColor))
+						using(Brush brushCo=new SolidBrush(DefC.Short[(int)DefCat.ChartGraphicColors][1].ItemColor))
+						using(Brush brushRo=new SolidBrush(DefC.Short[(int)DefCat.ChartGraphicColors][4].ItemColor))
+						using(Brush brushTp=new SolidBrush(DefC.Short[(int)DefCat.ChartGraphicColors][0].ItemColor))
+						using(Font bodyFont=new Font("Arial",9f,FontStyle.Regular,GraphicsUnit.Point))
+						using(Graphics gM=Graphics.FromImage(new Bitmap(500,500))) { //arbitrarily sized graphics object used for measuring strings
+							if(gx==null) {
+								float yPos=field.YPos;
+								//Always centered on page.
+								float xPos=0.5f*(sheet.Width-
+								                 (gM.MeasureString(Lan.g("ContrTreat","Existing"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Complete"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Referred Out"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Treatment Planned"),bodyFont).Width
+								                  +123)); //inter-field spacing
+								g.FillRectangle(Brushes.White,new Rectangle((int)xPos,field.YPos,sheet.Width-2*(int)xPos+10,14)); //buffer the image for smooth drawing.
+								//Existing
+								g.FillRectangle(brushEx,xPos,yPos,14,14);
+								g.DrawString(Lan.g("ContrTreat","Existing"),bodyFont,Brushes.Black,xPos+16,yPos);
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Existing"),bodyFont).Width+23+16;
+								//Complete/ExistingComplete
+								g.FillRectangle(brushCo,xPos,yPos,7,14);
+								g.FillRectangle(brushEc,xPos+7,yPos,7,14);
+								g.DrawString(Lan.g("ContrTreat","Complete"),bodyFont,Brushes.Black,xPos+16,yPos);
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Complete"),bodyFont).Width+23+16;
+								//ReferredOut
+								g.FillRectangle(brushRo,xPos,yPos,14,14);
+								g.DrawString(Lan.g("ContrTreat","Referred Out"),bodyFont,Brushes.Black,xPos+16,yPos);
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Referred Out"),bodyFont).Width+23+16;
+								//TreatmentPlanned
+								g.FillRectangle(brushTp,xPos,yPos,14,14);
+								g.DrawString(Lan.g("ContrTreat","Treatment Planned"),bodyFont,Brushes.Black,xPos+16,yPos);
+							}
+							else {
+								XFont bodyFontX=new XFont(bodyFont.SystemFontName,bodyFont.Size,XFontStyle.Regular);
+								float yPos=field.YPos;
+								//Always centered on page.
+								float xPos=0.5f*(sheet.Width-
+								                 (gM.MeasureString(Lan.g("ContrTreat","Existing"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Complete"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Referred Out"),bodyFont).Width
+								                  +gM.MeasureString(Lan.g("ContrTreat","Treatment Planned"),bodyFont).Width
+								                  +123)); //inter-field spacing
+								gx.DrawRectangle(XBrushes.White,new RectangleF((float)p(xPos),(float)p(field.YPos),(float)p(sheet.Width-2*xPos+10),(float)p(14))); //buffer the image for smooth drawing.
+								//Existing
+								gx.DrawRectangle(brushEx,p(xPos),p(yPos),p(14),p(14));
+								GraphicsHelper.DrawStringX(gx,gM,(double)((1d)/p(1)),Lan.g("ContrTreat","Existing"),bodyFontX,XBrushes.Black,
+									new XRect(p(xPos+16),p(yPos)-1,gM.MeasureString(Lan.g("ContrTreat","Existing"),bodyFont).Width,14),XStringAlignment.Near);
+								//gx.DrawString(Lan.g("ContrTreat","Existing"),bodyFontX,Brushes.Black,p(xPos+16),p(yPos));
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Existing"),bodyFont).Width+23+16;
+								//Complete/ExistingComplete
+								gx.DrawRectangle(brushCo,p(xPos),p(yPos),p(7),p(14));
+								gx.DrawRectangle(brushEc,p(xPos+7),p(yPos),p(7),p(14));
+								GraphicsHelper.DrawStringX(gx,gM,(double)((1d)/p(1)),Lan.g("ContrTreat","Complete"),bodyFontX,XBrushes.Black,
+									new XRect(p(xPos+16),p(yPos)-1,gM.MeasureString(Lan.g("ContrTreat","Complete"),bodyFont).Width,14),XStringAlignment.Near);
+								//gx.DrawString(Lan.g("ContrTreat","Complete"),bodyFontX,Brushes.Black,p(xPos+16),p(yPos));
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Complete"),bodyFont).Width+23+16;
+								//ReferredOut
+								gx.DrawRectangle(brushRo,p(xPos),p(yPos),p(14),p(14));
+								GraphicsHelper.DrawStringX(gx,gM,(double)((1d)/p(1)),Lan.g("ContrTreat","Referred Out"),bodyFontX,XBrushes.Black,
+									new XRect(p(xPos+16),p(yPos)-1,gM.MeasureString(Lan.g("ContrTreat","Referred Out"),bodyFont).Width,14),XStringAlignment.Near);
+								//gx.DrawString(Lan.g("ContrTreat","Referred Out"),bodyFontX,Brushes.Black,p(xPos+16),p(yPos));
+								xPos+=gM.MeasureString(Lan.g("ContrTreat","Referred Out"),bodyFont).Width+23+16;
+								//TreatmentPlanned
+								gx.DrawRectangle(brushTp,p(xPos),p(yPos),p(14),p(14));
+								GraphicsHelper.DrawStringX(gx,gM,(double)((1d)/p(1)),Lan.g("ContrTreat","Treatment Planned"),bodyFontX,XBrushes.Black,
+									new XRect(p(xPos+16),p(yPos)-1,gM.MeasureString(Lan.g("ContrTreat","Treatment Planned"),bodyFont).Width,14),XStringAlignment.Near);
+								//gx.DrawString(Lan.g("ContrTreat","Treatment Planned"),bodyFontX,Brushes.Black,p(xPos+16),p(yPos));
+							}
+						}
+					break;
+				default:
+					//do nothing
+					break;
+			}
+		}
+
+		public static Image GetToothChartHelper(long patNum,TreatPlan treatPlan,bool showCompleted) {
+			if(!PrefC.GetBool(PrefName.TreatPlanShowGraphics) 
+				|| Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				return null;
+			}
+			SparksToothChart.ToothChartWrapper toothChart=new SparksToothChart.ToothChartWrapper();
+			toothChart.ColorBackground=DefC.Long[(int)DefCat.ChartGraphicColors][14].ItemColor;
+			toothChart.ColorText=DefC.Long[(int)DefCat.ChartGraphicColors][15].ItemColor;
+			toothChart.Size=new Size(500,370);
+			toothChart.UseHardware=ComputerPrefs.LocalComputer.GraphicsUseHardware;
+			toothChart.SetToothNumberingNomenclature((ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
+			toothChart.PreferredPixelFormatNumber=ComputerPrefs.LocalComputer.PreferredPixelFormatNum;
+			toothChart.DeviceFormat=new SparksToothChart.ToothChartDirectX.DirectXDeviceFormat(ComputerPrefs.LocalComputer.DirectXFormat);
+			toothChart.DrawMode=ComputerPrefs.LocalComputer.GraphicsSimple;
+			ComputerPrefs.LocalComputer.PreferredPixelFormatNum=toothChart.PreferredPixelFormatNumber;
+			ComputerPrefs.Update(ComputerPrefs.LocalComputer);
+			toothChart.ResetTeeth();
+			List<ToothInitial> toothInitialList=patNum==0?new List<ToothInitial>():ToothInitials.Refresh(patNum);
+			//first, primary.  That way, you can still set a primary tooth missing afterwards.
+			for(int i=0;i<toothInitialList.Count;i++) {
+				if(toothInitialList[i].InitialType==ToothInitialType.Primary) {
+					toothChart.SetPrimary(toothInitialList[i].ToothNum);
+				}
+			}
+			for(int i=0;i<toothInitialList.Count;i++) {
+				switch(toothInitialList[i].InitialType) {
+					case ToothInitialType.Missing:
+						toothChart.SetMissing(toothInitialList[i].ToothNum);
+						break;
+					case ToothInitialType.Hidden:
+						toothChart.SetHidden(toothInitialList[i].ToothNum);
+						break;
+					case ToothInitialType.Rotate:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,toothInitialList[i].Movement,0,0,0,0,0);
+						break;
+					case ToothInitialType.TipM:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,0,toothInitialList[i].Movement,0,0,0,0);
+						break;
+					case ToothInitialType.TipB:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,0,0,toothInitialList[i].Movement,0,0,0);
+						break;
+					case ToothInitialType.ShiftM:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,0,0,0,toothInitialList[i].Movement,0,0);
+						break;
+					case ToothInitialType.ShiftO:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,0,0,0,0,toothInitialList[i].Movement,0);
+						break;
+					case ToothInitialType.ShiftB:
+						toothChart.MoveTooth(toothInitialList[i].ToothNum,0,0,0,0,0,toothInitialList[i].Movement);
+						break;
+					case ToothInitialType.Drawing:
+						toothChart.AddDrawingSegment(toothInitialList[i].Copy());
+						break;
+				}
+			}
+			List<Procedure> listProceduresAll=Procedures.Refresh(patNum);
+			List<Procedure> listProceduresFiltered=listProceduresAll.FindAll(x => new[] { ProcStat.R,ProcStat.Cn }.Contains(x.ProcStatus));//always show referred and conditions
+			if(showCompleted) {
+				listProceduresFiltered.AddRange(listProceduresAll.FindAll(x => new[] {ProcStat.C,ProcStat.EC,ProcStat.EO}.Contains(x.ProcStatus)));//show complete
+			}
+			foreach(ProcTP procTP in treatPlan.ListProcTPs) {//Add procs for TP.
+				Procedure procDummy=listProceduresAll.FirstOrDefault(x => x.ProcNum==procTP.ProcNumOrig)??new Procedure();
+				if(Tooth.IsValidEntry(procTP.ToothNumTP)) {
+					procDummy.ToothNum=Tooth.FromInternat(procTP.ToothNumTP);
+				}
+				if(ProcedureCodes.GetProcCode(procTP.ProcCode).TreatArea==TreatmentArea.Surf) {
+					procDummy.Surf=Tooth.SurfTidyFromDisplayToDb(procTP.Surf,procDummy.ToothNum);
+				}
+				else {
+					procDummy.Surf=procTP.Surf;//for quad, arch, etc.
+				}
+				if(procDummy.ToothRange==null) {
+					procDummy.ToothRange="";
+				}
+				procDummy.ProcStatus=ProcStat.TP;
+				procDummy.CodeNum=ProcedureCodes.GetProcCode(procTP.ProcCode).CodeNum;
+				listProceduresFiltered.Add(procDummy);
+			}
+			listProceduresFiltered.Sort(CompareProcListFiltered);
+			//Draw tooth chart
+			DrawProcsGraphics(listProceduresFiltered,toothChart,toothInitialList);
+			toothChart.AutoFinish=true;
+			Image retVal=toothChart.GetBitmap();
+			toothChart.Dispose();
+			return retVal;
+		}
+
+		#region toothChartHelpers. These are cut and pasted from various parts of ContrTreat and can probably be optimized greatly
+
+		private static int CompareProcListFiltered(Procedure proc1,Procedure proc2) {
+			if(proc1.ProcDate!=proc2.ProcDate) {
+				return proc1.ProcDate.CompareTo(proc2.ProcDate);
+			}
+			return GetProcStatusIdx(proc1.ProcStatus).CompareTo(GetProcStatusIdx(proc2.ProcStatus));
+		}
+
+		///<summary>Returns index for sorting based on this order: Cn,TP,R,EO,EC,C,D</summary>
+		private static int GetProcStatusIdx(ProcStat procStat) {
+			switch(procStat) {
+				case ProcStat.Cn:
+					return 0;
+				case ProcStat.TP:
+					return 1;
+				case ProcStat.R:
+					return 2;
+				case ProcStat.EO:
+					return 3;
+				case ProcStat.EC:
+					return 4;
+				case ProcStat.C:
+					return 5;
+				case ProcStat.D:
+					return 6;
+			}
+			return 0;
+		}
+
+		private static void DrawProcsGraphics(List<Procedure> procList,SparksToothChart.ToothChartWrapper toothChart,List<ToothInitial> toothInitialList) {
+			Procedure proc;
+			string[] teeth;
+			System.Drawing.Color cLight=System.Drawing.Color.White;
+			System.Drawing.Color cDark=System.Drawing.Color.White;
+			for(int i=0;i<procList.Count;i++) {
+				proc=procList[i];
+				//if(proc.ProcStatus!=procStat) {
+				//  continue;
+				//}
+				if(proc.HideGraphics) {
+					continue;
+				}
+				if(ProcedureCodes.GetProcCode(proc.CodeNum).PaintType==ToothPaintingType.Extraction && (
+					proc.ProcStatus==ProcStat.C
+					|| proc.ProcStatus==ProcStat.EC
+					|| proc.ProcStatus==ProcStat.EO
+					)) {
+					continue;//prevents the red X. Missing teeth already handled.
+				}
+				if(ProcedureCodes.GetProcCode(proc.CodeNum).GraphicColor==System.Drawing.Color.FromArgb(0)) {
+					switch(proc.ProcStatus) {
+						case ProcStat.C:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][1].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][6].ItemColor;
+							break;
+						case ProcStat.TP:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][0].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][5].ItemColor;
+							break;
+						case ProcStat.EC:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][2].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][7].ItemColor;
+							break;
+						case ProcStat.EO:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][3].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][8].ItemColor;
+							break;
+						case ProcStat.R:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][4].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][9].ItemColor;
+							break;
+						case ProcStat.Cn:
+							cDark=DefC.Short[(int)DefCat.ChartGraphicColors][16].ItemColor;
+							cLight=DefC.Short[(int)DefCat.ChartGraphicColors][17].ItemColor;
+							break;
+					}
+				}
+				else {
+					cDark=ProcedureCodes.GetProcCode(proc.CodeNum).GraphicColor;
+					cLight=ProcedureCodes.GetProcCode(proc.CodeNum).GraphicColor;
+				}
+				switch(ProcedureCodes.GetProcCode(proc.CodeNum).PaintType) {
+					case ToothPaintingType.BridgeDark:
+						if(ToothInitials.ToothIsMissingOrHidden(toothInitialList,proc.ToothNum)) {
+							toothChart.SetPontic(proc.ToothNum,cDark);
+						}
+						else {
+							toothChart.SetCrown(proc.ToothNum,cDark);
+						}
+						break;
+					case ToothPaintingType.BridgeLight:
+						if(ToothInitials.ToothIsMissingOrHidden(toothInitialList,proc.ToothNum)) {
+							toothChart.SetPontic(proc.ToothNum,cLight);
+						}
+						else {
+							toothChart.SetCrown(proc.ToothNum,cLight);
+						}
+						break;
+					case ToothPaintingType.CrownDark:
+						toothChart.SetCrown(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.CrownLight:
+						toothChart.SetCrown(proc.ToothNum,cLight);
+						break;
+					case ToothPaintingType.DentureDark:
+						if(proc.Surf=="U") {
+							teeth=new string[14];
+							for(int t=0;t<14;t++) {
+								teeth[t]=(t+2).ToString();
+							}
+						}
+						else if(proc.Surf=="L") {
+							teeth=new string[14];
+							for(int t=0;t<14;t++) {
+								teeth[t]=(t+18).ToString();
+							}
+						}
+						else {
+							teeth=proc.ToothRange.Split(new char[] { ',' });
+						}
+						for(int t=0;t<teeth.Length;t++) {
+							if(ToothInitials.ToothIsMissingOrHidden(toothInitialList,teeth[t])) {
+								toothChart.SetPontic(teeth[t],cDark);
+							}
+							else {
+								toothChart.SetCrown(teeth[t],cDark);
+							}
+						}
+						break;
+					case ToothPaintingType.DentureLight:
+						if(proc.Surf=="U") {
+							teeth=new string[14];
+							for(int t=0;t<14;t++) {
+								teeth[t]=(t+2).ToString();
+							}
+						}
+						else if(proc.Surf=="L") {
+							teeth=new string[14];
+							for(int t=0;t<14;t++) {
+								teeth[t]=(t+18).ToString();
+							}
+						}
+						else {
+							teeth=proc.ToothRange.Split(new char[] { ',' });
+						}
+						for(int t=0;t<teeth.Length;t++) {
+							if(ToothInitials.ToothIsMissingOrHidden(toothInitialList,teeth[t])) {
+								toothChart.SetPontic(teeth[t],cLight);
+							}
+							else {
+								toothChart.SetCrown(teeth[t],cLight);
+							}
+						}
+						break;
+					case ToothPaintingType.Extraction:
+						toothChart.SetBigX(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.FillingDark:
+						toothChart.SetSurfaceColors(proc.ToothNum,proc.Surf,cDark);
+						break;
+					case ToothPaintingType.FillingLight:
+						toothChart.SetSurfaceColors(proc.ToothNum,proc.Surf,cLight);
+						break;
+					case ToothPaintingType.Implant:
+						toothChart.SetImplant(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.PostBU:
+						toothChart.SetBU(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.RCT:
+						toothChart.SetRCT(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.Sealant:
+						toothChart.SetSealant(proc.ToothNum,cDark);
+						break;
+					case ToothPaintingType.Veneer:
+						toothChart.SetVeneer(proc.ToothNum,cLight);
+						break;
+					case ToothPaintingType.Watch:
+						toothChart.SetWatch(proc.ToothNum,cDark);
+						break;
+				}
+			}
+		}
+		#endregion
+
 		///<summary>If drawing grids for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,Statement stmt=null,MedLab medLab=null) {
 			DataSet dataSet=null;
@@ -558,6 +961,7 @@ namespace OpenDental {
 			int _yAdjCurRow=0;//used to adjust for Titles, Headers, Rows, and footers (all considered part of the same row).
 			odGrid.Width=0;
 			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
+			filterColumnsHelper(sheet,field,Columns);
 			foreach(DisplayField Col in Columns) {
 				odGrid.Width+=Col.ColumnWidth;
 			}
@@ -571,7 +975,7 @@ namespace OpenDental {
 			odGrid.TopMargin=_printMargin.Top;
 			odGrid.BottomMargin=_printMargin.Bottom;
 			odGrid.PageHeight=sheet.HeightPage;
-			DataTable Table=SheetUtil.GetDataTableForGridType(dataSet,field.FieldName,stmt,medLab);
+			DataTable Table=SheetUtil.GetDataTableForGridType(sheet,dataSet,field.FieldName,stmt,medLab);
 			#region  Fill Grid, Set Text Alignment
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
@@ -585,6 +989,15 @@ namespace OpenDental {
 					case "StatementPayPlan.charges":
 					case "StatementPayPlan.credits":
 					case "StatementPayPlan.balance":
+					case "TreatPlanMain.Fee":
+					case "TreatPlanMain.Pri Ins":
+					case "TreatPlanMain.Sec Ins":
+					case "TreatPlanMain.Discount":
+					case "TreatPlanMain.Pat":
+					case "TreatPlanBenefitsFamily.Primary":
+					case "TreatPlanBenefitsFamily.Secondary":
+					case "TreatPlanBenefitsIndividual.Primary":
+					case "TreatPlanBenefitsIndividual.Secondary":
 						col.TextAlign=HorizontalAlignment.Right;
 						break;
 					case "StatementAging.Age00to30":
@@ -609,6 +1022,22 @@ namespace OpenDental {
 				}
 				if(Table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
 					row.Tag=Table.Rows[i]["PatNum"].ToString();
+				}
+				//Colored Text
+				if(Table.Columns.Contains("paramTextColor") && !string.IsNullOrEmpty(Table.Rows[i]["paramTextColor"].ToString())) {
+					Color cRowText=Color.FromArgb(PIn.Int(Table.Rows[i]["paramTextColor"].ToString()));
+					if(!cRowText.IsEmpty) {
+						row.ColorText=cRowText;
+					}
+				}
+				//Bold Text
+				if(Table.Columns.Contains("paramIsBold")) {
+					row.Bold=(bool)Table.Rows[i]["paramIsBold"];
+				}
+				if(Table.Columns.Contains("paramIsBorderBoldBottom")) {
+					if((bool)Table.Rows[i]["paramIsBorderBoldBottom"]) {
+						row.ColorLborder=Color.Black;
+					}
 				}
 				odGrid.Rows.Add(row);
 			}
@@ -660,6 +1089,40 @@ namespace OpenDental {
 								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
 									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
+									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
+								}
+							}
+							break;
+						case "TreatPlanBenefitsFamily":
+							sSize=new SizeF();
+							using(Graphics f= Graphics.FromImage(new Bitmap(100,100))) {//using graphics f because g is null when gx is not.
+								sSize=f.MeasureString("Family Insurance Benefits",new Font("Arial",10,FontStyle.Bold));
+							}
+							if(gx==null) {
+								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Family Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
+							}
+							else {
+								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
+								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Family Insurance Benefits",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
+									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
+								}
+							}
+							break;
+						case "TreatPlanBenefitsIndividual":
+							sSize=new SizeF();
+							using(Graphics f= Graphics.FromImage(new Bitmap(100,100))) {//using graphics f because g is null when gx is not.
+								sSize=f.MeasureString("Individual Insurance Benefits",new Font("Arial",10,FontStyle.Bold));
+							}
+							if(gx==null) {
+								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Individual Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
+							}
+							else {
+								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
+								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Individual Insurance Benefits",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
@@ -731,6 +1194,38 @@ namespace OpenDental {
 			}
 		}
 
+		private static void filterColumnsHelper(Sheet sheet,SheetField field,List<DisplayField> Columns) {
+			switch(sheet.SheetType+"."+field.FieldName) {
+				case "TreatmentPlan.TreatPlanMain":
+					bool checkShowDiscount;
+					bool checkShowFees;
+					bool checkShowIns;
+					try {
+						checkShowDiscount=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowDiscount").ParamValue;
+						checkShowFees=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowFees").ParamValue;
+						checkShowIns=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowIns").ParamValue;
+					}
+					catch {
+						//if unable to find any assume default values of true
+						checkShowDiscount=true;
+						checkShowFees=true;
+						checkShowIns=true;
+					}
+					if(!checkShowFees) {
+						Columns.RemoveAll(x => x.InternalName=="Fee");
+					}
+					if(!checkShowIns) {
+						Columns.RemoveAll(x => x.InternalName=="Pri Ins" || x.InternalName=="Sec Ins" || x.InternalName=="Pat");
+					}
+					if(!checkShowDiscount) {
+						Columns.RemoveAll(x => x.InternalName=="Discount");
+					}
+					//recenters the GridColumnStylesCollection on the page.
+					field.XPos=(sheet.WidthPage-Columns.Sum(x => x.ColumnWidth))/2;
+					break;
+			}
+		}
+
 		///<summary>Calculates the bottom of the current page assuming a 40px top margin (except for MedLabResults sheets which have a 120 top margin) and 60px bottom margin.</summary>
 		public static int bottomCurPage(int yPos,Sheet sheet,out int pageCount) {
 			Sheets.SetPageMargin(sheet,_printMargin);
@@ -797,6 +1292,18 @@ namespace OpenDental {
 				//xfont.Dispose();
 				xfont=null;
 			}
+			if(field.FieldType==SheetFieldType.OutputText) {
+				switch(sheet.SheetType.ToString()+"."+field.FieldName) {
+					case "TreatmentPlan.Note":
+						if(gx==null) {
+							g.DrawRectangle(Pens.DarkGray,field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
+						}
+						else {
+							gx.DrawRectangle(XPens.DarkGray,new XRect(p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height)));
+						}
+						break;
+				}
+			}
 			doubleBuffer.Dispose();
 			doubleBuffer=null;
 			gfx.Dispose();
@@ -823,33 +1330,91 @@ namespace OpenDental {
 		}
 
 		public static void drawFieldSigBox(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
-			SignatureBoxWrapper wrapper=new SignatureBoxWrapper();
-			wrapper.Width=field.Width;
-			wrapper.Height=field.Height;
-			if(field.FieldValue.Length>0) {//a signature is present
-				bool sigIsTopaz=false;
-				if(field.FieldValue[0]=='1') {
-					sigIsTopaz=true;
-				}
-				string signature="";
-				if(field.FieldValue.Length>1) {
-					signature=field.FieldValue.Substring(1);
-				}
-				//string keyData=Sheets.GetSignatureKey(sheet);//can't do this because some of the fields might have different new line characters. Sig will be invalid.
-				wrapper.FillSignature(sigIsTopaz,field.SigKey,signature);
-			}
-			if(g!=null) {
-				Bitmap sigBitmap=wrapper.GetSigImage();
-				g.DrawImage(sigBitmap,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
-				sigBitmap.Dispose();
-				sigBitmap=null;
+			Bitmap sigImage=new Bitmap(field.Width,field.Height);
+			if(sheet.SheetType==SheetTypeEnum.TreatmentPlan) {
+				sigImage=GetSigTPHelper(sheet,field);
 			}
 			else {
-				XImage sigBitmap=XImage.FromGdiPlusImage(wrapper.GetSigImage());
-				gx.DrawImage(sigBitmap,p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
-				sigBitmap.Dispose();
-				sigBitmap=null;
+				SignatureBoxWrapper wrapper=new SignatureBoxWrapper();
+				wrapper.Width=field.Width;
+				wrapper.Height=field.Height;
+				if(field.FieldValue.Length>0) { //a signature is present
+					bool sigIsTopaz=false;
+					if(field.FieldValue[0]=='1') {
+						sigIsTopaz=true;
+					}
+					string signature="";
+					if(field.FieldValue.Length>1) {
+						signature=field.FieldValue.Substring(1);
+					}
+					//string keyData=Sheets.GetSignatureKey(sheet);//can't do this because some of the fields might have different new line characters. Sig will be invalid.
+					wrapper.FillSignature(sigIsTopaz,field.SigKey,signature);
+					sigImage=wrapper.GetSigImage();
+				}
 			}
+			if(g!=null) {
+				g.DrawImage(sigImage,field.XPos,field.YPos-_yPosPrint,field.Width-2,field.Height-2);
+			}
+			else {
+				gx.DrawImage(XImage.FromGdiPlusImage(sigImage),p(field.XPos),p(field.YPos-_yPosPrint),p(field.Width-2),p(field.Height-2));
+			}
+			sigImage.Dispose();
+			sigImage=null;
+		}
+
+		private static Bitmap GetSigTPHelper(Sheet sheet,SheetField field) {
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			if(treatPlan.SigIsTopaz) {
+				if(treatPlan.Signature!="") {
+					Control sigBoxTopaz=new Control("sigPlusNET1",field.XPos,field.YPos,362,79);//sized to the FormTPSign sigbox control size.
+					sigBoxTopaz.Name="sigBoxTopaz";
+					sigBoxTopaz.Enabled=false;//cannot edit TP signatures from here.
+					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
+					string keystring=TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs);
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
+					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
+					}
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						return new Bitmap(field.Width,field.Height);
+					}
+					SignatureBoxWrapper sbw=new SignatureBoxWrapper(){Width=362,Height=79};
+					sbw.SetControlSigBoxTopaz(sigBoxTopaz);
+					return sbw.GetSigImage();
+				}
+			}
+			else {
+				SignatureBox sigBox= new OpenDental.UI.SignatureBox();
+				sigBox.Location=new Point(field.XPos,field.YPos);
+				sigBox.Width=362;
+				sigBox.Height=79;
+				sigBox.Enabled=false;
+				if(treatPlan.Signature!="") {
+					sigBox.Visible=true;
+					sigBox.ClearTablet();
+					//sigBox.SetSigCompressionMode(0);
+					//sigBox.SetEncryptionMode(0);
+					sigBox.SetKeyString(TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs));
+					//"0000000000000000");
+					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
+					//sigBox.SetEncryptionMode(2);//high encryption
+					//sigBox.SetSigCompressionMode(2);//high compression
+					sigBox.SetSigString(treatPlan.Signature);
+					//panelMain.Controls.Add(sigBox);
+					//sigBox.BringToFront();
+					if(sigBox.NumberOfTabletPoints()!=0) {
+						return new Bitmap(sigBox.GetSigImage(true));
+					}
+				}
+			}
+			return new Bitmap(field.Width,field.Height);
 		}
 
 		private static void drawHeader(Sheet sheet,Graphics g,XGraphics gx) {
@@ -1326,6 +1891,9 @@ namespace OpenDental {
 					case SheetFieldType.Line:
 						drawFieldLine(field,null,gx);
 						break;
+					case SheetFieldType.Special:
+						drawFieldSpecial(sheet,field,null,gx);
+						break;
 					case SheetFieldType.Grid:
 						drawFieldGrid(field,sheet,null,gx,dataSet,_stmt,_medLab);
 						break;
@@ -1340,6 +1908,7 @@ namespace OpenDental {
 					case SheetFieldType.SigBox:
 						drawFieldSigBox(field,sheet,null,gx);
 						break;
+					case SheetFieldType.Parameter:
 					default:
 						//Parameter or possibly new field type.
 						break;

@@ -301,6 +301,10 @@ namespace OpenDental.UI {
 			OnSignatureChanged();
 		}
 
+		public void SetControlSigBoxTopaz(Control sigBoxTopaz) {
+			this.sigBoxTopaz=sigBox;
+		}
+
 
 
 

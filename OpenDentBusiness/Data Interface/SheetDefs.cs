@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -146,7 +148,14 @@ namespace OpenDentBusiness{
 			return "";
 		}
 
-
+		public static SheetDef GetInternalOrCustom(SheetInternalType sheetInternalType) {
+			SheetDef retVal=SheetsInternal.GetSheetDef(sheetInternalType);
+			SheetDef custom=GetCustomForType(retVal.SheetType).OrderBy(x => x.Description).ThenBy(x => x.SheetDefNum).FirstOrDefault();
+			if(custom!=null) {
+				retVal=GetSheetDef(custom.SheetDefNum);
+			}
+			return retVal;
+		}
 
 	}
 }

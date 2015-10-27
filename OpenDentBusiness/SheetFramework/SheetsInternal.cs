@@ -62,6 +62,8 @@ namespace OpenDentBusiness{
 					return StmtSheet();
 				case SheetInternalType.MedLabResults:
 					return MedLabResultReport();
+				case SheetInternalType.TreatmentPlan:
+					return TreatmentPlan();
 				default:
 					throw new ApplicationException("Invalid SheetInternalType.");
 			}
@@ -1578,7 +1580,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(488,326,278,0,true));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("SIGNATURE",8f,"Arial",false,445,335,80,14,isPaymentOption:true));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(521,351,245,0,true));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(0,359,850,0,isPaymentOption:true,itemColor:KnownColor.LightGray));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(0,359,850,0,true,KnownColor.LightGray));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("PLEASE DETACH AND RETURN THE UPPER PORTION WITH YOUR PAYMENT",6f,"Arial",false,225,360,400,10,isPaymentOption:true,itemColor:KnownColor.LightGray));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("totalLabel",9f,"Arial",false,554,385,150,14,HorizontalAlignment.Right));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("totalValue",9f,"Arial",false,705,385,80,14,HorizontalAlignment.Right));
@@ -1745,6 +1747,40 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			x+=24;
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText(item2,sheet.FontSize,sheet.FontName,false,x,y,280,18));
 		}
+
+		private static SheetDef TreatmentPlan() {
+			//SheetDef sheet=new SheetDef(SheetTypeEnum.TreatmentPlan);
+			SheetDef sheet=new SheetDef(SheetTypeEnum.TreatmentPlan);
+			sheet.Description="Treatment Plan";
+			sheet.FontName="Arial";
+			sheet.FontSize=9f;
+			sheet.Width=850;
+			sheet.Height=1100;
+			using(Font fontTitle  =new Font("Arial",13f,FontStyle.Bold,GraphicsUnit.Point))
+			using(Font fontHeading=new Font("Arial",10f,FontStyle.Bold,GraphicsUnit.Point))
+			using(Font fontBody  =new Font("Arial",9f,FontStyle.Regular,GraphicsUnit.Point))
+			using(Font fontGrid  =new Font("Arial",8.5f,FontStyle.Regular,GraphicsUnit.Point))  
+			{
+				sheet.SheetFieldDefs=new List<SheetFieldDef> {
+					//Heading---------------------------------------------------------------------------------------------------------------	
+					new SheetFieldDef(SheetFieldType.OutputText,225,60,400,22,fontTitle) {FieldName="Heading",TextAlign=HorizontalAlignment.Center,GrowthBehavior=GrowthBehaviorEnum.DownGlobal},
+					new SheetFieldDef(SheetFieldType.OutputText,225,88,400,20,fontHeading) {FieldName="defaultHeading",TextAlign=HorizontalAlignment.Center,GrowthBehavior=GrowthBehaviorEnum.DownGlobal},
+					//Graphic---------------------------------------------------------------------------------------------------------------
+					new SheetFieldDef(SheetFieldType.Special,175,114,500,370) {FieldName="toothChart"}, 
+					new SheetFieldDef(SheetFieldType.StaticText,120,280,50,44,fontBody,"Your\r\nLeft") {TextAlign=HorizontalAlignment.Center},
+					new SheetFieldDef(SheetFieldType.StaticText,680,280,50,44,fontBody,"Your\r\nRight") {TextAlign=HorizontalAlignment.Center},
+					new SheetFieldDef(SheetFieldType.Special,100,500,650,14) {FieldName="toothChartLegend"}, 
+					//Grids---------------------------------------------------------------------------------------------------------------
+					new SheetFieldDef(SheetFieldType.Grid,51,520,845,31,fontGrid) {FieldName="TreatPlanMain",GrowthBehavior=GrowthBehaviorEnum.DownGlobal}, 
+					new SheetFieldDef(SheetFieldType.Grid,275,556,300,49,fontGrid) {FieldName="TreatPlanBenefitsFamily",GrowthBehavior=GrowthBehaviorEnum.DownGlobal}, 
+					new SheetFieldDef(SheetFieldType.Grid,275,609,300,49,fontGrid) {FieldName="TreatPlanBenefitsIndividual",GrowthBehavior=GrowthBehaviorEnum.DownGlobal},
+					new SheetFieldDef(SheetFieldType.OutputText,50,664,750,50,fontBody) {FieldName="Note",GrowthBehavior=GrowthBehaviorEnum.DownGlobal}, 
+					new SheetFieldDef(SheetFieldType.SigBox,244,720,362,79)//matches size of FormTPsign sig box control
+				};
+			}//end using
+			return sheet;
+		}
+
 
 	}
 }

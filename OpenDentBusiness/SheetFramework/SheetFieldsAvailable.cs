@@ -16,9 +16,22 @@ namespace OpenDentBusiness{
 			return GetList(sheetType,OutInCheck.Check);
 		}*/
 
+		public static List<SheetFieldDef> GetSpecial(SheetTypeEnum sheetType) {
+			List<SheetFieldDef> retVal=new List<SheetFieldDef>();
+			switch(sheetType) {
+				case SheetTypeEnum.TreatmentPlan:
+					retVal.AddRange(new[] {
+						new SheetFieldDef( SheetFieldType.Special,0,0,500,370){ FieldName="toothChart"},
+						new SheetFieldDef( SheetFieldType.Special,0,0,640,14){ FieldName="toothChartLegend"}
+					});
+					break;
+			}
+			return retVal;
+		}
+
 		///<Summary>This is the list of input, output, or checkbox fieldnames for user to pick from.</Summary>
-		public static List<SheetFieldDef> GetList(SheetTypeEnum sheetType,OutInCheck outInCheck){
-			switch(sheetType){
+		public static List<SheetFieldDef> GetList(SheetTypeEnum sheetType,OutInCheck outInCheck) {
+			switch(sheetType) {
 				case SheetTypeEnum.LabelPatient:
 					return GetLabelPatient(outInCheck);
 				case SheetTypeEnum.LabelCarrier:
@@ -53,6 +66,8 @@ namespace OpenDentBusiness{
 					return GetStatement(outInCheck);
 				case SheetTypeEnum.MedLabResults:
 					return GetMedLabResults(outInCheck);
+				case SheetTypeEnum.TreatmentPlan:
+					return GetTreatmentPlans(outInCheck);
 			}
 			return new List<SheetFieldDef>();
 		}
@@ -99,15 +114,15 @@ namespace OpenDentBusiness{
 			return new SheetFieldDef(SheetFieldType.OutputText,fieldName,"",0,"",false,0,0,0,0,GrowthBehaviorEnum.None,"");
 		}
 
-		private static SheetFieldDef NewInput(string fieldName){
+		private static SheetFieldDef NewInput(string fieldName) {
 			return new SheetFieldDef(SheetFieldType.InputField,fieldName,"",0,"",false,0,0,0,0,GrowthBehaviorEnum.None,"");
 		}
 
-		private static SheetFieldDef NewCheck(string fieldName){
+		private static SheetFieldDef NewCheck(string fieldName) {
 			return new SheetFieldDef(SheetFieldType.CheckBox,fieldName,"",0,"",false,0,0,0,0,GrowthBehaviorEnum.None,"");
 		}
 
-		private static SheetFieldDef NewRadio(string fieldName,string radioButtonValue){
+		private static SheetFieldDef NewRadio(string fieldName,string radioButtonValue) {
 			return new SheetFieldDef(SheetFieldType.CheckBox,fieldName,"",0,"",false,0,0,0,0,GrowthBehaviorEnum.None,radioButtonValue);
 		}
 
@@ -115,12 +130,12 @@ namespace OpenDentBusiness{
 			return new SheetFieldDef(SheetFieldType.Special,fieldName,"",0,"",false,0,0,0,0,GrowthBehaviorEnum.None,"");
 		}
 
-		private static List<SheetFieldDef> GetLabelPatient(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetLabelPatient(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("nameFL"));
 				list.Add(NewOutput("nameLF"));
-				list.Add(NewOutput("address"));//includes address2
+				list.Add(NewOutput("address")); //includes address2
 				list.Add(NewOutput("cityStateZip"));
 				list.Add(NewOutput("ChartNumber"));
 				list.Add(NewOutput("PatNum"));
@@ -133,9 +148,9 @@ namespace OpenDentBusiness{
 
 		private static List<SheetFieldDef> GetLabelCarrier(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("CarrierName"));
-				list.Add(NewOutput("address"));//includes address2
+				list.Add(NewOutput("address")); //includes address2
 				list.Add(NewOutput("cityStateZip"));
 			}
 			return list;
@@ -143,9 +158,9 @@ namespace OpenDentBusiness{
 
 		private static List<SheetFieldDef> GetLabelReferral(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
-				list.Add(NewOutput("nameFL"));//includes Title
-				list.Add(NewOutput("address"));//includes address2
+			if(outInCheck==OutInCheck.Out) {
+				list.Add(NewOutput("nameFL")); //includes Title
+				list.Add(NewOutput("address")); //includes address2
 				list.Add(NewOutput("cityStateZip"));
 			}
 			return list;
@@ -153,7 +168,7 @@ namespace OpenDentBusiness{
 
 		private static List<SheetFieldDef> GetReferralSlip(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("referral.nameFL"));
 				list.Add(NewOutput("referral.address"));
 				list.Add(NewOutput("referral.cityStateZip"));
@@ -168,18 +183,18 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("patient.cityStateZip"));
 				list.Add(NewOutput("patient.provider"));
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				list.Add(NewInput("notes"));
 			}
-			else if(outInCheck==OutInCheck.Check){
+			else if(outInCheck==OutInCheck.Check) {
 				list.Add(NewCheck("misc"));
 			}
 			return list;
 		}
 
-		private static List<SheetFieldDef> GetLabelAppointment(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetLabelAppointment(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("nameFL"));
 				list.Add(NewOutput("nameLF"));
 				list.Add(NewOutput("weekdayDateTime"));
@@ -188,9 +203,9 @@ namespace OpenDentBusiness{
 			return list;
 		}
 
-		private static List<SheetFieldDef> GetRx(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetRx(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("prov.nameFL"));
 				list.Add(NewOutput("prov.address"));
 				list.Add(NewOutput("prov.cityStateZip"));
@@ -211,19 +226,19 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("prov.StateLicense"));
 				list.Add(NewOutput("prov.NationalProvID"));
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				list.Add(NewInput("notes"));
 			}
 			return list;
 		}
 
-		private static List<SheetFieldDef> GetConsent(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetConsent(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("dateTime.Today"));
 				list.Add(NewOutput("patient.nameFL"));
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				list.Add(NewInput("toothNum"));
 				list.Add(NewInput("misc"));
 			}
@@ -233,9 +248,9 @@ namespace OpenDentBusiness{
 			return list;
 		}
 
-		private static List<SheetFieldDef> GetPatientLetter(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetPatientLetter(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("PracticeTitle"));
 				list.Add(NewOutput("PracticeAddress"));
 				list.Add(NewOutput("practiceCityStateZip"));
@@ -246,15 +261,15 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("patient.salutation"));
 				list.Add(NewOutput("patient.priProvNameFL"));
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				//none
 			}
 			return list;
 		}
 
-		private static List<SheetFieldDef> GetReferralLetter(OutInCheck outInCheck){
+		private static List<SheetFieldDef> GetReferralLetter(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
-			if(outInCheck==OutInCheck.Out){
+			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("PracticeTitle"));
 				list.Add(NewOutput("PracticeAddress"));
 				list.Add(NewOutput("practiceCityStateZip"));
@@ -268,7 +283,7 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("referral.salutation"));
 				list.Add(NewOutput("patient.priProvNameFL"));
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				//none
 			}
 			else if(outInCheck==OutInCheck.Check) {
@@ -282,7 +297,7 @@ namespace OpenDentBusiness{
 			if(outInCheck==OutInCheck.Out) {
 				//I can't really think of any for this kind				
 			}
-			else if(outInCheck==OutInCheck.In){
+			else if(outInCheck==OutInCheck.In) {
 				list.Add(NewInput("Address"));
 				list.Add(NewInput("Address2"));
 				list.Add(NewInput("Birthdate"));
@@ -316,7 +331,7 @@ namespace OpenDentBusiness{
 				list.Add(NewInput("wirelessCarrier"));
 				list.Add(NewInput("Zip"));
 			}
-			else if(outInCheck==OutInCheck.Check){
+			else if(outInCheck==OutInCheck.Check) {
 				list.Add(NewCheck("addressAndHmPhoneIsSameEntireFamily"));
 				list.Add(NewCheck("Gender"));
 				list.Add(NewCheck("ins1Relat"));
@@ -441,7 +456,7 @@ namespace OpenDentBusiness{
 			return list;
 		}
 
-		public static List<SheetFieldDef> GetExamSheet(OutInCheck outInCheck){
+		public static List<SheetFieldDef> GetExamSheet(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
 			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("patient.priProvNameFL"));
@@ -455,15 +470,15 @@ namespace OpenDentBusiness{
 				list.Add(NewInput("misc"));
 				list.Add(NewInput("Preferred"));
 			}
-			else if(outInCheck==OutInCheck.Check){
+			else if(outInCheck==OutInCheck.Check) {
 				list.Add(NewCheck("Gender"));
 				list.Add(NewCheck("misc"));
-				list.Add(NewCheck("Race"));//This is really race/ethnicity combined.
+				list.Add(NewCheck("Race")); //This is really race/ethnicity combined.
 			}
 			return list;
 		}
 
-		public static List<SheetFieldDef> GetDepositSlip(OutInCheck outInCheck){
+		public static List<SheetFieldDef> GetDepositSlip(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
 			if(outInCheck==OutInCheck.Out) {
 				list.Add(NewOutput("deposit.BankAccountInfo"));
@@ -490,9 +505,9 @@ namespace OpenDentBusiness{
 				list.Add(NewOutput("depositItem17"));
 				list.Add(NewOutput("depositItem18"));
 			}
-			else if(outInCheck==OutInCheck.In){				
+			else if(outInCheck==OutInCheck.In) {
 			}
-			else if(outInCheck==OutInCheck.Check){
+			else if(outInCheck==OutInCheck.Check) {
 			}
 			return list;
 		}
@@ -526,7 +541,7 @@ namespace OpenDentBusiness{
 			}
 			return list;
 		}
-		
+
 		private static List<SheetFieldDef> GetMedLabResults(OutInCheck outInCheck) {
 			List<SheetFieldDef> list=new List<SheetFieldDef>();
 			if(outInCheck==OutInCheck.Out) {
@@ -569,9 +584,18 @@ namespace OpenDentBusiness{
 			return list;
 		}
 
-
-
-
+		private static List<SheetFieldDef> GetTreatmentPlans(OutInCheck outInCheck) {
+			List<SheetFieldDef> list=new List<SheetFieldDef>();
+			if(outInCheck==OutInCheck.Out) {
+				list.Add(NewOutput("Heading"));
+				list.Add(NewOutput("defaultHeading"));
+				list.Add(NewOutput("Note"));
+			}
+			else if(outInCheck==OutInCheck.In) {
+			}
+			else if(outInCheck==OutInCheck.Check) {
+			}
+			return list;
+		}
 	}
-
 }

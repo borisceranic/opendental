@@ -577,6 +577,7 @@ namespace OpenDentBusiness {
 		TreatPlanShowCompleted,
 		TreatPlanShowGraphics,
 		TreatPlanShowIns,
+		TreatPlanUseSheets,
 		TrojanExpressCollectBillingType,
 		TrojanExpressCollectPassword,
 		TrojanExpressCollectPath,

@@ -139,6 +139,7 @@ namespace OpenDental{
 		private CheckBox checkBrokenApptAdjustmentWithProcedure;
 		private CheckBox checkTPSaveSigned;
 		private CheckBox checkSelectProv;
+		private CheckBox checkTreatPlanUseSheets;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -249,6 +250,7 @@ namespace OpenDental{
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
 			this.tabTreatPlan = new System.Windows.Forms.TabPage();
+			this.checkTreatPlanUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkTPSaveSigned = new System.Windows.Forms.CheckBox();
 			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
 			this.textDiscountPercentage = new System.Windows.Forms.TextBox();
@@ -1179,6 +1181,7 @@ namespace OpenDental{
 			// tabTreatPlan
 			// 
 			this.tabTreatPlan.BackColor = System.Drawing.SystemColors.Window;
+			this.tabTreatPlan.Controls.Add(this.checkTreatPlanUseSheets);
 			this.tabTreatPlan.Controls.Add(this.checkTPSaveSigned);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanItemized);
 			this.tabTreatPlan.Controls.Add(this.textDiscountPercentage);
@@ -1194,6 +1197,19 @@ namespace OpenDental{
 			this.tabTreatPlan.Size = new System.Drawing.Size(466, 479);
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
+			// 
+			// checkTreatPlanUseSheets
+			// 
+			this.checkTreatPlanUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTreatPlanUseSheets.Location = new System.Drawing.Point(138, 186);
+			this.checkTreatPlanUseSheets.Name = "checkTreatPlanUseSheets";
+			this.checkTreatPlanUseSheets.Size = new System.Drawing.Size(302, 17);
+			this.checkTreatPlanUseSheets.TabIndex = 214;
+			this.checkTreatPlanUseSheets.Text = "Treatment Plans use Sheets";
+			this.checkTreatPlanUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkTreatPlanUseSheets.UseVisualStyleBackColor = false;
+			this.checkTreatPlanUseSheets.Click += new System.EventHandler(this.checkTreatPlanUseSheets_Click);
 			// 
 			// checkTPSaveSigned
 			// 
@@ -1969,6 +1985,7 @@ namespace OpenDental{
 			}
 			checkTreatPlanItemized.Checked=PrefC.GetBool(PrefName.TreatPlanItemized);
 			checkTPSaveSigned.Checked=PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf);
+			checkTreatPlanUseSheets.Checked=PrefC.GetBool(PrefName.TreatPlanUseSheets);
 			#endregion
 			#region Chart Module
 			//Chart module-----------------------------------------------------------------------
@@ -2038,6 +2055,12 @@ namespace OpenDental{
 			textBillingElectBatchMax.Text=PrefC.GetInt(PrefName.BillingElectBatchMax).ToString();
 			checkIntermingleDefault.Checked=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
 			#endregion
+		}
+
+		private void checkTreatPlanUseSheets_Click(object sender,EventArgs e) {
+			if(checkTreatPlanUseSheets.Checked) {
+				checkTPSaveSigned.Checked=true;
+			}
 		}
 
 		private void checkAllowedFeeSchedsAutomate_Click(object sender,EventArgs e) {
@@ -2306,6 +2329,7 @@ namespace OpenDental{
 				| Prefs.UpdateLong(PrefName.TreatPlanDiscountAdjustmentType,listNegAdjTypes[comboProcDiscountType.SelectedIndex].DefNum)
 				| Prefs.UpdateDouble(PrefName.TreatPlanDiscountPercent,percent)
 				| Prefs.UpdateBool(PrefName.TreatPlanSaveSignedToPdf,checkTPSaveSigned.Checked)
+				| Prefs.UpdateBool(PrefName.TreatPlanUseSheets,checkTreatPlanUseSheets.Checked)
 				#endregion
 				#region Chart Module
 				| Prefs.UpdateBool(PrefName.AutoResetTPEntryStatus,checkAutoClearEntryStatus.Checked)

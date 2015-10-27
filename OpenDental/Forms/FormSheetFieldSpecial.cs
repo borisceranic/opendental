@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -16,6 +17,8 @@ namespace OpenDental {
 		public SheetDef SheetDefCur;
 		//private List<SheetFieldDef> AvailFields;
 		public bool IsReadOnly;
+		public bool IsNew;
+		private List<SheetFieldDef> _listFieldDefsAvailable;
 
 		public FormSheetFieldSpecial() {
 			InitializeComponent();
@@ -28,29 +31,67 @@ namespace OpenDental {
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
+			_listFieldDefsAvailable=SheetFieldsAvailable.GetSpecial(SheetDefCur.SheetType);
+			listBoxAvailable.Items.AddRange(_listFieldDefsAvailable.Select(x => (object)x.FieldName).ToArray());
+			if(IsNew) {
+				listBoxAvailable.SetSelected(0,true);
+				SheetFieldDefCur=_listFieldDefsAvailable[0];
+			}
+			else {
+				listBoxAvailable.SetSelected(_listFieldDefsAvailable.FindIndex(x => x.FieldName==SheetFieldDefCur.FieldName),true);
+				listBoxAvailable.Enabled=false;
+			}
+			FillFields();
+		}
+
+		///<summary>Each special field type is a little bit different, this allows each field to fill the form in its own way.</summary>
+		private void FillFields() {
 			textXPos.Text=SheetFieldDefCur.XPos.ToString();
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
 			textHeight.Text=SheetFieldDefCur.Height.ToString();
+			labelSpecialInfo.Text="";
+			//textXPos.Enabled=true;
+			//textYPos.Enabled=true;
+			textHeight.Enabled=true;
+			textWidth.Enabled=true;
+			switch(listBoxAvailable.SelectedItem.ToString()) {
+				case "toothChart":
+					labelSpecialInfo.Text=Lan.g(this,"The tooth chart will display a graphical toothchart based on which patient and treatment plan is selected. "+
+					                                 "Fixed aspect ratio of 1.35");
+					break;
+				case "toothChartLegend":
+					labelSpecialInfo.Text=Lan.g(this,"The tooth chart legend shows what the colors on the tooth chart mean.");
+					textWidth.Text="600";
+					textHeight.Text="14";
+					textWidth.Enabled=false;
+					textHeight.Enabled=false;
+					break;
+				case "toothGrid"://not used
+				default:
+					break;
+			}
 		}
 
-		private void listFields_DoubleClick(object sender,EventArgs e) {
-			SaveAndClose();
-		}
-
-		private void butSetup_Click(object sender,EventArgs e) {
-			FormToothGridDef FormTGD = new FormToothGridDef();
-			//FormTGD.SheetFieldDefCur=SheetFieldDefCur;
-			FormTGD.ShowDialog();
-			if(FormTGD.DialogResult!=DialogResult.OK) {
+		private void listBoxAvailable_SelectedIndexChanged(object sender,EventArgs e) {
+			if(!IsNew) {
+				return; //should never happen
+			}
+			if(listBoxAvailable.SelectedIndices.Count==0 || listBoxAvailable.SelectedIndex<0) {
 				return;
 			}
-			//SheetFieldDefCur=FormTGD.SheetFieldDefCur;
+			SheetFieldDefCur=_listFieldDefsAvailable[listBoxAvailable.SelectedIndex];
+			FillFields();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
 			SheetFieldDefCur=null;
-			DialogResult=DialogResult.OK;
+			if(IsNew) {
+				DialogResult=DialogResult.Cancel;
+			}
+			else {
+				DialogResult=DialogResult.OK;
+			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -66,7 +107,6 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
 			}
-			SheetFieldDefCur.FieldName="ToothGrid";
 			SheetFieldDefCur.XPos=PIn.Int(textXPos.Text);
 			SheetFieldDefCur.YPos=PIn.Int(textYPos.Text);
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);

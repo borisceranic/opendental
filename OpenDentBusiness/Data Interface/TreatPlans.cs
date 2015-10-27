@@ -21,6 +21,14 @@ namespace OpenDentBusiness{
 			return Crud.TreatPlanCrud.SelectMany(command).ToArray();
 		}
 
+		///<summary>A single treatplan from the DB.</summary>
+		public static TreatPlan GetOne(long treatPlanNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<TreatPlan>(MethodBase.GetCurrentMethod(),treatPlanNum);
+			}
+			return Crud.TreatPlanCrud.SelectOne(treatPlanNum);
+		}
+
 		///<summary></summary>
 		public static void Update(TreatPlan tp){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

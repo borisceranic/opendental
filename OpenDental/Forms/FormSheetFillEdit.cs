@@ -9,6 +9,8 @@ using CodeBase;
 using OpenDentBusiness;
 using System.Drawing.Printing;
 using System.Data;
+using System.Linq;
+using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormSheetFillEdit:Form {
@@ -32,11 +34,8 @@ namespace OpenDental {
 		///<summary>Statements use Sheets needs access to the entire Account data set for measuring grids.  See RefreshPanel()</summary>
 		private DataSet _dataSet;
 
-		public FormSheetFillEdit(Sheet sheet):this(sheet,null) {
-		}
-
 		///<summary>Use this constructor when displaying a statement.  dataSet should be filled with the data set from AccountModules.GetAccount()</summary>
-		public FormSheetFillEdit(Sheet sheet,DataSet dataSet){
+		public FormSheetFillEdit(Sheet sheet, DataSet dataSet=null){
 			InitializeComponent();
 			Lan.F(this);
 			SheetCur=sheet;
@@ -77,7 +76,7 @@ namespace OpenDental {
 				}
 			}
 			if(SheetCur.IsLandscape){
-				panelMain.Width=SheetCur.Height;
+				panelMain.Width=SheetCur.Height;//+20 for VScrollBar
 				panelMain.Height=SheetCur.Width;
 			}
 			else{
@@ -187,7 +186,7 @@ namespace OpenDental {
 			pictDraw.MouseDown+=new MouseEventHandler(pictDraw_MouseDown);
 			pictDraw.MouseMove+=new MouseEventHandler(pictDraw_MouseMove);
 			pictDraw.MouseUp+=new MouseEventHandler(pictDraw_MouseUp);
-			//draw drawings, rectangles, and lines-----------------------------------------------------------------------
+			//draw drawings, rectangles, and lines, special, and grids.-----------------------------------------------------------------------
 			RefreshPanel();
 			//draw textboxes----------------------------------------------------------------------------------------------
 			foreach(SheetField field in SheetCur.SheetFields) {
@@ -207,7 +206,7 @@ namespace OpenDental {
 				}
 				else if(field.FieldType==SheetFieldType.InputField) {
 					textbox.BackColor=Color.FromArgb(245,245,200);
-					textbox.TabStop=(field.TabOrder==0?false:true);
+					textbox.TabStop=(field.TabOrder>0);
 					textbox.TabIndex=field.TabOrder;
 				}
 				textbox.Location=new Point(field.XPos,field.YPos);
@@ -253,7 +252,7 @@ namespace OpenDental {
 				checkbox.Height=field.Height;
 				checkbox.Tag=field;
 				checkbox.MouseUp+=new MouseEventHandler(checkbox_MouseUp);
-				checkbox.TabStop=(field.TabOrder==0?false:true);
+				checkbox.TabStop=(field.TabOrder>0);
 				checkbox.TabIndex=field.TabOrder;
 				panelMain.Controls.Add(checkbox);
 				checkbox.BringToFront();
@@ -263,15 +262,16 @@ namespace OpenDental {
 				if(field.FieldType!=SheetFieldType.SigBox) {
 					continue;
 				}
+				if(SheetCur.SheetType==SheetTypeEnum.TreatmentPlan) {
+					FillSigBoxTpHelper(SheetCur,field);
+					continue;
+				}
 				OpenDental.UI.SignatureBoxWrapper sigBox=new OpenDental.UI.SignatureBoxWrapper();
 				sigBox.Location=new Point(field.XPos,field.YPos);
 				sigBox.Width=field.Width;
-				sigBox.Height=field.Height;
+				sigBox.Height=field.Height; 
 				if(field.FieldValue.Length>0) {//a signature is present
-					bool sigIsTopaz=false;
-					if(field.FieldValue[0]=='1') {
-						sigIsTopaz=true;
-					}
+					bool sigIsTopaz=(field.FieldValue[0]=='1');
 					string signature="";
 					if(field.FieldValue.Length>1) {
 						signature=field.FieldValue.Substring(1);
@@ -280,10 +280,72 @@ namespace OpenDental {
 					sigBox.FillSignature(sigIsTopaz,keyData,signature);
 				}
 				sigBox.Tag=field;
-				sigBox.TabStop=(field.TabOrder==0?false:true);
+				sigBox.TabStop=(field.TabOrder>0);
 				sigBox.TabIndex=field.TabOrder;
 				panelMain.Controls.Add(sigBox);
 				sigBox.BringToFront();
+			}
+		}
+
+		private void FillSigBoxTpHelper(Sheet sheet, SheetField field) {
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			if(treatPlan.SigIsTopaz) {
+				if(treatPlan.Signature!="") {
+					Control sigBoxTopaz=new Control("sigPlusNET1",field.XPos,field.YPos,field.Width,field.Height);
+					sigBoxTopaz.Name="sigBoxTopaz";
+					sigBoxTopaz.Enabled=false;//cannot edit TP signatures from here.
+					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
+					string keystring=TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs);
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
+					panelMain.Controls.Add(sigBoxTopaz);
+					sigBoxTopaz.BringToFront();
+					sigBoxTopaz.Refresh();
+					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
+					}
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						Label invalidSignature=new Label();
+						invalidSignature.Location=sigBoxTopaz.Location;
+						invalidSignature.Size=sigBoxTopaz.Size;
+						invalidSignature.Text=Lan.g("sigPlusNet1","Invalid Signature");
+						panelMain.Controls.Add(invalidSignature);
+					}
+				}
+			}
+			else {
+				SignatureBox sigBox= new OpenDental.UI.SignatureBox();
+				sigBox.Location=new Point(field.XPos,field.YPos);
+				sigBox.Width=field.Width;
+				sigBox.Height=field.Height;
+				sigBox.Enabled=false;
+				if(treatPlan.Signature!="") {
+					sigBox.Visible=true;
+					sigBox.ClearTablet();
+					//sigBox.SetSigCompressionMode(0);
+					//sigBox.SetEncryptionMode(0);
+					sigBox.SetKeyString(TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs));
+					//"0000000000000000");
+					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
+					//sigBox.SetEncryptionMode(2);//high encryption
+					//sigBox.SetSigCompressionMode(2);//high compression
+					sigBox.SetSigString(treatPlan.Signature);
+					panelMain.Controls.Add(sigBox);
+					sigBox.BringToFront();
+					if(sigBox.NumberOfTabletPoints()==0) {
+						Label invalidSignature=new Label();
+						invalidSignature.Location=sigBox.Location;
+						invalidSignature.Size=sigBox.Size;
+						invalidSignature.Text=Lan.g("sigPlusNet1","Invalid Signature");
+						panelMain.Controls.Add(invalidSignature);
+					}
+				}
 			}
 		}
 
@@ -556,11 +618,29 @@ namespace OpenDental {
 						SheetCur.SheetFields[f].Height);
 				}
 			}
-			for(int f=0;f<SheetCur.SheetFields.Count;f++) {
-				if(SheetCur.SheetFields[f].FieldType!=SheetFieldType.Grid){
-					continue;
+			foreach(SheetField field in SheetCur.SheetFields.Where(x => x.FieldType==SheetFieldType.OutputText)) {//rectangles around specific output fields
+				switch(SheetCur.SheetType.ToString()+"."+field.FieldName) {
+					case "TreatmentPlan.Note":
+						g.DrawRectangle(Pens.DarkGray,
+							field.XPos-pictDraw.Left-1,
+							field.YPos-pictDraw.Top-1,
+							field.Width+2,
+							field.Height+2);
+						break;
 				}
-				SheetPrinting.drawFieldGrid(SheetCur.SheetFields[f],SheetCur,g,null,_dataSet,Stmt,MedLabCur);
+			}
+			foreach(SheetField field in SheetCur.SheetFields.Where(x => x.FieldType==SheetFieldType.SigBox)) {//rectangles around specific output fields
+				switch(SheetCur.SheetType) {
+					case SheetTypeEnum.TreatmentPlan:
+						g.DrawRectangle(Pens.Black,field.XPos-pictDraw.Left-1,field.YPos-pictDraw.Top-1,field.Width+2,field.Height+2);
+						break;
+				}
+			}
+			foreach(SheetField field in SheetCur.SheetFields.Where(x => x.FieldType==SheetFieldType.Special)) {
+				SheetPrinting.drawFieldSpecial(SheetCur,field,g,null);
+			}
+			foreach(SheetField field in SheetCur.SheetFields.Where(x => x.FieldType==SheetFieldType.Grid)) {
+				SheetPrinting.drawFieldGrid(field,SheetCur,g,null,_dataSet,Stmt,MedLabCur);
 			}
 			//Draw pagebreak
 			Pen pDashPage=new Pen(Color.Green);
@@ -735,7 +815,7 @@ namespace OpenDental {
 			if(!IsStatement && !TryToSaveData()){
 				return;
 			}
-			if(!IsStatement) {
+			if(!IsStatement && SheetCur.SheetType!=SheetTypeEnum.TreatmentPlan) {
 				SheetCur=Sheets.GetSheet(SheetCur.SheetNum);
 			}
 			string filePathAndName=PrefL.GetRandomTempFile(".pdf");

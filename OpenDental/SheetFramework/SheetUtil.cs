@@ -65,10 +65,10 @@ namespace OpenDental{
 			foreach(SheetField field in sheet.SheetFields) {
 				if(field.FieldType==SheetFieldType.Image || field.FieldType==SheetFieldType.PatImage) {
 					#region Get the path for the image
-					string filePathAndName="";
+					string filePathAndName;
 					switch(field.FieldType) {
 						case SheetFieldType.Image:
-							filePathAndName=ODFileUtils.CombinePaths(SheetUtil.GetImagePath(),field.FieldName);
+							filePathAndName=ODFileUtils.CombinePaths(GetImagePath(),field.FieldName);
 							break;
 						case SheetFieldType.PatImage:
 							if(field.FieldValue=="") {
@@ -104,14 +104,21 @@ namespace OpenDental{
 				}
 				font=new Font(field.FontName,field.FontSize,fontstyle);
 				//calcH=(int)g.MeasureString(field.FieldValue,font).Height;//this was too short
-				if(field.FieldType!=SheetFieldType.Grid) {
-					calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
-				}
-				else {//handle grid height calculation seperately.
-					calcH=CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab,dataSet);
+				switch(field.FieldType) {
+					case SheetFieldType.Grid:
+						calcH=CalculateGridHeightHelper(field,sheet,stmt,topMargin,bottomMargin,medLab,dataSet);
+						break;
+					case SheetFieldType.Special:
+						calcH=field.Height;
+						break;
+					default:
+						calcH=GraphicsHelper.MeasureStringH(g,field.FieldValue,font,field.Width);
+						break;
 				}
 				if(calcH<=field.Height //calc height is smaller
-					&& field.FieldName!="StatementPayPlan") 
+					&& field.FieldName!="StatementPayPlan" //allow this grid to shrink and disapear.
+					&& field.FieldName!="TreatPlanBenefitsFamily" //allow this grid to shrink and disapear.
+					&& field.FieldName!="TreatPlanBenefitsIndividual") //allow this grid to shrink and disapear.
 				{
 					continue;
 				}
@@ -209,7 +216,7 @@ namespace OpenDental{
 			}
 			//get ready to copy text from the current field to a copy of the field that will be moved down.
 			//find the character in the text box that makes the text box taller than the calculated max line height and split the text box at that line
-			SheetField fieldNew=new SheetField();
+			SheetField fieldNew;
 			fieldNew=field.Copy();
 			field.Height=fieldH;
 			fieldNew.Height-=fieldH;//reduce the size of the new text box by the height of the text removed
@@ -217,18 +224,18 @@ namespace OpenDental{
 			//this is so all new line characters will be a single character, we will replace \n's with \r\n's after this for loop
 			fieldNew.FieldValue=fieldNew.FieldValue.Replace("\r\n","\n");
 			int exponentN=Convert.ToInt32(Math.Ceiling(Math.Log(fieldNew.FieldValue.Length,2)))-1;
-			int indexCur=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
-			int fieldHeightCur=0;
+			int indexCur=Convert.ToInt32(Math.Pow(2,exponentN));
+			int fieldHeightCur;
 			while(exponentN>0) {
 				exponentN--;
 				if(indexCur>=fieldNew.FieldValue.Length
 					|| Convert.ToInt32(Math.Ceiling(lineSpacingForPdf*GraphicsHelper.MeasureStringH(g,fieldNew.FieldValue.Substring(0,indexCur+1),
 								font,fieldNew.Width)))>field.Height)
 				{
-					indexCur-=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
+					indexCur-=Convert.ToInt32(Math.Pow(2,exponentN));
 				}
 				else {
-					indexCur+=Convert.ToInt32(Math.Pow((double)2,(double)exponentN));
+					indexCur+=Convert.ToInt32(Math.Pow(2,exponentN));
 				}
 			}
 			if(indexCur>=fieldNew.FieldValue.Length) {//just in case, set indexCur to the last character if it is larger than the size of the fieldValue
@@ -272,26 +279,11 @@ namespace OpenDental{
 		}
 
 		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.
-		///If calculating for a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
-		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin,MedLab medLab) {
-			DataSet dataSet=null;
-			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
-				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
-				//Worst case scenario we will end up calling the database a few extra times for the same data set.
-				//It use to call this method many, many times so anything is an improvement at this point.
-				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
-			}
-			return CalculateGridHeightHelper(field,sheet,g,stmt,topMargin,bottomMargin,medLab,dataSet);
-		}
-
-		///<summary>Calculates height of grid taking into account page breaks, word wrapping, cell width, font size, and actual data to be used to fill this grid.
 		///DataSet should be prefilled with AccountModules.GetAccount() before calling this method if calculating for a statement.</summary>
-		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Graphics g,Statement stmt,int topMargin,int bottomMargin,MedLab medLab
+		private static int CalculateGridHeightHelper(SheetField field,Sheet sheet,Statement stmt,int topMargin,int bottomMargin,MedLab medLab
 			,DataSet dataSet) 
 		{
-			UI.ODGrid odGrid=new UI.ODGrid();
+			ODGrid odGrid=new ODGrid();
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			odGrid.Width=field.Width;
 			odGrid.HideScrollBars=true;
@@ -303,24 +295,24 @@ namespace OpenDental{
 			if(stmt!=null) {
 				odGrid.Title+=(stmt.Intermingled?".Intermingled":".NotIntermingled");//Important for calculating heights.
 			}
-			DataTable Table=SheetUtil.GetDataTableForGridType(dataSet,field.FieldName,stmt,medLab);
-			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
+			DataTable table=GetDataTableForGridType(sheet,dataSet,field.FieldName,stmt,medLab);
+			List<DisplayField> columns=GetGridColumnsAvailable(field.FieldName);
 			#region  Fill Grid
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
 			ODGridColumn col;
-			for(int i=0;i<Columns.Count;i++) {
-				col=new ODGridColumn(Columns[i].InternalName,Columns[i].ColumnWidth);
+			for(int i=0;i<columns.Count;i++) {
+				col=new ODGridColumn(columns[i].InternalName,columns[i].ColumnWidth);
 				odGrid.Columns.Add(col);
 			}
 			ODGridRow row;
-			for(int i=0;i<Table.Rows.Count;i++) {
+			for(int i=0;i<table.Rows.Count;i++) {
 				row=new ODGridRow();
-				for(int c=0;c<Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
-					row.Cells.Add(Table.Rows[i][Columns[c].InternalName].ToString());
+				for(int c=0;c<columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
+					row.Cells.Add(table.Rows[i][columns[c].InternalName].ToString());
 				}
-				if(Table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
-					row.Tag=Table.Rows[i]["PatNum"].ToString();
+				if(table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
+					row.Tag=table.Rows[i]["PatNum"].ToString();
 				}
 				odGrid.Rows.Add(row);
 			}
@@ -429,7 +421,7 @@ namespace OpenDental{
 			List<SheetField> retVal=new List<SheetField>();
 			SheetField field;
 			for(int i=0;i<sheetFieldDefList.Count;i++){
-				if(hidePaymentOptions && fieldIsPaymentOptionHelper(sheetFieldDefList[i])){
+				if(hidePaymentOptions && FieldIsPaymentOptionHelper(sheetFieldDefList[i])){
 					continue;
 				}
 				field=new SheetField();
@@ -458,7 +450,7 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		private static bool fieldIsPaymentOptionHelper(SheetFieldDef sheetFieldDef) {
+		private static bool FieldIsPaymentOptionHelper(SheetFieldDef sheetFieldDef) {
 			if(sheetFieldDef.IsPaymentOption) {
 				return true;
 			}
@@ -529,6 +521,19 @@ namespace OpenDental{
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="obsRefRange",Description="Ref Interval",ColumnWidth=97,ItemOrder=++i });
 					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="facilityID",Description="Lab",ColumnWidth=28,ItemOrder=++i });
 					break;
+				case "TreatPlanMain":
+					retVal=DisplayFields.GetForCategory(DisplayFieldCategory.TreatmentPlanModule);
+					break;
+				case "TreatPlanBenefitsFamily":
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="BenefitName",Description="",ColumnWidth=150,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="Primary",Description="Primary",ColumnWidth=75,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="Secondary",Description="Secondary",ColumnWidth=75,ItemOrder=++i });
+					break;
+				case "TreatPlanBenefitsIndividual":
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="BenefitName",Description="",ColumnWidth=150,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="Primary",Description="Primary",ColumnWidth=75,ItemOrder=++i });
+					retVal.Add(new DisplayField { Category=DisplayFieldCategory.None,InternalName="Secondary",Description="Secondary",ColumnWidth=75,ItemOrder=++i });
+					break;
 			}
 			return retVal;
 		}
@@ -546,12 +551,17 @@ namespace OpenDental{
 				case SheetTypeEnum.MedLabResults:
 					retVal.Add("MedLabResults");
 					break;
+				case SheetTypeEnum.TreatmentPlan:
+					retVal.Add("TreatPlanMain");
+					retVal.Add("TreatPlanBenefitsFamily");
+					retVal.Add("TreatPlanBenefitsIndividual");
+					break;
 			}
 			return retVal;
 		}
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if getting a table for a statement.</Summary>
-		public static DataTable GetDataTableForGridType(DataSet dataSet,string gridType,Statement stmt,MedLab medLab) {
+		public static DataTable GetDataTableForGridType(Sheet sheet,DataSet dataSet,string gridType,Statement stmt,MedLab medLab) {
 			DataTable retVal=new DataTable();
 			switch(gridType) {
 				case "StatementMain":
@@ -561,7 +571,7 @@ namespace OpenDental{
 					retVal=getTable_StatementAging(stmt);
 					break;
 				case "StatementPayPlan":
-					retVal=getTable_StatementPayPlan(dataSet,stmt);
+					retVal=getTable_StatementPayPlan(dataSet);
 					break;
 				case "StatementEnclosed":
 					retVal=getTable_StatementEnclosed(dataSet,stmt);
@@ -569,8 +579,277 @@ namespace OpenDental{
 				case "MedLabResults":
 					retVal=getTable_MedLabResults(medLab);
 					break;
+				case "TreatPlanMain":
+					retVal=getTable_TreatPlanMain(sheet);
+					break;
+				case "TreatPlanBenefitsFamily":
+					retVal=getTable_TreatPlanBenefitsFamily(sheet);
+					break;
+				case "TreatPlanBenefitsIndividual":
+					retVal=getTable_TreatPlanBenefitsIndividual(sheet);
+					break;
 				default:
 					break;
+			}
+			return retVal;
+		}
+
+		private static DataTable getTable_TreatPlanMain(Sheet sheet) {
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			bool checkShowSubtotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowTotals").ParamValue;
+			bool checkShowTotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowCompleted").ParamValue;
+			//Note: this logic was ported from ContrTreat.cs
+			//Construct empty Data table ===============================================================================
+			DataTable retVal=new DataTable();
+			retVal.Columns.AddRange(new[] {
+				new DataColumn("Done",typeof(string)),
+				new DataColumn("Priority",typeof(string)),
+				new DataColumn("Tth",typeof(string)),
+				new DataColumn("Surf",typeof(string)),
+				new DataColumn("Code",typeof(string)),
+				new DataColumn("Sub",typeof(string)),
+				new DataColumn("Description",typeof(string)),
+				new DataColumn("Fee",typeof(string)),
+				new DataColumn("Pri Ins",typeof(string)),
+				new DataColumn("Sec Ins",typeof(string)),
+				new DataColumn("Discount",typeof(string)),
+				new DataColumn("Pat",typeof(string)),
+				new DataColumn("Prognosis",typeof(string)),
+				new DataColumn("Dx",typeof(string)),
+				new DataColumn("Abbr",typeof(string)),
+				new DataColumn("paramTextColor",typeof(int)),//Name. EG "Black" or "ff0000d7"
+				new DataColumn("paramIsBold",typeof(bool)),
+				new DataColumn("paramIsBorderBoldBottom",typeof(bool))
+			});
+			Patient patCur=Patients.GetPat(treatPlan.PatNum);
+			if(treatPlan.PatNum==0 || patCur==null) {
+				return retVal;//return an empty data table that has the correct format.
+			}
+			//Fill data table if neccessary ===============================================================================
+			Family famCur=Patients.GetFamily(patCur.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(famCur);
+			List<InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlanList=PatPlans.Refresh(patCur.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
+			List<Procedure> procList=Procedures.Refresh(patCur.PatNum);
+			decimal subfee=0;
+			decimal subpriIns=0;
+			decimal subsecIns=0;
+			decimal subdiscount=0;
+			decimal subpat=0;
+			decimal totFee=0;
+			decimal totPriIns=0;
+			decimal totSecIns=0;
+			decimal totDiscount=0;
+			decimal totPat=0;
+			List<TpRow> rowsMain=new List<TpRow>();
+			TpRow row;
+			#region AnyTP
+			//else {//any except current tp selected
+				//ProcTP[] ProcTPSelectList=ProcTPs.GetListForTP(treatPlan.TreatPlanNum,procTPList);
+				bool isDone;
+				for(int i=0;i<treatPlan.ListProcTPs.Count;i++) {
+					row=new TpRow();
+					isDone=false;
+					for(int j=0;j<procList.Count;j++) {
+						if(procList[j].ProcNum==treatPlan.ListProcTPs[i].ProcNumOrig) {
+							if(procList[j].ProcStatus==ProcStat.C) {
+								isDone=true;
+							}
+						}
+					}
+					if(isDone) {
+						row.Done="X";
+					}
+					row.Priority=DefC.GetName(DefCat.TxPriorities,treatPlan.ListProcTPs[i].Priority);
+					row.Tth=treatPlan.ListProcTPs[i].ToothNumTP;
+					row.Surf=treatPlan.ListProcTPs[i].Surf;
+					row.Code=treatPlan.ListProcTPs[i].ProcCode;
+					row.Description=treatPlan.ListProcTPs[i].Descript;
+					row.Fee=(decimal)treatPlan.ListProcTPs[i].FeeAmt;//Fee
+					subfee+=(decimal)treatPlan.ListProcTPs[i].FeeAmt;
+					totFee+=(decimal)treatPlan.ListProcTPs[i].FeeAmt;
+					row.PriIns=(decimal)treatPlan.ListProcTPs[i].PriInsAmt;//PriIns
+					subpriIns+=(decimal)treatPlan.ListProcTPs[i].PriInsAmt;
+					totPriIns+=(decimal)treatPlan.ListProcTPs[i].PriInsAmt;
+					row.SecIns=(decimal)treatPlan.ListProcTPs[i].SecInsAmt;//SecIns
+					subsecIns+=(decimal)treatPlan.ListProcTPs[i].SecInsAmt;
+					totSecIns+=(decimal)treatPlan.ListProcTPs[i].SecInsAmt;
+					row.Discount=(decimal)treatPlan.ListProcTPs[i].Discount;//Discount
+					subdiscount+=(decimal)treatPlan.ListProcTPs[i].Discount;
+					totDiscount+=(decimal)treatPlan.ListProcTPs[i].Discount;
+					row.Pat=(decimal)treatPlan.ListProcTPs[i].PatAmt;//Pat
+					subpat+=(decimal)treatPlan.ListProcTPs[i].PatAmt;
+					totPat+=(decimal)treatPlan.ListProcTPs[i].PatAmt;
+					row.Prognosis=treatPlan.ListProcTPs[i].Prognosis;//Prognosis
+					row.Dx=treatPlan.ListProcTPs[i].Dx;
+					row.ColorText=DefC.GetColor(DefCat.TxPriorities,treatPlan.ListProcTPs[i].Priority);
+					if(row.ColorText==System.Drawing.Color.White) {
+						row.ColorText=System.Drawing.Color.Black;
+					}
+					row.Tag=treatPlan.ListProcTPs[i].Copy();
+					rowsMain.Add(row);
+					#region subtotal
+					if(checkShowSubtotals &&
+						(i==treatPlan.ListProcTPs.Count-1 || treatPlan.ListProcTPs[i+1].Priority != treatPlan.ListProcTPs[i].Priority)) {
+						row=new TpRow();
+						row.Description="Subtotal";
+						row.Fee=subfee;
+						row.PriIns=subpriIns;
+						row.SecIns=subsecIns;
+						row.Discount=subdiscount;
+						row.Pat=subpat;
+						row.ColorText=DefC.GetColor(DefCat.TxPriorities,treatPlan.ListProcTPs[i].Priority);
+						if(row.ColorText==System.Drawing.Color.White) {
+							row.ColorText=System.Drawing.Color.Black;
+						}
+						row.Bold=true;
+						row.ColorLborder=System.Drawing.Color.Black;
+						rowsMain.Add(row);
+						subfee=0;
+						subpriIns=0;
+						subsecIns=0;
+						subdiscount=0;
+						subpat=0;
+					}
+					#endregion
+				}
+			#endregion AnyTP except current
+			#region Totals
+			if(checkShowTotals) {
+				row=new TpRow();
+				row.Description="Total";
+				row.Fee=totFee;
+				row.PriIns=totPriIns;
+				row.SecIns=totSecIns;
+				row.Discount=totDiscount;
+				row.Pat=totPat;
+				row.Bold=true;
+				row.ColorText=System.Drawing.Color.Black;
+				rowsMain.Add(row);
+			}
+			#endregion Totals
+			foreach(TpRow tpRow in rowsMain){
+				DataRow dRow=retVal.NewRow();
+				dRow["Done"]                   =tpRow.Done;
+				dRow["Priority"]               =tpRow.Priority;
+				dRow["Tth"]                    =tpRow.Tth;
+				dRow["Surf"]                   =tpRow.Surf;
+				dRow["Code"]                   =tpRow.Code;
+				dRow["Sub"]                    =ProcedureCodes.IsValidCode(ProcedureCodes.GetProcCode(tpRow.Code).SubstitutionCode)?"X":"";
+				dRow["Description"]            =tpRow.Description;
+				dRow["Fee"]                    =tpRow.Fee.ToString("F");
+				dRow["Pri Ins"]                =tpRow.PriIns.ToString("F");
+				dRow["Sec Ins"]                =tpRow.SecIns.ToString("F");
+				dRow["Discount"]               =tpRow.Discount.ToString("F");
+				dRow["Pat"]                    =tpRow.Pat.ToString("F");
+				dRow["Prognosis"]              =tpRow.Prognosis;
+				dRow["Dx"]                     =tpRow.Dx;
+				dRow["Abbr"]                   =tpRow.ProcAbbr;
+				dRow["paramTextColor"]         =tpRow.ColorText.ToArgb();
+				dRow["paramIsBold"]            =tpRow.Bold;
+				dRow["paramIsBorderBoldBottom"]=tpRow.Bold;
+				retVal.Rows.Add(dRow);
+			}
+			return retVal;
+		}
+
+		private static DataTable getTable_TreatPlanBenefitsFamily(Sheet sheet) {
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			bool checkShowIns=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowIns").ParamValue;
+			//Note this logic was ported from ContrTreat.cs and is intended to emulate the way ContrTreat.CreateDocument created the insurance benefit table
+			//Construct empty Data table ===============================================================================
+			DataTable retVal=new DataTable();
+			retVal.Columns.AddRange(new[] {
+				new DataColumn("BenefitName",typeof(string)),
+				new DataColumn("Primary",typeof(string)),
+				new DataColumn("Secondary",typeof(string))
+			});
+			if(!checkShowIns) {
+				return retVal;
+			}
+			retVal.Rows.Add("Family Maximum","","");
+			retVal.Rows.Add("Family Deductible","","");
+			Patient patCur=Patients.GetPat(treatPlan.PatNum);
+			if(treatPlan.PatNum==0 || patCur==null) {
+				return retVal;//return an empty data table that has the correct format.
+			}
+			//Fill data table if neccessary ===============================================================================
+			Family famCur=Patients.GetFamily(patCur.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(famCur);
+			List<InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlanList=PatPlans.Refresh(patCur.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
+			for(int i=0;i<patPlanList.Count && i<2;i++) {//limit to first 2 insplans
+				InsSub subCur=InsSubs.GetSub(patPlanList[i].InsSubNum,subList);
+				InsPlan planCur=InsPlans.GetPlan(subCur.PlanNum,insPlanList);
+				double familyMax=Benefits.GetAnnualMaxDisplay(benefitList,planCur.PlanNum,patPlanList[i].PatPlanNum,true);
+				if(!familyMax.IsEqual(-1)) {
+					retVal.Rows[0][i+1]=familyMax.ToString("F");
+				}
+				double familyDed=Benefits.GetDeductGeneralDisplay(benefitList,planCur.PlanNum,patPlanList[i].PatPlanNum,BenefitCoverageLevel.Family);
+				if(!familyDed.IsEqual(-1)) {
+					retVal.Rows[1][i+1]=familyDed.ToString("F");
+				}
+			}
+			return retVal;
+		}
+
+		private static DataTable getTable_TreatPlanBenefitsIndividual(Sheet sheet) {
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			bool checkShowIns=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowIns").ParamValue;
+			//Note this logic was ported from ContrTreat.cs and is intended to emulate the way ContrTreat.CreateDocument created the insurance benefit table
+			//Construct empty Data table ===============================================================================
+			DataTable retVal=new DataTable();
+			retVal.Columns.AddRange(new[] {
+				new DataColumn("BenefitName",typeof(string)),
+				new DataColumn("Primary",typeof(string)),
+				new DataColumn("Secondary",typeof(string))
+			});
+			if(!checkShowIns) {
+				return retVal;
+			}
+			Patient patCur=Patients.GetPat(treatPlan.PatNum);
+			retVal.Rows.Add("Annual Maximum","","");
+			retVal.Rows.Add("Deductible","","");
+			retVal.Rows.Add("Deductible Remaining","","");
+			retVal.Rows.Add("Insurance Used","","");
+			retVal.Rows.Add("Pending","","");
+			retVal.Rows.Add("Remaining","","");
+			if(treatPlan.PatNum==0 || patCur==null) {
+				return retVal;//return an empty data table that has the correct format.
+			}
+			//Fill data table if neccessary ===============================================================================
+			Family famCur=Patients.GetFamily(patCur.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(famCur);
+			List<InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlanList=PatPlans.Refresh(patCur.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
+			List<ClaimProcHist> histList=ClaimProcs.GetHistList(patCur.PatNum,benefitList,patPlanList,insPlanList,DateTimeOD.Today,subList);
+			for(int i=0;i<patPlanList.Count && i<2;i++){
+				InsSub subCur=InsSubs.GetSub(patPlanList[i].InsSubNum,subList);
+				InsPlan planCur=InsPlans.GetPlan(subCur.PlanNum,insPlanList);
+				double pend=InsPlans.GetPendingDisplay(histList,DateTime.Today,planCur,patPlanList[i].PatPlanNum,-1,patCur.PatNum,patPlanList[i].InsSubNum,benefitList);
+				double used=InsPlans.GetInsUsedDisplay(histList,DateTime.Today,planCur.PlanNum,patPlanList[i].PatPlanNum,-1,insPlanList,benefitList,patCur.PatNum,patPlanList[i].InsSubNum);
+				retVal.Rows[3][i+1]=used.ToString("F");
+				retVal.Rows[4][i+1]=pend.ToString("F");
+				double maxInd=Benefits.GetAnnualMaxDisplay(benefitList,planCur.PlanNum,patPlanList[i].PatPlanNum,false);
+				if(!maxInd.IsEqual(-1)) {
+					double remain=maxInd-used-pend;
+					if(remain<0) {
+						remain=0;
+					}
+					retVal.Rows[0][i+1]=maxInd.ToString("F");
+					retVal.Rows[5][i+1]=remain.ToString("F");
+				}
+				//deductible:
+				double ded=Benefits.GetDeductGeneralDisplay(benefitList,planCur.PlanNum,patPlanList[i].PatPlanNum,BenefitCoverageLevel.Individual);
+				double dedFam=Benefits.GetDeductGeneralDisplay(benefitList,planCur.PlanNum,patPlanList[i].PatPlanNum,BenefitCoverageLevel.Family);
+				if(!ded.IsEqual(-1)) {
+					double dedRem=InsPlans.GetDedRemainDisplay(histList,DateTime.Today,planCur.PlanNum,patPlanList[i].PatPlanNum,-1,insPlanList,patCur.PatNum,ded,dedFam);
+					retVal.Rows[1][i+1]=ded.ToString("F");
+					retVal.Rows[2][i+1]=dedRem.ToString("F");
+				}
 			}
 			return retVal;
 		}
@@ -618,15 +897,12 @@ namespace OpenDental{
 						}
 					}
 					if(CultureInfo.CurrentCulture.Name=="en-AU" && r["prov"].ToString().Trim()!="") {//English (Australia)
-						r["description"]=r["prov"].ToString()+" - "+r["description"].ToString();
+						r["description"]=r["prov"]+" - "+r["description"];
 					}
 					retVal.ImportRow(r);
 				}
 				if(t.Rows.Count==0) {
-					Patient p=Patients.GetPat(PIn.Long(t.TableName.Replace("account","")));
-					if(p==null) {
-						p=Patients.GetPat(stmt.PatNum);
-					}
+					Patient p=Patients.GetPat(PIn.Long(t.TableName.Replace("account","")))??Patients.GetPat(stmt.PatNum);
 					retVal.Rows.Add(
 						"",//"AdjNum"          
 						"",//"balance"         
@@ -679,7 +955,7 @@ namespace OpenDental{
 		}
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
-		private static DataTable getTable_StatementPayPlan(DataSet dataSet,Statement stmt) {
+		private static DataTable getTable_StatementPayPlan(DataSet dataSet) {
 			DataTable retVal=new DataTable();
 			foreach(DataTable t in dataSet.Tables) {
 				if(!t.TableName.StartsWith("payplan")) {
@@ -696,7 +972,7 @@ namespace OpenDental{
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
 		private static DataTable getTable_StatementEnclosed(DataSet dataSet,Statement stmt) {
 			DataTable tableMisc=dataSet.Tables["misc"];
-			string text="";
+			string text;
 			DataTable table=new DataTable();
 			table.Columns.Add(new DataColumn("AmountDue"));
 			table.Columns.Add(new DataColumn("DateDue"));

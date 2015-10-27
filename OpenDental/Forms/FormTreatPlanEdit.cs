@@ -355,6 +355,7 @@ namespace OpenDental{
 				textResponsParty.Text=Patients.GetLim(PlanCur.ResponsParty).GetNameLF();
 			}
 			if(PlanCur.Signature!="") { //Per Nathan 01 OCT 2015: In addition to invalidating signature (old behavior) we will also block editing signed TPs.
+				butOK.Enabled=false;
 				textHeading.ReadOnly=true;
 				textDateTP.ReadOnly=true;
 				textNote.ReadOnly=true;
@@ -428,6 +429,12 @@ namespace OpenDental{
 		private void butSigClear_Click(object sender,EventArgs e) {
 			//Cannot click this button if you are not authorized to edit, so it is safe to re-enable edit controls below.
 			//Disable signature buttons
+			if(!Security.IsAuthorized(Permissions.TreatPlanEdit,PlanCur.DateTP)) {
+				butOK.Enabled=false;
+			}
+			else {
+				butOK.Enabled=true;
+			}
 			PlanCur.Signature="";
 			PlanCur.SigIsTopaz=false;
 			butSigClear.Enabled=false;

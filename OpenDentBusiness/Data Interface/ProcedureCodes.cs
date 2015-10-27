@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Word;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -179,11 +181,9 @@ namespace OpenDentBusiness{
 				return "";
 				//throw new ApplicationException("CodeNum cannot be zero.");
 			}
-			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
-			for(int i=0;i<listProcedureCodes.Count;i++) {
-				if(listProcedureCodes[i].CodeNum==codeNum) {
-					return listProcedureCodes[i].ProcCode;
-				}
+			ProcedureCode procedureCode=ProcedureCodeC.GetListLong().FirstOrDefault(x => x.CodeNum==codeNum);
+			if(procedureCode!=null) {
+				return procedureCode.ProcCode;
 			}
 			throw new ApplicationException("Missing codenum");
 		}

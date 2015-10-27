@@ -153,6 +153,8 @@ namespace OpenDentBusiness {
 		[CrudColumn(IsNotDbColumn=true)]
 		public bool SigIsTopaz;
 
+		private int _priorityOrder=int.MinValue;
+
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProcTime",typeof(long))]
 		public long ProcTimeXml {
@@ -172,6 +174,16 @@ namespace OpenDentBusiness {
 			}
 			set {
 				ProcTimeEnd = TimeSpan.FromTicks(value);
+			}
+		}
+
+		///<summary>Gets priority order from Definiton cache.</summary>
+		public int PriorityOrder {
+			get {
+				if(_priorityOrder==int.MinValue) {
+					_priorityOrder=DefC.GetOrder(DefCat.TxPriorities,this.Priority);
+				}
+				return _priorityOrder;
 			}
 		}
 

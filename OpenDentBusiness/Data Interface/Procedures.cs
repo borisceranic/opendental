@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness {
@@ -1079,17 +1080,12 @@ namespace OpenDentBusiness {
 		///<summary>Used from TP to get a list of all TP procs, ordered by priority, toothnum.</summary>
 		public static Procedure[] GetListTP(List<Procedure> procList) {
 			//No need to check RemotingRole; no call to db.
-			ArrayList al=new ArrayList();
-			for(int i=0;i<procList.Count;i++) {
-				if(procList[i].ProcStatus==ProcStat.TP) {
-					al.Add(procList[i]);
-				}
-			}
-			IComparer myComparer=new ProcedureComparer();
-			al.Sort(myComparer);
-			Procedure[] retVal=new Procedure[al.Count];
-			al.CopyTo(retVal);
-			return retVal;
+			return procList.Where(x => x.ProcStatus==ProcStat.TP)
+				.OrderBy(x => x.PriorityOrder)
+				.ThenBy(x => x.ToothRange)
+				.ThenBy(x => Tooth.ToInt(x.ToothNum))
+				.ThenBy(x => ProcedureCodes.GetStringProcCode(x.CodeNum))
+				.ToArray();
 		}
 
 		public static void ComputeEstimates(Procedure proc,long patNum,List<ClaimProc> claimProcs,bool isInitialEntry,List<InsPlan> planList,List<PatPlan> patPlans,List<Benefit> benefitList,int patientAge,List<InsSub> subList) {
@@ -1104,29 +1100,12 @@ namespace OpenDentBusiness {
 			if(proc.ProcDate<DateTime.Today && proc.ProcStatus==ProcStat.C) {
 				isHistorical=true;//Don't automatically create an estimate for completed procedures, especially if they are older than today.  Very important after a conversion from another software.
 				//Special logic in place only for capitation plans:
-				for(int i=0;i<planList.Count;i++) {
-					if(planList[i].PlanType!="c") {
-						//11/19/2012 js We had a specific complaint where changing plan type to capitation automatically added WOs to historical procs.
-						continue;
-					}
-					//04/02/2013 Jason- To relax this filter for offices that enter treatment a few days after it's done, we will loop through all the claimprocs and see if any capitation statuses exist.
-					bool hasCapClaimProcs=false;
-					for(int j=0;j<claimProcs.Count;j++) {
-						if(claimProcs[j].ProcNum!=proc.ProcNum) {
-							continue;
-						}
-						//Check if this claimproc is capitation.
-						if(claimProcs[j].Status==ClaimProcStatus.CapClaim
-				      || claimProcs[j].Status==ClaimProcStatus.CapComplete
-				      || claimProcs[j].Status==ClaimProcStatus.CapEstimate) 
-						{
-							hasCapClaimProcs=true;
-							break;
-						}
-					}
-					if(!hasCapClaimProcs) {//There are no capitation claimprocs for this procedure, therefore we don't want to touch/damage this proc.
-						return;
-					}
+				if(planList.Any(x => x.PlanType=="c") //11/19/2012 js We had a specific complaint where changing plan type to capitation automatically added WOs to historical procs.
+				   && !claimProcs.Any(x => x.ProcNum==proc.ProcNum && new[] {ClaimProcStatus.CapClaim,ClaimProcStatus.CapComplete,ClaimProcStatus.CapEstimate}.Contains(x.Status))) 
+				{
+					//If there are any capitation plans but no capitation claimproc.statuses then return.
+					//04/02/2013 Jason- To relax this filter for offices that enter treatment a few days after it's done, we will see if any capitation statuses exist.
+					return;//There are no capitation claimprocs for this procedure, therefore we don't want to touch/damage this proc.
 				}
 			}
 			//first test to see if each estimate matches an existing patPlan (current coverage),

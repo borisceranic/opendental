@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness{
 
@@ -24,15 +27,22 @@ namespace OpenDentBusiness{
 		public long ResponsParty;
 		///<summary>FK to document.DocNum. Can be 0.  If signed, this is the pdf document of the TP at time of signing. See PrefName.TreatPlanSaveSignedToPdf</summary>
 		public long DocNum;
-		
-		///<summary></summary>
-		public TreatPlan Copy(){
-			return (TreatPlan)MemberwiseClone();
+		///<summary>Used to pass the list of ProcTPs in memory with the TreatPlan.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		[XmlIgnore]
+		public List<ProcTP> ListProcTPs;
+
+		public TreatPlan() {
+			ListProcTPs=new List<ProcTP>();
 		}
 
-		
+		///<summary></summary>
+		public TreatPlan Copy(){
+			TreatPlan newTP=(TreatPlan)MemberwiseClone();
+			newTP.ListProcTPs=this.ListProcTPs.Select(x => x.Copy()).ToList();
+			return newTP;
+		}
 
-	
 	}
 
 	

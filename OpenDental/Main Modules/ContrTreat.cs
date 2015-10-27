@@ -2118,6 +2118,7 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMainPrint_Click() {
+			#region FuchsOptionOn
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				if(checkShowDiscount.Checked || checkShowIns.Checked) {
 					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and discounts from printed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
@@ -2127,6 +2128,7 @@ namespace OpenDental{
 					}
 				}
 			}
+			#endregion
 			if(gridPlans.SelectedIndices[0]>0
 				&& PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)
 			  && PlanList[gridPlans.SelectedIndices[0]-1].Signature!=""
@@ -2138,30 +2140,48 @@ namespace OpenDental{
 				Cursor=Cursors.Default;
 				return;
 			}
-			PrepImageForPrinting();
-			MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
-			MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
-			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
-			renderer.PrepareDocument();
-			printdoc.Renderer=renderer;
-			//we might want to surround some of this with a try-catch
-			#if DEBUG
-				pView = new FormRpPrintPreview();
+			Sheet sheetTP=null;
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) { // gridPlans.SelectedIndices[0]>0) {
+				TreatPlan treatPlan;
+				if(gridPlans.SelectedIndices[0]>0) {
+					treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
+					treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
+				}
+				else {
+					treatPlan=GetCurrentTPHelper();
+				}
+				sheetTP=TreatPlanToSheet(treatPlan);
+				SheetPrinting.Print(sheetTP);
+				//FormSFE.ShowDialog();
+				//return;
+			}
+			else { //clasic TPs
+				PrepImageForPrinting();
+				MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
+				MigraDoc.Rendering.Printing.MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
+				MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
+				renderer.PrepareDocument();
+				printdoc.Renderer=renderer;
+				//we might want to surround some of this with a try-catch
+#if DEBUG
+				pView=new FormRpPrintPreview();
 				pView.printPreviewControl2.Document=printdoc;
-				pView.ShowDialog();			
-			#else
+				pView.ShowDialog();
+#else
 				if(PrinterL.SetPrinter(pd2,PrintSituation.TPPerio,PatCur.PatNum,"Treatment plan for printed")){
 					printdoc.PrinterSettings=pd2.PrinterSettings;
 					printdoc.Print();
 				}
-			#endif
-			SaveTPAsDocument(false);
+#endif
+			}
+			SaveTPAsDocument(false,sheetTP);
 		}
 
 		private void ToolBarMainEmail_Click() {
 			if(!Security.IsAuthorized(Permissions.EmailSend)) {
 				return;
 			}
+			#region FuchsOptionOn
 			if(PrefC.GetBool(PrefName.FuchsOptionsOn)) {
 				if(checkShowDiscount.Checked || checkShowIns.Checked) {
 					if(MessageBox.Show(this,string.Format(Lan.g(this,"Do you want to remove insurance estimates and discounts from e-mailed treatment plan?")),"Open Dental",MessageBoxButtons.YesNo,MessageBoxIcon.Question) != DialogResult.No) {
@@ -2171,6 +2191,7 @@ namespace OpenDental{
 					}
 				}
 			}
+			#endregion
 			PrepImageForPrinting();
 			string attachPath=EmailAttaches.GetAttachPath();
 			Random rnd=new Random();
@@ -2185,7 +2206,19 @@ namespace OpenDental{
 				//copy file to email attach folder so files will be where they are exptected to be.
 				File.Copy(filePathAndNameTemp,filePathAndName);
 			}
-			else {//generate and save a new document from scratch
+			else if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
+				TreatPlan treatPlan;
+				if(gridPlans.SelectedIndices[0]>0) {
+					treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
+					treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
+				}
+				else {
+					treatPlan=GetCurrentTPHelper();
+				}
+				Sheet sheetTP=TreatPlanToSheet(treatPlan);
+				SheetPrinting.CreatePdf(sheetTP,filePathAndName,null);
+			}
+			else{//generate and save a new document from scratch
 				MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer=new MigraDoc.Rendering.PdfDocumentRenderer(true,PdfFontEmbedding.Always);
 				pdfRenderer.Document=CreateDocument();
 				pdfRenderer.RenderDocument();
@@ -2295,6 +2328,81 @@ namespace OpenDental{
 			toothChart.AutoFinish=true;
 			chartBitmap=toothChart.GetBitmap();
 			toothChart.Dispose();
+		}
+
+		/// <summary>Returns in-memory TreatPlan representing the current treatplan. For displaying current treat-plan before saving it.</summary>
+		private TreatPlan GetCurrentTPHelper() {
+			TreatPlan retVal=new TreatPlan();
+			retVal.Heading=Lan.g(this,"Proposed Treatment Plan");
+			retVal.DateTP=DateTimeOD.Today;
+			retVal.PatNum=PatCur.PatNum;
+			retVal.Note=PrefC.GetString(PrefName.TreatmentPlanNote);
+			retVal.ListProcTPs=new List<ProcTP>();
+			ProcTP procTP;
+			Procedure proc;
+			int itemNo=0;
+			List<Procedure> procList=new List<Procedure>();
+			if(gridMain.SelectedIndices.Length==0 || gridMain.SelectedIndices.All(x=>gridMain.Rows[x].Tag==null)) {
+				gridMain.SetSelected(true);//either no rows selected, or only total rows selected.
+			}
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
+					//user must have highlighted a subtotal row.
+					continue;
+				}
+				proc=(Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
+				procList.Add(proc);
+				procTP=new ProcTP();
+				//procTP.TreatPlanNum=tp.TreatPlanNum;
+				procTP.PatNum=PatCur.PatNum;
+				procTP.ProcNumOrig=proc.ProcNum;
+				procTP.ItemOrder=itemNo;
+				procTP.Priority=proc.Priority;
+				procTP.ToothNumTP=Tooth.ToInternat(proc.ToothNum);
+				if(ProcedureCodes.GetProcCode(proc.CodeNum).TreatArea==TreatmentArea.Surf) {
+					procTP.Surf=Tooth.SurfTidyFromDbToDisplay(proc.Surf,proc.ToothNum);
+				}
+				else {
+					procTP.Surf=proc.Surf;//for UR, L, etc.
+				}
+				procTP.ProcCode=ProcedureCodes.GetStringProcCode(proc.CodeNum);
+				procTP.Descript=RowsMain[gridMain.SelectedIndices[i]].Description;
+				if(checkShowFees.Checked) {
+					procTP.FeeAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Fee.ToString());
+				}
+				if(checkShowIns.Checked) {
+					procTP.PriInsAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].PriIns.ToString());
+					procTP.SecInsAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].SecIns.ToString());
+				}
+				if(checkShowDiscount.Checked) {
+					procTP.Discount=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Discount.ToString());
+				}
+				procTP.PatAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Pat.ToString());
+				procTP.Prognosis=RowsMain[gridMain.SelectedIndices[i]].Prognosis;
+				procTP.Dx=RowsMain[gridMain.SelectedIndices[i]].Dx;
+				retVal.ListProcTPs.Add(procTP);
+				//ProcTPs.InsertOrUpdate(procTP,true);
+				itemNo++;
+			}
+			return retVal;
+		}
+
+		///<summary>Simply creates a new sheet from a given treatment plan and adds parameters to the sheet based on which checkboxes are checked.</summary>
+		private Sheet TreatPlanToSheet(TreatPlan treatPlan) {
+			Sheet sheetTP=SheetUtil.CreateSheet(SheetDefs.GetInternalOrCustom(SheetInternalType.TreatmentPlan),PatCur.PatNum);
+			sheetTP.Parameters.Add(new SheetParameter(true,"TreatPlan") { ParamValue=treatPlan });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowDiscountNotAutomatic") { ParamValue=checkShowDiscountNotAutomatic });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowDiscount") { ParamValue=checkShowDiscount.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowMaxDed") { ParamValue=checkShowMaxDed.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowTotals") { ParamValue=checkShowTotals.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowCompleted") { ParamValue=checkShowCompleted.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowFees") { ParamValue=checkShowFees.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowIns") { ParamValue=checkShowIns.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"toothChartImg") { ParamValue=SheetPrinting.GetToothChartHelper(PatCur.PatNum,treatPlan,checkShowCompleted.Checked) });
+			//FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheetTP);
+			SheetFiller.FillFields(sheetTP);
+			SheetUtil.CalculateHeights(sheetTP,Graphics.FromImage(new Bitmap(sheetTP.WidthPage,sheetTP.HeightPage)));
+			return sheetTP;
 		}
 
 		private MigraDoc.DocumentObjectModel.Document CreateDocument(){
@@ -3058,16 +3166,26 @@ namespace OpenDental{
 					return;
 				}
 			}
-			PrepImageForPrinting();
-			MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
-			MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
-			DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
-			renderer.PrepareDocument();
-			printdoc.Renderer=renderer;
 			FormTPsign FormT=new FormTPsign();
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
+				TreatPlan treatPlan;
+				treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
+				treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
+				FormT.SheetTP=TreatPlanToSheet(treatPlan);
+				FormT.Document=SheetPrinting.Print(FormT.SheetTP,isPrintDocument:true);
+				FormT.TotalPages=Sheets.CalculatePageCount(FormT.SheetTP,SheetPrinting.PrintMargin);
+			}
+			else {//Classic TPs
+				PrepImageForPrinting();
+				MigraDoc.DocumentObjectModel.Document doc=CreateDocument();
+				MigraDocPrintDocument printdoc=new MigraDoc.Rendering.Printing.MigraDocPrintDocument();
+				DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
+				renderer.PrepareDocument();
+				printdoc.Renderer=renderer;
+				FormT.Document=printdoc;
+				FormT.TotalPages=renderer.FormattedDocument.PageCount;
+			}
 			FormT.SaveDocDelegate=SaveTPAsDocument;
-			FormT.Document=printdoc;
-			FormT.TotalPages=renderer.FormattedDocument.PageCount;
 			FormT.TPcur=PlanList[gridPlans.SelectedIndices[0]-1];
 			FormT.ShowDialog();
 			long tpNum=PlanList[gridPlans.SelectedIndices[0]-1].TreatPlanNum;
@@ -3082,8 +3200,13 @@ namespace OpenDental{
 
 		///<summary>Saves TP as PDF in each image category defined as TP category. 
 		/// If TreatPlanSaveSignedToPdf enabled, will default to first non-hidden category if no TP categories are explicitly defined.</summary>
-		private List<Document> SaveTPAsDocument(bool isSigSave) {
+		private List<Document> SaveTPAsDocument(bool isSigSave,Sheet sheet=null) {
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets) && sheet==null) {
+				MsgBox.Show(this,"An error has occured with the Treatment Plans to sheets feature. Switch back to classic treatment plans and try again.");
+				return new List<Document>();
+			}
 			List<Document> retVal=new List<Document>();
+			//Determine each of the document categories that this TP should be saved to.
 			List<long> categories=DefC.Short[(int)DefCat.ImageCats].Where(x => x.ItemValue=="R" || x.ItemValue=="XR").Select(x=>x.DefNum).ToList();
 			if(isSigSave && categories.Count==0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
 				//we must save at least one document, pick first non-hidden image category.
@@ -3094,36 +3217,56 @@ namespace OpenDental{
 				}
 				categories.Add(imgCat.DefNum);
 			}
-			MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer = new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
-			pdfRenderer.Document=CreateDocument();
-			pdfRenderer.RenderDocument();
+			//Gauranteed to have at least one image category at this point.
+			//Saving pdf to tempfile first simplifies this code, but can use extra bandwidth copying the file to and from the temp directory/Open Dent imgs.
+			string tempFile=ODFileUtils.CreateRandomFile(ODFileUtils.CombinePaths(Path.GetTempPath(),"opendental"),".pdf");
 			string rawBase64="";
-			if(!PrefC.AtoZfolderUsed) {
-				using(MemoryStream stream=new MemoryStream()) {
-					pdfRenderer.Save(stream,false);
-					rawBase64=Convert.ToBase64String(stream.ToArray());
-					stream.Close();
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
+				SheetPrinting.CreatePdf(sheet,tempFile,null);
+				if(!PrefC.AtoZfolderUsed) {
+					rawBase64=Convert.ToBase64String(System.IO.File.ReadAllBytes(tempFile));//Todo test this
 				}
 			}
-			for(int i=0;i<categories.Count;i++) {//usually only one, but do allow them to be saved once per image category.
+			else {//classic TPs
+				MigraDoc.Rendering.PdfDocumentRenderer pdfRenderer;
+				pdfRenderer=new MigraDoc.Rendering.PdfDocumentRenderer(false,PdfFontEmbedding.Always);
+				pdfRenderer.Document=CreateDocument();
+				pdfRenderer.RenderDocument();
+				pdfRenderer.Save(tempFile);
+				if(!PrefC.AtoZfolderUsed) {
+					using(MemoryStream stream=new MemoryStream()) {
+						pdfRenderer.Save(stream,false);
+						rawBase64=Convert.ToBase64String(stream.ToArray());
+						stream.Close();
+					}
+				}
+			}
+			foreach(long docCategory in categories) {//usually only one, but do allow them to be saved once per image category.
 				OpenDentBusiness.Document docSave=new Document();
 				docSave.DocNum=Documents.Insert(docSave);
 				string fileName="TPArchive"+docSave.DocNum;
 				docSave.ImgType=ImageType.Document;
 				docSave.DateCreated=DateTime.Now;
 				docSave.PatNum=PatCur.PatNum;
-				docSave.DocCategory=categories[i];
+				docSave.DocCategory=docCategory;
 				docSave.Description=fileName;//no extension.
 				docSave.RawBase64=rawBase64;//blank if using AtoZfolder
 				if(PrefC.AtoZfolderUsed) {
 					string filePath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
+					while(File.Exists(filePath+"\\"+fileName+".pdf")) {
+						fileName+="x";
+					}
 					docSave.FileName=fileName;
-					pdfRenderer.Save(filePath+"\\"+fileName+".pdf");
+					File.Copy(tempFile,filePath+"\\"+fileName+".pdf");
 				}
 				docSave.FileName+=".pdf";//file extension used fo rboth DB images and AtoZ images
 				Documents.Update(docSave);
 				retVal.Add(docSave);
 			}
+			try {
+				File.Delete(tempFile); //cleanup the temp file.
+			}
+			catch {}
 			return retVal;
 		}
 

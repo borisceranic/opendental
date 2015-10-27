@@ -36,10 +36,11 @@ namespace OpenDental {
 			UI.ODGrid odGrid=new ODGrid();
 			using(Graphics g=Graphics.FromImage(new Bitmap(100,100))) {
 				SheetFieldDefCur.Height=0;
-				if(SheetFieldDefCur.FieldName=="StatementPayPlan") {
+				//These grids display a title.
+				if(new[] {"StatementPayPlan","TreatPlanBenefitsFamily","TreatPlanBenefitsIndividual"}.Contains(SheetFieldDefCur.FieldName)) {
 					SheetFieldDefCur.Height+=odGrid.TitleHeight;
 				}
-				SheetFieldDefCur.Height+=odGrid.HeaderHeight+(int)g.MeasureString("Any",odGrid.Font,100,StringFormat.GenericDefault).Height+3;
+				SheetFieldDefCur.Height+=odGrid.HeaderHeight+(int)g.MeasureString("Any",odGrid.Font,100,StringFormat.GenericTypographic).Height+3;
 				textHeight.Text=SheetFieldDefCur.Height.ToString();
 			}
 			for(int i=0;i<Enum.GetNames(typeof(GrowthBehaviorEnum)).Length;i++) {

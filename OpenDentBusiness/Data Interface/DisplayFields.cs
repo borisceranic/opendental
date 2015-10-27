@@ -273,21 +273,21 @@ namespace OpenDentBusiness {
 				//}
 			}
 			else if(category==DisplayFieldCategory.TreatmentPlanModule) {
-				list.Add(new DisplayField("Done",50,category));
-				list.Add(new DisplayField("Priority",50,category));
-				list.Add(new DisplayField("Tth",40,category));
-				list.Add(new DisplayField("Surf",45,category));
-				list.Add(new DisplayField("Code",50,category));
-				list.Add(new DisplayField("Sub",28,category));
-				list.Add(new DisplayField("Description",230,category));
-				list.Add(new DisplayField("Fee",50,category));
-				list.Add(new DisplayField("Pri Ins",50,category));
-				list.Add(new DisplayField("Sec Ins",50,category));
-				list.Add(new DisplayField("Discount",55,category));
-				list.Add(new DisplayField("Pat",50,category));
-				//list.Add(new DisplayField("Prognosis",60,category));
-				//list.Add(new DisplayField("Dx",28,category));
-				//list.Add(new DisplayField("Abbr",110,category));
+				list.Add(new DisplayField("Done",50,category) {Description="Done"});
+				list.Add(new DisplayField("Priority",50,category) {Description="Priority"});
+				list.Add(new DisplayField("Tth",40,category) {Description="Tth"});
+				list.Add(new DisplayField("Surf",45,category) {Description="Surf"});
+				list.Add(new DisplayField("Code",50,category) {Description="Code"});
+				list.Add(new DisplayField("Sub",28,category) {Description="Sub"});
+				list.Add(new DisplayField("Description",230,category) {Description="Description"});
+				list.Add(new DisplayField("Fee",50,category) {Description="Fee"});
+				list.Add(new DisplayField("Pri Ins",50,category) {Description="Pri Ins"});
+				list.Add(new DisplayField("Sec Ins",50,category) {Description="Sec Ins"});
+				list.Add(new DisplayField("Discount",55,category) {Description="Discount"});
+				list.Add(new DisplayField("Pat",50,category) {Description="Pat"});
+				//list.Add(new DisplayField("Prognosis",60,category){Description="Prognosis"});
+				//list.Add(new DisplayField("Dx",28,category){Description="Dx"});
+				//list.Add(new DisplayField("Abbr",110,category){Description="Abbr"});
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				//Ortho chart has no default columns.  User must explicitly set up columns.
@@ -333,14 +333,14 @@ namespace OpenDentBusiness {
 			}
 			else if(category==DisplayFieldCategory.StatementMainGrid) {
 				int i=0;
-				list.Add(new DisplayField { Category=category,InternalName="date",Description="Date",ColumnWidth=75,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="patient",Description="Patient",ColumnWidth=100,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="ProcCode",Description="Code",ColumnWidth=45,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="tth",Description="Tooth",ColumnWidth=45,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="description",Description="Description",ColumnWidth=275,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
+				list.Add(new DisplayField {Category=category,InternalName="date",Description="Date",ColumnWidth=75,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="patient",Description="Patient",ColumnWidth=100,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="ProcCode",Description="Code",ColumnWidth=45,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="tth",Description="Tooth",ColumnWidth=45,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="description",Description="Description",ColumnWidth=275,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i});
 			}
 			else if(category==DisplayFieldCategory.FamilyRecallGrid) {
 				list.Add(new DisplayField("Type",90,category));
@@ -541,24 +541,24 @@ namespace OpenDentBusiness {
 				}
 			}
 			else if(category==DisplayFieldCategory.TreatmentPlanModule) {
-				list.Add(new DisplayField("Done",50,category));
-				list.Add(new DisplayField("Priority",50,category));
-				list.Add(new DisplayField("Tth",40,category));
-				list.Add(new DisplayField("Surf",45,category));
-				list.Add(new DisplayField("Code",50,category));
-				list.Add(new DisplayField("Sub",28,category));
-				list.Add(new DisplayField("Description",230,category));
-				list.Add(new DisplayField("Fee",50,category));
-				list.Add(new DisplayField("Pri Ins",50,category));
-				list.Add(new DisplayField("Sec Ins",50,category));
-				list.Add(new DisplayField("Discount",55,category));
-				list.Add(new DisplayField("Pat",50,category));
-				list.Add(new DisplayField("Prognosis",60,category));
-				list.Add(new DisplayField("Dx",28,category));
-				list.Add(new DisplayField("Abbr",110,category));
+				list.Add(new DisplayField("Done",50,category) {Description="Done"});
+				list.Add(new DisplayField("Priority",50,category) {Description="Priority"});
+				list.Add(new DisplayField("Tth",40,category) {Description="Tth"});
+				list.Add(new DisplayField("Surf",45,category) {Description="Surf"});
+				list.Add(new DisplayField("Code",50,category) {Description="Code"});
+				list.Add(new DisplayField("Sub",28,category) {Description="Sub"});
+				list.Add(new DisplayField("Description",230,category) {Description="Description"});
+				list.Add(new DisplayField("Fee",50,category) {Description="Fee"});
+				list.Add(new DisplayField("Pri Ins",50,category) {Description="Pri Ins"});
+				list.Add(new DisplayField("Sec Ins",50,category) {Description="Sec Ins"});
+				list.Add(new DisplayField("Discount",55,category) {Description="Discount"});
+				list.Add(new DisplayField("Pat",50,category) {Description="Pat"});
+				list.Add(new DisplayField("Prognosis",60,category) {Description="Prognosis"});
+				list.Add(new DisplayField("Dx",28,category) {Description="Dx"});
+				list.Add(new DisplayField("Abbr",110,category) {Description="Abbr"});
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
-				list=GetForCategory(DisplayFieldCategory.OrthoChart);//The display fields that the user has already saved
+				list=GetForCategory(DisplayFieldCategory.OrthoChart); //The display fields that the user has already saved
 				List<OrthoChart> listDistinctOrthoCharts=OrthoCharts.GetByDistinctFieldNames();
 				for(int i=0;i<listDistinctOrthoCharts.Count;i++) {
 					bool addToList=true;
@@ -614,14 +614,14 @@ namespace OpenDentBusiness {
 			}
 			else if(category==DisplayFieldCategory.StatementMainGrid) {
 				int i=0;
-				list.Add(new DisplayField { Category=category,InternalName="date",Description="Date",ColumnWidth=75,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="patient",Description="Patient",ColumnWidth=100,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="ProcCode",Description="Code",ColumnWidth=45,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="tth",Description="Tooth",ColumnWidth=45,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="description",Description="Description",ColumnWidth=275,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i });
-				list.Add(new DisplayField { Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i });
+				list.Add(new DisplayField {Category=category,InternalName="date",Description="Date",ColumnWidth=75,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="patient",Description="Patient",ColumnWidth=100,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="ProcCode",Description="Code",ColumnWidth=45,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="tth",Description="Tooth",ColumnWidth=45,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="description",Description="Description",ColumnWidth=275,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="charges",Description="Charges",ColumnWidth=60,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="credits",Description="Credits",ColumnWidth=60,ItemOrder=++i});
+				list.Add(new DisplayField {Category=category,InternalName="balance",Description="Balance",ColumnWidth=60,ItemOrder=++i});
 			}
 			else if(category==DisplayFieldCategory.FamilyRecallGrid) {
 				list.Add(new DisplayField("Type",90,category));

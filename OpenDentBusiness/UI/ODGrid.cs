@@ -690,12 +690,17 @@ namespace OpenDental.UI {
 				{
 					drawTitle=true;
 				}
-				else if(title.StartsWith("StatementMain.NotIntermingled")
+				else if(i==0 
+					&& (title.StartsWith("TreatPlanBenefitsFamily") 
+					|| title.StartsWith("TreatPlanBenefitsIndividual"))) 
+				{
+					drawTitle=true;
+				}
+				else if(title.StartsWith("StatementMain.NotIntermingled") 
 					&& i>0 
-					//&& rows[i].Cells[1].Text!=rows[i-1].Cells[1].Text) //cell index 1 should be patient. May need to be enhanced later if grid customization is enabled.
 					&& rows[i].Tag.ToString()!=rows[i-1].Tag.ToString()) //Tag should be PatNum
 				{
-					yPosCur+=20;//space out grids.
+					yPosCur+=20; //space out grids.
 					PrintRows[i-1].IsBottomRow=true;
 					drawTitle=true;
 					drawHeader=true;
@@ -1738,45 +1743,49 @@ namespace OpenDental.UI {
 			Color cTitleBackG=Color.LightGray;
 			g.FillRectangle(new SolidBrush(cTitleBackG),x,y,Width,headerHeight);//background
 			g.DrawLine(new Pen(Color.FromArgb(102,102,122)),x,y,x+Width,y);//line between title and headers
-			Font headerFont=new Font("Arial",8.5f,FontStyle.Bold);
-			for(int i=0;i<columns.Count;i++) {
-				if(i!=0) {
-					//vertical lines separating column headers
-					g.DrawLine(new Pen(cOutline),x+(-hScroll.Value+ColPos[i]),y,
-						x+(-hScroll.Value+ColPos[i]),y+headerHeight);
-				}
-				g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
-					(float)x+(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2-g.MeasureString(columns[i].Heading,headerFont).Width/2),
-					(float)y+1);
-				if(sortedByColumnIdx==i) {
-					PointF p=new PointF(x+(-hScroll.Value+1+ColPos[i]+6),y+(float)headerHeight/2f);
-					if(sortedIsAscending) {//pointing up
-						g.FillPolygon(Brushes.White,new PointF[] {
-							new PointF(p.X-4.9f,p.Y+2f),//LLstub
-							new PointF(p.X-4.9f,p.Y+2.5f),//LLbase
-							new PointF(p.X+4.9f,p.Y+2.5f),//LRbase
-							new PointF(p.X+4.9f,p.Y+2f),//LRstub
-							new PointF(p.X,p.Y-2.8f)});//Top
-						g.FillPolygon(Brushes.Black,new PointF[] {
-							new PointF(p.X-4,p.Y+2),//LL
-							new PointF(p.X+4,p.Y+2),//LR
-							new PointF(p.X,p.Y-2)});//Top
+			using(Font headerFont=new Font("Arial",8.5f,FontStyle.Bold)) {
+				for(int i=0;i<columns.Count;i++) {
+					if(i!=0) {
+						//vertical lines separating column headers
+						g.DrawLine(new Pen(cOutline),x+(-hScroll.Value+ColPos[i]),y,
+							x+(-hScroll.Value+ColPos[i]),y+headerHeight);
 					}
-					else {//pointing down
-						g.FillPolygon(Brushes.White,new PointF[] {//shaped like home plate
-							new PointF(p.X-4.9f,p.Y-2f),//ULstub
-							new PointF(p.X-4.9f,p.Y-2.7f),//ULtop
-							new PointF(p.X+4.9f,p.Y-2.7f),//URtop
-							new PointF(p.X+4.9f,p.Y-2f),//URstub
-							new PointF(p.X,p.Y+2.8f)});//Bottom
-						g.FillPolygon(Brushes.Black,new PointF[] {
-							new PointF(p.X-4,p.Y-2),//UL
-							new PointF(p.X+4,p.Y-2),//UR
-							new PointF(p.X,p.Y+2)});//Bottom
+					g.DrawString(columns[i].Heading,headerFont,Brushes.Black,
+						(float)x+(-hScroll.Value+ColPos[i]+columns[i].ColWidth/2-g.MeasureString(columns[i].Heading,headerFont).Width/2),
+						(float)y+1);
+					if(sortedByColumnIdx==i) {
+						PointF p=new PointF(x+(-hScroll.Value+1+ColPos[i]+6),y+(float)headerHeight/2f);
+						if(sortedIsAscending) { //pointing up
+							g.FillPolygon(Brushes.White,new PointF[] {
+								new PointF(p.X-4.9f,p.Y+2f), //LLstub
+								new PointF(p.X-4.9f,p.Y+2.5f), //LLbase
+								new PointF(p.X+4.9f,p.Y+2.5f), //LRbase
+								new PointF(p.X+4.9f,p.Y+2f), //LRstub
+								new PointF(p.X,p.Y-2.8f)
+							}); //Top
+							g.FillPolygon(Brushes.Black,new PointF[] {
+								new PointF(p.X-4,p.Y+2), //LL
+								new PointF(p.X+4,p.Y+2), //LR
+								new PointF(p.X,p.Y-2)
+							}); //Top
+						}
+						else { //pointing down
+							g.FillPolygon(Brushes.White,new PointF[] { //shaped like home plate
+								new PointF(p.X-4.9f,p.Y-2f), //ULstub
+								new PointF(p.X-4.9f,p.Y-2.7f), //ULtop
+								new PointF(p.X+4.9f,p.Y-2.7f), //URtop
+								new PointF(p.X+4.9f,p.Y-2f), //URstub
+								new PointF(p.X,p.Y+2.8f)
+							}); //Bottom
+							g.FillPolygon(Brushes.Black,new PointF[] {
+								new PointF(p.X-4,p.Y-2), //UL
+								new PointF(p.X+4,p.Y-2), //UR
+								new PointF(p.X,p.Y+2)
+							}); //Bottom
+						}
 					}
-				}
-			}//end for columns.Count
-			headerFont.Dispose();
+				} //end for columns.Count
+			}
 			//Outline the Title
 			using(Pen pen=new Pen(cOutline)) {
 				g.DrawRectangle(pen,x,y,Width,HeaderHeight);
