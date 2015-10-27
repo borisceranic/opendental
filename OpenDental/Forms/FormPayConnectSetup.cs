@@ -1,13 +1,9 @@
 using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -99,7 +95,7 @@ namespace OpenDental{
 			this.linkLabel1.Location = new System.Drawing.Point(10, 13);
 			this.linkLabel1.Name = "linkLabel1";
 			this.linkLabel1.Size = new System.Drawing.Size(312, 16);
-			this.linkLabel1.TabIndex = 3;
+			this.linkLabel1.TabIndex = 1;
 			this.linkLabel1.TabStop = true;
 			this.linkLabel1.Text = "The PayConnect website is at www.dentalxchange.com";
 			this.linkLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -111,7 +107,7 @@ namespace OpenDental{
 			this.checkEnabled.Location = new System.Drawing.Point(10, 37);
 			this.checkEnabled.Name = "checkEnabled";
 			this.checkEnabled.Size = new System.Drawing.Size(226, 18);
-			this.checkEnabled.TabIndex = 4;
+			this.checkEnabled.TabIndex = 2;
 			this.checkEnabled.Text = "Enabled (affects all clinics)";
 			this.checkEnabled.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			this.checkEnabled.UseVisualStyleBackColor = true;
@@ -121,7 +117,7 @@ namespace OpenDental{
 			this.label1.Location = new System.Drawing.Point(6, 22);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(124, 16);
-			this.label1.TabIndex = 53;
+			this.label1.TabIndex = 0;
 			this.label1.Text = "Payment Type";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -133,14 +129,14 @@ namespace OpenDental{
 			this.comboPaymentType.MaxDropDownItems = 25;
 			this.comboPaymentType.Name = "comboPaymentType";
 			this.comboPaymentType.Size = new System.Drawing.Size(175, 21);
-			this.comboPaymentType.TabIndex = 54;
+			this.comboPaymentType.TabIndex = 4;
 			// 
 			// label2
 			// 
 			this.label2.Location = new System.Drawing.Point(6, 48);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(124, 16);
-			this.label2.TabIndex = 55;
+			this.label2.TabIndex = 0;
 			this.label2.Text = "Username";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -149,14 +145,14 @@ namespace OpenDental{
 			this.textUsername.Location = new System.Drawing.Point(131, 46);
 			this.textUsername.Name = "textUsername";
 			this.textUsername.Size = new System.Drawing.Size(175, 20);
-			this.textUsername.TabIndex = 56;
+			this.textUsername.TabIndex = 5;
 			// 
 			// label3
 			// 
 			this.label3.Location = new System.Drawing.Point(6, 74);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(124, 16);
-			this.label3.TabIndex = 57;
+			this.label3.TabIndex = 0;
 			this.label3.Text = "Password";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -165,7 +161,7 @@ namespace OpenDental{
 			this.textPassword.Location = new System.Drawing.Point(131, 72);
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(175, 20);
-			this.textPassword.TabIndex = 58;
+			this.textPassword.TabIndex = 6;
 			// 
 			// comboClinic
 			// 
@@ -174,7 +170,7 @@ namespace OpenDental{
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(175, 21);
-			this.comboClinic.TabIndex = 60;
+			this.comboClinic.TabIndex = 3;
 			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
 			// 
 			// labelClinic
@@ -182,7 +178,7 @@ namespace OpenDental{
 			this.labelClinic.Location = new System.Drawing.Point(10, 98);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(130, 16);
-			this.labelClinic.TabIndex = 59;
+			this.labelClinic.TabIndex = 0;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -197,7 +193,7 @@ namespace OpenDental{
 			this.groupPaySettings.Location = new System.Drawing.Point(10, 127);
 			this.groupPaySettings.Name = "groupPaySettings";
 			this.groupPaySettings.Size = new System.Drawing.Size(312, 100);
-			this.groupPaySettings.TabIndex = 61;
+			this.groupPaySettings.TabIndex = 0;
 			this.groupPaySettings.TabStop = false;
 			this.groupPaySettings.Text = "Clinic Payment Settings";
 			// 
@@ -206,7 +202,7 @@ namespace OpenDental{
 			this.labelClinicEnable.Location = new System.Drawing.Point(44, 58);
 			this.labelClinicEnable.Name = "labelClinicEnable";
 			this.labelClinicEnable.Size = new System.Drawing.Size(246, 28);
-			this.labelClinicEnable.TabIndex = 62;
+			this.labelClinicEnable.TabIndex = 0;
 			this.labelClinicEnable.Text = "To enable PayConnect for a clinic, set the Username and Password for that clinic." +
     "";
 			this.labelClinicEnable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -222,7 +218,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(161, 242);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 1;
+			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -237,7 +233,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(247, 242);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 0;
+			this.butCancel.TabIndex = 8;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -346,13 +342,40 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a payment type first.");
 				return;
 			}
+			SynchWithHQ();//if the user just modified the HQ credentials, change any credentials that were the same as HQ to keep them synched
 			//set the values in the list for the clinic we are switching from, at _clinicIndexRevert
-			_listProgProps.FindAll(x => x.ClinicNum==_indexClinicRevert && x.PropertyDesc=="Username").ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
-			_listProgProps.FindAll(x => x.ClinicNum==_indexClinicRevert && x.PropertyDesc=="Password").ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
-			_listProgProps.FindAll(x => x.ClinicNum==_indexClinicRevert && x.PropertyDesc=="PaymentType" && comboPaymentType.SelectedIndex>-1) //but dont save invalid paymenttype
+			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="Username")
+				.ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
+			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="Password")
+				.ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
+			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="PaymentType" && comboPaymentType.SelectedIndex>-1)
 				.ForEach(x => x.PropertyValue=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString());//always 1 item; null safe
 			_indexClinicRevert=comboClinic.SelectedIndex;//now that we've updated the values for the clinic we're switching from, update _indexClinicRevert
 			FillFields();
+		}
+
+		///<summary>For each clinic, if the Username and Password are the same as the HQ (ClinicNum=0) Username and Password, update the clinic with the
+		///values in the text boxes.  Only modifies other clinics if _indexClinicRevert=0, meaning user just modified the HQ clinic credentials.</summary>
+		private void SynchWithHQ() {
+			if(!PrefC.HasClinicsEnabled || _listUserClinicNums[_indexClinicRevert]>0) {//using clinics, and modifying the HQ clinic. otherwise return.
+				return;
+			}
+			string hqUsername=ProgramProperties.GetPropValFromList(_listProgProps,"Username",0);//HQ Username before updating to value in textbox
+			string hqPassword=ProgramProperties.GetPropValFromList(_listProgProps,"Password",0);//HQ Password before updating to value in textbox
+			//for each distinct ClinicNum in the prog property list for PayConnect except HQ
+			foreach(long clinicNum in _listProgProps.Select(x => x.ClinicNum).Where(x => x>0).Distinct()) {
+				//if this clinic has a different username or password, skip it
+				if(!_listProgProps.Exists(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username" && x.PropertyValue==hqUsername)
+					|| !_listProgProps.Exists(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password" && x.PropertyValue==hqPassword))
+				{
+					continue;
+				}
+				//update the username and password to keep it synched with HQ
+				_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username")
+					.ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
+				_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password")
+					.ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
+			}
 		}
 
 		private void linkLabel1_LinkClicked(object sender,LinkLabelLinkClickedEventArgs e) {
@@ -381,7 +404,8 @@ namespace OpenDental{
 				clinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
 			}
 			string payTypeSelected = DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
-			//set the values in the list for the clinic we are switching from, at _clinicIndexRevert
+			SynchWithHQ();//if the user changes the HQ credentials, any clinic that had the same credentials will be kept in synch with HQ
+			//set the values in the list for this clinic
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username").ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password").ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType").ForEach(x => x.PropertyValue=payTypeSelected);//always 1 item; null safe
@@ -391,7 +415,6 @@ namespace OpenDental{
 				if(!checkEnabled.Checked) {//if program link is not enabled, do not bother checking the payment type selected
 					break;
 				}
-				ProgramProperty progP=new ProgramProperty() { PropertyValue="" };
 				payTypeCur=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",_listUserClinicNums[i]);
 				//if the program is enabled and the username and password fields are not blank,
 				//PayConnect is enabled for this clinic so make sure the payment type is also set
