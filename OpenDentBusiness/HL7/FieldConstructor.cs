@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using OpenDental;
-using OpenDental.UI;
-using OpenDentBusiness.UI;
 
 
 namespace OpenDentBusiness.HL7 {
@@ -424,11 +418,17 @@ namespace OpenDentBusiness.HL7 {
 							retval+=def.RepetitionSeparator;
 						}
 						ICD9 icd9Cur=ICD9s.GetByCode(listDiagCodes[i]);
-						if(icd9Cur==null) {//not a valid ICD9 code or not in the ICD9 table, just stick in the code they have in OD
-							retval+=listDiagCodes[i];
+						Icd10 icd10Cur=Icd10s.GetByCode(listDiagCodes[i]);
+						if(icd9Cur!=null && icd10Cur==null) {
+							retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd9Cur.Description,"I9C","","","","31");//See HL7 v2.6 Ch 6.5.2.3
 							continue;
 						}
-						retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd9Cur.Description,"I9C","","","","31");
+						if(icd10Cur!=null && icd9Cur==null) {
+							retval+=gConcat(def.ComponentSeparator,listDiagCodes[i],icd10Cur.Description,"I10","","","","2013");//See HL7 v2.6 Ch 6.5.2.3
+							continue;
+						}
+						//either the code exists in both lists or neither list, just stick in the code they have entered into OD
+						retval+=listDiagCodes[i];
 					}
 					return retval;
 				case "proc.location":
