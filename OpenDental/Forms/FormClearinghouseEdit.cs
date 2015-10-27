@@ -90,8 +90,7 @@ namespace OpenDental{
 		private Label label37;
 		private TextBox textSeparatorSegment;
 		private Label label38;
-		private Label labelClinic;
-		private Label label2;
+		private Label labelInfo;
 		private ComboBox comboClinic;
 		private Clearinghouse ClearinghouseClin;
 		///<summary>This must be set externally before opening the form.  The HQ version of the clearinghouse.  
@@ -113,6 +112,7 @@ namespace OpenDental{
 		///<summary>This is never edited from within this form.  Set externally for reference to use in the Sync() method.
 		///May not be null.  Assign a new list of clearinghouse objects to this if creating a new clearinghouse.</summary>
 		public List<Clearinghouse> ListClearinghousesClinOld;
+		private Label labelClinic;
 		private int clinicSelectionLastIndex=-1;
 
 		///<summary></summary>
@@ -219,12 +219,12 @@ namespace OpenDental{
 			this.textISA05 = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
-			this.labelClinic = new System.Windows.Forms.Label();
+			this.labelInfo = new System.Windows.Forms.Label();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label2 = new System.Windows.Forms.Label();
-			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -871,17 +871,28 @@ namespace OpenDental{
 			this.label17.Text = "Also used in X12 1000B NM103";
 			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// labelClinic
+			// labelInfo
 			// 
-			this.labelClinic.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelClinic.Location = new System.Drawing.Point(248, 6);
-			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(698, 17);
-			this.labelClinic.TabIndex = 0;
-			this.labelClinic.Text = "Bolded fields are unique for each clinic.  Other fields are not editable unless U" +
+			this.labelInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelInfo.Location = new System.Drawing.Point(248, 6);
+			this.labelInfo.Name = "labelInfo";
+			this.labelInfo.Size = new System.Drawing.Size(698, 17);
+			this.labelInfo.TabIndex = 0;
+			this.labelInfo.Text = "Bolded fields are unique for each clinic.  Other fields are not editable unless U" +
     "nassigned/Default is selected.";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelClinic.Visible = false;
+			this.labelInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelInfo.Visible = false;
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(768, 34);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(165, 21);
+			this.comboClinic.TabIndex = 15;
+			this.comboClinic.Visible = false;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
 			// 
 			// butDelete
 			// 
@@ -931,35 +942,24 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// label2
+			// labelClinic
 			// 
-			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(695, 30);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(70, 18);
-			this.label2.TabIndex = 0;
-			this.label2.Text = "Clinic";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.label2.Visible = false;
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(768, 29);
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(165, 21);
-			this.comboClinic.TabIndex = 15;
-			this.comboClinic.Visible = false;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelClinic.Location = new System.Drawing.Point(697, 35);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(70, 18);
+			this.labelClinic.TabIndex = 16;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Visible = false;
 			// 
 			// FormClearinghouseEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(958, 696);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.label17);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.textLoginID);
@@ -1066,7 +1066,7 @@ namespace OpenDental{
 			//checkIsDefault.Checked=ClearinghouseCur.IsDefault;
 			textPayors.Text=ClearinghouseCur.Payors;
 			if(PrefC.HasClinicsEnabled) {
-				labelClinic.Visible=true;
+				labelInfo.Visible=true;
 				labelTIN.Font=new System.Drawing.Font(labelTIN.Font,FontStyle.Bold);
 				labelSenderName.Font=new System.Drawing.Font(labelSenderName.Font,FontStyle.Bold);
 				labelSenderTelephone.Font=new System.Drawing.Font(labelSenderTelephone.Font,FontStyle.Bold);
@@ -1075,8 +1075,8 @@ namespace OpenDental{
 				labelExportPath.Font=new System.Drawing.Font(labelExportPath.Font,FontStyle.Bold);
 				labelReportPath.Font=new System.Drawing.Font(labelReportPath.Font,FontStyle.Bold);
 				labelClientProgram.Font=new System.Drawing.Font(labelClientProgram.Font,FontStyle.Bold);
-				comboClinic.Visible=true;
 				labelClinic.Visible=true;
+				comboClinic.Visible=true;
 			}
 			if(ClinicNum!=0) {
 				textDescription.ReadOnly=true;

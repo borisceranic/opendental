@@ -28,7 +28,6 @@ namespace OpenDental.Eclaims {
 	public class DentiCal {
 
 		private static string remoteHost="ftp.delta.org";
-		private static Clearinghouse _clearinghouseClin=null;
 		public static string ErrorMessage="";
 
 		///<summary></summary>
@@ -37,7 +36,6 @@ namespace OpenDental.Eclaims {
 
 		///<summary>Returns true if the communications were successful, and false if they failed. Both sends and retrieves.</summary>
 		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) { //called from FormClaimReports and Eclaims.cs. clinic-level clearinghouse passed in.
-			_clearinghouseClin=clearinghouseClin;
 			//Before this function is called, the X12 file for the current batch has already been generated in
 			//the clearinghouse export folder. The export folder will also contain batch files which have failed
 			//to upload from previous attempts and we must attempt to upload these older batch files again if
@@ -51,8 +49,8 @@ namespace OpenDental.Eclaims {
 			ChannelSftp ch=null;
 			JSch jsch=new JSch();
 			try {
-				session=jsch.getSession(_clearinghouseClin.LoginID,remoteHost);
-				session.setPassword(_clearinghouseClin.Password);
+				session=jsch.getSession(clearinghouseClin.LoginID,remoteHost);
+				session.setPassword(clearinghouseClin.Password);
 				Hashtable config=new Hashtable();
 				config.Add("StrictHostKeyChecking","no");
 				session.setConfig(config);
