@@ -1730,12 +1730,11 @@ namespace OpenDental
 				+". "+Lan.g(this,"Manually launched Edit Fee window via Edit Claim Procedure window."),FeeCur.CodeNum);
 			FormFE.FeeCur=FeeCur;
 			FormFE.ShowDialog();
-			if(FormFE.DialogResult==DialogResult.OK){
-				Fees.RefreshCache();
-				DataValid.SetInvalid(InvalidType.Fees);
+			//The Fees cache is updated in the closing of FormFeeEdit if there were any changes made.  Simply refresh our window.
+			if(FormFE.DialogResult==DialogResult.OK) {
+				FillAllowed();
+				ComputeAmounts();//?
 			}
-			FillAllowed();
-			ComputeAmounts();//?
 		}
 
 		private void ComputeAmounts(){

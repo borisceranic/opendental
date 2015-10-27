@@ -1014,7 +1014,7 @@ namespace OpenDentBusiness {
 		}*/
 
 		///<summary>Only fees, not estimates.  Returns number of fees changed.</summary>
-		public static long GlobalUpdateFees() {
+		public static long GlobalUpdateFees(List<Fee> listFees) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
@@ -1040,8 +1040,6 @@ namespace OpenDentBusiness {
 			double newFee;
 			double oldFee;
 			long rowsChanged=0;
-			Fees.ListFees=Fees.GetListt(); //If we don't do this here, Getlistt() gets called table.Rows.Count or more times below.  Used in GetAmount0(). 
-			//Customers with large databases were taking around 20 minutes for the below code to run without the above change.
 			for(int i=0;i<table.Rows.Count;i++) {
 				priPlanFeeSched=PIn.Long(table.Rows[i]["PlanFeeSched"].ToString());
 				patFeeSched=PIn.Long(table.Rows[i]["PatFeeSched"].ToString());
@@ -1049,12 +1047,14 @@ namespace OpenDentBusiness {
 				planType=PIn.String(table.Rows[i]["PlanType"].ToString());
 				insfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
 					,Fees.GetFeeSched(priPlanFeeSched,patFeeSched,procProv)
-					,PIn.Long(table.Rows[i]["ClinicNum"].ToString()),procProv);
+					,PIn.Long(table.Rows[i]["ClinicNum"].ToString()),procProv
+					,listFees);
 				if(planType=="p") {//PPO
 					standardfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
 						,Providers.GetProv(procProv).FeeSched
 						,PIn.Long(table.Rows[i]["ClinicNum"].ToString())
-						,procProv);
+						,procProv
+						,listFees);
 					if(standardfee>insfee) {
 						newFee=standardfee;
 					} 
@@ -1073,7 +1073,6 @@ namespace OpenDentBusiness {
 					+"WHERE ProcNum="+POut.String(table.Rows[i]["ProcNum"].ToString());
 				rowsChanged+=Db.NonQ(command);
 			}
-			Fees.ListFees=null;//We set this above so we need to set this back.  Otherwise other places in the code would be using a stale list of fees.
 			return rowsChanged;
 		}
 
