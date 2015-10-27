@@ -97,7 +97,7 @@ namespace OpenDentBusiness {
 				}
 				while(Contains(databases,newDb));
 			}
-			command="CREATE DATABASE "+newDb+" CHARACTER SET utf8";
+			command="CREATE DATABASE `"+newDb+"` CHARACTER SET utf8";
 			dcon.NonQ(command);
 			command="SHOW FULL TABLES WHERE Table_type='BASE TABLE'";//Tables, not views.  Does not work in MySQL 4.1, however we test for MySQL version >= 5.0 in PrefL.
 			table=dcon.GetTable(command);
@@ -110,12 +110,12 @@ namespace OpenDentBusiness {
 			for(int i=0;i<tableName.Length;i++) {
 				//Alert anyone that cares that we are backing up this table.
 				ODEvent.Fire(new ODEventArgs("BackupProgress",Lans.g("MiscData","Backing up table")+": "+tableName[i]));
-				command="SHOW CREATE TABLE "+oldDb+"."+tableName[i];//also works with views.
+				command="SHOW CREATE TABLE `"+oldDb+"`.`"+tableName[i]+"`";//also works with views. Added backticks around table name for unusual characters.
 				table=newDcon.GetTable(command);
 				command=PIn.ByteArray(table.Rows[0][1]);
 				newDcon.NonQ(command);//this has to be run using connection with new database
-				command="INSERT INTO "+newDb+"."+tableName[i]
-					+" SELECT * FROM "+oldDb+"."+tableName[i];
+				command="INSERT INTO `"+newDb+"`.`"+tableName[i]+"` "
+					+"SELECT * FROM `"+oldDb+"`.`"+tableName[i]+"`";//Added backticks around table name for unusual characters.
 				newDcon.NonQ(command);
 			}
 			return 0;

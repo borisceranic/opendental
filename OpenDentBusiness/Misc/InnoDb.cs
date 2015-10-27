@@ -42,14 +42,14 @@ namespace OpenDentBusiness {
 			string database=Db.GetScalar(command);
 			command=@"SELECT table_name
 				FROM information_schema.tables
-				WHERE table_schema='"+database+"' AND information_schema.tables.engine='"+fromEngine+"'";
+				WHERE table_schema='"+POut.String(database)+"' AND information_schema.tables.engine='"+fromEngine+"'";
 			DataTable results=Db.GetTable(command);
 			command="";
 			if(results.Rows.Count==0) {
 				return numtables;
 			}
 			for(int i=0;i<results.Rows.Count;i++) {
-				command+="ALTER TABLE "+database+"."+POut.String(results.Rows[i]["table_name"].ToString())+" ENGINE='"+toEngine+"'; ";
+				command+="ALTER TABLE `"+database+"`.`"+results.Rows[i]["table_name"].ToString()+"` ENGINE='"+toEngine+"'; ";
 				numtables++;
 			}
 			Db.NonQ(command);

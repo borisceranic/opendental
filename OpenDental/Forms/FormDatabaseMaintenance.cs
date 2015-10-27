@@ -517,6 +517,9 @@ namespace OpenDental {
 				labelApptProcs.Visible=false;
 			}
 			FillGrid();
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				butRemoveNulls.Visible=false;
+			}
 		}
 
 		private void FillGrid() {
@@ -699,7 +702,7 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will replace ALL null strings in your database with empty strings.  This cannot be undone.  Do you wish to continue?")) {
 				return;
 			}
-			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+":"+DatabaseMaintenance.RemoveNullStrings());
+			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+": "+DatabaseMaintenance.MySqlRemoveNullStrings());
 		}
 
 		private void butEtrans_Click(object sender,EventArgs e) {
@@ -745,7 +748,8 @@ namespace OpenDental {
 			logText.Append(result);//No database maintenance checks should be run unless this passes.
 			if(!DatabaseMaintenance.GetSuccess()) {
 				Cursor=Cursors.Default;
-				MessageBox.Show(result);//Result is already translated.  Use normal message box to display.
+				MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(result);//Result is already translated.
+				msgBoxCP.Show();//Let this window be non-modal so that they can keep it open while they fix their problems.
 				return;
 			}
 			if(gridMain.SelectedIndices.Length < 1) {

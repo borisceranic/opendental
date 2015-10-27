@@ -35,31 +35,44 @@ namespace OpenDentBusiness {
 			table=Db.GetTable(command);
 			string[] tableNames=new string[table.Rows.Count];
 			int lastRow;
-			bool allOK=true;
+			bool existsCorruptFiles=false;
+			bool existsUnvalidatedTables=false;
 			for(int i=0;i<table.Rows.Count;i++) {
 				tableNames[i]=table.Rows[i][0].ToString();
 			}
 			for(int i=0;i<tableNames.Length;i++) {
 				//Alert anyone that cares that we are checking this table.
 				ODEvent.Fire(new ODEventArgs("CheckTableProgress",Lans.g("MiscData","Checking table")+": "+tableNames[i]));
-				command="CHECK TABLE "+tableNames[i];
-				table=Db.GetTable(command);
-				lastRow=table.Rows.Count-1;
-				string status=PIn.ByteArray(table.Rows[lastRow][3]);
-				if(status!="OK") {
-					log+=Lans.g("FormDatabaseMaintenance","Corrupt file found for table")+" "+tableNames[i]+"\r\n";
-					allOK=false;
+				command="CHECK TABLE `"+tableNames[i]+"`";
+				try {
+					table=Db.GetTable(command);
+					lastRow=table.Rows.Count-1;
+					string status=PIn.ByteArray(table.Rows[lastRow][3]);
+					if(status!="OK") {
+						log+=Lans.g("FormDatabaseMaintenance","Corrupt file found for table")+" "+tableNames[i]+"\r\n";
+						existsCorruptFiles=true;
+					}
+				}
+				catch(Exception ex) {
+					log+=Lans.g("FormDatabaseMaintenance","Unable to validate table")+" "+tableNames[i]+"\r\n"+ex.Message+"\r\n";
+					existsUnvalidatedTables=true;
 				}
 			}
-			if(allOK) {
-				if(verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","No corrupted tables.")+"\r\n";
-				}
-			}
-			else {
+			if(existsUnvalidatedTables) {
 				success=false;//no other checks should be done until we can successfully get past this.
-				log+=Lans.g("FormDatabaseMaintenance","Corrupted files found.  Run the optimize tool to repair them, then click check to be sure they were really fixed.")+"\r\n"
+				log+=Lans.g("FormDatabaseMaintenance","Tables found that could not be validated.")+"\r\n"
 					+Lans.g("FormDatabaseMaintenance","Done.");
+			}
+			if(existsCorruptFiles) {
+				success=false;//no other checks should be done until we can successfully get past this.
+				log+=Lans.g("FormDatabaseMaintenance","Corrupted files found.  Run the optimize tool to repair them, "
+					+"then click check to be sure they were really fixed.")+"\r\n"
+					+Lans.g("FormDatabaseMaintenance","Done.");
+			}
+			if(!existsUnvalidatedTables && !existsCorruptFiles) {
+				if(verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Tables validated successfully.  No corrupted tables.")+"\r\n";
+				}
 			}
 			return log;
 		}
@@ -5353,7 +5366,7 @@ HAVING cnt>1";
 		}
 
 		///<summary>Replaces null strings with empty strings and returns the number of rows changed.</summary>
-		public static long RemoveNullStrings() {
+		public static long MySqlRemoveNullStrings() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
@@ -5369,9 +5382,9 @@ HAVING cnt>1";
 			DataTable table=Db.GetTable(command);
 			long changeCount=0;
 			for(int i=0;i<table.Rows.Count;i++) {
-				command="UPDATE "+POut.String(table.Rows[i]["table_name"].ToString())
-					+" SET "+POut.String(table.Rows[i]["column_name"].ToString())
-					+"='' WHERE "+POut.String(table.Rows[i]["column_name"].ToString())+" IS NULL";
+				command="UPDATE `"+table.Rows[i]["table_name"].ToString()+"` "
+					+"SET `"+table.Rows[i]["column_name"].ToString()
+					+"`='' WHERE `"+table.Rows[i]["column_name"].ToString()+"` IS NULL";
 				changeCount+=Db.NonQ(command);
 			}
 			return changeCount;
@@ -5489,7 +5502,7 @@ HAVING cnt>1";
 						continue;
 					}
 					string tableName=PIn.String(dtTableTypes.Rows[i]["TABLE_NAME"].ToString());
-					command="ALTER TABLE "+POut.String(tableName)+" ENGINE='MyISAM'";
+					command="ALTER TABLE `"+tableName+"` ENGINE='MyISAM'";
 					try {
 						Db.NonQ(command);
 					}
