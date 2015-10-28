@@ -290,6 +290,7 @@ namespace OpenDentBusiness{
 				//case Permissions.WebmailDelete:
 				//case Permissions.MissingRequiredField:
 				//case Permissions.ReferralMerge:
+				//case Permissions.ProcEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;

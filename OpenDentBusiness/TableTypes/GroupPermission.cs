@@ -227,7 +227,12 @@ namespace OpenDentBusiness{
 		///permission.</summary>
 		RequiredFields,
 		///<summary>99- Allows user to merge referrals.</summary>
-		ReferralMerge
+		ReferralMerge,
+		///<summary>100- There is no user interface in the security window for this permission.  It is only used for tracking.
+		///Currently only used for tracking automatically changing the IsCpoe flag on procedures.  Can be enhanced to do more in the future.
+		///There is only one place where we could have automatically changed IsCpoe without a corresponding log of a different permission.
+		///That place is in the OnClosing of the Procedure Edit window.  We update this flag even when the user Cancels out of it.</summary>
+		ProcEdit
 	}
 
 	

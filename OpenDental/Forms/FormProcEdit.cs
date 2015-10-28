@@ -5893,6 +5893,8 @@ namespace OpenDental{
 			if(Userods.IsUserCpoe(Security.CurUser) && !ProcOld.IsCpoe) {
 				//There's a possibility that we are making a second, unnecessary call to the database here but it is worth it to help meet EHR measures.
 				Procedures.UpdateCpoeForProc(ProcCur.ProcNum,true);
+				//Make a log that we edited this procedure's CPOE flag.
+				SecurityLogs.MakeLogEntry(Permissions.ProcEdit,ProcCur.PatNum,"Procedure automatically flagged as CPOE.");
 			}
 			if(DialogResult==DialogResult.OK) {
 				//this catches date,prov,fee,status,etc for all claimProcs attached to this proc.
