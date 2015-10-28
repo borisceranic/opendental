@@ -216,6 +216,7 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butColor = new System.Windows.Forms.Button();
 			this.textWaitRoomWarn = new System.Windows.Forms.TextBox();
@@ -293,7 +294,6 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -833,6 +833,18 @@ namespace OpenDental{
 			this.tabAppts.Size = new System.Drawing.Size(466, 479);
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
+			// 
+			// checkBrokenApptAdjustmentWithProcedure
+			// 
+			this.checkBrokenApptAdjustmentWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustmentWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBrokenApptAdjustmentWithProcedure.Location = new System.Drawing.Point(32, 92);
+			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
+			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
+			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 218;
+			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addition to broken appt procedure";
+			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
 			// 
 			// label23
 			// 
@@ -1717,18 +1729,6 @@ namespace OpenDental{
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// checkBrokenApptAdjustmentWithProcedure
-			// 
-			this.checkBrokenApptAdjustmentWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBrokenApptAdjustmentWithProcedure.Location = new System.Drawing.Point(32, 92);
-			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
-			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
-			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 218;
-			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addtion to broken appt procedure";
-			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
 			// 
 			// FormModuleSetup
 			// 
