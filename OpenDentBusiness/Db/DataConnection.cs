@@ -660,6 +660,11 @@ namespace OpenDentBusiness {
 				conOr.Close();
 			}
 			else if(DBtype==DatabaseType.MySql) {
+#if DEBUG
+				//Wait up to 5 minutes for queries to finish before timing out in debug mode.
+				//This is because we have several projects that run huge DB creation scripts and cannot have the MySQL command timeout.
+				cmd.CommandTimeout=300;
+#endif
 				cmd.CommandText=commands;
 				for(int p=0;p<parameters.Length;p++) {
 					cmd.Parameters.Add(DbHelper.ParamChar+parameters[p].ParameterName,parameters[p].GetMySqlDbType()).Value=parameters[p].Value;
