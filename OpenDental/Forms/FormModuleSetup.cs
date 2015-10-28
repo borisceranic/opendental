@@ -850,7 +850,7 @@ namespace OpenDental{
 			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
 			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
 			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 217;
-			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addtion to broken appt procedure";
+			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addition to broken appt procedure";
 			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
 			// 
