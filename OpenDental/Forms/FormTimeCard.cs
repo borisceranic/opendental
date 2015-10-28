@@ -338,6 +338,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(18, 60);
 			this.gridMain.Name = "gridMain";
@@ -460,7 +461,6 @@ namespace OpenDental{
 			// 
 			// groupEmployee
 			// 
-			this.groupEmployee.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupEmployee.Controls.Add(this.butPrevEmp);
 			this.groupEmployee.Controls.Add(this.butNextEmp);
 			this.groupEmployee.Location = new System.Drawing.Point(635, 3);
@@ -524,6 +524,7 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(907, 313);
 			this.Name = "FormTimeCard";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
