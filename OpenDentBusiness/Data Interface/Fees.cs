@@ -247,6 +247,15 @@ namespace OpenDentBusiness{
 			List<Fee> listFees=new List<Fee>();
 			//We do not want to make a deep copy here because that takes a lot of time if the calling method is calling this method in a loop.
 			//Locking this next helper method call will guard against the dictionary itself (not its content) from being modified.
+			bool isDictNull=false;
+			lock(_lockObj) {
+				if(_dictFeesByFeeSchedNumsAndCodeNums==null) {
+					isDictNull=true;
+				}
+			}
+			if(isDictNull) {
+				Fees.RefreshCache();
+			}
 			lock(_lockObj) {
 				listFees=GetFeesBySchedAndCode(feeSched.FeeSchedNum,codeNum,_dictFeesByFeeSchedNumsAndCodeNums);
 			}
