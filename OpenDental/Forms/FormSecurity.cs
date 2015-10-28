@@ -521,6 +521,8 @@ namespace OpenDental{
 				node2=SetNode("Merge Tools");
 					node3=SetNode(Permissions.PatientMerge);
 						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ProviderMerge);
+						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ReferralMerge);
 						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);

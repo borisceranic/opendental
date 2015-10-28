@@ -291,6 +291,7 @@ namespace OpenDentBusiness{
 				//case Permissions.MissingRequiredField:
 				//case Permissions.ReferralMerge:
 				//case Permissions.ProcEdit:
+				//case Permissions.ProviderMerge:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -420,6 +421,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Providers");
 				case Permissions.ProviderFeeEdit:
 					return Lans.g("enumPermissions","Provider Fee Edit");
+				case Permissions.ProviderMerge:
+					return Lans.g("enumPermissions","Provider Merge Tool");
 				case Permissions.Reports:
 					return Lans.g("enumPermissions","Reports");
 				case Permissions.RefAttachAdd:

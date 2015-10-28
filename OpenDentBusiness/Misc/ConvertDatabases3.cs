@@ -10794,7 +10794,8 @@ namespace OpenDentBusiness {
 							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",99)";//ReferralMerge
 						Db.NonQ(command);
 					}
-				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('TimeCardShowSeconds','0')";
 					Db.NonQ(command);
 				}
@@ -10895,6 +10896,39 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE provider ADD CustomID varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider ADD ProvStatus tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider ADD ProvStatus number(3)";
+					Db.NonQ(command);
+					command="UPDATE provider SET ProvStatus = 0 WHERE ProvStatus IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE provider MODIFY ProvStatus NOT NULL";
+					Db.NonQ(command);
+				}
+				//Add provider merge permission to groups with existing permission SecurityAdmin
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=24";//SecurityAdmin
+				table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",100)";//ProviderMerge
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<table.Rows.Count;i++) {
+						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",100)";//ProviderMerge
+						Db.NonQ(command);
+					}
+				}
+				
+
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

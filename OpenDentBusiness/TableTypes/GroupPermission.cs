@@ -232,7 +232,9 @@ namespace OpenDentBusiness{
 		///Currently only used for tracking automatically changing the IsCpoe flag on procedures.  Can be enhanced to do more in the future.
 		///There is only one place where we could have automatically changed IsCpoe without a corresponding log of a different permission.
 		///That place is in the OnClosing of the Procedure Edit window.  We update this flag even when the user Cancels out of it.</summary>
-		ProcEdit
+		ProcEdit,
+		///<summary>101- Allows user to use the provider merge tool.</summary>
+		ProviderMerge
 	}
 
 	

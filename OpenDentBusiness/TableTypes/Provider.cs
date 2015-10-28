@@ -84,6 +84,8 @@ namespace OpenDentBusiness{
 		public long ProvNumBillingOverride;
 		///<summary>Custom ID used for reports or bridges only.</summary>
 		public string CustomID;
+		///<summary>Enum:ProviderStatus.  Active=0, Deleted=1</summary>
+		public ProviderStatus ProvStatus;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProvColor",typeof(int))]
@@ -190,6 +192,13 @@ namespace OpenDentBusiness{
 		
 	}
 	
+	///<summary>Status of the provider.</summary>
+	public enum ProviderStatus {
+		///<summary>0</summary>
+		Active,
+		///<summary>1</summary>
+		Deleted
+	}
 	
 
 }

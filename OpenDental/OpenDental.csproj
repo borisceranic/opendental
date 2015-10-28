@@ -434,6 +434,12 @@
     <Compile Include="Forms\FormActionNeeded.designer.cs">
       <DependentUpon>FormActionNeeded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormProviderMerge.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormProviderMerge.designer.cs">
+      <DependentUpon>FormProviderMerge.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormProgramLinkOutputFile .cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3955,6 +3961,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormActionNeeded.resx">
       <DependentUpon>FormActionNeeded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormProviderMerge.resx">
+      <DependentUpon>FormProviderMerge.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProgramLinkOutputFile .resx">
       <DependentUpon>FormProgramLinkOutputFile .cs</DependentUpon>

@@ -91,7 +91,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,MAX(UserName) UserName,PatCountPri,PatCountSec "//Max function used for Oracle compatability (some providers may have multiple user names).
+			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,MAX(UserName) UserName,PatCountPri,PatCountSec,ProvStatus "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider "
 				+"LEFT JOIN userod ON userod.ProvNum=provider.ProvNum "//there can be multiple userods attached to one provider
 				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCountPri FROM patient "
@@ -110,7 +110,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolClassNum,lastName,firstName,provNum,selectInstructors,selectAll);
 			}
-			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName,PatCountPri,PatCountSec "//Max function used for Oracle compatability (some providers may have multiple user names).
+			string command="SELECT Abbr,LName,FName,provider.IsHidden,provider.ItemOrder,provider.ProvNum,GradYear,IsInstructor,Descript,MAX(UserName) UserName,PatCountPri,PatCountSec,ProvStatus "//Max function used for Oracle compatability (some providers may have multiple user names).
 				+"FROM provider LEFT JOIN schoolclass ON provider.SchoolClassNum=schoolclass.SchoolClassNum "
 				+"LEFT JOIN userod ON userod.ProvNum=provider.ProvNum "//there can be multiple userods attached to one provider
 				+"LEFT JOIN (SELECT PriProv, COUNT(*) PatCountPri FROM patient "
@@ -783,6 +783,96 @@ namespace OpenDentBusiness{
 				return false;
 			}
 			return true;
+		}
+
+		///<summary>Provider merge tool.  Returns the number of rows changed when the tool is used.</summary>
+		public static long Merge(long provNumFrom, long provNumInto) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),provNumFrom,provNumInto);
+			}
+			string[] provNumForeignKeys=new string[] { //add any new FKs to this list.
+				"adjustment.ProvNum",
+				"anestheticrecord.ProvNum",
+				"appointment.ProvNum",
+				"appointment.ProvHyg",
+				"apptviewitem.ProvNum",
+				"claim.ProvTreat",
+				"claim.ProvBill",
+				"claim.ReferringProv",
+				"claim.ProvOrderOverride",
+				"claimproc.ProvNum",
+				"clinic.DefaultProv",
+				"clinic.InsBillingProv",
+				"dispsupply.ProvNum",
+				"ehrnotperformed.ProvNum",
+				"emailmessage.ProvNumWebMail",
+				"encounter.ProvNum",
+				"equipment.ProvNumCheckedOut",
+				"erxlog.ProvNum",
+				"evaluation.InstructNum",
+				"evaluation.StudentNum",
+				"fee.ProvNum",
+				"intervention.ProvNum",
+        "labcase.ProvNum",
+				"medicalorder.ProvNum",
+				"medicationpat.ProvNum",
+				"operatory.ProvDentist",
+				"operatory.ProvHygienist",
+				"patient.PriProv",
+				"patient.SecProv",
+				"payplancharge.ProvNum",
+        "paysplit.ProvNum",
+				"perioexam.ProvNum",
+				"proccodenote.ProvNum",
+				"procedurecode.ProvNumDefault",
+        "procedurelog.ProvNum",
+				"procedurelog.ProvOrderOverride",
+				"provider.ProvNumBillingOverride",
+				"providerident.ProvNum",
+				"refattach.ProvNum",
+				"reqstudent.ProvNum",
+				"reqstudent.InstructorNum",
+				"rxpat.ProvNum",
+				"schedule.ProvNum",
+				"userod.ProvNum",
+				"vaccinepat.ProvNumAdminister",
+				"vaccinepat.ProvNumOrdering"
+			};
+			string command="";
+			long retVal=0;
+			for(int i=0;i<provNumForeignKeys.Length;i++) { //actually change all of the FKs in the above tables.
+				string[] tableAndKeyName=provNumForeignKeys[i].Split(new char[] { '.' });
+				command="UPDATE "+tableAndKeyName[0]
+					+" SET "+tableAndKeyName[1]+"="+POut.Long(provNumInto)
+					+" WHERE "+tableAndKeyName[1]+"="+POut.Long(provNumFrom);
+				retVal+=Db.NonQ(command);
+			}
+			command="UPDATE provider SET IsHidden=1 WHERE ProvNum="+POut.Long(provNumFrom);
+			Db.NonQ(command);
+			command="UPDATE provider SET ProvStatus="+POut.Int((int)ProviderStatus.Deleted)+" WHERE ProvNum="+POut.Long(provNumFrom);
+			Db.NonQ(command);
+			return retVal;
+		}
+
+		public static long CountPats(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT COUNT(DISTINCT patient.PatNum) FROM patient WHERE (patient.PriProv="+POut.Long(provNum)
+				+" OR patient.SecProv="+POut.Long(provNum)+")"
+				+" AND patient.PatStatus=0";
+			string retVal=Db.GetScalar(command);
+			return PIn.Long(retVal);
+		}
+
+		public static long CountClaims(long provNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),provNum);
+			}
+			string command="SELECT COUNT(DISTINCT claim.ClaimNum) FROM claim WHERE claim.ProvBill="+POut.Long(provNum)
+				+" OR claim.ProvTreat="+POut.Long(provNum);
+			string retVal=Db.GetScalar(command);
+			return PIn.Long(retVal);
 		}
 
 	}

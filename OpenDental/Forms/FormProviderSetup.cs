@@ -625,6 +625,9 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++){
 				row=new ODGridRow();
+				if(table.Rows[i]["ProvStatus"].ToString()==POut.Int((int)ProviderStatus.Deleted)) {
+					continue;
+				}
 				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 					row.Cells.Add(table.Rows[i]["ProvNum"].ToString());
 				}
