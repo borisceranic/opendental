@@ -422,7 +422,7 @@ namespace OpenDentBusiness{
 				case Permissions.ProviderFeeEdit:
 					return Lans.g("enumPermissions","Provider Fee Edit");
 				case Permissions.ProviderMerge:
-					return Lans.g("enumPermissions","Provider Merge Tool");
+					return Lans.g("enumPermissions","Provider Merge");
 				case Permissions.Reports:
 					return Lans.g("enumPermissions","Reports");
 				case Permissions.RefAttachAdd:
