@@ -95,6 +95,8 @@ namespace OpenDental{
 		private UI.Button butNone;
 		private TextBox textProviderID;
 		private Label label20;
+		private Label label21;
+		private TextBox textCustomID;
 		private long _provNumSelected;
 
 		///<summary></summary>
@@ -202,6 +204,8 @@ namespace OpenDental{
 			this.butNone = new OpenDental.UI.Button();
 			this.textProviderID = new System.Windows.Forms.TextBox();
 			this.label20 = new System.Windows.Forms.Label();
+			this.label21 = new System.Windows.Forms.Label();
+			this.textCustomID = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupAnesthProvType.SuspendLayout();
@@ -975,12 +979,31 @@ namespace OpenDental{
 			this.label20.Text = "Provider ID";
 			this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// label21
+			// 
+			this.label21.Location = new System.Drawing.Point(395, 215);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(107, 14);
+			this.label21.TabIndex = 261;
+			this.label21.Text = "Custom ID";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// textCustomID
+			// 
+			this.textCustomID.Location = new System.Drawing.Point(397, 231);
+			this.textCustomID.MaxLength = 255;
+			this.textCustomID.Name = "textCustomID";
+			this.textCustomID.Size = new System.Drawing.Size(108, 20);
+			this.textCustomID.TabIndex = 260;
+			// 
 			// FormProvEdit
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(844, 653);
+			this.Controls.Add(this.label21);
+			this.Controls.Add(this.textCustomID);
 			this.Controls.Add(this.label20);
 			this.Controls.Add(this.textProviderID);
 			this.Controls.Add(this.butNone);
@@ -1142,6 +1165,7 @@ namespace OpenDental{
 			textMedicaidID.Text=ProvCur.MedicaidID;
 			textNationalProvID.Text=ProvCur.NationalProvID;
 			textCanadianOfficeNum.Text=ProvCur.CanadianOfficeNum;
+			textCustomID.Text=ProvCur.CustomID;
 			checkIsSecondary.Checked=ProvCur.IsSecondary;
 			checkSigOnFile.Checked=ProvCur.SigOnFile;
 			checkIsHidden.Checked=ProvCur.IsHidden;
@@ -1382,6 +1406,7 @@ namespace OpenDental{
 			ProvCur.OutlineColor=butOutlineColor.BackColor;
 			ProvCur.IsInstructor=checkIsInstructor.Checked;
 			ProvCur.EhrMuStage=comboEhrMu.SelectedIndex;
+			ProvCur.CustomID=textCustomID.Text;
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
 				if(ProvCur.SchoolClassNum!=0) {
 					ProvCur.SchoolClassNum=SchoolClasses.List[comboSchoolClass.SelectedIndex].SchoolClassNum;

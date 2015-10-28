@@ -82,6 +82,8 @@ namespace OpenDentBusiness{
 		public int EhrMuStage;
 		///<summary>FK to provider.ProvNum</summary>
 		public long ProvNumBillingOverride;
+		///<summary>Custom ID used for reports or bridges only.</summary>
+		public string CustomID;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ProvColor",typeof(int))]

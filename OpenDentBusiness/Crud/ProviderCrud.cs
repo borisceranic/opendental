@@ -81,6 +81,7 @@ namespace OpenDentBusiness.Crud{
 				provider.IsInstructor          = PIn.Bool  (row["IsInstructor"].ToString());
 				provider.EhrMuStage            = PIn.Int   (row["EhrMuStage"].ToString());
 				provider.ProvNumBillingOverride= PIn.Long  (row["ProvNumBillingOverride"].ToString());
+				provider.CustomID              = PIn.String(row["CustomID"].ToString());
 				retVal.Add(provider);
 			}
 			return retVal;
@@ -121,7 +122,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProvNum,";
 			}
-			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride) VALUES(";
+			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride,CustomID) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(provider.ProvNum)+",";
 			}
@@ -159,7 +160,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (provider.EmailAddressNum)+","
 				+    POut.Bool  (provider.IsInstructor)+","
 				+    POut.Int   (provider.EhrMuStage)+","
-				+    POut.Long  (provider.ProvNumBillingOverride)+")";
+				+    POut.Long  (provider.ProvNumBillingOverride)+","
+				+"'"+POut.String(provider.CustomID)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -192,7 +194,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProvNum,";
 			}
-			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride) VALUES(";
+			command+="Abbr,ItemOrder,LName,FName,MI,Suffix,FeeSched,Specialty,SSN,StateLicense,DEANum,IsSecondary,ProvColor,IsHidden,UsingTIN,BlueCrossID,SigOnFile,MedicaidID,OutlineColor,SchoolClassNum,NationalProvID,CanadianOfficeNum,AnesthProvType,TaxonomyCodeOverride,IsCDAnet,EcwID,StateRxID,IsNotPerson,StateWhereLicensed,EmailAddressNum,IsInstructor,EhrMuStage,ProvNumBillingOverride,CustomID) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(provider.ProvNum)+",";
 			}
@@ -230,7 +232,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (provider.EmailAddressNum)+","
 				+    POut.Bool  (provider.IsInstructor)+","
 				+    POut.Int   (provider.EhrMuStage)+","
-				+    POut.Long  (provider.ProvNumBillingOverride)+")";
+				+    POut.Long  (provider.ProvNumBillingOverride)+","
+				+"'"+POut.String(provider.CustomID)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -276,7 +279,8 @@ namespace OpenDentBusiness.Crud{
 				+"EmailAddressNum       =  "+POut.Long  (provider.EmailAddressNum)+", "
 				+"IsInstructor          =  "+POut.Bool  (provider.IsInstructor)+", "
 				+"EhrMuStage            =  "+POut.Int   (provider.EhrMuStage)+", "
-				+"ProvNumBillingOverride=  "+POut.Long  (provider.ProvNumBillingOverride)+" "
+				+"ProvNumBillingOverride=  "+POut.Long  (provider.ProvNumBillingOverride)+", "
+				+"CustomID              = '"+POut.String(provider.CustomID)+"' "
 				+"WHERE ProvNum = "+POut.Long(provider.ProvNum);
 			Db.NonQ(command);
 		}
@@ -416,6 +420,10 @@ namespace OpenDentBusiness.Crud{
 			if(provider.ProvNumBillingOverride != oldProvider.ProvNumBillingOverride) {
 				if(command!=""){ command+=",";}
 				command+="ProvNumBillingOverride = "+POut.Long(provider.ProvNumBillingOverride)+"";
+			}
+			if(provider.CustomID != oldProvider.CustomID) {
+				if(command!=""){ command+=",";}
+				command+="CustomID = '"+POut.String(provider.CustomID)+"'";
 			}
 			if(command==""){
 				return false;

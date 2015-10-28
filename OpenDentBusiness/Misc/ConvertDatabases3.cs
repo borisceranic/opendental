@@ -10887,11 +10887,14 @@ namespace OpenDentBusiness {
 						+"'RadiologyDateStartedUsing154',"+POut.DateT(DateTime.Now.Date)+")";
 					Db.NonQ(command);
 				}
-
-
-
-
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE provider ADD CustomID varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE provider ADD CustomID varchar2(255)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
