@@ -432,6 +432,8 @@ namespace OpenDentBusiness {
 		QuickBooksCompanyFile,
 		QuickBooksDepositAccounts,
 		QuickBooksIncomeAccount,
+		///<summary>Date when user upgraded to or past 15.4.1 and started using ADA procedures to count CPOE radiology orders for EHR.</summary>
+		RadiologyDateStartedUsing154,
 		RandomPrimaryKeys,
 		RecallAdjustDown,
 		RecallAdjustRight,

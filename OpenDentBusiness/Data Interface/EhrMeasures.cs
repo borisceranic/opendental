@@ -2814,18 +2814,29 @@ namespace OpenDentBusiness{
 						+"AND ehrlab.ObservationDateTimeStart BETWEEN DATE_FORMAT("+POut.Date(dateStart)+",'%Y%m%d') AND DATE_FORMAT("+POut.Date(dateEnd)+",'%Y%m%d') "
 						+"AND (CASE WHEN ehrlab.UsiCodeSystemName='LN' THEN ehrlab.UsiID WHEN ehrlab.UsiCodeSystemNameAlt='LN' THEN ehrlab.UsiIDAlt ELSE '' END) "
 							+"IN (SELECT LoincCode FROM loinc WHERE loinc.ClassType LIKE '%RAD%')";
-					//As of v15.4 we started storing radiology orders at the procedure level by flagging the procedure itself as IsCpoe.
-					//We are going to keep on running both of these queries at the same time.  
-					//Users can simply unmark procedure codes as IsRadiology if they want to only count radiology orders the via the old way (lab order window).
-					command+=" UNION ALL ";//Use union all so that duplicate columns do NOT get grouped together.
-					//Get all completed procedures within the date range that are associated to procedure codes that are flagged as IsRadiology.
-					command+="SELECT patient.PatNum,patient.LName,patient.FName,procedurelog.IsCpoe,procedurelog.DateEntryC,'' as LoincCode "
+					DateTime dateStartRad154=PrefC.GetDate(PrefName.RadiologyDateStartedUsing154);
+					//Only count radiology orders via the procedurelog table if the date that the office updated to v15.4.1 is less than the end date.
+					if(dateStartRad154 < dateEnd.Date) {
+						string dateStartStr=POut.Date(dateStart);
+						//We need to use a start date of whichever date is greater, dateStart or the date the the office updated to v15.4.1.
+						if(dateStartRad154 > dateStart) {
+							//The date that the office updated past 15.4.1 is greater than the reporting period's start date.
+							//Use the preference date instead so that the office isn't penalized for radiology orders prior to updating past v15.4.1.
+							dateStartStr=POut.Date(dateStartRad154);
+						}
+						//As of v15.4 we started storing radiology orders at the procedure level by flagging the procedure itself as IsCpoe.
+						//We are going to keep on running both of these queries at the same time.  
+						//Users can simply unmark procedure codes as IsRadiology if they want to only count radiology orders the via the old way (lab order window).
+						command+=" UNION ALL ";//Use union all so that duplicate columns do NOT get grouped together.
+						//Get all completed procedures within the date range that are associated to procedure codes that are flagged as IsRadiology.
+						command+="SELECT patient.PatNum,patient.LName,patient.FName,procedurelog.IsCpoe,procedurelog.DateEntryC,'' as LoincCode "
 						+"FROM procedurelog "
 						+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
 						+"LEFT JOIN patient ON procedurelog.PatNum=patient.PatNum "
 						+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 						+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
-						+"AND procedurelog.DateEntryC BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
+						+"AND procedurelog.DateEntryC BETWEEN "+dateStartStr+" AND "+POut.Date(dateEnd);
+					}
 					tableRaw=Db.GetTable(command);
 					break;
 				#endregion
@@ -3744,15 +3755,26 @@ namespace OpenDentBusiness{
 						+" INNER JOIN loinc on ehrlab.UsiID=loinc.LoincCode"
 						+" AND loinc.ClassType LIKE '%rad%'";
 					countRadOrders=PIn.Int(Db.GetScalar(command));
-					//As of v15.4 we started storing radiology orders at the procedure level.
-					//Add all the procedure radiology orders to the count of radiology lab orders above.
-					command="SELECT COUNT(*) AS 'Count' "
-					+"FROM procedurelog "
-						+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
-						+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
-						+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
-						+"AND procedurelog.DateEntryC BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
-					countRadOrders+=PIn.Int(Db.GetCount(command));
+					DateTime dateStartRad154=PrefC.GetDate(PrefName.RadiologyDateStartedUsing154);
+					//Only count radiology orders via the procedurelog table if the date that the office updated to v15.4.1 is less than the end date.
+					if(dateStartRad154 < dateEnd.Date) {
+						string dateStartStr=POut.Date(dateStart);
+						//We need to use a start date of whichever date is greater, dateStart or the date the the office updated to v15.4.1.
+						if(dateStartRad154 > dateStart) {
+							//The date that the office updated past 15.4.1 is greater than the reporting period's start date.
+							//Use the preference date instead so that the office isn't penalized for radiology orders prior to updating past v15.4.1.
+							dateStartStr=POut.Date(dateStartRad154);
+						}
+						//As of v15.4 we started storing radiology orders at the procedure level.
+						//Add all the procedure radiology orders to the count of radiology lab orders above.
+						command="SELECT COUNT(*) AS 'Count' "
+							+"FROM procedurelog "
+							+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
+							+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+							+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
+							+"AND procedurelog.DateEntryC BETWEEN "+dateStartStr+" AND "+POut.Date(dateEnd);
+						countRadOrders+=PIn.Int(Db.GetCount(command));
+					}
 					return countRadOrders;
 				#endregion
 				#region Rx
@@ -4069,7 +4091,7 @@ namespace OpenDentBusiness{
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				ehrLabList=EhrLabs.GetAllForPat(pat.PatNum);
 			}
-			List<Procedure> listRadProcs=Procedures.GetProcsRadiologyForPat(pat.PatNum);
+			List<Procedure> listRadCpoeProcs=Procedures.GetProcsRadiologyCpoeForPat(pat.PatNum);
 			List<EhrMeasureEvent> listMeasureEvents=EhrMeasureEvents.Refresh(pat.PatNum);
 			List<RefAttach> listRefAttach=RefAttaches.Refresh(pat.PatNum);
 			for(int i=0;i<retVal.Count;i++) {
@@ -4230,9 +4252,9 @@ namespace OpenDentBusiness{
 						}
 						//As of v15.4 we started storing radiology orders at the procedure level.
 						//Go through all completed radiology procedures for the denominator and only count ones that are flagged as IsCpoe in the numerator.
-						for(int m=0;m<listRadProcs.Count;m++) {
+						for(int m=0;m<listRadCpoeProcs.Count;m++) {
 							radOrderCount++;
-							if(listRadProcs[m].IsCpoe) {
+							if(listRadCpoeProcs[m].IsCpoe) {
 								radOrderCpoeCount++;
 							}
 						}

@@ -367,10 +367,12 @@ namespace OpenDentBusiness {
 
 		///<summary>Gets a list of TP or C procedures starting a year into the past that are flagged as IsRadiology and IsCpoe for the specified patient.
 		///Primarily used for showing patient specific MU data in the EHR dashboard.</summary>
-		public static List<Procedure> GetProcsRadiologyForPat(long patNum) {
+		public static List<Procedure> GetProcsRadiologyCpoeForPat(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),patNum);
 			}
+			//Since this is used for the dashboard and not directly used in any reporting calculations, we do not need to worry about the date that the
+			// office updated past v15.4.1.
 			DateTime dateStart=new DateTime(DateTime.Now.Year,1,1);//January first of this year.
 			DateTime dateEnd=dateStart.AddYears(1).AddDays(-1);//Last day in December of this year.
 			string command="SELECT procedurelog.* "
