@@ -226,6 +226,7 @@ namespace OpenDental {
 			_errorProv.BlinkStyle=ErrorBlinkStyle.NeverBlink;
 			SetRequiredFields();
 			_isLoad=false;
+			Plugins.HookAddCode(this,"FormPatientAddAll.FormPatientAddAll_Load_end");
 		}
 
 		private void FormPatientAddAll_Shown(object sender,EventArgs e) {
@@ -1730,6 +1731,9 @@ namespace OpenDental {
 		#endregion InsPlanPick
 
 		private void butOK_Click(object sender,EventArgs e) {
+			if(Plugins.HookMethod(this,"FormPatientAddAll.butOK_Click_start")) {
+				return;
+			}
 			#region Validation		
 			if(  textBirthdate1.errorProvider1.GetError(textBirthdate1)!=""
 				|| textBirthdate2.errorProvider1.GetError(textBirthdate2)!=""
