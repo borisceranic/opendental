@@ -3571,6 +3571,7 @@ namespace OpenDental{
 #endif
 				}
 			}
+			Plugins.HookAddCode(this,"FormPatientEdit.butOK_Click_end",PatCur);
 			DialogResult=DialogResult.OK;
 		}
 
