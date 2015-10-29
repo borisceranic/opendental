@@ -1898,11 +1898,15 @@ FROM insplan";
 				"ehrquarterlykey.PatNum",
 				"ehrsummaryccd.PatNum",
 				"emailmessage.PatNum",
+				"emailmessage.PatNumSubj",
 				"encounter.PatNum",
 				"erxlog.PatNum",
 				"etrans.PatNum",
 				"familyhealth.PatNum",
+				//formpat.FormPatNum IS NOT a PatNum so it is should not be merged.  It is the primary key.
 				"formpat.PatNum",
+				"guardian.PatNumChild",  //This may create duplicate entries for a single patient and guardian
+				"guardian.PatNumGuardian",  //This may create duplicate entries for a single patient and guardian
 				"hl7msg.PatNum",
 				"inssub.Subscriber",
 				"installmentplan.PatNum",
@@ -1910,12 +1914,17 @@ FROM insplan";
 				"labcase.PatNum",
 				"labpanel.PatNum",
 				"medicalorder.PatNum",
+				//medicationpat.MedicationPatNum IS NOT a PatNum so it is should not be merged.  It is the primary key.
 				"medicationpat.PatNum",
 				"medlab.PatNum",
 				"mount.PatNum",
 				"orthochart.PatNum",
+				//"oidexternal.IDInternal",  //TODO:  Deal with these elegantly below, not always a patnum
 				//"patfield.PatNum", //Taken care of below
 				"patient.ResponsParty",
+				//"patient.PatNum"  //We do not want to change patnum
+				//"patient.Guarnator"  //This is taken care of below
+				"patient.SuperFamily",  //The patfrom guarantor was changed, so this should be updated
 				//"patientnote.PatNum"	//The patientnote table is ignored because only one record can exist for each patient.  The record in 'patFrom' remains so it can be accessed again if needed.
 				//"patientrace.PatNum", //The patientrace table is ignored because we don't want duplicate races.  We could merge them but we would have to add specific code to stop duplicate races being inserted.
 				"patplan.PatNum",
@@ -1933,8 +1942,10 @@ FROM insplan";
 				"procedurelog.PatNum",
 				"procnote.PatNum",
 				"proctp.PatNum",
+				"providererx.PatNum",  //For non-HQ this should always be 0.
+				//question.FormPatNum IS NOT a PatNum so it is should not be merged.  It is a FKey to FormPat.FormPatNum
 				"question.PatNum",
-				"recall.PatNum",
+				//"recall.PatNum",  //We do not merge recall entries because it would cause duplicate recall entries.  Instead, update current recall entries.
 				"refattach.PatNum",
 				//"referral.PatNum",  //This is synched with the new information below.
 				"registrationkey.PatNum",
@@ -1943,17 +1954,21 @@ FROM insplan";
 				"reseller.PatNum",
 				"rxpat.PatNum",
 				"screenpat.PatNum",
+				//screenpat.ScreenPatNum IS NOT a PatNum so it is should not be merged.  It is a primary key.
 				"securitylog.PatNum",
 				"sheet.PatNum",
+				"smsfrommobile.PatNum",
+				"smstomobile.PatNum",
 				"statement.PatNum",
 				//task.KeyNum,  //Taken care of in a seperate step, because it is not always a patnum.
+				//taskhist.KeyNum,  //Taken care of in a seperate step, because it is not always a patnum.
 				"terminalactive.PatNum",
 				"toothinitial.PatNum",
 				"treatplan.PatNum",
 				"treatplan.ResponsParty",
+				//vaccineobs.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the FK to the vaccinepat.VaccinePatNum.
 				"vaccinepat.PatNum",
 				//vaccinepat.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the primary key.
-				//vaccineobs.VaccinePatNum IS NOT a PatNum so it is should not be merged. It is the FK to the vaccinepat.VaccinePatNum.
 				"vitalsign.PatNum",
 				"xchargetransaction.PatNum"
 			};
@@ -2083,6 +2098,18 @@ FROM insplan";
 				+"SET KeyNum="+POut.Long(patTo)+" "
 				+"WHERE KeyNum="+POut.Long(patFrom)+" AND ObjectType="+((int)TaskObjectType.Patient);
 			Db.NonQ(command);
+			//We have to move over the tasks belonging to the 'patFrom' patient in a seperate step because the KeyNum field of the taskhist table might be 
+			//  a foreign key to something other than a patnum, including possibly an appointment number.
+			command="UPDATE taskhist "
+				+"SET KeyNum="+POut.Long(patTo)+" "
+				+"WHERE KeyNum="+POut.Long(patFrom)+" AND ObjectType="+((int)TaskObjectType.Patient);
+			Db.NonQ(command);
+			//We have to move over the tasks belonging to the 'patFrom' patient in a seperate step because the IDInternal field of the oidexternal table 
+			//  might be a foreign key to something other than a patnum depending on the IDType
+			command="UPDATE oidexternal "
+				+"SET IDInternal="+POut.Long(patTo)+" "
+				+"WHERE IDInternal="+POut.Long(patFrom)+" AND IDType='"+(IdentifierType.Patient.ToString())+"'";
+			Db.NonQ(command);
 			//Mark the patient where data was pulled from as archived unless the patient is already marked as deceased.
 			//We need to have the patient marked either archived or deceased so that it is hidden by default, and
 			//we also need the customer to be able to access the account again in case a particular table gets missed
@@ -2115,6 +2142,7 @@ FROM insplan";
 					break;
 				}
 			}
+			Recalls.Synch(patTo);  //Update patient's recalls now that merge is completed.
 			#endregion
 			return true;
 		}
