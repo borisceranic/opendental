@@ -382,6 +382,33 @@ namespace OpenDental.ReportingComplex
 			int yLimit=paperSize.Height-currentMargins.Bottom;//the largest yPos allowed
 			//Now calculate and layout each section in sequence.
 			Section section;
+			//Technically the ReportFooter should only be subtracted from the printableHeight of the last page, but we have no way to know how many pages
+			//the report will end up taking so we will subtract it from the printable height of all pages.
+			//Used to determine the max height of a single grid cell.
+			int maxGridCellHeight=printableHeight-_myReport.GetSectionHeight(AreaSectionType.PageHeader)
+				-_myReport.GetSectionHeight(AreaSectionType.GroupFooter)-_myReport.GetSectionHeight(AreaSectionType.GroupTitle)
+				-_myReport.GetSectionHeight(AreaSectionType.GroupHeader)-_myReport.GetSectionHeight(AreaSectionType.ReportFooter);
+			if(_pagesPrinted==0) {
+				maxGridCellHeight-=_myReport.GetSectionHeight(AreaSectionType.ReportHeader);
+			}
+			foreach(ReportObject reportObject in _myReport.ReportObjects) {
+				if(reportObject.ObjectType!=ReportObjectType.QueryObject) {
+					continue;
+				}
+				QueryObject queryObject=(QueryObject)reportObject;
+				for(int i=0;i<queryObject.RowHeightValues.Count;i++) {
+					queryObject.RowHeightValues[i]=Math.Min(queryObject.RowHeightValues[i],maxGridCellHeight);
+				}
+				foreach(ReportObject rObject in queryObject.ReportObjects) {
+					if(rObject.SectionType!=AreaSectionType.Detail && rObject.SectionType!=AreaSectionType.GroupFooter) {
+						rObject.ContentAlignment=ContentAlignment.TopCenter;
+						continue;
+					}
+					if(rObject.ObjectType==ReportObjectType.FieldObject && rObject.FieldValueType==FieldValueType.Number) {
+						rObject.ContentAlignment=ContentAlignment.TopRight;
+					}
+				}
+			}
 			while(true){//will break out if no more room on page
 				//if no sections have been printed yet, print a report header.
 				if(_lastSectionPrinted==AreaSectionType.None) {
@@ -527,7 +554,7 @@ namespace OpenDental.ReportingComplex
 					displayText="";
 					if(fieldObject.FieldDefKind==FieldDefKind.SummaryField) {
 						//displayText=fieldObject.GetSummaryValue
-						//	(MyReport.ReportTables,MyReport.DataFields.IndexOf
+						//	(_myReport.ReportTables,_myReport.DataFields.IndexOf
 						//	(fieldObject.SummarizedField))
 						//	.ToString(fieldObject.FormatString);
 					}

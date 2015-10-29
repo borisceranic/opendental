@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
-using System.Data;
 using OpenDentBusiness;
-using System.IO;
 
 namespace OpenDental.ReportingComplex {
 
@@ -582,10 +578,10 @@ namespace OpenDental.ReportingComplex {
 			Font fontFooter=new Font(font.FontFamily,font.Size,FontStyle.Bold);
 			ContentAlignment textAlign;
 			if(fieldValueType==FieldValueType.Number) {
-				textAlign=ContentAlignment.MiddleRight;
+				textAlign=ContentAlignment.TopRight;
 			}
 			else {
-				textAlign=ContentAlignment.MiddleLeft;
+				textAlign=ContentAlignment.TopLeft;
 			}
 			string formatString="";
 			if(fieldValueType==FieldValueType.Number) {
@@ -905,7 +901,8 @@ namespace OpenDental.ReportingComplex {
 						List<string> listString=GetDisplayString(rawText,prevDisplayText,reportObject,i);
 						displayText=listString[0];
 						prevDisplayText=listString[1];
-						int curCellHeight=(int)(g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height;
+						int curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),
+							ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
 						if(curCellHeight>rowHeight) {
 							rowHeight=curCellHeight;
 						}
