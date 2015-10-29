@@ -1196,7 +1196,7 @@ namespace OpenDentBusiness {
 				+"(SELECT COUNT(*) FROM procedurelog WHERE procedurelog.PlannedAptNum=plannedappt.AptNum AND procedurelog.ProcStatus=2) someAreComplete, "
 				+"appointment.AptNum AS schedAptNum "
 				+"FROM plannedappt "
-				+"LEFT JOIN appointment ON appointment.NextAptNum=plannedappt.AptNum "
+				+"LEFT JOIN appointment ON appointment.NextAptNum=plannedappt.AptNum AND appointment.NextAptNum!=0 "
 				//+"LEFT JOIN procedurelog ON procedurelog.PlannedAptNum=plannedappt.AptNum "//grab all attached completed procs
 				//+"AND procedurelog.ProcStatus=2 "
 				+"WHERE plannedappt.PatNum="+POut.Long(patNum)+" ";
