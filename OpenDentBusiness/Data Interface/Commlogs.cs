@@ -81,13 +81,15 @@ namespace OpenDentBusiness{
 		///<summary>Used when printing or emailing recall to make a commlog entry without any display.</summary>
 		public static void InsertForRecall(long patNum,CommItemMode _mode,int numberOfReminders,long defNumNewStatus) {
 			//No need to check RemotingRole; no call to db.
-			InsertForRecall(patNum,_mode,numberOfReminders,defNumNewStatus,false,Security.CurUser.UserNum);//Recall commlog not associated to the Web Sched app.
+			InsertForRecall(patNum,_mode,numberOfReminders,defNumNewStatus,CommItemSource.User,Security.CurUser.UserNum);//Recall commlog not associated to the Web Sched app.
 		}
 
-		///<summary>Used when printing or emailing recall to make a commlog entry without any display.  Only set isWebSched to true if this is a commlog associated to the GWT Web Sched app.</summary>
-		public static void InsertForRecall(long patNum,CommItemMode _mode,int numberOfReminders,long defNumNewStatus,bool isWebSched,long userNum) {
+		///<summary>Used when printing or emailing recall to make a commlog entry without any display.  
+		///Set commSource to the corresponding entity that is making this recall.  E.g. Web Sched.
+		///If the commSource is a 3rd party, set it to ProgramLink and make an overload that accepts the ProgramNum.</summary>
+		public static void InsertForRecall(long patNum,CommItemMode _mode,int numberOfReminders,long defNumNewStatus,CommItemSource commSource,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,_mode,numberOfReminders,defNumNewStatus,isWebSched,userNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,_mode,numberOfReminders,defNumNewStatus,commSource,userNum);
 				return;
 			}
 			long recallType=Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL);
@@ -132,7 +134,7 @@ namespace OpenDentBusiness{
 				com.Note+="  "+DefC.GetName(DefCat.RecallUnschedStatus,defNumNewStatus);
 			}
 			com.UserNum=userNum;
-			com.IsWebSched=isWebSched;
+			com.CommSource=commSource;
 			Insert(com);
 			EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
 			newMeasureEvent.DateTEvent=com.CommDateTime;

@@ -58,7 +58,8 @@ namespace OpenDentBusiness.Crud{
 				commlog.SigIsTopaz    = PIn.Bool  (row["SigIsTopaz"].ToString());
 				commlog.DateTStamp    = PIn.DateT (row["DateTStamp"].ToString());
 				commlog.DateTimeEnd   = PIn.DateT (row["DateTimeEnd"].ToString());
-				commlog.IsWebSched    = PIn.Bool  (row["IsWebSched"].ToString());
+				commlog.CommSource        = (OpenDentBusiness.CommItemSource)PIn.Int(row["Source"].ToString());
+				commlog.ProgramNum    = PIn.Long  (row["ProgramNum"].ToString());
 				retVal.Add(commlog);
 			}
 			return retVal;
@@ -99,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CommlogNum,";
 			}
-			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,IsWebSched) VALUES(";
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,Source,ProgramNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(commlog.CommlogNum)+",";
 			}
@@ -115,7 +116,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (commlog.SigIsTopaz)+","
 				//DateTStamp can only be set by MySQL
 				+    POut.DateT (commlog.DateTimeEnd)+","
-				+    POut.Bool  (commlog.IsWebSched)+")";
+				+    POut.Int   ((int)commlog.CommSource)+","
+				+    POut.Long  (commlog.ProgramNum)+")";
 			if(commlog.Note==null) {
 				commlog.Note="";
 			}
@@ -152,7 +154,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CommlogNum,";
 			}
-			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,IsWebSched) VALUES(";
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,Source,ProgramNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(commlog.CommlogNum)+",";
 			}
@@ -168,7 +170,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (commlog.SigIsTopaz)+","
 				//DateTStamp can only be set by MySQL
 				+    POut.DateT (commlog.DateTimeEnd)+","
-				+    POut.Bool  (commlog.IsWebSched)+")";
+				+    POut.Int   ((int)commlog.CommSource)+","
+				+    POut.Long  (commlog.ProgramNum)+")";
 			if(commlog.Note==null) {
 				commlog.Note="";
 			}
@@ -196,7 +199,8 @@ namespace OpenDentBusiness.Crud{
 				+"SigIsTopaz    =  "+POut.Bool  (commlog.SigIsTopaz)+", "
 				//DateTStamp can only be set by MySQL
 				+"DateTimeEnd   =  "+POut.DateT (commlog.DateTimeEnd)+", "
-				+"IsWebSched    =  "+POut.Bool  (commlog.IsWebSched)+" "
+				+"Source        =  "+POut.Int   ((int)commlog.CommSource)+", "
+				+"ProgramNum    =  "+POut.Long  (commlog.ProgramNum)+" "
 				+"WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
 			if(commlog.Note==null) {
 				commlog.Note="";
@@ -249,9 +253,13 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DateTimeEnd = "+POut.DateT(commlog.DateTimeEnd)+"";
 			}
-			if(commlog.IsWebSched != oldCommlog.IsWebSched) {
+			if(commlog.CommSource != oldCommlog.CommSource) {
 				if(command!=""){ command+=",";}
-				command+="IsWebSched = "+POut.Bool(commlog.IsWebSched)+"";
+				command+="Source = "+POut.Int   ((int)commlog.CommSource)+"";
+			}
+			if(commlog.ProgramNum != oldCommlog.ProgramNum) {
+				if(command!=""){ command+=",";}
+				command+="ProgramNum = "+POut.Long(commlog.ProgramNum)+"";
 			}
 			if(command==""){
 				return false;

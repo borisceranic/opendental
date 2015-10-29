@@ -132,11 +132,14 @@ namespace OpenDental.Bridges {
 				}
 				commText+=phoneNumbersTried;
 			}
+			long programNum=Programs.GetProgramNum(ProgramName.Podium);
 			Commlog commlogCur=new Commlog();
 			commlogCur.CommDateTime=DateTime.Now;
 			commlogCur.DateTimeEnd=DateTime.Now;
 			commlogCur.PatNum=pat.PatNum;
 			commlogCur.UserNum=0;//run from server, no valid CurUser
+			commlogCur.CommSource=CommItemSource.ProgramLink;
+			commlogCur.ProgramNum=programNum;
 			commlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC);
 			commlogCur.Note=commText;
 			Commlogs.Insert(commlogCur);

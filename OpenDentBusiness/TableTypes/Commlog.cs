@@ -37,8 +37,10 @@ namespace OpenDentBusiness{
 		///<summary>Date and time when commlog ended.  Mainly for internal use.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeEnd;
-		///<summary>True if commlog was created on behalf of the Web Sched app.  Mainly used for reporting metrics.</summary>
-		public bool IsWebSched;
+		///<summary>Enum:CommItemSource Set to the source of the entity that created this commlog.  E.g. WebSched.</summary>
+		public CommItemSource CommSource;
+		///<summary>FK to program.ProgramNum.  This will be 0 unless CommSource is set to ProgramLink.</summary>
+		public long ProgramNum;
 
 		///<summary></summary>
 		public Commlog Copy(){
@@ -73,6 +75,15 @@ namespace OpenDentBusiness{
 		Received
 	}
 
+	///<summary>0=neither, 1=sent, 2=received.</summary>
+	public enum CommItemSource {
+		///<summary>0</summary>
+		User,
+		///<summary>1</summary>
+		WebSched,
+		///<summary>2</summary>
+		ProgramLink
+	}
 
 
 

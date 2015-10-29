@@ -10927,6 +10927,32 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//Change IsWebSched column to "Source" to allow use of enums.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE commlog CHANGE IsWebSched CommSource tinyint";//Source is a keyword in MySQL
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="RENAME COLUMN commlog.IsWebSched TO CommSource";//Source is a keyword in MySQL
+					Db.NonQ(command);
+				}
+				//Add a FK to the program table which will be used in conjunction with the above enum (CommSource)
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE commlog ADD ProgramNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE commlog ADD INDEX (ProgramNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE commlog ADD ProgramNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE commlog SET ProgramNum = 0 WHERE ProgramNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE commlog MODIFY ProgramNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX commlog_ProgramNum ON commlog (ProgramNum)";
+					Db.NonQ(command);
+				}
 				
 
 
