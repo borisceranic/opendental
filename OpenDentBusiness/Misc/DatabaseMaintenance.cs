@@ -3615,6 +3615,29 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string PlannedApptsWithInvalidAptNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command=@"SELECT COUNT(*) FROM plannedappt WHERE AptNum=0";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Planned appointments found with invalid AptNum")+": "+numFound+"\r\n";
+				}
+			}
+			else {
+				command=@"DELETE FROM plannedappt WHERE AptNum=0";
+				long numberFixed=Db.NonQ(command);
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Planned appointments deleted due to invalid AptNum")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string PreferenceAllergiesIndicateNone(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
