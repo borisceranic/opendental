@@ -1897,7 +1897,7 @@ FROM insplan";
 				"procnote.PatNum",
 				"proctp.PatNum",
 				"question.PatNum",
-				"recall.PatNum",
+				//"recall.PatNum",  //We do not merge recall entries because it would cause duplicate recall entries.  Instead, update current recall entries.
 				"refattach.PatNum",
 				//"referral.PatNum",  //This is synched with the new information below.
 				"registrationkey.PatNum",
@@ -2078,6 +2078,7 @@ FROM insplan";
 					break;
 				}
 			}
+			Recalls.Synch(patTo);  //Update patient's recalls now that merge is completed.
 			#endregion
 			return true;
 		}
