@@ -339,13 +339,16 @@ namespace OpenDentBusiness{
 				return Meth.GetDouble(MethodBase.GetCurrentMethod(),clinicNum);
 			}
 			double limit=0;
-			if(PrefC.GetBool(PrefName.EasyNoClinics) && PrefC.GetDate(PrefName.SmsContractDate).Year>1880){
+			if(PrefC.GetBool(PrefName.EasyNoClinics) && PrefC.GetDate(PrefName.SmsContractDate).Year>1880) {
 				limit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
 			}
-			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880){
-				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;	
+			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880) {
+				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;
 			}
-			string command="SELECT SUM(MsgChargeUSD) FROM smstomobile WHERE ClinicNum="+POut.Long(clinicNum);
+			DateTime dtStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
+			DateTime dtEnd=dtStart.AddMonths(1);
+			string command="SELECT SUM(MsgChargeUSD) FROM smstomobile WHERE ClinicNum="+POut.Long(clinicNum)+" "
+				+"AND DateTimeSent>="+POut.Date(dtStart)+" AND DateTimeSent<"+POut.Date(dtEnd);
 			limit-=PIn.Double(Db.GetScalar(command));
 			return limit;
 		}
