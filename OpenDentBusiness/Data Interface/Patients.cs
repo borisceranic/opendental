@@ -1864,7 +1864,7 @@ FROM insplan";
 			return true;
 		}
 
-		///<summary>Updated 05/09/2014 v14.2.  To prevent orphaned patients, if patFrom is a guarantor then all family members of patFrom are moved into the family patTo belongs to, and then the merge of the two specified accounts is performed.  Returns false if the merge was canceled by the user.</summary>
+		///<summary>Updated 10/29/2015 v15.4.  To prevent orphaned patients, if patFrom is a guarantor then all family members of patFrom are moved into the family patTo belongs to, and then the merge of the two specified accounts is performed.  Returns false if the merge was canceled by the user.</summary>
 		public static bool MergeTwoPatients(long patTo,long patFrom){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),patTo,patFrom);
@@ -1923,7 +1923,7 @@ FROM insplan";
 				//"patfield.PatNum", //Taken care of below
 				"patient.ResponsParty",
 				//"patient.PatNum"  //We do not want to change patnum
-				//"patient.Guarnator"  //This is taken care of below
+				//"patient.Guarantor"  //This is taken care of below
 				"patient.SuperFamily",  //The patfrom guarantor was changed, so this should be updated
 				//"patientnote.PatNum"	//The patientnote table is ignored because only one record can exist for each patient.  The record in 'patFrom' remains so it can be accessed again if needed.
 				//"patientrace.PatNum", //The patientrace table is ignored because we don't want duplicate races.  We could merge them but we would have to add specific code to stop duplicate races being inserted.
