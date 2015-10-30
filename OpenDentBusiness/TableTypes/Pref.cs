@@ -77,6 +77,10 @@ namespace OpenDentBusiness {
 		AtoZfolderNotRequired,
 		///<summary>Normally 1.  If this is set to 0, then that means images are being stored in the database.  This used to be called AtoZfolderNotRequired, but that name was confusing.</summary>
 		AtoZfolderUsed,
+		///<summary>Used to determine the runtime of the threads that do automatic communication in the listener.  Stored as a DateTime.</summary>
+		AutomaticCommunicationTimeStart,
+		///<summary>Used to determine the runtime of the threads that do automatic communication in the listener.  Stored as a DateTime.</summary>
+		AutomaticCommunicationTimeEnd,
 		AutoResetTPEntryStatus,
 		BackupExcludeImageFolder,
 		BackupFromPath,

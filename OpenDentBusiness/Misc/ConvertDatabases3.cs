@@ -10953,6 +10953,22 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX commlog_ProgramNum ON commlog (ProgramNum)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticCommunicationTimeStart','01-01-0001 07:00:00')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticCommunicationTimeStart','01-01-0001 07:00:00')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticCommunicationTimeEnd','01-01-0001 20:00:00')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticCommunicationTimeEnd','01-01-0001 20:00:00')";
+					Db.NonQ(command);
+				}
 				//This index was added to greatly increase the speed of the select patient window when searching by chartnum
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE patient ADD INDEX (ChartNumber)";
@@ -10969,6 +10985,7 @@ namespace OpenDentBusiness {
 			}
 			//To15_4_1();
 		}
+
 
 
 	}
