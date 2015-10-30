@@ -10953,7 +10953,15 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX commlog_ProgramNum ON commlog (ProgramNum)";
 					Db.NonQ(command);
 				}
-				
+				//This index was added to greatly increase the speed of the select patient window when searching by chartnum
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patient ADD INDEX (ChartNumber)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command=@"CREATE INDEX patient_ChartNumber ON patient (ChartNumber)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

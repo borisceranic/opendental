@@ -222,12 +222,12 @@ namespace OpenDentBusiness{
 
 		///<summary>Only used for the Select Patient dialog.  Pass in a billing type of 0 for all billing types.</summary>
 		public static DataTable GetPtDataTable(bool limit,string lname,string fname,string phone,
-			string address,bool hideInactive,string city,string state,string ssn,string patnum,string chartnumber,
+			string address,bool hideInactive,string city,string state,string ssn,string patNumStr,string chartnumber,
 			long billingtype,bool guarOnly,bool showArchived,DateTime birthdate,
 			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums,List<long> explicitPatNums=null) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patnum,chartnumber,billingtype,
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patNumStr,chartnumber,billingtype,
 					guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums,explicitPatNums);
 			}
 			string billingsnippet=" ";
@@ -246,12 +246,12 @@ namespace OpenDentBusiness{
 					billingsnippet+=") ";
 				}
 			}*/
-			string phonedigits="";
-			for(int i=0;i<phone.Length;i++){
-				if(Regex.IsMatch(phone[i].ToString(),"[0-9]")){
-					phonedigits=phonedigits+phone[i];
-				}
-			}
+			string phonedigits=new string(phone.Where(x=>char.IsDigit(x)).ToArray());
+			//for(int i=0;i<phone.Length;i++){
+			//	if(Regex.IsMatch(phone[i].ToString(),"[0-9]")){
+			//		phonedigits=phonedigits+phone[i];
+			//	}
+			//}
 			string regexp="";
 			for(int i=0;i<phonedigits.Length;i++){
 				if(i!=0){
@@ -352,13 +352,27 @@ namespace OpenDentBusiness{
 						+"OR (SELECT REGEXP_INSTR(p.WirelessPhone,'"+POut.String(regexp)+"') FROM dual)<>0) ";
 				}
 			}
+			//Mathematical " LIKE '#%' " statement. Matches first part of patNumStr if possible. Much faster than a long cast to string followed by string compair
+			long patNum=0;
+			long.TryParse(patNumStr,out patNum);
+			if(patNum>0) {
+				command+="AND (patNumStr="+POut.Long(patNum)+" ";
+				for(int i=0;i<18-patNumStr.Length;i++) {
+					//Example, if user types 1234 this will add "OR patNumStr BETWEEN 12340000 AND 12349999 "
+					command+=string.Format("OR patNumStr BETWEEN {0} AND {1} ",patNum*Convert.ToInt64(Math.Pow(10,i)),patNum*Convert.ToInt64(Math.Pow(10,i))+Convert.ToInt64(Math.Pow(10,i))-1);
+				}
+				command+=")";
+			}
+			else if(patNumStr.Length>0){
+				command+="AND FALSE ";//impossible to match a patNumStr that did not parse into a long.
+			}
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+=
 					(address.Length>0?"AND patient.Address LIKE '%"+POut.String(address)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(city.Length>0?"AND patient.City LIKE '"+POut.String(city)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(state.Length>0?"AND patient.State LIKE '"+POut.String(state)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(ssn.Length>0?"AND patient.SSN LIKE '"+POut.String(ssn)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//LIKE is case insensitive in mysql.
+					//+(patNumStr.Length>0?"AND patient.PatNum LIKE '"+POut.String(patNumStr)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(chartnumber.Length>0?"AND patient.ChartNumber LIKE '"+POut.String(chartnumber)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(email.Length>0?"AND patient.Email LIKE '%"+POut.String(email)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(country.Length>0?"AND patient.Country LIKE '%"+POut.String(country)+"%' ":"")//LIKE is case insensitive in mysql.
@@ -370,7 +384,7 @@ namespace OpenDentBusiness{
 					+(city.Length>0?"AND LOWER(patient.City) LIKE '"+POut.String(city).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(state.Length>0?"AND LOWER(patient.State) LIKE '"+POut.String(state).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(ssn.Length>0?"AND LOWER(patient.SSN) LIKE '"+POut.String(ssn).ToLower()+"%' ":"")//In case an office uses this field for something else.
-					+(patnum.Length>0?"AND patient.PatNum LIKE '"+POut.String(patnum)+"%' ":"")//case matters in a like statement in oracle.
+					//+(patNumStr.Length>0?"AND patient.PatNum LIKE '"+POut.String(patNumStr)+"%' ":"")//case matters in a like statement in oracle.
 					+(chartnumber.Length>0?"AND LOWER(patient.ChartNumber) LIKE '"+POut.String(chartnumber).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(email.Length>0?"AND LOWER(patient.Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(country.Length>0?"AND LOWER(patient.Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"")//case matters in a like statement in oracle.
@@ -433,32 +447,30 @@ namespace OpenDentBusiness{
 					listPatNums.Add(table.Rows[i]["PatNum"].ToString());
 				}
 			}
-			command=@"SELECT appointment.PatNum,MIN(appointment.AptDateTime) AS NextVisit 
-				FROM appointment 
-				WHERE (appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)
-				+" OR appointment.AptStatus="+POut.Int((int)ApptStatus.ASAP)
-				+") AND appointment.AptDateTime>= "+DbHelper.Now();//query for next visits
-			if(listPatNums.Count>0) {
-				command+=" AND appointment.PatNum IN ("+string.Join(",",listPatNums)+")";
-			}
-			command+=" GROUP BY appointment.PatNum ";
-			DataTable nextAptTable=Db.GetTable(command); //get table from database.
 			Dictionary<string,string> dictNextApts=new Dictionary<string,string>();
-			for(int i=0;i<nextAptTable.Rows.Count;i++) { //put all of the results in a dictionary.
-				dictNextApts.Add(nextAptTable.Rows[i]["PatNum"].ToString(),nextAptTable.Rows[i]["NextVisit"].ToString()); //Key: PatNum, Value: NextVisit
-			}
-			command=@"SELECT appointment.PatNum,MAX(appointment.AptDateTime) AS LastVisit 
-				FROM appointment 
-				WHERE appointment.AptStatus="+POut.Int((int)ApptStatus.Complete)+@"
-				AND appointment.AptDateTime<= "+DbHelper.Now();//query for last visits
-			if(listPatNums.Count>0) {
-				command+=" AND appointment.PatNum IN ("+string.Join(",",listPatNums)+")";
-			}
-			command+=" GROUP BY appointment.PatNum ";
-			DataTable lastAptTable=Db.GetTable(command);//get table from database.
 			Dictionary<string,string> dictLastApts=new Dictionary<string,string>();
-			for(int i=0;i<lastAptTable.Rows.Count;i++) {//put into dictionary.
-				dictLastApts.Add(lastAptTable.Rows[i]["PatNum"].ToString(),lastAptTable.Rows[i]["LastVisit"].ToString()); //Key:PatNum, Value: LastVisit
+			if(listPatNums.Count>0) {
+				command=@"SELECT appointment.PatNum,MIN(appointment.AptDateTime) AS NextVisit 
+					FROM appointment 
+					WHERE (appointment.AptStatus="+POut.Int((int)ApptStatus.Scheduled)
+				  +" OR appointment.AptStatus="+POut.Int((int)ApptStatus.ASAP)
+				  +") AND appointment.AptDateTime>= "+DbHelper.Now() //query for next visits
+				  +" AND appointment.PatNum IN ("+string.Join(",",listPatNums)+")"
+				  +" GROUP BY appointment.PatNum ";
+				DataTable nextAptTable=Db.GetTable(command); //get table from database.
+				for(int i=0;i<nextAptTable.Rows.Count;i++) { //put all of the results in a dictionary.
+					dictNextApts.Add(nextAptTable.Rows[i]["PatNum"].ToString(),nextAptTable.Rows[i]["NextVisit"].ToString()); //Key: PatNum, Value: NextVisit
+				}
+				command=@"SELECT appointment.PatNum,MAX(appointment.AptDateTime) AS LastVisit 
+					FROM appointment 
+					WHERE appointment.AptStatus="+POut.Int((int)ApptStatus.Complete)
+					+" AND appointment.AptDateTime<= "+DbHelper.Now()
+					+" AND appointment.PatNum IN ("+string.Join(",",listPatNums)+")"
+					+" GROUP BY appointment.PatNum ";
+				DataTable lastAptTable=Db.GetTable(command); //get table from database.
+				for(int i=0;i<lastAptTable.Rows.Count;i++) { //put into dictionary.
+					dictLastApts.Add(lastAptTable.Rows[i]["PatNum"].ToString(),lastAptTable.Rows[i]["LastVisit"].ToString()); //Key:PatNum, Value: LastVisit
+				}
 			}
 			DataTable PtDataTable=table.Clone();//does not copy any data
 			PtDataTable.TableName="table";
@@ -476,16 +488,16 @@ namespace OpenDentBusiness{
 			//}
 			DataRow r;
 			DateTime date;
-			for(int i=0;i<table.Rows.Count;i++){
+			foreach(DataRow dRow in table.Rows){
 				r=PtDataTable.NewRow();
 				//PatNum,LName,FName,MiddleI,Preferred,Birthdate,SSN,HmPhone,WkPhone,Address,PatStatus"
 				//+",BillingType,ChartNumber,City,State
-				r["PatNum"]=table.Rows[i]["PatNum"].ToString();
-				r["LName"]=table.Rows[i]["LName"].ToString();
-				r["FName"]=table.Rows[i]["FName"].ToString();
-				r["MiddleI"]=table.Rows[i]["MiddleI"].ToString();
-				r["Preferred"]=table.Rows[i]["Preferred"].ToString();
-				date=PIn.Date(table.Rows[i]["Birthdate"].ToString());
+				r["PatNum"]=dRow["PatNum"].ToString();
+				r["LName"]=dRow["LName"].ToString();
+				r["FName"]=dRow["FName"].ToString();
+				r["MiddleI"]=dRow["MiddleI"].ToString();
+				r["Preferred"]=dRow["Preferred"].ToString();
+				date=PIn.Date(dRow["Birthdate"].ToString());
 				if(date.Year>1880){
 					r["age"]=DateToAge(date);
 					r["Birthdate"]=date.ToShortDateString();
@@ -494,36 +506,36 @@ namespace OpenDentBusiness{
 					r["age"]="";
 					r["Birthdate"]="";
 				}
-				r["SSN"]=table.Rows[i]["SSN"].ToString();
-				r["HmPhone"]=table.Rows[i]["HmPhone"].ToString();
-				r["WkPhone"]=table.Rows[i]["WkPhone"].ToString();
-				r["Address"]=table.Rows[i]["Address"].ToString();
-				r["PatStatus"]=((PatientStatus)PIn.Long(table.Rows[i]["PatStatus"].ToString())).ToString();
-				r["BillingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(table.Rows[i]["BillingType"].ToString()));
-				r["ChartNumber"]=table.Rows[i]["ChartNumber"].ToString();
-				r["City"]=table.Rows[i]["City"].ToString();
-				r["State"]=table.Rows[i]["State"].ToString();
-				r["PriProv"]=Providers.GetAbbr(PIn.Long(table.Rows[i]["PriProv"].ToString()));
-				r["site"]=Sites.GetDescription(PIn.Long(table.Rows[i]["SiteNum"].ToString()));
-				r["Email"]=table.Rows[i]["Email"].ToString();
-				r["Country"]=table.Rows[i]["Country"].ToString();
-				r["clinic"]=Clinics.GetDesc(PIn.Long(table.Rows[i]["ClinicNum"].ToString()));
+				r["SSN"]=dRow["SSN"].ToString();
+				r["HmPhone"]=dRow["HmPhone"].ToString();
+				r["WkPhone"]=dRow["WkPhone"].ToString();
+				r["Address"]=dRow["Address"].ToString();
+				r["PatStatus"]=((PatientStatus)PIn.Long(dRow["PatStatus"].ToString())).ToString();
+				r["BillingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(dRow["BillingType"].ToString()));
+				r["ChartNumber"]=dRow["ChartNumber"].ToString();
+				r["City"]=dRow["City"].ToString();
+				r["State"]=dRow["State"].ToString();
+				r["PriProv"]=Providers.GetAbbr(PIn.Long(dRow["PriProv"].ToString()));
+				r["site"]=Sites.GetDescription(PIn.Long(dRow["SiteNum"].ToString()));
+				r["Email"]=dRow["Email"].ToString();
+				r["Country"]=dRow["Country"].ToString();
+				r["clinic"]=Clinics.GetDesc(PIn.Long(dRow["ClinicNum"].ToString()));
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if for OD HQ
-					r["OtherPhone"]=table.Rows[i]["OtherPhone"].ToString();
-					r["RegKey"]=table.Rows[i]["RegKey"].ToString();
+					r["OtherPhone"]=dRow["OtherPhone"].ToString();
+					r["RegKey"]=dRow["RegKey"].ToString();
 				}
-				r["WirelessPhone"]=table.Rows[i]["WirelessPhone"].ToString();
-				r["SecProv"]=Providers.GetAbbr(PIn.Long(table.Rows[i]["SecProv"].ToString()));
+				r["WirelessPhone"]=dRow["WirelessPhone"].ToString();
+				r["SecProv"]=Providers.GetAbbr(PIn.Long(dRow["SecProv"].ToString()));
 				r["lastVisit"]="";
-				if(dictLastApts.ContainsKey(table.Rows[i]["PatNum"].ToString())) {
-					date=PIn.Date(dictLastApts[table.Rows[i]["PatNum"].ToString()]);
+				if(dictLastApts.ContainsKey(dRow["PatNum"].ToString())) {
+					date=PIn.Date(dictLastApts[dRow["PatNum"].ToString()]);
 					if(date.Year>1880) {//if the date is valid
 						r["lastVisit"]=date.ToShortDateString();
 					}
 				}
 				r["nextVisit"]="";
-				if(dictNextApts.ContainsKey(table.Rows[i]["PatNum"].ToString())) {
-					date=PIn.Date(dictNextApts[table.Rows[i]["PatNum"].ToString()]);
+				if(dictNextApts.ContainsKey(dRow["PatNum"].ToString())) {
+					date=PIn.Date(dictNextApts[dRow["PatNum"].ToString()]);
 					if(date.Year>1880) {//if the date is valid
 						r["nextVisit"]=date.ToShortDateString();
 					}

@@ -15,12 +15,13 @@ using OpenDental.Bridges;
 using OpenDentBusiness;
 using CodeBase;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace OpenDental{
 ///<summary>All this dialog does is set the patnum and it is up to the calling form to do an immediate refresh, or possibly just change the patnum back to what it was.  So the other patient fields must remain intact during all logic in this form, especially if SelectionModeOnly.</summary>
 	public class FormPatientSelect : System.Windows.Forms.Form{
 		private System.Windows.Forms.Label label1;
-		private System.ComponentModel.Container components = null;
+		private IContainer components;
 		private Patients Patients;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
@@ -88,6 +89,9 @@ namespace OpenDental{
 		private bool _isPreFillLoad=false;
 		///<summary>If set, initial patient list will be set to these patients.</summary>
 		public List<long> ExplicitPatNums;
+		private ODThread _fillGridThread=null;
+		private DateTime _dateTimeLastSearch;
+		private DateTime _dateTimeLastRequest;
 
 		///<summary></summary>
 		public FormPatientSelect():this(null) {
@@ -1124,149 +1128,197 @@ namespace OpenDental{
 			FillGrid(false);
 		}
 
-		private void OnDataEntered(){
-			//Do not call FillGrid unless _isPreFillLoad=false.  Since the first name and last name are pre-filled, the results should be minimal.
-			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) && !_isPreFillLoad) {
-				FillGrid(true);
+	private void OnDataEntered() {
+		//Do not call FillGrid unless _isPreFillLoad=false.  Since the first name and last name are pre-filled, the results should be minimal.
+		if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) && !_isPreFillLoad) {
+			FillGrid(true);
+		}
+	}
+
+	private void FillGrid(bool limit,List<long> explicitPatNums=null) {
+		_dateTimeLastRequest=DateTime.Now;
+		if(_fillGridThread!=null) {
+			return;
+		}
+		_dateTimeLastSearch=_dateTimeLastRequest;
+		long billingType=0;
+		if(comboBillingType.SelectedIndex!=0) {
+			billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
+		}
+		long siteNum=0;
+		if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
+			siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
+		}
+		DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
+		string clinicNums="";
+		if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+			if(comboClinic.SelectedIndex==0) {
+				for(int i=0;i<_listClinics.Count;i++) {
+					if(i>0) {
+						clinicNums+=",";
+					}
+					clinicNums+=_listClinics[i].ClinicNum;
+				}
+			}
+			else {
+				clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
 			}
 		}
-
-		private void FillGrid(bool limit,List<long> explicitPatNums=null){
-			long billingType=0;
-			if(comboBillingType.SelectedIndex!=0){
-				billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
-			}
-			long siteNum=0;
-			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
-				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
-			}
-			DateTime birthdate=PIn.Date(textBirthdate.Text);//this will frequently be minval.
-			string clinicNums="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)){
-				if(comboClinic.SelectedIndex==0) {
-					for(int i=0;i<_listClinics.Count;i++) {
-						if(i>0){
-							clinicNums+=",";
-						}
-						clinicNums+=_listClinics[i].ClinicNum;
-					}
-				}
-				else {
-					clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
-				}
-			}
+		_fillGridThread=new ODThread(new ODThread.WorkerDelegate((ODThread o) => {
 			PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
 				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 				checkGuarantors.Checked,checkShowArchived.Checked,
 				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
-			gridMain.BeginUpdate();
-			gridMain.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<PtDataTable.Rows.Count;i++){
-				row=new ODGridRow();
-				for(int f=0;f<fields.Count;f++) {
-					switch(fields[f].InternalName){
-						case "LastName":
-							row.Cells.Add(PtDataTable.Rows[i]["LName"].ToString());
-							break;
-						case "First Name":
-							row.Cells.Add(PtDataTable.Rows[i]["FName"].ToString());
-							break;
-						case "MI":
-							row.Cells.Add(PtDataTable.Rows[i]["MiddleI"].ToString());
-							break;
-						case "Pref Name":
-							row.Cells.Add(PtDataTable.Rows[i]["Preferred"].ToString());
-							break;
-						case "Age":
-							row.Cells.Add(PtDataTable.Rows[i]["age"].ToString());
-							break;
-						case "SSN":
-							row.Cells.Add(PtDataTable.Rows[i]["SSN"].ToString());
-							break;
-						case "Hm Phone":
-							row.Cells.Add(PtDataTable.Rows[i]["HmPhone"].ToString());
-							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-							}
-							break;
-						case "Wk Phone":
-							row.Cells.Add(PtDataTable.Rows[i]["WkPhone"].ToString());
-							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-							}
-							break;
-						case "PatNum":
-							row.Cells.Add(PtDataTable.Rows[i]["PatNum"].ToString());
-							break;
-						case "ChartNum":
-							row.Cells.Add(PtDataTable.Rows[i]["ChartNumber"].ToString());
-							break;
-						case "Address":
-							row.Cells.Add(PtDataTable.Rows[i]["Address"].ToString());
-							break;
-						case "Status":
-							row.Cells.Add(PtDataTable.Rows[i]["PatStatus"].ToString());
-							break;
-						case "Bill Type":
-							row.Cells.Add(PtDataTable.Rows[i]["BillingType"].ToString());
-							break;
-						case "City":
-							row.Cells.Add(PtDataTable.Rows[i]["City"].ToString());
-							break;
-						case "State":
-							row.Cells.Add(PtDataTable.Rows[i]["State"].ToString());
-							break;
-						case "Pri Prov":
-							row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
-							break;
-						case "Clinic":
-							row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
-							break;
-						case "Birthdate":
-							row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
-							break;
-						case "Site":
-							row.Cells.Add(PtDataTable.Rows[i]["site"].ToString());
-							break;
-						case "Email":
-							row.Cells.Add(PtDataTable.Rows[i]["Email"].ToString());
-							break;
-						case "Country":
-							row.Cells.Add(PtDataTable.Rows[i]["Country"].ToString());
-							break;
-						case "RegKey":
-							row.Cells.Add(PtDataTable.Rows[i]["RegKey"].ToString());
-							break;
-						case "OtherPhone"://will only be available if OD HQ
-							row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
-							break;
-						case "Wireless Ph":
-							row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
-							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-							}
-							break;
-						case "Sec Prov":
-							row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
-							break;
-						case "LastVisit":
-							row.Cells.Add(PtDataTable.Rows[i]["lastVisit"].ToString());
-							break;
-						case "NextVisit":
-							row.Cells.Add(PtDataTable.Rows[i]["nextVisit"].ToString());
-							break;
+		}));
+		_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((ODThread o) => {
+			_fillGridThread=null;
+			this.BeginInvoke((Action)(() => {
+				FillGridFinal(limit);
+			}));
+		}));
+		_fillGridThread.Start(true);
+	}
+
+	private void FillGridFinal(bool limit){
+		//long billingType=0;
+		//if(comboBillingType.SelectedIndex!=0) {
+		//	billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
+		//}
+		//long siteNum=0;
+		//if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
+		//	siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
+		//}
+		//DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
+		//string clinicNums="";
+		//if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+		//	if(comboClinic.SelectedIndex==0) {
+		//		for(int i=0;i<_listClinics.Count;i++) {
+		//			if(i>0) {
+		//				clinicNums+=",";
+		//			}
+		//			clinicNums+=_listClinics[i].ClinicNum;
+		//		}
+		//	}
+		//	else {
+		//		clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
+		//	}
+		//}
+		//	PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
+		//		textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
+		//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
+		//		checkGuarantors.Checked,checkShowArchived.Checked,
+		//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+				gridMain.BeginUpdate();
+				gridMain.Rows.Clear();
+				ODGridRow row;
+				for(int i=0;i<PtDataTable.Rows.Count;i++) {
+					row=new ODGridRow();
+					for(int f=0;f<fields.Count;f++) {
+						switch(fields[f].InternalName) {
+							case "LastName":
+								row.Cells.Add(PtDataTable.Rows[i]["LName"].ToString());
+								break;
+							case "First Name":
+								row.Cells.Add(PtDataTable.Rows[i]["FName"].ToString());
+								break;
+							case "MI":
+								row.Cells.Add(PtDataTable.Rows[i]["MiddleI"].ToString());
+								break;
+							case "Pref Name":
+								row.Cells.Add(PtDataTable.Rows[i]["Preferred"].ToString());
+								break;
+							case "Age":
+								row.Cells.Add(PtDataTable.Rows[i]["age"].ToString());
+								break;
+							case "SSN":
+								row.Cells.Add(PtDataTable.Rows[i]["SSN"].ToString());
+								break;
+							case "Hm Phone":
+								row.Cells.Add(PtDataTable.Rows[i]["HmPhone"].ToString());
+								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+								}
+								break;
+							case "Wk Phone":
+								row.Cells.Add(PtDataTable.Rows[i]["WkPhone"].ToString());
+								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+								}
+								break;
+							case "PatNum":
+								row.Cells.Add(PtDataTable.Rows[i]["PatNum"].ToString());
+								break;
+							case "ChartNum":
+								row.Cells.Add(PtDataTable.Rows[i]["ChartNumber"].ToString());
+								break;
+							case "Address":
+								row.Cells.Add(PtDataTable.Rows[i]["Address"].ToString());
+								break;
+							case "Status":
+								row.Cells.Add(PtDataTable.Rows[i]["PatStatus"].ToString());
+								break;
+							case "Bill Type":
+								row.Cells.Add(PtDataTable.Rows[i]["BillingType"].ToString());
+								break;
+							case "City":
+								row.Cells.Add(PtDataTable.Rows[i]["City"].ToString());
+								break;
+							case "State":
+								row.Cells.Add(PtDataTable.Rows[i]["State"].ToString());
+								break;
+							case "Pri Prov":
+								row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
+								break;
+							case "Clinic":
+								row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
+								break;
+							case "Birthdate":
+								row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
+								break;
+							case "Site":
+								row.Cells.Add(PtDataTable.Rows[i]["site"].ToString());
+								break;
+							case "Email":
+								row.Cells.Add(PtDataTable.Rows[i]["Email"].ToString());
+								break;
+							case "Country":
+								row.Cells.Add(PtDataTable.Rows[i]["Country"].ToString());
+								break;
+							case "RegKey":
+								row.Cells.Add(PtDataTable.Rows[i]["RegKey"].ToString());
+								break;
+							case "OtherPhone": //will only be available if OD HQ
+								row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
+								break;
+							case "Wireless Ph":
+								row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
+								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+								}
+								break;
+							case "Sec Prov":
+								row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
+								break;
+							case "LastVisit":
+								row.Cells.Add(PtDataTable.Rows[i]["lastVisit"].ToString());
+								break;
+							case "NextVisit":
+								row.Cells.Add(PtDataTable.Rows[i]["nextVisit"].ToString());
+								break;
+						}
 					}
+					gridMain.Rows.Add(row);
 				}
-				gridMain.Rows.Add(row);
-			}
-			gridMain.EndUpdate();
-			gridMain.SetSelected(0,true);
-		}
+				gridMain.EndUpdate();
+				gridMain.SetSelected(0,true);
+				if(_dateTimeLastSearch!=_dateTimeLastRequest) {
+					FillGrid(limit);//in case data was entered while thread was running.
+				}
+	}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PatSelected();
@@ -1404,6 +1456,9 @@ namespace OpenDental{
 		}
 
 		private void PatSelected(){
+			if(_fillGridThread!=null) {
+				return;//still filtering results (rarely happens)
+			}
 			//SelectedPatNum=PIn.PInt(PtDataTable.Rows[grid2.CurrentRowIndex][0].ToString());
 			SelectedPatNum=PIn.Long(PtDataTable.Rows[gridMain.GetSelectedIndex()][0].ToString());
 			DialogResult=DialogResult.OK;
