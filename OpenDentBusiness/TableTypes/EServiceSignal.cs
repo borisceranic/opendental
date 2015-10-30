@@ -60,6 +60,18 @@ namespace OpenDentBusiness {
 		///<summary>Runs 1 instance per customer on a given client PC.</summary>		
 		ListenerService=1,
 		///<summary>Runs 1 instance total on HQ server.</summary>		
-		IntegratedTexting=2
+		IntegratedTexting=2,
+		///<summary>Runs 1 instance total on HQ server.</summary>		
+		HQProxyService=3,
+		///<summary>EService WebApp.</summary>		
+		MobileWeb,
+		///<summary>EService WebApp.</summary>		
+		PatientPortal,
+		///<summary>EService WebApp.</summary>		
+		WebSched,
+		///<summary>EService WebApp.</summary>		
+		WebForms,
+		///<summary>EService WebApp.</summary>		
+		ResellerPortal
 	}
 }

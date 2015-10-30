@@ -1378,10 +1378,10 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OpenDentBusiness_OpenDentalServer_ServiceMain</CachedSettingsPropName>
     </WebReferenceUrl>
-    <WebReferenceUrl Include="http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx">
+    <WebReferenceUrl Include="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\WebServiceMainHQ\</RelPath>
-      <UpdateFromURL>http://www.patientviewer.com:49999/opendentalwebservicehq/webservicemainhq.asmx</UpdateFromURL>
+      <UpdateFromURL>http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

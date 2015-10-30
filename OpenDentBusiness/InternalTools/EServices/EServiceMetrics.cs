@@ -123,7 +123,7 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod());
 			}
-			//-- Returns 5 rows, each having a different ReasonCategory. Reason categories are defined by enum: OpenDentalWebCore.BroadcasterThreadDefs.
+			//Reason categories are defined by enums: BroadcasterThreadDefs AND ProxyThreadDef.
 			string command=@"
 				SELECT * FROM (
 				  SELECT 
@@ -132,7 +132,7 @@ namespace OpenDentBusiness {
 				  FROM eservicesignalhq e
 					WHERE
 					  e.RegistrationKeyNum=-1  -- HQ
-					  AND e.ServiceCode=2 -- IntegratedTexting
+					  AND (e.ServiceCode=2 OR e.ServiceCode=3) -- IntegratedTexting OR HQProxyService
 					  AND 
 					  (
 						e.ReasonCode=1004 -- Heartbeat
@@ -143,11 +143,7 @@ namespace OpenDentBusiness {
 				) a
 				GROUP BY a.ReasonCategory
 				ORDER BY a.SigDateTime DESC;";
-			List<EServiceSignal> signals=Crud.EServiceSignalCrud.SelectMany(command);
-			//Should be 5 heartbeats, 1 for each Broadcaster thread.
-			if(signals.Count<5) {
-				return false;
-			}
+			List<EServiceSignal> signals=Crud.EServiceSignalCrud.SelectMany(command);			
 			if(signals.Exists(x => x.Severity==eServiceSignalSeverity.Critical || DateTime.Now.Subtract(x.SigDateTime)>TimeSpan.FromMinutes(10))) {
 				return false;
 			}
