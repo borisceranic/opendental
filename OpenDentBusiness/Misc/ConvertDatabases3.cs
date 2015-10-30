@@ -11021,6 +11021,19 @@ namespace OpenDentBusiness {
 						+POut.Int((int)EbillAddress.PracticePhysical)+","+POut.Int((int)EbillAddress.PracticeBilling)+")";
 				}
 				Db.NonQ(command);
+				//Add new computerpref PatSelectSearchMode
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD PatSelectSearchMode tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD PatSelectSearchMode number(3)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET PatSelectSearchMode = 0 WHERE PatSelectSearchMode IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY PatSelectSearchMode NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

@@ -86,6 +86,8 @@ namespace OpenDental{
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkShowOpenTickets = new System.Windows.Forms.CheckBox();
 			this.groupBoxTaskDefaults = new System.Windows.Forms.GroupBox();
+			this.validNumY = new OpenDental.ValidNumber();
+			this.validNumX = new OpenDental.ValidNumber();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -99,8 +101,6 @@ namespace OpenDental{
 			this.checkRefresh = new System.Windows.Forms.CheckBox();
 			this.checkImeCompositionCompatibility = new System.Windows.Forms.CheckBox();
 			this.textInactiveSignal = new OpenDental.ValidNumber();
-			this.validNumY = new OpenDental.ValidNumber();
-			this.validNumX = new OpenDental.ValidNumber();
 			this.butLanguages = new OpenDental.UI.Button();
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
@@ -291,6 +291,30 @@ namespace OpenDental{
 			this.groupBoxTaskDefaults.TabStop = false;
 			this.groupBoxTaskDefaults.Text = "Local Computer Default Settings";
 			// 
+			// validNumY
+			// 
+			this.validNumY.Location = new System.Drawing.Point(235, 59);
+			this.validNumY.MaxLength = 4;
+			this.validNumY.MaxVal = 1200;
+			this.validNumY.MinVal = 300;
+			this.validNumY.Name = "validNumY";
+			this.validNumY.Size = new System.Drawing.Size(47, 20);
+			this.validNumY.TabIndex = 188;
+			this.validNumY.Text = "542";
+			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// validNumX
+			// 
+			this.validNumX.Location = new System.Drawing.Point(115, 59);
+			this.validNumX.MaxLength = 4;
+			this.validNumX.MaxVal = 2000;
+			this.validNumX.MinVal = 300;
+			this.validNumX.Name = "validNumX";
+			this.validNumX.Size = new System.Drawing.Size(47, 20);
+			this.validNumX.TabIndex = 186;
+			this.validNumX.Text = "542";
+			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
 			// label15
 			// 
 			this.label15.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -405,7 +429,7 @@ namespace OpenDental{
 			this.checkRefresh.Name = "checkRefresh";
 			this.checkRefresh.Size = new System.Drawing.Size(435, 18);
 			this.checkRefresh.TabIndex = 202;
-			this.checkRefresh.Text = "Refresh while typing in Select Patient window";
+			this.checkRefresh.Text = "New Computers default to refresh while typing in Select Patient window";
 			this.checkRefresh.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkRefresh.UseVisualStyleBackColor = true;
 			// 
@@ -429,30 +453,6 @@ namespace OpenDental{
 			this.textInactiveSignal.Size = new System.Drawing.Size(74, 20);
 			this.textInactiveSignal.TabIndex = 201;
 			this.textInactiveSignal.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// validNumY
-			// 
-			this.validNumY.Location = new System.Drawing.Point(235, 59);
-			this.validNumY.MaxLength = 4;
-			this.validNumY.MaxVal = 1200;
-			this.validNumY.MinVal = 300;
-			this.validNumY.Name = "validNumY";
-			this.validNumY.Size = new System.Drawing.Size(47, 20);
-			this.validNumY.TabIndex = 188;
-			this.validNumY.Text = "542";
-			this.validNumY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
-			// validNumX
-			// 
-			this.validNumX.Location = new System.Drawing.Point(115, 59);
-			this.validNumX.MaxLength = 4;
-			this.validNumX.MaxVal = 2000;
-			this.validNumX.MinVal = 300;
-			this.validNumX.Name = "validNumX";
-			this.validNumX.Size = new System.Drawing.Size(47, 20);
-			this.validNumX.TabIndex = 186;
-			this.validNumX.Text = "542";
-			this.validNumX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// butLanguages
 			// 

@@ -71,6 +71,7 @@ namespace OpenDentBusiness.Crud{
 				computerPref.ClinicNum              = PIn.Long  (row["ClinicNum"].ToString());
 				computerPref.ApptViewNum            = PIn.Long  (row["ApptViewNum"].ToString());
 				computerPref.RecentApptView         = PIn.Byte  (row["RecentApptView"].ToString());
+				computerPref.PatSelectSearchMode    = (OpenDentBusiness.SearchMode)PIn.Int(row["PatSelectSearchMode"].ToString());
 				retVal.Add(computerPref);
 			}
 			return retVal;
@@ -111,7 +112,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ComputerPrefNum,";
 			}
-			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView) VALUES(";
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(computerPref.ComputerPrefNum)+",";
 			}
@@ -139,7 +140,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (computerPref.ScanDocQuality)+","
 				+    POut.Long  (computerPref.ClinicNum)+","
 				+    POut.Long  (computerPref.ApptViewNum)+","
-				+    POut.Byte  (computerPref.RecentApptView)+")";
+				+    POut.Byte  (computerPref.RecentApptView)+","
+				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +174,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ComputerPrefNum,";
 			}
-			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView) VALUES(";
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(computerPref.ComputerPrefNum)+",";
 			}
@@ -200,7 +202,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (computerPref.ScanDocQuality)+","
 				+    POut.Long  (computerPref.ClinicNum)+","
 				+    POut.Long  (computerPref.ApptViewNum)+","
-				+    POut.Byte  (computerPref.RecentApptView)+")";
+				+    POut.Byte  (computerPref.RecentApptView)+","
+				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -236,7 +239,8 @@ namespace OpenDentBusiness.Crud{
 				+"ScanDocQuality         =  "+POut.Byte  (computerPref.ScanDocQuality)+", "
 				+"ClinicNum              =  "+POut.Long  (computerPref.ClinicNum)+", "
 				+"ApptViewNum            =  "+POut.Long  (computerPref.ApptViewNum)+", "
-				+"RecentApptView         =  "+POut.Byte  (computerPref.RecentApptView)+" "
+				+"RecentApptView         =  "+POut.Byte  (computerPref.RecentApptView)+", "
+				+"PatSelectSearchMode    =  "+POut.Int   ((int)computerPref.PatSelectSearchMode)+" "
 				+"WHERE ComputerPrefNum = "+POut.Long(computerPref.ComputerPrefNum);
 			Db.NonQ(command);
 		}
@@ -339,6 +343,10 @@ namespace OpenDentBusiness.Crud{
 			if(computerPref.RecentApptView != oldComputerPref.RecentApptView) {
 				if(command!=""){ command+=",";}
 				command+="RecentApptView = "+POut.Byte(computerPref.RecentApptView)+"";
+			}
+			if(computerPref.PatSelectSearchMode != oldComputerPref.PatSelectSearchMode) {
+				if(command!=""){ command+=",";}
+				command+="PatSelectSearchMode = "+POut.Int   ((int)computerPref.PatSelectSearchMode)+"";
 			}
 			if(command==""){
 				return false;

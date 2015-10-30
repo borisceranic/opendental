@@ -371,6 +371,7 @@ namespace OpenDentBusiness {
 		PatientPortalNotifySubject,
 		PatientPortalURL,
 		PatientSelectUseFNameForPreferred,
+		///<summary>Boolean. This is the default for new computers, otherwise it uses the computerpref PatSelectSearchMode.</summary>
 		PatientSelectUsesSearchButton,
 		///<summary>Boolean. True by default.  If false, the Payment window follows old "Split to family" behavior.</summary>
 		PaymentsPromptForAutoSplit,

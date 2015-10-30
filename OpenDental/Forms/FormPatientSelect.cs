@@ -67,6 +67,7 @@ namespace OpenDental{
 		private Label label2;
 		private ComboBox comboBillingType;
 		private OpenDental.UI.Button butGetAll;
+		private CheckBox checkRefresh;
 		private OpenDental.UI.Button butAddAll;
 		private ComboBox comboSite;
 		private Label labelSite;
@@ -92,7 +93,7 @@ namespace OpenDental{
 		private ODThread _fillGridThread=null;
 		private DateTime _dateTimeLastSearch;
 		private DateTime _dateTimeLastRequest;
-
+		private ComputerPref _computerPref;
 		///<summary></summary>
 		public FormPatientSelect():this(null) {
 		}
@@ -173,6 +174,7 @@ namespace OpenDental{
 			this.textFName = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.checkRefresh = new System.Windows.Forms.CheckBox();
 			this.butGetAll = new OpenDental.UI.Button();
 			this.butSearch = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
@@ -209,9 +211,9 @@ namespace OpenDental{
 			this.groupAddPt.Controls.Add(this.butAddPt);
 			this.groupAddPt.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupAddPt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.groupAddPt.Location = new System.Drawing.Point(674, 598);
+			this.groupAddPt.Location = new System.Drawing.Point(674, 607);
 			this.groupAddPt.Name = "groupAddPt";
-			this.groupAddPt.Size = new System.Drawing.Size(262, 55);
+			this.groupAddPt.Size = new System.Drawing.Size(262, 51);
 			this.groupAddPt.TabIndex = 1;
 			this.groupAddPt.TabStop = false;
 			this.groupAddPt.Text = "Add New Family:";
@@ -662,15 +664,26 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.checkRefresh);
 			this.groupBox1.Controls.Add(this.butGetAll);
 			this.groupBox1.Controls.Add(this.butSearch);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(674, 536);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(262, 56);
+			this.groupBox1.Size = new System.Drawing.Size(262, 70);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Search";
+			// 
+			// checkRefresh
+			// 
+			this.checkRefresh.Location = new System.Drawing.Point(11, 51);
+			this.checkRefresh.Name = "checkRefresh";
+			this.checkRefresh.Size = new System.Drawing.Size(245, 18);
+			this.checkRefresh.TabIndex = 72;
+			this.checkRefresh.Text = "Refresh while typing";
+			this.checkRefresh.UseVisualStyleBackColor = true;
+			this.checkRefresh.Click += new System.EventHandler(this.checkRefresh_Click);
 			// 
 			// butGetAll
 			// 
@@ -828,6 +841,7 @@ namespace OpenDental{
 					}
 				}
 			}
+			FillSearchOption();
 			SetGridCols();
 			if(ExplicitPatNums!=null && ExplicitPatNums.Count>0) {
 				FillGrid(false,ExplicitPatNums);
@@ -857,9 +871,26 @@ namespace OpenDental{
 				return;
 			}
 			//Always fillGrid if _isPreFilledLoad.  Since the first name and last name are pre-filled, the results should be minimal.
-			if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) || _isPreFillLoad) {
+			if(checkRefresh.Checked || _isPreFillLoad) {
 				FillGrid(true);
 				_isPreFillLoad=false;
+			}
+		}
+
+		///<summary>This used to be called all the time, now only needs to be called on load.</summary>
+		private void FillSearchOption() {
+			_computerPref=ComputerPrefs.LocalComputer;  //This is the computerprefs for this local computer.
+			switch(_computerPref.PatSelectSearchMode) {
+				case SearchMode.Default:
+					checkRefresh.Checked=PrefC.GetBool(PrefName.PatientSelectUsesSearchButton);//Use global preference
+					break;
+				case SearchMode.RefreshWhileTyping:
+					checkRefresh.Checked=true;
+					break;
+				case SearchMode.UseSearchButton:
+				default:
+					checkRefresh.Checked=false;
+					break;
 			}
 		}
 
@@ -1120,6 +1151,17 @@ namespace OpenDental{
 			}
 		}
 
+		private void checkRefresh_Click(object sender,EventArgs e) {
+			if(checkRefresh.Checked) {
+				_computerPref.PatSelectSearchMode=SearchMode.RefreshWhileTyping;
+				FillGrid(true);
+			}
+			else{
+				_computerPref.PatSelectSearchMode=SearchMode.UseSearchButton;
+			}
+			ComputerPrefs.Update(_computerPref);
+		}
+
 		private void butSearch_Click(object sender, System.EventArgs e) {
 			FillGrid(true);
 		}
@@ -1128,42 +1170,42 @@ namespace OpenDental{
 			FillGrid(false);
 		}
 
-	private void OnDataEntered() {
-		//Do not call FillGrid unless _isPreFillLoad=false.  Since the first name and last name are pre-filled, the results should be minimal.
-		if(!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton) && !_isPreFillLoad) {
-			FillGrid(true);
+		private void OnDataEntered() {
+			//Do not call FillGrid unless _isPreFillLoad=false.  Since the first name and last name are pre-filled, the results should be minimal.
+			if(checkRefresh.Checked && !_isPreFillLoad) {
+				FillGrid(true);
+			}
 		}
-	}
 
-	private void FillGrid(bool limit,List<long> explicitPatNums=null) {
+		private void FillGrid(bool limit,List<long> explicitPatNums=null) {
 		_dateTimeLastRequest=DateTime.Now;
 		if(_fillGridThread!=null) {
 			return;
 		}
 		_dateTimeLastSearch=_dateTimeLastRequest;
-		long billingType=0;
-		if(comboBillingType.SelectedIndex!=0) {
-			billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
-		}
-		long siteNum=0;
-		if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
-			siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
-		}
-		DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
-		string clinicNums="";
-		if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-			if(comboClinic.SelectedIndex==0) {
-				for(int i=0;i<_listClinics.Count;i++) {
-					if(i>0) {
-						clinicNums+=",";
+			long billingType=0;
+			if(comboBillingType.SelectedIndex!=0) {
+				billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
+			}
+			long siteNum=0;
+			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
+				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
+			}
+			DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
+			string clinicNums="";
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(comboClinic.SelectedIndex==0) {
+					for(int i=0;i<_listClinics.Count;i++) {
+						if(i>0) {
+							clinicNums+=",";
+						}
+						clinicNums+=_listClinics[i].ClinicNum;
 					}
-					clinicNums+=_listClinics[i].ClinicNum;
+				}
+				else {
+					clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
 				}
 			}
-			else {
-				clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
-			}
-		}
 		_fillGridThread=new ODThread(new ODThread.WorkerDelegate((ODThread o) => {
 			PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
 				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
@@ -1209,115 +1251,115 @@ namespace OpenDental{
 		//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 		//		checkGuarantors.Checked,checkShowArchived.Checked,
 		//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
-				gridMain.BeginUpdate();
-				gridMain.Rows.Clear();
-				ODGridRow row;
-				for(int i=0;i<PtDataTable.Rows.Count;i++) {
-					row=new ODGridRow();
-					for(int f=0;f<fields.Count;f++) {
-						switch(fields[f].InternalName) {
-							case "LastName":
-								row.Cells.Add(PtDataTable.Rows[i]["LName"].ToString());
-								break;
-							case "First Name":
-								row.Cells.Add(PtDataTable.Rows[i]["FName"].ToString());
-								break;
-							case "MI":
-								row.Cells.Add(PtDataTable.Rows[i]["MiddleI"].ToString());
-								break;
-							case "Pref Name":
-								row.Cells.Add(PtDataTable.Rows[i]["Preferred"].ToString());
-								break;
-							case "Age":
-								row.Cells.Add(PtDataTable.Rows[i]["age"].ToString());
-								break;
-							case "SSN":
-								row.Cells.Add(PtDataTable.Rows[i]["SSN"].ToString());
-								break;
-							case "Hm Phone":
-								row.Cells.Add(PtDataTable.Rows[i]["HmPhone"].ToString());
-								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-								}
-								break;
-							case "Wk Phone":
-								row.Cells.Add(PtDataTable.Rows[i]["WkPhone"].ToString());
-								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-								}
-								break;
-							case "PatNum":
-								row.Cells.Add(PtDataTable.Rows[i]["PatNum"].ToString());
-								break;
-							case "ChartNum":
-								row.Cells.Add(PtDataTable.Rows[i]["ChartNumber"].ToString());
-								break;
-							case "Address":
-								row.Cells.Add(PtDataTable.Rows[i]["Address"].ToString());
-								break;
-							case "Status":
-								row.Cells.Add(PtDataTable.Rows[i]["PatStatus"].ToString());
-								break;
-							case "Bill Type":
-								row.Cells.Add(PtDataTable.Rows[i]["BillingType"].ToString());
-								break;
-							case "City":
-								row.Cells.Add(PtDataTable.Rows[i]["City"].ToString());
-								break;
-							case "State":
-								row.Cells.Add(PtDataTable.Rows[i]["State"].ToString());
-								break;
-							case "Pri Prov":
-								row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
-								break;
-							case "Clinic":
-								row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
-								break;
-							case "Birthdate":
-								row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
-								break;
-							case "Site":
-								row.Cells.Add(PtDataTable.Rows[i]["site"].ToString());
-								break;
-							case "Email":
-								row.Cells.Add(PtDataTable.Rows[i]["Email"].ToString());
-								break;
-							case "Country":
-								row.Cells.Add(PtDataTable.Rows[i]["Country"].ToString());
-								break;
-							case "RegKey":
-								row.Cells.Add(PtDataTable.Rows[i]["RegKey"].ToString());
-								break;
-							case "OtherPhone": //will only be available if OD HQ
-								row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
-								break;
-							case "Wireless Ph":
-								row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
-								if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
-									row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
-									row.Cells[row.Cells.Count-1].Underline=YN.Yes;
-								}
-								break;
-							case "Sec Prov":
-								row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
-								break;
-							case "LastVisit":
-								row.Cells.Add(PtDataTable.Rows[i]["lastVisit"].ToString());
-								break;
-							case "NextVisit":
-								row.Cells.Add(PtDataTable.Rows[i]["nextVisit"].ToString());
-								break;
-						}
+			gridMain.BeginUpdate();
+			gridMain.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<PtDataTable.Rows.Count;i++) {
+				row=new ODGridRow();
+				for(int f=0;f<fields.Count;f++) {
+					switch(fields[f].InternalName) {
+						case "LastName":
+							row.Cells.Add(PtDataTable.Rows[i]["LName"].ToString());
+							break;
+						case "First Name":
+							row.Cells.Add(PtDataTable.Rows[i]["FName"].ToString());
+							break;
+						case "MI":
+							row.Cells.Add(PtDataTable.Rows[i]["MiddleI"].ToString());
+							break;
+						case "Pref Name":
+							row.Cells.Add(PtDataTable.Rows[i]["Preferred"].ToString());
+							break;
+						case "Age":
+							row.Cells.Add(PtDataTable.Rows[i]["age"].ToString());
+							break;
+						case "SSN":
+							row.Cells.Add(PtDataTable.Rows[i]["SSN"].ToString());
+							break;
+						case "Hm Phone":
+							row.Cells.Add(PtDataTable.Rows[i]["HmPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
+							break;
+						case "Wk Phone":
+							row.Cells.Add(PtDataTable.Rows[i]["WkPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
+							break;
+						case "PatNum":
+							row.Cells.Add(PtDataTable.Rows[i]["PatNum"].ToString());
+							break;
+						case "ChartNum":
+							row.Cells.Add(PtDataTable.Rows[i]["ChartNumber"].ToString());
+							break;
+						case "Address":
+							row.Cells.Add(PtDataTable.Rows[i]["Address"].ToString());
+							break;
+						case "Status":
+							row.Cells.Add(PtDataTable.Rows[i]["PatStatus"].ToString());
+							break;
+						case "Bill Type":
+							row.Cells.Add(PtDataTable.Rows[i]["BillingType"].ToString());
+							break;
+						case "City":
+							row.Cells.Add(PtDataTable.Rows[i]["City"].ToString());
+							break;
+						case "State":
+							row.Cells.Add(PtDataTable.Rows[i]["State"].ToString());
+							break;
+						case "Pri Prov":
+							row.Cells.Add(PtDataTable.Rows[i]["PriProv"].ToString());
+							break;
+						case "Clinic":
+							row.Cells.Add(PtDataTable.Rows[i]["clinic"].ToString());
+							break;
+						case "Birthdate":
+							row.Cells.Add(PtDataTable.Rows[i]["Birthdate"].ToString());
+							break;
+						case "Site":
+							row.Cells.Add(PtDataTable.Rows[i]["site"].ToString());
+							break;
+						case "Email":
+							row.Cells.Add(PtDataTable.Rows[i]["Email"].ToString());
+							break;
+						case "Country":
+							row.Cells.Add(PtDataTable.Rows[i]["Country"].ToString());
+							break;
+						case "RegKey":
+							row.Cells.Add(PtDataTable.Rows[i]["RegKey"].ToString());
+							break;
+						case "OtherPhone": //will only be available if OD HQ
+							row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
+							break;
+						case "Wireless Ph":
+							row.Cells.Add(PtDataTable.Rows[i]["WirelessPhone"].ToString());
+							if(Programs.GetCur(ProgramName.DentalTekSmartOfficePhone).Enabled) {
+								row.Cells[row.Cells.Count-1].ColorText=Color.Blue;
+								row.Cells[row.Cells.Count-1].Underline=YN.Yes;
+							}
+							break;
+						case "Sec Prov":
+							row.Cells.Add(PtDataTable.Rows[i]["SecProv"].ToString());
+							break;
+						case "LastVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["lastVisit"].ToString());
+							break;
+						case "NextVisit":
+							row.Cells.Add(PtDataTable.Rows[i]["nextVisit"].ToString());
+							break;
 					}
-					gridMain.Rows.Add(row);
 				}
-				gridMain.EndUpdate();
-				gridMain.SetSelected(0,true);
+				gridMain.Rows.Add(row);
+			}
+			gridMain.EndUpdate();
+			gridMain.SetSelected(0,true);
 				if(_dateTimeLastSearch!=_dateTimeLastRequest) {
 					FillGrid(limit);//in case data was entered while thread was running.
-				}
+		}
 	}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
