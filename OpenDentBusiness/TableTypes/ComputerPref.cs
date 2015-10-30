@@ -60,6 +60,9 @@ namespace OpenDentBusiness {
 		public long ApptViewNum;
 		///<summary>Deprecated.  The index of the most recent appt view for this computer.  Uses it when opening.  This column cannot be dropped due to older versions using it upon opening (prior to calling the update file copier code) so they will throw a UE if this column is ever dropped.</summary>
 		public byte RecentApptView;
+		///<summary>Enum:SearchMode The search mode that is used when loading the patient select window, and while typing.
+		///When 0 the patient select window will use the DB wide pref PatientSelectUsesSearchButton.</summary>
+		public SearchMode PatSelectSearchMode;
 
 
 		public ComputerPref Copy(){
@@ -74,6 +77,16 @@ namespace OpenDentBusiness {
 		Simple2D,
 		///<summary>2</summary>
 		OpenGL
+	}
+
+	///<summary>The search mode that is used when loading the patient select window, and while typing</summary>
+	public enum SearchMode {
+		///<summary>0</summary>
+		Default,
+		///<summary>1</summary>
+		UseSearchButton,
+		///<summary>2</summary>
+		RefreshWhileTyping
 	}
 
 }
