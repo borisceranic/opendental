@@ -16,10 +16,28 @@ namespace OpenDentBusiness {
 		public string ElectUserName;
 		///<summary>The password for this particular account.</summary>
 		public string ElectPassword;
+		///<summary></summary>
+		public EbillAddress PracticeAddress;
+		///<summary></summary>
+		public EbillAddress RemitAddress;
 
 		public Ebill Copy(){
 			return (Ebill)this.MemberwiseClone();
 		}
 	}
-	
+
+	public enum EbillAddress {
+		///<summary>0</summary>
+		PracticePhysical,
+		///<summary>1</summary>
+		PracticeBilling,
+		///<summary>2</summary>
+		PracticePayTo,
+		///<summary>3</summary>
+		ClinicPhysical,
+		///<summary>4</summary>
+		ClinicBilling,
+		///<summary>5</summary>
+		ClinicPayTo
+	}	
 }

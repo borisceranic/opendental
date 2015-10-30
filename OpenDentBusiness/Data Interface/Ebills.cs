@@ -106,6 +106,7 @@ namespace OpenDentBusiness{
 		 
 		*/
 
+		///<summary>To get the defaults, use clinicNum=0.</summary>
 		public static Ebill GetForClinic(long clinicNum) {
 			//No need to check RemotingRole; no call to db.
 			List<Ebill> listEbills=GetList();

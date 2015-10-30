@@ -104,11 +104,14 @@ namespace OpenDentBusiness {
 		BillingDefaultsNote,
 		///<summary>Value is an integer, identifying the max number of electronic statements that can be sent per batch.  Default of 0, which indicates no limit.</summary>
 		BillingElectBatchMax,
+		///<summary>Deprecated.  Use ebill.ClientAcctNumber instead.</summary>
 		BillingElectClientAcctNumber,
 		BillingElectCreditCardChoices,
+		///<summary>Deprecated.  Use ebill.ElectPassword instead.</summary>
 		BillingElectPassword,
 		///<summary>No UI, can only be manually enabled by a programmer.  Only used for debugging electronic statements, because it will bloat the OpenDentImages folder.  Originally created to help with the "missing brackets bug" for EHG billing.</summary>
 		BillingElectSaveHistory,
+		///<summary>Deprecated.  Use ebill.ElectUserName instead.</summary>
 		BillingElectUserName,
 		BillingElectVendorId,
 		BillingElectVendorPMSCode,

@@ -51,6 +51,8 @@ namespace OpenDentBusiness.Crud{
 				ebill.ClientAcctNumber= PIn.String(row["ClientAcctNumber"].ToString());
 				ebill.ElectUserName   = PIn.String(row["ElectUserName"].ToString());
 				ebill.ElectPassword   = PIn.String(row["ElectPassword"].ToString());
+				ebill.PracticeAddress = (OpenDentBusiness.EbillAddress)PIn.Int(row["PracticeAddress"].ToString());
+				ebill.RemitAddress    = (OpenDentBusiness.EbillAddress)PIn.Int(row["RemitAddress"].ToString());
 				retVal.Add(ebill);
 			}
 			return retVal;
@@ -91,7 +93,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EbillNum,";
 			}
-			command+="ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword) VALUES(";
+			command+="ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword,PracticeAddress,RemitAddress) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(ebill.EbillNum)+",";
 			}
@@ -99,7 +101,9 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (ebill.ClinicNum)+","
 				+"'"+POut.String(ebill.ClientAcctNumber)+"',"
 				+"'"+POut.String(ebill.ElectUserName)+"',"
-				+"'"+POut.String(ebill.ElectPassword)+"')";
+				+"'"+POut.String(ebill.ElectPassword)+"',"
+				+    POut.Int   ((int)ebill.PracticeAddress)+","
+				+    POut.Int   ((int)ebill.RemitAddress)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -132,7 +136,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EbillNum,";
 			}
-			command+="ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword) VALUES(";
+			command+="ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword,PracticeAddress,RemitAddress) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(ebill.EbillNum)+",";
 			}
@@ -140,7 +144,9 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (ebill.ClinicNum)+","
 				+"'"+POut.String(ebill.ClientAcctNumber)+"',"
 				+"'"+POut.String(ebill.ElectUserName)+"',"
-				+"'"+POut.String(ebill.ElectPassword)+"')";
+				+"'"+POut.String(ebill.ElectPassword)+"',"
+				+    POut.Int   ((int)ebill.PracticeAddress)+","
+				+    POut.Int   ((int)ebill.RemitAddress)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -156,7 +162,9 @@ namespace OpenDentBusiness.Crud{
 				+"ClinicNum       =  "+POut.Long  (ebill.ClinicNum)+", "
 				+"ClientAcctNumber= '"+POut.String(ebill.ClientAcctNumber)+"', "
 				+"ElectUserName   = '"+POut.String(ebill.ElectUserName)+"', "
-				+"ElectPassword   = '"+POut.String(ebill.ElectPassword)+"' "
+				+"ElectPassword   = '"+POut.String(ebill.ElectPassword)+"', "
+				+"PracticeAddress =  "+POut.Int   ((int)ebill.PracticeAddress)+", "
+				+"RemitAddress    =  "+POut.Int   ((int)ebill.RemitAddress)+" "
 				+"WHERE EbillNum = "+POut.Long(ebill.EbillNum);
 			Db.NonQ(command);
 		}
@@ -179,6 +187,14 @@ namespace OpenDentBusiness.Crud{
 			if(ebill.ElectPassword != oldEbill.ElectPassword) {
 				if(command!=""){ command+=",";}
 				command+="ElectPassword = '"+POut.String(ebill.ElectPassword)+"'";
+			}
+			if(ebill.PracticeAddress != oldEbill.PracticeAddress) {
+				if(command!=""){ command+=",";}
+				command+="PracticeAddress = "+POut.Int   ((int)ebill.PracticeAddress)+"";
+			}
+			if(ebill.RemitAddress != oldEbill.RemitAddress) {
+				if(command!=""){ command+=",";}
+				command+="RemitAddress = "+POut.Int   ((int)ebill.RemitAddress)+"";
 			}
 			if(command==""){
 				return false;

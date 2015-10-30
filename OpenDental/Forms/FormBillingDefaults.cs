@@ -51,25 +51,44 @@ namespace OpenDental {
 			if(cc.Contains("A")) {
 				checkAmEx.Checked=true;
 			}
-			_eBillDefault=new Ebill();
-			_eBillDefault.ClientAcctNumber=PrefC.GetString(PrefName.BillingElectClientAcctNumber);
-			_eBillDefault.ElectUserName=PrefC.GetString(PrefName.BillingElectUserName);
-			_eBillDefault.ElectPassword=PrefC.GetString(PrefName.BillingElectPassword);
-			_eBillDefault.ClinicNum=0;
-			_eBillCur=_eBillDefault;
-			textClientAcctNumber.Text=PrefC.GetString(PrefName.BillingElectClientAcctNumber);
-			textUserName.Text=PrefC.GetString(PrefName.BillingElectUserName);
-			textPassword.Text=PrefC.GetString(PrefName.BillingElectPassword);
-			//email
 			textBillingEmailSubject.Text=PrefC.GetString(PrefName.BillingEmailSubject);
 			textBillingEmailBody.Text=PrefC.GetString(PrefName.BillingEmailBodyText);
 			textInvoiceNote.Text=PrefC.GetString(PrefName.BillingDefaultsInvoiceNote);
 			_listEbills=Ebills.GetList();
+			//Find the default Ebill
+			for(int i=0;i<_listEbills.Count;i++) {
+				if(_listEbills[i].ClinicNum==0) {
+					_eBillDefault=_listEbills[i];
+				}
+			}
+			_eBillCur=_eBillDefault;
+			//Set the textboxes to default values.
+			textClientAcctNumber.Text=_eBillDefault.ClientAcctNumber;
+			textUserName.Text=_eBillDefault.ElectUserName;
+			textPassword.Text=_eBillDefault.ElectPassword;
+			string[] arrayEbillAddressEnums=Enum.GetNames(typeof(EbillAddress));
+			for(int i=0;i<arrayEbillAddressEnums.Length;i++) {
+				comboPracticeAddr.Items.Add(arrayEbillAddressEnums[i]);
+				comboRemitAddr.Items.Add(arrayEbillAddressEnums[i]);
+				//If clinics are off don't add the Clinic specific EbillAddress enums
+				if(!PrefC.HasClinicsEnabled && i==2) {
+					break;
+				}
+			}
 			if(PrefC.HasClinicsEnabled) {
 				comboClinic.Visible=true;
 				labelClinic.Visible=true;
+				//Bold clinic specific fields.
+				groupBoxBilling.Text=Lan.g(this,"Electronic Billing - Bolded fields are clinic specific");
+				labelAcctNum.Font=new Font(labelAcctNum.Font,FontStyle.Bold);
+				labelUserName.Font=new Font(labelUserName.Font,FontStyle.Bold);
+				labelPassword.Font=new Font(labelPassword.Font,FontStyle.Bold);
+				labelClinic.Font=new Font(labelClinic.Font,FontStyle.Bold);
+				labelPracticeAddr.Font=new Font(labelPracticeAddr.Font,FontStyle.Bold);
+				labelRemitAddr.Font=new Font(labelRemitAddr.Font,FontStyle.Bold);
 				comboClinic.Items.Clear();
 				_listClinics=new List<Clinic>();
+				//Add "Unassigned/Default" option if the user isn't restricted or the selected clinic is 0.
 				if(!Security.CurUser.ClinicIsRestricted || FormOpenDental.ClinicNum==0) {
 					Clinic clinicUnassigned=new Clinic();
 					clinicUnassigned.ClinicNum=0;
@@ -79,19 +98,23 @@ namespace OpenDental {
 				_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
 				for(int i=0;i<_listClinics.Count;i++) {
 					comboClinic.Items.Add(_listClinics[i].Description);
+					//If the clinic we're adding is the one currently selected in OD, attempt to find its Ebill entry.
 					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
 						comboClinic.SelectedIndex=i;
 						Ebill eBill=null;
-						if(_listClinics[i].ClinicNum==0) {
+						if(FormOpenDental.ClinicNum==0) {//Use the default Ebill if OD has Headquarters selected or if clinics are disabled.
 							eBill=_eBillDefault;
 						}
 						else {
 							eBill=_listEbills.FirstOrDefault(x => x.ClinicNum==_listClinics[i].ClinicNum);//Can be null.
 						}
-						LoadEbill(eBill);
+						//_eBillCur will be the default Ebill, the clinic's Ebill, or null if there are no existing ebills for OD's selected clinic.
+						_eBillCur=eBill;
 					}
 				}
 			}
+			//Load _eBillCur's fields into the UI.
+			LoadEbill(_eBillCur);
 		}
 
 		///<summary>eBill can be null, creates Ebill if needed.</summary>
@@ -102,6 +125,8 @@ namespace OpenDental {
 				eBill.ClientAcctNumber="";
 				eBill.ElectUserName="";
 				eBill.ElectPassword="";
+				eBill.PracticeAddress=EbillAddress.PracticePhysical;
+				eBill.RemitAddress=EbillAddress.PracticeBilling;
 				_listEbills.Add(eBill);
 			}
 			textClientAcctNumber.Text=_eBillDefault.ClientAcctNumber;
@@ -115,6 +140,37 @@ namespace OpenDental {
 			textPassword.Text=_eBillDefault.ElectPassword;
 			if(eBill.ElectPassword!="") {//If the Ebill field is blank use default value.
 				textPassword.Text=eBill.ElectPassword;
+			}
+			//If clinics are disabled and the eBill had a clinic specific enum, set it to default value.  May happen if clinics were previously enabled.
+			if(PrefC.HasClinicsEnabled) {
+				comboPracticeAddr.SelectedIndex=(int)eBill.PracticeAddress;
+				comboRemitAddr.SelectedIndex=(int)eBill.RemitAddress;
+			}
+			else {//No clinics
+				if(eBill.PracticeAddress==EbillAddress.ClinicPhysical) {
+					comboPracticeAddr.SelectedIndex=0;//PracticePhysical
+				}
+				else if(eBill.PracticeAddress==EbillAddress.ClinicBilling) {
+					comboPracticeAddr.SelectedIndex=1;//PracticeBilling
+				}
+				else if(eBill.PracticeAddress==EbillAddress.ClinicPayTo) {
+					comboPracticeAddr.SelectedIndex=2;//PracticePayTo
+				}
+				else {
+					comboPracticeAddr.SelectedIndex=(int)eBill.PracticeAddress;
+				}
+				if(eBill.RemitAddress==EbillAddress.ClinicPhysical) {
+					comboRemitAddr.SelectedIndex=0;//PracticePhysical
+				}
+				else if(eBill.RemitAddress==EbillAddress.ClinicBilling) {
+					comboRemitAddr.SelectedIndex=1;//PracticeBilling
+				}
+				else if(eBill.RemitAddress==EbillAddress.ClinicPayTo) {
+					comboRemitAddr.SelectedIndex=2;//PracticePayTo
+				}
+				else {
+					comboRemitAddr.SelectedIndex=(int)eBill.RemitAddress;
+				}
 			}
 			_eBillCur=eBill;
 		}
@@ -145,6 +201,29 @@ namespace OpenDental {
 				else {//Text was blank or the same as the default, blank it.
 					eBill.ElectPassword="";
 				}
+			}
+			eBill.PracticeAddress=(EbillAddress)comboPracticeAddr.SelectedIndex;
+			eBill.RemitAddress=(EbillAddress)comboRemitAddr.SelectedIndex;			
+		}
+
+		private void listElectBilling_SelectedIndexChanged(object sender,EventArgs e) {
+			//If Dental X Change is selected, enable its textboxes and combo.
+			if(listElectBilling.SelectedIndex==1) {
+				comboRemitAddr.Enabled=true;
+				textUserName.ReadOnly=false;
+				textPassword.ReadOnly=false;
+				textClientAcctNumber.ReadOnly=false;
+				textVendorId.ReadOnly=false;
+				textVendorPMScode.ReadOnly=false;
+			}
+			else {
+				//If Dental X Change is not selected, disable changing information for fields the selected format won't use.
+				comboRemitAddr.Enabled=false;
+				textUserName.ReadOnly=true;
+				textPassword.ReadOnly=true;
+				textClientAcctNumber.ReadOnly=true;
+				textVendorId.ReadOnly=true;
+				textVendorPMScode.ReadOnly=true;
 			}
 		}
 
@@ -203,14 +282,11 @@ namespace OpenDental {
 				| Prefs.UpdateString(PrefName.BillingElectVendorId,textVendorId.Text)
 				| Prefs.UpdateString(PrefName.BillingElectVendorPMSCode,textVendorPMScode.Text)
 				| Prefs.UpdateString(PrefName.BillingElectCreditCardChoices,cc)
-				| Prefs.UpdateString(PrefName.BillingElectClientAcctNumber,_eBillDefault.ClientAcctNumber)
-				| Prefs.UpdateString(PrefName.BillingElectUserName,_eBillDefault.ElectUserName)
-				| Prefs.UpdateString(PrefName.BillingElectPassword,_eBillDefault.ElectPassword)
 				| Prefs.UpdateString(PrefName.BillingDefaultsInvoiceNote,textInvoiceNote.Text))
 			{
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			if(PrefC.HasClinicsEnabled && Ebills.Sync(_listEbills)) {
+			if(Ebills.Sync(_listEbills)) {//Includes the default Ebill
 				DataValid.SetInvalid(InvalidType.Ebills);
 			}
 			DialogResult=DialogResult.OK;

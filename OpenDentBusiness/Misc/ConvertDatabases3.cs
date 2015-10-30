@@ -10978,6 +10978,49 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX patient_ChartNumber ON patient (ChartNumber)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ebill ADD PracticeAddress tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ebill ADD PracticeAddress number(3)";
+					Db.NonQ(command);
+					command="UPDATE ebill SET PracticeAddress = 0 WHERE PracticeAddress IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ebill MODIFY PracticeAddress NOT NULL";
+					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ebill ADD RemitAddress tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ebill ADD RemitAddress number(3)";
+					Db.NonQ(command);
+					command="UPDATE ebill SET RemitAddress = 0 WHERE RemitAddress IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ebill MODIFY RemitAddress NOT NULL";
+					Db.NonQ(command);
+				}
+				//Create default Ebill object
+				command="SELECT ValueString FROM preference WHERE PrefName = 'BillingElectUserName'";
+				string billingElectUserName=Db.GetScalar(command);
+				command="SELECT ValueString FROM preference WHERE PrefName = 'BillingElectPassword'";
+				string billingElectPassword=Db.GetScalar(command);
+				command="SELECT ValueString FROM preference WHERE PrefName = 'BillingElectClientAcctNumber'";
+				string billingElectClientAcctNumber=Db.GetScalar(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO ebill (ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword,PracticeAddress,RemitAddress) VALUES (0,'"
+						+POut.String(billingElectClientAcctNumber)+"','"+POut.String(billingElectUserName)+"','"+POut.String(billingElectPassword)+"',"
+						+POut.Int((int)EbillAddress.PracticePhysical)+","+POut.Int((int)EbillAddress.PracticeBilling)+")";
+				}
+				else {//oracle
+					command="INSERT INTO ebill (EbillNum,ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword,PracticeAddress,RemitAddress) "
+						+"VALUES ((SELECT MAX(EbillNum)+1 FROM ebill),0,'"
+						+POut.String(billingElectClientAcctNumber)+"','"+POut.String(billingElectUserName)+"','"+POut.String(billingElectPassword)+"',"
+						+POut.Int((int)EbillAddress.PracticePhysical)+","+POut.Int((int)EbillAddress.PracticeBilling)+")";
+				}
+				Db.NonQ(command);
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

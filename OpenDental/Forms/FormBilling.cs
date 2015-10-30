@@ -904,10 +904,14 @@ namespace OpenDental{
 					EbillStatement ebillStatement=new EbillStatement();
 					ebillStatement.family=fam;
 					ebillStatement.statement=stmt;
-					if(!dictEbills.ContainsKey(fam.ListPats[0].ClinicNum)) {
-						dictEbills.Add(fam.ListPats[0].ClinicNum,new List<EbillStatement>());
+					long clinicNum=0;//If clinics are disabled, then all bills will go into the same "bucket"
+					if(PrefC.HasClinicsEnabled) {
+						clinicNum=fam.ListPats[0].ClinicNum;
 					}
-					dictEbills[fam.ListPats[0].ClinicNum].Add(ebillStatement);
+					if(!dictEbills.ContainsKey(clinicNum)) {
+						dictEbills.Add(clinicNum,new List<EbillStatement>());
+					}
+					dictEbills[clinicNum].Add(ebillStatement);
 				}
 			}
 			//now print-------------------------------------------------------------------------------------
@@ -925,23 +929,23 @@ namespace OpenDental{
 			int sentElect=0;
 			string errorMsg="";
 			foreach(KeyValuePair<long,List<EbillStatement>> entryForClinic in dictEbills) {//Go through the dictionary entries
-				List<EbillStatement> listElectStmts=entryForClinic.Value;
-				int maxNumOfBatches=listElectStmts.Count;
+				List<EbillStatement> listClinicStmts=entryForClinic.Value;
+				int maxNumOfBatches=listClinicStmts.Count;//Worst case scenario is number of statements total.
 				int maxElectStmtsPerBatch=PrefC.GetInt(PrefName.BillingElectBatchMax);
 				if(maxElectStmtsPerBatch==0) {
-					maxElectStmtsPerBatch=listElectStmts.Count;//Make the batch size equal to the list of statements so that we send them all at once.
+					maxElectStmtsPerBatch=listClinicStmts.Count;//Make the batch size equal to the list of statements so that we send them all at once.
 				}
 				XmlWriterSettings xmlSettings=new XmlWriterSettings();
 				xmlSettings.OmitXmlDeclaration=true;
 				xmlSettings.Encoding=Encoding.UTF8;
 				xmlSettings.Indent=true;
 				xmlSettings.IndentChars="   ";
-				//Loop through all electronic bills and try to send them in batches.  Each batch size will be dictated via electBatchMaxNum.
+				//Loop through all electronic bills and try to send them in batches.  Each batch size will be dictated via maxNumOfBatches.
 				//At this point we know we will have at least one batch to send so we start batchNum to 1.
 				for(int batchNum=1;batchNum<=maxNumOfBatches;batchNum++) {
-					if(listElectStmts.Count==0) {//All statements have been sent for the current clinic.  Nothing more to do.
+					if(listClinicStmts.Count==0) {//All statements have been sent for the current clinic.  Nothing more to do.
 						break;
-					}					
+					}
 					StringBuilder strBuildElect=new StringBuilder();
 					XmlWriter writerElect=XmlWriter.Create(strBuildElect,xmlSettings);
 					List<long> listElectStmtNums=new List<long>();
@@ -949,17 +953,17 @@ namespace OpenDental{
 						OpenDental.Bridges.EHG_statements.GeneratePracticeInfo(writerElect,entryForClinic.Key);
 					}
 					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="2") {
-						OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect);
+						OpenDental.Bridges.POS_statements.GeneratePracticeInfo(writerElect,entryForClinic.Key);
 					}
 					else if(PrefC.GetString(PrefName.BillingUseElectronic)=="3") {
-						OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect);
+						OpenDental.Bridges.ClaimX_Statements.GeneratePracticeInfo(writerElect,entryForClinic.Key);
 					}
 					int stmtCountCur=0;
 					//Generate the statements for each batch.
-					for(int j=listElectStmts.Count-1;j>=0;j--) {//Construct the string for sending this clinic's ebills
-						Statement stmtCur=listElectStmts[j].statement;
-						fam=listElectStmts[j].family;
-						listElectStmts.RemoveAt(j);//Remove the statement from our list so that we do not send it again in the next batch.
+					for(int j=listClinicStmts.Count-1;j>=0;j--) {//Construct the string for sending this clinic's ebills
+						Statement stmtCur=listClinicStmts[j].statement;
+						fam=listClinicStmts[j].family;
+						listClinicStmts.RemoveAt(j);//Remove the statement from our list so that we do not send it again in the next batch.
 						pat=fam.GetPatient(stmtCur.PatNum);
 						dataSet=AccountModules.GetStatementDataSet(stmtCur);
 						bool statementWritten=true;
