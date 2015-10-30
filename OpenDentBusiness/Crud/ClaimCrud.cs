@@ -118,6 +118,7 @@ namespace OpenDentBusiness.Crud{
 				claim.OrigRefNum                  = PIn.String(row["OrigRefNum"].ToString());
 				claim.ProvOrderOverride           = PIn.Long  (row["ProvOrderOverride"].ToString());
 				claim.OrthoTotalM                 = PIn.Byte  (row["OrthoTotalM"].ToString());
+				claim.ShareOfCost                 = PIn.Double(row["ShareOfCost"].ToString());
 				retVal.Add(claim);
 			}
 			return retVal;
@@ -158,7 +159,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimNum,";
 			}
-			command+="PatNum,DateService,DateSent,ClaimStatus,DateReceived,PlanNum,ProvTreat,ClaimFee,InsPayEst,InsPayAmt,DedApplied,PreAuthString,IsProsthesis,PriorDate,ReasonUnderPaid,ClaimNote,ClaimType,ProvBill,ReferringProv,RefNumString,PlaceService,AccidentRelated,AccidentDate,AccidentST,EmployRelated,IsOrtho,OrthoRemainM,OrthoDate,PatRelat,PlanNum2,PatRelat2,WriteOff,Radiographs,ClinicNum,ClaimForm,AttachedImages,AttachedModels,AttachedFlags,AttachmentID,CanadianMaterialsForwarded,CanadianReferralProviderNum,CanadianReferralReason,CanadianIsInitialLower,CanadianDateInitialLower,CanadianMandProsthMaterial,CanadianIsInitialUpper,CanadianDateInitialUpper,CanadianMaxProsthMaterial,InsSubNum,InsSubNum2,CanadaTransRefNum,CanadaEstTreatStartDate,CanadaInitialPayment,CanadaPaymentMode,CanadaTreatDuration,CanadaNumAnticipatedPayments,CanadaAnticipatedPayAmount,PriorAuthorizationNumber,SpecialProgramCode,UniformBillType,MedType,AdmissionTypeCode,AdmissionSourceCode,PatientStatusCode,CustomTracking,DateResent,CorrectionType,ClaimIdentifier,OrigRefNum,ProvOrderOverride,OrthoTotalM) VALUES(";
+			command+="PatNum,DateService,DateSent,ClaimStatus,DateReceived,PlanNum,ProvTreat,ClaimFee,InsPayEst,InsPayAmt,DedApplied,PreAuthString,IsProsthesis,PriorDate,ReasonUnderPaid,ClaimNote,ClaimType,ProvBill,ReferringProv,RefNumString,PlaceService,AccidentRelated,AccidentDate,AccidentST,EmployRelated,IsOrtho,OrthoRemainM,OrthoDate,PatRelat,PlanNum2,PatRelat2,WriteOff,Radiographs,ClinicNum,ClaimForm,AttachedImages,AttachedModels,AttachedFlags,AttachmentID,CanadianMaterialsForwarded,CanadianReferralProviderNum,CanadianReferralReason,CanadianIsInitialLower,CanadianDateInitialLower,CanadianMandProsthMaterial,CanadianIsInitialUpper,CanadianDateInitialUpper,CanadianMaxProsthMaterial,InsSubNum,InsSubNum2,CanadaTransRefNum,CanadaEstTreatStartDate,CanadaInitialPayment,CanadaPaymentMode,CanadaTreatDuration,CanadaNumAnticipatedPayments,CanadaAnticipatedPayAmount,PriorAuthorizationNumber,SpecialProgramCode,UniformBillType,MedType,AdmissionTypeCode,AdmissionSourceCode,PatientStatusCode,CustomTracking,DateResent,CorrectionType,ClaimIdentifier,OrigRefNum,ProvOrderOverride,OrthoTotalM,ShareOfCost) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claim.ClaimNum)+",";
 			}
@@ -233,7 +234,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claim.ClaimIdentifier)+"',"
 				+"'"+POut.String(claim.OrigRefNum)+"',"
 				+    POut.Long  (claim.ProvOrderOverride)+","
-				+    POut.Byte  (claim.OrthoTotalM)+")";
+				+    POut.Byte  (claim.OrthoTotalM)+","
+				+"'"+POut.Double(claim.ShareOfCost)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -266,7 +268,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClaimNum,";
 			}
-			command+="PatNum,DateService,DateSent,ClaimStatus,DateReceived,PlanNum,ProvTreat,ClaimFee,InsPayEst,InsPayAmt,DedApplied,PreAuthString,IsProsthesis,PriorDate,ReasonUnderPaid,ClaimNote,ClaimType,ProvBill,ReferringProv,RefNumString,PlaceService,AccidentRelated,AccidentDate,AccidentST,EmployRelated,IsOrtho,OrthoRemainM,OrthoDate,PatRelat,PlanNum2,PatRelat2,WriteOff,Radiographs,ClinicNum,ClaimForm,AttachedImages,AttachedModels,AttachedFlags,AttachmentID,CanadianMaterialsForwarded,CanadianReferralProviderNum,CanadianReferralReason,CanadianIsInitialLower,CanadianDateInitialLower,CanadianMandProsthMaterial,CanadianIsInitialUpper,CanadianDateInitialUpper,CanadianMaxProsthMaterial,InsSubNum,InsSubNum2,CanadaTransRefNum,CanadaEstTreatStartDate,CanadaInitialPayment,CanadaPaymentMode,CanadaTreatDuration,CanadaNumAnticipatedPayments,CanadaAnticipatedPayAmount,PriorAuthorizationNumber,SpecialProgramCode,UniformBillType,MedType,AdmissionTypeCode,AdmissionSourceCode,PatientStatusCode,CustomTracking,DateResent,CorrectionType,ClaimIdentifier,OrigRefNum,ProvOrderOverride,OrthoTotalM) VALUES(";
+			command+="PatNum,DateService,DateSent,ClaimStatus,DateReceived,PlanNum,ProvTreat,ClaimFee,InsPayEst,InsPayAmt,DedApplied,PreAuthString,IsProsthesis,PriorDate,ReasonUnderPaid,ClaimNote,ClaimType,ProvBill,ReferringProv,RefNumString,PlaceService,AccidentRelated,AccidentDate,AccidentST,EmployRelated,IsOrtho,OrthoRemainM,OrthoDate,PatRelat,PlanNum2,PatRelat2,WriteOff,Radiographs,ClinicNum,ClaimForm,AttachedImages,AttachedModels,AttachedFlags,AttachmentID,CanadianMaterialsForwarded,CanadianReferralProviderNum,CanadianReferralReason,CanadianIsInitialLower,CanadianDateInitialLower,CanadianMandProsthMaterial,CanadianIsInitialUpper,CanadianDateInitialUpper,CanadianMaxProsthMaterial,InsSubNum,InsSubNum2,CanadaTransRefNum,CanadaEstTreatStartDate,CanadaInitialPayment,CanadaPaymentMode,CanadaTreatDuration,CanadaNumAnticipatedPayments,CanadaAnticipatedPayAmount,PriorAuthorizationNumber,SpecialProgramCode,UniformBillType,MedType,AdmissionTypeCode,AdmissionSourceCode,PatientStatusCode,CustomTracking,DateResent,CorrectionType,ClaimIdentifier,OrigRefNum,ProvOrderOverride,OrthoTotalM,ShareOfCost) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(claim.ClaimNum)+",";
 			}
@@ -341,7 +343,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claim.ClaimIdentifier)+"',"
 				+"'"+POut.String(claim.OrigRefNum)+"',"
 				+    POut.Long  (claim.ProvOrderOverride)+","
-				+    POut.Byte  (claim.OrthoTotalM)+")";
+				+    POut.Byte  (claim.OrthoTotalM)+","
+				+"'"+POut.Double(claim.ShareOfCost)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -424,7 +427,8 @@ namespace OpenDentBusiness.Crud{
 				+"ClaimIdentifier             = '"+POut.String(claim.ClaimIdentifier)+"', "
 				+"OrigRefNum                  = '"+POut.String(claim.OrigRefNum)+"', "
 				+"ProvOrderOverride           =  "+POut.Long  (claim.ProvOrderOverride)+", "
-				+"OrthoTotalM                 =  "+POut.Byte  (claim.OrthoTotalM)+" "
+				+"OrthoTotalM                 =  "+POut.Byte  (claim.OrthoTotalM)+", "
+				+"ShareOfCost                 = '"+POut.Double(claim.ShareOfCost)+"' "
 				+"WHERE ClaimNum = "+POut.Long(claim.ClaimNum);
 			Db.NonQ(command);
 		}
@@ -715,6 +719,10 @@ namespace OpenDentBusiness.Crud{
 			if(claim.OrthoTotalM != oldClaim.OrthoTotalM) {
 				if(command!=""){ command+=",";}
 				command+="OrthoTotalM = "+POut.Byte(claim.OrthoTotalM)+"";
+			}
+			if(claim.ShareOfCost != oldClaim.ShareOfCost) {
+				if(command!=""){ command+=",";}
+				command+="ShareOfCost = '"+POut.Double(claim.ShareOfCost)+"'";
 			}
 			if(command==""){
 				return false;

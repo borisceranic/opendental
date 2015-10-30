@@ -822,7 +822,13 @@ namespace OpenDentBusiness {
 						+idCode+"~");//PWK06: Identification Code.
 				}
 				//2300 CN1: Contract Info (medical)
-				//2300 AMT: Patient amount paid
+				//2300 AMT: Patient amount paid (medical,dental)
+				if(claim.ShareOfCost > 0) {
+					seg++;
+					sw.WriteLine("AMT*"
+						+"F5*"//AMT01 1/3 Amount Qualifier Code: F5=Patient Amount Paid.
+						+claim.ShareOfCost.ToString("f2")+"~");//AMT02 1/18 Monetary Amount:
+				}
 				//2300 AMT: Total Purchased Service Amt (medical)
 				//2300 REF: (A bunch of ref segments for medical which we don't need)
 				//2300 REF: Predetermination ID

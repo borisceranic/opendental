@@ -11034,6 +11034,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE computerpref MODIFY PatSelectSearchMode NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claim ADD ShareOfCost double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claim ADD ShareOfCost number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE claim SET ShareOfCost = 0 WHERE ShareOfCost IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim MODIFY ShareOfCost NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

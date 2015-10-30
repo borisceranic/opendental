@@ -901,10 +901,10 @@ namespace OpenDentBusiness
 				//2300 AMT: (institutional) Patient Estimated Amount Due.
 				//2300 AMT: (medical,dental) Patient Amount Paid.  Sum of all amounts paid specifically to this claim by the patient or family Situational.
 				if(medType==EnumClaimMedType.Medical || medType==EnumClaimMedType.Dental) {
-					if(IsDentiCal(clearinghouseClin)) {
+					if(claim.ShareOfCost > 0) {
 						sw.Write("AMT"+s
 						  +"F5"+s//AMT01 1/3 Amount Qualifier Code: F5=Patient Paid Amount.
-						  +"0");//AMT02 1/18 Monetary Amount: We don't track this information very well so we always put zero.
+						  +claim.ShareOfCost.ToString("F2"));//AMT02 1/18 Monetary Amount:
 						EndSegment(sw);//AMT03 is not used.
 					}
 				}

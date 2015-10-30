@@ -155,6 +155,10 @@ namespace OpenDentBusiness{
 		public long ProvOrderOverride;
 		///<summary>Total estimated months of ortho.  Valid values are 1-36, although we allow greater than or equal to 0.</summary>
 		public byte OrthoTotalM;
+		///<summary>Sum of all amounts paid specifically to this claim by the patient or family.
+		///Goes out in X12 4010/5010 loop 2300 AMT segment if greater than zero.  Default value is 0, thus will not go out by default unless the user
+		///enters a value.  This field was added for Denti-Cal certification, but can go out for any clearinghouse.</summary>
+		public double ShareOfCost;
 
 		///<summary>Not a data column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
