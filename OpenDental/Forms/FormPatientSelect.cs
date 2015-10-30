@@ -86,6 +86,9 @@ namespace OpenDental{
 		private List<Clinic> _listClinics;
 		///<summary>If set, initial patient list will be set to these patients.</summary>
 		public List<long> ExplicitPatNums;
+		private ODThread _fillGridThread=null;
+		private DateTime _dateTimeLastSearch;
+		private DateTime _dateTimeLastRequest;
 
 		///<summary></summary>
 		public FormPatientSelect(){
@@ -1138,21 +1141,26 @@ namespace OpenDental{
 			}
 		}
 
-		private void FillGrid(bool limit,List<long> explicitPatNums=null){
+		private void FillGrid(bool limit,List<long> explicitPatNums=null) {
+			_dateTimeLastRequest=DateTime.Now;
+			if(_fillGridThread!=null) {
+				return;
+			}
+			_dateTimeLastSearch=_dateTimeLastRequest;
 			long billingType=0;
-			if(comboBillingType.SelectedIndex!=0){
+			if(comboBillingType.SelectedIndex!=0) {
 				billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
 			}
 			long siteNum=0;
 			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
 				siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
 			}
-			DateTime birthdate=PIn.Date(textBirthdate.Text);//this will frequently be minval.
+			DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
 			string clinicNums="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)){
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				if(comboClinic.SelectedIndex==0) {
 					for(int i=0;i<_listClinics.Count;i++) {
-						if(i>0){
+						if(i>0) {
 							clinicNums+=",";
 						}
 						clinicNums+=_listClinics[i].ClinicNum;
@@ -1162,18 +1170,58 @@ namespace OpenDental{
 					clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
 				}
 			}
-			PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
-				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
-				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
-				checkGuarantors.Checked,checkShowArchived.Checked,
-				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+			_fillGridThread=new ODThread(new ODThread.WorkerDelegate((o) => {
+				PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
+					textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
+					textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
+					checkGuarantors.Checked,checkShowArchived.Checked,
+					birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+			}));
+			_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((o) => {
+				_fillGridThread=null;
+				this.BeginInvoke((Action)(() => {
+					FillGridFinal(limit);
+				}));
+			}));
+			_fillGridThread.Start(true);
+		}
+
+		private void FillGridFinal(bool limit) {
+			//long billingType=0;
+			//if(comboBillingType.SelectedIndex!=0) {
+			//	billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
+			//}
+			//long siteNum=0;
+			//if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && comboSite.SelectedIndex!=0) {
+			//	siteNum=SiteC.List[comboSite.SelectedIndex-1].SiteNum;
+			//}
+			//DateTime birthdate=PIn.Date(textBirthdate.Text); //this will frequently be minval.
+			//string clinicNums="";
+			//if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+			//	if(comboClinic.SelectedIndex==0) {
+			//		for(int i=0;i<_listClinics.Count;i++) {
+			//			if(i>0) {
+			//				clinicNums+=",";
+			//			}
+			//			clinicNums+=_listClinics[i].ClinicNum;
+			//		}
+			//	}
+			//	else {
+			//		clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
+			//	}
+			//}
+			//	PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
+			//		textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
+			//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
+			//		checkGuarantors.Checked,checkShowArchived.Checked,
+			//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<PtDataTable.Rows.Count;i++){
+			for(int i=0;i<PtDataTable.Rows.Count;i++) {
 				row=new ODGridRow();
 				for(int f=0;f<fields.Count;f++) {
-					switch(fields[f].InternalName){
+					switch(fields[f].InternalName) {
 						case "LastName":
 							row.Cells.Add(PtDataTable.Rows[i]["LName"].ToString());
 							break;
@@ -1248,7 +1296,7 @@ namespace OpenDental{
 						case "RegKey":
 							row.Cells.Add(PtDataTable.Rows[i]["RegKey"].ToString());
 							break;
-						case "OtherPhone"://will only be available if OD HQ
+						case "OtherPhone": //will only be available if OD HQ
 							row.Cells.Add(PtDataTable.Rows[i]["OtherPhone"].ToString());
 							break;
 						case "Wireless Ph":
@@ -1273,6 +1321,9 @@ namespace OpenDental{
 			}
 			gridMain.EndUpdate();
 			gridMain.SetSelected(0,true);
+			if(_dateTimeLastSearch!=_dateTimeLastRequest) {
+				FillGrid(limit);//in case data was entered while thread was running.
+			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -1410,7 +1461,10 @@ namespace OpenDental{
 			}*/
 		}
 
-		private void PatSelected(){
+		private void PatSelected() {
+			if(_fillGridThread!=null) {
+				return;//still filtering results (rarely happens)
+			}
 			//SelectedPatNum=PIn.PInt(PtDataTable.Rows[grid2.CurrentRowIndex][0].ToString());
 			SelectedPatNum=PIn.Long(PtDataTable.Rows[gridMain.GetSelectedIndex()][0].ToString());
 			DialogResult=DialogResult.OK;
