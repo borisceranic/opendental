@@ -23,6 +23,7 @@ namespace OpenDental {
 				textProvNumInto.Text=POut.Long(selectedProv.ProvNum);
 				textNpiInto.Text=selectedProv.NationalProvID;
 				textFullNameInto.Text=selectedProv.FName+" "+selectedProv.LName;
+				CheckUIState();
 			}
 		}
 
@@ -35,12 +36,17 @@ namespace OpenDental {
 				textProvNumFrom.Text=POut.Long(selectedProv.ProvNum);
 				textNpiFrom.Text=selectedProv.NationalProvID;
 				textFullNameFrom.Text=selectedProv.FName+" "+selectedProv.LName;
+				CheckUIState();
 			}
+		}
+
+		private void CheckUIState() {
+			butMerge.Enabled=(textProvNumInto.Text!="" && textProvNumFrom.Text!="");
 		}
 
 		private void butMerge_Click(object sender,EventArgs e) {
 			string differentFields="";
-			if(textProvNumFrom.Text==textProvNumInto.Text || textProvNumInto.Text=="" || textProvNumFrom.Text=="") { 
+			if(textProvNumFrom.Text==textProvNumInto.Text) { 
 				//do not attempt a merge if the same provider was selected twice, or if one of the fields is blank.
 				MsgBox.Show(this,"You must select two different providers to merge.");
 				return;

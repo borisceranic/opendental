@@ -61,9 +61,9 @@ namespace OpenDental {
 			this.groupBox2.Controls.Add(this.label4);
 			this.groupBox2.Controls.Add(this.label6);
 			this.groupBox2.Controls.Add(this.textTitleFrom);
-			this.groupBox2.Location = new System.Drawing.Point(12, 88);
+			this.groupBox2.Location = new System.Drawing.Point(12, 110);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(638, 76);
+			this.groupBox2.Size = new System.Drawing.Size(638, 88);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Referral to merge from. This referral will be merged into the referral above.";
@@ -86,7 +86,7 @@ namespace OpenDental {
 			this.butChangeReferralFrom.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChangeReferralFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butChangeReferralFrom.CornerRadius = 4F;
-			this.butChangeReferralFrom.Location = new System.Drawing.Point(550, 34);
+			this.butChangeReferralFrom.Location = new System.Drawing.Point(550, 32);
 			this.butChangeReferralFrom.Name = "butChangeReferralFrom";
 			this.butChangeReferralFrom.Size = new System.Drawing.Size(75, 24);
 			this.butChangeReferralFrom.TabIndex = 9;
@@ -105,7 +105,7 @@ namespace OpenDental {
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(8, 21);
+			this.label8.Location = new System.Drawing.Point(4, 21);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(114, 13);
 			this.label8.TabIndex = 131;
@@ -170,7 +170,7 @@ namespace OpenDental {
 			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Location = new System.Drawing.Point(12, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(638, 70);
+			this.groupBox1.Size = new System.Drawing.Size(638, 88);
 			this.groupBox1.TabIndex = 8;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Referral to merge into. The referral below will be merged into this referral.";
@@ -239,7 +239,7 @@ namespace OpenDental {
 			this.butChangeReferralInto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChangeReferralInto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butChangeReferralInto.CornerRadius = 4F;
-			this.butChangeReferralInto.Location = new System.Drawing.Point(550, 34);
+			this.butChangeReferralInto.Location = new System.Drawing.Point(550, 32);
 			this.butChangeReferralInto.Name = "butChangeReferralInto";
 			this.butChangeReferralInto.Size = new System.Drawing.Size(75, 24);
 			this.butChangeReferralInto.TabIndex = 4;
@@ -257,7 +257,7 @@ namespace OpenDental {
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(8, 21);
+			this.label2.Location = new System.Drawing.Point(4, 21);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(114, 13);
 			this.label2.TabIndex = 2;
@@ -272,7 +272,7 @@ namespace OpenDental {
 			this.butMerge.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMerge.CornerRadius = 4F;
 			this.butMerge.Enabled = false;
-			this.butMerge.Location = new System.Drawing.Point(562, 179);
+			this.butMerge.Location = new System.Drawing.Point(478, 211);
 			this.butMerge.Name = "butMerge";
 			this.butMerge.Size = new System.Drawing.Size(75, 24);
 			this.butMerge.TabIndex = 7;
@@ -286,7 +286,7 @@ namespace OpenDental {
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(562, 220);
+			this.butClose.Location = new System.Drawing.Point(562, 211);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 6;
@@ -296,7 +296,7 @@ namespace OpenDental {
 			// FormReferralMerge
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(666, 259);
+			this.ClientSize = new System.Drawing.Size(666, 249);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butMerge);

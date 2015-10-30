@@ -30,6 +30,7 @@ namespace OpenDental{
 			this.textNpiInto = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textFullNameInto = new System.Windows.Forms.TextBox();
+			this.butChangeProvInto = new OpenDental.UI.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textProvNumInto = new System.Windows.Forms.TextBox();
@@ -38,12 +39,11 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.textNpiFrom = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
+			this.butChangeProvFrom = new OpenDental.UI.Button();
 			this.textFullNameFrom = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textProvNumFrom = new System.Windows.Forms.TextBox();
-			this.butChangeProvFrom = new OpenDental.UI.Button();
-			this.butChangeProvInto = new OpenDental.UI.Button();
 			this.butMerge = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.groupBoxInto.SuspendLayout();
@@ -108,6 +108,21 @@ namespace OpenDental{
 			this.textFullNameInto.ReadOnly = true;
 			this.textFullNameInto.Size = new System.Drawing.Size(162, 20);
 			this.textFullNameInto.TabIndex = 3;
+			// 
+			// butChangeProvInto
+			// 
+			this.butChangeProvInto.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeProvInto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butChangeProvInto.Autosize = true;
+			this.butChangeProvInto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangeProvInto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangeProvInto.CornerRadius = 4F;
+			this.butChangeProvInto.Location = new System.Drawing.Point(577, 33);
+			this.butChangeProvInto.Name = "butChangeProvInto";
+			this.butChangeProvInto.Size = new System.Drawing.Size(75, 24);
+			this.butChangeProvInto.TabIndex = 4;
+			this.butChangeProvInto.Text = "Change";
+			this.butChangeProvInto.Click += new System.EventHandler(this.butChangeProvInto_Click);
 			// 
 			// label2
 			// 
@@ -184,6 +199,21 @@ namespace OpenDental{
 			this.label9.TabIndex = 5;
 			this.label9.Text = "NPI";
 			// 
+			// butChangeProvFrom
+			// 
+			this.butChangeProvFrom.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeProvFrom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butChangeProvFrom.Autosize = true;
+			this.butChangeProvFrom.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangeProvFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangeProvFrom.CornerRadius = 4F;
+			this.butChangeProvFrom.Location = new System.Drawing.Point(577, 34);
+			this.butChangeProvFrom.Name = "butChangeProvFrom";
+			this.butChangeProvFrom.Size = new System.Drawing.Size(75, 24);
+			this.butChangeProvFrom.TabIndex = 4;
+			this.butChangeProvFrom.Text = "Change";
+			this.butChangeProvFrom.Click += new System.EventHandler(this.butChangeProvFrom_Click);
+			// 
 			// textFullNameFrom
 			// 
 			this.textFullNameFrom.Location = new System.Drawing.Point(269, 37);
@@ -216,36 +246,6 @@ namespace OpenDental{
 			this.textProvNumFrom.Size = new System.Drawing.Size(141, 20);
 			this.textProvNumFrom.TabIndex = 0;
 			// 
-			// butChangeProvFrom
-			// 
-			this.butChangeProvFrom.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butChangeProvFrom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butChangeProvFrom.Autosize = true;
-			this.butChangeProvFrom.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butChangeProvFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butChangeProvFrom.CornerRadius = 4F;
-			this.butChangeProvFrom.Location = new System.Drawing.Point(577, 34);
-			this.butChangeProvFrom.Name = "butChangeProvFrom";
-			this.butChangeProvFrom.Size = new System.Drawing.Size(75, 24);
-			this.butChangeProvFrom.TabIndex = 4;
-			this.butChangeProvFrom.Text = "Change";
-			this.butChangeProvFrom.Click += new System.EventHandler(this.butChangeProvFrom_Click);
-			// 
-			// butChangeProvInto
-			// 
-			this.butChangeProvInto.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butChangeProvInto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butChangeProvInto.Autosize = true;
-			this.butChangeProvInto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butChangeProvInto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butChangeProvInto.CornerRadius = 4F;
-			this.butChangeProvInto.Location = new System.Drawing.Point(577, 33);
-			this.butChangeProvInto.Name = "butChangeProvInto";
-			this.butChangeProvInto.Size = new System.Drawing.Size(75, 24);
-			this.butChangeProvInto.TabIndex = 4;
-			this.butChangeProvInto.Text = "Change";
-			this.butChangeProvInto.Click += new System.EventHandler(this.butChangeProvInto_Click);
-			// 
 			// butMerge
 			// 
 			this.butMerge.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -254,7 +254,8 @@ namespace OpenDental{
 			this.butMerge.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMerge.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMerge.CornerRadius = 4F;
-			this.butMerge.Location = new System.Drawing.Point(508, 209);
+			this.butMerge.Enabled = false;
+			this.butMerge.Location = new System.Drawing.Point(505, 209);
 			this.butMerge.Name = "butMerge";
 			this.butMerge.Size = new System.Drawing.Size(75, 24);
 			this.butMerge.TabIndex = 3;
@@ -288,7 +289,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormProviderMerge";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Provider Merge";
+			this.Text = "Merge Providers";
 			this.groupBoxInto.ResumeLayout(false);
 			this.groupBoxInto.PerformLayout();
 			this.groupBoxFrom.ResumeLayout(false);

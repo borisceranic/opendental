@@ -163,8 +163,8 @@ Merge the patient at the bottom into the patient shown at the top?"))
 			this.Cursor=Cursors.Default;
 		}
 
-		private void butCancel_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.Cancel;
+		private void butClose_Click(object sender,EventArgs e) {
+			Close();
 		}
 
 	}
