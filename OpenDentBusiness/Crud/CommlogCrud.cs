@@ -58,7 +58,7 @@ namespace OpenDentBusiness.Crud{
 				commlog.SigIsTopaz    = PIn.Bool  (row["SigIsTopaz"].ToString());
 				commlog.DateTStamp    = PIn.DateT (row["DateTStamp"].ToString());
 				commlog.DateTimeEnd   = PIn.DateT (row["DateTimeEnd"].ToString());
-				commlog.CommSource        = (OpenDentBusiness.CommItemSource)PIn.Int(row["Source"].ToString());
+				commlog.CommSource    = (OpenDentBusiness.CommItemSource)PIn.Int(row["CommSource"].ToString());
 				commlog.ProgramNum    = PIn.Long  (row["ProgramNum"].ToString());
 				retVal.Add(commlog);
 			}
@@ -100,7 +100,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CommlogNum,";
 			}
-			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,Source,ProgramNum) VALUES(";
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,CommSource,ProgramNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(commlog.CommlogNum)+",";
 			}
@@ -154,7 +154,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CommlogNum,";
 			}
-			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,Source,ProgramNum) VALUES(";
+			command+="PatNum,CommDateTime,CommType,Note,Mode_,SentOrReceived,UserNum,Signature,SigIsTopaz,DateTimeEnd,CommSource,ProgramNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(commlog.CommlogNum)+",";
 			}
@@ -199,7 +199,7 @@ namespace OpenDentBusiness.Crud{
 				+"SigIsTopaz    =  "+POut.Bool  (commlog.SigIsTopaz)+", "
 				//DateTStamp can only be set by MySQL
 				+"DateTimeEnd   =  "+POut.DateT (commlog.DateTimeEnd)+", "
-				+"Source        =  "+POut.Int   ((int)commlog.CommSource)+", "
+				+"CommSource    =  "+POut.Int   ((int)commlog.CommSource)+", "
 				+"ProgramNum    =  "+POut.Long  (commlog.ProgramNum)+" "
 				+"WHERE CommlogNum = "+POut.Long(commlog.CommlogNum);
 			if(commlog.Note==null) {
@@ -255,7 +255,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(commlog.CommSource != oldCommlog.CommSource) {
 				if(command!=""){ command+=",";}
-				command+="Source = "+POut.Int   ((int)commlog.CommSource)+"";
+				command+="CommSource = "+POut.Int   ((int)commlog.CommSource)+"";
 			}
 			if(commlog.ProgramNum != oldCommlog.ProgramNum) {
 				if(command!=""){ command+=",";}
