@@ -362,6 +362,11 @@ namespace OpenDental{
 			}
 			string hqUsername=ProgramProperties.GetPropValFromList(_listProgProps,"Username",0);//HQ Username before updating to value in textbox
 			string hqPassword=ProgramProperties.GetPropValFromList(_listProgProps,"Password",0);//HQ Password before updating to value in textbox
+			string hqPayType=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",0);//HQ PaymentType before updating to combo box selection
+			string payTypeCur="";
+			if(comboPaymentType.SelectedIndex>-1) {
+				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
+			}
 			//for each distinct ClinicNum in the prog property list for PayConnect except HQ
 			foreach(long clinicNum in _listProgProps.Select(x => x.ClinicNum).Where(x => x>0).Distinct()) {
 				//if this clinic has a different username or password, skip it
@@ -370,11 +375,17 @@ namespace OpenDental{
 				{
 					continue;
 				}
-				//update the username and password to keep it synched with HQ
+				//this clinic had a matching username and password, so update the username and password to keep it synched with HQ
 				_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username")
 					.ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
 				_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password")
 					.ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
+				if(string.IsNullOrEmpty(payTypeCur)) {
+					continue;
+				}
+				//update clinic payment type if it originally matched HQ's payment type and the selected payment type is valid
+				_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType" && x.PropertyValue==hqPayType)
+					.ForEach(x => x.PropertyValue=payTypeCur);//always 1 item; null safe
 			}
 		}
 
@@ -399,12 +410,15 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a payment type first.");
 				return;
 			}
+			SynchWithHQ();//if the user changes the HQ credentials, any clinic that had the same credentials will be kept in synch with HQ
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
 			}
-			string payTypeSelected = DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
-			SynchWithHQ();//if the user changes the HQ credentials, any clinic that had the same credentials will be kept in synch with HQ
+			string payTypeSelected="";
+			if(comboPaymentType.SelectedIndex>-1) {
+				payTypeSelected=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
+			}
 			//set the values in the list for this clinic
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username").ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password").ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
@@ -428,11 +442,11 @@ namespace OpenDental{
 			}
 			#endregion Validation
 			#region Save
-			if(_progCur.Enabled!=checkEnabled.Checked) {//only update the program in the IsEnabled flag has changed
+			if(_progCur.Enabled!=checkEnabled.Checked) {//only update the program if the IsEnabled flag has changed
 				_progCur.Enabled=checkEnabled.Checked;
 				Programs.Update(_progCur);
 			}
-			ProgramProperties.SyncSimple(_listProgProps,_progCur.ProgramNum);
+			ProgramProperties.Sync(_listProgProps,_progCur.ProgramNum);
 			#endregion Save
 			DataValid.SetInvalid(InvalidType.Programs);
 			DialogResult=DialogResult.OK;

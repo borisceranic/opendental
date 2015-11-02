@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 
 namespace OpenDentBusiness {
 
@@ -209,22 +209,16 @@ namespace OpenDentBusiness {
 			ProgramProperties.Insert(pp);
 		}
 
-		///<summary>Updates any ProgramProperty in listProgProps with a different PropertyValue than the database.
-		///listProgPropsNew will always have the same number of items as the database list, since ProgramProperties are never deleted and are only
-		///inserted during convert database or when a new clinic is created.  We can simply update the property using listProgPropsNew and the db list
-		///sorted by primary key.  Simple sync function that never inserts or deletes rows.  Updates if the PropertyValue has changed.</summary>
-		public static void SyncSimple(List<ProgramProperty> listProgPropsNew,long programNum) {
+		public static void Sync(List<ProgramProperty> listProgPropsNew,long programNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listProgPropsNew,programNum);
 				return;
 			}
-			List<ProgramProperty> listPPDB=ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum && x.PropertyDesc!="");
-			for(int i=0;i<listProgPropsNew.Count;i++) {
-				ProgramProperty ppDB=listPPDB.FirstOrDefault(x => listProgPropsNew[i].ProgramPropertyNum==x.ProgramPropertyNum)??new ProgramProperty();
-				Crud.ProgramPropertyCrud.Update(listProgPropsNew[i],ppDB);
-			}
+			//prevents delete of program properties for clinics added while editing program properties.
+			List<long> listClinicNums = listProgPropsNew.Select(x => x.ClinicNum).Distinct().ToList();
+			List<ProgramProperty> listProgPropsDb=ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum && x.PropertyDesc!="" && listClinicNums.Contains(x.ClinicNum));
+			Crud.ProgramPropertyCrud.Sync(listProgPropsNew,listProgPropsDb);
 		}
-		
 
 	}
 }

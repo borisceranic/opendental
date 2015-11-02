@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -217,9 +216,10 @@ namespace OpenDentBusiness{
 			#endregion
 			//End checking for dependencies.
 			//Clinic is not being used, OK to delete.
-			command= "DELETE FROM clinic" 
-				+" WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
+			//Delete clinic specific program properties.
+			command="DELETE FROM programproperty WHERE ClinicNum="+POut.Long(clinic.ClinicNum)+" AND ClinicNum!=0";//just in case a programming error tries to delete an invalid clinic.
 			Db.NonQ(command);
+			Crud.ClinicCrud.Delete(clinic.ClinicNum);
 		}
 
 		///<summary>Returns null if clinic not found.  Pulls from cache.</summary>
