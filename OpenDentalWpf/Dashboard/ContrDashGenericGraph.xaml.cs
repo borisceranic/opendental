@@ -108,7 +108,7 @@ namespace OpenDentalWpf {
 				label.MaxWidth=100;
 				Canvas.SetTop(label,rectMain.Bottom()-4);
 				Typeface typeface=new Typeface(FontFamily,FontStyle,FontWeight,FontStretch);
-				FormattedText ft=new FormattedText(content,CultureInfo.CurrentCulture,FlowDirection.LeftToRight,typeface,FontSize,Foreground);
+				FormattedText ft=new FormattedText(content,PrefC.GetLanguageAndRegion(),FlowDirection.LeftToRight,typeface,FontSize,Foreground);
 				double wText=ft.Width;
 				//Debug.WriteLine(content+": "+wText.ToString("F0"));
 				Canvas.SetLeft(label,rectMain.Left()+(i*wCol)-wText/2d-5);
@@ -270,7 +270,7 @@ namespace OpenDentalWpf {
 			double yCenter=Canvas.GetTop((Ellipse)sender)+7;
 			Typeface typeface=new Typeface(FontFamily,FontStyle,FontWeight,FontStretch);
 			FormattedText ft=new FormattedText(labelHover.Content.ToString(), 
-				CultureInfo.CurrentCulture,FlowDirection.LeftToRight,typeface,FontSize,Foreground);
+				PrefC.GetLanguageAndRegion(),FlowDirection.LeftToRight,typeface,FontSize,Foreground);
 			double wText=ft.Width;
 			Canvas.SetLeft(labelHover,xCenter-wText/2d-1);
 			Canvas.SetTop(labelHover,yCenter-23);

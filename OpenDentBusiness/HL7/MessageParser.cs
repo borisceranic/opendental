@@ -1708,7 +1708,7 @@ namespace OpenDentBusiness.HL7 {
 					if(strSurf=="1" || strSurf=="2" || strSurf=="3" || strSurf=="4" || strSurf=="5" || strSurf=="6") {
 						isValidSextant=true;
 					}
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(strSurf=="03" || strSurf=="04" || strSurf=="05" || strSurf=="06" || strSurf=="07" || strSurf=="08") {
 							isValidSextant=true;
 						}

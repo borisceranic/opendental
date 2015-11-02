@@ -149,7 +149,7 @@ namespace OpenDental {
 				_clinicCur=_listClinics[0];//default to first clinic in list, if no clinics were passed into this form using the constructor.
 			}
 			FillComboClinicSms();
-			textCountryCode.Text=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
+			textCountryCode.Text=PrefC.GetCurrentRegion();
 			FillGridClinics();
 			FillGridSmsUsage();
 			SetSmsServiceAgreement();

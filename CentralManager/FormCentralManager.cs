@@ -49,8 +49,8 @@ namespace CentralManager {
 				Application.Exit();
 				return;
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
-				CultureInfo cInfo=(CultureInfo)CultureInfo.CurrentCulture.Clone();
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+				CultureInfo cInfo=(CultureInfo)PrefC.GetLanguageAndRegion().Clone();
 				cInfo.DateTimeFormat.ShortDatePattern="MM/dd/yyyy";
 				Application.CurrentCulture=cInfo;
 			}

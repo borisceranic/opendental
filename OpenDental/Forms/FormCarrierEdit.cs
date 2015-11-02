@@ -781,7 +781,7 @@ namespace OpenDental{
 			}
 			//textTemplates.Text=Carriers.DependentTemplates().ToString();
 			checkIsCDAnet.Checked=CarrierCur.IsCDA;//Can be checked but not visible.
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelCitySt.Text="City,Province,PostalCode";
 				labelElectID.Text="Carrier Identification Number";
 				groupCDAnet.Visible=checkIsCDAnet.Checked;
@@ -859,8 +859,8 @@ namespace OpenDental{
 				return;
 			}
 			//for US and Canada, capitalize second letter as well.
-			if(CultureInfo.CurrentCulture.Name=="en-US"
-				|| CultureInfo.CurrentCulture.Name=="en-CA"){
+			if(PrefC.GetLanguageAndRegion().Name=="en-US"
+				|| PrefC.GetLanguageAndRegion().Name=="en-CA") {
 				if(textState.Text.Length==2){
 					textState.Text=textState.Text.ToUpper();
 					textState.SelectionStart=cursor;

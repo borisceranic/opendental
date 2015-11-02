@@ -221,7 +221,7 @@ namespace OpenDentBusiness {
 		}
 
 		public static void SetSpansToDefault() {
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				SetSpansToDefaultCanada();
 			}
 			else {

@@ -103,10 +103,10 @@ namespace OpenDental{
 
 		///<summary>F is for Form. Translates the following controls on the entire form: title Text, labels, buttons, groupboxes, checkboxes, radiobuttons.  Can include a list of controls to exclude. Also puts all the correct controls into the All category (OK,Cancel,Close,Delete,etc).</summary>
 		public static void F(Form sender,Control[] exclusions) {
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				return;
 			}
-			if(CultureInfo.CurrentCulture.TextInfo.IsRightToLeft) {
+			if(PrefC.GetLanguageAndRegion().TextInfo.IsRightToLeft) {
 				sender.RightToLeft=RightToLeft.Yes;
 				sender.RightToLeftLayout=true;
 			}
@@ -146,7 +146,7 @@ namespace OpenDental{
 					Fchildren(sender,contr,exclusions);
 				}
 				Type contrType=contr.GetType();
-				if(CultureInfo.CurrentCulture.TextInfo.IsRightToLeft) {
+				if(PrefC.GetLanguageAndRegion().TextInfo.IsRightToLeft) {
 					if(contrType==typeof(GroupBox) || contrType==typeof(Panel)){
 						foreach(Control contrGb in contr.Controls){ 
 							contrGb.Location=new Point(contr.Width-contrGb.Width-contrGb.Left,contrGb.Top); 

@@ -866,7 +866,7 @@ namespace OpenDental{
 					retVal=t.Clone();
 				}
 				foreach(DataRow r in t.Rows) {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && stmt.IsReceipt) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && stmt.IsReceipt) {//Canadian. en-CA or fr-CA
 						if(r["StatementNum"].ToString()!="0") {//Hide statement rows for Canadian receipts.
 							continue;
 						}
@@ -879,14 +879,14 @@ namespace OpenDental{
 						r["ProcCode"]="";//Code: blank in Canada normally because this information is used on taxes and is considered a security concern.
 						r["tth"]="";//Tooth: blank in Canada normally because this information is used on taxes and is considered a security concern.
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-US"	&& stmt.IsReceipt && r["PayNum"].ToString()=="0") {//Hide everything except patient payments
+					if(PrefC.GetLanguageAndRegion().Name=="en-US"	&& stmt.IsReceipt && r["PayNum"].ToString()=="0") {//Hide everything except patient payments
 						continue;
 						//js Some additional features would be nice for receipts, such as hiding the bal column, the aging, and the amount due sections.
 					}
 					//The old way of printing "Single patient only" receipts would simply show all rows from the "account" table in one grid for foreign users.
 					//In order to keep this functionality for "Statements use Sheets" we need to force all rows to be associated to the stmt.PatNum.
-					if(CultureInfo.CurrentCulture.Name!="en-US"
-						&& !CultureInfo.CurrentCulture.Name.EndsWith("CA")
+					if(PrefC.GetLanguageAndRegion().Name!="en-US"
+						&& !PrefC.GetLanguageAndRegion().Name.EndsWith("CA")
 						&& stmt.IsReceipt
 						&& stmt.SinglePatient) 
 					{
@@ -896,7 +896,7 @@ namespace OpenDental{
 							r["PatNum"]=POut.Long(stmt.PatNum);
 						}
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-AU" && r["prov"].ToString().Trim()!="") {//English (Australia)
+					if(PrefC.GetLanguageAndRegion().Name=="en-AU" && r["prov"].ToString().Trim()!="") {//English (Australia)
 						r["description"]=r["prov"]+" - "+r["description"];
 					}
 					retVal.ImportRow(r);

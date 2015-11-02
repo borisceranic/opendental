@@ -83,7 +83,7 @@ namespace OpenDental {
 				if(PatCur.Birthdate!=DateTime.MinValue) {
 					textPatBirth.Text=PatCur.Birthdate.ToShortDateString();
 				}
-				comboPatLang.SelectedIndex=comboPatLang.Items.IndexOf(System.Globalization.CultureInfo.CurrentCulture.DisplayName);
+				comboPatLang.SelectedIndex=comboPatLang.Items.IndexOf(PrefC.GetLanguageAndRegion().DisplayName);
 				switch(PatCur.Gender) {
 					case PatientGender.Female:
 						radioPatGenFem.Checked=true;
@@ -107,7 +107,7 @@ namespace OpenDental {
 			if(ProvCur!=null) {
 				textProvName.Text=ProvCur.GetFormalName();
 				textProvID.Text=ProvCur.NationalProvID;
-				comboProvLang.SelectedIndex=comboPatLang.Items.IndexOf(System.Globalization.CultureInfo.CurrentCulture.DisplayName);
+				comboProvLang.SelectedIndex=comboPatLang.Items.IndexOf(PrefC.GetLanguageAndRegion().DisplayName);
 			}
 			//Fill Organization--------------------------------------------------------------------------------------------------------------
 			textOrgName.Text=PrefC.GetString(PrefName.PracticeTitle);

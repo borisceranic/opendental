@@ -743,8 +743,8 @@ namespace OpenDental{
 			textZip.Text=PrefC.GetString(PrefName.PracticeZip);
 			string phone=PrefC.GetString(PrefName.PracticePhone);
 			if(phone.Length==10 
-				&& (CultureInfo.CurrentCulture.Name=="en-US" || 
-				CultureInfo.CurrentCulture.Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
+				&& (PrefC.GetLanguageAndRegion().Name=="en-US" || 
+				PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
 			{
 				textPhone.Text="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 			}
@@ -753,8 +753,8 @@ namespace OpenDental{
 			}
 			string fax=PrefC.GetString(PrefName.PracticeFax);
 			if(fax.Length==10 
-				&& (CultureInfo.CurrentCulture.Name=="en-US" || 
-				CultureInfo.CurrentCulture.Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
+				&& (PrefC.GetLanguageAndRegion().Name=="en-US" || 
+				PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
 			{
 				textFax.Text="("+fax.Substring(0,3)+")"+fax.Substring(3,3)+"-"+fax.Substring(6);
 			}
@@ -773,7 +773,7 @@ namespace OpenDental{
 			textPayToST.Text=PrefC.GetString(PrefName.PracticePayToST);
 			textPayToZip.Text=PrefC.GetString(PrefName.PracticePayToZip);
 			textBankNumber.Text=PrefC.GetString(PrefName.PracticeBankNumber);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 				textBankRouting.Text=PrefC.GetString(PrefName.BankRouting);
 				textBankAddress.Text=PrefC.GetString(PrefName.BankAddress);
 			}
@@ -841,8 +841,8 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			string phone=textPhone.Text;
-			if(Application.CurrentCulture.Name=="en-US"
-				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) //Canadian. en-CA or fr-CA)
+			if(PrefC.GetLanguageAndRegion().Name=="en-US"
+				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) //Canadian. en-CA or fr-CA)
 			{
 				phone=phone.Replace("(","");
 				phone=phone.Replace(")","");
@@ -854,8 +854,8 @@ namespace OpenDental{
 				}
 			}
 			string fax=textFax.Text;
-			if(Application.CurrentCulture.Name=="en-US"
-				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) //Canadian. en-CA or fr-CA)
+			if(PrefC.GetLanguageAndRegion().Name=="en-US"
+				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) //Canadian. en-CA or fr-CA)
 			{
 				fax=fax.Replace("(","");
 				fax=fax.Replace(")","");
@@ -905,7 +905,7 @@ namespace OpenDental{
 			{
 				changed=true;
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 				if( Prefs.UpdateString(PrefName.BankRouting,textBankRouting.Text)
 					| Prefs.UpdateString(PrefName.BankAddress,textBankAddress.Text))
 				{

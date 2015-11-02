@@ -389,7 +389,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Store name cannot be blank."));
 				return;
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US"){
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				if(textPhone.Text!="" && TelephoneNumbers.FormatNumbersExactTen(textPhone.Text)==""){
 					MessageBox.Show(Lan.g(this,"Phone number must be in a 10-digit format."));
 					return;

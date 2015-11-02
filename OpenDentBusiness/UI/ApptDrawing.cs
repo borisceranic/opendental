@@ -457,7 +457,7 @@ namespace OpenDentBusiness.UI {
 			Font bfont=new Font(FontFamily.GenericSansSerif,8,FontStyle.Bold);//was Arial
 			g.TextRenderingHint=TextRenderingHint.SingleBitPerPixelGridFit;//to make printing clearer
 			DateTime hour;
-			CultureInfo ci=(CultureInfo)CultureInfo.CurrentCulture.Clone();
+			CultureInfo ci=(CultureInfo)PrefC.GetLanguageAndRegion().Clone();
 			string hFormat=Lans.GetShortTimeFormat(ci);
 			string sTime;
 			int stop=stopTime.Hour;

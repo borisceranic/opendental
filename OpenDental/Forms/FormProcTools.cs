@@ -227,7 +227,7 @@ namespace OpenDental{
 				checkApptProcsQuickAdd.Enabled=false;
 				checkRecallTypes.Enabled=false;
 			#endif
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//Tcodes remain enabled
 				//Ncodes remain enabled
 				checkDcodes.Text="CDA codes - Add any missing 2014 CDA codes.  This option does not work in the trial version.";
@@ -327,7 +327,7 @@ namespace OpenDental{
 			#region D Codes
 			if(checkDcodes.Checked) {
 				try {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(_codeList==null) {
 							CanadaDownloadProcedureCodes();
 						}

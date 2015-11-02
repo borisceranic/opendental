@@ -164,7 +164,7 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			if(CultureInfo.CurrentCulture.Name=="en-US"){
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				//if not match to D****
 				if(!Regex.IsMatch(textFrom.Text,@"^D\w{4}$") || !Regex.IsMatch(textTo.Text,@"^D\w{4}$")){
 					if(!MsgBox.Show(this,true,"One of the codes is not a standard ADA code.  Use anyway?")){

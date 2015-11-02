@@ -511,7 +511,7 @@ namespace OpenDental{
 			textDateFrom.Text=DateTime.Today.AddDays(-7).ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
 			_listCurEtransTypes=new List<EtransType>();
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				_listCurEtransTypes.Add(EtransType.ClaimPrinted);
 				_listCurEtransTypes.Add(EtransType.Claim_CA);
 				_listCurEtransTypes.Add(EtransType.Claim_Ren);
@@ -588,7 +588,7 @@ namespace OpenDental{
 			button.DropDownMenu=contextMenuEclaims;
 			ToolBarMain.Buttons.Add(button);
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Validate Claims"),-1,Lan.g(this,"Refresh and Validate Selected Claims"),"Validate"));
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Outstanding"),-1,Lan.g(this,"Get Outstanding Transactions"),"Outstanding"));
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Payment Rec"),-1,Lan.g(this,"Get Payment Reconciliation Transactions"),"PayRec"));
 				//ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Summary Rec"),-1,Lan.g(this,"Get Summary Reconciliation Transactions"),"SummaryRec"));
@@ -1262,7 +1262,7 @@ namespace OpenDental{
 			//listQueue=Claims.GetQueueList();
 			gridHistory.BeginUpdate();
 			gridHistory.Columns.Clear();
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				ODGridColumn col;
 				col=new ODGridColumn(Lan.g("TableClaimHistory","Patient Name"),130);
 				gridHistory.Columns.Add(col);

@@ -1322,18 +1322,18 @@ namespace OpenDentBusiness{
 				}
 				else if(message.DateValue.Contains(",")) {//The day-of-week, comma and following space are optional. Examples: "Tue, 3 Dec 2013 17:10:37 +0000", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
 					try {
-						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,31),"ddd, d MMM yyyy HH:mm:ss zzz",System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat);
+						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,31),"ddd, d MMM yyyy HH:mm:ss zzz",PrefC.GetLanguageAndRegion().DateTimeFormat);
 					}
 					catch {
-						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,30),"ddd, d MMM yyyy HH:mm:ss zzz",System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat);
+						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,30),"ddd, d MMM yyyy HH:mm:ss zzz",PrefC.GetLanguageAndRegion().DateTimeFormat);
 					}
 				}
 				else {//Examples: "3 Dec 2013 17:10:37 -0800", "12 Nov 2013 17:10:37 -0800 (UTC)"
 					try {
-						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,26),"d MMM yyyy HH:mm:ss zzz",System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat);
+						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,26),"d MMM yyyy HH:mm:ss zzz",PrefC.GetLanguageAndRegion().DateTimeFormat);
 					}
 					catch {
-						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,25),"d MMM yyyy HH:mm:ss zzz",System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat);
+						emailMessage.MsgDateTime=DateTime.ParseExact(message.DateValue.Substring(0,25),"d MMM yyyy HH:mm:ss zzz",PrefC.GetLanguageAndRegion().DateTimeFormat);
 					}
 				}
 			}

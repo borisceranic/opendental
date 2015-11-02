@@ -161,7 +161,7 @@ namespace OpenDentBusiness {
 				ds.Tables.Add(JobRoles.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.Languages) || isAll) {
-				if(CultureInfo.CurrentCulture.Name!="en-US") {
+				if(PrefC.GetLanguageAndRegion().Name!="en-US") {
 					ds.Tables.Add(Lans.RefreshCache());
 				}
 			}

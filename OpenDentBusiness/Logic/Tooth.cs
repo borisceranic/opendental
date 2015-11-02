@@ -163,7 +163,7 @@ namespace OpenDentBusiness{
 			int index = Array.IndexOf(labelsUniversal, tooth_id);
 			if(index==-1){
 				if(nomenclature == ToothNumberingNomenclature.FDI
-					&& CultureInfo.CurrentCulture.Name.EndsWith("CA")
+					&& PrefC.GetLanguageAndRegion().Name.EndsWith("CA")
 					&& tooth_id=="51")
 				{
 					return "99";//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
@@ -223,7 +223,7 @@ namespace OpenDentBusiness{
 			}
 			int index = 0;
 			if(nomenclature == ToothNumberingNomenclature.FDI) {
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && tooth_label=="99") {
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && tooth_label=="99") {
 					return "51";//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
 				}
 				index = Array.IndexOf(labelsFDI, tooth_label);
@@ -417,7 +417,7 @@ namespace OpenDentBusiness{
 				if(Regex.IsMatch(toothNum,"^[5-8][1-5]$")){//pri teeth: matches firt digit 5-8 and second digit 1-5
 					return true;
 				}
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && toothNum=="99") {//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && toothNum=="99") {//supernumerary tooth: It is documented in the cdha website that 99 is the only valid number for supernumerary teeth.
 					return true;
 				}
 				return false;
@@ -751,7 +751,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Handles direct user input and tidies according to rules.  ToothNum might be empty, and a tidy should still be attempted.  Otherwise, toothNum must be valid.</summary>
 		public static string SurfTidyForDisplay(string surf,string toothNum){
-			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
+			bool isCanadian=PrefC.GetLanguageAndRegion().Name.EndsWith("CA");//Canadian. en-CA or fr-CA
 			//Canadian valid=MOIDBLV
 			if(surf==null){
 				surf="";
@@ -822,7 +822,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Converts the database value to a claim value.  Special handling for V surfaces.  ToothNum must be valid.</summary>
 		public static string SurfTidyForClaims(string surf,string toothNum) {
-			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
+			bool isCanadian=PrefC.GetLanguageAndRegion().Name.EndsWith("CA");//Canadian. en-CA or fr-CA
 			//Canadian valid=MOIDBLV
 			if(surf==null) {
 				surf="";
@@ -879,7 +879,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Takes display string and converts it into Db string.  ToothNum does not need to be valid.</summary>
 		public static string SurfTidyFromDisplayToDb(string surf,string toothNum) {
-			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
+			bool isCanadian=PrefC.GetLanguageAndRegion().Name.EndsWith("CA");//Canadian. en-CA or fr-CA
 			//Canadian valid=MOIDBLV
 			if(surf==null) {
 				surf="";
@@ -950,7 +950,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Takes surfaces from Db and converts them to appropriate culture for display.  Only Canada supported so far.  ToothNum does not need to be valid since minimal manipulation here.</summary>
 		public static string SurfTidyFromDbToDisplay(string surf,string toothNum) {
-			bool isCanadian=CultureInfo.CurrentCulture.Name.EndsWith("CA");//Canadian. en-CA or fr-CA
+			bool isCanadian=PrefC.GetLanguageAndRegion().Name.EndsWith("CA");//Canadian. en-CA or fr-CA
 			//Canadian valid=MOIDBLV
 			if(!isCanadian) {
 				return surf;

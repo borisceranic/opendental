@@ -265,7 +265,7 @@ namespace OpenDental{
 			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),pat2.PatNum.ToString()+".pdf");
 			PrintDocument pd=new PrintDocument();
 			pd.DefaultPageSettings.Margins=new Margins(40,40,40,60);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 				//leave a big margin on the bottom for the routing slip
 				pd.DefaultPageSettings.Margins=new Margins(40,40,40,440);//4.4" from bottom
 			}
@@ -415,7 +415,7 @@ namespace OpenDental{
 			//dataSet=AccountModuleL.GetStatement(stmt.PatNum,stmt.SinglePatient,stmt.DateRangeFrom,stmt.DateRangeTo,
 			//	stmt.Intermingled);
 			pd.DefaultPageSettings.Margins=new Margins(40,40,40,60);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 				//leave a big margin on the bottom for the routing slip
 				pd.DefaultPageSettings.Margins=new Margins(40,40,40,440);//4.4" from bottom
 			}
@@ -472,7 +472,7 @@ namespace OpenDental{
 			par.Format=parformat;
 			font=MigraDocHelper.CreateFont(14,true);
 			if(Stmt.IsInvoice) {
-				if(CultureInfo.CurrentCulture.Name=="en-NZ" || CultureInfo.CurrentCulture.Name=="en-AU") {//New Zealand and Australia
+				if(PrefC.GetLanguageAndRegion().Name=="en-NZ" || PrefC.GetLanguageAndRegion().Name=="en-AU") {//New Zealand and Australia
 					text=Lan.g(this,"TAX INVOICE");
 				}
 				else {
@@ -482,7 +482,7 @@ namespace OpenDental{
 			}
 			else if(Stmt.IsReceipt) {
 				text=Lan.g(this,"RECEIPT");
-				if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("SG")) {//SG=Singapore
 					text+=" #"+Stmt.StatementNum.ToString();
 				}
 			}
@@ -507,7 +507,7 @@ namespace OpenDental{
 			#endregion Heading
 			//"COPY" for foreign countries' TAX INVOICES------------------------------------------------------------------------
 			#region Tax Invoice Copy
-			if(Stmt.IsInvoiceCopy && CultureInfo.CurrentCulture.Name!="en-US") {//We don't show this for US.
+			if(Stmt.IsInvoiceCopy && PrefC.GetLanguageAndRegion().Name!="en-US") {//We don't show this for US.
 				font=MigraDocHelper.CreateFont(28,true,System.Drawing.Color.Red);
 				frame=section.AddTextFrame();
 				frame.RelativeVertical=RelativeVertical.Page;
@@ -542,12 +542,12 @@ namespace OpenDental{
 					par.Format.Font=font;
 					par.AddText(clinic.Description);
 					par.AddLineBreak();
-					if(CultureInfo.CurrentCulture.Name=="en-AU") {//Australia
+					if(PrefC.GetLanguageAndRegion().Name=="en-AU") {//Australia
 						Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 						par.AddText("ABN: "+defaultProv.NationalProvID);
 						par.AddLineBreak();
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-NZ") {//New Zealand
+					if(PrefC.GetLanguageAndRegion().Name=="en-NZ") {//New Zealand
 						Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 						par.AddText("GST: "+defaultProv.SSN);
 						par.AddLineBreak();
@@ -558,10 +558,10 @@ namespace OpenDental{
 						par.AddText(clinic.Address2);
 						par.AddLineBreak();
 					}
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 						par.AddText(clinic.Zip+" "+clinic.City);
 					}
-					else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+					else if(PrefC.GetLanguageAndRegion().Name.EndsWith("SG")) {//SG=Singapore
 						par.AddText(clinic.City+" "+clinic.Zip);
 					}
 					else {
@@ -580,12 +580,12 @@ namespace OpenDental{
 					par.Format.Font=font;
 					par.AddText(PrefC.GetString(PrefName.PracticeTitle));
 					par.AddLineBreak();
-					if(CultureInfo.CurrentCulture.Name=="en-AU"){//Australia
+					if(PrefC.GetLanguageAndRegion().Name=="en-AU"){//Australia
 						Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 						par.AddText("ABN: "+defaultProv.NationalProvID);
 						par.AddLineBreak();
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-NZ") {//New Zealand
+					if(PrefC.GetLanguageAndRegion().Name=="en-NZ") {//New Zealand
 						Provider defaultProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 						par.AddText("GST: "+defaultProv.SSN);
 						par.AddLineBreak();
@@ -596,10 +596,10 @@ namespace OpenDental{
 						par.AddText(PrefC.GetString(PrefName.PracticeAddress2));
 						par.AddLineBreak();
 					}
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 						par.AddText(PrefC.GetString(PrefName.PracticeZip)+" "+PrefC.GetString(PrefName.PracticeCity));
 					}
-					else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+					else if(PrefC.GetLanguageAndRegion().Name.EndsWith("SG")) {//SG=Singapore
 						par.AddText(PrefC.GetString(PrefName.PracticeCity)+" "+PrefC.GetString(PrefName.PracticeZip));
 					}
 					else {
@@ -756,10 +756,10 @@ namespace OpenDental{
 				par.AddText(PatGuar.Address2);
 				par.AddLineBreak();
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
 				par.AddText(PatGuar.Zip+" "+PatGuar.City);
 			}
-			else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
+			else if(PrefC.GetLanguageAndRegion().Name.EndsWith("SG")) {//SG=Singapore
 				par.AddText(PatGuar.City+" "+PatGuar.Zip);
 			}
 			else {
@@ -787,7 +787,7 @@ namespace OpenDental{
 			//Australian Provider Legend
 			#region Australian Provider Legend
 			int legendOffset=0;
-			if(CultureInfo.CurrentCulture.Name=="en-AU") {//English (Australia)
+			if(PrefC.GetLanguageAndRegion().Name=="en-AU") {//English (Australia)
 				Providers.RefreshCache();
 				legendOffset=25+15*(1+ProviderC.ListShort.Count);
 				MigraDocHelper.InsertSpacer(section,legendOffset);
@@ -1199,7 +1199,7 @@ namespace OpenDental{
 				gridPat.Rows.Clear();
 				//lineData=FamilyStatementDataList[famIndex].PatDataList[i].PatData;
 				for(int p=0;p<tableAccount.Rows.Count;p++) {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
 							if(tableAccount.Rows[p]["StatementNum"].ToString()!="0") {//Hide statement rows for Canadian receipts.
 								continue;
@@ -1209,7 +1209,7 @@ namespace OpenDental{
 							}
 						}
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-US") {
+					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 						if(Stmt.IsReceipt) {
 							if(tableAccount.Rows[p]["PayNum"].ToString()=="0") {//Hide everything except patient payments
 								continue;
@@ -1220,7 +1220,7 @@ namespace OpenDental{
 					grow=new ODGridRow();
 					grow.Cells.Add(tableAccount.Rows[p]["date"].ToString());
 					grow.Cells.Add(tableAccount.Rows[p]["patient"].ToString());
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
 							grow.Cells.Add("");//Code: blank in Canada normally because this information is used on taxes and is considered a security concern.
 							grow.Cells.Add("");//Tooth: blank in Canada normally because this information is used on taxes and is considered a security concern.
@@ -1238,7 +1238,7 @@ namespace OpenDental{
 							grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
 						}
 					}
-					if(CultureInfo.CurrentCulture.Name=="en-AU") {//English (Australia)
+					if(PrefC.GetLanguageAndRegion().Name=="en-AU") {//English (Australia)
 						if(tableAccount.Rows[p]["prov"].ToString().Trim()!="") {
 							grow.Cells.Add(tableAccount.Rows[p]["prov"].ToString()+" - "+tableAccount.Rows[p]["description"].ToString());
 						}
@@ -1246,7 +1246,7 @@ namespace OpenDental{
 							grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
 						}
 					}
-					else if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					else if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
 							if(PIn.Long(tableAccount.Rows[p]["ProcNum"].ToString())==0) {
 								grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
@@ -1308,7 +1308,7 @@ namespace OpenDental{
 			#endregion Future appointments
 			//Region specific static notes--------------------------------------------------------------------------------------
 			#region Region specific static notes i.e. "KEEP THIS RECEIPT FOR INCOME TAX PURPOSES" for Canada
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(Stmt.IsReceipt) {
 					font=MigraDocHelper.CreateFont(9);
 					par=section.AddParagraph();
@@ -1335,7 +1335,7 @@ namespace OpenDental{
 			#endregion
 			//Swiss Banking-----------------------------------------------------------------------------------------------------
 			#region SwissBanking
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")){//CH is for switzerland. eg de-CH
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CH")){//CH is for switzerland. eg de-CH
 				//&& pagesPrinted==0)//only on the first page
 			//{
 				//float yred=744;//768;//660 for testing

@@ -517,7 +517,7 @@ namespace OpenDental{
 				if(ClaimProcsForClaim[i].ProcNum==0){
 					continue;//skip payments
 				}
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					proc=Procedures.GetProcFromList(ListProc,ClaimProcsForClaim[i].ProcNum);
 					if(proc.ProcNumLab!=0) { //This is a lab fee procedure.
 						continue;//skip lab fee procedures in Canada, because they will show up on the same line as the procedure that they are attached to.
@@ -901,7 +901,7 @@ namespace OpenDental{
 						}
 						break;
 					case "Relationship":
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							if(ClaimCur.PatRelat==Relat.Self) {
 								displayStrings[i]="Self";
 							}
@@ -933,7 +933,7 @@ namespace OpenDental{
 						}
 						break;
 					case "IsStudent":
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")//Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")//Canadian. en-CA or fr-CA
 							&& (PatCur.CanadianEligibilityCode==1 || PatCur.CanadianEligibilityCode==3))//Patient is a student
 						{
 							displayStrings[i]="X";
@@ -1045,7 +1045,7 @@ namespace OpenDental{
 						break;
 					case "PatIDFromPatPlan": //Dependant Code for Canada
 						patPlans=PatPlans.Refresh(PatNumCur);
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							if(carrier.ElectID=="000064") { //Pacific Blue Cross (PBC)
 								displayStrings[i]=subCur.SubscriberID+"-"+PatPlans.GetPatID(subCur.InsSubNum,patPlans);
 							}
@@ -1372,7 +1372,7 @@ namespace OpenDental{
 						break;
 					case "Remarks":
 						displayStrings[i]="";
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							if(carrier.ElectID=="000064") { //Pacific Blue Cross (PBC)
 								if(ClaimCur.ClaimType=="PreAuth") {
 									displayStrings[i]+="Predetermination only."+Environment.NewLine;
@@ -1680,7 +1680,7 @@ namespace OpenDental{
 						break;
 					case "BillingDentistNPI":
 						displayStrings[i]=ProviderC.ListLong[Providers.GetIndexLong(ClaimCur.ProvBill)].NationalProvID;
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && //Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && //Canadian. en-CA or fr-CA
 							carrier.ElectID=="000064" && //Pacific Blue Cross (PBC)
 							ProviderC.ListLong[Providers.GetIndexLong(ClaimCur.ProvBill)].NationalProvID!= ProviderC.ListLong[Providers.GetIndexLong(ClaimCur.ProvTreat)].NationalProvID && //Billing and treating providers are different
 							displayStrings[i].Length==9) { //Only for provider numbers which have been entered correctly (to prevent and indexing exception).
@@ -2044,7 +2044,7 @@ namespace OpenDental{
 						}
 						break;
 				}//switch
-				if(CultureInfo.CurrentCulture.Name=="nl-BE"	&& displayStrings[i]==""){//Dutch Belgium
+				if(PrefC.GetLanguageAndRegion().Name=="nl-BE"	&& displayStrings[i]=="") {//Dutch Belgium
 					displayStrings[i]="*   *   *";
 				}
 				//Renaissance eclaims only: Remove newlines from display strings to prevent formatting issues, because the .rss file format requires each field on a single line.
@@ -3043,7 +3043,7 @@ namespace OpenDental{
 						for(int f=startProc;f<startProc+totProcs;f++) {//eg f=0;f<10;f++
 							if(f < ListClaimProcs.Count) {
 								fee+=(decimal)((ClaimProc)ListClaimProcs[f]).FeeBilled;
-								if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+								if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 									List<Procedure> labProcs=Procedures.GetCanadianLabFees(ListClaimProcs[f].ProcNum,ListProc);
 									for(int j=0;j<labProcs.Count;j++) {
 										fee+=(decimal)labProcs[j].ProcFee;
@@ -3075,7 +3075,7 @@ namespace OpenDental{
 						}
 						break;
 				}//switch
-				if(CultureInfo.CurrentCulture.Name=="nl-BE" && displayStrings[i]==""){//Dutch Belgium
+				if(PrefC.GetLanguageAndRegion().Name=="nl-BE" && displayStrings[i]=="") {//Dutch Belgium
 					displayStrings[i]="*   *   *";
 				}
 			}//for i
@@ -3553,7 +3553,7 @@ namespace OpenDental{
 			//remember that procIndex is 1 based, not 0 based, 
 			procIndex--;//so convert to 0 based
 			if(ListClaimProcs.Count <= procIndex){
-				//if(CultureInfo.CurrentCulture.Name=="nl-BE"){//Dutch Belgium
+				//if(PrefC.GetLanguageAndRegion().Name=="nl-BE"){//Dutch Belgium
 				//	return"*   *   *";
 				//}
 				//else{
@@ -3571,7 +3571,7 @@ namespace OpenDental{
 			}
 			if(field=="Fee") {
 				decimal totalProcFees=(decimal)ListClaimProcs[procIndex].FeeBilled;
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					List<Procedure> labProcs=Procedures.GetCanadianLabFees(ListClaimProcs[procIndex].ProcNum,ListProc);
 					for(int i=0;i<labProcs.Count;i++) {
 						totalProcFees+=(decimal)labProcs[i].ProcFee;
@@ -3702,7 +3702,7 @@ namespace OpenDental{
 				return pointer;
 			}
 			if(field=="Lab") {// && ProcCur.LabFee>0) {
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					List<Procedure> labProcs=Procedures.GetCanadianLabFees(ListClaimProcs[procIndex].ProcNum,ListProc);
 					decimal totalLabFees=0;
 					for(int i=0;i<labProcs.Count;i++) {
@@ -3719,7 +3719,7 @@ namespace OpenDental{
 				return "";//ProcCur.LabFee.ToString("n");
 			}
 			if(field=="FeeMinusLab") {
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					if(stringFormat=="") {
 						return ListClaimProcs[procIndex].FeeBilled.ToString("F");
 					}
@@ -3753,7 +3753,7 @@ namespace OpenDental{
 					//surf blank
 					break;
 				case TreatmentArea.Sextant:
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						//United States Sextant 1 is Canadian sextant 03.
 						//United States Sextant 2 is Canadian sextant 04.
 						//United States Sextant 3 is Canadian sextant 05.

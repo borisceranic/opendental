@@ -2976,7 +2976,7 @@ namespace OpenDental{
 				comboBillingTypeTwo.Visible=false;
 				labelBillingTypeTwo.Visible=false;
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//groupCanadianProcType.Location=new Point(106,301);
 				groupProsth.Visible=false;
 				labelClaimNote.Visible=false;
@@ -3070,7 +3070,7 @@ namespace OpenDental{
 				butSnomedBodySiteSelect.Visible=false;
 				butNoneSnomedBodySite.Visible=false;
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				radioS1.Text="03";//Sextant 1 in the United States is sextant 03 in Canada.
 				radioS2.Text="04";//Sextant 2 in the United States is sextant 04 in Canada.
 				radioS3.Text="05";//Sextant 3 in the United States is sextant 05 in Canada.
@@ -3230,7 +3230,7 @@ namespace OpenDental{
 				}
 			}
 			textSite.Text=Sites.GetDescription(ProcCur.SiteNum);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(ProcCur.CanadianTypeCodes==null || ProcCur.CanadianTypeCodes=="") {
 					checkTypeCodeX.Checked=true;
 				}
@@ -3475,14 +3475,14 @@ namespace OpenDental{
 
 		private void SetSurfButtons(){
 			if(textSurfaces.Text.Contains("B") || textSurfaces.Text.Contains("F")) butBF.BackColor=Color.White;
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textSurfaces.Text.Contains("V")) butBF.BackColor=Color.White;
 			}
 			if(textSurfaces.Text.Contains("O") || textSurfaces.Text.Contains("I")) butOI.BackColor=Color.White;
 			if(textSurfaces.Text.Contains("M")) butM.BackColor=Color.White;
 			if(textSurfaces.Text.Contains("D")) butD.BackColor=Color.White;
 			if(textSurfaces.Text.Contains("L")) butL.BackColor=Color.White;
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textSurfaces.Text.Contains("5")) butV.BackColor=Color.White;
 			}
 			else{
@@ -4726,7 +4726,7 @@ namespace OpenDental{
 				textSurfaces.AppendText("D");
 			}
 			if(butV.BackColor==Color.White) {
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					textSurfaces.AppendText("5");
 				}
 				else {
@@ -4736,7 +4736,7 @@ namespace OpenDental{
 			if(butBF.BackColor==Color.White) {
 				//if(ToothGraphic.IsAnterior(Tooth.FromInternat(textTooth.Text))) {
 				if(Tooth.IsAnterior(Tooth.FromInternat(textTooth.Text))) {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						textSurfaces.AppendText("V");//vestibular
 					}
 					else {
@@ -5170,7 +5170,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(checkTypeCodeX.Checked) {
 					if(checkTypeCodeA.Checked
 						|| checkTypeCodeB.Checked
@@ -5427,7 +5427,7 @@ namespace OpenDental{
 			}
 			ProcCur.BillingNote=textBillingNote.Text;
 			//ProcCur.HideGraphical=checkHideGraphical.Checked;
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				ProcCur.CanadianTypeCodes="";
 				if(checkTypeCodeA.Checked) {
 					ProcCur.CanadianTypeCodes+="A";
@@ -5709,11 +5709,11 @@ namespace OpenDental{
 				ToothInitials.SetValue(ProcCur.PatNum,ProcCur.ToothNum,ToothInitialType.Missing);
 			}
 			//Canadian lab fees complete-----------------------------------------------------------------------------------------------------------------------
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && ProcCur.ProcStatus==ProcStat.C) {//Canada
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && ProcCur.ProcStatus==ProcStat.C) {//Canada
 				Procedures.SetCanadianLabFeesCompleteForProc(ProcCur);
 			}
 			//Canadian lab fees not complete-----------------------------------------------------------------------------------------------------------------------
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && ProcCur.ProcStatus!=ProcStat.C) {//Canada
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && ProcCur.ProcStatus!=ProcStat.C) {//Canada
 				Procedures.SetCanadianLabFeesStatusForProc(ProcCur);
 			}
 			//Autocodes----------------------------------------------------------------------------------------------------------------------------------------

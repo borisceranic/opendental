@@ -3907,7 +3907,7 @@ namespace OpenDental{
 				butBatch.Visible=false;
 				labelBatch.Visible=false;
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelPredeterm.Text=Lan.g(this,"Predeterm Num");
 				labelPriorAuth.Visible=false;
 				textPriorAuth.Visible=false;
@@ -4263,7 +4263,7 @@ namespace OpenDental{
 			}
 			//Canadian------------------------------------------------------------------
 			//(there's also a FillCanadian section for fields that do not collide with USA fields)
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(ClaimCur.AccidentDate.Year<1880) {
 					textCanadianAccidentDate.Text="";
 				}
@@ -4572,7 +4572,7 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
 			gridProc.Columns.Add(col);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				col=new ODGridColumn(Lan.g("TableClaimProc","Labs"),62,HorizontalAlignment.Right);
 				gridProc.Columns.Add(col);
 			}
@@ -4639,7 +4639,7 @@ namespace OpenDental{
 				}
 				row.Cells.Add(ClaimProcsForClaim[i].FeeBilled.ToString("F"));
 				decimal claimProcInsEst=(decimal)ClaimProcsForClaim[i].InsPayEst;
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					decimal labFeesForProc=0;
 					List<Procedure> labFeeProcs=Procedures.GetCanadianLabFees(ClaimProcsForClaim[i].ProcNum,ProcList);
 					for(int j=0;j<labFeeProcs.Count;j++) {
@@ -6042,7 +6042,7 @@ namespace OpenDental{
 
 		///<summary>Only called from one location above.  In its own method for readability.</summary>
 		private bool CanadianWarnings(){
-			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//if not Canadian
+			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//if not Canadian
 				return true;//skip this entire method
 			}
 			if(textCanadianAccidentDate.errorProvider1.GetError(textCanadianAccidentDate)!="") {
@@ -6342,7 +6342,7 @@ namespace OpenDental{
 			}
 			ClaimCur.AttachmentID=textAttachID.Text;
 			//Canadian---------------------------------------------------------------------------------
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				ClaimCur.CanadianMaterialsForwarded="";
 				if(checkEmail.Checked) {
 					ClaimCur.CanadianMaterialsForwarded+="E";

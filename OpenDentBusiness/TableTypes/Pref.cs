@@ -307,6 +307,8 @@ namespace OpenDentBusiness {
 		InsWriteoffDescript,
 		IntermingleFamilyDefault,
 		LabelPatientDefaultSheetDefNum,
+		///<summary>Used to determine how many windows are displayed throughout the program, translation, charting, and other features. Version 15.4.1</summary>
+		LanguageAndRegion,
 		///<summary>Initially set to Declined to Specify.  Indicates which language from the LanguagesUsedByPatients preference is the language that indicates the patient declined to specify.  Text must exactly match a language in the list of available languages.  Can be blank if the user deletes the language from the list of available languages.</summary>
 		LanguagesIndicateNone,
 		///<summary>Comma-delimited list of two-letter language names and custom language names.  The custom language names are the full string name and are not necessarily supported by Microsoft.</summary>

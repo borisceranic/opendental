@@ -241,7 +241,7 @@ namespace OpenDental{
 				if(claimProcCur.CodeSent.Length>5 && claimProcCur.CodeSent.Substring(0,1)=="D") {
 					claimProcCur.CodeSent=claimProcCur.CodeSent.Substring(0,5);
 				}
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					if(claimProcCur.CodeSent.Length>5) {//In Canadian e-claims, codes can contain letters or numbers and cannot be longer than 5 characters.
 						claimProcCur.CodeSent=claimProcCur.CodeSent.Substring(0,5);
 					}
@@ -280,7 +280,7 @@ namespace OpenDental{
 			retVal.Add(claimCur);
 			ClaimL.CalculateAndUpdate(new List<Procedure> {proc},insPlanList,claimCur,patPlanList,benefitList,Patients.GetPat(proc.PatNum).Age,subList);
 			if(PatPlans.GetOrdinal(PriSecMed.Secondary,patPlanList,insPlanList,subList)>0 //if there exists a secondary plan
-			   && !CultureInfo.CurrentCulture.Name.EndsWith("CA")) //and not canada (don't create secondary claim for canada)
+			   && !PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) //and not canada (don't create secondary claim for canada)
 			{
 				claimCur=CreateClaim("S",patPlanList,insPlanList,claimProcList,proc,subList);
 				if(claimCur.ClaimNum==0) {

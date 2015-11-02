@@ -19,7 +19,7 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			get {
 				if(hList==null) {
-					if(CultureInfo.CurrentCulture.Name=="en-US") {
+					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 						hList=new Dictionary<string,Language>();
 						return hList;
 					}
@@ -36,7 +36,7 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
 			string command="SELECT * FROM language";
 			DataTable table=null;
-			if(CultureInfo.CurrentCulture.Name!="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name!="en-US") {
 				table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 				table.TableName="Language";
 			}
@@ -48,7 +48,7 @@ namespace OpenDentBusiness {
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
 			hList=new Dictionary<string,Language>();
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				return;
 			}
 			List<Language> list=Crud.LanguageCrud.TableToList(table);
@@ -82,7 +82,7 @@ namespace OpenDentBusiness {
 		///<summary>This is where all the action happens.  This method is used by all the others.  This is always run on the client rather than the server, unless, of course, it's being called from the server.  If it inserts an item into the db table, it will also add it to the local cache, but will not trigger a refresh on both ends.</summary>
 		public static string ConvertString(string classType,string text) {
 			//No need to check RemotingRole; no call to db.
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				return text;
 			}
 			if(text=="") {
@@ -179,14 +179,14 @@ namespace OpenDentBusiness {
 		///<summary>This had to be added because SilverLight does not allow globally setting the current culture format.</summary>
 		public static string GetShortDateTimeFormat() {
 			//No need to check RemotingRole; no call to db.
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
-				//DateTimeFormatInfo formatinfo=(DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone();
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+				//DateTimeFormatInfo formatinfo=(DateTimeFormatInfo)PrefC.GetLanguageAndRegion().DateTimeFormat.Clone();
 				//formatinfo.ShortDatePattern="MM/dd/yyyy";
 				//return formatinfo;
 				return "MM/dd/yyyy";
 			}
 			else {
-				return CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+				return PrefC.GetLanguageAndRegion().DateTimeFormat.ShortDatePattern;
 			}
 		}
 

@@ -854,14 +854,14 @@ namespace OpenDental{
 			}
 			textDescription.Text=ClinicCur.Description;
 			string phone=ClinicCur.Phone;
-			if(phone!=null && phone.Length==10 && Application.CurrentCulture.Name=="en-US"){
+			if(phone!=null && phone.Length==10 && PrefC.GetLanguageAndRegion().Name=="en-US") {
 				textPhone.Text="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 			}
 			else{
 				textPhone.Text=phone;
 			}
 			string fax=ClinicCur.Fax;
-			if(fax!=null && fax.Length==10 && Application.CurrentCulture.Name=="en-US") {
+			if(fax!=null && fax.Length==10 && PrefC.GetLanguageAndRegion().Name=="en-US") {
 				textFax.Text="("+fax.Substring(0,3)+")"+fax.Substring(3,3)+"-"+fax.Substring(6);
 			}
 			else {
@@ -1015,7 +1015,7 @@ namespace OpenDental{
 				return;
 			}
 			string phone=textPhone.Text;
-			if(Application.CurrentCulture.Name=="en-US"){
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				phone=phone.Replace("(","");
 				phone=phone.Replace(")","");
 				phone=phone.Replace(" ","");
@@ -1026,7 +1026,7 @@ namespace OpenDental{
 				}
 			}
 			string fax=textFax.Text;
-			if(Application.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				fax=fax.Replace("(","");
 				fax=fax.Replace(")","");
 				fax=fax.Replace(" ","");

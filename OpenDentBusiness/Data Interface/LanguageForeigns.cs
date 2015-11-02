@@ -15,7 +15,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			get {
 				if(hList==null) {
-					Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+					Refresh(PrefC.GetLanguageAndRegion().Name,PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName);
 				}
 				return hList;
 			}
@@ -96,7 +96,7 @@ namespace OpenDentBusiness{
 			}
 			string command=
 				"SELECT * FROM languageforeign "
-				+"WHERE Culture='"+CultureInfo.CurrentCulture.Name+"'";
+				+"WHERE Culture='"+PrefC.GetLanguageAndRegion().Name+"'";
 			return Crud.LanguageForeignCrud.SelectMany(command).ToArray();
 		}
 

@@ -663,7 +663,7 @@ namespace OpenDental{
 				checkIntermingled.Checked=StmtCur.Intermingled;
 				checkIsReceipt.Checked=StmtCur.IsReceipt;
 				if(StmtCur.IsInvoice) {//If they got here with drop down menu invoice item.
-					if(CultureInfo.CurrentCulture.Name=="en-US") {
+					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 						checkIsInvoiceCopy.Visible=false;
 					}
 					checkIsInvoice.Checked=true;
@@ -1311,7 +1311,7 @@ namespace OpenDental{
 		}
 
 		private void textDate_KeyPress(object sender,KeyPressEventArgs e) {
-			if(CultureInfo.CurrentCulture.Name=="fr-CA" || CultureInfo.CurrentCulture.Name=="en-CA") {
+			if(PrefC.GetLanguageAndRegion().Name=="fr-CA" || PrefC.GetLanguageAndRegion().Name=="en-CA") {
 				return;//because they use - in their regular dates which interferes with this feature.
 			}
 			if(e.KeyChar!='+' && e.KeyChar!='-') {
@@ -1360,7 +1360,7 @@ namespace OpenDental{
 		}
 
 		private void textDateStart_KeyPress(object sender,KeyPressEventArgs e) {
-			if(CultureInfo.CurrentCulture.Name=="fr-CA" || CultureInfo.CurrentCulture.Name=="en-CA") {
+			if(PrefC.GetLanguageAndRegion().Name=="fr-CA" || PrefC.GetLanguageAndRegion().Name=="en-CA") {
 				return;//because they use - in their regular dates which interferes with this feature.
 			}
 			if(e.KeyChar!='+' && e.KeyChar!='-') {
@@ -1409,7 +1409,7 @@ namespace OpenDental{
 		}
 
 		private void textDateEnd_KeyPress(object sender,KeyPressEventArgs e) {
-			if(CultureInfo.CurrentCulture.Name=="fr-CA" || CultureInfo.CurrentCulture.Name=="en-CA") {
+			if(PrefC.GetLanguageAndRegion().Name=="fr-CA" || PrefC.GetLanguageAndRegion().Name=="en-CA") {
 				return;//because they use - in their regular dates which interferes with this feature.
 			}
 			if(e.KeyChar!='+' && e.KeyChar!='-') {
@@ -1468,7 +1468,7 @@ namespace OpenDental{
 						allNums=false;
 					}
 				}
-				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
+				if(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName=="en") {
 					if(allNums) {
 						if(textDate.Text.Length==6) {
 							textDate.Text=textDate.Text.Substring(0,2)+"/"+textDate.Text.Substring(2,2)+"/"+textDate.Text.Substring(4,2);
@@ -1496,7 +1496,7 @@ namespace OpenDental{
 						allNums=false;
 					}
 				}
-				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
+				if(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName=="en") {
 					if(allNums) {
 						if(textDateStart.Text.Length==6) {
 							textDateStart.Text=textDateStart.Text.Substring(0,2)+"/"+textDateStart.Text.Substring(2,2)+"/"+textDateStart.Text.Substring(4,2);
@@ -1524,7 +1524,7 @@ namespace OpenDental{
 						allNums=false;
 					}
 				}
-				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
+				if(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName=="en") {
 					if(allNums) {
 						if(textDateEnd.Text.Length==6) {
 							textDateEnd.Text=textDateEnd.Text.Substring(0,2)+"/"+textDateEnd.Text.Substring(2,2)+"/"+textDateEnd.Text.Substring(4,2);

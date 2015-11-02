@@ -756,8 +756,8 @@ namespace OpenDentBusiness{
 				mergedAL.Add(timeAdjust);
 			}
 			//then, fill grid
-			Calendar cal=CultureInfo.CurrentCulture.Calendar;
-			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule;
+			Calendar cal=PrefC.GetLanguageAndRegion().Calendar;
+			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//PrefC.GetLanguageAndRegion().DateTimeFormat.CalendarWeekRule;
 			//rule=CalendarWeekRule.FirstFullWeek;//CalendarWeekRule is an Enum. For these calculations, we want to use FirstFullWeek, not FirstDay;
 			List<TimeSpan> WeeklyTotals = new List<TimeSpan>();
 			WeeklyTotals = FillWeeklyTotalsHelper(true,EmployeeCur,mergedAL);
@@ -821,8 +821,8 @@ namespace OpenDentBusiness{
 				mergedAL.Add(timeAdjust);
 			}
 			//then, fill grid
-			Calendar cal=CultureInfo.CurrentCulture.Calendar;
-			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule;
+			Calendar cal=PrefC.GetLanguageAndRegion().Calendar;
+			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//PrefC.GetLanguageAndRegion().DateTimeFormat.CalendarWeekRule;
 			//rule=CalendarWeekRule.FirstFullWeek;//CalendarWeekRule is an Enum. For these calculations, we want to use FirstFullWeek, not FirstDay;
 			List<TimeSpan> WeeklyTotals = new List<TimeSpan>();
 			WeeklyTotals = FillWeeklyTotalsHelper(true,EmployeeCur,mergedAL);
@@ -864,8 +864,8 @@ namespace OpenDentBusiness{
 			}
 			TimeSpan periodSpan=new TimeSpan(0);//used to add up totals for entire page.
 			TimeSpan otspan=new TimeSpan(0);//overtime for the entire period
-			Calendar cal=CultureInfo.CurrentCulture.Calendar;
-			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;// CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule;
+			Calendar cal=PrefC.GetLanguageAndRegion().Calendar;
+			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;// PrefC.GetLanguageAndRegion().DateTimeFormat.CalendarWeekRule;
 			DateTime curDate=DateTime.MinValue;
 			DateTime previousDate=DateTime.MinValue;
 			Type type;

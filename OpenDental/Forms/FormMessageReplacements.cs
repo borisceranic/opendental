@@ -439,10 +439,10 @@ namespace OpenDental {
 			if(clinic!=null && !String.IsNullOrEmpty(clinic.Description)) {
 				officeName=clinic.Description;
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US" && officePhone.Length==10) {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US" && officePhone.Length==10) {
 				officePhone="("+officePhone.Substring(0,3)+")"+officePhone.Substring(3,3)+"-"+officePhone.Substring(6);
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US" && officeFax.Length==10) {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US" && officeFax.Length==10) {
 				officeFax="("+officeFax.Substring(0,3)+")"+officeFax.Substring(3,3)+"-"+officeFax.Substring(6);
 			}
 			retVal=retVal.Replace("[OfficePhone]",officePhone);

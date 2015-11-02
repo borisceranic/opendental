@@ -301,7 +301,7 @@ namespace OpenDentBusiness{
 				PaySplitCur.DatePay=pay.PayDate;
 				PaySplitCur.ClinicNum=pay.ClinicNum;
 				PaySplitCur.ProvNum=Patients.GetProvNum(pats[i]);
-				PaySplitCur.SplitAmt=Math.Round(amtSplits[i],CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalDigits);
+				PaySplitCur.SplitAmt=Math.Round(amtSplits[i],PrefC.GetLanguageAndRegion().NumberFormat.CurrencyDecimalDigits);
 				//PaySplitCur.InsertOrUpdate(true);
 				retVal.Add(PaySplitCur);
 			}

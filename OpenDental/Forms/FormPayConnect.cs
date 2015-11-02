@@ -257,8 +257,8 @@ namespace OpenDental {
 					result+=clinicCur.City+", "+clinicCur.State+" "+clinicCur.Zip+Environment.NewLine;
 				}
 				if(clinicCur.Phone.Length==10
-					&& (CultureInfo.CurrentCulture.Name=="en-US" ||
-					CultureInfo.CurrentCulture.Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
+					&& (PrefC.GetLanguageAndRegion().Name=="en-US" ||
+					PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
 				{
 					result+="("+clinicCur.Phone.Substring(0,3)+")"+clinicCur.Phone.Substring(3,3)+"-"+clinicCur.Phone.Substring(6)+Environment.NewLine;
 				}

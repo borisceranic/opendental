@@ -6009,7 +6009,7 @@ namespace OpenDental {
 					+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
 				phone=PrefC.GetString(PrefName.PracticePhone);
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US" && phone.Length==10) {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US" && phone.Length==10) {
 				str+="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 			}
 			else {//any other phone format

@@ -850,7 +850,7 @@ namespace OpenDentBusiness {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.2.22"));//No translation in convert script.
 				string command;
 				//Moving codes to the Obsolete category that were deleted in CDT 2014.
-				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
 					//Make sure the procedure code category exists before moving the procedure codes.
 					string procCatDescript="Obsolete";
@@ -6128,7 +6128,7 @@ namespace OpenDentBusiness {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 14.3.12"));//No translation in convert script.
 				string command;
 				//Moving codes to the Obsolete category that were deleted in CDT 2015.
-				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
 					//Make sure the procedure code category exists before moving the procedure codes.
 					string procCatDescript="Obsolete";
@@ -9712,7 +9712,7 @@ namespace OpenDentBusiness {
 				}
 				command="UPDATE procedurecode SET CanadaTimeUnits=1";//This is the correct value for most Canadian procedure codes.
 				Db.NonQ(command);
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					command="UPDATE procedurecode SET CanadaTimeUnits=2 WHERE procedurecode.ProcCode='02802'";
 					Db.NonQ(command);
 					command="UPDATE procedurecode SET CanadaTimeUnits=0.5 WHERE procedurecode.ProcCode='04507'";
@@ -10538,7 +10538,7 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
-				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
 					//Insert all 50 US states and Washington DC
 					command="INSERT INTO stateabbr (Description,Abbr) VALUES('Alabama','AL'),('Alaska','AK'),('Arizona','AZ'),('Arkansas','AR'),"
 						+"('California','CA'),('Colorado','CO'),('Connecticut','CT'),('Delaware','DE'),('District of Columbia','DC'),('Florida','FL'),"
@@ -11046,6 +11046,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE claim MODIFY ShareOfCost NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('LanguageAndRegion','')";//default to blank, will be set when first connected.
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','')";
+					Db.NonQ(command);
+				} 
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

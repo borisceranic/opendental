@@ -6,6 +6,7 @@ using System.Data;
 using System.Globalization;
 using System.Windows.Forms;
 using CodeBase;
+using OpenDentBusiness;
 
 namespace ODR{
 ///<summary></summary>
@@ -45,7 +46,7 @@ namespace ODR{
 						allNums=false;
 					}
 				}
-				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en"){
+				if(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName=="en"){
 					if(allNums){
 						if(Text.Length==6){
 							Text=Text.Substring(0,2)+"/"+Text.Substring(2,2)+"/"+Text.Substring(4,2);
@@ -91,7 +92,7 @@ namespace ODR{
 		///<summary></summary>
 		protected override void OnKeyPress(KeyPressEventArgs e) {
 			base.OnKeyPress(e);
-			if(CultureInfo.CurrentCulture.Name=="fr-CA" || CultureInfo.CurrentCulture.Name=="en-CA"){
+			if(PrefC.GetLanguageAndRegion().Name=="fr-CA" || PrefC.GetLanguageAndRegion().Name=="en-CA"){
 				return;//because they use - in their regular dates which interferes with this feature.
 			}
 			if(e.KeyChar!='+' && e.KeyChar!='-'){

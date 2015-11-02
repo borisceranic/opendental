@@ -70,7 +70,7 @@ namespace OpenDental {
 				SheetDefAddress=wh.GetSheetDefAddress(RegistrationKey);
 				//dennis: the below if statement is for backward compatibility only April 14 2011 and can be removed later.
 				if(String.IsNullOrEmpty(PrefObj.CultureName)){
-					PrefObj.CultureName=System.Globalization.CultureInfo.CurrentCulture.Name;
+					PrefObj.CultureName=PrefC.GetLanguageAndRegion().Name;
 					wh.SetPreferencesV2(RegistrationKey,PrefObj);
 					}
 			}
@@ -217,7 +217,7 @@ namespace OpenDental {
 				}
 				OpenDental.WebSheets.webforms_preference PrefObj=new OpenDental.WebSheets.webforms_preference();
 				PrefObj.ColorBorder=butWebformBorderColor.BackColor.ToArgb();
-				PrefObj.CultureName=System.Globalization.CultureInfo.CurrentCulture.Name;
+				PrefObj.CultureName=PrefC.GetLanguageAndRegion().Name;
 				bool IsPrefSet=wh.SetPreferencesV2(RegistrationKey,PrefObj);
 				Cursor=Cursors.Default;
 				if(!IsPrefSet) {

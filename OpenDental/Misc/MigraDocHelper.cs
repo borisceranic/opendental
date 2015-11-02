@@ -24,7 +24,7 @@ namespace OpenDental {
 			framebig.MarginTop=Unit.Zero;
 			framebig.Top=TopPosition.Parse("0 in");
 			framebig.Left=LeftPosition.Parse("0 in");
-			if(CultureInfo.CurrentCulture.Name=="en-US"){
+			if(PrefC.GetLanguageAndRegion().Name=="en-US"){
 				framebig.Width=Unit.FromInch(8.5);
 			}
 			//don't know about Canada
@@ -53,7 +53,7 @@ namespace OpenDental {
 
 		///<summary>In 100ths of an inch</summary>
 		public static int GetDocWidth(){
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				return 850;
 			}
 			//don't know about Canada
@@ -325,7 +325,7 @@ namespace OpenDental {
 		public static void DrawGrid(Section section,ODGrid grid){
 			//first, calculate width of dummy column that will push the grid over just enough to center it on the page.
 			double pageW=0;
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				pageW=850;
 			}
 			//don't know about Canada

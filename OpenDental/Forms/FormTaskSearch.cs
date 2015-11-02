@@ -173,19 +173,19 @@ namespace OpenDental {
 		}
 
 		private void dateCreatedFrom_ValueChanged(object sender,EventArgs e) {
-			dateCreatedFrom.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+			dateCreatedFrom.CustomFormat=PrefC.GetLanguageAndRegion().DateTimeFormat.ShortDatePattern;
 		}
 
 		private void dateCreatedTo_ValueChanged(object sender,EventArgs e) {
-			dateCreatedTo.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+			dateCreatedTo.CustomFormat=PrefC.GetLanguageAndRegion().DateTimeFormat.ShortDatePattern;
 		}
 
 		private void dateCompletedFrom_ValueChanged(object sender,EventArgs e) {
-			dateCompletedFrom.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+			dateCompletedFrom.CustomFormat=PrefC.GetLanguageAndRegion().DateTimeFormat.ShortDatePattern;
 		}
 
 		private void dateCompletedTo_ValueChanged(object sender,EventArgs e) {
-			dateCompletedTo.CustomFormat=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+			dateCompletedTo.CustomFormat=PrefC.GetLanguageAndRegion().DateTimeFormat.ShortDatePattern;
 		}
 
 		private void butClearCreated_Click(object sender,EventArgs e) {

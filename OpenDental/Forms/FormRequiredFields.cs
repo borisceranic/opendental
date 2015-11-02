@@ -74,12 +74,12 @@ namespace OpenDental {
 						}
 						break;
 					case RequiredFieldName.StudentStatus:
-						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							continue;//Canada uses Eligibility Excep. Code instead of Student Status radio buttons
 						}
 						break;
 					case RequiredFieldName.EligibilityExceptCode:
-						if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) { // Not Canadian. en-CA or fr-CA
+						if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) { // Not Canadian. en-CA or fr-CA
 							continue;//Don't show EligibilityExceptCode
 						}
 						break;

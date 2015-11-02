@@ -72,7 +72,7 @@ namespace OpenDental {
 			AddListConditionType(RequiredFieldName.Position);
 			AddListConditionType(RequiredFieldName.PatientStatus);
 			AddListConditionType(RequiredFieldName.PrimaryProvider);
-			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {// Not Canadian. en-CA or fr-CA
+			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {// Not Canadian. en-CA or fr-CA
 				AddListConditionType(RequiredFieldName.StudentStatus);
 			}
 			textConditionValue1.Location=new Point(textConditionValue1.Location.X,comboOperator1.Location.Y);

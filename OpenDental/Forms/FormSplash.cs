@@ -21,7 +21,7 @@ namespace OpenDental
 
         private void FormSplash_Load(object sender, EventArgs e)
         {
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						BackgroundImage=Properties.Resources.splashCanada;
 					}
 					if(File.Exists(Directory.GetCurrentDirectory()+@"\Splash.jpg")) {

@@ -801,7 +801,7 @@ namespace OpenDentBusiness {
 					isShowUnsent=true;
 				}
 				string strProcNumLab=rawProc.Rows[i]["ProcNumLab"].ToString();
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && strProcNumLab!="0") {//Canadian. en-CA or fr-CA, lab fee.
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && strProcNumLab!="0") {//Canadian. en-CA or fr-CA, lab fee.
 					long procNumLab=PIn.Long(strProcNumLab);
 					//Locate the parent proc. Since the lab is attached to a proc, the parent proc should be in the raw proc list.
 					isShowUnsent=false;
@@ -1173,7 +1173,7 @@ namespace OpenDentBusiness {
 				}
 				decimal claimLabFeeTotalAmt=0;
 				//For Canada, add lab fee amounts into total claim amount.
-				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {
 					string[] arrayProcNumsForClaim=PIn.ByteArray(rawClaim.Rows[i]["ProcNums_"]).Split(',');
 					for(int j=0;j<arrayProcNumsForClaim.Length;j++) {
 						long procNum=PIn.Long(arrayProcNumsForClaim[j]);

@@ -84,7 +84,7 @@ namespace OpenDental{
 				IsPatient=true;
 			}
 			Lan.F(this);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				groupSSN.Text=Lan.g(this,"CDA Number");
 				radioSSN.Visible=false;
 				radioTIN.Visible=false;

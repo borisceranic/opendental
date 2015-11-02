@@ -837,7 +837,7 @@ namespace OpenDental.UI {
 		///<summary>Draws the background, lines, and text for all rows that are visible.</summary>
 		private void DrawRows(Graphics g) {
 			Font cellFont=new Font(FontFamily.GenericSansSerif,cellFontSize);
-			if(CultureInfo.CurrentCulture.Name.EndsWith("IN")) {
+			if(PrefC.GetLanguageAndRegion().Name.EndsWith("IN")) {
 				cellFont.Dispose();
 				cellFont=new Font("Arial",cellFontSize);
 			}

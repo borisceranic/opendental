@@ -1339,7 +1339,7 @@ namespace OpenDental{
 				if(clinic!=null && !String.IsNullOrEmpty(clinic.Phone)) {
 					officePhone=clinic.Phone;
 				}
-				if(CultureInfo.CurrentCulture.Name=="en-US" && officePhone.Length==10) {
+				if(PrefC.GetLanguageAndRegion().Name=="en-US" && officePhone.Length==10) {
 					officePhone="("+officePhone.Substring(0,3)+")"+officePhone.Substring(3,3)+"-"+officePhone.Substring(6);
 				}
 				emailBody=emailBody.Replace("[OfficePhone]",officePhone);
@@ -1703,8 +1703,8 @@ namespace OpenDental{
 				phone=PrefC.GetString(PrefName.PracticePhone);
 			}
 			if(phone.Length==10 
-				&& (CultureInfo.CurrentCulture.Name=="en-US" || 
-				CultureInfo.CurrentCulture.Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
+				&& (PrefC.GetLanguageAndRegion().Name=="en-US" || 
+				PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))) //Canadian. en-CA or fr-CA
 			{
 				practice.Phone="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 			}
@@ -1958,7 +1958,7 @@ namespace OpenDental{
 						}
 						str+=clinic.City+",  "+clinic.State+"  "+clinic.Zip+"\r\n";
 						string phone=clinic.Phone;
-						if(CultureInfo.CurrentCulture.Name=="en-US" && phone.Length==10) {
+						if(PrefC.GetLanguageAndRegion().Name=="en-US" && phone.Length==10) {
 							str+="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 						}
 						else {//any other phone format
@@ -1974,7 +1974,7 @@ namespace OpenDental{
 						}
 						str+=PrefC.GetString(PrefName.PracticeCity)+",  "+PrefC.GetString(PrefName.PracticeST)+"  "+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
 						string phone=PrefC.GetString(PrefName.PracticePhone);
-						if(CultureInfo.CurrentCulture.Name=="en-US"&& phone.Length==10) {
+						if(PrefC.GetLanguageAndRegion().Name=="en-US"&& phone.Length==10) {
 							str+="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 						}
 						else {//any other phone format

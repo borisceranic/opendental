@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
+using OpenDentBusiness;
 
 namespace OpenDentBusiness {
 	public class PrefC {
@@ -185,6 +187,32 @@ namespace OpenDentBusiness {
 				throw new Exception(prefName+" is an invalid pref name.");
 			}
 			return dictPrefs[prefName].ValueString;
+		}
+
+		///<summary>Gets culture info from DB if possible, if not returns current culture.</summary
+		public static CultureInfo GetLanguageAndRegion() {
+			Dictionary<string,Pref> dictPrefs=new Dictionary<string,Pref>();
+			try {
+				dictPrefs=GetDict();
+			}
+			catch(Exception ex) {
+				//if no database selected on startup.
+			}
+			if(dictPrefs.ContainsKey("LanguageAndRegion") && dictPrefs["LanguageAndRegion"].ValueString!="") {
+				try {
+					return CultureInfo.GetCultureInfo(dictPrefs["LanguageAndRegion"].ValueString);
+				}
+				catch(Exception ex) { 
+					//if saved pref is invalid
+				}
+			}
+			return CultureInfo.CurrentCulture;
+		}
+
+		///<summary>Returns last two letters of language and region settings. For example, en-US and fr-CA return US and CA respectively.</summary>
+		public static string GetCurrentRegion() {
+			string langAndRegName=GetLanguageAndRegion().Name;
+			return langAndRegName.Substring(langAndRegName.Length-2);
 		}
 
 		///<summary>Used by an outside developer.</summary>

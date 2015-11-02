@@ -2283,7 +2283,7 @@ namespace OpenDental{
 			FillSignalButtons(null);
 			ContrManage2.InitializeOnStartup();//so that when a signal is received, it can handle it.
 			//Lan.Refresh();//automatically skips if current culture is en-US
-			//LanguageForeigns.Refresh(CultureInfo.CurrentCulture);//automatically skips if current culture is en-US
+			//LanguageForeigns.Refresh(PrefC.GetLanguageAndRegion());//automatically skips if current culture is en-US
 			DataValid.BecameInvalid += new OpenDental.ValidEventHandler(DataValid_BecameInvalid);
 			signalLastRefreshed=MiscData.GetNowDateTime();
 			if(PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)==0) {
@@ -2308,17 +2308,17 @@ namespace OpenDental{
 			foreach(MenuItem menuItem in mainMenu.MenuItems){
 				TranslateMenuItem(menuItem);
 			}
-			if(CultureInfo.CurrentCulture.Name=="en-US") {
+			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
 				//for the business layer, this functionality is duplicated in the Lan class.  Need for SL.
-				CultureInfo cInfo=(CultureInfo)CultureInfo.CurrentCulture.Clone();
+				CultureInfo cInfo=(CultureInfo)PrefC.GetLanguageAndRegion().Clone();
 				cInfo.DateTimeFormat.ShortDatePattern="MM/dd/yyyy";
 				Application.CurrentCulture=cInfo;
 				//
-				//if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en"){
+				//if(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName=="en"){
 				menuItemTranslation.Visible=false;
 			}
 			else {//not en-US
-				CultureInfo cInfo=(CultureInfo)CultureInfo.CurrentCulture.Clone();
+				CultureInfo cInfo=(CultureInfo)PrefC.GetLanguageAndRegion().Clone();
 				string dateFormatCur=cInfo.DateTimeFormat.ShortDatePattern;
 				//The carrot indicates the beginning of a word.  {2} means that there has to be exactly 2 y's.  [^a-z] means any character except a through z.  $ means end of word.
 				if(Regex.IsMatch(dateFormatCur,"^y{2}[^a-z]")
@@ -2602,6 +2602,13 @@ namespace OpenDental{
 				menuItemAccount.MenuItems.Clear();
 			}
 			ContrAppt2.SendSmsClickDelegate=OnTxtMsg_Click;//used in the appointment right click context menu.
+			if(PrefC.GetString(PrefName.LanguageAndRegion)=="") {
+				FormLanguageAndRegion FormLAR=new FormLanguageAndRegion();
+				FormLAR.ShowDialog();
+				if(FormLAR.DialogResult!=DialogResult.OK) {
+					Application.Exit();
+				}
+			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -2728,7 +2735,7 @@ namespace OpenDental{
 				PrefL.GetTempFolderPath();//We don't care about the return value.  Just trying to trigger the one-time cleanup and create the temp/opendental directory.
 			}
 			Lans.RefreshCache();//automatically skips if current culture is en-US
-			LanguageForeigns.Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);//automatically skips if current culture is en-US
+			LanguageForeigns.Refresh(PrefC.GetLanguageAndRegion().Name,PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName);//automatically skips if current culture is en-US
 			//menuItemMergeDatabases.Visible=PrefC.GetBool(PrefName.RandomPrimaryKeys");
 			return true;
 		}
@@ -4820,7 +4827,7 @@ namespace OpenDental{
 				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.None) {//And the format is "None" (accessed from all regions)
 					FormClaimReports.RetrieveAndImport(clearinghouseClin,true);
 				}
-				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Canadian && PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {
 					//Or the Eformat is Canadian and the region is Canadian.  In Canada, the "Outstanding Reports" are received upon request.
 					//Canadian reports must be retrieved using an office num and valid provider number for the office,
 					//which will cause all reports for that office to be returned.
@@ -4845,13 +4852,13 @@ namespace OpenDental{
 						}
 					}
 				}
-				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Dutch && CultureInfo.CurrentCulture.Name.EndsWith("DE")) {
+				else if(clearinghouseHq.Eformat==ElectronicClaimFormat.Dutch && PrefC.GetLanguageAndRegion().Name.EndsWith("DE")) {
 					//Or the Eformat is German and the region is German
 					FormClaimReports.RetrieveAndImport(clearinghouseClin,true);
 				}
 				else if(clearinghouseHq.Eformat!=ElectronicClaimFormat.Canadian 
 					&& clearinghouseHq.Eformat!=ElectronicClaimFormat.Dutch
-					&& CultureInfo.CurrentCulture.Name.EndsWith("US")) //Or the Eformat is in any other format and the region is US
+					&& PrefC.GetLanguageAndRegion().Name.EndsWith("US")) //Or the Eformat is in any other format and the region is US
 				{
 					FormClaimReports.RetrieveAndImport(clearinghouseClin,true);
 				}

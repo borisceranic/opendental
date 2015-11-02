@@ -238,7 +238,7 @@ namespace OpenDental {
 			for(int i=0;i<=ColCount;i++) {
 				g.DrawLine(LinePen,ColWidth*i,HeaderHeight,ColWidth*i,HeaderHeight+DayHeadHeight);
 			}
-			string[] daysOfWeek=CultureInfo.CurrentCulture.DateTimeFormat.DayNames;//already translated
+			string[] daysOfWeek=PrefC.GetLanguageAndRegion().DateTimeFormat.DayNames;//already translated
 			for(int i=0;i<daysOfWeek.Length;i++) {
 				int xPos=i*ColWidth+ColWidth/2-(int)(g.MeasureString(daysOfWeek[i],FontText).Width/2f);
 				int yPos=HeaderHeight+DayHeadHeight-(int)(FontText.GetHeight()/2f);
