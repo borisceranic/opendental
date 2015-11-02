@@ -11046,12 +11046,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE claim MODIFY ShareOfCost NOT NULL";
 					Db.NonQ(command);
 				}
+				//Set the to the language and region of the computer running the update.
+				string languageAndRegion=CultureInfo.CurrentCulture.Name;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('LanguageAndRegion','')";//default to blank, will be set when first connected.
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('LanguageAndRegion','"+POut.String(languageAndRegion)+"')";//default to blank, will be set when first connected.
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','"+POut.String(languageAndRegion)+"')";
 					Db.NonQ(command);
 				} 
 
