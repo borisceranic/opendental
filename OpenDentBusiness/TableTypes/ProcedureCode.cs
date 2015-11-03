@@ -7,6 +7,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>A list setup ahead of time with all the procedure codes used by the office.  Every procedurelog entry which is attached to a patient is also linked to this table.</summary>
 	[Serializable]
+	[CrudTable(AuditPerms=CrudAuditPerm.ProcFeeEdit)]
 	public class ProcedureCode:TableBase{
 		///<summary>Primary Key.  This happened in version 4.8.7.</summary>
 		[CrudColumn(IsPriKey=true)]

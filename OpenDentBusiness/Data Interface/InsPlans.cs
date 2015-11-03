@@ -1100,5 +1100,15 @@ namespace OpenDentBusiness {
 			string command="UPDATE insplan SET CobRule="+POut.Int((int)cobRule);
 			Db.NonQ(command);
 		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching planNum as FKey and are related to InsPlan.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the InsPlan table type.</summary>
+		public static void ClearFkey(long planNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),planNum);
+				return;
+			}
+			Crud.InsPlanCrud.ClearFkey(planNum);
+		}
 	}
 }

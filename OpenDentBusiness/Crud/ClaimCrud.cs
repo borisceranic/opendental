@@ -735,8 +735,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one Claim from the database.</summary>
 		public static void Delete(long claimNum){
+			ClearFkey(claimNum);
 			string command="DELETE FROM claim "
 				+"WHERE ClaimNum = "+POut.Long(claimNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching claimNum as FKey and are related to Claim.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Claim table type.</summary>
+		public static void ClearFkey(long claimNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(claimNum)+" AND PermType IN (95)";
 			Db.NonQ(command);
 		}
 

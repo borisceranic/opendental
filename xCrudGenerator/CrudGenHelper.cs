@@ -141,6 +141,24 @@ namespace xCrudGenerator {
 			return false;
 		}
 
+		///<summary>Returns a bitwise enum that represents all permissions used by the security log FKey column for the class passed in.</summary>
+		public static CrudAuditPerm GetCrudAuditPermForClass(Type typeClass) {
+			object[] attributes=typeClass.GetCustomAttributes(typeof(CrudTableAttribute),true);
+			if(attributes.Length==0) {
+				return CrudAuditPerm.None;
+			}
+			for(int i=0;i<attributes.Length;i++) {
+				if(attributes[i].GetType()!=typeof(CrudTableAttribute)) {
+					continue;
+				}
+				if(((CrudTableAttribute)attributes[i]).AuditPerms!=CrudAuditPerm.None) {
+					return ((CrudTableAttribute)attributes[i]).AuditPerms;
+				}
+			}
+			//couldn't find any.
+			return CrudAuditPerm.None;
+		}
+
 		///<summary>For Mobile, this only excludes PK2; result includes PK1, the CustomerNum.  Always excludes fields that are not in the database, like patient.Age.</summary>
 		public static List<FieldInfo> GetFieldsExceptPriKey(FieldInfo[] fields,FieldInfo priKey) {
 			List<FieldInfo> retVal=new List<FieldInfo>();
@@ -393,7 +411,51 @@ namespace xCrudGenerator {
 			}
 		}
 
-
+		///<summary>Returns a list of permissions that are included in the bitwise enum passed in.</summary>
+		public static List<Permissions> GetPermsFromCrudAuditPerm(CrudAuditPerm crudSLFKeyPerms) {
+			List<Permissions> listPerms=new List<Permissions>();
+			//No check for none.
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.AppointmentCompleteEdit)) { //b01
+				listPerms.Add(Permissions.AppointmentCompleteEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.AppointmentCreate)) { //b010
+				listPerms.Add(Permissions.AppointmentCreate);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.AppointmentEdit)) { //b0100
+				listPerms.Add(Permissions.AppointmentEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.AppointmentMove)) { //b01000
+				listPerms.Add(Permissions.AppointmentMove);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.ClaimHistoryEdit)) { //b010000
+				listPerms.Add(Permissions.ClaimHistoryEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.ImageDelete)) { //b0100000
+				listPerms.Add(Permissions.ImageDelete);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.ImageEdit)) { //b01000000
+				listPerms.Add(Permissions.ImageEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.InsPlanChangeCarrierName)) { //b010000000
+				listPerms.Add(Permissions.InsPlanChangeCarrierName);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.RxCreate)) { //b0100000000
+				listPerms.Add(Permissions.RxCreate);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.RxEdit)) { //b01000000000
+				listPerms.Add(Permissions.RxEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.TaskNoteEdit)) { //b010000000000
+				listPerms.Add(Permissions.TaskNoteEdit);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.PatientPortal)) { //b0100000000000
+				listPerms.Add(Permissions.PatientPortal);
+			}
+			if(crudSLFKeyPerms.HasFlag(CrudAuditPerm.ProcFeeEdit)) { //b01000000000000
+				listPerms.Add(Permissions.ProcFeeEdit);
+			}
+			return listPerms;
+	}
 
 
 

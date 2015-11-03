@@ -8,6 +8,7 @@ namespace OpenDentBusiness{
 
 	///<summary>The claim table holds information about individual claims.  Each row represents one claim.</summary>
 	[Serializable()]
+	[CrudTable(AuditPerms=CrudAuditPerm.ClaimHistoryEdit)]
 	public class Claim:TableBase{
 		///<summary>Primary key</summary>
 		[CrudColumn(IsPriKey=true)]

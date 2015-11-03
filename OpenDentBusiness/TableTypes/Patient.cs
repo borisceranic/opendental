@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 namespace OpenDentBusiness{
 	///<summary>One row for each patient.  Includes deleted patients.</summary>
 	[Serializable()]
+	[CrudTable(AuditPerms=CrudAuditPerm.PatientPortal)]
 	public class Patient : TableBase {
 		/// <summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

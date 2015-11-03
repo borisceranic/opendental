@@ -364,8 +364,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one Document from the database.</summary>
 		public static void Delete(long docNum){
+			ClearFkey(docNum);
 			string command="DELETE FROM document "
 				+"WHERE DocNum = "+POut.Long(docNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching docNum as FKey and are related to Document.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Document table type.</summary>
+		public static void ClearFkey(long docNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(docNum)+" AND PermType IN (44,89)";
 			Db.NonQ(command);
 		}
 

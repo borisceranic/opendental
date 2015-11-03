@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace OpenDentBusiness {
-	[AttributeUsage(AttributeTargets.Class,AllowMultiple=false)]
+	///<summary>Crud table attributes cannot be used by inherited classes because some properties would not work if they were inherited.
+	///Simply add the desired attributes to the "inheriting" class which will effectively override the attribute.</summary>
+	[AttributeUsage(AttributeTargets.Class,AllowMultiple=false,Inherited=false)]
 	public class CrudTableAttribute : Attribute {
 		public CrudTableAttribute() {
 			this.tableName="";
@@ -11,6 +13,7 @@ namespace OpenDentBusiness {
 			this.isMissingInGeneral=false;
 			this.isMobile=false;
 			this.isSynchable=false;
+			this._auditPerms=CrudAuditPerm.None;
 		}
 
 		private string tableName;
@@ -48,5 +51,50 @@ namespace OpenDentBusiness {
 			set { isSynchable=value; }
 		}
 
+		private CrudAuditPerm _auditPerms;
+		///<summary>Enum containing all permissions used as an FKey entry for the Securitylog table.
+		///The Crud generator uses these to add an additional function call to Delete(), and a new function ClearFkey() to ensure that securitylog FKeys 
+		///  are not orphaned.</summary>
+		public CrudAuditPerm AuditPerms {
+			get { return _auditPerms; }
+			set { _auditPerms=value; }
+		}
+
 	}
+
+	///<summary>Hard coded list of all permission names that are used for securitylog.FKey.  Uses 2^n values for use in bitwise operations.
+	///This enum can only hold 31 permissions (and none) before we will need to create a new one.  Instead of creating a new enum, we could instead
+	///create a new table to hold a composite key between the permission type the table name and foreign key.</summary>
+	[Flags]
+	public enum CrudAuditPerm {
+		///<summary>Perm#:0 - Value:0</summary>
+		None=0,
+		///<summary>Perm#:1 - Value:1</summary>
+		AppointmentCompleteEdit=1,
+		///<summary>Perm#:2 - Value:2</summary>
+		AppointmentCreate=2,
+		///<summary>Perm#:3 - Value:4</summary>
+		AppointmentEdit=4,
+		///<summary>Perm#:4 - Value:8</summary>
+		AppointmentMove=8,
+		///<summary>Perm#:5 - Value:16</summary>
+		ClaimHistoryEdit=16,
+		///<summary>Perm#:6 - Value:32</summary>
+		ImageDelete=32,
+		///<summary>Perm#:7 - Value:64</summary>
+		ImageEdit=64,
+		///<summary>Perm#:8 - Value:128</summary>
+		InsPlanChangeCarrierName=128,
+		///<summary>Perm#:9 - Value:256</summary>
+		RxCreate=256,
+		///<summary>Perm#:10 - Value:512</summary>
+		RxEdit=512,
+		///<summary>Perm#:11 - Value:1024</summary>
+		TaskNoteEdit=1024,
+		///<summary>Perm#:12 - Value:2048</summary>
+		PatientPortal=2048,
+		///<summary>Perm#:13 - Value:4096</summary>
+		ProcFeeEdit=4096,
+	}
+
 }

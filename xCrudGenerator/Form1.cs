@@ -142,6 +142,7 @@ namespace xCrudGenerator {
 			else {
 				priKeyParam=priKey.Name.Substring(0,1).ToLower()+priKey.Name.Substring(1);//lowercase initial letter.  Example patNum
 			}
+			List<Permissions> listAuditTrailPerms=CrudGenHelper.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
 			string obj=typeClass.Name.Substring(0,1).ToLower()+typeClass.Name.Substring(1);//lowercase initial letter.  Example feeSched
 			string oldObj="old"+typeClass.Name;//used in the second update overload.  Example oldFeeSched
 			#endregion initialize variables
@@ -955,6 +956,9 @@ using System.Drawing;"+rn);
 				}
 				else {
 					strb.Append(rn+t2+"public static void Delete(long "+priKeyParam+"){");
+					if(listAuditTrailPerms!=null && listAuditTrailPerms.Count!=0) {
+						strb.Append(rn+t3+"ClearFkey("+priKeyParam+");");
+					}
 					strb.Append(rn+t3+"string command=\"DELETE FROM "+tablename+" \"");
 					strb.Append(rn+t4+"+\"WHERE "+priKey.Name+" = \"+POut.Long("+priKeyParam+");");
 				}
@@ -1079,6 +1083,22 @@ using System.Drawing;"+rn);
 				}
 			}
 			#endregion ConvertToM
+			#region ClearFkey
+			if(listAuditTrailPerms!=null && listAuditTrailPerms.Count!=0) {  //If there are any AuditPerms set for this table
+				strb.Append(rn+rn+t2+"///<summary>Zeros securitylog FKey column for rows that are using the matching "+priKeyParam+" as FKey and are related to "+typeClass.Name+".");
+				strb.Append(rn+t2+"///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the "+typeClass.Name+@" table type.</summary>");
+				strb.Append(rn+t2+"public static void ClearFkey(long "+priKeyParam+") {");
+				List<string> listPermTypes=new List<string>();
+				for(int i=0;i<listAuditTrailPerms.Count;i++) {
+					listPermTypes.Add(((int)listAuditTrailPerms[i]).ToString());
+				}
+				strb.Append(rn+t3+"string command=\"UPDATE securitylog SET FKey=0 WHERE FKey=\"+POut.Long("+priKeyParam+")+"
+					+"\" AND PermType IN ("+String.Join(",",listPermTypes)+")\";");  
+				//If we wanted to make this more readable we could put a comment into the crud file here of what the listPermTypes mean.
+				strb.Append(rn+t3+"Db.NonQ(command);");
+				strb.Append(rn+t2+"}");
+			}
+			#endregion ClearFkey
 			//IsEqual is currently unfinished, but is here so that we can enhance it later to truly compare two objects. 
 			//This will check all DB columns and all Non-DB columns for equality and return a boolean. 
 			//The problem with implementing this at this time (3/4/2014) is that we don't have time to implement validating lists of objects.
@@ -1236,6 +1256,9 @@ using System.Drawing;"+rn);
 }");
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private void butSnippet_Click(object sender,EventArgs e) {
 			if(listClass.SelectedIndex==-1){
 				MessageBox.Show("Please select a class.");

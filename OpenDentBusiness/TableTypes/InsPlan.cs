@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 	//Any changes made to this tabletype needs to be documented on the Online Manual
 	///<summary>Subscribers can share insplans by using the InsSub table.  The patplan table determines coverage for individual patients.  InsPlans can also exist without any subscriber. </summary>
 	[Serializable]
+	[CrudTable(AuditPerms=CrudAuditPerm.InsPlanChangeCarrierName)]
 	public class InsPlan:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

@@ -279,8 +279,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one Task from the database.</summary>
 		public static void Delete(long taskNum){
+			ClearFkey(taskNum);
 			string command="DELETE FROM task "
 				+"WHERE TaskNum = "+POut.Long(taskNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching taskNum as FKey and are related to Task.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Task table type.</summary>
+		public static void ClearFkey(long taskNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(taskNum)+" AND PermType IN (66)";
 			Db.NonQ(command);
 		}
 

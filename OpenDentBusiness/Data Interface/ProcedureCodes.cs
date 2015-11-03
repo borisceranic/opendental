@@ -501,6 +501,15 @@ namespace OpenDentBusiness{
 			return Crud.ProcedureCodeCrud.SelectMany(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching codeNum as FKey and are related to ProcedureCode.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the ProcedureCode table type.</summary>
+		public static void ClearFkey(long codeNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),codeNum);
+				return;
+			}
+			Crud.ProcedureCodeCrud.ClearFkey(codeNum);
+		}
 
 		/* js These are not currently in use.  This probably needs to be consolidated with code from other places.  ProcsColored and InsSpans comes to mind.
 		///<summary>Returns true if any of the codes in the list fall within the code range.</summary>

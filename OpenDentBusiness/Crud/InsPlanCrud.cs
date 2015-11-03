@@ -383,8 +383,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one InsPlan from the database.</summary>
 		public static void Delete(long planNum){
+			ClearFkey(planNum);
 			string command="DELETE FROM insplan "
 				+"WHERE PlanNum = "+POut.Long(planNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching planNum as FKey and are related to InsPlan.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the InsPlan table type.</summary>
+		public static void ClearFkey(long planNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(planNum)+" AND PermType IN (65)";
 			Db.NonQ(command);
 		}
 

@@ -4,6 +4,7 @@ namespace OpenDentBusiness{
 
 	///<summary>One Rx for one patient. Copied from rxdef rather than linked to it.</summary>
 	[Serializable]
+	[CrudTable(AuditPerms=CrudAuditPerm.RxCreate|CrudAuditPerm.RxEdit)]
 	public class RxPat:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

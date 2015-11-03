@@ -68,7 +68,8 @@ namespace xCrudGenerator {
 						return GetEntireSclassMobile(typeClass.Name,obj,priKey1.Name,priKey2.Name,Sname,tablename,priKeyParam1,priKeyParam2);
 					}
 					else {
-						return GetEntireSclass(typeClass.Name,obj,priKey.Name,Sname,tablename,priKeyParam);
+						List<Permissions> listAuditTrailPerms=CrudGenHelper.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
+						return GetEntireSclass(typeClass.Name,obj,priKey.Name,Sname,tablename,priKeyParam,listAuditTrailPerms);
 					}
 				case SnippetType.CreateTable:
 					return "Currently unavailable.";
@@ -185,7 +186,26 @@ namespace xCrudGenerator {
 			return retVal;
 		}
 
-		private static string GetEntireSclass(string typeClassName,string obj,string priKeyName,string Sname,string tablename,string priKeyParam){
+		private static string GetClearFkey(List<Permissions> listPermissions,string typeClassName,string priKeyParam,string priKeyName) {
+			string retVal="";
+			if(listPermissions==null || listPermissions.Count==0){
+				return retVal;
+			}
+			retVal=@"///<summary>Zeros securitylog FKey column for rows that are using the matching "+priKeyParam+" as FKey and are related to "+typeClassName+@".
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the "+typeClassName+@" table type.</summary>
+		public static void ClearFkey(long "+priKeyParam+@") {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),"+priKeyParam+@");
+				return;
+			}
+			Crud."+typeClassName+@"Crud.ClearFkey("+priKeyParam+@");
+		}";
+			return retVal;
+		}
+
+		private static string GetEntireSclass(string typeClassName,string obj,string priKeyName,string Sname,string tablename,string priKeyParam,
+			List<Permissions> listAuditTrailPerms)
+		{
 			string str=@"using System;
 using System.Collections.Generic;
 using System.Data;
@@ -267,6 +287,8 @@ namespace OpenDentBusiness{
 			}
 			Crud."+typeClassName+@"Crud.Delete("+priKeyParam+@");
 		}
+
+		"+GetClearFkey(listAuditTrailPerms,typeClassName,priKeyParam,priKeyName)+@"
 		*/
 
 

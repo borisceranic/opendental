@@ -599,6 +599,16 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching claimNum as FKey and are related to Claim.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Claim table type.</summary>
+		public static void ClearFkey(long claimNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),claimNum);
+				return;
+			}
+			Crud.ClaimCrud.ClearFkey(claimNum);
+		}
+
 	}//end class Claims
 
 	///<summary>This is an odd class.  It holds data for the X12 (4010 only) generation process.  It replaces an older multi-dimensional array, so the names are funny, but helpful to prevent bugs.  Not an actual database table.</summary>

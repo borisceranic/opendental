@@ -276,8 +276,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one RxPat from the database.</summary>
 		public static void Delete(long rxNum){
+			ClearFkey(rxNum);
 			string command="DELETE FROM rxpat "
 				+"WHERE RxNum = "+POut.Long(rxNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching rxNum as FKey and are related to RxPat.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the RxPat table type.</summary>
+		public static void ClearFkey(long rxNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(rxNum)+" AND PermType IN (9,76)";
 			Db.NonQ(command);
 		}
 

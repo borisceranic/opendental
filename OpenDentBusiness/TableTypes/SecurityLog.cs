@@ -22,7 +22,17 @@ namespace OpenDentBusiness{
 		public long PatNum;
 		///<summary>.</summary>
 		public string CompName;
-		///<summary>A foreign key to a table associated with the PermType.  0 indicates not in use.  This is typically used for objects that have specific audit trails so that users can see all audit entries related to a particular object.  For the patient portal, it is used to indicate logs created on behalf of other patients.  It's uses include:  AptNum with PermType AppointmentCreate, AppointmentEdit, or AppointmentMove tracks all appointment logs for a particular appointment.  CodeNum with PermType ProcFeeEdit currently only tracks fee changes.  PatNum with PermType PatientPortal represents an entry that a patient made on behalf of another patient.  The PatNum column will represent the patient who is taking the action.  PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
+		///<summary>A foreign key to a table associated with the PermType.  0 indicates not in use.  
+		///This is typically used for objects that have specific audit trails so that users can see all audit entries related to a particular object.  
+		///Every permission using FKey should be included and implmented in the CrudAuditPerms enum so that securitylog FKeys are note orphaned.
+		///Additonaly, the tabletype will to have the [CrudTable(CrudAuditPerms=CrudAuditPerm._____] added with the new CrudAuditPerm you created.
+		///For the patient portal, it is used to indicate logs created on behalf of other patients.  
+		///It's uses include:  AptNum with PermType AppointmentCreate, AppointmentEdit, or AppointmentMove tracks all appointment logs for a particular 
+		///appointment.
+		///CodeNum with PermType ProcFeeEdit currently only tracks fee changes.  
+		///PatNum with PermType PatientPortal represents an entry that a patient made on behalf of another patient.
+		///	The PatNum column will represent the patient who is taking the action.  
+		///PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
 		public long FKey;
 		///<summary>Enum:LogSources None, WebSched.</summary>
 		public LogSources LogSource;

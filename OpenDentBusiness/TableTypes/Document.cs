@@ -5,6 +5,7 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary>Represents a single document in the images module.</summary>
 	[Serializable]
+	[CrudTable(AuditPerms=CrudAuditPerm.ImageDelete|CrudAuditPerm.ImageEdit)]
 	public class Document:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

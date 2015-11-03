@@ -664,6 +664,16 @@ namespace OpenDentBusiness {
 			}
 			return docPath;
 		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching docNum as FKey and are related to Document.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Document table type.</summary>
+		public static void ClearFkey(long docNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),docNum);
+				return;
+			}
+			Crud.DocumentCrud.ClearFkey(docNum);
+		}
 	}	
   
 }

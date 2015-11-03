@@ -6,6 +6,7 @@ namespace OpenDentBusiness{
 
 	///<summary>A task is a single todo item.</summary>
 	[Serializable]
+	[CrudTable(AuditPerms=CrudAuditPerm.TaskNoteEdit)]
 	public class Task:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

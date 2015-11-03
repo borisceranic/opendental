@@ -385,8 +385,16 @@ namespace OpenDentBusiness.Crud{
 
 		///<summary>Deletes one ProcedureCode from the database.</summary>
 		public static void Delete(long codeNum){
+			ClearFkey(codeNum);
 			string command="DELETE FROM procedurecode "
 				+"WHERE CodeNum = "+POut.Long(codeNum);
+			Db.NonQ(command);
+		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching codeNum as FKey and are related to ProcedureCode.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the ProcedureCode table type.</summary>
+		public static void ClearFkey(long codeNum) {
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey="+POut.Long(codeNum)+" AND PermType IN (64)";
 			Db.NonQ(command);
 		}
 
