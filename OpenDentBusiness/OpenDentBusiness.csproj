@@ -125,9 +125,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Required dlls\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="OpenPop">
       <HintPath>..\Required dlls\OpenPop.dll</HintPath>
     </Reference>

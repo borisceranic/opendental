@@ -29,6 +29,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
     [System.Web.Services.WebServiceBindingAttribute(Name="WebServiceMainHQSoap", Namespace="https://www.opendental.com/OpenDentalWebServiceHQ/")]
     public partial class WebServiceMainHQ : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
+        private System.Threading.SendOrPostCallback PerformRefreshCacheOperationCompleted;
+        
         private System.Threading.SendOrPostCallback GenerateWebAppUrlOperationCompleted;
         
         private System.Threading.SendOrPostCallback ValidateWebAppUrlOperationCompleted;
@@ -80,6 +82,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         }
         
         /// <remarks/>
+        public event PerformRefreshCacheCompletedEventHandler PerformRefreshCacheCompleted;
+        
+        /// <remarks/>
         public event GenerateWebAppUrlCompletedEventHandler GenerateWebAppUrlCompleted;
         
         /// <remarks/>
@@ -96,6 +101,35 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         /// <remarks/>
         public event RequestListenerProxyPrefsCompletedEventHandler RequestListenerProxyPrefsCompleted;
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/PerformRefreshCache", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string PerformRefreshCache(string officeData) {
+            object[] results = this.Invoke("PerformRefreshCache", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void PerformRefreshCacheAsync(string officeData) {
+            this.PerformRefreshCacheAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void PerformRefreshCacheAsync(string officeData, object userState) {
+            if ((this.PerformRefreshCacheOperationCompleted == null)) {
+                this.PerformRefreshCacheOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPerformRefreshCacheOperationCompleted);
+            }
+            this.InvokeAsync("PerformRefreshCache", new object[] {
+                        officeData}, this.PerformRefreshCacheOperationCompleted, userState);
+        }
+        
+        private void OnPerformRefreshCacheOperationCompleted(object arg) {
+            if ((this.PerformRefreshCacheCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PerformRefreshCacheCompleted(this, new PerformRefreshCacheCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/GenerateWebAppUrl", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -287,6 +321,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
                 return true;
             }
             return false;
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    public delegate void PerformRefreshCacheCompletedEventHandler(object sender, PerformRefreshCacheCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class PerformRefreshCacheCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal PerformRefreshCacheCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
         }
     }
     

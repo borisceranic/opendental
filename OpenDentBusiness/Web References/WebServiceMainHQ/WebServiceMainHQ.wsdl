@@ -2,6 +2,20 @@
 <wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="https://www.opendental.com/OpenDentalWebServiceHQ/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <s:schema elementFormDefault="qualified" targetNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/">
+      <s:element name="PerformRefreshCache">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PerformRefreshCacheResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PerformRefreshCacheResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="GenerateWebAppUrl">
         <s:complexType>
           <s:sequence>
@@ -89,6 +103,12 @@
       <s:element name="string" nillable="true" type="s:string" />
     </s:schema>
   </wsdl:types>
+  <wsdl:message name="PerformRefreshCacheSoapIn">
+    <wsdl:part name="parameters" element="tns:PerformRefreshCache" />
+  </wsdl:message>
+  <wsdl:message name="PerformRefreshCacheSoapOut">
+    <wsdl:part name="parameters" element="tns:PerformRefreshCacheResponse" />
+  </wsdl:message>
   <wsdl:message name="GenerateWebAppUrlSoapIn">
     <wsdl:part name="parameters" element="tns:GenerateWebAppUrl" />
   </wsdl:message>
@@ -124,6 +144,12 @@
   </wsdl:message>
   <wsdl:message name="RequestListenerProxyPrefsSoapOut">
     <wsdl:part name="parameters" element="tns:RequestListenerProxyPrefsResponse" />
+  </wsdl:message>
+  <wsdl:message name="PerformRefreshCacheHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="PerformRefreshCacheHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
   <wsdl:message name="GenerateWebAppUrlHttpPostIn">
     <wsdl:part name="officeData" type="s:string" />
@@ -162,6 +188,10 @@
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
   <wsdl:portType name="WebServiceMainHQSoap">
+    <wsdl:operation name="PerformRefreshCache">
+      <wsdl:input message="tns:PerformRefreshCacheSoapIn" />
+      <wsdl:output message="tns:PerformRefreshCacheSoapOut" />
+    </wsdl:operation>
     <wsdl:operation name="GenerateWebAppUrl">
       <wsdl:input message="tns:GenerateWebAppUrlSoapIn" />
       <wsdl:output message="tns:GenerateWebAppUrlSoapOut" />
@@ -188,6 +218,10 @@
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="WebServiceMainHQHttpPost">
+    <wsdl:operation name="PerformRefreshCache">
+      <wsdl:input message="tns:PerformRefreshCacheHttpPostIn" />
+      <wsdl:output message="tns:PerformRefreshCacheHttpPostOut" />
+    </wsdl:operation>
     <wsdl:operation name="GenerateWebAppUrl">
       <wsdl:input message="tns:GenerateWebAppUrlHttpPostIn" />
       <wsdl:output message="tns:GenerateWebAppUrlHttpPostOut" />
@@ -215,6 +249,15 @@
   </wsdl:portType>
   <wsdl:binding name="WebServiceMainHQSoap" type="tns:WebServiceMainHQSoap">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PerformRefreshCache">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/PerformRefreshCache" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GenerateWebAppUrl">
       <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GenerateWebAppUrl" style="document" />
       <wsdl:input>
@@ -272,6 +315,15 @@
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQSoap12" type="tns:WebServiceMainHQSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PerformRefreshCache">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/PerformRefreshCache" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GenerateWebAppUrl">
       <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GenerateWebAppUrl" style="document" />
       <wsdl:input>
@@ -329,6 +381,15 @@
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQHttpPost" type="tns:WebServiceMainHQHttpPost">
     <http:binding verb="POST" />
+    <wsdl:operation name="PerformRefreshCache">
+      <http:operation location="/PerformRefreshCache" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GenerateWebAppUrl">
       <http:operation location="/GenerateWebAppUrl" />
       <wsdl:input>
