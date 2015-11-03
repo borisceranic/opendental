@@ -133,14 +133,11 @@ namespace OpenDental{
 			// 
 			// checkEnabled
 			// 
-			this.checkEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkEnabled.Location = new System.Drawing.Point(187, 46);
+			this.checkEnabled.Location = new System.Drawing.Point(187, 45);
 			this.checkEnabled.Name = "checkEnabled";
-			this.checkEnabled.Size = new System.Drawing.Size(273, 16);
+			this.checkEnabled.Size = new System.Drawing.Size(273, 17);
 			this.checkEnabled.TabIndex = 2;
 			this.checkEnabled.Text = "Enabled (affects all clinics)";
-			this.checkEnabled.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			this.checkEnabled.UseVisualStyleBackColor = true;
 			// 
 			// textPath
@@ -180,7 +177,7 @@ namespace OpenDental{
 			this.comboPaymentType.MaxDropDownItems = 25;
 			this.comboPaymentType.Name = "comboPaymentType";
 			this.comboPaymentType.Size = new System.Drawing.Size(192, 21);
-			this.comboPaymentType.TabIndex = 8;
+			this.comboPaymentType.TabIndex = 3;
 			// 
 			// textPassword
 			// 
@@ -189,7 +186,7 @@ namespace OpenDental{
 			this.textPassword.Location = new System.Drawing.Point(175, 45);
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(273, 20);
-			this.textPassword.TabIndex = 7;
+			this.textPassword.TabIndex = 2;
 			this.textPassword.UseSystemPasswordChar = true;
 			this.textPassword.TextChanged += new System.EventHandler(this.textPassword_TextChanged);
 			// 
@@ -209,7 +206,7 @@ namespace OpenDental{
 			this.textUsername.Location = new System.Drawing.Point(175, 19);
 			this.textUsername.Name = "textUsername";
 			this.textUsername.Size = new System.Drawing.Size(273, 20);
-			this.textUsername.TabIndex = 6;
+			this.textUsername.TabIndex = 1;
 			// 
 			// labelUsername
 			// 
@@ -240,8 +237,7 @@ namespace OpenDental{
 			// 
 			// groupXWeb
 			// 
-			this.groupXWeb.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.groupXWeb.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupXWeb.Controls.Add(this.textTerminalID);
 			this.groupXWeb.Controls.Add(this.labelTerminalID);
@@ -250,10 +246,10 @@ namespace OpenDental{
 			this.groupXWeb.Controls.Add(this.labelAuthKey);
 			this.groupXWeb.Controls.Add(this.textXWebID);
 			this.groupXWeb.Controls.Add(this.labelXWebID);
-			this.groupXWeb.Location = new System.Drawing.Point(6, 142);
+			this.groupXWeb.Location = new System.Drawing.Point(6, 144);
 			this.groupXWeb.Name = "groupXWeb";
 			this.groupXWeb.Size = new System.Drawing.Size(448, 134);
-			this.groupXWeb.TabIndex = 0;
+			this.groupXWeb.TabIndex = 6;
 			this.groupXWeb.TabStop = false;
 			this.groupXWeb.Text = "X-Web";
 			this.groupXWeb.Visible = false;
@@ -265,7 +261,7 @@ namespace OpenDental{
 			this.textTerminalID.Location = new System.Drawing.Point(169, 108);
 			this.textTerminalID.Name = "textTerminalID";
 			this.textTerminalID.Size = new System.Drawing.Size(273, 20);
-			this.textTerminalID.TabIndex = 13;
+			this.textTerminalID.TabIndex = 3;
 			// 
 			// labelTerminalID
 			// 
@@ -278,8 +274,6 @@ namespace OpenDental{
 			// 
 			// labelXwebDesc
 			// 
-			this.labelXwebDesc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelXwebDesc.Location = new System.Drawing.Point(6, 19);
 			this.labelXwebDesc.Name = "labelXwebDesc";
 			this.labelXwebDesc.Size = new System.Drawing.Size(436, 31);
@@ -296,7 +290,7 @@ namespace OpenDental{
 			this.textAuthKey.Location = new System.Drawing.Point(169, 82);
 			this.textAuthKey.Name = "textAuthKey";
 			this.textAuthKey.Size = new System.Drawing.Size(273, 20);
-			this.textAuthKey.TabIndex = 12;
+			this.textAuthKey.TabIndex = 2;
 			this.textAuthKey.TextChanged += new System.EventHandler(this.textAuthKey_TextChanged);
 			// 
 			// labelAuthKey
@@ -315,7 +309,7 @@ namespace OpenDental{
 			this.textXWebID.Location = new System.Drawing.Point(169, 56);
 			this.textXWebID.Name = "textXWebID";
 			this.textXWebID.Size = new System.Drawing.Size(273, 20);
-			this.textXWebID.TabIndex = 11;
+			this.textXWebID.TabIndex = 1;
 			// 
 			// labelXWebID
 			// 
@@ -328,26 +322,20 @@ namespace OpenDental{
 			// 
 			// checkPrintReceipt
 			// 
-			this.checkPrintReceipt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkPrintReceipt.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPrintReceipt.Location = new System.Drawing.Point(175, 120);
+			this.checkPrintReceipt.Location = new System.Drawing.Point(175, 121);
 			this.checkPrintReceipt.Name = "checkPrintReceipt";
-			this.checkPrintReceipt.Size = new System.Drawing.Size(273, 16);
-			this.checkPrintReceipt.TabIndex = 10;
+			this.checkPrintReceipt.Size = new System.Drawing.Size(273, 17);
+			this.checkPrintReceipt.TabIndex = 5;
 			this.checkPrintReceipt.Text = "Print receipts by default";
-			this.checkPrintReceipt.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// checkPromptSig
 			// 
-			this.checkPromptSig.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkPromptSig.Location = new System.Drawing.Point(175, 98);
 			this.checkPromptSig.Name = "checkPromptSig";
-			this.checkPromptSig.Size = new System.Drawing.Size(273, 16);
-			this.checkPromptSig.TabIndex = 9;
+			this.checkPromptSig.Size = new System.Drawing.Size(273, 17);
+			this.checkPromptSig.TabIndex = 4;
 			this.checkPromptSig.Text = "Prompt for signature on CC trans by default";
-			this.checkPromptSig.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// labelClinicEnable
 			// 
@@ -394,8 +382,8 @@ namespace OpenDental{
 			this.groupPaySettings.Controls.Add(this.labelPaymentType);
 			this.groupPaySettings.Location = new System.Drawing.Point(12, 177);
 			this.groupPaySettings.Name = "groupPaySettings";
-			this.groupPaySettings.Size = new System.Drawing.Size(460, 282);
-			this.groupPaySettings.TabIndex = 0;
+			this.groupPaySettings.Size = new System.Drawing.Size(460, 284);
+			this.groupPaySettings.TabIndex = 6;
 			this.groupPaySettings.TabStop = false;
 			this.groupPaySettings.Text = "Clinic Payment Settings";
 			// 
@@ -410,7 +398,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(311, 474);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 14;
+			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -425,7 +413,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(397, 474);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 15;
+			this.butCancel.TabIndex = 8;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
