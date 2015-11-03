@@ -1,9 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -12,7 +7,11 @@ namespace OpenDental {
 		public int TransactionType;
 		public decimal CashBackAmount;
 		public bool SaveToken;
+		///<summary>Set on the way in based on the property value for the clinic on the payment.  Sets the initial checked state of checkSignature.
+		///When the user presses OK, this value reflects the final state of checkSignature when the user hits OK.</summary>
 		public bool PromptSignature;
+		///<summary>Set on the way in based on the property value for the clinic on the payment.  Sets the initial checked state of checkPrintReceipt.
+		///When the user presses OK, this value reflects the final state of checkPrintReceipt when the user hits OK.</summary>
 		public bool PrintReceipt;
 
 		public FormXchargeTrans() {
@@ -38,8 +37,8 @@ namespace OpenDental {
 			if(prog==null) {
 				return;
 			}
-			checkSignature.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PromptSignature"));
-			checkPrintReceipt.Checked=PIn.Bool(ProgramProperties.GetPropVal(prog.ProgramNum,"PrintReceipt"));
+			checkSignature.Checked=PromptSignature;
+			checkPrintReceipt.Checked=PrintReceipt;
 		}
 
 		private void listTransType_MouseClick(object sender,MouseEventArgs e) {

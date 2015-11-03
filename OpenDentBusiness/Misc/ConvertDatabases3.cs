@@ -11056,6 +11056,30 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','"+POut.String(languageAndRegion)+"')";
 					Db.NonQ(command);
 				} 
+				//Add the X-Charge programproperty rows Username, Password, PaymentType, XWebID, AuthKey, TerminalID, PromptSignature, and PrintReceipt
+				//for each clinic in the database.  Local path override will not be clinic specific, so not duplicated for each clinic.
+				command="SELECT ClinicNum FROM clinic";
+				List<long> listCNums=Db.GetListLong(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					for(int i=0;i<listCNums.Count;i++) {
+						command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"(SELECT programproperty.ProgramNum,PropertyDesc,PropertyValue,ComputerName,"+listCNums[i]+" "
+							+"FROM program INNER JOIN programproperty ON program.ProgramNum=programproperty.ProgramNum "
+							+"WHERE program.ProgName='Xcharge' AND programproperty.ClinicNum=0 "//all existing programproperty rows for XCharge have ClinicNum=0
+							+"AND PropertyDesc!='')";//Local path override will not be clinic specific, so don't duplicate for each clinic
+						Db.NonQ32(command);
+					}
+				}
+				else {//oracle
+					for(int i=0;i<listCNums.Count;i++) {
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"(SELECT (SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),programproperty.ProgramNum,PropertyDesc,PropertyValue,ComputerName,"
+							+listCNums[i]+" FROM program INNER JOIN programproperty ON program.ProgramNum=programproperty.ProgramNum "
+							+"WHERE program.ProgName='Xcharge' AND programproperty.ClinicNum=0 "//all existing programproperty rows for XCharge have ClinicNum=0
+							+"AND PropertyDesc!='')";//Local path override will not be clinic specific, so don't duplicate for each clinic
+						Db.NonQ32(command);
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";

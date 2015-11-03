@@ -1,10 +1,10 @@
 using System;
-using System.Windows.Forms;
-using OpenDentBusiness;
-using System.IO;
-using OpenDental.ReportingComplex;
 using System.Data;
 using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using OpenDental.ReportingComplex;
+using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormXChargeReconcile:Form {
@@ -89,9 +89,10 @@ namespace OpenDental {
 		private void butViewImported_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,CASE WHEN ResultCode='000' OR ResultCode='010' THEN Amount ELSE Amount=0 END AS Amount "
+			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,"
+				+"CASE WHEN ResultCode IN('000','010') THEN Amount ELSE 0 END AS Amount "
 				+"FROM xchargetransaction "
-				+"WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
+				+"WHERE "+DbHelper.DtimeToDate("TransactionDateTime")+" BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"AND TransType!='CCVoid'";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
@@ -113,13 +114,16 @@ namespace OpenDental {
 
 		private void butPayments_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			string paymentType=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query="SET @pos=0; "
 				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt,PayType "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
+				+"INNER JOIN ("
+					+"SELECT ClinicNum,PropertyValue AS PaymentType FROM programproperty "
+					+"WHERE ProgramNum="+POut.Long(Programs.GetProgramNum(ProgramName.Xcharge))+" AND PropertyDesc='PaymentType'"
+				+") paytypes ON paytypes.ClinicNum=payment.ClinicNum AND paytypes.PaymentType=payment.PayType "
 				//Must be DateEntry here. PayDate will not work with recurring charges
-				+"WHERE PayType="+paymentType+" AND (DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
+				+"WHERE DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
 				+"ORDER BY Count ASC";
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
@@ -140,7 +144,6 @@ namespace OpenDental {
 
 		private void butMissing_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
@@ -150,7 +153,7 @@ namespace OpenDental {
 			report.GetTitle("Title").IsUnderlined=true;
 			report.AddSubTitle("SubTitle","No Matching Transaction Found in Open Dental",fontSubTitle);
 			QueryObject query;
-			DataTable dt=XChargeTransactions.GetMissingTable(programNum,date1.SelectionStart,date2.SelectionStart);
+			DataTable dt=XChargeTransactions.GetMissingPaymentsTable(date1.SelectionStart,date2.SelectionStart);
 			query=report.AddQuery(dt,"Missing Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
 			query.AddColumn("Transaction Date/Time",170,FieldValueType.String,font);
 			query.AddColumn("Transaction Type",120,FieldValueType.String,font);
@@ -174,7 +177,6 @@ namespace OpenDental {
 
 		private void butExtra_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			string programNum=ProgramProperties.GetPropVal(Programs.GetCur(ProgramName.Xcharge).ProgramNum,"PaymentType");
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);
@@ -184,21 +186,14 @@ namespace OpenDental {
 			report.GetTitle("Title").IsUnderlined=true;
 			report.AddSubTitle("SubTitle","No Matching X-Charge Transactions for these Payments",fontSubTitle);
 			QueryObject query;
-			query=report.AddQuery("SELECT payment.PatNum, LName, FName, payment.DateEntry,payment.PayDate, payment.PayNote,payment.PayAmt "
-				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
-				+"LEFT JOIN (SELECT TransactionDateTime,ClerkID,BatchNum,ItemNum,PatNum,CCType,CreditCardNum,Expiration,Result,Amount FROM xchargetransaction "
-					+"WHERE (DATE(TransactionDateTime) BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+") "
-						+"AND (ResultCode=0 OR ResultCode=10)) AS X "
-				+"ON X.PatNum=payment.PatNum AND DATE(X.TransactionDateTime)=payment.DateEntry AND X.Amount=payment.PayAmt "
-				+"WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
-				+"AND X.TransactionDateTime IS NULL "
-				+"ORDER BY PayDate ASC, patient.LName","Extra Payments","",SplitByKind.None,1,true);//Valid entries to count have result code 0
+			DataTable dt=XChargeTransactions.GetMissingXTransTable(date1.SelectionStart,date2.SelectionStart);
+			query=report.AddQuery(dt,"Extra Payments","",SplitByKind.None,1,true);
 			query.AddColumn("Pat",50,FieldValueType.String,font);
 			query.AddColumn("LName",100,FieldValueType.String,font);
 			query.AddColumn("FName",100,FieldValueType.String,font);
-			query.AddColumn("DateEntry",100,FieldValueType.Date,font);
-			query.AddColumn("PayDate",100,FieldValueType.Date,font);
-			query.AddColumn("PayNote",150,FieldValueType.String,font);
+			query.AddColumn("DateEntry",90,FieldValueType.Date,font);
+			query.AddColumn("PayDate",90,FieldValueType.Date,font);
+			query.AddColumn("PayNote",210,FieldValueType.String,font);
 			query.AddColumn("PayAmt",70,FieldValueType.Number,font);
 			query.GetColumnHeader("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;

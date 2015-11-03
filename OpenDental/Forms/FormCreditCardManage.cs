@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -66,18 +62,24 @@ namespace OpenDental {
 				if(Programs.IsEnabled(ProgramName.Xcharge)) {
 					Program prog=Programs.GetCur(ProgramName.Xcharge);
 					string path=Programs.GetProgramPath(prog);
-					if(!File.Exists(path)){
-						MsgBox.Show(this,"Path is not valid.");
-						if(Security.IsAuthorized(Permissions.Setup)) {
-							FormXchargeSetup FormX=new FormXchargeSetup();
-							FormX.ShowDialog();
-							if(FormX.DialogResult!=DialogResult.OK) {
-								return;
-							}
+					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum).Trim();
+					string xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum).Trim();
+					while(!File.Exists(path) || string.IsNullOrEmpty(xPassword) || string.IsNullOrEmpty(xUsername)) {
+						MsgBox.Show(this,"The Path, Username, and/or Password for X-Charge have not been set or are invalid.");
+						if(!Security.IsAuthorized(Permissions.Setup)) {
+							return;
 						}
+						FormXchargeSetup FormX=new FormXchargeSetup();//refreshes program and program property caches on OK click
+						FormX.ShowDialog();
+						if(FormX.DialogResult!=DialogResult.OK) {
+							return;
+						}
+						prog=Programs.GetCur(ProgramName.Xcharge);//refresh local variable prog to reflect any changes made in setup window
+						path=Programs.GetProgramPath(prog);
+						xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum).Trim();
+						xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum).Trim();
 					}
-					string user=ProgramProperties.GetPropVal(prog.ProgramNum,"Username");
-					string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"));
+					xPassword=CodeBase.MiscUtils.Decrypt(xPassword);
 					ProcessStartInfo info=new ProcessStartInfo(path);
 					string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
 					try {
@@ -90,8 +92,8 @@ namespace OpenDental {
 					info.Arguments="";
 					info.Arguments+="/TRANSACTIONTYPE:ArchiveVaultAdd /LOCKTRANTYPE ";
 					info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
-					info.Arguments+="/USERID:"+user+" ";
-					info.Arguments+="/PASSWORD:"+password+" ";
+					info.Arguments+="/USERID:"+xUsername+" ";
+					info.Arguments+="/PASSWORD:"+xPassword+" ";
 					info.Arguments+="/VALIDATEARCHIVEVAULTACCOUNT ";
 					info.Arguments+="/STAYONTOP ";
 					info.Arguments+="/SMARTAUTOPROCESS ";
@@ -126,7 +128,7 @@ namespace OpenDental {
 								resulttext+=line;
 								if(line.StartsWith("RESULT=")) {
 									if(line!="RESULT=SUCCESS") {
-										break;
+										throw new Exception();
 									}
 									insertCard=true;
 								}
@@ -162,7 +164,7 @@ namespace OpenDental {
 						}
 						RefreshCardList();
 					}
-					catch {
+					catch(Exception ex) {
 						MsgBox.Show(this,Lan.g(this,"There was a problem adding the credit card.  Please try again."));
 						return;
 					}

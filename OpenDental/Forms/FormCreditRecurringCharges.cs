@@ -22,9 +22,9 @@ namespace OpenDental {
 		private int headingPrintH;
 		private bool headingPrinted;
 		private bool insertPayment;
-		private Program _program;
-		private DateTime nowDateTime;
-		private string xPath;
+		private Program _progCur;
+		private DateTime _nowDateTime;
+		private string _xPath;
 		private int _success;
 		private int _failed;
 
@@ -40,12 +40,12 @@ namespace OpenDental {
 				checkHideBold.Visible=false;
 			}
 			if(Programs.IsEnabled(ProgramName.PayConnect)) {
-				_program=Programs.GetCur(ProgramName.PayConnect);
+				_progCur=Programs.GetCur(ProgramName.PayConnect);
 			}
 			else if(Programs.IsEnabled(ProgramName.Xcharge)) {
-				_program=Programs.GetCur(ProgramName.Xcharge);
-				xPath=Programs.GetProgramPath(_program);
-				if(!File.Exists(xPath)) {//program path is invalid
+				_progCur=Programs.GetCur(ProgramName.Xcharge);
+				_xPath=Programs.GetProgramPath(_progCur);
+				if(!File.Exists(_xPath)) {//program path is invalid
 					//if user has setup permission and they want to edit the program path, show the X-Charge setup window
 					if(Security.IsAuthorized(Permissions.Setup)
 						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"The X-Charge path is not valid.  Would you like to edit the path?"))
@@ -54,25 +54,25 @@ namespace OpenDental {
 						FormX.ShowDialog();
 						if(FormX.DialogResult==DialogResult.OK) {
 							//The user could have correctly enabled the X-Charge bridge, we need to update our local _programCur and _xPath variable2
-							_program=Programs.GetCur(ProgramName.Xcharge);
-							xPath=Programs.GetProgramPath(_program);
+							_progCur=Programs.GetCur(ProgramName.Xcharge);
+							_xPath=Programs.GetProgramPath(_progCur);
 						}
 					}
 					//if the program path still does not exist, whether or not they attempted to edit the program link, tell them to edit and close the form
-					if(!File.Exists(xPath)) {
+					if(!File.Exists(_xPath)) {
 						MsgBox.Show(this,"The X-Charge program path is not valid.  Edit the program link in order to use the CC Recurring Charges feature.");
 						Close();
 						return;
 					}
 				}
 			}
-			if(_program==null) {
+			if(_progCur==null) {
 				MsgBox.Show(this,"The PayConnect or X-Charge program link must be enabled in order to use the CC Recurring Charges feature.");
 				Close();
 				return;
 			}
 			//X-Charge or PayConnect is enabled and if X-Charge is enabled the path to the X-Charge executable is valid
-			nowDateTime=MiscData.GetNowDateTime();
+			_nowDateTime=MiscData.GetNowDateTime();
 			labelCharged.Text=Lan.g(this,"Charged=")+"0";
 			labelFailed.Text=Lan.g(this,"Failed=")+"0";
 			FillGrid();
@@ -192,17 +192,17 @@ namespace OpenDental {
 		///<summary>Returns a valid DateTime for the payment's PayDate.  Contains logic if payment should be for the previous or the current month.</summary>
 		private DateTime GetPayDate(DateTime latestPayment,DateTime dateStart) {
 			//Most common, current day >= dateStart so we use current month and year with the dateStart day.  Will always be a legal DateTime.
-			if(nowDateTime.Day>=dateStart.Day) {
-				return new DateTime(nowDateTime.Year,nowDateTime.Month,dateStart.Day);
+			if(_nowDateTime.Day>=dateStart.Day) {
+				return new DateTime(_nowDateTime.Year,_nowDateTime.Month,dateStart.Day);
 			}
 			//If not enough days in current month to match the dateStart see if on the last day in the month.
 			//Example: dateStart=08/31/2009 and month is February 28th so we need the PayDate to be today not for last day on the last month, which would happen below.
-			int daysInMonth=DateTime.DaysInMonth(nowDateTime.Year,nowDateTime.Month);
-			if(daysInMonth<=dateStart.Day && daysInMonth==nowDateTime.Day) {
-				return nowDateTime;//Today is last day of the month so return today as the PayDate.
+			int daysInMonth=DateTime.DaysInMonth(_nowDateTime.Year,_nowDateTime.Month);
+			if(daysInMonth<=dateStart.Day && daysInMonth==_nowDateTime.Day) {
+				return _nowDateTime;//Today is last day of the month so return today as the PayDate.
 			}
 			//PayDate needs to be for the previous month so we need to determine if using the dateStart day would be a legal DateTime.
-			DateTime nowMinusOneMonth=nowDateTime.AddMonths(-1);
+			DateTime nowMinusOneMonth=_nowDateTime.AddMonths(-1);
 			daysInMonth=DateTime.DaysInMonth(nowMinusOneMonth.Year,nowMinusOneMonth.Month);
 			if(daysInMonth<=dateStart.Day) {
 				return new DateTime(nowMinusOneMonth.Year,nowMinusOneMonth.Month,daysInMonth);//Returns the last day of the previous month.
@@ -213,7 +213,7 @@ namespace OpenDental {
 		///<summary>Tests the selected indicies with newly calculated pay dates.  If there's a date violation, a warning shows and false is returned.</summary>
 		private bool PaymentsWithinLockDate() {
 			//Check if user has the payment create permission in the first place to save time.
-			if(!Security.IsAuthorized(Permissions.PaymentCreate,nowDateTime.Date)) {
+			if(!Security.IsAuthorized(Permissions.PaymentCreate,_nowDateTime.Date)) {
 				return false;
 			}
 			List<string> warnings=new List<string>();
@@ -370,18 +370,41 @@ namespace OpenDental {
 			StringBuilder strBuilderResultFile=new StringBuilder();
 			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
 			strBuilderResultFile.AppendLine();
-			string user=ProgramProperties.GetPropVal(_program.ProgramNum,"Username");
-			string password=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(_program.ProgramNum,"Password"));
-			string resultfile=ODFileUtils.CombinePaths(Path.GetDirectoryName(xPath),"XResult.txt");
+			string resultfile=ODFileUtils.CombinePaths(Path.GetDirectoryName(_xPath),"XResult.txt");
+			List<long> listClinicNumsBadCredentials=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="" &&
 					CreditCards.IsDuplicateXChargeToken(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()))
 				{
-					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
+					_failed++;
+					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer")+": "+table.Rows[i]["PatName"].ToString());
 					continue;
 				}
+				//this is patient.ClinicNum or if it's a payplan row it's the ClinicNum from one of the payplancharges on the payplan
+				long clinicNumCur=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
+				if(listClinicNumsBadCredentials.Contains(clinicNumCur)) {//username or password is blank, don't try to process
+					_failed++;
+					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					continue;
+				}
+				string username=ProgramProperties.GetPropVal(_progCur.ProgramNum,"Username",clinicNumCur);
+				string password=ProgramProperties.GetPropVal(_progCur.ProgramNum,"Password",clinicNumCur);
+				if(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) {//clinicNumCur is not in listClinicNumsBadCredentials yet
+					_failed++;
+					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
+					string clinicDesc="Headquarters";
+					if(clinicNumCur>0) {
+						clinicDesc=Clinics.GetDesc(clinicNumCur);
+					}
+					MessageBox.Show(this,Lan.g(this,"The X-Charge Username or Password for the following clinic has not been set")+":\r\n"+clinicDesc+"\r\n"
+						+Lan.g(this,"All charges for that clinic will be skipped."));
+					listClinicNumsBadCredentials.Add(clinicNumCur);
+					continue;
+				}
+				password=CodeBase.MiscUtils.Decrypt(password);
 				insertPayment=false;
-				ProcessStartInfo info=new ProcessStartInfo(xPath);
+				ProcessStartInfo info=new ProcessStartInfo(_xPath);
 				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
 				Patient patCur=Patients.GetPat(patNum);
 				if(patCur==null) {
@@ -439,7 +462,7 @@ namespace OpenDental {
 				info.Arguments+="/RECEIPT:Pat"+patNum+" ";//aka invoice#
 				info.Arguments+="\"/CLERK:"+Security.CurUser.UserName+" R\" /LOCKCLERK ";
 				info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
-				info.Arguments+="/USERID:"+user+" ";
+				info.Arguments+="/USERID:"+username+" ";
 				info.Arguments+="/PASSWORD:"+password+" ";
 				info.Arguments+="/HIDEMAINWINDOW ";
 				info.Arguments+="/AUTOPROCESS ";
@@ -489,7 +512,7 @@ namespace OpenDental {
 				}
 			}
 			try {
-				File.WriteAllText(ODFileUtils.CombinePaths(Path.GetDirectoryName(xPath),"RecurringChargeResult.txt"),strBuilderResultFile.ToString());
+				File.WriteAllText(ODFileUtils.CombinePaths(Path.GetDirectoryName(_xPath),"RecurringChargeResult.txt"),strBuilderResultFile.ToString());
 			}
 			catch { } //Do nothing cause this is just for internal use.
 		}
@@ -615,7 +638,7 @@ namespace OpenDental {
 		///of the gridMain row this payment is for.</summary>
 		private void CreatePayment(Patient patCur,int indexCur,string note) {
 			Payment paymentCur=new Payment();
-			paymentCur.DateEntry=nowDateTime.Date;
+			paymentCur.DateEntry=_nowDateTime.Date;
 			DateTime dateStart=PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString());
 			if(Prefs.IsODHQ() && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 				dateStart=new DateTime(dateStart.Year,dateStart.Month,PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
@@ -624,7 +647,7 @@ namespace OpenDental {
 			paymentCur.PatNum=patCur.PatNum;
 			paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
 			//ClinicNum can be 0 for 'Headquarters' or clinics not enabled, PayType will be the 0 clinic or headquarters PayType if using PayConnect
-			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_program.ProgramNum,"PaymentType",paymentCur.ClinicNum));
+			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_progCur.ProgramNum,"PaymentType",paymentCur.ClinicNum));
 			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
 			double payPlanDue=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanDue"].ToString());
 			paymentCur.PayNote=note;
@@ -703,10 +726,10 @@ namespace OpenDental {
 			}
 			_success=0;
 			_failed=0;
-			if(_program.ProgName==ProgramName.Xcharge.ToString()) {
+			if(_progCur.ProgName==ProgramName.Xcharge.ToString()) {
 				SendXCharge();
 			}
-			else if(_program.ProgName==ProgramName.PayConnect.ToString()) {
+			else if(_progCur.ProgName==ProgramName.PayConnect.ToString()) {
 				SendPayConnect();
 			}
 			FillGrid();

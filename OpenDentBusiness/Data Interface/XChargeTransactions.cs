@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
 namespace OpenDentBusiness{
 
@@ -57,19 +55,50 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		public static DataTable GetMissingTable(string programNum,DateTime dateStart,DateTime dateEnd) {
+		public static DataTable GetMissingPaymentsTable(DateTime dateStart,DateTime dateEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod());
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
 			}
-			return Db.GetTable("SELECT TransactionDateTime,TransType,ClerkID,ItemNum,xchargetransaction.PatNum,CreditCardNum,Expiration,Result,Amount "
-				+" FROM xchargetransaction LEFT JOIN ("
-					+" SELECT patient.PatNum,LName,FName,DateEntry,PayDate,PayAmt,PayNote"
-					+" FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum"
-					+" WHERE PayType="+programNum+" AND DateEntry BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
-				+" ) AS P ON xchargetransaction.PatNum=P.PatNum AND DATE(xchargetransaction.TransactionDateTime)=P.DateEntry AND xchargetransaction.Amount=P.PayAmt "
-				+" WHERE DATE(TransactionDateTime) BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
-				+" AND P.PatNum IS NULL"
-				+" AND xchargetransaction.ResultCode=0;");
+			string command="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,xchargetransaction.PatNum,CreditCardNum,Expiration,Result,Amount "
+				+"FROM xchargetransaction "
+				+"LEFT JOIN ("
+					+"SELECT PatNum,DateEntry,PayAmt "
+					+"FROM payment "
+					//only payments with the same PaymentType as the X-Charge PaymentType for the clinic
+					+"INNER JOIN ("
+						+"SELECT ClinicNum,PropertyValue PaymentType FROM programproperty "
+						+"WHERE ProgramNum="+POut.Long(Programs.GetProgramNum(ProgramName.Xcharge))+" AND PropertyDesc='PaymentType'"
+					+") paytypes ON paytypes.ClinicNum=payment.ClinicNum AND paytypes.PaymentType=payment.PayType "
+					+"WHERE DateEntry BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
+				+") pay ON xchargetransaction.PatNum=pay.PatNum "
+					+"AND "+DbHelper.DtimeToDate("TransactionDateTime")+"=pay.DateEntry "
+					+"AND xchargetransaction.Amount=pay.PayAmt "
+				+"WHERE "+DbHelper.DtimeToDate("TransactionDateTime")+" BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+				+"AND pay.PatNum IS NULL "
+				+"AND xchargetransaction.ResultCode=0";//Valid entries to count have result code 0
+			return Db.GetTable(command);
+		}
+
+		public static DataTable GetMissingXTransTable(DateTime dateStart,DateTime dateEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
+			}
+			string command="SELECT payment.PatNum,LName,FName,payment.DateEntry,payment.PayDate,payment.PayNote,payment.PayAmt "
+				+"FROM patient "
+				+"INNER JOIN payment ON payment.PatNum=patient.PatNum "
+				//only payments with the same PaymentType as the X-Charge PaymentType for the clinic
+				+"INNER JOIN ("
+					+"SELECT ClinicNum,PropertyValue AS PaymentType FROM programproperty "
+					+"WHERE ProgramNum="+POut.Long(Programs.GetProgramNum(ProgramName.Xcharge))+" AND PropertyDesc='PaymentType'"
+				+") paytypes ON paytypes.ClinicNum=payment.ClinicNum AND paytypes.PaymentType=payment.PayType "
+				+"LEFT JOIN xchargetransaction ON xchargetransaction.PatNum=payment.PatNum "
+					+"AND "+DbHelper.DtimeToDate("TransactionDateTime")+"=payment.DateEntry "
+					+"AND xchargetransaction.Amount=payment.PayAmt "
+					+"AND xchargetransaction.ResultCode IN(0,10) "
+				+"WHERE payment.DateEntry BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+				+"AND TransactionDateTime IS NULL "
+				+"ORDER BY payment.PayDate ASC,LName,FName";
+			return Db.GetTable(command);
 		}
 	
 

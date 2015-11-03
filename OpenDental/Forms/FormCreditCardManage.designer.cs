@@ -41,7 +41,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(210, 165);
+			this.butClose.Location = new System.Drawing.Point(210, 172);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(82, 26);
 			this.butClose.TabIndex = 2;
@@ -56,7 +56,7 @@ namespace OpenDental{
 			this.listCreditCards.IntegralHeight = false;
 			this.listCreditCards.Location = new System.Drawing.Point(12, 12);
 			this.listCreditCards.Name = "listCreditCards";
-			this.listCreditCards.Size = new System.Drawing.Size(175, 179);
+			this.listCreditCards.Size = new System.Drawing.Size(175, 186);
 			this.listCreditCards.TabIndex = 4;
 			this.listCreditCards.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listCreditCards_MouseDoubleClick);
 			// 
@@ -108,13 +108,13 @@ namespace OpenDental{
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
-			// labelXChargeWarning
+			// labelStoreCCNumWarning
 			// 
 			this.labelStoreCCNumWarning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.labelStoreCCNumWarning.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-			this.labelStoreCCNumWarning.Location = new System.Drawing.Point(12, 195);
-			this.labelStoreCCNumWarning.Name = "labelXChargeWarning";
-			this.labelStoreCCNumWarning.Size = new System.Drawing.Size(280, 36);
+			this.labelStoreCCNumWarning.Location = new System.Drawing.Point(12, 201);
+			this.labelStoreCCNumWarning.Name = "labelStoreCCNumWarning";
+			this.labelStoreCCNumWarning.Size = new System.Drawing.Size(280, 30);
 			this.labelStoreCCNumWarning.TabIndex = 39;
 			this.labelStoreCCNumWarning.Text = "You should turn off the option in Module Setup for \"allow storing credit card num" +
     "bers\" in order to start using tokens.";
@@ -123,7 +123,6 @@ namespace OpenDental{
 			// butMoveTo
 			// 
 			this.butMoveTo.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butMoveTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butMoveTo.Autosize = true;
 			this.butMoveTo.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMoveTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -147,6 +146,7 @@ namespace OpenDental{
 			this.Controls.Add(this.listCreditCards);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(320, 278);
 			this.Name = "FormCreditCardManage";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Credit Card Manage";

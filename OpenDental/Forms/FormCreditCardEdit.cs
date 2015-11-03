@@ -259,7 +259,6 @@ namespace OpenDental {
 						return;
 					}
 					//Either update the exp date or update credit card number by deleting archive so new token can be created next time it's used.
-					ProgramProperty prop=(ProgramProperty)ProgramProperties.GetForProgram(prog.ProgramNum)[0];
 					ProcessStartInfo info=new ProcessStartInfo(path);
 					string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
 					try {
@@ -269,13 +268,15 @@ namespace OpenDental {
 						MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have sufficient permissions.");
 						return;
 					}
+					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum);
+					string xPassword=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum));
 					if(_creditCardOld.CCNumberMasked!=CreditCardCur.CCNumberMasked) {//User changed card number, which invlidates the X-Charge token
 						//delete archived token, a new one will be created the next time the card is charged.
 						info.Arguments+="/TRANSACTIONTYPE:ARCHIVEVAULTDELETE ";
 						info.Arguments+="/XCACCOUNTID:"+CreditCardCur.XChargeToken+" ";
 						info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
-						info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-						info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
+						info.Arguments+="/USERID:"+xUsername+" ";
+						info.Arguments+="/PASSWORD:"+xPassword+" ";
 						info.Arguments+="/AUTOPROCESS ";
 						info.Arguments+="/AUTOCLOSE ";
 						CreditCardCur.XChargeToken="";//Clear the XChargeToken in our db.
@@ -287,8 +288,8 @@ namespace OpenDental {
 							info.Arguments+="/EXP:"+CreditCardCur.CCExpiration.ToString("MMyy")+" ";
 						}
 						info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
-						info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username")+" ";
-						info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password"))+" ";
+						info.Arguments+="/USERID:"+xUsername+" ";
+						info.Arguments+="/PASSWORD:"+xPassword+" ";
 						info.Arguments+="/AUTOPROCESS ";
 						info.Arguments+="/AUTOCLOSE ";
 					}

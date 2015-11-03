@@ -1,8 +1,5 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -1073,6 +1070,8 @@ namespace OpenDental{
 				//for every new clinic, insert a set of program properties for PayConnect with the values from
 				//the 'Headquarters' or ClinicNum=0 set of properties
 				List<ProgramProperty> listProps=ProgramProperties.GetListForProgramAndClinic(Programs.GetProgramNum(ProgramName.PayConnect),0);
+				//Add the program props for X-Charge for the HQ or practice level clinic (ClinicNum=0) to the list of props to duplicate for the new clinic
+				listProps.AddRange(ProgramProperties.GetListForProgramAndClinic(Programs.GetProgramNum(ProgramName.Xcharge),0));//doesn't include path override
 				for(int i=0;i<listProps.Count;i++) {
 					listProps[i].ClinicNum=ClinicCur.ClinicNum;
 					ProgramProperties.Insert(listProps[i]);//copy all values from the 0 clinic except ClinicNum and the primary key, insert will assign pri key
