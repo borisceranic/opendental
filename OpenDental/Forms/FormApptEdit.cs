@@ -3654,7 +3654,6 @@ namespace OpenDental{
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 			Appointments.Sync(_listAppointments,AptCur.PatNum);//This line also detaches any attached procedures within Appointments.Delete().
-			ApptComms.SendReminders();
 		}
 		
 
