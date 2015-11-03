@@ -11080,7 +11080,61 @@ namespace OpenDentBusiness {
 						Db.NonQ32(command);
 					}
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS apptcomm";
+					Db.NonQ(command);
+					command=@"CREATE TABLE apptcomm (
+						ApptCommNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ApptNum bigint NOT NULL,
+						ApptCommType tinyint NOT NULL,
+						DateTimeSend datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						INDEX(ApptNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE apptcomm'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE apptcomm (
+						ApptCommNum number(20) NOT NULL,
+						ApptNum number(20) NOT NULL,
+						ApptCommType number(3) NOT NULL,
+						DateTimeSend date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						CONSTRAINT apptcomm_ApptCommNum PRIMARY KEY (ApptCommNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX apptcomm_ApptNum ON apptcomm (ApptNum)";
+					Db.NonQ(command);
+				}
+				//Add ApptReminder preferences
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderDayInterval','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderDayMessage','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderHourInterval','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderHourMessage','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderSendAll','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderSendOrder','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayInterval','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayMessage','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourInterval','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourMessage','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendAll','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendOrder','0,1,2')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

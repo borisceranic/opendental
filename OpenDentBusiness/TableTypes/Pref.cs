@@ -71,6 +71,14 @@ namespace OpenDentBusiness {
 		ApptPrintTimeStart,
 		///<summary>Stored as DateTime.  Currently the date portion is not used but might be used in future versions.</summary>
 		ApptPrintTimeStop,
+		ApptReminderDayInterval,
+		ApptReminderDayMessage,
+		ApptReminderHourInterval,
+		ApptReminderHourMessage,
+		///<summary>Boolean defaults to 0.</summary>
+		ApptReminderSendAll,
+		///<summary>Comma-delimited string.</summary>
+		ApptReminderSendOrder,
 		///<summary>Used by OD HQ.  Not added to db convert script.  Used to store the IP address of the asterisk phone server for the phone comms and voice mails.</summary>
 		AsteriskServerIp,
 		///<summary>Deprecated, but must remain here to avoid breaking updates.</summary>

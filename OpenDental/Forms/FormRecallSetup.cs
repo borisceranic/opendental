@@ -56,7 +56,22 @@ namespace OpenDental{
 		private TabPage tabConfirmationAutomation;
 		private ODGrid gridConfirmationRules;
 		private UI.Button butAdd;
+		private TabPage tabCommunicationSetup;
+		private CheckBox checkSendAll;
+		private Label label7;
+		private Label label9;
+		private UI.Button butDown;
+		private UI.Button butUp;
+		private ODGrid gridPriorities;
+		private Label label10;
+		private Label label11;
+		private ValidNumber textHourInterval;
+		private ValidNumber textDayInterval;
 		private bool changed;
+		private RichTextBox textDayMsg;
+		private RichTextBox textHourMsg;
+		private Label label16;
+		string[] _priorities;
 
 		///<summary></summary>
 		public FormRecallSetup(){
@@ -113,7 +128,6 @@ namespace OpenDental{
 			this.textDaysFirstReminder = new OpenDental.ValidNumber();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.comboStatusEmailedConfirm = new System.Windows.Forms.ComboBox();
@@ -127,9 +141,24 @@ namespace OpenDental{
 			this.radioExcludeFutureYes = new System.Windows.Forms.RadioButton();
 			this.tabControlSetup = new System.Windows.Forms.TabControl();
 			this.tabRecallConfirmationSetup = new System.Windows.Forms.TabPage();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.tabConfirmationAutomation = new System.Windows.Forms.TabPage();
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridConfirmationRules = new OpenDental.UI.ODGrid();
+			this.tabCommunicationSetup = new System.Windows.Forms.TabPage();
+			this.textHourMsg = new System.Windows.Forms.RichTextBox();
+			this.textDayMsg = new System.Windows.Forms.RichTextBox();
+			this.checkSendAll = new System.Windows.Forms.CheckBox();
+			this.label7 = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.butDown = new OpenDental.UI.Button();
+			this.butUp = new OpenDental.UI.Button();
+			this.label10 = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textHourInterval = new OpenDental.ValidNumber();
+			this.textDayInterval = new OpenDental.ValidNumber();
+			this.gridPriorities = new OpenDental.UI.ODGrid();
+			this.label16 = new System.Windows.Forms.Label();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -137,6 +166,7 @@ namespace OpenDental{
 			this.tabControlSetup.SuspendLayout();
 			this.tabRecallConfirmationSetup.SuspendLayout();
 			this.tabConfirmationAutomation.SuspendLayout();
+			this.tabCommunicationSetup.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textPostcardsPerSheet
@@ -402,21 +432,6 @@ namespace OpenDental{
 			this.label3.Text = "Second (or more) Reminder";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(35, 14);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(872, 374);
-			this.gridMain.TabIndex = 67;
-			this.gridMain.Title = "Messages";
-			this.gridMain.TranslationName = "TableRecallMsgs";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
 			// butOK
 			// 
 			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -541,6 +556,7 @@ namespace OpenDental{
 			// 
 			this.tabControlSetup.Controls.Add(this.tabRecallConfirmationSetup);
 			this.tabControlSetup.Controls.Add(this.tabConfirmationAutomation);
+			this.tabControlSetup.Controls.Add(this.tabCommunicationSetup);
 			this.tabControlSetup.Location = new System.Drawing.Point(12, 12);
 			this.tabControlSetup.Name = "tabControlSetup";
 			this.tabControlSetup.SelectedIndex = 0;
@@ -576,6 +592,21 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup.TabIndex = 0;
 			this.tabRecallConfirmationSetup.Text = "Recalls & Confirmations";
 			this.tabRecallConfirmationSetup.UseVisualStyleBackColor = true;
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(35, 14);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(872, 374);
+			this.gridMain.TabIndex = 67;
+			this.gridMain.Title = "Messages";
+			this.gridMain.TranslationName = "TableRecallMsgs";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// tabConfirmationAutomation
 			// 
@@ -621,6 +652,162 @@ namespace OpenDental{
 			this.gridConfirmationRules.TranslationName = "TableConfirmationRules";
 			this.gridConfirmationRules.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridConfirmationRules_CellDoubleClick);
 			// 
+			// tabCommunicationSetup
+			// 
+			this.tabCommunicationSetup.Controls.Add(this.label16);
+			this.tabCommunicationSetup.Controls.Add(this.textHourMsg);
+			this.tabCommunicationSetup.Controls.Add(this.textDayMsg);
+			this.tabCommunicationSetup.Controls.Add(this.checkSendAll);
+			this.tabCommunicationSetup.Controls.Add(this.label7);
+			this.tabCommunicationSetup.Controls.Add(this.label9);
+			this.tabCommunicationSetup.Controls.Add(this.butDown);
+			this.tabCommunicationSetup.Controls.Add(this.butUp);
+			this.tabCommunicationSetup.Controls.Add(this.label10);
+			this.tabCommunicationSetup.Controls.Add(this.label11);
+			this.tabCommunicationSetup.Controls.Add(this.textHourInterval);
+			this.tabCommunicationSetup.Controls.Add(this.textDayInterval);
+			this.tabCommunicationSetup.Controls.Add(this.gridPriorities);
+			this.tabCommunicationSetup.Location = new System.Drawing.Point(4, 22);
+			this.tabCommunicationSetup.Name = "tabCommunicationSetup";
+			this.tabCommunicationSetup.Padding = new System.Windows.Forms.Padding(3);
+			this.tabCommunicationSetup.Size = new System.Drawing.Size(942, 615);
+			this.tabCommunicationSetup.TabIndex = 2;
+			this.tabCommunicationSetup.Text = "Appt Communication";
+			this.tabCommunicationSetup.UseVisualStyleBackColor = true;
+			// 
+			// textHourMsg
+			// 
+			this.textHourMsg.Location = new System.Drawing.Point(190, 83);
+			this.textHourMsg.Name = "textHourMsg";
+			this.textHourMsg.Size = new System.Drawing.Size(167, 171);
+			this.textHourMsg.TabIndex = 70;
+			this.textHourMsg.Text = "";
+			// 
+			// textDayMsg
+			// 
+			this.textDayMsg.Location = new System.Drawing.Point(17, 83);
+			this.textDayMsg.Name = "textDayMsg";
+			this.textDayMsg.Size = new System.Drawing.Size(167, 171);
+			this.textDayMsg.TabIndex = 69;
+			this.textDayMsg.Text = "";
+			// 
+			// checkSendAll
+			// 
+			this.checkSendAll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSendAll.Location = new System.Drawing.Point(349, 79);
+			this.checkSendAll.Name = "checkSendAll";
+			this.checkSendAll.Size = new System.Drawing.Size(100, 24);
+			this.checkSendAll.TabIndex = 23;
+			this.checkSendAll.Text = "Send All";
+			this.checkSendAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSendAll.UseVisualStyleBackColor = true;
+			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(187, 57);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(100, 23);
+			this.label7.TabIndex = 22;
+			this.label7.Text = "Hour Message";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// label9
+			// 
+			this.label9.Location = new System.Drawing.Point(14, 57);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(100, 23);
+			this.label9.TabIndex = 21;
+			this.label9.Text = "Day Message";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// butDown
+			// 
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDown.Autosize = false;
+			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDown.CornerRadius = 4F;
+			this.butDown.Image = global::OpenDental.Properties.Resources.down;
+			this.butDown.Location = new System.Drawing.Point(419, 26);
+			this.butDown.Name = "butDown";
+			this.butDown.Size = new System.Drawing.Size(30, 30);
+			this.butDown.TabIndex = 18;
+			this.butDown.UseVisualStyleBackColor = true;
+			this.butDown.Click += new System.EventHandler(this.butDown_Click);
+			// 
+			// butUp
+			// 
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUp.Autosize = false;
+			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUp.CornerRadius = 4F;
+			this.butUp.Image = global::OpenDental.Properties.Resources.up;
+			this.butUp.Location = new System.Drawing.Point(383, 26);
+			this.butUp.Name = "butUp";
+			this.butUp.Size = new System.Drawing.Size(30, 30);
+			this.butUp.TabIndex = 17;
+			this.butUp.UseVisualStyleBackColor = true;
+			this.butUp.Click += new System.EventHandler(this.butUp_Click);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(187, 10);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(100, 23);
+			this.label10.TabIndex = 15;
+			this.label10.Text = "Hour Interval";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(14, 10);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(100, 23);
+			this.label11.TabIndex = 14;
+			this.label11.Text = "Day Interval";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// textHourInterval
+			// 
+			this.textHourInterval.Location = new System.Drawing.Point(190, 36);
+			this.textHourInterval.MaxVal = 255;
+			this.textHourInterval.MinVal = 0;
+			this.textHourInterval.Name = "textHourInterval";
+			this.textHourInterval.Size = new System.Drawing.Size(167, 20);
+			this.textHourInterval.TabIndex = 13;
+			// 
+			// textDayInterval
+			// 
+			this.textDayInterval.Location = new System.Drawing.Point(17, 36);
+			this.textDayInterval.MaxVal = 255;
+			this.textDayInterval.MinVal = 0;
+			this.textDayInterval.Name = "textDayInterval";
+			this.textDayInterval.Size = new System.Drawing.Size(167, 20);
+			this.textDayInterval.TabIndex = 12;
+			// 
+			// gridPriorities
+			// 
+			this.gridPriorities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPriorities.HasMultilineHeaders = false;
+			this.gridPriorities.HScrollVisible = false;
+			this.gridPriorities.Location = new System.Drawing.Point(455, 26);
+			this.gridPriorities.Name = "gridPriorities";
+			this.gridPriorities.ScrollValue = 0;
+			this.gridPriorities.Size = new System.Drawing.Size(413, 294);
+			this.gridPriorities.TabIndex = 68;
+			this.gridPriorities.Title = "Communication Priorities";
+			this.gridPriorities.TranslationName = null;
+			// 
+			// label16
+			// 
+			this.label16.Location = new System.Drawing.Point(17, 271);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(340, 130);
+			this.label16.TabIndex = 71;
+			this.label16.Text = resources.GetString("label16.Text");
+			// 
 			// FormRecallSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -649,6 +836,8 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup.ResumeLayout(false);
 			this.tabRecallConfirmationSetup.PerformLayout();
 			this.tabConfirmationAutomation.ResumeLayout(false);
+			this.tabCommunicationSetup.ResumeLayout(false);
+			this.tabCommunicationSetup.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -662,6 +851,7 @@ namespace OpenDental{
 #else
 			tabControlSetup.TabPages.Remove(tabConfirmationAutomation);
 #endif
+			FillPriorityTab();
 		}
 
 		#region Recalls & Confirmations
@@ -1044,6 +1234,71 @@ namespace OpenDental{
 
 		#endregion
 
+		#region Appt Communication Setup
+
+		private void FillPriorityTab() {
+			textDayInterval.Text=PrefC.GetString(PrefName.ApptReminderDayInterval);
+			textDayMsg.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
+			textHourInterval.Text=PrefC.GetString(PrefName.ApptReminderHourInterval);
+			textHourMsg.Text=PrefC.GetString(PrefName.ApptReminderHourMessage);
+			checkSendAll.Checked=PrefC.GetBool(PrefName.ApptReminderSendAll);
+			string prefPriority=PrefC.GetString(PrefName.ApptReminderSendOrder);
+			_priorities=prefPriority.Split(',');
+			FillPriorityGrid();
+		}
+
+		private void FillPriorityGrid() {
+			gridPriorities.BeginUpdate();
+			gridPriorities.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn("",0);
+			gridPriorities.Columns.Add(col);
+			gridPriorities.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_priorities.Length;i++) {
+				row=new ODGridRow();
+				int enumNum=PIn.Int(_priorities[i]);
+				row.Cells.Add(((CommType)enumNum).ToString());//Adding in the enums in order that the preference was.
+				row.Tag=enumNum;
+				gridPriorities.Rows.Add(row);
+			}
+			gridPriorities.EndUpdate();
+		}
+
+		private void butUp_Click(object sender,EventArgs e) {
+			if(gridPriorities.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a row to move.");
+				return;
+			}
+			if(gridPriorities.GetSelectedIndex()==0){//Return if it's already at the first position.
+				return;
+			}
+			int selectedIdx=gridPriorities.GetSelectedIndex();
+			string destinationString=_priorities[selectedIdx-1];
+			_priorities[selectedIdx-1]=_priorities[selectedIdx];
+			_priorities[selectedIdx]=destinationString;
+			FillPriorityGrid();
+			gridPriorities.SetSelected(selectedIdx-1,true);
+		}
+
+		private void butDown_Click(object sender,EventArgs e) {
+			if(gridPriorities.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a row to move.");
+				return;
+			}
+			if(gridPriorities.GetSelectedIndex()==gridPriorities.Rows.Count-1) {//Return if it's already at the last position.
+				return;
+			}
+			int selectedIdx=gridPriorities.GetSelectedIndex();
+			string destinationString=_priorities[selectedIdx+1];
+			_priorities[selectedIdx+1]=_priorities[selectedIdx];
+			_priorities[selectedIdx]=destinationString;
+			FillPriorityGrid();
+			gridPriorities.SetSelected(selectedIdx+1,true);
+		}
+
+		#endregion ApptCommunication Setup
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textRight.errorProvider1.GetError(textRight)!=""
 				|| textDown.errorProvider1.GetError(textDown)!=""
@@ -1051,7 +1306,9 @@ namespace OpenDental{
 				|| textDaysFuture.errorProvider1.GetError(textDaysFuture)!=""
 				|| textDaysFirstReminder.errorProvider1.GetError(textDaysFirstReminder)!=""
 				|| textDaysSecondReminder.errorProvider1.GetError(textDaysSecondReminder)!=""
-				|| textMaxReminders.errorProvider1.GetError(textMaxReminders)!="")
+				|| textMaxReminders.errorProvider1.GetError(textMaxReminders)!=""
+				|| textDayInterval.errorProvider1.GetError(textDayInterval)!=""
+				|| textHourInterval.errorProvider1.GetError(textHourInterval)!="")
 			{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
@@ -1151,6 +1408,19 @@ namespace OpenDental{
 			else{
 				Prefs.UpdateBool(PrefName.RecallUseEmailIfHasEmailAddress,false);
 			}
+			Prefs.UpdateBool(PrefName.ApptReminderSendAll,checkSendAll.Checked);
+			Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDayInterval.Text));
+			Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHourInterval.Text));
+			Prefs.UpdateString(PrefName.ApptReminderDayMessage,PIn.String(textDayMsg.Text));
+			Prefs.UpdateString(PrefName.ApptReminderHourMessage,PIn.String(textHourMsg.Text));
+			string sendOrder="";
+			for(int i=0;i<gridPriorities.Rows.Count;i++) {
+				if(i>0) {
+					sendOrder+=",";
+				}
+				sendOrder+=((int)gridPriorities.Rows[i].Tag).ToString();
+			}
+			Prefs.UpdateString(PrefName.ApptReminderSendOrder,sendOrder);
 			changed=true;
 			DialogResult=DialogResult.OK;
 		}

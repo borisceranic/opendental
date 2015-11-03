@@ -2728,6 +2728,21 @@ namespace OpenDental {
 					//	patField.FieldValue=PIn.String(pinBoard.SelectedAppt.TablePatFields.Rows[i]["FieldValue"].ToString());
 					//	PatFields.Insert(patField);
 					//}
+					int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+					ApptComm apptComm;
+					if(dayInterval>0) {
+						apptComm=new ApptComm();
+						apptComm.ApptNum=aptCur.AptNum;
+						apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+						ApptComms.Insert(apptComm);
+					}
+					int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+					if(hourInterval>0) {
+						apptComm=new ApptComm();
+						apptComm.ApptNum=aptCur.AptNum;
+						apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+						ApptComms.Insert(apptComm);
+					}
 				}
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);
@@ -2795,11 +2810,46 @@ namespace OpenDental {
 							aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
 							aptCur.AptNum);
 						isCreate=true;
+						int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+						ApptComm apptComm;
+						if(dayInterval>0) {
+							apptComm=new ApptComm();
+							apptComm.ApptNum=aptCur.AptNum;
+							apptComm.ApptCommType=IntervalType.Daily;
+							apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+							ApptComms.Insert(apptComm);
+						}
+						int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+						if(hourInterval>0) {
+							apptComm=new ApptComm();
+							apptComm.ApptNum=aptCur.AptNum;
+							apptComm.ApptCommType=IntervalType.Hourly;
+							apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+							ApptComms.Insert(apptComm);
+						}
 					}
 					else { //If existing appt is being moved
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentMove,aptCur.PatNum,
 							aptCur.ProcDescript+", from "+aptOld.AptDateTime.ToString()+", to "+aptCur.AptDateTime.ToString(),
 							aptCur.AptNum);
+						ApptComms.DeleteForAppt(aptCur.AptNum);
+						int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+						ApptComm apptComm;
+						if(dayInterval>0) {
+							apptComm=new ApptComm();
+							apptComm.ApptNum=aptCur.AptNum;
+							apptComm.ApptCommType=IntervalType.Daily;
+							apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+							ApptComms.Insert(apptComm);
+						}
+						int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+						if(hourInterval>0) {
+							apptComm=new ApptComm();
+							apptComm.ApptNum=aptCur.AptNum;
+							apptComm.ApptCommType=IntervalType.Hourly;
+							apptComm.DateTimeSend=aptCur.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+							ApptComms.Insert(apptComm);
+						}
 					}
 					//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 					if(HL7Defs.IsExistingHL7Enabled()) {
@@ -3586,6 +3636,22 @@ namespace OpenDental {
 				}
 			}
 			try {
+				ApptComms.DeleteForAppt(apt.AptNum);
+				int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+				ApptComm apptComm;
+				if(dayInterval>0) {
+					apptComm=new ApptComm();
+					apptComm.ApptNum=apt.AptNum;
+					apptComm.DateTimeSend=apt.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+					ApptComms.Insert(apptComm);
+				}
+				int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+				if(hourInterval>0) {
+					apptComm=new ApptComm();
+					apptComm.ApptNum=apt.AptNum;
+					apptComm.DateTimeSend=apt.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+					ApptComms.Insert(apptComm);
+				}
 				Appointments.Update(apt,aptOld);
 			}
 			catch(ApplicationException ex) {
@@ -5474,6 +5540,7 @@ namespace OpenDental {
 					}
 				}
 			}
+			ApptComms.DeleteForAppt(selectedAptNum);
 			Appointments.Delete(selectedAptNum);
 			ContrApptSingle.SelectedAptNum=-1;
 			pinBoard.SelectedIndex=-1;

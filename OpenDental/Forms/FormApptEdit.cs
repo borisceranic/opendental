@@ -3457,6 +3457,7 @@ namespace OpenDental{
 			for(int i=0;i<_listAppointments.Count;i++) {
 				if(_listAppointments[i].AptNum==AptCur.AptNum) {
 					_listAppointments.RemoveAt(i);
+					ApptComms.DeleteForAppt(AptCur.AptNum);
 				}
 			}
 			if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
@@ -3514,6 +3515,24 @@ namespace OpenDental{
 						AptCur.AptNum);
 					sendHL7=true;
 					isCreateAppt=true;
+					//Set up appointment reminders for day and hour intervals prior to the appointment.
+					int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+					ApptComm apptComm;
+					if(dayInterval>0) {
+						apptComm=new ApptComm();
+						apptComm.ApptNum=AptCur.AptNum;
+						apptComm.ApptCommType=IntervalType.Daily;
+						apptComm.DateTimeSend=AptCur.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));//Setting the ApptComm reminder to be sent dayInterval days before the appt.
+						ApptComms.Insert(apptComm);
+					}
+					int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+					if(hourInterval>0) {
+						apptComm=new ApptComm();
+						apptComm.ApptNum=AptCur.AptNum;
+						apptComm.ApptCommType=IntervalType.Hourly;
+						apptComm.DateTimeSend=AptCur.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0,0));//Setting the ApptComm reminder to be sent hourInterval hours before the appt.
+						ApptComms.Insert(apptComm);
+					}
 				}
 			}
 			else {
@@ -3635,6 +3654,7 @@ namespace OpenDental{
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
 			Appointments.Sync(_listAppointments,AptCur.PatNum);//This line also detaches any attached procedures within Appointments.Delete().
+			ApptComms.SendReminders();
 		}
 		
 
