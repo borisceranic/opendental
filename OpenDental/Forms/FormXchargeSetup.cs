@@ -256,6 +256,7 @@ namespace OpenDental{
 			this.groupXWeb.TabIndex = 0;
 			this.groupXWeb.TabStop = false;
 			this.groupXWeb.Text = "X-Web";
+			this.groupXWeb.Visible = false;
 			// 
 			// textTerminalID
 			// 
@@ -468,6 +469,9 @@ namespace OpenDental{
 			if(_progCur==null) {
 				return;//should never happen
 			}
+#if DEBUG
+			groupXWeb.Visible=true;
+#endif
 			if(PrefC.HasClinicsEnabled) {
 				groupPaySettings.Text=Lan.g(this,"Clinic Payment Settings");
 				_listUserClinicNums=new List<long>();
