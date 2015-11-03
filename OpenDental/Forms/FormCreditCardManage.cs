@@ -64,6 +64,7 @@ namespace OpenDental {
 					string path=Programs.GetProgramPath(prog);
 					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum).Trim();
 					string xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum).Trim();
+					//Force user to retry entering information until it's correct or they press cancel
 					while(!File.Exists(path) || string.IsNullOrEmpty(xPassword) || string.IsNullOrEmpty(xUsername)) {
 						MsgBox.Show(this,"The Path, Username, and/or Password for X-Charge have not been set or are invalid.");
 						if(!Security.IsAuthorized(Permissions.Setup)) {
@@ -71,7 +72,7 @@ namespace OpenDental {
 						}
 						FormXchargeSetup FormX=new FormXchargeSetup();//refreshes program and program property caches on OK click
 						FormX.ShowDialog();
-						if(FormX.DialogResult!=DialogResult.OK) {
+						if(FormX.DialogResult!=DialogResult.OK) {//if user presses cancel, return
 							return;
 						}
 						prog=Programs.GetCur(ProgramName.Xcharge);//refresh local variable prog to reflect any changes made in setup window
