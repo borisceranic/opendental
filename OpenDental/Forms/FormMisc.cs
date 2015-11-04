@@ -713,8 +713,8 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.TasksShowOpenTickets,checkShowOpenTickets.Checked)
 				| Prefs.UpdateBool(PrefName.TitleBarShowSite, checkTitleBarShowSite.Checked)
 				| Prefs.UpdateString(PrefName.WebServiceServerName,textWebServiceServerName.Text)
-				| Prefs.UpdateBool(PrefName.PatientSelectUseFNameForPreferred,checkPrefFName.Checked
-				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked))
+				| Prefs.UpdateBool(PrefName.PatientSelectUseFNameForPreferred,checkPrefFName.Checked)
+				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked)
 				| Prefs.UpdateBool(PrefName.ImeCompositionCompatibility,checkImeCompositionCompatibility.Checked)
 				)
 			{
