@@ -52,10 +52,10 @@ namespace OpenDental {
 				return;
 			}
 			if(textNpiFrom.Text!=textNpiInto.Text) {
-				differentFields+="\r\n-NPI";
+				differentFields+="\r\nNPI";
 			}
 			if(textFullNameFrom.Text!=textFullNameInto.Text) {
-				differentFields+="\r\n-Full Name";
+				differentFields+="\r\nFull Name";
 			}
 			long numPats=Providers.CountPats(PIn.Long(textProvNumFrom.Text));
 			long numClaims=Providers.CountClaims(PIn.Long(textProvNumFrom.Text));
@@ -81,6 +81,7 @@ namespace OpenDental {
 			textNpiFrom.Clear();
 			textFullNameFrom.Clear();
 			MsgBox.Show(this,"Done.");
+			DataValid.SetInvalid(InvalidType.Providers);
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

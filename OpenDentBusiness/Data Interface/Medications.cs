@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.Linq;
 
 namespace OpenDentBusiness{
 
@@ -408,6 +409,67 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
+		///<summary>Returns the number of patients associated with the passed-in medicationNum.</summary>
+		public static long CountPats(long medNum) {
+			string command="SELECT COUNT(DISTINCT medicationpat.PatNum) from medicationpat WHERE MedicationNum="+medNum;
+			return PIn.Long(Db.GetScalar(command));
+		}
+
+		///<summary>Medication merge tool.  Returns the number of rows changed.  Deletes the medication associated with medNumInto.</summary>
+		public static long Merge(long medNumFrom,long medNumInto) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),medNumFrom,medNumInto);
+			}
+			string[] medNumForeignKeys=new string[] { //add any new FKs to this list.
+				"allergydef.MedicationNum",
+				"eduresource.MedicationNum",
+				"medication.GenericNum",
+				"medicationpat.MedicationNum",
+				"rxalert.MedicationNum"
+			};
+			string command="";
+			long rowsChanged=0;
+			for(int i=0;i<medNumForeignKeys.Length;i++) { //actually change all of the FKs in the above tables.
+				string[] tableAndKeyName=medNumForeignKeys[i].Split(new char[] { '.' });
+				command="UPDATE "+tableAndKeyName[0]
+					+" SET "+tableAndKeyName[1]+"="+POut.Long(medNumInto)
+					+" WHERE "+tableAndKeyName[1]+"="+POut.Long(medNumFrom);
+				rowsChanged+=Db.NonQ(command);
+			}
+			command="SELECT * FROM ehrtrigger WHERE MedicationNumList LIKE '% "+POut.Long(medNumFrom)+" %'";
+			List<EhrTrigger> ListEhrTrigger=Crud.EhrTriggerCrud.SelectMany(command); //get all ehr triggers with matching mednum in mednumlist
+			for(int i=0;i<ListEhrTrigger.Count;i++) {//for each trigger...
+				string[] arrayMedNums=ListEhrTrigger[i].MedicationNumList.Split(new char[] { ' ' }); //get an array of their medicationNums.
+				bool containsMedNumInto=arrayMedNums.Any(x => x==POut.Long(medNumInto));
+				string strMedNumList="";
+				foreach(string medNumStr in arrayMedNums) { //for each mednum in the MedicationList for the current trigger.
+					string medNumCur=medNumStr.Trim();
+					if(medNumCur=="") {	//because we use spaces as a buffer before and after mednums, this prevents empty spaces from being considered.
+						continue;
+					}
+					if(containsMedNumInto) { //if the list already contains medNumInto, 
+						if(medNumCur==POut.Long(medNumFrom)) {
+							continue;	//skip medNumFrom (remove it from the list)
+						}
+						else {
+							strMedNumList+=" "+medNumCur+" ";
+						}
+					}
+					else { //if the list doesn't contain medNumInto
+						if(medNumCur==POut.Long(medNumFrom)) {
+							strMedNumList+=" "+medNumInto+" "; //replace medNumFrom with medNumInto
+						}
+						else {
+							strMedNumList+=" "+medNumCur+" ";
+						}
+					}
+				}//end for each mednum
+				ListEhrTrigger[i].MedicationNumList=strMedNumList;
+				EhrTriggers.Update(ListEhrTrigger[i]); //update the ehrtrigger list.
+			}//end for each trigger
+			Crud.MedicationCrud.Delete(medNumFrom); //finally, delete the mednum.
+			return rowsChanged;
+		}
 	}
 
 	

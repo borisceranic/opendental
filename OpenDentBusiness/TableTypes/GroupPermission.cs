@@ -234,7 +234,9 @@ namespace OpenDentBusiness{
 		///That place is in the OnClosing of the Procedure Edit window.  We update this flag even when the user Cancels out of it.</summary>
 		ProcEdit,
 		///<summary>101- Allows user to use the provider merge tool.</summary>
-		ProviderMerge
+		ProviderMerge,
+		///<summary>102- Allows user to use the medication merge tool.</summary>
+		MedicationMerge
 	}
 
 	
