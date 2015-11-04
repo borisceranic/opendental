@@ -42,5 +42,25 @@ namespace OpenDentBusiness.Properties {
                 return ((string)(this["OpenDentBusiness_WebServiceMainHQ_WebServiceMainHQ"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://50.201.161.44:1942/WebServiceCustomerUpdates/Service1.asmx")]
+        public string OpenDentBusiness_customerupdates_Service1 {
+            get {
+                return ((string)(this["OpenDentBusiness_customerupdates_Service1"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:3824/Service1.asmx")]
+        public string OpenDentBusiness_localhost_Service1 {
+            get {
+                return ((string)(this["OpenDentBusiness_localhost_Service1"]));
+            }
+        }
     }
 }

@@ -10962,11 +10962,11 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticCommunicationTimeEnd','01-01-0001 20:00:00')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticCommunicationTimeEnd','01-01-0001 22:00:00')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticCommunicationTimeEnd','01-01-0001 20:00:00')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticCommunicationTimeEnd','01-01-0001 22:00:00')";
 					Db.NonQ(command);
 				}
 				//This index was added to greatly increase the speed of the select patient window when searching by chartnum
@@ -11135,6 +11135,14 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendOrder','0,1,2')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('WebSchedAutomaticSendSetting','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedAutomaticSendSetting','0";
+					Db.NonQ(command);
+				} 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

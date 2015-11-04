@@ -71,6 +71,20 @@ namespace OpenDental{
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
 		private Label label16;
+		private TabPage tabPage1;
+		private GroupBox groupBox5;
+		private RadioButton radioSendToEmailNoPreferred;
+		private RadioButton radioSendToEmail;
+		private Label label19;
+		private GroupBox groupBox6;
+		private DateTimePicker dateRunEnd;
+		private DateTimePicker dateRunStart;
+		private Label label17;
+		private Label label18;
+		private GroupBox groupBox7;
+		private GroupBox groupBox8;
+		private RadioButton radioSendToEmailOnlyPreferred;
+		private RadioButton radioDoNotSend;
 		string[] _priorities;
 
 		///<summary></summary>
@@ -146,6 +160,7 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridConfirmationRules = new OpenDental.UI.ODGrid();
 			this.tabCommunicationSetup = new System.Windows.Forms.TabPage();
+			this.label16 = new System.Windows.Forms.Label();
 			this.textHourMsg = new System.Windows.Forms.RichTextBox();
 			this.textDayMsg = new System.Windows.Forms.RichTextBox();
 			this.checkSendAll = new System.Windows.Forms.CheckBox();
@@ -158,7 +173,20 @@ namespace OpenDental{
 			this.textHourInterval = new OpenDental.ValidNumber();
 			this.textDayInterval = new OpenDental.ValidNumber();
 			this.gridPriorities = new OpenDental.UI.ODGrid();
-			this.label16 = new System.Windows.Forms.Label();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.groupBox8 = new System.Windows.Forms.GroupBox();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.radioSendToEmailOnlyPreferred = new System.Windows.Forms.RadioButton();
+			this.radioSendToEmailNoPreferred = new System.Windows.Forms.RadioButton();
+			this.radioSendToEmail = new System.Windows.Forms.RadioButton();
+			this.groupBox7 = new System.Windows.Forms.GroupBox();
+			this.label19 = new System.Windows.Forms.Label();
+			this.groupBox6 = new System.Windows.Forms.GroupBox();
+			this.dateRunEnd = new System.Windows.Forms.DateTimePicker();
+			this.dateRunStart = new System.Windows.Forms.DateTimePicker();
+			this.label17 = new System.Windows.Forms.Label();
+			this.label18 = new System.Windows.Forms.Label();
+			this.radioDoNotSend = new System.Windows.Forms.RadioButton();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -167,6 +195,11 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup.SuspendLayout();
 			this.tabConfirmationAutomation.SuspendLayout();
 			this.tabCommunicationSetup.SuspendLayout();
+			this.tabPage1.SuspendLayout();
+			this.groupBox8.SuspendLayout();
+			this.groupBox5.SuspendLayout();
+			this.groupBox7.SuspendLayout();
+			this.groupBox6.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// textPostcardsPerSheet
@@ -557,6 +590,7 @@ namespace OpenDental{
 			this.tabControlSetup.Controls.Add(this.tabRecallConfirmationSetup);
 			this.tabControlSetup.Controls.Add(this.tabConfirmationAutomation);
 			this.tabControlSetup.Controls.Add(this.tabCommunicationSetup);
+			this.tabControlSetup.Controls.Add(this.tabPage1);
 			this.tabControlSetup.Location = new System.Drawing.Point(12, 12);
 			this.tabControlSetup.Name = "tabControlSetup";
 			this.tabControlSetup.SelectedIndex = 0;
@@ -674,6 +708,14 @@ namespace OpenDental{
 			this.tabCommunicationSetup.TabIndex = 2;
 			this.tabCommunicationSetup.Text = "Appt Communication";
 			this.tabCommunicationSetup.UseVisualStyleBackColor = true;
+			// 
+			// label16
+			// 
+			this.label16.Location = new System.Drawing.Point(17, 271);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(340, 130);
+			this.label16.TabIndex = 71;
+			this.label16.Text = resources.GetString("label16.Text");
 			// 
 			// textHourMsg
 			// 
@@ -800,13 +842,147 @@ namespace OpenDental{
 			this.gridPriorities.Title = "Communication Priorities";
 			this.gridPriorities.TranslationName = null;
 			// 
-			// label16
+			// tabPage1
 			// 
-			this.label16.Location = new System.Drawing.Point(17, 271);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(340, 130);
-			this.label16.TabIndex = 71;
-			this.label16.Text = resources.GetString("label16.Text");
+			this.tabPage1.Controls.Add(this.groupBox8);
+			this.tabPage1.Controls.Add(this.groupBox7);
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(942, 615);
+			this.tabPage1.TabIndex = 3;
+			this.tabPage1.Text = "Automation Settings";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// groupBox8
+			// 
+			this.groupBox8.Controls.Add(this.groupBox5);
+			this.groupBox8.Location = new System.Drawing.Point(185, 169);
+			this.groupBox8.Name = "groupBox8";
+			this.groupBox8.Size = new System.Drawing.Size(572, 120);
+			this.groupBox8.TabIndex = 76;
+			this.groupBox8.TabStop = false;
+			this.groupBox8.Text = "Web Sched";
+			// 
+			// groupBox5
+			// 
+			this.groupBox5.Controls.Add(this.radioDoNotSend);
+			this.groupBox5.Controls.Add(this.radioSendToEmailOnlyPreferred);
+			this.groupBox5.Controls.Add(this.radioSendToEmailNoPreferred);
+			this.groupBox5.Controls.Add(this.radioSendToEmail);
+			this.groupBox5.Location = new System.Drawing.Point(61, 19);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(451, 95);
+			this.groupBox5.TabIndex = 73;
+			this.groupBox5.TabStop = false;
+			this.groupBox5.Text = "Send Automatically To";
+			// 
+			// radioSendToEmailOnlyPreferred
+			// 
+			this.radioSendToEmailOnlyPreferred.Location = new System.Drawing.Point(7, 69);
+			this.radioSendToEmailOnlyPreferred.Name = "radioSendToEmailOnlyPreferred";
+			this.radioSendToEmailOnlyPreferred.Size = new System.Drawing.Size(438, 18);
+			this.radioSendToEmailOnlyPreferred.TabIndex = 74;
+			this.radioSendToEmailOnlyPreferred.Text = "Patients with email address and email is selected as their preferred recall metho" +
+    "d.";
+			this.radioSendToEmailOnlyPreferred.UseVisualStyleBackColor = true;
+			// 
+			// radioSendToEmailNoPreferred
+			// 
+			this.radioSendToEmailNoPreferred.Location = new System.Drawing.Point(7, 51);
+			this.radioSendToEmailNoPreferred.Name = "radioSendToEmailNoPreferred";
+			this.radioSendToEmailNoPreferred.Size = new System.Drawing.Size(438, 18);
+			this.radioSendToEmailNoPreferred.TabIndex = 1;
+			this.radioSendToEmailNoPreferred.Text = "Patients with email address and no other preferred recall method is selected.";
+			this.radioSendToEmailNoPreferred.UseVisualStyleBackColor = true;
+			// 
+			// radioSendToEmail
+			// 
+			this.radioSendToEmail.Location = new System.Drawing.Point(7, 34);
+			this.radioSendToEmail.Name = "radioSendToEmail";
+			this.radioSendToEmail.Size = new System.Drawing.Size(438, 18);
+			this.radioSendToEmail.TabIndex = 0;
+			this.radioSendToEmail.Text = "Patients with email addresses";
+			this.radioSendToEmail.UseVisualStyleBackColor = true;
+			// 
+			// groupBox7
+			// 
+			this.groupBox7.Controls.Add(this.label19);
+			this.groupBox7.Controls.Add(this.groupBox6);
+			this.groupBox7.Location = new System.Drawing.Point(185, 6);
+			this.groupBox7.Name = "groupBox7";
+			this.groupBox7.Size = new System.Drawing.Size(572, 157);
+			this.groupBox7.TabIndex = 75;
+			this.groupBox7.TabStop = false;
+			this.groupBox7.Text = "General";
+			// 
+			// label19
+			// 
+			this.label19.Location = new System.Drawing.Point(6, 16);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(560, 41);
+			this.label19.TabIndex = 72;
+			this.label19.Text = resources.GetString("label19.Text");
+			// 
+			// groupBox6
+			// 
+			this.groupBox6.Controls.Add(this.dateRunEnd);
+			this.groupBox6.Controls.Add(this.dateRunStart);
+			this.groupBox6.Controls.Add(this.label17);
+			this.groupBox6.Controls.Add(this.label18);
+			this.groupBox6.Location = new System.Drawing.Point(193, 60);
+			this.groupBox6.Name = "groupBox6";
+			this.groupBox6.Size = new System.Drawing.Size(186, 68);
+			this.groupBox6.TabIndex = 74;
+			this.groupBox6.TabStop = false;
+			this.groupBox6.Text = "Run Times";
+			// 
+			// dateRunEnd
+			// 
+			this.dateRunEnd.CustomFormat = " ";
+			this.dateRunEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+			this.dateRunEnd.Location = new System.Drawing.Point(78, 36);
+			this.dateRunEnd.Name = "dateRunEnd";
+			this.dateRunEnd.ShowUpDown = true;
+			this.dateRunEnd.Size = new System.Drawing.Size(90, 20);
+			this.dateRunEnd.TabIndex = 7;
+			this.dateRunEnd.Value = new System.DateTime(2015, 11, 3, 22, 0, 0, 0);
+			// 
+			// dateRunStart
+			// 
+			this.dateRunStart.CustomFormat = " ";
+			this.dateRunStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+			this.dateRunStart.Location = new System.Drawing.Point(78, 16);
+			this.dateRunStart.Name = "dateRunStart";
+			this.dateRunStart.ShowUpDown = true;
+			this.dateRunStart.Size = new System.Drawing.Size(90, 20);
+			this.dateRunStart.TabIndex = 6;
+			this.dateRunStart.Value = new System.DateTime(2015, 11, 3, 7, 0, 0, 0);
+			// 
+			// label17
+			// 
+			this.label17.Location = new System.Drawing.Point(46, 38);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(32, 15);
+			this.label17.TabIndex = 5;
+			this.label17.Text = "End";
+			// 
+			// label18
+			// 
+			this.label18.Location = new System.Drawing.Point(45, 18);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(32, 15);
+			this.label18.TabIndex = 4;
+			this.label18.Text = "Start";
+			// 
+			// radioDoNotSend
+			// 
+			this.radioDoNotSend.Location = new System.Drawing.Point(7, 16);
+			this.radioDoNotSend.Name = "radioDoNotSend";
+			this.radioDoNotSend.Size = new System.Drawing.Size(438, 18);
+			this.radioDoNotSend.TabIndex = 77;
+			this.radioDoNotSend.Text = "Do Not Send";
+			this.radioDoNotSend.UseVisualStyleBackColor = true;
 			// 
 			// FormRecallSetup
 			// 
@@ -838,6 +1014,11 @@ namespace OpenDental{
 			this.tabConfirmationAutomation.ResumeLayout(false);
 			this.tabCommunicationSetup.ResumeLayout(false);
 			this.tabCommunicationSetup.PerformLayout();
+			this.tabPage1.ResumeLayout(false);
+			this.groupBox8.ResumeLayout(false);
+			this.groupBox5.ResumeLayout(false);
+			this.groupBox7.ResumeLayout(false);
+			this.groupBox6.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -852,6 +1033,7 @@ namespace OpenDental{
 			tabControlSetup.TabPages.Remove(tabConfirmationAutomation);
 #endif
 			FillPriorityTab();
+			FillAutomationTab();
 		}
 
 		#region Recalls & Confirmations
@@ -1299,6 +1481,27 @@ namespace OpenDental{
 
 		#endregion ApptCommunication Setup
 
+		#region Automation Settings
+		private void FillAutomationTab() {
+			dateRunStart.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart).ToShortTimeString();
+			dateRunEnd.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd).ToShortTimeString();
+			switch(PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting)) {
+				case (int)WebSchedAutomaticSend.DoNotSend:
+					radioDoNotSend.Checked=true;
+					break;
+				case (int)WebSchedAutomaticSend.SendToEmail:
+					radioSendToEmail.Checked=true;
+					break;
+				case (int)WebSchedAutomaticSend.SendToEmailNoPreferred:
+					radioSendToEmailNoPreferred.Checked=true;
+					break;
+				case (int)WebSchedAutomaticSend.SendToEmailOnlyPreferred:
+					radioSendToEmailOnlyPreferred.Checked=true;
+					break;
+			}
+		}
+		#endregion
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textRight.errorProvider1.GetError(textRight)!=""
 				|| textDown.errorProvider1.GetError(textDown)!=""
@@ -1421,6 +1624,20 @@ namespace OpenDental{
 				sendOrder+=((int)gridPriorities.Rows[i].Tag).ToString();
 			}
 			Prefs.UpdateString(PrefName.ApptReminderSendOrder,sendOrder);
+			if(radioDoNotSend.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.DoNotSend);
+			}
+			else if(radioSendToEmail.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmail);
+			}
+			else if(radioSendToEmailNoPreferred.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailNoPreferred);
+			}
+			else {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailOnlyPreferred);
+			}
+			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeStart,dateRunStart.Value);
+			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeEnd,dateRunEnd.Value);
 			changed=true;
 			DialogResult=DialogResult.OK;
 		}

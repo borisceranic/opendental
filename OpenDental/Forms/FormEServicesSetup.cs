@@ -1058,72 +1058,42 @@ namespace OpenDental {
 			Application.DoEvents();
 			//The enable button is not enabled for offices that already have the service enabled.  Therefore go straight to making the web call to our service.
 			Cursor.Current=Cursors.WaitCursor;
-			#region Web Service Settings
-#if DEBUG
-			OpenDental.localhost.Service1 updateService=new OpenDental.localhost.Service1();
-#else
-			OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
-			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
-#endif
-			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
-				IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
-				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
-				proxy.Credentials=cred;
-				updateService.Proxy=proxy;
-			}
-			XmlWriterSettings settings = new XmlWriterSettings();
-			settings.Indent = true;
-			settings.IndentChars = ("    ");
-			StringBuilder strbuild=new StringBuilder();
-			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
-				writer.WriteStartElement("RegistrationKey");
-				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
-				writer.WriteEndElement();
-			}
-			#endregion
-			string result="";
+			string error="";
 			try {
-				result=updateService.ValidateWebSched(strbuild.ToString());
+				Recalls.ValidateWebSched();
 			}
-			catch {
-				//Our service might be down or the client might not be connected to the internet or the transmission got cut off somehow.
+			catch(Exception ex) {
+				//Prep a generic error response just in case something unexpected went wrong.
+				error=Lan.g(this,"There was a problem enabling the Web Sched.  Please give us a call or try again.");
+				if(ex.GetType()==typeof(ODException)) {
+					error=ex.Message;//Show special errors for ODExceptions that were already translated.
+					//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable
+					if(((ODException)ex).ErrorCode==110) {//Customer not registered for Web Sched monthly service
+						//We want to launch our Web Sched page if the user is not signed up:
+						try {
+							Process.Start(Recalls.GetWebSchedPromoURL());
+						}
+						catch(Exception) {
+							//The promotional web site can't be shown, most likely due to the computer not having a default browser.  Simply do nothing.
+						}
+					}
+				}
 			}
 			Cursor.Current=Cursors.Default;
-			string error="";
-			int errorCode=0;
-			if(Recalls.IsWebSchedResponseValid(result,out error,out errorCode)) {
-				//Everything went good, the office is actively on support and has an active WebSched repeating charge.
-				butWebSchedEnable.Enabled=false;
-				labelWebSchedEnable.Text=Lan.g(this,"The Web Sched service has been enabled.");
-				//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
-				if(Prefs.UpdateBool(PrefName.WebSchedService,true)) {
-					_changed=true;
-					SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"The Web Sched service was enabled.");
-				}
-				return;
-			}
-			#region Error Handling
-			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the Web Sched service.
-			if(errorCode==110) {//Customer not registered for WebSched monthly service
-				//We want to launch our Web Sched page if the user is not signed up:
-				try {
-					Process.Start(Recalls.GetWebSchedPromoURL());
-				}
-				catch(Exception) {
-					//The promotional web site can't be shown, most likely due to the computer not having a default browser.  Simply don't do anything.
-				}
+			if(error!="") {
 				//Just in case no browser was opened for them, make the message next to the button say something now so that they can visually see that something should have happened.
 				labelWebSchedEnable.Text=error;
+				MessageBox.Show(error);
 				return;
 			}
-			else if(errorCode==120) {
-				labelWebSchedEnable.Text=error;
-				return;
+			//Everything went good, the office is actively on support and has an active WebSched repeating charge.
+			butWebSchedEnable.Enabled=false;
+			labelWebSchedEnable.Text=Lan.g(this,"The Web Sched service has been enabled.");
+			//This if statement will only save database calls in the off chance that this window was originally loaded with the pref turned off and got turned on by another computer while open.
+			if(Prefs.UpdateBool(PrefName.WebSchedService,true)) {
+				_changed=true;
+				SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,"The Web Sched service was enabled.");
 			}
-			//For every other error message returned, we'll simply show a generic error in the label and display the detailed error in a pop up.
-			labelWebSchedEnable.Text=Lan.g(this,"There was a problem enabling the Web Sched.  Please give us a call or try again.");
-			MessageBox.Show(error);
-			#endregion
 		}
 
 		private void butSignUp_Click(object sender,EventArgs e) {

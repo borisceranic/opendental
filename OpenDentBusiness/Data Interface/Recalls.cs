@@ -4,8 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 
 namespace OpenDentBusiness{
@@ -1078,15 +1081,52 @@ namespace OpenDentBusiness{
 		}
 
 		#region Web Sched
-		///<summary>Validates the results of our ValidateWebSched web service call.  Returns true if they are valid, false if the office is not allowed to use the Web Sched or if there was an error with the web service.  Error will be empty and ErrorCode will be 0 for valid responses and filled with error text if office is not valid or if something went wrong with the web service call.</summary>
+		///<summary>Makes a web service call to WebServiceCustomerUpdates to make sure this customer is signed up for Web Sched.
+		///Throws exceptions if the user is not valid.
+		///An ODException will have an error code; 0=no errors. 110=No Web Sched repeating charge. 120=Invalid web service response. 190=All other errors.</summary>
+		public static void ValidateWebSched() {
+			//Either the Web Sched service was enabled or they just enabled it.
+			//Send off a web request to  WebServiceCustomersUpdates to verify that the office is still valid and is currently paying for the eService.  
+			StringBuilder strbuild=new StringBuilder();
+			#region Web Service Call
+#if DEBUG
+			OpenDentBusiness.localhost.Service1 updateService=new OpenDentBusiness.localhost.Service1();
+#else
+			OpenDentBusiness.customerUpdates.Service1 updateService=new OpenDentBusiness.customerUpdates.Service1();
+			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+			if(PrefC.GetString(PrefName.UpdateWebProxyAddress) !="") {
+				IWebProxy proxy = new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+				proxy.Credentials=cred;
+				updateService.Proxy=proxy;
+			}
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = ("    ");
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+			}
+			#endregion
+			string result="";
+			try {
+				result=updateService.ValidateWebSched(strbuild.ToString());
+			}
+			catch {
+				//Do nothing.  Leaving result empty will display correct error messages later on.
+			}
+			ValidateWebSchedResponse(result);
+		}
+
+		///<summary>Validates the results of our ValidateWebSched web service call.
+		///Returns true if they are valid otherwise throws an exception if the office is not allowed to use the Web Sched or other errors.
+		///An ODException will have an error code; 0=no errors. 110=No Web Sched repeating charge. 120=Invalid web service response. 190=All other errors.</summary>
 		///<param name="response">This should be the result string that was received from WebServiceCustomerUpdates.ValidateWebSched()</param>
-		///<param name="error">Empty unless the customer is not valid for the Web Sched service or there was an error with the web service response.</param>
-		///<param name="errorCode">0=no errors. 110=No Web Sched repeating charge. 120=Invalid web service response. 190=All other errors.</param>
 		///<returns>True if user is an active customer and they have an active WebSched repeating charge.</returns>
-		public static bool IsWebSchedResponseValid(string response,out string error,out int errorCode) {
+		private static void ValidateWebSchedResponse(string response) {
 			//No need to check RemotingRole; no call to db.
-			error="";
-			errorCode=0;
 			XmlDocument doc=new XmlDocument();
 			XmlNode node=null;
 			try {
@@ -1098,35 +1138,27 @@ namespace OpenDentBusiness{
 			}
 			if(node==null) {
 				//There should always be a ValidateWebSchedResponse node.  If there isn't, something went wrong.
-				error=Lans.g("Recalls","Invalid web service response.  Please try again or give us a call.");
-				errorCode=120;
-				return false;
+				throw new ODException(Lans.g("Recalls","Invalid web service response.  Please try again or give us a call."),120);
 			}
 			if(node.InnerText=="Valid") {
-				return true;
+				return;
 			}
-			#region Error Handling
+			#region Specific Error Handling
 			//At this point we know something went wrong.  So we need to give the user a hint as to why they can't enable the Web Sched.
 			XmlNode nodeError=doc.SelectSingleNode("//Error");
 			XmlNode nodeErrorCode=doc.SelectSingleNode("//ErrorCode");
 			if(nodeError==null || nodeErrorCode==null) {
 				//Something went wronger than wrong.
-				error=Lans.g("Recalls","Invalid web service response.  Please try again or give us a call.");
-				errorCode=120;
-				return false;
+				throw new ODException(Lans.g("Recalls","Invalid web service response.  Please try again or give us a call."),120);
 			}
 			//Typical error messages will say something like: "Registration key period has ended", "Customer not registered for WebSched monthly service", etc.
 			if(nodeErrorCode.InnerText=="110") {//Customer not registered for WebSched monthly service
-				error=Lans.g("Recalls","Please give us a call or visit our web page to see more information about signing up for this service.")
-					+"\r\n"+Recalls.GetWebSchedPromoURL();
-				errorCode=110;
-				return false;
+				throw new ODException(Lans.g("Recalls","Please give us a call or visit our web page to see more information about signing up for this service."
+					+"\r\n"+Recalls.GetWebSchedPromoURL()),110);
 			}
 			//For every other error message returned, we'll simply show it to the user.
 			//Inner text can be exception text if something goes very wrong.  Do not translate.
-			error=Lans.g("Recalls","Error")+": "+nodeError.InnerText;
-			errorCode=190;
-			return false;
+			throw new ODException(Lans.g("Recalls","Error")+": "+nodeError.InnerText,190);
 			#endregion
 		}
 
@@ -1411,6 +1443,165 @@ namespace OpenDentBusiness{
 				return true;
 			}
 			return false;
+		}
+
+		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy) {
+			//No need to check RemotingRole; no call to db.
+			string response="";
+			Dictionary<long,string> dictWebSchedParameters=new Dictionary<long,string>();
+			//Send off a web request to WebServiceCustomersUpdates to get the obfuscated URLs for the selected patients.
+			#region Send Web Service Request For URLs
+#if DEBUG
+			OpenDentBusiness.localhost.Service1 updateService=new OpenDentBusiness.localhost.Service1();
+#else
+			OpenDentBusiness.customerUpdates.Service1 updateService=new OpenDentBusiness.customerUpdates.Service1();
+			updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
+#endif
+			if(PrefC.GetString(PrefName.UpdateWebProxyAddress)!="") {
+				IWebProxy proxy=new WebProxy(PrefC.GetString(PrefName.UpdateWebProxyAddress));
+				ICredentials cred=new NetworkCredential(PrefC.GetString(PrefName.UpdateWebProxyUserName),PrefC.GetString(PrefName.UpdateWebProxyPassword));
+				proxy.Credentials=cred;
+				updateService.Proxy=proxy;
+			}
+			XmlWriterSettings settings=new XmlWriterSettings();
+			settings.Indent=true;
+			settings.IndentChars=("    ");
+			StringBuilder strbuild=new StringBuilder();
+			using(XmlWriter writer=XmlWriter.Create(strbuild,settings)) {
+				writer.WriteStartElement("RSData");
+				writer.WriteStartElement("RegistrationKey");
+				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
+				writer.WriteEndElement();
+				writer.WriteStartElement("RecallNums");
+				writer.WriteString(String.Join("|",recallNums));//A pipe delimited list of recall nums. E.g. 3|2|1|4
+				writer.WriteEndElement();
+				writer.WriteEndElement();
+			}
+			try {
+				response=updateService.GetWebSchedURLs(strbuild.ToString());
+			}
+			catch {
+				//Do nothing.  Leaving result empty will display correct error messages later on.
+			}
+			#endregion
+			#region Parse Response
+			XmlDocument doc=new XmlDocument();
+			XmlNode nodeError=null;
+			XmlNode nodeResponse=null;
+			XmlNodeList nodeURLs=null;
+			try {
+				doc.LoadXml(response);
+				nodeError=doc.SelectSingleNode("//Error");
+				nodeResponse=doc.SelectSingleNode("//GetWebSchedURLsResponse");
+			}
+			catch {
+				//Invalid web service response passed in.  Node will be null and will return false correctly.
+			}
+			#region Error Handling
+			if(nodeError!=null || nodeResponse==null) {
+				string error=Lans.g("WebSched","There was an error with the web request.  Please try again or give us a call.");
+				//Either something went wrong or someone tried to get cute and use our Web Sched service when they weren't supposed to.
+				if(nodeError!=null) {
+					error+="\r\n"+Lans.g("WebSched","Error Details")+":\r\n" +nodeError.InnerText;
+				}
+				return error;
+			}
+			#endregion
+			//At this point we know we got a valid response from our web service.
+			dictWebSchedParameters.Clear();
+			nodeURLs=doc.GetElementsByTagName("URL");
+			if(nodeURLs!=null) {
+				//Loop through all the URL nodes that were returned.
+				//Each URL node will contain an RN attribute which will be the corresponding recall num.
+				for(int i=0;i<nodeURLs.Count;i++) {
+					long recallNum=0;
+					XmlAttribute attributeRecallNum=nodeURLs[i].Attributes["RN"];
+					if(attributeRecallNum!=null) {
+						recallNum=PIn.Long(attributeRecallNum.Value);
+					}
+					dictWebSchedParameters.Add(recallNum,nodeURLs[i].InnerText);
+				}
+			}
+			#endregion
+			//Now that the web service response has been validated, parsed, and our dictionary filled, we now can loop through the selected patients and send off the emails.
+			DataTable addrTable=Recalls.GetAddrTableForWebSched(recallNums,isGroupFamily,sortBy);
+			EmailMessage emailMessage;
+			EmailAddress emailAddress;
+			for(int i=0;i<addrTable.Rows.Count;i++) {
+				#region Send Email Notification
+				string emailBody="";
+				string emailSubject="";
+				emailMessage=new EmailMessage();
+				emailMessage.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
+				emailMessage.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
+				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				emailMessage.FromAddress=emailAddress.SenderAddress;
+				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
+					emailSubject=PrefC.GetString(PrefName.WebSchedSubject);
+					emailBody=PrefC.GetString(PrefName.WebSchedMessage);
+				}
+				else if(addrTable.Rows[i]["numberOfReminders"].ToString()=="1") {
+					emailSubject=PrefC.GetString(PrefName.WebSchedSubject2);
+					emailBody=PrefC.GetString(PrefName.WebSchedMessage2);
+				}
+				else {
+					emailSubject=PrefC.GetString(PrefName.WebSchedSubject3);
+					emailBody=PrefC.GetString(PrefName.WebSchedMessage3);
+				}
+				emailSubject=emailSubject.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
+				//It is common for offices to have paitents with a blank recall date (they've never had a recall performed at the office).
+				//Instead of showing 01/01/0001 in the email, we will simply show today's date because that is what the Web Sched time slots will start showing.
+				DateTime dateDue=PIn.Date(addrTable.Rows[i]["dateDue"].ToString());
+				if(dateDue.Year < 1880) {
+					dateDue=DateTime.Today;
+				}
+				emailBody=emailBody.Replace("[DueDate]",dateDue.ToShortDateString());
+				emailBody=emailBody.Replace("[NameF]",addrTable.Rows[i]["patientNameF"].ToString());
+				string URL="";
+				try {
+					dictWebSchedParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
+				}
+				catch(Exception ex) {
+					string error=ex.Message+"\r\n";
+					return error+Lans.g("WebSched","Problem getting Web Sched URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+				}
+				emailBody=emailBody.Replace("[URL]",URL);
+				string officePhone=PrefC.GetString(PrefName.PracticePhone);
+				Clinic clinic=Clinics.GetClinic(PIn.Long(addrTable.Rows[i]["clinicNum"].ToString()));
+				if(clinic!=null && !String.IsNullOrEmpty(clinic.Phone)) {
+					officePhone=clinic.Phone;
+				}
+				if(CultureInfo.CurrentCulture.Name=="en-US" && officePhone.Length==10) {
+					officePhone="("+officePhone.Substring(0,3)+")"+officePhone.Substring(3,3)+"-"+officePhone.Substring(6);
+				}
+				emailBody=emailBody.Replace("[OfficePhone]",officePhone);
+				emailMessage.Subject=emailSubject;
+				emailMessage.BodyText=emailBody;
+				try {
+					EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
+				}
+				catch(Exception ex) {
+					string error=ex.Message+"\r\n";
+					if(ex.GetType()==typeof(System.ArgumentException)) {
+						error+=Lans.g("WebSched","Go to Setup | Appointments | Recall.  The subject for WebSched notifications must not span multiple lines.")+"\r\n";
+					}
+					return error+Lans.g("WebSched","Patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+				}
+				emailMessage.MsgDateTime=DateTime.Now;
+				emailMessage.SentOrReceived=EmailSentOrReceived.Sent;
+				EmailMessages.Insert(emailMessage);
+				#endregion
+				#region Insert Commlog
+				long userNum=0;//For Web Sched
+				if(Security.CurUser!=null) {
+					userNum=Security.CurUser.UserNum;//Middle tier should not be using this method, it does not call the db.
+				}
+				Commlogs.InsertForRecall(PIn.Long(addrTable.Rows[i]["PatNum"].ToString()),CommItemMode.Email,PIn.Int(addrTable.Rows[i]["numberOfReminders"].ToString()),
+					PrefC.GetLong(PrefName.RecallStatusEmailed),CommItemSource.WebSched,userNum);
+				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));
+				#endregion
+			}
+			return "";
 		}
 
 		private struct TimeSlot {

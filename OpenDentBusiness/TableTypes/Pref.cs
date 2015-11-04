@@ -627,6 +627,8 @@ namespace OpenDentBusiness {
 		WaitingRoomFilterByView,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>
 		WebHostSynchServerURL,
+		///<summary>Stored as an int value from the WebSchedAutomaticSend enum.</summary>
+		WebSchedAutomaticSendSetting,
 		WebSchedMessage,
 		WebSchedMessage2,
 		WebSchedMessage3,

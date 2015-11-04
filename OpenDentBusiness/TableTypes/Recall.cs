@@ -46,6 +46,18 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
+	public enum WebSchedAutomaticSend {
+		///<summary>0 - Do not send Web Sched notifications automatically.</summary>
+		DoNotSend,
+		///<summary>1 - Send to all patients with email address</summary>
+		SendToEmail,
+		///<summary>2 - Send to patients with email address and no other preferred recall method is selected.</summary>
+		SendToEmailNoPreferred,
+		///<summary>3 - Send to patients with email address and email is selected as their preferred recall method.</summary>
+		SendToEmailOnlyPreferred
+	}
+
 }
 
 
