@@ -516,7 +516,7 @@ DROP TABLE IF EXISTS etAck";
 				//set MonetaryAmt empty when Limitation and a quantity is entered
 				command="UPDATE benefit SET MonetaryAmt=-1 WHERE BenefitType=5 AND Quantity != 0";
 				Db.NonQ32(command);
-				if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+				if(CultureInfo.CurrentCulture.Name=="en-US") {
 					command="UPDATE covcat SET CovOrder=CovOrder+1 WHERE CovOrder > 1";
 					Db.NonQ32(command);
 					command="INSERT INTO covcat (Description,DefaultPercent,CovOrder,IsHidden,EbenefitCat) VALUES('X-Ray',100,2,0,13)";
@@ -5099,7 +5099,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 					Db.NonQ(command);
 					//Add carriers from the temporary carrier table which do not already exist in the live carrier table.
 					//We only want to insert these carriers if in Canada because they are of no use elsewhere.
-					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						command="INSERT INTO carrier (`CarrierNum`,`CarrierName`,`Address`,`Address2`,`City`,`State`,`Zip`,`Phone`,`ElectID`,`NoSendElect`,`IsCDA`,"
 							+"`CDAnetVersion`,`CanadianNetworkNum`,`IsHidden`,`CanadianEncryptionMethod`,`CanadianSupportedTypes`) "
 							+"SELECT `CarrierNumNew`,`CarrierName`,`Address`,`Address2`,`City`,`State`,`Zip`,`Phone`,`ElectID`,`NoSendElect`,`IsCDA`,"
@@ -6063,7 +6063,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 				command="UPDATE carrier SET CDAnetVersion='02',CanadianSupportedTypes=416,CanadianNetworkNum=7 WHERE ElectID='311109'";//wawanesa
 				Db.NonQ(command);
 				//We only want to insert these carriers if in Canada because they are of no use elsewhere.
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					command="SELECT COUNT(*) FROM carrier WHERE ElectID='000090'"; //alberta blue cross
 					if(Db.GetCount(command)=="0") {
 						command="INSERT INTO carrier (CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes) VALUES "+
@@ -8945,7 +8945,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 					command="ALTER TABLE timecardrule MODIFY BeforeTimeOfDay NOT NULL";
 					Db.NonQ(command);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='CSI' LIMIT 1";
 					long canadianNetworkNumCSI=PIn.Long(Db.GetScalar(command));
 					command="SELECT COUNT(*) FROM carrier WHERE ElectID='000116'"; //boilermakers' national benefit plan
@@ -11361,7 +11361,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 			if(FromVersion<new Version("12.4.28.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.28"));//No translation in convert script.
 				string command;
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					long codeNum=0;
 					string procCode="D1208";//This code is needed for important automation.
 					command="SELECT CodeNum FROM procedurecode WHERE ProcCode='"+POut.String(procCode)+"'";
@@ -11489,7 +11489,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 			if(FromVersion<new Version("12.4.30.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.30"));//No translation in convert script.
 				string command;
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
 					//Make sure the procedure code category exists before moving the procedure codes.
 					string procCatDescript="Obsolete";
@@ -11538,7 +11538,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 			if(FromVersion<new Version("12.4.32.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 12.4.32"));//No translation in convert script.
 				string command;
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					long codeNumD1203=0;
 					command="SELECT CodeNum FROM procedurecode WHERE ProcCode='D1203'";
 					DataTable dtProcCode=Db.GetTable(command);
@@ -11745,7 +11745,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 						)";
 					Db.NonQ(command);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					command="SELECT CanadianNetworkNum FROM canadiannetwork WHERE Abbrev='CSI' LIMIT 1";
 					long canadianNetworkNumCSI=PIn.Long(Db.GetScalar(command));
 					command="SELECT COUNT(*) FROM carrier WHERE ElectID='000118'"; //local 1030 health benefit plan

@@ -119,7 +119,7 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
 				return;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
 				DeleteCanadianLabFeesForProcCode(procNum);//Deletes lab fees attached to current procedures.
 			}
 			ValidateDelete(procNum);
@@ -1495,7 +1495,7 @@ namespace OpenDentBusiness {
 				if(oldProc.ProcStatus!=ProcStat.C) {
 					procList[i].Note+=ProcCodeNotes.GetNote(procList[i].ProvNum,procList[i].CodeNum);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canada
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 					SetCanadianLabFeesCompleteForProc(procList[i]);
 				}
 				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procList[i],oldProc);

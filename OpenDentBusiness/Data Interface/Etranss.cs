@@ -388,7 +388,7 @@ namespace OpenDentBusiness{
 			//Change the claim back to W.
 			command="UPDATE claim SET ClaimStatus='W' WHERE ClaimNum="+POut.Long(claimNum);
 			Db.NonQ(command);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//We cannot delete etrans entries, because we need to retain the OfficeSequenceNumber in order to prevent reuse.
 				//We used to allow deleting here, but some customers were getting the "invalid dental claim number or office sequence number" error message when sending claims thereafter.
 				//Office sequence numbers must be unique for every request and response, whether related to a claim or not.

@@ -175,9 +175,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormTranslation_Load(object sender, System.EventArgs e) {
-			//MessageBox.Show(PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName);
-			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
-				MessageBox.Show("You must change your culture from setup > Language And Region to something other than English-US.");
+			//MessageBox.Show(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+			if(CultureInfo.CurrentCulture.Name=="en-US"){
+				MessageBox.Show("You must change your culture in Windows first to something other than English-US.");
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
@@ -206,7 +206,7 @@ namespace OpenDental{
 				return;
 			}
 			string remoteUri = "http://www.opendental.com/cultures/";
-			string fileName = PrefC.GetLanguageAndRegion().Name+".txt";//eg. en-US.txt
+			string fileName = CultureInfo.CurrentCulture.Name+".txt";//eg. en-US.txt
 			string myStringWebResource = null;
 			WebClient myWebClient = new WebClient();
 			myStringWebResource=remoteUri+fileName;
@@ -214,7 +214,7 @@ namespace OpenDental{
 				myWebClient.DownloadFile(myStringWebResource,fileName);
 			}
 			catch{
-				MessageBox.Show("Either you do not have internet access, or no translations are available for "+PrefC.GetLanguageAndRegion().DisplayName);
+				MessageBox.Show("Either you do not have internet access, or no translations are available for "+CultureInfo.CurrentCulture.DisplayName);
 				return;
 			}
 			//ClassConvertDatabase ConvertDB=new ClassConvertDatabase();
@@ -227,21 +227,21 @@ namespace OpenDental{
 				MessageBox.Show("Translations not installed properly.");
 				return;
 			}
-			LanguageForeigns.Refresh(PrefC.GetLanguageAndRegion().Name,PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName);
+			LanguageForeigns.Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 			MessageBox.Show("Done");
 		}
 
 		///<summary>Only exports for the current culture.</summary>
 		private void butExport_Click(object sender, System.EventArgs e) {
 			saveFileDialog1.InitialDirectory=Application.StartupPath;
-			string fileName=PrefC.GetLanguageAndRegion().Name+".sql";//eg en-US.sql
+			string fileName=CultureInfo.CurrentCulture.Name+".sql";//eg en-US.sql
 			saveFileDialog1.FileName=fileName;
 			if(saveFileDialog1.ShowDialog()!=DialogResult.OK){
 				return;
 			}
 			StreamWriter sw=new StreamWriter(fileName,false,System.Text.Encoding.UTF8);
-			sw.WriteLine("DELETE FROM languageforeign WHERE Culture='"+PrefC.GetLanguageAndRegion().Name+"';");
-			LanguageForeign[] LFList=LanguageForeigns.GetListForCulture(PrefC.GetLanguageAndRegion());
+			sw.WriteLine("DELETE FROM languageforeign WHERE Culture='"+CultureInfo.CurrentCulture.Name+"';");
+			LanguageForeign[] LFList=LanguageForeigns.GetListForCulture(CultureInfo.CurrentCulture);
 			for(int i=0;i<LFList.Length;i++){
 				sw.WriteLine(
 					"INSERT INTO languageforeign (ClassType,English,Culture,Translation,Comments) VALUES ('"+POut.String(LFList[i].ClassType)

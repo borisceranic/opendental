@@ -731,8 +731,8 @@ namespace OpenDental{
 			TimeSpan periodSpan=new TimeSpan(0);//used to add up totals for entire page.
 			TimeSpan otspan=new TimeSpan(0);//overtime for the entire period
 			TimeSpan rate2span=new TimeSpan(0);//rate2 hours total
-			Calendar cal=PrefC.GetLanguageAndRegion().Calendar;
-			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//PrefC.GetLanguageAndRegion().DateTimeFormat.CalendarWeekRule;PrefC.GetLanguageAndRegion().DateTimeFormat.CalendarWeekRule()
+      Calendar cal=CultureInfo.CurrentCulture.Calendar;
+			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;//CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule;
 			DateTime curDate=DateTime.MinValue;
 			DateTime previousDate=DateTime.MinValue;
 			Type type;

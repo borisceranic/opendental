@@ -850,7 +850,7 @@ namespace OpenDentBusiness {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 13.2.22"));//No translation in convert script.
 				string command;
 				//Moving codes to the Obsolete category that were deleted in CDT 2014.
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
 					//Make sure the procedure code category exists before moving the procedure codes.
 					string procCatDescript="Obsolete";
@@ -6128,7 +6128,7 @@ namespace OpenDentBusiness {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 14.3.12"));//No translation in convert script.
 				string command;
 				//Moving codes to the Obsolete category that were deleted in CDT 2015.
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Move depricated codes to the Obsolete procedure code category.
 					//Make sure the procedure code category exists before moving the procedure codes.
 					string procCatDescript="Obsolete";
@@ -9712,7 +9712,7 @@ namespace OpenDentBusiness {
 				}
 				command="UPDATE procedurecode SET CanadaTimeUnits=1";//This is the correct value for most Canadian procedure codes.
 				Db.NonQ(command);
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					command="UPDATE procedurecode SET CanadaTimeUnits=2 WHERE procedurecode.ProcCode='02802'";
 					Db.NonQ(command);
 					command="UPDATE procedurecode SET CanadaTimeUnits=0.5 WHERE procedurecode.ProcCode='04507'";
@@ -10538,7 +10538,7 @@ namespace OpenDentBusiness {
 						)";
 					Db.NonQ(command);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Insert all 50 US states and Washington DC
 					command="INSERT INTO stateabbr (Description,Abbr) VALUES('Alabama','AL'),('Alaska','AK'),('Arizona','AZ'),('Arkansas','AR'),"
 						+"('California','CA'),('Colorado','CO'),('Connecticut','CT'),('Delaware','DE'),('District of Columbia','DC'),('Florida','FL'),"
@@ -11046,16 +11046,6 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE claim MODIFY ShareOfCost NOT NULL";
 					Db.NonQ(command);
 				}
-				//Set the to the language and region of the computer running the update.
-				string languageAndRegion=CultureInfo.CurrentCulture.Name;
-				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('LanguageAndRegion','"+POut.String(languageAndRegion)+"')";//default to blank, will be set when first connected.
-					Db.NonQ(command);
-				}
-				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','"+POut.String(languageAndRegion)+"')";
-					Db.NonQ(command);
-				} 
 				//Add the X-Charge programproperty rows Username, Password, PaymentType, XWebID, AuthKey, TerminalID, PromptSignature, and PrintReceipt
 				//for each clinic in the database.  Local path override will not be clinic specific, so not duplicated for each clinic.
 				command="SELECT ClinicNum FROM clinic";
@@ -11161,6 +11151,18 @@ namespace OpenDentBusiness {
 							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",102)";//MedicationMerge
 						Db.NonQ(command);
 					}
+				} 
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD NoShowLanguage tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD NoShowLanguage number(3)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET NoShowLanguage = 0 WHERE NoShowLanguage IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY NoShowLanguage NOT NULL";
+					Db.NonQ(command);
 				}
 				
 

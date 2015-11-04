@@ -226,7 +226,7 @@ namespace OpenDental{
 			//tbPercentPlan.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbPercentPlan_CellClicked);
 			//tbPercentPat.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbPercentPat_CellClicked);
 			Lan.F(this);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelPatID.Text=Lan.g(this,"Dependant Code");
 				labelCitySTZip.Text=Lan.g(this,"City,Prov,Post");   //Postal Code";
 				butSearch.Visible=false;
@@ -240,7 +240,7 @@ namespace OpenDental{
 				textDivisionNo.Visible=false;
 				groupCanadian.Visible=false;
 			}
-			if(PrefC.GetCurrentRegion()=="GB"){//en-GB
+			if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="GB"){//en-GB
 				labelCitySTZip.Text=Lan.g(this,"City,Postcode");
 			}
 			panelPat.BackColor=DefC.Long[(int)DefCat.MiscColors][0].ItemColor;
@@ -2519,8 +2519,8 @@ namespace OpenDental{
 		}
 
 		private void textState_TextChanged(object sender,System.EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" //if USA or Canada, capitalize first 2 letters
-				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name=="en-US" //if USA or Canada, capitalize first 2 letters
+				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textState.Text.Length==1 || textState.Text.Length==2) {
 					textState.Text=textState.Text.ToUpper();
 					textState.SelectionStart=2;
@@ -2538,7 +2538,7 @@ namespace OpenDental{
 			if(textElectID.Text=="") {
 				return;
 			}
-			if(PrefC.GetCurrentRegion()=="CA"){//en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="CA"){//en-CA or fr-CA
 				if(!Regex.IsMatch(textElectID.Text,@"^[0-9]{6}$")) {
 					if(!MsgBox.Show(this,true,"Carrier ID should be six digits long.  Continue anyway?")){
 						e.Cancel=true;
@@ -3986,7 +3986,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textPlanFlag.Text!="" && textPlanFlag.Text!="A" && textPlanFlag.Text!="V" && textPlanFlag.Text!="N") {
 					MsgBox.Show(this,"Plan flag must be A, V, N, or blank.");
 					return false;
@@ -4052,7 +4052,7 @@ namespace OpenDental{
 			CarrierCur.Zip=textZip.Text;
 			CarrierCur.ElectID=textElectID.Text;
 			CarrierCur.NoSendElect=checkNoSendElect.Checked;
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				bool carrierFound=true;
 				try {
 					CarrierCur=Carriers.GetIndentical(CarrierCur);

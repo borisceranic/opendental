@@ -1269,7 +1269,7 @@ namespace OpenDental{
 					textFlo.Text=ben.Quantity.ToString();
 				}
 				//Canadian Flo
-				else if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && 
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && 
 					((Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="12400")//The proc code is different for Quebec!
 					|| (!Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="12101"))//The rest of Canada conforms to a standard.
 					&& ben.BenefitType==InsBenefitType.Limitations
@@ -1305,7 +1305,7 @@ namespace OpenDental{
 					}
 				}
 				//Canadian BWs
-				else if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")//All of Canada, including Quebec (the proc codes are the same in this instance).
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA")//All of Canada, including Quebec (the proc codes are the same in this instance).
 					&& ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02144"//4BW
 					&& ben.BenefitType==InsBenefitType.Limitations
 					//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
@@ -1351,7 +1351,7 @@ namespace OpenDental{
 					}
 				}
 				//Canadian Pano
-				else if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && 
+				else if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && 
 					((Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02600")//The proc code is different for Quebec!
 					|| (!Canadian.IsQuebec() && ProcedureCodes.GetStringProcCode(ben.CodeNum)=="02601"))//The rest of Canada conforms to a standard.
 					&& ben.BenefitType==InsBenefitType.Limitations
@@ -2006,7 +2006,7 @@ namespace OpenDental{
 			//Flo
 			if(textFlo.Text !=""){
 				ben=new Benefit();
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					if(Canadian.IsQuebec()) {//Quebec
 						ben.CodeNum=ProcedureCodes.GetCodeNum("12400");
 					}
@@ -2027,7 +2027,7 @@ namespace OpenDental{
 			//frequency BW
 			if(textBW.Text !="") {
 				ben=new Benefit();
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					ben.CodeNum=ProcedureCodes.GetCodeNum("02144");//4BW The same code for Quebec as well as the rest of Canada.
 				}
 				else {//USA
@@ -2058,7 +2058,7 @@ namespace OpenDental{
 			//Frequency pano
 			if(textPano.Text !="") {
 				ben=new Benefit();
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					if(Canadian.IsQuebec()) {
 						ben.CodeNum=ProcedureCodes.GetCodeNum("02600");
 					}

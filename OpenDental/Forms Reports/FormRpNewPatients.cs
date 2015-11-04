@@ -305,7 +305,7 @@ namespace OpenDental{
 			DateTime dateFrom=PIn.Date(textDateFrom.Text);
 			DateTime dateTo=PIn.Date(textDateTo.Text);
 			bool toLastDay=false;
-			if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
+			if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
 				toLastDay=true;
 			}
 			textDateFrom.Text=dateFrom.AddMonths(-1).ToShortDateString();
@@ -313,7 +313,7 @@ namespace OpenDental{
 			dateTo=PIn.Date(textDateTo.Text);
 			if(toLastDay){
 				textDateTo.Text=new DateTime(dateTo.Year,dateTo.Month,
-					PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
+					CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
 					.ToShortDateString();
 			}
 		}
@@ -328,7 +328,7 @@ namespace OpenDental{
 			DateTime dateFrom=PIn.Date(textDateFrom.Text);
 			DateTime dateTo=PIn.Date(textDateTo.Text);
 			bool toLastDay=false;
-			if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
+			if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
 				toLastDay=true;
 			}
 			textDateFrom.Text=dateFrom.AddMonths(1).ToShortDateString();
@@ -336,7 +336,7 @@ namespace OpenDental{
 			dateTo=PIn.Date(textDateTo.Text);
 			if(toLastDay){
 				textDateTo.Text=new DateTime(dateTo.Year,dateTo.Month,
-					PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
+					CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
 					.ToShortDateString();
 			}
 		}

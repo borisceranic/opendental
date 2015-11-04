@@ -275,7 +275,7 @@ namespace OpenDental{
 			//greeting
 			str.Append(Lan.g(this, "Dear "));
 			if (ReferralCur == null) {
-				if(PrefC.GetLanguageAndRegion().Name == "en-GB") {
+				if (CultureInfo.CurrentCulture.Name == "en-GB") {
 					if (PatCur.Salutation != "")
 						str.Append(PatCur.Salutation);
 					else {
@@ -303,7 +303,7 @@ namespace OpenDental{
 			//body text
 			str.Append(LetterCur.BodyText);
 			//closing
-			if(PrefC.GetLanguageAndRegion().Name == "en-GB") {
+			if (CultureInfo.CurrentCulture.Name == "en-GB") {
 				str.Append("\r\n\r\nYours sincerely,\r\n\r\n\r\n\r\n");
 			}
 			else {

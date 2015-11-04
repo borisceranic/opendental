@@ -957,7 +957,7 @@ namespace OpenDental{
 			else {
 				checkShowCompleted.Visible=true;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//Since the bonus information in FormInsRemain is currently only helpful in Canada,
 				//we have decided not to show this button in other countries for now.
 				butInsRem.Visible=true;
@@ -3288,7 +3288,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"You can only send a preauth from the current TP, not a saved TP.");
 				return;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canada
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 				int numLabProcsUnselected=0;
 				List<int> selectedIndices=new List<int>(gridMain.SelectedIndices);
 				for(int i=0;i<selectedIndices.Count;i++) {
@@ -3397,7 +3397,7 @@ namespace OpenDental{
 					if(ClaimProcCur.CodeSent.Length>5 && ClaimProcCur.CodeSent.Substring(0,1)=="D"){
 						ClaimProcCur.CodeSent=ClaimProcCur.CodeSent.Substring(0,5);
 					}
-					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(ClaimProcCur.CodeSent.Length>5) { //In Canadian electronic claims, codes can contain letters or numbers and cannot be longer than 5 characters.
 							ClaimProcCur.CodeSent=ClaimProcCur.CodeSent.Substring(0,5);
 						}

@@ -209,12 +209,6 @@ namespace OpenDentBusiness {
 			return CultureInfo.CurrentCulture;
 		}
 
-		///<summary>Returns last two letters of language and region settings. For example, en-US and fr-CA return US and CA respectively.</summary>
-		public static string GetCurrentRegion() {
-			string langAndRegName=GetLanguageAndRegion().Name;
-			return langAndRegName.Substring(langAndRegName.Length-2);
-		}
-
 		///<summary>Used by an outside developer.</summary>
 		public static bool ContainsKey(string prefName) {
 			Dictionary<string,Pref> dictPrefs=GetDict();

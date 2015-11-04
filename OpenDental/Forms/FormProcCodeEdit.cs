@@ -928,7 +928,7 @@ namespace OpenDental{
 			textDrugNDC.Text=ProcCode.DrugNDC;
 			textRevenueCode.Text=ProcCode.RevenueCodeDefault;
 			checkIsRadiology.Checked=ProcCode.IsRadiology;
-			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Not Canadian. en-CA or fr-CA
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Not Canadian. en-CA or fr-CA
 				checkIsCanadianLab.Visible=false;
 			}
 			//else {//always enabled
@@ -969,7 +969,7 @@ namespace OpenDental{
 				labelTreatArea.Visible=false;
 				listTreatArea.Visible=false;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//Since Time Units are currently only helpful in Canada,
 				//we have decided not to show this textbox in other countries for now.
 				labelTimeUnits.Visible=true;
@@ -1196,7 +1196,7 @@ namespace OpenDental{
 			else{
 				ProcCode.ProvNumDefault=ProviderC.ListShort[comboProvNumDefault.SelectedIndex-1].ProvNum;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA, for CanadaTimeUnits
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA, for CanadaTimeUnits
 				ProcCode.CanadaTimeUnits=PIn.Double(textTimeUnits.Text);
 			}
 			ProcedureCodes.Update(ProcCode);//whether new or not.

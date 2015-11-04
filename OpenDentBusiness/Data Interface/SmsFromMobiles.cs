@@ -160,7 +160,7 @@ namespace OpenDentBusiness{
 				SmsFromMobile sms=listMessages[i];
 				sms.DateTimeReceived=DateTime.Now;
 				SmsPhone smsPhone=SmsPhones.GetByPhone(sms.SmsPhoneNumber);
-				string countryCode=PrefC.GetCurrentRegion();
+				string countryCode=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
 				if(smsPhone!=null) {
 					sms.ClinicNum=smsPhone.ClinicNum;
 					countryCode=smsPhone.CountryCode;

@@ -1751,7 +1751,7 @@ namespace OpenDentBusiness{
 				//convert two letter languages to 5 char specific culture names-------------------------------------------------
 				string command="";
 				DataTable table;
-				if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+				if(CultureInfo.CurrentCulture.Name=="en-US") {
 					command="DELETE FROM languageforeign";
 					Db.NonQ32(command);
 				}
@@ -2276,7 +2276,7 @@ namespace OpenDentBusiness{
 						Db.NonQ32(command);
 					}
 					//FloToAge
-					if(PrefC.GetLanguageAndRegion().Name=="en-US" && table.Rows[i][3].ToString() != "-1") {
+					if(CultureInfo.CurrentCulture.Name=="en-US" && table.Rows[i][3].ToString() != "-1") {
 						command="INSERT INTO benefit (PlanNum,PatPlanNum,CovCatNum,ADACode,BenefitType,Percent,MonetaryAmt,"
 							+"TimePeriod,QuantityQualifier,Quantity) VALUES("
 							+"'"+table.Rows[i][0].ToString()+"', "//planNum
@@ -2669,7 +2669,7 @@ namespace OpenDentBusiness{
 			if(FromVersion < new Version("4.1.0.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 4.1.0"));//No translation in convert script.
 				string command;
-				if(PrefC.GetLanguageAndRegion().Name=="en-US"){
+				if(CultureInfo.CurrentCulture.Name=="en-US"){
 					//Convert CovCats to new names and ranges----------------------------------------------------------------------
 					//Db
 					command="UPDATE covcat SET EbenefitCat=1 WHERE Description='General'";
@@ -4900,7 +4900,7 @@ namespace OpenDentBusiness{
 					try {
 						/*
 						int claimFormNum=FormClaimForms.ImportForm("",true,Properties.Resources.ClaimForm2006);
-						if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+						if(CultureInfo.CurrentCulture.Name=="en-US") {
 							command="UPDATE preference SET ValueString="+POut.PInt(claimFormNum)+" WHERE PrefName='DefaultClaimForm'";
 							Db.NonQ32(command);
 						}
@@ -5242,7 +5242,7 @@ namespace OpenDentBusiness{
 					try {
 						/*
 						int claimFormNum=FormClaimForms.ImportForm("",true,Properties.Resources.ClaimForm2006);
-						if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+						if(CultureInfo.CurrentCulture.Name=="en-US") {
 							command="UPDATE preference SET ValueString="+POut.PInt(claimFormNum)+" WHERE PrefName='DefaultClaimForm'";
 							Db.NonQ32(command);
 						}
@@ -8103,7 +8103,7 @@ namespace OpenDentBusiness{
 					}
 					command="INSERT INTO preference (PrefName,ValueString,Comments) VALUES ('RecallTypeSpecialPerio','3','FK to recalltype.RecallTypeNum.')";
 					Db.NonQ32(command);
-					if(PrefC.GetLanguageAndRegion().Name=="en-US"){
+					if(CultureInfo.CurrentCulture.Name=="en-US"){
 						//4BWX-----------------------------------------------------------------------------
 						timepattern="";
 						procs="D0274";

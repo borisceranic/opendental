@@ -128,7 +128,7 @@ namespace CentralManager {
 			}
 			else if(radioMonthly.Checked) {
 				bool toLastDay=false;
-				if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month)==_dateTo.Day) {
+				if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month)==_dateTo.Day) {
 					toLastDay=true;
 				}
 				textDateFrom.Text=_dateFrom.AddMonths(-1).ToShortDateString();
@@ -136,7 +136,7 @@ namespace CentralManager {
 				_dateTo=PIn.Date(textDateTo.Text);
 				if(toLastDay) {
 					textDateTo.Text=new DateTime(_dateTo.Year,_dateTo.Month,
-						PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month))
+						CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month))
 						.ToShortDateString();
 				}
 			}
@@ -161,7 +161,7 @@ namespace CentralManager {
 			}
 			else if(radioMonthly.Checked) {
 				bool toLastDay=false;
-				if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month)==_dateTo.Day) {
+				if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month)==_dateTo.Day) {
 					toLastDay=true;
 				}
 				textDateFrom.Text=_dateFrom.AddMonths(1).ToShortDateString();
@@ -169,7 +169,7 @@ namespace CentralManager {
 				_dateTo=PIn.Date(textDateTo.Text);
 				if(toLastDay) {
 					textDateTo.Text=new DateTime(_dateTo.Year,_dateTo.Month,
-						PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month))
+						CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(_dateTo.Year,_dateTo.Month))
 						.ToShortDateString();
 				}
 			}

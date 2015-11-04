@@ -203,7 +203,7 @@ namespace OpenDental{
 				LanForeign=new LanguageForeign();
 				LanForeign.ClassType=LanCur.ClassType;
 				LanForeign.English=LanCur.English;
-				LanForeign.Culture=PrefC.GetLanguageAndRegion().Name;
+				LanForeign.Culture=CultureInfo.CurrentCulture.Name;
 				Text="Add Translation";
 				IsNew=true;
 			}

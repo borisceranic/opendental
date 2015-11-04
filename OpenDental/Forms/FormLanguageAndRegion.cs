@@ -17,15 +17,24 @@ namespace OpenDental {
 		private void FormLanguageAndRegion_Load(object sender,EventArgs e) {
 			CultureInfo cultureCur=PrefC.GetLanguageAndRegion();
 			_listAllCultures=CultureInfo.GetCultures(CultureTypes.AllCultures).Where(x => !x.IsNeutralCulture).OrderBy(x => x.DisplayName).ToList();
+			textLARLocal.Text=CultureInfo.CurrentCulture.DisplayName;
 			if(PrefC.GetString(PrefName.LanguageAndRegion)=="") {
-				textLanguageAndRegion.Text="None";
+				textLARDB.Text="None";
 			}
 			else {
-				textLanguageAndRegion.Text=cultureCur.DisplayName;
+				textLARDB.Text=cultureCur.DisplayName;
 			}
 			comboLanguageAndRegion.Items.Clear();
 			_listAllCultures.ForEach(x => comboLanguageAndRegion.Items.Add(x.DisplayName));
 			comboLanguageAndRegion.SelectedIndex=_listAllCultures.FindIndex(x => x.DisplayName==cultureCur.DisplayName);
+			checkNoShow.Checked=ComputerPrefs.LocalComputer.NoShowLanguage;
+			if(!Security.IsAuthorized(Permissions.Setup,true)) {
+				comboLanguageAndRegion.Visible=false;
+				labelNewLAR.Visible=false;
+				butOK.Enabled=false;
+				butCancel.Text=Lan.g(this,"&Close");
+				checkNoShow.Enabled=false;
+			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -33,9 +42,14 @@ namespace OpenDental {
 				MsgBox.Show(this,"Select a language and region.");
 				return;
 			}
-			//_cultureCur=_listAllCultures[comboLanguageAndRegion.SelectedIndex];
-			if(Prefs.UpdateString(PrefName.LanguageAndRegion,_listAllCultures[comboLanguageAndRegion.SelectedIndex].Name)) {
-				MsgBox.Show(this,"Program must be restarted for changes to take full effect.");
+			if(Security.IsAuthorized(Permissions.Setup,true)) {
+				//_cultureCur=_listAllCultures[comboLanguageAndRegion.SelectedIndex];
+				if(Prefs.UpdateString(PrefName.LanguageAndRegion,_listAllCultures[comboLanguageAndRegion.SelectedIndex].Name)) {
+					MsgBox.Show(this,"Program must be restarted for changes to take full effect.");
+				}
+				ComputerPref local=ComputerPrefs.LocalComputer;
+				local.NoShowLanguage=checkNoShow.Checked;
+				ComputerPrefs.Update(local);
 			}
 			DialogResult=DialogResult.OK;
 		}

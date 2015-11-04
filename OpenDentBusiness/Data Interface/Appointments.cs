@@ -795,7 +795,7 @@ namespace OpenDentBusiness{
 			DataTable rawProcLab=null;
 			if(raw.Rows.Count==0){
 				rawProc=new DataTable();
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					rawProcLab=new DataTable();
 				}
 			}
@@ -839,7 +839,7 @@ namespace OpenDentBusiness{
 					command+=") GROUP BY procedurelog.ProcNum,AptNum,PlannedAptNum,ProcFee";
 				}
 				rawProc=dcon.GetTable(command);
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && rawProc.Rows.Count>0) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && rawProc.Rows.Count>0) {//Canadian. en-CA or fr-CA
 					command="SELECT procedurelog.ProcNum,ProcNumLab,ProcFee,SUM(CASE WHEN WriteOffEstOverride!=-1 THEN WriteOffEstOverride ELSE WriteOffEst END) writeoffPPO "
 						+"FROM procedurelog "
 						+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum "

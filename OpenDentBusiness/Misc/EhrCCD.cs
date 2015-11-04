@@ -3016,7 +3016,7 @@ Vital Signs
 				strDateTimeFormat="yyyy";
 			}
 			try {
-				return DateTime.ParseExact(strDateTime,strDateTimeFormat,PrefC.GetLanguageAndRegion().DateTimeFormat);
+				return DateTime.ParseExact(strDateTime,strDateTimeFormat,CultureInfo.CurrentCulture.DateTimeFormat);
 			}
 			catch {
 			}

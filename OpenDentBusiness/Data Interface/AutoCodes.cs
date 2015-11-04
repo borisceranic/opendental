@@ -121,7 +121,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="DELETE FROM autocodeitem";
 			Db.NonQ(command);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				SetToDefaultCanada();
 				return;
 			}

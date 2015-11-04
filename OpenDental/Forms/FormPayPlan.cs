@@ -111,7 +111,7 @@ namespace OpenDental{
 		private TextBox textDue;
 		private List<PaySplit> _listPaySplits;
 		private string _payPlanNote;
-		int _roundDec=PrefC.GetLanguageAndRegion().NumberFormat.NumberDecimalDigits;
+		int _roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
 		public FormPayPlan(Patient patCur,PayPlan payPlanCur){

@@ -63,6 +63,7 @@ namespace OpenDentBusiness {
 		///<summary>Enum:SearchMode The search mode that is used when loading the patient select window, and while typing.
 		///When 0 the patient select window will use the DB wide pref PatientSelectUsesSearchButton.</summary>
 		public SearchMode PatSelectSearchMode;
+		public bool NoShowLanguage;
 
 
 		public ComputerPref Copy(){

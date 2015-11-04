@@ -567,7 +567,7 @@ namespace OpenDental{
 			par.AddText(text);
 			par.AddLineBreak();
 			text=PrefC.GetString(PrefName.PracticePhone);
-			if(text.Length==10&&PrefC.GetLanguageAndRegion().Name=="en-US") {
+			if(text.Length==10&&Application.CurrentCulture.Name=="en-US") {
 				text="("+text.Substring(0,3)+")"+text.Substring(3,3)+"-"+text.Substring(6);
 			}
 			par.AddText(text);

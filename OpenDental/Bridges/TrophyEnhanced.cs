@@ -144,7 +144,7 @@ namespace OpenDental.Bridges{
 				folder.LName=GetValueFromLines("NOM",datafileLines);
 				date=GetValueFromLines("DATE",datafileLines);
 				try{
-					folder.BirthDate=DateTime.ParseExact(date,"yyyyMMdd",PrefC.GetLanguageAndRegion().DateTimeFormat);
+					folder.BirthDate=DateTime.ParseExact(date,"yyyyMMdd",CultureInfo.CurrentCulture.DateTimeFormat);
 				}
 				catch{}
 				if(pat.LName.ToUpper()==folder.LName.ToUpper() && pat.FName.ToUpper()==folder.FName.ToUpper()) {

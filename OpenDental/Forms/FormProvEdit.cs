@@ -104,7 +104,7 @@ namespace OpenDental{
 			InitializeComponent();// Required for Windows Form Designer support
 			Lan.F(this);
 			//ProvCur=provCur;
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelNPI.Text=Lan.g(this,"CDA Number");
 			}
 			else{
@@ -1207,7 +1207,7 @@ namespace OpenDental{
 				radAsstCirc.Checked = true;
 			}
 			checkIsCDAnet.Checked=ProvCur.IsCDAnet;
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				checkIsCDAnet.Visible=true;
 			}
 			checkIsNotPerson.Checked=ProvCur.IsNotPerson;
@@ -1347,7 +1347,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && checkIsCDAnet.Checked) {
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && checkIsCDAnet.Checked) {
 				if(textNationalProvID.Text!=Eclaims.Canadian.TidyAN(textNationalProvID.Text,9,true)) {
 					MsgBox.Show(this,"CDA number must be 9 characters long and composed of numbers and letters only.");
 					return;

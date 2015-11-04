@@ -178,7 +178,7 @@ namespace OpenDentBusiness{
 			smsToMobile.GuidMessage=Guid.NewGuid().ToString();
 			smsToMobile.GuidBatch=smsToMobile.GuidMessage;
 			smsToMobile.IsTimeSensitive=true;
-			smsToMobile.MobilePhoneNumber=ConvertPhoneToInternational(wirelessPhone,PrefC.GetCurrentRegion());//Example "en-US"="US"
+			smsToMobile.MobilePhoneNumber=ConvertPhoneToInternational(wirelessPhone,CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
 			smsToMobile.PatNum=patNum;
 			smsToMobile.MsgText=message;
 			smsToMobile.MsgType=SmsMessageSource.DirectSms;

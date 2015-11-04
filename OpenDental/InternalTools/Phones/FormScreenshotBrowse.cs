@@ -7,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormScreenshotBrowse:Form {
@@ -31,7 +30,7 @@ namespace OpenDental {
 					filename=filename.Substring(0,10)+" "+filename.Substring(11,2)+":"+filename.Substring(13,2)+":"+filename.Substring(15,2);//2011-08-20 07:11:32
 				}
 				arrayFileNames[i]=files[i];
-				arrayDates[i]=DateTime.ParseExact(filename,"yyyy-MM-dd HH:mm:ss",PrefC.GetLanguageAndRegion());
+				arrayDates[i]=DateTime.ParseExact(filename,"yyyy-MM-dd HH:mm:ss",CultureInfo.CurrentCulture);
 			}
 			Array.Sort(arrayDates,arrayFileNames);//sort filenames by date
 			//if(arrayFileNames.Length>50) {

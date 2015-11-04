@@ -235,7 +235,7 @@ namespace OpenDentBusiness{
 				writer.WriteString(monthlyLimitUSD.ToString());
 				writer.WriteEndElement(); //SmsMonthlyLimit	
 				writer.WriteStartElement("CountryCode");
-				writer.WriteString(PrefC.GetCurrentRegion());//Example "en-US"="US"
+				writer.WriteString(CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
 				writer.WriteEndElement(); //SmsMonthlyLimit	
 				writer.WriteEndElement(); //Payload	
 			}

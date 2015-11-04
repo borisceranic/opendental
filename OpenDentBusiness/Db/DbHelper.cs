@@ -151,7 +151,7 @@ namespace OpenDentBusiness {
 				throw new Exception("Unrecognized date format string.");
 			}
 			//MySQL-----------------------------------------------------------------------------
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {
+			if(System.Globalization.CultureInfo.CurrentCulture.Name.EndsWith("US")) {
 				return "DATE_FORMAT("+colName+",'"+format+"')";
 			}
 			//foreign, assume d/m/y
@@ -176,7 +176,7 @@ namespace OpenDentBusiness {
 				throw new Exception("Unrecognized datetime format string.");
 			}
 			//MySQL-----------------------------------------------------------------------------
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {
+			if(System.Globalization.CultureInfo.CurrentCulture.Name.EndsWith("US")) {
 				return "DATE_FORMAT("+colName+",'"+format+"')";
 			}
 			//foreign, assume d/m/y

@@ -289,7 +289,7 @@ namespace OpenDental
 		#endregion
 
 		private void FormRpBirthday_Load(object sender, System.EventArgs e){
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("US")) {//United States
+			if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 				cultureDateFormat="MM/dd";
 			}
 			else {
@@ -306,10 +306,10 @@ namespace OpenDental
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
-			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
-			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 			bool toLastDay=false;
-			if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day) {
+			if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
 				toLastDay=true;
 			}
 			textDateFrom.Text=dateFrom.AddMonths(-1).ToString(cultureDateFormat);
@@ -317,7 +317,7 @@ namespace OpenDental
 			textDateTo.Text=dateTo.ToString(cultureDateFormat);
 			if(toLastDay){
 				textDateTo.Text=new DateTime(dateTo.Year,dateTo.Month,
-					PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
+					CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
 					.ToString(cultureDateFormat);
 			}
 		}
@@ -333,12 +333,12 @@ namespace OpenDental
 				MessageBox.Show(Lan.g(this,"Please fix data entry errors first."));
 				return;
 			}
-			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
-			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 			//textDateFrom.Text=dateFrom.AddMonths(-1).ToShortDateString();
 			//textDateTo.Text=dateTo.AddMonths(-1).ToShortDateString();
 			bool toLastDay=false;
-			if(PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day) {
+			if(CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month)==dateTo.Day){
 				toLastDay=true;
 			}
 			textDateFrom.Text=dateFrom.AddMonths(1).ToString(cultureDateFormat);
@@ -346,7 +346,7 @@ namespace OpenDental
 			textDateTo.Text=dateTo.ToString(cultureDateFormat);
 			if(toLastDay){
 				textDateTo.Text=new DateTime(dateTo.Year,dateTo.Month,
-					PrefC.GetLanguageAndRegion().Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
+					CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
 					.ToString(cultureDateFormat);
 			}
 		}
@@ -364,7 +364,7 @@ namespace OpenDental
 
 		private void textDateFrom_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
 			try{
-				DateTime date=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+				DateTime date=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 				textDateFrom.Text=date.ToString(cultureDateFormat);
 				errorProvider1.SetError(textDateFrom,"");
 			}
@@ -375,7 +375,7 @@ namespace OpenDental
 
 		private void textDateTo_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
 			try{
-				DateTime date=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+				DateTime date=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 				textDateTo.Text=date.ToString(cultureDateFormat);//allows users in other countries to set their own format
 				errorProvider1.SetError(textDateTo,"");
 			}
@@ -396,8 +396,8 @@ namespace OpenDental
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
 			}
-			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
-			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 			//DateTime dateFrom=PIn.PDate(textDateFrom.Text);
 			//DateTime dateTo=PIn.PDate(textDateTo.Text);
 			if(dateTo < dateFrom) {
@@ -451,7 +451,7 @@ namespace OpenDental
 					}
 					str+=PrefC.GetString(PrefName.PracticeCity)+",  "+PrefC.GetString(PrefName.PracticeST)+"  "+PrefC.GetString(PrefName.PracticeZip)+"\r\n";
 					string phone=PrefC.GetString(PrefName.PracticePhone);
-					if(PrefC.GetLanguageAndRegion().Name=="en-US"&& phone.Length==10) {
+					if(CultureInfo.CurrentCulture.Name=="en-US"&& phone.Length==10) {
 						str+="("+phone.Substring(0,3)+")"+phone.Substring(3,3)+"-"+phone.Substring(6);
 					}
 					else {//any other phone format
@@ -517,8 +517,8 @@ namespace OpenDental
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
 			}
-			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
-			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,PrefC.GetLanguageAndRegion());
+			DateTime dateFrom=DateTime.ParseExact(textDateFrom.Text,cultureDateFormat,CultureInfo.CurrentCulture);
+			DateTime dateTo=DateTime.ParseExact(textDateTo.Text,cultureDateFormat,CultureInfo.CurrentCulture);
 			if(dateTo < dateFrom) {
 				MsgBox.Show(this,"To date cannot be before From date.");
 				return;

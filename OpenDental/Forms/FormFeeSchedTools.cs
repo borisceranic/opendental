@@ -695,7 +695,7 @@ namespace OpenDental{
 			if(!Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				butImportEcw.Visible=false;
 			}
-			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				butImportCanada.Visible=false;
 			}
 		}

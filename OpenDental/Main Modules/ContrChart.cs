@@ -315,7 +315,7 @@ namespace OpenDental{
 			Logger.openlog.Log("Initializing chart module...",Logger.Severity.INFO);
 			InitializeComponent();
 			tabControlImages.DrawItem += new DrawItemEventHandler(OnDrawItem);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//panelQuickButtons.Enabled=false;
 				butBF.Text=Lan.g(this,"B/V");//vestibular instead of facial
 				butV.Text=Lan.g(this,"5");
@@ -6109,10 +6109,10 @@ namespace OpenDental{
 				DateTime month2=DateTime.Now.AddMonths(-2);
 				DateTime month3=DateTime.Now.AddMonths(-3);
 				//Set the month labels.
-				labelMonth0.Text=PrefC.GetLanguageAndRegion().DateTimeFormat.GetAbbreviatedMonthName(month0.Month);
-				labelMonth1.Text=PrefC.GetLanguageAndRegion().DateTimeFormat.GetAbbreviatedMonthName(month1.Month);
-				labelMonth2.Text=PrefC.GetLanguageAndRegion().DateTimeFormat.GetAbbreviatedMonthName(month2.Month);
-				labelMonth3.Text=PrefC.GetLanguageAndRegion().DateTimeFormat.GetAbbreviatedMonthName(month3.Month);
+				labelMonth0.Text=CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month0.Month);
+				labelMonth1.Text=CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month1.Month);
+				labelMonth2.Text=CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month2.Month);
+				labelMonth3.Text=CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month3.Month);
 				List<Commlog>	commlogsList=Commlogs.GetTimedCommlogsForPat(PatCur.Guarantor);
 				TimeSpan month0Span=new TimeSpan();
 				TimeSpan month1Span=new TimeSpan();
@@ -6650,7 +6650,7 @@ namespace OpenDental{
 				textSurf.AppendText("D");
 			}
 			if(butV.BackColor==Color.White){
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					textSurf.AppendText("5");
 				}
 				else {
@@ -6659,7 +6659,7 @@ namespace OpenDental{
 			}
 			if(butBF.BackColor==Color.White){
 				if(ToothGraphic.IsAnterior(toothChart.SelectedTeeth[0])) {
-					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						textSurf.AppendText("V");//vestibular
 					}
 					else {
@@ -7822,7 +7822,7 @@ namespace OpenDental{
 					return;
 				}
 			}
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" && Regex.IsMatch(textProcCode.Text,@"^\d{4}$")){//if exactly 4 digits
+			if(CultureInfo.CurrentCulture.Name=="en-US" && Regex.IsMatch(textProcCode.Text,@"^\d{4}$")){//if exactly 4 digits
 				if(!ProcedureCodeC.HList.ContainsKey(textProcCode.Text)) {//4 digit code is not found
 					textProcCode.Text="D"+textProcCode.Text;
 				}
@@ -9554,7 +9554,7 @@ namespace OpenDental{
 				if(procCur.DiagnosticCode=="") {
 					procCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canada
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 					Procedures.SetCanadianLabFeesCompleteForProc(procCur);
 				}
 				Plugins.HookAddCode(this,"ContrChart.menuItemSetComplete_Click_procLoop",procCur,procOld);

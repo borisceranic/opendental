@@ -72,6 +72,7 @@ namespace OpenDentBusiness.Crud{
 				computerPref.ApptViewNum            = PIn.Long  (row["ApptViewNum"].ToString());
 				computerPref.RecentApptView         = PIn.Byte  (row["RecentApptView"].ToString());
 				computerPref.PatSelectSearchMode    = (OpenDentBusiness.SearchMode)PIn.Int(row["PatSelectSearchMode"].ToString());
+				computerPref.NoShowLanguage         = PIn.Bool  (row["NoShowLanguage"].ToString());
 				retVal.Add(computerPref);
 			}
 			return retVal;
@@ -112,7 +113,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ComputerPrefNum,";
 			}
-			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode) VALUES(";
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode,NoShowLanguage) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(computerPref.ComputerPrefNum)+",";
 			}
@@ -141,7 +142,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (computerPref.ClinicNum)+","
 				+    POut.Long  (computerPref.ApptViewNum)+","
 				+    POut.Byte  (computerPref.RecentApptView)+","
-				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+")";
+				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+","
+				+    POut.Bool  (computerPref.NoShowLanguage)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -174,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ComputerPrefNum,";
 			}
-			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode) VALUES(";
+			command+="ComputerName,GraphicsUseHardware,GraphicsSimple,SensorType,SensorBinned,SensorPort,SensorExposure,GraphicsDoubleBuffering,PreferredPixelFormatNum,AtoZpath,TaskKeepListHidden,TaskDock,TaskX,TaskY,DirectXFormat,ScanDocSelectSource,ScanDocShowOptions,ScanDocDuplex,ScanDocGrayscale,ScanDocResolution,ScanDocQuality,ClinicNum,ApptViewNum,RecentApptView,PatSelectSearchMode,NoShowLanguage) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(computerPref.ComputerPrefNum)+",";
 			}
@@ -203,7 +205,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (computerPref.ClinicNum)+","
 				+    POut.Long  (computerPref.ApptViewNum)+","
 				+    POut.Byte  (computerPref.RecentApptView)+","
-				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+")";
+				+    POut.Int   ((int)computerPref.PatSelectSearchMode)+","
+				+    POut.Bool  (computerPref.NoShowLanguage)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -240,7 +243,8 @@ namespace OpenDentBusiness.Crud{
 				+"ClinicNum              =  "+POut.Long  (computerPref.ClinicNum)+", "
 				+"ApptViewNum            =  "+POut.Long  (computerPref.ApptViewNum)+", "
 				+"RecentApptView         =  "+POut.Byte  (computerPref.RecentApptView)+", "
-				+"PatSelectSearchMode    =  "+POut.Int   ((int)computerPref.PatSelectSearchMode)+" "
+				+"PatSelectSearchMode    =  "+POut.Int   ((int)computerPref.PatSelectSearchMode)+", "
+				+"NoShowLanguage         =  "+POut.Bool  (computerPref.NoShowLanguage)+" "
 				+"WHERE ComputerPrefNum = "+POut.Long(computerPref.ComputerPrefNum);
 			Db.NonQ(command);
 		}
@@ -347,6 +351,10 @@ namespace OpenDentBusiness.Crud{
 			if(computerPref.PatSelectSearchMode != oldComputerPref.PatSelectSearchMode) {
 				if(command!=""){ command+=",";}
 				command+="PatSelectSearchMode = "+POut.Int   ((int)computerPref.PatSelectSearchMode)+"";
+			}
+			if(computerPref.NoShowLanguage != oldComputerPref.NoShowLanguage) {
+				if(command!=""){ command+=",";}
+				command+="NoShowLanguage = "+POut.Bool(computerPref.NoShowLanguage)+"";
 			}
 			if(command==""){
 				return false;

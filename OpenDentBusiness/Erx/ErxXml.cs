@@ -101,8 +101,8 @@ namespace OpenDentBusiness {
 			string practiceZip4=practiceZip.Substring(5);//Last 4 digits of zip.
 			practiceZip=practiceZip.Substring(0,5);//First 5 digits of zip.
 			string country="US";//Always United States for now.
-			//if(PrefC.GetLanguageAndRegion().Name.Length>=2) {
-			//  country=PrefC.GetLanguageAndRegion().Name.Substring(PrefC.GetLanguageAndRegion().Name.Length-2);
+			//if(CultureInfo.CurrentCulture.Name.Length>=2) {
+			//  country=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
 			//}
 			ncScript.Account=new AccountTypeRx();
 			//Each LicensedPrescriberID must be unique within an account. Since we send ProvNum for LicensedPrescriberID, each OD database must have a unique AccountID.

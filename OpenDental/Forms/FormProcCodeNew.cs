@@ -455,7 +455,7 @@ namespace OpenDental{
 		}
 
 		private void listType_Click(object sender,EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" && listType.SelectedIndex!=0) {
+			if(CultureInfo.CurrentCulture.Name=="en-US" && listType.SelectedIndex!=0){
 				textNewCode.Text="D";
 			}
 			else{
@@ -728,7 +728,7 @@ namespace OpenDental{
 			string previous=textNewCode.Text;
 			if(AddProc()){
 				ProcedureCodes.RefreshCache();
-				if(PrefC.GetLanguageAndRegion().Name=="en-US" && listType.SelectedIndex!=0) {
+				if(CultureInfo.CurrentCulture.Name=="en-US" && listType.SelectedIndex!=0) {
 					textNewCode.Text="D";
 				}
 				else {

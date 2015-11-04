@@ -246,7 +246,7 @@ namespace OpenDental{
 				labelST.Text="ST, Country";
 				textCountry.Visible=true;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelSSN.Text="SIN";
 				labelZip.Text="Postal Code";
 				labelST.Text="Province";
@@ -257,7 +257,7 @@ namespace OpenDental{
 				radioStudentP.Visible=false;
 				radioStudentF.Visible=false;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("GB")) {//en-GB
+			if(CultureInfo.CurrentCulture.Name.EndsWith("GB")){//en-GB
 				//labelSSN.Text="?";
 				labelZip.Text="Postcode";
 				labelST.Text="";//no such thing as state in GB
@@ -2200,7 +2200,7 @@ namespace OpenDental{
 				textDateDeceased.Text=PatCur.DateTimeDeceased.ToShortDateString()+"  "+PatCur.DateTimeDeceased.ToShortTimeString();
 			}
 			textAge.Text=PatientLogic.DateToAgeString(PatCur.Birthdate,PatCur.DateTimeDeceased);
-			if(PrefC.GetLanguageAndRegion().Name=="en-US"//if USA
+			if(CultureInfo.CurrentCulture.Name=="en-US"//if USA
 				&& PatCur.SSN!=null//the null catches new patients
 				&& PatCur.SSN.Length==9)//and length exactly 9 (no data gets lost in formatting)
 			{
@@ -2353,7 +2353,7 @@ namespace OpenDental{
 					break;
 			}
 			textSchool.Text=PatCur.SchoolName;
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				labelSchoolName.Text=Lan.g(this,"Name of School");
 				comboCanadianEligibilityCode.Items.Add("0 - Please Choose");
 				comboCanadianEligibilityCode.Items.Add("1 - Full-time student");
@@ -2540,7 +2540,7 @@ namespace OpenDental{
 				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.Ward);
 				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.AdmitDate);
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
 				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.StudentStatus);
 			}
 			else {//Not Canadian
@@ -3018,7 +3018,7 @@ namespace OpenDental{
 
 		///<summary>Returns true if the conditions for StudentStatus are true.</summary>
 		private bool CheckStudentStatusConditions(int condCurIndex,List<RequiredFieldCondition> listConds) {
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) { //Canadian. en-CA or fr-CA
 				return true;
 			}
 			if(listConds[condCurIndex].Operator==ConditionOperator.Equals) {
@@ -3218,7 +3218,7 @@ namespace OpenDental{
 		}
 
 		private void textSSN_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name!="en-US") {
+			if(CultureInfo.CurrentCulture.Name!="en-US"){
 				return;
 			}
 			//only reformats if in USA and exactly 9 digits.
@@ -3437,8 +3437,8 @@ namespace OpenDental{
 		}
 
 		private void textState_TextChanged(object sender, System.EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" //if USA or Canada, capitalize first 2 letters
-				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name=="en-US" //if USA or Canada, capitalize first 2 letters
+				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textState.Text.Length==1 || textState.Text.Length==2){
 					textState.Text=textState.Text.ToUpper();
 					textState.SelectionStart=2;
@@ -3453,8 +3453,8 @@ namespace OpenDental{
 		}
 
 		private void textMedicaidState_TextChanged(object sender,EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" //if USA or Canada, capitalize first 2 letters
-				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) //Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name=="en-US" //if USA or Canada, capitalize first 2 letters
+				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) //Canadian. en-CA or fr-CA
 			{
 				if(textMedicaidState.Text.Length==1 || textMedicaidState.Text.Length==2) {
 					textMedicaidState.Text=textMedicaidState.Text.ToUpper();
@@ -4385,7 +4385,7 @@ namespace OpenDental{
 					PatCur.SiteNum=matchingSite;
 				}
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(comboCanadianEligibilityCode.SelectedIndex==1//FT student
 					&& textSchool.Text=="" && PIn.Date(textBirthdate.Text).AddYears(18)<=DateTime.Today)
 				{
@@ -4456,7 +4456,7 @@ namespace OpenDental{
 			}
 			PatCur.Birthdate=PIn.Date(textBirthdate.Text);
 			PatCur.DateTimeDeceased=dateTimeDeceased;
-			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+			if(CultureInfo.CurrentCulture.Name=="en-US"){
 				if(Regex.IsMatch(textSSN.Text,@"^\d\d\d-\d\d-\d\d\d\d$")){
 					PatCur.SSN=textSSN.Text.Substring(0,3)+textSSN.Text.Substring(4,2)
 						+textSSN.Text.Substring(7,4);
@@ -4600,7 +4600,7 @@ namespace OpenDental{
 			PatCur.PreferConfirmMethod=(ContactMethod)comboConfirm.SelectedIndex;
 			PatCur.PreferRecallMethod=(ContactMethod)comboRecall.SelectedIndex;
 			PatCur.AdmitDate=PIn.Date(textAdmitDate.Text);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				PatCur.CanadianEligibilityCode=(byte)comboCanadianEligibilityCode.SelectedIndex;
 			}
 			if(PatCur.Guarantor==0){

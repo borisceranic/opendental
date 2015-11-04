@@ -2956,7 +2956,7 @@ namespace OpenDental {
 					}
 					sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
 					if(Procedures.NeedsSent(proc.ProcNum,sub.InsSubNum,ClaimProcList)){
-						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && countSelected==7) {//Canadian. en-CA or fr-CA
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && countSelected==7) {//Canadian. en-CA or fr-CA
 							MsgBox.Show(this,"Only the first 7 procedures will be automatically selected.  You will need to create another claim for the remaining procedures.");
 							continue;//only send 7.  
 						}
@@ -3009,7 +3009,7 @@ namespace OpenDental {
 				return;//will have already been deleted
 			}
 			if(PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)>0 //if there exists a secondary plan
-				&& !PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
+				&& !CultureInfo.CurrentCulture.Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
 			{
 				sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)),SubList);
 				plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
@@ -3040,7 +3040,7 @@ namespace OpenDental {
 			if(labProcsUnselected>0) {
 				MessageBox.Show(Lan.g(this,"Number of lab fee procedures automatically unselected")+": "+labProcsUnselected.ToString());
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && gridAccount.SelectedIndices.Length>7) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && gridAccount.SelectedIndices.Length>7) {//Canadian. en-CA or fr-CA
 				selectedIndicies=new List<int>(gridAccount.SelectedIndices);
 				selectedIndicies.Sort();
 				for(int i=0;i<selectedIndicies.Count;i++) { //Unselect all but the first 7 procedures with the smallest index numbers.
@@ -3282,7 +3282,7 @@ namespace OpenDental {
 					if(claimProcs[i].CodeSent.Length>5 && claimProcs[i].CodeSent.Substring(0,1)=="D"){
 						claimProcs[i].CodeSent=claimProcs[i].CodeSent.Substring(0,5);
 					}
-					if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(claimProcs[i].CodeSent.Length>5) { //In Canadian electronic claims, codes can contain letters or numbers and cannot be longer than 5 characters.
 							claimProcs[i].CodeSent=claimProcs[i].CodeSent.Substring(0,5);
 						}
@@ -4794,7 +4794,7 @@ namespace OpenDental {
 		}
 
 		private void labelInsRem_Click(object sender,EventArgs e) {
-			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				//Since the bonus information in FormInsRemain is currently only helpful in Canada,
 				//we have decided not to show the form for other countries at this time.
 				return;

@@ -981,7 +981,7 @@ namespace OpenDental{
 				textBirthdate.Text="";
 			else
 				textBirthdate.Text=PatCur.Birthdate.ToShortDateString();
-			if(PrefC.GetLanguageAndRegion().Name=="en-US"//if USA
+			if(CultureInfo.CurrentCulture.Name=="en-US"//if USA
 				&& PatCur.SSN!=null//the null catches new patients
 				&& PatCur.SSN.Length==9)//and length exactly 9 (no data gets lost in formatting)
 			{
@@ -1094,7 +1094,7 @@ namespace OpenDental{
 		}
 
 		private void textSSN_Validating(object sender,System.ComponentModel.CancelEventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name!="en-US") {
+			if(CultureInfo.CurrentCulture.Name!="en-US") {
 				return;
 			}
 			//only reformats if in USA and exactly 9 digits.
@@ -1156,8 +1156,8 @@ namespace OpenDental{
 		}
 
 		private void textState_TextChanged(object sender,System.EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name=="en-US" //if USA or Canada, capitalize first 2 letters
-				|| PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name=="en-US" //if USA or Canada, capitalize first 2 letters
+				|| CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				if(textState.Text.Length==1 || textState.Text.Length==2) {
 					textState.Text=textState.Text.ToUpper();
 					textState.SelectionStart=2;
@@ -1254,7 +1254,7 @@ namespace OpenDental{
 				case 4: PatCur.Position=PatientPosition.Divorced; break;
 			}
 			PatCur.Birthdate=PIn.Date(textBirthdate.Text);
-			if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+			if(CultureInfo.CurrentCulture.Name=="en-US") {
 				if(Regex.IsMatch(textSSN.Text,@"^\d\d\d-\d\d-\d\d\d\d$")) {
 					PatCur.SSN=textSSN.Text.Substring(0,3)+textSSN.Text.Substring(4,2)
 						+textSSN.Text.Substring(7,4);

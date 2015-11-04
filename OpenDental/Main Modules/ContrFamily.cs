@@ -658,10 +658,10 @@ namespace OpenDental{
 				row=new ODGridRow();
 				if(fields[f].Description==""){
 					if(fields[f].InternalName=="SS#"){
-						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							row.Cells.Add("SIN");
 						}
-						else if(PrefC.GetCurrentRegion()=="GB") {
+						else if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="GB") {
 							row.Cells.Add("");
 						}
 						else{
@@ -669,10 +669,10 @@ namespace OpenDental{
 						}
 					}
 					else if(fields[f].InternalName=="State"){
-						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							row.Cells.Add("Province");
 						}
-						else if(PrefC.GetCurrentRegion()=="GB") {
+						else if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="GB") {
 							row.Cells.Add("");
 						}
 						else{
@@ -680,10 +680,10 @@ namespace OpenDental{
 						}
 					}
 					else if(fields[f].InternalName=="Zip"){
-						if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 							row.Cells.Add("Postal Code");
 						}
-						else if(PrefC.GetCurrentRegion()=="GB") {
+						else if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="GB") {
 							row.Cells.Add("Postcode");
 						}
 						else{
@@ -748,7 +748,7 @@ namespace OpenDental{
 						row.Cells.Add(PatientLogic.DateToAgeString(PatCur.Birthdate,PatCur.DateTimeDeceased));
 						break;
 					case "SS#":
-						if(PrefC.GetCurrentRegion()=="US" 
+						if(CultureInfo.CurrentCulture.Name.Length>=4 && CultureInfo.CurrentCulture.Name.Substring(3)=="US" 
 							&& PatCur.SSN !=null && PatCur.SSN.Length==9)
 						{
 							row.Cells.Add(PatCur.SSN.Substring(0,3)+"-"+PatCur.SSN.Substring(3,2)+"-"+PatCur.SSN.Substring(5,4));
@@ -2337,7 +2337,7 @@ namespace OpenDental{
 			gridIns.Rows.Add(row);
 			//group number
 			row=new ODGridRow();
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				row.Cells.Add(Lan.g("TableCoverage","Plan Number"));
 			}
 			else {
@@ -2458,7 +2458,7 @@ namespace OpenDental{
 					else if(benMatrix[x,y].BenefitType==InsBenefitType.Limitations
 						&& benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02144")//4BW in Quebec and also the rest of Canada.
 						&& benMatrix[x,y].Quantity !=0
-						&& PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))
+						&& CultureInfo.CurrentCulture.Name.EndsWith("CA"))
 					{
 						desc+="BW frequency ";
 					}
@@ -2473,7 +2473,7 @@ namespace OpenDental{
 						&& ((Canadian.IsQuebec() && benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02600"))//Different code for Quebec,
 							|| (!Canadian.IsQuebec() && benMatrix[x,y].CodeNum==ProcedureCodes.GetCodeNum("02601")))//than for the rest of Canada.
 						&& benMatrix[x,y].Quantity !=0
-						&& PrefC.GetLanguageAndRegion().Name.EndsWith("CA"))
+						&& CultureInfo.CurrentCulture.Name.EndsWith("CA"))
 					{
 						desc+="Pano/FMX frequency ";
 					}

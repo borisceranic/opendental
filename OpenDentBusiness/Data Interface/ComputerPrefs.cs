@@ -52,6 +52,7 @@ namespace OpenDentBusiness {
 			computerPref.ScanDocResolution=150;//default suggested in FormImagingSetup
 			computerPref.ScanDocQuality=40;//default suggested in FormImagingSetup
 			computerPref.GraphicsSimple=DrawingMode.DirectX;
+			computerPref.NoShowLanguage=false;
 			DataTable table=GetPrefsForComputer(computerName);
 			if(table==null){
 				//In case of database error, just use default graphics settings so that it is possible for the program to start.

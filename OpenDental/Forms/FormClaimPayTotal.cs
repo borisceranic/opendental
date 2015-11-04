@@ -305,7 +305,7 @@ namespace OpenDental
 
 		private void FormClaimPayTotal_Load(object sender, System.EventArgs e) {
 			ProcList=Procedures.Refresh(PatCur.PatNum);
-			if(!PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				textLabFees.Visible=false;
 				textDedApplied.Location=textLabFees.Location;
 				textInsPayAllowed.Location=new Point(textDedApplied.Right-1,textInsPayAllowed.Location.Y);
@@ -356,7 +356,7 @@ namespace OpenDental
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Fee Billed"),62,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				col=new ODGridColumn(Lan.g("TableClaimProc","Labs"),62,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
 			}
@@ -405,7 +405,7 @@ namespace OpenDental
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
 				}
 				row.Cells.Add(ClaimProcsToEdit[i].FeeBilled.ToString("F"));
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					decimal labFeesForProc=0;
 					List<Procedure> labFeeProcs=Procedures.GetCanadianLabFees(ClaimProcsToEdit[i].ProcNum,ProcList);
 					for(int j=0;j<labFeeProcs.Count;j++) {
@@ -500,7 +500,7 @@ namespace OpenDental
 			//double amt;
 			for(int i=0;i<gridMain.Rows.Count;i++){
 				claimFee+=ClaimProcsToEdit[i].FeeBilled;//5
-				if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					labFees+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Labs")].Text);
 				}
 				dedApplied+=PIn.Double(gridMain.Rows[i].Cells[gridMain.Columns.GetIndex("Deduct")].Text);
@@ -595,7 +595,7 @@ namespace OpenDental
 
 		public void butWriteOff_Click(object sender, System.EventArgs e) {
 			DialogResult dresWriteoff=DialogResult.Cancel;
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				dresWriteoff=MessageBox.Show(
 					 Lan.g(this,"Write off unpaid amounts on labs and procedures?")+"\r\n"
 					+Lan.g(this,"Choose Yes to write off unpaid amounts on both labs and procedures.")+"\r\n"
@@ -612,7 +612,7 @@ namespace OpenDental
 			if(!SaveGridChanges()) {
 				return;
 			}
-			if(PrefC.GetLanguageAndRegion().Name.EndsWith("CA") && dresWriteoff==DialogResult.Yes) {//Canadian. en-CA or fr-CA
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && dresWriteoff==DialogResult.Yes) {//Canadian. en-CA or fr-CA
 				Claim claim=Claims.GetClaim(ClaimProcsToEdit[0].ClaimNum);//There should be at least one, since a claim can only be created with one or more procedures.
 				ClaimProc cpTotalLabs=new ClaimProc();
 				cpTotalLabs.ClaimNum=claim.ClaimNum;

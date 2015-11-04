@@ -124,7 +124,7 @@ namespace OpenDental{
 		}
 
 		private void butReformat_Click(object sender, System.EventArgs e) {
-			if(PrefC.GetLanguageAndRegion().Name!="en-US") {
+			if(CultureInfo.CurrentCulture.Name!="en-US"){
 				if(MessageBox.Show(Lan.g(this,"Are you sure?  The phone number formatting is only meant for the United States?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
 					return;
 				}

@@ -28,8 +28,8 @@ namespace OpenDental{
 			InitializeComponent();
 			gridLan.Title=classType+" Words";
 			
-			//tbLan.Fields[2]=PrefC.GetLanguageAndRegion().Parent.DisplayName;
-			//tbLan.Fields[3]=PrefC.GetLanguageAndRegion().Parent.DisplayName + " Comments";
+			//tbLan.Fields[2]=CultureInfo.CurrentCulture.Parent.DisplayName;
+			//tbLan.Fields[3]=CultureInfo.CurrentCulture.Parent.DisplayName + " Comments";
 			//no need to translate much here
 			Lan.C("All", new System.Windows.Forms.Control[] {
 				butClose,																											
@@ -160,20 +160,20 @@ namespace OpenDental{
 		private void FillGrid(){
 			LanList=Lans.GetListForCat(ClassType);
 			ListForType=LanguageForeigns.GetListForType(ClassType);
-			LanguageForeigns.Refresh(PrefC.GetLanguageAndRegion().Name,PrefC.GetLanguageAndRegion().TwoLetterISOLanguageName);
+			LanguageForeigns.Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 			gridLan.BeginUpdate();
 			gridLan.Columns.Clear();
 			ODGridColumn column=new ODGridColumn("English",220);
 			gridLan.Columns.Add(column);
-			column=new ODGridColumn(PrefC.GetLanguageAndRegion().DisplayName,220);
+			column=new ODGridColumn(CultureInfo.CurrentCulture.DisplayName,220);
 			gridLan.Columns.Add(column);
-			column=new ODGridColumn("Other "+PrefC.GetLanguageAndRegion().Parent.DisplayName+" Translation",220);
+			column=new ODGridColumn("Other "+CultureInfo.CurrentCulture.Parent.DisplayName+" Translation",220);
 			gridLan.Columns.Add(column);
-			column=new ODGridColumn(PrefC.GetLanguageAndRegion().DisplayName+" Comments",220);
+			column=new ODGridColumn(CultureInfo.CurrentCulture.DisplayName+" Comments",220);
 			gridLan.Columns.Add(column);
 			//gridLan.Columns[1].Heading=;
-			//gridLan.Columns[2].Heading="Other "+PrefC.GetLanguageAndRegion().Parent.DisplayName+" Translation";
-			//gridLan.Columns[3].Heading=PrefC.GetLanguageAndRegion().DisplayName+" Comments";
+			//gridLan.Columns[2].Heading="Other "+CultureInfo.CurrentCulture.Parent.DisplayName+" Translation";
+			//gridLan.Columns[3].Heading=CultureInfo.CurrentCulture.DisplayName+" Comments";
 			gridLan.Rows.Clear();
 			UI.ODGridRow row;
 			LanguageForeign lanForeign;
@@ -181,8 +181,8 @@ namespace OpenDental{
 			for(int i=0;i<LanList.Length;i++){
 				row=new OpenDental.UI.ODGridRow();
 				row.Cells.Add(LanList[i].English);
-				lanForeign=LanguageForeigns.GetForCulture(ListForType,LanList[i].English,PrefC.GetLanguageAndRegion().Name);
-				lanForeignOther=LanguageForeigns.GetOther(ListForType,LanList[i].English,PrefC.GetLanguageAndRegion().Name);
+				lanForeign=LanguageForeigns.GetForCulture(ListForType,LanList[i].English,CultureInfo.CurrentCulture.Name);
+				lanForeignOther=LanguageForeigns.GetOther(ListForType,LanList[i].English,CultureInfo.CurrentCulture.Name);
 				if(lanForeign==null){
 					row.Cells.Add("");
 				}
@@ -208,8 +208,8 @@ namespace OpenDental{
 
 		private void gridLan_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
 			Language LanCur=LanList[e.Row];
-			LanguageForeign lanForeign=LanguageForeigns.GetForCulture(ListForType,LanCur.English,PrefC.GetLanguageAndRegion().Name);
-			LanguageForeign lanForeignOther=LanguageForeigns.GetOther(ListForType,LanCur.English,PrefC.GetLanguageAndRegion().Name);
+			LanguageForeign lanForeign=LanguageForeigns.GetForCulture(ListForType,LanCur.English,CultureInfo.CurrentCulture.Name);
+			LanguageForeign lanForeignOther=LanguageForeigns.GetOther(ListForType,LanCur.English,CultureInfo.CurrentCulture.Name);
 			string otherTrans="";
 			if(lanForeignOther!=null){
 				otherTrans=lanForeignOther.Translation;
@@ -237,8 +237,8 @@ namespace OpenDental{
 			LanguageForeign lanForeign;
 			LanguageForeign lanForeignOther;
 			for(int i=0;i<LanList.Length;i++){
-				lanForeign=LanguageForeigns.GetForCulture(ListForType,LanList[i].English,PrefC.GetLanguageAndRegion().Name);
-				lanForeignOther=LanguageForeigns.GetOther(ListForType,LanList[i].English,PrefC.GetLanguageAndRegion().Name);
+				lanForeign=LanguageForeigns.GetForCulture(ListForType,LanList[i].English,CultureInfo.CurrentCulture.Name);
+				lanForeignOther=LanguageForeigns.GetOther(ListForType,LanList[i].English,CultureInfo.CurrentCulture.Name);
 				if(lanForeign==null && lanForeignOther==null){
 					strList.Add(LanList[i].English);
 				}

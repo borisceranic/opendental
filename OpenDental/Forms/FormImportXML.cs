@@ -589,7 +589,7 @@ namespace OpenDental{
 					break;				
 				case "SSN":
 					pat.SSN=textValue;
-					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+					if(CultureInfo.CurrentCulture.Name=="en-US"){
 						if(Regex.IsMatch(pat.SSN,@"^\d\d\d-\d\d-\d\d\d\d$")){
 							pat.SSN=pat.SSN.Replace("-","");
 						}
@@ -698,7 +698,7 @@ namespace OpenDental{
 					break;
 				case "SSN":
 					guar.SSN=textValue;
-					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+					if(CultureInfo.CurrentCulture.Name=="en-US"){
 						if(Regex.IsMatch(guar.SSN,@"^\d\d\d-\d\d-\d\d\d\d$")){
 							guar.SSN=guar.SSN.Replace("-","");
 						}
@@ -928,7 +928,7 @@ namespace OpenDental{
 					break;
 				case "InsuredsSSN":
 					subsc.SSN=textValue;
-					if(PrefC.GetLanguageAndRegion().Name=="en-US") {
+					if(CultureInfo.CurrentCulture.Name=="en-US"){
 						if(Regex.IsMatch(subsc.SSN,@"^\d\d\d-\d\d-\d\d\d\d$")){
 							subsc.SSN=subsc.SSN.Replace("-","");
 						}
