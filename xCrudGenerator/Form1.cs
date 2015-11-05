@@ -142,7 +142,7 @@ namespace xCrudGenerator {
 			else {
 				priKeyParam=priKey.Name.Substring(0,1).ToLower()+priKey.Name.Substring(1);//lowercase initial letter.  Example patNum
 			}
-			List<Permissions> listAuditTrailPerms=CrudGenHelper.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
+			List<Permissions> listAuditTrailPerms=GroupPermissions.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
 			string obj=typeClass.Name.Substring(0,1).ToLower()+typeClass.Name.Substring(1);//lowercase initial letter.  Example feeSched
 			string oldObj="old"+typeClass.Name;//used in the second update overload.  Example oldFeeSched
 			#endregion initialize variables

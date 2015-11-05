@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using CodeBase;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	public class DatabaseMaintenance {
@@ -4774,6 +4775,76 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		///<summary>This function will fix any FKey entries in securitylog that point to entries in other tables that have been deleted (orphaned FKeys).
+		///It uses reflection to find all tables using audit trail Fkey columns and their respective permissions.
+		///This method does not need to change even if more permissions are added.</summary>
+		[DbmMethod]
+		public static string SecurityLogInvalidFKey(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			long numFoundOrFixed=0;
+			Assembly assembly=Assembly.GetExecutingAssembly();
+			foreach(Type type in assembly.GetTypes()) {
+				if(type.Namespace!="OpenDentBusiness" || !type.IsClass) {
+					continue;
+				}
+				string tableName=type.Name.ToLower();
+				List<CrudTableAttribute> listCrudTableAttributes=type.GetCustomAttributes(typeof(CrudTableAttribute),true)
+					.Select(x => (CrudTableAttribute)x).ToList();
+				//Get audit trail permissions
+				if(listCrudTableAttributes.Count!=1 || listCrudTableAttributes[0].AuditPerms==CrudAuditPerm.None) {
+					continue;
+				}
+				List<Permissions> listPermissions=GroupPermissions.GetPermsFromCrudAuditPerm(listCrudTableAttributes[0].AuditPerms);
+				if(listPermissions.Count==0) {
+					//This error log is explicitly for Open Dental engineers and is purposefully not translated.
+					log+="Error: Permission not found in GetPermsFromCrudAuditPerm() for "+tableName+" \r\n";
+					continue;
+				}
+				//Make a comma delimited string of the int values of each permission for this class.
+				string permsCommaDelimStr=String.Join(",",listPermissions.Select(x => (int)x).ToList());
+				//Get the table type name from the type.
+				if(listCrudTableAttributes[0].TableName!="") {
+					tableName=listCrudTableAttributes[0].TableName;
+				}
+				//Get primary key column name
+				string priKeyColumnName="";
+				foreach(FieldInfo field in type.GetFields()) {
+					List<CrudColumnAttribute> listCrudColumnAttributes=field.GetCustomAttributes(typeof(CrudColumnAttribute),true)
+						.Select(x => (CrudColumnAttribute)x).ToList();
+					if(listCrudColumnAttributes.Count!=1 || !listCrudColumnAttributes[0].IsPriKey) {
+						continue;
+					}
+					priKeyColumnName=field.Name;
+					break;
+				}
+				if(priKeyColumnName=="") {
+					//This error log is explicitly for Open Dental engineers and is purposefully not translated.
+					log+="Error: Primary key attribute not found for table "+tableName+"\r\n";
+					continue;
+				}
+				if(isCheck) {
+					numFoundOrFixed+=GetCountForSecuritylogInvalidFKeys(permsCommaDelimStr,tableName,priKeyColumnName);
+				}
+				else {
+					numFoundOrFixed+=UpdateOrphanedSecuritylogInvalidKeys(permsCommaDelimStr,tableName,priKeyColumnName);
+				}
+			}
+			if(isCheck) {
+				if(numFoundOrFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Audit trail entries with invalid FKeys found")+": "+numFoundOrFixed.ToString()+"\r\n";
+				}
+			}
+			else{
+				if(numFoundOrFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Audit trail entries with invalid FKeys fixed")+": "+numFoundOrFixed.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		public static string SignalInFuture(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -5544,6 +5615,36 @@ HAVING cnt>1";
 			return true;
 		}
 
+		///<summary>Returns the number of invalid FKey entries for specified tableName, permissions, and primary key column.
+		///You MUST check remoting role before calling this method.  It is purposefully private and must remain so.</summary>
+		private static long GetCountForSecuritylogInvalidFKeys(string permsCommaDelimStr,string tableName,string priKeyColumnName) {
+			//No remoting role check; This is a private static method and those cannot be called from the middle tier.
+			command="SELECT COUNT(securitylog.SecurityLogNum) "
+					+"FROM securitylog "
+					+"WHERE securitylog.PermType IN ("+POut.String(permsCommaDelimStr)+") "
+					+"AND securitylog.FKey!=0 "
+					+"AND NOT EXISTS ( "
+						+"SELECT "+tableName+"."+priKeyColumnName+" "
+						+"FROM "+tableName+" "
+						+"WHERE "+tableName+"."+priKeyColumnName+"=securitylog.FKey "
+					+")";
+			return PIn.Long(Db.GetCount(command));
+		}
+
+		///<summary>Fixes orphaned FKey entries for specific tableName, permissions, and primary key column.
+		///Returns number of rows fixed.
+		///You MUST check remoting role before calling this method.  It is purposefully private and must remain so.</summary>
+		private static long UpdateOrphanedSecuritylogInvalidKeys(string permsCommaDelimStr,string tableName,string priKeyColumnName) {
+			command="UPDATE securitylog SET FKey=0 "
+					+"WHERE securitylog.PermType IN ("+POut.String(permsCommaDelimStr)+") "
+					+"AND securitylog.FKey!=0 "
+					+"AND NOT EXISTS ( "
+						+"SELECT "+tableName+"."+priKeyColumnName+" "
+						+"FROM "+tableName+" "
+						+"WHERE "+tableName+"."+priKeyColumnName+"=securitylog.FKey "
+					+")";
+			return Db.NonQ(command);
+		}
 
 	}
 

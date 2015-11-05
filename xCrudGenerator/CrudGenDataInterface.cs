@@ -68,7 +68,7 @@ namespace xCrudGenerator {
 						return GetEntireSclassMobile(typeClass.Name,obj,priKey1.Name,priKey2.Name,Sname,tablename,priKeyParam1,priKeyParam2);
 					}
 					else {
-						List<Permissions> listAuditTrailPerms=CrudGenHelper.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
+						List<Permissions> listAuditTrailPerms=GroupPermissions.GetPermsFromCrudAuditPerm(CrudGenHelper.GetCrudAuditPermForClass(typeClass));
 						return GetEntireSclass(typeClass.Name,obj,priKey.Name,Sname,tablename,priKeyParam,listAuditTrailPerms);
 					}
 				case SnippetType.CreateTable:
