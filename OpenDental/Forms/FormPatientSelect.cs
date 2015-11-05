@@ -861,13 +861,6 @@ namespace OpenDental{
 						break;
 					}
 				}*/
-				gridMain.SetSelected(false);
-				for(int i=0;i<PtDataTable.Rows.Count;i++){
-					if(PIn.Long(PtDataTable.Rows[i][0].ToString())==InitialPatNum) {
-						gridMain.SetSelected(i,true);
-						break;
-					}
-				}
 				return;
 			}
 			//Always fillGrid if _isPreFilledLoad.  Since the first name and last name are pre-filled, the results should be minimal.
@@ -1356,11 +1349,17 @@ namespace OpenDental{
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
+			if(_dateTimeLastSearch!=_dateTimeLastRequest) {
+				FillGrid(limit);//in case data was entered while thread was running.
+			}
 			gridMain.SetSelected(0,true);
-				if(_dateTimeLastSearch!=_dateTimeLastRequest) {
-					FillGrid(limit);//in case data was entered while thread was running.
+			for(int i=0;i<PtDataTable.Rows.Count;i++) {
+				if(PIn.Long(PtDataTable.Rows[i][0].ToString())==InitialPatNum) {
+					gridMain.SetSelected(i,true);
+					break;
+				}
+			}
 		}
-	}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			PatSelected();
