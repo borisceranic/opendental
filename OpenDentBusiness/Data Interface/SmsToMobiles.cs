@@ -242,7 +242,7 @@ namespace OpenDentBusiness{
 				return true;
 			}
 			//Should never happen, we didn't get an explicit fail or success
-			throw new Exception("Unkown error has occured.");
+			throw new Exception("Unknown error has occured.");
 		}
 
 	}

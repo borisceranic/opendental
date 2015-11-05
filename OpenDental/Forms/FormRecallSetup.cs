@@ -56,7 +56,7 @@ namespace OpenDental{
 		private TabPage tabConfirmationAutomation;
 		private ODGrid gridConfirmationRules;
 		private UI.Button butAdd;
-		private TabPage tabCommunicationSetup;
+		private TabPage tabReminderSetup;
 		private CheckBox checkSendAll;
 		private Label label7;
 		private Label label9;
@@ -71,7 +71,7 @@ namespace OpenDental{
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
 		private Label label16;
-		private TabPage tabPage1;
+		private TabPage tabAutomationSettings;
 		private GroupBox groupBox5;
 		private RadioButton radioSendToEmailNoPreferred;
 		private RadioButton radioSendToEmail;
@@ -159,7 +159,7 @@ namespace OpenDental{
 			this.tabConfirmationAutomation = new System.Windows.Forms.TabPage();
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridConfirmationRules = new OpenDental.UI.ODGrid();
-			this.tabCommunicationSetup = new System.Windows.Forms.TabPage();
+			this.tabReminderSetup = new System.Windows.Forms.TabPage();
 			this.label16 = new System.Windows.Forms.Label();
 			this.textHourMsg = new System.Windows.Forms.RichTextBox();
 			this.textDayMsg = new System.Windows.Forms.RichTextBox();
@@ -173,9 +173,10 @@ namespace OpenDental{
 			this.textHourInterval = new OpenDental.ValidNumber();
 			this.textDayInterval = new OpenDental.ValidNumber();
 			this.gridPriorities = new OpenDental.UI.ODGrid();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.tabAutomationSettings = new System.Windows.Forms.TabPage();
 			this.groupBox8 = new System.Windows.Forms.GroupBox();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.radioDoNotSend = new System.Windows.Forms.RadioButton();
 			this.radioSendToEmailOnlyPreferred = new System.Windows.Forms.RadioButton();
 			this.radioSendToEmailNoPreferred = new System.Windows.Forms.RadioButton();
 			this.radioSendToEmail = new System.Windows.Forms.RadioButton();
@@ -186,7 +187,6 @@ namespace OpenDental{
 			this.dateRunStart = new System.Windows.Forms.DateTimePicker();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
-			this.radioDoNotSend = new System.Windows.Forms.RadioButton();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -194,8 +194,8 @@ namespace OpenDental{
 			this.tabControlSetup.SuspendLayout();
 			this.tabRecallConfirmationSetup.SuspendLayout();
 			this.tabConfirmationAutomation.SuspendLayout();
-			this.tabCommunicationSetup.SuspendLayout();
-			this.tabPage1.SuspendLayout();
+			this.tabReminderSetup.SuspendLayout();
+			this.tabAutomationSettings.SuspendLayout();
 			this.groupBox8.SuspendLayout();
 			this.groupBox5.SuspendLayout();
 			this.groupBox7.SuspendLayout();
@@ -589,8 +589,8 @@ namespace OpenDental{
 			// 
 			this.tabControlSetup.Controls.Add(this.tabRecallConfirmationSetup);
 			this.tabControlSetup.Controls.Add(this.tabConfirmationAutomation);
-			this.tabControlSetup.Controls.Add(this.tabCommunicationSetup);
-			this.tabControlSetup.Controls.Add(this.tabPage1);
+			this.tabControlSetup.Controls.Add(this.tabReminderSetup);
+			this.tabControlSetup.Controls.Add(this.tabAutomationSettings);
 			this.tabControlSetup.Location = new System.Drawing.Point(12, 12);
 			this.tabControlSetup.Name = "tabControlSetup";
 			this.tabControlSetup.SelectedIndex = 0;
@@ -686,28 +686,28 @@ namespace OpenDental{
 			this.gridConfirmationRules.TranslationName = "TableConfirmationRules";
 			this.gridConfirmationRules.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridConfirmationRules_CellDoubleClick);
 			// 
-			// tabCommunicationSetup
+			// tabReminderSetup
 			// 
-			this.tabCommunicationSetup.Controls.Add(this.label16);
-			this.tabCommunicationSetup.Controls.Add(this.textHourMsg);
-			this.tabCommunicationSetup.Controls.Add(this.textDayMsg);
-			this.tabCommunicationSetup.Controls.Add(this.checkSendAll);
-			this.tabCommunicationSetup.Controls.Add(this.label7);
-			this.tabCommunicationSetup.Controls.Add(this.label9);
-			this.tabCommunicationSetup.Controls.Add(this.butDown);
-			this.tabCommunicationSetup.Controls.Add(this.butUp);
-			this.tabCommunicationSetup.Controls.Add(this.label10);
-			this.tabCommunicationSetup.Controls.Add(this.label11);
-			this.tabCommunicationSetup.Controls.Add(this.textHourInterval);
-			this.tabCommunicationSetup.Controls.Add(this.textDayInterval);
-			this.tabCommunicationSetup.Controls.Add(this.gridPriorities);
-			this.tabCommunicationSetup.Location = new System.Drawing.Point(4, 22);
-			this.tabCommunicationSetup.Name = "tabCommunicationSetup";
-			this.tabCommunicationSetup.Padding = new System.Windows.Forms.Padding(3);
-			this.tabCommunicationSetup.Size = new System.Drawing.Size(942, 615);
-			this.tabCommunicationSetup.TabIndex = 2;
-			this.tabCommunicationSetup.Text = "Appt Communication";
-			this.tabCommunicationSetup.UseVisualStyleBackColor = true;
+			this.tabReminderSetup.Controls.Add(this.label16);
+			this.tabReminderSetup.Controls.Add(this.textHourMsg);
+			this.tabReminderSetup.Controls.Add(this.textDayMsg);
+			this.tabReminderSetup.Controls.Add(this.checkSendAll);
+			this.tabReminderSetup.Controls.Add(this.label7);
+			this.tabReminderSetup.Controls.Add(this.label9);
+			this.tabReminderSetup.Controls.Add(this.butDown);
+			this.tabReminderSetup.Controls.Add(this.butUp);
+			this.tabReminderSetup.Controls.Add(this.label10);
+			this.tabReminderSetup.Controls.Add(this.label11);
+			this.tabReminderSetup.Controls.Add(this.textHourInterval);
+			this.tabReminderSetup.Controls.Add(this.textDayInterval);
+			this.tabReminderSetup.Controls.Add(this.gridPriorities);
+			this.tabReminderSetup.Location = new System.Drawing.Point(4, 22);
+			this.tabReminderSetup.Name = "tabReminderSetup";
+			this.tabReminderSetup.Padding = new System.Windows.Forms.Padding(3);
+			this.tabReminderSetup.Size = new System.Drawing.Size(942, 615);
+			this.tabReminderSetup.TabIndex = 2;
+			this.tabReminderSetup.Text = "Appt Reminder";
+			this.tabReminderSetup.UseVisualStyleBackColor = true;
 			// 
 			// label16
 			// 
@@ -798,7 +798,7 @@ namespace OpenDental{
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(100, 23);
 			this.label10.TabIndex = 15;
-			this.label10.Text = "Hour Interval";
+			this.label10.Text = "Hours Prior";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label11
@@ -807,7 +807,7 @@ namespace OpenDental{
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(100, 23);
 			this.label11.TabIndex = 14;
-			this.label11.Text = "Day Interval";
+			this.label11.Text = "Days Prior";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// textHourInterval
@@ -839,20 +839,20 @@ namespace OpenDental{
 			this.gridPriorities.ScrollValue = 0;
 			this.gridPriorities.Size = new System.Drawing.Size(413, 294);
 			this.gridPriorities.TabIndex = 68;
-			this.gridPriorities.Title = "Communication Priorities";
+			this.gridPriorities.Title = "Reminder Priorities";
 			this.gridPriorities.TranslationName = null;
 			// 
-			// tabPage1
+			// tabAutomationSettings
 			// 
-			this.tabPage1.Controls.Add(this.groupBox8);
-			this.tabPage1.Controls.Add(this.groupBox7);
-			this.tabPage1.Location = new System.Drawing.Point(4, 22);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(942, 615);
-			this.tabPage1.TabIndex = 3;
-			this.tabPage1.Text = "Automation Settings";
-			this.tabPage1.UseVisualStyleBackColor = true;
+			this.tabAutomationSettings.Controls.Add(this.groupBox8);
+			this.tabAutomationSettings.Controls.Add(this.groupBox7);
+			this.tabAutomationSettings.Location = new System.Drawing.Point(4, 22);
+			this.tabAutomationSettings.Name = "tabAutomationSettings";
+			this.tabAutomationSettings.Padding = new System.Windows.Forms.Padding(3);
+			this.tabAutomationSettings.Size = new System.Drawing.Size(942, 615);
+			this.tabAutomationSettings.TabIndex = 3;
+			this.tabAutomationSettings.Text = "Automation Settings";
+			this.tabAutomationSettings.UseVisualStyleBackColor = true;
 			// 
 			// groupBox8
 			// 
@@ -876,6 +876,15 @@ namespace OpenDental{
 			this.groupBox5.TabIndex = 73;
 			this.groupBox5.TabStop = false;
 			this.groupBox5.Text = "Send Automatically To";
+			// 
+			// radioDoNotSend
+			// 
+			this.radioDoNotSend.Location = new System.Drawing.Point(7, 16);
+			this.radioDoNotSend.Name = "radioDoNotSend";
+			this.radioDoNotSend.Size = new System.Drawing.Size(438, 18);
+			this.radioDoNotSend.TabIndex = 77;
+			this.radioDoNotSend.Text = "Do Not Send";
+			this.radioDoNotSend.UseVisualStyleBackColor = true;
 			// 
 			// radioSendToEmailOnlyPreferred
 			// 
@@ -975,15 +984,6 @@ namespace OpenDental{
 			this.label18.TabIndex = 4;
 			this.label18.Text = "Start";
 			// 
-			// radioDoNotSend
-			// 
-			this.radioDoNotSend.Location = new System.Drawing.Point(7, 16);
-			this.radioDoNotSend.Name = "radioDoNotSend";
-			this.radioDoNotSend.Size = new System.Drawing.Size(438, 18);
-			this.radioDoNotSend.TabIndex = 77;
-			this.radioDoNotSend.Text = "Do Not Send";
-			this.radioDoNotSend.UseVisualStyleBackColor = true;
-			// 
 			// FormRecallSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1012,9 +1012,9 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup.ResumeLayout(false);
 			this.tabRecallConfirmationSetup.PerformLayout();
 			this.tabConfirmationAutomation.ResumeLayout(false);
-			this.tabCommunicationSetup.ResumeLayout(false);
-			this.tabCommunicationSetup.PerformLayout();
-			this.tabPage1.ResumeLayout(false);
+			this.tabReminderSetup.ResumeLayout(false);
+			this.tabReminderSetup.PerformLayout();
+			this.tabAutomationSettings.ResumeLayout(false);
 			this.groupBox8.ResumeLayout(false);
 			this.groupBox5.ResumeLayout(false);
 			this.groupBox7.ResumeLayout(false);
@@ -1416,7 +1416,7 @@ namespace OpenDental{
 
 		#endregion
 
-		#region Appt Communication Setup
+		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
 			textDayInterval.Text=PrefC.GetString(PrefName.ApptReminderDayInterval);
@@ -1479,7 +1479,7 @@ namespace OpenDental{
 			gridPriorities.SetSelected(selectedIdx+1,true);
 		}
 
-		#endregion ApptCommunication Setup
+		#endregion Appt Reminder Setup
 
 		#region Automation Settings
 		private void FillAutomationTab() {

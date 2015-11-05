@@ -62,39 +62,73 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Creates two ApptComm items, one to send using dayInterval, and one to send using hourInterval.</summary>
+		public static void InsertForAppt(Appointment appt) {
+			int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
+			ApptComm apptComm;
+			DateTime daySend=appt.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+			//This prevents a UE while pre-inserting new appointments and prevents adding reminder if the interval can't be reached.
+			if(dayInterval > 0 && appt.AptNum!=0 && daySend > DateTime.Now) {
+				apptComm=new ApptComm();
+				apptComm.ApptNum=appt.AptNum;
+				apptComm.ApptCommType=IntervalType.Daily;
+				apptComm.DateTimeSend=daySend;//Setting the ApptComm reminder to be sent dayInterval days before the appt.
+				ApptComms.Insert(apptComm);
+			}
+			int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
+			DateTime hourSend=appt.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+			if(hourInterval > 0 && appt.AptNum!=0 && hourSend > DateTime.Now) {//This prevents a UE while pre-inserting new appointments.
+				apptComm=new ApptComm();
+				apptComm.ApptNum=appt.AptNum;
+				apptComm.ApptCommType=IntervalType.Hourly;
+				apptComm.DateTimeSend=hourSend;//Setting the ApptComm reminder to be sent hourInterval hours before the appt.
+				ApptComms.Insert(apptComm);
+			}
+		}
+
+		///<summary>First deletes then re-inserts ApptComm items for an appointment that has been moved.</summary>
+		public static void UpdateForAppt(Appointment appt) {
+			DeleteForAppt(appt.AptNum);
+			if(appt.AptDateTime > DateTime.Now) {//Prevents UE's when updating pre-inserted appointments with no scheduled time as well as appointments updated that were in the past.
+				InsertForAppt(appt);
+			}
+		}
+
 		///<summary>Send Appointment reminders for all ApptComm items.</summary>
 		public static string SendReminders() {
 			List<ApptComm> listApptComms=GetAll();
 			int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
 			int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
 			string errorText="";
-			for(int i=0;i<listApptComms.Count;i++) {
-				if(listApptComms[i].ApptCommType==IntervalType.Daily && (DateTime.Now-listApptComms[i].DateTimeSend).Days<0) {
+			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.
+				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).Days > 0) {
 					continue;//It's not currently enough days prior to the appointment to send a reminder.
 				}
-				if(listApptComms[i].ApptCommType==IntervalType.Hourly && (DateTime.Now-listApptComms[i].DateTimeSend).Hours<0) {
-					continue;//It's the correct number of days but current hour isn't in the time interval.
+				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).Hours > 0) {
+					continue;//It's not the correct number of hours prior to the appointment to send a reminder.
 				}
-				if(listApptComms[i].DateTimeSend<(DateTime.Now-TimeSpan.FromDays(1))) {//Entries in the past.  Delete?  This shouldn't happen.  If we don't delete they'll be sent.  Maybe one day in the past is safe to delete?
-					Delete(listApptComms[i].ApptCommNum);
+				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 20 minutes leeway was deemed enough to 
+				//catch edge cases.  If the DateTime the apptComm was supposed to be sent is older than 20 minutes ago, just delete it.
+				if(apptComm.DateTimeSend < (DateTime.Now-new TimeSpan(0,20,0))) {
+					Delete(apptComm.ApptCommNum);
 					continue;
 				}
 				//It's within the correct day interval and within the correct hour interval, time to send a reminder.
 				bool sendAll=PrefC.GetBool(PrefName.ApptReminderSendAll);
 				string[] arraySendPriorities=PrefC.GetString(PrefName.ApptReminderSendOrder).Split(',');
-				Appointment appt=Appointments.GetOneApt(listApptComms[i].ApptNum);
+				Appointment appt=Appointments.GetOneApt(apptComm.ApptNum);
 				Family family=Patients.GetFamily(appt.PatNum);
 				Patient pat=family.GetPatient(appt.PatNum);
 				if(sendAll) {
 					//Attempt to send both email and text reminder no matter what.
 					//First we'll attempt to send via email.
-					string emailError=SendEmail(pat,family,appt,dayInterval,hourInterval);
+					string emailError=SendEmail(pat,family,appt,apptComm.ApptCommType);
 					if(emailError=="") {
 						Commlog comm=new Commlog();
 						comm.Mode_=CommItemMode.Email;
 						comm.CommDateTime=DateTime.Now;
-						comm.CommSource=CommItemSource.User;
-						comm.Note=Lans.g("ApptComms","Appointment reminder emailed.");
+						comm.CommSource=CommItemSource.ApptReminder;
+						comm.Note=Lans.g("ApptComms","Appointment reminder emailed for appointment on"+" "+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
@@ -102,52 +136,52 @@ namespace OpenDentBusiness{
 					}
 					errorText+=emailError;
 					//Second we'll attempt to send via text.
-					string textError=SendText(pat,family,appt,dayInterval,hourInterval);		
+					string textError=SendText(pat,family,appt,apptComm.ApptCommType);		
 					if(textError=="") {
 						Commlog comm=new Commlog();
 						comm.Mode_=CommItemMode.Text;
 						comm.CommDateTime=DateTime.Now;
-						comm.CommSource=CommItemSource.User;
-						comm.Note=Lans.g("ApptComms","Appointment reminder texted.");
+						comm.CommSource=CommItemSource.ApptReminder;
+						comm.Note=Lans.g("ApptComms","Appointment reminder texted for appointment on"+" "+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
 						Commlogs.Insert(comm);
 					}
 					errorText+=textError;
-					if(errorText=="") {//If both are successful, delete.  I think perhaps we can delete if even only one is successful, but that's an executive decision.
-						Delete(listApptComms[i].ApptCommNum);
+					if(emailError=="" || textError=="") {//If either are successful, delete.
+						Delete(apptComm.ApptCommNum);
 					}
 				}
 				else {
 					//Attempt to send reminders based on the priority of email/text/preferred.  Only attempt other methods if the previous priority failed. 
  					Commlog comm=new Commlog();
-					for(int j=0;j<arraySendPriorities.Length;i++) {
+					for(int i=0;i<arraySendPriorities.Length;i++) {
 						CommType priority=(CommType)PIn.Int(arraySendPriorities[i]);
 						string error="";
 						if(priority==CommType.Preferred) {
 							if(pat.PreferContactMethod==ContactMethod.Email) {
-								error=SendEmail(pat,family,appt,dayInterval,hourInterval);
+								error=SendEmail(pat,family,appt,apptComm.ApptCommType);
 								comm.Mode_=CommItemMode.Email;
 							}
 							else if(pat.PreferContactMethod==ContactMethod.TextMessage) {
-								error=SendText(pat,family,appt,dayInterval,hourInterval);
+								error=SendText(pat,family,appt,apptComm.ApptCommType);
 								comm.Mode_=CommItemMode.Text;
 							}
 						}
 						if(priority==CommType.Email) {
-							error=SendEmail(pat,family,appt,dayInterval,hourInterval);
+							error=SendEmail(pat,family,appt,apptComm.ApptCommType);
 							comm.Mode_=CommItemMode.Email;
 						}
 						if(priority==CommType.Text) {
-							error=SendText(pat,family,appt,dayInterval,hourInterval);
+							error=SendText(pat,family,appt,apptComm.ApptCommType);
 							comm.Mode_=CommItemMode.Text;
 						}
 						if(error=="") {
 							Delete(listApptComms[i].ApptCommNum);
 							comm.CommDateTime=DateTime.Now;
-							comm.CommSource=CommItemSource.User;
-							comm.Note=Lans.g("ApptComms","Appointment reminder sent.");
+							comm.CommSource=CommItemSource.ApptReminder;
+							comm.Note=Lans.g("ApptComms","Appointment reminder sent for appointment on"+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
 							comm.PatNum=pat.PatNum;
 							comm.SentOrReceived=CommSentOrReceived.Sent;
 							comm.UserNum=0;
@@ -163,8 +197,21 @@ namespace OpenDentBusiness{
 			return errorText;
 		}
 
-		///<summary>Helper function for SendReminders.</summary>
-		private static string SendEmail(Patient pat,Family fam,Appointment appt,int dayInterval,int hourInterval) {
+		///<summary>Generates text by replacing variable strings (such as [nameF]) with their corresponding parts.</summary>
+		private static string GenerateText(string text,Patient pat,Appointment appt) {
+			text=text.Replace("[title]",pat.Title);
+			text=text.Replace("[nameF]",pat.GetNameFirst());//includes preferred.  Not sure I like this.
+			text=text.Replace("[nameL]",pat.LName);
+			text=text.Replace("[nameFLnoPref]",pat.GetNameFLnoPref());//Not sure how to handle the preferred.  Statements do it this way. ex. Statements line 320
+			text=text.Replace("[nameFL]",pat.GetNameFL());
+			text=text.Replace("[namePref]",pat.Preferred);
+			text=text.Replace("[apptDate]",appt.AptDateTime.ToShortDateString());//Do we want to put logic in here to do "ask time arrive" instead of normal aptdatetime?
+			text=text.Replace("[apptTime]",appt.AptDateTime.ToShortTimeString());
+			return text;
+		}
+
+		///<summary>Helper function for SendReminders.  Sends an email with the requisite fields.</summary>
+		private static string SendEmail(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
 			string patEmail=pat.Email;
 			if(patEmail=="") {
 				patEmail=fam.ListPats[0].Email;
@@ -177,17 +224,16 @@ namespace OpenDentBusiness{
 			emailMessage.PatNumSubj=pat.PatNum;
 			emailMessage.ToAddress=patEmail;
 			emailMessage.Subject="Appointment Reminder";
+			emailMessage.CcAddress="";
+			emailMessage.BccAddress="";
 			//Determine if we should use the day or hour message.
 			//Amount of time until the appointment.
-			if((appt.AptDateTime-DateTime.Now).Days < dayInterval && (appt.AptDateTime=DateTime.Now).Hour <= hourInterval) { //Same day and correct hour
-				//now - send date = amount of time past when it should be sent.  If it's the same day and it should be sent now or previously
-				emailMessage.BodyText=PrefC.GetString(PrefName.ApptReminderHourMessage);
+			if(intervalType==IntervalType.Hourly) {
+				emailMessage.BodyText=GenerateText(PrefC.GetString(PrefName.ApptReminderHourMessage),pat,appt);
 			}
 			else {
-				emailMessage.BodyText=PrefC.GetString(PrefName.ApptReminderDayMessage);
+				emailMessage.BodyText=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
-			//"This is a reminder that you have an appointment on "+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString();
-			//Probably need more, this is my best guess right now.
 			EmailAddress emailAddress;
 			if(PrefC.HasClinicsEnabled) {
 				emailAddress=EmailAddresses.GetByClinic(pat.ClinicNum);
@@ -195,6 +241,7 @@ namespace OpenDentBusiness{
 			else {
 				emailAddress=EmailAddresses.GetByClinic(0);
 			}
+			emailMessage.FromAddress=emailAddress.SenderAddress;
 			try {
 				EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
 			}
@@ -204,13 +251,15 @@ namespace OpenDentBusiness{
 			return errorText;
 		}
 
-		///<summary>Helper function for SendReminders.</summary>
-		private static string SendText(Patient pat,Family fam,Appointment appt,int dayInterval,int hourInterval) {
+		///<summary>Helper function for SendReminders.  Sends a text message with the requisite fields.</summary>
+		private static string SendText(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
 			string errorText="";
 			string patPhone=pat.WirelessPhone;
-			if(pat.TxtMsgOk==YN.No || patPhone=="") {//If it's marked as No perhaps we should just stop here and not get the guarantor's info.
+			bool txtUnknownIsNo=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
+			//If texting is marked as no, the phone is blank, or unknown are treated as no, look for guarantor texting status.
+			if(pat.TxtMsgOk==YN.No || patPhone=="" || (pat.TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
 				patPhone=fam.ListPats[0].WirelessPhone;
-				if(fam.ListPats[0].TxtMsgOk==YN.No) {
+				if(fam.ListPats[0].TxtMsgOk==YN.No || (fam.ListPats[0].TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
 					patPhone="";
 				}
 			}
@@ -218,11 +267,11 @@ namespace OpenDentBusiness{
 				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts.");
 			}
 			string textMsg;
-			if((appt.AptDateTime-DateTime.Now).Days < dayInterval && (appt.AptDateTime=DateTime.Now).Hour <= hourInterval) { //Same day and correct hour
-				textMsg=PrefC.GetString(PrefName.ApptReminderHourMessage);
+			if(intervalType==IntervalType.Hourly) {
+				textMsg=GenerateText(PrefC.GetString(PrefName.ApptReminderHourMessage),pat,appt);
 			}
 			else {
-				textMsg=PrefC.GetString(PrefName.ApptReminderDayMessage);
+				textMsg=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
 			try {
 				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,textMsg,Clinics.ClinicNum);

@@ -312,6 +312,7 @@ namespace OpenDentBusiness{
 				List<Provider> listProvs=ProviderC.GetListShort();
 				appt.ProvNum=listProvs[0].ProvNum;
 			}
+			ApptComms.InsertForAppt(appt);
 			return Crud.AppointmentCrud.Insert(appt,useExistingPK);
 		}
 
@@ -321,6 +322,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),appointment,oldAppointment);
 				return;
 			}
+			ApptComms.UpdateForAppt(appointment);
 			Crud.AppointmentCrud.Update(appointment,oldAppointment);
 		}
 
@@ -583,6 +585,9 @@ namespace OpenDentBusiness{
 			}
 			string command="UPDATE appointment SET AptStatus="+POut.Long((int)newStatus)
 				+" WHERE AptNum="+POut.Long(aptNum);
+			if(newStatus!=ApptStatus.Scheduled) {
+				ApptComms.DeleteForAppt(aptNum);//Delete the automated reminder if it was unscheduled.
+			}
 			Db.NonQ(command);
 		}
 
@@ -1820,7 +1825,8 @@ namespace OpenDentBusiness{
 		///Deletes any rows in the plannedappt table with this AptNum.
 		///Updates appointment.NextAptNum (for planned apts) of any apt pointing to this planned apt; sets to 0;
 		///Deletes any rows in the apptfield table with this AptNum.
-		///Makes an entry in the deletedobject table.</summary>
+		///Makes an entry in the deletedobject table.
+		///Deletes ApptComm entries that were created for this appointment.</summary>
 		public static void Delete(long aptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),aptNum);
@@ -1870,6 +1876,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			//we will not reset item orders here
 			command="DELETE FROM appointment WHERE AptNum = "+POut.Long(aptNum);
+			ApptComms.DeleteForAppt(aptNum);
 			Db.NonQ(command);
 			DeletedObjects.SetDeleted(DeletedObjectType.Appointment,aptNum);
 		}
@@ -2353,7 +2360,8 @@ namespace OpenDentBusiness{
 			return listProcs;
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  It doesn't create any ApptComm items, but it will delete ApptComm items.
+		///If you use Sync, you need to create new Apptcomm items.</summary>
 		public static void Sync(List<Appointment> listNew,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum);

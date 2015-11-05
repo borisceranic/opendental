@@ -118,13 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label16.Text" xml:space="preserve">
-    <value>These variables can be used in the message boxes and will use the patient's information when sending the communication: 
+    <value>These variables can be used in the message boxes and will use the patient's information when sending the reminder: 
 
      [nameF]
      [nameL]
      [nameFL]
      [nameFLnoPref]
      [namePref]
+     [title]
      [apptDate]
      [apptTime]
 </value>

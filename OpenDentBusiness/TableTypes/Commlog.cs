@@ -82,7 +82,9 @@ namespace OpenDentBusiness{
 		///<summary>1</summary>
 		WebSched,
 		///<summary>2</summary>
-		ProgramLink
+		ProgramLink,
+		///<summary>3</summary>
+		ApptReminder
 	}
 
 
