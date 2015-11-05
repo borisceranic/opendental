@@ -339,8 +339,10 @@ namespace OpenDentBusiness{
 				return Meth.GetDouble(MethodBase.GetCurrentMethod(),clinicNum);
 			}
 			double limit=0;
-			if(PrefC.GetBool(PrefName.EasyNoClinics) && PrefC.GetDate(PrefName.SmsContractDate).Year>1880) {
-				limit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
+			if(PrefC.GetBool(PrefName.EasyNoClinics)){
+				if(PrefC.GetDate(PrefName.SmsContractDate).Year>1880) {
+					limit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
+				}
 			}
 			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880) {
 				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;
