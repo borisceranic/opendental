@@ -11151,6 +11151,16 @@ namespace OpenDentBusiness {
 							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",102)";//MedicationMerge
 						Db.NonQ(command);
 					}
+				}
+				//Set the to the language and region of the computer running the update.
+				string languageAndRegion=CultureInfo.CurrentCulture.Name;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('LanguageAndRegion','"+POut.String(languageAndRegion)+"')";//default to blank, will be set when first connected.
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LanguageAndRegion','"+POut.String(languageAndRegion)+"')";
+					Db.NonQ(command);
 				} 
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE computerpref ADD NoShowLanguage tinyint NOT NULL";
@@ -11163,7 +11173,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE computerpref MODIFY NoShowLanguage NOT NULL";
 					Db.NonQ(command);
-				}
+				} 
 				
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -11176,6 +11186,7 @@ namespace OpenDentBusiness {
 
 	}
 }
+
 
 
 
