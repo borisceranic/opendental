@@ -321,6 +321,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM disease WHERE DiseaseDefNum="+POut.Long(PrefC.GetLong(PrefName.ProblemsIndicateNone))+" "
 						+"AND ProbStatus=0 GROUP BY PatNum) problemsNone ON problemsNone.PatNum=A.PatNum "
@@ -339,6 +341,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum	AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM medicationpat "
 						+"WHERE MedicationNum="+POut.Long(PrefC.GetLong(PrefName.MedicationsIndicateNone))+" "
@@ -368,6 +372,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum	AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM allergy	"
 						+"WHERE AllergyDefNum="+POut.Long(PrefC.GetLong(PrefName.AllergiesIndicateNone))+" AND StatusIsActive=1 "
@@ -401,6 +407,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN(SELECT PatNum, 1 AS HasRace FROM patientrace "
 						+"WHERE patientrace.Race IN( "
 						+POut.Int((int)PatRace.AfricanAmerican)+","
@@ -440,6 +448,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.EducationProvided)+" "
@@ -455,6 +465,8 @@ namespace OpenDentBusiness{
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as dateProvided FROM ehrmeasureevent "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.OnlineAccessProvided)+") "
 						+"OnlineAccess ON patient.PatNum=OnlineAccess.PatNum "
 						+"GROUP BY patient.PatNum";
@@ -478,8 +490,10 @@ namespace OpenDentBusiness{
 					//get all patients who have been seen during the period, along with the most recent visit date during the period
 					command="INSERT INTO tempehrmeasure"+rndStr+" (PatNum,LName,FName,lastVisitDate) SELECT patient.PatNum,LName,FName, "
 						+"MAX(procedurelog.ProcDate) "
-						+"FROM patient,procedurelog "
+						+"FROM patient,procedurelog,procedurecode "
 						+"WHERE patient.PatNum=procedurelog.PatNum "
+						+"AND procedurelog.CodeNum=procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"AND procedurelog.ProcStatus=2 "//complete
 						//+"AND procedurelog.ProvNum="+POut.Long(provNum)+" "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
@@ -537,6 +551,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"INNER JOIN medicationpat ON medicationpat.PatNum=patient.PatNum "
 						+"AND MedicationNum!="+POut.Long(PrefC.GetLong(PrefName.MedicationsIndicateNone))+" "
 						+"GROUP BY patient.PatNum) allpats "//allpats seen by provider in date range with medication in med list that is not the 'None' medication
@@ -568,6 +584,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"INNER JOIN medicationpat ON medicationpat.PatNum=patient.PatNum "
 						+"AND medicationpat.MedicationNum=0 ";//MedicationNum is 0 when creating an Rx either manually or through NewCrop.  MedicationNum is not 0 when manually added through the medical window.
 					//this next join limits to only patients for whom the provider has previously ordered medications
@@ -622,6 +640,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE patient.Birthdate <= "+POut.Date(DateTime.Today.AddYears(-2))+" "//2 and older
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign	WHERE Height>0 AND Weight>0 GROUP BY PatNum) hwCount ON hwCount.PatNum=A.PatNum "
@@ -639,6 +659,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign	WHERE Height>0 AND Weight>0 GROUP BY PatNum) hwCount ON hwCount.PatNum=A.PatNum "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign WHERE BpSystolic>0 AND BpDiastolic>0 GROUP BY PatNum) bpCount ON bpCount.PatNum=A.PatNum";
@@ -652,6 +674,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign	WHERE Height>0 AND Weight>0 GROUP BY PatNum) hwCount ON hwCount.PatNum=A.PatNum ";
 					tableRaw=Db.GetTable(command);
@@ -664,6 +688,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 						+"AND procedurelog.ProcStatus=2	AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN vitalsign ON vitalsign.PatNum=patient.PatNum AND BpSystolic!=0 AND BpDiastolic!=0 "
 						+"GROUP BY patient.PatNum "
 						+"HAVING Birthdate<=MAX(ProcDate)-INTERVAL 3 YEAR ";//only include in results if over 3 yrs old at date of last visit
@@ -686,6 +712,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE patient.Birthdate <= "+POut.Date(DateTime.Today.AddYears(-13))+" "//13 and older
 						+"GROUP BY patient.PatNum";
 					tableRaw=Db.GetTable(command);
@@ -821,6 +849,8 @@ namespace OpenDentBusiness{
 								+"SELECT patient.PatNum,LName,FName,ProcDate AS visitDate, "
 								+"(CASE WHEN DAYOFWEEK(ProcDate) IN (4,5,6) THEN "+DbHelper.DateAddDay("ProcDate","5") +" ELSE "+DbHelper.DateAddDay("ProcDate","3")+" END) AS 'DeadlineDate' "
 								+"FROM procedurelog "
+								+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+								+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 								+"LEFT JOIN patient ON patient.PatNum=procedurelog.PatNum "
 								+"WHERE ProcDate >= "+POut.Date(dateStart)+" "
 								+"AND ProcDate <= "+POut.Date(dateEnd)+" "
@@ -865,6 +895,8 @@ namespace OpenDentBusiness{
 					command="SELECT patient.PatNum,LName,FName,COALESCE(reminderCount.Count,0) AS reminderCount FROM patient "
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 						+"AND ProcStatus=2 AND ProcDate>"+POut.Date(dateStart)+"-INTERVAL 3 YEAR "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum,COUNT(*) AS 'Count' FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.ReminderSent)+" "
 						+"AND DATE(ehrmeasureevent.DateTEvent) BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
@@ -917,6 +949,8 @@ namespace OpenDentBusiness{
 								+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 								+"AND ProcStatus=2 AND ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 								+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
+								+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+								+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 								+"GROUP BY patient.PatNum) ptsSeen "
 							+"INNER JOIN refattach ON ptsSeen.PatNum=refattach.PatNum "
 							+"AND RefDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
@@ -1553,6 +1587,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum	AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"INNER JOIN medicalorder ON A.PatNum=medicalorder.PatNum "
 						+"AND MedOrderType="+POut.Int((int)MedicalOrderType.Laboratory)+" "
@@ -1565,6 +1601,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum	AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					//left join allergies with DateTStamp within reporting period
 					command+="LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM allergy "
@@ -1605,6 +1643,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -1617,6 +1657,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -1625,7 +1667,9 @@ namespace OpenDentBusiness{
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
-						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
+						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
 				#region Reminders
@@ -1639,6 +1683,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -2832,6 +2878,7 @@ namespace OpenDentBusiness{
 						command+="SELECT patient.PatNum,patient.LName,patient.FName,procedurelog.IsCpoe,procedurelog.DateEntryC,'' as LoincCode "
 						+"FROM procedurelog "
 						+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN patient ON procedurelog.PatNum=patient.PatNum "
 						+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 						+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
@@ -2867,6 +2914,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN(SELECT PatNum, 1 AS HasRace FROM patientrace "
 						+"WHERE patientrace.Race IN( "
 						+POut.Int((int)PatRace.AfricanAmerican)+","
@@ -2899,6 +2948,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign	WHERE Height>0 AND Weight>0 GROUP BY PatNum) hwCount ON hwCount.PatNum=A.PatNum "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign WHERE BpSystolic>0 AND BpDiastolic>0 GROUP BY PatNum) bpCount ON bpCount.PatNum=A.PatNum";
@@ -2912,6 +2963,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM vitalsign	WHERE Height>0 AND Weight>0 GROUP BY PatNum) hwCount ON hwCount.PatNum=A.PatNum ";
 					tableRaw=Db.GetTable(command);
@@ -2924,6 +2977,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 						+"AND procedurelog.ProcStatus=2	AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN vitalsign ON vitalsign.PatNum=patient.PatNum AND BpSystolic!=0 AND BpDiastolic!=0 "
 						+"GROUP BY patient.PatNum "
 						+"HAVING Birthdate<=MAX(ProcDate)-INTERVAL 3 YEAR ";//only include in results if over 3 yrs old at date of last visit
@@ -2936,7 +2991,9 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+") "
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
-						+"AND patient.Birthdate <= "+POut.Date(DateTime.Today.AddYears(-13))+" "//13 and older
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
+						+"WHERE patient.Birthdate <= "+POut.Date(DateTime.Today.AddYears(-13))+" "//13 and older
 						+"GROUP BY patient.PatNum";
 					tableRaw=Db.GetTable(command);
 					break;
@@ -2948,6 +3005,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as dateProvided FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.OnlineAccessProvided)+") "
 						+"OnlineAccess ON patient.PatNum=OnlineAccess.PatNum "
@@ -2962,6 +3021,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, MIN(ehrmeasureevent.DateTEvent) as dateRequested FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.ElectronicCopyRequested)+" "
 						+"GROUP BY patnum) "
@@ -2977,6 +3038,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as summaryProvided FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.ClinicalSummaryProvidedToPt)+") "
 					  +"ClinSum ON patient.PatNum=ClinSum.PatNum "
@@ -3018,7 +3081,10 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.Reminders:
 					command="SELECT patient.PatNum,LName,FName,COALESCE(reminderCount.Count,0) AS reminderCount FROM patient "
 						+"INNER JOIN(SELECT PatNum FROM ( "
-						+"SELECT PatNum, ProcDate FROM procedurelog WHERE ProcStatus=2 "
+						+"SELECT PatNum, ProcDate FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
+						+"WHERE ProcStatus="+POut.Int((int)ProcStat.C)+" "
 						+"AND ProcDate>"+POut.Date(dateStart)+"-INTERVAL 2 YEAR "
 						+"AND ProcDate<"+POut.Date(dateStart)+" GROUP BY PatNum,ProcDate) uniqueprocdates "
 						+"GROUP BY uniqueprocdates.PatNum HAVING COUNT(*)>1) procscomplete ON procscomplete.PatNum=patient.PatNum "
@@ -3040,6 +3106,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A "
 						+"LEFT JOIN (SELECT PatNum,COUNT(*) AS 'Count' FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.EducationProvided)+" "
@@ -3055,6 +3123,8 @@ namespace OpenDentBusiness{
 								+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 								+"AND ProcStatus=2 AND ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 								+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
+								+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+								+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 								+"GROUP BY patient.PatNum) ptsSeen "
 							+"INNER JOIN refattach ON ptsSeen.PatNum=refattach.PatNum "
 							+"AND RefDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
@@ -3114,7 +3184,10 @@ namespace OpenDentBusiness{
 						+"FROM patient "
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
-						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" GROUP BY procedurelog.PatNum) A "
+						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
+						+" GROUP BY procedurelog.PatNum) A "
 						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as secureMessageRead FROM ehrmeasureevent "
 						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.SecureMessageFromPat)+" GROUP BY ehrmeasureevent.PatNum) "
 						+"SecureMessage ON a.PatNum=SecureMessage.PatNum "
@@ -3129,6 +3202,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) AS UniquePatsAndProcs "
 						+"LEFT JOIN familyhealth ON UniquePatsAndProcs.PatNum=familyhealth.PatNum "
 						+"GROUP BY UniquePatsAndProcs.PatNum";
@@ -3145,11 +3220,15 @@ namespace OpenDentBusiness{
 								+"AND procedurelog.ProcStatus=2 "
 								+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 								+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+							+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+								+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 							+"GROUP BY patient.PatNum "
 						+") AS uniquepatseen "
 						+"LEFT JOIN ( "
 							+"SELECT procedurelog.PatNum, SUM((CASE WHEN ISNULL(procnotesigned.ProcNoteNum) THEN 0 ELSE 1 END)) AS NumNotes "
 							+"FROM procedurelog "
+							+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+								+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 							+"LEFT JOIN ( "
 								+"SELECT procnote.PatNum,procnote.ProcNum, procnote.ProcNoteNum "
 								+"FROM procnote "
@@ -3770,6 +3849,7 @@ namespace OpenDentBusiness{
 						command="SELECT COUNT(*) AS 'Count' "
 							+"FROM procedurelog "
 							+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum AND procedurecode.IsRadiology=1 "
+							+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 							+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 							+"AND procedurelog.ProvNum IN ("+POut.String(provs)+") "
 							+"AND procedurelog.DateEntryC BETWEEN "+dateStartStr+" AND "+POut.Date(dateEnd);
@@ -3798,6 +3878,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -3813,6 +3895,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -3824,6 +3908,8 @@ namespace OpenDentBusiness{
 						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
 						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"GROUP BY patient.PatNum) A ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -3839,6 +3925,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.ClinicalSummaries:
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
 					return retval=PIn.Int(Db.GetScalar(command));
@@ -3858,6 +3946,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.Reminders:
 					//Excluded if Provider has had no office visits in the 24 months before the EHR reporting period.
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart.AddMonths(-24))+" AND "+POut.Date(dateStart)+" ";
 					return retval=PIn.Int(Db.GetScalar(command));
@@ -3866,6 +3956,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.Education:
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
 					return retval=PIn.Int(Db.GetScalar(command));
@@ -3896,6 +3988,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.SecureMessaging:
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
 					return retval=PIn.Int(Db.GetScalar(command));
@@ -3904,6 +3998,8 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.FamilyHistory:
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
+						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
 					return retval=PIn.Int(Db.GetScalar(command));
