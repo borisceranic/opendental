@@ -396,5 +396,15 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching planNums as FKey and are related to InsPlan.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the InsPlan table type.</summary>
+		public static void ClearFkey(List<long> listPlanNums) {
+			if(listPlanNums==null || listPlanNums.Count==0) {
+				return;
+			}
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey IN("+String.Join(",",listPlanNums)+") AND PermType IN (65)";
+			Db.NonQ(command);
+		}
+
 	}
 }

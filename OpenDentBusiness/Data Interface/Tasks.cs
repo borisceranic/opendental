@@ -918,6 +918,15 @@ namespace OpenDentBusiness{
 			Crud.TaskCrud.ClearFkey(taskNum);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching taskNums as FKey and are related to Task.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Task table type.</summary>
+		public static void ClearFkey(List<long> listTaskNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listTaskNums);
+				return;
+			}
+			Crud.TaskCrud.ClearFkey(listTaskNums);
+		}
 	}
 
 

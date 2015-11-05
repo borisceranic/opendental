@@ -398,5 +398,15 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching codeNums as FKey and are related to ProcedureCode.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the ProcedureCode table type.</summary>
+		public static void ClearFkey(List<long> listCodeNums) {
+			if(listCodeNums==null || listCodeNums.Count==0) {
+				return;
+			}
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey IN("+String.Join(",",listCodeNums)+") AND PermType IN (64)";
+			Db.NonQ(command);
+		}
+
 	}
 }

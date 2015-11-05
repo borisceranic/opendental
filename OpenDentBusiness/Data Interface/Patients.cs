@@ -2651,6 +2651,16 @@ FROM insplan";
 			}
 			Crud.PatientCrud.ClearFkey(patNum);
 		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching patNums as FKey and are related to Patient.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Patient table type.</summary>
+		public static void ClearFkey(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPatNums);
+				return;
+			}
+			Crud.PatientCrud.ClearFkey(listPatNums);
+		}
 	}
 
 	///<summary>Not a database table.  Just used in billing and finance charges.</summary>

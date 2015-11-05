@@ -2380,6 +2380,15 @@ namespace OpenDentBusiness{
 			Crud.AppointmentCrud.ClearFkey(aptNum);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching aptNums as FKey and are related to Appointment.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Appointment table type.</summary>
+		public static void ClearFkey(List<long> listAptNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listAptNums);
+				return;
+			}
+			Crud.AppointmentCrud.ClearFkey(listAptNums);
+		}
 	}
 
 	///<summary>Holds information about a provider's Schedule. Not actual database table.</summary>

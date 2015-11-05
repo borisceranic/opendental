@@ -289,5 +289,15 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching rxNums as FKey and are related to RxPat.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the RxPat table type.</summary>
+		public static void ClearFkey(List<long> listRxNums) {
+			if(listRxNums==null || listRxNums.Count==0) {
+				return;
+			}
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey IN("+String.Join(",",listRxNums)+") AND PermType IN (9,76)";
+			Db.NonQ(command);
+		}
+
 	}
 }

@@ -292,5 +292,15 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching taskNums as FKey and are related to Task.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the Task table type.</summary>
+		public static void ClearFkey(List<long> listTaskNums) {
+			if(listTaskNums==null || listTaskNums.Count==0) {
+				return;
+			}
+			string command="UPDATE securitylog SET FKey=0 WHERE FKey IN("+String.Join(",",listTaskNums)+") AND PermType IN (66)";
+			Db.NonQ(command);
+		}
+
 	}
 }

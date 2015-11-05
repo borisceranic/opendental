@@ -1110,5 +1110,15 @@ namespace OpenDentBusiness {
 			}
 			Crud.InsPlanCrud.ClearFkey(planNum);
 		}
+
+		///<summary>Zeros securitylog FKey column for rows that are using the matching planNums as FKey and are related to InsPlan.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the InsPlan table type.</summary>
+		public static void ClearFkey(List<long> listPlanNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPlanNums);
+				return;
+			}
+			Crud.InsPlanCrud.ClearFkey(listPlanNums);
+		}
 	}
 }

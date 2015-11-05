@@ -1083,7 +1083,7 @@ using System.Drawing;"+rn);
 				}
 			}
 			#endregion ConvertToM
-			#region ClearFkey
+			#region ClearFkey(long)
 			if(listAuditTrailPerms!=null && listAuditTrailPerms.Count!=0) {  //If there are any AuditPerms set for this table
 				strb.Append(rn+rn+t2+"///<summary>Zeros securitylog FKey column for rows that are using the matching "+priKeyParam+" as FKey and are related to "+typeClass.Name+".");
 				strb.Append(rn+t2+"///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the "+typeClass.Name+@" table type.</summary>");
@@ -1099,6 +1099,26 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t2+"}");
 			}
 			#endregion ClearFkey
+			#region ClearFkey(List<long>)
+			if(listAuditTrailPerms!=null && listAuditTrailPerms.Count!=0) {  //If there are any AuditPerms set for this table
+				strb.Append(rn+rn+t2+"///<summary>Zeros securitylog FKey column for rows that are using the matching "+priKeyParam+"s as FKey and are related to "+typeClass.Name+".");
+				strb.Append(rn+t2+"///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the "+typeClass.Name+@" table type.</summary>");
+				string nameListParam="list"+priKeyParam.Substring(0,1).ToUpper()+priKeyParam.Substring(1)+"s";
+				strb.Append(rn+t2+"public static void ClearFkey(List<long> "+nameListParam+") {");
+				strb.Append(rn+t3+"if("+nameListParam+"==null || "+nameListParam+".Count==0) {");
+				strb.Append(rn+t4+"return;");
+				strb.Append(rn+t3+"}");
+				List<string> listPermTypes=new List<string>();
+				for(int i=0;i<listAuditTrailPerms.Count;i++) {
+					listPermTypes.Add(((int)listAuditTrailPerms[i]).ToString());
+				}
+				strb.Append(rn+t3+"string command=\"UPDATE securitylog SET FKey=0 WHERE FKey IN(\"+String.Join(\",\","+nameListParam+")+\")"
+					+" AND PermType IN ("+String.Join(",",listPermTypes)+")\";");
+				//If we wanted to make this more readable we could put a comment into the crud file here of what the listPermTypes mean.
+				strb.Append(rn+t3+"Db.NonQ(command);");
+				strb.Append(rn+t2+"}");
+			}
+			#endregion ClearFkey(List<long>)
 			//IsEqual is currently unfinished, but is here so that we can enhance it later to truly compare two objects. 
 			//This will check all DB columns and all Non-DB columns for equality and return a boolean. 
 			//The problem with implementing this at this time (3/4/2014) is that we don't have time to implement validating lists of objects.

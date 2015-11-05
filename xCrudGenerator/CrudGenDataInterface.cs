@@ -203,6 +203,24 @@ namespace xCrudGenerator {
 			return retVal;
 		}
 
+		private static string GetClearFkeyList(List<Permissions> listPermissions,string typeClassName,string priKeyParam,string priKeyName) {
+			string retVal="";
+			if(listPermissions==null || listPermissions.Count==0) {
+				return retVal;
+			}
+			string nameListPriKeyParam="list"+priKeyParam.Substring(0,1).ToUpper()+priKeyName.Substring(1)+"s";
+			retVal=@"///<summary>Zeros securitylog FKey column for rows that are using the matching "+priKeyParam+"s as FKey and are related to "+typeClassName+@".
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the "+typeClassName+@" table type.</summary>
+		public static void ClearFkey(List<long> "+nameListPriKeyParam+@") {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),"+nameListPriKeyParam+@");
+				return;
+			}
+			Crud."+typeClassName+@"Crud.ClearFkey("+nameListPriKeyParam+@");
+		}";
+			return retVal;
+		}
+
 		private static string GetEntireSclass(string typeClassName,string obj,string priKeyName,string Sname,string tablename,string priKeyParam,
 			List<Permissions> listAuditTrailPerms)
 		{
@@ -289,6 +307,8 @@ namespace OpenDentBusiness{
 		}
 
 		"+GetClearFkey(listAuditTrailPerms,typeClassName,priKeyParam,priKeyName)+@"
+
+		"+GetClearFkeyList(listAuditTrailPerms,typeClassName,priKeyParam,priKeyName)+@"
 		*/
 
 

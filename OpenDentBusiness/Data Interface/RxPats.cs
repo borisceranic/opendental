@@ -132,6 +132,15 @@ namespace OpenDentBusiness{
 			Crud.RxPatCrud.ClearFkey(rxNum);
 		}
 
+		///<summary>Zeros securitylog FKey column for rows that are using the matching rxNums as FKey and are related to RxPat.
+		///Permtypes are generated from the AuditPerms property of the CrudTableAttribute within the RxPat table type.</summary>
+		public static void ClearFkey(List<long> listRxNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listRxNums);
+				return;
+			}
+			Crud.RxPatCrud.ClearFkey(listRxNums);
+		}
 	}
 
 	
