@@ -849,13 +849,6 @@ namespace OpenDental{
 						break;
 					}
 				}*/
-				gridMain.SetSelected(false);
-				for(int i=0;i<PtDataTable.Rows.Count;i++){
-					if(PIn.Long(PtDataTable.Rows[i][0].ToString())==InitialPatNum) {
-						gridMain.SetSelected(i,true);
-						break;
-					}
-				}
 				return;
 			}
 			if(checkRefresh.Checked){
@@ -1320,9 +1313,15 @@ namespace OpenDental{
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			gridMain.SetSelected(0,true);
 			if(_dateTimeLastSearch!=_dateTimeLastRequest) {
 				FillGrid(limit);//in case data was entered while thread was running.
+			}
+			gridMain.SetSelected(0,true);
+			for(int i=0;i<PtDataTable.Rows.Count;i++) {
+				if(PIn.Long(PtDataTable.Rows[i][0].ToString())==InitialPatNum) {
+					gridMain.SetSelected(i,true);
+					break;
+				}
 			}
 		}
 
