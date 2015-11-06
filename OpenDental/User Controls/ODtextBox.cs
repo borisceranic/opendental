@@ -553,7 +553,7 @@ namespace OpenDental {
 			MatchCollection mc=Regex.Matches(Text,@"(\S+)");//use Regex.Matches because our matches include the index within our text for underlining
 			if(mc.Count==0) {//all text was deleted, clear the entire text box
 				Rectangle wavyLineArea=new Rectangle(1,1,this.Width,this.Height);
-				BufferGraphics.FillRectangle(Brushes.White,wavyLineArea);
+				BufferGraphics.FillRectangle(new SolidBrush(this.BackColor),wavyLineArea);
 				graphicsTextBox.DrawImageUnscaled(bitmapOverlay,0,0);
 				graphicsTextBox.Dispose();
 				bitmapOverlay.Dispose();
@@ -612,7 +612,7 @@ namespace OpenDental {
 				//word may span more than one line, so white out all lines between the starting char line and the ending char line
 				for(int j=start.Y;j<=end.Y;j+=this.FontHeight) {
 					Rectangle wavyLineArea=new Rectangle(1,j,this.Width,2);
-					BufferGraphics.FillRectangle(Brushes.White,wavyLineArea);
+					BufferGraphics.FillRectangle(new SolidBrush(this.BackColor),wavyLineArea);
 				}
 			}
 			graphicsTextBox.DrawImageUnscaled(bitmapOverlay,0,0);
