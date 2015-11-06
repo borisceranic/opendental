@@ -1004,6 +1004,7 @@ namespace OpenDentBusiness {
 			}
 			command="DELETE FROM benefit WHERE PlanNum="+POut.Long(plan.PlanNum);
 			Db.NonQ(command);
+			InsPlans.ClearFkey(plan.PlanNum);//Zero securitylog FKey column for rows to be deleted.
 			command="DELETE FROM insplan "
 				+"WHERE PlanNum = '"+plan.PlanNum.ToString()+"'";
 			Db.NonQ(command);

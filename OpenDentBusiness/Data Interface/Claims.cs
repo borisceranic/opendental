@@ -259,17 +259,12 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void Delete(Claim Cur){
+		public static void Delete(Claim claim){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),Cur);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),claim);
 				return;
 			}
-			string command = "DELETE FROM claim WHERE ClaimNum = '"+POut.Long(Cur.ClaimNum)+"'";
-			Db.NonQ(command);
-			//command = "DELETE FROM canadianclaim WHERE ClaimNum = '"+POut.Long(Cur.ClaimNum)+"'";
-			//Db.NonQ(command);
-			//command = "DELETE FROM canadianextract WHERE ClaimNum = '"+POut.Long(Cur.ClaimNum)+"'";
-			//Db.NonQ(command);
+			Crud.ClaimCrud.Delete(claim.ClaimNum);
 		}
 
 		///<summary></summary>

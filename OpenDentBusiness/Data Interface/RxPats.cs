@@ -58,8 +58,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),rxNum);
 				return;
 			}
-			string command= "DELETE FROM rxpat WHERE RxNum = '"+POut.Long(rxNum)+"'";
-			Db.NonQ(command);
+			Crud.RxPatCrud.Delete(rxNum);
 		}
 
 		public static List<long> GetChangedSinceRxNums(DateTime changedSince) {

@@ -139,8 +139,7 @@ namespace OpenDentBusiness {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),doc);
 				return;
 			}
-			string command= "DELETE from document WHERE DocNum = '"+doc.DocNum.ToString()+"'";
-			Db.NonQ(command);
+			Crud.DocumentCrud.Delete(doc.DocNum);
 		}
 
 		///<summary>This is used by FormImageViewer to get a list of paths based on supplied list of DocNums. The reason is that later we will allow sharing of documents, so the paths may not be in the current patient folder. Rewritten by Ryan on 10/26/2011 to use List&lt;&gt; instead of ArrayList.</summary>

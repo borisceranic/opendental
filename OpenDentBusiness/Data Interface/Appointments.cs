@@ -1874,6 +1874,7 @@ namespace OpenDentBusiness{
 			//apptfield
 			command="DELETE FROM apptfield WHERE AptNum = "+POut.Long(aptNum);
 			Db.NonQ(command);
+			Appointments.ClearFkey(aptNum);//Zero securitylog FKey column for row to be deleted.
 			//we will not reset item orders here
 			command="DELETE FROM appointment WHERE AptNum = "+POut.Long(aptNum);
 			ApptComms.DeleteForAppt(aptNum);

@@ -424,12 +424,21 @@ namespace OpenDentBusiness {
 						command="UPDATE procedurelog P, appointment A SET P.PlannedAptNum = 0 WHERE P.PlannedAptNum = A.AptNum AND A.Pattern = ''";
 					}
 					Db.NonQ(command);
+					command="SELECT appointment.AptNum FROM appointment WHERE Pattern = ''";
+					DataTable tableAptNums=Db.GetTable(command);
+					List<long> listAptNums=new List<long>();
+					for(int i=0;i<tableAptNums.Rows.Count;i++) {
+						listAptNums.Add(PIn.Long(tableAptNums.Rows[i]["AptNum"].ToString()));
+					}
+					if(listAptNums.Count>0) {
+						Appointments.ClearFkey(listAptNums);//Zero securitylog FKey column for rows to be deleted.
+					}
 					command="DELETE FROM appointment WHERE Pattern = ''";
 					Db.NonQ(command);
 				}
 				int numberFixed=table.Rows.Count;
 				if(numberFixed!=0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Appointments deleted with zero length: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Appointments deleted with zero length")+": "+numberFixed.ToString()+"\r\n";
 				}
 			}
 			return log;
@@ -448,17 +457,29 @@ namespace OpenDentBusiness {
 				  +"AND NOT EXISTS(SELECT * FROM procedurelog WHERE procedurelog.AptNum=appointment.AptNum)";//and no procs
 				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound!=0 || verbose) {
-				  log+=Lans.g("FormDatabaseMaintenance","Appointments found with no date and no procs: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Appointments found with no date and no procs")+": "+numFound+"\r\n";
 				}
 			}
 			else{
+				command="SELECT appointment.AptNum FROM appointment "
+					+"WHERE AptStatus="+POut.Int((int)ApptStatus.Scheduled)+" "
+				  +"AND "+DbHelper.Year("AptDateTime")+"<1880 "//scheduled but no date 
+				  +"AND NOT EXISTS(SELECT * FROM procedurelog WHERE procedurelog.AptNum=appointment.AptNum)";//and no procs
+				DataTable tableAptNums=Db.GetTable(command);
+				List<long> listAptNums=new List<long>();
+				for(int i=0;i<tableAptNums.Rows.Count;i++) {
+					listAptNums.Add(PIn.Long(tableAptNums.Rows[i]["AptNum"].ToString()));
+				}
+				if(listAptNums.Count>0) {
+					Appointments.ClearFkey(listAptNums);//Zero securitylog FKey column for rows to be deleted.
+				}
 				command="DELETE FROM appointment "
-				  +"WHERE AptStatus=1 "//scheduled 
+				  +"WHERE AptStatus="+POut.Int((int)ApptStatus.Scheduled)+" "
 				  +"AND "+DbHelper.Year("AptDateTime")+"<1880 "//scheduled but no date 
 				  +"AND NOT EXISTS(SELECT * FROM procedurelog WHERE procedurelog.AptNum=appointment.AptNum)";//and no procs
 				long numberFixed=Db.NonQ(command);
 				if(numberFixed!=0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Appointments deleted due to no date and no procs: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Appointments deleted due to no date and no procs")+": "+numberFixed.ToString()+"\r\n";
 				}
 			}
 			return log;
@@ -1096,16 +1117,26 @@ namespace OpenDentBusiness {
 					SELECT * FROM claimproc WHERE claim.ClaimNum=claimproc.ClaimNum)";
 				int numFound=PIn.Int(Db.GetCount(command));
 				if(numFound!=0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claims found with no procedures: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Claims found with no procedures")+": "+numFound+"\r\n";
 				}
 			}
 			else{
+				command="SELECT claim.ClaimNum FROM claim WHERE NOT EXISTS( "
+					+"SELECT * FROM claimproc WHERE claim.ClaimNum=claimproc.ClaimNum)";
+				DataTable tableClaimNums=Db.GetTable(command);
+				List<long> listClaimNums=new List<long>();
+				for(int i=0;i<tableClaimNums.Rows.Count;i++) {
+					listClaimNums.Add(PIn.Long(tableClaimNums.Rows[i]["ClaimNum"].ToString()));
+				}
+				if(listClaimNums.Count>0) {
+					Claims.ClearFkey(listClaimNums);//Zero securitylog FKey column for rows to be deleted.
+				}
 				//Orphaned claims do not show in the account module (tested) so we need to delete them because no other way.
 				command=@"DELETE FROM claim WHERE NOT EXISTS(
 					SELECT * FROM claimproc WHERE claim.ClaimNum=claimproc.ClaimNum)";
 				long numberFixed=Db.NonQ(command);
 				if(numberFixed!=0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claims deleted due to no procedures: ")+numberFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Claims deleted due to no procedures")+": "+numberFixed.ToString()+"\r\n";
 				}
 			}
 			return log;
@@ -2559,35 +2590,35 @@ namespace OpenDentBusiness {
 					+"WHERE PlanNum NOT IN (SELECT inssub.PlanNum FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum) ";
 				numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum/PlanNum values: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum/PlanNum values")+": "+numFound+"\r\n";
 				}
 				//claim.PlanNum2---------------------------------------------------------------------------------------------------
 				command="SELECT COUNT(*) FROM claim WHERE PlanNum2 != 0 "//not really necessary; just a reminder
 					+"AND PlanNum2 NOT IN (SELECT inssub.PlanNum FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum2)";
 				numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum2/PlanNum2 values: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum2/PlanNum2 values")+": "+numFound+"\r\n";
 				}
 				//claimproc---------------------------------------------------------------------------------------------------
 				command="SELECT COUNT(*) FROM claimproc "
 					+"WHERE PlanNum NOT IN (SELECT inssub.PlanNum FROM inssub WHERE inssub.InsSubNum=claimproc.InsSubNum)";
 				numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched claimproc InsSubNum/PlanNum values: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched claimproc InsSubNum/PlanNum values")+": "+numFound+"\r\n";
 				}
 				//etrans---------------------------------------------------------------------------------------------------
 				command="SELECT COUNT(*) FROM etrans "
 					+"WHERE PlanNum!=0 AND PlanNum NOT IN (SELECT inssub.PlanNum FROM inssub WHERE inssub.InsSubNum=etrans.InsSubNum)";
 				numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched etrans InsSubNum/PlanNum values: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched etrans InsSubNum/PlanNum values")+": "+numFound+"\r\n";
 				}
 				//payplan---------------------------------------------------------------------------------------------------
 				command="SELECT COUNT(*) FROM payplan "
 					+"WHERE EXISTS (SELECT PlanNum FROM inssub WHERE inssub.InsSubNum=payplan.InsSubNum AND inssub.PlanNum!=payplan.PlanNum)";
 				numFound=PIn.Int(Db.GetCount(command));
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched payplan InsSubNum/PlanNum values: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched payplan InsSubNum/PlanNum values")+": "+numFound+"\r\n";
 				}
 			}
 			else {//fix
@@ -2597,15 +2628,25 @@ namespace OpenDentBusiness {
 					+"WHERE PlanNum != (SELECT inssub.PlanNum FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum)";
 				numFixed=Db.NonQ(command);
 				if(numFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum/PlanNum fixed: ")+numFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Mismatched claim InsSubNum/PlanNum fixed")+": "+numFixed.ToString()+"\r\n";
 				}
 				numFixed=0;
 				//claim.PlanNum (2/4) PlanNum zero, invalid InsSubNum--------------------------------------------------------------------------------
 				//Will leave orphaned claimprocs. No finanicals to check.
+				command="SELECT claim.ClaimNum FROM PlanNum=0 AND ClaimStatus IN ('PreAuth','W','U') "
+					+"AND NOT EXISTS(SELECT * FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum)";
+				DataTable tableClaimNums=Db.GetTable(command);
+				List<long> listClaimNums=new List<long>();
+				for(int i=0;i<tableClaimNums.Rows.Count;i++) {
+					listClaimNums.Add(PIn.Long(tableClaimNums.Rows[i]["ClaimNum"].ToString()));
+				}
+				if(listClaimNums.Count>0) {
+					Claims.ClearFkey(listClaimNums);//Zero securitylog FKey column for rows to be deleted.
+				}
 				command="DELETE FROM claim WHERE PlanNum=0 AND ClaimStatus IN ('PreAuth','W','U') AND NOT EXISTS(SELECT * FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum)";
 				numFixed=Db.NonQ(command);
 				if(numFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claims deleted with invalid InsSubNum and PlanNum=0: ")+numFixed.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Claims deleted with invalid InsSubNum and PlanNum=0")+": "+numFixed.ToString()+"\r\n";
 				}
 				numFixed=0;
 				//claim.PlanNum (3/4) PlanNum invalid, and claim.InsSubNum invalid-------------------------------------------------------------------

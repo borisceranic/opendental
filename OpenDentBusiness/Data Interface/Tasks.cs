@@ -751,6 +751,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),taskNum);
 				return;
 			}
+			Tasks.ClearFkey(taskNum);//Zero securitylog FKey column for rows to be deleted.
 			string command= "DELETE FROM task WHERE TaskNum = "+POut.Long(taskNum);
  			Db.NonQ(command);
 			command="DELETE FROM taskancestor WHERE TaskNum = "+POut.Long(taskNum);

@@ -353,16 +353,19 @@ namespace OpenDentBusiness{
 				return;
 			}
 			//first delete any unused T codes
-			string command=@"SELECT CodeNum,ProcCode FROM procedurecode
+			string command=@"SELECT CodeNum FROM procedurecode
 				WHERE NOT EXISTS(SELECT * FROM procedurelog WHERE procedurelog.CodeNum=procedurecode.CodeNum)
 				AND ProcCode LIKE 'T%'";
 			DataTable table=Db.GetTable(command);
-			long codenum;
+			List<long> listCodeNums=new List<long>();
 			for(int i=0;i<table.Rows.Count;i++) {
-				codenum=PIn.Long(table.Rows[i]["CodeNum"].ToString());
-				command="DELETE FROM fee WHERE CodeNum="+POut.Long(codenum);
+				listCodeNums.Add(PIn.Long(table.Rows[i]["CodeNum"].ToString()));
+			}
+			if(listCodeNums.Count>0) {
+				ProcedureCodes.ClearFkey(listCodeNums);//Zero securitylog FKey column for rows to be deleted.
+				command="DELETE FROM fee WHERE CodeNum IN("+String.Join(",",listCodeNums)+")";
 				Db.NonQ(command);
-				command="DELETE FROM procedurecode WHERE CodeNum="+POut.Long(codenum);
+				command="DELETE FROM procedurecode WHERE CodeNum IN("+String.Join(",",listCodeNums)+")";
 				Db.NonQ(command);
 			}
 			//then, move any other T codes to obsolete category
