@@ -98,6 +98,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSubject.Location = new System.Drawing.Point(119, 87);
 			this.textSubject.Name = "textSubject";
+			this.textSubject.ReadOnly = true;
 			this.textSubject.Size = new System.Drawing.Size(632, 20);
 			this.textSubject.TabIndex = 3;
 			// 
@@ -236,10 +237,12 @@ namespace OpenDental{
 			this.textBody.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBody.BackColor = System.Drawing.SystemColors.Control;
 			this.textBody.DetectUrls = false;
 			this.textBody.Location = new System.Drawing.Point(119, 113);
 			this.textBody.Name = "textBody";
 			this.textBody.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
+			this.textBody.ReadOnly = true;
 			this.textBody.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textBody.Size = new System.Drawing.Size(632, 178);
 			this.textBody.TabIndex = 4;

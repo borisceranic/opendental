@@ -1,32 +1,53 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
-using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics;
+using System.Linq;
 
 namespace OpenDental {
-	///<summary>DialogResult will be Abort if message was unable to be read. If message is read successfully (Ok or Cancel), then caller is responsible for updating SentOrReceived to read (where applicable).</summary>
+	///<summary>DialogResult will be Abort if message was unable to be read. If message is read successfully (Ok or Cancel), then caller is responsible
+	///for updating SentOrReceived to read (where applicable).</summary>
 	public partial class FormWebMailMessageEdit:Form {
 		private EmailMessage _secureMessage;
 		private EmailMessage _insecureMessage;
 		private EmailAddress _emailAddressSender;
 		private long _patNum;
+		///<summary>This is the emailMessageNum parameter from the constructors, either 0 if composing a new message or the EmailMessageNum of the
+		///existing message being viewed/replied to.</summary>
 		private long _replyToEmailMessageNum;
 		private bool _allowSendSecureMessage=true;
 		private bool _allowSendNotificationMessage=true;
+		///<summary>If viewing existing message, this will be a list with only the "regarding" patient in it.  If replying or composing, this will contain
+		///all family members of the current patient of which the patient is eligible to view given PHI constraints.</summary>
 		private List<Patient> _listPatients=null;
+		///<summary>Set to the message with EmailMessageNum=_replyToEmailMessageNum for viewing existing messages or replying to an existing message.
+		///If we are composing a new message this will be null.</summary>
 		private EmailMessage _emailMessage;
-		///<summary>Attachment objects will be set right before inserting _secureMessage into db. Until then they will be held separate.</summary>
+		///<summary>Attachment objects will be set right before inserting _secureMessage into db. Until then they will be held separate.  If viewing an
+		///existing message, this will hold the list of attachments sent with the message.</summary>
 		private List<EmailAttach> _listAttachments=new List<EmailAttach>();
-	
-		///<summary>Default ctor. This implies that we are composing a new message, NOT replying to an existing message. Provider attached to this message should be Security.CurUser.ProvNum</summary>
+		///<summary>On load, the form will be Compose mode if emailMessageNum is not sent in or is 0.
+		///Otherwise, on load the form will be View mode, meaning we are viewing an existing message.
+		///Once the user presses the reply button, the form reloads in Reply mode.</summary>
+		private _formMode _formModeCur;
+
+		private enum _formMode {
+			Compose,
+			View,
+			Reply
+		}
+
+		///<summary>Default constructor. This implies that we are composing a new message, NOT replying to an existing message.
+		///Provider attached to this message should be Security.CurUser.ProvNum</summary>
 		public FormWebMailMessageEdit(long patNum) : this(patNum,0) { }
 
-		///<summary>This implies that we are replying to an existing message. Provider attached to this message will be the ProvNum attached to the original message. If this ProvNum does not match Security.CurUser.ProvNum then the send action will be blocked.</summary>
+		///<summary>This implies that we are replying to an existing message. Provider attached to this message will be the ProvNum attached to the
+		///original message. If this ProvNum does not match Security.CurUser.ProvNum then the send action will be blocked.</summary>
 		public FormWebMailMessageEdit(long patNum,long emailMessageNum) {
 			InitializeComponent();
 			Lan.F(this);
@@ -35,8 +56,74 @@ namespace OpenDental {
 		}
 
 		private void FormWebMailMessageEdit_Load(object sender,EventArgs e) {
-			VerifyInputs();
-			listAttachments.ContextMenu=contextMenuAttachments;
+			_formModeCur=_formMode.View;
+			if(_replyToEmailMessageNum<1) {
+				_formModeCur=_formMode.Compose;
+			}
+			FillFields();
+		}
+
+		///<summary>On load, we are either viewing an existing message (_isReply is false) or composing a new message (_replyToEmailMessageNum is 0).
+		///If _replyToEmailMessageNum > 0 and _isReply is false, fill the fields with the existing message information.
+		///Otherwise call VerifyInputs to fill the fields with the appropriate information for either a reply message or a new message.</summary>
+		private void FillFields() {
+			if(_formModeCur!=_formMode.View) {//composing a new message or replying to an existing message
+				_listAttachments=new List<EmailAttach>();
+				FillAttachments();
+				SetEnabledHelper();
+				VerifyInputs();
+				return;
+			}
+			//_emailMessage is not null and _isReply is false, viewing an existing message
+			_emailMessage=EmailMessages.GetOne(_replyToEmailMessageNum);
+			if(_emailMessage==null) {
+				MsgBox.Show(this,"Invalid email message");
+				DialogResult=DialogResult.Abort;//nothing to show so abort, caller should be waiting for abort to determine if message should be marked read
+				return;
+			}
+			SetEnabledHelper();
+			Patient patRegarding=Patients.GetPat(_emailMessage.PatNumSubj);
+			comboRegardingPatient.Items.Clear();
+			_listPatients=new List<Patient>();
+			if(patRegarding!=null) {
+				_listPatients.Add(patRegarding);
+				comboRegardingPatient.Items.Add(patRegarding.GetNameFL());
+				comboRegardingPatient.SelectedIndex=0;
+			}
+			textTo.Text=_emailMessage.ToAddress;
+			textFrom.Text=_emailMessage.FromAddress;
+			textSubject.Text=_emailMessage.Subject;
+			textBody.Text=_emailMessage.BodyText;
+			_listAttachments=_emailMessage.Attachments;
+			FillAttachments();
+		}
+
+		///<summary>Sets Enabled/ReadOnly status for fields based on whether we are viewing an existing message or replying to/composing a message.</summary>
+		private void SetEnabledHelper() {
+			if(_formModeCur!=_formMode.View) {//if _emailMessage is null, we are composing a new message
+				comboRegardingPatient.Enabled=true;
+				textSubject.ReadOnly=false;
+				textBody.ReadOnly=false;
+				textBody.BackColor=SystemColors.Window;
+				butAttach.Enabled=true;
+				butPreview.Enabled=true;
+				butSend.Text=Lan.g(this,"&Send");
+				butSend.Tag="";
+				listAttachments.ContextMenu=contextMenuAttachments;//contains a remove and open
+				//labelNotification.Text will be set in VerifyInputs based on input values
+			}
+			else {
+				comboRegardingPatient.Enabled=false;
+				textSubject.ReadOnly=true;
+				textBody.ReadOnly=true;
+				textBody.BackColor=SystemColors.Control;
+				butAttach.Enabled=false;
+				butPreview.Enabled=false;
+				butSend.Text=Lan.g(this,"&Reply");
+				butSend.Tag="Reply";
+				listAttachments.ContextMenu=new ContextMenu(new[] { menuItemAttachmentPreview });
+				labelNotification.Text="";
+			}
 		}
 
 		private void FillAttachments() {
@@ -88,7 +175,7 @@ namespace OpenDental {
 				BlockSendSecureMessage("Patient is invalid.");
 				_listPatients=null;
 			}
-			else {			
+			else {
 				textTo.Text=patCur.GetNameFL();
 				Provider priProv=Providers.GetProv(patCur.PriProv);
 				if(priProv==null) {
@@ -101,7 +188,8 @@ namespace OpenDental {
 						BlockSendSecureMessage("Not logged in as valid provider. Login as patient's primary provider to send message.");
 					}
 					else if(userODProv.ProvNum!=priProv.ProvNum) {
-						BlockSendSecureMessage("The patient's primary provider does not match the provider attached to the user currently logged in. Login as patient's primary provider to send message.");
+						BlockSendSecureMessage("The patient's primary provider does not match the provider attached to the user currently logged in. "
+							+"Login as patient's primary provider to send message.");
 					}
 					else {
 						textFrom.Text=priProv.GetFormalName();
@@ -120,9 +208,9 @@ namespace OpenDental {
 				_emailMessage=EmailMessages.GetOne(_replyToEmailMessageNum);
 				if(_emailMessage==null) {
 					MsgBox.Show(this,"Invalid input email message");
-					DialogResult=DialogResult.Abort;  //nothing to show so abort, caller should be waiting for abort to determine if message should be marked read
+					DialogResult=DialogResult.Abort;//nothing to show so abort, caller should be waiting for abort to determine if message should be marked read
 					return;
-				}				
+				}
 				textSubject.Text=_emailMessage.Subject;
 				if(_emailMessage.Subject.IndexOf("RE:")!=0) {
 					textSubject.Text="RE: "+textSubject.Text;
@@ -151,13 +239,14 @@ namespace OpenDental {
 					comboRegardingPatient.Items.Add(patFamilyMember.GetNameFL());
 					if(patFamilyMember.PatNum==patNumSubj) {
 						comboRegardingPatient.SelectedIndex=(comboRegardingPatient.Items.Count-1);
-					}					
+					}
 				}
 			}
 			notificationSubject=PrefC.GetString(PrefName.PatientPortalNotifySubject);
 			notificationBodyNoUrl=PrefC.GetString(PrefName.PatientPortalNotifyBody);
 			notificationURL=PrefC.GetString(PrefName.PatientPortalURL);
-			_emailAddressSender=EmailAddresses.GetOne(PrefC.GetLong(PrefName.EmailNotifyAddressNum));//Webmail notification email address.  One notification email per database (not clinic specific).
+			//Webmail notification email address.  One notification email per database (not clinic specific).
+			_emailAddressSender=EmailAddresses.GetOne(PrefC.GetLong(PrefName.EmailNotifyAddressNum));
 			if(_emailAddressSender==null 
 				|| _emailAddressSender.EmailAddressNum==0
 				|| _emailAddressSender.EmailUsername=="")
@@ -256,7 +345,7 @@ namespace OpenDental {
 		private void menuItemAttachmentPreview_Click(object sender,EventArgs e) {
 			listAttachments_DoubleClick(sender,e);
 		}
-				
+
 		private void menuItemAttachmentRemove_Click(object sender,EventArgs e) {
 			try {
 				if(listAttachments.SelectedIndex==-1) {
@@ -290,7 +379,8 @@ namespace OpenDental {
 				sb.AppendLine(Lan.g(this,"Body")+": "+_insecureMessage.BodyText);
 			}
 			else {
-				sb.AppendLine(Lan.g(this,"------ "+Lan.g(this,"Notification email settings are not set up.  Click Setup from the web mail message edit window to set up notification emails")+" ------"));
+				sb.AppendLine(Lan.g(this,"------ "+Lan.g(this,"Notification email settings are not set up.  Click Setup from the web mail message edit window"
+					+" to set up notification emails")+" ------"));
 			}
 			sb.AppendLine();
 			sb.AppendLine("------ "+Lan.g(this,"Secure web mail message that will be sent to the patient's portal:"));
@@ -307,8 +397,7 @@ namespace OpenDental {
 			if(patCur!=null && patCur.ImageFolder!="") {
 				if(PrefC.AtoZfolderUsed) {
 					dlg.InitialDirectory=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
-																																				patCur.ImageFolder.Substring(0,1).ToUpper(),
-																																				patCur.ImageFolder);
+						patCur.ImageFolder.Substring(0,1).ToUpper(),patCur.ImageFolder);
 				}
 				else {
 					//Use the OS default directory for this type of file viewer.
@@ -325,7 +414,8 @@ namespace OpenDental {
 			try {
 				for(int i=0;i<dlg.FileNames.Length;i++) {
 					//copy the file
-					newName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()+Path.GetExtension(dlg.FileNames[i]);
+					newName=DateTime.Now.ToString("yyyyMMdd")+"_"+DateTime.Now.TimeOfDay.Ticks.ToString()+rnd.Next(1000).ToString()
+						+Path.GetExtension(dlg.FileNames[i]);
 					File.Copy(dlg.FileNames[i],ODFileUtils.CombinePaths(attachPath,newName));
 					//create the attachment
 					attach=new EmailAttach();
@@ -370,7 +460,16 @@ namespace OpenDental {
 			DialogResult=DialogResult.Abort;//We want to abort here to avoid using the email in parent windows when it's been deleted.
 		}
 
+		///<summary>When viewing an existing message, the "Send" button text will be "Reply" and _formModeCur will be View.  Pressing the button will
+		///reload this form as a reply message.
+		///When composing a new message or replying to an existing message, the button text will be "Send" and _formModeCur will be
+		///either Compose or Reply.  Pressing the button will cause an attempt to send the secure and insecure message if applicable.</summary>
 		private void butSend_Click(object sender,EventArgs e) {
+			if(_formModeCur==_formMode.View) {
+				_formModeCur=_formMode.Reply;
+				FillFields();
+				return;
+			}
 			if(!Security.IsAuthorized(Permissions.WebmailSend,false)) {
 				return;
 			}
@@ -388,7 +487,7 @@ namespace OpenDental {
 			_secureMessage.BodyText=textBody.Text;
 			_secureMessage.MsgDateTime=DateTime.Now;
 			_secureMessage.PatNumSubj=GetPatNumSubj();
-			if(_allowSendNotificationMessage) { 
+			if(_allowSendNotificationMessage) {
 				//Send an insecure notification email to the patient.
 				_insecureMessage.MsgDateTime=DateTime.Now;
 				_insecureMessage.PatNumSubj=GetPatNumSubj();
@@ -400,7 +499,7 @@ namespace OpenDental {
 				catch(Exception ex) {
 					MsgBox.Show(this,ex.Message);
 					return;
-				}				
+				}
 			}
 			_secureMessage.Attachments=_listAttachments;
 			EmailMessages.Insert(_secureMessage);
