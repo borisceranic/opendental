@@ -1242,23 +1242,12 @@ namespace OpenDentBusiness{
 			IPAddress ipAddressGlobalDnsServer=IPAddress.Parse(strGlobalDnsServer);
 			MailAddress mailAddressQuery=new MailAddress(strAddressTest);
 			//Attempt to discover the certificate via DNS.
-			Health.Direct.Common.Certificates.ICertificateResolver certResolverInternetDns=new Health.Direct.Common.Certificates.DnsCertResolver(ipAddressGlobalDnsServer);
-			X509Certificate2Collection collectionCerts=certResolverInternetDns.GetCertificates(mailAddressQuery);//Can return null.
 			List<X509Certificate2> listCertsDiscoveredActive=new List<X509Certificate2>();
 			List<X509Certificate2> listCertsDiscoveredInactive=new List<X509Certificate2>();
-			if(collectionCerts!=null) {//Certificates found via DNS. Remove any invalid or expired certificates.
-				for(int i=0;i<collectionCerts.Count;i++) {
-					if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
-						//If the certificate is not yet valid or is expired, then discard so we can possibly discover a better certificate below.
-						listCertsDiscoveredInactive.Add(collectionCerts[i]);
-						continue;
-					}
-					listCertsDiscoveredActive.Add(collectionCerts[i]);
-				}
-			}
+			DnsQueryForCert(ipAddressGlobalDnsServer,mailAddressQuery,listCertsDiscoveredActive,listCertsDiscoveredInactive);
 			if(listCertsDiscoveredActive.Count==0) {//A valid certificate was not found via DNS.  Attempt to locate via LDAP.
 				Health.Direct.Common.Certificates.ICertificateResolver certResolverInternetLdap=new Health.Direct.ResolverPlugins.LdapCertResolver(ipAddressGlobalDnsServer,TimeSpan.FromMinutes(3));
-				collectionCerts=certResolverInternetLdap.GetCertificates(mailAddressQuery);//Can return null.
+				X509Certificate2Collection collectionCerts=certResolverInternetLdap.GetCertificates(mailAddressQuery);//Can return null.
 				if(collectionCerts!=null) {
 					for(int i=0;i<collectionCerts.Count;i++) {
 						if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
@@ -1280,6 +1269,41 @@ namespace OpenDentBusiness{
 			//A certificate was discovered via DNS or LDAP.  Save it locally for later reference.
 			storePublicCerts.Add(listCertsDiscoveredActive);//Write the discovered certificate to the Windows certificate store for future reference.
 			return listCertsDiscoveredActive.Count;
+		}
+
+		///<summary>Send certificate DNS query to DNS server IP address to look for an email encryption certificate for the given emailAddress.
+		///Adds the discovered certificates (if any) to the two X509Certificate2 lists given.</summary>
+		private static void DnsQueryForCert(IPAddress ipAddressDnsServer,MailAddress emailAddress,
+			List<X509Certificate2> listCertsDiscoveredActive,List<X509Certificate2> listCertsDiscoveredInactive)
+		{
+			Health.Direct.Common.Certificates.ICertificateResolver certResolverInternetDns=
+				new Health.Direct.Common.Certificates.DnsCertResolver(ipAddressDnsServer);
+			X509Certificate2Collection collectionCerts=certResolverInternetDns.GetCertificates(emailAddress);//Can return null.
+			if(collectionCerts!=null) {//Certificates found via DNS.  Remove any invalid or expired certificates.
+				for(int i=0;i<collectionCerts.Count;i++) {
+					if(DateTime.Now<collectionCerts[i].NotBefore || DateTime.Now>collectionCerts[i].NotAfter) {
+						//If the certificate is not yet valid or is expired, then discard so we can possibly discover a better certificate below.
+						listCertsDiscoveredInactive.Add(collectionCerts[i]);
+						continue;
+					}
+					listCertsDiscoveredActive.Add(collectionCerts[i]);
+				}
+			}
+		}
+
+		///<summary>Called by Broadcaster service to determine if the OD DNS certificate service is up and running.  Checks for a specific email address
+		///which we have registered.  May not be able to find the reference using the Find All Refrences tool.  Assume the head version of this function
+		///is always the live version.</summary>
+		public static bool ExistsActiveCertInDns(string ipAddressDnsServer,string emailAddress) {
+			IPAddress ipAddressGlobalDnsServer=IPAddress.Parse(ipAddressDnsServer);
+			MailAddress mailAddressQuery=new MailAddress(emailAddress);
+			List<X509Certificate2> listCertsDiscoveredActive=new List<X509Certificate2>();
+			List<X509Certificate2> listCertsDiscoveredInactive=new List<X509Certificate2>();
+			DnsQueryForCert(ipAddressGlobalDnsServer,mailAddressQuery,listCertsDiscoveredActive,listCertsDiscoveredInactive);
+			if(listCertsDiscoveredActive.Count >= 1) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Gets all mime parts in the message which do not have child mime parts.  Returns null on error.</summary>
