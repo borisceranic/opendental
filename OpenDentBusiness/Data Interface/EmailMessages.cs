@@ -494,7 +494,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Throws exceptions.  Attempts to physically send the message over the network wire.
-		///This is used from wherever email needs to be sent throughout the program.  If a message must be encrypted, then encrypt it before calling this function.  nameValueCollectionHeaders can be null.</summary>
+		///This is used from wherever email needs to be sent throughout the program.
+		///If a message must be encrypted, then encrypt it before calling this function.
+		///nameValueCollectionHeaders can be null.</summary>
 		private static void WireEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress,NameValueCollection nameValueCollectionHeaders,params AlternateView[] arrayAlternateViews) {
 			//No need to check RemotingRole; no call to db.
 			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
@@ -514,9 +516,15 @@ namespace OpenDentBusiness{
 				//if(PrefC.GetBool(PrefName.EmailUseSSL)) {
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpusessl","true");//false was also tested and does not work
 				message.From=emailMessage.FromAddress.Trim();
-				message.To=emailMessage.ToAddress.Trim();
-				message.Cc=emailMessage.CcAddress.Trim();
-				message.Bcc=emailMessage.BccAddress.Trim();
+				if(!string.IsNullOrWhiteSpace(emailMessage.ToAddress)) {
+					message.To=emailMessage.ToAddress.Trim();
+				}
+				if(!string.IsNullOrWhiteSpace(emailMessage.CcAddress)) {
+					message.Cc=emailMessage.CcAddress.Trim();
+				}
+				if(!string.IsNullOrWhiteSpace(emailMessage.BccAddress)) {
+					message.Bcc=emailMessage.BccAddress.Trim();
+				}
 				message.Subject=SubjectTidy(emailMessage.Subject);
 				message.Body=BodyTidy(emailMessage.BodyText);
 				//message.Cc=;
@@ -553,13 +561,13 @@ namespace OpenDentBusiness{
 				client.Timeout=180000;//3 minutes
 				MailMessage message=new MailMessage();
 				message.From=new MailAddress(emailMessage.FromAddress.Trim());
-				if(emailMessage.ToAddress.Trim()!="") {
+				if(!string.IsNullOrWhiteSpace(emailMessage.ToAddress)) {
 					message.To.Add(emailMessage.ToAddress.Trim());
 				}
-				if(emailMessage.CcAddress.Trim()!="") {
+				if(!string.IsNullOrWhiteSpace(emailMessage.CcAddress)) {
 					message.CC.Add(emailMessage.CcAddress.Trim());
 				}
-				if(emailMessage.BccAddress.Trim()!="") {
+				if(!string.IsNullOrWhiteSpace(emailMessage.BccAddress)) {
 					message.Bcc.Add(emailMessage.BccAddress.Trim());
 				}
 				message.Subject=SubjectTidy(emailMessage.Subject);
@@ -1433,9 +1441,19 @@ namespace OpenDentBusiness{
 		private static Health.Direct.Common.Mail.Message ConvertEmailMessageToMessage(EmailMessage emailMessage,bool hasAttachments) {
 			//No need to check RemotingRole; no call to db.
 			//We need to use emailAddressFrom.Username instead of emailAddressFrom.SenderAddress, because of how strict encryption is for matching the name to the certificate.
-			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message(emailMessage.ToAddress.Trim(),emailMessage.FromAddress.Trim(),"","text/plain");//Body is set below.  Setting the default type helps with signing.
-			message.CcValue=emailMessage.CcAddress.Trim();//constructor does not accept cc and bcc values
-			message.BccValue=emailMessage.BccAddress.Trim();
+			Health.Direct.Common.Mail.Message message=new Health.Direct.Common.Mail.Message();
+			if(!string.IsNullOrWhiteSpace(emailMessage.ToAddress)) {
+				message.To=new Health.Direct.Common.Mime.Header("To",emailMessage.ToAddress.Trim());
+			}
+			message.From=new Health.Direct.Common.Mime.Header("From",emailMessage.FromAddress.Trim());
+			//message.Body is set below.
+			message.ContentType="text/plain";//Setting the default content type helps with signing.
+			if(!string.IsNullOrWhiteSpace(emailMessage.CcAddress)) {
+				message.CcValue=emailMessage.CcAddress.Trim();//constructor does not accept cc and bcc values
+			}
+			if(!string.IsNullOrWhiteSpace(emailMessage.BccAddress)) {
+				message.BccValue=emailMessage.BccAddress.Trim();
+			}
 			string subject=SubjectTidy(emailMessage.Subject);
 			if(subject!="") {
 				Health.Direct.Common.Mime.Header headerSubject=new Health.Direct.Common.Mime.Header("Subject",subject);
