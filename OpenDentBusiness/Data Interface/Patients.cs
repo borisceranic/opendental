@@ -356,10 +356,10 @@ namespace OpenDentBusiness{
 			long patNum=0;
 			long.TryParse(patNumStr,out patNum);
 			if(patNum>0) {
-				command+="AND (PatNum="+POut.Long(patNum)+" ";
+				command+="AND (patient.PatNum="+POut.Long(patNum)+" ";
 				for(int i=0;i<18-patNumStr.Length;i++) {
 					//Example, if user types 1234 this will add "OR patNum BETWEEN 12340000 AND 12349999 "
-					command+=string.Format("OR PatNum BETWEEN {0} AND {1} ",patNum*Convert.ToInt64(Math.Pow(10,i)),patNum*Convert.ToInt64(Math.Pow(10,i))+Convert.ToInt64(Math.Pow(10,i))-1);
+					command+=string.Format("OR patient.PatNum BETWEEN {0} AND {1} ",patNum*Convert.ToInt64(Math.Pow(10,i)),patNum*Convert.ToInt64(Math.Pow(10,i))+Convert.ToInt64(Math.Pow(10,i))-1);
 				}
 				command+=")";
 			}

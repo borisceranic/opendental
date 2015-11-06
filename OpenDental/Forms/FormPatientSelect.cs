@@ -1212,6 +1212,11 @@ namespace OpenDental{
 				FillGridFinal(limit);
 			}));
 		}));
+		_fillGridThread.AddExceptionHandler(new ODThread.ExceptionDelegate((e) => {
+			this.BeginInvoke((Action)(() => {
+				MessageBox.Show(e.Message);
+			}));
+		}));
 		_fillGridThread.Start(true);
 	}
 
