@@ -1445,6 +1445,42 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
+		///<summary>Used in the eConnector service.</summary>
+		public static string SendWebSchedNotifications() {
+			try {
+				ValidateWebSched();
+			}
+			catch(Exception ex) {
+				return ex.Message;
+			}
+			DateTime fromDate=DateTime.MinValue;
+			DateTime toDate=DateTime.MinValue;
+			int daysPast=PrefC.GetInt(PrefName.RecallDaysPast);
+			int daysFuture=PrefC.GetInt(PrefName.RecallDaysFuture);
+			if(daysPast==-1) {
+				fromDate=DateTime.MinValue;
+			}
+			else {
+				fromDate=DateTime.MinValue;
+				//fromDate=DateTime.Today.AddDays(-daysPast);
+			}
+			if(daysFuture==-1) {
+				toDate=DateTime.MaxValue;
+			}
+			else {
+				toDate=DateTime.Today.AddDays(daysFuture);
+			}
+			long provNum=0;
+			long clinicNum=0;
+			long siteNum=0;
+			List<long> recallNums=new List<long>();
+			DataTable table=Recalls.GetRecallList(fromDate,toDate,PrefC.GetBool(PrefName.RecallGroupByFamily),provNum,clinicNum,siteNum,RecallListSort.Alphabetical,RecallListShowNumberReminders.All,recallNums);
+			for(int i=0;i<table.Rows.Count;i++) {
+				recallNums.Add(PIn.Long(table.Rows[i]["RecallNum"].ToString()));
+			}
+			return SendWebSchedNotifications(recallNums,PrefC.GetBool(PrefName.RecallGroupByFamily),RecallListSort.Alphabetical);
+		}
+
 		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy) {
 			//No need to check RemotingRole; no call to db.
 			string response="";
