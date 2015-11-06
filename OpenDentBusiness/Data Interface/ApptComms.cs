@@ -97,8 +97,6 @@ namespace OpenDentBusiness{
 		///<summary>Send Appointment reminders for all ApptComm items.</summary>
 		public static string SendReminders() {
 			List<ApptComm> listApptComms=GetAll();
-			int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
-			int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
 			string errorText="";
 			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.
 				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).Days > 0) {
