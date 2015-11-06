@@ -24,6 +24,7 @@ namespace OpenDental {
 			textDateTime.Text=TaskNoteCur.DateTimeNote.ToString();
 			textUser.Text=Userods.GetName(TaskNoteCur.UserNum);
 			textNote.Text=TaskNoteCur.Note;
+			textNote.Select(TaskNoteCur.Note.Length,0);
 			this.Top+=150;
 			if(TaskNoteCur.IsNew) {
 				textDateTime.ReadOnly=true;
