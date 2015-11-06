@@ -44,6 +44,9 @@ namespace OpenDental.Eclaims {
 				if(clearinghouseClin.CommBridge==EclaimsCommBridge.EDS) {
 					x12response=EDS.Benefits270(clearinghouseClin,x12message);
 				}
+				if(clearinghouseClin.CommBridge==EclaimsCommBridge.WebMD) {
+					x12response=WebMD.Benefits270(clearinghouseClin,x12message);
+				}
 			}
 			catch(Exception ex) {
 				EtransMessageTexts.Delete(etrans.EtransMessageTextNum);

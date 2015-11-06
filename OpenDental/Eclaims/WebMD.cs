@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
 using Ionic.Zip;
+using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace OpenDental.Eclaims
 {
@@ -140,6 +142,23 @@ namespace OpenDental.Eclaims
 			}
 		}
 
+		///<summary>Sends an X12 270 request and returns X12 271 response or an error message.</summary>
+		public static string Benefits270(Clearinghouse clearhouse,string x12message) {
+			x12message=Regex.Replace(x12message,"\r\n","");//Emdeon specifically requires that each segment ends with ~ and does not include a newline.
+			string retVal="";
+			string url="https://eligibility.webmddental.com/WebMD_Eligibility_002/Request_002X12.aspx";
+			//We used the WebClient class here, because that is what they used in their example Visual Basic code.
+			WebClient client=new WebClient();
+			try {
+				byte[] postData=Encoding.ASCII.GetBytes(x12message);
+				byte[] response=client.UploadData(url,postData);
+				retVal=Encoding.ASCII.GetString(response);
+			}
+			catch(Exception ex) {
+				retVal=ex.Message;
+			}
+			return retVal;
+		}
 
 
 

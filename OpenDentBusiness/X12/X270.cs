@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace OpenDentBusiness
 {
@@ -19,13 +20,22 @@ namespace OpenDentBusiness
 			int transactionNum=1;
 			StringBuilder strb=new StringBuilder();
 			//Interchange Control Header
-			strb.AppendLine("ISA*00*          *"//ISA01,ISA02: 00 + 10 spaces
-				+"00*          *"//ISA03,ISA04: 00 + 10 spaces
-				+clearinghouseClin.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
-				+X12Generator.GetISA06(clearinghouseClin)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
-				+clearinghouseClin.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
-				+Sout(clearinghouseClin.ISA08,15,15)+"*"//ISA08: Receiver ID. Validated to make sure length is at least 2.
-				+DateTime.Today.ToString("yyMMdd")+"*"//ISA09: today's date
+			strb.Append("ISA*00*          *");//ISA01,ISA02: 00 + 10 spaces
+			if(IsEmdeonDental(clearinghouseClin)) {
+				strb.Append("00*"+Sout(clearinghouseClin.Password,10,10)+"*"//ISA03,ISA04: 00 + emdeon password padded to 10 characters
+					+clearinghouseClin.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
+					+"316:"+Sout(clearinghouseClin.LoginID,11,11)+"*"//ISA06: Emdeon vendor number + username
+					+clearinghouseClin.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
+					+Sout("EMDEONDENTAL",15,15)+"*");//ISA08: Receiver ID. Validated to make sure length is at least 2.
+			}
+			else{
+				strb.Append("00*          *"//ISA03,ISA04: 00 + 10 spaces
+					+clearinghouseClin.ISA05+"*"//ISA05: Sender ID type: ZZ=mutually defined. 30=TIN. Validated
+					+X12Generator.GetISA06(clearinghouseClin)+"*"//ISA06: Sender ID(TIN). Or might be TIN of Open Dental
+					+clearinghouseClin.ISA07+"*"//ISA07: Receiver ID type: ZZ=mutually defined. 30=TIN. Validated
+					+Sout(clearinghouseClin.ISA08,15,15)+"*");//ISA08: Receiver ID. Validated to make sure length is at least 2.
+			}
+			strb.AppendLine(DateTime.Today.ToString("yyMMdd")+"*"//ISA09: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//ISA10: current time
 				+"U*00401*"//ISA11 and ISA12. 
 				//ISA13: interchange control number, right aligned:
@@ -34,10 +44,17 @@ namespace OpenDentBusiness
 				+clearinghouseClin.ISA15+"*"//ISA15: T=Test P=Production. Validated.
 				+":~");//ISA16: use ':'
 			//Functional Group Header
-			strb.AppendLine("GS*HS*"//GS01: HS for 270 benefit inquiry
-				+X12Generator.GetGS02(clearinghouseClin)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
-				+Sout(clearinghouseClin.GS03,15,2)+"*"//GS03: Application Receiver's Code
-				+DateTime.Today.ToString("yyyyMMdd")+"*"//GS04: today's date
+			if(IsEmdeonDental(clearinghouseClin)) {
+				strb.Append("GS*HS*"//GS01: HS for 270 benefit inquiry
+					+X12Generator.GetGS02(clearinghouseClin)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
+					+Sout("EMDEONDENTAL",15,15)+"*");//GS03: Application Receiver's Code
+			}
+			else{
+				strb.Append("GS*HS*"//GS01: HS for 270 benefit inquiry
+					+X12Generator.GetGS02(clearinghouseClin)+"*"//GS02: Senders Code. Sometimes Jordan Sparks.  Sometimes the sending clinic.
+					+Sout(clearinghouseClin.GS03,15,2)+"*");//GS03: Application Receiver's Code
+			}
+			strb.AppendLine(DateTime.Today.ToString("yyyyMMdd")+"*"//GS04: today's date
 				+DateTime.Now.ToString("HHmm")+"*"//GS05: current time
 				+groupControlNumber+"*"//GS06: Group control number. Max length 9. No padding necessary.
 				+"X*"//GS07: X
@@ -89,6 +106,19 @@ namespace OpenDentBusiness
 				+"XX*"//NM108: ID code qualifier. 24=EIN. 34=SSN, XX=NPI
 				+Sout(billProv.NationalProvID,80)+"~");//NM109: ID code. NPI validated
 			//2100B REF: Information Receiver ID
+			if(IsEmdeonDental(clearinghouseClin) && IsDentiCalCarrier(carrier)) {
+				string ref4aSegment="";
+				List<Clearinghouse> listClearinghouses=Clearinghouses.GetHqListShort();
+				Clearinghouse clearinghouseDentiCalHQ=listClearinghouses.FirstOrDefault(x => IsDentiCalClearinghouse(x));
+				if(clearinghouseDentiCalHQ!=null) {
+					Clearinghouse clearinghouseDentiCalClin=Clearinghouses.OverrideFields(clearinghouseDentiCalHQ,clearinghouseClin.ClinicNum);
+					if(clearinghouseDentiCalClin!=null){
+						ref4aSegment=clearinghouseDentiCalClin.Password;
+					}
+				}
+				seg++;
+				strb.Append("REF*4A*"+ref4aSegment+"~");
+			}
 			seg++;
 			strb.Append("REF*");
 			if(billProv.UsingTIN) {
@@ -342,7 +372,21 @@ IEA*1*000012145~";
 			}
 			return strb.ToString();
 		}
-		
+
+		///<summary>Checks carrier ElectIDs to match to Denti-Cal's unique ElectID.</summary>
+		private static bool IsDentiCalCarrier(Carrier carrier) {
+			return (carrier.ElectID=="94146");
+		}
+
+		///<summary>DentiCal is a carrier.  Pass in either a clinic or HQ-level clearinghouse.</summary>
+		private static bool IsDentiCalClearinghouse(Clearinghouse clearinghouse) {
+			return (clearinghouse.ISA08=="DENTICAL");
+		}
+
+		///<summary>Pass in either a clinic or HQ-level clearinghouse.</summary>
+		private static bool IsEmdeonDental(Clearinghouse clearinghouse) {
+			return (clearinghouse.ISA08=="0135WCH00");
+		}
 
 
 	}

@@ -3510,7 +3510,8 @@ namespace OpenDental{
 				return;
 			}
 			if((clearinghouseHq.CommBridge!=EclaimsCommBridge.ClaimConnect 
-				&& clearinghouseHq.CommBridge!=EclaimsCommBridge.EDS)
+				&& clearinghouseHq.CommBridge!=EclaimsCommBridge.EDS
+				&& clearinghouseHq.CommBridge!=EclaimsCommBridge.WebMD)
 				&& clearinghouseHq.Eformat!=ElectronicClaimFormat.Canadian)
 			{
 				MsgBox.Show(this,"So far, eligibility checks only work with ClaimConnect, EDS, and CDAnet.");
