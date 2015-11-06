@@ -63,6 +63,14 @@ namespace OpenDentBusiness{
 			Crud.ProcedureCodeCrud.Update(code);
 		}
 
+		///<summary></summary>
+		public static bool Update(ProcedureCode procCode,ProcedureCode procCodeOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),procCode,procCodeOld);
+			}
+			return Crud.ProcedureCodeCrud.Update(procCode,procCodeOld);
+		}
+
 		///<summary>Counts all procedure codes, including hidden codes.</summary>
 		public static long GetCodeCount() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

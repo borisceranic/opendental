@@ -66,6 +66,7 @@ namespace OpenDental{
 		private ODGrid gridNotes;
 		private OpenDental.UI.Button butAddNote;
 		private ProcedureCode ProcCode;
+		private ProcedureCode _procCodeOld;
 		private Label label19;
 		private ComboBox comboSubstOnlyIf;
 		private CheckBox checkMultiVisit;
@@ -89,6 +90,7 @@ namespace OpenDental{
 			tbTime.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbTime_CellClicked);
 			Lan.F(this);
 			ProcCode=procCode;
+			_procCodeOld=procCode.Copy();
 		}
 
 		///<summary></summary>
@@ -1131,12 +1133,9 @@ namespace OpenDental{
 			else{
 				ProcCode.ProvNumDefault=ProviderC.ListShort[comboProvNumDefault.SelectedIndex-1].ProvNum;
 			}
-			ProcedureCodes.Update(ProcCode);//whether new or not.
-			//if(DoSynchRecall){
-			//	Cursor=Cursors.WaitCursor;
-			//	Recalls.SynchAllPatients();
-			//	Cursor=Cursors.Default;
-			//}
+			if(ProcedureCodes.Update(ProcCode,_procCodeOld)) {//whether new or not.
+				DataValid.SetInvalid(InvalidType.ProcCodes);
+			}
 			DialogResult=DialogResult.OK;
 		}
 
