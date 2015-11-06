@@ -5732,7 +5732,6 @@ namespace OpenDental {
 		}
 
 		private void butSearch_Click(object sender,System.EventArgs e) {
-			ApptComms.SendReminders();
 			if(pinBoard.ApptList.Count==0) {
 				MsgBox.Show(this,"An appointment must be placed on the pinboard before a search can be done.");
 				return;
