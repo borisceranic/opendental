@@ -4530,7 +4530,7 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
+		[DbmMethod(HasBreakDown=true)]
 		public static string ProviderHiddenWithClaimPayments(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -4546,16 +4546,20 @@ namespace OpenDentBusiness {
 			if(table.Rows.Count==0 && !verbose) {
 				return log;
 			}
-			log+=Lans.g("FormDatabaseMaintenance","Hidden providers checked for claim payments")+": "+table.Rows.Count;
-			Provider prov;
-			for(int i=0;i<table.Rows.Count;i++) {
-				prov=Providers.GetProv(PIn.Long(table.Rows[i]["ProvNum"].ToString()));
-				log+=Lans.g("FormDatabaseMaintenance","Warning!  Hidden provider ")+" "+prov.Abbr+" "
-						+Lans.g("FormDatabaseMaintenance","has claim payments entered as recently as ")
-						+PIn.Date(table.Rows[i][0].ToString()).ToShortDateString();
+			//There is something to report OR the user has verbose mode on.
+			log+=Lans.g("FormDatabaseMaintenance","Hidden providers with claim payments")+": "+table.Rows.Count;
+			if(isCheck && table.Rows.Count > 0) {
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
 			}
-			if(table.Rows.Count>0) {
-				log+=Lans.g("FormDatabaseMaintenance","   This data will be missing on income reports.")+"\r\n";
+			else if(table.Rows.Count > 0) {
+				Provider prov;
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i=0;i<table.Rows.Count;i++) {
+					prov=Providers.GetProv(PIn.Long(table.Rows[i]["ProvNum"].ToString()));
+					log+=prov.Abbr+" "+Lans.g("FormDatabaseMaintenance","has claim payments entered as recently as")+" "
+						+PIn.Date(table.Rows[i]["ProcDate"].ToString()).ToShortDateString()+"\r\n";
+				}
+				log+="   "+Lans.g("FormDatabaseMaintenance","This data will be missing on income reports.")+"\r\n";
 			}
 			return log;
 		}
