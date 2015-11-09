@@ -49,7 +49,7 @@ namespace OpenDental {
 
 		public void SetEServiceMetrics(EServiceMetrics metricsToday) {
 			eServiceMetricsControl.AccountBalance=metricsToday.AccountBalanceEuro;
-			if(metricsToday.Severity==eServiceSignalSeverity.Critical || metricsToday.Severity==eServiceSignalSeverity.Error) {
+			if(metricsToday.Severity==eServiceSignalSeverity.Critical) {
 				eServiceMetricsControl.StartFlashing();
 			}
 			else {
