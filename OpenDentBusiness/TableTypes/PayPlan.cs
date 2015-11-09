@@ -11,7 +11,7 @@ namespace OpenDentBusiness{
 		public long PayPlanNum;
 		/// <summary>FK to patient.PatNum.  The patient who had the treatment done.</summary>
 		public long PatNum;
-		/// <summary>FK to patient.PatNum.  The person responsible for the payments.  Does not need to be in the same family as the patient.  Will be 0 if PlanNum and InsSubNum have values.</summary>
+		/// <summary>FK to patient.PatNum.  The person responsible for the payments.  Does not need to be in the same family as the patient.</summary>
 		public long Guarantor;
 		/// <summary>Date that the payment plan will display in the account.</summary>
 		public DateTime PayPlanDate;
