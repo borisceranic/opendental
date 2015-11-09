@@ -875,7 +875,7 @@ namespace OpenDental{
 			_computerPref=ComputerPrefs.LocalComputer;  //This is the computerprefs for this local computer.
 			switch(_computerPref.PatSelectSearchMode) {
 				case SearchMode.Default:
-					checkRefresh.Checked=PrefC.GetBool(PrefName.PatientSelectUsesSearchButton);//Use global preference
+					checkRefresh.Checked=!PrefC.GetBool(PrefName.PatientSelectUsesSearchButton);//Use global preference
 					break;
 				case SearchMode.RefreshWhileTyping:
 					checkRefresh.Checked=true;
