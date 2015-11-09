@@ -35,6 +35,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         private System.Threading.SendOrPostCallback ValidateWebAppUrlOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ValidateVersionDeprecatedOperationCompleted;
+        
         private System.Threading.SendOrPostCallback SmsSendOperationCompleted;
         
         private System.Threading.SendOrPostCallback SmsSignAgreementOperationCompleted;
@@ -42,6 +44,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private System.Threading.SendOrPostCallback SmsCancelServiceOperationCompleted;
         
         private System.Threading.SendOrPostCallback RequestListenerProxyPrefsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetListenerTypeOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -91,6 +95,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         public event ValidateWebAppUrlCompletedEventHandler ValidateWebAppUrlCompleted;
         
         /// <remarks/>
+        public event ValidateVersionDeprecatedCompletedEventHandler ValidateVersionDeprecatedCompleted;
+        
+        /// <remarks/>
         public event SmsSendCompletedEventHandler SmsSendCompleted;
         
         /// <remarks/>
@@ -101,6 +108,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         /// <remarks/>
         public event RequestListenerProxyPrefsCompletedEventHandler RequestListenerProxyPrefsCompleted;
+        
+        /// <remarks/>
+        public event GetListenerTypeCompletedEventHandler GetListenerTypeCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/PerformRefreshCache", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -186,6 +196,35 @@ namespace OpenDentBusiness.WebServiceMainHQ {
             if ((this.ValidateWebAppUrlCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ValidateWebAppUrlCompleted(this, new ValidateWebAppUrlCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/ValidateVersionDeprecated", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ValidateVersionDeprecated(string officeData) {
+            object[] results = this.Invoke("ValidateVersionDeprecated", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ValidateVersionDeprecatedAsync(string officeData) {
+            this.ValidateVersionDeprecatedAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void ValidateVersionDeprecatedAsync(string officeData, object userState) {
+            if ((this.ValidateVersionDeprecatedOperationCompleted == null)) {
+                this.ValidateVersionDeprecatedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnValidateVersionDeprecatedOperationCompleted);
+            }
+            this.InvokeAsync("ValidateVersionDeprecated", new object[] {
+                        officeData}, this.ValidateVersionDeprecatedOperationCompleted, userState);
+        }
+        
+        private void OnValidateVersionDeprecatedOperationCompleted(object arg) {
+            if ((this.ValidateVersionDeprecatedCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ValidateVersionDeprecatedCompleted(this, new ValidateVersionDeprecatedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -306,6 +345,35 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/GetListenerType", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetListenerType(string officeData) {
+            object[] results = this.Invoke("GetListenerType", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetListenerTypeAsync(string officeData) {
+            this.GetListenerTypeAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void GetListenerTypeAsync(string officeData, object userState) {
+            if ((this.GetListenerTypeOperationCompleted == null)) {
+                this.GetListenerTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetListenerTypeOperationCompleted);
+            }
+            this.InvokeAsync("GetListenerType", new object[] {
+                        officeData}, this.GetListenerTypeOperationCompleted, userState);
+        }
+        
+        private void OnGetListenerTypeOperationCompleted(object arg) {
+            if ((this.GetListenerTypeCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetListenerTypeCompleted(this, new GetListenerTypeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -389,6 +457,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private object[] results;
         
         internal ValidateWebAppUrlCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    public delegate void ValidateVersionDeprecatedCompletedEventHandler(object sender, ValidateVersionDeprecatedCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ValidateVersionDeprecatedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ValidateVersionDeprecatedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -493,6 +587,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private object[] results;
         
         internal RequestListenerProxyPrefsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    public delegate void GetListenerTypeCompletedEventHandler(object sender, GetListenerTypeCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.34209")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetListenerTypeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetListenerTypeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
