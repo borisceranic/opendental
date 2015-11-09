@@ -111,6 +111,7 @@ namespace OpenDental {
 		private Label labelInsRem;
 		private decimal PPBalanceTotal;
 		private PatField[] _patFieldList;
+		private Def[] _acctProcQuickAddDefs;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
 
@@ -173,6 +174,7 @@ namespace OpenDental {
 		private ODGrid gridPatInfo;
 		private bool InitializedOnStartup;
 		private MenuItem menuItemRepeatWebSched;
+		private ContextMenu contextMenuQuickCharge;
 		private List<DisplayField> _patInfoDisplayFields;
 		#endregion UserVariables
 
@@ -318,6 +320,7 @@ namespace OpenDental {
 			this.gridComm = new OpenDental.UI.ODGrid();
 			this.gridPatInfo = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.contextMenuQuickCharge = new System.Windows.Forms.ContextMenu();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -1726,7 +1729,12 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Payment Plan"),-1,"","PayPlan"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Installment Plan"),-1,"","InstallPlan"));
-
+			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+			button=new ODToolBarButton(Lan.g(this,"Quick Charge"),1,"","QuickCharge");
+			button.Style=ODToolBarButtonStyle.DropDownButton;
+			button.DropDownMenu=contextMenuQuickCharge;
+			contextMenuQuickCharge.Popup+=new EventHandler(contextMenuQuickCharge_Popup);
+			ToolBarMain.Buttons.Add(button);
 			if(!PrefC.GetBool(PrefName.EasyHideRepeatCharges)) {
 				button=new ODToolBarButton(Lan.g(this,"Repeating Charge"),-1,"","RepeatCharge");
 				button.Style=ODToolBarButtonStyle.PushButton;
@@ -1753,6 +1761,16 @@ namespace OpenDental {
 			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.AccountModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrAccount.LayoutToolBar_end",PatCur);
+		}
+
+		///<summary>This gets run just prior to the contextMenuQuickCharge menu displaying to the user.</summary>
+		private void contextMenuQuickCharge_Popup(object sender,EventArgs e) {
+			//Dynamically fill contextMenuQuickCharge's menu items because the definitions may have changed since last time it was filled.
+			_acctProcQuickAddDefs=DefC.GetList(DefCat.AccountQuickCharge);
+			contextMenuQuickCharge.MenuItems.Clear();
+			for(int i=0;i<_acctProcQuickAddDefs.Length;i++) {
+				contextMenuQuickCharge.MenuItems.Add(new MenuItem(_acctProcQuickAddDefs[i].ItemName,menuItemQuickCharge_Click));
+			}
 		}
 
 		private void ContrAccount_Layout(object sender,System.Windows.Forms.LayoutEventArgs e) {
@@ -1903,6 +1921,7 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=false;
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
+				ToolBarMain.Buttons["QuickCharge"].Enabled=false;
 				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
 					ToolBarMain.Buttons["RepeatCharge"].Enabled=false;
 				}
@@ -1927,6 +1946,7 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=true;
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
+				ToolBarMain.Buttons["QuickCharge"].Enabled=true;
 				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
 					ToolBarMain.Buttons["RepeatCharge"].Enabled=true;
 				} 
@@ -2858,6 +2878,9 @@ namespace OpenDental {
 						break;
 					case "TrojanCollect":
 						toolBarButTrojan_Click();
+						break;
+					case "QuickCharge":
+						toolBarButQuickCharge_Click();
 						break;
 				}
 			}
@@ -4317,6 +4340,55 @@ namespace OpenDental {
 			FormTrojanCollect FormT=new FormTrojanCollect();
 			FormT.PatNum=PatCur.PatNum;
 			FormT.ShowDialog();
+		}
+
+		private void toolBarButQuickCharge_Click() {
+			//Main QuickCharge button was clicked.  Do nothing for now.
+		}
+
+		private void menuItemQuickCharge_Click(object sender,EventArgs e) {
+			//One of the QuickCharge menu items was clicked.
+			if(!Security.IsAuthorized(Permissions.AccountQuickCharge) || sender.GetType()!=typeof(MenuItem)) {
+				return;
+			}
+			List<InsSub> listInsSubs=InsSubs.RefreshForFam(FamCur);
+			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+			List<PatPlan> listPatPlans=PatPlans.Refresh(PatCur.PatNum);
+			List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
+			Def quickChargeDef=_acctProcQuickAddDefs[contextMenuQuickCharge.MenuItems.IndexOf((MenuItem)sender)];
+			string[] procCodes=quickChargeDef.ItemValue.Split(',');
+			Provider patProv=Providers.GetProv(PatCur.PriProv);
+			FeeSched provFeeSched=FeeScheds.GetOne(patProv.FeeSched,FeeSchedC.GetListShort());
+			for(int i=0;i<procCodes.Length;i++) {
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(procCodes[i].Trim());
+				Fee fee=Fees.GetFee(procCode.CodeNum,provFeeSched.FeeSchedNum);
+				Procedure proc=new Procedure();
+				proc.ProcStatus=ProcStat.C;
+				proc.ClinicNum=FormOpenDental.ClinicNum;
+				proc.CodeNum=procCode.CodeNum;
+				proc.DateEntryC=DateTime.Now;
+				proc.DateTP=DateTime.Now;
+				proc.PatNum=PatCur.PatNum;
+				proc.ProcDate=DateTime.Now;
+				if(fee==null) {
+					proc.ProcFee=0;
+				}
+				else {
+					proc.ProcFee=fee.Amount;
+				}
+				proc.ProvNum=patProv.ProvNum;
+				proc.UnitQty=1;
+				Procedures.Insert(proc);
+				ClaimProc cp=new ClaimProc();
+				Procedures.ComputeEstimates(proc,PatCur.PatNum,new List<ClaimProc>(),true,listInsPlans,listPatPlans,listBenefits,PatCur.Age,listInsSubs);
+				//We do not make ProcComplCreate audit trail enteries here because we instead will make an AccountQuickCharge entry.
+			}
+			if(procCodes.Length > 0) {
+				SecurityLogs.MakeLogEntry(Permissions.AccountQuickCharge,PatCur.PatNum
+					,Lan.g(this,"The following procedures were added via the Quick Charge button from the Account module")
+						+": "+String.Join(",",procCodes));
+			}
+			ModuleSelected(PatCur.PatNum);
 		}
 
 		private void gridComm_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {

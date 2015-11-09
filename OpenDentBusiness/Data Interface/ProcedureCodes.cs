@@ -82,7 +82,7 @@ namespace OpenDentBusiness{
 			return PIn.Long(Db.GetCount(command));
 		}
 
-		///<summary>Returns the ProcedureCode for the supplied procCode such as such as D####.</summary>
+		///<summary>Returns the ProcedureCode for the supplied procCode such as such as D####.  If no ProcedureCode is found, returns a new ProcedureCode.</summary>
 		public static ProcedureCode GetProcCode(string myCode){
 			//No need to check RemotingRole; no call to db.
 			if(myCode==null){

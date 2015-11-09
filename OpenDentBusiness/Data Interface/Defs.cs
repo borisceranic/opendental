@@ -97,6 +97,8 @@ namespace OpenDentBusiness {
 				case DefCat.SupplyCats:
 					listCommands.Add("SELECT COUNT(*) FROM supply WHERE Category="+POut.Long(def.DefNum));
 					break;
+				case DefCat.AccountQuickCharge:
+					break;//Users can delete AcctProcQuickCharge entries.  Nothing has an FKey to a AcctProcQuickCharge Def so no need to check anything.
 				default:
 					throw new ApplicationException("NOT Allowed to delete this type of def.");
 			}

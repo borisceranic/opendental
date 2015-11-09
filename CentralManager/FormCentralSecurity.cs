@@ -123,6 +123,8 @@ namespace CentralManager {
 			node=SetNode(Permissions.AccountModule);
 				node2=SetNode(Permissions.ClaimSentEdit);
 					node.Nodes.Add(node2);
+				node2=SetNode(Permissions.AccountQuickCharge);
+					node.Nodes.Add(node2);
 				node2=SetNode("Insurance Payment");
 					node3=SetNode(Permissions.InsPayCreate);
 						node2.Nodes.Add(node3);

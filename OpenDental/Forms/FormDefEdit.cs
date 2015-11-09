@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -461,6 +462,23 @@ namespace OpenDental{
 					}
 					else textValue.Text="";
 					break;*/
+				case DefCat.AccountQuickCharge:
+					string[] procCodes=textValue.Text.Split(',');
+					List<string> listProcCodes=new List<string>();
+					for(int i=0;i<procCodes.Length;i++) {
+						ProcedureCode procCode=ProcedureCodes.GetProcCode(procCodes[i].Trim());
+						if(procCode.CodeNum==0) {
+							MessageBox.Show(Lan.g(this,"Invalid procedure code entered")+": "+procCodes[i].Trim());
+							return;
+						}
+						if(procCode.TreatArea==TreatmentArea.Surf || procCode.TreatArea==TreatmentArea.Tooth) {
+							MsgBox.Show(this,"You cannot use a procedure code that has type Surface or Tooth.");
+							return;
+						}
+						listProcCodes.Add(procCodes[i].Trim());
+					}
+					textValue.Text=String.Join(",",listProcCodes);
+					break;
 			}//end switch
 			DefCur.ItemName=textName.Text;
 			if(EnableValue) DefCur.ItemValue=textValue.Text;

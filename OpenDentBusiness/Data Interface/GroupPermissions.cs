@@ -293,6 +293,7 @@ namespace OpenDentBusiness{
 				//case Permissions.ProcEdit:
 				//case Permissions.ProviderMerge:
 				//case Permissions.MedicationMerge:
+				//case Permissions.AccountQuickCharge:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -310,6 +311,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Accounting Edit Entry");
 				case Permissions.AccountModule:
 					return Lans.g("enumPermissions","Account Module");
+				case Permissions.AccountQuickCharge:
+					return Lans.g("enumPermissions","Account Quick Charge");
 				case Permissions.AdjustmentCreate:
 					return Lans.g("enumPermissions","Adjustment Create");
 				case Permissions.AdjustmentEdit:

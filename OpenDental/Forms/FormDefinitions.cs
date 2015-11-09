@@ -198,6 +198,7 @@ namespace OpenDental{
 			// 
 			this.listCategory.Items.AddRange(new object[] {
             "Account Colors",
+            "Account Quick Charge",
             "Adj Types",
             "Appointment Colors",
             "Appt Confirmed",
@@ -206,7 +207,7 @@ namespace OpenDental{
             "Blockout Types",
             "Chart Graphic Colors",
             "Claim Custom Tracking",
-						"Claim Payment Tracking",
+            "Claim Payment Tracking",
             "Commlog Types",
             "Contact Categories",
             "Diagnosis",
@@ -228,7 +229,7 @@ namespace OpenDental{
             "Treat\' Plan Priorities"});
 			this.listCategory.Location = new System.Drawing.Point(22, 36);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(147, 381);
+			this.listCategory.Size = new System.Drawing.Size(147, 394);
 			this.listCategory.TabIndex = 0;
 			this.listCategory.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listCategory_MouseDown);
 			// 
@@ -280,34 +281,35 @@ namespace OpenDental{
 			}*/
 			lookupCat=new DefCat[listCategory.Items.Count];
 			lookupCat[0]=DefCat.AccountColors;
-			lookupCat[1]=DefCat.AdjTypes;
-			lookupCat[2]=DefCat.AppointmentColors;
-			lookupCat[3]=DefCat.ApptConfirmed;
-			lookupCat[4]=DefCat.ApptProcsQuickAdd;
-			lookupCat[5]=DefCat.BillingTypes;
-			lookupCat[6]=DefCat.BlockoutTypes;
-			lookupCat[7]=DefCat.ChartGraphicColors;
-			lookupCat[8]=DefCat.ClaimCustomTracking;
-			lookupCat[9]=DefCat.ClaimPaymentTracking;
-			lookupCat[10]=DefCat.CommLogTypes;
-			lookupCat[11]=DefCat.ContactCategories;
-			lookupCat[12]=DefCat.Diagnosis;
-			lookupCat[13]=DefCat.FeeColors;
-			lookupCat[14]=DefCat.ImageCats;
-			lookupCat[15]=DefCat.InsurancePaymentType;
-			lookupCat[16]=DefCat.LetterMergeCats;
-			lookupCat[17]=DefCat.MiscColors;
-			lookupCat[18]=DefCat.PaymentTypes;
-			lookupCat[19]=DefCat.PaySplitUnearnedType;
-			lookupCat[20]=DefCat.ProcButtonCats;
-			lookupCat[21]=DefCat.ProcCodeCats;
-			lookupCat[22]=DefCat.ProgNoteColors;
-			lookupCat[23]=DefCat.Prognosis;
-			lookupCat[24]=DefCat.ProviderSpecialties;
-			lookupCat[25]=DefCat.RecallUnschedStatus;
-			lookupCat[26]=DefCat.SupplyCats;
-			lookupCat[27]=DefCat.TaskPriorities;
-			lookupCat[28]=DefCat.TxPriorities;			
+			lookupCat[1]=DefCat.AccountQuickCharge;
+			lookupCat[2]=DefCat.AdjTypes;
+			lookupCat[3]=DefCat.AppointmentColors;
+			lookupCat[4]=DefCat.ApptConfirmed;
+			lookupCat[5]=DefCat.ApptProcsQuickAdd;
+			lookupCat[6]=DefCat.BillingTypes;
+			lookupCat[7]=DefCat.BlockoutTypes;
+			lookupCat[8]=DefCat.ChartGraphicColors;
+			lookupCat[9]=DefCat.ClaimCustomTracking;
+			lookupCat[10]=DefCat.ClaimPaymentTracking;
+			lookupCat[11]=DefCat.CommLogTypes;
+			lookupCat[12]=DefCat.ContactCategories;
+			lookupCat[13]=DefCat.Diagnosis;
+			lookupCat[14]=DefCat.FeeColors;
+			lookupCat[15]=DefCat.ImageCats;
+			lookupCat[16]=DefCat.InsurancePaymentType;
+			lookupCat[17]=DefCat.LetterMergeCats;
+			lookupCat[18]=DefCat.MiscColors;
+			lookupCat[19]=DefCat.PaymentTypes;
+			lookupCat[20]=DefCat.PaySplitUnearnedType;
+			lookupCat[21]=DefCat.ProcButtonCats;
+			lookupCat[22]=DefCat.ProcCodeCats;
+			lookupCat[23]=DefCat.ProgNoteColors;
+			lookupCat[24]=DefCat.Prognosis;
+			lookupCat[25]=DefCat.ProviderSpecialties;
+			lookupCat[26]=DefCat.RecallUnschedStatus;
+			lookupCat[27]=DefCat.SupplyCats;
+			lookupCat[28]=DefCat.TaskPriorities;
+			lookupCat[29]=DefCat.TxPriorities;			
 			for(int i=0;i<listCategory.Items.Count;i++){
 				listCategory.Items[i]=Lan.g(this,(string)listCategory.Items[i]);
 				if((int)lookupCat[i]==SelectedCat){
@@ -342,19 +344,26 @@ namespace OpenDental{
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.HelpText=Lan.g(this,"Changes the color of text for different types of entries in Account Module");
 					break;
-				case 1://"Adj Types":
+				case 1://"Acct Proc Quick Charge":
+					FormDefEdit.CanHide=true;
+					FormDefEdit.CanDelete=true;
+					FormDefEdit.EnableValue=true;
+					FormDefEdit.ValueText=Lan.g(this,"Procedure Codes");
+					FormDefEdit.HelpText=Lan.g(this,"Quick charge items.  Each entry can be a series of procedure codes separated by commas (e.g. D0180,D1101,D8220) but cannot be procedure codes of type tooth or surface.  Used in the account module to quickly charge patients for items.");
+					break;
+				case 2://"Adj Types":
 					//SelectedCat=1;
 					FormDefEdit.ValueText=Lan.g(this,"+ or -");
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.HelpText=Lan.g(this,"Plus increases the patient balance.  Minus decreases it.  Not allowed to change value after creating new type since changes affect all patient accounts.");
 					break;
-				case 2://"Appointment Colors":
+				case 3://"Appointment Colors":
 					//SelectedCat=17;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
 					FormDefEdit.HelpText=Lan.g(this,"Changes colors of background in Appointments Module, and colors for completed appointments.");
 					break;
-				case 3://"Appt Confirmed":
+				case 4://"Appt Confirmed":
 					//SelectedCat=2;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Abbrev");
@@ -362,7 +371,7 @@ namespace OpenDental{
 					//tbDefs.Fields[2]="Color";
 					FormDefEdit.HelpText=Lan.g(this,"Color shows on each appointment if Appointment View is set to show ConfirmedColor.");
 					break;
-				case 4://"Appt Procs Quick Add":
+				case 5://"Appt Procs Quick Add":
 					//SelectedCat=3;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"ADA Code(s)");
@@ -373,18 +382,18 @@ namespace OpenDental{
 						FormDefEdit.HelpText=Lan.g(this,"These are the procedures that you can quickly add to the treatment plan from within the appointment editing window.  They must not require a tooth number. Multiple procedures may be separated by commas with no spaces. These definitions may be freely edited without affecting any patient records.");
 					}	
 					break;
-				case 5://"Billing Types":
+				case 6://"Billing Types":
 					//SelectedCat=4;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"E=Email bill");
 					FormDefEdit.HelpText=Lan.g(this,"It is recommended to use as few billing types as possible.  They can be useful when running reports to separate delinquent accounts, but can cause 'forgotten accounts' if used without good office procedures. Changes affect all patients.");
 					break;
-				case 6://"Blockout Types":
+				case 7://"Blockout Types":
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.EnableValue=false;
 					FormDefEdit.HelpText=Lan.g(this,"Blockout types are used in the appointments module.");
 					break;
-				case 7://"Chart Graphic Colors":
+				case 8://"Chart Graphic Colors":
 					//SelectedCat=22;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
@@ -395,47 +404,47 @@ namespace OpenDental{
 						FormDefEdit.HelpText=Lan.g(this,"These colors will be used on the graphical tooth chart to draw restorations.");
 					}	
 					break;
-				case 8://"Custom Tracking":
+				case 9://"Custom Tracking":
 					butHide.Visible=false;
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.EnableColor=false;
 					FormDefEdit.HelpText=Lan.g(this,"Some offices may set up claim tracking statuses such as 'review', 'hold', 'riskmanage', etc.");
 					break;
-				case 9://"Payment Tracking":
+				case 10://"Payment Tracking":
 					FormDefEdit.EnableColor=false;
 					FormDefEdit.ValueText=Lan.g(this,"Value");
 					FormDefEdit.HelpText=Lan.g(this,"EOB adjudication method codes to be used for insurance payments.  Last entry cannot be hidden.");
 					break;
-				case 10://"Commlog Types"
+				case 11://"Commlog Types"
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"APPT,FIN,RECALL,MISC");
 					FormDefEdit.HelpText=Lan.g(this,"Changes affect all current commlog entries.  In the second column, you can optionally specify APPT,FIN,RECALL,or MISC. Only one of each. This helps automate new entries.");
 					break;
-				case 11://"Contact Categories":
+				case 12://"Contact Categories":
 					//SelectedCat=(int)DefCat.ContactCategories;
 					FormDefEdit.HelpText=Lan.g(this,"You can add as many categories as you want.  Changes affect all current contact records.");
 					break;
-				case 12://"Diagnosis":
+				case 13://"Diagnosis":
 					//SelectedCat=16;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"1 or 2 letter abbreviation");
 					FormDefEdit.HelpText=Lan.g(this,"The diagnosis list is shown when entering a procedure.  Ones that are less used should go lower on the list.  The abbreviation is shown in the progress notes.  BE VERY CAREFUL.  Changes affect all patients.");
 					break;
-				case 13://"Fee Colors":
+				case 14://"Fee Colors":
 					FormDefEdit.CanDelete=false;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
 					FormDefEdit.HelpText=Lan.g(this,"These are the colors associated to fee types.");
 					break;
-				case 14://"Image Categories":
+				case 15://"Image Categories":
 					//SelectedCat=18;
 					//FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Usage");
 					FormDefEdit.HelpText=Lan.g(this,"These are the categories that will be available in the image and chart modules.  If you hide a category, images in that category will be hidden, so only hide a category if you are certain it has never been used.  Multiple categories can be set to show in the Chart module, but only one category should set for patient pictures, statements, and tooth chart. Affects all patient records.");
 					break;
-				case 15://"Insurance Payment Types":
+				case 16://"Insurance Payment Types":
 					butHide.Visible=false;
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.CanHide=false;
@@ -444,56 +453,56 @@ namespace OpenDental{
 					FormDefEdit.EnableColor=false;
 					FormDefEdit.HelpText=Lan.g(this,"These are claim payment types for insurance payments attached to claims.");
 					break;
-				case 16://"Letter Merge Cats"
+				case 17://"Letter Merge Cats"
 					//SelectedCat=(int)DefCat.LetterMergeCats;
 					FormDefEdit.HelpText=Lan.g(this,"Categories for Letter Merge.  You can safely make any changes you want.");
 					break;
-				case 17://"Misc Colors":
+				case 18://"Misc Colors":
 					//SelectedCat=21;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
 					FormDefEdit.HelpText="";
 					break;
-				case 18://"Payment Types":
+				case 19://"Payment Types":
 					//SelectedCat=10;
 					FormDefEdit.HelpText=Lan.g(this,"Types of payments that patients might make. Any changes will affect all patients.");
 					break;
-				case 19://paysplit unearned types
+				case 20://paysplit unearned types
 					FormDefEdit.HelpText=Lan.g(this,"Usually only used by offices that use accrual basis accounting instead of cash basis accounting. Any changes will affect all patients.");
 					break;
-				case 20://"Proc Button Categories":
+				case 21://"Proc Button Categories":
 					FormDefEdit.HelpText=Lan.g(this,"These are similar to the procedure code categories, but are only used for organizing and grouping the procedure buttons in the Chart module.");
 					break;
-				case 21://"Proc Code Categories":
+				case 22://"Proc Code Categories":
 					//SelectedCat=11;
 					FormDefEdit.HelpText=Lan.g(this,"These are the categories for organizing procedure codes. They do not have to follow ADA categories.  There is no relationship to insurance categories which are setup in the Ins Categories section.  Does not affect any patient records.");
 					break;
-				case 22://"Prog Notes Colors":
+				case 23://"Prog Notes Colors":
 					//SelectedCat=12;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
 					FormDefEdit.HelpText=Lan.g(this,"Changes color of text for different types of entries in the Chart Module Progress Notes.");
 					break;
-				case 23://"Prognosis":
+				case 24://"Prognosis":
 					//Nothing special. Might add HelpText later.
 					FormDefEdit.HelpText=Lan.g(this,"");
 					break;
-				case 24://"Provider Specialties":
+				case 25://"Provider Specialties":
 					FormDefEdit.HelpText=Lan.g(this,"Provider specialties cannot be deleted.  Changes to provider specialties could affect e-claims.");
 					break;
-				case 25://"Recall/Unsch Status":
+				case 26://"Recall/Unsch Status":
 					//SelectedCat=13;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Abbreviation");
 					FormDefEdit.HelpText=Lan.g(this,"Recall/Unsched Status.  Abbreviation must be 7 characters or less.  Changes affect all patients.");
 					break;
-				case 26://Supply Categories
+				case 27://Supply Categories
 					butHide.Visible=false;
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.HelpText=Lan.g(this,"The categories for inventory supplies.");
 					break;
-				case 27://Task Priorities
+				case 28://Task Priorities
 					FormDefEdit.CanDelete=false;
 					FormDefEdit.CanHide=true;
 					FormDefEdit.ValueText=Lan.g(this,"D = Default");
@@ -501,7 +510,7 @@ namespace OpenDental{
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection within the task edit window.  Task lists are sorted using the order of these priorities.  They can have any description and color.  At least one priority should be Default (D).  If more than one priority is flagged as the default, the last default in the list will be used.  If no default is set, the last priority will be used.  Changes affect all tasks where the definition is used.");
 					break;
-				case 28://"Treat' Plan Priorities":
+				case 29://"Treat' Plan Priorities":
 					//SelectedCat=20;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.HelpText=Lan.g(this,"Priorities available for selection in the Treatment Plan module.  They can be simple numbers or descriptive abbreviations 7 letters or less.  Changes affect all procedures where the definition is used.");

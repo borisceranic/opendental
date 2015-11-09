@@ -236,7 +236,9 @@ namespace OpenDentBusiness{
 		///<summary>101- Allows user to use the provider merge tool.</summary>
 		ProviderMerge,
 		///<summary>102- Allows user to use the medication merge tool.</summary>
-		MedicationMerge
+		MedicationMerge,
+		///<summary>103- Allow users to use the Quick Charge tool in the Account module.</summary>
+		AccountQuickCharge
 	}
 
 	

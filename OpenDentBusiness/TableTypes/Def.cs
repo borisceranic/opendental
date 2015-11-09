@@ -134,7 +134,9 @@ namespace OpenDentBusiness {
 		///<summary>35- Provider specialties.  General, Hygienist, Pediatric, Primary Care Physician, etc.</summary>
 		ProviderSpecialties,
 		///<summary>36- </summary>
-		ClaimPaymentTracking
+		ClaimPaymentTracking,
+		///<summary>37- Procedure quick charge list for patient accounts.</summary>
+		AccountQuickCharge
 	}
 
 	
