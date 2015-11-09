@@ -30,8 +30,8 @@ namespace OpenDental{
 			this.butLinkFeatReq = new OpenDental.UI.Button();
 			this.butLinkBug = new OpenDental.UI.Button();
 			this.groupAddLink = new System.Windows.Forms.GroupBox();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butLinkQuote = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.groupAddLink.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -87,6 +87,7 @@ namespace OpenDental{
 			this.butLinkFeatReq.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLinkFeatReq.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLinkFeatReq.CornerRadius = 4F;
+			this.butLinkFeatReq.Enabled = false;
 			this.butLinkFeatReq.Location = new System.Drawing.Point(6, 47);
 			this.butLinkFeatReq.Name = "butLinkFeatReq";
 			this.butLinkFeatReq.Size = new System.Drawing.Size(77, 22);
@@ -101,6 +102,7 @@ namespace OpenDental{
 			this.butLinkBug.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLinkBug.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLinkBug.CornerRadius = 4F;
+			this.butLinkBug.Enabled = false;
 			this.butLinkBug.Location = new System.Drawing.Point(6, 75);
 			this.butLinkBug.Name = "butLinkBug";
 			this.butLinkBug.Size = new System.Drawing.Size(77, 22);
@@ -121,6 +123,20 @@ namespace OpenDental{
 			this.groupAddLink.TabStop = false;
 			this.groupAddLink.Text = "Add Link";
 			// 
+			// butLinkQuote
+			// 
+			this.butLinkQuote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkQuote.Autosize = true;
+			this.butLinkQuote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkQuote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkQuote.CornerRadius = 4F;
+			this.butLinkQuote.Location = new System.Drawing.Point(6, 103);
+			this.butLinkQuote.Name = "butLinkQuote";
+			this.butLinkQuote.Size = new System.Drawing.Size(77, 22);
+			this.butLinkQuote.TabIndex = 3;
+			this.butLinkQuote.Text = "Quote";
+			this.butLinkQuote.Click += new System.EventHandler(this.butLinkQuote_Click);
+			// 
 			// gridMain
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -137,20 +153,6 @@ namespace OpenDental{
 			this.gridMain.Title = "Links";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
-			// butLinkQuote
-			// 
-			this.butLinkQuote.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinkQuote.Autosize = true;
-			this.butLinkQuote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLinkQuote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLinkQuote.CornerRadius = 4F;
-			this.butLinkQuote.Location = new System.Drawing.Point(6, 103);
-			this.butLinkQuote.Name = "butLinkQuote";
-			this.butLinkQuote.Size = new System.Drawing.Size(77, 22);
-			this.butLinkQuote.TabIndex = 3;
-			this.butLinkQuote.Text = "Quote";
-			this.butLinkQuote.Click += new System.EventHandler(this.butLinkQuote_Click);
 			// 
 			// FormJobLinks
 			// 
