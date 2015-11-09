@@ -142,7 +142,7 @@ namespace OpenDentBusiness{
 
 		public static DataTable GetSmsUsageLocal(List<long> listClinicNums, DateTime dateMonth) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),listClinicNums,dateMonth);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listClinicNums,dateMonth);
 			}
 			#region Initialize retVal DataTable
 			List<SmsPhone> listSmsPhones=GetForClinics(listClinicNums);
@@ -161,6 +161,7 @@ namespace OpenDentBusiness{
 							FROM
 							  DUAL";//this is a simple way to get a data table with the correct layout without having to query any real data.
 			DataTable retVal=Db.GetTable(command).Clone();//use .Clone() to get schema only, with no rows.
+			retVal.TableName="SmsUsageLocal";
 			for(int i=0;i<listClinicNums.Count;i++) {
 				DataRow row=retVal.NewRow();
 				row["ClinicNum"]=listClinicNums[i];
