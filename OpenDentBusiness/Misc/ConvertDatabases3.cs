@@ -11193,7 +11193,6 @@ namespace OpenDentBusiness {
 				      Db.NonQ(command);
 				   }
 				}
-				}
 				string valuestr=Db.GetScalar("SELECT ValueString FROM preference WHERE PrefName LIKE '"+POut.String(PrefName.ShowFeatureEhr.ToString())+"';");
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticSummaryOfCareWebmail','"+valuestr+"')";
@@ -11203,6 +11202,7 @@ namespace OpenDentBusiness {
 						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticSummaryOfCareWebmail','"+valuestr+"')";
 					Db.NonQ(command);
 				}
+
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
