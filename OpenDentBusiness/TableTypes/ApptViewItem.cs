@@ -59,6 +59,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum ApptViewAlignment {
 		///<summary>0</summary>
 		Main,

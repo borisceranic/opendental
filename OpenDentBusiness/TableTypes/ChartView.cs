@@ -33,6 +33,7 @@ namespace OpenDentBusiness{
 		}	
 	}
 
+	///<summary></summary>
 	[Flags]
 	public enum ChartViewObjs {
 		///<summary>0- None</summary>
@@ -57,6 +58,7 @@ namespace OpenDentBusiness{
 		All=255
 	}
 
+	///<summary></summary>
 	[Flags]
 	public enum ChartViewProcStat {
 		///<summary>0- None.</summary>
@@ -79,6 +81,7 @@ namespace OpenDentBusiness{
 		All=127
 	}
 
+	///<summary></summary>
 	public enum ChartViewDates{
 		/// <summary>0- All</summary>
 		All=0,

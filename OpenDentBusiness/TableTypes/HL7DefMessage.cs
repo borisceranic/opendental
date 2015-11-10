@@ -149,6 +149,7 @@ namespace OpenDentBusiness {
 		S17
 	}
 
+	///<summary></summary>
 	public enum InOutHL7 {
 		///<summary>0</summary>
 		Incoming,
@@ -156,6 +157,7 @@ namespace OpenDentBusiness {
 		Outgoing
 	}
 
+	///<summary></summary>
 	public enum MessageStructureHL7 {
 		///<summary>Use this for unsupported message structures</summary>
 		NotDefined,

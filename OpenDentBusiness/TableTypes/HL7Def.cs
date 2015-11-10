@@ -100,6 +100,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum ModeTxHL7 {
 		///<summary>0</summary>
 		File,
@@ -109,6 +110,7 @@ namespace OpenDentBusiness{
 		Sftp
 	}
 
+	///<summary></summary>
 	public enum HL7ShowDemographics {
 		///<summary>Cannot see or change.</summary>
 		Hide,

@@ -26,6 +26,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum EbillAddress {
 		///<summary>0</summary>
 		PracticePhysical,

@@ -29,6 +29,7 @@ namespace OpenDentBusiness {
     }
   }
 
+	///<summary></summary>
   public enum MedicalOrderType {
     ///<summary>0- Laboratory</summary>
     Laboratory,

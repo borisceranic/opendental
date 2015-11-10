@@ -197,6 +197,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum EnumClaimMedType {
 		///<summary>0</summary>
 		Dental,
@@ -222,6 +223,7 @@ namespace OpenDentBusiness{
 		SecondOpinion_9=9
 	}
 
+	///<summary></summary>
 	public enum ClaimCorrectionType {
 		///<summary>0 - X12 1. Use for claims that are not ongoing.</summary>
 		Original,

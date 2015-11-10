@@ -23,6 +23,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum ApptFieldType {
 		///<summary>0</summary>
 		Text,

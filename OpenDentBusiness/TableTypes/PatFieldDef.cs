@@ -31,7 +31,7 @@ namespace OpenDentBusiness{
 		
 	}
 
-
+	///<summary></summary>
 	public enum PatFieldType {
 		///<summary>0</summary>
 		Text,

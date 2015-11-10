@@ -36,6 +36,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum EhrMeasureEventType {
 		///<summary>0</summary>
 		EducationProvided,

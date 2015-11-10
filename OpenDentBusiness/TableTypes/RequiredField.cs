@@ -46,11 +46,13 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum RequiredFieldType {
 		///<summary>0 - Edit Patient Information window and Add Family window.</summary>
 		PatientInfo
 	}
 
+	///<summary></summary>
 	public enum RequiredFieldName {
 		///<summary></summary>
 		Address,

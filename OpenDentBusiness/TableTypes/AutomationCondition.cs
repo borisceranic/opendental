@@ -25,25 +25,33 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum AutoCondField {
 		///<summary>Typically specify Equals the exact name/description of the sheet.</summary>
 		NeedsSheet,
 		///<summary>disease</summary>
 		Problem,
+		///<summary></summary>
 		Medication,
+		///<summary></summary>
 		Allergy,
 		///<summary>Example, 23</summary>
 		Age,
 		///<summary>Allowed values are M or F, not case sensitive.  Enforce at entry time.</summary>
 		Gender,
+		///<summary></summary>
 		Labresult,
+		///<summary></summary>
 		InsuranceNotEffective
 	}
 
+	///<summary></summary>
 	public enum AutoCondComparison{
 		///<summary>Not sensitive to capitalization.</summary>
 		Equals,
+		///<summary></summary>
 		GreaterThan,
+		///<summary></summary>
 		LessThan,
 		///<summary>aka Like</summary>
 		Contains,

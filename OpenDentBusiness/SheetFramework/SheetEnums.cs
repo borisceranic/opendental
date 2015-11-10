@@ -53,6 +53,7 @@ namespace OpenDentBusiness {
 		DownGlobal
 	}
 
+	///<summary></summary>
 	public enum SheetFieldType {
 		///<Summary>0-Pulled from the database to be printed on the sheet.  Or also possibly just generated at runtime even though not pulled from the database.   User still allowed to change the output text as they are filling out the sheet so that it can different from what was initially generated.</Summary>
 		OutputText,

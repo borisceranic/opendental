@@ -50,6 +50,7 @@ namespace OpenDentBusiness {
 
 	}
 
+	///<summary></summary>
 	public enum EhrMeasureType {
 		///<summary>0</summary>
 		ProblemList,

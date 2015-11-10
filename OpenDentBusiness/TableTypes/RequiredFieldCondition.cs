@@ -25,6 +25,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum ConditionOperator {
 		///<summary>0: =</summary>
 		Equals,
@@ -40,6 +41,7 @@ namespace OpenDentBusiness {
 		LessThanOrEqual
 	}
 
+	///<summary></summary>
 	public enum LogicalOperator {
 		///<summary>0</summary>
 		None,

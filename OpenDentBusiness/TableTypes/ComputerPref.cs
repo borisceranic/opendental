@@ -71,6 +71,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum DrawingMode{
 		///<summary>0</summary>
 		DirectX,

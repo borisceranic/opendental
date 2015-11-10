@@ -25,6 +25,7 @@ namespace OpenDentBusiness{
 		}	
 	}
 
+	///<summary></summary>
 	public enum FeeScheduleType{
 		///<summary>0</summary>
 		Normal,

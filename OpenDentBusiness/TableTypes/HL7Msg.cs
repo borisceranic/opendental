@@ -28,6 +28,7 @@ namespace OpenDentBusiness{
 		}	
 	}
 
+	///<summary></summary>
 	public enum HL7MessageStatus {
 		///<summary>0</summary>
 		OutPending,

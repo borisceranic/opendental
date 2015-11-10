@@ -198,6 +198,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum EnumProcDrugUnit {
 		///<summary>0</summary>
 		None,
@@ -212,8 +213,8 @@ namespace OpenDentBusiness {
 		///<summary>5 - UN on UB04.</summary>
 		Unit
 	}
-	
 
+	///<summary></summary>
 	public enum ProcUnitQtyType {
 		///<summary>0-Only allowed on dental, and only option allowed on dental.  This is also the default for all procs in our UI.  For example, 4 PAs all on one line on the e-claim.</summary>
 		MultProcs,

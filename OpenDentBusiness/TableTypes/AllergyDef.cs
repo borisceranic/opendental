@@ -32,6 +32,7 @@ namespace OpenDentBusiness {
 		
 	}
 
+	///<summary></summary>
 	public enum SnomedAllergy{
 		///<summary>0-No SNOMED allergy type code has been assigned.</summary>
 		None,

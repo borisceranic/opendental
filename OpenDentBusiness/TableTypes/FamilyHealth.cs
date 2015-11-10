@@ -25,6 +25,7 @@ namespace OpenDentBusiness {
 
 	}
 
+	///<summary></summary>
 	public enum FamilyRelationship {
 		///<summary>0</summary>
 		Parent,

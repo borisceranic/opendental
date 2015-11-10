@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
+	///<summary></summary>
 	[Serializable()]
 	public class ApptComm:TableBase {
 		///<summary>Primary key.</summary>
@@ -18,6 +19,7 @@ namespace OpenDentBusiness {
 		public DateTime DateTimeSend;
 	}
 
+	///<summary></summary>
 	public enum CommType {
 		///<summary></summary>
 		Preferred,
@@ -27,6 +29,7 @@ namespace OpenDentBusiness {
 		Email
 	}
 
+	///<summary></summary>
 	public enum IntervalType {
 		///<summary></summary>
 		Daily,

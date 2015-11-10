@@ -31,6 +31,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum GuardianRelationship {
 		///<summary>0 - Added due to feature request.  Needed for EHR.</summary>
 		Father,

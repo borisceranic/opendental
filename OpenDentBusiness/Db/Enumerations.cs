@@ -920,6 +920,7 @@ namespace OpenDentBusiness{
 		Appointment
 	}
 
+	///<summary></summary>
 	public enum TaskStatusEnum{
 		///<summary>0</summary>
 		New,
@@ -1243,6 +1244,7 @@ namespace OpenDentBusiness{
 		Electronic
 	}
 
+	///<summary></summary>
 	public enum DeletedObjectType{
 		///<summary>0</summary>
 		Appointment,

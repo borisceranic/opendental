@@ -100,6 +100,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum EnumCobRule {
 		///<summary>0=Basic</summary>
 		Basic,

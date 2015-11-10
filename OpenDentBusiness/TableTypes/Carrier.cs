@@ -58,27 +58,43 @@ namespace OpenDentBusiness{
 	///<summary>Type 23, Predetermination EOB (regular and embedded) are not included because they are not part of the testing scripts.  The three required types are not included: ClaimTransaction_01, ClaimAcknowledgement_11, and ClaimEOB_21.  Can't find specs for PredeterminationEobEmbedded.</summary>
 	[Flags]
 	public enum CanSupTransTypes {
+		///<summary></summary>
 		None=0,
+		///<summary></summary>
 		EligibilityTransaction_08=1,
+		///<summary></summary>
 		EligibilityResponse_18=2,
+		///<summary></summary>
 		CobClaimTransaction_07=4,
 		///<summary>ClaimAck_11 is not here because it's required by all carriers.</summary>
 		ClaimAckEmbedded_11e=8,
 		///<summary>ClaimEob_21 is not here because it's required by all carriers.</summary>
 		ClaimEobEmbedded_21e=16,
+		///<summary></summary>
 		ClaimReversal_02=32,
+		///<summary></summary>
 		ClaimReversalResponse_12=64,
+		///<summary></summary>
 		PredeterminationSinglePage_03=128,
+		///<summary></summary>
 		PredeterminationMultiPage_03=256,
+		///<summary></summary>
 		PredeterminationAck_13=512,
+		///<summary></summary>
 		PredeterminationAckEmbedded_13e=1024,
+		///<summary></summary>
 		RequestForOutstandingTrans_04=2048,
+		///<summary></summary>
 		OutstandingTransAck_14=4096,
 		///<summary>Response</summary>
 		EmailTransaction_24=8192,
+		///<summary></summary>
 		RequestForSummaryReconciliation_05=16384,
+		///<summary></summary>
 		SummaryReconciliation_15=32768,
+		///<summary></summary>
 		RequestForPaymentReconciliation_06=65536,
+		///<summary></summary>
 		PaymentReconciliation_16=131072
 	}
 	

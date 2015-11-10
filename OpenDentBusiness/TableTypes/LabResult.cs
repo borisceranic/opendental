@@ -37,7 +37,8 @@ namespace OpenDentBusiness{
 
 
 	}
-	
+
+	///<summary></summary>
 	public enum LabAbnormalFlag{
 		///<summary>0-No value.</summary>
 		None,

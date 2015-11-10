@@ -30,6 +30,7 @@ namespace OpenDentBusiness {
 		}
 	}
 
+	///<summary></summary>
 	public enum EhrAptObsIdentifier {
 		///<summary>0 - Body temperature:Temp:Enctrfrst:Patient:Qn:	Loinc code 11289-6.</summary>
 		BodyTemp,
@@ -53,6 +54,7 @@ namespace OpenDentBusiness {
 		VisitType,
 	}
 
+	///<summary></summary>
 	public enum EhrAptObsType {
 		///<summary>0 - This should only be used with EhrAptObsIdentifier.TreatFacilityLocation.</summary>
 		Address,

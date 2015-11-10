@@ -41,6 +41,7 @@ namespace OpenDentBusiness{
 
 	}
 
+	///<summary></summary>
 	public enum PaymentSchedule {
 		///<summary>0 - Pay 1 time every month.</summary>
 		Monthly,
