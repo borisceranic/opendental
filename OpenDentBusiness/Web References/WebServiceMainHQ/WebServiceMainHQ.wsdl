@@ -44,17 +44,17 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="ValidateVersionDeprecated">
+      <s:element name="ValidateVersion">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="ValidateVersionDeprecatedResponse">
+      <s:element name="ValidateVersionResponse">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="ValidateVersionDeprecatedResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ValidateVersionResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -128,6 +128,21 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="SetEConnectorType">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="isListening" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SetEConnectorTypeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SetEConnectorTypeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="string" nillable="true" type="s:string" />
     </s:schema>
   </wsdl:types>
@@ -149,11 +164,11 @@
   <wsdl:message name="ValidateWebAppUrlSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateWebAppUrlResponse" />
   </wsdl:message>
-  <wsdl:message name="ValidateVersionDeprecatedSoapIn">
-    <wsdl:part name="parameters" element="tns:ValidateVersionDeprecated" />
+  <wsdl:message name="ValidateVersionSoapIn">
+    <wsdl:part name="parameters" element="tns:ValidateVersion" />
   </wsdl:message>
-  <wsdl:message name="ValidateVersionDeprecatedSoapOut">
-    <wsdl:part name="parameters" element="tns:ValidateVersionDeprecatedResponse" />
+  <wsdl:message name="ValidateVersionSoapOut">
+    <wsdl:part name="parameters" element="tns:ValidateVersionResponse" />
   </wsdl:message>
   <wsdl:message name="SmsSendSoapIn">
     <wsdl:part name="parameters" element="tns:SmsSend" />
@@ -185,6 +200,12 @@
   <wsdl:message name="GetListenerTypeSoapOut">
     <wsdl:part name="parameters" element="tns:GetListenerTypeResponse" />
   </wsdl:message>
+  <wsdl:message name="SetEConnectorTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:SetEConnectorType" />
+  </wsdl:message>
+  <wsdl:message name="SetEConnectorTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:SetEConnectorTypeResponse" />
+  </wsdl:message>
   <wsdl:message name="PerformRefreshCacheHttpPostIn">
     <wsdl:part name="officeData" type="s:string" />
   </wsdl:message>
@@ -203,10 +224,10 @@
   <wsdl:message name="ValidateWebAppUrlHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
-  <wsdl:message name="ValidateVersionDeprecatedHttpPostIn">
+  <wsdl:message name="ValidateVersionHttpPostIn">
     <wsdl:part name="officeData" type="s:string" />
   </wsdl:message>
-  <wsdl:message name="ValidateVersionDeprecatedHttpPostOut">
+  <wsdl:message name="ValidateVersionHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
   <wsdl:message name="SmsSendHttpPostIn">
@@ -239,6 +260,13 @@
   <wsdl:message name="GetListenerTypeHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
+  <wsdl:message name="SetEConnectorTypeHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+    <wsdl:part name="isListening" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SetEConnectorTypeHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
   <wsdl:portType name="WebServiceMainHQSoap">
     <wsdl:operation name="PerformRefreshCache">
       <wsdl:input message="tns:PerformRefreshCacheSoapIn" />
@@ -252,9 +280,9 @@
       <wsdl:input message="tns:ValidateWebAppUrlSoapIn" />
       <wsdl:output message="tns:ValidateWebAppUrlSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="ValidateVersionDeprecated">
-      <wsdl:input message="tns:ValidateVersionDeprecatedSoapIn" />
-      <wsdl:output message="tns:ValidateVersionDeprecatedSoapOut" />
+    <wsdl:operation name="ValidateVersion">
+      <wsdl:input message="tns:ValidateVersionSoapIn" />
+      <wsdl:output message="tns:ValidateVersionSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="SmsSend">
       <wsdl:input message="tns:SmsSendSoapIn" />
@@ -276,6 +304,10 @@
       <wsdl:input message="tns:GetListenerTypeSoapIn" />
       <wsdl:output message="tns:GetListenerTypeSoapOut" />
     </wsdl:operation>
+    <wsdl:operation name="SetEConnectorType">
+      <wsdl:input message="tns:SetEConnectorTypeSoapIn" />
+      <wsdl:output message="tns:SetEConnectorTypeSoapOut" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="WebServiceMainHQHttpPost">
     <wsdl:operation name="PerformRefreshCache">
@@ -290,9 +322,9 @@
       <wsdl:input message="tns:ValidateWebAppUrlHttpPostIn" />
       <wsdl:output message="tns:ValidateWebAppUrlHttpPostOut" />
     </wsdl:operation>
-    <wsdl:operation name="ValidateVersionDeprecated">
-      <wsdl:input message="tns:ValidateVersionDeprecatedHttpPostIn" />
-      <wsdl:output message="tns:ValidateVersionDeprecatedHttpPostOut" />
+    <wsdl:operation name="ValidateVersion">
+      <wsdl:input message="tns:ValidateVersionHttpPostIn" />
+      <wsdl:output message="tns:ValidateVersionHttpPostOut" />
     </wsdl:operation>
     <wsdl:operation name="SmsSend">
       <wsdl:input message="tns:SmsSendHttpPostIn" />
@@ -313,6 +345,10 @@
     <wsdl:operation name="GetListenerType">
       <wsdl:input message="tns:GetListenerTypeHttpPostIn" />
       <wsdl:output message="tns:GetListenerTypeHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SetEConnectorType">
+      <wsdl:input message="tns:SetEConnectorTypeHttpPostIn" />
+      <wsdl:output message="tns:SetEConnectorTypeHttpPostOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WebServiceMainHQSoap" type="tns:WebServiceMainHQSoap">
@@ -344,8 +380,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateVersionDeprecated">
-      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/ValidateVersionDeprecated" style="document" />
+    <wsdl:operation name="ValidateVersion">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/ValidateVersion" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -398,6 +434,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SetEConnectorType">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SetEConnectorType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQSoap12" type="tns:WebServiceMainHQSoap">
     <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
@@ -428,8 +473,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateVersionDeprecated">
-      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/ValidateVersionDeprecated" style="document" />
+    <wsdl:operation name="ValidateVersion">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/ValidateVersion" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -482,6 +527,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SetEConnectorType">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/SetEConnectorType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQHttpPost" type="tns:WebServiceMainHQHttpPost">
     <http:binding verb="POST" />
@@ -512,8 +566,8 @@
         <mime:mimeXml part="Body" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ValidateVersionDeprecated">
-      <http:operation location="/ValidateVersionDeprecated" />
+    <wsdl:operation name="ValidateVersion">
+      <http:operation location="/ValidateVersion" />
       <wsdl:input>
         <mime:content type="application/x-www-form-urlencoded" />
       </wsdl:input>
@@ -566,16 +620,25 @@
         <mime:mimeXml part="Body" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SetEConnectorType">
+      <http:operation location="/SetEConnectorType" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="WebServiceMainHQ">
     <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
-      <soap:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <soap:address location="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
-      <soap12:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <soap12:address location="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
-      <http:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <http:address location="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

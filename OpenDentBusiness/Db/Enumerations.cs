@@ -1504,6 +1504,17 @@ namespace OpenDentBusiness{
 		EZTEC_OTHER_DS_OPEN
 	}
 
+	///<summary>Only applies to 15.4 and following.  This defines what and how the eConnector is running for a customer.</summary>
+	public enum ListenerServiceType {
+		///<summary>0.  Default for people who had been using the listener prior to the 15.3 proxy listener.</summary>
+		ListenerService,
+		///<summary>1.  Opt-in required to use the proxy service.</summary>
+		ListenerServiceProxy,
+		///<summary>2.  Customer is off by HQ's choice. This can only be undone by HQ.</summary>
+		DisabledByHQ,
+		///<summary>3.  Customer listener is off and awaiting customer consent.</summary>
+		NoListener
+	}
 
 	
 }
