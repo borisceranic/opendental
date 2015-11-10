@@ -3341,8 +3341,8 @@ namespace OpenDental {
 				}
 				ClaimSnapshot snapshot=new ClaimSnapshot();
 				snapshot.ProcNum=listClaimProcs[i].ProcNum;
-				snapshot.Writeoff=listClaimProcs[i].WriteOff;
-				snapshot.InsPayEst=listClaimProcs[i].InsPayEst;
+				snapshot.Writeoff=listClaimProcs[i].WriteOffEst;
+				snapshot.InsPayEst=listClaimProcs[i].InsEstTotal;
 				snapshot.Fee=listClaimProcs[i].FeeBilled;
 				snapshot.ClaimType=claimType;				
 				ClaimSnapshots.Insert(snapshot);
