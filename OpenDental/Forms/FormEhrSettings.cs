@@ -27,6 +27,7 @@ namespace OpenDental {
 			}
 			checkAlertHighSeverity.Checked=PrefC.GetBool(PrefName.EhrRxAlertHighSeverity);
 			checkMU2.Checked=PrefC.GetBool(PrefName.MeaningfulUseTwo);
+			checkAutoWebmails.Checked=PrefC.GetBool(PrefName.AutomaticSummaryOfCareWebmail);
 			FillRecEncCodesList();
 			FillDefaultEncCode();
 			#region DefaultPregnancyGroup
@@ -411,6 +412,7 @@ namespace OpenDental {
 			Prefs.UpdateBool(PrefName.MeaningfulUseTwo,checkMU2.Checked);
 			Prefs.UpdateString(PrefName.CQMDefaultEncounterCodeSystem,NewEncCodeSystem);
 			Prefs.UpdateString(PrefName.PregnancyDefaultCodeSystem,NewPregCodeSystem);
+			Prefs.UpdateBool(PrefName.AutomaticSummaryOfCareWebmail,checkAutoWebmails.Checked);
 			if(comboEncCodes.SelectedIndex==-1) {
 				Prefs.UpdateString(PrefName.CQMDefaultEncounterCodeValue,textEncCodeValue.Text);
 			}

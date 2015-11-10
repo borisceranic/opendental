@@ -377,7 +377,7 @@ namespace OpenDental{
 			}
 			RefAttaches.Insert(refattach);
 			SecurityLogs.MakeLogEntry(Permissions.RefAttachAdd,PatNum,"Referred To "+Referrals.GetNameFL(refattach.ReferralNum));
-			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+			if(PrefC.GetBool(PrefName.AutomaticSummaryOfCareWebmail)) {
 				FormRefAttachEdit FormRAE=new FormRefAttachEdit();
 				FormRAE.RefAttachCur=refattach;
 				FormRAE.ShowDialog();

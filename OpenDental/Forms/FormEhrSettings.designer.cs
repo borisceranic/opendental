@@ -26,6 +26,8 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrSettings));
 			this.checkMU2 = new System.Windows.Forms.CheckBox();
 			this.groupEncounter = new System.Windows.Forms.GroupBox();
+			this.label7 = new System.Windows.Forms.Label();
+			this.butEncounterTool = new OpenDental.UI.Button();
 			this.textEncCodeDescript = new System.Windows.Forms.TextBox();
 			this.butEncCpt = new OpenDental.UI.Button();
 			this.comboEncCodes = new System.Windows.Forms.ComboBox();
@@ -58,8 +60,7 @@ namespace OpenDental{
 			this.checkAlertHighSeverity = new System.Windows.Forms.CheckBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.butEncounterTool = new OpenDental.UI.Button();
-			this.label7 = new System.Windows.Forms.Label();
+			this.checkAutoWebmails = new System.Windows.Forms.CheckBox();
 			this.groupEncounter.SuspendLayout();
 			this.groupPregnancy.SuspendLayout();
 			this.groupGlobalSettings.SuspendLayout();
@@ -68,7 +69,7 @@ namespace OpenDental{
 			// checkMU2
 			// 
 			this.checkMU2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkMU2.Location = new System.Drawing.Point(6, 19);
+			this.checkMU2.Location = new System.Drawing.Point(6, 15);
 			this.checkMU2.Name = "checkMU2";
 			this.checkMU2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkMU2.Size = new System.Drawing.Size(162, 20);
@@ -102,6 +103,31 @@ namespace OpenDental{
 			this.groupEncounter.TabIndex = 119;
 			this.groupEncounter.TabStop = false;
 			this.groupEncounter.Text = "Default Encounter Code";
+			// 
+			// label7
+			// 
+			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label7.Location = new System.Drawing.Point(90, 272);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(357, 17);
+			this.label7.TabIndex = 131;
+			this.label7.Text = "Insert encounters for a specified code for a specified date range.";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// butEncounterTool
+			// 
+			this.butEncounterTool.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEncounterTool.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butEncounterTool.Autosize = true;
+			this.butEncounterTool.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEncounterTool.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEncounterTool.CornerRadius = 4F;
+			this.butEncounterTool.Location = new System.Drawing.Point(9, 268);
+			this.butEncounterTool.Name = "butEncounterTool";
+			this.butEncounterTool.Size = new System.Drawing.Size(75, 24);
+			this.butEncounterTool.TabIndex = 122;
+			this.butEncounterTool.Text = "Insert Encs";
+			this.butEncounterTool.Click += new System.EventHandler(this.butEncounterTool_Click);
 			// 
 			// textEncCodeDescript
 			// 
@@ -416,11 +442,12 @@ namespace OpenDental{
 			// 
 			// groupGlobalSettings
 			// 
+			this.groupGlobalSettings.Controls.Add(this.checkAutoWebmails);
 			this.groupGlobalSettings.Controls.Add(this.checkAlertHighSeverity);
 			this.groupGlobalSettings.Controls.Add(this.checkMU2);
-			this.groupGlobalSettings.Location = new System.Drawing.Point(12, 12);
+			this.groupGlobalSettings.Location = new System.Drawing.Point(12, 4);
 			this.groupGlobalSettings.Name = "groupGlobalSettings";
-			this.groupGlobalSettings.Size = new System.Drawing.Size(453, 52);
+			this.groupGlobalSettings.Size = new System.Drawing.Size(453, 60);
 			this.groupGlobalSettings.TabIndex = 121;
 			this.groupGlobalSettings.TabStop = false;
 			this.groupGlobalSettings.Text = "Global Settings";
@@ -428,7 +455,7 @@ namespace OpenDental{
 			// checkAlertHighSeverity
 			// 
 			this.checkAlertHighSeverity.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkAlertHighSeverity.Location = new System.Drawing.Point(174, 19);
+			this.checkAlertHighSeverity.Location = new System.Drawing.Point(174, 15);
 			this.checkAlertHighSeverity.Name = "checkAlertHighSeverity";
 			this.checkAlertHighSeverity.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkAlertHighSeverity.Size = new System.Drawing.Size(270, 20);
@@ -468,30 +495,17 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// butEncounterTool
+			// checkAutoWebmails
 			// 
-			this.butEncounterTool.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEncounterTool.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEncounterTool.Autosize = true;
-			this.butEncounterTool.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butEncounterTool.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butEncounterTool.CornerRadius = 4F;
-			this.butEncounterTool.Location = new System.Drawing.Point(9, 268);
-			this.butEncounterTool.Name = "butEncounterTool";
-			this.butEncounterTool.Size = new System.Drawing.Size(75, 24);
-			this.butEncounterTool.TabIndex = 122;
-			this.butEncounterTool.Text = "Insert Encs";
-			this.butEncounterTool.Click += new System.EventHandler(this.butEncounterTool_Click);
-			// 
-			// label7
-			// 
-			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label7.Location = new System.Drawing.Point(90, 272);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(357, 17);
-			this.label7.TabIndex = 131;
-			this.label7.Text = "Insert encounters for a specified code for a specified date range.";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.checkAutoWebmails.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAutoWebmails.Location = new System.Drawing.Point(6, 38);
+			this.checkAutoWebmails.Name = "checkAutoWebmails";
+			this.checkAutoWebmails.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.checkAutoWebmails.Size = new System.Drawing.Size(337, 20);
+			this.checkAutoWebmails.TabIndex = 7;
+			this.checkAutoWebmails.Text = "Automatically send Summary of Care webmails";
+			this.checkAutoWebmails.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAutoWebmails.UseVisualStyleBackColor = true;
 			// 
 			// FormEhrSettings
 			// 
@@ -554,5 +568,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPregCodeDescript;
 		private UI.Button butEncounterTool;
 		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox checkAutoWebmails;
 	}
 }

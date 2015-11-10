@@ -89,6 +89,8 @@ namespace OpenDentBusiness {
 		AutomaticCommunicationTimeStart,
 		///<summary>Used to determine the runtime of the threads that do automatic communication in the listener.  Stored as a DateTime.</summary>
 		AutomaticCommunicationTimeEnd,
+		///<summary>Boolean.  Defaults to same value as ShowFeatureEhr.  Used to determine whether automatic summary of care webmails are sent.</summary>
+		AutomaticSummaryOfCareWebmail,
 		AutoResetTPEntryStatus,
 		BackupExcludeImageFolder,
 		BackupFromPath,
