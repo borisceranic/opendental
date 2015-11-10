@@ -2633,7 +2633,7 @@ namespace OpenDentBusiness {
 				numFixed=0;
 				//claim.PlanNum (2/4) PlanNum zero, invalid InsSubNum--------------------------------------------------------------------------------
 				//Will leave orphaned claimprocs. No finanicals to check.
-				command="SELECT claim.ClaimNum FROM PlanNum=0 AND ClaimStatus IN ('PreAuth','W','U') "
+				command="SELECT claim.ClaimNum FROM claim WHERE PlanNum=0 AND ClaimStatus IN ('PreAuth','W','U') "
 					+"AND NOT EXISTS(SELECT * FROM inssub WHERE inssub.InsSubNum=claim.InsSubNum)";
 				DataTable tableClaimNums=Db.GetTable(command);
 				List<long> listClaimNums=new List<long>();
