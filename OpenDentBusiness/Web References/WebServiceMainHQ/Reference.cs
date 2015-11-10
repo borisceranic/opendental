@@ -45,7 +45,7 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         private System.Threading.SendOrPostCallback RequestListenerProxyPrefsOperationCompleted;
         
-        private System.Threading.SendOrPostCallback GetListenerTypeOperationCompleted;
+        private System.Threading.SendOrPostCallback GetEConnectorTypeOperationCompleted;
         
         private System.Threading.SendOrPostCallback SetEConnectorTypeOperationCompleted;
         
@@ -112,7 +112,7 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         public event RequestListenerProxyPrefsCompletedEventHandler RequestListenerProxyPrefsCompleted;
         
         /// <remarks/>
-        public event GetListenerTypeCompletedEventHandler GetListenerTypeCompleted;
+        public event GetEConnectorTypeCompletedEventHandler GetEConnectorTypeCompleted;
         
         /// <remarks/>
         public event SetEConnectorTypeCompletedEventHandler SetEConnectorTypeCompleted;
@@ -350,31 +350,31 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/GetListenerType", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public string GetListenerType(string officeData) {
-            object[] results = this.Invoke("GetListenerType", new object[] {
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/GetEConnectorType", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetEConnectorType(string officeData) {
+            object[] results = this.Invoke("GetEConnectorType", new object[] {
                         officeData});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void GetListenerTypeAsync(string officeData) {
-            this.GetListenerTypeAsync(officeData, null);
+        public void GetEConnectorTypeAsync(string officeData) {
+            this.GetEConnectorTypeAsync(officeData, null);
         }
         
         /// <remarks/>
-        public void GetListenerTypeAsync(string officeData, object userState) {
-            if ((this.GetListenerTypeOperationCompleted == null)) {
-                this.GetListenerTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetListenerTypeOperationCompleted);
+        public void GetEConnectorTypeAsync(string officeData, object userState) {
+            if ((this.GetEConnectorTypeOperationCompleted == null)) {
+                this.GetEConnectorTypeOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetEConnectorTypeOperationCompleted);
             }
-            this.InvokeAsync("GetListenerType", new object[] {
-                        officeData}, this.GetListenerTypeOperationCompleted, userState);
+            this.InvokeAsync("GetEConnectorType", new object[] {
+                        officeData}, this.GetEConnectorTypeOperationCompleted, userState);
         }
         
-        private void OnGetListenerTypeOperationCompleted(object arg) {
-            if ((this.GetListenerTypeCompleted != null)) {
+        private void OnGetEConnectorTypeOperationCompleted(object arg) {
+            if ((this.GetEConnectorTypeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.GetListenerTypeCompleted(this, new GetListenerTypeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.GetEConnectorTypeCompleted(this, new GetEConnectorTypeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -638,17 +638,17 @@ namespace OpenDentBusiness.WebServiceMainHQ {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
-    public delegate void GetListenerTypeCompletedEventHandler(object sender, GetListenerTypeCompletedEventArgs e);
+    public delegate void GetEConnectorTypeCompletedEventHandler(object sender, GetEConnectorTypeCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.18408")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class GetListenerTypeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class GetEConnectorTypeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal GetListenerTypeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal GetEConnectorTypeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
