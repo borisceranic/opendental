@@ -6520,6 +6520,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Podium_Button_100x24.png" />
+    <None Include="Resources\DI_Button_100x24.png" />
     <None Include="Resources\butDentalIntel.png" />
     <None Include="Resources\webSched_PV_Button.png" />
     <None Include="Resources\HICF2012.jpg" />
