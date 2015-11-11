@@ -185,11 +185,14 @@ namespace OpenDentBusiness{
 			#endregion
 		}
 
-		public static TreatPlan GetUnassigned() {
+		public static TreatPlan GetUnassigned(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<TreatPlan>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<TreatPlan>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM treatplan WHERE TPStatus="+POut.Int((int)TreatPlanStatus.Inactive)+" AND Heading='"+POut.String(Lans.g("TreatPlan","Unassigned"))+"'";
+			string command="SELECT * FROM treatplan "
+				+"WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND TPStatus="+POut.Int((int)TreatPlanStatus.Inactive)+" "
+				+"AND Heading='"+POut.String(Lans.g("TreatPlan","Unassigned"))+"'";
 			return Crud.TreatPlanCrud.SelectOne(command)??new TreatPlan();
 		}
 

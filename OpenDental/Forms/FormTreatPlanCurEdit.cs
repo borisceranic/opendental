@@ -25,7 +25,7 @@ namespace OpenDental {
 			if(TreatPlanCur==null || (TreatPlanCur.TPStatus!=TreatPlanStatus.Active && TreatPlanCur.TPStatus!=TreatPlanStatus.Inactive)) {
 				throw new Exception("No treatment plan loaded.");
 			}
-			_treatPlanUnassigned=TreatPlans.GetUnassigned();
+			_treatPlanUnassigned=TreatPlans.GetUnassigned(TreatPlanCur.PatNum);
 			this.Text=TreatPlanCur.Heading+" - {"+Lans.g(this,TreatPlanCur.TPStatus.ToString())+"}";
 			_listProceduresTPAll=Procedures.GetProcsByStatusForPat(TreatPlanCur.PatNum,new[] {ProcStat.TP,ProcStat.TPi});
 			_listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(TreatPlanCur.TreatPlanNum);
