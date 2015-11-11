@@ -765,11 +765,11 @@ namespace OpenDental{
 			this.butNewTP.CornerRadius = 4F;
 			this.butNewTP.Image = global::OpenDental.Properties.Resources.Add;
 			this.butNewTP.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butNewTP.Location = new System.Drawing.Point(432, 29);
+			this.butNewTP.Location = new System.Drawing.Point(431, 29);
 			this.butNewTP.Name = "butNewTP";
-			this.butNewTP.Size = new System.Drawing.Size(76, 23);
+			this.butNewTP.Size = new System.Drawing.Size(77, 23);
 			this.butNewTP.TabIndex = 69;
-			this.butNewTP.Text = "Add";
+			this.butNewTP.Text = "New TP";
 			this.butNewTP.Click += new System.EventHandler(this.butNewTP_Click);
 			// 
 			// butSaveTP
@@ -781,11 +781,11 @@ namespace OpenDental{
 			this.butSaveTP.CornerRadius = 4F;
 			this.butSaveTP.Image = global::OpenDental.Properties.Resources.butCopy;
 			this.butSaveTP.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butSaveTP.Location = new System.Drawing.Point(432, 58);
+			this.butSaveTP.Location = new System.Drawing.Point(431, 58);
 			this.butSaveTP.Name = "butSaveTP";
-			this.butSaveTP.Size = new System.Drawing.Size(76, 23);
+			this.butSaveTP.Size = new System.Drawing.Size(77, 23);
 			this.butSaveTP.TabIndex = 70;
-			this.butSaveTP.Text = "Save";
+			this.butSaveTP.Text = "Save TP";
 			this.butSaveTP.Click += new System.EventHandler(this.butSaveTP_Click);
 			// 
 			// ContrTreat
@@ -1041,7 +1041,17 @@ namespace OpenDental{
 				TPStatus=TreatPlanStatus.Inactive,
 			};
 			FormTPCE.ShowDialog();
-			ModuleSelected(PatCur.PatNum);
+			if(FormTPCE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			long tpNum=FormTPCE.TreatPlanCur.TreatPlanNum;
+			ModuleSelected(PatCur.PatNum);//refreshes TPs
+			for(int i=0;i<_listTreatPlans.Count;i++) {
+				if(_listTreatPlans[i].TreatPlanNum==tpNum) {
+					gridPlans.SetSelected(i,true);
+				}
+			}
+			FillMain();
 		}
 
 		private void butSaveTP_Click(object sender,EventArgs e) {

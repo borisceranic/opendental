@@ -143,18 +143,17 @@ namespace OpenDentBusiness{
 				//Delete TreatPlanAttaches for procedures that are no longer TP status.
 				foreach(TreatPlanAttach tpa in listActiveTreatPlanAttaches) {
 					Procedure proc=listProceduresActiveTP.FirstOrDefault(x => x.ProcNum==tpa.ProcNum);
-					if(proc!=null && proc.ProcStatus==ProcStat.TPi) {
-						Procedure procClone=proc.Copy();
-						proc.ProcStatus=ProcStat.TP;
-						Procedures.Update(proc,procClone);
+					if(proc==null || proc.ProcStatus!=ProcStat.TPi) {
 						continue;
 					}
-					TreatPlanAttaches.Delete(tpa.TreatPlanAttachNum);
+					Procedure procClone=proc.Copy();
+					proc.ProcStatus=ProcStat.TP;
+					Procedures.Update(proc,procClone);
 				}
 			}
 			#endregion
-			#region Orphans and Unassigned TP
 			TreatPlanAttaches.DeleteOrphaned();
+			#region Orphans and Unassigned TP
 			List<TreatPlanAttach> listTPAttaches=TreatPlanAttaches.GetAllForPatNum(patNum);
 			//Find all TPi Procedures that do not have a treatplanattach
 			List<Procedure> listProcTPiOrphans=Procedures.GetProcsByStatusForPat(patNum,new[] { ProcStat.TPi }).FindAll(x => listTPAttaches.All(y => y.ProcNum!=x.ProcNum));
