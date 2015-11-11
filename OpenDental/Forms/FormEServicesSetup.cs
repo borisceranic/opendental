@@ -17,6 +17,9 @@ using System.Xml;
 using System.Globalization;
 using System.Data;
 using System.Linq;
+using System.IO;
+using WebServiceSerializer;
+using OpenDentBusiness.WebServiceMainHQ;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup.  Also includes monitoring for the Listener Service that is required for HQ hosted eServices.</summary>
@@ -61,6 +64,12 @@ namespace OpenDental {
 		private long _webSchedProvNum=0;
 		///<summary>Clinic number used to filter the Time Slots grid.  0 is treated as 'Unassigned'</summary>
 		private long _webSchedClinicNum=0;
+		private ListenerServiceType _listenerType=ListenerServiceType.NoListener;
+		private WebServiceMainHQ _webServiceMain {
+			get {
+				return WebServiceMainHQProxy.GetWebServiceMainHQInstance();
+			}
+		}
 		
 		///<summary>Launches the eServices Setup window defaulted to the tab of the eService passed in.</summary>
 		public FormEServicesSetup(EService setTab=EService.PatientPortal) {
@@ -94,6 +103,15 @@ namespace OpenDental {
 			textBoxNotificationSubject.Text=PrefC.GetString(PrefName.PatientPortalNotifySubject);
 			textBoxNotificationBody.Text=PrefC.GetString(PrefName.PatientPortalNotifyBody);
 			textListenerPort.Text=PrefC.GetString(PrefName.CustListenerPort);
+			try {
+				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+					_webServiceMain.GetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)))
+				);
+				SetEConnectorCommunicationStatus();
+			}
+			catch(Exception ex) {
+				checkAllowEConnectorComm.Enabled=false;
+			}
 			#region mobile synch
 			textMobileSyncServerURL.Text=PrefC.GetString(PrefName.MobileSyncServerURL);
 			textSynchMinutes.Text=PrefC.GetInt(PrefName.MobileSyncIntervalMinutes).ToString();
@@ -1171,6 +1189,52 @@ namespace OpenDental {
 			return eServiceStatus;
 		}
 
+		private void SetEConnectorCommunicationStatus() {
+			switch(_listenerType) {
+				case ListenerServiceType.ListenerService:
+					checkAllowEConnectorComm.Checked=true;
+					break;
+				case ListenerServiceType.ListenerServiceProxy:
+					checkAllowEConnectorComm.Checked=true;
+					textListenerPort.Enabled=false;
+					break;
+				case ListenerServiceType.NoListener:
+					checkAllowEConnectorComm.Checked=false;
+					break;
+				case ListenerServiceType.DisabledByHQ:
+				default:
+					checkAllowEConnectorComm.Enabled=false;
+					break;
+			}
+		}
+
+		private void butInstallEConnector_Click(object sender,EventArgs e) {
+			ServiceManager.FormServiceManage FormSM=new ServiceManager.FormServiceManage("OpenDentalEConnector",true);
+			FormSM.ShowDialog();
+			if(!FormSM.HadServiceInstalled) {
+				return;
+			}
+			bool startListenerCommunications=false;
+			string messageStartListener=Lan.g(this,"The EConnector you installed is currently not accepting communications with Open Dental.")+"  "
+				+Lan.g(this,"This means that eServices will not work for that EConnector.")+"  "+Lan.g(this,"Do you want to start accepting communications?");
+			if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
+				startListenerCommunications=true;
+			}
+			Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
+			try {
+				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+					OpenDentBusiness.WebServiceMainHQProxy.GetWebServiceMainHQInstance().SetEConnectorType(
+						WebSerializer.SerializePrimitive<string>(OpenDentBusiness.PrefC.GetString(OpenDentBusiness.PrefName.RegistrationKey)),
+						startListenerCommunications
+					)
+				);
+			}
+			catch(Exception ex) {
+
+			}
+			SetEConnectorCommunicationStatus();
+		}
+
 		private void FillGridListenerService() {
 			//Display some historical information for the last 30 days in this grid about the lifespan of the listener heartbeats.
 			List<EServiceSignal> listESignals=EServiceSignals.GetServiceHistory(eServiceCode.ListenerService,DateTime.Today.AddDays(-30),DateTime.Today);
@@ -1206,7 +1270,19 @@ namespace OpenDental {
 			if(Prefs.UpdateString(PrefName.CustListenerPort,textListenerPort.Text)) {
 				_changed=true;//Sends invalid signal upon closing the form.
 			}
-			MsgBox.Show(this,"Listener Port Saved");
+			ListenerServiceType listenerTypeOld=_listenerType;
+			try {
+				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+					_webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey))
+						,checkAllowEConnectorComm.Checked)
+				);
+				SetEConnectorCommunicationStatus();
+			}
+			catch(Exception) {
+				MsgBox.Show(this,"Could not update the eConnector communication status.");
+				return;
+			}
+			MsgBox.Show(this,"eConnector settings saved.");
 		}
 
 		private void butStartListenerService_Click(object sender,EventArgs e) {
@@ -1228,7 +1304,7 @@ namespace OpenDental {
 				string test1=test.Replace("\"","");
 				string[] arrayExePath=hklm.GetValue("ImagePath").ToString().Replace("\"","").Split('\\');
 				//This will not work if in the future we allow command line args for the listener service that include paths.
-				if(arrayExePath[arrayExePath.Length-1].StartsWith("OpenDentalCustListener.exe")) {
+				if(arrayExePath[arrayExePath.Length-1].StartsWith("OpenDentalEConnector.exe")) {
 					listListenerServices.Add(listOdServices[i]);
 				}
 			}

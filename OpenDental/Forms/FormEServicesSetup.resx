@@ -141,13 +141,13 @@ If Open Dental is hosting your Patient Portal:
 For more information, see our online manual.</value>
   </data>
   <data name="label25.Text" xml:space="preserve">
-    <value>The Listener Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the Listener Service again.  Make sure to install the Listener Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
+    <value>The eConnector Service is shared by all eServices hosted by Open Dental.  If you already use another eService, you do not need to install the eConnector Service again.  Make sure to install the eConnector Service on a computer that will always be on.  If it is installed on a computer that is turned off or loses internet, all eServices hosted by Open Dental will not be accessible.
 
-Installing the Listener Service for the first time requires installing the OpenDentalCustListener service via our Service Manager and forwarding the Listener Port from your router to the computer where the Listener Service is installed.  For more information, see our online manual.
+Installing the Listener Service for the first time requires installing the eConnector service via our Service Manager and forwarding the eConnector Port from your router to the computer where the eConnector Service is installed.  For more information, see our online manual.
 </value>
   </data>
   <data name="label26.Text" xml:space="preserve">
-    <value>A listener status of "Critical" means your eServices are not accessible and the Listener Service should be started as soon as possible:  if you are on the computer hosting the Listener Service click Start to try and turn the Listener Service on.
+    <value>A listener status of "Critical" means your eServices are not accessible and the eConnector Service should be started as soon as possible:  if you are on the computer hosting the eConnector Service click Start to try and turn the eConnector Service on.
 </value>
   </data>
   <data name="label12.Text" xml:space="preserve">

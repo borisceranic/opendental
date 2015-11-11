@@ -11178,7 +11178,15 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE computerpref MODIFY NoShowLanguage NOT NULL";
 					Db.NonQ(command);
-				} 
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('EConnectorEnabled','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'EConnectorEnabled','0')";
+					Db.NonQ(command);
+				}
 				//Add permission to groups with existing permission ProcComplCreate (23) ------------------------------------------------------
 				command="SELECT DISTINCT UserGroupNum FROM grouppermission WHERE PermType=23";
 				table=Db.GetTable(command);

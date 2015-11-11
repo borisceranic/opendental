@@ -7690,6 +7690,10 @@
       <Project>{D99145B1-CB6C-41F5-BA86-723325145FB5}</Project>
       <Name>RdlViewer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ServiceManager\ServiceManager.csproj">
+      <Project>{791a5d15-7b14-4a12-ba78-34604cc10d7c}</Project>
+      <Name>ServiceManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SparksToothChart\SparksToothChart.csproj">
       <Project>{033B77F4-2E98-49A7-901F-5F388DEDF83E}</Project>
       <Name>SparksToothChart</Name>

@@ -42,12 +42,14 @@ namespace OpenDental{
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabListenerService = new System.Windows.Forms.TabPage();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.checkAllowEConnectorComm = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textListenerPort = new OpenDental.ValidNum();
 			this.label10 = new System.Windows.Forms.Label();
 			this.butSaveListenerPort = new OpenDental.UI.Button();
 			this.label25 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.butInstallEConnector = new OpenDental.UI.Button();
 			this.labelListenerServiceAck = new System.Windows.Forms.Label();
 			this.butListenerServiceAck = new OpenDental.UI.Button();
 			this.label27 = new System.Windows.Forms.Label();
@@ -368,20 +370,33 @@ namespace OpenDental{
 			this.tabListenerService.Padding = new System.Windows.Forms.Padding(3);
 			this.tabListenerService.Size = new System.Drawing.Size(944, 588);
 			this.tabListenerService.TabIndex = 4;
-			this.tabListenerService.Text = "Listener Service";
+			this.tabListenerService.Text = "eConnector Service";
 			// 
 			// groupBox4
 			// 
+			this.groupBox4.Controls.Add(this.checkAllowEConnectorComm);
 			this.groupBox4.Controls.Add(this.label11);
 			this.groupBox4.Controls.Add(this.textListenerPort);
 			this.groupBox4.Controls.Add(this.label10);
 			this.groupBox4.Controls.Add(this.butSaveListenerPort);
 			this.groupBox4.Location = new System.Drawing.Point(117, 445);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(711, 133);
+			this.groupBox4.Size = new System.Drawing.Size(711, 137);
 			this.groupBox4.TabIndex = 252;
 			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Listener Service Settings";
+			this.groupBox4.Text = "eConnector Service Settings";
+			// 
+			// checkAllowEConnectorComm
+			// 
+			this.checkAllowEConnectorComm.AutoSize = true;
+			this.checkAllowEConnectorComm.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAllowEConnectorComm.Location = new System.Drawing.Point(130, 77);
+			this.checkAllowEConnectorComm.Name = "checkAllowEConnectorComm";
+			this.checkAllowEConnectorComm.Size = new System.Drawing.Size(252, 17);
+			this.checkAllowEConnectorComm.TabIndex = 244;
+			this.checkAllowEConnectorComm.Text = "Allow eConnector to communicate for eServices";
+			this.checkAllowEConnectorComm.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAllowEConnectorComm.UseVisualStyleBackColor = true;
 			// 
 			// label11
 			// 
@@ -391,14 +406,14 @@ namespace OpenDental{
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(698, 35);
 			this.label11.TabIndex = 56;
-			this.label11.Text = "The Listener Port is the same for all eServices hosted by Open Dental and must be" +
-    " forwarded by your router to the computer that is running the OpenDentCustListen" +
-    "er service.";
+			this.label11.Text = "The eConnector Port is the same for all eServices hosted by Open Dental and must " +
+    "be forwarded by your router to the computer that is running the eConnector servi" +
+    "ce.";
 			// 
 			// textListenerPort
 			// 
 			this.textListenerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textListenerPort.Location = new System.Drawing.Point(311, 56);
+			this.textListenerPort.Location = new System.Drawing.Point(282, 54);
 			this.textListenerPort.MaxVal = 65535;
 			this.textListenerPort.MinVal = 0;
 			this.textListenerPort.Name = "textListenerPort";
@@ -409,11 +424,11 @@ namespace OpenDental{
 			// label10
 			// 
 			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label10.Location = new System.Drawing.Point(120, 57);
+			this.label10.Location = new System.Drawing.Point(91, 55);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(185, 17);
 			this.label10.TabIndex = 57;
-			this.label10.Text = "Listener Port";
+			this.label10.Text = "eConnector Port";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butSaveListenerPort
@@ -424,7 +439,7 @@ namespace OpenDental{
 			this.butSaveListenerPort.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSaveListenerPort.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSaveListenerPort.CornerRadius = 4F;
-			this.butSaveListenerPort.Location = new System.Drawing.Point(323, 100);
+			this.butSaveListenerPort.Location = new System.Drawing.Point(323, 104);
 			this.butSaveListenerPort.Name = "butSaveListenerPort";
 			this.butSaveListenerPort.Size = new System.Drawing.Size(61, 24);
 			this.butSaveListenerPort.TabIndex = 243;
@@ -442,6 +457,7 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.butInstallEConnector);
 			this.groupBox3.Controls.Add(this.labelListenerServiceAck);
 			this.groupBox3.Controls.Add(this.butListenerServiceAck);
 			this.groupBox3.Controls.Add(this.label27);
@@ -458,7 +474,21 @@ namespace OpenDental{
 			this.groupBox3.Size = new System.Drawing.Size(929, 339);
 			this.groupBox3.TabIndex = 249;
 			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Listener Service Monitor";
+			this.groupBox3.Text = "eConnector Service Monitor";
+			// 
+			// butInstallEConnector
+			// 
+			this.butInstallEConnector.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butInstallEConnector.Autosize = true;
+			this.butInstallEConnector.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butInstallEConnector.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butInstallEConnector.CornerRadius = 4F;
+			this.butInstallEConnector.Location = new System.Drawing.Point(594, 45);
+			this.butInstallEConnector.Name = "butInstallEConnector";
+			this.butInstallEConnector.Size = new System.Drawing.Size(61, 24);
+			this.butInstallEConnector.TabIndex = 255;
+			this.butInstallEConnector.Text = "Install";
+			this.butInstallEConnector.Click += new System.EventHandler(this.butInstallEConnector_Click);
 			// 
 			// labelListenerServiceAck
 			// 
@@ -491,8 +521,8 @@ namespace OpenDental{
 			this.label27.Name = "label27";
 			this.label27.Size = new System.Drawing.Size(916, 19);
 			this.label27.TabIndex = 252;
-			this.label27.Text = "Open Dental monitors the status of the Listener Service and alerts all workstatio" +
-    "ns when status is critical.";
+			this.label27.Text = "Open Dental monitors the status of the eConnector Service and alerts all workstat" +
+    "ions when status is critical.";
 			// 
 			// butListenerServiceHistoryRefresh
 			// 
@@ -529,7 +559,7 @@ namespace OpenDental{
 			this.gridListenerServiceStatusHistory.ScrollValue = 0;
 			this.gridListenerServiceStatusHistory.Size = new System.Drawing.Size(917, 138);
 			this.gridListenerServiceStatusHistory.TabIndex = 249;
-			this.gridListenerServiceStatusHistory.Title = "Listener Service History";
+			this.gridListenerServiceStatusHistory.Title = "eConnector History";
 			this.gridListenerServiceStatusHistory.TranslationName = "FormEServicesSetup";
 			this.gridListenerServiceStatusHistory.WrapText = false;
 			// 
@@ -555,8 +585,8 @@ namespace OpenDental{
 			this.label24.Name = "label24";
 			this.label24.Size = new System.Drawing.Size(578, 29);
 			this.label24.TabIndex = 248;
-			this.label24.Text = "Before you stop monitoring, first uninstall the Listener Service.\r\nMonitoring wil" +
-    "l automatically resume when an active Listener Service has been detected.";
+			this.label24.Text = "Before you stop monitoring, first uninstall the eConnector Service.\r\nMonitoring w" +
+    "ill automatically resume when an active eConnector Service has been detected.";
 			// 
 			// labelListenerStatus
 			// 
@@ -564,7 +594,7 @@ namespace OpenDental{
 			this.labelListenerStatus.Name = "labelListenerStatus";
 			this.labelListenerStatus.Size = new System.Drawing.Size(238, 17);
 			this.labelListenerStatus.TabIndex = 244;
-			this.labelListenerStatus.Text = "Current Listener Service Status";
+			this.labelListenerStatus.Text = "Current eConnector Service Status";
 			this.labelListenerStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butListenerAlertsOff
@@ -1543,7 +1573,7 @@ namespace OpenDental{
 			this.label23.Size = new System.Drawing.Size(949, 28);
 			this.label23.TabIndex = 244;
 			this.label23.Text = "eServices refer to Open Dental features that can be delivered electronically via " +
-    "the internet.  All eServices hosted by Open Dental use the Listener Service.";
+    "the internet.  All eServices hosted by Open Dental use the eConnector Service.";
 			this.label23.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
 			// butClose
@@ -2010,6 +2040,8 @@ namespace OpenDental{
 		private UI.ODGrid odGrid2;
 		private UI.Button button6;
 		private UI.Button button7;
+		private UI.Button butInstallEConnector;
+		private System.Windows.Forms.CheckBox checkAllowEConnectorComm;
 
 	}
 }

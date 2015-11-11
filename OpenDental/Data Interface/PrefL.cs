@@ -6,6 +6,8 @@ using OpenDentBusiness;
 using System.Windows.Forms;
 using CodeBase;
 using Ionic.Zip;
+using WebServiceSerializer;
+using OpenDentBusiness.WebServiceMainHQ;
 
 namespace OpenDental {
 	public class PrefL{
@@ -239,6 +241,32 @@ namespace OpenDental {
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
 				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,DateTime.Now);
 				Cache.Refresh(InvalidType.Prefs);
+				//If this is the Update Server computer, we need to check if they have upgraded the CustListener service to the eConnector.
+				if(PrefC.GetString(PrefName.WebServiceServerName)!="" 
+					&& ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower())
+					&& !PrefC.GetBool(PrefName.EConnectorEnabled))
+				{
+					//Customer has not upgraded to the eConnector service.
+					bool isListening;
+					//if isSilent=false, a messagebox will be displayed if anything goes wrong.
+					if(ServiceHelper.UpgradeOrInstallEConnector(isSilent,out isListening)) {
+						Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
+						try {
+							WebServiceMainHQ webServiceMain=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
+							webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)),isListening);
+						}
+						catch(Exception ex) {
+							if(!isSilent) {
+								//We probably don't want to notify them that a connection to HQ to update their listener type has failed.  Or do we?
+							}
+						}
+					}
+					else {//Upgrading to eConnector failed.
+						//Purposefully do not fail the upgrade if automatically upgrading to the eConnector failed.
+						//The user will call us up when their eServices are no longer working and we will be able to assist them in installing the new service.
+						//NEVER update the EConnectorEnabled preference to false.  There is no such thing.  It is used as a one time flag.
+					}
+				}
 			}
 			if(storedVersion>currentVersion) {
 				if(isSilent) {//This should never happen after a silent update.

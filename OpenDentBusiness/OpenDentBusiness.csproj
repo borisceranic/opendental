@@ -146,6 +146,7 @@
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -702,6 +703,7 @@
     <Compile Include="Misc\ConvertDatabases1.cs" />
     <Compile Include="Misc\Mime.cs" />
     <Compile Include="Misc\NTPv4.cs" />
+    <Compile Include="Misc\ServiceHelper.cs" />
     <Compile Include="Misc\WebServiceMainHQProxy.cs" />
     <Compile Include="Misc\WindowsTime.cs" />
     <Compile Include="Mobile\Crud\AllergyDefmCrud.cs" />

@@ -30,13 +30,13 @@ namespace ServiceManager {
 			if(listMain.SelectedIndex==-1) {
 				return;
 			}
-			FormServiceManage FormS=new FormServiceManage(listMain.SelectedItem.ToString());
+			FormServiceManage FormS=new FormServiceManage(listMain.SelectedItem.ToString(),false);
 			FormS.ShowDialog();
 			FillList();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormServiceManage FormS=new FormServiceManage("OpenDent");
+			FormServiceManage FormS=new FormServiceManage("OpenDent",false);
 			FormS.ShowDialog();
 			FillList();
 		}

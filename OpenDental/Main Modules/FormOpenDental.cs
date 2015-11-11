@@ -1747,7 +1747,7 @@ namespace OpenDental{
 			// 
 			this.menuItemListenerService.Index = 6;
 			this.menuItemListenerService.OwnerDraw = true;
-			this.menuItemListenerService.Text = "Listener Service";
+			this.menuItemListenerService.Text = "eConnector Service";
 			this.menuItemListenerService.Click += new System.EventHandler(this.menuItemListenerService_Click);
 			this.menuItemListenerService.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.menuItemEServices_DrawItem);
 			this.menuItemListenerService.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.menuItemListenerService_MeasureItem);

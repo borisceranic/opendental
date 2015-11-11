@@ -1,17 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Text.RegularExpressions;
-using System.Collections;
-using System.Linq;
 using System.Drawing;
-using System.Globalization;
 using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
-namespace WebServiceCustomerUpdates {
+namespace WebServiceSerializer {
 	///<summary>Used to serialize primitives for WebServiceCustUpdates I/O.</summary>
 	public static class WebSerializer {
 

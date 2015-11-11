@@ -200,12 +200,12 @@ namespace OpenDentBusiness {
 		CQMDefaultEncounterCodeSystem,
 		CropDelta,
 		///<summary>Used by OD HQ.  Not added to db convert script.  Allowable timeout for Negotiator to establish a connection with Listener. Different than SocketTimeoutMS and TransmissionTimeoutMS.  Specifies the allowable timeout for Patient Portal Negotiator to establish a connection with Listener.  Negotiator will only wait this long to get an acknowledgement that the Listener is available for a transmission before timing out.  Initially 10000</summary>
-		CustListenerConnectionRequestTimeoutMS,		
-		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalCustListener when service initialized.  Specifies the time (in minutes) between each time that the listener service will upload it's current heartbeat to HQ.  Initially 360</summary>
+		CustListenerConnectionRequestTimeoutMS,
+		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalEConnector when service initialized.  Specifies the time (in minutes) between each time that the listener service will upload it's current heartbeat to HQ.  Initially 360</summary>
 		CustListenerHeartbeatFrequencyMinutes,
-		///<summary>Used by OpenDentalCustListener.  String specifies which port the OpenDentalWebService should look for on the customer's server in order to create a socket connection.  Initially 25255</summary>
+		///<summary>Used by OpenDentalEConnector.  String specifies which port the OpenDentalWebService should look for on the customer's server in order to create a socket connection.  Initially 25255</summary>
 		CustListenerPort,
-		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalCustListener when service initialized.  Specifies the read/write socket timeout.  Initially 3000</summary>
+		///<summary>Used by OD HQ.  Not added to db convert script.  Will be passed to OpenDentalEConnector when service initialized.  Specifies the read/write socket timeout.  Initially 3000</summary>
 		CustListenerSocketTimeoutMS,
 		///<summary>Used by OD HQ.  Not added to db convert script.  Specifies the entire wait time alloted for a transmission initiated by the patient portal.  Negotiator will only wait this long for a valid response back from Listener before timing out.  Initially 30000</summary>		
 		CustListenerTransmissionTimeoutMS,
@@ -238,6 +238,11 @@ namespace OpenDentBusiness {
 		EasyHideRepeatCharges,
 		EasyNoClinics,
 		EclaimsSeparateTreatProv,
+		///<summary>Boolean, false by default.  Will be set to true when the update server successfully upgrades the CustListener service to the 
+		///eConnector service.  This only needs to happen once.  This will automatically happen after upgrading past v15.4.
+		///If automatically upgrading the CustListener service to the eConnector service fails, they can click Install in eService Setup.
+		///NEVER programmatically set this preference back to false.</summary>
+		EConnectorEnabled,
 		EHREmailFromAddress,
 		EHREmailPassword,
 		EHREmailPOPserver,
