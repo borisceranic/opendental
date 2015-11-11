@@ -3319,14 +3319,14 @@ namespace OpenDental {
 				ClaimProcs.Update(listClaimProcs[i]);
 			}
 			//Insert claim snapshots for historical reporting purposes.
-			CreateClaimSnapshot(claimType,listClaimProcs);//,procsForPat
+			CreateClaimSnapshot(claimType,listClaimProcs,proc.ProcFee);//,procsForPat
 			return ClaimCur;
 			//return null;
 		}
 
 		///<summary>Creates a snapshot for the claimprocs passed in.  Used for reporting purposes.  claimType=P,S
 		///Only creates snapshots if the feature is enabled and if the claimproc is of certain statuses.</summary>
-		private void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs) {//,List<Procedure> listPatProcs
+		private void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs,double procFee) {//,List<Procedure> listPatProcs
 			if(!PrefC.GetBool(PrefName.ClaimSnapshotEnabled) || (claimType!="P" && claimType!="S")) {
 				return;
 			}
@@ -3343,7 +3343,7 @@ namespace OpenDental {
 				snapshot.ProcNum=listClaimProcs[i].ProcNum;
 				snapshot.Writeoff=listClaimProcs[i].WriteOffEst;
 				snapshot.InsPayEst=listClaimProcs[i].InsEstTotal;
-				snapshot.Fee=listClaimProcs[i].FeeBilled;
+				snapshot.Fee=procFee;
 				snapshot.ClaimType=claimType;				
 				ClaimSnapshots.Insert(snapshot);
 			}
