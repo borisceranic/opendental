@@ -262,6 +262,31 @@ namespace OpenDentBusiness {
 			return proc;
 		}
 
+		///<summary>Gets one procedure directly from the db.  Option to include the note.  If the procNum is 0 or if the procNum does not exist in the database, this will return a new Procedure object with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
+		public static List<Procedure> GetManyProc(List<long> listProcNums,bool includeNote) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),listProcNums,includeNote);
+			}
+			if(listProcNums==null || listProcNums.Count==0) {
+				return new List<Procedure>();
+			}
+			string command="SELECT * FROM procedurelog WHERE ProcNum IN ("+string.Join(",",listProcNums)+")";
+			List<Procedure> listProcs=Crud.ProcedureCrud.SelectMany(command);
+			foreach(Procedure proc in listProcs) {
+				command="SELECT * FROM procnote WHERE ProcNum="+POut.Long(proc.ProcNum)+" ORDER BY EntryDateTime DESC";
+				DbHelper.LimitOrderBy(command,1);
+				DataTable table=Db.GetTable(command);
+				if(table.Rows.Count==0) {
+					continue;
+				}
+				proc.UserNum=PIn.Long(table.Rows[0]["UserNum"].ToString());
+				proc.Note=PIn.String(table.Rows[0]["Note"].ToString());
+				proc.SigIsTopaz=PIn.Bool(table.Rows[0]["SigIsTopaz"].ToString());
+				proc.Signature=PIn.String(table.Rows[0]["Signature"].ToString());
+			}
+			return listProcs;
+		}
+
 		///<summary>Gets Procedures for a single appointment directly from the database</summary>
 		public static List<Procedure> GetProcsForSingle(long aptNum,bool isPlanned) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -382,6 +407,17 @@ namespace OpenDentBusiness {
 				+"AND procedurelog.PatNum="+POut.Long(patNum)+" "
 				+"AND procedurelog.IsCpoe=1 "
 				+"AND procedurelog.DateEntryC BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
+		public static List<Procedure> GetProcsByStatusForPat(long patNum,ProcStat[] procStatuses) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),patNum,procStatuses);
+			}
+			if(procStatuses==null || procStatuses.Length==0) {
+				return new List<Procedure>();
+			}
+			string command="SELECT * FROM procedurelog WHERE PatNum="+POut.Long(patNum)+" AND ProcStatus IN ("+string.Join(",",procStatuses.Select(x => (int)x))+")";
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
@@ -1724,6 +1760,24 @@ namespace OpenDentBusiness {
 				return;
 			}
 			Crud.ProcedureCrud.Sync(listNew,listDB);
+		}
+
+		public static void SetTPActive(long patNum,List<long> listProcNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,listProcNums); //Never pass DB list through the web service (Note: Why?  Our proc list is special, it doesn't contain all procs so we shouldn't code this method to always use our limited list of procs........)
+				return;
+			}
+			string command="UPDATE procedurelog SET ProcStatus="+POut.Int((int)ProcStat.TPi)+" WHERE PatNum="+POut.Long(patNum)+" "+
+			  "AND ProcStatus="+POut.Int((int)ProcStat.TP)+" ";
+			if(listProcNums.Count==0) {
+				Db.NonQ(command);
+				return; //no procedures left on active plan
+			}
+			command+="AND ProcNum NOT IN ("+string.Join(",",listProcNums)+") ";
+			Db.NonQ(command);
+			command="UPDATE procedurelog SET ProcStatus="+POut.Int((int)ProcStat.TP)+" WHERE PatNum="+POut.Long(patNum)+" "+
+			  "AND ProcStatus="+POut.Int((int)ProcStat.TPi)+" AND ProcNum IN ("+string.Join(",",listProcNums)+") ";
+			Db.NonQ(command);
 		}
 	}
 

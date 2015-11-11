@@ -3140,6 +3140,12 @@ namespace OpenDental{
 					comboProcStatus.SelectedIndex=5;
 				}
 			}
+			if(ProcCur.ProcStatus==ProcStat.TPi) {
+				comboProcStatus.Items.Add(Lan.g("TreatPlan","Treatment Planned Inactive"));
+				comboProcStatus.SelectedIndex=comboProcStatus.Items.Count-1;
+				comboProcStatus.Enabled=false;
+				butSetComplete.Enabled=false;
+			}
 			if(ProcCur.ProcStatus==ProcStat.D && ProcCur.IsLocked){//an invalidated proc
 				comboProcStatus.Items.Clear();
 				comboProcStatus.Items.Add(Lan.g(this,"Invalidated"));
@@ -4093,6 +4099,7 @@ namespace OpenDental{
 
 		private void comboProcStatus_SelectionChangeCommitted(object sender,EventArgs e) {
 			//status cannot be changed for completed procedures attached to a claim.
+			//cannot edit status for TPi procedures.
 			if(Procedures.IsAttachedToClaim(ProcOld,ClaimProcsForProc) && ProcOld.ProcStatus==ProcStat.C) {
 				MsgBox.Show(this, "This is a completed procedure that is attached to a claim.  You must remove the procedure from the claim"+
 					" or delete the claim before editing the status.");

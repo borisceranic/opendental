@@ -596,8 +596,8 @@ namespace OpenDental{
 
 		private static DataTable getTable_TreatPlanMain(Sheet sheet) {
 			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
-			bool checkShowSubtotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowTotals").ParamValue;
-			bool checkShowTotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowCompleted").ParamValue;
+			bool checkShowSubtotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowSubTotals").ParamValue;
+			bool checkShowTotals=(bool)SheetParameter.GetParamByName(sheet.Parameters,"checkShowTotals").ParamValue;
 			//Note: this logic was ported from ContrTreat.cs
 			//Construct empty Data table ===============================================================================
 			DataTable retVal=new DataTable();

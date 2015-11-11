@@ -55,6 +55,7 @@ namespace OpenDentBusiness.Crud{
 				treatPlan.SigIsTopaz  = PIn.Bool  (row["SigIsTopaz"].ToString());
 				treatPlan.ResponsParty= PIn.Long  (row["ResponsParty"].ToString());
 				treatPlan.DocNum      = PIn.Long  (row["DocNum"].ToString());
+				treatPlan.TPStatus    = (OpenDentBusiness.TreatPlanStatus)PIn.Int(row["TPStatus"].ToString());
 				retVal.Add(treatPlan);
 			}
 			return retVal;
@@ -95,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -107,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(treatPlan.Signature)+"',"
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+","
-				+    POut.Long  (treatPlan.DocNum)+")";
+				+    POut.Long  (treatPlan.DocNum)+","
+				+    POut.Int   ((int)treatPlan.TPStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -140,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -152,7 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(treatPlan.Signature)+"',"
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+","
-				+    POut.Long  (treatPlan.DocNum)+")";
+				+    POut.Long  (treatPlan.DocNum)+","
+				+    POut.Int   ((int)treatPlan.TPStatus)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +175,8 @@ namespace OpenDentBusiness.Crud{
 				+"Signature   = '"+POut.String(treatPlan.Signature)+"', "
 				+"SigIsTopaz  =  "+POut.Bool  (treatPlan.SigIsTopaz)+", "
 				+"ResponsParty=  "+POut.Long  (treatPlan.ResponsParty)+", "
-				+"DocNum      =  "+POut.Long  (treatPlan.DocNum)+" "
+				+"DocNum      =  "+POut.Long  (treatPlan.DocNum)+", "
+				+"TPStatus    =  "+POut.Int   ((int)treatPlan.TPStatus)+" "
 				+"WHERE TreatPlanNum = "+POut.Long(treatPlan.TreatPlanNum);
 			Db.NonQ(command);
 		}
@@ -211,6 +215,10 @@ namespace OpenDentBusiness.Crud{
 			if(treatPlan.DocNum != oldTreatPlan.DocNum) {
 				if(command!=""){ command+=",";}
 				command+="DocNum = "+POut.Long(treatPlan.DocNum)+"";
+			}
+			if(treatPlan.TPStatus != oldTreatPlan.TPStatus) {
+				if(command!=""){ command+=",";}
+				command+="TPStatus = "+POut.Int   ((int)treatPlan.TPStatus)+"";
 			}
 			if(command==""){
 				return false;

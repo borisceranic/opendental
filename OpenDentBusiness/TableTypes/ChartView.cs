@@ -27,6 +27,8 @@ namespace OpenDentBusiness{
 		public OrionStatus OrionStatusFlags;
 		///<summary>Enum:ChartViewDates </summary>
 		public ChartViewDates DatesShowing;
+		///<summary>set true to show treatment plan controls in chart module.</summary>
+		public bool IsTpCharting;
 
 		public ChartView Copy() {
 			return (ChartView)this.MemberwiseClone();

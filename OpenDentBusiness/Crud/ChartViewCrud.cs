@@ -56,6 +56,7 @@ namespace OpenDentBusiness.Crud{
 				chartView.SelectedTeethOnly= PIn.Bool  (row["SelectedTeethOnly"].ToString());
 				chartView.OrionStatusFlags = (OpenDentBusiness.OrionStatus)PIn.Int(row["OrionStatusFlags"].ToString());
 				chartView.DatesShowing     = (OpenDentBusiness.ChartViewDates)PIn.Int(row["DatesShowing"].ToString());
+				chartView.IsTpCharting     = PIn.Bool  (row["IsTpCharting"].ToString());
 				retVal.Add(chartView);
 			}
 			return retVal;
@@ -96,7 +97,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ChartViewNum,";
 			}
-			command+="Description,ItemOrder,ProcStatuses,ObjectTypes,ShowProcNotes,IsAudit,SelectedTeethOnly,OrionStatusFlags,DatesShowing) VALUES(";
+			command+="Description,ItemOrder,ProcStatuses,ObjectTypes,ShowProcNotes,IsAudit,SelectedTeethOnly,OrionStatusFlags,DatesShowing,IsTpCharting) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(chartView.ChartViewNum)+",";
 			}
@@ -109,7 +110,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (chartView.IsAudit)+","
 				+    POut.Bool  (chartView.SelectedTeethOnly)+","
 				+    POut.Int   ((int)chartView.OrionStatusFlags)+","
-				+    POut.Int   ((int)chartView.DatesShowing)+")";
+				+    POut.Int   ((int)chartView.DatesShowing)+","
+				+    POut.Bool  (chartView.IsTpCharting)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -142,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ChartViewNum,";
 			}
-			command+="Description,ItemOrder,ProcStatuses,ObjectTypes,ShowProcNotes,IsAudit,SelectedTeethOnly,OrionStatusFlags,DatesShowing) VALUES(";
+			command+="Description,ItemOrder,ProcStatuses,ObjectTypes,ShowProcNotes,IsAudit,SelectedTeethOnly,OrionStatusFlags,DatesShowing,IsTpCharting) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(chartView.ChartViewNum)+",";
 			}
@@ -155,7 +157,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (chartView.IsAudit)+","
 				+    POut.Bool  (chartView.SelectedTeethOnly)+","
 				+    POut.Int   ((int)chartView.OrionStatusFlags)+","
-				+    POut.Int   ((int)chartView.DatesShowing)+")";
+				+    POut.Int   ((int)chartView.DatesShowing)+","
+				+    POut.Bool  (chartView.IsTpCharting)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -176,7 +179,8 @@ namespace OpenDentBusiness.Crud{
 				+"IsAudit          =  "+POut.Bool  (chartView.IsAudit)+", "
 				+"SelectedTeethOnly=  "+POut.Bool  (chartView.SelectedTeethOnly)+", "
 				+"OrionStatusFlags =  "+POut.Int   ((int)chartView.OrionStatusFlags)+", "
-				+"DatesShowing     =  "+POut.Int   ((int)chartView.DatesShowing)+" "
+				+"DatesShowing     =  "+POut.Int   ((int)chartView.DatesShowing)+", "
+				+"IsTpCharting     =  "+POut.Bool  (chartView.IsTpCharting)+" "
 				+"WHERE ChartViewNum = "+POut.Long(chartView.ChartViewNum);
 			Db.NonQ(command);
 		}
@@ -219,6 +223,10 @@ namespace OpenDentBusiness.Crud{
 			if(chartView.DatesShowing != oldChartView.DatesShowing) {
 				if(command!=""){ command+=",";}
 				command+="DatesShowing = "+POut.Int   ((int)chartView.DatesShowing)+"";
+			}
+			if(chartView.IsTpCharting != oldChartView.IsTpCharting) {
+				if(command!=""){ command+=",";}
+				command+="IsTpCharting = "+POut.Bool(chartView.IsTpCharting)+"";
 			}
 			if(command==""){
 				return false;

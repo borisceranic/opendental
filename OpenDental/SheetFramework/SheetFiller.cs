@@ -592,10 +592,10 @@ namespace OpenDental{
 				#endregion
 				#region Treatment Plan
 				//Treatment plan-----------------------------------------------------------------------------------------------------------
-				TreatPlan[] treatPlanList=TreatPlans.Refresh(pat.PatNum);
+				List<TreatPlan> treatPlanList=TreatPlans.Refresh(pat.PatNum);
 				TreatPlan treatPlan=null;
-				if(treatPlanList.Length>0) {
-					treatPlan=treatPlanList[treatPlanList.Length-1].Copy();
+				if(treatPlanList.Count>0) {
+					treatPlan=treatPlanList[treatPlanList.Count-1].Copy();
 					dateOfLastSavedTP=treatPlan.DateTP.ToShortDateString();
 					Patient patRespParty=Patients.GetPat(treatPlan.ResponsParty);
 					if(patRespParty!=null) {

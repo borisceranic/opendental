@@ -583,7 +583,9 @@ namespace OpenDental{
 			SaveSignature();//"saves" signature to TPCur, does not save to DB.
 			TreatPlans.Update(TPcur);//save signature to DB.
 			TPcur.ListProcTPs=ProcTPs.RefreshForTP(TPcur.TreatPlanNum);
-			SheetParameter.SetParameter(SheetTP,"TreatPlan",TPcur);//update TP on sheet to have new signature for generating pdfs
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
+				SheetParameter.SetParameter(SheetTP,"TreatPlan",TPcur); //update TP on sheet to have new signature for generating pdfs
+			}
 			if(TPcur.Signature.Length>0 && TPcur.DocNum==0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
 				SigChanged=true;
 			}

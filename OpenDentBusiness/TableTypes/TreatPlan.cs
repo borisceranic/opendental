@@ -27,6 +27,8 @@ namespace OpenDentBusiness{
 		public long ResponsParty;
 		///<summary>FK to document.DocNum. Can be 0.  If signed, this is the pdf document of the TP at time of signing. See PrefName.TreatPlanSaveSignedToPdf</summary>
 		public long DocNum;
+		///<summary>Determines the type of treatment plan this is.</summary>
+		public TreatPlanStatus TPStatus;
 		///<summary>Used to pass the list of ProcTPs in memory with the TreatPlan.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		[XmlIgnore]
@@ -45,9 +47,18 @@ namespace OpenDentBusiness{
 
 	}
 
-	
+	public enum TreatPlanStatus {
+		///<summary>0 - Saved treatment plans. Prior to version 15.4.1 all treatment plans were considered archived. Archived TPs are linked to ProcTPs.</summary>
+		Saved=0,
+		///<summary>1 - Current active TP. There should be only one Active TP per patient. This is a TP linked directly to procedures via the TreatPlanAttach table.</summary>
+		Active=1,
+		///<summary>2 - Current inactive TP. This is a TP linked directly to procedures via the TreatPlanAttach table.</summary>
+		Inactive=2
+	}
 
-	
+
+
+
 
 
 }

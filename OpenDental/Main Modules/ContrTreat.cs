@@ -6,29 +6,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
-using System.Data;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
-using System.Drawing.Design;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using OpenDental.UI;
 using OpenDentBusiness.HL7;
 using SparksToothChart;
 using OpenDentBusiness;
 using CodeBase;
-using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Shapes;
-using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 using MigraDoc.Rendering.Printing;
 using Document=OpenDentBusiness.Document;
@@ -59,7 +49,7 @@ namespace OpenDental{
 		//private bool mainPrinted;
 		//private bool benefitsPrinted;
 		//private bool notePrinted;
-		private double[] ColTotal;
+		//private double[] ColTotal;
 		private System.Drawing.Font bodyFont=new System.Drawing.Font("Arial",9);
 		private System.Drawing.Font nameFont=new System.Drawing.Font("Arial",9,FontStyle.Bold);
 		//private Font headingFont=new Font("Arial",13,FontStyle.Bold);
@@ -100,7 +90,8 @@ namespace OpenDental{
 		private List<InsPlan> InsPlanList;
 		private List<InsSub> SubList;
 		private OpenDental.UI.ODGrid gridPlans;
-		private TreatPlan[] PlanList;
+		private List<TreatPlan> _listTreatPlans;
+		//private List<TreatPlan> _listTPCurrent;
 		///<summary>A list of all ProcTP objects for this patient.</summary>
 		private ProcTP[] ProcTPList;
 		private ODtextBox textNote;
@@ -143,6 +134,8 @@ namespace OpenDental{
 		private bool checkShowDiscountNotAutomatic;
 		private List<TpRow> RowsMain;
 		private UI.Button butInsRem;
+		private UI.Button butNewTP;
+		private UI.Button butSaveTP;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
 
@@ -218,6 +211,8 @@ namespace OpenDental{
 			this.gridPreAuth = new OpenDental.UI.ODGrid();
 			this.gridPlans = new OpenDental.UI.ODGrid();
 			this.butInsRem = new OpenDental.UI.Button();
+			this.butNewTP = new OpenDental.UI.Button();
+			this.butSaveTP = new OpenDental.UI.Button();
 			this.groupShow.SuspendLayout();
 			this.groupBoxFamilyIns.SuspendLayout();
 			this.groupBoxIndIns.SuspendLayout();
@@ -252,9 +247,9 @@ namespace OpenDental{
 			this.groupShow.Controls.Add(this.checkShowIns);
 			this.groupShow.Controls.Add(this.checkShowCompleted);
 			this.groupShow.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupShow.Location = new System.Drawing.Point(466, 25);
+			this.groupShow.Location = new System.Drawing.Point(518, 25);
 			this.groupShow.Name = "groupShow";
-			this.groupShow.Size = new System.Drawing.Size(173, 138);
+			this.groupShow.Size = new System.Drawing.Size(160, 138);
 			this.groupShow.TabIndex = 59;
 			this.groupShow.TabStop = false;
 			this.groupShow.Text = "Show";
@@ -264,9 +259,9 @@ namespace OpenDental{
 			this.checkShowDiscount.Checked = true;
 			this.checkShowDiscount.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowDiscount.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowDiscount.Location = new System.Drawing.Point(31, 84);
+			this.checkShowDiscount.Location = new System.Drawing.Point(24, 84);
 			this.checkShowDiscount.Name = "checkShowDiscount";
-			this.checkShowDiscount.Size = new System.Drawing.Size(131, 17);
+			this.checkShowDiscount.Size = new System.Drawing.Size(128, 17);
 			this.checkShowDiscount.TabIndex = 25;
 			this.checkShowDiscount.Text = "Discount";
 			this.checkShowDiscount.Click += new System.EventHandler(this.checkShowDiscount_Click);
@@ -276,7 +271,7 @@ namespace OpenDental{
 			this.checkShowTotals.Checked = true;
 			this.checkShowTotals.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowTotals.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowTotals.Location = new System.Drawing.Point(31, 118);
+			this.checkShowTotals.Location = new System.Drawing.Point(24, 118);
 			this.checkShowTotals.Name = "checkShowTotals";
 			this.checkShowTotals.Size = new System.Drawing.Size(128, 15);
 			this.checkShowTotals.TabIndex = 24;
@@ -288,9 +283,9 @@ namespace OpenDental{
 			this.checkShowMaxDed.Checked = true;
 			this.checkShowMaxDed.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowMaxDed.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowMaxDed.Location = new System.Drawing.Point(15, 33);
+			this.checkShowMaxDed.Location = new System.Drawing.Point(6, 33);
 			this.checkShowMaxDed.Name = "checkShowMaxDed";
-			this.checkShowMaxDed.Size = new System.Drawing.Size(154, 17);
+			this.checkShowMaxDed.Size = new System.Drawing.Size(146, 17);
 			this.checkShowMaxDed.TabIndex = 23;
 			this.checkShowMaxDed.Text = "Use Ins Max and Deduct";
 			this.checkShowMaxDed.Click += new System.EventHandler(this.checkShowMaxDed_Click);
@@ -300,7 +295,7 @@ namespace OpenDental{
 			this.checkShowSubtotals.Checked = true;
 			this.checkShowSubtotals.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowSubtotals.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowSubtotals.Location = new System.Drawing.Point(31, 101);
+			this.checkShowSubtotals.Location = new System.Drawing.Point(24, 101);
 			this.checkShowSubtotals.Name = "checkShowSubtotals";
 			this.checkShowSubtotals.Size = new System.Drawing.Size(128, 17);
 			this.checkShowSubtotals.TabIndex = 22;
@@ -312,7 +307,7 @@ namespace OpenDental{
 			this.checkShowFees.Checked = true;
 			this.checkShowFees.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowFees.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowFees.Location = new System.Drawing.Point(15, 50);
+			this.checkShowFees.Location = new System.Drawing.Point(6, 50);
 			this.checkShowFees.Name = "checkShowFees";
 			this.checkShowFees.Size = new System.Drawing.Size(146, 17);
 			this.checkShowFees.TabIndex = 20;
@@ -324,9 +319,9 @@ namespace OpenDental{
 			this.checkShowIns.Checked = true;
 			this.checkShowIns.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowIns.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowIns.Location = new System.Drawing.Point(31, 67);
+			this.checkShowIns.Location = new System.Drawing.Point(24, 67);
 			this.checkShowIns.Name = "checkShowIns";
-			this.checkShowIns.Size = new System.Drawing.Size(131, 17);
+			this.checkShowIns.Size = new System.Drawing.Size(128, 17);
 			this.checkShowIns.TabIndex = 19;
 			this.checkShowIns.Text = "Insurance Estimates";
 			this.checkShowIns.Click += new System.EventHandler(this.checkShowIns_Click);
@@ -336,9 +331,9 @@ namespace OpenDental{
 			this.checkShowCompleted.Checked = true;
 			this.checkShowCompleted.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowCompleted.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowCompleted.Location = new System.Drawing.Point(15, 16);
+			this.checkShowCompleted.Location = new System.Drawing.Point(6, 16);
 			this.checkShowCompleted.Name = "checkShowCompleted";
-			this.checkShowCompleted.Size = new System.Drawing.Size(154, 17);
+			this.checkShowCompleted.Size = new System.Drawing.Size(146, 17);
 			this.checkShowCompleted.TabIndex = 18;
 			this.checkShowCompleted.Text = "Graphical Completed Tx";
 			// 
@@ -722,7 +717,7 @@ namespace OpenDental{
 			// 
 			this.gridPreAuth.HasMultilineHeaders = false;
 			this.gridPreAuth.HScrollVisible = false;
-			this.gridPreAuth.Location = new System.Drawing.Point(659, 29);
+			this.gridPreAuth.Location = new System.Drawing.Point(684, 29);
 			this.gridPreAuth.Name = "gridPreAuth";
 			this.gridPreAuth.ScrollValue = 0;
 			this.gridPreAuth.Size = new System.Drawing.Size(252, 134);
@@ -739,7 +734,7 @@ namespace OpenDental{
 			this.gridPlans.Location = new System.Drawing.Point(0, 29);
 			this.gridPlans.Name = "gridPlans";
 			this.gridPlans.ScrollValue = 0;
-			this.gridPlans.Size = new System.Drawing.Size(460, 134);
+			this.gridPlans.Size = new System.Drawing.Size(426, 134);
 			this.gridPlans.TabIndex = 60;
 			this.gridPlans.Title = "Treatment Plans";
 			this.gridPlans.TranslationName = "TableTPList";
@@ -761,8 +756,42 @@ namespace OpenDental{
 			this.butInsRem.Visible = false;
 			this.butInsRem.Click += new System.EventHandler(this.butInsRem_Click);
 			// 
+			// butNewTP
+			// 
+			this.butNewTP.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNewTP.Autosize = true;
+			this.butNewTP.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNewTP.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNewTP.CornerRadius = 4F;
+			this.butNewTP.Image = global::OpenDental.Properties.Resources.Add;
+			this.butNewTP.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butNewTP.Location = new System.Drawing.Point(432, 29);
+			this.butNewTP.Name = "butNewTP";
+			this.butNewTP.Size = new System.Drawing.Size(76, 23);
+			this.butNewTP.TabIndex = 69;
+			this.butNewTP.Text = "Add";
+			this.butNewTP.Click += new System.EventHandler(this.butNewTP_Click);
+			// 
+			// butSaveTP
+			// 
+			this.butSaveTP.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSaveTP.Autosize = true;
+			this.butSaveTP.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSaveTP.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSaveTP.CornerRadius = 4F;
+			this.butSaveTP.Image = global::OpenDental.Properties.Resources.butCopy;
+			this.butSaveTP.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butSaveTP.Location = new System.Drawing.Point(432, 58);
+			this.butSaveTP.Name = "butSaveTP";
+			this.butSaveTP.Size = new System.Drawing.Size(76, 23);
+			this.butSaveTP.TabIndex = 70;
+			this.butSaveTP.Text = "Save";
+			this.butSaveTP.Click += new System.EventHandler(this.butSaveTP_Click);
+			// 
 			// ContrTreat
 			// 
+			this.Controls.Add(this.butSaveTP);
+			this.Controls.Add(this.butNewTP);
 			this.Controls.Add(this.butInsRem);
 			this.Controls.Add(this.groupBoxIndIns);
 			this.Controls.Add(this.groupBoxFamilyIns);
@@ -850,7 +879,7 @@ namespace OpenDental{
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"PreAuthorization"),-1,"","PreAuth"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Discount"),-1,"","Discount"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Update Fees"),1,"","Update"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Save TP"),3,"","Create"));
+			//ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Save TP"),3,"","Create"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print TP"),2,"","Print"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Email TP"),-1,"","Email"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Sign TP"),-1,"","Sign"));
@@ -883,7 +912,8 @@ namespace OpenDental{
 		}
 
 		private void RefreshModuleData(long patNum) {
-			if(patNum!=0){
+			if(patNum!=0) {
+				TreatPlans.AuditPlans(patNum);
 				FamCur=Patients.GetFamily(patNum);
 				PatCur=FamCur.GetPatient(patNum);
 				SubList=InsSubs.RefreshForFam(FamCur);
@@ -909,7 +939,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Discount"].Enabled=true;
 				ToolBarMain.Buttons["PreAuth"].Enabled=true;
 				ToolBarMain.Buttons["Update"].Enabled=true;
-				ToolBarMain.Buttons["Create"].Enabled=true;
+				//ToolBarMain.Buttons["Create"].Enabled=true;
 				ToolBarMain.Buttons["Print"].Enabled=true;
 				ToolBarMain.Buttons["Email"].Enabled=true;
 				ToolBarMain.Buttons["Sign"].Enabled=true;
@@ -939,7 +969,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Discount"].Enabled=false;
 				ToolBarMain.Buttons["PreAuth"].Enabled=false;
 				ToolBarMain.Buttons["Update"].Enabled=false;
-				ToolBarMain.Buttons["Create"].Enabled=false;
+				//ToolBarMain.Buttons["Create"].Enabled=false;
 				ToolBarMain.Buttons["Print"].Enabled=false;
 				ToolBarMain.Buttons["Email"].Enabled=false;
 				ToolBarMain.Buttons["Sign"].Enabled=false;
@@ -979,9 +1009,9 @@ namespace OpenDental{
 					case "Update":
 						ToolBarMainUpdate_Click();
 						break;
-					case "Create":
-						ToolBarMainCreate_Click();
-						break;
+					//case "Create":
+					//	ToolBarMainCreate_Click();
+					//	break;
 					case "Print":
 						//The reason we are using a delegate and BeginInvoke() is because of a Microsoft bug that causes the Print Dialog window to not be in focus			
 						//when it comes from a toolbar click.
@@ -1002,6 +1032,22 @@ namespace OpenDental{
 			}
 		}
 
+		private void butNewTP_Click(object sender,EventArgs e) {
+			FormTreatPlanCurEdit FormTPCE=new FormTreatPlanCurEdit();
+			FormTPCE.TreatPlanCur=new TreatPlan() {
+				Heading="Inactive Treatment Plan",
+				Note=PrefC.GetString(PrefName.TreatmentPlanNote),
+				PatNum=PatCur.PatNum,
+				TPStatus=TreatPlanStatus.Inactive,
+			};
+			FormTPCE.ShowDialog();
+			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void butSaveTP_Click(object sender,EventArgs e) {
+			ToolBarMainCreate_Click();
+		}
+
 		///<summary></summary>
 		private void OnPatientSelected(Patient pat) {
 			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
@@ -1013,11 +1059,13 @@ namespace OpenDental{
 		private void FillPlans(){
 			gridPlans.BeginUpdate();
 			gridPlans.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableTPList","Date"),80);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableTPList","Date"),70);
 			gridPlans.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableTPList","Heading"),310);
+			col=new ODGridColumn(Lan.g("TableTPList","Status"),50);
 			gridPlans.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableTPList","Signed"),80,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableTPList","Heading"),230);
+			gridPlans.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableTPList","Signed"),76,HorizontalAlignment.Center);
 			gridPlans.Columns.Add(col);
 			gridPlans.Rows.Clear();
 			if(PatCur==null){
@@ -1026,23 +1074,26 @@ namespace OpenDental{
 			}
 			ProcList=Procedures.Refresh(PatCur.PatNum);
 			ProcListTP=Procedures.GetListTP(ProcList);//sorted by priority, then toothnum
-			PlanList=TreatPlans.Refresh(PatCur.PatNum);
+			//_listTPCurrent=TreatPlans.Refresh(PatCur.PatNum,new[] {TreatPlanStatus.Active,TreatPlanStatus.Inactive});
+			_listTreatPlans=TreatPlans.GetAllForPat(PatCur.PatNum).OrderBy(x=>x.TPStatus!=TreatPlanStatus.Active).ThenBy(x=>x.TPStatus!=TreatPlanStatus.Inactive).ThenBy(x=>x.DateTP).ToList();
 			ProcTPList=ProcTPs.Refresh(PatCur.PatNum);
 			OpenDental.UI.ODGridRow row;
-			row=new ODGridRow();
-			row.Cells.Add("");//date empty
-			row.Cells.Add(Lan.g(this,"Default"));
-			gridPlans.Rows.Add(row);
+			//row=new ODGridRow();
+			//row.Cells.Add("");//date empty
+			//row.Cells.Add("");//date empty
+			//row.Cells.Add(Lan.g(this,"Current Treatment Plans"));
+			//gridPlans.Rows.Add(row);
 			string str;
-			for(int i=0;i<PlanList.Length;i++){
+			for(int i=0;i<_listTreatPlans.Count;i++){
 				row=new ODGridRow();
-				row.Cells.Add(PlanList[i].DateTP.ToShortDateString());
-				str=PlanList[i].Heading;
-				if(PlanList[i].ResponsParty!=0){
-					str+="\r\n"+Lan.g(this,"Responsible Party: ")+Patients.GetLim(PlanList[i].ResponsParty).GetNameLF();
+				row.Cells.Add(_listTreatPlans[i].TPStatus==TreatPlanStatus.Saved?_listTreatPlans[i].DateTP.ToShortDateString():"");
+				row.Cells.Add(_listTreatPlans[i].TPStatus.ToString());
+				str=_listTreatPlans[i].Heading;
+				if(_listTreatPlans[i].ResponsParty!=0){
+					str+="\r\n"+Lan.g(this,"Responsible Party: ")+Patients.GetLim(_listTreatPlans[i].ResponsParty).GetNameLF();
 				}
 				row.Cells.Add(str);
-				if(PlanList[i].Signature==""){
+				if(_listTreatPlans[i].Signature==""){
 					row.Cells.Add("");
 				}
 				else{
@@ -1055,7 +1106,7 @@ namespace OpenDental{
 		}
 
 		private void FillMain() {
-			if(gridPlans.GetSelectedIndex() > 0 && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="") {
+			if(gridPlans.GetSelectedIndex() >= 0 && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="") {
 				listSetPr.Enabled=false; //disable changing priorities for signed TPs
 			}
 			else {
@@ -1065,358 +1116,113 @@ namespace OpenDental{
 			FillMainDisplay();
 		}
 
-		/// <summary>Fills RowsMain list for gridMain display.</summary>
-		private void FillMainData() {
-			if(PatCur==null) {
-				return;
-			}
-			decimal fee;
-			decimal priIns;
-			decimal secIns;
-			decimal discount;
-			decimal pat;
-			decimal subfee=0;
-			decimal subpriIns=0;
-			decimal subsecIns=0;
-			decimal subdiscount=0;
-			decimal subpat=0;
-			decimal totFee=0;
-			decimal totPriIns=0;
-			decimal totSecIns=0;
-			decimal totDiscount=0;
-			decimal totPat=0;
-			long feeSched=Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched;//for standard fee
-			RowsMain=new List<TpRow>();
-			TpRow row;
-			#region currentTP
-			if(gridPlans.SelectedIndices[0]==0){//current treatplan selected
-				InsPlan	PriPlanCur=null;
-				InsSub PriSubCur=null;
-				if(PatPlanList.Count>0) {//primary
-					PriSubCur=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
-					PriPlanCur=InsPlans.GetPlan(PriSubCur.PlanNum,InsPlanList);
-				}
-				InsPlan SecPlanCur=null;
-				InsSub SecSubCur=null;
-				if(PatPlanList.Count>1) {//secondary
-					SecSubCur=InsSubs.GetSub(PatPlanList[1].InsSubNum,SubList);
-					SecPlanCur=InsPlans.GetPlan(SecSubCur.PlanNum,InsPlanList);
-				}
-				ClaimProc claimproc;//holds the estimate.
-				string descript;
-				//One thing to watch out for here is that we must be absolutely sure to include all claimprocs for the procedures listed,
-				//regardless of status.  Needed for Procedures.ComputeEstimates.  This should be fine.
-				ClaimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
-				List<ClaimProc> claimProcListOld=new List<ClaimProc>();//This didn't work:(ClaimProcList);//make a copy
-				for(int i=0;i<ClaimProcList.Count;i++) {
-					claimProcListOld.Add(ClaimProcList[i].Copy());
-				}
-				LoopList=new List<ClaimProcHist>();
-				for(int i=0;i<ProcListTP.Length;i++){
-					Procedures.ComputeEstimates(ProcListTP[i],PatCur.PatNum,ref ClaimProcList,false,InsPlanList,PatPlanList,BenefitList,
-						HistList,LoopList,false,PatCur.Age,SubList);
-					//then, add this information to loopList so that the next procedure is aware of it.
-					LoopList.AddRange(ClaimProcs.GetHistForProc(ClaimProcList,ProcListTP[i].ProcNum,ProcListTP[i].CodeNum));
-				}
-				//save changes in the list to the database
-				ClaimProcs.Synch(ref ClaimProcList,claimProcListOld);
-				//claimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
-				string estimateNote;
-				if(!checkShowDiscountNotAutomatic) {
-					checkShowDiscount.Checked=false;
-				}
-				for(int i=0;i<ProcListTP.Length;i++) {
-					ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum);
-					if(!checkShowDiscountNotAutomatic 
-						&& !checkShowDiscount.Checked 
-						&& (ProcListTP[i].Discount!=0
-						|| ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,ProcListTP[i].ProcNum)!=0)) 
-					{
-						checkShowDiscount.Checked=true;
-					}
-					row=new TpRow();
-					row.ProcAbbr=procCodeCur.AbbrDesc;
-					fee=(decimal)ProcListTP[i].ProcFee;
-					int qty=ProcListTP[i].BaseUnits + ProcListTP[i].UnitQty;
-					if(qty>0) {
-						fee*=qty;
-					}
-					subfee+=fee;
-					totFee+=fee;
-					#region ShowMaxDed
-					string showPriDeduct="";
-					string showSecDeduct="";
-					if(PatPlanList.Count>0) {//Primary
-						claimproc=ClaimProcs.GetEstimate(ClaimProcList,ProcListTP[i].ProcNum,PriPlanCur.PlanNum,PatPlanList[0].InsSubNum);
-						if(claimproc==null) {
-							priIns=0;
-						}
-						else {
-							if(checkShowMaxDed.Checked) {//whether visible or not
-								priIns=(decimal)ClaimProcs.GetInsEstTotal(claimproc);
-								double ded=ClaimProcs.GetDeductibleDisplay(claimproc);
-								if(ded > 0) {
-									showPriDeduct="\r\n"+Lan.g(this,"Pri Deduct Applied: ")+ded.ToString("c");
-								}
-							}
-							else {
-								priIns=(decimal)claimproc.BaseEst;
-							}
-						}
-					}
-					else {//no primary ins
-						priIns=0;
-					}
-					if(PatPlanList.Count>1) {//Secondary
-						claimproc=ClaimProcs.GetEstimate(ClaimProcList,ProcListTP[i].ProcNum,SecPlanCur.PlanNum,PatPlanList[1].InsSubNum);
-						if(claimproc==null) {
-							secIns=0;
-						}
-						else {
-							if(checkShowMaxDed.Checked) {
-								secIns=(decimal)ClaimProcs.GetInsEstTotal(claimproc);
-								decimal ded=(decimal)ClaimProcs.GetDeductibleDisplay(claimproc);
-								if(ded > 0) {
-									showSecDeduct="\r\n"+Lan.g(this,"Sec Deduct Applied: ")+ded.ToString("c");
-								}
-							}
-							else {
-								secIns=(decimal)claimproc.BaseEst;
-							}
-						}
-					}//secondary
-					else {//no secondary ins
-						secIns=0;
-					}
-					#endregion ShowMaxDed
-					subpriIns+=priIns;
-					totPriIns+=priIns;
-					subsecIns+=secIns;
-					totSecIns+=secIns;
-					discount=(decimal)ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,ProcListTP[i].ProcNum);
-					discount+=(decimal)ProcListTP[i].Discount;
-					subdiscount+=discount;
-					totDiscount+=discount;
-					pat=fee-priIns-secIns-discount;
-					if(pat<0) {
-						pat=0;
-					}
-					subpat+=pat;
-					totPat+=pat;
-					//Fill TpRow object with information.
-					row.Priority=(DefC.GetName(DefCat.TxPriorities,ProcListTP[i].Priority));
-					row.Tth=(Tooth.ToInternat(ProcListTP[i].ToothNum));
-					if(ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum).TreatArea==TreatmentArea.Surf) {
-						row.Surf=(Tooth.SurfTidyFromDbToDisplay(ProcListTP[i].Surf,ProcListTP[i].ToothNum));
-					}
-					else if(ProcedureCodes.GetProcCode(ProcListTP[i].CodeNum).TreatArea==TreatmentArea.Sextant) {
-						row.Surf=Tooth.GetSextant(ProcListTP[i].Surf,(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));						
-					}
-					else {
-						row.Surf=(ProcListTP[i].Surf);//I think this will properly allow UR, L, etc.
-					}
-					row.Code=procCodeCur.ProcCode;
-					descript=ProcedureCodes.GetLaymanTerm(ProcListTP[i].CodeNum);
-					if(ProcListTP[i].ToothRange!="") {
-						descript+=" #"+Tooth.FormatRangeForDisplay(ProcListTP[i].ToothRange);
-					}
-					if(checkShowMaxDed.Checked) {
-						estimateNote=ClaimProcs.GetEstimateNotes(ProcListTP[i].ProcNum,ClaimProcList);
-						if(estimateNote!="") {
-							descript+="\r\n"+estimateNote;
-						}
-					}
-					row.Description=(descript);
-					if(showPriDeduct!="") {
-						row.Description+=showPriDeduct;
-					}
-					if(showSecDeduct!="") {
-						row.Description+=showSecDeduct;
-					}
-					row.Prognosis=DefC.GetName(DefCat.Prognosis,PIn.Long(ProcListTP[i].Prognosis.ToString()));
-					row.Dx=DefC.GetValue(DefCat.Diagnosis,PIn.Long(ProcListTP[i].Dx.ToString()));
-					row.Fee=fee;
-					row.PriIns=priIns;
-					row.SecIns=secIns;
-					row.Discount=discount;
-					row.Pat=pat;
-					row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcListTP[i].Priority);
-					if(row.ColorText==System.Drawing.Color.White){
-						row.ColorText=System.Drawing.Color.Black;
-					}
-					row.Tag=ProcListTP[i].Copy();
-					RowsMain.Add(row);
-					#region Canadian Lab 
-					/*
-					if(ProcListTP[i].LabProcCode!=""){
-						row=new ODGridRow();
-						row.Cells.Add("");//done
-						row.Cells.Add(DefB.GetName(DefCat.TxPriorities,ProcListTP[i].Priority));//priority
-						row.Cells.Add(Tooth.ToInternat(ProcListTP[i].ToothNum));//toothnum
-						row.Cells.Add("");//surf
-						row.Cells.Add(ProcListTP[i].LabProcCode);//proccode
-						row.Cells.Add("    "+ProcedureCodes.GetLaymanTerm(ProcListTP[i].LabProcCode));//descript (indented)
-						if(checkShowStandard.Checked) {
-							row.Cells.Add("");//standard
-						}
-						fee=ProcListTP[i].LabFee;
-						subfee+=fee;
-						totFee+=fee;
-				//possibly incomplete. Insurance not considered
-						pat=fee;//-priIns-secIns;
-						if(pat<0) {
-							pat=0;
-						}
-						subpat+=pat;
-						totPat+=pat;
-						if(checkShowFees.Checked) {
-							row.Cells.Add(ProcListTP[i].LabFee.ToString("F"));//fee
-						}
-						if(checkShowIns.Checked) {
-							row.Cells.Add("");//pri
-							row.Cells.Add("");//sec
-							row.Cells.Add("");//pat portion
-						}
-						row.ColorText=DefB.GetColor(DefCat.TxPriorities,ProcListTP[i].Priority);
-						if(row.ColorText==Color.White) {
-							row.ColorText=Color.Black;
-						}
-						row.Tag=ProcListTP[i].Clone();
-						gridMain.Rows.Add(row);
-					}*/
-					#endregion Canadian Lab
-					#region subtotal
-					if(checkShowSubtotals.Checked &&
-						(i==ProcListTP.Length-1 || ProcListTP[i+1].Priority != ProcListTP[i].Priority))
-					{
-						row=new TpRow();
-						row.Description="Subtotal";
-						row.Fee=subfee;
-						row.PriIns=subpriIns;
-						row.SecIns=subsecIns;
-						row.Discount=subdiscount;
-						row.Pat=subpat;
-						row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcListTP[i].Priority);
-						if(row.ColorText==System.Drawing.Color.White) {
-							row.ColorText=System.Drawing.Color.Black;
-						}
-						row.Bold=true;
-						row.ColorLborder=System.Drawing.Color.Black;
-						RowsMain.Add(row);
-						subfee=0;
-						subpriIns=0;
-						subsecIns=0;
-						subdiscount=0;
-						subpat=0;
-					}
-					#endregion subtotal
-				}//for(int i=0;i<ProcListTP.Length
-				textNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
-			}
-			#endregion currentTP
-			#region AnyTP except current
-			else {//any except current tp selected
-				ProcTPSelectList=ProcTPs.GetListForTP(PlanList[gridPlans.SelectedIndices[0]-1].TreatPlanNum,ProcTPList);
-				bool isDone;
-				for(int i=0;i<ProcTPSelectList.Length;i++){
-					row=new TpRow();
-					isDone=false;
-					for(int j=0;j<ProcList.Count;j++) {
-						if(ProcList[j].ProcNum==ProcTPSelectList[i].ProcNumOrig) {
-							if(ProcList[j].ProcStatus==ProcStat.C){
-								isDone=true;
-							}
-						}
-					}
-					if(isDone) {
-						row.Done="X";
-					}
-					row.Priority=DefC.GetName(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
-					row.Tth=ProcTPSelectList[i].ToothNumTP;
-					row.Surf=ProcTPSelectList[i].Surf;
-					row.Code=ProcTPSelectList[i].ProcCode;
-					row.Description=ProcTPSelectList[i].Descript;
-					row.Fee=(decimal)ProcTPSelectList[i].FeeAmt;//Fee
-					subfee+=(decimal)ProcTPSelectList[i].FeeAmt;
-					totFee+=(decimal)ProcTPSelectList[i].FeeAmt;
-					row.PriIns=(decimal)ProcTPSelectList[i].PriInsAmt;//PriIns
-					subpriIns+=(decimal)ProcTPSelectList[i].PriInsAmt;
-					totPriIns+=(decimal)ProcTPSelectList[i].PriInsAmt;
-					row.SecIns=(decimal)ProcTPSelectList[i].SecInsAmt;//SecIns
-					subsecIns+=(decimal)ProcTPSelectList[i].SecInsAmt;
-					totSecIns+=(decimal)ProcTPSelectList[i].SecInsAmt;
-					row.Discount=(decimal)ProcTPSelectList[i].Discount;//Discount
-					subdiscount+=(decimal)ProcTPSelectList[i].Discount;
-					totDiscount+=(decimal)ProcTPSelectList[i].Discount;
-					row.Pat=(decimal)ProcTPSelectList[i].PatAmt;//Pat
-					subpat+=(decimal)ProcTPSelectList[i].PatAmt;
-					totPat+=(decimal)ProcTPSelectList[i].PatAmt;
-					row.Prognosis=ProcTPSelectList[i].Prognosis;//Prognosis
-					row.Dx=ProcTPSelectList[i].Dx;
-					//if(checkShowStandard.Checked) {
-					//	standard=Fees.GetAmount0(ProcedureCodes.GetCodeNum(ProcTPSelectList[i].ProcCode),feeSched);
-					//	row.Cells.Add(standard.ToString("F"));//standard
-					//	substandard+=standard;
-					//	totStandard+=standard;
-					//}
-					row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
-					if(row.ColorText==System.Drawing.Color.White){
-						row.ColorText=System.Drawing.Color.Black;
-					}
-					row.Tag=ProcTPSelectList[i].Copy();
-					RowsMain.Add(row);
-					#region subtotal
-					if(checkShowSubtotals.Checked &&
-						(i==ProcTPSelectList.Length-1 || ProcTPSelectList[i+1].Priority != ProcTPSelectList[i].Priority)) {
-						row=new TpRow();
-						row.Description="Subtotal";
-						row.Fee=subfee;
-						row.PriIns=subpriIns;
-						row.SecIns=subsecIns;
-						row.Discount=subdiscount;
-						row.Pat=subpat;
-						//if(checkShowStandard.Checked) {
-						//	row.Cells.Add(substandard.ToString("F"));//standard
-						//}
-						row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
-						if(row.ColorText==System.Drawing.Color.White) {
-							row.ColorText=System.Drawing.Color.Black;
-						}
-						row.Bold=true;
-						row.ColorLborder=System.Drawing.Color.Black;
-						RowsMain.Add(row);
-						//substandard=0;
-						subfee=0;
-						subpriIns=0;
-						subsecIns=0;
-						subdiscount=0;
-						subpat=0;
-					}
-					#endregion
-				}
-				textNote.Text=PlanList[gridPlans.SelectedIndices[0]-1].Note;
-			}
-			#endregion AnyTP except current
-			#region Totals
-			if(checkShowTotals.Checked) {
-				row=new TpRow();
-				row.Description="Total";
-				row.Fee=totFee;
-				row.PriIns=totPriIns;
-				row.SecIns=totSecIns;
-				row.Discount=totDiscount;
-				row.Pat=totPat;
-				//if(checkShowStandard.Checked) {
-				//	row.Cells.Add(totStandard.ToString("F"));//standard
-				//}
-				row.Bold=true;
-				row.ColorText=System.Drawing.Color.Black;
-				RowsMain.Add(row);
-			}
-			#endregion Totals
+	/// <summary>Fills RowsMain list for gridMain display.</summary>
+	private void FillMainData() {
+		decimal subfee=0;
+		decimal subpriIns=0;
+		decimal subsecIns=0;
+		decimal subdiscount=0;
+		decimal subpat=0;
+		decimal totFee=0;
+		decimal totPriIns=0;
+		decimal totSecIns=0;
+		decimal totDiscount=0;
+		decimal totPat=0;
+		RowsMain=new List<TpRow>();
+		if(PatCur==null || gridPlans.Rows.Count==0) {
+			return;
 		}
+		TpRow row;
+		TreatPlan treatPlanTemp=_listTreatPlans[gridPlans.SelectedIndices[0]];
+		//Active and Inactive Treatment Plans========================================================================
+		if(treatPlanTemp.TPStatus==TreatPlanStatus.Active
+		   || treatPlanTemp.TPStatus==TreatPlanStatus.Inactive) {
+			LoadActiveTP(ref treatPlanTemp);
+			return;
+		}
+		//Archived TPs below this point==============================================================================
+		ProcTPSelectList=ProcTPs.GetListForTP(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum,ProcTPList);
+		bool isDone;
+		for(int i=0;i<ProcTPSelectList.Length;i++) {
+			row=new TpRow();
+			isDone=false;
+			for(int j=0;j<ProcList.Count;j++) {
+				if(ProcList[j].ProcNum==ProcTPSelectList[i].ProcNumOrig) {
+					if(ProcList[j].ProcStatus==ProcStat.C) {
+						isDone=true;
+					}
+				}
+			}
+			if(isDone) {
+				row.Done="X";
+			}
+			row.Priority=DefC.GetName(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
+			row.Tth=ProcTPSelectList[i].ToothNumTP;
+			row.Surf=ProcTPSelectList[i].Surf;
+			row.Code=ProcTPSelectList[i].ProcCode;
+			row.Description=ProcTPSelectList[i].Descript;
+			row.Fee=(decimal)ProcTPSelectList[i].FeeAmt; //Fee
+			subfee+=(decimal)ProcTPSelectList[i].FeeAmt;
+			totFee+=(decimal)ProcTPSelectList[i].FeeAmt;
+			row.PriIns=(decimal)ProcTPSelectList[i].PriInsAmt; //PriIns
+			subpriIns+=(decimal)ProcTPSelectList[i].PriInsAmt;
+			totPriIns+=(decimal)ProcTPSelectList[i].PriInsAmt;
+			row.SecIns=(decimal)ProcTPSelectList[i].SecInsAmt; //SecIns
+			subsecIns+=(decimal)ProcTPSelectList[i].SecInsAmt;
+			totSecIns+=(decimal)ProcTPSelectList[i].SecInsAmt;
+			row.Discount=(decimal)ProcTPSelectList[i].Discount; //Discount
+			subdiscount+=(decimal)ProcTPSelectList[i].Discount;
+			totDiscount+=(decimal)ProcTPSelectList[i].Discount;
+			row.Pat=(decimal)ProcTPSelectList[i].PatAmt; //Pat
+			subpat+=(decimal)ProcTPSelectList[i].PatAmt;
+			totPat+=(decimal)ProcTPSelectList[i].PatAmt;
+			row.Prognosis=ProcTPSelectList[i].Prognosis; //Prognosis
+			row.Dx=ProcTPSelectList[i].Dx;
+			row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
+			if(row.ColorText==System.Drawing.Color.White) {
+				row.ColorText=System.Drawing.Color.Black;
+			}
+			row.Tag=ProcTPSelectList[i].Copy();
+			RowsMain.Add(row);
+			if(checkShowSubtotals.Checked &&
+			   (i==ProcTPSelectList.Length-1 || ProcTPSelectList[i+1].Priority!=ProcTPSelectList[i].Priority)) {
+				row=new TpRow();
+				row.Description="Subtotal";
+				row.Fee=subfee;
+				row.PriIns=subpriIns;
+				row.SecIns=subsecIns;
+				row.Discount=subdiscount;
+				row.Pat=subpat;
+				row.ColorText=DefC.GetColor(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
+				if(row.ColorText==System.Drawing.Color.White) {
+					row.ColorText=System.Drawing.Color.Black;
+				}
+				row.Bold=true;
+				row.ColorLborder=System.Drawing.Color.Black;
+				RowsMain.Add(row);
+				subfee=0;
+				subpriIns=0;
+				subsecIns=0;
+				subdiscount=0;
+				subpat=0;
+			}
+		}
+		textNote.Text=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
+		if(checkShowTotals.Checked) {
+			row=new TpRow();
+			row.Description="Total";
+			row.Fee=totFee;
+			row.PriIns=totPriIns;
+			row.SecIns=totSecIns;
+			row.Discount=totDiscount;
+			row.Pat=totPat;
+			row.Bold=true;
+			row.ColorText=System.Drawing.Color.Black;
+			RowsMain.Add(row);
+		}
+	}
 
-		private void FillMainDisplay(){
+	private void FillMainDisplay(){
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -1456,6 +1262,10 @@ namespace OpenDental{
 			}			
 			gridMain.Rows.Clear();
 			if(PatCur==null){
+				gridMain.EndUpdate();
+				return;
+			}
+			if(RowsMain==null || RowsMain.Count==0) {
 				gridMain.EndUpdate();
 				return;
 			}
@@ -1933,8 +1743,11 @@ namespace OpenDental{
 			if(gridMain.Rows[e.Row].Tag==null){
 				return;//user double clicked on a subtotal row
 			}
-			if(gridPlans.SelectedIndices[0]==0){//current plan
-				Procedure ProcCur=Procedures.GetOneProc(((Procedure)gridMain.Rows[e.Row].Tag).ProcNum,true); 
+			if(gridPlans.GetSelectedIndex()>-1 
+				&& (_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Active 
+					||_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Inactive))
+			{//current plan
+				Procedure ProcCur=Procedures.GetOneProc(((ProcTP)gridMain.Rows[e.Row].Tag).ProcNumOrig,true); 
 				//generate a new loop list containing only the procs before this one in it
 				LoopList=new List<ClaimProcHist>();
 				for(int i=0;i<ProcListTP.Length;i++) {
@@ -1947,9 +1760,12 @@ namespace OpenDental{
 				FormPE.LoopList=LoopList;
 				FormPE.HistList=HistList;
 				FormPE.ShowDialog();
+				long treatPlanNum=_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum;
 				ModuleSelected(PatCur.PatNum);
+				gridPlans.SetSelected(_listTreatPlans.IndexOf(_listTreatPlans.FirstOrDefault(x=>x.TreatPlanNum==treatPlanNum)),true);
+				FillMain();
 				for(int i=0;i<gridMain.Rows.Count;i++){
-					if(gridMain.Rows[i].Tag !=null && ((Procedure)gridMain.Rows[i].Tag).ProcNum==ProcCur.ProcNum){
+					if(gridMain.Rows[i].Tag !=null && ((ProcTP)gridMain.Rows[i].Tag).ProcNumOrig==ProcCur.ProcNum){
 						gridMain.SetSelected(i,true);
 					}
 				}
@@ -1957,9 +1773,9 @@ namespace OpenDental{
 			}
 			//any other TP
 			ProcTP procT=(ProcTP)gridMain.Rows[e.Row].Tag;
-			DateTime dateTP=PlanList[gridPlans.SelectedIndices[0]-1].DateTP;
+			DateTime dateTP=_listTreatPlans[gridPlans.SelectedIndices[0]].DateTP;
 			bool isSigned=false;
-			if(PlanList[gridPlans.SelectedIndices[0]-1].Signature!="") {
+			if(_listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="") {
 				isSigned=true;
 			}
 			FormProcTPEdit FormP=new FormProcTPEdit(procT,dateTP,isSigned);
@@ -1985,16 +1801,24 @@ namespace OpenDental{
 		}
 
 		private void gridPlans_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			if(e.Row==0){
-				return;//there is nothing to edit if user clicks on current.
+			//if(e.Row==0){
+			//	return;//there is nothing to edit if user clicks on current.
+			//}
+			long tpNum=_listTreatPlans[e.Row].TreatPlanNum;
+			TreatPlan tpSelected=_listTreatPlans[e.Row];
+			if(tpSelected.TPStatus==TreatPlanStatus.Saved) {
+				FormTreatPlanEdit FormT=new FormTreatPlanEdit(_listTreatPlans[e.Row]);
+				FormT.ShowDialog();
 			}
-			long tpNum=PlanList[e.Row-1].TreatPlanNum;
-			FormTreatPlanEdit FormT=new FormTreatPlanEdit(PlanList[e.Row-1]);
-			FormT.ShowDialog();
+			else {
+				FormTreatPlanCurEdit FormTPC=new FormTreatPlanCurEdit();
+				FormTPC.TreatPlanCur=tpSelected;
+				FormTPC.ShowDialog();
+			}
 			ModuleSelected(PatCur.PatNum);
-			for(int i=0;i<PlanList.Length;i++){
-				if(PlanList[i].TreatPlanNum==tpNum){
-					gridPlans.SetSelected(i+1,true);
+			for(int i=0;i<_listTreatPlans.Count;i++){
+				if(_listTreatPlans[i].TreatPlanNum==tpNum){
+					gridPlans.SetSelected(i,true);
 				}
 			}
 			FillMain();
@@ -2005,43 +1829,55 @@ namespace OpenDental{
 			if(clickedRow==-1) {
 				return;
 			}
-			if(gridPlans.SelectedIndices[0]==0) {//current TP
-				//Procedure ProcCur;
-				//Procedure ProcOld;
-				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {//loop through the main list of selected procs
-					if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
-						//user must have highlighted a subtotal row, so ignore
+			if(_listTreatPlans.Count>0
+			   && (_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Active
+			       || _listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Inactive)) {
+				List<TreatPlanAttach> listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
+				foreach(int selectedIdx in gridMain.SelectedIndices) {
+					if(gridMain.Rows[selectedIdx].Tag==null) {
 						continue;
 					}
-					//ProcCur=(Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
-					//ProcOld=ProcCur.Clone();
-					if(clickedRow==0) {//set priority to "no priority"
-						//ProcCur.Priority=0;
-						Procedures.UpdatePriority(((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProcNum,0);
+					TreatPlanAttach tpa=listTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==((ProcTP)gridMain.Rows[selectedIdx].Tag).ProcNumOrig);
+					if(tpa==null) {
+						continue;
 					}
-					else {
-						//ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][clickedRow-1].DefNum;
-						Procedures.UpdatePriority(((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProcNum,
-							DefC.Short[(int)DefCat.TxPriorities][clickedRow-1].DefNum);
+					tpa.Priority=0;
+					if(clickedRow!=0) {
+						tpa.Priority=DefC.Short[(int)DefCat.TxPriorities][clickedRow-1].DefNum;
 					}
-					//Procedures.Update(ProcCur,ProcOld);//no recall synch required
+					TreatPlanAttaches.Update(tpa);
+				}
+				long treatPlanNum=_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum;
+				List<long> selectedProcs=new List<long>();
+				foreach(int selectedIdx in gridMain.SelectedIndices) {
+					if(gridMain.Rows[selectedIdx].Tag==null) {
+						continue;
+					}
+					selectedProcs.Add(((ProcTP)gridMain.Rows[selectedIdx].Tag).ProcNumOrig);
 				}
 				ModuleSelected(PatCur.PatNum);
+				gridPlans.SetSelected(_listTreatPlans.IndexOf(_listTreatPlans.FirstOrDefault(x => x.TreatPlanNum==treatPlanNum)),true);
+				FillMain();
+				for(int i=0;i<gridMain.Rows.Count;i++) {
+					if(gridMain.Rows[i].Tag!=null && selectedProcs.Contains(((ProcTP)gridMain.Rows[i].Tag).ProcNumOrig)) {
+						gridMain.SetSelected(i,true);
+					}
+				}
 			}
-			else {//any other TP
-				DateTime dateTP=PlanList[gridPlans.SelectedIndices[0]-1].DateTP;
+			else { //any Saved TP
+				DateTime dateTP=_listTreatPlans[gridPlans.SelectedIndices[0]].DateTP;
 				if(!Security.IsAuthorized(Permissions.TreatPlanEdit,dateTP)) {
 					return;
 				}
 				int selectedTP=gridPlans.SelectedIndices[0];
 				ProcTP proc;
-				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {//loop through the main list of selected procTPs
+				for(int i=0;i<gridMain.SelectedIndices.Length;i++) { //loop through the main list of selected procTPs
 					if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
 						//user must have highlighted a subtotal row, so ignore
 						continue;
 					}
 					proc=(ProcTP)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
-					if(clickedRow==0) {//set priority to "no priority"
+					if(clickedRow==0) { //set priority to "no priority"
 						proc.Priority=0;
 					}
 					else {
@@ -2127,31 +1963,30 @@ namespace OpenDental{
 				}
 			}
 			#endregion
-			if(gridPlans.SelectedIndices[0]>0
+			if(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Saved
 				&& PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)
-			  && PlanList[gridPlans.SelectedIndices[0]-1].Signature!=""
-			  && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) 
+			  && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!=""
+			  && Documents.DocExists(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum)) 
 			{
 				//Open PDF and allow user to print from pdf software.
 				Cursor=Cursors.WaitCursor;
-				Documents.OpenDoc(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				Documents.OpenDoc(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum);
 				Cursor=Cursors.Default;
 				return;
 			}
 			Sheet sheetTP=null;
-			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) { // gridPlans.SelectedIndices[0]>0) {
-				TreatPlan treatPlan;
-				if(gridPlans.SelectedIndices[0]>0) {
-					treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
-					treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
-				}
-				else {
-					treatPlan=GetCurrentTPHelper();
-				}
+			TreatPlan treatPlan;
+			if(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Saved) {
+				treatPlan=_listTreatPlans[gridPlans.SelectedIndices[0]].Copy();
+				treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
+			}
+			else {
+				treatPlan=_listTreatPlans[gridPlans.SelectedIndices[0]];
+				LoadActiveTP(ref treatPlan);
+			}
+			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) { 
 				sheetTP=TreatPlanToSheet(treatPlan);
 				SheetPrinting.Print(sheetTP);
-				//FormSFE.ShowDialog();
-				//return;
 			}
 			else { //clasic TPs
 				PrepImageForPrinting();
@@ -2197,21 +2032,22 @@ namespace OpenDental{
 			string filePathAndName=ODFileUtils.CombinePaths(attachPath,fileName);
 			if(gridPlans.SelectedIndices[0]>0 //not the default plan.
 				&& PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) //preference enabled
-			  && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="" //and document is signed
-			  && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) //and file exists
+			  && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="" //and document is signed
+			  && Documents.DocExists(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum)) //and file exists
 			{
-				string filePathAndNameTemp=Documents.GetPath(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				string filePathAndNameTemp=Documents.GetPath(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum);
 				//copy file to email attach folder so files will be where they are exptected to be.
 				File.Copy(filePathAndNameTemp,filePathAndName);
 			}
 			else if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
 				TreatPlan treatPlan;
-				if(gridPlans.SelectedIndices[0]>0) {
-					treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
+				if(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Saved) {
+					treatPlan=_listTreatPlans[gridPlans.SelectedIndices[0]].Copy();
 					treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
 				}
 				else {
-					treatPlan=GetCurrentTPHelper();
+					treatPlan=_listTreatPlans[gridPlans.SelectedIndices[0]];
+					LoadActiveTP(ref treatPlan);
 				}
 				Sheet sheetTP=TreatPlanToSheet(treatPlan);
 				SheetPrinting.CreatePdf(sheetTP,filePathAndName,null);
@@ -2242,7 +2078,7 @@ namespace OpenDental{
 
 		private void PrepImageForPrinting(){
 			//linesPrinted=0;
-			ColTotal = new double[10];
+			//ColTotal = new double[10];
 			//headingPrinted=false;
 			//graphicsPrinted=false;
 			//mainPrinted=false;
@@ -2328,7 +2164,243 @@ namespace OpenDental{
 			toothChart.Dispose();
 		}
 
-		/// <summary>Returns in-memory TreatPlan representing the current treatplan. For displaying current treat-plan before saving it.</summary>
+	private List<ProcTP> LoadActiveTP(ref TreatPlan treatPlan) {
+		List<TreatPlanAttach> listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(treatPlan.TreatPlanNum);
+		List<Procedure> listProcForTP=Procedures.GetManyProc(listTreatPlanAttaches.Select(x=>x.ProcNum).ToList(),false)
+			.OrderBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority)<0)
+			.ThenBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority))
+			.ThenBy(x => PIn.Int(x.ToothNum))
+			.ThenBy(x=>x.ProcDate).ToList();
+		InsPlan priPlanCur=null;
+		if(PatPlanList.Count>0) { //primary
+			InsSub priSubCur=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
+			priPlanCur=InsPlans.GetPlan(priSubCur.PlanNum,InsPlanList);
+		}
+		InsPlan secPlanCur=null;
+		if(PatPlanList.Count>1) { //secondary
+			InsSub secSubCur=InsSubs.GetSub(PatPlanList[1].InsSubNum,SubList);
+			secPlanCur=InsPlans.GetPlan(secSubCur.PlanNum,InsPlanList);
+		}
+		//One thing to watch out for here is that we must be absolutely sure to include all claimprocs for the procedures listed,
+		//regardless of status.  Needed for Procedures.ComputeEstimates.  This should be fine.
+		ClaimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
+		List<ClaimProc> claimProcListOld=ClaimProcList.Select(x => x.Copy()).ToList();
+		LoopList=new List<ClaimProcHist>();
+		//foreach(Procedure tpProc in listProcForTP){
+		for(int i=0;i<listProcForTP.Count;i++) {
+			Procedures.ComputeEstimates(listProcForTP[i],PatCur.PatNum,ref ClaimProcList,false,InsPlanList,PatPlanList,BenefitList,
+				HistList,LoopList,false,PatCur.Age,SubList);
+			//then, add this information to loopList so that the next procedure is aware of it.
+			LoopList.AddRange(ClaimProcs.GetHistForProc(ClaimProcList,listProcForTP[i].ProcNum,listProcForTP[i].CodeNum));
+		}
+		//save changes in the list to the database
+		ClaimProcs.Synch(ref ClaimProcList,claimProcListOld);
+		//claimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
+		string estimateNote;
+		if(!checkShowDiscountNotAutomatic) {
+			checkShowDiscount.Checked=false;
+		}
+		decimal subfee,totFee,priIns,secIns,subpriIns,totPriIns,subsecIns,totSecIns,subdiscount,totDiscount,subpat,totPat;
+		subfee=totFee=priIns=secIns=subpriIns=totPriIns=subsecIns=totSecIns=subdiscount=totDiscount=subpat=totPat=0;
+		List<ProcTP> retVal=new List<ProcTP>();
+		for(int i=0;i<listProcForTP.Count;i++) {
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(listProcForTP[i].CodeNum);
+			TpRow row=new TpRow();
+			row.ProcAbbr=procCodeCur.AbbrDesc;
+			decimal fee=(decimal)listProcForTP[i].ProcFee;
+			int qty=listProcForTP[i].BaseUnits+listProcForTP[i].UnitQty;
+			if(qty>0) {
+				fee*=qty;
+			}
+			subfee+=fee;
+			totFee+=fee;
+			#region ShowMaxDed
+			string showPriDeduct="";
+			string showSecDeduct="";
+			ClaimProc claimproc; //holds the estimate.
+			if(PatPlanList.Count>0) { //Primary
+				claimproc=ClaimProcs.GetEstimate(ClaimProcList,listProcForTP[i].ProcNum,priPlanCur.PlanNum,PatPlanList[0].InsSubNum);
+				if(claimproc==null) {
+					priIns=0;
+				}
+				else {
+					if(checkShowMaxDed.Checked) { //whether visible or not
+						priIns=(decimal)ClaimProcs.GetInsEstTotal(claimproc);
+						double ded=ClaimProcs.GetDeductibleDisplay(claimproc);
+						if(ded>0) {
+							showPriDeduct="\r\n"+Lan.g(this,"Pri Deduct Applied: ")+ded.ToString("c");
+						}
+					}
+					else {
+						priIns=(decimal)claimproc.BaseEst;
+					}
+				}
+			}
+			else { //no primary ins
+				priIns=0;
+			}
+			if(PatPlanList.Count>1) { //Secondary
+				claimproc=ClaimProcs.GetEstimate(ClaimProcList,listProcForTP[i].ProcNum,secPlanCur.PlanNum,PatPlanList[1].InsSubNum);
+				if(claimproc==null) {
+					secIns=0;
+				}
+				else {
+					if(checkShowMaxDed.Checked) {
+						secIns=(decimal)ClaimProcs.GetInsEstTotal(claimproc);
+						decimal ded=(decimal)ClaimProcs.GetDeductibleDisplay(claimproc);
+						if(ded>0) {
+							showSecDeduct="\r\n"+Lan.g(this,"Sec Deduct Applied: ")+ded.ToString("c");
+						}
+					}
+					else {
+						secIns=(decimal)claimproc.BaseEst;
+					}
+				}
+			} //secondary
+			else { //no secondary ins
+				secIns=0;
+			}
+			#endregion ShowMaxDed
+			subpriIns+=priIns;
+			totPriIns+=priIns;
+			subsecIns+=secIns;
+			totSecIns+=secIns;
+			decimal discount=(decimal)ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,listProcForTP[i].ProcNum); 
+			if(!checkShowDiscountNotAutomatic
+			   && !checkShowDiscount.Checked
+			   && (listProcForTP[i].Discount!=0
+			       || ClaimProcs.GetTotalWriteOffEstimateDisplay(ClaimProcList,listProcForTP[i].ProcNum)!=0)) {
+				checkShowDiscount.Checked=true;
+			}
+			discount+=(decimal)listProcForTP[i].Discount;
+			subdiscount+=discount;
+			totDiscount+=discount;
+			decimal pat=fee-priIns-secIns-discount;
+			if(pat<0) {
+				pat=0;
+			}
+			subpat+=pat;
+			totPat+=pat;
+			//Fill TpRow object with information.
+			row.Priority=DefC.GetName(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==listProcForTP[i].ProcNum).Priority);//(DefC.GetName(DefCat.TxPriorities,listProcForTP[i].Priority));
+			row.Tth=(Tooth.ToInternat(listProcForTP[i].ToothNum));
+			if(ProcedureCodes.GetProcCode(listProcForTP[i].CodeNum).TreatArea==TreatmentArea.Surf) {
+				row.Surf=(Tooth.SurfTidyFromDbToDisplay(listProcForTP[i].Surf,listProcForTP[i].ToothNum));
+			}
+			else if(ProcedureCodes.GetProcCode(listProcForTP[i].CodeNum).TreatArea==TreatmentArea.Sextant) {
+				row.Surf=Tooth.GetSextant(listProcForTP[i].Surf,(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
+			}
+			else {
+				row.Surf=(listProcForTP[i].Surf); //I think this will properly allow UR, L, etc.
+			}
+			row.Code=procCodeCur.ProcCode;
+			string descript=ProcedureCodes.GetLaymanTerm(listProcForTP[i].CodeNum);
+			if(listProcForTP[i].ToothRange!="") {
+				descript+=" #"+Tooth.FormatRangeForDisplay(listProcForTP[i].ToothRange);
+			}
+			if(checkShowMaxDed.Checked) {
+				estimateNote=ClaimProcs.GetEstimateNotes(listProcForTP[i].ProcNum,ClaimProcList);
+				if(estimateNote!="") {
+					descript+="\r\n"+estimateNote;
+				}
+			}
+			row.Description=(descript);
+			if(showPriDeduct!="") {
+				row.Description+=showPriDeduct;
+			}
+			if(showSecDeduct!="") {
+				row.Description+=showSecDeduct;
+			}
+			row.Prognosis=DefC.GetName(DefCat.Prognosis,PIn.Long(listProcForTP[i].Prognosis.ToString()));
+			row.Dx=DefC.GetValue(DefCat.Diagnosis,PIn.Long(listProcForTP[i].Dx.ToString()));
+			row.Fee=fee;
+			row.PriIns=priIns;
+			row.SecIns=secIns;
+			row.Discount=discount;
+			row.Pat=pat;
+			row.ColorText= DefC.GetColor(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==listProcForTP[i].ProcNum).Priority);//DefC.GetColor(DefCat.TxPriorities,listProcForTP[i].Priority);
+			if(row.ColorText==System.Drawing.Color.White) {
+				row.ColorText=System.Drawing.Color.Black;
+			}
+			//row.Tag=listProcForTP[i].Copy();
+			Procedure proc=listProcForTP[i].Copy();
+			//procList.Add(proc);
+			ProcTP procTP=new ProcTP();
+			//procTP.TreatPlanNum=tp.TreatPlanNum;
+			procTP.PatNum=PatCur.PatNum;
+			procTP.ProcNumOrig=proc.ProcNum;
+			procTP.ItemOrder=i;
+			procTP.Priority=listTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==proc.ProcNum).Priority;//proc.Priority;
+			procTP.ToothNumTP=Tooth.ToInternat(proc.ToothNum);
+			if(ProcedureCodes.GetProcCode(proc.CodeNum).TreatArea==TreatmentArea.Surf) {
+				procTP.Surf=Tooth.SurfTidyFromDbToDisplay(proc.Surf,proc.ToothNum);
+			}
+			else {
+				procTP.Surf=proc.Surf;//for UR, L, etc.
+			}
+			procTP.ProcCode=ProcedureCodes.GetStringProcCode(proc.CodeNum);
+			procTP.Descript=row.Description;
+			if(checkShowFees.Checked) {
+				procTP.FeeAmt=PIn.Double(row.Fee.ToString());
+			}
+			if(checkShowIns.Checked) {
+				procTP.PriInsAmt=PIn.Double(row.PriIns.ToString());
+				procTP.SecInsAmt=PIn.Double(row.SecIns.ToString());
+			}
+			if(checkShowDiscount.Checked) {
+				procTP.Discount=PIn.Double(row.Discount.ToString());
+			}
+			procTP.PatAmt=PIn.Double(row.Pat.ToString());
+			procTP.Prognosis=row.Prognosis;
+			procTP.Dx=row.Dx;
+			retVal.Add(procTP);
+			row.Tag=procTP;
+			RowsMain.Add(row);
+			#region subtotal
+			if(checkShowSubtotals.Checked &&
+			   (i==listProcForTP.Count-1 || listTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==listProcForTP[i+1].ProcNum).Priority!=procTP.Priority)) {
+				row=new TpRow();
+				row.Description="Subtotal";
+				row.Fee=subfee;
+				row.PriIns=subpriIns;
+				row.SecIns=subsecIns;
+				row.Discount=subdiscount;
+				row.Pat=subpat;
+				row.ColorText=DefC.GetColor(DefCat.TxPriorities,listProcForTP[i].Priority);
+				if(row.ColorText==System.Drawing.Color.White) {
+					row.ColorText=System.Drawing.Color.Black;
+				}
+				row.Bold=true;
+				row.ColorLborder=System.Drawing.Color.Black;
+				RowsMain.Add(row);
+				subfee=0;
+				subpriIns=0;
+				subsecIns=0;
+				subdiscount=0;
+				subpat=0;
+			}
+			#endregion subtotal
+		}
+		textNote.Text=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
+		#region Totals
+		if(checkShowTotals.Checked) {
+			TpRow row=new TpRow();
+			row.Description="Total";
+			row.Fee=totFee;
+			row.PriIns=totPriIns;
+			row.SecIns=totSecIns;
+			row.Discount=totDiscount;
+			row.Pat=totPat;
+			row.Bold=true;
+			row.ColorText=System.Drawing.Color.Black;
+			RowsMain.Add(row);
+		}
+		#endregion Totals
+		treatPlan.ListProcTPs=retVal;
+		return retVal;
+	}
+
+	/// <summary>Returns in-memory TreatPlan representing the current treatplan. For displaying current treat-plan before saving it.</summary>
 		private TreatPlan GetCurrentTPHelper() {
 			TreatPlan retVal=new TreatPlan();
 			retVal.Heading=Lan.g(this,"Proposed Treatment Plan");
@@ -2392,6 +2464,7 @@ namespace OpenDental{
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowDiscountNotAutomatic") { ParamValue=checkShowDiscountNotAutomatic });
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowDiscount") { ParamValue=checkShowDiscount.Checked });
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowMaxDed") { ParamValue=checkShowMaxDed.Checked });
+			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowSubTotals") { ParamValue=checkShowSubtotals.Checked });
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowTotals") { ParamValue=checkShowTotals.Checked });
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowCompleted") { ParamValue=checkShowCompleted.Checked });
 			sheetTP.Parameters.Add(new SheetParameter(true,"checkShowFees") { ParamValue=checkShowFees.Checked });
@@ -2423,12 +2496,7 @@ namespace OpenDental{
 			parformat.Alignment=ParagraphAlignment.Center;
 			parformat.Font=MigraDocHelper.CreateFont(10,true);
 			par.Format=parformat;
-			if(gridPlans.SelectedIndices[0]==0) {//current TP
-				text=Lan.g(this,"Proposed Treatment Plan");
-			}
-			else {
-				text=PlanList[gridPlans.SelectedIndices[0]-1].Heading;
-			}
+			text=_listTreatPlans[gridPlans.SelectedIndices[0]].Heading;
 			par.AddFormattedText(text,headingFont);
 			par.AddLineBreak();
 			if(PatCur.ClinicNum==0) {
@@ -2453,18 +2521,18 @@ namespace OpenDental{
 			par.AddText(text);
 			par.AddLineBreak();
 			if(gridPlans.SelectedIndices[0]>0){//not the default plan
-				if(PlanList[gridPlans.SelectedIndices[0]-1].ResponsParty!=0){
+				if(_listTreatPlans[gridPlans.SelectedIndices[0]].ResponsParty!=0){
 					text=Lan.g(this,"Responsible Party: ")
-						+Patients.GetLim(PlanList[gridPlans.SelectedIndices[0]-1].ResponsParty).GetNameFL();
+						+Patients.GetLim(_listTreatPlans[gridPlans.SelectedIndices[0]].ResponsParty).GetNameFL();
 					par.AddText(text);
 					par.AddLineBreak();
 				}
 			}
-			if(gridPlans.SelectedIndices[0]==0) {//default TP
+			if(new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {//Active/Inactive TP
 				text=DateTime.Today.ToShortDateString();
 			}
 			else {
-				text=PlanList[gridPlans.SelectedIndices[0]-1].DateTP.ToShortDateString();
+				text=_listTreatPlans[gridPlans.SelectedIndices[0]].DateTP.ToShortDateString();
 			}
 			par.AddText(text);
 			#endregion
@@ -2619,7 +2687,7 @@ namespace OpenDental{
 				note=PrefC.GetString(PrefName.TreatmentPlanNote);
 			}
 			else {
-				note=PlanList[gridPlans.SelectedIndices[0]-1].Note;
+				note=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
 			}
 			char nbsp='\u00A0';
 			if(note!="") {
@@ -2638,27 +2706,27 @@ namespace OpenDental{
 			//Signature-----------------------------------------------------------------------------------------------------------
 			#region signature
 			if(gridPlans.SelectedIndices[0]!=0//can't be default TP
-				&& PlanList[gridPlans.SelectedIndices[0]-1].Signature!="")
+				&& _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="")
 			{
 				System.Drawing.Bitmap sigBitmap=null;
-				List<ProcTP> proctpList=ProcTPs.RefreshForTP(PlanList[gridPlans.SelectedIndices[0]-1].TreatPlanNum);
-				if(PlanList[gridPlans.SelectedIndices[0]-1].SigIsTopaz){
+				List<ProcTP> proctpList=ProcTPs.RefreshForTP(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
+				if(_listTreatPlans[gridPlans.SelectedIndices[0]].SigIsTopaz){
 					Control sigBoxTopaz=CodeBase.TopazWrapper.GetTopaz();
 					sigBoxTopaz.Size=new System.Drawing.Size(362,79);
 					Controls.Add(sigBoxTopaz);
 					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
 					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
 					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);					
-					string keystring=TreatPlans.GetHashString(PlanList[gridPlans.SelectedIndices[0]-1],proctpList);
+					string keystring=TreatPlans.GetHashString(_listTreatPlans[gridPlans.SelectedIndices[0]],proctpList);
 					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
 					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
 					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,PlanList[gridPlans.SelectedIndices[0]-1].Signature);
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
 					sigBoxTopaz.Refresh();
 					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
 					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
 						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,PlanList[gridPlans.SelectedIndices[0]-1].Signature);
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
 					}
 					sigBitmap=new Bitmap(362,79);
 					sigBoxTopaz.DrawToBitmap(sigBitmap,new Rectangle(0,0,362,79));//GetBitmap would probably work.
@@ -2671,12 +2739,12 @@ namespace OpenDental{
 					sigBox.ClearTablet();
 					//sigBox.SetSigCompressionMode(0);
 					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString(TreatPlans.GetHashString(PlanList[gridPlans.SelectedIndices[0]-1],proctpList));
+					sigBox.SetKeyString(TreatPlans.GetHashString(_listTreatPlans[gridPlans.SelectedIndices[0]],proctpList));
 					//"0000000000000000");
 					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
 					//sigBox.SetEncryptionMode(2);//high encryption
 					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(PlanList[gridPlans.SelectedIndices[0]-1].Signature);
+					sigBox.SetSigString(_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
 					//if(sigBox.NumberOfTabletPoints()==0) {
 					//	labelInvalidSig.Visible=true;
 					//}
@@ -2692,68 +2760,63 @@ namespace OpenDental{
 			return doc;
 		}
 
-		///<summary>Just used for printing the 3D chart.</summary>
-		private void ComputeProcListFiltered() {
-			ProcListFiltered=new List<Procedure>();
-			//first, add all completed work and conditions. C,EC,EO, and Referred
-			for(int i=0;i<ProcList.Count;i++) {
-				if(ProcList[i].ProcStatus==ProcStat.C
-					|| ProcList[i].ProcStatus==ProcStat.EC
-					|| ProcList[i].ProcStatus==ProcStat.EO)
-				{
-					if(checkShowCompleted.Checked){
-						ProcListFiltered.Add(ProcList[i]);
-					}
-				}
-				if(ProcList[i].ProcStatus==ProcStat.R){//always show all referred
-					ProcListFiltered.Add(ProcList[i]);
-				}
-				if(ProcList[i].ProcStatus==ProcStat.Cn){//always show all conditions.
+	///<summary>Just used for printing the 3D chart.</summary>
+	private void ComputeProcListFiltered() {
+		ProcListFiltered=new List<Procedure>();
+		//first, add all completed work and conditions. C,EC,EO, and Referred
+		for(int i=0;i<ProcList.Count;i++) {
+			if(ProcList[i].ProcStatus==ProcStat.C
+			   || ProcList[i].ProcStatus==ProcStat.EC
+			   || ProcList[i].ProcStatus==ProcStat.EO) 
+			{
+				if(checkShowCompleted.Checked) {
 					ProcListFiltered.Add(ProcList[i]);
 				}
 			}
-			//then add whatever is showing on the selected TP
-			if(gridPlans.SelectedIndices[0]==0) {//current plan
-				for(int i=0;i<ProcListTP.Length;i++) {
-					if(ProcListTP[i].HideGraphics){
-						continue;
-					}
-					ProcListFiltered.Add(ProcListTP[i]);
+			if(ProcList[i].ProcStatus==ProcStat.R) { //always show all referred
+				ProcListFiltered.Add(ProcList[i]);
+			}
+			if(ProcList[i].ProcStatus==ProcStat.Cn) { //always show all conditions.
+				ProcListFiltered.Add(ProcList[i]);
+			}
+		}
+		//then add whatever is showing on the selected TP
+		//Always select all procedures in TP.
+		gridMain.SetSelected(true);
+		if(new[] {TreatPlanStatus.Active,TreatPlanStatus.Inactive}.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) { //current plan
+			ProcTPSelectList=gridMain.SelectedIndices.Where(x => gridMain.Rows[x].Tag!=null).Select(x => (ProcTP)gridMain.Rows[x].Tag).ToArray();
+		}
+		Procedure procDummy; //not a real procedure.  Just used to help display on graphical chart
+		for(int i=0;i<ProcTPSelectList.Length;i++) {
+			procDummy=new Procedure();
+			//this next loop is a way to get missing fields like tooth range.  Could be improved.
+			for(int j=0;j<ProcList.Count;j++) {
+				if(ProcList[j].ProcNum==ProcTPSelectList[i].ProcNumOrig) {
+					//but remember that even if the procedure is found, Status might have been altered
+					procDummy=ProcList[j].Copy();
 				}
+			}
+			if(Tooth.IsValidEntry(ProcTPSelectList[i].ToothNumTP)) {
+				procDummy.ToothNum=Tooth.FromInternat(ProcTPSelectList[i].ToothNumTP);
+			}
+			if(ProcedureCodes.GetProcCode(ProcTPSelectList[i].ProcCode).TreatArea==TreatmentArea.Surf) {
+				procDummy.Surf=Tooth.SurfTidyFromDisplayToDb(ProcTPSelectList[i].Surf,procDummy.ToothNum);
 			}
 			else {
-				Procedure procDummy;//not a real procedure.  Just used to help display on graphical chart
-				for(int i=0;i<ProcTPSelectList.Length;i++) {
-					procDummy=new Procedure();
-					//this next loop is a way to get missing fields like tooth range.  Could be improved.
-					for(int j=0;j<ProcList.Count;j++) {
-						if(ProcList[j].ProcNum==ProcTPSelectList[i].ProcNumOrig) {
-							//but remember that even if the procedure is found, Status might have been altered
-							procDummy=ProcList[j].Copy();
-						}
-					}
-					if(Tooth.IsValidEntry(ProcTPSelectList[i].ToothNumTP)) {
-						procDummy.ToothNum=Tooth.FromInternat(ProcTPSelectList[i].ToothNumTP);
-					}
-					if(ProcedureCodes.GetProcCode(ProcTPSelectList[i].ProcCode).TreatArea==TreatmentArea.Surf){
-						procDummy.Surf=Tooth.SurfTidyFromDisplayToDb(ProcTPSelectList[i].Surf,procDummy.ToothNum);
-					}
-					else{
-						procDummy.Surf=ProcTPSelectList[i].Surf;//for quad, arch, etc.
-					}
-					if(procDummy.ToothRange==null){
-						procDummy.ToothRange="";
-					}
-					//procDummy.HideGraphical??
-					procDummy.ProcStatus=ProcStat.TP;
-					procDummy.CodeNum=ProcedureCodes.GetProcCode(ProcTPSelectList[i].ProcCode).CodeNum;
-					ProcListFiltered.Add(procDummy);
-				}
+				procDummy.Surf=ProcTPSelectList[i].Surf; //for quad, arch, etc.
 			}
-			ProcListFiltered.Sort(CompareProcListFiltered);
+			if(procDummy.ToothRange==null) {
+				procDummy.ToothRange="";
+			}
+			//procDummy.HideGraphical??
+			procDummy.ProcStatus=ProcStat.TP;
+			procDummy.CodeNum=ProcedureCodes.GetProcCode(ProcTPSelectList[i].ProcCode).CodeNum;
+			ProcListFiltered.Add(procDummy);
 		}
+		ProcListFiltered.Sort(CompareProcListFiltered);
+	}
 
-		private int CompareProcListFiltered(Procedure proc1,Procedure proc2) {
+	private int CompareProcListFiltered(Procedure proc1,Procedure proc2) {
 			int dateFilter=proc1.ProcDate.CompareTo(proc2.ProcDate);
 			if(dateFilter!=0) {
 				return dateFilter;
@@ -2769,6 +2832,7 @@ namespace OpenDental{
 			switch(procStat) {
 				case ProcStat.Cn:
 					return 0;
+				case ProcStat.TPi:
 				case ProcStat.TP:
 					return 1;
 				case ProcStat.R:
@@ -2942,8 +3006,8 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMainUpdate_Click() {
-			if(gridPlans.SelectedIndices[0]!=0) {
-				MsgBox.Show(this,"The update fee utility only works on the current treatment plan, not any saved plans.");
+			if(!new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {
+				MsgBox.Show(this,"The update fee utility only works on current treatment plans, not any saved plans.");
 				return;
 			}
 			if(!MsgBox.Show(this,true,"Update all fees and insurance estimates on this treatment plan to the current fees for this patient?")) {
@@ -3002,12 +3066,20 @@ namespace OpenDental{
 				Procedures.UpdateFee(procCur.ProcNum,procCur.ProcFee);
 				//Procedures.Update(procCur,procOld);//no recall synch required 
 			}
-			ModuleSelected(PatCur.PatNum);
+			long tpNum=_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum;
+			ModuleSelected(PatCur.PatNum);//refreshes TPs
+			for(int i=0;i<_listTreatPlans.Count;i++) {
+				if(_listTreatPlans[i].TreatPlanNum==tpNum) {
+					gridPlans.SetSelected(i,true);
+				}
+			}
+			FillMain();
 		}
 
 		private void ToolBarMainCreate_Click(){//Save TP
-			if(gridPlans.SelectedIndices[0]!=0){
-				MsgBox.Show(this,"The default TP must be selected before saving a TP.  You can highlight some procedures in the default TP to save a TP with only those procedures in it.");
+			if(!new[]{TreatPlanStatus.Active,TreatPlanStatus.Inactive}.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)){
+			//if(gridPlans.SelectedIndices[0]!=0){
+				MsgBox.Show(this,"An Active or Inactive TP must be selected before saving a TP.  You can highlight some procedures in the TP to save a TP with only those procedures in it.");
 				return;
 			}
 			//Check for duplicate procedures on the appointment before sending the DFT to eCW.
@@ -3022,6 +3094,7 @@ namespace OpenDental{
 			if(gridMain.SelectedIndices.Length==0){
 				gridMain.SetSelected(true);
 			}
+			List<TreatPlanAttach> listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
 			TreatPlan tp=new TreatPlan();
 			tp.Heading=Lan.g(this,"Proposed Treatment Plan");
 			tp.DateTP=DateTimeOD.Today;
@@ -3038,14 +3111,14 @@ namespace OpenDental{
 					//user must have highlighted a subtotal row.
 					continue;
 				}
-				proc=(Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
+				proc=Procedures.GetOneProc(((ProcTP)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProcNumOrig,true);
 				procList.Add(proc);
 				procTP=new ProcTP();
 				procTP.TreatPlanNum=tp.TreatPlanNum;
 				procTP.PatNum=PatCur.PatNum;
 				procTP.ProcNumOrig=proc.ProcNum;
 				procTP.ItemOrder=itemNo;
-				procTP.Priority=proc.Priority;
+				procTP.Priority=listTreatPlanAttaches.FirstOrDefault(x=>x.ProcNum==proc.ProcNum).Priority;
 				procTP.ToothNumTP=Tooth.ToInternat(proc.ToothNum);
 				if(ProcedureCodes.GetProcCode(proc.CodeNum).TreatArea==TreatmentArea.Surf){
 					procTP.Surf=Tooth.SurfTidyFromDbToDisplay(proc.Surf,proc.ToothNum);
@@ -3101,9 +3174,9 @@ namespace OpenDental{
 				#endregion Canadian Lab Fees
 			}
 			ModuleSelected(PatCur.PatNum);
-			for(int i=0;i<PlanList.Length;i++){
-				if(PlanList[i].TreatPlanNum==tp.TreatPlanNum){
-					gridPlans.SetSelected(i+1,true);
+			for(int i=0;i<_listTreatPlans.Count;i++){
+				if(_listTreatPlans[i].TreatPlanNum==tp.TreatPlanNum){
+					gridPlans.SetSelected(i,true);
 					FillMain();
 				}
 			}
@@ -3143,22 +3216,22 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMainSign_Click() {
-			if(gridPlans.SelectedIndices[0]==0) {
-				MsgBox.Show(this,"You may only sign a saved TP, not the default TP.");
+			if(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus!=TreatPlanStatus.Saved) {
+				MsgBox.Show(this,"You may only sign a saved TP, not an Active or Inactive TP.");
 				return;
 			}
 			//string patFolder=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());
 			if(PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf) //preference enabled
-			   && PlanList[gridPlans.SelectedIndices[0]-1].Signature!="" //and document is signed
-			   && Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) //and file exists
+			   && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="" //and document is signed
+			   && Documents.DocExists(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum)) //and file exists
 			{
 				MsgBox.Show(this,"Document already signed and saved to PDF. Unsign treatment plan from edit window to enable resigning.");
 				Cursor=Cursors.WaitCursor;
-				Documents.OpenDoc(PlanList[gridPlans.SelectedIndices[0]-1].DocNum);
+				Documents.OpenDoc(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum);
 				Cursor=Cursors.Default;
 				return;//cannot re-sign document.
 			}
-			if(PlanList[gridPlans.SelectedIndices[0]-1].DocNum>0 && !Documents.DocExists(PlanList[gridPlans.SelectedIndices[0]-1].DocNum)) {
+			if(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum>0 && !Documents.DocExists(_listTreatPlans[gridPlans.SelectedIndices[0]].DocNum)) {
 				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Unable to open saved treatment plan. Would you like to recreate document using current information?")) {
 					return;
 				}
@@ -3166,7 +3239,7 @@ namespace OpenDental{
 			FormTPsign FormT=new FormTPsign();
 			if(PrefC.GetBool(PrefName.TreatPlanUseSheets)) {
 				TreatPlan treatPlan;
-				treatPlan=PlanList[gridPlans.SelectedIndices[0]-1].Copy();
+				treatPlan=_listTreatPlans[gridPlans.SelectedIndices[0]].Copy();
 				treatPlan.ListProcTPs=ProcTPs.RefreshForTP(treatPlan.TreatPlanNum);
 				FormT.SheetTP=TreatPlanToSheet(treatPlan);
 				FormT.Document=SheetPrinting.Print(FormT.SheetTP,isPrintDocument:true);
@@ -3183,13 +3256,13 @@ namespace OpenDental{
 				FormT.TotalPages=renderer.FormattedDocument.PageCount;
 			}
 			FormT.SaveDocDelegate=SaveTPAsDocument;
-			FormT.TPcur=PlanList[gridPlans.SelectedIndices[0]-1];
+			FormT.TPcur=_listTreatPlans[gridPlans.SelectedIndices[0]];
 			FormT.ShowDialog();
-			long tpNum=PlanList[gridPlans.SelectedIndices[0]-1].TreatPlanNum;
+			long tpNum=_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum;
 			ModuleSelected(PatCur.PatNum);//refreshes TPs
-			for(int i=0;i<PlanList.Length;i++) {
-				if(PlanList[i].TreatPlanNum==tpNum) {
-					gridPlans.SetSelected(i+1,true);
+			for(int i=0;i<_listTreatPlans.Count;i++) {
+				if(_listTreatPlans[i].TreatPlanNum==tpNum) {
+					gridPlans.SetSelected(i,true);
 				}
 			}
 			FillMain();
@@ -3284,15 +3357,15 @@ namespace OpenDental{
 			if(!CheckClearinghouseDefaults()) {
 				return;
 			}
-			if(gridPlans.SelectedIndices[0]!=0){
-				MsgBox.Show(this,"You can only send a preauth from the current TP, not a saved TP.");
+			if(!new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {
+				MsgBox.Show(this,"You can only send a preauth from a current TP, not a saved TP.");
 				return;
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 				int numLabProcsUnselected=0;
 				List<int> selectedIndices=new List<int>(gridMain.SelectedIndices);
 				for(int i=0;i<selectedIndices.Count;i++) {
-					Procedure proc=((Procedure)gridMain.Rows[selectedIndices[i]].Tag);
+					Procedure proc=(Procedures.GetOneProc(((ProcTP)gridMain.Rows[selectedIndices[i]].Tag).ProcNumOrig,false));
 					if(proc!=null) {
 						ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
 						if(procCode.IsCanadianLab) {
@@ -3307,19 +3380,22 @@ namespace OpenDental{
 				if(gridMain.SelectedIndices.Length>7) {
 					List <int> selectedIndicies=new List<int>(gridMain.SelectedIndices);
 					selectedIndicies.Sort();
-					for(int i=0;i<selectedIndicies.Count;i++) { //Unselect all but the first 7 procedures with the smallest index numbers.
-						gridMain.SetSelected(selectedIndicies[i],(i<7));
+					gridMain.SetSelected(false);
+					foreach(int selectedIdx in selectedIndices) {
+						if(gridMain.Rows[selectedIdx].Tag==null) {
+							continue;//subtotal row.
+						}
+						gridMain.SetSelected(selectedIdx,true);
+						if(gridMain.SelectedIndices.Length>=7) {
+							break;//we have found seven procedures.
+						}
 					}
-					MsgBox.Show(this,"Only the first 7 procedures will be selected.  You will need to create another preauth for the remaining procedures.");
+					if(selectedIndices.FindAll(x => gridMain.Rows[x].Tag!=null).Count>7) {//only if they selected more than 7 procedures, not 7 rows.
+						MsgBox.Show(this,"Only the first 7 procedures will be selected.  You will need to create another preauth for the remaining procedures.");
+					}
 				}
 			}
-			bool procsSelected=false;
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag!=null){
-					procsSelected=true;
-				}
-			}
-			if(!procsSelected) {
+			if(gridMain.SelectedIndices.All(x => gridMain.Rows[x].Tag==null)) {
 				MessageBox.Show(Lan.g(this,"Please select procedures first."));
 				return;
 			}
@@ -3337,15 +3413,18 @@ namespace OpenDental{
 			ClaimCur.InsSubNum=FormIPS.SelectedSub.InsSubNum;
 			ClaimCur.ProvTreat=0;
 			ClaimCur.ClaimForm=FormIPS.SelectedPlan.ClaimFormNum;
+			List<Procedure> listProcsSelected=new List<Procedure>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
 				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null){
 					continue;//skip any hightlighted subtotal lines
 				}
+				Procedure proc=Procedures.GetOneProc(((ProcTP)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProcNumOrig,false);
+				listProcsSelected.Add(proc);
 				if(ClaimCur.ProvTreat==0){//makes sure that at least one prov is set
-					ClaimCur.ProvTreat=((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProvNum;
+					ClaimCur.ProvTreat=proc.ProvNum;
 				}
-				if(!Providers.GetIsSec(((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProvNum)){
-					ClaimCur.ProvTreat=((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProvNum;
+				if(!Providers.GetIsSec(proc.ProvNum)) {
+					ClaimCur.ProvTreat=proc.ProvNum;
 				}
 			}
 			ClaimCur.ClinicNum=PatCur.ClinicNum;
@@ -3364,36 +3443,31 @@ namespace OpenDental{
 			//instead of making the user enter it:
 			ClaimCur.PatRelat=FormIPS.PatRelat;
 			Claims.Insert(ClaimCur);
-			Procedure ProcCur;
 			ClaimProc ClaimProcCur;
 			ClaimProc cpExisting;
 			List<ClaimProc> listClaimProcs=new List<ClaimProc>();
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
-					continue;//skip any highlighted subtotal lines
-				}
-				ProcCur=(Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
+			foreach(Procedure procCur in listProcsSelected){
         ClaimProcCur=new ClaimProc();
-				ClaimProcCur.ProcNum=ProcCur.ProcNum;
+				ClaimProcCur.ProcNum=procCur.ProcNum;
         ClaimProcCur.ClaimNum=ClaimCur.ClaimNum;
         ClaimProcCur.PatNum=PatCur.PatNum;
-        ClaimProcCur.ProvNum=ProcCur.ProvNum;
+        ClaimProcCur.ProvNum=procCur.ProvNum;
 				ClaimProcCur.Status=ClaimProcStatus.Preauth;
-				ClaimProcCur.FeeBilled=ProcCur.ProcFee;
+				ClaimProcCur.FeeBilled=procCur.ProcFee;
 				ClaimProcCur.PlanNum=FormIPS.SelectedPlan.PlanNum;
 				ClaimProcCur.InsSubNum=FormIPS.SelectedSub.InsSubNum;
-				cpExisting=ClaimProcs.GetEstimate(ClaimProcList,ProcCur.ProcNum,FormIPS.SelectedPlan.PlanNum,FormIPS.SelectedSub.InsSubNum);
+				cpExisting=ClaimProcs.GetEstimate(ClaimProcList,procCur.ProcNum,FormIPS.SelectedPlan.PlanNum,FormIPS.SelectedSub.InsSubNum);
 				if(cpExisting!=null){
 					ClaimProcCur.InsPayEst=cpExisting.InsPayEst;
 				}
-				if(FormIPS.SelectedPlan.UseAltCode && (ProcedureCodes.GetProcCode(ProcCur.CodeNum).AlternateCode1!="")){
-					ClaimProcCur.CodeSent=ProcedureCodes.GetProcCode(ProcCur.CodeNum).AlternateCode1;
+				if(FormIPS.SelectedPlan.UseAltCode && (ProcedureCodes.GetProcCode(procCur.CodeNum).AlternateCode1!="")){
+					ClaimProcCur.CodeSent=ProcedureCodes.GetProcCode(procCur.CodeNum).AlternateCode1;
 				}
-				else if(FormIPS.SelectedPlan.IsMedical && ProcCur.MedicalCode!=""){
-					ClaimProcCur.CodeSent=ProcCur.MedicalCode;
+				else if(FormIPS.SelectedPlan.IsMedical && procCur.MedicalCode!=""){
+					ClaimProcCur.CodeSent=procCur.MedicalCode;
 				}
 				else{
-					ClaimProcCur.CodeSent=ProcedureCodes.GetStringProcCode(ProcCur.CodeNum);
+					ClaimProcCur.CodeSent=ProcedureCodes.GetStringProcCode(procCur.CodeNum);
 					if(ClaimProcCur.CodeSent.Length>5 && ClaimProcCur.CodeSent.Substring(0,1)=="D"){
 						ClaimProcCur.CodeSent=ClaimProcCur.CodeSent.Substring(0,5);
 					}
@@ -3422,30 +3496,32 @@ namespace OpenDental{
 		}
 
 		private void ToolBarMainDiscount_Click() {
-			if(gridPlans.SelectedIndices[0]!=0) {
-				MsgBox.Show(this,"You can only create discounts from the current TP, not a saved TP.");
+			if(!new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {
+				MsgBox.Show(this,"You can only create discounts from a current TP, not a saved TP.");
 				return;
 			}
 			if(gridMain.SelectedIndices.Length==0) {
 				gridMain.SetSelected(true);
 			}
-			List<Procedure> listProcs=new List<Procedure>();
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
-					continue;//skip any hightlighted subtotal lines
-				}
-				if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag.GetType()==typeof(Procedure)) {
-					listProcs.Add(((Procedure)gridMain.Rows[gridMain.SelectedIndices[i]].Tag));
-				}
-			}
+			List<Procedure> listProcs=Procedures.GetManyProc(gridMain.SelectedIndices.ToList()
+				.FindAll(x => gridMain.Rows[x].Tag!=null)
+				.Select(x => ((ProcTP)gridMain.Rows[x].Tag).ProcNumOrig)
+				.ToList(),false);
 			if(listProcs.Count<=0) {
-				MsgBox.Show(this,"There are no procedures in the default treatment plan. Please add procedures to the treatment plan before applying a discount");
+				MsgBox.Show(this,"There are no procedures selected in the treatment plan. Please add to, or select from, procedures attached to the treatment plan before applying a discount");
 				return;
 			}
 			FormTreatmentPlanDiscount FormTPD=new FormTreatmentPlanDiscount(listProcs);
 			FormTPD.ShowDialog();
 			if(FormTPD.DialogResult==DialogResult.OK) {
-				ModuleSelected(PatCur.PatNum);
+				long tpNum=_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum;
+				ModuleSelected(PatCur.PatNum);//refreshes TPs
+				for(int i=0;i<_listTreatPlans.Count;i++) {
+					if(_listTreatPlans[i].TreatPlanNum==tpNum) {
+						gridPlans.SetSelected(i,true);
+					}
+				}
+				FillMain();
 			}
 		}
 
@@ -3461,20 +3537,20 @@ namespace OpenDental{
 		}
 
 		private void gridPreAuth_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			if(gridPlans.SelectedIndices[0]!=0){
+			if(!new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {
 				return;
 			}
 			gridMain.SetSelected(false);
 			Claim ClaimCur=(Claim)ALPreAuth[e.Row];
 			List<ClaimProc> ClaimProcsForClaim=ClaimProcs.RefreshForClaim(ClaimCur.ClaimNum);
-			Procedure proc;
 			for(int i=0;i<gridMain.Rows.Count;i++){//ProcListTP.Length;i++){
 				if(gridMain.Rows[i].Tag==null){
 					continue;//must be a subtotal row
 				}
-				proc=(Procedure)gridMain.Rows[i].Tag;
+				ProcTP procTP=(ProcTP)gridMain.Rows[i].Tag;
+				//proc=(Procedure)gridMain.Rows[i].Tag;
 				for(int j=0;j<ClaimProcsForClaim.Count;j++){
-					if(proc.ProcNum==ClaimProcsForClaim[j].ProcNum){
+					if(procTP.ProcNumOrig==ClaimProcsForClaim[j].ProcNum){
 						gridMain.SetSelected(i,true);
 					}
 				}

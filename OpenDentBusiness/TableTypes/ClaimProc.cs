@@ -68,7 +68,7 @@ namespace OpenDentBusiness{
 		public double DedEst;
 		///<summary>-1 if blank.  Overrides the DedEst value.</summary>
 		public double DedEstOverride;
-		///<summary>Always has a value.  BaseEst-(DedEst or DedEstOverride)-PaidOtherIns-OverAnnualMax.  User cannot edit, but can instead use InsEstTotalOverride.</summary>
+		///<summary>Always has a value.  BaseEst-(DedEst or DedEstOverride)-PaidOtherIns-OverAnnualMax.  User cannot edit, but can instead use InsEstTotalOverride. Recalculated each time TP is viewed, is saved as the value calculated for the last viewed TP. This variable should probably just be moved to memory and removed as a DB field.</summary>
 		public double InsEstTotal;
 		///<summary>-1 if blank.  Overrides the InsEstTotal value.</summary>
 		public double InsEstTotalOverride;

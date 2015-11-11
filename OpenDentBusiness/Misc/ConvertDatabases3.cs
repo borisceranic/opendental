@@ -11207,6 +11207,63 @@ namespace OpenDentBusiness {
 						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AutomaticSummaryOfCareWebmail','"+valuestr+"')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE treatplan ADD TPStatus tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE treatplan ADD TPStatus number(3)";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET TPStatus = 0 WHERE TPStatus IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan MODIFY TPStatus NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS treatplanattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE treatplanattach (
+						TreatPlanAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						TreatPlanNum bigint NOT NULL,
+						ProcNum bigint NOT NULL,
+						Priority bigint NOT NULL,
+						INDEX(TreatPlanNum),
+						INDEX(ProcNum),
+						INDEX(Priority)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE treatplanattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE treatplanattach (
+						TreatPlanAttachNum number(20) NOT NULL,
+						TreatPlanNum number(20) NOT NULL,
+						ProcNum number(20) NOT NULL,
+						Priority number(20) NOT NULL,
+						CONSTRAINT treatplanattach_TreatPlanAttac PRIMARY KEY (TreatPlanAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX treatplanattach_TreatPlanNum ON treatplanattach (TreatPlanNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX treatplanattach_ProcNum ON treatplanattach (ProcNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX treatplanattach_Priority ON treatplanattach (Priority)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE chartview ADD IsTpCharting tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE chartview ADD IsTpCharting number(3)";
+					Db.NonQ(command);
+					command="UPDATE chartview SET IsTpCharting = 0 WHERE IsTpCharting IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE chartview MODIFY IsTpCharting NOT NULL";
+					Db.NonQ(command);
+				}
+				
 
 
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -11224,3 +11281,7 @@ namespace OpenDentBusiness {
 
 
 
+
+
+
+			

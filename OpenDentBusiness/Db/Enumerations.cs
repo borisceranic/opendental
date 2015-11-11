@@ -136,7 +136,9 @@ namespace OpenDentBusiness{
 		///<summary>6- Deleted.</summary>
 		D,
 		///<summary>7- Condition.</summary>
-		Cn
+		Cn,
+		///<summary>8- Treatment Plan inactive.</summary>
+		TPi
 	}
 		//?new?
 	
