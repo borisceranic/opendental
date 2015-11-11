@@ -203,8 +203,8 @@ namespace OpenDental {
 			// picturePodium
 			// 
 			this.picturePodium.HasBorder = false;
-			this.picturePodium.Image = ((System.Drawing.Image)(resources.GetObject("picturePodium.Image")));
-			this.picturePodium.Location = new System.Drawing.Point(6, 19);
+			this.picturePodium.Image = global::OpenDental.Properties.Resources.Podium_Button_100x24;
+			this.picturePodium.Location = new System.Drawing.Point(8, 19);
 			this.picturePodium.Name = "picturePodium";
 			this.picturePodium.Size = new System.Drawing.Size(95, 24);
 			this.picturePodium.TabIndex = 28;
@@ -405,8 +405,8 @@ namespace OpenDental {
 			// odPictureBox2
 			// 
 			this.odPictureBox2.HasBorder = false;
-			this.odPictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("odPictureBox2.Image")));
-			this.odPictureBox2.Location = new System.Drawing.Point(6, 19);
+			this.odPictureBox2.Image = global::OpenDental.Properties.Resources.DI_Button_100x24;
+			this.odPictureBox2.Location = new System.Drawing.Point(8, 19);
 			this.odPictureBox2.Name = "odPictureBox2";
 			this.odPictureBox2.Size = new System.Drawing.Size(95, 24);
 			this.odPictureBox2.TabIndex = 0;

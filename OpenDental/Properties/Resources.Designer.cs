@@ -362,6 +362,16 @@ namespace OpenDental.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap DI_Button_100x24 {
+            get {
+                object obj = ResourceManager.GetObject("DI_Button_100x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap down {
             get {
                 object obj = ResourceManager.GetObject("down", resourceCulture);
@@ -536,6 +546,16 @@ namespace OpenDental.Properties {
         public static System.Drawing.Bitmap phoneInUse {
             get {
                 object obj = ResourceManager.GetObject("phoneInUse", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Podium_Button_100x24 {
+            get {
+                object obj = ResourceManager.GetObject("Podium_Button_100x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -6899,6 +6899,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Podium_Button_100x24.png" />
+    <None Include="Resources\DI_Button_100x24.png" />
     <None Include="Resources\deleteX18.gif" />
     <None Include="Resources\butDentalIntel.png" />
     <None Include="Resources\webSched_PV_Button.png" />
