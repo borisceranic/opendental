@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,38 +11,55 @@ namespace OpenDentBusiness {
 		public static string NewCropPartnerName {
 			get {
 				string newCropName=PrefC.GetString(PrefName.NewCropName);
-				if(newCropName=="") { //Resellers use this field to send different credentials. Thus, if blank, then send OD credentials.
+				if(newCropName!="") { //Distributors use this field to send different credentials. Thus, if blank, then send OD credentials.
+					return PrefC.GetString(PrefName.NewCropPartnerName);//Distributor
+				}
+				if(PrefC.GetBool(PrefName.NewCropIsLexiData)) {
+					return "OpenDentalLexi";
+				}
+				else {//First Data Bank (FDB) customers.
 					return "OpenDental";
 				}
-				return PrefC.GetString(PrefName.NewCropPartnerName);//Reseller.
 			}
 		}
 
 		public static string NewCropAccountName {
 			get {
 				string newCropName=PrefC.GetString(PrefName.NewCropName);
-				if(newCropName=="") { //Resellers use this field to send different credentials. Thus, if blank, then send OD credentials.
-#if DEBUG
-					return CodeBase.MiscUtils.Decrypt("Xv40GArhEXYjEZxAE3Fw9g==");//Assigned by NewCrop. Used globally for all customers.
-#else
-					return CodeBase.MiscUtils.Decrypt("HumacKlUtM1MLCHsZY/PH86W10AY5u2bukFp15lEKhT6zD/aa9nG//zYzbYgpH8+");//Assigned by NewCrop. Used globally for all customers.
-#endif
+				if(newCropName!="") { //Distributors use this field to send different credentials. Thus, if blank, then send OD credentials.
+					return newCropName;//Distributor
 				}
-				return newCropName;//Reseller.
+#if DEBUG
+				return CodeBase.MiscUtils.Decrypt("Xv40GArhEXYjEZxAE3Fw9g==");//Assigned by NewCrop. Used globally for all customers.
+#else
+				//Assigned by NewCrop.  Used globally for all customers.
+				if(PrefC.GetBool(PrefName.NewCropIsLexiData)) {
+					return CodeBase.MiscUtils.Decrypt("22kFdicmXHDom20yKqaLIJAo0iq9fGvQnjjyV7Pb3Pn51zo0gjs0/h8eWNyCPO68");
+				}
+				else {//First Data Bank (FDB) customers.
+					return CodeBase.MiscUtils.Decrypt("HumacKlUtM1MLCHsZY/PH86W10AY5u2bukFp15lEKhT6zD/aa9nG//zYzbYgpH8+");
+				}
+#endif
 			}
 		}
 
 		public static string NewCropAccountPasssword {
 			get {
 				string newCropName=PrefC.GetString(PrefName.NewCropName);
-				if(newCropName=="") { //Resellers use this field to send different credentials. Thus, if blank, then send OD credentials.
-#if DEBUG
-					return CodeBase.MiscUtils.Decrypt("Xv40GArhEXYjEZxAE3Fw9g==");//Assigned by NewCrop. Used globally for all customers.
-#else
-					return CodeBase.MiscUtils.Decrypt("I0Itlo5F3ZOYUSwMKpgbY5X6++XpUetMvrqj0vVB7bKzYwJlWtsLiFFgpMBplLaH");//Assigned by NewCrop. Used globally for all customers.
-#endif
+				if(newCropName!="") { //Distributors use this field to send different credentials. Thus, if blank, then send OD credentials.
+					return PrefC.GetString(PrefName.NewCropPassword);//Distributor
 				}
-				return PrefC.GetString(PrefName.NewCropPassword);//Reseller.
+#if DEBUG
+				return CodeBase.MiscUtils.Decrypt("Xv40GArhEXYjEZxAE3Fw9g==");//Assigned by NewCrop. Used globally for all customers.
+#else
+				//Assigned by NewCrop. Used globally for all customers.
+				if(PrefC.GetBool(PrefName.NewCropIsLexiData)) {
+					return CodeBase.MiscUtils.Decrypt("tv9uB38IYv1dRddpVgJjDYD9JlEpPhWd3VpmXd9KtpS7DkOxUdYt8ggS+tFZeYsv");
+				}
+				else {//First Data Bank (FDB) customers.
+					return CodeBase.MiscUtils.Decrypt("I0Itlo5F3ZOYUSwMKpgbY5X6++XpUetMvrqj0vVB7bKzYwJlWtsLiFFgpMBplLaH");
+				}
+#endif
 			}
 		}
 

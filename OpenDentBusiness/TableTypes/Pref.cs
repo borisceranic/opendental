@@ -363,7 +363,11 @@ namespace OpenDentBusiness {
 		NewCropDateLastAccessCheck,
 		///<summary>True for customers who were using NewCrop before version 15.4.  True if NewCropAccountId was not blank when upgraded.</summary>
 		NewCropIsLegacy,
-		/// <summary>There is no UI for user to change this. For resellers, this is part of the credentials.  OD credentials are not stored here, but are hard-coded.</summary>
+		///<summary>Controls which NewCrop database to use.  If false, then the customer uses the First Data Bank (FDB) database, otherwise the 
+		///customer uses the LexiData database.  Connecting to LexiData saves NewCrop some money on the new accounts.  Additionally, the RxNorms which
+		///come back from the prescription refresh in the Chart are more complete for the LexiData database than for the FDB database.</summary>
+		NewCropIsLexiData,
+		///<summary>There is no UI for user to change this. For distributors, this is part of the credentials.  OD credentials are not stored here, but are hard-coded.</summary>
 		NewCropName,
 		///<summary>There is no UI for user to change this.  For distributors, this is part of the credentials.
 		///OD credentials are not stored here, but are hard-coded.</summary>

@@ -10423,10 +10423,15 @@ namespace OpenDentBusiness {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('NewCropIsLegacy','"+(isLegacyErx?"1":"0")+"')";
 					Db.NonQ(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('NewCropIsLexiData','"+(isLegacyErx?"0":"1")+"')";
+					Db.NonQ(command);
 				}
 				else {//oracle
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
 						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'NewCropIsLegacy','"+(isLegacyErx?"1":"0")+"')";
+					Db.NonQ(command);
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'NewCropIsLexiData','"+(isLegacyErx?"0":"1")+"')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
