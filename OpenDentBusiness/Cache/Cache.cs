@@ -485,5 +485,80 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>Returns a list of all invalid types that are used for the cache.  Currently only called from DBM.</summary>
+		public static List<InvalidType> GetAllCachedInvalidTypes() {
+			List<InvalidType> listInvalidTypes=new List<InvalidType>();
+			//Below is a list of all invalid types in the same order the appear in the InvalidType enum.  
+			//Comment out any rows that are not used for cache table refreshes.  See Cache.GetCacheDs() for more info.
+			//listInvalidTypes.Add(InvalidType.None);  //No need to send a signal
+			//listInvalidTypes.Add(InvalidType.Date);  //Not used with any other flags, not cached
+			//listInvalidTypes.Add(InvalidType.AllLocal);  //Deprecated
+			//listInvalidTypes.Add(InvalidType.Task);  //Not used with any other flags, not cached
+			listInvalidTypes.Add(InvalidType.ProcCodes);
+			listInvalidTypes.Add(InvalidType.Prefs);
+			listInvalidTypes.Add(InvalidType.Views);
+			listInvalidTypes.Add(InvalidType.AutoCodes);
+			listInvalidTypes.Add(InvalidType.Carriers);
+			listInvalidTypes.Add(InvalidType.ClearHouses);
+			listInvalidTypes.Add(InvalidType.Computers);
+			listInvalidTypes.Add(InvalidType.InsCats);
+			listInvalidTypes.Add(InvalidType.Employees);
+			//listInvalidTypes.Add(InvalidType.StartupOld);  //Deprecated
+			listInvalidTypes.Add(InvalidType.Defs);
+			listInvalidTypes.Add(InvalidType.Email);
+			listInvalidTypes.Add(InvalidType.Fees);
+			listInvalidTypes.Add(InvalidType.Letters);
+			listInvalidTypes.Add(InvalidType.QuickPaste);
+			listInvalidTypes.Add(InvalidType.Security);
+			listInvalidTypes.Add(InvalidType.Programs);
+			listInvalidTypes.Add(InvalidType.ToolBut);
+			listInvalidTypes.Add(InvalidType.Providers);
+			listInvalidTypes.Add(InvalidType.ClaimForms);
+			listInvalidTypes.Add(InvalidType.ZipCodes);
+			listInvalidTypes.Add(InvalidType.LetterMerge);
+			listInvalidTypes.Add(InvalidType.DentalSchools);
+			listInvalidTypes.Add(InvalidType.Operatories);
+			//listInvalidTypes.Add(InvalidType.TaskPopup);  //Not needed, not cached
+			listInvalidTypes.Add(InvalidType.Sites);
+			listInvalidTypes.Add(InvalidType.Pharmacies);
+			listInvalidTypes.Add(InvalidType.Sheets);
+			listInvalidTypes.Add(InvalidType.RecallTypes);
+			listInvalidTypes.Add(InvalidType.FeeScheds);
+			//listInvalidTypes.Add(InvalidType.PhoneNumbers);  //Internal only, not cached
+			listInvalidTypes.Add(InvalidType.Signals);
+			listInvalidTypes.Add(InvalidType.DisplayFields);
+			listInvalidTypes.Add(InvalidType.PatFields);
+			listInvalidTypes.Add(InvalidType.AccountingAutoPays);
+			listInvalidTypes.Add(InvalidType.ProcButtons);
+			listInvalidTypes.Add(InvalidType.Diseases);
+			listInvalidTypes.Add(InvalidType.Languages);
+			listInvalidTypes.Add(InvalidType.AutoNotes);
+			listInvalidTypes.Add(InvalidType.ElectIDs);
+			listInvalidTypes.Add(InvalidType.Employers);
+			listInvalidTypes.Add(InvalidType.ProviderIdents);
+			//listInvalidTypes.Add(InvalidType.ShutDownNow);  //Do not want to send shutdown signal
+			listInvalidTypes.Add(InvalidType.InsFilingCodes);
+			listInvalidTypes.Add(InvalidType.ReplicationServers);
+			listInvalidTypes.Add(InvalidType.Automation);
+			//listInvalidTypes.Add(InvalidType.PhoneAsteriskReload);  //Internal only, not cached
+			listInvalidTypes.Add(InvalidType.TimeCardRules);
+			listInvalidTypes.Add(InvalidType.Vaccines);
+			listInvalidTypes.Add(InvalidType.HL7Defs);
+			listInvalidTypes.Add(InvalidType.DictCustoms);
+			listInvalidTypes.Add(InvalidType.Wiki);
+			listInvalidTypes.Add(InvalidType.Sops);
+			listInvalidTypes.Add(InvalidType.EhrCodes);
+			listInvalidTypes.Add(InvalidType.AppointmentTypes);
+			listInvalidTypes.Add(InvalidType.Medications);
+			//listInvalidTypes.Add(InvalidType.SmsTextMsgReceivedUnreadCount);  //Special InvalidType that would break things if we sent, not cached
+			listInvalidTypes.Add(InvalidType.ProviderErxs);
+			//listInvalidTypes.Add(InvalidType.Jobs);  //Internal only, not needed
+			//listInvalidTypes.Add(InvalidType.JobRoles);  //Internal only, not needed
+			listInvalidTypes.Add(InvalidType.StateAbbrs);
+			listInvalidTypes.Add(InvalidType.RequiredFields);
+			listInvalidTypes.Add(InvalidType.Ebills);
+			return listInvalidTypes;
+		}
+
 	}
 }

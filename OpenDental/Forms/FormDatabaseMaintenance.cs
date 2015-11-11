@@ -57,6 +57,8 @@ namespace OpenDental {
 		private UI.Button butEtrans;
 		///<summary>Holds the date and time of the last time a Check or Fix was run.  Only used for printing.</summary>
 		private DateTime _dateTimeLastRun;
+		///<summary>This bool keeps track of whether we need to invalidate cache for all users.</summary>
+		private bool _isCacheInvalid; 
 
 		///<summary></summary>
 		public FormDatabaseMaintenance() {
@@ -486,6 +488,7 @@ namespace OpenDental {
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Database Maintenance";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDatabaseMaintenance_FormClosing);
 			this.Load += new System.EventHandler(this.FormDatabaseMaintenance_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -686,6 +689,7 @@ namespace OpenDental {
 			}
 			DatabaseMaintenance.FixSpecialCharacters();
 			MsgBox.Show(this,"Special Characters have been removed from Appointment Notes, Appointment Procedure Descriptions, Patient Address Notes, and Patient Family Financial Urgent Notes.  Invalid null characters have been removed from Adjustment Notes, Payment Notes, and Definition Names.");
+			_isCacheInvalid=true;//Definitions are cached and could have been changed from above DBM.
 		}
 
 		private void butInnoDB_Click(object sender,EventArgs e) {
@@ -703,6 +707,7 @@ namespace OpenDental {
 				return;
 			}
 			MessageBox.Show(Lan.g(this,"Number of null strings replaced with empty strings")+": "+DatabaseMaintenance.MySqlRemoveNullStrings());
+			_isCacheInvalid=true;//The above DBM could have potentially changed cached tables. 
 		}
 
 		private void butEtrans_Click(object sender,EventArgs e) {
@@ -877,12 +882,20 @@ namespace OpenDental {
 
 		private void butFix_Click(object sender,EventArgs e) {
 			Run(false);
+			_isCacheInvalid=true;//Flag cache to be invalidated on closing.  Some DBM fixes alter cached tables.
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {
 			Close();
 		}
 
+		private void FormDatabaseMaintenance_FormClosing(object sender,FormClosingEventArgs e) {
+			if(_isCacheInvalid) {
+				//Invalidate all cached tables.  DBM could have touched anything so blast them all.  
+				//Failure to invalidate cache can cause UEs in the main program.
+				DataValid.SetInvalid(Cache.GetAllCachedInvalidTypes().ToArray());
+			}
+		}
 	}
 
 
