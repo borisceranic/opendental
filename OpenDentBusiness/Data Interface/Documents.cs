@@ -41,6 +41,9 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Document>>(MethodBase.GetCurrentMethod(),listDocNums);
 			}
+			if(listDocNums.Count<1) {
+				return new List<Document>();
+			}
 			string command="SELECT * FROM document WHERE DocNum IN("+string.Join(",",listDocNums)+")";
 			return Crud.DocumentCrud.SelectMany(command);
 		}
