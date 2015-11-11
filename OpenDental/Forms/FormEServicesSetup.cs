@@ -213,7 +213,7 @@ namespace OpenDental {
 		#region patient portal
 		private void butGetUrlPatientPortal_Click(object sender,EventArgs e) {
 			try {
-				string url=CustomerUpdatesProxy.GetHostedURL("PatientPortal");
+				string url=CustomerUpdatesProxy.GetHostedURL(eServiceCode.PatientPortal);
 				textOpenDentalUrlPatientPortal.Text=url;
 				if(textRedirectUrlPatientPortal.Text=="") {
 					textRedirectUrlPatientPortal.Text=url;
@@ -260,7 +260,7 @@ namespace OpenDental {
 		#region mobile web (new-style)
 		private void butGetUrlMobileWeb_Click(object sender,EventArgs e) {
 			try {
-				string url=CustomerUpdatesProxy.GetHostedURL("MobileWeb");
+				string url=CustomerUpdatesProxy.GetHostedURL(eServiceCode.MobileWeb);
 				textOpenDentalUrlMobileWeb.Text=url;				
 			}
 			catch(Exception ex) {

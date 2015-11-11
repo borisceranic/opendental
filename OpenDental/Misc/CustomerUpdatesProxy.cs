@@ -32,7 +32,7 @@ namespace OpenDental {
 
 		/// <summary>Throws exception if anything fails. Exception should typically be caught and shown as MessageBox.
 		/// Returns OD-Hosted URL for this customer's registration key.  Supported hostedService inputs: PatientPortal, MobileWeb.</summary>
-		public static string GetHostedURL(string hostedService) {
+		public static string GetHostedURL(eServiceCode eService) {
 			XmlWriterSettings settings = new XmlWriterSettings();
 			settings.Indent = true;
 			settings.IndentChars = ("    ");
@@ -43,7 +43,7 @@ namespace OpenDental {
 				writer.WriteString(PrefC.GetString(PrefName.RegistrationKey));
 				writer.WriteEndElement(); //RegistrationKey
 				writer.WriteStartElement("eService");
-				writer.WriteString(hostedService);
+				writer.WriteString(eService.ToString());
 				writer.WriteEndElement(); //ODHostedService					
 				writer.WriteEndElement(); //Input					
 			}
