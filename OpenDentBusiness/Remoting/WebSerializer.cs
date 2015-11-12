@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+///<summary>This file is used in conjunction with and must match WebServiceCustomerUpdates\WebSerialize.cs.</summary>
 namespace WebServiceSerializer {
 	///<summary>Used to serialize primitives for WebServiceCustUpdates I/O.</summary>
 	public static class WebSerializer {
