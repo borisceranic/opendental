@@ -471,8 +471,8 @@ namespace OpenDental{
 							MessageBox.Show(Lan.g(this,"Invalid procedure code entered")+": "+procCodes[i].Trim());
 							return;
 						}
-						if(procCode.TreatArea==TreatmentArea.Surf || procCode.TreatArea==TreatmentArea.Tooth) {
-							MsgBox.Show(this,"You cannot use a procedure code that has type Surface or Tooth.");
+						if(procCode.TreatArea!=TreatmentArea.None || procCode.TreatArea!=TreatmentArea.Mouth) {
+							MsgBox.Show(this,"You can only use a procedure code that has type None or Mouth.");
 							return;
 						}
 						listProcCodes.Add(procCodes[i].Trim());
