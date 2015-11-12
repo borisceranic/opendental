@@ -50,6 +50,8 @@ namespace OpenDentBusiness{
 		public int ScreenGroupOrder;
 		///<summary>.</summary>
 		public string Comments;
+		///<summary>FK to screenpat.ScreenPatNum.</summary>
+		public long ScreenPatNum;
 	}
 
 	

@@ -45,7 +45,12 @@ namespace OpenDental{
 		private UI.Button butCancel;
 		private UI.Button butDelete;
 		private Label label2;
+		private TextBox textName;
+		private Label label3;
 		public ScreenGroup ScreenGroupCur;
+		public ScreenPat ScreenPatCur;
+		public bool IsDeleted;
+		private bool _isValid;
 
 		///<summary></summary>
 		public FormScreenEdit()
@@ -108,13 +113,15 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.textName = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// comboGradeLevel
 			// 
 			this.comboGradeLevel.BackColor = System.Drawing.SystemColors.Window;
 			this.comboGradeLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboGradeLevel.Location = new System.Drawing.Point(111, 36);
+			this.comboGradeLevel.Location = new System.Drawing.Point(111, 66);
 			this.comboGradeLevel.MaxDropDownItems = 25;
 			this.comboGradeLevel.Name = "comboGradeLevel";
 			this.comboGradeLevel.Size = new System.Drawing.Size(149, 21);
@@ -122,7 +129,7 @@ namespace OpenDental{
 			// 
 			// label35
 			// 
-			this.label35.Location = new System.Drawing.Point(23, 331);
+			this.label35.Location = new System.Drawing.Point(23, 361);
 			this.label35.Name = "label35";
 			this.label35.Size = new System.Drawing.Size(89, 14);
 			this.label35.TabIndex = 16;
@@ -131,7 +138,7 @@ namespace OpenDental{
 			// 
 			// label15
 			// 
-			this.label15.Location = new System.Drawing.Point(37, 37);
+			this.label15.Location = new System.Drawing.Point(37, 67);
 			this.label15.Name = "label15";
 			this.label15.Size = new System.Drawing.Size(75, 17);
 			this.label15.TabIndex = 13;
@@ -140,7 +147,7 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(-1, 193);
+			this.label10.Location = new System.Drawing.Point(-1, 223);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(113, 17);
 			this.label10.TabIndex = 10;
@@ -149,7 +156,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(47, 59);
+			this.label4.Location = new System.Drawing.Point(47, 89);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(65, 14);
 			this.label4.TabIndex = 108;
@@ -158,7 +165,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(35, 388);
+			this.label8.Location = new System.Drawing.Point(35, 418);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(77, 16);
 			this.label8.TabIndex = 115;
@@ -167,7 +174,7 @@ namespace OpenDental{
 			// 
 			// textComments
 			// 
-			this.textComments.Location = new System.Drawing.Point(111, 387);
+			this.textComments.Location = new System.Drawing.Point(111, 417);
 			this.textComments.MaxLength = 255;
 			this.textComments.Name = "textComments";
 			this.textComments.Size = new System.Drawing.Size(171, 20);
@@ -175,7 +182,7 @@ namespace OpenDental{
 			// 
 			// listUrgency
 			// 
-			this.listUrgency.Location = new System.Drawing.Point(111, 331);
+			this.listUrgency.Location = new System.Drawing.Point(111, 361);
 			this.listUrgency.Name = "listUrgency";
 			this.listUrgency.Size = new System.Drawing.Size(97, 56);
 			this.listUrgency.TabIndex = 9;
@@ -187,7 +194,7 @@ namespace OpenDental{
 			this.checkHasCaries.Checked = true;
 			this.checkHasCaries.CheckState = System.Windows.Forms.CheckState.Indeterminate;
 			this.checkHasCaries.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkHasCaries.Location = new System.Drawing.Point(8, 97);
+			this.checkHasCaries.Location = new System.Drawing.Point(8, 127);
 			this.checkHasCaries.Name = "checkHasCaries";
 			this.checkHasCaries.Size = new System.Drawing.Size(116, 16);
 			this.checkHasCaries.TabIndex = 14;
@@ -201,7 +208,7 @@ namespace OpenDental{
 			this.checkNeedsSealants.AutoCheck = false;
 			this.checkNeedsSealants.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkNeedsSealants.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkNeedsSealants.Location = new System.Drawing.Point(4, 161);
+			this.checkNeedsSealants.Location = new System.Drawing.Point(4, 191);
 			this.checkNeedsSealants.Name = "checkNeedsSealants";
 			this.checkNeedsSealants.Size = new System.Drawing.Size(120, 16);
 			this.checkNeedsSealants.TabIndex = 18;
@@ -213,7 +220,7 @@ namespace OpenDental{
 			// updownAgeArrows
 			// 
 			this.updownAgeArrows.InterceptArrowKeys = false;
-			this.updownAgeArrows.Location = new System.Drawing.Point(146, 57);
+			this.updownAgeArrows.Location = new System.Drawing.Point(146, 87);
 			this.updownAgeArrows.Name = "updownAgeArrows";
 			this.updownAgeArrows.Size = new System.Drawing.Size(20, 20);
 			this.updownAgeArrows.TabIndex = 7;
@@ -222,7 +229,7 @@ namespace OpenDental{
 			// radioM
 			// 
 			this.radioM.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioM.Location = new System.Drawing.Point(111, 314);
+			this.radioM.Location = new System.Drawing.Point(111, 344);
 			this.radioM.Name = "radioM";
 			this.radioM.Size = new System.Drawing.Size(33, 17);
 			this.radioM.TabIndex = 11;
@@ -231,7 +238,7 @@ namespace OpenDental{
 			// radioF
 			// 
 			this.radioF.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioF.Location = new System.Drawing.Point(144, 314);
+			this.radioF.Location = new System.Drawing.Point(144, 344);
 			this.radioF.Name = "radioF";
 			this.radioF.Size = new System.Drawing.Size(33, 17);
 			this.radioF.TabIndex = 12;
@@ -241,7 +248,7 @@ namespace OpenDental{
 			// 
 			this.radioUnknown.Checked = true;
 			this.radioUnknown.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.radioUnknown.Location = new System.Drawing.Point(177, 314);
+			this.radioUnknown.Location = new System.Drawing.Point(177, 344);
 			this.radioUnknown.Name = "radioUnknown";
 			this.radioUnknown.Size = new System.Drawing.Size(33, 17);
 			this.radioUnknown.TabIndex = 13;
@@ -253,7 +260,7 @@ namespace OpenDental{
 			this.checkExistingSealants.AutoCheck = false;
 			this.checkExistingSealants.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkExistingSealants.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkExistingSealants.Location = new System.Drawing.Point(-3, 145);
+			this.checkExistingSealants.Location = new System.Drawing.Point(-3, 175);
 			this.checkExistingSealants.Name = "checkExistingSealants";
 			this.checkExistingSealants.Size = new System.Drawing.Size(127, 16);
 			this.checkExistingSealants.TabIndex = 17;
@@ -267,7 +274,7 @@ namespace OpenDental{
 			this.checkCariesExperience.AutoCheck = false;
 			this.checkCariesExperience.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkCariesExperience.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkCariesExperience.Location = new System.Drawing.Point(-1, 129);
+			this.checkCariesExperience.Location = new System.Drawing.Point(-1, 159);
 			this.checkCariesExperience.Name = "checkCariesExperience";
 			this.checkCariesExperience.Size = new System.Drawing.Size(125, 16);
 			this.checkCariesExperience.TabIndex = 16;
@@ -281,7 +288,7 @@ namespace OpenDental{
 			this.checkEarlyChildCaries.AutoCheck = false;
 			this.checkEarlyChildCaries.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkEarlyChildCaries.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkEarlyChildCaries.Location = new System.Drawing.Point(-1, 113);
+			this.checkEarlyChildCaries.Location = new System.Drawing.Point(-1, 143);
 			this.checkEarlyChildCaries.Name = "checkEarlyChildCaries";
 			this.checkEarlyChildCaries.Size = new System.Drawing.Size(125, 16);
 			this.checkEarlyChildCaries.TabIndex = 15;
@@ -295,7 +302,7 @@ namespace OpenDental{
 			this.checkMissingAllTeeth.AutoCheck = false;
 			this.checkMissingAllTeeth.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkMissingAllTeeth.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkMissingAllTeeth.Location = new System.Drawing.Point(-1, 177);
+			this.checkMissingAllTeeth.Location = new System.Drawing.Point(-1, 207);
 			this.checkMissingAllTeeth.Name = "checkMissingAllTeeth";
 			this.checkMissingAllTeeth.Size = new System.Drawing.Size(125, 16);
 			this.checkMissingAllTeeth.TabIndex = 19;
@@ -306,7 +313,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(32, 78);
+			this.label5.Location = new System.Drawing.Point(32, 108);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(80, 17);
 			this.label5.TabIndex = 139;
@@ -316,7 +323,7 @@ namespace OpenDental{
 			// textBirthdate
 			// 
 			this.textBirthdate.AcceptsReturn = true;
-			this.textBirthdate.Location = new System.Drawing.Point(111, 77);
+			this.textBirthdate.Location = new System.Drawing.Point(111, 107);
 			this.textBirthdate.Multiline = true;
 			this.textBirthdate.Name = "textBirthdate";
 			this.textBirthdate.Size = new System.Drawing.Size(81, 20);
@@ -325,7 +332,7 @@ namespace OpenDental{
 			// 
 			// textAge
 			// 
-			this.textAge.Location = new System.Drawing.Point(111, 57);
+			this.textAge.Location = new System.Drawing.Point(111, 87);
 			this.textAge.Name = "textAge";
 			this.textAge.Size = new System.Drawing.Size(35, 20);
 			this.textAge.TabIndex = 141;
@@ -333,7 +340,7 @@ namespace OpenDental{
 			// 
 			// listRace
 			// 
-			this.listRace.Location = new System.Drawing.Point(111, 193);
+			this.listRace.Location = new System.Drawing.Point(111, 223);
 			this.listRace.Name = "listRace";
 			this.listRace.Size = new System.Drawing.Size(113, 121);
 			this.listRace.TabIndex = 142;
@@ -357,7 +364,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(-1, 314);
+			this.label2.Location = new System.Drawing.Point(-1, 344);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(113, 17);
 			this.label2.TabIndex = 10;
@@ -404,17 +411,37 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(224, 422);
+			this.butOK.Location = new System.Drawing.Point(143, 452);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 24;
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// textName
+			// 
+			this.textName.Location = new System.Drawing.Point(111, 40);
+			this.textName.MaxLength = 255;
+			this.textName.Name = "textName";
+			this.textName.ReadOnly = true;
+			this.textName.Size = new System.Drawing.Size(171, 20);
+			this.textName.TabIndex = 145;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(35, 40);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(75, 17);
+			this.label3.TabIndex = 146;
+			this.label3.Text = "Name";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormScreenEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(311, 488);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.textName);
 			this.Controls.Add(this.textComments);
 			this.Controls.Add(this.listUrgency);
 			this.Controls.Add(this.textScreenGroupOrder);
@@ -507,6 +534,15 @@ namespace OpenDental{
 				checkNeedsSealants.CheckState=CheckState.Unchecked;
 				checkHasCaries.CheckState=CheckState.Unchecked;
 			}
+			if(ScreenPatCur==null) {
+				textName.Text="Anonymous";
+				ScreenCur.ScreenPatNum=0;
+			}
+			else {
+				textName.Text=Patients.GetPat(ScreenPatCur.PatNum).GetNameLF();
+				ScreenCur.ScreenPatNum=ScreenPatCur.ScreenPatNum;
+			}
+			_isValid=true;
 		}
 
 		private void SetCheckState(CheckBox checkBox,YN state){
@@ -529,6 +565,7 @@ namespace OpenDental{
 			}
 			catch{
 				MessageBox.Show("Order invalid.");
+				_isValid=false;
 				e.Cancel=true;
 			}
 		}
@@ -545,6 +582,7 @@ namespace OpenDental{
 			}
 			catch{
 				MessageBox.Show("Age invalid.");
+				_isValid=false;
 				e.Cancel=true;
 			}
 		}
@@ -580,6 +618,7 @@ namespace OpenDental{
 			}
 			catch{
 				MessageBox.Show("Birthdate invalid.");
+				_isValid=false;
 				e.Cancel=true;
 			}
 		}
@@ -615,17 +654,29 @@ namespace OpenDental{
 			if(IsNew) {
 				Screens.Delete(ScreenCur);
 				DialogResult=DialogResult.Cancel;
+				if(ScreenPatCur!=null) {
+					ScreenPatCur.PatScreenPerm=PatScreenPerm.Unknown;
+				}
+				IsDeleted=true;
 				return;
 			}
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Are you sure you want to delete this screening?")){
 				return;
 			}
+			if(ScreenPatCur!=null) {
+				ScreenPatCur.PatScreenPerm=PatScreenPerm.Unknown;
+			}
+			IsDeleted=true;
 			Screens.Delete(ScreenCur);
 			DialogResult=DialogResult.Cancel;
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			//the first 6 fields are handled when the ScreenGroup is saved.
+			if(!_isValid) {//If validation failed and they still want to continue, do Cancel instead.
+				DialogResult=DialogResult.Cancel;
+				return;
+			}
 			ScreenCur.ScreenGroupOrder=PIn.Int(textScreenGroupOrder.Text);
 			ScreenCur.ScreenGroupNum=ScreenGroupCur.ScreenGroupNum;
 			if(radioUnknown.Checked) {
@@ -639,7 +690,15 @@ namespace OpenDental{
 			}
 			ScreenCur.RaceOld=(PatientRaceOld)listRace.SelectedIndex;
 			ScreenCur.GradeLevel=(PatientGrade)comboGradeLevel.SelectedIndex;
-			ScreenCur.Age=PIn.Byte(textAge.Text);//"" is OK
+			if(textBirthdate.Text!="" && textAge.Text=="") {//Birthdate is present but age isn't entered, calculate it.
+				ScreenCur.Age=PIn.Byte(PatientLogic.DateToAgeString(PIn.DateT(textBirthdate.Text)));
+			}
+			else if(textAge.Text!="") {//Age was manually entered, use it.
+				ScreenCur.Age=PIn.Byte(textAge.Text);
+			}
+			else {//No age information was entered at all.
+				ScreenCur.Age=0;
+			}
 			ScreenCur.Urgency=(TreatmentUrgency)listUrgency.SelectedIndex;
 			ScreenCur.HasCaries=GetCheckState(checkHasCaries);
 			ScreenCur.NeedsSealants=GetCheckState(checkNeedsSealants);

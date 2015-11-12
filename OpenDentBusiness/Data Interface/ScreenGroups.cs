@@ -55,9 +55,9 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),Cur);
 				return;
 			}
-			string command="DELETE from screen WHERE ScreenGroupNum ='"+POut.Long(Cur.ScreenGroupNum)+"'";
+			string command="DELETE FROM screen WHERE ScreenGroupNum ='"+POut.Long(Cur.ScreenGroupNum)+"'";
 			Db.NonQ(command);
-			command="DELETE from screengroup WHERE ScreenGroupNum ='"+POut.Long(Cur.ScreenGroupNum)+"'";
+			command="DELETE FROM screengroup WHERE ScreenGroupNum ='"+POut.Long(Cur.ScreenGroupNum)+"'";
 			Db.NonQ(command);
 		}
 

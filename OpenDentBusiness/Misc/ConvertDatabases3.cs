@@ -11272,8 +11272,34 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				
-
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screen ADD ScreenPatNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screen ADD INDEX (ScreenPatNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screen ADD ScreenPatNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE screen SET ScreenPatNum = 0 WHERE ScreenPatNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screen MODIFY ScreenPatNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX screen_ScreenPatNum ON screen (ScreenPatNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screenpat ADD PatScreenPerm tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screenpat ADD PatScreenPerm number(3)";
+					Db.NonQ(command);
+					command="UPDATE screenpat SET PatScreenPerm = 0 WHERE PatScreenPerm IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screenpat MODIFY PatScreenPerm NOT NULL";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
@@ -11289,7 +11315,3 @@ namespace OpenDentBusiness {
 
 
 
-
-
-
-			

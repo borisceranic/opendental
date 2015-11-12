@@ -50,6 +50,7 @@ namespace OpenDentBusiness.Crud{
 				screenPat.PatNum        = PIn.Long  (row["PatNum"].ToString());
 				screenPat.ScreenGroupNum= PIn.Long  (row["ScreenGroupNum"].ToString());
 				screenPat.SheetNum      = PIn.Long  (row["SheetNum"].ToString());
+				screenPat.PatScreenPerm = (OpenDentBusiness.PatScreenPerm)PIn.Int(row["PatScreenPerm"].ToString());
 				retVal.Add(screenPat);
 			}
 			return retVal;
@@ -90,14 +91,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScreenPatNum,";
 			}
-			command+="PatNum,ScreenGroupNum,SheetNum) VALUES(";
+			command+="PatNum,ScreenGroupNum,SheetNum,PatScreenPerm) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(screenPat.ScreenPatNum)+",";
 			}
 			command+=
 				     POut.Long  (screenPat.PatNum)+","
 				+    POut.Long  (screenPat.ScreenGroupNum)+","
-				+    POut.Long  (screenPat.SheetNum)+")";
+				+    POut.Long  (screenPat.SheetNum)+","
+				+    POut.Int   ((int)screenPat.PatScreenPerm)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -130,14 +132,15 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ScreenPatNum,";
 			}
-			command+="PatNum,ScreenGroupNum,SheetNum) VALUES(";
+			command+="PatNum,ScreenGroupNum,SheetNum,PatScreenPerm) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(screenPat.ScreenPatNum)+",";
 			}
 			command+=
 				     POut.Long  (screenPat.PatNum)+","
 				+    POut.Long  (screenPat.ScreenGroupNum)+","
-				+    POut.Long  (screenPat.SheetNum)+")";
+				+    POut.Long  (screenPat.SheetNum)+","
+				+    POut.Int   ((int)screenPat.PatScreenPerm)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -152,7 +155,8 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE screenpat SET "
 				+"PatNum        =  "+POut.Long  (screenPat.PatNum)+", "
 				+"ScreenGroupNum=  "+POut.Long  (screenPat.ScreenGroupNum)+", "
-				+"SheetNum      =  "+POut.Long  (screenPat.SheetNum)+" "
+				+"SheetNum      =  "+POut.Long  (screenPat.SheetNum)+", "
+				+"PatScreenPerm =  "+POut.Int   ((int)screenPat.PatScreenPerm)+" "
 				+"WHERE ScreenPatNum = "+POut.Long(screenPat.ScreenPatNum);
 			Db.NonQ(command);
 		}
@@ -172,6 +176,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SheetNum = "+POut.Long(screenPat.SheetNum)+"";
 			}
+			if(screenPat.PatScreenPerm != oldScreenPat.PatScreenPerm) {
+				if(command!=""){ command+=",";}
+				command+="PatScreenPerm = "+POut.Int   ((int)screenPat.PatScreenPerm)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -186,6 +194,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM screenpat "
 				+"WHERE ScreenPatNum = "+POut.Long(screenPatNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<ScreenPat> listNew,List<ScreenPat> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<ScreenPat> listIns    =new List<ScreenPat>();
+			List<ScreenPat> listUpdNew =new List<ScreenPat>();
+			List<ScreenPat> listUpdDB  =new List<ScreenPat>();
+			List<ScreenPat> listDel    =new List<ScreenPat>();
+			listNew.Sort((ScreenPat x,ScreenPat y) => { return x.ScreenPatNum.CompareTo(y.ScreenPatNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((ScreenPat x,ScreenPat y) => { return x.ScreenPatNum.CompareTo(y.ScreenPatNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			ScreenPat fieldNew;
+			ScreenPat fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.ScreenPatNum<fieldDB.ScreenPatNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.ScreenPatNum>fieldDB.ScreenPatNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].ScreenPatNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

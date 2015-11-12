@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Linq;
 using OpenDentBusiness;
 using OpenDental.UI;
 
@@ -12,10 +13,7 @@ namespace OpenDental{
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
 	public class FormScreenGroupEdit:System.Windows.Forms.Form {
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
+		private IContainer components;
 		///<summary></summary>
 		public bool IsNew;
 		private System.Windows.Forms.Label label14;
@@ -38,9 +36,14 @@ namespace OpenDental{
 		private UI.Button butCancel;
 		private UI.Button butDelete;
 		private UI.ODGrid gridMain;
-		private OpenDentBusiness.Screen[] ScreenList;
-		private List<ScreenPat> ListScreenPats;
-		private List<Patient> ListPats;
+		private OpenDentBusiness.Screen[] _arrayScreens;
+		private ODGrid gridScreenPats;
+		private List<ScreenPat> _listScreenPats;
+		private UI.Button button1;
+		private UI.Button butRemovePat;
+		private UI.Button butStartScreens;
+		private Label label4;
+		private ContextMenu patContextMenu;
 
 		///<summary></summary>
 		public FormScreenGroupEdit()
@@ -85,56 +88,61 @@ namespace OpenDental{
 			this.comboPlaceService = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.butOK = new OpenDental.UI.Button();
 			this.comboCounty = new System.Windows.Forms.ComboBox();
 			this.comboGradeSchool = new System.Windows.Forms.ComboBox();
 			this.textProvName = new System.Windows.Forms.TextBox();
 			this.labelScreener = new System.Windows.Forms.Label();
-			this.butAdd = new OpenDental.UI.Button();
-			this.butCancel = new OpenDental.UI.Button();
-			this.butDelete = new OpenDental.UI.Button();
+			this.label4 = new System.Windows.Forms.Label();
+			this.gridScreenPats = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butStartScreens = new OpenDental.UI.Button();
+			this.butRemovePat = new OpenDental.UI.Button();
+			this.button1 = new OpenDental.UI.Button();
+			this.butAdd = new OpenDental.UI.Button();
+			this.butDelete = new OpenDental.UI.Button();
+			this.butCancel = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label14
 			// 
-			this.label14.Location = new System.Drawing.Point(40, 116);
+			this.label14.Location = new System.Drawing.Point(10, 113);
 			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(44, 16);
+			this.label14.Size = new System.Drawing.Size(93, 16);
 			this.label14.TabIndex = 12;
 			this.label14.Text = "School";
 			this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label13
 			// 
-			this.label13.Location = new System.Drawing.Point(31, 95);
+			this.label13.Location = new System.Drawing.Point(1, 92);
 			this.label13.Name = "label13";
-			this.label13.Size = new System.Drawing.Size(52, 15);
+			this.label13.Size = new System.Drawing.Size(101, 15);
 			this.label13.TabIndex = 11;
 			this.label13.Text = "County";
 			this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelProv
 			// 
-			this.labelProv.Location = new System.Drawing.Point(32, 74);
+			this.labelProv.Location = new System.Drawing.Point(2, 71);
 			this.labelProv.Name = "labelProv";
-			this.labelProv.Size = new System.Drawing.Size(52, 16);
+			this.labelProv.Size = new System.Drawing.Size(101, 16);
 			this.labelProv.TabIndex = 50;
-			this.labelProv.Text = "Or Prov";
+			this.labelProv.Text = "or Prov";
 			this.labelProv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(22, 13);
+			this.label1.Location = new System.Drawing.Point(4, 10);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(61, 17);
+			this.label1.Size = new System.Drawing.Size(98, 17);
 			this.label1.TabIndex = 51;
 			this.label1.Text = "Date";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textScreenDate
 			// 
-			this.textScreenDate.Location = new System.Drawing.Point(83, 12);
+			this.textScreenDate.Location = new System.Drawing.Point(102, 9);
 			this.textScreenDate.Name = "textScreenDate";
 			this.textScreenDate.Size = new System.Drawing.Size(64, 20);
 			this.textScreenDate.TabIndex = 0;
@@ -142,7 +150,7 @@ namespace OpenDental{
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(83, 32);
+			this.textDescription.Location = new System.Drawing.Point(102, 29);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(173, 20);
 			this.textDescription.TabIndex = 1;
@@ -152,7 +160,7 @@ namespace OpenDental{
 			// 
 			this.comboProv.BackColor = System.Drawing.SystemColors.Window;
 			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProv.Location = new System.Drawing.Point(83, 72);
+			this.comboProv.Location = new System.Drawing.Point(102, 69);
 			this.comboProv.MaxDropDownItems = 25;
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(173, 21);
@@ -165,7 +173,7 @@ namespace OpenDental{
 			// 
 			this.comboPlaceService.BackColor = System.Drawing.SystemColors.Window;
 			this.comboPlaceService.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboPlaceService.Location = new System.Drawing.Point(83, 135);
+			this.comboPlaceService.Location = new System.Drawing.Point(102, 132);
 			this.comboPlaceService.MaxDropDownItems = 25;
 			this.comboPlaceService.Name = "comboPlaceService";
 			this.comboPlaceService.Size = new System.Drawing.Size(173, 21);
@@ -173,41 +181,26 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(31, 136);
+			this.label2.Location = new System.Drawing.Point(4, 133);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(52, 17);
+			this.label2.Size = new System.Drawing.Size(98, 17);
 			this.label2.TabIndex = 119;
 			this.label2.Text = "Location";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(-20, 33);
+			this.label3.Location = new System.Drawing.Point(2, 30);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(103, 16);
+			this.label3.Size = new System.Drawing.Size(100, 16);
 			this.label3.TabIndex = 128;
-			this.label3.Text = "Descript";
+			this.label3.Text = "Description";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// butOK
-			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butOK.Autosize = true;
-			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(682, 583);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(70, 24);
-			this.butOK.TabIndex = 24;
-			this.butOK.Text = "OK";
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// comboCounty
 			// 
 			this.comboCounty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboCounty.Location = new System.Drawing.Point(83, 93);
+			this.comboCounty.Location = new System.Drawing.Point(102, 90);
 			this.comboCounty.Name = "comboCounty";
 			this.comboCounty.Size = new System.Drawing.Size(173, 21);
 			this.comboCounty.TabIndex = 4;
@@ -216,7 +209,7 @@ namespace OpenDental{
 			// comboGradeSchool
 			// 
 			this.comboGradeSchool.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboGradeSchool.Location = new System.Drawing.Point(83, 114);
+			this.comboGradeSchool.Location = new System.Drawing.Point(102, 111);
 			this.comboGradeSchool.Name = "comboGradeSchool";
 			this.comboGradeSchool.Size = new System.Drawing.Size(173, 21);
 			this.comboGradeSchool.TabIndex = 140;
@@ -224,7 +217,7 @@ namespace OpenDental{
 			// 
 			// textProvName
 			// 
-			this.textProvName.Location = new System.Drawing.Point(83, 52);
+			this.textProvName.Location = new System.Drawing.Point(102, 49);
 			this.textProvName.Name = "textProvName";
 			this.textProvName.Size = new System.Drawing.Size(173, 20);
 			this.textProvName.TabIndex = 141;
@@ -233,12 +226,102 @@ namespace OpenDental{
 			// 
 			// labelScreener
 			// 
-			this.labelScreener.Location = new System.Drawing.Point(33, 54);
+			this.labelScreener.Location = new System.Drawing.Point(3, 51);
 			this.labelScreener.Name = "labelScreener";
-			this.labelScreener.Size = new System.Drawing.Size(50, 16);
+			this.labelScreener.Size = new System.Drawing.Size(99, 16);
 			this.labelScreener.TabIndex = 142;
 			this.labelScreener.Text = "Screener";
 			this.labelScreener.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(472, 4);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(390, 17);
+			this.label4.TabIndex = 152;
+			this.label4.Text = "Right click patient to set screening permission.";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// gridScreenPats
+			// 
+			this.gridScreenPats.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridScreenPats.HasMultilineHeaders = false;
+			this.gridScreenPats.HScrollVisible = false;
+			this.gridScreenPats.Location = new System.Drawing.Point(472, 21);
+			this.gridScreenPats.Name = "gridScreenPats";
+			this.gridScreenPats.ScrollValue = 0;
+			this.gridScreenPats.Size = new System.Drawing.Size(390, 144);
+			this.gridScreenPats.TabIndex = 148;
+			this.gridScreenPats.Title = "Patients for Screening";
+			this.gridScreenPats.TranslationName = null;
+			this.gridScreenPats.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridScreenPats_CellDoubleClick);
+			this.gridScreenPats.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gridScreenPats_MouseClick);
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(2, 165);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(860, 438);
+			this.gridMain.TabIndex = 147;
+			this.gridMain.Title = "Screenings";
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butStartScreens
+			// 
+			this.butStartScreens.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butStartScreens.Autosize = true;
+			this.butStartScreens.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butStartScreens.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butStartScreens.CornerRadius = 4F;
+			this.butStartScreens.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butStartScreens.Location = new System.Drawing.Point(375, 106);
+			this.butStartScreens.Name = "butStartScreens";
+			this.butStartScreens.Size = new System.Drawing.Size(92, 23);
+			this.butStartScreens.TabIndex = 151;
+			this.butStartScreens.Text = "Screen Patients";
+			this.butStartScreens.UseVisualStyleBackColor = true;
+			this.butStartScreens.Click += new System.EventHandler(this.butStartScreens_Click);
+			// 
+			// butRemovePat
+			// 
+			this.butRemovePat.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRemovePat.Autosize = true;
+			this.butRemovePat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRemovePat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRemovePat.CornerRadius = 4F;
+			this.butRemovePat.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butRemovePat.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butRemovePat.Location = new System.Drawing.Point(392, 52);
+			this.butRemovePat.Name = "butRemovePat";
+			this.butRemovePat.Size = new System.Drawing.Size(75, 23);
+			this.butRemovePat.TabIndex = 150;
+			this.butRemovePat.Text = "Remove";
+			this.butRemovePat.UseVisualStyleBackColor = true;
+			this.butRemovePat.Click += new System.EventHandler(this.butRemovePat_Click);
+			// 
+			// button1
+			// 
+			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.button1.Autosize = true;
+			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.button1.CornerRadius = 4F;
+			this.button1.Image = global::OpenDental.Properties.Resources.Add;
+			this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.button1.Location = new System.Drawing.Point(392, 23);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 149;
+			this.button1.Text = "Add";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.butAddPat_Click);
 			// 
 			// butAdd
 			// 
@@ -250,27 +333,12 @@ namespace OpenDental{
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(357, 613);
+			this.butAdd.Location = new System.Drawing.Point(375, 613);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(78, 24);
+			this.butAdd.Size = new System.Drawing.Size(114, 24);
 			this.butAdd.TabIndex = 146;
-			this.butAdd.Text = "Add Item";
-			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
-			// 
-			// butCancel
-			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butCancel.Autosize = true;
-			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(682, 613);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(70, 24);
-			this.butCancel.TabIndex = 24;
-			this.butCancel.Text = "Cancel";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			this.butAdd.Text = "Add Anonymous";
+			this.butAdd.Click += new System.EventHandler(this.butAddAnonymous_Click);
 			// 
 			// butDelete
 			// 
@@ -289,24 +357,45 @@ namespace OpenDental{
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
-			// gridMain
+			// butCancel
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(2, 162);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(760, 415);
-			this.gridMain.TabIndex = 147;
-			this.gridMain.Title = "Screenings";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(782, 613);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(70, 24);
+			this.butCancel.TabIndex = 24;
+			this.butCancel.Text = "Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(706, 613);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(70, 24);
+			this.butOK.TabIndex = 24;
+			this.butOK.Text = "OK";
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// FormScreenGroupEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(764, 641);
+			this.ClientSize = new System.Drawing.Size(864, 641);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.butStartScreens);
+			this.Controls.Add(this.butRemovePat);
+			this.Controls.Add(this.button1);
+			this.Controls.Add(this.gridScreenPats);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.textProvName);
@@ -331,6 +420,7 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Edit Screening Group";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormScreenGroupEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormScreenGroup_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -342,19 +432,16 @@ namespace OpenDental{
 			if(IsNew){
 				ScreenGroups.Insert(ScreenGroupCur);
 			}
-			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
-				labelScreener.Visible=false;
-				textProvName.Visible=false;
-				labelProv.Visible=false;
-				comboProv.Visible=false;
-				ScreenList=new OpenDentBusiness.Screen[0];
-				FillGridScreenPat();
-			}
-			else {*/
-			ListPats=new List<Patient>();
+			patContextMenu=new ContextMenu();
+			_listScreenPats=ScreenPats.GetForScreenGroup(ScreenGroupCur.ScreenGroupNum);
 			FillGrid();
-			if(ScreenList.Length>0){
-				OpenDentBusiness.Screen ScreenCur=ScreenList[0];
+			FillScreenPats();
+			string[] patScreenPerms=Enum.GetNames(typeof(PatScreenPerm));
+			for(int i=0;i<patScreenPerms.Length;i++) {
+				patContextMenu.MenuItems.Add(new MenuItem(patScreenPerms[i],patContextMenuItem_Click));
+			}
+			if(_arrayScreens.Length>0){
+				OpenDentBusiness.Screen ScreenCur=_arrayScreens[0];
 				ScreenGroupCur.SGDate=ScreenCur.ScreenDate;
 				ScreenGroupCur.ProvName=ScreenCur.ProvName;
 				ScreenGroupCur.ProvNum=ScreenCur.ProvNum;
@@ -420,11 +507,13 @@ namespace OpenDental{
 		}*/
 
 		private void FillGrid(){
-			ScreenList=Screens.Refresh(ScreenGroupCur.ScreenGroupNum);
+			_arrayScreens=Screens.Refresh(ScreenGroupCur.ScreenGroupNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
 			col=new ODGridColumn(Lan.g(this,"#"),30);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Name"),100);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Grade"),55);
 			gridMain.Columns.Add(col);
@@ -454,26 +543,70 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ScreenList.Length;i++) {
+			for(int i=0;i<_arrayScreens.Length;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(ScreenList[i].ScreenGroupOrder.ToString());
-				row.Cells.Add(ScreenList[i].GradeLevel.ToString());
-				row.Cells.Add(ScreenList[i].Age.ToString());
-				row.Cells.Add(ScreenList[i].RaceOld.ToString());
-				row.Cells.Add(ScreenList[i].Gender.ToString());
-				row.Cells.Add(ScreenList[i].Urgency.ToString());
+				row.Cells.Add(_arrayScreens[i].ScreenGroupOrder.ToString());
+				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_arrayScreens[i].ScreenPatNum);
+				row.Cells.Add((screenPat==null)?"Anonymous":Patients.GetPat(screenPat.PatNum).GetNameLF());
+				row.Cells.Add(_arrayScreens[i].GradeLevel.ToString());
+				row.Cells.Add(_arrayScreens[i].Age.ToString());
+				row.Cells.Add(_arrayScreens[i].RaceOld.ToString());
+				row.Cells.Add(_arrayScreens[i].Gender.ToString());
+				row.Cells.Add(_arrayScreens[i].Urgency.ToString());
 				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					row.Cells.Add(getX(ScreenList[i].HasCaries));
-					row.Cells.Add(getX(ScreenList[i].EarlyChildCaries));
-					row.Cells.Add(getX(ScreenList[i].CariesExperience));
-					row.Cells.Add(getX(ScreenList[i].ExistingSealants));
-					row.Cells.Add(getX(ScreenList[i].NeedsSealants));
-					row.Cells.Add(getX(ScreenList[i].MissingAllTeeth));
+					row.Cells.Add(getX(_arrayScreens[i].HasCaries));
+					row.Cells.Add(getX(_arrayScreens[i].EarlyChildCaries));
+					row.Cells.Add(getX(_arrayScreens[i].CariesExperience));
+					row.Cells.Add(getX(_arrayScreens[i].ExistingSealants));
+					row.Cells.Add(getX(_arrayScreens[i].NeedsSealants));
+					row.Cells.Add(getX(_arrayScreens[i].MissingAllTeeth));
 				}
-				row.Cells.Add(ScreenList[i].Comments);
+				row.Cells.Add(_arrayScreens[i].Comments);
 				gridMain.Rows.Add(row);
 			}
+			gridMain.Title=Lan.g(this,"Screenings")+" - "+_arrayScreens.Length;
 			gridMain.EndUpdate();
+		}
+
+		private void FillScreenPats() {
+			gridScreenPats.BeginUpdate();
+			gridScreenPats.Columns.Clear();
+			ODGridColumn col;
+			col=new ODGridColumn(Lan.g(this,"Patient"),200);
+			gridScreenPats.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Permission"),100);
+			gridScreenPats.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Screened"),90);
+			gridScreenPats.Columns.Add(col);
+			gridScreenPats.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_listScreenPats.Count;i++) {
+				row=new ODGridRow();
+				Patient pat=Patients.GetPat(_listScreenPats[i].PatNum);
+				row.Cells.Add(pat.GetNameLF());
+				row.Cells.Add(_listScreenPats[i].PatScreenPerm.ToString());
+				OpenDentBusiness.Screen screen=_arrayScreens.FirstOrDefault(x => x.ScreenPatNum==_listScreenPats[i].ScreenPatNum);
+				row.Cells.Add((screen==null)?"":"X");
+				gridScreenPats.Rows.Add(row);
+			}
+			gridScreenPats.Title=Lan.g(this,"Patients for Screening")+" - "+_listScreenPats.Count;
+			gridScreenPats.EndUpdate();
+		}
+
+		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {
+			if(e.Button!=MouseButtons.Right) {
+				return;
+			}
+			if(gridScreenPats.GetSelectedIndex()==-1) {
+				return;
+			}
+			patContextMenu.Show(gridScreenPats,new Point(e.X,e.Y));
+		}
+
+		private void patContextMenuItem_Click(object sender,EventArgs e) {
+			int idx=patContextMenu.MenuItems.IndexOf((MenuItem)sender);
+			_listScreenPats[gridScreenPats.GetSelectedIndex()].PatScreenPerm=(PatScreenPerm)idx;
+			FillScreenPats();
 		}
 
 		private string getX(YN ynValue){
@@ -493,7 +626,7 @@ namespace OpenDental{
 			}
 			else {*/
 			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenCur=ScreenList[gridMain.SelectedIndices[0]];
+			FormSE.ScreenCur=_arrayScreens[gridMain.SelectedIndices[0]];
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.ShowDialog();
 			if(FormSE.DialogResult!=DialogResult.OK) {
@@ -552,7 +685,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void butAdd_Click(object sender, System.EventArgs e) {
+		private void butAddAnonymous_Click(object sender, System.EventArgs e) {
 			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
 				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
 				while(true) {
@@ -576,15 +709,18 @@ namespace OpenDental{
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.IsNew=true;
-			if(ScreenList.Length==0) {
+			if(_arrayScreens.Length==0) {
 				FormSE.ScreenCur=new OpenDentBusiness.Screen();
 				FormSE.ScreenCur.ScreenGroupOrder=1;
 			}
 			else {
-				FormSE.ScreenCur=ScreenList[ScreenList.Length-1];//'remembers' the last entry
+				FormSE.ScreenCur=_arrayScreens[_arrayScreens.Length-1];//'remembers' the last entry
 				FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
 			}
 			while(true) {
+				//For Anonymous patients always default to unknowns.
+				FormSE.ScreenCur.Gender=PatientGender.Unknown;
+				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;
 				FormSE.ShowDialog();
 				if(FormSE.DialogResult!=DialogResult.OK) {
 					return;
@@ -605,43 +741,166 @@ namespace OpenDental{
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.IsNew=false;
-			FormSE.ScreenCur=ScreenList[e.Row];
+			FormSE.ScreenCur=_arrayScreens[e.Row];
+			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_arrayScreens[e.Row].ScreenPatNum);
+			FormSE.ScreenPatCur=screenPat;//Null represents anonymous.
 			FormSE.ShowDialog();
 			FillGrid();
+			FillScreenPats();
+		}
+		
+		private void gridScreenPats_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Family fam=Patients.GetFamily(_listScreenPats[gridScreenPats.GetSelectedIndex()].PatNum);
+			Patient pat=fam.GetPatient(_listScreenPats[gridScreenPats.GetSelectedIndex()].PatNum);
+			FormPatientEdit FormPE=new FormPatientEdit(pat,fam);
+			if(FormPE.ShowDialog()==DialogResult.OK) {//Information may have changed. Look for screens for this patient that may need changing.
+				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.PatNum==pat.PatNum);
+				foreach(OpenDentBusiness.Screen screen in _arrayScreens){
+					if(screen.ScreenPatNum==screenPat.ScreenPatNum) {//Found a screen belonging to the edited patient.
+						//Don't unintelligently overwrite the screen's values.  They may have entered in patient information not pertaining to the screen such as address.
+						screen.Birthdate=(pat.Birthdate==DateTime.MinValue)?screen.Birthdate:pat.Birthdate;//If birthdate isn't entered in pat select it will be mindate.
+						screen.Age=(pat.Birthdate==DateTime.MinValue)?screen.Age:(byte)pat.Age;
+						screen.Gender=pat.Gender;//Default value in pat edit is male. No way of knowing if it's intentional or not, just use it.
+						screen.GradeLevel=(pat.GradeLevel==0)?screen.GradeLevel:pat.GradeLevel;//Default value is Unknown, use pat's grade if it's not unknown.
+						Screens.Update(screen);
+						FillGrid();
+					}
+				}
+			}
+		}
+
+		private void butAddPat_Click(object sender,EventArgs e) {
+			FormPatientSelect FormPS=new FormPatientSelect();
+			FormPS.ShowDialog();
+			if(FormPS.DialogResult==DialogResult.OK){
+				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.PatNum==FormPS.SelectedPatNum);
+				if(screenPat!=null) {
+					MsgBox.Show(this,"Cannot add patient already in screen group.");
+					for(int i=0;i<_listScreenPats.Count;i++) {
+						if(_listScreenPats[i].ScreenPatNum==screenPat.ScreenPatNum) {
+							gridScreenPats.SetSelected(i,true);
+							break;
+						}
+					}
+					return;
+				}
+				screenPat=new ScreenPat();
+				screenPat.PatNum=FormPS.SelectedPatNum;
+				screenPat.PatScreenPerm=PatScreenPerm.Unknown;
+				screenPat.ScreenGroupNum=ScreenGroupCur.ScreenGroupNum;
+				ScreenPats.Insert(screenPat);
+				_listScreenPats.Add(screenPat);
+				FillScreenPats();
+			}
+		}
+		
+		private void butRemovePat_Click(object sender,EventArgs e) {
+			_listScreenPats.RemoveAt(gridScreenPats.GetSelectedIndex());
+			FillScreenPats();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(ScreenList.Length>0) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Are you sure you want to delete this screening group? All screenings in this group will be deleted?")) {
-					return;
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Are you sure you want to delete this screening group? All screenings in this group will be deleted.")) {
+				return;
+			}
+			ScreenGroups.Delete(ScreenGroupCur);//Also deletes screens.
+			DialogResult=DialogResult.OK;
+		}
+
+		private void butStartScreens_Click(object sender,EventArgs e) {
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.IsNew=true;
+			int selectedIdx=gridScreenPats.GetSelectedIndex();
+			int i=selectedIdx;
+			if(i==-1){
+				i=0;
+			}
+			while(true) {
+				ScreenPat screenPat=_listScreenPats[i];
+			//foreach(ScreenPat screenPat in _listScreenPats) {
+				if(screenPat.PatScreenPerm!=PatScreenPerm.Allowed) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//Skip people who aren't allowed
+				}
+				if(_arrayScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
+				}
+				FormSE.ScreenPatCur=screenPat;
+				if(_arrayScreens.Length==0) {
+					FormSE.ScreenCur=new OpenDentBusiness.Screen();
+					FormSE.ScreenCur.ScreenGroupOrder=1;
+				}
+				else {
+					FormSE.ScreenCur=_arrayScreens[_arrayScreens.Length-1];//'remembers' the last entry
+					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
+				}
+				Patient pat=Patients.GetPat(screenPat.PatNum);//Get a patient so we can pre-fill some of the information (age/sex/birthdate/grade)
+				FormSE.ScreenCur.Age=(pat.Birthdate==DateTime.MinValue)?FormSE.ScreenCur.Age:(byte)pat.Age;
+				FormSE.ScreenCur.Birthdate=(pat.Birthdate==DateTime.MinValue)?FormSE.ScreenCur.Birthdate:pat.Birthdate;
+				FormSE.ScreenCur.Gender=pat.Gender;//Default value in pat edit is male. No way of knowing if it's intentional or not, just use it.
+				FormSE.ScreenCur.GradeLevel=(pat.GradeLevel==0)?FormSE.ScreenCur.GradeLevel:pat.GradeLevel;//Default value is Unknown, use pat's grade if it's not unknown.
+				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;//Default to unknown. Patient Edit doesn't have the same type of race as screen edit.
+				if(FormSE.ShowDialog()!=DialogResult.OK) {
+					break;
+				}
+				FormSE.ScreenCur.ScreenGroupOrder++;
+				FillGrid();
+				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+				if(i==selectedIdx && selectedIdx!=-1) {
+					break;
+				}
+				if(i==0 && selectedIdx==-1) {
+					break;
 				}
 			}
-			for(int i=0;i<ScreenList.Length;i++) {
-				Screens.Delete(ScreenList[i]);
-			}
-			ScreenGroups.Delete(ScreenGroupCur);
-			DialogResult=DialogResult.Cancel;
+			FillScreenPats();
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			if(ScreenList.Length==0){
-				if(MessageBox.Show("Since you have no items in the list, the screener and location information cannot be saved. Continue?","",MessageBoxButtons.OKCancel)==DialogResult.Cancel){
+			if(_arrayScreens.Length==0 && _listScreenPats.Count==0) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel
+					,"Since you have no items nor patients in the group, the screener and location information cannot be saved. Continue?")) 
+				{
 					return;
 				}
+			}
+			if(textDescription.Text=="") {
+				MsgBox.Show(this,"Description field cannot be blank.");
+				textDescription.Focus();
+				return;
 			}
 			ScreenGroupCur.SGDate=PIn.Date(textScreenDate.Text);
 			ScreenGroupCur.Description=textDescription.Text;
 			ScreenGroupCur.ProvName=textProvName.Text;
 			ScreenGroupCur.ProvNum=comboProv.SelectedIndex+1;//this works for -1 also.
-			if(comboCounty.SelectedIndex==-1)
+			if(comboCounty.SelectedIndex==-1) {
 				ScreenGroupCur.County="";
-			else
+			}
+			else {
 				ScreenGroupCur.County=comboCounty.SelectedItem.ToString();
-			if(comboGradeSchool.SelectedIndex==-1)
+			}
+			if(comboGradeSchool.SelectedIndex==-1) {
 				ScreenGroupCur.GradeSchool="";
-			else
+			}
+			else {
 				ScreenGroupCur.GradeSchool=comboGradeSchool.SelectedItem.ToString();
+			}
 			ScreenGroupCur.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
+			ScreenPats.Sync(_listScreenPats,ScreenGroupCur.ScreenGroupNum);
 			ScreenGroups.Update(ScreenGroupCur);
 			Screens.UpdateForGroup(ScreenGroupCur);
 			DialogResult=DialogResult.OK;
@@ -649,6 +908,12 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+		}
+
+		private void FormScreenGroupEdit_FormClosing(object sender,FormClosingEventArgs e) {
+			if(IsNew && DialogResult==DialogResult.Cancel) {
+				ScreenGroups.Delete(ScreenGroupCur);//Also deletes screens.
+			}
 		}
 		
 

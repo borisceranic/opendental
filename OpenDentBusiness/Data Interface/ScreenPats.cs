@@ -21,8 +21,13 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				return Meth.GetObject<List<ScreenPat>>(MethodBase.GetCurrentMethod(),screenGroupNum);
 			}
-			string command="SELECT * FROM screenpat WHERE ScreenPatNum IN (SELECT ScreenPatNum FROM screengroup WHERE ScreenGroupNum="+POut.Long(screenGroupNum)+")";
+			string command="SELECT * FROM screenpat WHERE ScreenGroupNum ="+POut.Long(screenGroupNum);
 			return Crud.ScreenPatCrud.SelectMany(command);
+		}
+
+		///<summary>Syncs the ScreenPats for the supplied ScreenGroup.</summary>
+		public static bool Sync(List<ScreenPat> listScreenPats,long screenGroupNum) {
+			return Crud.ScreenPatCrud.Sync(listScreenPats,GetForScreenGroup(screenGroupNum));
 		}
 
 		/*
