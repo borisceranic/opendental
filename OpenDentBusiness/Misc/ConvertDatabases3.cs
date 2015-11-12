@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.1.0.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -9682,12 +9682,12 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.3.22.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To15_4_0();
+			To15_4_1();
 		}
 
-		private static void To15_4_0() {
-			if(FromVersion<new Version("15.4.0.0")) {
-				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.0"));//No translation in convert script.
+		private static void To15_4_1() {
+			if(FromVersion<new Version("15.4.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.1"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('PatientSelectUseFNameForPreferred','0')";
@@ -11300,10 +11300,24 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE screenpat MODIFY PatScreenPerm NOT NULL";
 					Db.NonQ(command);
 				}
-				command="UPDATE preference SET ValueString = '15.4.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '15.4.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To15_4_1();
+			To16_1_0();
+		}
+
+		private static void To16_1_0() {
+			if(FromVersion<new Version("16.1.0.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.0"));//No translation in convert script.
+				string command="";
+
+
+
+
+
+				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 		}
 
 
