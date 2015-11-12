@@ -143,6 +143,7 @@ namespace OpenDentBusiness {
 					}
 					switch((ProcStat)PIn.Long(rawProcs.Rows[i]["ProcStatus"].ToString())) {
 						case ProcStat.TP:
+						case ProcStat.TPi:
 							row["colorText"]=arrayDefs[(int)DefCat.ProgNoteColors][0].ItemColor.ToArgb().ToString();
 							break;
 						case ProcStat.C:

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using System.Windows.Forms;
-using SparksToothChart;
-using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDentBusiness;
+using SparksToothChart;
 
 namespace OpenDental {
 	public class ChartLayoutHelper {
@@ -226,6 +222,47 @@ namespace OpenDental {
 		public static void GridPtInfoSetSize(ODGrid gridPtInfo,TabControl tabControlImages){
 			if(!Programs.UsingOrion) {
 				gridPtInfo.Height=tabControlImages.Top-gridPtInfo.Top;
+			}
+		}
+
+		///<summary>Reorganizes controls when switching between TP charting mode and procedure notes mode in Chart Module.</summary>
+		public static void SetTpChartingHelper(bool isTpChartingEnabled,Patient patCur,ODGrid gridProg,ListBox listBtnCats,CheckBox checkTPs,
+			Panel panelTP,ODGrid gridTPs,ODGrid gridTpProcs,OpenDental.UI.Button butNewTP,ListBox listPriorities)
+		{
+			listBtnCats.BringToFront();
+			if(!isTpChartingEnabled) {
+				checkTPs.Checked=false;
+				//set listBtnCats height so it will be 2 pixels below checkTPs Y pos + checkTPs height
+				listBtnCats.Height=checkTPs.Location.Y+checkTPs.Height+2-listBtnCats.Location.Y;
+				panelTP.Visible=false;
+				gridProg.Visible=true;
+				return;
+			}
+			//IsTpChartingEnabled is true, set panelTP and gridProg visibility based on whether or not checkTPs is checked
+			panelTP.Visible=checkTPs.Checked;
+			gridProg.Visible=!checkTPs.Checked;
+			//adjust listBtnCats height so it will be 1 pixel above checkTPs Y pos
+			listBtnCats.Height=checkTPs.Location.Y-listBtnCats.Location.Y-1;
+			panelTP.Location=gridProg.Location;
+			panelTP.Size=new Size(770,gridProg.Size.Height);
+			butNewTP.Location=new Point(gridTPs.Location.X+gridTPs.Width+6,butNewTP.Location.Y);
+			//Fill Priority list. Can probably be moved to the calling class.
+			listPriorities.Items.Clear();
+			listPriorities.Items.Add(Lan.g("ContrChart","no priority"));
+			for(int i=0;i<DefC.Short[(int)DefCat.TxPriorities].Length;i++) {
+				listPriorities.Items.Add(DefC.Short[(int)DefCat.TxPriorities][i].ItemName);
+			}
+			if(patCur==null) {
+				gridTPs.Enabled=false;
+				gridTpProcs.Enabled=false;
+				listPriorities.Enabled=false;
+				butNewTP.Enabled=false;
+			}
+			else {
+				gridTPs.Enabled=true;
+				gridTpProcs.Enabled=true;
+				listPriorities.Enabled=true;
+				butNewTP.Enabled=true;
 			}
 		}
 

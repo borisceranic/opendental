@@ -2328,7 +2328,7 @@ namespace OpenDental{
 			row.SecIns=secIns;
 			row.Discount=discount;
 			row.Pat=pat;
-			row.ColorText= DefC.GetColor(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==listProcForTP[i].ProcNum).Priority);//DefC.GetColor(DefCat.TxPriorities,listProcForTP[i].Priority);
+			row.ColorText=DefC.GetColor(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==listProcForTP[i].ProcNum).Priority);
 			if(row.ColorText==System.Drawing.Color.White) {
 				row.ColorText=System.Drawing.Color.Black;
 			}
@@ -2376,7 +2376,7 @@ namespace OpenDental{
 				row.SecIns=subsecIns;
 				row.Discount=subdiscount;
 				row.Pat=subpat;
-				row.ColorText=DefC.GetColor(DefCat.TxPriorities,listProcForTP[i].Priority);
+				row.ColorText=DefC.GetColor(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==listProcForTP[i].ProcNum).Priority);
 				if(row.ColorText==System.Drawing.Color.White) {
 					row.ColorText=System.Drawing.Color.Black;
 				}

@@ -17,50 +17,56 @@ namespace OpenDentBusiness {
 					//EC must come after C so that group notes will come after their procedures in Progress Notes.
 					int xIdx=0;
 					switch(x["ProcStatus"].ToString()) {
-						case "7"://Cn
+						case "8"://TPi
 							xIdx=0;
 							break;
-						case "1"://TP
+						case "7"://Cn
 							xIdx=1;
 							break;
-						case "5"://R
+						case "1"://TP
 							xIdx=2;
 							break;
-						case "4"://EO
+						case "5"://R
 							xIdx=3;
 							break;
-						case "2"://C
+						case "4"://EO
 							xIdx=4;
 							break;
-						case "3"://EC
+						case "2"://C
 							xIdx=5;
 							break;
-						case "6"://D
+						case "3"://EC
 							xIdx=6;
+							break;
+						case "6"://D
+							xIdx=7;
 							break;
 					}
 					int yIdx=0;
 					switch(y["ProcStatus"].ToString()) {
-						case "7"://Cn
+						case "8"://TPi
 							yIdx=0;
 							break;
-						case "1"://TP
+						case "7"://Cn
 							yIdx=1;
 							break;
-						case "5"://R
+						case "1"://TP
 							yIdx=2;
 							break;
-						case "4"://EO
+						case "5"://R
 							yIdx=3;
 							break;
-						case "2"://C
+						case "4"://EO
 							yIdx=4;
 							break;
-						case "3"://EC
+						case "2"://C
 							yIdx=5;
 							break;
-						case "6"://D
+						case "3"://EC
 							yIdx=6;
+							break;
+						case "6"://D
+							yIdx=7;
 							break;
 					}
 					return xIdx.CompareTo(yIdx);
