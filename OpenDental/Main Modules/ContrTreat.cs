@@ -3106,10 +3106,10 @@ namespace OpenDental{
 			}
 			List<TreatPlanAttach> listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
 			TreatPlan tp=new TreatPlan();
-			tp.Heading=Lan.g(this,"Proposed Treatment Plan");
+			tp.Heading=_listTreatPlans[gridPlans.SelectedIndices[0]].Heading;
 			tp.DateTP=DateTimeOD.Today;
 			tp.PatNum=PatCur.PatNum;
-			tp.Note=PrefC.GetString(PrefName.TreatmentPlanNote);
+			tp.Note=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
 			tp.ResponsParty=PatCur.ResponsParty;
 			TreatPlans.Insert(tp);
 			ProcTP procTP;
