@@ -124,7 +124,7 @@ namespace ServiceManager {
 				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
 				//new strategy for having control over servicename
 				//InstallUtil /ServiceName=OpenDentHL7_abc OpenDentHL7.exe
-				process.StartInfo.Arguments="/ServiceName="+textName.Text+" "+_serviceFile.FullName;
+				process.StartInfo.Arguments="/ServiceName="+textName.Text+" \""+_serviceFile.FullName+"\"";
 				process.Start();
 				process.WaitForExit(10000);
 				if(process.ExitCode!=0) {
@@ -151,7 +151,7 @@ namespace ServiceManager {
 				Process process=new Process();
 				process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
 				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
-				process.StartInfo.Arguments="/u /ServiceName="+textName.Text+" "+_serviceFile.FullName;
+				process.StartInfo.Arguments="/u /ServiceName="+textName.Text+" \""+_serviceFile.FullName+"\"";
 				process.Start();
 				process.WaitForExit(10000);
 				if(process.ExitCode!=0) {
