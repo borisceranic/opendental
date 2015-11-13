@@ -169,16 +169,6 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenDentBusiness\OpenDentBusiness.csproj">
-      <Project>{3d0fc76e-803c-4de2-bdb1-47d63a4e2357}</Project>
-      <Name>OpenDentBusiness</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenDentHL7\OpenDentHL7.csproj">
-      <Project>{F7F9E047-0E19-4E3E-A7DF-40257CFBD8FC}</Project>
-      <Name>OpenDentHL7</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
