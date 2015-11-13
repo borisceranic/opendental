@@ -9,10 +9,15 @@ namespace ServiceManager {
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main() {
+		static void Main(string[] args) {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new FormMain());
+			if(args!=null && args.Length > 0 && args[0].GetType()==typeof(string)) {
+				Application.Run(new FormServiceManage(args[0],true));
+			}
+			else {
+				Application.Run(new FormMain());
+			}
 		}
 	}
 }
