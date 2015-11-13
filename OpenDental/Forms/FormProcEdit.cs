@@ -2867,6 +2867,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormProcInfo_Load(object sender,System.EventArgs e) {
+			ClaimProcsForProc=new List<ClaimProc>();
 			//Set the title bar to show the patient's name much like the main screen does.
 			this.Text+=" - "+PatCur.GetNameLF();
 			//richTextBox1.Text="This is a test of the functions of a rich text box.";
@@ -2913,7 +2914,7 @@ namespace OpenDental{
 			}
 			if(IsNew){
 				if(ProcCur.ProcStatus==ProcStat.C){
-					if(!Security.IsAuthorized(Permissions.ProcComplCreate)){
+					if(!_isQuickAdd && !Security.IsAuthorized(Permissions.ProcComplCreate)){
 						DialogResult=DialogResult.Cancel;
 						return;
 					}
@@ -3103,6 +3104,7 @@ namespace OpenDental{
 			//MsgBoxCopyPaste msgb=new MsgBoxCopyPaste(retVal);
 			//msgb.ShowDialog();
 			if(_isQuickAdd) {
+				textDate.Enabled=false;
 				butOK_Click(this,new EventArgs());
 				if(this.DialogResult!=DialogResult.OK) {
 					this.WindowState=FormWindowState.Normal;
@@ -5168,11 +5170,11 @@ namespace OpenDental{
 						textDate.Text=apt.AptDateTime.ToShortDateString();
 					}
 				}
-				if(!Security.IsAuthorized(Permissions.ProcComplCreate,PIn.Date(textDate.Text))){//use the new date
+				if(!_isQuickAdd && !Security.IsAuthorized(Permissions.ProcComplCreate,PIn.Date(textDate.Text))){//use the new date
 					return false;
 				}
 			}
-			else if(IsNew && ProcCur.ProcStatus==ProcStat.C){//if new procedure is complete
+			else if(!_isQuickAdd && IsNew && ProcCur.ProcStatus==ProcStat.C) {//if new procedure is complete
 				if(!Security.IsAuthorized(Permissions.ProcComplCreate,PIn.Date(textDate.Text))){
 					return false;
 				}
