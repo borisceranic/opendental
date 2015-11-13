@@ -584,25 +584,31 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select an item first."));
 				return;
 			}
-			if(emailPreview.HasMessageChanged){
-				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?"),"",MessageBoxButtons.OKCancel)
+			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.Attachments.Count > 0){
+				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text and attachments with text "
+					+"and attachments from the template?"),"",MessageBoxButtons.OKCancel)
 					!=DialogResult.OK){
 					return;
 				}
 			}
-			emailPreview.LoadTemplate(EmailTemplates.List[listTemplates.SelectedIndex].Subject,EmailTemplates.List[listTemplates.SelectedIndex].BodyText);
+			EmailTemplate[] arrayEmailTemplates=EmailTemplates.List;
+			List<EmailAttach> listAttachments=EmailAttaches.GetForTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].EmailTemplateNum);
+			emailPreview.LoadTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].Subject,
+				arrayEmailTemplates[listTemplates.SelectedIndex].BodyText,listAttachments);
 		}
 
 		///<summary>Hard coded template.</summary>
 		private void buttonFuchsMailDSF_Click(object sender,EventArgs e) {
 			emailPreview.ToAddress="skimom@springfielddental.net";
-			emailPreview.LoadTemplate("Statement to DSF","For accounting, sent statement to skimom@springfielddental.net"+emailPreview.BodyText);
+			emailPreview.LoadTemplate("Statement to DSF",
+				"For accounting, sent statement to skimom@springfielddental.net"+emailPreview.BodyText,new List<EmailAttach>());
 		}
 
 		///<summary>Hard coded template.</summary>
 		private void buttonFuchsMailDMF_Click(object sender,EventArgs e) {
 			emailPreview.ToAddress="smilecouple@yahoo.com";
-			emailPreview.LoadTemplate("Statement to DMF","For accounting, sent statement to smilecouple@yahoo.com"+emailPreview.BodyText);
+			emailPreview.LoadTemplate("Statement to DMF",
+				"For accounting, sent statement to smilecouple@yahoo.com"+emailPreview.BodyText,new List<EmailAttach>());
 		}
 
 		#endregion Templates

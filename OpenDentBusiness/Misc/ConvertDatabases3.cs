@@ -11310,6 +11310,22 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("16.1.0.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.0"));//No translation in convert script.
 				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE emailattach ADD EmailTemplateNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE emailattach ADD INDEX (EmailTemplateNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE emailattach ADD EmailTemplateNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE emailattach SET EmailTemplateNum = 0 WHERE EmailTemplateNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE emailattach MODIFY EmailTemplateNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX emailattach_EmailTemplateNum ON emailattach (EmailTemplateNum)";
+					Db.NonQ(command);
+				}
 
 
 

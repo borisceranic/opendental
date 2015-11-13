@@ -109,5 +109,22 @@ namespace OpenDentBusiness{
 			return attachPath;
 		}
 
+		///<summary>Returns all EmailAttaches assocaited to a specific EmailTemplateNum.</summary>
+		public static List<EmailAttach> GetForTemplate(long emailTemplateNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EmailAttach>>(MethodBase.GetCurrentMethod(),emailTemplateNum);
+			}
+			string command="SELECT * FROM emailattach WHERE EmailTemplateNum="+POut.Long(emailTemplateNum);
+			return Crud.EmailAttachCrud.SelectMany(command);
+		}
+
+		///<summary>Syncs a given list of EmailAttaches to a list of old EmailAttaches.</summary>
+		public static void Sync(List<EmailAttach> emailAttachNew,List<EmailAttach> emailAttachOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),emailAttachNew,emailAttachOld);
+			}
+			Crud.EmailAttachCrud.Sync(emailAttachNew,emailAttachOld);
+		}
+
 	}
 }

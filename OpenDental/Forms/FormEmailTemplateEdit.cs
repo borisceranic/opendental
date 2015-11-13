@@ -1,10 +1,11 @@
 using System;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
+using System.Diagnostics;
 using OpenDentBusiness;
+using OpenDental.UI;
+using System.Collections.Generic;
+using System.IO;
+using CodeBase;
 
 namespace OpenDental{
 	/// <summary>
@@ -26,7 +27,11 @@ namespace OpenDental{
 		private ODtextBox textDescription;
 		///<summary></summary>
 		public EmailTemplate ETcur;
+		private UI.Button butAttach;
+		private UI.ODGrid gridAttachments;
 		private UI.Button butSubjectFields;
+		private List<EmailAttach> _listEmailAttachDisplayed;
+		private List<EmailAttach> _listEmailAttachOld=new List<EmailAttach>();
 
 		///<summary></summary>
 		public FormEmailTemplateEdit()
@@ -71,6 +76,8 @@ namespace OpenDental{
 			this.textSubject = new OpenDental.ODtextBox();
 			this.textDescription = new OpenDental.ODtextBox();
 			this.butSubjectFields = new OpenDental.UI.Button();
+			this.butAttach = new OpenDental.UI.Button();
+			this.gridAttachments = new OpenDental.UI.ODGrid();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -106,7 +113,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(8, 33);
+			this.label2.Location = new System.Drawing.Point(8, 65);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(88, 20);
 			this.label2.TabIndex = 0;
@@ -120,17 +127,17 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBodyText.DetectUrls = false;
-			this.textBodyText.Location = new System.Drawing.Point(97, 54);
+			this.textBodyText.Location = new System.Drawing.Point(97, 86);
 			this.textBodyText.Name = "textBodyText";
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBodyText.Size = new System.Drawing.Size(780, 598);
+			this.textBodyText.Size = new System.Drawing.Size(861, 564);
 			this.textBodyText.TabIndex = 3;
 			this.textBodyText.Text = "";
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(8, 54);
+			this.label1.Location = new System.Drawing.Point(8, 86);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(88, 20);
 			this.label1.TabIndex = 0;
@@ -139,7 +146,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(8, 12);
+			this.label3.Location = new System.Drawing.Point(8, 44);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(88, 20);
 			this.label3.TabIndex = 0;
@@ -149,12 +156,11 @@ namespace OpenDental{
 			// butBodyFields
 			// 
 			this.butBodyFields.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBodyFields.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butBodyFields.Autosize = true;
 			this.butBodyFields.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butBodyFields.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butBodyFields.CornerRadius = 4F;
-			this.butBodyFields.Location = new System.Drawing.Point(883, 56);
+			this.butBodyFields.Location = new System.Drawing.Point(182, 23);
 			this.butBodyFields.Name = "butBodyFields";
 			this.butBodyFields.Size = new System.Drawing.Size(82, 20);
 			this.butBodyFields.TabIndex = 4;
@@ -167,12 +173,12 @@ namespace OpenDental{
 			this.textSubject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textSubject.DetectUrls = false;
-			this.textSubject.Location = new System.Drawing.Point(97, 33);
+			this.textSubject.Location = new System.Drawing.Point(97, 65);
 			this.textSubject.Multiline = false;
 			this.textSubject.Name = "textSubject";
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textSubject.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textSubject.Size = new System.Drawing.Size(780, 20);
+			this.textSubject.Size = new System.Drawing.Size(635, 20);
 			this.textSubject.TabIndex = 2;
 			this.textSubject.Text = "";
 			// 
@@ -182,34 +188,65 @@ namespace OpenDental{
 			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textDescription.DetectUrls = false;
-			this.textDescription.Location = new System.Drawing.Point(97, 12);
+			this.textDescription.Location = new System.Drawing.Point(97, 44);
 			this.textDescription.Multiline = false;
 			this.textDescription.Name = "textDescription";
 			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textDescription.Size = new System.Drawing.Size(780, 20);
+			this.textDescription.Size = new System.Drawing.Size(635, 20);
 			this.textDescription.TabIndex = 1;
 			this.textDescription.Text = "";
 			// 
 			// butSubjectFields
 			// 
 			this.butSubjectFields.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSubjectFields.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSubjectFields.Autosize = true;
 			this.butSubjectFields.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSubjectFields.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSubjectFields.CornerRadius = 4F;
-			this.butSubjectFields.Location = new System.Drawing.Point(883, 33);
+			this.butSubjectFields.Location = new System.Drawing.Point(97, 23);
 			this.butSubjectFields.Name = "butSubjectFields";
 			this.butSubjectFields.Size = new System.Drawing.Size(82, 20);
 			this.butSubjectFields.TabIndex = 7;
 			this.butSubjectFields.Text = "Subject Fields";
 			this.butSubjectFields.Click += new System.EventHandler(this.butSubjectFields_Click);
 			// 
+			// butAttach
+			// 
+			this.butAttach.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAttach.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAttach.Autosize = true;
+			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAttach.CornerRadius = 4F;
+			this.butAttach.Location = new System.Drawing.Point(738, 2);
+			this.butAttach.Name = "butAttach";
+			this.butAttach.Size = new System.Drawing.Size(82, 20);
+			this.butAttach.TabIndex = 9;
+			this.butAttach.Text = "Attach...";
+			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
+			// 
+			// gridAttachments
+			// 
+			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAttachments.HasMultilineHeaders = false;
+			this.gridAttachments.HScrollVisible = false;
+			this.gridAttachments.Location = new System.Drawing.Point(738, 23);
+			this.gridAttachments.Name = "gridAttachments";
+			this.gridAttachments.ScrollValue = 0;
+			this.gridAttachments.Size = new System.Drawing.Size(220, 62);
+			this.gridAttachments.TabIndex = 8;
+			this.gridAttachments.TabStop = false;
+			this.gridAttachments.Title = "Attachments";
+			this.gridAttachments.TranslationName = null;
+			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
+			// 
 			// FormEmailTemplateEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 695);
+			this.Controls.Add(this.butAttach);
+			this.Controls.Add(this.gridAttachments);
 			this.Controls.Add(this.butSubjectFields);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.textSubject);
@@ -236,6 +273,84 @@ namespace OpenDental{
 			textSubject.Text=ETcur.Subject;
 			textBodyText.Text=ETcur.BodyText;
 			textDescription.Text=ETcur.Description;
+			if(ETcur.EmailTemplateNum==0) {//New email template
+				_listEmailAttachDisplayed=new List<EmailAttach>();
+			}
+			else {
+				_listEmailAttachDisplayed=EmailAttaches.GetForTemplate(ETcur.EmailTemplateNum); 
+				foreach(EmailAttach attachment in _listEmailAttachDisplayed) {
+					_listEmailAttachOld.Add(attachment);
+				}
+			}
+			FillAttachments();
+		}
+
+		public void FillAttachments() {
+			gridAttachments.BeginUpdate();
+			gridAttachments.Rows.Clear();
+			gridAttachments.Columns.Clear();
+			gridAttachments.Columns.Add(new OpenDental.UI.ODGridColumn("",0));//No name column, since there is only one column.
+			foreach(EmailAttach attachment in _listEmailAttachDisplayed) {
+				ODGridRow row=new ODGridRow();
+				row.Cells.Add(attachment.DisplayedFileName);
+				gridAttachments.Rows.Add(row);
+			}
+			gridAttachments.EndUpdate();
+			if(gridAttachments.Rows.Count>0) {
+				gridAttachments.SetSelected(0,true);
+			}
+		}
+
+		private void butAttach_Click(object sender,EventArgs e) {
+			OpenFileDialog dlg=new OpenFileDialog();
+			dlg.Multiselect=true;
+			//Use the OS default directory for this type of file viewer.
+			dlg.InitialDirectory="";
+			if(dlg.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			try {
+				for(int i=0;i<dlg.FileNames.Length;i++) {
+					_listEmailAttachDisplayed.Add(EmailAttaches.CreateAttach(Path.GetFileName(dlg.FileNames[i]),File.ReadAllBytes(dlg.FileNames[i])));
+				}
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+			FillAttachments();
+		}
+
+		private void gridAttachments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
+			string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailAttach.ActualFileName);
+			try {
+				string tempFile=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),emailAttach.DisplayedFileName);
+				File.Copy(strFilePathAttach,tempFile,true);
+				Process.Start(tempFile);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+
+		private void butSubjectFields_Click(object sender,EventArgs e) {
+			FormMessageReplacements FormMR=new FormMessageReplacements(
+				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
+			FormMR.IsSelectionMode=true;
+			FormMR.ShowDialog();
+			if(FormMR.DialogResult==DialogResult.OK) {
+				textSubject.SelectedText=FormMR.Replacement;
+			}
+		}
+
+		private void butBodyFields_Click(object sender,EventArgs e) {
+			FormMessageReplacements FormMR=new FormMessageReplacements(
+				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
+			FormMR.IsSelectionMode=true;
+			FormMR.ShowDialog();
+			if(FormMR.DialogResult==DialogResult.OK) {
+				textBodyText.SelectedText=FormMR.Replacement;
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -256,27 +371,15 @@ namespace OpenDental{
 			else{
 				EmailTemplates.Update(ETcur);
 			}
+			foreach(EmailAttach attachment in _listEmailAttachDisplayed) {
+				attachment.EmailTemplateNum=ETcur.EmailTemplateNum;
+			}
+			EmailAttaches.Sync(_listEmailAttachDisplayed,_listEmailAttachOld);
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}
-
-		private void butSubjectFields_Click(object sender,EventArgs e) {
-			FormMessageReplacements FormMR=new FormMessageReplacements(
-				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
-			FormMR.IsSelectionMode=true;
-			FormMR.ShowDialog();
-			textSubject.SelectedText=FormMR.Replacement;
-		}
-
-		private void butBodyFields_Click(object sender,EventArgs e) {
-			FormMessageReplacements FormMR=new FormMessageReplacements(
-				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
-			FormMR.IsSelectionMode=true;
-			FormMR.ShowDialog();
-			textBodyText.SelectedText=FormMR.Replacement;
 		}
 	}
 }

@@ -50,6 +50,7 @@ namespace OpenDentBusiness.Crud{
 				emailAttach.EmailMessageNum  = PIn.Long  (row["EmailMessageNum"].ToString());
 				emailAttach.DisplayedFileName= PIn.String(row["DisplayedFileName"].ToString());
 				emailAttach.ActualFileName   = PIn.String(row["ActualFileName"].ToString());
+				emailAttach.EmailTemplateNum = PIn.Long  (row["EmailTemplateNum"].ToString());
 				retVal.Add(emailAttach);
 			}
 			return retVal;
@@ -90,14 +91,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EmailAttachNum,";
 			}
-			command+="EmailMessageNum,DisplayedFileName,ActualFileName) VALUES(";
+			command+="EmailMessageNum,DisplayedFileName,ActualFileName,EmailTemplateNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(emailAttach.EmailAttachNum)+",";
 			}
 			command+=
 				     POut.Long  (emailAttach.EmailMessageNum)+","
 				+"'"+POut.String(emailAttach.DisplayedFileName)+"',"
-				+"'"+POut.String(emailAttach.ActualFileName)+"')";
+				+"'"+POut.String(emailAttach.ActualFileName)+"',"
+				+    POut.Long  (emailAttach.EmailTemplateNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -130,14 +132,15 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EmailAttachNum,";
 			}
-			command+="EmailMessageNum,DisplayedFileName,ActualFileName) VALUES(";
+			command+="EmailMessageNum,DisplayedFileName,ActualFileName,EmailTemplateNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(emailAttach.EmailAttachNum)+",";
 			}
 			command+=
 				     POut.Long  (emailAttach.EmailMessageNum)+","
 				+"'"+POut.String(emailAttach.DisplayedFileName)+"',"
-				+"'"+POut.String(emailAttach.ActualFileName)+"')";
+				+"'"+POut.String(emailAttach.ActualFileName)+"',"
+				+    POut.Long  (emailAttach.EmailTemplateNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -152,7 +155,8 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE emailattach SET "
 				+"EmailMessageNum  =  "+POut.Long  (emailAttach.EmailMessageNum)+", "
 				+"DisplayedFileName= '"+POut.String(emailAttach.DisplayedFileName)+"', "
-				+"ActualFileName   = '"+POut.String(emailAttach.ActualFileName)+"' "
+				+"ActualFileName   = '"+POut.String(emailAttach.ActualFileName)+"', "
+				+"EmailTemplateNum =  "+POut.Long  (emailAttach.EmailTemplateNum)+" "
 				+"WHERE EmailAttachNum = "+POut.Long(emailAttach.EmailAttachNum);
 			Db.NonQ(command);
 		}
@@ -172,6 +176,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ActualFileName = '"+POut.String(emailAttach.ActualFileName)+"'";
 			}
+			if(emailAttach.EmailTemplateNum != oldEmailAttach.EmailTemplateNum) {
+				if(command!=""){ command+=",";}
+				command+="EmailTemplateNum = "+POut.Long(emailAttach.EmailTemplateNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -186,6 +194,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM emailattach "
 				+"WHERE EmailAttachNum = "+POut.Long(emailAttachNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<EmailAttach> listNew,List<EmailAttach> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<EmailAttach> listIns    =new List<EmailAttach>();
+			List<EmailAttach> listUpdNew =new List<EmailAttach>();
+			List<EmailAttach> listUpdDB  =new List<EmailAttach>();
+			List<EmailAttach> listDel    =new List<EmailAttach>();
+			listNew.Sort((EmailAttach x,EmailAttach y) => { return x.EmailAttachNum.CompareTo(y.EmailAttachNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((EmailAttach x,EmailAttach y) => { return x.EmailAttachNum.CompareTo(y.EmailAttachNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			EmailAttach fieldNew;
+			EmailAttach fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.EmailAttachNum<fieldDB.EmailAttachNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.EmailAttachNum>fieldDB.EmailAttachNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].EmailAttachNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

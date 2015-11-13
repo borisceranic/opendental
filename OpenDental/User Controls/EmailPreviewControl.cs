@@ -33,6 +33,7 @@ namespace OpenDental {
 		public string CcAddress { get { return textCcAddress.Text; } set { textCcAddress.Text=value; } }
 		public string BccAddress { get { return textBccAddress.Text; } set { textBccAddress.Text=value; } }
 		public bool IsSigned { get { return (_isSigningEnabled && _certSig!=null); } }
+		public List<EmailAttach> Attachments { get { return (_emailMessage.Attachments); } set { _emailMessage.Attachments=value; } }
 		
 		public X509Certificate2 Signature {
 			get {
@@ -337,7 +338,7 @@ namespace OpenDental {
 
 		#region Body
 
-		public void LoadTemplate(string subject,string bodyText) {
+		public void LoadTemplate(string subject,string bodyText,List<EmailAttach> attachments) {
 			List<Appointment> listApts=Appointments.GetFutureSchedApts(_patCur.PatNum);
 			Appointment aptNext=null;
 			if(listApts.Count > 0){
@@ -362,6 +363,8 @@ namespace OpenDental {
 			BodyText=FormMessageReplacements.ReplaceUser(BodyText,Security.CurUser);
 			//Clinic Information
 			BodyText=FormMessageReplacements.ReplaceOffice(BodyText,clinic);
+			Attachments=attachments;
+			FillAttachments();
 			_hasMessageChanged=false;
 		}
 
