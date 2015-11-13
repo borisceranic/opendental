@@ -114,7 +114,7 @@ namespace OpenDental{
 			this.gridTP.TabIndex = 56;
 			this.gridTP.Title = "Treatment Planned Procedures";
 			this.gridTP.TranslationName = "FormDisplayFields";
-			this.gridTP.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grids_MouseMove);
+			this.gridTP.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grids_MouseDown);
 			// 
 			// contextMenuProcs
 			// 
@@ -151,7 +151,7 @@ namespace OpenDental{
 			this.gridAll.TabIndex = 59;
 			this.gridAll.Title = "Available Procedures";
 			this.gridAll.TranslationName = "FormDisplayFields";
-			this.gridAll.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grids_MouseMove);
+			this.gridAll.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grids_MouseDown);
 			// 
 			// butDelete
 			// 
