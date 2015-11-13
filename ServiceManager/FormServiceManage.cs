@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.ServiceProcess;
 using System.Windows.Forms;
-using Microsoft.Win32;
-using OpenDentBusiness;
-
 
 namespace ServiceManager {
 	public partial class FormServiceManage:Form {
@@ -22,7 +21,7 @@ namespace ServiceManager {
 				return null;
 			}
 		}
-		
+
 		///<summary>Pass in empty string to create a new service. Pass in OpenDent string to manage an existing service.</summary>
 		public FormServiceManage(string serviceName,bool isInstallOnly) {
 			InitializeComponent();
@@ -53,7 +52,7 @@ namespace ServiceManager {
 		}
 
 		private void FormServiceManager_Load(object sender,EventArgs e) {
-			ServiceController service=GetOpenDentServiceByName(textName.Text);			
+			ServiceController service=GetOpenDentServiceByName(textName.Text);
 			if(service!=null) {//installed
 				RegistryKey hklm=Registry.LocalMachine;
 				hklm=hklm.OpenSubKey(@"System\CurrentControlSet\Services\"+service.ServiceName);
@@ -119,8 +118,25 @@ namespace ServiceManager {
 					return;
 				}
 			}
-			if(ServiceHelper.Install(textName.Text,_serviceFile)) {
-				HadServiceInstalled=true;
+			try {
+				Process process=new Process();
+				process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
+				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
+				//new strategy for having control over servicename
+				//InstallUtil /ServiceName=OpenDentHL7_abc OpenDentHL7.exe
+				process.StartInfo.Arguments="/ServiceName="+textName.Text+" "+_serviceFile.FullName;
+				process.Start();
+				process.WaitForExit(10000);
+				if(process.ExitCode!=0) {
+					MessageBox.Show("Error. Exit code:"+process.ExitCode.ToString());
+				}
+				List<ServiceController> listServices=ServiceController.GetServices().ToList();
+				if(listServices.Exists(x => x.ServiceName==textName.Text)) {
+					HadServiceInstalled=true;//We verified that the service was successfully installed
+				}
+			}
+			catch {
+				MessageBox.Show("Error. Did not exit after 10 seconds.");
 			}
 			butRefresh_Click(this,e);
 		}
@@ -130,11 +146,21 @@ namespace ServiceManager {
 				MessageBox.Show("Selected service has an invalid path");
 				return;
 			}
-			ServiceController service=ServiceHelper.GetServiceByExeFullPath(_serviceFile.FullName);
-			if(service!=null) {
-				if(!ServiceHelper.Uninstall(service)) {
-					MessageBox.Show("The service was not successfully uninstalled.  This may be a permissions issue.");
+			try {
+				RegistryKey hklm=Registry.LocalMachine;
+				Process process=new Process();
+				process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
+				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
+				process.StartInfo.Arguments="/u /ServiceName="+textName.Text+" "+_serviceFile.FullName;
+				process.Start();
+				process.WaitForExit(10000);
+				if(process.ExitCode!=0) {
+					MessageBox.Show("Error. Exit code:"+process.ExitCode.ToString());
 				}
+			}
+			catch {
+				MessageBox.Show("Error. Did not exit after 10 seconds.");
+				return;
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -169,7 +195,7 @@ namespace ServiceManager {
 				MessageBox.Show(ex.Message);
 			}
 			finally {
-				Cursor=Cursors.Default;			
+				Cursor=Cursors.Default;
 			}
 			butRefresh_Click(this,e);
 		}
@@ -177,7 +203,7 @@ namespace ServiceManager {
 		private void butRefresh_Click(object sender,EventArgs e) {
 			FormServiceManager_Load(this,e);
 		}
-				
+
 		private void butBrowse_Click(object sender,EventArgs e) {
 			OpenFileDialog fdlg=new OpenFileDialog();
 			fdlg.Title="Select a Service";
@@ -185,7 +211,7 @@ namespace ServiceManager {
 			fdlg.Filter="Executable files(*.exe)|*.exe";
 			fdlg.RestoreDirectory=true;
 			if(fdlg.ShowDialog()!=DialogResult.OK) {
-				return;				
+				return;
 			}
 			textPathToExe.Text=fdlg.FileName;
 		}
