@@ -686,6 +686,10 @@ namespace OpenDental {
 		public void ModuleSelected(long patNum,long docNum) {
 			RefreshModuleData(patNum);
 			RefreshModuleScreen();
+			if(panelNote.Visible) {//Notes and sig box may have been visible previously, with info from another image/patient
+				panelNote.Visible=false;
+				ResizeAll();//Resize pictureboxmain to fit the whole screen
+			}
 			if(docNum!=0) {
 				SelectTreeNode(GetNodeById(MakeIdDoc(docNum)));
 			}
