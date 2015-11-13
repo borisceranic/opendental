@@ -268,7 +268,9 @@ namespace OpenDental{
 				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
 			FormMR.IsSelectionMode=true;
 			FormMR.ShowDialog();
-			textSubject.SelectedText=FormMR.Replacement;
+			if(FormMR.DialogResult==DialogResult.OK) {
+				textSubject.SelectedText=FormMR.Replacement;
+			}
 		}
 
 		private void butBodyFields_Click(object sender,EventArgs e) {
@@ -276,7 +278,9 @@ namespace OpenDental{
 				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
 			FormMR.IsSelectionMode=true;
 			FormMR.ShowDialog();
-			textBodyText.SelectedText=FormMR.Replacement;
+			if(FormMR.DialogResult==DialogResult.OK) {
+				textBodyText.SelectedText=FormMR.Replacement;
+			}
 		}
 	}
 }
