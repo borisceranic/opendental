@@ -201,16 +201,25 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),treatPlanCur);
 				return;
 			}
-			//Should only ever update a single TP.
-			string command="UPDATE treatplan SET TPStatus="+POut.Int((int)TreatPlanStatus.Inactive)+" "+
-			  "WHERE TPStatus="+POut.Int((int)TreatPlanStatus.Active)+" "+
-			  "AND TreatPlanNum!="+POut.Long(treatPlanCur.TreatPlanNum);
-			Db.NonQ(command);
-			//Should only ever update a single TP.
-			command="UPDATE treatplan SET TPStatus="+POut.Int((int)TreatPlanStatus.Active)+" "+
-			 "WHERE TreatPlanNum="+POut.Long(treatPlanCur.TreatPlanNum);
-			Db.NonQ(command);
-
+			string command="SELECT * FROM treatplan "
+				+"WHERE PatNum="+POut.Long(treatPlanCur.PatNum)+" "
+				+"AND TPStatus="+POut.Int((int)TreatPlanStatus.Active)+" "
+				+"AND TreatPlanNum!="+POut.Long(treatPlanCur.TreatPlanNum);
+			//Make Active TP's inactive. Rename if TP's still have default name.
+			List<TreatPlan> listActivePlans=Crud.TreatPlanCrud.SelectMany(command);
+			foreach(TreatPlan tp in listActivePlans) {//should only ever be one, but just in case there are multiple this will rectify the problem.
+				if(tp.Heading==Lans.g("TreatPlan","Active Treatment Plan")) {
+					tp.Heading=Lans.g("TreatPlan","Inactive Treatment Plan");
+				}
+				tp.TPStatus=TreatPlanStatus.Inactive;
+				TreatPlans.Update(tp);
+			}
+			//Heading is changed from within the form, if they have changed it back to Inactive Treatment Plan it was deliberate.
+			//if(treatPlanCur.Heading==Lans.g("TreatPlan","Inactive Treatment Plan")) {
+			//	treatPlanCur.Heading=Lans.g("TreatPlan","Active Treatment Plan");
+			//}
+			treatPlanCur.TPStatus=TreatPlanStatus.Active;
+			TreatPlans.Update(treatPlanCur);
 		}
 
 

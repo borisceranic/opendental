@@ -13,8 +13,11 @@ namespace OpenDental {
 		private List<Procedure> _listProceduresTPAll;
 		private List<Procedure> _listProceduresTPCur;
 		private List<TreatPlanAttach> _listAllAttaches;
+		private List<Appointment> _listAppointments;
 		private long _apptNum;
 		private long _apptNumPlanned;
+		///<summary>Set to true if the "Make Active Treatment Plan" button is pressed.</summary>
+		private bool _makeActive=false;
 
 		public FormTreatPlanCurEdit() {
 			InitializeComponent();
@@ -27,11 +30,12 @@ namespace OpenDental {
 			}
 			_treatPlanUnassigned=TreatPlans.GetUnassigned(TreatPlanCur.PatNum);
 			this.Text=TreatPlanCur.Heading+" - {"+Lans.g(this,TreatPlanCur.TPStatus.ToString())+"}";
-			_listProceduresTPAll=Procedures.GetProcsByStatusForPat(TreatPlanCur.PatNum,new[] {ProcStat.TP,ProcStat.TPi});
+			_listProceduresTPAll=Procedures.GetProcsByStatusForPat(TreatPlanCur.PatNum,new[] { ProcStat.TP,ProcStat.TPi });
 			_listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(TreatPlanCur.TreatPlanNum);
 			_listProceduresTPCur=_listProceduresTPAll.FindAll(x => _listTreatPlanAttaches.Any(y => x.ProcNum==y.ProcNum) 
 				|| (TreatPlanCur.TPStatus==TreatPlanStatus.Active && (x.AptNum>0 || x.PlannedAptNum>0)));
 			_listAllAttaches=TreatPlanAttaches.GetAllForPatNum(TreatPlanCur.PatNum);
+			_listAppointments=Appointments.GetMultApts(_listProceduresTPAll.SelectMany(x => new[] { x.AptNum,x.PlannedAptNum }).Distinct().Where(x => x>0).ToList());
 			textHeading.Text=TreatPlanCur.Heading;
 			textNote.Text=TreatPlanCur.Note;
 			FillGrids();
@@ -66,8 +70,8 @@ namespace OpenDental {
 			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Tth"),30));
 			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Surf"),40));
 			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Code"),40));
-			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Description"),200));
-			grid.Columns.Add(new ODGridColumn(Lan.g(this,"TPs"),40));
+			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Description"),195));
+			grid.Columns.Add(new ODGridColumn(Lan.g(this,"TPs"),35));
 			grid.Columns.Add(new ODGridColumn(Lan.g(this,"Apt"),40));
 			grid.Rows.Clear();
 			ODGridRow row;
@@ -87,7 +91,37 @@ namespace OpenDental {
 				row.Cells.Add(proccode.ProcCode);
 				row.Cells.Add(proccode.LaymanTerm);
 				row.Cells.Add(_listAllAttaches.FindAll(x => x.ProcNum==proc.ProcNum && x.TreatPlanNum!=_treatPlanUnassigned.TreatPlanNum).Count.ToString());
-				row.Cells.Add(proc.AptNum>0 || proc.PlannedAptNum>0?"X":"");
+				string aptStatus="";
+				foreach(long aptNum in new[] {proc.AptNum,proc.PlannedAptNum}.Where(x => x>0)) {
+					Appointment apt=_listAppointments.FirstOrDefault(x => x.AptNum==aptNum);
+					if(apt!=null) {
+						switch(apt.AptStatus) {
+							case ApptStatus.UnschedList:
+								aptStatus+="U";
+								break;
+							case ApptStatus.ASAP:
+							case ApptStatus.Scheduled:
+								aptStatus+="S";
+								break;
+							case ApptStatus.Complete:
+								aptStatus+="C";
+								break;
+							case ApptStatus.Broken:
+								aptStatus+="B";
+								break;
+							case ApptStatus.Planned:
+								aptStatus+="P";
+								break;
+							case ApptStatus.PtNote:
+							case ApptStatus.PtNoteCompleted:
+							case ApptStatus.None:
+							default:
+								aptStatus+="!"; //should never happen
+								break;
+						}
+					}
+				}
+				row.Cells.Add(aptStatus);
 				row.Tag=proc;
 				grid.Rows.Add(row);
 			}
@@ -110,8 +144,8 @@ namespace OpenDental {
 			}
 			foreach(int idx in gridTP.SelectedIndices) {
 				if(TreatPlanCur.TPStatus==TreatPlanStatus.Active //Active TP
-					&&(((Procedure)gridTP.Rows[idx].Tag).AptNum>0||((Procedure)gridTP.Rows[idx].Tag).PlannedAptNum>0)) //Proc is attached to appointment
-				{//if active TP, don't allow scheduled procedures to me moved off the TP.
+				   && (((Procedure)gridTP.Rows[idx].Tag).AptNum>0 || ((Procedure)gridTP.Rows[idx].Tag).PlannedAptNum>0)) //Proc is attached to appointment
+				{ //if active TP, don't allow scheduled procedures to me moved off the TP.
 					continue;
 				}
 				_listProceduresTPCur.Remove((Procedure)gridTP.Rows[idx].Tag);
@@ -119,7 +153,7 @@ namespace OpenDental {
 			FillGrids();
 		}
 
-		private void grids_MouseMove(object sender,MouseEventArgs e) {
+		private void grids_MouseDown(object sender,MouseEventArgs e) {
 			contextMenuProcs.Items.Clear();
 			gridAll.ContextMenu=null;
 			gridTP.ContextMenu=null;
@@ -155,8 +189,13 @@ namespace OpenDental {
 		}
 
 		private void butMakeActive_Click(object sender,EventArgs e) {
+			_makeActive=true;//affects the OK click
 			if(TreatPlanCur.TPStatus==TreatPlanStatus.Inactive && TreatPlanCur.Heading==Lan.g("TreatPlan","Unassigned")) {
 				_treatPlanUnassigned=new TreatPlan();
+				TreatPlanCur.Heading=Lan.g("TreatPlan","Active Treatment Plan");
+				textHeading.Text=TreatPlanCur.Heading;
+			}
+			if(TreatPlanCur.TPStatus==TreatPlanStatus.Inactive && TreatPlanCur.Heading==Lan.g("TreatPlan","Inactive Treatment Plan")) {
 				TreatPlanCur.Heading=Lan.g("TreatPlan","Active Treatment Plan");
 				textHeading.Text=TreatPlanCur.Heading;
 			}
@@ -173,7 +212,7 @@ namespace OpenDental {
 			butOK.Enabled=true;
 			butDelete.Visible=true;
 			butDelete.Enabled=false;
-			_listProceduresTPCur.RemoveAll(x => x.AptNum>0 || x.PlannedAptNum>0);//to prevent duplicate additions
+			_listProceduresTPCur.RemoveAll(x => x.AptNum>0 || x.PlannedAptNum>0); //to prevent duplicate additions
 			_listProceduresTPCur.AddRange(_listProceduresTPAll.FindAll(x => x.AptNum>0 || x.PlannedAptNum>0));
 			FillGrids();
 		}
@@ -189,9 +228,9 @@ namespace OpenDental {
 			}
 			List<TreatPlanAttach> listNew=_listTreatPlanAttaches.FindAll(x => _listProceduresTPCur.Any(y => x.ProcNum==y.ProcNum));
 			_listProceduresTPCur.FindAll(x => listNew.All(y => x.ProcNum!=y.ProcNum))
-				.ForEach(x => listNew.Add(new TreatPlanAttach() {TreatPlanNum=TreatPlanCur.TreatPlanNum,ProcNum=x.ProcNum,Priority=x.Priority}));
+				.ForEach(x => listNew.Add(new TreatPlanAttach() { TreatPlanNum=TreatPlanCur.TreatPlanNum,ProcNum=x.ProcNum,Priority=x.Priority }));
 			TreatPlanAttaches.Sync(listNew,TreatPlanCur.TreatPlanNum);
-			if(TreatPlanCur.TPStatus==TreatPlanStatus.Active) {
+			if(_makeActive) {
 				TreatPlans.SetActive(TreatPlanCur);
 				Procedures.SetTPActive(TreatPlanCur.PatNum,listNew.Select(x => x.ProcNum).ToList());
 			}
@@ -204,20 +243,19 @@ namespace OpenDental {
 
 		private void butDelete_Click(object sender,EventArgs e) {
 			if(TreatPlanCur.TPStatus==TreatPlanStatus.Active) {
-				MsgBox.Show(this,"Cannot delete active treatment plan.");//Should never happen.
+				MsgBox.Show(this,"Cannot delete active treatment plan."); //Should never happen.
 				return;
 			}
 			if(TreatPlanCur.TreatPlanNum!=0) {
 				try {
 					TreatPlans.Delete(TreatPlanCur);
 				}
-				catch (Exception ex) {
+				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
 					return;
 				}
 			}
 			DialogResult=DialogResult.OK;
 		}
-
 	}
 }
