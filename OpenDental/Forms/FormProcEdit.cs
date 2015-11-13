@@ -268,9 +268,10 @@ namespace OpenDental{
 		private ODGrid gridAdj;
 		private ODGrid gridPay;
 		private long _provNumOrderingSelected;
+		private bool _isQuickAdd=false;
 		
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
-		public FormProcEdit(Procedure proc,Patient patCur,Family famCur){
+		public FormProcEdit(Procedure proc,Patient patCur,Family famCur,bool isQuickAdd=false){
 			ProcCur=proc;
 			ProcOld=proc.Copy();
 			PatCur=patCur;
@@ -304,6 +305,10 @@ namespace OpenDental{
 			if(!PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance)) {
 				tabControl.TabPages.Remove(tabPageMedical);
 				//groupMedical.Visible=false;
+			}
+			_isQuickAdd=isQuickAdd;
+			if(isQuickAdd) {
+				this.WindowState=FormWindowState.Minimized;
 			}
 		}
 
@@ -3097,6 +3102,14 @@ namespace OpenDental{
 			//string retVal=ProcCur.Note+ProcCur.UserNum.ToString();
 			//MsgBoxCopyPaste msgb=new MsgBoxCopyPaste(retVal);
 			//msgb.ShowDialog();
+			if(_isQuickAdd) {
+				butOK_Click(this,new EventArgs());
+				if(this.DialogResult!=DialogResult.OK) {
+					this.WindowState=FormWindowState.Normal;
+					this.CenterToScreen();
+					this.BringToFront();
+				}
+			}
 		}
 
 		private void sigBoxTopaz_Leave(object sender,EventArgs e) {

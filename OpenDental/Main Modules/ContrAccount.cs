@@ -4357,6 +4357,7 @@ namespace OpenDental {
 			List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
 			Def quickChargeDef=_acctProcQuickAddDefs[contextMenuQuickCharge.MenuItems.IndexOf((MenuItem)sender)];
 			string[] procCodes=quickChargeDef.ItemValue.Split(',');
+			List<string> procCodesAdded=new List<string>();
 			Provider patProv=Providers.GetProv(PatCur.PriProv);
 			FeeSched provFeeSched=FeeScheds.GetOne(patProv.FeeSched,FeeSchedC.GetListShort());
 			for(int i=0;i<procCodes.Length;i++) {
@@ -4379,14 +4380,20 @@ namespace OpenDental {
 				proc.ProvNum=patProv.ProvNum;
 				proc.UnitQty=1;
 				Procedures.Insert(proc);
-				ClaimProc cp=new ClaimProc();
-				Procedures.ComputeEstimates(proc,PatCur.PatNum,new List<ClaimProc>(),true,listInsPlans,listPatPlans,listBenefits,PatCur.Age,listInsSubs);
+				FormProcEdit FormPE=new FormProcEdit(proc,PatCur,FamCur,true);
+				FormPE.IsNew=true;
+				FormPE.ShowDialog();
+				if(FormPE.DialogResult!=DialogResult.OK) {
+					Procedures.Delete(proc.ProcNum);
+					continue;
+				}
+				procCodesAdded.Add(procCodes[i]);
 				//We do not make ProcComplCreate audit trail enteries here because we instead will make an AccountQuickCharge entry.
 			}
-			if(procCodes.Length > 0) {
+			if(procCodesAdded.Count > 0) {
 				SecurityLogs.MakeLogEntry(Permissions.AccountQuickCharge,PatCur.PatNum
 					,Lan.g(this,"The following procedures were added via the Quick Charge button from the Account module")
-						+": "+String.Join(",",procCodes));
+						+": "+string.Join(",",procCodesAdded));
 			}
 			ModuleSelected(PatCur.PatNum);
 		}
