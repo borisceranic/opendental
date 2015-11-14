@@ -468,6 +468,8 @@ namespace OpenDentBusiness.UI {
 			for(int i=startTime.Hour;i<stop;i++) {
 				hour=new DateTime(2000,1,1,i,0,0);//hour is the only important part of this time.
 				sTime=hour.ToString(hFormat,ci);
+				sTime=sTime.Replace("a. m.","am");//So that the times are not cutoff for foreign users
+				sTime=sTime.Replace("p. m.","pm");
 				SizeF sizef=g.MeasureString(sTime,bfont);
 				g.DrawString(sTime,bfont,new SolidBrush(Color.Black),TimeWidth-sizef.Width-2,index*LineH*RowsPerHr+1);
 				g.DrawString(sTime,bfont,new SolidBrush(Color.Black)
