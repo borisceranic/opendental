@@ -1389,7 +1389,7 @@ namespace OpenDental {
 			if(amt<0) {//X-Charge always wants a positive number, even for returns.
 				amt*=-1;
 			}
-			info.Arguments+="/AMOUNT:"+amt.ToString("F2")+" /LOCKAMOUNT ";
+			info.Arguments+="/AMOUNT:"+amt.ToString("F2")+" ";
 			CreditCard cc=null;
 			List<CreditCard> creditCards=CreditCards.Refresh(_patCur.PatNum);
 			for(int i=0;i<creditCards.Count;i++) {
@@ -1850,7 +1850,7 @@ namespace OpenDental {
 			string tranText="";
 			switch(tranType) {
 				case 0:
-					tranText+="/TRANSACTIONTYPE:PURCHASE /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:PURCHASE /LOCKTRANTYPE /LOCKAMOUNT ";
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
@@ -1861,7 +1861,7 @@ namespace OpenDental {
 					}
 					break;
 				case 1:
-					tranText+="/TRANSACTIONTYPE:RETURN /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:RETURN /LOCKTRANTYPE /LOCKAMOUNT ";
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
@@ -1872,17 +1872,17 @@ namespace OpenDental {
 					}
 					break;
 				case 2:
-					tranText+="/TRANSACTIONTYPE:DEBITPURCHASE /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:DEBITPURCHASE /LOCKTRANTYPE /LOCKAMOUNT ";
 					tranText+="/CASHBACK:"+cashBack+" ";
 					break;
 				case 3:
-					tranText+="/TRANSACTIONTYPE:DEBITRETURN /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:DEBITRETURN /LOCKTRANTYPE /LOCKAMOUNT ";
 					break;
 				case 4:
-					tranText+="/TRANSACTIONTYPE:FORCE /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:FORCE /LOCKTRANTYPE /LOCKAMOUNT ";
 					break;
 				case 5:
-					tranText+="/TRANSACTIONTYPE:PREAUTH /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:PREAUTH /LOCKTRANTYPE /LOCKAMOUNT ";
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
@@ -1893,7 +1893,7 @@ namespace OpenDental {
 					}
 					break;
 				case 6:
-					tranText+="/TRANSACTIONTYPE:ADJUSTMENT /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:ADJUSTMENT /LOCKTRANTYPE ";//excluding /LOCKAMOUNT, amount must be editable in X-Charge to make an adjustment
 					string adjustTransactionID="";
 					string[] noteSplit=Regex.Split(textNote.Text,"\r\n");
 					foreach(string XCTrans in noteSplit) {
@@ -1907,7 +1907,7 @@ namespace OpenDental {
 					}
 					break;
 				case 7:
-					tranText+="/TRANSACTIONTYPE:VOID /LOCKTRANTYPE ";
+					tranText+="/TRANSACTIONTYPE:VOID /LOCKTRANTYPE /LOCKAMOUNT ";
 					break;
 			}
 			if(_promptSignature) {
