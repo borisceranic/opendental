@@ -3766,6 +3766,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Misc\MigraDocHelper.cs" />
+    <Compile Include="Misc\ServicesHelper.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -241,6 +241,26 @@ namespace OpenDentBusiness {
 			return ServerName;
 		}
 
+		///<summary>From local variable.  Does not query the database.</summary>
+		public static string GetMysqlUser() {
+			return MysqlUser;
+		}
+
+		///<summary>From local variable.  Does not query the database.</summary>
+		public static string GetMysqlPass() {
+			return MysqlPass;
+		}
+
+		///<summary>From local variable.  Does not query the database.</summary>
+		public static string GetMysqlUserLow() {
+			return MysqlUserLow;
+		}
+
+		///<summary>From local variable.  Does not query the database.</summary>
+		public static string GetMysqlPassLow() {
+			return MysqlPassLow;
+		}
+
 		#region Constructors
 		public DataConnection(bool isLow) {
 			string connectStr=ConnectionString;
