@@ -197,6 +197,82 @@ namespace OpenDental {
 			if(CreditCardCur.IsNew) {
 				DialogResult=DialogResult.Cancel;
 			}
+			#region X-Charge
+			//Delete the archived X-Charge token 
+			if(_isXChargeEnabled && CreditCardCur.XChargeToken!="") { 
+				Program prog=Programs.GetCur(ProgramName.Xcharge);
+				string path=Programs.GetProgramPath(prog);
+				if(prog==null) {
+					MsgBox.Show(this,"X-Charge entry is missing from the database.");//should never happen
+					return;
+				}
+				if(!prog.Enabled) {
+					if(Security.IsAuthorized(Permissions.Setup)) {
+						FormXchargeSetup FormX=new FormXchargeSetup();
+						FormX.ShowDialog();
+					}
+					return;
+				}
+				if(!File.Exists(path)) {
+					MsgBox.Show(this,"Path is not valid.");
+					if(Security.IsAuthorized(Permissions.Setup)) {
+						FormXchargeSetup FormX=new FormXchargeSetup();
+						FormX.ShowDialog();
+					}
+					return;
+				}
+				ProcessStartInfo info=new ProcessStartInfo(path);
+				string resultfile=Path.Combine(Path.GetDirectoryName(path),"XResult.txt");
+				try {
+					File.Delete(resultfile);//delete the old result file.
+				}
+				catch {
+					MsgBox.Show(this,"Could not delete XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have "
+						+"sufficient permissions.");
+					return;
+				}
+				string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum);
+				string xPassword=CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum));
+				info.Arguments+="/TRANSACTIONTYPE:ARCHIVEVAULTDELETE ";
+				info.Arguments+="/XCACCOUNTID:"+CreditCardCur.XChargeToken+" ";
+				info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
+				info.Arguments+="/USERID:"+xUsername+" ";
+				info.Arguments+="/PASSWORD:"+xPassword+" ";
+				info.Arguments+="/AUTOPROCESS ";
+				info.Arguments+="/AUTOCLOSE ";
+				Cursor=Cursors.WaitCursor;
+				Process process=new Process();
+				process.StartInfo=info;
+				process.EnableRaisingEvents=true;
+				process.Start();
+				while(!process.HasExited) {
+					Application.DoEvents();
+				}
+				Thread.Sleep(200);//Wait 2/10 second to give time for file to be created.
+				Cursor=Cursors.Default;
+				string line="";
+				try {
+					using(TextReader reader=new StreamReader(resultfile)) {
+						line=reader.ReadLine();
+						while(line!=null) {
+							if(line=="RESULT=SUCCESS") {
+								break;
+							}
+							if(line.StartsWith("DESCRIPTION") && !line.Contains("Alias does not exist")) {//If token doesn't exist in X-Charge, still delete from OD
+								MsgBox.Show(this,"There was a problem deleting this card within X-Charge.  Please try again.");
+								return;//Don't delete the card from OD
+							}
+							line=reader.ReadLine();
+						}
+					}
+				}
+				catch {
+					MsgBox.Show(this,"Could not read XResult.txt file.  It may be in use by another program, flagged as read-only, or you might not have "
+						+"sufficient permissions.");
+					return;
+				}
+			}
+			#endregion
 			CreditCards.Delete(CreditCardCur.CreditCardNum);
 			List<CreditCard> creditCards=CreditCards.Refresh(PatCur.PatNum);
 			for(int i=0;i<creditCards.Count;i++) {
