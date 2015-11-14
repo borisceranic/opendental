@@ -210,10 +210,12 @@ namespace OpenDental{
 			string myStringWebResource = null;
 			WebClient myWebClient = new WebClient();
 			myStringWebResource=remoteUri+fileName;
+			Cursor=Cursors.WaitCursor;
 			try{
 				myWebClient.DownloadFile(myStringWebResource,fileName);
 			}
 			catch{
+				Cursor=Cursors.Default;
 				MessageBox.Show("Either you do not have internet access, or no translations are available for "+CultureInfo.CurrentCulture.DisplayName);
 				return;
 			}
@@ -224,10 +226,12 @@ namespace OpenDental{
 				Lans.LoadTranslationsFromTextFile(content);
 			}
 			catch{
+				Cursor=Cursors.Default;
 				MessageBox.Show("Translations not installed properly.");
 				return;
 			}
 			LanguageForeigns.Refresh(CultureInfo.CurrentCulture.Name,CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+			Cursor=Cursors.Default;
 			MessageBox.Show("Done");
 		}
 
@@ -239,6 +243,7 @@ namespace OpenDental{
 			if(saveFileDialog1.ShowDialog()!=DialogResult.OK){
 				return;
 			}
+			fileName=saveFileDialog1.FileName;
 			StreamWriter sw=new StreamWriter(fileName,false,System.Text.Encoding.UTF8);
 			sw.WriteLine("DELETE FROM languageforeign WHERE Culture='"+CultureInfo.CurrentCulture.Name+"';");
 			LanguageForeign[] LFList=LanguageForeigns.GetListForCulture(CultureInfo.CurrentCulture);
