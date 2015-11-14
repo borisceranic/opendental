@@ -1209,15 +1209,15 @@ namespace OpenDental {
 		}
 
 		private void butInstallEConnector_Click(object sender,EventArgs e) {
-			ServiceManager.FormServiceManage FormSM=new ServiceManager.FormServiceManage("OpenDentalEConnector",true);
-			FormSM.ShowDialog();
-			if(!FormSM.HadServiceInstalled) {
+			bool isListening;
+			if(!ServicesHelper.UpgradeOrInstallEConnector(false,out isListening)) {
 				return;
 			}
 			bool startListenerCommunications=false;
-			string messageStartListener=Lan.g(this,"The EConnector you installed is currently not accepting communications with Open Dental.")+"  "
-				+Lan.g(this,"This means that eServices will not work for that EConnector.")+"  "+Lan.g(this,"Do you want to start accepting communications?");
-			if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
+			string messageStartListener=Lan.g(this,"The eConnector you installed is currently not accepting inbound communication.")+"  "
+				+Lan.g(this,"eServices will not work as expected untill inbound communication is allowed.")+"\r\n\r\n"
+				+Lan.g(this,"Do you want to start accepting inbound communication?");
+			if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.YesNo)==DialogResult.Yes) {
 				startListenerCommunications=true;
 			}
 			Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
@@ -1229,10 +1229,12 @@ namespace OpenDental {
 					)
 				);
 			}
-			catch(Exception ex) {
-
+			catch(Exception) {
+				//Telling HQ about the EConnectorType failed.  This information will get to HQ eventually via heartbeats so it's not important to tell users.
 			}
 			SetEConnectorCommunicationStatus();
+			FillTextListenerServiceStatus();
+			FillGridListenerService();
 		}
 
 		private void FillGridListenerService() {
