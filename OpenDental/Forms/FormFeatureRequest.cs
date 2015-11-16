@@ -24,15 +24,20 @@ namespace OpenDental{
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label label1;
 		private IContainer components;
-		private Label label2;
+		private Label labelVote;
 		private Label label5;
 		private TextBox textSearch;
 		private OpenDental.UI.ODGrid gridMain;
 		private OpenDental.UI.Button buttonAdd;
-		private Label label4;
+		private Label labelSearchFirst;
 		private OpenDental.UI.Button butSearch;
 		private ODDataTable table;
 		private bool isAdminMode;
+		private UI.Button butOK;
+		///<summary>Used in the JobManager system for attaching features to jobs.</summary>
+		public bool IsSelectionMode;
+		///<summary>Only for IsSelectionMode, returns the selected num.</summary>
+		public long SelectedFeatureNum=0;
 
 		///<summary></summary>
 		public FormFeatureRequest()
@@ -69,77 +74,78 @@ namespace OpenDental{
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormFeatureRequest));
 			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
+			this.labelVote = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textSearch = new System.Windows.Forms.TextBox();
-			this.label4 = new System.Windows.Forms.Label();
+			this.labelSearchFirst = new System.Windows.Forms.Label();
 			this.butSearch = new OpenDental.UI.Button();
 			this.buttonAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butClose = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(0,0);
+			this.label1.Location = new System.Drawing.Point(0, 0);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(100,23);
+			this.label1.Size = new System.Drawing.Size(100, 23);
 			this.label1.TabIndex = 0;
 			// 
-			// label2
+			// labelVote
 			// 
-			this.label2.Location = new System.Drawing.Point(359,7);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(511,16);
-			this.label2.TabIndex = 51;
-			this.label2.Text = "Vote for your favorite features here.  Please remember that we cannot ever give a" +
+			this.labelVote.Location = new System.Drawing.Point(359, 7);
+			this.labelVote.Name = "labelVote";
+			this.labelVote.Size = new System.Drawing.Size(511, 16);
+			this.labelVote.TabIndex = 51;
+			this.labelVote.Text = "Vote for your favorite features here.  Please remember that we cannot ever give a" +
     "ny time estimates.";
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(4,5);
+			this.label5.Location = new System.Drawing.Point(4, 5);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(90,18);
+			this.label5.Size = new System.Drawing.Size(90, 18);
 			this.label5.TabIndex = 56;
 			this.label5.Text = "Search terms";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textSearch
 			// 
-			this.textSearch.Location = new System.Drawing.Point(93,5);
+			this.textSearch.Location = new System.Drawing.Point(93, 5);
 			this.textSearch.Name = "textSearch";
-			this.textSearch.Size = new System.Drawing.Size(167,20);
+			this.textSearch.Size = new System.Drawing.Size(167, 20);
 			this.textSearch.TabIndex = 57;
 			// 
-			// label4
+			// labelSearchFirst
 			// 
-			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label4.Location = new System.Drawing.Point(91,633);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(180,18);
-			this.label4.TabIndex = 61;
-			this.label4.Text = "A search is required first";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.label4.Visible = false;
+			this.labelSearchFirst.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.labelSearchFirst.Location = new System.Drawing.Point(91, 633);
+			this.labelSearchFirst.Name = "labelSearchFirst";
+			this.labelSearchFirst.Size = new System.Drawing.Size(180, 18);
+			this.labelSearchFirst.TabIndex = 61;
+			this.labelSearchFirst.Text = "A search is required first";
+			this.labelSearchFirst.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelSearchFirst.Visible = false;
 			// 
 			// butSearch
 			// 
-			this.butSearch.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butSearch.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butSearch.Autosize = true;
 			this.butSearch.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSearch.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSearch.CornerRadius = 4F;
 			this.butSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butSearch.Location = new System.Drawing.Point(266,2);
+			this.butSearch.Location = new System.Drawing.Point(266, 2);
 			this.butSearch.Name = "butSearch";
-			this.butSearch.Size = new System.Drawing.Size(75,24);
+			this.butSearch.Size = new System.Drawing.Size(75, 24);
 			this.butSearch.TabIndex = 62;
 			this.butSearch.Text = "Search";
 			this.butSearch.Click += new System.EventHandler(this.butSearch_Click);
 			// 
 			// buttonAdd
 			// 
-			this.buttonAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.buttonAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.buttonAdd.Autosize = true;
 			this.buttonAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -147,9 +153,9 @@ namespace OpenDental{
 			this.buttonAdd.CornerRadius = 4F;
 			this.buttonAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.buttonAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.buttonAdd.Location = new System.Drawing.Point(12,630);
+			this.buttonAdd.Location = new System.Drawing.Point(12, 630);
 			this.buttonAdd.Name = "buttonAdd";
-			this.buttonAdd.Size = new System.Drawing.Size(75,24);
+			this.buttonAdd.Size = new System.Drawing.Size(75, 24);
 			this.buttonAdd.TabIndex = 60;
 			this.buttonAdd.Text = "Add";
 			this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
@@ -159,11 +165,12 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12,28);
+			this.gridMain.Location = new System.Drawing.Point(12, 28);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(861,599);
+			this.gridMain.Size = new System.Drawing.Size(861, 599);
 			this.gridMain.TabIndex = 59;
 			this.gridMain.Title = "Feature Requests";
 			this.gridMain.TranslationName = null;
@@ -171,37 +178,55 @@ namespace OpenDental{
 			// 
 			// butClose
 			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butClose.Autosize = true;
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(798,630);
+			this.butClose.Location = new System.Drawing.Point(798, 630);
 			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75,24);
+			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 0;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(717, 630);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 24);
+			this.butOK.TabIndex = 63;
+			this.butOK.Text = "&OK";
+			this.butOK.Visible = false;
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
 			// FormFeatureRequest
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(882,657);
+			this.ClientSize = new System.Drawing.Size(882, 657);
+			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butSearch);
-			this.Controls.Add(this.label4);
+			this.Controls.Add(this.labelSearchFirst);
 			this.Controls.Add(this.buttonAdd);
 			this.Controls.Add(this.textSearch);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.gridMain);
-			this.Controls.Add(this.label2);
+			this.Controls.Add(this.labelVote);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(870, 300);
 			this.Name = "FormFeatureRequest";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Feature Requests";
-			this.Load += new System.EventHandler(this.FormFeatureRequest_Load);
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormUpdate_FormClosing);
+			this.Load += new System.EventHandler(this.FormFeatureRequest_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -209,6 +234,14 @@ namespace OpenDental{
 		#endregion
 
 		private void FormFeatureRequest_Load(object sender, System.EventArgs e) {
+			if(IsSelectionMode) {
+				this.Text="Select a Feature Request";
+				butClose.Text="Cancel";
+				butOK.Visible=true;
+				buttonAdd.Visible=false;
+				labelSearchFirst.Visible=false;
+				labelVote.Visible=false;
+			}
 			/*
 				if(Security.IsAuthorized(Permissions.Setup,true)) {
 					butCheck2.Visible=true;
@@ -372,6 +405,11 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(IsSelectionMode) {
+				SelectedFeatureNum=PIn.Long(table.Rows[e.Row]["RequestId"]);
+				DialogResult=DialogResult.OK;
+				return;
+			}
 			FormRequestEdit FormR=new FormRequestEdit();
 			FormR.RequestId=PIn.Long(table.Rows[e.Row]["RequestId"]);
 			FormR.IsAdminMode=isAdminMode;
@@ -379,7 +417,19 @@ namespace OpenDental{
 			FillGrid();
 		}
 
+		private void butOK_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select a feature request.");
+				return;
+			}
+			SelectedFeatureNum=PIn.Long(table.Rows[gridMain.GetSelectedIndex()]["RequestId"]);
+			DialogResult=DialogResult.OK;
+		}
+
 		private void butClose_Click(object sender, System.EventArgs e) {
+			if(IsSelectionMode) {
+				DialogResult=DialogResult.Cancel;
+			}
 			Close();
 		}
 
