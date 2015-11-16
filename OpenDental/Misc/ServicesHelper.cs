@@ -20,7 +20,7 @@ namespace OpenDental {
 		public static bool Install(string serviceName,FileInfo fileInfo) {
 			try {
 				Process process=new Process();
-				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"Install","installutil.exe");
+				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"InstallUtil","installutil.exe");
 				//new strategy for having control over servicename
 				//InstallUtil /ServiceName=OpenDentHL7_abc OpenDentHL7.exe
 				process.StartInfo.Arguments="/ServiceName="+serviceName+" \""+fileInfo.FullName+"\"";
