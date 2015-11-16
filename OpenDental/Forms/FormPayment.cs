@@ -111,6 +111,7 @@ namespace OpenDental {
 		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
 		///as comboClinic and is used to set payment.ClinicNum when saving.</summary>
 		private List<long> _listUserClinicNums;
+		private bool _isCCDeclined;
 
 		///<summary>PatCur and FamCur are not for the PatCur of the payment.  They are for the patient and family from which this window was accessed.</summary>
 		public FormPayment(Patient patCur,Family famCur,Payment paymentCur) {
@@ -1528,6 +1529,7 @@ namespace OpenDental {
 								}
 								needToken=false;//Don't update CCard due to failure
 								newCard=false;//Don't insert CCard due to failure
+								_isCCDeclined=true;
 								break;
 							}
 							if(tranType==1) {
@@ -1542,6 +1544,7 @@ namespace OpenDental {
 							else { //If the transaction is not a void transaction, we will void this transaction if the user hits Cancel
 								_wasCreditCardSuccessful=true;
 							}
+							_isCCDeclined=false;
 						}
 						if(line.StartsWith("APPROVEDAMOUNT=")) {
 							approvedAmt=PIn.Double(line.Substring(15));
@@ -1967,8 +1970,10 @@ namespace OpenDental {
 			listPayType.SelectedIndex=DefC.GetOrder(DefCat.PaymentTypes,PIn.Long(paytype));
 			SetComboDepositAccounts();
 			if(FormP.Response!=null) {
-				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
-					Lan.g(this,"Status")+": "+FormP.Response.Status.description;
+				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+
+					Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
+					Lan.g(this,"Status")+": "+FormP.Response.Status.description+Environment.NewLine+
+					Lan.g(this,"Amount")+": "+FormP.AmountCharged;
 				if(FormP.Response.Status.code==0) { //The transaction succeeded.
 					if(FormP.TranType!=PayConnectService.transType.VOID) {
 						_wasCreditCardSuccessful=true; //Will void the transaction if user cancels out of window.
@@ -1976,8 +1981,8 @@ namespace OpenDental {
 					else {
 						_wasCreditCardSuccessful=false;
 					}
+					_isCCDeclined=false;
 					textNote.Text+=Environment.NewLine
-						+Lan.g(this,"Amount")+": "+FormP.AmountCharged+Environment.NewLine
 						+Lan.g(this,"Auth Code")+": "+FormP.Response.AuthCode+Environment.NewLine
 						+Lan.g(this,"Ref Number")+": "+FormP.Response.RefNumber;
 					textNote.Select(textNote.Text.Length-1,0);
@@ -2009,6 +2014,7 @@ namespace OpenDental {
 				if(FormP.TranType==PayConnectService.transType.SALE || FormP.TranType==PayConnectService.transType.AUTH) {
 					textAmount.Text=FormP.AmountCharged;//Preserve the amount so the user can try the payment again more easily.
 				}
+				_isCCDeclined=true;
 			}
 		}
 
@@ -2195,6 +2201,11 @@ namespace OpenDental {
 					return false;
 				}
 			}
+			if(_isCCDeclined) {
+				textAmount.Text="0.00";//So that a declined transaction does not affect account balance
+				_listPaySplits.ForEach(x => x.SplitAmt=0);
+				textTotal.Text="0.00";
+			}
 			if(IsNew) {
 				//prevents backdating of initial payment
 				if(!Security.IsAuthorized(Permissions.PaymentCreate,PIn.Date(textDate.Text))) {
@@ -2303,8 +2314,10 @@ namespace OpenDental {
 			}
 			else {
 				if(_listPaySplits.Count==0) {//Existing payment with no splits.
-					if(Payments.AllocationRequired(_paymentCur.PayAmt,_paymentCur.PatNum)
-						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?")) {
+					if(!_isCCDeclined
+						&& Payments.AllocationRequired(_paymentCur.PayAmt,_paymentCur.PatNum)
+						&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Apply part of payment to other family members?"))
+					{
 						_listPaySplits=Payments.Allocate(_paymentCur);//PayAmt needs to be set first
 					}
 					else {//Either no allocation required, or user does not want to allocate.  Just add one split.
