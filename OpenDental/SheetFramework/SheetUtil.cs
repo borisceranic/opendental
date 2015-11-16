@@ -905,6 +905,7 @@ namespace OpenDental{
 					Patient p=Patients.GetPat(PIn.Long(t.TableName.Replace("account","")))??Patients.GetPat(stmt.PatNum);
 					retVal.Rows.Add(
 						"",//"AdjNum"          
+						"",//"AbbrDesc"
 						"",//"balance"         
 						0,//"balanceDouble"   
 						"",//"charges"         
