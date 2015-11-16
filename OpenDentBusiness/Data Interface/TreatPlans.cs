@@ -40,6 +40,15 @@ namespace OpenDentBusiness{
 			return Crud.TreatPlanCrud.SelectOne(treatPlanNum);
 		}
 
+		///<summary>Gets the first Active TP from the DB for the patient.  Returns null if no Active TP is found for this patient.</summary>
+		public static TreatPlan GetActiveForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<TreatPlan>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM treatplan WHERE PatNum="+POut.Long(patNum)+" AND TPStatus="+POut.Int((int)TreatPlanStatus.Active);
+			return Crud.TreatPlanCrud.SelectOne(command);
+		}
+
 		///<summary></summary>
 		public static void Update(TreatPlan tp){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -136,6 +145,10 @@ namespace OpenDentBusiness{
 				//Add TreatPlanAttaches for procedures that need it.
 				foreach(Procedure tpProc in listProceduresActiveTP) {
 					if(listActiveTreatPlanAttaches.Any(x => x.ProcNum==tpProc.ProcNum)) {
+						//if TpAttach exists for this proc, set the proc priority to the TpAttach priority
+						Procedure procClone=tpProc.Copy();
+						tpProc.Priority=listActiveTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==tpProc.ProcNum).Priority;//TpAttach exists, null safe
+						Procedures.Update(tpProc,procClone);
 						continue; //TP procedure is already attached to the active plan.
 					}
 					TreatPlanAttaches.Insert(new TreatPlanAttach() {ProcNum=tpProc.ProcNum,TreatPlanNum=activePlan.TreatPlanNum,Priority=tpProc.Priority});
@@ -154,9 +167,18 @@ namespace OpenDentBusiness{
 			#endregion
 			TreatPlanAttaches.DeleteOrphaned();
 			#region Orphans and Unassigned TP
+			//get all treatplanattaches for the patient
 			List<TreatPlanAttach> listTPAttaches=TreatPlanAttaches.GetAllForPatNum(patNum);
+			//get all TPi procs for the patient
+			List<Procedure> listProcTPiAll=listProcsAll.FindAll(x => x.ProcStatus==ProcStat.TPi);// Procedures.GetProcsByStatusForPat(patNum,new[] { ProcStat.TPi });
+			//set all TPi proc priorities to 0
+			foreach(Procedure procTPi in listProcTPiAll) {
+				Procedure procClone=procTPi.Copy();
+				procTPi.Priority=0;
+				Procedures.Update(procTPi,procClone);
+			}
 			//Find all TPi Procedures that do not have a treatplanattach
-			List<Procedure> listProcTPiOrphans=Procedures.GetProcsByStatusForPat(patNum,new[] { ProcStat.TPi }).FindAll(x => listTPAttaches.All(y => y.ProcNum!=x.ProcNum));
+			List<Procedure> listProcTPiOrphans=listProcTPiAll.FindAll(x => listTPAttaches.All(y => y.ProcNum!=x.ProcNum));
 			TreatPlan unassignedPlan=listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Inactive && x.Heading==Lans.g("TreatPlans","Unassigned"));
 			if(listProcTPiOrphans.Count>0) {
 				if(unassignedPlan==null) {
@@ -170,7 +192,7 @@ namespace OpenDentBusiness{
 					listTreatPlans.Add(unassignedPlan);
 				}
 				listProcTPiOrphans
-					.ForEach(x => TreatPlanAttaches.Insert(new TreatPlanAttach() {TreatPlanNum=unassignedPlan.TreatPlanNum,ProcNum=x.ProcNum,Priority=x.Priority}));
+					.ForEach(x => TreatPlanAttaches.Insert(new TreatPlanAttach() { TreatPlanNum=unassignedPlan.TreatPlanNum,ProcNum=x.ProcNum,Priority=0 }));
 				return;
 			}
 			if(unassignedPlan==null) {
@@ -179,7 +201,13 @@ namespace OpenDentBusiness{
 			//remove procedures from the orphaned treatment plan if they are attached to other TPs
 			List<TreatPlanAttach> listTPAOrphans=listTPAttaches.FindAll(x => x.TreatPlanNum==unassignedPlan.TreatPlanNum);
 			TreatPlanAttaches.DeleteMany(listTPAOrphans.FindAll(x => listTPAttaches.FindAll(y => x.ProcNum==y.ProcNum).Count>1));
-			if(TreatPlanAttaches.GetAllForTreatPlan(unassignedPlan.TreatPlanNum).Count==0) {
+			//set all unassigned TreatPlanAttaches to priority 0 and if there are any left 
+			List<TreatPlanAttach> listTpAttaches=TreatPlanAttaches.GetAllForTreatPlan(unassignedPlan.TreatPlanNum);
+			if(listTpAttaches.Count>0) {
+				listTpAttaches.ForEach(x => x.Priority=0);
+				TreatPlanAttaches.Sync(listTpAttaches,unassignedPlan.TreatPlanNum);
+			}
+			else {
 				Crud.TreatPlanCrud.Delete(unassignedPlan.TreatPlanNum);
 			}
 			#endregion
@@ -196,7 +224,10 @@ namespace OpenDentBusiness{
 			return Crud.TreatPlanCrud.SelectOne(command)??new TreatPlan();
 		}
 
-		public static void SetActive(TreatPlan treatPlanCur) {
+		///<summary>Called after setting the status to treatPlanCur to Active.
+		///Updates the status of any other plan with Active status to Inactive.
+		///If the original heading of the other plan is "Active Treatment Plan" it will be updated to "Inactive Treatment Plan".</summary>
+		public static void SetOtherActiveTPsToInactive(TreatPlan treatPlanCur) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),treatPlanCur);
 				return;
@@ -218,8 +249,9 @@ namespace OpenDentBusiness{
 			//if(treatPlanCur.Heading==Lans.g("TreatPlan","Inactive Treatment Plan")) {
 			//	treatPlanCur.Heading=Lans.g("TreatPlan","Active Treatment Plan");
 			//}
-			treatPlanCur.TPStatus=TreatPlanStatus.Active;
-			TreatPlans.Update(treatPlanCur);
+			//Not necessary, treatPlanCur should be set to Active prior to calling this function.
+			//treatPlanCur.TPStatus=TreatPlanStatus.Active;
+			//TreatPlans.Update(treatPlanCur);
 		}
 
 
