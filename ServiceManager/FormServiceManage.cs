@@ -12,6 +12,8 @@ namespace ServiceManager {
 		///<summary>Indicates if a service was successfully installed while the service manager was showing.</summary>
 		public bool HadServiceInstalled=false;
 		private bool _isInstallOnly=false;
+		///<summary>[CurrentDirectory]/InstallUtil/installutil.exe</summary>
+		private string _installUtilPath=Path.Combine(Directory.GetCurrentDirectory(),"InstallUtil","installutil.exe");
 
 		private FileInfo _serviceFile {
 			get {
@@ -121,7 +123,7 @@ namespace ServiceManager {
 			try {
 				Process process=new Process();
 				process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
-				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
+				process.StartInfo.FileName=_installUtilPath;
 				//new strategy for having control over servicename
 				//InstallUtil /ServiceName=OpenDentHL7_abc OpenDentHL7.exe
 				process.StartInfo.Arguments="/ServiceName="+textName.Text+" \""+_serviceFile.FullName+"\"";
@@ -150,7 +152,7 @@ namespace ServiceManager {
 				RegistryKey hklm=Registry.LocalMachine;
 				Process process=new Process();
 				process.StartInfo.WorkingDirectory=_serviceFile.DirectoryName;
-				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
+				process.StartInfo.FileName=_installUtilPath;
 				process.StartInfo.Arguments="/u /ServiceName="+textName.Text+" \""+_serviceFile.FullName+"\"";
 				process.Start();
 				process.WaitForExit(10000);
