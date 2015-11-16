@@ -31,6 +31,10 @@ namespace OpenDental{
 		private UI.ODGrid gridAttachments;
 		private UI.Button butSubjectFields;
 		private List<EmailAttach> _listEmailAttachDisplayed;
+		private ContextMenu contextMenuAttachments;
+		private MenuItem menuItemOpen;
+		private MenuItem menuItemRename;
+		private MenuItem menuItemRemove;
 		private List<EmailAttach> _listEmailAttachOld=new List<EmailAttach>();
 
 		///<summary></summary>
@@ -78,6 +82,10 @@ namespace OpenDental{
 			this.butSubjectFields = new OpenDental.UI.Button();
 			this.butAttach = new OpenDental.UI.Button();
 			this.gridAttachments = new OpenDental.UI.ODGrid();
+			this.contextMenuAttachments = new System.Windows.Forms.ContextMenu();
+			this.menuItemOpen = new System.Windows.Forms.MenuItem();
+			this.menuItemRename = new System.Windows.Forms.MenuItem();
+			this.menuItemRemove = new System.Windows.Forms.MenuItem();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -240,6 +248,33 @@ namespace OpenDental{
 			this.gridAttachments.Title = "Attachments";
 			this.gridAttachments.TranslationName = null;
 			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
+			this.gridAttachments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridAttachments_MouseDown);
+			// 
+			// contextMenuAttachments
+			// 
+			this.contextMenuAttachments.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemOpen,
+            this.menuItemRename,
+            this.menuItemRemove});
+			this.contextMenuAttachments.Popup += new System.EventHandler(this.contextMenuAttachments_Popup);
+			// 
+			// menuItemOpen
+			// 
+			this.menuItemOpen.Index = 0;
+			this.menuItemOpen.Text = "Open";
+			this.menuItemOpen.Click += new System.EventHandler(this.menuItemOpen_Click);
+			// 
+			// menuItemRename
+			// 
+			this.menuItemRename.Index = 1;
+			this.menuItemRename.Text = "Rename";
+			this.menuItemRename.Click += new System.EventHandler(this.menuItemRename_Click);
+			// 
+			// menuItemRemove
+			// 
+			this.menuItemRemove.Index = 2;
+			this.menuItemRemove.Text = "Remove";
+			this.menuItemRemove.Click += new System.EventHandler(this.menuItemRemove_Click);
 			// 
 			// FormEmailTemplateEdit
 			// 
@@ -270,6 +305,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormEmailTemplateEdit_Load(object sender, System.EventArgs e) {
+			gridAttachments.ContextMenu=contextMenuAttachments;
 			textSubject.Text=ETcur.Subject;
 			textBodyText.Text=ETcur.BodyText;
 			textDescription.Text=ETcur.Description;
@@ -279,13 +315,13 @@ namespace OpenDental{
 			else {
 				_listEmailAttachDisplayed=EmailAttaches.GetForTemplate(ETcur.EmailTemplateNum); 
 				foreach(EmailAttach attachment in _listEmailAttachDisplayed) {
-					_listEmailAttachOld.Add(attachment);
+					_listEmailAttachOld.Add(attachment.Copy());
 				}
 			}
 			FillAttachments();
 		}
 
-		public void FillAttachments() {
+		private void FillAttachments() {
 			gridAttachments.BeginUpdate();
 			gridAttachments.Rows.Clear();
 			gridAttachments.Columns.Clear();
@@ -298,6 +334,19 @@ namespace OpenDental{
 			gridAttachments.EndUpdate();
 			if(gridAttachments.Rows.Count>0) {
 				gridAttachments.SetSelected(0,true);
+			}
+		}
+
+		private void OpenFile() {
+			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
+			string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailAttach.ActualFileName);
+			try {
+				string tempFile=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),emailAttach.DisplayedFileName);
+				File.Copy(strFilePathAttach,tempFile,true);
+				Process.Start(tempFile);
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
 			}
 		}
 
@@ -321,16 +370,7 @@ namespace OpenDental{
 		}
 
 		private void gridAttachments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
-			string strFilePathAttach=ODFileUtils.CombinePaths(EmailAttaches.GetAttachPath(),emailAttach.ActualFileName);
-			try {
-				string tempFile=ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),emailAttach.DisplayedFileName);
-				File.Copy(strFilePathAttach,tempFile,true);
-				Process.Start(tempFile);
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-			}
+			OpenFile();
 		}
 
 		private void butSubjectFields_Click(object sender,EventArgs e) {
@@ -351,6 +391,49 @@ namespace OpenDental{
 			if(FormMR.DialogResult==DialogResult.OK) {
 				textBodyText.SelectedText=FormMR.Replacement;
 			}
+		}
+
+		private void gridAttachments_MouseDown(object sender,MouseEventArgs e) {
+			//A right click also needs to select an items so that the context menu will work properly.
+			if(e.Button==MouseButtons.Right) {
+				int clickedIndex=gridAttachments.PointToRow(e.Y);
+				if(clickedIndex!=-1) {
+					gridAttachments.SetSelected(clickedIndex,true);
+				}
+			}
+		}
+
+		private void contextMenuAttachments_Popup(object sender,EventArgs e) {
+			menuItemOpen.Enabled=false;
+			menuItemRename.Enabled=false;
+			menuItemRemove.Enabled=false;
+			if(gridAttachments.SelectedIndices.Length > 0) {
+				menuItemOpen.Enabled=true;
+				menuItemRename.Enabled=true;
+				menuItemRemove.Enabled=true;
+			}
+		}
+
+		private void menuItemOpen_Click(object sender,EventArgs e) {
+			OpenFile();
+		}
+
+		private void menuItemRename_Click(object sender,EventArgs e) {
+			InputBox input=new InputBox(Lan.g(this,"Filename"));
+			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
+			input.textResult.Text=emailAttach.DisplayedFileName;
+			input.ShowDialog();
+			if(input.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			emailAttach.DisplayedFileName=input.textResult.Text;
+			FillAttachments();
+		}
+
+		private void menuItemRemove_Click(object sender,EventArgs e) {
+			EmailAttach emailAttach=_listEmailAttachDisplayed[gridAttachments.SelectedIndices[0]];
+			_listEmailAttachDisplayed.Remove(emailAttach);
+			FillAttachments();
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
