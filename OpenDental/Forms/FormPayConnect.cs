@@ -254,7 +254,7 @@ namespace OpenDental {
 			result+=request.CardNumber.Substring(request.CardNumber.Length-4)+Environment.NewLine;//last 4 digits of card number only.
 			result+="Exp Date".PadRight(xright-xleft,'.')+request.Expiration.month.ToString().PadLeft(2,'0')+(request.Expiration.year%100)+Environment.NewLine;
 			result+="Card Type".PadRight(xright-xleft,'.')+CreditCardUtils.GetType(request.CardNumber)+Environment.NewLine;
-			result+="Entry".PadRight(xright-xleft,'.')+(request.MagData==""?"Manual":"Swiped")+Environment.NewLine;
+			result+="Entry".PadRight(xright-xleft,'.')+(String.IsNullOrEmpty(request.MagData)?"Manual":"Swiped")+Environment.NewLine;
 			result+="Auth Code".PadRight(xright-xleft,'.')+response.AuthCode+Environment.NewLine;
 			result+="Result".PadRight(xright-xleft,'.')+response.Status.description+Environment.NewLine;			
 			if(response.Messages!=null) {
