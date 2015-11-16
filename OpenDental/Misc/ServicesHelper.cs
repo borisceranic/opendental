@@ -15,12 +15,14 @@ namespace OpenDental {
 	///<summary>This is a helper class meant to be used by Open Dental to easily manage Windows services.
 	///It is flagged as internal because the logic within this class requires valid paths relative to the OpenDental.exe (../Install dir)</summary>
 	internal class ServicesHelper {
+		///<summary>[CurrentDirectory]/InstallUtil/installutil.exe</summary>
+		private static string _installUtilPath=Path.Combine(Directory.GetCurrentDirectory(),"InstallUtil","installutil.exe");
 
 		///<summary>Returns true if the service was installed successfully.</summary>
 		public static bool Install(string serviceName,FileInfo fileInfo) {
 			try {
 				Process process=new Process();
-				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"InstallUtil","installutil.exe");
+				process.StartInfo.FileName=_installUtilPath;
 				//new strategy for having control over servicename
 				//InstallUtil /ServiceName=OpenDentHL7_abc OpenDentHL7.exe
 				process.StartInfo.Arguments="/ServiceName="+serviceName+" \""+fileInfo.FullName+"\"";
@@ -62,7 +64,7 @@ namespace OpenDental {
 				FileInfo serviceFile=new FileInfo(imagePath);
 				Process process=new Process();
 				process.StartInfo.WorkingDirectory=serviceFile.DirectoryName;
-				process.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(),"installutil.exe");
+				process.StartInfo.FileName=_installUtilPath;
 				process.StartInfo.Arguments="/u /ServiceName="+service.ServiceName+" "+serviceFile.FullName;
 				process.Start();
 				process.WaitForExit(10000);//Wait 10 seconds to give the user's computer opportunity to process the uninstall.
