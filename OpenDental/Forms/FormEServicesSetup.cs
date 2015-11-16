@@ -158,6 +158,16 @@ namespace OpenDental {
 			listBoxWebSchedProviderPref.SelectedIndex=PrefC.GetInt(PrefName.WebSchedProviderRule);
 			#endregion
 			#region Listener Service
+			//Check to see if the eConnector service is already installed.  If it is, disable the install button.
+			//Users who want to install multiple on one computer can use the Service Manager instead.
+			try {
+				if(ServicesHelper.GetServicesByExe("OpenDentalEConnector.exe").Count > 0) {
+					butInstallEConnector.Enabled=false;
+				}
+			}
+			catch(Exception) {
+				//Do nothing.  The Install button will simply be visible.
+			}
 			FillTextListenerServiceStatus();
 			FillGridListenerService();
 			#endregion
@@ -1209,30 +1219,62 @@ namespace OpenDental {
 		}
 
 		private void butInstallEConnector_Click(object sender,EventArgs e) {
+			//Check to see if the update server preference is set.
+			//If set, make sure that this is set to the computer currently logged on.
+			DialogResult result;
+			string updateServerName=PrefC.GetString(PrefName.WebServiceServerName);
+			if(!string.IsNullOrEmpty(updateServerName) && !ODEnvironment.IdIsThisComputer(updateServerName.ToLower())) {
+				result=MessageBox.Show(Lan.g(this,"The eConnector service should be installed on the Update Server")+": "+updateServerName+"\r\n"
+					+Lan.g(this,"Are you trying to install the eConnector on a different computer by accident?"),"",MessageBoxButtons.YesNoCancel);
+				//Only saying No to this message box pop up will allow the user to continue (meaning they fully understand what they are getting into).
+				if(result!=DialogResult.No) {
+					return;
+				}
+			}
+			//Only ask the user if they want to set the Update Server Name preference if it is not already set.
+			if(string.IsNullOrEmpty(updateServerName)) {
+				result=MessageBox.Show(Lan.g(this,"The computer that has the eConnector service installed should be set as the Update Server.")+"\r\n"
+					+Lan.g(this,"Would you like to make this computer the Update Server?"),"",MessageBoxButtons.YesNoCancel);
+				if(result==DialogResult.Cancel) {
+					return;
+				}
+				else if(result==DialogResult.Yes) {
+					Prefs.UpdateString(PrefName.WebServiceServerName,Dns.GetHostName());
+					_changed=true;
+				}
+			}
+			//At this point the user wants to install the eConnector service (or upgrade the old cust listener to the eConnector).
 			bool isListening;
 			if(!ServicesHelper.UpgradeOrInstallEConnector(false,out isListening)) {
+				//Warning messages would have already been shown to the user, simply return.
 				return;
 			}
-			bool startListenerCommunications=false;
-			string messageStartListener=Lan.g(this,"The eConnector you installed is currently not accepting inbound communication.")+"  "
-				+Lan.g(this,"eServices will not work as expected untill inbound communication is allowed.")+"\r\n\r\n"
-				+Lan.g(this,"Do you want to start accepting inbound communication?");
-			if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.YesNo)==DialogResult.Yes) {
-				startListenerCommunications=true;
-			}
-			Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
-			try {
-				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
-					OpenDentBusiness.WebServiceMainHQProxy.GetWebServiceMainHQInstance().SetEConnectorType(
-						WebSerializer.SerializePrimitive<string>(OpenDentBusiness.PrefC.GetString(OpenDentBusiness.PrefName.RegistrationKey)),
-						startListenerCommunications
-					)
-				);
-			}
-			catch(Exception) {
-				//Telling HQ about the EConnectorType failed.  This information will get to HQ eventually via heartbeats so it's not important to tell users.
+			//The eConnector service was successfully installed and is running.
+			//If this is the first time installing the eConnector, ask them if they are willing to accept inbound comms from Open Dental.
+			if(!PrefC.GetBool(PrefName.EConnectorEnabled)) {
+				bool startListenerCommunications=false;
+				string messageStartListener=Lan.g(this,"The eConnector you installed is currently not accepting inbound communication.")+"  "
+					+Lan.g(this,"eServices will not work as expected untill inbound communication is allowed.")+"\r\n\r\n"
+					+Lan.g(this,"Do you want to start accepting inbound communication?");
+				if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.YesNo)==DialogResult.Yes) {
+					startListenerCommunications=true;
+				}
+				Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
+				_changed=true;
+				try {
+					_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+						OpenDentBusiness.WebServiceMainHQProxy.GetWebServiceMainHQInstance().SetEConnectorType(
+							WebSerializer.SerializePrimitive<string>(OpenDentBusiness.PrefC.GetString(OpenDentBusiness.PrefName.RegistrationKey)),
+							startListenerCommunications
+						)
+					);
+				}
+				catch(Exception) {
+				}
 			}
 			SetEConnectorCommunicationStatus();
+			MsgBox.Show(this,"eConnector successfully installed");
+			butInstallEConnector.Enabled=false;
 			FillTextListenerServiceStatus();
 			FillGridListenerService();
 		}
