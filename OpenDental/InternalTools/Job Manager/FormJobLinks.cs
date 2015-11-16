@@ -61,7 +61,7 @@ namespace OpenDental {
 					row.Cells.Add("Under Construction");
 				}
 				else if(_jobLinks[i].LinkType==JobLinkType.Request) {
-					row.Cells.Add("Under Construction");
+					row.Cells.Add("Feature Request #"+_jobLinks[i].FKey);
 				}
 				else if(_jobLinks[i].LinkType==JobLinkType.Quote) {
 					JobQuote quote=JobQuotes.GetOne(_jobLinks[i].FKey);
@@ -95,6 +95,11 @@ namespace OpenDental {
 					FillGrid();
 					break;
 				case JobLinkType.Request:
+					FormRequestEdit FormRE=new FormRequestEdit();
+					FormRE.RequestId=_jobLinks[gridMain.SelectedIndices[0]].FKey;
+					FormRE.IsAdminMode=true;
+					FormRE.ShowDialog();
+					FillGrid();
 					break;
 				case JobLinkType.Bug:
 					break;
@@ -129,8 +134,19 @@ namespace OpenDental {
 		}
 
 		private void butLinkFeatReq_Click(object sender,EventArgs e) {
-			//FormFeatureRequest FormFR=new FormFeatureRequest();
-			MsgBox.Show(this,"This functionality is not yet implemented. Stay tuned for updates.");
+			FormFeatureRequest FormFR=new FormFeatureRequest();
+			FormFR.IsSelectionMode=true;
+			FormFR.ShowDialog();
+			if(FormFR.DialogResult==DialogResult.OK) {
+				JobLink jobLink=new JobLink();
+				jobLink.JobNum=_jobNum;
+				jobLink.FKey=FormFR.SelectedFeatureNum;
+				jobLink.LinkType=JobLinkType.Request;
+				JobLinks.Insert(jobLink);
+				_jobLinks=JobLinks.GetJobLinks(_jobNum);
+				_hasChanged=true;
+				FillGrid();
+			}
 		}
 
 		private void butLinkQuote_Click(object sender,EventArgs e) {

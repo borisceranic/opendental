@@ -87,7 +87,6 @@ namespace OpenDental{
 			this.butLinkFeatReq.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLinkFeatReq.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLinkFeatReq.CornerRadius = 4F;
-			this.butLinkFeatReq.Enabled = false;
 			this.butLinkFeatReq.Location = new System.Drawing.Point(6, 47);
 			this.butLinkFeatReq.Name = "butLinkFeatReq";
 			this.butLinkFeatReq.Size = new System.Drawing.Size(77, 22);
