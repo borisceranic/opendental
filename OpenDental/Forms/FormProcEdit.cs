@@ -19,6 +19,7 @@ using CodeBase;
 using SparksToothChart;
 using OpenDental.UI;
 using System.Threading;
+using System.Linq;
 
 
 namespace OpenDental{
@@ -5616,6 +5617,16 @@ namespace OpenDental{
 			}
 			//The actual update----------------------------------------------------------------------------------------------------------------------------------
 			Procedures.Update(ProcCur,ProcOld);
+			if(ProcCur.ProcStatus==ProcStat.TP) {
+				//if proc is TP status, update priority on any TreatPlanAttach objects if they are attaching this proc to the active TP
+				TreatPlan activePlan=TreatPlans.GetActiveForPat(ProcCur.PatNum);
+				if(activePlan!=null) {
+					List<TreatPlanAttach> listTpAttaches=TreatPlanAttaches.GetAllForTreatPlan(activePlan.TreatPlanNum);
+					//should only be 0 or one TPAttach on this TP with this ProcNum
+					listTpAttaches.FindAll(x => x.ProcNum==ProcCur.ProcNum).ForEach(x => x.Priority=ProcCur.Priority);
+					TreatPlanAttaches.Sync(listTpAttaches,activePlan.TreatPlanNum);
+				}
+			}
 			if(ProcCur.AptNum>0 || ProcCur.PlannedAptNum>0) {
 				//Update the ProcDescript on the appointment if procedure is attached to one.
 				//The ApptProcDescript region is also in FormApptEdit.UpdateToDB() and FormDatabaseMaintenance.butApptProcs_Click()  Make any changes there as well.

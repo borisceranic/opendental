@@ -6189,6 +6189,9 @@ namespace OpenDental{
 			for(int i=0;i<gridTreatPlans.Rows.Count && listTreatPlanNums.Count>0;i++) {
 				gridTreatPlans.SetSelected(i,listTreatPlanNums.Contains(_listTreatPlans[i].TreatPlanNum));
 			}
+			if(gridTreatPlans.GetSelectedIndex()>-1) {
+				gridTreatPlans.ScrollToIndex(gridTreatPlans.GetSelectedIndex());
+			}
 			FillTpProcs();
 			//create a copy of the original _procList for filling the tooth chart with all procs. Deep copy of filtered list required.
 			_procListOrig=new List<DataRow>();
@@ -10488,7 +10491,7 @@ namespace OpenDental{
 			}
 			List<long> selectedTpNums=new List<long>();
 			selectedTpNums.AddRange(gridTreatPlans.SelectedIndices.Select(x => _listTreatPlans[x].TreatPlanNum));
-			//Priority of Procedures is dependent on which TP it is attached to. Track selected procedures by TP and Proc
+			//Priority of Procedures is dependent on which TP it is attached to. Track selected procedures by TPNum and ProcNum
 			List<Tuple<long,long>> selectedTpNumProcNums=new List<Tuple<long,long>>();
 			selectedTpNumProcNums.AddRange(gridTpProcs.SelectedIndices.Where(x => gridTpProcs.Rows[x].Tag!=null).Select(x => (ProcTP)gridTpProcs.Rows[x].Tag)
 				.Select(x => new Tuple<long,long>(x.TreatPlanNum,x.ProcNumOrig)));
@@ -10509,6 +10512,7 @@ namespace OpenDental{
 			}
 			listAllTpAttaches.Select(x => x.TreatPlanNum).Distinct().ToList()
 				.ForEach(x => TreatPlanAttaches.Sync(listAllTpAttaches.FindAll(y => y.TreatPlanNum==x),x));//sync each TP seperately
+			TreatPlans.AuditPlans(PatCur.PatNum);//consider adding logic here to update active plan priorities instead of calling the entire AuditPlans function
 			selectedTpNums.ForEach(x => gridTreatPlans.SetSelected(_listTreatPlans.IndexOf(_listTreatPlans.FirstOrDefault(y => y.TreatPlanNum==x)),true));
 			FillTpProcs();
 			//Reselect TPs and Procs.
@@ -10574,11 +10578,16 @@ namespace OpenDental{
 			FormTreatPlanCurEdit FormTPC=new FormTreatPlanCurEdit();
 			FormTPC.TreatPlanCur=tpSelected;
 			FormTPC.ShowDialog();
-			ModuleSelected(PatCur.PatNum);
-			//reselect TPs and procs
+			if(FormTPC.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			FillTreatPlans();
 			_listTreatPlans.ForEach(x => gridTreatPlans.SetSelected(_listTreatPlans.IndexOf(_listTreatPlans.FirstOrDefault(y => y.TreatPlanNum==x.TreatPlanNum)),
-				tpSelected.TreatPlanNum==x.TreatPlanNum));
-			FillTpProcs();
+				FormTPC.TreatPlanCur.TreatPlanNum==x.TreatPlanNum));
+			if(gridTreatPlans.GetSelectedIndex()>-1) {
+				gridTreatPlans.ScrollToIndex(gridTreatPlans.GetSelectedIndex());
+			}
+			ModuleSelected(PatCur.PatNum);
 		}
 
 		private void gridTpProcs_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -11067,10 +11076,13 @@ namespace OpenDental{
 			if(FormTPCE.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ModuleSelected(PatCur.PatNum);//refreshes TPs
+			FillTreatPlans();
 			_listTreatPlans.ForEach(x => gridTreatPlans.SetSelected(_listTreatPlans.IndexOf(_listTreatPlans.FirstOrDefault(y => y.TreatPlanNum==x.TreatPlanNum)),
 				FormTPCE.TreatPlanCur.TreatPlanNum==x.TreatPlanNum));
-			gridTreatPlans.ScrollToIndex(gridTreatPlans.GetSelectedIndex());
+			if(gridTreatPlans.GetSelectedIndex()>-1) {
+				gridTreatPlans.ScrollToIndex(gridTreatPlans.GetSelectedIndex());
+			}
+			ModuleSelected(PatCur.PatNum);//refreshes TPs
 		}
 
 		private void butBig_Click(object sender,EventArgs e) {
