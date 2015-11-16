@@ -102,16 +102,6 @@ namespace OpenDental {
 			textRedirectUrlPatientPortal.Text=PrefC.GetString(PrefName.PatientPortalURL);
 			textBoxNotificationSubject.Text=PrefC.GetString(PrefName.PatientPortalNotifySubject);
 			textBoxNotificationBody.Text=PrefC.GetString(PrefName.PatientPortalNotifyBody);
-			textListenerPort.Text=PrefC.GetString(PrefName.CustListenerPort);
-			try {
-				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
-					_webServiceMain.GetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)))
-				);
-				SetEConnectorCommunicationStatus();
-			}
-			catch(Exception ex) {
-				checkAllowEConnectorComm.Enabled=false;
-			}
 			#region mobile synch
 			textMobileSyncServerURL.Text=PrefC.GetString(PrefName.MobileSyncServerURL);
 			textSynchMinutes.Text=PrefC.GetInt(PrefName.MobileSyncIntervalMinutes).ToString();
@@ -158,6 +148,16 @@ namespace OpenDental {
 			listBoxWebSchedProviderPref.SelectedIndex=PrefC.GetInt(PrefName.WebSchedProviderRule);
 			#endregion
 			#region Listener Service
+			textListenerPort.Text=PrefC.GetString(PrefName.CustListenerPort);
+			try {
+				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+					_webServiceMain.GetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)))
+				);
+			}
+			catch(Exception ex) {
+				checkAllowEConnectorComm.Enabled=false;
+			}
+			SetEConnectorCommunicationStatus();
 			//Check to see if the eConnector service is already installed.  If it is, disable the install button.
 			//Users who want to install multiple on one computer can use the Service Manager instead.
 			try {
@@ -1200,6 +1200,7 @@ namespace OpenDental {
 		}
 
 		private void SetEConnectorCommunicationStatus() {
+			textEConnectorListeningType.Text=_listenerType.ToString();
 			switch(_listenerType) {
 				case ListenerServiceType.ListenerService:
 					checkAllowEConnectorComm.Checked=true;
@@ -1270,6 +1271,7 @@ namespace OpenDental {
 					);
 				}
 				catch(Exception) {
+					MsgBox.Show(this,"Could not update the eConnector communication status.  Please contact us to enable eServices.");
 				}
 			}
 			SetEConnectorCommunicationStatus();
@@ -1323,7 +1325,7 @@ namespace OpenDental {
 				SetEConnectorCommunicationStatus();
 			}
 			catch(Exception) {
-				MsgBox.Show(this,"Could not update the eConnector communication status.");
+				MsgBox.Show(this,"Could not update the eConnector communication status.  Please contact us to enable eServices.");
 				return;
 			}
 			MsgBox.Show(this,"eConnector settings saved.");

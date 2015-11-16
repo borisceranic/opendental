@@ -161,6 +161,8 @@ namespace OpenDental{
 			this.button6 = new OpenDental.UI.Button();
 			this.button7 = new OpenDental.UI.Button();
 			this.label37 = new System.Windows.Forms.Label();
+			this.textEConnectorListeningType = new System.Windows.Forms.TextBox();
+			this.label38 = new System.Windows.Forms.Label();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -374,25 +376,26 @@ namespace OpenDental{
 			// 
 			// groupBox4
 			// 
+			this.groupBox4.Controls.Add(this.textEConnectorListeningType);
+			this.groupBox4.Controls.Add(this.label38);
 			this.groupBox4.Controls.Add(this.checkAllowEConnectorComm);
 			this.groupBox4.Controls.Add(this.label11);
 			this.groupBox4.Controls.Add(this.textListenerPort);
 			this.groupBox4.Controls.Add(this.label10);
 			this.groupBox4.Controls.Add(this.butSaveListenerPort);
-			this.groupBox4.Location = new System.Drawing.Point(117, 445);
+			this.groupBox4.Location = new System.Drawing.Point(117, 424);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(711, 137);
+			this.groupBox4.Size = new System.Drawing.Size(711, 158);
 			this.groupBox4.TabIndex = 252;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "eConnector Service Settings";
 			// 
 			// checkAllowEConnectorComm
 			// 
-			this.checkAllowEConnectorComm.AutoSize = true;
 			this.checkAllowEConnectorComm.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkAllowEConnectorComm.Location = new System.Drawing.Point(130, 77);
+			this.checkAllowEConnectorComm.Location = new System.Drawing.Point(10, 102);
 			this.checkAllowEConnectorComm.Name = "checkAllowEConnectorComm";
-			this.checkAllowEConnectorComm.Size = new System.Drawing.Size(252, 17);
+			this.checkAllowEConnectorComm.Size = new System.Drawing.Size(372, 17);
 			this.checkAllowEConnectorComm.TabIndex = 244;
 			this.checkAllowEConnectorComm.Text = "Allow eConnector to communicate for eServices";
 			this.checkAllowEConnectorComm.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -439,7 +442,7 @@ namespace OpenDental{
 			this.butSaveListenerPort.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSaveListenerPort.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSaveListenerPort.CornerRadius = 4F;
-			this.butSaveListenerPort.Location = new System.Drawing.Point(323, 104);
+			this.butSaveListenerPort.Location = new System.Drawing.Point(323, 125);
 			this.butSaveListenerPort.Name = "butSaveListenerPort";
 			this.butSaveListenerPort.Size = new System.Drawing.Size(61, 24);
 			this.butSaveListenerPort.TabIndex = 243;
@@ -450,7 +453,7 @@ namespace OpenDental{
 			// 
 			this.label25.Location = new System.Drawing.Point(6, 8);
 			this.label25.Name = "label25";
-			this.label25.Size = new System.Drawing.Size(932, 84);
+			this.label25.Size = new System.Drawing.Size(932, 68);
 			this.label25.TabIndex = 251;
 			this.label25.Text = resources.GetString("label25.Text");
 			// 
@@ -468,7 +471,7 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.labelListenerStatus);
 			this.groupBox3.Controls.Add(this.butListenerAlertsOff);
 			this.groupBox3.Controls.Add(this.textListenerServiceStatus);
-			this.groupBox3.Location = new System.Drawing.Point(9, 100);
+			this.groupBox3.Location = new System.Drawing.Point(9, 79);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(929, 339);
 			this.groupBox3.TabIndex = 249;
@@ -1857,6 +1860,24 @@ namespace OpenDental{
 			this.label37.Size = new System.Drawing.Size(100, 23);
 			this.label37.TabIndex = 0;
 			// 
+			// textEConnectorListeningType
+			// 
+			this.textEConnectorListeningType.Location = new System.Drawing.Point(282, 78);
+			this.textEConnectorListeningType.Name = "textEConnectorListeningType";
+			this.textEConnectorListeningType.ReadOnly = true;
+			this.textEConnectorListeningType.Size = new System.Drawing.Size(100, 20);
+			this.textEConnectorListeningType.TabIndex = 249;
+			// 
+			// label38
+			// 
+			this.label38.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label38.Location = new System.Drawing.Point(91, 79);
+			this.label38.Name = "label38";
+			this.label38.Size = new System.Drawing.Size(185, 17);
+			this.label38.TabIndex = 248;
+			this.label38.Text = "eConnector Listening Type";
+			this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormEServicesSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2041,6 +2062,8 @@ namespace OpenDental{
 		private UI.Button button7;
 		private UI.Button butInstallEConnector;
 		private System.Windows.Forms.CheckBox checkAllowEConnectorComm;
+		private System.Windows.Forms.TextBox textEConnectorListeningType;
+		private System.Windows.Forms.Label label38;
 
 	}
 }
