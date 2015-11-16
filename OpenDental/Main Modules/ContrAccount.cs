@@ -3858,7 +3858,7 @@ namespace OpenDental {
 				if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()!="0") {//the selected item is a proc
 					Procedure proc=Procedures.GetOneProc(PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()),false);
 					if(proc.PatNum!=PatCur.PatNum) {
-						MsgBox.Show(this,"You can only select procedures or adjustments for the currently patient on an invoice.");
+						MsgBox.Show(this,"You can only select procedures or adjustments for the current patient on an invoice.");
 						gridAccount.SetSelected(false);
 						return;
 					}
