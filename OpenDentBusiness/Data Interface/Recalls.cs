@@ -1478,6 +1478,9 @@ namespace OpenDentBusiness{
 			for(int i=0;i<table.Rows.Count;i++) {
 				recallNums.Add(PIn.Long(table.Rows[i]["RecallNum"].ToString()));
 			}
+			if(recallNums.Count==0) {
+				return "Did not send recall notifications for Web Sched.  There are no recalls to send notifications for.";
+			}
 			return SendWebSchedNotifications(recallNums,PrefC.GetBool(PrefName.RecallGroupByFamily),RecallListSort.Alphabetical);
 		}
 
