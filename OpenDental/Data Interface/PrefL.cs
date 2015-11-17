@@ -244,30 +244,52 @@ namespace OpenDental {
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
 				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,DateTime.Now);
 				Cache.Refresh(InvalidType.Prefs);
-				//If this is the Update Server computer, we need to check if they have upgraded the CustListener service to the eConnector.
-				if(PrefC.GetString(PrefName.WebServiceServerName)!="" 
-					&& ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower())
-					&& !PrefC.GetBool(PrefName.EConnectorEnabled))
-				{
-					//Customer has not upgraded to the eConnector service.
-					bool isListening;
-					//if isSilent=false, a messagebox will be displayed if anything goes wrong.
-					if(ServicesHelper.UpgradeOrInstallEConnector(isSilent,out isListening)) {
-						Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
+				bool needsEConnectorUpgrade=false;
+				//Check to see if the eConnector has ever been installed.  Warn them about potential complications due to converting to eConnector.
+				//This only needs to happen once due to transitioning users over to the new eConnector service.
+				if(!PrefC.GetBool(PrefName.EConnectorEnabled)) {
+					//This upgrade might require converting the CustListener service over to the eConnector.
+					if(PrefC.GetString(PrefName.WebServiceServerName)=="") {
+						//There isn't an "Update Server Name" set so we don't know if this is the correct computer that should be running the eConnector.
+						//Check to see if it currently has the listener installed on it and if it does, upgrade it to the eConnector.
+						//Otherwise, warn them that their eServices might not work.
+						int countCustListeners=0;
 						try {
-							WebServiceMainHQ webServiceMain=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
-							webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)),isListening);
+							countCustListeners=ServicesHelper.GetServicesByExe("OpenDentalCustListener.exe").Count;
 						}
-						catch(Exception ex) {
-							if(!isSilent) {
-								//We probably don't want to notify them that a connection to HQ to update their listener type has failed.  Or do we?
-							}
+						catch(Exception) {
+							//Do nothing and assume no CustListeners are installed.
+						}
+						if(countCustListeners > 0) {
+							needsEConnectorUpgrade=true;//This computer is not set as the upgrade server but is upgrading and DOES have a listener present.
+						}
+						else if(!isSilent) {//Warn the user that their eServices will go down.
+							MsgBox.Show("PrefL","If you currently use any eServices like the Patient Portal or Integrated Texting, these services will not work correctly until you upgrade your Listener service to the new eConnector service.  Please call us to help upgrade your eServices.");
 						}
 					}
-					else {//Upgrading to eConnector failed.
-						//Purposefully do not fail the upgrade if automatically upgrading to the eConnector failed.
-						//The user will call us up when their eServices are no longer working and we will be able to assist them in installing the new service.
-						//NEVER update the EConnectorEnabled preference to false.  There is no such thing.  It is used as a one time flag.
+					//The "Update Server Name" preference is set to something so check to see if this is the Update Server computer.
+					if(ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.WebServiceServerName).ToLower()) || needsEConnectorUpgrade) {
+						//This is the computer that the eConnector should be installed on.  Try to upgrade or install it.
+						bool isListening;
+						//if isSilent=false, a messagebox will be displayed if anything goes wrong.
+						if(ServicesHelper.UpgradeOrInstallEConnector(isSilent,out isListening)) {
+							Prefs.UpdateBool(PrefName.EConnectorEnabled,true);//No need to send an invalidate signal to other workstations.  They were kicked out.
+							try {
+								WebServiceMainHQ webServiceMain=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
+								webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)),isListening);
+							}
+							catch(Exception) {
+								if(!isSilent) {
+									//Notify the user that HQ was not updated regarding the status of the eConnector (important).
+									MsgBox.Show("PrefL","Could not update the eConnector communication status.  Please contact us to enable eServices.");
+								}
+							}
+						}
+						else {//Upgrading to eConnector failed.
+							//Purposefully do not fail the upgrade if automatically upgrading to the eConnector failed.
+							//The user will call us up when their eServices are no longer working and we will be able to assist them in installing the new service.
+							//NEVER update the EConnectorEnabled preference to false.  There is no such thing.  It is used as a one time flag.
+						}
 					}
 				}
 			}
