@@ -593,6 +593,10 @@ namespace OpenDental{
 			if(RepeatCur.CopyNoteToProc) {
 				proc.BillingNote=RepeatCur.Note;
 			}
+			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+				Patient pat=Patients.GetPat(RepeatCur.PatNum);
+				proc.SiteNum=pat.SiteNum;
+			}
 			Procedures.Insert(proc);
 			Recalls.Synch(RepeatCur.PatNum);
 			MsgBox.Show(this,"Procedure added.");

@@ -2000,7 +2000,7 @@ namespace OpenDental{
 			if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault!=0) {//Override provider for procedures with a default provider
 				proc.ProvNum=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault;
 			}
-			proc.ClinicNum=pat.ClinicNum;
+			proc.ClinicNum=AptCur.ClinicNum;
 			//Get the fee amount for medical or dental.
 			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
 				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
@@ -2871,6 +2871,9 @@ namespace OpenDental{
 					else {
 						procedureCur.ProcFee=procFee;
 					}
+					if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+						procedureCur.SiteNum=pat.SiteNum;
+					}
 					_listProcs.Add(procedureCur);
 					Procedures.Insert(procedureCur);
 					//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
@@ -2888,7 +2891,7 @@ namespace OpenDental{
 						AdjustmentCur.ProvNum=AptCur.ProvNum;
 						AdjustmentCur.PatNum=pat.PatNum;
 						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-						AdjustmentCur.ClinicNum=pat.ClinicNum;
+						AdjustmentCur.ClinicNum=AptCur.ClinicNum;
 						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
 						FormA.IsNew=true;
 						FormA.ShowDialog();
@@ -2927,7 +2930,7 @@ namespace OpenDental{
 						AdjustmentCur.ProvNum=AptCur.ProvNum;
 						AdjustmentCur.PatNum=pat.PatNum;
 						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-						AdjustmentCur.ClinicNum=pat.ClinicNum;
+						AdjustmentCur.ClinicNum=AptCur.ClinicNum;
 						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
 						FormA.IsNew=true;
 						FormA.ShowDialog();

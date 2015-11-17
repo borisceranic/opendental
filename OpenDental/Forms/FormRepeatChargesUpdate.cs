@@ -343,6 +343,10 @@ namespace OpenDental{
 			if(repeatCharge.CopyNoteToProc && !string.IsNullOrEmpty(repeatCharge.Note)) {
 				procedure.BillingNote=repeatCharge.Note;
 			}
+			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+				Patient pat=Patients.GetPat(repeatCharge.PatNum);
+				procedure.SiteNum=pat.SiteNum;
+			}
 			Procedures.Insert(procedure); //no recall synch needed because dental offices don't use this feature
 			return procedure;
 		}
