@@ -2354,6 +2354,9 @@ namespace OpenDentBusiness{
 					//This procedure is considered CPOE because the provider is the one that has added it.
 					procCur.IsCpoe=true;
 				}
+				if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+					procCur.SiteNum=patCur.SiteNum;
+				}
 				Procedures.Insert(procCur);//no recall synch required
 				Procedures.ComputeEstimates(procCur,patCur.PatNum,new List<ClaimProc>(),false,listPlans,listPatPlans,listBenifits,patCur.Age,listSubs);
 				listProcs.Add(procCur);

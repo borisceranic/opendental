@@ -4379,6 +4379,9 @@ namespace OpenDental {
 				}
 				proc.ProvNum=patProv.ProvNum;
 				proc.UnitQty=1;
+				if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+					proc.SiteNum=PatCur.SiteNum;
+				}
 				Procedures.Insert(proc);
 				FormProcEdit FormPE=new FormProcEdit(proc,PatCur,FamCur,true);
 				FormPE.IsNew=true;

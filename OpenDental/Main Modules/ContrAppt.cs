@@ -5254,6 +5254,9 @@ namespace OpenDental {
 				else {
 					procedureCur.ProcFee=procFee;
 				}
+				if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+					procedureCur.SiteNum=pat.SiteNum;
+				}
 				Procedures.Insert(procedureCur);
 				//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
 				List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
@@ -5270,7 +5273,7 @@ namespace OpenDental {
 					AdjustmentCur.ProvNum=provNum;
 					AdjustmentCur.PatNum=pat.PatNum;
 					AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-					AdjustmentCur.ClinicNum=pat.ClinicNum;
+					AdjustmentCur.ClinicNum=apt.ClinicNum;
 					FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
 					FormA.IsNew=true;
 					FormA.ShowDialog();
@@ -5309,7 +5312,7 @@ namespace OpenDental {
 					AdjustmentCur.ProvNum=provNum;
 					AdjustmentCur.PatNum=pat.PatNum;
 					AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-					AdjustmentCur.ClinicNum=pat.ClinicNum;
+					AdjustmentCur.ClinicNum=apt.ClinicNum;
 					FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
 					FormA.IsNew=true;
 					FormA.ShowDialog();
