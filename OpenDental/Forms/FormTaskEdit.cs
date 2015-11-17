@@ -1070,6 +1070,7 @@ namespace OpenDental {
 			form.TaskNoteCur.DateTimeNote=DateTime.Now;//Will be slightly adjusted at server.
 			form.TaskNoteCur.UserNum=Security.CurUser.UserNum;
 			form.TaskNoteCur.IsNew=true;
+			form.TaskNoteCur.Note="";
 			form.EditComplete=OnNoteEditComplete_Add;
 			form.Show(this);//non-modal subwindow, but if the parent is closed by the user when the child is open, then the child is forced closed along with the parent and after the parent.
 		}
@@ -1427,6 +1428,7 @@ namespace OpenDental {
 				form.TaskNoteCur.DateTimeNote=DateTime.Now;//Will be slightly adjusted at server.
 				form.TaskNoteCur.UserNum=Security.CurUser.UserNum;
 				form.TaskNoteCur.IsNew=true;
+				form.TaskNoteCur.Note="";
 				form.EditComplete=OnNoteEditComplete_Reply;
 				form.Show(this);//non-modal subwindow, but if the parent is closed by the user when the child is open, then the child is forced closed along with the parent and after the parent.
 				return;
