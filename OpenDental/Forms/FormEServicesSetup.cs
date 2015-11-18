@@ -1257,7 +1257,7 @@ namespace OpenDental {
 				string messageStartListener=Lan.g(this,"The eConnector you installed is currently not accepting inbound communication.")+"  "
 					+Lan.g(this,"eServices will not work as expected untill inbound communication is allowed.")+"\r\n\r\n"
 					+Lan.g(this,"Do you want to start accepting inbound communication?");
-				if(MessageBox.Show(messageStartListener,"",MessageBoxButtons.YesNo)==DialogResult.Yes) {
+				if(_listenerType==ListenerServiceType.NoListener && MessageBox.Show(messageStartListener,"",MessageBoxButtons.YesNo)==DialogResult.Yes) {
 					startListenerCommunications=true;
 				}
 				Prefs.UpdateBool(PrefName.EConnectorEnabled,true);
