@@ -198,7 +198,7 @@ namespace OpenDental{
 			// 
 			this.listCategory.Items.AddRange(new object[] {
             "Account Colors",
-            "Account Quick Charge",
+            "Account Procs Quick Add",
             "Adj Types",
             "Appointment Colors",
             "Appt Confirmed",
@@ -344,12 +344,12 @@ namespace OpenDental{
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.HelpText=Lan.g(this,"Changes the color of text for different types of entries in Account Module");
 					break;
-				case 1://"Acct Proc Quick Charge":
+				case 1://"Acct Proc Quick Add":
 					FormDefEdit.CanHide=true;
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Procedure Codes");
-					FormDefEdit.HelpText=Lan.g(this,"Quick charge items.  Each entry can be a series of procedure codes separated by commas (e.g. D0180,D1101,D8220) but cannot be procedure codes of type tooth or surface.  Used in the account module to quickly charge patients for items.");
+					FormDefEdit.HelpText=Lan.g(this,"Account Proc Quick Add items.  Each entry can be a series of procedure codes separated by commas (e.g. D0180,D1101,D8220).  Used in the account module to quickly charge patients for items.");
 					break;
 				case 2://"Adj Types":
 					//SelectedCat=1;

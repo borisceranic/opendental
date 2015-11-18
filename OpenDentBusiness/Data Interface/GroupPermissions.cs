@@ -311,8 +311,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Accounting Edit Entry");
 				case Permissions.AccountModule:
 					return Lans.g("enumPermissions","Account Module");
-				case Permissions.AccountQuickCharge:
-					return Lans.g("enumPermissions","Account Quick Charge");
+				case Permissions.AccountProcsQuickAdd:
+					return Lans.g("enumPermissions","Account Procs Quick Add");
 				case Permissions.AdjustmentCreate:
 					return Lans.g("enumPermissions","Adjustment Create");
 				case Permissions.AdjustmentEdit:
