@@ -840,7 +840,7 @@ namespace OpenDental{
 			// display report
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+			//DialogResult=DialogResult.OK;//Allow running multiple reports.
 		}
 
 		private DataTable GetClinicTotals(DataSet dataSetDailyProdSplitByClinic) {
@@ -1010,7 +1010,7 @@ namespace OpenDental{
 			// display report
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+			//DialogResult=DialogResult.OK;//Allow running multiple reports.
 		}
 
 		private void RunAnnual(){
@@ -1144,7 +1144,7 @@ namespace OpenDental{
 			// display report
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+			//DialogResult=DialogResult.OK;//Allow running multiple reports.
 		}
 
 		private void RunProvider() {
@@ -1271,7 +1271,7 @@ namespace OpenDental{
 			// display the report
 			FormReportComplex FormR=new FormReportComplex(report);
 			FormR.ShowDialog();
-			DialogResult=DialogResult.OK;
+			//DialogResult=DialogResult.OK;//Allow running multiple reports.
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
