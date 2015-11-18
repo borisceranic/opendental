@@ -263,8 +263,12 @@ namespace OpenDental {
 						if(countCustListeners > 0) {
 							needsEConnectorUpgrade=true;//This computer is not set as the upgrade server but is upgrading and DOES have a listener present.
 						}
-						else if(!isSilent) {//Warn the user that their eServices will go down.
-							MsgBox.Show("PrefL","If you currently use any eServices like the Patient Portal or Integrated Texting, these services will not work correctly until you upgrade your Listener service to the new eConnector service.  Please call us to help upgrade your eServices.");
+						else {//No listener services found on the computer doing the upgrade.
+							//Warn the user that their eServices will go down if there are any entries in the eservicesignal table within the last month.
+							List<EServiceSignal> listSignals=EServiceSignals.GetServiceHistory(eServiceCode.ListenerService,DateTime.Now.AddMonths(-1),DateTime.Now);
+							if(listSignals.Count > 0 && !isSilent) {
+								MsgBox.Show("PrefL","eServices will not work until the eConnector service is installed on the computer that is running the Listener Service.  Please contact us for help installing the eConnector service or see our online manual for more information.");
+							}
 						}
 					}
 					//The "Update Server Name" preference is set to something so check to see if this is the Update Server computer.
