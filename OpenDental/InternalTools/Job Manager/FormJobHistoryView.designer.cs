@@ -64,6 +64,9 @@ namespace OpenDental{
 			// textDescription
 			// 
 			this.textDescription.AcceptsTab = true;
+			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textDescription.DetectUrls = false;
 			this.textDescription.Location = new System.Drawing.Point(95, 108);
 			this.textDescription.Name = "textDescription";
