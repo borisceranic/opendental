@@ -112,6 +112,7 @@ namespace OpenDental {
 		private decimal PPBalanceTotal;
 		private PatField[] _patFieldList;
 		private Def[] _acctProcQuickAddDefs;
+		private ODToolBarButton _butQuickProcs;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
 
@@ -174,7 +175,8 @@ namespace OpenDental {
 		private ODGrid gridPatInfo;
 		private bool InitializedOnStartup;
 		private MenuItem menuItemRepeatWebSched;
-		private ContextMenu contextMenuQuickCharge;
+		private ContextMenu contextMenuQuickProcs;
+		private TextBox textQuickProcs;
 		private List<DisplayField> _patInfoDisplayFields;
 		#endregion UserVariables
 
@@ -320,7 +322,8 @@ namespace OpenDental {
 			this.gridComm = new OpenDental.UI.ODGrid();
 			this.gridPatInfo = new OpenDental.UI.ODGrid();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.contextMenuQuickCharge = new System.Windows.Forms.ContextMenu();
+			this.contextMenuQuickProcs = new System.Windows.Forms.ContextMenu();
+			this.textQuickProcs = new System.Windows.Forms.TextBox();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -1625,8 +1628,17 @@ namespace OpenDental {
 			this.ToolBarMain.TabIndex = 47;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
+			// textQuickCharge
+			// 
+			this.textQuickProcs.Location = new System.Drawing.Point(17, 3);
+			this.textQuickProcs.Name = "textQuickCharge";
+			this.textQuickProcs.Size = new System.Drawing.Size(100, 20);
+			this.textQuickProcs.TabIndex = 220;
+			this.textQuickProcs.Visible = false;
+			// 
 			// ContrAccount
 			// 
+			this.Controls.Add(this.textQuickProcs);
 			this.Controls.Add(this.gridPatInfo);
 			this.Controls.Add(this.groupBoxIndIns);
 			this.Controls.Add(this.groupBoxFamilyIns);
@@ -1659,6 +1671,7 @@ namespace OpenDental {
 			this.groupBoxFamilyIns.ResumeLayout(false);
 			this.groupBoxFamilyIns.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 		#endregion
@@ -1699,6 +1712,12 @@ namespace OpenDental {
 					butRefresh
 				});
 			LayoutToolBar();
+			textQuickProcs.AcceptsTab=true;
+			textQuickProcs.KeyDown+=textQuickCharge_KeyDown;
+			textQuickProcs.MouseDown+=textQuickCharge_MouseClick;
+			textQuickProcs.MouseCaptureChanged+=textQuickCharge_CaptureChange;
+			textQuickProcs.LostFocus+=textQuickCharge_FocusLost;
+			ToolBarMain.Controls.Add(textQuickProcs);
 			if(ViewingInRecall) {
 				panelSplitter.Top=300;//start the splitter higher for recall window.
 			}
@@ -1707,6 +1726,20 @@ namespace OpenDental {
 			LayoutPanels();
 			checkShowFamilyComm.Checked=PrefC.GetBoolSilent(PrefName.ShowAccountFamilyCommEntries,true);
 			Plugins.HookAddCode(this,"ContrAccount.InitializeOnStartup_end");
+		}
+
+		private void textQuickCharge_MouseClick(object sender,MouseEventArgs e) {
+			if(e.X<0 || e.X>textQuickProcs.Width ||e.Y<0 || e.Y>textQuickProcs.Height) {
+				textQuickProcs.Text="";
+				textQuickProcs.Visible=false;
+				textQuickProcs.Capture=false;
+			}
+		}
+
+		private void textQuickCharge_CaptureChange(object sender,EventArgs e) {
+			if(textQuickProcs.Visible==true) {
+				textQuickProcs.Capture=true;
+			}
 		}
 
 		private void ContrAccount_Load(object sender,System.EventArgs e) {
@@ -1729,12 +1762,15 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Payment Plan"),-1,"","PayPlan"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Installment Plan"),-1,"","InstallPlan"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-			button=new ODToolBarButton(Lan.g(this,"Quick Charge"),1,"","QuickCharge");
-			button.Style=ODToolBarButtonStyle.DropDownButton;
-			button.DropDownMenu=contextMenuQuickCharge;
-			contextMenuQuickCharge.Popup+=new EventHandler(contextMenuQuickCharge_Popup);
-			ToolBarMain.Buttons.Add(button);
+			if(Security.IsAuthorized(Permissions.AccountProcsQuickAdd,true)) {
+				//If the user doesn't have permission to use the quick charge button don't add it to the toolbar.
+				ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+				_butQuickProcs=new ODToolBarButton(Lan.g(this,"Quick Procs"),-1,"","QuickProcs");
+				_butQuickProcs.Style=ODToolBarButtonStyle.DropDownButton;
+				_butQuickProcs.DropDownMenu=contextMenuQuickProcs;
+				contextMenuQuickProcs.Popup+=new EventHandler(contextMenuQuickProcs_Popup);
+				ToolBarMain.Buttons.Add(_butQuickProcs);
+			}
 			if(!PrefC.GetBool(PrefName.EasyHideRepeatCharges)) {
 				button=new ODToolBarButton(Lan.g(this,"Repeating Charge"),-1,"","RepeatCharge");
 				button.Style=ODToolBarButtonStyle.PushButton;
@@ -1764,12 +1800,15 @@ namespace OpenDental {
 		}
 
 		///<summary>This gets run just prior to the contextMenuQuickCharge menu displaying to the user.</summary>
-		private void contextMenuQuickCharge_Popup(object sender,EventArgs e) {
+		private void contextMenuQuickProcs_Popup(object sender,EventArgs e) {
 			//Dynamically fill contextMenuQuickCharge's menu items because the definitions may have changed since last time it was filled.
 			_acctProcQuickAddDefs=DefC.GetList(DefCat.AccountQuickCharge);
-			contextMenuQuickCharge.MenuItems.Clear();
+			contextMenuQuickProcs.MenuItems.Clear();
 			for(int i=0;i<_acctProcQuickAddDefs.Length;i++) {
-				contextMenuQuickCharge.MenuItems.Add(new MenuItem(_acctProcQuickAddDefs[i].ItemName,menuItemQuickCharge_Click));
+				contextMenuQuickProcs.MenuItems.Add(new MenuItem(_acctProcQuickAddDefs[i].ItemName,menuItemQuickProcs_Click));
+			}
+			if(_acctProcQuickAddDefs.Length==0) {
+				contextMenuQuickProcs.MenuItems.Add(new MenuItem(Lan.g(this,"No quick charge procedures defined. Go to Setup | Definitions to add."),(x,y) => { }));//"null" event handler.
 			}
 		}
 
@@ -1921,7 +1960,9 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=false;
 				ToolBarMain.Buttons["PayPlan"].Enabled=false;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=false;
-				ToolBarMain.Buttons["QuickCharge"].Enabled=false;
+				if(ToolBarMain.Buttons["QuickProcs"]!=null) {
+					ToolBarMain.Buttons["QuickProcs"].Enabled=false;
+				}
 				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
 					ToolBarMain.Buttons["RepeatCharge"].Enabled=false;
 				}
@@ -1946,7 +1987,9 @@ namespace OpenDental {
 				ToolBarMain.Buttons["Insurance"].Enabled=true;
 				ToolBarMain.Buttons["PayPlan"].Enabled=true;
 				ToolBarMain.Buttons["InstallPlan"].Enabled=true;
-				ToolBarMain.Buttons["QuickCharge"].Enabled=true;
+				if(ToolBarMain.Buttons["QuickProcs"]!=null) {
+					ToolBarMain.Buttons["QuickProcs"].Enabled=true;
+				}
 				if(ToolBarMain.Buttons["RepeatCharge"]!=null) {
 					ToolBarMain.Buttons["RepeatCharge"].Enabled=true;
 				} 
@@ -2879,8 +2922,8 @@ namespace OpenDental {
 					case "TrojanCollect":
 						toolBarButTrojan_Click();
 						break;
-					case "QuickCharge":
-						toolBarButQuickCharge_Click();
+					case "QuickProcs":
+						toolBarButQuickProcs_Click();
 						break;
 				}
 			}
@@ -4342,63 +4385,120 @@ namespace OpenDental {
 			FormT.ShowDialog();
 		}
 
-		private void toolBarButQuickCharge_Click() {
-			//Main QuickCharge button was clicked.  Do nothing for now.
-		}
-
-		private void menuItemQuickCharge_Click(object sender,EventArgs e) {
-			//One of the QuickCharge menu items was clicked.
-			if(!Security.IsAuthorized(Permissions.AccountQuickCharge) || sender.GetType()!=typeof(MenuItem)) {
+		private void toolBarButQuickProcs_Click() {
+			if(!Security.IsAuthorized(Permissions.AccountProcsQuickAdd,true)) {
+				//only happens if permissions are changed after the program is opened. (Very Rare)
+				MsgBox.Show(this,"Not authorized for Quick Procs.");
+				LayoutToolBar();
 				return;
 			}
-			List<InsSub> listInsSubs=InsSubs.RefreshForFam(FamCur);
-			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
-			List<PatPlan> listPatPlans=PatPlans.Refresh(PatCur.PatNum);
-			List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
-			Def quickChargeDef=_acctProcQuickAddDefs[contextMenuQuickCharge.MenuItems.IndexOf((MenuItem)sender)];
+			//Main QuickCharge button was clicked.  Create a textbox that can be entered so users can insert manually entered proc codes.
+			if(!Security.IsAuthorized(Permissions.ProcComplCreate,true)) {//Button doesn't show up unless they have AccountQuickCharge permission. 
+				//user can still use dropdown, just not type in codes.
+				contextMenuQuickProcs.Show(this,new Point(_butQuickProcs.Bounds.X,_butQuickProcs.Bounds.Y+_butQuickProcs.Bounds.Height));
+				return; 
+			}
+			textQuickProcs.SetBounds(_butQuickProcs.Bounds.X+1,_butQuickProcs.Bounds.Y+2,_butQuickProcs.Bounds.Width-17,_butQuickProcs.Bounds.Height-2);
+			textQuickProcs.Visible=true;
+			textQuickProcs.BringToFront();
+			textQuickProcs.Focus();
+			textQuickProcs.Capture=true;
+		}
+
+		private void textQuickCharge_FocusLost(object sender,EventArgs e) {
+			textQuickProcs.Text="";
+			textQuickProcs.Visible=false;
+			textQuickProcs.Capture=false;
+		}
+
+		private void textQuickCharge_KeyDown(object sender,KeyEventArgs e) {
+			//This is only the KeyDown event, user can still type if we return here.
+			if(e.KeyCode!=Keys.Enter) {
+				return;
+			}
+			textQuickProcs.Visible=false;
+			textQuickProcs.Capture=false;
+			e.Handled=true;//Suppress the "ding" in windows when pressing enter.
+			e.SuppressKeyPress=true;//Suppress the "ding" in windows when pressing enter.
+			if(textQuickProcs.Text=="") {
+				return;
+			}
+			Provider patProv=Providers.GetProv(PatCur.PriProv);
+			FeeSched provFeeSched=FeeScheds.GetOne(patProv.FeeSched,FeeSchedC.GetListShort());
+			if(AddProcAndValidate(textQuickProcs.Text,provFeeSched,patProv)) {
+				SecurityLogs.MakeLogEntry(Permissions.AccountProcsQuickAdd,PatCur.PatNum
+					,Lan.g(this,"The following procedures were added via the Quick Charge button from the Account module")
+						+": "+string.Join(",",textQuickProcs.Text));
+				ModuleSelected(PatCur.PatNum);
+			}
+			textQuickProcs.Text="";
+		}
+
+		private void menuItemQuickProcs_Click(object sender,EventArgs e) {
+			//Quick Charge button won't be present unless they have AccountQuickCharge permission, no need to check it.
+			//One of the QuickCharge menu items was clicked.
+			if(sender.GetType()!=typeof(MenuItem)) {
+				return;
+			}
+			Def quickChargeDef=_acctProcQuickAddDefs[contextMenuQuickProcs.MenuItems.IndexOf((MenuItem)sender)];
 			string[] procCodes=quickChargeDef.ItemValue.Split(',');
+			if(procCodes.Length==0) {
+				//No items entered into the definition category.  Notify the user.
+				MsgBox.Show(this,"There are no Quick Charge items in Setup | Definitions.  There must be at least one in order to use the Quick Charge drop down menu.");
+			}
 			List<string> procCodesAdded=new List<string>();
 			Provider patProv=Providers.GetProv(PatCur.PriProv);
 			FeeSched provFeeSched=FeeScheds.GetOne(patProv.FeeSched,FeeSchedC.GetListShort());
 			for(int i=0;i<procCodes.Length;i++) {
-				ProcedureCode procCode=ProcedureCodes.GetProcCode(procCodes[i].Trim());
-				Fee fee=Fees.GetFee(procCode.CodeNum,provFeeSched.FeeSchedNum);
-				Procedure proc=new Procedure();
-				proc.ProcStatus=ProcStat.C;
-				proc.ClinicNum=FormOpenDental.ClinicNum;
-				proc.CodeNum=procCode.CodeNum;
-				proc.DateEntryC=DateTime.Now;
-				proc.DateTP=DateTime.Now;
-				proc.PatNum=PatCur.PatNum;
-				proc.ProcDate=DateTime.Now;
-				if(fee==null) {
-					proc.ProcFee=0;
+				if(AddProcAndValidate(procCodes[i],provFeeSched,patProv)) {
+					procCodesAdded.Add(procCodes[i]);
 				}
-				else {
-					proc.ProcFee=fee.Amount;
-				}
-				proc.ProvNum=patProv.ProvNum;
-				proc.UnitQty=1;
-				if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
-					proc.SiteNum=PatCur.SiteNum;
-				}
-				Procedures.Insert(proc);
-				FormProcEdit FormPE=new FormProcEdit(proc,PatCur,FamCur,true);
-				FormPE.IsNew=true;
-				FormPE.ShowDialog();
-				if(FormPE.DialogResult!=DialogResult.OK) {
-					Procedures.Delete(proc.ProcNum);
-					continue;
-				}
-				procCodesAdded.Add(procCodes[i]);
-				//We do not make ProcComplCreate audit trail enteries here because we instead will make an AccountQuickCharge entry.
 			}
 			if(procCodesAdded.Count > 0) {
-				SecurityLogs.MakeLogEntry(Permissions.AccountQuickCharge,PatCur.PatNum
+				SecurityLogs.MakeLogEntry(Permissions.AccountProcsQuickAdd,PatCur.PatNum
 					,Lan.g(this,"The following procedures were added via the Quick Charge button from the Account module")
 						+": "+string.Join(",",procCodesAdded));
+				ModuleSelected(PatCur.PatNum);
 			}
-			ModuleSelected(PatCur.PatNum);
+		}
+
+		///<summary>Validated the procedure code using FormProcEdit and prompts user for input if required.</summary>
+		private bool AddProcAndValidate(string procString,FeeSched provFeeSched,Provider patProv) {
+			ProcedureCode procCode=ProcedureCodes.GetProcCode(procString.Trim());
+			if(procCode.CodeNum==0) {
+				MsgBox.Show(this,"Invalid Procedure Code: "+procString.Trim());
+				return false; //Invalid ProcCode string manually entered.
+			}
+			Fee fee=Fees.GetFee(procCode.CodeNum,provFeeSched.FeeSchedNum);
+			Procedure proc=new Procedure();
+			proc.ProcStatus=ProcStat.C;
+			proc.ClinicNum=FormOpenDental.ClinicNum;
+			proc.CodeNum=procCode.CodeNum;
+			proc.DateEntryC=DateTime.Now;
+			proc.DateTP=DateTime.Now;
+			proc.PatNum=PatCur.PatNum;
+			proc.ProcDate=DateTime.Now;
+			if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+				proc.SiteNum=PatCur.SiteNum;
+			}
+			if(fee==null) {
+				proc.ProcFee=0;
+			}
+			else {
+				proc.ProcFee=fee.Amount;
+			}
+			proc.ProvNum=patProv.ProvNum;
+			proc.UnitQty=1;
+			Procedures.Insert(proc);
+			//launch form silently to validate code. If entry errors occur the form will be shown to user, otherwise it will close imidiately.
+			FormProcEdit FormPE=new FormProcEdit(proc,PatCur,FamCur,true);
+			FormPE.IsNew=true;
+			FormPE.ShowDialog();
+			if(FormPE.DialogResult!=DialogResult.OK) {
+				Procedures.Delete(proc.ProcNum);
+				return false;
+			}
+			return true;
 		}
 
 		private void gridComm_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
