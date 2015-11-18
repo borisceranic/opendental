@@ -6,13 +6,17 @@ namespace OpenDentBusiness {
 	public static class WebServiceMainHQProxy {
 
 		///<summary>Request either a valid instance of PrefC cache OR a valid connection to HQ customers database.</summary>
-		public static WebServiceMainHQ.WebServiceMainHQ GetWebServiceMainHQInstance() {
+		public static WebServiceMainHQ.WebServiceMainHQ GetWebServiceMainHQInstance(string webServiceHqUrl="") {
 			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
-			//Default to the production URL.
-			service.Url=PrefC.GetString(PrefName.WebServiceHQServerURL);
+			if(string.IsNullOrEmpty(webServiceHqUrl)) { //Default to the production URL.				
+				service.Url=PrefC.GetString(PrefName.WebServiceHQServerURL);
+			}
+			else { //URL was provided so use that.
+				service.Url=webServiceHqUrl;
+			}
 #if DEBUG
 			//Change arguments for debug only.
-			service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//localhost
+			//service.Url="http://localhost/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//localhost
 			//service.Url="http://10.10.2.18:55018/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
 			//service.Url="http://server184:49999/OpenDentalWebServiceHQ/WebServiceMainHQ.asmx";//Sam's Computer
 			service.Timeout=(int)TimeSpan.FromMinutes(60).TotalMilliseconds;
