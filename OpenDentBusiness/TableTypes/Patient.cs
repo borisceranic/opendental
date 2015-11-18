@@ -250,6 +250,11 @@ namespace OpenDentBusiness{
 			return Patients.GetNameLF(LName,FName,Preferred,MiddleI);
 		}
 
+		///<summary>LName, FName M</summary>
+		public string GetNameLFnoPref() {
+			return Patients.GetNameLFnoPref(LName,FName,MiddleI);
+		}
+
 		///<summary>FName 'Preferred' M LName</summary>
 		public string GetNameFL(){
 			return Patients.GetNameFL(LName,FName,Preferred,MiddleI);
