@@ -278,13 +278,12 @@ namespace OpenDental{
 			// textDescription
 			// 
 			this.textDescription.AcceptsTab = true;
-			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textDescription.DetectUrls = false;
 			this.textDescription.Location = new System.Drawing.Point(373, 56);
 			this.textDescription.Name = "textDescription";
-			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.CommLog;
+			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textDescription.Size = new System.Drawing.Size(475, 266);
 			this.textDescription.TabIndex = 11;
@@ -293,7 +292,7 @@ namespace OpenDental{
 			// butDelete
 			// 
 			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butDelete.Autosize = true;
 			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -368,7 +367,6 @@ namespace OpenDental{
 			// 
 			// groupActions
 			// 
-			this.groupActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupActions.Controls.Add(this.butAction2);
 			this.groupActions.Controls.Add(this.butAction3);
 			this.groupActions.Controls.Add(this.butAction4);
@@ -441,7 +439,7 @@ namespace OpenDental{
 			// butAddNote
 			// 
 			this.butAddNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAddNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAddNote.Autosize = true;
 			this.butAddNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -458,7 +456,7 @@ namespace OpenDental{
 			// butReviews
 			// 
 			this.butReviews.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butReviews.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.butReviews.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butReviews.Autosize = true;
 			this.butReviews.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butReviews.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -473,7 +471,7 @@ namespace OpenDental{
 			// butHistory
 			// 
 			this.butHistory.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.butHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butHistory.Autosize = true;
 			this.butHistory.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butHistory.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -488,7 +486,7 @@ namespace OpenDental{
 			// butLinks
 			// 
 			this.butLinks.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this.butLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butLinks.Autosize = true;
 			this.butLinks.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLinks.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -521,7 +519,6 @@ namespace OpenDental{
 			// butOverride
 			// 
 			this.butOverride.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOverride.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOverride.Autosize = true;
 			this.butOverride.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOverride.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -537,7 +534,6 @@ namespace OpenDental{
 			// butOwnerPick
 			// 
 			this.butOwnerPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOwnerPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOwnerPick.Autosize = true;
 			this.butOwnerPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOwnerPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -553,7 +549,6 @@ namespace OpenDental{
 			// butExpertPick
 			// 
 			this.butExpertPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butExpertPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this.butExpertPick.Autosize = true;
 			this.butExpertPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butExpertPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;

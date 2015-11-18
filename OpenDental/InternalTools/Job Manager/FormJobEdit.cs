@@ -295,6 +295,9 @@ namespace OpenDental {
 			if(!_job.IsNew && !JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
 				butDelete.Enabled=false;
 			}
+			if(_editMode==EditMode.Concept && Security.CurUser.UserNum==JobCur.Owner) {
+				butDelete.Enabled=true;
+			}
 			#endregion
 		}
 

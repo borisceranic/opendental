@@ -111,6 +111,7 @@ namespace OpenDental{
 			// 
 			// groupAddLink
 			// 
+			this.groupAddLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupAddLink.Controls.Add(this.butLinkQuote);
 			this.groupAddLink.Controls.Add(this.butLinkTask);
 			this.groupAddLink.Controls.Add(this.butLinkFeatReq);
