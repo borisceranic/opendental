@@ -1379,7 +1379,7 @@ namespace OpenDental {
 			if(FormPS.DialogResult != DialogResult.OK) {
 				return;
 			}
-			textStartName.Text=Patients.GetPat(FormPS.SelectedPatNum).GetNameLF();
+			textStartName.Text=Patients.GetPat(FormPS.SelectedPatNum).GetNameLFnoPref();
 		}
 
 		private void butEndName_Click(object sender,EventArgs e) {
@@ -1389,7 +1389,7 @@ namespace OpenDental {
 			if(FormPS.DialogResult != DialogResult.OK) {
 				return;
 			}
-			textEndName.Text=Patients.GetPat(FormPS.SelectedPatNum).GetNameLF();
+			textEndName.Text=Patients.GetPat(FormPS.SelectedPatNum).GetNameLFnoPref();
 			if(String.Compare(textStartName.Text,textEndName.Text)==1) {
 				textEndName.Text = textStartName.Text.ToString();
 

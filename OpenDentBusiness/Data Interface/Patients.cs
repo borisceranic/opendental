@@ -2179,6 +2179,11 @@ FROM insplan";
 			return retVal;
 		}
 
+		///<summary>LName, FName M</summary>
+		public static string GetNameLFnoPref(string LName,string FName,string MiddleI) {
+			return GetNameLF(LName,FName,"",MiddleI);
+		}
+
 		///<summary>FName 'Preferred' M LName</summary>
 		public static string GetNameFL(string LName,string FName,string Preferred,string MiddleI) {
 			//No need to check RemotingRole; no call to db.
