@@ -5,7 +5,8 @@ using System.Xml;
 namespace OpenDentBusiness {
 	public static class WebServiceMainHQProxy {
 
-		///<summary>Request either a valid instance of PrefC cache OR a valid connection to HQ customers database.</summary>
+		///<summary>Get an instance of the WebServicesHQ web service which includes the URL (pulled from PrefC). 
+		///Optionally, you can provide the URL. This option should only be used by web apps which don't want to cause a call to PrefC.</summary>
 		public static WebServiceMainHQ.WebServiceMainHQ GetWebServiceMainHQInstance(string webServiceHqUrl="") {
 			WebServiceMainHQ.WebServiceMainHQ service=new WebServiceMainHQ.WebServiceMainHQ();
 			if(string.IsNullOrEmpty(webServiceHqUrl)) { //Default to the production URL.				
