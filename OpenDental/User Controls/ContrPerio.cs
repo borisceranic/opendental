@@ -921,6 +921,13 @@ namespace OpenDental
 				}//for seqI
 			}//for examI
 			CurCell=new Point(1,GetTableRow(selectedExam,0,PerioSequenceType.Probing));
+			int curTooth=GetToothNumCur(GetSection(CurCell.Y));
+			while(skippedTeeth.Contains(curTooth)) {
+				AdvanceCell();//Advance forward 3 times, since there are 3 measurements per tooth.
+				AdvanceCell();
+				AdvanceCell();
+				curTooth=GetToothNumCur(GetSection(CurCell.Y));
+			}
 		}
 
 		///<summary>Used in LoadData.</summary>
@@ -1191,21 +1198,22 @@ namespace OpenDental
 		}
 
 		
-		///<summary>Returns -1 if a tooth row and not a section row. Used in GetBounds, DrawRow, and OnMouseDown.</summary>
+		///<summary>Returns -1 if tooth row and not section row.  0 = Maxillary Facial, 1 = Maxillary Lingual, 2 = Mandible Facial, 3 = Mandible Lingual.
+		///Used in GetBounds, DrawRow, and OnMouseDown.</summary>
 		private int GetSection(int tableRow){
-			if(tableRow<RowTypes[0].Length){
+			if(tableRow<RowTypes[0].Length) {//0 = Maxillary Facial
 				return 0;
 			}
 			if(tableRow==RowTypes[0].Length){
 				return -1;//max teeth
 			}
-			if(tableRow<RowTypes[0].Length+1+RowTypes[1].Length){
+			if(tableRow<RowTypes[0].Length+1+RowTypes[1].Length) {//1 = Maxillary Lingual
 				return 1;
 			}
-			if(tableRow<RowTypes[0].Length+1+RowTypes[1].Length+RowTypes[2].Length){
+			if(tableRow<RowTypes[0].Length+1+RowTypes[1].Length+RowTypes[2].Length) {//2 = Mandible Facial
 				return 2;
 			}
-			if(tableRow==RowTypes[0].Length+1+RowTypes[1].Length+RowTypes[2].Length){
+			if(tableRow==RowTypes[0].Length+1+RowTypes[1].Length+RowTypes[2].Length) {//3 = Mandible Lingual
 				return -1;//mand teeth
 			}
 			return 3;
@@ -1621,6 +1629,16 @@ namespace OpenDental
 			Invalidate(Rectangle.Ceiling(GetBounds(CurCell.X,CurCell.Y)));
 		}
 
+		///<summary>Most of the time use GetSection() to calculate the section.  A section corresponds to the maxillary/mandible facial/lingual 
+		///(4 sections total, see GetSection() summary)</summary>
+		private int GetToothNumCur(int section) {
+			int intTooth=(int)Math.Ceiling((double)CurCell.X/3);
+			if(section==2 || section==3) {//if on mand
+				intTooth=33-intTooth;//wrap
+			}
+			return intTooth;
+		}
+
 		private void AdvanceCell(bool isReverse){
 			PerioSequenceType seqType=RowTypes[GetSection(CurCell.Y)][GetSectionRow(CurCell.Y)];
 			int newRow=0;//used when jumping between sections
@@ -1629,12 +1647,9 @@ namespace OpenDental
 			int newSection=0;
 			bool locIsValid=false;//used when testing for skipped tooth and mobility location
 			bool startedOnSkipped=false;//special situation:
-			intTooth=(int)Math.Ceiling((double)CurCell.X/3);
 			section=GetSection(CurCell.Y);
 			newSection=section;//in case it doesn't change
-			if(section==2 || section==3){//if on mand
-				intTooth=33-intTooth;
-			}
+			intTooth=GetToothNumCur(section);
 			if(skippedTeeth.Contains(intTooth)){
 				startedOnSkipped=true;
 			}
@@ -1734,10 +1749,7 @@ namespace OpenDental
 				}
 				if(startedOnSkipped)//since we started on a skipped tooth
 					return;//we can continue entry on a skipped tooth.
-				intTooth=(int)Math.Ceiling((double)CurCell.X/3);
-				if(newSection==2 || newSection==3){//if on mand
-					intTooth=33-intTooth;
-				}
+				intTooth=GetToothNumCur(newSection);
 				locIsValid=true;
 				if(skippedTeeth.Contains(intTooth)){//if we are on a skipped tooth
 					locIsValid=false;
