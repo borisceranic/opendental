@@ -14,11 +14,13 @@ namespace OpenDental {
 		///into FormJobManager.cs which is where the flow panel really lives.  This could be done with eventing, public static methods, etc.</summary>
 		private FlowLayoutPanel _flowPanel;
 		private bool _isDocked=true;
+		private string _title;
 
 		///<summary>Creates a draggable control containing the control passed in that will be added to the flow panel passed in.</summary>
-		public JobContainerControl(Control controlJob,FlowLayoutPanel flowPanel) {
+		public JobContainerControl(Control controlJob,FlowLayoutPanel flowPanel,string title) {
 			InitializeComponent();
 			_flowPanel=flowPanel;
+			_title=title;
 			this.Controls.Add(controlJob);
 			if(controlJob.GetType()==typeof(UserControlManage)) {
 				this.Height=flowPanel.Height-10;
@@ -39,7 +41,7 @@ namespace OpenDental {
 				butRight.Visible=false;
 				butDock.ImageIndex=0;
 				controlJob.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
-				FormJobContainer FormJC=new FormJobContainer(this);
+				FormJobContainer FormJC=new FormJobContainer(this,_title);
 				FormJC.Show();
 				_isDocked=false;
 				AllowDragging=false;
@@ -124,7 +126,7 @@ namespace OpenDental {
 				butRight.Visible=false;
 				butDock.ImageIndex=0;
 				_flowPanel.Controls.Remove(this);
-				FormJobContainer FormJC=new FormJobContainer(this);
+				FormJobContainer FormJC=new FormJobContainer(this,_title);
 				this.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);
 				FormJC.Show();
 				_isDocked=false;
