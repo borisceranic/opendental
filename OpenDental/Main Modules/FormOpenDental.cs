@@ -2612,8 +2612,9 @@ namespace OpenDental{
 			}
 			ContrAppt2.SendSmsClickDelegate=OnTxtMsg_Click;//used in the appointment right click context menu.
 			if(PrefC.GetString(PrefName.LanguageAndRegion)!=CultureInfo.CurrentCulture.Name && !ComputerPrefs.LocalComputer.NoShowLanguage) {
-				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Warning, having mismatched lanugage setting between the workstation and server may cause the program to behave in unexpected ways."+
-				                                        " Would you like to view the setup window?")) {
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Warning, having mismatched language setting between the workstation and server may cause the program "
+					+"to behave in unexpected ways. Would you like to view the setup window?"))
+				{
 					FormLanguageAndRegion FormLAR=new FormLanguageAndRegion();
 					FormLAR.ShowDialog();
 				}
