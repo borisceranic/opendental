@@ -18,7 +18,7 @@ namespace OpenDental {
 
 		private void FormJobManager_Load(object sender,EventArgs e) {
 			LayoutToolBar();
-			AddJobControl(new UserControlManage());
+			AddJobControl(new UserControlManage(),"Manage");
 		}
 
 		///<summary>Causes the toolbar to be laid out.</summary>
@@ -33,23 +33,23 @@ namespace OpenDental {
 		private void ToolBarMain_ButtonClick(object sender,ODToolBarButtonClickEventArgs e) {
 			switch(e.Button.Tag.ToString()) {
 				case "Add Project Window":
-					AddJobControl(new UserControlProjects());
+					AddJobControl(new UserControlProjects(),"Projects");
 					break;
 				case "Add Job Window":
-					AddJobControl(new UserControlJobs());
+					AddJobControl(new UserControlJobs(),"Jobs");
 					break;
 				case "Add Review Window":
-					AddJobControl(new UserControlReviews());
+					AddJobControl(new UserControlReviews(),"Reviews");
 					break;
 				case "Add Manage Window":
-					AddJobControl(new UserControlManage());
+					AddJobControl(new UserControlManage(),"Manage");
 					break;
 			}
 		}
 
 		///<summary>Adds a JobContainerControl to flowPanel that will be filled with the control that was passed in.</summary>
-		private void AddJobControl(Control jobControl) {
-			JobContainerControl jobContainerControl=new JobContainerControl(jobControl,flowPanel);
+		private void AddJobControl(Control jobControl,string title) {
+			JobContainerControl jobContainerControl=new JobContainerControl(jobControl,flowPanel,title);
 			_listJobContainerControls.Add(jobContainerControl);
 		}
 
