@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class UserControlTasks:UserControl {
@@ -1126,11 +1127,26 @@ namespace OpenDental {
 				DataValid.SetInvalid(InvalidType.Task);
 			}
 			else {//Is task
+				Task task=TasksList[clickedI-TaskListsList.Count];
+				bool isTaskForCurUser=true;
+				if(task.UserNum!=Security.CurUser.UserNum) {//current user didn't write this task, so block them.
+					isTaskForCurUser=false;//Delete will only be allowed if the user has the TaskEdit and TaskNoteEdit permissions.
+				}
+				else if(task.TaskListNum!=Security.CurUser.TaskListInBox) {//the task is not in the logged-in user's inbox
+					isTaskForCurUser=false;
+				}
+				if(isTaskForCurUser) {//this just allows getting the Task Notes less often
+					//Check to see if other users have added notes
+					isTaskForCurUser=TaskNotes.GetForTask(task.TaskNum).All(x => x.UserNum==Security.CurUser.UserNum);
+				}
+				if(!isTaskForCurUser && (!Security.IsAuthorized(Permissions.TaskEdit) || !Security.IsAuthorized(Permissions.TaskNoteEdit))) {
+					return;
+				}
 				if(!MsgBox.Show(this,true,"Delete?")) {
 					return;
 				}
-				Tasks.Delete(TasksList[clickedI-TaskListsList.Count].TaskNum);
-				DataValid.SetInvalidTask(TasksList[clickedI-TaskListsList.Count].TaskNum,false);
+				Tasks.Delete(task.TaskNum);
+				DataValid.SetInvalidTask(task.TaskNum,false);
 			}
 			//FillGrid();
 		}
