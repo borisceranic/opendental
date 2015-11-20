@@ -92,7 +92,8 @@ namespace OpenDentBusiness{
 				+"LEFT JOIN payment pay ON cc.PatNum=pay.PatNum AND pay.IsRecurringCC=1 "
 				+"WHERE cc.PatNum=pat.PatNum "
 				+"AND pat.Guarantor=guar.PatNum "
-				+"AND cc.PayPlanNum=0 ";//Keeps card from showing up in case they have a balance AND is setup for payment plan. 
+				+"AND cc.PayPlanNum=0 "//Keeps card from showing up in case they have a balance AND is setup for payment plan. 
+				+"AND guar.BalTotal-guar.InsEst>=ChargeAmt ";//don't include cc's that are not attached to payplans if there is no family balance to charge
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY cc.CreditCardNum) ";
 			}
@@ -119,19 +120,19 @@ namespace OpenDentBusiness{
 				+"LEFT JOIN payment pay ON pay.PayNum=ps.PayNum AND pay.IsRecurringCC=1 "
 				+"WHERE cc.PayPlanNum<>0 ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY cc.CreditCardNum) ";
+				command+="GROUP BY cc.CreditCardNum ";
 			}
 			else {//Oracle
 				command+="GROUP BY cc.CreditCardNum,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+",PatName,guar.BalTotal-guar.InsEst,"
-					+"cc.Address,pat.Address,cc.Zip,pat.Zip,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop) ";
+					+"cc.Address,pat.Address,cc.Zip,pat.Zip,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop ";
 			}
+			command+="HAVING FamBalTotal>0)";//don't show cc's attached to payplans when the payplan has nothing due
 			#endregion
 			//Now we have all the results for payments and payment plans, so do an obvious filter. A more thorough filter happens later.
 			command+=") due "
-				+"WHERE FamBalTotal>=ChargeAmt "
-				+"AND ChargeAmt>0 "
+				+"WHERE  ChargeAmt>0 "
 				+"AND DateStart<="+DbHelper.Curdate()+" "
-				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ";
+				+"AND (DateStop>="+DbHelper.Curdate()+" OR YEAR(DateStop)<1880) ORDER BY PatName";
 			table=Db.GetTable(command);
 			FilterRecurringChargeList(table);
 			return table;
@@ -162,7 +163,10 @@ namespace OpenDentBusiness{
 				}
 				else {//Else, current date is before the recurring date in the current month, so the recurring charge will be going in for last month
 					//Check if payment didn't happen last month.
-					if(curDate.AddMonths(-1).Month!=latestPayment.Month && curDate.Date!=latestPayment.Date) {
+					if(curDate.AddMonths(-1).Date>latestPayment.Date//the latest recurring charge payment for this card was before one month ago
+						&& curDate.AddMonths(-1).Month!=latestPayment.Month)//the latest recurring charge payment for this card did not happen during last month
+						//&& curDate.Date!=latestPayment.Date)//no longer necessary since latest payment was before one month ago
+					{
 						//Charge did not happen last month so the patient needs to show up in list.
 						//Example: Last month had a recurring charge set at the end of the month that fell on a weekend.
 						//Today is the next month and still before the recurring charge date. 

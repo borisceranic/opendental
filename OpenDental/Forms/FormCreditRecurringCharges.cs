@@ -84,7 +84,7 @@ namespace OpenDental {
 				row.Cells.Add(table.Rows[i]["PatNum"].ToString());
 				row.Cells.Add(table.Rows[i]["PatName"].ToString());
 				row.Cells.Add(famBalTotal.ToString("c"));
-				row.Cells.Add(chargeAmt.ToString("c"));
+				row.Cells.Add(Math.Min(chargeAmt,famBalTotal).ToString("c"));
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -279,7 +279,9 @@ namespace OpenDental {
 					continue;
 				}
 				info.Arguments="";
-				double amt=PIn.Double(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
+				Double famBalTotal=PIn.Double(table.Rows[gridMain.SelectedIndices[i]]["FamBalTotal"].ToString());
+				Double chargeAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
+				double amt=Math.Min(chargeAmt,famBalTotal);
 				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
 				string address=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Address"].ToString());
 				string addressPat=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["AddressPat"].ToString());
