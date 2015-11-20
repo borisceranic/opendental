@@ -55,6 +55,7 @@ namespace OpenDentBusiness.Crud{
 				emailAddress.SenderAddress     = PIn.String(row["SenderAddress"].ToString());
 				emailAddress.Pop3ServerIncoming= PIn.String(row["Pop3ServerIncoming"].ToString());
 				emailAddress.ServerPortIncoming= PIn.Int   (row["ServerPortIncoming"].ToString());
+				emailAddress.UserNum           = PIn.Long  (row["UserNum"].ToString());
 				retVal.Add(emailAddress);
 			}
 			return retVal;
@@ -95,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EmailAddressNum,";
 			}
-			command+="SMTPserver,EmailUsername,EmailPassword,ServerPort,UseSSL,SenderAddress,Pop3ServerIncoming,ServerPortIncoming) VALUES(";
+			command+="SMTPserver,EmailUsername,EmailPassword,ServerPort,UseSSL,SenderAddress,Pop3ServerIncoming,ServerPortIncoming,UserNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(emailAddress.EmailAddressNum)+",";
 			}
@@ -107,7 +108,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (emailAddress.UseSSL)+","
 				+"'"+POut.String(emailAddress.SenderAddress)+"',"
 				+"'"+POut.String(emailAddress.Pop3ServerIncoming)+"',"
-				+    POut.Int   (emailAddress.ServerPortIncoming)+")";
+				+    POut.Int   (emailAddress.ServerPortIncoming)+","
+				+    POut.Long  (emailAddress.UserNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -140,7 +142,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EmailAddressNum,";
 			}
-			command+="SMTPserver,EmailUsername,EmailPassword,ServerPort,UseSSL,SenderAddress,Pop3ServerIncoming,ServerPortIncoming) VALUES(";
+			command+="SMTPserver,EmailUsername,EmailPassword,ServerPort,UseSSL,SenderAddress,Pop3ServerIncoming,ServerPortIncoming,UserNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(emailAddress.EmailAddressNum)+",";
 			}
@@ -152,7 +154,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (emailAddress.UseSSL)+","
 				+"'"+POut.String(emailAddress.SenderAddress)+"',"
 				+"'"+POut.String(emailAddress.Pop3ServerIncoming)+"',"
-				+    POut.Int   (emailAddress.ServerPortIncoming)+")";
+				+    POut.Int   (emailAddress.ServerPortIncoming)+","
+				+    POut.Long  (emailAddress.UserNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -172,7 +175,8 @@ namespace OpenDentBusiness.Crud{
 				+"UseSSL            =  "+POut.Bool  (emailAddress.UseSSL)+", "
 				+"SenderAddress     = '"+POut.String(emailAddress.SenderAddress)+"', "
 				+"Pop3ServerIncoming= '"+POut.String(emailAddress.Pop3ServerIncoming)+"', "
-				+"ServerPortIncoming=  "+POut.Int   (emailAddress.ServerPortIncoming)+" "
+				+"ServerPortIncoming=  "+POut.Int   (emailAddress.ServerPortIncoming)+", "
+				+"UserNum           =  "+POut.Long  (emailAddress.UserNum)+" "
 				+"WHERE EmailAddressNum = "+POut.Long(emailAddress.EmailAddressNum);
 			Db.NonQ(command);
 		}
@@ -211,6 +215,10 @@ namespace OpenDentBusiness.Crud{
 			if(emailAddress.ServerPortIncoming != oldEmailAddress.ServerPortIncoming) {
 				if(command!=""){ command+=",";}
 				command+="ServerPortIncoming = "+POut.Int(emailAddress.ServerPortIncoming)+"";
+			}
+			if(emailAddress.UserNum != oldEmailAddress.UserNum) {
+				if(command!=""){ command+=",";}
+				command+="UserNum = "+POut.Long(emailAddress.UserNum)+"";
 			}
 			if(command==""){
 				return false;

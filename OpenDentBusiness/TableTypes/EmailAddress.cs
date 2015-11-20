@@ -13,7 +13,7 @@ namespace OpenDentBusiness {
 		public string SMTPserver;
 		///<summary>.</summary>
 		public string EmailUsername;
-		///<summary>.</summary>
+		///<summary>Password associated with this email address.  Encrypted when stored in the database and decrypted before using.</summary>
 		public string EmailPassword;
 		///<summary>Usually 587, sometimes 25 or 465.</summary>
 		public int ServerPort;
@@ -25,6 +25,9 @@ namespace OpenDentBusiness {
 		public string Pop3ServerIncoming;
 		///<summary>Usually 110, sometimes 995.</summary>
 		public int ServerPortIncoming;
+		///<summary>FK to userod.UserNum.  Associates a user with this email address.  A user may only have one email address associated with them.
+		///Can be 0 if no user is associated with this email address.</summary>
+		public long UserNum;
 
 		///<summary>We assume the email settings are implicit if the server port is 465.</summary>
 		public bool IsImplicitSsl {

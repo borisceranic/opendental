@@ -37,6 +37,8 @@
 			this.label5 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
+			this.gridAttachments = new OpenDental.UI.ODGrid();
+			this.comboEmailFrom = new System.Windows.Forms.ComboBox();
 			this.textBccAddress = new OpenDental.ODtextBox();
 			this.textCcAddress = new OpenDental.ODtextBox();
 			this.butShowImages = new OpenDental.UI.Button();
@@ -45,7 +47,6 @@
 			this.textToAddress = new OpenDental.ODtextBox();
 			this.textFromAddress = new OpenDental.ODtextBox();
 			this.butAttach = new OpenDental.UI.Button();
-			this.gridAttachments = new OpenDental.UI.ODGrid();
 			this.butSig = new OpenDental.UI.Button();
 			this.webBrowser = new System.Windows.Forms.WebBrowser();
 			this.textBodyText = new OpenDental.ODtextBox();
@@ -62,14 +63,12 @@
 			// 
 			// textMsgDateTime
 			// 
-			this.textMsgDateTime.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textMsgDateTime.BackColor = System.Drawing.SystemColors.Control;
 			this.textMsgDateTime.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.textMsgDateTime.ForeColor = System.Drawing.Color.Red;
 			this.textMsgDateTime.Location = new System.Drawing.Point(89, 21);
 			this.textMsgDateTime.Name = "textMsgDateTime";
-			this.textMsgDateTime.Size = new System.Drawing.Size(555, 13);
+			this.textMsgDateTime.Size = new System.Drawing.Size(234, 13);
 			this.textMsgDateTime.TabIndex = 0;
 			this.textMsgDateTime.TabStop = false;
 			this.textMsgDateTime.Text = "Unsent";
@@ -171,9 +170,37 @@
 			this.label6.Location = new System.Drawing.Point(0, 103);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(88, 14);
-			this.label6.TabIndex = 10;
+			this.label6.TabIndex = 0;
 			this.label6.Text = "BCC:";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// gridAttachments
+			// 
+			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAttachments.HasMultilineHeaders = false;
+			this.gridAttachments.HScrollVisible = false;
+			this.gridAttachments.Location = new System.Drawing.Point(750, 21);
+			this.gridAttachments.Name = "gridAttachments";
+			this.gridAttachments.ScrollValue = 0;
+			this.gridAttachments.Size = new System.Drawing.Size(220, 140);
+			this.gridAttachments.TabIndex = 0;
+			this.gridAttachments.TabStop = false;
+			this.gridAttachments.Title = "Attachments";
+			this.gridAttachments.TranslationName = null;
+			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
+			this.gridAttachments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridAttachments_MouseDown);
+			// 
+			// comboEmailFrom
+			// 
+			this.comboEmailFrom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboEmailFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboEmailFrom.Location = new System.Drawing.Point(391, 36);
+			this.comboEmailFrom.MaxDropDownItems = 40;
+			this.comboEmailFrom.Name = "comboEmailFrom";
+			this.comboEmailFrom.Size = new System.Drawing.Size(356, 21);
+			this.comboEmailFrom.TabIndex = 2;
+			this.comboEmailFrom.SelectionChangeCommitted += new System.EventHandler(this.comboEmailFrom_SelectionChangeCommitted);
 			// 
 			// textBccAddress
 			// 
@@ -186,9 +213,9 @@
 			this.textBccAddress.Name = "textBccAddress";
 			this.textBccAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textBccAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textBccAddress.Size = new System.Drawing.Size(559, 20);
+			this.textBccAddress.Size = new System.Drawing.Size(658, 20);
 			this.textBccAddress.SpellCheckIsEnabled = false;
-			this.textBccAddress.TabIndex = 11;
+			this.textBccAddress.TabIndex = 5;
 			this.textBccAddress.Text = "";
 			this.textBccAddress.WordWrap = false;
 			// 
@@ -203,9 +230,9 @@
 			this.textCcAddress.Name = "textCcAddress";
 			this.textCcAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textCcAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textCcAddress.Size = new System.Drawing.Size(559, 20);
+			this.textCcAddress.Size = new System.Drawing.Size(658, 20);
 			this.textCcAddress.SpellCheckIsEnabled = false;
-			this.textCcAddress.TabIndex = 9;
+			this.textCcAddress.TabIndex = 4;
 			this.textCcAddress.Text = "";
 			this.textCcAddress.WordWrap = false;
 			// 
@@ -219,7 +246,7 @@
 			this.butShowImages.Location = new System.Drawing.Point(8, 163);
 			this.butShowImages.Name = "butShowImages";
 			this.butShowImages.Size = new System.Drawing.Size(78, 22);
-			this.butShowImages.TabIndex = 7;
+			this.butShowImages.TabIndex = 9;
 			this.butShowImages.Text = "Show Images";
 			this.butShowImages.Visible = false;
 			this.butShowImages.Click += new System.EventHandler(this.butShowImages_Click);
@@ -235,8 +262,8 @@
 			this.textSubject.Name = "textSubject";
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textSubject.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textSubject.Size = new System.Drawing.Size(559, 20);
-			this.textSubject.TabIndex = 4;
+			this.textSubject.Size = new System.Drawing.Size(658, 20);
+			this.textSubject.TabIndex = 7;
 			this.textSubject.Text = "";
 			this.textSubject.WordWrap = false;
 			// 
@@ -252,7 +279,7 @@
 			this.textSignedBy.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textSignedBy.ReadOnly = true;
 			this.textSignedBy.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textSignedBy.Size = new System.Drawing.Size(523, 20);
+			this.textSignedBy.Size = new System.Drawing.Size(622, 20);
 			this.textSignedBy.SpellCheckIsEnabled = false;
 			this.textSignedBy.TabIndex = 0;
 			this.textSignedBy.TabStop = false;
@@ -270,24 +297,22 @@
 			this.textToAddress.Name = "textToAddress";
 			this.textToAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textToAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textToAddress.Size = new System.Drawing.Size(559, 20);
+			this.textToAddress.Size = new System.Drawing.Size(658, 20);
 			this.textToAddress.SpellCheckIsEnabled = false;
-			this.textToAddress.TabIndex = 2;
+			this.textToAddress.TabIndex = 3;
 			this.textToAddress.Text = "";
 			this.textToAddress.WordWrap = false;
 			// 
 			// textFromAddress
 			// 
 			this.textFromAddress.AcceptsTab = true;
-			this.textFromAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textFromAddress.DetectUrls = false;
 			this.textFromAddress.Location = new System.Drawing.Point(89, 37);
 			this.textFromAddress.Multiline = false;
 			this.textFromAddress.Name = "textFromAddress";
 			this.textFromAddress.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textFromAddress.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-			this.textFromAddress.Size = new System.Drawing.Size(559, 20);
+			this.textFromAddress.Size = new System.Drawing.Size(300, 20);
 			this.textFromAddress.SpellCheckIsEnabled = false;
 			this.textFromAddress.TabIndex = 1;
 			this.textFromAddress.Text = "";
@@ -303,28 +328,12 @@
 			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAttach.CornerRadius = 4F;
-			this.butAttach.Location = new System.Drawing.Point(649, 1);
+			this.butAttach.Location = new System.Drawing.Point(750, 0);
 			this.butAttach.Name = "butAttach";
 			this.butAttach.Size = new System.Drawing.Size(75, 20);
-			this.butAttach.TabIndex = 6;
+			this.butAttach.TabIndex = 10;
 			this.butAttach.Text = "Attach...";
 			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
-			// 
-			// gridAttachments
-			// 
-			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridAttachments.HasMultilineHeaders = false;
-			this.gridAttachments.HScrollVisible = false;
-			this.gridAttachments.Location = new System.Drawing.Point(649, 22);
-			this.gridAttachments.Name = "gridAttachments";
-			this.gridAttachments.ScrollValue = 0;
-			this.gridAttachments.Size = new System.Drawing.Size(323, 140);
-			this.gridAttachments.TabIndex = 0;
-			this.gridAttachments.TabStop = false;
-			this.gridAttachments.Title = "Attachments";
-			this.gridAttachments.TranslationName = null;
-			this.gridAttachments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAttachments_CellDoubleClick);
-			this.gridAttachments.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridAttachments_MouseDown);
 			// 
 			// butSig
 			// 
@@ -334,10 +343,10 @@
 			this.butSig.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSig.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSig.CornerRadius = 4F;
-			this.butSig.Location = new System.Drawing.Point(614, 121);
+			this.butSig.Location = new System.Drawing.Point(714, 121);
 			this.butSig.Name = "butSig";
 			this.butSig.Size = new System.Drawing.Size(33, 20);
-			this.butSig.TabIndex = 3;
+			this.butSig.TabIndex = 6;
 			this.butSig.Text = "Sig";
 			this.butSig.Click += new System.EventHandler(this.butSig_Click);
 			// 
@@ -368,7 +377,7 @@
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textBodyText.Size = new System.Drawing.Size(884, 242);
-			this.textBodyText.TabIndex = 5;
+			this.textBodyText.TabIndex = 8;
 			this.textBodyText.Text = "";
 			this.textBodyText.TextChanged += new System.EventHandler(this.textBodyText_TextChanged);
 			// 
@@ -376,6 +385,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.comboEmailFrom);
 			this.Controls.Add(this.textBccAddress);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.textCcAddress);
@@ -433,6 +443,7 @@
 		private System.Windows.Forms.Label label4;
 		private ODtextBox textBccAddress;
 		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.ComboBox comboEmailFrom;
 
 	}
 }

@@ -11328,6 +11328,31 @@ namespace OpenDentBusiness {
 				}
 				command="UPDATE clearinghouse SET Description='ITRANS' WHERE Description='CDAnet';";//oracle compatible
 				Db.NonQ(command);
+				command="SELECT emailaddress.EmailAddressNum, emailaddress.EmailPassword FROM emailaddress";
+				DataTable table=Db.GetTable(command);
+				for(int i=0;i < table.Rows.Count;i++) {
+					long emailAddressNum=PIn.Long(table.Rows[i][0].ToString());
+					string emailPassEncrypted=POut.String(Encrypt(table.Rows[i][1].ToString()));
+					command="UPDATE emailaddress SET EmailPassword = '"+emailPassEncrypted
+						+"' WHERE EmailAddressNum = "+emailAddressNum;
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE emailaddress ADD UserNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE emailaddress ADD INDEX (UserNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE emailaddress ADD UserNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE emailaddress SET UserNum = 0 WHERE UserNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE emailaddress MODIFY UserNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX emailaddress_UserNum ON emailaddress (UserNum)";
+					Db.NonQ(command);
+				}
 
 
 
@@ -11342,8 +11367,6 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
 
 
 

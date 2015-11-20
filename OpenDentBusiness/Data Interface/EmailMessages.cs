@@ -429,7 +429,7 @@ namespace OpenDentBusiness{
 			SmtpClient client=new SmtpClient(emailAddress.SMTPserver,emailAddress.ServerPort);
 			//The default credentials are not used by default, according to: 
 			//http://msdn2.microsoft.com/en-us/library/system.net.mail.smtpclient.usedefaultcredentials.aspx
-			client.Credentials=new NetworkCredential(emailAddress.EmailUsername.Trim(),emailAddress.EmailPassword);
+			client.Credentials=new NetworkCredential(emailAddress.EmailUsername.Trim(),MiscUtils.Decrypt(emailAddress.EmailPassword));
 			client.DeliveryMethod=SmtpDeliveryMethod.Network;
 			client.EnableSsl=emailAddress.UseSSL;
 			client.Timeout=180000;//3 minutes
@@ -512,7 +512,7 @@ namespace OpenDentBusiness{
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusing","2");//sendusing: 1=pickup, 2=port, 3=using microsoft exchange
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate","1");//0=anonymous,1=clear text auth,2=context (NTLM)
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusername",emailAddress.EmailUsername.Trim());
-				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendpassword",emailAddress.EmailPassword);
+				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendpassword",MiscUtils.Decrypt(emailAddress.EmailPassword));
 				//if(PrefC.GetBool(PrefName.EmailUseSSL)) {
 				message.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpusessl","true");//false was also tested and does not work
 				message.From=emailMessage.FromAddress.Trim();
@@ -555,7 +555,7 @@ namespace OpenDentBusiness{
 				SmtpClient client=new SmtpClient(emailAddress.SMTPserver,emailAddress.ServerPort);
 				//The default credentials are not used by default, according to: 
 				//http://msdn2.microsoft.com/en-us/library/system.net.mail.smtpclient.usedefaultcredentials.aspx
-				client.Credentials=new NetworkCredential(emailAddress.EmailUsername.Trim(),emailAddress.EmailPassword);
+				client.Credentials=new NetworkCredential(emailAddress.EmailUsername.Trim(),MiscUtils.Decrypt(emailAddress.EmailPassword));
 				client.DeliveryMethod=SmtpDeliveryMethod.Network;
 				client.EnableSsl=emailAddress.UseSSL;
 				client.Timeout=180000;//3 minutes
@@ -651,7 +651,7 @@ namespace OpenDentBusiness{
 			//This code is modified from the example at: http://hpop.sourceforge.net/exampleFetchAllMessages.php
 			using(OpenPop.Pop3.Pop3Client client=new OpenPop.Pop3.Pop3Client()) {//The client disconnects from the server when being disposed.
 				client.Connect(emailAddressInbox.Pop3ServerIncoming,emailAddressInbox.ServerPortIncoming,emailAddressInbox.UseSSL,180000,180000,null);//3 minute timeout, just as for sending emails.
-				client.Authenticate(emailAddressInbox.EmailUsername.Trim(),emailAddressInbox.EmailPassword,OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword);
+				client.Authenticate(emailAddressInbox.EmailUsername.Trim(),MiscUtils.Decrypt(emailAddressInbox.EmailPassword),OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword);
 				List <string> listMsgUids=client.GetMessageUids();//Get all unique identifiers for each email in the inbox.
 				List<EmailMessageUid> listDownloadedMsgUids=EmailMessageUids.GetForRecipientAddress(emailAddressInbox.EmailUsername.Trim());
 				List<string> listDownloadedMsgUidStrs=new List<string>();

@@ -78,7 +78,10 @@ namespace OpenDental{
 		private UI.Button butECards;
 		private Panel panelWebSched;
 		private MenuItem menuItemSeeAccount;
+		private ComboBox comboEmailFrom;
 		private List<Clinic> _listUserClinics;
+		private GroupBox groupBox2;
+		private List<EmailAddress> _listEmailAddresses;
 		//<summary>Only used if PinClicked=true</summary>
 		//public List<long> AptNumsSelected;
 
@@ -148,8 +151,11 @@ namespace OpenDental{
 			this.butUndo = new OpenDental.UI.Button();
 			this.butECards = new OpenDental.UI.Button();
 			this.panelWebSched = new System.Windows.Forms.Panel();
+			this.comboEmailFrom = new System.Windows.Forms.ComboBox();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox3.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labelClinic
@@ -210,7 +216,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.butRefresh);
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(6, 2);
+			this.groupBox1.Location = new System.Drawing.Point(6, 1);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(641, 83);
 			this.groupBox1.TabIndex = 1;
@@ -379,9 +385,9 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.comboStatus);
 			this.groupBox3.Controls.Add(this.butSetStatus);
 			this.groupBox3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox3.Location = new System.Drawing.Point(654, 2);
+			this.groupBox3.Location = new System.Drawing.Point(654, 1);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(188, 83);
+			this.groupBox3.Size = new System.Drawing.Size(263, 40);
 			this.groupBox3.TabIndex = 15;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Set Status";
@@ -389,7 +395,7 @@ namespace OpenDental{
 			// comboStatus
 			// 
 			this.comboStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboStatus.Location = new System.Drawing.Point(17, 19);
+			this.comboStatus.Location = new System.Drawing.Point(17, 14);
 			this.comboStatus.MaxDropDownItems = 40;
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(160, 21);
@@ -398,12 +404,11 @@ namespace OpenDental{
 			// butSetStatus
 			// 
 			this.butSetStatus.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSetStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSetStatus.Autosize = true;
 			this.butSetStatus.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSetStatus.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSetStatus.CornerRadius = 4F;
-			this.butSetStatus.Location = new System.Drawing.Point(110, 47);
+			this.butSetStatus.Location = new System.Drawing.Point(183, 11);
 			this.butSetStatus.Name = "butSetStatus";
 			this.butSetStatus.Size = new System.Drawing.Size(67, 24);
 			this.butSetStatus.TabIndex = 14;
@@ -432,6 +437,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(6, 88);
 			this.gridMain.Name = "gridMain";
@@ -649,11 +655,32 @@ namespace OpenDental{
 			this.panelWebSched.TabIndex = 119;
 			this.panelWebSched.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelWebSched_MouseClick);
 			// 
+			// comboEmailFrom
+			// 
+			this.comboEmailFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboEmailFrom.Location = new System.Drawing.Point(17, 14);
+			this.comboEmailFrom.MaxDropDownItems = 40;
+			this.comboEmailFrom.Name = "comboEmailFrom";
+			this.comboEmailFrom.Size = new System.Drawing.Size(233, 21);
+			this.comboEmailFrom.TabIndex = 65;
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.comboEmailFrom);
+			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.groupBox2.Location = new System.Drawing.Point(654, 44);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(263, 40);
+			this.groupBox2.TabIndex = 16;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Email From";
+			// 
 			// FormRecallList
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(975, 691);
+			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.panelWebSched);
 			this.Controls.Add(this.butUndo);
 			this.Controls.Add(this.butGotoFamily);
@@ -684,6 +711,7 @@ namespace OpenDental{
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
+			this.groupBox2.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -765,7 +793,32 @@ namespace OpenDental{
 				comboStatus.Items.Add(DefC.Short[(int)DefCat.RecallUnschedStatus][i].ItemName);
 			}
 			FillMain(null);
+			FillComboEmail();
 			Plugins.HookAddCode(this,"FormRecallList.Load_End",table);
+		}
+
+		private void FillComboEmail() {
+			_listEmailAddresses=EmailAddresses.GetListt();//Does not include user specific email addresses.
+			Clinic[] listClinicsAll=Clinics.GetList();
+			for(int i=0;i<listClinicsAll.Length;i++) {//Exclude any email addresses that are associated to a clinic.
+				_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==listClinicsAll[i].EmailAddressNum);
+			}
+			//Exclude default practice email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailDefaultAddressNum));
+			//Exclude web mail notification email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
+			comboEmailFrom.Items.Add(Lan.g(this,"Practice/Clinic"));//default
+			comboEmailFrom.SelectedIndex=0;
+			//Add all email addresses which are not associated to a user, a clinic, or either of the default email addresses.
+			for(int i=0;i<_listEmailAddresses.Count;i++) {
+				comboEmailFrom.Items.Add(_listEmailAddresses[i].EmailUsername);
+			}
+			//Add user specific email address if present.
+			EmailAddress emailAddressMe=EmailAddresses.GetForUser(Security.CurUser.UserNum);//can be null
+			if(emailAddressMe!=null) {
+				_listEmailAddresses.Insert(0,emailAddressMe);
+				comboEmailFrom.Items.Insert(1,Lan.g(this,"Me")+" <"+emailAddressMe.EmailUsername+">");//Just below Practice/Clinic
+			}
 		}
 
 		///<summary>OK to pass in null for excludePatNums.</summary>
@@ -1179,7 +1232,15 @@ namespace OpenDental{
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				recallNums.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["RecallNum"].ToString()));
 			}
-			Recalls.SendWebSchedNotifications(recallNums,checkGroupFamilies.Checked,(RecallListSort)comboSort.SelectedIndex);
+			EmailAddress emailAddressFrom;
+			if(comboEmailFrom.SelectedIndex==0) {
+				//clinic/practice default. Set to null here to pull patient's clinic email address in Recalls.SendWebSchedNotifications().
+				emailAddressFrom=null;
+			}
+			else { //me or static email address, email address for 'me' is the first one in _listEmailAddresses
+				emailAddressFrom=_listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" items in combobox
+			}
+			Recalls.SendWebSchedNotifications(recallNums,checkGroupFamilies.Checked,(RecallListSort)comboSort.SelectedIndex,emailAddressFrom);
 			FillMain(null);
 			Cursor=Cursors.Default;
 		}
@@ -1632,7 +1693,12 @@ namespace OpenDental{
 				message=new EmailMessage();
 				message.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
 				message.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
-				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
+					emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				}
+				else { //me or static email address, email address for 'me' is the first one in _listEmailAddresses
+					emailAddress=_listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" item in combobox
+				}
 				message.FromAddress=emailAddress.SenderAddress;
 				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
 					message.Subject=PrefC.GetString(PrefName.RecallEmailSubject);

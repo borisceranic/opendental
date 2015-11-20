@@ -1488,6 +1488,10 @@ namespace OpenDentBusiness{
 		}
 
 		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy) {
+			return SendWebSchedNotifications(recallNums,isGroupFamily,sortBy,null);
+		}
+
+		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy,EmailAddress emailAddressOverride) {
 			//No need to check RemotingRole; no call to db.
 			string response="";
 			Dictionary<long,string> dictWebSchedParameters=new Dictionary<long,string>();
@@ -1576,7 +1580,12 @@ namespace OpenDentBusiness{
 				emailMessage=new EmailMessage();
 				emailMessage.PatNum=PIn.Long(addrTable.Rows[i]["emailPatNum"].ToString());
 				emailMessage.ToAddress=PIn.String(addrTable.Rows[i]["email"].ToString());//might be guarantor email
-				emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				if(emailAddressOverride!=null) {
+					emailAddress=emailAddressOverride;
+				}
+				else {
+					emailAddress=EmailAddresses.GetByClinic(PIn.Long(addrTable.Rows[i]["ClinicNum"].ToString()));
+				}
 				emailMessage.FromAddress=emailAddress.SenderAddress;
 				if(addrTable.Rows[i]["numberOfReminders"].ToString()=="0") {
 					emailSubject=PrefC.GetString(PrefName.WebSchedSubject);

@@ -214,7 +214,6 @@ namespace OpenDental{
 		private MenuItem menuItemMergePatients;
 		private MenuItem menuItemDuplicateBlockouts;
 		private OpenDental.UI.ODToolBar ToolBarMain;
-		private MenuItem menuItemPassword;
 		private MenuItem menuItem3;
 		private MenuItem menuApptFieldDefs;
 		private MenuItem menuItemWebForms;
@@ -372,6 +371,9 @@ namespace OpenDental{
 		private MenuItem menuItemActionNeeded;
 		private MenuItem menuItemMergeProviders;
 		private MenuItem menuItemMergeMedications;
+		private MenuItem menuItem4;
+		private MenuItem menuItemPassword;
+		private MenuItem menuItemEmailSettings;
 		private FormSmsTextMessaging _formSmsTextMessaging;
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
@@ -490,7 +492,9 @@ namespace OpenDental{
 			this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
 			this.menuItemLogOff = new System.Windows.Forms.MenuItem();
 			this.menuItemFile = new System.Windows.Forms.MenuItem();
+			this.menuItem4 = new System.Windows.Forms.MenuItem();
 			this.menuItemPassword = new System.Windows.Forms.MenuItem();
+			this.menuItemEmailSettings = new System.Windows.Forms.MenuItem();
 			this.menuItem3 = new System.Windows.Forms.MenuItem();
 			this.menuItemPrinter = new System.Windows.Forms.MenuItem();
 			this.menuItemGraphics = new System.Windows.Forms.MenuItem();
@@ -711,7 +715,7 @@ namespace OpenDental{
 			// 
 			this.menuItemFile.Index = 1;
 			this.menuItemFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItemPassword,
+            this.menuItem4,
             this.menuItem3,
             this.menuItemPrinter,
             this.menuItemGraphics,
@@ -722,11 +726,25 @@ namespace OpenDental{
 			this.menuItemFile.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
 			this.menuItemFile.Text = "&File";
 			// 
+			// menuItem4
+			// 
+			this.menuItem4.Index = 0;
+			this.menuItem4.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemPassword,
+            this.menuItemEmailSettings});
+			this.menuItem4.Text = "User Password/Email";
+			// 
 			// menuItemPassword
 			// 
 			this.menuItemPassword.Index = 0;
 			this.menuItemPassword.Text = "Change Password";
 			this.menuItemPassword.Click += new System.EventHandler(this.menuItemPassword_Click);
+			// 
+			// menuItemEmailSettings
+			// 
+			this.menuItemEmailSettings.Index = 1;
+			this.menuItemEmailSettings.Text = "Email Settings";
+			this.menuItemEmailSettings.Click += new System.EventHandler(this.menuItemEmailSettings_Click);
 			// 
 			// menuItem3
 			// 
@@ -5258,6 +5276,19 @@ namespace OpenDental{
 				return;
 			}
 			DataValid.SetInvalid(InvalidType.Security);
+		}
+
+		private void menuItemEmailSettings_Click(object sender,EventArgs e) {
+			EmailAddress emailAddressCur=EmailAddresses.GetForUser(Security.CurUser.UserNum);
+			if(emailAddressCur==null) {
+				emailAddressCur=new EmailAddress();
+				emailAddressCur.UserNum=Security.CurUser.UserNum;
+				EmailAddresses.Insert(emailAddressCur);
+			}
+			FormEmailAddressEdit FormEAE=new FormEmailAddressEdit();
+			FormEAE.EmailAddressCur=emailAddressCur;
+			FormEAE.IsNew=false;
+			FormEAE.ShowDialog();
 		}
 
 		private void menuItemPrinter_Click(object sender, System.EventArgs e) {

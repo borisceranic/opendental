@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -14,7 +15,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textSMTPserver;
 		private System.Windows.Forms.TextBox textSender;
-		private System.Windows.Forms.TextBox textBox1;
 		private TextBox textUsername;
 		private Label label3;
 		private TextBox textPassword;
@@ -33,22 +33,18 @@ namespace OpenDental{
 		private Label label8;
 		private Label label10;
 		private TextBox textPortIncoming;
-		private TextBox textBox5;
 		private Label label11;
 		private Label label9;
 		private Label label12;
 		private UI.Button butRegisterCertificate;
+		private Label label13;
+		private Label label14;
 		public bool IsNew;
 
 		///<summary></summary>
 		public FormEmailAddressEdit() {
 			InitializeComponent();
 			Lan.F(this);
-			Lan.C(this, new System.Windows.Forms.Control[]
-			{
-				textBox1,
-				textBox5
-			});
 		}
 
 		///<summary></summary>
@@ -75,7 +71,6 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.textSMTPserver = new System.Windows.Forms.TextBox();
 			this.textSender = new System.Windows.Forms.TextBox();
-			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.textUsername = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.textPassword = new System.Windows.Forms.TextBox();
@@ -87,13 +82,14 @@ namespace OpenDental{
 			this.label7 = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
 			this.groupOutgoing = new System.Windows.Forms.GroupBox();
+			this.label13 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.groupIncoming = new System.Windows.Forms.GroupBox();
+			this.label14 = new System.Windows.Forms.Label();
 			this.textSMTPserverIncoming = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.textPortIncoming = new System.Windows.Forms.TextBox();
-			this.textBox5 = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.label12 = new System.Windows.Forms.Label();
 			this.butRegisterCertificate = new OpenDental.UI.Button();
@@ -155,26 +151,14 @@ namespace OpenDental{
 			this.textSMTPserver.Location = new System.Drawing.Point(185, 19);
 			this.textSMTPserver.Name = "textSMTPserver";
 			this.textSMTPserver.Size = new System.Drawing.Size(218, 20);
-			this.textSMTPserver.TabIndex = 0;
+			this.textSMTPserver.TabIndex = 1;
 			// 
 			// textSender
 			// 
 			this.textSender.Location = new System.Drawing.Point(185, 142);
 			this.textSender.Name = "textSender";
 			this.textSender.Size = new System.Drawing.Size(218, 20);
-			this.textSender.TabIndex = 5;
-			// 
-			// textBox1
-			// 
-			this.textBox1.BackColor = System.Drawing.SystemColors.Control;
-			this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.textBox1.Location = new System.Drawing.Point(187, 42);
-			this.textBox1.Multiline = true;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(198, 74);
-			this.textBox1.TabIndex = 16;
-			this.textBox1.Text = "smtp.comcast.net\r\nmailhost.mycompany.com \r\nmail.mycompany.com\r\nsmtp.gmail.com\r\nor" +
-    " similar...";
+			this.textSender.TabIndex = 3;
 			// 
 			// textUsername
 			// 
@@ -188,7 +172,7 @@ namespace OpenDental{
 			this.label3.Location = new System.Drawing.Point(97, 6);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(98, 20);
-			this.label3.TabIndex = 18;
+			this.label3.TabIndex = 0;
 			this.label3.Text = "Username";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -205,7 +189,7 @@ namespace OpenDental{
 			this.label4.Location = new System.Drawing.Point(18, 26);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(177, 20);
-			this.label4.TabIndex = 20;
+			this.label4.TabIndex = 0;
 			this.label4.Text = "Password";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -214,7 +198,7 @@ namespace OpenDental{
 			this.textPort.Location = new System.Drawing.Point(185, 114);
 			this.textPort.Name = "textPort";
 			this.textPort.Size = new System.Drawing.Size(56, 20);
-			this.textPort.TabIndex = 3;
+			this.textPort.TabIndex = 2;
 			// 
 			// label5
 			// 
@@ -230,7 +214,7 @@ namespace OpenDental{
 			this.label6.Location = new System.Drawing.Point(247, 114);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(251, 20);
-			this.label6.TabIndex = 23;
+			this.label6.TabIndex = 0;
 			this.label6.Text = "Usually 587.  Sometimes 25 or 465.";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
@@ -240,7 +224,7 @@ namespace OpenDental{
 			this.checkSSL.Location = new System.Drawing.Point(21, 47);
 			this.checkSSL.Name = "checkSSL";
 			this.checkSSL.Size = new System.Drawing.Size(190, 17);
-			this.checkSSL.TabIndex = 4;
+			this.checkSSL.TabIndex = 3;
 			this.checkSSL.Text = "Use SSL";
 			this.checkSSL.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSSL.UseVisualStyleBackColor = true;
@@ -250,7 +234,7 @@ namespace OpenDental{
 			this.label7.Location = new System.Drawing.Point(217, 48);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(251, 20);
-			this.label7.TabIndex = 25;
+			this.label7.TabIndex = 0;
 			this.label7.Text = "For Gmail and some others";
 			// 
 			// butDelete
@@ -266,12 +250,13 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 384);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
-			this.butDelete.TabIndex = 6;
+			this.butDelete.TabIndex = 8;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// groupOutgoing
 			// 
+			this.groupOutgoing.Controls.Add(this.label13);
 			this.groupOutgoing.Controls.Add(this.label9);
 			this.groupOutgoing.Controls.Add(this.textSMTPserver);
 			this.groupOutgoing.Controls.Add(this.label1);
@@ -279,52 +264,68 @@ namespace OpenDental{
 			this.groupOutgoing.Controls.Add(this.label6);
 			this.groupOutgoing.Controls.Add(this.textSender);
 			this.groupOutgoing.Controls.Add(this.textPort);
-			this.groupOutgoing.Controls.Add(this.textBox1);
 			this.groupOutgoing.Controls.Add(this.label5);
 			this.groupOutgoing.Location = new System.Drawing.Point(12, 73);
 			this.groupOutgoing.Name = "groupOutgoing";
 			this.groupOutgoing.Size = new System.Drawing.Size(572, 180);
-			this.groupOutgoing.TabIndex = 26;
+			this.groupOutgoing.TabIndex = 4;
 			this.groupOutgoing.TabStop = false;
 			this.groupOutgoing.Text = "Outgoing Email Settings";
+			// 
+			// label13
+			// 
+			this.label13.Location = new System.Drawing.Point(187, 42);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(198, 69);
+			this.label13.TabIndex = 0;
+			this.label13.Text = "smtp.comcast.net\r\nmailhost.mycompany.com \r\nmail.mycompany.com\r\nsmtp.gmail.com\r\nor" +
+    " similar...";
 			// 
 			// label9
 			// 
 			this.label9.Location = new System.Drawing.Point(404, 142);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(159, 20);
-			this.label9.TabIndex = 24;
+			this.label9.TabIndex = 0;
 			this.label9.Text = "(not used in encrypted email)";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// groupIncoming
 			// 
+			this.groupIncoming.Controls.Add(this.label14);
 			this.groupIncoming.Controls.Add(this.textSMTPserverIncoming);
 			this.groupIncoming.Controls.Add(this.label8);
 			this.groupIncoming.Controls.Add(this.label10);
 			this.groupIncoming.Controls.Add(this.textPortIncoming);
-			this.groupIncoming.Controls.Add(this.textBox5);
 			this.groupIncoming.Controls.Add(this.label11);
 			this.groupIncoming.Location = new System.Drawing.Point(12, 259);
 			this.groupIncoming.Name = "groupIncoming";
 			this.groupIncoming.Size = new System.Drawing.Size(572, 116);
-			this.groupIncoming.TabIndex = 27;
+			this.groupIncoming.TabIndex = 5;
 			this.groupIncoming.TabStop = false;
 			this.groupIncoming.Text = "Incoming Email Settings";
+			// 
+			// label14
+			// 
+			this.label14.Location = new System.Drawing.Point(187, 42);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(198, 43);
+			this.label14.TabIndex = 0;
+			this.label14.Text = "pop.secureserver.net\r\npop.gmail.com\r\nor similar...";
 			// 
 			// textSMTPserverIncoming
 			// 
 			this.textSMTPserverIncoming.Location = new System.Drawing.Point(185, 19);
 			this.textSMTPserverIncoming.Name = "textSMTPserverIncoming";
 			this.textSMTPserverIncoming.Size = new System.Drawing.Size(218, 20);
-			this.textSMTPserverIncoming.TabIndex = 0;
+			this.textSMTPserverIncoming.TabIndex = 1;
 			// 
 			// label8
 			// 
 			this.label8.Location = new System.Drawing.Point(12, 19);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(173, 20);
-			this.label8.TabIndex = 2;
+			this.label8.TabIndex = 0;
 			this.label8.Text = "Incoming POP3 Server";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -333,7 +334,7 @@ namespace OpenDental{
 			this.label10.Location = new System.Drawing.Point(247, 88);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(251, 20);
-			this.label10.TabIndex = 23;
+			this.label10.TabIndex = 0;
 			this.label10.Text = "Usually 110.  Sometimes 995.";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
@@ -342,25 +343,14 @@ namespace OpenDental{
 			this.textPortIncoming.Location = new System.Drawing.Point(185, 88);
 			this.textPortIncoming.Name = "textPortIncoming";
 			this.textPortIncoming.Size = new System.Drawing.Size(56, 20);
-			this.textPortIncoming.TabIndex = 3;
-			// 
-			// textBox5
-			// 
-			this.textBox5.BackColor = System.Drawing.SystemColors.Control;
-			this.textBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.textBox5.Location = new System.Drawing.Point(187, 42);
-			this.textBox5.Multiline = true;
-			this.textBox5.Name = "textBox5";
-			this.textBox5.Size = new System.Drawing.Size(198, 48);
-			this.textBox5.TabIndex = 16;
-			this.textBox5.Text = "pop.secureserver.net\r\npop.gmail.com\r\nor similar...";
+			this.textPortIncoming.TabIndex = 2;
 			// 
 			// label11
 			// 
 			this.label11.Location = new System.Drawing.Point(9, 88);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(174, 20);
-			this.label11.TabIndex = 22;
+			this.label11.TabIndex = 0;
 			this.label11.Text = "Incoming Port";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -369,7 +359,7 @@ namespace OpenDental{
 			this.label12.Location = new System.Drawing.Point(416, 6);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(178, 20);
-			this.label12.TabIndex = 28;
+			this.label12.TabIndex = 0;
 			this.label12.Text = "(full email address)";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
@@ -384,7 +374,7 @@ namespace OpenDental{
 			this.butRegisterCertificate.Location = new System.Drawing.Point(197, 384);
 			this.butRegisterCertificate.Name = "butRegisterCertificate";
 			this.butRegisterCertificate.Size = new System.Drawing.Size(122, 24);
-			this.butRegisterCertificate.TabIndex = 29;
+			this.butRegisterCertificate.TabIndex = 9;
 			this.butRegisterCertificate.Text = "Certificate";
 			this.butRegisterCertificate.Click += new System.EventHandler(this.butRegisterCertificate_Click);
 			// 
@@ -409,6 +399,7 @@ namespace OpenDental{
 			this.Controls.Add(this.label3);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
+			this.MaximumSize = new System.Drawing.Size(616, 463);
 			this.MinimizeBox = false;
 			this.Name = "FormEmailAddressEdit";
 			this.ShowInTaskbar = false;
@@ -426,13 +417,12 @@ namespace OpenDental{
 		#endregion
 
 		private void FormEmailAddress_Load(object sender, System.EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.SecurityAdmin,true)){
-				textPassword.PasswordChar='*';
-			}
 			if(EmailAddressCur!=null) {
 				textSMTPserver.Text=EmailAddressCur.SMTPserver;
 				textUsername.Text=EmailAddressCur.EmailUsername;
-				textPassword.Text=EmailAddressCur.EmailPassword;
+				if(!String.IsNullOrEmpty(EmailAddressCur.EmailPassword)) { //can happen if creating a new user email.
+					textPassword.Text=MiscUtils.Decrypt(EmailAddressCur.EmailPassword);
+				}
 				textPort.Text=EmailAddressCur.ServerPort.ToString();
 				checkSSL.Checked=EmailAddressCur.UseSSL;
 				textSender.Text=EmailAddressCur.SenderAddress;
@@ -476,7 +466,7 @@ namespace OpenDental{
 		private void butOK_Click(object sender, System.EventArgs e) {
 			EmailAddressCur.SMTPserver=PIn.String(textSMTPserver.Text);
 			EmailAddressCur.EmailUsername=PIn.String(textUsername.Text);
-			EmailAddressCur.EmailPassword=PIn.String(textPassword.Text);
+			EmailAddressCur.EmailPassword=PIn.String(MiscUtils.Encrypt(textPassword.Text));
 			try{
 			  EmailAddressCur.ServerPort=PIn.Int(textPort.Text);
 			}

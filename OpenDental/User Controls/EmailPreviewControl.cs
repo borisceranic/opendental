@@ -23,6 +23,7 @@ namespace OpenDental {
 		private Patient _patCur=null;
 		///<summary>If the message is an html email with images, then this list contains the raw image mime parts.  The user must give permission before converting these to images, for security purposes.  Gmail also does this with images, for example.</summary>
 		private List<Health.Direct.Common.Mime.MimeEntity> _listImageParts=null;
+		private List<EmailAddress> _listEmailAddresses;
 
 		public bool HasMessageChanged { get { return _hasMessageChanged; } }
 		public bool IsComposing { get { return _isComposing; } }
@@ -47,8 +48,13 @@ namespace OpenDental {
 		public EmailAddress GetEmailAddress() {
 			if(_patCur==null) {//can happen if sending deposit slip by email
 				return EmailAddresses.GetByClinic(0);//gets the practice default address
-			}
+			} 
+			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
 			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+			}
+			else { //me or static email address
+			return _listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" and items in combobox
+			}
 		}				
 
 		public EmailPreviewControl() {
@@ -120,8 +126,45 @@ namespace OpenDental {
 				textBodyText.Text=_emailMessage.BodyText;//Show the body text exactly as typed by the user.
 			}
 			FillAttachments();
+			FillComboEmail();
 			textBodyText.Select();
 			Cursor=Cursors.Default;
+		}
+
+		private void FillComboEmail() {
+			_listEmailAddresses=EmailAddresses.GetListt();//Does not include user specific email addresses.
+			Clinic[] listClinicsAll=Clinics.GetList();
+			for(int i=0;i<listClinicsAll.Length;i++) {//Exclude any email addresses that are associated to a clinic.
+				_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==listClinicsAll[i].EmailAddressNum);
+			}
+			//Exclude default practice email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailDefaultAddressNum));
+			//Exclude web mail notification email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
+			comboEmailFrom.Items.Add(Lan.g(this,"Practice/Clinic"));//default
+			comboEmailFrom.SelectedIndex=0;
+			textFromAddress.Text=EmailAddresses.GetByClinic(_patCur.ClinicNum).EmailUsername;
+			//Add all email addresses which are not associated to a user, a clinic, or either of the default email addresses.
+			for(int i=0;i<_listEmailAddresses.Count;i++) {
+				comboEmailFrom.Items.Add(_listEmailAddresses[i].EmailUsername);
+			}
+			//Add user specific email address if present.
+			EmailAddress emailAddressMe=EmailAddresses.GetForUser(Security.CurUser.UserNum);//can be null
+			if(emailAddressMe!=null) {
+				_listEmailAddresses.Insert(0,emailAddressMe);
+				comboEmailFrom.Items.Insert(1,Lan.g(this,"Me")+" <"+emailAddressMe.EmailUsername+">");//Just below Practice/Clinic
+				comboEmailFrom.SelectedIndex=1;
+				textFromAddress.Text=emailAddressMe.EmailUsername;
+			}
+		}
+
+		private void comboEmailFrom_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
+				textFromAddress.Text=EmailAddresses.GetByClinic(_patCur.ClinicNum).EmailUsername;
+			}
+			else { //me or static email address
+				textFromAddress.Text=_listEmailAddresses[comboEmailFrom.SelectedIndex-1].EmailUsername;//-1 to account for predefined "Clinic/Practice" item in combobox
+			}
 		}
 
 		#region Attachments

@@ -62,8 +62,12 @@ namespace OpenDental{
 		private Label labelClinic;
 		private bool ignoreRefreshOnce;
 		public long ClinicNum;
+		private ComboBox comboEmailFrom;
+		private Label label6;
 		///<summary>Do not pass a list of clinics in.  This list gets filled on load based on the user logged in.  ListClinics is used in other forms so it is public.</summary>
 		public List<Clinic> ListClinics;
+		///<summary>List of emails not attached to a clinic, the practice default, or a user.</summary>
+		private List<EmailAddress> _listEmailAddresses;
 
 		protected void OnGoToChanged(long patNum) {
 			if(GoToChanged!=null) {
@@ -122,6 +126,8 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this.comboEmailFrom = new System.Windows.Forms.ComboBox();
+			this.label6 = new System.Windows.Forms.Label();
 			this.contextMenu.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -192,6 +198,7 @@ namespace OpenDental{
 			this.gridBill.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridBill.ContextMenuStrip = this.contextMenu;
+			this.gridBill.HasMultilineHeaders = false;
 			this.gridBill.HScrollVisible = false;
 			this.gridBill.Location = new System.Drawing.Point(12, 58);
 			this.gridBill.Name = "gridBill";
@@ -210,12 +217,12 @@ namespace OpenDental{
 			this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemGoTo});
 			this.contextMenu.Name = "contextMenu";
-			this.contextMenu.Size = new System.Drawing.Size(108, 26);
+			this.contextMenu.Size = new System.Drawing.Size(107, 26);
 			// 
 			// menuItemGoTo
 			// 
 			this.menuItemGoTo.Name = "menuItemGoTo";
-			this.menuItemGoTo.Size = new System.Drawing.Size(107, 22);
+			this.menuItemGoTo.Size = new System.Drawing.Size(106, 22);
 			this.menuItemGoTo.Text = "Go To";
 			this.menuItemGoTo.Click += new System.EventHandler(this.menuItemGoTo_Click);
 			// 
@@ -262,7 +269,6 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.labelSentElect);
 			this.groupBox1.Controls.Add(this.labelEmailed);
 			this.groupBox1.Controls.Add(this.labelPrinted);
@@ -314,7 +320,6 @@ namespace OpenDental{
 			// butEdit
 			// 
 			this.butEdit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butEdit.Autosize = true;
 			this.butEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -328,21 +333,21 @@ namespace OpenDental{
 			// 
 			// textDateEnd
 			// 
-			this.textDateEnd.Location = new System.Drawing.Point(650, 32);
+			this.textDateEnd.Location = new System.Drawing.Point(694, 32);
 			this.textDateEnd.Name = "textDateEnd";
 			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
 			this.textDateEnd.TabIndex = 38;
 			// 
 			// textDateStart
 			// 
-			this.textDateStart.Location = new System.Drawing.Point(651, 8);
+			this.textDateStart.Location = new System.Drawing.Point(695, 8);
 			this.textDateStart.Name = "textDateStart";
 			this.textDateStart.Size = new System.Drawing.Size(77, 20);
 			this.textDateStart.TabIndex = 37;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(584, 35);
+			this.label2.Location = new System.Drawing.Point(628, 35);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(64, 14);
 			this.label2.TabIndex = 36;
@@ -351,7 +356,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(578, 11);
+			this.label3.Location = new System.Drawing.Point(622, 11);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(70, 14);
 			this.label3.TabIndex = 35;
@@ -361,7 +366,6 @@ namespace OpenDental{
 			// butRefresh
 			// 
 			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butRefresh.Autosize = true;
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -376,16 +380,16 @@ namespace OpenDental{
 			// comboOrder
 			// 
 			this.comboOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboOrder.Location = new System.Drawing.Point(195, 8);
+			this.comboOrder.Location = new System.Drawing.Point(234, 8);
 			this.comboOrder.MaxDropDownItems = 40;
 			this.comboOrder.Name = "comboOrder";
-			this.comboOrder.Size = new System.Drawing.Size(133, 21);
+			this.comboOrder.Size = new System.Drawing.Size(173, 21);
 			this.comboOrder.TabIndex = 41;
 			this.comboOrder.SelectionChangeCommitted += new System.EventHandler(this.comboOrder_SelectionChangeCommitted);
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(110, 12);
+			this.label4.Location = new System.Drawing.Point(149, 12);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(83, 14);
 			this.label4.TabIndex = 40;
@@ -422,7 +426,7 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(409, 8);
+			this.comboClinic.Location = new System.Drawing.Point(488, 8);
 			this.comboClinic.MaxDropDownItems = 40;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(133, 21);
@@ -432,7 +436,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(334, 13);
+			this.labelClinic.Location = new System.Drawing.Point(413, 13);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(73, 14);
 			this.labelClinic.TabIndex = 45;
@@ -440,12 +444,32 @@ namespace OpenDental{
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.labelClinic.Visible = false;
 			// 
+			// comboEmailFrom
+			// 
+			this.comboEmailFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboEmailFrom.Location = new System.Drawing.Point(234, 32);
+			this.comboEmailFrom.MaxDropDownItems = 40;
+			this.comboEmailFrom.Name = "comboEmailFrom";
+			this.comboEmailFrom.Size = new System.Drawing.Size(173, 21);
+			this.comboEmailFrom.TabIndex = 47;
+			// 
+			// label6
+			// 
+			this.label6.Location = new System.Drawing.Point(118, 36);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(110, 14);
+			this.label6.TabIndex = 46;
+			this.label6.Text = "Email From";
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormBilling
 			// 
 			this.AcceptButton = this.butSend;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(888, 688);
+			this.Controls.Add(this.comboEmailFrom);
+			this.Controls.Add(this.label6);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.label5);
@@ -514,6 +538,7 @@ namespace OpenDental{
 					}
 				}
 			}
+			FillComboEmail();
 		}
 
 		private void FormBilling_Activated(object sender,EventArgs e) {
@@ -616,6 +641,30 @@ namespace OpenDental{
 			gridBill.ScrollValue=scrollPos;
 			labelTotal.Text=Lan.g(this,"Total=")+table.Rows.Count.ToString();
 			labelSelected.Text=Lan.g(this,"Selected=")+gridBill.SelectedIndices.Length.ToString();
+		}
+
+		private void FillComboEmail() {
+			_listEmailAddresses=EmailAddresses.GetListt();//Does not include user specific email addresses.
+			Clinic[] listClinicsAll=Clinics.GetList();
+			for(int i=0;i<listClinicsAll.Length;i++) {//Exclude any email addresses that are associated to a clinic.
+				_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==listClinicsAll[i].EmailAddressNum);
+			}
+			//Exclude default practice email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailDefaultAddressNum));
+			//Exclude web mail notification email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
+			comboEmailFrom.Items.Add(Lan.g(this,"Practice/Clinic"));//default
+			comboEmailFrom.SelectedIndex=0;
+			//Add all email addresses which are not associated to a user, a clinic, or either of the default email addresses.
+			for(int i=0;i<_listEmailAddresses.Count;i++) {
+				comboEmailFrom.Items.Add(_listEmailAddresses[i].EmailUsername);
+			}
+			//Add user specific email address if present.
+			EmailAddress emailAddressMe=EmailAddresses.GetForUser(Security.CurUser.UserNum);//can be null
+			if(emailAddressMe!=null) {
+				_listEmailAddresses.Insert(0,emailAddressMe);
+				comboEmailFrom.Items.Insert(1,Lan.g(this,"Me")+" <"+emailAddressMe.EmailUsername+">");//Just below Practice/Clinic
+			}
 		}
 
 		private void butAll_Click(object sender, System.EventArgs e) {
@@ -821,7 +870,12 @@ namespace OpenDental{
 				pat=fam.GetPatient(stmt.PatNum);
 				patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
 				dataSet=AccountModules.GetStatementDataSet(stmt);
-				emailAddress=EmailAddresses.GetByClinic(pat.ClinicNum);
+				if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
+					emailAddress=EmailAddresses.GetByClinic(pat.ClinicNum);
+				}
+				else { //me or static email address, email address for 'me' is the first one in _listEmailAddresses
+					emailAddress=_listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" item in combobox
+				}
 				if(stmt.Mode_==StatementMode.Email){
 					if(emailAddress.SMTPserver==""){
 						MsgBox.Show(this,"You need to enter an SMTP server name in e-mail setup before you can send e-mail.");

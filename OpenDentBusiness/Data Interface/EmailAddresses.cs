@@ -6,11 +6,11 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class EmailAddresses{
 		#region CachePattern
-		///<summary>A list of all EmailAddresses.</summary>
+		///<summary>A list of all EmailAddresses whose UserNum=0.</summary>
 		private static List<EmailAddress> _listt;
 		private static object _lockObj=new object();
 
-		///<summary>A list of all EmailAddresses.</summary>
+		///<summary>A list of all EmailAddresses whose UserNum=0.</summary>
 		public static List<EmailAddress> Listt{
 			get {
 				return GetListt();
@@ -21,8 +21,8 @@ namespace OpenDentBusiness{
 				}
 			}
 		}
-		
-		///<summary>A list of all EmailAddresses.</summary>
+
+		///<summary>A list of all EmailAddresses whose UserNum=0.</summary>
 		public static List<EmailAddress> GetListt() {
 			bool isListNull=false;
 			lock(_lockObj) {
@@ -45,7 +45,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache(){
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM emailaddress";
+			string command="SELECT * FROM emailaddress WHERE UserNum = 0 ORDER BY EmailUsername";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="EmailAddress";
 			FillCache(table);
@@ -74,7 +74,7 @@ namespace OpenDentBusiness{
 			}
 			if(emailAddress==null) {
 				List<EmailAddress> listEmailAddresses=GetListt();
-				if(listEmailAddresses.Count>0) {//user didn't set a default
+				if(listEmailAddresses.Count>0) {//user didn't set a default, so just pick the first email in the list.
 					emailAddress=listEmailAddresses[0];
 				}
 				else {
@@ -87,6 +87,13 @@ namespace OpenDentBusiness{
 				}
 			}
 			return emailAddress;
+		}
+
+		///<summary>Executes a query to the database to get the email address associated to the passed-in user.  
+		///Does not use the cache.  Returns null if no email address in the database matches the passed-in user.</summary>
+		public static EmailAddress GetForUser(long userNum) {
+			string command="SELECT * FROM emailaddress WHERE emailaddress.UserNum = "+userNum;
+			return Crud.EmailAddressCrud.SelectOne(command);
 		}
 
 		///<summary>Gets one EmailAddress from the cached listt.  Might be null.</summary>

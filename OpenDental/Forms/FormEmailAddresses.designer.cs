@@ -38,13 +38,14 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.label2 = new System.Windows.Forms.Label();
 			this.groupEmailPrefs.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labelInboxComputerName
 			// 
 			this.labelInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxComputerName.Location = new System.Drawing.Point(16, 453);
+			this.labelInboxComputerName.Location = new System.Drawing.Point(16, 482);
 			this.labelInboxComputerName.Name = "labelInboxComputerName";
 			this.labelInboxComputerName.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxComputerName.TabIndex = 6;
@@ -54,7 +55,7 @@ namespace OpenDental{
 			// labelInboxCheckInterval
 			// 
 			this.labelInboxCheckInterval.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxCheckInterval.Location = new System.Drawing.Point(16, 497);
+			this.labelInboxCheckInterval.Location = new System.Drawing.Point(16, 526);
 			this.labelInboxCheckInterval.Name = "labelInboxCheckInterval";
 			this.labelInboxCheckInterval.Size = new System.Drawing.Size(335, 18);
 			this.labelInboxCheckInterval.TabIndex = 7;
@@ -64,7 +65,7 @@ namespace OpenDental{
 			// labelInboxCheckUnits
 			// 
 			this.labelInboxCheckUnits.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelInboxCheckUnits.Location = new System.Drawing.Point(49, 519);
+			this.labelInboxCheckUnits.Location = new System.Drawing.Point(49, 548);
 			this.labelInboxCheckUnits.Name = "labelInboxCheckUnits";
 			this.labelInboxCheckUnits.Size = new System.Drawing.Size(198, 18);
 			this.labelInboxCheckUnits.TabIndex = 9;
@@ -73,8 +74,9 @@ namespace OpenDental{
 			// 
 			// textInboxComputerName
 			// 
-			this.textInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textInboxComputerName.Location = new System.Drawing.Point(18, 472);
+			this.textInboxComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textInboxComputerName.Location = new System.Drawing.Point(18, 501);
 			this.textInboxComputerName.MaxLength = 2147483647;
 			this.textInboxComputerName.Multiline = true;
 			this.textInboxComputerName.Name = "textInboxComputerName";
@@ -84,7 +86,7 @@ namespace OpenDental{
 			// textInboxCheckInterval
 			// 
 			this.textInboxCheckInterval.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textInboxCheckInterval.Location = new System.Drawing.Point(18, 516);
+			this.textInboxCheckInterval.Location = new System.Drawing.Point(18, 545);
 			this.textInboxCheckInterval.MaxLength = 2147483647;
 			this.textInboxCheckInterval.Multiline = true;
 			this.textInboxCheckInterval.Name = "textInboxCheckInterval";
@@ -93,6 +95,7 @@ namespace OpenDental{
 			// 
 			// groupEmailPrefs
 			// 
+			this.groupEmailPrefs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupEmailPrefs.Controls.Add(this.label1);
 			this.groupEmailPrefs.Controls.Add(this.butSetDefault);
 			this.groupEmailPrefs.Controls.Add(this.butWebMailNotify);
@@ -148,8 +151,9 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(18, 12);
+			this.gridMain.Location = new System.Drawing.Point(18, 41);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.Size = new System.Drawing.Size(391, 440);
@@ -166,7 +170,7 @@ namespace OpenDental{
 			this.butThisComputer.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butThisComputer.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butThisComputer.CornerRadius = 4F;
-			this.butThisComputer.Location = new System.Drawing.Point(264, 472);
+			this.butThisComputer.Location = new System.Drawing.Point(264, 501);
 			this.butThisComputer.Name = "butThisComputer";
 			this.butThisComputer.Size = new System.Drawing.Size(87, 24);
 			this.butThisComputer.TabIndex = 10;
@@ -198,7 +202,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(431, 472);
+			this.butOK.Location = new System.Drawing.Point(431, 501);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 2;
@@ -213,17 +217,28 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(431, 516);
+			this.butCancel.Location = new System.Drawing.Point(431, 545);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(16, 5);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(393, 33);
+			this.label2.TabIndex = 13;
+			this.label2.Text = "Setup clinic, practice, and group email addresses here.\r\nIndividual user inboxes " +
+    "can be setup in File | Change Password/Email.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEmailAddresses
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(529, 558);
+			this.ClientSize = new System.Drawing.Size(529, 587);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.groupEmailPrefs);
 			this.Controls.Add(this.textInboxCheckInterval);
 			this.Controls.Add(this.textInboxComputerName);
@@ -236,6 +251,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(545, 400);
 			this.Name = "FormEmailAddresses";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Email Addresses";
@@ -263,5 +279,6 @@ namespace OpenDental{
 		private UI.Button butWebMailNotify;
 		private System.Windows.Forms.GroupBox groupEmailPrefs;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label label2;
 	}
 }
