@@ -382,7 +382,6 @@ namespace OpenDental{
 			this.butSave.Size = new System.Drawing.Size(88, 24);
 			this.butSave.TabIndex = 77;
 			this.butSave.Text = "Save to Images";
-			this.toolTip1.SetToolTip(this.butSave, "Toggle the selected teeth as skipped");
 			this.butSave.Click += new System.EventHandler(this.butSave_Click);
 			// 
 			// butCalcIndex
