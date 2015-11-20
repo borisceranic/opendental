@@ -11326,6 +11326,8 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX emailattach_EmailTemplateNum ON emailattach (EmailTemplateNum)";
 					Db.NonQ(command);
 				}
+				command="UPDATE clearinghouse SET Description='ITRANS' WHERE Description='CDAnet';";//oracle compatible
+				Db.NonQ(command);
 
 
 
