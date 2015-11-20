@@ -6262,7 +6262,7 @@ namespace OpenDental{
 				List<Procedure> listProcsForTP=Procedures.GetManyProc(listTreatPlanAttaches.Select(x => x.ProcNum).ToList(),false)
 					.OrderBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority)<0)
 					.ThenBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority))
-					.ThenBy(x => PIn.Int(x.ToothNum))
+					.ThenBy(x => Tooth.ToInt(x.ToothNum))
 					.ThenBy(x => x.ProcDate).ToList();
 				List<ProcTP> listProcTPsCur=new List<ProcTP>();
 				TpRow row;

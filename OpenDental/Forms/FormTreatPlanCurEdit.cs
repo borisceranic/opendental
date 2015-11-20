@@ -83,10 +83,10 @@ namespace OpenDental {
 			ODGridRow row;
 			List<Procedure> listProcs;
 			if(grid==gridAll) {
-				listProcs=_listTpProcsAll.FindAll(x => _listTpProcsCur.All(y => x.ProcNum!=y.ProcNum)).OrderBy(x => PIn.Int(x.ToothNum)).ToList();
+				listProcs=_listTpProcsAll.FindAll(x => _listTpProcsCur.All(y => x.ProcNum!=y.ProcNum)).OrderBy(x => Tooth.ToInt(x.ToothNum)).ToList();
 			}
 			else {
-				listProcs=_listTpProcsCur.OrderBy(x => PIn.Int(x.ToothNum)).ToList();
+				listProcs=_listTpProcsCur.OrderBy(x => Tooth.ToInt(x.ToothNum)).ToList();
 			}
 			foreach(Procedure proc in listProcs) {
 				row=new ODGridRow();
