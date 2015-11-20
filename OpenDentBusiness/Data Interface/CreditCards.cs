@@ -119,7 +119,7 @@ namespace OpenDentBusiness{
 				+"guar.LName GuarLName,guar.FName GuarFName,guar.BalTotal-guar.InsEst FamBalTotal,"
 				//Special select statement to figure out how much is owed on a particular payment plan.
 				+"ROUND((SELECT COALESCE(SUM(ppc.Principal+ppc.Interest),0) FROM PayPlanCharge ppc WHERE ppc.PayPlanNum=cc.PayPlanNum "
-				+"AND ppc.ChargeDate<="+DbHelper.Curdate()+")-COALESCE(SUM(ps.SplitAmt),0),2) PayPlanDue,"
+				+"AND ppc.ChargeDate<="+DbHelper.Curdate()+")-COALESCE(SUM(ps.SplitAmt),0),2) PayPlanDueCalc,"
 				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,"
 				+"cc.PayPlanNum,cc.DateStop,(SELECT ppc1.ProvNum FROM payplancharge ppc1 WHERE ppc1.PayPlanNum=cc.PayPlanNum "+DbHelper.LimitAnd(1)+") ProvNum,"
 				+"(SELECT ppc2.ClinicNum FROM payplancharge ppc2 WHERE ppc2.PayPlanNum=cc.PayPlanNum "+DbHelper.LimitAnd(1)+") ClinicNum,cc.Procedures,"
@@ -130,13 +130,14 @@ namespace OpenDentBusiness{
 				+"LEFT JOIN paysplit ps ON ps.PayPlanNum=cc.PayPlanNum AND ps.PayPlanNum<>0 "
 				+"WHERE cc.PayPlanNum<>0 ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY cc.CreditCardNum) ";
+				command+="GROUP BY cc.CreditCardNum ";
 			}
 			else {//Oracle
 				command+="GROUP BY cc.CreditCardNum,cc.PatNum,"+DbHelper.Concat("pat.LName","', '","pat.FName")+",PatName,guar.BalTotal-guar.InsEst,"
 					+"cc.Address,pat.Address,cc.Zip,pat.Zip,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,cc.PayPlanNum,cc.DateStop,"
-					+"ClinicNum,cc.Procedues,pat.BillingCycleDay,pat.Guarantor)";
+					+"ClinicNum,cc.Procedues,pat.BillingCycleDay,pat.Guarantor ";
 			}
+			command+="HAVING PayPlanDueCalc>0)";//don't show cc's attached to payplans when the payplan has nothing due
 			#endregion
 			//Now we have all the results for payments and payment plans, so do an obvious filter. A more thorough filter happens later.
 			command+=") due "
@@ -247,7 +248,10 @@ namespace OpenDentBusiness{
 				}
 				else {//Else, current date is before the recurring date in the current month, so the recurring charge will be going in for last month
 					//Check if payment didn't happen last month.
-					if(curDate.AddMonths(-1).Month!=latestPayment.Month && curDate.Date!=latestPayment.Date) {
+					if(curDate.AddMonths(-1).Date>latestPayment.Date//the latest recurring charge payment for this card was before one month ago
+						&& curDate.AddMonths(-1).Month!=latestPayment.Month)//the latest recurring charge payment for this card did not happen during last month
+						//&& curDate.Date!=latestPayment.Date)//no longer necessary since latest payment was before one month ago
+					{
 						//Charge did not happen last month so the patient needs to show up in list.
 						//Example: Last month had a recurring charge set at the end of the month that fell on a weekend.
 						//Today is the next month and still before the recurring charge date. 
