@@ -1416,14 +1416,16 @@ namespace OpenDental{
 			}
 			PatCur.PatStatus=PatientStatus.Patient;
 			PatCur.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-			//Explicitly use the combo clinic instead of FormOpenDental.ClinicNum becuase the combo box should default to that clinic unless manually changed by the user.
-			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0) {//not no clinics and all isn't selected
-				//Set the patients primary provider to the clinic default provider.
-				PatCur.PriProv=Providers.GetDefaultProvider(_listClinics[comboClinic.SelectedIndex-1].ClinicNum).ProvNum;
-			}
-			else {
-				//Set the patients primary provider to the practice default provider.
-				PatCur.PriProv=Providers.GetDefaultProvider().ProvNum;
+			if(!PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				//Explicitly use the combo clinic instead of FormOpenDental.ClinicNum becuase the combo box should default to that clinic unless manually changed by the user.
+				if(PrefC.HasClinicsEnabled && comboClinic.SelectedIndex!=0) {//clinics enabled and all isn't selected
+					//Set the patients primary provider to the clinic default provider.
+					PatCur.PriProv=Providers.GetDefaultProvider(_listClinics[comboClinic.SelectedIndex-1].ClinicNum).ProvNum;
+				}
+				else {
+					//Set the patients primary provider to the practice default provider.
+					PatCur.PriProv=Providers.GetDefaultProvider().ProvNum;
+				}
 			}
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				PatCur.Gender=PatientGender.Unknown;
