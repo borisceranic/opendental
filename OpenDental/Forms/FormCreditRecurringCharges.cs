@@ -677,14 +677,15 @@ namespace OpenDental {
 			split.ProcDate=paymentCur.PayDate;
 			split.DatePay=paymentCur.PayDate;
 			split.PayPlanNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanNum"].ToString());
-			if(split.PayPlanNum==0) {//this row is not for a payplan
+			if(split.PayPlanNum==0 || payPlanDue<=0) {//this row is not for a payplan or there is no payplandue
+				split.PayPlanNum=0;//if the payplan does not have any amount due, don't attach split to payplan
 				split.SplitAmt=paymentCur.PayAmt;
 				paymentCur.PayAmt-=split.SplitAmt;
 				split.ProvNum=provNumRegPmts;
 				split.ClinicNum=patCur.ClinicNum;
 			}
 			else {//row includes a payplan amount due, could also include a regular repeating pay amount as part of the total charge amount
-				split.SplitAmt=payPlanDue;
+				split.SplitAmt=Math.Min(payPlanDue,paymentCur.PayAmt);//ensures a split is not more than the actual payment amount
 				paymentCur.PayAmt-=split.SplitAmt;//subtract the payplan pay amount from the total payment amount and create another split not attached to payplan
 				split.ProvNum=provNumPayPlan;
 			}
