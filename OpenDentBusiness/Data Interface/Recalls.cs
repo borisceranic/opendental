@@ -306,6 +306,9 @@ namespace OpenDentBusiness{
 				if(contmeth==ContactMethod.WirelessPh) {
 					row["contactMethod"]=Lans.g("FormRecallList","Cell:")+rawtable.Rows[i]["WirelessPhone"].ToString();
 				}
+				if(contmeth==ContactMethod.TextMessage) {
+					row["contactMethod"]=Lans.g("FormRecallList","Text:")+rawtable.Rows[i]["WirelessPhone"].ToString();
+				}
 				if(contmeth==ContactMethod.Email) {
 					if(groupByFamilies) {
 						//always use guarantor email

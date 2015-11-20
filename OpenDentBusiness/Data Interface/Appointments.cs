@@ -479,6 +479,9 @@ namespace OpenDentBusiness{
 				if(contmeth==ContactMethod.DoNotCall || contmeth==ContactMethod.SeeNotes) {
 					row["contactMethod"]=Lans.g("enumContactMethod",contmeth.ToString());
 				}
+				if(contmeth==ContactMethod.Mail) {
+					row["contactMethod"]=Lans.g("FormConfirmList","Mail");
+				}
 				row["dateSched"]="Unknown";
 				if(rawtable.Rows[i]["LogDateTime"].ToString().Length>0) {
 					row["dateSched"]=rawtable.Rows[i]["LogDateTime"].ToString();
