@@ -2179,7 +2179,7 @@ namespace OpenDental{
 		List<Procedure> listProcForTP=Procedures.GetManyProc(listTreatPlanAttaches.Select(x=>x.ProcNum).ToList(),false)
 			.OrderBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority)<0)
 			.ThenBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority))
-			.ThenBy(x => PIn.Int(x.ToothNum))
+			.ThenBy(x => Tooth.ToInt(x.ToothNum))
 			.ThenBy(x=>x.ProcDate).ToList();
 		InsPlan priPlanCur=null;
 		if(PatPlanList.Count>0) { //primary
