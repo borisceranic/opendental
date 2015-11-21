@@ -170,6 +170,8 @@ namespace OpenDental {
 				return false;//did not click inside a table
 			}
 			textContent.SelectionLength=0;//otherwise we get an annoying highlight
+			//==Travis 11/20/15:  If we want to fix wiki tables in the future so duplicate tables dont both get changed from a double click, we'll need to
+			//   use a regular expression to find which match of strTableLoad the user clicked on, and only replace that match below.
 			FormWikiTableEdit formT=new FormWikiTableEdit();
 			formT.Markup=strTableLoad;
 			formT.CountTablesInPage=countTable;
