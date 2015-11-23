@@ -11303,6 +11303,18 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.4.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_4_4();
+		}
+
+		private static void To15_4_4() {
+			if(FromVersion<new Version("15.4.4.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.4.0"));//No translation in convert script.
+				string command="";
+				command="UPDATE clearinghouse SET Description='ITRANS' WHERE Description='CDAnet';";//oracle compatible
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.4.4.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_1_0();
 		}
 
@@ -11326,8 +11338,6 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX emailattach_EmailTemplateNum ON emailattach (EmailTemplateNum)";
 					Db.NonQ(command);
 				}
-				command="UPDATE clearinghouse SET Description='ITRANS' WHERE Description='CDAnet';";//oracle compatible
-				Db.NonQ(command);
 				command="SELECT emailaddress.EmailAddressNum, emailaddress.EmailPassword FROM emailaddress";
 				DataTable table=Db.GetTable(command);
 				for(int i=0;i < table.Rows.Count;i++) {
