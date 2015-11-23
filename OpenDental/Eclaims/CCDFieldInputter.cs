@@ -97,6 +97,19 @@ namespace OpenDental.Eclaims {
 		public string InputField(string message,string fieldId){
 			CCDField field=new CCDField(fieldId,isVersion2);
 			int len=field.GetRequiredLength(this);
+			if(len >= 0 && message!=null && message.Length < len) {//The remainder of the message (the very last line) is shorter than the field.
+				if(fieldId=="G26") {//Note Text
+					//We have seen G26 coming back without trailing spaces and instead containing a newline.  G26 is supposed to be 75 chars padded right.
+					//We have only seen this issue coming from the ITRANS clearinghouse with regards to the Accerta carrier 311140.
+					len=message.Length;//Read the remainder of the message as the G26.
+					if(message.EndsWith("\n")) {
+						len--;//Exclude the newline character, since we might not handle newlines properly elsewhere.
+					}
+				}
+				else {//Not G26
+					return null;//If another field, then we need to investigate before making a decision.  For now, the field is invalid.
+				}
+			}
 			if(len<0 || message==null || message.Length<len){
 				return null;
 			}
