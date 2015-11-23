@@ -4891,7 +4891,10 @@ namespace OpenDental{
 			List<Appointment> listApptsCur=Appointments.GetAppointmentsStartingWithinPeriod(Podium.DateTimeLastRan.AddMinutes(-40).AddMilliseconds(_podiumIntervalMS),nowDT.AddMilliseconds(-_podiumIntervalMS));
 			for(int i=0;i<listApptsCur.Count;i++) {
 				Appointment apptCur=listApptsCur[i];
-				if(apptCur.AptStatus==ApptStatus.Broken) {
+				if(apptCur.AptStatus!=ApptStatus.Scheduled
+					&& apptCur.AptStatus!=ApptStatus.Complete
+					&& apptCur.AptStatus!=ApptStatus.ASAP)
+				{
 					continue;
 				}
 				Patient patCur=Patients.GetPat(apptCur.PatNum);
