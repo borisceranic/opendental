@@ -45,7 +45,7 @@ namespace OpenDental {
 		private GroupBox groupBox1;
 		private ToolStripMenuItem setupToolStripMenuItem;
 		private UI.ODPictureBox picturePodium;
-		private UI.ODPictureBox odPictureBox2;
+		private UI.ODPictureBox pictureDentalIntel;
 		private GroupBox groupBox2;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
@@ -103,7 +103,7 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
-			this.odPictureBox2 = new OpenDental.UI.ODPictureBox();
+			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.menuMain.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -402,19 +402,20 @@ namespace OpenDental {
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// odPictureBox2
+			// pictureDentalIntel
 			// 
-			this.odPictureBox2.HasBorder = false;
-			this.odPictureBox2.Image = global::OpenDental.Properties.Resources.DI_Button_100x24;
-			this.odPictureBox2.Location = new System.Drawing.Point(8, 19);
-			this.odPictureBox2.Name = "odPictureBox2";
-			this.odPictureBox2.Size = new System.Drawing.Size(95, 24);
-			this.odPictureBox2.TabIndex = 0;
-			this.odPictureBox2.TextNullImage = null;
+			this.pictureDentalIntel.HasBorder = false;
+			this.pictureDentalIntel.Image = global::OpenDental.Properties.Resources.DI_Button_100x24;
+			this.pictureDentalIntel.Location = new System.Drawing.Point(8, 19);
+			this.pictureDentalIntel.Name = "pictureDentalIntel";
+			this.pictureDentalIntel.Size = new System.Drawing.Size(95, 24);
+			this.pictureDentalIntel.TabIndex = 0;
+			this.pictureDentalIntel.TextNullImage = null;
+			this.pictureDentalIntel.Click += new System.EventHandler(this.pictureDentalIntel_Click);
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.odPictureBox2);
+			this.groupBox2.Controls.Add(this.pictureDentalIntel);
 			this.groupBox2.Location = new System.Drawing.Point(532, 87);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(113, 53);
