@@ -736,14 +736,7 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT * FROM userod "
 				+"INNER JOIN jobrole ON userod.UserNum=jobrole.UserNum "
-				+"WHERE jobrole.RoleType=("+POut.Long((int)JobRoleType.Approval)+" "
-				+"OR "+POut.Long((int)JobRoleType.Documentation)+" "
-				+"OR "+POut.Long((int)JobRoleType.Writeup)+" "
-				+"OR "+POut.Long((int)JobRoleType.Engineer)+" "
-				+"OR "+POut.Long((int)JobRoleType.Concept)+" "
-				+"OR "+POut.Long((int)JobRoleType.Assignment)+" "
-				+"OR "+POut.Long((int)JobRoleType.Review)+") "
-				+"AND IsHidden=0";
+				+"WHERE IsHidden=0 GROUP BY userod.UserNum ORDER BY UserName";
 			return Crud.UserodCrud.SelectMany(command);
 		}
 
