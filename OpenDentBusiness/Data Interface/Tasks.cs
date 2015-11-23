@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -65,125 +66,82 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all tasks for the Task Search function, limited to 50 by default.</summary>
-		public static DataTable GetDataSet(long userNum,List<long> listTaskListNums,long taskNum,string taskDateCreatedFrom,string taskDateCreatedTo,string taskDateCompletedFrom,string taskDateCompletedTo,string taskDescription,long taskPriorityNum,long patNum,bool limit) {
-			string whereClause="";
-			string whereNoteClause="";
+		public static DataTable GetDataSet(long userNum,List<long> listTaskListNums,long taskNum,string taskDateCreatedFrom,string taskDateCreatedTo,
+			string taskDateCompletedFrom,string taskDateCompletedTo,string taskDescription,long taskPriorityNum,long patNum,bool limit)
+		{
+			List<string> listWhereClauses=new List<string>();
+			List<string> listWhereNoteClauses=new List<string>();
+			DateTime dateCreatedFrom=PIn.Date(taskDateCreatedFrom);//will be DateTime.MinValue if not set, i.e. if " "
+			DateTime dateCreatedTo=PIn.Date(taskDateCreatedTo);//will be DateTime.MinValue if not set, i.e. if " "
+			DateTime dateCompletedFrom=PIn.Date(taskDateCompletedFrom);//will be DateTime.MinValue if not set, i.e. if " "
+			DateTime dateCompletedTo=PIn.Date(taskDateCompletedTo);//will be DateTime.MinValue if not set, i.e. if " "
 			if(userNum!=0) {
-				whereClause+="task.UserNum="+POut.Long(userNum)+" ";
-				whereNoteClause+="tasknote.UserNum="+POut.Long(userNum)+" ";
+				listWhereClauses.Add("task.UserNum="+POut.Long(userNum));
+				listWhereNoteClauses.Add("tasknote.UserNum="+POut.Long(userNum));
 			}
-			if(listTaskListNums.Count!=0) {
-				if(listTaskListNums.Count>0) {
-					if(whereClause!="") {
-						whereClause+="AND ";
-					}
-					whereClause+="task.TaskListNum IN("+String.Join(",",listTaskListNums)+") ";
-				}
+			if(listTaskListNums.Count>0) {
+				listWhereClauses.Add("task.TaskListNum IN("+string.Join(",",listTaskListNums)+")");
 			}
 			if(taskNum!=0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(whereNoteClause!="") {
-					whereNoteClause+="AND ";
-				}
-				whereClause+="task.TaskNum="+POut.Long(taskNum)+" ";
-				whereNoteClause+="tasknote.TaskNum="+POut.Long(taskNum)+" ";
+				listWhereClauses.Add("task.TaskNum="+POut.Long(taskNum));
+				listWhereNoteClauses.Add("tasknote.TaskNum="+POut.Long(taskNum));
 			}
 			//Note: DateTime strings that are empty actually are " " due to how the empty datetime control behaves.
-			if(taskDateCreatedFrom!=" " || taskDateCreatedTo!=" ") {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(whereNoteClause!="") {
-					whereNoteClause+="AND ";
-				}
-				if(taskDateCreatedFrom!=" " && taskDateCreatedTo!=" ") {//Needs to be a between statement
-					whereClause+="DATE(task.DateTimeEntry) BETWEEN "+POut.Date(PIn.Date(taskDateCreatedFrom))+" AND "+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
-					whereNoteClause+="DATE(tasknote.DateTimeNote) BETWEEN "+POut.Date(PIn.Date(taskDateCreatedFrom))+" AND "+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
-				}
-				else if(taskDateCreatedFrom!=" ") {
-					whereClause+="DATE(task.DateTimeEntry)>="+POut.Date(PIn.Date(taskDateCreatedFrom))+" ";
-					whereNoteClause+="DATE(tasknote.DateTimeNote)>="+POut.Date(PIn.Date(taskDateCreatedFrom))+" ";
-				}
-				else {//Only the To field was entered.
-					whereClause+="DATE(task.DateTimeEntry)<="+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
-					whereNoteClause+="DATE(tasknote.DateTimeNote)<="+POut.Date(PIn.Date(taskDateCreatedTo))+" ";
-				}
+			if(dateCreatedFrom>DateTime.MinValue) {
+				listWhereClauses.Add("DATE(task.DateTimeEntry)>="+POut.Date(dateCreatedFrom));
+				listWhereNoteClauses.Add("DATE(tasknote.DateTimeNote)>="+POut.Date(dateCreatedFrom));
 			}
-			if(taskDateCompletedFrom!=" " || taskDateCompletedTo!=" ") {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(whereNoteClause!="") {
-					whereNoteClause+="AND ";
-				}
-				if(taskDateCompletedFrom!=" " && taskDateCompletedTo!=" ") {//Needs to be a between statement
-					whereClause+="DATE(task.DateTimeFinished) BETWEEN "+POut.Date(PIn.Date(taskDateCompletedFrom))+" AND "+POut.Date(PIn.Date(taskDateCompletedTo))+" ";
-				}
-				else if(taskDateCompletedFrom!=" ") {
-					whereClause+="DATE(task.DateTimeFinished)>="+POut.Date(PIn.Date(taskDateCompletedFrom))+" ";
-				}
-				else {//Only the To field was entered.
-					whereClause+="DATE(task.DateTimeFinished)<="+POut.Date(PIn.Date(taskDateCompletedTo))+" ";
-				}
-				whereNoteClause="";
+			if(dateCreatedTo>DateTime.MinValue) {
+				listWhereClauses.Add("DATE(task.DateTimeEntry)<="+POut.Date(dateCreatedTo));
+				listWhereNoteClauses.Add("DATE(tasknote.DateTimeNote)<="+POut.Date(dateCreatedTo));
+			}
+			if(dateCompletedFrom>DateTime.MinValue) {
+				listWhereClauses.Add("DATE(task.DateTimeFinished)>="+POut.Date(dateCompletedFrom));
+			}
+			if(dateCompletedTo>DateTime.MinValue) {
+				listWhereClauses.Add("DATE(task.DateTimeFinished)<="+POut.Date(dateCompletedTo));
 			}
 			if(taskDescription!="") {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(whereNoteClause!="") {
-					whereNoteClause+="AND ";
-				}
-				whereClause+="task.Descript LIKE '%"+POut.String(taskDescription)+"%' ";
-				whereNoteClause+="tasknote.Note LIKE '%"+POut.String(taskDescription)+"%' ";
+				listWhereClauses.Add("task.Descript LIKE '%"+POut.String(taskDescription)+"%'");
+				listWhereNoteClauses.Add("tasknote.Note LIKE '%"+POut.String(taskDescription)+"%'");
 			}
 			if(taskPriorityNum!=0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="task.PriorityDefNum="+POut.Long(taskPriorityNum)+" ";
+				listWhereClauses.Add("task.PriorityDefNum="+POut.Long(taskPriorityNum));
 			}
 			if(patNum!=0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="(task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" AND task.KeyNum="+POut.Long(patNum)+") ";
+				listWhereClauses.Add("task.ObjectType="+POut.Int((int)TaskObjectType.Patient));
+				listWhereClauses.Add("task.KeyNum="+POut.Long(patNum));
 			}
-			if(whereNoteClause!="") {
-				whereNoteClause="WHERE "+whereNoteClause;
+			string whereClause="";
+			if(listWhereClauses.Count>0) {
+				whereClause="WHERE "+string.Join(" AND ",listWhereClauses)+" ";
 			}
-			if(whereClause!="") {
-				whereClause="WHERE "+whereClause;
+			string whereNoteClause="";
+			if(listWhereNoteClauses.Count>0) {
+				whereNoteClause="WHERE "+string.Join(" AND ",listWhereNoteClauses)+" ";
 			}
+			//First Data set from Task, Unioned with...
 			string command="(SELECT task.TaskNum AS TaskNum "
 				+"FROM task "
 				+whereClause
-				+"ORDER BY task.DateTimeEntry DESC ";
+				+"ORDER BY task.DateTimeEntry DESC";
 			if(limit) {
-				command+="LIMIT 50 ";
+				command+=" LIMIT 50";
 			}
-			command+=") ";
+			command+=")";
+			//Second Data set from TaskNote
 			if((whereClause!="" && whereNoteClause!="") || (whereClause=="" && whereNoteClause=="")) {
-				command+="UNION "
+				command+=" UNION "
 				+"(SELECT taskNote.TaskNum AS TaskNum "
 				+"FROM tasknote "
 				+whereNoteClause
-				+"ORDER BY tasknote.DateTimeNote DESC ";
+				+"ORDER BY tasknote.DateTimeNote DESC";
 				if(limit) {
-					command+="LIMIT 50 ";
+					command+=" LIMIT 50";
 				}
 				command+=")";
 			}
-			DataTable rawTask=Db.GetTable(command);
-			List<long> listTaskNums=new List<long>();
-			for(int i=0;i<rawTask.Rows.Count;i++) {
-				listTaskNums.Add(PIn.Long(rawTask.Rows[i]["TaskNum"].ToString()));
-			}
-			DateTime dateCreate;
-			DateTime dateComplete;
-			DataRow row;
+			List<long> listTaskNums=Db.GetListLong(command);
 			DataTable table=new DataTable();
 			table.Columns.Add(new DataColumn("description"));
 			table.Columns.Add(new DataColumn("note"));
@@ -193,115 +151,71 @@ namespace OpenDentBusiness{
 			table.Columns.Add(new DataColumn("dateComplete"));
 			table.Columns.Add(new DataColumn("TaskNum"));
 			table.Columns.Add(new DataColumn("color"));
-			if(listTaskNums.Count!=0) {
-				List<Task> listTasks=Tasks.GetMany(listTaskNums);//All tasks for the notes and tasks.
-				//There are potentially too many tasks in listTasks at this point.  It contains all tasks that met the criteria for the task union but it
-				//also contains all tasks for task notes that met the note criteria in the note union.  The tasks obtained from the notes only had to have a  
-				//single note meet the note criteria, which is description, creation date, author, and task num.  There are an additional 4 criteria that the
-				//tasks themselves should meet which are priority, finished date, pat num, and task list.  Instead of doing a costly join on the task table
-				//from the tasknotes inside the query, we will instead remove tasks from listTasks that don't meet the task criteria (they were obtained from 
-				//notes which matched the note criteria).  In this way we then have a list of tasks that met all the criteria from the task union to begin with
-				//and also has tasks that were obtained from notes which also have the additional task criteria.
-				for(int i=listTasks.Count-1;i>=0;i--) {
-					if(listTaskListNums.Count>0 && !listTaskListNums.Contains(listTasks[i].TaskListNum)) {//The TaskListNum of this task isn't included in the search.
-						listTasks.RemoveAt(i);
-						continue;
-					}
-					if(taskPriorityNum!=0 && listTasks[i].PriorityDefNum!=taskPriorityNum) {//The task doesn't have a priority that matches what we are searching for.
-						listTasks.RemoveAt(i);
-						continue;
-					}
-					if(patNum!=0 && listTasks[i].ObjectType!=TaskObjectType.Patient && listTasks[i].KeyNum!=patNum) {//The task isn't associated with the correct patient we're searching for.
-						listTasks.RemoveAt(i);
-						continue;
-					}
-					if(taskDateCompletedFrom!=" " && taskDateCompletedTo!=" ") {
-						if(listTasks[i].DateTimeFinished.Date<PIn.DateT(taskDateCompletedFrom).Date && listTasks[i].DateTimeFinished.Date>PIn.DateT(taskDateCompletedTo).Date) {
-							//Task finished date is not in the specified date range.
-							listTasks.RemoveAt(i);
-							continue;
-						}
-					}
-					else if(taskDateCompletedFrom!=" ") {
-						if(listTasks[i].DateTimeFinished.Date<PIn.DateT(taskDateCompletedFrom).Date) {
-							//Task finished date is not in the specified date range.
-							listTasks.RemoveAt(i);
-							continue;
-						}
-					}
-					else if(taskDateCompletedTo!=" ") {
-						if(listTasks[i].DateTimeFinished.Date>PIn.DateT(taskDateCompletedTo).Date) {
-							//Task finished date is not in the specified date range.
-							listTasks.RemoveAt(i);
-							continue;
-						}
-					}
+			if(listTaskNums.Count==0) {
+				return table;//empty table with correct structure.
+			}
+			//listTaskNums contains too many items. Tasks found from matching task notes must be filtered too. (This prevents a costly join in the query.)
+			List<Task> listTasks=Tasks.GetMany(listTaskNums)//All tasks for the notes and tasks
+				.FindAll(x => listTaskListNums.Count==0 || listTaskListNums.Contains(x.TaskListNum))//filter by TaskListNum, if neccesary
+				.FindAll(x => taskPriorityNum==0 || taskPriorityNum==x.PriorityDefNum)//filter by priority, if neccesary
+				.FindAll(x => patNum==0 || (x.ObjectType==TaskObjectType.Patient && x.KeyNum==patNum))//filter by patnum, if neccesary
+				.FindAll(x => dateCompletedFrom==DateTime.MinValue || x.DateTimeFinished.Date>=dateCompletedFrom.Date)//filter by dateFrom, if neccesary
+				.FindAll(x => dateCompletedTo==DateTime.MinValue || x.DateTimeFinished.Date<=dateCompletedTo.Date)
+				.OrderByDescending(x=> x.DateTimeEntry).ToList();//Order results
+			List<TaskNote> listTaskNotes=TaskNotes.RefreshForTasks(listTaskNums);//All notes for the tasks.	(Ordered by dateTime)		
+			int textColor=DefC.GetColor(DefCat.ProgNoteColors,DefC.GetList(DefCat.ProgNoteColors)[18].DefNum).ToArgb();//18="Patient Note Text"
+			int textCompletedColor=DefC.GetColor(DefCat.ProgNoteColors,DefC.GetList(DefCat.ProgNoteColors)[20].DefNum).ToArgb();//20="Completed Pt Note Text"
+			string txt;
+			DataRow row;
+			foreach(Task taskCur in listTasks) {
+				txt="";
+				row=table.NewRow();
+				//Build data row
+				if(taskCur.TaskStatus==TaskStatusEnum.Done) {
+					row["color"]=textCompletedColor;
+					txt+=Lans.g("TaskSearch","Completed")+" ";
 				}
-				listTasks.Sort(CompareDateTimeEntry);
-				List<TaskNote> listTaskNotes=TaskNotes.RefreshForTasks(listTaskNums);//All notes for the tasks.
-				Def[] taskColors=DefC.GetList(DefCat.ProgNoteColors);
-				for(int i=0;i<listTasks.Count;i++) {
-					string txt="";
-					row=table.NewRow();
-					row["color"]=POut.Int(taskColors[18].ItemColor.ToArgb());
-					if(listTasks[i].TaskStatus==TaskStatusEnum.Done) {
-						row["color"]=POut.Int(taskColors[20].ItemColor.ToArgb());
-						txt+=Lans.g("TaskSearch","Completed ");
-					}
-					if(listTasks[i].TaskListNum!=0) {
-						row["description"]=txt+Lans.g("TaskSearch","In List: ")+TaskLists.GetFullPath(listTasks[i].TaskListNum);
-					}
-					else {
-						row["description"]=txt+Lans.g("TaskSearch","Not in list");
-					}
-					txt="";
-					if(!listTasks[i].Descript.StartsWith("==") && listTasks[i].UserNum!=0) {
-						txt+=Userods.GetName(PIn.Long(listTasks[i].UserNum.ToString()))+" - ";
-					}
-					txt+=listTasks[i].Descript;
-					long taskNumDs=listTasks[i].TaskNum;
-					for(int n=0;n<listTaskNotes.Count;n++) {
-						if(listTaskNotes[n].TaskNum!=taskNumDs) {
-							continue;
-						}
-						txt+="\r\n"//even on the first loop
-					+"=="+Userods.GetName(listTaskNotes[n].UserNum)+" - "
-					+listTaskNotes[n].DateTimeNote.ToShortDateString()+" "
-					+listTaskNotes[n].DateTimeNote.ToShortTimeString()
-					+" - "+listTaskNotes[n].Note;
-					}
-					row["note"]=txt;
-					row["PatNum"]=listTasks[i].KeyNum;
-					dateCreate=listTasks[i].DateTask;
-					dateComplete=listTasks[i].DateTimeFinished;
-					row["procTime"]="";
-					if(dateCreate.Year<1880) {//check if due date set for task or note
-						dateCreate=listTasks[i].DateTimeEntry;
-						if(dateCreate.Year<1880) {//since dateT was just redefined, check it now
-							row["dateCreate"]="";
-						}
-						else {
-							row["dateCreate"]=dateCreate.ToShortDateString();
-						}
-						if(dateCreate.TimeOfDay!=TimeSpan.Zero) {
-							row["procTime"]=dateCreate.ToString("h:mm")+dateCreate.ToString("%t").ToLower();
-						}
-					}
-					else {
-						row["dateCreate"]=dateCreate.ToString(Lans.GetShortDateTimeFormat());
-						if(dateCreate.TimeOfDay!=TimeSpan.Zero) {
-							row["procTime"]=dateCreate.ToString("h:mm") + dateCreate.ToString("%t").ToLower();
-						}
-					}
-					if(dateComplete.Year<1880) {
-						row["dateComplete"]="";
-					}
-					else {
-						row["dateComplete"]=dateComplete.ToString(Lans.GetShortDateTimeFormat());
-					}
-					row["TaskNum"]=listTasks[i].TaskNum;
-					table.Rows.Add(row);
+				else {
+					row["color"]=textColor;
 				}
+				if(taskCur.TaskListNum!=0) {
+					row["description"]=txt+Lans.g("TaskSearch","In List")+": "+TaskLists.GetFullPath(taskCur.TaskListNum);
+				}
+				else {
+					row["description"]=txt+Lans.g("TaskSearch","Not in list");
+				}
+				txt="";
+				if(!taskCur.Descript.StartsWith("==") && taskCur.UserNum!=0) {
+					txt+=Userods.GetName(PIn.Long(taskCur.UserNum.ToString()))+" - ";
+				}
+				txt+=taskCur.Descript;
+				listTaskNotes.FindAll(x => x.TaskNum==taskCur.TaskNum)
+					.ForEach(x => txt+="\r\n"//even on the first loop
+						+"=="+Userods.GetName(x.UserNum)+" - "
+						+x.DateTimeNote.ToShortDateString()+" "
+						+x.DateTimeNote.ToShortTimeString()
+						+" - "+x.Note);
+				row["note"]=txt;
+				if(taskCur.ObjectType==TaskObjectType.Patient) {
+					row["PatNum"]=taskCur.KeyNum;
+				}
+				if(taskCur.DateTask.Year>1880) {//check if due date set for task or note
+					row["dateCreate"]=taskCur.DateTask.ToString(Lans.GetShortDateTimeFormat());
+				}
+				else if(taskCur.DateTimeEntry.Year>1880) {//since dateT was just redefined, check it now
+					row["dateCreate"]=taskCur.DateTimeEntry.ToShortDateString();
+				}
+				if(taskCur.DateTask.TimeOfDay!=TimeSpan.Zero) {
+					row["procTime"]=taskCur.DateTask.ToString("h:mm")+taskCur.DateTask.ToString("%t").ToLower();
+				}
+				else if(taskCur.DateTimeEntry.TimeOfDay!=TimeSpan.Zero) {
+					row["procTime"]=taskCur.DateTimeEntry.ToString("h:mm")+taskCur.DateTimeEntry.ToString("%t").ToLower();
+				}
+				if(taskCur.DateTimeFinished.Year>1880) {
+					row["dateComplete"]=taskCur.DateTimeFinished.ToString(Lans.GetShortDateTimeFormat());
+				}
+				row["TaskNum"]=taskCur.TaskNum;
+				table.Rows.Add(row);
 			}
 			return table;
 		}
@@ -902,11 +816,6 @@ namespace OpenDentBusiness{
 				DateTime yMaxDateTime=PIn.DateT(y["DateTimeEntry"].ToString());
 				return xMaxDateTime.CompareTo(yMaxDateTime);
 			}
-		}
-
-		///<summary>Compares the task DateTimeEntry to sort the list.</summary>
-		public static int CompareDateTimeEntry(Task x,Task y) {
-			return 0-(x.DateTimeEntry.CompareTo(y.DateTimeEntry));//Sorting most recent first.
 		}
 
 		///<summary>Zeros securitylog FKey column for rows that are using the matching taskNum as FKey and are related to Task.
