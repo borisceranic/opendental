@@ -4789,8 +4789,7 @@ namespace OpenDental{
 				String defValue=DefC.GetName(DefCat.ClaimCustomTracking,securityLogArray[i].DefNum);//get definition Name
 				row.Cells.Add(defValue);
 				row.Cells.Add(securityLogArray[i].LogText);
-				string empFL=Employees.GetNameFL(securityLogArray[i].UserNum);//get employee first and last name
-				row.Cells.Add(empFL);
+				row.Cells.Add(Userods.GetName(securityLogArray[i].UserNum));
 				gridStatusHistory.Rows.Add(row);
 			}
 			gridStatusHistory.EndUpdate();
