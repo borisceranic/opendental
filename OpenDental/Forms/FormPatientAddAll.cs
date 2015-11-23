@@ -1878,7 +1878,8 @@ namespace OpenDental {
 			}
 			bool hasSavedMissingFields=false;
 			if(_isMissingRequiredFields) {
-				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Required Fields are missing. Do you want to go back and finish entering patient information?")) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Required fields are missing or incorrect.  Click OK to save anyway or Cancel to return and "
+						+"finish editing patient information.")) {
 					_isValidating=true;
 					SetRequiredFields();
 					return;
