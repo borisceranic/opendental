@@ -66,7 +66,7 @@ namespace OpenDentBusiness.UI {
 			}
 			DrawGridLines(g);
 			if(showRedTimeLine) {
-				DrawRedTimeIndicator(g);
+				DrawTimeIndicatorLine(g);
 			}
 			DrawMinutes(g,startTime,stopTime);
 		}
@@ -443,11 +443,11 @@ namespace OpenDentBusiness.UI {
 		}
 
 		///<summary></summary>
-		public static void DrawRedTimeIndicator(Graphics g) {
+		public static void DrawTimeIndicatorLine(Graphics g) {
 			int curTimeY=(int)(DateTime.Now.Hour*LineH*RowsPerHr+DateTime.Now.Minute/60f*(float)LineH*RowsPerHr);
-			g.DrawLine(new Pen(Color.Red),0,curTimeY
+			g.DrawLine(new Pen(PrefC.GetColor(PrefName.AppointmentTimeLineColor)),0,curTimeY
 				,TimeWidth*2+ProvWidth*ProvCount+ColWidth*ColCount,curTimeY);
-			g.DrawLine(new Pen(Color.Red),0,curTimeY+1
+			g.DrawLine(new Pen(PrefC.GetColor(PrefName.AppointmentTimeLineColor)),0,curTimeY+1
 				,TimeWidth*2+ProvWidth*ProvCount+ColWidth*ColCount,curTimeY+1);
 		}
 

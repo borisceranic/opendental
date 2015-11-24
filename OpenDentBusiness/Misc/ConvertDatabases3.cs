@@ -11363,8 +11363,15 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX emailaddress_UserNum ON emailaddress (UserNum)";
 					Db.NonQ(command);
 				}
-
-
+				//Appointment time line color.  Default to old color of Color.Red = ARGB #FFFF0000.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentTimeLineColor','-65536')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentTimeLineColor','-65536')";
+					Db.NonQ(command);
+				}
 
 
 

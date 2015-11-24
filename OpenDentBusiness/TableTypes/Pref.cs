@@ -56,6 +56,8 @@ namespace OpenDentBusiness {
 		AppointmentTimeIncrement,
 		///<summary>Set to true if appointment times are locked by default.</summary>
 		AppointmentTimeIsLocked,
+		///<summary>Used to set the color of the time indicator line in the appt module.  Stored as an int.</summary>
+		AppointmentTimeLineColor,
 		AppointmentTimeSeatedTrigger,
 		ApptBubbleDelay,
 		ApptExclamationShowForUnsentIns,
