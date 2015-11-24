@@ -709,7 +709,7 @@ namespace OpenDental {
 			this.butLab.Name = "butLab";
 			this.butLab.Size = new System.Drawing.Size(79, 21);
 			this.butLab.TabIndex = 77;
-			this.butLab.Text = "LabCases";
+			this.butLab.Text = "Lab Cases";
 			this.butLab.Click += new System.EventHandler(this.butLab_Click);
 			// 
 			// butSearch
