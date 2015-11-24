@@ -26,6 +26,8 @@ namespace OpenDental {
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("Date",80);
 			gridMain.Columns.Add(col);
+			col=new ODGridColumn("Pulse",55);
+			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Height",55);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Weight",55);
@@ -42,6 +44,7 @@ namespace OpenDental {
 			for(int i=0;i<listVs.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(listVs[i].DateTaken.ToShortDateString());
+				row.Cells.Add(listVs[i].Pulse.ToString()+" bpm");
 				row.Cells.Add(listVs[i].Height.ToString()+" in.");
 				row.Cells.Add(listVs[i].Weight.ToString()+" lbs.");
 				row.Cells.Add(listVs[i].BpSystolic.ToString()+"/"+listVs[i].BpDiastolic.ToString());

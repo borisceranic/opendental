@@ -30,9 +30,6 @@
 			this.labelWeight = new System.Windows.Forms.Label();
 			this.labelHeight = new System.Windows.Forms.Label();
 			this.textDateTaken = new System.Windows.Forms.TextBox();
-			this.butCancel = new System.Windows.Forms.Button();
-			this.butOK = new System.Windows.Forms.Button();
-			this.butDelete = new System.Windows.Forms.Button();
 			this.textBPd = new System.Windows.Forms.TextBox();
 			this.textBPs = new System.Windows.Forms.TextBox();
 			this.textWeight = new System.Windows.Forms.TextBox();
@@ -55,7 +52,8 @@
 			this.textPregCode = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.groupExclusion = new System.Windows.Forms.GroupBox();
-			this.butChangeDefault = new System.Windows.Forms.Button();
+			this.textReasonDescript = new System.Windows.Forms.TextBox();
+			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.labelNotPerf = new System.Windows.Forms.Label();
 			this.textReasonCode = new System.Windows.Forms.TextBox();
@@ -63,13 +61,17 @@
 			this.checkNotPerf = new System.Windows.Forms.CheckBox();
 			this.labelPregNotice = new System.Windows.Forms.Label();
 			this.groupInterventions = new System.Windows.Forms.GroupBox();
-			this.gridInterventions = new OpenDental.UI.ODGrid();
-			this.butAdd = new System.Windows.Forms.Button();
 			this.textBMIPercentile = new System.Windows.Forms.TextBox();
 			this.labelBMIPercentile = new System.Windows.Forms.Label();
 			this.textBMIPercentileCode = new System.Windows.Forms.TextBox();
-			this.textPregCodeDescript = new System.Windows.Forms.TextBox();
-			this.textReasonDescript = new System.Windows.Forms.TextBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.textPulse = new System.Windows.Forms.TextBox();
+			this.gridInterventions = new OpenDental.UI.ODGrid();
+			this.butDelete = new OpenDental.UI.Button();
+			this.butCancel = new OpenDental.UI.Button();
+			this.butOk = new OpenDental.UI.Button();
+			this.butAdd = new OpenDental.UI.Button();
+			this.butChangeDefault = new OpenDental.UI.Button();
 			this.groupExclusion.SuspendLayout();
 			this.groupInterventions.SuspendLayout();
 			this.SuspendLayout();
@@ -88,7 +90,7 @@
 			this.labelBMI.Location = new System.Drawing.Point(26, 139);
 			this.labelBMI.Name = "labelBMI";
 			this.labelBMI.Size = new System.Drawing.Size(93, 17);
-			this.labelBMI.TabIndex = 2;
+			this.labelBMI.TabIndex = 0;
 			this.labelBMI.Text = "BMI";
 			this.labelBMI.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -97,7 +99,7 @@
 			this.labelBPs.Location = new System.Drawing.Point(26, 44);
 			this.labelBPs.Name = "labelBPs";
 			this.labelBPs.Size = new System.Drawing.Size(93, 17);
-			this.labelBPs.TabIndex = 4;
+			this.labelBPs.TabIndex = 0;
 			this.labelBPs.Text = "Systolic BP";
 			this.labelBPs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -106,7 +108,7 @@
 			this.labelWeight.Location = new System.Drawing.Point(26, 116);
 			this.labelWeight.Name = "labelWeight";
 			this.labelWeight.Size = new System.Drawing.Size(93, 17);
-			this.labelWeight.TabIndex = 5;
+			this.labelWeight.TabIndex = 0;
 			this.labelWeight.Text = "Weight (.lbs)";
 			this.labelWeight.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -115,7 +117,7 @@
 			this.labelHeight.Location = new System.Drawing.Point(26, 92);
 			this.labelHeight.Name = "labelHeight";
 			this.labelHeight.Size = new System.Drawing.Size(93, 17);
-			this.labelHeight.TabIndex = 6;
+			this.labelHeight.TabIndex = 0;
 			this.labelHeight.Text = "Height (in.)";
 			this.labelHeight.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -124,49 +126,15 @@
 			this.textDateTaken.Location = new System.Drawing.Point(122, 18);
 			this.textDateTaken.Name = "textDateTaken";
 			this.textDateTaken.Size = new System.Drawing.Size(80, 20);
-			this.textDateTaken.TabIndex = 0;
+			this.textDateTaken.TabIndex = 1;
 			this.textDateTaken.Leave += new System.EventHandler(this.textDateTaken_Leave);
-			// 
-			// butCancel
-			// 
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Location = new System.Drawing.Point(513, 579);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75, 23);
-			this.butCancel.TabIndex = 6;
-			this.butCancel.Text = "&Cancel";
-			this.butCancel.UseVisualStyleBackColor = true;
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// butOK
-			// 
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Location = new System.Drawing.Point(432, 579);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75, 23);
-			this.butOK.TabIndex = 5;
-			this.butOK.Text = "&OK";
-			this.butOK.UseVisualStyleBackColor = true;
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
-			// 
-			// butDelete
-			// 
-			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butDelete.Location = new System.Drawing.Point(10, 579);
-			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(75, 23);
-			this.butDelete.TabIndex = 10;
-			this.butDelete.TabStop = false;
-			this.butDelete.Text = "&Delete";
-			this.butDelete.UseVisualStyleBackColor = true;
-			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// textBPd
 			// 
 			this.textBPd.Location = new System.Drawing.Point(122, 66);
 			this.textBPd.Name = "textBPd";
 			this.textBPd.Size = new System.Drawing.Size(39, 20);
-			this.textBPd.TabIndex = 6;
+			this.textBPd.TabIndex = 4;
 			this.textBPd.TextChanged += new System.EventHandler(this.textBPd_TextChanged);
 			// 
 			// textBPs
@@ -174,7 +142,7 @@
 			this.textBPs.Location = new System.Drawing.Point(122, 42);
 			this.textBPs.Name = "textBPs";
 			this.textBPs.Size = new System.Drawing.Size(40, 20);
-			this.textBPs.TabIndex = 5;
+			this.textBPs.TabIndex = 3;
 			this.textBPs.TextChanged += new System.EventHandler(this.textBPs_TextChanged);
 			// 
 			// textWeight
@@ -182,7 +150,7 @@
 			this.textWeight.Location = new System.Drawing.Point(122, 114);
 			this.textWeight.Name = "textWeight";
 			this.textWeight.Size = new System.Drawing.Size(56, 20);
-			this.textWeight.TabIndex = 3;
+			this.textWeight.TabIndex = 6;
 			this.textWeight.TextChanged += new System.EventHandler(this.textWeight_TextChanged);
 			// 
 			// textHeight
@@ -190,7 +158,7 @@
 			this.textHeight.Location = new System.Drawing.Point(122, 90);
 			this.textHeight.Name = "textHeight";
 			this.textHeight.Size = new System.Drawing.Size(56, 20);
-			this.textHeight.TabIndex = 1;
+			this.textHeight.TabIndex = 5;
 			this.textHeight.TextChanged += new System.EventHandler(this.textHeight_TextChanged);
 			// 
 			// textBMI
@@ -218,7 +186,7 @@
 			this.comboHeightExamCode.MaxDropDownItems = 30;
 			this.comboHeightExamCode.Name = "comboHeightExamCode";
 			this.comboHeightExamCode.Size = new System.Drawing.Size(158, 21);
-			this.comboHeightExamCode.TabIndex = 2;
+			this.comboHeightExamCode.TabIndex = 7;
 			// 
 			// comboWeightExamCode
 			// 
@@ -227,14 +195,14 @@
 			this.comboWeightExamCode.MaxDropDownItems = 30;
 			this.comboWeightExamCode.Name = "comboWeightExamCode";
 			this.comboWeightExamCode.Size = new System.Drawing.Size(158, 21);
-			this.comboWeightExamCode.TabIndex = 4;
+			this.comboWeightExamCode.TabIndex = 8;
 			// 
 			// labelHeightExamCode
 			// 
 			this.labelHeightExamCode.Location = new System.Drawing.Point(301, 92);
 			this.labelHeightExamCode.Name = "labelHeightExamCode";
 			this.labelHeightExamCode.Size = new System.Drawing.Size(130, 17);
-			this.labelHeightExamCode.TabIndex = 28;
+			this.labelHeightExamCode.TabIndex = 0;
 			this.labelHeightExamCode.Text = "Height Code";
 			this.labelHeightExamCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -243,7 +211,7 @@
 			this.labelWeightExamCode.Location = new System.Drawing.Point(301, 116);
 			this.labelWeightExamCode.Name = "labelWeightExamCode";
 			this.labelWeightExamCode.Size = new System.Drawing.Size(130, 17);
-			this.labelWeightExamCode.TabIndex = 27;
+			this.labelWeightExamCode.TabIndex = 0;
 			this.labelWeightExamCode.Text = "Weight Code";
 			this.labelWeightExamCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -252,7 +220,7 @@
 			this.labelBMIPercentileCode.Location = new System.Drawing.Point(301, 163);
 			this.labelBMIPercentileCode.Name = "labelBMIPercentileCode";
 			this.labelBMIPercentileCode.Size = new System.Drawing.Size(130, 17);
-			this.labelBMIPercentileCode.TabIndex = 30;
+			this.labelBMIPercentileCode.TabIndex = 0;
 			this.labelBMIPercentileCode.Text = "BMI Percentile Code";
 			this.labelBMIPercentileCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.labelBMIPercentileCode.Visible = false;
@@ -262,7 +230,7 @@
 			this.labelBMIExamCode.Location = new System.Drawing.Point(301, 139);
 			this.labelBMIExamCode.Name = "labelBMIExamCode";
 			this.labelBMIExamCode.Size = new System.Drawing.Size(130, 17);
-			this.labelBMIExamCode.TabIndex = 32;
+			this.labelBMIExamCode.TabIndex = 0;
 			this.labelBMIExamCode.Text = "BMI Code";
 			this.labelBMIExamCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -279,7 +247,7 @@
 			this.labelBPd.Location = new System.Drawing.Point(26, 68);
 			this.labelBPd.Name = "labelBPd";
 			this.labelBPd.Size = new System.Drawing.Size(93, 17);
-			this.labelBPd.TabIndex = 33;
+			this.labelBPd.TabIndex = 0;
 			this.labelBPd.Text = "Diastolic BP";
 			this.labelBPd.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -288,7 +256,7 @@
 			this.labelBPdExamCode.Location = new System.Drawing.Point(301, 68);
 			this.labelBPdExamCode.Name = "labelBPdExamCode";
 			this.labelBPdExamCode.Size = new System.Drawing.Size(130, 17);
-			this.labelBPdExamCode.TabIndex = 35;
+			this.labelBPdExamCode.TabIndex = 0;
 			this.labelBPdExamCode.Text = "Diastolic BP Code";
 			this.labelBPdExamCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -305,7 +273,7 @@
 			this.labelBPsExamCode.Location = new System.Drawing.Point(301, 44);
 			this.labelBPsExamCode.Name = "labelBPsExamCode";
 			this.labelBPsExamCode.Size = new System.Drawing.Size(130, 17);
-			this.labelBPsExamCode.TabIndex = 37;
+			this.labelBPsExamCode.TabIndex = 0;
 			this.labelBPsExamCode.Text = "Systolic BP Code";
 			this.labelBPsExamCode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -323,7 +291,7 @@
 			this.checkPregnant.Location = new System.Drawing.Point(6, 16);
 			this.checkPregnant.Name = "checkPregnant";
 			this.checkPregnant.Size = new System.Drawing.Size(261, 44);
-			this.checkPregnant.TabIndex = 25;
+			this.checkPregnant.TabIndex = 1;
 			this.checkPregnant.Text = "Height and Weight was not recorded because the patient is pregnant or has been pr" +
     "egnant any time during the measurement period.";
 			this.checkPregnant.TextAlign = System.Drawing.ContentAlignment.TopLeft;
@@ -336,7 +304,7 @@
 			this.textPregCode.Name = "textPregCode";
 			this.textPregCode.ReadOnly = true;
 			this.textPregCode.Size = new System.Drawing.Size(100, 20);
-			this.textPregCode.TabIndex = 128;
+			this.textPregCode.TabIndex = 0;
 			// 
 			// label6
 			// 
@@ -344,15 +312,15 @@
 			this.label6.Location = new System.Drawing.Point(273, 15);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(101, 17);
-			this.label6.TabIndex = 129;
+			this.label6.TabIndex = 0;
 			this.label6.Text = "Pregnancy Code";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// groupExclusion
 			// 
+			this.groupExclusion.Controls.Add(this.butChangeDefault);
 			this.groupExclusion.Controls.Add(this.textReasonDescript);
 			this.groupExclusion.Controls.Add(this.textPregCodeDescript);
-			this.groupExclusion.Controls.Add(this.butChangeDefault);
 			this.groupExclusion.Controls.Add(this.label4);
 			this.groupExclusion.Controls.Add(this.labelNotPerf);
 			this.groupExclusion.Controls.Add(this.textReasonCode);
@@ -365,27 +333,40 @@
 			this.groupExclusion.Location = new System.Drawing.Point(10, 186);
 			this.groupExclusion.Name = "groupExclusion";
 			this.groupExclusion.Size = new System.Drawing.Size(578, 180);
-			this.groupExclusion.TabIndex = 23;
+			this.groupExclusion.TabIndex = 9;
 			this.groupExclusion.TabStop = false;
 			this.groupExclusion.Text = "Exclusion From BMI Exam";
 			// 
-			// butChangeDefault
+			// textReasonDescript
 			// 
-			this.butChangeDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butChangeDefault.Location = new System.Drawing.Point(483, 12);
-			this.butChangeDefault.Name = "butChangeDefault";
-			this.butChangeDefault.Size = new System.Drawing.Size(89, 23);
-			this.butChangeDefault.TabIndex = 143;
-			this.butChangeDefault.Text = "Change Default";
-			this.butChangeDefault.UseVisualStyleBackColor = true;
-			this.butChangeDefault.Click += new System.EventHandler(this.butChangeDefault_Click);
+			this.textReasonDescript.AcceptsTab = true;
+			this.textReasonDescript.Location = new System.Drawing.Point(377, 133);
+			this.textReasonDescript.MaxLength = 2147483647;
+			this.textReasonDescript.Multiline = true;
+			this.textReasonDescript.Name = "textReasonDescript";
+			this.textReasonDescript.ReadOnly = true;
+			this.textReasonDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textReasonDescript.Size = new System.Drawing.Size(195, 40);
+			this.textReasonDescript.TabIndex = 0;
+			// 
+			// textPregCodeDescript
+			// 
+			this.textPregCodeDescript.AcceptsTab = true;
+			this.textPregCodeDescript.Location = new System.Drawing.Point(377, 40);
+			this.textPregCodeDescript.MaxLength = 2147483647;
+			this.textPregCodeDescript.Multiline = true;
+			this.textPregCodeDescript.Name = "textPregCodeDescript";
+			this.textPregCodeDescript.ReadOnly = true;
+			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textPregCodeDescript.Size = new System.Drawing.Size(195, 40);
+			this.textPregCodeDescript.TabIndex = 0;
 			// 
 			// label4
 			// 
 			this.label4.Location = new System.Drawing.Point(273, 134);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(101, 17);
-			this.label4.TabIndex = 142;
+			this.label4.TabIndex = 0;
 			this.label4.Text = "Description";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -395,7 +376,7 @@
 			this.labelNotPerf.Location = new System.Drawing.Point(273, 108);
 			this.labelNotPerf.Name = "labelNotPerf";
 			this.labelNotPerf.Size = new System.Drawing.Size(101, 17);
-			this.labelNotPerf.TabIndex = 140;
+			this.labelNotPerf.TabIndex = 0;
 			this.labelNotPerf.Text = "Reason Code";
 			this.labelNotPerf.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -405,14 +386,14 @@
 			this.textReasonCode.Name = "textReasonCode";
 			this.textReasonCode.ReadOnly = true;
 			this.textReasonCode.Size = new System.Drawing.Size(100, 20);
-			this.textReasonCode.TabIndex = 139;
+			this.textReasonCode.TabIndex = 0;
 			// 
 			// label3
 			// 
 			this.label3.Location = new System.Drawing.Point(273, 41);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(101, 17);
-			this.label3.TabIndex = 133;
+			this.label3.TabIndex = 0;
 			this.label3.Text = "Description";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -422,7 +403,7 @@
 			this.checkNotPerf.Location = new System.Drawing.Point(6, 108);
 			this.checkNotPerf.Name = "checkNotPerf";
 			this.checkNotPerf.Size = new System.Drawing.Size(261, 31);
-			this.checkNotPerf.TabIndex = 131;
+			this.checkNotPerf.TabIndex = 2;
 			this.checkNotPerf.Text = "Height and Weight was not recorded for a medical or other reason.";
 			this.checkNotPerf.TextAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.checkNotPerf.UseVisualStyleBackColor = true;
@@ -434,43 +415,21 @@
 			this.labelPregNotice.Location = new System.Drawing.Point(24, 61);
 			this.labelPregNotice.Name = "labelPregNotice";
 			this.labelPregNotice.Size = new System.Drawing.Size(243, 39);
-			this.labelPregNotice.TabIndex = 130;
+			this.labelPregNotice.TabIndex = 0;
 			this.labelPregNotice.Text = "A diagnosis of pregnancy with this code will be added to the patient\'s medical hi" +
     "story with a start date equal to the date of this exam.";
 			this.labelPregNotice.Visible = false;
 			// 
 			// groupInterventions
 			// 
-			this.groupInterventions.Controls.Add(this.gridInterventions);
 			this.groupInterventions.Controls.Add(this.butAdd);
+			this.groupInterventions.Controls.Add(this.gridInterventions);
 			this.groupInterventions.Location = new System.Drawing.Point(10, 372);
 			this.groupInterventions.Name = "groupInterventions";
 			this.groupInterventions.Size = new System.Drawing.Size(578, 198);
-			this.groupInterventions.TabIndex = 161;
+			this.groupInterventions.TabIndex = 10;
 			this.groupInterventions.TabStop = false;
 			this.groupInterventions.Text = "Interventions";
-			// 
-			// gridInterventions
-			// 
-			this.gridInterventions.HScrollVisible = false;
-			this.gridInterventions.Location = new System.Drawing.Point(6, 19);
-			this.gridInterventions.Name = "gridInterventions";
-			this.gridInterventions.ScrollValue = 0;
-			this.gridInterventions.Size = new System.Drawing.Size(485, 169);
-			this.gridInterventions.TabIndex = 161;
-			this.gridInterventions.Title = "Interventions and/or Medications";
-			this.gridInterventions.TranslationName = null;
-			this.gridInterventions.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInterventions_CellDoubleClick);
-			// 
-			// butAdd
-			// 
-			this.butAdd.Location = new System.Drawing.Point(497, 19);
-			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75, 23);
-			this.butAdd.TabIndex = 153;
-			this.butAdd.Text = "Add";
-			this.butAdd.UseVisualStyleBackColor = true;
-			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// textBMIPercentile
 			// 
@@ -487,7 +446,7 @@
 			this.labelBMIPercentile.Location = new System.Drawing.Point(26, 163);
 			this.labelBMIPercentile.Name = "labelBMIPercentile";
 			this.labelBMIPercentile.Size = new System.Drawing.Size(93, 17);
-			this.labelBMIPercentile.TabIndex = 162;
+			this.labelBMIPercentile.TabIndex = 0;
 			this.labelBMIPercentile.Text = "BMI Percentile";
 			this.labelBMIPercentile.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.labelBMIPercentile.Visible = false;
@@ -501,37 +460,126 @@
 			this.textBMIPercentileCode.TabIndex = 164;
 			this.textBMIPercentileCode.Visible = false;
 			// 
-			// textPregCodeDescript
+			// label2
 			// 
-			this.textPregCodeDescript.AcceptsTab = true;
-			this.textPregCodeDescript.Location = new System.Drawing.Point(377, 40);
-			this.textPregCodeDescript.MaxLength = 2147483647;
-			this.textPregCodeDescript.Multiline = true;
-			this.textPregCodeDescript.Name = "textPregCodeDescript";
-			this.textPregCodeDescript.ReadOnly = true;
-			this.textPregCodeDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textPregCodeDescript.Size = new System.Drawing.Size(195, 40);
-			this.textPregCodeDescript.TabIndex = 132;
+			this.label2.Location = new System.Drawing.Point(316, 18);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(115, 17);
+			this.label2.TabIndex = 0;
+			this.label2.Text = "Pulse (bpm)";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textReasonDescript
+			// textPulse
 			// 
-			this.textReasonDescript.AcceptsTab = true;
-			this.textReasonDescript.Location = new System.Drawing.Point(377, 133);
-			this.textReasonDescript.MaxLength = 2147483647;
-			this.textReasonDescript.Multiline = true;
-			this.textReasonDescript.Name = "textReasonDescript";
-			this.textReasonDescript.ReadOnly = true;
-			this.textReasonDescript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textReasonDescript.Size = new System.Drawing.Size(195, 40);
-			this.textReasonDescript.TabIndex = 141;
+			this.textPulse.Location = new System.Drawing.Point(434, 18);
+			this.textPulse.Name = "textPulse";
+			this.textPulse.Size = new System.Drawing.Size(39, 20);
+			this.textPulse.TabIndex = 2;
+			// 
+			// gridInterventions
+			// 
+			this.gridInterventions.HasMultilineHeaders = false;
+			this.gridInterventions.HScrollVisible = false;
+			this.gridInterventions.Location = new System.Drawing.Point(6, 19);
+			this.gridInterventions.Name = "gridInterventions";
+			this.gridInterventions.ScrollValue = 0;
+			this.gridInterventions.Size = new System.Drawing.Size(485, 169);
+			this.gridInterventions.TabIndex = 0;
+			this.gridInterventions.Title = "Interventions and/or Medications";
+			this.gridInterventions.TranslationName = null;
+			this.gridInterventions.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInterventions_CellDoubleClick);
+			// 
+			// butDelete
+			// 
+			this.butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butDelete.Autosize = true;
+			this.butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDelete.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDelete.CornerRadius = 4F;
+			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDelete.Location = new System.Drawing.Point(10, 579);
+			this.butDelete.Name = "butDelete";
+			this.butDelete.Size = new System.Drawing.Size(75, 24);
+			this.butDelete.TabIndex = 13;
+			this.butDelete.Text = "Delete";
+			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
+			// 
+			// butCancel
+			// 
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(513, 579);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
+			this.butCancel.TabIndex = 12;
+			this.butCancel.Text = "Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// butOk
+			// 
+			this.butOk.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOk.Autosize = true;
+			this.butOk.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOk.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOk.CornerRadius = 4F;
+			this.butOk.Location = new System.Drawing.Point(432, 579);
+			this.butOk.Name = "butOk";
+			this.butOk.Size = new System.Drawing.Size(75, 24);
+			this.butOk.TabIndex = 11;
+			this.butOk.Text = "&OK";
+			this.butOk.Click += new System.EventHandler(this.butOK_Click);
+			// 
+			// butAdd
+			// 
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAdd.Autosize = true;
+			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAdd.CornerRadius = 4F;
+			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAdd.Location = new System.Drawing.Point(497, 19);
+			this.butAdd.Name = "butAdd";
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
+			this.butAdd.TabIndex = 1;
+			this.butAdd.Text = "Add";
+			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
+			// 
+			// butChangeDefault
+			// 
+			this.butChangeDefault.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butChangeDefault.Autosize = true;
+			this.butChangeDefault.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangeDefault.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangeDefault.CornerRadius = 4F;
+			this.butChangeDefault.Location = new System.Drawing.Point(483, 12);
+			this.butChangeDefault.Name = "butChangeDefault";
+			this.butChangeDefault.Size = new System.Drawing.Size(89, 24);
+			this.butChangeDefault.TabIndex = 3;
+			this.butChangeDefault.Text = "Change Default";
+			this.butChangeDefault.Click += new System.EventHandler(this.butChangeDefault_Click);
 			// 
 			// FormVitalsignEdit2014
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(602, 614);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.textPulse);
+			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.textBMIPercentileCode);
+			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.textBMIPercentile);
+			this.Controls.Add(this.butOk);
 			this.Controls.Add(this.labelBMIPercentile);
 			this.Controls.Add(this.groupInterventions);
 			this.Controls.Add(this.labelBPsExamCode);
@@ -553,9 +601,6 @@
 			this.Controls.Add(this.textBPs);
 			this.Controls.Add(this.textHeight);
 			this.Controls.Add(this.textWeight);
-			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.butOK);
-			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.textDateTaken);
 			this.Controls.Add(this.labelHeight);
 			this.Controls.Add(this.labelWeight);
@@ -583,9 +628,6 @@
 		private System.Windows.Forms.Label labelWeight;
 		private System.Windows.Forms.Label labelHeight;
 		private System.Windows.Forms.TextBox textDateTaken;
-		private System.Windows.Forms.Button butCancel;
-		private System.Windows.Forms.Button butOK;
-		private System.Windows.Forms.Button butDelete;
 		private System.Windows.Forms.TextBox textBPd;
 		private System.Windows.Forms.TextBox textBPs;
 		private System.Windows.Forms.TextBox textWeight;
@@ -614,14 +656,19 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label labelNotPerf;
 		private System.Windows.Forms.TextBox textReasonCode;
-		private System.Windows.Forms.Button butChangeDefault;
 		private System.Windows.Forms.GroupBox groupInterventions;
 		private OpenDental.UI.ODGrid gridInterventions;
-		private System.Windows.Forms.Button butAdd;
 		private System.Windows.Forms.TextBox textBMIPercentile;
 		private System.Windows.Forms.Label labelBMIPercentile;
 		private System.Windows.Forms.TextBox textBMIPercentileCode;
 		private System.Windows.Forms.TextBox textReasonDescript;
 		private System.Windows.Forms.TextBox textPregCodeDescript;
+		private UI.Button butChangeDefault;
+		private UI.Button butAdd;
+		private UI.Button butOk;
+		private UI.Button butCancel;
+		private UI.Button butDelete;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.TextBox textPulse;
 	}
 }

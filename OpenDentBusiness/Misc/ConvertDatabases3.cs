@@ -11372,6 +11372,18 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentTimeLineColor','-65536')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE vitalsign ADD Pulse int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE vitalsign ADD Pulse number(11)";
+					Db.NonQ(command);
+					command="UPDATE vitalsign SET Pulse = 0 WHERE Pulse IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE vitalsign MODIFY Pulse NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

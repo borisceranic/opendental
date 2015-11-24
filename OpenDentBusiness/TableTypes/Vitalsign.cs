@@ -21,7 +21,7 @@ namespace OpenDentBusiness {
 		public DateTime DateTaken;
 		///<summary>For an abnormal BMI measurement this must be true in order to meet quality measurement.</summary>//intervention? I think these should be deprecated and use an Intervention object instead.
 		public bool HasFollowupPlan;
-		///<summary>If a BMI was not recored, this must be true in order to meet quality measurement.  For children, this is used as an IsPregnant flag, the only valid reason for not taking BMI on children.</summary>//intervention? I think these should be deprecated and use an Intervention object instead.
+		///<summary>If a BMI was not recorded, this must be true in order to meet quality measurement.  For children, this is used as an IsPregnant flag, the only valid reason for not taking BMI on children.</summary>//intervention? I think these should be deprecated and use an Intervention object instead.
 		public bool IsIneligible;
 		///<summary>For HasFollowupPlan or IsIneligible, this documents the specifics.</summary>//intervention? I think these should be deprecated and use an Intervention object instead.
 		public string Documentation;
@@ -43,6 +43,8 @@ namespace OpenDentBusiness {
 		public long PregDiseaseNum;
 		///<summary>BMI percentile of patient, based on gender and age and the calculated BMI.  We will use the CDC numbers to calculate percentile found here: (http://www.cdc.gov/nchs/data/series/sr_11/sr11_246.pdf).</summary>
 		public int BMIPercentile;
+		///<summary>Recorded pulse of the patient. Stored in beats per minute.</summary>
+		public int Pulse;
 
 		///<summary></summary>
 		public Vitalsign Copy() {

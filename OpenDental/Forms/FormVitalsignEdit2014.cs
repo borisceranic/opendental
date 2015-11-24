@@ -113,6 +113,7 @@ namespace OpenDental {
 				}
 			}
 			#endregion
+			textPulse.Text=VitalsignCur.Pulse.ToString();
 		}
 
 		///<summary>Sets the pregnancy code and description text box with either the attached pregnancy dx if exists or the default preg dx set in FormEhrSettings or a manually selected def.  If the pregnancy diseasedef with the default pregnancy code and code system does not exist, it will be inserted.  The pregnancy problem will be inserted when closing if necessary.</summary>
@@ -1327,9 +1328,19 @@ Do you want to remove the pregnancy diagnosis?"))
 				MsgBox.Show(this,"Please fix BP first.");
 				return;
 			}
+			//validate pulse
+			int pulse=0;
+			try {
+				pulse=int.Parse(textPulse.Text);
+			}
+			catch {
+				MsgBox.Show(this,"Please fix Pulse first.");
+				return;
+			}
 			#endregion
 			#region Save
 			VitalsignCur.DateTaken=date;
+			VitalsignCur.Pulse=pulse;
 			VitalsignCur.Height=height;
 			VitalsignCur.Weight=weight;
 			VitalsignCur.BpDiastolic=BPdia;
