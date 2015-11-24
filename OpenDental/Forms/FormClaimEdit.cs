@@ -5795,6 +5795,9 @@ namespace OpenDental{
 		}
 
 		private void comboCustomTracking_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboCustomTracking.SelectedIndex < 1) {
+				return;
+			}
 			InputBox inputBox=new InputBox(Lan.g(this,"Please enter note below"));
 			inputBox.setTitle("Status History Note");
 			inputBox.ShowDialog();
