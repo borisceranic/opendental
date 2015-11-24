@@ -306,12 +306,13 @@ namespace OpenDental{
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
 		private List<ProcButtonQuick> listProcButtonQuicks;
+		///<summary>List containing only rows showing in gridPlanned, can be the same as _tablePlannedAll</summary>
 		private List<DataRow> _listPlannedAppt;
 		private DataTable _tablePlannedAll;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
 		///<summary>Used to cache the selected AptNums of the items in the main grid, to reselect them after a refresh.</summary>
-		private List<long> SelectedGridItems=new List<long>();
+		private List<long> _listSelectedAptNums=new List<long>();
 		///<summary>Gets set when a patient is selected and eRx prescriptions are refreshed.
 		///Cannot use PatCur or _patNumLast, because they are cleared when the module is unselected.</summary>
 		private long _patNumLastErx=0;
@@ -8881,7 +8882,7 @@ namespace OpenDental{
 			}
 			gridPlanned.EndUpdate();
 			for(int i=0;i<_listPlannedAppt.Count;i++) {
-				if(SelectedGridItems.Contains(PIn.Long(_listPlannedAppt[i]["AptNum"].ToString()))) {
+				if(_listSelectedAptNums.Contains(PIn.Long(_listPlannedAppt[i]["AptNum"].ToString()))) {
 					gridPlanned.SetSelected(i,true);
 				}
 			}
@@ -8951,8 +8952,8 @@ namespace OpenDental{
 			if(!MsgBox.Show(this,true,"Delete planned appointment(s)?")){
 				return;
 			}
-			for(int i=0;i<gridPlanned.SelectedIndices.Length;i++){
-				Appointments.Delete(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
+			for(int i=0;i<gridPlanned.SelectedIndices.Length;i++){			
+				Appointments.Delete(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
 			}
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -8965,27 +8966,27 @@ namespace OpenDental{
 			}
 			List<long> aptNums=new List<long>();
 			for(int i=0;i<gridPlanned.SelectedIndices.Length;i++){
-				ApptStatus aptStatus=(ApptStatus)(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptStatus"].ToString()));
+				ApptStatus aptStatus=(ApptStatus)(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["AptStatus"].ToString()));
 				if(aptStatus==ApptStatus.Complete) {
 					//Warn the user they are moving a completed appointment.
 					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"You are about to move an already completed appointment.  Continue?")) {
 						return;
 					}
-					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+					aptNums.Add(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
 				}
 				else if(aptStatus==ApptStatus.Scheduled || aptStatus==ApptStatus.ASAP) {
 					//Warn the user they are moving an already scheduled appointment.
 					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"You are about to move an appointment already on the schedule.  Continue?")) {
 						return;
 					}
-					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+					aptNums.Add(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
 				}
 				else if(aptStatus==ApptStatus.UnschedList || aptStatus==ApptStatus.Broken) {
 					//Dont need to warn user, just put onto the pinboard.
-					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
+					aptNums.Add(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["SchedAptNum"].ToString()));
 				}
 				else { //No appointment
-					aptNums.Add(PIn.Long(DataSetMain.Tables["Planned"].Rows[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
+					aptNums.Add(PIn.Long(_listPlannedAppt[gridPlanned.SelectedIndices[i]]["AptNum"].ToString()));
 				}
 			}
 			GotoModule.PinToAppt(aptNums,0);
@@ -9011,6 +9012,7 @@ namespace OpenDental{
 			moveItemOrderHelper(selectedApptRow,PIn.Int(aboveSelectedApptRow["ItemOrder"].ToString()));//Sets the selected rows item order = the above rows and adjust everything inbetween
 			saveChangesToDBHelper();//Loops through list, gets PlannedAppt, sets the new ItemOrder and then updates if needed
 			DataSetMain=ChartModules.GetAll(PatCur.PatNum,checkAudit.Checked);
+			_listSelectedAptNums.Clear();
 			FillPlanned();
 			gridPlanned.SetSelected(idx-1,true);
 		}
@@ -9034,6 +9036,7 @@ namespace OpenDental{
 			moveItemOrderHelper(selectedApptRow,PIn.Int(belowSelectedApptRow["ItemOrder"].ToString()));//Sets the selected rows item order = the above rows and adjust everything inbetween
 			saveChangesToDBHelper();//Loops through list, gets PlannedAppt, sets the new ItemOrder and then updates if needed
 			DataSetMain=ChartModules.GetAll(PatCur.PatNum,checkAudit.Checked);
+			_listSelectedAptNums.Clear();
 			FillPlanned();
 			gridPlanned.SetSelected(idx+1,true);
 		}
@@ -9081,9 +9084,9 @@ namespace OpenDental{
 		}
 
 		private void checkShowCompleted_CheckedChanged(object sender,EventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedAptNums.Clear();
 			foreach(int index in gridPlanned.SelectedIndices) {
-				SelectedGridItems.Add(PIn.Long(_listPlannedAppt[index]["AptNum"].ToString()));
+				_listSelectedAptNums.Add(PIn.Long(_listPlannedAppt[index]["AptNum"].ToString()));
 			}
 			FillPlanned();
 		}
