@@ -1,36 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OpenDentBusiness;
 
 namespace OpenDental {
 	public class ProcedureL {
-		///<summary>Sets all procedures associated to the appointment passed in complete.  Flags procedures as CPOE as needed (when provider logged in).
+		///<summary>If procedures are not already associated with the appointment in the DB, e.g. from FormApptEdit since they have not been synched yet,
+		///set listProcsInAppt equal to the list of procedures that will be attached to the appt once synched.  Sets all procedures associated to the
+		///appointment passed in, or in listProcsInAppt if not null, complete.  Flags procedures as CPOE as needed (when provider logged in).
 		///Makes a log entry for each completed procedure.  And then finally fires the "CompleteProcedure" automation trigger.</summary>
-		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,List<InsSub> subList) {
-			List<Procedure> procsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
+		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,
+			List<InsSub> subList,List<Procedure> listProcsInAppt=null)
+		{
+			if(listProcsInAppt==null) {
+				listProcsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
+			}
 			//Flag all the procedures as CPOE if the provider of the procedure is currently logged in.  
 			//We have to do this here and not within SetCompleteInAppt() due to RemotingRole checks.
-			bool isUserCpoe=Userods.IsUserCpoe(Security.CurUser);
-			for(int i=0;i<procsInAppt.Count;i++) {
-				if(isUserCpoe) {//Only change the status of IsCpoe to true.  Never set it back to false for any reason.  Once true, always true.
-					procsInAppt[i].IsCpoe=true;
-				}
+			if(Userods.IsUserCpoe(Security.CurUser)) {
+				//Only change the status of IsCpoe to true.  Never set it back to false for any reason.  Once true, always true.
+				listProcsInAppt.ForEach(x => x.IsCpoe=true);
 			}
-			Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,procsInAppt,subList);
-			for(int i=0;i<procsInAppt.Count();i++) {
-				LogProcComplCreate(apt.PatNum,procsInAppt[i],procsInAppt[i].ToothNum);
-			}
+			listProcsInAppt=Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,listProcsInAppt,subList);
+			listProcsInAppt.ForEach(x => LogProcComplCreate(apt.PatNum,x,x.ToothNum));
 			if(Programs.UsingOrion) {
-				OrionProcs.SetCompleteInAppt(procsInAppt);
+				OrionProcs.SetCompleteInAppt(listProcsInAppt);
 			}
 			//automation
-			List<string> procCodes=new List<string>();
-			for(int i=0;i<procsInAppt.Count;i++){
-				procCodes.Add(ProcedureCodes.GetStringProcCode(procsInAppt[i].CodeNum));
-			}
-			AutomationL.Trigger(AutomationTrigger.CompleteProcedure,procCodes,apt.PatNum);
+			AutomationL.Trigger(AutomationTrigger.CompleteProcedure,listProcsInAppt.Select(x => ProcedureCodes.GetStringProcCode(x.CodeNum)).ToList(),apt.PatNum);
 		}
 
 		///<summary>Returns empty string if no duplicates, otherwise returns duplicate procedure information.  In all places where this is called, we are guaranteed to have the eCW bridge turned on.  So this is an eCW peculiarity rather than an HL7 restriction.  Other HL7 interfaces will not be checking for duplicate procedures unless we intentionally add that as a feature later.</summary>

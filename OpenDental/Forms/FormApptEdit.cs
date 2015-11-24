@@ -1,23 +1,19 @@
 using System;
-using System.Data;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Shapes;
-using MigraDoc.DocumentObjectModel.Tables;
+using OpenDental.Bridges;
+using OpenDental.UI;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
 using OpenDentBusiness.UI;
-using OpenDental.UI;
-using PdfSharp.Drawing;
 using PdfSharp.Pdf;
-using OpenDental.Bridges;
 
 namespace OpenDental{
 	/// <summary>
@@ -2382,9 +2378,10 @@ namespace OpenDental{
 					}
 				}
 				Procedures.ComputeEstimates(proc,pat.PatNum,ClaimProcList,false,PlanList,PatPlanList,benefitList,pat.Age,SubList);
-				_listProcs.Add(proc);
 				listAddedProcs.Add(proc);
 			}
+			//Get from db to remove nulls. Consider initializing dates and strings instead.
+			_listProcs.AddRange(Procedures.GetManyProc(listAddedProcs.Select(x => x.ProcNum).ToList(),false));
 			listQuickAdd.SelectedIndex=-1;
 			FillProcedures();
 			for(int i=0;i<gridProc.Rows.Count;i++) {
@@ -2775,24 +2772,16 @@ namespace OpenDental{
 			//if appointment is marked complete and any procedures are not,
 			//then set the remaining procedures complete
 			List<Procedure> listProcsInAppt=new List<Procedure>();
-			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				listProcsInAppt.Add(_listProcs[gridProc.SelectedIndices[i]]);
-			}
+			//don't use _listProcs[x].Copy() so changes made to procs in listProcsInAppt will be reflected in _listProcs
+			gridProc.SelectedIndices.ToList().ForEach(x => listProcsInAppt.Add(_listProcs[x]));
 			if(AptCur.AptStatus==ApptStatus.Complete) {
-				bool allProcsComplete=true;
-				//We can use the SelectedIndices because we've been making sure only those on this appointment are selected.
-				for(int i=0;i<listProcsInAppt.Count;i++) {
-					if(listProcsInAppt[i].ProcStatus!=ProcStat.C) {
-						allProcsComplete=false;
-						break;
-					}
-				}
-				if(!allProcsComplete) {
+				if(listProcsInAppt.Any(x => x.ProcStatus!=ProcStat.C)) {
 					if(!Security.IsAuthorized(Permissions.ProcComplCreate,AptCur.AptDateTime)) {
 						return false;
 					}
 					List<PatPlan> PatPlanList=PatPlans.Refresh(AptCur.PatNum);
-					ProcedureL.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList);
+					//changes made to listProcsInAppt will be reflected in _listProcs
+					ProcedureL.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList,listProcsInAppt);
 					if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
 						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
@@ -2804,7 +2793,15 @@ namespace OpenDental{
 				}
 			}
 			else {
-				Procedures.SetProvidersInAppointment(AptCur,listProcsInAppt);
+				Procedures.SetProvidersInAppointment(AptCur,listProcsInAppt);//changes made to listProcsInAppt will be reflected in _listProcs
+			}
+			//Save changes from local listProcsInAppt to classwide _listProcs
+			foreach(Procedure proc in listProcsInAppt) {
+				int procIndex=_listProcs.FindIndex(x => x.ProcNum==proc.ProcNum);
+				if(procIndex<0) {
+					continue;
+				}
+				_listProcs[procIndex]=proc.Copy();
 			}
 			//Do the appointment "break" automation for appointments that were just broken.
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
@@ -3632,8 +3629,7 @@ namespace OpenDental{
 				}
 			}
 			else {//DialogResult==DialogResult.OK (User clicked OK or Delete)
-				_listProcsFromDB=Procedures.GetProcsForApptEdit(AptCur);
-				Procedures.Sync(_listProcs,_listProcsFromDB);
+				Procedures.Sync(_listProcs,AptCur);
 			}
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);
