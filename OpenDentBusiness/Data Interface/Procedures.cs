@@ -938,25 +938,21 @@ namespace OpenDentBusiness {
 			for(int i=0;i<procList.Count;i++) {
 				changedProc=procList[i].Copy();
 				procCode=ProcedureCodes.GetProcCode(procList[i].CodeNum);
-				if(apt.ProvHyg!=0) {//if the appointment has a hygiene provider
-					if(procCode.IsHygiene) {//hygiene proc
-						changedProc.ProvNum=apt.ProvHyg;
-					} 
-					else {//dentist proc
-						changedProc.ProvNum=apt.ProvNum;
-					}
-				} 
-				else {//same provider for every procedure
-					changedProc.ProvNum=apt.ProvNum;
-				}
 				if(procCode.ProvNumDefault!=0) {
 					changedProc.ProvNum=procCode.ProvNumDefault;//Override ProvNum if there is a default provider for procCode
+				}
+				else if(apt.ProvHyg==0 || !procCode.IsHygiene) {//if either appt doesn't have a higiene prov or the proc is not a hygiene proc
+					changedProc.ProvNum=apt.ProvNum;
+				}
+				else {//if the appointment has a hygiene provider and the proc IsHygiene
+					changedProc.ProvNum=apt.ProvHyg;
 				}
 				changedProc.ClinicNum=apt.ClinicNum;
 				if(procList[i].ProcStatus==ProcStat.TP) {
 					changedProc.ProcDate=apt.AptDateTime;
 				}
 				Update(changedProc,procList[i]);//won't go to db unless a field has changed.
+				procList[i]=changedProc.Copy();//save DB changes to in memory list
 			}
 		}
 
@@ -1453,104 +1449,85 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Loops through each proc. Does not add notes to a procedure that already has notes. Used three times, security checked in all three places before calling this.  Also sets provider for each proc and claimproc.</summary>
-		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> planList,List<PatPlan> patPlans,long siteNum,int patientAge,List<Procedure> procsInAppt,List<InsSub> subList) { 
+		///<summary>Loops through each proc. Does not add notes to a procedure that already has notes. Used three times, security checked in all three
+		///places before calling this.  Also sets provider for each proc and claimproc.  Returns procList with changes made to the procs.</summary>
+		public static List<Procedure> SetCompleteInAppt(Appointment apt,List<InsPlan> planList,List<PatPlan> patPlans,long siteNum,int patientAge,
+			List<Procedure> procList,List<InsSub> subList)
+		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,procsInAppt,subList);
-				return;
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,procList,subList);
 			}
-			List<Procedure> procList=Refresh(apt.PatNum);
 			List<ClaimProc> claimProcList=ClaimProcs.Refresh(apt.PatNum);
 			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
-			//this query could be improved slightly to only get notes of interest.
-			string command="SELECT * FROM procnote WHERE PatNum="+POut.Long(apt.PatNum)+" ORDER BY EntryDateTime";
+			//most recent note will be first in list.
+			string command="SELECT * FROM procnote WHERE ProcNum IN("+string.Join(",",procList.Select(x => x.ProcNum))+") ORDER BY EntryDateTime DESC";
 			DataTable rawNotes=Db.GetTable(command);
-			//CovPats.Refresh(PlanList,patPlans);
-			//bool doResetRecallStatus=false;
 			ProcedureCode procCode;
-			Procedure oldProc;
-			//int siteNum=0;
-			//if(!PrefC.GetBool(PrefName.EasyHidePublicHealth")){
-			//	siteNum=Patients.GetPat(apt.PatNum).SiteNum;
-			//}
-			List<long> encounterProvNums = new List<long>();  //for auto-inserting default encounters
-			for(int i=0;i<procList.Count;i++) {
-				if(procList[i].AptNum!=apt.AptNum) {
-					continue;
-				}
-				//if(ProcList[i].ProcStatus==ProcStat.C) {//if the procedure is already complete, don't touch it.
-				//too severe
-				//}
+			Procedure procOld;
+			List<long> encounterProvNums=new List<long>();//for auto-inserting default encounters
+			foreach(Procedure procCur in procList) {
+				//Should only be procs for this appointment
 				//attach the note, if it exists.
-				for(int n=rawNotes.Rows.Count-1;n>=0;n--) {//loop through each note, backwards.
-					if(procList[i].ProcNum.ToString()!=rawNotes.Rows[n]["ProcNum"].ToString()) {
+				foreach(DataRow row in rawNotes.Rows) {
+					if(procCur.ProcNum.ToString()!=row["ProcNum"].ToString()) {
 						continue;
 					}
-					procList[i].UserNum=PIn.Long(rawNotes.Rows[n]["UserNum"].ToString());
-					procList[i].Note=PIn.String(rawNotes.Rows[n]["Note"].ToString());
-					procList[i].SigIsTopaz=PIn.Bool(rawNotes.Rows[n]["SigIsTopaz"].ToString());
-					procList[i].Signature=PIn.String(rawNotes.Rows[n]["Signature"].ToString());
+					procCur.UserNum=PIn.Long(row["UserNum"].ToString());
+					procCur.Note=PIn.String(row["Note"].ToString());
+					procCur.SigIsTopaz=PIn.Bool(row["SigIsTopaz"].ToString());
+					procCur.Signature=PIn.String(row["Signature"].ToString());
 					break;//out of note loop.
 				}
-				oldProc=procList[i].Copy();
-				procCode=ProcedureCodes.GetProcCode(procList[i].CodeNum);
+				procOld=procCur.Copy();
+				procCode=ProcedureCodes.GetProcCode(procCur.CodeNum);
 				if(procCode.PaintType==ToothPaintingType.Extraction) {//if an extraction, then mark previous procs hidden
-					//SetHideGraphical(ProcList[i]);//might not matter anymore
-					ToothInitials.SetValue(apt.PatNum,procList[i].ToothNum,ToothInitialType.Missing);
+					//SetHideGraphical(procCur);//might not matter anymore
+					ToothInitials.SetValue(apt.PatNum,procCur.ToothNum,ToothInitialType.Missing);
 				}
-				procList[i].ProcStatus=ProcStat.C;
-				if(oldProc.ProcStatus!=ProcStat.C) {
-					procList[i].ProcDate=apt.AptDateTime.Date;//only change date to match appt if not already complete.
-					if(procList[i].ProcDate.Year<1880) {
-						procList[i].ProcDate=MiscData.GetNowDateTime().Date;//Change procdate to today if the appointment date was invalid
+				procCur.ProcStatus=ProcStat.C;
+				if(procOld.ProcStatus!=ProcStat.C) {
+					procCur.ProcDate=apt.AptDateTime.Date;//only change date to match appt if not already complete.
+					if(procCur.ProcDate.Year<1880) {
+						procCur.ProcDate=MiscData.GetNowDateTime().Date;//Change procdate to today if the appointment date was invalid
 					}
-					procList[i].DateEntryC=DateTime.Now;//this triggers it to set to server time NOW().
-					if(procList[i].DiagnosticCode=="") {
-						procList[i].DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-					}
-				}
-				procList[i].PlaceService=(PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
-				procList[i].ClinicNum=apt.ClinicNum;
-				procList[i].SiteNum=siteNum;
-				procList[i].PlaceService=Clinics.GetPlaceService(apt.ClinicNum);
-				if(apt.ProvHyg!=0) {//if the appointment has a hygiene provider
-					if(procCode.IsHygiene) {//hyg proc
-						procList[i].ProvNum=apt.ProvHyg;
-					}
-					else {//regular proc
-						procList[i].ProvNum=apt.ProvNum;
+					procCur.DateEntryC=DateTime.Now;//this triggers it to set to server time NOW().
+					if(procCur.DiagnosticCode=="") {
+						procCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 					}
 				}
-				else {//same provider for every procedure
-					procList[i].ProvNum=apt.ProvNum;
-				}
+				procCur.PlaceService=(PlaceOfService)PrefC.GetLong(PrefName.DefaultProcedurePlaceService);
+				procCur.ClinicNum=apt.ClinicNum;
+				procCur.SiteNum=siteNum;
+				procCur.PlaceService=Clinics.GetPlaceService(apt.ClinicNum);
 				if(procCode.ProvNumDefault!=0) {//Override provider for procedures with a default provider
-					procList[i].ProvNum=procCode.ProvNumDefault;
+					procCur.ProvNum=procCode.ProvNumDefault;
+				}
+				else if(apt.ProvHyg==0 || !procCode.IsHygiene) {//either no hygiene prov on the appt or the proc is not a hygiene proc
+					procCur.ProvNum=apt.ProvNum;
+				}
+				else {//appointment has a hygiene prov and the proc IsHygiene
+					procCur.ProvNum=apt.ProvHyg;
 				}
 				//if procedure was already complete, then don't add more notes.
-				if(oldProc.ProcStatus!=ProcStat.C) {
-					procList[i].Note+=ProcCodeNotes.GetNote(procList[i].ProvNum,procList[i].CodeNum);
+				if(procOld.ProcStatus!=ProcStat.C) {
+					procCur.Note+=ProcCodeNotes.GetNote(procCur.ProvNum,procCur.CodeNum);
 				}
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
-					SetCanadianLabFeesCompleteForProc(procList[i]);
+					SetCanadianLabFeesCompleteForProc(procCur);
 				}
-				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procList[i],oldProc);
-				Update(procList[i],oldProc);
-				ComputeEstimates(procList[i],apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
-				ClaimProcs.SetProvForProc(procList[i],claimProcList);
+				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procCur,procOld);
+				Update(procCur,procOld);
+				ComputeEstimates(procCur,apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
+				ClaimProcs.SetProvForProc(procCur,claimProcList);
 				//Add provnum to list to create an encounter later. Done to limit calls to DB from Encounters.InsertDefaultEncounter().
-				if(oldProc.ProcStatus!=ProcStat.C && !encounterProvNums.Contains(procList[i].ProvNum)) {
-					encounterProvNums.Add(procList[i].ProvNum);
+				if(procOld.ProcStatus!=ProcStat.C) {//check for distinct later.
+					encounterProvNums.Add(procCur.ProvNum);
 				}
 			}
 			//Auto-insert default encounters for the providers that did work on this appointment
-			for(int j=0;j<encounterProvNums.Count;j++) {
-				Encounters.InsertDefaultEncounter(apt.PatNum,encounterProvNums[j],apt.AptDateTime);
-			}
-			//if(doResetRecallStatus){
-			//	Recalls.Reset(apt.PatNum);//this also synchs recall
-			//}
+			encounterProvNums.Distinct().ToList().ForEach(x => Encounters.InsertDefaultEncounter(apt.PatNum,x,apt.AptDateTime));
 			Recalls.Synch(apt.PatNum);
+			return procList;
 			//Patient pt=Patients.GetPat(apt.PatNum);
 			//jsparks-See notes within this method:
 			//Reporting.Allocators.AllocatorCollection.CallAll_Allocators(pt.Guarantor);
@@ -1754,11 +1731,12 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in two lists.</summary>
-		public static void Sync(List<Procedure> listNew,List<Procedure> listDB) {
+		public static void Sync(List<Procedure> listNew,Appointment apptCur) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listDB);//Never pass DB list through the web service (Note: Why?  Our proc list is special, it doesn't contain all procs so we shouldn't code this method to always use our limited list of procs........)
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,apptCur);//Never pass DB list through the web service (Note: Why?  Our proc list is special, it doesn't contain all procs so we shouldn't code this method to always use our limited list of procs........)
 				return;
 			}
+			List<Procedure> listDB=Procedures.GetProcsForApptEdit(apptCur);
 			Crud.ProcedureCrud.Sync(listNew,listDB);
 		}
 
