@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
 using System.Runtime.InteropServices;
+using OpenDental.Bridges;
 
 namespace OpenDental{
 	/// <summary>
@@ -46,6 +47,8 @@ namespace OpenDental{
 		private double curVal;
 		private GroupBox groupBox2;
 		private CheckBox checkExcludeImages;
+		private GroupBox groupBox3;
+		private UI.ODPictureBox pictureCDS;
 		//private bool usesInternalImages;
 		///<summary>This message will only get filled when a backup attempt has failed.  It will hold the message text that we want to show to the user giving them more information about the failure.</summary>
 		private string _errorMessage;
@@ -104,7 +107,10 @@ namespace OpenDental{
 			this.butBrowseTo = new OpenDental.UI.Button();
 			this.butBackup = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.pictureCDS = new OpenDental.UI.ODPictureBox();
 			this.groupBox1.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -378,10 +384,32 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.pictureCDS);
+			this.groupBox3.Location = new System.Drawing.Point(330, 485);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(113, 53);
+			this.groupBox3.TabIndex = 29;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Managed Backups";
+			// 
+			// pictureCDS
+			// 
+			this.pictureCDS.HasBorder = false;
+			this.pictureCDS.Image = global::OpenDental.Properties.Resources.CDS_Button_green;
+			this.pictureCDS.Location = new System.Drawing.Point(8, 19);
+			this.pictureCDS.Name = "pictureCDS";
+			this.pictureCDS.Size = new System.Drawing.Size(87, 24);
+			this.pictureCDS.TabIndex = 0;
+			this.pictureCDS.TextNullImage = null;
+			this.pictureCDS.Click += new System.EventHandler(this.pictureCDS_Click);
+			// 
 			// FormBackup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(777, 550);
+			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.checkExcludeImages);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.textBox2);
@@ -405,6 +433,7 @@ namespace OpenDental{
 			this.Load += new System.EventHandler(this.FormBackup_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -944,6 +973,10 @@ namespace OpenDental{
 		private void checkExcludeImages_Click(object sender,EventArgs e) {
 			textBackupRestoreAtoZToPath.Enabled=ShouldUseAtoZFolder();
 			butBrowseRestoreAtoZTo.Enabled=ShouldUseAtoZFolder();	
+		}
+
+		private void pictureCDS_Click(object sender,EventArgs e) {
+			CDS.ShowPage();
 		}		
 
 	}

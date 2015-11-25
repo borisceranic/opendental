@@ -241,6 +241,7 @@
   <ItemGroup>
     <Compile Include="Bridges\Apteryx.cs" />
     <Compile Include="Bridges\AudaxCeph.cs" />
+    <Compile Include="Bridges\CDS.cs" />
     <Compile Include="Bridges\Cerec.cs" />
     <Compile Include="Bridges\Apixia.cs" />
     <Compile Include="Bridges\BioPAK.cs" />
@@ -6900,6 +6901,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\CDS_Button_green.png" />
     <None Include="Resources\Podium_Button_100x24.png" />
     <None Include="Resources\DI_Button_100x24.png" />
     <None Include="Resources\deleteX18.gif" />
