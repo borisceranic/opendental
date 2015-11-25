@@ -9291,9 +9291,9 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE provider MODIFY Specialty number(20) NOT NULL";
+					command="ALTER TABLE provider MODIFY Specialty number(20)";
 					Db.NonQ(command);
-					command="ALTER TABLE referral MODIFY Specialty number(20) NOT NULL";
+					command="ALTER TABLE referral MODIFY Specialty number(20)";
 					Db.NonQ(command);
 				}
 				long[] defNums=new long[14];
@@ -10041,7 +10041,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE program ADD ButtonImage varchar2";
+					command="ALTER TABLE program ADD ButtonImage varchar2(4000)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -10092,7 +10092,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE displayfield ADD PickList varchar2";
+					command="ALTER TABLE displayfield ADD PickList clob";
 					Db.NonQ(command);
 				}
 				//Insert the company logo for DentalTek for all users.
@@ -10254,7 +10254,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE emailtemplate ADD Description varchar2";
+					command="ALTER TABLE emailtemplate ADD Description varchar2(255)";
 					Db.NonQ(command);
 				}
 				command="UPDATE emailtemplate SET Description=emailtemplate.Subject";//Oracle compatible.
@@ -10545,22 +10545,35 @@ namespace OpenDentBusiness {
 				}
 				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Insert all 50 US states and Washington DC
-					command="INSERT INTO stateabbr (Description,Abbr) VALUES('Alabama','AL'),('Alaska','AK'),('Arizona','AZ'),('Arkansas','AR'),"
-						+"('California','CA'),('Colorado','CO'),('Connecticut','CT'),('Delaware','DE'),('District of Columbia','DC'),('Florida','FL'),"
-						+"('Georgia','GA'),('Hawaii','HI'),('Idaho','ID'),('Illinois','IL'),('Indiana','IN'),('Iowa','IA'),('Kansas','KS'),('Kentucky','KY'),"
-						+"('Louisiana','LA'),('Maine','ME'),('Maryland','MD'),('Massachusetts','MA'),('Michigan','MI'),('Minnesota','MN'),('Mississippi','MS'),"
-						+"('Missouri','MO'),('Montana','MT'),('Nebraska','NE'),('Nevada','NV'),('New Hampshire','NH'),('New Jersey','NJ'),('New Mexico','NM'),"
-						+"('New York','NY'),('North Carolina','NC'),('North Dakota','ND'),('Ohio','OH'),('Oklahoma','OK'),('Oregon','OR'),('Pennsylvania','PA'),"
-						+"('Rhode Island','RI'),('South Carolina','SC'),('South Dakota','SD'),('Tennessee','TN'),('Texas','TX'),('Utah','UT'),('Vermont','VT'),"
-						+"('Virginia','VA'),('Washington','WA'),('West Virginia','WV'),('Wisconsin','WI'),('Wyoming','WY')";
-					Db.NonQ(command);
+					List<string> listStateAbbrs=new List<string>() { "(1,'Alabama','AL')","(2,'Alaska','AK')","(3,'Arizona','AZ')","(4,'Arkansas','AR')"
+						,"(5,'California','CA')","(6,'Colorado','CO')","(7,'Connecticut','CT')","(8,'Delaware','DE')","(9,'District of Columbia','DC')"
+						,"(10,'Florida','FL')","(11,'Georgia','GA')","(12,'Hawaii','HI')","(13,'Idaho','ID')","(14,'Illinois','IL')","(15,'Indiana','IN')"
+						,"(16,'Iowa','IA')","(17,'Kansas','KS')","(18,'Kentucky','KY')","(19,'Louisiana','LA')","(20,'Maine','ME')","(21,'Maryland','MD')"
+						,"(22,'Massachusetts','MA')","(23,'Michigan','MI')","(24,'Minnesota','MN')","(25,'Mississippi','MS')","(26,'Missouri','MO')"
+						,"(27,'Montana','MT')","(28,'Nebraska','NE')","(29,'Nevada','NV')","(30,'New Hampshire','NH')","(31,'New Jersey','NJ')"
+						,"(32,'New Mexico','NM')","(33,'New York','NY')","(34,'North Carolina','NC')","(35,'North Dakota','ND')","(36,'Ohio','OH')"
+						,"(37,'Oklahoma','OK')","(38,'Oregon','OR')","(39,'Pennsylvania','PA')","(40,'Rhode Island','RI')","(41,'South Carolina','SC')"
+						,"(42,'South Dakota','SD')","(43,'Tennessee','TN')","(44,'Texas','TX')","(45,'Utah','UT')","(46,'Vermont','VT')","(47,'Virginia','VA')"
+						,"(48,'Washington','WA')","(49,'West Virginia','WV')","(50,'Wisconsin','WI')","(51,'Wyoming','WY')"
+					};
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO stateabbr (StateAbbrNum,Description,Abbr) VALUES"+string.Join(",",listStateAbbrs);
+						Db.NonQ(command);
+					}
+					else {//Oracle
+						//Oracle is not smart enough to insert multiple values in the same insert statement, so we'll make roughly 50 separate inserts.
+						foreach(string stateAbbr in listStateAbbrs) {
+							command="INSERT INTO stateabbr (StateAbbrNum,Description,Abbr) VALUES"+stateAbbr;
+							Db.NonQ(command);
+						}
+					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE program ADD FileTemplate text NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE program ADD FileTemplate varchar2";
+					command="ALTER TABLE program ADD FileTemplate varchar2(4000)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -10643,7 +10656,7 @@ namespace OpenDentBusiness {
 						CONSTRAINT requiredfieldcondition_Require PRIMARY KEY (RequiredFieldConditionNum)
 						)";
 					Db.NonQ(command);
-					command=@"CREATE INDEX requiredfieldcondition_Require ON requiredfieldcondition (RequiredFieldNum)";
+					command=@"CREATE INDEX requiredfieldcondition_Field ON requiredfieldcondition (RequiredFieldNum)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -10763,12 +10776,13 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 					else {//oracle
-						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
-				    +") VALUES("
-				    +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
-				    +"'"+POut.Long(programNumCur)+"', "
-				    +"'Enter your API Token', "
-				    +"'')";
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+							+") VALUES("
+							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+							+"'"+POut.Long(programNumCur)+"', "
+							+"'Enter your API Token', "
+							+"'', "
+							+"0)";
 						Db.NonQ(command);
 					}
 				}
@@ -10938,7 +10952,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="RENAME COLUMN commlog.IsWebSched TO CommSource";//Source is a keyword in MySQL
+					command="ALTER TABLE commlog RENAME COLUMN IsWebSched TO CommSource";//Source is a keyword in MySQL
 					Db.NonQ(command);
 				}
 				//Add a FK to the program table which will be used in conjunction with the above enum (CommSource)
@@ -11020,8 +11034,9 @@ namespace OpenDentBusiness {
 						+POut.Int((int)EbillAddress.PracticePhysical)+","+POut.Int((int)EbillAddress.PracticeBilling)+")";
 				}
 				else {//oracle
+					//We just added this table and there are no current entries, so we have to start with a PK of 1 instead of selecting MAX +1.
 					command="INSERT INTO ebill (EbillNum,ClinicNum,ClientAcctNumber,ElectUserName,ElectPassword,PracticeAddress,RemitAddress) "
-						+"VALUES ((SELECT MAX(EbillNum)+1 FROM ebill),0,'"
+						+"VALUES (1,0,'"
 						+POut.String(billingElectClientAcctNumber)+"','"+POut.String(billingElectUserName)+"','"+POut.String(billingElectPassword)+"',"
 						+POut.Int((int)EbillAddress.PracticePhysical)+","+POut.Int((int)EbillAddress.PracticeBilling)+")";
 				}
@@ -11117,17 +11132,17 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayInterval','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayInterval','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayMessage','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderDayMessage','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourInterval','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourInterval','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourMessage','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderHourMessage','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendAll','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendAll','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendOrder','0,1,2')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderSendOrder','0,1,2')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -11135,7 +11150,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedAutomaticSendSetting','0";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WebSchedAutomaticSendSetting','0')";
 					Db.NonQ(command);
 				} 
 				//Add medication merge permission to groups with existing permission SecurityAdmin
@@ -11206,7 +11221,7 @@ namespace OpenDentBusiness {
 				      Db.NonQ(command);
 				   }
 				}
-				string valuestr=Db.GetScalar("SELECT ValueString FROM preference WHERE PrefName LIKE '"+POut.String(PrefName.ShowFeatureEhr.ToString())+"';");
+				string valuestr=Db.GetScalar("SELECT ValueString FROM preference WHERE PrefName LIKE '"+POut.String(PrefName.ShowFeatureEhr.ToString())+"'");
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('AutomaticSummaryOfCareWebmail','"+valuestr+"')";
 					Db.NonQ(command);
@@ -11306,6 +11321,7 @@ namespace OpenDentBusiness {
 			To15_4_4();
 		}
 
+		///<summary>Oracle compatible: 11/25/2015</summary>
 		private static void To15_4_4() {
 			if(FromVersion<new Version("15.4.4.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.4.0"));//No translation in convert script.
