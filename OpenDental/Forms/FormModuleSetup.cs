@@ -140,6 +140,7 @@ namespace OpenDental{
 		private CheckBox checkTPSaveSigned;
 		private CheckBox checkSelectProv;
 		private CheckBox checkTreatPlanUseSheets;
+		private CheckBox checkApptModuleDefaultToWeek;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -302,6 +303,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkApptModuleDefaultToWeek = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -809,6 +811,7 @@ namespace OpenDental{
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.checkApptModuleDefaultToWeek);
 			this.tabAppts.Controls.Add(this.checkBrokenApptAdjustmentWithProcedure);
 			this.tabAppts.Controls.Add(this.label23);
 			this.tabAppts.Controls.Add(this.butColor);
@@ -1790,6 +1793,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkApptModuleDefaultToWeek
+			// 
+			this.checkApptModuleDefaultToWeek.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptModuleDefaultToWeek.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkApptModuleDefaultToWeek.Location = new System.Drawing.Point(34, 382);
+			this.checkApptModuleDefaultToWeek.Name = "checkApptModuleDefaultToWeek";
+			this.checkApptModuleDefaultToWeek.Size = new System.Drawing.Size(406, 17);
+			this.checkApptModuleDefaultToWeek.TabIndex = 221;
+			this.checkApptModuleDefaultToWeek.Text = "Appointment Module Defaults to Week View";
+			this.checkApptModuleDefaultToWeek.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1933,6 +1947,7 @@ namespace OpenDental{
 			checkWaitingRoomFilterByView.Checked=PrefC.GetBool(PrefName.WaitingRoomFilterByView);
 			textWaitRoomWarn.Text=PrefC.GetInt(PrefName.WaitingRoomAlertTime).ToString();
 			butColor.BackColor=PrefC.GetColor(PrefName.WaitingRoomAlertColor);
+			checkApptModuleDefaultToWeek.Checked=PrefC.GetBool(PrefName.ApptModuleDefaultToWeek);
 			#endregion
 			#region Family Module
 			//Family module-----------------------------------------------------------------------
@@ -2287,6 +2302,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.WaitingRoomFilterByView,checkWaitingRoomFilterByView.Checked)
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertTime,waitingRoomAlertTime)
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
+				| Prefs.UpdateBool(PrefName.ApptModuleDefaultToWeek,checkApptModuleDefaultToWeek.Checked)
 				#endregion
 				#region Family Module
 				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
