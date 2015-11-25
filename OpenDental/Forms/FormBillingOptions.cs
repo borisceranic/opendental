@@ -459,7 +459,7 @@ namespace OpenDental{
 			this.groupDateRange.Size = new System.Drawing.Size(319, 69);
 			this.groupDateRange.TabIndex = 237;
 			this.groupDateRange.TabStop = false;
-			this.groupDateRange.Text = "Date Range";
+			this.groupDateRange.Text = "Account History Date Range";
 			// 
 			// but30days
 			// 
