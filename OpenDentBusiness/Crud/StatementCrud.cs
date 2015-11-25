@@ -236,15 +236,15 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(statement.PatNum)+"";
 			}
-			if(statement.DateSent != oldStatement.DateSent) {
+			if(statement.DateSent.Date != oldStatement.DateSent.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateSent = "+POut.Date(statement.DateSent)+"";
 			}
-			if(statement.DateRangeFrom != oldStatement.DateRangeFrom) {
+			if(statement.DateRangeFrom.Date != oldStatement.DateRangeFrom.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateRangeFrom = "+POut.Date(statement.DateRangeFrom)+"";
 			}
-			if(statement.DateRangeTo != oldStatement.DateRangeTo) {
+			if(statement.DateRangeTo.Date != oldStatement.DateRangeTo.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateRangeTo = "+POut.Date(statement.DateRangeTo)+"";
 			}

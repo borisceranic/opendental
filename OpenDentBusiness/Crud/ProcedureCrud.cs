@@ -396,7 +396,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="OldCode = '"+POut.String(procedure.OldCode)+"'";
 			}
-			if(procedure.ProcDate != oldProcedure.ProcDate) {
+			if(procedure.ProcDate.Date != oldProcedure.ProcDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ProcDate = "+POut.Date(procedure.ProcDate)+"";
 			}
@@ -444,7 +444,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Prosthesis = '"+POut.String(procedure.Prosthesis)+"'";
 			}
-			if(procedure.DateOriginalProsth != oldProcedure.DateOriginalProsth) {
+			if(procedure.DateOriginalProsth.Date != oldProcedure.DateOriginalProsth.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateOriginalProsth = "+POut.Date(procedure.DateOriginalProsth)+"";
 			}
@@ -452,7 +452,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClaimNote = '"+POut.String(procedure.ClaimNote)+"'";
 			}
-			if(procedure.DateEntryC != oldProcedure.DateEntryC) {
+			if(procedure.DateEntryC.Date != oldProcedure.DateEntryC.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntryC = "+POut.Date(procedure.DateEntryC)+"";
 			}
@@ -524,7 +524,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="StopTime = "+POut.Int(procedure.StopTime)+"";
 			}
-			if(procedure.DateTP != oldProcedure.DateTP) {
+			if(procedure.DateTP.Date != oldProcedure.DateTP.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTP = "+POut.Date(procedure.DateTP)+"";
 			}

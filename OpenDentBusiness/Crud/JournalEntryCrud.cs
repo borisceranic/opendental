@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="AccountNum = "+POut.Long(journalEntry.AccountNum)+"";
 			}
-			if(journalEntry.DateDisplayed != oldJournalEntry.DateDisplayed) {
+			if(journalEntry.DateDisplayed.Date != oldJournalEntry.DateDisplayed.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateDisplayed = "+POut.Date(journalEntry.DateDisplayed)+"";
 			}

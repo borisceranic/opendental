@@ -160,7 +160,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one DashboardAR in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(DashboardAR dashboardAR,DashboardAR oldDashboardAR){
 			string command="";
-			if(dashboardAR.DateCalc != oldDashboardAR.DateCalc) {
+			if(dashboardAR.DateCalc.Date != oldDashboardAR.DateCalc.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCalc = "+POut.Date(dashboardAR.DateCalc)+"";
 			}

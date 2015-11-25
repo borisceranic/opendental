@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one GroupPermission in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(GroupPermission groupPermission,GroupPermission oldGroupPermission){
 			string command="";
-			if(groupPermission.NewerDate != oldGroupPermission.NewerDate) {
+			if(groupPermission.NewerDate.Date != oldGroupPermission.NewerDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="NewerDate = "+POut.Date(groupPermission.NewerDate)+"";
 			}

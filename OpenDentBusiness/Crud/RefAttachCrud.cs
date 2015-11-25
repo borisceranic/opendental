@@ -204,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ItemOrder = "+POut.Int(refAttach.ItemOrder)+"";
 			}
-			if(refAttach.RefDate != oldRefAttach.RefDate) {
+			if(refAttach.RefDate.Date != oldRefAttach.RefDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="RefDate = "+POut.Date(refAttach.RefDate)+"";
 			}
@@ -228,7 +228,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProcNum = "+POut.Long(refAttach.ProcNum)+"";
 			}
-			if(refAttach.DateProcComplete != oldRefAttach.DateProcComplete) {
+			if(refAttach.DateProcComplete.Date != oldRefAttach.DateProcComplete.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateProcComplete = "+POut.Date(refAttach.DateProcComplete)+"";
 			}

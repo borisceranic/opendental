@@ -180,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(ehrSummaryCcd.PatNum)+"";
 			}
-			if(ehrSummaryCcd.DateSummary != oldEhrSummaryCcd.DateSummary) {
+			if(ehrSummaryCcd.DateSummary.Date != oldEhrSummaryCcd.DateSummary.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateSummary = "+POut.Date(ehrSummaryCcd.DateSummary)+"";
 			}

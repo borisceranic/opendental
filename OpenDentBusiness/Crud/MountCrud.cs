@@ -188,7 +188,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DocCategory = "+POut.Long(mount.DocCategory)+"";
 			}
-			if(mount.DateCreated != oldMount.DateCreated) {
+			if(mount.DateCreated.Date != oldMount.DateCreated.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCreated = "+POut.Date(mount.DateCreated)+"";
 			}

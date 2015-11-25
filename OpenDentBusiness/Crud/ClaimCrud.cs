@@ -440,11 +440,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(claim.PatNum)+"";
 			}
-			if(claim.DateService != oldClaim.DateService) {
+			if(claim.DateService.Date != oldClaim.DateService.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateService = "+POut.Date(claim.DateService)+"";
 			}
-			if(claim.DateSent != oldClaim.DateSent) {
+			if(claim.DateSent.Date != oldClaim.DateSent.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateSent = "+POut.Date(claim.DateSent)+"";
 			}
@@ -452,7 +452,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClaimStatus = '"+POut.String(claim.ClaimStatus)+"'";
 			}
-			if(claim.DateReceived != oldClaim.DateReceived) {
+			if(claim.DateReceived.Date != oldClaim.DateReceived.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateReceived = "+POut.Date(claim.DateReceived)+"";
 			}
@@ -488,7 +488,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsProsthesis = '"+POut.String(claim.IsProsthesis)+"'";
 			}
-			if(claim.PriorDate != oldClaim.PriorDate) {
+			if(claim.PriorDate.Date != oldClaim.PriorDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="PriorDate = "+POut.Date(claim.PriorDate)+"";
 			}
@@ -524,7 +524,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="AccidentRelated = '"+POut.String(claim.AccidentRelated)+"'";
 			}
-			if(claim.AccidentDate != oldClaim.AccidentDate) {
+			if(claim.AccidentDate.Date != oldClaim.AccidentDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="AccidentDate = "+POut.Date(claim.AccidentDate)+"";
 			}
@@ -544,7 +544,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="OrthoRemainM = "+POut.Byte(claim.OrthoRemainM)+"";
 			}
-			if(claim.OrthoDate != oldClaim.OrthoDate) {
+			if(claim.OrthoDate.Date != oldClaim.OrthoDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="OrthoDate = "+POut.Date(claim.OrthoDate)+"";
 			}
@@ -608,7 +608,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CanadianIsInitialLower = '"+POut.String(claim.CanadianIsInitialLower)+"'";
 			}
-			if(claim.CanadianDateInitialLower != oldClaim.CanadianDateInitialLower) {
+			if(claim.CanadianDateInitialLower.Date != oldClaim.CanadianDateInitialLower.Date) {
 				if(command!=""){ command+=",";}
 				command+="CanadianDateInitialLower = "+POut.Date(claim.CanadianDateInitialLower)+"";
 			}
@@ -620,7 +620,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CanadianIsInitialUpper = '"+POut.String(claim.CanadianIsInitialUpper)+"'";
 			}
-			if(claim.CanadianDateInitialUpper != oldClaim.CanadianDateInitialUpper) {
+			if(claim.CanadianDateInitialUpper.Date != oldClaim.CanadianDateInitialUpper.Date) {
 				if(command!=""){ command+=",";}
 				command+="CanadianDateInitialUpper = "+POut.Date(claim.CanadianDateInitialUpper)+"";
 			}
@@ -640,7 +640,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CanadaTransRefNum = '"+POut.String(claim.CanadaTransRefNum)+"'";
 			}
-			if(claim.CanadaEstTreatStartDate != oldClaim.CanadaEstTreatStartDate) {
+			if(claim.CanadaEstTreatStartDate.Date != oldClaim.CanadaEstTreatStartDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="CanadaEstTreatStartDate = "+POut.Date(claim.CanadaEstTreatStartDate)+"";
 			}
@@ -696,7 +696,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CustomTracking = "+POut.Long(claim.CustomTracking)+"";
 			}
-			if(claim.DateResent != oldClaim.DateResent) {
+			if(claim.DateResent.Date != oldClaim.DateResent.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateResent = "+POut.Date(claim.DateResent)+"";
 			}

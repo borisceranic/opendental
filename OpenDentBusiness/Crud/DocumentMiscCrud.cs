@@ -176,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one DocumentMisc in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(DocumentMisc documentMisc,DocumentMisc oldDocumentMisc){
 			string command="";
-			if(documentMisc.DateCreated != oldDocumentMisc.DateCreated) {
+			if(documentMisc.DateCreated.Date != oldDocumentMisc.DateCreated.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCreated = "+POut.Date(documentMisc.DateCreated)+"";
 			}

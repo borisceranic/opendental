@@ -245,7 +245,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="TaskListNum = "+POut.Long(taskHist.TaskListNum)+"";
 			}
-			if(taskHist.DateTask != oldTaskHist.DateTask) {
+			if(taskHist.DateTask.Date != oldTaskHist.DateTask.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTask = "+POut.Date(taskHist.DateTask)+"";
 			}

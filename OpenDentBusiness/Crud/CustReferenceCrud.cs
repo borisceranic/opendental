@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(custReference.PatNum)+"";
 			}
-			if(custReference.DateMostRecent != oldCustReference.DateMostRecent) {
+			if(custReference.DateMostRecent.Date != oldCustReference.DateMostRecent.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateMostRecent = "+POut.Date(custReference.DateMostRecent)+"";
 			}

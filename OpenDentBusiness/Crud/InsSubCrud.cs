@@ -204,11 +204,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Subscriber = "+POut.Long(insSub.Subscriber)+"";
 			}
-			if(insSub.DateEffective != oldInsSub.DateEffective) {
+			if(insSub.DateEffective.Date != oldInsSub.DateEffective.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEffective = "+POut.Date(insSub.DateEffective)+"";
 			}
-			if(insSub.DateTerm != oldInsSub.DateTerm) {
+			if(insSub.DateTerm.Date != oldInsSub.DateTerm.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTerm = "+POut.Date(insSub.DateTerm)+"";
 			}

@@ -176,11 +176,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(installmentPlan.PatNum)+"";
 			}
-			if(installmentPlan.DateAgreement != oldInstallmentPlan.DateAgreement) {
+			if(installmentPlan.DateAgreement.Date != oldInstallmentPlan.DateAgreement.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateAgreement = "+POut.Date(installmentPlan.DateAgreement)+"";
 			}
-			if(installmentPlan.DateFirstPayment != oldInstallmentPlan.DateFirstPayment) {
+			if(installmentPlan.DateFirstPayment.Date != oldInstallmentPlan.DateFirstPayment.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateFirstPayment = "+POut.Date(installmentPlan.DateFirstPayment)+"";
 			}

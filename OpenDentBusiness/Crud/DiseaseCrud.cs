@@ -201,11 +201,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProbStatus = "+POut.Int   ((int)disease.ProbStatus)+"";
 			}
-			if(disease.DateStart != oldDisease.DateStart) {
+			if(disease.DateStart.Date != oldDisease.DateStart.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStart = "+POut.Date(disease.DateStart)+"";
 			}
-			if(disease.DateStop != oldDisease.DateStop) {
+			if(disease.DateStop.Date != oldDisease.DateStop.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStop = "+POut.Date(disease.DateStop)+"";
 			}

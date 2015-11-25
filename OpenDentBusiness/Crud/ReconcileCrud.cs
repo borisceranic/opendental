@@ -180,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="EndingBal = '"+POut.Double(reconcile.EndingBal)+"'";
 			}
-			if(reconcile.DateReconcile != oldReconcile.DateReconcile) {
+			if(reconcile.DateReconcile.Date != oldReconcile.DateReconcile.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateReconcile = "+POut.Date(reconcile.DateReconcile)+"";
 			}

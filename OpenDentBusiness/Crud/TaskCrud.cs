@@ -216,7 +216,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="TaskListNum = "+POut.Long(task.TaskListNum)+"";
 			}
-			if(task.DateTask != oldTask.DateTask) {
+			if(task.DateTask.Date != oldTask.DateTask.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTask = "+POut.Date(task.DateTask)+"";
 			}

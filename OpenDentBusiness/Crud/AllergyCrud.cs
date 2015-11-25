@@ -193,7 +193,7 @@ namespace OpenDentBusiness.Crud{
 				command+="StatusIsActive = "+POut.Bool(allergy.StatusIsActive)+"";
 			}
 			//DateTStamp can only be set by MySQL
-			if(allergy.DateAdverseReaction != oldAllergy.DateAdverseReaction) {
+			if(allergy.DateAdverseReaction.Date != oldAllergy.DateAdverseReaction.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateAdverseReaction = "+POut.Date(allergy.DateAdverseReaction)+"";
 			}

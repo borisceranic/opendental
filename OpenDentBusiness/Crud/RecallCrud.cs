@@ -204,15 +204,15 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(recall.PatNum)+"";
 			}
-			if(recall.DateDueCalc != oldRecall.DateDueCalc) {
+			if(recall.DateDueCalc.Date != oldRecall.DateDueCalc.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateDueCalc = "+POut.Date(recall.DateDueCalc)+"";
 			}
-			if(recall.DateDue != oldRecall.DateDue) {
+			if(recall.DateDue.Date != oldRecall.DateDue.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateDue = "+POut.Date(recall.DateDue)+"";
 			}
-			if(recall.DatePrevious != oldRecall.DatePrevious) {
+			if(recall.DatePrevious.Date != oldRecall.DatePrevious.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePrevious = "+POut.Date(recall.DatePrevious)+"";
 			}
@@ -241,11 +241,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DisableUntilBalance = '"+POut.Double(recall.DisableUntilBalance)+"'";
 			}
-			if(recall.DisableUntilDate != oldRecall.DisableUntilDate) {
+			if(recall.DisableUntilDate.Date != oldRecall.DisableUntilDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="DisableUntilDate = "+POut.Date(recall.DisableUntilDate)+"";
 			}
-			if(recall.DateScheduled != oldRecall.DateScheduled) {
+			if(recall.DateScheduled.Date != oldRecall.DateScheduled.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateScheduled = "+POut.Date(recall.DateScheduled)+"";
 			}

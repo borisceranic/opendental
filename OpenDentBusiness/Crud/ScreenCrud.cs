@@ -236,7 +236,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Screen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Screen screen,Screen oldScreen){
 			string command="";
-			if(screen.ScreenDate != oldScreen.ScreenDate) {
+			if(screen.ScreenDate.Date != oldScreen.ScreenDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ScreenDate = "+POut.Date(screen.ScreenDate)+"";
 			}
@@ -304,7 +304,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="MissingAllTeeth = "+POut.Int   ((int)screen.MissingAllTeeth)+"";
 			}
-			if(screen.Birthdate != oldScreen.Birthdate) {
+			if(screen.Birthdate.Date != oldScreen.Birthdate.Date) {
 				if(command!=""){ command+=",";}
 				command+="Birthdate = "+POut.Date(screen.Birthdate)+"";
 			}

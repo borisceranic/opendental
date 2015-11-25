@@ -160,7 +160,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(supplyNeeded.Description)+"'";
 			}
-			if(supplyNeeded.DateAdded != oldSupplyNeeded.DateAdded) {
+			if(supplyNeeded.DateAdded.Date != oldSupplyNeeded.DateAdded.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateAdded = "+POut.Date(supplyNeeded.DateAdded)+"";
 			}

@@ -352,7 +352,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PlanNum = "+POut.Long(claimProc.PlanNum)+"";
 			}
-			if(claimProc.DateCP != oldClaimProc.DateCP) {
+			if(claimProc.DateCP.Date != oldClaimProc.DateCP.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCP = "+POut.Date(claimProc.DateCP)+"";
 			}
@@ -396,11 +396,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CopayOverride = '"+POut.Double(claimProc.CopayOverride)+"'";
 			}
-			if(claimProc.ProcDate != oldClaimProc.ProcDate) {
+			if(claimProc.ProcDate.Date != oldClaimProc.ProcDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ProcDate = "+POut.Date(claimProc.ProcDate)+"";
 			}
-			if(claimProc.DateEntry != oldClaimProc.DateEntry) {
+			if(claimProc.DateEntry.Date != oldClaimProc.DateEntry.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(claimProc.DateEntry)+"";
 			}

@@ -172,7 +172,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNumRef = "+POut.Long(custRefEntry.PatNumRef)+"";
 			}
-			if(custRefEntry.DateEntry != oldCustRefEntry.DateEntry) {
+			if(custRefEntry.DateEntry.Date != oldCustRefEntry.DateEntry.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(custRefEntry.DateEntry)+"";
 			}

@@ -204,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Guarantor = "+POut.Long(payPlan.Guarantor)+"";
 			}
-			if(payPlan.PayPlanDate != oldPayPlan.PayPlanDate) {
+			if(payPlan.PayPlanDate.Date != oldPayPlan.PayPlanDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="PayPlanDate = "+POut.Date(payPlan.PayPlanDate)+"";
 			}

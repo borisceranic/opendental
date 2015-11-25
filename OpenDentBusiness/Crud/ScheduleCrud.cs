@@ -188,7 +188,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Schedule in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Schedule schedule,Schedule oldSchedule){
 			string command="";
-			if(schedule.SchedDate != oldSchedule.SchedDate) {
+			if(schedule.SchedDate.Date != oldSchedule.SchedDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="SchedDate = "+POut.Date(schedule.SchedDate)+"";
 			}

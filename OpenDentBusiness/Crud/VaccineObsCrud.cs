@@ -212,7 +212,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="UcumCode = '"+POut.String(vaccineObs.UcumCode)+"'";
 			}
-			if(vaccineObs.DateObs != oldVaccineObs.DateObs) {
+			if(vaccineObs.DateObs.Date != oldVaccineObs.DateObs.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateObs = "+POut.Date(vaccineObs.DateObs)+"";
 			}

@@ -196,7 +196,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(payPlanCharge.PatNum)+"";
 			}
-			if(payPlanCharge.ChargeDate != oldPayPlanCharge.ChargeDate) {
+			if(payPlanCharge.ChargeDate.Date != oldPayPlanCharge.ChargeDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ChargeDate = "+POut.Date(payPlanCharge.ChargeDate)+"";
 			}

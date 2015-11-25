@@ -176,7 +176,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Instructions = '"+POut.String(ehrCarePlan.Instructions)+"'";
 			}
-			if(ehrCarePlan.DatePlanned != oldEhrCarePlan.DatePlanned) {
+			if(ehrCarePlan.DatePlanned.Date != oldEhrCarePlan.DatePlanned.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePlanned = "+POut.Date(ehrCarePlan.DatePlanned)+"";
 			}

@@ -196,7 +196,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Note = '"+POut.String(intervention.Note)+"'";
 			}
-			if(intervention.DateEntry != oldIntervention.DateEntry) {
+			if(intervention.DateEntry.Date != oldIntervention.DateEntry.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(intervention.DateEntry)+"";
 			}

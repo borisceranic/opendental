@@ -205,11 +205,11 @@ namespace OpenDentBusiness.Crud{
 				command+="PatNote = '"+POut.String(medicationPat.PatNote)+"'";
 			}
 			//DateTStamp can only be set by MySQL
-			if(medicationPat.DateStart != oldMedicationPat.DateStart) {
+			if(medicationPat.DateStart.Date != oldMedicationPat.DateStart.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStart = "+POut.Date(medicationPat.DateStart)+"";
 			}
-			if(medicationPat.DateStop != oldMedicationPat.DateStop) {
+			if(medicationPat.DateStop.Date != oldMedicationPat.DateStop.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStop = "+POut.Date(medicationPat.DateStop)+"";
 			}

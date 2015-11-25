@@ -160,15 +160,15 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one PayPeriod in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(PayPeriod payPeriod,PayPeriod oldPayPeriod){
 			string command="";
-			if(payPeriod.DateStart != oldPayPeriod.DateStart) {
+			if(payPeriod.DateStart.Date != oldPayPeriod.DateStart.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStart = "+POut.Date(payPeriod.DateStart)+"";
 			}
-			if(payPeriod.DateStop != oldPayPeriod.DateStop) {
+			if(payPeriod.DateStop.Date != oldPayPeriod.DateStop.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStop = "+POut.Date(payPeriod.DateStop)+"";
 			}
-			if(payPeriod.DatePaycheck != oldPayPeriod.DatePaycheck) {
+			if(payPeriod.DatePaycheck.Date != oldPayPeriod.DatePaycheck.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePaycheck = "+POut.Date(payPeriod.DatePaycheck)+"";
 			}

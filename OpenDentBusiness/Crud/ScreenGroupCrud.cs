@@ -160,7 +160,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Description = '"+POut.String(screenGroup.Description)+"'";
 			}
-			if(screenGroup.SGDate != oldScreenGroup.SGDate) {
+			if(screenGroup.SGDate.Date != oldScreenGroup.SGDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="SGDate = "+POut.Date(screenGroup.SGDate)+"";
 			}

@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(perioExam.PatNum)+"";
 			}
-			if(perioExam.ExamDate != oldPerioExam.ExamDate) {
+			if(perioExam.ExamDate.Date != oldPerioExam.ExamDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ExamDate = "+POut.Date(perioExam.ExamDate)+"";
 			}

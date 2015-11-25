@@ -208,7 +208,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="InstructorNum = "+POut.Long(reqStudent.InstructorNum)+"";
 			}
-			if(reqStudent.DateCompleted != oldReqStudent.DateCompleted) {
+			if(reqStudent.DateCompleted.Date != oldReqStudent.DateCompleted.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCompleted = "+POut.Date(reqStudent.DateCompleted)+"";
 			}

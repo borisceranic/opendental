@@ -196,11 +196,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DPCpost = "+POut.Int   ((int)orionProc.DPCpost)+"";
 			}
-			if(orionProc.DateScheduleBy != oldOrionProc.DateScheduleBy) {
+			if(orionProc.DateScheduleBy.Date != oldOrionProc.DateScheduleBy.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateScheduleBy = "+POut.Date(orionProc.DateScheduleBy)+"";
 			}
-			if(orionProc.DateStopClock != oldOrionProc.DateStopClock) {
+			if(orionProc.DateStopClock.Date != oldOrionProc.DateStopClock.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStopClock = "+POut.Date(orionProc.DateStopClock)+"";
 			}

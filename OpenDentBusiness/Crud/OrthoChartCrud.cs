@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(orthoChart.PatNum)+"";
 			}
-			if(orthoChart.DateService != oldOrthoChart.DateService) {
+			if(orthoChart.DateService.Date != oldOrthoChart.DateService.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateService = "+POut.Date(orthoChart.DateService)+"";
 			}

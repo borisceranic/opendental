@@ -228,11 +228,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ModelYear = '"+POut.String(equipment.ModelYear)+"'";
 			}
-			if(equipment.DatePurchased != oldEquipment.DatePurchased) {
+			if(equipment.DatePurchased.Date != oldEquipment.DatePurchased.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePurchased = "+POut.Date(equipment.DatePurchased)+"";
 			}
-			if(equipment.DateSold != oldEquipment.DateSold) {
+			if(equipment.DateSold.Date != oldEquipment.DateSold.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateSold = "+POut.Date(equipment.DateSold)+"";
 			}
@@ -248,7 +248,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Location = '"+POut.String(equipment.Location)+"'";
 			}
-			if(equipment.DateEntry != oldEquipment.DateEntry) {
+			if(equipment.DateEntry.Date != oldEquipment.DateEntry.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(equipment.DateEntry)+"";
 			}
@@ -256,11 +256,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProvNumCheckedOut = "+POut.Long(equipment.ProvNumCheckedOut)+"";
 			}
-			if(equipment.DateCheckedOut != oldEquipment.DateCheckedOut) {
+			if(equipment.DateCheckedOut.Date != oldEquipment.DateCheckedOut.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateCheckedOut = "+POut.Date(equipment.DateCheckedOut)+"";
 			}
-			if(equipment.DateExpectedBack != oldEquipment.DateExpectedBack) {
+			if(equipment.DateExpectedBack.Date != oldEquipment.DateExpectedBack.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateExpectedBack = "+POut.Date(equipment.DateExpectedBack)+"";
 			}

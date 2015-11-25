@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one ClaimPayment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(ClaimPayment claimPayment,ClaimPayment oldClaimPayment){
 			string command="";
-			if(claimPayment.CheckDate != oldClaimPayment.CheckDate) {
+			if(claimPayment.CheckDate.Date != oldClaimPayment.CheckDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="CheckDate = "+POut.Date(claimPayment.CheckDate)+"";
 			}
@@ -224,7 +224,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CarrierName = '"+POut.String(claimPayment.CarrierName)+"'";
 			}
-			if(claimPayment.DateIssued != oldClaimPayment.DateIssued) {
+			if(claimPayment.DateIssued.Date != oldClaimPayment.DateIssued.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateIssued = "+POut.Date(claimPayment.DateIssued)+"";
 			}

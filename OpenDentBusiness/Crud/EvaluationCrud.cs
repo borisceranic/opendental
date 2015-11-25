@@ -200,7 +200,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="EvalTitle = '"+POut.String(evaluation.EvalTitle)+"'";
 			}
-			if(evaluation.DateEval != oldEvaluation.DateEval) {
+			if(evaluation.DateEval.Date != oldEvaluation.DateEval.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEval = "+POut.Date(evaluation.DateEval)+"";
 			}

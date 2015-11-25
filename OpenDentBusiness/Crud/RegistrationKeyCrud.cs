@@ -208,15 +208,15 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Note = '"+POut.String(registrationKey.Note)+"'";
 			}
-			if(registrationKey.DateStarted != oldRegistrationKey.DateStarted) {
+			if(registrationKey.DateStarted.Date != oldRegistrationKey.DateStarted.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStarted = "+POut.Date(registrationKey.DateStarted)+"";
 			}
-			if(registrationKey.DateDisabled != oldRegistrationKey.DateDisabled) {
+			if(registrationKey.DateDisabled.Date != oldRegistrationKey.DateDisabled.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateDisabled = "+POut.Date(registrationKey.DateDisabled)+"";
 			}
-			if(registrationKey.DateEnded != oldRegistrationKey.DateEnded) {
+			if(registrationKey.DateEnded.Date != oldRegistrationKey.DateEnded.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEnded = "+POut.Date(registrationKey.DateEnded)+"";
 			}

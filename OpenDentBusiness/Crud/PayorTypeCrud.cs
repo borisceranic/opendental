@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(payorType.PatNum)+"";
 			}
-			if(payorType.DateStart != oldPayorType.DateStart) {
+			if(payorType.DateStart.Date != oldPayorType.DateStart.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStart = "+POut.Date(payorType.DateStart)+"";
 			}

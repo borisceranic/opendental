@@ -208,7 +208,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(paySplit.PatNum)+"";
 			}
-			if(paySplit.ProcDate != oldPaySplit.ProcDate) {
+			if(paySplit.ProcDate.Date != oldPaySplit.ProcDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ProcDate = "+POut.Date(paySplit.ProcDate)+"";
 			}
@@ -232,7 +232,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PayPlanNum = "+POut.Long(paySplit.PayPlanNum)+"";
 			}
-			if(paySplit.DatePay != oldPaySplit.DatePay) {
+			if(paySplit.DatePay.Date != oldPaySplit.DatePay.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePay = "+POut.Date(paySplit.DatePay)+"";
 			}

@@ -164,7 +164,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Deposit in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Deposit deposit,Deposit oldDeposit){
 			string command="";
-			if(deposit.DateDeposit != oldDeposit.DateDeposit) {
+			if(deposit.DateDeposit.Date != oldDeposit.DateDeposit.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateDeposit = "+POut.Date(deposit.DateDeposit)+"";
 			}

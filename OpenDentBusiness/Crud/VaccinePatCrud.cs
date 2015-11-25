@@ -288,7 +288,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProvNumAdminister = "+POut.Long(vaccinePat.ProvNumAdminister)+"";
 			}
-			if(vaccinePat.DateExpire != oldVaccinePat.DateExpire) {
+			if(vaccinePat.DateExpire.Date != oldVaccinePat.DateExpire.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateExpire = "+POut.Date(vaccinePat.DateExpire)+"";
 			}

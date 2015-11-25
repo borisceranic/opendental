@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsGraphed = "+POut.Bool(phoneGraph.IsGraphed)+"";
 			}
-			if(phoneGraph.DateEntry != oldPhoneGraph.DateEntry) {
+			if(phoneGraph.DateEntry.Date != oldPhoneGraph.DateEntry.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateEntry = "+POut.Date(phoneGraph.DateEntry)+"";
 			}

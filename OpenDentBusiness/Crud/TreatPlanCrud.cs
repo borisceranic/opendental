@@ -188,7 +188,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(treatPlan.PatNum)+"";
 			}
-			if(treatPlan.DateTP != oldTreatPlan.DateTP) {
+			if(treatPlan.DateTP.Date != oldTreatPlan.DateTP.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTP = "+POut.Date(treatPlan.DateTP)+"";
 			}

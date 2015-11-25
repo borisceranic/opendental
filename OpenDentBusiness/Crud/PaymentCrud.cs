@@ -216,7 +216,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PayType = "+POut.Long(payment.PayType)+"";
 			}
-			if(payment.PayDate != oldPayment.PayDate) {
+			if(payment.PayDate.Date != oldPayment.PayDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="PayDate = "+POut.Date(payment.PayDate)+"";
 			}

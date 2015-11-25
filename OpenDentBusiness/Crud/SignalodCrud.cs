@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ITypes = '"+POut.String(signalod.ITypes)+"'";
 			}
-			if(signalod.DateViewing != oldSignalod.DateViewing) {
+			if(signalod.DateViewing.Date != oldSignalod.DateViewing.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateViewing = "+POut.Date(signalod.DateViewing)+"";
 			}

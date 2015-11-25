@@ -168,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SupplierNum = "+POut.Long(supplyOrder.SupplierNum)+"";
 			}
-			if(supplyOrder.DatePlaced != oldSupplyOrder.DatePlaced) {
+			if(supplyOrder.DatePlaced.Date != oldSupplyOrder.DatePlaced.Date) {
 				if(command!=""){ command+=",";}
 				command+="DatePlaced = "+POut.Date(supplyOrder.DatePlaced)+"";
 			}

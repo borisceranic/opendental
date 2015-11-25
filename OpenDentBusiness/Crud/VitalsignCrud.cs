@@ -244,7 +244,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="BpDiastolic = "+POut.Int(vitalsign.BpDiastolic)+"";
 			}
-			if(vitalsign.DateTaken != oldVitalsign.DateTaken) {
+			if(vitalsign.DateTaken.Date != oldVitalsign.DateTaken.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTaken = "+POut.Date(vitalsign.DateTaken)+"";
 			}

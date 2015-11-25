@@ -228,7 +228,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CCNumberMasked = '"+POut.String(creditCard.CCNumberMasked)+"'";
 			}
-			if(creditCard.CCExpiration != oldCreditCard.CCExpiration) {
+			if(creditCard.CCExpiration.Date != oldCreditCard.CCExpiration.Date) {
 				if(command!=""){ command+=",";}
 				command+="CCExpiration = "+POut.Date(creditCard.CCExpiration)+"";
 			}
@@ -240,11 +240,11 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ChargeAmt = '"+POut.Double(creditCard.ChargeAmt)+"'";
 			}
-			if(creditCard.DateStart != oldCreditCard.DateStart) {
+			if(creditCard.DateStart.Date != oldCreditCard.DateStart.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStart = "+POut.Date(creditCard.DateStart)+"";
 			}
-			if(creditCard.DateStop != oldCreditCard.DateStop) {
+			if(creditCard.DateStop.Date != oldCreditCard.DateStop.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateStop = "+POut.Date(creditCard.DateStop)+"";
 			}
@@ -260,7 +260,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PayConnectToken = '"+POut.String(creditCard.PayConnectToken)+"'";
 			}
-			if(creditCard.PayConnectTokenExp != oldCreditCard.PayConnectTokenExp) {
+			if(creditCard.PayConnectTokenExp.Date != oldCreditCard.PayConnectTokenExp.Date) {
 				if(command!=""){ command+=",";}
 				command+="PayConnectTokenExp = "+POut.Date(creditCard.PayConnectTokenExp)+"";
 			}

@@ -492,7 +492,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Position = "+POut.Int   ((int)patient.Position)+"";
 			}
-			if(patient.Birthdate != oldPatient.Birthdate) {
+			if(patient.Birthdate.Date != oldPatient.Birthdate.Date) {
 				if(command!=""){ command+=",";}
 				command+="Birthdate = "+POut.Date(patient.Birthdate)+"";
 			}
@@ -648,7 +648,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Urgency = "+POut.Int   ((int)patient.Urgency)+"";
 			}
-			if(patient.DateFirstVisit != oldPatient.DateFirstVisit) {
+			if(patient.DateFirstVisit.Date != oldPatient.DateFirstVisit.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateFirstVisit = "+POut.Date(patient.DateFirstVisit)+"";
 			}
@@ -704,7 +704,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Language = '"+POut.String(patient.Language)+"'";
 			}
-			if(patient.AdmitDate != oldPatient.AdmitDate) {
+			if(patient.AdmitDate.Date != oldPatient.AdmitDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="AdmitDate = "+POut.Date(patient.AdmitDate)+"";
 			}

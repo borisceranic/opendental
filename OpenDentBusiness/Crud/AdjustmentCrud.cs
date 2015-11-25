@@ -192,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Adjustment in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Adjustment adjustment,Adjustment oldAdjustment){
 			string command="";
-			if(adjustment.AdjDate != oldAdjustment.AdjDate) {
+			if(adjustment.AdjDate.Date != oldAdjustment.AdjDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="AdjDate = "+POut.Date(adjustment.AdjDate)+"";
 			}
@@ -216,7 +216,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="AdjNote = '"+POut.String(adjustment.AdjNote)+"'";
 			}
-			if(adjustment.ProcDate != oldAdjustment.ProcDate) {
+			if(adjustment.ProcDate.Date != oldAdjustment.ProcDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="ProcDate = "+POut.Date(adjustment.ProcDate)+"";
 			}

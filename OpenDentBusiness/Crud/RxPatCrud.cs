@@ -212,7 +212,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(rxPat.PatNum)+"";
 			}
-			if(rxPat.RxDate != oldRxPat.RxDate) {
+			if(rxPat.RxDate.Date != oldRxPat.RxDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="RxDate = "+POut.Date(rxPat.RxDate)+"";
 			}

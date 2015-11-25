@@ -188,7 +188,7 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Parent = "+POut.Long(taskList.Parent)+"";
 			}
-			if(taskList.DateTL != oldTaskList.DateTL) {
+			if(taskList.DateTL.Date != oldTaskList.DateTL.Date) {
 				if(command!=""){ command+=",";}
 				command+="DateTL = "+POut.Date(taskList.DateTL)+"";
 			}

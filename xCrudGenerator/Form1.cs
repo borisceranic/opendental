@@ -848,7 +848,16 @@ using System.Drawing;"+rn);
 						strb.Append(rn+t3+"//"+fieldsExceptPri[f].Name+" excluded from update");
 						continue;
 					}
-					strb.Append(rn+t3+"if("+obj+"."+fieldsExceptPri[f].Name+" != "+oldObj+"."+fieldsExceptPri[f].Name+") {");
+					if(specialType==CrudSpecialColType.DateEntryEditable//DateEntryEditable special type is date data type in the db
+						|| (specialType!=CrudSpecialColType.DateT//if not special type DateT
+							&& specialType!=CrudSpecialColType.DateTEntryEditable//and not DateTEntryEditable
+							&& fieldsExceptPri[f].FieldType.Name=="DateTime"))//and field name is DateTime, then it is a date data type in the db
+					{
+						strb.Append(rn+t3+"if("+obj+"."+fieldsExceptPri[f].Name+".Date != "+oldObj+"."+fieldsExceptPri[f].Name+".Date) {");
+					}
+					else {
+						strb.Append(rn+t3+"if("+obj+"."+fieldsExceptPri[f].Name+" != "+oldObj+"."+fieldsExceptPri[f].Name+") {");
+					}
 					strb.Append(rn+t4+"if(command!=\"\"){ command+=\",\";}");
 					strb.Append(rn+t4+"command+=\""+fieldsExceptPri[f].Name+" = ");
 					if(specialType==CrudSpecialColType.DateT) {
