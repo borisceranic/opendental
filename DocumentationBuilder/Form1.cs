@@ -239,6 +239,7 @@ namespace DocumentationBuilder {
 				case "allergydef": return "AllergyDef";
 				case "appointmentrule": return "AppointmentRule";
 				case "appointmenttype": return "AppointmentType";
+				case "apptcomm": return "ApptComm";
 				case "apptfield": return "ApptField";
 				case "apptfielddef": return "ApptFieldDef";
 				case "apptview": return "ApptView";
@@ -261,6 +262,7 @@ namespace DocumentationBuilder {
 				case "claimformitem": return "ClaimFormItem";
 				case "claimpayment": return "ClaimPayment";
 				case "claimproc": return "ClaimProc";
+				case "claimsnapshot": return "ClaimSnapshot";
 				case "claimvalcodelog": return "ClaimValCodeLog";
 				case "clockevent": return "ClockEvent";
 				case "codesystem": return "CodeSystem";
@@ -451,6 +453,7 @@ namespace DocumentationBuilder {
 				case "toothgriddef": return "ToothGridDef";
 				case "toothinitial": return "ToothInitial";
 				case "treatplan": return "TreatPlan";
+				case "treatplanattach": return "TreatPlanAttach";
 				case "usergroup": return "UserGroup";
 				case "userodapptview": return "UserodApptView";
 				case "userquery": return "UserQuery";
