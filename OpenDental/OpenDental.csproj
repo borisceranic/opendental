@@ -248,6 +248,7 @@
     <Compile Include="Bridges\ClioSoft.cs" />
     <Compile Include="Bridges\AaTemplate.cs" />
     <Compile Include="Bridges\ClaimX_Statements.cs" />
+    <Compile Include="Bridges\CDS.cs" />
     <Compile Include="Bridges\DentalIntel.cs" />
     <Compile Include="Bridges\Podium.cs" />
     <Compile Include="Bridges\DentalTek.cs" />
@@ -6900,6 +6901,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\CDS_Button_green.png" />
     <None Include="Resources\Podium_Button_100x24.png" />
     <None Include="Resources\DI_Button_100x24.png" />
     <None Include="Resources\deleteX18.gif" />
