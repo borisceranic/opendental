@@ -14,9 +14,13 @@ namespace OpenDental {
 		private MessageReplaceType _replaceTypes;
 		public bool IsSelectionMode;
 
-		public string Replacement{
+		///<summary>Returns empty string if there is no Replacement String selected in the grid.</summary>
+		public string Replacement {
 			get {
-				return getReplacements(gridMain.GetSelectedIndex());
+				if(gridMain==null || gridMain.IsDisposed || gridMain.GetSelectedIndex()==-1) {
+					return "";
+				}
+				return gridMain.Rows[gridMain.GetSelectedIndex()].Cells[1].Text;
 			}
 		}
 
@@ -451,10 +455,6 @@ namespace OpenDental {
 			return retVal;
 		}
 
-		private string getReplacements(int selectedIndex) {
-			return gridMain.Rows[selectedIndex].Cells[1].Text;
-		}
-
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 			Close();//Because we want the option to open this window non-modal.
@@ -470,12 +470,16 @@ namespace OpenDental {
 		}
 
 		private void PressOK(int index) {
-			if(IsSelectionMode && gridMain.Rows[index].ColorText!=Color.Red) {
-				DialogResult=DialogResult.OK;
+			if(index<0) {
+				MsgBox.Show(this,"Please select a field.");
+				return;
 			}
-			else {
+			if(gridMain.Rows[index].ColorText==Color.Red) {
 				MsgBox.Show(this,"The selected field is not supported.");
+				return;
 			}
+			DialogResult=DialogResult.OK;
+			Close();//Because we want the option to open this window non-modal.
 		}
 
 	}
