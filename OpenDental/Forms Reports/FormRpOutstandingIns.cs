@@ -111,9 +111,9 @@ namespace OpenDental {
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(100, 25);
+			this.label1.Location = new System.Drawing.Point(100, 28);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(175, 18);
+			this.label1.Size = new System.Drawing.Size(175, 16);
 			this.label1.TabIndex = 54;
 			this.label1.Text = "(leave both blank to show all)";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -293,6 +293,7 @@ namespace OpenDental {
 			this.Controls.Add(this.labelDaysOldMax);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormRpOutstandingIns";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Outstanding Insurance Claims";
@@ -451,12 +452,14 @@ namespace OpenDental {
 					row.Cells.Add(Table.Rows[i]["LName"].ToString()+", "+Table.Rows[i]["FName"].ToString()+" "+Table.Rows[i]["MiddleI"].ToString());
 				}
 				if(PrefC.HasClinicsEnabled) {
+					string clinicName="Unassigned";
 					for(int j=0;j<_listClinics.Count;j++) {
 						if(_listClinics[j].ClinicNum==PIn.Long(Table.Rows[i]["ClinicNum"].ToString())) {
-							row.Cells.Add(_listClinics[j].Description);
+							clinicName=_listClinics[j].Description;
 							break;
 						}
 					}
+					row.Cells.Add(clinicName);
 				}
 				DateTime dateService=PIn.Date(Table.Rows[i]["DateService"].ToString());
 				if(dateService.Year<1880) {
