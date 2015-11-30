@@ -115,6 +115,7 @@ namespace OpenDental {
 			contextMenu.MenuItems.Add(menuItem);
 			menuItem=new MenuItem(Lan.g(this,"Paste"),onClick,Shortcut.CtrlV);
 			contextMenu.MenuItems.Add(menuItem);
+			base.BackColor=SystemColors.Window;//Needed for OnReadOnlyChanged() to change backcolor when ReadOnly because of an issue with RichTextBox.
 		}
 
 		///<summary>Clean up any resources being used.</summary>
@@ -223,6 +224,17 @@ namespace OpenDental {
 			}
 			else {//End IME check.
 				base.WndProc(ref m);
+			}
+		}
+
+		protected override void OnReadOnlyChanged(EventArgs e) {
+			base.OnReadOnlyChanged(e);
+			//Richtextbox does not redraw the textbox with grey after turning it ReadOnly, so we do this to immitate how textbox works.
+			if(ReadOnly) {
+				base.BackColor=SystemColors.Control;
+			}
+			else {
+				base.BackColor=SystemColors.Window;
 			}
 		}
 
