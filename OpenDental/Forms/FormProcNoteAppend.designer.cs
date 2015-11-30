@@ -70,7 +70,6 @@ namespace OpenDental{
 			// signatureBoxWrapper
 			// 
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.signatureBoxWrapper.LabelText = null;
 			this.signatureBoxWrapper.Location = new System.Drawing.Point(112, 340);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
@@ -110,6 +109,7 @@ namespace OpenDental{
 			// textNotes
 			// 
 			this.textNotes.AcceptsTab = true;
+			this.textNotes.BackColor = System.Drawing.SystemColors.Control;
 			this.textNotes.DetectUrls = false;
 			this.textNotes.Location = new System.Drawing.Point(112, 38);
 			this.textNotes.Name = "textNotes";
@@ -141,6 +141,7 @@ namespace OpenDental{
 			// textAppended
 			// 
 			this.textAppended.AcceptsTab = true;
+			this.textAppended.BackColor = System.Drawing.SystemColors.Window;
 			this.textAppended.DetectUrls = false;
 			this.textAppended.Location = new System.Drawing.Point(112, 208);
 			this.textAppended.Name = "textAppended";

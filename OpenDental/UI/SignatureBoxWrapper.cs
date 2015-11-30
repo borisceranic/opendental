@@ -13,10 +13,20 @@ namespace OpenDental.UI {
 		private bool sigChanged;
 		//private bool allowTopaz;
 		private Control sigBoxTopaz;
-		private string labelText;
 		///<summary>The reason for this event is so that if a different user is signing, that it properly records the change in users.  See the example pattern in FormProcGroup.</summary>
 		[Category("Action"),Description("Event raised when signature is cleared or altered.")]
 		public event EventHandler SignatureChanged=null;
+
+		[Category("Property"),Description("Set the text that shows in the invalid signature label"),DefaultValue("Invalid Signature")]
+		///<summary>Usually "Invalid Signature", but this can be changed for different situations.</summary>
+		public string LabelText {
+			get {
+				return labelInvalidSig.Text;
+			}
+			set {
+				labelInvalidSig.Text=value;
+			}
+		}
 
 		///<summary>A new Width property with local scope to SignatureBoxWrapper.  Sets the width of this control as well as the width of the topaz signature control.</summary>
 		public new int Width {
@@ -73,17 +83,6 @@ namespace OpenDental.UI {
 			sigChanged=true;
 			if(SignatureChanged!=null){
 				SignatureChanged(this,new EventArgs());
-			}
-		}
-
-		///<summary>Usually "Invalid Signature", but this can be changed for different situations.</summary>
-		public string LabelText{
-			get{
-				return labelText;
-			}
-			set{
-				labelText=value;
-				labelInvalidSig.Text=value;
 			}
 		}
 
