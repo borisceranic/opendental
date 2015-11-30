@@ -95,12 +95,17 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static CovSpan[] GetForCat(long catNum){
+		public static CovSpan[] GetForCat(long catNum) {
+			//No need to check RemotingRole; no call to db.
+			return GetForCat(catNum,CovSpanC.GetList());
+		}
+
+		///<summary></summary>
+		public static CovSpan[] GetForCat(long catNum,CovSpan[] arrayCovSpans) {
 			//No need to check RemotingRole; no call to db.
 			ArrayList AL=new ArrayList();
-			CovSpan[] arrayCovSpans=CovSpanC.GetList();
-			for(int i=0;i<arrayCovSpans.Length;i++){
-				if(arrayCovSpans[i].CovCatNum==catNum){
+			for(int i=0;i<arrayCovSpans.Length;i++) {
+				if(arrayCovSpans[i].CovCatNum==catNum) {
 					AL.Add(arrayCovSpans[i].Copy());
 				}
 			}

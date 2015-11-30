@@ -136,14 +136,19 @@ namespace OpenDentBusiness {
 		///<summary>Returns -1 if not in ListShort.</summary>
 		public static int GetOrderShort(long CovCatNum) {
 			//No need to check RemotingRole; no call to db.
-			List<CovCat> listCovCatsShort=CovCatC.GetListShort();
+			return GetOrderShort(CovCatNum,CovCatC.GetListShort());
+		}
+
+		///<summary>Returns -1 if not in the provided list.</summary>
+		public static int GetOrderShort(long CovCatNum,List<CovCat> listCovCats) {
+			//No need to check RemotingRole; no call to db.
 			int retVal=-1;
-			for(int i=0;i<listCovCatsShort.Count;i++){
-				if(CovCatNum==listCovCatsShort[i].CovCatNum){
+			for(int i=0;i<listCovCats.Count;i++) {
+				if(CovCatNum==listCovCats[i].CovCatNum) {
 					retVal=i;
 				}
 			}
-			return retVal;	
+			return retVal;
 		}
 
 		///<summary>Gets a matching benefit category from the short list.  Returns null if not found, which should be tested for.</summary>
