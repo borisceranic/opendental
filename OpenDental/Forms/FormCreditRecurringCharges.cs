@@ -35,7 +35,7 @@ namespace OpenDental {
 		}
 
 		private void FormRecurringCharges_Load(object sender,EventArgs e) {
-			if(!Prefs.IsODHQ()) {
+			if(!PrefC.IsODHQ) {
 				checkHideBold.Checked=true;
 				checkHideBold.Visible=false;
 			}
@@ -92,7 +92,7 @@ namespace OpenDental {
 				Double payPlanDue=Math.Max(PIn.Double(table.Rows[i]["PayPlanDue"].ToString()),0);
 				long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
 				string procedures=table.Rows[i]["Procedures"].ToString();
-				if(Prefs.IsODHQ()) {//HQ calculates repeating charges based on the presence of procedures on the patient's account that are linked to the CC
+				if(PrefC.IsODHQ) {//HQ calculates repeating charges based on the presence of procedures on the patient's account that are linked to the CC
 					if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 						rptChargeAmt=CreditCards.TotalRecurringCharges(patNum,procedures,PIn.Int(table.Rows[i]["BillingCycleDay"].ToString()));
 					}
@@ -445,7 +445,7 @@ namespace OpenDental {
 				}
 				//If ODHQ, do not add the zip code if the customer has an active foreign registration key
 				bool hasForeignKey=false;
-				if(Prefs.IsODHQ()) {
+				if(PrefC.IsODHQ) {
 					hasForeignKey=RegistrationKeys.GetForPatient(patNum)
 						.Where(x => x.IsForeign)
 						.Where(x => x.DateStarted<=DateTimeOD.Today)
@@ -640,7 +640,7 @@ namespace OpenDental {
 			Payment paymentCur=new Payment();
 			paymentCur.DateEntry=_nowDateTime.Date;
 			DateTime dateStart=PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString());
-			if(Prefs.IsODHQ() && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+			if(PrefC.IsODHQ && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 				dateStart=new DateTime(dateStart.Year,dateStart.Month,PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
 			}
 			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);

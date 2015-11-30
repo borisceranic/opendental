@@ -66,6 +66,14 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>Returns true if DockPhonePanelShow is enabled. Convenience function that should be used if for ODHQ only, and not resellers.</summary>
+		/// <returns></returns>
+		public static bool IsODHQ {
+			get {
+				return GetBool(PrefName.DockPhonePanelShow);
+			}
+		}
+
 		///<summary>Gets a pref of type long.</summary>
 		public static long GetLong(PrefName prefName) {
 			Dictionary<string,Pref> dictPrefs=GetDict();

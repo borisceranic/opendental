@@ -378,7 +378,7 @@ namespace OpenDental{
 			if(UserCur.Password==""){
 				butPassword.Text=Lan.g(this,"Create Password");
 			}
-			if(!Prefs.IsODHQ()) {
+			if(!PrefC.IsODHQ) {
 				butJobRoles.Visible=false;
 			}
 		}

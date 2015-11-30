@@ -434,7 +434,7 @@ namespace OpenDental{
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			int proceduresAddedCount=0;
 			int claimsAddedCount=0;
-			if(Prefs.IsODHQ()) {
+			if(PrefC.IsODHQ) {
 				//If ODHQ, handle Integrated texting repeating charges differently.
 				listRepeatingCharges.RemoveAll(x => x.ProcCode=="038");
 				proceduresAddedCount+=AddSmsRepeatingChargesHelper().Count;

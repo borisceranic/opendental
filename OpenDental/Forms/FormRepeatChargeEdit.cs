@@ -494,7 +494,7 @@ namespace OpenDental{
 				checkCreatesClaim.Enabled=false;
 				checkIsEnabled.Enabled=false;
 			}
-			if(Prefs.IsODHQ() && RepeatCur.ProcCode=="038") {//Integrated Texting Access Charge
+			if(PrefC.IsODHQ && RepeatCur.ProcCode=="038") {//Integrated Texting Access Charge
 				textDesc.ReadOnly=true;
 				textTotalAmount.ReadOnly=true;
 				textNumOfCharges.ReadOnly=true;
@@ -664,7 +664,7 @@ namespace OpenDental{
 					Patients.Update(patNew,patOld);
 				}
 				RepeatCharges.Insert(RepeatCur);
-				if(Prefs.IsODHQ()) {
+				if(PrefC.IsODHQ) {
 					AddProcedureToCC();
 				}
 			}

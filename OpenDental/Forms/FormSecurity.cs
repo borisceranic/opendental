@@ -736,6 +736,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableSecurity","Employee"),90);
 			gridMain.Columns.Add(col);
+			if(PrefC.IsODHQ) {
+				col=new ODGridColumn(Lan.g("TableSecurity","Job Roles"),60,HorizontalAlignment.Center);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g("TableSecurity","Provider"),90);
 			gridMain.Columns.Add(col);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
@@ -791,6 +795,14 @@ namespace OpenDental{
 				row.Cells.Add(userdesc);
 				row.Cells.Add(UserGroups.GetGroup(ListUser[i].UserGroupNum).Description);
 				row.Cells.Add(Employees.GetNameFL(ListUser[i].EmployeeNum));
+				if(PrefC.IsODHQ) {
+					if(JobRoles.GetForUser(ListUser[i].UserNum).Count>0) {
+						row.Cells.Add("X");
+					}
+					else {
+						row.Cells.Add("");
+					}
+				}
 				row.Cells.Add(Providers.GetLongDesc(ListUser[i].ProvNum));
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 					row.Cells.Add(Clinics.GetDesc(ListUser[i].ClinicNum));
@@ -859,6 +871,11 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Userod user=Userods.GetUser(ListUser[e.Row].UserNum);
+			if(gridMain.Columns[e.Col].Heading=="Job Roles") {
+				FormJobRoles FormJR=new FormJobRoles(user.UserNum);
+				FormJR.ShowDialog();
+				return;
+			}
 			FormUserEdit FormU=new FormUserEdit(user);
 			FormU.ShowDialog();
 			if(FormU.DialogResult==DialogResult.Cancel){

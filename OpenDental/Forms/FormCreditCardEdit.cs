@@ -42,7 +42,7 @@ namespace OpenDental {
 						comboPaymentPlans.SelectedIndex=i+1;
 					}
 				}
-				if(Prefs.IsODHQ()) {
+				if(PrefC.IsODHQ) {
 					groupProcedures.Visible=true;
 					FillProcs();
 				}

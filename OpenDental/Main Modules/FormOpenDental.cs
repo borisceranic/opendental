@@ -2608,7 +2608,7 @@ namespace OpenDental{
 					FillPatientButton(pat);
 				}
 			}
-			if(!Prefs.IsODHQ()) {
+			if(!PrefC.IsODHQ) {
 				//Remove the menu items that are only needed for HQ like Default CC Procedures
 				menuItemAccount.MenuItems.Clear();
 			}
