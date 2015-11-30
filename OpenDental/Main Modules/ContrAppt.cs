@@ -5638,6 +5638,10 @@ namespace OpenDental {
 			int minutes=(int)((ContrAppt.SheetClickedonMin/ApptDrawing.MinPerIncr)*ApptDrawing.MinPerIncr);
 			SchedCur.StartTime=new TimeSpan(ContrAppt.SheetClickedonHour,minutes,0);
 			SchedCur.StopTime=new TimeSpan(ContrAppt.SheetClickedonHour,minutes,0);
+			if(SchedCur.StartTime>TimeSpan.FromHours(23)) {//if user clicked anywhere during the last hour of the day, set blockout to the last hour of the day.
+				SchedCur.StartTime=new TimeSpan(23,00,00);
+				SchedCur.StopTime=new TimeSpan(23,59,00);
+			}
 			if(ApptDrawing.IsWeeklyView) {
 				SchedCur.SchedDate=WeekStartDate.AddDays(SheetClickedonDay);
 			}
