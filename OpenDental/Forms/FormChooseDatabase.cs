@@ -200,6 +200,8 @@ namespace OpenDental{
 			// 
 			// comboDatabase
 			// 
+			this.comboDatabase.DropDownHeight = 390;
+			this.comboDatabase.IntegralHeight = false;
 			this.comboDatabase.Location = new System.Drawing.Point(13, 98);
 			this.comboDatabase.MaxDropDownItems = 100;
 			this.comboDatabase.Name = "comboDatabase";
@@ -220,6 +222,8 @@ namespace OpenDental{
 			// 
 			// comboComputerName
 			// 
+			this.comboComputerName.DropDownHeight = 390;
+			this.comboComputerName.IntegralHeight = false;
 			this.comboComputerName.Location = new System.Drawing.Point(13, 56);
 			this.comboComputerName.MaxDropDownItems = 100;
 			this.comboComputerName.Name = "comboComputerName";
