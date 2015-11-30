@@ -104,6 +104,7 @@ namespace OpenDental{
 		private CheckBox checkGingMarg;
 		/// <summary>This control is located behind gridP in the upper left corner.  It is used to allow text voice activated perio charting.  This also allows text to be pasted in the perio chart.</summary>
 		private TextBox textInputBox;
+		private UI.Button butCopyPrevious;
 		private PerioExam PerioExamCur;
 
 		///<summary></summary>
@@ -155,7 +156,6 @@ namespace OpenDental{
 			this.butColorPlaque = new System.Windows.Forms.Button();
 			this.checkThree = new System.Windows.Forms.CheckBox();
 			this.checkGingMarg = new System.Windows.Forms.CheckBox();
-			this.butSave = new OpenDental.UI.Button();
 			this.butCalcIndex = new OpenDental.UI.Button();
 			this.butCalculus = new OpenDental.UI.Button();
 			this.butPlaque = new OpenDental.UI.Button();
@@ -205,7 +205,9 @@ namespace OpenDental{
 			this.labelPlaqueHistory = new System.Windows.Forms.Label();
 			this.listPlaqueHistory = new System.Windows.Forms.ListBox();
 			this.textInputBox = new System.Windows.Forms.TextBox();
+			this.butCopyPrevious = new OpenDental.UI.Button();
 			this.gridP = new OpenDental.ContrPerio();
+			this.butSave = new OpenDental.UI.Button();
 			this.butGraphical = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
@@ -369,20 +371,6 @@ namespace OpenDental{
 			this.toolTip1.SetToolTip(this.checkGingMarg, "Or hold down the Ctrl key while you type numbers.  Affects gingival margins only." +
         "  Used to input positive gingival margins (hyperplasia).");
 			this.checkGingMarg.Click += new System.EventHandler(this.checkGingMarg_CheckedChanged);
-			// 
-			// butSave
-			// 
-			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSave.Autosize = true;
-			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSave.CornerRadius = 4F;
-			this.butSave.Location = new System.Drawing.Point(764, 616);
-			this.butSave.Name = "butSave";
-			this.butSave.Size = new System.Drawing.Size(88, 24);
-			this.butSave.TabIndex = 77;
-			this.butSave.Text = "Save to Images";
-			this.butSave.Click += new System.EventHandler(this.butSave_Click);
 			// 
 			// butCalcIndex
 			// 
@@ -868,6 +856,23 @@ namespace OpenDental{
 			this.textInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textInputBox_KeyDown);
 			this.textInputBox.Leave += new System.EventHandler(this.textInputBox_Leave);
 			// 
+			// butCopyPrevious
+			// 
+			this.butCopyPrevious.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCopyPrevious.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCopyPrevious.Autosize = true;
+			this.butCopyPrevious.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCopyPrevious.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCopyPrevious.CornerRadius = 4F;
+			this.butCopyPrevious.Image = global::OpenDental.Properties.Resources.Add;
+			this.butCopyPrevious.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butCopyPrevious.Location = new System.Drawing.Point(7, 227);
+			this.butCopyPrevious.Name = "butCopyPrevious";
+			this.butCopyPrevious.Size = new System.Drawing.Size(124, 24);
+			this.butCopyPrevious.TabIndex = 82;
+			this.butCopyPrevious.Text = "Copy Previous";
+			this.butCopyPrevious.Click += new System.EventHandler(this.butCopyPrevious_Click);
+			// 
 			// gridP
 			// 
 			this.gridP.BackColor = System.Drawing.SystemColors.Window;
@@ -879,6 +884,20 @@ namespace OpenDental{
 			this.gridP.Text = "contrPerio2";
 			this.gridP.DirectionChangedRight += new System.EventHandler(this.gridP_DirectionChangedRight);
 			this.gridP.DirectionChangedLeft += new System.EventHandler(this.gridP_DirectionChangedLeft);
+			// 
+			// butSave
+			// 
+			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSave.Autosize = true;
+			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSave.CornerRadius = 4F;
+			this.butSave.Location = new System.Drawing.Point(764, 616);
+			this.butSave.Name = "butSave";
+			this.butSave.Size = new System.Drawing.Size(88, 24);
+			this.butSave.TabIndex = 77;
+			this.butSave.Text = "Save to Images";
+			this.butSave.Click += new System.EventHandler(this.butSave_Click);
 			// 
 			// butGraphical
 			// 
@@ -922,7 +941,7 @@ namespace OpenDental{
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butAdd.Location = new System.Drawing.Point(7, 197);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(82, 24);
+			this.butAdd.Size = new System.Drawing.Size(124, 24);
 			this.butAdd.TabIndex = 53;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
@@ -951,9 +970,9 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(7, 228);
+			this.butDelete.Location = new System.Drawing.Point(7, 257);
 			this.butDelete.Name = "butDelete";
-			this.butDelete.Size = new System.Drawing.Size(82, 24);
+			this.butDelete.Size = new System.Drawing.Size(124, 24);
 			this.butDelete.TabIndex = 34;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
@@ -1102,6 +1121,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(982, 700);
+			this.Controls.Add(this.butCopyPrevious);
 			this.Controls.Add(this.gridP);
 			this.Controls.Add(this.textInputBox);
 			this.Controls.Add(this.checkGingMarg);
@@ -1314,6 +1334,34 @@ namespace OpenDental{
 			PerioMeasures.SetSkipped(PerioExamCur.PerioExamNum,skippedTeeth);
 			RefreshListExams();
 			listExams.SelectedIndex=PerioExams.ListExams.Count-1;
+			FillGrid();
+		}
+
+		private void butCopyPrevious_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.PerioEdit,MiscData.GetNowDateTime())) {
+				return;
+			}
+			if(listExams.SelectedIndex==-1) {
+				MsgBox.Show(this,"There are currently no exams to copy from.  Please create an initial exam.");
+				return;
+			}
+			gridP.SaveCurExam(PerioExamCur.PerioExamNum);
+			PerioExamCur=new PerioExam();
+			PerioExamCur.PatNum=PatCur.PatNum;
+			PerioExamCur.ExamDate=DateTimeOD.Today;
+			PerioExamCur.ProvNum=PatCur.PriProv;
+			PerioExams.Insert(PerioExamCur); //insert a new Perio exam for today.
+			List<int> skippedTeeth=new List<int>();//int 1-32
+			skippedTeeth=PerioMeasures.GetSkipped(PerioExams.ListExams[PerioExams.ListExams.Count-1].PerioExamNum); //get skipped teeth from last exam.
+			PerioMeasures.SetSkipped(PerioExamCur.PerioExamNum,skippedTeeth);
+			//get meaures from last exam
+			List<PerioMeasure> listPerio=PerioMeasures.GetAllForExam(PerioExams.ListExams[PerioExams.ListExams.Count-1].PerioExamNum);
+			for(int i=0;i<listPerio.Count;i++) { //add all of the previous exam's measures to this perio exam.
+				listPerio[i].PerioExamNum=PerioExamCur.PerioExamNum;
+				PerioMeasures.Insert(listPerio[i]);
+			}
+			RefreshListExams();
+			listExams.SelectedIndex=PerioExams.ListExams.Count-1; //select the exam that was just inserted.
 			FillGrid();
 		}
 
