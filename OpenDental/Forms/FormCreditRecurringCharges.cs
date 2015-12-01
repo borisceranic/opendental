@@ -641,7 +641,9 @@ namespace OpenDental {
 			paymentCur.DateEntry=_nowDateTime.Date;
 			DateTime dateStart=PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString());
 			if(PrefC.IsODHQ && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-				dateStart=new DateTime(dateStart.Year,dateStart.Month,PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
+				int dayOfMonth=Math.Min(DateTime.DaysInMonth(dateStart.Year,dateStart.Month),
+					PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
+				dateStart=new DateTime(dateStart.Year,dateStart.Month,dayOfMonth);
 			}
 			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);
 			paymentCur.PatNum=patCur.PatNum;
