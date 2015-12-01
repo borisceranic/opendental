@@ -1317,21 +1317,25 @@ namespace OpenDental{
 			PerioExamCur.ExamDate=DateTimeOD.Today;
 			PerioExamCur.ProvNum=PatCur.PriProv;
 			PerioExams.Insert(PerioExamCur);
-			List<int> skippedTeeth=new List<int>();//int 1-32
-			if(PerioExams.ListExams.Count==0) {//For patient's first perio chart, any teeth marked missing are automatically marked skipped.
-				for(int i=0;i<MissingTeeth.Count;i++){
-					if(((string)MissingTeeth[i]).CompareTo("A")<0//if a number
-						|| ((string)MissingTeeth[i]).CompareTo("Z")>0)
-					{
-						skippedTeeth.Add(PIn.Int(MissingTeeth[i]));
+			List<int> listSkippedTeeth=new List<int>();//int 1-32
+			if(PerioExams.ListExams.Count > 0) {
+				//set skipped teeth based on the last exam in the list: 
+				listSkippedTeeth=PerioMeasures.GetSkipped(PerioExams.ListExams[PerioExams.ListExams.Count-1].PerioExamNum);
+			}
+			//For patient's first perio chart, any teeth marked missing are automatically marked skipped.
+			if(PerioExams.ListExams.Count==0 || PrefC.GetBool(PrefName.PerioSkipMissingTeeth)) {
+				for(int i=0;i<MissingTeeth.Count;i++) {
+					if(MissingTeeth[i].CompareTo("A") >= 0 && MissingTeeth[i].CompareTo("Z") <= 0) {//if is a letter (not a number)
+						continue;//Skipped teeth are only recorded by tooth number within the perio exam.
 					}
+					int toothNum=PIn.Int(MissingTeeth[i]);
+					if(listSkippedTeeth.Contains(toothNum)) {
+						continue;//Skip duplicates
+					}
+					listSkippedTeeth.Add(toothNum);
 				}
 			}
-			else {//Request #661 - Better synch of missing teeth after initial perio exam
-				//set skipped teeth based on the last exam in the list: 
-				skippedTeeth=PerioMeasures.GetSkipped(PerioExams.ListExams[PerioExams.ListExams.Count-1].PerioExamNum);
-			}
-			PerioMeasures.SetSkipped(PerioExamCur.PerioExamNum,skippedTeeth);
+			PerioMeasures.SetSkipped(PerioExamCur.PerioExamNum,listSkippedTeeth);
 			RefreshListExams();
 			listExams.SelectedIndex=PerioExams.ListExams.Count-1;
 			FillGrid();

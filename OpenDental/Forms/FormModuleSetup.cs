@@ -144,6 +144,7 @@ namespace OpenDental{
 		private Label label25;
 		private Button butApptLineColor;
 		private CheckBox checkApptModuleDefaultToWeek;
+		private CheckBox checkPerioSkipMissingTeeth;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -224,6 +225,7 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.checkApptModuleDefaultToWeek = new System.Windows.Forms.CheckBox();
 			this.label25 = new System.Windows.Forms.Label();
 			this.butApptLineColor = new System.Windows.Forms.Button();
 			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
@@ -308,7 +310,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkApptModuleDefaultToWeek = new System.Windows.Forms.CheckBox();
+			this.checkPerioSkipMissingTeeth = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -852,6 +854,17 @@ namespace OpenDental{
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
+			// checkApptModuleDefaultToWeek
+			// 
+			this.checkApptModuleDefaultToWeek.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptModuleDefaultToWeek.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkApptModuleDefaultToWeek.Location = new System.Drawing.Point(34, 407);
+			this.checkApptModuleDefaultToWeek.Name = "checkApptModuleDefaultToWeek";
+			this.checkApptModuleDefaultToWeek.Size = new System.Drawing.Size(406, 17);
+			this.checkApptModuleDefaultToWeek.TabIndex = 220;
+			this.checkApptModuleDefaultToWeek.Text = "Appointment Module Defaults to Week View";
+			this.checkApptModuleDefaultToWeek.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// label25
 			// 
 			this.label25.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -1304,6 +1317,7 @@ namespace OpenDental{
 			// tabChart
 			// 
 			this.tabChart.BackColor = System.Drawing.SystemColors.Window;
+			this.tabChart.Controls.Add(this.checkPerioSkipMissingTeeth);
 			this.tabChart.Controls.Add(this.checkProvColorChart);
 			this.tabChart.Controls.Add(this.label11);
 			this.tabChart.Controls.Add(this.textMedDefaultStopDays);
@@ -1819,16 +1833,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkApptModuleDefaultToWeek
+			// checkPerioSkipMissingTeeth
 			// 
-			this.checkApptModuleDefaultToWeek.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkApptModuleDefaultToWeek.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkApptModuleDefaultToWeek.Location = new System.Drawing.Point(34, 407);
-			this.checkApptModuleDefaultToWeek.Name = "checkApptModuleDefaultToWeek";
-			this.checkApptModuleDefaultToWeek.Size = new System.Drawing.Size(406, 17);
-			this.checkApptModuleDefaultToWeek.TabIndex = 220;
-			this.checkApptModuleDefaultToWeek.Text = "Appointment Module Defaults to Week View";
-			this.checkApptModuleDefaultToWeek.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioSkipMissingTeeth.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioSkipMissingTeeth.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPerioSkipMissingTeeth.Location = new System.Drawing.Point(139, 304);
+			this.checkPerioSkipMissingTeeth.Name = "checkPerioSkipMissingTeeth";
+			this.checkPerioSkipMissingTeeth.Size = new System.Drawing.Size(302, 15);
+			this.checkPerioSkipMissingTeeth.TabIndex = 215;
+			this.checkPerioSkipMissingTeeth.Text = "Perio exams always skip missing teeth";
+			this.checkPerioSkipMissingTeeth.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioSkipMissingTeeth.UseVisualStyleBackColor = true;
 			// 
 			// FormModuleSetup
 			// 
@@ -2052,6 +2067,7 @@ namespace OpenDental{
 			//checkChartAddProcNoRefreshGrid.Checked=PrefC.GetBool(PrefName.ChartAddProcNoRefreshGrid);//Not implemented.  May revisit some day.
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
 			checkProvColorChart.Checked=PrefC.GetBool(PrefName.UseProviderColorsInChart);
+			checkPerioSkipMissingTeeth.Checked=PrefC.GetBool(PrefName.PerioSkipMissingTeeth);
 			if(PrefC.GetByte(PrefName.DxIcdVersion)==9) {
 				checkDxIcdVersion.Checked=false;
 			}
@@ -2393,6 +2409,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ProcLockingIsAllowed,checkProcLockingIsAllowed.Checked)
 				| Prefs.UpdateInt(PrefName.MedDefaultStopDays,daysStop)
 				| Prefs.UpdateBool(PrefName.UseProviderColorsInChart,checkProvColorChart.Checked)
+				| Prefs.UpdateBool(PrefName.PerioSkipMissingTeeth,checkPerioSkipMissingTeeth.Checked)
 				//| Prefs.UpdateBool(PrefName.ToothChartMoveMenuToRight,checkToothChartMoveMenuToRight.Checked)
 				//| Prefs.UpdateBool(PrefName.ChartQuickAddHideAmalgam, checkChartQuickAddHideAmalgam.Checked) //Deprecated.
 				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.

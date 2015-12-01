@@ -11400,6 +11400,15 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE vitalsign MODIFY Pulse NOT NULL";
 					Db.NonQ(command);
 				}
+				//Perio chart skip missing teeth by default preference
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PerioSkipMissingTeeth','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PerioSkipMissingTeeth','1')";
+					Db.NonQ(command);
+				}
 
 
 

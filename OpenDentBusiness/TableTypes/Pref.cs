@@ -412,6 +412,8 @@ namespace OpenDentBusiness {
 		PerioRedMGJ,
 		PerioRedMob,
 		PerioRedProb,
+		///<summary>Enabled by default.  When a new perio exam is created, will always mark all missing teeth as skipped.</summary>
+		PerioSkipMissingTeeth,
 		PlannedApptTreatedAsRegularAppt,
 		PracticeAddress,
 		PracticeAddress2,
