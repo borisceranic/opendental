@@ -50,7 +50,9 @@ namespace OpenDental {
 
 		private void FillGrid() {
 			List<string> listExpertNums=new List<string>();
+			bool hasAllExperts=false;
 			if(comboBoxMultiExpert.SelectedIndices.Contains(0)) {//Combo Box has All selected
+				hasAllExperts=true;
 				for(int i=0;i<_listUsers.Count;i++) {
 					listExpertNums.Add(_listUsers[i].UserNum.ToString());
 				}
@@ -61,7 +63,9 @@ namespace OpenDental {
 				}
 			}
 			List<string> listOwnerNums=new List<string>();
+			bool hasAllOwners=false;
 			if(comboBoxMultiOwner.SelectedIndices.Contains(0)) {//Combo Box has All selected
+				hasAllOwners=true;
 				for(int i=0;i<_listUsers.Count;i++) {
 					listOwnerNums.Add(_listUsers[i].UserNum.ToString());
 				}
@@ -87,7 +91,7 @@ namespace OpenDental {
 			_listExpertFilterNums=listExpertNums;
 			_listOwnerFilterNums=listOwnerNums;
 			_listJobStatusFilters=listJobStatuses;
-			_table=Jobs.GetForJobManager(checkExpert.Checked,listExpertNums,checkOwner.Checked,listOwnerNums,checkStatus.Checked,listJobStatuses,checkDate.Checked);
+			_table=Jobs.GetForJobManager(checkExpert.Checked,listExpertNums,checkOwner.Checked,listOwnerNums,checkStatus.Checked,listJobStatuses,checkDate.Checked,hasAllExperts,hasAllOwners);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("Expert",55);

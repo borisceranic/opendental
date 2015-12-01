@@ -137,7 +137,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns a data table for the Job Manager control.  This data table will be optionally grouped by the booleans passed in and
 		///will be filtered to include entries based on the lists passed in.</summary>
-		public static DataTable GetForJobManager(bool groupExpert,List<string> listExpertNums,bool groupOwners,List<string> listOwnerNums,bool groupEnums,List<string> listJobStatuses,bool groupDate) {
+		public static DataTable GetForJobManager(bool groupExpert,List<string> listExpertNums,bool groupOwners,List<string> listOwnerNums,bool groupEnums,List<string> listJobStatuses,bool groupDate,bool allExperts,bool allOwners) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),groupExpert,listExpertNums,groupOwners,listOwnerNums,groupEnums,listJobStatuses,groupDate);
 			}
@@ -149,13 +149,21 @@ namespace OpenDentBusiness {
 			string whereClause="";
 			string groupClause="";
 			if(listExpertNums.Count>0) {
-				whereClause+="Expert IN("+String.Join(",",listExpertNums)+") OR Expert=0 ";
+				whereClause+="Expert IN(";
+				if(allExperts) {
+					whereClause+="0,";
+				}
+				whereClause+=String.Join(",",listExpertNums)+") ";
 			}
 			if(listOwnerNums.Count>0) {
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Owner IN("+String.Join(",",listOwnerNums)+") OR Owner=0 ";
+				whereClause+="Owner IN(";
+				if(allOwners) {
+					whereClause+="0,";
+				}
+				whereClause+=String.Join(",",listOwnerNums)+") ";
 			}
 			if(listJobStatuses.Count>0) {
 				if(whereClause!="") {
