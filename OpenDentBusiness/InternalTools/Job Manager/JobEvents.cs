@@ -28,6 +28,25 @@ namespace OpenDentBusiness{
 			return Crud.JobEventCrud.SelectMany(command);
 		}
 
+		///<summary>Returns blank if no previous owner</summary>
+		public static string GetPrevOwnerName(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			long ownerCur=Jobs.GetOne(jobNum).Owner;
+			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum)
+				+" ORDER BY DateTimeEntry";
+			List<JobEvent> listJobEvents=Crud.JobEventCrud.SelectMany(command);
+			long ownerPrev=0;
+			foreach(JobEvent jobEvent in listJobEvents) {
+				if(jobEvent.Owner!=ownerCur) {
+					ownerPrev=jobEvent.Owner;
+					break;
+				}
+			}
+			return Userods.GetName(ownerPrev);
+		}
+
 		///<summary>Gets one JobEvent from the db.</summary>
 		public static JobEvent GetOne(long jobEventNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
