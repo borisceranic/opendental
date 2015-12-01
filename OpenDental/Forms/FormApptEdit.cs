@@ -3469,7 +3469,12 @@ namespace OpenDental{
 					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
 					AptCur.AptNum);
 			}
-			DialogResult=DialogResult.OK;
+			if(IsNew) {
+				DialogResult=DialogResult.Cancel;
+			}
+			else {
+				DialogResult=DialogResult.OK;
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
