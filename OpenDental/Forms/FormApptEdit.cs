@@ -16,9 +16,7 @@ using OpenDentBusiness.UI;
 using PdfSharp.Pdf;
 
 namespace OpenDental{
-	/// <summary>
-	/// Summary description for FormBasicTemplate.
-	/// </summary>
+	///<summary>Edit window for appointments.  Will have a DialogResult of Cancel if the appointment was marked as new and is deleted.</summary>
 	public class FormApptEdit : System.Windows.Forms.Form{
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
@@ -3469,7 +3467,12 @@ namespace OpenDental{
 					"Delete for date/time: "+AptCur.AptDateTime.ToString(),
 					AptCur.AptNum);
 			}
-			DialogResult=DialogResult.OK;
+			if(IsNew) {
+				DialogResult=DialogResult.Cancel;
+			}
+			else {
+				DialogResult=DialogResult.OK;
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
