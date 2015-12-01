@@ -324,7 +324,20 @@ namespace OpenDentBusiness {
 						+DbHelper.DtimeToDate("procedurelog.ProcDate")+"="+POut.Date(appt.AptDateTime)+") ";
 			}
 			command+=") AND procedurelog.ProcStatus != "+POut.Long((int)ProcStat.D)+" AND procedurecode.IsCanadianLab=0";
-			return Crud.ProcedureCrud.SelectMany(command);
+			List<Procedure> result=Crud.ProcedureCrud.SelectMany(command);
+			for(int i=0;i<result.Count;i++){
+				command="SELECT * FROM procnote WHERE ProcNum="+POut.Long(result[i].ProcNum)+" ORDER BY EntryDateTime DESC";
+				command=DbHelper.LimitOrderBy(command,1);
+				DataTable table=Db.GetTable(command);
+				if(table.Rows.Count==0) {
+					continue;
+				}
+				result[i].UserNum   =PIn.Long(table.Rows[0]["UserNum"].ToString());
+				result[i].Note      =PIn.String(table.Rows[0]["Note"].ToString());
+				result[i].SigIsTopaz=PIn.Bool(table.Rows[0]["SigIsTopaz"].ToString());
+				result[i].Signature =PIn.String(table.Rows[0]["Signature"].ToString());
+			}
+			return result;
 		}
 
 		///<summary>Gets all Procedures for a single date for the specified patient directly from the database.  Excludes deleted procs.</summary>
