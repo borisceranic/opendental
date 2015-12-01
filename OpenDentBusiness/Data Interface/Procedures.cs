@@ -1470,6 +1470,9 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,procList,subList);
 			}
+			if(procList.Count==0) {
+				return procList;//Nothing to do.
+			}
 			List<ClaimProc> claimProcList=ClaimProcs.Refresh(apt.PatNum);
 			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
 			//most recent note will be first in list.
