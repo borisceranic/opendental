@@ -240,14 +240,14 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Project";
-			this.Load += new System.EventHandler(this.FormOperatoryEdit_Load);
+			this.Load += new System.EventHandler(this.FormJobProjectEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 		#endregion
 
-		private void FormOperatoryEdit_Load(object sender, System.EventArgs e) {
+		private void FormJobProjectEdit_Load(object sender, System.EventArgs e) {
 			Array arrayJobProjectStatuses=Enum.GetValues(typeof(JobProjectStatus));
 			foreach(JobProjectStatus status in arrayJobProjectStatuses) {//If a JobProjectStatus ever gets added, it will automatically get added here.
 				comboJobProjStatus.Items.Add(status.ToString());
@@ -256,8 +256,14 @@ namespace OpenDental{
 				comboJobProjStatus.SelectedIndex=(int)_jobProjCur.ProjectStatus;
 				textJobProjName.Text=_jobProjCur.Title;
 				textJobProjDescrip.Text=_jobProjCur.Description;
-				labelParentProj.Text=JobProjects.GetOne(_jobProjCur.ParentProjectNum).Title;
-				labelRootProj.Text=JobProjects.GetOne(_jobProjCur.RootProjectNum).Title;
+				JobProject parent=JobProjects.GetOne(_jobProjCur.ParentProjectNum);
+				JobProject root=JobProjects.GetOne(_jobProjCur.RootProjectNum);
+				if(parent!=null) {
+					labelParentProj.Text=parent.Title;
+				}
+				if(root!=null) {
+					labelRootProj.Text=root.Title;
+				}
 			}
 			else {
 				comboJobProjStatus.SelectedIndex=0;

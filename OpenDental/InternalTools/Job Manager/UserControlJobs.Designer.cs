@@ -75,7 +75,7 @@
 			this.comboType.Name = "comboType";
 			this.comboType.Size = new System.Drawing.Size(89, 21);
 			this.comboType.TabIndex = 8;
-			this.comboType.SelectedIndexChanged += new System.EventHandler(this.comboType_SelectedIndexChanged);
+			this.comboType.SelectionChangeCommitted += new System.EventHandler(this.comboType_SelectionChangeCommitted);
 			// 
 			// labelClinic
 			// 
@@ -94,7 +94,7 @@
 			this.comboPriority.Name = "comboPriority";
 			this.comboPriority.Size = new System.Drawing.Size(89, 21);
 			this.comboPriority.TabIndex = 7;
-			this.comboPriority.SelectedIndexChanged += new System.EventHandler(this.comboPriority_SelectedIndexChanged);
+			this.comboPriority.SelectionChangeCommitted += new System.EventHandler(this.comboPriority_SelectionChangeCommitted);
 			// 
 			// labelSite
 			// 
@@ -113,7 +113,7 @@
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(89, 21);
 			this.comboStatus.TabIndex = 6;
-			this.comboStatus.SelectedIndexChanged += new System.EventHandler(this.comboStatus_SelectedIndexChanged);
+			this.comboStatus.SelectionChangeCommitted += new System.EventHandler(this.comboStatus_SelectionChangeCommitted);
 			// 
 			// textTitle
 			// 
@@ -242,7 +242,7 @@
 			this.groupBox2.Controls.Add(this.textExpert);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(263, 35);
+			this.groupBox2.Location = new System.Drawing.Point(615, 35);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(184, 240);
 			this.groupBox2.TabIndex = 13;
@@ -262,7 +262,7 @@
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(263, 5);
+			this.butAdd.Location = new System.Drawing.Point(615, 5);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 15;
@@ -279,7 +279,7 @@
 			this.gridMain.Location = new System.Drawing.Point(4, 5);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(253, 270);
+			this.gridMain.Size = new System.Drawing.Size(605, 604);
 			this.gridMain.TabIndex = 11;
 			this.gridMain.TabStop = false;
 			this.gridMain.Title = "Jobs";
@@ -290,12 +290,12 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.groupBox2);
+			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.gridMain);
 			this.MinimumSize = new System.Drawing.Size(450, 290);
 			this.Name = "UserControlJobs";
-			this.Size = new System.Drawing.Size(450, 290);
+			this.Size = new System.Drawing.Size(802, 624);
 			this.Load += new System.EventHandler(this.UserControlJob_Load);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();

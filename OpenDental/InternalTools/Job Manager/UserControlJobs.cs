@@ -48,7 +48,6 @@ namespace OpenDental {
 			comboPriority.SelectedIndex=0; //comboboxes have no filter to start with.
 			comboType.SelectedIndex=0;
 			comboStatus.SelectedIndex=0;
-			
 			FillGrid();
 		}
 
@@ -75,10 +74,8 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Priority",55);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Title",120);
+			col=new ODGridColumn("Title",180);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",300);
-			gridMain.Columns.Add(col); 
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_jobList.Count;i++) {
@@ -88,21 +85,6 @@ namespace OpenDental {
 				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobList[i].Status)); //if null returns blank
 				row.Cells.Add(Enum.GetName(typeof(JobPriority),(int)_jobList[i].Priority)); //if null returns blank
 				row.Cells.Add(_jobList[i].Title);
-				string[] arrayDescriptionLines=_jobList[i].Description.Split('\n');
-				if(arrayDescriptionLines.Length>0) {
-					if(arrayDescriptionLines[0].Length>=40) {
-						row.Cells.Add(arrayDescriptionLines[0].Substring(0,40)+"...");//Description
-					}
-					else if(arrayDescriptionLines.Length>1) {
-						row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
-					}
-					else {
-						row.Cells.Add(arrayDescriptionLines[0]);
-					}
-				}
-				else {
-					row.Cells.Add("");
-				}
 				row.Tag=_jobList[i].JobNum;
 				gridMain.Rows.Add(row);
 			}
@@ -177,16 +159,19 @@ namespace OpenDental {
 			timerSearch.Start();
 		}
 
-		private void comboStatus_SelectedIndexChanged(object sender,EventArgs e) {
-			FillGrid();
+		private void comboStatus_SelectionChangeCommitted(object sender,EventArgs e) {
+			timerSearch.Stop();
+			timerSearch.Start();
 		}
 
-		private void comboPriority_SelectedIndexChanged(object sender,EventArgs e) {
-			FillGrid();
+		private void comboPriority_SelectionChangeCommitted(object sender,EventArgs e) {
+			timerSearch.Stop();
+			timerSearch.Start();
 		}
 
-		private void comboType_SelectedIndexChanged(object sender,EventArgs e) {
-			FillGrid();
+		private void comboType_SelectionChangeCommitted(object sender,EventArgs e) {
+			timerSearch.Stop();
+			timerSearch.Start();
 		}
 
 		private void checkShowHidden_CheckedChanged(object sender,EventArgs e) {
