@@ -14,6 +14,9 @@ namespace OpenDental {
 			if(listProcsInAppt==null) {
 				listProcsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
 			}
+			if(listProcsInAppt.Count==0) {
+				return;//Nothing to do.
+			}
 			//Flag all the procedures as CPOE if the provider of the procedure is currently logged in.  
 			//We have to do this here and not within SetCompleteInAppt() due to RemotingRole checks.
 			if(Userods.IsUserCpoe(Security.CurUser)) {
