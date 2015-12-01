@@ -41,7 +41,7 @@
 			this.gridMain.Location = new System.Drawing.Point(4, 5);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(443, 282);
+			this.gridMain.Size = new System.Drawing.Size(545, 382);
 			this.gridMain.TabIndex = 11;
 			this.gridMain.TabStop = false;
 			this.gridMain.Title = "Reviews";
@@ -69,7 +69,7 @@
 			this.Controls.Add(this.gridMain);
 			this.MinimumSize = new System.Drawing.Size(450, 290);
 			this.Name = "UserControlReviews";
-			this.Size = new System.Drawing.Size(450, 290);
+			this.Size = new System.Drawing.Size(552, 390);
 			this.Load += new System.EventHandler(this.UserControlReviews_Load);
 			this.contextMenuStrip.ResumeLayout(false);
 			this.ResumeLayout(false);

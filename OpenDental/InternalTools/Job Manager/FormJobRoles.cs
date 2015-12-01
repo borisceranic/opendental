@@ -42,6 +42,7 @@ namespace OpenDental {
 		private void butPreExpert_Click(object sender,EventArgs e) {
 			listAvailable.ClearSelected();
 			listAvailable.SelectedIndices.Add((int)JobRoleType.Writeup);
+			listAvailable.SelectedIndices.Add((int)JobRoleType.Assignment);
 			listAvailable.SelectedIndices.Add((int)JobRoleType.Review);
 			listAvailable.SelectedIndices.Add((int)JobRoleType.Engineer);
 			listAvailable.SelectedIndices.Add((int)JobRoleType.Concept);

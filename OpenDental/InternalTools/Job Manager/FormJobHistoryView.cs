@@ -24,7 +24,12 @@ namespace OpenDental {
 			textJobNum.Text=_jobEvent.JobNum.ToString();
 			textOwner.Text=Userods.GetName(_jobEvent.Owner);
 			textStatus.Text=Enum.GetName(typeof(JobStatus),(int)_jobEvent.Status);
-			textDescription.Text=_jobEvent.Description;
+			try {
+				textDescription.Rtf=_jobEvent.Description;
+			}
+			catch {
+				textDescription.Text=_jobEvent.Description;
+			}
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

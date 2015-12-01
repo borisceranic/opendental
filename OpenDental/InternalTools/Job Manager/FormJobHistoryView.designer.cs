@@ -45,7 +45,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(309, 235);
+			this.butClose.Location = new System.Drawing.Point(809, 631);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 16;
@@ -67,13 +67,15 @@ namespace OpenDental{
 			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textDescription.BackColor = System.Drawing.SystemColors.Control;
 			this.textDescription.DetectUrls = false;
 			this.textDescription.Location = new System.Drawing.Point(95, 108);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.CommLog;
 			this.textDescription.ReadOnly = true;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textDescription.Size = new System.Drawing.Size(289, 121);
+			this.textDescription.Size = new System.Drawing.Size(789, 517);
+			this.textDescription.SpellCheckIsEnabled = false;
 			this.textDescription.TabIndex = 30;
 			this.textDescription.Text = "";
 			// 
@@ -155,7 +157,7 @@ namespace OpenDental{
 			// FormJobHistoryView
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(400, 271);
+			this.ClientSize = new System.Drawing.Size(900, 667);
 			this.Controls.Add(this.textStatus);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.label11);

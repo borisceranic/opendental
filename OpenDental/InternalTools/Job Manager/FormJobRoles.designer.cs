@@ -61,7 +61,7 @@ namespace OpenDental{
 			this.labelAvailable.Name = "labelAvailable";
 			this.labelAvailable.Size = new System.Drawing.Size(161, 17);
 			this.labelAvailable.TabIndex = 60;
-			this.labelAvailable.Text = "(HIghlight Multiple)";
+			this.labelAvailable.Text = "(Highlight Multiple)";
 			this.labelAvailable.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// listAvailable

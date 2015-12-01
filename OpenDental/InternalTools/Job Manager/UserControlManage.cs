@@ -100,8 +100,6 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Job Title",470);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",580);
-			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Count",50);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
@@ -169,21 +167,11 @@ namespace OpenDental {
 					row.Cells.Add(" - ");
 				}
 				if(!isGroupBy || groupCount==1) {
-					row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
-					string[] arrayDescriptionLines=_table.Rows[i]["Description"].ToString().Split('\n');
-					if(arrayDescriptionLines.Length>0) {
-						if(arrayDescriptionLines[0].Length>=120) {
-							row.Cells.Add(arrayDescriptionLines[0].Substring(0,120)+"...");//Description
-						}
-						else if(arrayDescriptionLines.Length>1) {
-							row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
-						}
-						else {
-							row.Cells.Add(arrayDescriptionLines[0]);
-						}
+					if(_table.Rows[i]["Title"].ToString().Length>=50) {
+						row.Cells.Add(_table.Rows[i]["Title"].ToString().Substring(0,50)+"...");//Title
 					}
 					else {
-						row.Cells.Add("");
+						row.Cells.Add(_table.Rows[i]["Title"].ToString());
 					}
 				}
 				else {

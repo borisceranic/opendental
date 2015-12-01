@@ -130,8 +130,6 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableJobProjects","Owner"),80);//any width
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableJobProjects","Description"),300);//any width
-			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			int imageIdx;
@@ -144,7 +142,6 @@ namespace OpenDental {
 				row.Cells.Add(imageIdx.ToString());
 				row.Cells.Add(_listJobProjects[j].Title);
 				row.Cells.Add("");
-				row.Cells.Add(_listJobProjects[j].Description);
 				row.Tag=-1;//can't select projects
 				gridMain.Rows.Add(row);
 			}
@@ -158,20 +155,6 @@ namespace OpenDental {
 				row.Cells.Add(_listJobs[i].Title);
 				row.Cells.Add(Userods.GetName(_listJobs[i].Owner));
 				string[] arrayDescriptionLines=_listJobs[i].Description.Split('\n');
-				if(arrayDescriptionLines.Length>0) {
-					if(arrayDescriptionLines[0].Length>=40) {
-						row.Cells.Add(arrayDescriptionLines[0].Substring(0,40)+"...");//Description
-					}
-					else if(arrayDescriptionLines.Length>1) {
-						row.Cells.Add(arrayDescriptionLines[0]+"...");//Description
-					}
-					else {
-						row.Cells.Add(arrayDescriptionLines[0]);
-					}
-				}
-				else {
-					row.Cells.Add("");
-				}
 				row.Tag=_listJobs[i].JobNum;
 				gridMain.Rows.Add(row);
 			}
