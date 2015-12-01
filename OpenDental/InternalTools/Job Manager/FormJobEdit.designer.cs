@@ -67,7 +67,7 @@ namespace OpenDental{
 			this.tabHistory = new System.Windows.Forms.TabPage();
 			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.label9 = new System.Windows.Forms.Label();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.textPrevOwner = new System.Windows.Forms.TextBox();
 			this.comboStatus = new System.Windows.Forms.ComboBox();
 			this.butExpertPick = new OpenDental.UI.Button();
 			this.butOwnerPick = new OpenDental.UI.Button();
@@ -489,13 +489,11 @@ namespace OpenDental{
 			// 
 			// panel2
 			// 
-			this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.panel2.Controls.Add(this.gridNotes);
-			this.panel2.Location = new System.Drawing.Point(394, 0);
+			this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
+			this.panel2.Location = new System.Drawing.Point(393, 0);
 			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(582, 192);
+			this.panel2.Size = new System.Drawing.Size(583, 198);
 			this.panel2.TabIndex = 156;
 			// 
 			// gridNotes
@@ -508,7 +506,7 @@ namespace OpenDental{
 			this.gridNotes.Location = new System.Drawing.Point(1, 1);
 			this.gridNotes.Name = "gridNotes";
 			this.gridNotes.ScrollValue = 0;
-			this.gridNotes.Size = new System.Drawing.Size(579, 189);
+			this.gridNotes.Size = new System.Drawing.Size(580, 195);
 			this.gridNotes.TabIndex = 150;
 			this.gridNotes.Title = "Notes";
 			this.gridNotes.TranslationName = "FormTaskEdit";
@@ -715,15 +713,15 @@ namespace OpenDental{
 			this.label9.Text = "Prev. Owner";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// textBox1
+			// textPrevOwner
 			// 
-			this.textBox1.Location = new System.Drawing.Point(68, 116);
-			this.textBox1.MaxLength = 100;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.ReadOnly = true;
-			this.textBox1.Size = new System.Drawing.Size(183, 20);
-			this.textBox1.TabIndex = 190;
-			this.textBox1.TabStop = false;
+			this.textPrevOwner.Location = new System.Drawing.Point(68, 116);
+			this.textPrevOwner.MaxLength = 100;
+			this.textPrevOwner.Name = "textPrevOwner";
+			this.textPrevOwner.ReadOnly = true;
+			this.textPrevOwner.Size = new System.Drawing.Size(183, 20);
+			this.textPrevOwner.TabIndex = 190;
+			this.textPrevOwner.TabStop = false;
 			// 
 			// comboStatus
 			// 
@@ -806,6 +804,7 @@ namespace OpenDental{
 			this.butAction2.Size = new System.Drawing.Size(145, 24);
 			this.butAction2.TabIndex = 0;
 			this.butAction2.Text = "Action 2";
+			this.butAction2.Click += new System.EventHandler(this.butAction2_Click);
 			// 
 			// butAction3
 			// 
@@ -819,6 +818,7 @@ namespace OpenDental{
 			this.butAction3.Size = new System.Drawing.Size(145, 24);
 			this.butAction3.TabIndex = 18;
 			this.butAction3.Text = "Action 3";
+			this.butAction3.Click += new System.EventHandler(this.butAction3_Click);
 			// 
 			// butAction4
 			// 
@@ -832,6 +832,7 @@ namespace OpenDental{
 			this.butAction4.Size = new System.Drawing.Size(145, 24);
 			this.butAction4.TabIndex = 14;
 			this.butAction4.Text = "Action 4";
+			this.butAction4.Click += new System.EventHandler(this.butAction4_Click);
 			// 
 			// butAction1
 			// 
@@ -845,6 +846,7 @@ namespace OpenDental{
 			this.butAction1.Size = new System.Drawing.Size(145, 24);
 			this.butAction1.TabIndex = 19;
 			this.butAction1.Text = "Action 1";
+			this.butAction1.Click += new System.EventHandler(this.butAction1_Click);
 			// 
 			// butOverride
 			// 
@@ -1071,7 +1073,7 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1281, 714);
 			this.Controls.Add(this.label9);
-			this.Controls.Add(this.textBox1);
+			this.Controls.Add(this.textPrevOwner);
 			this.Controls.Add(this.comboStatus);
 			this.Controls.Add(this.butExpertPick);
 			this.Controls.Add(this.butOverride);
@@ -1172,7 +1174,7 @@ namespace OpenDental{
 		private UI.Button butLinkBug;
 		private UI.Button butRemove;
 		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox textPrevOwner;
 		private System.Windows.Forms.ComboBox comboStatus;
 		private UI.Button butExpertPick;
 		private UI.Button butOwnerPick;

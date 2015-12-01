@@ -139,19 +139,20 @@ namespace OpenDental {
 				catch {
 					textDescription.Text=_job.Description.ToString();
 				}
-				InstalledFontCollection installedFonts=new InstalledFontCollection();
-				foreach(FontFamily font in installedFonts.Families) {
-					comboFontType.Items.Add(font.Name);
-					if(font.Name.Contains("Microsoft Sans Serif")) {
-						comboFontType.SelectedIndex=comboFontType.Items.Count-1;
-					}
-				}
-				//Sizes 7-20
-				for(int i=7;i<21;i++) {
-					comboFontSize.Items.Add(i);
-				}
-				comboFontSize.SelectedIndex=1;//Size 8;
+				textPrevOwner.Text=JobEvents.GetPrevOwnerName(_job.JobNum);
 			}
+			InstalledFontCollection installedFonts=new InstalledFontCollection();
+			foreach(FontFamily font in installedFonts.Families) {
+				comboFontType.Items.Add(font.Name);
+				if(font.Name.Contains("Microsoft Sans Serif")) {
+					comboFontType.SelectedIndex=comboFontType.Items.Count-1;
+				}
+			}
+			//Sizes 7-20
+			for(int i=7;i<21;i++) {
+				comboFontSize.Items.Add(i);
+			}
+			comboFontSize.SelectedIndex=1;//Size 8;
 			this.Text="Job Edit: "+textProject.Text+" - "+textTitle.Text;
 			#endregion
 			#region Evaluate Permissions
@@ -378,7 +379,7 @@ namespace OpenDental {
 				return;
 			}
 			_job.Title=textTitle.Text; //title
-			_job.Description=textDescription.Text; //description
+			_job.Description=textDescription.Rtf; //description
 		}
 
 		private void butAction1_Click(object sender,EventArgs e) {
