@@ -172,7 +172,7 @@ namespace CentralManager {
 					row.Cells.Add(_dataConnPats.Tables[i].Rows[j]["Email"].ToString());
 					row.Cells.Add(_dataConnPats.Tables[i].Rows[j]["ChartNumber"].ToString());
 					row.Cells.Add(_dataConnPats.Tables[i].Rows[j]["Country"].ToString());
-					row.Tag=ListConns[i];
+					row.Tag=ListConns.Find(x => (x.ServerName+", "+x.DatabaseName)==_dataConnPats.Tables[i].TableName);
 					gridMain.Rows.Add(row);
 				}
 			}
