@@ -461,14 +461,15 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.ElectronicCopyAccess:
 					command="SELECT patient.PatNum,patient.LName,patient.FName,OnlineAccess.dateProvided,MIN(procedurelog.ProcDate) as leastRecentDate "
 						+"FROM patient "
-						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum AND procedurelog.ProcStatus=2 "
-						+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
-						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
-						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as dateProvided FROM ehrmeasureevent "
+						+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
+							+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+							+"AND procedurelog.ProvNum IN("+POut.String(provs)+")	"
+							+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
-						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
-						+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.OnlineAccessProvided)+") "
-						+"OnlineAccess ON patient.PatNum=OnlineAccess.PatNum "
+							+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
+						+"LEFT JOIN (SELECT ehrmeasureevent.PatNum, ehrmeasureevent.DateTEvent as dateProvided "
+							+"FROM ehrmeasureevent "
+							+"WHERE EventType="+POut.Int((int)EhrMeasureEventType.OnlineAccessProvided)+") OnlineAccess ON patient.PatNum=OnlineAccess.PatNum "
 						+"GROUP BY patient.PatNum";
 					tableRaw=Db.GetTable(command);
 					break;
@@ -1666,9 +1667,9 @@ namespace OpenDentBusiness{
 				case EhrMeasureType.ClinicalSummaries:
 					//Excluded if no completed procedures during the reporting period
 					command="SELECT COUNT(DISTINCT ProcNum) FROM procedurelog "
+						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
 						+"WHERE ProcStatus=2 AND ProvNum IN("+POut.String(provs)+")	"
 						+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
-						+"INNER JOIN procedurecode ON procedurelog.CodeNum = procedurecode.CodeNum "
 						+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') ";
 					return retval=PIn.Int(Db.GetScalar(command));
 				#endregion
@@ -4361,7 +4362,8 @@ namespace OpenDentBusiness{
 							mu.Details="Rads entered in CPOE: "+radOrderCount.ToString();
 							mu.Met=MuMet.True;
 						}
-						mu.Action="Approve radiology orders";
+						mu.Action="Edit labs";
+						mu.Action2="Approve radiology orders";
 						break;
 					#endregion
 					#region Rx
