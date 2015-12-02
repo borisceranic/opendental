@@ -894,16 +894,35 @@ namespace OpenDental{
 			//Patients using:
 			string[] patsTo  =RefAttaches.GetPats(RefCur.ReferralNum,false);
 			string[] patsFrom=RefAttaches.GetPats(RefCur.ReferralNum,true);
-			textPatientsNumTo.Text  =patsTo.Length.ToString();
-			textPatientsNumFrom.Text=patsFrom.Length.ToString();
 			comboPatientsTo.Items.Clear();
 			comboPatientsFrom.Items.Clear();
-			for(int i=0;i<patsTo.Length;i++){
-				comboPatientsTo.Items.Add(patsTo[i]);
+			Dictionary<string,int> dictPatRefCount=new Dictionary<string,int>();
+			for(int i=0;i<patsTo.Length;i++) {
+				if(dictPatRefCount.ContainsKey(patsTo[i])) {
+					dictPatRefCount[patsTo[i]]+=1;
+				}
+				else {
+					dictPatRefCount[patsTo[i]]=1;
+				}
 			}
-			for(int i=0;i<patsFrom.Length;i++){
-				comboPatientsFrom.Items.Add(patsFrom[i]);
+			foreach(KeyValuePair<string,int> pat in dictPatRefCount) {
+				//Add each patient referral once with the count of how many times they've been referred.
+				comboPatientsTo.Items.Add(pat.Key+" ("+pat.Value+")");
 			}
+			textPatientsNumTo.Text=dictPatRefCount.Count.ToString();
+			dictPatRefCount=new Dictionary<string,int>();
+			for(int i=0;i<patsFrom.Length;i++) {
+				if(dictPatRefCount.ContainsKey(patsFrom[i])) {
+					dictPatRefCount[patsFrom[i]]+=1;
+				}
+				else {
+					dictPatRefCount[patsFrom[i]]=1;
+				}
+			}
+			foreach(KeyValuePair<string,int> pat in dictPatRefCount) {
+				comboPatientsFrom.Items.Add(pat.Key+" ("+pat.Value+")");
+			}
+			textPatientsNumFrom.Text=dictPatRefCount.Count.ToString();
 			if(patsTo.Length>0){
 				comboPatientsTo.SelectedIndex=0;
 			}
