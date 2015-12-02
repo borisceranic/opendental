@@ -63,6 +63,10 @@ namespace OpenDental {
 					layoutH);
 				using(StringFormat sf=StringFormat.GenericDefault) {
 					sf.Alignment=sa;
+					//The overload for DrawString that takes a StringFormat will cause the tabs '\t' to be ignored.
+					//In order for the tabs to not get ignored, we have to tell StringFormat how many pixels each tab should be.  
+					//50.0f is the closest to our Fill Sheet Edit preview.
+					sf.SetTabStops(0.0f,new float[1] { 50.0f });
 					g.DrawString(str.Substring(ix,chars),font,brush,layoutRectangle,sf);
 				}
 				lineIdx+=1;
@@ -120,6 +124,10 @@ namespace OpenDental {
 				sf.Alignment=sa;
 				//sf.LineAlignment= XLineAlignment.Near;
 				//xg.DrawString(str.Substring(ix,chars),xfont,xbrush,layoutRectangle,sf);
+				//There is currently a problem with printing the tab character '\t' when using XStringFormat.
+				//C#'s StringFormat has a method called SetTabStops() which can be used to get the tabs to be drawn (see regular printing above).
+				//We're doing nothing for now because the current complaint is only for printing, not PDF creation.  
+				//A workaround is to not use tabs and to instead use separate static text fields that are spaced out as desired.
 				xg.DrawString(str.Substring(ix,chars),xfont,xbrush,(double)layoutRectangle.Left,(double)layoutRectangle.Top,sf);
 				lineIdx+=1;
 			}
