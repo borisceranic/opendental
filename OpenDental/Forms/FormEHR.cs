@@ -335,6 +335,7 @@ namespace OpenDental {
 					case EhrMeasureType.ElectronicNote:
 						//Sign a Note
 						break;
+					case EhrMeasureType.CPOE_RadiologyOrdersOnly:
 					case EhrMeasureType.CPOE_LabOrdersOnly:
 						if(DataConnection.DBtype==DatabaseType.Oracle) {
 							MsgBox.Show(this,"Labs not supported with Oracle");
@@ -343,20 +344,6 @@ namespace OpenDental {
 						FormEhrLabOrders FormLab=new FormEhrLabOrders();
 						FormLab.PatCur=PatCur;
 						FormLab.ShowDialog();
-						FillGridMu();
-						break;
-					case EhrMeasureType.CPOE_RadiologyOrdersOnly:
-						if(DataConnection.DBtype==DatabaseType.Oracle) {
-							MsgBox.Show(this,"Labs not supported with Oracle");
-							break;
-						}
-						//As of v15.4 we started storing radiology orders at the procedure level by flagging the procedure itself as IsCpoe.
-						//Show the radiology order window which will be the best way for the provider to mark "radiology orders" as CPOE.
-						FormRadOrderList FormROL=new FormRadOrderList(Security.CurUser);
-						FormROL.ShowDialog();//Do not use a non-modal window in this case due to needing to refresh the grid after closing.
-						//FormEhrLabOrders FormRad=new FormEhrLabOrders();
-						//FormRad.PatCur=PatCur;
-						//FormRad.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.LabImages:
@@ -501,6 +488,20 @@ namespace OpenDental {
 						break;
 					case EhrMeasureType.Lab:
 						//Redundant now that everything is done from one window
+						break;
+					case EhrMeasureType.CPOE_RadiologyOrdersOnly:
+						if(DataConnection.DBtype==DatabaseType.Oracle) {
+							MsgBox.Show(this,"Labs not supported with Oracle");
+							break;
+						}
+						//As of v15.4 we started storing radiology orders at the procedure level by flagging the procedure itself as IsCpoe.
+						//Show the radiology order window which will be the best way for the provider to mark "radiology orders" as CPOE.
+						FormRadOrderList FormROL=new FormRadOrderList(Security.CurUser);
+						FormROL.ShowDialog();//Do not use a non-modal window in this case due to needing to refresh the grid after closing.
+						//FormEhrLabOrders FormRad=new FormEhrLabOrders();
+						//FormRad.PatCur=PatCur;
+						//FormRad.ShowDialog();
+						FillGridMu();
 						break;
 				}
 			}
