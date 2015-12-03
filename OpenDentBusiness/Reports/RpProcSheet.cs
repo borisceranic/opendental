@@ -18,9 +18,11 @@ namespace OpenDentBusiness {
 			if(!isAnyClinicMedical) {
 				query+="procedurelog.ToothNum,";
 			}
-			query+="procedurecode.Descript,provider.Abbr,"
-				+"clinic.Description,"
-				+"procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)"
+			query+="procedurecode.Descript,provider.Abbr,";
+			if(PrefC.HasClinicsEnabled) {
+				query+="COALESCE(clinic.Description,\"Unassigned\") Clinic,";
+			}
+			query+="procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)"
 				+"-COALESCE(SUM(claimproc.WriteOff),0) ";//\"$fee\" "  //if no writeoff, then subtract 0
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				query+="$fee ";
@@ -31,16 +33,18 @@ namespace OpenDentBusiness {
 			query+="FROM patient "
 				+"INNER JOIN procedurelog ON procedurelog.PatNum=patient.PatNum "
 				+"INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum "
-				+"INNER JOIN provider ON provider.ProvNum=procedurelog.ProvNum "
-				+"INNER JOIN clinic ON clinic.ClinicNum=procedurelog.ClinicNum "
-				+"LEFT JOIN claimproc ON procedurelog.ProcNum=claimproc.ProcNum "
+				+"INNER JOIN provider ON provider.ProvNum=procedurelog.ProvNum ";
+			if(PrefC.HasClinicsEnabled) {
+				query+="LEFT JOIN clinic ON clinic.ClinicNum=procedurelog.ClinicNum ";
+			}
+			query+="LEFT JOIN claimproc ON procedurelog.ProcNum=claimproc.ProcNum "
 				+"AND claimproc.Status="+POut.Int((int)ClaimProcStatus.CapComplete)+" "//only CapComplete writeoffs are subtracted here.
 				+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 				+"AND procedurelog.ProvNum IN ("+String.Join(",",listProvNums)+") ";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+			if(PrefC.HasClinicsEnabled) {
 				query+="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
 			}
-				query+="AND procedurecode.ProcCode LIKE '%"+POut.String(procCode)+"%' "
+			query+="AND procedurecode.ProcCode LIKE '%"+POut.String(procCode)+"%' "
 				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" >= " +POut.Date(dateFrom)+" "
 				+"AND "+DbHelper.DtimeToDate("procedurelog.ProcDate")+" <= " +POut.Date(dateTo)+" "
 				+"GROUP BY procedurelog.ProcNum "
