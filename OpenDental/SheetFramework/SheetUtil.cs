@@ -119,9 +119,9 @@ namespace OpenDental{
 						CalculateHeightsPageBreak(fieldCur,sheet,g);
 					}
 				}
-				//sort the fields again since we may have broken up some of the text fields into multiple fields and added them to sheetfields.
-				sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			}
+			//sort the fields again since we may have broken up some of the text fields into multiple fields and added them to sheetfields.
+			sheet.SheetFields.Sort(SheetFields.SortDrawingOrderLayers);
 			//return sheetCopy;
 		}
 
