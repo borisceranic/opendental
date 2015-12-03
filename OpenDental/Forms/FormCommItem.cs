@@ -417,19 +417,7 @@ namespace OpenDental{
 			}
 			textNote.Select();
 			string keyData=GetSignatureKey();
-			//In version 13.1 and prior, the commlog Note was included in the keyData with newlines represented as "\r\n".
-			//In versions after 13.1, the commlog Note for new commlogs are included in the keyData with newlines represented as "\n", and changed
-			//to \r\n before being saved into the database.
-			//The two scenarios to be accounted for in terms of newline characters are:  
-			//  \r\n - used in v13.1 and prior.  Also used when loading the form for all versions (all versions save newlines as \r\n to the database).
-			//  \n   - for versions above 13.1, the ODTextBox will force all \r\n to \n after the form has loaded.
-			//Since we do not want to invalidate any existing key data, we must allow signatures to be valid with either type of newline.
-			signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData,CommlogCur.Signature);//Try to fill and validate the signature using "\r\n".
-			//TODO:  Fix this. It should not need to call with replacement text, the rest should be handled by the wrapper.
-			if(!signatureBoxWrapper.IsValid) {
-				//If validation failed, try again to validate the signature using "\n" newlines.
-				signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData.Replace("\r\n","\n"),CommlogCur.Signature);
-			}
+			signatureBoxWrapper.FillSignature(CommlogCur.SigIsTopaz,keyData,CommlogCur.Signature);
 			signatureBoxWrapper.BringToFront();
 			IsStartingUp=false;
 			if(!Security.IsAuthorized(Permissions.CommlogEdit,CommlogCur.CommDateTime)){
