@@ -88,68 +88,81 @@ namespace OpenDental.UI {
 		}
 
 		public void FillSignature(bool sigIsTopaz,string keyData,string signature) {
-			labelInvalidSig.Visible=false;
-			sigBox.Visible=true;
+			if(signature==null || signature=="") {
+				return;
+			}
+			//This does 3 checks for both topaz and normal signatures.  These keyData replacements are due to MiddleTier & RichTextBox newline issues.
+			//Most cases will not get past check 1.  Some of the following checks are taken care of by things like POut.StringNote().
+			//Check 1:  keyData.Replace("\r\n","\n").  This reverts any changes middle tier made to the keydata.  
+			//					Middle tier converts "\r\n" -> "\n" -> "\r\n" so we change it back to "normal".
+			//Check 2:  Normal keydata.  This is for cases that had "\r\n" as the original note.  These are keydata that were captured with a textbox.
+			//Check 3:  keyData.Replace("\r\n","\n").Replace("\n","\r\n").  This is for cases where the original note was captured with a textbox, and then
+			//					was filled into an ODTextBox(richtextbox) and the "\r\n" was changed to "\n" then the user clicked ok changing the note.
 			if(sigIsTopaz) {
-				if(signature!="") {
-					//if(allowTopaz){
-					sigBox.Visible=false;
-					sigBoxTopaz.Visible=true;
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
-					//older items may have been signed with zeros due to a bug.  We still want to show the sig in that case.
-					//but if a sig is not showing, then set the key string to try to get it to show.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
-					}
-					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
-					}
-					//If sig still not showing it must be invalid.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						labelInvalidSig.Visible=true;
-					}
-					CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
-					//}
+				FillSignatureHelperTopaz(keyData.Replace("\r\n","\n"),signature);
+				if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+					FillSignatureHelperTopaz(keyData,signature);
+				}
+				if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+					FillSignatureHelperTopaz(keyData.Replace("\r\n","\n").Replace("\n","\r\n"),signature);
 				}
 			}
 			else {
-				if(signature!=null && signature!="") {
-					sigBox.Visible=true;
-					sigBoxTopaz.Visible=false;
-					sigBox.ClearTablet();
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString("0000000000000000");
-					//Note.Replace("\r\n","\n") will only revert the changes Middle Tier made to the note back it's original form, 
-					//	which would invalidate this signature. No effect when not using Middle Tier.
-					sigBox.SetAutoKeyData(keyData.Replace("\r\n","\n"));
-					//sigBox.SetEncryptionMode(2);//high encryption
-					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(signature);
-					if(sigBox.NumberOfTabletPoints()==0) {  //Signature invalid.
-						//At this point we think the signature is invalid.  We must now recheck signature without replacing \r\n with \n.  This is because old 
-						//	signatures were captured with \r\n instead of \n, and updating to a newer version would invalidate all valid signatures.
-						sigBox.SetAutoKeyData(keyData);
-						sigBox.SetSigString(signature);
-						if(sigBox.NumberOfTabletPoints()==0) {  //Both signature checks were invalid.
-							labelInvalidSig.Visible=true;
-						}
-						else { //The first signature check was invalid, but the second was valid.
-							labelInvalidSig.Visible=false;
-						}
-					}
-					sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
+				FillSignatureHelper(keyData.Replace("\r\n","\n"),signature);
+				if(sigBox.NumberOfTabletPoints()==0) {
+					FillSignatureHelper(keyData,signature);
+				}
+				if(sigBox.NumberOfTabletPoints()==0) {
+					FillSignatureHelper(keyData.Replace("\r\n","\n").Replace("\n","\r\n"),signature);
 				}
 			}
+		}
+
+		private void FillSignatureHelperTopaz(string keyData,string signature) {
+			sigBox.Visible=false;
+			sigBoxTopaz.Visible=true;
+			labelInvalidSig.Visible=false;
+			CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
+			CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
+			CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
+			CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
+			CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+			CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
+			CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+			//older items may have been signed with zeros due to a bug.  We still want to show the sig in that case.
+			//but if a sig is not showing, then set the key string to try to get it to show.
+			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+				CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
+				CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+			}
+			//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+				CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+			}
+			//If sig still not showing it must be invalid.
+			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+				labelInvalidSig.Visible=true;
+			}
+			CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
+		}
+
+		private void FillSignatureHelper(string keyData,string signature) {
+			sigBox.Visible=true;
+			sigBoxTopaz.Visible=false;
+			labelInvalidSig.Visible=false;
+			sigBox.ClearTablet();
+			//sigBox.SetSigCompressionMode(0);
+			//sigBox.SetEncryptionMode(0);
+			sigBox.SetKeyString("0000000000000000");
+			sigBox.SetAutoKeyData(keyData);
+			//sigBox.SetEncryptionMode(2);//high encryption
+			//sigBox.SetSigCompressionMode(2);//high compression
+			sigBox.SetSigString(signature);
+			if(sigBox.NumberOfTabletPoints()==0) {  //Both signature checks were invalid.
+				labelInvalidSig.Visible=true;
+			}
+			sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
 		}
 
 		///<summary>This can be used to determine whether the signature has changed since the control was created.  It is, however, preferrable to have the parent form use the SignatureChanged event to track changes.</summary>
