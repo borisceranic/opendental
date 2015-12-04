@@ -1477,8 +1477,8 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,listProcsForAppt,subList,isDbUpdate);
 			}
-			if(procList.Count==0) {
-				return procList;//Nothing to do.
+			if(listProcsForAppt.Count==0) {
+				return listProcsForAppt;//Nothing to do.
 			}
 			List<ClaimProc> claimProcList=ClaimProcs.Refresh(apt.PatNum);
 			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
