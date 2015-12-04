@@ -32,7 +32,7 @@ namespace OpenDental {
 
 		private void FormMessageReplacements_Load(object sender,EventArgs e) {
 			if(IsSelectionMode) {
-				butClose.Text=Lans.g(this,"Cancel");
+				butClose.Text=Lan.g(this,"Cancel");
 				butOK.Visible=true;
 			}
 			FillGrid();
@@ -41,275 +41,88 @@ namespace OpenDental {
 		private void FillGrid() {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("Type",100);
+			ODGridColumn col=new ODGridColumn(Lan.g(this,"Type"),100);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Replacement",155);
+			col=new ODGridColumn(Lan.g(this,"Replacement"),155);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Description",0);
+			col=new ODGridColumn(Lan.g(this,"Description"),0);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
-			ODGridRow row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[FName]");
-			row.Cells.Add("The patient's first name.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[LName]");
-			row.Cells.Add("The patient's last name.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[LNameLetter]");
-			row.Cells.Add("The first letter of the patient's last name, capitalized.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[NameF]");
-			row.Cells.Add("The patient's first name.  Same as FName.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[NameFL]");
-			row.Cells.Add("The patient's first name, a space, then the patient's last name.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[PatNum]");
-			row.Cells.Add("The patient's account number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[ChartNumber]");
-			row.Cells.Add("The patient's chart number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[WirelessPhone]");
-			row.Cells.Add("The patient's wireless phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[HmPhone]");
-			row.Cells.Add("The patient's home phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[WkPhone]");
-			row.Cells.Add("The patient's work phone number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[Birthdate]");
-			row.Cells.Add("The patient's birthdate.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[SSN]");
-			row.Cells.Add("The patient's social security number.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[Address]");
-			row.Cells.Add("The patient's address.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[City]");
-			row.Cells.Add("The patient's city.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[State]");
-			row.Cells.Add("The patient's state.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[Zip]");
-			row.Cells.Add("The patient's zip code.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Patient");
-			row.Cells.Add("[ReferredFromProvNameFL]");
-			row.Cells.Add("The first and last name of the provider that referred the patient.");
-			if((_replaceTypes & MessageReplaceType.Patient)!=MessageReplaceType.Patient) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Family");
-			row.Cells.Add("[FamilyList]");
-			row.Cells.Add("List of the patient's family members, one per line.");
-			if((_replaceTypes & MessageReplaceType.Family)!=MessageReplaceType.Family) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[ApptDate]");
-			row.Cells.Add("The appointment date.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[ApptTime]");
-			row.Cells.Add("The appointment time.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[ApptDayOfWeek]");
-			row.Cells.Add("The day of the week the appointment falls on.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[ApptProcsList]");
-			row.Cells.Add("The procedures attached to the appointment, one per line, including procedure date and layman's term.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[date]");
-			row.Cells.Add("The appointment date.  Synonym of ApptDate.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Appointment");
-			row.Cells.Add("[time]");
-			row.Cells.Add("The appointment time.  Synonym of ApptTime.");
-			if((_replaceTypes & MessageReplaceType.Appointment)!=MessageReplaceType.Appointment) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Recall");
-			row.Cells.Add("[DueDate]");
-			row.Cells.Add("Max selected recall date for the patient.");
-			if((_replaceTypes & MessageReplaceType.Recall)!=MessageReplaceType.Recall) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Recall");
-			row.Cells.Add("[URL]");
-			row.Cells.Add("The link where a patient can go to schedule a recall from the web.");
-			if((_replaceTypes & MessageReplaceType.Recall)!=MessageReplaceType.Recall) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("User");
-			row.Cells.Add("[UserNameF]");
-			row.Cells.Add("The first name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("User");
-			row.Cells.Add("[UserNameL]");
-			row.Cells.Add("The last name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("User");
-			row.Cells.Add("[UserNameFL]");
-			row.Cells.Add("The first name, a space, then the last name of the person who is currently logged in.");
-			if((_replaceTypes & MessageReplaceType.User)!=MessageReplaceType.User) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Office");
-			row.Cells.Add("[OfficePhone]");
-			row.Cells.Add("The practice or clinic phone number in standard format.");
-			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Office");
-			row.Cells.Add("[OfficeFax]");
-			row.Cells.Add("The practice or clinic fax number in standard format.");
-			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
-			row=new ODGridRow();
-			row.Cells.Add("Office");
-			row.Cells.Add("[OfficeName]");
-			row.Cells.Add("The practice or clinic name.");
-			if((_replaceTypes & MessageReplaceType.Office)!=MessageReplaceType.Office) {
-				row.ColorText=Color.Red;
-			}
-			gridMain.Rows.Add(row);
+
+			#region Patient Replacement Rows
+			AddReplacementRow("[FName]","The patient's first name.",MessageReplaceType.Patient);
+			AddReplacementRow("[LName]","The patient's last name.",MessageReplaceType.Patient);
+			AddReplacementRow("[LNameLetter]","The first letter of the patient's last name, capitalized.",MessageReplaceType.Patient);
+			AddReplacementRow("[NameF]","The patient's first name.  Same as FName.",MessageReplaceType.Patient);
+			AddReplacementRow("[NameFL]","The patient's first name, a space, then the patient's last name.",MessageReplaceType.Patient);
+			AddReplacementRow("[PatNum]","The patient's account number.",MessageReplaceType.Patient);
+			AddReplacementRow("[ChartNumber]","The patient's chart number.",MessageReplaceType.Patient);
+			AddReplacementRow("[WirelessPhone]","The patient's wireless phone number.",MessageReplaceType.Patient);
+			AddReplacementRow("[HmPhone]","The patient's home phone number.",MessageReplaceType.Patient);
+			AddReplacementRow("[WkPhone]","The patient's work phone number.",MessageReplaceType.Patient);
+			AddReplacementRow("[Birthdate]","The patient's birthdate.",MessageReplaceType.Patient);
+			AddReplacementRow("[SSN]","The patient's social security number.",MessageReplaceType.Patient);
+			AddReplacementRow("[Address]","The patient's address.",MessageReplaceType.Patient);
+			AddReplacementRow("[City]","The patient's city.",MessageReplaceType.Patient);
+			AddReplacementRow("[State]","The patient's state.",MessageReplaceType.Patient);
+			AddReplacementRow("[Zip]","The patient's zip code.",MessageReplaceType.Patient);
+			AddReplacementRow("[ReferredFromProvNameFL]","The first and last name of the provider that referred the patient.",MessageReplaceType.Patient);
+			AddReplacementRow("[MonthlyCardsOnFile]","Masked list of the patient's monthly credit cards on file.",MessageReplaceType.Patient);
+			#endregion
+			#region Family Replacement Rows
+			//family replacement rows
+			AddReplacementRow("[FamilyList]","List of the patient's family members, one per line.",MessageReplaceType.Family);
+			#endregion
+			#region Appointment Replacement Rows
+			//appointment replacement rows
+			AddReplacementRow("[ApptDate]","The appointment date.",MessageReplaceType.Appointment);
+			AddReplacementRow("[ApptTime]","The appointment time.",MessageReplaceType.Appointment);
+			AddReplacementRow("[ApptDayOfWeek]","The day of the week the appointment falls on.",MessageReplaceType.Appointment);
+			AddReplacementRow("[ApptProcsList]","The procedures attached to the appointment, one per line, including procedure date and layman's term.",
+				MessageReplaceType.Appointment);
+			AddReplacementRow("[date]","The appointment date.  Synonym of ApptDate.",MessageReplaceType.Appointment);
+			AddReplacementRow("[time]","The appointment time.  Synonym of ApptTime.",MessageReplaceType.Appointment);
+			#endregion
+			#region Recall Replacement Rows
+			//recall replacement rows
+			AddReplacementRow("[DueDate]","Max selected recall date for the patient.",MessageReplaceType.Recall);
+			AddReplacementRow("[URL]","The link where a patient can go to schedule a recall from the web.",MessageReplaceType.Recall);
+			#endregion
+			#region User Replacement Rows
+			//user replacement rows
+			AddReplacementRow("[UserNameF]","The first name of the person who is currently logged in.",MessageReplaceType.User);
+			AddReplacementRow("[UserNameL]","The last name of the person who is currently logged in.",MessageReplaceType.User);
+			AddReplacementRow("[UserNameFL]","The first name, a space, then the last name of the person who is currently logged in.",
+				MessageReplaceType.User);
+			#endregion
+			#region Office Replacement Rows
+			//office replacement rows
+			AddReplacementRow("[OfficePhone]","The practice or clinic phone number in standard format.",MessageReplaceType.Office);
+			AddReplacementRow("[OfficeFax]","The practice or clinic fax number in standard format.",MessageReplaceType.Office);
+			AddReplacementRow("[OfficeName]","The practice or clinic fax number in standard format.",MessageReplaceType.Office);
+			#endregion
+			#region Miscellaneous Replacement Rows
+			//misc replacement rows
+			AddReplacementRow("[CurrentMonth]","The text description of the current month (ex December).",MessageReplaceType.Misc);
+			#endregion
 			gridMain.EndUpdate();
+		}
+
+		///<summary>Builds and inserts a replacement row into the grid using the passed in field name, description, and replacement type.</summary>
+		private void AddReplacementRow(String fieldName,String descript,MessageReplaceType replacementTypeCur) {
+			ODGridRow row=new ODGridRow();
+			row.Cells.Add(Lan.g("enumMessageReplaceType",replacementTypeCur.ToString()));
+			row.Cells.Add(fieldName);
+			row.Cells.Add(Lan.g(this,descript));
+			if((_replaceTypes & replacementTypeCur)!=replacementTypeCur) {
+				row.ColorText=Color.Red;
+			}
+			gridMain.Rows.Add(row);
 		}
 
 		///<summary>Replaces all patient fields in the given message with the given patient's information.  Returns the resulting string.
 		///Replaces: [FName], [LName], [LNameLetter], [NameF], [NameFL], [PatNum], 
-		///[ChartNumber], [HmPhone], [WkPhone], [WirelessPhone], [ReferredFromProvNameFL].</summary>
+		///[ChartNumber], [HmPhone], [WkPhone], [WirelessPhone], [ReferredFromProvNameFL], etc.</summary>
 		public static string ReplacePatient(string message,Patient pat) {
 			string retVal=message;
 			retVal=retVal.Replace("[FName]",pat.FName);
@@ -328,6 +141,7 @@ namespace OpenDental {
 			retVal=retVal.Replace("[City]",pat.City);
 			retVal=retVal.Replace("[State]",pat.State);
 			retVal=retVal.Replace("[Zip]",pat.Zip);
+			retVal=retVal.Replace("[MonthlyCardsOnFile]",CreditCards.GetMonthlyCardsOnFile(pat.PatNum));
 			Referral patRef=Referrals.GetReferralForPat(pat.PatNum);
 			if(patRef!=null) {
 				retVal=retVal.Replace("[ReferredFromProvNameFL]",patRef.FName+" "+patRef.LName);
@@ -455,6 +269,14 @@ namespace OpenDental {
 			return retVal;
 		}
 
+		///<summary>Replaces all miscellaneous fields in the given message.  Returns the resulting string.
+		///Replaces: [CurrentMonth]</summary>
+		public static string ReplaceMisc(string message) {
+			string retVal=message;
+			retVal=retVal.Replace("[CurrentMonth]",DateTimeOD.Today.ToString("MMMM"));
+			return retVal;
+		}
+
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 			Close();//Because we want the option to open this window non-modal.
@@ -492,6 +314,7 @@ namespace OpenDental {
 		Recall=8,
 		User=16,
 		Office=32,
+		Misc=64,
 	}
 
 }

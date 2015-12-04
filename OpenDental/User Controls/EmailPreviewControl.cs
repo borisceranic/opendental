@@ -397,6 +397,8 @@ namespace OpenDental {
 			Subject=FormMessageReplacements.ReplaceUser(Subject,Security.CurUser);
 			//Clinic Information
 			Subject=FormMessageReplacements.ReplaceOffice(Subject,clinic);
+			//Misc Information
+			Subject=FormMessageReplacements.ReplaceMisc(Subject);
 			BodyText=bodyText;
 			//patient information
 			BodyText=FormMessageReplacements.ReplacePatient(BodyText,_patCur);
@@ -406,6 +408,8 @@ namespace OpenDental {
 			BodyText=FormMessageReplacements.ReplaceUser(BodyText,Security.CurUser);
 			//Clinic Information
 			BodyText=FormMessageReplacements.ReplaceOffice(BodyText,clinic);
+			//Misc Information
+			BodyText=FormMessageReplacements.ReplaceMisc(BodyText);
 			Attachments=attachments;
 			FillAttachments();
 			_hasMessageChanged=false;
