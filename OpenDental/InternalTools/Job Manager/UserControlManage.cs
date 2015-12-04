@@ -180,7 +180,6 @@ namespace OpenDental {
 				}
 				else {
 					row.Cells.Add(" - ");
-					row.Cells.Add(" - ");
 				}
 				if(isGroupBy) {
 					row.Cells.Add(_table.Rows[i]["countJobs"].ToString());//Count
