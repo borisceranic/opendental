@@ -943,30 +943,36 @@ namespace OpenDentBusiness {
 			return ConvertProcToString(proc.CodeNum,proc.Surf,proc.ToothNum,false);
 		}
 
-		///<Summary>Supply the list of procedures attached to the appointment.  It will loop through each and assign the correct provider.  Also sets clinic.  Also sets procDate for TP procs.  js 7/24/12 This is not supposed to be called if the appointment is complete.</Summary>
+		///<Summary>Supply the list of procedures attached to the appointment.  It will loop through each and assign the correct provider.
+		///Also sets clinic.  Also sets procDate for TP procs.  js 7/24/12 This is not supposed to be called if the appointment is complete.</Summary>
 		public static void SetProvidersInAppointment(Appointment apt,List<Procedure> procList) {
 			//No need to check RemotingRole; no call to db.
-			ProcedureCode procCode;
 			Procedure changedProc;
 			for(int i=0;i<procList.Count;i++) {
 				changedProc=procList[i].Copy();
-				procCode=ProcedureCodes.GetProcCode(procList[i].CodeNum);
-				if(procCode.ProvNumDefault!=0) {
-					changedProc.ProvNum=procCode.ProvNumDefault;//Override ProvNum if there is a default provider for procCode
-				}
-				else if(apt.ProvHyg==0 || !procCode.IsHygiene) {//if either appt doesn't have a higiene prov or the proc is not a hygiene proc
-					changedProc.ProvNum=apt.ProvNum;
-				}
-				else {//if the appointment has a hygiene provider and the proc IsHygiene
-					changedProc.ProvNum=apt.ProvHyg;
-				}
-				changedProc.ClinicNum=apt.ClinicNum;
-				if(procList[i].ProcStatus==ProcStat.TP) {
-					changedProc.ProcDate=apt.AptDateTime;
-				}
+				changedProc=UpdateProcInAppointment(apt,changedProc);
 				Update(changedProc,procList[i]);//won't go to db unless a field has changed.
-				procList[i]=changedProc.Copy();//save DB changes to in memory list
 			}
+		}
+
+		///<summary>Sets the provider and clinic for a proc based on the appt to which it is attached.  Also sets ProcDate for TP procs.  Changes are
+		///reflected in proc returned, but not saved to the db (for synch later).</summary>
+		public static Procedure UpdateProcInAppointment(Appointment apt,Procedure proc) {
+			ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
+			if(procCode.ProvNumDefault!=0) {
+				proc.ProvNum=procCode.ProvNumDefault;//Override ProvNum if there is a default provider for procCode
+			}
+			else if(apt.ProvHyg==0 || !procCode.IsHygiene) {//if either appt doesn't have a higiene prov or the proc is not a hygiene proc
+				proc.ProvNum=apt.ProvNum;
+			}
+			else {//if the appointment has a hygiene provider and the proc IsHygiene
+				proc.ProvNum=apt.ProvHyg;
+			}
+			proc.ClinicNum=apt.ClinicNum;
+			if(proc.ProcStatus==ProcStat.TP) {
+				proc.ProcDate=apt.AptDateTime;
+			}
+			return proc;
 		}
 
 		///<summary>Gets a list of procedures representing extracted teeth.  Status of C,EC,orEO. Includes procs with toothNum "1"-"32".  Will not include procs with procdate before 1880.  Used for Canadian e-claims instead of the usual ToothInitials.GetMissingOrHiddenTeeth, because Canada requires dates on the extracted teeth.  Supply all procedures for the patient.</summary>
@@ -1462,13 +1468,14 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Loops through each proc. Does not add notes to a procedure that already has notes. Used three times, security checked in all three
-		///places before calling this.  Also sets provider for each proc and claimproc.  Returns procList with changes made to the procs.</summary>
+		///<summary>Loops through each proc in the dictionary.  Dictionary key is the index in the list of procs for appointment edit, only used if called
+		///from FormApptEdit.  Does not add notes to a procedure that already has notes. Only called from ProcedureL.SetCompleteInAppt, security checked
+		///before calling this.  Also sets provider for each proc and claimproc.  Returns dictIndexInListForProc with changes made to the procs.</summary>
 		public static List<Procedure> SetCompleteInAppt(Appointment apt,List<InsPlan> planList,List<PatPlan> patPlans,long siteNum,int patientAge,
-			List<Procedure> procList,List<InsSub> subList)
+			List<Procedure> listProcsForAppt,List<InsSub> subList,bool isDbUpdate)
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,procList,subList);
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,listProcsForAppt,subList,isDbUpdate);
 			}
 			if(procList.Count==0) {
 				return procList;//Nothing to do.
@@ -1476,12 +1483,14 @@ namespace OpenDentBusiness {
 			List<ClaimProc> claimProcList=ClaimProcs.Refresh(apt.PatNum);
 			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
 			//most recent note will be first in list.
-			string command="SELECT * FROM procnote WHERE ProcNum IN("+string.Join(",",procList.Select(x => x.ProcNum))+") ORDER BY EntryDateTime DESC";
+			string command="SELECT * FROM procnote "
+				+"WHERE ProcNum IN("+string.Join(",",listProcsForAppt.Select(x => x.ProcNum))+") "
+				+"ORDER BY EntryDateTime DESC";
 			DataTable rawNotes=Db.GetTable(command);
 			ProcedureCode procCode;
 			Procedure procOld;
 			List<long> encounterProvNums=new List<long>();//for auto-inserting default encounters
-			foreach(Procedure procCur in procList) {
+			foreach(Procedure procCur in listProcsForAppt) {
 				//Should only be procs for this appointment
 				//attach the note, if it exists.
 				foreach(DataRow row in rawNotes.Rows) {
@@ -1532,7 +1541,9 @@ namespace OpenDentBusiness {
 					SetCanadianLabFeesCompleteForProc(procCur);
 				}
 				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procCur,procOld);
-				Update(procCur,procOld);
+				if(isDbUpdate) {//if called from FormApptEdit, the update call is handled in the Procedures.Sync call on FormClosing
+					Update(procCur,procOld);
+				}
 				ComputeEstimates(procCur,apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
 				ClaimProcs.SetProvForProc(procCur,claimProcList);
 				//Add provnum to list to create an encounter later. Done to limit calls to DB from Encounters.InsertDefaultEncounter().
@@ -1542,8 +1553,10 @@ namespace OpenDentBusiness {
 			}
 			//Auto-insert default encounters for the providers that did work on this appointment
 			encounterProvNums.Distinct().ToList().ForEach(x => Encounters.InsertDefaultEncounter(apt.PatNum,x,apt.AptDateTime));
-			Recalls.Synch(apt.PatNum);
-			return procList;
+			if(isDbUpdate) {//if called from FormApptEdit, Recalls.Synch is handled after the Procedures.Sync call on FormClosing
+				Recalls.Synch(apt.PatNum);
+			}
+			return listProcsForAppt;
 			//Patient pt=Patients.GetPat(apt.PatNum);
 			//jsparks-See notes within this method:
 			//Reporting.Allocators.AllocatorCollection.CallAll_Allocators(pt.Guarantor);

@@ -2552,7 +2552,7 @@ namespace OpenDental{
 			FillFields();
 		}
 
-		///<summary>Called from butOK_Click and butPin_Click</summary>
+		///<summary>Called from butOK_Click and butPin_Click. Only saves appointment infomration to DB. Procedure information is saved in form closing.</summary>
 		private bool UpdateToDB(){
 			DateTime dateTimeAskedToArrive=DateTime.MinValue;
 			if((AptOld.AptStatus==ApptStatus.Complete && comboStatus.SelectedIndex!=1)
@@ -2769,37 +2769,39 @@ namespace OpenDental{
 			}
 			//if appointment is marked complete and any procedures are not,
 			//then set the remaining procedures complete
-			List<Procedure> listProcsInAppt=new List<Procedure>();
-			//don't use _listProcs[x].Copy() so changes made to procs in listProcsInAppt will be reflected in _listProcs
-			gridProc.SelectedIndices.ToList().ForEach(x => listProcsInAppt.Add(_listProcs[x]));
-			if(AptCur.AptStatus==ApptStatus.Complete) {
-				if(listProcsInAppt.Any(x => x.ProcStatus!=ProcStat.C)) {
-					if(!Security.IsAuthorized(Permissions.ProcComplCreate,AptCur.AptDateTime)) {
-						return false;
+			if(AptCur.AptStatus!=ApptStatus.Complete) {
+				for(int i=0;i<_listProcs.Count;i++) {
+					if(!gridProc.SelectedIndices.Contains(i)) {
+						continue;
 					}
-					List<PatPlan> PatPlanList=PatPlans.Refresh(AptCur.PatNum);
-					//changes made to listProcsInAppt will be reflected in _listProcs
-					ProcedureL.SetCompleteInAppt(AptCur,PlanList,PatPlanList,pat.SiteNum,pat.Age,SubList,listProcsInAppt);
-					if(AptOld.AptStatus!=ApptStatus.Complete) { //seperate log entry for completed appointments
-						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
-						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
-					}
-					else {
-						SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
-						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
-					}
+					_listProcs[i]=Procedures.UpdateProcInAppointment(AptCur,_listProcs[i]);
 				}
 			}
-			else {
-				Procedures.SetProvidersInAppointment(AptCur,listProcsInAppt);//changes made to listProcsInAppt will be reflected in _listProcs
-			}
-			//Save changes from local listProcsInAppt to classwide _listProcs
-			foreach(Procedure proc in listProcsInAppt) {
-				int procIndex=_listProcs.FindIndex(x => x.ProcNum==proc.ProcNum);
-				if(procIndex<0) {
-					continue;
+			else if(gridProc.SelectedIndices.Select(x => _listProcs[x]).Any(x => x.ProcStatus!=ProcStat.C)) {//appt is complete and a proc attached is not
+				if(!Security.IsAuthorized(Permissions.ProcComplCreate,AptCur.AptDateTime)) {
+					return false;
 				}
-				_listProcs[procIndex]=proc.Copy();
+				List<PatPlan> listPatPlans=PatPlans.Refresh(AptCur.PatNum);
+				List<Procedure> listSelectedProcs=new List<Procedure>();
+				gridProc.SelectedIndices.ToList().ForEach(x => listSelectedProcs.Add(_listProcs[x]));
+				listSelectedProcs=ProcedureL.SetCompleteInAppt(AptCur,PlanList,listPatPlans,pat.SiteNum,pat.Age,SubList,listSelectedProcs);
+				Procedure procNew;
+				//update _listProcs with changes made to listSelectedProcs
+				for(int i=0;i<_listProcs.Count;i++) {
+					procNew=listSelectedProcs.FirstOrDefault(x => x.ProcNum==_listProcs[i].ProcNum);
+					if(procNew==null) {//if proc is not selected, continue
+						continue;
+					}
+					_listProcs[i]=procNew.Copy();
+				}
+				if(AptOld.AptStatus==ApptStatus.Complete) {//seperate log entry for completed appointments
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
+						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
+						+", "+AptCur.ProcDescript+", Procedures automatically set complete due to appt being set complete",AptCur.AptNum);
+				}
 			}
 			//Do the appointment "break" automation for appointments that were just broken.
 			if(AptCur.AptStatus==ApptStatus.Broken && AptOld.AptStatus!=ApptStatus.Broken) {
@@ -3357,8 +3359,9 @@ namespace OpenDental{
 		}
 
 		private void butPin_Click(object sender,System.EventArgs e) {
-			if(!UpdateToDB())
+			if(!UpdateToDB()) {
 				return;
+			}
 			PinClicked=true;
 			DialogResult=DialogResult.OK;
 		}

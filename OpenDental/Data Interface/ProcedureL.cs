@@ -4,18 +4,22 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public class ProcedureL {
-		///<summary>If procedures are not already associated with the appointment in the DB, e.g. from FormApptEdit since they have not been synched yet,
-		///set listProcsInAppt equal to the list of procedures that will be attached to the appt once synched.  Sets all procedures associated to the
-		///appointment passed in, or in listProcsInAppt if not null, complete.  Flags procedures as CPOE as needed (when provider logged in).
-		///Makes a log entry for each completed procedure.  And then finally fires the "CompleteProcedure" automation trigger.</summary>
-		public static void SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,int patientAge,
-			List<InsSub> subList,List<Procedure> listProcsInAppt=null)
+		///<summary>Sets all procedures for apt (or in listProcsForAppt) complete.  Flags procedures as CPOE as needed (when prov logged in).  Makes a log
+		///entry for each completed proc.  Then fires the CompleteProcedure automation trigger.
+		///<para>If the procs to be set complete already exist in the db and are associated to apt, do not set listProcsForAppt, they will be pulled
+		///from/updated to the db.</para>
+		///<para>If procs are not already associated with the appointment in the db, e.g. from FormApptEdit since they have not been synched yet, set
+		///listProcsForAppt equal to the list of procedures that are selected in the grid in FormApptEdit.  The proc changes will not be saved to the db,
+		///but will be reflected in the returned list of procs for synching later.</para></summary>
+		public static List<Procedure> SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,
+			int patientAge,List<InsSub> subList,List<Procedure> listProcsInAppt=null)
 		{
-			if(listProcsInAppt==null) {
+			bool isDbUpdate=listProcsInAppt==null;
+			if(isDbUpdate) {
 				listProcsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
 			}
 			if(listProcsInAppt.Count==0) {
-				return;//Nothing to do.
+				return listProcsInAppt;//Nothing to do.
 			}
 			//Flag all the procedures as CPOE if the provider of the procedure is currently logged in.  
 			//We have to do this here and not within SetCompleteInAppt() due to RemotingRole checks.
@@ -23,13 +27,14 @@ namespace OpenDental {
 				//Only change the status of IsCpoe to true.  Never set it back to false for any reason.  Once true, always true.
 				listProcsInAppt.ForEach(x => x.IsCpoe=true);
 			}
-			listProcsInAppt=Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,listProcsInAppt,subList);
+			listProcsInAppt=Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,listProcsInAppt,subList,isDbUpdate);
 			listProcsInAppt.ForEach(x => LogProcComplCreate(apt.PatNum,x,x.ToothNum));
 			if(Programs.UsingOrion) {
 				OrionProcs.SetCompleteInAppt(listProcsInAppt);
 			}
 			//automation
 			AutomationL.Trigger(AutomationTrigger.CompleteProcedure,listProcsInAppt.Select(x => ProcedureCodes.GetStringProcCode(x.CodeNum)).ToList(),apt.PatNum);
+			return listProcsInAppt;
 		}
 
 		///<summary>Returns empty string if no duplicates, otherwise returns duplicate procedure information.  In all places where this is called, we are guaranteed to have the eCW bridge turned on.  So this is an eCW peculiarity rather than an HL7 restriction.  Other HL7 interfaces will not be checking for duplicate procedures unless we intentionally add that as a feature later.</summary>
