@@ -627,15 +627,17 @@ namespace OpenDentBusiness {
 			return false;
 		}
 
-		///<summary>Called from FormProcEdit to signal when to disable much of the editing in that form. If the procedure is 'AttachedToClaim' then user should not change it very much.  Also prevents user from Invalidating a locked procedure if attached to a claim.  The claimProcList can be all claimProcs for the patient or only those attached to this proc.</summary>
-		public static bool IsAttachedToClaim(Procedure proc,List<ClaimProc> claimProcList) {
+		///<summary>Called from FormProcEdit to signal when to disable much of the editing in that form.  If the procedure is 'AttachedToClaim' then user
+		///should not change it very much.  Also prevents user from Invalidating a locked procedure if attached to a claim.  The claimProcList can be all
+		///claimProcs for the patient or only those attached to this proc.  Ignore preauth claims by setting isPreauthIncluded to false.</summary>
+		public static bool IsAttachedToClaim(Procedure proc,List<ClaimProc> claimProcList,bool isPreauthIncluded=true) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<claimProcList.Count;i++) {
 				if(claimProcList[i].ProcNum==proc.ProcNum
 					&& claimProcList[i].ClaimNum>0
 					&& (claimProcList[i].Status==ClaimProcStatus.CapClaim
 					|| claimProcList[i].Status==ClaimProcStatus.NotReceived
-					|| claimProcList[i].Status==ClaimProcStatus.Preauth
+					|| (claimProcList[i].Status==ClaimProcStatus.Preauth && isPreauthIncluded)
 					|| claimProcList[i].Status==ClaimProcStatus.Received
 					|| claimProcList[i].Status==ClaimProcStatus.Supplemental
 					)) {

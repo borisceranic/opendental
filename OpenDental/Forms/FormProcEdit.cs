@@ -4063,8 +4063,8 @@ namespace OpenDental{
 		}
 
 		private void comboProcStatus_SelectionChangeCommitted(object sender,EventArgs e) {
-			//status cannot be changed for completed procedures attached to a claim.
-			if(Procedures.IsAttachedToClaim(ProcOld,ClaimProcsForProc) && ProcOld.ProcStatus==ProcStat.C) {
+			//status cannot be changed for completed procedures attached to a claim, except we allow changing status for preauths.
+			if(Procedures.IsAttachedToClaim(ProcOld,ClaimProcsForProc,false) && ProcOld.ProcStatus==ProcStat.C) {
 				MsgBox.Show(this,"This is a completed procedure that is attached to a claim.  You must remove the procedure from the claim"+
 					" or delete the claim before editing the status.");
 				comboProcStatus.SelectedIndex=1;//Complete
