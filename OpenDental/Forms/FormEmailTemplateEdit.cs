@@ -265,7 +265,7 @@ namespace OpenDental{
 
 		private void butSubjectFields_Click(object sender,EventArgs e) {
 			FormMessageReplacements FormMR=new FormMessageReplacements(
-				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
+				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User | MessageReplaceType.Misc);
 			FormMR.IsSelectionMode=true;
 			FormMR.ShowDialog();
 			if(FormMR.DialogResult==DialogResult.OK) {
@@ -275,7 +275,7 @@ namespace OpenDental{
 
 		private void butBodyFields_Click(object sender,EventArgs e) {
 			FormMessageReplacements FormMR=new FormMessageReplacements(
-				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User);
+				MessageReplaceType.Appointment | MessageReplaceType.Office | MessageReplaceType.Patient | MessageReplaceType.User | MessageReplaceType.Misc);
 			FormMR.IsSelectionMode=true;
 			FormMR.ShowDialog();
 			if(FormMR.DialogResult==DialogResult.OK) {
