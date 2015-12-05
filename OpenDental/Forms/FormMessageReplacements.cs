@@ -129,7 +129,7 @@ namespace OpenDental {
 			retVal=retVal.Replace("[LName]",pat.LName);
 			retVal=retVal.Replace("[LNameLetter]",pat.LName.Substring(0,1).ToUpper());
 			retVal=retVal.Replace("[NameF]",pat.FName);
-			retVal=retVal.Replace("[NameFL]",pat.FName+" "+pat.LName);
+			retVal=retVal.Replace("[NameFL]",Patients.GetNameFL(pat.LName,pat.FName,"",""));
 			retVal=retVal.Replace("[PatNum]",pat.PatNum.ToString());
 			retVal=retVal.Replace("[ChartNumber]",pat.ChartNumber);
 			retVal=retVal.Replace("[HmPhone]",pat.HmPhone);
@@ -144,7 +144,7 @@ namespace OpenDental {
 			retVal=retVal.Replace("[MonthlyCardsOnFile]",CreditCards.GetMonthlyCardsOnFile(pat.PatNum));
 			Referral patRef=Referrals.GetReferralForPat(pat.PatNum);
 			if(patRef!=null) {
-				retVal=retVal.Replace("[ReferredFromProvNameFL]",patRef.FName+" "+patRef.LName);
+				retVal=retVal.Replace("[ReferredFromProvNameFL]",Patients.GetNameFL(patRef.LName,patRef.FName,"",""));
 			}
 			else {
 				retVal=retVal.Replace("[ReferredFromProvNameFL]","");
@@ -236,7 +236,7 @@ namespace OpenDental {
 			}
 			retVal=retVal.Replace("[UserNameF]",userNameF);
 			retVal=retVal.Replace("[UserNameL]",userNameL);
-			retVal=retVal.Replace("[UserNameFL]",userNameF+" "+userNameL);
+			retVal=retVal.Replace("[UserNameFL]",Patients.GetNameFL(userNameL,userNameF,"",""));
 			return retVal;
 		}
 
