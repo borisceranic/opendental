@@ -2165,16 +2165,20 @@ FROM insplan";
 		public static string GetNameLF(string LName,string FName,string Preferred,string MiddleI) {
 			//No need to check RemotingRole; no call to db.
 			string retVal="";
-			//if(Title!=""){
-			//	retVal+=Title+" ";
-			//}
-			retVal+=LName+", ";
-			if(Preferred!=""){
-				retVal+="'"+Preferred+"' ";
+			retVal+=LName;
+			if(FName!="" || MiddleI!="" || Preferred!="") {
+				retVal+=",";
 			}
-			retVal+=FName;
-			if(MiddleI!=""){
-				retVal+=" "+MiddleI;
+			if(Preferred!="") {
+				retVal+=" '"+Preferred+"'";
+			}
+			if(FName!="") {
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=FName;
+			}
+			if(MiddleI!="") {
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=MiddleI;
 			}
 			return retVal;
 		}
@@ -2188,16 +2192,18 @@ FROM insplan";
 		public static string GetNameFL(string LName,string FName,string Preferred,string MiddleI) {
 			//No need to check RemotingRole; no call to db.
 			string retVal="";
-			//if(Title!="") {
-				//retVal+=Title+" ";
-			//}
-			retVal+=FName+" ";
+			if(FName!="") {
+				retVal+=FName;
+			}
 			if(Preferred!="") {
-				retVal+="'"+Preferred+"' ";
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+="'"+Preferred+"'";
 			}
 			if(MiddleI!="") {
-				retVal+=MiddleI+" ";
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=MiddleI;
 			}
+			retVal=AddSpaceIfNeeded(retVal);
 			retVal+=LName;
 			return retVal;
 		}
@@ -2206,10 +2212,12 @@ FROM insplan";
 		public static string GetNameFLnoPref(string LName,string FName,string MiddleI) {
 			//No need to check RemotingRole; no call to db.
 			string retVal="";
-			retVal+=FName+" ";
+			retVal+=FName;
 			if(MiddleI!="") {
-				retVal+=MiddleI+" ";
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=MiddleI;
 			}
+			retVal=AddSpaceIfNeeded(retVal);
 			retVal+=LName;
 			return retVal;
 		}
@@ -2219,11 +2227,12 @@ FROM insplan";
 			//No need to check RemotingRole; no call to db.
 			string retVal="";
 			if(Preferred=="") {
-				retVal+=FName+" ";
+				retVal+=FName;
 			}
 			else {
-				retVal+=Preferred+" ";
+				retVal+=Preferred;
 			}
+			retVal=AddSpaceIfNeeded(retVal);
 			retVal+=LName;
 			return retVal;
 		}
@@ -2233,14 +2242,16 @@ FROM insplan";
 			//No need to check RemotingRole; no call to db.
 			string retVal="";
 			if(Preferred=="") {
-				retVal+=FName+" ";
+				retVal+=FName;
 			}
 			else {
-				retVal+=Preferred+" ";
+				retVal+=Preferred; ;
 			}
 			if(MiddleI!="") {
-				retVal+=MiddleI+". ";
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=MiddleI+".";
 			}
+			retVal=AddSpaceIfNeeded(retVal);
 			retVal+=LName;
 			return retVal;
 		}
@@ -2268,6 +2279,14 @@ FROM insplan";
 				return Preferred;
 			}
 			return FName;
+		}
+
+		///<summary>Adds a space if the passed in string is not empty.  Used for name functions to add a space only when needed.</summary>
+		private static string AddSpaceIfNeeded(string name) {
+			if(name!="") {
+				return name+" ";
+			}
+			return name;
 		}
 
 		///<summary>Dear __.  Does not include the "Dear" or the comma.</summary>
