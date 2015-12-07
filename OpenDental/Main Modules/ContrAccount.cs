@@ -2406,7 +2406,7 @@ namespace OpenDental {
 				if(!this.checkShowFamilyComm.Checked										//show family not checked
 					&& !isSelectingFamily																	//family not selected
 					&& table.Rows[i]["PatNum"].ToString()!=PatCur.PatNum.ToString()	//not this patient
-					&& table.Rows[i]["patName"].ToString()!="")						//No name; For example, formpat 
+					&& table.Rows[i]["FormPatNum"].ToString()=="0")				//not a questionnaire (FormPat)
 				{
 					continue;
 				}
