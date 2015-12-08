@@ -1259,6 +1259,9 @@ namespace OpenDental {
 							startListenerCommunications
 						)
 					);
+					string logText=Lan.g(this,"eConnector status set to")+" "+_listenerType.ToString()+" "
+						+Lan.g("PrefL","by manually installing the eConnector service.");
+					SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,logText);
 				}
 				catch(Exception) {
 					MsgBox.Show(this,"Failure sending the eConnector communication status.  Please contact us to enable eServices.");
@@ -1325,6 +1328,11 @@ namespace OpenDental {
 					_webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey))
 						,checkAllowEConnectorComm.Checked)
 				);
+				if(_listenerType!=listenerTypeOld) {
+					string logText=Lan.g(this,"eConnector status manually changed from")+" "+listenerTypeOld.ToString()+" "
+						+Lan.g("PrefL","to")+" "+_listenerType.ToString();
+					SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,logText);
+				}
 				SetEConnectorCommunicationStatus();
 			}
 			catch(Exception) {

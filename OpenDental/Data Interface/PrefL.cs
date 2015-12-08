@@ -280,7 +280,12 @@ namespace OpenDental {
 							Prefs.UpdateBool(PrefName.EConnectorEnabled,true);//No need to send an invalidate signal to other workstations.  They were kicked out.
 							try {
 								WebServiceMainHQ webServiceMain=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
-								webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)),isListening);
+								ListenerServiceType listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
+									webServiceMain.SetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)),isListening)
+								);
+								string logText=Lan.g("PrefL","eConnector status automatically set to")+" "+listenerType.ToString()+" "
+									+Lan.g("PrefL","via the upgrade process.");
+								SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,logText);
 							}
 							catch(Exception) {
 								if(!isSilent) {
