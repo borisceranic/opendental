@@ -2072,7 +2072,7 @@ namespace OpenDental.Eclaims {
 				}
 				doc.DrawString(g,text,procedureNotesCol,0,doc.standardFont,(int)(doc.bounds.Right-procedureNotesCol));
 				List<Procedure> labProcs=Procedures.GetCanadianLabFees(proc.ProcNum,procListAll);
-				if(labProcs.Count>0) {
+				if(labProcs.Count > 0 && eligibleLabAmounts1.Length > 0) {//In version 2 the lab fee is rolled into the procedure amount and so there is no lab section.
 					//List the first lab info for the current procedure on its own line.
 					x=doc.StartElement();
 					text=ProcedureCodes.GetProcCodeFromDb(labProcs[0].CodeNum).ProcCode.PadLeft(6,' ');
@@ -2088,7 +2088,7 @@ namespace OpenDental.Eclaims {
 					text=RawMoneyStrToDisplayMoney(benefitLabAmount1[i].valuestr);//G58
 					doc.DrawString(g,text,procedureBenefitCol+amountWidth-g.MeasureString(text,doc.standardFont).Width,0);
 				}
-				if(labProcs.Count>1) {
+				if(labProcs.Count > 1 && eligibleLabAmounts2.Length > 0) {//In version 2 the lab fee is rolled into the procedure amount and so there is no lab section.
 					//List the second lab info for the current procedure on its own line.
 					x=doc.StartElement();
 					text=ProcedureCodes.GetProcCodeFromDb(labProcs[1].CodeNum).ProcCode.PadLeft(6,' ');
