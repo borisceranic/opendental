@@ -35,13 +35,13 @@ namespace OpenDental {
 		private IContainer components;// Required designer variable.
 		private static Hunspell HunspellGlobal;//We create this object one time for every instance of this textbox control within the entire program.
 		private QuickPasteType quickPasteType;
-		private List<string> ListCorrect;
-		private List<string> ListIncorrect;
+		public List<string> ListCorrect;
+		public List<string> ListIncorrect;
 		private Graphics BufferGraphics;
-		private Timer timerSpellCheck;
+		public Timer timerSpellCheck;
 		private Point PositionOfClick;
-		private MatchOD ReplWord;
-		private bool spellCheckIsEnabled;//set to true in constructor
+		public MatchOD ReplWord;
+		public bool spellCheckIsEnabled;//set to true in constructor
 		private Point textEndPoint;
 		///<summary>Only used when ImeCompositionCompatibility is enabled.  Set to true when the user presses the space bar.
 		///This will cause the cursor to move to the next position and no longer have composition affect the current character.
@@ -227,13 +227,14 @@ namespace OpenDental {
 			}
 		}
 
+
 		protected override void OnReadOnlyChanged(EventArgs e) {
 			base.OnReadOnlyChanged(e);
 			//Richtextbox does not redraw the textbox with grey after turning it ReadOnly, so we do this to immitate how textbox works.
-			if(ReadOnly) {
+			if(ReadOnly){
 				base.BackColor=SystemColors.Control;
 			}
-			else {
+			else{
 				base.BackColor=SystemColors.Window;
 			}
 		}
@@ -556,7 +557,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void ClearWavyLines() {
+		public void ClearWavyLines() {
 			Bitmap bitmapOverlay=new Bitmap(this.Width,this.Height);
 			BufferGraphics=Graphics.FromImage(bitmapOverlay);
 			BufferGraphics.Clear(Color.Transparent);//We don't want to overwrite the text in the rich text box.
@@ -849,7 +850,7 @@ namespace OpenDental {
 		}
 
 		///<summary>Analogous to a Match.  We use it to keep track of words that we find and their location within the larger string.</summary>
-		private class MatchOD {
+		public class MatchOD {
 			//This is the 'word' for this match
 			public string Value="";
 			//This is the starting index of the first char of the 'word' within the full textbox text

@@ -134,25 +134,13 @@ namespace OpenDental {
 				textDateEntry.Text=_job.DateTimeEntry.ToShortDateString(); //date entry
 				textTitle.Text=_job.Title.ToString(); //title
 				try {
-					textDescription.Rtf=_job.Description.ToString(); //This is here to convert our old job descriptions to the new RTF descriptions.
+					textEditorMain.MainRtf=_job.Description.ToString(); //This is here to convert our old job descriptions to the new RTF descriptions.
 				}
 				catch {
-					textDescription.Text=_job.Description.ToString();
+					textEditorMain.MainText=_job.Description.ToString();
 				}
 				textPrevOwner.Text=JobEvents.GetPrevOwnerName(_job.JobNum);
 			}
-			InstalledFontCollection installedFonts=new InstalledFontCollection();
-			foreach(FontFamily font in installedFonts.Families) {
-				comboFontType.Items.Add(font.Name);
-				if(font.Name.Contains("Microsoft Sans Serif")) {
-					comboFontType.SelectedIndex=comboFontType.Items.Count-1;
-				}
-			}
-			//Sizes 7-20
-			for(int i=7;i<21;i++) {
-				comboFontSize.Items.Add(i);
-			}
-			comboFontSize.SelectedIndex=1;//Size 8;
 			this.Text="Job Edit: "+textProject.Text+" - "+textTitle.Text;
 			#endregion
 			#region Evaluate Permissions
@@ -212,7 +200,7 @@ namespace OpenDental {
 				if(_job.Expert!=Security.CurUser.UserNum) {
 					textTitle.ReadOnly=true;
 					textEstHours.ReadOnly=true;
-					textDescription.ReadOnly=true;
+					textEditorMain.ReadOnly=true;
 				}
 			}
 			//Engineer Edit Mode by Expert
@@ -233,7 +221,7 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddReview.Enabled=false;
@@ -248,7 +236,7 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddReview.Enabled=false;
@@ -266,7 +254,7 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddReview.Enabled=false;
@@ -280,7 +268,7 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddReview.Enabled=false;
@@ -297,7 +285,7 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddNote.Enabled=false;
@@ -311,12 +299,11 @@ namespace OpenDental {
 				comboPriority.Enabled=false;
 				textTitle.ReadOnly=true;
 				textEstHours.ReadOnly=true;
-				textDescription.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 				textVersion.ReadOnly=true;
 				butAddReview.Enabled=false;
 				butOK.Enabled=false;
-				butAddNote.Enabled=false;
 				butRemove.Enabled=false;
 				butLinkTask.Enabled=false;
 				butLinkBug.Enabled=false;
@@ -328,26 +315,6 @@ namespace OpenDental {
 			}
 			if(_editMode==EditMode.Concept && Security.CurUser.UserNum==JobCur.Owner) {
 				butDelete.Enabled=true;
-			}
-			if(textDescription.ReadOnly) {
-				butCut.Enabled=false;
-				butCopy.Enabled=false;
-				butPaste.Enabled=false;
-				butUndo.Enabled=false;
-				butRedo.Enabled=false;
-				butBold.Enabled=false;
-				butItalics.Enabled=false;
-				butUnderline.Enabled=false;
-				butStrikeout.Enabled=false;
-				butBullet.Enabled=false;
-				butFont.Enabled=false;
-				comboFontSize.Enabled=false;
-				comboFontType.Enabled=false;
-				butColor.Enabled=false;
-				butColorSelect.Enabled=false;
-				butHighlight.Enabled=false;
-				butHighlightSelect.Enabled=false;
-				textDescription.SpellCheckIsEnabled=false;
 			}
 			#endregion
 		}
@@ -379,7 +346,7 @@ namespace OpenDental {
 				return;
 			}
 			_job.Title=textTitle.Text; //title
-			_job.Description=textDescription.Rtf; //description
+			_job.Description=textEditorMain.MainRtf; //description
 		}
 
 		private void butAction1_Click(object sender,EventArgs e) {
@@ -631,13 +598,18 @@ namespace OpenDental {
 			butExpertPick.Visible=true;
 			butOwnerPick.Visible=true;
 			textTitle.ReadOnly=false;
-			textDescription.ReadOnly=false;
 			textActualHours.ReadOnly=false;
 			textEstHours.ReadOnly=false;
 			textVersion.ReadOnly=false;
 			butAddNote.Enabled=true;
 			butOK.Enabled=true;
 			butAddReview.Enabled=true;
+			butLinkBug.Enabled=true;
+			butLinkQuote.Enabled=true;
+			butLinkFeatReq.Enabled=true;
+			butLinkTask.Enabled=true;
+			butRemove.Enabled=true;
+			textEditorMain.ReadOnly=true;
 			_isOverridden=true;
 		}
 
@@ -687,221 +659,10 @@ namespace OpenDental {
 			}
 		}
 
-		#region Main Tab Toolbar
-		private void butCut_Click(object sender,EventArgs e) {
-			Clipboard.SetText(textDescription.SelectedRtf);
-			textDescription.SelectedRtf="";
+		private void textEditorMain_SaveClick(object sender,EventArgs e) {
+			_job.Description=textEditorMain.MainRtf;
+			Jobs.Update(_job); //This will save all changes made to _job, but not yet committed to the DB.
 		}
-
-		private void butCut_MouseEnter(object sender,EventArgs e) {
-			butCut.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butCut_MouseLeave(object sender,EventArgs e) {
-			butCut.BackColor=Color.Transparent;
-		}
-
-		private void butCopy_Click(object sender,EventArgs e) {
-			Clipboard.SetText(textDescription.SelectedRtf);
-		}
-
-		private void butCopy_MouseEnter(object sender,EventArgs e) {
-			butCopy.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butCopy_MouseLeave(object sender,EventArgs e) {
-			butCopy.BackColor=Color.Transparent;
-		}
-
-		private void butPaste_Click(object sender,EventArgs e) {
-			textDescription.SelectedRtf=Clipboard.GetText();
-		}
-
-		private void butPaste_MouseEnter(object sender,EventArgs e) {
-			butPaste.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butPaste_MouseLeave(object sender,EventArgs e) {
-			butPaste.BackColor=Color.Transparent;
-		}
-
-		private void butUndo_Click(object sender,EventArgs e) {
-			textDescription.Undo();
-		}
-
-		private void butUndo_MouseEnter(object sender,EventArgs e) {
-			butUndo.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butUndo_MouseLeave(object sender,EventArgs e) {
-			butUndo.BackColor=Color.Transparent;
-		}
-
-		private void butRedo_Click(object sender,EventArgs e) {
-			textDescription.Redo();
-		}
-
-		private void butRedo_MouseEnter(object sender,EventArgs e) {
-			butRedo.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butRedo_MouseLeave(object sender,EventArgs e) {
-			butRedo.BackColor=Color.Transparent;
-		}
-
-		private void butBold_Click(object sender,EventArgs e) {
-			try {
-				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Bold);
-				labelWarning.Text="";
-			}
-			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
-			}
-		}
-
-		private void butBold_MouseEnter(object sender,EventArgs e) {
-			butBold.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butBold_MouseLeave(object sender,EventArgs e) {
-			butBold.BackColor=Color.Transparent;
-		}
-
-		private void butItalics_Click(object sender,EventArgs e) {
-			try {
-				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Italic);
-				labelWarning.Text="";
-			}
-			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
-			}
-		}
-
-		private void butItalics_MouseEnter(object sender,EventArgs e) {
-			butItalics.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butItalics_MouseLeave(object sender,EventArgs e) {
-			butItalics.BackColor=Color.Transparent;
-		}
-
-		private void butUnderline_Click(object sender,EventArgs e) {
-			try {
-				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Underline);
-				labelWarning.Text="";
-			}
-			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
-			}
-		}
-
-		private void butUnderline_MouseEnter(object sender,EventArgs e) {
-			butUnderline.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butUnderline_MouseLeave(object sender,EventArgs e) {
-			butUnderline.BackColor=Color.Transparent;
-		}
-
-		private void butStrikeout_Click(object sender,EventArgs e) {
-			try {
-				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Strikeout);
-				labelWarning.Text="";
-			}
-			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
-			}
-		}
-
-		private void butStrikeout_MouseEnter(object sender,EventArgs e) {
-			butStrikeout.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butStrikeout_MouseLeave(object sender,EventArgs e) {
-			butStrikeout.BackColor=Color.Transparent;
-		}
-
-		private void butBullet_Click(object sender,EventArgs e) {
-			if(textDescription.SelectionBullet) {
-				textDescription.SelectionBullet=false;
-			}
-			else {
-				textDescription.SelectionBullet=true;
-			}
-		}
-
-		private void butBullet_MouseEnter(object sender,EventArgs e) {
-			butBullet.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butBullet_MouseLeave(object sender,EventArgs e) {
-			butBullet.BackColor=Color.Transparent;
-		}
-
-		private void butFont_Click(object sender,EventArgs e) {
-			textDescription.SelectionFont=new Font((string)comboFontType.SelectedItem,(int)comboFontSize.SelectedItem,textDescription.SelectionFont.Style);
-		}
-
-		private void butFont_MouseEnter(object sender,EventArgs e) {
-			butFont.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butFont_MouseLeave(object sender,EventArgs e) {
-			butFont.BackColor=Color.Transparent;
-		}
-
-		private void butColor_Click(object sender,EventArgs e) {
-			textDescription.SelectionColor=butColor.ForeColor;
-		}
-
-		private void butColor_MouseEnter(object sender,EventArgs e) {
-			butColor.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butColor_MouseLeave(object sender,EventArgs e) {
-			butColor.BackColor=Color.Transparent;
-		}
-
-		private void butColorSelect_Click(object sender,EventArgs e) {
-			colorDialog1.Color=butColor.ForeColor;
-			colorDialog1.ShowDialog();
-			butColor.ForeColor=colorDialog1.Color;
-		}
-
-		private void butColorSelect_MouseEnter(object sender,EventArgs e) {
-			butColorSelect.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butColorSelect_MouseLeave(object sender,EventArgs e) {
-			butColorSelect.BackColor=Color.Transparent;
-		}
-
-		private void butHighlight_Click(object sender,EventArgs e) {
-			textDescription.SelectionBackColor=butHighlight.ForeColor;
-		}
-
-		private void butHighlight_MouseEnter(object sender,EventArgs e) {
-			butHighlight.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butHighlight_MouseLeave(object sender,EventArgs e) {
-			butHighlight.BackColor=Color.Transparent;
-		}
-
-		private void butHighlightSelect_Click(object sender,EventArgs e) {
-			colorDialog1.Color=butColor.ForeColor;
-			colorDialog1.ShowDialog();
-			butHighlight.ForeColor=colorDialog1.Color;
-		}
-
-		private void butHighlightSelect_MouseEnter(object sender,EventArgs e) {
-			butHighlightSelect.BackColor=Color.PaleTurquoise;
-		}
-
-		private void butHighlightSelect_MouseLeave(object sender,EventArgs e) {
-			butHighlightSelect.BackColor=Color.Transparent;
-		}
-		#endregion
 
 		#region Links Grid
 		private void FillGridLink() {
@@ -1204,7 +965,7 @@ namespace OpenDental {
 			_job.Category=(JobCategory)comboCategory.SelectedIndex; //Category
 			_job.JobVersion=textVersion.Text; //version
 			_job.Title=textTitle.Text; //title
-			_job.Description=textDescription.Rtf; //description
+			_job.Description=textEditorMain.MainRtf; //description
 			_job.HoursEstimate=PIn.Int(textEstHours.Text);
 			_job.HoursActual=PIn.Int(textActualHours.Text);
 			if(_isOverridden) {
@@ -1213,8 +974,8 @@ namespace OpenDental {
 			Jobs.Update(_job);
 			if(_isOverridden) {
 				JobEvent jobEventCur=new JobEvent();
-				textDescription.Text.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
-				jobEventCur.Description=textDescription.Rtf;
+				textEditorMain.Text.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
+				jobEventCur.Description=textEditorMain.MainRtf;
 				jobEventCur.JobNum=_job.JobNum;
 				jobEventCur.Status=_job.Status;
 				jobEventCur.Owner=_job.Owner;

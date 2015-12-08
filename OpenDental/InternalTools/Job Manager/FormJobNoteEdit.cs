@@ -35,7 +35,8 @@ namespace OpenDental {
 			textUser.Text=Userods.GetName(_jobNote.UserNum);
 			textNote.Text=_jobNote.Note;
 			textDateTime.ReadOnly=true;
-			if(Security.CurUser.UserNum!=_jobNote.UserNum) {//Tasknotes are not editable unless user has TaskNoteEdit permission.
+			if(Security.CurUser.UserNum!=_jobNote.UserNum) {
+				textNote.ReadOnly=true;
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
