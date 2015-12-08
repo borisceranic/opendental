@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.3.22.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.3.36.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -9627,6 +9627,54 @@ namespace OpenDentBusiness {
 				command="UPDATE clinic SET UseBillAddrOnClaims=CASE WHEN BillingAddress='' THEN 0 ELSE 1 END";//For backwards compatibility to version 15.3
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.3.22.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_3_36();
+		}
+
+		private static void To15_3_36() {
+			if(FromVersion<new Version("15.3.36.0")) {
+				string command="";
+				//Moving codes to the Obsolete category that were deleted in CDT 2016.
+				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
+					//Move deprecated codes to the Obsolete procedure code category.
+					//Make sure the procedure code category exists before moving the procedure codes.
+					string procCatDescript="Obsolete";
+					long defNum=0;
+					command="SELECT DefNum FROM definition WHERE Category=11 AND ItemName='"+POut.String(procCatDescript)+"'";//11 is DefCat.ProcCodeCats
+					DataTable dtDef=Db.GetTable(command);
+					if(dtDef.Rows.Count==0) { //The procedure code category does not exist, add it
+						command="SELECT COUNT(*) FROM definition WHERE Category=11";//11 is DefCat.ProcCodeCats
+						int countCats=PIn.Int(Db.GetCount(command));
+						if(DataConnection.DBtype==DatabaseType.MySql) {
+							command="INSERT INTO definition (Category,ItemName,ItemOrder) "
+									+"VALUES (11"+",'"+POut.String(procCatDescript)+"',"+POut.Int(countCats)+")";//11 is DefCat.ProcCodeCats
+						}
+						else {//oracle
+							command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder) "
+									+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),11,'"+POut.String(procCatDescript)+"',"+POut.Int(countCats)+")";//11 is DefCat.ProcCodeCats
+						}
+						defNum=Db.NonQ(command,true);
+					}
+					else { //The procedure code category already exists, get the existing defnum
+						defNum=PIn.Long(dtDef.Rows[0]["DefNum"].ToString());
+					}
+					string[] cdtCodesDeleted=new string[] {
+						"D0260","D0421","D2970","D9220","D9221","D9241","D9242","D9931"
+					};
+					for(int i=0;i<cdtCodesDeleted.Length;i++) {
+						string procCode=cdtCodesDeleted[i];
+						command="SELECT CodeNum FROM procedurecode WHERE ProcCode='"+POut.String(procCode)+"'";
+						DataTable dtProcCode=Db.GetTable(command);
+						if(dtProcCode.Rows.Count==0) { //The procedure code does not exist in this database.
+							continue;//Do not try to move it.
+						}
+						long codeNum=PIn.Long(dtProcCode.Rows[0]["CodeNum"].ToString());
+						command="UPDATE procedurecode SET ProcCat="+POut.Long(defNum)+" WHERE CodeNum="+POut.Long(codeNum);
+						Db.NonQ(command);
+					}
+				}//end United States CDT codes update
+				command="UPDATE preference SET ValueString = '15.3.36.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_3_X();
