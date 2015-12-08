@@ -35,7 +35,7 @@ namespace OpenDentBusiness{
 			}
 			long ownerCur=Jobs.GetOne(jobNum).Owner;
 			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum)
-				+" ORDER BY DateTimeEntry";
+				+" ORDER BY DateTimeEntry DESC";
 			List<JobEvent> listJobEvents=Crud.JobEventCrud.SelectMany(command);
 			long ownerPrev=0;
 			foreach(JobEvent jobEvent in listJobEvents) {

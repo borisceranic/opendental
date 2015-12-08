@@ -504,6 +504,12 @@
     <Compile Include="Forms\FormEmailAutographEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\ODtextEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\ODtextEditor.Designer.cs">
+      <DependentUpon>ODtextEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobHistoryView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4031,6 +4037,9 @@
     <EmbeddedResource Include="Forms\FormEmailAutographEdit.resx">
       <DependentUpon>FormEmailAutographEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\ODtextEditor.resx">
+      <DependentUpon>ODtextEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistoryView.resx">
       <DependentUpon>FormJobHistoryView.cs</DependentUpon>
