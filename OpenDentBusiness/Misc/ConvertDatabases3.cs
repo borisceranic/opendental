@@ -11128,7 +11128,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderSendAll','0')";
 					Db.NonQ(command);
-					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderSendOrder','')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderSendOrder','')";//This should be 0,1,2, fixed in version 15.4.7
 					Db.NonQ(command);
 				}
 				else {//oracle
@@ -11329,6 +11329,32 @@ namespace OpenDentBusiness {
 				command="UPDATE clearinghouse SET Description='ITRANS' WHERE Description='CDAnet';";//oracle compatible
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.4.4.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_4_7();
+		}
+
+		private static void To15_4_7() {
+			if(FromVersion<new Version("15.4.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.7.0"));//No translation in convert script.
+				string command="";
+				command="UPDATE preference SET ValueString='0,1,2' WHERE Prefname='ApptReminderSendOrder'";
+				Db.NonQ(command);
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderHourMessage'";
+				string result=Db.GetScalar(command);
+				if(result=="0" || result=="") {//Set default text value for ApptReminderHourMessage
+					string recallText="[nameFL],\r\nYou have an upcoming appointment on [apptDate] at [apptTime] with [practiceName] with [provName].\r\nThanks!";
+					command="UPDATE preference SET ValueString='"+recallText+"' WHERE PrefName='ApptReminderHourMessage'";
+					Db.NonQ(command);
+				}
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderDayMessage'";
+				result=Db.GetScalar(command);
+				if(result=="0" || result=="") {//Set default text value for ApptReminderDayMessage
+					string recallText="[nameFL],\r\nYou have an upcoming appointment on [apptDate] at [apptTime] with [practiceName] with [provName].\r\nThanks!";
+					command="UPDATE preference SET ValueString='"+recallText+"' WHERE PrefName='ApptReminderDayMessage'";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.4.7.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			To16_1_0();
