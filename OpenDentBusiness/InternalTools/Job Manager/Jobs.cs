@@ -137,68 +137,31 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns a data table for the Job Manager control.  This data table will be optionally grouped by the booleans passed in and
 		///will be filtered to include entries based on the lists passed in.</summary>
-		public static DataTable GetForJobManager(bool groupExpert,List<string> listExpertNums,bool groupOwners,List<string> listOwnerNums,bool groupEnums,List<string> listJobStatuses,bool groupDate,bool allExperts,bool allOwners) {
+		public static DataTable GetForJobManager(List<string> listExpertNums,List<string> listOwnerNums,List<string> listJobStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),groupExpert,listExpertNums,groupOwners,listOwnerNums,groupEnums,listJobStatuses,groupDate);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listExpertNums,listOwnerNums,listJobStatuses);
 			}
-			string command="SELECT job.* ";
-			if(groupExpert || groupOwners || groupEnums || groupDate){
-				command+=", COUNT(DISTINCT job.JobNum) AS 'countJobs' ";
-			}
-			command+="FROM job WHERE ";
+			string command="SELECT * FROM job ";
 			string whereClause="";
-			string groupClause="";
-			if(listExpertNums.Count>0) {
-				whereClause+="Expert IN(";
-				if(allExperts) {
-					whereClause+="0,";
-				}
-				whereClause+=String.Join(",",listExpertNums)+") ";
+			if(listExpertNums.Count>0) {//There are specific experts
+				whereClause+="Expert IN("+String.Join(",",listExpertNums)+") ";
 			}
-			if(listOwnerNums.Count>0) {
+			if(listOwnerNums.Count>0) {//There are specific owners
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
-				whereClause+="Owner IN(";
-				if(allOwners) {
-					whereClause+="0,";
-				}
-				whereClause+=String.Join(",",listOwnerNums)+") ";
+				whereClause+="Owner IN("+String.Join(",",listOwnerNums)+") ";
 			}
-			if(listJobStatuses.Count>0) {
+			if(listJobStatuses.Count>0) {//There are specific statuses
 				if(whereClause!="") {
 					whereClause+="AND ";
 				}
 				whereClause+="Status IN("+String.Join(",",listJobStatuses)+") ";
 			}
-			if(groupExpert) {
-				groupClause+="GROUP BY Expert";
+			if(whereClause!="") {
+				whereClause="WHERE "+whereClause;
 			}
-			if(groupOwners) {
-				if(groupClause!="") {
-					groupClause+=", Owner";
-				}
-				else {
-					groupClause+="GROUP BY Owner";
-				}
-			}
-			if(groupEnums) {
-				if(groupClause!="") {
-					groupClause+=", Status";
-				}
-				else {
-					groupClause+="GROUP BY Status";
-				}
-			}
-			if(groupDate){
-				if(groupClause!="") {
-					groupClause+=", DATE(DateTimeEntry)";
-				}
-				else {
-					groupClause+="GROUP BY DATE(DateTimeEntry)";
-				}
-			}
-			command+=whereClause+groupClause;
+			command+=whereClause;
 			return Db.GetTable(command);
 		}
 
@@ -228,82 +191,6 @@ namespace OpenDentBusiness {
 				+","+POut.Long((int)JobStatus.ReadyForReview)
 				+","+POut.Long((int)JobStatus.ReadyToAssign)
 				+","+POut.Long((int)JobStatus.OnHold)+")";
-			return Db.GetTable(command);
-		}
-
-		public static DataTable GetForJobPicker(bool groupExpert,List<string> listExpertFilterNums,string rowExpert,
-			bool groupOwner,List<string> listOwnerFilterNums,string rowOwner,
-			bool groupStatus,List<string> listJobStatusFilters,string rowStatus,
-			bool groupDate,string rowDate) 
-		{
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),groupExpert,listExpertFilterNums,rowExpert,
-					groupOwner,listOwnerFilterNums,rowOwner,
-					groupStatus,listJobStatusFilters,rowStatus,
-					groupDate,rowDate);
-			}
-			string command="SELECT * FROM job WHERE ";
-			string whereClause="";
-			if(groupExpert && rowExpert!="") {
-				if(rowExpert!="None") {
-					whereClause+="Expert="+Userods.GetUserByName(rowExpert,false).UserNum+" ";
-				}
-				else {
-					whereClause+="Expert=0 ";
-				}
-			}
-			if(listExpertFilterNums.Count>0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(rowExpert!="None") {
-					whereClause+="Expert IN("+String.Join(",",listExpertFilterNums)+") ";
-				}
-				else {
-					whereClause+="Expert=0 ";
-				}
-			}
-			if(groupOwner) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(rowOwner!="None") {
-					whereClause+="Owner="+Userods.GetUserByName(rowOwner,false).UserNum+" ";
-				}
-				else {
-					whereClause+="Owner=0 ";
-				}
-			}
-			if(listOwnerFilterNums.Count>0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				if(rowOwner!="None") {
-					whereClause+="Owner IN("+String.Join(",",listExpertFilterNums)+") ";
-				}
-				else {
-					whereClause+="Owner=0 ";
-				}
-			}
-			if(groupStatus) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="Status="+rowStatus+" ";
-			}
-			if(listJobStatusFilters.Count>0) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="Status IN("+String.Join(",",listJobStatusFilters)+") ";
-			}
-			if(groupDate) {
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="DATE(DateTimeEntry)="+POut.Date(PIn.Date(rowDate))+" ";
-			}
-			command+=whereClause;
 			return Db.GetTable(command);
 		}
 

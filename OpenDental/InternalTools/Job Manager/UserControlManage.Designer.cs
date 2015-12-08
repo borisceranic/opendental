@@ -34,28 +34,22 @@
 			this.labelOwnerHrs = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.checkStatus = new System.Windows.Forms.CheckBox();
-			this.checkDate = new System.Windows.Forms.CheckBox();
-			this.checkOwner = new System.Windows.Forms.CheckBox();
-			this.checkExpert = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.comboBoxMultiOwner = new OpenDental.UI.ComboBoxMulti();
-			this.comboBoxMultiStatus = new OpenDental.UI.ComboBoxMulti();
-			this.comboBoxMultiExpert = new OpenDental.UI.ComboBoxMulti();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.labelExpertJobs = new System.Windows.Forms.Label();
 			this.labelExpertHrs = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butRefresh = new OpenDental.UI.Button();
+			this.comboBoxMultiOwner = new OpenDental.UI.ComboBoxMulti();
+			this.comboBoxMultiStatus = new OpenDental.UI.ComboBoxMulti();
+			this.comboBoxMultiExpert = new OpenDental.UI.ComboBoxMulti();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.groupDetails.SuspendLayout();
 			this.groupSummary.SuspendLayout();
-			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
@@ -164,63 +158,6 @@
 			this.label7.Text = "Incompl Job Hrs:";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.checkStatus);
-			this.groupBox1.Controls.Add(this.checkDate);
-			this.groupBox1.Controls.Add(this.checkOwner);
-			this.groupBox1.Controls.Add(this.checkExpert);
-			this.groupBox1.Location = new System.Drawing.Point(4, 4);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(211, 95);
-			this.groupBox1.TabIndex = 14;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Group By";
-			// 
-			// checkStatus
-			// 
-			this.checkStatus.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkStatus.Location = new System.Drawing.Point(110, 50);
-			this.checkStatus.Name = "checkStatus";
-			this.checkStatus.Size = new System.Drawing.Size(80, 24);
-			this.checkStatus.TabIndex = 3;
-			this.checkStatus.Text = "Status";
-			this.checkStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkStatus.UseVisualStyleBackColor = true;
-			// 
-			// checkDate
-			// 
-			this.checkDate.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkDate.Location = new System.Drawing.Point(110, 20);
-			this.checkDate.Name = "checkDate";
-			this.checkDate.Size = new System.Drawing.Size(80, 24);
-			this.checkDate.TabIndex = 2;
-			this.checkDate.Text = "Date";
-			this.checkDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkDate.UseVisualStyleBackColor = true;
-			// 
-			// checkOwner
-			// 
-			this.checkOwner.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkOwner.Location = new System.Drawing.Point(28, 50);
-			this.checkOwner.Name = "checkOwner";
-			this.checkOwner.Size = new System.Drawing.Size(80, 24);
-			this.checkOwner.TabIndex = 1;
-			this.checkOwner.Text = "Owner";
-			this.checkOwner.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkOwner.UseVisualStyleBackColor = true;
-			// 
-			// checkExpert
-			// 
-			this.checkExpert.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkExpert.Location = new System.Drawing.Point(28, 20);
-			this.checkExpert.Name = "checkExpert";
-			this.checkExpert.Size = new System.Drawing.Size(80, 24);
-			this.checkExpert.TabIndex = 0;
-			this.checkExpert.Text = "Expert";
-			this.checkExpert.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkExpert.UseVisualStyleBackColor = true;
-			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.label3);
@@ -229,16 +166,16 @@
 			this.groupBox2.Controls.Add(this.comboBoxMultiOwner);
 			this.groupBox2.Controls.Add(this.comboBoxMultiStatus);
 			this.groupBox2.Controls.Add(this.comboBoxMultiExpert);
-			this.groupBox2.Location = new System.Drawing.Point(221, 4);
+			this.groupBox2.Location = new System.Drawing.Point(4, 26);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(241, 95);
+			this.groupBox2.Size = new System.Drawing.Size(672, 73);
 			this.groupBox2.TabIndex = 15;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Filter By";
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(20, 62);
+			this.label3.Location = new System.Drawing.Point(214, 31);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(68, 21);
 			this.label3.TabIndex = 5;
@@ -247,7 +184,7 @@
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(20, 40);
+			this.label2.Location = new System.Drawing.Point(414, 31);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(68, 21);
 			this.label2.TabIndex = 4;
@@ -256,48 +193,12 @@
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(20, 18);
+			this.label1.Location = new System.Drawing.Point(19, 31);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(68, 21);
 			this.label1.TabIndex = 3;
 			this.label1.Text = "Expert";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// comboBoxMultiOwner
-			// 
-			this.comboBoxMultiOwner.BackColor = System.Drawing.SystemColors.Window;
-			this.comboBoxMultiOwner.DroppedDown = false;
-			this.comboBoxMultiOwner.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiOwner.Items")));
-			this.comboBoxMultiOwner.Location = new System.Drawing.Point(89, 62);
-			this.comboBoxMultiOwner.Name = "comboBoxMultiOwner";
-			this.comboBoxMultiOwner.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiOwner.SelectedIndices")));
-			this.comboBoxMultiOwner.Size = new System.Drawing.Size(120, 21);
-			this.comboBoxMultiOwner.TabIndex = 2;
-			this.comboBoxMultiOwner.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiOwner_SelectionChangeCommitted);
-			// 
-			// comboBoxMultiStatus
-			// 
-			this.comboBoxMultiStatus.BackColor = System.Drawing.SystemColors.Window;
-			this.comboBoxMultiStatus.DroppedDown = false;
-			this.comboBoxMultiStatus.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiStatus.Items")));
-			this.comboBoxMultiStatus.Location = new System.Drawing.Point(89, 40);
-			this.comboBoxMultiStatus.Name = "comboBoxMultiStatus";
-			this.comboBoxMultiStatus.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiStatus.SelectedIndices")));
-			this.comboBoxMultiStatus.Size = new System.Drawing.Size(120, 21);
-			this.comboBoxMultiStatus.TabIndex = 1;
-			this.comboBoxMultiStatus.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiStatus_SelectionChangeCommitted);
-			// 
-			// comboBoxMultiExpert
-			// 
-			this.comboBoxMultiExpert.BackColor = System.Drawing.SystemColors.Window;
-			this.comboBoxMultiExpert.DroppedDown = false;
-			this.comboBoxMultiExpert.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiExpert.Items")));
-			this.comboBoxMultiExpert.Location = new System.Drawing.Point(89, 18);
-			this.comboBoxMultiExpert.Name = "comboBoxMultiExpert";
-			this.comboBoxMultiExpert.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiExpert.SelectedIndices")));
-			this.comboBoxMultiExpert.Size = new System.Drawing.Size(120, 21);
-			this.comboBoxMultiExpert.TabIndex = 0;
-			this.comboBoxMultiExpert.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiExpert_SelectionChangeCommitted);
 			// 
 			// groupBox3
 			// 
@@ -351,6 +252,57 @@
 			this.label4.Text = "Incompl Job Hrs:";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(682, 76);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 23);
+			this.butRefresh.TabIndex = 16;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.UseVisualStyleBackColor = true;
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
+			// comboBoxMultiOwner
+			// 
+			this.comboBoxMultiOwner.BackColor = System.Drawing.SystemColors.Window;
+			this.comboBoxMultiOwner.DroppedDown = false;
+			this.comboBoxMultiOwner.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiOwner.Items")));
+			this.comboBoxMultiOwner.Location = new System.Drawing.Point(288, 31);
+			this.comboBoxMultiOwner.Name = "comboBoxMultiOwner";
+			this.comboBoxMultiOwner.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiOwner.SelectedIndices")));
+			this.comboBoxMultiOwner.Size = new System.Drawing.Size(120, 21);
+			this.comboBoxMultiOwner.TabIndex = 2;
+			this.comboBoxMultiOwner.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiOwner_SelectionChangeCommitted);
+			// 
+			// comboBoxMultiStatus
+			// 
+			this.comboBoxMultiStatus.BackColor = System.Drawing.SystemColors.Window;
+			this.comboBoxMultiStatus.DroppedDown = false;
+			this.comboBoxMultiStatus.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiStatus.Items")));
+			this.comboBoxMultiStatus.Location = new System.Drawing.Point(488, 31);
+			this.comboBoxMultiStatus.Name = "comboBoxMultiStatus";
+			this.comboBoxMultiStatus.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiStatus.SelectedIndices")));
+			this.comboBoxMultiStatus.Size = new System.Drawing.Size(120, 21);
+			this.comboBoxMultiStatus.TabIndex = 1;
+			this.comboBoxMultiStatus.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiStatus_SelectionChangeCommitted);
+			// 
+			// comboBoxMultiExpert
+			// 
+			this.comboBoxMultiExpert.BackColor = System.Drawing.SystemColors.Window;
+			this.comboBoxMultiExpert.DroppedDown = false;
+			this.comboBoxMultiExpert.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiExpert.Items")));
+			this.comboBoxMultiExpert.Location = new System.Drawing.Point(88, 31);
+			this.comboBoxMultiExpert.Name = "comboBoxMultiExpert";
+			this.comboBoxMultiExpert.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiExpert.SelectedIndices")));
+			this.comboBoxMultiExpert.Size = new System.Drawing.Size(120, 21);
+			this.comboBoxMultiExpert.TabIndex = 0;
+			this.comboBoxMultiExpert.SelectionChangeCommitted += new OpenDental.UI.ComboBoxMulti.SelectionChangeCommittedHandler(this.comboBoxMultiExpert_SelectionChangeCommitted);
+			// 
 			// gridMain
 			// 
 			this.gridMain.AllowSortingByColumn = true;
@@ -370,21 +322,6 @@
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
-			// butRefresh
-			// 
-			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRefresh.Autosize = true;
-			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(468, 76);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(75, 23);
-			this.butRefresh.TabIndex = 16;
-			this.butRefresh.Text = "Refresh";
-			this.butRefresh.UseVisualStyleBackColor = true;
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
-			// 
 			// UserControlManage
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -392,7 +329,6 @@
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.groupBox2);
-			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.groupSummary);
 			this.Controls.Add(this.groupDetails);
 			this.Controls.Add(this.gridMain);
@@ -402,7 +338,6 @@
 			this.Load += new System.EventHandler(this.UserControlManage_Load);
 			this.groupDetails.ResumeLayout(false);
 			this.groupSummary.ResumeLayout(false);
-			this.groupBox1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox3.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -414,7 +349,6 @@
 		private UI.ODGrid gridMain;
 		private System.Windows.Forms.GroupBox groupDetails;
 		private System.Windows.Forms.GroupBox groupSummary;
-		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
@@ -428,10 +362,6 @@
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.CheckBox checkStatus;
-		private System.Windows.Forms.CheckBox checkDate;
-		private System.Windows.Forms.CheckBox checkOwner;
-		private System.Windows.Forms.CheckBox checkExpert;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label labelActualHrs;
