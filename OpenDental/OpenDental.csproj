@@ -3608,7 +3608,9 @@
       <DependentUpon>FormJobRoles.cs</DependentUpon>
     </Compile>
     <Compile Include="InternalTools\Job Manager\JobHandler.cs" />
-    <Compile Include="InternalTools\Job Manager\ODtextEditor.cs" />
+    <Compile Include="InternalTools\Job Manager\ODtextEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\ODtextEditor.Designer.cs" />
     <Compile Include="InternalTools\Job Manager\UserControlManage.cs">
       <SubType>UserControl</SubType>
