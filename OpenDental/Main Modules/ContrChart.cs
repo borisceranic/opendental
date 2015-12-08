@@ -5965,26 +5965,29 @@ namespace OpenDental{
 			bool showGroupNote;
 			if(checkShowTeeth.Checked) {
 				//we will want to see groupnotes that are attached to any procs that should be visible.
-				for(int i=0;i<table.Rows.Count;i++) {//loop through all rows in table.
-					if(table.Rows[i]["ProcNum"].ToString()=="0") {//if this is not a procedure
+				foreach(DataRow rowCur in table.Rows) {
+					string procNumStr=rowCur["ProcNum"].ToString();
+					if(procNumStr=="0") {//if this is not a procedure
 						continue;
 					}
-					if(table.Rows[i]["ProcCode"].ToString()==ProcedureCodes.GroupProcCode) {
+					if(rowCur["ProcCode"].ToString()==ProcedureCodes.GroupProcCode) {
 						continue;//skip procgroups
 					}
-					if(ShouldDisplayProc(table.Rows[i])) {
-						procNumList.Add(PIn.Long(table.Rows[i]["ProcNum"].ToString()));//remember that procnum
+					if(ShouldDisplayProc(rowCur)) {
+						procNumList.Add(PIn.Long(procNumStr));//remember that procnum
 					}
 				}
 			}
-			for(int i=0;i<table.Rows.Count;i++) {
-				if(table.Rows[i]["ProcNum"].ToString()!="0") {//if this is a procedure 
+			foreach(DataRow rowCur in table.Rows) {
+				long procNumCur=PIn.Long(rowCur["ProcNum"].ToString());//increase code efficiency
+				long patNumCur=PIn.Long(rowCur["PatNum"].ToString());//increase code efficiency
+				if(procNumCur!=0) {//if this is a procedure 
 					//if it's a group note and we are viewing by tooth number
-					if(table.Rows[i]["ProcCode"].ToString()==ProcedureCodes.GroupProcCode && checkShowTeeth.Checked) {
+					if(rowCur["ProcCode"].ToString()==ProcedureCodes.GroupProcCode && checkShowTeeth.Checked) {
 						//consult the list of previously obtained procedures and ProcGroupItems to see if this procgroup should be visible.
 						showGroupNote=false;
 						for(int j=0;j<procGroupItems.Count;j++) {//loop through all procGroupItems for the patient. 
-							if(procGroupItems[j].GroupNum==PIn.Long(table.Rows[i]["ProcNum"].ToString())) {//if this item is associated with this group note
+							if(procGroupItems[j].GroupNum==procNumCur) {//if this item is associated with this group note
 								for(int k=0;k<procNumList.Count;k++) {//check all of the visible procs
 									if(procNumList[k]==procGroupItems[j].ProcNum) {//if this group note is associated with a visible proc
 										showGroupNote=true;
@@ -5997,8 +6000,8 @@ namespace OpenDental{
 						}
 					}
 					else {//procedure or group note, not viewing by tooth number
-						if(ShouldDisplayProc(table.Rows[i])) {
-							_procList.Add(table.Rows[i]);//show it in the graphical tooth chart
+						if(ShouldDisplayProc(rowCur)) {
+							_procList.Add(rowCur);//show it in the graphical tooth chart
 							//show it in the grid below
 						}
 						else {
@@ -6006,55 +6009,55 @@ namespace OpenDental{
 						}
 					}
 				}
-				else if(table.Rows[i]["CommlogNum"].ToString()!="0") {//if this is a commlog
+				else if(rowCur["CommlogNum"].ToString()!="0") {//if this is a commlog
 					if(!checkComm.Checked) {
 						continue;
 					}
-					if(table.Rows[i]["PatNum"].ToString()!=PatCur.PatNum.ToString()) {//if this is a different family member
+					if(patNumCur!=PatCur.PatNum) {//if this is a different family member
 						if(!checkCommFamily.Checked) {
 							continue;
 						}
 					}
 				}
-				else if(table.Rows[i]["RxNum"].ToString()!="0") {//if this is an Rx
+				else if(rowCur["RxNum"].ToString()!="0") {//if this is an Rx
 					if(!checkRx.Checked) {
 						continue;
 					}
 				}
-				else if(table.Rows[i]["LabCaseNum"].ToString()!="0") {//if this is a LabCase
+				else if(rowCur["LabCaseNum"].ToString()!="0") {//if this is a LabCase
 					if(!checkLabCase.Checked) {
 						continue;
 					}
 				}
-				else if(table.Rows[i]["TaskNum"].ToString()!="0") {//if this is a TaskItem
+				else if(rowCur["TaskNum"].ToString()!="0") {//if this is a TaskItem
 					if(!checkTasks.Checked) {
 						continue;
 					}
-					if(table.Rows[i]["PatNum"].ToString()!=PatCur.PatNum.ToString()) {//if this is a different family member
+					if(patNumCur!=PatCur.PatNum) {//if this is a different family member
 						if(!checkCommFamily.Checked) { //uses same check box as commlog
 							continue;
 						}
 					}
 				}
-				else if(table.Rows[i]["EmailMessageNum"].ToString()!="0") {//if this is an Email
+				else if(rowCur["EmailMessageNum"].ToString()!="0") {//if this is an Email
 					if(!checkEmail.Checked) {
 						continue;
 					}
 				}
-				else if(table.Rows[i]["AptNum"].ToString()!="0") {//if this is an Appointment
+				else if(rowCur["AptNum"].ToString()!="0") {//if this is an Appointment
 					if(!checkAppt.Checked) {
 						continue;
 					}
 				}
-				else if(table.Rows[i]["SheetNum"].ToString()!="0") {//if this is a sheet
+				else if(rowCur["SheetNum"].ToString()!="0") {//if this is a sheet
 					if(!checkSheets.Checked) {
 						continue;
 					}
 				}
-				if(ShowDateStart.Year>1880 && ((DateTime)(table.Rows[i]["ProcDate"])).Date < ShowDateStart.Date) {
+				if(ShowDateStart.Year>1880 && PIn.Date(rowCur["ProcDate"].ToString()).Date<ShowDateStart.Date) {
 					continue;
 				}
-				if(ShowDateEnd.Year>1880 && ((DateTime)(table.Rows[i]["ProcDate"])).Date > ShowDateEnd.Date) {
+				if(ShowDateEnd.Year>1880 && PIn.Date(rowCur["ProcDate"].ToString()).Date>ShowDateEnd.Date) {
 					continue;
 				}
 				row=new ODGridRow();
@@ -6063,88 +6066,88 @@ namespace OpenDental{
 				for(int f=0;f<fields.Count;f++) {
 					switch(fields[f].InternalName) {
 						case "Date":
-							row.Cells.Add(table.Rows[i]["procDate"].ToString());
+							row.Cells.Add(rowCur["procDate"].ToString());
 							break;
 						case "Time":
-							row.Cells.Add(table.Rows[i]["procTime"].ToString());
+							row.Cells.Add(rowCur["procTime"].ToString());
 							break;
 						case "Th":
-							row.Cells.Add(table.Rows[i]["toothNum"].ToString());
+							row.Cells.Add(rowCur["toothNum"].ToString());
 							break;
 						case "Surf":
-							row.Cells.Add(table.Rows[i]["surf"].ToString());
+							row.Cells.Add(rowCur["surf"].ToString());
 							break;
 						case "Dx":
-							row.Cells.Add(table.Rows[i]["dx"].ToString());
+							row.Cells.Add(rowCur["dx"].ToString());
 							break;
 						case "Description":
-							row.Cells.Add(table.Rows[i]["description"].ToString());
+							row.Cells.Add(rowCur["description"].ToString());
 							break;
 						case "Stat":
-							row.Cells.Add(table.Rows[i]["procStatus"].ToString());
+							row.Cells.Add(rowCur["procStatus"].ToString());
 							break;
 						case "Prov":
-							row.Cells.Add(table.Rows[i]["prov"].ToString());
+							row.Cells.Add(rowCur["prov"].ToString());
 							break;
 						case "Amount":
-							row.Cells.Add(table.Rows[i]["procFee"].ToString());
+							row.Cells.Add(rowCur["procFee"].ToString());
 							break;
 						case "ADA Code":
-							row.Cells.Add(table.Rows[i]["ProcCode"].ToString());
+							row.Cells.Add(rowCur["ProcCode"].ToString());
 							break;
 						case "User":
-							row.Cells.Add(table.Rows[i]["user"].ToString());
+							row.Cells.Add(rowCur["user"].ToString());
 							break;
 						case "Signed":
-							row.Cells.Add(table.Rows[i]["signature"].ToString());
+							row.Cells.Add(rowCur["signature"].ToString());
 							break;
 						case "Priority":
-							row.Cells.Add(table.Rows[i]["priority"].ToString());
+							row.Cells.Add(rowCur["priority"].ToString());
 							break;
 						case "Date Entry":
-							row.Cells.Add(table.Rows[i]["dateEntryC"].ToString());
+							row.Cells.Add(rowCur["dateEntryC"].ToString());
 							break;
 						case "Prognosis":
-							row.Cells.Add(table.Rows[i]["prognosis"].ToString());
+							row.Cells.Add(rowCur["prognosis"].ToString());
 							break;
 						case "Date TP":
-							row.Cells.Add(table.Rows[i]["dateTP"].ToString());
+							row.Cells.Add(rowCur["dateTP"].ToString());
 							break;
 						case "End Time":
-							row.Cells.Add(table.Rows[i]["procTimeEnd"].ToString());
+							row.Cells.Add(rowCur["procTimeEnd"].ToString());
 							break;
 						case "Quadrant":
-							row.Cells.Add(table.Rows[i]["quadrant"].ToString());
+							row.Cells.Add(rowCur["quadrant"].ToString());
 							break;
 						case "Schedule By":
-							row.Cells.Add(table.Rows[i]["orionDateScheduleBy"].ToString());
+							row.Cells.Add(rowCur["orionDateScheduleBy"].ToString());
 							break;
 						case "Stop Clock":
-							row.Cells.Add(table.Rows[i]["orionDateStopClock"].ToString());
+							row.Cells.Add(rowCur["orionDateStopClock"].ToString());
 							break;
 						case "DPC":
-							row.Cells.Add(table.Rows[i]["orionDPC"].ToString());
+							row.Cells.Add(rowCur["orionDPC"].ToString());
 							break;
 						case "Effective Comm":
-							row.Cells.Add(table.Rows[i]["orionIsEffectiveComm"].ToString());
+							row.Cells.Add(rowCur["orionIsEffectiveComm"].ToString());
 							break;
 						case "On Call":
-							row.Cells.Add(table.Rows[i]["orionIsOnCall"].ToString());
+							row.Cells.Add(rowCur["orionIsOnCall"].ToString());
 							break;
 						case "Stat 2":
-							row.Cells.Add(table.Rows[i]["orionStatus2"].ToString());
+							row.Cells.Add(rowCur["orionStatus2"].ToString());
 							break;
 						case "DPCpost":
-							row.Cells.Add(table.Rows[i]["orionDPCpost"].ToString());
+							row.Cells.Add(rowCur["orionDPCpost"].ToString());
 							break;
 						case "Length":
-							row.Cells.Add(table.Rows[i]["length"].ToString());
+							row.Cells.Add(rowCur["length"].ToString());
 							break;
 						case "Abbr":
-							row.Cells.Add(table.Rows[i]["AbbrDesc"].ToString());
+							row.Cells.Add(rowCur["AbbrDesc"].ToString());
 							break;
 						case "Locked":
-							row.Cells.Add(table.Rows[i]["isLocked"].ToString());
+							row.Cells.Add(rowCur["isLocked"].ToString());
 							break;
 						default:
 							row.Cells.Add("");
@@ -6152,21 +6155,21 @@ namespace OpenDental{
 					}
 				}
 				if(checkNotes.Checked) {
-					row.Note=table.Rows[i]["note"].ToString();
+					row.Note=rowCur["note"].ToString();
 				}
-				row.ColorText=Color.FromArgb(PIn.Int(table.Rows[i]["colorText"].ToString()));
-				long procNum=PIn.Long(table.Rows[i]["ProcNum"].ToString());
+				row.ColorText=Color.FromArgb(PIn.Int(rowCur["colorText"].ToString()));
+				long provNum=PIn.Long(rowCur["ProvNum"].ToString());
 				if(PrefC.GetBool(PrefName.UseProviderColorsInChart)
-						&& procNum!=0
-						&& Procedures.GetOneProc(procNum,false).ProcStatus==ProcStat.C
-						&& table.Rows[i]["ProvNum"].ToString()!="")
+						&& procNumCur>0
+						&& provNum>0
+						&& new[] { ProcStat.C,ProcStat.EC }.Contains((ProcStat)PIn.Int(rowCur["ProcStatus"].ToString())))
 				{
-					row.ColorBackG=Providers.GetColor(PIn.Long(table.Rows[i]["ProvNum"].ToString()));
+					row.ColorBackG=Providers.GetColor(provNum);
 				}
 				else {
-					row.ColorBackG=Color.FromArgb(PIn.Int(table.Rows[i]["colorBackG"].ToString()));
+					row.ColorBackG=Color.FromArgb(PIn.Int(rowCur["colorBackG"].ToString()));
 				}
-				row.Tag=table.Rows[i];
+				row.Tag=rowCur;
 				gridProg.Rows.Add(row);
 			}
 			ChartLayoutHelper.SetGridProgWidth(gridProg,ClientSize,panelEcw,textTreatmentNotes,toothChart);
