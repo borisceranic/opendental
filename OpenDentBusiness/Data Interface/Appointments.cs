@@ -2011,6 +2011,19 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
 
+		///<summary>Returns a list of appointments that are scheduled (have scheduled or ASAP status) to start between start date and end date.</summary>
+		public static List<Appointment> GetSchedApptsForPeriod(DateTime start,DateTime end) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),start,end);
+			}
+			string command="SELECT * FROM appointment "
+				+"WHERE AptDateTime >= "+POut.DateT(start)+" "
+				+"AND AptDateTime <= "+POut.DateT(end)+" "
+				+"AND AptStatus IN("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.ASAP)+")";
+			List<Appointment> retVal=Crud.AppointmentCrud.TableToList(Db.GetTable(command));
+			return retVal;
+		}
+
 		///<summary>Gets the ProvNum for the last completed or scheduled appointment for a patient. If none, returns 0.</summary>
 		public static long GetProvNumFromLastApptForPat(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

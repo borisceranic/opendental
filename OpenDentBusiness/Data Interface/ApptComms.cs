@@ -64,6 +64,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Creates two ApptComm items, one to send using dayInterval, and one to send using hourInterval.</summary>
 		public static void InsertForAppt(Appointment appt) {
+			if(appt.AptStatus!=ApptStatus.Scheduled && appt.AptStatus!=ApptStatus.ASAP) {
+				return;//Do nothing unless it's scheduled or ASAP.
+			}
 			int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
 			ApptComm apptComm;
 			DateTime daySend=appt.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
@@ -105,9 +108,9 @@ namespace OpenDentBusiness{
 				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).Hours > 0) {
 					continue;//It's not the correct number of hours prior to the appointment to send a reminder.
 				}
-				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 20 minutes leeway was deemed enough to 
-				//catch edge cases.  If the DateTime the apptComm was supposed to be sent is older than 20 minutes ago, just delete it.
-				if(apptComm.DateTimeSend < (DateTime.Now-new TimeSpan(0,20,0))) {
+				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 30 minutes leeway was deemed enough to 
+				//catch edge cases (2 attempted sends on average).  If the DateTime the apptComm was supposed to be sent is older than 30 minutes ago, just delete it.
+				if(apptComm.DateTimeSend < (DateTime.Now-new TimeSpan(0,30,0))) {
 					Delete(apptComm.ApptCommNum);
 					continue;
 				}
@@ -205,19 +208,37 @@ namespace OpenDentBusiness{
 			text=text.Replace("[namePref]",pat.Preferred);
 			text=text.Replace("[apptDate]",appt.AptDateTime.ToShortDateString());//Do we want to put logic in here to do "ask time arrive" instead of normal aptdatetime?
 			text=text.Replace("[apptTime]",appt.AptDateTime.ToShortTimeString());
+			if(text.Contains("[practiceName]")) {//Don't do extra work if we don't have to..
+				text=text.Replace("[practiceName]",PrefC.GetString(PrefName.PracticeTitle));
+			}
+			if(text.Contains("[clinicName]")) {
+				text=text.Replace("[clinicName]",Clinics.GetDesc(pat.ClinicNum));
+			}
+			if(text.Contains("[provName]")) {
+				text=text.Replace("[provName]",Providers.GetFormalName(pat.PriProv));
+			}
 			return text;
 		}
 
-		///<summary>Helper function for SendReminders.  Sends an email with the requisite fields.</summary>
+		///<summary>Helper function for SendReminders.  Sends an email with the requisite fields.  Skips sending if there is no practice/clinic email set up, if the patient/guarantor has a preferred contact method of None or DoNotCall, or neither the patient nor their guarantor has an email entered.</summary>
 		private static string SendEmail(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
+			EmailAddress emailAddress=EmailAddresses.GetByClinic(Clinics.ClinicNum);//Gets an address based on cascading priorities.
+			if(emailAddress.EmailUsername=="") {
+				return Lans.g("ApptComms","No default email set up for practice/clinic")+".\r\n";
+			}
+			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".\r\n";
+			}
 			string patEmail=pat.Email;
 			if(patEmail=="") {
+				if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
+					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".\r\n";
+				}
 				patEmail=fam.ListPats[0].Email;
 			}
 			if(patEmail=="") {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has no email.");
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has no email")+".\r\n";
 			}
-			string errorText="";
 			EmailMessage emailMessage=new EmailMessage();
 			emailMessage.PatNumSubj=pat.PatNum;
 			emailMessage.ToAddress=patEmail;
@@ -232,37 +253,38 @@ namespace OpenDentBusiness{
 			else {
 				emailMessage.BodyText=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
-			EmailAddress emailAddress;
-			if(PrefC.HasClinicsEnabled) {
-				emailAddress=EmailAddresses.GetByClinic(pat.ClinicNum);
-			}
-			else {
-				emailAddress=EmailAddresses.GetByClinic(0);
-			}
 			emailMessage.FromAddress=emailAddress.SenderAddress;
 			try {
 				EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
 			}
 			catch(Exception ex) {
-				errorText+=ex.Message+"\r\n";
+				return ex.Message+"\r\n";
 			}
-			return errorText;
+			return "";
 		}
 
-		///<summary>Helper function for SendReminders.  Sends a text message with the requisite fields.</summary>
+		///<summary>Helper function for SendReminders.  Sends a text message with the requisite fields.  Skips sending if text messaging isn't enabled, if the patient/guarantor has a preferred contact method of None or DoNotCall, or if neither the patient nor the guarantor has a valid wireless phone with text messaging enabled.</summary>
 		private static string SendText(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
-			string errorText="";
+			if(!SmsPhones.IsIntegratedTextingEnabled()) {
+				return Lans.g("ApptComms","Text messaging not enabled")+".\r\n";
+			}
+			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".\r\n";
+			}
 			string patPhone=pat.WirelessPhone;
 			bool txtUnknownIsNo=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
 			//If texting is marked as no, the phone is blank, or unknown are treated as no, look for guarantor texting status.
 			if(pat.TxtMsgOk==YN.No || patPhone=="" || (pat.TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
+				if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
+					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".\r\n";
+				}
 				patPhone=fam.ListPats[0].WirelessPhone;
 				if(fam.ListPats[0].TxtMsgOk==YN.No || (fam.ListPats[0].TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
 					patPhone="";
 				}
 			}
 			if(patPhone=="") {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts.");
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".\r\n";
 			}
 			string textMsg;
 			if(intervalType==IntervalType.Hourly) {
@@ -275,9 +297,9 @@ namespace OpenDentBusiness{
 				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,textMsg,Clinics.ClinicNum);
 			}
 			catch(Exception ex) {
-				errorText+=ex.Message+"\r\n";
+				return ex.Message+"\r\n";
 			}
-			return errorText;
+			return "";
 		}
 
 	}

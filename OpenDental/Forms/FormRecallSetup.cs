@@ -65,8 +65,8 @@ namespace OpenDental{
 		private ODGrid gridPriorities;
 		private Label label10;
 		private Label label11;
-		private ValidNumber textHourInterval;
-		private ValidNumber textDayInterval;
+		private ValidNumber textHoursPrior;
+		private ValidNumber textDaysPrior;
 		private bool changed;
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
@@ -85,7 +85,25 @@ namespace OpenDental{
 		private GroupBox groupBox8;
 		private RadioButton radioSendToEmailOnlyPreferred;
 		private RadioButton radioDoNotSend;
-		string[] _priorities;
+		private ValidNumber textTextCount;
+		private Label label23;
+		private Label label22;
+		private Label label21;
+		private Label label20;
+		private ValidNumber textHourCharCount;
+		private Label label28;
+		private ValidNumber textDayCharCount;
+		private Label label24;
+		private ValidNumber textApptCount;
+		private Label label31;
+		private ValidNumber textNeitherCount;
+		private Label label30;
+		private ValidNumber textEmailCount;
+		private Label label29;
+		private GroupBox groupBox9;
+		private Label labelNotSetup;
+		private Label label27;
+		string[] _arrayPriorities;
 
 		///<summary></summary>
 		public FormRecallSetup(){
@@ -160,6 +178,23 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.gridConfirmationRules = new OpenDental.UI.ODGrid();
 			this.tabReminderSetup = new System.Windows.Forms.TabPage();
+			this.labelNotSetup = new System.Windows.Forms.Label();
+			this.groupBox9 = new System.Windows.Forms.GroupBox();
+			this.label23 = new System.Windows.Forms.Label();
+			this.textApptCount = new OpenDental.ValidNumber();
+			this.textTextCount = new OpenDental.ValidNumber();
+			this.label31 = new System.Windows.Forms.Label();
+			this.label29 = new System.Windows.Forms.Label();
+			this.textNeitherCount = new OpenDental.ValidNumber();
+			this.textEmailCount = new OpenDental.ValidNumber();
+			this.label30 = new System.Windows.Forms.Label();
+			this.textHourCharCount = new OpenDental.ValidNumber();
+			this.label28 = new System.Windows.Forms.Label();
+			this.textDayCharCount = new OpenDental.ValidNumber();
+			this.label24 = new System.Windows.Forms.Label();
+			this.label22 = new System.Windows.Forms.Label();
+			this.label21 = new System.Windows.Forms.Label();
+			this.label20 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.textHourMsg = new System.Windows.Forms.RichTextBox();
 			this.textDayMsg = new System.Windows.Forms.RichTextBox();
@@ -170,8 +205,8 @@ namespace OpenDental{
 			this.butUp = new OpenDental.UI.Button();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
-			this.textHourInterval = new OpenDental.ValidNumber();
-			this.textDayInterval = new OpenDental.ValidNumber();
+			this.textHoursPrior = new OpenDental.ValidNumber();
+			this.textDaysPrior = new OpenDental.ValidNumber();
 			this.gridPriorities = new OpenDental.UI.ODGrid();
 			this.tabAutomationSettings = new System.Windows.Forms.TabPage();
 			this.groupBox8 = new System.Windows.Forms.GroupBox();
@@ -187,6 +222,7 @@ namespace OpenDental{
 			this.dateRunStart = new System.Windows.Forms.DateTimePicker();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
+			this.label27 = new System.Windows.Forms.Label();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -195,6 +231,7 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup.SuspendLayout();
 			this.tabConfirmationAutomation.SuspendLayout();
 			this.tabReminderSetup.SuspendLayout();
+			this.groupBox9.SuspendLayout();
 			this.tabAutomationSettings.SuspendLayout();
 			this.groupBox8.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -688,6 +725,16 @@ namespace OpenDental{
 			// 
 			// tabReminderSetup
 			// 
+			this.tabReminderSetup.Controls.Add(this.labelNotSetup);
+			this.tabReminderSetup.Controls.Add(this.groupBox9);
+			this.tabReminderSetup.Controls.Add(this.textHourCharCount);
+			this.tabReminderSetup.Controls.Add(this.label28);
+			this.tabReminderSetup.Controls.Add(this.textDayCharCount);
+			this.tabReminderSetup.Controls.Add(this.label24);
+			this.tabReminderSetup.Controls.Add(this.label27);
+			this.tabReminderSetup.Controls.Add(this.label22);
+			this.tabReminderSetup.Controls.Add(this.label21);
+			this.tabReminderSetup.Controls.Add(this.label20);
 			this.tabReminderSetup.Controls.Add(this.label16);
 			this.tabReminderSetup.Controls.Add(this.textHourMsg);
 			this.tabReminderSetup.Controls.Add(this.textDayMsg);
@@ -698,8 +745,8 @@ namespace OpenDental{
 			this.tabReminderSetup.Controls.Add(this.butUp);
 			this.tabReminderSetup.Controls.Add(this.label10);
 			this.tabReminderSetup.Controls.Add(this.label11);
-			this.tabReminderSetup.Controls.Add(this.textHourInterval);
-			this.tabReminderSetup.Controls.Add(this.textDayInterval);
+			this.tabReminderSetup.Controls.Add(this.textHoursPrior);
+			this.tabReminderSetup.Controls.Add(this.textDaysPrior);
 			this.tabReminderSetup.Controls.Add(this.gridPriorities);
 			this.tabReminderSetup.Location = new System.Drawing.Point(4, 22);
 			this.tabReminderSetup.Name = "tabReminderSetup";
@@ -709,57 +756,237 @@ namespace OpenDental{
 			this.tabReminderSetup.Text = "Appt Reminder";
 			this.tabReminderSetup.UseVisualStyleBackColor = true;
 			// 
+			// labelNotSetup
+			// 
+			this.labelNotSetup.Location = new System.Drawing.Point(505, 207);
+			this.labelNotSetup.Name = "labelNotSetup";
+			this.labelNotSetup.Size = new System.Drawing.Size(105, 43);
+			this.labelNotSetup.TabIndex = 90;
+			this.labelNotSetup.Text = "A grey option means the method is not set up properly.";
+			this.labelNotSetup.Visible = false;
+			// 
+			// groupBox9
+			// 
+			this.groupBox9.Controls.Add(this.label23);
+			this.groupBox9.Controls.Add(this.textApptCount);
+			this.groupBox9.Controls.Add(this.textTextCount);
+			this.groupBox9.Controls.Add(this.label31);
+			this.groupBox9.Controls.Add(this.label29);
+			this.groupBox9.Controls.Add(this.textNeitherCount);
+			this.groupBox9.Controls.Add(this.textEmailCount);
+			this.groupBox9.Controls.Add(this.label30);
+			this.groupBox9.Location = new System.Drawing.Point(553, 297);
+			this.groupBox9.Name = "groupBox9";
+			this.groupBox9.Size = new System.Drawing.Size(363, 125);
+			this.groupBox9.TabIndex = 89;
+			this.groupBox9.TabStop = false;
+			this.groupBox9.Text = "Reminder Forecast (next 7 days)";
+			// 
+			// label23
+			// 
+			this.label23.Location = new System.Drawing.Point(6, 16);
+			this.label23.Name = "label23";
+			this.label23.Size = new System.Drawing.Size(282, 20);
+			this.label23.TabIndex = 75;
+			this.label23.Text = "Texts to be sent:";
+			this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textApptCount
+			// 
+			this.textApptCount.Location = new System.Drawing.Point(294, 94);
+			this.textApptCount.MaxVal = 255;
+			this.textApptCount.MinVal = 0;
+			this.textApptCount.Name = "textApptCount";
+			this.textApptCount.ReadOnly = true;
+			this.textApptCount.Size = new System.Drawing.Size(51, 20);
+			this.textApptCount.TabIndex = 88;
+			this.textApptCount.Text = "0";
+			// 
+			// textTextCount
+			// 
+			this.textTextCount.Location = new System.Drawing.Point(294, 16);
+			this.textTextCount.MaxVal = 255;
+			this.textTextCount.MinVal = 0;
+			this.textTextCount.Name = "textTextCount";
+			this.textTextCount.ReadOnly = true;
+			this.textTextCount.Size = new System.Drawing.Size(51, 20);
+			this.textTextCount.TabIndex = 76;
+			this.textTextCount.Text = "0";
+			// 
+			// label31
+			// 
+			this.label31.Location = new System.Drawing.Point(6, 94);
+			this.label31.Name = "label31";
+			this.label31.Size = new System.Drawing.Size(282, 20);
+			this.label31.TabIndex = 87;
+			this.label31.Text = "Total potential reminders for the next 7 days:";
+			this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label29
+			// 
+			this.label29.Location = new System.Drawing.Point(6, 42);
+			this.label29.Name = "label29";
+			this.label29.Size = new System.Drawing.Size(282, 20);
+			this.label29.TabIndex = 83;
+			this.label29.Text = "Emails to be sent:";
+			this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textNeitherCount
+			// 
+			this.textNeitherCount.Location = new System.Drawing.Point(294, 68);
+			this.textNeitherCount.MaxVal = 255;
+			this.textNeitherCount.MinVal = 0;
+			this.textNeitherCount.Name = "textNeitherCount";
+			this.textNeitherCount.ReadOnly = true;
+			this.textNeitherCount.Size = new System.Drawing.Size(51, 20);
+			this.textNeitherCount.TabIndex = 86;
+			this.textNeitherCount.Text = "0";
+			// 
+			// textEmailCount
+			// 
+			this.textEmailCount.Location = new System.Drawing.Point(294, 42);
+			this.textEmailCount.MaxVal = 255;
+			this.textEmailCount.MinVal = 0;
+			this.textEmailCount.Name = "textEmailCount";
+			this.textEmailCount.ReadOnly = true;
+			this.textEmailCount.Size = new System.Drawing.Size(51, 20);
+			this.textEmailCount.TabIndex = 84;
+			this.textEmailCount.Text = "0";
+			// 
+			// label30
+			// 
+			this.label30.Location = new System.Drawing.Point(6, 68);
+			this.label30.Name = "label30";
+			this.label30.Size = new System.Drawing.Size(282, 20);
+			this.label30.TabIndex = 85;
+			this.label30.Text = "No send method (can\'t be sent):";
+			this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textHourCharCount
+			// 
+			this.textHourCharCount.Location = new System.Drawing.Point(316, 588);
+			this.textHourCharCount.MaxVal = 255;
+			this.textHourCharCount.MinVal = 0;
+			this.textHourCharCount.Name = "textHourCharCount";
+			this.textHourCharCount.ReadOnly = true;
+			this.textHourCharCount.Size = new System.Drawing.Size(51, 20);
+			this.textHourCharCount.TabIndex = 82;
+			this.textHourCharCount.Text = "0";
+			// 
+			// label28
+			// 
+			this.label28.Location = new System.Drawing.Point(28, 588);
+			this.label28.Name = "label28";
+			this.label28.Size = new System.Drawing.Size(282, 20);
+			this.label28.TabIndex = 81;
+			this.label28.Text = "Estimated character count:";
+			this.label28.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDayCharCount
+			// 
+			this.textDayCharCount.Location = new System.Drawing.Point(316, 297);
+			this.textDayCharCount.MaxVal = 255;
+			this.textDayCharCount.MinVal = 0;
+			this.textDayCharCount.Name = "textDayCharCount";
+			this.textDayCharCount.ReadOnly = true;
+			this.textDayCharCount.Size = new System.Drawing.Size(51, 20);
+			this.textDayCharCount.TabIndex = 80;
+			this.textDayCharCount.Text = "0";
+			// 
+			// label24
+			// 
+			this.label24.Location = new System.Drawing.Point(28, 297);
+			this.label24.Name = "label24";
+			this.label24.Size = new System.Drawing.Size(282, 20);
+			this.label24.TabIndex = 79;
+			this.label24.Text = "Estimated character count:";
+			this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label22
+			// 
+			this.label22.Location = new System.Drawing.Point(612, 71);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(304, 52);
+			this.label22.TabIndex = 74;
+			this.label22.Text = "Set the order of methods used to attempt to send reminders. If Send All is checke" +
+    "d, both email AND text will be attempted \r\nregardless of order; otherwise only t" +
+    "ext OR email will be sent.";
+			this.label22.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// label21
+			// 
+			this.label21.Location = new System.Drawing.Point(144, 59);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(223, 50);
+			this.label21.TabIndex = 73;
+			this.label21.Text = "Enter the number of days prior to an appointment a reminder should be sent.\r\nA va" +
+    "lue of 0 disables this reminder.\r\n";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// label20
+			// 
+			this.label20.Location = new System.Drawing.Point(144, 350);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(223, 54);
+			this.label20.TabIndex = 72;
+			this.label20.Text = "Enter the number of hours prior to an appointment a reminder should be sent.\r\nA v" +
+    "alue of 0 disables this reminder.";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(17, 271);
+			this.label16.Location = new System.Drawing.Point(3, 6);
 			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(340, 130);
+			this.label16.Size = new System.Drawing.Size(933, 57);
 			this.label16.TabIndex = 71;
 			this.label16.Text = resources.GetString("label16.Text");
 			// 
 			// textHourMsg
 			// 
-			this.textHourMsg.Location = new System.Drawing.Point(190, 83);
+			this.textHourMsg.Location = new System.Drawing.Point(66, 423);
 			this.textHourMsg.Name = "textHourMsg";
-			this.textHourMsg.Size = new System.Drawing.Size(167, 171);
+			this.textHourMsg.Size = new System.Drawing.Size(312, 159);
 			this.textHourMsg.TabIndex = 70;
 			this.textHourMsg.Text = "";
+			this.textHourMsg.TextChanged += new System.EventHandler(this.textHourMsg_TextChanged);
 			// 
 			// textDayMsg
 			// 
-			this.textDayMsg.Location = new System.Drawing.Point(17, 83);
+			this.textDayMsg.Location = new System.Drawing.Point(66, 132);
 			this.textDayMsg.Name = "textDayMsg";
-			this.textDayMsg.Size = new System.Drawing.Size(167, 171);
+			this.textDayMsg.Size = new System.Drawing.Size(312, 159);
 			this.textDayMsg.TabIndex = 69;
 			this.textDayMsg.Text = "";
+			this.textDayMsg.TextChanged += new System.EventHandler(this.textDayMsg_TextChanged);
 			// 
 			// checkSendAll
 			// 
 			this.checkSendAll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkSendAll.Location = new System.Drawing.Point(349, 79);
+			this.checkSendAll.Location = new System.Drawing.Point(520, 180);
 			this.checkSendAll.Name = "checkSendAll";
-			this.checkSendAll.Size = new System.Drawing.Size(100, 24);
+			this.checkSendAll.Size = new System.Drawing.Size(89, 24);
 			this.checkSendAll.TabIndex = 23;
 			this.checkSendAll.Text = "Send All";
 			this.checkSendAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSendAll.UseVisualStyleBackColor = true;
+			this.checkSendAll.CheckedChanged += new System.EventHandler(this.checkSendAll_CheckedChanged);
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(187, 57);
+			this.label7.Location = new System.Drawing.Point(63, 397);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(100, 23);
+			this.label7.Size = new System.Drawing.Size(204, 23);
 			this.label7.TabIndex = 22;
-			this.label7.Text = "Hour Message";
+			this.label7.Text = "Hour(s) Prior Message ";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(14, 57);
+			this.label9.Location = new System.Drawing.Point(63, 106);
 			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(100, 23);
+			this.label9.Size = new System.Drawing.Size(204, 23);
 			this.label9.TabIndex = 21;
-			this.label9.Text = "Day Message";
+			this.label9.Text = "Day(s) Prior Message";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// butDown
@@ -770,7 +997,7 @@ namespace OpenDental{
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
-			this.butDown.Location = new System.Drawing.Point(419, 26);
+			this.butDown.Location = new System.Drawing.Point(580, 132);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(30, 30);
 			this.butDown.TabIndex = 18;
@@ -785,7 +1012,7 @@ namespace OpenDental{
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
-			this.butUp.Location = new System.Drawing.Point(383, 26);
+			this.butUp.Location = new System.Drawing.Point(541, 132);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(30, 30);
 			this.butUp.TabIndex = 17;
@@ -794,7 +1021,7 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(187, 10);
+			this.label10.Location = new System.Drawing.Point(63, 350);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(100, 23);
 			this.label10.TabIndex = 15;
@@ -803,30 +1030,33 @@ namespace OpenDental{
 			// 
 			// label11
 			// 
-			this.label11.Location = new System.Drawing.Point(14, 10);
+			this.label11.Location = new System.Drawing.Point(63, 59);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(100, 23);
 			this.label11.TabIndex = 14;
 			this.label11.Text = "Days Prior";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// textHourInterval
+			// textHoursPrior
 			// 
-			this.textHourInterval.Location = new System.Drawing.Point(190, 36);
-			this.textHourInterval.MaxVal = 255;
-			this.textHourInterval.MinVal = 0;
-			this.textHourInterval.Name = "textHourInterval";
-			this.textHourInterval.Size = new System.Drawing.Size(167, 20);
-			this.textHourInterval.TabIndex = 13;
+			this.textHoursPrior.Location = new System.Drawing.Point(66, 376);
+			this.textHoursPrior.MaxVal = 255;
+			this.textHoursPrior.MinVal = 0;
+			this.textHoursPrior.Name = "textHoursPrior";
+			this.textHoursPrior.Size = new System.Drawing.Size(51, 20);
+			this.textHoursPrior.TabIndex = 13;
+			this.textHoursPrior.Text = "0";
+			this.textHoursPrior.Leave += new System.EventHandler(this.textHourInterval_Leave);
 			// 
-			// textDayInterval
+			// textDaysPrior
 			// 
-			this.textDayInterval.Location = new System.Drawing.Point(17, 36);
-			this.textDayInterval.MaxVal = 255;
-			this.textDayInterval.MinVal = 0;
-			this.textDayInterval.Name = "textDayInterval";
-			this.textDayInterval.Size = new System.Drawing.Size(167, 20);
-			this.textDayInterval.TabIndex = 12;
+			this.textDaysPrior.Location = new System.Drawing.Point(66, 85);
+			this.textDaysPrior.MaxVal = 255;
+			this.textDaysPrior.MinVal = 0;
+			this.textDaysPrior.Name = "textDaysPrior";
+			this.textDaysPrior.Size = new System.Drawing.Size(51, 20);
+			this.textDaysPrior.TabIndex = 12;
+			this.textDaysPrior.Leave += new System.EventHandler(this.textDayInterval_Leave);
 			// 
 			// gridPriorities
 			// 
@@ -834,12 +1064,12 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridPriorities.HasMultilineHeaders = false;
 			this.gridPriorities.HScrollVisible = false;
-			this.gridPriorities.Location = new System.Drawing.Point(455, 26);
+			this.gridPriorities.Location = new System.Drawing.Point(615, 132);
 			this.gridPriorities.Name = "gridPriorities";
 			this.gridPriorities.ScrollValue = 0;
-			this.gridPriorities.Size = new System.Drawing.Size(413, 294);
+			this.gridPriorities.Size = new System.Drawing.Size(301, 118);
 			this.gridPriorities.TabIndex = 68;
-			this.gridPriorities.Title = "Reminder Priorities";
+			this.gridPriorities.Title = "Reminder Method Order";
 			this.gridPriorities.TranslationName = null;
 			// 
 			// tabAutomationSettings
@@ -984,6 +1214,14 @@ namespace OpenDental{
 			this.label18.TabIndex = 4;
 			this.label18.Text = "Start";
 			// 
+			// label27
+			// 
+			this.label27.Location = new System.Drawing.Point(513, 494);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(403, 118);
+			this.label27.TabIndex = 78;
+			this.label27.Text = resources.GetString("label27.Text");
+			// 
 			// FormRecallSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1014,6 +1252,8 @@ namespace OpenDental{
 			this.tabConfirmationAutomation.ResumeLayout(false);
 			this.tabReminderSetup.ResumeLayout(false);
 			this.tabReminderSetup.PerformLayout();
+			this.groupBox9.ResumeLayout(false);
+			this.groupBox9.PerformLayout();
 			this.tabAutomationSettings.ResumeLayout(false);
 			this.groupBox8.ResumeLayout(false);
 			this.groupBox5.ResumeLayout(false);
@@ -1419,14 +1659,198 @@ namespace OpenDental{
 		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
-			textDayInterval.Text=PrefC.GetString(PrefName.ApptReminderDayInterval);
+			textDaysPrior.Text=PrefC.GetString(PrefName.ApptReminderDayInterval);
 			textDayMsg.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
-			textHourInterval.Text=PrefC.GetString(PrefName.ApptReminderHourInterval);
+			textHoursPrior.Text=PrefC.GetString(PrefName.ApptReminderHourInterval);
 			textHourMsg.Text=PrefC.GetString(PrefName.ApptReminderHourMessage);
 			checkSendAll.Checked=PrefC.GetBool(PrefName.ApptReminderSendAll);
 			string prefPriority=PrefC.GetString(PrefName.ApptReminderSendOrder);
-			_priorities=prefPriority.Split(',');
+			textDayCharCount.Text=textDayMsg.TextLength.ToString();
+			textHourCharCount.Text=textHourMsg.TextLength.ToString();
+			_arrayPriorities=prefPriority.Split(',');
+			FillPriorityMetrics();
 			FillPriorityGrid();
+		}
+
+		private void FillPriorityMetrics() {
+			int daysPrior=PIn.Int(textDaysPrior.Text);
+			int hoursPrior=PIn.Int(textHoursPrior.Text);
+			DateTime dateDayStart=DateTime.Now.AddDays(daysPrior);
+			DateTime dateHourStart=DateTime.Now.AddHours(hoursPrior);
+			DateTime dateDayStop=dateDayStart.AddDays(7);
+			DateTime dateHourStop=dateHourStart.AddDays(7);
+			List<Appointment> listApptsForDays=new List<Appointment>();
+			List<Appointment> listApptsForHours=new List<Appointment>();
+			if(daysPrior!=0) {
+				listApptsForDays=Appointments.GetSchedApptsForPeriod(dateDayStart,dateDayStop);//These run queries, sadly.  At least they're simple...
+			}
+			if(hoursPrior!=0) {
+				listApptsForHours=Appointments.GetSchedApptsForPeriod(dateHourStart,dateHourStop);
+			}
+			textApptCount.Text=(listApptsForDays.Count+listApptsForHours.Count).ToString();
+			int textSent=0;
+			int emailSent=0;
+			int cannotSend=0;
+			bool hasTextingEnabled=SmsPhones.IsIntegratedTextingEnabled();
+			if(checkSendAll.Checked) {//Much simpler, just take each patient on the appointments and see if both text and email are valid and tally them up.
+				textApptCount.Text=((listApptsForDays.Count+listApptsForHours.Count)*2).ToString();//This assumes that email and text will both be successful for all appointments hourly and daily.
+				EmailAddress emailAddress=EmailAddresses.GetByClinic(Clinics.ClinicNum);//Gets an address based on cascading priorities.
+				for(int i=listApptsForDays.Count-1;i>=0;i--) {
+					Patient pat=Patients.GetPat(listApptsForDays[i].PatNum);
+					bool isContacted=false;
+					if(emailAddress.EmailUsername!="" && CanEmail(pat)) {//Check for email validity
+						isContacted=true;
+						emailSent++;
+					}
+					else {
+						cannotSend++;
+					}
+					if(hasTextingEnabled && CanText(pat)) {//Check for text validity
+						isContacted=true;
+						textSent++;
+					}
+					else {
+						cannotSend++;
+					}
+					if(isContacted) {
+						listApptsForDays.RemoveAt(i);//If they're contacted any of the above ways remove them from the list.
+					}
+				}
+				for(int i=listApptsForHours.Count-1;i>=0;i--) {
+					bool isContacted=false;
+					Patient pat=Patients.GetPat(listApptsForHours[i].PatNum);
+					if(emailAddress.EmailUsername!="" && CanEmail(pat)) {//Check for email validity
+						isContacted=true;
+						emailSent++;
+					}
+					else {
+						cannotSend++;
+					}
+					if(hasTextingEnabled && CanText(pat)) {//Check for text validity
+						isContacted=true;
+						textSent++;
+					}
+					else {
+						cannotSend++;
+					}
+					if(isContacted) {
+						listApptsForHours.RemoveAt(i);//If they're contacted any of the above ways remove them from the list.
+					}
+				}
+			}
+			else {
+				foreach(string commTypeString in _arrayPriorities) {
+					//If an appt confirmation is sent by one method that appt can't have another reminder sent using a different method.
+					CommType commType=(CommType)PIn.Int(commTypeString);
+					if(commType==CommType.Email) {
+						EmailAddress emailAddress=EmailAddresses.GetByClinic(Clinics.ClinicNum);//Gets an address based on cascading priorities.
+						if(emailAddress.EmailUsername=="") {
+							continue;//No email set up at all, just go to the next CommType
+						}
+						//Remove appointments from the list if either the patient or guarantor has a valid email.
+						for(int i=listApptsForDays.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForDays[i].PatNum);
+							if(CanEmail(pat)) {
+								listApptsForDays.RemoveAt(i);
+								emailSent++;
+							}
+						}
+						for(int i=listApptsForHours.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForHours[i].PatNum);
+							if(CanEmail(pat)) {
+								listApptsForHours.RemoveAt(i);
+								emailSent++;
+							}
+						}
+					}
+					if(commType==CommType.Text) {
+						if(!hasTextingEnabled) {
+							continue;//Integrated texting not set up, just go to the next CommType
+						}
+						for(int i=listApptsForDays.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForDays[i].PatNum);
+							if(CanText(pat)) {
+								//Either the patient or the guarantor has a valid phone number and texting is allowed.
+								listApptsForDays.RemoveAt(i);
+								textSent++;
+							}
+						}
+						for(int i=listApptsForHours.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForHours[i].PatNum);
+							if(CanText(pat)) {
+								listApptsForHours.RemoveAt(i);
+								textSent++;
+							}
+						}
+					}
+					if(commType==CommType.Preferred) {
+						for(int i=listApptsForDays.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForDays[i].PatNum);
+							if(pat.PreferContactMethod==ContactMethod.Email && CanEmail(pat)) {
+								listApptsForDays.RemoveAt(i);
+								emailSent++;
+							}
+							if(pat.PreferContactMethod==ContactMethod.TextMessage && CanText(pat) && hasTextingEnabled) {
+								listApptsForDays.RemoveAt(i);
+								textSent++;
+							}
+						}
+						for(int i=listApptsForHours.Count-1;i>=0;i--) {
+							Patient pat=Patients.GetPat(listApptsForHours[i].PatNum);
+							if(pat.PreferContactMethod==ContactMethod.Email && CanEmail(pat)) {
+								listApptsForHours.RemoveAt(i);
+								emailSent++;
+							}
+							if(pat.PreferContactMethod==ContactMethod.TextMessage && CanText(pat) && hasTextingEnabled) {
+								listApptsForHours.RemoveAt(i);
+								textSent++;
+							}
+						}
+					}
+				}
+			}
+			textTextCount.Text=textSent.ToString();
+			textEmailCount.Text=emailSent.ToString();
+			textNeitherCount.Text=(listApptsForDays.Count+listApptsForHours.Count).ToString();
+			if(checkSendAll.Checked) {
+				textNeitherCount.Text=cannotSend.ToString();
+			}
+		}
+
+		///<summary>Returns a boolean representing if this patient or the patient's guarantor can be contacted by email.  Takes into account DoNotCall contact methods.</summary>
+		private bool CanEmail(Patient pat) {
+			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
+				return false;//Don't contact patients who have contact method of DoNotCall
+			}
+			if(pat.Email!="") {
+				return true;
+			}
+			Family fam=Patients.GetFamily(pat.PatNum);
+			if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
+				return false;//Don't contact guarantors who have contact method of DoNotCall
+			}
+			if(fam.ListPats[0].Email!="") {
+				return true;
+			}
+			return false;
+		}
+
+		private bool CanText(Patient pat) {
+			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
+				return false;//Don't contact patients who have contact method of DoNotCall
+			}
+			bool txtUnknownIsNo=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
+			//If texting is marked as no, the phone is blank, or unknown are treated as no, look for guarantor texting status.
+			if(pat.TxtMsgOk==YN.No || pat.WirelessPhone=="" || (pat.TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
+				Family fam=Patients.GetFamily(pat.PatNum);
+				if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
+					return false;//Don't contact guarantors who have contact method of DoNotCall
+				}
+				if(fam.ListPats[0].TxtMsgOk==YN.No || fam.ListPats[0].WirelessPhone=="" || (fam.ListPats[0].TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
+					return false;
+				}
+			}
+			return true;//Either the patient or the guarantor has a valid wireless phone that is OK to text.
 		}
 
 		private void FillPriorityGrid() {
@@ -1437,14 +1861,46 @@ namespace OpenDental{
 			gridPriorities.Columns.Add(col);
 			gridPriorities.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_priorities.Length;i++) {
+			for(int i=0;i<_arrayPriorities.Length;i++) {
 				row=new ODGridRow();
-				int enumNum=PIn.Int(_priorities[i]);
+				int enumNum=PIn.Int(_arrayPriorities[i]);
 				row.Cells.Add(((CommType)enumNum).ToString());//Adding in the enums in order that the preference was.
+				if((CommType)enumNum==CommType.Email) {
+					//Either gets an address based on cascading priority or an empty address object
+					EmailAddress emailAddress=EmailAddresses.GetByClinic(FormOpenDental.ClinicNum);
+					if(emailAddress.EmailUsername=="") {//There are no email addresses set up at all
+						row.Cells[row.Cells.Count-1].ColorText=Color.Gray;
+						labelNotSetup.Visible=true;
+					}
+				}
+				if((CommType)enumNum==CommType.Text && !SmsPhones.IsIntegratedTextingEnabled()) {
+					row.Cells[row.Cells.Count-1].ColorText=Color.Gray;
+					labelNotSetup.Visible=true;
+				}
 				row.Tag=enumNum;
 				gridPriorities.Rows.Add(row);
 			}
 			gridPriorities.EndUpdate();
+		}
+
+		private void textDayMsg_TextChanged(object sender,EventArgs e) {
+			textDayCharCount.Text=textDayMsg.TextLength.ToString();
+		}
+
+		private void textHourMsg_TextChanged(object sender,EventArgs e) {
+			textHourCharCount.Text=textHourMsg.TextLength.ToString();
+		}
+
+		private void textDayInterval_Leave(object sender,EventArgs e) {
+			FillPriorityMetrics();
+		}
+
+		private void textHourInterval_Leave(object sender,EventArgs e) {
+			FillPriorityMetrics();
+		}
+
+		private void checkSendAll_CheckedChanged(object sender,EventArgs e) {
+			FillPriorityMetrics();
 		}
 
 		private void butUp_Click(object sender,EventArgs e) {
@@ -1456,11 +1912,12 @@ namespace OpenDental{
 				return;
 			}
 			int selectedIdx=gridPriorities.GetSelectedIndex();
-			string destinationString=_priorities[selectedIdx-1];
-			_priorities[selectedIdx-1]=_priorities[selectedIdx];
-			_priorities[selectedIdx]=destinationString;
+			string destinationString=_arrayPriorities[selectedIdx-1];
+			_arrayPriorities[selectedIdx-1]=_arrayPriorities[selectedIdx];
+			_arrayPriorities[selectedIdx]=destinationString;
 			FillPriorityGrid();
 			gridPriorities.SetSelected(selectedIdx-1,true);
+			FillPriorityMetrics();
 		}
 
 		private void butDown_Click(object sender,EventArgs e) {
@@ -1472,11 +1929,12 @@ namespace OpenDental{
 				return;
 			}
 			int selectedIdx=gridPriorities.GetSelectedIndex();
-			string destinationString=_priorities[selectedIdx+1];
-			_priorities[selectedIdx+1]=_priorities[selectedIdx];
-			_priorities[selectedIdx]=destinationString;
+			string destinationString=_arrayPriorities[selectedIdx+1];
+			_arrayPriorities[selectedIdx+1]=_arrayPriorities[selectedIdx];
+			_arrayPriorities[selectedIdx]=destinationString;
 			FillPriorityGrid();
 			gridPriorities.SetSelected(selectedIdx+1,true);
+			FillPriorityMetrics();
 		}
 
 		#endregion Appt Reminder Setup
@@ -1510,8 +1968,8 @@ namespace OpenDental{
 				|| textDaysFirstReminder.errorProvider1.GetError(textDaysFirstReminder)!=""
 				|| textDaysSecondReminder.errorProvider1.GetError(textDaysSecondReminder)!=""
 				|| textMaxReminders.errorProvider1.GetError(textMaxReminders)!=""
-				|| textDayInterval.errorProvider1.GetError(textDayInterval)!=""
-				|| textHourInterval.errorProvider1.GetError(textHourInterval)!="")
+				|| textDaysPrior.errorProvider1.GetError(textDaysPrior)!=""
+				|| textHoursPrior.errorProvider1.GetError(textHoursPrior)!="")
 			{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
@@ -1612,8 +2070,8 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.RecallUseEmailIfHasEmailAddress,false);
 			}
 			Prefs.UpdateBool(PrefName.ApptReminderSendAll,checkSendAll.Checked);
-			Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDayInterval.Text));
-			Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHourInterval.Text));
+			Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDaysPrior.Text));
+			Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHoursPrior.Text));
 			Prefs.UpdateString(PrefName.ApptReminderDayMessage,PIn.String(textDayMsg.Text));
 			Prefs.UpdateString(PrefName.ApptReminderHourMessage,PIn.String(textHourMsg.Text));
 			string sendOrder="";

@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.4.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.7.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11331,9 +11331,34 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.4.4.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_4_7();
+		}
+		
+		private static void To15_4_7() {
+			if(FromVersion<new Version("15.4.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.7.0"));//No translation in convert script.
+				string command="";
+				command="UPDATE preference SET ValueString='0,1,2' WHERE Prefname='ApptReminderSendOrder'";
+				Db.NonQ(command);
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderHourMessage'";
+				string result=Db.GetScalar(command);
+				if(result=="0" || result=="") {//Set default text value for ApptReminderHourMessage
+					string recallText="[nameFL],\r\nYou have an upcoming appointment on [apptDate] at [apptTime] with [practiceName] with [provName].\r\nThanks!";
+					command="UPDATE preference SET ValueString='"+recallText+"' WHERE PrefName='ApptReminderHourMessage'";
+					Db.NonQ(command);
+				}
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderDayMessage'";
+				result=Db.GetScalar(command);
+				if(result=="0" || result=="") {//Set default text value for ApptReminderDayMessage
+					string recallText="[nameFL],\r\nYou have an upcoming appointment on [apptDate] at [apptTime] with [practiceName] with [provName].\r\nThanks!";
+					command="UPDATE preference SET ValueString='"+recallText+"' WHERE PrefName='ApptReminderDayMessage'";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.4.7.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			//To15_4_X();
 		}
-
 
 
 	}
