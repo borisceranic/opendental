@@ -70,7 +70,6 @@ namespace OpenDental{
 		private bool changed;
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
-		private Label label16;
 		private TabPage tabAutomationSettings;
 		private GroupBox groupBox5;
 		private RadioButton radioSendToEmailNoPreferred;
@@ -103,6 +102,7 @@ namespace OpenDental{
 		private GroupBox groupBox9;
 		private Label labelNotSetup;
 		private Label label27;
+		private Label label32;
 		string[] _arrayPriorities;
 
 		///<summary></summary>
@@ -195,7 +195,6 @@ namespace OpenDental{
 			this.label22 = new System.Windows.Forms.Label();
 			this.label21 = new System.Windows.Forms.Label();
 			this.label20 = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
 			this.textHourMsg = new System.Windows.Forms.RichTextBox();
 			this.textDayMsg = new System.Windows.Forms.RichTextBox();
 			this.checkSendAll = new System.Windows.Forms.CheckBox();
@@ -222,6 +221,7 @@ namespace OpenDental{
 			this.dateRunStart = new System.Windows.Forms.DateTimePicker();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
+			this.label32 = new System.Windows.Forms.Label();
 			this.label27 = new System.Windows.Forms.Label();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -725,17 +725,17 @@ namespace OpenDental{
 			// 
 			// tabReminderSetup
 			// 
+			this.tabReminderSetup.Controls.Add(this.label27);
+			this.tabReminderSetup.Controls.Add(this.label32);
 			this.tabReminderSetup.Controls.Add(this.labelNotSetup);
 			this.tabReminderSetup.Controls.Add(this.groupBox9);
 			this.tabReminderSetup.Controls.Add(this.textHourCharCount);
 			this.tabReminderSetup.Controls.Add(this.label28);
 			this.tabReminderSetup.Controls.Add(this.textDayCharCount);
 			this.tabReminderSetup.Controls.Add(this.label24);
-			this.tabReminderSetup.Controls.Add(this.label27);
 			this.tabReminderSetup.Controls.Add(this.label22);
 			this.tabReminderSetup.Controls.Add(this.label21);
 			this.tabReminderSetup.Controls.Add(this.label20);
-			this.tabReminderSetup.Controls.Add(this.label16);
 			this.tabReminderSetup.Controls.Add(this.textHourMsg);
 			this.tabReminderSetup.Controls.Add(this.textDayMsg);
 			this.tabReminderSetup.Controls.Add(this.checkSendAll);
@@ -932,14 +932,6 @@ namespace OpenDental{
 			this.label20.Text = "Enter the number of hours prior to an appointment a reminder should be sent.\r\nA v" +
     "alue of 0 disables this reminder.";
 			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// label16
-			// 
-			this.label16.Location = new System.Drawing.Point(3, 6);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(933, 57);
-			this.label16.TabIndex = 71;
-			this.label16.Text = resources.GetString("label16.Text");
 			// 
 			// textHourMsg
 			// 
@@ -1214,12 +1206,20 @@ namespace OpenDental{
 			this.label18.TabIndex = 4;
 			this.label18.Text = "Start";
 			// 
+			// label32
+			// 
+			this.label32.Location = new System.Drawing.Point(3, 6);
+			this.label32.Name = "label32";
+			this.label32.Size = new System.Drawing.Size(933, 57);
+			this.label32.TabIndex = 91;
+			this.label32.Text = resources.GetString("label32.Text");
+			// 
 			// label27
 			// 
 			this.label27.Location = new System.Drawing.Point(513, 494);
 			this.label27.Name = "label27";
 			this.label27.Size = new System.Drawing.Size(403, 118);
-			this.label27.TabIndex = 78;
+			this.label27.TabIndex = 92;
 			this.label27.Text = resources.GetString("label27.Text");
 			// 
 			// FormRecallSetup
