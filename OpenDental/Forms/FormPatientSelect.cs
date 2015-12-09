@@ -1204,7 +1204,7 @@ namespace OpenDental{
 				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 				checkGuarantors.Checked,checkShowArchived.Checked,
-				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums,InitialPatNum);
 		}));
 		_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((ODThread o) => {
 			_fillGridThread=null;
@@ -1249,6 +1249,12 @@ namespace OpenDental{
 		//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 		//		checkGuarantors.Checked,checkShowArchived.Checked,
 		//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+			if(InitialPatNum!=0 && limit) {
+				//The InitialPatNum will be at the top, so resort the list alphabetically
+				DataView ptDataView=PtDataTable.DefaultView;
+				ptDataView.Sort="LName,FName";
+				PtDataTable=ptDataView.ToTable();
+			}
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;
