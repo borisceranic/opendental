@@ -491,33 +491,56 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
-			command="SELECT Count(*) FROM appointment WHERE PatNum NOT IN(SELECT PatNum FROM patient)";
+			command="SELECT Count(*) FROM appointment WHERE PatNum NOT IN (SELECT PatNum FROM patient)";
 			int count=PIn.Int(Db.GetCount(command));
 			if(isCheck){
 				if(count>0 || verbose){
-					log+=Lans.g("FormDatabaseMaintenance","Appointments found abandoned: ")+count.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Appointments found with invalid patients: ")+count.ToString()+"\r\n";
 				}
 			}
 			else{//Fix is safe because we are not deleting data, we are just attaching abandoned appointments to a dummy patient.
-				long numfixed=0;
-				if(count!=0) {
-					Patient dummyPatient=new Patient();
-					dummyPatient.FName="MISSING";
-					dummyPatient.LName="PATIENT";
-					dummyPatient.AddrNote="Appointments with missing patients were assigned to this patient on "+DateTime.Now.ToShortDateString()+" while doing database maintenance.";
-					dummyPatient.Birthdate=DateTime.MinValue;
-					dummyPatient.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-					dummyPatient.PatStatus=PatientStatus.Archived;
-					dummyPatient.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
-					long dummyPatNum=Patients.Insert(dummyPatient,false);
-					Patient oldDummyPatient=dummyPatient.Copy();
-					dummyPatient.Guarantor=dummyPatNum;
-					Patients.Update(dummyPatient,oldDummyPatient);
-					command="UPDATE appointment SET PatNum="+POut.Long(dummyPatNum)+" WHERE PatNum NOT IN(SELECT PatNum FROM patient)";
-					numfixed=Db.NonQ(command);
+				long patientsAdded=0;
+				if(count!=0){
+					command="SELECT PatNum FROM Appointment WHERE PatNum NOT IN (SELECT PatNum FROM patient)";
+					List<long> patNums=Db.GetListLong(command).Distinct().ToList();
+					if(patNums.Contains(0)){//appointments with no patient.
+						Patient tempPat=new Patient() {
+							FName="MISSING",
+							LName="PATIENT",
+							AddrNote="DBM created this patient and assigned patientless appointments to it on "+DateTime.Now.ToShortDateString(),
+							Birthdate=DateTime.MinValue,
+							BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType),
+							PatStatus=PatientStatus.Inactive,
+							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv)
+						};
+						
+						Patients.Insert(tempPat,false);
+						Patient oldPat=tempPat.Copy();
+						tempPat.Guarantor=tempPat.PatNum;
+						Patients.Update(tempPat,oldPat);//update guarantor
+						command="UPDATE appointment SET PatNum="+POut.Long(tempPat.PatNum)+" WHERE PatNum = 0";
+						Db.NonQ(command);
+						patientsAdded++;
+						patNums.Remove(0);
+					}
+					foreach(long patnum in patNums){//appointments with missing patient
+						Patients.Insert(new Patient() {
+							PatNum=patnum,
+							Guarantor=patnum,
+							FName="MISSING",
+							LName="PATIENT",
+							AddrNote="DBM re-created this patient because an appointment existed for the patient on "+DateTime.Now.ToShortDateString(),
+							Birthdate=DateTime.MinValue,
+							BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType),
+							PatStatus=PatientStatus.Inactive,
+							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv)
+						},true);
+						patientsAdded++;
+					}
 				}
-				if(numfixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Appointments altered due to no patient: ")+count.ToString()+"\r\n";
+				if(count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Appointments fixed with invalid patients: ")+count.ToString()+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Missing patients added: ")+patientsAdded.ToString()+"\r\n";
 				}
 			}
 			return log;
