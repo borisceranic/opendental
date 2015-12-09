@@ -154,7 +154,7 @@ namespace OpenDental {
 			return true;
 		}
 
-			///<summary>Called in two places.  Once from FormOpenDental.PrefsStartup, and also from FormBackups after a restore.</summary>
+		///<summary>Called from FormBackups after a restore.</summary>
 		public static bool CheckProgramVersion() {
 			return CheckProgramVersion(false);
 		}
@@ -317,8 +317,13 @@ namespace OpenDental {
 				DocumentMisc docmisc=DocumentMiscs.GetUpdateFilesZip();
 				if(docmisc!=null) {
 					byte[] rawBytes=Convert.FromBase64String(docmisc.RawBase64);
-					using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
-						unzipped.ExtractAll(folderUpdate);
+					try {
+						using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
+							unzipped.ExtractAll(folderUpdate);
+						}
+					}
+					catch(Exception) {
+						//fail silently
 					}
 				} 
 				//look at the manifest to see if it's the version we need
