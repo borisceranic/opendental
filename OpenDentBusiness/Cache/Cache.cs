@@ -66,6 +66,12 @@ namespace OpenDentBusiness {
 				isAll=true;
 			}
 			DataSet ds=new DataSet();
+			//All Internal OD Tables that are cached go here
+			if(Prefs.IsODHQ()) {
+				if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
+					ds.Tables.Add(JobRoles.RefreshCache());
+				}
+			}
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {
 				ds.Tables.Add(AccountingAutoPays.RefreshCache());
 			}
@@ -156,9 +162,6 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.InsFilingCodes) || isAll){
 				ds.Tables.Add(InsFilingCodes.RefreshCache());
 				ds.Tables.Add(InsFilingCodeSubtypes.RefreshCache());
-			}
-			if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
-				ds.Tables.Add(JobRoles.RefreshCache());
 			}
 			if(itypes.Contains((int)InvalidType.Languages) || isAll) {
 				if(CultureInfo.CurrentCulture.Name!="en-US") {
@@ -288,6 +291,12 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.AllLocal)) {
 				isAll=true;
 			}
+			//All Internal OD Tables that are cached go here
+			if(Prefs.IsODHQ()) {
+				if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
+					ds.Tables.Add(JobRoles.RefreshCache());
+				}
+			}
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {
 				AccountingAutoPays.FillCache(ds.Tables["AccountingAutoPay"]);
 			}
@@ -373,9 +382,6 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.InsFilingCodes) || isAll){
 				InsFilingCodes.FillCache(ds.Tables["InsFilingCode"]);
 				InsFilingCodeSubtypes.FillCache(ds.Tables["InsFilingCodeSubtype"]);
-			}
-			if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
-				JobRoles.FillCache(ds.Tables["JobRole"]);
 			}
 			if(itypes.Contains((int)InvalidType.Languages) || isAll) {
 				Lans.FillCache(ds.Tables["Language"]);
