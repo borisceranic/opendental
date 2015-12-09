@@ -2421,6 +2421,27 @@ namespace OpenDental {
 			}
 			if(_listPaySplits.Count==0) {
 				AddOneSplit();
+				FillMain();
+			}
+			else if(_listPaySplits.Count==1//if one split
+				&& _listPaySplits[0].PayPlanNum!=0//and split is on a payment plan
+				&& _listPaySplits[0].SplitAmt!=_paymentCur.PayAmt)//and amount doesn't match payment
+			{
+				_listPaySplits[0].SplitAmt=_paymentCur.PayAmt;//make amounts match automatically
+				textTotal.Text=textAmount.Text;
+			}
+			else if(_listPaySplits.Count==1//if one split
+				&& _listPaySplits[0].ProcDate!=_paymentCur.PayDate
+				&& _listPaySplits[0].ProcNum==0)//not attached to procedure
+			{
+				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
+					_listPaySplits[0].ProcDate=_paymentCur.PayDate;
+				}
+			}
+			if(_paymentCur.PayAmt!=PIn.Double(textTotal.Text)) {
+				MsgBox.Show(this,"Split totals must equal payment amount.");
+				DialogResult=DialogResult.None;
+				return;
 			}
 			if(_listPaySplits.Count>1) {
 				_paymentCur.IsSplit=true;
