@@ -136,7 +136,11 @@ namespace OpenDentBusiness {
 		///<summary>36- </summary>
 		ClaimPaymentTracking,
 		///<summary>37- Procedure quick charge list for patient accounts.</summary>
-		AccountQuickCharge
+		AccountQuickCharge,
+		///<summary>38- Procedure quick charge list for patient accounts.</summary>
+		InsuranceVerificationStatus,
+		///<summary>39- Procedure quick charge list for patient accounts.</summary>
+		Regions
 	}
 
 	

@@ -74,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.SmsMonthlyLimit    = PIn.Double(row["SmsMonthlyLimit"].ToString());
 				clinic.IsMedicalOnly      = PIn.Bool  (row["IsMedicalOnly"].ToString());
 				clinic.UseBillAddrOnClaims= PIn.Bool  (row["UseBillAddrOnClaims"].ToString());
+				clinic.Region             = PIn.Bool  (row["Region"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -114,7 +115,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -145,7 +146,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (clinic.SmsContractDate)+","
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
-				+    POut.Bool  (clinic.UseBillAddrOnClaims)+")";
+				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
+				+    POut.Bool  (clinic.Region)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -178,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -209,7 +211,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (clinic.SmsContractDate)+","
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
-				+    POut.Bool  (clinic.UseBillAddrOnClaims)+")";
+				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
+				+    POut.Bool  (clinic.Region)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -248,7 +251,8 @@ namespace OpenDentBusiness.Crud{
 				+"SmsContractDate    =  "+POut.DateT (clinic.SmsContractDate)+", "
 				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"', "
 				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+", "
-				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+" "
+				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+", "
+				+"Region             =  "+POut.Bool  (clinic.Region)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -363,6 +367,10 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.UseBillAddrOnClaims != oldClinic.UseBillAddrOnClaims) {
 				if(command!=""){ command+=",";}
 				command+="UseBillAddrOnClaims = "+POut.Bool(clinic.UseBillAddrOnClaims)+"";
+			}
+			if(clinic.Region != oldClinic.Region) {
+				if(command!=""){ command+=",";}
+				command+="Region = "+POut.Bool(clinic.Region)+"";
 			}
 			if(command==""){
 				return false;

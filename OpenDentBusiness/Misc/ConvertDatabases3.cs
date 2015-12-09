@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -11474,6 +11475,174 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}//end United States CDT codes update
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS insverify";
+					Db.NonQ(command);
+					command=@"CREATE TABLE insverify (
+						InsVerifyNum bigint NOT NULL auto_increment PRIMARY KEY,
+						DateLastVerified date NOT NULL DEFAULT '0001-01-01',
+						UserNum bigint NOT NULL,
+						VerifyType tinyint NOT NULL,
+						FKey bigint NOT NULL,
+						DefNum bigint NOT NULL,
+						Note text NOT NULL,
+						INDEX(UserNum),
+						INDEX(FKey),
+						INDEX(DefNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE insverify'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE insverify (
+						InsVerifyNum number(20) NOT NULL,
+						DateLastVerified date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						UserNum number(20) NOT NULL,
+						VerifyType number(3) NOT NULL,
+						FKey number(20) NOT NULL,
+						DefNum number(20) NOT NULL,
+						Note clob,
+						CONSTRAINT insverify_InsVerifyNum PRIMARY KEY (InsVerifyNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverify_UserNum ON insverify (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverify_FKey ON insverify (FKey)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverify_DefNum ON insverify (DefNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS insverifyhist";
+					Db.NonQ(command);
+					command=@"CREATE TABLE insverifyhist (
+						InsVerifyHistNum bigint NOT NULL auto_increment PRIMARY KEY,
+						InsVerifyNum bigint NOT NULL,
+						DateLastVerified date NOT NULL DEFAULT '0001-01-01',
+						UserNum bigint NOT NULL,
+						VerifyType tinyint NOT NULL,
+						FKey bigint NOT NULL,
+						DefNum bigint NOT NULL,
+						Note text NOT NULL,
+						INDEX(InsVerifyNum),
+						INDEX(UserNum),
+						INDEX(FKey),
+						INDEX(DefNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE insverifyhist'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE insverifyhist (
+						InsVerifyHistNum number(20) NOT NULL,
+						InsVerifyNum number(20) NOT NULL,
+						DateLastVerified date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						UserNum number(20) NOT NULL,
+						VerifyType number(3) NOT NULL,
+						FKey number(20) NOT NULL,
+						DefNum number(20) NOT NULL,
+						Note clob,
+						CONSTRAINT insverifyhist_InsVerifyHistNum PRIMARY KEY (InsVerifyHistNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverifyhist_InsVerifyNum ON insverifyhist (InsVerifyNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverifyhist_UserNum ON insverifyhist (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverifyhist_FKey ON insverifyhist (FKey)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insverifyhist_DefNum ON insverifyhist (DefNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD Region tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD Region number(3)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET Region = 0 WHERE Region IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY Region NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyBenefitEligibilityDays','90')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyBenefitEligibilityDays','90')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyPatientEnrollmentDays','30')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyPatientEnrollmentDays','30')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyAppointmentScheduledDays','7')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyAppointmentScheduledDays','7')";
+					Db.NonQ(command);
+				}
+				long unverifiedDefNum=0;
+				//Add 2 new definitions for the Insurance Verification Status definition category.
+				if(DataConnection.DBtype==DatabaseType.MySql) { //38 is DefCat.InsuranceVerificationStatus
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) VALUES (38,'Unverified',0,'')";
+					unverifiedDefNum=Db.NonQ(command,true);
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) VALUES (38,'Verified',1,'')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Default',0,'')";
+					unverifiedDefNum=Db.NonQ(command,true);
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Provider',1,'')";
+					Db.NonQ(command);
+				}
+				string insBenefitEnumValue="1";//VerifyTypes.InsuranceBenefit
+				string patientEnrollmentEnumValue="2";//VerifyTypes.PatientEnrollment
+				command="SELECT * FROM insplan";
+				DataTable dtInsPlans=Db.GetTable(command);
+				for(int i=0;i<dtInsPlans.Rows.Count;i++) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO insverify (DateLastVerified,UserNum,VerifyType,FKey,DefNum) "
+							+"VALUES('0001-01-01',0,"+insBenefitEnumValue+","+dtInsPlans.Rows[i]["PlanNum"]+","+unverifiedDefNum.ToString()+")";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO insverify (InsVerifyNum,DateLastVerified,UserNum,VerifyType,FKey,DefNum) "
+							+"VALUES((SELECT MAX(InsVerifyNum)+1 FROM insverify),"
+							+"'0001-01-01 00:00:00',0,"+insBenefitEnumValue+","+dtInsPlans.Rows[i]["PlanNum"]+","+unverifiedDefNum.ToString()+")";
+						Db.NonQ(command);
+					}
+				}
+				command="SELECT * FROM patplan";
+				DataTable dtPatPlans=Db.GetTable(command);
+				for(int i=0;i<dtPatPlans.Rows.Count;i++) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO insverify (DateLastVerified,UserNum,VerifyType,FKey,DefNum) "
+							+"VALUES('0001-01-01',0,"+patientEnrollmentEnumValue+","+dtPatPlans.Rows[i]["PatPlanNum"]+","+unverifiedDefNum.ToString()+")";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO insverify (InsVerifyNum,DateLastVerified,UserNum,VerifyType,FKey,DefNum) "
+							+"VALUES((SELECT MAX(InsVerifyNum)+1 FROM insverify),"
+							+"'0001-01-01 00:00:00',0,"+patientEnrollmentEnumValue+","+dtPatPlans.Rows[i]["PatPlanNum"]+","+unverifiedDefNum.ToString()+")";
+						Db.NonQ(command);
+					}
+				}
 
 
 

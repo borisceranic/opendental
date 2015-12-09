@@ -293,6 +293,8 @@
     <Compile Include="Crud\InsPlanCrud.cs" />
     <Compile Include="Crud\InsSubCrud.cs" />
     <Compile Include="Crud\InstallmentPlanCrud.cs" />
+    <Compile Include="Crud\InsVerifyCrud.cs" />
+    <Compile Include="Crud\InsVerifyHistCrud.cs" />
     <Compile Include="Crud\InterventionCrud.cs" />
     <Compile Include="Crud\JobControlCrud.cs" />
     <Compile Include="Crud\JobCrud.cs" />
@@ -422,6 +424,8 @@
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
+    <Compile Include="Data Interface\InsVerifies.cs" />
+    <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
@@ -985,6 +989,8 @@
     <Compile Include="TableTypes\ConnectionGroup.cs" />
     <Compile Include="TableTypes\ConnGroupAttach.cs" />
     <Compile Include="TableTypes\ClaimSnapshot.cs" />
+    <Compile Include="TableTypes\InsVerify.cs" />
+    <Compile Include="TableTypes\InsVerifyHist.cs" />
     <Compile Include="TableTypes\TreatPlanAttach.cs" />
     <Compile Include="TableTypes\Ebill.cs" />
     <Compile Include="TableTypes\EmailAutograph.cs" />
