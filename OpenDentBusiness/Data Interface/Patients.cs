@@ -224,11 +224,12 @@ namespace OpenDentBusiness{
 		public static DataTable GetPtDataTable(bool limit,string lname,string fname,string phone,
 			string address,bool hideInactive,string city,string state,string ssn,string patNumStr,string chartnumber,
 			long billingtype,bool guarOnly,bool showArchived,DateTime birthdate,
-			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums,List<long> explicitPatNums=null) 
+			long siteNum,string subscriberId,string email,string country,string regKey,string clinicNums,List<long> explicitPatNums=null,
+			long initialPatNum=0) 
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),limit,lname,fname,phone,address,hideInactive,city,state,ssn,patNumStr,chartnumber,billingtype,
-					guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums,explicitPatNums);
+					guarOnly,showArchived,birthdate,siteNum,subscriberId,email,country,regKey,clinicNums,explicitPatNums,initialPatNum);
 			}
 			string billingsnippet=" ";
 			if(billingtype!=0) {
@@ -430,7 +431,12 @@ namespace OpenDentBusiness{
 			if(PrefC.GetBool(PrefName.DistributorKey)) { //if for OD HQ
 				command+="GROUP BY patient.PatNum ";
 			}
-			command+="ORDER BY patient.LName,patient.FName ";
+			if(initialPatNum!=0 && limit) {
+				command+="ORDER BY patient.PatNum="+POut.Long(initialPatNum)+" DESC,patient.LName,patient.FName ";//Make sure initial patnum is in results
+			}
+			else {
+				command+="ORDER BY patient.LName,patient.FName ";				
+			}
 			if(limit) {
 				command=DbHelper.LimitOrderBy(command,40);
 			}
