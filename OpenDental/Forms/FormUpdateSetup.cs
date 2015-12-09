@@ -450,25 +450,6 @@ namespace OpenDental{
 					return;
 				}
 			}
-			DocumentMisc docmisc=DocumentMiscs.GetUpdateFilesZip();
-			if(docmisc!=null) {
-				byte[] rawBytes=Convert.FromBase64String(docmisc.RawBase64);
-				using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
-					unzipped.ExtractAll(folderUpdate);
-				}
-			}
-			//identify the ideal situation where everything is already in place and no copy is needed.
-			if(Directory.Exists(folderUpdate)) {
-				string filePath=ODFileUtils.CombinePaths(folderUpdate,"Manifest.txt");
-				if(File.Exists(filePath)) {
-					string fileText=File.ReadAllText(filePath);
-					if(fileText==versionCurrent.ToString(3)) {
-						if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"According to the information in UpdateFiles\\Manifest.txt, the UpdateFiles folder is current.  Recopy anyway?")) {
-							return;
-						}
-					}
-				}
-			}
 			Cursor=Cursors.WaitCursor;
 			if(!PrefL.CopyFromHereToUpdateFiles(versionCurrent)) {
 				Cursor=Cursors.Default;
