@@ -1857,6 +1857,7 @@ namespace OpenDental{
 			else {//User did not delete the procedure.
 				_listProcs[e.Row]=proc;//Replace the proc in the mem list with the edited proc.
 			}
+			_listProcs.Sort(ProcedureLogic.CompareProcedures);
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -2053,6 +2054,7 @@ namespace OpenDental{
 			else {
 				proc.AptNum=AptCur.AptNum;
 			}
+			_listProcs.Sort(ProcedureLogic.CompareProcedures);
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -2381,6 +2383,7 @@ namespace OpenDental{
 			//Get from db to remove nulls. Consider initializing dates and strings instead.
 			_listProcs.AddRange(Procedures.GetManyProc(listAddedProcs.Select(x => x.ProcNum).ToList(),false));
 			listQuickAdd.SelectedIndex=-1;
+			_listProcs.Sort(ProcedureLogic.CompareProcedures);
 			FillProcedures();
 			for(int i=0;i<gridProc.Rows.Count;i++) {
 				if(listAddedProcs.Contains((Procedure)gridProc.Rows[i].Tag)) {
