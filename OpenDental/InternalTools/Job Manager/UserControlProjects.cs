@@ -229,10 +229,7 @@ namespace OpenDental {
 					projectNum=_listJobProjectHistory[_listJobProjectHistory.Count-1].JobProjectNum;
 				}
 				FormJobEdit FormJPE=new FormJobEdit(0,projectNum);
-				FormJPE.ShowDialog();
-				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
-					FillGrid();
-				}
+				FormJPE.Show();
 			}
 		}
 
@@ -243,10 +240,7 @@ namespace OpenDental {
 			if(e.Row>=_listJobProjects.Count) {
 				Job cur=_listJobs[e.Row-_listJobProjects.Count];
 				FormJobEdit FormJPE=new FormJobEdit(cur.JobNum);
-				FormJPE.ShowDialog();
-				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
-					FillGrid();
-				}
+				FormJPE.Show();
 			}
 		}
 
@@ -323,10 +317,7 @@ namespace OpenDental {
 			else {
 				Job cur=_listJobs[_clickedIdx-_listJobProjects.Count];
 				FormJobEdit FormJPE=new FormJobEdit(cur.JobNum);
-				FormJPE.ShowDialog();
-				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
-					FillGrid();
-				}
+				FormJPE.Show();
 			}
 		}
 
@@ -386,7 +377,10 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		
+		protected override void OnHandleDestroyed(EventArgs e) {
+			base.OnHandleDestroyed(e);
+			JobHandler.JobFired-=ODEvent_Fired;
+		}
 
 		
 

@@ -165,6 +165,58 @@ namespace OpenDentBusiness {
 			return Db.GetTable(command);
 		}
 
+		///<summary>Returns a data table for the Job Manager control.  This data table will be relevant to the currently logged in user.</summary>
+		public static DataTable GetMyJobsTable(bool showDone) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),showDone);
+			}
+			string command="SELECT job.JobNum,job.Priority,job.DateTimeEntry,job.Expert,job.Owner,job.Status,job.Category"
+				+",job.Title,job.HoursEstimate,mainevent.Owner EventOwner,jobproject.Title ProjectTitle "
+				+"FROM job "
+				+"LEFT JOIN jobproject ON job.ProjectNum=jobproject.JobProjectNum "
+				+"LEFT JOIN jobevent mainevent ON job.JobNum=mainevent.JobNum "
+					+"AND mainevent.DateTimeEntry=(SELECT MIN(DateTimeEntry) FROM jobevent subevent WHERE subevent.JobEventNum=mainevent.JobEventNum) "
+				+"WHERE (job.Owner="+POut.Long(Security.CurUser.UserNum)+" "
+					+"OR job.Expert="+POut.Long(Security.CurUser.UserNum)+") ";
+			if(showDone) {
+				command+="AND job.Status NOT IN("+POut.Int((int)JobStatus.Done)+","+POut.Int((int)JobStatus.Deleted)+") ";
+			}
+			command+="GROUP BY job.JobNum "
+				+"ORDER BY job.Priority,job.DateTimeEntry";
+			DataTable jobInfoTable=Db.GetTable(command);
+			DataTable returnTable=new DataTable();
+			returnTable.TableName="table";
+			returnTable.Columns.Add("JobNum");
+			returnTable.Columns.Add("priority");
+			returnTable.Columns.Add("date");
+			returnTable.Columns.Add("expert");
+			returnTable.Columns.Add("owner");
+			returnTable.Columns.Add("status");
+			returnTable.Columns.Add("category");
+			returnTable.Columns.Add("Title");
+			returnTable.Columns.Add("Project");
+			returnTable.Columns.Add("originator");
+			returnTable.Columns.Add("EstimatedHours");
+			//Sets the primary key for use in tagging. This must be the JobNum since the grid is tagged with the JobNum in the UI.
+			returnTable.PrimaryKey=new DataColumn[] { returnTable.Columns["JobNum"] };
+			DataRow r;
+			foreach(DataRow dRow in jobInfoTable.Rows) {
+				r=returnTable.NewRow();
+				r["JobNum"]=dRow["JobNum"].ToString();
+				r["priority"]=Enum.GetName(typeof(JobPriority),PIn.Int(dRow["Priority"].ToString()));
+				r["date"]=PIn.DateT(dRow["DateTimeEntry"].ToString()).ToShortDateString();
+				r["expert"]=Userods.GetName(PIn.Long(dRow["Expert"].ToString()));
+				r["owner"]=Userods.GetName(PIn.Long(dRow["Owner"].ToString()));
+				r["status"]=Enum.GetName(typeof(JobStatus),PIn.Int(dRow["Status"].ToString()));
+				r["category"]=Enum.GetName(typeof(JobCategory),PIn.Int(dRow["Category"].ToString()));
+				r["Title"]=dRow["Title"].ToString();
+				r["Project"]=dRow["ProjectTitle"].ToString();
+				r["originator"]=Userods.GetName(PIn.Long(dRow["EventOwner"].ToString()));
+				r["EstimatedHours"]=dRow["HoursEstimate"].ToString();
+				returnTable.Rows.Add(r);
+			}
+			return returnTable;
+		}
 
 		public static DataTable GetSummaryForOwner(long ownerNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

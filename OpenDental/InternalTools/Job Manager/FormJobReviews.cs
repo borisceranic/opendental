@@ -72,10 +72,14 @@ namespace OpenDental {
 				InputBox FormIB=new InputBox(Userods.GetName(_jobReviews[gridMain.GetSelectedIndex()].Reviewer));
 				FormIB.setTitle("Log-in to Edit Review");
 				FormIB.textResult.PasswordChar='*';
-				if(FormIB.ShowDialog()==DialogResult.OK
+				FormIB.ShowDialog();
+				if(FormIB.DialogResult==DialogResult.OK
 					&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridMain.GetSelectedIndex()].Reviewer).Password)) 
 				{
 					isReadOnly=false;
+				}
+				else if(FormIB.DialogResult==DialogResult.Cancel) {
+					//Do not show anything here since they simply want to see the read-only version of the review
 				}
 				else {
 					MsgBox.Show(this,"Log-in Failed");

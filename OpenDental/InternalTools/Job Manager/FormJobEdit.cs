@@ -15,11 +15,11 @@ namespace OpenDental {
 		///<summary>The current mode that this Job Edit window is to be displayed in.</summary>
 		private EditMode _editMode;
 		private List<JobNote> _jobNotes;
-		List<JobEvent> _jobEvents;
-		List<JobReview> _jobReviews;
-		List<JobLink> _jobLinks;
+		private List<JobEvent> _jobEvents;
+		private List<JobReview> _jobReviews;
+		private List<JobLink> _jobLinks;
 		private bool _isOverridden=false;
-		private bool _hasChanged=false;//TODO: Implement this for the ODEvent
+		private bool _hasChanged=false;
 
 		///<summary>Creates a new job.</summary>
 		public FormJobEdit():this(0,0) {
@@ -364,6 +364,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
 				Jobs.SetStatus(_job,JobStatus.NeedsApproval,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -382,6 +383,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				_job.Expert=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.NeedsExpertDefinition,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -392,6 +394,7 @@ namespace OpenDental {
 				&& _job.Expert==Security.CurUser.UserNum) 
 			{
 				Jobs.SetStatus(_job,JobStatus.UnderConstruction,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -399,6 +402,7 @@ namespace OpenDental {
 			#region In Progress
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.InProgress,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -414,6 +418,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.QuestionForEngineers,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -429,6 +434,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -438,6 +444,7 @@ namespace OpenDental {
 				&& JobRoles.IsAuthorized(JobRoleType.NotifyCustomer,true)) 
 			{
 				Jobs.SetStatus(_job,JobStatus.Done,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 			}
 			#endregion
@@ -465,6 +472,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Concept,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -475,6 +483,7 @@ namespace OpenDental {
 				&& _job.Expert==Security.CurUser.UserNum) 
 			{
 				Jobs.SetStatus(_job,JobStatus.ReadyToAssign,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -482,6 +491,7 @@ namespace OpenDental {
 			#region Ready For Review
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.OnHold,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -497,6 +507,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.QuestionForManager,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -519,6 +530,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -526,6 +538,7 @@ namespace OpenDental {
 			#region Ready For Review
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.ReadyForReview,_job.Owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 			}
 			#endregion
@@ -540,6 +553,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Documented,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 			}
 			#endregion
@@ -559,6 +573,7 @@ namespace OpenDental {
 				}
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
+				_hasChanged=true;
 				DialogResult=DialogResult.OK;
 				return;
 			}
@@ -575,6 +590,7 @@ namespace OpenDental {
 			}
 			_job.Owner=FormUP.SelectedUserNum;
 			textOwner.Text=Userods.GetName(_job.Owner);
+			_hasChanged=true;
 		}
 
 		private void butExpertPick_Click(object sender,EventArgs e) {
@@ -587,6 +603,7 @@ namespace OpenDental {
 			}
 			_job.Expert=FormUP.SelectedUserNum;
 			textExpert.Text=Userods.GetName(_job.Expert);
+			_hasChanged=true;
 		}
 
 		private void butOverride_Click(object sender,EventArgs e) {
@@ -908,6 +925,9 @@ namespace OpenDental {
 					&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridReview.GetSelectedIndex()].Reviewer).Password)) {
 					isReadOnly=false;
 				}
+				else if(FormIB.DialogResult==DialogResult.Cancel) {
+					//Do not show anything here since they simply want to see the read-only version of the review
+				}
 				else {
 					MsgBox.Show(this,"Log-in Failed");
 				}
@@ -931,9 +951,18 @@ namespace OpenDental {
 				FormJRE.JobReviewCur.IsNew=false;
 				_jobReviews.Add(FormJRE.JobReviewCur);
 				FillGridReviews();
+				_hasChanged=true;
 			}
 		}
 		#endregion
+
+		private void comboCategory_SelectionChangeCommitted(object sender,EventArgs e) {
+			_hasChanged=true;
+		}
+		
+		private void textTitle_KeyDown(object sender,KeyEventArgs e) {
+			_hasChanged=true;
+		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
 			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Deleting this job will delete all JobEvents"
@@ -942,7 +971,7 @@ namespace OpenDental {
 					Jobs.Delete(_job.JobNum);
 					_job=null;
 					DataValid.SetInvalid(InvalidType.Jobs);
-					DialogResult=DialogResult.OK;
+					Close();
 				}
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
@@ -981,28 +1010,27 @@ namespace OpenDental {
 				jobEventCur.Owner=_job.Owner;
 				JobEvents.Insert(jobEventCur);
 			}
-			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.Cancel; //removing new jobs from the DB is taken care of in FormClosing
-		}
-
-		private void FormJobEdit_FormClosing(object sender,FormClosingEventArgs e) {
-			if(DialogResult!=DialogResult.OK) { //to account for when the form is closed using the toolbar buttons.
-				if(_job.IsNew) {
+			if(_job.IsNew) {
 					try {
 						Jobs.Delete(_job.JobNum);
 					}
 					catch(Exception ex) { //unlikely. this would only happen if someone created a job and then immediately attached reviews to it.
 						MessageBox.Show(ex.Message);
-						e.Cancel=true;
+						return;
 					}
 				}
+			Close();
+		}
+
+		private void FormJobEdit_FormClosing(object sender,FormClosingEventArgs e) {
+			if(_hasChanged) {
+				Signalods.SetInvalidNoCache(InvalidType.Jobs);
 			}
-			else {
-				DataValid.SetInvalid(InvalidType.Jobs);
-			}
+			JobHandler.JobFired-=ODEvent_Fired;
 		}
 
 		private void ODEvent_Fired(ODEventArgs e) {
