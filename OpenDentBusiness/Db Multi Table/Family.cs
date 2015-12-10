@@ -29,14 +29,7 @@ namespace OpenDentBusiness
 		///<summary>Gets last, (preferred) first middle</summary>
 		public string GetNameInFamLFI(int myi){
 			//No need to check RemotingRole; no call to db.
-			string retStr="";
-			if(ListPats[myi].Preferred==""){
-				retStr=ListPats[myi].LName+", "+ListPats[myi].FName+" "+ListPats[myi].MiddleI; 
-			}
-			else{
-				retStr=ListPats[myi].LName+", '"+ListPats[myi].Preferred+"' "+ListPats[myi].FName+" "+ListPats[myi].MiddleI;
-			}
-			return retStr;
+			return Patients.GetNameLF(ListPats[myi].LName,ListPats[myi].FName,ListPats[myi].Preferred,ListPats[myi].MiddleI);
 		}
 
 		///<summary>Gets a formatted name from the family list.  If the patient is not in the family list, then it gets that info from the database.</summary>
@@ -65,12 +58,10 @@ namespace OpenDentBusiness
 		public string GetNameInFamFLI(int myi){
 			//No need to check RemotingRole; no call to db.
 			string retStr="";
-			if(ListPats[myi].Preferred==""){
-				retStr=ListPats[myi].FName+" "+ListPats[myi].MiddleI+" "+ListPats[myi].LName; 
+			if(ListPats[myi].Preferred!=""){
+				retStr="'"+ListPats[myi].Preferred+"' ";
 			}
-			else{
-				retStr="'"+ListPats[myi].Preferred+"' "+ListPats[myi].FName+" "+ListPats[myi].MiddleI+" "+ListPats[myi].LName;
-			}
+			retStr+=Patients.GetNameFLnoPref(ListPats[myi].LName,ListPats[myi].FName,ListPats[myi].MiddleI);
 			return retStr;
 		}
 
