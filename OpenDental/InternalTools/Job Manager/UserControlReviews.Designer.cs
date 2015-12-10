@@ -24,7 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
-			this.gridMain = new OpenDental.UI.ODGrid();
+			this.gridReviews = new OpenDental.UI.ODGrid();
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.setSeenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip.SuspendLayout();
@@ -32,21 +32,21 @@
 			// 
 			// gridMain
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.gridReviews.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.ContextMenuStrip = this.contextMenuStrip;
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(4, 5);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(545, 382);
-			this.gridMain.TabIndex = 11;
-			this.gridMain.TabStop = false;
-			this.gridMain.Title = "Reviews";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridReviews.ContextMenuStrip = this.contextMenuStrip;
+			this.gridReviews.HasMultilineHeaders = false;
+			this.gridReviews.HScrollVisible = true;
+			this.gridReviews.Location = new System.Drawing.Point(4, 5);
+			this.gridReviews.Name = "gridMain";
+			this.gridReviews.ScrollValue = 0;
+			this.gridReviews.Size = new System.Drawing.Size(545, 382);
+			this.gridReviews.TabIndex = 11;
+			this.gridReviews.TabStop = false;
+			this.gridReviews.Title = "Reviews";
+			this.gridReviews.TranslationName = null;
+			this.gridReviews.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// contextMenuStrip
 			// 
@@ -66,7 +66,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.gridMain);
+			this.Controls.Add(this.gridReviews);
 			this.MinimumSize = new System.Drawing.Size(450, 290);
 			this.Name = "UserControlReviews";
 			this.Size = new System.Drawing.Size(552, 390);
@@ -78,7 +78,7 @@
 
 		#endregion
 
-		private UI.ODGrid gridMain;
+		private UI.ODGrid gridReviews;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem setSeenToolStripMenuItem;
 

@@ -517,6 +517,7 @@ namespace OpenDental{
 			this.textTitle.Name = "textTitle";
 			this.textTitle.Size = new System.Drawing.Size(183, 20);
 			this.textTitle.TabIndex = 181;
+			this.textTitle.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textTitle_KeyDown);
 			// 
 			// comboCategory
 			// 
@@ -526,6 +527,7 @@ namespace OpenDental{
 			this.comboCategory.Name = "comboCategory";
 			this.comboCategory.Size = new System.Drawing.Size(183, 21);
 			this.comboCategory.TabIndex = 178;
+			this.comboCategory.SelectionChangeCommitted += new System.EventHandler(this.comboCategory_SelectionChangeCommitted);
 			// 
 			// comboPriority
 			// 

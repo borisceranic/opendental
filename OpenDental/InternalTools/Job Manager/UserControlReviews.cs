@@ -22,28 +22,28 @@ namespace OpenDental {
 			if(Security.CurUser==null) {
 				return;
 			}
-			FillGrid();
+			FillGridReviews();
 		}
 
-		private void FillGrid() {
+		private void FillGridReviews() {
 			long selectedReviewNum=0;
-			if(gridMain.GetSelectedIndex()!=-1) {
-				selectedReviewNum=(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag;
+			if(gridReviews.GetSelectedIndex()!=-1) {
+				selectedReviewNum=(long)gridReviews.Rows[gridReviews.GetSelectedIndex()].Tag;
 			}
 			_table=JobReviews.GetOutstandingForUser(Security.CurUser.UserNum);
-			gridMain.BeginUpdate();
-			gridMain.Columns.Clear();
+			gridReviews.BeginUpdate();
+			gridReviews.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("Owner",55);
-			gridMain.Columns.Add(col);
+			gridReviews.Columns.Add(col);
 			col=new ODGridColumn("Date",70);
-			gridMain.Columns.Add(col);
+			gridReviews.Columns.Add(col);
 			col=new ODGridColumn("Status",75);
-			gridMain.Columns.Add(col);
+			gridReviews.Columns.Add(col);
 			col=new ODGridColumn("Job Title",115);
-			gridMain.Columns.Add(col);
+			gridReviews.Columns.Add(col);
 			col=new ODGridColumn("Description",500);
-			gridMain.Columns.Add(col);
-			gridMain.Rows.Clear();
+			gridReviews.Columns.Add(col);
+			gridReviews.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_table.Rows.Count;i++) {
 				row=new ODGridRow();
@@ -53,12 +53,12 @@ namespace OpenDental {
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());
 				row.Cells.Add(_table.Rows[i]["Description"].ToString());
 				row.Tag=long.Parse(_table.Rows[i]["JobReviewNum"].ToString());
-				gridMain.Rows.Add(row);
+				gridReviews.Rows.Add(row);
 			}
-			gridMain.EndUpdate();
-			for(int i=0;i<gridMain.Rows.Count;i++) {
-				if((long)gridMain.Rows[i].Tag==selectedReviewNum) {
-					gridMain.SetSelected(i,true);
+			gridReviews.EndUpdate();
+			for(int i=0;i<gridReviews.Rows.Count;i++) {
+				if((long)gridReviews.Rows[i].Tag==selectedReviewNum) {
+					gridReviews.SetSelected(i,true);
 				}
 			}
 		}
@@ -68,22 +68,24 @@ namespace OpenDental {
 			if(e.Name!="Job Manager" || e.Tag==null || e.Tag.GetType()!=typeof(string)) {
 				return;
 			}
-			FillGrid();
+			FillGridReviews();
 		}
 
 		private void setSeenToolStripMenuItem_Click(object sender,EventArgs e) {
-			JobReviews.SetSeen(PIn.Long(_table.Rows[gridMain.GetSelectedIndex()]["JobReviewNum"].ToString()));
+			JobReviews.SetSeen(PIn.Long(_table.Rows[gridReviews.GetSelectedIndex()]["JobReviewNum"].ToString()));
 			DataValid.SetInvalid(InvalidType.Jobs);
-			FillGrid();
+			FillGridReviews();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) { //open FormJobEdit
 			long jobNum=PIn.Long(_table.Rows[e.Row]["JobNum"].ToString()); //every job must have a jobNum associated with it, so no need for try-catch.
 			FormJobEdit FormJE=new FormJobEdit(jobNum);
-			FormJE.ShowDialog();
-			if(FormJE.DialogResult==DialogResult.OK) {
-				FillGrid();
-			}
+			FormJE.Show();
+		}
+
+		protected override void OnHandleDestroyed(EventArgs e) {
+			base.OnHandleDestroyed(e);
+			JobHandler.JobFired-=ODEvent_Fired;
 		}
 
 	}

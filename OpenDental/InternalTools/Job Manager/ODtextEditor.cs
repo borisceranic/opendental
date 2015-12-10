@@ -19,6 +19,10 @@ namespace OpenDental {
 	public partial class OdtextEditor:UserControl {
 		private bool _hasSaveButton;
 		private bool _isReadOnly;
+		///<summary>Used to set the button color back after hovering</summary>
+		private Color _backColor;
+		///<summary>Used when highlighting.</summary>
+		private Color _highlightColor;
 		///<summary></summary>
 		[Category("Appearance"),Description("Toggles whether the control contains a save button or not.")]
 		public bool HasSaveButton {
@@ -154,12 +158,13 @@ namespace OpenDental {
 
 		private void HoverColorEnter(object sender,EventArgs e) {
 			System.Windows.Forms.Button btn=(System.Windows.Forms.Button)sender;
+			_backColor=btn.BackColor;
 			btn.BackColor=Color.PaleTurquoise;
 		}
 
 		private void HoverColorLeave(object sender,EventArgs e) {
 			System.Windows.Forms.Button btn=(System.Windows.Forms.Button)sender;
-			btn.BackColor=Color.Transparent;
+			btn.BackColor=_backColor;
 		}
 
 		private void butCut_Click(object sender,EventArgs e) {
@@ -247,22 +252,18 @@ namespace OpenDental {
 		}
 
 		private void butHighlight_Click(object sender,EventArgs e) {
-			textDescription.SelectionBackColor=butHighlight.ForeColor;
+			textDescription.SelectionBackColor=_highlightColor;
 		}
 
 		private void butHighlightSelect_Click(object sender,EventArgs e) {
 			colorDialog1.Color=butColor.ForeColor;
 			colorDialog1.ShowDialog();
-			butHighlight.ForeColor=colorDialog1.Color;
+			butHighlight.BackColor=colorDialog1.Color;
+			_highlightColor=colorDialog1.Color;
 		}
 
 		///<summary></summary>
 		private void butSave_Click(object sender,EventArgs e) {
-			OnSaveClick();
-		}
-
-		///<summary>Implement this if you want the save button to perform an action</summary>
-		protected void OnSaveClick() {
 			EventArgs gArgs=new EventArgs();
 			if(SaveClick!=null) {
 				SaveClick(this,gArgs);
@@ -335,13 +336,6 @@ namespace OpenDental {
 
 		///<summary></summary>
 		protected override void OnKeyDown(KeyEventArgs e) {
-			if(e.KeyCode==Keys.Q && e.Modifiers==Keys.Control) {
-				e.Handled=true;
-				return;
-			}
-			if(e.KeyCode==Keys.S && e.Modifiers==Keys.Control) {
-				OnSaveClick();
-			}
 			string textRtf=textDescription.Rtf;
 			base.OnKeyUp(e);
 			textDescription.Rtf=textRtf;

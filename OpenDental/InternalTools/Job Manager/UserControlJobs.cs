@@ -190,27 +190,19 @@ namespace OpenDental {
 		private void butAdd_Click(object sender,EventArgs e) {
 			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
 				FormJobEdit FormJE=new FormJobEdit();
-				FormJE.ShowDialog();
-				if(FormJE.DialogResult==DialogResult.OK) {
-					_jobList.Add(FormJE.JobCur);
-					FillGrid();
-				}
+				FormJE.Show();
 			}
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) { //open FormJobEdit
 			long jobNum=_jobList[e.Row].JobNum; //every job must have a jobNum associated with it, so no need for try-catch.
 			FormJobEdit FormJE=new FormJobEdit(jobNum);
-			FormJE.ShowDialog();
-			if(FormJE.DialogResult==DialogResult.OK) {
-				if(FormJE.JobCur==null) {
-					_jobList.RemoveAt(e.Row);
-				}
-				else {
-					_jobList[e.Row]=FormJE.JobCur;
-				}
-				FillGrid();
-			}
+			FormJE.Show();
+		}
+
+		protected override void OnHandleDestroyed(EventArgs e) {
+			base.OnHandleDestroyed(e);
+			JobHandler.JobFired-=ODEvent_Fired;
 		}
 	}
 }
