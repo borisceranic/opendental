@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using CodeBase;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	public class DatabaseMaintenance {
