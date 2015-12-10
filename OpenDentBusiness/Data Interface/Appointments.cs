@@ -217,6 +217,19 @@ namespace OpenDentBusiness{
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
 
+		///<summary>Gets a list of all future appointments which are either sched or ASAP for all patients.  Ordered by dateTime</summary>
+		public static List<Appointment> GetFutureSchedApts() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM appointment "
+				+"WHERE AptDateTime > "+DbHelper.Now()+" "
+				+"AND (AptStatus = "+(int)ApptStatus.Scheduled+" "
+				+"OR AptStatus = "+(int)ApptStatus.ASAP+") "
+				+"ORDER BY AptDateTime";
+			return Crud.AppointmentCrud.SelectMany(command);
+		}
+
 		public static List<Appointment> GetChangedSince(DateTime changedSince,DateTime excludeOlderThan) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),changedSince,excludeOlderThan);

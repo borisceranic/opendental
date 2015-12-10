@@ -89,6 +89,16 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Inserts appointment reminders for all future appointments.  
+		///Used when automated appt reminder settings are changed so we can make sure all future appointments have appropriate reminders.</summary>
+		public static void InsertForFutureAppts() {
+			List<Appointment> listFutureAppts=Appointments.GetFutureSchedApts();
+			foreach(Appointment appt in listFutureAppts) {
+				DeleteForAppt(appt.AptNum);
+				InsertForAppt(appt);
+			}
+		}
+
 		///<summary>First deletes then re-inserts ApptComm items for an appointment that has been moved.</summary>
 		public static void UpdateForAppt(Appointment appt) {
 			DeleteForAppt(appt.AptNum);

@@ -103,7 +103,9 @@ namespace OpenDental{
 		private GroupBox groupBox9;
 		private Label labelNotSetup;
 		private Label label27;
-		string[] _arrayPriorities;
+		private string[] _arrayPriorities;
+		private int _daysPrior;
+		private int _hoursPrior;
 
 		///<summary></summary>
 		public FormRecallSetup(){
@@ -1659,9 +1661,11 @@ namespace OpenDental{
 		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
-			textDaysPrior.Text=PrefC.GetString(PrefName.ApptReminderDayInterval);
+			_daysPrior=PIn.Int(PrefC.GetString(PrefName.ApptReminderDayInterval));
+			_hoursPrior=PIn.Int(PrefC.GetString(PrefName.ApptReminderHourInterval));
+			textDaysPrior.Text=_daysPrior.ToString();
 			textDayMsg.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
-			textHoursPrior.Text=PrefC.GetString(PrefName.ApptReminderHourInterval);
+			textHoursPrior.Text=_hoursPrior.ToString();
 			textHourMsg.Text=PrefC.GetString(PrefName.ApptReminderHourMessage);
 			checkSendAll.Checked=PrefC.GetBool(PrefName.ApptReminderSendAll);
 			string prefPriority=PrefC.GetString(PrefName.ApptReminderSendOrder);
@@ -2070,8 +2074,12 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.RecallUseEmailIfHasEmailAddress,false);
 			}
 			Prefs.UpdateBool(PrefName.ApptReminderSendAll,checkSendAll.Checked);
-			Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDaysPrior.Text));
-			Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHoursPrior.Text));
+			if(_daysPrior!=PIn.Int(textDaysPrior.Text) || _hoursPrior!=PIn.Int(textHoursPrior.Text)) {
+				Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDaysPrior.Text));
+				Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHoursPrior.Text));
+				//Update ApptComms with new reminder entries.
+				ApptComms.InsertForFutureAppts();
+			}
 			Prefs.UpdateString(PrefName.ApptReminderDayMessage,PIn.String(textDayMsg.Text));
 			Prefs.UpdateString(PrefName.ApptReminderHourMessage,PIn.String(textHourMsg.Text));
 			string sendOrder="";
