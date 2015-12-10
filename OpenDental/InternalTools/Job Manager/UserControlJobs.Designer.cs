@@ -45,8 +45,8 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.timerSearch = new System.Windows.Forms.Timer(this.components);
-			this.butAdd = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butAdd = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -242,7 +242,7 @@
 			this.groupBox2.Controls.Add(this.textExpert);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(615, 35);
+			this.groupBox2.Location = new System.Drawing.Point(715, 35);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(184, 240);
 			this.groupBox2.TabIndex = 13;
@@ -254,6 +254,23 @@
 			this.timerSearch.Interval = 500;
 			this.timerSearch.Tick += new System.EventHandler(this.timerSearch_Tick);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(4, 5);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(705, 604);
+			this.gridMain.TabIndex = 11;
+			this.gridMain.TabStop = false;
+			this.gridMain.Title = "Jobs";
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -262,29 +279,12 @@
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(615, 5);
+			this.butAdd.Location = new System.Drawing.Point(715, 5);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 24);
 			this.butAdd.TabIndex = 15;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
-			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(4, 5);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(605, 604);
-			this.gridMain.TabIndex = 11;
-			this.gridMain.TabStop = false;
-			this.gridMain.Title = "Jobs";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// UserControlJobs
 			// 
@@ -295,7 +295,7 @@
 			this.Controls.Add(this.gridMain);
 			this.MinimumSize = new System.Drawing.Size(450, 290);
 			this.Name = "UserControlJobs";
-			this.Size = new System.Drawing.Size(802, 624);
+			this.Size = new System.Drawing.Size(902, 624);
 			this.Load += new System.EventHandler(this.UserControlJob_Load);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();

@@ -12,7 +12,8 @@ namespace OpenDental {
 		public FormJobContainer(Control control,string title) {
 			InitializeComponent();
 			this.Controls.Add(control);
-			control.SetBounds(0,0,this.ClientSize.Width,this.ClientSize.Height);//Resizes the control to the size of the window.
+			this.Width=control.Width+10;
+			this.Height=control.Height+10;
 			control.Anchor=(AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right);//Allows resizing the control in this window.
 			this.Text=title;
 		}
