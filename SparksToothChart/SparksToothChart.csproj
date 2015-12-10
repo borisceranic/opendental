@@ -100,6 +100,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Microsoft.DirectX.Direct3DX.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualC" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
