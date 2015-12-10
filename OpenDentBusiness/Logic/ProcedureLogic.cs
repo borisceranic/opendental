@@ -101,6 +101,55 @@ namespace OpenDentBusiness {
 		}
 
 
+		///<summary>Compares two procedures and returns the order they should appear based on status, priority, toothrange, toothnum, then proccode.  
+		///Uses the same logic as the other CompareProcedures but takes Procedure objects instead of DataRows.  
+		///Only used for the Appointment Edit window currently.</summary>
+		public static int CompareProcedures(Procedure x,Procedure y) {
+			//first by status
+			if(x.ProcStatus!=y.ProcStatus) {
+				//Cn,TP,R,EO,C,EC,D
+				//EC procs will draw on top of C procs of same date in the 3D tooth chart, 
+				//but this is not a problem since C procs should always have a later date than EC procs.
+				//EC must come after C so that group notes will come after their procedures in Progress Notes.
+				int xIdx, yIdx;
+				List<ProcStat> sortOrder = new List<ProcStat>
+				{//The order of statuses in this list is very important and determines the sort order for procedures.
+					ProcStat.TPi,
+					ProcStat.Cn,
+					ProcStat.TP,
+					ProcStat.R,
+					ProcStat.EO,
+					ProcStat.C,
+					ProcStat.EC,
+					ProcStat.D
+				};
+				xIdx=sortOrder.IndexOf(x.ProcStatus);
+				yIdx=sortOrder.IndexOf(y.ProcStatus);
+				return xIdx.CompareTo(yIdx);
+			}
+			//by priority
+			if(x.Priority!=y.Priority) {//if priorities are different
+					if(x.Priority==0) {
+						return 1;//x is greater than y. Priorities always come first.
+					}
+					if(y.Priority==0) {
+						return -1;//x is less than y. Priorities always come first.
+					}
+					return DefC.GetOrder(DefCat.TxPriorities,x.Priority).CompareTo(DefC.GetOrder(DefCat.TxPriorities,y.Priority));
+			}
+			//priorities are the same, so sort by toothrange
+			if(x.ToothRange!=y.ToothRange) {
+				//empty toothranges come before filled toothrange values
+				return x.ToothRange.CompareTo(y.ToothRange);
+			}
+			//toothranges are the same (usually empty), so compare toothnumbers
+			if(x.ToothNum!=y.ToothNum) {
+				//this also puts invalid or empty toothnumbers before the others.
+				return Tooth.ToInt(x.ToothNum).CompareTo(Tooth.ToInt(y.ToothNum));
+			}
+			//priority and toothnums are the same, so sort by proccode.
+			return ProcedureCodes.GetProcCode(x.CodeNum).ProcCode.CompareTo(ProcedureCodes.GetProcCode(y.CodeNum).ProcCode);
+		}
 
 
 

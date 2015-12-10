@@ -337,6 +337,7 @@ namespace OpenDentBusiness {
 				result[i].SigIsTopaz=PIn.Bool(table.Rows[0]["SigIsTopaz"].ToString());
 				result[i].Signature =PIn.String(table.Rows[0]["Signature"].ToString());
 			}
+			result.Sort(ProcedureLogic.CompareProcedures);
 			return result;
 		}
 
