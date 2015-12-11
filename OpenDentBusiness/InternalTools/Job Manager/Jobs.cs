@@ -166,9 +166,9 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Returns a data table for the Job Manager control.  This data table will be relevant to the currently logged in user.</summary>
-		public static DataTable GetMyJobsTable(bool showDone) {
+		public static DataTable GetMyJobsTable(bool showCreated,bool showCompleted) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),showDone);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),showCreated,showCompleted);
 			}
 			string command="SELECT job.JobNum,job.Priority,job.DateTimeEntry,job.Expert,job.Owner,job.Status,job.Category"
 				+",job.Title,job.HoursEstimate,mainevent.Owner EventOwner,jobproject.Title ProjectTitle "
@@ -177,8 +177,12 @@ namespace OpenDentBusiness {
 				+"LEFT JOIN jobevent mainevent ON job.JobNum=mainevent.JobNum "
 					+"AND mainevent.DateTimeEntry=(SELECT MIN(DateTimeEntry) FROM jobevent subevent WHERE subevent.JobEventNum=mainevent.JobEventNum) "
 				+"WHERE (job.Owner="+POut.Long(Security.CurUser.UserNum)+" "
-					+"OR job.Expert="+POut.Long(Security.CurUser.UserNum)+") ";
-			if(showDone) {
+					+"OR job.Expert="+POut.Long(Security.CurUser.UserNum);
+			if(showCreated) {
+				command+=" OR mainevent.Owner="+POut.Long(Security.CurUser.UserNum);
+			}
+			command+=") ";
+			if(showCompleted) {
 				command+="AND job.Status NOT IN("+POut.Int((int)JobStatus.Done)+","+POut.Int((int)JobStatus.Deleted)+") ";
 			}
 			command+="GROUP BY job.JobNum "

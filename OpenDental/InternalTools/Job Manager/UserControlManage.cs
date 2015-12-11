@@ -121,7 +121,7 @@ namespace OpenDental {
 
 		#region MyJobs Tab
 		private void FillGridMyJobs() {
-			_tableMyJobs=Jobs.GetMyJobsTable(true);
+			_tableMyJobs=Jobs.GetMyJobsTable(checkShowCreated.Checked,checkShowCompleted.Checked);
 			gridMyJobs.BeginUpdate();
 			gridMyJobs.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("JobNum",50,GridSortingStrategy.AmountParse);
@@ -173,6 +173,10 @@ namespace OpenDental {
 			labelMyJobsCreator.Text=originator;
 			labelMyJobsEstHours.Text=estHours;
 			FillGridLink();
+		}
+
+		private void butRefreshMyJobs_Click(object sender,EventArgs e) {
+			FillGridMyJobs();
 		}
 
 		#region Reviews

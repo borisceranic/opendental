@@ -49,6 +49,10 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPageMyJobs = new System.Windows.Forms.TabPage();
+			this.butRefreshMyJobs = new OpenDental.UI.Button();
+			this.checkShowCreated = new System.Windows.Forms.CheckBox();
+			this.checkShowCompleted = new System.Windows.Forms.CheckBox();
+			this.butAddJob = new OpenDental.UI.Button();
 			this.gridReviews = new OpenDental.UI.ODGrid();
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.setSeenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,10 +64,9 @@
 			this.label17 = new System.Windows.Forms.Label();
 			this.gridMyJobs = new OpenDental.UI.ODGrid();
 			this.tabPageManager = new System.Windows.Forms.TabPage();
+			this.butAddJobMain = new OpenDental.UI.Button();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
-			this.butAddJob = new OpenDental.UI.Button();
-			this.butAddJobMain = new OpenDental.UI.Button();
 			this.groupDetails.SuspendLayout();
 			this.groupSummary.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -325,6 +328,9 @@
 			// tabPageMyJobs
 			// 
 			this.tabPageMyJobs.BackColor = System.Drawing.SystemColors.Control;
+			this.tabPageMyJobs.Controls.Add(this.butRefreshMyJobs);
+			this.tabPageMyJobs.Controls.Add(this.checkShowCreated);
+			this.tabPageMyJobs.Controls.Add(this.checkShowCompleted);
 			this.tabPageMyJobs.Controls.Add(this.butAddJob);
 			this.tabPageMyJobs.Controls.Add(this.gridReviews);
 			this.tabPageMyJobs.Controls.Add(this.gridLinks);
@@ -337,13 +343,63 @@
 			this.tabPageMyJobs.TabIndex = 1;
 			this.tabPageMyJobs.Text = "My Jobs";
 			// 
+			// butRefreshMyJobs
+			// 
+			this.butRefreshMyJobs.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefreshMyJobs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRefreshMyJobs.Autosize = true;
+			this.butRefreshMyJobs.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefreshMyJobs.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefreshMyJobs.CornerRadius = 4F;
+			this.butRefreshMyJobs.Location = new System.Drawing.Point(606, 45);
+			this.butRefreshMyJobs.Name = "butRefreshMyJobs";
+			this.butRefreshMyJobs.Size = new System.Drawing.Size(75, 24);
+			this.butRefreshMyJobs.TabIndex = 160;
+			this.butRefreshMyJobs.Text = "Refresh";
+			this.butRefreshMyJobs.Click += new System.EventHandler(this.butRefreshMyJobs_Click);
+			// 
+			// checkShowCreated
+			// 
+			this.checkShowCreated.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkShowCreated.Location = new System.Drawing.Point(606, 3);
+			this.checkShowCreated.Name = "checkShowCreated";
+			this.checkShowCreated.Size = new System.Drawing.Size(99, 23);
+			this.checkShowCreated.TabIndex = 159;
+			this.checkShowCreated.Text = "Show Created";
+			this.checkShowCreated.UseVisualStyleBackColor = true;
+			// 
+			// checkShowCompleted
+			// 
+			this.checkShowCompleted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkShowCompleted.Location = new System.Drawing.Point(606, 23);
+			this.checkShowCompleted.Name = "checkShowCompleted";
+			this.checkShowCompleted.Size = new System.Drawing.Size(108, 23);
+			this.checkShowCompleted.TabIndex = 158;
+			this.checkShowCompleted.Text = "Show Completed";
+			this.checkShowCompleted.UseVisualStyleBackColor = true;
+			// 
+			// butAddJob
+			// 
+			this.butAddJob.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddJob.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAddJob.Autosize = true;
+			this.butAddJob.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddJob.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddJob.CornerRadius = 4F;
+			this.butAddJob.Location = new System.Drawing.Point(602, 681);
+			this.butAddJob.Name = "butAddJob";
+			this.butAddJob.Size = new System.Drawing.Size(75, 24);
+			this.butAddJob.TabIndex = 157;
+			this.butAddJob.Text = "Add Job";
+			this.butAddJob.Click += new System.EventHandler(this.butAddJob_Click);
+			// 
 			// gridReviews
 			// 
 			this.gridReviews.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridReviews.ContextMenuStrip = this.contextMenuStrip;
 			this.gridReviews.HasMultilineHeaders = false;
 			this.gridReviews.HScrollVisible = false;
-			this.gridReviews.Location = new System.Drawing.Point(599, 36);
+			this.gridReviews.Location = new System.Drawing.Point(602, 114);
 			this.gridReviews.Name = "gridReviews";
 			this.gridReviews.ScrollValue = 0;
 			this.gridReviews.Size = new System.Drawing.Size(377, 230);
@@ -372,7 +428,7 @@
 			this.gridLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridLinks.HasMultilineHeaders = false;
 			this.gridLinks.HScrollVisible = false;
-			this.gridLinks.Location = new System.Drawing.Point(599, 272);
+			this.gridLinks.Location = new System.Drawing.Point(602, 350);
 			this.gridLinks.Name = "gridLinks";
 			this.gridLinks.ScrollValue = 0;
 			this.gridLinks.Size = new System.Drawing.Size(377, 199);
@@ -389,7 +445,7 @@
 			this.groupJobDetails.Controls.Add(this.labelMyJobsCreator);
 			this.groupJobDetails.Controls.Add(this.label16);
 			this.groupJobDetails.Controls.Add(this.label17);
-			this.groupJobDetails.Location = new System.Drawing.Point(599, 477);
+			this.groupJobDetails.Location = new System.Drawing.Point(602, 555);
 			this.groupJobDetails.Name = "groupJobDetails";
 			this.groupJobDetails.Size = new System.Drawing.Size(378, 81);
 			this.groupJobDetails.TabIndex = 15;
@@ -470,6 +526,20 @@
 			this.tabPageManager.TabIndex = 0;
 			this.tabPageManager.Text = "Overview";
 			// 
+			// butAddJobMain
+			// 
+			this.butAddJobMain.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddJobMain.Autosize = true;
+			this.butAddJobMain.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddJobMain.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddJobMain.CornerRadius = 4F;
+			this.butAddJobMain.Location = new System.Drawing.Point(678, 20);
+			this.butAddJobMain.Name = "butAddJobMain";
+			this.butAddJobMain.Size = new System.Drawing.Size(75, 24);
+			this.butAddJobMain.TabIndex = 158;
+			this.butAddJobMain.Text = "Add Job";
+			this.butAddJobMain.Click += new System.EventHandler(this.butAddJob_Click);
+			// 
 			// butRefresh
 			// 
 			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -503,35 +573,6 @@
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
-			// 
-			// butAddJob
-			// 
-			this.butAddJob.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddJob.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAddJob.Autosize = true;
-			this.butAddJob.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAddJob.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAddJob.CornerRadius = 4F;
-			this.butAddJob.Location = new System.Drawing.Point(602, 6);
-			this.butAddJob.Name = "butAddJob";
-			this.butAddJob.Size = new System.Drawing.Size(75, 24);
-			this.butAddJob.TabIndex = 157;
-			this.butAddJob.Text = "Add Job";
-			this.butAddJob.Click += new System.EventHandler(this.butAddJob_Click);
-			// 
-			// butAddJobMain
-			// 
-			this.butAddJobMain.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddJobMain.Autosize = true;
-			this.butAddJobMain.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAddJobMain.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAddJobMain.CornerRadius = 4F;
-			this.butAddJobMain.Location = new System.Drawing.Point(678, 20);
-			this.butAddJobMain.Name = "butAddJobMain";
-			this.butAddJobMain.Size = new System.Drawing.Size(75, 24);
-			this.butAddJobMain.TabIndex = 158;
-			this.butAddJobMain.Text = "Add Job";
-			this.butAddJobMain.Click += new System.EventHandler(this.butAddJob_Click);
 			// 
 			// UserControlManage
 			// 
@@ -596,6 +637,9 @@
 		private System.Windows.Forms.ToolStripMenuItem setSeenToolStripMenuItem;
 		private UI.Button butAddJob;
 		private UI.Button butAddJobMain;
+		private System.Windows.Forms.CheckBox checkShowCompleted;
+		private System.Windows.Forms.CheckBox checkShowCreated;
+		private UI.Button butRefreshMyJobs;
 
 
 	}
