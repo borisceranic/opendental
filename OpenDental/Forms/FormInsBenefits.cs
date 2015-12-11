@@ -1257,7 +1257,7 @@ namespace OpenDental{
 					textDeductibleFam.Text=ben.MonetaryAmt.ToString("n");
 				}
 				//Flo
-				else if(ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D1208"
+				else if((ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D1208" || ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D1206")
 					&& ben.BenefitType==InsBenefitType.Limitations
 					//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
 					&& ben.MonetaryAmt==-1
@@ -2016,6 +2016,14 @@ namespace OpenDental{
 				}
 				else{//USA
 					ben.CodeNum=ProcedureCodes.GetCodeNum("D1208");
+					Benefit benFlo=new Benefit();//Insert a benefit for D1206 for offices that use D1206 instead of D1208.
+					benFlo.CodeNum=ProcedureCodes.GetCodeNum("D1206");
+					benFlo.BenefitType=InsBenefitType.Limitations;
+					benFlo.CovCatNum=0;
+					benFlo.PlanNum=PlanNum;
+					benFlo.QuantityQualifier=BenefitQuantity.AgeLimit;
+					benFlo.Quantity=PIn.Byte(textFlo.Text);
+					benefitListAll.Add(benFlo);
 				}
 				ben.BenefitType=InsBenefitType.Limitations;
 				ben.CovCatNum=0;
