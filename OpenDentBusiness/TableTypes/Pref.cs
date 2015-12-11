@@ -636,6 +636,10 @@ namespace OpenDentBusiness {
 		WaitingRoomAlertTime,
 		///<summary>Boolean.  0 by default.  When enabled, the waiting room will filter itself by the selected appointment view.  0, normal filtering, will show all patients waiting for the entire practice (or entire clinic when using clinics).</summary>
 		WaitingRoomFilterByView,
+		///<summary>Used by OD HQ.  Not added to db convert script.  No UI to change this value.
+		///Determines how often in milliseconds that WebCamOD should capture and send a picture to the phone table.
+		///If this value is manually changed, all Web Cams need to be restarted for the change to take effect.</summary>
+		WebCamFrequencyMS,
 		///<summary>Only used for sheet synch.  See Mobile... for URL for mobile synch.</summary>
 		WebHostSynchServerURL,
 		///<summary>Stored as an int value from the WebSchedAutomaticSend enum.</summary>

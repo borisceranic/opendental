@@ -55,7 +55,9 @@ namespace WebCamOD {
 				}
 			}
 			intPtrVideo=IntPtr.Zero;
+			timerPhoneWebCam.Interval=PrefC.GetInt(PrefName.WebCamFrequencyMS);
 			timerPhoneWebCam.Enabled=true;
+			timerPhoneWebCam_Tick(this,new EventArgs());//Force an initial picture
 			timerScreenShots.Enabled=true;
 			timerScreenShots_Tick(this,new EventArgs());//force an initial screenshot
 		}
