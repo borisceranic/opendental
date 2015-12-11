@@ -365,7 +365,7 @@ namespace OpenDental {
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
 				Jobs.SetStatus(_job,JobStatus.NeedsApproval,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -384,7 +384,7 @@ namespace OpenDental {
 				_job.Expert=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.NeedsExpertDefinition,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -395,7 +395,7 @@ namespace OpenDental {
 			{
 				Jobs.SetStatus(_job,JobStatus.UnderConstruction,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -403,7 +403,7 @@ namespace OpenDental {
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.InProgress,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -419,7 +419,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.QuestionForEngineers,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -435,7 +435,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -445,7 +445,7 @@ namespace OpenDental {
 			{
 				Jobs.SetStatus(_job,JobStatus.Done,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 			}
 			#endregion
 			#region Unlock Job
@@ -473,7 +473,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Concept,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -484,7 +484,7 @@ namespace OpenDental {
 			{
 				Jobs.SetStatus(_job,JobStatus.ReadyToAssign,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -492,7 +492,7 @@ namespace OpenDental {
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.OnHold,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -508,7 +508,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.QuestionForManager,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -531,7 +531,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
@@ -539,7 +539,7 @@ namespace OpenDental {
 			else if(_editMode==EditMode.Engineer) {
 				Jobs.SetStatus(_job,JobStatus.ReadyForReview,_job.Owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 			}
 			#endregion
 			#region Documented
@@ -554,7 +554,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.Documented,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 			}
 			#endregion
 		}
@@ -574,7 +574,7 @@ namespace OpenDental {
 				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
 				_hasChanged=true;
-				DialogResult=DialogResult.OK;
+				Close();
 				return;
 			}
 			#endregion
