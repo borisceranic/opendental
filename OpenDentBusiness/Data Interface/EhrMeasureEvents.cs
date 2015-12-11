@@ -66,6 +66,17 @@ namespace OpenDentBusiness{
 			return Crud.EhrMeasureEventCrud.SelectMany(command);
 		}
 
+		///<summary>Creates a measure event for the patient and event type passed in.  Used by eServices.</summary>
+		public static long CreateEventForPat(long patNum,EhrMeasureEventType measureEventType) {
+			//No need to check RemotingRole; no call to db.
+			EhrMeasureEvent measureEvent=new EhrMeasureEvent();
+			measureEvent.DateTEvent=DateTime.Now;
+			measureEvent.EventType=measureEventType;
+			measureEvent.PatNum=patNum;
+			measureEvent.MoreInfo="";
+			return Insert(measureEvent);
+		}
+
 		///<summary></summary>
 		public static long Insert(EhrMeasureEvent ehrMeasureEvent){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
