@@ -145,6 +145,7 @@ namespace OpenDental{
 		private Button butApptLineColor;
 		private CheckBox checkApptModuleDefaultToWeek;
 		private CheckBox checkPerioSkipMissingTeeth;
+		private CheckBox checkPerioTreatImplantsAsNotMissing;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
 
@@ -266,6 +267,7 @@ namespace OpenDental{
 			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
 			this.label19 = new System.Windows.Forms.Label();
 			this.tabChart = new System.Windows.Forms.TabPage();
+			this.checkPerioSkipMissingTeeth = new System.Windows.Forms.CheckBox();
 			this.checkProvColorChart = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textMedDefaultStopDays = new System.Windows.Forms.TextBox();
@@ -310,7 +312,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkPerioSkipMissingTeeth = new System.Windows.Forms.CheckBox();
+			this.checkPerioTreatImplantsAsNotMissing = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -1317,6 +1319,7 @@ namespace OpenDental{
 			// tabChart
 			// 
 			this.tabChart.BackColor = System.Drawing.SystemColors.Window;
+			this.tabChart.Controls.Add(this.checkPerioTreatImplantsAsNotMissing);
 			this.tabChart.Controls.Add(this.checkPerioSkipMissingTeeth);
 			this.tabChart.Controls.Add(this.checkProvColorChart);
 			this.tabChart.Controls.Add(this.label11);
@@ -1347,6 +1350,18 @@ namespace OpenDental{
 			this.tabChart.Size = new System.Drawing.Size(466, 479);
 			this.tabChart.TabIndex = 4;
 			this.tabChart.Text = "Chart";
+			// 
+			// checkPerioSkipMissingTeeth
+			// 
+			this.checkPerioSkipMissingTeeth.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioSkipMissingTeeth.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPerioSkipMissingTeeth.Location = new System.Drawing.Point(139, 304);
+			this.checkPerioSkipMissingTeeth.Name = "checkPerioSkipMissingTeeth";
+			this.checkPerioSkipMissingTeeth.Size = new System.Drawing.Size(302, 15);
+			this.checkPerioSkipMissingTeeth.TabIndex = 215;
+			this.checkPerioSkipMissingTeeth.Text = "Perio exams always skip missing teeth";
+			this.checkPerioSkipMissingTeeth.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioSkipMissingTeeth.UseVisualStyleBackColor = true;
 			// 
 			// checkProvColorChart
 			// 
@@ -1833,17 +1848,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkPerioSkipMissingTeeth
+			// checkPerioTreatImplantsAsNotMissing
 			// 
-			this.checkPerioSkipMissingTeeth.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPerioSkipMissingTeeth.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPerioSkipMissingTeeth.Location = new System.Drawing.Point(139, 304);
-			this.checkPerioSkipMissingTeeth.Name = "checkPerioSkipMissingTeeth";
-			this.checkPerioSkipMissingTeeth.Size = new System.Drawing.Size(302, 15);
-			this.checkPerioSkipMissingTeeth.TabIndex = 215;
-			this.checkPerioSkipMissingTeeth.Text = "Perio exams always skip missing teeth";
-			this.checkPerioSkipMissingTeeth.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPerioSkipMissingTeeth.UseVisualStyleBackColor = true;
+			this.checkPerioTreatImplantsAsNotMissing.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioTreatImplantsAsNotMissing.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPerioTreatImplantsAsNotMissing.Location = new System.Drawing.Point(139, 321);
+			this.checkPerioTreatImplantsAsNotMissing.Name = "checkPerioTreatImplantsAsNotMissing";
+			this.checkPerioTreatImplantsAsNotMissing.Size = new System.Drawing.Size(302, 15);
+			this.checkPerioTreatImplantsAsNotMissing.TabIndex = 216;
+			this.checkPerioTreatImplantsAsNotMissing.Text = "Perio exams treat implants as not missing";
+			this.checkPerioTreatImplantsAsNotMissing.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPerioTreatImplantsAsNotMissing.UseVisualStyleBackColor = true;
 			// 
 			// FormModuleSetup
 			// 
@@ -2068,6 +2083,7 @@ namespace OpenDental{
 			checkMedicalFeeUsedForNewProcs.Checked=PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs);
 			checkProvColorChart.Checked=PrefC.GetBool(PrefName.UseProviderColorsInChart);
 			checkPerioSkipMissingTeeth.Checked=PrefC.GetBool(PrefName.PerioSkipMissingTeeth);
+			checkPerioTreatImplantsAsNotMissing.Checked=PrefC.GetBool(PrefName.PerioTreatImplantsAsNotMissing);
 			if(PrefC.GetByte(PrefName.DxIcdVersion)==9) {
 				checkDxIcdVersion.Checked=false;
 			}
@@ -2410,6 +2426,7 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.MedDefaultStopDays,daysStop)
 				| Prefs.UpdateBool(PrefName.UseProviderColorsInChart,checkProvColorChart.Checked)
 				| Prefs.UpdateBool(PrefName.PerioSkipMissingTeeth,checkPerioSkipMissingTeeth.Checked)
+				| Prefs.UpdateBool(PrefName.PerioTreatImplantsAsNotMissing,checkPerioTreatImplantsAsNotMissing.Checked)
 				//| Prefs.UpdateBool(PrefName.ToothChartMoveMenuToRight,checkToothChartMoveMenuToRight.Checked)
 				//| Prefs.UpdateBool(PrefName.ChartQuickAddHideAmalgam, checkChartQuickAddHideAmalgam.Checked) //Deprecated.
 				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.

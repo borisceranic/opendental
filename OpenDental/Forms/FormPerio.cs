@@ -97,6 +97,7 @@ namespace OpenDental{
 		//private int pagesPrinted;
 		private List<string> MissingTeeth;
 		private Patient PatCur;
+		private List<Procedure> _listPatProcs;
 		private OpenDental.UI.Button butGraphical;
 		private OpenDental.UI.Button butSave;
 		private Label labelPlaqueHistory;
@@ -108,13 +109,14 @@ namespace OpenDental{
 		private PerioExam PerioExamCur;
 
 		///<summary></summary>
-		public FormPerio(Patient patCur)
+		public FormPerio(Patient patCur,List<Procedure> listPatProcs)
 		{
 			//
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
 			PatCur=patCur;
+			_listPatProcs=listPatProcs;
 			Lan.F(this);
 		}
 
@@ -1169,6 +1171,7 @@ namespace OpenDental{
 			this.Controls.Add(this.but7);
 			this.Controls.Add(this.butClose);
 			this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -1324,6 +1327,7 @@ namespace OpenDental{
 			}
 			//For patient's first perio chart, any teeth marked missing are automatically marked skipped.
 			if(PerioExams.ListExams.Count==0 || PrefC.GetBool(PrefName.PerioSkipMissingTeeth)) {
+				List<ProcedureCode> listProcedureCodes=null;
 				for(int i=0;i<MissingTeeth.Count;i++) {
 					if(MissingTeeth[i].CompareTo("A") >= 0 && MissingTeeth[i].CompareTo("Z") <= 0) {//if is a letter (not a number)
 						continue;//Skipped teeth are only recorded by tooth number within the perio exam.
@@ -1331,6 +1335,23 @@ namespace OpenDental{
 					int toothNum=PIn.Int(MissingTeeth[i]);
 					if(listSkippedTeeth.Contains(toothNum)) {
 						continue;//Skip duplicates
+					}
+					bool isImplant=false;
+					if(PrefC.GetBool(PrefName.PerioTreatImplantsAsNotMissing)) {
+						if(listProcedureCodes==null) {
+							listProcedureCodes=ProcedureCodeC.GetListLong();
+						}
+						List<Procedure> listProcsForTooth=_listPatProcs.FindAll(x => x.ToothNum==MissingTeeth[i]);
+						for(int j=0;j<listProcsForTooth.Count;j++) {
+							ProcedureCode procCode=ProcedureCodes.GetProcCode(listProcedureCodes,listProcsForTooth[j].CodeNum);
+							if(procCode.PaintType==ToothPaintingType.Implant) {
+								isImplant=true;
+								break;
+							}
+						}
+						if(isImplant) {
+							continue;//The tooth is missing, but is an implant.  The user has chosen to "count implants as not missing".
+						}
 					}
 					listSkippedTeeth.Add(toothNum);
 				}

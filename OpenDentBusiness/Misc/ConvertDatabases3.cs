@@ -11643,6 +11643,15 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//Perio exams treat implants as not missing
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PerioTreatImplantsAsNotMissing','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PerioTreatImplantsAsNotMissing','1')";
+					Db.NonQ(command);
+				}
 
 
 

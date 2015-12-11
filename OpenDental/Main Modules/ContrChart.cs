@@ -4650,8 +4650,21 @@ namespace OpenDental{
 			ModuleSelected(PatCur.PatNum);
 		}
 
-		private void Tool_Perio_Click(){
-			FormPerio FormP=new FormPerio(PatCur);
+		private void Tool_Perio_Click() {
+			List<Procedure> listPatProcs=new List<Procedure>();
+			DataTable table=DataSetMain.Tables["ProgNotes"];
+			//Find rows which are procedures (ProcNum!=0) and use the CodeNum and ToothNum columns to create a list of pseudo "Procedures".
+			//We pull the procedures from the ProgNotes in memory so that we do not have to run a query to get the procedure data.
+			for(int i=0;i<table.Rows.Count;i++){
+				if(table.Rows[i]["ProcNum"] == "0") {
+					continue;//Not a procedure row.
+				}
+				Procedure procTemp=new Procedure();
+				procTemp.ToothNum=PIn.String(table.Rows[i]["ToothNum"].ToString());
+				procTemp.CodeNum=PIn.Int(table.Rows[i]["CodeNum"].ToString());
+				listPatProcs.Add(procTemp);
+			}
+			FormPerio FormP=new FormPerio(PatCur,listPatProcs);
 			FormP.ShowDialog();
 		}
 
