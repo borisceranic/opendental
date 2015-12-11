@@ -24,6 +24,8 @@ namespace OpenDental {
 		///<summary>If the message is an html email with images, then this list contains the raw image mime parts.  The user must give permission before converting these to images, for security purposes.  Gmail also does this with images, for example.</summary>
 		private List<Health.Direct.Common.Mime.MimeEntity> _listImageParts=null;
 		private List<EmailAddress> _listEmailAddresses;
+		///<summary>Must be set externally before showing this control to the user.</summary>
+		public EmailAddress EmailAddressPreview=null;
 
 		public bool HasMessageChanged { get { return _hasMessageChanged; } }
 		public bool IsComposing { get { return _isComposing; } }
@@ -34,8 +36,8 @@ namespace OpenDental {
 		public string CcAddress { get { return textCcAddress.Text; } set { textCcAddress.Text=value; } }
 		public string BccAddress { get { return textBccAddress.Text; } set { textBccAddress.Text=value; } }
 		public bool IsSigned { get { return (_isSigningEnabled && _certSig!=null); } }
-		public List<EmailAttach> Attachments { get { return (_emailMessage.Attachments); } set { _emailMessage.Attachments=value; } }
-		
+		public bool HasAttachments { get { return _emailMessage.Attachments.Count>0; } }
+
 		public X509Certificate2 Signature {
 			get {
 				if(IsSigned) {
@@ -45,17 +47,18 @@ namespace OpenDental {
 			}
 		}
 
-		public EmailAddress GetEmailAddress() {
+		///<summary>Passes back the email address selected in the combobox.  Only used to get the email address to send From in outgoing emails.</summary>
+		public EmailAddress GetOutgoingEmailAddress() {
 			if(_patCur==null) {//can happen if sending deposit slip by email
 				return EmailAddresses.GetByClinic(0);//gets the practice default address
 			} 
 			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
-			return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+				return EmailAddresses.GetByClinic(_patCur.ClinicNum);
 			}
 			else { //me or static email address
-			return _listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" and items in combobox
+				return _listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" and items in combobox
 			}
-		}				
+		}
 
 		public EmailPreviewControl() {
 			InitializeComponent();
@@ -88,6 +91,10 @@ namespace OpenDental {
 				textSubject.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
 				textBodyText.ReadOnly=true;
 				textBodyText.SpellCheckIsEnabled=false;//Prevents slowness resizing the window, because spell checker runs each time resize event is fired.
+				comboEmailFrom.Visible=false;
+				textFromAddress.Width=textCcAddress.Width;//Match the size of Cc Address.
+				textFromAddress.Anchor=((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+					| System.Windows.Forms.AnchorStyles.Right)));//Change the anchors to accommodate.
 			}
 			textSentOrReceived.Text=_emailMessage.SentOrReceived.ToString();
 			textFromAddress.Text=_emailMessage.FromAddress;
@@ -99,7 +106,7 @@ namespace OpenDental {
 			webBrowser.Visible=false;
 			if(EmailMessages.IsReceived(_emailMessage.SentOrReceived)) {
 				List<List<Health.Direct.Common.Mime.MimeEntity>> listMimeParts=
-					EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,GetEmailAddress(),"text/html","text/plain","image/");
+					EmailMessages.GetMimePartsForMimeTypes(_emailMessage.RawEmailIn,EmailAddressPreview,"text/html","text/plain","image/");
 				List<Health.Direct.Common.Mime.MimeEntity> listHtmlParts=listMimeParts[0];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 				List<Health.Direct.Common.Mime.MimeEntity> listTextParts=listMimeParts[1];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
 				_listImageParts=listMimeParts[2];//If RawEmailIn is blank, then this list will also be blank (ex Secure Web Mail messages).
@@ -126,7 +133,9 @@ namespace OpenDental {
 				textBodyText.Text=_emailMessage.BodyText;//Show the body text exactly as typed by the user.
 			}
 			FillAttachments();
-			FillComboEmail();
+			if(IsComposing) {
+				FillComboEmail();
+			}
 			textBodyText.Select();
 			Cursor=Cursors.Default;
 		}
@@ -165,6 +174,10 @@ namespace OpenDental {
 			else { //me or static email address
 				textFromAddress.Text=_listEmailAddresses[comboEmailFrom.SelectedIndex-1].EmailUsername;//-1 to account for predefined "Clinic/Practice" item in combobox
 			}
+			if(!_isComposing || !_isSigningEnabled) {
+				return;
+			}
+			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
 		}
 
 		#region Attachments
@@ -359,7 +372,7 @@ namespace OpenDental {
 			FormEmailDigitalSignature form=new FormEmailDigitalSignature(_certSig);
 			if(form.ShowDialog()==DialogResult.OK) {
 				//If the user just added trust, then refresh to pull the newly added certificate into the memory cache.
-				EmailMessages.RefreshCertStoreExternal(GetEmailAddress());
+				EmailMessages.RefreshCertStoreExternal(EmailAddressPreview);
 			}
 		}
 
@@ -410,7 +423,7 @@ namespace OpenDental {
 			BodyText=FormMessageReplacements.ReplaceOffice(BodyText,clinic);
 			//Misc Information
 			BodyText=FormMessageReplacements.ReplaceMisc(BodyText);
-			Attachments=attachments;
+			_emailMessage.Attachments=attachments;
 			FillAttachments();
 			_hasMessageChanged=false;
 		}

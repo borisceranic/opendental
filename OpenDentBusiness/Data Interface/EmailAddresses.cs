@@ -108,6 +108,12 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets all email addresses, including those email addresses which are not in the cache.</summary>
+		public static List<EmailAddress> GetAll() {
+			string command="SELECT * FROM emailaddress";
+			return Crud.EmailAddressCrud.SelectMany(command);
+		}
+
 		///<summary>Checks to make sure at least one email address has a valid (not blank) SMTP server.</summary>
 		public static bool ExistsValidEmail() {
 			List<EmailAddress> listEmailAddresses=GetListt();

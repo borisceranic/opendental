@@ -976,9 +976,16 @@ namespace OpenDentBusiness {
 			#endregion Appointments
 			if(componentsToLoad.ShowEmail) {
 				#region email
+				//For privacy reasons, only show email messages for which the recipient or the From address is not a user inbox.
 				command="SELECT EmailMessageNum,MsgDateTime,Subject,BodyText,PatNum,SentOrReceived "
 				+"FROM emailmessage "
+				+"LEFT JOIN emailaddress ON emailaddress.UserNum != 0 "//For a user's personal inbox.
+				//Recipient address is already scrubbed, so we do not need to do a LIKE %string% comparison.
+				+"AND (emailmessage.RecipientAddress=emailaddress.EmailUsername "
+					//FromAddress could contain a bunch of extra characters, so we do a LIKE %string% comparison.
+					+"OR emailmessage.FromAddress LIKE CONCAT(CONCAT('%',emailaddress.EmailUsername),'%')) "
 				+"WHERE PatNum="+POut.Long(patNum)+" AND SentOrReceived NOT IN (12,13) "//Do not show Direct message acknowledgements in Chart progress notes
+				+"AND emailAddress.EmailUsername IS NULL "//Ignore email messages for user inboxes.
 				+"ORDER BY MsgDateTime";
 				DataTable rawEmail=dcon.GetTable(command);
 				for(int i=0;i<rawEmail.Rows.Count;i++) {

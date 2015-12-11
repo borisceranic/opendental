@@ -7,17 +7,27 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormEmailInbox:Form {
-		///<summary>Do no access direclty.  Instead use AddressInbox.</summary>
+		///<summary>Do not access directly.  Instead use AddressInbox.</summary>
 		private EmailAddress _addressInbox=null;
 		private List<EmailMessage> ListEmailMessages;
+		private List<EmailAddress> _listEmailAddresses;
 
 		private EmailAddress AddressInbox {
 			get {
-				if(_addressInbox==null) {
-					_addressInbox=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
+				if(comboEmailAddress.SelectedIndex==0 && Security.CurUser.ProvNum!=0) {//Webmail only shows for providers.
+					EmailAddress webEmailAddress=new EmailAddress();
+					webEmailAddress.EmailUsername="WebMail";
+					_addressInbox=webEmailAddress;
+				}
+				else if(Security.CurUser.ProvNum!=0) {//When the user is a provider, the Webmail option is available, so subtract 1 from index.
+					_addressInbox=_listEmailAddresses[comboEmailAddress.SelectedIndex-1];
+				}
+				else {
+					_addressInbox=_listEmailAddresses[comboEmailAddress.SelectedIndex];
 				}
 				return _addressInbox;
 			}
@@ -25,18 +35,72 @@ namespace OpenDental {
 
 		public FormEmailInbox() {
 			InitializeComponent();
-			Lan.F(this);
+			Lan.F(this);			
+		}
+
+		private void FormEmailInbox_Resize(object sender,EventArgs e) {
+			if(_listEmailAddresses!=null) {//Since Resize() is called once before Load(), we must ensure FillComboEmail() has been called at least once.
+				FillGridEmailMessages();//To resize the columnns in the grid as needed.
+			}
 		}
 
 		private void FormEmailInbox_Load(object sender,EventArgs e) {
+			FillComboEmail();
+			if(_listEmailAddresses.Count==0) {
+				throw new Exception(Lan.g(this,"No email addresses available for current user.  Edit email address info in the File menu or Setup menu."));
+			}
 			textComputerNameReceive.Text=PrefC.GetString(PrefName.EmailInboxComputerName);
 			textComputerName.Text=Dns.GetHostName();
 			Application.DoEvents();//Show the form contents before loading email into the grid.
 			GetMessages();//If no new messages, then the user will know based on what shows in the grid.
 		}
 
-		private void FormEmailInbox_Resize(object sender,EventArgs e) {
-			FillGridEmailMessages();//To resize the columnns in the grid as needed.
+		private void FillComboEmail() {
+			_listEmailAddresses=EmailAddresses.GetListt();//Does not include user specific email addresses.
+			//Exclude any email addresses which are associated to clinics.
+			if(PrefC.HasClinicsEnabled) {
+				Clinic[] listClinicsAll=Clinics.GetList();
+				for(int i=0;i<listClinicsAll.Length;i++) {
+					_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==listClinicsAll[i].EmailAddressNum);
+				}
+			}
+			//Exclude default practice email address, since it is added on another line below.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailDefaultAddressNum));
+			//Exclude web mail notification email address.
+			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
+			//Add clinic defaults that the user has access to.  Do not add duplicates.
+			if(PrefC.HasClinicsEnabled) {
+				List<Clinic> listClinicForUser=Clinics.GetForUserod(Security.CurUser);
+				for(int i=0;i < listClinicForUser.Count;i++) {
+					EmailAddress emailClinic=EmailAddresses.GetByClinic(listClinicForUser[i].ClinicNum);
+					if(_listEmailAddresses.Any(x => x.EmailAddressNum == emailClinic.EmailAddressNum)) {
+						continue;
+					}
+					_listEmailAddresses.Insert(0,emailClinic);
+				}
+			}
+			//Add addresses which are: not associated to anything, or not default, or unique per clinic.
+			for(int i=0;i<_listEmailAddresses.Count();i++) {
+				comboEmailAddress.Items.Add(_listEmailAddresses[i].EmailUsername);
+			}
+			//Add the practice default.
+			EmailAddress emailAddressPractice=EmailAddresses.GetOne(PrefC.GetLong(PrefName.EmailDefaultAddressNum));
+			if(emailAddressPractice!=null) {
+				comboEmailAddress.Items.Insert(0,"Default <"+emailAddressPractice.EmailUsername+">");
+				_listEmailAddresses.Insert(0,emailAddressPractice);//Practice Default
+			}
+			//Add the personal email address for the current user.
+			EmailAddress emailAddressMe=EmailAddresses.GetForUser(Security.CurUser.UserNum);
+			if(emailAddressMe!=null) {
+				comboEmailAddress.Items.Insert(0,"Me <"+emailAddressMe.EmailUsername+">");
+				_listEmailAddresses.Insert(0,emailAddressMe);//"Me"
+			}
+			if(comboEmailAddress.Items.Count > 0) {
+				comboEmailAddress.SelectedIndex=0;//This could be the default practice address, or personal address, or another address.
+			}
+			if(Security.CurUser.ProvNum!=0) { //If the first item in the combobox is selected, make checks to see if the current user has a provnum.
+				comboEmailAddress.Items.Insert(0,"WebMail");//Only providers have access to see Webmail messages.
+			}
 		}
 
 		private void menuItemSetup_Click(object sender,EventArgs e) {
@@ -54,8 +118,12 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			FillGridEmailMessages();//Show what is in db.
 			Cursor=Cursors.Default;
+			if(comboEmailAddress.SelectedIndex==0 && Security.CurUser.ProvNum!=0) { //WebMail is selected
+				Text="Email Inbox for "+AddressInbox.EmailUsername;
+				return 0;//Webmail messages are in the database, so we will not need to receive email from the email server.
+			}
 			if(AddressInbox.EmailUsername=="" || AddressInbox.Pop3ServerIncoming=="") {//Email address not setup.
-				Text="Email Inbox - Showing webmail messages only.  Either no email addresses have been setup or the default address is not setup fully.";
+				Text="Email Inbox - The currently selected email address is not setup to receive email.";
 				return 0;
 			}
 			Text="Email Inbox for "+AddressInbox.EmailUsername;
@@ -113,7 +181,12 @@ namespace OpenDental {
 				isSortAsc=false;
 			}
 			//Refresh the list and grid from the database.
-			ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
+			if(comboEmailAddress.SelectedIndex==0 && Security.CurUser.ProvNum!=0) { //webmail
+				ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,Security.CurUser.ProvNum);
+			}
+			else{
+				ListEmailMessages=EmailMessages.GetInboxForAddress(AddressInbox.EmailUsername,0);
+			}
 			gridEmailMessages.BeginUpdate();
 			gridEmailMessages.Rows.Clear();
 			gridEmailMessages.Columns.Clear();
@@ -205,6 +278,7 @@ namespace OpenDental {
 			splitContainerNoFlicker.Panel2Collapsed=false;
 			emailPreview.Width=splitContainerNoFlicker.Panel2.Width;//For some reason the anchors do not always work inside panel2.
 			emailPreview.Height=splitContainerNoFlicker.Panel2.Height;//For some reason the anchors do not always work inside panel2.
+			emailPreview.EmailAddressPreview=AddressInbox;
 			emailPreview.LoadEmailMessage(emailMessage);
 			Cursor=Cursors.Default;
 			//Handle Sig column clicks.
@@ -250,6 +324,7 @@ namespace OpenDental {
 				//When an email is read from the database for display in the inbox, the BodyText is limited to 50 characters and the RawEmailIn is blank.
 				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Refresh the email from the database to include the full BodyText and RawEmailIn.
 				FormEmailMessageEdit formEME=new FormEmailMessageEdit(emailMessage);
+				formEME.EmailPreviewAddress=AddressInbox;
 				formEME.ShowDialog();
 				emailMessage=EmailMessages.GetOne(emailMessage.EmailMessageNum);//Fetch from DB, in case changed due to decrypt.
 				if(emailMessage!=null && emailMessage.SentOrReceived!=EmailSentOrReceived.ReceivedEncrypted) {//emailMessage could be null if the message was deleted in FormEmailMessageEdit().

@@ -270,11 +270,7 @@ namespace OpenDental{
 		///region the user is in.  If an error is returned from the importation, this thread will silently fail.</summary>
 		private ODThread _threadClaimReportRetrieve;
 		private int _claimReportRetrieveIntervalMS;
-		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new messages 
-		///every x number of minutes (1 to 60) based on preference value.</summary>
-		private Thread ThreadEmailInbox;
-		private bool _isEmailThreadRunning=false;
-		private AutoResetEvent _emailSleep=new AutoResetEvent(false);
+		private TimeSpan _timeEmailInboxesLastChecked=TimeSpan.Zero;
 				/// <summary>If OpenDental is running on the same machine as the mysql server, then a thread is runs in the background to update the local machine's time
 		///using NTPv4 from the NIST time server set in the NistTimeServerUrl pref./// </summary>
 		private Thread _threadTimeSynch;
@@ -2568,8 +2564,8 @@ namespace OpenDental{
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
 			timerReplicationMonitor.Enabled=true;
-			ThreadEmailInbox=new Thread(new ThreadStart(ThreadEmailInbox_Receive));
-			ThreadEmailInbox.Start();
+			ODThread threadEmailInbox=new ODThread(10000,ThreadEmailInbox_Receive);
+			threadEmailInbox.Start();
 			_claimReportRetrieveIntervalMS=(int)TimeSpan.FromMinutes(PrefC.GetInt(PrefName.ClaimReportReceiveInterval)).TotalMilliseconds;
 			_threadClaimReportRetrieve=new ODThread(_claimReportRetrieveIntervalMS,ThreadClaimReportRetrieve);
 			_threadClaimReportRetrieve.Name="Claim Report Thread";
@@ -4934,36 +4930,53 @@ namespace OpenDental{
 			Podium.DateTimeLastRan=nowDT;
 		}
 
-		private void ThreadEmailInbox_Receive() {
+		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new
+		///messages every x number of minutes (1 to 60) based on preference value.</summary>
+		private void ThreadEmailInbox_Receive(ODThread odThread) {
+			//Certificate stores need to be created on all computers since any of the computers are able to potentially send encrypted email.
 			try {
 				EmailMessages.CreateCertificateStoresIfNeeded();
 			}
 			catch {
 				//Probably a permission issue creating the stores.  Nothing we can do except explain in the manual.
 			}
-			//The EmailInboxCheckInterval preference defines the number of minutes between automatic inbox receiving.
-			//Do not perform the first email inbox receive within the first EmailInboxCheckInterval minutes of program startup (thread startup).
-			_isEmailThreadRunning=true;
-			while(_isEmailThreadRunning) {
-				_emailSleep.WaitOne(TimeSpan.FromMinutes(PrefC.GetInt(PrefName.EmailInboxCheckInterval)));
-				if(!_isEmailThreadRunning) {
-					break;
-				}
-				EmailAddress Address=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
-				if(Address.Pop3ServerIncoming=="") {
+			if(!ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.EmailInboxComputerName))) {
+				return;//If email inbox computer name is not setup, or if the name does not match this computer, then do not get email from this computer.
+			}
+			//Do not perform the first email inbox receive within the first minute of program startup (thread startup), in order to prevent slow login.
+			//The EmailInboxCheckInterval preference defines the number of minutes between automatic inbox receiving (minimum 1 minute).
+			if((odThread.GetTimeElapsed()-_timeEmailInboxesLastChecked).TotalMinutes < PrefC.GetInt(PrefName.EmailInboxCheckInterval)) {
+				return;
+			}
+			_timeEmailInboxesLastChecked=odThread.GetTimeElapsed();
+			List<EmailAddress> listEmailAddresses=EmailAddresses.GetAll();
+			for(int i=0;i<listEmailAddresses.Count;i++) {
+				EmailAddress emailAddress=listEmailAddresses[i];
+				if(emailAddress.Pop3ServerIncoming=="") {//not active
 					continue;//Email address not setup.
 				}
-				if(!ODEnvironment.IdIsThisComputer(PrefC.GetString(PrefName.EmailInboxComputerName))) {
-					continue;//If the email inbox computer name is not setup, or if the name does not match this computer, then do not get email from this computer.
-				}
-				try {
-					EmailMessages.ReceiveFromInbox(0,Address);
-				}
-				catch(Exception ex) {
-					//Do not tell the user, because it would be annoying to see an error every 30 seconds (if the server was down for instance).
-					//Maybe we could log to the system EventViewer Application log someday if users complain. Keep in mind that the user can always manually go to Manage | Email Inbox to see the error message.
+				List<ODThread> listEmailThreads=ODThread.GetThreadsByGroupName("EmailInbox - #"+emailAddress.EmailAddressNum);
+				if(listEmailThreads.Count==0) {//Only launch a thread for this email address if one is not still running.
+					ODThread threadEmailRetrieve=new ODThread(RetrieveForAddress);
+					threadEmailRetrieve.GroupName="EmailInbox - #"+emailAddress.EmailAddressNum;
+					threadEmailRetrieve.Tag=emailAddress;
+					threadEmailRetrieve.Start();
 				}
 			}
+		}
+
+		///<summary>This thread runs one time per each email address per each retrieve interval.</summary>
+		private void RetrieveForAddress(ODThread odThread) {
+			EmailAddress emailAddress=(EmailAddress)odThread.Tag;
+			try {
+				EmailMessages.ReceiveFromInbox(0,emailAddress);
+			}
+			catch(Exception ex) {
+				//Do not tell the user, because it would be annoying to see an error every 30 seconds (if the server was down for instance).
+				//Maybe we could log to the system EventViewer Application log someday if users complain. Keep in mind that the user can always manually go 
+				//to Manage | Email Inbox to see the error message.
+			}
+			odThread.QuitAsync();
 		}
 
 		private void ThreadTimeSynch_Synch() {
@@ -7539,16 +7552,6 @@ namespace OpenDental{
 				ThreadVM.Abort();
 				ThreadVM.Join();
 				ThreadVM=null;
-			}			
-			if(_isEmailThreadRunning) {
-				_isEmailThreadRunning=false;
-				_emailSleep.Set();//If the thread is just sitting around waiting for the next email check interval, then this will cause the thread to exit immediately.
-				//We used to show a message on exit because our email inbox used to delete messages after downloading. We only copy messages now, so we can kill the thread at any time.
-				//FormAlertSimple formAS=new FormAlertSimple(Lan.g(this,"Shutting down.\r\nPlease wait while email finishes downloading.\r\nMay take up to 3 minutes to complete."));
-				//formAS.Show();//Non-modal, so the program will not wait for user input before closing.
-				ThreadEmailInbox.Abort();
-				ThreadEmailInbox.Join();//We must wait for the thread to die, so that the .exe is freed up if the user is trying to update OD.
-				ThreadEmailInbox=null;
 			}
 			if(_isTimeSynchThreadRunning) {
 				_isTimeSynchThreadRunning=false;

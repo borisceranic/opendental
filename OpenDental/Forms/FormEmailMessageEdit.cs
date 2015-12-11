@@ -37,6 +37,12 @@ namespace OpenDental{
 		private ListBox listAutographs;
 		private EmailPreviewControl emailPreview;
 
+		public EmailAddress EmailPreviewAddress {
+			set {
+				emailPreview.EmailAddressPreview=value;
+			}
+		}
+
 		///<summary></summary>
 		public FormEmailMessageEdit(EmailMessage emailMessage){
 			InitializeComponent();// Required for Windows Form Designer support
@@ -584,7 +590,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select an item first."));
 				return;
 			}
-			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.Attachments.Count > 0){
+			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.HasAttachments){
 				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text and attachments with text "
 					+"and attachments from the template?"),"",MessageBoxButtons.OKCancel)
 					!=DialogResult.OK){
@@ -706,7 +712,7 @@ namespace OpenDental{
 				}
 			}
 			Cursor=Cursors.WaitCursor;
-			EmailAddress emailAddress=emailPreview.GetEmailAddress();
+			EmailAddress emailAddress=emailPreview.EmailAddressPreview;
 			try {
 				_emailMessage=EmailMessages.ProcessRawEmailMessageIn(_emailMessage.BodyText,_emailMessage.EmailMessageNum,emailAddress,true);//If decryption is successful, sets status to ReceivedDirect.
 				//The Direct message was decrypted.
@@ -760,7 +766,7 @@ namespace OpenDental{
 		private void butRefresh_Click(object sender,EventArgs e) {
 			List<EmailAttach> listEmailAttachOld=_emailMessage.Attachments;
 			Cursor=Cursors.WaitCursor;
-			EmailAddress emailAddress=emailPreview.GetEmailAddress();
+			EmailAddress emailAddress=emailPreview.EmailAddressPreview;
 			try {
 				_emailMessage=EmailMessages.ProcessRawEmailMessageIn(_emailMessage.RawEmailIn,_emailMessage.EmailMessageNum,emailAddress,false);
 				EmailMessages.UpdateSentOrReceivedRead(_emailMessage);//Mark read, because we are already viewing the message within the current window.
@@ -790,7 +796,7 @@ namespace OpenDental{
 				MessageBox.Show("Addresses not allowed to be blank.");
 				return;
 			}
-			EmailAddress emailAddressFrom=emailPreview.GetEmailAddress();
+			EmailAddress emailAddressFrom=emailPreview.GetOutgoingEmailAddress();
 			if(emailPreview.FromAddress!=emailAddressFrom.EmailUsername) {
 				//Without this block, encryption would fail with an obscure error message, because the from address would not match the digital signature of the sender.
 				MessageBox.Show(Lan.g(this,"From address must match email address username in email setup.")+"\r\n"+Lan.g(this,"From address must be exactly")+" "+emailAddressFrom.EmailUsername);
@@ -852,7 +858,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"The email has a summary of care attachment which may contain sensitive patient data.  Use the Direct Message button instead.");
 				return;
 			}
-			EmailAddress emailAddress=emailPreview.GetEmailAddress();
+			EmailAddress emailAddress=emailPreview.GetOutgoingEmailAddress();
 			if(emailAddress.SMTPserver==""){
 				MsgBox.Show(this,"The email address in email setup must have an SMTP server.");
 				return;

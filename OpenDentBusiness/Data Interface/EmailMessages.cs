@@ -37,7 +37,8 @@ namespace OpenDentBusiness{
 			return emailMessage;
 		}
 
-		///<summary>Gets all inbox email messages where EmailMessage.RecipientAddress==emailAddressInbox OR EmailMessage.ProvNumWebMail==provNum.</summary>
+		///<summary>Gets all inbox email messages where EmailMessage.RecipientAddress==emailAddressInbox, or returns webmail messages instead.  
+		///Pass in 0 for provNum to get email messages, pass in the current user's provNum to get webmail messages.</summary>
 		public static List<EmailMessage> GetInboxForAddress(string emailAddressInbox,long provNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<EmailMessage>>(MethodBase.GetCurrentMethod(),emailAddressInbox,provNum);
@@ -47,18 +48,23 @@ namespace OpenDentBusiness{
 			string command="SELECT EmailMessageNum,PatNum,ToAddress,FromAddress,Subject,SUBSTR(BodyText,1,50) BodyText,MsgDateTime,SentOrReceived,"
 				+"RecipientAddress,'' RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress "
 				+"FROM emailmessage "
-				+"WHERE SentOrReceived IN ("
+				+"WHERE SentOrReceived IN (";
+			if(provNum==0) {//emailmessages
 					//must match one of these EmailSentOrReceived statuses
-					+POut.Int((int)EmailSentOrReceived.Read)+","
+				command+=POut.Int((int)EmailSentOrReceived.Read)+","
 					+POut.Int((int)EmailSentOrReceived.Received)+","
 					+POut.Int((int)EmailSentOrReceived.ReceivedEncrypted)+","
 					+POut.Int((int)EmailSentOrReceived.ReceivedDirect)+","
-					+POut.Int((int)EmailSentOrReceived.ReadDirect)+","
-					+POut.Int((int)EmailSentOrReceived.WebMailRecdRead)+","
+					+POut.Int((int)EmailSentOrReceived.ReadDirect)
+				+") AND RecipientAddress='"+POut.String(emailAddressInbox.Trim())+"' ";
+			}
+			else {//webmail messages for matching provnum
+					//must match one of these EmailSentOrReceived statuses
+				command+=POut.Int((int)EmailSentOrReceived.WebMailRecdRead)+","
 					+POut.Int((int)EmailSentOrReceived.WebMailReceived)
-					//can belong to either the RecipientAddress OR the ProvNumWebMail
-				+") AND (RecipientAddress='"+POut.String(emailAddressInbox.Trim())+"' OR (ProvNumWebMail<>0 AND ProvNumWebMail="+POut.Long(provNum)+")) "
-				+"ORDER BY MsgDateTime";
+				+") AND ProvNumWebMail="+POut.Long(provNum)+" ";
+			}
+			command+="ORDER BY MsgDateTime";
 			List<EmailMessage> retVal=Crud.EmailMessageCrud.SelectMany(command);
 			for(int i=0;i<retVal.Count;i++) {
 				command="SELECT * FROM emailattach WHERE EmailMessageNum = "+POut.Long(retVal[i].EmailMessageNum);

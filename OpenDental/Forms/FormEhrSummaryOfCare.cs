@@ -256,7 +256,7 @@ namespace OpenDental {
 				return;
 			}
 			EmailMessages.Insert(emailMessage);
-			FormEmailMessageEdit formE=new FormEmailMessageEdit(emailMessage);
+			FormEmailMessageEdit formE=new FormEmailMessageEdit(emailMessage);//Not "new" message because it already exists in db due to pre-insert.
 			if(formE.ShowDialog()==DialogResult.OK) {
 				EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
 				newMeasureEvent.DateTEvent=DateTime.Now;
