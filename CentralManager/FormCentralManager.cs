@@ -243,6 +243,7 @@ namespace CentralManager {
 
 		private void menuConnSetup_Click(object sender,EventArgs e) {
 			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCC.ListConns=_listConns;
 			FormCC.LabelText.Text=Lans.g("FormCentralConnections","Double click an existing connection to edit or click the 'Add' button to add a new connection.");
 			FormCC.Text=Lans.g("FormCentralConnections","Connection Setup");
 			FormCC.ShowDialog();
