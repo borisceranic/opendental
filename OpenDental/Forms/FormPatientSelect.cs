@@ -1171,11 +1171,11 @@ namespace OpenDental{
 		}
 
 		private void FillGrid(bool limit,List<long> explicitPatNums=null) {
-		_dateTimeLastRequest=DateTime.Now;
-		if(_fillGridThread!=null) {
-			return;
-		}
-		_dateTimeLastSearch=_dateTimeLastRequest;
+			_dateTimeLastRequest=DateTime.Now;
+			if(_fillGridThread!=null) {
+				return;
+			}
+			_dateTimeLastSearch=_dateTimeLastRequest;
 			long billingType=0;
 			if(comboBillingType.SelectedIndex!=0) {
 				billingType=DefC.Short[(int)DefCat.BillingTypes][comboBillingType.SelectedIndex-1].DefNum;
@@ -1199,26 +1199,32 @@ namespace OpenDental{
 					clinicNums=_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString();
 				}
 			}
-		_fillGridThread=new ODThread(new ODThread.WorkerDelegate((ODThread o) => {
-			PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
-				textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
-				textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
-				checkGuarantors.Checked,checkShowArchived.Checked,
-				birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums,InitialPatNum);
-		}));
-		_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((ODThread o) => {
-			_fillGridThread=null;
-			this.BeginInvoke((Action)(() => {
-				FillGridFinal(limit);
+			_fillGridThread=new ODThread(new ODThread.WorkerDelegate((ODThread o) => {
+				PtDataTable=Patients.GetPtDataTable(limit,textLName.Text,textFName.Text,textHmPhone.Text,
+					textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
+					textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
+					checkGuarantors.Checked,checkShowArchived.Checked,
+					birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
 			}));
-		}));
-		_fillGridThread.AddExceptionHandler(new ODThread.ExceptionDelegate((e) => {
-			this.BeginInvoke((Action)(() => {
-				MessageBox.Show(e.Message);
+			_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((ODThread o) => {
+				_fillGridThread=null;
+				try {
+					this.BeginInvoke((Action)(() => {
+						FillGridFinal(limit);
+					}));
+				}
+				catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
 			}));
-		}));
-		_fillGridThread.Start(true);
-	}
+			_fillGridThread.AddExceptionHandler(new ODThread.ExceptionDelegate((e) => {
+				try {
+					this.BeginInvoke((Action)(() => {
+						MessageBox.Show(e.Message);
+					}));
+				}
+				catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
+			}));
+			_fillGridThread.Start(true);
+		}
 
 	private void FillGridFinal(bool limit){
 		//long billingType=0;
@@ -1249,12 +1255,6 @@ namespace OpenDental{
 		//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 		//		checkGuarantors.Checked,checkShowArchived.Checked,
 		//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
-			if(InitialPatNum!=0 && limit) {
-				//The InitialPatNum will be at the top, so resort the list alphabetically
-				DataView ptDataView=PtDataTable.DefaultView;
-				ptDataView.Sort="LName,FName";
-				PtDataTable=ptDataView.ToTable();
-			}
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;
