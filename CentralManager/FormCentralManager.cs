@@ -191,10 +191,6 @@ namespace CentralManager {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(CentralConnections.Validate(_listConns[e.Row])!="OK"){
-				MsgBox.Show(this,CentralConnections.Validate(_listConns[e.Row]));
-				return;
-			}
 			if(_listConns[e.Row].ConnectionStatus=="OFFLINE") {
 				MsgBox.Show(this,"Server Offline.  Fix connection and check status again to connect.");
 				return;

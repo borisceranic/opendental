@@ -70,12 +70,6 @@ namespace OpenDentBusiness{
       Crud.CentralConnectionCrud.Sync(listNew,listDB);
 		}
 
-		///<summary>Used as a central place to store validation error messages for connections.</summary>
-		public static string Validate(CentralConnection conn) {
-
-			return "";
-		}
-
 		///<summary>Encrypts signature text and returns a base 64 string so that it can go directly into the database.</summary>
 		public static string Encrypt(string str,byte[] key){
 			//No need to check RemotingRole; no call to db.
