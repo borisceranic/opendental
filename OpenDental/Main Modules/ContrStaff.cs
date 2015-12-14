@@ -791,6 +791,13 @@ namespace OpenDental{
 		}
 
 		private void butSendClaims_Click(object sender, System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.InsPayCreate,true) && !Security.IsAuthorized(Permissions.InsPayEdit,true)) {
+				//Custom message for multiple permissions.
+				MessageBox.Show(Lan.g(this,"Not authorized")+".\r\n"
+					+Lan.g(this,"A user with the SecurityAdmin permission must grant you access for")+":\r\n"
+					+Lan.g(this,"Insurance Payment Create and Insurance Payment Edit"));
+				return;
+			}
 			if(FormCS!=null && !FormCS.IsDisposed) {//Form is open
 				FormCS.Focus();//Don't open a new form.
 				//We may need to close and reopen the form in the future if the window is not being brought to the front.
