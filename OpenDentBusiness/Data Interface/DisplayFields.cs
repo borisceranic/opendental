@@ -350,6 +350,34 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("Previous Date",90,category));
 				//list.Add(new DisplayField("Interval",80,category));
 			}
+			else if(category==DisplayFieldCategory.AppointmentEdit) {
+				list.Add(new DisplayField("Stat",35,category));
+				list.Add(new DisplayField("Priority",45,category));
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+					list.Add(new DisplayField("Code",125,category));
+				}
+				else {
+					list.Add(new DisplayField("Tth",25,category));
+					list.Add(new DisplayField("Surf",50,category));
+					list.Add(new DisplayField("Code",50,category));
+				}
+				list.Add(new DisplayField("Description",275,category));
+				list.Add(new DisplayField("Fee",60,category));
+			}
+			else if(category==DisplayFieldCategory.PlannedAppointmentEdit) {
+				list.Add(new DisplayField("Stat",35,category));
+				list.Add(new DisplayField("Priority",45,category));
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+					list.Add(new DisplayField("Code",125,category));
+				}
+				else {
+					list.Add(new DisplayField("Tth",25,category));
+					list.Add(new DisplayField("Surf",50,category));
+					list.Add(new DisplayField("Code",50,category));
+				}
+				list.Add(new DisplayField("Description",275,category));
+				list.Add(new DisplayField("Fee",60,category));
+			}
 			return list;
 		}
 
@@ -630,6 +658,34 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Notes",255,category));
 				list.Add(new DisplayField("Previous Date",90,category));
 				list.Add(new DisplayField("Interval",80,category));
+			}
+			else if(category==DisplayFieldCategory.AppointmentEdit) {
+				list.Add(new DisplayField("Stat",35,category));
+				list.Add(new DisplayField("Priority",45,category));
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+					list.Add(new DisplayField("Code",125,category));
+				}
+				else {
+					list.Add(new DisplayField("Tth",25,category));
+					list.Add(new DisplayField("Surf",50,category));
+					list.Add(new DisplayField("Code",50,category));
+				}
+				list.Add(new DisplayField("Description",275,category));
+				list.Add(new DisplayField("Fee",60,category));
+			}
+			else if(category==DisplayFieldCategory.PlannedAppointmentEdit) {
+				list.Add(new DisplayField("Stat",35,category));
+				list.Add(new DisplayField("Priority",45,category));
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+					list.Add(new DisplayField("Code",125,category));
+				}
+				else {
+					list.Add(new DisplayField("Tth",25,category));
+					list.Add(new DisplayField("Surf",50,category));
+					list.Add(new DisplayField("Code",50,category));
+				}
+				list.Add(new DisplayField("Description",275,category));
+				list.Add(new DisplayField("Fee",60,category));
 			}
 			return list;
 		}

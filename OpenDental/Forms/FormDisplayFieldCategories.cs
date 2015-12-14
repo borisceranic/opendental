@@ -133,17 +133,19 @@ namespace OpenDental{
 
 		private void FormDisplayFields_Load(object sender,EventArgs e) {
 			//Alphabetical order.  When new display fields are added this will need to be changed.
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountModule"));
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountPatientInformation"));
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AppointmentBubble"));
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ChartPatientInformation"));
-			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","FamilyRecallGrid"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountModule"));//0
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AccountPatientInformation"));//1
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AppointmentBubble"));//2
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","AppointmentEdit"));//3
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ChartPatientInformation"));//4
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","FamilyRecallGrid"));//5
 			//skip None because user not allowed to select that
 			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
 				listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","OrthoChart"));
 			}
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientInformation"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientSelect"));
+			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PlannedAppointmentEdit"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ProcedureGroupNote"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","RecallList"));
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","StatementMainGrid"));
@@ -158,15 +160,17 @@ namespace OpenDental{
 				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
 				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
 				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
-				case 3: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
-				case 4: selectedCategory=DisplayFieldCategory.FamilyRecallGrid; break;
-				case 5: selectedCategory=DisplayFieldCategory.OrthoChart; break;
-				case 6: selectedCategory=DisplayFieldCategory.PatientInformation; break;
-				case 7: selectedCategory=DisplayFieldCategory.PatientSelect; break;
-				case 8: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
-				case 9: selectedCategory=DisplayFieldCategory.RecallList; break;
-				case 10: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
-				case 11: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+				case 3: selectedCategory=DisplayFieldCategory.AppointmentEdit; break;
+				case 4: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
+				case 5: selectedCategory=DisplayFieldCategory.FamilyRecallGrid; break;
+				case 6: selectedCategory=DisplayFieldCategory.OrthoChart; break;
+				case 7: selectedCategory=DisplayFieldCategory.PatientInformation; break;
+				case 8: selectedCategory=DisplayFieldCategory.PatientSelect; break;
+				case 9: selectedCategory=DisplayFieldCategory.PlannedAppointmentEdit; break;
+				case 10: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
+				case 11: selectedCategory=DisplayFieldCategory.RecallList; break;
+				case 12: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
+				case 13: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
 			}
 			if(selectedCategory==DisplayFieldCategory.None) {
 				return;//This could happen if a programmer added a new item to the list and didn't include it in the switch statement above.
@@ -184,18 +188,20 @@ namespace OpenDental{
 				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
 				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
 				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
-				case 3: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
-				case 4: selectedCategory=DisplayFieldCategory.FamilyRecallGrid; break;
-				case 5: selectedCategory=DisplayFieldCategory.OrthoChart; break;
-				case 6: selectedCategory=DisplayFieldCategory.PatientInformation; break;
-				case 7: selectedCategory=DisplayFieldCategory.PatientSelect; break;
-				case 8: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
-				case 9: selectedCategory=DisplayFieldCategory.RecallList; break;
-				case 10: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
-				case 11: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
+				case 3: selectedCategory=DisplayFieldCategory.AppointmentEdit; break;
+				case 4: selectedCategory=DisplayFieldCategory.ChartPatientInformation; break;
+				case 5: selectedCategory=DisplayFieldCategory.FamilyRecallGrid; break;
+				case 6: selectedCategory=DisplayFieldCategory.OrthoChart; break;
+				case 7: selectedCategory=DisplayFieldCategory.PatientInformation; break;
+				case 8: selectedCategory=DisplayFieldCategory.PatientSelect; break;
+				case 9: selectedCategory=DisplayFieldCategory.PlannedAppointmentEdit; break;
+				case 10: selectedCategory=DisplayFieldCategory.ProcedureGroupNote; break;
+				case 11: selectedCategory=DisplayFieldCategory.RecallList; break;
+				case 12: selectedCategory=DisplayFieldCategory.StatementMainGrid; break;
+				case 13: selectedCategory=DisplayFieldCategory.TreatmentPlanModule; break;
 			}
-			if(selectedCategory==DisplayFieldCategory.None) {  //This should never happen
-				return;
+			if(selectedCategory==DisplayFieldCategory.None) {
+				return;//This could happen if a programmer added a new item to the list and didn't include it in the switch statement above.
 			}
 			FormDisplayFields FormF=new FormDisplayFields();
 			FormF.Category=selectedCategory;

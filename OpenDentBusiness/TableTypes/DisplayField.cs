@@ -78,7 +78,11 @@ namespace OpenDentBusiness{
 		///<summary>11</summary>
 		StatementMainGrid,
 		///<summary>12</summary>
-		FamilyRecallGrid
+		FamilyRecallGrid,
+		///<summary>13</summary>
+		AppointmentEdit,
+		///<summary>14</summary>
+		PlannedAppointmentEdit
 	}
 	
 

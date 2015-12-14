@@ -979,6 +979,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(21, 469);
 			this.textNote.Name = "textNote";
@@ -1595,14 +1596,8 @@ namespace OpenDental{
 		private void CalcPatientFeeThisAppt() {
 			double feeThisAppt=0;
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					feeThisAppt+=PIn.Double(gridProc.Rows[gridProc.SelectedIndices[i]].Cells[4].Text);
-				}
-				else {
-					feeThisAppt+=PIn.Double(gridProc.Rows[gridProc.SelectedIndices[i]].Cells[6].Text);
-				}
+					feeThisAppt+=((Procedure)(gridProc.Rows[gridProc.SelectedIndices[i]].Tag)).ProcFee;
 			}
-				
 			gridPatient.Rows[gridPatient.Rows.Count-1].Cells[1].Text=POut.Double(feeThisAppt);
 			gridPatient.Invalidate();
 		}
@@ -1656,60 +1651,76 @@ namespace OpenDental{
 		}
 
 		private void FillProcedures(){
+			bool isMedical=Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum);
 			gridProc.BeginUpdate();
+			gridProc.Rows.Clear();
 			gridProc.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableApptProcs","Stat"),35);
-			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptProcs","Priority"),45);
-			gridProc.Columns.Add(col);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				col=new ODGridColumn(Lan.g("TableApptProcs","Code"),125);
-				gridProc.Columns.Add(col);
+			List<DisplayField> listAptDisplayFields;
+			if(AptCur.AptStatus==ApptStatus.Planned){
+				listAptDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.PlannedAppointmentEdit);
 			}
 			else {
-				col=new ODGridColumn(Lan.g("TableApptProcs","Tth"),25);
-				gridProc.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableApptProcs","Surf"),50);
-				gridProc.Columns.Add(col);
-				col=new ODGridColumn(Lan.g("TableApptProcs","Code"),50);
+				listAptDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.AppointmentEdit);
+			}
+			ODGridColumn col;
+			foreach(DisplayField displayField in listAptDisplayFields) {
+				if(isMedical && (displayField.InternalName=="Surf" || displayField.InternalName=="Tth")) {
+					continue;
+				}
+				col=new ODGridColumn(displayField.InternalName,displayField.ColumnWidth);
 				gridProc.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g("TableApptProcs","Description"),275);
-			gridProc.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableApptProcs","Fee"),60,HorizontalAlignment.Right);
-			gridProc.Columns.Add(col);
-			gridProc.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listProcs.Count;i++){
+			foreach(Procedure proc in _listProcs) {
 				row=new ODGridRow();
-				row.Cells.Add(_listProcs[i].ProcStatus.ToString());
-				row.Cells.Add(DefC.GetName(DefCat.TxPriorities,_listProcs[i].Priority));
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					row.Cells.Add(Tooth.GetToothLabel(_listProcs[i].ToothNum));
-					row.Cells.Add(_listProcs[i].Surf);
+				ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
+				foreach(DisplayField displayField in listAptDisplayFields) {
+					switch (displayField.InternalName) {
+						case "Stat":
+							row.Cells.Add(proc.ProcStatus.ToString());
+							break;
+						case "Priority":
+							row.Cells.Add(DefC.GetName(DefCat.TxPriorities,proc.Priority));
+							break;
+						case "Code":
+								row.Cells.Add(procCode.ProcCode);
+							break;
+						case "Tth":
+							if(!isMedical) {
+								row.Cells.Add(Tooth.GetToothLabel(proc.ToothNum));
+							}
+							break;
+						case "Surf":
+							if(!isMedical) {
+								row.Cells.Add(proc.Surf);
+							}
+							break;
+						case "Description":
+							string descript="";
+							//This descript is gotten the same way it was in Appointments.GetProcTable()
+							if(_isPlanned && proc.PlannedAptNum!=0 && proc.PlannedAptNum!=AptCur.AptNum) {
+								descript+=Lan.g(this,"(other appt) ");
+							}
+							else if(!_isPlanned && proc.AptNum!=0 && proc.AptNum!=AptCur.AptNum) {
+								descript+=Lan.g(this,"(other appt) ");
+							}
+							if(procCode.LaymanTerm=="") {
+								descript+=procCode.Descript;
+							}
+							else {
+								descript+=procCode.LaymanTerm;
+							}
+							if(proc.ToothRange!="") {
+								descript+=" #"+Tooth.FormatRangeForDisplay(proc.ToothRange);
+							}
+							row.Cells.Add(descript);
+							break;
+						case "Fee":
+							row.Cells.Add(proc.ProcFee.ToString("F"));
+							break;
+					}
 				}
-				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,_listProcs[i].CodeNum);
-				row.Cells.Add(procCode.ProcCode);
-				string descript="";
-				//This descript is gotten the same way it was in Appointments.GetProcTable()
-				if(_isPlanned && _listProcs[i].PlannedAptNum!=0 && _listProcs[i].PlannedAptNum!=AptCur.AptNum) {
-					descript+=Lan.g(this,"(other appt) ");
-				}
-				else if(!_isPlanned && _listProcs[i].AptNum!=0 && _listProcs[i].AptNum!=AptCur.AptNum){
-					descript+=Lan.g(this,"(other appt) ");
-				}
-				if(procCode.LaymanTerm=="") {
-					descript+=procCode.Descript;
-				}
-				else {
-					descript+=procCode.LaymanTerm;
-				}
-				if(_listProcs[i].ToothRange!="") {
-					descript+=" #"+Tooth.FormatRangeForDisplay(_listProcs[i].ToothRange);
-				}
-				row.Cells.Add(descript);
-				row.Cells.Add(_listProcs[i].ProcFee.ToString("F"));
-				row.Tag=_listProcs[i];
+				row.Tag=proc;
 				gridProc.Rows.Add(row);
 			}
 			gridProc.EndUpdate();
@@ -1722,7 +1733,7 @@ namespace OpenDental{
 				}
 			}
 		}
-
+		
 		private string GetLabCaseDescript() {
 			string descript="";
 			if(_labCur!=null) {
