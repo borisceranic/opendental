@@ -266,6 +266,7 @@
 			this.Controls.Add(this.butRun);
 			this.Controls.Add(this.label1);
 			this.Name = "Form1";
+			this.ShowIcon = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Crud Generator";
 			this.Load += new System.EventHandler(this.Form1_Load);
