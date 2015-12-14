@@ -1955,6 +1955,7 @@ namespace OpenDental{
 			proc.PatNum=AptCur.PatNum;
 			proc.ProcDate=DateTimeOD.Today;
 			proc.DateTP=proc.ProcDate;
+			proc.ToothRange="";
 			InsPlan primaryPlan=null;
 			InsSub primarySub=null;
 			List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
