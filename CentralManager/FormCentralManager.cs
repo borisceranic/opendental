@@ -365,6 +365,7 @@ namespace CentralManager {
 				CentralConnection connection=_listConns.Find(x => x.CentralConnectionNum==conn.CentralConnectionNum);
 				connection.ConnectionStatus=status;
 			}
+			ODThread.QuitSyncThreadsByGroupName(100,"Verify");
 			Cursor=Cursors.Default;
 			FillGrid();
 		}
