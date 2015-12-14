@@ -1514,7 +1514,9 @@ namespace OpenDental{
 							break;
 						case "Fee":
 							if(checkShowFees.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
+									|| RowsMain[i].Description.ToString()=="Subtotal")
+								{
 									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
 								}
 								else {
@@ -1524,7 +1526,9 @@ namespace OpenDental{
 							break;
 						case "Pri Ins":
 							if(checkShowIns.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
+									|| RowsMain[i].Description.ToString()=="Subtotal")
+								{
 									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
 								}
 								else {
@@ -1534,7 +1538,9 @@ namespace OpenDental{
 							break;
 						case "Sec Ins":
 							if(checkShowIns.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
+									|| RowsMain[i].Description.ToString()=="Subtotal")
+								{
 									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
 								}
 								else {
@@ -1544,7 +1550,9 @@ namespace OpenDental{
 							break;
 						case "Discount":
 							if(checkShowDiscount.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
+									|| RowsMain[i].Description.ToString()=="Subtotal")
+								{
 									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
 								}
 								else {
@@ -1554,7 +1562,9 @@ namespace OpenDental{
 							break;
 						case "Pat":
 							if(checkShowIns.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total") {
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
+									|| RowsMain[i].Description.ToString()=="Subtotal")
+								{
 									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
 								}
 								else {
