@@ -2222,6 +2222,7 @@ namespace OpenDental{
 		}
 		decimal subfee,totFee,priIns,secIns,subpriIns,totPriIns,subsecIns,totSecIns,subdiscount,totDiscount,subpat,totPat;
 		subfee=totFee=priIns=secIns=subpriIns=totPriIns=subsecIns=totSecIns=subdiscount=totDiscount=subpat=totPat=0;
+		RowsMain.Clear();
 		List<ProcTP> retVal=new List<ProcTP>();
 		for(int i=0;i<listProcForTP.Count;i++) {
 			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(listProcForTP[i].CodeNum);
