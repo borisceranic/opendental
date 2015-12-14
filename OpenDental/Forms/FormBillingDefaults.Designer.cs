@@ -137,7 +137,7 @@ namespace OpenDental{
 			// 
 			this.comboPracticeAddr.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPracticeAddr.FormattingEnabled = true;
-			this.comboPracticeAddr.Location = new System.Drawing.Point(470, 24);
+			this.comboPracticeAddr.Location = new System.Drawing.Point(478, 24);
 			this.comboPracticeAddr.Name = "comboPracticeAddr";
 			this.comboPracticeAddr.Size = new System.Drawing.Size(124, 21);
 			this.comboPracticeAddr.TabIndex = 260;
@@ -147,7 +147,7 @@ namespace OpenDental{
 			this.comboRemitAddr.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboRemitAddr.Enabled = false;
 			this.comboRemitAddr.FormattingEnabled = true;
-			this.comboRemitAddr.Location = new System.Drawing.Point(470, 46);
+			this.comboRemitAddr.Location = new System.Drawing.Point(478, 46);
 			this.comboRemitAddr.Name = "comboRemitAddr";
 			this.comboRemitAddr.Size = new System.Drawing.Size(124, 21);
 			this.comboRemitAddr.TabIndex = 259;
@@ -156,7 +156,7 @@ namespace OpenDental{
 			// 
 			this.labelPracticeAddr.Location = new System.Drawing.Point(371, 26);
 			this.labelPracticeAddr.Name = "labelPracticeAddr";
-			this.labelPracticeAddr.Size = new System.Drawing.Size(98, 16);
+			this.labelPracticeAddr.Size = new System.Drawing.Size(106, 16);
 			this.labelPracticeAddr.TabIndex = 258;
 			this.labelPracticeAddr.Text = "Practice Address";
 			this.labelPracticeAddr.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -165,16 +165,16 @@ namespace OpenDental{
 			// 
 			this.labelRemitAddr.Location = new System.Drawing.Point(371, 48);
 			this.labelRemitAddr.Name = "labelRemitAddr";
-			this.labelRemitAddr.Size = new System.Drawing.Size(98, 16);
+			this.labelRemitAddr.Size = new System.Drawing.Size(106, 16);
 			this.labelRemitAddr.TabIndex = 257;
 			this.labelRemitAddr.Text = "Remit Address";
 			this.labelRemitAddr.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(379, 70);
+			this.labelClinic.Location = new System.Drawing.Point(371, 70);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(90, 16);
+			this.labelClinic.Size = new System.Drawing.Size(106, 16);
 			this.labelClinic.TabIndex = 256;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -184,7 +184,7 @@ namespace OpenDental{
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboClinic.FormattingEnabled = true;
-			this.comboClinic.Location = new System.Drawing.Point(470, 68);
+			this.comboClinic.Location = new System.Drawing.Point(478, 68);
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(124, 21);
 			this.comboClinic.TabIndex = 255;
@@ -377,6 +377,7 @@ namespace OpenDental{
 			// textBillingEmailBody
 			// 
 			this.textBillingEmailBody.AcceptsTab = true;
+			this.textBillingEmailBody.BackColor = System.Drawing.SystemColors.Window;
 			this.textBillingEmailBody.DetectUrls = false;
 			this.textBillingEmailBody.Location = new System.Drawing.Point(12, 98);
 			this.textBillingEmailBody.Name = "textBillingEmailBody";
@@ -408,6 +409,7 @@ namespace OpenDental{
 			// textInvoiceNote
 			// 
 			this.textInvoiceNote.AcceptsTab = true;
+			this.textInvoiceNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textInvoiceNote.DetectUrls = false;
 			this.textInvoiceNote.Location = new System.Drawing.Point(24, 573);
 			this.textInvoiceNote.Name = "textInvoiceNote";
@@ -429,6 +431,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(24, 78);
 			this.textNote.Name = "textNote";
