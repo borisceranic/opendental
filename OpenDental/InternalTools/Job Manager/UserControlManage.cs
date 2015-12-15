@@ -138,9 +138,13 @@ namespace OpenDental {
 			gridMyJobs.Columns.Add(col);
 			col=new ODGridColumn("Category",80);
 			gridMyJobs.Columns.Add(col);
-			col=new ODGridColumn("Title",600);
+			col=new ODGridColumn("Title",500);
 			gridMyJobs.Columns.Add(col);
-			col=new ODGridColumn("Project",200);
+			col=new ODGridColumn("Project",150);
+			gridMyJobs.Columns.Add(col);
+			col=new ODGridColumn("Version",70);
+			gridMyJobs.Columns.Add(col);
+			col=new ODGridColumn("Quoted",50,HorizontalAlignment.Center);
 			gridMyJobs.Columns.Add(col);
 			gridMyJobs.Rows.Clear();
 			ODGridRow row;
@@ -155,6 +159,8 @@ namespace OpenDental {
 				row.Cells.Add(_tableMyJobs.Rows[i]["category"].ToString());
 				row.Cells.Add(_tableMyJobs.Rows[i]["Title"].ToString());
 				row.Cells.Add(_tableMyJobs.Rows[i]["project"].ToString());
+				row.Cells.Add(_tableMyJobs.Rows[i]["JobVersion"].ToString());
+				row.Cells.Add(_tableMyJobs.Rows[i]["hasQuote"].ToString());
 				row.Tag=PIn.Long(_tableMyJobs.Rows[i]["JobNum"].ToString());
 				gridMyJobs.Rows.Add(row);
 			}

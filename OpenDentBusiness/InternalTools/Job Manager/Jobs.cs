@@ -171,11 +171,13 @@ namespace OpenDentBusiness {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),showCreated,showCompleted);
 			}
 			string command="SELECT job.JobNum,job.Priority,job.DateTimeEntry,job.Expert,job.Owner,job.Status,job.Category"
-				+",job.Title,job.HoursEstimate,mainevent.Owner EventOwner,jobproject.Title ProjectTitle "
+				+",job.Title,job.HoursEstimate,mainevent.Owner EventOwner,jobproject.Title ProjectTitle,COALESCE(quote.JobLinkNum,0) hasQuote,job.JobVersion "
 				+"FROM job "
 				+"LEFT JOIN jobproject ON job.ProjectNum=jobproject.JobProjectNum "
 				+"LEFT JOIN jobevent mainevent ON job.JobNum=mainevent.JobNum "
 					+"AND mainevent.DateTimeEntry=(SELECT MIN(DateTimeEntry) FROM jobevent subevent WHERE subevent.JobEventNum=mainevent.JobEventNum) "
+				+"LEFT JOIN joblink quote ON job.JobNum=quote.JobNum "
+					+"AND quote.LinkType="+(int)JobLinkType.Quote+" "
 				+"WHERE (job.Owner="+POut.Long(Security.CurUser.UserNum)+" "
 					+"OR job.Expert="+POut.Long(Security.CurUser.UserNum);
 			if(showCreated) {
@@ -201,6 +203,8 @@ namespace OpenDentBusiness {
 			returnTable.Columns.Add("Project");
 			returnTable.Columns.Add("originator");
 			returnTable.Columns.Add("EstimatedHours");
+			returnTable.Columns.Add("hasQuote");
+			returnTable.Columns.Add("JobVersion");
 			//Sets the primary key for use in tagging. This must be the JobNum since the grid is tagged with the JobNum in the UI.
 			returnTable.PrimaryKey=new DataColumn[] { returnTable.Columns["JobNum"] };
 			DataRow r;
@@ -217,6 +221,13 @@ namespace OpenDentBusiness {
 				r["Project"]=dRow["ProjectTitle"].ToString();
 				r["originator"]=Userods.GetName(PIn.Long(dRow["EventOwner"].ToString()));
 				r["EstimatedHours"]=dRow["HoursEstimate"].ToString();
+				if(dRow["hasQuote"].ToString()=="0") {
+					r["hasQuote"]="";
+				}
+				else {
+					r["hasQuote"]="X";
+				}
+				r["JobVersion"]=dRow["JobVersion"].ToString();
 				returnTable.Rows.Add(r);
 			}
 			return returnTable;

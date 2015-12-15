@@ -25,7 +25,7 @@ namespace OpenDentBusiness{
 			return Crud.JobLinkCrud.SelectOne(jobLinknum);
 		}
 
-		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, and Tasks.</summary>
+		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, Quotes, and Tasks.</summary>
 		public static List<JobLink> GetJobLinks(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobLink>>(MethodBase.GetCurrentMethod(),jobNum);

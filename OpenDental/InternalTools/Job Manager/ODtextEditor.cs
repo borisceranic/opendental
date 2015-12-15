@@ -144,7 +144,6 @@ namespace OpenDental {
 				butUnderline.Enabled=false;
 				butStrikeout.Enabled=false;
 				butBullet.Enabled=false;
-				butFont.Enabled=false;
 				comboFontSize.Enabled=false;
 				comboFontType.Enabled=false;
 				butColor.Enabled=false;
@@ -194,7 +193,7 @@ namespace OpenDental {
 				labelWarning.Text="";
 			}
 			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
+				//labelWarning.Text="Cannot format multiple Fonts";
 			}
 		}
 
@@ -204,7 +203,7 @@ namespace OpenDental {
 				labelWarning.Text="";
 			}
 			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
+				//labelWarning.Text="Cannot format multiple Fonts";
 			}
 		}
 
@@ -214,7 +213,7 @@ namespace OpenDental {
 				labelWarning.Text="";
 			}
 			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
+				//labelWarning.Text="Cannot format multiple Fonts";
 			}
 		}
 
@@ -224,7 +223,7 @@ namespace OpenDental {
 				labelWarning.Text="";
 			}
 			catch {
-				labelWarning.Text="Cannot format multiple Fonts";
+				//labelWarning.Text="Cannot format multiple Fonts";
 			}
 		}
 
@@ -237,8 +236,22 @@ namespace OpenDental {
 			}
 		}
 
-		private void butFont_Click(object sender,EventArgs e) {
-			textDescription.SelectionFont=new Font((string)comboFontType.SelectedItem,(int)comboFontSize.SelectedItem,textDescription.SelectionFont.Style);
+		private void comboFontType_SelectionChangeCommitted(object sender,EventArgs e) {
+			try {
+				textDescription.SelectionFont=new Font((string)comboFontType.SelectedItem,(int)comboFontSize.SelectedItem,textDescription.SelectionFont.Style);
+			}
+			catch {
+
+			}
+		}
+
+		private void comboFontSize_SelectionChangeCommitted(object sender,EventArgs e) {
+			try {
+				textDescription.SelectionFont=new Font((string)comboFontType.SelectedItem,(int)comboFontSize.SelectedItem,textDescription.SelectionFont.Style);
+			}
+			catch {
+
+			}
 		}
 
 		private void butColor_Click(object sender,EventArgs e) {
@@ -354,9 +367,6 @@ namespace OpenDental {
 				base.ProcessCmdKey(ref msg,e.KeyData);
 			}
 		}
-
-
-
 
 	}
 

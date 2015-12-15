@@ -63,7 +63,7 @@ namespace OpenDental {
 				return;
 			}
 			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the current job review. Are you sure?")) {
-				JobReviews.Delete(_jobReviewCur.JobReviewNum,JobLinkType.Review);
+				JobReviews.Delete(_jobReviewCur.JobReviewNum);
 				_jobReviewCur=null;
 				DialogResult=DialogResult.OK;
 			}

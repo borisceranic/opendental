@@ -28,7 +28,6 @@
 			this.comboFontType = new System.Windows.Forms.ComboBox();
 			this.butColorSelect = new System.Windows.Forms.Button();
 			this.butHighlight = new System.Windows.Forms.Button();
-			this.butFont = new System.Windows.Forms.Button();
 			this.butBullet = new System.Windows.Forms.Button();
 			this.butStrikeout = new System.Windows.Forms.Button();
 			this.butRedo = new System.Windows.Forms.Button();
@@ -49,17 +48,18 @@
 			// comboFontSize
 			// 
 			this.comboFontSize.FormattingEnabled = true;
-			this.comboFontSize.Location = new System.Drawing.Point(556, 4);
+			this.comboFontSize.Location = new System.Drawing.Point(515, 4);
 			this.comboFontSize.Name = "comboFontSize";
 			this.comboFontSize.Size = new System.Drawing.Size(39, 21);
 			this.comboFontSize.TabIndex = 186;
+			this.comboFontSize.SelectionChangeCommitted += new System.EventHandler(this.comboFontSize_SelectionChangeCommitted);
 			// 
 			// butHighlightSelect
 			// 
 			this.butHighlightSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butHighlightSelect.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butHighlightSelect.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.butHighlightSelect.Location = new System.Drawing.Point(702, 2);
+			this.butHighlightSelect.Location = new System.Drawing.Point(656, 2);
 			this.butHighlightSelect.Name = "butHighlightSelect";
 			this.butHighlightSelect.Size = new System.Drawing.Size(10, 24);
 			this.butHighlightSelect.TabIndex = 184;
@@ -71,17 +71,18 @@
 			// comboFontType
 			// 
 			this.comboFontType.FormattingEnabled = true;
-			this.comboFontType.Location = new System.Drawing.Point(442, 4);
+			this.comboFontType.Location = new System.Drawing.Point(401, 4);
 			this.comboFontType.Name = "comboFontType";
 			this.comboFontType.Size = new System.Drawing.Size(113, 21);
 			this.comboFontType.TabIndex = 183;
+			this.comboFontType.SelectionChangeCommitted += new System.EventHandler(this.comboFontType_SelectionChangeCommitted);
 			// 
 			// butColorSelect
 			// 
 			this.butColorSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butColorSelect.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butColorSelect.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.butColorSelect.Location = new System.Drawing.Point(627, 2);
+			this.butColorSelect.Location = new System.Drawing.Point(581, 2);
 			this.butColorSelect.Name = "butColorSelect";
 			this.butColorSelect.Size = new System.Drawing.Size(10, 24);
 			this.butColorSelect.TabIndex = 182;
@@ -93,7 +94,7 @@
 			// butHighlight
 			// 
 			this.butHighlight.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butHighlight.Location = new System.Drawing.Point(645, 2);
+			this.butHighlight.Location = new System.Drawing.Point(599, 2);
 			this.butHighlight.Name = "butHighlight";
 			this.butHighlight.Size = new System.Drawing.Size(57, 24);
 			this.butHighlight.TabIndex = 181;
@@ -101,18 +102,6 @@
 			this.butHighlight.Click += new System.EventHandler(this.butHighlight_Click);
 			this.butHighlight.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butHighlight.MouseLeave += new System.EventHandler(this.HoverColorLeave);
-			// 
-			// butFont
-			// 
-			this.butFont.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butFont.Location = new System.Drawing.Point(400, 2);
-			this.butFont.Name = "butFont";
-			this.butFont.Size = new System.Drawing.Size(41, 24);
-			this.butFont.TabIndex = 178;
-			this.butFont.Text = "Font";
-			this.butFont.Click += new System.EventHandler(this.butFont_Click);
-			this.butFont.MouseEnter += new System.EventHandler(this.HoverColorEnter);
-			this.butFont.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
 			// butBullet
 			// 
@@ -155,7 +144,7 @@
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butColor.Font = new System.Drawing.Font("Modern No. 20", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butColor.Location = new System.Drawing.Point(601, 2);
+			this.butColor.Location = new System.Drawing.Point(555, 2);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(26, 24);
 			this.butColor.TabIndex = 170;
@@ -260,7 +249,7 @@
 			// labelWarning
 			// 
 			this.labelWarning.AutoSize = true;
-			this.labelWarning.Location = new System.Drawing.Point(718, 8);
+			this.labelWarning.Location = new System.Drawing.Point(672, 7);
 			this.labelWarning.Name = "labelWarning";
 			this.labelWarning.Size = new System.Drawing.Size(47, 13);
 			this.labelWarning.TabIndex = 187;
@@ -307,7 +296,6 @@
 			this.Controls.Add(this.comboFontType);
 			this.Controls.Add(this.butColorSelect);
 			this.Controls.Add(this.butHighlight);
-			this.Controls.Add(this.butFont);
 			this.Controls.Add(this.butBullet);
 			this.Controls.Add(this.butStrikeout);
 			this.Controls.Add(this.butRedo);
@@ -336,7 +324,6 @@
 		private System.Windows.Forms.ComboBox comboFontType;
 		private System.Windows.Forms.Button butColorSelect;
 		private System.Windows.Forms.Button butHighlight;
-		private System.Windows.Forms.Button butFont;
 		private System.Windows.Forms.Button butBullet;
 		private System.Windows.Forms.Button butStrikeout;
 		private System.Windows.Forms.Button butRedo;
