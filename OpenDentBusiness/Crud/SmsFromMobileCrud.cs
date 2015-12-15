@@ -66,6 +66,46 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SmsFromMobile> listSmsFromMobiles) {
+			DataTable table=new DataTable("SmsFromMobiles");
+			table.Columns.Add("SmsFromMobileNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("CommlogNum");
+			table.Columns.Add("MsgText");
+			table.Columns.Add("DateTimeReceived");
+			table.Columns.Add("SmsPhoneNumber");
+			table.Columns.Add("MobilePhoneNumber");
+			table.Columns.Add("MsgPart");
+			table.Columns.Add("MsgTotal");
+			table.Columns.Add("MsgRefID");
+			table.Columns.Add("SmsStatus");
+			table.Columns.Add("Flags");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("MatchCount");
+			foreach(SmsFromMobile smsFromMobile in listSmsFromMobiles) {
+				table.Rows.Add(new object[] {
+					POut.Long  (smsFromMobile.SmsFromMobileNum),
+					POut.Long  (smsFromMobile.PatNum),
+					POut.Long  (smsFromMobile.ClinicNum),
+					POut.Long  (smsFromMobile.CommlogNum),
+					POut.String(smsFromMobile.MsgText),
+					POut.DateT (smsFromMobile.DateTimeReceived),
+					POut.String(smsFromMobile.SmsPhoneNumber),
+					POut.String(smsFromMobile.MobilePhoneNumber),
+					POut.Int   (smsFromMobile.MsgPart),
+					POut.Int   (smsFromMobile.MsgTotal),
+					POut.String(smsFromMobile.MsgRefID),
+					POut.Int   ((int)smsFromMobile.SmsStatus),
+					POut.String(smsFromMobile.Flags),
+					POut.Bool  (smsFromMobile.IsHidden),
+					POut.Int   (smsFromMobile.MatchCount),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SmsFromMobile into the database.  Returns the new priKey.</summary>
 		public static long Insert(SmsFromMobile smsFromMobile){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

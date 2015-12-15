@@ -83,6 +83,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLabResultsCopyTo> listEhrLabResultsCopyTos) {
+			DataTable table=new DataTable("EhrLabResultsCopyTos");
+			table.Columns.Add("EhrLabResultsCopyToNum");
+			table.Columns.Add("EhrLabNum");
+			table.Columns.Add("CopyToID");
+			table.Columns.Add("CopyToLName");
+			table.Columns.Add("CopyToFName");
+			table.Columns.Add("CopyToMiddleNames");
+			table.Columns.Add("CopyToSuffix");
+			table.Columns.Add("CopyToPrefix");
+			table.Columns.Add("CopyToAssigningAuthorityNamespaceID");
+			table.Columns.Add("CopyToAssigningAuthorityUniversalID");
+			table.Columns.Add("CopyToAssigningAuthorityIDType");
+			table.Columns.Add("CopyToNameTypeCode");
+			table.Columns.Add("CopyToIdentifierTypeCode");
+			foreach(EhrLabResultsCopyTo ehrLabResultsCopyTo in listEhrLabResultsCopyTos) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLabResultsCopyTo.EhrLabResultsCopyToNum),
+					POut.Long  (ehrLabResultsCopyTo.EhrLabNum),
+					POut.String(ehrLabResultsCopyTo.CopyToID),
+					POut.String(ehrLabResultsCopyTo.CopyToLName),
+					POut.String(ehrLabResultsCopyTo.CopyToFName),
+					POut.String(ehrLabResultsCopyTo.CopyToMiddleNames),
+					POut.String(ehrLabResultsCopyTo.CopyToSuffix),
+					POut.String(ehrLabResultsCopyTo.CopyToPrefix),
+					POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID),
+					POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID),
+					POut.String(ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType),
+					POut.Int   ((int)ehrLabResultsCopyTo.CopyToNameTypeCode),
+					POut.Int   ((int)ehrLabResultsCopyTo.CopyToIdentifierTypeCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLabResultsCopyTo into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLabResultsCopyTo ehrLabResultsCopyTo){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

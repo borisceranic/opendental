@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcNote> listProcNotes) {
+			DataTable table=new DataTable("ProcNotes");
+			table.Columns.Add("ProcNoteNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("EntryDateTime");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("Note");
+			table.Columns.Add("SigIsTopaz");
+			table.Columns.Add("Signature");
+			foreach(ProcNote procNote in listProcNotes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (procNote.ProcNoteNum),
+					POut.Long  (procNote.PatNum),
+					POut.Long  (procNote.ProcNum),
+					POut.DateT (procNote.EntryDateTime),
+					POut.Long  (procNote.UserNum),
+					POut.String(procNote.Note),
+					POut.Bool  (procNote.SigIsTopaz),
+					POut.String(procNote.Signature),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ProcNote into the database.  Returns the new priKey.</summary>
 		public static long Insert(ProcNote procNote){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

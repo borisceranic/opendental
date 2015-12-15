@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SheetDef> listSheetDefs) {
+			DataTable table=new DataTable("SheetDefs");
+			table.Columns.Add("SheetDefNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("SheetType");
+			table.Columns.Add("FontSize");
+			table.Columns.Add("FontName");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			table.Columns.Add("IsLandscape");
+			table.Columns.Add("PageCount");
+			table.Columns.Add("IsMultiPage");
+			foreach(SheetDef sheetDef in listSheetDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (sheetDef.SheetDefNum),
+					POut.String(sheetDef.Description),
+					POut.Int   ((int)sheetDef.SheetType),
+					POut.Float (sheetDef.FontSize),
+					POut.String(sheetDef.FontName),
+					POut.Int   (sheetDef.Width),
+					POut.Int   (sheetDef.Height),
+					POut.Bool  (sheetDef.IsLandscape),
+					POut.Int   (sheetDef.PageCount),
+					POut.Bool  (sheetDef.IsMultiPage),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SheetDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(SheetDef sheetDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

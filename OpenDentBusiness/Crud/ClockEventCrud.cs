@@ -66,6 +66,46 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClockEvent> listClockEvents) {
+			DataTable table=new DataTable("ClockEvents");
+			table.Columns.Add("ClockEventNum");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("TimeEntered1");
+			table.Columns.Add("TimeDisplayed1");
+			table.Columns.Add("ClockStatus");
+			table.Columns.Add("Note");
+			table.Columns.Add("TimeEntered2");
+			table.Columns.Add("TimeDisplayed2");
+			table.Columns.Add("OTimeHours");
+			table.Columns.Add("OTimeAuto");
+			table.Columns.Add("Adjust");
+			table.Columns.Add("AdjustAuto");
+			table.Columns.Add("AdjustIsOverridden");
+			table.Columns.Add("Rate2Hours");
+			table.Columns.Add("Rate2Auto");
+			foreach(ClockEvent clockEvent in listClockEvents) {
+				table.Rows.Add(new object[] {
+					POut.Long  (clockEvent.ClockEventNum),
+					POut.Long  (clockEvent.EmployeeNum),
+					POut.DateT (clockEvent.TimeEntered1),
+					POut.DateT (clockEvent.TimeDisplayed1),
+					POut.Int   ((int)clockEvent.ClockStatus),
+					POut.String(clockEvent.Note),
+					POut.DateT (clockEvent.TimeEntered2),
+					POut.DateT (clockEvent.TimeDisplayed2),
+					POut.Time  (clockEvent.OTimeHours),
+					POut.Time  (clockEvent.OTimeAuto),
+					POut.Time  (clockEvent.Adjust),
+					POut.Time  (clockEvent.AdjustAuto),
+					POut.Bool  (clockEvent.AdjustIsOverridden),
+					POut.Time  (clockEvent.Rate2Hours),
+					POut.Time  (clockEvent.Rate2Auto),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClockEvent into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClockEvent clockEvent){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

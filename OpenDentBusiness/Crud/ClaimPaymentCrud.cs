@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimPayment> listClaimPayments) {
+			DataTable table=new DataTable("ClaimPayments");
+			table.Columns.Add("ClaimPaymentNum");
+			table.Columns.Add("CheckDate");
+			table.Columns.Add("CheckAmt");
+			table.Columns.Add("CheckNum");
+			table.Columns.Add("BankBranch");
+			table.Columns.Add("Note");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("DepositNum");
+			table.Columns.Add("CarrierName");
+			table.Columns.Add("DateIssued");
+			table.Columns.Add("IsPartial");
+			table.Columns.Add("PayType");
+			foreach(ClaimPayment claimPayment in listClaimPayments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimPayment.ClaimPaymentNum),
+					POut.Date  (claimPayment.CheckDate),
+					POut.Double(claimPayment.CheckAmt),
+					POut.String(claimPayment.CheckNum),
+					POut.String(claimPayment.BankBranch),
+					POut.String(claimPayment.Note),
+					POut.Long  (claimPayment.ClinicNum),
+					POut.Long  (claimPayment.DepositNum),
+					POut.String(claimPayment.CarrierName),
+					POut.Date  (claimPayment.DateIssued),
+					POut.Bool  (claimPayment.IsPartial),
+					POut.Long  (claimPayment.PayType),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimPayment into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimPayment claimPayment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

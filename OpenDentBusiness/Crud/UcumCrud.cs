@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Ucum> listUcums) {
+			DataTable table=new DataTable("Ucums");
+			table.Columns.Add("UcumNum");
+			table.Columns.Add("UcumCode");
+			table.Columns.Add("Description");
+			table.Columns.Add("IsInUse");
+			foreach(Ucum ucum in listUcums) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ucum.UcumNum),
+					POut.String(ucum.UcumCode),
+					POut.String(ucum.Description),
+					POut.Bool  (ucum.IsInUse),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Ucum into the database.  Returns the new priKey.</summary>
 		public static long Insert(Ucum ucum){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

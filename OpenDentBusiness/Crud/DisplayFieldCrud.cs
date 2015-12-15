@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<DisplayField> listDisplayFields) {
+			DataTable table=new DataTable("DisplayFields");
+			table.Columns.Add("DisplayFieldNum");
+			table.Columns.Add("InternalName");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("Description");
+			table.Columns.Add("ColumnWidth");
+			table.Columns.Add("Category");
+			table.Columns.Add("ChartViewNum");
+			table.Columns.Add("PickList");
+			foreach(DisplayField displayField in listDisplayFields) {
+				table.Rows.Add(new object[] {
+					POut.Long  (displayField.DisplayFieldNum),
+					POut.String(displayField.InternalName),
+					POut.Int   (displayField.ItemOrder),
+					POut.String(displayField.Description),
+					POut.Int   (displayField.ColumnWidth),
+					POut.Int   ((int)displayField.Category),
+					POut.Long  (displayField.ChartViewNum),
+					POut.String(displayField.PickList),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one DisplayField into the database.  Returns the new priKey.</summary>
 		public static long Insert(DisplayField displayField){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

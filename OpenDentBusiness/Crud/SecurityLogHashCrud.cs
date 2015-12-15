@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SecurityLogHash> listSecurityLogHashs) {
+			DataTable table=new DataTable("SecurityLogHashs");
+			table.Columns.Add("SecurityLogHashNum");
+			table.Columns.Add("SecurityLogNum");
+			table.Columns.Add("LogHash");
+			foreach(SecurityLogHash securityLogHash in listSecurityLogHashs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (securityLogHash.SecurityLogHashNum),
+					POut.Long  (securityLogHash.SecurityLogNum),
+					POut.String(securityLogHash.LogHash),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SecurityLogHash into the database.  Returns the new priKey.</summary>
 		public static long Insert(SecurityLogHash securityLogHash){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

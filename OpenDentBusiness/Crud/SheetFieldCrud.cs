@@ -71,6 +71,56 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SheetField> listSheetFields) {
+			DataTable table=new DataTable("SheetFields");
+			table.Columns.Add("SheetFieldNum");
+			table.Columns.Add("SheetNum");
+			table.Columns.Add("FieldType");
+			table.Columns.Add("FieldName");
+			table.Columns.Add("FieldValue");
+			table.Columns.Add("FontSize");
+			table.Columns.Add("FontName");
+			table.Columns.Add("FontIsBold");
+			table.Columns.Add("XPos");
+			table.Columns.Add("YPos");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			table.Columns.Add("GrowthBehavior");
+			table.Columns.Add("RadioButtonValue");
+			table.Columns.Add("RadioButtonGroup");
+			table.Columns.Add("IsRequired");
+			table.Columns.Add("TabOrder");
+			table.Columns.Add("ReportableName");
+			table.Columns.Add("TextAlign");
+			table.Columns.Add("ItemColor");
+			foreach(SheetField sheetField in listSheetFields) {
+				table.Rows.Add(new object[] {
+					POut.Long  (sheetField.SheetFieldNum),
+					POut.Long  (sheetField.SheetNum),
+					POut.Int   ((int)sheetField.FieldType),
+					POut.String(sheetField.FieldName),
+					POut.String(sheetField.FieldValue),
+					POut.Float (sheetField.FontSize),
+					POut.String(sheetField.FontName),
+					POut.Bool  (sheetField.FontIsBold),
+					POut.Int   (sheetField.XPos),
+					POut.Int   (sheetField.YPos),
+					POut.Int   (sheetField.Width),
+					POut.Int   (sheetField.Height),
+					POut.Int   ((int)sheetField.GrowthBehavior),
+					POut.String(sheetField.RadioButtonValue),
+					POut.String(sheetField.RadioButtonGroup),
+					POut.Bool  (sheetField.IsRequired),
+					POut.Int   (sheetField.TabOrder),
+					POut.String(sheetField.ReportableName),
+					POut.Int   ((int)sheetField.TextAlign),
+					POut.Int   (sheetField.ItemColor.ToArgb()),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SheetField into the database.  Returns the new priKey.</summary>
 		public static long Insert(SheetField sheetField){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

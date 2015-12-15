@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SecurityLog> listSecurityLogs) {
+			DataTable table=new DataTable("SecurityLogs");
+			table.Columns.Add("SecurityLogNum");
+			table.Columns.Add("PermType");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("LogDateTime");
+			table.Columns.Add("LogText");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("CompName");
+			table.Columns.Add("FKey");
+			table.Columns.Add("LogSource");
+			table.Columns.Add("DefNum");
+			foreach(SecurityLog securityLog in listSecurityLogs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (securityLog.SecurityLogNum),
+					POut.Int   ((int)securityLog.PermType),
+					POut.Long  (securityLog.UserNum),
+					POut.DateT (securityLog.LogDateTime),
+					POut.String(securityLog.LogText),
+					POut.Long  (securityLog.PatNum),
+					POut.String(securityLog.CompName),
+					POut.Long  (securityLog.FKey),
+					POut.Int   ((int)securityLog.LogSource),
+					POut.Long  (securityLog.DefNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SecurityLog into the database.  Returns the new priKey.</summary>
 		public static long Insert(SecurityLog securityLog){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

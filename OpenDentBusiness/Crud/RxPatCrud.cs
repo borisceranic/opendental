@@ -67,6 +67,48 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RxPat> listRxPats) {
+			DataTable table=new DataTable("RxPats");
+			table.Columns.Add("RxNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("RxDate");
+			table.Columns.Add("Drug");
+			table.Columns.Add("Sig");
+			table.Columns.Add("Disp");
+			table.Columns.Add("Refills");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("Notes");
+			table.Columns.Add("PharmacyNum");
+			table.Columns.Add("IsControlled");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("SendStatus");
+			table.Columns.Add("RxCui");
+			table.Columns.Add("DosageCode");
+			table.Columns.Add("NewCropGuid");
+			foreach(RxPat rxPat in listRxPats) {
+				table.Rows.Add(new object[] {
+					POut.Long  (rxPat.RxNum),
+					POut.Long  (rxPat.PatNum),
+					POut.Date  (rxPat.RxDate),
+					POut.String(rxPat.Drug),
+					POut.String(rxPat.Sig),
+					POut.String(rxPat.Disp),
+					POut.String(rxPat.Refills),
+					POut.Long  (rxPat.ProvNum),
+					POut.String(rxPat.Notes),
+					POut.Long  (rxPat.PharmacyNum),
+					POut.Bool  (rxPat.IsControlled),
+					POut.DateT (rxPat.DateTStamp),
+					POut.Int   ((int)rxPat.SendStatus),
+					POut.Long  (rxPat.RxCui),
+					POut.String(rxPat.DosageCode),
+					POut.String(rxPat.NewCropGuid),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RxPat into the database.  Returns the new priKey.</summary>
 		public static long Insert(RxPat rxPat){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

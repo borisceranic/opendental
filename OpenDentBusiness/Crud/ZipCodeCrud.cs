@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ZipCode> listZipCodes) {
+			DataTable table=new DataTable("ZipCodes");
+			table.Columns.Add("ZipCodeNum");
+			table.Columns.Add("ZipCodeDigits");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("IsFrequent");
+			foreach(ZipCode zipCode in listZipCodes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (zipCode.ZipCodeNum),
+					POut.String(zipCode.ZipCodeDigits),
+					POut.String(zipCode.City),
+					POut.String(zipCode.State),
+					POut.Bool  (zipCode.IsFrequent),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ZipCode into the database.  Returns the new priKey.</summary>
 		public static long Insert(ZipCode zipCode){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<MedicationPat> listMedicationPats) {
+			DataTable table=new DataTable("MedicationPats");
+			table.Columns.Add("MedicationPatNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("MedicationNum");
+			table.Columns.Add("PatNote");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("DateStop");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("MedDescript");
+			table.Columns.Add("RxCui");
+			table.Columns.Add("NewCropGuid");
+			table.Columns.Add("IsCpoe");
+			foreach(MedicationPat medicationPat in listMedicationPats) {
+				table.Rows.Add(new object[] {
+					POut.Long  (medicationPat.MedicationPatNum),
+					POut.Long  (medicationPat.PatNum),
+					POut.Long  (medicationPat.MedicationNum),
+					POut.String(medicationPat.PatNote),
+					POut.DateT (medicationPat.DateTStamp),
+					POut.Date  (medicationPat.DateStart),
+					POut.Date  (medicationPat.DateStop),
+					POut.Long  (medicationPat.ProvNum),
+					POut.String(medicationPat.MedDescript),
+					POut.Long  (medicationPat.RxCui),
+					POut.String(medicationPat.NewCropGuid),
+					POut.Bool  (medicationPat.IsCpoe),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one MedicationPat into the database.  Returns the new priKey.</summary>
 		public static long Insert(MedicationPat medicationPat){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

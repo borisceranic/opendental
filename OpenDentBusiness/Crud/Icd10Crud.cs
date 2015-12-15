@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Icd10> listIcd10s) {
+			DataTable table=new DataTable("Icd10s");
+			table.Columns.Add("Icd10Num");
+			table.Columns.Add("Icd10Code");
+			table.Columns.Add("Description");
+			table.Columns.Add("IsCode");
+			foreach(Icd10 icd10 in listIcd10s) {
+				table.Rows.Add(new object[] {
+					POut.Long  (icd10.Icd10Num),
+					POut.String(icd10.Icd10Code),
+					POut.String(icd10.Description),
+					POut.String(icd10.IsCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Icd10 into the database.  Returns the new priKey.</summary>
 		public static long Insert(Icd10 icd10){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

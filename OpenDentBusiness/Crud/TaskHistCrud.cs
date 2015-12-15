@@ -69,6 +69,52 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<TaskHist> listTaskHists) {
+			DataTable table=new DataTable("TaskHists");
+			table.Columns.Add("TaskHistNum");
+			table.Columns.Add("UserNumHist");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("IsNoteChange");
+			table.Columns.Add("TaskNum");
+			table.Columns.Add("TaskListNum");
+			table.Columns.Add("DateTask");
+			table.Columns.Add("KeyNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("TaskStatus");
+			table.Columns.Add("IsRepeating");
+			table.Columns.Add("DateType");
+			table.Columns.Add("FromNum");
+			table.Columns.Add("ObjectType");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("DateTimeFinished");
+			table.Columns.Add("PriorityDefNum");
+			foreach(TaskHist taskHist in listTaskHists) {
+				table.Rows.Add(new object[] {
+					POut.Long  (taskHist.TaskHistNum),
+					POut.Long  (taskHist.UserNumHist),
+					POut.DateT (taskHist.DateTStamp),
+					POut.Bool  (taskHist.IsNoteChange),
+					POut.Long  (taskHist.TaskNum),
+					POut.Long  (taskHist.TaskListNum),
+					POut.Date  (taskHist.DateTask),
+					POut.Long  (taskHist.KeyNum),
+					POut.String(taskHist.Descript),
+					POut.Int   ((int)taskHist.TaskStatus),
+					POut.Bool  (taskHist.IsRepeating),
+					POut.Int   ((int)taskHist.DateType),
+					POut.Long  (taskHist.FromNum),
+					POut.Int   ((int)taskHist.ObjectType),
+					POut.DateT (taskHist.DateTimeEntry),
+					POut.Long  (taskHist.UserNum),
+					POut.DateT (taskHist.DateTimeFinished),
+					POut.Long  (taskHist.PriorityDefNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one TaskHist into the database.  Returns the new priKey.</summary>
 		public static long Insert(TaskHist taskHist){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

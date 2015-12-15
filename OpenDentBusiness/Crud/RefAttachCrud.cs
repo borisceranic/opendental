@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RefAttach> listRefAttachs) {
+			DataTable table=new DataTable("RefAttachs");
+			table.Columns.Add("RefAttachNum");
+			table.Columns.Add("ReferralNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("RefDate");
+			table.Columns.Add("IsFrom");
+			table.Columns.Add("RefToStatus");
+			table.Columns.Add("Note");
+			table.Columns.Add("IsTransitionOfCare");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("DateProcComplete");
+			table.Columns.Add("ProvNum");
+			foreach(RefAttach refAttach in listRefAttachs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (refAttach.RefAttachNum),
+					POut.Long  (refAttach.ReferralNum),
+					POut.Long  (refAttach.PatNum),
+					POut.Int   (refAttach.ItemOrder),
+					POut.Date  (refAttach.RefDate),
+					POut.Bool  (refAttach.IsFrom),
+					POut.Int   ((int)refAttach.RefToStatus),
+					POut.String(refAttach.Note),
+					POut.Bool  (refAttach.IsTransitionOfCare),
+					POut.Long  (refAttach.ProcNum),
+					POut.Date  (refAttach.DateProcComplete),
+					POut.Long  (refAttach.ProvNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RefAttach into the database.  Returns the new priKey.</summary>
 		public static long Insert(RefAttach refAttach){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

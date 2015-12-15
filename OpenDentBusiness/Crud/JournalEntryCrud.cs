@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<JournalEntry> listJournalEntrys) {
+			DataTable table=new DataTable("JournalEntrys");
+			table.Columns.Add("JournalEntryNum");
+			table.Columns.Add("TransactionNum");
+			table.Columns.Add("AccountNum");
+			table.Columns.Add("DateDisplayed");
+			table.Columns.Add("DebitAmt");
+			table.Columns.Add("CreditAmt");
+			table.Columns.Add("Memo");
+			table.Columns.Add("Splits");
+			table.Columns.Add("CheckNumber");
+			table.Columns.Add("ReconcileNum");
+			foreach(JournalEntry journalEntry in listJournalEntrys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (journalEntry.JournalEntryNum),
+					POut.Long  (journalEntry.TransactionNum),
+					POut.Long  (journalEntry.AccountNum),
+					POut.Date  (journalEntry.DateDisplayed),
+					POut.Double(journalEntry.DebitAmt),
+					POut.Double(journalEntry.CreditAmt),
+					POut.String(journalEntry.Memo),
+					POut.String(journalEntry.Splits),
+					POut.String(journalEntry.CheckNumber),
+					POut.Long  (journalEntry.ReconcileNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one JournalEntry into the database.  Returns the new priKey.</summary>
 		public static long Insert(JournalEntry journalEntry){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

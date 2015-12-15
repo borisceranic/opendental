@@ -316,6 +316,82 @@ using System.Drawing;"+rn);
 			strb.Append(rn+t3+"return retVal;");
 			strb.Append(rn+t2+"}");
 			#endregion TableToList
+			#region ListToTable
+			//ListToTable----------------------------------------------------------------------------------------
+			strb.Append(rn+rn+t2+"///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>");
+			strb.Append(rn+t2+"public static DataTable ListToTable(List<"+typeClass.Name+"> list"+typeClass.Name+"s) {");
+			strb.Append(rn+t3+"DataTable table=new DataTable(\""+typeClass.Name+"s\");");
+			//Now add columns.
+			foreach(FieldInfo field in fieldsInDb) {
+				strb.Append(rn+t3+"table.Columns.Add(\""+field.Name+"\");");
+			}
+			string classLowerCase=typeClass.Name.Substring(0,1).ToLower()+typeClass.Name.Substring(1);
+			strb.Append(rn+t3+"foreach("+typeClass.Name+" "+classLowerCase+" in list"+typeClass.Name+"s) {");
+			strb.Append(rn+t4+"table.Rows.Add(new object[] {");
+			foreach(FieldInfo field in fieldsInDb) {
+				strb.Append(rn+t5);
+				//Fields are not guaranteed to be in any particular order.
+				specialType=CrudGenHelper.GetSpecialType(field);
+				if(specialType==CrudSpecialColType.DateT
+					|| specialType==CrudSpecialColType.TimeStamp
+					|| specialType==CrudSpecialColType.DateTEntry
+					|| specialType==CrudSpecialColType.DateTEntryEditable) 
+				{
+					//specialTypes.DateEntry and DateEntryEditable is handled fine by the normal DateTime (date) below.
+					strb.Append("POut.DateT (");
+				}
+				else if(specialType==CrudSpecialColType.TimeSpanNeg) {
+					strb.Append("POut.Time  (");
+				}
+				else if(field.FieldType.IsEnum) {
+					strb.Append("POut.Int   ((int)");
+				}
+				else switch(field.FieldType.Name) {
+						default:
+							throw new ApplicationException("Type not yet supported: "+field.FieldType.Name);
+						case "Bitmap":
+							strb.Append("POut.Bitmap(");
+							break;
+						case "Boolean":
+							strb.Append("POut.Bool  (");
+							break;
+						case "Byte":
+							strb.Append("POut.Byte  (");
+							break;
+						case "DateTime"://This ONLY handles date, not dateT which is a special type.
+							strb.Append("POut.Date  (");
+							break;
+						case "Double":
+							strb.Append("POut.Double(");
+							break;
+						case "Int64":
+							strb.Append("POut.Long  (");
+							break;
+						case "Color":
+						case "Int32":
+						case "Interval":
+							strb.Append("POut.Int   (");
+							break;
+						case "Single":
+							strb.Append("POut.Float (");
+							break;
+						case "String":
+							strb.Append("POut.String(");
+							break;
+						case "TimeSpan":
+							strb.Append("POut.Time  (");
+							break;
+					}
+				strb.Append(classLowerCase+"."+field.Name
+					+(field.FieldType.Name=="Color" ? ".ToArgb()" : "")
+					+(field.FieldType.Name=="Interval" ? ".ToInt()" : "")
+					+"),");
+			}
+			strb.Append(rn+t4+"});");
+			strb.Append(rn+t3+"}");
+			strb.Append(rn+t3+"return table;");
+			strb.Append(rn+t2+"}");
+			#endregion
 			#region Insert
 			//Insert---------------------------------------------------------------------------------------------
 			List<FieldInfo> fieldsExceptPri=null; 

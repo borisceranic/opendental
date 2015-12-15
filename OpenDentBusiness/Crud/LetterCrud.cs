@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Letter> listLetters) {
+			DataTable table=new DataTable("Letters");
+			table.Columns.Add("LetterNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("BodyText");
+			foreach(Letter letter in listLetters) {
+				table.Rows.Add(new object[] {
+					POut.Long  (letter.LetterNum),
+					POut.String(letter.Description),
+					POut.String(letter.BodyText),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Letter into the database.  Returns the new priKey.</summary>
 		public static long Insert(Letter letter){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

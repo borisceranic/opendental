@@ -159,6 +159,140 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLab> listEhrLabs) {
+			DataTable table=new DataTable("EhrLabs");
+			table.Columns.Add("EhrLabNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("OrderControlCode");
+			table.Columns.Add("PlacerOrderNum");
+			table.Columns.Add("PlacerOrderNamespace");
+			table.Columns.Add("PlacerOrderUniversalID");
+			table.Columns.Add("PlacerOrderUniversalIDType");
+			table.Columns.Add("FillerOrderNum");
+			table.Columns.Add("FillerOrderNamespace");
+			table.Columns.Add("FillerOrderUniversalID");
+			table.Columns.Add("FillerOrderUniversalIDType");
+			table.Columns.Add("PlacerGroupNum");
+			table.Columns.Add("PlacerGroupNamespace");
+			table.Columns.Add("PlacerGroupUniversalID");
+			table.Columns.Add("PlacerGroupUniversalIDType");
+			table.Columns.Add("OrderingProviderID");
+			table.Columns.Add("OrderingProviderLName");
+			table.Columns.Add("OrderingProviderFName");
+			table.Columns.Add("OrderingProviderMiddleNames");
+			table.Columns.Add("OrderingProviderSuffix");
+			table.Columns.Add("OrderingProviderPrefix");
+			table.Columns.Add("OrderingProviderAssigningAuthorityNamespaceID");
+			table.Columns.Add("OrderingProviderAssigningAuthorityUniversalID");
+			table.Columns.Add("OrderingProviderAssigningAuthorityIDType");
+			table.Columns.Add("OrderingProviderNameTypeCode");
+			table.Columns.Add("OrderingProviderIdentifierTypeCode");
+			table.Columns.Add("SetIdOBR");
+			table.Columns.Add("UsiID");
+			table.Columns.Add("UsiText");
+			table.Columns.Add("UsiCodeSystemName");
+			table.Columns.Add("UsiIDAlt");
+			table.Columns.Add("UsiTextAlt");
+			table.Columns.Add("UsiCodeSystemNameAlt");
+			table.Columns.Add("UsiTextOriginal");
+			table.Columns.Add("ObservationDateTimeStart");
+			table.Columns.Add("ObservationDateTimeEnd");
+			table.Columns.Add("SpecimenActionCode");
+			table.Columns.Add("ResultDateTime");
+			table.Columns.Add("ResultStatus");
+			table.Columns.Add("ParentObservationID");
+			table.Columns.Add("ParentObservationText");
+			table.Columns.Add("ParentObservationCodeSystemName");
+			table.Columns.Add("ParentObservationIDAlt");
+			table.Columns.Add("ParentObservationTextAlt");
+			table.Columns.Add("ParentObservationCodeSystemNameAlt");
+			table.Columns.Add("ParentObservationTextOriginal");
+			table.Columns.Add("ParentObservationSubID");
+			table.Columns.Add("ParentPlacerOrderNum");
+			table.Columns.Add("ParentPlacerOrderNamespace");
+			table.Columns.Add("ParentPlacerOrderUniversalID");
+			table.Columns.Add("ParentPlacerOrderUniversalIDType");
+			table.Columns.Add("ParentFillerOrderNum");
+			table.Columns.Add("ParentFillerOrderNamespace");
+			table.Columns.Add("ParentFillerOrderUniversalID");
+			table.Columns.Add("ParentFillerOrderUniversalIDType");
+			table.Columns.Add("ListEhrLabResultsHandlingF");
+			table.Columns.Add("ListEhrLabResultsHandlingN");
+			table.Columns.Add("TQ1SetId");
+			table.Columns.Add("TQ1DateTimeStart");
+			table.Columns.Add("TQ1DateTimeEnd");
+			table.Columns.Add("IsCpoe");
+			table.Columns.Add("OriginalPIDSegment");
+			foreach(EhrLab ehrLab in listEhrLabs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLab.EhrLabNum),
+					POut.Long  (ehrLab.PatNum),
+					POut.Int   ((int)ehrLab.OrderControlCode),
+					POut.String(ehrLab.PlacerOrderNum),
+					POut.String(ehrLab.PlacerOrderNamespace),
+					POut.String(ehrLab.PlacerOrderUniversalID),
+					POut.String(ehrLab.PlacerOrderUniversalIDType),
+					POut.String(ehrLab.FillerOrderNum),
+					POut.String(ehrLab.FillerOrderNamespace),
+					POut.String(ehrLab.FillerOrderUniversalID),
+					POut.String(ehrLab.FillerOrderUniversalIDType),
+					POut.String(ehrLab.PlacerGroupNum),
+					POut.String(ehrLab.PlacerGroupNamespace),
+					POut.String(ehrLab.PlacerGroupUniversalID),
+					POut.String(ehrLab.PlacerGroupUniversalIDType),
+					POut.String(ehrLab.OrderingProviderID),
+					POut.String(ehrLab.OrderingProviderLName),
+					POut.String(ehrLab.OrderingProviderFName),
+					POut.String(ehrLab.OrderingProviderMiddleNames),
+					POut.String(ehrLab.OrderingProviderSuffix),
+					POut.String(ehrLab.OrderingProviderPrefix),
+					POut.String(ehrLab.OrderingProviderAssigningAuthorityNamespaceID),
+					POut.String(ehrLab.OrderingProviderAssigningAuthorityUniversalID),
+					POut.String(ehrLab.OrderingProviderAssigningAuthorityIDType),
+					POut.Int   ((int)ehrLab.OrderingProviderNameTypeCode),
+					POut.Int   ((int)ehrLab.OrderingProviderIdentifierTypeCode),
+					POut.Long  (ehrLab.SetIdOBR),
+					POut.String(ehrLab.UsiID),
+					POut.String(ehrLab.UsiText),
+					POut.String(ehrLab.UsiCodeSystemName),
+					POut.String(ehrLab.UsiIDAlt),
+					POut.String(ehrLab.UsiTextAlt),
+					POut.String(ehrLab.UsiCodeSystemNameAlt),
+					POut.String(ehrLab.UsiTextOriginal),
+					POut.String(ehrLab.ObservationDateTimeStart),
+					POut.String(ehrLab.ObservationDateTimeEnd),
+					POut.Int   ((int)ehrLab.SpecimenActionCode),
+					POut.String(ehrLab.ResultDateTime),
+					POut.Int   ((int)ehrLab.ResultStatus),
+					POut.String(ehrLab.ParentObservationID),
+					POut.String(ehrLab.ParentObservationText),
+					POut.String(ehrLab.ParentObservationCodeSystemName),
+					POut.String(ehrLab.ParentObservationIDAlt),
+					POut.String(ehrLab.ParentObservationTextAlt),
+					POut.String(ehrLab.ParentObservationCodeSystemNameAlt),
+					POut.String(ehrLab.ParentObservationTextOriginal),
+					POut.String(ehrLab.ParentObservationSubID),
+					POut.String(ehrLab.ParentPlacerOrderNum),
+					POut.String(ehrLab.ParentPlacerOrderNamespace),
+					POut.String(ehrLab.ParentPlacerOrderUniversalID),
+					POut.String(ehrLab.ParentPlacerOrderUniversalIDType),
+					POut.String(ehrLab.ParentFillerOrderNum),
+					POut.String(ehrLab.ParentFillerOrderNamespace),
+					POut.String(ehrLab.ParentFillerOrderUniversalID),
+					POut.String(ehrLab.ParentFillerOrderUniversalIDType),
+					POut.Bool  (ehrLab.ListEhrLabResultsHandlingF),
+					POut.Bool  (ehrLab.ListEhrLabResultsHandlingN),
+					POut.Long  (ehrLab.TQ1SetId),
+					POut.String(ehrLab.TQ1DateTimeStart),
+					POut.String(ehrLab.TQ1DateTimeEnd),
+					POut.Bool  (ehrLab.IsCpoe),
+					POut.String(ehrLab.OriginalPIDSegment),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLab into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLab ehrLab){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

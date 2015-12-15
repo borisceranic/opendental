@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EmailMessage> listEmailMessages) {
+			DataTable table=new DataTable("EmailMessages");
+			table.Columns.Add("EmailMessageNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ToAddress");
+			table.Columns.Add("FromAddress");
+			table.Columns.Add("Subject");
+			table.Columns.Add("BodyText");
+			table.Columns.Add("MsgDateTime");
+			table.Columns.Add("SentOrReceived");
+			table.Columns.Add("RecipientAddress");
+			table.Columns.Add("RawEmailIn");
+			table.Columns.Add("ProvNumWebMail");
+			table.Columns.Add("PatNumSubj");
+			table.Columns.Add("CcAddress");
+			table.Columns.Add("BccAddress");
+			foreach(EmailMessage emailMessage in listEmailMessages) {
+				table.Rows.Add(new object[] {
+					POut.Long  (emailMessage.EmailMessageNum),
+					POut.Long  (emailMessage.PatNum),
+					POut.String(emailMessage.ToAddress),
+					POut.String(emailMessage.FromAddress),
+					POut.String(emailMessage.Subject),
+					POut.String(emailMessage.BodyText),
+					POut.DateT (emailMessage.MsgDateTime),
+					POut.Int   ((int)emailMessage.SentOrReceived),
+					POut.String(emailMessage.RecipientAddress),
+					POut.String(emailMessage.RawEmailIn),
+					POut.Long  (emailMessage.ProvNumWebMail),
+					POut.Long  (emailMessage.PatNumSubj),
+					POut.String(emailMessage.CcAddress),
+					POut.String(emailMessage.BccAddress),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EmailMessage into the database.  Returns the new priKey.</summary>
 		public static long Insert(EmailMessage emailMessage){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

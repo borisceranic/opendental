@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Mount> listMounts) {
+			DataTable table=new DataTable("Mounts");
+			table.Columns.Add("MountNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DocCategory");
+			table.Columns.Add("DateCreated");
+			table.Columns.Add("Description");
+			table.Columns.Add("Note");
+			table.Columns.Add("ImgType");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			foreach(Mount mount in listMounts) {
+				table.Rows.Add(new object[] {
+					POut.Long  (mount.MountNum),
+					POut.Long  (mount.PatNum),
+					POut.Long  (mount.DocCategory),
+					POut.Date  (mount.DateCreated),
+					POut.String(mount.Description),
+					POut.String(mount.Note),
+					POut.Int   ((int)mount.ImgType),
+					POut.Int   (mount.Width),
+					POut.Int   (mount.Height),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Mount into the database.  Returns the new priKey.</summary>
 		public static long Insert(Mount mount){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

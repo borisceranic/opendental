@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<GradingScaleItem> listGradingScaleItems) {
+			DataTable table=new DataTable("GradingScaleItems");
+			table.Columns.Add("GradingScaleItemNum");
+			table.Columns.Add("GradingScaleNum");
+			table.Columns.Add("GradeShowing");
+			table.Columns.Add("GradeNumber");
+			table.Columns.Add("Description");
+			foreach(GradingScaleItem gradingScaleItem in listGradingScaleItems) {
+				table.Rows.Add(new object[] {
+					POut.Long  (gradingScaleItem.GradingScaleItemNum),
+					POut.Long  (gradingScaleItem.GradingScaleNum),
+					POut.String(gradingScaleItem.GradeShowing),
+					POut.Float (gradingScaleItem.GradeNumber),
+					POut.String(gradingScaleItem.Description),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one GradingScaleItem into the database.  Returns the new priKey.</summary>
 		public static long Insert(GradingScaleItem gradingScaleItem){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

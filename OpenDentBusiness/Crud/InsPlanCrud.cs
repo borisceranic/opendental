@@ -80,6 +80,74 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<InsPlan> listInsPlans) {
+			DataTable table=new DataTable("InsPlans");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("GroupName");
+			table.Columns.Add("GroupNum");
+			table.Columns.Add("PlanNote");
+			table.Columns.Add("FeeSched");
+			table.Columns.Add("PlanType");
+			table.Columns.Add("ClaimFormNum");
+			table.Columns.Add("UseAltCode");
+			table.Columns.Add("ClaimsUseUCR");
+			table.Columns.Add("CopayFeeSched");
+			table.Columns.Add("EmployerNum");
+			table.Columns.Add("CarrierNum");
+			table.Columns.Add("AllowedFeeSched");
+			table.Columns.Add("TrojanID");
+			table.Columns.Add("DivisionNo");
+			table.Columns.Add("IsMedical");
+			table.Columns.Add("FilingCode");
+			table.Columns.Add("DentaideCardSequence");
+			table.Columns.Add("ShowBaseUnits");
+			table.Columns.Add("CodeSubstNone");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("MonthRenew");
+			table.Columns.Add("FilingCodeSubtype");
+			table.Columns.Add("CanadianPlanFlag");
+			table.Columns.Add("CanadianDiagnosticCode");
+			table.Columns.Add("CanadianInstitutionCode");
+			table.Columns.Add("RxBIN");
+			table.Columns.Add("CobRule");
+			table.Columns.Add("SopCode");
+			foreach(InsPlan insPlan in listInsPlans) {
+				table.Rows.Add(new object[] {
+					POut.Long  (insPlan.PlanNum),
+					POut.String(insPlan.GroupName),
+					POut.String(insPlan.GroupNum),
+					POut.String(insPlan.PlanNote),
+					POut.Long  (insPlan.FeeSched),
+					POut.String(insPlan.PlanType),
+					POut.Long  (insPlan.ClaimFormNum),
+					POut.Bool  (insPlan.UseAltCode),
+					POut.Bool  (insPlan.ClaimsUseUCR),
+					POut.Long  (insPlan.CopayFeeSched),
+					POut.Long  (insPlan.EmployerNum),
+					POut.Long  (insPlan.CarrierNum),
+					POut.Long  (insPlan.AllowedFeeSched),
+					POut.String(insPlan.TrojanID),
+					POut.String(insPlan.DivisionNo),
+					POut.Bool  (insPlan.IsMedical),
+					POut.Long  (insPlan.FilingCode),
+					POut.Byte  (insPlan.DentaideCardSequence),
+					POut.Bool  (insPlan.ShowBaseUnits),
+					POut.Bool  (insPlan.CodeSubstNone),
+					POut.Bool  (insPlan.IsHidden),
+					POut.Byte  (insPlan.MonthRenew),
+					POut.Long  (insPlan.FilingCodeSubtype),
+					POut.String(insPlan.CanadianPlanFlag),
+					POut.String(insPlan.CanadianDiagnosticCode),
+					POut.String(insPlan.CanadianInstitutionCode),
+					POut.String(insPlan.RxBIN),
+					POut.Int   ((int)insPlan.CobRule),
+					POut.String(insPlan.SopCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one InsPlan into the database.  Returns the new priKey.</summary>
 		public static long Insert(InsPlan insPlan){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

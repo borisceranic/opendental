@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrAmendment> listEhrAmendments) {
+			DataTable table=new DataTable("EhrAmendments");
+			table.Columns.Add("EhrAmendmentNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("IsAccepted");
+			table.Columns.Add("Description");
+			table.Columns.Add("Source");
+			table.Columns.Add("SourceName");
+			table.Columns.Add("FileName");
+			table.Columns.Add("RawBase64");
+			table.Columns.Add("DateTRequest");
+			table.Columns.Add("DateTAcceptDeny");
+			table.Columns.Add("DateTAppend");
+			foreach(EhrAmendment ehrAmendment in listEhrAmendments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrAmendment.EhrAmendmentNum),
+					POut.Long  (ehrAmendment.PatNum),
+					POut.Int   ((int)ehrAmendment.IsAccepted),
+					POut.String(ehrAmendment.Description),
+					POut.Int   ((int)ehrAmendment.Source),
+					POut.String(ehrAmendment.SourceName),
+					POut.String(ehrAmendment.FileName),
+					POut.String(ehrAmendment.RawBase64),
+					POut.DateT (ehrAmendment.DateTRequest),
+					POut.DateT (ehrAmendment.DateTAcceptDeny),
+					POut.DateT (ehrAmendment.DateTAppend),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrAmendment into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrAmendment ehrAmendment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -61,6 +61,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLabClinicalInfo> listEhrLabClinicalInfos) {
+			DataTable table=new DataTable("EhrLabClinicalInfos");
+			table.Columns.Add("EhrLabClinicalInfoNum");
+			table.Columns.Add("EhrLabNum");
+			table.Columns.Add("ClinicalInfoID");
+			table.Columns.Add("ClinicalInfoText");
+			table.Columns.Add("ClinicalInfoCodeSystemName");
+			table.Columns.Add("ClinicalInfoIDAlt");
+			table.Columns.Add("ClinicalInfoTextAlt");
+			table.Columns.Add("ClinicalInfoCodeSystemNameAlt");
+			table.Columns.Add("ClinicalInfoTextOriginal");
+			foreach(EhrLabClinicalInfo ehrLabClinicalInfo in listEhrLabClinicalInfos) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLabClinicalInfo.EhrLabClinicalInfoNum),
+					POut.Long  (ehrLabClinicalInfo.EhrLabNum),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoID),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoText),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoCodeSystemName),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoIDAlt),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoTextAlt),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt),
+					POut.String(ehrLabClinicalInfo.ClinicalInfoTextOriginal),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLabClinicalInfo into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLabClinicalInfo ehrLabClinicalInfo){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

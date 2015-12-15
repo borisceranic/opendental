@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<WikiPageHist> listWikiPageHists) {
+			DataTable table=new DataTable("WikiPageHists");
+			table.Columns.Add("WikiPageNum");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("PageTitle");
+			table.Columns.Add("PageContent");
+			table.Columns.Add("DateTimeSaved");
+			table.Columns.Add("IsDeleted");
+			foreach(WikiPageHist wikiPageHist in listWikiPageHists) {
+				table.Rows.Add(new object[] {
+					POut.Long  (wikiPageHist.WikiPageNum),
+					POut.Long  (wikiPageHist.UserNum),
+					POut.String(wikiPageHist.PageTitle),
+					POut.String(wikiPageHist.PageContent),
+					POut.DateT (wikiPageHist.DateTimeSaved),
+					POut.Bool  (wikiPageHist.IsDeleted),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one WikiPageHist into the database.  Returns the new priKey.</summary>
 		public static long Insert(WikiPageHist wikiPageHist){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

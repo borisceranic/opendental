@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<AutoNoteControl> listAutoNoteControls) {
+			DataTable table=new DataTable("AutoNoteControls");
+			table.Columns.Add("AutoNoteControlNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("ControlType");
+			table.Columns.Add("ControlLabel");
+			table.Columns.Add("ControlOptions");
+			foreach(AutoNoteControl autoNoteControl in listAutoNoteControls) {
+				table.Rows.Add(new object[] {
+					POut.Long  (autoNoteControl.AutoNoteControlNum),
+					POut.String(autoNoteControl.Descript),
+					POut.String(autoNoteControl.ControlType),
+					POut.String(autoNoteControl.ControlLabel),
+					POut.String(autoNoteControl.ControlOptions),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one AutoNoteControl into the database.  Returns the new priKey.</summary>
 		public static long Insert(AutoNoteControl autoNoteControl){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

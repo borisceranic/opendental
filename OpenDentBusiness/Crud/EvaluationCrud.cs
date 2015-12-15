@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Evaluation> listEvaluations) {
+			DataTable table=new DataTable("Evaluations");
+			table.Columns.Add("EvaluationNum");
+			table.Columns.Add("InstructNum");
+			table.Columns.Add("StudentNum");
+			table.Columns.Add("SchoolCourseNum");
+			table.Columns.Add("EvalTitle");
+			table.Columns.Add("DateEval");
+			table.Columns.Add("GradingScaleNum");
+			table.Columns.Add("OverallGradeShowing");
+			table.Columns.Add("OverallGradeNumber");
+			table.Columns.Add("Notes");
+			foreach(Evaluation evaluation in listEvaluations) {
+				table.Rows.Add(new object[] {
+					POut.Long  (evaluation.EvaluationNum),
+					POut.Long  (evaluation.InstructNum),
+					POut.Long  (evaluation.StudentNum),
+					POut.Long  (evaluation.SchoolCourseNum),
+					POut.String(evaluation.EvalTitle),
+					POut.Date  (evaluation.DateEval),
+					POut.Long  (evaluation.GradingScaleNum),
+					POut.String(evaluation.OverallGradeShowing),
+					POut.Float (evaluation.OverallGradeNumber),
+					POut.String(evaluation.Notes),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Evaluation into the database.  Returns the new priKey.</summary>
 		public static long Insert(Evaluation evaluation){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

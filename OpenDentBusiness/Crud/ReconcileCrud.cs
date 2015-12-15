@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Reconcile> listReconciles) {
+			DataTable table=new DataTable("Reconciles");
+			table.Columns.Add("ReconcileNum");
+			table.Columns.Add("AccountNum");
+			table.Columns.Add("StartingBal");
+			table.Columns.Add("EndingBal");
+			table.Columns.Add("DateReconcile");
+			table.Columns.Add("IsLocked");
+			foreach(Reconcile reconcile in listReconciles) {
+				table.Rows.Add(new object[] {
+					POut.Long  (reconcile.ReconcileNum),
+					POut.Long  (reconcile.AccountNum),
+					POut.Double(reconcile.StartingBal),
+					POut.Double(reconcile.EndingBal),
+					POut.Date  (reconcile.DateReconcile),
+					POut.Bool  (reconcile.IsLocked),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Reconcile into the database.  Returns the new priKey.</summary>
 		public static long Insert(Reconcile reconcile){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

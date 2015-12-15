@@ -64,6 +64,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RegistrationKey> listRegistrationKeys) {
+			DataTable table=new DataTable("RegistrationKeys");
+			table.Columns.Add("RegistrationKeyNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("RegKey");
+			table.Columns.Add("Note");
+			table.Columns.Add("DateStarted");
+			table.Columns.Add("DateDisabled");
+			table.Columns.Add("DateEnded");
+			table.Columns.Add("IsForeign");
+			table.Columns.Add("UsesServerVersion");
+			table.Columns.Add("IsFreeVersion");
+			table.Columns.Add("IsOnlyForTesting");
+			table.Columns.Add("VotesAllotted");
+			table.Columns.Add("IsResellerCustomer");
+			foreach(RegistrationKey registrationKey in listRegistrationKeys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (registrationKey.RegistrationKeyNum),
+					POut.Long  (registrationKey.PatNum),
+					POut.String(registrationKey.RegKey),
+					POut.String(registrationKey.Note),
+					POut.Date  (registrationKey.DateStarted),
+					POut.Date  (registrationKey.DateDisabled),
+					POut.Date  (registrationKey.DateEnded),
+					POut.Bool  (registrationKey.IsForeign),
+					POut.Bool  (registrationKey.UsesServerVersion),
+					POut.Bool  (registrationKey.IsFreeVersion),
+					POut.Bool  (registrationKey.IsOnlyForTesting),
+					POut.Int   (registrationKey.VotesAllotted),
+					POut.Bool  (registrationKey.IsResellerCustomer),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RegistrationKey into the database.  Returns the new priKey.</summary>
 		public static long Insert(RegistrationKey registrationKey){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

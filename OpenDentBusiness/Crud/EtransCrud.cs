@@ -73,6 +73,60 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Etrans> listEtranss) {
+			DataTable table=new DataTable("Etranss");
+			table.Columns.Add("EtransNum");
+			table.Columns.Add("DateTimeTrans");
+			table.Columns.Add("ClearingHouseNum");
+			table.Columns.Add("Etype");
+			table.Columns.Add("ClaimNum");
+			table.Columns.Add("OfficeSequenceNumber");
+			table.Columns.Add("CarrierTransCounter");
+			table.Columns.Add("CarrierTransCounter2");
+			table.Columns.Add("CarrierNum");
+			table.Columns.Add("CarrierNum2");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("BatchNumber");
+			table.Columns.Add("AckCode");
+			table.Columns.Add("TransSetNum");
+			table.Columns.Add("Note");
+			table.Columns.Add("EtransMessageTextNum");
+			table.Columns.Add("AckEtransNum");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("InsSubNum");
+			table.Columns.Add("TranSetId835");
+			table.Columns.Add("CarrierNameRaw");
+			table.Columns.Add("PatientNameRaw");
+			foreach(Etrans etrans in listEtranss) {
+				table.Rows.Add(new object[] {
+					POut.Long  (etrans.EtransNum),
+					POut.DateT (etrans.DateTimeTrans),
+					POut.Long  (etrans.ClearingHouseNum),
+					POut.Int   ((int)etrans.Etype),
+					POut.Long  (etrans.ClaimNum),
+					POut.Int   (etrans.OfficeSequenceNumber),
+					POut.Int   (etrans.CarrierTransCounter),
+					POut.Int   (etrans.CarrierTransCounter2),
+					POut.Long  (etrans.CarrierNum),
+					POut.Long  (etrans.CarrierNum2),
+					POut.Long  (etrans.PatNum),
+					POut.Int   (etrans.BatchNumber),
+					POut.String(etrans.AckCode),
+					POut.Int   (etrans.TransSetNum),
+					POut.String(etrans.Note),
+					POut.Long  (etrans.EtransMessageTextNum),
+					POut.Long  (etrans.AckEtransNum),
+					POut.Long  (etrans.PlanNum),
+					POut.Long  (etrans.InsSubNum),
+					POut.String(etrans.TranSetId835),
+					POut.String(etrans.CarrierNameRaw),
+					POut.String(etrans.PatientNameRaw),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Etrans into the database.  Returns the new priKey.</summary>
 		public static long Insert(Etrans etrans){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

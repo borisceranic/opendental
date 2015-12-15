@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<TaskList> listTaskLists) {
+			DataTable table=new DataTable("TaskLists");
+			table.Columns.Add("TaskListNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("Parent");
+			table.Columns.Add("DateTL");
+			table.Columns.Add("IsRepeating");
+			table.Columns.Add("DateType");
+			table.Columns.Add("FromNum");
+			table.Columns.Add("ObjectType");
+			table.Columns.Add("DateTimeEntry");
+			foreach(TaskList taskList in listTaskLists) {
+				table.Rows.Add(new object[] {
+					POut.Long  (taskList.TaskListNum),
+					POut.String(taskList.Descript),
+					POut.Long  (taskList.Parent),
+					POut.Date  (taskList.DateTL),
+					POut.Bool  (taskList.IsRepeating),
+					POut.Int   ((int)taskList.DateType),
+					POut.Long  (taskList.FromNum),
+					POut.Int   ((int)taskList.ObjectType),
+					POut.DateT (taskList.DateTimeEntry),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one TaskList into the database.  Returns the new priKey.</summary>
 		public static long Insert(TaskList taskList){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

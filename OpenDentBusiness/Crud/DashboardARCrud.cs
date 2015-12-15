@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<DashboardAR> listDashboardARs) {
+			DataTable table=new DataTable("DashboardARs");
+			table.Columns.Add("DashboardARNum");
+			table.Columns.Add("DateCalc");
+			table.Columns.Add("BalTotal");
+			table.Columns.Add("InsEst");
+			foreach(DashboardAR dashboardAR in listDashboardARs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (dashboardAR.DashboardARNum),
+					POut.Date  (dashboardAR.DateCalc),
+					POut.Double(dashboardAR.BalTotal),
+					POut.Double(dashboardAR.InsEst),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one DashboardAR into the database.  Returns the new priKey.</summary>
 		public static long Insert(DashboardAR dashboardAR){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

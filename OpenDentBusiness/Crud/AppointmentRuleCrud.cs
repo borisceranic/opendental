@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<AppointmentRule> listAppointmentRules) {
+			DataTable table=new DataTable("AppointmentRules");
+			table.Columns.Add("AppointmentRuleNum");
+			table.Columns.Add("RuleDesc");
+			table.Columns.Add("CodeStart");
+			table.Columns.Add("CodeEnd");
+			table.Columns.Add("IsEnabled");
+			foreach(AppointmentRule appointmentRule in listAppointmentRules) {
+				table.Rows.Add(new object[] {
+					POut.Long  (appointmentRule.AppointmentRuleNum),
+					POut.String(appointmentRule.RuleDesc),
+					POut.String(appointmentRule.CodeStart),
+					POut.String(appointmentRule.CodeEnd),
+					POut.Bool  (appointmentRule.IsEnabled),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one AppointmentRule into the database.  Returns the new priKey.</summary>
 		public static long Insert(AppointmentRule appointmentRule){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

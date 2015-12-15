@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<VaccineDef> listVaccineDefs) {
+			DataTable table=new DataTable("VaccineDefs");
+			table.Columns.Add("VaccineDefNum");
+			table.Columns.Add("CVXCode");
+			table.Columns.Add("VaccineName");
+			table.Columns.Add("DrugManufacturerNum");
+			foreach(VaccineDef vaccineDef in listVaccineDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (vaccineDef.VaccineDefNum),
+					POut.String(vaccineDef.CVXCode),
+					POut.String(vaccineDef.VaccineName),
+					POut.Long  (vaccineDef.DrugManufacturerNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one VaccineDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(VaccineDef vaccineDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

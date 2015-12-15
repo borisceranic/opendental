@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<StateAbbr> listStateAbbrs) {
+			DataTable table=new DataTable("StateAbbrs");
+			table.Columns.Add("StateAbbrNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("Abbr");
+			table.Columns.Add("MedicaidIDLength");
+			foreach(StateAbbr stateAbbr in listStateAbbrs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (stateAbbr.StateAbbrNum),
+					POut.String(stateAbbr.Description),
+					POut.String(stateAbbr.Abbr),
+					POut.Int   (stateAbbr.MedicaidIDLength),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one StateAbbr into the database.  Returns the new priKey.</summary>
 		public static long Insert(StateAbbr stateAbbr){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

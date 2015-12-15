@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimSnapshot> listClaimSnapshots) {
+			DataTable table=new DataTable("ClaimSnapshots");
+			table.Columns.Add("ClaimSnapshotNum");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("ClaimType");
+			table.Columns.Add("Writeoff");
+			table.Columns.Add("InsPayEst");
+			table.Columns.Add("Fee");
+			table.Columns.Add("DateTEntry");
+			foreach(ClaimSnapshot claimSnapshot in listClaimSnapshots) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimSnapshot.ClaimSnapshotNum),
+					POut.Long  (claimSnapshot.ProcNum),
+					POut.String(claimSnapshot.ClaimType),
+					POut.Double(claimSnapshot.Writeoff),
+					POut.Double(claimSnapshot.InsPayEst),
+					POut.Double(claimSnapshot.Fee),
+					POut.DateT (claimSnapshot.DateTEntry),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimSnapshot into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimSnapshot claimSnapshot){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

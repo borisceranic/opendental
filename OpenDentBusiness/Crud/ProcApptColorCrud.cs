@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcApptColor> listProcApptColors) {
+			DataTable table=new DataTable("ProcApptColors");
+			table.Columns.Add("ProcApptColorNum");
+			table.Columns.Add("CodeRange");
+			table.Columns.Add("ShowPreviousDate");
+			table.Columns.Add("ColorText");
+			foreach(ProcApptColor procApptColor in listProcApptColors) {
+				table.Rows.Add(new object[] {
+					POut.Long  (procApptColor.ProcApptColorNum),
+					POut.String(procApptColor.CodeRange),
+					POut.Bool  (procApptColor.ShowPreviousDate),
+					POut.Int   (procApptColor.ColorText.ToArgb()),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ProcApptColor into the database.  Returns the new priKey.</summary>
 		public static long Insert(ProcApptColor procApptColor){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

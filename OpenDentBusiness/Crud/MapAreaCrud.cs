@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<MapArea> listMapAreas) {
+			DataTable table=new DataTable("MapAreas");
+			table.Columns.Add("MapAreaNum");
+			table.Columns.Add("Extension");
+			table.Columns.Add("XPos");
+			table.Columns.Add("YPos");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			table.Columns.Add("Description");
+			table.Columns.Add("ItemType");
+			foreach(MapArea mapArea in listMapAreas) {
+				table.Rows.Add(new object[] {
+					POut.Long  (mapArea.MapAreaNum),
+					POut.Int   (mapArea.Extension),
+					POut.Double(mapArea.XPos),
+					POut.Double(mapArea.YPos),
+					POut.Double(mapArea.Width),
+					POut.Double(mapArea.Height),
+					POut.String(mapArea.Description),
+					POut.Int   ((int)mapArea.ItemType),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one MapArea into the database.  Returns the new priKey.</summary>
 		public static long Insert(MapArea mapArea){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

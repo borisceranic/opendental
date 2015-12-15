@@ -67,6 +67,48 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrTrigger> listEhrTriggers) {
+			DataTable table=new DataTable("EhrTriggers");
+			table.Columns.Add("EhrTriggerNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ProblemSnomedList");
+			table.Columns.Add("ProblemIcd9List");
+			table.Columns.Add("ProblemIcd10List");
+			table.Columns.Add("ProblemDefNumList");
+			table.Columns.Add("MedicationNumList");
+			table.Columns.Add("RxCuiList");
+			table.Columns.Add("CvxList");
+			table.Columns.Add("AllergyDefNumList");
+			table.Columns.Add("DemographicsList");
+			table.Columns.Add("LabLoincList");
+			table.Columns.Add("VitalLoincList");
+			table.Columns.Add("Instructions");
+			table.Columns.Add("Bibliography");
+			table.Columns.Add("Cardinality");
+			foreach(EhrTrigger ehrTrigger in listEhrTriggers) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrTrigger.EhrTriggerNum),
+					POut.String(ehrTrigger.Description),
+					POut.String(ehrTrigger.ProblemSnomedList),
+					POut.String(ehrTrigger.ProblemIcd9List),
+					POut.String(ehrTrigger.ProblemIcd10List),
+					POut.String(ehrTrigger.ProblemDefNumList),
+					POut.String(ehrTrigger.MedicationNumList),
+					POut.String(ehrTrigger.RxCuiList),
+					POut.String(ehrTrigger.CvxList),
+					POut.String(ehrTrigger.AllergyDefNumList),
+					POut.String(ehrTrigger.DemographicsList),
+					POut.String(ehrTrigger.LabLoincList),
+					POut.String(ehrTrigger.VitalLoincList),
+					POut.String(ehrTrigger.Instructions),
+					POut.String(ehrTrigger.Bibliography),
+					POut.Int   ((int)ehrTrigger.Cardinality),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrTrigger into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrTrigger ehrTrigger){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

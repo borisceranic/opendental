@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SmsPhone> listSmsPhones) {
+			DataTable table=new DataTable("SmsPhones");
+			table.Columns.Add("SmsPhoneNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("PhoneNumber");
+			table.Columns.Add("DateTimeActive");
+			table.Columns.Add("DateTimeInactive");
+			table.Columns.Add("InactiveCode");
+			table.Columns.Add("CountryCode");
+			foreach(SmsPhone smsPhone in listSmsPhones) {
+				table.Rows.Add(new object[] {
+					POut.Long  (smsPhone.SmsPhoneNum),
+					POut.Long  (smsPhone.ClinicNum),
+					POut.String(smsPhone.PhoneNumber),
+					POut.DateT (smsPhone.DateTimeActive),
+					POut.DateT (smsPhone.DateTimeInactive),
+					POut.String(smsPhone.InactiveCode),
+					POut.String(smsPhone.CountryCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SmsPhone into the database.  Returns the new priKey.</summary>
 		public static long Insert(SmsPhone smsPhone){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

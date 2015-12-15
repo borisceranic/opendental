@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ReplicationServer> listReplicationServers) {
+			DataTable table=new DataTable("ReplicationServers");
+			table.Columns.Add("ReplicationServerNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("ServerId");
+			table.Columns.Add("RangeStart");
+			table.Columns.Add("RangeEnd");
+			table.Columns.Add("AtoZpath");
+			table.Columns.Add("UpdateBlocked");
+			table.Columns.Add("SlaveMonitor");
+			foreach(ReplicationServer replicationServer in listReplicationServers) {
+				table.Rows.Add(new object[] {
+					POut.Long  (replicationServer.ReplicationServerNum),
+					POut.String(replicationServer.Descript),
+					POut.Int   (replicationServer.ServerId),
+					POut.Long  (replicationServer.RangeStart),
+					POut.Long  (replicationServer.RangeEnd),
+					POut.String(replicationServer.AtoZpath),
+					POut.Bool  (replicationServer.UpdateBlocked),
+					POut.String(replicationServer.SlaveMonitor),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ReplicationServer into the database.  Returns the new priKey.</summary>
 		public static long Insert(ReplicationServer replicationServer){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

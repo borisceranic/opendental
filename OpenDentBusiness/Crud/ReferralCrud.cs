@@ -75,6 +75,64 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Referral> listReferrals) {
+			DataTable table=new DataTable("Referrals");
+			table.Columns.Add("ReferralNum");
+			table.Columns.Add("LName");
+			table.Columns.Add("FName");
+			table.Columns.Add("MName");
+			table.Columns.Add("SSN");
+			table.Columns.Add("UsingTIN");
+			table.Columns.Add("Specialty");
+			table.Columns.Add("ST");
+			table.Columns.Add("Telephone");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("Zip");
+			table.Columns.Add("Note");
+			table.Columns.Add("Phone2");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("NotPerson");
+			table.Columns.Add("Title");
+			table.Columns.Add("EMail");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("NationalProvID");
+			table.Columns.Add("Slip");
+			table.Columns.Add("IsDoctor");
+			table.Columns.Add("IsTrustedDirect");
+			foreach(Referral referral in listReferrals) {
+				table.Rows.Add(new object[] {
+					POut.Long  (referral.ReferralNum),
+					POut.String(referral.LName),
+					POut.String(referral.FName),
+					POut.String(referral.MName),
+					POut.String(referral.SSN),
+					POut.Bool  (referral.UsingTIN),
+					POut.Long  (referral.Specialty),
+					POut.String(referral.ST),
+					POut.String(referral.Telephone),
+					POut.String(referral.Address),
+					POut.String(referral.Address2),
+					POut.String(referral.City),
+					POut.String(referral.Zip),
+					POut.String(referral.Note),
+					POut.String(referral.Phone2),
+					POut.Bool  (referral.IsHidden),
+					POut.Bool  (referral.NotPerson),
+					POut.String(referral.Title),
+					POut.String(referral.EMail),
+					POut.Long  (referral.PatNum),
+					POut.String(referral.NationalProvID),
+					POut.Long  (referral.Slip),
+					POut.Bool  (referral.IsDoctor),
+					POut.Bool  (referral.IsTrustedDirect),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Referral into the database.  Returns the new priKey.</summary>
 		public static long Insert(Referral referral){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

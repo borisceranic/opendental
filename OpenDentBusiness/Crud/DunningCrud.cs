@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Dunning> listDunnings) {
+			DataTable table=new DataTable("Dunnings");
+			table.Columns.Add("DunningNum");
+			table.Columns.Add("DunMessage");
+			table.Columns.Add("BillingType");
+			table.Columns.Add("AgeAccount");
+			table.Columns.Add("InsIsPending");
+			table.Columns.Add("MessageBold");
+			table.Columns.Add("EmailSubject");
+			table.Columns.Add("EmailBody");
+			foreach(Dunning dunning in listDunnings) {
+				table.Rows.Add(new object[] {
+					POut.Long  (dunning.DunningNum),
+					POut.String(dunning.DunMessage),
+					POut.Long  (dunning.BillingType),
+					POut.Byte  (dunning.AgeAccount),
+					POut.Int   ((int)dunning.InsIsPending),
+					POut.String(dunning.MessageBold),
+					POut.String(dunning.EmailSubject),
+					POut.String(dunning.EmailBody),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Dunning into the database.  Returns the new priKey.</summary>
 		public static long Insert(Dunning dunning){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

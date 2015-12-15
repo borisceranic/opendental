@@ -86,6 +86,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<HL7DefMessage> listHL7DefMessages) {
+			DataTable table=new DataTable("HL7DefMessages");
+			table.Columns.Add("HL7DefMessageNum");
+			table.Columns.Add("HL7DefNum");
+			table.Columns.Add("MessageType");
+			table.Columns.Add("EventType");
+			table.Columns.Add("InOrOut");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("Note");
+			table.Columns.Add("MessageStructure");
+			foreach(HL7DefMessage hL7DefMessage in listHL7DefMessages) {
+				table.Rows.Add(new object[] {
+					POut.Long  (hL7DefMessage.HL7DefMessageNum),
+					POut.Long  (hL7DefMessage.HL7DefNum),
+					POut.Int   ((int)hL7DefMessage.MessageType),
+					POut.Int   ((int)hL7DefMessage.EventType),
+					POut.Int   ((int)hL7DefMessage.InOrOut),
+					POut.Int   (hL7DefMessage.ItemOrder),
+					POut.String(hL7DefMessage.Note),
+					POut.Int   ((int)hL7DefMessage.MessageStructure),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one HL7DefMessage into the database.  Returns the new priKey.</summary>
 		public static long Insert(HL7DefMessage hL7DefMessage){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

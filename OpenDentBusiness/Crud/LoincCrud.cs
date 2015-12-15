@@ -70,6 +70,54 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Loinc> listLoincs) {
+			DataTable table=new DataTable("Loincs");
+			table.Columns.Add("LoincNum");
+			table.Columns.Add("LoincCode");
+			table.Columns.Add("Component");
+			table.Columns.Add("PropertyObserved");
+			table.Columns.Add("TimeAspct");
+			table.Columns.Add("SystemMeasured");
+			table.Columns.Add("ScaleType");
+			table.Columns.Add("MethodType");
+			table.Columns.Add("StatusOfCode");
+			table.Columns.Add("NameShort");
+			table.Columns.Add("ClassType");
+			table.Columns.Add("UnitsRequired");
+			table.Columns.Add("OrderObs");
+			table.Columns.Add("HL7FieldSubfieldID");
+			table.Columns.Add("ExternalCopyrightNotice");
+			table.Columns.Add("NameLongCommon");
+			table.Columns.Add("UnitsUCUM");
+			table.Columns.Add("RankCommonTests");
+			table.Columns.Add("RankCommonOrders");
+			foreach(Loinc loinc in listLoincs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (loinc.LoincNum),
+					POut.String(loinc.LoincCode),
+					POut.String(loinc.Component),
+					POut.String(loinc.PropertyObserved),
+					POut.String(loinc.TimeAspct),
+					POut.String(loinc.SystemMeasured),
+					POut.String(loinc.ScaleType),
+					POut.String(loinc.MethodType),
+					POut.String(loinc.StatusOfCode),
+					POut.String(loinc.NameShort),
+					POut.String(loinc.ClassType),
+					POut.Bool  (loinc.UnitsRequired),
+					POut.String(loinc.OrderObs),
+					POut.String(loinc.HL7FieldSubfieldID),
+					POut.String(loinc.ExternalCopyrightNotice),
+					POut.String(loinc.NameLongCommon),
+					POut.String(loinc.UnitsUCUM),
+					POut.Int   (loinc.RankCommonTests),
+					POut.Int   (loinc.RankCommonOrders),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Loinc into the database.  Returns the new priKey.</summary>
 		public static long Insert(Loinc loinc){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

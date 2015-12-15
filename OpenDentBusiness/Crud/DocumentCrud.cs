@@ -74,6 +74,62 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Document> listDocuments) {
+			DataTable table=new DataTable("Documents");
+			table.Columns.Add("DocNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("DateCreated");
+			table.Columns.Add("DocCategory");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("FileName");
+			table.Columns.Add("ImgType");
+			table.Columns.Add("IsFlipped");
+			table.Columns.Add("DegreesRotated");
+			table.Columns.Add("ToothNumbers");
+			table.Columns.Add("Note");
+			table.Columns.Add("SigIsTopaz");
+			table.Columns.Add("Signature");
+			table.Columns.Add("CropX");
+			table.Columns.Add("CropY");
+			table.Columns.Add("CropW");
+			table.Columns.Add("CropH");
+			table.Columns.Add("WindowingMin");
+			table.Columns.Add("WindowingMax");
+			table.Columns.Add("MountItemNum");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("RawBase64");
+			table.Columns.Add("Thumbnail");
+			foreach(Document document in listDocuments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (document.DocNum),
+					POut.String(document.Description),
+					POut.DateT (document.DateCreated),
+					POut.Long  (document.DocCategory),
+					POut.Long  (document.PatNum),
+					POut.String(document.FileName),
+					POut.Int   ((int)document.ImgType),
+					POut.Bool  (document.IsFlipped),
+					POut.Int   (document.DegreesRotated),
+					POut.String(document.ToothNumbers),
+					POut.String(document.Note),
+					POut.Bool  (document.SigIsTopaz),
+					POut.String(document.Signature),
+					POut.Int   (document.CropX),
+					POut.Int   (document.CropY),
+					POut.Int   (document.CropW),
+					POut.Int   (document.CropH),
+					POut.Int   (document.WindowingMin),
+					POut.Int   (document.WindowingMax),
+					POut.Long  (document.MountItemNum),
+					POut.DateT (document.DateTStamp),
+					POut.String(document.RawBase64),
+					POut.String(document.Thumbnail),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Document into the database.  Returns the new priKey.</summary>
 		public static long Insert(Document document){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

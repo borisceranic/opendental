@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrQuarterlyKey> listEhrQuarterlyKeys) {
+			DataTable table=new DataTable("EhrQuarterlyKeys");
+			table.Columns.Add("EhrQuarterlyKeyNum");
+			table.Columns.Add("YearValue");
+			table.Columns.Add("QuarterValue");
+			table.Columns.Add("PracticeName");
+			table.Columns.Add("KeyValue");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Notes");
+			foreach(EhrQuarterlyKey ehrQuarterlyKey in listEhrQuarterlyKeys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrQuarterlyKey.EhrQuarterlyKeyNum),
+					POut.Int   (ehrQuarterlyKey.YearValue),
+					POut.Int   (ehrQuarterlyKey.QuarterValue),
+					POut.String(ehrQuarterlyKey.PracticeName),
+					POut.String(ehrQuarterlyKey.KeyValue),
+					POut.Long  (ehrQuarterlyKey.PatNum),
+					POut.String(ehrQuarterlyKey.Notes),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrQuarterlyKey into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrQuarterlyKey ehrQuarterlyKey){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

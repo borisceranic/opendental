@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Signalod> listSignalods) {
+			DataTable table=new DataTable("Signalods");
+			table.Columns.Add("SignalNum");
+			table.Columns.Add("FromUser");
+			table.Columns.Add("ITypes");
+			table.Columns.Add("DateViewing");
+			table.Columns.Add("SigType");
+			table.Columns.Add("SigText");
+			table.Columns.Add("SigDateTime");
+			table.Columns.Add("ToUser");
+			table.Columns.Add("AckTime");
+			table.Columns.Add("TaskNum");
+			foreach(Signalod signalod in listSignalods) {
+				table.Rows.Add(new object[] {
+					POut.Long  (signalod.SignalNum),
+					POut.String(signalod.FromUser),
+					POut.String(signalod.ITypes),
+					POut.Date  (signalod.DateViewing),
+					POut.Int   ((int)signalod.SigType),
+					POut.String(signalod.SigText),
+					POut.DateT (signalod.SigDateTime),
+					POut.String(signalod.ToUser),
+					POut.DateT (signalod.AckTime),
+					POut.Long  (signalod.TaskNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Signalod into the database.  Returns the new priKey.</summary>
 		public static long Insert(Signalod signalod){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -91,6 +91,96 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimProc> listClaimProcs) {
+			DataTable table=new DataTable("ClaimProcs");
+			table.Columns.Add("ClaimProcNum");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("ClaimNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("FeeBilled");
+			table.Columns.Add("InsPayEst");
+			table.Columns.Add("DedApplied");
+			table.Columns.Add("Status");
+			table.Columns.Add("InsPayAmt");
+			table.Columns.Add("Remarks");
+			table.Columns.Add("ClaimPaymentNum");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("DateCP");
+			table.Columns.Add("WriteOff");
+			table.Columns.Add("CodeSent");
+			table.Columns.Add("AllowedOverride");
+			table.Columns.Add("Percentage");
+			table.Columns.Add("PercentOverride");
+			table.Columns.Add("CopayAmt");
+			table.Columns.Add("NoBillIns");
+			table.Columns.Add("PaidOtherIns");
+			table.Columns.Add("BaseEst");
+			table.Columns.Add("CopayOverride");
+			table.Columns.Add("ProcDate");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("LineNumber");
+			table.Columns.Add("DedEst");
+			table.Columns.Add("DedEstOverride");
+			table.Columns.Add("InsEstTotal");
+			table.Columns.Add("InsEstTotalOverride");
+			table.Columns.Add("PaidOtherInsOverride");
+			table.Columns.Add("EstimateNote");
+			table.Columns.Add("WriteOffEst");
+			table.Columns.Add("WriteOffEstOverride");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("InsSubNum");
+			table.Columns.Add("PaymentRow");
+			table.Columns.Add("PayPlanNum");
+			table.Columns.Add("ClaimPaymentTracking");
+			foreach(ClaimProc claimProc in listClaimProcs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimProc.ClaimProcNum),
+					POut.Long  (claimProc.ProcNum),
+					POut.Long  (claimProc.ClaimNum),
+					POut.Long  (claimProc.PatNum),
+					POut.Long  (claimProc.ProvNum),
+					POut.Double(claimProc.FeeBilled),
+					POut.Double(claimProc.InsPayEst),
+					POut.Double(claimProc.DedApplied),
+					POut.Int   ((int)claimProc.Status),
+					POut.Double(claimProc.InsPayAmt),
+					POut.String(claimProc.Remarks),
+					POut.Long  (claimProc.ClaimPaymentNum),
+					POut.Long  (claimProc.PlanNum),
+					POut.Date  (claimProc.DateCP),
+					POut.Double(claimProc.WriteOff),
+					POut.String(claimProc.CodeSent),
+					POut.Double(claimProc.AllowedOverride),
+					POut.Int   (claimProc.Percentage),
+					POut.Int   (claimProc.PercentOverride),
+					POut.Double(claimProc.CopayAmt),
+					POut.Bool  (claimProc.NoBillIns),
+					POut.Double(claimProc.PaidOtherIns),
+					POut.Double(claimProc.BaseEst),
+					POut.Double(claimProc.CopayOverride),
+					POut.Date  (claimProc.ProcDate),
+					POut.Date  (claimProc.DateEntry),
+					POut.Byte  (claimProc.LineNumber),
+					POut.Double(claimProc.DedEst),
+					POut.Double(claimProc.DedEstOverride),
+					POut.Double(claimProc.InsEstTotal),
+					POut.Double(claimProc.InsEstTotalOverride),
+					POut.Double(claimProc.PaidOtherInsOverride),
+					POut.String(claimProc.EstimateNote),
+					POut.Double(claimProc.WriteOffEst),
+					POut.Double(claimProc.WriteOffEstOverride),
+					POut.Long  (claimProc.ClinicNum),
+					POut.Long  (claimProc.InsSubNum),
+					POut.Int   (claimProc.PaymentRow),
+					POut.Long  (claimProc.PayPlanNum),
+					POut.Long  (claimProc.ClaimPaymentTracking),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimProc into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimProc claimProc){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

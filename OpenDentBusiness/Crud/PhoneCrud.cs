@@ -77,6 +77,50 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Phone> listPhones) {
+			DataTable table=new DataTable("Phones");
+			table.Columns.Add("PhoneNum");
+			table.Columns.Add("Extension");
+			table.Columns.Add("EmployeeName");
+			table.Columns.Add("ClockStatus");
+			table.Columns.Add("Description");
+			table.Columns.Add("ColorBar");
+			table.Columns.Add("ColorText");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("CustomerNumber");
+			table.Columns.Add("InOrOut");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateTimeStart");
+			table.Columns.Add("WebCamImage");
+			table.Columns.Add("ScreenshotPath");
+			table.Columns.Add("ScreenshotImage");
+			table.Columns.Add("CustomerNumberRaw");
+			table.Columns.Add("LastCallTimeStart");
+			foreach(Phone phone in listPhones) {
+				table.Rows.Add(new object[] {
+					POut.Long  (phone.PhoneNum),
+					POut.Int   (phone.Extension),
+					POut.String(phone.EmployeeName),
+					POut.Int   ((int)phone.ClockStatus),
+					POut.String(phone.Description),
+					POut.Int   (phone.ColorBar.ToArgb()),
+					POut.Int   (phone.ColorText.ToArgb()),
+					POut.Long  (phone.EmployeeNum),
+					POut.String(phone.CustomerNumber),
+					POut.String(phone.InOrOut),
+					POut.Long  (phone.PatNum),
+					POut.DateT (phone.DateTimeStart),
+					POut.String(phone.WebCamImage),
+					POut.String(phone.ScreenshotPath),
+					POut.String(phone.ScreenshotImage),
+					POut.String(phone.CustomerNumberRaw),
+					POut.DateT (phone.LastCallTimeStart),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Phone into the database.  Returns the new priKey.</summary>
 		public static long Insert(Phone phone){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

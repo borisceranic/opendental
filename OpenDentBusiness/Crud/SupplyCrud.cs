@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Supply> listSupplys) {
+			DataTable table=new DataTable("Supplys");
+			table.Columns.Add("SupplyNum");
+			table.Columns.Add("SupplierNum");
+			table.Columns.Add("CatalogNumber");
+			table.Columns.Add("Descript");
+			table.Columns.Add("Category");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("LevelDesired");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("Price");
+			table.Columns.Add("BarCodeOrID");
+			table.Columns.Add("DispDefaultQuant");
+			table.Columns.Add("DispUnitsCount");
+			table.Columns.Add("DispUnitDesc");
+			table.Columns.Add("LevelOnHand");
+			foreach(Supply supply in listSupplys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (supply.SupplyNum),
+					POut.Long  (supply.SupplierNum),
+					POut.String(supply.CatalogNumber),
+					POut.String(supply.Descript),
+					POut.Long  (supply.Category),
+					POut.Int   (supply.ItemOrder),
+					POut.Float (supply.LevelDesired),
+					POut.Bool  (supply.IsHidden),
+					POut.Double(supply.Price),
+					POut.String(supply.BarCodeOrID),
+					POut.Float (supply.DispDefaultQuant),
+					POut.Int   (supply.DispUnitsCount),
+					POut.String(supply.DispUnitDesc),
+					POut.Float (supply.LevelOnHand),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Supply into the database.  Returns the new priKey.</summary>
 		public static long Insert(Supply supply){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

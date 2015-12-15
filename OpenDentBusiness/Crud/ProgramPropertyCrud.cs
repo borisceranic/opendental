@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProgramProperty> listProgramPropertys) {
+			DataTable table=new DataTable("ProgramPropertys");
+			table.Columns.Add("ProgramPropertyNum");
+			table.Columns.Add("ProgramNum");
+			table.Columns.Add("PropertyDesc");
+			table.Columns.Add("PropertyValue");
+			table.Columns.Add("ComputerName");
+			table.Columns.Add("ClinicNum");
+			foreach(ProgramProperty programProperty in listProgramPropertys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (programProperty.ProgramPropertyNum),
+					POut.Long  (programProperty.ProgramNum),
+					POut.String(programProperty.PropertyDesc),
+					POut.String(programProperty.PropertyValue),
+					POut.String(programProperty.ComputerName),
+					POut.Long  (programProperty.ClinicNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ProgramProperty into the database.  Returns the new priKey.</summary>
 		public static long Insert(ProgramProperty programProperty){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<AppointmentType> listAppointmentTypes) {
+			DataTable table=new DataTable("AppointmentTypes");
+			table.Columns.Add("AppointmentTypeNum");
+			table.Columns.Add("AppointmentTypeName");
+			table.Columns.Add("AppointmentTypeColor");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("IsHidden");
+			foreach(AppointmentType appointmentType in listAppointmentTypes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (appointmentType.AppointmentTypeNum),
+					POut.String(appointmentType.AppointmentTypeName),
+					POut.Int   (appointmentType.AppointmentTypeColor.ToArgb()),
+					POut.Int   (appointmentType.ItemOrder),
+					POut.Bool  (appointmentType.IsHidden),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one AppointmentType into the database.  Returns the new priKey.</summary>
 		public static long Insert(AppointmentType appointmentType){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EmailAddress> listEmailAddresss) {
+			DataTable table=new DataTable("EmailAddresss");
+			table.Columns.Add("EmailAddressNum");
+			table.Columns.Add("SMTPserver");
+			table.Columns.Add("EmailUsername");
+			table.Columns.Add("EmailPassword");
+			table.Columns.Add("ServerPort");
+			table.Columns.Add("UseSSL");
+			table.Columns.Add("SenderAddress");
+			table.Columns.Add("Pop3ServerIncoming");
+			table.Columns.Add("ServerPortIncoming");
+			table.Columns.Add("UserNum");
+			foreach(EmailAddress emailAddress in listEmailAddresss) {
+				table.Rows.Add(new object[] {
+					POut.Long  (emailAddress.EmailAddressNum),
+					POut.String(emailAddress.SMTPserver),
+					POut.String(emailAddress.EmailUsername),
+					POut.String(emailAddress.EmailPassword),
+					POut.Int   (emailAddress.ServerPort),
+					POut.Bool  (emailAddress.UseSSL),
+					POut.String(emailAddress.SenderAddress),
+					POut.String(emailAddress.Pop3ServerIncoming),
+					POut.Int   (emailAddress.ServerPortIncoming),
+					POut.Long  (emailAddress.UserNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EmailAddress into the database.  Returns the new priKey.</summary>
 		public static long Insert(EmailAddress emailAddress){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

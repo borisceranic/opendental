@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<AutomationCondition> listAutomationConditions) {
+			DataTable table=new DataTable("AutomationConditions");
+			table.Columns.Add("AutomationConditionNum");
+			table.Columns.Add("AutomationNum");
+			table.Columns.Add("CompareField");
+			table.Columns.Add("Comparison");
+			table.Columns.Add("CompareString");
+			foreach(AutomationCondition automationCondition in listAutomationConditions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (automationCondition.AutomationConditionNum),
+					POut.Long  (automationCondition.AutomationNum),
+					POut.Int   ((int)automationCondition.CompareField),
+					POut.Int   ((int)automationCondition.Comparison),
+					POut.String(automationCondition.CompareString),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one AutomationCondition into the database.  Returns the new priKey.</summary>
 		public static long Insert(AutomationCondition automationCondition){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

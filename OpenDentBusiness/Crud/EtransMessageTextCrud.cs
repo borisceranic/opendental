@@ -53,6 +53,20 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EtransMessageText> listEtransMessageTexts) {
+			DataTable table=new DataTable("EtransMessageTexts");
+			table.Columns.Add("EtransMessageTextNum");
+			table.Columns.Add("MessageText");
+			foreach(EtransMessageText etransMessageText in listEtransMessageTexts) {
+				table.Rows.Add(new object[] {
+					POut.Long  (etransMessageText.EtransMessageTextNum),
+					POut.String(etransMessageText.MessageText),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EtransMessageText into the database.  Returns the new priKey.</summary>
 		public static long Insert(EtransMessageText etransMessageText){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

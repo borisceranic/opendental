@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EServiceSignal> listEServiceSignals) {
+			DataTable table=new DataTable("EServiceSignals");
+			table.Columns.Add("EServiceSignalNum");
+			table.Columns.Add("ServiceCode");
+			table.Columns.Add("ReasonCategory");
+			table.Columns.Add("ReasonCode");
+			table.Columns.Add("Severity");
+			table.Columns.Add("Description");
+			table.Columns.Add("SigDateTime");
+			table.Columns.Add("Tag");
+			table.Columns.Add("IsProcessed");
+			foreach(EServiceSignal eServiceSignal in listEServiceSignals) {
+				table.Rows.Add(new object[] {
+					POut.Long  (eServiceSignal.EServiceSignalNum),
+					POut.Int   (eServiceSignal.ServiceCode),
+					POut.Int   (eServiceSignal.ReasonCategory),
+					POut.Int   (eServiceSignal.ReasonCode),
+					POut.Int   ((int)eServiceSignal.Severity),
+					POut.String(eServiceSignal.Description),
+					POut.DateT (eServiceSignal.SigDateTime),
+					POut.String(eServiceSignal.Tag),
+					POut.Bool  (eServiceSignal.IsProcessed),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EServiceSignal into the database.  Returns the new priKey.</summary>
 		public static long Insert(EServiceSignal eServiceSignal){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

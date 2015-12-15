@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EvaluationCriterion> listEvaluationCriterions) {
+			DataTable table=new DataTable("EvaluationCriterions");
+			table.Columns.Add("EvaluationCriterionNum");
+			table.Columns.Add("EvaluationNum");
+			table.Columns.Add("CriterionDescript");
+			table.Columns.Add("IsCategoryName");
+			table.Columns.Add("GradingScaleNum");
+			table.Columns.Add("GradeShowing");
+			table.Columns.Add("GradeNumber");
+			table.Columns.Add("Notes");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("MaxPointsPoss");
+			foreach(EvaluationCriterion evaluationCriterion in listEvaluationCriterions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (evaluationCriterion.EvaluationCriterionNum),
+					POut.Long  (evaluationCriterion.EvaluationNum),
+					POut.String(evaluationCriterion.CriterionDescript),
+					POut.Bool  (evaluationCriterion.IsCategoryName),
+					POut.Long  (evaluationCriterion.GradingScaleNum),
+					POut.String(evaluationCriterion.GradeShowing),
+					POut.Float (evaluationCriterion.GradeNumber),
+					POut.String(evaluationCriterion.Notes),
+					POut.Int   (evaluationCriterion.ItemOrder),
+					POut.Float (evaluationCriterion.MaxPointsPoss),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EvaluationCriterion into the database.  Returns the new priKey.</summary>
 		public static long Insert(EvaluationCriterion evaluationCriterion){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

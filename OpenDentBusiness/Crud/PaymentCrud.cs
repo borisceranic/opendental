@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Payment> listPayments) {
+			DataTable table=new DataTable("Payments");
+			table.Columns.Add("PayNum");
+			table.Columns.Add("PayType");
+			table.Columns.Add("PayDate");
+			table.Columns.Add("PayAmt");
+			table.Columns.Add("CheckNum");
+			table.Columns.Add("BankBranch");
+			table.Columns.Add("PayNote");
+			table.Columns.Add("IsSplit");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("DepositNum");
+			table.Columns.Add("Receipt");
+			table.Columns.Add("IsRecurringCC");
+			foreach(Payment payment in listPayments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (payment.PayNum),
+					POut.Long  (payment.PayType),
+					POut.Date  (payment.PayDate),
+					POut.Double(payment.PayAmt),
+					POut.String(payment.CheckNum),
+					POut.String(payment.BankBranch),
+					POut.String(payment.PayNote),
+					POut.Bool  (payment.IsSplit),
+					POut.Long  (payment.PatNum),
+					POut.Long  (payment.ClinicNum),
+					POut.Date  (payment.DateEntry),
+					POut.Long  (payment.DepositNum),
+					POut.String(payment.Receipt),
+					POut.Bool  (payment.IsRecurringCC),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Payment into the database.  Returns the new priKey.</summary>
 		public static long Insert(Payment payment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

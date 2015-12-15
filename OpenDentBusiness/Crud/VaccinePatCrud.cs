@@ -72,6 +72,58 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<VaccinePat> listVaccinePats) {
+			DataTable table=new DataTable("VaccinePats");
+			table.Columns.Add("VaccinePatNum");
+			table.Columns.Add("VaccineDefNum");
+			table.Columns.Add("DateTimeStart");
+			table.Columns.Add("DateTimeEnd");
+			table.Columns.Add("AdministeredAmt");
+			table.Columns.Add("DrugUnitNum");
+			table.Columns.Add("LotNumber");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Note");
+			table.Columns.Add("FilledCity");
+			table.Columns.Add("FilledST");
+			table.Columns.Add("CompletionStatus");
+			table.Columns.Add("AdministrationNoteCode");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("ProvNumOrdering");
+			table.Columns.Add("ProvNumAdminister");
+			table.Columns.Add("DateExpire");
+			table.Columns.Add("RefusalReason");
+			table.Columns.Add("ActionCode");
+			table.Columns.Add("AdministrationRoute");
+			table.Columns.Add("AdministrationSite");
+			foreach(VaccinePat vaccinePat in listVaccinePats) {
+				table.Rows.Add(new object[] {
+					POut.Long  (vaccinePat.VaccinePatNum),
+					POut.Long  (vaccinePat.VaccineDefNum),
+					POut.DateT (vaccinePat.DateTimeStart),
+					POut.DateT (vaccinePat.DateTimeEnd),
+					POut.Float (vaccinePat.AdministeredAmt),
+					POut.Long  (vaccinePat.DrugUnitNum),
+					POut.String(vaccinePat.LotNumber),
+					POut.Long  (vaccinePat.PatNum),
+					POut.String(vaccinePat.Note),
+					POut.String(vaccinePat.FilledCity),
+					POut.String(vaccinePat.FilledST),
+					POut.Int   ((int)vaccinePat.CompletionStatus),
+					POut.Int   ((int)vaccinePat.AdministrationNoteCode),
+					POut.Long  (vaccinePat.UserNum),
+					POut.Long  (vaccinePat.ProvNumOrdering),
+					POut.Long  (vaccinePat.ProvNumAdminister),
+					POut.Date  (vaccinePat.DateExpire),
+					POut.Int   ((int)vaccinePat.RefusalReason),
+					POut.Int   ((int)vaccinePat.ActionCode),
+					POut.Int   ((int)vaccinePat.AdministrationRoute),
+					POut.Int   ((int)vaccinePat.AdministrationSite),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one VaccinePat into the database.  Returns the new priKey.</summary>
 		public static long Insert(VaccinePat vaccinePat){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

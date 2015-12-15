@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Fee> listFees) {
+			DataTable table=new DataTable("Fees");
+			table.Columns.Add("FeeNum");
+			table.Columns.Add("Amount");
+			table.Columns.Add("OldCode");
+			table.Columns.Add("FeeSched");
+			table.Columns.Add("UseDefaultFee");
+			table.Columns.Add("UseDefaultCov");
+			table.Columns.Add("CodeNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ProvNum");
+			foreach(Fee fee in listFees) {
+				table.Rows.Add(new object[] {
+					POut.Long  (fee.FeeNum),
+					POut.Double(fee.Amount),
+					POut.String(fee.OldCode),
+					POut.Long  (fee.FeeSched),
+					POut.Bool  (fee.UseDefaultFee),
+					POut.Bool  (fee.UseDefaultCov),
+					POut.Long  (fee.CodeNum),
+					POut.Long  (fee.ClinicNum),
+					POut.Long  (fee.ProvNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Fee into the database.  Returns the new priKey.</summary>
 		public static long Insert(Fee fee){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

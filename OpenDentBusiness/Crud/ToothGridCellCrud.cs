@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ToothGridCell> listToothGridCells) {
+			DataTable table=new DataTable("ToothGridCells");
+			table.Columns.Add("ToothGridCellNum");
+			table.Columns.Add("SheetFieldNum");
+			table.Columns.Add("ToothGridColNum");
+			table.Columns.Add("ValueEntered");
+			table.Columns.Add("ToothNum");
+			foreach(ToothGridCell toothGridCell in listToothGridCells) {
+				table.Rows.Add(new object[] {
+					POut.Long  (toothGridCell.ToothGridCellNum),
+					POut.Long  (toothGridCell.SheetFieldNum),
+					POut.Long  (toothGridCell.ToothGridColNum),
+					POut.String(toothGridCell.ValueEntered),
+					POut.String(toothGridCell.ToothNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ToothGridCell into the database.  Returns the new priKey.</summary>
 		public static long Insert(ToothGridCell toothGridCell){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

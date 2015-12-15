@@ -72,6 +72,58 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SheetFieldDef> listSheetFieldDefs) {
+			DataTable table=new DataTable("SheetFieldDefs");
+			table.Columns.Add("SheetFieldDefNum");
+			table.Columns.Add("SheetDefNum");
+			table.Columns.Add("FieldType");
+			table.Columns.Add("FieldName");
+			table.Columns.Add("FieldValue");
+			table.Columns.Add("FontSize");
+			table.Columns.Add("FontName");
+			table.Columns.Add("FontIsBold");
+			table.Columns.Add("XPos");
+			table.Columns.Add("YPos");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			table.Columns.Add("GrowthBehavior");
+			table.Columns.Add("RadioButtonValue");
+			table.Columns.Add("RadioButtonGroup");
+			table.Columns.Add("IsRequired");
+			table.Columns.Add("TabOrder");
+			table.Columns.Add("ReportableName");
+			table.Columns.Add("TextAlign");
+			table.Columns.Add("IsPaymentOption");
+			table.Columns.Add("ItemColor");
+			foreach(SheetFieldDef sheetFieldDef in listSheetFieldDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (sheetFieldDef.SheetFieldDefNum),
+					POut.Long  (sheetFieldDef.SheetDefNum),
+					POut.Int   ((int)sheetFieldDef.FieldType),
+					POut.String(sheetFieldDef.FieldName),
+					POut.String(sheetFieldDef.FieldValue),
+					POut.Float (sheetFieldDef.FontSize),
+					POut.String(sheetFieldDef.FontName),
+					POut.Bool  (sheetFieldDef.FontIsBold),
+					POut.Int   (sheetFieldDef.XPos),
+					POut.Int   (sheetFieldDef.YPos),
+					POut.Int   (sheetFieldDef.Width),
+					POut.Int   (sheetFieldDef.Height),
+					POut.Int   ((int)sheetFieldDef.GrowthBehavior),
+					POut.String(sheetFieldDef.RadioButtonValue),
+					POut.String(sheetFieldDef.RadioButtonGroup),
+					POut.Bool  (sheetFieldDef.IsRequired),
+					POut.Int   (sheetFieldDef.TabOrder),
+					POut.String(sheetFieldDef.ReportableName),
+					POut.Int   ((int)sheetFieldDef.TextAlign),
+					POut.Bool  (sheetFieldDef.IsPaymentOption),
+					POut.Int   (sheetFieldDef.ItemColor.ToArgb()),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SheetFieldDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(SheetFieldDef sheetFieldDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

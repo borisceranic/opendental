@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimForm> listClaimForms) {
+			DataTable table=new DataTable("ClaimForms");
+			table.Columns.Add("ClaimFormNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("FontName");
+			table.Columns.Add("FontSize");
+			table.Columns.Add("UniqueID");
+			table.Columns.Add("PrintImages");
+			table.Columns.Add("OffsetX");
+			table.Columns.Add("OffsetY");
+			foreach(ClaimForm claimForm in listClaimForms) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimForm.ClaimFormNum),
+					POut.String(claimForm.Description),
+					POut.Bool  (claimForm.IsHidden),
+					POut.String(claimForm.FontName),
+					POut.Float (claimForm.FontSize),
+					POut.String(claimForm.UniqueID),
+					POut.Bool  (claimForm.PrintImages),
+					POut.Int   (claimForm.OffsetX),
+					POut.Int   (claimForm.OffsetY),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimForm into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimForm claimForm){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ReminderRule> listReminderRules) {
+			DataTable table=new DataTable("ReminderRules");
+			table.Columns.Add("ReminderRuleNum");
+			table.Columns.Add("ReminderCriterion");
+			table.Columns.Add("CriterionFK");
+			table.Columns.Add("CriterionValue");
+			table.Columns.Add("Message");
+			foreach(ReminderRule reminderRule in listReminderRules) {
+				table.Rows.Add(new object[] {
+					POut.Long  (reminderRule.ReminderRuleNum),
+					POut.Int   ((int)reminderRule.ReminderCriterion),
+					POut.Long  (reminderRule.CriterionFK),
+					POut.String(reminderRule.CriterionValue),
+					POut.String(reminderRule.Message),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ReminderRule into the database.  Returns the new priKey.</summary>
 		public static long Insert(ReminderRule reminderRule){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

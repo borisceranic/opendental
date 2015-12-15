@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<FormPat> listFormPats) {
+			DataTable table=new DataTable("FormPats");
+			table.Columns.Add("FormPatNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("FormDateTime");
+			foreach(FormPat formPat in listFormPats) {
+				table.Rows.Add(new object[] {
+					POut.Long  (formPat.FormPatNum),
+					POut.Long  (formPat.PatNum),
+					POut.DateT (formPat.FormDateTime),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one FormPat into the database.  Returns the new priKey.</summary>
 		public static long Insert(FormPat formPat){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

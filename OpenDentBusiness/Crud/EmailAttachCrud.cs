@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EmailAttach> listEmailAttachs) {
+			DataTable table=new DataTable("EmailAttachs");
+			table.Columns.Add("EmailAttachNum");
+			table.Columns.Add("EmailMessageNum");
+			table.Columns.Add("DisplayedFileName");
+			table.Columns.Add("ActualFileName");
+			table.Columns.Add("EmailTemplateNum");
+			foreach(EmailAttach emailAttach in listEmailAttachs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (emailAttach.EmailAttachNum),
+					POut.Long  (emailAttach.EmailMessageNum),
+					POut.String(emailAttach.DisplayedFileName),
+					POut.String(emailAttach.ActualFileName),
+					POut.Long  (emailAttach.EmailTemplateNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EmailAttach into the database.  Returns the new priKey.</summary>
 		public static long Insert(EmailAttach emailAttach){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

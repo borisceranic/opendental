@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<VaccineObs> listVaccineObss) {
+			DataTable table=new DataTable("VaccineObss");
+			table.Columns.Add("VaccineObsNum");
+			table.Columns.Add("VaccinePatNum");
+			table.Columns.Add("ValType");
+			table.Columns.Add("IdentifyingCode");
+			table.Columns.Add("ValReported");
+			table.Columns.Add("ValCodeSystem");
+			table.Columns.Add("VaccineObsNumGroup");
+			table.Columns.Add("UcumCode");
+			table.Columns.Add("DateObs");
+			table.Columns.Add("MethodCode");
+			foreach(VaccineObs vaccineObs in listVaccineObss) {
+				table.Rows.Add(new object[] {
+					POut.Long  (vaccineObs.VaccineObsNum),
+					POut.Long  (vaccineObs.VaccinePatNum),
+					POut.Int   ((int)vaccineObs.ValType),
+					POut.Int   ((int)vaccineObs.IdentifyingCode),
+					POut.String(vaccineObs.ValReported),
+					POut.Int   ((int)vaccineObs.ValCodeSystem),
+					POut.Long  (vaccineObs.VaccineObsNumGroup),
+					POut.String(vaccineObs.UcumCode),
+					POut.Date  (vaccineObs.DateObs),
+					POut.String(vaccineObs.MethodCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one VaccineObs into the database.  Returns the new priKey.</summary>
 		public static long Insert(VaccineObs vaccineObs){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

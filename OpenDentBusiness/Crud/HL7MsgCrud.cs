@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<HL7Msg> listHL7Msgs) {
+			DataTable table=new DataTable("HL7Msgs");
+			table.Columns.Add("HL7MsgNum");
+			table.Columns.Add("HL7Status");
+			table.Columns.Add("MsgText");
+			table.Columns.Add("AptNum");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Note");
+			foreach(HL7Msg hL7Msg in listHL7Msgs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (hL7Msg.HL7MsgNum),
+					POut.Int   ((int)hL7Msg.HL7Status),
+					POut.String(hL7Msg.MsgText),
+					POut.Long  (hL7Msg.AptNum),
+					POut.DateT (hL7Msg.DateTStamp),
+					POut.Long  (hL7Msg.PatNum),
+					POut.String(hL7Msg.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one HL7Msg into the database.  Returns the new priKey.</summary>
 		public static long Insert(HL7Msg hL7Msg){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

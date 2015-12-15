@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Operatory> listOperatorys) {
+			DataTable table=new DataTable("Operatorys");
+			table.Columns.Add("OperatoryNum");
+			table.Columns.Add("OpName");
+			table.Columns.Add("Abbrev");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("ProvDentist");
+			table.Columns.Add("ProvHygienist");
+			table.Columns.Add("IsHygiene");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("SetProspective");
+			table.Columns.Add("IsWebSched");
+			foreach(Operatory operatory in listOperatorys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (operatory.OperatoryNum),
+					POut.String(operatory.OpName),
+					POut.String(operatory.Abbrev),
+					POut.Int   (operatory.ItemOrder),
+					POut.Bool  (operatory.IsHidden),
+					POut.Long  (operatory.ProvDentist),
+					POut.Long  (operatory.ProvHygienist),
+					POut.Bool  (operatory.IsHygiene),
+					POut.Long  (operatory.ClinicNum),
+					POut.Bool  (operatory.SetProspective),
+					POut.Bool  (operatory.IsWebSched),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Operatory into the database.  Returns the new priKey.</summary>
 		public static long Insert(Operatory operatory){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

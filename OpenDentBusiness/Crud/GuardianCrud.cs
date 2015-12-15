@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Guardian> listGuardians) {
+			DataTable table=new DataTable("Guardians");
+			table.Columns.Add("GuardianNum");
+			table.Columns.Add("PatNumChild");
+			table.Columns.Add("PatNumGuardian");
+			table.Columns.Add("Relationship");
+			table.Columns.Add("IsGuardian");
+			foreach(Guardian guardian in listGuardians) {
+				table.Rows.Add(new object[] {
+					POut.Long  (guardian.GuardianNum),
+					POut.Long  (guardian.PatNumChild),
+					POut.Long  (guardian.PatNumGuardian),
+					POut.Int   ((int)guardian.Relationship),
+					POut.Bool  (guardian.IsGuardian),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Guardian into the database.  Returns the new priKey.</summary>
 		public static long Insert(Guardian guardian){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

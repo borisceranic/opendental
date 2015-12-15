@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Program> listPrograms) {
+			DataTable table=new DataTable("Programs");
+			table.Columns.Add("ProgramNum");
+			table.Columns.Add("ProgName");
+			table.Columns.Add("ProgDesc");
+			table.Columns.Add("Enabled");
+			table.Columns.Add("Path");
+			table.Columns.Add("CommandLine");
+			table.Columns.Add("Note");
+			table.Columns.Add("PluginDllName");
+			table.Columns.Add("ButtonImage");
+			table.Columns.Add("FileTemplate");
+			table.Columns.Add("FilePath");
+			foreach(Program program in listPrograms) {
+				table.Rows.Add(new object[] {
+					POut.Long  (program.ProgramNum),
+					POut.String(program.ProgName),
+					POut.String(program.ProgDesc),
+					POut.Bool  (program.Enabled),
+					POut.String(program.Path),
+					POut.String(program.CommandLine),
+					POut.String(program.Note),
+					POut.String(program.PluginDllName),
+					POut.String(program.ButtonImage),
+					POut.String(program.FileTemplate),
+					POut.String(program.FilePath),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Program into the database.  Returns the new priKey.</summary>
 		public static long Insert(Program program){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

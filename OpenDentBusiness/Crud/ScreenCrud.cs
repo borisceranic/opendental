@@ -74,6 +74,62 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Screen> listScreens) {
+			DataTable table=new DataTable("Screens");
+			table.Columns.Add("ScreenNum");
+			table.Columns.Add("ScreenDate");
+			table.Columns.Add("GradeSchool");
+			table.Columns.Add("County");
+			table.Columns.Add("PlaceService");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("ProvName");
+			table.Columns.Add("Gender");
+			table.Columns.Add("RaceOld");
+			table.Columns.Add("GradeLevel");
+			table.Columns.Add("Age");
+			table.Columns.Add("Urgency");
+			table.Columns.Add("HasCaries");
+			table.Columns.Add("NeedsSealants");
+			table.Columns.Add("CariesExperience");
+			table.Columns.Add("EarlyChildCaries");
+			table.Columns.Add("ExistingSealants");
+			table.Columns.Add("MissingAllTeeth");
+			table.Columns.Add("Birthdate");
+			table.Columns.Add("ScreenGroupNum");
+			table.Columns.Add("ScreenGroupOrder");
+			table.Columns.Add("Comments");
+			table.Columns.Add("ScreenPatNum");
+			foreach(Screen screen in listScreens) {
+				table.Rows.Add(new object[] {
+					POut.Long  (screen.ScreenNum),
+					POut.Date  (screen.ScreenDate),
+					POut.String(screen.GradeSchool),
+					POut.String(screen.County),
+					POut.Int   ((int)screen.PlaceService),
+					POut.Long  (screen.ProvNum),
+					POut.String(screen.ProvName),
+					POut.Int   ((int)screen.Gender),
+					POut.Int   ((int)screen.RaceOld),
+					POut.Int   ((int)screen.GradeLevel),
+					POut.Byte  (screen.Age),
+					POut.Int   ((int)screen.Urgency),
+					POut.Int   ((int)screen.HasCaries),
+					POut.Int   ((int)screen.NeedsSealants),
+					POut.Int   ((int)screen.CariesExperience),
+					POut.Int   ((int)screen.EarlyChildCaries),
+					POut.Int   ((int)screen.ExistingSealants),
+					POut.Int   ((int)screen.MissingAllTeeth),
+					POut.Date  (screen.Birthdate),
+					POut.Long  (screen.ScreenGroupNum),
+					POut.Int   (screen.ScreenGroupOrder),
+					POut.String(screen.Comments),
+					POut.Long  (screen.ScreenPatNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Screen into the database.  Returns the new priKey.</summary>
 		public static long Insert(Screen screen){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrCode> listEhrCodes) {
+			DataTable table=new DataTable("EhrCodes");
+			table.Columns.Add("EhrCodeNum");
+			table.Columns.Add("MeasureIds");
+			table.Columns.Add("ValueSetName");
+			table.Columns.Add("ValueSetOID");
+			table.Columns.Add("QDMCategory");
+			table.Columns.Add("CodeValue");
+			table.Columns.Add("Description");
+			table.Columns.Add("CodeSystem");
+			table.Columns.Add("CodeSystemOID");
+			table.Columns.Add("IsInDb");
+			foreach(EhrCode ehrCode in listEhrCodes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrCode.EhrCodeNum),
+					POut.String(ehrCode.MeasureIds),
+					POut.String(ehrCode.ValueSetName),
+					POut.String(ehrCode.ValueSetOID),
+					POut.String(ehrCode.QDMCategory),
+					POut.String(ehrCode.CodeValue),
+					POut.String(ehrCode.Description),
+					POut.String(ehrCode.CodeSystem),
+					POut.String(ehrCode.CodeSystemOID),
+					POut.Bool  (ehrCode.IsInDb),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrCode into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrCode ehrCode){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

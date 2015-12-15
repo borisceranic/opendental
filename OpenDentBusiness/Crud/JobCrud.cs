@@ -64,6 +64,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Job> listJobs) {
+			DataTable table=new DataTable("Jobs");
+			table.Columns.Add("JobNum");
+			table.Columns.Add("Expert");
+			table.Columns.Add("ProjectNum");
+			table.Columns.Add("Priority");
+			table.Columns.Add("Category");
+			table.Columns.Add("JobVersion");
+			table.Columns.Add("HoursEstimate");
+			table.Columns.Add("HoursActual");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("Description");
+			table.Columns.Add("Title");
+			table.Columns.Add("Status");
+			table.Columns.Add("Owner");
+			foreach(Job job in listJobs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (job.JobNum),
+					POut.Long  (job.Expert),
+					POut.Long  (job.ProjectNum),
+					POut.Int   ((int)job.Priority),
+					POut.Int   ((int)job.Category),
+					POut.String(job.JobVersion),
+					POut.Int   (job.HoursEstimate),
+					POut.Int   (job.HoursActual),
+					POut.DateT (job.DateTimeEntry),
+					POut.String(job.Description),
+					POut.String(job.Title),
+					POut.Int   ((int)job.Status),
+					POut.Long  (job.Owner),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Job into the database.  Returns the new priKey.</summary>
 		public static long Insert(Job job){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

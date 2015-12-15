@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobEvent> listJobEvents) {
+			DataTable table=new DataTable("JobEvents");
+			table.Columns.Add("JobEventNum");
+			table.Columns.Add("JobNum");
+			table.Columns.Add("Owner");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("Description");
+			table.Columns.Add("Status");
+			foreach(JobEvent jobEvent in listJobEvents) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobEvent.JobEventNum),
+					POut.Long  (jobEvent.JobNum),
+					POut.Long  (jobEvent.Owner),
+					POut.DateT (jobEvent.DateTimeEntry),
+					POut.String(jobEvent.Description),
+					POut.Int   ((int)jobEvent.Status),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one JobEvent into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobEvent jobEvent){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

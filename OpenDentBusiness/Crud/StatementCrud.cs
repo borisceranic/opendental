@@ -70,6 +70,54 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Statement> listStatements) {
+			DataTable table=new DataTable("Statements");
+			table.Columns.Add("StatementNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateSent");
+			table.Columns.Add("DateRangeFrom");
+			table.Columns.Add("DateRangeTo");
+			table.Columns.Add("Note");
+			table.Columns.Add("NoteBold");
+			table.Columns.Add("Mode_");
+			table.Columns.Add("HidePayment");
+			table.Columns.Add("SinglePatient");
+			table.Columns.Add("Intermingled");
+			table.Columns.Add("IsSent");
+			table.Columns.Add("DocNum");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("IsReceipt");
+			table.Columns.Add("IsInvoice");
+			table.Columns.Add("IsInvoiceCopy");
+			table.Columns.Add("EmailSubject");
+			table.Columns.Add("EmailBody");
+			foreach(Statement statement in listStatements) {
+				table.Rows.Add(new object[] {
+					POut.Long  (statement.StatementNum),
+					POut.Long  (statement.PatNum),
+					POut.Date  (statement.DateSent),
+					POut.Date  (statement.DateRangeFrom),
+					POut.Date  (statement.DateRangeTo),
+					POut.String(statement.Note),
+					POut.String(statement.NoteBold),
+					POut.Int   ((int)statement.Mode_),
+					POut.Bool  (statement.HidePayment),
+					POut.Bool  (statement.SinglePatient),
+					POut.Bool  (statement.Intermingled),
+					POut.Bool  (statement.IsSent),
+					POut.Long  (statement.DocNum),
+					POut.DateT (statement.DateTStamp),
+					POut.Bool  (statement.IsReceipt),
+					POut.Bool  (statement.IsInvoice),
+					POut.Bool  (statement.IsInvoiceCopy),
+					POut.String(statement.EmailSubject),
+					POut.String(statement.EmailBody),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Statement into the database.  Returns the new priKey.</summary>
 		public static long Insert(Statement statement){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

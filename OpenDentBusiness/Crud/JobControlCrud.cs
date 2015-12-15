@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobControl> listJobControls) {
+			DataTable table=new DataTable("JobControls");
+			table.Columns.Add("JobControlNum");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("JobControlType");
+			table.Columns.Add("ControlData");
+			table.Columns.Add("XPos");
+			table.Columns.Add("YPos");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			foreach(JobControl jobControl in listJobControls) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobControl.JobControlNum),
+					POut.Long  (jobControl.UserNum),
+					POut.Int   ((int)jobControl.JobControlType),
+					POut.String(jobControl.ControlData),
+					POut.Int   (jobControl.XPos),
+					POut.Int   (jobControl.YPos),
+					POut.Int   (jobControl.Width),
+					POut.Int   (jobControl.Height),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one JobControl into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobControl jobControl){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

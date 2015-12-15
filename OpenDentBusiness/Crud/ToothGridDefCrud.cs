@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ToothGridDef> listToothGridDefs) {
+			DataTable table=new DataTable("ToothGridDefs");
+			table.Columns.Add("ToothGridDefNum");
+			table.Columns.Add("SheetFieldDefNum");
+			table.Columns.Add("NameInternal");
+			table.Columns.Add("NameShowing");
+			table.Columns.Add("CellType");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("ColumnWidth");
+			table.Columns.Add("CodeNum");
+			table.Columns.Add("ProcStatus");
+			foreach(ToothGridDef toothGridDef in listToothGridDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (toothGridDef.ToothGridDefNum),
+					POut.Long  (toothGridDef.SheetFieldDefNum),
+					POut.String(toothGridDef.NameInternal),
+					POut.String(toothGridDef.NameShowing),
+					POut.Int   ((int)toothGridDef.CellType),
+					POut.Int   (toothGridDef.ItemOrder),
+					POut.Int   (toothGridDef.ColumnWidth),
+					POut.Long  (toothGridDef.CodeNum),
+					POut.Int   ((int)toothGridDef.ProcStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ToothGridDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(ToothGridDef toothGridDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

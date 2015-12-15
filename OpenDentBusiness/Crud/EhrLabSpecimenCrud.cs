@@ -64,6 +64,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLabSpecimen> listEhrLabSpecimens) {
+			DataTable table=new DataTable("EhrLabSpecimens");
+			table.Columns.Add("EhrLabSpecimenNum");
+			table.Columns.Add("EhrLabNum");
+			table.Columns.Add("SetIdSPM");
+			table.Columns.Add("SpecimenTypeID");
+			table.Columns.Add("SpecimenTypeText");
+			table.Columns.Add("SpecimenTypeCodeSystemName");
+			table.Columns.Add("SpecimenTypeIDAlt");
+			table.Columns.Add("SpecimenTypeTextAlt");
+			table.Columns.Add("SpecimenTypeCodeSystemNameAlt");
+			table.Columns.Add("SpecimenTypeTextOriginal");
+			table.Columns.Add("CollectionDateTimeStart");
+			table.Columns.Add("CollectionDateTimeEnd");
+			foreach(EhrLabSpecimen ehrLabSpecimen in listEhrLabSpecimens) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLabSpecimen.EhrLabSpecimenNum),
+					POut.Long  (ehrLabSpecimen.EhrLabNum),
+					POut.Long  (ehrLabSpecimen.SetIdSPM),
+					POut.String(ehrLabSpecimen.SpecimenTypeID),
+					POut.String(ehrLabSpecimen.SpecimenTypeText),
+					POut.String(ehrLabSpecimen.SpecimenTypeCodeSystemName),
+					POut.String(ehrLabSpecimen.SpecimenTypeIDAlt),
+					POut.String(ehrLabSpecimen.SpecimenTypeTextAlt),
+					POut.String(ehrLabSpecimen.SpecimenTypeCodeSystemNameAlt),
+					POut.String(ehrLabSpecimen.SpecimenTypeTextOriginal),
+					POut.String(ehrLabSpecimen.CollectionDateTimeStart),
+					POut.String(ehrLabSpecimen.CollectionDateTimeEnd),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLabSpecimen into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLabSpecimen ehrLabSpecimen){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

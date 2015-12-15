@@ -64,6 +64,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimCondCodeLog> listClaimCondCodeLogs) {
+			DataTable table=new DataTable("ClaimCondCodeLogs");
+			table.Columns.Add("ClaimCondCodeLogNum");
+			table.Columns.Add("ClaimNum");
+			table.Columns.Add("Code0");
+			table.Columns.Add("Code1");
+			table.Columns.Add("Code2");
+			table.Columns.Add("Code3");
+			table.Columns.Add("Code4");
+			table.Columns.Add("Code5");
+			table.Columns.Add("Code6");
+			table.Columns.Add("Code7");
+			table.Columns.Add("Code8");
+			table.Columns.Add("Code9");
+			table.Columns.Add("Code10");
+			foreach(ClaimCondCodeLog claimCondCodeLog in listClaimCondCodeLogs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimCondCodeLog.ClaimCondCodeLogNum),
+					POut.Long  (claimCondCodeLog.ClaimNum),
+					POut.String(claimCondCodeLog.Code0),
+					POut.String(claimCondCodeLog.Code1),
+					POut.String(claimCondCodeLog.Code2),
+					POut.String(claimCondCodeLog.Code3),
+					POut.String(claimCondCodeLog.Code4),
+					POut.String(claimCondCodeLog.Code5),
+					POut.String(claimCondCodeLog.Code6),
+					POut.String(claimCondCodeLog.Code7),
+					POut.String(claimCondCodeLog.Code8),
+					POut.String(claimCondCodeLog.Code9),
+					POut.String(claimCondCodeLog.Code10),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimCondCodeLog into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimCondCodeLog claimCondCodeLog){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

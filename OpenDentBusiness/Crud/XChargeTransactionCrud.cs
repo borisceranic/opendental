@@ -66,6 +66,46 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<XChargeTransaction> listXChargeTransactions) {
+			DataTable table=new DataTable("XChargeTransactions");
+			table.Columns.Add("XChargeTransactionNum");
+			table.Columns.Add("TransType");
+			table.Columns.Add("Amount");
+			table.Columns.Add("CCEntry");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Result");
+			table.Columns.Add("ClerkID");
+			table.Columns.Add("ResultCode");
+			table.Columns.Add("Expiration");
+			table.Columns.Add("CCType");
+			table.Columns.Add("CreditCardNum");
+			table.Columns.Add("BatchNum");
+			table.Columns.Add("ItemNum");
+			table.Columns.Add("ApprCode");
+			table.Columns.Add("TransactionDateTime");
+			foreach(XChargeTransaction xChargeTransaction in listXChargeTransactions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (xChargeTransaction.XChargeTransactionNum),
+					POut.String(xChargeTransaction.TransType),
+					POut.Double(xChargeTransaction.Amount),
+					POut.String(xChargeTransaction.CCEntry),
+					POut.Long  (xChargeTransaction.PatNum),
+					POut.String(xChargeTransaction.Result),
+					POut.String(xChargeTransaction.ClerkID),
+					POut.String(xChargeTransaction.ResultCode),
+					POut.String(xChargeTransaction.Expiration),
+					POut.String(xChargeTransaction.CCType),
+					POut.String(xChargeTransaction.CreditCardNum),
+					POut.String(xChargeTransaction.BatchNum),
+					POut.String(xChargeTransaction.ItemNum),
+					POut.String(xChargeTransaction.ApprCode),
+					POut.DateT (xChargeTransaction.TransactionDateTime),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one XChargeTransaction into the database.  Returns the new priKey.</summary>
 		public static long Insert(XChargeTransaction xChargeTransaction){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

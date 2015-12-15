@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<TimeAdjust> listTimeAdjusts) {
+			DataTable table=new DataTable("TimeAdjusts");
+			table.Columns.Add("TimeAdjustNum");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("TimeEntry");
+			table.Columns.Add("RegHours");
+			table.Columns.Add("OTimeHours");
+			table.Columns.Add("Note");
+			table.Columns.Add("IsAuto");
+			foreach(TimeAdjust timeAdjust in listTimeAdjusts) {
+				table.Rows.Add(new object[] {
+					POut.Long  (timeAdjust.TimeAdjustNum),
+					POut.Long  (timeAdjust.EmployeeNum),
+					POut.DateT (timeAdjust.TimeEntry),
+					POut.Time  (timeAdjust.RegHours),
+					POut.Time  (timeAdjust.OTimeHours),
+					POut.String(timeAdjust.Note),
+					POut.Bool  (timeAdjust.IsAuto),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one TimeAdjust into the database.  Returns the new priKey.</summary>
 		public static long Insert(TimeAdjust timeAdjust){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

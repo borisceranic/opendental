@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrNotPerformed> listEhrNotPerformeds) {
+			DataTable table=new DataTable("EhrNotPerformeds");
+			table.Columns.Add("EhrNotPerformedNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("CodeValue");
+			table.Columns.Add("CodeSystem");
+			table.Columns.Add("CodeValueReason");
+			table.Columns.Add("CodeSystemReason");
+			table.Columns.Add("Note");
+			table.Columns.Add("DateEntry");
+			foreach(EhrNotPerformed ehrNotPerformed in listEhrNotPerformeds) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrNotPerformed.EhrNotPerformedNum),
+					POut.Long  (ehrNotPerformed.PatNum),
+					POut.Long  (ehrNotPerformed.ProvNum),
+					POut.String(ehrNotPerformed.CodeValue),
+					POut.String(ehrNotPerformed.CodeSystem),
+					POut.String(ehrNotPerformed.CodeValueReason),
+					POut.String(ehrNotPerformed.CodeSystemReason),
+					POut.String(ehrNotPerformed.Note),
+					POut.Date  (ehrNotPerformed.DateEntry),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrNotPerformed into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrNotPerformed ehrNotPerformed){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

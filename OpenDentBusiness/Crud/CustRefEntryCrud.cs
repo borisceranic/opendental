@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<CustRefEntry> listCustRefEntrys) {
+			DataTable table=new DataTable("CustRefEntrys");
+			table.Columns.Add("CustRefEntryNum");
+			table.Columns.Add("PatNumCust");
+			table.Columns.Add("PatNumRef");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("Note");
+			foreach(CustRefEntry custRefEntry in listCustRefEntrys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (custRefEntry.CustRefEntryNum),
+					POut.Long  (custRefEntry.PatNumCust),
+					POut.Long  (custRefEntry.PatNumRef),
+					POut.Date  (custRefEntry.DateEntry),
+					POut.String(custRefEntry.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one CustRefEntry into the database.  Returns the new priKey.</summary>
 		public static long Insert(CustRefEntry custRefEntry){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

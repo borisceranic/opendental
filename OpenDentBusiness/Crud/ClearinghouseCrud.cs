@@ -78,6 +78,70 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Clearinghouse> listClearinghouses) {
+			DataTable table=new DataTable("Clearinghouses");
+			table.Columns.Add("ClearinghouseNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ExportPath");
+			table.Columns.Add("Payors");
+			table.Columns.Add("Eformat");
+			table.Columns.Add("ISA05");
+			table.Columns.Add("SenderTIN");
+			table.Columns.Add("ISA07");
+			table.Columns.Add("ISA08");
+			table.Columns.Add("ISA15");
+			table.Columns.Add("Password");
+			table.Columns.Add("ResponsePath");
+			table.Columns.Add("CommBridge");
+			table.Columns.Add("ClientProgram");
+			table.Columns.Add("LastBatchNumber");
+			table.Columns.Add("ModemPort");
+			table.Columns.Add("LoginID");
+			table.Columns.Add("SenderName");
+			table.Columns.Add("SenderTelephone");
+			table.Columns.Add("GS03");
+			table.Columns.Add("ISA02");
+			table.Columns.Add("ISA04");
+			table.Columns.Add("ISA16");
+			table.Columns.Add("SeparatorData");
+			table.Columns.Add("SeparatorSegment");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("HqClearinghouseNum");
+			foreach(Clearinghouse clearinghouse in listClearinghouses) {
+				table.Rows.Add(new object[] {
+					POut.Long  (clearinghouse.ClearinghouseNum),
+					POut.String(clearinghouse.Description),
+					POut.String(clearinghouse.ExportPath),
+					POut.String(clearinghouse.Payors),
+					POut.Int   ((int)clearinghouse.Eformat),
+					POut.String(clearinghouse.ISA05),
+					POut.String(clearinghouse.SenderTIN),
+					POut.String(clearinghouse.ISA07),
+					POut.String(clearinghouse.ISA08),
+					POut.String(clearinghouse.ISA15),
+					POut.String(clearinghouse.Password),
+					POut.String(clearinghouse.ResponsePath),
+					POut.Int   ((int)clearinghouse.CommBridge),
+					POut.String(clearinghouse.ClientProgram),
+					POut.Int   (clearinghouse.LastBatchNumber),
+					POut.Byte  (clearinghouse.ModemPort),
+					POut.String(clearinghouse.LoginID),
+					POut.String(clearinghouse.SenderName),
+					POut.String(clearinghouse.SenderTelephone),
+					POut.String(clearinghouse.GS03),
+					POut.String(clearinghouse.ISA02),
+					POut.String(clearinghouse.ISA04),
+					POut.String(clearinghouse.ISA16),
+					POut.String(clearinghouse.SeparatorData),
+					POut.String(clearinghouse.SeparatorSegment),
+					POut.Long  (clearinghouse.ClinicNum),
+					POut.Long  (clearinghouse.HqClearinghouseNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Clearinghouse into the database.  Returns the new priKey.</summary>
 		public static long Insert(Clearinghouse clearinghouse){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PhoneEmpDefault> listPhoneEmpDefaults) {
+			DataTable table=new DataTable("PhoneEmpDefaults");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("IsGraphed");
+			table.Columns.Add("HasColor");
+			table.Columns.Add("RingGroups");
+			table.Columns.Add("EmpName");
+			table.Columns.Add("PhoneExt");
+			table.Columns.Add("StatusOverride");
+			table.Columns.Add("Notes");
+			table.Columns.Add("ComputerName");
+			table.Columns.Add("IsPrivateScreen");
+			table.Columns.Add("IsTriageOperator");
+			table.Columns.Add("EscalationOrder");
+			foreach(PhoneEmpDefault phoneEmpDefault in listPhoneEmpDefaults) {
+				table.Rows.Add(new object[] {
+					POut.Long  (phoneEmpDefault.EmployeeNum),
+					POut.Bool  (phoneEmpDefault.IsGraphed),
+					POut.Bool  (phoneEmpDefault.HasColor),
+					POut.Int   ((int)phoneEmpDefault.RingGroups),
+					POut.String(phoneEmpDefault.EmpName),
+					POut.Int   (phoneEmpDefault.PhoneExt),
+					POut.Int   ((int)phoneEmpDefault.StatusOverride),
+					POut.String(phoneEmpDefault.Notes),
+					POut.String(phoneEmpDefault.ComputerName),
+					POut.Bool  (phoneEmpDefault.IsPrivateScreen),
+					POut.Bool  (phoneEmpDefault.IsTriageOperator),
+					POut.Int   (phoneEmpDefault.EscalationOrder),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PhoneEmpDefault into the database.  Returns the new priKey.</summary>
 		public static long Insert(PhoneEmpDefault phoneEmpDefault){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

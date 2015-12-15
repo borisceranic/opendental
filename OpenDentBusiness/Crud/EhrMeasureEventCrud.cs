@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrMeasureEvent> listEhrMeasureEvents) {
+			DataTable table=new DataTable("EhrMeasureEvents");
+			table.Columns.Add("EhrMeasureEventNum");
+			table.Columns.Add("DateTEvent");
+			table.Columns.Add("EventType");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("MoreInfo");
+			table.Columns.Add("CodeValueEvent");
+			table.Columns.Add("CodeSystemEvent");
+			table.Columns.Add("CodeValueResult");
+			table.Columns.Add("CodeSystemResult");
+			table.Columns.Add("FKey");
+			foreach(EhrMeasureEvent ehrMeasureEvent in listEhrMeasureEvents) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrMeasureEvent.EhrMeasureEventNum),
+					POut.DateT (ehrMeasureEvent.DateTEvent),
+					POut.Int   ((int)ehrMeasureEvent.EventType),
+					POut.Long  (ehrMeasureEvent.PatNum),
+					POut.String(ehrMeasureEvent.MoreInfo),
+					POut.String(ehrMeasureEvent.CodeValueEvent),
+					POut.String(ehrMeasureEvent.CodeSystemEvent),
+					POut.String(ehrMeasureEvent.CodeValueResult),
+					POut.String(ehrMeasureEvent.CodeSystemResult),
+					POut.Long  (ehrMeasureEvent.FKey),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrMeasureEvent into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrMeasureEvent ehrMeasureEvent){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

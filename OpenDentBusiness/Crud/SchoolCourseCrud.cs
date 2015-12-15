@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SchoolCourse> listSchoolCourses) {
+			DataTable table=new DataTable("SchoolCourses");
+			table.Columns.Add("SchoolCourseNum");
+			table.Columns.Add("CourseID");
+			table.Columns.Add("Descript");
+			foreach(SchoolCourse schoolCourse in listSchoolCourses) {
+				table.Rows.Add(new object[] {
+					POut.Long  (schoolCourse.SchoolCourseNum),
+					POut.String(schoolCourse.CourseID),
+					POut.String(schoolCourse.Descript),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SchoolCourse into the database.  Returns the new priKey.</summary>
 		public static long Insert(SchoolCourse schoolCourse){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

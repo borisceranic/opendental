@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<TimeCardRule> listTimeCardRules) {
+			DataTable table=new DataTable("TimeCardRules");
+			table.Columns.Add("TimeCardRuleNum");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("OverHoursPerDay");
+			table.Columns.Add("AfterTimeOfDay");
+			table.Columns.Add("BeforeTimeOfDay");
+			foreach(TimeCardRule timeCardRule in listTimeCardRules) {
+				table.Rows.Add(new object[] {
+					POut.Long  (timeCardRule.TimeCardRuleNum),
+					POut.Long  (timeCardRule.EmployeeNum),
+					POut.Time  (timeCardRule.OverHoursPerDay),
+					POut.Time  (timeCardRule.AfterTimeOfDay),
+					POut.Time  (timeCardRule.BeforeTimeOfDay),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one TimeCardRule into the database.  Returns the new priKey.</summary>
 		public static long Insert(TimeCardRule timeCardRule){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

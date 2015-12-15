@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RepeatCharge> listRepeatCharges) {
+			DataTable table=new DataTable("RepeatCharges");
+			table.Columns.Add("RepeatChargeNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProcCode");
+			table.Columns.Add("ChargeAmt");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("DateStop");
+			table.Columns.Add("Note");
+			table.Columns.Add("CopyNoteToProc");
+			table.Columns.Add("CreatesClaim");
+			table.Columns.Add("IsEnabled");
+			foreach(RepeatCharge repeatCharge in listRepeatCharges) {
+				table.Rows.Add(new object[] {
+					POut.Long  (repeatCharge.RepeatChargeNum),
+					POut.Long  (repeatCharge.PatNum),
+					POut.String(repeatCharge.ProcCode),
+					POut.Double(repeatCharge.ChargeAmt),
+					POut.Date  (repeatCharge.DateStart),
+					POut.Date  (repeatCharge.DateStop),
+					POut.String(repeatCharge.Note),
+					POut.Bool  (repeatCharge.CopyNoteToProc),
+					POut.Bool  (repeatCharge.CreatesClaim),
+					POut.Bool  (repeatCharge.IsEnabled),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RepeatCharge into the database.  Returns the new priKey.</summary>
 		public static long Insert(RepeatCharge repeatCharge){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

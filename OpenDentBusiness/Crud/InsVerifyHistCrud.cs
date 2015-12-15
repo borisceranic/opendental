@@ -59,6 +59,32 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<InsVerifyHist> listInsVerifyHists) {
+			DataTable table=new DataTable("InsVerifyHists");
+			table.Columns.Add("InsVerifyHistNum");
+			table.Columns.Add("InsVerifyNum");
+			table.Columns.Add("DateLastVerified");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("VerifyType");
+			table.Columns.Add("FKey");
+			table.Columns.Add("DefNum");
+			table.Columns.Add("Note");
+			foreach(InsVerifyHist insVerifyHist in listInsVerifyHists) {
+				table.Rows.Add(new object[] {
+					POut.Long  (insVerifyHist.InsVerifyHistNum),
+					POut.Long  (insVerifyHist.InsVerifyNum),
+					POut.Date  (insVerifyHist.DateLastVerified),
+					POut.Long  (insVerifyHist.UserNum),
+					POut.Int   ((int)insVerifyHist.VerifyType),
+					POut.Long  (insVerifyHist.FKey),
+					POut.Long  (insVerifyHist.DefNum),
+					POut.String(insVerifyHist.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one InsVerifyHist into the database.  Returns the new priKey.</summary>
 		public static long Insert(InsVerifyHist insVerifyHist){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

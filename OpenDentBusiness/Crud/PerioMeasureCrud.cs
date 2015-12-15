@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PerioMeasure> listPerioMeasures) {
+			DataTable table=new DataTable("PerioMeasures");
+			table.Columns.Add("PerioMeasureNum");
+			table.Columns.Add("PerioExamNum");
+			table.Columns.Add("SequenceType");
+			table.Columns.Add("IntTooth");
+			table.Columns.Add("ToothValue");
+			table.Columns.Add("MBvalue");
+			table.Columns.Add("Bvalue");
+			table.Columns.Add("DBvalue");
+			table.Columns.Add("MLvalue");
+			table.Columns.Add("Lvalue");
+			table.Columns.Add("DLvalue");
+			foreach(PerioMeasure perioMeasure in listPerioMeasures) {
+				table.Rows.Add(new object[] {
+					POut.Long  (perioMeasure.PerioMeasureNum),
+					POut.Long  (perioMeasure.PerioExamNum),
+					POut.Int   ((int)perioMeasure.SequenceType),
+					POut.Int   (perioMeasure.IntTooth),
+					POut.Int   (perioMeasure.ToothValue),
+					POut.Int   (perioMeasure.MBvalue),
+					POut.Int   (perioMeasure.Bvalue),
+					POut.Int   (perioMeasure.DBvalue),
+					POut.Int   (perioMeasure.MLvalue),
+					POut.Int   (perioMeasure.Lvalue),
+					POut.Int   (perioMeasure.DLvalue),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PerioMeasure into the database.  Returns the new priKey.</summary>
 		public static long Insert(PerioMeasure perioMeasure){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

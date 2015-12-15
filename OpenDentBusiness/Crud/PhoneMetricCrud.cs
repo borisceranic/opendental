@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PhoneMetric> listPhoneMetrics) {
+			DataTable table=new DataTable("PhoneMetrics");
+			table.Columns.Add("PhoneMetricNum");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("VoiceMails");
+			table.Columns.Add("Triages");
+			table.Columns.Add("MinutesBehind");
+			foreach(PhoneMetric phoneMetric in listPhoneMetrics) {
+				table.Rows.Add(new object[] {
+					POut.Long  (phoneMetric.PhoneMetricNum),
+					POut.DateT (phoneMetric.DateTimeEntry),
+					POut.Int   (phoneMetric.VoiceMails),
+					POut.Int   (phoneMetric.Triages),
+					POut.Int   (phoneMetric.MinutesBehind),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PhoneMetric into the database.  Returns the new priKey.</summary>
 		public static long Insert(PhoneMetric phoneMetric){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EvaluationCriterionDef> listEvaluationCriterionDefs) {
+			DataTable table=new DataTable("EvaluationCriterionDefs");
+			table.Columns.Add("EvaluationCriterionDefNum");
+			table.Columns.Add("EvaluationDefNum");
+			table.Columns.Add("CriterionDescript");
+			table.Columns.Add("IsCategoryName");
+			table.Columns.Add("GradingScaleNum");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("MaxPointsPoss");
+			foreach(EvaluationCriterionDef evaluationCriterionDef in listEvaluationCriterionDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (evaluationCriterionDef.EvaluationCriterionDefNum),
+					POut.Long  (evaluationCriterionDef.EvaluationDefNum),
+					POut.String(evaluationCriterionDef.CriterionDescript),
+					POut.Bool  (evaluationCriterionDef.IsCategoryName),
+					POut.Long  (evaluationCriterionDef.GradingScaleNum),
+					POut.Int   (evaluationCriterionDef.ItemOrder),
+					POut.Float (evaluationCriterionDef.MaxPointsPoss),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EvaluationCriterionDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(EvaluationCriterionDef evaluationCriterionDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

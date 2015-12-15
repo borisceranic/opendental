@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PayPeriod> listPayPeriods) {
+			DataTable table=new DataTable("PayPeriods");
+			table.Columns.Add("PayPeriodNum");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("DateStop");
+			table.Columns.Add("DatePaycheck");
+			foreach(PayPeriod payPeriod in listPayPeriods) {
+				table.Rows.Add(new object[] {
+					POut.Long  (payPeriod.PayPeriodNum),
+					POut.Date  (payPeriod.DateStart),
+					POut.Date  (payPeriod.DateStop),
+					POut.Date  (payPeriod.DatePaycheck),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PayPeriod into the database.  Returns the new priKey.</summary>
 		public static long Insert(PayPeriod payPeriod){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

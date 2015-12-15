@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Schedule> listSchedules) {
+			DataTable table=new DataTable("Schedules");
+			table.Columns.Add("ScheduleNum");
+			table.Columns.Add("SchedDate");
+			table.Columns.Add("StartTime");
+			table.Columns.Add("StopTime");
+			table.Columns.Add("SchedType");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("BlockoutType");
+			table.Columns.Add("Note");
+			table.Columns.Add("Status");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("DateTStamp");
+			foreach(Schedule schedule in listSchedules) {
+				table.Rows.Add(new object[] {
+					POut.Long  (schedule.ScheduleNum),
+					POut.Date  (schedule.SchedDate),
+					POut.Time  (schedule.StartTime),
+					POut.Time  (schedule.StopTime),
+					POut.Int   ((int)schedule.SchedType),
+					POut.Long  (schedule.ProvNum),
+					POut.Long  (schedule.BlockoutType),
+					POut.String(schedule.Note),
+					POut.Int   ((int)schedule.Status),
+					POut.Long  (schedule.EmployeeNum),
+					POut.DateT (schedule.DateTStamp),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Schedule into the database.  Returns the new priKey.</summary>
 		public static long Insert(Schedule schedule){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -64,6 +64,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PayPlan> listPayPlans) {
+			DataTable table=new DataTable("PayPlans");
+			table.Columns.Add("PayPlanNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Guarantor");
+			table.Columns.Add("PayPlanDate");
+			table.Columns.Add("APR");
+			table.Columns.Add("Note");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("CompletedAmt");
+			table.Columns.Add("InsSubNum");
+			table.Columns.Add("PaySchedule");
+			table.Columns.Add("NumberOfPayments");
+			table.Columns.Add("PayAmt");
+			table.Columns.Add("DownPayment");
+			foreach(PayPlan payPlan in listPayPlans) {
+				table.Rows.Add(new object[] {
+					POut.Long  (payPlan.PayPlanNum),
+					POut.Long  (payPlan.PatNum),
+					POut.Long  (payPlan.Guarantor),
+					POut.Date  (payPlan.PayPlanDate),
+					POut.Double(payPlan.APR),
+					POut.String(payPlan.Note),
+					POut.Long  (payPlan.PlanNum),
+					POut.Double(payPlan.CompletedAmt),
+					POut.Long  (payPlan.InsSubNum),
+					POut.Int   ((int)payPlan.PaySchedule),
+					POut.Int   (payPlan.NumberOfPayments),
+					POut.Double(payPlan.PayAmt),
+					POut.Double(payPlan.DownPayment),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PayPlan into the database.  Returns the new priKey.</summary>
 		public static long Insert(PayPlan payPlan){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

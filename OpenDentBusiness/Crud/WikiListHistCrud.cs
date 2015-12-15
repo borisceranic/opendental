@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<WikiListHist> listWikiListHists) {
+			DataTable table=new DataTable("WikiListHists");
+			table.Columns.Add("WikiListHistNum");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("ListName");
+			table.Columns.Add("ListHeaders");
+			table.Columns.Add("ListContent");
+			table.Columns.Add("DateTimeSaved");
+			foreach(WikiListHist wikiListHist in listWikiListHists) {
+				table.Rows.Add(new object[] {
+					POut.Long  (wikiListHist.WikiListHistNum),
+					POut.Long  (wikiListHist.UserNum),
+					POut.String(wikiListHist.ListName),
+					POut.String(wikiListHist.ListHeaders),
+					POut.String(wikiListHist.ListContent),
+					POut.DateT (wikiListHist.DateTimeSaved),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one WikiListHist into the database.  Returns the new priKey.</summary>
 		public static long Insert(WikiListHist wikiListHist){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

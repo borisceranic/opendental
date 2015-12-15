@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ErxLog> listErxLogs) {
+			DataTable table=new DataTable("ErxLogs");
+			table.Columns.Add("ErxLogNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("MsgText");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("ProvNum");
+			foreach(ErxLog erxLog in listErxLogs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (erxLog.ErxLogNum),
+					POut.Long  (erxLog.PatNum),
+					POut.String(erxLog.MsgText),
+					POut.DateT (erxLog.DateTStamp),
+					POut.Long  (erxLog.ProvNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ErxLog into the database.  Returns the new priKey.</summary>
 		public static long Insert(ErxLog erxLog){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

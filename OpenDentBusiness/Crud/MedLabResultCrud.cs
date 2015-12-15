@@ -95,6 +95,50 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<MedLabResult> listMedLabResults) {
+			DataTable table=new DataTable("MedLabResults");
+			table.Columns.Add("MedLabResultNum");
+			table.Columns.Add("MedLabNum");
+			table.Columns.Add("ObsID");
+			table.Columns.Add("ObsText");
+			table.Columns.Add("ObsLoinc");
+			table.Columns.Add("ObsLoincText");
+			table.Columns.Add("ObsIDSub");
+			table.Columns.Add("ObsValue");
+			table.Columns.Add("ObsSubType");
+			table.Columns.Add("ObsUnits");
+			table.Columns.Add("ReferenceRange");
+			table.Columns.Add("AbnormalFlag");
+			table.Columns.Add("ResultStatus");
+			table.Columns.Add("DateTimeObs");
+			table.Columns.Add("FacilityID");
+			table.Columns.Add("DocNum");
+			table.Columns.Add("Note");
+			foreach(MedLabResult medLabResult in listMedLabResults) {
+				table.Rows.Add(new object[] {
+					POut.Long  (medLabResult.MedLabResultNum),
+					POut.Long  (medLabResult.MedLabNum),
+					POut.String(medLabResult.ObsID),
+					POut.String(medLabResult.ObsText),
+					POut.String(medLabResult.ObsLoinc),
+					POut.String(medLabResult.ObsLoincText),
+					POut.String(medLabResult.ObsIDSub),
+					POut.String(medLabResult.ObsValue),
+					POut.Int   ((int)medLabResult.ObsSubType),
+					POut.String(medLabResult.ObsUnits),
+					POut.String(medLabResult.ReferenceRange),
+					POut.Int   ((int)medLabResult.AbnormalFlag),
+					POut.Int   ((int)medLabResult.ResultStatus),
+					POut.DateT (medLabResult.DateTimeObs),
+					POut.String(medLabResult.FacilityID),
+					POut.Long  (medLabResult.DocNum),
+					POut.String(medLabResult.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one MedLabResult into the database.  Returns the new priKey.</summary>
 		public static long Insert(MedLabResult medLabResult){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

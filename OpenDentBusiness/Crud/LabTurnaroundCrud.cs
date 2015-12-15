@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<LabTurnaround> listLabTurnarounds) {
+			DataTable table=new DataTable("LabTurnarounds");
+			table.Columns.Add("LabTurnaroundNum");
+			table.Columns.Add("LaboratoryNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("DaysPublished");
+			table.Columns.Add("DaysActual");
+			foreach(LabTurnaround labTurnaround in listLabTurnarounds) {
+				table.Rows.Add(new object[] {
+					POut.Long  (labTurnaround.LabTurnaroundNum),
+					POut.Long  (labTurnaround.LaboratoryNum),
+					POut.String(labTurnaround.Description),
+					POut.Int   (labTurnaround.DaysPublished),
+					POut.Int   (labTurnaround.DaysActual),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one LabTurnaround into the database.  Returns the new priKey.</summary>
 		public static long Insert(LabTurnaround labTurnaround){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

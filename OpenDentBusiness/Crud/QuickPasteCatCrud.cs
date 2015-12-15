@@ -55,6 +55,24 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<QuickPasteCat> listQuickPasteCats) {
+			DataTable table=new DataTable("QuickPasteCats");
+			table.Columns.Add("QuickPasteCatNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("DefaultForTypes");
+			foreach(QuickPasteCat quickPasteCat in listQuickPasteCats) {
+				table.Rows.Add(new object[] {
+					POut.Long  (quickPasteCat.QuickPasteCatNum),
+					POut.String(quickPasteCat.Description),
+					POut.Int   (quickPasteCat.ItemOrder),
+					POut.String(quickPasteCat.DefaultForTypes),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one QuickPasteCat into the database.  Returns the new priKey.</summary>
 		public static long Insert(QuickPasteCat quickPasteCat){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

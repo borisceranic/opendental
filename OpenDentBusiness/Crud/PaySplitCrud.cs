@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PaySplit> listPaySplits) {
+			DataTable table=new DataTable("PaySplits");
+			table.Columns.Add("SplitNum");
+			table.Columns.Add("SplitAmt");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProcDate");
+			table.Columns.Add("PayNum");
+			table.Columns.Add("IsDiscount");
+			table.Columns.Add("DiscountType");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("PayPlanNum");
+			table.Columns.Add("DatePay");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("UnearnedType");
+			table.Columns.Add("ClinicNum");
+			foreach(PaySplit paySplit in listPaySplits) {
+				table.Rows.Add(new object[] {
+					POut.Long  (paySplit.SplitNum),
+					POut.Double(paySplit.SplitAmt),
+					POut.Long  (paySplit.PatNum),
+					POut.Date  (paySplit.ProcDate),
+					POut.Long  (paySplit.PayNum),
+					POut.Bool  (paySplit.IsDiscount),
+					POut.Byte  (paySplit.DiscountType),
+					POut.Long  (paySplit.ProvNum),
+					POut.Long  (paySplit.PayPlanNum),
+					POut.Date  (paySplit.DatePay),
+					POut.Long  (paySplit.ProcNum),
+					POut.Date  (paySplit.DateEntry),
+					POut.Long  (paySplit.UnearnedType),
+					POut.Long  (paySplit.ClinicNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PaySplit into the database.  Returns the new priKey.</summary>
 		public static long Insert(PaySplit paySplit){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

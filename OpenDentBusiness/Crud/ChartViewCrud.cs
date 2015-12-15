@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ChartView> listChartViews) {
+			DataTable table=new DataTable("ChartViews");
+			table.Columns.Add("ChartViewNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("ProcStatuses");
+			table.Columns.Add("ObjectTypes");
+			table.Columns.Add("ShowProcNotes");
+			table.Columns.Add("IsAudit");
+			table.Columns.Add("SelectedTeethOnly");
+			table.Columns.Add("OrionStatusFlags");
+			table.Columns.Add("DatesShowing");
+			table.Columns.Add("IsTpCharting");
+			foreach(ChartView chartView in listChartViews) {
+				table.Rows.Add(new object[] {
+					POut.Long  (chartView.ChartViewNum),
+					POut.String(chartView.Description),
+					POut.Int   (chartView.ItemOrder),
+					POut.Int   ((int)chartView.ProcStatuses),
+					POut.Int   ((int)chartView.ObjectTypes),
+					POut.Bool  (chartView.ShowProcNotes),
+					POut.Bool  (chartView.IsAudit),
+					POut.Bool  (chartView.SelectedTeethOnly),
+					POut.Int   ((int)chartView.OrionStatusFlags),
+					POut.Int   ((int)chartView.DatesShowing),
+					POut.Bool  (chartView.IsTpCharting),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ChartView into the database.  Returns the new priKey.</summary>
 		public static long Insert(ChartView chartView){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

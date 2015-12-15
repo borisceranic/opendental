@@ -66,6 +66,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RequiredFieldCondition> listRequiredFieldConditions) {
+			DataTable table=new DataTable("RequiredFieldConditions");
+			table.Columns.Add("RequiredFieldConditionNum");
+			table.Columns.Add("RequiredFieldNum");
+			table.Columns.Add("ConditionType");
+			table.Columns.Add("Operator");
+			table.Columns.Add("ConditionValue");
+			table.Columns.Add("ConditionRelationship");
+			foreach(RequiredFieldCondition requiredFieldCondition in listRequiredFieldConditions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (requiredFieldCondition.RequiredFieldConditionNum),
+					POut.Long  (requiredFieldCondition.RequiredFieldNum),
+					POut.Int   ((int)requiredFieldCondition.ConditionType),
+					POut.Int   ((int)requiredFieldCondition.Operator),
+					POut.String(requiredFieldCondition.ConditionValue),
+					POut.Int   ((int)requiredFieldCondition.ConditionRelationship),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RequiredFieldCondition into the database.  Returns the new priKey.</summary>
 		public static long Insert(RequiredFieldCondition requiredFieldCondition){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

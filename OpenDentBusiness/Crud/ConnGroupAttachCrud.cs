@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ConnGroupAttach> listConnGroupAttachs) {
+			DataTable table=new DataTable("ConnGroupAttachs");
+			table.Columns.Add("ConnGroupAttachNum");
+			table.Columns.Add("ConnectionGroupNum");
+			table.Columns.Add("CentralConnectionNum");
+			foreach(ConnGroupAttach connGroupAttach in listConnGroupAttachs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (connGroupAttach.ConnGroupAttachNum),
+					POut.Long  (connGroupAttach.ConnectionGroupNum),
+					POut.Long  (connGroupAttach.CentralConnectionNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ConnGroupAttach into the database.  Returns the new priKey.</summary>
 		public static long Insert(ConnGroupAttach connGroupAttach){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

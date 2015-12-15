@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<AllergyDef> listAllergyDefs) {
+			DataTable table=new DataTable("AllergyDefs");
+			table.Columns.Add("AllergyDefNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("SnomedType");
+			table.Columns.Add("MedicationNum");
+			table.Columns.Add("UniiCode");
+			foreach(AllergyDef allergyDef in listAllergyDefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (allergyDef.AllergyDefNum),
+					POut.String(allergyDef.Description),
+					POut.Bool  (allergyDef.IsHidden),
+					POut.DateT (allergyDef.DateTStamp),
+					POut.Int   ((int)allergyDef.SnomedType),
+					POut.Long  (allergyDef.MedicationNum),
+					POut.String(allergyDef.UniiCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one AllergyDef into the database.  Returns the new priKey.</summary>
 		public static long Insert(AllergyDef allergyDef){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

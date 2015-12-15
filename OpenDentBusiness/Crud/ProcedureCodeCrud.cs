@@ -81,6 +81,76 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcedureCode> listProcedureCodes) {
+			DataTable table=new DataTable("ProcedureCodes");
+			table.Columns.Add("CodeNum");
+			table.Columns.Add("ProcCode");
+			table.Columns.Add("Descript");
+			table.Columns.Add("AbbrDesc");
+			table.Columns.Add("ProcTime");
+			table.Columns.Add("ProcCat");
+			table.Columns.Add("TreatArea");
+			table.Columns.Add("NoBillIns");
+			table.Columns.Add("IsProsth");
+			table.Columns.Add("DefaultNote");
+			table.Columns.Add("IsHygiene");
+			table.Columns.Add("GTypeNum");
+			table.Columns.Add("AlternateCode1");
+			table.Columns.Add("MedicalCode");
+			table.Columns.Add("IsTaxed");
+			table.Columns.Add("PaintType");
+			table.Columns.Add("GraphicColor");
+			table.Columns.Add("LaymanTerm");
+			table.Columns.Add("IsCanadianLab");
+			table.Columns.Add("PreExisting");
+			table.Columns.Add("BaseUnits");
+			table.Columns.Add("SubstitutionCode");
+			table.Columns.Add("SubstOnlyIf");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("IsMultiVisit");
+			table.Columns.Add("DrugNDC");
+			table.Columns.Add("RevenueCodeDefault");
+			table.Columns.Add("ProvNumDefault");
+			table.Columns.Add("CanadaTimeUnits");
+			table.Columns.Add("IsRadiology");
+			foreach(ProcedureCode procedureCode in listProcedureCodes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (procedureCode.CodeNum),
+					POut.String(procedureCode.ProcCode),
+					POut.String(procedureCode.Descript),
+					POut.String(procedureCode.AbbrDesc),
+					POut.String(procedureCode.ProcTime),
+					POut.Long  (procedureCode.ProcCat),
+					POut.Int   ((int)procedureCode.TreatArea),
+					POut.Bool  (procedureCode.NoBillIns),
+					POut.Bool  (procedureCode.IsProsth),
+					POut.String(procedureCode.DefaultNote),
+					POut.Bool  (procedureCode.IsHygiene),
+					POut.Int   (procedureCode.GTypeNum),
+					POut.String(procedureCode.AlternateCode1),
+					POut.String(procedureCode.MedicalCode),
+					POut.Bool  (procedureCode.IsTaxed),
+					POut.Int   ((int)procedureCode.PaintType),
+					POut.Int   (procedureCode.GraphicColor.ToArgb()),
+					POut.String(procedureCode.LaymanTerm),
+					POut.Bool  (procedureCode.IsCanadianLab),
+					POut.Bool  (procedureCode.PreExisting),
+					POut.Int   (procedureCode.BaseUnits),
+					POut.String(procedureCode.SubstitutionCode),
+					POut.Int   ((int)procedureCode.SubstOnlyIf),
+					POut.DateT (procedureCode.DateTStamp),
+					POut.Bool  (procedureCode.IsMultiVisit),
+					POut.String(procedureCode.DrugNDC),
+					POut.String(procedureCode.RevenueCodeDefault),
+					POut.Long  (procedureCode.ProvNumDefault),
+					POut.Double(procedureCode.CanadaTimeUnits),
+					POut.Bool  (procedureCode.IsRadiology),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ProcedureCode into the database.  Returns the new priKey.</summary>
 		public static long Insert(ProcedureCode procedureCode){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

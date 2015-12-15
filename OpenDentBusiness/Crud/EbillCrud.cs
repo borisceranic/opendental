@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Ebill> listEbills) {
+			DataTable table=new DataTable("Ebills");
+			table.Columns.Add("EbillNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ClientAcctNumber");
+			table.Columns.Add("ElectUserName");
+			table.Columns.Add("ElectPassword");
+			table.Columns.Add("PracticeAddress");
+			table.Columns.Add("RemitAddress");
+			foreach(Ebill ebill in listEbills) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ebill.EbillNum),
+					POut.Long  (ebill.ClinicNum),
+					POut.String(ebill.ClientAcctNumber),
+					POut.String(ebill.ElectUserName),
+					POut.String(ebill.ElectPassword),
+					POut.Int   ((int)ebill.PracticeAddress),
+					POut.Int   ((int)ebill.RemitAddress),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Ebill into the database.  Returns the new priKey.</summary>
 		public static long Insert(Ebill ebill){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

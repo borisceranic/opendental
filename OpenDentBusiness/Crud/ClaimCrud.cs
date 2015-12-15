@@ -124,6 +124,162 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Claim> listClaims) {
+			DataTable table=new DataTable("Claims");
+			table.Columns.Add("ClaimNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateService");
+			table.Columns.Add("DateSent");
+			table.Columns.Add("ClaimStatus");
+			table.Columns.Add("DateReceived");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("ProvTreat");
+			table.Columns.Add("ClaimFee");
+			table.Columns.Add("InsPayEst");
+			table.Columns.Add("InsPayAmt");
+			table.Columns.Add("DedApplied");
+			table.Columns.Add("PreAuthString");
+			table.Columns.Add("IsProsthesis");
+			table.Columns.Add("PriorDate");
+			table.Columns.Add("ReasonUnderPaid");
+			table.Columns.Add("ClaimNote");
+			table.Columns.Add("ClaimType");
+			table.Columns.Add("ProvBill");
+			table.Columns.Add("ReferringProv");
+			table.Columns.Add("RefNumString");
+			table.Columns.Add("PlaceService");
+			table.Columns.Add("AccidentRelated");
+			table.Columns.Add("AccidentDate");
+			table.Columns.Add("AccidentST");
+			table.Columns.Add("EmployRelated");
+			table.Columns.Add("IsOrtho");
+			table.Columns.Add("OrthoRemainM");
+			table.Columns.Add("OrthoDate");
+			table.Columns.Add("PatRelat");
+			table.Columns.Add("PlanNum2");
+			table.Columns.Add("PatRelat2");
+			table.Columns.Add("WriteOff");
+			table.Columns.Add("Radiographs");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ClaimForm");
+			table.Columns.Add("AttachedImages");
+			table.Columns.Add("AttachedModels");
+			table.Columns.Add("AttachedFlags");
+			table.Columns.Add("AttachmentID");
+			table.Columns.Add("CanadianMaterialsForwarded");
+			table.Columns.Add("CanadianReferralProviderNum");
+			table.Columns.Add("CanadianReferralReason");
+			table.Columns.Add("CanadianIsInitialLower");
+			table.Columns.Add("CanadianDateInitialLower");
+			table.Columns.Add("CanadianMandProsthMaterial");
+			table.Columns.Add("CanadianIsInitialUpper");
+			table.Columns.Add("CanadianDateInitialUpper");
+			table.Columns.Add("CanadianMaxProsthMaterial");
+			table.Columns.Add("InsSubNum");
+			table.Columns.Add("InsSubNum2");
+			table.Columns.Add("CanadaTransRefNum");
+			table.Columns.Add("CanadaEstTreatStartDate");
+			table.Columns.Add("CanadaInitialPayment");
+			table.Columns.Add("CanadaPaymentMode");
+			table.Columns.Add("CanadaTreatDuration");
+			table.Columns.Add("CanadaNumAnticipatedPayments");
+			table.Columns.Add("CanadaAnticipatedPayAmount");
+			table.Columns.Add("PriorAuthorizationNumber");
+			table.Columns.Add("SpecialProgramCode");
+			table.Columns.Add("UniformBillType");
+			table.Columns.Add("MedType");
+			table.Columns.Add("AdmissionTypeCode");
+			table.Columns.Add("AdmissionSourceCode");
+			table.Columns.Add("PatientStatusCode");
+			table.Columns.Add("CustomTracking");
+			table.Columns.Add("DateResent");
+			table.Columns.Add("CorrectionType");
+			table.Columns.Add("ClaimIdentifier");
+			table.Columns.Add("OrigRefNum");
+			table.Columns.Add("ProvOrderOverride");
+			table.Columns.Add("OrthoTotalM");
+			table.Columns.Add("ShareOfCost");
+			foreach(Claim claim in listClaims) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claim.ClaimNum),
+					POut.Long  (claim.PatNum),
+					POut.Date  (claim.DateService),
+					POut.Date  (claim.DateSent),
+					POut.String(claim.ClaimStatus),
+					POut.Date  (claim.DateReceived),
+					POut.Long  (claim.PlanNum),
+					POut.Long  (claim.ProvTreat),
+					POut.Double(claim.ClaimFee),
+					POut.Double(claim.InsPayEst),
+					POut.Double(claim.InsPayAmt),
+					POut.Double(claim.DedApplied),
+					POut.String(claim.PreAuthString),
+					POut.String(claim.IsProsthesis),
+					POut.Date  (claim.PriorDate),
+					POut.String(claim.ReasonUnderPaid),
+					POut.String(claim.ClaimNote),
+					POut.String(claim.ClaimType),
+					POut.Long  (claim.ProvBill),
+					POut.Long  (claim.ReferringProv),
+					POut.String(claim.RefNumString),
+					POut.Int   ((int)claim.PlaceService),
+					POut.String(claim.AccidentRelated),
+					POut.Date  (claim.AccidentDate),
+					POut.String(claim.AccidentST),
+					POut.Int   ((int)claim.EmployRelated),
+					POut.Bool  (claim.IsOrtho),
+					POut.Byte  (claim.OrthoRemainM),
+					POut.Date  (claim.OrthoDate),
+					POut.Int   ((int)claim.PatRelat),
+					POut.Long  (claim.PlanNum2),
+					POut.Int   ((int)claim.PatRelat2),
+					POut.Double(claim.WriteOff),
+					POut.Byte  (claim.Radiographs),
+					POut.Long  (claim.ClinicNum),
+					POut.Long  (claim.ClaimForm),
+					POut.Int   (claim.AttachedImages),
+					POut.Int   (claim.AttachedModels),
+					POut.String(claim.AttachedFlags),
+					POut.String(claim.AttachmentID),
+					POut.String(claim.CanadianMaterialsForwarded),
+					POut.String(claim.CanadianReferralProviderNum),
+					POut.Byte  (claim.CanadianReferralReason),
+					POut.String(claim.CanadianIsInitialLower),
+					POut.Date  (claim.CanadianDateInitialLower),
+					POut.Byte  (claim.CanadianMandProsthMaterial),
+					POut.String(claim.CanadianIsInitialUpper),
+					POut.Date  (claim.CanadianDateInitialUpper),
+					POut.Byte  (claim.CanadianMaxProsthMaterial),
+					POut.Long  (claim.InsSubNum),
+					POut.Long  (claim.InsSubNum2),
+					POut.String(claim.CanadaTransRefNum),
+					POut.Date  (claim.CanadaEstTreatStartDate),
+					POut.Double(claim.CanadaInitialPayment),
+					POut.Byte  (claim.CanadaPaymentMode),
+					POut.Byte  (claim.CanadaTreatDuration),
+					POut.Byte  (claim.CanadaNumAnticipatedPayments),
+					POut.Double(claim.CanadaAnticipatedPayAmount),
+					POut.String(claim.PriorAuthorizationNumber),
+					POut.Int   ((int)claim.SpecialProgramCode),
+					POut.String(claim.UniformBillType),
+					POut.Int   ((int)claim.MedType),
+					POut.String(claim.AdmissionTypeCode),
+					POut.String(claim.AdmissionSourceCode),
+					POut.String(claim.PatientStatusCode),
+					POut.Long  (claim.CustomTracking),
+					POut.Date  (claim.DateResent),
+					POut.Int   ((int)claim.CorrectionType),
+					POut.String(claim.ClaimIdentifier),
+					POut.String(claim.OrigRefNum),
+					POut.Long  (claim.ProvOrderOverride),
+					POut.Byte  (claim.OrthoTotalM),
+					POut.Double(claim.ShareOfCost),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Claim into the database.  Returns the new priKey.</summary>
 		public static long Insert(Claim claim){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

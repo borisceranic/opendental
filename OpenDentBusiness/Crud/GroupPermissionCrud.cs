@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<GroupPermission> listGroupPermissions) {
+			DataTable table=new DataTable("GroupPermissions");
+			table.Columns.Add("GroupPermNum");
+			table.Columns.Add("NewerDate");
+			table.Columns.Add("NewerDays");
+			table.Columns.Add("UserGroupNum");
+			table.Columns.Add("PermType");
+			foreach(GroupPermission groupPermission in listGroupPermissions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (groupPermission.GroupPermNum),
+					POut.Date  (groupPermission.NewerDate),
+					POut.Int   (groupPermission.NewerDays),
+					POut.Long  (groupPermission.UserGroupNum),
+					POut.Int   ((int)groupPermission.PermType),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one GroupPermission into the database.  Returns the new priKey.</summary>
 		public static long Insert(GroupPermission groupPermission){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

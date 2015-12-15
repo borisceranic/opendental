@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ApptViewItem> listApptViewItems) {
+			DataTable table=new DataTable("ApptViewItems");
+			table.Columns.Add("ApptViewItemNum");
+			table.Columns.Add("ApptViewNum");
+			table.Columns.Add("OpNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("ElementDesc");
+			table.Columns.Add("ElementOrder");
+			table.Columns.Add("ElementColor");
+			table.Columns.Add("ElementAlignment");
+			table.Columns.Add("ApptFieldDefNum");
+			table.Columns.Add("PatFieldDefNum");
+			foreach(ApptViewItem apptViewItem in listApptViewItems) {
+				table.Rows.Add(new object[] {
+					POut.Long  (apptViewItem.ApptViewItemNum),
+					POut.Long  (apptViewItem.ApptViewNum),
+					POut.Long  (apptViewItem.OpNum),
+					POut.Long  (apptViewItem.ProvNum),
+					POut.String(apptViewItem.ElementDesc),
+					POut.Byte  (apptViewItem.ElementOrder),
+					POut.Int   (apptViewItem.ElementColor.ToArgb()),
+					POut.Int   ((int)apptViewItem.ElementAlignment),
+					POut.Long  (apptViewItem.ApptFieldDefNum),
+					POut.Long  (apptViewItem.PatFieldDefNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ApptViewItem into the database.  Returns the new priKey.</summary>
 		public static long Insert(ApptViewItem apptViewItem){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

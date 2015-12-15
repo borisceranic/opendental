@@ -61,6 +61,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLabSpecimenCondition> listEhrLabSpecimenConditions) {
+			DataTable table=new DataTable("EhrLabSpecimenConditions");
+			table.Columns.Add("EhrLabSpecimenConditionNum");
+			table.Columns.Add("EhrLabSpecimenNum");
+			table.Columns.Add("SpecimenConditionID");
+			table.Columns.Add("SpecimenConditionText");
+			table.Columns.Add("SpecimenConditionCodeSystemName");
+			table.Columns.Add("SpecimenConditionIDAlt");
+			table.Columns.Add("SpecimenConditionTextAlt");
+			table.Columns.Add("SpecimenConditionCodeSystemNameAlt");
+			table.Columns.Add("SpecimenConditionTextOriginal");
+			foreach(EhrLabSpecimenCondition ehrLabSpecimenCondition in listEhrLabSpecimenConditions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLabSpecimenCondition.EhrLabSpecimenConditionNum),
+					POut.Long  (ehrLabSpecimenCondition.EhrLabSpecimenNum),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionID),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionText),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemName),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionIDAlt),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionTextAlt),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt),
+					POut.String(ehrLabSpecimenCondition.SpecimenConditionTextOriginal),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLabSpecimenCondition into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLabSpecimenCondition ehrLabSpecimenCondition){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

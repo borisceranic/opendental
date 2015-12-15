@@ -66,6 +66,46 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Userod> listUserods) {
+			DataTable table=new DataTable("Userods");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("UserName");
+			table.Columns.Add("Password");
+			table.Columns.Add("UserGroupNum");
+			table.Columns.Add("EmployeeNum");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("TaskListInBox");
+			table.Columns.Add("AnesthProvType");
+			table.Columns.Add("DefaultHidePopups");
+			table.Columns.Add("PasswordIsStrong");
+			table.Columns.Add("ClinicIsRestricted");
+			table.Columns.Add("InboxHidePopups");
+			table.Columns.Add("UserNumCEMT");
+			foreach(Userod userod in listUserods) {
+				table.Rows.Add(new object[] {
+					POut.Long  (userod.UserNum),
+					POut.String(userod.UserName),
+					POut.String(userod.Password),
+					POut.Long  (userod.UserGroupNum),
+					POut.Long  (userod.EmployeeNum),
+					POut.Long  (userod.ClinicNum),
+					POut.Long  (userod.ProvNum),
+					POut.Bool  (userod.IsHidden),
+					POut.Long  (userod.TaskListInBox),
+					POut.Int   (userod.AnesthProvType),
+					POut.Bool  (userod.DefaultHidePopups),
+					POut.Bool  (userod.PasswordIsStrong),
+					POut.Bool  (userod.ClinicIsRestricted),
+					POut.Bool  (userod.InboxHidePopups),
+					POut.Long  (userod.UserNumCEMT),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Userod into the database.  Returns the new priKey.</summary>
 		public static long Insert(Userod userod){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

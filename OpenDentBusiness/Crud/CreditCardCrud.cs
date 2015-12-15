@@ -67,6 +67,48 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<CreditCard> listCreditCards) {
+			DataTable table=new DataTable("CreditCards");
+			table.Columns.Add("CreditCardNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Address");
+			table.Columns.Add("Zip");
+			table.Columns.Add("XChargeToken");
+			table.Columns.Add("CCNumberMasked");
+			table.Columns.Add("CCExpiration");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("ChargeAmt");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("DateStop");
+			table.Columns.Add("Note");
+			table.Columns.Add("PayPlanNum");
+			table.Columns.Add("PayConnectToken");
+			table.Columns.Add("PayConnectTokenExp");
+			table.Columns.Add("Procedures");
+			foreach(CreditCard creditCard in listCreditCards) {
+				table.Rows.Add(new object[] {
+					POut.Long  (creditCard.CreditCardNum),
+					POut.Long  (creditCard.PatNum),
+					POut.String(creditCard.Address),
+					POut.String(creditCard.Zip),
+					POut.String(creditCard.XChargeToken),
+					POut.String(creditCard.CCNumberMasked),
+					POut.Date  (creditCard.CCExpiration),
+					POut.Int   (creditCard.ItemOrder),
+					POut.Double(creditCard.ChargeAmt),
+					POut.Date  (creditCard.DateStart),
+					POut.Date  (creditCard.DateStop),
+					POut.String(creditCard.Note),
+					POut.Long  (creditCard.PayPlanNum),
+					POut.String(creditCard.PayConnectToken),
+					POut.Date  (creditCard.PayConnectTokenExp),
+					POut.String(creditCard.Procedures),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one CreditCard into the database.  Returns the new priKey.</summary>
 		public static long Insert(CreditCard creditCard){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

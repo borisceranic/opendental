@@ -68,6 +68,50 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcTP> listProcTPs) {
+			DataTable table=new DataTable("ProcTPs");
+			table.Columns.Add("ProcTPNum");
+			table.Columns.Add("TreatPlanNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ProcNumOrig");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("Priority");
+			table.Columns.Add("ToothNumTP");
+			table.Columns.Add("Surf");
+			table.Columns.Add("ProcCode");
+			table.Columns.Add("Descript");
+			table.Columns.Add("FeeAmt");
+			table.Columns.Add("PriInsAmt");
+			table.Columns.Add("SecInsAmt");
+			table.Columns.Add("PatAmt");
+			table.Columns.Add("Discount");
+			table.Columns.Add("Prognosis");
+			table.Columns.Add("Dx");
+			foreach(ProcTP procTP in listProcTPs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (procTP.ProcTPNum),
+					POut.Long  (procTP.TreatPlanNum),
+					POut.Long  (procTP.PatNum),
+					POut.Long  (procTP.ProcNumOrig),
+					POut.Int   (procTP.ItemOrder),
+					POut.Long  (procTP.Priority),
+					POut.String(procTP.ToothNumTP),
+					POut.String(procTP.Surf),
+					POut.String(procTP.ProcCode),
+					POut.String(procTP.Descript),
+					POut.Double(procTP.FeeAmt),
+					POut.Double(procTP.PriInsAmt),
+					POut.Double(procTP.SecInsAmt),
+					POut.Double(procTP.PatAmt),
+					POut.Double(procTP.Discount),
+					POut.String(procTP.Prognosis),
+					POut.String(procTP.Dx),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ProcTP into the database.  Returns the new priKey.</summary>
 		public static long Insert(ProcTP procTP){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

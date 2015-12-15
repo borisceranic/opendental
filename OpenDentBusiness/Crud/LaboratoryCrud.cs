@@ -62,6 +62,38 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Laboratory> listLaboratorys) {
+			DataTable table=new DataTable("Laboratorys");
+			table.Columns.Add("LaboratoryNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("Phone");
+			table.Columns.Add("Notes");
+			table.Columns.Add("Slip");
+			table.Columns.Add("Address");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("Email");
+			table.Columns.Add("WirelessPhone");
+			foreach(Laboratory laboratory in listLaboratorys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (laboratory.LaboratoryNum),
+					POut.String(laboratory.Description),
+					POut.String(laboratory.Phone),
+					POut.String(laboratory.Notes),
+					POut.Long  (laboratory.Slip),
+					POut.String(laboratory.Address),
+					POut.String(laboratory.City),
+					POut.String(laboratory.State),
+					POut.String(laboratory.Zip),
+					POut.String(laboratory.Email),
+					POut.String(laboratory.WirelessPhone),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Laboratory into the database.  Returns the new priKey.</summary>
 		public static long Insert(Laboratory laboratory){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

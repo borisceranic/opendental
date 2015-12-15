@@ -128,6 +128,170 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Patient> listPatients) {
+			DataTable table=new DataTable("Patients");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("LName");
+			table.Columns.Add("FName");
+			table.Columns.Add("MiddleI");
+			table.Columns.Add("Preferred");
+			table.Columns.Add("PatStatus");
+			table.Columns.Add("Gender");
+			table.Columns.Add("Position");
+			table.Columns.Add("Birthdate");
+			table.Columns.Add("SSN");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("HmPhone");
+			table.Columns.Add("WkPhone");
+			table.Columns.Add("WirelessPhone");
+			table.Columns.Add("Guarantor");
+			table.Columns.Add("CreditType");
+			table.Columns.Add("Email");
+			table.Columns.Add("Salutation");
+			table.Columns.Add("EstBalance");
+			table.Columns.Add("PriProv");
+			table.Columns.Add("SecProv");
+			table.Columns.Add("FeeSched");
+			table.Columns.Add("BillingType");
+			table.Columns.Add("ImageFolder");
+			table.Columns.Add("AddrNote");
+			table.Columns.Add("FamFinUrgNote");
+			table.Columns.Add("MedUrgNote");
+			table.Columns.Add("ApptModNote");
+			table.Columns.Add("StudentStatus");
+			table.Columns.Add("SchoolName");
+			table.Columns.Add("ChartNumber");
+			table.Columns.Add("MedicaidID");
+			table.Columns.Add("Bal_0_30");
+			table.Columns.Add("Bal_31_60");
+			table.Columns.Add("Bal_61_90");
+			table.Columns.Add("BalOver90");
+			table.Columns.Add("InsEst");
+			table.Columns.Add("BalTotal");
+			table.Columns.Add("EmployerNum");
+			table.Columns.Add("EmploymentNote");
+			table.Columns.Add("County");
+			table.Columns.Add("GradeLevel");
+			table.Columns.Add("Urgency");
+			table.Columns.Add("DateFirstVisit");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("HasIns");
+			table.Columns.Add("TrophyFolder");
+			table.Columns.Add("PlannedIsDone");
+			table.Columns.Add("Premed");
+			table.Columns.Add("Ward");
+			table.Columns.Add("PreferConfirmMethod");
+			table.Columns.Add("PreferContactMethod");
+			table.Columns.Add("PreferRecallMethod");
+			table.Columns.Add("SchedBeforeTime");
+			table.Columns.Add("SchedAfterTime");
+			table.Columns.Add("SchedDayOfWeek");
+			table.Columns.Add("Language");
+			table.Columns.Add("AdmitDate");
+			table.Columns.Add("Title");
+			table.Columns.Add("PayPlanDue");
+			table.Columns.Add("SiteNum");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("ResponsParty");
+			table.Columns.Add("CanadianEligibilityCode");
+			table.Columns.Add("AskToArriveEarly");
+			table.Columns.Add("OnlinePassword");
+			table.Columns.Add("PreferContactConfidential");
+			table.Columns.Add("SuperFamily");
+			table.Columns.Add("TxtMsgOk");
+			table.Columns.Add("SmokingSnoMed");
+			table.Columns.Add("Country");
+			table.Columns.Add("DateTimeDeceased");
+			table.Columns.Add("BillingCycleDay");
+			foreach(Patient patient in listPatients) {
+				table.Rows.Add(new object[] {
+					POut.Long  (patient.PatNum),
+					POut.String(patient.LName),
+					POut.String(patient.FName),
+					POut.String(patient.MiddleI),
+					POut.String(patient.Preferred),
+					POut.Int   ((int)patient.PatStatus),
+					POut.Int   ((int)patient.Gender),
+					POut.Int   ((int)patient.Position),
+					POut.Date  (patient.Birthdate),
+					POut.String(patient.SSN),
+					POut.String(patient.Address),
+					POut.String(patient.Address2),
+					POut.String(patient.City),
+					POut.String(patient.State),
+					POut.String(patient.Zip),
+					POut.String(patient.HmPhone),
+					POut.String(patient.WkPhone),
+					POut.String(patient.WirelessPhone),
+					POut.Long  (patient.Guarantor),
+					POut.String(patient.CreditType),
+					POut.String(patient.Email),
+					POut.String(patient.Salutation),
+					POut.Double(patient.EstBalance),
+					POut.Long  (patient.PriProv),
+					POut.Long  (patient.SecProv),
+					POut.Long  (patient.FeeSched),
+					POut.Long  (patient.BillingType),
+					POut.String(patient.ImageFolder),
+					POut.String(patient.AddrNote),
+					POut.String(patient.FamFinUrgNote),
+					POut.String(patient.MedUrgNote),
+					POut.String(patient.ApptModNote),
+					POut.String(patient.StudentStatus),
+					POut.String(patient.SchoolName),
+					POut.String(patient.ChartNumber),
+					POut.String(patient.MedicaidID),
+					POut.Double(patient.Bal_0_30),
+					POut.Double(patient.Bal_31_60),
+					POut.Double(patient.Bal_61_90),
+					POut.Double(patient.BalOver90),
+					POut.Double(patient.InsEst),
+					POut.Double(patient.BalTotal),
+					POut.Long  (patient.EmployerNum),
+					POut.String(patient.EmploymentNote),
+					POut.String(patient.County),
+					POut.Int   ((int)patient.GradeLevel),
+					POut.Int   ((int)patient.Urgency),
+					POut.Date  (patient.DateFirstVisit),
+					POut.Long  (patient.ClinicNum),
+					POut.String(patient.HasIns),
+					POut.String(patient.TrophyFolder),
+					POut.Bool  (patient.PlannedIsDone),
+					POut.Bool  (patient.Premed),
+					POut.String(patient.Ward),
+					POut.Int   ((int)patient.PreferConfirmMethod),
+					POut.Int   ((int)patient.PreferContactMethod),
+					POut.Int   ((int)patient.PreferRecallMethod),
+					POut.Time  (patient.SchedBeforeTime),
+					POut.Time  (patient.SchedAfterTime),
+					POut.Byte  (patient.SchedDayOfWeek),
+					POut.String(patient.Language),
+					POut.Date  (patient.AdmitDate),
+					POut.String(patient.Title),
+					POut.Double(patient.PayPlanDue),
+					POut.Long  (patient.SiteNum),
+					POut.DateT (patient.DateTStamp),
+					POut.Long  (patient.ResponsParty),
+					POut.Byte  (patient.CanadianEligibilityCode),
+					POut.Int   (patient.AskToArriveEarly),
+					POut.String(patient.OnlinePassword),
+					POut.Int   ((int)patient.PreferContactConfidential),
+					POut.Long  (patient.SuperFamily),
+					POut.Int   ((int)patient.TxtMsgOk),
+					POut.String(patient.SmokingSnoMed),
+					POut.String(patient.Country),
+					POut.DateT (patient.DateTimeDeceased),
+					POut.Int   (patient.BillingCycleDay),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Patient into the database.  Returns the new priKey.</summary>
 		public static long Insert(Patient patient){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

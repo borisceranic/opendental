@@ -88,6 +88,72 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<HL7Def> listHL7Defs) {
+			DataTable table=new DataTable("HL7Defs");
+			table.Columns.Add("HL7DefNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ModeTx");
+			table.Columns.Add("IncomingFolder");
+			table.Columns.Add("OutgoingFolder");
+			table.Columns.Add("IncomingPort");
+			table.Columns.Add("OutgoingIpPort");
+			table.Columns.Add("FieldSeparator");
+			table.Columns.Add("ComponentSeparator");
+			table.Columns.Add("SubcomponentSeparator");
+			table.Columns.Add("RepetitionSeparator");
+			table.Columns.Add("EscapeCharacter");
+			table.Columns.Add("IsInternal");
+			table.Columns.Add("InternalType");
+			table.Columns.Add("InternalTypeVersion");
+			table.Columns.Add("IsEnabled");
+			table.Columns.Add("Note");
+			table.Columns.Add("HL7Server");
+			table.Columns.Add("HL7ServiceName");
+			table.Columns.Add("ShowDemographics");
+			table.Columns.Add("ShowAppts");
+			table.Columns.Add("ShowAccount");
+			table.Columns.Add("IsQuadAsToothNum");
+			table.Columns.Add("LabResultImageCat");
+			table.Columns.Add("SftpUsername");
+			table.Columns.Add("SftpPassword");
+			table.Columns.Add("SftpInSocket");
+			table.Columns.Add("HasLongDCodes");
+			foreach(HL7Def hL7Def in listHL7Defs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (hL7Def.HL7DefNum),
+					POut.String(hL7Def.Description),
+					POut.Int   ((int)hL7Def.ModeTx),
+					POut.String(hL7Def.IncomingFolder),
+					POut.String(hL7Def.OutgoingFolder),
+					POut.String(hL7Def.IncomingPort),
+					POut.String(hL7Def.OutgoingIpPort),
+					POut.String(hL7Def.FieldSeparator),
+					POut.String(hL7Def.ComponentSeparator),
+					POut.String(hL7Def.SubcomponentSeparator),
+					POut.String(hL7Def.RepetitionSeparator),
+					POut.String(hL7Def.EscapeCharacter),
+					POut.Bool  (hL7Def.IsInternal),
+					POut.Int   ((int)hL7Def.InternalType),
+					POut.String(hL7Def.InternalTypeVersion),
+					POut.Bool  (hL7Def.IsEnabled),
+					POut.String(hL7Def.Note),
+					POut.String(hL7Def.HL7Server),
+					POut.String(hL7Def.HL7ServiceName),
+					POut.Int   ((int)hL7Def.ShowDemographics),
+					POut.Bool  (hL7Def.ShowAppts),
+					POut.Bool  (hL7Def.ShowAccount),
+					POut.Bool  (hL7Def.IsQuadAsToothNum),
+					POut.Long  (hL7Def.LabResultImageCat),
+					POut.String(hL7Def.SftpUsername),
+					POut.String(hL7Def.SftpPassword),
+					POut.String(hL7Def.SftpInSocket),
+					POut.Bool  (hL7Def.HasLongDCodes),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one HL7Def into the database.  Returns the new priKey.</summary>
 		public static long Insert(HL7Def hL7Def){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

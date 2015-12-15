@@ -71,6 +71,56 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Vitalsign> listVitalsigns) {
+			DataTable table=new DataTable("Vitalsigns");
+			table.Columns.Add("VitalsignNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Height");
+			table.Columns.Add("Weight");
+			table.Columns.Add("BpSystolic");
+			table.Columns.Add("BpDiastolic");
+			table.Columns.Add("DateTaken");
+			table.Columns.Add("HasFollowupPlan");
+			table.Columns.Add("IsIneligible");
+			table.Columns.Add("Documentation");
+			table.Columns.Add("ChildGotNutrition");
+			table.Columns.Add("ChildGotPhysCouns");
+			table.Columns.Add("WeightCode");
+			table.Columns.Add("HeightExamCode");
+			table.Columns.Add("WeightExamCode");
+			table.Columns.Add("BMIExamCode");
+			table.Columns.Add("EhrNotPerformedNum");
+			table.Columns.Add("PregDiseaseNum");
+			table.Columns.Add("BMIPercentile");
+			table.Columns.Add("Pulse");
+			foreach(Vitalsign vitalsign in listVitalsigns) {
+				table.Rows.Add(new object[] {
+					POut.Long  (vitalsign.VitalsignNum),
+					POut.Long  (vitalsign.PatNum),
+					POut.Float (vitalsign.Height),
+					POut.Float (vitalsign.Weight),
+					POut.Int   (vitalsign.BpSystolic),
+					POut.Int   (vitalsign.BpDiastolic),
+					POut.Date  (vitalsign.DateTaken),
+					POut.Bool  (vitalsign.HasFollowupPlan),
+					POut.Bool  (vitalsign.IsIneligible),
+					POut.String(vitalsign.Documentation),
+					POut.Bool  (vitalsign.ChildGotNutrition),
+					POut.Bool  (vitalsign.ChildGotPhysCouns),
+					POut.String(vitalsign.WeightCode),
+					POut.String(vitalsign.HeightExamCode),
+					POut.String(vitalsign.WeightExamCode),
+					POut.String(vitalsign.BMIExamCode),
+					POut.Long  (vitalsign.EhrNotPerformedNum),
+					POut.Long  (vitalsign.PregDiseaseNum),
+					POut.Int   (vitalsign.BMIPercentile),
+					POut.Int   (vitalsign.Pulse),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Vitalsign into the database.  Returns the new priKey.</summary>
 		public static long Insert(Vitalsign vitalsign){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

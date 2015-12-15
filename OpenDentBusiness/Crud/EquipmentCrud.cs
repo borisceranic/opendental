@@ -66,6 +66,46 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Equipment> listEquipments) {
+			DataTable table=new DataTable("Equipments");
+			table.Columns.Add("EquipmentNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("SerialNumber");
+			table.Columns.Add("ModelYear");
+			table.Columns.Add("DatePurchased");
+			table.Columns.Add("DateSold");
+			table.Columns.Add("PurchaseCost");
+			table.Columns.Add("MarketValue");
+			table.Columns.Add("Location");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("ProvNumCheckedOut");
+			table.Columns.Add("DateCheckedOut");
+			table.Columns.Add("DateExpectedBack");
+			table.Columns.Add("DispenseNote");
+			table.Columns.Add("Status");
+			foreach(Equipment equipment in listEquipments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (equipment.EquipmentNum),
+					POut.String(equipment.Description),
+					POut.String(equipment.SerialNumber),
+					POut.String(equipment.ModelYear),
+					POut.Date  (equipment.DatePurchased),
+					POut.Date  (equipment.DateSold),
+					POut.Double(equipment.PurchaseCost),
+					POut.Double(equipment.MarketValue),
+					POut.String(equipment.Location),
+					POut.Date  (equipment.DateEntry),
+					POut.Long  (equipment.ProvNumCheckedOut),
+					POut.Date  (equipment.DateCheckedOut),
+					POut.Date  (equipment.DateExpectedBack),
+					POut.String(equipment.DispenseNote),
+					POut.String(equipment.Status),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Equipment into the database.  Returns the new priKey.</summary>
 		public static long Insert(Equipment equipment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

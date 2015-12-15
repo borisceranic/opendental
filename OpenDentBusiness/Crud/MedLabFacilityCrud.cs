@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<MedLabFacility> listMedLabFacilitys) {
+			DataTable table=new DataTable("MedLabFacilitys");
+			table.Columns.Add("MedLabFacilityNum");
+			table.Columns.Add("FacilityName");
+			table.Columns.Add("Address");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("Phone");
+			table.Columns.Add("DirectorTitle");
+			table.Columns.Add("DirectorLName");
+			table.Columns.Add("DirectorFName");
+			foreach(MedLabFacility medLabFacility in listMedLabFacilitys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (medLabFacility.MedLabFacilityNum),
+					POut.String(medLabFacility.FacilityName),
+					POut.String(medLabFacility.Address),
+					POut.String(medLabFacility.City),
+					POut.String(medLabFacility.State),
+					POut.String(medLabFacility.Zip),
+					POut.String(medLabFacility.Phone),
+					POut.String(medLabFacility.DirectorTitle),
+					POut.String(medLabFacility.DirectorLName),
+					POut.String(medLabFacility.DirectorFName),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one MedLabFacility into the database.  Returns the new priKey.</summary>
 		public static long Insert(MedLabFacility medLabFacility){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

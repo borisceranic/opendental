@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<County> listCountys) {
+			DataTable table=new DataTable("Countys");
+			table.Columns.Add("CountyNum");
+			table.Columns.Add("CountyName");
+			table.Columns.Add("CountyCode");
+			foreach(County county in listCountys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (county.CountyNum),
+					POut.String(county.CountyName),
+					POut.String(county.CountyCode),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one County into the database.  Returns the new priKey.</summary>
 		public static long Insert(County county){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

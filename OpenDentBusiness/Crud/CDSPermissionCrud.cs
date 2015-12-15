@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<CDSPermission> listCDSPermissions) {
+			DataTable table=new DataTable("CDSPermissions");
+			table.Columns.Add("CDSPermissionNum");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("SetupCDS");
+			table.Columns.Add("ShowCDS");
+			table.Columns.Add("ShowInfobutton");
+			table.Columns.Add("EditBibliography");
+			table.Columns.Add("ProblemCDS");
+			table.Columns.Add("MedicationCDS");
+			table.Columns.Add("AllergyCDS");
+			table.Columns.Add("DemographicCDS");
+			table.Columns.Add("LabTestCDS");
+			table.Columns.Add("VitalCDS");
+			foreach(CDSPermission cDSPermission in listCDSPermissions) {
+				table.Rows.Add(new object[] {
+					POut.Long  (cDSPermission.CDSPermissionNum),
+					POut.Long  (cDSPermission.UserNum),
+					POut.Bool  (cDSPermission.SetupCDS),
+					POut.Bool  (cDSPermission.ShowCDS),
+					POut.Bool  (cDSPermission.ShowInfobutton),
+					POut.Bool  (cDSPermission.EditBibliography),
+					POut.Bool  (cDSPermission.ProblemCDS),
+					POut.Bool  (cDSPermission.MedicationCDS),
+					POut.Bool  (cDSPermission.AllergyCDS),
+					POut.Bool  (cDSPermission.DemographicCDS),
+					POut.Bool  (cDSPermission.LabTestCDS),
+					POut.Bool  (cDSPermission.VitalCDS),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one CDSPermission into the database.  Returns the new priKey.</summary>
 		public static long Insert(CDSPermission cDSPermission){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

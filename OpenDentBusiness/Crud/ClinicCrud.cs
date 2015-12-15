@@ -80,6 +80,74 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Clinic> listClinics) {
+			DataTable table=new DataTable("Clinics");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("BillingAddress");
+			table.Columns.Add("BillingAddress2");
+			table.Columns.Add("BillingCity");
+			table.Columns.Add("BillingState");
+			table.Columns.Add("BillingZip");
+			table.Columns.Add("PayToAddress");
+			table.Columns.Add("PayToAddress2");
+			table.Columns.Add("PayToCity");
+			table.Columns.Add("PayToState");
+			table.Columns.Add("PayToZip");
+			table.Columns.Add("Phone");
+			table.Columns.Add("BankNumber");
+			table.Columns.Add("DefaultPlaceService");
+			table.Columns.Add("InsBillingProv");
+			table.Columns.Add("Fax");
+			table.Columns.Add("EmailAddressNum");
+			table.Columns.Add("DefaultProv");
+			table.Columns.Add("SmsContractDate");
+			table.Columns.Add("SmsMonthlyLimit");
+			table.Columns.Add("IsMedicalOnly");
+			table.Columns.Add("UseBillAddrOnClaims");
+			table.Columns.Add("Region");
+			foreach(Clinic clinic in listClinics) {
+				table.Rows.Add(new object[] {
+					POut.Long  (clinic.ClinicNum),
+					POut.String(clinic.Description),
+					POut.String(clinic.Address),
+					POut.String(clinic.Address2),
+					POut.String(clinic.City),
+					POut.String(clinic.State),
+					POut.String(clinic.Zip),
+					POut.String(clinic.BillingAddress),
+					POut.String(clinic.BillingAddress2),
+					POut.String(clinic.BillingCity),
+					POut.String(clinic.BillingState),
+					POut.String(clinic.BillingZip),
+					POut.String(clinic.PayToAddress),
+					POut.String(clinic.PayToAddress2),
+					POut.String(clinic.PayToCity),
+					POut.String(clinic.PayToState),
+					POut.String(clinic.PayToZip),
+					POut.String(clinic.Phone),
+					POut.String(clinic.BankNumber),
+					POut.Int   ((int)clinic.DefaultPlaceService),
+					POut.Long  (clinic.InsBillingProv),
+					POut.String(clinic.Fax),
+					POut.Long  (clinic.EmailAddressNum),
+					POut.Long  (clinic.DefaultProv),
+					POut.DateT (clinic.SmsContractDate),
+					POut.Double(clinic.SmsMonthlyLimit),
+					POut.Bool  (clinic.IsMedicalOnly),
+					POut.Bool  (clinic.UseBillAddrOnClaims),
+					POut.Bool  (clinic.Region),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Clinic into the database.  Returns the new priKey.</summary>
 		public static long Insert(Clinic clinic){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

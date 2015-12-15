@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Popup> listPopups) {
+			DataTable table=new DataTable("Popups");
+			table.Columns.Add("PopupNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("IsDisabled");
+			table.Columns.Add("PopupLevel");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("IsArchived");
+			table.Columns.Add("PopupNumArchive");
+			foreach(Popup popup in listPopups) {
+				table.Rows.Add(new object[] {
+					POut.Long  (popup.PopupNum),
+					POut.Long  (popup.PatNum),
+					POut.String(popup.Description),
+					POut.Bool  (popup.IsDisabled),
+					POut.Int   ((int)popup.PopupLevel),
+					POut.Long  (popup.UserNum),
+					POut.DateT (popup.DateTimeEntry),
+					POut.Bool  (popup.IsArchived),
+					POut.Long  (popup.PopupNumArchive),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Popup into the database.  Returns the new priKey.</summary>
 		public static long Insert(Popup popup){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

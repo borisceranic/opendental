@@ -103,6 +103,84 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<MedLab> listMedLabs) {
+			DataTable table=new DataTable("MedLabs");
+			table.Columns.Add("MedLabNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("SendingApp");
+			table.Columns.Add("SendingFacility");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("PatIDLab");
+			table.Columns.Add("PatIDAlt");
+			table.Columns.Add("PatAge");
+			table.Columns.Add("PatAccountNum");
+			table.Columns.Add("PatFasting");
+			table.Columns.Add("SpecimenID");
+			table.Columns.Add("SpecimenIDFiller");
+			table.Columns.Add("ObsTestID");
+			table.Columns.Add("ObsTestDescript");
+			table.Columns.Add("ObsTestLoinc");
+			table.Columns.Add("ObsTestLoincText");
+			table.Columns.Add("DateTimeCollected");
+			table.Columns.Add("TotalVolume");
+			table.Columns.Add("ActionCode");
+			table.Columns.Add("ClinicalInfo");
+			table.Columns.Add("DateTimeEntered");
+			table.Columns.Add("OrderingProvNPI");
+			table.Columns.Add("OrderingProvLocalID");
+			table.Columns.Add("OrderingProvLName");
+			table.Columns.Add("OrderingProvFName");
+			table.Columns.Add("SpecimenIDAlt");
+			table.Columns.Add("DateTimeReported");
+			table.Columns.Add("ResultStatus");
+			table.Columns.Add("ParentObsID");
+			table.Columns.Add("ParentObsTestID");
+			table.Columns.Add("NotePat");
+			table.Columns.Add("NoteLab");
+			table.Columns.Add("FileName");
+			table.Columns.Add("OriginalPIDSegment");
+			foreach(MedLab medLab in listMedLabs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (medLab.MedLabNum),
+					POut.Long  (medLab.ProvNum),
+					POut.String(medLab.SendingApp),
+					POut.String(medLab.SendingFacility),
+					POut.Long  (medLab.PatNum),
+					POut.String(medLab.PatIDLab),
+					POut.String(medLab.PatIDAlt),
+					POut.String(medLab.PatAge),
+					POut.String(medLab.PatAccountNum),
+					POut.Int   ((int)medLab.PatFasting),
+					POut.String(medLab.SpecimenID),
+					POut.String(medLab.SpecimenIDFiller),
+					POut.String(medLab.ObsTestID),
+					POut.String(medLab.ObsTestDescript),
+					POut.String(medLab.ObsTestLoinc),
+					POut.String(medLab.ObsTestLoincText),
+					POut.DateT (medLab.DateTimeCollected),
+					POut.String(medLab.TotalVolume),
+					POut.Int   ((int)medLab.ActionCode),
+					POut.String(medLab.ClinicalInfo),
+					POut.DateT (medLab.DateTimeEntered),
+					POut.String(medLab.OrderingProvNPI),
+					POut.String(medLab.OrderingProvLocalID),
+					POut.String(medLab.OrderingProvLName),
+					POut.String(medLab.OrderingProvFName),
+					POut.String(medLab.SpecimenIDAlt),
+					POut.DateT (medLab.DateTimeReported),
+					POut.Int   ((int)medLab.ResultStatus),
+					POut.String(medLab.ParentObsID),
+					POut.String(medLab.ParentObsTestID),
+					POut.String(medLab.NotePat),
+					POut.String(medLab.NoteLab),
+					POut.String(medLab.FileName),
+					POut.String(medLab.OriginalPIDSegment),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one MedLab into the database.  Returns the new priKey.</summary>
 		public static long Insert(MedLab medLab){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

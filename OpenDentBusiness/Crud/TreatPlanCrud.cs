@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<TreatPlan> listTreatPlans) {
+			DataTable table=new DataTable("TreatPlans");
+			table.Columns.Add("TreatPlanNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateTP");
+			table.Columns.Add("Heading");
+			table.Columns.Add("Note");
+			table.Columns.Add("Signature");
+			table.Columns.Add("SigIsTopaz");
+			table.Columns.Add("ResponsParty");
+			table.Columns.Add("DocNum");
+			table.Columns.Add("TPStatus");
+			foreach(TreatPlan treatPlan in listTreatPlans) {
+				table.Rows.Add(new object[] {
+					POut.Long  (treatPlan.TreatPlanNum),
+					POut.Long  (treatPlan.PatNum),
+					POut.Date  (treatPlan.DateTP),
+					POut.String(treatPlan.Heading),
+					POut.String(treatPlan.Note),
+					POut.String(treatPlan.Signature),
+					POut.Bool  (treatPlan.SigIsTopaz),
+					POut.Long  (treatPlan.ResponsParty),
+					POut.Long  (treatPlan.DocNum),
+					POut.Int   ((int)treatPlan.TPStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one TreatPlan into the database.  Returns the new priKey.</summary>
 		public static long Insert(TreatPlan treatPlan){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

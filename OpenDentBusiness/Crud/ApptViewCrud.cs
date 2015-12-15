@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ApptView> listApptViews) {
+			DataTable table=new DataTable("ApptViews");
+			table.Columns.Add("ApptViewNum");
+			table.Columns.Add("Description");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("RowsPerIncr");
+			table.Columns.Add("OnlyScheduledProvs");
+			table.Columns.Add("OnlySchedBeforeTime");
+			table.Columns.Add("OnlySchedAfterTime");
+			table.Columns.Add("StackBehavUR");
+			table.Columns.Add("StackBehavLR");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ApptTimeScrollStart");
+			table.Columns.Add("IsScrollStartDynamic");
+			foreach(ApptView apptView in listApptViews) {
+				table.Rows.Add(new object[] {
+					POut.Long  (apptView.ApptViewNum),
+					POut.String(apptView.Description),
+					POut.Int   (apptView.ItemOrder),
+					POut.Byte  (apptView.RowsPerIncr),
+					POut.Bool  (apptView.OnlyScheduledProvs),
+					POut.Time  (apptView.OnlySchedBeforeTime),
+					POut.Time  (apptView.OnlySchedAfterTime),
+					POut.Int   ((int)apptView.StackBehavUR),
+					POut.Int   ((int)apptView.StackBehavLR),
+					POut.Long  (apptView.ClinicNum),
+					POut.Time  (apptView.ApptTimeScrollStart),
+					POut.Bool  (apptView.IsScrollStartDynamic),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ApptView into the database.  Returns the new priKey.</summary>
 		public static long Insert(ApptView apptView){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

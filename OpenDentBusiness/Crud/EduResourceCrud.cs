@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EduResource> listEduResources) {
+			DataTable table=new DataTable("EduResources");
+			table.Columns.Add("EduResourceNum");
+			table.Columns.Add("DiseaseDefNum");
+			table.Columns.Add("MedicationNum");
+			table.Columns.Add("LabResultID");
+			table.Columns.Add("LabResultName");
+			table.Columns.Add("LabResultCompare");
+			table.Columns.Add("ResourceUrl");
+			foreach(EduResource eduResource in listEduResources) {
+				table.Rows.Add(new object[] {
+					POut.Long  (eduResource.EduResourceNum),
+					POut.Long  (eduResource.DiseaseDefNum),
+					POut.Long  (eduResource.MedicationNum),
+					POut.String(eduResource.LabResultID),
+					POut.String(eduResource.LabResultName),
+					POut.String(eduResource.LabResultCompare),
+					POut.String(eduResource.ResourceUrl),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EduResource into the database.  Returns the new priKey.</summary>
 		public static long Insert(EduResource eduResource){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

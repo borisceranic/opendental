@@ -64,6 +64,42 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<LabCase> listLabCases) {
+			DataTable table=new DataTable("LabCases");
+			table.Columns.Add("LabCaseNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("LaboratoryNum");
+			table.Columns.Add("AptNum");
+			table.Columns.Add("PlannedAptNum");
+			table.Columns.Add("DateTimeDue");
+			table.Columns.Add("DateTimeCreated");
+			table.Columns.Add("DateTimeSent");
+			table.Columns.Add("DateTimeRecd");
+			table.Columns.Add("DateTimeChecked");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("Instructions");
+			table.Columns.Add("LabFee");
+			foreach(LabCase labCase in listLabCases) {
+				table.Rows.Add(new object[] {
+					POut.Long  (labCase.LabCaseNum),
+					POut.Long  (labCase.PatNum),
+					POut.Long  (labCase.LaboratoryNum),
+					POut.Long  (labCase.AptNum),
+					POut.Long  (labCase.PlannedAptNum),
+					POut.DateT (labCase.DateTimeDue),
+					POut.DateT (labCase.DateTimeCreated),
+					POut.DateT (labCase.DateTimeSent),
+					POut.DateT (labCase.DateTimeRecd),
+					POut.DateT (labCase.DateTimeChecked),
+					POut.Long  (labCase.ProvNum),
+					POut.String(labCase.Instructions),
+					POut.Double(labCase.LabFee),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one LabCase into the database.  Returns the new priKey.</summary>
 		public static long Insert(LabCase labCase){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

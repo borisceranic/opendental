@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PayPlanCharge> listPayPlanCharges) {
+			DataTable table=new DataTable("PayPlanCharges");
+			table.Columns.Add("PayPlanChargeNum");
+			table.Columns.Add("PayPlanNum");
+			table.Columns.Add("Guarantor");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("ChargeDate");
+			table.Columns.Add("Principal");
+			table.Columns.Add("Interest");
+			table.Columns.Add("Note");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("ClinicNum");
+			foreach(PayPlanCharge payPlanCharge in listPayPlanCharges) {
+				table.Rows.Add(new object[] {
+					POut.Long  (payPlanCharge.PayPlanChargeNum),
+					POut.Long  (payPlanCharge.PayPlanNum),
+					POut.Long  (payPlanCharge.Guarantor),
+					POut.Long  (payPlanCharge.PatNum),
+					POut.Date  (payPlanCharge.ChargeDate),
+					POut.Double(payPlanCharge.Principal),
+					POut.Double(payPlanCharge.Interest),
+					POut.String(payPlanCharge.Note),
+					POut.Long  (payPlanCharge.ProvNum),
+					POut.Long  (payPlanCharge.ClinicNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PayPlanCharge into the database.  Returns the new priKey.</summary>
 		public static long Insert(PayPlanCharge payPlanCharge){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

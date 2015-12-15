@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Sheet> listSheets) {
+			DataTable table=new DataTable("Sheets");
+			table.Columns.Add("SheetNum");
+			table.Columns.Add("SheetType");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateTimeSheet");
+			table.Columns.Add("FontSize");
+			table.Columns.Add("FontName");
+			table.Columns.Add("Width");
+			table.Columns.Add("Height");
+			table.Columns.Add("IsLandscape");
+			table.Columns.Add("InternalNote");
+			table.Columns.Add("Description");
+			table.Columns.Add("ShowInTerminal");
+			table.Columns.Add("IsWebForm");
+			table.Columns.Add("IsMultiPage");
+			foreach(Sheet sheet in listSheets) {
+				table.Rows.Add(new object[] {
+					POut.Long  (sheet.SheetNum),
+					POut.Int   ((int)sheet.SheetType),
+					POut.Long  (sheet.PatNum),
+					POut.DateT (sheet.DateTimeSheet),
+					POut.Float (sheet.FontSize),
+					POut.String(sheet.FontName),
+					POut.Int   (sheet.Width),
+					POut.Int   (sheet.Height),
+					POut.Bool  (sheet.IsLandscape),
+					POut.String(sheet.InternalNote),
+					POut.String(sheet.Description),
+					POut.Byte  (sheet.ShowInTerminal),
+					POut.Bool  (sheet.IsWebForm),
+					POut.Bool  (sheet.IsMultiPage),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Sheet into the database.  Returns the new priKey.</summary>
 		public static long Insert(Sheet sheet){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Adjustment> listAdjustments) {
+			DataTable table=new DataTable("Adjustments");
+			table.Columns.Add("AdjNum");
+			table.Columns.Add("AdjDate");
+			table.Columns.Add("AdjAmt");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("AdjType");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("AdjNote");
+			table.Columns.Add("ProcDate");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("DateEntry");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("StatementNum");
+			foreach(Adjustment adjustment in listAdjustments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (adjustment.AdjNum),
+					POut.Date  (adjustment.AdjDate),
+					POut.Double(adjustment.AdjAmt),
+					POut.Long  (adjustment.PatNum),
+					POut.Long  (adjustment.AdjType),
+					POut.Long  (adjustment.ProvNum),
+					POut.String(adjustment.AdjNote),
+					POut.Date  (adjustment.ProcDate),
+					POut.Long  (adjustment.ProcNum),
+					POut.Date  (adjustment.DateEntry),
+					POut.Long  (adjustment.ClinicNum),
+					POut.Long  (adjustment.StatementNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Adjustment into the database.  Returns the new priKey.</summary>
 		public static long Insert(Adjustment adjustment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

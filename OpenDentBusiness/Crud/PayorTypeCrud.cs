@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PayorType> listPayorTypes) {
+			DataTable table=new DataTable("PayorTypes");
+			table.Columns.Add("PayorTypeNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("SopCode");
+			table.Columns.Add("Note");
+			foreach(PayorType payorType in listPayorTypes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (payorType.PayorTypeNum),
+					POut.Long  (payorType.PatNum),
+					POut.Date  (payorType.DateStart),
+					POut.String(payorType.SopCode),
+					POut.String(payorType.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PayorType into the database.  Returns the new priKey.</summary>
 		public static long Insert(PayorType payorType){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

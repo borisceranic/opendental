@@ -58,6 +58,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<PatPlan> listPatPlans) {
+			DataTable table=new DataTable("PatPlans");
+			table.Columns.Add("PatPlanNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Ordinal");
+			table.Columns.Add("IsPending");
+			table.Columns.Add("Relationship");
+			table.Columns.Add("PatID");
+			table.Columns.Add("InsSubNum");
+			foreach(PatPlan patPlan in listPatPlans) {
+				table.Rows.Add(new object[] {
+					POut.Long  (patPlan.PatPlanNum),
+					POut.Long  (patPlan.PatNum),
+					POut.Byte  (patPlan.Ordinal),
+					POut.Bool  (patPlan.IsPending),
+					POut.Int   ((int)patPlan.Relationship),
+					POut.String(patPlan.PatID),
+					POut.Long  (patPlan.InsSubNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one PatPlan into the database.  Returns the new priKey.</summary>
 		public static long Insert(PatPlan patPlan){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

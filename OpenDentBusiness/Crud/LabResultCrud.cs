@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<LabResult> listLabResults) {
+			DataTable table=new DataTable("LabResults");
+			table.Columns.Add("LabResultNum");
+			table.Columns.Add("LabPanelNum");
+			table.Columns.Add("DateTimeTest");
+			table.Columns.Add("TestName");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("TestID");
+			table.Columns.Add("ObsValue");
+			table.Columns.Add("ObsUnits");
+			table.Columns.Add("ObsRange");
+			table.Columns.Add("AbnormalFlag");
+			foreach(LabResult labResult in listLabResults) {
+				table.Rows.Add(new object[] {
+					POut.Long  (labResult.LabResultNum),
+					POut.Long  (labResult.LabPanelNum),
+					POut.DateT (labResult.DateTimeTest),
+					POut.String(labResult.TestName),
+					POut.DateT (labResult.DateTStamp),
+					POut.String(labResult.TestID),
+					POut.String(labResult.ObsValue),
+					POut.String(labResult.ObsUnits),
+					POut.String(labResult.ObsRange),
+					POut.Int   ((int)labResult.AbnormalFlag),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one LabResult into the database.  Returns the new priKey.</summary>
 		public static long Insert(LabResult labResult){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

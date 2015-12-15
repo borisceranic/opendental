@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Recall> listRecalls) {
+			DataTable table=new DataTable("Recalls");
+			table.Columns.Add("RecallNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateDueCalc");
+			table.Columns.Add("DateDue");
+			table.Columns.Add("DatePrevious");
+			table.Columns.Add("RecallInterval");
+			table.Columns.Add("RecallStatus");
+			table.Columns.Add("Note");
+			table.Columns.Add("IsDisabled");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("RecallTypeNum");
+			table.Columns.Add("DisableUntilBalance");
+			table.Columns.Add("DisableUntilDate");
+			table.Columns.Add("DateScheduled");
+			foreach(Recall recall in listRecalls) {
+				table.Rows.Add(new object[] {
+					POut.Long  (recall.RecallNum),
+					POut.Long  (recall.PatNum),
+					POut.Date  (recall.DateDueCalc),
+					POut.Date  (recall.DateDue),
+					POut.Date  (recall.DatePrevious),
+					POut.Int   (recall.RecallInterval.ToInt()),
+					POut.Long  (recall.RecallStatus),
+					POut.String(recall.Note),
+					POut.Bool  (recall.IsDisabled),
+					POut.DateT (recall.DateTStamp),
+					POut.Long  (recall.RecallTypeNum),
+					POut.Double(recall.DisableUntilBalance),
+					POut.Date  (recall.DisableUntilDate),
+					POut.Date  (recall.DateScheduled),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Recall into the database.  Returns the new priKey.</summary>
 		public static long Insert(Recall recall){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

@@ -78,6 +78,70 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ComputerPref> listComputerPrefs) {
+			DataTable table=new DataTable("ComputerPrefs");
+			table.Columns.Add("ComputerPrefNum");
+			table.Columns.Add("ComputerName");
+			table.Columns.Add("GraphicsUseHardware");
+			table.Columns.Add("GraphicsSimple");
+			table.Columns.Add("SensorType");
+			table.Columns.Add("SensorBinned");
+			table.Columns.Add("SensorPort");
+			table.Columns.Add("SensorExposure");
+			table.Columns.Add("GraphicsDoubleBuffering");
+			table.Columns.Add("PreferredPixelFormatNum");
+			table.Columns.Add("AtoZpath");
+			table.Columns.Add("TaskKeepListHidden");
+			table.Columns.Add("TaskDock");
+			table.Columns.Add("TaskX");
+			table.Columns.Add("TaskY");
+			table.Columns.Add("DirectXFormat");
+			table.Columns.Add("ScanDocSelectSource");
+			table.Columns.Add("ScanDocShowOptions");
+			table.Columns.Add("ScanDocDuplex");
+			table.Columns.Add("ScanDocGrayscale");
+			table.Columns.Add("ScanDocResolution");
+			table.Columns.Add("ScanDocQuality");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ApptViewNum");
+			table.Columns.Add("RecentApptView");
+			table.Columns.Add("PatSelectSearchMode");
+			table.Columns.Add("NoShowLanguage");
+			foreach(ComputerPref computerPref in listComputerPrefs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (computerPref.ComputerPrefNum),
+					POut.String(computerPref.ComputerName),
+					POut.Bool  (computerPref.GraphicsUseHardware),
+					POut.Int   ((int)computerPref.GraphicsSimple),
+					POut.String(computerPref.SensorType),
+					POut.Bool  (computerPref.SensorBinned),
+					POut.Int   (computerPref.SensorPort),
+					POut.Int   (computerPref.SensorExposure),
+					POut.Bool  (computerPref.GraphicsDoubleBuffering),
+					POut.Int   (computerPref.PreferredPixelFormatNum),
+					POut.String(computerPref.AtoZpath),
+					POut.Bool  (computerPref.TaskKeepListHidden),
+					POut.Int   (computerPref.TaskDock),
+					POut.Int   (computerPref.TaskX),
+					POut.Int   (computerPref.TaskY),
+					POut.String(computerPref.DirectXFormat),
+					POut.Bool  (computerPref.ScanDocSelectSource),
+					POut.Bool  (computerPref.ScanDocShowOptions),
+					POut.Bool  (computerPref.ScanDocDuplex),
+					POut.Bool  (computerPref.ScanDocGrayscale),
+					POut.Int   (computerPref.ScanDocResolution),
+					POut.Byte  (computerPref.ScanDocQuality),
+					POut.Long  (computerPref.ClinicNum),
+					POut.Long  (computerPref.ApptViewNum),
+					POut.Byte  (computerPref.RecentApptView),
+					POut.Int   ((int)computerPref.PatSelectSearchMode),
+					POut.Bool  (computerPref.NoShowLanguage),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ComputerPref into the database.  Returns the new priKey.</summary>
 		public static long Insert(ComputerPref computerPref){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

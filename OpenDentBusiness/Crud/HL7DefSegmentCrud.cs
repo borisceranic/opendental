@@ -67,6 +67,30 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<HL7DefSegment> listHL7DefSegments) {
+			DataTable table=new DataTable("HL7DefSegments");
+			table.Columns.Add("HL7DefSegmentNum");
+			table.Columns.Add("HL7DefMessageNum");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("CanRepeat");
+			table.Columns.Add("IsOptional");
+			table.Columns.Add("SegmentName");
+			table.Columns.Add("Note");
+			foreach(HL7DefSegment hL7DefSegment in listHL7DefSegments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (hL7DefSegment.HL7DefSegmentNum),
+					POut.Long  (hL7DefSegment.HL7DefMessageNum),
+					POut.Int   (hL7DefSegment.ItemOrder),
+					POut.Bool  (hL7DefSegment.CanRepeat),
+					POut.Bool  (hL7DefSegment.IsOptional),
+					POut.Int   ((int)hL7DefSegment.SegmentName),
+					POut.String(hL7DefSegment.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one HL7DefSegment into the database.  Returns the new priKey.</summary>
 		public static long Insert(HL7DefSegment hL7DefSegment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

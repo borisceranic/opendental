@@ -67,6 +67,48 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Carrier> listCarriers) {
+			DataTable table=new DataTable("Carriers");
+			table.Columns.Add("CarrierNum");
+			table.Columns.Add("CarrierName");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("Phone");
+			table.Columns.Add("ElectID");
+			table.Columns.Add("NoSendElect");
+			table.Columns.Add("IsCDA");
+			table.Columns.Add("CDAnetVersion");
+			table.Columns.Add("CanadianNetworkNum");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("CanadianEncryptionMethod");
+			table.Columns.Add("CanadianSupportedTypes");
+			foreach(Carrier carrier in listCarriers) {
+				table.Rows.Add(new object[] {
+					POut.Long  (carrier.CarrierNum),
+					POut.String(carrier.CarrierName),
+					POut.String(carrier.Address),
+					POut.String(carrier.Address2),
+					POut.String(carrier.City),
+					POut.String(carrier.State),
+					POut.String(carrier.Zip),
+					POut.String(carrier.Phone),
+					POut.String(carrier.ElectID),
+					POut.Bool  (carrier.NoSendElect),
+					POut.Bool  (carrier.IsCDA),
+					POut.String(carrier.CDAnetVersion),
+					POut.Long  (carrier.CanadianNetworkNum),
+					POut.Bool  (carrier.IsHidden),
+					POut.Byte  (carrier.CanadianEncryptionMethod),
+					POut.Int   ((int)carrier.CanadianSupportedTypes),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Carrier into the database.  Returns the new priKey.</summary>
 		public static long Insert(Carrier carrier){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

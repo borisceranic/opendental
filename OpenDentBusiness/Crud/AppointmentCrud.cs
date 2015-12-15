@@ -79,6 +79,72 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Appointment> listAppointments) {
+			DataTable table=new DataTable("Appointments");
+			table.Columns.Add("AptNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("AptStatus");
+			table.Columns.Add("Pattern");
+			table.Columns.Add("Confirmed");
+			table.Columns.Add("TimeLocked");
+			table.Columns.Add("Op");
+			table.Columns.Add("Note");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("ProvHyg");
+			table.Columns.Add("AptDateTime");
+			table.Columns.Add("NextAptNum");
+			table.Columns.Add("UnschedStatus");
+			table.Columns.Add("IsNewPatient");
+			table.Columns.Add("ProcDescript");
+			table.Columns.Add("Assistant");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("IsHygiene");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("DateTimeArrived");
+			table.Columns.Add("DateTimeSeated");
+			table.Columns.Add("DateTimeDismissed");
+			table.Columns.Add("InsPlan1");
+			table.Columns.Add("InsPlan2");
+			table.Columns.Add("DateTimeAskedToArrive");
+			table.Columns.Add("ProcsColored");
+			table.Columns.Add("ColorOverride");
+			table.Columns.Add("AppointmentTypeNum");
+			foreach(Appointment appointment in listAppointments) {
+				table.Rows.Add(new object[] {
+					POut.Long  (appointment.AptNum),
+					POut.Long  (appointment.PatNum),
+					POut.Int   ((int)appointment.AptStatus),
+					POut.String(appointment.Pattern),
+					POut.Long  (appointment.Confirmed),
+					POut.Bool  (appointment.TimeLocked),
+					POut.Long  (appointment.Op),
+					POut.String(appointment.Note),
+					POut.Long  (appointment.ProvNum),
+					POut.Long  (appointment.ProvHyg),
+					POut.DateT (appointment.AptDateTime),
+					POut.Long  (appointment.NextAptNum),
+					POut.Long  (appointment.UnschedStatus),
+					POut.Bool  (appointment.IsNewPatient),
+					POut.String(appointment.ProcDescript),
+					POut.Long  (appointment.Assistant),
+					POut.Long  (appointment.ClinicNum),
+					POut.Bool  (appointment.IsHygiene),
+					POut.DateT (appointment.DateTStamp),
+					POut.DateT (appointment.DateTimeArrived),
+					POut.DateT (appointment.DateTimeSeated),
+					POut.DateT (appointment.DateTimeDismissed),
+					POut.Long  (appointment.InsPlan1),
+					POut.Long  (appointment.InsPlan2),
+					POut.DateT (appointment.DateTimeAskedToArrive),
+					POut.String(appointment.ProcsColored),
+					POut.Int   (appointment.ColorOverride.ToArgb()),
+					POut.Long  (appointment.AppointmentTypeNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Appointment into the database.  Returns the new priKey.</summary>
 		public static long Insert(Appointment appointment){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

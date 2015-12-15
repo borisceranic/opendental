@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Pharmacy> listPharmacys) {
+			DataTable table=new DataTable("Pharmacys");
+			table.Columns.Add("PharmacyNum");
+			table.Columns.Add("PharmID");
+			table.Columns.Add("StoreName");
+			table.Columns.Add("Phone");
+			table.Columns.Add("Fax");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("Note");
+			table.Columns.Add("DateTStamp");
+			foreach(Pharmacy pharmacy in listPharmacys) {
+				table.Rows.Add(new object[] {
+					POut.Long  (pharmacy.PharmacyNum),
+					POut.String(pharmacy.PharmID),
+					POut.String(pharmacy.StoreName),
+					POut.String(pharmacy.Phone),
+					POut.String(pharmacy.Fax),
+					POut.String(pharmacy.Address),
+					POut.String(pharmacy.Address2),
+					POut.String(pharmacy.City),
+					POut.String(pharmacy.State),
+					POut.String(pharmacy.Zip),
+					POut.String(pharmacy.Note),
+					POut.DateT (pharmacy.DateTStamp),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Pharmacy into the database.  Returns the new priKey.</summary>
 		public static long Insert(Pharmacy pharmacy){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

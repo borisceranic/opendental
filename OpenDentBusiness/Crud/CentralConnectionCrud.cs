@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<CentralConnection> listCentralConnections) {
+			DataTable table=new DataTable("CentralConnections");
+			table.Columns.Add("CentralConnectionNum");
+			table.Columns.Add("ServerName");
+			table.Columns.Add("DatabaseName");
+			table.Columns.Add("MySqlUser");
+			table.Columns.Add("MySqlPassword");
+			table.Columns.Add("ServiceURI");
+			table.Columns.Add("OdUser");
+			table.Columns.Add("OdPassword");
+			table.Columns.Add("Note");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("WebServiceIsEcw");
+			table.Columns.Add("ConnectionStatus");
+			foreach(CentralConnection centralConnection in listCentralConnections) {
+				table.Rows.Add(new object[] {
+					POut.Long  (centralConnection.CentralConnectionNum),
+					POut.String(centralConnection.ServerName),
+					POut.String(centralConnection.DatabaseName),
+					POut.String(centralConnection.MySqlUser),
+					POut.String(centralConnection.MySqlPassword),
+					POut.String(centralConnection.ServiceURI),
+					POut.String(centralConnection.OdUser),
+					POut.String(centralConnection.OdPassword),
+					POut.String(centralConnection.Note),
+					POut.Int   (centralConnection.ItemOrder),
+					POut.Bool  (centralConnection.WebServiceIsEcw),
+					POut.String(centralConnection.ConnectionStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one CentralConnection into the database.  Returns the new priKey.</summary>
 		public static long Insert(CentralConnection centralConnection){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

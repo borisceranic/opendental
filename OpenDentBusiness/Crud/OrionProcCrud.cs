@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<OrionProc> listOrionProcs) {
+			DataTable table=new DataTable("OrionProcs");
+			table.Columns.Add("OrionProcNum");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("DPC");
+			table.Columns.Add("DPCpost");
+			table.Columns.Add("DateScheduleBy");
+			table.Columns.Add("DateStopClock");
+			table.Columns.Add("Status2");
+			table.Columns.Add("IsOnCall");
+			table.Columns.Add("IsEffectiveComm");
+			table.Columns.Add("IsRepair");
+			foreach(OrionProc orionProc in listOrionProcs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (orionProc.OrionProcNum),
+					POut.Long  (orionProc.ProcNum),
+					POut.Int   ((int)orionProc.DPC),
+					POut.Int   ((int)orionProc.DPCpost),
+					POut.Date  (orionProc.DateScheduleBy),
+					POut.Date  (orionProc.DateStopClock),
+					POut.Int   ((int)orionProc.Status2),
+					POut.Bool  (orionProc.IsOnCall),
+					POut.Bool  (orionProc.IsEffectiveComm),
+					POut.Bool  (orionProc.IsRepair),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one OrionProc into the database.  Returns the new priKey.</summary>
 		public static long Insert(OrionProc orionProc){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

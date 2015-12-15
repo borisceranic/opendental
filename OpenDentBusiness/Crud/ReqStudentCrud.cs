@@ -60,6 +60,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ReqStudent> listReqStudents) {
+			DataTable table=new DataTable("ReqStudents");
+			table.Columns.Add("ReqStudentNum");
+			table.Columns.Add("ReqNeededNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("SchoolCourseNum");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("AptNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("InstructorNum");
+			table.Columns.Add("DateCompleted");
+			foreach(ReqStudent reqStudent in listReqStudents) {
+				table.Rows.Add(new object[] {
+					POut.Long  (reqStudent.ReqStudentNum),
+					POut.Long  (reqStudent.ReqNeededNum),
+					POut.String(reqStudent.Descript),
+					POut.Long  (reqStudent.SchoolCourseNum),
+					POut.Long  (reqStudent.ProvNum),
+					POut.Long  (reqStudent.AptNum),
+					POut.Long  (reqStudent.PatNum),
+					POut.Long  (reqStudent.InstructorNum),
+					POut.Date  (reqStudent.DateCompleted),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ReqStudent into the database.  Returns the new priKey.</summary>
 		public static long Insert(ReqStudent reqStudent){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

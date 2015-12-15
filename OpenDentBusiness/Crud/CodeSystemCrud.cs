@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<CodeSystem> listCodeSystems) {
+			DataTable table=new DataTable("CodeSystems");
+			table.Columns.Add("CodeSystemNum");
+			table.Columns.Add("CodeSystemName");
+			table.Columns.Add("VersionCur");
+			table.Columns.Add("VersionAvail");
+			table.Columns.Add("HL7OID");
+			table.Columns.Add("Note");
+			foreach(CodeSystem codeSystem in listCodeSystems) {
+				table.Rows.Add(new object[] {
+					POut.Long  (codeSystem.CodeSystemNum),
+					POut.String(codeSystem.CodeSystemName),
+					POut.String(codeSystem.VersionCur),
+					POut.String(codeSystem.VersionAvail),
+					POut.String(codeSystem.HL7OID),
+					POut.String(codeSystem.Note),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one CodeSystem into the database.  Returns the new priKey.</summary>
 		public static long Insert(CodeSystem codeSystem){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

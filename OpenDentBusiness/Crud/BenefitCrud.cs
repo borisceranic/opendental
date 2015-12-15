@@ -63,6 +63,40 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Benefit> listBenefits) {
+			DataTable table=new DataTable("Benefits");
+			table.Columns.Add("BenefitNum");
+			table.Columns.Add("PlanNum");
+			table.Columns.Add("PatPlanNum");
+			table.Columns.Add("CovCatNum");
+			table.Columns.Add("BenefitType");
+			table.Columns.Add("Percent");
+			table.Columns.Add("MonetaryAmt");
+			table.Columns.Add("TimePeriod");
+			table.Columns.Add("QuantityQualifier");
+			table.Columns.Add("Quantity");
+			table.Columns.Add("CodeNum");
+			table.Columns.Add("CoverageLevel");
+			foreach(Benefit benefit in listBenefits) {
+				table.Rows.Add(new object[] {
+					POut.Long  (benefit.BenefitNum),
+					POut.Long  (benefit.PlanNum),
+					POut.Long  (benefit.PatPlanNum),
+					POut.Long  (benefit.CovCatNum),
+					POut.Int   ((int)benefit.BenefitType),
+					POut.Int   (benefit.Percent),
+					POut.Double(benefit.MonetaryAmt),
+					POut.Int   ((int)benefit.TimePeriod),
+					POut.Int   ((int)benefit.QuantityQualifier),
+					POut.Byte  (benefit.Quantity),
+					POut.Long  (benefit.CodeNum),
+					POut.Int   ((int)benefit.CoverageLevel),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Benefit into the database.  Returns the new priKey.</summary>
 		public static long Insert(Benefit benefit){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

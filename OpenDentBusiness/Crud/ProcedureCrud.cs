@@ -111,6 +111,136 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Procedure> listProcedures) {
+			DataTable table=new DataTable("Procedures");
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("AptNum");
+			table.Columns.Add("OldCode");
+			table.Columns.Add("ProcDate");
+			table.Columns.Add("ProcFee");
+			table.Columns.Add("Surf");
+			table.Columns.Add("ToothNum");
+			table.Columns.Add("ToothRange");
+			table.Columns.Add("Priority");
+			table.Columns.Add("ProcStatus");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("Dx");
+			table.Columns.Add("PlannedAptNum");
+			table.Columns.Add("PlaceService");
+			table.Columns.Add("Prosthesis");
+			table.Columns.Add("DateOriginalProsth");
+			table.Columns.Add("ClaimNote");
+			table.Columns.Add("DateEntryC");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("MedicalCode");
+			table.Columns.Add("DiagnosticCode");
+			table.Columns.Add("IsPrincDiag");
+			table.Columns.Add("ProcNumLab");
+			table.Columns.Add("BillingTypeOne");
+			table.Columns.Add("BillingTypeTwo");
+			table.Columns.Add("CodeNum");
+			table.Columns.Add("CodeMod1");
+			table.Columns.Add("CodeMod2");
+			table.Columns.Add("CodeMod3");
+			table.Columns.Add("CodeMod4");
+			table.Columns.Add("RevCode");
+			table.Columns.Add("UnitQty");
+			table.Columns.Add("BaseUnits");
+			table.Columns.Add("StartTime");
+			table.Columns.Add("StopTime");
+			table.Columns.Add("DateTP");
+			table.Columns.Add("SiteNum");
+			table.Columns.Add("HideGraphics");
+			table.Columns.Add("CanadianTypeCodes");
+			table.Columns.Add("ProcTime");
+			table.Columns.Add("ProcTimeEnd");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("Prognosis");
+			table.Columns.Add("DrugUnit");
+			table.Columns.Add("DrugQty");
+			table.Columns.Add("UnitQtyType");
+			table.Columns.Add("StatementNum");
+			table.Columns.Add("IsLocked");
+			table.Columns.Add("BillingNote");
+			table.Columns.Add("RepeatChargeNum");
+			table.Columns.Add("DiagnosticCode2");
+			table.Columns.Add("DiagnosticCode3");
+			table.Columns.Add("DiagnosticCode4");
+			table.Columns.Add("Discount");
+			table.Columns.Add("SnomedBodySite");
+			table.Columns.Add("ProvOrderOverride");
+			table.Columns.Add("IsDateProsthEst");
+			table.Columns.Add("IcdVersion");
+			table.Columns.Add("IsCpoe");
+			foreach(Procedure procedure in listProcedures) {
+				table.Rows.Add(new object[] {
+					POut.Long  (procedure.ProcNum),
+					POut.Long  (procedure.PatNum),
+					POut.Long  (procedure.AptNum),
+					POut.String(procedure.OldCode),
+					POut.Date  (procedure.ProcDate),
+					POut.Double(procedure.ProcFee),
+					POut.String(procedure.Surf),
+					POut.String(procedure.ToothNum),
+					POut.String(procedure.ToothRange),
+					POut.Long  (procedure.Priority),
+					POut.Int   ((int)procedure.ProcStatus),
+					POut.Long  (procedure.ProvNum),
+					POut.Long  (procedure.Dx),
+					POut.Long  (procedure.PlannedAptNum),
+					POut.Int   ((int)procedure.PlaceService),
+					POut.String(procedure.Prosthesis),
+					POut.Date  (procedure.DateOriginalProsth),
+					POut.String(procedure.ClaimNote),
+					POut.Date  (procedure.DateEntryC),
+					POut.Long  (procedure.ClinicNum),
+					POut.String(procedure.MedicalCode),
+					POut.String(procedure.DiagnosticCode),
+					POut.Bool  (procedure.IsPrincDiag),
+					POut.Long  (procedure.ProcNumLab),
+					POut.Long  (procedure.BillingTypeOne),
+					POut.Long  (procedure.BillingTypeTwo),
+					POut.Long  (procedure.CodeNum),
+					POut.String(procedure.CodeMod1),
+					POut.String(procedure.CodeMod2),
+					POut.String(procedure.CodeMod3),
+					POut.String(procedure.CodeMod4),
+					POut.String(procedure.RevCode),
+					POut.Int   (procedure.UnitQty),
+					POut.Int   (procedure.BaseUnits),
+					POut.Int   (procedure.StartTime),
+					POut.Int   (procedure.StopTime),
+					POut.Date  (procedure.DateTP),
+					POut.Long  (procedure.SiteNum),
+					POut.Bool  (procedure.HideGraphics),
+					POut.String(procedure.CanadianTypeCodes),
+					POut.Time  (procedure.ProcTime),
+					POut.Time  (procedure.ProcTimeEnd),
+					POut.DateT (procedure.DateTStamp),
+					POut.Long  (procedure.Prognosis),
+					POut.Int   ((int)procedure.DrugUnit),
+					POut.Float (procedure.DrugQty),
+					POut.Int   ((int)procedure.UnitQtyType),
+					POut.Long  (procedure.StatementNum),
+					POut.Bool  (procedure.IsLocked),
+					POut.String(procedure.BillingNote),
+					POut.Long  (procedure.RepeatChargeNum),
+					POut.String(procedure.DiagnosticCode2),
+					POut.String(procedure.DiagnosticCode3),
+					POut.String(procedure.DiagnosticCode4),
+					POut.Double(procedure.Discount),
+					POut.String(procedure.SnomedBodySite),
+					POut.Long  (procedure.ProvOrderOverride),
+					POut.Bool  (procedure.IsDateProsthEst),
+					POut.Byte  (procedure.IcdVersion),
+					POut.Bool  (procedure.IsCpoe),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Procedure into the database.  Returns the new priKey.</summary>
 		public static long Insert(Procedure procedure){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

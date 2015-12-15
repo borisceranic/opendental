@@ -57,6 +57,28 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimValCodeLog> listClaimValCodeLogs) {
+			DataTable table=new DataTable("ClaimValCodeLogs");
+			table.Columns.Add("ClaimValCodeLogNum");
+			table.Columns.Add("ClaimNum");
+			table.Columns.Add("ClaimField");
+			table.Columns.Add("ValCode");
+			table.Columns.Add("ValAmount");
+			table.Columns.Add("Ordinal");
+			foreach(ClaimValCodeLog claimValCodeLog in listClaimValCodeLogs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (claimValCodeLog.ClaimValCodeLogNum),
+					POut.Long  (claimValCodeLog.ClaimNum),
+					POut.String(claimValCodeLog.ClaimField),
+					POut.String(claimValCodeLog.ValCode),
+					POut.Double(claimValCodeLog.ValAmount),
+					POut.Int   (claimValCodeLog.Ordinal),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one ClaimValCodeLog into the database.  Returns the new priKey.</summary>
 		public static long Insert(ClaimValCodeLog claimValCodeLog){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

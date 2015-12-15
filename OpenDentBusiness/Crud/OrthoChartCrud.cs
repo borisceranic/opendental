@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<OrthoChart> listOrthoCharts) {
+			DataTable table=new DataTable("OrthoCharts");
+			table.Columns.Add("OrthoChartNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DateService");
+			table.Columns.Add("FieldName");
+			table.Columns.Add("FieldValue");
+			foreach(OrthoChart orthoChart in listOrthoCharts) {
+				table.Rows.Add(new object[] {
+					POut.Long  (orthoChart.OrthoChartNum),
+					POut.Long  (orthoChart.PatNum),
+					POut.Date  (orthoChart.DateService),
+					POut.String(orthoChart.FieldName),
+					POut.String(orthoChart.FieldValue),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one OrthoChart into the database.  Returns the new priKey.</summary>
 		public static long Insert(OrthoChart orthoChart){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

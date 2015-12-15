@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Commlog> listCommlogs) {
+			DataTable table=new DataTable("Commlogs");
+			table.Columns.Add("CommlogNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("CommDateTime");
+			table.Columns.Add("CommType");
+			table.Columns.Add("Note");
+			table.Columns.Add("Mode_");
+			table.Columns.Add("SentOrReceived");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("Signature");
+			table.Columns.Add("SigIsTopaz");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("DateTimeEnd");
+			table.Columns.Add("CommSource");
+			table.Columns.Add("ProgramNum");
+			foreach(Commlog commlog in listCommlogs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (commlog.CommlogNum),
+					POut.Long  (commlog.PatNum),
+					POut.DateT (commlog.CommDateTime),
+					POut.Long  (commlog.CommType),
+					POut.String(commlog.Note),
+					POut.Int   ((int)commlog.Mode_),
+					POut.Int   ((int)commlog.SentOrReceived),
+					POut.Long  (commlog.UserNum),
+					POut.String(commlog.Signature),
+					POut.Bool  (commlog.SigIsTopaz),
+					POut.DateT (commlog.DateTStamp),
+					POut.DateT (commlog.DateTimeEnd),
+					POut.Int   ((int)commlog.CommSource),
+					POut.Long  (commlog.ProgramNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Commlog into the database.  Returns the new priKey.</summary>
 		public static long Insert(Commlog commlog){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

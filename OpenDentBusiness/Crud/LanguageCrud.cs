@@ -56,6 +56,26 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Language> listLanguages) {
+			DataTable table=new DataTable("Languages");
+			table.Columns.Add("LanguageNum");
+			table.Columns.Add("EnglishComments");
+			table.Columns.Add("ClassType");
+			table.Columns.Add("English");
+			table.Columns.Add("IsObsolete");
+			foreach(Language language in listLanguages) {
+				table.Rows.Add(new object[] {
+					POut.Long  (language.LanguageNum),
+					POut.String(language.EnglishComments),
+					POut.String(language.ClassType),
+					POut.String(language.English),
+					POut.Bool  (language.IsObsolete),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Language into the database.  Returns the new priKey.</summary>
 		public static long Insert(Language language){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

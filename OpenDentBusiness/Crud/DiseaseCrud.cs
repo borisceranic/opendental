@@ -61,6 +61,36 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Disease> listDiseases) {
+			DataTable table=new DataTable("Diseases");
+			table.Columns.Add("DiseaseNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("DiseaseDefNum");
+			table.Columns.Add("PatNote");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("ProbStatus");
+			table.Columns.Add("DateStart");
+			table.Columns.Add("DateStop");
+			table.Columns.Add("SnomedProblemType");
+			table.Columns.Add("FunctionStatus");
+			foreach(Disease disease in listDiseases) {
+				table.Rows.Add(new object[] {
+					POut.Long  (disease.DiseaseNum),
+					POut.Long  (disease.PatNum),
+					POut.Long  (disease.DiseaseDefNum),
+					POut.String(disease.PatNote),
+					POut.DateT (disease.DateTStamp),
+					POut.Int   ((int)disease.ProbStatus),
+					POut.Date  (disease.DateStart),
+					POut.Date  (disease.DateStop),
+					POut.String(disease.SnomedProblemType),
+					POut.Int   ((int)disease.FunctionStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Disease into the database.  Returns the new priKey.</summary>
 		public static long Insert(Disease disease){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

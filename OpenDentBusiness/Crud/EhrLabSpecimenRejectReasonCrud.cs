@@ -61,6 +61,34 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrLabSpecimenRejectReason> listEhrLabSpecimenRejectReasons) {
+			DataTable table=new DataTable("EhrLabSpecimenRejectReasons");
+			table.Columns.Add("EhrLabSpecimenRejectReasonNum");
+			table.Columns.Add("EhrLabSpecimenNum");
+			table.Columns.Add("SpecimenRejectReasonID");
+			table.Columns.Add("SpecimenRejectReasonText");
+			table.Columns.Add("SpecimenRejectReasonCodeSystemName");
+			table.Columns.Add("SpecimenRejectReasonIDAlt");
+			table.Columns.Add("SpecimenRejectReasonTextAlt");
+			table.Columns.Add("SpecimenRejectReasonCodeSystemNameAlt");
+			table.Columns.Add("SpecimenRejectReasonTextOriginal");
+			foreach(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason in listEhrLabSpecimenRejectReasons) {
+				table.Rows.Add(new object[] {
+					POut.Long  (ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum),
+					POut.Long  (ehrLabSpecimenRejectReason.EhrLabSpecimenNum),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonID),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonText),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt),
+					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one EhrLabSpecimenRejectReason into the database.  Returns the new priKey.</summary>
 		public static long Insert(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

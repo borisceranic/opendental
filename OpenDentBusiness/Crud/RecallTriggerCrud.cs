@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<RecallTrigger> listRecallTriggers) {
+			DataTable table=new DataTable("RecallTriggers");
+			table.Columns.Add("RecallTriggerNum");
+			table.Columns.Add("RecallTypeNum");
+			table.Columns.Add("CodeNum");
+			foreach(RecallTrigger recallTrigger in listRecallTriggers) {
+				table.Rows.Add(new object[] {
+					POut.Long  (recallTrigger.RecallTriggerNum),
+					POut.Long  (recallTrigger.RecallTypeNum),
+					POut.Long  (recallTrigger.CodeNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one RecallTrigger into the database.  Returns the new priKey.</summary>
 		public static long Insert(RecallTrigger recallTrigger){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

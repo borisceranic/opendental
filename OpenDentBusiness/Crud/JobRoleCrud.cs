@@ -54,6 +54,22 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobRole> listJobRoles) {
+			DataTable table=new DataTable("JobRoles");
+			table.Columns.Add("JobRoleNum");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("RoleType");
+			foreach(JobRole jobRole in listJobRoles) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobRole.JobRoleNum),
+					POut.Long  (jobRole.UserNum),
+					POut.Int   ((int)jobRole.RoleType),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one JobRole into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobRole jobRole){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

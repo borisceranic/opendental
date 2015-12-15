@@ -65,6 +65,44 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Task> listTasks) {
+			DataTable table=new DataTable("Tasks");
+			table.Columns.Add("TaskNum");
+			table.Columns.Add("TaskListNum");
+			table.Columns.Add("DateTask");
+			table.Columns.Add("KeyNum");
+			table.Columns.Add("Descript");
+			table.Columns.Add("TaskStatus");
+			table.Columns.Add("IsRepeating");
+			table.Columns.Add("DateType");
+			table.Columns.Add("FromNum");
+			table.Columns.Add("ObjectType");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("UserNum");
+			table.Columns.Add("DateTimeFinished");
+			table.Columns.Add("PriorityDefNum");
+			foreach(Task task in listTasks) {
+				table.Rows.Add(new object[] {
+					POut.Long  (task.TaskNum),
+					POut.Long  (task.TaskListNum),
+					POut.Date  (task.DateTask),
+					POut.Long  (task.KeyNum),
+					POut.String(task.Descript),
+					POut.Int   ((int)task.TaskStatus),
+					POut.Bool  (task.IsRepeating),
+					POut.Int   ((int)task.DateType),
+					POut.Long  (task.FromNum),
+					POut.Int   ((int)task.ObjectType),
+					POut.DateT (task.DateTimeEntry),
+					POut.Long  (task.UserNum),
+					POut.DateT (task.DateTimeFinished),
+					POut.Long  (task.PriorityDefNum),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Task into the database.  Returns the new priKey.</summary>
 		public static long Insert(Task task){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

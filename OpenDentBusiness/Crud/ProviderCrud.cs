@@ -88,6 +88,90 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<Provider> listProviders) {
+			DataTable table=new DataTable("Providers");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("Abbr");
+			table.Columns.Add("ItemOrder");
+			table.Columns.Add("LName");
+			table.Columns.Add("FName");
+			table.Columns.Add("MI");
+			table.Columns.Add("Suffix");
+			table.Columns.Add("FeeSched");
+			table.Columns.Add("Specialty");
+			table.Columns.Add("SSN");
+			table.Columns.Add("StateLicense");
+			table.Columns.Add("DEANum");
+			table.Columns.Add("IsSecondary");
+			table.Columns.Add("ProvColor");
+			table.Columns.Add("IsHidden");
+			table.Columns.Add("UsingTIN");
+			table.Columns.Add("BlueCrossID");
+			table.Columns.Add("SigOnFile");
+			table.Columns.Add("MedicaidID");
+			table.Columns.Add("OutlineColor");
+			table.Columns.Add("SchoolClassNum");
+			table.Columns.Add("NationalProvID");
+			table.Columns.Add("CanadianOfficeNum");
+			table.Columns.Add("DateTStamp");
+			table.Columns.Add("AnesthProvType");
+			table.Columns.Add("TaxonomyCodeOverride");
+			table.Columns.Add("IsCDAnet");
+			table.Columns.Add("EcwID");
+			table.Columns.Add("StateRxID");
+			table.Columns.Add("IsNotPerson");
+			table.Columns.Add("StateWhereLicensed");
+			table.Columns.Add("EmailAddressNum");
+			table.Columns.Add("IsInstructor");
+			table.Columns.Add("EhrMuStage");
+			table.Columns.Add("ProvNumBillingOverride");
+			table.Columns.Add("CustomID");
+			table.Columns.Add("ProvStatus");
+			foreach(Provider provider in listProviders) {
+				table.Rows.Add(new object[] {
+					POut.Long  (provider.ProvNum),
+					POut.String(provider.Abbr),
+					POut.Int   (provider.ItemOrder),
+					POut.String(provider.LName),
+					POut.String(provider.FName),
+					POut.String(provider.MI),
+					POut.String(provider.Suffix),
+					POut.Long  (provider.FeeSched),
+					POut.Long  (provider.Specialty),
+					POut.String(provider.SSN),
+					POut.String(provider.StateLicense),
+					POut.String(provider.DEANum),
+					POut.Bool  (provider.IsSecondary),
+					POut.Int   (provider.ProvColor.ToArgb()),
+					POut.Bool  (provider.IsHidden),
+					POut.Bool  (provider.UsingTIN),
+					POut.String(provider.BlueCrossID),
+					POut.Bool  (provider.SigOnFile),
+					POut.String(provider.MedicaidID),
+					POut.Int   (provider.OutlineColor.ToArgb()),
+					POut.Long  (provider.SchoolClassNum),
+					POut.String(provider.NationalProvID),
+					POut.String(provider.CanadianOfficeNum),
+					POut.DateT (provider.DateTStamp),
+					POut.Long  (provider.AnesthProvType),
+					POut.String(provider.TaxonomyCodeOverride),
+					POut.Bool  (provider.IsCDAnet),
+					POut.String(provider.EcwID),
+					POut.String(provider.StateRxID),
+					POut.Bool  (provider.IsNotPerson),
+					POut.String(provider.StateWhereLicensed),
+					POut.Long  (provider.EmailAddressNum),
+					POut.Bool  (provider.IsInstructor),
+					POut.Int   (provider.EhrMuStage),
+					POut.Long  (provider.ProvNumBillingOverride),
+					POut.String(provider.CustomID),
+					POut.Int   ((int)provider.ProvStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one Provider into the database.  Returns the new priKey.</summary>
 		public static long Insert(Provider provider){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

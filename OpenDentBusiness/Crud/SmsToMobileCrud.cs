@@ -68,6 +68,50 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
+		public static DataTable ListToTable(List<SmsToMobile> listSmsToMobiles) {
+			DataTable table=new DataTable("SmsToMobiles");
+			table.Columns.Add("SmsToMobileNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("GuidMessage");
+			table.Columns.Add("GuidBatch");
+			table.Columns.Add("SmsPhoneNumber");
+			table.Columns.Add("MobilePhoneNumber");
+			table.Columns.Add("IsTimeSensitive");
+			table.Columns.Add("MsgType");
+			table.Columns.Add("MsgText");
+			table.Columns.Add("SmsStatus");
+			table.Columns.Add("MsgParts");
+			table.Columns.Add("MsgChargeUSD");
+			table.Columns.Add("ClinicNum");
+			table.Columns.Add("CustErrorText");
+			table.Columns.Add("DateTimeSent");
+			table.Columns.Add("DateTimeTerminated");
+			table.Columns.Add("IsHidden");
+			foreach(SmsToMobile smsToMobile in listSmsToMobiles) {
+				table.Rows.Add(new object[] {
+					POut.Long  (smsToMobile.SmsToMobileNum),
+					POut.Long  (smsToMobile.PatNum),
+					POut.String(smsToMobile.GuidMessage),
+					POut.String(smsToMobile.GuidBatch),
+					POut.String(smsToMobile.SmsPhoneNumber),
+					POut.String(smsToMobile.MobilePhoneNumber),
+					POut.Bool  (smsToMobile.IsTimeSensitive),
+					POut.Int   ((int)smsToMobile.MsgType),
+					POut.String(smsToMobile.MsgText),
+					POut.Int   ((int)smsToMobile.SmsStatus),
+					POut.Int   (smsToMobile.MsgParts),
+					POut.Float (smsToMobile.MsgChargeUSD),
+					POut.Long  (smsToMobile.ClinicNum),
+					POut.String(smsToMobile.CustErrorText),
+					POut.DateT (smsToMobile.DateTimeSent),
+					POut.DateT (smsToMobile.DateTimeTerminated),
+					POut.Bool  (smsToMobile.IsHidden),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one SmsToMobile into the database.  Returns the new priKey.</summary>
 		public static long Insert(SmsToMobile smsToMobile){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
