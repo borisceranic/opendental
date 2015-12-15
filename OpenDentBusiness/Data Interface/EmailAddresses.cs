@@ -92,6 +92,9 @@ namespace OpenDentBusiness{
 		///<summary>Executes a query to the database to get the email address associated to the passed-in user.  
 		///Does not use the cache.  Returns null if no email address in the database matches the passed-in user.</summary>
 		public static EmailAddress GetForUser(long userNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<EmailAddress>(MethodBase.GetCurrentMethod(),userNum);
+			}
 			string command="SELECT * FROM emailaddress WHERE emailaddress.UserNum = "+userNum;
 			return Crud.EmailAddressCrud.SelectOne(command);
 		}
@@ -110,11 +113,14 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets all email addresses, including those email addresses which are not in the cache.</summary>
 		public static List<EmailAddress> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EmailAddress>>(MethodBase.GetCurrentMethod());
+			}
 			string command="SELECT * FROM emailaddress";
 			return Crud.EmailAddressCrud.SelectMany(command);
 		}
 
-		///<summary>Checks to make sure at least one email address has a valid (not blank) SMTP server.</summary>
+		///<summary>Checks to make sure at least one non-user email address has a valid (not blank) SMTP server.</summary>
 		public static bool ExistsValidEmail() {
 			List<EmailAddress> listEmailAddresses=GetListt();
 			for(int i=0;i<listEmailAddresses.Count;i++) {
