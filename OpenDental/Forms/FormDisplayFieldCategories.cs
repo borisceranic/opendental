@@ -155,8 +155,12 @@ namespace OpenDental{
 
 		private void listCategory_DoubleClick(object sender,EventArgs e) {
 			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
+			int index=listCategory.SelectedIndex;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum) && index >= 6) {
+				index++;
+			}
 			//When new display fields are added this switch statement will need to be changed to match the order set in the load.
-			switch(listCategory.SelectedIndex) {
+			switch(index) {
 				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
 				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
 				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
@@ -183,8 +187,12 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,EventArgs e) {
 			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
+			int index=listCategory.SelectedIndex;
+			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum) && index >= 6) {
+				index++;
+			}
 			//When new display fields are added this switch statement will need to be changed to match the order set in the load.
-			switch(listCategory.SelectedIndex) {
+			switch(index) {
 				case 0: selectedCategory=DisplayFieldCategory.AccountModule; break;
 				case 1: selectedCategory=DisplayFieldCategory.AccountPatientInformation; break;
 				case 2: selectedCategory=DisplayFieldCategory.AppointmentBubble; break;
