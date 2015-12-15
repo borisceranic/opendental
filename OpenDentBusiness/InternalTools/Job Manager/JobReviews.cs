@@ -22,7 +22,8 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobReview>>(MethodBase.GetCurrentMethod(),jobNum);
 			}
-			string command="SELECT * FROM jobreview INNER JOIN joblink ON joblink.FKey=jobreview.JobReviewNum "
+			string command="SELECT * FROM jobreview "
+				+"INNER JOIN joblink ON joblink.FKey=jobreview.JobReviewNum AND joblink.LinkType="+POut.Int((int)JobLinkType.Review)+" "
 				+"WHERE joblink.JobNum = "+POut.Long(jobNum);
 			return Crud.JobReviewCrud.SelectMany(command);
 		}
@@ -78,12 +79,12 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Deletes a joblink of the specified type and num.</summary>
-		public static void Delete(long jobReviewNum, JobLinkType jobLinkType) {
+		public static void Delete(long jobReviewNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobReviewNum);
 				return;
 			}
-			string command="DELETE FROM joblink WHERE FKey="+POut.Long(jobReviewNum)+" AND LinkType="+POut.Int((int)jobLinkType);
+			string command="DELETE FROM joblink WHERE FKey="+POut.Long(jobReviewNum)+" AND LinkType="+POut.Int((int)JobLinkType.Review);
 			Db.NonQ(command);
 			Crud.JobReviewCrud.Delete(jobReviewNum);
 		}
