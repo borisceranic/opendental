@@ -1407,9 +1407,69 @@ namespace OpenDental {
 			if(vScrollBar1.Value==0) {//ApptViewC.List seems to already be not null by this point.
 				int rowsPerHr=60/ApptDrawing.MinPerIncr*ApptDrawing.RowsPerIncr;
 				//use the row setting from the selected view.
-				if(_listApptViews.Count>0 && comboView.SelectedIndex>0) {
-					rowsPerHr=60/ApptDrawing.MinPerIncr*_listApptViews[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
+				if(_listApptViews.Count>0 && comboView.SelectedIndex>0) {					
 					TimeSpan apptTimeScrollStart=_listApptViews[comboView.SelectedIndex-1].ApptTimeScrollStart;
+					if(_listApptViews[comboView.SelectedIndex-1].IsScrollStartDynamic) {//Scroll start time at the earliest scheduled operatory or appointment
+						//Get the schedules that have any operatory visible
+						List<Schedule> listVisScheds=new List<Schedule>();
+						foreach(Schedule sched in SchedListPeriod) {
+							if(sched.Ops.Any(x => ApptDrawing.VisOps.Exists(y => x==y.OperatoryNum))//The schedule is linked to a visible operatory
+								|| ApptDrawing.VisOps.Exists(x => x.ProvDentist==sched.ProvNum && !x.IsHygiene)//The dentist is in a visible operatory
+								|| ApptDrawing.VisOps.Exists(x => x.ProvHygienist==sched.ProvNum && x.IsHygiene))//The hygienist is in a visible operatory
+							{
+								listVisScheds.Add(sched);
+							}
+						}
+						long schedProvUnassinged=PrefC.GetLong(PrefName.ScheduleProvUnassigned);
+						bool opShowsDefaultProv=false;
+						foreach(Operatory op in ApptDrawing.VisOps) {
+							if((op.ProvDentist!=0 && !op.IsHygiene)
+								||(op.ProvHygienist!=0 && op.IsHygiene))
+							{
+								continue;//The operatory has a provider assigned to it
+							}
+							if(SchedListPeriod.Any(x => x.Ops.Contains(op.OperatoryNum))) {
+								continue;//The operatory has a scheduled assigned to it
+							}
+							opShowsDefaultProv=true;//The operatory will have the provider for unassigned operatories
+							break;
+						}
+						if(opShowsDefaultProv && SchedListPeriod.Exists(x => x.ProvNum==schedProvUnassinged)) {//The provider for unassigned ops has a schedule
+							//Add that provider's earliest schedule
+							listVisScheds.Add(SchedListPeriod.FindAll(x => x.ProvNum==schedProvUnassinged).OrderBy(x => x.StartTime).FirstOrDefault());
+						}
+						//Get the appointment times that are in a visible operatory
+						List<TimeSpan> listVisAptTimes=new List<TimeSpan>();
+						foreach(DataRow row in DS.Tables["Appointments"].Rows) {
+							long opNum=PIn.Long(row["Op"].ToString());
+							if(!ApptDrawing.VisOps.Exists(x => x.OperatoryNum==opNum) //The appointment is in a visible operatory
+								|| !new[] { "1","2","4","5","7","8" }.Contains(row["AptStatus"].ToString())) //Scheduled,Complete,ASAP,Broken,PtNote,PtNoteComp
+							{
+								continue;
+							}
+							listVisAptTimes.Add(PIn.Date(row["AptDateTime"].ToString()).TimeOfDay);
+						}
+						TimeSpan earliestApt=new TimeSpan();
+						TimeSpan earliestOp=new TimeSpan();
+						if(listVisAptTimes.Count>0 && listVisScheds.Count>0) {//There is at least one schedule and at least one appointment visible
+							earliestApt=listVisScheds.Min(x => x.StartTime);
+							earliestOp=listVisAptTimes.Min();
+							if(TimeSpan.Compare(earliestOp,earliestApt)==1) {//earliestOp is later than earliestApt
+								apptTimeScrollStart=earliestApt;
+							}
+							else {//earliestApt is later than earliestOp or they are both equal
+								apptTimeScrollStart=earliestOp;
+							}
+						}
+						else if(listVisScheds.Count>0) {//There is at least one visible schedule and no visible appointments
+							apptTimeScrollStart=listVisScheds.Min(x => x.StartTime);
+						}
+						else if(listVisAptTimes.Count>0) {//There is at least one visible appointment and no visible schedules
+							apptTimeScrollStart=listVisAptTimes.Min();
+						}
+						//else apptTimeScrollStart will remain as the start time listed in the appt view		
+					}
+					rowsPerHr=60/ApptDrawing.MinPerIncr*_listApptViews[comboView.SelectedIndex-1].RowsPerIncr;//comboView.SelectedIndex-1 because combo box contains none but list does not.
 					double apptTimeHrs=((apptTimeScrollStart.Hours*60)+apptTimeScrollStart.Minutes)/60.0;
 					if(apptTimeHrs*rowsPerHr*ApptDrawing.LineH<vScrollBar1.Maximum-vScrollBar1.LargeChange) {
 						vScrollBar1.Value=(int)(apptTimeHrs*rowsPerHr*ApptDrawing.LineH);

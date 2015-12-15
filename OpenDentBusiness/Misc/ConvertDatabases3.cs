@@ -11427,6 +11427,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE vitalsign MODIFY Pulse NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE apptview ADD IsScrollStartDynamic tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE apptview ADD IsScrollStartDynamic number(3)";
+					Db.NonQ(command);
+					command="UPDATE apptview SET IsScrollStartDynamic = 0 WHERE IsScrollStartDynamic IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE apptview MODIFY IsScrollStartDynamic NOT NULL";
+					Db.NonQ(command);
+				}
 				//Perio chart skip missing teeth by default preference
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('PerioSkipMissingTeeth','1')";

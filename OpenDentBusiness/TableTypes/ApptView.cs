@@ -33,6 +33,8 @@ namespace OpenDentBusiness{
 		///<summary>Time the appointment module's view will scroll to on load.</summary>
 		[XmlIgnore]
 		public TimeSpan ApptTimeScrollStart;
+		///<summary>If set to true, the appointment view scrolls to the first scheduled operatory start time or the first scheduled appointment.</summary>
+		public bool IsScrollStartDynamic;
 
 		///<summary>Returns a copy of this ApptView.</summary>
 		public ApptView Copy() {
