@@ -26,6 +26,18 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectMany(command);
 		}
 
+		public static List<EmailAttach> GetForEmails(List<long> listEmailMessageNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EmailAttach>>(MethodBase.GetCurrentMethod(),listEmailMessageNums);
+			}
+			List<EmailAttach> listAttaches=new List<EmailAttach>();
+			if(listEmailMessageNums.Count < 1) {
+				return listAttaches;
+			}
+			string command="SELECT * FROM emailattach WHERE EmailMessageNum IN("+string.Join(",",listEmailMessageNums)+")";
+			return Crud.EmailAttachCrud.SelectMany(command);
+		}
+
 		///<summary>Gets one EmailAttach from the db. Used by Patient Portal.</summary>
 		public static EmailAttach GetOne(long emailAttachNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
