@@ -415,7 +415,8 @@ namespace OpenDentBusiness{
 		private static void WireEmailUnsecure(Health.Direct.Agent.OutgoingMessage msgOut,EmailAddress emailAddress,long patNum) {
 			//No need to check RemotingRole; no call to db.
 			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
-			if(!Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)) {//This overload throws an exception if user is not authorized.
+            //Security.CurUser will be null if this is called from a third party application (like Patient Portal).  We want to continue if that is the case.
+			if(Security.CurUser!=null && !Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)) {//This overload throws an exception if user is not authorized.
 				return;
 			}
 			if(emailAddress.IsImplicitSsl) {
@@ -498,12 +499,12 @@ namespace OpenDentBusiness{
 		///If a message must be encrypted, then encrypt it before calling this function.
 		///nameValueCollectionHeaders can be null.</summary>
 		private static void WireEmailUnsecure(EmailMessage emailMessage,EmailAddress emailAddress,NameValueCollection nameValueCollectionHeaders,params AlternateView[] arrayAlternateViews) {
-			//No need to check RemotingRole; no call to db.
-			//When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
-			if(!Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)){//This overload throws an exception if user is not authorized.
-				return;
-			}
-			if(emailAddress.ServerPort==465) {//implicit
+            //No need to check RemotingRole; no call to db.
+            //When batch email operations are performed, we sometimes do this check further up in the UI.  This check is here to as a catch-all.
+            if(Security.CurUser!=null && !Security.IsAuthorized(Permissions.EmailSend,DateTime.Now,true,Security.CurUser.UserGroupNum)) {//This overload throws an exception if user is not authorized.
+                return;
+            }
+            if(emailAddress.ServerPort==465) {//implicit
 				//uses System.Web.Mail, which is marked as deprecated, but still supports implicit
 				//http://msdn.microsoft.com/en-us/library/ms877952(v=exchg.65).aspx
 				System.Web.Mail.MailMessage message=new System.Web.Mail.MailMessage();
