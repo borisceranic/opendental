@@ -2596,24 +2596,29 @@ FROM insplan";
 			}
 			List<long> listPatNums=new List<long>();
 			listPatNums.Add(patNum);
-			if(OpenDentBusiness.PrefC.GetBool(OpenDentBusiness.PrefName.FamPhiAccess)) { //Include guarantor's family if pref is set.
+			string command="";
+			if(PrefC.GetBool(PrefName.FamPhiAccess)) { //Include guarantor's family if pref is set.
 				//Include any patient where this PatNum is the Guarantor.
-				DataTable tablePatientsG=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE Guarantor = "+OpenDentBusiness.POut.Long(patNum));
+				command="SELECT PatNum FROM patient WHERE Guarantor = "+POut.Long(patNum);
+				DataTable tablePatientsG=Db.GetTable(command);
 				for(int i=0;i<tablePatientsG.Rows.Count;i++) {
-					listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsG.Rows[i]["PatNum"].ToString()));
+					listPatNums.Add(PIn.Long(tablePatientsG.Rows[i]["PatNum"].ToString()));
 				}
 			}
 			//Include any patient where the given patient is the responsible party.
-			DataTable tablePatientsR=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE ResponsParty = "+OpenDentBusiness.POut.Long(patNum));
+			command="SELECT PatNum FROM patient WHERE ResponsParty = "+POut.Long(patNum);
+			DataTable tablePatientsR=Db.GetTable(command);
 			for(int i=0;i<tablePatientsR.Rows.Count;i++) {
-				listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsR.Rows[i]["PatNum"].ToString()));
+				listPatNums.Add(PIn.Long(tablePatientsR.Rows[i]["PatNum"].ToString()));
 			}
 			//Include any patient where this patient is the guardian.
-			DataTable tablePatientsD=OpenDentBusiness.DataCore.GetTable("SELECT PatNum FROM patient WHERE PatNum IN (SELECT guardian.PatNumChild FROM guardian WHERE guardian.IsGuardian = 1 AND guardian.PatNumGuardian="+OpenDentBusiness.POut.Long(patNum)+") ");
+			command="SELECT PatNum FROM patient "
+				+"WHERE PatNum IN (SELECT guardian.PatNumChild FROM guardian WHERE guardian.IsGuardian = 1 AND guardian.PatNumGuardian="+POut.Long(patNum)+") ";
+			DataTable tablePatientsD=Db.GetTable(command);
 			for(int i=0;i<tablePatientsD.Rows.Count;i++) {
-				listPatNums.Add(OpenDentBusiness.PIn.Long(tablePatientsD.Rows[i]["PatNum"].ToString()));
+				listPatNums.Add(PIn.Long(tablePatientsD.Rows[i]["PatNum"].ToString()));
 			}
-			return listPatNums;//There might be dupliates, but the list should be short enough that it does not matter.
+			return listPatNums.Distinct().ToList();
 		}
 
 		///<summary>Validate password against strong password rules. Currently only used for patient portal passwords. Requirements: 8 characters, 1 uppercase character, 1 lowercase character, 1 number. Returns non-empty string if validation failed. Return string will be translated.</summary>

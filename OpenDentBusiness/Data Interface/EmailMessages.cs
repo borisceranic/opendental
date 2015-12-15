@@ -73,6 +73,22 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		public static List<EmailMessage> GetWebMailForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<EmailMessage>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			List<long> listPatNums=Patients.GetPatNumsForPhi(patNum);//Guaranteed to have at least one value (the patNum passed in).
+			string command="SELECT * FROM emailmessage "
+				+"WHERE PatNumSubj IN("+string.Join(",",listPatNums)+") "
+				+"AND SentOrReceived IN ("
+					+POut.Int((int)EmailSentOrReceived.WebMailReceived)+", "
+					+POut.Int((int)EmailSentOrReceived.WebMailRecdRead)+", "
+					+POut.Int((int)EmailSentOrReceived.WebMailSent)+", "
+					+POut.Int((int)EmailSentOrReceived.WebMailSentRead)+") "
+				+"ORDER BY MsgDateTime DESC";
+			return Crud.EmailMessageCrud.SelectMany(command);
+		}
+
 		///<summary>OD will call this version. It will automatically delete and restore attachments.</summary>
 		public static void Update(EmailMessage message) {
 			//No need to check RemotingRole; no call to db.
