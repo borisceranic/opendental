@@ -105,7 +105,10 @@ namespace OpenDental {
 			else {
 				labelInternal.Visible=false;
 			}
-			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement && SheetDefCur.SheetType!=SheetTypeEnum.MedLabResults) {
+			if(SheetDefCur.SheetType!=SheetTypeEnum.Statement 
+				&& SheetDefCur.SheetType!=SheetTypeEnum.MedLabResults
+				&& SheetDefCur.SheetType!=SheetTypeEnum.TreatmentPlan) 
+			{
 				butAddGrid.Visible=false;
 			}
 			if(Sheets.SheetTypeIsSinglePage(SheetDefCur.SheetType)) {
@@ -1466,8 +1469,15 @@ namespace OpenDental {
 					return;
 				}
 				for(int i=listFields.SelectedIndices.Count-1;i>=0;i--) { //iterate backwards through list
-					if(SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]].FieldType==SheetFieldType.Image) {
+					SheetFieldDef fieldI=SheetDefCur.SheetFieldDefs[listFields.SelectedIndices[i]];
+					if(fieldI.FieldType==SheetFieldType.Image) {
 						refreshBuffer=true;
+					}
+					if(fieldI.FieldType==SheetFieldType.Grid && fieldI.FieldName=="TreatPlanMain"
+						&& SheetDefCur.SheetFieldDefs.FindAll(x=>x.FieldType==SheetFieldType.Grid && x.FieldName=="TreatPlanMain").Count==1) 
+					{
+						MsgBox.Show(this,"Cannot delete the last main grid from treatment plan.");
+						continue;//skip this one.
 					}
 					SheetDefCur.SheetFieldDefs.RemoveAt(listFields.SelectedIndices[i]);
 				}
@@ -1709,6 +1719,10 @@ namespace OpenDental {
 				case SheetTypeEnum.TreatmentPlan:
 					if(SheetDefCur.SheetFieldDefs.FindAll(x => x.FieldType==SheetFieldType.SigBox).Count!=1) {
 						MessageBox.Show(Lan.g(this,"Treatment plans must have exactly one signature box."));
+						return false;
+					}
+					if(SheetDefCur.SheetFieldDefs.FindAll(x => x.FieldType==SheetFieldType.Grid && x.FieldName=="TreatPlanMain").Count<1) {
+						MessageBox.Show(Lan.g(this,"Treatment plans must have one main grid."));
 						return false;
 					}
 					break;
