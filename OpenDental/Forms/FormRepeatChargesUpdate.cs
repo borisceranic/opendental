@@ -317,8 +317,29 @@ namespace OpenDental{
 			retVal.RemoveAll(x => x > DateTime.Today);
 			//Remove billing dates past the end of the dateStop
 			int monthAdd=0;
+			//To account for a partial month, add a charge after the repeat charge stop date in certain circumstances (for each of these scenarios, the 
+			//billingCycleDay will be 11):
+			//--Scenario #1: The start day is before the stop day which is before the billing day. Ex: Start: 12/08, Stop 12/09
+			//--Scenario #2: The start day is after the billing day which is after the stop day. Ex: Start: 11/25 Stop 12/01
+			//--Scenario #3: The start day is before the stop day but before the billing day. Ex: Start: 11/25, Stop 11/27
+			//--Scenario #4: The start day is the same as the stop day but after the billing day. Ex: Start: 10/13, Stop 11/13
+			//--Scenario #5: The start day is the same as the stop day but before the billing day. Ex: Start: 11/10, Stop 12/10
+			//Each of these repeat charges will post a charge on 12/11 even though it is after the stop date.
 			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-				monthAdd=1;
+				if(dateStart.Day<billingCycleDay) {
+					if((dateStop.Day<billingCycleDay && dateStart.Day<dateStop.Day)//Scenario #1
+						|| dateStart.Day==dateStop.Day)//Scenario #5
+					{
+						monthAdd=1;
+					}
+				}
+				else if(dateStart.Day>billingCycleDay) {
+					if(dateStart.Day<=dateStop.Day//Scenario #3 and #4
+						|| dateStop.Day<billingCycleDay)//Scenario #2
+					{
+						monthAdd=1;
+					}
+				}
 			}
 			if(dateStop.Year>1880) {
 				retVal.RemoveAll(x => x > dateStop.AddMonths(monthAdd));
