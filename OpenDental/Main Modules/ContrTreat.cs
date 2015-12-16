@@ -931,7 +931,8 @@ namespace OpenDental{
 
 		private void RefreshModuleScreen(){
 			//ParentForm.Text=Patients.GetMainTitle(PatCur);
-			if(PatCur!=null){
+			FillPlans();
+			if(PatCur!=null && _listTreatPlans.Count>0) {
 				gridMain.Enabled=true;
 				groupShow.Enabled=true;
 				listSetPr.Enabled=true;
@@ -943,6 +944,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Print"].Enabled=true;
 				ToolBarMain.Buttons["Email"].Enabled=true;
 				ToolBarMain.Buttons["Sign"].Enabled=true;
+				butSaveTP.Enabled=true;
 				ToolBarMain.Invalidate();
 				if(PatPlanList.Count==0){//patient doesn't have insurance
 					checkShowIns.Checked=false;
@@ -965,6 +967,7 @@ namespace OpenDental{
 				gridMain.Enabled=false;
 				groupShow.Enabled=false;
 				listSetPr.Enabled=false;
+				butSaveTP.Enabled=false;
 				//panelSide.Enabled=false;
 				ToolBarMain.Buttons["Discount"].Enabled=false;
 				ToolBarMain.Buttons["PreAuth"].Enabled=false;
@@ -976,7 +979,12 @@ namespace OpenDental{
 				ToolBarMain.Invalidate();
         //listPreAuth.Enabled=false;
 			}
-			FillPlans();
+			if(PatCur==null) {
+				butNewTP.Enabled=false;
+			}
+			else {
+				butNewTP.Enabled=true;
+			}
 			FillMain();
 			FillSummary();
       FillPreAuth();
@@ -1116,8 +1124,10 @@ namespace OpenDental{
 		}
 
 		private void FillMain() {
-			if(gridPlans.GetSelectedIndex() >= 0 && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="") {
-				listSetPr.Enabled=false; //disable changing priorities for signed TPs
+			if((gridPlans.GetSelectedIndex()>=0 && _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="")//disable changing priorities for signed TPs
+				|| PatCur==null ||_listTreatPlans.Count<1)//disable if the patient has no TPs
+			{
+				listSetPr.Enabled=false;
 			}
 			else {
 				listSetPr.Enabled=true;//allow changing priority for un-signed TPs
