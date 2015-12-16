@@ -321,15 +321,19 @@ namespace OpenDental {
 			MigraDoc.Rendering.DocumentRenderer renderer=new MigraDoc.Rendering.DocumentRenderer(doc);
 			renderer.PrepareDocument();
 			printdoc.Renderer=renderer;
-			//we might want to surround some of this with a try-catch
 #if DEBUG
 			FormRpPrintPreview pView=new FormRpPrintPreview();
 			pView.printPreviewControl2.Document=printdoc;
 			pView.ShowDialog();
 #else
-			if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,_patCur.PatNum,"PayConnect receipt printed")) {
-				printdoc.PrinterSettings=pd2.PrinterSettings;
-				printdoc.Print();
+			try {
+				if(PrinterL.SetPrinter(pd2,PrintSituation.Receipt,_patCur.PatNum,"PayConnect receipt printed")) {
+					printdoc.PrinterSettings=pd2.PrinterSettings;
+					printdoc.Print();
+				}
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g(this,"Printer not available.")+"\r\n"+Lan.g(this,"Original error")+": "+ex.Message);
 			}
 #endif
 		}
