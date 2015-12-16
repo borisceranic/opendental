@@ -238,7 +238,9 @@ namespace OpenDentBusiness{
 		///<summary>102- Allows user to use the medication merge tool.</summary>
 		MedicationMerge,
 		///<summary>103- Allow users to use the Quick Add tool in the Account module.</summary>
-		AccountProcsQuickAdd
+		AccountProcsQuickAdd,
+		///<summary>104- Allow users to send claims.</summary>
+		ClaimSend
 	}
 
 	

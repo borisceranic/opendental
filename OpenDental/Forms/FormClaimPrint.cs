@@ -3850,6 +3850,7 @@ namespace OpenDental{
 			if(PrintClaim()){
 				Etranss.SetClaimSentOrPrinted(ClaimNumCur,ClaimCur.PatNum,0,EtransType.ClaimPrinted,0);
 				//Claims.UpdateStatus(ThisClaimNum,"P");
+				SecurityLogs.MakeLogEntry(Permissions.ClaimSend,ClaimCur.PatNum,Lan.g(this,"Claim printed from Claim Preview window."));
 				DialogResult=DialogResult.OK;
 			}
 			else{

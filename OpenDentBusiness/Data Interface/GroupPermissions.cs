@@ -294,6 +294,7 @@ namespace OpenDentBusiness{
 				//case Permissions.ProviderMerge:
 				//case Permissions.MedicationMerge:
 				//case Permissions.AccountQuickCharge:
+				//case Permissions.ClaimSend:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -357,6 +358,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Choose Database");
 				case Permissions.ClaimHistoryEdit:
 					return Lans.g("enumPermissions","Claim History Edit");
+				case Permissions.ClaimSend:
+					return Lans.g("enumPermissions","Claim Send");
 				case Permissions.ClaimSentEdit:
 					return Lans.g("enumPermissions","Claim Sent Edit");
 				case Permissions.CommlogEdit:

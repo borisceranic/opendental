@@ -5603,6 +5603,9 @@ namespace OpenDental{
 		}
 
 		private void butPreview_Click(object sender, System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ClaimSend)) {
+				return;
+			}
 			if(!ClaimIsValid()) {
 				return;
 			}
@@ -5623,6 +5626,9 @@ namespace OpenDental{
 		}
 
 		private void ButPrint_Click(object sender,System.EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ClaimSend)) {
+				return;
+			}
 			if(!ClaimIsValid()){
 				return;
 			}
@@ -5647,10 +5653,14 @@ namespace OpenDental{
 			//ClaimCur.ClaimStatus="S";
 			//ClaimCur.DateSent=DateTime.Today;
 			//Claims.Update(ClaimCur);
+			SecurityLogs.MakeLogEntry(Permissions.ClaimSend,ClaimCur.PatNum,Lan.g(this,"Claim printed from Claim Edit window."));
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butSend_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ClaimSend)) {
+				return;
+			}
 			SendClaim();
 		}
 
@@ -5708,10 +5718,14 @@ namespace OpenDental{
 				Eclaims.Eclaims.SendBatch(clearinghouseClin,queueItems,medType);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
 			}
 			Cursor=Cursors.Default;
+			SecurityLogs.MakeLogEntry(Permissions.ClaimSend,PatCur.PatNum,Lan.g(this,"Claim sent from Claim Edit Window."));
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butResend_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ClaimSend)) {
+				return;
+			}
 			FormClaimResend fcr=new FormClaimResend();
 			if(fcr.ShowDialog()==DialogResult.OK) {
 				if(fcr.IsClaimReplacement) {

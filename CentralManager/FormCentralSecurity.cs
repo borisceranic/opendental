@@ -121,6 +121,8 @@ namespace CentralManager {
 					node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
 			node=SetNode(Permissions.AccountModule);
+				node2=SetNode(Permissions.ClaimSend);
+					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.ClaimSentEdit);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.AccountProcsQuickAdd);
