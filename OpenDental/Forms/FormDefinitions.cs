@@ -628,6 +628,12 @@ namespace OpenDental{
 				}
 				retVal+=Lan.g(this,"TreatPlans");
 			}
+			if(itemValue.Contains("L")) {
+				if(retVal!="") {
+					retVal+=", ";
+				}
+				retVal+=Lan.g(this,"PatientPortal");
+			}
 			return retVal;
 		}
 
