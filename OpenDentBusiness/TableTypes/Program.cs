@@ -47,6 +47,7 @@ namespace OpenDentBusiness{
 		Camsight,
 		CaptureLink,
 		Cerec,
+		CleaRay,
 		CliniView,
 		ClioSoft,
 		DBSWin,
