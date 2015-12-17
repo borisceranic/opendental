@@ -562,6 +562,10 @@ namespace OpenDental{
 			if(textAuthKey.Text.Trim().Length>0) {
 				authKeyEncrypted=CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim());
 			}
+			string payTypeCur="";
+			if(comboPaymentType.SelectedIndex>-1) {
+				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
+			}
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="Username")
 				.ForEach(x => x.PropertyValue=textUsername.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="Password")
@@ -577,7 +581,7 @@ namespace OpenDental{
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="TerminalID")
 				.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="PaymentType")//payment type already validated
-				.ForEach(x => x.PropertyValue=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString());//always 1 item, null safe
+				.ForEach(x => x.PropertyValue=payTypeCur);//always 1 item, null safe
 			_indexClinicRevert=comboClinic.SelectedIndex;//now that we've updated the values for the clinic we're switching from, update _indexClinicRevert
 			textPassword.UseSystemPasswordChar=false;//FillFields will set this to true if the clinic being selected has a password set
 			textAuthKey.UseSystemPasswordChar=false;//FillFields will set this to true if the clinic being selected has an AuthKey entered
