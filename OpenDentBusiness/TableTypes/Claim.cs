@@ -111,7 +111,8 @@ namespace OpenDentBusiness{
 		public byte CanadianMaxProsthMaterial;
 		///<summary>FK to inssub.InsSubNum.</summary>
 		public long InsSubNum;
-		///<summary>FK to inssub.InsSubNum.</summary>
+		///<summary>FK to inssub.InsSubNum.  The fk to the 'Other' insurance subscriber.  For a primary claim, this will be the secondary insurance
+		///subscriber.  For a secondary claim, this will be primary insurance subscriber.</summary>
 		public long InsSubNum2;
 		///<summary>G01 assigned by carrier/network and returned in acks.  Used for claim reversal.</summary>
 		public string CanadaTransRefNum;
