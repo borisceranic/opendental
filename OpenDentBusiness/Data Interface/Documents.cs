@@ -213,6 +213,42 @@ namespace OpenDentBusiness {
 			return pictureDocs[0];
 		}
 
+		///<summary>Gets all documents within the doc category designated as the "S"tatements directory via definitions.
+		///Also gets dependents' statements if this patient is a guarantor (needed by the patient portal).</summary>
+		public static List<Document> GetStatementsForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Document>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM document d "
+			+"WHERE (d.PatNum = "+POut.Long(patNum)+" OR d.PatNum IN (SELECT p.PatNum FROM patient p WHERE p.Guarantor = "+POut.Long(patNum)+")) "
+				+"AND d.DocCategory IN "
+				+"( SELECT def.DefNum FROM  definition def "
+					+"WHERE def.Category="+POut.Int((int)DefCat.ImageCats)+" "
+					+"AND def.IsHidden=0  "
+					+"AND def.ItemValue LIKE '%S%'  "//Statements category indicator
+				+") "
+			+"ORDER BY d.DateCreated DESC";
+			return Crud.DocumentCrud.SelectMany(command);
+		}
+
+		///<summary>Get document info for all images linked to this patient.
+		///Also gets dependents' images if this patient is a guarantor (needed by the patient portal).</summary>
+		public static List<Document> GetPatientPortalDocsForPat(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Document>>(MethodBase.GetCurrentMethod(),patNum);
+			}
+			string command="SELECT * FROM document d "
+			+"WHERE (d.PatNum = "+POut.Long(patNum)+" OR d.PatNum IN (SELECT p.PatNum FROM patient p WHERE p.Guarantor = "+POut.Long(patNum)+")) "
+				+"AND d.DocCategory IN "
+				+"( SELECT def.DefNum FROM  definition def "
+					+"WHERE def.Category="+POut.Int((int)DefCat.ImageCats)+" "
+					+"AND def.IsHidden=0  "
+					+"AND def.ItemValue LIKE '%L%'  "//Patient Portal category indicator
+				+") "
+			+"ORDER BY d.DateCreated DESC";
+			return Crud.DocumentCrud.SelectMany(command);
+		}
+
 		/// <summary>Makes one call to the database to retrieve the document of the patient for the given patNum, then uses that document and the patFolder to load and process the patient picture so it appears the same way it did in the image module.  It first creates a 100x100 thumbnail if needed, then it uses the thumbnail so no scaling needed. Returns false if there is no patient picture, true otherwise. Sets the value of patientPict equal to a new instance of the patient's processed picture, but will be set to null on error. Assumes WithPat will always be same as patnum.</summary>
 		public static bool GetPatPict(long patNum,string patFolder,out Bitmap patientPict) {
 			//No need to check RemotingRole; no call to db.
