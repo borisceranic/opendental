@@ -21,7 +21,6 @@ namespace OpenDental{
 		private ValidDate textDateFrom;
 		private Label label1;
 		private ListBox listProv;
-		private Label labelProv;
 		private CheckBox checkWeekend;
 		private GroupBox groupCopy;
 		private OpenDental.UI.Button butCopyDay;
@@ -42,7 +41,6 @@ namespace OpenDental{
 		private DateTime DateCopyEnd;
 		private CheckBox checkPractice;
 		private ListBox listEmp;
-		private Label label5;
 		private CheckBox checkReplace;
 		private GroupBox groupPaste;
 		///<summary>This tracks whether the provList or empList has been click on since the last refresh.  Forces user to refresh before deleting or pasting so that the list exactly matches the grid.</summary>
@@ -56,6 +54,9 @@ namespace OpenDental{
 		bool changed;
 		private List<Clinic> _listClinics;
 		private List<Provider> _listProvs;
+		private TabControl tabControl1;
+		private TabPage tabPageProv;
+		private TabPage tabPageEmp;
 		private List<Employee> _listEmps;
 
 		///<summary></summary>
@@ -94,7 +95,6 @@ namespace OpenDental{
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.listProv = new System.Windows.Forms.ListBox();
-			this.labelProv = new System.Windows.Forms.Label();
 			this.checkWeekend = new System.Windows.Forms.CheckBox();
 			this.groupCopy = new System.Windows.Forms.GroupBox();
 			this.butCopyWeek = new OpenDental.UI.Button();
@@ -105,7 +105,6 @@ namespace OpenDental{
 			this.textRepeat = new System.Windows.Forms.TextBox();
 			this.checkPractice = new System.Windows.Forms.CheckBox();
 			this.listEmp = new System.Windows.Forms.ListBox();
-			this.label5 = new System.Windows.Forms.Label();
 			this.checkReplace = new System.Windows.Forms.CheckBox();
 			this.groupPaste = new System.Windows.Forms.GroupBox();
 			this.butRepeat = new OpenDental.UI.Button();
@@ -118,8 +117,14 @@ namespace OpenDental{
 			this.textDateFrom = new OpenDental.ValidDate();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.tabPageProv = new System.Windows.Forms.TabPage();
+			this.tabPageEmp = new System.Windows.Forms.TabPage();
 			this.groupCopy.SuspendLayout();
 			this.groupPaste.SuspendLayout();
+			this.tabControl1.SuspendLayout();
+			this.tabPageProv.SuspendLayout();
+			this.tabPageEmp.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -142,21 +147,13 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(18, 144);
+			this.listProv.Location = new System.Drawing.Point(0, 0);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(82, 290);
+			this.listProv.Size = new System.Drawing.Size(191, 277);
 			this.listProv.TabIndex = 23;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
-			// 
-			// labelProv
-			// 
-			this.labelProv.Location = new System.Drawing.Point(15, 124);
-			this.labelProv.Name = "labelProv";
-			this.labelProv.Size = new System.Drawing.Size(87, 18);
-			this.labelProv.TabIndex = 22;
-			this.labelProv.Text = "Providers";
-			this.labelProv.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.listProv.SelectedIndexChanged += new System.EventHandler(this.listProv_SelectedIndexChanged);
 			// 
 			// checkWeekend
 			// 
@@ -257,21 +254,13 @@ namespace OpenDental{
 			// 
 			// listEmp
 			// 
-			this.listEmp.Location = new System.Drawing.Point(106, 144);
+			this.listEmp.Location = new System.Drawing.Point(0, 0);
 			this.listEmp.Name = "listEmp";
 			this.listEmp.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listEmp.Size = new System.Drawing.Size(82, 290);
+			this.listEmp.Size = new System.Drawing.Size(192, 277);
 			this.listEmp.TabIndex = 30;
 			this.listEmp.Click += new System.EventHandler(this.listEmp_Click);
-			// 
-			// label5
-			// 
-			this.label5.Location = new System.Drawing.Point(103, 124);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(87, 18);
-			this.label5.TabIndex = 29;
-			this.label5.Text = "Employees";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.listEmp.SelectedIndexChanged += new System.EventHandler(this.listEmp_SelectedIndexChanged);
 			// 
 			// checkReplace
 			// 
@@ -407,6 +396,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(207, 8);
 			this.gridMain.Name = "gridMain";
@@ -418,24 +408,53 @@ namespace OpenDental{
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// tabControl1
+			// 
+			this.tabControl1.Controls.Add(this.tabPageProv);
+			this.tabControl1.Controls.Add(this.tabPageEmp);
+			this.tabControl1.Location = new System.Drawing.Point(1, 130);
+			this.tabControl1.Name = "tabControl1";
+			this.tabControl1.SelectedIndex = 0;
+			this.tabControl1.Size = new System.Drawing.Size(200, 300);
+			this.tabControl1.TabIndex = 36;
+			// 
+			// tabPageProv
+			// 
+			this.tabPageProv.Controls.Add(this.listProv);
+			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
+			this.tabPageProv.Name = "tabPageProv";
+			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageProv.Size = new System.Drawing.Size(192, 274);
+			this.tabPageProv.TabIndex = 0;
+			this.tabPageProv.Text = "Providers";
+			this.tabPageProv.UseVisualStyleBackColor = true;
+			// 
+			// tabPageEmp
+			// 
+			this.tabPageEmp.Controls.Add(this.listEmp);
+			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
+			this.tabPageEmp.Name = "tabPageEmp";
+			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageEmp.Size = new System.Drawing.Size(192, 274);
+			this.tabPageEmp.TabIndex = 1;
+			this.tabPageEmp.Text = "Employees";
+			this.tabPageEmp.UseVisualStyleBackColor = true;
+			// 
 			// FormSchedule
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 695);
+			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.groupCopy);
 			this.Controls.Add(this.groupPaste);
-			this.Controls.Add(this.listEmp);
-			this.Controls.Add(this.label5);
 			this.Controls.Add(this.checkPractice);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.textDateTo);
 			this.Controls.Add(this.textDateFrom);
 			this.Controls.Add(this.checkWeekend);
-			this.Controls.Add(this.listProv);
-			this.Controls.Add(this.labelProv);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
@@ -453,6 +472,9 @@ namespace OpenDental{
 			this.groupCopy.PerformLayout();
 			this.groupPaste.ResumeLayout(false);
 			this.groupPaste.PerformLayout();
+			this.tabControl1.ResumeLayout(false);
+			this.tabPageProv.ResumeLayout(false);
+			this.tabPageEmp.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -623,6 +645,14 @@ namespace OpenDental{
 				colI--;
 			}
 			gridMain.Rows[Schedules.GetRowCal(PIn.Date(textDateFrom.Text),DateTime.Today)].Cells[colI].ColorText=Color.Red;
+		}
+
+		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
+			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.Count+")";
+		}
+
+		private void listEmp_SelectedIndexChanged(object sender,EventArgs e) {
+			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.Count+")";
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -1070,19 +1100,6 @@ namespace OpenDental{
 				SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			}
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
 
 	}
 }

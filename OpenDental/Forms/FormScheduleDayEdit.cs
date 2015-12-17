@@ -38,6 +38,10 @@ namespace OpenDental{
 		private List<Employee> _listEmps;
 		///<summary>The provider nums of _listProvs.  Helper, which is set once on load.</summary>
 		private List<long> _listProvNums;
+		private TabControl tabControl2;
+		private TabPage tabPageProv;
+		private TabPage tabPageEmp;
+
 		///<summary>The employee nums of _listEmps.  Helper, which is set once on load.</summary>
 		private List<long> _listEmpNums;
 		
@@ -82,10 +86,13 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormScheduleDayEdit));
 			this.labelDate = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.tabControl2 = new System.Windows.Forms.TabControl();
+			this.tabPageProv = new System.Windows.Forms.TabPage();
+			this.listProv = new System.Windows.Forms.ListBox();
+			this.tabPageEmp = new System.Windows.Forms.TabPage();
 			this.listEmp = new System.Windows.Forms.ListBox();
 			this.butProvNote = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
-			this.listProv = new System.Windows.Forms.ListBox();
 			this.butAddTime = new OpenDental.UI.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -101,6 +108,9 @@ namespace OpenDental{
 			this.butCloseOffice = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.groupBox3.SuspendLayout();
+			this.tabControl2.SuspendLayout();
+			this.tabPageProv.SuspendLayout();
+			this.tabPageEmp.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
@@ -120,26 +130,68 @@ namespace OpenDental{
 			// 
 			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox3.Controls.Add(this.listEmp);
+			this.groupBox3.Controls.Add(this.tabControl2);
 			this.groupBox3.Controls.Add(this.butProvNote);
 			this.groupBox3.Controls.Add(this.label1);
-			this.groupBox3.Controls.Add(this.listProv);
 			this.groupBox3.Controls.Add(this.butAddTime);
-			this.groupBox3.Location = new System.Drawing.Point(819, 45);
+			this.groupBox3.Location = new System.Drawing.Point(819, 12);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(179, 463);
+			this.groupBox3.Size = new System.Drawing.Size(179, 496);
 			this.groupBox3.TabIndex = 12;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Add Time Block";
 			// 
+			// tabControl2
+			// 
+			this.tabControl2.Controls.Add(this.tabPageProv);
+			this.tabControl2.Controls.Add(this.tabPageEmp);
+			this.tabControl2.Location = new System.Drawing.Point(5, 51);
+			this.tabControl2.Name = "tabControl2";
+			this.tabControl2.SelectedIndex = 0;
+			this.tabControl2.Size = new System.Drawing.Size(168, 409);
+			this.tabControl2.TabIndex = 16;
+			// 
+			// tabPageProv
+			// 
+			this.tabPageProv.Controls.Add(this.listProv);
+			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
+			this.tabPageProv.Name = "tabPageProv";
+			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageProv.Size = new System.Drawing.Size(160, 383);
+			this.tabPageProv.TabIndex = 0;
+			this.tabPageProv.Text = "Providers (0)";
+			this.tabPageProv.UseVisualStyleBackColor = true;
+			// 
+			// listProv
+			// 
+			this.listProv.FormattingEnabled = true;
+			this.listProv.Location = new System.Drawing.Point(0, 0);
+			this.listProv.Name = "listProv";
+			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+			this.listProv.Size = new System.Drawing.Size(160, 381);
+			this.listProv.TabIndex = 6;
+			this.listProv.SelectedIndexChanged += new System.EventHandler(this.listProv_SelectedIndexChanged);
+			// 
+			// tabPageEmp
+			// 
+			this.tabPageEmp.Controls.Add(this.listEmp);
+			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
+			this.tabPageEmp.Name = "tabPageEmp";
+			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageEmp.Size = new System.Drawing.Size(160, 383);
+			this.tabPageEmp.TabIndex = 1;
+			this.tabPageEmp.Text = "Employees (0)";
+			this.tabPageEmp.UseVisualStyleBackColor = true;
+			// 
 			// listEmp
 			// 
 			this.listEmp.FormattingEnabled = true;
-			this.listEmp.Location = new System.Drawing.Point(93, 49);
+			this.listEmp.Location = new System.Drawing.Point(0, 0);
 			this.listEmp.Name = "listEmp";
 			this.listEmp.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listEmp.Size = new System.Drawing.Size(80, 329);
+			this.listEmp.Size = new System.Drawing.Size(160, 381);
 			this.listEmp.TabIndex = 6;
+			this.listEmp.SelectedIndexChanged += new System.EventHandler(this.listEmp_SelectedIndexChanged);
 			// 
 			// butProvNote
 			// 
@@ -148,7 +200,7 @@ namespace OpenDental{
 			this.butProvNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butProvNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butProvNote.CornerRadius = 4F;
-			this.butProvNote.Location = new System.Drawing.Point(47, 424);
+			this.butProvNote.Location = new System.Drawing.Point(93, 466);
 			this.butProvNote.Name = "butProvNote";
 			this.butProvNote.Size = new System.Drawing.Size(80, 24);
 			this.butProvNote.TabIndex = 15;
@@ -163,15 +215,6 @@ namespace OpenDental{
 			this.label1.TabIndex = 7;
 			this.label1.Text = "Select One or More Providers or Employees";
 			// 
-			// listProv
-			// 
-			this.listProv.FormattingEnabled = true;
-			this.listProv.Location = new System.Drawing.Point(7, 49);
-			this.listProv.Name = "listProv";
-			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(80, 329);
-			this.listProv.TabIndex = 6;
-			// 
 			// butAddTime
 			// 
 			this.butAddTime.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -181,7 +224,7 @@ namespace OpenDental{
 			this.butAddTime.CornerRadius = 4F;
 			this.butAddTime.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAddTime.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddTime.Location = new System.Drawing.Point(47, 391);
+			this.butAddTime.Location = new System.Drawing.Point(9, 466);
 			this.butAddTime.Name = "butAddTime";
 			this.butAddTime.Size = new System.Drawing.Size(80, 24);
 			this.butAddTime.TabIndex = 4;
@@ -240,6 +283,7 @@ namespace OpenDental{
 			// gridMain
 			// 
 			this.gridMain.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(3, 3);
 			this.gridMain.Name = "gridMain";
@@ -388,6 +432,9 @@ namespace OpenDental{
 			this.Text = "Edit Day";
 			this.Load += new System.EventHandler(this.FormScheduleDay_Load);
 			this.groupBox3.ResumeLayout(false);
+			this.tabControl2.ResumeLayout(false);
+			this.tabPageProv.ResumeLayout(false);
+			this.tabPageEmp.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.tabControl1.ResumeLayout(false);
 			this.tabPage1.ResumeLayout(false);
@@ -543,6 +590,14 @@ namespace OpenDental{
 			}
 		}
 
+		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
+			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.Count+")";
+		}
+
+		private void listEmp_SelectedIndexChanged(object sender,EventArgs e) {
+			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.Count+")";
+		}
+
 		//private void butAll_Click(object sender,EventArgs e) {
 		//	for(int i=0;i<listProv.Items.Count;i++){
 		//		listProv.SetSelected(i,true);
@@ -696,20 +751,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
 
 	}
 }
