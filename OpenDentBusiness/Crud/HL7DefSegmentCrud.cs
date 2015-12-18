@@ -67,9 +67,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<HL7DefSegment> listHL7DefSegments) {
-			DataTable table=new DataTable("HL7DefSegments");
+		///<summary>Converts a list of HL7DefSegment into a DataTable.</summary>
+		public static DataTable ListToTable(List<HL7DefSegment> listHL7DefSegments,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="HL7DefSegment";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("HL7DefSegmentNum");
 			table.Columns.Add("HL7DefMessageNum");
 			table.Columns.Add("ItemOrder");

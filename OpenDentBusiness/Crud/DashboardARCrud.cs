@@ -55,9 +55,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<DashboardAR> listDashboardARs) {
-			DataTable table=new DataTable("DashboardARs");
+		///<summary>Converts a list of DashboardAR into a DataTable.</summary>
+		public static DataTable ListToTable(List<DashboardAR> listDashboardARs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="DashboardAR";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("DashboardARNum");
 			table.Columns.Add("DateCalc");
 			table.Columns.Add("BalTotal");

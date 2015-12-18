@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<PhoneMetric> listPhoneMetrics) {
-			DataTable table=new DataTable("PhoneMetrics");
+		///<summary>Converts a list of PhoneMetric into a DataTable.</summary>
+		public static DataTable ListToTable(List<PhoneMetric> listPhoneMetrics,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="PhoneMetric";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("PhoneMetricNum");
 			table.Columns.Add("DateTimeEntry");
 			table.Columns.Add("VoiceMails");

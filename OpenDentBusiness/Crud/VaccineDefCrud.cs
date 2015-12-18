@@ -55,9 +55,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<VaccineDef> listVaccineDefs) {
-			DataTable table=new DataTable("VaccineDefs");
+		///<summary>Converts a list of VaccineDef into a DataTable.</summary>
+		public static DataTable ListToTable(List<VaccineDef> listVaccineDefs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="VaccineDef";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("VaccineDefNum");
 			table.Columns.Add("CVXCode");
 			table.Columns.Add("VaccineName");

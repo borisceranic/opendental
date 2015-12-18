@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<Guardian> listGuardians) {
-			DataTable table=new DataTable("Guardians");
+		///<summary>Converts a list of Guardian into a DataTable.</summary>
+		public static DataTable ListToTable(List<Guardian> listGuardians,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Guardian";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("GuardianNum");
 			table.Columns.Add("PatNumChild");
 			table.Columns.Add("PatNumGuardian");

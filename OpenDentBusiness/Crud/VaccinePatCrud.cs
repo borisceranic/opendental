@@ -72,9 +72,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<VaccinePat> listVaccinePats) {
-			DataTable table=new DataTable("VaccinePats");
+		///<summary>Converts a list of VaccinePat into a DataTable.</summary>
+		public static DataTable ListToTable(List<VaccinePat> listVaccinePats,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="VaccinePat";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("VaccinePatNum");
 			table.Columns.Add("VaccineDefNum");
 			table.Columns.Add("DateTimeStart");

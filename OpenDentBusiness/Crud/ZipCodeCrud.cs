@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<ZipCode> listZipCodes) {
-			DataTable table=new DataTable("ZipCodes");
+		///<summary>Converts a list of ZipCode into a DataTable.</summary>
+		public static DataTable ListToTable(List<ZipCode> listZipCodes,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="ZipCode";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ZipCodeNum");
 			table.Columns.Add("ZipCodeDigits");
 			table.Columns.Add("City");

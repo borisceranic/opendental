@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<SigButDef> listSigButDefs) {
-			DataTable table=new DataTable("SigButDefs");
+		///<summary>Converts a list of SigButDef into a DataTable.</summary>
+		public static DataTable ListToTable(List<SigButDef> listSigButDefs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="SigButDef";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("SigButDefNum");
 			table.Columns.Add("ButtonText");
 			table.Columns.Add("ButtonIndex");

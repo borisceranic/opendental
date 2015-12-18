@@ -66,9 +66,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<RequiredFieldCondition> listRequiredFieldConditions) {
-			DataTable table=new DataTable("RequiredFieldConditions");
+		///<summary>Converts a list of RequiredFieldCondition into a DataTable.</summary>
+		public static DataTable ListToTable(List<RequiredFieldCondition> listRequiredFieldConditions,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="RequiredFieldCondition";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("RequiredFieldConditionNum");
 			table.Columns.Add("RequiredFieldNum");
 			table.Columns.Add("ConditionType");

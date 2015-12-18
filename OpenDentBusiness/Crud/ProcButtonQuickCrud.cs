@@ -58,9 +58,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<ProcButtonQuick> listProcButtonQuicks) {
-			DataTable table=new DataTable("ProcButtonQuicks");
+		///<summary>Converts a list of ProcButtonQuick into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcButtonQuick> listProcButtonQuicks,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="ProcButtonQuick";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ProcButtonQuickNum");
 			table.Columns.Add("Description");
 			table.Columns.Add("CodeValue");

@@ -54,9 +54,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<FormPat> listFormPats) {
-			DataTable table=new DataTable("FormPats");
+		///<summary>Converts a list of FormPat into a DataTable.</summary>
+		public static DataTable ListToTable(List<FormPat> listFormPats,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="FormPat";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("FormPatNum");
 			table.Columns.Add("PatNum");
 			table.Columns.Add("FormDateTime");

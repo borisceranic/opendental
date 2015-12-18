@@ -54,9 +54,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<Hcpcs> listHcpcss) {
-			DataTable table=new DataTable("Hcpcss");
+		///<summary>Converts a list of Hcpcs into a DataTable.</summary>
+		public static DataTable ListToTable(List<Hcpcs> listHcpcss,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Hcpcs";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("HcpcsNum");
 			table.Columns.Add("HcpcsCode");
 			table.Columns.Add("DescriptionShort");

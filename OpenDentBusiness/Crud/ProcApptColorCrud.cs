@@ -55,9 +55,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<ProcApptColor> listProcApptColors) {
-			DataTable table=new DataTable("ProcApptColors");
+		///<summary>Converts a list of ProcApptColor into a DataTable.</summary>
+		public static DataTable ListToTable(List<ProcApptColor> listProcApptColors,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="ProcApptColor";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ProcApptColorNum");
 			table.Columns.Add("CodeRange");
 			table.Columns.Add("ShowPreviousDate");

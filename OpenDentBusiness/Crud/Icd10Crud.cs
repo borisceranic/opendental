@@ -55,9 +55,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<Icd10> listIcd10s) {
-			DataTable table=new DataTable("Icd10s");
+		///<summary>Converts a list of Icd10 into a DataTable.</summary>
+		public static DataTable ListToTable(List<Icd10> listIcd10s,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Icd10";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("Icd10Num");
 			table.Columns.Add("Icd10Code");
 			table.Columns.Add("Description");

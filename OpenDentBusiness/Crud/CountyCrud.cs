@@ -54,9 +54,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<County> listCountys) {
-			DataTable table=new DataTable("Countys");
+		///<summary>Converts a list of County into a DataTable.</summary>
+		public static DataTable ListToTable(List<County> listCountys,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="County";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("CountyNum");
 			table.Columns.Add("CountyName");
 			table.Columns.Add("CountyCode");

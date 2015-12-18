@@ -65,9 +65,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<Commlog> listCommlogs) {
-			DataTable table=new DataTable("Commlogs");
+		///<summary>Converts a list of Commlog into a DataTable.</summary>
+		public static DataTable ListToTable(List<Commlog> listCommlogs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Commlog";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("CommlogNum");
 			table.Columns.Add("PatNum");
 			table.Columns.Add("CommDateTime");

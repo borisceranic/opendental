@@ -318,9 +318,12 @@ using System.Drawing;"+rn);
 			#endregion TableToList
 			#region ListToTable
 			//ListToTable----------------------------------------------------------------------------------------
-			strb.Append(rn+rn+t2+"///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>");
-			strb.Append(rn+t2+"public static DataTable ListToTable(List<"+typeClass.Name+"> list"+typeClass.Name+"s) {");
-			strb.Append(rn+t3+"DataTable table=new DataTable(\""+typeClass.Name+"s\");");
+			strb.Append(rn+rn+t2+"///<summary>Converts a list of "+typeClass.Name+" into a DataTable.</summary>");
+			strb.Append(rn+t2+"public static DataTable ListToTable(List<"+typeClass.Name+"> list"+typeClass.Name+"s,string tableName=\"\") {");
+			strb.Append(rn+t3+"if(string.IsNullOrEmpty(tableName)) {");
+			strb.Append(rn+t4+"tableName=\""+typeClass.Name+"\";");
+			strb.Append(rn+t3+"}");
+			strb.Append(rn+t3+"DataTable table=new DataTable(tableName);");
 			//Now add columns.
 			foreach(FieldInfo field in fieldsInDb) {
 				strb.Append(rn+t3+"table.Columns.Add(\""+field.Name+"\");");

@@ -63,9 +63,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<OIDInternal> listOIDInternals) {
-			DataTable table=new DataTable("OIDInternals");
+		///<summary>Converts a list of OIDInternal into a DataTable.</summary>
+		public static DataTable ListToTable(List<OIDInternal> listOIDInternals,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="OIDInternal";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("OIDInternalNum");
 			table.Columns.Add("IDType");
 			table.Columns.Add("IDRoot");

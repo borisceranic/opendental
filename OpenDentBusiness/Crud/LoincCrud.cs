@@ -70,9 +70,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<Loinc> listLoincs) {
-			DataTable table=new DataTable("Loincs");
+		///<summary>Converts a list of Loinc into a DataTable.</summary>
+		public static DataTable ListToTable(List<Loinc> listLoincs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Loinc";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("LoincNum");
 			table.Columns.Add("LoincCode");
 			table.Columns.Add("Component");

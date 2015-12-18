@@ -55,9 +55,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<ICD9> listICD9s) {
-			DataTable table=new DataTable("ICD9s");
+		///<summary>Converts a list of ICD9 into a DataTable.</summary>
+		public static DataTable ListToTable(List<ICD9> listICD9s,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="ICD9";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ICD9Num");
 			table.Columns.Add("ICD9Code");
 			table.Columns.Add("Description");

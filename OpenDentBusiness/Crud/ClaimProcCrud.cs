@@ -91,9 +91,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<ClaimProc> listClaimProcs) {
-			DataTable table=new DataTable("ClaimProcs");
+		///<summary>Converts a list of ClaimProc into a DataTable.</summary>
+		public static DataTable ListToTable(List<ClaimProc> listClaimProcs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="ClaimProc";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ClaimProcNum");
 			table.Columns.Add("ProcNum");
 			table.Columns.Add("ClaimNum");

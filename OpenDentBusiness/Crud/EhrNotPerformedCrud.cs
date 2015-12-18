@@ -60,9 +60,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<EhrNotPerformed> listEhrNotPerformeds) {
-			DataTable table=new DataTable("EhrNotPerformeds");
+		///<summary>Converts a list of EhrNotPerformed into a DataTable.</summary>
+		public static DataTable ListToTable(List<EhrNotPerformed> listEhrNotPerformeds,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="EhrNotPerformed";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("EhrNotPerformedNum");
 			table.Columns.Add("PatNum");
 			table.Columns.Add("ProvNum");

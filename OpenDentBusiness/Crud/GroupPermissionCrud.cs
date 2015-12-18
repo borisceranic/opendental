@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<GroupPermission> listGroupPermissions) {
-			DataTable table=new DataTable("GroupPermissions");
+		///<summary>Converts a list of GroupPermission into a DataTable.</summary>
+		public static DataTable ListToTable(List<GroupPermission> listGroupPermissions,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="GroupPermission";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("GroupPermNum");
 			table.Columns.Add("NewerDate");
 			table.Columns.Add("NewerDays");

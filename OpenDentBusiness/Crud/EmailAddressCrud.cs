@@ -61,9 +61,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<EmailAddress> listEmailAddresss) {
-			DataTable table=new DataTable("EmailAddresss");
+		///<summary>Converts a list of EmailAddress into a DataTable.</summary>
+		public static DataTable ListToTable(List<EmailAddress> listEmailAddresss,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="EmailAddress";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("EmailAddressNum");
 			table.Columns.Add("SMTPserver");
 			table.Columns.Add("EmailUsername");

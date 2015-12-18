@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<GradingScaleItem> listGradingScaleItems) {
-			DataTable table=new DataTable("GradingScaleItems");
+		///<summary>Converts a list of GradingScaleItem into a DataTable.</summary>
+		public static DataTable ListToTable(List<GradingScaleItem> listGradingScaleItems,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="GradingScaleItem";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("GradingScaleItemNum");
 			table.Columns.Add("GradingScaleNum");
 			table.Columns.Add("GradeShowing");

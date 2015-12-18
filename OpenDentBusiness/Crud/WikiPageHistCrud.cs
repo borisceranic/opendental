@@ -57,9 +57,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<WikiPageHist> listWikiPageHists) {
-			DataTable table=new DataTable("WikiPageHists");
+		///<summary>Converts a list of WikiPageHist into a DataTable.</summary>
+		public static DataTable ListToTable(List<WikiPageHist> listWikiPageHists,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="WikiPageHist";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("WikiPageNum");
 			table.Columns.Add("UserNum");
 			table.Columns.Add("PageTitle");

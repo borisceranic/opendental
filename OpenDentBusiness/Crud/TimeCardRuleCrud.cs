@@ -56,9 +56,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<TimeCardRule> listTimeCardRules) {
-			DataTable table=new DataTable("TimeCardRules");
+		///<summary>Converts a list of TimeCardRule into a DataTable.</summary>
+		public static DataTable ListToTable(List<TimeCardRule> listTimeCardRules,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="TimeCardRule";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("TimeCardRuleNum");
 			table.Columns.Add("EmployeeNum");
 			table.Columns.Add("OverHoursPerDay");

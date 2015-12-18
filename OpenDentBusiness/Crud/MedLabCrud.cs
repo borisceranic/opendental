@@ -103,9 +103,12 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of EServiceFeatures into a DataTable.</summary>
-		public static DataTable ListToTable(List<MedLab> listMedLabs) {
-			DataTable table=new DataTable("MedLabs");
+		///<summary>Converts a list of MedLab into a DataTable.</summary>
+		public static DataTable ListToTable(List<MedLab> listMedLabs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="MedLab";
+			}
+			DataTable table=new DataTable(tableName);
 			table.Columns.Add("MedLabNum");
 			table.Columns.Add("ProvNum");
 			table.Columns.Add("SendingApp");
