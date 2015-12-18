@@ -46,35 +46,39 @@ namespace OpenDentBusiness {
 		///<summary>0 -</summary>
 		Concept,
 		///<summary>1 -</summary>
-		NeedsExpertDefinition,
+		ConceptApproved,
 		///<summary>2 -</summary>
-		UnderConstruction,
+		CurrentlyWriting,
 		///<summary>3 -</summary>
-		NeedsApproval,
+		NeedsConceptApproval,
 		///<summary>4 -</summary>
-		ReadyToAssign,
+		JobApproved,
 		///<summary>5 -</summary>
 		Assigned,
 		///<summary>6 -</summary>
-		InProgress,
+		CurrentlyWorkingOn,
 		///<summary>7 -</summary>
-		OnHold,
+		OnHoldExpert,
 		///<summary>8 -</summary>
 		Rescinded,
 		///<summary>9 -</summary>
 		ReadyForReview,
 		///<summary>10 -</summary>
-		Done,
+		Complete,
 		///<summary>11 -</summary>
 		ReadyToBeDocumented,
 		///<summary>12 -</summary>
-		Documented,
-		///<summary>13 -</summary>
-		QuestionForManager,
+		NotifyCustomer,
 		///<summary>14 -</summary>
 		Deleted,
 		///<summary>15 -</summary>
-		QuestionForEngineers
+		NeedsClarification,
+		///<summary>16 -</summary>
+		NeedsJobApproval,
+		///<summary>17 -</summary>
+		OnHoldEngineer,	
+		///<summary>18 -</summary>
+		ReadyToAssign
 	}
 
 

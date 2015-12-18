@@ -20,6 +20,8 @@ namespace OpenDental {
 		private List<JobLink> _jobLinks;
 		private bool _isOverridden=false;
 		private bool _hasChanged=false;
+		private Userod _prevOwner;
+		private Job _jobOld;
 
 		///<summary>Creates a new job.</summary>
 		public FormJobEdit():this(0,0) {
@@ -57,35 +59,42 @@ namespace OpenDental {
 		}
 
 		private void FormJobEdit_Load(object sender,EventArgs e) {
+			_jobOld=_job.Copy();
 			#region Set Mode
 			switch(_job.Status) {
 				case JobStatus.Concept:
 					_editMode=EditMode.Concept;
 					break;
-				case JobStatus.NeedsApproval:
-					_editMode=EditMode.Approval;
+				case JobStatus.NeedsConceptApproval:
+					_editMode=EditMode.ConceptApproval;
 					break;
-				case JobStatus.NeedsExpertDefinition:
-				case JobStatus.UnderConstruction:
+				case JobStatus.ConceptApproved:
+				case JobStatus.CurrentlyWriting:
+					_editMode=EditMode.ExpertDefinition;
+					break;
+				case JobStatus.NeedsJobApproval:
+					_editMode=EditMode.JobApproval;
+					break;
+				case JobStatus.JobApproved:
+				case JobStatus.OnHoldExpert:
 				case JobStatus.ReadyToAssign:
-					_editMode=EditMode.Expert;
+					_editMode=EditMode.AssignToEngineer;
 					break;
 				case JobStatus.Assigned:
-				case JobStatus.InProgress:
+				case JobStatus.CurrentlyWorkingOn:
 				case JobStatus.ReadyForReview:
-				case JobStatus.OnHold:
+				case JobStatus.OnHoldEngineer:
 					_editMode=EditMode.Engineer;
 					break;
 				case JobStatus.ReadyToBeDocumented:
-				case JobStatus.QuestionForEngineers:
-				case JobStatus.QuestionForManager:
+				case JobStatus.NeedsClarification:
 					_editMode=EditMode.Documentation;
 					break;
-				case JobStatus.Documented:
+				case JobStatus.NotifyCustomer:
 					_editMode=EditMode.NotifyCustomer;
 					break;
 				case JobStatus.Rescinded:
-				case JobStatus.Done:
+				case JobStatus.Complete:
 				case JobStatus.Deleted:
 					_editMode=EditMode.Done;
 					break;
@@ -139,7 +148,10 @@ namespace OpenDental {
 				catch {
 					textEditorMain.MainText=_job.Description.ToString();
 				}
-				textPrevOwner.Text=JobEvents.GetPrevOwnerName(_job.JobNum);
+				_prevOwner=JobEvents.GetPrevOwner(_job.JobNum);
+				if(_prevOwner!=null) {
+					textPrevOwner.Text=_prevOwner.UserName;
+				}
 			}
 			this.Text="Job Edit: "+textProject.Text+" - "+textTitle.Text;
 			#endregion
@@ -151,7 +163,7 @@ namespace OpenDental {
 			if(_editMode==EditMode.Concept
 				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) 
 			{
-				butAction1.Text="Send for Approval";
+				butAction1.Text="Send For Approval";
 				butAction2.Visible=false;
 				butAction3.Visible=false;
 				butAction4.Visible=false;
@@ -159,12 +171,12 @@ namespace OpenDental {
 				textVersion.ReadOnly=true;
 				textActualHours.ReadOnly=true;
 			}
-			//Approval Edit Mode
-			else if(_editMode==EditMode.Approval
+			//ConceptApproval Edit Mode
+			else if(_editMode==EditMode.ConceptApproval
 				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
 			{
-				butAction1.Text="Send to Expert";
-				butAction2.Text="Send for Re-write";
+				butAction1.Text="Approve Concept";
+				butAction2.Text="Ask For Clarification";
 				butAction3.Visible=false;
 				butAction4.Visible=false;
 				butAddReview.Enabled=false;
@@ -172,15 +184,65 @@ namespace OpenDental {
 				comboCategory.Enabled=false;
 				textActualHours.ReadOnly=true;
 			}
-			//Expert Edit Mode
-			else if(_editMode==EditMode.Expert
+			//ExpertDefinition Edit Mode
+			else if(_editMode==EditMode.ExpertDefinition
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
 				&& _job.Expert==Security.CurUser.UserNum) 
 			{
-				butAction1.Text="Under Construction";
-				butAction2.Text="Ready to Assign";
-				butAction3.Text="Send to Engineer";
+				butAction1.Text="Send For Approval";
+				butAction2.Text="Currently Writing";
+				butAction3.Text="Send For Clarification";
 				butAction4.Visible=false;
+				butProjectPick.Enabled=false;
+				butAddReview.Enabled=false;
+				comboCategory.Enabled=false;
+				comboPriority.Enabled=false;
+				textVersion.ReadOnly=true;
+				textActualHours.ReadOnly=true;
+			}
+			//JobApproval Edit Mode
+			else if(_editMode==EditMode.JobApproval
+				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
+				butAction1.Text="Approve Job";
+				butAction2.Text="Assign To Engineer";
+				butAction3.Text="Ask For Clarification";
+				butAction4.Visible=false;
+				butAddReview.Enabled=false;
+				textVersion.ReadOnly=true;
+				comboCategory.Enabled=false;
+				textActualHours.ReadOnly=true;
+			}
+			//AssignToEngineer Edit Mode
+			else if(_editMode==EditMode.AssignToEngineer
+				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
+				&& _job.Expert==Security.CurUser.UserNum) 
+			{
+				butAction1.Text="Assign To Engineer";
+				butAction2.Text="Put On Hold";
+				butAction3.Text="Ready To Assign";
+				butAction4.Visible=false;
+				if(_job.Expert!=Security.CurUser.UserNum && _job.Status==JobStatus.ReadyToAssign) {
+					textEditorMain.ReadOnly=true;
+					butAction2.Enabled=false;
+				}
+				butProjectPick.Enabled=false;
+				butAddReview.Enabled=false;
+				comboCategory.Enabled=false;
+				comboPriority.Enabled=false;
+				textVersion.ReadOnly=true;
+				textActualHours.ReadOnly=true;
+			}
+			//AssignToEngineer Edit Mode (Other Engineer)
+			else if(_editMode==EditMode.AssignToEngineer
+				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
+				&& _job.Expert!=Security.CurUser.UserNum 
+				&& _job.Status==JobStatus.ReadyToAssign)
+			{
+				butAction1.Text="Assign To Engineer";
+				butAction2.Visible=false;
+				butAction3.Visible=false;
+				butAction4.Visible=false;
+				textEditorMain.ReadOnly=true;
 				butProjectPick.Enabled=false;
 				butAddReview.Enabled=false;
 				comboCategory.Enabled=false;
@@ -190,10 +252,10 @@ namespace OpenDental {
 			}
 			//Engineer Edit Mode
 			else if(_editMode==EditMode.Engineer && _job.Owner==Security.CurUser.UserNum) {
-				butAction1.Text="In Progress";
-				butAction2.Text="On Hold";
-				butAction3.Text="Ready For Review";
-				butAction4.Text="Send to Documentation";
+				butAction1.Text="Send To Tech Writer";
+				butAction2.Text="Currently Working On";
+				butAction3.Text="Put On Hold";
+				butAction4.Text="Ready For Review";
 				butProjectPick.Enabled=false;
 				comboCategory.Enabled=false;
 				comboPriority.Enabled=false;
@@ -212,9 +274,9 @@ namespace OpenDental {
 			}
 			//Documentation Edit Mode
 			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				butAction1.Text="Question For Engineers";
-				butAction2.Text="Question For Manager";
-				butAction3.Text="Documented";
+				butAction1.Text="Send To Customer Relat.";
+				butAction2.Text="Ask For Clarification";
+				butAction3.Visible=false;
 				butAction4.Visible=false;
 				butProjectPick.Enabled=false;
 				comboCategory.Enabled=false;
@@ -227,7 +289,7 @@ namespace OpenDental {
 				butAddReview.Enabled=false;
 			}
 			else if(_editMode==EditMode.Documentation && !JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				butAction1.Text="Send to Documentation";
+				butAction1.Text="Send to Tech Writer";
 				butAction2.Visible=false;
 				butAction3.Visible=false;
 				butAction4.Visible=false;
@@ -245,7 +307,7 @@ namespace OpenDental {
 			else if(_editMode==EditMode.NotifyCustomer
 				&& JobRoles.IsAuthorized(JobRoleType.NotifyCustomer,true)) 
 			{
-				butAction1.Text="Customer Notified";
+				butAction1.Text="Mark Complete";
 				butAction2.Visible=false;
 				butAction3.Visible=false;
 				butAction4.Visible=false;
@@ -351,84 +413,146 @@ namespace OpenDental {
 
 		private void butAction1_Click(object sender,EventArgs e) {
 			PrepareForAction();
-			List<Userod> listUsersForPicker=new List<Userod>();
+			List<Userod> listUsersForPicker = new List<Userod>();
 			#region Send For Approval
 			if(_editMode==EditMode.Concept) {
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
-				FormUserPick FormUP=new FormUserPick();
+				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select a Job Manager";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner=FormUP.SelectedUserNum;
+				long owner = FormUP.SelectedUserNum;
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
-				Jobs.SetStatus(_job,JobStatus.NeedsApproval,owner);
+				Jobs.SetStatus(_job,JobStatus.NeedsConceptApproval,owner);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
-			#region Send To Expert
-			else if(_editMode==EditMode.Approval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
-			{
+			#region Approve Concept
+			else if(_editMode==EditMode.ConceptApproval
+				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
-				FormUserPick FormUP=new FormUserPick();
+				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_prevOwner.UserNum;
+				FormUP.Text="Select an Expert";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner=FormUP.SelectedUserNum;
+				long owner = FormUP.SelectedUserNum;
 				_job.Expert=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NeedsExpertDefinition,owner);
+				Jobs.SetStatus(_job,JobStatus.ConceptApproved,owner);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
-			#region Under Construction
-			else if(_editMode==EditMode.Expert
+			#region Send For Approval (Expert)
+			else if(_editMode==EditMode.ExpertDefinition
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
+				&& _job.Expert==Security.CurUser.UserNum) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+				FormUserPick FormUP = new FormUserPick();
+				FormUP.IsSelectionmode=true;
+				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select a Job Manager";
+				if(FormUP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				long owner = FormUP.SelectedUserNum;
+				_job.HoursEstimate=PIn.Int(textEstHours.Text);
+				Jobs.SetStatus(_job,JobStatus.NeedsJobApproval,owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Approve Job
+			else if(_editMode==EditMode.JobApproval
+				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+				FormUserPick FormUP = new FormUserPick();
+				FormUP.IsSelectionmode=true;
+				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.Text="Select an Expert";
+				if(FormUP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				long owner = FormUP.SelectedUserNum;
+				_job.Expert=FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStatus.JobApproved,owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Assign To Engineer
+			else if(_editMode==EditMode.AssignToEngineer
+				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true))
 			{
-				Jobs.SetStatus(_job,JobStatus.UnderConstruction,_job.Owner);
-				_hasChanged=true;
-				Close();
-				return;
-			}
-			#endregion
-			#region In Progress
-			else if(_editMode==EditMode.Engineer) {
-				Jobs.SetStatus(_job,JobStatus.InProgress,_job.Owner);
-				_hasChanged=true;
-				Close();
-				return;
-			}
-			#endregion
-			#region Questions For Engineers
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Engineer,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select an Engineer";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.QuestionForEngineers,owner);
+				long owner = FormUP.SelectedUserNum;
+				_job.HoursEstimate=PIn.Int(textEstHours.Text);
+				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
-			#region Send To Documentation
+			#region Send To Tech Writer
+			else if(_editMode==EditMode.Engineer) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Documentation,false);
+				FormUserPick FormUP=new FormUserPick();
+				FormUP.IsSelectionmode=true;
+				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select a Tech Writer";
+				if(FormUP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				long owner = FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
+				_hasChanged=true;
+				Close();
+			}
+			#endregion
+			#region Send To Customer Relat.
+			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.NotifyCustomer,false);
+				FormUserPick FormUP=new FormUserPick();
+				FormUP.IsSelectionmode=true;
+				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select a Customer Relations Coordinator";
+				if(FormUP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				long owner=FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStatus.NotifyCustomer,owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Send To Tech Writer
 			else if(_editMode==EditMode.Documentation && !JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Documentation,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_prevOwner.UserNum;
+				FormUP.Text="Select a Tech Writer";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
@@ -439,11 +563,11 @@ namespace OpenDental {
 				return;
 			}
 			#endregion
-			#region Customer Notified
+			#region Mark Complete
 			if(_editMode==EditMode.NotifyCustomer
 				&& JobRoles.IsAuthorized(JobRoleType.NotifyCustomer,true)) 
 			{
-				Jobs.SetStatus(_job,JobStatus.Done,_job.Owner);
+				Jobs.SetStatus(_job,JobStatus.Complete,_job.Owner);
 				_hasChanged=true;
 				Close();
 			}
@@ -459,14 +583,18 @@ namespace OpenDental {
 		private void butAction2_Click(object sender,EventArgs e) {
 			PrepareForAction();
 			List<Userod> listUsersForPicker=new List<Userod>();
-			#region Send for Re-write
-			if(_editMode==EditMode.Approval
+			#region Ask For Clarification
+			if(_editMode==EditMode.ConceptApproval
 				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
 			{
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				if(_prevOwner!=null) {
+					FormUP.SelectedUserNum=_prevOwner.UserNum;
+				}
+				FormUP.Text="Select a Concept Writer";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
@@ -477,36 +605,65 @@ namespace OpenDental {
 				return;
 			}
 			#endregion
-			#region Ready To Assign
-			if(_editMode==EditMode.Expert
+			#region Currently Writing
+			if(_editMode==EditMode.ExpertDefinition
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
 				&& _job.Expert==Security.CurUser.UserNum) 
 			{
-				Jobs.SetStatus(_job,JobStatus.ReadyToAssign,_job.Owner);
+				Jobs.SetStatus(_job,JobStatus.CurrentlyWriting,_job.Owner);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
-			#region Ready For Review
-			else if(_editMode==EditMode.Engineer) {
-				Jobs.SetStatus(_job,JobStatus.OnHold,_job.Owner);
-				_hasChanged=true;
-				Close();
-				return;
-			}
-			#endregion
-			#region Question For Manager
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+			#region Assign to Engineer
+			if(_editMode==EditMode.JobApproval
+				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Engineer,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.Text="Select an Engineer";
+				if(FormUP.ShowDialog()!=DialogResult.OK) {
+					return;
+				}
+				Jobs.SetStatus(_job,JobStatus.JobApproved,_job.Owner);
+				long owner=FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Put On Hold
+			if(_editMode==EditMode.AssignToEngineer
+				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
+				&& _job.Expert==Security.CurUser.UserNum) {
+				Jobs.SetStatus(_job,JobStatus.OnHoldExpert,_job.Owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Currently Working On
+			else if(_editMode==EditMode.Engineer) {
+				Jobs.SetStatus(_job,JobStatus.CurrentlyWorkingOn,_job.Owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Ask For Clarification
+			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
+				FormUserPick FormUP=new FormUserPick();
+				FormUP.IsSelectionmode=true;
+				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.Text="Select a User";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.QuestionForManager,owner);
+				Jobs.SetStatus(_job,JobStatus.NeedsClarification,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -517,42 +674,57 @@ namespace OpenDental {
 		private void butAction3_Click(object sender,EventArgs e) {
 			PrepareForAction();
 			List<Userod> listUsersForPicker=new List<Userod>();
-			#region Send To Engineer
-			if(_editMode==EditMode.Expert
+			#region Send For Clarification
+			if(_editMode==EditMode.ExpertDefinition
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) {
-					listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Engineer,false);
-				FormUserPick FormUP=new FormUserPick();
+				&& _job.Expert==Security.CurUser.UserNum) 
+			{
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
+				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_prevOwner.UserNum;
+				FormUP.Text="Select a User";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
-				_hasChanged=true;
-				Close();
-				return;
-			}
-			#endregion
-			#region Ready For Review
-			else if(_editMode==EditMode.Engineer) {
-				Jobs.SetStatus(_job,JobStatus.ReadyForReview,_job.Owner);
+				long owner = FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStatus.NeedsConceptApproval,owner);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
-			#region Documented
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.NotifyCustomer,false);
+			#region Ask For Clarification
+			else if(_editMode==EditMode.JobApproval
+				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
+			{
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.Text="Select an Expert";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.Documented,owner);
+				Jobs.SetStatus(_job,JobStatus.ConceptApproved,owner);
+				_hasChanged=true;
+				Close();
+			}
+			#endregion
+			#region Ready To Assign
+			else if(_editMode==EditMode.AssignToEngineer
+				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)) 
+			{
+				Jobs.SetStatus(_job,JobStatus.ReadyToAssign,_job.Owner);
+				_hasChanged=true;
+				Close();
+			}
+			#endregion
+			#region Put On Hold
+			else if(_editMode==EditMode.Engineer&&_job.Owner==Security.CurUser.UserNum) {
+				Jobs.SetStatus(_job,JobStatus.OnHoldEngineer,_job.Owner);
 				_hasChanged=true;
 				Close();
 			}
@@ -562,19 +734,26 @@ namespace OpenDental {
 		private void butAction4_Click(object sender,EventArgs e) {
 			PrepareForAction();
 			List<Userod> listUsersForPicker=new List<Userod>();
-			#region Send To Documentation
-			if(_editMode==EditMode.Engineer) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Documentation,false);
+			#region Ready For Review
+			if(_editMode==EditMode.Engineer && _job.Owner==Security.CurUser.UserNum) {
+				listUsersForPicker = Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
+				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.Text="Select an Expert";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
-				_hasChanged=true;
-				Close();
+				FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,FormUP.SelectedUserNum);
+				if(FormJRE.ShowDialog()==DialogResult.OK) {
+					FormJRE.JobReviewCur.IsNew=false;
+					_jobReviews.Add(FormJRE.JobReviewCur);
+					FillGridReviews();
+					Jobs.SetStatus(_job,JobStatus.ReadyForReview,_job.Owner);
+					_hasChanged=true;
+					Close();
+				}
 				return;
 			}
 			#endregion
@@ -612,8 +791,8 @@ namespace OpenDental {
 			comboPriority.Enabled=true;
 			comboCategory.Enabled=true;
 			butProjectPick.Enabled=true;
-			butExpertPick.Visible=true;
-			butOwnerPick.Visible=true;
+			butExpertPick.Enabled=true;
+			butOwnerPick.Enabled=true;
 			textTitle.ReadOnly=false;
 			textActualHours.ReadOnly=false;
 			textEstHours.ReadOnly=false;
@@ -677,8 +856,8 @@ namespace OpenDental {
 		}
 
 		private void textEditorMain_SaveClick(object sender,EventArgs e) {
-			_job.Description=textEditorMain.MainRtf;
-			Jobs.Update(_job); //This will save all changes made to _job, but not yet committed to the DB.
+			_jobOld.Description=textEditorMain.MainRtf;
+			Jobs.Update(_jobOld); //This will save all changes made to _job, but not yet committed to the DB.
 		}
 
 		#region Links Grid
@@ -943,6 +1122,8 @@ namespace OpenDental {
 			FormUserPick FormUP=new FormUserPick();
 			FormUP.IsSelectionmode=true;
 			FormUP.ListUser=listUsersForPicker;
+			FormUP.SelectedUserNum=_job.Expert;
+			FormUP.Text="Select an Expert";
 			if(FormUP.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
@@ -1046,19 +1227,23 @@ namespace OpenDental {
 		private enum EditMode {
 			///<summary>0 - An idea for a job with a rough or refined definition that needs approval.</summary>
 			Concept,
-			///<summary>1 - All jobs that need the attention of a user that has job approval access.</summary>
-			Approval,
+			///<summary>1 - All jobs that need the attention of a user that has job approval access for the intial concept review.</summary>
+			ConceptApproval,
 			///<summary>2 - Pending jobs for experts.  They can be anything from still writing up to ready to assign.</summary>
-			Expert,
-			///<summary>3 - Jobs that are in queue or are being actively worked on by an engineer.</summary>
+			ExpertDefinition,
+			///<summary>3 - All jobs that need the attention of a user that has job approval access for the final review of the writeup.</summary>
+			JobApproval,
+			///<summary>4 - Pending jobs for experts to assign out.</summary>
+			AssignToEngineer,
+			///<summary>5 - Jobs that are in queue or are being actively worked on by an engineer.</summary>
 			Engineer,
-			///<summary>4 - In the process of being documented or in limbo with additional information needed for documenting purposes.</summary>
+			///<summary>6 - In the process of being documented or in limbo with additional information needed for documenting purposes.</summary>
 			Documentation,
-			///<summary>5 - Final step is to notify the customer of the changes made.</summary>
+			///<summary>7 - Final step is to notify the customer of the changes made.</summary>
 			NotifyCustomer,
-			///<summary>6 - Jobs that have been finished, documented, and all customers notified.  Can also mean "deleted".</summary>
+			///<summary>8 - Jobs that have been finished, documented, and all customers notified.  Can also mean "deleted".</summary>
 			Done,
-			///<summary>7 - Typically a user without the correct permission simply viewing an old job.</summary>
+			///<summary>9 - Typically a user without the correct permission simply viewing an old job.</summary>
 			ReadOnly
 		}
 	}

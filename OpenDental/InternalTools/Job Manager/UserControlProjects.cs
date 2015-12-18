@@ -146,7 +146,7 @@ namespace OpenDental {
 				gridMain.Rows.Add(row);
 			}
 			for(int i=0;i<_listJobs.Count;i++) {
-				if(_listJobs[i].Status==JobStatus.Done && !checkShowFinished.Checked) {
+				if(_listJobs[i].Status==JobStatus.Complete && !checkShowFinished.Checked) {
 					continue;
 				}
 				row=new ODGridRow();
@@ -294,7 +294,7 @@ namespace OpenDental {
 					return;
 				}
 				Job jobCur=_listJobs[_clickedIdx-_listJobProjects.Count];
-				jobCur.Status=JobStatus.Done;
+				jobCur.Status=JobStatus.Complete;
 				try {
 					Jobs.Update(jobCur);
 					DataValid.SetInvalid(InvalidType.Jobs);

@@ -29,9 +29,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Returns blank if no previous owner</summary>
-		public static string GetPrevOwnerName(long jobNum) {
+		public static Userod GetPrevOwner(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),jobNum);
+				return Meth.GetObject<Userod>(MethodBase.GetCurrentMethod(),jobNum);
 			}
 			long ownerCur=Jobs.GetOne(jobNum).Owner;
 			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum)
@@ -44,7 +44,7 @@ namespace OpenDentBusiness{
 					break;
 				}
 			}
-			return Userods.GetName(ownerPrev);
+			return Userods.GetUser(ownerPrev);
 		}
 
 		///<summary>Gets one JobEvent from the db.</summary>

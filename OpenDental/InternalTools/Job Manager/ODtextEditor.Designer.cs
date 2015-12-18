@@ -40,15 +40,24 @@
 			this.butCopy = new System.Windows.Forms.Button();
 			this.butCut = new System.Windows.Forms.Button();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.labelWarning = new System.Windows.Forms.Label();
 			this.butSave = new System.Windows.Forms.Button();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.panel3 = new System.Windows.Forms.Panel();
+			this.panel4 = new System.Windows.Forms.Panel();
+			this.panel5 = new System.Windows.Forms.Panel();
+			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.textDescription = new OpenDental.ODtextBox();
+			this.panel1.SuspendLayout();
+			this.panel3.SuspendLayout();
+			this.panel4.SuspendLayout();
+			this.panel5.SuspendLayout();
+			this.flowLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// comboFontSize
 			// 
 			this.comboFontSize.FormattingEnabled = true;
-			this.comboFontSize.Location = new System.Drawing.Point(515, 4);
+			this.comboFontSize.Location = new System.Drawing.Point(137, 0);
 			this.comboFontSize.Name = "comboFontSize";
 			this.comboFontSize.Size = new System.Drawing.Size(39, 21);
 			this.comboFontSize.TabIndex = 186;
@@ -59,7 +68,7 @@
 			this.butHighlightSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butHighlightSelect.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butHighlightSelect.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.butHighlightSelect.Location = new System.Drawing.Point(656, 2);
+			this.butHighlightSelect.Location = new System.Drawing.Point(105, 0);
 			this.butHighlightSelect.Name = "butHighlightSelect";
 			this.butHighlightSelect.Size = new System.Drawing.Size(10, 24);
 			this.butHighlightSelect.TabIndex = 184;
@@ -71,9 +80,9 @@
 			// comboFontType
 			// 
 			this.comboFontType.FormattingEnabled = true;
-			this.comboFontType.Location = new System.Drawing.Point(401, 4);
+			this.comboFontType.Location = new System.Drawing.Point(0, 0);
 			this.comboFontType.Name = "comboFontType";
-			this.comboFontType.Size = new System.Drawing.Size(113, 21);
+			this.comboFontType.Size = new System.Drawing.Size(133, 21);
 			this.comboFontType.TabIndex = 183;
 			this.comboFontType.SelectionChangeCommitted += new System.EventHandler(this.comboFontType_SelectionChangeCommitted);
 			// 
@@ -82,7 +91,7 @@
 			this.butColorSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butColorSelect.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butColorSelect.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.butColorSelect.Location = new System.Drawing.Point(581, 2);
+			this.butColorSelect.Location = new System.Drawing.Point(26, 0);
 			this.butColorSelect.Name = "butColorSelect";
 			this.butColorSelect.Size = new System.Drawing.Size(10, 24);
 			this.butColorSelect.TabIndex = 182;
@@ -94,7 +103,7 @@
 			// butHighlight
 			// 
 			this.butHighlight.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butHighlight.Location = new System.Drawing.Point(599, 2);
+			this.butHighlight.Location = new System.Drawing.Point(48, 0);
 			this.butHighlight.Name = "butHighlight";
 			this.butHighlight.Size = new System.Drawing.Size(57, 24);
 			this.butHighlight.TabIndex = 181;
@@ -106,7 +115,7 @@
 			// butBullet
 			// 
 			this.butBullet.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butBullet.Location = new System.Drawing.Point(345, 2);
+			this.butBullet.Location = new System.Drawing.Point(99, 0);
 			this.butBullet.Name = "butBullet";
 			this.butBullet.Size = new System.Drawing.Size(55, 24);
 			this.butBullet.TabIndex = 179;
@@ -119,7 +128,7 @@
 			// 
 			this.butStrikeout.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butStrikeout.Font = new System.Drawing.Font("Times New Roman", 8.25F, System.Drawing.FontStyle.Strikeout, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butStrikeout.Location = new System.Drawing.Point(315, 2);
+			this.butStrikeout.Location = new System.Drawing.Point(69, 0);
 			this.butStrikeout.Name = "butStrikeout";
 			this.butStrikeout.Size = new System.Drawing.Size(30, 24);
 			this.butStrikeout.TabIndex = 185;
@@ -131,7 +140,7 @@
 			// butRedo
 			// 
 			this.butRedo.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butRedo.Location = new System.Drawing.Point(205, 2);
+			this.butRedo.Location = new System.Drawing.Point(204, 0);
 			this.butRedo.Name = "butRedo";
 			this.butRedo.Size = new System.Drawing.Size(41, 24);
 			this.butRedo.TabIndex = 177;
@@ -144,7 +153,7 @@
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butColor.Font = new System.Drawing.Font("Modern No. 20", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butColor.Location = new System.Drawing.Point(555, 2);
+			this.butColor.Location = new System.Drawing.Point(0, 0);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(26, 24);
 			this.butColor.TabIndex = 170;
@@ -157,7 +166,7 @@
 			// 
 			this.butUnderline.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butUnderline.Font = new System.Drawing.Font("Times New Roman", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butUnderline.Location = new System.Drawing.Point(292, 2);
+			this.butUnderline.Location = new System.Drawing.Point(46, 0);
 			this.butUnderline.Name = "butUnderline";
 			this.butUnderline.Size = new System.Drawing.Size(23, 24);
 			this.butUnderline.TabIndex = 180;
@@ -170,7 +179,7 @@
 			// 
 			this.butItalics.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butItalics.Font = new System.Drawing.Font("Times New Roman", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butItalics.Location = new System.Drawing.Point(269, 2);
+			this.butItalics.Location = new System.Drawing.Point(23, 0);
 			this.butItalics.Name = "butItalics";
 			this.butItalics.Size = new System.Drawing.Size(23, 24);
 			this.butItalics.TabIndex = 176;
@@ -184,7 +193,7 @@
 			this.butPaste.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butPaste.Image = global::OpenDental.Properties.Resources.butPaste;
 			this.butPaste.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPaste.Location = new System.Drawing.Point(102, 2);
+			this.butPaste.Location = new System.Drawing.Point(101, 0);
 			this.butPaste.Name = "butPaste";
 			this.butPaste.Size = new System.Drawing.Size(62, 24);
 			this.butPaste.TabIndex = 175;
@@ -198,7 +207,7 @@
 			// 
 			this.butBold.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butBold.Font = new System.Drawing.Font("Times New Roman", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butBold.Location = new System.Drawing.Point(246, 2);
+			this.butBold.Location = new System.Drawing.Point(0, 0);
 			this.butBold.Name = "butBold";
 			this.butBold.Size = new System.Drawing.Size(23, 24);
 			this.butBold.TabIndex = 173;
@@ -210,7 +219,7 @@
 			// butUndo
 			// 
 			this.butUndo.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butUndo.Location = new System.Drawing.Point(164, 2);
+			this.butUndo.Location = new System.Drawing.Point(163, 0);
 			this.butUndo.Name = "butUndo";
 			this.butUndo.Size = new System.Drawing.Size(41, 24);
 			this.butUndo.TabIndex = 172;
@@ -224,7 +233,7 @@
 			this.butCopy.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butCopy.Image = global::OpenDental.Properties.Resources.butCopy;
 			this.butCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCopy.Location = new System.Drawing.Point(42, 2);
+			this.butCopy.Location = new System.Drawing.Point(41, 0);
 			this.butCopy.Name = "butCopy";
 			this.butCopy.Size = new System.Drawing.Size(60, 24);
 			this.butCopy.TabIndex = 174;
@@ -237,7 +246,7 @@
 			// butCut
 			// 
 			this.butCut.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butCut.Location = new System.Drawing.Point(1, 2);
+			this.butCut.Location = new System.Drawing.Point(0, 0);
 			this.butCut.Name = "butCut";
 			this.butCut.Size = new System.Drawing.Size(41, 24);
 			this.butCut.TabIndex = 171;
@@ -246,20 +255,10 @@
 			this.butCut.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butCut.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
-			// labelWarning
-			// 
-			this.labelWarning.AutoSize = true;
-			this.labelWarning.Location = new System.Drawing.Point(672, 7);
-			this.labelWarning.Name = "labelWarning";
-			this.labelWarning.Size = new System.Drawing.Size(47, 13);
-			this.labelWarning.TabIndex = 187;
-			this.labelWarning.Text = "Warning";
-			// 
 			// butSave
 			// 
-			this.butSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butSave.Location = new System.Drawing.Point(800, 2);
+			this.butSave.Location = new System.Drawing.Point(245, 0);
 			this.butSave.Name = "butSave";
 			this.butSave.Size = new System.Drawing.Size(55, 24);
 			this.butSave.TabIndex = 188;
@@ -268,20 +267,83 @@
 			this.butSave.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butSave.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.butHighlight);
+			this.panel1.Controls.Add(this.butHighlightSelect);
+			this.panel1.Controls.Add(this.butColor);
+			this.panel1.Controls.Add(this.butColorSelect);
+			this.panel1.Location = new System.Drawing.Point(640, 0);
+			this.panel1.Margin = new System.Windows.Forms.Padding(0);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(118, 24);
+			this.panel1.TabIndex = 189;
+			// 
+			// panel3
+			// 
+			this.panel3.Controls.Add(this.comboFontType);
+			this.panel3.Controls.Add(this.comboFontSize);
+			this.panel3.Location = new System.Drawing.Point(459, 0);
+			this.panel3.Margin = new System.Windows.Forms.Padding(0);
+			this.panel3.Name = "panel3";
+			this.panel3.Size = new System.Drawing.Size(181, 22);
+			this.panel3.TabIndex = 191;
+			// 
+			// panel4
+			// 
+			this.panel4.AutoSize = true;
+			this.panel4.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panel4.Controls.Add(this.butUndo);
+			this.panel4.Controls.Add(this.butSave);
+			this.panel4.Controls.Add(this.butCopy);
+			this.panel4.Controls.Add(this.butCut);
+			this.panel4.Controls.Add(this.butPaste);
+			this.panel4.Controls.Add(this.butRedo);
+			this.panel4.Location = new System.Drawing.Point(0, 0);
+			this.panel4.Margin = new System.Windows.Forms.Padding(0);
+			this.panel4.Name = "panel4";
+			this.panel4.Size = new System.Drawing.Size(303, 27);
+			this.panel4.TabIndex = 192;
+			// 
+			// panel5
+			// 
+			this.panel5.Controls.Add(this.butBold);
+			this.panel5.Controls.Add(this.butItalics);
+			this.panel5.Controls.Add(this.butUnderline);
+			this.panel5.Controls.Add(this.butStrikeout);
+			this.panel5.Controls.Add(this.butBullet);
+			this.panel5.Location = new System.Drawing.Point(303, 0);
+			this.panel5.Margin = new System.Windows.Forms.Padding(0);
+			this.panel5.Name = "panel5";
+			this.panel5.Size = new System.Drawing.Size(156, 25);
+			this.panel5.TabIndex = 193;
+			// 
+			// flowLayoutPanel1
+			// 
+			this.flowLayoutPanel1.AutoSize = true;
+			this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.flowLayoutPanel1.Controls.Add(this.panel4);
+			this.flowLayoutPanel1.Controls.Add(this.panel5);
+			this.flowLayoutPanel1.Controls.Add(this.panel3);
+			this.flowLayoutPanel1.Controls.Add(this.panel1);
+			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(855, 27);
+			this.flowLayoutPanel1.TabIndex = 195;
+			// 
 			// textDescription
 			// 
 			this.textDescription.AcceptsTab = true;
-			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.textDescription.BackColor = System.Drawing.SystemColors.Window;
 			this.textDescription.DetectUrls = false;
+			this.textDescription.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textDescription.HideSelection = false;
-			this.textDescription.Location = new System.Drawing.Point(0, 25);
+			this.textDescription.Location = new System.Drawing.Point(0, 27);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textDescription.Size = new System.Drawing.Size(855, 498);
+			this.textDescription.Size = new System.Drawing.Size(855, 496);
 			this.textDescription.TabIndex = 169;
 			this.textDescription.Text = "";
 			// 
@@ -289,29 +351,17 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.butSave);
-			this.Controls.Add(this.labelWarning);
-			this.Controls.Add(this.comboFontSize);
-			this.Controls.Add(this.butHighlightSelect);
-			this.Controls.Add(this.comboFontType);
-			this.Controls.Add(this.butColorSelect);
-			this.Controls.Add(this.butHighlight);
-			this.Controls.Add(this.butBullet);
-			this.Controls.Add(this.butStrikeout);
-			this.Controls.Add(this.butRedo);
-			this.Controls.Add(this.butColor);
-			this.Controls.Add(this.butUnderline);
-			this.Controls.Add(this.butItalics);
-			this.Controls.Add(this.butPaste);
-			this.Controls.Add(this.butBold);
-			this.Controls.Add(this.butUndo);
 			this.Controls.Add(this.textDescription);
-			this.Controls.Add(this.butCopy);
-			this.Controls.Add(this.butCut);
-			this.MinimumSize = new System.Drawing.Size(450, 290);
+			this.Controls.Add(this.flowLayoutPanel1);
 			this.Name = "OdtextEditor";
 			this.Size = new System.Drawing.Size(855, 523);
 			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.OdtextEditor_Layout);
+			this.panel1.ResumeLayout(false);
+			this.panel3.ResumeLayout(false);
+			this.panel4.ResumeLayout(false);
+			this.panel5.ResumeLayout(false);
+			this.flowLayoutPanel1.ResumeLayout(false);
+			this.flowLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -337,9 +387,11 @@
 		private System.Windows.Forms.Button butCopy;
 		private System.Windows.Forms.Button butCut;
 		private System.Windows.Forms.ColorDialog colorDialog1;
-		private System.Windows.Forms.Label labelWarning;
 		private System.Windows.Forms.Button butSave;
-
-
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Panel panel3;
+		private System.Windows.Forms.Panel panel4;
+		private System.Windows.Forms.Panel panel5;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 	}
 }
