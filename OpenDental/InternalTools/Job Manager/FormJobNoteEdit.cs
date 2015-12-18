@@ -69,6 +69,7 @@ namespace OpenDental {
 			}
 			_jobNote.Note=textNote.Text;
 			if(_jobNote.IsNew) {
+				_jobNote.IsNew=false;
 				JobNotes.Insert(_jobNote);
 			}
 			else {

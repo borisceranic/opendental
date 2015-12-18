@@ -25,6 +25,9 @@ namespace OpenDental {
 			}
 			for(int i=0;i<ListUser.Count;i++) {
 				listUser.Items.Add(ListUser[i]);
+				if(SelectedUserNum!=0 && ListUser[i].UserNum==SelectedUserNum) {
+					listUser.SelectedIndex=i;
+				}
 			}
 		}
 

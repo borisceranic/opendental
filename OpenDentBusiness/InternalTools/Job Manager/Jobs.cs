@@ -23,7 +23,7 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT * FROM job WHERE ProjectNum = "+POut.Long(projectNum);
 			if(!showFinished) {
-				command+=" AND Status != " + (int)JobStatus.Done;
+				command+=" AND Status != " + (int)JobStatus.Complete;
 			}
 			return Crud.JobCrud.SelectMany(command);
 		}
@@ -112,12 +112,12 @@ namespace OpenDentBusiness {
 				command+=" AND Category="+category;
 			}
 			if(!showHidden) {
-				command+=" AND Status NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Done+","+(int)JobStatus.Rescinded+")";
+				command+=" AND Status NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Complete+","+(int)JobStatus.Rescinded+")";
 			}
 			return Crud.JobCrud.SelectMany(command);
 		}
 
-		///<summary>Sets a job's status and creates a JobEvent.  Does not set a new owner of the job.</summary>
+		///<summary>Sets a job's status and creates a JobEvent.</summary>
 		public static void SetStatus(Job job,JobStatus jobStatus,long jobOwner) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),job,jobStatus);
@@ -127,7 +127,7 @@ namespace OpenDentBusiness {
 				jobEventCur.Description=job.Description;
 				jobEventCur.JobNum=job.JobNum;
 				jobEventCur.Status=job.Status;
-				jobEventCur.Owner=job.Owner;
+				jobEventCur.Owner=Security.CurUser.UserNum;
 				JobEvents.Insert(jobEventCur);
 			}
 			job.Status=jobStatus;
@@ -184,8 +184,8 @@ namespace OpenDentBusiness {
 				command+=" OR mainevent.Owner="+POut.Long(Security.CurUser.UserNum);
 			}
 			command+=") ";
-			if(showCompleted) {
-				command+="AND job.Status NOT IN("+POut.Int((int)JobStatus.Done)+","+POut.Int((int)JobStatus.Deleted)+") ";
+			if(!showCompleted) {
+				command+="AND job.Status NOT IN("+POut.Int((int)JobStatus.Complete)+","+POut.Int((int)JobStatus.Deleted)+") ";
 			}
 			command+="GROUP BY job.JobNum "
 				+"ORDER BY job.Priority,job.DateTimeEntry";
@@ -240,10 +240,10 @@ namespace OpenDentBusiness {
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
 				+"WHERE Owner="+POut.Long(ownerNum)+" AND Status IN("
 				+POut.Long((int)JobStatus.Assigned)
-				+","+POut.Long((int)JobStatus.InProgress)
+				+","+POut.Long((int)JobStatus.CurrentlyWorkingOn)
 				+","+POut.Long((int)JobStatus.ReadyForReview)
-				+","+POut.Long((int)JobStatus.ReadyToAssign)
-				+","+POut.Long((int)JobStatus.OnHold)+")";
+				+","+POut.Long((int)JobStatus.JobApproved)
+				+","+POut.Long((int)JobStatus.OnHoldExpert)+")";
 			return Db.GetTable(command);
 		}
 
@@ -254,10 +254,10 @@ namespace OpenDentBusiness {
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
 				+"WHERE Expert="+POut.Long(expertNum)+" AND Status IN("
 				+POut.Long((int)JobStatus.Assigned)
-				+","+POut.Long((int)JobStatus.InProgress)
+				+","+POut.Long((int)JobStatus.CurrentlyWorkingOn)
 				+","+POut.Long((int)JobStatus.ReadyForReview)
-				+","+POut.Long((int)JobStatus.ReadyToAssign)
-				+","+POut.Long((int)JobStatus.OnHold)+")";
+				+","+POut.Long((int)JobStatus.JobApproved)
+				+","+POut.Long((int)JobStatus.OnHoldExpert)+")";
 			return Db.GetTable(command);
 		}
 

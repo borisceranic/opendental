@@ -47,17 +47,6 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Gets or sets the warning label text.</summary>
-		public string WarningText {
-			get {
-				return labelWarning.Text;
-			}
-			set {
-				labelWarning.Text=value;
-				Invalidate();
-			}
-		}
-
 		///<summary>Gets or sets the main textbox text.</summary>
 		public string MainText {
 			get {
@@ -90,7 +79,6 @@ namespace OpenDental {
 		///<summary></summary>
 		protected override void OnLoad(EventArgs e) {
 			base.OnLoad(e);
-			labelWarning.Text="";
 			InstalledFontCollection installedFonts=new InstalledFontCollection();
 			foreach(FontFamily font in installedFonts.Families) {
 				comboFontType.Items.Add(font.Name);
@@ -190,7 +178,6 @@ namespace OpenDental {
 		private void butBold_Click(object sender,EventArgs e) {
 			try {
 				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Bold);
-				labelWarning.Text="";
 			}
 			catch {
 				//labelWarning.Text="Cannot format multiple Fonts";
@@ -200,7 +187,6 @@ namespace OpenDental {
 		private void butItalics_Click(object sender,EventArgs e) {
 			try {
 				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Italic);
-				labelWarning.Text="";
 			}
 			catch {
 				//labelWarning.Text="Cannot format multiple Fonts";
@@ -210,7 +196,6 @@ namespace OpenDental {
 		private void butUnderline_Click(object sender,EventArgs e) {
 			try {
 				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Underline);
-				labelWarning.Text="";
 			}
 			catch {
 				//labelWarning.Text="Cannot format multiple Fonts";
@@ -220,7 +205,6 @@ namespace OpenDental {
 		private void butStrikeout_Click(object sender,EventArgs e) {
 			try {
 				textDescription.SelectionFont=new Font(textDescription.SelectionFont,textDescription.SelectionFont.Style ^ FontStyle.Strikeout);
-				labelWarning.Text="";
 			}
 			catch {
 				//labelWarning.Text="Cannot format multiple Fonts";
