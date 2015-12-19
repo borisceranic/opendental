@@ -28,16 +28,18 @@ namespace OpenDentBusiness{
 			return Crud.WikiListHistCrud.Insert(wikiListHist);
 		}
 
-		///<summary>Does not save to DB. Return null if listName does not exist.</summary>
-		public static WikiListHist GenerateFromName(string listName) {
+		///<summary>Does not save to DB. Return null if listName does not exist.
+		///Pass in the userod.UserNum of the user that is making the change.  Typically Security.CurUser.UserNum.
+		///Security.CurUser cannot be used within this method due to the server side of middle tier.</summary>
+		public static WikiListHist GenerateFromName(string listName,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<WikiListHist>(MethodBase.GetCurrentMethod(),listName);
+				return Meth.GetObject<WikiListHist>(MethodBase.GetCurrentMethod(),listName,userNum);
 			}
 			if(!WikiLists.CheckExists(listName)) {
 				return null;
 			}
 			WikiListHist retVal=new WikiListHist();
-			retVal.UserNum=Security.CurUser.UserNum;
+			retVal.UserNum=userNum;
 			retVal.ListName=listName;
 			retVal.DateTimeSaved=DateTime.Now;
 			DataTable table=WikiLists.GetByName(listName);
@@ -62,10 +64,11 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>Drops table in DB.  Recreates Table, then fills with Data.</summary>
-		public static void RevertFrom(WikiListHist wikiListHist) {
+		///<summary>Drops table in DB.  Recreates Table, then fills with Data.
+		///Pass in the userod.UserNum of the user that is making the change.  Typically Security.CurUser.UserNum.</summary>
+		public static void RevertFrom(WikiListHist wikiListHist,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiListHist);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiListHist,userNum);
 				return;
 			}
 			if(!WikiLists.CheckExists(wikiListHist.ListName)) {
@@ -77,7 +80,7 @@ namespace OpenDentBusiness{
 			}
 			//Begin the process of deleting old table and creating new one.
 			//Save current wiki list content to the history
-			WikiListHists.Insert(GenerateFromName(wikiListHist.ListName));
+			WikiListHists.Insert(GenerateFromName(wikiListHist.ListName,userNum));
 			//Delete current wiki list
 			WikiLists.DeleteList(wikiListHist.ListName);
 			//Create a new empty wiki list, except for the PK column
