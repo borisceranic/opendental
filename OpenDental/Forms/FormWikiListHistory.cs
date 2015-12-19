@@ -155,7 +155,7 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Revert list to currently selected revision?")) {
 				return;
 			}
-			WikiListHists.RevertFrom(_listWikiListHists[gridMain.GetSelectedIndex()]);
+			WikiListHists.RevertFrom(_listWikiListHists[gridMain.GetSelectedIndex()],Security.CurUser.UserNum);
 			FillGridMain();
 			gridMain.SetSelected(false);
 			gridMain.SetSelected(gridMain.Rows.Count-1,true);//select the new revision.
