@@ -5090,6 +5090,33 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
+		public static string TreatPlansInvalid(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT treatplan.PatNum FROM procedurelog	"//procs for 1 pat attached to a treatplan for another
+					+"INNER JOIN treatplanattach ON treatplanattach.ProcNum=procedurelog.ProcNum "
+					+"INNER JOIN treatplan ON treatplan.TreatPlanNum=treatplanattach.TreatPlanNum AND procedurelog.PatNum!=treatplan.PatNum "
+					+"UNION "//more than 1 active treatment plan
+					+"SELECT PatNum FROM treatplan WHERE TPStatus=1 GROUP BY PatNum HAVING COUNT(DISTINCT TreatPlanNum)>1";
+			List<long> listPatNumsForAudit=Db.GetListLong(command).Distinct().ToList();
+			if(isCheck) {
+				if(listPatNumsForAudit.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Patients found with one or more invalid treatment plans")+": "+listPatNumsForAudit.Count+"\r\n";
+				}
+			}
+			else {
+				listPatNumsForAudit.ForEach(TreatPlans.AuditPlans);
+				TreatPlanAttaches.DeleteOrphaned();
+				if(listPatNumsForAudit.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Patients with one or more invalid treatment plans fixed")+": "+listPatNumsForAudit.Count+"\r\n";
+				}
+			}
+			return log;
+		}
+
 		[DbmMethod(HasBreakDown=true)]
 		/// <summary>Only one user of a given UserName may be unhidden at a time. Warn the user and instruct them to hide extras.</summary>
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
@@ -5712,6 +5739,47 @@ HAVING cnt>1";
 						+"WHERE "+tableName+"."+priKeyColumnName+"=securitylog.FKey "
 					+")";
 			return Db.NonQ(command);
+		}
+
+		///<summary>Used to estimate the time that CreateMissingActiveTPs will take to run.</summary>
+		public static List<Procedure> GetProcsNoActiveTp() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod());
+			}
+			//pats with TP'd procs and no active treatplan OR pats with TPi'd procs that are attached to a sched or planned appt and no active treatplan
+			string command="SELECT * FROM procedurelog WHERE (ProcStatus="+(int)ProcStat.TP+" "//TP proc exists
+				+"OR (ProcStatus="+(int)ProcStat.TPi+" AND (AptNum>0 OR PlannedAptNum>0))) "//TPi proc exists that is attached to a sched or planned appt
+				+"AND PatNum NOT IN(SELECT PatNum FROM treatplan WHERE TPStatus="+(int)TreatPlanStatus.Active+")";//no active treatplan
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
+		public static string CreateMissingActiveTPs(List<Procedure> listTpTpiProcs) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),listTpTpiProcs);
+			}
+			if(listTpTpiProcs.Count==0) {//should never happen, won't get called if the list is empty, but just in case
+				return "";
+			}
+			listTpTpiProcs=listTpTpiProcs.OrderBy(x => x.PatNum).ToList();//code below relies of patients being grouped.
+			//listTpTpiProcs.Sort((x,y) => { return x.PatNum.CompareTo(y.PatNum); });//possibly more efficient
+			TreatPlan activePlan=null;
+			long patNumCur=0;
+			//listProcsNoTp is ordered by PatNum, so each time we find a new PatNum we will create a new active plan and attach procs to it
+			//until we find the next PatNum
+			foreach(Procedure procCur in listTpTpiProcs) {
+				if(procCur.PatNum!=patNumCur) {//new patient, create active plan
+					activePlan=new TreatPlan {//create active plan, all patients in listPatNumsNoTp do not have an active plan
+						Heading=Lans.g("TreatPlans","Active Treatment Plan"),
+						Note=PrefC.GetString(PrefName.TreatmentPlanNote),
+						TPStatus=TreatPlanStatus.Active,
+						PatNum=procCur.PatNum
+					};
+					activePlan.TreatPlanNum=TreatPlans.Insert(activePlan);
+					patNumCur=procCur.PatNum;
+				}
+				TreatPlanAttaches.Insert(new TreatPlanAttach { ProcNum=procCur.ProcNum,TreatPlanNum=activePlan.TreatPlanNum,Priority=procCur.Priority });
+			}
+			return "Patients with active treatment plans created: "+listTpTpiProcs.Select(x => x.PatNum).Distinct().ToList().Count;
 		}
 
 	}
