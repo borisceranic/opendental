@@ -45,7 +45,18 @@ namespace OpenDentBusiness{
 			if(listTreatPlans.Count==0) {
 				return new List<TreatPlanAttach>();
 			}
-			string command="SELECT * FROM treatplanattach WHERE TreatPlanNum IN ("+string.Join(",",listTreatPlans.Select(x=>x.TreatPlanNum).Distinct())+")";
+			return GetAllForTPs(listTreatPlans.Select(x => x.TreatPlanNum).Distinct().ToList());
+		}
+
+		///<summary>Gets all treatplanattaches with TreatPlanNum in listTpNums.</summary>
+		public static List<TreatPlanAttach> GetAllForTPs(List<long> listTpNums) {
+			if(listTpNums.Count==0) {
+				return new List<TreatPlanAttach>();
+			}
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<TreatPlanAttach>>(MethodBase.GetCurrentMethod(),listTpNums);
+			}
+			string command="SELECT * FROM treatplanattach WHERE TreatPlanNum IN ("+string.Join(",",listTpNums)+")";
 			return Crud.TreatPlanAttachCrud.SelectMany(command);
 		}
 
@@ -69,7 +80,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			//Orphaned TreatPlanAttaches due to missing procedures or procedures that are no longer TP or TPi status.
 			command="DELETE FROM treatplanattach WHERE ProcNum NOT IN (SELECT ProcNum FROM procedurelog "+
-			        "WHERE ProcStatus IN ("+string.Join(",",new[]{(int)ProcStat.TP,(int)ProcStat.TPi})+"))";
+				"WHERE ProcStatus IN ("+string.Join(",",new[]{(int)ProcStat.TP,(int)ProcStat.TPi})+"))";
 			Db.NonQ(command);
 		}
 
