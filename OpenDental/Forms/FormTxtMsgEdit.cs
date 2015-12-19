@@ -86,10 +86,6 @@ namespace OpenDental {
 				return false;
 			}
 			if(SmsPhones.IsIntegratedTextingEnabled()) {
-			    if(message.Length>160) {
-				    MsgBox.Show(this,"Text length must be less than 160 characters.");
-				    return false;
-			    }
 				try {
 					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);  //Can pass in 0 as PatNum if no patient selected.
 				}
@@ -99,6 +95,10 @@ namespace OpenDental {
 				}
 			}
 			else {
+				if(message.Length>160) {//only a limitation for CallFire
+					MsgBox.Show(this,"Text length must be less than 160 characters.");
+					return false;
+				}
 				return SendCallFire(patNum,wirelessPhone,message);  //Can pass in 0 as PatNum if no patient selected.
 			}
 		}
