@@ -9,31 +9,28 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
+using CodeBase;
 using OpenDental.UI;
-using Tao.Platform.Windows;
-using SparksToothChart;
 using OpenDentBusiness;
 using OpenDentBusiness.HL7;
-using CodeBase;
 using SHDocVw;
-using System.Linq;
+using SparksToothChart;
 #if EHRTEST
 using EHR;
 #endif
 
-namespace OpenDental{
-///<summary></summary>
+namespace OpenDental {
+	///<summary></summary>
 	public class ContrChart : System.Windows.Forms.UserControl	{
 		private OpenDental.UI.Button butAddProc;
 		private OpenDental.UI.Button butM;
@@ -3469,7 +3466,6 @@ namespace OpenDental{
 			PlanList=InsPlans.RefreshForSubList(SubList);
 			PatPlanList=PatPlans.Refresh(patNum);
 			BenefitList=Benefits.Refresh(PatPlanList,SubList);
-			TreatPlans.AuditPlans(patNum);
 			_listClaimProcHists=ClaimProcs.GetHistList(patNum,BenefitList,PatPlanList,PlanList,DateTimeOD.Today,SubList);
 //todo: track down where this is altered.  Optimize for eCW:
 			PatientNoteCur=PatientNotes.Refresh(patNum,PatCur.Guarantor);
@@ -6222,11 +6218,7 @@ namespace OpenDental{
 			}
 			_listPatProcs=Procedures.Refresh(PatCur.PatNum);
 			_arrayTpProcs=Procedures.GetListTP(_listPatProcs);//sorted by priority, then toothnum
-			_listTreatPlans=TreatPlans.GetAllForPat(PatCur.PatNum)
-				.Where(x => x.TPStatus!=TreatPlanStatus.Saved)
-				.OrderBy(x => x.TPStatus!=TreatPlanStatus.Active)
-				//.ThenBy(x => x.TPStatus!=TreatPlanStatus.Inactive) //probably don't need this, only active and inactive should be in the list
-				.ThenBy(x => x.DateTP).ToList();
+			_listTreatPlans=TreatPlans.GetAllCurrentForPat(PatCur.PatNum);
 			ODGridRow row;
 			string str;
 			List<TreatPlanAttach> listTpAttaches=TreatPlanAttaches.GetAllForPatNum(PatCur.PatNum);
@@ -6983,10 +6975,18 @@ namespace OpenDental{
 			}//for
 		}
 
-		///<summary>Inserts neccesary TreatPlanAttaches that allows the procedure to be charted to one or more treatment plans at the same time.</summary>
+		///<summary>Inserts TreatPlanAttaches that allows the procedure to be charted to one or more treatment plans at the same time.</summary>
 		private void AttachProcToTPs(Procedure proc) {
+			if(proc.ProcStatus!=ProcStat.TP && proc.ProcStatus!=ProcStat.TPi) {
+				return;
+			}
+			List<long> listTpNums=new List<long>();
+			if(gridTreatPlans.GetSelectedIndex()>=0) {
+				listTpNums=gridTreatPlans.SelectedIndices.Select(x => _listTreatPlans[x].TreatPlanNum).ToList();
+			}
+			_listTreatPlans=TreatPlans.GetAllCurrentForPat(PatCur.PatNum);
 			//If there is no active TP, make sure to add an active treatment plan.
-			if(_listTreatPlans==null || _listTreatPlans.Count<1) {
+			if(_listTreatPlans.All(x => x.TPStatus!=TreatPlanStatus.Active)) {
 				TreatPlan activePlan=new TreatPlan() {
 					Heading=Lans.g("TreatPlans","Active Treatment Plan"),
 					Note=PrefC.GetString(PrefName.TreatmentPlanNote),
@@ -6995,20 +6995,19 @@ namespace OpenDental{
 				};
 				activePlan.TreatPlanNum=TreatPlans.Insert(activePlan);
 				_listTreatPlans=new List<TreatPlan>() { activePlan };
+				listTpNums.Add(activePlan.TreatPlanNum);
 			}
-			List<long> listTpNums;
-			if(gridTreatPlans.GetSelectedIndex()<0) {//If no TP selected then chart to the active TP.
-				listTpNums=new List<long>() { _listTreatPlans[0].TreatPlanNum };
-			}
-			else {
-				listTpNums=gridTreatPlans.SelectedIndices.Select(x => _listTreatPlans[x].TreatPlanNum).ToList();
+			else if(listTpNums.Count==0) {//NOT treat plan charting so no TP selected, active plan exists so get TPNum from active plan
+				listTpNums.Add(_listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Active).TreatPlanNum);
 			}
 			long priorityNum=0;
 			if(comboPriority.SelectedIndex>0) {
 				priorityNum=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
 			}
 			listTpNums.ForEach(x => TreatPlanAttaches.Insert(new TreatPlanAttach() { TreatPlanNum=x,ProcNum=proc.ProcNum,Priority=priorityNum }));
-			if(gridTreatPlans.SelectedIndices.Length>0 && _listTreatPlans[gridTreatPlans.GetSelectedIndex()].TPStatus!=TreatPlanStatus.Active) {//this works because the active will always be first if exists
+			//if all treatplans selected are not the active treatplan, then chart proc as status TPi
+			//we know there is an active plan for the patient at this point
+			if(_listTreatPlans.FindAll(x => listTpNums.Contains(x.TreatPlanNum)).All(x => x.TPStatus!=TreatPlanStatus.Active)) {
 				Procedure procOld=proc.Copy();
 				proc.ProcStatus=ProcStat.TPi;//change proc status to TPi if all selected plans are Inactive status
 				Procedures.Update(proc,procOld);

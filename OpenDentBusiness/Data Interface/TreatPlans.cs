@@ -32,6 +32,12 @@ namespace OpenDentBusiness{
 			return Crud.TreatPlanCrud.SelectMany(command);
 		}
 
+		public static List<TreatPlan> GetAllCurrentForPat(long patNum) {
+			return GetAllForPat(patNum).Where(x => x.TPStatus!=TreatPlanStatus.Saved)
+				.OrderBy(x => x.TPStatus!=TreatPlanStatus.Active)
+				.ThenBy(x => x.DateTP).ToList();
+		}
+
 		///<summary>A single treatplan from the DB.</summary>
 		public static TreatPlan GetOne(long treatPlanNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -108,109 +114,149 @@ namespace OpenDentBusiness{
 			return Encoding.ASCII.GetString(hash);
 		}
 
-		///<summary>Finds orphaned TP and TPi procedures and attaches them to new or current TP. Many calls to DB, consider optimizing or calling sparingly.</summary>
+		///<summary>This is the automation behind keeping treatplans correct.  Many calls to DB, consider optimizing or calling sparingly.
+		///<para>Ensures patients only have one active treatplan, marks extras inactive and creates an active if necessary.</para>
+		///<para>Attaches procedures to the active plan if the proc status is TP or status is TPi and the procs is attached to a sched/planned appt.</para>
+		///<para>Creates an unassigned treatplan if necessary and attaches any unassigned procedures to it.</para>
+		///<para>Also maintains priorities of treatplanattaches and procedures and updates the procstatus of TP and TPi procs if necessary.</para></summary>
 		public static void AuditPlans(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum);
 				return;
 			}
-			List<Procedure> listProcsAll=Procedures.GetProcsByStatusForPat(patNum,new[] {ProcStat.TP,ProcStat.TPi});
-			//Psuedo# Code:
-			//find all TP procedures.
-			//Find procedures marked TP
-			//  Find/Make active plan
-			//    Add missing TP procs to active plan
-			//delete orphaned treatplanattaches
-			//select all treatplanattaches for patient
-			//find orphaned TPi procedures
-			//Find/Create Unassigned Procedures TP
-			//Assign orphaned procedures to unassigned procedures TP.
-			//Remove procedures from the orphaned plan if they are attached to other plans.
-			List<Procedure> listProceduresActiveTP=listProcsAll.FindAll(x => x.ProcStatus==ProcStat.TP || x.AptNum>0 || x.PlannedAptNum>0);
-			List<TreatPlan> listTreatPlans=TreatPlans.GetAllForPat(patNum);
-			#region Active Treatment Plan
-			TreatPlan activePlan=listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Active);
-			if(listProceduresActiveTP.Count>0) {
-				if(activePlan==null) { //there is no active plan, and there should be
-					activePlan=new TreatPlan() {
-						Heading=Lans.g("TreatPlans","Active Treatment Plan"),
-						Note=PrefC.GetString(PrefName.TreatmentPlanNote),
-						TPStatus=TreatPlanStatus.Active,
-						PatNum=patNum
-					};
-					activePlan.TreatPlanNum=TreatPlans.Insert(activePlan);
-					listTreatPlans.Add(activePlan);
+			#region Pseudo Code
+			//Get all treatplans for the patient
+			//Find active TP if it already exists
+			//If more than one active TP, update all but the first to Inactive
+			//Find unassigned TP if it already exists
+			//Get all treatplanattaches for the treatplans
+			//Get all TP and TPi procs for the patient
+			//Get list of procs for the active plan, i.e. TPA exists linking to active plan or ProcStatus is TP or attached to sched/planned appt
+			//Get list of inactive procs, i.e. ProcStatus is TPi and AptNum is 0 and PlannedAptNum is 0 and no TPA exists linking it to the active plan
+			//Create an active plan if one doesn't exist and there are procs that need to be attached to it
+			//Create an unassigned plan if one doesn't exist and there are unassigned TPi procs
+			//For each proc that should be attached to the active plan
+			//  update status from TPi to TP
+			//  if TPA exists linking to active plan, update priority to TPA priority
+			//  delete any TPA that links the proc to the unassigned plan
+			//  if TPA linking the proc to the active plan does not exist, insert one with TPA priority set to the proc priority
+			//For each proc that is not attached to the active plan (ProcStatus is TPi)
+			//  set proc priority to 0
+			//  if TPA does not exist, insert one linking the proc to the unassigned plan with TPA priority 0
+			//  if multiple TPAs exist with one linking the proc to the unassigned plan, delete the TPA linking to the unassigned plan
+			//Foreach TPA
+			//  if TPA links proc to the unassigned plan and TPA exists linking the proc to any other plan, delete the link to the unassigned plan
+			//If an unassigned plan exists and there are no TPAs pointing to it, delete the unassigned plan
+			#endregion Pseudo Code
+			#region Variables
+			List<TreatPlan> listTreatPlans=TreatPlans.GetAllForPat(patNum);//All treatplans for the pat. [([Includes Saved Plans]}};
+			TreatPlan activePlan=listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Active);//can be null
+			TreatPlan unassignedPlan=listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Inactive && x.Heading==Lans.g("TreatPlans","Unassigned"));//can be null
+			List<TreatPlanAttach> listTPAs=TreatPlanAttaches.GetAllForTPs(listTreatPlans.Select(x => x.TreatPlanNum).ToList());
+			List<Procedure> listProcsTpTpi=Procedures.GetProcsByStatusForPat(patNum,new[] { ProcStat.TP,ProcStat.TPi });//All TP and TPi procs for the pat.
+			List<Procedure> listProcsForActive=new List<Procedure>();//All procs that should be linked to the active plan (can be linked to inactive plans as well)
+			List<Procedure> listProcsForInactive=new List<Procedure>();//All procs that should not be linked to the active plan (linked to inactive or unnasigned)
+			long[] arrayTpaProcNums=listTPAs.Select(x => x.ProcNum).ToArray();//All procnums from listTPAs, makes it easier to see if a TPA exists for a proc
+			#endregion Variables
+			#region Fill Proc Lists and Create Active and Unassigned Plans
+			foreach(Procedure procCur in listProcsTpTpi) {//puts each procedure in listProcsForActive or listProcsForInactive
+				if(procCur.ProcStatus==ProcStat.TP	//all TP procs should be linked to active plan
+					|| procCur.AptNum>0								//all procs attached to an appt should be linked to active plan
+					|| procCur.PlannedAptNum>0				//all procs attached to a planned appt should be linked to active plan
+					|| (activePlan!=null							//if active plan exists and proc is linked to it, add to list
+							&& listTPAs.Any(x => x.ProcNum==procCur.ProcNum && x.TreatPlanNum==activePlan.TreatPlanNum)))
+				{
+					listProcsForActive.Add(procCur);
 				}
-				List<TreatPlanAttach> listActiveTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(activePlan.TreatPlanNum);
-				//Add TreatPlanAttaches for procedures that need it.
-				foreach(Procedure tpProc in listProceduresActiveTP) {
-					if(listActiveTreatPlanAttaches.Any(x => x.ProcNum==tpProc.ProcNum)) {
-						//if TpAttach exists for this proc, set the proc priority to the TpAttach priority
-						Procedure procClone=tpProc.Copy();
-						tpProc.Priority=listActiveTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==tpProc.ProcNum).Priority;//TpAttach exists, null safe
-						Procedures.Update(tpProc,procClone);
-						continue; //TP procedure is already attached to the active plan.
+				else {//TPi status, AptNum=0, PlannedAptNum=0, and not attached to active plan
+					listProcsForInactive.Add(procCur);
+				}
+			}
+			//Create active plan if needed
+			if(activePlan==null && listProcsForActive.Count>0) {
+				activePlan=new TreatPlan() {
+					Heading=Lans.g("TreatPlans","Active Treatment Plan"),
+					Note=PrefC.GetString(PrefName.TreatmentPlanNote),
+					TPStatus=TreatPlanStatus.Active,
+					PatNum=patNum
+				};
+				TreatPlans.Insert(activePlan);
+				listTreatPlans.Add(activePlan);
+			}
+			//Update extra active plans to Inactive status, should only ever be one Active status plan
+			//All TP procs are linked to the active plan, so proc statuses won't have to change to TPi for procs attached to an "extra" active plan
+			foreach(TreatPlan tp in listTreatPlans.FindAll(x => x.TreatPlanNum!=activePlan.TreatPlanNum && x.TPStatus==TreatPlanStatus.Active)) {
+				tp.TPStatus=TreatPlanStatus.Inactive;
+				TreatPlans.Update(tp);
+			}
+			//Create unassigned plan if needed
+			if(unassignedPlan==null && listProcsForInactive.Any(x => !arrayTpaProcNums.Contains(x.ProcNum))) {
+				unassignedPlan=new TreatPlan() {
+					Heading=Lans.g("TreatPlans","Unassigned"),
+					Note=PrefC.GetString(PrefName.TreatmentPlanNote),
+					TPStatus=TreatPlanStatus.Inactive,
+					PatNum=patNum
+				};
+				TreatPlans.Insert(unassignedPlan);
+				listTreatPlans.Add(unassignedPlan);
+			}
+			#endregion Fill Proc Lists and Create Active and Unassigned Plans
+			#region Procs for Active Plan
+			//Update proc status to TP for all procs that should be linked to the active plan.
+			//For procs with an existing TPA linking it to the active plan, update proc priority to the TPA priority.
+			//Remove any TPAs linking the proc to the unassigned plan.
+			//Create TPAs linking the proc to the active plan if needed with TPA priority set to the proc priority.
+			foreach(Procedure procActive in listProcsForActive) {
+				Procedure procOld=procActive.Copy();
+				procActive.ProcStatus=ProcStat.TP;
+				//checking the array of ProcNums for an existing TPA is fast, so check the list first
+				if(arrayTpaProcNums.Contains(procActive.ProcNum)) {
+					if(unassignedPlan!=null) {//remove any TPAs linking the proc to the unassigned plan
+						listTPAs.RemoveAll(x => x.ProcNum==procActive.ProcNum && x.TreatPlanNum==unassignedPlan.TreatPlanNum);
 					}
-					TreatPlanAttaches.Insert(new TreatPlanAttach() {ProcNum=tpProc.ProcNum,TreatPlanNum=activePlan.TreatPlanNum,Priority=tpProc.Priority});
-				}
-				//Delete TreatPlanAttaches for procedures that are no longer TP status.
-				foreach(TreatPlanAttach tpa in listActiveTreatPlanAttaches) {
-					Procedure proc=listProceduresActiveTP.FirstOrDefault(x => x.ProcNum==tpa.ProcNum);
-					if(proc==null || proc.ProcStatus!=ProcStat.TPi) {
-						continue;
+					TreatPlanAttach tpaActivePlan=listTPAs.FirstOrDefault(x => x.ProcNum==procActive.ProcNum && x.TreatPlanNum==activePlan.TreatPlanNum);
+					if(tpaActivePlan==null) {//no TPA linking the proc to the active plan, create one with priority equal to the proc priority
+						listTPAs.Add(new TreatPlanAttach() { ProcNum=procActive.ProcNum,TreatPlanNum=activePlan.TreatPlanNum,Priority=procActive.Priority });
 					}
-					Procedure procClone=proc.Copy();
-					proc.ProcStatus=ProcStat.TP;
-					Procedures.Update(proc,procClone);
+					else {//TPA linking this proc to the active plan exists, update proc priority to equal TPA priority
+						procActive.Priority=tpaActivePlan.Priority;
+					}
+				}
+				else {//no TPAs exist for this proc, add one linking the proc to the active plan and set the TPA priority equal to the proc priority
+					listTPAs.Add(new TreatPlanAttach() { ProcNum=procActive.ProcNum,TreatPlanNum=activePlan.TreatPlanNum,Priority=procActive.Priority });
+				}
+				Procedures.Update(procActive,procOld);
+			}
+			#endregion Procs for Active Plan
+			#region Procs for Inactive and Unassigned Plans
+			//Update proc priority to 0 for all inactive procs.
+			//If no TPA exists for the proc, create a TPA with priority 0 linking the proc to the unassigned plan.
+			foreach(Procedure procInactive in listProcsForInactive) {
+				Procedure procOld=procInactive.Copy();
+				procInactive.Priority=0;
+				Procedures.Update(procInactive,procOld);
+				if(unassignedPlan!=null && !arrayTpaProcNums.Contains(procInactive.ProcNum)) {
+					//no TPAs for this proc, add a new one to the list linking proc to the unassigned plan
+					listTPAs.Add(new TreatPlanAttach { TreatPlanNum=unassignedPlan.TreatPlanNum,ProcNum=procInactive.ProcNum,Priority=0 });
 				}
 			}
-			#endregion
-			TreatPlanAttaches.DeleteOrphaned();
-			#region Orphans and Unassigned TP
-			//get all treatplanattaches for the patient
-			List<TreatPlanAttach> listTPAttaches=TreatPlanAttaches.GetAllForPatNum(patNum);
-			//get all TPi procs for the patient
-			List<Procedure> listProcTPiAll=listProcsAll.FindAll(x => x.ProcStatus==ProcStat.TPi);// Procedures.GetProcsByStatusForPat(patNum,new[] { ProcStat.TPi });
-			//set all TPi proc priorities to 0
-			foreach(Procedure procTPi in listProcTPiAll) {
-				Procedure procClone=procTPi.Copy();
-				procTPi.Priority=0;
-				Procedures.Update(procTPi,procClone);
+			#endregion Procs for Inactive and Unassigned Plans
+			#region Sync and Clean-Up TreatPlanAttach List
+			//Remove any TPAs if the proc isn't in listProcsTpTpi, status could've changed or possibly proc is for a different pat.
+			listTPAs.RemoveAll(x => !listProcsTpTpi.Select(y => y.ProcNum).Contains(x.ProcNum));
+			if(unassignedPlan!=null) {//if an unassigned plan exists
+				//Remove any TPAs from the list that link a proc to the unassigned plan if there is a TPA that links the proc to any other plan
+				listTPAs.RemoveAll(x => x.TreatPlanNum==unassignedPlan.TreatPlanNum
+					&& listTPAs.Any(y => y.ProcNum==x.ProcNum && y.TreatPlanNum!=unassignedPlan.TreatPlanNum));
 			}
-			//Find all TPi Procedures that do not have a treatplanattach
-			List<Procedure> listProcTPiOrphans=listProcTPiAll.FindAll(x => listTPAttaches.All(y => y.ProcNum!=x.ProcNum));
-			TreatPlan unassignedPlan=listTreatPlans.FirstOrDefault(x => x.TPStatus==TreatPlanStatus.Inactive && x.Heading==Lans.g("TreatPlans","Unassigned"));
-			if(listProcTPiOrphans.Count>0) {
-				if(unassignedPlan==null) {
-					unassignedPlan=new TreatPlan() {
-						Heading=Lans.g("TreatPlans","Unassigned"),
-						Note=PrefC.GetString(PrefName.TreatmentPlanNote),
-						TPStatus=TreatPlanStatus.Inactive,
-						PatNum=patNum
-					};
-					unassignedPlan.TreatPlanNum=TreatPlans.Insert(unassignedPlan);
-					listTreatPlans.Add(unassignedPlan);
+			listTreatPlans.ForEach(x => TreatPlanAttaches.Sync(listTPAs.FindAll(y => y.TreatPlanNum==x.TreatPlanNum),x.TreatPlanNum));
+			if(unassignedPlan!=null) {//Must happen after Sync. Delete the unassigned plan if it exists and there are no TPAs pointing to it.
+				listTPAs=TreatPlanAttaches.GetAllForTreatPlan(unassignedPlan.TreatPlanNum);//from DB.
+				if(listTPAs.Count==0) {//nothing attached to unassigned anymore
+					Crud.TreatPlanCrud.Delete(unassignedPlan.TreatPlanNum);
 				}
-				listProcTPiOrphans
-					.ForEach(x => TreatPlanAttaches.Insert(new TreatPlanAttach() { TreatPlanNum=unassignedPlan.TreatPlanNum,ProcNum=x.ProcNum,Priority=0 }));
-				return;
 			}
-			if(unassignedPlan==null) {
-				return;
-			} 
-			//remove procedures from the orphaned treatment plan if they are attached to other TPs
-			List<TreatPlanAttach> listTPAOrphans=listTPAttaches.FindAll(x => x.TreatPlanNum==unassignedPlan.TreatPlanNum);
-			TreatPlanAttaches.DeleteMany(listTPAOrphans.FindAll(x => listTPAttaches.FindAll(y => x.ProcNum==y.ProcNum).Count>1));
-			//set all unassigned TreatPlanAttaches to priority 0 and if there are any left 
-			List<TreatPlanAttach> listTpAttaches=TreatPlanAttaches.GetAllForTreatPlan(unassignedPlan.TreatPlanNum);
-			if(listTpAttaches.Count>0) {
-				listTpAttaches.ForEach(x => x.Priority=0);
-				TreatPlanAttaches.Sync(listTpAttaches,unassignedPlan.TreatPlanNum);
-			}
-			else {
-				Crud.TreatPlanCrud.Delete(unassignedPlan.TreatPlanNum);
-			}
-			#endregion
+			#endregion Sync and Clean-Up TreatPlanAttach List
 		}
 
 		public static TreatPlan GetUnassigned(long patNum) {
