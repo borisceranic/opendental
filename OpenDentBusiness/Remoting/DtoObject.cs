@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -56,6 +57,9 @@ namespace OpenDentBusiness {
 				XmlSerializer serializer = new XmlSerializer(typeof(int));
 				serializer.Serialize(writer,((Color)Obj).ToArgb());
 			}
+			else if(TypeName=="System.Data.DataTable") {
+				writer.WriteRaw(XmlConverter.TableToXml((DataTable)Obj));
+			}
 			else {
 				//string assemb=Assembly.GetAssembly(typeof(Db)).FullName;//"OpenDentBusiness, Version=14.3.0.0, Culture=neutral, PublicKeyToken=null"
 				Type type=ConvertNameToType(TypeName);//,assemb);
@@ -100,6 +104,9 @@ namespace OpenDentBusiness {
 			XmlTextReader reader2=new XmlTextReader(new StringReader(strObj));
 			if(TypeName=="System.Drawing.Color") {
 				Obj=Color.FromArgb((int)serializer.Deserialize(reader2));
+			}
+			else if(TypeName=="System.Data.DataTable") {
+				Obj=XmlConverter.XmlToTable(strObj);
 			}
 			else {
 				Obj=serializer.Deserialize(reader2);
@@ -155,6 +162,9 @@ namespace OpenDentBusiness {
 			}
 			else if(strTypeName=="System.Drawing.Color") {
 				typeObj=typeof(Color);
+			}
+			else if(strTypeName=="System.Data.DataTable") {
+				typeObj=typeof(DataTable);
 			}
 			else {//system types, OpenDentBusiness, and plugins
 				string strAssembName=strTypeName.Substring(0,strTypeName.IndexOf("."));//example: System.String: index=6, substring(0,6)="System"
