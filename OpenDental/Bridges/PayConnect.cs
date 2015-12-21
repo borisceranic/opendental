@@ -10,7 +10,7 @@ namespace OpenDental.Bridges {
 	public class PayConnect {
 
 		private static PayConnectService.Credentials GetCredentials(Program prog,long clinicNum){
-			PayConnectService.Credentials cred=new OpenDental.PayConnectService.Credentials();
+			PayConnectService.Credentials cred=new PayConnectService.Credentials();
 			cred.Username=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",clinicNum);
 			cred.Password=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",clinicNum);
 			cred.Client="OpenDental2";
@@ -23,12 +23,12 @@ namespace OpenDental.Bridges {
 			return cred;
 		}
 
-		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber,bool tokenRequested) {
-			PayConnectService.creditCardRequest request=new OpenDental.PayConnectService.creditCardRequest();
+		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber,bool tokenRequested,string authCode="") {
+			PayConnectService.creditCardRequest request=new PayConnectService.creditCardRequest();
 			request.Amount=amount;
 			request.AmountSpecified=true;
 			request.CardNumber=cardNumber;
-			request.Expiration=new OpenDental.PayConnectService.expiration();
+			request.Expiration=new PayConnectService.expiration();
 			request.Expiration.year=expYear;
 			request.Expiration.month=expMonth;
 			if(magData!=null) { //MagData is the data returned from magnetic card readers. Will only be present if a card was swiped.
@@ -40,6 +40,7 @@ namespace OpenDental.Bridges {
 			request.TransType=transtype;
 			request.Zip=zip;
 			request.PaymentTokenRequested=tokenRequested;
+			//request.AuthCode=authCode;//This field does not exist in the WSDL yet.  Dentalxchange will let us know once they finish adding it.
 			return request;
 		}
 
@@ -48,7 +49,7 @@ namespace OpenDental.Bridges {
 			try {
 				Program prog=Programs.GetCur(ProgramName.PayConnect);
 				PayConnectService.Credentials cred=GetCredentials(prog,clinicNum);
-				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+				PayConnectService.MerchantService ms=new PayConnectService.MerchantService();
 #if DEBUG
 				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
 #else
@@ -73,7 +74,7 @@ namespace OpenDental.Bridges {
 				PayConnectService.expiration pcExp=new PayConnectService.expiration();
 				pcExp.year=expYear;
 				pcExp.month=expMonth;
-				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+				PayConnectService.MerchantService ms=new PayConnectService.MerchantService();
 #if DEBUG
 				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
 #else
@@ -95,7 +96,7 @@ namespace OpenDental.Bridges {
 			bool isTypeSpecified;//not sure what this bool is for
 			string retval="";
 			try {
-				PayConnectService.MerchantService ms=new OpenDental.PayConnectService.MerchantService();
+				PayConnectService.MerchantService ms=new PayConnectService.MerchantService();
 #if DEBUG
 				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
 #else

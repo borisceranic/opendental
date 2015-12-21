@@ -67,6 +67,7 @@ namespace OpenDental {
 			radioAuthorization.Checked=false;
 			radioVoid.Checked=false;
 			radioReturn.Checked=false;
+			radioForce.Checked=false;
 			textRefNumber.Visible=false;
 			labelRefNumber.Visible=false;
 			_trantype=PayConnectService.transType.SALE;
@@ -78,6 +79,7 @@ namespace OpenDental {
 			radioAuthorization.Checked=true;
 			radioVoid.Checked=false;
 			radioReturn.Checked=false;
+			radioForce.Checked=false;
 			textRefNumber.Visible=false;
 			labelRefNumber.Visible=false;
 			_trantype=PayConnectService.transType.AUTH;
@@ -89,8 +91,10 @@ namespace OpenDental {
 			radioAuthorization.Checked=false;
 			radioVoid.Checked=true;
 			radioReturn.Checked=false;
+			radioForce.Checked=false;
 			textRefNumber.Visible=true;
 			labelRefNumber.Visible=true;
+			labelRefNumber.Text=Lan.g(this,"Ref Number");
 			_trantype=PayConnectService.transType.VOID;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
@@ -100,9 +104,24 @@ namespace OpenDental {
 			radioAuthorization.Checked=false;
 			radioVoid.Checked=false;
 			radioReturn.Checked=true;
+			radioForce.Checked=false;
 			textRefNumber.Visible=true;
 			labelRefNumber.Visible=true;
+			labelRefNumber.Text=Lan.g(this,"Ref Number");
 			_trantype=PayConnectService.transType.RETURN;
+			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
+		}
+
+		private void radioForce_Click(object sender,EventArgs e) {
+			radioSale.Checked=false;
+			radioAuthorization.Checked=false;
+			radioVoid.Checked=false;
+			radioReturn.Checked=false;
+			radioForce.Checked=true;
+			textRefNumber.Visible=true;
+			labelRefNumber.Visible=true;
+			labelRefNumber.Text=Lan.g(this,"Authorization Code");
+			_trantype=PayConnectService.transType.FORCE;
 			textCardNumber.Focus();//Usually transaction type is chosen before card number is entered, but textCardNumber box must be selected in order for card swipe to work.
 		}
 
@@ -161,6 +180,7 @@ namespace OpenDental {
 			get { return _receiptStr; }
 		}
 
+		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
 		public PayConnectService.transType TranType {
 			get { return _trantype; }
 		}
@@ -207,6 +227,10 @@ namespace OpenDental {
 			}
 			if((_trantype==PayConnectService.transType.VOID || _trantype==PayConnectService.transType.RETURN) && textRefNumber.Text=="") {
 				MsgBox.Show(this,"Ref Number required.");
+				return false;
+			}
+			if(_trantype==PayConnectService.transType.FORCE && textRefNumber.Text=="") {
+				MsgBox.Show(this,"Authorization Code required.");
 				return false;
 			}
 			//verify the selected clinic has a username, password, and payment type entered
@@ -366,8 +390,12 @@ namespace OpenDental {
 				expYear=_creditCardCur.PayConnectTokenExp.Year;
 				expMonth=_creditCardCur.PayConnectTokenExp.Month;
 			}
+			string authCode="";
+			if(_trantype==PayConnectService.transType.FORCE) {
+				authCode=textRefNumber.Text;
+			}
 			_request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
-				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,_trantype,refNumber,checkSaveToken.Checked);
+				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,_trantype,refNumber,checkSaveToken.Checked,authCode);
 			_response=Bridges.PayConnect.ProcessCreditCard(_request,_paymentCur.ClinicNum);
 			if(_response==null || _response.Status.code!=0) {//error in transaction
 				Cursor=Cursors.Default;
