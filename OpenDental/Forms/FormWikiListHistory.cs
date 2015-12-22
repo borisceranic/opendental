@@ -77,10 +77,13 @@ namespace OpenDental {
 
 		/// <summary></summary>
 		private void FillGridOld() {
-			List<WikiListHeaderWidth> colHeaderWidths=WikiListHeaderWidths.GetFromListHist(_listWikiListHists[gridMain.GetSelectedIndex()]);
+			List<WikiListHeaderWidth> colHeaderWidths=new List<WikiListHeaderWidth>();
 			_tableOld=new DataTable();
-			using(XmlReader xmlReader=XmlReader.Create(new StringReader(_listWikiListHists[gridMain.GetSelectedIndex()].ListContent))) {
-				_tableOld.ReadXml(xmlReader);
+			if(gridMain.GetSelectedIndex() > -1) {
+				colHeaderWidths=WikiListHeaderWidths.GetFromListHist(_listWikiListHists[gridMain.GetSelectedIndex()]);
+				using(XmlReader xmlReader=XmlReader.Create(new StringReader(_listWikiListHists[gridMain.GetSelectedIndex()].ListContent))) {
+					_tableOld.ReadXml(xmlReader);
+				}
 			}
 			gridOld.BeginUpdate();
 			gridOld.Columns.Clear();
