@@ -1,5 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDental", "OpenDental\OpenDental.csproj", "{8136317D-C936-49B6-9E31-D90F02D2F207}"
 	ProjectSection(ProjectDependencies) = postProject
 		{84688345-BB6A-4F2F-8672-A82B52FD433B} = {84688345-BB6A-4F2F-8672-A82B52FD433B}
@@ -514,6 +516,7 @@ Global
 		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|x86.ActiveCfg = Release|x86
+		{98B2999C-8A9F-4795-B452-7F6231ED56B4}.Release|x86.Build.0 = Release|x86
 		{E734D539-5EA7-49F3-A777-821237D1094C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E734D539-5EA7-49F3-A777-821237D1094C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E734D539-5EA7-49F3-A777-821237D1094C}.Debug|Mixed Platforms.ActiveCfg = Debug|x86

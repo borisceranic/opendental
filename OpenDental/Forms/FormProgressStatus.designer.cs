@@ -60,6 +60,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormProgressStatus";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormProgressStatus_FormClosing);
 			this.ResumeLayout(false);
 
 		}
