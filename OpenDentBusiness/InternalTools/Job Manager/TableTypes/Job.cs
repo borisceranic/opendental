@@ -69,16 +69,18 @@ namespace OpenDentBusiness {
 		ReadyToBeDocumented,
 		///<summary>12 -</summary>
 		NotifyCustomer,
-		///<summary>14 -</summary>
+		///<summary>13 -</summary>
 		Deleted,
+		///<summary>14 -</summary>
+		NeedsDocumentationClarification,
 		///<summary>15 -</summary>
-		NeedsClarification,
-		///<summary>16 -</summary>
 		NeedsJobApproval,
+		///<summary>16 -</summary>
+		OnHoldEngineer,
 		///<summary>17 -</summary>
-		OnHoldEngineer,	
+		ReadyToAssign,
 		///<summary>18 -</summary>
-		ReadyToAssign
+		NeedsJobClarification
 	}
 
 

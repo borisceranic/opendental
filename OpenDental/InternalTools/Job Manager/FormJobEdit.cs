@@ -75,6 +75,9 @@ namespace OpenDental {
 				case JobStatus.NeedsJobApproval:
 					_editMode=EditMode.JobApproval;
 					break;
+				case JobStatus.NeedsJobClarification:
+					_editMode=EditMode.JobClarify;
+					break;
 				case JobStatus.JobApproved:
 				case JobStatus.OnHoldExpert:
 				case JobStatus.ReadyToAssign:
@@ -87,7 +90,7 @@ namespace OpenDental {
 					_editMode=EditMode.Engineer;
 					break;
 				case JobStatus.ReadyToBeDocumented:
-				case JobStatus.NeedsClarification:
+				case JobStatus.NeedsDocumentationClarification:
 					_editMode=EditMode.Documentation;
 					break;
 				case JobStatus.NotifyCustomer:
@@ -207,10 +210,43 @@ namespace OpenDental {
 				butAction2.Text="Assign To Engineer";
 				butAction3.Text="Ask For Clarification";
 				butAction4.Visible=false;
+				butProjectPick.Enabled=false;
 				butAddReview.Enabled=false;
 				textVersion.ReadOnly=true;
 				comboCategory.Enabled=false;
 				textActualHours.ReadOnly=true;
+			}
+			//JobClarify Edit Mode
+			else if(_editMode==EditMode.JobClarify
+				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) {
+				string prevOwnerName="Previous Owner";//This should never display, but I set it just in case
+				if(_prevOwner!=null) {
+					prevOwnerName=_prevOwner.UserName;
+				}
+				butAction1.Text="Send Back To "+prevOwnerName;
+				if(_job.Expert==Security.CurUser.UserNum) {
+					butAction2.Text="Change to Edit Mode";
+				}
+				else {
+					butAction2.Visible=false;
+				}
+				butAction3.Visible=false;
+				butAction4.Visible=false;
+				butProjectPick.Enabled=false;
+				comboCategory.Enabled=false;
+				comboPriority.Enabled=false;
+				textTitle.ReadOnly=true;
+				textEstHours.ReadOnly=true;
+				textEditorMain.ReadOnly=true;
+				textActualHours.ReadOnly=true;
+				textVersion.ReadOnly=true;
+				butAddReview.Enabled=false;
+				butOK.Enabled=false;
+				butRemove.Enabled=false;
+				butLinkTask.Enabled=false;
+				butLinkBug.Enabled=false;
+				butLinkQuote.Enabled=false;
+				butLinkFeatReq.Enabled=false;
 			}
 			//AssignToEngineer Edit Mode
 			else if(_editMode==EditMode.AssignToEngineer
@@ -476,7 +512,7 @@ namespace OpenDental {
 			else if(_editMode==EditMode.JobApproval
 				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
 				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
-				FormUserPick FormUP = new FormUserPick();
+				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
 				FormUP.SelectedUserNum=_job.Expert;
@@ -484,9 +520,19 @@ namespace OpenDental {
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner = FormUP.SelectedUserNum;
+				long owner=FormUP.SelectedUserNum;
 				_job.Expert=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.JobApproved,owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
+			#region Send Back To *USERNAME*
+			else if(_editMode==EditMode.JobClarify
+				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) 
+			{
+				Jobs.SetStatus(_job,JobStatus.NeedsJobApproval,_prevOwner.UserNum);
 				_hasChanged=true;
 				Close();
 				return;
@@ -635,6 +681,17 @@ namespace OpenDental {
 				return;
 			}
 			#endregion
+			#region Change to Edit Mode
+			if(_editMode==EditMode.JobClarify
+				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)
+				&& _job.Expert==Security.CurUser.UserNum) 
+			{
+				Jobs.SetStatus(_job,JobStatus.ConceptApproved,_job.Owner);
+				_hasChanged=true;
+				Close();
+				return;
+			}
+			#endregion
 			#region Put On Hold
 			if(_editMode==EditMode.AssignToEngineer
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
@@ -663,7 +720,7 @@ namespace OpenDental {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NeedsClarification,owner);
+				Jobs.SetStatus(_job,JobStatus.NeedsDocumentationClarification,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -679,16 +736,16 @@ namespace OpenDental {
 				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
 				&& _job.Expert==Security.CurUser.UserNum) 
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
-				FormUserPick FormUP = new FormUserPick();
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
 				FormUP.SelectedUserNum=_prevOwner.UserNum;
-				FormUP.Text="Select a User";
+				FormUP.Text="Select a Job Manager";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				long owner = FormUP.SelectedUserNum;
+				long owner=FormUP.SelectedUserNum;
 				Jobs.SetStatus(_job,JobStatus.NeedsConceptApproval,owner);
 				_hasChanged=true;
 				Close();
@@ -698,17 +755,17 @@ namespace OpenDental {
 			else if(_editMode==EditMode.JobApproval
 				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
 				FormUP.SelectedUserNum=_job.Expert;
-				FormUP.Text="Select an Expert";
+				FormUP.Text="Select a User";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.ConceptApproved,owner);
+				Jobs.SetStatus(_job,JobStatus.NeedsJobClarification,owner);
 				_hasChanged=true;
 				Close();
 			}
@@ -1233,17 +1290,19 @@ namespace OpenDental {
 			ExpertDefinition,
 			///<summary>3 - All jobs that need the attention of a user that has job approval access for the final review of the writeup.</summary>
 			JobApproval,
-			///<summary>4 - Pending jobs for experts to assign out.</summary>
+			///<summary>4 - Jobs that need clarification before final approval.</summary>
+			JobClarify,
+			///<summary>5 - Pending jobs for experts to assign out.</summary>
 			AssignToEngineer,
-			///<summary>5 - Jobs that are in queue or are being actively worked on by an engineer.</summary>
+			///<summary>6 - Jobs that are in queue or are being actively worked on by an engineer.</summary>
 			Engineer,
-			///<summary>6 - In the process of being documented or in limbo with additional information needed for documenting purposes.</summary>
+			///<summary>7 - In the process of being documented or in limbo with additional information needed for documenting purposes.</summary>
 			Documentation,
-			///<summary>7 - Final step is to notify the customer of the changes made.</summary>
+			///<summary>8 - Final step is to notify the customer of the changes made.</summary>
 			NotifyCustomer,
-			///<summary>8 - Jobs that have been finished, documented, and all customers notified.  Can also mean "deleted".</summary>
+			///<summary>9 - Jobs that have been finished, documented, and all customers notified.  Can also mean "deleted".</summary>
 			Done,
-			///<summary>9 - Typically a user without the correct permission simply viewing an old job.</summary>
+			///<summary>10 - Typically a user without the correct permission simply viewing an old job.</summary>
 			ReadOnly
 		}
 	}
