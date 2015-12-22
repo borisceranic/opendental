@@ -1308,7 +1308,7 @@ namespace OpenDental {
 				menuItemSubscribe.Enabled=false;
 				menuItemUnsubscribe.Enabled=false;
 			}
-			else if(tabContr.SelectedTab==tabUser) {//user
+			else if(tabContr.SelectedTab==tabUser && clickedI<TaskListsList.Count) {//user tab and is a list
 				menuItemSubscribe.Enabled=false;
 				menuItemUnsubscribe.Enabled=true;
 			}
