@@ -1361,6 +1361,12 @@ namespace OpenDental {
 			if(!HasXCharge()) {
 				return;
 			}
+			if(_listPaySplits.Count>0 && PIn.Double(textAmount.Text)!=PIn.Double(textTotal.Text)
+				&& (_listPaySplits.Count!=1 || _listPaySplits[0].PayPlanNum==0)) //Not one paysplit attached to payplan
+			{
+				MsgBox.Show(this, "Split totals must equal payment amount before running a credit card transaction.");
+				return;
+			}
 			string resultfile=Path.Combine(Path.GetDirectoryName(_xPath),"XResult.txt");
 			try {
 				File.Delete(resultfile);//delete the old result file.
@@ -1497,7 +1503,6 @@ namespace OpenDental {
 			string signatureResult="";
 			string receipt="";
 			bool isDigitallySigned=false;
-			_wasCreditCardSuccessful=false;
 			try {
 				using(TextReader reader=new StreamReader(resultfile)) {
 					line=reader.ReadLine();
@@ -1540,10 +1545,7 @@ namespace OpenDental {
 							}
 							if(tranType==7) {
 								xVoid=true;
-							}
-							else { //If the transaction is not a void transaction, we will void this transaction if the user hits Cancel
-								_wasCreditCardSuccessful=true;
-							}
+							}							
 							_isCCDeclined=false;
 						}
 						if(line.StartsWith("APPROVEDAMOUNT=")) {
@@ -1627,17 +1629,59 @@ namespace OpenDental {
 			else if(xReturn) {
 				textAmount.Text="-"+approvedAmt.ToString("F");
 			}
-			else if(xVoid) {//Close FormPayment window now so the user will not have the option to hit Cancel
-				textAmount.Text="-"+approvedAmt.ToString("F");
-				textNote.Text+=resulttext;
-				_paymentCur.Receipt=receipt;
-				if(_printReceipt && receipt!="") {
-					PrintReceipt(receipt);
+			else if(xVoid) {
+				if(IsNew) {
+					if(!_wasCreditCardSuccessful) {
+						textAmount.Text="-"+approvedAmt.ToString("F");
+						textNote.Text+=resulttext;
+					}
+					_paymentCur.Receipt=receipt;
+					if (_printReceipt && receipt!="")	{
+						PrintReceipt(receipt);
+						_printReceipt=false;
+					}
+					SavePaymentToDb();
 				}
-				SavePaymentToDb();
-				DialogResult=DialogResult.OK;
+				if(!IsNew || _wasCreditCardSuccessful) {//Create a new negative payment if the void is being run from an existing payment
+					if(_listPaySplits.Count==0) {
+						AddOneSplit();
+						FillMain();
+					}
+					else if(_listPaySplits.Count==1//if one split
+						&& _listPaySplits[0].PayPlanNum!=0//and split is on a payment plan
+						&& _listPaySplits[0].SplitAmt!=_paymentCur.PayAmt)//and amount doesn't match payment
+					{
+						_listPaySplits[0].SplitAmt=_paymentCur.PayAmt;//make amounts match automatically
+						textTotal.Text=textAmount.Text;
+					}
+					else if(_listPaySplits.Count==1//if one split
+						&& _listPaySplits[0].ProcDate!=_paymentCur.PayDate
+						&& _listPaySplits[0].ProcNum==0)//not attached to procedure
+					{
+						if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
+							_listPaySplits[0].ProcDate=_paymentCur.PayDate;
+						}
+					}
+					_paymentCur.IsSplit=_listPaySplits.Count>1;
+					Payment voidPayment=_paymentCur.Clone();
+					voidPayment.PayAmt*=-1;//the negation of the original amount
+					voidPayment.PayNote=resulttext;
+					voidPayment.Receipt=receipt;
+					if(_printReceipt && receipt!="") {
+						PrintReceipt(receipt);
+					}
+					voidPayment.PayNum=Payments.Insert(voidPayment);
+					foreach(PaySplit splitCur in _listPaySplits) {//Modify the paysplits for the original transaction to work for the void transaction
+						PaySplit split=splitCur.Copy();
+						split.SplitAmt*=-1;
+						split.PayNum=voidPayment.PayNum;
+						PaySplits.Insert(split);
+					}
+				}
+				DialogResult=DialogResult.OK;//Close FormPayment window now so the user will not have the option to hit Cancel
 				return;
-			}
+			}			
+			_wasCreditCardSuccessful=!_isCCDeclined;//If the transaction is not a void transaction, we will void this transaction if the user hits Cancel
 			if(additionalFunds>0) {
 				MessageBox.Show(Lan.g(this,"Additional funds required")+": "+additionalFunds.ToString("C"));
 			}
@@ -1692,8 +1736,8 @@ namespace OpenDental {
 #endif
 		}
 
-		/// <summary>Only used to void a transaction that has just been completed when the user hits Cancel. Uses the same Prompt Signature and Print
-		/// Receipt settings as the original transaction.</summary>
+		///<summary>Only used to void a transaction that has just been completed when the user hits Cancel. Uses the same Print Receipt settings as the 
+		///original transaction.</summary>
 		private void VoidXChargeTransaction(string transID,string amount,bool isDebit) {
 			ProcessStartInfo info=new ProcessStartInfo(_xProg.Path);
 			string resultfile=Path.Combine(Path.GetDirectoryName(_xProg.Path),"XResult.txt");
@@ -1935,6 +1979,12 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please enter an amount first.");
 				return;
 			}
+			if(_listPaySplits.Count>0 && PIn.Double(textAmount.Text)!=PIn.Double(textTotal.Text)
+				&& (_listPaySplits.Count!=1 || _listPaySplits[0].PayPlanNum==0)) //Not one paysplit attached to payplan
+			{
+				MsgBox.Show(this, "Split totals must equal payment amount before running a credit card transaction.");
+				return;
+			}
 			CreditCard CCard=null;
 			List<CreditCard> creditCards=CreditCards.Refresh(_patCur.PatNum);
 			for(int i=0;i<creditCards.Count;i++) {
@@ -1970,25 +2020,16 @@ namespace OpenDental {
 			listPayType.SelectedIndex=DefC.GetOrder(DefCat.PaymentTypes,PIn.Long(paytype));
 			SetComboDepositAccounts();
 			if(FormP.Response!=null) {
-				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+
-					Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
+				string resultNote=Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
 					Lan.g(this,"Status")+": "+FormP.Response.Status.description+Environment.NewLine+
 					Lan.g(this,"Amount")+": "+FormP.AmountCharged+Environment.NewLine+
 					Lan.g(this,"Card Type")+": "+PayConnectUtils.GetCardType(FormP.CardNumber);
-				if(FormP.Response.Status.code==0) { //The transaction succeeded.
-					if(FormP.TranType!=PayConnectService.transType.VOID) {
-						_wasCreditCardSuccessful=true; //Will void the transaction if user cancels out of window.
-					}
-					else {
-						_wasCreditCardSuccessful=false;
-					}
+				if(FormP.Response.Status.code==0) { //The transaction succeeded.					
 					_isCCDeclined=false;
-					textNote.Text+=Environment.NewLine
+					resultNote+=Environment.NewLine
 						+Lan.g(this,"Auth Code")+": "+FormP.Response.AuthCode+Environment.NewLine
 						+Lan.g(this,"Ref Number")+": "+FormP.Response.RefNumber;
-					textNote.Select(textNote.Text.Length-1,0);
-					textNote.ScrollToCaret();//Scroll to the end of the text box to see the newest notes.
-					if(FormP.TranType==PayConnectService.transType.VOID || FormP.TranType==PayConnectService.transType.RETURN) {
+					if(FormP.TranType==PayConnectService.transType.RETURN) {
 						textAmount.Text="-"+FormP.AmountCharged;
 					}
 					else if(FormP.TranType==PayConnectService.transType.AUTH) {
@@ -1999,12 +2040,59 @@ namespace OpenDental {
 						_paymentCur.Receipt=FormP.ReceiptStr; //There is only a receipt when a sale takes place.
 					}
 					if(FormP.TranType==PayConnectService.transType.VOID) {//Close FormPayment window now so the user will not have the option to hit Cancel
-						SavePaymentToDb();
-						DialogResult=DialogResult.OK;
+						if(IsNew) {
+							if(!_wasCreditCardSuccessful) {
+								textAmount.Text="-"+FormP.AmountCharged;
+								textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+resultNote;
+							}
+							_paymentCur.Receipt=FormP.ReceiptStr;
+							SavePaymentToDb();
+						}
+						if(!IsNew || _wasCreditCardSuccessful) {//Create a new negative payment if the void is being run from an existing payment
+							if(_listPaySplits.Count==0) {
+								AddOneSplit();
+								FillMain();
+							}
+							else if(_listPaySplits.Count==1//if one split
+								&& _listPaySplits[0].PayPlanNum!=0//and split is on a payment plan
+								&& _listPaySplits[0].SplitAmt!=_paymentCur.PayAmt)//and amount doesn't match payment
+							{
+								_listPaySplits[0].SplitAmt=_paymentCur.PayAmt;//make amounts match automatically
+								textTotal.Text=textAmount.Text;
+							}
+							else if(_listPaySplits.Count==1//if one split
+								&& _listPaySplits[0].ProcDate!=_paymentCur.PayDate
+								&& _listPaySplits[0].ProcNum==0)//not attached to procedure
+							{
+								if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Change split date to match payment date?")) {
+									_listPaySplits[0].ProcDate=_paymentCur.PayDate;
+								}
+							}
+							_paymentCur.IsSplit=_listPaySplits.Count>1;
+							Payment voidPayment=_paymentCur.Clone();
+							voidPayment.PayAmt*=-1;//the negation of the original amount
+							voidPayment.PayNote=resultNote;
+							voidPayment.Receipt=FormP.ReceiptStr;
+							voidPayment.PayNum=Payments.Insert(voidPayment);
+							foreach(PaySplit splitCur in _listPaySplits) {//Modify the paysplits for the original transaction to work for the void transaction
+								PaySplit split=splitCur.Copy();
+								split.SplitAmt*=-1;
+								split.PayNum=voidPayment.PayNum;
+								PaySplits.Insert(split);
+							}
+						}
+						MsgBox.Show(this,"Void successful.");
+						DialogResult=DialogResult.OK;//Close FormPayment window now so the user will not have the option to hit Cancel
 						return;
 					}
-					_payConnectRequest=FormP.Request;
+					else {//Not Void
+						_wasCreditCardSuccessful=true; //Will void the transaction if user cancels out of window.
+					}
+					_payConnectRequest=FormP.Request;					
 				}
+				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+resultNote;
+				textNote.Select(textNote.Text.Length-1,0);
+				textNote.ScrollToCaret();//Scroll to the end of the text box to see the newest notes.
 				_paymentOld.PayNote=textNote.Text;
 				Payments.Update(_paymentOld,true);
 			}
@@ -2016,6 +2104,7 @@ namespace OpenDental {
 					textAmount.Text=FormP.AmountCharged;//Preserve the amount so the user can try the payment again more easily.
 				}
 				_isCCDeclined=true;
+				_wasCreditCardSuccessful=false;
 			}
 		}
 
@@ -2392,17 +2481,16 @@ namespace OpenDental {
 		}
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
-			if(!IsNew) {
+			if(!IsNew && !_wasCreditCardSuccessful) {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			//New payment
-			if(!_wasCreditCardSuccessful) {//not a credit card payment that has already been processed
+			if(!_wasCreditCardSuccessful) {//new payment that was not a credit card payment that has already been processed
 				Payments.Delete(_paymentCur);
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			//New payment and a successful CC payment
+			//Successful CC payment
 			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This will void the transaction that has just been completed. Are you sure you want to continue?")) {
 				DialogResult=DialogResult.None;
 				return;
@@ -2491,6 +2579,9 @@ namespace OpenDental {
 			}
 			else if(transactionID!="" && HasXCharge()) {//Void the X-Charge transaction if there is one
 				VoidXChargeTransaction(transactionID,amount,isDebit);
+			}
+			else {
+				MsgBox.Show(this,"Unable to void transaction");
 			}
 			DialogResult=DialogResult.Cancel;
 		}
