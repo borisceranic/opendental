@@ -11743,6 +11743,15 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES ((SELECT MAX(PrefNum)+1 FROM preference),'ReportPrintWrapColumns','0')";
 					Db.NonQ(command);
 				}
+				//Screenings use sheets preference.  Defaults to being off so that this new functionality is opt in.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ScreeningsUseSheets','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ScreeningsUseSheets','0')";
+					Db.NonQ(command);
+				}
 
 
 

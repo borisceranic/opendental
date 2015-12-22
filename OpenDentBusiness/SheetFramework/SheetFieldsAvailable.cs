@@ -68,6 +68,8 @@ namespace OpenDentBusiness{
 					return GetMedLabResults(outInCheck);
 				case SheetTypeEnum.TreatmentPlan:
 					return GetTreatmentPlans(outInCheck);
+				case SheetTypeEnum.Screening:
+					return GetScreening(outInCheck);
 			}
 			return new List<SheetFieldDef>();
 		}
@@ -596,6 +598,41 @@ namespace OpenDentBusiness{
 			else if(outInCheck==OutInCheck.Check) {
 			}
 			return list;
+		}
+
+		private static List<SheetFieldDef> GetScreening(OutInCheck outInCheck) {
+			List<SheetFieldDef> listSheetFieldDefs=new List<SheetFieldDef>();
+			if(outInCheck==OutInCheck.Out) {
+				listSheetFieldDefs.Add(NewInput("Description"));
+				listSheetFieldDefs.Add(NewInput("DateScreenGroup"));
+				listSheetFieldDefs.Add(NewInput("ProvName"));
+				listSheetFieldDefs.Add(NewInput("PlaceOfService"));
+				listSheetFieldDefs.Add(NewInput("County"));
+				listSheetFieldDefs.Add(NewInput("GradeSchool"));
+			}
+			else if(outInCheck==OutInCheck.In) {
+				listSheetFieldDefs.Add(NewInput("Birthdate"));
+				listSheetFieldDefs.Add(NewInput("FName"));
+				listSheetFieldDefs.Add(NewInput("LName"));
+				listSheetFieldDefs.Add(NewInput("MiddleI"));
+				listSheetFieldDefs.Add(NewInput("Preferred"));
+				listSheetFieldDefs.Add(NewInput("GradeLevel"));
+				listSheetFieldDefs.Add(NewInput("Race/Ethnicity"));
+				listSheetFieldDefs.Add(NewInput("Urgency"));
+				listSheetFieldDefs.Add(NewInput("Comments"));
+				listSheetFieldDefs.Add(NewInput("misc"));
+			}
+			else if(outInCheck==OutInCheck.Check) {
+				listSheetFieldDefs.Add(NewOutput("HasCaries"));
+				listSheetFieldDefs.Add(NewOutput("EarlyChildCaries"));
+				listSheetFieldDefs.Add(NewOutput("CariesExperience"));
+				listSheetFieldDefs.Add(NewOutput("ExistingSealants"));
+				listSheetFieldDefs.Add(NewOutput("NeedsSealants"));
+				listSheetFieldDefs.Add(NewOutput("MissingAllTeeth"));
+				listSheetFieldDefs.Add(NewCheck("Gender"));
+				listSheetFieldDefs.Add(NewOutput("misc"));
+			}
+			return listSheetFieldDefs;
 		}
 	}
 }

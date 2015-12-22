@@ -30,14 +30,17 @@ namespace OpenDentBusiness {
 		LabSlip,
 		///<Summary>13-Requires SheetParameter for PatNum.</Summary>
 		ExamSheet,
-		///<summary>14-Requires SheetParameter for PatNum.</summary>
+		///<summary>14-Requires SheetParameter for DepositNum.</summary>
 		DepositSlip,
 		///<summary>15-Requires SheetParameter for PatNum.</summary>
 		Statement,
 		///<summary>16-Requires SheetParameters for PatNum,MedLab,MedLabResult.</summary>
 		MedLabResults,
 		///<summary>17-Requires SheetParameters for PatNum,TreatmentPlan.</summary>
-		TreatmentPlan
+		TreatmentPlan,
+		///<summary>18-Requires SheetParameter for ScreenGroupNum.  
+		///Optional SheetParameter for PatNum if screening is associated to a patient.</summary>
+		Screening
 		/*StatementHeader,
 		TxPlanHeader,
 		Postcard*/

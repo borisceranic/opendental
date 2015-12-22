@@ -18,7 +18,6 @@ namespace OpenDental{
 		private IContainer components;
 		private UI.Button butClose;
 		private UI.ODGrid gridMain;
-		private MainMenu mainMenu;
 		private List<ScreenGroup> ScreenGroupList;
 		private UI.Button butLeft;
 		private UI.Button butRight;
@@ -59,7 +58,6 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormScreenGroups));
 			this.textDateFrom = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
@@ -67,7 +65,6 @@ namespace OpenDental{
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
-			this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butLeft = new OpenDental.UI.Button();
 			this.butRight = new OpenDental.UI.Button();
@@ -117,7 +114,7 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -140,7 +137,7 @@ namespace OpenDental{
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butClose.Location = new System.Drawing.Point(441, 565);
+			this.butClose.Location = new System.Drawing.Point(442, 540);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(70, 24);
 			this.butClose.TabIndex = 79;
@@ -157,7 +154,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(13, 82);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(499, 465);
+			this.gridMain.Size = new System.Drawing.Size(499, 444);
 			this.gridMain.TabIndex = 80;
 			this.gridMain.Title = "Screening Groups";
 			this.gridMain.TranslationName = null;
@@ -217,7 +214,7 @@ namespace OpenDental{
 			// FormScreenGroups
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(524, 604);
+			this.ClientSize = new System.Drawing.Size(524, 576);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.butAdd);
@@ -230,7 +227,6 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label2);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Menu = this.mainMenu;
 			this.Name = "FormScreenGroups";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

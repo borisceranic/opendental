@@ -532,6 +532,9 @@ namespace OpenDentBusiness {
 		ScannerResolution,
 		ScannerSuppressDialog,
 		ScheduleProvUnassigned,
+		///<summary>Boolean. Off by default so that users will have to opt into utilizing the screening with sheets feature.
+		///Screening with sheets is extremely customized for Dental3 (D3)</summary>
+		ScreeningsUseSheets,
 		///<summary>UserGroupNum for Instructors.  Set only for dental schools in dental school setup.</summary>
 		SecurityGroupForInstructors,
 		///<summary>UserGroupNum for Students.  Set only for dental schools in dental school setup.</summary>

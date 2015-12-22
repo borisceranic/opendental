@@ -113,52 +113,18 @@ namespace OpenDental{
 				case SheetTypeEnum.TreatmentPlan:
 					FillFieldsForTreatPlan(sheet);
 					break;
+				case SheetTypeEnum.Screening:
+					ScreenGroup screenGroup=ScreenGroups.GetScreenGroup((long)GetParamByName(sheet,"ScreenGroupNum").ParamValue);
+					//Look for the optional PatNum param:
+					SheetParameter paraPatNum=GetParamByName(sheet,"PatNum");
+					if(paraPatNum!=null) {
+						pat=Patients.GetPat((long)paraPatNum.ParamValue);
+					}
+					FillFieldsForScreening(sheet,screenGroup,pat);
+					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
 			FillPatientImages(sheet,pat);
-		}
-
-		private static void FillFieldsForTreatPlan(Sheet sheet) {
-			Patient pat=Patients.GetPat(sheet.PatNum);
-			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
-			foreach(SheetField field in sheet.SheetFields) {
-				switch(field.FieldName) {
-					case "Heading":
-						field.FieldValue=treatPlan.Heading;
-						break;
-					case "defaultHeading":
-						string value="";
-						Clinic clinic;
-						if(pat.ClinicNum==0) {
-							clinic=Clinics.GetPracticeAsClinicZero();
-						}
-						else {
-							clinic=Clinics.GetClinic(pat.ClinicNum);
-						}
-						value=clinic.Description;
-						if(clinic.Phone.Length==10 && CultureInfo.CurrentCulture.Name=="en-US") {
-							value+="\r\n"+"("+clinic.Phone.Substring(0,3)+")"+clinic.Phone.Substring(3,3)+"-"+clinic.Phone.Substring(6);
-						}
-						else {
-							value+="\r\n"+clinic.Phone;
-						}
-						value+="\r\n"+pat.GetNameFLFormal()+", DOB "+pat.Birthdate.ToShortDateString();
-						if(treatPlan.ResponsParty!=0) {
-							value+="\r\n"+Lan.g("ContrTreat","Responsible Party")+": "+Patients.GetLim(treatPlan.ResponsParty).GetNameFL();
-						}
-						if(treatPlan.TPStatus==TreatPlanStatus.Saved) {
-							value+="\r\n"+treatPlan.DateTP.ToShortDateString();
-						}
-						else {//active or inactive TP
-							value+="\r\n"+DateTime.Today.ToShortDateString();
-						}
-						field.FieldValue=value;
-						break;
-					case "Note":
-						field.FieldValue=treatPlan.Note;
-						break;
-				}
-			}
 		}
 
 		private static SheetParameter GetParamByName(Sheet sheet,string paramName){
@@ -1879,16 +1845,6 @@ namespace OpenDental{
 			}
 		}
 
-		private static int CompareSheetFieldNames(SheetField input1,SheetField input2) {
-			if(Convert.ToInt32(input1.FieldName.Remove(0,8)) < Convert.ToInt32(input2.FieldName.Remove(0,8))) {
-				return -1;
-			}
-			if(Convert.ToInt32(input1.FieldName.Remove(0,8)) > Convert.ToInt32(input2.FieldName.Remove(0,8))) {
-				return 1;
-			}
-			return 0;
-		}
-
 		private static void FillFieldsForLabCase(Sheet sheet,Patient pat,LabCase labcase) {
 			Laboratory lab=Laboratories.GetOne(labcase.LaboratoryNum);//might possibly be null
 			Provider prov=Providers.GetProv(labcase.ProvNum);
@@ -2831,6 +2787,97 @@ namespace OpenDental{
 			}
 		}
 
+		private static void FillFieldsForTreatPlan(Sheet sheet) {
+			Patient pat=Patients.GetPat(sheet.PatNum);
+			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
+			foreach(SheetField field in sheet.SheetFields) {
+				switch(field.FieldName) {
+					case "Heading":
+						field.FieldValue=treatPlan.Heading;
+						break;
+					case "defaultHeading":
+						string value="";
+						Clinic clinic;
+						if(pat.ClinicNum==0) {
+							clinic=Clinics.GetPracticeAsClinicZero();
+						}
+						else {
+							clinic=Clinics.GetClinic(pat.ClinicNum);
+						}
+						value=clinic.Description;
+						if(clinic.Phone.Length==10 && CultureInfo.CurrentCulture.Name=="en-US") {
+							value+="\r\n"+"("+clinic.Phone.Substring(0,3)+")"+clinic.Phone.Substring(3,3)+"-"+clinic.Phone.Substring(6);
+						}
+						else {
+							value+="\r\n"+clinic.Phone;
+						}
+						value+="\r\n"+pat.GetNameFLFormal()+", DOB "+pat.Birthdate.ToShortDateString();
+						if(treatPlan.ResponsParty!=0) {
+							value+="\r\n"+Lan.g("ContrTreat","Responsible Party")+": "+Patients.GetLim(treatPlan.ResponsParty).GetNameFL();
+						}
+						if(treatPlan.TPStatus==TreatPlanStatus.Saved) {
+							value+="\r\n"+treatPlan.DateTP.ToShortDateString();
+						}
+						else {//active or inactive TP
+							value+="\r\n"+DateTime.Today.ToShortDateString();
+						}
+						field.FieldValue=value;
+						break;
+					case "Note":
+						field.FieldValue=treatPlan.Note;
+						break;
+				}
+			}
+		}
+
+		private static void FillFieldsForScreening(Sheet sheet,ScreenGroup screenGroup,Patient pat) {
+			//None of these might be necessary due to them being Input fields instead of Ouput fields...
+			//Screenings are weird...
+			//For now, no field needs to be prepopulated if there is not a patient already attached.
+			foreach(SheetField field in sheet.SheetFields) {
+				switch(field.FieldName) {
+					case "Description":
+						field.FieldValue=screenGroup.Description;
+						break;
+					case "DateScreenGroup":
+						field.FieldValue=screenGroup.SGDate.ToShortDateString();
+						break;
+					case "ProvName":
+						field.FieldValue=screenGroup.ProvName;
+						break;
+					case "PlaceOfService":
+						field.FieldValue=screenGroup.PlaceService.ToString();
+						break;
+					case "County":
+						field.FieldValue=screenGroup.County;
+						break;
+					case "GradeSchool":
+						field.FieldValue=screenGroup.GradeSchool;
+						break;
+				}
+				//Patient specific fields--------------------------------------------------
+				if(pat!=null) {
+					switch(field.FieldName) {
+						case "Birthdate":
+							field.FieldValue=pat.Birthdate.ToShortDateString();
+							break;
+						case "FName":
+							field.FieldValue=pat.FName;
+							break;
+						case "LName":
+							field.FieldValue=pat.LName;
+							break;
+						case "MiddleI":
+							field.FieldValue=pat.MiddleI;
+							break;
+						case "Preferred":
+							field.FieldValue=pat.Preferred;
+							break;
+					}
+				}
+			}
+		}
+
 		///<summary>Returns three label strings: Total, Insurance, Balance. These labels change based on various settings.</summary>
 		private static string[] totInsBalLabsHelper(Sheet sheet,Statement Stmt) {
 			string sLine1="";//Total
@@ -2927,6 +2974,16 @@ namespace OpenDental{
 				}
 			}
 			return new string[] { sLine1,sLine2,sLine3 };
+		}
+
+		private static int CompareSheetFieldNames(SheetField input1,SheetField input2) {
+			if(Convert.ToInt32(input1.FieldName.Remove(0,8)) < Convert.ToInt32(input2.FieldName.Remove(0,8))) {
+				return -1;
+			}
+			if(Convert.ToInt32(input1.FieldName.Remove(0,8)) > Convert.ToInt32(input2.FieldName.Remove(0,8))) {
+				return 1;
+			}
+			return 0;
 		}
 
 
