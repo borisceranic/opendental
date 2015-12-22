@@ -353,17 +353,28 @@ namespace OpenDentBusiness{
 				return;
 			}
 			//first delete any unused T codes
-			string command=@"SELECT CodeNum FROM procedurecode
-				WHERE NOT EXISTS(SELECT * FROM procedurelog WHERE procedurelog.CodeNum=procedurecode.CodeNum)
+			string command=@"SELECT CodeNum,ProcCode FROM procedurecode
+				WHERE CodeNum NOT IN(SELECT CodeNum FROM procedurelog)
+				AND CodeNum NOT IN(SELECT CodeNum FROM autocodeitem)
+				AND CodeNum NOT IN(SELECT CodeNum FROM procbuttonitem)
+				AND CodeNum NOT IN(SELECT CodeNum FROM recalltrigger)
+				AND CodeNum NOT IN(SELECT CodeNum FROM benefit)
+				AND ProcCode NOT IN(SELECT CodeValue FROM encounter WHERE CodeSystem='CDT')
 				AND ProcCode LIKE 'T%'";
 			DataTable table=Db.GetTable(command);
 			List<long> listCodeNums=new List<long>();
+			List<string> listRecallCodes=RecallTypeC.Listt.SelectMany(x => x.Procedures.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+				.ToList();
 			for(int i=0;i<table.Rows.Count;i++) {
-				listCodeNums.Add(PIn.Long(table.Rows[i]["CodeNum"].ToString()));
+				if(!listRecallCodes.Contains(PIn.String(table.Rows[i]["ProcCode"].ToString()))) {//The ProcCode is not attached to a recall type.
+					listCodeNums.Add(PIn.Long(table.Rows[i]["CodeNum"].ToString()));
+				}
 			}
 			if(listCodeNums.Count>0) {
 				ProcedureCodes.ClearFkey(listCodeNums);//Zero securitylog FKey column for rows to be deleted.
 				command="DELETE FROM fee WHERE CodeNum IN("+String.Join(",",listCodeNums)+")";
+				Db.NonQ(command);
+				command="DELETE FROM proccodenote WHERE CodeNum IN("+String.Join(",",listCodeNums)+")";
 				Db.NonQ(command);
 				command="DELETE FROM procedurecode WHERE CodeNum IN("+String.Join(",",listCodeNums)+")";
 				Db.NonQ(command);
