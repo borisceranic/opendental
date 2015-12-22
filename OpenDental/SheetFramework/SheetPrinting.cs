@@ -154,7 +154,7 @@ namespace OpenDental {
 		}
 
 		///<summary>If printing a statement, use the polymorphism that takes a DataSet otherwise this method will make another call to the db.</summary>
-		public static PrintDocument Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=false) {
+		public static PrintDocument Print(Sheet sheet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=true) {
 			if(sheet.SheetType==SheetTypeEnum.Statement && stmt!=null) {
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
@@ -167,7 +167,7 @@ namespace OpenDental {
 		}
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if printing a statement.</Summary>
-		public static PrintDocument Print(Sheet sheet,DataSet dataSet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=false) {
+		public static PrintDocument Print(Sheet sheet,DataSet dataSet,int copies=1,bool isRxControlled=false,Statement stmt=null,MedLab medLab=null,bool isPrintDocument=true) {
 			_dataSet=dataSet;
 			//parameter null check moved to SheetFiller.
 			//could validate field names here later.
@@ -234,37 +234,29 @@ namespace OpenDental {
 				_sheetList.Add(sheet.Copy());
 			}
 			//later: add a check here for print preview.
-		#if DEBUG
+#if DEBUG
 			FormPrintPreview printPreview;
 			int pageCount=0;
 			foreach(Sheet s in _sheetList) {
 				pageCount+=Sheets.CalculatePageCount(s,_printMargin);
 			}
-			if(!isPrintDocument) {
+			if(isPrintDocument) {
 				printPreview=new FormPrintPreview(sit,pd,pageCount,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed");
 				printPreview.ShowDialog();
 			}
-			#else
-				try {
-					if(sheet.PatNum!=null){
-						if(!PrinterL.SetPrinter(pd,sit,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
-							return null;
-						}
+#else
+			try {
+				pd.DefaultPageSettings.Margins=new Margins(0,0,0,0);
+				if(isPrintDocument) {//Only show the printer prompt if we're actually going to print the document.
+					if(!PrinterL.SetPrinter(pd,sit,sheet.PatNum,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
+						return null;
 					}
-					else{
-						if(!PrinterL.SetPrinter(pd,sit,0,sheet.Description+" sheet from "+sheet.DateTimeSheet.ToShortDateString()+" printed")) {
-							return null;
-						}
-					}
-					pd.DefaultPageSettings.Margins=new Margins(0,0,0,0);
-					if(!isPrintDocument){
-						pd.Print();
-					}
+					pd.Print();
 				}
-				catch(Exception ex){
-					throw ex;
-					//MessageBox.Show(Lan.g("Sheet","Printer not available"));
-				}
+			}
+			catch(Exception ex) {
+				throw ex;
+			}
 #endif
 			_isPrinting=false;
 			g.Dispose();
