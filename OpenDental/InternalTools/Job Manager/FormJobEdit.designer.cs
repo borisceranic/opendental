@@ -25,16 +25,32 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormJobEdit));
 			this.splitDescriptNotes = new System.Windows.Forms.SplitContainer();
+			this.textEditorMain = new OpenDental.OdtextEditor();
+			this.gridNotes = new OpenDental.UI.ODGrid();
+			this.gridLinks = new OpenDental.UI.ODGrid();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.butAddNote = new OpenDental.UI.Button();
 			this.groupAddLink = new System.Windows.Forms.GroupBox();
+			this.butLinkQuote = new OpenDental.UI.Button();
+			this.butLinkTask = new OpenDental.UI.Button();
+			this.butLinkFeatReq = new OpenDental.UI.Button();
+			this.butLinkBug = new OpenDental.UI.Button();
+			this.butRemove = new OpenDental.UI.Button();
 			this.tabControlMain = new System.Windows.Forms.TabControl();
 			this.tabMain = new System.Windows.Forms.TabPage();
 			this.tabReviews = new System.Windows.Forms.TabPage();
+			this.gridReview = new OpenDental.UI.ODGrid();
+			this.butAddReview = new OpenDental.UI.Button();
 			this.tabHistory = new System.Windows.Forms.TabPage();
+			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.label9 = new System.Windows.Forms.Label();
 			this.textPrevOwner = new System.Windows.Forms.TextBox();
 			this.comboStatus = new System.Windows.Forms.ComboBox();
 			this.groupActions = new System.Windows.Forms.GroupBox();
+			this.butAction2 = new OpenDental.UI.Button();
+			this.butAction3 = new OpenDental.UI.Button();
+			this.butAction4 = new OpenDental.UI.Button();
+			this.butAction1 = new OpenDental.UI.Button();
 			this.label12 = new System.Windows.Forms.Label();
 			this.textTitle = new System.Windows.Forms.TextBox();
 			this.comboCategory = new System.Windows.Forms.ComboBox();
@@ -57,28 +73,12 @@ namespace OpenDental{
 			this.label19 = new System.Windows.Forms.Label();
 			this.textJobNum = new System.Windows.Forms.TextBox();
 			this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-			this.gridNotes = new OpenDental.UI.ODGrid();
-			this.gridLinks = new OpenDental.UI.ODGrid();
-			this.gridReview = new OpenDental.UI.ODGrid();
-			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.butExpertPick = new OpenDental.UI.Button();
 			this.butOverride = new OpenDental.UI.Button();
 			this.butOwnerPick = new OpenDental.UI.Button();
 			this.textActualHours = new OpenDental.ValidNumber();
 			this.textEstHours = new OpenDental.ValidNumber();
-			this.butAction2 = new OpenDental.UI.Button();
-			this.butAction3 = new OpenDental.UI.Button();
-			this.butAction4 = new OpenDental.UI.Button();
-			this.butAction1 = new OpenDental.UI.Button();
 			this.butProjectPick = new OpenDental.UI.Button();
-			this.textEditorMain = new OpenDental.OdtextEditor();
-			this.butAddNote = new OpenDental.UI.Button();
-			this.butLinkQuote = new OpenDental.UI.Button();
-			this.butLinkTask = new OpenDental.UI.Button();
-			this.butLinkFeatReq = new OpenDental.UI.Button();
-			this.butLinkBug = new OpenDental.UI.Button();
-			this.butRemove = new OpenDental.UI.Button();
-			this.butAddReview = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
@@ -121,6 +121,55 @@ namespace OpenDental{
 			this.splitDescriptNotes.SplitterWidth = 10;
 			this.splitDescriptNotes.TabIndex = 0;
 			// 
+			// textEditorMain
+			// 
+			this.textEditorMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textEditorMain.HasSaveButton = true;
+			this.textEditorMain.Location = new System.Drawing.Point(0, -2);
+			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
+    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
+			this.textEditorMain.MainText = "";
+			this.textEditorMain.MinimumSize = new System.Drawing.Size(450, 290);
+			this.textEditorMain.Name = "textEditorMain";
+			this.textEditorMain.ReadOnly = false;
+			this.textEditorMain.Size = new System.Drawing.Size(1013, 366);
+			this.textEditorMain.TabIndex = 191;
+			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditorMain_SaveClick);
+			// 
+			// gridNotes
+			// 
+			this.gridNotes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridNotes.HasMultilineHeaders = false;
+			this.gridNotes.HScrollVisible = false;
+			this.gridNotes.Location = new System.Drawing.Point(431, 0);
+			this.gridNotes.Name = "gridNotes";
+			this.gridNotes.ScrollValue = 0;
+			this.gridNotes.Size = new System.Drawing.Size(577, 191);
+			this.gridNotes.TabIndex = 150;
+			this.gridNotes.Title = "Notes";
+			this.gridNotes.TranslationName = "FormTaskEdit";
+			this.gridNotes.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridNotes_CellDoubleClick);
+			// 
+			// gridLinks
+			// 
+			this.gridLinks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridLinks.HasMultilineHeaders = false;
+			this.gridLinks.HScrollVisible = false;
+			this.gridLinks.Location = new System.Drawing.Point(0, 0);
+			this.gridLinks.Name = "gridLinks";
+			this.gridLinks.ScrollValue = 0;
+			this.gridLinks.Size = new System.Drawing.Size(423, 191);
+			this.gridLinks.TabIndex = 154;
+			this.gridLinks.TabStop = false;
+			this.gridLinks.Title = "Links";
+			this.gridLinks.TranslationName = null;
+			this.gridLinks.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridLinks_CellDoubleClick);
+			// 
 			// panel1
 			// 
 			this.panel1.Controls.Add(this.butAddNote);
@@ -131,6 +180,23 @@ namespace OpenDental{
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(1012, 58);
 			this.panel1.TabIndex = 155;
+			// 
+			// butAddNote
+			// 
+			this.butAddNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAddNote.Autosize = true;
+			this.butAddNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddNote.CornerRadius = 4F;
+			this.butAddNote.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddNote.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAddNote.Location = new System.Drawing.Point(932, 22);
+			this.butAddNote.Name = "butAddNote";
+			this.butAddNote.Size = new System.Drawing.Size(75, 24);
+			this.butAddNote.TabIndex = 151;
+			this.butAddNote.Text = "Add";
+			this.butAddNote.Click += new System.EventHandler(this.butAddNote_Click);
 			// 
 			// groupAddLink
 			// 
@@ -144,6 +210,78 @@ namespace OpenDental{
 			this.groupAddLink.TabIndex = 152;
 			this.groupAddLink.TabStop = false;
 			this.groupAddLink.Text = "Add Link";
+			// 
+			// butLinkQuote
+			// 
+			this.butLinkQuote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkQuote.Autosize = true;
+			this.butLinkQuote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkQuote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkQuote.CornerRadius = 4F;
+			this.butLinkQuote.Location = new System.Drawing.Point(200, 19);
+			this.butLinkQuote.Name = "butLinkQuote";
+			this.butLinkQuote.Size = new System.Drawing.Size(60, 22);
+			this.butLinkQuote.TabIndex = 3;
+			this.butLinkQuote.Text = "Quote";
+			this.butLinkQuote.Click += new System.EventHandler(this.butLinkQuote_Click);
+			// 
+			// butLinkTask
+			// 
+			this.butLinkTask.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkTask.Autosize = true;
+			this.butLinkTask.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkTask.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkTask.CornerRadius = 4F;
+			this.butLinkTask.Location = new System.Drawing.Point(6, 19);
+			this.butLinkTask.Name = "butLinkTask";
+			this.butLinkTask.Size = new System.Drawing.Size(60, 22);
+			this.butLinkTask.TabIndex = 0;
+			this.butLinkTask.Text = "Task";
+			this.butLinkTask.Click += new System.EventHandler(this.butLinkTask_Click);
+			// 
+			// butLinkFeatReq
+			// 
+			this.butLinkFeatReq.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkFeatReq.Autosize = true;
+			this.butLinkFeatReq.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkFeatReq.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkFeatReq.CornerRadius = 4F;
+			this.butLinkFeatReq.Location = new System.Drawing.Point(70, 19);
+			this.butLinkFeatReq.Name = "butLinkFeatReq";
+			this.butLinkFeatReq.Size = new System.Drawing.Size(62, 22);
+			this.butLinkFeatReq.TabIndex = 1;
+			this.butLinkFeatReq.Text = "Feat. Req.";
+			this.butLinkFeatReq.Click += new System.EventHandler(this.butLinkFeatReq_Click);
+			// 
+			// butLinkBug
+			// 
+			this.butLinkBug.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLinkBug.Autosize = true;
+			this.butLinkBug.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLinkBug.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLinkBug.CornerRadius = 4F;
+			this.butLinkBug.Enabled = false;
+			this.butLinkBug.Location = new System.Drawing.Point(136, 19);
+			this.butLinkBug.Name = "butLinkBug";
+			this.butLinkBug.Size = new System.Drawing.Size(60, 22);
+			this.butLinkBug.TabIndex = 2;
+			this.butLinkBug.Text = "Bug";
+			this.butLinkBug.Click += new System.EventHandler(this.butLinkBug_Click);
+			// 
+			// butRemove
+			// 
+			this.butRemove.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRemove.Autosize = true;
+			this.butRemove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRemove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRemove.CornerRadius = 4F;
+			this.butRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butRemove.Location = new System.Drawing.Point(5, 22);
+			this.butRemove.Name = "butRemove";
+			this.butRemove.Size = new System.Drawing.Size(75, 24);
+			this.butRemove.TabIndex = 153;
+			this.butRemove.Text = "Remove";
+			this.butRemove.Click += new System.EventHandler(this.butLinkRemove_Click);
 			// 
 			// tabControlMain
 			// 
@@ -182,6 +320,40 @@ namespace OpenDental{
 			this.tabReviews.Text = "Reviews";
 			this.tabReviews.UseVisualStyleBackColor = true;
 			// 
+			// gridReview
+			// 
+			this.gridReview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridReview.HasMultilineHeaders = false;
+			this.gridReview.HScrollVisible = false;
+			this.gridReview.Location = new System.Drawing.Point(0, 0);
+			this.gridReview.Name = "gridReview";
+			this.gridReview.ScrollValue = 0;
+			this.gridReview.Size = new System.Drawing.Size(1014, 607);
+			this.gridReview.TabIndex = 21;
+			this.gridReview.TabStop = false;
+			this.gridReview.Title = "Reviews";
+			this.gridReview.TranslationName = null;
+			this.gridReview.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridReview_CellDoubleClick);
+			// 
+			// butAddReview
+			// 
+			this.butAddReview.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddReview.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.butAddReview.Autosize = true;
+			this.butAddReview.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddReview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddReview.CornerRadius = 4F;
+			this.butAddReview.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddReview.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAddReview.Location = new System.Drawing.Point(470, 613);
+			this.butAddReview.Name = "butAddReview";
+			this.butAddReview.Size = new System.Drawing.Size(75, 24);
+			this.butAddReview.TabIndex = 20;
+			this.butAddReview.Text = "Add";
+			this.butAddReview.Click += new System.EventHandler(this.butAddReview_Click);
+			// 
 			// tabHistory
 			// 
 			this.tabHistory.Controls.Add(this.gridHistory);
@@ -192,6 +364,20 @@ namespace OpenDental{
 			this.tabHistory.TabIndex = 3;
 			this.tabHistory.Text = "History";
 			this.tabHistory.UseVisualStyleBackColor = true;
+			// 
+			// gridHistory
+			// 
+			this.gridHistory.HasMultilineHeaders = false;
+			this.gridHistory.HScrollVisible = false;
+			this.gridHistory.Location = new System.Drawing.Point(0, 0);
+			this.gridHistory.Name = "gridHistory";
+			this.gridHistory.ScrollValue = 0;
+			this.gridHistory.Size = new System.Drawing.Size(523, 640);
+			this.gridHistory.TabIndex = 19;
+			this.gridHistory.TabStop = false;
+			this.gridHistory.Title = "History Events";
+			this.gridHistory.TranslationName = null;
+			this.gridHistory.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridHistory_CellDoubleClick);
 			// 
 			// label9
 			// 
@@ -234,6 +420,62 @@ namespace OpenDental{
 			this.groupActions.TabIndex = 183;
 			this.groupActions.TabStop = false;
 			this.groupActions.Text = "Job Actions";
+			// 
+			// butAction2
+			// 
+			this.butAction2.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAction2.Autosize = true;
+			this.butAction2.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAction2.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAction2.CornerRadius = 4F;
+			this.butAction2.Location = new System.Drawing.Point(16, 51);
+			this.butAction2.Name = "butAction2";
+			this.butAction2.Size = new System.Drawing.Size(145, 24);
+			this.butAction2.TabIndex = 0;
+			this.butAction2.Text = "Action 2";
+			this.butAction2.Click += new System.EventHandler(this.butAction2_Click);
+			// 
+			// butAction3
+			// 
+			this.butAction3.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAction3.Autosize = true;
+			this.butAction3.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAction3.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAction3.CornerRadius = 4F;
+			this.butAction3.Location = new System.Drawing.Point(16, 81);
+			this.butAction3.Name = "butAction3";
+			this.butAction3.Size = new System.Drawing.Size(145, 24);
+			this.butAction3.TabIndex = 18;
+			this.butAction3.Text = "Action 3";
+			this.butAction3.Click += new System.EventHandler(this.butAction3_Click);
+			// 
+			// butAction4
+			// 
+			this.butAction4.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAction4.Autosize = true;
+			this.butAction4.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAction4.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAction4.CornerRadius = 4F;
+			this.butAction4.Location = new System.Drawing.Point(16, 111);
+			this.butAction4.Name = "butAction4";
+			this.butAction4.Size = new System.Drawing.Size(145, 24);
+			this.butAction4.TabIndex = 14;
+			this.butAction4.Text = "Action 4";
+			this.butAction4.Click += new System.EventHandler(this.butAction4_Click);
+			// 
+			// butAction1
+			// 
+			this.butAction1.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAction1.Autosize = true;
+			this.butAction1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAction1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAction1.CornerRadius = 4F;
+			this.butAction1.Location = new System.Drawing.Point(16, 21);
+			this.butAction1.Name = "butAction1";
+			this.butAction1.Size = new System.Drawing.Size(145, 24);
+			this.butAction1.TabIndex = 19;
+			this.butAction1.Text = "Action 1";
+			this.butAction1.Click += new System.EventHandler(this.butAction1_Click);
 			// 
 			// label12
 			// 
@@ -429,69 +671,6 @@ namespace OpenDental{
 			this.textJobNum.TabIndex = 174;
 			this.textJobNum.TabStop = false;
 			// 
-			// gridNotes
-			// 
-			this.gridNotes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridNotes.HasMultilineHeaders = false;
-			this.gridNotes.HScrollVisible = false;
-			this.gridNotes.Location = new System.Drawing.Point(431, 0);
-			this.gridNotes.Name = "gridNotes";
-			this.gridNotes.ScrollValue = 0;
-			this.gridNotes.Size = new System.Drawing.Size(577, 197);
-			this.gridNotes.TabIndex = 150;
-			this.gridNotes.Title = "Notes";
-			this.gridNotes.TranslationName = "FormTaskEdit";
-			this.gridNotes.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridNotes_CellDoubleClick);
-			// 
-			// gridLinks
-			// 
-			this.gridLinks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridLinks.HasMultilineHeaders = false;
-			this.gridLinks.HScrollVisible = false;
-			this.gridLinks.Location = new System.Drawing.Point(0, 0);
-			this.gridLinks.Name = "gridLinks";
-			this.gridLinks.ScrollValue = 0;
-			this.gridLinks.Size = new System.Drawing.Size(423, 197);
-			this.gridLinks.TabIndex = 154;
-			this.gridLinks.TabStop = false;
-			this.gridLinks.Title = "Links";
-			this.gridLinks.TranslationName = null;
-			this.gridLinks.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridLinks_CellDoubleClick);
-			// 
-			// gridReview
-			// 
-			this.gridReview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridReview.HasMultilineHeaders = false;
-			this.gridReview.HScrollVisible = false;
-			this.gridReview.Location = new System.Drawing.Point(0, 0);
-			this.gridReview.Name = "gridReview";
-			this.gridReview.ScrollValue = 0;
-			this.gridReview.Size = new System.Drawing.Size(1014, 607);
-			this.gridReview.TabIndex = 21;
-			this.gridReview.TabStop = false;
-			this.gridReview.Title = "Reviews";
-			this.gridReview.TranslationName = null;
-			this.gridReview.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridReview_CellDoubleClick);
-			// 
-			// gridHistory
-			// 
-			this.gridHistory.HasMultilineHeaders = false;
-			this.gridHistory.HScrollVisible = false;
-			this.gridHistory.Location = new System.Drawing.Point(0, 0);
-			this.gridHistory.Name = "gridHistory";
-			this.gridHistory.ScrollValue = 0;
-			this.gridHistory.Size = new System.Drawing.Size(523, 640);
-			this.gridHistory.TabIndex = 19;
-			this.gridHistory.TabStop = false;
-			this.gridHistory.Title = "History Events";
-			this.gridHistory.TranslationName = null;
-			this.gridHistory.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridHistory_CellDoubleClick);
-			// 
 			// butExpertPick
 			// 
 			this.butExpertPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -555,62 +734,6 @@ namespace OpenDental{
 			this.textEstHours.Size = new System.Drawing.Size(46, 20);
 			this.textEstHours.TabIndex = 184;
 			// 
-			// butAction2
-			// 
-			this.butAction2.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAction2.Autosize = true;
-			this.butAction2.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAction2.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAction2.CornerRadius = 4F;
-			this.butAction2.Location = new System.Drawing.Point(16, 51);
-			this.butAction2.Name = "butAction2";
-			this.butAction2.Size = new System.Drawing.Size(145, 24);
-			this.butAction2.TabIndex = 0;
-			this.butAction2.Text = "Action 2";
-			this.butAction2.Click += new System.EventHandler(this.butAction2_Click);
-			// 
-			// butAction3
-			// 
-			this.butAction3.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAction3.Autosize = true;
-			this.butAction3.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAction3.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAction3.CornerRadius = 4F;
-			this.butAction3.Location = new System.Drawing.Point(16, 81);
-			this.butAction3.Name = "butAction3";
-			this.butAction3.Size = new System.Drawing.Size(145, 24);
-			this.butAction3.TabIndex = 18;
-			this.butAction3.Text = "Action 3";
-			this.butAction3.Click += new System.EventHandler(this.butAction3_Click);
-			// 
-			// butAction4
-			// 
-			this.butAction4.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAction4.Autosize = true;
-			this.butAction4.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAction4.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAction4.CornerRadius = 4F;
-			this.butAction4.Location = new System.Drawing.Point(16, 111);
-			this.butAction4.Name = "butAction4";
-			this.butAction4.Size = new System.Drawing.Size(145, 24);
-			this.butAction4.TabIndex = 14;
-			this.butAction4.Text = "Action 4";
-			this.butAction4.Click += new System.EventHandler(this.butAction4_Click);
-			// 
-			// butAction1
-			// 
-			this.butAction1.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAction1.Autosize = true;
-			this.butAction1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAction1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAction1.CornerRadius = 4F;
-			this.butAction1.Location = new System.Drawing.Point(16, 21);
-			this.butAction1.Name = "butAction1";
-			this.butAction1.Size = new System.Drawing.Size(145, 24);
-			this.butAction1.TabIndex = 19;
-			this.butAction1.Text = "Action 1";
-			this.butAction1.Click += new System.EventHandler(this.butAction1_Click);
-			// 
 			// butProjectPick
 			// 
 			this.butProjectPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -624,129 +747,6 @@ namespace OpenDental{
 			this.butProjectPick.TabIndex = 180;
 			this.butProjectPick.Text = "...";
 			this.butProjectPick.Click += new System.EventHandler(this.butProjectPick_Click);
-			// 
-			// textEditorMain
-			// 
-			this.textEditorMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textEditorMain.HasSaveButton = true;
-			this.textEditorMain.Location = new System.Drawing.Point(0, -2);
-			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
-    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
-			this.textEditorMain.MainText = "";
-			this.textEditorMain.MinimumSize = new System.Drawing.Size(450, 290);
-			this.textEditorMain.Name = "textEditorMain";
-			this.textEditorMain.ReadOnly = false;
-			this.textEditorMain.Size = new System.Drawing.Size(1013, 366);
-			this.textEditorMain.TabIndex = 191;
-			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditorMain_SaveClick);
-			// 
-			// butAddNote
-			// 
-			this.butAddNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butAddNote.Autosize = true;
-			this.butAddNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAddNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAddNote.CornerRadius = 4F;
-			this.butAddNote.Image = global::OpenDental.Properties.Resources.Add;
-			this.butAddNote.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddNote.Location = new System.Drawing.Point(932, 22);
-			this.butAddNote.Name = "butAddNote";
-			this.butAddNote.Size = new System.Drawing.Size(75, 24);
-			this.butAddNote.TabIndex = 151;
-			this.butAddNote.Text = "Add";
-			this.butAddNote.Click += new System.EventHandler(this.butAddNote_Click);
-			// 
-			// butLinkQuote
-			// 
-			this.butLinkQuote.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinkQuote.Autosize = true;
-			this.butLinkQuote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLinkQuote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLinkQuote.CornerRadius = 4F;
-			this.butLinkQuote.Location = new System.Drawing.Point(200, 19);
-			this.butLinkQuote.Name = "butLinkQuote";
-			this.butLinkQuote.Size = new System.Drawing.Size(60, 22);
-			this.butLinkQuote.TabIndex = 3;
-			this.butLinkQuote.Text = "Quote";
-			this.butLinkQuote.Click += new System.EventHandler(this.butLinkQuote_Click);
-			// 
-			// butLinkTask
-			// 
-			this.butLinkTask.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinkTask.Autosize = true;
-			this.butLinkTask.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLinkTask.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLinkTask.CornerRadius = 4F;
-			this.butLinkTask.Location = new System.Drawing.Point(6, 19);
-			this.butLinkTask.Name = "butLinkTask";
-			this.butLinkTask.Size = new System.Drawing.Size(60, 22);
-			this.butLinkTask.TabIndex = 0;
-			this.butLinkTask.Text = "Task";
-			this.butLinkTask.Click += new System.EventHandler(this.butLinkTask_Click);
-			// 
-			// butLinkFeatReq
-			// 
-			this.butLinkFeatReq.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinkFeatReq.Autosize = true;
-			this.butLinkFeatReq.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLinkFeatReq.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLinkFeatReq.CornerRadius = 4F;
-			this.butLinkFeatReq.Location = new System.Drawing.Point(70, 19);
-			this.butLinkFeatReq.Name = "butLinkFeatReq";
-			this.butLinkFeatReq.Size = new System.Drawing.Size(62, 22);
-			this.butLinkFeatReq.TabIndex = 1;
-			this.butLinkFeatReq.Text = "Feat. Req.";
-			this.butLinkFeatReq.Click += new System.EventHandler(this.butLinkFeatReq_Click);
-			// 
-			// butLinkBug
-			// 
-			this.butLinkBug.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butLinkBug.Autosize = true;
-			this.butLinkBug.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butLinkBug.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butLinkBug.CornerRadius = 4F;
-			this.butLinkBug.Enabled = false;
-			this.butLinkBug.Location = new System.Drawing.Point(136, 19);
-			this.butLinkBug.Name = "butLinkBug";
-			this.butLinkBug.Size = new System.Drawing.Size(60, 22);
-			this.butLinkBug.TabIndex = 2;
-			this.butLinkBug.Text = "Bug";
-			this.butLinkBug.Click += new System.EventHandler(this.butLinkBug_Click);
-			// 
-			// butRemove
-			// 
-			this.butRemove.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butRemove.Autosize = true;
-			this.butRemove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butRemove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butRemove.CornerRadius = 4F;
-			this.butRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butRemove.Location = new System.Drawing.Point(5, 22);
-			this.butRemove.Name = "butRemove";
-			this.butRemove.Size = new System.Drawing.Size(75, 24);
-			this.butRemove.TabIndex = 153;
-			this.butRemove.Text = "Remove";
-			this.butRemove.Click += new System.EventHandler(this.butLinkRemove_Click);
-			// 
-			// butAddReview
-			// 
-			this.butAddReview.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddReview.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.butAddReview.Autosize = true;
-			this.butAddReview.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAddReview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAddReview.CornerRadius = 4F;
-			this.butAddReview.Image = global::OpenDental.Properties.Resources.Add;
-			this.butAddReview.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddReview.Location = new System.Drawing.Point(470, 613);
-			this.butAddReview.Name = "butAddReview";
-			this.butAddReview.Size = new System.Drawing.Size(75, 24);
-			this.butAddReview.TabIndex = 20;
-			this.butAddReview.Text = "Add";
-			this.butAddReview.Click += new System.EventHandler(this.butAddReview_Click);
 			// 
 			// butOK
 			// 

@@ -381,12 +381,14 @@
 			// butAddJob
 			// 
 			this.butAddJob.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddJob.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAddJob.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAddJob.Autosize = true;
 			this.butAddJob.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddJob.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAddJob.CornerRadius = 4F;
-			this.butAddJob.Location = new System.Drawing.Point(602, 681);
+			this.butAddJob.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddJob.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAddJob.Location = new System.Drawing.Point(606, 84);
 			this.butAddJob.Name = "butAddJob";
 			this.butAddJob.Size = new System.Drawing.Size(75, 24);
 			this.butAddJob.TabIndex = 157;
@@ -533,6 +535,8 @@
 			this.butAddJobMain.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddJobMain.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAddJobMain.CornerRadius = 4F;
+			this.butAddJobMain.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddJobMain.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butAddJobMain.Location = new System.Drawing.Point(678, 20);
 			this.butAddJobMain.Name = "butAddJobMain";
 			this.butAddJobMain.Size = new System.Drawing.Size(75, 24);
