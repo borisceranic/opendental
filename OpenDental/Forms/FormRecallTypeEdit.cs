@@ -672,10 +672,10 @@ namespace OpenDental{
 		}
 
 		private void FillTriggers(){
+			listTriggers.Items.Clear();
 			if(TriggerList.Count==0 || comboSpecial.SelectedIndex==2) {//child prophy special type has no triggers, triggers from Prophy type are used
 				return;
 			}
-			listTriggers.Items.Clear();
 			string str;
 			for(int i=0;i<TriggerList.Count;i++){
 				str=ProcedureCodes.GetStringProcCode(TriggerList[i].CodeNum);
