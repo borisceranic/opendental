@@ -142,15 +142,15 @@ namespace OpenDental{
 						else {
 							value+="\r\n"+clinic.Phone;
 						}
-						value+=pat.GetNameFLFormal()+", DOB "+pat.Birthdate.ToShortDateString();
+						value+="\r\n"+pat.GetNameFLFormal()+", DOB "+pat.Birthdate.ToShortDateString();
 						if(treatPlan.ResponsParty!=0) {
 							value+="\r\n"+Lan.g("ContrTreat","Responsible Party")+": "+Patients.GetLim(treatPlan.ResponsParty).GetNameFL();
 						}
-						if(treatPlan.TreatPlanNum==0) {//default TP
-							value+="\r\n"+DateTime.Today.ToShortDateString();
-						}
-						else {
+						if(treatPlan.TPStatus==TreatPlanStatus.Saved) {
 							value+="\r\n"+treatPlan.DateTP.ToShortDateString();
+						}
+						else {//active or inactive TP
+							value+="\r\n"+DateTime.Today.ToShortDateString();
 						}
 						field.FieldValue=value;
 						break;
