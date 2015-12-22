@@ -505,7 +505,16 @@ namespace OpenDentBusiness{
 			FeeSched toSched=FeeScheds.GetOne(toFeeSched,listFeeScheds);
 			List<Fee> listFeesForSched=listFees.FindAll(x => x.FeeSched==fromFeeSched);
 			foreach(Fee feeCur in listFeesForSched) {
+				if(listFees.Exists(x => x.CodeNum==feeCur.CodeNum 
+						&& x.ClinicNum==toClinicNum 
+						&& x.ProvNum==toProvNum)) 
+				{
+					continue;
+				}
 				Fee feeBestMatch=GetFee(feeCur.CodeNum,fromFeeSched,fromClinicNum,fromProvNum,listFeesForSched);
+				if(feeBestMatch==null) {//The source fee schedule doesn't have a fee for that
+					continue;
+				}
 				fee=feeBestMatch.Copy();
 				fee.ProvNum=toProvNum;
 				fee.ClinicNum=toClinicNum;
