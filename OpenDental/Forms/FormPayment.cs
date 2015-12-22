@@ -1973,7 +1973,8 @@ namespace OpenDental {
 				textNote.Text+=((textNote.Text=="")?"":Environment.NewLine)+
 					Lan.g(this,"Transaction Type")+": "+Enum.GetName(typeof(PayConnectService.transType),FormP.TranType)+Environment.NewLine+
 					Lan.g(this,"Status")+": "+FormP.Response.Status.description+Environment.NewLine+
-					Lan.g(this,"Amount")+": "+FormP.AmountCharged;
+					Lan.g(this,"Amount")+": "+FormP.AmountCharged+Environment.NewLine+
+					Lan.g(this,"Card Type")+": "+PayConnectUtils.GetCardType(FormP.CardNumber);
 				if(FormP.Response.Status.code==0) { //The transaction succeeded.
 					if(FormP.TranType!=PayConnectService.transType.VOID) {
 						_wasCreditCardSuccessful=true; //Will void the transaction if user cancels out of window.

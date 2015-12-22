@@ -90,28 +90,5 @@ namespace OpenDental.Bridges {
 			return isValid;
 		}
 
-		///<summary>Returns the card type string for the supplied CC number.  If any errors happen retrieving the card type, this will return an empty string.</summary>
-		public static string GetCardType(string cardNumber) {
-			PayConnectService.cardType pcCardType;
-			bool isTypeSpecified;//not sure what this bool is for
-			string retval="";
-			try {
-				PayConnectService.MerchantService ms=new PayConnectService.MerchantService();
-#if DEBUG
-				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
-#else
-				ms.Url="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl";
-#endif
-				ms.getCardType(cardNumber,out pcCardType,out isTypeSpecified);
-				retval=pcCardType.ToString();
-				ms.Dispose();
-			}
-			catch(Exception ex) {
-				MessageBox.Show(Lan.g("PayConnect","Call to get card type failed")+". \r\n"+Lan.g("PayConnect","Error message from")
-					+" Open Dental: \""+ex.Message+"\"");
-			}
-			return retval;
-		}
-
 	}
 }

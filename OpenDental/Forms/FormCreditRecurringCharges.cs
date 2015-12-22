@@ -613,7 +613,7 @@ namespace OpenDental {
 					strBuilderResultText.AppendLine("CARD TYPE=PayConnect Token");
 				}
 				else {
-					strBuilderResultText.AppendLine("CARD TYPE="+PayConnect.GetCardType(tokenOrCCMasked).ToString());
+					strBuilderResultText.AppendLine("CARD TYPE="+PayConnectUtils.GetCardType(tokenOrCCMasked));
 				}
 				strBuilderResultText.AppendLine("AMOUNT="+payConnectRequest.Amount.ToString("F2"));
 				CreatePayment(patCur,i,strBuilderResultText.ToString());

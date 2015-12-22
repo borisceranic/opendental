@@ -185,6 +185,11 @@ namespace OpenDental {
 			get { return _trantype; }
 		}
 
+		///<summary>Only call after the form is closed and the DialogResult is DialogResult.OK.</summary>
+		public string CardNumber {
+			get { return textCardNumber.Text; }
+		}
+
 		private bool VerifyData(out int expYear,out int expMonth){
 			expYear=0;
 			expMonth=0;
@@ -304,7 +309,7 @@ namespace OpenDental {
 			}
 			result+=request.CardNumber.Substring(request.CardNumber.Length-4)+Environment.NewLine;//last 4 digits of card number only.
 			result+="Exp Date".PadRight(xright-xleft,'.')+request.Expiration.month.ToString().PadLeft(2,'0')+(request.Expiration.year%100)+Environment.NewLine;
-			result+="Card Type".PadRight(xright-xleft,'.')+Bridges.PayConnect.GetCardType(request.CardNumber)+Environment.NewLine;
+			result+="Card Type".PadRight(xright-xleft,'.')+PayConnectUtils.GetCardType(request.CardNumber)+Environment.NewLine;
 			result+="Entry".PadRight(xright-xleft,'.')+(String.IsNullOrEmpty(request.MagData)?"Manual":"Swiped")+Environment.NewLine;
 			result+="Auth Code".PadRight(xright-xleft,'.')+response.AuthCode+Environment.NewLine;
 			result+="Result".PadRight(xright-xleft,'.')+response.Status.description+Environment.NewLine;
@@ -447,7 +452,7 @@ namespace OpenDental {
 
 	}
 
-	public class MagstripCardParser {
+	internal class MagstripCardParser {
 
 		private const char TRACK_SEPARATOR='?';
 		private const char FIELD_SEPARATOR='^';
@@ -578,7 +583,7 @@ namespace OpenDental {
 			if(parts.Length!=3) {
 				throw new MagstripCardParseException("Missing last field separator (^) in track 1 data.");
 			}
-			_accountNumber=CreditCardUtils.StripNonDigits(parts[0]);
+			_accountNumber=PayConnectUtils.StripNonDigits(parts[0]);
 			if(!String.IsNullOrEmpty(parts[1])) {
 				_accountHolder=parts[1].Trim();
 			}
@@ -615,7 +620,7 @@ namespace OpenDental {
 					throw new MagstripCardParseException("Missing field separator (=) in track 2 data.");
 				}
 				if(String.IsNullOrEmpty(_accountNumber)) {
-					_accountNumber=CreditCardUtils.StripNonDigits(parts[0]);
+					_accountNumber=PayConnectUtils.StripNonDigits(parts[0]);
 				}
 				if(_expMonth==0 || _expYear==0) {
 					//date format: YYMM
@@ -631,7 +636,7 @@ namespace OpenDental {
 		}
 
 		private int ParseExpireMonth(string s) {
-			s=CreditCardUtils.StripNonDigits(s);
+			s=PayConnectUtils.StripNonDigits(s);
 			if(!ValidateExpiration(s)) {
 				return 0;
 			}
@@ -642,7 +647,7 @@ namespace OpenDental {
 		}
 
 		private int ParseExpireYear(string s) {
-			s=CreditCardUtils.StripNonDigits(s);
+			s=PayConnectUtils.StripNonDigits(s);
 			if(!ValidateExpiration(s)) {
 				return 0;
 			}
@@ -671,9 +676,9 @@ namespace OpenDental {
 
 	}
 
-	static class CreditCardUtils {
+	static class PayConnectUtils {
 
-		public static string GetType(string ccNum) {
+		public static string GetCardType(string ccNum) {
 			if(ccNum==null || ccNum=="") {
 				return "";
 			}
@@ -832,7 +837,7 @@ namespace OpenDental {
 
 	}
 
-	public class MagstripCardParseException:Exception {
+	internal class MagstripCardParseException:Exception {
 
 		public MagstripCardParseException(Exception cause)
 			: base(cause.Message,cause) {
