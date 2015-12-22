@@ -82,7 +82,12 @@ namespace OpenDental {
 			if(gridMain.GetSelectedIndex() > -1) {
 				colHeaderWidths=WikiListHeaderWidths.GetFromListHist(_listWikiListHists[gridMain.GetSelectedIndex()]);
 				using(XmlReader xmlReader=XmlReader.Create(new StringReader(_listWikiListHists[gridMain.GetSelectedIndex()].ListContent))) {
-					_tableOld.ReadXml(xmlReader);
+					try {
+						_tableOld.ReadXml(xmlReader);
+					}
+					catch(Exception) {
+						MsgBox.Show(this,"Corruption detected in the Old Revision table.  Partial data will be displayed.  Please call us for support.");
+					}
 				}
 			}
 			gridOld.BeginUpdate();
@@ -158,7 +163,13 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Revert list to currently selected revision?")) {
 				return;
 			}
-			WikiListHists.RevertFrom(_listWikiListHists[gridMain.GetSelectedIndex()],Security.CurUser.UserNum);
+			try {
+				WikiListHists.RevertFrom(_listWikiListHists[gridMain.GetSelectedIndex()],Security.CurUser.UserNum);
+			}
+			catch(Exception) {
+				MsgBox.Show(this,"There was an error when trying to revert changes.  Please call us for support.");
+				return;
+			}
 			FillGridMain();
 			gridMain.SetSelected(false);
 			gridMain.SetSelected(gridMain.Rows.Count-1,true);//select the new revision.
