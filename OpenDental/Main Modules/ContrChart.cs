@@ -8087,7 +8087,6 @@ namespace OpenDental {
 				}//n selected teeth
 			}//end Part 1 checking for ProcCodes, now will check for AutoCodes
 			string toothNum;
-			string surf;
 			bool isAdditional;
 			//long orionProvNum=0;
 			for(int i=0;i<autoCodeList.Length;i++){
@@ -8097,11 +8096,10 @@ namespace OpenDental {
 						toothNum=toothChart.SelectedTeeth[n];
 					else
 						toothNum="";
-					surf=textSurf.Text;
 					isAdditional= n!=0;
 					ProcCur=new Procedure();//this will be an insert, so no need to set CurOld
 					//Clean to db
-					surf=Tooth.SurfTidyFromDisplayToDb(surf,toothNum);
+					string surf=Tooth.SurfTidyForClaims(textSurf.Text,toothNum);
 					ProcCur.CodeNum=AutoCodeItems.GetCodeNum(autoCodeList[i],toothNum,surf,isAdditional,PatCur.PatNum,PatCur.Age);
 					tArea=ProcedureCodes.GetProcCode(ProcCur.CodeNum).TreatArea;
 					if((tArea==TreatmentArea.Arch
