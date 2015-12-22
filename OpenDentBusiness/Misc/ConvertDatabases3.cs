@@ -11734,6 +11734,15 @@ namespace OpenDentBusiness {
 								+"'CleaRay')";
 								Db.NonQ(command);
 				}//end CleaRay bridge
+				//Wrap columns when printing
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('ReportPrintWrapColumns','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES ((SELECT MAX(PrefNum)+1 FROM preference),'ReportPrintWrapColumns','0')";
+					Db.NonQ(command);
+				}
 
 
 

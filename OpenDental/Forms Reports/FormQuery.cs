@@ -1335,27 +1335,64 @@ namespace OpenDental{
 				}
 			}
 			yPos+=bodyFont.GetHeight(ev.Graphics)+5;
-			//table:
-			while(yPos<bounds.Top+bounds.Height-18//The 18 is allowance for the line about to print. 
-				&& linesPrinted < report.TableQ.Rows.Count)
+			float fontHeight=bodyFont.GetHeight(ev.Graphics);
+			float yPosTableTop=yPos;
+			//table: each loop iteration prints one row in the grid.
+			while(yPos<bounds.Top+bounds.Height-18//The 18 is minimum allowance for the line about to print. 
+				&& linesPrinted < report.TableQ.Rows.Count)//Page might finish early on the last page.
 			{
-				for(int iCol=0;iCol<report.TableQ.Columns.Count;iCol++){
-					if(report.ColAlign[iCol]==HorizontalAlignment.Right){
-						ev.Graphics.DrawString(grid2[linesPrinted,iCol].ToString()
-							,bodyFont,Brushes.Black,new RectangleF(
-							bounds.Left+report.ColPos[iCol+1]
-							-ev.Graphics.MeasureString(grid2[linesPrinted,iCol].ToString(),bodyFont).Width-1,yPos
-							,report.ColWidth[iCol],bodyFont.GetHeight(ev.Graphics)));
+				bool isColWrap=PrefC.GetBool(PrefName.ReportPrintWrapColumns);
+				if(isColWrap && yPos > yPosTableTop) {//First row always prints.  Otherwise the row might be pushed to next page if too tall.
+					int cellWidth;//Width to be adjusted and used to calculate row height.
+					bool isRowTooTall=false;//Bool to indicate if a row we are about to print is too tall for the avaible space on page.
+					for(int iCol2=0;iCol2<report.TableQ.Columns.Count;iCol2++){
+						if(report.ColAlign[iCol2]==HorizontalAlignment.Right) {
+							cellWidth=report.ColWidth[iCol2];
+						}
+						else {
+							cellWidth=report.ColPos[iCol2+1]-report.ColPos[iCol2]+6;
+						}
+						//Current height of the string with given width.
+						string cellText=grid2[linesPrinted,iCol2].ToString();
+						float rectHeight=ev.Graphics.MeasureString(cellText,bodyFont,cellWidth).Height;
+						if(yPos+rectHeight > bounds.Bottom) {//Check for if we have enough height to print on current page.
+							isRowTooTall=true;
+							break;
+						}
 					}
-					else{
-						ev.Graphics.DrawString(grid2[linesPrinted,iCol].ToString()
-							,bodyFont,Brushes.Black,new RectangleF(
-							bounds.Left+report.ColPos[iCol],yPos
-							,report.ColPos[iCol+1]-report.ColPos[iCol]+6
-							,bodyFont.GetHeight(ev.Graphics)));
+					if(isRowTooTall) {
+						break;//Break so current row goes to next page.
 					}
 				}
-				yPos+=bodyFont.GetHeight(ev.Graphics);
+				float rowHeight=fontHeight;//When wrapping, we get the hight of the tallest cell in the row and increase yPos by it.
+				for(int iCol=0;iCol<report.TableQ.Columns.Count;iCol++){//For each cell in the row, print the cell contents.
+					float cellHeight=rowHeight;
+					if(isColWrap) {
+						cellHeight=0;//Infinate height.
+					}
+					int cellWidth=0;
+					string cellText=grid2[linesPrinted,iCol].ToString();
+					if(report.ColAlign[iCol]==HorizontalAlignment.Right){
+						cellWidth=report.ColWidth[iCol];
+						ev.Graphics.DrawString(cellText
+							,bodyFont,Brushes.Black,new RectangleF(
+							bounds.Left+report.ColPos[iCol+1]
+							-ev.Graphics.MeasureString(cellText,bodyFont).Width-1,yPos
+							,cellWidth,cellHeight));
+					}
+					else{
+						cellWidth=report.ColPos[iCol+1]-report.ColPos[iCol]+6;
+						ev.Graphics.DrawString(cellText
+							,bodyFont,Brushes.Black,new RectangleF(
+							bounds.Left+report.ColPos[iCol],yPos
+							,cellWidth
+							,cellHeight));
+					}
+					if(isColWrap) {
+						rowHeight=Math.Max(rowHeight,ev.Graphics.MeasureString(cellText,bodyFont,cellWidth).Height);
+					}
+				}
+				yPos+=rowHeight;
 				linesPrinted++;
 				if(linesPrinted==report.TableQ.Rows.Count){
 					tablePrinted=true;
