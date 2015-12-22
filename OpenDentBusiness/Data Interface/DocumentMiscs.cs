@@ -17,10 +17,10 @@ namespace OpenDentBusiness{
 			return Crud.DocumentMiscCrud.SelectOne(command);
 		}
 
-		///<summary></summary>
-		public static long SetUpdateFilesZip(string rawBase64zipped) {
+		///<summary>Completely deletes the UpdateFiles row and then inserts a new one and returns the PK of the new record.</summary>
+		public static long SetUpdateFilesZip() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod(),rawBase64zipped);
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
 			string command="DELETE FROM documentmisc WHERE DocMiscType="+POut.Long((int)DocumentMiscType.UpdateFiles);
 			Db.NonQ(command);
@@ -28,7 +28,7 @@ namespace OpenDentBusiness{
 			doc.DateCreated=DateTime.Today;
 			doc.DocMiscType=DocumentMiscType.UpdateFiles;
 			doc.FileName="UpdateFiles.zip";
-			doc.RawBase64=rawBase64zipped;
+			doc.RawBase64="";
 			return Crud.DocumentMiscCrud.Insert(doc);
 		}
 

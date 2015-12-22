@@ -38,5 +38,8 @@ namespace OpenDental {
 			Application.DoEvents();//So that the label updates with the new status.
 		}
 
+		private void FormProgressStatus_FormClosing(object sender,FormClosingEventArgs e) {
+			ODEvent.Fired-=ODEvent_Fired;
+		}
 	}
 }

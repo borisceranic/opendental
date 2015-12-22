@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using WebServiceSerializer;
@@ -45,6 +46,11 @@ namespace OpenDental {
 
 		///<summary>Copies the installation directory files into the database.  Set hasAtoZ to true to copy to the AtoZ share as well.</summary>
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent,bool hasAtoZ) {
+			if(!isSilent) {
+				ODThread odThreadRecopy=new ODThread(ShowRecopyProgress);
+				odThreadRecopy.Name="RecopyProgressThread";
+				odThreadRecopy.Start(true);
+			}
 			string folderUpdate="";
 			if(PrefC.AtoZfolderUsed && hasAtoZ) {
 				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
@@ -54,15 +60,17 @@ namespace OpenDental {
 			}
 			if(Directory.Exists(folderUpdate)) {
 				try {
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Removing old update files...")));
 					Directory.Delete(folderUpdate,true);
 				}
 				catch {
+					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
 					if(isSilent) {
 						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
 						Application.Exit();
 						return false;
 					}
-					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program: ")+folderUpdate);
+					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program")+": "+folderUpdate);
 					return false;
 				}
 				//wait a bit so that CreateDirectory won't malfunction.
@@ -71,12 +79,13 @@ namespace OpenDental {
 					Application.DoEvents();
 				}
 				if(Directory.Exists(folderUpdate)) {
+					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
 					if(isSilent) {
 						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
 						Application.Exit();
 						return false;
 					}
-					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program: ")+folderUpdate);
+					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program")+": "+folderUpdate);
 					return false;
 				}
 			}
@@ -84,6 +93,7 @@ namespace OpenDental {
 			//When PrefC.AtoZfolderUsed is true and we're upgrading from a version prior to 15.3.10, this copy that we are about to make allows backwards 
 			//compatibility for versions of OD that do not look at the database for their UpdateFiles.
 			try {
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Backing up new update files...")));
 				Directory.CreateDirectory(folderUpdate);
 				DirectoryInfo dirInfo=new DirectoryInfo(Application.StartupPath);
 				FileInfo[] appfiles=dirInfo.GetFiles();
@@ -106,52 +116,72 @@ namespace OpenDental {
 				//Create a simple manifest file so that we know what version the files are for.
 				File.WriteAllText(ODFileUtils.CombinePaths(folderUpdate,"Manifest.txt"),versionCurrent.ToString(3));
 			}
-			catch(Exception ex) {
+			catch(Exception) {
+				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
 				MessageBox.Show(Lan.g("Prefs","Failed copying the update files to the following directory")+":\r\n"
 					+folderUpdate+"\r\n"+"\r\n"
 					+Lan.g("Prefs","This could be due to a lack of permissions to create the above folder or the files in the installation directory are still in use."));
 				return false;
 			}
 			//Starting in v15.3, we always insert the UpdateFiles into the database.
-			ZipFile zipFile=new ZipFile();
-			MemoryStream memStream=new MemoryStream();
-			try {
-				zipFile.AddDirectory(folderUpdate);
-				zipFile.Save(memStream);
-				bool isFirst=true;
-				long docNum=0;
-				//Our installations of MySQL defaults the global property 'max_allowed_packet' to 40MB.
-				//The UpdateFiles folder will only get larger as time goes on.  Therefore, we want to break up the UpdateFiles folder into 15MB chunks.
-				//If the chunk size is to be changed, it must be changed to a size that is divisible by 3.
-				//Because we are converting the byte array into a Base64String, it needs to be in 3-byte chunks to perform the conversion without padding.
-				//Any incomplete 3-byte chunks will get padded with '=' to complete the 3-byte chunk.
-				//If this ever happens in the middle of inserting, the zip will be corrupted and we will not be able to extract the data later.
-				//Converting the file to Base64String bloats the size by approximately 30% so we need to make sure that the chunk size is well below 
-				//the max_allowed_packet size.
-				byte[] zipFileBytes=new byte[15728640]; //15MB
-				int readBytes=0;
-				memStream.Position=0;//Start at the beginning of the stream.
-				while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-					string zipFileBytesBase64=Convert.ToBase64String(zipFileBytes,0,readBytes);
-					if(isFirst) {
-						docNum=DocumentMiscs.SetUpdateFilesZip(zipFileBytesBase64);
-						isFirst=false;
+			int maxAllowedPacket=0;
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Getting MySQL max allowed packet setting...")));
+				maxAllowedPacket=MiscData.GetMaxAllowedPacket();
+			}
+			//If using Oracle OR trying to get the max_allowed_packet value for MySQL failed, assume they can handle 40MB of data.
+			//Our installations of MySQL defaults the global property 'max_allowed_packet' to 40MB.
+			if(maxAllowedPacket==0) {
+				maxAllowedPacket=41943040;
+			}
+			using(ZipFile zipFile=new ZipFile())
+			using(MemoryStream memStream=new MemoryStream()) {
+				try {
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
+					zipFile.AddDirectory(folderUpdate);
+					zipFile.Save(memStream);
+					StringBuilder strBuilder=new StringBuilder();
+					byte[] zipFileBytes=new byte[memStream.Length];
+					int readBytes=0;
+					memStream.Position=0;//Start at the beginning of the stream.
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Converting new update files...")));
+					while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
+						strBuilder.Append(Convert.ToBase64String(zipFileBytes,0,readBytes));
 					}
-					else {
-						DocumentMiscs.AppendRawBase64ForDoc(zipFileBytesBase64,docNum); //Updates document by appending more of it into the DB (30MB increments)
+					//Now we need to break up the Base64 string into payloads that are small enough to send to MySQL.
+					//Each character in Base64 represents 6 bits.  Therefore, 4 chars are used to represent 3 bytes
+					//However, MySQL doesn't know that we are sending over a Base64 string so lets assume 1 char = 1 byte.
+					//Also, we want to 'buffer' a few KB for MySQL because the query itself and the parameter information will take up some bytes (unknown).
+					int charsPerPayload=maxAllowedPacket-8192;//Arbitrarily subtracted 8KB from max allowed bytes for MySQL "header" information.
+					List<string> listRawBase64s=new List<string>();
+					string strBase64=strBuilder.ToString();
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Creating new update file payloads...")));
+					for(int i=0;i<strBase64.Length;i+=charsPerPayload) {
+						listRawBase64s.Add(strBase64.Substring(i,Math.Min(charsPerPayload,strBase64.Length-i)));
+					}
+					//Now we have a list of Base64 strings each of which are guaranteed to successfully send to MySQL under the max_packet_allowed limitation.
+					//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
+					long docNum=DocumentMiscs.SetUpdateFilesZip();
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
+					foreach(string rawBase64 in listRawBase64s) {
+						DocumentMiscs.AppendRawBase64ForDoc(rawBase64,docNum);
 					}
 				}
+				catch(Exception) {
+					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+					MessageBox.Show(Lan.g("Prefs","Failed inserting update files into the database."
+						+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file."));
+					return false;
+				}
+				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+				return true;
 			}
-			catch(Exception ex) {
-				MessageBox.Show(Lan.g("Prefs","Failed inserting update files into the database."
-					+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file."));
-				return false;
-			}
-			finally {
-				zipFile.Dispose();
-				memStream.Dispose();
-			}
-			return true;
+		}
+
+		private static void ShowRecopyProgress(ODThread odThread) {
+			FormProgressStatus FormPS=new FormProgressStatus("RecopyProgress");
+			FormPS.TopMost=true;//Make this window show on top of ALL other windows.
+			FormPS.ShowDialog();
 		}
 
 		///<summary>Called from FormBackups after a restore.</summary>
