@@ -658,10 +658,6 @@ namespace OpenDental {
 		}
 
 		public static Image GetToothChartHelper(long patNum,TreatPlan treatPlan,bool showCompleted) {
-			if(!PrefC.GetBool(PrefName.TreatPlanShowGraphics) 
-				|| Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				return null;
-			}
 			SparksToothChart.ToothChartWrapper toothChart=new SparksToothChart.ToothChartWrapper();
 			toothChart.ColorBackground=DefC.Long[(int)DefCat.ChartGraphicColors][14].ItemColor;
 			toothChart.ColorText=DefC.Long[(int)DefCat.ChartGraphicColors][15].ItemColor;

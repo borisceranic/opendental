@@ -602,9 +602,6 @@ namespace OpenDental {
 			//benefitsPrinted=false;
 			//notePrinted=false;
 			//pagesPrinted=0;
-			if(!PrefC.GetBool(PrefName.TreatPlanShowGraphics) || Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				return null;
-			}
 			//prints the graphical tooth chart and legend
 			//Panel panelHide=new Panel();
 			//panelHide.Size=new Size(600,500);
