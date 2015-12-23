@@ -1499,6 +1499,21 @@ namespace OpenDental {
 				}
 			}
 			panelOps.Controls.Clear();
+			Operatory curOp;
+			//If the the Operatory name does not fit on one line, expand panelOps so that two lines will fit
+			panelOps.Height=17;//Enough to fit one line of text	
+			if(!ApptDrawing.IsWeeklyView) {			
+				for(int i=0;i<ApptDrawing.ColCount;i++) {
+					curOp=ApptDrawing.VisOps[i];
+					Size textSize=TextRenderer.MeasureText(curOp.OpName,new Font("Microsoft Sans Serif",8.25f,FontStyle.Regular));
+					if(textSize.Width>ApptDrawing.ColWidth) {
+						panelOps.Height=30;//Enough to fit two lines of text
+						break;
+					}
+				}
+			}
+			panelSheet.Location=new Point(panelSheet.Location.X,panelOps.Height);
+			vScrollBar1.Location=new Point(vScrollBar1.Location.X,panelOps.Height);
 			for(int i=0;i<ApptDrawing.ProvCount;i++) {
 				Panel panProv=new Panel();
 				panProv.BackColor=ApptDrawing.VisProvs[i].ProvColor;
@@ -1508,13 +1523,12 @@ namespace OpenDental {
 					panProv.Location=new Point(panProv.Location.X-1,panProv.Location.Y);
 					panProv.Width=panProv.Width+1;
 				}
-				panProv.Height=18;
+				panProv.Height=panelOps.Height;
 				panProv.BorderStyle=BorderStyle.Fixed3D;
 				panProv.ForeColor=Color.DarkGray;
 				panelOps.Controls.Add(panProv);
 				toolTip1.SetToolTip(panProv,ApptDrawing.VisProvs[i].Abbr);
 			}
-			Operatory curOp;
 			if(ApptDrawing.IsWeeklyView) {
 				for(int i=0;i<ApptDrawing.NumOfWeekDaysToDisplay;i++) {
 					Panel panOpName=new Panel();
@@ -1555,13 +1569,13 @@ namespace OpenDental {
 					float xPos=ApptDrawing.TimeWidth+ApptDrawing.ProvWidth*ApptDrawing.ProvCount+i*ApptDrawing.ColWidth;
 					panOpName.Location=new Point(2+(int)xPos,0);
 					panOpName.Width=(int)ApptDrawing.ColWidth;
-					panOpName.Height=18;
+					panOpName.Height=panelOps.Height;
 					panOpName.BorderStyle=BorderStyle.Fixed3D;
 					panOpName.ForeColor=Color.DarkGray;
 					//add label within panOpName
 					labOpName.Location=new Point(0,-2);
 					labOpName.Width=panOpName.Width;
-					labOpName.Height=18;
+					labOpName.Height=panelOps.Height;
 					labOpName.TextAlign=ContentAlignment.MiddleCenter;
 					labOpName.ForeColor=Color.Black;
 					panOpName.Controls.Add(labOpName);
