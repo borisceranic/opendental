@@ -5787,8 +5787,9 @@ namespace OpenDental{
 						(ProcedureCode2.CodeNum,"1","",false,PatCur.PatNum,PatCur.Age,out AutoCodeCur);//max
 			}
 			else{//surf or tooth
+				string claimSurf=Tooth.SurfTidyForClaims(ProcCur.Surf,ProcCur.ToothNum);
 				verifyCode=AutoCodeItems.VerifyCode
-					(ProcedureCode2.CodeNum,ProcCur.ToothNum,ProcCur.Surf,false,PatCur.PatNum,PatCur.Age,out AutoCodeCur);
+					(ProcedureCode2.CodeNum,ProcCur.ToothNum,claimSurf,false,PatCur.PatNum,PatCur.Age,out AutoCodeCur);
 			}
 			if(ProcedureCode2.CodeNum!=verifyCode){
 				string desc=ProcedureCodes.GetProcCode(verifyCode).Descript;
