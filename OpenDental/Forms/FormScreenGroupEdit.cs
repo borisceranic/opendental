@@ -871,10 +871,8 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			if(_arrayScreens.Length==0 && _listScreenPats.Count==0) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel
-					,"Since you have no items nor patients in the group, the screener and location information cannot be saved. Continue?")) 
-				{
+			if(_arrayScreens.Length==0) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Since you have no screenings, the screener and location information cannot be saved.  Continue?")) {
 					return;
 				}
 			}
