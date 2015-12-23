@@ -95,7 +95,7 @@ namespace OpenDental {
 				row.Cells.Add(proc.ToothNum);
 				row.Cells.Add(proc.Surf);
 				row.Cells.Add(proccode.ProcCode);
-				row.Cells.Add(proccode.LaymanTerm);
+				row.Cells.Add(ProcedureCodes.GetLaymanTerm(proc.CodeNum));
 				row.Cells.Add(_listTpAttachesAll.FindAll(x => x.ProcNum==proc.ProcNum && x.TreatPlanNum!=_treatPlanUnassigned.TreatPlanNum).Count.ToString());
 				string aptStatus="";
 				foreach(long aptNum in new[] {proc.AptNum,proc.PlannedAptNum}.Where(x => x>0)) {
