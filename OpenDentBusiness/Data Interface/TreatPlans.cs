@@ -185,7 +185,7 @@ namespace OpenDentBusiness{
 			}
 			//Update extra active plans to Inactive status, should only ever be one Active status plan
 			//All TP procs are linked to the active plan, so proc statuses won't have to change to TPi for procs attached to an "extra" active plan
-			foreach(TreatPlan tp in listTreatPlans.FindAll(x => x.TreatPlanNum!=activePlan.TreatPlanNum && x.TPStatus==TreatPlanStatus.Active)) {
+			foreach(TreatPlan tp in listTreatPlans.FindAll(x => x.TPStatus==TreatPlanStatus.Active && activePlan!=null && x.TreatPlanNum!=activePlan.TreatPlanNum)) {
 				tp.TPStatus=TreatPlanStatus.Inactive;
 				TreatPlans.Update(tp);
 			}
