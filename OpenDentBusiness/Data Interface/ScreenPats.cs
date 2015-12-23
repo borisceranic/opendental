@@ -4,12 +4,12 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	///<summary></summary>
-	public class ScreenPats{
+	public class ScreenPats {
 		///<summary></summary>
-		public static long Insert(ScreenPat screenPat){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+		public static long Insert(ScreenPat screenPat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				screenPat.ScreenPatNum=Meth.GetLong(MethodBase.GetCurrentMethod(),screenPat);
 				return screenPat.ScreenPatNum;
 			}
@@ -18,7 +18,7 @@ namespace OpenDentBusiness{
 
 		/// <summary></summary>
 		public static List<ScreenPat> GetForScreenGroup(long screenGroupNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ScreenPat>>(MethodBase.GetCurrentMethod(),screenGroupNum);
 			}
 			string command="SELECT * FROM screenpat WHERE ScreenGroupNum ="+POut.Long(screenGroupNum);
@@ -27,6 +27,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Syncs the ScreenPats for the supplied ScreenGroup.</summary>
 		public static bool Sync(List<ScreenPat> listScreenPats,long screenGroupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listScreenPats,screenGroupNum);
+			}
 			return Crud.ScreenPatCrud.Sync(listScreenPats,GetForScreenGroup(screenGroupNum));
 		}
 
