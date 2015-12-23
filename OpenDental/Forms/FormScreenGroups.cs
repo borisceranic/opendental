@@ -350,8 +350,8 @@ namespace OpenDental{
 				return;
 			}
 			ScreenGroupCur=ScreenGroupList[gridMain.GetSelectedIndex()];
-			OpenDentBusiness.Screen[] screenList=Screens.Refresh(ScreenGroupCur.ScreenGroupNum);
-			if(screenList.Length>0) {
+			List<OpenDentBusiness.Screen> listScreens=Screens.GetScreensForGroup(ScreenGroupCur.ScreenGroupNum);
+			if(listScreens.Count>0) {
 				MessageBox.Show("Not allowed to delete a screening group with items in it.");
 				return;
 			}

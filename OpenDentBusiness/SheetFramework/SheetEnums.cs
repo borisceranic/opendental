@@ -38,7 +38,7 @@ namespace OpenDentBusiness {
 		MedLabResults,
 		///<summary>17-Requires SheetParameters for PatNum,TreatmentPlan.</summary>
 		TreatmentPlan,
-		///<summary>18-Requires SheetParameter for ScreenGroupNum.  
+		///<summary>18-Requires SheetParameter for ScreenNum.  
 		///Optional SheetParameter for PatNum if screening is associated to a patient.</summary>
 		Screening
 		/*StatementHeader,

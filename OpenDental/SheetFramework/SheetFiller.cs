@@ -114,13 +114,13 @@ namespace OpenDental{
 					FillFieldsForTreatPlan(sheet);
 					break;
 				case SheetTypeEnum.Screening:
-					ScreenGroup screenGroup=ScreenGroups.GetScreenGroup((long)GetParamByName(sheet,"ScreenGroupNum").ParamValue);
+					Screen screen=Screens.GetOne((long)GetParamByName(sheet,"ScreenNum").ParamValue);
 					//Look for the optional PatNum param:
 					SheetParameter paraPatNum=GetParamByName(sheet,"PatNum");
 					if(paraPatNum!=null) {
 						pat=Patients.GetPat((long)paraPatNum.ParamValue);
 					}
-					FillFieldsForScreening(sheet,screenGroup,pat);
+					FillFieldsForScreening(sheet,screen,pat);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -2830,10 +2830,8 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForScreening(Sheet sheet,ScreenGroup screenGroup,Patient pat) {
-			//None of these might be necessary due to them being Input fields instead of Ouput fields...
-			//Screenings are weird...
-			//For now, no field needs to be prepopulated if there is not a patient already attached.
+		private static void FillFieldsForScreening(Sheet sheet,Screen screen,Patient pat) {
+			ScreenGroup screenGroup=ScreenGroups.GetScreenGroup(screen.ScreenGroupNum);
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "Description":
@@ -2843,16 +2841,16 @@ namespace OpenDental{
 						field.FieldValue=screenGroup.SGDate.ToShortDateString();
 						break;
 					case "ProvName":
-						field.FieldValue=screenGroup.ProvName;
+						field.FieldValue=screen.ProvName;
 						break;
 					case "PlaceOfService":
-						field.FieldValue=screenGroup.PlaceService.ToString();
+						field.FieldValue=screen.PlaceService.ToString();
 						break;
 					case "County":
-						field.FieldValue=screenGroup.County;
+						field.FieldValue=screen.County;
 						break;
 					case "GradeSchool":
-						field.FieldValue=screenGroup.GradeSchool;
+						field.FieldValue=screen.GradeSchool;
 						break;
 				}
 				//Patient specific fields--------------------------------------------------

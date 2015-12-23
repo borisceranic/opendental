@@ -1,22 +1,30 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 
 namespace OpenDentBusiness{
   ///<summary></summary>
-	public class Screens{
-	
-		///<summary></summary>
-		public static Screen[] Refresh(long screenGroupNum) {
+	public class Screens {
+
+		///<summary>Gets one Screen from the db.</summary>
+		public static Screen GetOne(long screenNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Screen[]>(MethodBase.GetCurrentMethod(),screenGroupNum);
+				return Meth.GetObject<Screen>(MethodBase.GetCurrentMethod(),screenNum);
 			}
-			string command =
-				"SELECT * from screen "
+			return Crud.ScreenCrud.SelectOne(screenNum);
+		}
+
+		///<summary>Gets all screens associated to the screen group passed in.</summary>
+		public static List<Screen> GetScreensForGroup(long screenGroupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Screen>>(MethodBase.GetCurrentMethod(),screenGroupNum);
+			}
+			string command="SELECT * FROM screen "
 				+"WHERE ScreenGroupNum = '"+POut.Long(screenGroupNum)+"' "
 				+"ORDER BY ScreenGroupOrder";
-			return Crud.ScreenCrud.SelectMany(command).ToArray();
+			return Crud.ScreenCrud.SelectMany(command);
 		}
 
 		///<summary></summary>

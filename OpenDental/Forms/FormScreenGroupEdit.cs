@@ -36,7 +36,7 @@ namespace OpenDental{
 		private UI.Button butCancel;
 		private UI.Button butDelete;
 		private UI.ODGrid gridMain;
-		private OpenDentBusiness.Screen[] _arrayScreens;
+		private List<OpenDentBusiness.Screen> _listScreens;
 		private ODGrid gridScreenPats;
 		private List<ScreenPat> _listScreenPats;
 		private UI.Button button1;
@@ -440,8 +440,8 @@ namespace OpenDental{
 			for(int i=0;i<patScreenPerms.Length;i++) {
 				patContextMenu.MenuItems.Add(new MenuItem(patScreenPerms[i],patContextMenuItem_Click));
 			}
-			if(_arrayScreens.Length>0){
-				OpenDentBusiness.Screen ScreenCur=_arrayScreens[0];
+			if(_listScreens.Count > 0) {
+				OpenDentBusiness.Screen ScreenCur=_listScreens[0];
 				ScreenGroupCur.SGDate=ScreenCur.ScreenDate;
 				ScreenGroupCur.ProvName=ScreenCur.ProvName;
 				ScreenGroupCur.ProvNum=ScreenCur.ProvNum;
@@ -507,7 +507,7 @@ namespace OpenDental{
 		}*/
 
 		private void FillGrid(){
-			_arrayScreens=Screens.Refresh(ScreenGroupCur.ScreenGroupNum);
+			_listScreens=Screens.GetScreensForGroup(ScreenGroupCur.ScreenGroupNum).ToList();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -543,28 +543,28 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_arrayScreens.Length;i++) {
+			for(int i=0;i<_listScreens.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(_arrayScreens[i].ScreenGroupOrder.ToString());
-				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_arrayScreens[i].ScreenPatNum);
+				row.Cells.Add(_listScreens[i].ScreenGroupOrder.ToString());
+				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_listScreens[i].ScreenPatNum);
 				row.Cells.Add((screenPat==null)?"Anonymous":Patients.GetPat(screenPat.PatNum).GetNameLF());
-				row.Cells.Add(_arrayScreens[i].GradeLevel.ToString());
-				row.Cells.Add(_arrayScreens[i].Age.ToString());
-				row.Cells.Add(_arrayScreens[i].RaceOld.ToString());
-				row.Cells.Add(_arrayScreens[i].Gender.ToString());
-				row.Cells.Add(_arrayScreens[i].Urgency.ToString());
+				row.Cells.Add(_listScreens[i].GradeLevel.ToString());
+				row.Cells.Add(_listScreens[i].Age.ToString());
+				row.Cells.Add(_listScreens[i].RaceOld.ToString());
+				row.Cells.Add(_listScreens[i].Gender.ToString());
+				row.Cells.Add(_listScreens[i].Urgency.ToString());
 				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					row.Cells.Add(getX(_arrayScreens[i].HasCaries));
-					row.Cells.Add(getX(_arrayScreens[i].EarlyChildCaries));
-					row.Cells.Add(getX(_arrayScreens[i].CariesExperience));
-					row.Cells.Add(getX(_arrayScreens[i].ExistingSealants));
-					row.Cells.Add(getX(_arrayScreens[i].NeedsSealants));
-					row.Cells.Add(getX(_arrayScreens[i].MissingAllTeeth));
+					row.Cells.Add(getX(_listScreens[i].HasCaries));
+					row.Cells.Add(getX(_listScreens[i].EarlyChildCaries));
+					row.Cells.Add(getX(_listScreens[i].CariesExperience));
+					row.Cells.Add(getX(_listScreens[i].ExistingSealants));
+					row.Cells.Add(getX(_listScreens[i].NeedsSealants));
+					row.Cells.Add(getX(_listScreens[i].MissingAllTeeth));
 				}
-				row.Cells.Add(_arrayScreens[i].Comments);
+				row.Cells.Add(_listScreens[i].Comments);
 				gridMain.Rows.Add(row);
 			}
-			gridMain.Title=Lan.g(this,"Screenings")+" - "+_arrayScreens.Length;
+			gridMain.Title=Lan.g(this,"Screenings")+" - "+_listScreens.Count;
 			gridMain.EndUpdate();
 		}
 
@@ -585,7 +585,7 @@ namespace OpenDental{
 				Patient pat=Patients.GetPat(_listScreenPats[i].PatNum);
 				row.Cells.Add(pat.GetNameLF());
 				row.Cells.Add(_listScreenPats[i].PatScreenPerm.ToString());
-				OpenDentBusiness.Screen screen=_arrayScreens.FirstOrDefault(x => x.ScreenPatNum==_listScreenPats[i].ScreenPatNum);
+				OpenDentBusiness.Screen screen=_listScreens.FirstOrDefault(x => x.ScreenPatNum==_listScreenPats[i].ScreenPatNum);
 				row.Cells.Add((screen==null)?"":"X");
 				gridScreenPats.Rows.Add(row);
 			}
@@ -626,7 +626,7 @@ namespace OpenDental{
 			}
 			else {*/
 			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenCur=_arrayScreens[gridMain.SelectedIndices[0]];
+			FormSE.ScreenCur=_listScreens[gridMain.SelectedIndices[0]];
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.ShowDialog();
 			if(FormSE.DialogResult!=DialogResult.OK) {
@@ -709,12 +709,12 @@ namespace OpenDental{
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.IsNew=true;
-			if(_arrayScreens.Length==0) {
+			if(_listScreens.Count==0) {
 				FormSE.ScreenCur=new OpenDentBusiness.Screen();
 				FormSE.ScreenCur.ScreenGroupOrder=1;
 			}
 			else {
-				FormSE.ScreenCur=_arrayScreens[_arrayScreens.Length-1];//'remembers' the last entry
+				FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
 				FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
 			}
 			while(true) {
@@ -741,8 +741,8 @@ namespace OpenDental{
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=ScreenGroupCur;
 			FormSE.IsNew=false;
-			FormSE.ScreenCur=_arrayScreens[e.Row];
-			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_arrayScreens[e.Row].ScreenPatNum);
+			FormSE.ScreenCur=_listScreens[e.Row];
+			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_listScreens[e.Row].ScreenPatNum);
 			FormSE.ScreenPatCur=screenPat;//Null represents anonymous.
 			FormSE.ShowDialog();
 			FillGrid();
@@ -755,7 +755,7 @@ namespace OpenDental{
 			FormPatientEdit FormPE=new FormPatientEdit(pat,fam);
 			if(FormPE.ShowDialog()==DialogResult.OK) {//Information may have changed. Look for screens for this patient that may need changing.
 				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.PatNum==pat.PatNum);
-				foreach(OpenDentBusiness.Screen screen in _arrayScreens){
+				foreach(OpenDentBusiness.Screen screen in _listScreens){
 					if(screen.ScreenPatNum==screenPat.ScreenPatNum) {//Found a screen belonging to the edited patient.
 						//Don't unintelligently overwrite the screen's values.  They may have entered in patient information not pertaining to the screen such as address.
 						screen.Birthdate=(pat.Birthdate==DateTime.MinValue)?screen.Birthdate:pat.Birthdate;//If birthdate isn't entered in pat select it will be mindate.
@@ -829,7 +829,7 @@ namespace OpenDental{
 					}
 					continue;//Skip people who aren't allowed
 				}
-				if(_arrayScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
+				if(_listScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
 					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
 					if(i==selectedIdx && selectedIdx!=-1) {
 						break;
@@ -840,12 +840,12 @@ namespace OpenDental{
 					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
 				}
 				FormSE.ScreenPatCur=screenPat;
-				if(_arrayScreens.Length==0) {
+				if(_listScreens.Count==0) {
 					FormSE.ScreenCur=new OpenDentBusiness.Screen();
 					FormSE.ScreenCur.ScreenGroupOrder=1;
 				}
 				else {
-					FormSE.ScreenCur=_arrayScreens[_arrayScreens.Length-1];//'remembers' the last entry
+					FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
 					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
 				}
 				Patient pat=Patients.GetPat(screenPat.PatNum);//Get a patient so we can pre-fill some of the information (age/sex/birthdate/grade)
@@ -871,10 +871,8 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			if(_arrayScreens.Length==0 && _listScreenPats.Count==0) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel
-					,"Since you have no items nor patients in the group, the screener and location information cannot be saved. Continue?")) 
-				{
+			if(_listScreens.Count==0) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Since you have no screenings, the screener and location information cannot be saved.  Continue?")) {
 					return;
 				}
 			}
