@@ -2854,6 +2854,54 @@ namespace UnitTests {
 			retVal+="50: Passed.  Insurance estimate with override over family max showed \"over family max\" EstimateNote.\r\n";
 			return retVal;
 		}
-			
+
+		///<summary></summary>
+		public static string TestFiftyOne(int specificTest) {
+			if(specificTest!=0 && specificTest!=51) {
+				return "";
+			}
+			string suffix="51";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			plan.IsMedical=true;
+			InsPlans.Update(plan);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateDeductibleGeneral(plan.PlanNum,BenefitCoverageLevel.None,50.00);
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.OralSurgery,80);
+			PatPlan pplan=PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			//procs - D7140 (extraction)
+			Procedure proc1=ProcedureT.CreateProcedure(pat,"D7140",ProcStat.TP,"18",500);
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			string retVal="";
+			Procedures.ComputeEstimates(ProcList[0],pat.PatNum,ref claimProcs,false,planList,patPlans,benefitList,
+				histList,loopList,false,pat.Age,subList);
+			//save changes in the list to the database
+			ClaimProcs.Synch(ref claimProcs,claimProcListOld);
+			claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			Claim ClaimCur=ClaimT.CreateClaim("Med",patPlans,planList,claimProcs,ProcList,pat,ProcList,benefitList,subList);
+			List<ClaimProc> ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
+			ClaimCur.ClaimStatus="W";
+			ClaimCur.DateSent=DateTimeOD.Today;
+			ClaimL.CalculateAndUpdate(ProcList,planList,ClaimCur,patPlans,benefitList,pat.Age,subList);
+			claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			//Check to see if deductible applied correctly
+			if(claimProcs[0].DedApplied!=50.00) {//The deductible applied should be $50.00
+				throw new Exception("Claimproc's DedApplied was "+claimProcs[0].DedApplied+", should be $50.00.\r\n");
+			}
+			retVal+="51: Passed.  Medical insurance estimate deductible applied calculated correctly.\r\n";
+			return retVal;
+		}
 	}
 }

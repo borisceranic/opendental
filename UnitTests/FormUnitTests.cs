@@ -508,6 +508,13 @@ namespace UnitTests {
 			catch(Exception ex) {
 				textResults.Text+="50: Failed. "+ex.Message;
 			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftyOne(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="51: Failed. "+ex.Message;
+			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
 		}

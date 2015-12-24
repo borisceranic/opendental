@@ -29,6 +29,11 @@ namespace UnitTests {
 					SubCur2=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,1),SubList);
 					//PlanCur2=InsPlans.GetPlan(SubCur.PlanNum,InsPlanList);//can end up null
 					break;
+				case "Med":
+					SubCur1=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)),SubList);
+					PlanCur1=InsPlans.GetPlan(SubCur1.PlanNum,InsPlanList);
+					SubCur2=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,InsPlanList,SubList)),SubList);
+					break;
 			}
 			//DataTable table=DataSetMain.Tables["account"];
 			Procedure proc;
@@ -75,6 +80,15 @@ namespace UnitTests {
 					claim.PlanNum2=SubCur2.PlanNum;
 					claim.InsSubNum2=PatPlans.GetInsSubNum(PatPlanList,1);
 					claim.PatRelat2=PatPlans.GetRelat(PatPlanList,1);
+					break;
+				case "Med":
+					claim.PlanNum=SubCur1.PlanNum;
+					claim.InsSubNum=PatPlans.GetInsSubNum(PatPlanList,1);
+					claim.PatRelat=PatPlans.GetRelat(PatPlanList,1);
+					claim.ClaimType="Other";
+					claim.PlanNum2=SubCur2.PlanNum;//might be 0 if no other ins
+					claim.InsSubNum2=PatPlans.GetInsSubNum(PatPlanList,2);
+					claim.PatRelat2=PatPlans.GetRelat(PatPlanList,2);
 					break;
 			}
 			claim.ProvTreat=procsForClaim[0].ProvNum;
