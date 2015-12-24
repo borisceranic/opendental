@@ -4777,7 +4777,7 @@ namespace OpenDental{
 			if(ContrChart2.Visible && e.KeyCode>=Keys.F1 && e.KeyCode<=Keys.F12) {
 				ContrChart2.FunctionKeyPressContrChart(e.KeyCode);
 			}
-			//In Windows 10 you can push Control + LWin to swtich between desktops.
+			//In Windows 10 you can push Control + LWin to switch between desktops.
 			//This key combination has the flags for Control + X somehow and causes FormReferralsPatient to show which is extremely annoying.
 			if(e.KeyCode.HasFlag(Keys.LWin)) {
 				return;

@@ -5013,6 +5013,41 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string TasksCompletedWithInvalidFinishDateTime(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT task.TaskNum,IFNULL(MAX(tasknote.DateTimeNote),task.DateTimeEntry) AS DateTimeNoteMax "
+				+"FROM task "
+				+"LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum "
+				+"WHERE task.TaskStatus="+POut.Int((int)TaskStatusEnum.Done)+" "
+				+"AND task.DateTimeFinished="+POut.DateT(new DateTime(1,1,1))+" "
+				+"GROUP BY task.TaskNum";
+			DataTable table=Db.GetTable(command);
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Tasks completed with invalid Finished Date/Time")+": "+table.Rows.Count.ToString()+"\r\n";
+				}
+			}
+			else {
+				foreach(DataRow row in table.Rows) {
+					//Update the DateTimeFinished with either the max note DateTime or the time of the tasks DateTimeEntry.
+					//We cannot use the raw string in the DataTable because C# has auto-formatted the row into a DateTime row.
+					//Therefore we have to convert the string into a DateTime object and then send it back out in the format that MySQL expects.
+					DateTime dateTimeNoteMax=PIn.DateT(row["DateTimeNoteMax"].ToString());
+					command="UPDATE task SET DateTimeFinished="+POut.DateT(dateTimeNoteMax)+" "
+						+"WHERE TaskNum="+row["TaskNum"].ToString();
+					Db.NonQ(command);
+				}
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Tasks completed with invalid Finished Date/Times corrected")+": "+table.Rows.Count.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string TaskSubscriptionsInvalid(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
