@@ -4763,7 +4763,11 @@ namespace OpenDental{
 			if(ContrChart2.Visible && e.KeyCode>=Keys.F1 && e.KeyCode<=Keys.F12) {
 				ContrChart2.FunctionKeyPressContrChart(e.KeyCode);
 			}
-			Keys keys=e.KeyCode;
+			//In Windows 10 you can push Control + LWin to switch between desktops.
+			//This key combination has the flags for Control + X somehow and causes FormReferralsPatient to show which is extremely annoying.
+			if(e.KeyCode.HasFlag(Keys.LWin)) {
+				return;
+			}
 			//Ctrl-Alt-R is supposed to show referral window, but it doesn't work on some computers.
 			if((e.Modifiers&Keys.Alt)==Keys.Alt
 				&& (e.Modifiers&Keys.Control)==Keys.Control
