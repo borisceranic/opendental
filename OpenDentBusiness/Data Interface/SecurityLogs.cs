@@ -115,7 +115,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Takes a foreign key to a table associated with that PermType.  PatNum can be 0.</summary>
 		public static void MakeLogEntry(Permissions permType,long patNum,string logText,long fKey,LogSources logSource) {
-			MakeLogEntry(permType,patNum,logText,fKey,LogSources.None,0);
+			MakeLogEntry(permType,patNum,logText,fKey,logSource,0);
 		}
 
 		///<summary>Takes a foreign key to a table associated with that PermType.  PatNum can be 0.</summary>
