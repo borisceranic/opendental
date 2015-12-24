@@ -214,10 +214,7 @@ namespace OpenDental {
 				listBoxWebSchedProviderPref.Enabled=false;
 				butRecallSchedSetup.Enabled=false;
 				((Control)tabMobileOld).Enabled=false;
-				return;
 			}
-			textListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
-			butSaveListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
 		}
 
 		#region patient portal
@@ -1207,7 +1204,6 @@ namespace OpenDental {
 					break;
 				case ListenerServiceType.ListenerServiceProxy:
 					checkAllowEConnectorComm.Checked=true;
-					textListenerPort.Enabled=false;
 					break;
 				case ListenerServiceType.NoListener:
 					checkAllowEConnectorComm.Checked=false;
