@@ -2845,7 +2845,9 @@ namespace OpenDental{
 #endif
 					}
 				}
-				if(ProcedureCodes.HasBrokenApptCode()) {//ADA proc code D9986 exists
+				//If broken appointment procedure automation is enabled, create a D9986 procedure. 
+				//The D9986 procedurecode should always exist if BrokenApptProcedure preference is true.
+				if(PrefC.GetBool(PrefName.BrokenApptProcedure)) {
 					ProcedureCode procCodeBrokenApt=ProcedureCodes.GetProcCode("D9986");
 					Procedure procedureCur=new Procedure();
 					procedureCur.PatNum=pat.PatNum;
@@ -2856,7 +2858,7 @@ namespace OpenDental{
 					procedureCur.ProcStatus=ProcStat.C;
 					procedureCur.ClinicNum=AptCur.ClinicNum;
 					procedureCur.UserNum=Security.CurUser.UserNum;
-					procedureCur.Note=Lan.g(this,"Appt BROKEN for ")+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
+					procedureCur.Note=Lan.g(this,"Appt BROKEN for")+" "+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
 					List<InsSub> listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(pat.PatNum));
 					List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
 					List<PatPlan> listPatPlans=PatPlans.Refresh(pat.PatNum);
@@ -2895,58 +2897,31 @@ namespace OpenDental{
 					FormProcBroken FormPB=new FormProcBroken(procedureCur);
 					FormPB.IsNew=true;
 					FormPB.ShowDialog();
-					if(PrefC.GetBool(PrefName.BrokenApptAdjustmentWithProcedure)) {
-						Adjustment AdjustmentCur=new Adjustment();
-						AdjustmentCur.DateEntry=DateTime.Today;
-						AdjustmentCur.AdjDate=DateTime.Today;
-						AdjustmentCur.ProcDate=DateTime.Today;
-						AdjustmentCur.ProvNum=AptCur.ProvNum;
-						AdjustmentCur.PatNum=pat.PatNum;
-						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-						AdjustmentCur.ClinicNum=AptCur.ClinicNum;
-						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
-						FormA.IsNew=true;
-						FormA.ShowDialog();
-					}
-					if(PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure)) {
-						Commlog CommlogCur=new Commlog();
-						CommlogCur.PatNum=pat.PatNum;
-						CommlogCur.CommDateTime=DateTime.Now;
-						CommlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
-						CommlogCur.Note=Lan.g(this,"Appt BROKEN for ")+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
-						CommlogCur.Mode_=CommItemMode.None;
-						CommlogCur.UserNum=Security.CurUser.UserNum;
-						FormCommItem FormCI=new FormCommItem(CommlogCur);
-						FormCI.IsNew=true;
-						FormCI.ShowDialog();
-					}
 				}
-				else {//No D9986 present
-					if(PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment)) {
-						Commlog CommlogCur=new Commlog();
-						CommlogCur.PatNum=pat.PatNum;
-						CommlogCur.CommDateTime=DateTime.Now;
-						CommlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
-						CommlogCur.Note=Lan.g(this,"Appt BROKEN for ")+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
-						CommlogCur.Mode_=CommItemMode.None;
-						CommlogCur.UserNum=Security.CurUser.UserNum;
-						FormCommItem FormCI=new FormCommItem(CommlogCur);
-						FormCI.IsNew=true;
-						FormCI.ShowDialog();
-					}
-					else {
-						Adjustment AdjustmentCur=new Adjustment();
-						AdjustmentCur.DateEntry=DateTime.Today;
-						AdjustmentCur.AdjDate=DateTime.Today;
-						AdjustmentCur.ProcDate=DateTime.Today;
-						AdjustmentCur.ProvNum=AptCur.ProvNum;
-						AdjustmentCur.PatNum=pat.PatNum;
-						AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
-						AdjustmentCur.ClinicNum=AptCur.ClinicNum;
-						FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
-						FormA.IsNew=true;
-						FormA.ShowDialog();
-					}
+				if(PrefC.GetBool(PrefName.BrokenApptAdjustment)) {
+					Adjustment AdjustmentCur=new Adjustment();
+					AdjustmentCur.DateEntry=DateTime.Today;
+					AdjustmentCur.AdjDate=DateTime.Today;
+					AdjustmentCur.ProcDate=DateTime.Today;
+					AdjustmentCur.ProvNum=AptCur.ProvNum;
+					AdjustmentCur.PatNum=pat.PatNum;
+					AdjustmentCur.AdjType=PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType);
+					AdjustmentCur.ClinicNum=AptCur.ClinicNum;
+					FormAdjust FormA=new FormAdjust(pat,AdjustmentCur);
+					FormA.IsNew=true;
+					FormA.ShowDialog();
+				}
+				if(PrefC.GetBool(PrefName.BrokenApptCommLog)) {
+					Commlog CommlogCur=new Commlog();
+					CommlogCur.PatNum=pat.PatNum;
+					CommlogCur.CommDateTime=DateTime.Now;
+					CommlogCur.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.APPT);
+					CommlogCur.Note=Lan.g(this,"Appt BROKEN for")+" "+AptCur.ProcDescript+"  "+AptCur.AptDateTime.ToString();
+					CommlogCur.Mode_=CommItemMode.None;
+					CommlogCur.UserNum=Security.CurUser.UserNum;
+					FormCommItem FormCI=new FormCommItem(CommlogCur);
+					FormCI.IsNew=true;
+					FormCI.ShowDialog();
 				}
 				AutomationL.Trigger(AutomationTrigger.BreakAppointment,null,pat.PatNum);
 			}

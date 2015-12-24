@@ -145,12 +145,15 @@ namespace OpenDentBusiness {
 		BirthdayPostcardMsg,
 		///<summary>FK to definition.DefNum.  The adjustment type that will be used on the adjustment that is automatically created when an appointment is broken.</summary>
 		BrokenAppointmentAdjustmentType,
-		///<summary>Boolean.  0 by default.  When true, makes a commlog, otherwise makes an adjustment.</summary>
+		///<summary>Boolean.  Default to true if D9986 is present.
+		///When true, creates a broken appointment procedure when an appointment is broken.</summary>
+		BrokenApptProcedure,
+		///<summary>Deprecated.  Boolean.  0 by default.  When true, makes a commlog, otherwise makes an adjustment.</summary>
 		BrokenApptCommLogNotAdjustment,
-		///<summary>Boolean.  0 by default.  When true, makes a commlog in addition to an ADA D9986 procedure.</summary>
-		BrokenApptCommLogWithProcedure,
-		///<summary>Boolean.  0 by default.  When true, makes an adjustment in addition to an ADA D9986 procedure.</summary>
-		BrokenApptAdjustmentWithProcedure,
+		///<summary>Boolean.  0 by default.  When true, makes a commlog when an appointment is broken.</summary>
+		BrokenApptCommLog,
+		///<summary>Boolean.  0 by default.  When true, makes an adjustment when an appointment is broken.</summary>
+		BrokenApptAdjustment,
 		///<summary>For Ontario Dental Association fee schedules.</summary>
 		CanadaODAMemberNumber,
 		///<summary>For Ontario Dental Association fee schedules.</summary>

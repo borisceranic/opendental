@@ -20,7 +20,6 @@ namespace OpenDental{
 		private CheckBox checkMedicalEclaimsEnabled;
 		private CheckBox checkSolidBlockouts;
 		private CheckBox checkAgingMonthly;
-		private CheckBox checkBrokenApptNote;
 		private ToolTip toolTip1;
 		private CheckBox checkApptBubbleDelay;
 		private CheckBox checkStoreCCnumbers;
@@ -118,7 +117,7 @@ namespace OpenDental{
 		private CheckBox checkWaitingRoomFilterByView;
 		private TextBox textApptBubNoteLength;
 		private Label label21;
-		private CheckBox checkBrokenApptCommLogWithProcedure;
+		private CheckBox checkBrokenApptCommLog;
 		private CheckBox checkInsPPOsecWriteoffs;
 		private TextBox textWaitRoomWarn;
 		private Label label22;
@@ -137,7 +136,7 @@ namespace OpenDental{
 		private CheckBox checkPromptAutoSplit;
 		private TextBox textInsWriteoffDescript;
 		private Label label17;
-		private CheckBox checkBrokenApptAdjustmentWithProcedure;
+		private CheckBox checkBrokenApptAdjustment;
 		private CheckBox checkTPSaveSigned;
 		private CheckBox checkSelectProv;
 		private CheckBox checkTreatPlanUseSheets;
@@ -147,6 +146,8 @@ namespace OpenDental{
 		private CheckBox checkPerioSkipMissingTeeth;
 		private CheckBox checkPerioTreatImplantsAsNotMissing;
 		private CheckBox checkScreeningsUseSheets;
+		private CheckBox checkBrokenApptProcedure;
+		private GroupBox groupBox2;
 
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
@@ -211,7 +212,6 @@ namespace OpenDental{
 			this.comboTimeArrived = new System.Windows.Forms.ComboBox();
 			this.checkApptExclamation = new System.Windows.Forms.CheckBox();
 			this.label7 = new System.Windows.Forms.Label();
-			this.checkBrokenApptNote = new System.Windows.Forms.CheckBox();
 			this.comboBrokenApptAdjType = new System.Windows.Forms.ComboBox();
 			this.checkApptBubbleDelay = new System.Windows.Forms.CheckBox();
 			this.checkAppointmentBubblesDisabled = new System.Windows.Forms.CheckBox();
@@ -228,15 +228,17 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.checkBrokenApptProcedure = new System.Windows.Forms.CheckBox();
+			this.checkBrokenApptCommLog = new System.Windows.Forms.CheckBox();
+			this.checkBrokenApptAdjustment = new System.Windows.Forms.CheckBox();
 			this.checkApptModuleDefaultToWeek = new System.Windows.Forms.CheckBox();
 			this.label25 = new System.Windows.Forms.Label();
 			this.butApptLineColor = new System.Windows.Forms.Button();
-			this.checkBrokenApptAdjustmentWithProcedure = new System.Windows.Forms.CheckBox();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butColor = new System.Windows.Forms.Button();
 			this.textWaitRoomWarn = new System.Windows.Forms.TextBox();
 			this.label22 = new System.Windows.Forms.Label();
-			this.checkBrokenApptCommLogWithProcedure = new System.Windows.Forms.CheckBox();
 			this.textApptBubNoteLength = new System.Windows.Forms.TextBox();
 			this.label21 = new System.Windows.Forms.Label();
 			this.checkWaitingRoomFilterByView = new System.Windows.Forms.CheckBox();
@@ -315,9 +317,9 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkScreeningsUseSheets = new System.Windows.Forms.CheckBox();
-			this.tabControl1.SuspendLayout();
+			this.checkScreeningsUseSheets = new System.Windows.Forms.CheckBox();			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.tabFamily.SuspendLayout();
 			this.tabAccount.SuspendLayout();
 			this.tabTreatPlan.SuspendLayout();
@@ -550,7 +552,7 @@ namespace OpenDental{
 			// 
 			this.checkApptRefreshEveryMinute.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkApptRefreshEveryMinute.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkApptRefreshEveryMinute.Location = new System.Drawing.Point(34, 222);
+			this.checkApptRefreshEveryMinute.Location = new System.Drawing.Point(34, 247);
 			this.checkApptRefreshEveryMinute.Name = "checkApptRefreshEveryMinute";
 			this.checkApptRefreshEveryMinute.Size = new System.Drawing.Size(406, 17);
 			this.checkApptRefreshEveryMinute.TabIndex = 198;
@@ -560,7 +562,7 @@ namespace OpenDental{
 			// label6
 			// 
 			this.label6.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label6.Location = new System.Drawing.Point(29, 201);
+			this.label6.Location = new System.Drawing.Point(29, 226);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(247, 15);
 			this.label6.TabIndex = 78;
@@ -571,7 +573,7 @@ namespace OpenDental{
 			// 
 			this.comboTimeDismissed.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTimeDismissed.FormattingEnabled = true;
-			this.comboTimeDismissed.Location = new System.Drawing.Point(278, 197);
+			this.comboTimeDismissed.Location = new System.Drawing.Point(278, 222);
 			this.comboTimeDismissed.MaxDropDownItems = 30;
 			this.comboTimeDismissed.Name = "comboTimeDismissed";
 			this.comboTimeDismissed.Size = new System.Drawing.Size(163, 21);
@@ -580,7 +582,7 @@ namespace OpenDental{
 			// label5
 			// 
 			this.label5.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label5.Location = new System.Drawing.Point(29, 179);
+			this.label5.Location = new System.Drawing.Point(29, 204);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(247, 15);
 			this.label5.TabIndex = 76;
@@ -591,7 +593,7 @@ namespace OpenDental{
 			// 
 			this.comboTimeSeated.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTimeSeated.FormattingEnabled = true;
-			this.comboTimeSeated.Location = new System.Drawing.Point(278, 175);
+			this.comboTimeSeated.Location = new System.Drawing.Point(278, 200);
 			this.comboTimeSeated.MaxDropDownItems = 30;
 			this.comboTimeSeated.Name = "comboTimeSeated";
 			this.comboTimeSeated.Size = new System.Drawing.Size(163, 21);
@@ -600,7 +602,7 @@ namespace OpenDental{
 			// label3
 			// 
 			this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label3.Location = new System.Drawing.Point(29, 157);
+			this.label3.Location = new System.Drawing.Point(29, 182);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(247, 15);
 			this.label3.TabIndex = 74;
@@ -611,7 +613,7 @@ namespace OpenDental{
 			// 
 			this.comboTimeArrived.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTimeArrived.FormattingEnabled = true;
-			this.comboTimeArrived.Location = new System.Drawing.Point(278, 153);
+			this.comboTimeArrived.Location = new System.Drawing.Point(278, 178);
 			this.comboTimeArrived.MaxDropDownItems = 30;
 			this.comboTimeArrived.Name = "comboTimeArrived";
 			this.comboTimeArrived.Size = new System.Drawing.Size(163, 21);
@@ -621,7 +623,7 @@ namespace OpenDental{
 			// 
 			this.checkApptExclamation.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkApptExclamation.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkApptExclamation.Location = new System.Drawing.Point(55, 133);
+			this.checkApptExclamation.Location = new System.Drawing.Point(55, 158);
 			this.checkApptExclamation.Name = "checkApptExclamation";
 			this.checkApptExclamation.Size = new System.Drawing.Size(385, 17);
 			this.checkApptExclamation.TabIndex = 72;
@@ -632,29 +634,17 @@ namespace OpenDental{
 			// label7
 			// 
 			this.label7.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label7.Location = new System.Drawing.Point(15, 115);
+			this.label7.Location = new System.Drawing.Point(6, 63);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(221, 15);
+			this.label7.Size = new System.Drawing.Size(197, 15);
 			this.label7.TabIndex = 71;
 			this.label7.Text = "Broken appt default adj type";
 			this.label7.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// checkBrokenApptNote
-			// 
-			this.checkBrokenApptNote.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptNote.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBrokenApptNote.Location = new System.Drawing.Point(32, 58);
-			this.checkBrokenApptNote.Name = "checkBrokenApptNote";
-			this.checkBrokenApptNote.Size = new System.Drawing.Size(408, 17);
-			this.checkBrokenApptNote.TabIndex = 67;
-			this.checkBrokenApptNote.Text = "Put broken appt note in Commlog instead of Adj (not recommended)";
-			this.checkBrokenApptNote.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptNote.UseVisualStyleBackColor = true;
-			// 
 			// comboBrokenApptAdjType
 			// 
 			this.comboBrokenApptAdjType.FormattingEnabled = true;
-			this.comboBrokenApptAdjType.Location = new System.Drawing.Point(238, 111);
+			this.comboBrokenApptAdjType.Location = new System.Drawing.Point(204, 61);
 			this.comboBrokenApptAdjType.MaxDropDownItems = 30;
 			this.comboBrokenApptAdjType.Name = "comboBrokenApptAdjType";
 			this.comboBrokenApptAdjType.Size = new System.Drawing.Size(203, 21);
@@ -823,15 +813,14 @@ namespace OpenDental{
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.groupBox2);
 			this.tabAppts.Controls.Add(this.checkApptModuleDefaultToWeek);
 			this.tabAppts.Controls.Add(this.label25);
 			this.tabAppts.Controls.Add(this.butApptLineColor);
-			this.tabAppts.Controls.Add(this.checkBrokenApptAdjustmentWithProcedure);
 			this.tabAppts.Controls.Add(this.label23);
 			this.tabAppts.Controls.Add(this.butColor);
 			this.tabAppts.Controls.Add(this.textWaitRoomWarn);
 			this.tabAppts.Controls.Add(this.label22);
-			this.tabAppts.Controls.Add(this.checkBrokenApptCommLogWithProcedure);
 			this.tabAppts.Controls.Add(this.textApptBubNoteLength);
 			this.tabAppts.Controls.Add(this.label21);
 			this.tabAppts.Controls.Add(this.checkWaitingRoomFilterByView);
@@ -845,11 +834,8 @@ namespace OpenDental{
 			this.tabAppts.Controls.Add(this.comboTimeDismissed);
 			this.tabAppts.Controls.Add(this.checkApptBubbleDelay);
 			this.tabAppts.Controls.Add(this.label5);
-			this.tabAppts.Controls.Add(this.comboBrokenApptAdjType);
 			this.tabAppts.Controls.Add(this.comboTimeSeated);
-			this.tabAppts.Controls.Add(this.checkBrokenApptNote);
 			this.tabAppts.Controls.Add(this.label3);
-			this.tabAppts.Controls.Add(this.label7);
 			this.tabAppts.Controls.Add(this.comboTimeArrived);
 			this.tabAppts.Controls.Add(this.checkApptExclamation);
 			this.tabAppts.Location = new System.Drawing.Point(4, 22);
@@ -859,11 +845,61 @@ namespace OpenDental{
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.checkBrokenApptProcedure);
+			this.groupBox2.Controls.Add(this.checkBrokenApptCommLog);
+			this.groupBox2.Controls.Add(this.checkBrokenApptAdjustment);
+			this.groupBox2.Controls.Add(this.comboBrokenApptAdjType);
+			this.groupBox2.Controls.Add(this.label7);
+			this.groupBox2.Location = new System.Drawing.Point(34, 62);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(418, 88);
+			this.groupBox2.TabIndex = 222;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Broken Appointment Automation";
+			// 
+			// checkBrokenApptProcedure
+			// 
+			this.checkBrokenApptProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBrokenApptProcedure.Location = new System.Drawing.Point(21, 11);
+			this.checkBrokenApptProcedure.Name = "checkBrokenApptProcedure";
+			this.checkBrokenApptProcedure.Size = new System.Drawing.Size(385, 17);
+			this.checkBrokenApptProcedure.TabIndex = 221;
+			this.checkBrokenApptProcedure.Text = "Make broken appointment Procedure";
+			this.checkBrokenApptProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptProcedure.UseVisualStyleBackColor = true;
+			// 
+			// checkBrokenApptCommLog
+			// 
+			this.checkBrokenApptCommLog.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptCommLog.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBrokenApptCommLog.Location = new System.Drawing.Point(21, 27);
+			this.checkBrokenApptCommLog.Name = "checkBrokenApptCommLog";
+			this.checkBrokenApptCommLog.Size = new System.Drawing.Size(385, 17);
+			this.checkBrokenApptCommLog.TabIndex = 61;
+			this.checkBrokenApptCommLog.Text = "Make broken appointment Commlog";
+			this.checkBrokenApptCommLog.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptCommLog.UseVisualStyleBackColor = true;
+			// 
+			// checkBrokenApptAdjustment
+			// 
+			this.checkBrokenApptAdjustment.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustment.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBrokenApptAdjustment.Location = new System.Drawing.Point(21, 43);
+			this.checkBrokenApptAdjustment.Name = "checkBrokenApptAdjustment";
+			this.checkBrokenApptAdjustment.Size = new System.Drawing.Size(385, 17);
+			this.checkBrokenApptAdjustment.TabIndex = 217;
+			this.checkBrokenApptAdjustment.Text = "Make broken appointment Adjustment";
+			this.checkBrokenApptAdjustment.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkBrokenApptAdjustment.UseVisualStyleBackColor = true;
+			// 
 			// checkApptModuleDefaultToWeek
 			// 
 			this.checkApptModuleDefaultToWeek.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkApptModuleDefaultToWeek.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkApptModuleDefaultToWeek.Location = new System.Drawing.Point(34, 407);
+			this.checkApptModuleDefaultToWeek.Location = new System.Drawing.Point(34, 432);
 			this.checkApptModuleDefaultToWeek.Name = "checkApptModuleDefaultToWeek";
 			this.checkApptModuleDefaultToWeek.Size = new System.Drawing.Size(406, 17);
 			this.checkApptModuleDefaultToWeek.TabIndex = 220;
@@ -873,7 +909,7 @@ namespace OpenDental{
 			// label25
 			// 
 			this.label25.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label25.Location = new System.Drawing.Point(167, 387);
+			this.label25.Location = new System.Drawing.Point(167, 412);
 			this.label25.Name = "label25";
 			this.label25.Size = new System.Drawing.Size(246, 16);
 			this.label25.TabIndex = 219;
@@ -883,28 +919,16 @@ namespace OpenDental{
 			// butApptLineColor
 			// 
 			this.butApptLineColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butApptLineColor.Location = new System.Drawing.Point(416, 383);
+			this.butApptLineColor.Location = new System.Drawing.Point(416, 408);
 			this.butApptLineColor.Name = "butApptLineColor";
 			this.butApptLineColor.Size = new System.Drawing.Size(24, 21);
 			this.butApptLineColor.TabIndex = 218;
 			this.butApptLineColor.Click += new System.EventHandler(this.butApptLineColor_Click);
 			// 
-			// checkBrokenApptAdjustmentWithProcedure
-			// 
-			this.checkBrokenApptAdjustmentWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBrokenApptAdjustmentWithProcedure.Location = new System.Drawing.Point(32, 92);
-			this.checkBrokenApptAdjustmentWithProcedure.Name = "checkBrokenApptAdjustmentWithProcedure";
-			this.checkBrokenApptAdjustmentWithProcedure.Size = new System.Drawing.Size(408, 17);
-			this.checkBrokenApptAdjustmentWithProcedure.TabIndex = 217;
-			this.checkBrokenApptAdjustmentWithProcedure.Text = "Make adjustment in addition to broken appt procedure";
-			this.checkBrokenApptAdjustmentWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptAdjustmentWithProcedure.UseVisualStyleBackColor = true;
-			// 
 			// label23
 			// 
 			this.label23.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label23.Location = new System.Drawing.Point(167, 362);
+			this.label23.Location = new System.Drawing.Point(167, 387);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(246, 16);
 			this.label23.TabIndex = 216;
@@ -914,7 +938,7 @@ namespace OpenDental{
 			// butColor
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Location = new System.Drawing.Point(416, 358);
+			this.butColor.Location = new System.Drawing.Point(416, 383);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(24, 21);
 			this.butColor.TabIndex = 215;
@@ -922,7 +946,7 @@ namespace OpenDental{
 			// 
 			// textWaitRoomWarn
 			// 
-			this.textWaitRoomWarn.Location = new System.Drawing.Point(358, 332);
+			this.textWaitRoomWarn.Location = new System.Drawing.Point(358, 357);
 			this.textWaitRoomWarn.Name = "textWaitRoomWarn";
 			this.textWaitRoomWarn.Size = new System.Drawing.Size(83, 20);
 			this.textWaitRoomWarn.TabIndex = 214;
@@ -930,28 +954,16 @@ namespace OpenDental{
 			// label22
 			// 
 			this.label22.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label22.Location = new System.Drawing.Point(109, 335);
+			this.label22.Location = new System.Drawing.Point(109, 360);
 			this.label22.Name = "label22";
 			this.label22.Size = new System.Drawing.Size(246, 16);
 			this.label22.TabIndex = 213;
 			this.label22.Text = "Waiting room alert time in minutes (0 to disable)";
 			this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// checkBrokenApptCommLogWithProcedure
-			// 
-			this.checkBrokenApptCommLogWithProcedure.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptCommLogWithProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBrokenApptCommLogWithProcedure.Location = new System.Drawing.Point(32, 75);
-			this.checkBrokenApptCommLogWithProcedure.Name = "checkBrokenApptCommLogWithProcedure";
-			this.checkBrokenApptCommLogWithProcedure.Size = new System.Drawing.Size(408, 17);
-			this.checkBrokenApptCommLogWithProcedure.TabIndex = 61;
-			this.checkBrokenApptCommLogWithProcedure.Text = "Put broken appt note in Commlog in addition to broken appt procedure";
-			this.checkBrokenApptCommLogWithProcedure.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkBrokenApptCommLogWithProcedure.UseVisualStyleBackColor = true;
-			// 
 			// textApptBubNoteLength
 			// 
-			this.textApptBubNoteLength.Location = new System.Drawing.Point(357, 287);
+			this.textApptBubNoteLength.Location = new System.Drawing.Point(357, 312);
 			this.textApptBubNoteLength.Name = "textApptBubNoteLength";
 			this.textApptBubNoteLength.Size = new System.Drawing.Size(83, 20);
 			this.textApptBubNoteLength.TabIndex = 211;
@@ -959,7 +971,7 @@ namespace OpenDental{
 			// label21
 			// 
 			this.label21.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label21.Location = new System.Drawing.Point(108, 290);
+			this.label21.Location = new System.Drawing.Point(108, 315);
 			this.label21.Name = "label21";
 			this.label21.Size = new System.Drawing.Size(246, 16);
 			this.label21.TabIndex = 210;
@@ -970,7 +982,7 @@ namespace OpenDental{
 			// 
 			this.checkWaitingRoomFilterByView.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkWaitingRoomFilterByView.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkWaitingRoomFilterByView.Location = new System.Drawing.Point(34, 309);
+			this.checkWaitingRoomFilterByView.Location = new System.Drawing.Point(34, 334);
 			this.checkWaitingRoomFilterByView.Name = "checkWaitingRoomFilterByView";
 			this.checkWaitingRoomFilterByView.Size = new System.Drawing.Size(406, 17);
 			this.checkWaitingRoomFilterByView.TabIndex = 201;
@@ -980,7 +992,7 @@ namespace OpenDental{
 			// label13
 			// 
 			this.label13.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label13.Location = new System.Drawing.Point(6, 246);
+			this.label13.Location = new System.Drawing.Point(6, 271);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(230, 15);
 			this.label13.TabIndex = 200;
@@ -991,7 +1003,7 @@ namespace OpenDental{
 			// 
 			this.comboSearchBehavior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSearchBehavior.FormattingEnabled = true;
-			this.comboSearchBehavior.Location = new System.Drawing.Point(238, 243);
+			this.comboSearchBehavior.Location = new System.Drawing.Point(238, 268);
 			this.comboSearchBehavior.MaxDropDownItems = 30;
 			this.comboSearchBehavior.Name = "comboSearchBehavior";
 			this.comboSearchBehavior.Size = new System.Drawing.Size(203, 21);
@@ -1001,7 +1013,7 @@ namespace OpenDental{
 			// 
 			this.checkAppointmentTimeIsLocked.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkAppointmentTimeIsLocked.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAppointmentTimeIsLocked.Location = new System.Drawing.Point(34, 268);
+			this.checkAppointmentTimeIsLocked.Location = new System.Drawing.Point(34, 293);
 			this.checkAppointmentTimeIsLocked.Name = "checkAppointmentTimeIsLocked";
 			this.checkAppointmentTimeIsLocked.Size = new System.Drawing.Size(406, 17);
 			this.checkAppointmentTimeIsLocked.TabIndex = 198;
@@ -1895,6 +1907,7 @@ namespace OpenDental{
 			this.tabControl1.ResumeLayout(false);
 			this.tabAppts.ResumeLayout(false);
 			this.tabAppts.PerformLayout();
+			this.groupBox2.ResumeLayout(false);
 			this.tabFamily.ResumeLayout(false);
 			this.tabAccount.ResumeLayout(false);
 			this.tabAccount.PerformLayout();
@@ -1929,19 +1942,17 @@ namespace OpenDental{
 			_changed=false;
 			#region Appointment Module
 			//Appointment module---------------------------------------------------------------
-			ProcedureCode procCodeBrokenApt=ProcedureCodes.GetProcCode("D9986");
-			if(ProcedureCodes.IsValidCode("D9986")) {//Has the ADA procedure code D9986 for broken appointments
-				checkBrokenApptNote.Enabled=false;//Disable the old preference that makes it seem like an adjustment will be created.
+			if(ProcedureCodes.HasBrokenApptCode()) {
+				checkBrokenApptProcedure.Checked=PrefC.GetBool(PrefName.BrokenApptProcedure);
 			}
-			else {
-				//Could be a foreign user.  Disable the new preference that makes it seem like a procedure will be created.
-				checkBrokenApptCommLogWithProcedure.Enabled=false;
-				checkBrokenApptAdjustmentWithProcedure.Enabled=false;
+			else {//Does not have the ADA procedure code D9986 for broken appointments
+				checkBrokenApptProcedure.Enabled=false;
+				checkBrokenApptProcedure.Checked=false;
 			}
 			checkSolidBlockouts.Checked=PrefC.GetBool(PrefName.SolidBlockouts);
-			checkBrokenApptNote.Checked=PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment);
-			checkBrokenApptAdjustmentWithProcedure.Checked=PrefC.GetBool(PrefName.BrokenApptAdjustmentWithProcedure);
-			checkBrokenApptCommLogWithProcedure.Checked=PrefC.GetBool(PrefName.BrokenApptCommLogWithProcedure);
+			checkBrokenApptAdjustment.Checked=PrefC.GetBool(PrefName.BrokenApptAdjustment);
+			checkBrokenApptCommLog.Checked=PrefC.GetBool(PrefName.BrokenApptCommLog);
+			//checkBrokenApptNote.Checked=PrefC.GetBool(PrefName.BrokenApptCommLogNotAdjustment);
 			checkApptBubbleDelay.Checked = PrefC.GetBool(PrefName.ApptBubbleDelay);
 			checkAppointmentBubblesDisabled.Checked=PrefC.GetBool(PrefName.AppointmentBubblesDisabled);
 			listPosAdjTypes=DefC.GetPositiveAdjTypes();
@@ -2373,9 +2384,10 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled,checkAppointmentBubblesDisabled.Checked)
 				| Prefs.UpdateBool(PrefName.ApptBubbleDelay,checkApptBubbleDelay.Checked)
 				| Prefs.UpdateBool(PrefName.SolidBlockouts,checkSolidBlockouts.Checked)
-				| Prefs.UpdateBool(PrefName.BrokenApptCommLogNotAdjustment,checkBrokenApptNote.Checked)
-				| Prefs.UpdateBool(PrefName.BrokenApptAdjustmentWithProcedure,checkBrokenApptAdjustmentWithProcedure.Checked)
-				| Prefs.UpdateBool(PrefName.BrokenApptCommLogWithProcedure,checkBrokenApptCommLogWithProcedure.Checked)
+				//| Prefs.UpdateBool(PrefName.BrokenApptCommLogNotAdjustment,checkBrokenApptNote.Checked) //Deprecated
+				| Prefs.UpdateBool(PrefName.BrokenApptAdjustment,checkBrokenApptAdjustment.Checked)
+				| Prefs.UpdateBool(PrefName.BrokenApptCommLog,checkBrokenApptCommLog.Checked)
+				| Prefs.UpdateBool(PrefName.BrokenApptProcedure,checkBrokenApptProcedure.Checked)
 				| Prefs.UpdateLong(PrefName.BrokenAppointmentAdjustmentType,listPosAdjTypes[comboBrokenApptAdjType.SelectedIndex].DefNum)
 				| Prefs.UpdateBool(PrefName.ApptExclamationShowForUnsentIns,checkApptExclamation.Checked)
 				| Prefs.UpdateBool(PrefName.ApptModuleRefreshesEveryMinute,checkApptRefreshEveryMinute.Checked)
@@ -2517,17 +2529,6 @@ namespace OpenDental{
 
 		
 
-		
-
-		
-
-		
-
-		
-
-		
-
-		
 	}
 }
 

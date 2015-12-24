@@ -11733,7 +11733,29 @@ namespace OpenDentBusiness {
 								+"'2', "//ToolBarsAvail.ChartModule
 								+"'CleaRay')";
 								Db.NonQ(command);
-				}//end CleaRay bridge
+				}//end CleaRay bridge				
+				//Broken Appointment Procedure
+				command="SELECT COUNT(CodeNum) FROM procedurecode WHERE procedurecode.ProcCode='D9986'";
+				string countBrokenApptProcCode=Db.GetCount(command);
+				bool hasBrokenApptProcCode=false;
+				if(PIn.Int(countBrokenApptProcCode)>0) {
+					hasBrokenApptProcCode=true;
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO Preference(PrefName,ValueString) VALUES('BrokenApptProcedure','"+POut.Bool(hasBrokenApptProcCode)+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO Preference(PrefNum,PrefName,ValueString) "
+						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptProcedure','"+POut.Bool(hasBrokenApptProcCode)+"')";
+					Db.NonQ(command);
+				}
+				//Rename Broken Appointment Adjustment pref
+				command="UPDATE preference SET PrefName='BrokenApptAdjustment' WHERE PrefName='BrokenApptAdjustmentWithProcedure'";
+				Db.NonQ(command);
+				//Rename Broken Appointment Commlog Pref
+				command="UPDATE preference SET PrefName='BrokenApptCommLog' WHERE PrefName='BrokenApptCommLogWithProcedure'";
+				Db.NonQ(command);
 				//Wrap columns when printing
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES ('ReportPrintWrapColumns','0')";
@@ -11752,8 +11774,6 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ScreeningsUseSheets','0')";
 					Db.NonQ(command);
 				}
-
-
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
