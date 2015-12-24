@@ -113,9 +113,11 @@ namespace OpenDental{
 					ClaimProcsForClaim[i].FeeBilled=qty*ProcCur.ProcFee;
 				}
 				claimFee+=ClaimProcsForClaim[i].FeeBilled;
-				if(claimCur.ClaimType=="PreAuth" || claimCur.ClaimType=="Other" || claimCur.ClaimType=="Cap") {
-					//only the fee gets calculated, the rest does not
-					ClaimProcs.Update(ClaimProcsForClaim[i]);
+				if(claimCur.ClaimType=="PreAuth" || claimCur.ClaimType=="Cap" || (claimCur.ClaimType=="Other" && !plan.IsMedical)) {
+					//12-18-2015 ==tg:  We added medical plans as an exclusion to the above logic.  In past versions Medical plans did not copy over values into
+					//the claimproc InsPayEst, DedApplied, or Writeoff columns.  DG and I determined that for now this is acceptable.	 If we ever implement a 
+					//medical claimtype in the future, or if there are issues with claims this will need to be changed.
+					ClaimProcs.Update(ClaimProcsForClaim[i]);//only the fee gets calculated, the rest does not
 					continue;
 				}
 				//ClaimProcs.ComputeBaseEst(ClaimProcsForClaim[i],ProcCur.ProcFee,ProcCur.ToothNum,ProcCur.CodeNum,plan,patPlanNum,benefitList,histList,loopList);
