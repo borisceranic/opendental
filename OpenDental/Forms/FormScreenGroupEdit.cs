@@ -795,6 +795,10 @@ namespace OpenDental{
 		}
 		
 		private void butRemovePat_Click(object sender,EventArgs e) {
+			if(gridScreenPats.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a patient to remove first.");
+				return;
+			}
 			_listScreenPats.RemoveAt(gridScreenPats.GetSelectedIndex());
 			FillScreenPats();
 		}
