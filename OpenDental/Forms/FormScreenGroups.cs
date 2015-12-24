@@ -18,13 +18,12 @@ namespace OpenDental{
 		private IContainer components;
 		private UI.Button butClose;
 		private UI.ODGrid gridMain;
-		private List<ScreenGroup> ScreenGroupList;
+		private List<ScreenGroup> _listScreenGroups;
 		private UI.Button butLeft;
 		private UI.Button butRight;
 		private UI.Button butToday;
 		private Label label1;
-		public ScreenGroup ScreenGroupCur;
-		private DateTime dateCur;
+		private DateTime _dateCur;
 
 		///<summary></summary>
 		public FormScreenGroups()
@@ -239,14 +238,14 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScreenings_Load(object sender, System.EventArgs e) {
-			dateCur=DateTime.Today;
+			_dateCur=DateTime.Today;
 			textDateFrom.Text=DateTime.Today.ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
 			FillGrid();
 		}
 
-		private void FillGrid(){
-			ScreenGroupList= ScreenGroups.Refresh(PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text));
+		private void FillGrid() {
+			_listScreenGroups=ScreenGroups.Refresh(PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text));
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -256,42 +255,42 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			ListViewItem[] items=new ListViewItem[ScreenGroupList.Count];
-			for(int i=0;i<items.Length;i++){
+			foreach(ScreenGroup screenGroup in _listScreenGroups) {
 				row=new ODGridRow();
-				row.Cells.Add(ScreenGroupList[i].SGDate.ToShortDateString());
-				row.Cells.Add(ScreenGroupList[i].Description);
+				row.Cells.Add(screenGroup.SGDate.ToShortDateString());
+				row.Cells.Add(screenGroup.Description);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
-			FormScreenGroupEdit FormSG=new FormScreenGroupEdit();
-			FormSG.ScreenGroupCur=ScreenGroupList[gridMain.GetSelectedIndex()];
+			FormScreenGroupEdit FormSG=new FormScreenGroupEdit(_listScreenGroups[gridMain.GetSelectedIndex()]);
 			FormSG.ShowDialog();
 			FillGrid();
 		}
 
 		private void textDateFrom_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(textDateFrom.Text=="")
+			if(textDateFrom.Text=="") {
 				return;
-			try{
+			}
+			try {
 				DateTime.Parse(textDateFrom.Text);
 			}
-			catch{
+			catch {
 				MessageBox.Show("Date invalid");
 				e.Cancel=true;
 			}
 		}
 
 		private void textDateTo_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(textDateTo.Text=="")
+			if(textDateTo.Text=="") {
 				return;
-			try{
+			}
+			try {
 				DateTime.Parse(textDateTo.Text);
 			}
-			catch{
+			catch {
 				MessageBox.Show("Date invalid");
 				e.Cancel=true;
 			}
@@ -301,47 +300,34 @@ namespace OpenDental{
 			FillGrid();
 		}
 
-		/*
-		private void menuItemSetup_Click(object sender,EventArgs e) {
-			FormScreenSetup FormSS=new FormScreenSetup();
-			FormSS.ShowDialog();
-		}
-		*/
-
 		private void butAdd_Click(object sender, System.EventArgs e) {
-			FormScreenGroupEdit FormSG=new FormScreenGroupEdit();
-			FormSG.IsNew=true;
-			//ScreenGroups.Cur=new ScreenGroup();
-			if(ScreenGroupList.Count==0){
-				FormSG.ScreenGroupCur=new ScreenGroup();
+			ScreenGroup screenGroup=new ScreenGroup();
+			if(_listScreenGroups.Count!=0) {
+				screenGroup=_listScreenGroups[_listScreenGroups.Count-1];//'remembers' the last entry
 			}
-			else{
-				FormSG.ScreenGroupCur=ScreenGroupList[ScreenGroupList.Count-1];//'remembers' the last entry
-			}
-			FormSG.ScreenGroupCur.SGDate=DateTime.Today;//except date will be today
+			screenGroup.SGDate=DateTime.Today;//except date will be today
+			screenGroup.IsNew=true;
+			FormScreenGroupEdit FormSG=new FormScreenGroupEdit(screenGroup);
 			FormSG.ShowDialog();
-			//if(FormSG.DialogResult!=DialogResult.OK){
-			//	return;
-			//}
 			FillGrid();
 		}
 
 		private void butToday_Click(object sender,EventArgs e) {
-			dateCur=DateTime.Today;
+			_dateCur=DateTime.Today;
 			textDateFrom.Text=DateTime.Today.ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
 		}
 
 		private void butLeft_Click(object sender,EventArgs e) {
-			dateCur=dateCur.AddDays(-1);
-			textDateFrom.Text=dateCur.ToShortDateString();
-			textDateTo.Text=dateCur.ToShortDateString();
+			_dateCur=_dateCur.AddDays(-1);
+			textDateFrom.Text=_dateCur.ToShortDateString();
+			textDateTo.Text=_dateCur.ToShortDateString();
 		}
 
 		private void butRight_Click(object sender,EventArgs e) {
-			dateCur=dateCur.AddDays(1);
-			textDateFrom.Text=dateCur.ToShortDateString();
-			textDateTo.Text=dateCur.ToShortDateString();
+			_dateCur=_dateCur.AddDays(1);
+			textDateFrom.Text=_dateCur.ToShortDateString();
+			textDateTo.Text=_dateCur.ToShortDateString();
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -349,13 +335,13 @@ namespace OpenDental{
 				MessageBox.Show("Please select one item first.");
 				return;
 			}
-			ScreenGroupCur=ScreenGroupList[gridMain.GetSelectedIndex()];
-			List<OpenDentBusiness.Screen> listScreens=Screens.GetScreensForGroup(ScreenGroupCur.ScreenGroupNum);
+			ScreenGroup screenGroupCur=_listScreenGroups[gridMain.GetSelectedIndex()];
+			List<OpenDentBusiness.Screen> listScreens=Screens.GetScreensForGroup(screenGroupCur.ScreenGroupNum);
 			if(listScreens.Count>0) {
 				MessageBox.Show("Not allowed to delete a screening group with items in it.");
 				return;
 			}
-			ScreenGroups.Delete(ScreenGroupCur);
+			ScreenGroups.Delete(screenGroupCur);
 			FillGrid();
 		}
 

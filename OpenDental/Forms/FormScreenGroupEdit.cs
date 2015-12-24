@@ -14,8 +14,6 @@ namespace OpenDental{
 	/// </summary>
 	public class FormScreenGroupEdit:System.Windows.Forms.Form {
 		private IContainer components;
-		///<summary></summary>
-		public bool IsNew;
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Label label13;
 		private System.Windows.Forms.Label labelProv;
@@ -32,7 +30,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textProvName;
 		private OpenDental.UI.Button butAdd;
 		private System.Windows.Forms.ComboBox comboGradeSchool;
-		public ScreenGroup ScreenGroupCur;
+		private ScreenGroup _screenGroup;
 		private UI.Button butCancel;
 		private UI.Button butDelete;
 		private UI.ODGrid gridMain;
@@ -46,13 +44,13 @@ namespace OpenDental{
 		private ContextMenu patContextMenu;
 
 		///<summary></summary>
-		public FormScreenGroupEdit()
-		{
+		public FormScreenGroupEdit(ScreenGroup screenGroup) {
 			//
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
 			Lan.F(this);
+			_screenGroup=screenGroup;
 		}
 
 		/// <summary>
@@ -154,7 +152,6 @@ namespace OpenDental{
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(173, 20);
 			this.textDescription.TabIndex = 1;
-			this.textDescription.TextChanged += new System.EventHandler(this.textProvName_TextChanged);
 			// 
 			// comboProv
 			// 
@@ -166,7 +163,6 @@ namespace OpenDental{
 			this.comboProv.Size = new System.Drawing.Size(173, 21);
 			this.comboProv.TabIndex = 2;
 			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
-			this.comboProv.SelectionChangeCommitted += new System.EventHandler(this.comboProv_SelectionChangeCommitted);
 			this.comboProv.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboProv_KeyDown);
 			// 
 			// comboPlaceService
@@ -221,7 +217,6 @@ namespace OpenDental{
 			this.textProvName.Name = "textProvName";
 			this.textProvName.Size = new System.Drawing.Size(173, 20);
 			this.textProvName.TabIndex = 141;
-			this.textProvName.TextChanged += new System.EventHandler(this.textProvName_TextChanged);
 			this.textProvName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textProvName_KeyUp);
 			// 
 			// labelScreener
@@ -429,85 +424,54 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScreenGroup_Load(object sender, System.EventArgs e) {
-			if(IsNew){
-				ScreenGroups.Insert(ScreenGroupCur);
+			if(_screenGroup.IsNew) {
+				ScreenGroups.Insert(_screenGroup);
 			}
-			patContextMenu=new ContextMenu();
-			_listScreenPats=ScreenPats.GetForScreenGroup(ScreenGroupCur.ScreenGroupNum);
+			_listScreenPats=ScreenPats.GetForScreenGroup(_screenGroup.ScreenGroupNum);
 			FillGrid();
 			FillScreenPats();
+			patContextMenu=new ContextMenu();
 			string[] patScreenPerms=Enum.GetNames(typeof(PatScreenPerm));
 			for(int i=0;i<patScreenPerms.Length;i++) {
 				patContextMenu.MenuItems.Add(new MenuItem(patScreenPerms[i],patContextMenuItem_Click));
 			}
 			if(_listScreens.Count > 0) {
-				OpenDentBusiness.Screen ScreenCur=_listScreens[0];
-				ScreenGroupCur.SGDate=ScreenCur.ScreenDate;
-				ScreenGroupCur.ProvName=ScreenCur.ProvName;
-				ScreenGroupCur.ProvNum=ScreenCur.ProvNum;
-				ScreenGroupCur.County=ScreenCur.County;
-				ScreenGroupCur.GradeSchool=ScreenCur.GradeSchool;
-				ScreenGroupCur.PlaceService=ScreenCur.PlaceService;
+				OpenDentBusiness.Screen screen=_listScreens[0];
+				_screenGroup.SGDate=screen.ScreenDate;
+				_screenGroup.ProvName=screen.ProvName;
+				_screenGroup.ProvNum=screen.ProvNum;
+				_screenGroup.County=screen.County;
+				_screenGroup.GradeSchool=screen.GradeSchool;
+				_screenGroup.PlaceService=screen.PlaceService;
 			}
-			textScreenDate.Text=ScreenGroupCur.SGDate.ToShortDateString();
-			textDescription.Text=ScreenGroupCur.Description;
-			textProvName.Text=ScreenGroupCur.ProvName;//has to be filled before provnum
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
+			textScreenDate.Text=_screenGroup.SGDate.ToShortDateString();
+			textDescription.Text=_screenGroup.Description;
+			textProvName.Text=_screenGroup.ProvName;//has to be filled before provnum
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
 				comboProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ScreenGroupCur.ProvNum==ProviderC.ListShort[i].ProvNum){
+				if(_screenGroup.ProvNum==ProviderC.ListShort[i].ProvNum) {
 					comboProv.SelectedIndex=i;
 				}
 			}
 			string[] CountiesListNames=Counties.GetListNames();
 			comboCounty.Items.AddRange(CountiesListNames);
-			if(ScreenGroupCur.County==null)
-				ScreenGroupCur.County="";//prevents the next line from crashing
-			comboCounty.SelectedIndex=comboCounty.Items.IndexOf(ScreenGroupCur.County);//"" etc OK
+			if(_screenGroup.County==null) {
+				_screenGroup.County="";//prevents the next line from crashing
+			}
+			comboCounty.SelectedIndex=comboCounty.Items.IndexOf(_screenGroup.County);//"" etc OK
 			for(int i=0;i<SiteC.List.Length;i++) {
 				comboGradeSchool.Items.Add(SiteC.List[i].Description);
 			}
-			if(ScreenGroupCur.GradeSchool==null)
-				ScreenGroupCur.GradeSchool="";//prevents the next line from crashing
-			comboGradeSchool.SelectedIndex=comboGradeSchool.Items.IndexOf(ScreenGroupCur.GradeSchool);//"" etc OK
+			if(_screenGroup.GradeSchool==null) {
+				_screenGroup.GradeSchool="";//prevents the next line from crashing
+			}
+			comboGradeSchool.SelectedIndex=comboGradeSchool.Items.IndexOf(_screenGroup.GradeSchool);//"" etc OK
 			comboPlaceService.Items.AddRange(Enum.GetNames(typeof(PlaceOfService)));
-			comboPlaceService.SelectedIndex=(int)ScreenGroupCur.PlaceService;
+			comboPlaceService.SelectedIndex=(int)_screenGroup.PlaceService;
 		}
 
-		/*
-		///<summary>This is never run.  It is only called when PrefName.PublicHealthScreeningUsePat is set to true.  The pref is set to 0 when added in convertdatabase and there is currently no UI to change it.  See note in Pref.cs pertaining to this.</summary>
-		private void FillGridScreenPat() {
-			ListScreenPats=ScreenPats.GetForScreenGroup(ScreenGroupCur.ScreenGroupNum);
-			ListPats=Patients.GetPatsForScreenGroup(ScreenGroupCur.ScreenGroupNum);
-			gridMain.BeginUpdate();
-			gridMain.Columns.Clear();
-			ODGridColumn col;
-			col=new ODGridColumn(Lan.g(this,"PatNum"),80);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Name"),300);
-			gridMain.Columns.Add(col);
-			//todo: birthdate
-			col=new ODGridColumn(Lan.g(this,"Age"),80);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Race"),105);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Gender"),80);
-			gridMain.Columns.Add(col);
-			gridMain.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<ListPats.Count;i++) {
-				row=new ODGridRow();
-				row.Cells.Add(ListPats[i].PatNum.ToString());
-				row.Cells.Add(ListPats[i].GetNameLF());
-				row.Cells.Add(ListPats[i].Age.ToString());
-				row.Cells.Add(PatientRaces.GetPatientRaceOldFromPatientRaces(ListPats[i].PatNum).ToString());
-				row.Cells.Add(ListPats[i].Gender.ToString());
-				gridMain.Rows.Add(row);
-			}
-			gridMain.EndUpdate();
-		}*/
-
-		private void FillGrid(){
-			_listScreens=Screens.GetScreensForGroup(ScreenGroupCur.ScreenGroupNum).ToList();
+		private void FillGrid() {
+			_listScreens=Screens.GetScreensForGroup(_screenGroup.ScreenGroupNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -526,42 +490,42 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g(this,"Urgency"),70);
 			gridMain.Columns.Add(col);
 			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-				col=new ODGridColumn(Lan.g(this,"Caries"),45);
+				col=new ODGridColumn(Lan.g(this,"Caries"),45,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"ECC"),30);
+				col=new ODGridColumn(Lan.g(this,"ECC"),30,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"CarExp"),50);
+				col=new ODGridColumn(Lan.g(this,"CarExp"),50,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"ExSeal"),45);
+				col=new ODGridColumn(Lan.g(this,"ExSeal"),45,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"NeedSeal"),60);
+				col=new ODGridColumn(Lan.g(this,"NeedSeal"),60,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
-				col=new ODGridColumn(Lan.g(this,"NoTeeth"),55);
+				col=new ODGridColumn(Lan.g(this,"NoTeeth"),55,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
 			}
 			col=new ODGridColumn(Lan.g(this,"Comments"),100);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listScreens.Count;i++) {
+			foreach(OpenDentBusiness.Screen screen in _listScreens) {
 				row=new ODGridRow();
-				row.Cells.Add(_listScreens[i].ScreenGroupOrder.ToString());
-				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_listScreens[i].ScreenPatNum);
-				row.Cells.Add((screenPat==null)?"Anonymous":Patients.GetPat(screenPat.PatNum).GetNameLF());
-				row.Cells.Add(_listScreens[i].GradeLevel.ToString());
-				row.Cells.Add(_listScreens[i].Age.ToString());
-				row.Cells.Add(_listScreens[i].RaceOld.ToString());
-				row.Cells.Add(_listScreens[i].Gender.ToString());
-				row.Cells.Add(_listScreens[i].Urgency.ToString());
+				row.Cells.Add(screen.ScreenGroupOrder.ToString());
+				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==screen.ScreenPatNum);
+				row.Cells.Add((screenPat==null)?"Anonymous":Patients.GetLim(screenPat.PatNum).GetNameLF());
+				row.Cells.Add(screen.GradeLevel.ToString());
+				row.Cells.Add(screen.Age.ToString());
+				row.Cells.Add(screen.RaceOld.ToString());
+				row.Cells.Add(screen.Gender.ToString());
+				row.Cells.Add(screen.Urgency.ToString());
 				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
-					row.Cells.Add(getX(_listScreens[i].HasCaries));
-					row.Cells.Add(getX(_listScreens[i].EarlyChildCaries));
-					row.Cells.Add(getX(_listScreens[i].CariesExperience));
-					row.Cells.Add(getX(_listScreens[i].ExistingSealants));
-					row.Cells.Add(getX(_listScreens[i].NeedsSealants));
-					row.Cells.Add(getX(_listScreens[i].MissingAllTeeth));
+					row.Cells.Add(screen.HasCaries==YN.Yes ? "X":"");
+					row.Cells.Add(screen.EarlyChildCaries==YN.Yes ? "X":"");
+					row.Cells.Add(screen.CariesExperience==YN.Yes ? "X":"");
+					row.Cells.Add(screen.ExistingSealants==YN.Yes ? "X":"");
+					row.Cells.Add(screen.NeedsSealants==YN.Yes ? "X":"");
+					row.Cells.Add(screen.MissingAllTeeth==YN.Yes ? "X":"");
 				}
-				row.Cells.Add(_listScreens[i].Comments);
+				row.Cells.Add(screen.Comments);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.Title=Lan.g(this,"Screenings")+" - "+_listScreens.Count;
@@ -570,26 +534,26 @@ namespace OpenDental{
 
 		private void FillScreenPats() {
 			gridScreenPats.BeginUpdate();
+			gridScreenPats.Title=Lan.g(this,"Patients for Screening")+" - "+_listScreenPats.Count;
 			gridScreenPats.Columns.Clear();
 			ODGridColumn col;
 			col=new ODGridColumn(Lan.g(this,"Patient"),200);
 			gridScreenPats.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Permission"),100);
 			gridScreenPats.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Screened"),90);
+			col=new ODGridColumn(Lan.g(this,"Screened"),90,HorizontalAlignment.Center);
 			gridScreenPats.Columns.Add(col);
 			gridScreenPats.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listScreenPats.Count;i++) {
+			foreach(ScreenPat screenPat in _listScreenPats) {
 				row=new ODGridRow();
-				Patient pat=Patients.GetPat(_listScreenPats[i].PatNum);
+				Patient pat=Patients.GetLim(screenPat.PatNum);
 				row.Cells.Add(pat.GetNameLF());
-				row.Cells.Add(_listScreenPats[i].PatScreenPerm.ToString());
-				OpenDentBusiness.Screen screen=_listScreens.FirstOrDefault(x => x.ScreenPatNum==_listScreenPats[i].ScreenPatNum);
+				row.Cells.Add(screenPat.PatScreenPerm.ToString());
+				OpenDentBusiness.Screen screen=_listScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum);
 				row.Cells.Add((screen==null)?"":"X");
 				gridScreenPats.Rows.Add(row);
 			}
-			gridScreenPats.Title=Lan.g(this,"Patients for Screening")+" - "+_listScreenPats.Count;
 			gridScreenPats.EndUpdate();
 		}
 
@@ -609,25 +573,10 @@ namespace OpenDental{
 			FillScreenPats();
 		}
 
-		private string getX(YN ynValue){
-			if(ynValue==YN.Yes)
-				return "X";
-			return "";
-		}
-
 		private void listMain_DoubleClick(object sender, System.EventArgs e) {
-			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
-				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
-				FormSPE.ShowDialog();
-				if(FormSPE.DialogResult!=DialogResult.OK) {
-					return;
-				}
-				FillGridScreenPat();
-			}
-			else {*/
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenCur=_listScreens[gridMain.SelectedIndices[0]];
-			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.ScreenGroupCur=_screenGroup;
 			FormSE.ShowDialog();
 			if(FormSE.DialogResult!=DialogResult.OK) {
 				return;
@@ -645,26 +594,16 @@ namespace OpenDental{
 			}
 		}
 
-		private void textProvName_TextChanged(object sender, System.EventArgs e) {
-			/*if(textProvName.Text!=""){    //if a prov name was entered
-				comboProv.SelectedIndex=-1;//then set the provnum to none.
-			}*/
-		}
-
 		private void textProvName_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e) {
 			comboProv.SelectedIndex=-1;//set the provnum to none.
 		}
 
 		private void comboProv_SelectedIndexChanged(object sender, System.EventArgs e) {
-			if(comboProv.SelectedIndex!=-1){//if a prov was selected
+			if(comboProv.SelectedIndex!=-1) {//if a prov was selected
 				//set the provname accordingly
 				textProvName.Text=ProviderC.ListShort[comboProv.SelectedIndex].LName+", "
 					+ProviderC.ListShort[comboProv.SelectedIndex].FName;
 			}
-		}
-
-		private void comboProv_SelectionChangeCommitted(object sender, System.EventArgs e) {
-			
 		}
 
 		private void comboProv_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e) {
@@ -686,28 +625,8 @@ namespace OpenDental{
 		}
 
 		private void butAddAnonymous_Click(object sender, System.EventArgs e) {
-			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)) {
-				FormScreenPatEdit FormSPE=new FormScreenPatEdit();
-				while(true) {
-					FormPatientSelect FormPS=new FormPatientSelect();
-					FormPS.ShowDialog();
-					if(FormPS.DialogResult!=DialogResult.OK) {
-						return;
-					}
-					ScreenPat screenPat=new ScreenPat();
-					screenPat.ScreenGroupNum=ScreenGroupCur.ScreenGroupNum;
-					screenPat.SheetNum=PrefC.GetLong(PrefName.PublicHealthScreeningSheet);
-					screenPat.PatNum=FormPS.SelectedPatNum;
-					ScreenPats.Insert(screenPat);
-					if(FormPS.DialogResult!=DialogResult.OK) {
-						return;
-					}
-					FillGridScreenPat();
-				}
-			}
-			else {*/
 			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.ScreenGroupCur=_screenGroup;
 			FormSE.IsNew=true;
 			if(_listScreens.Count==0) {
 				FormSE.ScreenCur=new OpenDentBusiness.Screen();
@@ -731,15 +650,8 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			/*if(PrefC.GetBool(PrefName.PublicHealthScreeningUsePat)){
-				//never implemented.  Supposedly, a sheet would come up for creation/editing, based on the sheetdef.
-				//But db fields couldn't even handle it yet.
-				
-				//FillGrid();
-			}
-			else{*/
 			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.ScreenGroupCur=_screenGroup;
 			FormSE.IsNew=false;
 			FormSE.ScreenCur=_listScreens[e.Row];
 			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_listScreens[e.Row].ScreenPatNum);
@@ -772,7 +684,7 @@ namespace OpenDental{
 		private void butAddPat_Click(object sender,EventArgs e) {
 			FormPatientSelect FormPS=new FormPatientSelect();
 			FormPS.ShowDialog();
-			if(FormPS.DialogResult==DialogResult.OK){
+			if(FormPS.DialogResult==DialogResult.OK) {
 				ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.PatNum==FormPS.SelectedPatNum);
 				if(screenPat!=null) {
 					MsgBox.Show(this,"Cannot add patient already in screen group.");
@@ -787,7 +699,7 @@ namespace OpenDental{
 				screenPat=new ScreenPat();
 				screenPat.PatNum=FormPS.SelectedPatNum;
 				screenPat.PatScreenPerm=PatScreenPerm.Unknown;
-				screenPat.ScreenGroupNum=ScreenGroupCur.ScreenGroupNum;
+				screenPat.ScreenGroupNum=_screenGroup.ScreenGroupNum;
 				ScreenPats.Insert(screenPat);
 				_listScreenPats.Add(screenPat);
 				FillScreenPats();
@@ -795,6 +707,10 @@ namespace OpenDental{
 		}
 		
 		private void butRemovePat_Click(object sender,EventArgs e) {
+			if(gridScreenPats.GetSelectedIndex()==-1) {
+				MsgBox.Show(this,"Please select a patient to remove first.");
+				return;
+			}
 			_listScreenPats.RemoveAt(gridScreenPats.GetSelectedIndex());
 			FillScreenPats();
 		}
@@ -803,22 +719,21 @@ namespace OpenDental{
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Are you sure you want to delete this screening group? All screenings in this group will be deleted.")) {
 				return;
 			}
-			ScreenGroups.Delete(ScreenGroupCur);//Also deletes screens.
+			ScreenGroups.Delete(_screenGroup);//Also deletes screens.
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butStartScreens_Click(object sender,EventArgs e) {
 			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=ScreenGroupCur;
+			FormSE.ScreenGroupCur=_screenGroup;
 			FormSE.IsNew=true;
 			int selectedIdx=gridScreenPats.GetSelectedIndex();
 			int i=selectedIdx;
-			if(i==-1){
+			if(i==-1) {
 				i=0;
 			}
 			while(true) {
 				ScreenPat screenPat=_listScreenPats[i];
-			//foreach(ScreenPat screenPat in _listScreenPats) {
 				if(screenPat.PatScreenPerm!=PatScreenPerm.Allowed) {
 					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
 					if(i==selectedIdx && selectedIdx!=-1) {
@@ -881,26 +796,26 @@ namespace OpenDental{
 				textDescription.Focus();
 				return;
 			}
-			ScreenGroupCur.SGDate=PIn.Date(textScreenDate.Text);
-			ScreenGroupCur.Description=textDescription.Text;
-			ScreenGroupCur.ProvName=textProvName.Text;
-			ScreenGroupCur.ProvNum=comboProv.SelectedIndex+1;//this works for -1 also.
+			_screenGroup.SGDate=PIn.Date(textScreenDate.Text);
+			_screenGroup.Description=textDescription.Text;
+			_screenGroup.ProvName=textProvName.Text;
+			_screenGroup.ProvNum=comboProv.SelectedIndex+1;//this works for -1 also.
 			if(comboCounty.SelectedIndex==-1) {
-				ScreenGroupCur.County="";
+				_screenGroup.County="";
 			}
 			else {
-				ScreenGroupCur.County=comboCounty.SelectedItem.ToString();
+				_screenGroup.County=comboCounty.SelectedItem.ToString();
 			}
 			if(comboGradeSchool.SelectedIndex==-1) {
-				ScreenGroupCur.GradeSchool="";
+				_screenGroup.GradeSchool="";
 			}
 			else {
-				ScreenGroupCur.GradeSchool=comboGradeSchool.SelectedItem.ToString();
+				_screenGroup.GradeSchool=comboGradeSchool.SelectedItem.ToString();
 			}
-			ScreenGroupCur.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
-			ScreenPats.Sync(_listScreenPats,ScreenGroupCur.ScreenGroupNum);
-			ScreenGroups.Update(ScreenGroupCur);
-			Screens.UpdateForGroup(ScreenGroupCur);
+			_screenGroup.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
+			ScreenPats.Sync(_listScreenPats,_screenGroup.ScreenGroupNum);
+			ScreenGroups.Update(_screenGroup);
+			Screens.UpdateForGroup(_screenGroup);
 			DialogResult=DialogResult.OK;
 		}
 
@@ -909,8 +824,8 @@ namespace OpenDental{
 		}
 
 		private void FormScreenGroupEdit_FormClosing(object sender,FormClosingEventArgs e) {
-			if(IsNew && DialogResult==DialogResult.Cancel) {
-				ScreenGroups.Delete(ScreenGroupCur);//Also deletes screens.
+			if(_screenGroup.IsNew && DialogResult==DialogResult.Cancel) {
+				ScreenGroups.Delete(_screenGroup);//Also deletes screens.
 			}
 		}
 		
