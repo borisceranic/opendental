@@ -149,6 +149,7 @@ namespace OpenDental {
 			#endregion
 			#region Listener Service
 			textListenerPort.Text=PrefC.GetString(PrefName.CustListenerPort);
+#if !DEBUG
 			try {
 				_listenerType=WebSerializer.DeserializePrimitiveOrThrow<ListenerServiceType>(
 					_webServiceMain.GetEConnectorType(WebSerializer.SerializePrimitive<string>(PrefC.GetString(PrefName.RegistrationKey)))
@@ -156,7 +157,8 @@ namespace OpenDental {
 			}
 			catch(Exception ex) {
 				checkAllowEConnectorComm.Enabled=false;
-			}
+			} 
+#endif
 			SetEConnectorCommunicationStatus();
 			//Check to see if the eConnector service is already installed.  If it is, disable the install button.
 			//Users who want to install multiple on one computer can use the Service Manager instead.
@@ -214,10 +216,7 @@ namespace OpenDental {
 				listBoxWebSchedProviderPref.Enabled=false;
 				butRecallSchedSetup.Enabled=false;
 				((Control)tabMobileOld).Enabled=false;
-				return;
 			}
-			textListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
-			butSaveListenerPort.Enabled=tabControl.SelectedTab!=tabMobileOld;
 		}
 
 		#region patient portal
@@ -1207,7 +1206,6 @@ namespace OpenDental {
 					break;
 				case ListenerServiceType.ListenerServiceProxy:
 					checkAllowEConnectorComm.Checked=true;
-					textListenerPort.Enabled=false;
 					break;
 				case ListenerServiceType.NoListener:
 					checkAllowEConnectorComm.Checked=false;
