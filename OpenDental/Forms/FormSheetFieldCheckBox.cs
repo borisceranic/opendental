@@ -269,7 +269,7 @@ namespace OpenDental {
 					}
 					fieldName+=":"+listMedical.SelectedItem;
 				}
-				if(radioNo.Checked) {
+				if(radioNo.Checked || fieldName.StartsWith("checkMed")) {
 					radioButtonValue="N";
 				}
 				else {
