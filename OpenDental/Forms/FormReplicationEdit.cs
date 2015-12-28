@@ -92,6 +92,16 @@ namespace OpenDental {
 				MsgBox.Show(this,"The end of the range must be at least 999,999 greater than the start of the range.");
 				return;
 			}
+			//Disallow a range that ends after 9 quintillion.  This is because the max value of a long is 9,223,372,036,854,775,807
+			//and we want to leave room for the convert script, which doesn't implement our random primary key logic.
+			//It will instead use the auto-increment number for the table.  
+			//If the table had a primary key of 9,223,372,036,854,775,807, the auto-increment would be out of bounds and give an error.
+			//So now the largest random primary key value for any table will be 9 quintillion, which leaves the convert script 200 quadrillion entries
+			//before going out of bounds.
+			if(rangeEnd>9000000000000000000) {
+				MsgBox.Show(this,"The end of the range must be less than or equal to nine quintillion.");
+				return;
+			}
 			RepServ.Descript=textDescript.Text;
 			RepServ.ServerId=serverid;//will be valid and greater than 0.
 			RepServ.RangeStart=rangeStart;
