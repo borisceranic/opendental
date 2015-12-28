@@ -418,6 +418,12 @@
     <Compile Include="Forms\BasicTemplate.designer.cs">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormConnectionLost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormConnectionLost.designer.cs">
+      <DependentUpon>FormConnectionLost.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormTreatPlanCurEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -3991,6 +3997,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormConnectionLost.resx">
+      <DependentUpon>FormConnectionLost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormTreatPlanCurEdit.resx">
       <DependentUpon>FormTreatPlanCurEdit.cs</DependentUpon>

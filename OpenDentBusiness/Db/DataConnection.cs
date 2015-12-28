@@ -75,6 +75,10 @@ namespace OpenDentBusiness {
 		private static string _connectionStringT="";
 		[ThreadStatic]
 		private static DatabaseType _dBtypeT;
+		///<summary>Set this variable to OpenDental's thread ID.  Until this is set, there is no chance of LostConnection events being fired.
+		///This is only set after FormChooseDatabase is closed and has allowed the initial connection.  FormChooseDatabase can also be launched in
+		///read-only mode from FormOpenDental, but the user cannot change the connection in that manner.</summary>
+		public static int MainThreadId;
 #if DEBUG
 		///<summary>milliseconds.</summary>
 		private static int delayForTesting=0;
@@ -495,6 +499,13 @@ namespace OpenDentBusiness {
 			SetDbT(connectStr,connectStrLow,dbtype,false);
 		}
 
+		///<summary>Fires an event to launch the LostConnection window to freeze the calling thread.</summary>
+		private void ConnectionLost() {
+			//Event to launch connection lost window from OpenDental.  Only do it once for each connection loss.
+			DataConnectionEvent.Fire(new ODEventArgs("DataConnection","Connection to the MySQL server has been lost.  "
+				+"Connectivity will be retried periodically.  Click Retry to attempt to connect manually or Exit Program to close the program."));
+		}
+
 		private void TestConnection(string connectStr,string connectStrLow,DatabaseType dbtype,bool skipValidation) {
 			DBtype=dbtype;
 			if(DBtype==DatabaseType.Oracle) {
@@ -572,6 +583,27 @@ namespace OpenDentBusiness {
 			}
 			else if(DBtype==DatabaseType.MySql) {
 				cmd.CommandText=command;
+				try {
+					con.Open();	
+				}
+				catch(MySqlException ex) {
+					//MySqlExceptions are the only ones we want to catch.
+					//Don't catch error 1153 (max_allowed_packet error), it will change program behavior if we do.
+					if(Thread.CurrentThread.ManagedThreadId==MainThreadId && 
+						((ex.Message.ToLower().Contains("stream") && ex.Message.ToLower().Contains("failed"))//Reading from the stream has failed 
+						|| ex.Number==1042//Unable to connect to any of the specified MySQL hosts
+						|| ex.Number==1045))//Access denied
+						{
+						//Only block the main thread with a ConnectionLost window.  All other threads need to handle their own exceptions.
+						//This also addresses Middle Tier as the server's main thread shouldn't be going through this code (does not listen for the fail event).
+						ConnectionLost();//The application pauses here in the main thread to wait for user input.
+						con.Close();
+						return GetTable(command);
+					}
+					else {
+						throw ex;//Throw the exception for any child threads to preserve functionality.
+					}
+				}
 				da=new MySqlDataAdapter(cmd);
 				da.Fill(table);
 				con.Close();
@@ -689,7 +721,27 @@ namespace OpenDentBusiness {
 				for(int p=0;p<parameters.Length;p++) {
 					cmd.Parameters.Add(DbHelper.ParamChar+parameters[p].ParameterName,parameters[p].GetMySqlDbType()).Value=parameters[p].Value;
 				}
-				con.Open();
+				try {
+					con.Open();
+				}
+				catch(MySqlException ex) {
+					//MySqlExceptions are the only ones we want to catch.
+					//Don't catch error 1153 (max_allowed_packet error), it will change program behavior if we do.
+					if(Thread.CurrentThread.ManagedThreadId==MainThreadId && 
+						((ex.Message.ToLower().Contains("stream") && ex.Message.ToLower().Contains("failed"))//Reading from the stream has failed 
+						|| ex.Number==1042//Unable to connect to any of the specified MySQL hosts
+						|| ex.Number==1045))//Access denied
+						{
+						//Only block the main thread with a ConnectionLost window.  All other threads need to handle their own exceptions.
+						//This also addresses Middle Tier as the server's main thread shouldn't be going through this code (does not listen for the fail event).
+						ConnectionLost();//The application pauses here in the main thread to wait for user input.
+						con.Close();
+						return NonQ(commands,getInsertID,parameters);
+					}
+					else {
+						throw ex;//Throw the exception for any child threads to preserve functionality.
+					}
+				}
 				try {
 					rowsChanged=cmd.ExecuteNonQuery();
 				}
@@ -742,7 +794,27 @@ namespace OpenDentBusiness {
 			}
 			else if(DBtype==DatabaseType.MySql) {
 				cmd.CommandText=command;
-				con.Open();
+				try {
+					con.Open();
+				}
+				catch(MySqlException ex) {
+					//MySqlExceptions are the only ones we want to catch.
+					//Don't catch error 1153 (max_allowed_packet error), it will change program behavior if we do.
+					if(Thread.CurrentThread.ManagedThreadId==MainThreadId && 
+						((ex.Message.ToLower().Contains("stream") && ex.Message.ToLower().Contains("failed"))//Reading from the stream has failed 
+						|| ex.Number==1042//Unable to connect to any of the specified MySQL hosts
+						|| ex.Number==1045))//Access denied
+						{
+						//Only block the main thread with a ConnectionLost window.  All other threads need to handle their own exceptions.
+						//This also addresses Middle Tier as the server's main thread shouldn't be going through this code (does not listen for the fail event).
+						ConnectionLost();//The application pauses here in the main thread to wait for user input.
+						con.Close();
+						return GetCount(command);
+					}
+					else {
+						throw ex;//Throw the exception for any child threads to preserve functionality.
+					}
+				}
 				dr=(MySqlDataReader)cmd.ExecuteReader();
 				dr.Read();
 				retVal=dr[0].ToString();
@@ -782,7 +854,27 @@ namespace OpenDentBusiness {
 			}
 			else if(DBtype==DatabaseType.MySql) {
 				cmd.CommandText=command;
-				con.Open();
+				try {
+					con.Open();
+				}
+				catch(MySqlException ex) {
+					//MySqlExceptions are the only ones we want to catch.
+					//Don't catch error 1153 (max_allowed_packet error), it will change program behavior if we do.
+					if(Thread.CurrentThread.ManagedThreadId==MainThreadId && 
+						((ex.Message.ToLower().Contains("stream") && ex.Message.ToLower().Contains("failed"))//Reading from the stream has failed 
+						|| ex.Number==1042//Unable to connect to any of the specified MySQL hosts
+						|| ex.Number==1045))//Access denied
+						{
+						//Only block the main thread with a ConnectionLost window.  All other threads need to handle their own exceptions.
+						//This also addresses Middle Tier as the server's main thread shouldn't be going through this code (does not listen for the fail event).
+						ConnectionLost();//The application pauses here in the main thread to wait for user input.
+						con.Close();
+						return GetScalar(command);
+					}
+					else {
+						throw ex;//Throw the exception for any child threads to preserve functionality.
+					}
+				}
 				scalar=cmd.ExecuteScalar();
 				if(scalar==null) {
 					retVal="";

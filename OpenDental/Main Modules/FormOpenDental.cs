@@ -2283,6 +2283,16 @@ namespace OpenDental{
 			if(Programs.UsingEcwTightOrFullMode()) {
 				Splash.Dispose();//We don't show splash screen when bridging to eCW.
 			}
+			//12-14-2015 DG: DataConnection.MainThreadId is a variable that contains the id of the thread that will fire LostConnection ODEvents.
+			//Until the MainThreadId is set no thread from OpenDental has any chance of triggering the event so we place it after any updates could happen.
+			//We don't want a LostConnection event to fire when updating because of Silent Updating which would fail due to window pop-ups from this event.
+			//When the event is triggered a "connection lost" window will display allowing the user to attempt reconnecting to the database
+			//and then resume what they were doing.  The purpose of this is to prevent UE's from happening with poor connections or temporary outages.  
+			//This ID could really be any thread ID that you want to have trigger the LostConnection but is set to OD's main thread ID so child 
+			//threads don't trigger the event.  IT IS IMPORTANT that child threads handle their own connectivity issues as this code only handles the main
+			//thread and blocks it with a ShowDialog() from a window.
+			DataConnection.MainThreadId=Thread.CurrentThread.ManagedThreadId;//Set the main thread ID after all update processes are finished.
+			DataConnectionEvent.Fired+=DataConnection_ConnectionLost;//Hook up the connection lost event. Nothing prior to this point will have LostConnection events fired.
 			RefreshLocalData(InvalidType.Prefs);//should only refresh preferences so that SignalLastClearedDate preference can be used in ClearOldSignals()
 			Signalods.ClearOldSignals();
 			//We no longer do this shotgun approach because it can slow the loading time.
@@ -5050,6 +5060,40 @@ namespace OpenDental{
 				MessageBox.Show(ex.Message);
 				return false;
 			}
+		}
+
+		///<summary>This method stops all (local) timers and displays a connection lost window that will let users attempt to reconnect.
+		///At any time during the lifespan of the application connection to the database can be lost for unknown reasons.
+		///When anything spawned by FormOpenDental (main thread) tries to connect to the database and fails, this event will get fired.</summary>
+		private void DataConnection_ConnectionLost(ODEventArgs e) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ClientDirect) {
+				return;
+			}
+			if(e!=null && e.Name!="DataConnection") {
+				return;
+			}
+			//Stop all timers.
+			timerSignals.Stop();
+			timerReplicationMonitor.Stop();
+			timerLogoff.Stop();
+			timerTimeIndic.Stop();
+			timerWebHostSynch.Stop();
+			timerDisabledKey.Stop();
+			string exceptionText=(string)e.Tag;
+			FormConnectionLost FormCL=new FormConnectionLost(exceptionText);
+			if(FormCL.ShowDialog()==DialogResult.Cancel) {
+				//This is problematic because it causes DirectX to cause a UE but there doesn't seem to be a better way to close without using the database.
+				Environment.Exit(0);
+			}
+			//Start all timers again (except signals if they aren't usually started).
+			if(PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)!=0) {
+				timerSignals.Start();
+			}
+			timerReplicationMonitor.Start();
+			timerLogoff.Start();
+			timerTimeIndic.Start();
+			timerWebHostSynch.Start();
+			timerDisabledKey.Start();
 		}
 
 		private void userControlTasks1_GoToChanged(object sender,EventArgs e) {
