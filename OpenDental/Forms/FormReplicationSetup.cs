@@ -126,13 +126,14 @@ namespace OpenDental {
 			}
 			//long serverCount=ReplicationServers.Listt.Count;
 			long offset=10000;
-			long span=(long.MaxValue-offset) / (long)ReplicationServers.Listt.Count;//rounds down
+			long maxValue=9000000000000000000;//use 9 quintillion instead of max long to ensure a buffer for the ranges.
+			long span=(maxValue-offset) / (long)ReplicationServers.Listt.Count;//rounds down
 			long counter=offset;
 			for(int i=0;i<ReplicationServers.Listt.Count;i++) {
 				ReplicationServers.Listt[i].RangeStart=counter;
 				counter+=span-1;
 				if(i==ReplicationServers.Listt.Count-1) {
-					ReplicationServers.Listt[i].RangeEnd=long.MaxValue;
+					ReplicationServers.Listt[i].RangeEnd=maxValue;
 				}
 				else {
 					ReplicationServers.Listt[i].RangeEnd=counter;
