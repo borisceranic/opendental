@@ -557,6 +557,69 @@ namespace OpenDental{
 			gridScreenPats.EndUpdate();
 		}
 
+		///<summary></summary>
+		private void AddAnonymousScreens() {
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=_screenGroup;
+			FormSE.IsNew=true;
+			if(_listScreens.Count==0) {
+				FormSE.ScreenCur=new OpenDentBusiness.Screen();
+				FormSE.ScreenCur.ScreenGroupOrder=1;
+			}
+			else {
+				FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
+				FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
+			}
+			while(true) {
+				//For Anonymous patients always default to unknowns.
+				FormSE.ScreenCur.Gender=PatientGender.Unknown;
+				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;
+				FormSE.ShowDialog();
+				if(FormSE.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				FormSE.ScreenCur.ScreenGroupOrder++;
+				FillGrid();
+			}
+		}
+
+		///<summary></summary>
+		private void AddAnonymousScreensForSheets() {
+			//Get the first custom Screening sheet or use the internal one
+			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
+			//Create a valid screen so that we can create a screening sheet with the corresponding ScreenNum.
+			OpenDentBusiness.Screen screen=new OpenDentBusiness.Screen();
+			screen.ScreenDate=_screenGroup.SGDate;
+			screen.GradeSchool=_screenGroup.GradeSchool;
+			screen.County=_screenGroup.County;
+			screen.PlaceService=_screenGroup.PlaceService;
+			screen.ProvNum=_screenGroup.ProvNum;
+			screen.ProvName=_screenGroup.ProvName;
+			screen.ScreenGroupOrder=1;
+			if(_listScreens.Count!=0) {
+				screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder++;
+			}
+			while(true) {
+				screen.Gender=PatientGender.Unknown;
+				screen.RaceOld=PatientRaceOld.Unknown;
+				Screens.Insert(screen);//We need a new PK so call insert.
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
+				SheetParameter.SetParameter(sheet,"ScreenNum",screen.ScreenNum);
+				SheetFiller.FillFields(sheet);
+				using(Graphics g=CreateGraphics()) {
+					SheetUtil.CalculateHeights(sheet,g);
+				}
+				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+				FormSFE.ShowDialog();
+				if(FormSFE.DialogResult!=DialogResult.OK) {
+					//Remove the unused screen from the database:
+					Screens.Delete(screen);
+					return;
+				}
+				//TODO: process the sheet and update the corresponding screen in the database?
+			}
+		}
+
 		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {
 			if(e.Button!=MouseButtons.Right) {
 				return;
@@ -624,31 +687,6 @@ namespace OpenDental{
 			}
 		}
 
-		private void butAddAnonymous_Click(object sender, System.EventArgs e) {
-			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=_screenGroup;
-			FormSE.IsNew=true;
-			if(_listScreens.Count==0) {
-				FormSE.ScreenCur=new OpenDentBusiness.Screen();
-				FormSE.ScreenCur.ScreenGroupOrder=1;
-			}
-			else {
-				FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
-				FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
-			}
-			while(true) {
-				//For Anonymous patients always default to unknowns.
-				FormSE.ScreenCur.Gender=PatientGender.Unknown;
-				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;
-				FormSE.ShowDialog();
-				if(FormSE.DialogResult!=DialogResult.OK) {
-					return;
-				}
-				FormSE.ScreenCur.ScreenGroupOrder++;
-				FillGrid();
-			}
-		}
-
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=_screenGroup;
@@ -678,6 +716,15 @@ namespace OpenDental{
 						FillGrid();
 					}
 				}
+			}
+		}
+
+		private void butAddAnonymous_Click(object sender,System.EventArgs e) {
+			if(PrefC.GetBool(PrefName.ScreeningsUseSheets)) {
+				AddAnonymousScreensForSheets();
+			}
+			else {
+				AddAnonymousScreens();
 			}
 		}
 

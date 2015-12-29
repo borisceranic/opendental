@@ -120,7 +120,8 @@ namespace OpenDentBusiness {
 		Statement,
 		///<summary>Users are NEVER allowed to use this sheet type. It is for internal use only. It should be hidden in all lists and unselectable.</summary>
 		MedLabResults,
-		TreatmentPlan
+		TreatmentPlan,
+		Screening
 	}
 
 	public enum OutInCheck{

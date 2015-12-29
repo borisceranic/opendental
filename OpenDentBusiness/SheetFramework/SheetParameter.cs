@@ -86,6 +86,9 @@ namespace OpenDentBusiness{
 				case SheetTypeEnum.DepositSlip:
 					list.Add(new SheetParameter(true,"DepositNum"));
 					break;
+				case SheetTypeEnum.Screening:
+					list.Add(new SheetParameter(true,"ScreenNum"));
+					break;
 				case SheetTypeEnum.TreatmentPlan:
 				case SheetTypeEnum.Statement:
 				case SheetTypeEnum.MedLabResults:

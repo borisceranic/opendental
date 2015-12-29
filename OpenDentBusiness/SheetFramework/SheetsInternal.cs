@@ -64,6 +64,8 @@ namespace OpenDentBusiness{
 					return MedLabResultReport();
 				case SheetInternalType.TreatmentPlan:
 					return TreatmentPlan();
+				case SheetInternalType.Screening:
+					return Screening();
 				default:
 					throw new ApplicationException("Invalid SheetInternalType.");
 			}
@@ -1779,6 +1781,60 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 				};
 			}//end using
 			return sheet;
+		}
+
+		private static SheetDef Screening() {
+			SheetDef sheetDef=new SheetDef(SheetTypeEnum.Screening);
+			sheetDef.Description="Screening";
+			sheetDef.FontName="Microsoft Sans Serif";
+			sheetDef.FontSize=9f;
+			sheetDef.Width=850;
+			sheetDef.Height=1100;
+			int rowH=18;
+			int y=60;
+			int x=75;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Screening",12f,sheetDef.FontName,true,312,y,275,20));
+			y=105;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Last Name:",sheetDef.FontSize,sheetDef.FontName,false,76,y,75,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("LName",sheetDef.FontSize,sheetDef.FontName,false,151,y,155,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("First Name:",sheetDef.FontSize,sheetDef.FontName,false,311,y,76,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("FName",sheetDef.FontSize,sheetDef.FontName,false,387,y,155,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Middle I:",sheetDef.FontSize,sheetDef.FontName,false,547,y,65,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("MiddleI",sheetDef.FontSize,sheetDef.FontName,false,612,y,145,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Birthdate:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Birthdate",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Description:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("Description",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Screener:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("ProvName",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("County:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("County",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Date of Screening:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("DateScreenGroup",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Place of Service:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("PlaceOfService",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Urgency:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Urgency",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Race / Ethnicity:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Race/Ethnicity",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Grade Level:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("GradeLevel",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Preferred:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Preferred",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			y+=rowH+2;
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Comments:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Comments",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,500));
+			return sheetDef;
 		}
 
 
