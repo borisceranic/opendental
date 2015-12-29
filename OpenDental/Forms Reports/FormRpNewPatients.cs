@@ -398,6 +398,7 @@ namespace OpenDental{
 			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
 			report.AddSubTitle("Dates of Report",dateFrom.ToString("d")+" - "+dateTo.ToString("d"),fontSubTitle);
 			QueryObject query=report.AddQuery(table,Lan.g(this,"Date")+": "+DateTimeOD.Today.ToString("d"));
+			query.AddColumn(Lan.g(this,"#"),40,FieldValueType.String,font);
 			query.AddColumn(Lan.g(this,"Date"),90,FieldValueType.Date,font);
 			query.AddColumn(Lan.g(this,"Last Name"),120,FieldValueType.String,font);
 			query.AddColumn(Lan.g(this,"First Name"),120,FieldValueType.String,font);
