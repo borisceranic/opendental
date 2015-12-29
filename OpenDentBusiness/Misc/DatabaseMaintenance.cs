@@ -2384,6 +2384,44 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string InsPayPlanWithPatientPayments(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			//Gets a list of payplans of type insurance that have patient payments attached to them and no insurance payments attached
+			command=@"SELECT payplan.PayPlanNum 
+								FROM payplan
+								INNER JOIN paysplit ON paysplit.PayPlanNum=payplan.PayPlanNum
+								LEFT JOIN claimproc ON claimproc.PayPlanNum=payplan.PayPlanNum
+									AND claimproc.Status IN("
+										+POut.Int((int)ClaimProcStatus.Received)+","
+										+POut.Int((int)ClaimProcStatus.Supplemental)+","
+										+POut.Int((int)ClaimProcStatus.CapClaim)+") "+
+							@"WHERE payplan.PlanNum!=0
+								AND claimproc.ClaimProcNum IS NULL
+								GROUP BY payplan.PayPlanNum";
+			List<long> listPayPlanNums=Db.GetListLong(command);
+			if(isCheck) {
+				if(listPayPlanNums.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Ins payment plans with patient payments attached")+": "+listPayPlanNums.Count+"\r\n";
+				}
+			}
+			else {
+				if(listPayPlanNums.Count>0) {
+					//Change the insurance payment plan to a patient payment plan so that the payments will be visible within the payment plan
+					command="UPDATE payplan SET PlanNum=0 WHERE PayPlanNum IN("+String.Join(",",listPayPlanNums)+")";
+					Db.NonQ(command);
+				}
+				int numberFixed=listPayPlanNums.Count;
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Ins payment plans with patient payments attached fixed")+": "+numberFixed.ToString()+"\r\n";
+				}
+			}			
+			return log;
+		}
+
+		[DbmMethod]
 		public static string InsPlanInvalidCarrier(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
