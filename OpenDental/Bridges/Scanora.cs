@@ -43,7 +43,10 @@ namespace OpenDental.Bridges{
 				iniText+=pat.SSN;
 			}
 			iniText+="\r\n";
-			iniText+="PATBD = "+pat.Birthdate.ToString("yyyy-MM-dd")+"\r\n";
+			//We changed the date format from yyyy-MM-dd to ToShortDateString() because of an email from Chris Bope (Product Manager for Sorodex).
+			//Chris said that a valid date must be in ToShortDateString() because their program assumes that is the format when it gets saved.
+			//The email copy can be found on PatNum 23172 on a commlog dated 12/29/2015.
+			iniText+="PATBD = "+pat.Birthdate.ToShortDateString()+"\r\n";
 			iniText+="PROVIDER1 = "+Providers.GetFormalName(pat.PriProv)+"\r\n";
 			iniText+="PROVIDER2 = "+Providers.GetFormalName(pat.SecProv)+"\r\n";
 			iniText+="ADDRESS1 = "+Tidy(pat.Address)+"\r\n";
