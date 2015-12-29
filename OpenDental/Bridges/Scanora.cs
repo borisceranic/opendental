@@ -25,7 +25,9 @@ namespace OpenDental.Bridges{
 				MsgBox.Show("Scanora","Please select a patient first.");
 				return;
 			}
-			string iniText="[PracticeManagementInterface]\r\n"
+			//Start with a blank line per Scanora's example ini file, and then another blank line following the Header.
+			string iniText="\r\n[PracticeManagementInterface]\r\n\r\n"
+				+"CLEAR_PRACTICE_MANAGEMENT_AUTOMATICALLY = 1\r\n"
 				+"USE_PRACTICE_MANAGEMENT = 1\r\n"
 				+"PATID = ";
 			if(ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Enter 0 to use PatientNum, or 1 to use ChartNum")=="0"){
