@@ -1448,8 +1448,12 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		///<summary>Used in the eConnector service.</summary>
-		public static string SendWebSchedNotifications() {
+		///<summary>Used in the eConnector service.  Honors the preferences for Web Sched automation.</summary>
+		public static string SendAutomaticWebSchedNotifications() {
+			WebSchedAutomaticSend webSchedSendSetting=(WebSchedAutomaticSend)PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting);
+			if(webSchedSendSetting==WebSchedAutomaticSend.DoNotSend) {
+				return "";//Do not flood the logs with unessecary text if they don't even have this enabled.
+			}
 			try {
 				ValidateWebSched();
 			}
@@ -1464,8 +1468,7 @@ namespace OpenDentBusiness{
 				fromDate=DateTime.MinValue;
 			}
 			else {
-				fromDate=DateTime.MinValue;
-				//fromDate=DateTime.Today.AddDays(-daysPast);
+				fromDate=DateTime.Today.AddDays(-daysPast);
 			}
 			if(daysFuture==-1) {
 				toDate=DateTime.MaxValue;
@@ -1479,19 +1482,31 @@ namespace OpenDentBusiness{
 			List<long> recallNums=new List<long>();
 			DataTable table=Recalls.GetRecallList(fromDate,toDate,PrefC.GetBool(PrefName.RecallGroupByFamily),provNum,clinicNum,siteNum,RecallListSort.Alphabetical,RecallListShowNumberReminders.All,recallNums);
 			for(int i=0;i<table.Rows.Count;i++) {
+				Patient patCur=Patients.GetPat(PIn.Long(table.Rows[i]["PatNum"].ToString()));
+				if(patCur==null) {
+					continue;//Should never happen.  If it does, we obviously can't send an email to a null patient.
+				}
+				if(patCur.Email=="") {//Can't send emails to a patient with no email set.
+					continue;
+				}
+				if(webSchedSendSetting==WebSchedAutomaticSend.SendToEmailNoPreferred 
+					&& patCur.PreferRecallMethod!=ContactMethod.None 
+					&& patCur.PreferRecallMethod!=ContactMethod.Email) 
+				{
+					continue;//The patient has a preferred recall contact method set and it isn't email.
+				}
+				if(webSchedSendSetting==WebSchedAutomaticSend.SendToEmailOnlyPreferred && patCur.PreferRecallMethod!=ContactMethod.Email) {
+					continue;//The patient's preferred recall contact method isn't set or is set to a contact method other than email.
+				}
 				recallNums.Add(PIn.Long(table.Rows[i]["RecallNum"].ToString()));
 			}
 			if(recallNums.Count==0) {
-				return "Did not send recall notifications for Web Sched.  There are no recalls to send notifications for.";
+				return "";
 			}
 			return SendWebSchedNotifications(recallNums,PrefC.GetBool(PrefName.RecallGroupByFamily),RecallListSort.Alphabetical);
 		}
 
-		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy) {
-			return SendWebSchedNotifications(recallNums,isGroupFamily,sortBy,null);
-		}
-
-		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy,EmailAddress emailAddressOverride) {
+		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy,EmailAddress emailAddressOverride=null) {
 			//No need to check RemotingRole; no call to db.
 			string response="";
 			Dictionary<long,string> dictWebSchedParameters=new Dictionary<long,string>();
