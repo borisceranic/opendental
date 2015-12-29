@@ -11,7 +11,7 @@ namespace OpenDentBusiness {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,includeAddress,excludeNoProd);
 			}
 			string query=@"SET @pos=0;
-				SELECT result.*,@pos:=@pos+1 patCount FROM (SELECT dateFirstProc,patient.LName,patient.FName,"
+				SELECT @pos:=@pos+1 patCount, result.* FROM (SELECT dateFirstProc,patient.LName,patient.FName,"
 				+DbHelper.Concat("referral.LName","IF(referral.FName='','',',')","referral.FName")+" refname,SUM(procedurelog.ProcFee) ";//\"$HowMuch\"";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				query+="$HowMuch";
