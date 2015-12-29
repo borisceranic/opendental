@@ -69,7 +69,6 @@ namespace OpenDental.Bridges{
 		///<summary>Removes semicolons and spaces.</summary>
 		private static string Tidy(string input) {
 			string retVal=input.Replace(";","");//get rid of any semicolons.
-			retVal=retVal.Replace(" ","");
 			return retVal;
 		}
 
