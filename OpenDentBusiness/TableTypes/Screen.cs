@@ -8,23 +8,11 @@ namespace OpenDentBusiness{
 		///<summary>Primary key</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long ScreenNum;
-		///<summary>The date of the screening.</summary>
-		public DateTime ScreenDate;
-		///<summary>FK to site.Description, although it will not crash if key absent.</summary>
-		public string GradeSchool;
-		///<summary>FK to county.CountyName, although it will not crash if key absent.</summary>
-		public string County;
-		///<summary>Enum:PlaceOfService</summary>
-		public PlaceOfService PlaceService;
-		///<summary>FK to provider.ProvNum.  ProvNAME is always entered, but ProvNum supplements it by letting user select from list.  When entering a provNum, the name will be filled in automatically. Can be 0 if the provider is not in the list, but provName is required.</summary>
-		public long ProvNum;
-		///<summary>Required.</summary>
-		public string ProvName;
-		///<summary>Enum:PatientGender</summary>
+		///<summary>Enum:PatientGender </summary>
 		public PatientGender Gender;
 		///<summary>Enum:PatientRaceOld and ethnicity.</summary>
 		public PatientRaceOld RaceOld;
-		///<summary>Enum:PatientGrade</summary>
+		///<summary>Enum:PatientGrade </summary>
 		public PatientGrade GradeLevel;
 		///<summary>Age of patient at the time the screening was done. Faster than recording birthdates.</summary>
 		public byte Age;
@@ -52,6 +40,11 @@ namespace OpenDentBusiness{
 		public string Comments;
 		///<summary>FK to screenpat.ScreenPatNum.</summary>
 		public long ScreenPatNum;
+
+		///<summary>Returns a copy of this Screen.</summary>
+		public Screen Copy() {
+			return (Screen)this.MemberwiseClone();
+		}
 	}
 
 	

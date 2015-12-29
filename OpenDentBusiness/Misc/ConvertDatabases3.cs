@@ -11774,6 +11774,92 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ScreeningsUseSheets','0')";
 					Db.NonQ(command);
 				}
+				//Screen Groups need the ability to be set up ahead of time prior to the actual screenings.
+				//Therefore we need to move the information regarding the screen group from the screen table to the screengroup table,
+				//since we used to save location and screener information on the screen instead of the screen group.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screengroup ADD ProvName varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screengroup ADD ProvName varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screengroup ADD ProvNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screengroup ADD INDEX (ProvNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screengroup ADD ProvNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE screengroup SET ProvNum = 0 WHERE ProvNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screengroup MODIFY ProvNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX screengroup_ProvNum ON screengroup (ProvNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screengroup ADD PlaceService tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screengroup ADD PlaceService number(3)";
+					Db.NonQ(command);
+					command="UPDATE screengroup SET PlaceService = 0 WHERE PlaceService IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screengroup MODIFY PlaceService NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screengroup ADD County varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screengroup ADD County varchar2(255)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screengroup ADD GradeSchool varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screengroup ADD GradeSchool varchar2(255)";
+					Db.NonQ(command);
+				}
+				//Now that the screengroup table has columns for the related information we need to update any current screen groups via their screens.
+				command=@"SELECT ScreenGroupNum,ProvName,ProvNum,PlaceService,County,GradeSchool 
+					FROM screen
+					GROUP BY ScreenGroupNum";//We want any random screen, since the screen for a screen group should have already been synced.
+				if(DataConnection.DBtype!=DatabaseType.MySql) {
+					command+=",ProvName,ProvNum,PlaceService,County,GradeSchool";
+				}
+				table=Db.GetTable(command);
+				foreach(DataRow row in table.Rows) {
+					command="UPDATE screengroup SET "
+							+"ProvName='"			+row["ProvName"].ToString()+"'"
+							+",ProvNum="			+row["ProvNum"].ToString()
+							+",PlaceService="	+row["PlaceService"].ToString()
+							+",County='"			+row["County"].ToString()+"'"
+							+",GradeSchool='"	+row["GradeSchool"].ToString()+"' "
+						+"WHERE ScreenGroupNum="+row["ScreenGroupNum"].ToString();
+					Db.NonQ(command);
+				}
+				//Drop the duplicate columns from the screen table that are now stored in the screengroup table.
+				command="ALTER TABLE screen DROP COLUMN ScreenDate";//This column already existed in the screengroup table.  Called SGDate.
+				Db.NonQ(command);
+				command="ALTER TABLE screen DROP COLUMN ProvName";
+				Db.NonQ(command);
+				command="ALTER TABLE screen DROP COLUMN ProvNum";
+				Db.NonQ(command);
+				command="ALTER TABLE screen DROP COLUMN PlaceService";
+				Db.NonQ(command);
+				command="ALTER TABLE screen DROP COLUMN County";
+				Db.NonQ(command);
+				command="ALTER TABLE screen DROP COLUMN GradeSchool";
+				Db.NonQ(command);
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
@@ -11787,3 +11873,4 @@ namespace OpenDentBusiness {
 
 
 
+				

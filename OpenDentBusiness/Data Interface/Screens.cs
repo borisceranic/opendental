@@ -45,23 +45,6 @@ namespace OpenDentBusiness{
 			Crud.ScreenCrud.Update(Cur);
 		}
 
-		///<summary>Updates all screens for a group with the date,prov, and location info of the current group.</summary>
-		public static void UpdateForGroup(ScreenGroup ScreenGroupCur){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ScreenGroupCur);
-				return;
-			}
-			string command = "UPDATE screen SET "
-				+"ScreenDate     ="    +POut.Date  (ScreenGroupCur.SGDate)
-				+",GradeSchool ='"      +POut.String(ScreenGroupCur.GradeSchool)+"'"
-				+",County ='"           +POut.String(ScreenGroupCur.County)+"'"
-				+",PlaceService ='"     +POut.Long   ((int)ScreenGroupCur.PlaceService)+"'"
-				+",ProvNum ='"          +POut.Long   (ScreenGroupCur.ProvNum)+"'"
-				+",ProvName ='"         +POut.String(ScreenGroupCur.ProvName)+"'"
-				+" WHERE ScreenGroupNum = '" +ScreenGroupCur.ScreenGroupNum.ToString()+"'";
-			Db.NonQ(command);
-		}
-
 		///<summary></summary>
 		public static void Delete(OpenDentBusiness.Screen Cur){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

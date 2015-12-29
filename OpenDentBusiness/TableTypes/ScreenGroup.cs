@@ -10,28 +10,30 @@ namespace OpenDentBusiness{
 		public long ScreenGroupNum;
 		///<summary>Up to the user.</summary>
 		public string Description;
-		///<summary>Date used to help order the groups.</summary>
+		///<summary>The date of the screening.</summary>
 		public DateTime SGDate;
-		///<summary>Not a database column. Used if ProvNum=0.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
+		///<summary>Required.  Could be the name of the screener and not a provider necessarily.</summary>
 		public string ProvName;
-		///<summary>Not a database column. Foreign key to provider.ProvNum. Can be 0 if not a standard provider.  In that case, a ProvName should be entered.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
+		///<summary>FK to provider.ProvNum.  ProvNAME is always entered, but ProvNum supplements it by letting user select from list.
+		///When entering a provNum, the name will be filled in automatically.
+		///Can be 0 if the provider is not in the list, but provName is required.</summary>
 		public long ProvNum;
-		///<summary>Not a database column. See the PlaceOfService enum.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
+		///<summary>Enum:PlaceOfService Describes where the screening will take place.</summary>
 		public PlaceOfService PlaceService;
-		///<summary>Not a database column. Foreign key to county.CountyName, although it will not crash if key absent.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
+		///<summary>FK to county.CountyName, although it will not crash if key absent.</summary>
 		public string County;
-		///<summary>Not a database column. Foreign key to school.SchoolName, although it will not crash if key absent.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
+		///<summary>FK to site.Description, although it will not crash if key absent.</summary>
 		public string GradeSchool;
+
+		///<summary>Returns a copy of this ScreenGroup.</summary>
+		public ScreenGroup Copy() {
+			return (ScreenGroup)this.MemberwiseClone();
+		}
 	}
 
-	
 
-	
+
+
 
 }
 

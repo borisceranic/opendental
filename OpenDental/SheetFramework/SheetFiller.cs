@@ -114,13 +114,13 @@ namespace OpenDental{
 					FillFieldsForTreatPlan(sheet);
 					break;
 				case SheetTypeEnum.Screening:
-					Screen screen=Screens.GetOne((long)GetParamByName(sheet,"ScreenNum").ParamValue);
+					ScreenGroup screenGroup=ScreenGroups.GetScreenGroup((long)GetParamByName(sheet,"ScreenGroupNum").ParamValue);
 					//Look for the optional PatNum param:
 					SheetParameter paraPatNum=GetParamByName(sheet,"PatNum");
 					if(paraPatNum!=null) {
 						pat=Patients.GetPat((long)paraPatNum.ParamValue);
 					}
-					FillFieldsForScreening(sheet,screen,pat);
+					FillFieldsForScreening(sheet,screenGroup,pat);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -2830,8 +2830,7 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForScreening(Sheet sheet,Screen screen,Patient pat) {
-			ScreenGroup screenGroup=ScreenGroups.GetScreenGroup(screen.ScreenGroupNum);
+		private static void FillFieldsForScreening(Sheet sheet,ScreenGroup screenGroup,Patient pat) {
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "Description":
@@ -2841,16 +2840,16 @@ namespace OpenDental{
 						field.FieldValue=screenGroup.SGDate.ToShortDateString();
 						break;
 					case "ProvName":
-						field.FieldValue=screen.ProvName;
+						field.FieldValue=screenGroup.ProvName;
 						break;
 					case "PlaceOfService":
-						field.FieldValue=screen.PlaceService.ToString();
+						field.FieldValue=screenGroup.PlaceService.ToString();
 						break;
 					case "County":
-						field.FieldValue=screen.County;
+						field.FieldValue=screenGroup.County;
 						break;
 					case "GradeSchool":
-						field.FieldValue=screen.GradeSchool;
+						field.FieldValue=screenGroup.GradeSchool;
 						break;
 				}
 				//Patient specific fields--------------------------------------------------

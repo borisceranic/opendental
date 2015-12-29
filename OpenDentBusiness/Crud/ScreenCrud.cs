@@ -47,12 +47,6 @@ namespace OpenDentBusiness.Crud{
 			foreach(DataRow row in table.Rows) {
 				screen=new Screen();
 				screen.ScreenNum       = PIn.Long  (row["ScreenNum"].ToString());
-				screen.ScreenDate      = PIn.Date  (row["ScreenDate"].ToString());
-				screen.GradeSchool     = PIn.String(row["GradeSchool"].ToString());
-				screen.County          = PIn.String(row["County"].ToString());
-				screen.PlaceService    = (OpenDentBusiness.PlaceOfService)PIn.Int(row["PlaceService"].ToString());
-				screen.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
-				screen.ProvName        = PIn.String(row["ProvName"].ToString());
 				screen.Gender          = (OpenDentBusiness.PatientGender)PIn.Int(row["Gender"].ToString());
 				screen.RaceOld         = (OpenDentBusiness.PatientRaceOld)PIn.Int(row["RaceOld"].ToString());
 				screen.GradeLevel      = (OpenDentBusiness.PatientGrade)PIn.Int(row["GradeLevel"].ToString());
@@ -81,12 +75,6 @@ namespace OpenDentBusiness.Crud{
 			}
 			DataTable table=new DataTable(tableName);
 			table.Columns.Add("ScreenNum");
-			table.Columns.Add("ScreenDate");
-			table.Columns.Add("GradeSchool");
-			table.Columns.Add("County");
-			table.Columns.Add("PlaceService");
-			table.Columns.Add("ProvNum");
-			table.Columns.Add("ProvName");
 			table.Columns.Add("Gender");
 			table.Columns.Add("RaceOld");
 			table.Columns.Add("GradeLevel");
@@ -106,12 +94,6 @@ namespace OpenDentBusiness.Crud{
 			foreach(Screen screen in listScreens) {
 				table.Rows.Add(new object[] {
 					POut.Long  (screen.ScreenNum),
-					POut.Date  (screen.ScreenDate),
-					POut.String(screen.GradeSchool),
-					POut.String(screen.County),
-					POut.Int   ((int)screen.PlaceService),
-					POut.Long  (screen.ProvNum),
-					POut.String(screen.ProvName),
 					POut.Int   ((int)screen.Gender),
 					POut.Int   ((int)screen.RaceOld),
 					POut.Int   ((int)screen.GradeLevel),
@@ -168,18 +150,12 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScreenNum,";
 			}
-			command+="ScreenDate,GradeSchool,County,PlaceService,ProvNum,ProvName,Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
+			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(screen.ScreenNum)+",";
 			}
 			command+=
-				     POut.Date  (screen.ScreenDate)+","
-				+"'"+POut.String(screen.GradeSchool)+"',"
-				+"'"+POut.String(screen.County)+"',"
-				+    POut.Int   ((int)screen.PlaceService)+","
-				+    POut.Long  (screen.ProvNum)+","
-				+"'"+POut.String(screen.ProvName)+"',"
-				+    POut.Int   ((int)screen.Gender)+","
+				     POut.Int   ((int)screen.Gender)+","
 				+    POut.Int   ((int)screen.RaceOld)+","
 				+    POut.Int   ((int)screen.GradeLevel)+","
 				+    POut.Byte  (screen.Age)+","
@@ -227,18 +203,12 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ScreenNum,";
 			}
-			command+="ScreenDate,GradeSchool,County,PlaceService,ProvNum,ProvName,Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
+			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(screen.ScreenNum)+",";
 			}
 			command+=
-				     POut.Date  (screen.ScreenDate)+","
-				+"'"+POut.String(screen.GradeSchool)+"',"
-				+"'"+POut.String(screen.County)+"',"
-				+    POut.Int   ((int)screen.PlaceService)+","
-				+    POut.Long  (screen.ProvNum)+","
-				+"'"+POut.String(screen.ProvName)+"',"
-				+    POut.Int   ((int)screen.Gender)+","
+				     POut.Int   ((int)screen.Gender)+","
 				+    POut.Int   ((int)screen.RaceOld)+","
 				+    POut.Int   ((int)screen.GradeLevel)+","
 				+    POut.Byte  (screen.Age)+","
@@ -266,12 +236,6 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Screen in the database.</summary>
 		public static void Update(Screen screen){
 			string command="UPDATE screen SET "
-				+"ScreenDate      =  "+POut.Date  (screen.ScreenDate)+", "
-				+"GradeSchool     = '"+POut.String(screen.GradeSchool)+"', "
-				+"County          = '"+POut.String(screen.County)+"', "
-				+"PlaceService    =  "+POut.Int   ((int)screen.PlaceService)+", "
-				+"ProvNum         =  "+POut.Long  (screen.ProvNum)+", "
-				+"ProvName        = '"+POut.String(screen.ProvName)+"', "
 				+"Gender          =  "+POut.Int   ((int)screen.Gender)+", "
 				+"RaceOld         =  "+POut.Int   ((int)screen.RaceOld)+", "
 				+"GradeLevel      =  "+POut.Int   ((int)screen.GradeLevel)+", "
@@ -295,30 +259,6 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Screen in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Screen screen,Screen oldScreen){
 			string command="";
-			if(screen.ScreenDate.Date != oldScreen.ScreenDate.Date) {
-				if(command!=""){ command+=",";}
-				command+="ScreenDate = "+POut.Date(screen.ScreenDate)+"";
-			}
-			if(screen.GradeSchool != oldScreen.GradeSchool) {
-				if(command!=""){ command+=",";}
-				command+="GradeSchool = '"+POut.String(screen.GradeSchool)+"'";
-			}
-			if(screen.County != oldScreen.County) {
-				if(command!=""){ command+=",";}
-				command+="County = '"+POut.String(screen.County)+"'";
-			}
-			if(screen.PlaceService != oldScreen.PlaceService) {
-				if(command!=""){ command+=",";}
-				command+="PlaceService = "+POut.Int   ((int)screen.PlaceService)+"";
-			}
-			if(screen.ProvNum != oldScreen.ProvNum) {
-				if(command!=""){ command+=",";}
-				command+="ProvNum = "+POut.Long(screen.ProvNum)+"";
-			}
-			if(screen.ProvName != oldScreen.ProvName) {
-				if(command!=""){ command+=",";}
-				command+="ProvName = '"+POut.String(screen.ProvName)+"'";
-			}
 			if(screen.Gender != oldScreen.Gender) {
 				if(command!=""){ command+=",";}
 				command+="Gender = "+POut.Int   ((int)screen.Gender)+"";

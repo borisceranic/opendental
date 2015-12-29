@@ -435,15 +435,6 @@ namespace OpenDental{
 			for(int i=0;i<patScreenPerms.Length;i++) {
 				patContextMenu.MenuItems.Add(new MenuItem(patScreenPerms[i],patContextMenuItem_Click));
 			}
-			if(_listScreens.Count > 0) {
-				OpenDentBusiness.Screen screen=_listScreens[0];
-				_screenGroup.SGDate=screen.ScreenDate;
-				_screenGroup.ProvName=screen.ProvName;
-				_screenGroup.ProvNum=screen.ProvNum;
-				_screenGroup.County=screen.County;
-				_screenGroup.GradeSchool=screen.GradeSchool;
-				_screenGroup.PlaceService=screen.PlaceService;
-			}
 			textScreenDate.Text=_screenGroup.SGDate.ToShortDateString();
 			textDescription.Text=_screenGroup.Description;
 			textProvName.Text=_screenGroup.ProvName;//has to be filled before provnum
@@ -589,12 +580,6 @@ namespace OpenDental{
 			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
 			//Create a valid screen so that we can create a screening sheet with the corresponding ScreenNum.
 			OpenDentBusiness.Screen screen=new OpenDentBusiness.Screen();
-			screen.ScreenDate=_screenGroup.SGDate;
-			screen.GradeSchool=_screenGroup.GradeSchool;
-			screen.County=_screenGroup.County;
-			screen.PlaceService=_screenGroup.PlaceService;
-			screen.ProvNum=_screenGroup.ProvNum;
-			screen.ProvName=_screenGroup.ProvName;
 			screen.ScreenGroupOrder=1;
 			if(_listScreens.Count!=0) {
 				screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder++;
@@ -833,11 +818,6 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
-			if(_listScreens.Count==0) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Since you have no screenings, the screener and location information cannot be saved.  Continue?")) {
-					return;
-				}
-			}
 			if(textDescription.Text=="") {
 				MsgBox.Show(this,"Description field cannot be blank.");
 				textDescription.Focus();
@@ -862,7 +842,6 @@ namespace OpenDental{
 			_screenGroup.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
 			ScreenPats.Sync(_listScreenPats,_screenGroup.ScreenGroupNum);
 			ScreenGroups.Update(_screenGroup);
-			Screens.UpdateForGroup(_screenGroup);
 			DialogResult=DialogResult.OK;
 		}
 

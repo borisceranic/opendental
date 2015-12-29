@@ -49,6 +49,11 @@ namespace OpenDentBusiness.Crud{
 				screenGroup.ScreenGroupNum= PIn.Long  (row["ScreenGroupNum"].ToString());
 				screenGroup.Description   = PIn.String(row["Description"].ToString());
 				screenGroup.SGDate        = PIn.Date  (row["SGDate"].ToString());
+				screenGroup.ProvName      = PIn.String(row["ProvName"].ToString());
+				screenGroup.ProvNum       = PIn.Long  (row["ProvNum"].ToString());
+				screenGroup.PlaceService  = (OpenDentBusiness.PlaceOfService)PIn.Int(row["PlaceService"].ToString());
+				screenGroup.County        = PIn.String(row["County"].ToString());
+				screenGroup.GradeSchool   = PIn.String(row["GradeSchool"].ToString());
 				retVal.Add(screenGroup);
 			}
 			return retVal;
@@ -63,11 +68,21 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ScreenGroupNum");
 			table.Columns.Add("Description");
 			table.Columns.Add("SGDate");
+			table.Columns.Add("ProvName");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("PlaceService");
+			table.Columns.Add("County");
+			table.Columns.Add("GradeSchool");
 			foreach(ScreenGroup screenGroup in listScreenGroups) {
 				table.Rows.Add(new object[] {
 					POut.Long  (screenGroup.ScreenGroupNum),
 					POut.String(screenGroup.Description),
 					POut.Date  (screenGroup.SGDate),
+					POut.String(screenGroup.ProvName),
+					POut.Long  (screenGroup.ProvNum),
+					POut.Int   ((int)screenGroup.PlaceService),
+					POut.String(screenGroup.County),
+					POut.String(screenGroup.GradeSchool),
 				});
 			}
 			return table;
@@ -108,13 +123,18 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScreenGroupNum,";
 			}
-			command+="Description,SGDate) VALUES(";
+			command+="Description,SGDate,ProvName,ProvNum,PlaceService,County,GradeSchool) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(screenGroup.ScreenGroupNum)+",";
 			}
 			command+=
 				 "'"+POut.String(screenGroup.Description)+"',"
-				+    POut.Date  (screenGroup.SGDate)+")";
+				+    POut.Date  (screenGroup.SGDate)+","
+				+"'"+POut.String(screenGroup.ProvName)+"',"
+				+    POut.Long  (screenGroup.ProvNum)+","
+				+    POut.Int   ((int)screenGroup.PlaceService)+","
+				+"'"+POut.String(screenGroup.County)+"',"
+				+"'"+POut.String(screenGroup.GradeSchool)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -147,13 +167,18 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ScreenGroupNum,";
 			}
-			command+="Description,SGDate) VALUES(";
+			command+="Description,SGDate,ProvName,ProvNum,PlaceService,County,GradeSchool) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(screenGroup.ScreenGroupNum)+",";
 			}
 			command+=
 				 "'"+POut.String(screenGroup.Description)+"',"
-				+    POut.Date  (screenGroup.SGDate)+")";
+				+    POut.Date  (screenGroup.SGDate)+","
+				+"'"+POut.String(screenGroup.ProvName)+"',"
+				+    POut.Long  (screenGroup.ProvNum)+","
+				+    POut.Int   ((int)screenGroup.PlaceService)+","
+				+"'"+POut.String(screenGroup.County)+"',"
+				+"'"+POut.String(screenGroup.GradeSchool)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -167,7 +192,12 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(ScreenGroup screenGroup){
 			string command="UPDATE screengroup SET "
 				+"Description   = '"+POut.String(screenGroup.Description)+"', "
-				+"SGDate        =  "+POut.Date  (screenGroup.SGDate)+" "
+				+"SGDate        =  "+POut.Date  (screenGroup.SGDate)+", "
+				+"ProvName      = '"+POut.String(screenGroup.ProvName)+"', "
+				+"ProvNum       =  "+POut.Long  (screenGroup.ProvNum)+", "
+				+"PlaceService  =  "+POut.Int   ((int)screenGroup.PlaceService)+", "
+				+"County        = '"+POut.String(screenGroup.County)+"', "
+				+"GradeSchool   = '"+POut.String(screenGroup.GradeSchool)+"' "
 				+"WHERE ScreenGroupNum = "+POut.Long(screenGroup.ScreenGroupNum);
 			Db.NonQ(command);
 		}
@@ -182,6 +212,26 @@ namespace OpenDentBusiness.Crud{
 			if(screenGroup.SGDate.Date != oldScreenGroup.SGDate.Date) {
 				if(command!=""){ command+=",";}
 				command+="SGDate = "+POut.Date(screenGroup.SGDate)+"";
+			}
+			if(screenGroup.ProvName != oldScreenGroup.ProvName) {
+				if(command!=""){ command+=",";}
+				command+="ProvName = '"+POut.String(screenGroup.ProvName)+"'";
+			}
+			if(screenGroup.ProvNum != oldScreenGroup.ProvNum) {
+				if(command!=""){ command+=",";}
+				command+="ProvNum = "+POut.Long(screenGroup.ProvNum)+"";
+			}
+			if(screenGroup.PlaceService != oldScreenGroup.PlaceService) {
+				if(command!=""){ command+=",";}
+				command+="PlaceService = "+POut.Int   ((int)screenGroup.PlaceService)+"";
+			}
+			if(screenGroup.County != oldScreenGroup.County) {
+				if(command!=""){ command+=",";}
+				command+="County = '"+POut.String(screenGroup.County)+"'";
+			}
+			if(screenGroup.GradeSchool != oldScreenGroup.GradeSchool) {
+				if(command!=""){ command+=",";}
+				command+="GradeSchool = '"+POut.String(screenGroup.GradeSchool)+"'";
 			}
 			if(command==""){
 				return false;
