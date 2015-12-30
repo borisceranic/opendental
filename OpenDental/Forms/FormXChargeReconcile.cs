@@ -92,8 +92,7 @@ namespace OpenDental {
 			report.Query="SELECT TransactionDateTime,TransType,ClerkID,ItemNum,PatNum,CreditCardNum,Expiration,Result,"
 				+"CASE WHEN ResultCode IN('000','010') THEN Amount ELSE 0 END AS Amount "
 				+"FROM xchargetransaction "
-				+"WHERE "+DbHelper.DtimeToDate("TransactionDateTime")+" BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart)+" "
-				+"AND TransType!='CCVoid'";
+				+"WHERE "+DbHelper.DtimeToDate("TransactionDateTime")+" BETWEEN "+POut.Date(date1.SelectionStart)+" AND "+POut.Date(date2.SelectionStart);
 			FormQuery FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();
