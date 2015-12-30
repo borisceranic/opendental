@@ -1176,6 +1176,11 @@ namespace OpenDental{
 			if(isDone) {
 				row.Done="X";
 			}
+			//This is done in 15.4 so we did not have to backport the ProcTP.ProcAbbr column. In 16.1 this column replaces this bit of logic.
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcTPSelectList[i].ProcCode);
+			if(procCodeCur!=null) {
+				row.ProcAbbr=procCodeCur.AbbrDesc;
+			}
 			row.Priority=DefC.GetName(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
 			row.Tth=ProcTPSelectList[i].ToothNumTP;
 			row.Surf=ProcTPSelectList[i].Surf;
@@ -1593,6 +1598,14 @@ namespace OpenDental{
 						case "Dx":
 							if(RowsMain[i].Dx!=null) {
 								row.Cells.Add(RowsMain[i].Dx.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Abbr":
+							if(!String.IsNullOrEmpty(RowsMain[i].ProcAbbr)){
+								row.Cells.Add(RowsMain[i].ProcAbbr.ToString());
 							}
 							else {
 								row.Cells.Add("");
