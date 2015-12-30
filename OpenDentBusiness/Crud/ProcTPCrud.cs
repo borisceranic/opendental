@@ -63,6 +63,7 @@ namespace OpenDentBusiness.Crud{
 				procTP.Discount    = PIn.Double(row["Discount"].ToString());
 				procTP.Prognosis   = PIn.String(row["Prognosis"].ToString());
 				procTP.Dx          = PIn.String(row["Dx"].ToString());
+				procTP.ProcAbbr    = PIn.String(row["ProcAbbr"].ToString());
 				retVal.Add(procTP);
 			}
 			return retVal;
@@ -91,6 +92,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Discount");
 			table.Columns.Add("Prognosis");
 			table.Columns.Add("Dx");
+			table.Columns.Add("ProcAbbr");
 			foreach(ProcTP procTP in listProcTPs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procTP.ProcTPNum),
@@ -110,6 +112,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(procTP.Discount),
 					POut.String(procTP.Prognosis),
 					POut.String(procTP.Dx),
+					POut.String(procTP.ProcAbbr),
 				});
 			}
 			return table;
@@ -150,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcTPNum,";
 			}
-			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx) VALUES(";
+			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procTP.ProcTPNum)+",";
 			}
@@ -170,7 +173,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(procTP.PatAmt)+"',"
 				+"'"+POut.Double(procTP.Discount)+"',"
 				+"'"+POut.String(procTP.Prognosis)+"',"
-				+"'"+POut.String(procTP.Dx)+"')";
+				+"'"+POut.String(procTP.Dx)+"',"
+				+"'"+POut.String(procTP.ProcAbbr)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -203,7 +207,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProcTPNum,";
 			}
-			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx) VALUES(";
+			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procTP.ProcTPNum)+",";
 			}
@@ -223,7 +227,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(procTP.PatAmt)+"',"
 				+"'"+POut.Double(procTP.Discount)+"',"
 				+"'"+POut.String(procTP.Prognosis)+"',"
-				+"'"+POut.String(procTP.Dx)+"')";
+				+"'"+POut.String(procTP.Dx)+"',"
+				+"'"+POut.String(procTP.ProcAbbr)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -251,7 +256,8 @@ namespace OpenDentBusiness.Crud{
 				+"PatAmt      = '"+POut.Double(procTP.PatAmt)+"', "
 				+"Discount    = '"+POut.Double(procTP.Discount)+"', "
 				+"Prognosis   = '"+POut.String(procTP.Prognosis)+"', "
-				+"Dx          = '"+POut.String(procTP.Dx)+"' "
+				+"Dx          = '"+POut.String(procTP.Dx)+"', "
+				+"ProcAbbr    = '"+POut.String(procTP.ProcAbbr)+"' "
 				+"WHERE ProcTPNum = "+POut.Long(procTP.ProcTPNum);
 			Db.NonQ(command);
 		}
@@ -322,6 +328,10 @@ namespace OpenDentBusiness.Crud{
 			if(procTP.Dx != oldProcTP.Dx) {
 				if(command!=""){ command+=",";}
 				command+="Dx = '"+POut.String(procTP.Dx)+"'";
+			}
+			if(procTP.ProcAbbr != oldProcTP.ProcAbbr) {
+				if(command!=""){ command+=",";}
+				command+="ProcAbbr = '"+POut.String(procTP.ProcAbbr)+"'";
 			}
 			if(command==""){
 				return false;

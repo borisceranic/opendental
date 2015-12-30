@@ -41,6 +41,8 @@ namespace OpenDentBusiness{
 		public string Prognosis;
 		///<summary>Text from diagnosis definition.  Can be changed by user at any time.</summary>
 		public string Dx;
+		///<summary>The ProcedureCode abbreviation.  Can be changed by user at any time.</summary>
+		public string ProcAbbr;
 		
 		///<summary></summary>
 		public ProcTP Copy(){

@@ -1176,6 +1176,7 @@ namespace OpenDental{
 			if(isDone) {
 				row.Done="X";
 			}
+			row.ProcAbbr=ProcTPSelectList[i].ProcAbbr;
 			row.Priority=DefC.GetName(DefCat.TxPriorities,ProcTPSelectList[i].Priority);
 			row.Tth=ProcTPSelectList[i].ToothNumTP;
 			row.Surf=ProcTPSelectList[i].Surf;
@@ -1593,6 +1594,14 @@ namespace OpenDental{
 						case "Dx":
 							if(RowsMain[i].Dx!=null) {
 								row.Cells.Add(RowsMain[i].Dx.ToString());
+							}
+							else {
+								row.Cells.Add("");
+							}
+							break;
+						case "Abbr":
+							if(!String.IsNullOrEmpty(RowsMain[i].ProcAbbr)){
+								row.Cells.Add(RowsMain[i].ProcAbbr.ToString());
 							}
 							else {
 								row.Cells.Add("");
@@ -3172,6 +3181,7 @@ namespace OpenDental{
 				procTP.PatAmt=PIn.Double(RowsMain[gridMain.SelectedIndices[i]].Pat.ToString());
 				procTP.Prognosis=RowsMain[gridMain.SelectedIndices[i]].Prognosis;
 				procTP.Dx=RowsMain[gridMain.SelectedIndices[i]].Dx;
+				procTP.ProcAbbr=RowsMain[gridMain.SelectedIndices[i]].ProcAbbr;
 				ProcTPs.InsertOrUpdate(procTP,true);
 				itemNo++;
 				#region Canadian Lab Fees

@@ -11860,6 +11860,24 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="ALTER TABLE screen DROP COLUMN GradeSchool";
 				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE proctp ADD ProcAbbr varchar(50) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE proctp ADD ProcAbbr varchar2(50)";
+					Db.NonQ(command);
+				}
+				command="SELECT ProcCode,AbbrDesc FROM procedurecode GROUP BY ProcCode";
+				if(DataConnection.DBtype!=DatabaseType.MySql) {
+					command+=",AbbrDesc";
+				}
+				DataTable dataTableProcCodes=Db.GetTable(command);
+				foreach(DataRow row in dataTableProcCodes.Rows) {
+					command="UPDATE proctp SET ProcAbbr='"+POut.String(row["AbbrDesc"].ToString())+"' "
+						+"WHERE ProcCode='"+POut.String(row["ProcCode"].ToString())+"'";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
