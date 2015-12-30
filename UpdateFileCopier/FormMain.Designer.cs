@@ -35,7 +35,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelFile.Location = new System.Drawing.Point(12, 9);
 			this.labelFile.Name = "labelFile";
-			this.labelFile.Size = new System.Drawing.Size(278, 58);
+			this.labelFile.Size = new System.Drawing.Size(360, 87);
 			this.labelFile.TabIndex = 0;
 			this.labelFile.Text = "Preparing to Copy Files...";
 			this.labelFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -43,7 +43,7 @@
 			// butRetry
 			// 
 			this.butRetry.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.butRetry.Location = new System.Drawing.Point(114, 77);
+			this.butRetry.Location = new System.Drawing.Point(155, 106);
 			this.butRetry.Name = "butRetry";
 			this.butRetry.Size = new System.Drawing.Size(75, 23);
 			this.butRetry.TabIndex = 1;
@@ -55,7 +55,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(302, 112);
+			this.ClientSize = new System.Drawing.Size(384, 141);
 			this.Controls.Add(this.butRetry);
 			this.Controls.Add(this.labelFile);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

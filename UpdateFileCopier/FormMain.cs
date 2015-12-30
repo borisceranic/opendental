@@ -14,6 +14,8 @@ namespace UpdateFileCopier {
 		private bool _hasFilesInUse=false;
 		///<summary>Set to true if any files in the UpdateFiles folder failed to copy over.</summary>
 		private bool _hasCopyFailed=false;
+		///<summary>If anything goes wrong with the file copying, this string should be used to hold more details about the error to show later.</summary>
+		private string _error="";
 		///<summary>Temporary directory that will be used to copy any files present in the destination folder before attempting to copy.</summary>
 		private string TempPathDest {
 			get {
@@ -89,6 +91,8 @@ namespace UpdateFileCopier {
 			FileInfo[] arraySourceFiles=dirInfoSource.GetFiles();
 			DirectoryInfo dirInfoDest=new DirectoryInfo(_destDirectory);
 			FileInfo[] arrayDestFiles=dirInfoDest.GetFiles();
+			_hasFilesInUse=false;
+			_hasCopyFailed=false;
 			//Recreate the temp directories that will be used in the copying process
 			if(!CreateTempDirectories()) {
 				_hasCopyFailed=true;
@@ -182,8 +186,33 @@ namespace UpdateFileCopier {
 						//This does not combat thread race conditions.  That is an impossible issue to combat (no such thing as an accurate "file in use" check).
 					}
 				}
-				catch {
-					//The file is unavailable because it is still be written to or used by another thread.
+				catch(System.Security.SecurityException se) {
+					_error="Security Error when accessing "+arrayDestFiles[i].Name+": "+se.Message;
+					return true;
+				}
+				catch(ArgumentException ae) {
+					_error="Argument Error when accessing "+arrayDestFiles[i].Name+": "+ae.Message;
+					return true;
+				}
+				catch(FileNotFoundException fnfe) {
+					_error="File Not Found Error when accessing "+arrayDestFiles[i].Name+": "+fnfe.Message;
+					return true;
+				}
+				catch(UnauthorizedAccessException uae) {
+					_error="Unauthorized Access Error when accessing "+arrayDestFiles[i].Name+": "+uae.Message;
+					return true;
+				}
+				catch(DirectoryNotFoundException dnfe) {
+					_error="Directory Not Found Error when accessing "+arrayDestFiles[i].Name+": "+dnfe.Message;
+					return true;
+				}
+				catch(IOException ioe) {
+					_error="IO Error when accessing "+arrayDestFiles[i].Name+": "+ioe.Message;
+					return true;
+				}
+				//The file is unavailable because it is still be written to or used by another thread.
+				catch(Exception ex) {
+					_error="Generic Error when accessing "+arrayDestFiles[i].Name+": "+ex.Message;
 					return true;
 				}
 			}
@@ -290,7 +319,11 @@ namespace UpdateFileCopier {
 			}
 			Cursor=Cursors.Default;
 			if(_hasFilesInUse) {
-				SetLabelText("There are files still in use.  Please make sure all instances of Open Dental are closed then click Retry.");
+				string error="There are files still in use.  Please make sure all instances of Open Dental are closed then click Retry.";
+				if(!string.IsNullOrEmpty(_error)) {
+					error=_error+"\r\n\r\nPlease address the error above, make sure all instances of Open Dental are closed, then click Retry.";
+				}
+				SetLabelText(error);
 				butRetry.Visible=true;
 			}
 			else if(_hasCopyFailed) {
