@@ -506,7 +506,8 @@ namespace OpenDentBusiness{
 			foreach(Fee feeCur in listFeesForSched) {
 				if(listFees.Exists(x => x.CodeNum==feeCur.CodeNum 
 						&& x.ClinicNum==toClinicNum 
-						&& x.ProvNum==toProvNum)) 
+						&& x.ProvNum==toProvNum
+						&& x.FeeSched==toFeeSched)) 
 				{
 					continue;
 				}
