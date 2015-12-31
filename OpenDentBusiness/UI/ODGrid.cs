@@ -685,14 +685,11 @@ namespace OpenDental.UI {
 			}
 			for(int i=0;i<RowHeights.Length;i++) {
 				#region Split patient accounts on Statement grids.
-				if(title.StartsWith("StatementMain.NotIntermingled") 
-					&& i==0) 
-				{
-					drawTitle=true;
-				}
-				else if(i==0 
+				if(i==0
 					&& (title.StartsWith("TreatPlanBenefitsFamily") 
-					|| title.StartsWith("TreatPlanBenefitsIndividual"))) 
+					|| title.StartsWith("TreatPlanBenefitsIndividual")
+					|| title.StartsWith("StatementPayPlan")
+					|| title.StartsWith("StatementMain.NotIntermingled")))
 				{
 					drawTitle=true;
 				}
