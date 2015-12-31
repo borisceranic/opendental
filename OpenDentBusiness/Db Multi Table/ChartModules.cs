@@ -741,6 +741,7 @@ namespace OpenDentBusiness {
 				for(int i=0;i<rawTask.Rows.Count;i++) {
 					taskNums.Add(PIn.Long(rawTask.Rows[i]["TaskNum"].ToString()));
 				}
+				List<TaskList> listTaskLists=TaskLists.GetAll();
 				List<TaskNote> TaskNoteList=TaskNotes.RefreshForTasks(taskNums);
 				for(int i=0;i<rawTask.Rows.Count;i++) {
 					row=table.NewRow();
@@ -769,7 +770,8 @@ namespace OpenDentBusiness {
 						row["colorText"] = arrayDefs[(int)DefCat.ProgNoteColors][20].ItemColor.ToArgb().ToString();
 						row["colorBackG"] = arrayDefs[(int)DefCat.ProgNoteColors][21].ItemColor.ToArgb().ToString();
 					}
-					row["description"]=txt+Lans.g("ChartModule","Task - In List: ")+TaskLists.GetFullPath(PIn.Long(rawTask.Rows[i]["TaskListNum"].ToString()));
+					long taskListNum=PIn.Long(rawTask.Rows[i]["TaskListNum"].ToString());
+					row["description"]=txt+Lans.g("ChartModule","Task - In List: ")+TaskLists.GetFullPath(taskListNum,listTaskLists);
 					row["dx"]="";
 					row["Dx"]="";
 					row["EmailMessageNum"]=0;

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Globalization;
 using System.Text;
@@ -190,6 +191,15 @@ namespace OpenDentBusiness{
 			return Crud.TaskListCrud.SelectOne(command);
 		}
 
+		///<summary>Gets all task lists from the database.</summary>
+		public static List<TaskList> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<TaskList>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM tasklist";
+			return Crud.TaskListCrud.SelectMany(command);
+		}
+
 		///<summary>Get TaskListNums based on description.</summary>
 		public static List<long> GetNumsByDescription(string descript) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -337,12 +347,30 @@ namespace OpenDentBusiness{
 		}
 		
 		///<summary>Build the full path to the passed in task list.  Returns the string in the standard Windows path format.</summary>
-		public static string GetFullPath(long tasklistNum) {
+		public static string GetFullPath(long tasklistNum,List<TaskList> listTaskLists=null) {
+			//No need to check RemotingRole; no call to db.
 			StringBuilder taskListPath=new StringBuilder();
-			TaskList curTaskList=GetOne(tasklistNum);
+			TaskList curTaskList=null;
+			if(listTaskLists!=null) {
+				curTaskList=listTaskLists.FirstOrDefault(x => x.TaskListNum==tasklistNum);
+			}
+			else {
+				curTaskList=GetOne(tasklistNum);
+			}
+			if(curTaskList==null) {
+				return "";
+			}
 			taskListPath.Append(curTaskList.Descript);
 			while(curTaskList.Parent!=0) {
-				curTaskList=GetOne(curTaskList.Parent);
+				if(listTaskLists!=null) {
+					curTaskList=listTaskLists.FirstOrDefault(x => x.TaskListNum==curTaskList.Parent);
+				}
+				else {
+					curTaskList=GetOne(curTaskList.Parent);
+				}
+				if(curTaskList==null) {
+					break;
+				}
 				taskListPath.Insert(0,curTaskList.Descript+"/");
 			}
 			return taskListPath.ToString();
