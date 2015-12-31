@@ -1,10 +1,4 @@
-﻿using CodeBase;
-using OpenDental.UI;
-using OpenDentBusiness;
-using PdfSharp;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -14,6 +8,12 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using CodeBase;
+using OpenDental.UI;
+using OpenDentBusiness;
+using PdfSharp;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
 
 namespace OpenDental {
 	public class SheetPrinting {
@@ -1053,13 +1053,15 @@ namespace OpenDental {
 								patName=pat.GetNameFLnoPref();
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.FillRectangle(Brushes.White,field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width+10,odGrid.TitleHeight);
 								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight));
+								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight));
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Near);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,
+										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
+										new XRect(p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight)),XStringAlignment.Near);
 									//gx.DrawString(patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
 								}
 							}
@@ -1076,7 +1078,9 @@ namespace OpenDental {
 							else {
 								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",
+										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
+										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
@@ -1093,7 +1097,9 @@ namespace OpenDental {
 							else {
 								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Family Insurance Benefits",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Family Insurance Benefits",
+										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
+										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
@@ -1110,7 +1116,9 @@ namespace OpenDental {
 							else {
 								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Individual Insurance Benefits",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(300),p(100)),XStringAlignment.Center);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Individual Insurance Benefits",
+										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
+										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
