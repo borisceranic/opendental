@@ -2373,16 +2373,26 @@ namespace OpenDental{
 							field.FieldValue+=PatGuar.Address2+"\r\n";
 						}
 						if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
-							field.FieldValue+=PatGuar.Zip+" "+PatGuar.City;//no line break
+							field.FieldValue+=(PatGuar.Zip+" "+PatGuar.City).Trim();//no line break
 						}
 						else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
-							field.FieldValue+=PatGuar.City+" "+PatGuar.Zip;//no line break
+							field.FieldValue+=(PatGuar.City+" "+PatGuar.Zip).Trim();//no line break
 						}
 						else {
-							field.FieldValue+=PatGuar.City+", "+PatGuar.State+" "+PatGuar.Zip;//no line break
+							field.FieldValue+=((PatGuar.City+", "+PatGuar.State).Trim(new[] { ',',' ' })+" "+PatGuar.Zip).Trim();//no line break
 						}
-						if(PatGuar.Country!="") {
-							field.FieldValue+="\r\n"+PatGuar.Country;
+						if(!string.IsNullOrWhiteSpace(PatGuar.Country)) {
+							if(CultureInfo.CurrentCulture.Name.EndsWith("CH")||CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//if Singapore or Switzerland
+								if(!string.IsNullOrWhiteSpace(PatGuar.City+PatGuar.Zip)) {//and either city or zip are not blank, add line break
+									field.FieldValue+="\r\n";
+								}
+							}
+							else {//all other cultures
+								if(!string.IsNullOrWhiteSpace(PatGuar.City+PatGuar.State+PatGuar.Zip)) {//any field, city, state or zip contain data, add line break
+									field.FieldValue+="\r\n";
+								}
+							}
+							field.FieldValue+=PatGuar.Country;
 						}
 						#endregion
 						break;

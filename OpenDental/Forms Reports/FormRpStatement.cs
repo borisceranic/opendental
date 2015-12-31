@@ -757,16 +757,25 @@ namespace OpenDental{
 				par.AddLineBreak();
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CH")) {//CH is for switzerland. eg de-CH
-				par.AddText(PatGuar.Zip+" "+PatGuar.City);
+				par.AddText((PatGuar.Zip+" "+PatGuar.City).Trim());
 			}
 			else if(CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//SG=Singapore
-				par.AddText(PatGuar.City+" "+PatGuar.Zip);
+				par.AddText((PatGuar.City+" "+PatGuar.Zip).Trim());
 			}
 			else {
-				par.AddText(PatGuar.City+", "+PatGuar.State+" "+PatGuar.Zip);
+				par.AddText(((PatGuar.City+", "+PatGuar.State).Trim(new[] { ',',' ' })+" "+PatGuar.Zip).Trim());
 			}
-			if(PatGuar.Country!="") {
-				par.AddLineBreak();
+			if(!string.IsNullOrWhiteSpace(PatGuar.Country)) {
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CH") || CultureInfo.CurrentCulture.Name.EndsWith("SG")) {//if Singapore or Switzerland
+					if(!string.IsNullOrWhiteSpace(PatGuar.City+PatGuar.Zip)) {//and either city or zip are not blank, add line break
+						par.AddLineBreak();
+					}
+				}
+				else {//all other cultures
+					if(!string.IsNullOrWhiteSpace(PatGuar.City+PatGuar.State+PatGuar.Zip)) {//any field, city, state or zip contain data, add line break
+						par.AddLineBreak();
+					}
+				}
 				par.AddText(PatGuar.Country);
 			}
 			#endregion
