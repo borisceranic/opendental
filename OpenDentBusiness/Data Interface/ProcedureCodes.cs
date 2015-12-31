@@ -113,14 +113,17 @@ namespace OpenDentBusiness{
 			return new ProcedureCode();
 		}
 
-		///<summary>The new way of getting a procCode. Uses the primary key instead of string code.</summary>
-		public static ProcedureCode GetProcCode(long codeNum) {
+		///<summary>The new way of getting a procCode. Uses the primary key instead of string code.
+		///Pass in a list of all codes to save from making deep copies of the cache if you are going to call this method repeatedly.</summary>
+		public static ProcedureCode GetProcCode(long codeNum,List<ProcedureCode> listProcedureCodes=null) {
 			//No need to check RemotingRole; no call to db.
 			if(codeNum==0) {
 				//MessageBox.Show(Lans.g("ProcCodes","Error. Invalid procedure code."));
 				return new ProcedureCode();
 			}
-			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
+			if(listProcedureCodes==null) {
+				listProcedureCodes=ProcedureCodeC.GetListLong();
+			}
 			for(int i=0;i<listProcedureCodes.Count;i++) {
 				if(listProcedureCodes[i].CodeNum==codeNum) {
 					return listProcedureCodes[i];

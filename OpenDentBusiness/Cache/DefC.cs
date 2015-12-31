@@ -117,12 +117,14 @@ namespace OpenDentBusiness {
 			return GetDef(myCat,GetByExactName(myCat,itemName));
 		}
 
-		///<summary></summary>
-		public static string GetName(DefCat myCat,long myDefNum) {
-			if(myDefNum==0){
+		///<summary>Pass in an array of all defs to save from making deep copies of the cache if you are going to call this method repeatedly.</summary>
+		public static string GetName(DefCat myCat,long myDefNum,Def[][] arrayDefs=null) {
+			if(myDefNum==0) {
 				return "";
 			}
-			Def[][] arrayDefs=GetArrayLong();
+			if(arrayDefs==null) {
+				arrayDefs=GetArrayLong();
+			}
 			for(int i=0;i<arrayDefs[(int)myCat].GetLength(0);i++) {
 				if(arrayDefs[(int)myCat][i].DefNum==myDefNum) {
 					return arrayDefs[(int)myCat][i].ItemName;
