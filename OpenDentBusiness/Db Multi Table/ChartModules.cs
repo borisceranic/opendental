@@ -98,11 +98,14 @@ namespace OpenDentBusiness {
 			string txt;
 			List<DataRow> labRows=new List<DataRow>();//Canadian lab procs, which must be added in a loop at the very end.
 			Def[][] arrayDefs=DefC.GetArrayLong();
+			List<Userod> listUserods=UserodC.GetListt();
+			List<ProcedureCode> listProcedureCodes=ProcedureCodeC.GetListLong();
 			if(componentsToLoad.ShowTreatPlan
 				|| componentsToLoad.ShowCompleted
 				|| componentsToLoad.ShowExisting
 				|| componentsToLoad.ShowReferred
-				|| componentsToLoad.ShowConditions){
+				|| componentsToLoad.ShowConditions)
+			{
 				#region Procedures
 				command="SELECT provider.Abbr,procedurecode.AbbrDesc,appointment.AptDateTime,procedurelog.BaseUnits,procedurelog.ClinicNum,"
 				+"procedurelog.CodeNum,procedurelog.DateEntryC,orionproc.DateScheduleBy,orionproc.DateStopClock,procedurelog.DateTP,"
@@ -252,7 +255,7 @@ namespace OpenDentBusiness {
 									row["note"]+="\r\n------------------------------------------------------\r\n";//start a new line
 								}
 								row["note"]+=PIn.DateT(rawNotes.Rows[n]["EntryDateTime"].ToString()).ToString();
-								row["note"]+="  "+Userods.GetName(PIn.Long(rawNotes.Rows[n]["UserNum"].ToString()));
+								row["note"]+="  "+Userods.GetName(PIn.Long(rawNotes.Rows[n]["UserNum"].ToString()),listUserods);
 								if(rawNotes.Rows[n]["SigPresent"].ToString()=="1") {
 									row["note"]+="  "+Lans.g("ChartModule","(signed)");
 								}
@@ -276,7 +279,7 @@ namespace OpenDentBusiness {
 							if(rawProcs.Rows[i]["ProcNum"].ToString() != rawNotes.Rows[n]["ProcNum"].ToString()) {
 								continue;
 							}
-							row["user"]=Userods.GetName(PIn.Long(rawNotes.Rows[n]["UserNum"].ToString()));
+							row["user"]=Userods.GetName(PIn.Long(rawNotes.Rows[n]["UserNum"].ToString()),listUserods);
 							if(rawNotes.Rows[n]["SigPresent"].ToString()=="1") {
 								row["signature"]=Lans.g("ChartModule","Signed");
 							}
@@ -288,7 +291,7 @@ namespace OpenDentBusiness {
 					}
 					row["PatNum"]="";
 					row["Priority"]=rawProcs.Rows[i]["Priority"].ToString();
-					row["priority"]=DefC.GetName(DefCat.TxPriorities,PIn.Long(rawProcs.Rows[i]["Priority"].ToString()));
+					row["priority"]=DefC.GetName(DefCat.TxPriorities,PIn.Long(rawProcs.Rows[i]["Priority"].ToString()),arrayDefs);
 					row["ProcCode"]=rawProcs.Rows[i]["ProcCode"].ToString();
 					dateT=PIn.DateT(rawProcs.Rows[i]["ProcDate"].ToString());
 					if(dateT.Year<1880) {
@@ -324,20 +327,20 @@ namespace OpenDentBusiness {
 					if(dateT.TimeOfDay!=TimeSpan.Zero) {
 						row["procTimeEnd"]=dateT.ToString("h:mm")+dateT.ToString("%t").ToLower();
 					}
-					row["prognosis"]=DefC.GetName(DefCat.Prognosis,PIn.Long(rawProcs.Rows[i]["Prognosis"].ToString()));
+					row["prognosis"]=DefC.GetName(DefCat.Prognosis,PIn.Long(rawProcs.Rows[i]["Prognosis"].ToString()),arrayDefs);
 					row["prov"]=rawProcs.Rows[i]["Abbr"].ToString();
 					row["ProvNum"]=rawProcs.Rows[i]["ProvNum"].ToString();
 					row["quadrant"]="";
-					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Tooth) {
+					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.Tooth) {
 						row["quadrant"]=Tooth.GetQuadrant(rawProcs.Rows[i]["ToothNum"].ToString());
 					}
-					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Surf) {
+					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.Surf) {
 						row["quadrant"]=Tooth.GetQuadrant(rawProcs.Rows[i]["ToothNum"].ToString());
 					}
-					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Quad) {
+					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.Quad) {
 						row["quadrant"]=rawProcs.Rows[i]["Surf"].ToString();
 					}
-					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.ToothRange) {
+					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.ToothRange) {
 						string[] toothNum=rawProcs.Rows[i]["ToothRange"].ToString().Split(',');
 						bool sameQuad=false;//Don't want true if length==0.
 						for(int n=0;n<toothNum.Length;n++) {//But want true if length==1 (check index 0 against itself).
@@ -356,10 +359,10 @@ namespace OpenDentBusiness {
 					row["RxNum"]=0;
 					row["SheetNum"]=0;
 					row["Surf"]=rawProcs.Rows[i]["Surf"].ToString();
-					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Surf) {
+					if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.Surf) {
 						row["surf"]=Tooth.SurfTidyFromDbToDisplay(rawProcs.Rows[i]["Surf"].ToString(),rawProcs.Rows[i]["ToothNum"].ToString());
 					}
-					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString())).TreatArea==TreatmentArea.Sextant) {
+					else if(ProcedureCodes.GetProcCode(PIn.Long(row["CodeNum"].ToString()),listProcedureCodes).TreatArea==TreatmentArea.Sextant) {
 						row["surf"]=Tooth.GetSextant(rawProcs.Rows[i]["Surf"].ToString(),
 							(ToothNumberingNomenclature)PrefC.GetInt(PrefName.UseInternationalToothNumbers));
 					}
@@ -409,7 +412,7 @@ namespace OpenDentBusiness {
 						txt="("+rawComm.Rows[i]["FName"].ToString()+") ";
 					}
 					row["description"]=txt+Lans.g("ChartModule","Comm - ")
-					+DefC.GetName(DefCat.CommLogTypes,PIn.Long(rawComm.Rows[i]["CommType"].ToString()));
+						+DefC.GetName(DefCat.CommLogTypes,PIn.Long(rawComm.Rows[i]["CommType"].ToString()),arrayDefs);
 					row["dx"]="";
 					row["Dx"]="";
 					row["EmailMessageNum"]=0;
@@ -467,7 +470,7 @@ namespace OpenDentBusiness {
 					row["toothNum"]="";
 					row["ToothNum"]="";
 					row["ToothRange"]="";
-					row["user"]=Userods.GetName(PIn.Long(rawComm.Rows[i]["UserNum"].ToString()));
+					row["user"]=Userods.GetName(PIn.Long(rawComm.Rows[i]["UserNum"].ToString()),listUserods);
 					rows.Add(row);
 				}
 				#endregion Commlog
@@ -782,7 +785,7 @@ namespace OpenDentBusiness {
 					row["length"]="";
 					txt="";
 					if(!rawTask.Rows[i]["Descript"].ToString().StartsWith("==") && rawTask.Rows[i]["UserNum"].ToString()!="") {
-						txt+=Userods.GetName(PIn.Long(rawTask.Rows[i]["UserNum"].ToString()))+" - ";
+						txt+=Userods.GetName(PIn.Long(rawTask.Rows[i]["UserNum"].ToString()),listUserods)+" - ";
 					}
 					txt+=rawTask.Rows[i]["Descript"].ToString();
 					long taskNum=PIn.Long(rawTask.Rows[i]["TaskNum"].ToString());
@@ -791,10 +794,10 @@ namespace OpenDentBusiness {
 							continue;
 						}
 						txt+="\r\n"//even on the first loop
-						+"=="+Userods.GetName(TaskNoteList[n].UserNum)+" - "
-						+TaskNoteList[n].DateTimeNote.ToShortDateString()+" "
-						+TaskNoteList[n].DateTimeNote.ToShortTimeString()
-						+" - "+TaskNoteList[n].Note;
+							+"=="+Userods.GetName(TaskNoteList[n].UserNum,listUserods)+" - "
+							+TaskNoteList[n].DateTimeNote.ToShortDateString()+" "
+							+TaskNoteList[n].DateTimeNote.ToShortTimeString()
+							+" - "+TaskNoteList[n].Note;
 					}
 					row["note"]=txt;
 					row["orionDateScheduleBy"]="";
