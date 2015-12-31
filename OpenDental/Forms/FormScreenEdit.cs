@@ -691,7 +691,7 @@ namespace OpenDental{
 			ScreenCur.RaceOld=(PatientRaceOld)listRace.SelectedIndex;
 			ScreenCur.GradeLevel=(PatientGrade)comboGradeLevel.SelectedIndex;
 			if(textBirthdate.Text!="" && textAge.Text=="") {//Birthdate is present but age isn't entered, calculate it.
-				ScreenCur.Age=PIn.Byte(PatientLogic.DateToAgeString(PIn.DateT(textBirthdate.Text)));
+				ScreenCur.Age=PIn.Byte(Patients.DateToAge(PIn.DateT(textBirthdate.Text)).ToString());
 			}
 			else if(textAge.Text!="") {//Age was manually entered, use it.
 				ScreenCur.Age=PIn.Byte(textAge.Text);

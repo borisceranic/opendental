@@ -801,6 +801,7 @@ namespace OpenDental{
 				FormSE.ScreenCur.Gender=pat.Gender;//Default value in pat edit is male. No way of knowing if it's intentional or not, just use it.
 				FormSE.ScreenCur.GradeLevel=(pat.GradeLevel==0)?FormSE.ScreenCur.GradeLevel:pat.GradeLevel;//Default value is Unknown, use pat's grade if it's not unknown.
 				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;//Default to unknown. Patient Edit doesn't have the same type of race as screen edit.
+				FormSE.ScreenCur.Urgency=pat.Urgency;
 				if(FormSE.ShowDialog()!=DialogResult.OK) {
 					break;
 				}
