@@ -1445,6 +1445,9 @@ namespace OpenDental{
 			PatCur.Guarantor=PatCur.PatNum;
 			Patients.Update(PatCur,PatOld);
 			Family FamCur=Patients.GetFamily(PatCur.PatNum);
+			if(Plugins.HookMethod(this,"FormPatientSelect.butAddPt_Click_showForm",PatCur,FamCur)) {
+				return;
+			}
 			FormPatientEdit FormPE=new FormPatientEdit(PatCur,FamCur);
 			FormPE.IsNew=true;
 			FormPE.ShowDialog();
