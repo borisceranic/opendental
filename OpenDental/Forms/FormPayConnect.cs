@@ -400,7 +400,7 @@ namespace OpenDental {
 				authCode=textRefNumber.Text;
 			}
 			_request=Bridges.PayConnect.BuildSaleRequest(PIn.Decimal(textAmount.Text),cardNumber,expYear,
-				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,_trantype,refNumber,checkSaveToken.Checked,authCode);
+				expMonth,textNameOnCard.Text,textSecurityCode.Text,textZipCode.Text,magData,_trantype,refNumber,checkSaveToken.Checked,authCode,checkForceDuplicate.Checked);
 			_response=Bridges.PayConnect.ProcessCreditCard(_request,_paymentCur.ClinicNum);
 			if(_response==null || _response.Status.code!=0) {//error in transaction
 				Cursor=Cursors.Default;
@@ -430,7 +430,8 @@ namespace OpenDental {
 			_creditCardCur.CCNumberMasked=textCardNumber.Text;
 			_creditCardCur.PayConnectToken="";
 			_creditCardCur.PayConnectTokenExp=DateTime.MinValue;
-			if(checkSaveToken.Checked) {//store the token and the masked CC number (only last four digits)
+			//Store the token and the masked CC number (only last four digits).  PaymentToken is null when testing the predefined fake card numbers.
+			if(checkSaveToken.Checked && _response.PaymentToken!=null) {
 				_creditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
 				_creditCardCur.PayConnectToken=_response.PaymentToken.TokenId;
 				_creditCardCur.PayConnectTokenExp=new DateTime(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month,

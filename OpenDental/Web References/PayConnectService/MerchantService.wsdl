@@ -2,10 +2,10 @@
 <definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="dxci.merchant" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" name="MerchantService" targetNamespace="dxci.merchant" xmlns="http://schemas.xmlsoap.org/wsdl/">
   <types>
     <xsd:schema>
-      <xsd:import schemaLocation="https://webservices.dentalxchange.com:443/merchant/MerchantService?xsd=1" namespace="dxci.merchant" />
+      <xsd:import schemaLocation="https://prelive2.dentalxchange.com:443/merchant/MerchantService?xsd=1" namespace="dxci.merchant" />
     </xsd:schema>
     <xsd:schema>
-      <xsd:import schemaLocation="https://webservices.dentalxchange.com:443/merchant/MerchantService?xsd=2" namespace="dxci.common" />
+      <xsd:import schemaLocation="https://prelive2.dentalxchange.com:443/merchant/MerchantService?xsd=2" namespace="dxci.common" />
     </xsd:schema>
   </types>
   <message name="getMerchantInfo">
@@ -13,6 +13,12 @@
   </message>
   <message name="getMerchantInfoResponse">
     <part name="parameters" element="tns:getMerchantInfoResponse" />
+  </message>
+  <message name="getBatchInfo">
+    <part name="parameters" element="tns:getBatchInfo" />
+  </message>
+  <message name="getBatchInfoResponse">
+    <part name="parameters" element="tns:getBatchInfoResponse" />
   </message>
   <message name="processCheck">
     <part name="parameters" element="tns:processCheck" />
@@ -31,6 +37,12 @@
   </message>
   <message name="processDebitCardResponse">
     <part name="parameters" element="tns:processDebitCardResponse" />
+  </message>
+  <message name="processSignature">
+    <part name="parameters" element="tns:processSignature" />
+  </message>
+  <message name="processSignatureResponse">
+    <part name="parameters" element="tns:processSignatureResponse" />
   </message>
   <message name="isValidExpiration">
     <part name="parameters" element="tns:isValidExpiration" />
@@ -55,6 +67,10 @@
       <input message="tns:getMerchantInfo" />
       <output message="tns:getMerchantInfoResponse" />
     </operation>
+    <operation name="getBatchInfo">
+      <input message="tns:getBatchInfo" />
+      <output message="tns:getBatchInfoResponse" />
+    </operation>
     <operation name="processCheck">
       <input message="tns:processCheck" />
       <output message="tns:processCheckResponse" />
@@ -66,6 +82,10 @@
     <operation name="processDebitCard">
       <input message="tns:processDebitCard" />
       <output message="tns:processDebitCardResponse" />
+    </operation>
+    <operation name="processSignature">
+      <input message="tns:processSignature" />
+      <output message="tns:processSignatureResponse" />
     </operation>
     <operation name="isValidExpiration">
       <input message="tns:isValidExpiration" />
@@ -91,6 +111,15 @@
         <soap:body use="literal" />
       </output>
     </operation>
+    <operation name="getBatchInfo">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
     <operation name="processCheck">
       <soap:operation soapAction="" />
       <input>
@@ -110,6 +139,15 @@
       </output>
     </operation>
     <operation name="processDebitCard">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="processSignature">
       <soap:operation soapAction="" />
       <input>
         <soap:body use="literal" />
@@ -148,7 +186,7 @@
   </binding>
   <service name="MerchantService">
     <port name="MerchantServiceInstancePort" binding="tns:MerchantServiceInstancePortBinding">
-      <soap:address location="https://webservices.dentalxchange.com:443/merchant/MerchantService" />
+      <soap:address location="https://prelive2.dentalxchange.com:443/merchant/MerchantService" />
     </port>
   </service>
 </definitions>

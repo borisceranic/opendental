@@ -6895,6 +6895,9 @@
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\NewCrop\Update1.wsdl" />
+    <None Include="Web References\PayConnectService\batchInfoResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
     <None Include="Web References\PayConnectService\cardType.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -6903,6 +6906,9 @@
     </None>
     <None Include="Web References\PayConnectService\MerchantService0.xsd">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\PayConnectService\signatureResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\WebSheets\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
@@ -7516,7 +7522,9 @@
     <None Include="Resources\butGoTo.gif" />
     <None Include="Resources\butRecall.gif" />
     <None Include="Resources\butLeft.gif" />
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\ReportAccountingBalanceSheet.txt" />
     <None Include="Resources\ReportAccountingGenLedger.txt" />
     <None Include="Resources\canadiancarriers.txt" />
@@ -7540,10 +7548,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="https://webservices.dentalxchange.com/merchant/MerchantService%3fwsdl">
+    <WebReferenceUrl Include="https://prelive2.dentalxchange.com/merchant/MerchantService%3fwsdl">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\PayConnectService\</RelPath>
-      <UpdateFromURL>https://webservices.dentalxchange.com/merchant/MerchantService%3fwsdl</UpdateFromURL>
+      <UpdateFromURL>https://prelive2.dentalxchange.com/merchant/MerchantService%3fwsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

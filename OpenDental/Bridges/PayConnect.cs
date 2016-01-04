@@ -23,7 +23,8 @@ namespace OpenDental.Bridges {
 			return cred;
 		}
 
-		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber,bool tokenRequested,string authCode="") {
+		///<summary>Parameters starting at authCode are optional, because our eServices probably reference this function as well.</summary>
+		public static PayConnectService.creditCardRequest BuildSaleRequest(decimal amount,string cardNumber,int expYear,int expMonth,string nameOnCard,string securityCode,string zip,string magData,PayConnectService.transType transtype,string refNumber,bool tokenRequested,string authCode="",bool isForced=false) {
 			PayConnectService.creditCardRequest request=new PayConnectService.creditCardRequest();
 			request.Amount=amount;
 			request.AmountSpecified=true;
@@ -41,6 +42,8 @@ namespace OpenDental.Bridges {
 			request.Zip=zip;
 			request.PaymentTokenRequested=tokenRequested;
 			//request.AuthCode=authCode;//This field does not exist in the WSDL yet.  Dentalxchange will let us know once they finish adding it.
+			request.ForceDuplicateSpecified=true;
+			request.ForceDuplicate=isForced;
 			return request;
 		}
 
@@ -57,13 +60,19 @@ namespace OpenDental.Bridges {
 #endif
 				PayConnectService.transResponse response=ms.processCreditCard(cred,request);
 				ms.Dispose();
-				if(response.Status.code!=0) {//Error
-					MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Pay Connect: \""+response.Status.description+"\"");
+				if(response.Status.code!=0 && response.Status.description.ToLower().Contains("duplicate")) {
+					MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Pay Connect: \""
+						+response.Status.description+"\"\r\n"
+						+Lan.g("PayConnect","Try using the Force Duplicate checkbox if a duplicate is intended."));
+				}
+				else if(response.Status.code!=0) {//Error
+					MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Pay Connect: \""
+						+response.Status.description+"\"");
 				}
 				return response;
 			}
 			catch(Exception ex) {
-				MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Open Dental: \""+ex.Message+"\"");
+				MessageBox.Show(Lan.g("PayConnect","Payment failed")+". \r\n"+Lan.g("PayConnect","Error message")+": \""+ex.Message+"\"");
 			}
 			return null;
 		}

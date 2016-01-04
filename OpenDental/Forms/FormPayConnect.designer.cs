@@ -49,6 +49,7 @@ namespace OpenDental{
 			this.labelStoreCCNumWarning = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.checkForceDuplicate = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -302,10 +303,20 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// checkForceDuplicate
+			// 
+			this.checkForceDuplicate.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkForceDuplicate.Location = new System.Drawing.Point(163, 197);
+			this.checkForceDuplicate.Name = "checkForceDuplicate";
+			this.checkForceDuplicate.Size = new System.Drawing.Size(217, 17);
+			this.checkForceDuplicate.TabIndex = 19;
+			this.checkForceDuplicate.Text = "Force Duplicate";
+			// 
 			// FormPayConnect
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(392, 290);
+			this.Controls.Add(this.checkForceDuplicate);
 			this.Controls.Add(this.radioForce);
 			this.Controls.Add(this.labelStoreCCNumWarning);
 			this.Controls.Add(this.checkSaveToken);
@@ -366,5 +377,6 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkSaveToken;
 		private System.Windows.Forms.Label labelStoreCCNumWarning;
 		private System.Windows.Forms.RadioButton radioForce;
+		private System.Windows.Forms.CheckBox checkForceDuplicate;
 	}
 }
