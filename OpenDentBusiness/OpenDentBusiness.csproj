@@ -1150,6 +1150,7 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebServiceTests.cs" />
+    <Compile Include="X12\X834.cs" />
     <Compile Include="X12\X835.cs" />
     <Compile Include="X12\X277.cs" />
     <Compile Include="X12\X999.cs" />
