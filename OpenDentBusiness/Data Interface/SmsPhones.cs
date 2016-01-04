@@ -340,13 +340,19 @@ namespace OpenDentBusiness{
 				return Meth.GetDouble(MethodBase.GetCurrentMethod(),clinicNum);
 			}
 			double limit=0;
-			if(PrefC.GetBool(PrefName.EasyNoClinics)){
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				if(PrefC.GetDate(PrefName.SmsContractDate).Year>1880) {
 					limit=PrefC.GetDouble(PrefName.SmsMonthlyLimit);
 				}
 			}
-			else if(Clinics.GetClinic(clinicNum).SmsContractDate.Year>1880) {
-				limit=Clinics.GetClinic(clinicNum).SmsMonthlyLimit;
+			else { 
+				if(clinicNum==0 && Clinics.List.Length>0) {//Sending text for "Unassigned" patient.  Use the first clinic in the list's information (for now).
+					clinicNum=Clinics.List[0].ClinicNum;
+				}
+				Clinic clinicCur=Clinics.GetClinic(clinicNum);
+				if(clinicCur!=null && clinicCur.SmsContractDate.Year>1880) {
+					limit=clinicCur.SmsMonthlyLimit;
+				}
 			}
 			DateTime dtStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
 			DateTime dtEnd=dtStart.AddMonths(1);
