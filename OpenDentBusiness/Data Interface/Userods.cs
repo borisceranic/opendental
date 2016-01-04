@@ -193,9 +193,13 @@ namespace OpenDentBusiness {
 			return listUserods;
 		}
 
-		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.
-		///Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.</summary>
-		public static string GetName(long userNum,List<Userod> listUserods=null) {
+		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>
+		public static string GetName(long userNum) {
+			return GetName(userNum,null);
+		}
+
+		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>
+		public static string GetName(long userNum,List<Userod> listUserods) {
 			//No need to check RemotingRole; no call to db.
 			if(userNum==0) {
 				return "";
