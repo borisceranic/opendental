@@ -179,6 +179,11 @@ namespace OpenDentBusiness{
 								error=SendText(pat,family,appt,apptComm.ApptCommType);
 								comm.Mode_=CommItemMode.Text;
 							}
+							else {
+								//If they have a contact method other than email and textmessage we won't attempt sending on this step.
+								//Simply continue on to the next priority.
+								continue;
+							}
 						}
 						if(priority==CommType.Email) {
 							error=SendEmail(pat,family,appt,apptComm.ApptCommType);
@@ -189,7 +194,7 @@ namespace OpenDentBusiness{
 							comm.Mode_=CommItemMode.Text;
 						}
 						if(error=="") {
-							Delete(listApptComms[i].ApptCommNum);
+							Delete(apptComm.ApptCommNum);
 							comm.CommDateTime=DateTime.Now;
 							comm.CommSource=CommItemSource.ApptReminder;
 							comm.Note=Lans.g("ApptComms","Appointment reminder sent for appointment on"+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
@@ -222,7 +227,12 @@ namespace OpenDentBusiness{
 				text=text.Replace("[practiceName]",PrefC.GetString(PrefName.PracticeTitle));
 			}
 			if(text.Contains("[clinicName]")) {
-				text=text.Replace("[clinicName]",Clinics.GetDesc(pat.ClinicNum));
+				if(PrefC.HasClinicsEnabled) {
+					text=text.Replace("[clinicName]",Clinics.GetDesc(pat.ClinicNum));
+				}
+				else {
+					text=text.Replace("[clinicName]",PrefC.GetString(PrefName.PracticeTitle));//Clinics disabled but put clinicName.  Use practice info.
+				}
 			}
 			if(text.Contains("[provName]")) {
 				text=text.Replace("[provName]",Providers.GetFormalName(pat.PriProv));
@@ -232,22 +242,22 @@ namespace OpenDentBusiness{
 
 		///<summary>Helper function for SendReminders.  Sends an email with the requisite fields.  Skips sending if there is no practice/clinic email set up, if the patient/guarantor has a preferred contact method of None or DoNotCall, or neither the patient nor their guarantor has an email entered.</summary>
 		private static string SendEmail(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
-			EmailAddress emailAddress=EmailAddresses.GetByClinic(Clinics.ClinicNum);//Gets an address based on cascading priorities.
+			EmailAddress emailAddress=EmailAddresses.GetByClinic(pat.ClinicNum);//Gets an address based on cascading priorities. Works for ClinicNum=0
 			if(emailAddress.EmailUsername=="") {
-				return Lans.g("ApptComms","No default email set up for practice/clinic")+".\r\n";
+				return Lans.g("ApptComms","No default email set up for practice/clinic")+".  ";
 			}
 			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".\r\n";
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".  ";
 			}
 			string patEmail=pat.Email;
 			if(patEmail=="") {
 				if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
-					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".\r\n";
+					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".  ";
 				}
 				patEmail=fam.ListPats[0].Email;
 			}
 			if(patEmail=="") {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has no email")+".\r\n";
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has no email")+".  ";
 			}
 			EmailMessage emailMessage=new EmailMessage();
 			emailMessage.PatNumSubj=pat.PatNum;
@@ -268,7 +278,7 @@ namespace OpenDentBusiness{
 				EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
 			}
 			catch(Exception ex) {
-				return ex.Message+"\r\n";
+				return ex.Message+"  ";
 			}
 			return "";
 		}
@@ -276,17 +286,17 @@ namespace OpenDentBusiness{
 		///<summary>Helper function for SendReminders.  Sends a text message with the requisite fields.  Skips sending if text messaging isn't enabled, if the patient/guarantor has a preferred contact method of None or DoNotCall, or if neither the patient nor the guarantor has a valid wireless phone with text messaging enabled.</summary>
 		private static string SendText(Patient pat,Family fam,Appointment appt,IntervalType intervalType) {
 			if(!SmsPhones.IsIntegratedTextingEnabled()) {
-				return Lans.g("ApptComms","Text messaging not enabled")+".\r\n";
+				return Lans.g("ApptComms","Text messaging not enabled")+".  ";
 			}
 			if(pat.PreferContactMethod==ContactMethod.DoNotCall) {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".\r\n";
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","has a preferred contact method of 'DoNotCall'")+".  ";
 			}
 			string patPhone=pat.WirelessPhone;
 			bool txtUnknownIsNo=PrefC.GetBool(PrefName.TextMsgOkStatusTreatAsNo);
 			//If texting is marked as no, the phone is blank, or unknown are treated as no, look for guarantor texting status.
 			if(pat.TxtMsgOk==YN.No || patPhone=="" || (pat.TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
 				if(fam.ListPats[0].PreferContactMethod==ContactMethod.DoNotCall) {
-					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".\r\n";
+					return pat.LName+", "+pat.FName+"'s "+Lans.g("ApptComms","guarantor has a preferred contact method of 'DoNotCall'")+".  ";
 				}
 				patPhone=fam.ListPats[0].WirelessPhone;
 				if(fam.ListPats[0].TxtMsgOk==YN.No || (fam.ListPats[0].TxtMsgOk==YN.Unknown && txtUnknownIsNo)) {
@@ -294,7 +304,7 @@ namespace OpenDentBusiness{
 				}
 			}
 			if(patPhone=="") {
-				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".\r\n";
+				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".  ";
 			}
 			string textMsg;
 			if(intervalType==IntervalType.Hourly) {
@@ -304,10 +314,10 @@ namespace OpenDentBusiness{
 				textMsg=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
 			try {
-				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,textMsg,Clinics.ClinicNum);
+				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,textMsg,pat.ClinicNum);
 			}
 			catch(Exception ex) {
-				return ex.Message+"\r\n";
+				return ex.Message+"  ";
 			}
 			return "";
 		}
