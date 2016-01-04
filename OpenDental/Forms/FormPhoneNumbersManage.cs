@@ -40,9 +40,12 @@ namespace OpenDental {
 			if(sender.GetType()!=typeof(TextBox)) {
 				return;
 			}
-			TextBox textResult=((TextBox)sender);
-			textResult.Text=TelephoneNumbers.AutoFormat(textResult.Text);
-			textResult.SelectionStart=textResult.Text.Length;
+			TextBox textPhone=(TextBox)sender;
+			int phoneTextPosition=textPhone.SelectionStart;
+			int textLength=textPhone.Text.Length;
+			textPhone.Text=TelephoneNumbers.AutoFormat(textPhone.Text);
+			int diff=textPhone.Text.Length-textLength;
+			textPhone.SelectionStart=phoneTextPosition+diff;
 		}
 
 		private void listOther_DoubleClick(object sender,EventArgs e) {
