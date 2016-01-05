@@ -74,13 +74,10 @@ namespace OpenDental{
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormUserEdit));
-			this.butCancel = new OpenDental.UI.Button();
-			this.butOK = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textUserName = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.listUserGroup = new System.Windows.Forms.ListBox();
-			this.butPassword = new OpenDental.UI.Button();
 			this.listEmployee = new System.Windows.Forms.ListBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
@@ -93,98 +90,60 @@ namespace OpenDental{
 			this.textUserNum = new System.Windows.Forms.TextBox();
 			this.label27 = new System.Windows.Forms.Label();
 			this.butJobRoles = new OpenDental.UI.Button();
+			this.butPassword = new OpenDental.UI.Button();
+			this.butOK = new OpenDental.UI.Button();
+			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
-			// 
-			// butCancel
-			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Autosize = true;
-			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(662, 380);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 0;
-			this.butCancel.Text = "&Cancel";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// butOK
-			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butOK.Autosize = true;
-			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(581, 380);
-			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 1;
-			this.butOK.Text = "&OK";
-			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(5, 59);
+			this.label1.Location = new System.Drawing.Point(8, 58);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(88, 20);
-			this.label1.TabIndex = 2;
+			this.label1.Size = new System.Drawing.Size(70, 17);
+			this.label1.TabIndex = 0;
 			this.label1.Text = "Name";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textUserName
 			// 
-			this.textUserName.Location = new System.Drawing.Point(95, 59);
+			this.textUserName.Location = new System.Drawing.Point(78, 59);
 			this.textUserName.Name = "textUserName";
 			this.textUserName.Size = new System.Drawing.Size(198, 20);
-			this.textUserName.TabIndex = 3;
+			this.textUserName.TabIndex = 1;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(1, 93);
+			this.label3.Location = new System.Drawing.Point(8, 91);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(93, 60);
-			this.label3.TabIndex = 6;
+			this.label3.Size = new System.Drawing.Size(70, 41);
+			this.label3.TabIndex = 0;
 			this.label3.Text = "User Group";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// listUserGroup
 			// 
-			this.listUserGroup.Location = new System.Drawing.Point(95, 91);
+			this.listUserGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.listUserGroup.Location = new System.Drawing.Point(78, 90);
 			this.listUserGroup.Name = "listUserGroup";
 			this.listUserGroup.Size = new System.Drawing.Size(197, 225);
-			this.listUserGroup.TabIndex = 7;
-			// 
-			// butPassword
-			// 
-			this.butPassword.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butPassword.Autosize = true;
-			this.butPassword.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPassword.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPassword.CornerRadius = 4F;
-			this.butPassword.Location = new System.Drawing.Point(189, 380);
-			this.butPassword.Name = "butPassword";
-			this.butPassword.Size = new System.Drawing.Size(103, 26);
-			this.butPassword.TabIndex = 8;
-			this.butPassword.Text = "Change Password";
-			this.butPassword.Click += new System.EventHandler(this.butPassword_Click);
+			this.listUserGroup.TabIndex = 2;
 			// 
 			// listEmployee
 			// 
-			this.listEmployee.Location = new System.Drawing.Point(317, 91);
+			this.listEmployee.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.listEmployee.Location = new System.Drawing.Point(281, 90);
 			this.listEmployee.Name = "listEmployee";
 			this.listEmployee.Size = new System.Drawing.Size(124, 225);
-			this.listEmployee.TabIndex = 11;
+			this.listEmployee.TabIndex = 3;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(316, 67);
+			this.label2.Location = new System.Drawing.Point(281, 69);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(152, 20);
-			this.label2.TabIndex = 10;
+			this.label2.Size = new System.Drawing.Size(124, 20);
+			this.label2.TabIndex = 0;
 			this.label2.Text = "Employee (for timecards)";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
@@ -199,54 +158,59 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(465, 91);
+			this.listProv.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.listProv.Location = new System.Drawing.Point(411, 90);
 			this.listProv.Name = "listProv";
 			this.listProv.Size = new System.Drawing.Size(124, 225);
-			this.listProv.TabIndex = 14;
+			this.listProv.TabIndex = 4;
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(464, 67);
+			this.label5.Location = new System.Drawing.Point(411, 69);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(156, 20);
-			this.label5.TabIndex = 13;
+			this.label5.Size = new System.Drawing.Size(124, 20);
+			this.label5.TabIndex = 0;
 			this.label5.Text = "Provider";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listClinic
 			// 
-			this.listClinic.Location = new System.Drawing.Point(612, 91);
+			this.listClinic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.listClinic.Location = new System.Drawing.Point(541, 90);
 			this.listClinic.Name = "listClinic";
-			this.listClinic.Size = new System.Drawing.Size(124, 225);
-			this.listClinic.TabIndex = 16;
+			this.listClinic.Size = new System.Drawing.Size(199, 225);
+			this.listClinic.TabIndex = 5;
 			this.listClinic.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listClinic_MouseClick);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(611, 67);
+			this.labelClinic.Location = new System.Drawing.Point(541, 69);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(150, 20);
-			this.labelClinic.TabIndex = 15;
+			this.labelClinic.Size = new System.Drawing.Size(199, 20);
+			this.labelClinic.TabIndex = 0;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// checkIsHidden
 			// 
 			this.checkIsHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsHidden.Location = new System.Drawing.Point(5, 8);
+			this.checkIsHidden.Location = new System.Drawing.Point(8, 8);
 			this.checkIsHidden.Name = "checkIsHidden";
-			this.checkIsHidden.Size = new System.Drawing.Size(104, 16);
-			this.checkIsHidden.TabIndex = 17;
+			this.checkIsHidden.Size = new System.Drawing.Size(84, 17);
+			this.checkIsHidden.TabIndex = 10;
 			this.checkIsHidden.Text = "Is Hidden";
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsHidden.UseVisualStyleBackColor = true;
 			// 
 			// checkClinicIsRestricted
 			// 
+			this.checkClinicIsRestricted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkClinicIsRestricted.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-			this.checkClinicIsRestricted.Location = new System.Drawing.Point(612, 322);
+			this.checkClinicIsRestricted.Location = new System.Drawing.Point(541, 322);
 			this.checkClinicIsRestricted.Name = "checkClinicIsRestricted";
-			this.checkClinicIsRestricted.Size = new System.Drawing.Size(125, 52);
+			this.checkClinicIsRestricted.Size = new System.Drawing.Size(199, 30);
 			this.checkClinicIsRestricted.TabIndex = 18;
 			this.checkClinicIsRestricted.Text = "Restrict user to only see this clinic";
 			this.checkClinicIsRestricted.TextAlign = System.Drawing.ContentAlignment.TopLeft;
@@ -255,7 +219,7 @@ namespace OpenDental{
 			// textUserNum
 			// 
 			this.textUserNum.BackColor = System.Drawing.SystemColors.Control;
-			this.textUserNum.Location = new System.Drawing.Point(95, 31);
+			this.textUserNum.Location = new System.Drawing.Point(78, 31);
 			this.textUserNum.Name = "textUserNum";
 			this.textUserNum.ReadOnly = true;
 			this.textUserNum.Size = new System.Drawing.Size(144, 20);
@@ -263,27 +227,72 @@ namespace OpenDental{
 			// 
 			// label27
 			// 
-			this.label27.Location = new System.Drawing.Point(5, 31);
+			this.label27.Location = new System.Drawing.Point(8, 30);
 			this.label27.Name = "label27";
-			this.label27.Size = new System.Drawing.Size(89, 17);
-			this.label27.TabIndex = 147;
+			this.label27.Size = new System.Drawing.Size(70, 17);
+			this.label27.TabIndex = 0;
 			this.label27.Text = "User ID";
 			this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butJobRoles
 			// 
 			this.butJobRoles.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butJobRoles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butJobRoles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butJobRoles.Autosize = true;
 			this.butJobRoles.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butJobRoles.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butJobRoles.CornerRadius = 4F;
-			this.butJobRoles.Location = new System.Drawing.Point(317, 380);
+			this.butJobRoles.Location = new System.Drawing.Point(281, 380);
 			this.butJobRoles.Name = "butJobRoles";
 			this.butJobRoles.Size = new System.Drawing.Size(103, 26);
-			this.butJobRoles.TabIndex = 148;
+			this.butJobRoles.TabIndex = 7;
 			this.butJobRoles.Text = "Set Job Roles";
 			this.butJobRoles.Click += new System.EventHandler(this.butJobRoles_Click);
+			// 
+			// butPassword
+			// 
+			this.butPassword.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butPassword.Autosize = true;
+			this.butPassword.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPassword.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPassword.CornerRadius = 4F;
+			this.butPassword.Location = new System.Drawing.Point(172, 380);
+			this.butPassword.Name = "butPassword";
+			this.butPassword.Size = new System.Drawing.Size(103, 26);
+			this.butPassword.TabIndex = 6;
+			this.butPassword.Text = "Change Password";
+			this.butPassword.Click += new System.EventHandler(this.butPassword_Click);
+			// 
+			// butOK
+			// 
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOK.Autosize = true;
+			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butOK.CornerRadius = 4F;
+			this.butOK.Location = new System.Drawing.Point(581, 380);
+			this.butOK.Name = "butOK";
+			this.butOK.Size = new System.Drawing.Size(75, 26);
+			this.butOK.TabIndex = 8;
+			this.butOK.Text = "&OK";
+			this.butOK.Click += new System.EventHandler(this.butOK_Click);
+			// 
+			// butCancel
+			// 
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(662, 380);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
+			this.butCancel.TabIndex = 9;
+			this.butCancel.Text = "&Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// FormUserEdit
 			// 
@@ -310,7 +319,9 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
+			this.MaximumSize = new System.Drawing.Size(789, 10000);
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(789, 470);
 			this.Name = "FormUserEdit";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
