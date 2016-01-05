@@ -1792,7 +1792,6 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheetDef.Height=1100;
 			int rowH=18;
 			int y=60;
-			int x=75;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Screening",12f,sheetDef.FontName,true,312,y,275,20));
 			y=105;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Last Name:",sheetDef.FontSize,sheetDef.FontName,false,76,y,75,rowH));
@@ -1802,8 +1801,12 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Middle I:",sheetDef.FontSize,sheetDef.FontName,false,547,y,65,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("MiddleI",sheetDef.FontSize,sheetDef.FontName,false,612,y,145,rowH));
 			y+=rowH+2;
-			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Birthdate:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
-			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Birthdate",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Gender:",sheetDef.FontSize,sheetDef.FontName,false,76,y,75,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Gender",sheetDef.FontSize,sheetDef.FontName,false,151,y,155,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Birthdate:",sheetDef.FontSize,sheetDef.FontName,false,311,y,76,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Birthdate",sheetDef.FontSize,sheetDef.FontName,false,387,y,155,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Age:",sheetDef.FontSize,sheetDef.FontName,false,547,y,65,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Age",sheetDef.FontSize,sheetDef.FontName,false,612,y,145,rowH));
 			y+=rowH+2;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Description:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewOutput("Description",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));

@@ -2868,6 +2868,9 @@ namespace OpenDental{
 						case "Birthdate":
 							field.FieldValue=pat.Birthdate.ToShortDateString();
 							break;
+						case "Age":
+							field.FieldValue=pat.Age.ToString();
+							break;
 						case "FName":
 							field.FieldValue=pat.FName;
 							break;
@@ -2879,6 +2882,9 @@ namespace OpenDental{
 							break;
 						case "Preferred":
 							field.FieldValue=pat.Preferred;
+							break;
+						case "Gender":
+							field.FieldValue=pat.Gender.ToString();
 							break;
 					}
 				}

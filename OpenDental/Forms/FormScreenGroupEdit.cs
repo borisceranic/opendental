@@ -143,7 +143,7 @@ namespace OpenDental{
 			this.textScreenDate.Location = new System.Drawing.Point(102, 9);
 			this.textScreenDate.Name = "textScreenDate";
 			this.textScreenDate.Size = new System.Drawing.Size(64, 20);
-			this.textScreenDate.TabIndex = 0;
+			this.textScreenDate.TabIndex = 6;
 			this.textScreenDate.Validating += new System.ComponentModel.CancelEventHandler(this.textScreenDate_Validating);
 			// 
 			// textDescription
@@ -151,7 +151,7 @@ namespace OpenDental{
 			this.textDescription.Location = new System.Drawing.Point(102, 29);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(173, 20);
-			this.textDescription.TabIndex = 1;
+			this.textDescription.TabIndex = 0;
 			// 
 			// comboProv
 			// 
@@ -173,7 +173,7 @@ namespace OpenDental{
 			this.comboPlaceService.MaxDropDownItems = 25;
 			this.comboPlaceService.Name = "comboPlaceService";
 			this.comboPlaceService.Size = new System.Drawing.Size(173, 21);
-			this.comboPlaceService.TabIndex = 3;
+			this.comboPlaceService.TabIndex = 5;
 			// 
 			// label2
 			// 
@@ -199,7 +199,7 @@ namespace OpenDental{
 			this.comboCounty.Location = new System.Drawing.Point(102, 90);
 			this.comboCounty.Name = "comboCounty";
 			this.comboCounty.Size = new System.Drawing.Size(173, 21);
-			this.comboCounty.TabIndex = 4;
+			this.comboCounty.TabIndex = 3;
 			this.comboCounty.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboCounty_KeyDown);
 			// 
 			// comboGradeSchool
@@ -208,7 +208,7 @@ namespace OpenDental{
 			this.comboGradeSchool.Location = new System.Drawing.Point(102, 111);
 			this.comboGradeSchool.Name = "comboGradeSchool";
 			this.comboGradeSchool.Size = new System.Drawing.Size(173, 21);
-			this.comboGradeSchool.TabIndex = 140;
+			this.comboGradeSchool.TabIndex = 4;
 			this.comboGradeSchool.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboGradeSchool_KeyDown);
 			// 
 			// textProvName
@@ -216,7 +216,7 @@ namespace OpenDental{
 			this.textProvName.Location = new System.Drawing.Point(102, 49);
 			this.textProvName.Name = "textProvName";
 			this.textProvName.Size = new System.Drawing.Size(173, 20);
-			this.textProvName.TabIndex = 141;
+			this.textProvName.TabIndex = 1;
 			this.textProvName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textProvName_KeyUp);
 			// 
 			// labelScreener
@@ -279,7 +279,7 @@ namespace OpenDental{
 			this.butStartScreens.Location = new System.Drawing.Point(375, 106);
 			this.butStartScreens.Name = "butStartScreens";
 			this.butStartScreens.Size = new System.Drawing.Size(92, 23);
-			this.butStartScreens.TabIndex = 151;
+			this.butStartScreens.TabIndex = 9;
 			this.butStartScreens.Text = "Screen Patients";
 			this.butStartScreens.UseVisualStyleBackColor = true;
 			this.butStartScreens.Click += new System.EventHandler(this.butStartScreens_Click);
@@ -296,7 +296,7 @@ namespace OpenDental{
 			this.butRemovePat.Location = new System.Drawing.Point(392, 52);
 			this.butRemovePat.Name = "butRemovePat";
 			this.butRemovePat.Size = new System.Drawing.Size(75, 23);
-			this.butRemovePat.TabIndex = 150;
+			this.butRemovePat.TabIndex = 8;
 			this.butRemovePat.Text = "Remove";
 			this.butRemovePat.UseVisualStyleBackColor = true;
 			this.butRemovePat.Click += new System.EventHandler(this.butRemovePat_Click);
@@ -313,7 +313,7 @@ namespace OpenDental{
 			this.button1.Location = new System.Drawing.Point(392, 23);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 149;
+			this.button1.TabIndex = 7;
 			this.button1.Text = "Add";
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.butAddPat_Click);
@@ -331,7 +331,7 @@ namespace OpenDental{
 			this.butAdd.Location = new System.Drawing.Point(375, 613);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(114, 24);
-			this.butAdd.TabIndex = 146;
+			this.butAdd.TabIndex = 10;
 			this.butAdd.Text = "Add Anonymous";
 			this.butAdd.Click += new System.EventHandler(this.butAddAnonymous_Click);
 			// 
@@ -348,7 +348,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(12, 613);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(70, 24);
-			this.butDelete.TabIndex = 24;
+			this.butDelete.TabIndex = 13;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -363,7 +363,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(782, 613);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(70, 24);
-			this.butCancel.TabIndex = 24;
+			this.butCancel.TabIndex = 12;
 			this.butCancel.Text = "Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -378,7 +378,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(706, 613);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(70, 24);
-			this.butOK.TabIndex = 24;
+			this.butOK.TabIndex = 11;
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -578,30 +578,40 @@ namespace OpenDental{
 		private void AddAnonymousScreensForSheets() {
 			//Get the first custom Screening sheet or use the internal one
 			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
+			Sheet sheet=SheetUtil.CreateSheet(sheetDef);
+			SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);
+			SheetFiller.FillFields(sheet);
+			using(Graphics g=CreateGraphics()) {
+				SheetUtil.CalculateHeights(sheet,g);
+			}
 			//Create a valid screen so that we can create a screening sheet with the corresponding ScreenNum.
 			OpenDentBusiness.Screen screen=new OpenDentBusiness.Screen();
+			screen.ScreenGroupNum=_screenGroup.ScreenGroupNum;
 			screen.ScreenGroupOrder=1;
 			if(_listScreens.Count!=0) {
-				screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder++;
+				screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder+1;//increments for next
 			}
 			while(true) {
-				screen.Gender=PatientGender.Unknown;
-				screen.RaceOld=PatientRaceOld.Unknown;
-				Screens.Insert(screen);//We need a new PK so call insert.
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
-				SheetParameter.SetParameter(sheet,"ScreenNum",screen.ScreenNum);
-				SheetFiller.FillFields(sheet);
-				using(Graphics g=CreateGraphics()) {
-					SheetUtil.CalculateHeights(sheet,g);
+				//For Anonymous patients always default to unknowns.
+				foreach(SheetField field in sheet.SheetFields) {
+					switch(field.FieldName) {
+						case "Race/Ethnicity":
+							field.FieldValue="Unknown";
+							break;
+						case "Gender":
+							field.FieldValue="Unknown";
+							break;
+					}
 				}
 				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 				FormSFE.ShowDialog();
 				if(FormSFE.DialogResult!=DialogResult.OK) {
-					//Remove the unused screen from the database:
-					Screens.Delete(screen);
 					return;
 				}
-				//TODO: process the sheet and update the corresponding screen in the database?
+				Sheets.Insert(sheet);
+				Screens.ImportScreenFromSheet(sheet,screen);
+				screen.ScreenGroupOrder++;
+				FillGrid();
 			}
 		}
 
