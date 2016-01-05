@@ -173,24 +173,12 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Returns all users that are associated to the permission passed in.  Returns empty list if no matches found.</summary>
-		public static List<Userod> GetUsersByJobRole(JobRoleType jobRoleType,bool showHidden) {
-			//No need to check RemotingRole; no call to db.
-			List<Userod> listAllUsers=new List<Userod>(); UserodC.GetListShort();
+		public static List<Userod> GetUsersByJobRole(JobPerm jobPerm,bool showHidden) {
+			List<JobPermission> listJobRoles=JobPermissions.GetList().FindAll(x=>x.JobPermType==jobPerm);
 			if(showHidden) {
-				listAllUsers=UserodC.GetListt();
+				return UserodC.GetListt().FindAll(x=>listJobRoles.Any(y=>x.UserNum==y.UserNum));
 			}
-			else {
-				listAllUsers=UserodC.GetListShort();
-			}
-			List<Userod> listUserods=new List<Userod>();
-			List<JobRole> listJobRoles=JobRoles.GetList();
-			for(int i=0;i<listAllUsers.Count;i++) {
-				//Only add users that have the job role passed in.
-				if(listJobRoles.Count(x => x.UserNum==listAllUsers[i].UserNum && x.RoleType==jobRoleType) > 0) {
-					listUserods.Add(listAllUsers[i]);
-				}
-			}
-			return listUserods;
+			return UserodC.GetListShort().FindAll(x=>listJobRoles.Any(y=>x.UserNum==y.UserNum));
 		}
 
 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>
@@ -799,6 +787,7 @@ namespace OpenDentBusiness {
 			string command="UPDATE userod SET PasswordIsStrong=0";
 			Db.NonQ(command);
 		}
+
 
 
 	}

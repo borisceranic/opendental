@@ -6,19 +6,24 @@ using System.Text;
 namespace OpenDentBusiness {
 	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
 	[Serializable]
-	[CrudTable(IsMissingInGeneral=true)]
+	[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
+	//[CrudTable(IsSynchable=true)]
 	public class JobReview:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long JobReviewNum;
+		///<summary>FK to job.JobNum.</summary>
+		public long JobNum;
 		///<summary>FK to userod.UserNum.  Links this project to the source project.</summary>
-		public long Reviewer;
+		public long ReviewerNum;
 		///<summary>Date/Time the review was created.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime DateTStamp;
 		///<summary>The text in this review.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Description;
 		///<summary>The status of this review.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public JobReviewStatus ReviewStatus;
 
 		///<summary></summary>
@@ -43,18 +48,3 @@ namespace OpenDentBusiness {
 }
 
 
-
-
-/*
-				command="DROP TABLE IF EXISTS jobreview";
-				Db.NonQ(command);
-				command=@"CREATE TABLE jobreview (
-					JobReviewNum bigint NOT NULL auto_increment PRIMARY KEY,
-					Reviewer bigint NOT NULL,
-					DateTStamp timestamp,
-					Description varchar(255) NOT NULL,
-					ReviewStatus tinyint NOT NULL,
-					INDEX(Reviewer)
-					) DEFAULT CHARSET=utf8";
-				Db.NonQ(command);
-			*/

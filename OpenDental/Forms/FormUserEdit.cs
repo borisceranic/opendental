@@ -418,7 +418,7 @@ namespace OpenDental{
 		}
 
 		private void butJobRoles_Click(object sender,EventArgs e) {
-			FormJobRoles FormJR=new FormJobRoles(UserCur.UserNum);
+			FormJobPermissions FormJR=new FormJobPermissions(UserCur.UserNum);
 			FormJR.ShowDialog();
 		}
 		private void butOK_Click(object sender, System.EventArgs e) {

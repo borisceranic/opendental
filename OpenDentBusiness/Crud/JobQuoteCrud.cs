@@ -47,12 +47,36 @@ namespace OpenDentBusiness.Crud{
 			foreach(DataRow row in table.Rows) {
 				jobQuote=new JobQuote();
 				jobQuote.JobQuoteNum= PIn.Long  (row["JobQuoteNum"].ToString());
+				jobQuote.JobNum     = PIn.Long  (row["JobNum"].ToString());
 				jobQuote.PatNum     = PIn.Long  (row["PatNum"].ToString());
 				jobQuote.Amount     = PIn.String(row["Amount"].ToString());
 				jobQuote.Note       = PIn.String(row["Note"].ToString());
 				retVal.Add(jobQuote);
 			}
 			return retVal;
+		}
+
+		///<summary>Converts a list of JobQuote into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobQuote> listJobQuotes,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="JobQuote";
+			}
+			DataTable table=new DataTable(tableName);
+			table.Columns.Add("JobQuoteNum");
+			table.Columns.Add("JobNum");
+			table.Columns.Add("PatNum");
+			table.Columns.Add("Amount");
+			table.Columns.Add("Note");
+			foreach(JobQuote jobQuote in listJobQuotes) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobQuote.JobQuoteNum),
+					POut.Long  (jobQuote.JobNum),
+					POut.Long  (jobQuote.PatNum),
+					POut.String(jobQuote.Amount),
+					POut.String(jobQuote.Note),
+				});
+			}
+			return table;
 		}
 
 		///<summary>Inserts one JobQuote into the database.  Returns the new priKey.</summary>
@@ -90,19 +114,24 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobQuoteNum,";
 			}
-			command+="PatNum,Amount,Note) VALUES(";
+			command+="JobNum,PatNum,Amount,Note) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobQuote.JobQuoteNum)+",";
 			}
 			command+=
-				     POut.Long  (jobQuote.PatNum)+","
+				     POut.Long  (jobQuote.JobNum)+","
+				+    POut.Long  (jobQuote.PatNum)+","
 				+"'"+POut.String(jobQuote.Amount)+"',"
-				+"'"+POut.String(jobQuote.Note)+"')";
+				+    DbHelper.ParamChar+"paramNote)";
+			if(jobQuote.Note==null) {
+				jobQuote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobQuote.Note);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramNote);
 			}
 			else {
-				jobQuote.JobQuoteNum=Db.NonQ(command,true);
+				jobQuote.JobQuoteNum=Db.NonQ(command,true,paramNote);
 			}
 			return jobQuote.JobQuoteNum;
 		}
@@ -130,19 +159,24 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobQuoteNum,";
 			}
-			command+="PatNum,Amount,Note) VALUES(";
+			command+="JobNum,PatNum,Amount,Note) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobQuote.JobQuoteNum)+",";
 			}
 			command+=
-				     POut.Long  (jobQuote.PatNum)+","
+				     POut.Long  (jobQuote.JobNum)+","
+				+    POut.Long  (jobQuote.PatNum)+","
 				+"'"+POut.String(jobQuote.Amount)+"',"
-				+"'"+POut.String(jobQuote.Note)+"')";
+				+    DbHelper.ParamChar+"paramNote)";
+			if(jobQuote.Note==null) {
+				jobQuote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobQuote.Note);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramNote);
 			}
 			else {
-				jobQuote.JobQuoteNum=Db.NonQ(command,true);
+				jobQuote.JobQuoteNum=Db.NonQ(command,true,paramNote);
 			}
 			return jobQuote.JobQuoteNum;
 		}
@@ -150,16 +184,25 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one JobQuote in the database.</summary>
 		public static void Update(JobQuote jobQuote){
 			string command="UPDATE jobquote SET "
+				+"JobNum     =  "+POut.Long  (jobQuote.JobNum)+", "
 				+"PatNum     =  "+POut.Long  (jobQuote.PatNum)+", "
 				+"Amount     = '"+POut.String(jobQuote.Amount)+"', "
-				+"Note       = '"+POut.String(jobQuote.Note)+"' "
+				+"Note       =  "+DbHelper.ParamChar+"paramNote "
 				+"WHERE JobQuoteNum = "+POut.Long(jobQuote.JobQuoteNum);
-			Db.NonQ(command);
+			if(jobQuote.Note==null) {
+				jobQuote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobQuote.Note);
+			Db.NonQ(command,paramNote);
 		}
 
 		///<summary>Updates one JobQuote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(JobQuote jobQuote,JobQuote oldJobQuote){
 			string command="";
+			if(jobQuote.JobNum != oldJobQuote.JobNum) {
+				if(command!=""){ command+=",";}
+				command+="JobNum = "+POut.Long(jobQuote.JobNum)+"";
+			}
 			if(jobQuote.PatNum != oldJobQuote.PatNum) {
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(jobQuote.PatNum)+"";
@@ -170,14 +213,18 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(jobQuote.Note != oldJobQuote.Note) {
 				if(command!=""){ command+=",";}
-				command+="Note = '"+POut.String(jobQuote.Note)+"'";
+				command+="Note = "+DbHelper.ParamChar+"paramNote";
 			}
 			if(command==""){
 				return false;
 			}
+			if(jobQuote.Note==null) {
+				jobQuote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobQuote.Note);
 			command="UPDATE jobquote SET "+command
 				+" WHERE JobQuoteNum = "+POut.Long(jobQuote.JobQuoteNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramNote);
 			return true;
 		}
 
@@ -186,6 +233,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM jobquote "
 				+"WHERE JobQuoteNum = "+POut.Long(jobQuoteNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<JobQuote> listNew,List<JobQuote> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<JobQuote> listIns    =new List<JobQuote>();
+			List<JobQuote> listUpdNew =new List<JobQuote>();
+			List<JobQuote> listUpdDB  =new List<JobQuote>();
+			List<JobQuote> listDel    =new List<JobQuote>();
+			listNew.Sort((JobQuote x,JobQuote y) => { return x.JobQuoteNum.CompareTo(y.JobQuoteNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((JobQuote x,JobQuote y) => { return x.JobQuoteNum.CompareTo(y.JobQuoteNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			JobQuote fieldNew;
+			JobQuote fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.JobQuoteNum<fieldDB.JobQuoteNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.JobQuoteNum>fieldDB.JobQuoteNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].JobQuoteNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

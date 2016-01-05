@@ -1,5 +1,5 @@
 namespace OpenDental{
-	partial class FormJobRoles {
+	partial class FormJobPermissions {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormJobRoles));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormJobPermissions));
 			this.butOK = new OpenDental.UI.Button();
 			this.labelAvailable = new System.Windows.Forms.Label();
 			this.listAvailable = new System.Windows.Forms.ListBox();
@@ -224,7 +224,7 @@ namespace OpenDental{
 			this.butQuoteManager.Text = "Quote Mang.";
 			this.butQuoteManager.Click += new System.EventHandler(this.butQuoteManager_Click);
 			// 
-			// FormJobRoles
+			// FormJobPermissions
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(278, 379);
@@ -244,9 +244,9 @@ namespace OpenDental{
 			this.Controls.Add(this.butPreExpert);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(294, 284);
-			this.Name = "FormJobRoles";
+			this.Name = "FormJobPermissions";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Job Roles";
+			this.Text = "Job Permissions";
 			this.Load += new System.EventHandler(this.FormJobRoles_Load);
 			this.ResumeLayout(false);
 

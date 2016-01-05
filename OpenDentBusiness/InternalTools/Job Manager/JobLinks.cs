@@ -26,14 +26,34 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, Quotes, and Tasks.</summary>
+		public static List<JobLink> GetJobLinksForJobs(List<long> jobNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobLink>>(MethodBase.GetCurrentMethod(),jobNums);
+			}
+			if(jobNums==null || jobNums.Count==0) {
+				return new List<JobLink>();
+			}
+			string command="SELECT * FROM joblink WHERE JobNum IN ("+string.Join(",",jobNums)+")";
+			return Crud.JobLinkCrud.SelectMany(command);
+		}
+
+		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, and Tasks.</summary>
 		public static List<JobLink> GetJobLinks(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<JobLink>>(MethodBase.GetCurrentMethod(),jobNum);
 			}
 			string command="SELECT * FROM joblink"
 				+" WHERE JobNum="+POut.Long(jobNum)
-				+" AND LinkType IN ("+(int)JobLinkType.Bug+","+(int)JobLinkType.Request+","+(int)JobLinkType.Task+","+(int)JobLinkType.Quote+")"
+				+" AND LinkType IN ("+(int)JobLinkType.Bug+","+(int)JobLinkType.Request+","+(int)JobLinkType.Task+")"
 				+" ORDER BY LinkType";
+			return Crud.JobLinkCrud.SelectMany(command);
+		}
+
+		public static List<JobLink> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobLink>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM joblink";
 			return Crud.JobLinkCrud.SelectMany(command);
 		}
 
@@ -64,6 +84,23 @@ namespace OpenDentBusiness{
 			Crud.JobLinkCrud.Delete(jobLinknum);
 		}
 
+		public static void DeleteForJob(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
+				return;
+			}
+			string command="DELETE FROM joblink WHERE JobNum="+POut.Long(jobNum);
+			Db.NonQ(command);
+		}
+
+		public static void Sync(List<JobLink> listNew,long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,jobNum);
+				return;
+			}
+			List<JobLink> listDB=GetByJobNum(jobNum);
+			Crud.JobLinkCrud.Sync(listNew,listDB);
+		}
 
 
 	}

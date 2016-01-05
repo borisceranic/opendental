@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness {
-	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
+	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.
+	/// Base object for use in the job tracking system.</summary>
 	[Serializable]
 	[CrudTable(IsMissingInGeneral=true)]
 	public class Job:TableBase {
@@ -10,12 +13,16 @@ namespace OpenDentBusiness {
 		[CrudColumn(IsPriKey=true)]
 		public long JobNum;
 		///<summary>FK to userod.UserNum.</summary>
-		public long Expert;
-		///<summary>FK to project.ProjectNum.</summary>
-		public long ProjectNum;
-		///<summary>The priority of the job.</summmary>
+		public long ExpertNum;
+		///<summary>FK to userod.UserNum.  The current owner of the job.  Historical owner data stored in JobEvent.Owner.</summary>
+		public long OwnerNum;
+		///<summary>FK to job.JobNum.</summary>
+		public long ParentNum;
+		///<summary>The priority of the job.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public JobPriority Priority;
 		///<summary>The type of the job.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public JobCategory Category;
 		///<summary>The version the job is for.</summary>
 		public string JobVersion;
@@ -26,23 +33,58 @@ namespace OpenDentBusiness {
 		///<summary>The date/time that the job was created.  Not user editable.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
-		///<summary>The description of the job.</summary>
+		///<summary>The description of the job. RTF content of the main body of the Job.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]//Text
 		public string Description;
 		///<summary>The short title of the job.</summary>
 		public string Title;
 		///<summary>The current status of the job.  Historical statuses for this job can be found in the jobevent table.</summary>
-		public JobStatus Status;
-		///<summary>FK to userod.UserNum.  The current owner of the job.  Historical owner data stored in JobEvent.Owner.</summary>
-		public long Owner;
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public JobStat JobStatus;
+
+		//The following varables should be filled by the class that uses them. Not filled in S class. 
+		//Just a convenient way to package a job for passing around in the job manager.
+		///<summary>Not a data column.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<JobLink> ListJobLinks=new List<JobLink>();
+		///<summary>Not a data column.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<JobNote> ListJobNotes=new List<JobNote>();
+		///<summary>Not a data column.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<JobReview> ListJobReviews=new List<JobReview>();
+		///<summary>Not a data column.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<JobQuote> ListJobQuotes=new List<JobQuote>();
+		///<summary>Not a data column.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<JobEvent> ListJobEvents=new List<JobEvent>();
+
+		public Job() {
+			JobVersion="";
+			Description="";
+			Title="";
+		}
 
 		///<summary></summary>
 		public Job Copy() {
-			return (Job)this.MemberwiseClone();
+			Job job=(Job)this.MemberwiseClone();
+			job.ListJobLinks=this.ListJobLinks.Select(x => x.Copy()).ToList();
+			job.ListJobNotes=this.ListJobNotes.Select(x => x.Copy()).ToList();
+			job.ListJobReviews=this.ListJobReviews.Select(x => x.Copy()).ToList();
+			job.ListJobQuotes=this.ListJobQuotes.Select(x => x.Copy()).ToList();
+			job.ListJobEvents=this.ListJobEvents.Select(x => x.Copy()).ToList();
+			return job;
+		}
+
+		///<summary>Used primarily to display a Job in the tree view.</summary>
+		public override string ToString() {
+			return Category.ToString().Substring(0,1)+JobNum+" - "+Title;
 		}
 	}
 
 
-	public enum JobStatus {
+	public enum JobStat {
 		///<summary>0 -</summary>
 		Concept,
 		///<summary>1 -</summary>
@@ -83,7 +125,6 @@ namespace OpenDentBusiness {
 		NeedsJobClarification
 	}
 
-
 	public enum JobPriority {
 		///<summary>0 -</summary>
 		High,
@@ -103,34 +144,9 @@ namespace OpenDentBusiness {
 		///<summary>3 -</summary>
 		Query,
 		///<summary>4 -</summary>
-		Bridge
+		ProgramBridge
 	}
 
 }
 
-
-
-
-/*
-					command="DROP TABLE IF EXISTS job";
-					Db.NonQ(command);
-					command=@"CREATE TABLE job (
-						JobNum bigint NOT NULL auto_increment PRIMARY KEY,
-						Expert bigint NOT NULL,
-						ProjectNum bigint NOT NULL,
-						Priority tinyint NOT NULL,
-						Category tinyint NOT NULL,
-						JobVersion varchar(255) NOT NULL,
-						HoursEstimate int NOT NULL,
-						HoursActual int NOT NULL,
-						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-						Description varchar(255) NOT NULL,
-						Title varchar(255) NOT NULL,
-						Status tinyint NOT NULL,
-						Owner bigint NOT NULL,
-						INDEX(Expert),
-						INDEX(ProjectNum)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				*/
 

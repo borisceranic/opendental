@@ -68,8 +68,8 @@ namespace OpenDentBusiness {
 			DataSet ds=new DataSet();
 			//All Internal OD Tables that are cached go here
 			if(Prefs.IsODHQ()) {
-				if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
-					ds.Tables.Add(JobRoles.RefreshCache());
+				if(itypes.Contains((int)InvalidType.JobPermission) || isAll) {
+					ds.Tables.Add(JobPermissions.RefreshCache());
 				}
 			}
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {
@@ -293,8 +293,8 @@ namespace OpenDentBusiness {
 			}
 			//All Internal OD Tables that are cached go here
 			if(Prefs.IsODHQ()) {
-				if(itypes.Contains((int)InvalidType.JobRoles) || isAll) {
-					ds.Tables.Add(JobRoles.RefreshCache());
+				if(itypes.Contains((int)InvalidType.JobPermission) || isAll) {
+					ds.Tables.Add(JobPermissions.RefreshCache());
 				}
 			}
 			if(itypes.Contains((int)InvalidType.AccountingAutoPays) || isAll) {

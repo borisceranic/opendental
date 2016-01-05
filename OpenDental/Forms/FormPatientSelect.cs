@@ -1204,7 +1204,7 @@ namespace OpenDental{
 					textAddress.Text,checkHideInactive.Checked,textCity.Text,textState.Text,
 					textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 					checkGuarantors.Checked,checkShowArchived.Checked,
-					birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+					birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums,InitialPatNum);
 			}));
 			_fillGridThread.AddThreadExitHandler(new ODThread.WorkerDelegate((ODThread o) => {
 				_fillGridThread=null;
@@ -1212,16 +1212,14 @@ namespace OpenDental{
 					this.BeginInvoke((Action)(() => {
 						FillGridFinal(limit);
 					}));
-				}
-				catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
+				}catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
 			}));
 			_fillGridThread.AddExceptionHandler(new ODThread.ExceptionDelegate((e) => {
 				try {
 					this.BeginInvoke((Action)(() => {
 						MessageBox.Show(e.Message);
 					}));
-				}
-				catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
+				}catch(Exception) { } //do nothing. Usually just a race condition trying to invoke from a disposed form.
 			}));
 			_fillGridThread.Start(true);
 		}
@@ -1255,6 +1253,12 @@ namespace OpenDental{
 		//		textSSN.Text,textPatNum.Text,textChartNumber.Text,billingType,
 		//		checkGuarantors.Checked,checkShowArchived.Checked,
 		//		birthdate,siteNum,textSubscriberID.Text,textEmail.Text,textCountry.Text,textRegKey.Text,clinicNums,explicitPatNums);
+			if(InitialPatNum!=0 && limit) {
+				//The InitialPatNum will be at the top, so resort the list alphabetically
+				DataView ptDataView=PtDataTable.DefaultView;
+				ptDataView.Sort="LName,FName";
+				PtDataTable=ptDataView.ToTable();
+			}
 			gridMain.BeginUpdate();
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -1534,25 +1538,5 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-	}
+}
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -29,22 +30,18 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Returns blank if no previous owner</summary>
-		public static Userod GetPrevOwner(long jobNum) {
+		public static string GetPrevOwnerName(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Userod>(MethodBase.GetCurrentMethod(),jobNum);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),jobNum);
 			}
-			long ownerCur=Jobs.GetOne(jobNum).Owner;
+			if(jobNum==0) {
+				return "";
+			}
+			long ownerCur=Jobs.GetOne(jobNum).OwnerNum;
 			string command="SELECT * FROM jobevent WHERE JobNum = "+POut.Long(jobNum)
-				+" ORDER BY DateTimeEntry DESC";
+				+" AND OwnerNum!="+POut.Long(ownerCur)+" ORDER BY DateTimeEntry DESC";
 			List<JobEvent> listJobEvents=Crud.JobEventCrud.SelectMany(command);
-			long ownerPrev=0;
-			foreach(JobEvent jobEvent in listJobEvents) {
-				if(jobEvent.Owner!=ownerCur) {
-					ownerPrev=jobEvent.Owner;
-					break;
-				}
-			}
-			return Userods.GetUser(ownerPrev);
+			return Userods.GetName(listJobEvents.Select(x=>x.OwnerNum).FirstOrDefault());
 		}
 
 		///<summary>Gets one JobEvent from the db.</summary>
@@ -92,6 +89,15 @@ namespace OpenDentBusiness{
 			Crud.JobEventCrud.Delete(jobEventNum);
 		}
 
+		public static void DeleteForJob(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
+				return;
+			}
+			string command="DELETE FROM jobevent WHERE JobNum="+POut.Long(jobNum);
+			Db.NonQ(command);
+		}
+
 		///<summary>Gets the most recent JobEvent of a job.</summary>
 		public static JobEvent GetMostRecent(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -102,6 +108,15 @@ namespace OpenDentBusiness{
 			return Crud.JobEventCrud.SelectOne(command);
 		}
 
-
+		public static List<JobEvent> GetJobEventsForJobs(List<long> jobNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobEvent>>(MethodBase.GetCurrentMethod(),jobNums);
+			}
+			if(jobNums==null || jobNums.Count==0) {
+				return new List<JobEvent>();
+			}
+			string command="SELECT * FROM jobevent WHERE JobNum IN ("+string.Join(",",jobNums)+")";
+			return Crud.JobEventCrud.SelectMany(command);
+		}
 	}
 }

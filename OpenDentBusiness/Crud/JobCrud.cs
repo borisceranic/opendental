@@ -47,21 +47,87 @@ namespace OpenDentBusiness.Crud{
 			foreach(DataRow row in table.Rows) {
 				job=new Job();
 				job.JobNum       = PIn.Long  (row["JobNum"].ToString());
-				job.Expert       = PIn.Long  (row["Expert"].ToString());
-				job.ProjectNum   = PIn.Long  (row["ProjectNum"].ToString());
-				job.Priority     = (OpenDentBusiness.JobPriority)PIn.Int(row["Priority"].ToString());
-				job.Category     = (OpenDentBusiness.JobCategory)PIn.Int(row["Category"].ToString());
+				job.ExpertNum    = PIn.Long  (row["ExpertNum"].ToString());
+				job.OwnerNum     = PIn.Long  (row["OwnerNum"].ToString());
+				job.ParentNum    = PIn.Long  (row["ParentNum"].ToString());
+				string priority=row["Priority"].ToString();
+				if(priority==""){
+					job.Priority   =(JobPriority)0;
+				}
+				else try{
+					job.Priority   =(JobPriority)Enum.Parse(typeof(JobPriority),priority);
+				}
+				catch{
+					job.Priority   =(JobPriority)0;
+				}
+				string category=row["Category"].ToString();
+				if(category==""){
+					job.Category   =(JobCategory)0;
+				}
+				else try{
+					job.Category   =(JobCategory)Enum.Parse(typeof(JobCategory),category);
+				}
+				catch{
+					job.Category   =(JobCategory)0;
+				}
 				job.JobVersion   = PIn.String(row["JobVersion"].ToString());
 				job.HoursEstimate= PIn.Int   (row["HoursEstimate"].ToString());
 				job.HoursActual  = PIn.Int   (row["HoursActual"].ToString());
 				job.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
 				job.Description  = PIn.String(row["Description"].ToString());
 				job.Title        = PIn.String(row["Title"].ToString());
-				job.Status       = (OpenDentBusiness.JobStatus)PIn.Int(row["Status"].ToString());
-				job.Owner        = PIn.Long  (row["Owner"].ToString());
+				string jobStatus=row["JobStatus"].ToString();
+				if(jobStatus==""){
+					job.JobStatus  =(JobStat)0;
+				}
+				else try{
+					job.JobStatus  =(JobStat)Enum.Parse(typeof(JobStat),jobStatus);
+				}
+				catch{
+					job.JobStatus  =(JobStat)0;
+				}
 				retVal.Add(job);
 			}
 			return retVal;
+		}
+
+		///<summary>Converts a list of Job into a DataTable.</summary>
+		public static DataTable ListToTable(List<Job> listJobs,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="Job";
+			}
+			DataTable table=new DataTable(tableName);
+			table.Columns.Add("JobNum");
+			table.Columns.Add("ExpertNum");
+			table.Columns.Add("OwnerNum");
+			table.Columns.Add("ParentNum");
+			table.Columns.Add("Priority");
+			table.Columns.Add("Category");
+			table.Columns.Add("JobVersion");
+			table.Columns.Add("HoursEstimate");
+			table.Columns.Add("HoursActual");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("Description");
+			table.Columns.Add("Title");
+			table.Columns.Add("JobStatus");
+			foreach(Job job in listJobs) {
+				table.Rows.Add(new object[] {
+					POut.Long  (job.JobNum),
+					POut.Long  (job.ExpertNum),
+					POut.Long  (job.OwnerNum),
+					POut.Long  (job.ParentNum),
+					POut.Int   ((int)job.Priority),
+					POut.Int   ((int)job.Category),
+					POut.String(job.JobVersion),
+					POut.Int   (job.HoursEstimate),
+					POut.Int   (job.HoursActual),
+					POut.DateT (job.DateTimeEntry),
+					POut.String(job.Description),
+					POut.String(job.Title),
+					POut.Int   ((int)job.JobStatus),
+				});
+			}
+			return table;
 		}
 
 		///<summary>Inserts one Job into the database.  Returns the new priKey.</summary>
@@ -99,28 +165,32 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Status,Owner) VALUES(";
+			command+="ExpertNum,OwnerNum,ParentNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,JobStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(job.JobNum)+",";
 			}
 			command+=
-				     POut.Long  (job.Expert)+","
-				+    POut.Long  (job.ProjectNum)+","
-				+    POut.Int   ((int)job.Priority)+","
-				+    POut.Int   ((int)job.Category)+","
+				     POut.Long  (job.ExpertNum)+","
+				+    POut.Long  (job.OwnerNum)+","
+				+    POut.Long  (job.ParentNum)+","
+				+"'"+POut.String(job.Priority.ToString())+"',"
+				+"'"+POut.String(job.Category.ToString())+"',"
 				+"'"+POut.String(job.JobVersion)+"',"
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(job.Description)+"',"
+				+    DbHelper.ParamChar+"paramDescription,"
 				+"'"+POut.String(job.Title)+"',"
-				+    POut.Int   ((int)job.Status)+","
-				+    POut.Long  (job.Owner)+")";
+				+"'"+POut.String(job.JobStatus.ToString())+"')";
+			if(job.Description==null) {
+				job.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,job.Description);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				job.JobNum=Db.NonQ(command,true);
+				job.JobNum=Db.NonQ(command,true,paramDescription);
 			}
 			return job.JobNum;
 		}
@@ -148,28 +218,32 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobNum,";
 			}
-			command+="Expert,ProjectNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,Status,Owner) VALUES(";
+			command+="ExpertNum,OwnerNum,ParentNum,Priority,Category,JobVersion,HoursEstimate,HoursActual,DateTimeEntry,Description,Title,JobStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(job.JobNum)+",";
 			}
 			command+=
-				     POut.Long  (job.Expert)+","
-				+    POut.Long  (job.ProjectNum)+","
-				+    POut.Int   ((int)job.Priority)+","
-				+    POut.Int   ((int)job.Category)+","
+				     POut.Long  (job.ExpertNum)+","
+				+    POut.Long  (job.OwnerNum)+","
+				+    POut.Long  (job.ParentNum)+","
+				+"'"+POut.String(job.Priority.ToString())+"',"
+				+"'"+POut.String(job.Category.ToString())+"',"
 				+"'"+POut.String(job.JobVersion)+"',"
 				+    POut.Int   (job.HoursEstimate)+","
 				+    POut.Int   (job.HoursActual)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(job.Description)+"',"
+				+    DbHelper.ParamChar+"paramDescription,"
 				+"'"+POut.String(job.Title)+"',"
-				+    POut.Int   ((int)job.Status)+","
-				+    POut.Long  (job.Owner)+")";
+				+"'"+POut.String(job.JobStatus.ToString())+"')";
+			if(job.Description==null) {
+				job.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,job.Description);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				job.JobNum=Db.NonQ(command,true);
+				job.JobNum=Db.NonQ(command,true,paramDescription);
 			}
 			return job.JobNum;
 		}
@@ -177,40 +251,48 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Job in the database.</summary>
 		public static void Update(Job job){
 			string command="UPDATE job SET "
-				+"Expert       =  "+POut.Long  (job.Expert)+", "
-				+"ProjectNum   =  "+POut.Long  (job.ProjectNum)+", "
-				+"Priority     =  "+POut.Int   ((int)job.Priority)+", "
-				+"Category     =  "+POut.Int   ((int)job.Category)+", "
+				+"ExpertNum    =  "+POut.Long  (job.ExpertNum)+", "
+				+"OwnerNum     =  "+POut.Long  (job.OwnerNum)+", "
+				+"ParentNum    =  "+POut.Long  (job.ParentNum)+", "
+				+"Priority     = '"+POut.String(job.Priority.ToString())+"', "
+				+"Category     = '"+POut.String(job.Category.ToString())+"', "
 				+"JobVersion   = '"+POut.String(job.JobVersion)+"', "
 				+"HoursEstimate=  "+POut.Int   (job.HoursEstimate)+", "
 				+"HoursActual  =  "+POut.Int   (job.HoursActual)+", "
 				//DateTimeEntry not allowed to change
-				+"Description  = '"+POut.String(job.Description)+"', "
+				+"Description  =  "+DbHelper.ParamChar+"paramDescription, "
 				+"Title        = '"+POut.String(job.Title)+"', "
-				+"Status       =  "+POut.Int   ((int)job.Status)+", "
-				+"Owner        =  "+POut.Long  (job.Owner)+" "
+				+"JobStatus    = '"+POut.String(job.JobStatus.ToString())+"' "
 				+"WHERE JobNum = "+POut.Long(job.JobNum);
-			Db.NonQ(command);
+			if(job.Description==null) {
+				job.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,job.Description);
+			Db.NonQ(command,paramDescription);
 		}
 
 		///<summary>Updates one Job in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(Job job,Job oldJob){
 			string command="";
-			if(job.Expert != oldJob.Expert) {
+			if(job.ExpertNum != oldJob.ExpertNum) {
 				if(command!=""){ command+=",";}
-				command+="Expert = "+POut.Long(job.Expert)+"";
+				command+="ExpertNum = "+POut.Long(job.ExpertNum)+"";
 			}
-			if(job.ProjectNum != oldJob.ProjectNum) {
+			if(job.OwnerNum != oldJob.OwnerNum) {
 				if(command!=""){ command+=",";}
-				command+="ProjectNum = "+POut.Long(job.ProjectNum)+"";
+				command+="OwnerNum = "+POut.Long(job.OwnerNum)+"";
+			}
+			if(job.ParentNum != oldJob.ParentNum) {
+				if(command!=""){ command+=",";}
+				command+="ParentNum = "+POut.Long(job.ParentNum)+"";
 			}
 			if(job.Priority != oldJob.Priority) {
 				if(command!=""){ command+=",";}
-				command+="Priority = "+POut.Int   ((int)job.Priority)+"";
+				command+="Priority = '"+POut.String(job.Priority.ToString())+"'";
 			}
 			if(job.Category != oldJob.Category) {
 				if(command!=""){ command+=",";}
-				command+="Category = "+POut.Int   ((int)job.Category)+"";
+				command+="Category = '"+POut.String(job.Category.ToString())+"'";
 			}
 			if(job.JobVersion != oldJob.JobVersion) {
 				if(command!=""){ command+=",";}
@@ -227,26 +309,26 @@ namespace OpenDentBusiness.Crud{
 			//DateTimeEntry not allowed to change
 			if(job.Description != oldJob.Description) {
 				if(command!=""){ command+=",";}
-				command+="Description = '"+POut.String(job.Description)+"'";
+				command+="Description = "+DbHelper.ParamChar+"paramDescription";
 			}
 			if(job.Title != oldJob.Title) {
 				if(command!=""){ command+=",";}
 				command+="Title = '"+POut.String(job.Title)+"'";
 			}
-			if(job.Status != oldJob.Status) {
+			if(job.JobStatus != oldJob.JobStatus) {
 				if(command!=""){ command+=",";}
-				command+="Status = "+POut.Int   ((int)job.Status)+"";
-			}
-			if(job.Owner != oldJob.Owner) {
-				if(command!=""){ command+=",";}
-				command+="Owner = "+POut.Long(job.Owner)+"";
+				command+="JobStatus = '"+POut.String(job.JobStatus.ToString())+"'";
 			}
 			if(command==""){
 				return false;
 			}
+			if(job.Description==null) {
+				job.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,job.Description);
 			command="UPDATE job SET "+command
 				+" WHERE JobNum = "+POut.Long(job.JobNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramDescription);
 			return true;
 		}
 

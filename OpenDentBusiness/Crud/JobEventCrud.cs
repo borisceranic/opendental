@@ -48,13 +48,47 @@ namespace OpenDentBusiness.Crud{
 				jobEvent=new JobEvent();
 				jobEvent.JobEventNum  = PIn.Long  (row["JobEventNum"].ToString());
 				jobEvent.JobNum       = PIn.Long  (row["JobNum"].ToString());
-				jobEvent.Owner        = PIn.Long  (row["Owner"].ToString());
+				jobEvent.OwnerNum     = PIn.Long  (row["OwnerNum"].ToString());
 				jobEvent.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
 				jobEvent.Description  = PIn.String(row["Description"].ToString());
-				jobEvent.Status       = (OpenDentBusiness.JobStatus)PIn.Int(row["Status"].ToString());
+				string jobStatus=row["JobStatus"].ToString();
+				if(jobStatus==""){
+					jobEvent.JobStatus  =(JobStat)0;
+				}
+				else try{
+					jobEvent.JobStatus  =(JobStat)Enum.Parse(typeof(JobStat),jobStatus);
+				}
+				catch{
+					jobEvent.JobStatus  =(JobStat)0;
+				}
 				retVal.Add(jobEvent);
 			}
 			return retVal;
+		}
+
+		///<summary>Converts a list of JobEvent into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobEvent> listJobEvents,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="JobEvent";
+			}
+			DataTable table=new DataTable(tableName);
+			table.Columns.Add("JobEventNum");
+			table.Columns.Add("JobNum");
+			table.Columns.Add("OwnerNum");
+			table.Columns.Add("DateTimeEntry");
+			table.Columns.Add("Description");
+			table.Columns.Add("JobStatus");
+			foreach(JobEvent jobEvent in listJobEvents) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobEvent.JobEventNum),
+					POut.Long  (jobEvent.JobNum),
+					POut.Long  (jobEvent.OwnerNum),
+					POut.DateT (jobEvent.DateTimeEntry),
+					POut.String(jobEvent.Description),
+					POut.Int   ((int)jobEvent.JobStatus),
+				});
+			}
+			return table;
 		}
 
 		///<summary>Inserts one JobEvent into the database.  Returns the new priKey.</summary>
@@ -92,21 +126,25 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,Owner,DateTimeEntry,Description,Status) VALUES(";
+			command+="JobNum,OwnerNum,DateTimeEntry,Description,JobStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
 			command+=
 				     POut.Long  (jobEvent.JobNum)+","
-				+    POut.Long  (jobEvent.Owner)+","
+				+    POut.Long  (jobEvent.OwnerNum)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(jobEvent.Description)+"',"
-				+    POut.Int   ((int)jobEvent.Status)+")";
+				+    DbHelper.ParamChar+"paramDescription,"
+				+"'"+POut.String(jobEvent.JobStatus.ToString())+"')";
+			if(jobEvent.Description==null) {
+				jobEvent.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				jobEvent.JobEventNum=Db.NonQ(command,true);
+				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription);
 			}
 			return jobEvent.JobEventNum;
 		}
@@ -134,21 +172,25 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,Owner,DateTimeEntry,Description,Status) VALUES(";
+			command+="JobNum,OwnerNum,DateTimeEntry,Description,JobStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
 			command+=
 				     POut.Long  (jobEvent.JobNum)+","
-				+    POut.Long  (jobEvent.Owner)+","
+				+    POut.Long  (jobEvent.OwnerNum)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(jobEvent.Description)+"',"
-				+    POut.Int   ((int)jobEvent.Status)+")";
+				+    DbHelper.ParamChar+"paramDescription,"
+				+"'"+POut.String(jobEvent.JobStatus.ToString())+"')";
+			if(jobEvent.Description==null) {
+				jobEvent.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				jobEvent.JobEventNum=Db.NonQ(command,true);
+				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription);
 			}
 			return jobEvent.JobEventNum;
 		}
@@ -157,12 +199,16 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(JobEvent jobEvent){
 			string command="UPDATE jobevent SET "
 				+"JobNum       =  "+POut.Long  (jobEvent.JobNum)+", "
-				+"Owner        =  "+POut.Long  (jobEvent.Owner)+", "
+				+"OwnerNum     =  "+POut.Long  (jobEvent.OwnerNum)+", "
 				//DateTimeEntry not allowed to change
-				+"Description  = '"+POut.String(jobEvent.Description)+"', "
-				+"Status       =  "+POut.Int   ((int)jobEvent.Status)+" "
+				+"Description  =  "+DbHelper.ParamChar+"paramDescription, "
+				+"JobStatus    = '"+POut.String(jobEvent.JobStatus.ToString())+"' "
 				+"WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
-			Db.NonQ(command);
+			if(jobEvent.Description==null) {
+				jobEvent.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
+			Db.NonQ(command,paramDescription);
 		}
 
 		///<summary>Updates one JobEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -172,25 +218,29 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="JobNum = "+POut.Long(jobEvent.JobNum)+"";
 			}
-			if(jobEvent.Owner != oldJobEvent.Owner) {
+			if(jobEvent.OwnerNum != oldJobEvent.OwnerNum) {
 				if(command!=""){ command+=",";}
-				command+="Owner = "+POut.Long(jobEvent.Owner)+"";
+				command+="OwnerNum = "+POut.Long(jobEvent.OwnerNum)+"";
 			}
 			//DateTimeEntry not allowed to change
 			if(jobEvent.Description != oldJobEvent.Description) {
 				if(command!=""){ command+=",";}
-				command+="Description = '"+POut.String(jobEvent.Description)+"'";
+				command+="Description = "+DbHelper.ParamChar+"paramDescription";
 			}
-			if(jobEvent.Status != oldJobEvent.Status) {
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
 				if(command!=""){ command+=",";}
-				command+="Status = "+POut.Int   ((int)jobEvent.Status)+"";
+				command+="JobStatus = '"+POut.String(jobEvent.JobStatus.ToString())+"'";
 			}
 			if(command==""){
 				return false;
 			}
+			if(jobEvent.Description==null) {
+				jobEvent.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
 			command="UPDATE jobevent SET "+command
 				+" WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramDescription);
 			return true;
 		}
 
@@ -199,6 +249,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM jobevent "
 				+"WHERE JobEventNum = "+POut.Long(jobEventNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<JobEvent> listNew,List<JobEvent> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<JobEvent> listIns    =new List<JobEvent>();
+			List<JobEvent> listUpdNew =new List<JobEvent>();
+			List<JobEvent> listUpdDB  =new List<JobEvent>();
+			List<JobEvent> listDel    =new List<JobEvent>();
+			listNew.Sort((JobEvent x,JobEvent y) => { return x.JobEventNum.CompareTo(y.JobEventNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((JobEvent x,JobEvent y) => { return x.JobEventNum.CompareTo(y.JobEventNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			JobEvent fieldNew;
+			JobEvent fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.JobEventNum<fieldDB.JobEventNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.JobEventNum>fieldDB.JobEventNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].JobEventNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

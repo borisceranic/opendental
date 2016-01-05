@@ -147,7 +147,6 @@ namespace OpenDental{
 			// butPatPicker
 			// 
 			this.butPatPicker.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPatPicker.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.butPatPicker.Autosize = true;
 			this.butPatPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPatPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;

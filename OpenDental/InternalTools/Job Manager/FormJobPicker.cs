@@ -158,7 +158,7 @@ namespace OpenDental{
 				else {
 					row.Cells.Add("None");
 				}
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(_table.Rows[i]["Status"].ToString())));//JobStatus
+				row.Cells.Add(Enum.GetName(typeof(JobStat),PIn.Long(_table.Rows[i]["Status"].ToString())));//JobStatus
 				row.Cells.Add(_table.Rows[i]["Title"].ToString());//Title
 				gridMain.Rows.Add(row);
 			}

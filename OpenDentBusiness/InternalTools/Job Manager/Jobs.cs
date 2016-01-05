@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -23,7 +24,7 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT * FROM job WHERE ProjectNum = "+POut.Long(projectNum);
 			if(!showFinished) {
-				command+=" AND Status != " + (int)JobStatus.Complete;
+				command+=" AND Status != " + (int)JobStat.Complete;
 			}
 			return Crud.JobCrud.SelectMany(command);
 		}
@@ -55,23 +56,20 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>You must surround with a try-catch when calling this method.  Deletes one job from the database.  
-		///Also deletes all JobLinks associated with the job.  Jobs that have reviews on them may not be deleted and will throw an exception.</summary>
+		///Also deletes all JobLinks, Job Events, and Job Notes associated with the job.  Jobs that have reviews or quotes on them may not be deleted and will throw an exception.</summary>
 		public static void Delete(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
 				return;
 			}
-			List<JobLink> listJobLinks=JobLinks.GetByJobNum(jobNum);
-			for(int i=0;i<listJobLinks.Count;i++) { //look for reviews. Throw an exception if one is found.
-				if(listJobLinks[i].LinkType==JobLinkType.Review) {
-					throw new Exception(Lans.g("Jobs","Not allowed to delete a job that has attached reviews.  Set the status to deleted instead.")); //The exception is caught in FormJobEdit.
-				}
+			if(JobReviews.GetForJob(jobNum).Count>0 || JobQuotes.GetForJob(jobNum).Count>0) {
+				throw new Exception(Lans.g("Jobs","Not allowed to delete a job that has attached reviews or quotes.  Set the status to deleted instead."));//The exception is caught in FormJobEdit.
 			}
-			//if there are any reviews, any code below this will not be executed.
-			string command="DELETE FROM JobLink	WHERE JobNum="+jobNum;
-			Db.NonQ(command);//Delete all jobLinks with matching jobNum from the linker table.
-			command="DELETE FROM JobEvent WHERE JobNum="+jobNum;
-			Db.NonQ(command);//Delete all jobEvents with matching jobNum.
+			//JobReviews.DeleteForJob(jobNum);//do not delete, blocked above
+			//JobQuotes.DeleteForJob(jobNum);//do not delete, blocked above
+			JobLinks.DeleteForJob(jobNum);
+			JobEvents.DeleteForJob(jobNum);
+			JobNotes.DeleteForJob(jobNum);
 			Crud.JobCrud.Delete(jobNum); //Finally, delete the job itself.
 		}
 
@@ -112,26 +110,26 @@ namespace OpenDentBusiness {
 				command+=" AND Category="+category;
 			}
 			if(!showHidden) {
-				command+=" AND Status NOT IN ("+(int)JobStatus.Deleted+","+(int)JobStatus.Complete+","+(int)JobStatus.Rescinded+")";
+				command+=" AND Status NOT IN ("+(int)JobStat.Deleted+","+(int)JobStat.Complete+","+(int)JobStat.Rescinded+")";
 			}
 			return Crud.JobCrud.SelectMany(command);
 		}
 
-		///<summary>Sets a job's status and creates a JobEvent.</summary>
-		public static void SetStatus(Job job,JobStatus jobStatus,long jobOwner) {
+		///<summary>Sets a job's status and creates a JobEvent.  Does not set a new owner of the job.</summary>
+		public static void SetStatus(Job job,JobStat jobStatus,long jobOwnerNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),job,jobStatus);
 			}
-			if(job.IsNew || job.Owner!=jobOwner || job.Status!=jobStatus) {
+			if(job.IsNew || job.OwnerNum!=jobOwnerNum || job.JobStatus!=jobStatus) {
 				JobEvent jobEventCur=new JobEvent();
 				jobEventCur.Description=job.Description;
 				jobEventCur.JobNum=job.JobNum;
-				jobEventCur.Status=job.Status;
-				jobEventCur.Owner=Security.CurUser.UserNum;
+				jobEventCur.JobStatus=job.JobStatus;
+				jobEventCur.OwnerNum=job.OwnerNum;
 				JobEvents.Insert(jobEventCur);
 			}
-			job.Status=jobStatus;
-			job.Owner=jobOwner;
+			job.JobStatus=jobStatus;
+			job.OwnerNum=jobOwnerNum;
 			Jobs.Update(job);
 		}
 
@@ -142,95 +140,20 @@ namespace OpenDentBusiness {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),listExpertNums,listOwnerNums,listJobStatuses);
 			}
 			string command="SELECT * FROM job ";
-			string whereClause="";
+			List<string> listWhereClauses=new List<string>();
 			if(listExpertNums.Count>0) {//There are specific experts
-				whereClause+="Expert IN("+String.Join(",",listExpertNums)+") ";
+				listWhereClauses.Add("Expert IN("+String.Join(",",listExpertNums)+")");
 			}
 			if(listOwnerNums.Count>0) {//There are specific owners
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="Owner IN("+String.Join(",",listOwnerNums)+") ";
+				listWhereClauses.Add("Owner IN("+String.Join(",",listOwnerNums)+")");
 			}
 			if(listJobStatuses.Count>0) {//There are specific statuses
-				if(whereClause!="") {
-					whereClause+="AND ";
-				}
-				whereClause+="Status IN("+String.Join(",",listJobStatuses)+") ";
+				listWhereClauses.Add("Status IN("+String.Join(",",listJobStatuses)+")");
 			}
-			if(whereClause!="") {
-				whereClause="WHERE "+whereClause;
+			if(listWhereClauses.Count>0) {
+				command+="WHERE "+string.Join(" AND ",listWhereClauses);
 			}
-			command+=whereClause;
 			return Db.GetTable(command);
-		}
-
-		///<summary>Returns a data table for the Job Manager control.  This data table will be relevant to the currently logged in user.</summary>
-		public static DataTable GetMyJobsTable(bool showCreated,bool showCompleted) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),showCreated,showCompleted);
-			}
-			string command="SELECT job.JobNum,job.Priority,job.DateTimeEntry,job.Expert,job.Owner,job.Status,job.Category"
-				+",job.Title,job.HoursEstimate,mainevent.Owner EventOwner,jobproject.Title ProjectTitle,COALESCE(quote.JobLinkNum,0) hasQuote,job.JobVersion "
-				+"FROM job "
-				+"LEFT JOIN jobproject ON job.ProjectNum=jobproject.JobProjectNum "
-				+"LEFT JOIN jobevent mainevent ON job.JobNum=mainevent.JobNum "
-					+"AND mainevent.DateTimeEntry=(SELECT MIN(DateTimeEntry) FROM jobevent subevent WHERE subevent.JobEventNum=mainevent.JobEventNum) "
-				+"LEFT JOIN joblink quote ON job.JobNum=quote.JobNum "
-					+"AND quote.LinkType="+(int)JobLinkType.Quote+" "
-				+"WHERE (job.Owner="+POut.Long(Security.CurUser.UserNum)+" "
-					+"OR job.Expert="+POut.Long(Security.CurUser.UserNum);
-			if(showCreated) {
-				command+=" OR mainevent.Owner="+POut.Long(Security.CurUser.UserNum);
-			}
-			command+=") ";
-			if(!showCompleted) {
-				command+="AND job.Status NOT IN("+POut.Int((int)JobStatus.Complete)+","+POut.Int((int)JobStatus.Deleted)+") ";
-			}
-			command+="GROUP BY job.JobNum "
-				+"ORDER BY job.Priority,job.DateTimeEntry";
-			DataTable jobInfoTable=Db.GetTable(command);
-			DataTable returnTable=new DataTable();
-			returnTable.TableName="table";
-			returnTable.Columns.Add("JobNum");
-			returnTable.Columns.Add("priority");
-			returnTable.Columns.Add("date");
-			returnTable.Columns.Add("expert");
-			returnTable.Columns.Add("owner");
-			returnTable.Columns.Add("status");
-			returnTable.Columns.Add("category");
-			returnTable.Columns.Add("Title");
-			returnTable.Columns.Add("Project");
-			returnTable.Columns.Add("originator");
-			returnTable.Columns.Add("EstimatedHours");
-			returnTable.Columns.Add("hasQuote");
-			returnTable.Columns.Add("JobVersion");
-			//Sets the primary key for use in tagging. This must be the JobNum since the grid is tagged with the JobNum in the UI.
-			returnTable.PrimaryKey=new DataColumn[] { returnTable.Columns["JobNum"] };
-			DataRow r;
-			foreach(DataRow dRow in jobInfoTable.Rows) {
-				r=returnTable.NewRow();
-				r["JobNum"]=dRow["JobNum"].ToString();
-				r["priority"]=Enum.GetName(typeof(JobPriority),PIn.Int(dRow["Priority"].ToString()));
-				r["date"]=PIn.DateT(dRow["DateTimeEntry"].ToString()).ToShortDateString();
-				r["expert"]=Userods.GetName(PIn.Long(dRow["Expert"].ToString()));
-				r["owner"]=Userods.GetName(PIn.Long(dRow["Owner"].ToString()));
-				r["status"]=Enum.GetName(typeof(JobStatus),PIn.Int(dRow["Status"].ToString()));
-				r["category"]=Enum.GetName(typeof(JobCategory),PIn.Int(dRow["Category"].ToString()));
-				r["Title"]=dRow["Title"].ToString();
-				r["Project"]=dRow["ProjectTitle"].ToString();
-				r["originator"]=Userods.GetName(PIn.Long(dRow["EventOwner"].ToString()));
-				r["EstimatedHours"]=dRow["HoursEstimate"].ToString();
-				if(dRow["hasQuote"].ToString()=="0") {
-					r["hasQuote"]="";
-				}
-				else {
-					r["hasQuote"]="X";
-				}
-				r["JobVersion"]=dRow["JobVersion"].ToString();
-				returnTable.Rows.Add(r);
-			}
-			return returnTable;
 		}
 
 		public static DataTable GetSummaryForOwner(long ownerNum) {
@@ -239,11 +162,11 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
 				+"WHERE Owner="+POut.Long(ownerNum)+" AND Status IN("
-				+POut.Long((int)JobStatus.Assigned)
-				+","+POut.Long((int)JobStatus.CurrentlyWorkingOn)
-				+","+POut.Long((int)JobStatus.ReadyForReview)
-				+","+POut.Long((int)JobStatus.JobApproved)
-				+","+POut.Long((int)JobStatus.OnHoldExpert)+")";
+				+POut.Long((int)JobStat.Assigned)
+				+","+POut.Long((int)JobStat.CurrentlyWorkingOn)
+				+","+POut.Long((int)JobStat.ReadyForReview)
+				+","+POut.Long((int)JobStat.ReadyToAssign)
+				+","+POut.Long((int)JobStat.OnHoldExpert)+")";
 			return Db.GetTable(command);
 		}
 
@@ -253,13 +176,84 @@ namespace OpenDentBusiness {
 			}
 			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
 				+"WHERE Expert="+POut.Long(expertNum)+" AND Status IN("
-				+POut.Long((int)JobStatus.Assigned)
-				+","+POut.Long((int)JobStatus.CurrentlyWorkingOn)
-				+","+POut.Long((int)JobStatus.ReadyForReview)
-				+","+POut.Long((int)JobStatus.JobApproved)
-				+","+POut.Long((int)JobStatus.OnHoldExpert)+")";
+				+POut.Long((int)JobStat.Assigned)
+				+","+POut.Long((int)JobStat.CurrentlyWorkingOn)
+				+","+POut.Long((int)JobStat.ReadyForReview)
+				+","+POut.Long((int)JobStat.ReadyToAssign)
+				+","+POut.Long((int)JobStat.OnHoldExpert)+")";
 			return Db.GetTable(command);
 		}
 
+		public static List<Job> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM job";
+			return Crud.JobCrud.SelectMany(command);
+		}
+
+		public static bool ValidateJobNum(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			string command="SELECT COUNT(*) FROM job WHERE JobNum="+POut.Long(jobNum);
+			return Db.GetScalar(command)!="0";
+		}
+
+		///<summary>Efficiently queries DB to fill all in memory lists for all jobs passed in.</summary>
+		public static void FillInMemoryLists(List<Job> listJobsAll) {
+			//No need for remoting call here.
+			List<long> jobNums=listJobsAll.Select(x=>x.JobNum).ToList();
+			Dictionary<long,List<JobLink>> listJobLinksAll=JobLinks.GetJobLinksForJobs(jobNums).GroupBy(x=>x.JobNum).ToDictionary(x=>x.Key,x=>x.ToList());
+			Dictionary<long,List<JobNote>> listJobNotesAll=JobNotes.GetJobNotesForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
+			Dictionary<long,List<JobReview>> listJobReviewsAll=JobReviews.GetJobReviewsForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
+			Dictionary<long,List<JobQuote>> listJobQuotesAll=JobQuotes.GetJobQuotesForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
+			Dictionary<long,List<JobEvent>> listJobEventsAll=JobEvents.GetJobEventsForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
+			for(int i=0;i<listJobsAll.Count;i++) {
+				Job job=listJobsAll[i];
+				if(!listJobLinksAll.TryGetValue(job.JobNum,out job.ListJobLinks)) {
+					job.ListJobLinks=new List<JobLink>();//empty list if not found
+				}
+				if(!listJobNotesAll.TryGetValue(job.JobNum,out job.ListJobNotes)) {
+					job.ListJobNotes=new List<JobNote>();//empty list if not found
+				}
+				if(!listJobReviewsAll.TryGetValue(job.JobNum,out job.ListJobReviews)) {
+					job.ListJobReviews=new List<JobReview>();//empty list if not found
+				}
+				if(!listJobQuotesAll.TryGetValue(job.JobNum,out job.ListJobQuotes)) {
+					job.ListJobQuotes=new List<JobQuote>();//empty list if not found
+				}
+				if(!listJobEventsAll.TryGetValue(job.JobNum,out job.ListJobEvents)) {
+					job.ListJobEvents=new List<JobEvent>();//empty list if not found
+				}
+			}
+		}
+
+		///<summary>Must be called after job is filled using Jobs.FillInMemoryLists(). Returns list of user nums associated with this job.
+		/// Currently that is Expert, Owner, and Watchers.</summary>
+		public static List<long> GetUserNums(Job job) {
+			List<long> retVal=new List<long> {
+				job.ExpertNum,
+				job.OwnerNum
+			};
+			job.ListJobLinks.FindAll(x=>x.LinkType==JobLinkType.Watcher).ForEach(x=>retVal.Add(x.FKey));
+			job.ListJobReviews.ForEach(x=>retVal.Add(x.ReviewerNum));
+			return retVal;
+		}
+
+		///<summary>Attempts to find infinite loop when changing job parent. Can be optimized to reduce trips to DB since we have all jobs in memory in the job manager.</summary>
+		public static bool CheckForLoop(long jobNum,long jobNumParent) {
+			List<long> lineage=new List<long>(){jobNum};
+			long parentNumNext=jobNumParent;
+			while(parentNumNext!=0){
+				if(lineage.Contains(parentNumNext)) {
+					return true;//loop found
+				}
+				Job jobNext=Jobs.GetOne(parentNumNext);
+				lineage.Add(parentNumNext);
+				parentNumNext=jobNext.ParentNum;
+			} 
+			return false;//no loop detected
+		}
 	}
 }

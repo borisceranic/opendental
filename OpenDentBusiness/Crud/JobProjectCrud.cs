@@ -57,6 +57,31 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
+		///<summary>Converts a list of JobProject into a DataTable.</summary>
+		public static DataTable ListToTable(List<JobProject> listJobProjects,string tableName="") {
+			if(string.IsNullOrEmpty(tableName)) {
+				tableName="JobProject";
+			}
+			DataTable table=new DataTable(tableName);
+			table.Columns.Add("JobProjectNum");
+			table.Columns.Add("RootProjectNum");
+			table.Columns.Add("ParentProjectNum");
+			table.Columns.Add("Title");
+			table.Columns.Add("Description");
+			table.Columns.Add("ProjectStatus");
+			foreach(JobProject jobProject in listJobProjects) {
+				table.Rows.Add(new object[] {
+					POut.Long  (jobProject.JobProjectNum),
+					POut.Long  (jobProject.RootProjectNum),
+					POut.Long  (jobProject.ParentProjectNum),
+					POut.String(jobProject.Title),
+					POut.String(jobProject.Description),
+					POut.Int   ((int)jobProject.ProjectStatus),
+				});
+			}
+			return table;
+		}
+
 		///<summary>Inserts one JobProject into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobProject jobProject){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {

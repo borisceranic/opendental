@@ -80,6 +80,7 @@ namespace OpenDental{
 			this.textNote.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(98, 63);
 			this.textNote.Name = "textNote";
@@ -119,6 +120,7 @@ namespace OpenDental{
 			// 
 			this.textDateTime.Location = new System.Drawing.Point(98, 11);
 			this.textDateTime.Name = "textDateTime";
+			this.textDateTime.ReadOnly = true;
 			this.textDateTime.Size = new System.Drawing.Size(164, 20);
 			this.textDateTime.TabIndex = 128;
 			// 

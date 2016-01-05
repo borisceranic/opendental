@@ -152,7 +152,7 @@
 			// butColor
 			// 
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butColor.Font = new System.Drawing.Font("Modern No. 20", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.butColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.butColor.Location = new System.Drawing.Point(0, 0);
 			this.butColor.Name = "butColor";
 			this.butColor.Size = new System.Drawing.Size(26, 24);
@@ -346,6 +346,7 @@
 			this.textDescription.Size = new System.Drawing.Size(855, 496);
 			this.textDescription.TabIndex = 169;
 			this.textDescription.Text = "";
+			this.textDescription.TextChanged += new System.EventHandler(this.textDescription_TextChanged);
 			// 
 			// OdtextEditor
 			// 

@@ -38,6 +38,9 @@ namespace OpenDental.UI {
 		public event ODGridClickEventHandler CellLeave=null;
 		[Category("Focus"),Description("Event used when cells are editable.  GotFocus event is passed up from the textbox where the editing is taking place.")]
 		public event ODGridClickEventHandler CellEnter=null;
+		///<summary></summary>
+		[Category("Action"),Description("If HasAddButton is true, this event will fire when the add button is clicked.")]
+		public event EventHandler TitleAddClick=null;
 		private string title;
 		//private Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
 		//private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
@@ -118,6 +121,7 @@ namespace OpenDental.UI {
 		///<summary>Height of field when printing.  Set using CalculateHeights() from EndUpdate()</summary>
 		private int _printHeight;
 		private bool _hasMultilineHeaders;
+		private bool _hasAddButton;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -229,6 +233,16 @@ namespace OpenDental.UI {
 			}
 			set {
 				_hasMultilineHeaders=value;
+			}
+		}
+
+		[Category("Appearance"),Description("The title of the grid which shows across the top.")]
+		//[NotifyParentProperty(true),RefreshProperties(RefreshProperties.Repaint)]
+		public bool HasAddButton {
+			get {return _hasAddButton;}
+			set {
+				_hasAddButton=value;
+				Refresh();
 			}
 		}
 
@@ -1060,6 +1074,23 @@ namespace OpenDental.UI {
 			g.FillRectangle(brushTitleBackground,0,0,Width,titleHeight);
 			Font titleFont=new Font(FontFamily.GenericSansSerif,10,FontStyle.Bold);
 			g.DrawString(title,titleFont,brushTitleText,Width/2-g.MeasureString(title,titleFont).Width/2,2);
+			if(HasAddButton) {
+				using(Pen pDark=new Pen(Color.FromArgb(102,102,122))) 
+				using(Pen pText=new Pen(cTitleText)){
+					int addW=titleHeight;
+					g.DrawLine(Pens.LightGray,new Point(Width-addW-3,0),new Point(Width-addW-2,this.TitleHeight));//divider line
+					g.DrawLine(pDark,new Point(Width-addW-4,0),new Point(Width-addW-3,this.TitleHeight));//divider line
+					g.FillRectangle(brushTitleText,//vertical bar in "+" sign
+						Width-addW/2-4,2,
+						4,addW-4);
+						//Width-addW/2+2,addW-2);
+					g.FillRectangle(brushTitleText,//horizontal bar in "+" sign
+						Width-addW,addW/2-2,
+						addW-4,4);
+					//Width-2,addW/2+2);
+					//g.DrawString("+",titleFont,brushTitleText,Width-addW+4,2);
+				}
+			}
 			if(brushTitleBackground!=null) {
 				brushTitleBackground.Dispose();
 				brushTitleBackground=null;
@@ -1190,6 +1221,12 @@ namespace OpenDental.UI {
 		///<summary></summary>
 		protected override void OnClick(EventArgs e) {
 			base.OnClick(e);
+			if(HasAddButton //only check this if we are showing the "add button"
+				&& TitleAddClick!=null //there is an event handler
+				&& ((MouseEventArgs)e).X>=Width-TitleHeight-5 && ((MouseEventArgs)e).Y<=TitleHeight)
+			{
+				TitleAddClick(this,e);
+			}
 			if(MouseDownRow==-1) {
 				return;//click was in the title or header section
 			}

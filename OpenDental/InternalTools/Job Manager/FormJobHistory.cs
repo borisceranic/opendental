@@ -46,8 +46,8 @@ namespace OpenDental {
 			for(int i=0;i<_jobEvents.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_jobEvents[i].DateTimeEntry.ToShortDateString()+" "+_jobEvents[i].DateTimeEntry.ToShortTimeString());
-				row.Cells.Add(Userods.GetName(_jobEvents[i].Owner));
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobEvents[i].Status));
+				row.Cells.Add(Userods.GetName(_jobEvents[i].OwnerNum));
+				row.Cells.Add(Enum.GetName(typeof(JobStat),(int)_jobEvents[i].JobStatus));
 				string[] arrayDescriptionLines=_jobEvents[i].Description.Split('\n');
 				if(arrayDescriptionLines.Length>0) {
 					if(arrayDescriptionLines[0].Length>=50) {
