@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
 using OpenDentBusiness;
-using System.Linq;
 
 namespace OpenDental {
 	public partial class FormPayConnect:Form {
@@ -255,7 +257,9 @@ namespace OpenDental {
 			return true;
 		}
 
-		private string BuildReceiptString(PayConnectService.creditCardRequest request,PayConnectService.transResponse response) {
+		private string BuildReceiptString(PayConnectService.creditCardRequest request,PayConnectService.transResponse response,
+			PayConnectService.signatureResponse sigResponse) 
+		{
 			string result="";
 			int xmin=0;
 			int xleft=xmin;
@@ -325,7 +329,12 @@ namespace OpenDental {
 			result+=Environment.NewLine+Environment.NewLine+Environment.NewLine;
 			result+="I agree to pay the above total amount according to my card issuer/bank agreement."+Environment.NewLine;
 			result+=Environment.NewLine+Environment.NewLine+Environment.NewLine+Environment.NewLine+Environment.NewLine;
-			result+="Signature X".PadRight(xmax-xleft,'_');
+			if(sigResponse==null || sigResponse.Status==null || sigResponse.Status.code!=0) {
+				result+="Signature X".PadRight(xmax-xleft,'_');
+			}
+			else {
+				result+="Electronically signed";
+			}
 			return result;
 		}
 
@@ -407,8 +416,21 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(_trantype==PayConnectService.transType.SALE && _response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.
-				_receiptStr=BuildReceiptString(_request,_response);
+			PayConnectService.signatureResponse sigResponse=null;
+			if(sigBoxWrapper.GetSigChanged() && !string.IsNullOrEmpty(sigBoxWrapper.GetSignature(""))) {
+				PayConnectService.signatureRequest sigRequest=new PayConnectService.signatureRequest();
+				sigRequest.RefNumber=_response.RefNumber;
+				sigRequest.SignatureType=PayConnectService.signatureType.JPEG;
+				using(Bitmap sigImage=sigBoxWrapper.GetSigImage())
+				using(MemoryStream memStream=new MemoryStream()) {
+					sigImage.Save(memStream,ImageFormat.Jpeg);
+					byte[] imageBytes=memStream.ToArray();
+					sigRequest.SignatureData=Convert.ToBase64String(imageBytes);
+				}
+				sigResponse=Bridges.PayConnect.ProcessSignature(sigRequest,_paymentCur.ClinicNum);
+			}
+			if(_trantype==PayConnectService.transType.SALE && _response.Status.code==0) {//Only print a receipt if transaction is an approved SALE.				
+				_receiptStr=BuildReceiptString(_request,_response,sigResponse);
 				PrintReceipt(_receiptStr);
 			}
 			if(!PrefC.GetBool(PrefName.StoreCCnumbers) && !checkSaveToken.Checked) {//not storing the card number or the token

@@ -50,13 +50,14 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.checkForceDuplicate = new System.Windows.Forms.CheckBox();
+			this.sigBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label1.Location = new System.Drawing.Point(262, 154);
+			this.label1.Location = new System.Drawing.Point(263, 154);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(117, 16);
 			this.label1.TabIndex = 0;
@@ -66,7 +67,7 @@ namespace OpenDental{
 			// textAmount
 			// 
 			this.textAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textAmount.Location = new System.Drawing.Point(262, 171);
+			this.textAmount.Location = new System.Drawing.Point(263, 171);
 			this.textAmount.Name = "textAmount";
 			this.textAmount.Size = new System.Drawing.Size(118, 20);
 			this.textAmount.TabIndex = 6;
@@ -86,7 +87,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textCardNumber.Location = new System.Drawing.Point(12, 85);
 			this.textCardNumber.Name = "textCardNumber";
-			this.textCardNumber.Size = new System.Drawing.Size(227, 20);
+			this.textCardNumber.Size = new System.Drawing.Size(228, 20);
 			this.textCardNumber.TabIndex = 1;
 			this.textCardNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textCardNumber_KeyPress);
 			// 
@@ -121,13 +122,13 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textNameOnCard.Location = new System.Drawing.Point(12, 171);
 			this.textNameOnCard.Name = "textNameOnCard";
-			this.textNameOnCard.Size = new System.Drawing.Size(227, 20);
+			this.textNameOnCard.Size = new System.Drawing.Size(228, 20);
 			this.textNameOnCard.TabIndex = 3;
 			// 
 			// label6
 			// 
 			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label6.Location = new System.Drawing.Point(262, 68);
+			this.label6.Location = new System.Drawing.Point(263, 68);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(117, 16);
 			this.label6.TabIndex = 0;
@@ -137,7 +138,7 @@ namespace OpenDental{
 			// textSecurityCode
 			// 
 			this.textSecurityCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textSecurityCode.Location = new System.Drawing.Point(262, 85);
+			this.textSecurityCode.Location = new System.Drawing.Point(263, 85);
 			this.textSecurityCode.Name = "textSecurityCode";
 			this.textSecurityCode.Size = new System.Drawing.Size(118, 20);
 			this.textSecurityCode.TabIndex = 4;
@@ -145,7 +146,7 @@ namespace OpenDental{
 			// label7
 			// 
 			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label7.Location = new System.Drawing.Point(262, 111);
+			this.label7.Location = new System.Drawing.Point(263, 111);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(117, 16);
 			this.label7.TabIndex = 0;
@@ -155,7 +156,7 @@ namespace OpenDental{
 			// textZipCode
 			// 
 			this.textZipCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textZipCode.Location = new System.Drawing.Point(262, 128);
+			this.textZipCode.Location = new System.Drawing.Point(263, 128);
 			this.textZipCode.Name = "textZipCode";
 			this.textZipCode.Size = new System.Drawing.Size(118, 20);
 			this.textZipCode.TabIndex = 5;
@@ -216,7 +217,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.radioVoid);
 			this.groupBox1.Location = new System.Drawing.Point(12, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(227, 50);
+			this.groupBox1.Size = new System.Drawing.Size(228, 50);
 			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Transaction Type";
@@ -236,7 +237,7 @@ namespace OpenDental{
 			// textRefNumber
 			// 
 			this.textRefNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textRefNumber.Location = new System.Drawing.Point(262, 42);
+			this.textRefNumber.Location = new System.Drawing.Point(263, 42);
 			this.textRefNumber.Name = "textRefNumber";
 			this.textRefNumber.Size = new System.Drawing.Size(118, 20);
 			this.textRefNumber.TabIndex = 7;
@@ -245,7 +246,7 @@ namespace OpenDental{
 			// labelRefNumber
 			// 
 			this.labelRefNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelRefNumber.Location = new System.Drawing.Point(262, 25);
+			this.labelRefNumber.Location = new System.Drawing.Point(263, 25);
 			this.labelRefNumber.Name = "labelRefNumber";
 			this.labelRefNumber.Size = new System.Drawing.Size(117, 16);
 			this.labelRefNumber.TabIndex = 0;
@@ -281,7 +282,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(208, 254);
+			this.butOK.Location = new System.Drawing.Point(209, 358);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 17;
@@ -296,7 +297,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(305, 254);
+			this.butCancel.Location = new System.Drawing.Point(306, 358);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 18;
@@ -312,10 +313,20 @@ namespace OpenDental{
 			this.checkForceDuplicate.TabIndex = 19;
 			this.checkForceDuplicate.Text = "Force Duplicate";
 			// 
+			// sigBoxWrapper
+			// 
+			this.sigBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.sigBoxWrapper.Location = new System.Drawing.Point(12, 262);
+			this.sigBoxWrapper.Name = "sigBoxWrapper";
+			this.sigBoxWrapper.Size = new System.Drawing.Size(369, 81);
+			this.sigBoxWrapper.TabIndex = 19;
+			this.sigBoxWrapper.TabStop = false;
+			// 
 			// FormPayConnect
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(392, 290);
+			this.ClientSize = new System.Drawing.Size(392, 394);
+			this.Controls.Add(this.sigBoxWrapper);
 			this.Controls.Add(this.checkForceDuplicate);
 			this.Controls.Add(this.radioForce);
 			this.Controls.Add(this.labelStoreCCNumWarning);
@@ -377,6 +388,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkSaveToken;
 		private System.Windows.Forms.Label labelStoreCCNumWarning;
 		private System.Windows.Forms.RadioButton radioForce;
+		private UI.SignatureBoxWrapper sigBoxWrapper;
 		private System.Windows.Forms.CheckBox checkForceDuplicate;
 	}
 }

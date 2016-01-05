@@ -77,6 +77,29 @@ namespace OpenDental.Bridges {
 			return null;
 		}
 
+		public static PayConnectService.signatureResponse ProcessSignature(PayConnectService.signatureRequest sigRequest,long clinicNum) {
+			try {
+				Program prog=Programs.GetCur(ProgramName.PayConnect);
+				PayConnectService.Credentials cred=GetCredentials(prog,clinicNum);
+				PayConnectService.MerchantService ms=new PayConnectService.MerchantService();
+#if DEBUG
+				ms.Url="https://prelive2.dentalxchange.com/merchant/MerchantService?wsdl";
+#else
+				ms.Url="https://webservices.dentalxchange.com/merchant/MerchantService?wsdl";
+#endif
+				PayConnectService.signatureResponse response=ms.processSignature(cred,sigRequest);
+				ms.Dispose();
+				if(response.Status.code!=0) {//Error
+					MessageBox.Show(Lan.g("PayConnect","Signature capture failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Pay Connect: \""+response.Status.description+"\"");
+				}
+				return response;
+			}
+			catch(Exception ex) {
+				MessageBox.Show(Lan.g("PayConnect","Signature capture failed")+". \r\n"+Lan.g("PayConnect","Error message from")+" Open Dental: \""+ex.Message+"\"");
+			}
+			return null;
+		}
+
 		public static bool IsValidCardAndExp(string cardNumber,int expYear,int expMonth) {
 			bool isValid=false;
 			try {
