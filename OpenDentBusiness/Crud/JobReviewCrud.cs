@@ -47,10 +47,20 @@ namespace OpenDentBusiness.Crud{
 			foreach(DataRow row in table.Rows) {
 				jobReview=new JobReview();
 				jobReview.JobReviewNum= PIn.Long  (row["JobReviewNum"].ToString());
-				jobReview.Reviewer    = PIn.Long  (row["Reviewer"].ToString());
+				jobReview.JobNum      = PIn.Long  (row["JobNum"].ToString());
+				jobReview.ReviewerNum = PIn.Long  (row["ReviewerNum"].ToString());
 				jobReview.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
 				jobReview.Description = PIn.String(row["Description"].ToString());
-				jobReview.ReviewStatus= (OpenDentBusiness.JobReviewStatus)PIn.Int(row["ReviewStatus"].ToString());
+				string reviewStatus=row["ReviewStatus"].ToString();
+				if(reviewStatus==""){
+					jobReview.ReviewStatus=(JobReviewStatus)0;
+				}
+				else try{
+					jobReview.ReviewStatus=(JobReviewStatus)Enum.Parse(typeof(JobReviewStatus),reviewStatus);
+				}
+				catch{
+					jobReview.ReviewStatus=(JobReviewStatus)0;
+				}
 				retVal.Add(jobReview);
 			}
 			return retVal;
@@ -63,14 +73,16 @@ namespace OpenDentBusiness.Crud{
 			}
 			DataTable table=new DataTable(tableName);
 			table.Columns.Add("JobReviewNum");
-			table.Columns.Add("Reviewer");
+			table.Columns.Add("JobNum");
+			table.Columns.Add("ReviewerNum");
 			table.Columns.Add("DateTStamp");
 			table.Columns.Add("Description");
 			table.Columns.Add("ReviewStatus");
 			foreach(JobReview jobReview in listJobReviews) {
 				table.Rows.Add(new object[] {
 					POut.Long  (jobReview.JobReviewNum),
-					POut.Long  (jobReview.Reviewer),
+					POut.Long  (jobReview.JobNum),
+					POut.Long  (jobReview.ReviewerNum),
 					POut.DateT (jobReview.DateTStamp),
 					POut.String(jobReview.Description),
 					POut.Int   ((int)jobReview.ReviewStatus),
@@ -114,20 +126,25 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobReviewNum,";
 			}
-			command+="Reviewer,Description,ReviewStatus) VALUES(";
+			command+="JobNum,ReviewerNum,Description,ReviewStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobReview.JobReviewNum)+",";
 			}
 			command+=
-				     POut.Long  (jobReview.Reviewer)+","
+				     POut.Long  (jobReview.JobNum)+","
+				+    POut.Long  (jobReview.ReviewerNum)+","
 				//DateTStamp can only be set by MySQL
-				+"'"+POut.String(jobReview.Description)+"',"
-				+    POut.Int   ((int)jobReview.ReviewStatus)+")";
+				+    DbHelper.ParamChar+"paramDescription,"
+				+"'"+POut.String(jobReview.ReviewStatus.ToString())+"')";
+			if(jobReview.Description==null) {
+				jobReview.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobReview.Description);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				jobReview.JobReviewNum=Db.NonQ(command,true);
+				jobReview.JobReviewNum=Db.NonQ(command,true,paramDescription);
 			}
 			return jobReview.JobReviewNum;
 		}
@@ -155,20 +172,25 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobReviewNum,";
 			}
-			command+="Reviewer,Description,ReviewStatus) VALUES(";
+			command+="JobNum,ReviewerNum,Description,ReviewStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobReview.JobReviewNum)+",";
 			}
 			command+=
-				     POut.Long  (jobReview.Reviewer)+","
+				     POut.Long  (jobReview.JobNum)+","
+				+    POut.Long  (jobReview.ReviewerNum)+","
 				//DateTStamp can only be set by MySQL
-				+"'"+POut.String(jobReview.Description)+"',"
-				+    POut.Int   ((int)jobReview.ReviewStatus)+")";
+				+    DbHelper.ParamChar+"paramDescription,"
+				+"'"+POut.String(jobReview.ReviewStatus.ToString())+"')";
+			if(jobReview.Description==null) {
+				jobReview.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobReview.Description);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramDescription);
 			}
 			else {
-				jobReview.JobReviewNum=Db.NonQ(command,true);
+				jobReview.JobReviewNum=Db.NonQ(command,true,paramDescription);
 			}
 			return jobReview.JobReviewNum;
 		}
@@ -176,36 +198,49 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one JobReview in the database.</summary>
 		public static void Update(JobReview jobReview){
 			string command="UPDATE jobreview SET "
-				+"Reviewer    =  "+POut.Long  (jobReview.Reviewer)+", "
+				+"JobNum      =  "+POut.Long  (jobReview.JobNum)+", "
+				+"ReviewerNum =  "+POut.Long  (jobReview.ReviewerNum)+", "
 				//DateTStamp can only be set by MySQL
-				+"Description = '"+POut.String(jobReview.Description)+"', "
-				+"ReviewStatus=  "+POut.Int   ((int)jobReview.ReviewStatus)+" "
+				+"Description =  "+DbHelper.ParamChar+"paramDescription, "
+				+"ReviewStatus= '"+POut.String(jobReview.ReviewStatus.ToString())+"' "
 				+"WHERE JobReviewNum = "+POut.Long(jobReview.JobReviewNum);
-			Db.NonQ(command);
+			if(jobReview.Description==null) {
+				jobReview.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobReview.Description);
+			Db.NonQ(command,paramDescription);
 		}
 
 		///<summary>Updates one JobReview in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
 		public static bool Update(JobReview jobReview,JobReview oldJobReview){
 			string command="";
-			if(jobReview.Reviewer != oldJobReview.Reviewer) {
+			if(jobReview.JobNum != oldJobReview.JobNum) {
 				if(command!=""){ command+=",";}
-				command+="Reviewer = "+POut.Long(jobReview.Reviewer)+"";
+				command+="JobNum = "+POut.Long(jobReview.JobNum)+"";
+			}
+			if(jobReview.ReviewerNum != oldJobReview.ReviewerNum) {
+				if(command!=""){ command+=",";}
+				command+="ReviewerNum = "+POut.Long(jobReview.ReviewerNum)+"";
 			}
 			//DateTStamp can only be set by MySQL
 			if(jobReview.Description != oldJobReview.Description) {
 				if(command!=""){ command+=",";}
-				command+="Description = '"+POut.String(jobReview.Description)+"'";
+				command+="Description = "+DbHelper.ParamChar+"paramDescription";
 			}
 			if(jobReview.ReviewStatus != oldJobReview.ReviewStatus) {
 				if(command!=""){ command+=",";}
-				command+="ReviewStatus = "+POut.Int   ((int)jobReview.ReviewStatus)+"";
+				command+="ReviewStatus = '"+POut.String(jobReview.ReviewStatus.ToString())+"'";
 			}
 			if(command==""){
 				return false;
 			}
+			if(jobReview.Description==null) {
+				jobReview.Description="";
+			}
+			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobReview.Description);
 			command="UPDATE jobreview SET "+command
 				+" WHERE JobReviewNum = "+POut.Long(jobReview.JobReviewNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramDescription);
 			return true;
 		}
 
@@ -214,6 +249,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM jobreview "
 				+"WHERE JobReviewNum = "+POut.Long(jobReviewNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<JobReview> listNew,List<JobReview> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<JobReview> listIns    =new List<JobReview>();
+			List<JobReview> listUpdNew =new List<JobReview>();
+			List<JobReview> listUpdDB  =new List<JobReview>();
+			List<JobReview> listDel    =new List<JobReview>();
+			listNew.Sort((JobReview x,JobReview y) => { return x.JobReviewNum.CompareTo(y.JobReviewNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((JobReview x,JobReview y) => { return x.JobReviewNum.CompareTo(y.JobReviewNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			JobReview fieldNew;
+			JobReview fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.JobReviewNum<fieldDB.JobReviewNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.JobReviewNum>fieldDB.JobReviewNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].JobReviewNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

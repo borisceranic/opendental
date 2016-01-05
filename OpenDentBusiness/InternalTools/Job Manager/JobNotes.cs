@@ -50,9 +50,36 @@ namespace OpenDentBusiness{
 			}
 			Crud.JobNoteCrud.Delete(jobNoteNum);
 		}
-		
 
+		public static void DeleteForJob(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
+				return;
+			}
+			string command="DELETE FROM jobnote WHERE JobNum="+POut.Long(jobNum);
+			Db.NonQ(command);
+		}
 
+		///<summary></summary>
+		public static void Sync(List<JobNote> listNotesNew,long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNotesNew,jobNum);
+				return;
+			}
+			List<JobNote> listNotesDB=JobNotes.GetForJob(jobNum);
+			Crud.JobNoteCrud.Sync(listNotesNew,listNotesDB);
+		}
 
+		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, and Tasks.</summary>
+		public static List<JobNote> GetJobNotesForJobs(List<long> jobNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobNote>>(MethodBase.GetCurrentMethod(),jobNums);
+			}
+			if(jobNums==null || jobNums.Count==0) {
+				return new List<JobNote>();
+			}
+			string command="SELECT * FROM jobnote WHERE JobNum IN ("+string.Join(",",jobNums)+")";
+			return Crud.JobNoteCrud.SelectMany(command);
+		}
 	}
 }

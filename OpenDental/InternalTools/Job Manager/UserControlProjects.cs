@@ -146,14 +146,14 @@ namespace OpenDental {
 				gridMain.Rows.Add(row);
 			}
 			for(int i=0;i<_listJobs.Count;i++) {
-				if(_listJobs[i].Status==JobStatus.Complete && !checkShowFinished.Checked) {
+				if(_listJobs[i].JobStatus==JobStat.Complete && !checkShowFinished.Checked) {
 					continue;
 				}
 				row=new ODGridRow();
 				imageIdx=-1;
 				row.Cells.Add(imageIdx.ToString());
 				row.Cells.Add(_listJobs[i].Title);
-				row.Cells.Add(Userods.GetName(_listJobs[i].Owner));
+				row.Cells.Add(Userods.GetName(_listJobs[i].OwnerNum));
 				string[] arrayDescriptionLines=_listJobs[i].Description.Split('\n');
 				row.Tag=_listJobs[i].JobNum;
 				gridMain.Rows.Add(row);
@@ -223,13 +223,16 @@ namespace OpenDental {
 		}
 
 		private void AddJob_Clicked() {
-			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
+			if(JobPermissions.IsAuthorized(JobPerm.Concept)) {
 				long projectNum=0;
 				if(_listJobProjectHistory.Count>0) {
 					projectNum=_listJobProjectHistory[_listJobProjectHistory.Count-1].JobProjectNum;
 				}
 				FormJobEdit FormJPE=new FormJobEdit(0,projectNum);
-				FormJPE.Show();
+				FormJPE.ShowDialog();
+				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
+					FillGrid();
+				}
 			}
 		}
 
@@ -240,7 +243,10 @@ namespace OpenDental {
 			if(e.Row>=_listJobProjects.Count) {
 				Job cur=_listJobs[e.Row-_listJobProjects.Count];
 				FormJobEdit FormJPE=new FormJobEdit(cur.JobNum);
-				FormJPE.Show();
+				FormJPE.ShowDialog();
+				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
+					FillGrid();
+				}
 			}
 		}
 
@@ -294,7 +300,7 @@ namespace OpenDental {
 					return;
 				}
 				Job jobCur=_listJobs[_clickedIdx-_listJobProjects.Count];
-				jobCur.Status=JobStatus.Complete;
+				jobCur.JobStatus=JobStat.Complete;
 				try {
 					Jobs.Update(jobCur);
 					DataValid.SetInvalid(InvalidType.Jobs);
@@ -317,7 +323,10 @@ namespace OpenDental {
 			else {
 				Job cur=_listJobs[_clickedIdx-_listJobProjects.Count];
 				FormJobEdit FormJPE=new FormJobEdit(cur.JobNum);
-				FormJPE.Show();
+				FormJPE.ShowDialog();
+				if(FormJPE.DialogResult==DialogResult.OK) {//Since FillGrid calls the DB, we want to avoid unnecessary DB calls.
+					FillGrid();
+				}
 			}
 		}
 
@@ -377,10 +386,7 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		protected override void OnHandleDestroyed(EventArgs e) {
-			base.OnHandleDestroyed(e);
-			JobHandler.JobFired-=ODEvent_Fired;
-		}
+		
 
 		
 

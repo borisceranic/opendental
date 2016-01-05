@@ -6,7 +6,8 @@ using System.Text;
 namespace OpenDentBusiness {
 	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
 	[Serializable]
-	[CrudTable(IsMissingInGeneral=true)]
+	[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
+	//[CrudTable(IsSynchable=true)]
 	public class JobLink:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -15,7 +16,7 @@ namespace OpenDentBusiness {
 		public long JobNum;
 		///<summary>FK to table primary key based on LinkType.</summary>
 		public long FKey;
-		///<summary>Type of table this links to.</summary>
+		///<summary>Type of table this links to and what role the objects on that table are.</summary>
 		public JobLinkType LinkType;
 
 		///<summary></summary>
@@ -31,26 +32,16 @@ namespace OpenDentBusiness {
 		Request,
 		///<summary>2 -</summary>
 		Bug,
-		///<summary>3 -</summary>
+		/////<summary>3 - deprecated</summary>//JobNum FKey added to JobReview table
 		Review,
 		///<summary>4 -</summary>
 		QueryRequest,
-		///<summary>5 -</summary>
-		Quote
+		/////<summary>5 - deprecated</summary>//JobNum FKey added to JobReview table
+		Quote,
+		///<summary>6 -</summary>
+		Watcher
 	}
 
 }
 	
-/*
-					command="DROP TABLE IF EXISTS joblink";
-					Db.NonQ(command);
-					command=@"CREATE TABLE joblink (
-						JobLinkNum bigint NOT NULL auto_increment PRIMARY KEY,
-						JobNum bigint NOT NULL,
-						FKey bigint NOT NULL,
-						LinkType tinyint NOT NULL,
-						INDEX(JobNum),
-						INDEX(FKey)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				*/
+

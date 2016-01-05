@@ -10,8 +10,9 @@ namespace OpenDentBusiness {
 	///It is also used to display the current status of the job and the description. 
 	///These will be created when the Owner or the Status change.</summary>
 	[Serializable]
-	[CrudTable(IsMissingInGeneral=true)]
-	public class JobEvent:TableBase {
+	[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
+	//[CrudTable(IsSynchable=true)]
+	public class JobEvent:TableBase {//JobHistory?
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long JobEventNum;
@@ -19,14 +20,16 @@ namespace OpenDentBusiness {
 		public long JobNum;
 		///<summary>FK to userod.UserNum.  The owner of the job at the time the entry was made.  
 		///Stored for viewing changes made to a job.</summary>
-		public long Owner;
+		public long OwnerNum;
 		///<summary>Date/Time the event was created.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
 		///<summary>Copy of the job description at the time of the event creation.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string Description;
 		///<summary>The status of the referenced job at the time the entry was made.</summary>
-		public JobStatus Status;
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public JobStat JobStatus;
 
 		///<summary></summary>
 		public JobEvent Copy() {
@@ -38,18 +41,3 @@ namespace OpenDentBusiness {
 
 
 
-/*
-					command="DROP TABLE IF EXISTS jobevent";
-					Db.NonQ(command);
-					command=@"CREATE TABLE jobevent (
-						JobEventNum bigint NOT NULL auto_increment PRIMARY KEY,
-						JobNum bigint NOT NULL,
-						Owner bigint NOT NULL,
-						DateTimeEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-						Description varchar(255) NOT NULL,
-						Status tinyint NOT NULL,
-						INDEX(JobNum),
-						INDEX(Owner)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);
-				*/

@@ -9,12 +9,10 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormJobQuoteEdit:Form {
 		private JobQuote _jobQuote;
-		private Patient _patCur;
-		public long JobLinkNum;
 
 		///<summary>Used for existing Reviews. Pass in the jobNum and the jobReviewNum.</summary>
 		public FormJobQuoteEdit(JobQuote jobQuote) {
-			_jobQuote=jobQuote;
+			_jobQuote=jobQuote.Copy();
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -26,24 +24,41 @@ namespace OpenDental {
 		}
 
 		private void FormJobQuoteEdit_Load(object sender,EventArgs e) {
-			if(!JobRoles.IsAuthorized(JobRoleType.Quote,true)) {
+			if(!JobPermissions.IsAuthorized(JobPerm.Quote,true)) {
 				textNote.ReadOnly=true;
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 			}
-			if(_jobQuote.PatNum!=0) {
-				_patCur=Patients.GetPat(_jobQuote.PatNum);
-				textPatient.Text=_patCur.LName+", "+_patCur.FName;
+			if(_jobQuote.PatNum>0) {
+				Patient pat=Patients.GetPat(_jobQuote.PatNum);
+				if(pat!=null) {
+					textPatient.Text=pat.GetNameFL();
+				}
+				else {
+					textPatient.Text="Missing Patient - "+_jobQuote.PatNum;
+				}
 			}
 			textNote.Text=_jobQuote.Note;
 			textAmount.Text=_jobQuote.Amount;
 		}
 
 		private void butPatPicker_Click(object sender,EventArgs e) {
-			FormPatientSelect FormPS=new FormPatientSelect(_patCur);
-			if(FormPS.ShowDialog()==DialogResult.OK) {
-				_patCur=Patients.GetPat(FormPS.SelectedPatNum);
-				textPatient.Text=_patCur.LName+", "+_patCur.FName;
+			FormPatientSelect FormPS=new FormPatientSelect();
+			if(_jobQuote.PatNum!=0) {
+				FormPS.ExplicitPatNums=new List<long> {_jobQuote.PatNum};
+			}
+			FormPS.ShowDialog();
+			if(FormPS.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			Patient pat=Patients.GetPat(FormPS.SelectedPatNum);
+			if(pat!=null) {
+				_jobQuote.PatNum=pat.PatNum;
+				textPatient.Text=pat.GetNameFL();
+			}
+			else {
+				_jobQuote.PatNum=0;
+				textPatient.Text="Missing Patient - "+_jobQuote.PatNum;
 			}
 		}
 
@@ -52,33 +67,15 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the current job quote. Are you sure?")) {
-				JobLinks.Delete(JobLinkNum);
-				JobQuotes.Delete(_jobQuote.JobQuoteNum);
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job quote, delete will not be permanent until changes are saved?")) {
+				_jobQuote=null;
 				DialogResult=DialogResult.OK;
 			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			//if(textAmount.Text=="") {
-			//	MsgBox.Show(this,"Please enter an amount.");//We can put this in if you don't want them to have auto-entered 0.00 on blank.
-			//	return;
-			//}
 			_jobQuote.Note=textNote.Text;
-			if(_patCur!=null) {
-				_jobQuote.PatNum=_patCur.PatNum;
-			}
-			else {
-				_jobQuote.PatNum=0;
-			}
 			_jobQuote.Amount=PIn.Double(textAmount.Text).ToString("F");//I personally think if they enter nothing it'll put in 0.00 for them. Good?
-			if(_jobQuote.IsNew) {
-				JobQuotes.Insert(_jobQuote);
-			}
-			else {
-				JobQuotes.Update(_jobQuote);
-			}
-			Signalods.SetInvalid(InvalidType.Jobs);
 			DialogResult=DialogResult.OK;
 		}
 

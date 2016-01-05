@@ -798,7 +798,7 @@ namespace OpenDental{
 				row.Cells.Add(UserGroups.GetGroup(ListUser[i].UserGroupNum).Description);
 				row.Cells.Add(Employees.GetNameFL(ListUser[i].EmployeeNum));
 				if(PrefC.IsODHQ) {
-					if(JobRoles.GetForUser(ListUser[i].UserNum).Count>0) {
+					if(JobPermissions.GetForUser(ListUser[i].UserNum).Count>0) {
 						row.Cells.Add("X");
 					}
 					else {
@@ -874,7 +874,7 @@ namespace OpenDental{
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Userod user=Userods.GetUser(ListUser[e.Row].UserNum);
 			if(gridMain.Columns[e.Col].Heading=="Job Roles") {
-				FormJobRoles FormJR=new FormJobRoles(user.UserNum);
+				FormJobPermissions FormJR=new FormJobPermissions(user.UserNum);
 				FormJR.ShowDialog();
 				return;
 			}

@@ -38,10 +38,10 @@ namespace OpenDental {
 			JobHandler.JobFired+=ODEvent_Fired;
 			if(jobNum==0) {
 				_job=new Job();
-				_job.ProjectNum=projectNum;
-				_job.Owner=Security.CurUser.UserNum;
-				_job.Priority=JobPriority.Medium;
-				_job.Status=JobStatus.Concept;
+				//_job.ProjectNum=projectNum;
+				//_job.OwnerNum=Security.CurUser.UserNum;
+				//_job.Priority=JobPriority.Medium;
+				//_job.Status=JobStat.Concept;
 				Jobs.Insert(_job);
 				_job.IsNew=true;
 			}
@@ -61,50 +61,50 @@ namespace OpenDental {
 		private void FormJobEdit_Load(object sender,EventArgs e) {
 			_jobOld=_job.Copy();
 			#region Set Mode
-			switch(_job.Status) {
-				case JobStatus.Concept:
-					_editMode=EditMode.Concept;
-					break;
-				case JobStatus.NeedsConceptApproval:
-					_editMode=EditMode.ConceptApproval;
-					break;
-				case JobStatus.ConceptApproved:
-				case JobStatus.CurrentlyWriting:
-					_editMode=EditMode.ExpertDefinition;
-					break;
-				case JobStatus.NeedsJobApproval:
-					_editMode=EditMode.JobApproval;
-					break;
-				case JobStatus.NeedsJobClarification:
-					_editMode=EditMode.JobClarify;
-					break;
-				case JobStatus.JobApproved:
-				case JobStatus.OnHoldExpert:
-				case JobStatus.ReadyToAssign:
-					_editMode=EditMode.AssignToEngineer;
-					break;
-				case JobStatus.Assigned:
-				case JobStatus.CurrentlyWorkingOn:
-				case JobStatus.ReadyForReview:
-				case JobStatus.OnHoldEngineer:
-					_editMode=EditMode.Engineer;
-					break;
-				case JobStatus.ReadyToBeDocumented:
-				case JobStatus.NeedsDocumentationClarification:
-					_editMode=EditMode.Documentation;
-					break;
-				case JobStatus.NotifyCustomer:
-					_editMode=EditMode.NotifyCustomer;
-					break;
-				case JobStatus.Rescinded:
-				case JobStatus.Complete:
-				case JobStatus.Deleted:
-					_editMode=EditMode.Done;
-					break;
-				default:
-					_editMode=EditMode.ReadOnly;
-					break;
-			}
+			//switch(_job.Status) {
+			//	case JobStat.Concept:
+			//		_editMode=EditMode.Concept;
+			//		break;
+			//	case JobStat.NeedsConceptApproval:
+			//		_editMode=EditMode.ConceptApproval;
+			//		break;
+			//	case JobStat.ConceptApproved:
+			//	case JobStat.CurrentlyWriting:
+			//		_editMode=EditMode.ExpertDefinition;
+			//		break;
+			//	case JobStat.NeedsJobApproval:
+			//		_editMode=EditMode.JobApproval;
+			//		break;
+			//	case JobStat.NeedsJobClarification:
+			//		_editMode=EditMode.JobClarify;
+			//		break;
+			//	case JobStat.JobApproved:
+			//	case JobStat.OnHoldExpert:
+			//	case JobStat.ReadyToAssign:
+			//		_editMode=EditMode.AssignToEngineer;
+			//		break;
+			//	case JobStat.Assigned:
+			//	case JobStat.CurrentlyWorkingOn:
+			//	case JobStat.ReadyForReview:
+			//	case JobStat.OnHoldEngineer:
+			//		_editMode=EditMode.Engineer;
+			//		break;
+			//	case JobStat.ReadyToBeDocumented:
+			//	case JobStat.NeedsDocumentationClarification:
+			//		_editMode=EditMode.Documentation;
+			//		break;
+			//	case JobStat.NotifyCustomer:
+			//		_editMode=EditMode.NotifyCustomer;
+			//		break;
+			//	case JobStat.Rescinded:
+			//	case JobStat.Complete:
+			//	case JobStat.Deleted:
+			//		_editMode=EditMode.Done;
+			//		break;
+			//	default:
+			//		_editMode=EditMode.ReadOnly;
+			//		break;
+			//}
 			#endregion
 			#region Fill Controls
 			_jobNotes=JobNotes.GetForJob(_job.JobNum);
@@ -123,306 +123,306 @@ namespace OpenDental {
 				comboCategory.Items.Add(Lan.g("enumJobType",Enum.GetNames(typeof(JobCategory))[i]));
 			}
 			comboCategory.SelectedIndex=(int)_job.Category;
-			for(int i=0;i<Enum.GetNames(typeof(JobStatus)).Length;i++) {
-				comboStatus.Items.Add(Lan.g("enumJobStatus",Enum.GetNames(typeof(JobStatus))[i]));
-			}
-			comboStatus.SelectedIndex=(int)_job.Status;
-			JobProject project=JobProjects.GetOne(_job.ProjectNum);
-			if(project!=null) {
-				textProject.Text=PIn.String(project.Title); //project
-			}
-			if(!_job.IsNew) { //load Job information. Skip if job is new.
-				Userod expert=Userods.GetUser(_job.Expert);
-				Userod owner=Userods.GetUser(_job.Owner);
-				if(expert!=null) {
-					textExpert.Text=expert.UserName;
-				}
-				if(owner!=null) {
-					textOwner.Text=owner.UserName;
-				}
-				textVersion.Text=_job.JobVersion;	//version
-				textEstHours.Text=_job.HoursEstimate.ToString(); //est hours
-				textActualHours.Text=_job.HoursActual.ToString(); //actual hours
-				textDateEntry.Text=_job.DateTimeEntry.ToShortDateString(); //date entry
-				textTitle.Text=_job.Title.ToString(); //title
-				try {
-					textEditorMain.MainRtf=_job.Description.ToString(); //This is here to convert our old job descriptions to the new RTF descriptions.
-				}
-				catch {
-					textEditorMain.MainText=_job.Description.ToString();
-				}
-				_prevOwner=JobEvents.GetPrevOwner(_job.JobNum);
-				if(_prevOwner!=null) {
-					textPrevOwner.Text=_prevOwner.UserName;
-				}
-			}
+			//for(int i=0;i<Enum.GetNames(typeof(JobStatus)).Length;i++) {
+			//	comboStatus.Items.Add(Lan.g("enumJobStatus",Enum.GetNames(typeof(JobStatus))[i]));
+			//}
+			//comboStatus.SelectedIndex=(int)_job.Status;
+			//JobProject project=JobProjects.GetOne(_job.ProjectNum);
+			//if(project!=null) {
+			//	textProject.Text=PIn.String(project.Title); //project
+			//}
+			//if(!_job.IsNew) { //load Job information. Skip if job is new.
+			//	Userod expert=Userods.GetUser(_job.ExpertNum);
+			//	Userod owner=Userods.GetUser(_job.OwnerNum);
+			//	if(expert!=null) {
+			//		textExpert.Text=expert.UserName;
+			//	}
+			//	if(owner!=null) {
+			//		textOwner.Text=owner.UserName;
+			//	}
+			//	textVersion.Text=_job.JobVersion;	//version
+			//	textEstHours.Text=_job.HoursEstimate.ToString(); //est hours
+			//	textActualHours.Text=_job.HoursActual.ToString(); //actual hours
+			//	textDateEntry.Text=_job.DateTimeEntry.ToShortDateString(); //date entry
+			//	textTitle.Text=_job.Title.ToString(); //title
+			//	try {
+			//		textEditorMain.MainRtf=_job.Description.ToString(); //This is here to convert our old job descriptions to the new RTF descriptions.
+			//	}
+			//	catch {
+			//		textEditorMain.MainText=_job.Description.ToString();
+			//	}
+			//	_prevOwner=JobEvents.GetPrevOwner(_job.JobNum);
+			//	if(_prevOwner!=null) {
+			//		textPrevOwner.Text=_prevOwner.UserName;
+			//	}
+			//}
 			this.Text="Job Edit: "+textProject.Text+" - "+textTitle.Text;
 			#endregion
-			#region Evaluate Permissions
-			if(JobRoles.IsAuthorized(JobRoleType.Override,true)) {
-				butOverride.Visible=true;
-			}
-			//Concept Edit Mode
-			if(_editMode==EditMode.Concept
-				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) 
-			{
-				butAction1.Text="Send For Approval";
-				butAction2.Visible=false;
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butAddReview.Enabled=false;
-				textVersion.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-			}
-			//ConceptApproval Edit Mode
-			else if(_editMode==EditMode.ConceptApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
-			{
-				butAction1.Text="Approve Concept";
-				butAction2.Text="Ask For Clarification";
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butAddReview.Enabled=false;
-				textVersion.ReadOnly=true;
-				comboCategory.Enabled=false;
-				textActualHours.ReadOnly=true;
-			}
-			//ExpertDefinition Edit Mode
-			else if(_editMode==EditMode.ExpertDefinition
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
-			{
-				butAction1.Text="Send For Approval";
-				butAction2.Text="Currently Writing";
-				butAction3.Text="Send For Clarification";
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				butAddReview.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textVersion.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-			}
-			//JobApproval Edit Mode
-			else if(_editMode==EditMode.JobApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				butAction1.Text="Approve Job";
-				butAction2.Text="Assign To Engineer";
-				butAction3.Text="Ask For Clarification";
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				butAddReview.Enabled=false;
-				textVersion.ReadOnly=true;
-				comboCategory.Enabled=false;
-				textActualHours.ReadOnly=true;
-			}
-			//JobClarify Edit Mode
-			else if(_editMode==EditMode.JobClarify
-				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) {
-				string prevOwnerName="Previous Owner";//This should never display, but I set it just in case
-				if(_prevOwner!=null) {
-					prevOwnerName=_prevOwner.UserName;
-				}
-				butAction1.Text="Send Back To "+prevOwnerName;
-				if(_job.Expert==Security.CurUser.UserNum) {
-					butAction2.Text="Change to Edit Mode";
-				}
-				else {
-					butAction2.Visible=false;
-				}
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-				butOK.Enabled=false;
-				butRemove.Enabled=false;
-				butLinkTask.Enabled=false;
-				butLinkBug.Enabled=false;
-				butLinkQuote.Enabled=false;
-				butLinkFeatReq.Enabled=false;
-			}
-			//AssignToEngineer Edit Mode
-			else if(_editMode==EditMode.AssignToEngineer
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
-			{
-				butAction1.Text="Assign To Engineer";
-				butAction2.Text="Put On Hold";
-				butAction3.Text="Ready To Assign";
-				butAction4.Visible=false;
-				if(_job.Expert!=Security.CurUser.UserNum && _job.Status==JobStatus.ReadyToAssign) {
-					textEditorMain.ReadOnly=true;
-					butAction2.Enabled=false;
-				}
-				butProjectPick.Enabled=false;
-				butAddReview.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textVersion.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-			}
-			//AssignToEngineer Edit Mode (Other Engineer)
-			else if(_editMode==EditMode.AssignToEngineer
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert!=Security.CurUser.UserNum 
-				&& _job.Status==JobStatus.ReadyToAssign)
-			{
-				butAction1.Text="Assign To Engineer";
-				butAction2.Visible=false;
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				textEditorMain.ReadOnly=true;
-				butProjectPick.Enabled=false;
-				butAddReview.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textVersion.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-			}
-			//Engineer Edit Mode
-			else if(_editMode==EditMode.Engineer && _job.Owner==Security.CurUser.UserNum) {
-				butAction1.Text="Send To Tech Writer";
-				butAction2.Text="Currently Working On";
-				butAction3.Text="Put On Hold";
-				butAction4.Text="Ready For Review";
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				if(_job.Expert!=Security.CurUser.UserNum) {
-					textTitle.ReadOnly=true;
-					textEstHours.ReadOnly=true;
-					textEditorMain.ReadOnly=true;
-				}
-			}
-			//Engineer Edit Mode by Expert
-			else if(_editMode==EditMode.Engineer && _job.Expert==Security.CurUser.UserNum) {
-				groupActions.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-			}
-			//Documentation Edit Mode
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				butAction1.Text="Send To Customer Relat.";
-				butAction2.Text="Ask For Clarification";
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-			}
-			else if(_editMode==EditMode.Documentation && !JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				butAction1.Text="Send to Tech Writer";
-				butAction2.Visible=false;
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-			}
-			//Notify the Customer mode
-			else if(_editMode==EditMode.NotifyCustomer
-				&& JobRoles.IsAuthorized(JobRoleType.NotifyCustomer,true)) 
-			{
-				butAction1.Text="Mark Complete";
-				butAction2.Visible=false;
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-				butOK.Enabled=false;
-			}
-			//Done Edit Mode
-			else if(_editMode==EditMode.Done && !JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				groupActions.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-				butAddReview.Enabled=false;
-				butAddNote.Enabled=false;
-			}
-			else if(_editMode==EditMode.Done && JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				butAction1.Text="Unlock Job";
-				butAction2.Visible=false;
-				butAction3.Visible=false;
-				butAction4.Visible=false;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddNote.Enabled=false;
-			}
-			//Read Only Mode
-			else {
-				groupActions.Visible=false;
-				_editMode=EditMode.ReadOnly;
-				butProjectPick.Enabled=false;
-				comboCategory.Enabled=false;
-				comboPriority.Enabled=false;
-				textTitle.ReadOnly=true;
-				textEstHours.ReadOnly=true;
-				textEditorMain.ReadOnly=true;
-				textActualHours.ReadOnly=true;
-				textVersion.ReadOnly=true;
-				butAddReview.Enabled=false;
-				butOK.Enabled=false;
-				butRemove.Enabled=false;
-				butLinkTask.Enabled=false;
-				butLinkBug.Enabled=false;
-				butLinkQuote.Enabled=false;
-				butLinkFeatReq.Enabled=false;
-			}
-			if(!_job.IsNew && !JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				butDelete.Enabled=false;
-			}
-			if(_editMode==EditMode.Concept && Security.CurUser.UserNum==JobCur.Owner) {
-				butDelete.Enabled=true;
-			}
-			#endregion
+			//#region Evaluate Permissions
+			//if(JobPermissions.IsAuthorized(JobPerm.Override,true)) {
+			//	butOverride.Visible=true;
+			//}
+			////Concept Edit Mode
+			//if(_editMode==EditMode.Concept
+			//	&& JobPermissions.IsAuthorized(JobPerm.Concept,true)) 
+			//{
+			//	butAction1.Text="Send For Approval";
+			//	butAction2.Visible=false;
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butAddReview.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////ConceptApproval Edit Mode
+			//else if(_editMode==EditMode.ConceptApproval
+			//	&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) 
+			//{
+			//	butAction1.Text="Approve Concept";
+			//	butAction2.Text="Ask For Clarification";
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butAddReview.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	comboCategory.Enabled=false;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////ExpertDefinition Edit Mode
+			//else if(_editMode==EditMode.ExpertDefinition
+			//	&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+			//	&& _job.ExpertNum==Security.CurUser.UserNum) 
+			//{
+			//	butAction1.Text="Send For Approval";
+			//	butAction2.Text="Currently Writing";
+			//	butAction3.Text="Send For Clarification";
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	butAddReview.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////JobApproval Edit Mode
+			//else if(_editMode==EditMode.JobApproval
+			//	&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+			//	butAction1.Text="Approve Job";
+			//	butAction2.Text="Assign To Engineer";
+			//	butAction3.Text="Ask For Clarification";
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	butAddReview.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	comboCategory.Enabled=false;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////JobClarify Edit Mode
+			//else if(_editMode==EditMode.JobClarify
+			//	&& JobPermissions.IsAuthorized(JobPerm.Concept,true)) {
+			//	string prevOwnerName="Previous Owner";//This should never display, but I set it just in case
+			//	if(_prevOwner!=null) {
+			//		prevOwnerName=_prevOwner.UserName;
+			//	}
+			//	butAction1.Text="Send Back To "+prevOwnerName;
+			//	if(_job.ExpertNum==Security.CurUser.UserNum) {
+			//		butAction2.Text="Change to Edit Mode";
+			//	}
+			//	else {
+			//		butAction2.Visible=false;
+			//	}
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//	butOK.Enabled=false;
+			//	butRemove.Enabled=false;
+			//	butLinkTask.Enabled=false;
+			//	butLinkBug.Enabled=false;
+			//	butLinkQuote.Enabled=false;
+			//	butLinkFeatReq.Enabled=false;
+			//}
+			////AssignToEngineer Edit Mode
+			//else if(_editMode==EditMode.AssignToEngineer
+			//	&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+			//	&& _job.ExpertNum==Security.CurUser.UserNum) 
+			//{
+			//	butAction1.Text="Assign To Engineer";
+			//	butAction2.Text="Put On Hold";
+			//	butAction3.Text="Ready To Assign";
+			//	butAction4.Visible=false;
+			//	if(_job.ExpertNum!=Security.CurUser.UserNum && _job.Status==JobStat.ReadyToAssign) {
+			//		textEditorMain.ReadOnly=true;
+			//		butAction2.Enabled=false;
+			//	}
+			//	butProjectPick.Enabled=false;
+			//	butAddReview.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////AssignToEngineer Edit Mode (Other Engineer)
+			//else if(_editMode==EditMode.AssignToEngineer
+			//	&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+			//	&& _job.ExpertNum!=Security.CurUser.UserNum 
+			//	&& _job.Status==JobStat.ReadyToAssign)
+			//{
+			//	butAction1.Text="Assign To Engineer";
+			//	butAction2.Visible=false;
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	textEditorMain.ReadOnly=true;
+			//	butProjectPick.Enabled=false;
+			//	butAddReview.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textVersion.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//}
+			////Engineer Edit Mode
+			//else if(_editMode==EditMode.Engineer && _job.OwnerNum==Security.CurUser.UserNum) {
+			//	butAction1.Text="Send To Tech Writer";
+			//	butAction2.Text="Currently Working On";
+			//	butAction3.Text="Put On Hold";
+			//	butAction4.Text="Ready For Review";
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	if(_job.ExpertNum!=Security.CurUser.UserNum) {
+			//		textTitle.ReadOnly=true;
+			//		textEstHours.ReadOnly=true;
+			//		textEditorMain.ReadOnly=true;
+			//	}
+			//}
+			////Engineer Edit Mode by Expert
+			//else if(_editMode==EditMode.Engineer && _job.ExpertNum==Security.CurUser.UserNum) {
+			//	groupActions.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//}
+			////Documentation Edit Mode
+			//else if(_editMode==EditMode.Documentation && JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
+			//	butAction1.Text="Send To Customer Relat.";
+			//	butAction2.Text="Ask For Clarification";
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//}
+			//else if(_editMode==EditMode.Documentation && !JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
+			//	butAction1.Text="Send to Tech Writer";
+			//	butAction2.Visible=false;
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//}
+			////Notify the Customer mode
+			//else if(_editMode==EditMode.NotifyCustomer
+			//	&& JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true)) 
+			//{
+			//	butAction1.Text="Mark Complete";
+			//	butAction2.Visible=false;
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//	butOK.Enabled=false;
+			//}
+			////Done Edit Mode
+			//else if(_editMode==EditMode.Done && !JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+			//	groupActions.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//	butAddReview.Enabled=false;
+			//	butAddNote.Enabled=false;
+			//}
+			//else if(_editMode==EditMode.Done && JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+			//	butAction1.Text="Unlock Job";
+			//	butAction2.Visible=false;
+			//	butAction3.Visible=false;
+			//	butAction4.Visible=false;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddNote.Enabled=false;
+			//}
+			////Read Only Mode
+			//else {
+			//	groupActions.Visible=false;
+			//	_editMode=EditMode.ReadOnly;
+			//	butProjectPick.Enabled=false;
+			//	comboCategory.Enabled=false;
+			//	comboPriority.Enabled=false;
+			//	textTitle.ReadOnly=true;
+			//	textEstHours.ReadOnly=true;
+			//	textEditorMain.ReadOnly=true;
+			//	textActualHours.ReadOnly=true;
+			//	textVersion.ReadOnly=true;
+			//	butAddReview.Enabled=false;
+			//	butOK.Enabled=false;
+			//	butRemove.Enabled=false;
+			//	butLinkTask.Enabled=false;
+			//	butLinkBug.Enabled=false;
+			//	butLinkQuote.Enabled=false;
+			//	butLinkFeatReq.Enabled=false;
+			//}
+			//if(!_job.IsNew && !JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+			//	butDelete.Enabled=false;
+			//}
+			//if(_editMode==EditMode.Concept && Security.CurUser.UserNum==JobCur.OwnerNum) {
+			//	butDelete.Enabled=true;
+			//}
+			//#endregion
 		}
 
 		private void butProjectPick_Click(object sender,EventArgs e) {
 			FormJobProjectSelect FormJPS=new FormJobProjectSelect();
-			if(FormJPS.ShowDialog()==DialogResult.OK) {
-				_job.ProjectNum=FormJPS.SelectedProject.JobProjectNum; //project 
-				textProject.Text=FormJPS.SelectedProject.Title; //project 
-			}
+			//if(FormJPS.ShowDialog()==DialogResult.OK) {
+			//	_job.ProjectNum=FormJPS.SelectedProject.JobProjectNum; //project 
+			//	textProject.Text=FormJPS.SelectedProject.Title; //project 
+			//}
 		}
 
 		private void PrepareForAction() {
@@ -452,7 +452,7 @@ namespace OpenDental {
 			List<Userod> listUsersForPicker = new List<Userod>();
 			#region Send For Approval
 			if(_editMode==EditMode.Concept) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Approval,false);
 				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -462,7 +462,7 @@ namespace OpenDental {
 				}
 				long owner = FormUP.SelectedUserNum;
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
-				Jobs.SetStatus(_job,JobStatus.NeedsConceptApproval,owner);
+				Jobs.SetStatus(_job,JobStat.NeedsConceptApproval,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -470,8 +470,8 @@ namespace OpenDental {
 			#endregion
 			#region Approve Concept
 			else if(_editMode==EditMode.ConceptApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+				&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
 				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -481,8 +481,8 @@ namespace OpenDental {
 					return;
 				}
 				long owner = FormUP.SelectedUserNum;
-				_job.Expert=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.ConceptApproved,owner);
+				_job.ExpertNum=FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStat.ConceptApproved,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -490,9 +490,9 @@ namespace OpenDental {
 			#endregion
 			#region Send For Approval (Expert)
 			else if(_editMode==EditMode.ExpertDefinition
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+				&& _job.ExpertNum==Security.CurUser.UserNum) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Approval,false);
 				FormUserPick FormUP = new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -502,7 +502,7 @@ namespace OpenDental {
 				}
 				long owner = FormUP.SelectedUserNum;
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
-				Jobs.SetStatus(_job,JobStatus.NeedsJobApproval,owner);
+				Jobs.SetStatus(_job,JobStat.NeedsJobApproval,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -510,19 +510,19 @@ namespace OpenDental {
 			#endregion
 			#region Approve Job
 			else if(_editMode==EditMode.JobApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+				&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
-				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.SelectedUserNum=_job.ExpertNum;
 				FormUP.Text="Select an Expert";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				_job.Expert=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.JobApproved,owner);
+				_job.ExpertNum=FormUP.SelectedUserNum;
+				Jobs.SetStatus(_job,JobStat.JobApproved,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -530,9 +530,9 @@ namespace OpenDental {
 			#endregion
 			#region Send Back To *USERNAME*
 			else if(_editMode==EditMode.JobClarify
-				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)) 
+				&& JobPermissions.IsAuthorized(JobPerm.Concept,true)) 
 			{
-				Jobs.SetStatus(_job,JobStatus.NeedsJobApproval,_prevOwner.UserNum);
+				Jobs.SetStatus(_job,JobStat.NeedsJobApproval,_prevOwner.UserNum);
 				_hasChanged=true;
 				Close();
 				return;
@@ -540,9 +540,9 @@ namespace OpenDental {
 			#endregion
 			#region Assign To Engineer
 			else if(_editMode==EditMode.AssignToEngineer
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true))
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true))
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Engineer,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Engineer,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -552,7 +552,7 @@ namespace OpenDental {
 				}
 				long owner = FormUP.SelectedUserNum;
 				_job.HoursEstimate=PIn.Int(textEstHours.Text);
-				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
+				Jobs.SetStatus(_job,JobStat.Assigned,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -560,7 +560,7 @@ namespace OpenDental {
 			#endregion
 			#region Send To Tech Writer
 			else if(_editMode==EditMode.Engineer) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Documentation,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Documentation,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -569,14 +569,14 @@ namespace OpenDental {
 					return;
 				}
 				long owner = FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
+				Jobs.SetStatus(_job,JobStat.ReadyToBeDocumented,owner);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
 			#region Send To Customer Relat.
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.NotifyCustomer,false);
+			else if(_editMode==EditMode.Documentation && JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.NotifyCustomer,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -585,15 +585,15 @@ namespace OpenDental {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NotifyCustomer,owner);
+				Jobs.SetStatus(_job,JobStat.NotifyCustomer,owner);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
 			#region Send To Tech Writer
-			else if(_editMode==EditMode.Documentation && !JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Documentation,false);
+			else if(_editMode==EditMode.Documentation && !JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Documentation,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -603,7 +603,7 @@ namespace OpenDental {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.ReadyToBeDocumented,owner);
+				Jobs.SetStatus(_job,JobStat.ReadyToBeDocumented,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -611,15 +611,15 @@ namespace OpenDental {
 			#endregion
 			#region Mark Complete
 			if(_editMode==EditMode.NotifyCustomer
-				&& JobRoles.IsAuthorized(JobRoleType.NotifyCustomer,true)) 
+				&& JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true)) 
 			{
-				Jobs.SetStatus(_job,JobStatus.Complete,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.Complete,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
 			#region Unlock Job
-			else if(_editMode==EditMode.Done && JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
+			else if(_editMode==EditMode.Done && JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
 				MsgBox.Show(this,"Not Yet Implemented");
 				return;
 			}
@@ -631,9 +631,9 @@ namespace OpenDental {
 			List<Userod> listUsersForPicker=new List<Userod>();
 			#region Ask For Clarification
 			if(_editMode==EditMode.ConceptApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
+				&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) 
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Concept,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -645,7 +645,7 @@ namespace OpenDental {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.Concept,owner);
+				Jobs.SetStatus(_job,JobStat.Concept,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -653,10 +653,10 @@ namespace OpenDental {
 			#endregion
 			#region Currently Writing
 			if(_editMode==EditMode.ExpertDefinition
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+				&& _job.ExpertNum==Security.CurUser.UserNum) 
 			{
-				Jobs.SetStatus(_job,JobStatus.CurrentlyWriting,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.CurrentlyWriting,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 				return;
@@ -664,8 +664,8 @@ namespace OpenDental {
 			#endregion
 			#region Assign to Engineer
 			if(_editMode==EditMode.JobApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) {
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Engineer,false);
+				&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Engineer,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -673,9 +673,9 @@ namespace OpenDental {
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				Jobs.SetStatus(_job,JobStatus.JobApproved,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.JobApproved,_job.OwnerNum);
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.Assigned,owner);
+				Jobs.SetStatus(_job,JobStat.Assigned,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -683,10 +683,10 @@ namespace OpenDental {
 			#endregion
 			#region Change to Edit Mode
 			if(_editMode==EditMode.JobClarify
-				&& JobRoles.IsAuthorized(JobRoleType.Concept,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
+				&& JobPermissions.IsAuthorized(JobPerm.Concept,true)
+				&& _job.ExpertNum==Security.CurUser.UserNum) 
 			{
-				Jobs.SetStatus(_job,JobStatus.ConceptApproved,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.ConceptApproved,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 				return;
@@ -694,9 +694,9 @@ namespace OpenDental {
 			#endregion
 			#region Put On Hold
 			if(_editMode==EditMode.AssignToEngineer
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) {
-				Jobs.SetStatus(_job,JobStatus.OnHoldExpert,_job.Owner);
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+				&& _job.ExpertNum==Security.CurUser.UserNum) {
+				Jobs.SetStatus(_job,JobStat.OnHoldExpert,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 				return;
@@ -704,23 +704,23 @@ namespace OpenDental {
 			#endregion
 			#region Currently Working On
 			else if(_editMode==EditMode.Engineer) {
-				Jobs.SetStatus(_job,JobStatus.CurrentlyWorkingOn,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.CurrentlyWorkingOn,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 				return;
 			}
 			#endregion
 			#region Ask For Clarification
-			else if(_editMode==EditMode.Documentation && JobRoles.IsAuthorized(JobRoleType.Documentation,true)) {
+			else if(_editMode==EditMode.Documentation && JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
-				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.SelectedUserNum=_job.ExpertNum;
 				FormUP.Text="Select a User";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NeedsDocumentationClarification,owner);
+				Jobs.SetStatus(_job,JobStat.NeedsDocumentationClarification,owner);
 				_hasChanged=true;
 				Close();
 				return;
@@ -733,10 +733,10 @@ namespace OpenDental {
 			List<Userod> listUsersForPicker=new List<Userod>();
 			#region Send For Clarification
 			if(_editMode==EditMode.ExpertDefinition
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)
-				&& _job.Expert==Security.CurUser.UserNum) 
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)
+				&& _job.ExpertNum==Security.CurUser.UserNum) 
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Approval,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Approval,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
@@ -746,42 +746,42 @@ namespace OpenDental {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NeedsConceptApproval,owner);
+				Jobs.SetStatus(_job,JobStat.NeedsConceptApproval,owner);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
 			#region Ask For Clarification
 			else if(_editMode==EditMode.JobApproval
-				&& JobRoles.IsAuthorized(JobRoleType.Approval,true)) 
+				&& JobPermissions.IsAuthorized(JobPerm.Approval,true)) 
 			{
-				listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Concept,false);
+				listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Concept,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
-				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.SelectedUserNum=_job.ExpertNum;
 				FormUP.Text="Select a User";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
 				long owner=FormUP.SelectedUserNum;
-				Jobs.SetStatus(_job,JobStatus.NeedsJobClarification,owner);
+				Jobs.SetStatus(_job,JobStat.NeedsJobClarification,owner);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
 			#region Ready To Assign
 			else if(_editMode==EditMode.AssignToEngineer
-				&& JobRoles.IsAuthorized(JobRoleType.Writeup,true)) 
+				&& JobPermissions.IsAuthorized(JobPerm.Writeup,true)) 
 			{
-				Jobs.SetStatus(_job,JobStatus.ReadyToAssign,_job.Owner);
+				Jobs.SetStatus(_job,JobStat.ReadyToAssign,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 			}
 			#endregion
 			#region Put On Hold
-			else if(_editMode==EditMode.Engineer&&_job.Owner==Security.CurUser.UserNum) {
-				Jobs.SetStatus(_job,JobStatus.OnHoldEngineer,_job.Owner);
+			else if(_editMode==EditMode.Engineer&&_job.OwnerNum==Security.CurUser.UserNum) {
+				Jobs.SetStatus(_job,JobStat.OnHoldEngineer,_job.OwnerNum);
 				_hasChanged=true;
 				Close();
 			}
@@ -792,26 +792,26 @@ namespace OpenDental {
 			PrepareForAction();
 			List<Userod> listUsersForPicker=new List<Userod>();
 			#region Ready For Review
-			if(_editMode==EditMode.Engineer && _job.Owner==Security.CurUser.UserNum) {
-				listUsersForPicker = Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+			if(_editMode==EditMode.Engineer && _job.OwnerNum==Security.CurUser.UserNum) {
+				listUsersForPicker = Userods.GetUsersByJobRole(JobPerm.Writeup,false);
 				FormUserPick FormUP=new FormUserPick();
 				FormUP.IsSelectionmode=true;
 				FormUP.ListUser=listUsersForPicker;
-				FormUP.SelectedUserNum=_job.Expert;
+				FormUP.SelectedUserNum=_job.ExpertNum;
 				FormUP.Text="Select an Expert";
 				if(FormUP.ShowDialog()!=DialogResult.OK) {
 					return;
 				}
-				FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,FormUP.SelectedUserNum);
-				if(FormJRE.ShowDialog()==DialogResult.OK) {
-					FormJRE.JobReviewCur.IsNew=false;
-					_jobReviews.Add(FormJRE.JobReviewCur);
-					FillGridReviews();
-					Jobs.SetStatus(_job,JobStatus.ReadyForReview,_job.Owner);
-					_hasChanged=true;
-					Close();
-				}
-				return;
+				//FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,FormUP.SelectedUserNum);
+				//if(FormJRE.ShowDialog()==DialogResult.OK) {
+				//	FormJRE.JobReviewCur.IsNew=false;
+				//	_jobReviews.Add(FormJRE.JobReviewCur);
+				//	FillGridReviews();
+				//	Jobs.SetStatus(_job,JobStat.ReadyForReview,_job.OwnerNum);
+				//	_hasChanged=true;
+				//	Close();
+				//}
+				//return;
 			}
 			#endregion
 		}
@@ -824,21 +824,21 @@ namespace OpenDental {
 			if(FormUP.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			_job.Owner=FormUP.SelectedUserNum;
-			textOwner.Text=Userods.GetName(_job.Owner);
+			_job.OwnerNum=FormUP.SelectedUserNum;
+			textOwner.Text=Userods.GetName(_job.OwnerNum);
 			_hasChanged=true;
 		}
 
 		private void butExpertPick_Click(object sender,EventArgs e) {
-			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
 			FormUserPick FormUP=new FormUserPick();
 			FormUP.IsSelectionmode=true;
 			FormUP.ListUser=listUsersForPicker;
 			if(FormUP.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			_job.Expert=FormUP.SelectedUserNum;
-			textExpert.Text=Userods.GetName(_job.Expert);
+			_job.ExpertNum=FormUP.SelectedUserNum;
+			textExpert.Text=Userods.GetName(_job.ExpertNum);
 			_hasChanged=true;
 		}
 
@@ -996,7 +996,7 @@ namespace OpenDental {
 				case JobLinkType.Quote:
 					JobQuote quote=JobQuotes.GetOne(_jobLinks[gridLinks.SelectedIndices[0]].FKey);
 					FormJobQuoteEdit FormJQE=new FormJobQuoteEdit(quote);
-					FormJQE.JobLinkNum=_jobLinks[gridLinks.SelectedIndices[0]].JobLinkNum;//Allows deletion of the link if the quote is deleted.
+					//FormJQE.JobLinkNum=_jobLinks[gridLinks.SelectedIndices[0]].JobLinkNum;//Allows deletion of the link if the quote is deleted.
 					FormJQE.ShowDialog();
 					FillGridLink();
 					break;
@@ -1037,7 +1037,7 @@ namespace OpenDental {
 		}
 
 		private void butLinkQuote_Click(object sender,EventArgs e) {
-			if(!JobRoles.IsAuthorized(JobRoleType.Quote)) {
+			if(!JobPermissions.IsAuthorized(JobPerm.Quote)) {
 				return;
 			}
 			JobQuote jobQuote=new JobQuote();
@@ -1090,8 +1090,8 @@ namespace OpenDental {
 			for(int i=0;i<listjobEvents.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(listjobEvents[i].DateTimeEntry.ToShortDateString()+" "+listjobEvents[i].DateTimeEntry.ToShortTimeString());
-				row.Cells.Add(Userods.GetName(listjobEvents[i].Owner));
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)listjobEvents[i].Status));
+				row.Cells.Add(Userods.GetName(listjobEvents[i].OwnerNum));
+				row.Cells.Add("");//Enum.GetName(typeof(JobStatus),(int)listjobEvents[i].Status));
 				row.Tag=listjobEvents[i].JobEventNum;
 				gridHistory.Rows.Add(row);
 			}
@@ -1131,7 +1131,7 @@ namespace OpenDental {
 			for(int i=0;i<_jobReviews.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_jobReviews[i].DateTStamp.ToShortDateString());
-				row.Cells.Add(Userods.GetName(_jobReviews[i].Reviewer));
+				row.Cells.Add("");//Userods.GetName(_jobReviews[i].Reviewer));
 				row.Cells.Add(Enum.GetName(typeof(JobReviewStatus),(int)_jobReviews[i].ReviewStatus));
 				if(_jobReviews[i].Description.Length>=80) {
 					row.Cells.Add(_jobReviews[i].Description.Substring(0,80)+"...");
@@ -1152,45 +1152,45 @@ namespace OpenDental {
 
 		private void gridReview_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			bool isReadOnly=false;
-			if(_jobReviews[gridReview.GetSelectedIndex()].Reviewer!=Security.CurUser.UserNum) {
-				isReadOnly=true;
-				InputBox FormIB=new InputBox(Userods.GetName(_jobReviews[gridReview.GetSelectedIndex()].Reviewer));
-				FormIB.setTitle("Log-in to Edit Review");
-				FormIB.textResult.PasswordChar='*';
-				if(FormIB.ShowDialog()==DialogResult.OK
-					&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridReview.GetSelectedIndex()].Reviewer).Password)) {
-					isReadOnly=false;
-				}
-				else if(FormIB.DialogResult==DialogResult.Cancel) {
-					//Do not show anything here since they simply want to see the read-only version of the review
-				}
-				else {
-					MsgBox.Show(this,"Log-in Failed");
-				}
-			}
-			FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,_jobReviews[gridReview.GetSelectedIndex()],isReadOnly);
-			if(FormJRE.ShowDialog()==DialogResult.OK) {
-				FillGridReviews();
-			}
+			//if(_jobReviews[gridReview.GetSelectedIndex()].Reviewer!=Security.CurUser.UserNum) {
+			//	isReadOnly=true;
+			//	InputBox FormIB=new InputBox(Userods.GetName(_jobReviews[gridReview.GetSelectedIndex()].Reviewer));
+			//	FormIB.setTitle("Log-in to Edit Review");
+			//	FormIB.textResult.PasswordChar='*';
+			//	if(FormIB.ShowDialog()==DialogResult.OK
+			//		&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridReview.GetSelectedIndex()].Reviewer).Password)) {
+			//		isReadOnly=false;
+			//	}
+			//	else if(FormIB.DialogResult==DialogResult.Cancel) {
+			//		//Do not show anything here since they simply want to see the read-only version of the review
+			//	}
+			//	else {
+			//		MsgBox.Show(this,"Log-in Failed");
+			//	}
+			//}
+			//FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,_jobReviews[gridReview.GetSelectedIndex()],isReadOnly);
+			//if(FormJRE.ShowDialog()==DialogResult.OK) {
+			//	FillGridReviews();
+			//}
 		}
 
 		private void butAddReview_Click(object sender,EventArgs e) {
-			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
-			FormUserPick FormUP=new FormUserPick();
-			FormUP.IsSelectionmode=true;
-			FormUP.ListUser=listUsersForPicker;
-			FormUP.SelectedUserNum=_job.Expert;
-			FormUP.Text="Select an Expert";
-			if(FormUP.ShowDialog()!=DialogResult.OK) {
-				return;
-			}
-			FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,FormUP.SelectedUserNum);
-			if(FormJRE.ShowDialog()==DialogResult.OK) {
-				FormJRE.JobReviewCur.IsNew=false;
-				_jobReviews.Add(FormJRE.JobReviewCur);
-				FillGridReviews();
-				_hasChanged=true;
-			}
+			//List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
+			//FormUserPick FormUP=new FormUserPick();
+			//FormUP.IsSelectionmode=true;
+			//FormUP.ListUser=listUsersForPicker;
+			//FormUP.SelectedUserNum=_job.ExpertNum;
+			//FormUP.Text="Select an Expert";
+			//if(FormUP.ShowDialog()!=DialogResult.OK) {
+			//	return;
+			//}
+			//FormJobReviewEdit FormJRE=new FormJobReviewEdit(_job.JobNum,FormUP.SelectedUserNum);
+			//if(FormJRE.ShowDialog()==DialogResult.OK) {
+			//	FormJRE.JobReviewCur.IsNew=false;
+			//	_jobReviews.Add(FormJRE.JobReviewCur);
+			//	FillGridReviews();
+			//	_hasChanged=true;
+			//}
 		}
 		#endregion
 
@@ -1235,19 +1235,19 @@ namespace OpenDental {
 			_job.Description=textEditorMain.MainRtf; //description
 			_job.HoursEstimate=PIn.Int(textEstHours.Text);
 			_job.HoursActual=PIn.Int(textActualHours.Text);
-			if(_isOverridden) {
-				_job.Status=(JobStatus)comboStatus.SelectedIndex;
-			}
-			Jobs.Update(_job);
-			if(_isOverridden) {
-				JobEvent jobEventCur=new JobEvent();
-				textEditorMain.Text.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
-				jobEventCur.Description=textEditorMain.MainRtf;
-				jobEventCur.JobNum=_job.JobNum;
-				jobEventCur.Status=_job.Status;
-				jobEventCur.Owner=_job.Owner;
-				JobEvents.Insert(jobEventCur);
-			}
+			//if(_isOverridden) {
+			//	_job.Status=(JobStatus)comboStatus.SelectedIndex;
+			//}
+			//Jobs.Update(_job);
+			//if(_isOverridden) {
+			//	JobEvent jobEventCur=new JobEvent();
+			//	textEditorMain.Text.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
+			//	jobEventCur.Description=textEditorMain.MainRtf;
+			//	jobEventCur.JobNum=_job.JobNum;
+			//	jobEventCur.Status=_job.Status;
+			//	jobEventCur.OwnerNum=_job.OwnerNum;
+			//	JobEvents.Insert(jobEventCur);
+			//}
 			Close();
 		}
 

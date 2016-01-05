@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
-	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
+	///<summary>Deprecated. This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
 	[Serializable]
 	[CrudTable(IsMissingInGeneral=true)]
-	public class JobProject:TableBase {
+	public class JobProject:TableBase {//deprecated
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long JobProjectNum;
@@ -41,19 +41,3 @@ namespace OpenDentBusiness {
 
 }
 
-
-/*
-				command="DROP TABLE IF EXISTS jobproject";
-				Db.NonQ(command);
-				command=@"CREATE TABLE jobproject (
-					JobProjectNum bigint NOT NULL auto_increment PRIMARY KEY,
-					RootProjectNum bigint NOT NULL,
-					ParentProjectNum bigint NOT NULL,
-					Title varchar(255) NOT NULL,
-					Description varchar(255) NOT NULL,
-					ProjectStatus tinyint NOT NULL,
-					INDEX(RootProjectNum),
-					INDEX(ParentProjectNum)
-					) DEFAULT CHARSET=utf8";
-				Db.NonQ(command);
-			*/

@@ -13,6 +13,8 @@ namespace OpenDental {
 		///<summary>If this form closes with OK, then this value will be filled.</summary>
 		public long SelectedUserNum;
 		public bool IsSelectionmode;
+		///<summary>If provided, this usernum will be preselected if it is also in the list of available usernums.</summary>
+		public long SuggestedUserNum=0;
 
 		public FormUserPick() {
 			InitializeComponent();
@@ -25,7 +27,7 @@ namespace OpenDental {
 			}
 			for(int i=0;i<ListUser.Count;i++) {
 				listUser.Items.Add(ListUser[i]);
-				if(SelectedUserNum!=0 && ListUser[i].UserNum==SelectedUserNum) {
+				if(ListUser[i].UserNum==SuggestedUserNum) {
 					listUser.SelectedIndex=i;
 				}
 			}

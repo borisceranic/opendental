@@ -4,26 +4,29 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
-	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.</summary>
+	///<summary>This table is not part of the general release.  User would have to add it manually.  All schema changes are done directly on our live database as needed.
+	/// Gives permission if a row exists.</summary>
 	[Serializable]
 	[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
-	public class JobRole:TableBase {
+	//[CrudTable(IsSynchable=true)]
+	public class JobPermission:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
-		public long JobRoleNum;
+		public long JobPermissionNum;
 		///<summary>FK to userod.UserNum.</summary>
 		public long UserNum;
-		///<summary>Enum:JobRoleType The role type that this user has.</summary>
-		public JobRoleType RoleType;
+		///<summary>Enum:JobPermissions The role type that this user has.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public JobPerm JobPermType;
 
 		///<summary></summary>
-		public JobRole Copy() {
-			return (JobRole)this.MemberwiseClone();
+		public JobPermission Copy() {
+			return (JobPermission)this.MemberwiseClone();
 		}
 	}
 
 	///<summary></summary>
-	public enum JobRoleType {
+	public enum JobPerm {
 		///<summary>0 -</summary>
 		Writeup,
 		///<summary>1 -</summary>
@@ -53,12 +56,3 @@ namespace OpenDentBusiness {
 
 }
 
-/*				command="DROP TABLE IF EXISTS jobrole";
-					Db.NonQ(command);
-					command=@"CREATE TABLE jobrole (
-						JobRoleNum bigint NOT NULL auto_increment PRIMARY KEY,
-						UserNum bigint NOT NULL,
-						RoleType tinyint NOT NULL,
-						INDEX(UserNum)
-						) DEFAULT CHARSET=utf8";
-					Db.NonQ(command);				*/

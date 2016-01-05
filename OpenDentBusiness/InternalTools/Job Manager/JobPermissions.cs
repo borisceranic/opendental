@@ -8,13 +8,13 @@ using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class JobRoles{
+	public class JobPermissions{
 
 		///<summary>JobRoles cannot be hidden so there is only one list.</summary>
-		private static List<JobRole> _list;
+		private static List<JobPermission> _list;
 		private static object _lockObj=new object();
 
-		public static List<JobRole> List {
+		public static List<JobPermission> List {
 			//No need to check RemotingRole; no call to db.
 			get {
 				return GetList();
@@ -26,7 +26,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		public static List<JobRole> GetList() {
+		public static List<JobPermission> GetList() {
 			//No need to check RemotingRole; no call to db.
 			bool isListNull=false;
 			lock(_lockObj) {
@@ -37,9 +37,9 @@ namespace OpenDentBusiness{
 			if(isListNull) {
 				RefreshCache();
 			}
-			List<JobRole> jobRoles;
+			List<JobPermission> jobRoles;
 			lock(_lockObj) {
-				jobRoles=new List<JobRole>();
+				jobRoles=new List<JobPermission>();
 				for(int i=0;i<_list.Count;i++) {
 					jobRoles.Add(_list[i].Copy());
 				}
@@ -50,7 +50,7 @@ namespace OpenDentBusiness{
 		///<summary>Refresh all jobroles.  Not actually part of official cache.</summary>
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM jobrole";
+			string command="SELECT * FROM jobpermission";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="JobRole";
 			FillCache(table);
@@ -60,68 +60,68 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			List=Crud.JobRoleCrud.TableToList(table);
+			List=Crud.JobPermissionCrud.TableToList(table);
 		}
 
-		///<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
-		public static bool IsAuthorized(JobRoleType jobRole) {
-			//No need to check RemotingRole; no call to db.
-			return IsAuthorized(jobRole,false);
-		}
+		/////<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
+		//public static bool IsAuthorized(JobRoleType jobRole) {
+		//	//No need to check RemotingRole; no call to db.
+		//	return IsAuthorized(jobRole,false);
+		//}
 
 		///<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
-		public static bool IsAuthorized(JobRoleType jobRole,bool suppressMessage) {
+		public static bool IsAuthorized(JobPerm jobPerm,bool suppressMessage=false) {
 			//No need to check RemotingRole; no call to db.
 			if(Security.CurUser==null) {
 				return false;
 			}
-			if(GetList().Count(x => x.UserNum==Security.CurUser.UserNum && x.RoleType==jobRole) > 0) {
+			if(GetList().Any(x => x.UserNum==Security.CurUser.UserNum && x.JobPermType==jobPerm)) {
 				return true;
 			}
 			if(!suppressMessage) {
-				MessageBox.Show(Lans.g("Security","A user with the SecurityAdmin permission must grant you access for job role")+"\r\n"+jobRole.ToString());
+				MessageBox.Show(Lans.g("Security","A user with the SecurityAdmin permission must grant you access for job role")+"\r\n"+jobPerm.ToString());
 			}
 			return false;
 		}
 
 		///<summary></summary>
-		public static List<JobRole> GetForUser(long userNum){
-			return GetList().Where(x => x.UserNum==userNum).ToList(); 
+		public static List<JobPermission> GetForUser(long userNum){
+			return GetList().FindAll(x => x.UserNum==userNum); 
 		}
 
 		///<summary>Gets one JobRole from the db.</summary>
-		public static JobRole GetOne(long jobRoleNum){
+		public static JobPermission GetOne(long jobRoleNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetObject<JobRole>(MethodBase.GetCurrentMethod(),jobRoleNum);
+				return Meth.GetObject<JobPermission>(MethodBase.GetCurrentMethod(),jobRoleNum);
 			}
-			return Crud.JobRoleCrud.SelectOne(jobRoleNum);
+			return Crud.JobPermissionCrud.SelectOne(jobRoleNum);
 		}
 
 		///<summary></summary>
-		public static long Insert(JobRole jobRole){
+		public static long Insert(JobPermission jobRole){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				jobRole.JobRoleNum=Meth.GetLong(MethodBase.GetCurrentMethod(),jobRole);
-				return jobRole.JobRoleNum;
+				jobRole.JobPermissionNum=Meth.GetLong(MethodBase.GetCurrentMethod(),jobRole);
+				return jobRole.JobPermissionNum;
 			}
-			return Crud.JobRoleCrud.Insert(jobRole);
+			return Crud.JobPermissionCrud.Insert(jobRole);
 		}
 
 		///<summary></summary>
-		public static void Update(JobRole jobRole){
+		public static void Update(JobPermission jobRole){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobRole);
 				return;
 			}
-			Crud.JobRoleCrud.Update(jobRole);
+			Crud.JobPermissionCrud.Update(jobRole);
 		}
 
 		///<summary>Inserts, updates, or deletes the passed in list against rows for the passed in user.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<JobRole> listNew,long userNum) {
+		public static bool Sync(List<JobPermission> listNew,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,userNum);
 			}
-			List<JobRole> listDB=GetForUser(userNum);
-			return Crud.JobRoleCrud.Sync(listNew,listDB);
+			List<JobPermission> listDB=GetForUser(userNum);
+			return Crud.JobPermissionCrud.Sync(listNew,listDB);
 		}
 
 		///<summary></summary>
@@ -130,7 +130,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobRoleNum);
 				return;
 			}
-			Crud.JobRoleCrud.Delete(jobRoleNum);
+			Crud.JobPermissionCrud.Delete(jobRoleNum);
 		}
 
 

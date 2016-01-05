@@ -2,32 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormJobReviewEdit:Form {
-		private long _jobNum;
 		private JobReview _jobReviewCur;
 		private bool _isReadOnly;
 
-		///<summary>Used for new Reviews. Pass in the jobNum.</summary>
-		public FormJobReviewEdit(long jobNum,long userNum):this(jobNum,null,true) {
-			_jobReviewCur=new JobReview();
-			_jobReviewCur.IsNew=true;
-			_jobReviewCur.Reviewer=userNum;
-		}
-
 		///<summary>Used for existing Reviews. Pass in the jobNum and the jobReviewNum.</summary>
-		public FormJobReviewEdit(long jobNum,JobReview jobReview,bool isReadOnly) {
-			_jobNum=jobNum;
-			_jobReviewCur=jobReview;
+		public FormJobReviewEdit(JobReview jobReview,bool isReadOnly) {
+			_jobReviewCur=jobReview.Copy();
 			_isReadOnly=isReadOnly;
 			InitializeComponent();
 			Lan.F(this);
 		}
 
+		///<summary>Can be null if deleted from this form.</summary>
 		public JobReview JobReviewCur {
 			get {
 				return _jobReviewCur;
@@ -35,26 +28,21 @@ namespace OpenDental {
 		}
 
 		private void FormJobReviewEdit_Load(object sender,EventArgs e) {
-			for(int i=0;i<Enum.GetNames(typeof(JobReviewStatus)).Length;i++) {
-				comboStatus.Items.Add(Lan.g("enumJobReviewStatus",Enum.GetNames(typeof(JobReviewStatus))[i]));
-			}
-			textReviewer.Text=Userods.GetName(_jobReviewCur.Reviewer);
+			Enum.GetNames(typeof(JobReviewStatus)).ToList().ForEach(x=>comboStatus.Items.Add(x));
+			comboStatus.SelectedIndex=(int)_jobReviewCur.ReviewStatus;
+			textReviewer.Text=Userods.GetName(_jobReviewCur.ReviewerNum);
 			if(_isReadOnly) {
 				textDescription.ReadOnly=true;
 				comboStatus.Enabled=false;
 				butDelete.Enabled=false;
 			}
-			if(comboStatus.SelectedIndex==(int)JobReviewStatus.Done 
-				|| comboStatus.SelectedIndex==(int)JobReviewStatus.NeedsAdditionalWork) 
-			{
+			if(new[]{JobReviewStatus.Done, JobReviewStatus.NeedsAdditionalWork}.Contains(_jobReviewCur.ReviewStatus)){
 				butDelete.Enabled=false;
 			}
-			comboStatus.SelectedIndex=0;
-			if(!_jobReviewCur.IsNew) { //load Review information. Skip if Review is new.
+			if(!_jobReviewCur.IsNew) {
 				textDateLastEdited.Text=_jobReviewCur.DateTStamp.ToShortDateString();
-				textDescription.Text=_jobReviewCur.Description;
-				comboStatus.SelectedIndex=(int)_jobReviewCur.ReviewStatus;
-			}
+			} 
+			textDescription.Text=_jobReviewCur.Description;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -62,8 +50,7 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"This will delete the current job review. Are you sure?")) {
-				JobReviews.Delete(_jobReviewCur.JobReviewNum);
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job review, delete will not be permanent until changes are saved?")) {
 				_jobReviewCur=null;
 				DialogResult=DialogResult.OK;
 			}
@@ -74,17 +61,7 @@ namespace OpenDental {
 			_jobReviewCur.Description=textDescription.Text;
 			if(_jobReviewCur.IsNew) {
 				_jobReviewCur.DateTStamp=DateTime.Now;
-				long jobReviewNum=JobReviews.Insert(_jobReviewCur);
-				JobLink jobLink=new JobLink();
-				jobLink.JobNum=_jobNum;
-				jobLink.LinkType=JobLinkType.Review;
-				jobLink.FKey=jobReviewNum;
-				JobLinks.Insert(jobLink);
 			}
-			else {
-				JobReviews.Update(_jobReviewCur);
-			}
-			DataValid.SetInvalid(InvalidType.Jobs);
 			DialogResult=DialogResult.OK;
 		}
 

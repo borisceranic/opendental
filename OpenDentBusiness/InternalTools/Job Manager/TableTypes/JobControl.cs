@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
-	///<summary>This table is not part of the general release.  User would have to add it manually. 
+	///<summary>Deprecated. This table is not part of the general release.  User would have to add it manually. 
 	///All schema changes are done directly on our live database as needed.
 	///This table is used to keep track of user preferences in regards to which 'controls' they want to have open within the Job Manager Dashboard
 	///window and their location.</summary>
 	[Serializable]
 	[CrudTable(IsMissingInGeneral=true)]
-	public class JobControl:TableBase {
+	public class JobControl:TableBase {//deprecated
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long JobControlNum;

@@ -13,7 +13,7 @@ using System.Linq;
 namespace OpenDental {
 	public partial class UserControlManage:UserControl {
 		private List<Userod> _listUsers;
-		private List<JobStatus> _listStatuses;
+		private List<JobStat> _listStatuses;
 		private DataTable _tableReviews;
 		private DataTable _tableMyJobs;
 		private List<JobLink> _jobLinks;
@@ -36,8 +36,8 @@ namespace OpenDental {
 				comboBoxMultiOwner.Items.Add(_listUsers[i].UserName);
 			}
 			comboBoxMultiStatus.Items.Add("All");
-			_listStatuses=Enum.GetValues(typeof(JobStatus)).Cast<JobStatus>().ToList();
-			foreach(JobStatus status in _listStatuses) {
+			_listStatuses=Enum.GetValues(typeof(JobStat)).Cast<JobStat>().ToList();
+			foreach(JobStat status in _listStatuses) {
 				comboBoxMultiStatus.Items.Add(status.ToString());
 			}
 			comboBoxMultiExpert.SetSelected(0,true);
@@ -105,7 +105,7 @@ namespace OpenDental {
 				else {
 					row.Cells.Add("");
 				}
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),PIn.Long(table.Rows[i]["Status"].ToString())));//JobStatus
+				row.Cells.Add(Enum.GetName(typeof(JobStat),PIn.Long(table.Rows[i]["Status"].ToString())));//JobStatus
 				row.Cells.Add(PIn.DateT(table.Rows[i]["DateTimeEntry"].ToString()).ToShortDateString());//Date
 				if(table.Rows[i]["Title"].ToString().Length>=50) {
 					row.Cells.Add(table.Rows[i]["Title"].ToString().Substring(0,50)+"...");//Title
@@ -121,7 +121,7 @@ namespace OpenDental {
 
 		#region MyJobs Tab
 		private void FillGridMyJobs() {
-			_tableMyJobs=Jobs.GetMyJobsTable(checkShowCreated.Checked,checkShowCompleted.Checked);
+			//_tableMyJobs=Jobs.GetMyJobsTable(checkShowCreated.Checked,checkShowCompleted.Checked);
 			gridMyJobs.BeginUpdate();
 			gridMyJobs.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("JobNum",50,GridSortingStrategy.AmountParse);
@@ -312,7 +312,7 @@ namespace OpenDental {
 				case JobLinkType.Quote:
 					JobQuote quote=JobQuotes.GetOne(_jobLinks[gridLinks.SelectedIndices[0]].FKey);
 					FormJobQuoteEdit FormJQE=new FormJobQuoteEdit(quote);
-					FormJQE.JobLinkNum=_jobLinks[gridLinks.SelectedIndices[0]].JobLinkNum;//Allows deletion of the link if the quote is deleted.
+					//FormJQE.JobLinkNum=_jobLinks[gridLinks.SelectedIndices[0]].JobLinkNum;//Allows deletion of the link if the quote is deleted.
 					FormJQE.ShowDialog();
 					FillGridLink();
 					break;
@@ -322,10 +322,10 @@ namespace OpenDental {
 		#endregion
 
 		private void butAddJob_Click(object sender,EventArgs e) {
-			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
-				FormJobEdit FormJE=new FormJobEdit();
-				FormJE.Show();
-			}
+			//if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
+			//	FormJobEdit FormJE=new FormJobEdit();
+			//	FormJE.Show();
+			//}
 		}
 
 		private void ODEvent_Fired(ODEventArgs e) {
@@ -345,8 +345,8 @@ namespace OpenDental {
 
 		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
 			Job job=Jobs.GetOne((long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag);
-			DataTable ownerSummaryText=Jobs.GetSummaryForOwner(job.Owner);
-			DataTable expertSummaryText=Jobs.GetSummaryForExpert(job.Expert);
+			DataTable ownerSummaryText=Jobs.GetSummaryForOwner(job.OwnerNum);
+			DataTable expertSummaryText=Jobs.GetSummaryForExpert(job.ExpertNum);
 			labelExpertHrs.Text=PIn.Int(expertSummaryText.Rows[0]["numEstHours"].ToString()).ToString();
 			labelExpertJobs.Text=PIn.Int(expertSummaryText.Rows[0]["numJobs"].ToString()).ToString();
 			labelOwnerHrs.Text=PIn.Int(ownerSummaryText.Rows[0]["numEstHours"].ToString()).ToString();

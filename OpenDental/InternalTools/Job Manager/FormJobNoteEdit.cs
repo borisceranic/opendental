@@ -10,11 +10,9 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormJobNoteEdit:Form {
 		public JobNote _jobNote;
-		///<summary>Only called when DialogResult is OK (for OK button and sometimes delete button).</summary>
-		public delegate void DelegateEditComplete(object sender);
 
 		public FormJobNoteEdit(JobNote jobNote) {
-			_jobNote=jobNote;
+			_jobNote=jobNote.Copy();
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -26,15 +24,9 @@ namespace OpenDental {
 		}
 
 		private void FormJobNoteEdit_Load(object sender,EventArgs e) {
-			if(_jobNote.IsNew) {
-				textDateTime.Text=DateTime.Now.ToShortDateString()+" "+DateTime.Now.ToShortTimeString();
-			}
-			else {
-				textDateTime.Text=_jobNote.DateTimeNote.ToString();
-			}
+			textDateTime.Text=_jobNote.DateTimeNote.ToString();
 			textUser.Text=Userods.GetName(_jobNote.UserNum);
 			textNote.Text=_jobNote.Note;
-			textDateTime.ReadOnly=true;
 			if(Security.CurUser.UserNum!=_jobNote.UserNum) {
 				textNote.ReadOnly=true;
 				butOK.Enabled=false;
@@ -43,38 +35,27 @@ namespace OpenDental {
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete?")) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete note?")) {
 				return;
 			}
 			if(_jobNote.IsNew) {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			JobNotes.Delete(_jobNote.JobNoteNum);
 			_jobNote=null;
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			if(textNote.Text=="") {
-				MsgBox.Show(this,"Please enter a note, or delete this entry.");
+				MsgBox.Show(this,"Cannot save a blank note.");
 				return;
 			}
-			try {
-				_jobNote.DateTimeNote=DateTime.Parse(textDateTime.Text);
-			}
-			catch{
+			if(!DateTime.TryParse(textDateTime.Text,out _jobNote.DateTimeNote)) {
 				MsgBox.Show(this,"Please fix date.");
 				return;
 			}
 			_jobNote.Note=textNote.Text;
-			if(_jobNote.IsNew) {
-				_jobNote.IsNew=false;
-				JobNotes.Insert(_jobNote);
-			}
-			else {
-				JobNotes.Update(_jobNote);
-			}
 			DialogResult=DialogResult.OK;
 		}
 

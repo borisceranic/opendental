@@ -9,6 +9,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
+	///<summary>Deprecated.</summary>
 	public partial class FormJobReviews:Form {
 		private long _jobNum;
 		private List<JobReview> _jobReviews;
@@ -46,7 +47,7 @@ namespace OpenDental {
 			for(int i=0;i<_jobReviews.Count;i++) {
 				row=new ODGridRow();
 				row.Cells.Add(_jobReviews[i].DateTStamp.ToShortDateString());
-				row.Cells.Add(Userods.GetName(_jobReviews[i].Reviewer));
+				row.Cells.Add(Userods.GetName(_jobReviews[i].ReviewerNum));
 				row.Cells.Add(Enum.GetName(typeof(JobReviewStatus),(int)_jobReviews[i].ReviewStatus));
 				if(_jobReviews[i].Description.Length>=80) {
 					row.Cells.Add(_jobReviews[i].Description.Substring(0,80)+"...");
@@ -67,14 +68,14 @@ namespace OpenDental {
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			bool isReadOnly=false;
-			if(_jobReviews[gridMain.GetSelectedIndex()].Reviewer!=Security.CurUser.UserNum) {
+			if(_jobReviews[gridMain.GetSelectedIndex()].ReviewerNum!=Security.CurUser.UserNum) {
 				isReadOnly=true;
-				InputBox FormIB=new InputBox(Userods.GetName(_jobReviews[gridMain.GetSelectedIndex()].Reviewer));
+				InputBox FormIB=new InputBox(Userods.GetName(_jobReviews[gridMain.GetSelectedIndex()].ReviewerNum));
 				FormIB.setTitle("Log-in to Edit Review");
 				FormIB.textResult.PasswordChar='*';
 				FormIB.ShowDialog();
 				if(FormIB.DialogResult==DialogResult.OK
-					&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridMain.GetSelectedIndex()].Reviewer).Password)) 
+					&& Userods.CheckTypedPassword(FormIB.textResult.Text,Userods.GetUser(_jobReviews[gridMain.GetSelectedIndex()].ReviewerNum).Password)) 
 				{
 					isReadOnly=false;
 				}
@@ -85,29 +86,29 @@ namespace OpenDental {
 					MsgBox.Show(this,"Log-in Failed");
 				}
 			}
-			FormJobReviewEdit FormJRE=new FormJobReviewEdit(_jobNum,_jobReviews[gridMain.GetSelectedIndex()],isReadOnly);
-			if(FormJRE.ShowDialog()==DialogResult.OK) {
-				if(FormJRE.JobReviewCur==null) {
-					_jobReviews.RemoveAt(gridMain.GetSelectedIndex());
-				}
-				FillGrid();
-			}
+			//FormJobReviewEdit FormJRE=new FormJobReviewEdit(_jobNum,_jobReviews[gridMain.GetSelectedIndex()],isReadOnly);
+			//if(FormJRE.ShowDialog()==DialogResult.OK) {
+			//	if(FormJRE.JobReviewCur==null) {
+			//		_jobReviews.RemoveAt(gridMain.GetSelectedIndex());
+			//	}
+			//	FillGrid();
+			//}
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobRoleType.Writeup,false);
+			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
 			FormUserPick FormUP=new FormUserPick();
 			FormUP.IsSelectionmode=true;
 			FormUP.ListUser=listUsersForPicker;
 			if(FormUP.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			FormJobReviewEdit FormJRE=new FormJobReviewEdit(_jobNum,FormUP.SelectedUserNum);
-			if(FormJRE.ShowDialog()==DialogResult.OK) {
-				FormJRE.JobReviewCur.IsNew=false;
-				_jobReviews.Add(FormJRE.JobReviewCur);
-				FillGrid();
-			}
+			//FormJobReviewEdit FormJRE=new FormJobReviewEdit(_jobNum,FormUP.SelectedUserNum);
+			//if(FormJRE.ShowDialog()==DialogResult.OK) {
+			//	FormJRE.JobReviewCur.IsNew=false;
+			//	_jobReviews.Add(FormJRE.JobReviewCur);
+			//	FillGrid();
+			//}
 		}
 
 		private void ODEvent_Fired(ODEventArgs e) {

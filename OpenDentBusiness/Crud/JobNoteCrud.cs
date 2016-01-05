@@ -122,12 +122,16 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobNote.JobNum)+","
 				+    POut.Long  (jobNote.UserNum)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(jobNote.Note)+"')";
+				+    DbHelper.ParamChar+"paramNote)";
+			if(jobNote.Note==null) {
+				jobNote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobNote.Note);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramNote);
 			}
 			else {
-				jobNote.JobNoteNum=Db.NonQ(command,true);
+				jobNote.JobNoteNum=Db.NonQ(command,true,paramNote);
 			}
 			return jobNote.JobNoteNum;
 		}
@@ -163,12 +167,16 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (jobNote.JobNum)+","
 				+    POut.Long  (jobNote.UserNum)+","
 				+    DbHelper.Now()+","
-				+"'"+POut.String(jobNote.Note)+"')";
+				+    DbHelper.ParamChar+"paramNote)";
+			if(jobNote.Note==null) {
+				jobNote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobNote.Note);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramNote);
 			}
 			else {
-				jobNote.JobNoteNum=Db.NonQ(command,true);
+				jobNote.JobNoteNum=Db.NonQ(command,true,paramNote);
 			}
 			return jobNote.JobNoteNum;
 		}
@@ -179,9 +187,13 @@ namespace OpenDentBusiness.Crud{
 				+"JobNum      =  "+POut.Long  (jobNote.JobNum)+", "
 				+"UserNum     =  "+POut.Long  (jobNote.UserNum)+", "
 				+"DateTimeNote=  "+POut.DateT (jobNote.DateTimeNote)+", "
-				+"Note        = '"+POut.String(jobNote.Note)+"' "
+				+"Note        =  "+DbHelper.ParamChar+"paramNote "
 				+"WHERE JobNoteNum = "+POut.Long(jobNote.JobNoteNum);
-			Db.NonQ(command);
+			if(jobNote.Note==null) {
+				jobNote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobNote.Note);
+			Db.NonQ(command,paramNote);
 		}
 
 		///<summary>Updates one JobNote in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -201,14 +213,18 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(jobNote.Note != oldJobNote.Note) {
 				if(command!=""){ command+=",";}
-				command+="Note = '"+POut.String(jobNote.Note)+"'";
+				command+="Note = "+DbHelper.ParamChar+"paramNote";
 			}
 			if(command==""){
 				return false;
 			}
+			if(jobNote.Note==null) {
+				jobNote.Note="";
+			}
+			OdSqlParameter paramNote=new OdSqlParameter("paramNote",OdDbType.Text,jobNote.Note);
 			command="UPDATE jobnote SET "+command
 				+" WHERE JobNoteNum = "+POut.Long(jobNote.JobNoteNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramNote);
 			return true;
 		}
 
@@ -217,6 +233,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM jobnote "
 				+"WHERE JobNoteNum = "+POut.Long(jobNoteNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<JobNote> listNew,List<JobNote> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<JobNote> listIns    =new List<JobNote>();
+			List<JobNote> listUpdNew =new List<JobNote>();
+			List<JobNote> listUpdDB  =new List<JobNote>();
+			List<JobNote> listDel    =new List<JobNote>();
+			listNew.Sort((JobNote x,JobNote y) => { return x.JobNoteNum.CompareTo(y.JobNoteNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((JobNote x,JobNote y) => { return x.JobNoteNum.CompareTo(y.JobNoteNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			JobNote fieldNew;
+			JobNote fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.JobNoteNum<fieldDB.JobNoteNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.JobNoteNum>fieldDB.JobNoteNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].JobNoteNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

@@ -6076,7 +6076,7 @@ namespace OpenDental{
 		}
 
 		private void menuItemJobManager_Click(object sender,System.EventArgs e) {
-			FormJobManager FormJM=new FormJobManager();
+			FormJobManager2 FormJM=new FormJobManager2();
 			FormJM.Show();
 		}
 

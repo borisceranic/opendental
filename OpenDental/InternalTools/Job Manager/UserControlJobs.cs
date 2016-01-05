@@ -41,8 +41,8 @@ namespace OpenDental {
 			for(int i=0;i<Enum.GetNames(typeof(JobCategory)).Length;i++) {
 				comboType.Items.Add(Lan.g("enumJobType",Enum.GetNames(typeof(JobCategory))[i]));
 			}
-			for(int i=0;i<Enum.GetNames(typeof(JobStatus)).Length;i++) {
-				comboStatus.Items.Add(Lan.g("enumJobStatus",Enum.GetNames(typeof(JobStatus))[i]));
+			for(int i=0;i<Enum.GetNames(typeof(JobStat)).Length;i++) {
+				comboStatus.Items.Add(Lan.g("enumJobStatus",Enum.GetNames(typeof(JobStat))[i]));
 
 			}
 			comboPriority.SelectedIndex=0; //comboboxes have no filter to start with.
@@ -80,9 +80,9 @@ namespace OpenDental {
 			ODGridRow row;
 			for(int i=0;i<_jobList.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(Userods.GetName(_jobList[i].Owner));
-				row.Cells.Add(Userods.GetName(_jobList[i].Expert));
-				row.Cells.Add(Enum.GetName(typeof(JobStatus),(int)_jobList[i].Status)); //if null returns blank
+				row.Cells.Add(Userods.GetName(_jobList[i].OwnerNum));
+				row.Cells.Add(Userods.GetName(_jobList[i].ExpertNum));
+				row.Cells.Add(Enum.GetName(typeof(JobStat),(int)_jobList[i].JobStatus)); //if null returns blank
 				row.Cells.Add(Enum.GetName(typeof(JobPriority),(int)_jobList[i].Priority)); //if null returns blank
 				row.Cells.Add(_jobList[i].Title);
 				row.Tag=_jobList[i].JobNum;
@@ -188,7 +188,7 @@ namespace OpenDental {
 		}
 		
 		private void butAdd_Click(object sender,EventArgs e) {
-			if(JobRoles.IsAuthorized(JobRoleType.Concept)) {
+			if(JobPermissions.IsAuthorized(JobPerm.Concept)) {
 				FormJobEdit FormJE=new FormJobEdit();
 				FormJE.Show();
 			}

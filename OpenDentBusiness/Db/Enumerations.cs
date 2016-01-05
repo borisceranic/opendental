@@ -290,7 +290,7 @@ namespace OpenDentBusiness{
 		///<summary>62. This is used internally by OD, refreshes the jobs windows in the Job Manager.</summary>
 		Jobs,
 		///<summary>63. This is used internally by OD, refreshes the jobRoles</summary>
-		JobRoles,
+		JobPermission,
 ///<summary>64. Caches the StateAbbrs used for helping prefill state fields and for state validations.</summary>
 		StateAbbrs,
 		///<summary>65</summary>

@@ -17,6 +17,22 @@ namespace OpenDentBusiness{
 			return Crud.JobQuoteCrud.SelectMany(command);
 		}
 
+		public static List<JobQuote> GetForJob(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobQuote>>(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			string command="SELECT * FROM jobquote WHERE JobNum = "+POut.Long(jobNum);
+			return Crud.JobQuoteCrud.SelectMany(command);
+		}
+
+		public static List<JobQuote> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobQuote>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM jobquote ";
+			return Crud.JobQuoteCrud.SelectMany(command);
+		}
+
 		///<summary>Gets one JobQuote from the db.</summary>
 		public static JobQuote GetOne(long jobQuoteNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -52,7 +68,34 @@ namespace OpenDentBusiness{
 			Crud.JobQuoteCrud.Delete(jobQuoteNum);
 		}
 
+		public static void DeleteForJob(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),jobNum);
+				return;
+			}
+			string command="DELETE FROM jobquote WHERE JobNum="+POut.Long(jobNum);
+			Db.NonQ(command);
+		}
 
+		public static void Sync(List<JobQuote> listNew,long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,jobNum);
+				return;
+			}
+			List<JobQuote> listDB=GetForJob(jobNum);
+			Crud.JobQuoteCrud.Sync(listNew,listDB);
+		}
+
+		public static List<JobQuote> GetJobQuotesForJobs(List<long> jobNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobQuote>>(MethodBase.GetCurrentMethod(),jobNums);
+			}
+			if(jobNums==null || jobNums.Count==0) {
+				return new List<JobQuote>();
+			}
+			string command="SELECT * FROM jobquote WHERE JobNum IN ("+string.Join(",",jobNums)+")";
+			return Crud.JobQuoteCrud.SelectMany(command);
+		}
 
 	}
 }

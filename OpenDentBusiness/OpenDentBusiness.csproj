@@ -301,10 +301,10 @@
     <Compile Include="Crud\JobEventCrud.cs" />
     <Compile Include="Crud\JobLinkCrud.cs" />
     <Compile Include="Crud\JobNoteCrud.cs" />
+    <Compile Include="Crud\JobPermissionCrud.cs" />
     <Compile Include="Crud\JobProjectCrud.cs" />
     <Compile Include="Crud\JobQuoteCrud.cs" />
     <Compile Include="Crud\JobReviewCrud.cs" />
-    <Compile Include="Crud\JobRoleCrud.cs" />
     <Compile Include="Crud\JournalEntryCrud.cs" />
     <Compile Include="Crud\LabCaseCrud.cs" />
     <Compile Include="Crud\LaboratoryCrud.cs" />
@@ -427,9 +427,11 @@
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
+    <Compile Include="InternalTools\Job Manager\BugCrud.cs" />
+    <Compile Include="InternalTools\Job Manager\Bugs.cs" />
     <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
-    <Compile Include="InternalTools\Job Manager\JobRoles.cs" />
+    <Compile Include="InternalTools\Job Manager\JobPermissions.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
     <Compile Include="Data Interface\StateAbbrs.cs" />
     <Compile Include="Data Interface\RequiredFieldConditions.cs" />
@@ -548,8 +550,9 @@
     <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
     <Compile Include="InternalTools\Job Manager\JobControls.cs" />
     <Compile Include="InternalTools\Job Manager\JobEvents.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\Bug.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobQuote.cs" />
-    <Compile Include="InternalTools\Job Manager\TableTypes\JobRole.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobPermission.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobControl.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobEvent.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobLink.cs" />
