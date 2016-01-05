@@ -3465,6 +3465,10 @@ namespace OpenDental{
 					continue;//skip any hightlighted subtotal lines
 				}
 				Procedure proc=Procedures.GetOneProc(((ProcTP)gridMain.Rows[gridMain.SelectedIndices[i]].Tag).ProcNumOrig,false);
+				if(Procedures.NoBillIns(proc,ClaimProcList,ClaimCur.PlanNum)) {
+					MsgBox.Show(this,"Not allowed to send procedures to insurance that are marked 'Do not bill to ins'.");
+					return;
+				}
 				listProcsSelected.Add(proc);
 				if(ClaimCur.ProvTreat==0){//makes sure that at least one prov is set
 					ClaimCur.ProvTreat=proc.ProvNum;
