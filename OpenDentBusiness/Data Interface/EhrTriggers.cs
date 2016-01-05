@@ -496,7 +496,7 @@ namespace OpenDentBusiness{
 						//Match all Icd9Codes-------------------------------------------------------------------------------------------------------------------------------------------------
 						string[] arrayIcd9Codes=listEhrTriggers[i].ProblemIcd9List.Split(new string[] {" "},StringSplitOptions.RemoveEmptyEntries);
 						for(int c=0;c<arrayIcd9Codes.Length;c++) {
-							if(MatchedCodes.Contains(arrayIcd9Codes[i])){
+							if(MatchedCodes.Contains(arrayIcd9Codes[c])){
 								continue;//found required code
 							}
 							//required code not found, set allConditionsMet to false and continue to next trigger
@@ -509,7 +509,7 @@ namespace OpenDentBusiness{
 						//Match all Icd10Codes------------------------------------------------------------------------------------------------------------------------------------------------
 						string[] arrayIcd10Codes=listEhrTriggers[i].ProblemIcd10List.Split(new string[] {" "},StringSplitOptions.RemoveEmptyEntries);
 						for(int c=0;c<arrayIcd10Codes.Length;c++) {
-							if(MatchedCodes.Contains(arrayIcd10Codes[i])){
+							if(MatchedCodes.Contains(arrayIcd10Codes[c])){
 								continue;//found required code
 							}
 							//required code not found, set allConditionsMet to false and continue to next trigger
@@ -522,7 +522,7 @@ namespace OpenDentBusiness{
 						//Match all SnomedCodes-----------------------------------------------------------------------------------------------------------------------------------------------
 						string[] arraySnomedCodes=listEhrTriggers[i].ProblemSnomedList.Split(new string[] { " " },StringSplitOptions.RemoveEmptyEntries);
 						for(int c=0;c<arraySnomedCodes.Length;c++) {
-							if(MatchedCodes.Contains(arraySnomedCodes[i])) {
+							if(MatchedCodes.Contains(arraySnomedCodes[c])) {
 								continue;//found required code
 							}
 							//required code not found, set allConditionsMet to false and continue to next trigger
@@ -535,7 +535,7 @@ namespace OpenDentBusiness{
 						//Match all CvxCodes--------------------------------------------------------------------------------------------------------------------------------------------------
 						string[] arrayCvxCodes=listEhrTriggers[i].CvxList.Split(new string[] { " " },StringSplitOptions.RemoveEmptyEntries);
 						for(int c=0;c<arrayCvxCodes.Length;c++) {
-							if(MatchedCodes.Contains(arrayCvxCodes[i])) {
+							if(MatchedCodes.Contains(arrayCvxCodes[c])) {
 								continue;//found required code
 							}
 							//required code not found, set allConditionsMet to false and continue to next trigger
@@ -548,7 +548,7 @@ namespace OpenDentBusiness{
 						//Match all LoincCodes------------------------------------------------------------------------------------------------------------------------------------------------
 						string[] arrayLoincCodes=listEhrTriggers[i].LabLoincList.Split(new string[] { " " },StringSplitOptions.RemoveEmptyEntries);
 						for(int c=0;c<arrayLoincCodes.Length;c++) {
-							if(MatchedCodes.Contains(arrayLoincCodes[i])) {
+							if(MatchedCodes.Contains(arrayLoincCodes[c])) {
 								continue;//found required code
 							}
 							//required code not found, set allConditionsMet to false and continue to next trigger
