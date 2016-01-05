@@ -2498,38 +2498,14 @@ namespace OpenDental{
 
 		private void menuItemArrivedNow_Click(object sender,EventArgs e) {
 			textTimeArrived.Text=DateTime.Now.ToShortTimeString();
-			if(PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0) { //Using AppointmentTimeArrivedTrigger preference
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Arrived'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
-				}
-			}
 		}
 
 		private void menuItemSeatedNow_Click(object sender,EventArgs e) {
 			textTimeSeated.Text=DateTime.Now.ToShortTimeString();
-			if(PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)!=0) { //Using AppointmentTimeSeatedTrigger preference
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'In Room'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
-				}
-			}
 		}
 
 		private void menuItemDismissedNow_Click(object sender,EventArgs e) {
 			textTimeDismissed.Text=DateTime.Now.ToShortTimeString();
-			if(PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)!=0) { //Using AppointmentTimeDismissedTrigger preference
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Dismissed'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
-				}
-			}
 		}
 
 		private void gridFields_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -2623,39 +2599,6 @@ namespace OpenDental{
 				catch{
 					MsgBox.Show(this,"Time Dismissed invalid.");
 					return false;
-				}
-			}
-			if(!String.IsNullOrWhiteSpace(textTimeArrived.Text) //only textTimeArrived has a value
-				&& String.IsNullOrWhiteSpace(textTimeSeated.Text)
-				&& String.IsNullOrWhiteSpace(textTimeDismissed.Text)
-				&& PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)!=0) //Using AppointmentTimeArrivedTrigger preference
-			{
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Arrived'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeArrivedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
-				}
-			}
-			if(!String.IsNullOrWhiteSpace(textTimeSeated.Text) //textTimeSeated has a value but textTimeDismissed does not
-				&& String.IsNullOrWhiteSpace(textTimeDismissed.Text)
-				&& PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)!=0)//Using AppointmentTimeSeatedTrigger preference
-			{
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'In Room'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeSeatedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
-				}
-			}
-			if(!String.IsNullOrWhiteSpace(textTimeDismissed.Text)//textTimeDismissed has a value
-				&& PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)!=0)//Using AppointmentTimeDismissedTrigger preference
-			{
-				for(int i=0;i<comboConfirmed.Items.Count;i++) { //set Confirmed status to 'Done'
-					if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)) { //index matches pref
-						comboConfirmed.SelectedIndex=i;
-						break;
-					}
 				}
 			}
 			//This change was just slightly too risky to make to 6.9, so 7.0 only

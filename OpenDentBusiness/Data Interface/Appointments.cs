@@ -1398,10 +1398,12 @@ namespace OpenDentBusiness{
 				+"AND DateTimeArrived < "+DbHelper.Now()+" "
 				+"AND "+DbHelper.DtimeToDate("DateTimeArrived")+"="+DbHelper.DtimeToDate("AptDateTime")+" ";//prevents people from getting "stuck" in waiting room.
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				command+="AND TO_NUMBER(TO_CHAR(DateTimeSeated,'SSSSS')) = 0 ";
+				command+="AND TO_NUMBER(TO_CHAR(DateTimeSeated,'SSSSS')) = 0 "
+					+"AND TO_NUMBER(TO_CHAR(DateTimeDismissed,'SSSSS')) = 0 ";
 			}
 			else{
-				command+="AND TIME(DateTimeSeated) = 0 ";
+				command+="AND TIME(DateTimeSeated) = 0 "
+					+"AND TIME(DateTimeDismissed) = 0 ";
 			}
 			command+="AND AptStatus IN ("+POut.Int((int)ApptStatus.Complete)+","
 																	 +POut.Int((int)ApptStatus.Scheduled)+","
