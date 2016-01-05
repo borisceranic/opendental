@@ -477,24 +477,30 @@ namespace OpenDental{
 					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop);
 				}
 				long codeNum=ProcedureCodes.GetCodeNum(repeatCharge.ProcCode);
-				//Remove billing dates if there is a procedure for that patient with that code for the same amount in that month and year
-				listBillingDates.RemoveAll(x => 
-					listExistingProcs.Exists(y => 
-						y.PatNum==repeatCharge.PatNum 
-						&& y.CodeNum==codeNum 
-						&& x.Year==y.ProcDate.Year
-						&& x.Month==y.ProcDate.Month
-						&& IsRepeatDateHelper(repeatCharge,x,y.ProcDate)
-						&& y.ProcFee.IsEqual(repeatCharge.ChargeAmt) 
-					)
-				);
-				//Remove the procedure so that if there is another repeat charge with the same ProcCode and ChargeAmt, it will be added in the next iteration
-				listExistingProcs.Remove(listExistingProcs.FirstOrDefault(x =>
-						x.PatNum==repeatCharge.PatNum 
-						&& x.CodeNum==codeNum 
-						&& x.ProcFee.IsEqual(repeatCharge.ChargeAmt)
-						)
-				);
+				//Remove billing dates and procedures if there is a procedure for that patient with that code for the same amount in that month and year
+				//BUG: This ensures the right number of procedures are added with the correct amount but not necessarily the correct repeat charge is used
+				//to generate the procedure, meaning the proc notes can be incorrect.
+				//Example: Repeat Charges A and B create Procedures A and B. B is deleted. Charge tool is run again and another A proc is added. 
+				//==Ryan and Chris understand this.
+				Procedure proc;
+				for(int i=listBillingDates.Count-1;i>=0;i--) {//iterate backwards to remove elements
+					DateTime billingDate=listBillingDates[i];
+					for(int j=listExistingProcs.Count-1;j>=0;j--) {//iterate backwards to remove elements
+						proc=listExistingProcs[j];
+						if(proc.PatNum==repeatCharge.PatNum //match patnum, codenum, fee, year, and month* 
+							&& proc.CodeNum==codeNum          //*(IsRepeatDateHelper uses special logic to determine correct month)
+							&& billingDate.Year==proc.ProcDate.Year
+							&& billingDate.Month==proc.ProcDate.Month
+							&& IsRepeatDateHelper(repeatCharge,billingDate,proc.ProcDate)
+							&& proc.ProcFee.IsEqual(repeatCharge.ChargeAmt)) 
+						{
+							//This is a match to an existing procedure.
+							listBillingDates.RemoveAt(i);//Removing so that a procedure will not get added on this date.
+							listExistingProcs.RemoveAt(j);//Removing so that if there is another repeat charge of the same code, date, and amount, it will be added.
+							break;//Go to the next billing date
+						}
+					}
+				}
 				//If any billing dates have not been filtered out, add a repeating charge on those dates
 				foreach (DateTime billingDate in listBillingDates) {
 					Procedure procAdded=AddRepeatingChargeHelper(repeatCharge, billingDate);
