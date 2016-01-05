@@ -59,7 +59,9 @@ namespace OpenDental.Bridges{
 			iniText+="HOMEPHONE = "+new string(pat.HmPhone.Where(x => char.IsDigit(x)).ToArray())+"\r\n";
 			iniText+="WORKPHONE = "+new string(pat.WkPhone.Where(x => char.IsDigit(x)).ToArray())+"\r\n";
 			iniText+="EMAIL1 = "+Tidy(pat.Email)+"\r\n";
-			File.WriteAllText(iniFile,iniText,Encoding.UTF8);
+			//Chris Bope (Product Manager for Sorodex) said "ANSI" is the preferred encoding.
+			//Code page 1252 is the most commonly used ANSI code page, and we use 1252 in other bridges as well.
+			File.WriteAllText(iniFile,iniText,Encoding.GetEncoding(1252));
 			try {
 				Process.Start(path);
 			}
