@@ -11774,6 +11774,15 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ScreeningsUseSheets','0')";
 					Db.NonQ(command);
 				}
+				//Change the appointment calendar to today's date when changing clinics
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('AppointmentClinicTimeReset','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentClinicTimeReset','0')";
+					Db.NonQ(command);
+				}
 				//Screen Groups need the ability to be set up ahead of time prior to the actual screenings.
 				//Therefore we need to move the information regarding the screen group from the screen table to the screengroup table,
 				//since we used to save location and screener information on the screen instead of the screen group.
@@ -11878,6 +11887,7 @@ namespace OpenDentBusiness {
 						+"WHERE ProcCode='"+POut.String(row["ProcCode"].ToString())+"'";
 					Db.NonQ(command);
 				}
+
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

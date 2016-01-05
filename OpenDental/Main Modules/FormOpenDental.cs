@@ -40,6 +40,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using OpenDentBusiness.UI;
 using CodeBase;
 using System.Security.AccessControl;
 using System.Xml;
@@ -3853,6 +3854,16 @@ namespace OpenDental{
 			ClinicNum=clinicCur.ClinicNum;
 			Clinics.ClinicNum=ClinicNum;
 			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			if(PrefC.GetBool(PrefName.AppointmentClinicTimeReset)) {
+				AppointmentL.DateSelected=DateTimeOD.Today;
+				if(AppointmentL.DateSelected.DayOfWeek==DayOfWeek.Sunday) {
+					ContrAppt.WeekStartDate=AppointmentL.DateSelected.AddDays(-6).Date;//go back to previous monday
+				}
+				else {
+					ContrAppt.WeekStartDate=AppointmentL.DateSelected.AddDays(1-(int)AppointmentL.DateSelected.DayOfWeek).Date;//go back to current monday
+				}
+				ContrAppt.WeekEndDate=ContrAppt.WeekStartDate.AddDays(ApptDrawing.NumOfWeekDaysToDisplay-1).Date;
+			}
 			RefreshMenuClinics();
 		}
 		

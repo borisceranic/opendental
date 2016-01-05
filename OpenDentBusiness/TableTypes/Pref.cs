@@ -48,6 +48,7 @@ namespace OpenDentBusiness {
 		AllowSettingProcsComplete,
 		AppointmentBubblesDisabled,
 		AppointmentBubblesNoteLength,
+		AppointmentClinicTimeReset,
 		///<summary>Enum:SearchBehaviorCriteria 0=ProviderTime, 1=ProviderTimeOperatory</summary>
 		AppointmentSearchBehavior,
 		AppointmentTimeArrivedTrigger,

@@ -148,6 +148,7 @@ namespace OpenDental{
 		private CheckBox checkScreeningsUseSheets;
 		private CheckBox checkBrokenApptProcedure;
 		private GroupBox groupBox2;
+		private CheckBox checkApptTimeReset;
 
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
@@ -228,6 +229,7 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.checkApptTimeReset = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkBrokenApptProcedure = new System.Windows.Forms.CheckBox();
 			this.checkBrokenApptCommLog = new System.Windows.Forms.CheckBox();
@@ -271,6 +273,7 @@ namespace OpenDental{
 			this.comboProcDiscountType = new System.Windows.Forms.ComboBox();
 			this.label19 = new System.Windows.Forms.Label();
 			this.tabChart = new System.Windows.Forms.TabPage();
+			this.checkScreeningsUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkPerioTreatImplantsAsNotMissing = new System.Windows.Forms.CheckBox();
 			this.checkPerioSkipMissingTeeth = new System.Windows.Forms.CheckBox();
 			this.checkProvColorChart = new System.Windows.Forms.CheckBox();
@@ -317,7 +320,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkScreeningsUseSheets = new System.Windows.Forms.CheckBox();			this.tabControl1.SuspendLayout();
+			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -813,6 +816,7 @@ namespace OpenDental{
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.checkApptTimeReset);
 			this.tabAppts.Controls.Add(this.groupBox2);
 			this.tabAppts.Controls.Add(this.checkApptModuleDefaultToWeek);
 			this.tabAppts.Controls.Add(this.label25);
@@ -844,6 +848,17 @@ namespace OpenDental{
 			this.tabAppts.Size = new System.Drawing.Size(466, 479);
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
+			// 
+			// checkApptTimeReset
+			// 
+			this.checkApptTimeReset.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptTimeReset.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkApptTimeReset.Location = new System.Drawing.Point(34, 449);
+			this.checkApptTimeReset.Name = "checkApptTimeReset";
+			this.checkApptTimeReset.Size = new System.Drawing.Size(406, 17);
+			this.checkApptTimeReset.TabIndex = 223;
+			this.checkApptTimeReset.Text = "Reset Calendar to Today on Clinic Select";
+			this.checkApptTimeReset.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// groupBox2
 			// 
@@ -1367,6 +1382,18 @@ namespace OpenDental{
 			this.tabChart.TabIndex = 4;
 			this.tabChart.Text = "Chart";
 			// 
+			// checkScreeningsUseSheets
+			// 
+			this.checkScreeningsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkScreeningsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkScreeningsUseSheets.Location = new System.Drawing.Point(139, 339);
+			this.checkScreeningsUseSheets.Name = "checkScreeningsUseSheets";
+			this.checkScreeningsUseSheets.Size = new System.Drawing.Size(302, 15);
+			this.checkScreeningsUseSheets.TabIndex = 217;
+			this.checkScreeningsUseSheets.Text = "Screenings use Sheets";
+			this.checkScreeningsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkScreeningsUseSheets.UseVisualStyleBackColor = true;
+			// 
 			// checkPerioTreatImplantsAsNotMissing
 			// 
 			this.checkPerioTreatImplantsAsNotMissing.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1876,18 +1903,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkScreeningsUseSheets
-			// 
-			this.checkScreeningsUseSheets.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkScreeningsUseSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkScreeningsUseSheets.Location = new System.Drawing.Point(139, 339);
-			this.checkScreeningsUseSheets.Name = "checkScreeningsUseSheets";
-			this.checkScreeningsUseSheets.Size = new System.Drawing.Size(302, 15);
-			this.checkScreeningsUseSheets.TabIndex = 217;
-			this.checkScreeningsUseSheets.Text = "Screenings use Sheets";
-			this.checkScreeningsUseSheets.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkScreeningsUseSheets.UseVisualStyleBackColor = true;
-			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2032,6 +2047,7 @@ namespace OpenDental{
 			butColor.BackColor=PrefC.GetColor(PrefName.WaitingRoomAlertColor);
 			butApptLineColor.BackColor=PrefC.GetColor(PrefName.AppointmentTimeLineColor);
 			checkApptModuleDefaultToWeek.Checked=PrefC.GetBool(PrefName.ApptModuleDefaultToWeek);
+			checkApptTimeReset.Checked=PrefC.GetBool(PrefName.AppointmentClinicTimeReset);
 			#endregion
 			#region Family Module
 			//Family module-----------------------------------------------------------------------
@@ -2399,8 +2415,9 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.WaitingRoomAlertColor,butColor.BackColor.ToArgb())
 				| Prefs.UpdateInt(PrefName.AppointmentTimeLineColor,butApptLineColor.BackColor.ToArgb())
 				| Prefs.UpdateBool(PrefName.ApptModuleDefaultToWeek,checkApptModuleDefaultToWeek.Checked)
-				#endregion
-				#region Family Module
+				| Prefs.UpdateBool(PrefName.AppointmentClinicTimeReset,checkApptTimeReset.Checked)
+			#endregion
+			#region Family Module
 				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
 				| Prefs.UpdateBool(PrefName.InsurancePlansShared,checkInsurancePlansShared.Checked)
 				| Prefs.UpdateBool(PrefName.InsDefaultPPOpercent,checkPPOpercentage.Checked)
