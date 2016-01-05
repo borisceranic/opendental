@@ -629,6 +629,7 @@ namespace OpenDental {
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(106, 152);
 			this.textNote.MaxLength = 4000;
@@ -779,6 +780,7 @@ namespace OpenDental {
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPayment_FormClosing);
 			this.Load += new System.EventHandler(this.FormPayment_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -2480,6 +2482,13 @@ namespace OpenDental {
 		}
 
 		private void butCancel_Click(object sender,System.EventArgs e) {
+			DialogResult=DialogResult.Cancel;
+		}
+
+		private void FormPayment_FormClosing(object sender,FormClosingEventArgs e) {
+			if(DialogResult==DialogResult.OK) {
+				return;
+			}
 			if(!IsNew && !_wasCreditCardSuccessful) {
 				DialogResult=DialogResult.Cancel;
 				return;
