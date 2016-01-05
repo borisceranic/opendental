@@ -194,7 +194,7 @@ namespace OpenDentBusiness {
 			}
 			Userod user=null;
 			if(listUserods!=null) {
-				listUserods.FirstOrDefault(x => x.UserNum==userNum);
+				user=listUserods.FirstOrDefault(x => x.UserNum==userNum);
 			}
 			else {
 				user=GetUser(userNum);
