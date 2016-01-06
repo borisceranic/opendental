@@ -52,7 +52,7 @@ namespace OpenDentBusiness {
 					}
 					else{
 						//try the Plugins folder
-						#if !DEBUG
+						//#if !DEBUG
 						if(PrefC.AtoZfolderUsed) {//must be using AtoZ folder
 							string dllPathVersionCentral=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"Plugins",
 								listPrograms[i].PluginDllName.Replace("[VersionMajMin]",vers.Major.ToString()+"."+vers.Minor.ToString()));
@@ -60,7 +60,7 @@ namespace OpenDentBusiness {
 								File.Copy(dllPathVersionCentral,dllPath,true);
 							}
 						}
-						#endif
+						//#endif
 					}
 				}
 				if(!File.Exists(dllPath)) {
