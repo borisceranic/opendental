@@ -1274,9 +1274,9 @@ namespace OpenDentBusiness {
 					//see if the claimProcHist is in this more restrictive category
 					CovSpan[] spansForCat=CovSpans.GetForCat(listShort[b].CovCatNum,arrayCovSpans);//get the spans 
 					//This must be a payment that was attached to a proc, so test the proc to be in the coderange of this annual max benefit
-					for(int j=0;j<arrayCovSpans.Length;j++) {
-						if(String.Compare(claimProcHist.StrProcCode,arrayCovSpans[j].FromCode)>=0 
-							&& String.Compare(claimProcHist.StrProcCode,arrayCovSpans[j].ToCode)<=0) 
+					for(int j=0;j<spansForCat.Length;j++) {
+						if(String.Compare(claimProcHist.StrProcCode,spansForCat[j].FromCode)>=0 
+							&& String.Compare(claimProcHist.StrProcCode,spansForCat[j].ToCode)<=0) 
 						{
 							return true;
 						}
