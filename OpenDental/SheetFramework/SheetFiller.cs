@@ -117,7 +117,7 @@ namespace OpenDental{
 					ScreenGroup screenGroup=ScreenGroups.GetScreenGroup((long)GetParamByName(sheet,"ScreenGroupNum").ParamValue);
 					//Look for the optional PatNum param:
 					SheetParameter paraPatNum=GetParamByName(sheet,"PatNum");
-					if(paraPatNum!=null) {
+					if(paraPatNum!=null && paraPatNum.ParamValue!=null) {
 						pat=Patients.GetPat((long)paraPatNum.ParamValue);
 					}
 					FillFieldsForScreening(sheet,screenGroup,pat);
@@ -2885,6 +2885,16 @@ namespace OpenDental{
 							break;
 						case "Gender":
 							field.FieldValue=pat.Gender.ToString();
+							break;
+						case "GradeLevel":
+							field.FieldValue=pat.GradeLevel.ToString();
+							break;
+						case "Race/Ethnicity":
+							//The patient object no longer has the same type of race so default to Unknown.
+							field.FieldValue=PatientRaceOld.Unknown.ToString();
+							break;
+						case "Urgency":
+							field.FieldValue=pat.Urgency.ToString();
 							break;
 					}
 				}

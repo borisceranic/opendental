@@ -615,6 +615,134 @@ namespace OpenDental{
 			}
 		}
 
+		private void StartScreensForPats() {
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=_screenGroup;
+			FormSE.IsNew=true;
+			int selectedIdx=gridScreenPats.GetSelectedIndex();
+			int i=selectedIdx;
+			if(i==-1) {
+				i=0;
+			}
+			while(true) {
+				ScreenPat screenPat=_listScreenPats[i];
+				if(screenPat.PatScreenPerm!=PatScreenPerm.Allowed) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//Skip people who aren't allowed
+				}
+				if(_listScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
+				}
+				FormSE.ScreenPatCur=screenPat;
+				if(_listScreens.Count==0) {
+					FormSE.ScreenCur=new OpenDentBusiness.Screen();
+					FormSE.ScreenCur.ScreenGroupOrder=1;
+				}
+				else {
+					FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
+					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
+				}
+				Patient pat=Patients.GetPat(screenPat.PatNum);//Get a patient so we can pre-fill some of the information (age/sex/birthdate/grade)
+				FormSE.ScreenCur.Age=(pat.Birthdate==DateTime.MinValue) ? FormSE.ScreenCur.Age : (byte)pat.Age;
+				FormSE.ScreenCur.Birthdate=(pat.Birthdate==DateTime.MinValue) ? FormSE.ScreenCur.Birthdate : pat.Birthdate;
+				FormSE.ScreenCur.Gender=pat.Gender;//Default value in pat edit is male. No way of knowing if it's intentional or not, just use it.
+				FormSE.ScreenCur.GradeLevel=(pat.GradeLevel==0) ? FormSE.ScreenCur.GradeLevel : pat.GradeLevel;//Default value is Unknown, use pat's grade if it's not unknown.
+				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;//Default to unknown. Patient Edit doesn't have the same type of race as screen edit.
+				FormSE.ScreenCur.Urgency=pat.Urgency;
+				if(FormSE.ShowDialog()!=DialogResult.OK) {
+					break;
+				}
+				FormSE.ScreenCur.ScreenGroupOrder++;
+				FillGrid();
+				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+				if(i==selectedIdx && selectedIdx!=-1) {
+					break;
+				}
+				if(i==0 && selectedIdx==-1) {
+					break;
+				}
+			}
+			FillScreenPats();
+		}
+
+		private void StartScreensForPatsWithSheets() {
+			//Get the first custom Screening sheet or use the internal one
+			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
+			int selectedIdx=gridScreenPats.GetSelectedIndex();
+			int i=selectedIdx;
+			if(i==-1) {
+				i=0;
+			}
+			while(true) {
+				ScreenPat screenPat=_listScreenPats[i];
+				if(screenPat.PatScreenPerm!=PatScreenPerm.Allowed) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//Skip people who aren't allowed
+				}
+				if(_listScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
+					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+					if(i==selectedIdx && selectedIdx!=-1) {
+						break;
+					}
+					if(i==0 && selectedIdx==-1) {
+						break;
+					}
+					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
+				}
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
+				SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);
+				SheetParameter.SetParameter(sheet,"PatNum",screenPat.PatNum);
+				SheetFiller.FillFields(sheet);
+				using(Graphics g=CreateGraphics()) {
+					SheetUtil.CalculateHeights(sheet,g);
+				}
+				//Create a valid screen so that we can create a screening sheet with the corresponding ScreenNum.
+				OpenDentBusiness.Screen screen=new OpenDentBusiness.Screen();
+				screen.ScreenPatNum=screenPat.ScreenPatNum;
+				screen.ScreenGroupNum=_screenGroup.ScreenGroupNum;
+				screen.ScreenGroupOrder=1;
+				if(_listScreens.Count!=0) {
+					screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder+1;//increments for next
+				}
+				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+				FormSFE.ShowDialog();
+				if(FormSFE.DialogResult!=DialogResult.OK) {
+					break;
+				}
+				Sheets.Insert(sheet);
+				Screens.ImportScreenFromSheet(sheet,screen);
+				screen.ScreenGroupOrder++;
+				FillGrid();
+				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
+				if(i==selectedIdx && selectedIdx!=-1) {
+					break;
+				}
+				if(i==0 && selectedIdx==-1) {
+					break;
+				}
+			}
+			FillScreenPats();
+		}
+
 		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {
 			if(e.Button!=MouseButtons.Right) {
 				return;
@@ -766,66 +894,12 @@ namespace OpenDental{
 		}
 
 		private void butStartScreens_Click(object sender,EventArgs e) {
-			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=_screenGroup;
-			FormSE.IsNew=true;
-			int selectedIdx=gridScreenPats.GetSelectedIndex();
-			int i=selectedIdx;
-			if(i==-1) {
-				i=0;
+			if(PrefC.GetBool(PrefName.ScreeningsUseSheets)) {
+				StartScreensForPatsWithSheets();
 			}
-			while(true) {
-				ScreenPat screenPat=_listScreenPats[i];
-				if(screenPat.PatScreenPerm!=PatScreenPerm.Allowed) {
-					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
-					if(i==selectedIdx && selectedIdx!=-1) {
-						break;
-					}
-					if(i==0 && selectedIdx==-1) {
-						break;
-					}
-					continue;//Skip people who aren't allowed
-				}
-				if(_listScreens.FirstOrDefault(x => x.ScreenPatNum==screenPat.ScreenPatNum)!=null) {
-					i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
-					if(i==selectedIdx && selectedIdx!=-1) {
-						break;
-					}
-					if(i==0 && selectedIdx==-1) {
-						break;
-					}
-					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
-				}
-				FormSE.ScreenPatCur=screenPat;
-				if(_listScreens.Count==0) {
-					FormSE.ScreenCur=new OpenDentBusiness.Screen();
-					FormSE.ScreenCur.ScreenGroupOrder=1;
-				}
-				else {
-					FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
-					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
-				}
-				Patient pat=Patients.GetPat(screenPat.PatNum);//Get a patient so we can pre-fill some of the information (age/sex/birthdate/grade)
-				FormSE.ScreenCur.Age=(pat.Birthdate==DateTime.MinValue)?FormSE.ScreenCur.Age:(byte)pat.Age;
-				FormSE.ScreenCur.Birthdate=(pat.Birthdate==DateTime.MinValue)?FormSE.ScreenCur.Birthdate:pat.Birthdate;
-				FormSE.ScreenCur.Gender=pat.Gender;//Default value in pat edit is male. No way of knowing if it's intentional or not, just use it.
-				FormSE.ScreenCur.GradeLevel=(pat.GradeLevel==0)?FormSE.ScreenCur.GradeLevel:pat.GradeLevel;//Default value is Unknown, use pat's grade if it's not unknown.
-				FormSE.ScreenCur.RaceOld=PatientRaceOld.Unknown;//Default to unknown. Patient Edit doesn't have the same type of race as screen edit.
-				FormSE.ScreenCur.Urgency=pat.Urgency;
-				if(FormSE.ShowDialog()!=DialogResult.OK) {
-					break;
-				}
-				FormSE.ScreenCur.ScreenGroupOrder++;
-				FillGrid();
-				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
-				if(i==selectedIdx && selectedIdx!=-1) {
-					break;
-				}
-				if(i==0 && selectedIdx==-1) {
-					break;
-				}
+			else {
+				StartScreensForPats();
 			}
-			FillScreenPats();
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {
