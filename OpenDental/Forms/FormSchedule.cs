@@ -111,15 +111,15 @@ namespace OpenDental{
 			this.butPaste = new OpenDental.UI.Button();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.tabPageProv = new System.Windows.Forms.TabPage();
+			this.tabPageEmp = new System.Windows.Forms.TabPage();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
 			this.textDateTo = new OpenDental.ValidDate();
 			this.textDateFrom = new OpenDental.ValidDate();
 			this.butRefresh = new OpenDental.UI.Button();
-			this.gridMain = new OpenDental.UI.ODGrid();
-			this.tabControl1 = new System.Windows.Forms.TabControl();
-			this.tabPageProv = new System.Windows.Forms.TabPage();
-			this.tabPageEmp = new System.Windows.Forms.TabPage();
 			this.groupCopy.SuspendLayout();
 			this.groupPaste.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -129,7 +129,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(102, 75);
+			this.label2.Location = new System.Drawing.Point(102, 38);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(85, 15);
 			this.label2.TabIndex = 9;
@@ -138,7 +138,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(16, 75);
+			this.label1.Location = new System.Drawing.Point(16, 38);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(86, 15);
 			this.label1.TabIndex = 7;
@@ -147,10 +147,10 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(0, 0);
+			this.listProv.Location = new System.Drawing.Point(0, 6);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(191, 277);
+			this.listProv.Size = new System.Drawing.Size(191, 290);
 			this.listProv.TabIndex = 23;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
 			this.listProv.SelectedIndexChanged += new System.EventHandler(this.listProv_SelectedIndexChanged);
@@ -244,7 +244,7 @@ namespace OpenDental{
 			// 
 			this.checkPractice.Checked = true;
 			this.checkPractice.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkPractice.Location = new System.Drawing.Point(18, 111);
+			this.checkPractice.Location = new System.Drawing.Point(18, 74);
 			this.checkPractice.Name = "checkPractice";
 			this.checkPractice.Size = new System.Drawing.Size(169, 18);
 			this.checkPractice.TabIndex = 28;
@@ -254,10 +254,10 @@ namespace OpenDental{
 			// 
 			// listEmp
 			// 
-			this.listEmp.Location = new System.Drawing.Point(0, 0);
+			this.listEmp.Location = new System.Drawing.Point(0, 45);
 			this.listEmp.Name = "listEmp";
 			this.listEmp.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listEmp.Size = new System.Drawing.Size(192, 277);
+			this.listEmp.Size = new System.Drawing.Size(191, 251);
 			this.listEmp.TabIndex = 30;
 			this.listEmp.Click += new System.EventHandler(this.listEmp_Click);
 			this.listEmp.SelectedIndexChanged += new System.EventHandler(this.listEmp_SelectedIndexChanged);
@@ -317,7 +317,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(19, 35);
+			this.labelClinic.Location = new System.Drawing.Point(9, 5);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(58, 13);
 			this.labelClinic.TabIndex = 34;
@@ -327,12 +327,60 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(18, 51);
+			this.comboClinic.Location = new System.Drawing.Point(8, 20);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(170, 21);
 			this.comboClinic.TabIndex = 35;
 			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// tabControl1
+			// 
+			this.tabControl1.Controls.Add(this.tabPageProv);
+			this.tabControl1.Controls.Add(this.tabPageEmp);
+			this.tabControl1.Location = new System.Drawing.Point(1, 100);
+			this.tabControl1.Name = "tabControl1";
+			this.tabControl1.SelectedIndex = 0;
+			this.tabControl1.Size = new System.Drawing.Size(200, 325);
+			this.tabControl1.TabIndex = 36;
+			// 
+			// tabPageProv
+			// 
+			this.tabPageProv.Controls.Add(this.listProv);
+			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
+			this.tabPageProv.Name = "tabPageProv";
+			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageProv.Size = new System.Drawing.Size(192, 299);
+			this.tabPageProv.TabIndex = 0;
+			this.tabPageProv.Text = "Providers (0)";
+			this.tabPageProv.UseVisualStyleBackColor = true;
+			// 
+			// tabPageEmp
+			// 
+			this.tabPageEmp.Controls.Add(this.listEmp);
+			this.tabPageEmp.Controls.Add(this.comboClinic);
+			this.tabPageEmp.Controls.Add(this.labelClinic);
+			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
+			this.tabPageEmp.Name = "tabPageEmp";
+			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPageEmp.Size = new System.Drawing.Size(192, 299);
+			this.tabPageEmp.TabIndex = 1;
+			this.tabPageEmp.Text = "Employees (0)";
+			this.tabPageEmp.UseVisualStyleBackColor = true;
+			// 
+			// gridMain
+			// 
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(207, 8);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
+			this.gridMain.Size = new System.Drawing.Size(761, 652);
+			this.gridMain.TabIndex = 0;
+			this.gridMain.Title = "Schedule";
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// butDelete
 			// 
@@ -368,14 +416,14 @@ namespace OpenDental{
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(105, 91);
+			this.textDateTo.Location = new System.Drawing.Point(105, 54);
 			this.textDateTo.Name = "textDateTo";
 			this.textDateTo.Size = new System.Drawing.Size(82, 20);
 			this.textDateTo.TabIndex = 10;
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(18, 91);
+			this.textDateFrom.Location = new System.Drawing.Point(18, 54);
 			this.textDateFrom.Name = "textDateFrom";
 			this.textDateFrom.Size = new System.Drawing.Size(82, 20);
 			this.textDateFrom.TabIndex = 8;
@@ -394,59 +442,11 @@ namespace OpenDental{
 			this.butRefresh.Text = "Refresh";
 			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
-			// gridMain
-			// 
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(207, 8);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
-			this.gridMain.Size = new System.Drawing.Size(761, 652);
-			this.gridMain.TabIndex = 0;
-			this.gridMain.Title = "Schedule";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
-			// 
-			// tabControl1
-			// 
-			this.tabControl1.Controls.Add(this.tabPageProv);
-			this.tabControl1.Controls.Add(this.tabPageEmp);
-			this.tabControl1.Location = new System.Drawing.Point(1, 130);
-			this.tabControl1.Name = "tabControl1";
-			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(200, 300);
-			this.tabControl1.TabIndex = 36;
-			// 
-			// tabPageProv
-			// 
-			this.tabPageProv.Controls.Add(this.listProv);
-			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
-			this.tabPageProv.Name = "tabPageProv";
-			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageProv.Size = new System.Drawing.Size(192, 274);
-			this.tabPageProv.TabIndex = 0;
-			this.tabPageProv.Text = "Providers";
-			this.tabPageProv.UseVisualStyleBackColor = true;
-			// 
-			// tabPageEmp
-			// 
-			this.tabPageEmp.Controls.Add(this.listEmp);
-			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
-			this.tabPageEmp.Name = "tabPageEmp";
-			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageEmp.Size = new System.Drawing.Size(192, 274);
-			this.tabPageEmp.TabIndex = 1;
-			this.tabPageEmp.Text = "Employees";
-			this.tabPageEmp.UseVisualStyleBackColor = true;
-			// 
 			// FormSchedule
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 695);
 			this.Controls.Add(this.tabControl1);
-			this.Controls.Add(this.comboClinic);
-			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.groupCopy);
 			this.Controls.Add(this.groupPaste);
 			this.Controls.Add(this.checkPractice);
@@ -656,6 +656,8 @@ namespace OpenDental{
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
+			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
 			FillEmployeesAndProviders();
 			FillGrid();
 		}
