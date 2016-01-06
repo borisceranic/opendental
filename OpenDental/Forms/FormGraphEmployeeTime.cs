@@ -31,7 +31,7 @@ namespace OpenDental {
 		}
 
 		private void FormGraphEmployeeTime_Load(object sender,EventArgs e) {
-			butEdit.Visible=Security.IsAuthorized(Permissions.Schedules);
+			butEdit.Visible=Security.IsAuthorized(Permissions.Schedules,true);
 			ListPED=PhoneEmpDefaults.Refresh();
 			DateShowing=AppointmentL.DateSelected.Date;
 			//fill in the missing PhoneGraph entries for today
