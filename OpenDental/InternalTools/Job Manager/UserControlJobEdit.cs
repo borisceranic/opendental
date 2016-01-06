@@ -747,7 +747,17 @@ namespace OpenDental.InternalTools.Job_Manager {
 			//JobEvents.Sync();//do not sync
 			if(job.OwnerNum!=_jobOld.OwnerNum || job.JobStatus!=_jobOld.JobStatus || job.Description!=_jobOld.Description) {
 				JobEvent jobEventCur=new JobEvent();
-				jobEventCur.Description=(_isOverride?"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n":"")+_jobOld.Description;
+				//Must do text manipulation inside the RichTextbox to preserve RTF Formatting.
+				try {
+					textEditorMain.MainRtf=_jobOld.Description;
+				}
+				catch {
+					textEditorMain.MainText=_jobOld.Description;
+				}
+				if(_isOverride) {
+					textEditorMain.MainText=textEditorMain.MainText.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
+				}
+				jobEventCur.Description=textEditorMain.MainRtf;
 				jobEventCur.JobNum=_jobOld.JobNum;
 				jobEventCur.JobStatus=_jobOld.JobStatus;
 				jobEventCur.OwnerNum=_jobOld.OwnerNum;
