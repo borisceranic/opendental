@@ -11887,6 +11887,22 @@ namespace OpenDentBusiness {
 						+"WHERE ProcCode='"+POut.String(row["ProcCode"].ToString())+"'";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE screen ADD SheetNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screen ADD INDEX (SheetNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE screen ADD SheetNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE screen SET SheetNum = 0 WHERE SheetNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE screen MODIFY SheetNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX screen_SheetNum ON screen (SheetNum)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";

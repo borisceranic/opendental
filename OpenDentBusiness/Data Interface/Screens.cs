@@ -41,6 +41,7 @@ namespace OpenDentBusiness{
 			if(screen==null) {
 				screen=new Screen();
 			}
+			screen.SheetNum=sheet.SheetNum;
 			screen.ScreenGroupNum=(long)SheetParameter.GetParamByName(sheet.Parameters,"ScreenGroupNum").ParamValue;
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {

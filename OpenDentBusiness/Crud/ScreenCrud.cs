@@ -63,6 +63,7 @@ namespace OpenDentBusiness.Crud{
 				screen.ScreenGroupOrder= PIn.Int   (row["ScreenGroupOrder"].ToString());
 				screen.Comments        = PIn.String(row["Comments"].ToString());
 				screen.ScreenPatNum    = PIn.Long  (row["ScreenPatNum"].ToString());
+				screen.SheetNum        = PIn.Long  (row["SheetNum"].ToString());
 				retVal.Add(screen);
 			}
 			return retVal;
@@ -91,6 +92,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ScreenGroupOrder");
 			table.Columns.Add("Comments");
 			table.Columns.Add("ScreenPatNum");
+			table.Columns.Add("SheetNum");
 			foreach(Screen screen in listScreens) {
 				table.Rows.Add(new object[] {
 					POut.Long  (screen.ScreenNum),
@@ -110,6 +112,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (screen.ScreenGroupOrder),
 					POut.String(screen.Comments),
 					POut.Long  (screen.ScreenPatNum),
+					POut.Long  (screen.SheetNum),
 				});
 			}
 			return table;
@@ -150,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScreenNum,";
 			}
-			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
+			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum,SheetNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(screen.ScreenNum)+",";
 			}
@@ -170,7 +173,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (screen.ScreenGroupNum)+","
 				+    POut.Int   (screen.ScreenGroupOrder)+","
 				+"'"+POut.String(screen.Comments)+"',"
-				+    POut.Long  (screen.ScreenPatNum)+")";
+				+    POut.Long  (screen.ScreenPatNum)+","
+				+    POut.Long  (screen.SheetNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -203,7 +207,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ScreenNum,";
 			}
-			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum) VALUES(";
+			command+="Gender,RaceOld,GradeLevel,Age,Urgency,HasCaries,NeedsSealants,CariesExperience,EarlyChildCaries,ExistingSealants,MissingAllTeeth,Birthdate,ScreenGroupNum,ScreenGroupOrder,Comments,ScreenPatNum,SheetNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(screen.ScreenNum)+",";
 			}
@@ -223,7 +227,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (screen.ScreenGroupNum)+","
 				+    POut.Int   (screen.ScreenGroupOrder)+","
 				+"'"+POut.String(screen.Comments)+"',"
-				+    POut.Long  (screen.ScreenPatNum)+")";
+				+    POut.Long  (screen.ScreenPatNum)+","
+				+    POut.Long  (screen.SheetNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -251,7 +256,8 @@ namespace OpenDentBusiness.Crud{
 				+"ScreenGroupNum  =  "+POut.Long  (screen.ScreenGroupNum)+", "
 				+"ScreenGroupOrder=  "+POut.Int   (screen.ScreenGroupOrder)+", "
 				+"Comments        = '"+POut.String(screen.Comments)+"', "
-				+"ScreenPatNum    =  "+POut.Long  (screen.ScreenPatNum)+" "
+				+"ScreenPatNum    =  "+POut.Long  (screen.ScreenPatNum)+", "
+				+"SheetNum        =  "+POut.Long  (screen.SheetNum)+" "
 				+"WHERE ScreenNum = "+POut.Long(screen.ScreenNum);
 			Db.NonQ(command);
 		}
@@ -322,6 +328,10 @@ namespace OpenDentBusiness.Crud{
 			if(screen.ScreenPatNum != oldScreen.ScreenPatNum) {
 				if(command!=""){ command+=",";}
 				command+="ScreenPatNum = "+POut.Long(screen.ScreenPatNum)+"";
+			}
+			if(screen.SheetNum != oldScreen.SheetNum) {
+				if(command!=""){ command+=",";}
+				command+="SheetNum = "+POut.Long(screen.SheetNum)+"";
 			}
 			if(command==""){
 				return false;

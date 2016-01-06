@@ -40,6 +40,8 @@ namespace OpenDentBusiness{
 		public string Comments;
 		///<summary>FK to screenpat.ScreenPatNum.</summary>
 		public long ScreenPatNum;
+		///<summary>FK to sheet.SheetNum</summary>
+		public long SheetNum;
 
 		///<summary>Returns a copy of this Screen.</summary>
 		public Screen Copy() {

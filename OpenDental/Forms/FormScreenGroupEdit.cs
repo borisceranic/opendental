@@ -579,6 +579,7 @@ namespace OpenDental{
 			//Get the first custom Screening sheet or use the internal one
 			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef);
+			sheet.IsNew=true;
 			SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);
 			SheetFiller.FillFields(sheet);
 			using(Graphics g=CreateGraphics()) {
@@ -608,7 +609,6 @@ namespace OpenDental{
 				if(FormSFE.DialogResult!=DialogResult.OK) {
 					return;
 				}
-				Sheets.Insert(sheet);
 				Screens.ImportScreenFromSheet(sheet,screen);
 				screen.ScreenGroupOrder++;
 				FillGrid();
@@ -709,6 +709,8 @@ namespace OpenDental{
 					continue;//If they already have a screen, don't make a new one.  We might think about opening up their old one for editing at this point.
 				}
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
+				sheet.IsNew=true;
+				sheet.PatNum=screenPat.PatNum;
 				SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);
 				SheetParameter.SetParameter(sheet,"PatNum",screenPat.PatNum);
 				SheetFiller.FillFields(sheet);
@@ -728,7 +730,6 @@ namespace OpenDental{
 				if(FormSFE.DialogResult!=DialogResult.OK) {
 					break;
 				}
-				Sheets.Insert(sheet);
 				Screens.ImportScreenFromSheet(sheet,screen);
 				screen.ScreenGroupOrder++;
 				FillGrid();
