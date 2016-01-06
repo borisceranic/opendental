@@ -448,13 +448,17 @@ namespace OpenDental {
 				_creditCardCur.ItemOrder=itemOrderCount.Count;
 			}
 			_creditCardCur.CCExpiration=new DateTime(expYear,expMonth,DateTime.DaysInMonth(expYear,expMonth));
+			if(PrefC.GetBool(PrefName.StoreCCnumbers)) {
+				_creditCardCur.CCNumberMasked=textCardNumber.Text;
+			}
+			else {
+				_creditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
+			}
 			_creditCardCur.Zip=textZipCode.Text;
-			_creditCardCur.CCNumberMasked=textCardNumber.Text;
 			_creditCardCur.PayConnectToken="";
 			_creditCardCur.PayConnectTokenExp=DateTime.MinValue;
 			//Store the token and the masked CC number (only last four digits).  PaymentToken is null when testing the predefined fake card numbers.
 			if(checkSaveToken.Checked && _response.PaymentToken!=null) {
-				_creditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
 				_creditCardCur.PayConnectToken=_response.PaymentToken.TokenId;
 				_creditCardCur.PayConnectTokenExp=new DateTime(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month,
 					DateTime.DaysInMonth(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month));
