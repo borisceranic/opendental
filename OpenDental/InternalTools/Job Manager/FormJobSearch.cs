@@ -151,7 +151,9 @@ namespace OpenDental {
 
 		private class FeatureRequest {
 			public long FeatReqNum;
-			public long TotalVotes;
+			public long Votes;
+			public long Critical;
+			public float Pledge;
 			public long Difficulty;
 			public float Weight;
 			public string Approval;
@@ -178,7 +180,7 @@ namespace OpenDental {
 #else
 				OpenDental.customerUpdates.Service1 updateService=new OpenDental.customerUpdates.Service1();
 				updateService.Url=PrefC.GetString(PrefName.UpdateServerAddress);
-			#endif
+#endif
 				//Send the message and get the result-------------------------------------------------------------------------------------
 				string result="";
 				try {
@@ -213,14 +215,25 @@ namespace OpenDental {
 				ODDataTable table=new ODDataTable(node.InnerXml);
 				List<FeatureRequest> retVal=new List<FeatureRequest>();
 				foreach(var dataRow in table.Rows) {
-					FeatureRequest req=new FeatureRequest() {
-						FeatReqNum=PIn.Long(dataRow["RequestId"].ToString()),
-						TotalVotes=PIn.Long(dataRow["totalVotes"].ToString()),
-						Difficulty=PIn.Long(dataRow["Difficulty"].ToString()),
-						Weight=PIn.Float(dataRow["Weight"].ToString()),
-						Approval=dataRow["Weight"].ToString(),
-						Description=dataRow["Description"].ToString()
-					};
+					FeatureRequest req=new FeatureRequest();
+					long.TryParse(dataRow["RequestId"].ToString(),out req.FeatReqNum);
+					string[] votes=dataRow["totalVotes"].ToString().Split(new string[] {"\r\n"},StringSplitOptions.RemoveEmptyEntries);
+					string vote=votes.FirstOrDefault(x=>!x.StartsWith("Critical") && !x.StartsWith("$"));
+					if(!string.IsNullOrEmpty(vote)) {
+						long.TryParse(vote,out req.Votes);
+					}
+					vote=votes.FirstOrDefault(x => x.StartsWith("Critical"));
+					if(!string.IsNullOrEmpty(vote)) {
+						long.TryParse(vote,out req.Critical);
+					}
+					vote=votes.FirstOrDefault(x => x.StartsWith("$"));
+					if(!string.IsNullOrEmpty(vote)) {
+						float.TryParse(vote,out req.Pledge);
+					}
+					req.Difficulty=PIn.Long(dataRow["Difficulty"].ToString());
+					req.Weight=PIn.Float(dataRow["Weight"].ToString());
+					req.Approval=dataRow["Weight"].ToString();
+					req.Description=dataRow["Description"].ToString();
 					retVal.Add(req);
 				}
 				return retVal;
