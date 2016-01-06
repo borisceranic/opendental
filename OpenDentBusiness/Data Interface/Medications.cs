@@ -436,6 +436,10 @@ namespace OpenDentBusiness{
 					+" WHERE "+tableAndKeyName[1]+"="+POut.Long(medNumFrom);
 				rowsChanged+=Db.NonQ(command);
 			}
+			command="SELECT medication.RxCui FROM medication WHERE MedicationNum="+medNumInto; //update medicationpat's RxNorms to match medication.
+			string rxNorm=Db.GetScalar(command);
+			command="UPDATE medicationpat SET RxCui="+rxNorm+" WHERE MedicationNum="+medNumInto;
+			Db.NonQ(command);
 			command="SELECT * FROM ehrtrigger WHERE MedicationNumList LIKE '% "+POut.Long(medNumFrom)+" %'";
 			List<EhrTrigger> ListEhrTrigger=Crud.EhrTriggerCrud.SelectMany(command); //get all ehr triggers with matching mednum in mednumlist
 			for(int i=0;i<ListEhrTrigger.Count;i++) {//for each trigger...
