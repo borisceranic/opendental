@@ -558,6 +558,9 @@ namespace OpenDental {
 		}
 
 		public void ClearWavyLines() {
+			if(this.Width <= 0 || this.Height <= 0) {//Width or Height can be 0 if the window or textbox is resized.  Causes a UE when creating a Bitmap. 
+				return;
+			}
 			Bitmap bitmapOverlay=new Bitmap(this.Width,this.Height);
 			BufferGraphics=Graphics.FromImage(bitmapOverlay);
 			BufferGraphics.Clear(Color.Transparent);//We don't want to overwrite the text in the rich text box.
@@ -642,6 +645,9 @@ namespace OpenDental {
 			{
 				//Do not spell check languages that use composition.  If needed in the future, fix the bug where the first char disapears in the box.
 				//E.g. go into an ODTextBox, set language input to Korean, and simply type the letter 'ㅇ' (d) and wait.  It will disapear.
+				return;
+			}
+			if(this.Width <= 0 || this.Height <= 0) {//Width or Height can be 0 if the window or textbox is resized.  Causes a UE when creating a Bitmap. 
 				return;
 			}
 			ClearWavyLines();
