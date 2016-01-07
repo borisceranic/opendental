@@ -6951,6 +6951,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Highlight_24x24.png" />
+    <None Include="Resources\Bullets_24x24.png" />
+    <None Include="Resources\Save_24x24.png" />
+    <None Include="Resources\Redo_24x24.png" />
+    <None Include="Resources\Undo_24x24.png" />
+    <None Include="Resources\Paste_24x24.png" />
+    <None Include="Resources\Copy_24x24.png" />
+    <None Include="Resources\Cut_24x24.png" />
     <None Include="Resources\CDS_Button_green.png" />
     <None Include="Resources\Podium_Button_100x24.png" />
     <None Include="Resources\DI_Button_100x24.png" />
