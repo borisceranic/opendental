@@ -1372,6 +1372,12 @@ namespace OpenDental {
 					if(!TaskCur.Equals(TaskOld)) {//If user clicks OK without making any changes, then skip.
 						Tasks.Update(TaskCur,TaskOld);//if task has already been altered, then this is where it will fail.
 					}
+					if(!TaskCur.Equals(TaskOld) || NotesChanged) {//We want to make a TaskHist entry if notes were changed as well as if the task was changed.
+						TaskHist taskHist=new TaskHist(TaskOld);
+						taskHist.UserNumHist=Security.CurUser.UserNum;
+						taskHist.IsNoteChange=NotesChanged;
+						TaskHists.Insert(taskHist);
+					}
 				}
 			}
 			catch(Exception ex) {
@@ -1438,10 +1444,6 @@ namespace OpenDental {
 				return;
 			}
 			DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
-			TaskHist taskHistory=new TaskHist(TaskOld);
-			taskHistory.IsNoteChange=NotesChanged;
-			taskHistory.UserNumHist=Security.CurUser.UserNum;
-			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}
@@ -1498,10 +1500,6 @@ namespace OpenDental {
 			if(NotesChanged || !TaskCur.Equals(TaskOld) || StatusChanged) {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
 			}
-			TaskHist taskHistory=new TaskHist(TaskOld);
-			taskHistory.IsNoteChange=NotesChanged;
-			taskHistory.UserNumHist=Security.CurUser.UserNum;
-			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}
@@ -1528,14 +1526,6 @@ namespace OpenDental {
 			else {
 				DataValid.SetInvalidTask(TaskCur.TaskNum,false);//no popup
 			}
-			TaskHist taskHistory=new TaskHist(TaskOld);
-			if(TaskCur.PriorityDefNum!=TaskOld.PriorityDefNum) {
-				//because of the way we compair tasks, this is required to detect priority changes properly
-				taskHistory.PriorityDefNum=TaskCur.PriorityDefNum;
-			}
-			taskHistory.IsNoteChange=NotesChanged;
-			taskHistory.UserNumHist=Security.CurUser.UserNum;
-			TaskHists.Insert(taskHistory);
 			DialogResult=DialogResult.OK;
 			Close();
 		}

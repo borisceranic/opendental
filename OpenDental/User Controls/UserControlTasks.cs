@@ -806,6 +806,9 @@ namespace OpenDental {
 			try {
 				Tasks.Update(task,oldTask);
 				TaskUnreads.DeleteForTask(task.TaskNum);
+				TaskHist taskHist=new TaskHist(oldTask);
+				taskHist.UserNumHist=Security.CurUser.UserNum;
+				TaskHists.Insert(taskHist);
 				DataValid.SetInvalidTask(task.TaskNum,false);//this causes an immediate local refresh of the grid
 			}
 			catch(Exception ex) {
@@ -851,6 +854,7 @@ namespace OpenDental {
 			WasCut=false;
 		}
 
+		///<summary>When cutting and pasting, Task hist will be lost because the pasted task has a new TaskNum.</summary>
 		private void Paste_Clicked() {
 			if(ClipTaskList!=null) {//a taskList is on the clipboard
 				TaskList newTL=ClipTaskList.Copy();
@@ -1030,6 +1034,9 @@ namespace OpenDental {
 				Tasks.Update(task,oldTask);
 				//At HQ the refresh interval wasn't quick enough for the task to pop up.
 				//We will immediately show the task instead of waiting for the refresh interval.
+				TaskHist taskHist=new TaskHist(oldTask);
+				taskHist.UserNumHist=Security.CurUser.UserNum;
+				TaskHists.Insert(taskHist);
 				DataValid.SetInvalidTask(task.TaskNum,false);
 				FormTaskEdit FormT=new FormTaskEdit(task,task.Copy());
 				FormT.IsPopup=true;

@@ -9885,6 +9885,9 @@ namespace OpenDental {
 					}
 					TaskUnreads.DeleteForTask(taskCur.TaskNum);//clear out taskunreads. We have too many tasks to read the done ones.
 					Tasks.Update(taskCur,taskOld);
+					TaskHist taskHist=new TaskHist(taskOld);
+					taskHist.UserNumHist=Security.CurUser.UserNum;
+					TaskHists.Insert(taskHist);
 					ModuleSelected(PatCur.PatNum);
 					return;
 				}
