@@ -108,21 +108,24 @@ namespace OpenDental {
 				_listJobsFiltered=_listJobsFiltered.FindAll(x => listCats.Contains(x.Category));
 			}
 			if(!string.IsNullOrWhiteSpace(textTask.Text)) {
+				textTask.Text=textTask.Text.ToLower();
 				long taskNumIn=0;
 				long.TryParse(textTask.Text,out taskNumIn);
-				long[] taskNums=_listTasksAll.FindAll(x=>x.Descript.Contains(textTask.Text) || x.TaskNum==taskNumIn).Select(x=>x.TaskNum).ToArray();
+				long[] taskNums=_listTasksAll.FindAll(x=>x.Descript.ToLower().Contains(textTask.Text) || x.TaskNum==taskNumIn).Select(x=>x.TaskNum).ToArray();
 				_listJobsFiltered=_listJobsFiltered.FindAll(x=>x.ListJobLinks.Any(y=>y.LinkType==JobLinkType.Task && taskNums.Contains(y.FKey)));
 			}
 			if(!string.IsNullOrWhiteSpace(textFeatReq.Text)) {
+				textFeatReq.Text=textFeatReq.Text.ToLower();
 				long featReqIn=0;
 				long.TryParse(textFeatReq.Text,out featReqIn);
-				long[] featReqNums=_listFeatureRequestsAll.FindAll(x=>x.FeatReqNum==featReqIn || x.Description.Contains(textFeatReq.Text)).Select(x=>x.FeatReqNum).ToArray();
+				long[] featReqNums=_listFeatureRequestsAll.FindAll(x=>x.FeatReqNum==featReqIn || x.Description.ToLower().Contains(textFeatReq.Text)).Select(x=>x.FeatReqNum).ToArray();
 				_listJobsFiltered=_listJobsFiltered.FindAll(x=>x.ListJobLinks.Any(y=>y.LinkType==JobLinkType.Request && featReqNums.Contains(y.FKey)));
 			}
 			if(!string.IsNullOrWhiteSpace(textCust.Text)) {
+				textCust.Text=textCust.Text.ToLower();
 				long patNumIn=0;
 				long.TryParse(textCust.Text,out patNumIn);
-				long[] patNums=_listPatientAll.FindAll(x=>x.PatNum==patNumIn || x.GetNameFL().Contains(textCust.Text)).Select(x=>x.PatNum).ToArray();
+				long[] patNums=_listPatientAll.FindAll(x=>x.PatNum==patNumIn || x.GetNameFL().ToLower().Contains(textCust.Text)).Select(x=>x.PatNum).ToArray();
 				long[] taskNums=_listTasksAll.FindAll(x=>x.ObjectType==TaskObjectType.Patient && (x.KeyNum==patNumIn || patNums.Contains(x.KeyNum))).Select(x=>x.TaskNum).ToArray();
 				_listJobsFiltered=_listJobsFiltered.FindAll(x=>x.ListJobQuotes.Any(y=>patNums.Contains(y.PatNum)) || x.ListJobLinks.Any(y=>y.LinkType==JobLinkType.Task&& taskNums.Contains(y.FKey)));
 			}
