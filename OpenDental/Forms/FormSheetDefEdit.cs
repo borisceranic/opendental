@@ -1215,7 +1215,6 @@ namespace OpenDental {
 					}
 					if(FormSFG.SheetFieldDefCur==null) {
 						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
-						return;
 					}
 					break;
 			}
