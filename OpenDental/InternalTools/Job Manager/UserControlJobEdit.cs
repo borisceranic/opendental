@@ -291,74 +291,120 @@ namespace OpenDental.InternalTools.Job_Manager {
 		///<summary>Based on job status, category, and user role, this will enable or disable various controls.</summary>
 		private void CheckPermissions() {
 			//disable various controls and re-enable them below depending on permissions.
-			comboStatus.Enabled=false;
-			butExpertPick.Visible=false;
-			butOwnerPick.Visible=false;
-			gridReview.HasAddButton=false;
-			textVersion.ReadOnly=true;
-			comboCategory.Enabled=false;
-			comboPriority.Enabled=false;
-			textActualHours.ReadOnly=true;
 			textTitle.ReadOnly=true;
-			butParentPick.Visible=false;
-			butParentRemove.Visible=false;
-			gridCustomerQuotes.HasAddButton=false;
-			gridTasks.HasAddButton=false;
-			gridFeatureReq.HasAddButton=false;
-			gridBugs.HasAddButton=false;
-			textEditorMain.ReadOnly=true;
+			comboPriority.Enabled=false;
+			comboStatus.Enabled=false;
+			comboCategory.Enabled=false;
+			textVersion.ReadOnly=true;
 			textEstHours.Enabled=false;
 			textActualHours.Enabled=false;
+			butParentPick.Visible=false;
+			butParentRemove.Visible=false;
+			butExpertPick.Visible=false;
+			butOwnerPick.Visible=false;
+			gridCustomerQuotes.HasAddButton=false;//Quote permission only
+			textEditorMain.ReadOnly=true;
 			if(_jobCur==null) {
 				return;
 			}
-			//Add reviews only if you are the owner, and only if job is Assigned, InProgress, ReadyForReview, or OnHold. Or Override.
-			bool isOwnerEdit=(new[] {JobStat.Assigned,JobStat.CurrentlyWorkingOn,JobStat.ReadyForReview,JobStat.OnHoldExpert}.Contains(_jobCur.JobStatus) && Security.CurUser.UserNum==_jobCur.OwnerNum);
-			bool isExpertEdit=(new[] { JobStat.Assigned,JobStat.CurrentlyWorkingOn,JobStat.ReadyForReview,JobStat.OnHoldExpert }.Contains(_jobCur.JobStatus) && Security.CurUser.UserNum==_jobCur.ExpertNum);
-			if(_isOverride || isOwnerEdit || isExpertEdit || IsNew){
-				gridReview.HasAddButton=true;
-				textVersion.ReadOnly=false;
-				textActualHours.ReadOnly=false;
-				textTitle.ReadOnly=false;
-				butParentPick.Visible=true;
-				butParentRemove.Visible=true;
+			if(JobPermissions.IsAuthorized(JobPerm.Quote,true) && _jobOld.JobStatus!=JobStat.Complete && _jobOld.JobStatus!=JobStat.Deleted) {
 				gridCustomerQuotes.HasAddButton=true;
-				gridTasks.HasAddButton=true;
-				gridFeatureReq.HasAddButton=true;
-				gridBugs.HasAddButton=true;
-				textEstHours.Enabled=true;
-				textActualHours.Enabled=true;
 			}
-			if(_isOverride || isExpertEdit || IsNew) {
-				textEditorMain.Enabled=true;
-				textEditorMain.ReadOnly=false;
-			}
-			if(_isOverride 
-				|| (_jobCur.JobStatus==JobStat.Concept && JobPermissions.IsAuthorized(JobPerm.Concept,true))//new jobs
-				|| (_jobCur.JobStatus==JobStat.NeedsConceptApproval && JobPermissions.IsAuthorized(JobPerm.Approval,true))) //job being approved
-			{
-				comboCategory.Enabled=true;
-				comboPriority.Enabled=true;
-				gridCustomerQuotes.HasAddButton=true;
-				gridTasks.HasAddButton=true;
-				gridFeatureReq.HasAddButton=true;
-				gridBugs.HasAddButton=true;
-			}
-			if(_jobCur.JobStatus==JobStat.Complete) {//disable everything except Job Actions.
-				foreach(Control c in this.Controls) {
-					c.Enabled=false;
-				}
-				butActions.Enabled=true;
+			switch(_jobCur.JobStatus) {
+				case JobStat.Concept:
+					if(!JobPermissions.IsAuthorized(JobPerm.Concept,true)) {
+						break;
+					}
+					comboPriority.Enabled=true;
+					comboCategory.Enabled=true;
+					textEstHours.ReadOnly=false;
+					butParentPick.Enabled=true;
+					butParentRemove.Enabled=true;
+					textEditorMain.ReadOnly=false;
+					break;
+				case JobStat.NeedsConceptApproval:
+				case JobStat.NeedsJobApproval:
+					if(!JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+						break;
+					}
+					comboPriority.Enabled=true;
+					comboCategory.Enabled=true;
+					textEstHours.ReadOnly=false;
+					butParentPick.Enabled=true;
+					butParentRemove.Enabled=true;
+					textEditorMain.ReadOnly=false;
+					break;
+				case JobStat.ConceptApproved:
+				case JobStat.CurrentlyWriting:
+				case JobStat.NeedsJobClarification:
+					if(!JobPermissions.IsAuthorized(JobPerm.Writeup,true) || _jobOld.ExpertNum!=Security.CurUser.UserNum) {
+						break;
+					}
+					comboPriority.Enabled=true;
+					comboCategory.Enabled=true;
+					textEstHours.ReadOnly=false;
+					butParentPick.Enabled=true;
+					butParentRemove.Enabled=true;
+					textEditorMain.ReadOnly=false;
+					break;
+				case JobStat.JobApproved:
+				case JobStat.ReadyToAssign:
+					if(!JobPermissions.IsAuthorized(JobPerm.Writeup,true) || (_jobOld.ExpertNum!=Security.CurUser.UserNum && _jobOld.ExpertNum!=0)) {
+						break;
+					}
+					comboPriority.Enabled=true;
+					comboCategory.Enabled=true;
+					textEstHours.ReadOnly=false;
+					butParentPick.Enabled=true;
+					butParentRemove.Enabled=true;
+					if(_jobOld.ExpertNum==0) {
+						butExpertPick.Enabled=true;
+					}
+					butOwnerPick.Enabled=true;
+					break;
+				case JobStat.Assigned:
+				case JobStat.CurrentlyWorkingOn:
+				case JobStat.OnHoldExpert:
+				case JobStat.ReadyForReview:
+				case JobStat.OnHoldEngineer:
+					if(_jobOld.OwnerNum!=Security.CurUser.UserNum && _jobOld.ExpertNum!=Security.CurUser.UserNum) {
+						break;
+					}
+					textActualHours.Enabled=true;
+					gridReview.HasAddButton=true;
+					break;
+				case JobStat.ReadyToBeDocumented:
+				case JobStat.NeedsDocumentationClarification:
+				case JobStat.NotifyCustomer:
+					//Not sure what needs to be edited here.
+					break;
+				case JobStat.Rescinded:
+				case JobStat.Complete:
+				case JobStat.Deleted:
+					gridTasks.HasAddButton=false;
+					gridFeatureReq.HasAddButton=false;
+					gridBugs.HasAddButton=false;
+					gridReview.HasAddButton=false;
+					//nothing enabled.
+					break;
+				default:
+					MessageBox.Show("Unsupported job status. Add to UserControlJobEdit.CheckPermissions()");
+					break;
 			}
 			if(_isOverride) {//Enable everything and make everything visible
+				textTitle.ReadOnly=false;
+				comboPriority.Enabled=true;
+				comboStatus.Enabled=true;
+				comboCategory.Enabled=true;
+				textVersion.ReadOnly=false;
+				textEstHours.Enabled=true;
+				textActualHours.Enabled=true;
+				butParentPick.Visible=true;
+				butParentRemove.Visible=true;
+				butExpertPick.Visible=true;
+				butOwnerPick.Visible=true;
+				gridCustomerQuotes.HasAddButton=true;
 				textEditorMain.ReadOnly=false;
-				List<Control> listControls=new List<Control> {this};
-				for(int i=0;i<listControls.Count;i++) {//flat recursion
-					Control c=listControls[i];
-					c.Enabled=true;
-					c.Visible=true;
-					listControls.AddRange(c.Controls.Cast<Control>().Where(x=>!(x is ODGrid) && !(x is TabControl)));//skip od grids, because they have hidden scrollbars.
-				}
 			}
 		}
 
@@ -474,7 +520,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NeedsConceptApproval;
+			comboStatus.SelectedIndex=(int)JobStat.NeedsConceptApproval;
 			SaveJob(_jobCur);
 		}
 
@@ -485,7 +531,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.ExpertNum=userNum;
-			_jobCur.JobStatus=JobStat.ConceptApproved;
+			comboStatus.SelectedIndex=(int)JobStat.ConceptApproved;
 			SaveJob(_jobCur);
 		}
 
@@ -496,7 +542,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.Concept;
+			comboStatus.SelectedIndex=(int)JobStat.Concept;
 			SaveJob(_jobCur);
 		}
 
@@ -507,7 +553,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NeedsJobClarification;
+			comboStatus.SelectedIndex=(int)JobStat.NeedsJobClarification;
 			SaveJob(_jobCur);
 		}
 
@@ -518,13 +564,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NeedsJobApproval;
+			comboStatus.SelectedIndex=(int)JobStat.NeedsJobApproval;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_CurrentlyWritingClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.CurrentlyWriting;
+			comboStatus.SelectedIndex=(int)JobStat.CurrentlyWriting;
 			SaveJob(_jobCur);
 		}
 
@@ -535,13 +581,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.JobApproved;
+			comboStatus.SelectedIndex=(int)JobStat.JobApproved;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_AssignClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.ReadyToAssign;
+			comboStatus.SelectedIndex=(int)JobStat.ReadyToAssign;
 			SaveJob(_jobCur);
 		}
 
@@ -552,7 +598,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.Assigned;
+			comboStatus.SelectedIndex=(int)JobStat.Assigned;
 			SaveJob(_jobCur);
 		}
 
@@ -560,38 +606,38 @@ namespace OpenDental.InternalTools.Job_Manager {
 			long userNum=JobEvents.GetMostRecent(_jobCur.JobNum).OwnerNum;
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NeedsJobApproval;
+			comboStatus.SelectedIndex=(int)JobStat.NeedsJobApproval;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_EditModeClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.ConceptApproved;
+			comboStatus.SelectedIndex=(int)JobStat.ConceptApproved;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_CurrentlyWorkingOnClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.CurrentlyWorkingOn;
+			comboStatus.SelectedIndex=(int)JobStat.CurrentlyWorkingOn;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_OnHoldExpertClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.OnHoldExpert;
+			comboStatus.SelectedIndex=(int)JobStat.OnHoldExpert;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_OnHoldEngineerClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.OnHoldEngineer;
+			comboStatus.SelectedIndex=(int)JobStat.OnHoldEngineer;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_ReviewClick(object sender,EventArgs e) {
 			//Todo: launch job review window, edit, and save.
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.ReadyForReview;
+			comboStatus.SelectedIndex=(int)JobStat.ReadyForReview;
 			SaveJob(_jobCur);
 		}
 
@@ -602,7 +648,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NeedsDocumentationClarification;
+			comboStatus.SelectedIndex=(int)JobStat.NeedsDocumentationClarification;
 			SaveJob(_jobCur);
 		}
 
@@ -613,7 +659,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.ReadyToBeDocumented;
+			comboStatus.SelectedIndex=(int)JobStat.ReadyToBeDocumented;
 			SaveJob(_jobCur);
 		}
 
@@ -624,13 +670,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.OwnerNum=userNum;
-			_jobCur.JobStatus=JobStat.NotifyCustomer;
+			comboStatus.SelectedIndex=(int)JobStat.NotifyCustomer;
 			SaveJob(_jobCur);
 		}
 
 		private void actionMenu_MarkCompleteClick(object sender,EventArgs e) {
 			IsChanged=true;
-			_jobCur.JobStatus=JobStat.Complete;
+			comboStatus.SelectedIndex=(int)JobStat.Complete;
 			SaveJob(_jobCur);
 		}
 
@@ -728,6 +774,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 			job.Description=textEditorMain.MainRtf;
 			job.HoursActual=PIn.Int(textActualHours.Text);
 			job.HoursEstimate=PIn.Int(textEstHours.Text);
+			job.Priority=(JobPriority)comboPriority.SelectedIndex;
+			job.JobStatus=(JobStat)comboStatus.SelectedIndex;
+			job.Category=(JobCategory)comboCategory.SelectedIndex;
 			//All other fields should have been maintained while editing the job in the form.
 			if(job.JobNum==0 || IsNew) {
 				Jobs.Insert(job);
@@ -776,6 +825,18 @@ namespace OpenDental.InternalTools.Job_Manager {
 				return;
 			}
 			SaveJob(_jobCur);
+		}
+
+		private void comboPriority_SelectionChangeCommitted(object sender,EventArgs e) {
+			IsChanged=true;
+		}
+
+		private void comboStatus_SelectionChangeCommitted(object sender,EventArgs e) {
+			IsChanged=true;
+		}
+
+		private void comboCategory_SelectionChangeCommitted(object sender,EventArgs e) {
+			IsChanged=true;
 		}
 
 		private void butExpertPick_Click(object sender,EventArgs e) {

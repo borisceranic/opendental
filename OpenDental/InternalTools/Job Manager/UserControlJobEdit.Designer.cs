@@ -472,6 +472,7 @@
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(117, 21);
 			this.comboStatus.TabIndex = 290;
+			this.comboStatus.SelectionChangeCommitted += new System.EventHandler(this.comboStatus_SelectionChangeCommitted);
 			// 
 			// comboCategory
 			// 
@@ -482,6 +483,7 @@
 			this.comboCategory.Name = "comboCategory";
 			this.comboCategory.Size = new System.Drawing.Size(117, 21);
 			this.comboCategory.TabIndex = 287;
+			this.comboCategory.SelectionChangeCommitted += new System.EventHandler(this.comboCategory_SelectionChangeCommitted);
 			// 
 			// label12
 			// 
@@ -501,6 +503,7 @@
 			this.comboPriority.Name = "comboPriority";
 			this.comboPriority.Size = new System.Drawing.Size(117, 21);
 			this.comboPriority.TabIndex = 286;
+			this.comboPriority.SelectionChangeCommitted += new System.EventHandler(this.comboPriority_SelectionChangeCommitted);
 			// 
 			// textTitle
 			// 
