@@ -19,6 +19,7 @@ namespace OpenDentBusiness {
 		///<summary>True if the note was changed when this historical copy was created.</summary>
 		public bool IsNoteChange;
 
+		///<summary>Pass in the old task that needs to be recorded.</summary>
 		public TaskHist(Task task) {
 			this.DateTask=task.DateTask;
 			this.DateTimeEntry=task.DateTimeEntry;
