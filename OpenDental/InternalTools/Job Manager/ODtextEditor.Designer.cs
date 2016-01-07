@@ -68,7 +68,7 @@
 			this.butHighlightSelect.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butHighlightSelect.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butHighlightSelect.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.butHighlightSelect.Location = new System.Drawing.Point(105, 0);
+			this.butHighlightSelect.Location = new System.Drawing.Point(72, 0);
 			this.butHighlightSelect.Name = "butHighlightSelect";
 			this.butHighlightSelect.Size = new System.Drawing.Size(10, 24);
 			this.butHighlightSelect.TabIndex = 184;
@@ -102,24 +102,26 @@
 			// 
 			// butHighlight
 			// 
+			this.butHighlight.BackgroundImage = global::OpenDental.Properties.Resources.Highlight_24x24;
+			this.butHighlight.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butHighlight.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butHighlight.Location = new System.Drawing.Point(48, 0);
 			this.butHighlight.Name = "butHighlight";
-			this.butHighlight.Size = new System.Drawing.Size(57, 24);
+			this.butHighlight.Size = new System.Drawing.Size(24, 24);
 			this.butHighlight.TabIndex = 181;
-			this.butHighlight.Text = "Highlight";
 			this.butHighlight.Click += new System.EventHandler(this.butHighlight_Click);
 			this.butHighlight.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butHighlight.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
 			// butBullet
 			// 
+			this.butBullet.BackgroundImage = global::OpenDental.Properties.Resources.Bullets_24x24;
+			this.butBullet.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butBullet.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butBullet.Location = new System.Drawing.Point(99, 0);
 			this.butBullet.Name = "butBullet";
-			this.butBullet.Size = new System.Drawing.Size(55, 24);
+			this.butBullet.Size = new System.Drawing.Size(24, 24);
 			this.butBullet.TabIndex = 179;
-			this.butBullet.Text = "Bulleted";
 			this.butBullet.Click += new System.EventHandler(this.butBullet_Click);
 			this.butBullet.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butBullet.MouseLeave += new System.EventHandler(this.HoverColorLeave);
@@ -139,12 +141,13 @@
 			// 
 			// butRedo
 			// 
+			this.butRedo.BackgroundImage = global::OpenDental.Properties.Resources.Redo_24x24;
+			this.butRedo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butRedo.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butRedo.Location = new System.Drawing.Point(204, 0);
+			this.butRedo.Location = new System.Drawing.Point(96, 0);
 			this.butRedo.Name = "butRedo";
-			this.butRedo.Size = new System.Drawing.Size(41, 24);
+			this.butRedo.Size = new System.Drawing.Size(24, 24);
 			this.butRedo.TabIndex = 177;
-			this.butRedo.Text = "Redo";
 			this.butRedo.Click += new System.EventHandler(this.butRedo_Click);
 			this.butRedo.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butRedo.MouseLeave += new System.EventHandler(this.HoverColorLeave);
@@ -168,7 +171,7 @@
 			this.butUnderline.Font = new System.Drawing.Font("Times New Roman", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.butUnderline.Location = new System.Drawing.Point(46, 0);
 			this.butUnderline.Name = "butUnderline";
-			this.butUnderline.Size = new System.Drawing.Size(23, 24);
+			this.butUnderline.Size = new System.Drawing.Size(24, 24);
 			this.butUnderline.TabIndex = 180;
 			this.butUnderline.Text = "U";
 			this.butUnderline.Click += new System.EventHandler(this.butUnderline_Click);
@@ -181,7 +184,7 @@
 			this.butItalics.Font = new System.Drawing.Font("Times New Roman", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.butItalics.Location = new System.Drawing.Point(23, 0);
 			this.butItalics.Name = "butItalics";
-			this.butItalics.Size = new System.Drawing.Size(23, 24);
+			this.butItalics.Size = new System.Drawing.Size(24, 24);
 			this.butItalics.TabIndex = 176;
 			this.butItalics.Text = "I";
 			this.butItalics.Click += new System.EventHandler(this.butItalics_Click);
@@ -190,14 +193,13 @@
 			// 
 			// butPaste
 			// 
+			this.butPaste.BackgroundImage = global::OpenDental.Properties.Resources.Paste_24x24;
+			this.butPaste.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butPaste.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butPaste.Image = global::OpenDental.Properties.Resources.butPaste;
-			this.butPaste.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPaste.Location = new System.Drawing.Point(101, 0);
+			this.butPaste.Location = new System.Drawing.Point(48, 0);
 			this.butPaste.Name = "butPaste";
-			this.butPaste.Size = new System.Drawing.Size(62, 24);
+			this.butPaste.Size = new System.Drawing.Size(24, 24);
 			this.butPaste.TabIndex = 175;
-			this.butPaste.Text = "Paste";
 			this.butPaste.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.butPaste.Click += new System.EventHandler(this.butPaste_Click);
 			this.butPaste.MouseEnter += new System.EventHandler(this.HoverColorEnter);
@@ -209,7 +211,7 @@
 			this.butBold.Font = new System.Drawing.Font("Times New Roman", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.butBold.Location = new System.Drawing.Point(0, 0);
 			this.butBold.Name = "butBold";
-			this.butBold.Size = new System.Drawing.Size(23, 24);
+			this.butBold.Size = new System.Drawing.Size(24, 24);
 			this.butBold.TabIndex = 173;
 			this.butBold.Text = "B";
 			this.butBold.Click += new System.EventHandler(this.butBold_Click);
@@ -218,26 +220,27 @@
 			// 
 			// butUndo
 			// 
+			this.butUndo.BackgroundImage = global::OpenDental.Properties.Resources.Undo_24x24;
+			this.butUndo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butUndo.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butUndo.Location = new System.Drawing.Point(163, 0);
+			this.butUndo.Location = new System.Drawing.Point(72, 0);
 			this.butUndo.Name = "butUndo";
-			this.butUndo.Size = new System.Drawing.Size(41, 24);
+			this.butUndo.Size = new System.Drawing.Size(24, 24);
 			this.butUndo.TabIndex = 172;
-			this.butUndo.Text = "Undo";
 			this.butUndo.Click += new System.EventHandler(this.butUndo_Click);
 			this.butUndo.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butUndo.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
 			// butCopy
 			// 
+			this.butCopy.BackgroundImage = global::OpenDental.Properties.Resources.Copy_24x24;
+			this.butCopy.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butCopy.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butCopy.Image = global::OpenDental.Properties.Resources.butCopy;
 			this.butCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butCopy.Location = new System.Drawing.Point(41, 0);
+			this.butCopy.Location = new System.Drawing.Point(24, 0);
 			this.butCopy.Name = "butCopy";
-			this.butCopy.Size = new System.Drawing.Size(60, 24);
+			this.butCopy.Size = new System.Drawing.Size(24, 24);
 			this.butCopy.TabIndex = 174;
-			this.butCopy.Text = "Copy";
 			this.butCopy.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.butCopy.Click += new System.EventHandler(this.butCopy_Click);
 			this.butCopy.MouseEnter += new System.EventHandler(this.HoverColorEnter);
@@ -245,48 +248,54 @@
 			// 
 			// butCut
 			// 
+			this.butCut.BackgroundImage = global::OpenDental.Properties.Resources.Cut_24x24;
+			this.butCut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butCut.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
 			this.butCut.Location = new System.Drawing.Point(0, 0);
 			this.butCut.Name = "butCut";
-			this.butCut.Size = new System.Drawing.Size(41, 24);
+			this.butCut.Size = new System.Drawing.Size(24, 24);
 			this.butCut.TabIndex = 171;
-			this.butCut.Text = "Cut";
 			this.butCut.Click += new System.EventHandler(this.butCut_Click);
 			this.butCut.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butCut.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
 			// butSave
 			// 
+			this.butSave.BackgroundImage = global::OpenDental.Properties.Resources.Save_24x24;
+			this.butSave.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.butSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-			this.butSave.Location = new System.Drawing.Point(245, 0);
+			this.butSave.Location = new System.Drawing.Point(120, 0);
 			this.butSave.Name = "butSave";
-			this.butSave.Size = new System.Drawing.Size(55, 24);
+			this.butSave.Size = new System.Drawing.Size(24, 24);
 			this.butSave.TabIndex = 188;
-			this.butSave.Text = "Save";
 			this.butSave.Click += new System.EventHandler(this.butSave_Click);
 			this.butSave.MouseEnter += new System.EventHandler(this.HoverColorEnter);
 			this.butSave.MouseLeave += new System.EventHandler(this.HoverColorLeave);
 			// 
 			// panel1
 			// 
+			this.panel1.AutoSize = true;
+			this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel1.Controls.Add(this.butHighlight);
 			this.panel1.Controls.Add(this.butHighlightSelect);
 			this.panel1.Controls.Add(this.butColor);
 			this.panel1.Controls.Add(this.butColorSelect);
-			this.panel1.Location = new System.Drawing.Point(640, 0);
+			this.panel1.Location = new System.Drawing.Point(452, 0);
 			this.panel1.Margin = new System.Windows.Forms.Padding(0);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(118, 24);
+			this.panel1.Size = new System.Drawing.Size(85, 27);
 			this.panel1.TabIndex = 189;
 			// 
 			// panel3
 			// 
+			this.panel3.AutoSize = true;
+			this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel3.Controls.Add(this.comboFontType);
 			this.panel3.Controls.Add(this.comboFontSize);
-			this.panel3.Location = new System.Drawing.Point(459, 0);
+			this.panel3.Location = new System.Drawing.Point(273, 0);
 			this.panel3.Margin = new System.Windows.Forms.Padding(0);
 			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(181, 22);
+			this.panel3.Size = new System.Drawing.Size(179, 24);
 			this.panel3.TabIndex = 191;
 			// 
 			// panel4
@@ -302,20 +311,22 @@
 			this.panel4.Location = new System.Drawing.Point(0, 0);
 			this.panel4.Margin = new System.Windows.Forms.Padding(0);
 			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(303, 27);
+			this.panel4.Size = new System.Drawing.Size(147, 27);
 			this.panel4.TabIndex = 192;
 			// 
 			// panel5
 			// 
+			this.panel5.AutoSize = true;
+			this.panel5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel5.Controls.Add(this.butBold);
 			this.panel5.Controls.Add(this.butItalics);
 			this.panel5.Controls.Add(this.butUnderline);
 			this.panel5.Controls.Add(this.butStrikeout);
 			this.panel5.Controls.Add(this.butBullet);
-			this.panel5.Location = new System.Drawing.Point(303, 0);
+			this.panel5.Location = new System.Drawing.Point(147, 0);
 			this.panel5.Margin = new System.Windows.Forms.Padding(0);
 			this.panel5.Name = "panel5";
-			this.panel5.Size = new System.Drawing.Size(156, 25);
+			this.panel5.Size = new System.Drawing.Size(126, 27);
 			this.panel5.TabIndex = 193;
 			// 
 			// flowLayoutPanel1

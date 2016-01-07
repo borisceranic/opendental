@@ -405,6 +405,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				butOwnerPick.Visible=true;
 				gridCustomerQuotes.HasAddButton=true;
 				textEditorMain.ReadOnly=false;
+        textEditorMain.Enabled=true;
 			}
 		}
 

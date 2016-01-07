@@ -125,38 +125,31 @@ namespace OpenDental {
 			textDescription.ContextMenu.MenuItems.Add(menuItem);
 		}
 
-		private void OdtextEditor_Layout(object sender,LayoutEventArgs e) {
-			if(!_hasSaveButton) {
-				butSave.Visible=false;
-			}
-			if(_isReadOnly) {
-				textDescription.ReadOnly=true;
-				butCut.Enabled=false;
-				butCopy.Enabled=false;
-				butPaste.Enabled=false;
-				butUndo.Enabled=false;
-				butRedo.Enabled=false;
-				butBold.Enabled=false;
-				butItalics.Enabled=false;
-				butUnderline.Enabled=false;
-				butStrikeout.Enabled=false;
-				butBullet.Enabled=false;
-				comboFontSize.Enabled=false;
-				comboFontType.Enabled=false;
-				butColor.Enabled=false;
-				butColorSelect.Enabled=false;
-				butHighlight.Enabled=false;
-				butHighlightSelect.Enabled=false;
-				butSave.Enabled=false;
-				textDescription.SpellCheckIsEnabled=false;
-			}
-			else {
-				textDescription.ReadOnly=false;
-				foreach(Control c in this.Controls) {
-					c.Enabled=true;
-				}
-			}
-		}
+    private void OdtextEditor_Layout(object sender,LayoutEventArgs e) {
+      if(!_hasSaveButton) {
+        butSave.Visible=false;
+      }
+      bool isEnabled=!_isReadOnly;//Only here for readability of the following code.
+      textDescription.ReadOnly=_isReadOnly;
+      butCut.Enabled=isEnabled;
+      butCopy.Enabled=isEnabled;
+      butPaste.Enabled=isEnabled;
+      butUndo.Enabled=isEnabled;
+      butRedo.Enabled=isEnabled;
+      butBold.Enabled=isEnabled;
+      butItalics.Enabled=isEnabled;
+      butUnderline.Enabled=isEnabled;
+      butStrikeout.Enabled=isEnabled;
+      butBullet.Enabled=isEnabled;
+      comboFontSize.Enabled=isEnabled;
+      comboFontType.Enabled=isEnabled;
+      butColor.Enabled=isEnabled;
+      butColorSelect.Enabled=isEnabled;
+      butHighlight.Enabled=isEnabled;
+      butHighlightSelect.Enabled=isEnabled;
+      butSave.Enabled=isEnabled;
+      textDescription.SpellCheckIsEnabled=isEnabled;
+    }
 
 		private void HoverColorEnter(object sender,EventArgs e) {
 			System.Windows.Forms.Button btn=(System.Windows.Forms.Button)sender;
