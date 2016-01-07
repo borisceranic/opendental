@@ -26,7 +26,7 @@ namespace OpenDentBusiness{
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
 			string command=
-				"SELECT * from emailtemplate ORDER BY Subject";
+				"SELECT * from emailtemplate ORDER BY Description";
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="EmailTemplate";
 			FillCache(table);
