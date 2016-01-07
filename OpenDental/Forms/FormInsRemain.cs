@@ -61,17 +61,18 @@ namespace OpenDental {
 						continue;
 					}
 					//for calendar year, get completed procs from January.01.CurYear ~ Curdate
+					List<long> listPatNums=new List<long> {_patCur.PatNum};//for current patient.
 					if(listPatBenefits[i].TimePeriod==BenefitTimePeriod.CalendarYear) {
 						//01/01/CurYear. is there a better way?
-						listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,1,1),DateTimeOD.Today); 
+						listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,1,1),DateTimeOD.Today,null,listPatNums);
 					}
 					else { //if not calendar year, then it must be service year
 						monthRenew=InsPlans.RefreshOne(listPatBenefits[i].PlanNum).MonthRenew; //monthrenew only stores the month as an int.
-						if(DateTimeOD.Today.Month >= monthRenew) {	//if the the current date is past the renewal month, use the current year
-							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,monthRenew,1),DateTimeOD.Today);
+						if(DateTimeOD.Today.Month >= monthRenew) {//if the the current date is past the renewal month, use the current year
+							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year,monthRenew,1),DateTimeOD.Today,null,listPatNums);
 						}
 						else { //otherwise use the previous year
-							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year-1,monthRenew,1),DateTimeOD.Today);
+							listProcs=Procedures.GetCompletedForDateRange(new DateTime(DateTimeOD.Today.Year-1,monthRenew,1),DateTimeOD.Today,null,listPatNums);
 						}
 					}
 					//Calculate the amount used for one benefit.
