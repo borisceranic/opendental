@@ -437,6 +437,9 @@ namespace OpenDental {
 		}
 
 		private void ClearWavyLines() {
+			if(this.Width <= 0 || this.Height <= 0) {//Width or Height can be 0 if the window or textbox is resized.  Causes a UE when creating a Bitmap. 
+				return;
+			}
 			Bitmap bitmapOverlay=new Bitmap(this.Width,this.Height);
 			BufferGraphics=Graphics.FromImage(bitmapOverlay);
 			BufferGraphics.Clear(Color.Transparent);//We don't want to overwrite the text in the rich text box.
@@ -515,6 +518,9 @@ namespace OpenDental {
 		///<summary>Performs spell checking against indiviudal words against the English USA dictionary.</summary>
 		private void SpellCheck() {
 			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
+				return;
+			}
+			if(this.Width <= 0 || this.Height <= 0) {//Width or Height can be 0 if the window or textbox is resized.  Causes a UE when creating a Bitmap. 
 				return;
 			}
 			ClearWavyLines();
