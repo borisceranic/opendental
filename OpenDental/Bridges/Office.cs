@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental.Bridges {
 	///<summary>This is a generic document editor, not a bridge to a specific software.</summary>
@@ -22,28 +23,37 @@ namespace OpenDental.Bridges {
 			}
 			string fileName=ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Document folder");
 			fileName+=Tidy(pat.LName+pat.FName);
+			string oldFileName=ODFileUtils.CombinePaths(fileName,Tidy(pat.LName+pat.FName));
 			//ProgramProperties.GetPropVal() is the way to get program properties.
 			if(ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Enter 0 to use PatientNum, or 1 to use ChartNum")=="0") {
-				fileName+=pat.PatNum.ToString();
+				fileName=ODFileUtils.CombinePaths(fileName,pat.PatNum.ToString());
+				oldFileName+=pat.PatNum.ToString();
 			}
 			else {
-				fileName+=Tidy(pat.ChartNumber);
+				fileName=ODFileUtils.CombinePaths(fileName,Tidy(pat.ChartNumber));
+				oldFileName+=Tidy(pat.ChartNumber);
 			}
 			fileName+=ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"File extension");
+			oldFileName+=ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"File extension");
 			Process process=new Process();
 			ProcessStartInfo startInfo=new ProcessStartInfo();
 			if(!File.Exists(fileName)) {
-				try {
-					startInfo.WindowStyle=ProcessWindowStyle.Hidden;
-					string cmdLocation=Environment.GetFolderPath(Environment.SpecialFolder.Windows)+@"\system32\cmd.exe";//This is incase the user doesn't have C: as their default drive letter.
-					startInfo.FileName=cmdLocation;//Path for the cmd prompt
-					startInfo.Arguments="/c copy nul "+fileName;
-					process.StartInfo=startInfo;
-					process.Start();
+				if(File.Exists(oldFileName)) {
+					fileName=oldFileName;
 				}
-				catch(Exception ex) {
-					MessageBox.Show(ex.Message);
-					return;
+				else {
+					try {
+						startInfo.WindowStyle=ProcessWindowStyle.Hidden;
+						string cmdLocation=Environment.GetFolderPath(Environment.SpecialFolder.Windows)+@"\system32\cmd.exe";//This is incase the user doesn't have C: as their default drive letter.
+						startInfo.FileName=cmdLocation;//Path for the cmd prompt
+						startInfo.Arguments="/c copy nul "+fileName;
+						process.StartInfo=startInfo;
+						process.Start();
+					}
+					catch(Exception ex) {
+						MessageBox.Show(ex.Message);
+						return;
+					}
 				}
 			}
 			process=new Process();
