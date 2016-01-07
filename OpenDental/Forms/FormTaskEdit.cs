@@ -140,8 +140,6 @@ namespace OpenDental {
 			this.listObjectType = new System.Windows.Forms.ListBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.panelObject = new System.Windows.Forms.Panel();
-			this.butGoto = new OpenDental.UI.Button();
-			this.butChange = new OpenDental.UI.Button();
 			this.label5 = new System.Windows.Forms.Label();
 			this.textDateTimeEntry = new System.Windows.Forms.TextBox();
 			this.textUser = new System.Windows.Forms.TextBox();
@@ -162,6 +160,7 @@ namespace OpenDental {
 			this.label8 = new System.Windows.Forms.Label();
 			this.butColor = new System.Windows.Forms.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.butAudit = new OpenDental.UI.Button();
 			this.butBlue = new OpenDental.UI.Button();
 			this.butRed = new OpenDental.UI.Button();
 			this.butChangeUser = new OpenDental.UI.Button();
@@ -171,12 +170,13 @@ namespace OpenDental {
 			this.butNowFinished = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butNow = new OpenDental.UI.Button();
+			this.butGoto = new OpenDental.UI.Button();
+			this.butChange = new OpenDental.UI.Button();
 			this.textDateTask = new OpenDental.ValidDate();
 			this.butCopy = new OpenDental.UI.Button();
 			this.textDescript = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.butAudit = new OpenDental.UI.Button();
 			this.panelObject.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -279,34 +279,6 @@ namespace OpenDental {
 			this.panelObject.Size = new System.Drawing.Size(550, 34);
 			this.panelObject.TabIndex = 15;
 			// 
-			// butGoto
-			// 
-			this.butGoto.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butGoto.Autosize = true;
-			this.butGoto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butGoto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butGoto.CornerRadius = 4F;
-			this.butGoto.Location = new System.Drawing.Point(449, 6);
-			this.butGoto.Name = "butGoto";
-			this.butGoto.Size = new System.Drawing.Size(75, 22);
-			this.butGoto.TabIndex = 12;
-			this.butGoto.Text = "Go To";
-			this.butGoto.Click += new System.EventHandler(this.butGoto_Click);
-			// 
-			// butChange
-			// 
-			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butChange.Autosize = true;
-			this.butChange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butChange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butChange.CornerRadius = 4F;
-			this.butChange.Location = new System.Drawing.Point(369, 6);
-			this.butChange.Name = "butChange";
-			this.butChange.Size = new System.Drawing.Size(75, 22);
-			this.butChange.TabIndex = 10;
-			this.butChange.Text = "Change";
-			this.butChange.Click += new System.EventHandler(this.butChange_Click);
-			// 
 			// label5
 			// 
 			this.label5.Location = new System.Drawing.Point(9, 25);
@@ -325,6 +297,7 @@ namespace OpenDental {
 			// 
 			// textUser
 			// 
+			this.textUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.textUser.Location = new System.Drawing.Point(582, 16);
 			this.textUser.Name = "textUser";
 			this.textUser.ReadOnly = true;
@@ -333,6 +306,7 @@ namespace OpenDental {
 			// 
 			// label16
 			// 
+			this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label16.Location = new System.Drawing.Point(487, 18);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(94, 16);
@@ -387,6 +361,7 @@ namespace OpenDental {
 			// 
 			// textTaskList
 			// 
+			this.textTaskList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.textTaskList.Location = new System.Drawing.Point(582, 39);
 			this.textTaskList.Name = "textTaskList";
 			this.textTaskList.ReadOnly = true;
@@ -395,6 +370,7 @@ namespace OpenDental {
 			// 
 			// label10
 			// 
+			this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label10.Location = new System.Drawing.Point(487, 41);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(94, 16);
@@ -456,6 +432,7 @@ namespace OpenDental {
 			// 
 			// comboTaskPriorities
 			// 
+			this.comboTaskPriorities.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboTaskPriorities.FormattingEnabled = true;
 			this.comboTaskPriorities.Location = new System.Drawing.Point(582, 61);
 			this.comboTaskPriorities.Name = "comboTaskPriorities";
@@ -465,6 +442,7 @@ namespace OpenDental {
 			// 
 			// label8
 			// 
+			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label8.Location = new System.Drawing.Point(488, 62);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(94, 16);
@@ -474,6 +452,7 @@ namespace OpenDental {
 			// 
 			// butColor
 			// 
+			this.butColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butColor.Enabled = false;
 			this.butColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.butColor.Location = new System.Drawing.Point(719, 61);
@@ -486,6 +465,8 @@ namespace OpenDental {
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 196);
 			this.gridMain.Name = "gridMain";
@@ -495,6 +476,21 @@ namespace OpenDental {
 			this.gridMain.Title = "Notes";
 			this.gridMain.TranslationName = "FormTaskEdit";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// butAudit
+			// 
+			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAudit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAudit.Autosize = true;
+			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAudit.CornerRadius = 4F;
+			this.butAudit.Location = new System.Drawing.Point(749, 59);
+			this.butAudit.Name = "butAudit";
+			this.butAudit.Size = new System.Drawing.Size(61, 24);
+			this.butAudit.TabIndex = 160;
+			this.butAudit.Text = "Audit";
+			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
 			// 
 			// butBlue
 			// 
@@ -529,6 +525,7 @@ namespace OpenDental {
 			// butChangeUser
 			// 
 			this.butChangeUser.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butChangeUser.Autosize = true;
 			this.butChangeUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butChangeUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -632,6 +629,34 @@ namespace OpenDental {
 			this.butNow.Text = "Now";
 			this.butNow.Click += new System.EventHandler(this.butNow_Click);
 			// 
+			// butGoto
+			// 
+			this.butGoto.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butGoto.Autosize = true;
+			this.butGoto.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butGoto.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butGoto.CornerRadius = 4F;
+			this.butGoto.Location = new System.Drawing.Point(449, 6);
+			this.butGoto.Name = "butGoto";
+			this.butGoto.Size = new System.Drawing.Size(75, 22);
+			this.butGoto.TabIndex = 12;
+			this.butGoto.Text = "Go To";
+			this.butGoto.Click += new System.EventHandler(this.butGoto_Click);
+			// 
+			// butChange
+			// 
+			this.butChange.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChange.Autosize = true;
+			this.butChange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChange.CornerRadius = 4F;
+			this.butChange.Location = new System.Drawing.Point(369, 6);
+			this.butChange.Name = "butChange";
+			this.butChange.Size = new System.Drawing.Size(75, 22);
+			this.butChange.TabIndex = 10;
+			this.butChange.Text = "Change";
+			this.butChange.Click += new System.EventHandler(this.butChange_Click);
+			// 
 			// textDateTask
 			// 
 			this.textDateTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -662,6 +687,7 @@ namespace OpenDental {
 			this.textDescript.AcceptsTab = true;
 			this.textDescript.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textDescript.BackColor = System.Drawing.SystemColors.Window;
 			this.textDescript.DetectUrls = false;
 			this.textDescript.Location = new System.Drawing.Point(127, 85);
 			this.textDescript.Name = "textDescript";
@@ -701,21 +727,6 @@ namespace OpenDental {
 			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// butAudit
-			// 
-			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAudit.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.butAudit.Autosize = true;
-			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAudit.CornerRadius = 4F;
-			this.butAudit.Location = new System.Drawing.Point(749, 59);
-			this.butAudit.Name = "butAudit";
-			this.butAudit.Size = new System.Drawing.Size(61, 24);
-			this.butAudit.TabIndex = 160;
-			this.butAudit.Text = "Audit";
-			this.butAudit.Click += new System.EventHandler(this.butAudit_Click);
 			// 
 			// FormTaskEdit
 			// 
@@ -765,7 +776,7 @@ namespace OpenDental {
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(852, 714);
 			this.Name = "FormTaskEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Task";
