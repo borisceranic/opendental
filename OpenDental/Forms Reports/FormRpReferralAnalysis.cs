@@ -389,28 +389,26 @@ namespace OpenDental{
 				whereProv+=") ";
 			}
 			ReportSimpleGrid report=new ReportSimpleGrid();
-			report.Query=@"SELECT referral.LName,referral.FName,
-COUNT(DISTINCT refattach.PatNum) HowMany,
-SUM(procedurelog.ProcFee) ""$HowMuch""";
+			report.Query="SELECT referral.LName,referral.FName,COUNT(DISTINCT attach.PatNum) AS HowMany,SUM(procedurelog.ProcFee) AS '$HowMuch'";
 			if(checkAddress.Checked){
-				report.Query+=",referral.Title,referral.Address,referral.Address2,referral.City,"
-					+"referral.ST,referral.Zip,referral.Specialty";
+				report.Query+=",referral.Title,referral.Address,referral.Address2,referral.City,referral.ST,referral.Zip,referral.Specialty";
 			}
-			report.Query+=@" FROM referral,refattach,procedurelog,patient
-WHERE referral.ReferralNum=refattach.ReferralNum
-AND procedurelog.PatNum=refattach.PatNum
-AND procedurelog.PatNum=patient.PatNum
-AND refattach.IsFrom=1
-AND procedurelog.ProcStatus=2
-AND procedurelog.ProcDate >= "+POut.Date(dateFrom)+" "
-				+"AND procedurelog.ProcDate <= "+POut.Date(dateTo)+" "
-				+whereProv;
+			report.Query+=" FROM referral"
+			+" INNER JOIN("
+				+" SELECT refattach.ReferralNum, refattach.PatNum FROM refattach"
+				+" WHERE refattach.IsFrom=1"
+				+" GROUP BY refattach.PatNum, refattach.ReferralNum"
+			+") attach ON attach.ReferralNum = referral.ReferralNum"
+			+" INNER JOIN procedurelog ON procedurelog.PatNum=attach.PatNum"
+				+" AND procedurelog.ProcDate BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)
+				+" AND procedurelog.ProcStatus=" +POut.Int((int)ProcStat.C)
+				+" "+whereProv
+			+" INNER JOIN patient ON patient.PatNum=procedurelog.PatNum";
 			if(checkNewPat.Checked){
-				report.Query+="AND patient.DateFirstVisit >= "+POut.Date(dateFrom)+" "
-					+"AND patient.DateFirstVisit <= "+POut.Date(dateTo)+" ";
+				report.Query+=" AND patient.DateFirstVisit BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo);
 			}
-			report.Query+=@"GROUP BY referral.ReferralNum
-ORDER BY HowMany Desc";
+			report.Query+=" GROUP BY referral.ReferralNum"
+				+" ORDER BY HowMany Desc";
 			FormQuery2=new FormQuery(report);
 			FormQuery2.IsReport=true;
 			FormQuery2.SubmitReportQuery();			

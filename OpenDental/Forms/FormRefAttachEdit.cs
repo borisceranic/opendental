@@ -267,6 +267,7 @@ namespace OpenDental{
 			this.textProc.ForeColor = System.Drawing.Color.DarkRed;
 			this.textProc.Location = new System.Drawing.Point(151, 395);
 			this.textProc.Name = "textProc";
+			this.textProc.ReadOnly = true;
 			this.textProc.Size = new System.Drawing.Size(232, 20);
 			this.textProc.TabIndex = 171;
 			this.textProc.Text = "test";
