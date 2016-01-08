@@ -1592,6 +1592,10 @@ namespace OpenDental {
 						cc.XChargeToken=xChargeToken;
 						cc.CCNumberMasked=accountMasked;
 						cc.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
+						//Add the default procedures to this card if those procedures are not attached to any other active card
+						List<string> listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
+						listDefaultProcs.RemoveAll(x => CreditCards.ProcLinkedToCard(_patCur.PatNum,x,cc.CreditCardNum));
+						cc.Procedures=string.Join(",",listDefaultProcs);
 						CreditCards.Update(cc);
 					}
 					if(newCard) {
@@ -1603,6 +1607,10 @@ namespace OpenDental {
 							cc.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
 							cc.XChargeToken=xChargeToken;
 							cc.CCNumberMasked=accountMasked;
+							//Add the default procedures to this card if those procedures are not attached to any other active card
+							List<string> listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
+							listDefaultProcs.RemoveAll(x => CreditCards.ProcLinkedToCard(_patCur.PatNum,x,0));
+							cc.Procedures=string.Join(",",listDefaultProcs);
 							CreditCards.Insert(cc);
 						}
 						else if(string.IsNullOrEmpty(xChargeToken)) {//Shouldn't happen again but leaving just in case.
