@@ -226,8 +226,8 @@ namespace OpenDental.InternalTools.Job_Manager {
 
 		private void FillGridReviews() {
 			long selectedReviewNum=0;
-			if(gridReview.GetSelectedIndex()!=-1) {
-				selectedReviewNum=(long)gridReview.Rows[gridReview.GetSelectedIndex()].Tag;
+			if(gridReview.GetSelectedIndex()!=-1 && (gridReview.Rows[gridReview.GetSelectedIndex()].Tag is JobReview)) {
+				selectedReviewNum=((JobReview)gridReview.Rows[gridReview.GetSelectedIndex()].Tag).JobNum;
 			}
 			gridReview.BeginUpdate();
 			gridReview.Columns.Clear();
@@ -248,12 +248,12 @@ namespace OpenDental.InternalTools.Job_Manager {
 				else {
 					row.Cells.Add(jobReview.Description);
 				}
-				row.Tag=jobReview.JobReviewNum;
+				row.Tag=jobReview;
 				gridReview.Rows.Add(row);
 			}
 			gridReview.EndUpdate();
 			for(int i=0;i<gridReview.Rows.Count;i++) {
-				if((long)gridReview.Rows[i].Tag==selectedReviewNum) {
+				if(gridReview.Rows[i].Tag is JobReview && ((JobReview)gridReview.Rows[i].Tag).JobReviewNum==selectedReviewNum) {
 					gridReview.SetSelected(i,true);
 					break;
 				}
@@ -316,6 +316,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 					if(!JobPermissions.IsAuthorized(JobPerm.Concept,true)) {
 						break;
 					}
+					textTitle.ReadOnly=false;
 					comboPriority.Enabled=true;
 					comboCategory.Enabled=true;
 					textEstHours.ReadOnly=false;
@@ -328,6 +329,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 					if(!JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
 						break;
 					}
+					textTitle.ReadOnly=false;
 					comboPriority.Enabled=true;
 					comboCategory.Enabled=true;
 					textEstHours.ReadOnly=false;
@@ -341,6 +343,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 					if(!JobPermissions.IsAuthorized(JobPerm.Writeup,true) || _jobOld.ExpertNum!=Security.CurUser.UserNum) {
 						break;
 					}
+					textTitle.ReadOnly=false;
 					comboPriority.Enabled=true;
 					comboCategory.Enabled=true;
 					textEstHours.ReadOnly=false;
@@ -406,7 +409,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				butOwnerPick.Visible=true;
 				gridCustomerQuotes.HasAddButton=true;
 				textEditorMain.ReadOnly=false;
-        textEditorMain.Enabled=true;
+				textEditorMain.Enabled=true;
 			}
 		}
 
@@ -533,6 +536,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			IsChanged=true;
 			_jobCur.ExpertNum=userNum;
+			_jobCur.OwnerNum=userNum;
 			comboStatus.SelectedIndex=(int)JobStat.ConceptApproved;
 			SaveJob(_jobCur);
 		}
@@ -1046,7 +1050,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void gridFeatureReq_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			//Todo. Open Feature request editor... this is tedious due to the fact that the feature request data set comes form the web service and is not a proper table.
+			if(!(gridFeatureReq.Rows[e.Row].Tag is long)) {
+				return;//should never happen.
+			}
+			FormRequestEdit FormFR=new FormRequestEdit();
+			FormFR.RequestId=(long)gridFeatureReq.Rows[e.Row].Tag;
+			FormFR.IsAdminMode=PrefC.IsODHQ;
+			FormFR.ShowDialog();
 		}
 
 		private void gridHistory_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -1064,6 +1074,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			if(FormJNE.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			IsChanged=true;
 			if(FormJNE._jobNote==null) {//delete from in memory list.
 				_jobCur.ListJobNotes.RemoveAt(e.Row);
 			}
@@ -1071,6 +1082,27 @@ namespace OpenDental.InternalTools.Job_Manager {
 				_jobCur.ListJobNotes[e.Row]=FormJNE._jobNote;
 			}
 			FillGridNote();
+		}
+
+		private void gridReview_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(!(gridNotes.Rows[e.Row].Tag is JobReview)) {
+				return;//should never happen.
+			}
+			JobReview jobReview=(JobReview)gridNotes.Rows[e.Row].Tag;
+			bool readOnly=(jobReview.ReviewerNum!=Security.CurUser.UserNum);//read only if you are not the expert.
+			FormJobReviewEdit FormJRE=new FormJobReviewEdit(jobReview,readOnly);
+			FormJRE.ShowDialog();
+			if(FormJRE.DialogResult!=DialogResult.OK || readOnly) {
+				return;
+			}
+			IsChanged=true;
+			if(FormJRE.JobReviewCur==null) {//delete from in memory list
+				_jobCur.ListJobReviews.RemoveAt(e.Row);
+			}
+			else {
+				_jobCur.ListJobReviews[e.Row]=FormJRE.JobReviewCur;
+			}
+			FillGridReviews();
 		}
 
 

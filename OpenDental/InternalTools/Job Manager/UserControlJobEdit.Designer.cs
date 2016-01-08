@@ -107,8 +107,9 @@
 			this.textEditorMain.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textEditorMain.HasSaveButton = true;
 			this.textEditorMain.Location = new System.Drawing.Point(0, 0);
-			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
-    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
+			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\nouicompat\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 " +
+    "Microsoft Sans Serif;}}\r\n{\\*\\generator Riched20 10.0.10586}\\viewkind4\\uc1 \r\n\\par" +
+    "d\\f0\\fs17\\par\r\n}\r\n";
 			this.textEditorMain.MainText = "";
 			this.textEditorMain.MinimumSize = new System.Drawing.Size(450, 120);
 			this.textEditorMain.Name = "textEditorMain";
@@ -183,6 +184,7 @@
 			this.gridReview.TabStop = false;
 			this.gridReview.Title = "Reviews";
 			this.gridReview.TranslationName = null;
+			this.gridReview.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridReview_CellDoubleClick);
 			this.gridReview.TitleAddClick += new System.EventHandler(this.gridReview_TitleAddClick);
 			// 
 			// tabHistory
