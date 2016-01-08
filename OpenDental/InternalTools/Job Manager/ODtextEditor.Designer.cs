@@ -353,6 +353,7 @@
 			this.textDescription.Location = new System.Drawing.Point(0, 27);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textDescription.RichEdit4IsEnabled = true;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textDescription.Size = new System.Drawing.Size(855, 496);
 			this.textDescription.TabIndex = 169;

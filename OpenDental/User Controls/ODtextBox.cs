@@ -41,7 +41,7 @@ namespace OpenDental {
 		public Timer timerSpellCheck;
 		private Point PositionOfClick;
 		public MatchOD ReplWord;
-		public bool spellCheckIsEnabled;//set to true in constructor
+		private bool _spellCheckIsEnabled;//set to true in constructor
 		private Point textEndPoint;
 		///<summary>Only used when ImeCompositionCompatibility is enabled.  Set to true when the user presses the space bar.
 		///This will cause the cursor to move to the next position and no longer have composition affect the current character.
@@ -56,16 +56,55 @@ namespace OpenDental {
 		///<summary>Always contains the text that should be displayed in the rich text box.  
 		///Also used to store the UNICODE representation of the RichTextBox.Text property (which we override) due to a Korean bug.</summary>
 		private string _msgText="";
+		///<summary>Pointer to the Rich Edit version 4.1 dll.  Null unless the property () is set to true and the new version is loaded.
+		///The new dll is named Msftedit.dll and the ClassName is changed from RichEdit20W to RichEdit50W.
+		///The new dll has been available since Windows XP SP1, released in 2002.  .NET is just set to use the old dll by default.</summary>
+		private static IntPtr _libPtr;
 
 		///<summary>Set true to enable spell checking in this control.</summary>
 		[Category("Behavior"),Description("Set true to enable spell checking.")]
 		[DefaultValue(true)]
 		public bool SpellCheckIsEnabled {
 			get {
-				return spellCheckIsEnabled;
+				return _spellCheckIsEnabled;
 			}
 			set {
-				spellCheckIsEnabled=value;
+				_spellCheckIsEnabled=value;
+			}
+		}
+
+		///<summary>Set true to enable the newer version 4.1 RichEdit library.</summary>
+		[Category("Behavior"), Description("Set true to enable RichEdit version 4.1 enhanced features.")]
+		[DefaultValue(false)]
+		public bool RichEdit4IsEnabled { get; set; }
+
+		[DllImport("kernel32.dll",EntryPoint="LoadLibrary",CharSet=CharSet.Auto,SetLastError=true)]
+		private static extern IntPtr LoadLibrary(string fileName);
+
+		///<summary>By default .NET uses the old library, riched20.dll, which corresponds to Rich Edit versions 2.0 and 3.0.
+		///As of Windows XP SP1 (2002 release date), the newer library, msftedit.dll, is included which corresponds to Rich Edit version 4.1.
+		///This method attempts to load the newer library, with the enhanced features, and sets the ClassName accordingly.
+		///If msftedit.dll is not found, the original default library is used.
+		///The msftedit.dll library is only loaded if the libPtr==IntPtr.Zero to prevent memory leaks.</summary>
+		protected override CreateParams CreateParams {
+			get {
+				CreateParams cParams=base.CreateParams;
+				if(!RichEdit4IsEnabled) {
+					return cParams;
+				}
+				try {
+					if(_libPtr==IntPtr.Zero) {//only try to load the library if not loaded already.
+						_libPtr=LoadLibrary("msftedit.dll");
+					}
+					if(_libPtr==IntPtr.Zero) {//still zero, library was not loaded successfully
+						return cParams;
+					}
+					cParams.ClassName="RichEdit50W";//old ClassName: "RichEdit20W" new ClassName: "RichEdit50W"
+				}
+				catch(Exception ex) {
+					//msftedit.dll must not exist, or LoadLibrary wasn't loaded, so simply return the base.CreateParams unaltered
+				}
+				return cParams;
 			}
 		}
 
@@ -82,7 +121,7 @@ namespace OpenDental {
 		///<summary></summary>
 		public ODtextBox() {
 			InitializeComponent();// Required for Windows.Forms Class Composition Designer support
-			spellCheckIsEnabled=true;
+			_spellCheckIsEnabled=true;
 			this.AcceptsTab=true;//Causes CR to not also trigger OK button on a form when that button is set as AcceptButton on the form.
 			this.DetectUrls=false;
 			if(System.ComponentModel.LicenseManager.UsageMode!=System.ComponentModel.LicenseUsageMode.Designtime
@@ -275,7 +314,7 @@ namespace OpenDental {
 				contextMenu.MenuItems[12].Enabled=true;
 				contextMenu.MenuItems[13].Enabled=true;
 			}
-			if(!this.spellCheckIsEnabled
+			if(!this._spellCheckIsEnabled
 			  || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)
 			  || !IsOnMisspelled(PositionOfClick)) {//did not click on a misspelled word OR spell check is disabled
 				contextMenu.MenuItems[0].Visible=false;//suggestion 1
@@ -288,7 +327,7 @@ namespace OpenDental {
 				contextMenu.MenuItems[7].Visible=false;//Disable Spell Check
 				contextMenu.MenuItems[8].Visible=false;//separator
 			}
-			else if(this.spellCheckIsEnabled
+			else if(this._spellCheckIsEnabled
 			  && PrefC.GetBool(PrefName.SpellCheckIsEnabled)
 			  && IsOnMisspelled(PositionOfClick)) {//clicked on or near a misspelled word AND spell check is enabled
 				List<string> suggestions=SpellSuggest();
@@ -403,7 +442,7 @@ namespace OpenDental {
 				case 2:
 				case 3:
 				case 4:
-					if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, break.  Should never happen since the suggested words won't show if spell check disabled
+					if(!this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, break.  Should never happen since the suggested words won't show if spell check disabled
 						break;
 					}
 					int originalCaret=this.SelectionStart;
@@ -419,7 +458,7 @@ namespace OpenDental {
 					break;
 				//case 5 is separator
 				case 6://Add to dict
-					if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, break.  Should never happen since Add to Dict won't show if spell check disabled
+					if(!this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, break.  Should never happen since Add to Dict won't show if spell check disabled
 						break;
 					}
 					string newWord=ReplWord.Value;
@@ -486,7 +525,7 @@ namespace OpenDental {
 		}
 
 		private void timerSpellCheck_Tick(object sender,EventArgs e) {
-			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+			if(!this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 				return;
 			}
 			timerSpellCheck.Stop();
@@ -494,7 +533,7 @@ namespace OpenDental {
 		}
 
 		private void ODtextBox_VScroll(object sender,EventArgs e) {
-			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+			if(!this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 				return;
 			}
 			timerSpellCheck.Stop();
@@ -503,7 +542,7 @@ namespace OpenDental {
 
 		protected override void OnKeyDown(KeyEventArgs e) {
 			base.OnKeyDown(e);
-			if(!this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+			if(!this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 				return;
 			}
 			//The lines were shifted due to new input. This causes the location of the red wavy underline to shift down as well, so clear them.
@@ -515,7 +554,7 @@ namespace OpenDental {
 		///<summary>When the contents of the text box is resized, e.g. when word wrap creates a new line, clear red wavy lines so they don't shift down.</summary>
 		private void ODtextBox_ContentsResized(object sender,ContentsResizedEventArgs e) {
 			try {
-				if(DesignMode || !this.spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
+				if(DesignMode || !this._spellCheckIsEnabled || !PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//if spell check disabled, return
 					return;
 				}
 			}
@@ -538,7 +577,7 @@ namespace OpenDental {
 		///<summary></summary>
 		protected override void OnKeyUp(KeyEventArgs e) {
 			base.OnKeyUp(e);
-			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
+			if(this._spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
 				timerSpellCheck.Stop();
 			}
 			int originalLength=Text.Length;
@@ -552,7 +591,7 @@ namespace OpenDental {
 			if(e.KeyCode==Keys.Q && e.Modifiers==Keys.Control) {
 				ShowFullDialog();
 			}
-			if(this.spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
+			if(this._spellCheckIsEnabled && PrefC.GetBool(PrefName.SpellCheckIsEnabled)) {//Only spell check if enabled
 				timerSpellCheck.Start();
 			}
 		}
@@ -639,7 +678,7 @@ namespace OpenDental {
 		///<summary>Performs spell checking against indiviudal words against the English USA dictionary.</summary>
 		private void SpellCheck() {
 			//Only spell check if enabled
-			if(!this.spellCheckIsEnabled 
+			if(!this._spellCheckIsEnabled 
 				|| !PrefC.GetBool(PrefName.SpellCheckIsEnabled)
 				|| PrefC.GetBool(PrefName.ImeCompositionCompatibility))
 			{
