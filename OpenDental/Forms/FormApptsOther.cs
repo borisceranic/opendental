@@ -1,8 +1,7 @@
 using System;
 using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -51,6 +50,8 @@ namespace OpenDental{
 		private OpenDental.UI.Button butNote;
 		private OpenDental.UI.Button butRecallFamily;
 		private UI.ODGrid gridMain;
+		private CheckBox checkShowCompletePlanned;
+
 		///<summary>If oResult=PinboardAndSearch, then when closing this form, this will contain the date to jump to when beginning the search.  If oResult=GoTo, then this will also contain the date.  Can't use DateTime type because C# complains about marshal by reference.</summary>
 		public string DateJumpToString;
 
@@ -101,6 +102,7 @@ namespace OpenDental{
 			this.butNote = new OpenDental.UI.Button();
 			this.butRecallFamily = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.checkShowCompletePlanned = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// checkDone
@@ -110,7 +112,7 @@ namespace OpenDental{
 			this.checkDone.ImeMode = System.Windows.Forms.ImeMode.NoControl;
 			this.checkDone.Location = new System.Drawing.Point(12, 145);
 			this.checkDone.Name = "checkDone";
-			this.checkDone.Size = new System.Drawing.Size(210, 16);
+			this.checkDone.Size = new System.Drawing.Size(168, 16);
 			this.checkDone.TabIndex = 1;
 			this.checkDone.TabStop = false;
 			this.checkDone.Text = "Planned Appt Done";
@@ -359,6 +361,8 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 168);
 			this.gridMain.Name = "gridMain";
@@ -369,11 +373,24 @@ namespace OpenDental{
 			this.gridMain.TranslationName = "FormDisplayFields";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// checkShowCompletePlanned
+			// 
+			this.checkShowCompletePlanned.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowCompletePlanned.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+			this.checkShowCompletePlanned.Location = new System.Drawing.Point(182, 145);
+			this.checkShowCompletePlanned.Name = "checkShowCompletePlanned";
+			this.checkShowCompletePlanned.Size = new System.Drawing.Size(251, 16);
+			this.checkShowCompletePlanned.TabIndex = 68;
+			this.checkShowCompletePlanned.TabStop = false;
+			this.checkShowCompletePlanned.Text = "Show Completed Planned Appts";
+			this.checkShowCompletePlanned.CheckedChanged += new System.EventHandler(this.checkShowCompletePlanned_CheckedChanged);
+			// 
 			// FormApptsOther
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(924, 658);
+			this.Controls.Add(this.checkShowCompletePlanned);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butRecallFamily);
 			this.Controls.Add(this.butNote);
@@ -444,6 +461,9 @@ namespace OpenDental{
 		private void FillGrid() {
 			ApptList=Appointments.GetForPat(PatCur.PatNum);
 			List<PlannedAppt> plannedList=PlannedAppts.Refresh(PatCur.PatNum);
+			List<PlannedAppt> listPlannedIncomplete=plannedList.FindAll(x => !ApptList.ToList()
+				.Exists(y => y.NextAptNum==x.AptNum && y.AptStatus==ApptStatus.Complete))
+				.OrderBy(x => x.ItemOrder).ToList();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("FormApptsOther","Appt Status"),100);
@@ -505,11 +525,30 @@ namespace OpenDental{
 						row.ColorBackG=DefC.Long[(int)DefCat.ProgNoteColors][17].ItemColor;
 						row.ColorText=DefC.Long[(int)DefCat.ProgNoteColors][16].ItemColor;
 						string txt=Lan.g("enumApptStatus","Planned")+" ";
-						for(int p=0;p<plannedList.Count;p++) {
-							if(plannedList[p].AptNum==ApptList[i].AptNum) {
-								txt+="#"+plannedList[p].ItemOrder.ToString();
+						int plannedAptIdx=listPlannedIncomplete.FindIndex(x => x.AptNum==ApptList[i].AptNum);
+						if(checkShowCompletePlanned.Checked) {
+							for(int p=0;p<plannedList.Count;p++) {
+								if(plannedList[p].AptNum==ApptList[i].AptNum) {
+									txt+="#"+plannedList[p].ItemOrder.ToString();
+								}
+							}							
+						}
+						else {
+							if(plannedAptIdx>=0) {
+								txt+="#"+(plannedAptIdx+1);
+							}
+							else {
+								continue;
 							}
 						}
+						if(plannedAptIdx<0) {//attached to a completed appointment
+							txt+=" ("+Lan.g("enumApptStatus",ApptStatus.Complete.ToString())+")";
+						}
+						if(ApptList.ToList().FindAll(x => x.NextAptNum==ApptList[i].AptNum)
+							.Exists(x => x.AptStatus==ApptStatus.Scheduled || x.AptStatus==ApptStatus.ASAP)) //attached to a scheduled appointment
+						{
+							txt+=" ("+Lan.g("enumApptStatus",ApptStatus.Scheduled.ToString())+")";
+						}						
 						row.Cells[0].Text=txt;
 					}
 					else if(ApptList[i].AptStatus==ApptStatus.PtNote) {
@@ -538,6 +577,7 @@ namespace OpenDental{
 				row.Cells.Add((ApptList[i].Pattern.Length * 5).ToString());
 				row.Cells.Add(ApptList[i].ProcDescript);
 				row.Cells.Add(ApptList[i].Note);
+				row.Tag=ApptList[i].AptNum;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -627,6 +667,10 @@ namespace OpenDental{
 				PatCur=FamCur.GetPatient(originalPatNum);
 				Filltb();
 			}*/
+		}
+
+		private void checkShowCompletePlanned_CheckedChanged(object sender,EventArgs e) {
+			FillGrid();
 		}
 
 		private void butRecall_Click(object sender, System.EventArgs e) {
@@ -999,10 +1043,10 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select appointment first."));
 				return;
 			}
-			if(!OKtoSendToPinboard(ApptList[gridMain.GetSelectedIndex()])){
+			if(!OKtoSendToPinboard(ApptList.FirstOrDefault(x => x.AptNum==(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag))) {//Tag is AptNum
 				return;
 			}
-			AptNumsSelected.Add(ApptList[gridMain.GetSelectedIndex()].AptNum);
+			AptNumsSelected.Add((long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag);
 			oResult=OtherResult.CopyToPinBoard;
 			DialogResult=DialogResult.OK;
 		}
@@ -1046,17 +1090,17 @@ namespace OpenDental{
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			int currentSelection=e.Row;
 			int currentScroll=gridMain.ScrollValue;
-			FormApptEdit FormAE=new FormApptEdit(ApptList[e.Row].AptNum);
+			FormApptEdit FormAE=new FormApptEdit((long)gridMain.Rows[e.Row].Tag);//Tag is AptNum
 			FormAE.IsInViewPatAppts=true;
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();
 			if(FormAE.DialogResult!=DialogResult.OK)
 				return;
 			if(FormAE.PinClicked){
-				if(!OKtoSendToPinboard(ApptList[e.Row])){
+				if(!OKtoSendToPinboard(ApptList.FirstOrDefault(x => x.AptNum==(long)gridMain.Rows[e.Row].Tag))) {
 					return;
 				}
-				AptNumsSelected.Add(ApptList[e.Row].AptNum);
+				AptNumsSelected.Add((long)gridMain.Rows[e.Row].Tag);
 				oResult=OtherResult.CopyToPinBoard;
 				DialogResult=DialogResult.OK;
 			}
@@ -1096,12 +1140,13 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select appointment first."));
 				return;
 			}
-			if(ApptList[gridMain.GetSelectedIndex()].AptDateTime.Year<1880){
+			Appointment aptSelected=ApptList.FirstOrDefault(x => x.AptNum==(long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag);//Tag is AptNum
+			if(aptSelected.AptDateTime.Year<1880) {
 				MessageBox.Show(Lan.g(this,"Unable to go to unscheduled appointment."));
 				return;
 			}
-			AptNumsSelected.Add(ApptList[gridMain.GetSelectedIndex()].AptNum);
-			DateJumpToString=ApptList[gridMain.GetSelectedIndex()].AptDateTime.Date.ToShortDateString();
+			AptNumsSelected.Add(aptSelected.AptNum);
+			DateJumpToString=aptSelected.AptDateTime.Date.ToShortDateString();
 			oResult=OtherResult.GoTo;
 			DialogResult=DialogResult.OK;
 		}
@@ -1113,7 +1158,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please select appointment first."));
 				return;
 			}
-			AptNumsSelected.Add(ApptList[gridMain.GetSelectedIndex()].AptNum);
+			AptNumsSelected.Add((long)gridMain.Rows[gridMain.GetSelectedIndex()].Tag);//Tag is AptNum
 			DialogResult=DialogResult.OK;
 		}
 
