@@ -171,15 +171,24 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetDouble(MethodBase.GetCurrentMethod(),patNum,procedures,billingDay);
 			}
+			//Find the beginning of the current billing cycle, use that date to total charges between now and then for this cycle only.
+			//Include that date only when we are not on the first day of the current billing cycle.
 			DateTime startBillingCycle;
 			if(DateTime.Today.Day>billingDay) {//if today is 7/13/2015 and billingDay is 26, startBillingCycle will be 6/26/2015
 				startBillingCycle=new DateTime(DateTime.Today.Year,DateTime.Today.Month,billingDay);
 			}
 			else {
-				DateTime lastMonth=DateTime.Today.AddMonths(-1);
-				//Make sure the billing day is not Febuary 30th or November 31st
-				billingDay=Math.Min(DateTime.DaysInMonth(lastMonth.Year,lastMonth.Month),billingDay);
-				startBillingCycle=new DateTime(lastMonth.Year,lastMonth.Month,billingDay);
+				//DateTime.Today.AddMonths handles the number of days in the month and leap years
+				//Examples: if today was 12/31/2015, AddMonths(-1) would yield 11/30/2015; if today was 3/31/2016, AddMonths(-1) would yield 2/29/2016
+				startBillingCycle=DateTime.Today.AddMonths(-1);
+				if(billingDay<=DateTime.DaysInMonth(startBillingCycle.Year,startBillingCycle.Month)) {
+					//This corrects the issue of a billing cycle day after today but this month doesn't have enough days when last month does
+					//Example: if today was 11/30/2015 and the pat's billing cycle day was the 31st, startBillingCycle=Today.AddMonths(-1) would be 10/30/2015.
+					//But this pat's billing cycle day is the 31st and the December has 31 days.  This adjusts the start of the billing cycle to 10/31/2015.
+					//Example 2: if today was 2/29/2016 (leap year) and the pat's billing cycle day was the 30th, startBillingCycle should be 1/30/2016.
+					//Today.AddMonths(-1) would be 1/29/2016, so this adjusts startBillingCycle to 1/30/2016.
+					startBillingCycle=new DateTime(startBillingCycle.Year,startBillingCycle.Month,billingDay);
+				}
 			}
 			string procStr="'"+POut.String(procedures).Replace(",","','")+"'";
 			string command="SELECT SUM(pl.ProcFee) "
