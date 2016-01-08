@@ -183,6 +183,7 @@
 			this.gridReview.TabStop = false;
 			this.gridReview.Title = "Reviews";
 			this.gridReview.TranslationName = null;
+			this.gridReview.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridReview_CellDoubleClick);
 			this.gridReview.TitleAddClick += new System.EventHandler(this.gridReview_TitleAddClick);
 			// 
 			// tabHistory

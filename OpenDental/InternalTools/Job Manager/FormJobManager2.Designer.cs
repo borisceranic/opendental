@@ -44,6 +44,7 @@
 			this.userControlJobEdit = new OpenDental.InternalTools.Job_Manager.UserControlJobEdit();
 			this.tabManage = new System.Windows.Forms.TabPage();
 			this.gridWorkSummary = new OpenDental.UI.ODGrid();
+			this.butRefresh = new OpenDental.UI.Button();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -61,6 +62,7 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.butRefresh);
 			this.splitContainer1.Panel1.Controls.Add(this.comboCategorySearch);
 			this.splitContainer1.Panel1.Controls.Add(this.label3);
 			this.splitContainer1.Panel1.Controls.Add(this.butSearch);
@@ -321,6 +323,20 @@
 			this.gridWorkSummary.TranslationName = "FormTaskEdit";
 			this.gridWorkSummary.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridWorkSummary_CellClick);
 			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(11, 75);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(52, 24);
+			this.butRefresh.TabIndex = 236;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
 			// FormJobManager2
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -368,6 +384,7 @@
 		private UI.Button butSearch;
 		private System.Windows.Forms.ComboBox comboCategorySearch;
 		private System.Windows.Forms.Label label3;
+		private UI.Button butRefresh;
 
 
 	}

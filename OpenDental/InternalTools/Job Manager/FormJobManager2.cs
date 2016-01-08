@@ -37,16 +37,7 @@ namespace OpenDental {
 
 		private void FormJobManager_Load(object sender,EventArgs e) {
 			UserFilter=Security.CurUser;
-			ODThread thread=new ODThread((o)=> {
-				_listJobsAll=Jobs.GetAll();
-				Jobs.FillInMemoryLists(_listJobsAll);
-				_listJobPermissionsAll=JobPermissions.GetList();
-				_listJobsFiltered=_listJobsAll.Select(x=>x.Copy()).ToList();
-				this.Invoke((Action)FillTree);
-				this.Invoke((Action)FillWorkSummary);
-			});
-			thread.AddExceptionHandler((ex)=> {/*todo, or not todo*/});
-			thread.Start();
+			RefreshAndFillThreaded();
 			comboCategorySearch.Items.Add("All");
 			Enum.GetNames(typeof(JobCategory)).ToList().ForEach(x => comboCategorySearch.Items.Add(x));
 			comboCategorySearch.SelectedIndex=0;
@@ -60,6 +51,20 @@ namespace OpenDental {
 			}
 			//FillTree();//Invoked above.
 			//FillWorkSummary();//Invoked above.
+		}
+
+		///<summary>Fills all in memory data from the DB on a seperate thread and then refills controls.</summary>
+		private void RefreshAndFillThreaded() {
+			ODThread thread=new ODThread((o) => {
+				_listJobsAll=Jobs.GetAll();
+				Jobs.FillInMemoryLists(_listJobsAll);
+				_listJobPermissionsAll=JobPermissions.GetList();
+				_listJobsFiltered=_listJobsAll.Select(x => x.Copy()).ToList();
+				this.Invoke((Action)FillTree);
+				this.Invoke((Action)FillWorkSummary);
+			});
+			thread.AddExceptionHandler((ex) => {/*todo, or not todo*/});
+			thread.Start();
 		}
 
 		private void FillWorkSummary() {
@@ -621,7 +626,21 @@ namespace OpenDental {
 			else {
 				_listJobsAll[_listJobsAll.IndexOf(jobStale)]=jobNew;
 			}
-			FilterAndFill();
+			UpdateNodes(jobNew);
+		}
+
+		///<summary>Flat recurssion. Updates any nodes displaying outdated information for the passed in job (identified by JobNum).</summary>
+		/// <param name="jobNew"></param>
+		private void UpdateNodes(Job jobNew) {
+			List<TreeNode> treeNodes=new List<TreeNode>(treeJobs.Nodes.Cast<TreeNode>());
+			for(int i=0;i<treeNodes.Count;i++) {
+				TreeNode nodeCur=treeNodes[i];
+				if((nodeCur.Tag is Job) && ((Job)nodeCur.Tag).JobNum==jobNew.JobNum) {
+					nodeCur.Text=jobNew.ToString();//update label if Title has changed.
+					nodeCur.Tag=jobNew;
+				}
+				treeNodes.AddRange(nodeCur.Nodes.Cast<TreeNode>());
+			}
 		}
 
 		///<summary>For UI only. Never saved to DB.</summary>
@@ -668,6 +687,24 @@ namespace OpenDental {
 
 		private void comboCategorySearch_SelectedIndexChanged(object sender,EventArgs e) {
 			FilterAndFill();
+		}
+
+		///<summary>This is a temporary solution. Once the Job Manager is programmed to use signals to refresh content dynamically this should be removed.</summary>
+		private void butRefresh_Click(object sender,EventArgs e) {
+			if(userControlJobEdit.IsChanged) {
+				switch(MessageBox.Show("Save changes to current job?","",MessageBoxButtons.YesNoCancel)) {
+					case System.Windows.Forms.DialogResult.OK:
+					case System.Windows.Forms.DialogResult.Yes:
+						userControlJobEdit.ForceSave();
+						break;
+					case System.Windows.Forms.DialogResult.No:
+						//do nothing
+						break;
+					case System.Windows.Forms.DialogResult.Cancel:
+						return;
+				}
+			}
+			RefreshAndFillThreaded();
 		}
 
 		private void FormJobManager2_FormClosing(object sender,FormClosingEventArgs e) {
