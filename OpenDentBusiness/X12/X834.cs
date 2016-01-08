@@ -154,10 +154,10 @@ namespace OpenDentBusiness {
 			while(_segCur.SegmentID=="INS") {
 				Hx834_Member member=new Hx834_Member();
 				ProcessLoop2000_INS(member);
-				ProcessLoop2000_REF_1();
-				ProcessLoop2000_REF_2();
-				ProcessLoop2000_REF_3();
-				ProcessLoop2000_DTP();
+				ProcessLoop2000_REF_1(member);
+				ProcessLoop2000_REF_2(member);
+				ProcessLoop2000_REF_3(member);
+				ProcessLoop2000_DTP(member);
 				ProcessLoop2100A();
 				ProcessLoop2100B();
 				ProcessLoop2100C();
@@ -270,49 +270,83 @@ namespace OpenDentBusiness {
 			else if(member.InsRelationshipCode=="G9") {//Other Relative
 				member.Relationship=Relat.Dependent;
 			}
-			member.MaintReasonCode=_segCur.Get(3);
+			member.MaintTypeCode=_segCur.Get(3);
 			member.MaintReason=Hx834_MemberMaintReason.None;
-			if(member.MaintReasonCode=="001") {//Change
+			if(member.MaintTypeCode=="001") {//Change
 				member.MaintReason=Hx834_MemberMaintReason.Change;
 			}
-			else if(member.MaintReasonCode=="021") {//Addition
+			else if(member.MaintTypeCode=="021") {//Addition
 				member.MaintReason=Hx834_MemberMaintReason.Addition;
 			}
-			else if(member.MaintReasonCode=="024") {//Cancellation or Termination
+			else if(member.MaintTypeCode=="024") {//Cancellation or Termination
 				member.MaintReason=Hx834_MemberMaintReason.CancellationOrTermination;
 			}
-			else if(member.MaintReasonCode=="025") {//Reinstatement
+			else if(member.MaintTypeCode=="025") {//Reinstatement
 				member.MaintReason=Hx834_MemberMaintReason.Reinstatement;
 			}
-			else if(member.MaintReasonCode=="030") {//Audit or Compare
+			else if(member.MaintTypeCode=="030") {//Audit or Compare
 				member.MaintReason=Hx834_MemberMaintReason.AuditOrCompare;
 			}
+			member.MaintReasonCode=_segCur.Get(4);
+			member.BenefitStatusCode=_segCur.Get(5);
+			if(_segCur.Get(6)!="") {
+				string[] arrayMedicare=_segCur.Get(6).Split(Separators.Subelement[0]);
+				member.MedicarePlanCode=arrayMedicare[0];
+				if(arrayMedicare.Length>1) {
+					member.MedicareEligibilityReasonCode=arrayMedicare[1];
+				}
+			}
+			member.CobraQualifyingCode=_segCur.Get(7);
+			member.EmploymentStatusCode=_segCur.Get(8);
+			member.StudentStatusCode=_segCur.Get(9);
+			member.IsHandicapped=false;
+			if(_segCur.Get(10)=="Y") {
+				member.IsHandicapped=true;
+			}
+			member.DateDeath=DtmToDateTime(_segCur.Get(12));
+			member.IsInfoRestrictedAccess=false;
+			if(_segCur.Get(13)=="R") {
+				member.IsInfoRestrictedAccess=true;
+			}
+			member.BirthSequenceNumber=PIn.Int(_segCur.Get(17));
 			_segNum++;
 		}
 
 		///<summary>REF: Subscriber Identifier.  Required.  Repeat 1.  Guide page 55.</summary>
-		private void ProcessLoop2000_REF_1() {
+		private void ProcessLoop2000_REF_1(Hx834_Member member) {
+			member.SubscriberId=_segCur.Get(2);
 			_segNum++;
 		}
 
 		///<summary>REF: Member Policy Number.  Situational.  Repeat 1.  Guide page 56.</summary>
-		private void ProcessLoop2000_REF_2() {
+		private void ProcessLoop2000_REF_2(Hx834_Member member) {
 			if(_segCur.SegmentID!="REF" || _segCur.Get(1)!="1L") {
 				return;
 			}
+			member.GroupPolicyNumber=_segCur.Get(2);
 			_segNum++;
 		}
 
 		///<summary>REF: Member Supplemental Identifier.  Situational.  Repeat 13.  Guide page 57.</summary>
-		private void ProcessLoop2000_REF_3() {
+		private void ProcessLoop2000_REF_3(Hx834_Member member) {
+			member.ListMemberSupplementalIds.Clear();
 			while(_segCur.SegmentID=="REF") {
+				Hx834_Ref href=new Hx834_Ref();
+				href.ReferenceIdQualifier=_segCur.Get(1);
+				href.ReferenceId=_segCur.Get(2);
+				member.ListMemberSupplementalIds.Add(href);
 				_segNum++;
 			}
 		}
 
 		///<summary>DTP: Member Level Dates.  Situational.  Repeat 24.  Guide page 59.</summary>
-		private void ProcessLoop2000_DTP() {
+		private void ProcessLoop2000_DTP(Hx834_Member member) {
+			member.ListMemberDates.Clear();
 			while(_segCur.SegmentID=="DTP") {
+				Hx834_Dtp dtp=new Hx834_Dtp();
+				dtp.DateTimeQualifier=_segCur.Get(1);
+				dtp.DateT=DtmToDateTime(_segCur.Get(3));
+				member.ListMemberDates.Add(dtp);
 				_segNum++;
 			}
 		}
@@ -940,6 +974,22 @@ namespace OpenDentBusiness {
 			_segNum++;
 		}
 
+		#region Helpers
+
+		///<summary>Converts a date in string format YYYYMMDD into a DateTime object.</summary>
+		private DateTime DtmToDateTime(string strDtm) {
+			DateTime dateTime=DateTime.MinValue;
+			if(strDtm.Length>=8) {
+				int dtmYear=int.Parse(strDtm.Substring(0,4));
+				int dtmMonth=int.Parse(strDtm.Substring(4,2));
+				int dtmDay=int.Parse(strDtm.Substring(6,2));
+				dateTime=new DateTime(dtmYear,dtmMonth,dtmDay);
+			}
+			return dateTime;
+		}
+
+		#endregion Helpers
+
 	}
 
 	#region Helper Classes
@@ -980,9 +1030,39 @@ namespace OpenDentBusiness {
 		///<summary>The insurance relationship to the subscriber.  Closest match to the value found in INS02.</summary>
 		public Relat Relationship;
 		///<summary>Loop 2000 INS03</summary>
-		public string MaintReasonCode;
+		public string MaintTypeCode;
 		///<summary>Maintenance reason.  Enum value of Loop 2000 INS03 (MaintReasonCode).</summary>
 		public Hx834_MemberMaintReason MaintReason;
+		///<summary>Loop 2000 INS04</summary>
+		public string MaintReasonCode;
+		///<summary>Loop 2000 INS05</summary>
+		public string BenefitStatusCode;
+		///<summary>Loop 2000 INS06-1</summary>
+		public string MedicarePlanCode;
+		///<summary>Loop 2000 INS06-2</summary>
+		public string MedicareEligibilityReasonCode;
+		///<summary>Loop 2000 INS07</summary>
+		public string CobraQualifyingCode;
+		///<summary>Loop 2000 INS08</summary>
+		public string EmploymentStatusCode;
+		///<summary>Loop 2000 INS09.  Corresponds exactly to patient.StudentStatus</summary>
+		public string StudentStatusCode;
+		///<summary>Loop 2000 INS10</summary>
+		public bool IsHandicapped;
+		///<summary>Loop 2000 INS12</summary>
+		public DateTime DateDeath;
+		///<summary>Loop 2000 INS13</summary>
+		public bool IsInfoRestrictedAccess;
+		///<summary>Loop 2000 INS17</summary>
+		public int BirthSequenceNumber;
+		///<summary>Loop 2000 REF02_1</summary>
+		public string SubscriberId;
+		///<summary>Loop 2000 REF02_2</summary>
+		public string GroupPolicyNumber;
+		///<summary>Loop 2000 REF02_3 (repeat 13)</summary>
+		public List <Hx834_Ref> ListMemberSupplementalIds=new List<Hx834_Ref>();
+		///<summary>Loop 2000 DTP (repeat 24)</summary>
+		public List <Hx834_Dtp> ListMemberDates=new List<Hx834_Dtp>();
 	}
 
 	public enum Hx834_MemberMaintReason {
@@ -998,6 +1078,18 @@ namespace OpenDentBusiness {
 		Reinstatement,
 		///<summary>5</summary>
 		AuditOrCompare,
+	}
+
+	///<summary>Corresponds to a REF segment.</summary>
+	public class Hx834_Ref {
+		public string ReferenceIdQualifier;
+		public string ReferenceId;
+	}
+
+	///<summary>Corresponds to a DTP segment.</summary>
+	public class Hx834_Dtp {
+		public string DateTimeQualifier;
+		public DateTime DateT;
 	}
 
 	#endregion Helper Classes
