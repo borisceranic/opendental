@@ -137,6 +137,7 @@ namespace OpenDental{
 		private List<ProcedureCode> _listProcCodes;
 		///<summary>A short list of procedures which were moved from another appointment to this appointment.</summary>
 		private List<Procedure> _listProcsMoved;
+		private Label labelPlannedComplete;
 		private List<Provider> _listProviders;
 
 		///<summary></summary>
@@ -252,6 +253,7 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butText = new OpenDental.UI.Button();
+			this.labelPlannedComplete = new System.Windows.Forms.Label();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -852,6 +854,7 @@ namespace OpenDental{
 			// 
 			this.gridFields.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridFields.HasAddButton = false;
 			this.gridFields.HasMultilineHeaders = false;
 			this.gridFields.HScrollVisible = false;
 			this.gridFields.Location = new System.Drawing.Point(21, 578);
@@ -867,6 +870,7 @@ namespace OpenDental{
 			// 
 			this.gridPatient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPatient.HasAddButton = false;
 			this.gridPatient.HasMultilineHeaders = false;
 			this.gridPatient.HScrollVisible = false;
 			this.gridPatient.Location = new System.Drawing.Point(282, 405);
@@ -884,6 +888,7 @@ namespace OpenDental{
 			this.gridComm.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridComm.HasAddButton = false;
 			this.gridComm.HasMultilineHeaders = false;
 			this.gridComm.HScrollVisible = false;
 			this.gridComm.Location = new System.Drawing.Point(542, 405);
@@ -901,6 +906,7 @@ namespace OpenDental{
 			this.gridProc.AllowSelection = false;
 			this.gridProc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProc.HasAddButton = false;
 			this.gridProc.HasMultilineHeaders = false;
 			this.gridProc.HScrollVisible = false;
 			this.gridProc.Location = new System.Drawing.Point(434, 28);
@@ -981,6 +987,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(21, 469);
 			this.textNote.Name = "textNote";
@@ -1129,10 +1136,22 @@ namespace OpenDental{
 			this.butText.Text = "Text";
 			this.butText.Click += new System.EventHandler(this.butText_Click);
 			// 
+			// labelPlannedComplete
+			// 
+			this.labelPlannedComplete.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelPlannedComplete.Location = new System.Drawing.Point(633, 1);
+			this.labelPlannedComplete.Name = "labelPlannedComplete";
+			this.labelPlannedComplete.Size = new System.Drawing.Size(305, 26);
+			this.labelPlannedComplete.TabIndex = 185;
+			this.labelPlannedComplete.Text = "This planned appointment is attached\r\nto a completed appointment.";
+			this.labelPlannedComplete.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelPlannedComplete.Visible = false;
+			// 
 			// FormApptEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 698);
+			this.Controls.Add(this.labelPlannedComplete);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.listQuickAdd);
 			this.Controls.Add(this.labelQuickAdd);
@@ -1245,6 +1264,11 @@ namespace OpenDental{
 				labelStatus.Visible=false;
 				comboStatus.Visible=false;
 				butDelete.Visible=false;
+				if(_listAppointments.FindAll(x => x.NextAptNum==AptCur.AptNum)//This planned appt is attached to a completed appt.
+					.Exists(x => x.AptStatus==ApptStatus.Complete)) 
+				{
+					labelPlannedComplete.Visible=true;
+				}
 			}
 			else if(AptCur.AptStatus==ApptStatus.PtNote) {
 				labelApptNote.Text="Patient NOTE:";
