@@ -155,6 +155,7 @@
 			this.gridNotes.TabIndex = 194;
 			this.gridNotes.Title = "Discussion";
 			this.gridNotes.TranslationName = "FormTaskEdit";
+			this.gridNotes.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridNotes_CellDoubleClick);
 			this.gridNotes.TitleAddClick += new System.EventHandler(this.gridNotes_TitleAddClick);
 			// 
 			// tabReviews

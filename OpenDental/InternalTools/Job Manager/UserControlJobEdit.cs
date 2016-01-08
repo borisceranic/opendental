@@ -217,6 +217,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				row.Cells.Add(jobNote.DateTimeNote.ToShortDateString()+" "+jobNote.DateTimeNote.ToShortTimeString());
 				row.Cells.Add(Userods.GetName(jobNote.UserNum));
 				row.Cells.Add(jobNote.Note);
+				row.Tag=jobNote;
 				gridNotes.Rows.Add(row);
 			}
 			gridNotes.EndUpdate();
@@ -1051,6 +1052,25 @@ namespace OpenDental.InternalTools.Job_Manager {
 		private void gridHistory_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormJobHistoryView FormJHV=new FormJobHistoryView((long)gridHistory.Rows[e.Row].Tag);
 			FormJHV.ShowDialog();
+		}
+
+		private void gridNotes_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(!(gridNotes.Rows[e.Row].Tag is JobNote)) {
+				return;//should never happen.
+			}
+			JobNote jobNote=(JobNote)gridNotes.Rows[e.Row].Tag;
+			FormJobNoteEdit FormJNE=new FormJobNoteEdit(jobNote);
+			FormJNE.ShowDialog();
+			if(FormJNE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			if(FormJNE._jobNote==null) {//delete from in memory list.
+				_jobCur.ListJobNotes.RemoveAt(e.Row);
+			}
+			else {//update in memory list
+				_jobCur.ListJobNotes[e.Row]=FormJNE._jobNote;
+			}
+			FillGridNote();
 		}
 
 

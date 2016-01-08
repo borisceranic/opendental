@@ -38,10 +38,6 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete note?")) {
 				return;
 			}
-			if(_jobNote.IsNew) {
-				DialogResult=DialogResult.Cancel;
-				return;
-			}
 			_jobNote=null;
 			DialogResult=DialogResult.OK;
 		}
