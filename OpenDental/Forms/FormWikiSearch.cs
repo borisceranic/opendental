@@ -36,7 +36,7 @@ namespace OpenDental {
 			webBrowserWiki.AllowNavigation=true;
 			butRestore.Enabled=false;
 			try {
-				if(checkDeletedOnly.Checked) {
+				if(checkArchivedOnly.Checked) {
 					webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(WikiPageHists.GetDeletedByTitle(WikiPageTitleCur).PageContent,true);
 					butRestore.Enabled=true;
 				}
@@ -59,7 +59,7 @@ namespace OpenDental {
 			//col=new ODGridColumn(Lan.g(this,"Saved"),42);
 			//gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
-			if(checkDeletedOnly.Checked) {
+			if(checkArchivedOnly.Checked) {
 				listWikiPageTitles=WikiPageHists.GetDeletedPages(textSearch.Text,checkIgnoreContent.Checked);
 			}
 			else {
@@ -81,7 +81,7 @@ namespace OpenDental {
 
 		private void gridMain_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {			
 			//SelectedWikiPage=listWikiPages[e.Row];
-			if(checkDeletedOnly.Checked) {
+			if(checkArchivedOnly.Checked) {
 				return;
 			}
 			wikiPageTitleSelected=listWikiPageTitles[e.Row];
@@ -99,8 +99,8 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void checkDeletedOnly_CheckedChanged(object sender,EventArgs e) {
-			butOK.Enabled=!checkDeletedOnly.Checked;
+		private void checkArchivedOnly_CheckedChanged(object sender,EventArgs e) {
+			butOK.Enabled=!checkArchivedOnly.Checked;
 			FillGrid();
 		}
 
@@ -139,7 +139,5 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			Close();
 		}
-
-
 	}
 }

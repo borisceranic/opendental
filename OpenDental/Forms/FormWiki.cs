@@ -125,7 +125,7 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Edit"),4,"","Edit"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print"),5,"","Print"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Rename"),6,"","Rename"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Delete"),7,"","Delete"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Archive"),7,"","Archive"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"History"),8,"","History"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Incoming Links"),9,"","Inc Links"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
@@ -160,8 +160,8 @@ namespace OpenDental {
 				case "Rename":
 					Rename_Click();
 					break;
-				case "Delete":
-					Delete_Click();
+				case "Archive":
+					Archive_Click();
 					break;
 				case "History":
 					History_Click();
@@ -299,15 +299,15 @@ namespace OpenDental {
 			LoadWikiPage(FormWR.PageTitle);
 		}
 
-		private void Delete_Click() {
+		private void Archive_Click() {
 			if(WikiPageCur==null) {
 				return;
 			}
 			if(WikiPageCur.PageTitle=="Home") {
-				MsgBox.Show(this,"Cannot delete homepage."); 
+				MsgBox.Show(this,"Cannot archive homepage."); 
 				return;
 			}
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete this wiki page?  It will still be available from the Search window if needed.")) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Archive this wiki page?  It will still be available from the Search window if needed.")) {
 				return;
 			}
 			WikiPages.Delete(WikiPageCur.PageTitle);

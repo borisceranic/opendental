@@ -29,7 +29,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.textSearch = new System.Windows.Forms.TextBox();
 			this.checkIgnoreContent = new System.Windows.Forms.CheckBox();
-			this.checkDeletedOnly = new System.Windows.Forms.CheckBox();
+			this.checkArchivedOnly = new System.Windows.Forms.CheckBox();
 			this.webBrowserWiki = new System.Windows.Forms.WebBrowser();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -41,6 +41,8 @@ namespace OpenDental{
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 38);
 			this.gridMain.Name = "gridMain";
@@ -79,15 +81,15 @@ namespace OpenDental{
 			this.checkIgnoreContent.Text = "Ignore Content";
 			this.checkIgnoreContent.CheckedChanged += new System.EventHandler(this.checkIgnoreContent_CheckedChanged);
 			// 
-			// checkDeletedOnly
+			// checkArchivedOnly
 			// 
-			this.checkDeletedOnly.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkDeletedOnly.Location = new System.Drawing.Point(460, 9);
-			this.checkDeletedOnly.Name = "checkDeletedOnly";
-			this.checkDeletedOnly.Size = new System.Drawing.Size(188, 22);
-			this.checkDeletedOnly.TabIndex = 15;
-			this.checkDeletedOnly.Text = "Deleted Only";
-			this.checkDeletedOnly.CheckedChanged += new System.EventHandler(this.checkDeletedOnly_CheckedChanged);
+			this.checkArchivedOnly.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkArchivedOnly.Location = new System.Drawing.Point(460, 9);
+			this.checkArchivedOnly.Name = "checkArchivedOnly";
+			this.checkArchivedOnly.Size = new System.Drawing.Size(188, 22);
+			this.checkArchivedOnly.TabIndex = 15;
+			this.checkArchivedOnly.Text = "Archived Only";
+			this.checkArchivedOnly.CheckedChanged += new System.EventHandler(this.checkArchivedOnly_CheckedChanged);
 			// 
 			// webBrowserWiki
 			// 
@@ -161,7 +163,7 @@ namespace OpenDental{
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(1184, 662);
 			this.Controls.Add(this.butRestore);
-			this.Controls.Add(this.checkDeletedOnly);
+			this.Controls.Add(this.checkArchivedOnly);
 			this.Controls.Add(this.checkIgnoreContent);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textSearch);
@@ -188,7 +190,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textSearch;
 		private System.Windows.Forms.CheckBox checkIgnoreContent;
-		private System.Windows.Forms.CheckBox checkDeletedOnly;
+		private System.Windows.Forms.CheckBox checkArchivedOnly;
 		private UI.Button butRestore;
 		private System.Windows.Forms.Timer timer1;
 	}
