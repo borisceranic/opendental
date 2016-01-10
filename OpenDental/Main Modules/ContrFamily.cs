@@ -490,8 +490,8 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary></summary>
-		private void OnPatientSelected(Patient pat){
+		///<summary>Public so it can be used from plugin.</summary>
+		public void OnPatientSelected(Patient pat){
 			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
 			if(PatientSelected!=null){
 				PatientSelected(this,eArgs);
