@@ -296,7 +296,7 @@ namespace OpenDentBusiness {
 				_accountNumReceiving=_accountNumReceiving.Substring(_accountNumReceiving.Length-4);
 			}
 			//BPR16 Date EFT Effective or Date Check Issued.  Situational.
-			_dateEffective=DtmToDateTime(segBPR.Get(16));
+			_dateEffective=X12Parse.ToDate(segBPR.Get(16));
 			//BPR17 through BPR21 at not used in the format.
 		}
 
@@ -426,10 +426,10 @@ namespace OpenDentBusiness {
 			retVal.DateServiceEnd=DateTime.MinValue;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && (_listSegments[segNum].Get(1)=="232" || _listSegments[segNum].Get(1)=="233")) {
 				if(_listSegments[segNum].Get(1)=="232") {
-					retVal.DateServiceStart=DtmToDateTime(_listSegments[segNum].Get(2));
+					retVal.DateServiceStart=X12Parse.ToDate(_listSegments[segNum].Get(2));
 				}
 				else {//_listSegments[segNum].Get(1)=="233"
-					retVal.DateServiceEnd=DtmToDateTime(_listSegments[segNum].Get(2));
+					retVal.DateServiceEnd=X12Parse.ToDate(_listSegments[segNum].Get(2));
 				}
 				segNum++;
 			}
@@ -446,7 +446,7 @@ namespace OpenDentBusiness {
 			//2100 DTM: Claim Received Date.  Situational.  Repeat 1.  Guide page 177.
 			retVal.DatePayerReceived=DateTime.MinValue;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM" && _listSegments[segNum].Get(1)=="050") {
-				retVal.DatePayerReceived=DtmToDateTime(_listSegments[segNum].Get(2));
+				retVal.DatePayerReceived=X12Parse.ToDate(_listSegments[segNum].Get(2));
 				segNum++;
 			}
 			//2100 PER: Claim Contact Information.  Situational.  Repeat 2.  Guide page 179.  We do not use.
@@ -842,10 +842,10 @@ namespace OpenDentBusiness {
 			proc.DateServiceEnd=dateClaimServiceEnd;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
 				if(_listSegments[segNum].Get(1)=="151") {//Service period end.
-					proc.DateServiceEnd=DtmToDateTime(_listSegments[segNum].Get(2));
+					proc.DateServiceEnd=X12Parse.ToDate(_listSegments[segNum].Get(2));
 				}
 				else {//_listSegments[segNum].Get(1)=="150" || _listSegments[segNum].Get(1)=="472"//Service period start
-					proc.DateServiceStart=DtmToDateTime(_listSegments[segNum].Get(2));
+					proc.DateServiceStart=X12Parse.ToDate(_listSegments[segNum].Get(2));
 				}
 				segNum++;
 			}
@@ -916,18 +916,6 @@ namespace OpenDentBusiness {
 
 		#endregion Segment Processing
 		#region Helpers
-
-		///<summary>Converts a date in string format YYYYMMDD into a DateTime object.</summary>
-		private DateTime DtmToDateTime(string strDtm) {
-			DateTime dateTime=DateTime.MinValue;
-			if(strDtm.Length>=8) {
-				int dtmYear=int.Parse(strDtm.Substring(0,4));
-				int dtmMonth=int.Parse(strDtm.Substring(4,2));
-				int dtmDay=int.Parse(strDtm.Substring(6,2));
-				dateTime=new DateTime(dtmYear,dtmMonth,dtmDay);
-			}
-			return dateTime;
-		}
 
 		public string GetHumanReadable() {
 			StringBuilder retVal=new StringBuilder();

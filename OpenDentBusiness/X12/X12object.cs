@@ -295,7 +295,386 @@ namespace OpenDentBusiness
 		public string Subelement;
 	}
 
+	#region Segments
 
+	public class X12_ACT {
+		///<summary>ACT01</summary>
+		public string AccountNumber1;
+		///<summary>ACT06</summary>
+		public string AccountNumber2;
+
+		public X12_ACT(X12Segment seg) {
+			AccountNumber1=seg.Get(1);
+			AccountNumber2=seg.Get(6);
+		}
+	}
+
+	public class X12_AMT {
+		///<summary>AMT01</summary>
+		public string AmountQualifierCode;
+		///<summary>AMT02</summary>
+		public string MonetaryAmount;
+
+		public X12_AMT(X12Segment seg) {
+			AmountQualifierCode=seg.Get(1);
+			MonetaryAmount=seg.Get(2);
+		}
+	}
+
+	public class X12_BGN {
+		///<summary>BGN01</summary>
+		public string TransactionSetPurposeCode;
+		///<summary>BGN02</summary>
+		public string ReferenceIdentification1;
+		///<summary>BGN03</summary>
+		public string DateBgn;
+		///<summary>BGN04</summary>
+		public string TimeBgn;
+		///<summary>BGN05</summary>
+		public string TimeCode;
+		///<summary>BGN06</summary>
+		public string ReferenceIdentifcation2;
+		///<summary>BGN08</summary>
+		public string ActionCode;
+
+		public X12_BGN(X12Segment seg) {
+			TransactionSetPurposeCode=seg.Get(1);
+			ReferenceIdentification1=seg.Get(2);
+			DateBgn=seg.Get(3);
+			TimeBgn=seg.Get(4);
+			TimeCode=seg.Get(5);
+			ReferenceIdentifcation2=seg.Get(6);
+			ActionCode=seg.Get(8);
+		}
+	}
+
+	public class X12_DMG {
+		///<summary>DMG01</summary>
+		public string DateTimePeriodFormatQualifier;
+		///<summary>DMG02</summary>
+		public string DateTimePeriod;
+		///<summary>DMG03</summary>
+		public string GenderCode;
+		///<summary>DMG04</summary>
+		public string MaritalStatusCode;
+		///<summary>DMG05</summary>
+		public string CompositeRaceOrEthnicityInformation;
+		///<summary>DMG06</summary>
+		public string CitizenshipStatusCode;
+		///<summary>DMG10</summary>
+		public string CodeListQualifierCode;
+		///<summary>DMG11</summary>
+		public string IndustryCode;
+
+		public X12_DMG(X12Segment seg) {
+			DateTimePeriodFormatQualifier=seg.Get(1);
+			DateTimePeriod=seg.Get(2);
+			GenderCode=seg.Get(3);
+			MaritalStatusCode=seg.Get(4);
+			CompositeRaceOrEthnicityInformation=seg.Get(5);
+			CitizenshipStatusCode=seg.Get(6);
+			CodeListQualifierCode=seg.Get(10);
+			IndustryCode=seg.Get(11);
+		}
+	}
+
+	public class X12_DSB {
+		///<summary>DSP01</summary>
+		public string DisabilityTypeCode;
+		///<summary>DSP07</summary>
+		public string ProductServiceIdQualifier;
+		///<summary>DSP08</summary>
+		public string MedicalCodeValue;
+
+		public X12_DSB(X12Segment seg) {
+			DisabilityTypeCode=seg.Get(1);
+			ProductServiceIdQualifier=seg.Get(7);
+			MedicalCodeValue=seg.Get(8);
+		}
+	}
+
+	public class X12_DTP {
+		///<summary>DTP01</summary>
+		public string DateTimeQualifier;
+		///<summary>DTP02</summary>
+		public string DateTimePeriodFormatQualifier;
+		///<summary>DTP03</summary>
+		public string DateTimePeriod;
+
+		public X12_DTP(X12Segment seg) {
+			DateTimeQualifier=seg.Get(1);
+			DateTimePeriodFormatQualifier=seg.Get(2);
+			DateTimePeriod=seg.Get(3);
+		}
+
+		public DateTime DateT() {
+			if(DateTimePeriodFormatQualifier=="D8") {
+				return X12Parse.ToDate(DateTimePeriod);
+			}
+			return DateTime.MinValue;
+		}
+	}
+
+	public class X12_EC {
+		///<summary>EC01</summary>
+		public string EmploymentClassCode1;
+		///<summary>EC02</summary>
+		public string EmploymentClassCode2;
+		///<summary>EC03</summary>
+		public string EmploymentClassCode3;
+
+		public X12_EC(X12Segment seg) {
+			EmploymentClassCode1=seg.Get(1);
+			EmploymentClassCode2=seg.Get(2);
+			EmploymentClassCode3=seg.Get(3);
+		}
+	}
+
+	public class X12_HLH {
+		///<summary>HLH01</summary>
+		public string HealthRelatedCode;
+		///<summary>HLH02</summary>
+		public string Height;
+		///<summary>HLH03</summary>
+		public string Weight;
+
+		public X12_HLH(X12Segment seg) {
+			HealthRelatedCode=seg.Get(1);
+			Height=seg.Get(2);
+			Weight=seg.Get(3);
+		}
+	}
+
+	public class X12_ICM {
+		///<summary>ICM01</summary>
+		public string FrequencyCode;
+		///<summary>ICM02</summary>
+		public string MonetaryAmount;
+		///<summary>ICM03</summary>
+		public string Quantity;
+		///<summary>ICM04</summary>
+		public string LocationIdentifier;
+		///<summary>ICM05</summary>
+		public string SalaryGrade;
+
+		public X12_ICM(X12Segment seg) {
+			FrequencyCode=seg.Get(1);
+			MonetaryAmount=seg.Get(2);
+			Quantity=seg.Get(3);
+			LocationIdentifier=seg.Get(4);
+			SalaryGrade=seg.Get(5);
+		}
+	}
+
+	public class X12_INS {
+		///<summary>INS01</summary>
+		public static string YesNoConditionOrResponseCode1;
+		///<summary>INS02</summary>
+		public static string IndividualRelationshipCode;
+		///<summary>INS03</summary>
+		public static string MaintenanceTypeCode;
+		///<summary>INS04</summary>
+		public static string MaintenanceReasonCode;
+		///<summary>INS05</summary>
+		public static string BenefitStatusCode;
+		///<summary>INS06</summary>
+		public static string MedicareStatusCode;
+		///<summary>INS07</summary>
+		public static string CobraQualifying;
+		///<summary>INS08</summary>
+		public static string EmploymentStatusCode;
+		///<summary>INS09</summary>
+		public static string StudentStatusCode;
+		///<summary>INS10</summary>
+		public static string YesNoConditionOrResponseCode2;
+		///<summary>INS11</summary>
+		public static string DateTimePeriodFormatQualifier;
+		///<summary>INS12</summary>
+		public static string DateTimePeriod;
+		///<summary>INS13</summary>
+		public static string ConfidentialityCode;
+		///<summary>INS17</summary>
+		public static string Number;
+
+		public X12_INS(X12Segment seg) {
+			YesNoConditionOrResponseCode1=seg.Get(1);
+			IndividualRelationshipCode=seg.Get(2);
+			MaintenanceTypeCode=seg.Get(3);
+			MaintenanceReasonCode=seg.Get(4);
+			BenefitStatusCode=seg.Get(5);
+			MedicareStatusCode=seg.Get(6);
+			CobraQualifying=seg.Get(7);
+			EmploymentStatusCode=seg.Get(8);
+			StudentStatusCode=seg.Get(9);
+			YesNoConditionOrResponseCode2=seg.Get(10);
+			DateTimePeriodFormatQualifier=seg.Get(11);
+			DateTimePeriod=seg.Get(12);
+			ConfidentialityCode=seg.Get(13);
+			Number=seg.Get(17);
+		}
+	}
+
+	public class X12_LUI {
+		///<summary>LUI01</summary>
+		public string IdentificationCodeQualifier;
+		///<summary>LUI02</summary>
+		public string IdentificationCode;
+		///<summary>LUI03</summary>
+		public string Description;
+		///<summary>LUI04</summary>
+		public string UseOfLanguageIndicator;
+
+		public X12_LUI(X12Segment seg) {
+			IdentificationCodeQualifier=seg.Get(1);
+			IdentificationCode=seg.Get(2);
+			Description=seg.Get(3);
+			UseOfLanguageIndicator=seg.Get(4);
+		}
+	}
+
+	public class X12_N1 {
+		///<summary>N101</summary>
+		public string EntityIdentifierCode;
+		///<summary>N102</summary>
+		private string Name;
+		///<summary>N103</summary>
+		private string IdentificationCodeQualifier;
+		///<summary>N104</summary>
+		private string IdentificationCode;
+
+		public X12_N1(X12Segment seg) {
+			EntityIdentifierCode=seg.Get(1);
+			Name=seg.Get(2);
+			IdentificationCodeQualifier=seg.Get(3);
+			IdentificationCode=seg.Get(4);
+		}
+	}
+
+	public class X12_N3 {
+		///<summary>N301</summary>
+		public string AddressInformation1;
+		///<summary>N302</summary>
+		public string AddressInformation2;
+
+		public X12_N3(X12Segment seg) {
+			AddressInformation1=seg.Get(1);
+			AddressInformation2=seg.Get(2);
+		}
+	}
+
+	public class X12_N4 {
+		///<summary>N401</summary>
+		public string CityName;
+		///<summary>N402</summary>
+		public string StateOrProvinceCode;
+		///<summary>N403</summary>
+		public string PostalCode;
+		///<summary>N404</summary>
+		public string CountryCode;
+		///<summary>N405</summary>
+		public string LocationQualifier;
+		///<summary>N406</summary>
+		public string LocationIdentifier;
+		///<summary>N407</summary>
+		public string CountrySubdivisionCode;
+
+		public X12_N4(X12Segment seg) {
+			CityName=seg.Get(1);
+			StateOrProvinceCode=seg.Get(2);
+			PostalCode=seg.Get(3);
+			CountryCode=seg.Get(4);
+			LocationQualifier=seg.Get(5);
+			LocationIdentifier=seg.Get(6);
+			CountrySubdivisionCode=seg.Get(7);
+		}
+	}
+
+	public class X12_NM1 {
+		///<summary>NM101</summary>
+		public string EntityIdentifierCode;
+		///<summary>NM102</summary>
+		public string EntityTypeQualifier;
+		///<summary>NM103</summary>
+		public string NameLast;
+		///<summary>NM104</summary>
+		public string NameFirst;
+		///<summary>NM105</summary>
+		public string NameMiddle;
+		///<summary>NM106</summary>
+		public string NamePrefix;
+		///<summary>NM107</summary>
+		public string NameSuffix;
+		///<summary>NM108</summary>
+		public string IdentificationCodeQualifier;
+		///<summary>NM109</summary>
+		public string IdentificationCode;
+
+		public X12_NM1(X12Segment seg) {
+			EntityIdentifierCode=seg.Get(1);
+			EntityTypeQualifier=seg.Get(2);
+			NameLast=seg.Get(3);
+			NameFirst=seg.Get(4);
+			NameMiddle=seg.Get(5);
+			NamePrefix=seg.Get(6);
+			NameSuffix=seg.Get(7);
+			IdentificationCodeQualifier=seg.Get(8);
+			IdentificationCode=seg.Get(9);
+		}
+	}
+
+	public class X12_PER {
+		///<summary>PER01</summary>
+		public string ContactFunctionCode;
+		///<summary>PER03</summary>
+		public string CommunicationNumberQualifier1;
+		///<summary>PER04</summary>
+		public string CommunicationNumber1;
+		///<summary>PER05</summary>
+		public string CommunicationNumberQualifier2;
+		///<summary>PER06</summary>
+		public string CommunicationNumber2;
+		///<summary>PER07</summary>
+		public string CommunicationNumberQualifier3;
+		///<summary>PER08</summary>
+		public string CommunicationNumber3;
+
+		public X12_PER(X12Segment seg) {
+			ContactFunctionCode=seg.Get(1);
+			CommunicationNumberQualifier1=seg.Get(3);
+			CommunicationNumber1=seg.Get(4);
+			CommunicationNumberQualifier2=seg.Get(5);
+			CommunicationNumber2=seg.Get(6);
+			CommunicationNumberQualifier3=seg.Get(7);
+			CommunicationNumber3=seg.Get(8);
+		}
+	}
+
+	public class X12_REF {
+		///<summary>REF01</summary>
+		public string ReferenceIdQualifier;
+		///<summary>REF02</summary>
+		public string ReferenceId;
+
+		public X12_REF(X12Segment seg) {
+			ReferenceIdQualifier=seg.Get(1);
+			ReferenceId=seg.Get(2);
+		}
+	}
+
+	public class X12_QTY {
+		///<summary>QTY01</summary>
+		public string QuantityQualifier;
+		///<summary>QTY02</summary>
+		public string Quantity;
+
+		public X12_QTY(X12Segment seg) {
+			QuantityQualifier=seg.Get(1);
+			Quantity=seg.Get(2);
+		}
+
+	}
+
+	#endregion Segments
 
 }
 

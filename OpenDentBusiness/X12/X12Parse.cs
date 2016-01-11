@@ -6,7 +6,7 @@ namespace OpenDentBusiness{
 	public class X12Parse {
 
 		public static DateTime ToDate(string element) {
-			if(element.Length != 8) {
+			if(element.Length < 8) {
 				return DateTime.MinValue;
 			}
 			int year=PIn.Int(element.Substring(0,4));
