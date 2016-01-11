@@ -371,7 +371,7 @@ namespace OpenDental{
 				gridMain.Rows.Add(row);
 				if(_listReqsInGrid[i].ReqNeededNum==selected) {
 					gridMain.SetSelected(i,true);
-					break;
+					continue;
 				}
 			}
 			gridMain.EndUpdate();
