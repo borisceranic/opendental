@@ -59,8 +59,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Can not move a plan into itself.");
 				return;
 			}
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Globally move all subscribers of the plan at the top over to the plan at the bottom and hide the plan at the top?  This will also remove any benefits which are patient specific from the plan on top.  Patient specific benefits are not commonly used.  This will not copy the subscriber notes or the benefit notes, and will also not copy the effective dates.  This tool is database intensive and can take several minutes to run.  Consider running this tool after business hours or when network usage is typically low.  The changes made will be irreversible.  Please make a full backup before continuing.\r\n\r\nClick OK to continue, or click Cancel if you are not sure."))
-			{
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Globally move all subscribers of the plan at the bottom over to the plan at the top and hide the plan at the bottom?  This will also remove any benefits which are patient specific from the plan on botom.  Patient specific benefits are not commonly used.  This will not copy the subscriber notes or the benefit notes, and will also not copy the effective dates.  This tool is database intensive and can take several minutes to run.  Consider running this tool after business hours or when network usage is typically low.  The changes made will be irreversible.  Please make a full backup before continuing.\r\n\r\nClick OK to continue, or click Cancel if you are not sure.")) {
 				return;
 			}
 			try {
