@@ -171,7 +171,7 @@ namespace OpenDental{
 			this.gridFamily.Size = new System.Drawing.Size(480, 100);
 			this.gridFamily.TabIndex = 31;
 			this.gridFamily.Title = "Family Members";
-			this.gridFamily.TranslationName = "TablePatient";
+			this.gridFamily.TranslationName = "TableFamily";
 			this.gridFamily.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFamily_CellClick);
 			// 
 			// gridPat
@@ -383,11 +383,16 @@ namespace OpenDental{
 			//cannot use Lan.F(this);
 			Lan.C(this,new Control[]
 				{
-				//butPatEdit,
-				//butEditPriCov,
-				//butEditPriPlan,
-				//butEditSecCov,
-				//butEditSecPlan
+					//butPatEdit,
+					//butEditPriCov,
+					//butEditPriPlan,
+					//butEditSecCov,
+					//butEditSecPlan,
+					gridFamily,
+					gridRecall,
+					gridPat,
+					gridSuperFam,
+					gridIns,
 				});
 			LayoutToolBar();
 			//gridPat.Height=this.ClientRectangle.Bottom-gridPat.Top-2;
