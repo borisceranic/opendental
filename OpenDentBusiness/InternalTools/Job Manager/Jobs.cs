@@ -192,6 +192,17 @@ namespace OpenDentBusiness {
 			return Crud.JobCrud.SelectMany(command);
 		}
 
+		public static List<Job> GetMany(List<long> jobNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),jobNums);
+			}
+			if(jobNums==null||jobNums.Count==0) {
+				return new List<Job>();
+			}
+			string command = "SELECT * FROM job WHERE JobNum IN ("+string.Join(",",jobNums)+")";
+			return Crud.JobCrud.SelectMany(command);
+		}
+
 		public static bool ValidateJobNum(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),jobNum);

@@ -39,6 +39,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 		public bool IsChanged {
 			get { return _isChanged; }
 			private set {
+				//TODO, if _jobCur!=null && _jobCur.JobNum!=0 && _isChanged==false && value==true: "Checkout" the job using current usernum.
 				_isChanged=value;
 				butSave.Enabled=_isChanged;
 			}
@@ -62,7 +63,14 @@ namespace OpenDental.InternalTools.Job_Manager {
 
 		///<summary>Not a property so that this is compatible with the VS designer.</summary>
 		public Job GetJob() {
-			return _jobCur;
+			Job job = _jobCur.Copy();
+			job.Description=textEditorMain.MainRtf;
+			job.HoursActual=PIn.Int(textActualHours.Text);
+			job.HoursEstimate=PIn.Int(textEstHours.Text);
+			job.Priority=(JobPriority)comboPriority.SelectedIndex;
+			job.JobStatus=(JobStat)comboStatus.SelectedIndex;
+			job.Category=(JobCategory)comboCategory.SelectedIndex;
+			return job;
 		}
 
 		///<summary>Should only be called once when new job should be loaded into control. If called again, changes will be lost.</summary>
@@ -108,7 +116,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 			CheckPermissions();
 			IsChanged=false;
 			if(job!=null) {//re-enable control after we have loaded the job.
+				/*if(job.checkoutNum!=0){
+					MsgBox.Show(this, "Job is currently being edited by "+UserName);
+				}
+				else{
+				*/
 				this.Enabled=true;
+				//}
 			}
 		}
 
@@ -698,6 +712,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			try { //Jobs.Delete will throw an application exception if there are any reviews associated with this job.
 				Jobs.Delete(_jobCur.JobNum);
+				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);
 				LoadJob(null);
 				if(SaveClick!=null) {
 					SaveClick(this,new EventArgs());
@@ -728,6 +743,24 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			userNum=FormUP.SelectedUserNum;
 			return true;
+		}
+
+		///<summary>Unions the lists of links from one job to another. Links passed in are assumed to be newer and more accurate.</summary>
+		public void LoadLinks(Job newJob) {
+			Job jobMerge = newJob.Copy();//otherwise changes would be made to the tree view.
+			//"Merge" lists of jobs together. Using newJob, we union the list with existing "stale" _jobCur.
+			jobMerge.ListJobLinks  .AddRange(_jobCur.ListJobLinks  .FindAll(x => !jobMerge.ListJobLinks  .Select(y => y.JobLinkNum  ).Contains(x.JobLinkNum  )));
+			jobMerge.ListJobNotes  .AddRange(_jobCur.ListJobNotes  .FindAll(x => !jobMerge.ListJobNotes  .Select(y => y.JobNoteNum  ).Contains(x.JobNoteNum  )));
+			jobMerge.ListJobQuotes .AddRange(_jobCur.ListJobQuotes .FindAll(x => !jobMerge.ListJobQuotes .Select(y => y.JobQuoteNum ).Contains(x.JobQuoteNum )));
+			jobMerge.ListJobReviews.AddRange(_jobCur.ListJobReviews.FindAll(x => !jobMerge.ListJobReviews.Select(y => y.JobReviewNum).Contains(x.JobReviewNum)));
+			jobMerge.ListJobEvents .AddRange(_jobCur.ListJobEvents .FindAll(x => !jobMerge.ListJobEvents .Select(y => y.JobEventNum ).Contains(x.JobEventNum )));
+			//Set _jobCur lists to the new lists made above.
+			_jobCur.ListJobLinks  =jobMerge.ListJobLinks;
+			_jobCur.ListJobNotes  =jobMerge.ListJobNotes;
+			_jobCur.ListJobQuotes =jobMerge.ListJobQuotes;
+			_jobCur.ListJobReviews=jobMerge.ListJobReviews;
+			_jobCur.ListJobEvents =jobMerge.ListJobEvents;
+			FillAllGrids();
 		}
 
 		#endregion
@@ -819,6 +852,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				JobEvents.Insert(jobEventCur);
 				job.ListJobEvents.Add(JobEvents.GetOne(jobEventCur.JobEventNum));//to get correct time stamp
 			}
+			Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
 			LoadJob(job);
 			if(SaveClick!=null) {
 				SaveClick(this,new EventArgs());

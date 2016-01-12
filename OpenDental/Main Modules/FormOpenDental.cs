@@ -62,7 +62,7 @@ using EHR;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormOpenDental:System.Windows.Forms.Form {
+	public class FormOpenDental:System.Windows.Forms.Form, ISignalProcessor{
 		private System.ComponentModel.IContainer components;
 		//private bool[,] buttonDown=new bool[2,6];
 		private System.Windows.Forms.Timer timerTimeIndic;
@@ -147,8 +147,6 @@ namespace OpenDental{
 		private MenuItem menuItemMessaging;
 		private OpenDental.UI.LightSignalGrid lightSignalGrid1;
 		private MenuItem menuItemMessagingButs;
-		///<summary>This is not the actual date/time last refreshed.  It is really the server based date/time of the last item in the database retrieved on previous refreshes.  That way, the local workstation time is irrelevant.</summary>
-		public static DateTime signalLastRefreshed;
 		private FormSplash Splash;
 		private Bitmap bitmapIcon;
 		private MenuItem menuItemCreateAtoZFolders;
@@ -374,6 +372,7 @@ namespace OpenDental{
 		private FormSmsTextMessaging _formSmsTextMessaging;
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
+		private FormJobManager2 _formJobManager2; //singleton
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -2319,7 +2318,7 @@ namespace OpenDental{
 			//Lan.Refresh();//automatically skips if current culture is en-US
 			//LanguageForeigns.Refresh(CultureInfo.CurrentCulture);//automatically skips if current culture is en-US
 			DataValid.BecameInvalid += new OpenDental.ValidEventHandler(DataValid_BecameInvalid);
-			signalLastRefreshed=MiscData.GetNowDateTime();
+			Signalods.SignalLastRefreshed=MiscData.GetNowDateTime();
 			if(PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)==0) {
 				timerSignals.Enabled=false;
 			}
@@ -4240,7 +4239,7 @@ namespace OpenDental{
 
 		private void lightSignalGrid1_ButtonClick(object sender,OpenDental.UI.ODLightSignalGridClickEventArgs e) {
 			if(e.ActiveSignal!=null){//user trying to ack an existing light signal
-				Signalods.AckButton(e.ButtonIndex+1,signalLastRefreshed);
+				Signalods.AckButton(e.ButtonIndex+1,Signalods.SignalLastRefreshed);
 				//then, manually ack the light on this computer.  The second ack in a few seconds will be ignored.
 				lightSignalGrid1.SetButtonActive(e.ButtonIndex,Color.White,null);
 				SigButDef butDef=SigButDefs.GetByIndex(e.ButtonIndex,SigButDefList);
@@ -4288,149 +4287,165 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Called every time timerSignals_Tick fires.  Usually about every 5-10 seconds.  Does not fire until one signal interval has passed (5-10 seconds after login).</summary>
-		public void ProcessSignals() {
-			if(Security.CurUser==null) {
-				//User must be at the log in screen, so no need to process signals.  We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
+		private void timerTimeIndic_Tick(object sender,System.EventArgs e) {
+			//every minute:
+			if(WindowState!=FormWindowState.Minimized && ContrAppt2.Visible) {
+				ContrAppt2.TickRefresh();
+			}
+		}
+
+		///<summary>Usually set at 4 to 6 second intervals.</summary>
+		private void timerSignals_Tick(object sender,System.EventArgs e) {
+			DateTime dtInactive = dateTimeLastActivity+TimeSpan.FromMinutes((double)PrefC.GetInt(PrefName.SignalInactiveMinutes));
+			if((double)PrefC.GetInt(PrefName.SignalInactiveMinutes)!=0 && DateTime.Now>dtInactive) {
 				return;
 			}
+			if(Security.CurUser==null) {
+				//User must be at the log in screen, so no need to process signals. We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
+				return;
+			}		
+			//Pre-Signal Processing
+			if(_butText!=null && _butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
+				SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
+			}
+			//Signal Processing
+			Signalods.SignalsTick(onShutdown);
+			//Post Signal Processing
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//No actual signals are sent, so this must happen independantly from SignalsTick.
+				lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
+			}
+		}
+
+		///<summary>Called when a shutdown signal is found.</summary>
+		private void onShutdown() {
+			timerSignals.Enabled=false;//quit receiving signals.
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				Process.GetProcessesByName("WebCamOD").ToList().ForEach(x => x.Kill());
+			}
+			ODThread killThread = new ODThread((o) => {
+				Thread.Sleep(15000);//15 seconds
+				Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
+			});
+			killThread.Start();
+			string msg = "";
+			if(Process.GetCurrentProcess().ProcessName=="OpenDental") {
+				msg+="All copies of Open Dental ";
+			}
+			else {
+				msg+=Process.GetCurrentProcess().ProcessName+" ";
+			}
+			msg+=Lan.g(this,"will shut down in 15 seconds.  Quickly click OK on any open windows with unsaved data.");
+			MsgBoxCopyPaste msgbox = new MsgBoxCopyPaste(msg);
+			msgbox.Size=new Size(300,300);
+			msgbox.TopMost=true;
+			msgbox.Show();
+			return;
+		}
+
+		private void timerDisabledKey_Tick(object sender,EventArgs e) {
+			//every 10 minutes:
+			if(PrefC.GetBoolSilent(PrefName.RegistrationKeyIsDisabled,false)) {
+				MessageBox.Show("Registration key has been disabled.  You are using an unauthorized version of this program.","Warning",
+					MessageBoxButtons.OK,MessageBoxIcon.Warning);
+			}
+		}
+
+		private void timerHeartBeat_Tick(object sender,EventArgs e) {
+			//every 3 minutes:
 			try {
-				List<Signalod> sigList=Signalods.RefreshTimed(signalLastRefreshed);//this also attaches all elements to their sigs				
-				if(_butText!=null) { //Not visible if eCW, and not enabled unless Text Messaging is enabled.					
-					//Check for the specific sms signal.
-					Signalod signal=sigList.OrderByDescending(x => x.SigDateTime)
-						.FirstOrDefault(x => x.SigType==SignalType.Invalid && x.ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString());
-					if(signal!=null) {
-						//This signal is not used when using Callfire so we should not have any conflicts here.
-						//The toolbar button might need to change state if we have just recently changed the state of IsIntegratedTextingEnabled().
-						_butText.Enabled=(Programs.IsEnabled(ProgramName.CallFire) || SmsPhones.IsIntegratedTextingEnabled());
-						SetSmsNotificationText(signal.SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
-					}
-					if(_butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
-						SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
-					}
+				Computers.UpdateHeartBeat(Environment.MachineName,false);
+			}
+			catch { }
+		}
+
+
+		///<summary>This only contains UI signal processing. See Singalods.SignalsTick() for cache updates.</summary>
+		public void ProcessSignals(List<Signalod> listSignals) {
+			//SMS NOTIFICATIONS
+			if(_butText!=null) { //Not visible if eCW, and not enabled unless Text Messaging is enabled.					
+				Signalod signalSmsCount = listSignals.OrderByDescending(x => x.SigDateTime).FirstOrDefault(x => x.SigType==SignalType.Invalid && x.ITypes==((int)InvalidType.SmsTextMsgReceivedUnreadCount).ToString());
+				if(signalSmsCount!=null) {
+					//This signal is not used when using Callfire so we should not have any conflicts here.
+					//The toolbar button might need to change state if we have just recently changed the state of IsIntegratedTextingEnabled().
+					_butText.Enabled=(Programs.IsEnabled(ProgramName.CallFire) || SmsPhones.IsIntegratedTextingEnabled());
+					SetSmsNotificationText(signalSmsCount.SigText,false);//Do not resend the signal again.  Would cause infinate signal loop.
 				}
-				if(sigList.Count==0) {
-					return;
+				if(_butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
+																																 //Usually only run once at startup.
+					SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
 				}
-				//look for shutdown signal
-				for(int i=0;i<sigList.Count;i++) {
-					if(sigList[i].ITypes==((int)InvalidType.ShutDownNow).ToString()) {
-						timerSignals.Enabled=false;//quit receiving signals.
-						//close the webcam if present so that it can be updated too.
-						if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-							Process[] processes=Process.GetProcessesByName("WebCamOD");
-							for(int p=0;p<processes.Length;p++) {
-								processes[p].Kill();
-							}
+			}
+			if(ContrAppt2.Visible && Signalods.ApptNeedsRefresh(listSignals,AppointmentL.DateSelected.Date)) {
+				ContrAppt2.RefreshPeriod();
+			}
+			bool areAnySignalsTasks = false;
+			for(int i = 0;i<listSignals.Count;i++) {
+				if(listSignals[i].ITypes==((int)InvalidType.Task).ToString()
+					|| listSignals[i].ITypes==((int)InvalidType.TaskPopup).ToString()) {
+					areAnySignalsTasks=true;
+				}
+			}
+			List<Task> tasksPopup = Signalods.GetNewTaskPopupsThisUser(listSignals,Security.CurUser.UserNum);
+			if(tasksPopup.Count>0) {
+				for(int i = 0;i<tasksPopup.Count;i++) {
+					//Even though this is triggered to popup, if this is my own task, then do not popup.
+					List<TaskNote> notesForThisTask = TaskNotes.GetForTask(tasksPopup[i].TaskNum);
+					if(notesForThisTask.Count==0) {//'sender' is the usernum on the task
+						if(tasksPopup[i].UserNum==Security.CurUser.UserNum) {
+							continue;
 						}
-						//start the thread that will kill the application
-						Thread killThread=new Thread(new ThreadStart(KillThread));
-						killThread.Start();
-						string msg="";
-						if(Process.GetCurrentProcess().ProcessName=="OpenDental") {
-							msg+="All copies of Open Dental ";
-						}
-						else {
-							msg+=Process.GetCurrentProcess().ProcessName+" ";
-						}
-						msg+=Lan.g(this,"will shut down in 15 seconds.  Quickly click OK on any open windows with unsaved data.");
-						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(msg);
-						msgbox.Size=new Size(300,300);
-						msgbox.TopMost=true;
-						msgbox.ShowDialog();
-						return;
 					}
-				}
-				if(sigList[sigList.Count-1].AckTime.Year>1880) {
-					signalLastRefreshed=sigList[sigList.Count-1].AckTime;
-				}
-				else {
-					signalLastRefreshed=sigList[sigList.Count-1].SigDateTime;
-				}
-				if(ContrAppt2.Visible && Signalods.ApptNeedsRefresh(sigList,AppointmentL.DateSelected.Date)) {
-					ContrAppt2.RefreshPeriod();
-				}
-				bool areAnySignalsTasks=false;
-				bool hasJobSignal=false;
-				for(int i=0;i<sigList.Count;i++) {
-					if(sigList[i].ITypes==((int)InvalidType.Task).ToString()
-						|| sigList[i].ITypes==((int)InvalidType.TaskPopup).ToString()) 
+					else {//'sender' is the user on the last added note
+						if(notesForThisTask[notesForThisTask.Count-1].UserNum==Security.CurUser.UserNum) {
+							continue;
+						}
+					}
+					if(tasksPopup[i].TaskListNum!=Security.CurUser.TaskListInBox//if not my inbox
+						&& Security.CurUser.DefaultHidePopups)//and popups blocked
 					{
-						areAnySignalsTasks=true;
+						continue;//no sound or popup
+										 //in other words, popups will always show for my inbox even if popups blocked.
 					}
-					if(sigList[i].ITypes==((int)InvalidType.Jobs).ToString()) {
-						hasJobSignal=true;
+					if(tasksPopup[i].TaskListNum==Security.CurUser.TaskListInBox//if my inbox
+						&& Security.CurUser.InboxHidePopups)//and inbox popups blocked
+					{
+						continue;//no sound or popup
+										 //in other words, popups will not show for my inbox if InboxHidePopups is enabled.
 					}
+					System.Media.SoundPlayer soundplay = new SoundPlayer(Properties.Resources.notify);
+					soundplay.Play();
+					this.BringToFront();//don't know if this is doing anything.
+					FormTaskEdit FormT = new FormTaskEdit(tasksPopup[i],tasksPopup[i].Copy());
+					FormT.IsPopup=true;
+					FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
+					FormT.Show();//non-modal
 				}
-				List<Task> tasksPopup=Signalods.GetNewTaskPopupsThisUser(sigList,Security.CurUser.UserNum);
-				if(tasksPopup.Count>0) {
-					for(int i=0;i<tasksPopup.Count;i++) {
-						//Even though this is triggered to popup, if this is my own task, then do not popup.
-						List<TaskNote> notesForThisTask=TaskNotes.GetForTask(tasksPopup[i].TaskNum);
-						if(notesForThisTask.Count==0) {//'sender' is the usernum on the task
-							if(tasksPopup[i].UserNum==Security.CurUser.UserNum) {
-								continue;
-							}
-						}
-						else {//'sender' is the user on the last added note
-							if(notesForThisTask[notesForThisTask.Count-1].UserNum==Security.CurUser.UserNum) {
-								continue;
-							}
-						}
-						if(tasksPopup[i].TaskListNum!=Security.CurUser.TaskListInBox//if not my inbox
-							&& Security.CurUser.DefaultHidePopups)//and popups blocked
-						{
-							continue;//no sound or popup
-							//in other words, popups will always show for my inbox even if popups blocked.
-						}
-						if(tasksPopup[i].TaskListNum==Security.CurUser.TaskListInBox//if my inbox
-							&& Security.CurUser.InboxHidePopups)//and inbox popups blocked
-						{
-							continue;//no sound or popup
-							//in other words, popups will not show for my inbox if InboxHidePopups is enabled.
-						}
-						System.Media.SoundPlayer soundplay=new SoundPlayer(Properties.Resources.notify);
-						soundplay.Play();
-						this.BringToFront();//don't know if this is doing anything.
-						FormTaskEdit FormT=new FormTaskEdit(tasksPopup[i],tasksPopup[i].Copy());
-						FormT.IsPopup=true;
-						FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
-						FormT.Show();//non-modal
-					}
-				}
-				if(areAnySignalsTasks || tasksPopup.Count>0) {
-					if(userControlTasks1.Visible) {
-						userControlTasks1.RefreshTasks();
-					}
-					//See if FormTasks is currently open.
-					if(ContrManage2!=null && ContrManage2.FormT!=null && !ContrManage2.FormT.IsDisposed) {
-						ContrManage2.FormT.RefreshUserControlTasks();
-					}
-				}
-				if(hasJobSignal) {
-					JobHandler.Fire(new ODEventArgs("Job Manager","Job Manager"));
-				}
-				List<int> itypes=Signalods.GetInvalidTypes(sigList);
-				InvalidType[] itypeArray=new InvalidType[itypes.Count];
-				for(int i=0;i<itypeArray.Length;i++) {
-					itypeArray[i]=(InvalidType)itypes[i];
-				}
-				//InvalidTypes invalidTypes=Signalods.GetInvalidTypes(sigList);
-				if(itypes.Count>0) {//invalidTypes!=0){
-					RefreshLocalData(itypeArray);
-				}
-				List<Signalod> sigListButs=Signalods.GetButtonSigs(sigList);
-				ContrManage2.LogMsgs(sigListButs);
-				FillSignalButtons(sigListButs);
-				//Need to add a test to this: do not play messages that are over 2 minutes old.
-				Thread newThread=new Thread(new ParameterizedThreadStart(PlaySounds));
-				newThread.Start(sigListButs);
-				Plugins.HookAddCode(this,"FormOpenDental.ProcessSignals_end",sigList);
 			}
-			catch {
-				signalLastRefreshed=MiscData.GetNowDateTime();
+			if(areAnySignalsTasks || tasksPopup.Count>0) {
+				if(userControlTasks1.Visible) {
+					userControlTasks1.RefreshTasks();
+				}
+				//See if FormTasks is currently open.
+				if(ContrManage2!=null && ContrManage2.FormT!=null && !ContrManage2.FormT.IsDisposed) {
+					ContrManage2.FormT.RefreshUserControlTasks();
+				}
 			}
+			//This can be enhanced.
+			List<int> itypes = Signalods.GetInvalidTypes(listSignals);
+			InvalidType[] itypeArray = new InvalidType[itypes.Count];
+			for(int i = 0;i<itypeArray.Length;i++) {
+				itypeArray[i]=(InvalidType)itypes[i];
+			}
+			if(itypes.Count>0) {//invalidTypes!=0){
+				RefreshLocalData(itypeArray);
+			}
+			List<Signalod> sigListButs = Signalods.GetButtonSigs(listSignals);
+			ContrManage2.LogMsgs(sigListButs);
+			FillSignalButtons(sigListButs);
+			//Need to add a test to this: do not play messages that are over 2 minutes old.
+			Thread newThread = new Thread(new ParameterizedThreadStart(PlaySounds));
+			newThread.Start(sigListButs);
+			Plugins.HookAddCode(this,"FormOpenDental.ProcessSignals_end",listSignals);
 		}
 
 		///<summary>Starts the eService monitoring thread that will run once a minute.  Only runs if the user currently logged in has the eServices permission.</summary>
@@ -4822,42 +4837,6 @@ namespace OpenDental{
 				FormRE.PatNum=CurPatNum;
 				FormRE.ShowDialog();
 			}
-		}
-
-		private void timerTimeIndic_Tick(object sender, System.EventArgs e){
-			//every minute:
-			if(WindowState!=FormWindowState.Minimized
-				&& ContrAppt2.Visible){
-				ContrAppt2.TickRefresh();
-      }
-		}
-
-		private void timerSignals_Tick(object sender, System.EventArgs e) {
-			DateTime dtInactive=dateTimeLastActivity+TimeSpan.FromMinutes((double)PrefC.GetInt(PrefName.SignalInactiveMinutes));
-			if((double)PrefC.GetInt(PrefName.SignalInactiveMinutes)!=0 && DateTime.Now>dtInactive) {
-				return;
-			}
-			//typically every 4 seconds:
-			ProcessSignals();
-			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
-			}
-		}
-
-		private void timerDisabledKey_Tick(object sender,EventArgs e) {
-			//every 10 minutes:
-			if(PrefC.GetBoolSilent(PrefName.RegistrationKeyIsDisabled,false)) {
-				MessageBox.Show("Registration key has been disabled.  You are using an unauthorized version of this program.","Warning",
-					MessageBoxButtons.OK,MessageBoxIcon.Warning);
-			}
-		}
-
-		private void timerHeartBeat_Tick(object sender,EventArgs e) {
-			//every 3 minutes:
-			try {
-				Computers.UpdateHeartBeat(Environment.MachineName,false);
-			}
-			catch { }
 		}
 
 		private void ThreadClaimReportRetrieve(ODThread worker) {
@@ -6076,8 +6055,14 @@ namespace OpenDental{
 		}
 
 		private void menuItemJobManager_Click(object sender,System.EventArgs e) {
-			FormJobManager2 FormJM=new FormJobManager2();
-			FormJM.Show();
+			if(_formJobManager2==null || _formJobManager2.IsDisposed) {
+				_formJobManager2=new FormJobManager2();
+			}
+			_formJobManager2.Show();
+			if(_formJobManager2.WindowState==FormWindowState.Minimized) {
+				_formJobManager2.WindowState=FormWindowState.Normal;
+			}
+			_formJobManager2.BringToFront();
 		}
 
 		private void menuItemLabCases_Click(object sender,EventArgs e) {
@@ -6292,7 +6277,7 @@ namespace OpenDental{
 				return;
 			}
 			//turn off signal reception for 5 seconds so this workstation will not shut down.
-			signalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
+			Signalods.SignalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
 			Signalod sig=new Signalod();
 			sig.ITypes=((int)InvalidType.ShutDownNow).ToString();
 			sig.SigType=SignalType.Invalid;
@@ -7294,7 +7279,7 @@ namespace OpenDental{
 			//No workstations will be able to connect to this single server while this flag is set.
 			Prefs.UpdateLong(PrefName.ReplicationFailureAtServer_id,ReplicationServers.Server_id);
 			//shut down all workstations on all servers
-			FormOpenDental.signalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
+			Signalods.SignalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
 			Signalod sig=new Signalod();
 			sig.ITypes=((int)InvalidType.ShutDownNow).ToString();
 			sig.SigType=SignalType.Invalid;

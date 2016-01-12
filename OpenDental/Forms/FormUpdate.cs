@@ -1124,7 +1124,7 @@ namespace OpenDental{
 				FormSD.ShowDialog();
 				if(FormSD.DialogResult==DialogResult.OK) {
 					//turn off signal reception for 5 seconds so this workstation will not shut down.
-					FormOpenDental.signalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
+					Signalods.SignalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
 					Signalod sig=new Signalod();
 					sig.ITypes=((int)InvalidType.ShutDownNow).ToString();
 					sig.SigType=SignalType.Invalid;

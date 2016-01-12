@@ -10,7 +10,7 @@ using CodeBase;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormJobManager2:Form {
+	public partial class FormJobManager2:Form, ISignalProcessor {
 		///<summary>All jobs</summary>
 		private List<Job> _listJobsAll=new List<Job>();
 		///<summary>Jobs to be displayed in tree.</summary>
@@ -51,6 +51,7 @@ namespace OpenDental {
 			}
 			//FillTree();//Invoked above.
 			//FillWorkSummary();//Invoked above.
+			Signalods.Subscribe(this);
 		}
 
 		///<summary>Fills all in memory data from the DB on a seperate thread and then refills controls.</summary>
@@ -722,6 +723,68 @@ namespace OpenDental {
 				}
 			}
 		}
+
+
+		public void ProcessSignals(List<Signalod> listSignals) {
+			if(listSignals.All(x => !x.ITypes.Contains(((int)InvalidType.Jobs).ToString()))) {
+				//no job signals;
+				return;
+			}
+			//Get the latest jobs that have been updated by the signal.
+			//Initialized to <jobNum,null>
+			Dictionary<long,Job> dictNewJobs= listSignals.FindAll(x => x.ITypes.Contains(((int)InvalidType.Jobs).ToString()) && x.FKeyType==KeyType.Job).Select(x => x.FKey).Distinct().ToDictionary(x=>x,x=>(Job)null);
+			List<Job> newJobs = Jobs.GetMany(dictNewJobs.Keys.ToList());
+			Jobs.FillInMemoryLists(newJobs);
+			newJobs.ForEach(x => dictNewJobs[x.JobNum]=x);
+			//Current job loaded in UserControlJobEdit (Should now be prevented by job checkout.)
+			Job jobCur = null;//job currently loaded into the UserControlJobEdit AND included in a signal.
+			if(userControlJobEdit.GetJob()!=null) {//get job curently loaded
+				jobCur=newJobs.FirstOrDefault(x => x.JobNum==userControlJobEdit.GetJob().JobNum);
+			}
+			if(jobCur!=null) {//someone updated the currently loaded job.
+				if(userControlJobEdit.IsChanged) {
+					userControlJobEdit.LoadLinks(jobCur);//only load links from the job. Effectively merging changes.
+				}
+				else {//either the job was force saved above and IsChanged=false, or it was not edited to begin with.
+					userControlJobEdit.LoadJob(jobCur);
+				}
+			}
+			//Update in memory lists.
+			foreach(KeyValuePair<long,Job> kvp in dictNewJobs) {
+				if(kvp.Value==null) {//deleted job
+					_listJobsAll.RemoveAll(x => x.JobNum==kvp.Key);
+					_listJobsFiltered.RemoveAll(x => x.JobNum==kvp.Key);
+					List<TreeNode> treeNodes = new List<TreeNode>(treeJobs.Nodes.Cast<TreeNode>());
+					for(int i = 0;i<treeNodes.Count;i++) {//flat recursion
+						TreeNode nodeCur = treeNodes[i];
+						if((nodeCur.Tag is Job) && ((Job)nodeCur.Tag).JobNum==kvp.Key) {
+							nodeCur.Text="(Deleted) - "+nodeCur.Text;//update label text to indicate deleted.
+							nodeCur.Tag=null;
+						}
+						treeNodes.AddRange(nodeCur.Nodes.Cast<TreeNode>());
+					}
+					continue;
+				}
+				//Master Job List
+				Job jobOld=_listJobsAll.FirstOrDefault(x => x.JobNum==kvp.Key);
+				if(jobOld==null) {//new job entirely, no need to update anything in memory, just add to jobs list.
+					_listJobsAll.Add(kvp.Value);
+					continue;
+				}
+				_listJobsAll[_listJobsAll.IndexOf(jobOld)]=kvp.Value;
+				//Filtered Job List
+				jobOld=_listJobsFiltered.FirstOrDefault(x => x.JobNum==kvp.Key);
+				if(jobOld!=null) {//update item in filtered list.
+					_listJobsFiltered[_listJobsFiltered.IndexOf(jobOld)]=kvp.Value;
+				}
+				//Jobs in tree
+				UpdateNodes(kvp.Value);
+			}
+
+		}
+
+
+
 
 	}
 }

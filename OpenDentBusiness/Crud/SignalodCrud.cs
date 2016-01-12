@@ -56,6 +56,17 @@ namespace OpenDentBusiness.Crud{
 				signalod.ToUser     = PIn.String(row["ToUser"].ToString());
 				signalod.AckTime    = PIn.DateT (row["AckTime"].ToString());
 				signalod.TaskNum    = PIn.Long  (row["TaskNum"].ToString());
+				signalod.FKey       = PIn.Long  (row["FKey"].ToString());
+				string fKeyType=row["FKeyType"].ToString();
+				if(fKeyType==""){
+					signalod.FKeyType =(KeyType)0;
+				}
+				else try{
+					signalod.FKeyType =(KeyType)Enum.Parse(typeof(KeyType),fKeyType);
+				}
+				catch{
+					signalod.FKeyType =(KeyType)0;
+				}
 				retVal.Add(signalod);
 			}
 			return retVal;
@@ -77,6 +88,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ToUser");
 			table.Columns.Add("AckTime");
 			table.Columns.Add("TaskNum");
+			table.Columns.Add("FKey");
+			table.Columns.Add("FKeyType");
 			foreach(Signalod signalod in listSignalods) {
 				table.Rows.Add(new object[] {
 					POut.Long  (signalod.SignalNum),
@@ -89,6 +102,8 @@ namespace OpenDentBusiness.Crud{
 					POut.String(signalod.ToUser),
 					POut.DateT (signalod.AckTime),
 					POut.Long  (signalod.TaskNum),
+					POut.Long  (signalod.FKey),
+					POut.Int   ((int)signalod.FKeyType),
 				});
 			}
 			return table;
@@ -129,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SignalNum,";
 			}
-			command+="FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum) VALUES(";
+			command+="FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum,FKey,FKeyType) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(signalod.SignalNum)+",";
 			}
@@ -142,7 +157,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (signalod.SigDateTime)+","
 				+"'"+POut.String(signalod.ToUser)+"',"
 				+    POut.DateT (signalod.AckTime)+","
-				+    POut.Long  (signalod.TaskNum)+")";
+				+    POut.Long  (signalod.TaskNum)+","
+				+    POut.Long  (signalod.FKey)+","
+				+"'"+POut.String(signalod.FKeyType.ToString())+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -175,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SignalNum,";
 			}
-			command+="FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum) VALUES(";
+			command+="FromUser,ITypes,DateViewing,SigType,SigText,SigDateTime,ToUser,AckTime,TaskNum,FKey,FKeyType) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(signalod.SignalNum)+",";
 			}
@@ -188,7 +205,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (signalod.SigDateTime)+","
 				+"'"+POut.String(signalod.ToUser)+"',"
 				+    POut.DateT (signalod.AckTime)+","
-				+    POut.Long  (signalod.TaskNum)+")";
+				+    POut.Long  (signalod.TaskNum)+","
+				+    POut.Long  (signalod.FKey)+","
+				+"'"+POut.String(signalod.FKeyType.ToString())+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -209,7 +228,9 @@ namespace OpenDentBusiness.Crud{
 				+"SigDateTime=  "+POut.DateT (signalod.SigDateTime)+", "
 				+"ToUser     = '"+POut.String(signalod.ToUser)+"', "
 				+"AckTime    =  "+POut.DateT (signalod.AckTime)+", "
-				+"TaskNum    =  "+POut.Long  (signalod.TaskNum)+" "
+				+"TaskNum    =  "+POut.Long  (signalod.TaskNum)+", "
+				+"FKey       =  "+POut.Long  (signalod.FKey)+", "
+				+"FKeyType   = '"+POut.String(signalod.FKeyType.ToString())+"' "
 				+"WHERE SignalNum = "+POut.Long(signalod.SignalNum);
 			Db.NonQ(command);
 		}
@@ -252,6 +273,14 @@ namespace OpenDentBusiness.Crud{
 			if(signalod.TaskNum != oldSignalod.TaskNum) {
 				if(command!=""){ command+=",";}
 				command+="TaskNum = "+POut.Long(signalod.TaskNum)+"";
+			}
+			if(signalod.FKey != oldSignalod.FKey) {
+				if(command!=""){ command+=",";}
+				command+="FKey = "+POut.Long(signalod.FKey)+"";
+			}
+			if(signalod.FKeyType != oldSignalod.FKeyType) {
+				if(command!=""){ command+=",";}
+				command+="FKeyType = '"+POut.String(signalod.FKeyType.ToString())+"'";
 			}
 			if(command==""){
 				return false;

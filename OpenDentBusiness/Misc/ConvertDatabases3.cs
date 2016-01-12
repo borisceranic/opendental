@@ -11903,6 +11903,31 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX screen_SheetNum ON screen (SheetNum)";
 					Db.NonQ(command);
 				}
+				//Form Level Signal Processing Phase I
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE signalod ADD FKey bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE signalod ADD INDEX (FKey)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE signalod ADD FKey number(20)";
+					Db.NonQ(command);
+					command="UPDATE signalod SET FKey = 0 WHERE FKey IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE signalod MODIFY FKey NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX signalod_FKey ON signalod (FKey)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE signalod ADD FKeyType varchar(255) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE signalod ADD FKeyType varchar2(255)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";

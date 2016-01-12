@@ -29,6 +29,11 @@ namespace OpenDentBusiness{
 		public DateTime AckTime;
 		///<summary>FK to task.TaskNum.  If IType=Tasks, then this is the taskNum that was added.</summary>
 		public long TaskNum;
+		///<summary>Usually identifies the object that was edited to cause the signal to be created.</summary>
+		public long FKey;
+		///<summary>Describes the type of object referenced by the FKey.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
+		public KeyType FKeyType;
 		///<summary>Not a database field.  The sounds and lights attached to the signal.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public SigElement[] ElementList;
@@ -65,6 +70,13 @@ namespace OpenDentBusiness{
 		}
 
 	
+	}
+
+	//Do not combine with SignalType, they must be seperate.
+	public enum KeyType {
+		Undefined = 0,
+		Job
+
 	}
 
 	

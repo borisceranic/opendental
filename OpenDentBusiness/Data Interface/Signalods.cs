@@ -2,11 +2,59 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Windows.Forms;
+using CodeBase;
 
-namespace OpenDentBusiness{
+namespace OpenDentBusiness {
 	///<summary></summary>
 	public class Signalods {
+		///<summary>This is not the actual date/time last refreshed.  It is really the server based date/time of the last item in the database retrieved on previous refreshes.  That way, the local workstation time is irrelevant.</summary>
+		public static DateTime SignalLastRefreshed;
+		private static List<ISignalProcessor> _listISignalProcessors = new List<ISignalProcessor>();
+
+		///<summary>Called in Form_Load() to subscribe a given form the signals.</summary>
+		public static bool Subscribe(Form form) {
+			ISignalProcessor sigProcessor = form as ISignalProcessor;
+			if(sigProcessor==null) {
+				return false;
+			}
+			_listISignalProcessors.Add(sigProcessor);
+			form.FormClosed+=delegate {
+				//todo: ISignalProcess may need an identifier so we know "which" one to remove. 
+				//EIther that or _listISignalProcessors should be a list of Forms, not a list of ISignalProcessor. Form has a built-in identifier so this should probably work.
+				_listISignalProcessors.Remove(sigProcessor);
+			};
+			return true;
+		}
+
+		///<summary>Retreives new signals from the DB, updates Caches, and broadcasts signals to all subscribed forms. Returns false if signals should stop being processed.</summary>
+		public static void SignalsTick(Action onShutdown) {
+			try {
+				List<Signalod> listSignals = RefreshTimed(SignalLastRefreshed);
+				if(listSignals.Count==0) {
+					return;
+				}
+				SignalLastRefreshed=listSignals.SelectMany(x=> new[] { x.SigDateTime,x.AckTime }).Max();
+				if(listSignals.Any(x => x.ITypes.Contains(((int)InvalidType.ShutDownNow).ToString()))) {
+					onShutdown();
+					return;
+				}
+				Cache.RefreshCache(string.Join(",",listSignals.SelectMany(x => x.ITypes.Split(',').Distinct())));//refresh invalid data
+				BroadcastSignals(listSignals);
+			}
+			catch {
+				SignalLastRefreshed=MiscData.GetNowDateTime();
+			}
+		}
+
+		public static void BroadcastSignals(List<Signalod> listSignals) {
+			_listISignalProcessors.ForEach(x => { try { x.ProcessSignals(listSignals); } catch {/*Do Nothing, or show msgbox?*/} });
+		}
+
 		///<summary>Gets all Signals and Acks Since a given DateTime.  If it can't connect to the database, then it no longer throws an error, but instead returns a list of length 0.  Remeber that the supplied dateTime is server time.  This has to be accounted for.</summary>
 		public static List<Signalod> RefreshTimed(DateTime sinceDateT) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -143,6 +191,18 @@ namespace OpenDentBusiness{
 			//because we need to update the signal object soon after creation.
 			sig.SigDateTime=MiscData.GetNowDateTime();
 			return Crud.SignalodCrud.Insert(sig);
+		}
+
+		///<summary>Simplest way to use the new fKey and FKeyType.</summary>
+		public static void SetInvalid(InvalidType iType,KeyType fKeyType,long fKey) {
+			//Remoting role check performed in the Insert.
+			Signalod sig = new Signalod();
+			sig.ITypes=((int)iType).ToString();
+			sig.DateViewing=DateTime.MinValue;
+			sig.SigType=SignalType.Invalid;
+			sig.FKey=fKey;
+			sig.FKeyType=fKeyType;
+			Insert(sig);
 		}
 
 		///<summary>Inserts a signal which tells all client machines to update the received unread SMS message count inside the Text button of the main toolbar.  To get the current count from the database, use SmsFromMobiles.GetSmsNotification().</summary>
