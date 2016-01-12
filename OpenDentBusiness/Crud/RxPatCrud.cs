@@ -62,6 +62,7 @@ namespace OpenDentBusiness.Crud{
 				rxPat.RxCui       = PIn.Long  (row["RxCui"].ToString());
 				rxPat.DosageCode  = PIn.String(row["DosageCode"].ToString());
 				rxPat.NewCropGuid = PIn.String(row["NewCropGuid"].ToString());
+				rxPat.IsErxOld    = PIn.Bool  (row["IsErxOld"].ToString());
 				retVal.Add(rxPat);
 			}
 			return retVal;
@@ -102,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="RxNum,";
 			}
-			command+="PatNum,RxDate,Drug,Sig,Disp,Refills,ProvNum,Notes,PharmacyNum,IsControlled,SendStatus,RxCui,DosageCode,NewCropGuid) VALUES(";
+			command+="PatNum,RxDate,Drug,Sig,Disp,Refills,ProvNum,Notes,PharmacyNum,IsControlled,SendStatus,RxCui,DosageCode,NewCropGuid,IsErxOld) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(rxPat.RxNum)+",";
 			}
@@ -121,7 +122,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)rxPat.SendStatus)+","
 				+    POut.Long  (rxPat.RxCui)+","
 				+"'"+POut.String(rxPat.DosageCode)+"',"
-				+"'"+POut.String(rxPat.NewCropGuid)+"')";
+				+"'"+POut.String(rxPat.NewCropGuid)+"',"
+				+    POut.Bool  (rxPat.IsErxOld)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -154,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="RxNum,";
 			}
-			command+="PatNum,RxDate,Drug,Sig,Disp,Refills,ProvNum,Notes,PharmacyNum,IsControlled,SendStatus,RxCui,DosageCode,NewCropGuid) VALUES(";
+			command+="PatNum,RxDate,Drug,Sig,Disp,Refills,ProvNum,Notes,PharmacyNum,IsControlled,SendStatus,RxCui,DosageCode,NewCropGuid,IsErxOld) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(rxPat.RxNum)+",";
 			}
@@ -173,7 +175,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)rxPat.SendStatus)+","
 				+    POut.Long  (rxPat.RxCui)+","
 				+"'"+POut.String(rxPat.DosageCode)+"',"
-				+"'"+POut.String(rxPat.NewCropGuid)+"')";
+				+"'"+POut.String(rxPat.NewCropGuid)+"',"
+				+    POut.Bool  (rxPat.IsErxOld)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -200,7 +203,8 @@ namespace OpenDentBusiness.Crud{
 				+"SendStatus  =  "+POut.Int   ((int)rxPat.SendStatus)+", "
 				+"RxCui       =  "+POut.Long  (rxPat.RxCui)+", "
 				+"DosageCode  = '"+POut.String(rxPat.DosageCode)+"', "
-				+"NewCropGuid = '"+POut.String(rxPat.NewCropGuid)+"' "
+				+"NewCropGuid = '"+POut.String(rxPat.NewCropGuid)+"', "
+				+"IsErxOld    =  "+POut.Bool  (rxPat.IsErxOld)+" "
 				+"WHERE RxNum = "+POut.Long(rxPat.RxNum);
 			Db.NonQ(command);
 		}
@@ -264,6 +268,10 @@ namespace OpenDentBusiness.Crud{
 			if(rxPat.NewCropGuid != oldRxPat.NewCropGuid) {
 				if(command!=""){ command+=",";}
 				command+="NewCropGuid = '"+POut.String(rxPat.NewCropGuid)+"'";
+			}
+			if(rxPat.IsErxOld != oldRxPat.IsErxOld) {
+				if(command!=""){ command+=",";}
+				command+="IsErxOld = "+POut.Bool(rxPat.IsErxOld)+"";
 			}
 			if(command==""){
 				return false;

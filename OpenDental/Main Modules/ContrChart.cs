@@ -4002,7 +4002,7 @@ namespace OpenDental {
 				rx.Drug="";
 				rx.Notes="";
 				rx.Refills="";
-				rx.SendStatus=RxSendStatus.SentElect;
+				rx.SendStatus=RxSendStatus.Unsent;
 				rx.Sig="";
 				string additionalSig="";
 				bool isProv=true;
@@ -4034,6 +4034,34 @@ namespace OpenDental {
 						case "externaluserid"://The person who ordered the prescription. Is a ProvNum when provider, or an EmployeeNum when an employee. If EmployeeNum, then is prepended with "emp" because of how we sent it to NewCrop in the first place.
 							if(nodeRxField.Value.StartsWith("emp")) {
 								isProv=false;
+							}
+							break;
+						case "finaldestinationtype":
+							//According to Brian from NewCrop:
+							//FinalDestinationType - Indicates the transmission method from NewCrop to the receiving entity.
+							//0=Not Transmitted
+							//1=Print
+							//2=Fax
+							//3=Electronic/Surescripts Retail
+							//4=Electronic/Surescripts Mail Order
+							//5=Test
+							if(nodeRxField.Value=="0") {//Not Transmitted
+								rx.SendStatus=RxSendStatus.Unsent;
+							}
+							else if(nodeRxField.Value=="1") {//Print
+								rx.SendStatus=RxSendStatus.Printed;
+							}
+							else if(nodeRxField.Value=="2") {//Fax
+								rx.SendStatus=RxSendStatus.Faxed;
+							}
+							else if(nodeRxField.Value=="3") {//Electronic/Surescripts Retail
+								rx.SendStatus=RxSendStatus.SentElect;
+							}
+							else if(nodeRxField.Value=="4") {//Electronic/Surescripts Mail Order
+								rx.SendStatus=RxSendStatus.SentElect;
+							}
+							else if(nodeRxField.Value=="5") {//Test
+								rx.SendStatus=RxSendStatus.Unsent;
 							}
 							break;
 						case "genericname":
@@ -4120,11 +4148,16 @@ namespace OpenDental {
 				}
 				if(rxOld==null) {
 					rx.IsNew=true;//Might not be necessary, but does not hurt.
+					rx.IsErxOld=false;
 					SecurityLogs.MakeLogEntry(Permissions.RxCreate,rx.PatNum,"eRx automatically created: "+rx.Drug);
 					RxPats.Insert(rx);
 				}
 				else {//The prescription was already in our database. Update it.
 					rx.RxNum=rxOld.RxNum;
+					if(rxOld.IsErxOld) {
+						rx.IsErxOld=true;
+						rx.SendStatus=RxSendStatus.SentElect;//To maintain backward compatibility.
+					}
 					RxPats.Update(rx);
 				}
 				//If rxCui==0, then NewCrop did not provide an RxCui.  Attempt to locate an RxCui using the other provided drug information.  An RxCui is not required for our program.  Meds missing an RxCui are not exported in CCD messages.
