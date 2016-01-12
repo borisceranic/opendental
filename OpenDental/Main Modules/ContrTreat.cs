@@ -847,7 +847,11 @@ namespace OpenDental{
 				label13,
 				label15,
 				label14,
-				label2
+				label2,
+				gridMain,
+				gridPlans,
+				gridPreAuth,
+				gridPrint,
 				});
 			LayoutToolBar();//redundant?
 		}

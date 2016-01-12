@@ -732,7 +732,9 @@ namespace OpenDental{
 				checkIncludeAck,
 				labelDays,
 				butAck,
-				label6
+				label6,
+				gridEmp,
+				gridMessages,
 				});
 			RefreshFullMessages();//after this, messages just get added to the list.
 			//But if checkIncludeAck is clicked,then it does RefreshMessages again.
