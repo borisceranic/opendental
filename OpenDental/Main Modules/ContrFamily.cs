@@ -127,6 +127,7 @@ namespace OpenDental{
 			// 
 			this.gridSuperFam.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridSuperFam.HasAddButton = false;
 			this.gridSuperFam.HasMultilineHeaders = false;
 			this.gridSuperFam.HScrollVisible = false;
 			this.gridSuperFam.Location = new System.Drawing.Point(254, 129);
@@ -141,6 +142,7 @@ namespace OpenDental{
 			// 
 			// gridRecall
 			// 
+			this.gridRecall.HasAddButton = false;
 			this.gridRecall.HasMultilineHeaders = false;
 			this.gridRecall.HScrollVisible = true;
 			this.gridRecall.Location = new System.Drawing.Point(585, 27);
@@ -156,6 +158,7 @@ namespace OpenDental{
 			// 
 			// gridFamily
 			// 
+			this.gridFamily.HasAddButton = false;
 			this.gridFamily.HasMultilineHeaders = false;
 			this.gridFamily.HScrollVisible = false;
 			this.gridFamily.Location = new System.Drawing.Point(103, 27);
@@ -165,7 +168,7 @@ namespace OpenDental{
 			this.gridFamily.Size = new System.Drawing.Size(480, 100);
 			this.gridFamily.TabIndex = 31;
 			this.gridFamily.Title = "Family Members";
-			this.gridFamily.TranslationName = "TablePatient";
+			this.gridFamily.TranslationName = "TableFamily";
 			this.gridFamily.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFamily_CellDoubleClick);
 			this.gridFamily.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFamily_CellClick);
 			// 
@@ -173,6 +176,7 @@ namespace OpenDental{
 			// 
 			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPat.HasAddButton = false;
 			this.gridPat.HasMultilineHeaders = false;
 			this.gridPat.HScrollVisible = false;
 			this.gridPat.Location = new System.Drawing.Point(0, 129);
@@ -191,6 +195,7 @@ namespace OpenDental{
 			this.gridIns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridIns.HasAddButton = false;
 			this.gridIns.HasMultilineHeaders = false;
 			this.gridIns.HScrollVisible = true;
 			this.gridIns.Location = new System.Drawing.Point(254, 129);
@@ -378,11 +383,16 @@ namespace OpenDental{
 			//cannot use Lan.F(this);
 			Lan.C(this,new Control[]
 				{
-				//butPatEdit,
-				//butEditPriCov,
-				//butEditPriPlan,
-				//butEditSecCov,
-				//butEditSecPlan
+					//butPatEdit,
+					//butEditPriCov,
+					//butEditPriPlan,
+					//butEditSecCov,
+					//butEditSecPlan,
+					gridFamily,
+					gridRecall,
+					gridPat,
+					gridSuperFam,
+					gridIns,
 				});
 			LayoutToolBar();
 			//gridPat.Height=this.ClientRectangle.Bottom-gridPat.Top-2;
