@@ -11358,6 +11358,30 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.4.7.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_4_19();
+		}
+
+		private static void To15_4_19() {
+			if(FromVersion<new Version("15.4.19.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.19.0"));//No translation in convert script.
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE rxpat ADD IsErxOld tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE rxpat ADD IsErxOld number(3)";
+					Db.NonQ(command);
+					command="UPDATE rxpat SET IsErxOld = 0 WHERE IsErxOld IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE rxpat MODIFY IsErxOld NOT NULL";
+					Db.NonQ(command);
+				}
+				command="UPDATE rxpat SET IsErxOld=1 WHERE NewCropGuid!=''";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.4.19.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_1_0();
 		}
 

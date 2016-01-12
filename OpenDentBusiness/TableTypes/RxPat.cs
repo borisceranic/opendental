@@ -40,6 +40,8 @@ namespace OpenDentBusiness{
 		public string DosageCode;
 		///<summary>NewCrop returns this unique identifier to use for electronic Rx.</summary>
 		public string NewCropGuid;
+		///<summary>True for historic prescriptions which existed prior to version 15.4.  The purpose of this column is to keep historic reports accurate.</summary>
+		public bool IsErxOld;
 
 		///<summary></summary>
 		public RxPat Copy() {
