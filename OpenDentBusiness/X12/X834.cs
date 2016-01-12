@@ -646,12 +646,13 @@ namespace OpenDentBusiness {
 			while(_segCur.SegmentID=="HD") {
 				Hx834_HealthCoverage healthCoverage=new Hx834_HealthCoverage();
 				ReadLoop2300_HD(healthCoverage);
-				ReadLoop2300_DTP();
-				ReadLoop2300_AMT();
-				ReadLoop2300_REF_1();
-				ReadLoop2300_REF_2();
-				ReadLoop2300_IDC();
-				ReadLoop2310();
+				ReadLoop2300_DTP(healthCoverage);
+				ReadLoop2300_AMT(healthCoverage);
+				ReadLoop2300_REF_1(healthCoverage);
+				ReadLoop2300_REF_2(healthCoverage);
+				ReadLoop2300_IDC(healthCoverage);
+				ReadLoop2310(healthCoverage);
+				ReadLoop2320(healthCoverage);
 				member.ListHealthCoverage.Add(healthCoverage);
 			}
 		}
@@ -661,112 +662,134 @@ namespace OpenDentBusiness {
 			if(_segCur.SegmentID!="HD") {
 				return;
 			}
-
+			healthCoverage.HealthCoverage=new X12_HD(_segCur);
 			_segNum++;
 		}
 
 		///<summary>DTP: Health Coverage Dates.  Required.  Repeat 6.  Guide page 145.</summary>
-		private void ReadLoop2300_DTP() {
+		private void ReadLoop2300_DTP(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListHealthCoverageDates.Clear();
 			while(_segCur.SegmentID=="DTP") {
+				healthCoverage.ListHealthCoverageDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>AMT: Health Coverage Policy.  Situational.  Repeat 9.  Guide page 147.</summary>
-		private void ReadLoop2300_AMT() {
+		private void ReadLoop2300_AMT(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListHealthCoveragePolicies.Clear();
 			while(_segCur.SegmentID=="AMT") {
+				healthCoverage.ListHealthCoveragePolicies.Add(new X12_AMT(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>REF: Health Coverage Policy Number.  Situational.  Repeat 14.  Guide page 148.</summary>
-		private void ReadLoop2300_REF_1() {
+		private void ReadLoop2300_REF_1(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListHealthCoveragePolicyNumbers.Clear();
 			List <string> listRefQualifiers=new List<string>(new string[] { "17","1L","9V","CE","E8","M7","PID","RB","X9","XM","XX1","XX2","ZX","ZZ" });
 			while(_segCur.SegmentID=="REF" && listRefQualifiers.Contains(_segCur.Get(1))) {
+				healthCoverage.ListHealthCoveragePolicyNumbers.Add(new X12_REF(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>REF: Prior Coverage Months.  Situational.  Repeat 1.  Guide page 150.</summary>
-		private void ReadLoop2300_REF_2() {
+		private void ReadLoop2300_REF_2(Hx834_HealthCoverage healthCoverage) {
 			if(_segCur.SegmentID!="REF" || _segCur.Get(1)!="QQ") {
 				return;
 			}
+			healthCoverage.PriorCoverageMonths=new X12_REF(_segCur);
 			_segNum++;
 		}
 
 		///<summary>IDC: IDentification Card.  Situational.  Repeat 3.  Guide page 152.</summary>
-		private void ReadLoop2300_IDC() {
+		private void ReadLoop2300_IDC(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListIdentificationCards.Clear();
 			while(_segCur.SegmentID=="IDC") {
+				healthCoverage.ListIdentificationCards.Add(new X12_IDC(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>Loop 2310: Provider Information.  Repeat 30.  Guide page 23.</summary>
-		private void ReadLoop2310() {
+		private void ReadLoop2310(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListProviderInformation.Clear();
 			//There are two different LX segments which could be at this spot.
 			//The LX segments have the same simple format, so we have to look at the following segment to figure out which LX we are looking at.
 			while(_segCur.SegmentID=="LX" && (_segNum+1) < _listSegments.Count && _listSegments[_segNum+1].SegmentID=="NM1") {
-				ReadLoop2310_LX();
-				ReadLoop2310_NM1();
-				ReadLoop2310_N3();
-				ReadLoop2310_N4();
-				ReadLoop2310_PER();
-				ReadLoop2310_PLA();
-				ReadLoop2320();
+				Hx834_Provider prov=new Hx834_Provider();
+				ReadLoop2310_LX(prov);
+				ReadLoop2310_NM1(prov);
+				ReadLoop2310_N3(prov);
+				ReadLoop2310_N4(prov);
+				ReadLoop2310_PER(prov);
+				ReadLoop2310_PLA(prov);
+				healthCoverage.ListProviderInformation.Add(prov);
 			}
 		}
 
 		///<summary>LX: Provider Information.  Situational.  Repeat 1.  Guide page 154.</summary>
-		private void ReadLoop2310_LX() {
+		private void ReadLoop2310_LX(Hx834_Provider prov) {
 			if(_segCur.SegmentID!="LX") {
 				return;
 			}
+			prov.ProviderInformation=new X12_LX(_segCur);
 			_segNum++;
 		}
 
 		///<summary>NM1: Provider Name.  Required.  Repeat 1.  Guide page 155.</summary>
-		private void ReadLoop2310_NM1() {
+		private void ReadLoop2310_NM1(Hx834_Provider prov) {
+			prov.ProviderName=new X12_NM1(_segCur);
 			_segNum++;
 		}
 
 		///<summary>N3: Provider Address. Situational.  Repeat 2.  Guide page 158.</summary>
-		private void ReadLoop2310_N3() {
+		private void ReadLoop2310_N3(Hx834_Provider prov) {
+			prov.ListProviderAddresses.Clear();
 			while(_segCur.SegmentID=="N3") {
+				prov.ListProviderAddresses.Add(new X12_N3(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>N4: Provider City, State, Zip Code.  Situational.  Repeat 1.  Guide page 159.</summary>
-		private void ReadLoop2310_N4() {
+		private void ReadLoop2310_N4(Hx834_Provider prov) {
 			if(_segCur.SegmentID!="N4") {
 				return;
 			}
+			prov.ProviderCityStateZipCode=new X12_N4(_segCur);
 			_segNum++;
 		}
 
 		///<summary>PER: Provider Communications Numbers.  Situational.  Repeat 2.  Guide page 161.</summary>
-		private void ReadLoop2310_PER() {
+		private void ReadLoop2310_PER(Hx834_Provider prov) {
+			prov.ListProviderCommunicationsNumbers.Clear();
 			while(_segCur.SegmentID=="PER") {
+				prov.ListProviderCommunicationsNumbers.Add(new X12_PER(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>PLA: PRovider Change Reason.  Situational.  Repeat 1.  Guide page 164.</summary>
-		private void ReadLoop2310_PLA() {
+		private void ReadLoop2310_PLA(Hx834_Provider prov) {
 			if(_segCur.SegmentID!="PLA") {
 				return;
 			}
+			prov.ProviderChangeReason=new X12_PLA(_segCur);
 			_segNum++;
 		}
 
 		///<summary>Loop 2320: Coordination of Benefits.  Repeat 5.  Guide page 23.</summary>
-		private void ReadLoop2320() {
+		private void ReadLoop2320(Hx834_HealthCoverage healthCoverage) {
+			healthCoverage.ListCoordinationOfBeneifts.Clear();
 			while(_segCur.SegmentID=="COB") {
+				Hx834_Cob cob=new Hx834_Cob();
 				ReadLoop2320_COB();
 				ReadLoop2320_REF();
 				ReadLoop2320_DTP();
 				ReadLoop2330();
+				healthCoverage.ListCoordinationOfBeneifts.Add(cob);
 			}
 		}
 
@@ -911,6 +934,11 @@ namespace OpenDentBusiness {
 		public X12_ACT TpaBrokerAccountInformation;
 	}
 
+	///<summary>Loop 2320</summary>
+	public class Hx834_Cob {
+
+	}
+
 	///<summary>Loop 2200</summary>
 	public class Hx834_DisabilityInformation {
 		///<summary>Loop 2200 DSB</summary>
@@ -933,7 +961,22 @@ namespace OpenDentBusiness {
 
 	///<summary>Loop 2300</summary>
 	public class Hx834_HealthCoverage {
-
+		///<summary>Loop 2300 HD</summary>
+		public X12_HD HealthCoverage;
+		///<summary>Loop 2300 DTP.  Repeat 6.</summary>
+		public List<X12_DTP> ListHealthCoverageDates=new List<X12_DTP>();
+		///<summary>Loop 2300 AMT.  Repeat 9.</summary>
+		public List<X12_AMT> ListHealthCoveragePolicies=new List<X12_AMT>();
+		///<summary>Loop 2300 REF_1.  Repeat 14.</summary>
+		public List<X12_REF> ListHealthCoveragePolicyNumbers=new List<X12_REF>();
+		///<summary>Loop 2300 REF_2.</summary>
+		public X12_REF PriorCoverageMonths;
+		///<summary>Loop2300 IDC.  Repeat 3.</summary>
+		public List<X12_IDC> ListIdentificationCards=new List<X12_IDC>();
+		///<summary>Loop 2310.  Repeat 30.</summary>
+		public List<Hx834_Provider> ListProviderInformation=new List<Hx834_Provider>();
+		///<summary>Loop 2320.  Repeat 5.</summary>
+		public List<Hx834_Cob> ListCoordinationOfBeneifts=new List<Hx834_Cob>();
 	}
 
 	///<summary>Loop 2000</summary>
@@ -1002,6 +1045,22 @@ namespace OpenDentBusiness {
 		public List<Hx834_DisabilityInformation> ListDisabilityInformation=new List<Hx834_DisabilityInformation>();
 		///<summary>Loop 2300</summary>
 		public List<Hx834_HealthCoverage> ListHealthCoverage=new List<Hx834_HealthCoverage>();
+	}
+
+	///<summary>Loop 2310</summary>
+	public class Hx834_Provider {
+		///<summary>Loop 2310 LX</summary>
+		public X12_LX ProviderInformation;
+		///<summary>Loop 2310 NM1</summary>
+		public X12_NM1 ProviderName;
+		///<summary>Loop 2310 N3.  Repeat 2.</summary>
+		public List<X12_N3> ListProviderAddresses=new List<X12_N3>();
+		///<summary>Loop 2310 N4</summary>
+		public X12_N4 ProviderCityStateZipCode;
+		///<summary>Loop 2310 PER.  Repeat 2.</summary>
+		public List <X12_PER> ListProviderCommunicationsNumbers=new List<X12_PER>();
+		///<summary>Loop 2310 PLA</summary>
+		public X12_PLA ProviderChangeReason;
 	}
 
 	///<summary>Loop 2100G</summary>

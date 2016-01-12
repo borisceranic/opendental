@@ -430,6 +430,27 @@ namespace OpenDentBusiness
 		}
 	}
 
+	public class X12_HD {
+		///<summary>HD01</summary>
+		public string MaintenanceTypeCode;
+		///<summary>HD03</summary>
+		public string InsuranceLineCode;
+		///<summary>HD04</summary>
+		public string PlanCoverageDescription;
+		///<summary>HD05</summary>
+		public string CoverageLevelCode;
+		///<summary>HD09</summary>
+		public string YesNoConditionOrResponseCode;
+
+		public X12_HD(X12Segment seg) {
+			MaintenanceTypeCode=seg.Get(1);
+			InsuranceLineCode=seg.Get(3);
+			PlanCoverageDescription=seg.Get(4);
+			CoverageLevelCode=seg.Get(5);
+			YesNoConditionOrResponseCode=seg.Get(9);
+		}
+	}
+
 	public class X12_HLH {
 		///<summary>HLH01</summary>
 		public string HealthRelatedCode;
@@ -463,6 +484,24 @@ namespace OpenDentBusiness
 			Quantity=seg.Get(3);
 			LocationIdentifier=seg.Get(4);
 			SalaryGrade=seg.Get(5);
+		}
+	}
+
+	public class X12_IDC {
+		///<summary>IDC01</summary>
+		public string PlanCoverageDescription;
+		///<summary>IDC02</summary>
+		public string IdentificationCardTypeCode;
+		///<summary>IDC03</summary>
+		public string Quantity;
+		///<summary>IDC04</summary>
+		public string ActionCode;
+
+		public X12_IDC(X12Segment seg) {
+			PlanCoverageDescription=seg.Get(1);
+			IdentificationCardTypeCode=seg.Get(2);
+			Quantity=seg.Get(3);
+			ActionCode=seg.Get(4);
 		}
 	}
 
@@ -529,6 +568,15 @@ namespace OpenDentBusiness
 			IdentificationCode=seg.Get(2);
 			Description=seg.Get(3);
 			UseOfLanguageIndicator=seg.Get(4);
+		}
+	}
+
+	public class X12_LX {
+		///<summary>LX01</summary>
+		public string AssignedNumber;
+
+		public X12_LX(X12Segment seg) {
+			AssignedNumber=seg.Get(1);
 		}
 	}
 
@@ -646,6 +694,27 @@ namespace OpenDentBusiness
 			CommunicationNumber2=seg.Get(6);
 			CommunicationNumberQualifier3=seg.Get(7);
 			CommunicationNumber3=seg.Get(8);
+		}
+	}
+
+	public class X12_PLA {
+		///<summary>PLA01</summary>
+		public string ActionCode;
+		///<summary>PLA02</summary>
+		public string EntityIdentifierCode;
+		///<summary>PLA03</summary>
+		public string DatePla;
+		///<summary>PLA04</summary>
+		public string TimePla;
+		///<summary>PLA05</summary>
+		public string MaintenanceReasonCode;
+
+		public X12_PLA(X12Segment seg) {
+			ActionCode=seg.Get(1);
+			EntityIdentifierCode=seg.Get(2);
+			DatePla=seg.Get(3);
+			TimePla=seg.Get(4);
+			MaintenanceReasonCode=seg.Get(5);
 		}
 	}
 
