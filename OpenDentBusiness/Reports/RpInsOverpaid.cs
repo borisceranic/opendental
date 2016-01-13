@@ -12,7 +12,7 @@ namespace OpenDentBusiness {
 			}
 			string query=@"SELECT "+DbHelper.Concat("patient.LName","', '","patient.FName")+@" patname,
 				procedurelog.ProcDate,
-				SUM(procedurelog.ProcFee) ""$sumfee"",
+				SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) ""$sumfee"",
 				SUM((SELECT SUM(claimproc.InsPayAmt + claimproc.Writeoff) FROM claimproc WHERE claimproc.ProcNum=procedurelog.ProcNum)) AS
 				""$PaidAndWriteoff""
 				FROM procedurelog

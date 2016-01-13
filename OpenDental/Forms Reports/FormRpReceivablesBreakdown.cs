@@ -311,8 +311,8 @@ namespace OpenDental {
 					whereProv += ") ";
 				}
 				report.Query = "SELECT procedurelog.ProcDate, "
-                + "SUM(procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)) "
-                + "FROM procedurelog "
+                + "SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) "
+								+ "FROM procedurelog "
                 + "WHERE procedurelog.ProcDate >= '" + bDate + "' "
                 + "AND procedurelog.ProcDate < '" + eDate + "' "
                 + "AND procedurelog.ProcStatus = '2' "

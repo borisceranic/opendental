@@ -12,7 +12,8 @@ namespace OpenDentBusiness {
 			}
 			string query=@"SET @pos=0;
 				SELECT @pos:=@pos+1 patCount, result.* FROM (SELECT dateFirstProc,patient.LName,patient.FName,"
-				+DbHelper.Concat("referral.LName","IF(referral.FName='','',',')","referral.FName")+" refname,SUM(procedurelog.ProcFee) ";//\"$HowMuch\"";
+				+DbHelper.Concat("referral.LName","IF(referral.FName='','',', ')","referral.FName")+" refname,"
+				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				query+="$HowMuch";
 			}

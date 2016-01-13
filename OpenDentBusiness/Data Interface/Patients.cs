@@ -663,7 +663,8 @@ namespace OpenDentBusiness{
 						CASE WHEN patient.Guarantor!=patient.PatNum THEN 1 ELSE 0 END IsNotGuar,patient.Birthdate
 					FROM(
 						/*Completed procedures*/
-						(SELECT patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum,SUM(procedurelog.ProcFee) AmtBal,0 InsEst
+						(SELECT patient.PatNum,procedurelog.ProvNum,procedurelog.ClinicNum,
+						SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) AmtBal,0 InsEst
 						FROM procedurelog,patient
 						WHERE patient.PatNum=procedurelog.PatNum
 						AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+@"

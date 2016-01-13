@@ -385,7 +385,7 @@ namespace OpenDentBusiness {
 				+"procedurecode.Descript Description, "
 				+"provider.Abbr, "
 				+"procedurelog.ClinicNum Clinic, "
-				+"procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)-IFNULL(SUM(claimproc.WriteOff),0) Production, "
+				+"procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)-IFNULL(SUM(claimproc.WriteOff),0) Production, "
 				+"procedurelog.ProcNum "
 				+"FROM patient "
 				+"INNER JOIN procedurelog ON patient.PatNum=procedurelog.PatNum "

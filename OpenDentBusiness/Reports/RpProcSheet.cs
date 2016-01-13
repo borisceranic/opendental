@@ -22,7 +22,7 @@ namespace OpenDentBusiness {
 			if(PrefC.HasClinicsEnabled) {
 				query+="COALESCE(clinic.Description,\"Unassigned\") Clinic,";
 			}
-			query+="procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE procedurelog.UnitQty+procedurelog.BaseUnits END)"
+			query+="procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)"
 				+"-COALESCE(SUM(claimproc.WriteOff),0) ";//\"$fee\" "  //if no writeoff, then subtract 0
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				query+="$fee ";
@@ -64,8 +64,7 @@ namespace OpenDentBusiness {
 				query+="Count(*),AVG(procs.fee) \"$AvgFee\",SUM(procs.fee) AS \"$TotFee\" ";
 			}
 			query+="FROM ( "
-				+"SELECT procedurelog.ProcFee*(CASE procedurelog.UnitQty+procedurelog.BaseUnits WHEN 0 THEN 1 ELSE "
-				+"procedurelog.UnitQty+procedurelog.BaseUnits END) -COALESCE(SUM(claimproc.WriteOff),0) fee, "
+				+"SELECT procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits) -COALESCE(SUM(claimproc.WriteOff),0) fee, "
 				+"procedurecode.ProcCode,	procedurecode.Descript,	definition.ItemName, definition.ItemOrder "
 				+"FROM procedurelog "
 				+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
