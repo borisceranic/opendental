@@ -684,7 +684,7 @@ namespace OpenDentHL7 {
 					if(IsVerboseLogging) {
 						EventLog.WriteEntry("OpenDentHL7","EndReceive is starting.",EventLogEntryType.Information);
 					}
-					byteCountReceived=socketIncomingHandler.EndReceive(asyncResult);//blocks until data is recieved.
+					byteCountReceived=socketIncomingHandler.EndReceive(asyncResult);//blocks until data is received.
 				}
 				catch(Exception ex) {
 					//Socket has been disposed or is null or something went wrong.
@@ -741,7 +741,7 @@ namespace OpenDentHL7 {
 						_ecwTCPModeIsReceiving=true;
 						IAsyncResult inResultIncomplMsg=socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
 						if(!inResultIncomplMsg.AsyncWaitHandle.WaitOne(new TimeSpan(0,0,30))) {//WaitOne will return true if data was received, false if the timeout is reached with no data received
-							//if we have received part of a message and 30 seconds goes by with no additional data recieved
+							//if we have received part of a message and 30 seconds goes by with no additional data received
 							//close the socket and set the receiveDone manual reset event.  A new socket connection will be accepted.
 							if(IsVerboseLogging) {
 								EventLog.WriteEntry("OpenDentHL7","Setting manual reset event so the main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
@@ -789,7 +789,7 @@ namespace OpenDentHL7 {
 						messageControlId=messageHl7Object.ControlId;
 					}
 					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDentHL7","Error in OnDataRecieved when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Information);
+						EventLog.WriteEntry("OpenDentHL7","Error in OnDataReceived when processing message:\r\n"+ex.Message+"\r\n"+ex.StackTrace,EventLogEntryType.Information);
 						isProcessed=false;
 					}
 				}
@@ -824,7 +824,7 @@ namespace OpenDentHL7 {
 				_ecwTCPModeIsReceiving=true;
 				IAsyncResult inSocketResult=socketIncomingHandler.BeginReceive(state.buffer,0,StateObject.BufferSize,SocketFlags.None,new AsyncCallback(OnDataReceived),state);
 				if(!inSocketResult.AsyncWaitHandle.WaitOne(new TimeSpan(0,5,0))) {//WaitOne will return true if data was received, false if the timeout is reached with no data received
-					//if 5 minutes goes by with no recieved data, close the socket and set the receiveDone manual reset event.  A new socket connection will be accepted.
+					//if 5 minutes goes by with no received data, close the socket and set the receiveDone manual reset event.  A new socket connection will be accepted.
 					if(IsVerboseLogging) {
 						EventLog.WriteEntry("OpenDentHL7","Setting manual reset event due to inactive timeout.  The main receive thread will accept a new incoming connection.",EventLogEntryType.Information);
 					}

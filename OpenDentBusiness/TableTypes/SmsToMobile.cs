@@ -75,7 +75,7 @@ namespace OpenDentBusiness {
 		DeliveryUnconf,
 		///<summary>4. Attempted delivery, failure message return after arriving at handset.</summary>
 		FailWithCharge,
-		///<summary>5. Attempted delivery, immediate failure confirmation recieved from carrier.</summary>
+		///<summary>5. Attempted delivery, immediate failure confirmation received from carrier.</summary>
 		FailNoCharge
 	}
 }

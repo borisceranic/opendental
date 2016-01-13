@@ -1576,11 +1576,11 @@ namespace OpenDental {
 			gridSmsSummary.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Sent\r\nCharges"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			//col=new ODGridColumn(Lan.g(this,"Recieved\r\nAll Time"),70,HorizontalAlignment.Right);
+			//col=new ODGridColumn(Lan.g(this,"Received\r\nAll Time"),70,HorizontalAlignment.Right);
 			//gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Recieved\r\nFor Month"),70,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Received\r\nFor Month"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Recieved\r\nCharges"),70,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g(this,"Received\r\nCharges"),70,HorizontalAlignment.Right);
 			gridSmsSummary.Columns.Add(col);
 			gridSmsSummary.Rows.Clear();
 			DataTable usage=SmsPhones.GetSmsUsageLocal(PrefC.GetBool(PrefName.EasyNoClinics)?new List<long>{0}:_listClinics.Select(x => x.ClinicNum).ToList(),dateTimePickerSms.Value);

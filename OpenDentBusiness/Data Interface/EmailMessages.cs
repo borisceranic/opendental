@@ -314,7 +314,7 @@ namespace OpenDentBusiness{
 					}
 					EmailMessage emailMessage=ConvertMessageToEmailMessage(outMsgDirect.Message,false,true);
 					emailMessage.PatNum=patNum;
-					//First save the ack message to the database in case their is a failure sending the email. This way we can remember to try and send it again later, based on SentOrRecieved.
+					//First save the ack message to the database in case their is a failure sending the email. This way we can remember to try and send it again later, based on SentOrReceived.
 					emailMessage.SentOrReceived=EmailSentOrReceived.AckDirectNotSent;
 					MemoryStream ms=new MemoryStream();
 					notificationMsg.Save(ms);
