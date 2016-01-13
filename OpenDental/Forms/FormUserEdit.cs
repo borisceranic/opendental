@@ -437,10 +437,6 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter a username.");
 				return;
 			}
-			if(listEmployee.SelectedIndex>0 && listProv.SelectedIndex>0){
-				MsgBox.Show(this,"Cannot set an employee and a provider for the same user.");
-				return;
-			}
 			UserCur.IsHidden=checkIsHidden.Checked;
 			UserCur.UserName=textUserName.Text;
 			UserCur.UserGroupNum=_listUserGroups[listUserGroup.SelectedIndex].UserGroupNum;
