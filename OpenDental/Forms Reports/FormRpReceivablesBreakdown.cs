@@ -375,7 +375,7 @@ namespace OpenDental {
                     + "SUM(WriteOff) FROM claimproc WHERE "
                     + "DateCP >= '" + bDate + "' "
                     + "AND DateCP < '" + eDate + "' "
-                    + "AND Status IN (1,4,5) "//Recieved, supplemental, capclaim. Otherwise, it's only an estimate. 7-CapCompl handled above.
+                    + "AND Status IN (1,4,5) "//Received, supplemental, capclaim. Otherwise, it's only an estimate. 7-CapCompl handled above.
                     + whereProv
                     + " GROUP BY DateCP "
                     + "ORDER BY DateCP";

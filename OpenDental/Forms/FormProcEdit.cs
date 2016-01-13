@@ -4341,7 +4341,7 @@ namespace OpenDental{
 				checkNoBillIns.CheckState=CheckState.Unchecked;
 			}
 			for(int i=0;i<ClaimProcsForProc.Count;i++) {
-				//ignore CapClaim,NotReceived,PreAuth,Recieved,Supplemental
+				//ignore CapClaim,NotReceived,PreAuth,Received,Supplemental
 				if(ClaimProcsForProc[i].Status==ClaimProcStatus.Estimate
 					|| ClaimProcsForProc[i].Status==ClaimProcStatus.CapComplete
 					|| ClaimProcsForProc[i].Status==ClaimProcStatus.CapEstimate)

@@ -52,7 +52,7 @@ namespace OpenDental{
 				//So, we must set it here.  We need to set it in the claimProcsAll list.  Find the matching one.
 				for(int j=0;j<ClaimProcsAll.Count;j++){
 					if(ClaimProcsAll[j].ClaimProcNum==ClaimProcsForClaim[i].ClaimProcNum){//same claimproc in a different list
-						if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived) {//ignores recieved, etc
+						if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived) {//ignores received, etc
 							ClaimProcsAll[j].InsPayEst=ClaimProcs.GetInsEstTotal(ClaimProcsAll[j]);
 						}
 					}

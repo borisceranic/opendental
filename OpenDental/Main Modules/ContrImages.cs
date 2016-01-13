@@ -2618,7 +2618,7 @@ namespace OpenDental {
 			while(true) {
 				try {
 					//Wait indefinitely for a signal to start processing again. Since the OS handles this function,
-					//this thread will not run even a single process cycle until a signal is recieved. This is ideal,
+					//this thread will not run even a single process cycle until a signal is received. This is ideal,
 					//since it means that we do not waste any CPU cycles when image processing is not currently needed.
 					//At the same time, this function allows us to keep a single thread for as long as possible, so
 					//that we do not need to destroy and recreate this thread (except in rare circumstances, such as
