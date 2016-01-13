@@ -1677,8 +1677,15 @@ namespace OpenDental{
 		}
 
 		private void FillPriorityMetrics() {
-			int daysPrior=PIn.Int(textDaysPrior.Text);
-			int hoursPrior=PIn.Int(textHoursPrior.Text);
+			int daysPrior;
+			int hoursPrior;
+			try {
+				daysPrior=PIn.Int(textDaysPrior.Text);
+				hoursPrior=PIn.Int(textHoursPrior.Text);
+			}
+			catch(Exception) {
+				return;//ValidNumber box will tell them what's wrong. No need for a message.
+			}
 			DateTime dateDayStart=DateTime.Now.AddDays(daysPrior);
 			DateTime dateHourStart=DateTime.Now.AddHours(hoursPrior);
 			DateTime dateDayStop=dateDayStart.AddDays(7);
