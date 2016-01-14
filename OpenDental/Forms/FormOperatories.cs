@@ -22,7 +22,11 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butDown;
 		private OpenDental.UI.Button butUp;
+		private ComboBox comboClinic;
+		private Label labelClinic;
 		private List<Operatory> _listOps;
+		private UI.Button butPickClinic;
+		private Clinic[] _arrayClinics;
 
 		///<summary></summary>
 		public FormOperatories()
@@ -58,9 +62,12 @@ namespace OpenDental{
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOperatories));
 			this.label1 = new System.Windows.Forms.Label();
+			this.gridMain = new OpenDental.UI.ODGrid();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
+			this.butPickClinic = new OpenDental.UI.Button();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.SuspendLayout();
@@ -69,10 +76,62 @@ namespace OpenDental{
 			// 
 			this.label1.Location = new System.Drawing.Point(20, 7);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(588, 20);
+			this.label1.Size = new System.Drawing.Size(251, 20);
 			this.label1.TabIndex = 12;
 			this.label1.Text = "(Also, see the appointment views section)";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(21, 31);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(679, 432);
+			this.gridMain.TabIndex = 11;
+			this.gridMain.Title = "Operatories";
+			this.gridMain.TranslationName = "TableOperatories";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(450, 8);
+			this.comboClinic.MaxDropDownItems = 30;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(226, 21);
+			this.comboClinic.TabIndex = 119;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelClinic.Location = new System.Drawing.Point(380, 12);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(67, 16);
+			this.labelClinic.TabIndex = 120;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butPickClinic
+			// 
+			this.butPickClinic.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickClinic.Autosize = false;
+			this.butPickClinic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickClinic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickClinic.CornerRadius = 2F;
+			this.butPickClinic.Location = new System.Drawing.Point(677, 8);
+			this.butPickClinic.Name = "butPickClinic";
+			this.butPickClinic.Size = new System.Drawing.Size(23, 21);
+			this.butPickClinic.TabIndex = 121;
+			this.butPickClinic.Text = "...";
+			this.butPickClinic.Click += new System.EventHandler(this.butPickClinic_Click);
 			// 
 			// butDown
 			// 
@@ -107,22 +166,6 @@ namespace OpenDental{
 			this.butUp.TabIndex = 13;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
-			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(21, 31);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(679, 432);
-			this.gridMain.TabIndex = 11;
-			this.gridMain.Title = "Operatories";
-			this.gridMain.TranslationName = "TableOperatories";
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
 			// butAdd
 			// 
@@ -160,6 +203,9 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(818, 486);
+			this.Controls.Add(this.butPickClinic);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butUp);
 			this.Controls.Add(this.label1);
@@ -181,6 +227,25 @@ namespace OpenDental{
 		#endregion
 
 		private void FormOperatories_Load(object sender, System.EventArgs e) {
+			if(!PrefC.HasClinicsEnabled) {
+				comboClinic.Visible=false;
+				labelClinic.Visible=false;
+			}
+			else {
+				comboClinic.Items.Add(Lan.g(this,"All"));
+				comboClinic.SelectedIndex=0;
+				_arrayClinics=Clinics.GetList();
+				for(int i=0;i<_arrayClinics.Length;i++) {
+					comboClinic.Items.Add(_arrayClinics[i].Description);
+					if(_arrayClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+						comboClinic.SelectedIndex=i+1;
+					}
+				}
+			}
+			if(comboClinic.SelectedIndex!=0) {
+				butUp.Enabled=false;
+				butDown.Enabled=false;
+			}
 			Cache.Refresh(InvalidType.Operatories);
 			_listOps=OperatoryC.GetListt();//Already ordered by ItemOrder
 			FillGrid();
@@ -208,6 +273,12 @@ namespace OpenDental{
 			gridMain.Rows.Clear();
 			UI.ODGridRow row;
 			for(int i=0;i<_listOps.Count;i++){
+				if(PrefC.HasClinicsEnabled 
+					&& comboClinic.SelectedIndex!=0 
+					&& _listOps[i].ClinicNum!=_arrayClinics[comboClinic.SelectedIndex-1].ClinicNum) 
+				{
+					continue;
+				}
 				row=new OpenDental.UI.ODGridRow();
 				row.Cells.Add(_listOps[i].OpName);
 				row.Cells.Add(_listOps[i].Abbrev);
@@ -237,6 +308,42 @@ namespace OpenDental{
 			FormE.ListOps=_listOps;
 			FormE.ShowDialog();
 			FillGrid();
+		}
+
+		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
+			FillGrid();
+			if(comboClinic.SelectedIndex!=0) {
+				butUp.Enabled=false;
+				butDown.Enabled=false;
+			}
+			else {
+				butUp.Enabled=true;
+				butDown.Enabled=true;
+			}
+		}
+		private void butPickClinic_Click(object sender,EventArgs e) {
+			FormClinics FormC=new FormClinics();
+			FormC.IsSelectionMode=true;
+			FormC.ShowDialog();
+			if(FormC.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			Clinic[] arrayClinics=Clinics.GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].ClinicNum!=FormC.SelectedClinicNum) {
+					continue;
+				}
+				comboClinic.SelectedIndex=i+1;
+			}
+			FillGrid();
+			if(comboClinic.SelectedIndex!=0) {
+				butUp.Enabled=false;
+				butDown.Enabled=false;
+			}
+			else {
+				butUp.Enabled=true;
+				butDown.Enabled=true;
+			}
 		}
 
 		private void butAdd_Click(object sender, System.EventArgs e) {
@@ -307,16 +414,6 @@ namespace OpenDental{
 			Operatories.Sync(_listOps);
 			DataValid.SetInvalid(InvalidType.Operatories);//With sync we don't know if anything changed.
 		}
-
-		
-
-		
-
-		
-
-
-
-		
 	}
 }
 

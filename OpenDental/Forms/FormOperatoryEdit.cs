@@ -28,14 +28,17 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textOpName;
 		private System.Windows.Forms.TextBox textAbbrev;
 		private System.Windows.Forms.CheckBox checkIsHidden;
-		private System.Windows.Forms.ComboBox comboProvHygienist;
-		private System.Windows.Forms.ComboBox comboProvDentist;
+		private System.Windows.Forms.ComboBox comboHyg;
+		private System.Windows.Forms.ComboBox comboProv;
 		private System.Windows.Forms.CheckBox checkIsHygiene;
 		private CheckBox checkSetProspective;
 		private Label label3;
 		private Operatory OpCur;
 		private Label label4;
 		private CheckBox checkIsWebSched;
+		private UI.Button butPickClin;
+		private UI.Button butPickProv;
+		private UI.Button butPickHyg;
 		public List<Operatory> ListOps;
 
 		///<summary></summary>
@@ -77,8 +80,8 @@ namespace OpenDental{
 			this.textAbbrev = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.checkIsHidden = new System.Windows.Forms.CheckBox();
-			this.comboProvHygienist = new System.Windows.Forms.ComboBox();
-			this.comboProvDentist = new System.Windows.Forms.ComboBox();
+			this.comboHyg = new System.Windows.Forms.ComboBox();
+			this.comboProv = new System.Windows.Forms.ComboBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -92,6 +95,9 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.checkIsWebSched = new System.Windows.Forms.CheckBox();
+			this.butPickClin = new OpenDental.UI.Button();
+			this.butPickProv = new OpenDental.UI.Button();
+			this.butPickHyg = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -139,23 +145,23 @@ namespace OpenDental{
 			this.checkIsHidden.Text = "Is Hidden";
 			this.checkIsHidden.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// comboProvHygienist
+			// comboHyg
 			// 
-			this.comboProvHygienist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProvHygienist.Location = new System.Drawing.Point(160, 123);
-			this.comboProvHygienist.MaxDropDownItems = 30;
-			this.comboProvHygienist.Name = "comboProvHygienist";
-			this.comboProvHygienist.Size = new System.Drawing.Size(126, 21);
-			this.comboProvHygienist.TabIndex = 5;
+			this.comboHyg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboHyg.Location = new System.Drawing.Point(160, 123);
+			this.comboHyg.MaxDropDownItems = 30;
+			this.comboHyg.Name = "comboHyg";
+			this.comboHyg.Size = new System.Drawing.Size(252, 21);
+			this.comboHyg.TabIndex = 5;
 			// 
-			// comboProvDentist
+			// comboProv
 			// 
-			this.comboProvDentist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProvDentist.Location = new System.Drawing.Point(160, 102);
-			this.comboProvDentist.MaxDropDownItems = 100;
-			this.comboProvDentist.Name = "comboProvDentist";
-			this.comboProvDentist.Size = new System.Drawing.Size(126, 21);
-			this.comboProvDentist.TabIndex = 4;
+			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboProv.Location = new System.Drawing.Point(160, 102);
+			this.comboProv.MaxDropDownItems = 30;
+			this.comboProv.Name = "comboProv";
+			this.comboProv.Size = new System.Drawing.Size(252, 21);
+			this.comboProv.TabIndex = 4;
 			// 
 			// label6
 			// 
@@ -206,9 +212,9 @@ namespace OpenDental{
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboClinic.Location = new System.Drawing.Point(160, 81);
-			this.comboClinic.MaxDropDownItems = 100;
+			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(126, 21);
+			this.comboClinic.Size = new System.Drawing.Size(252, 21);
 			this.comboClinic.TabIndex = 3;
 			// 
 			// labelClinic
@@ -288,10 +294,55 @@ namespace OpenDental{
 			this.checkIsWebSched.Text = "Is Web Sched";
 			this.checkIsWebSched.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// butPickClin
+			// 
+			this.butPickClin.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickClin.Autosize = false;
+			this.butPickClin.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickClin.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickClin.CornerRadius = 2F;
+			this.butPickClin.Location = new System.Drawing.Point(412, 81);
+			this.butPickClin.Name = "butPickClin";
+			this.butPickClin.Size = new System.Drawing.Size(23, 21);
+			this.butPickClin.TabIndex = 121;
+			this.butPickClin.Text = "...";
+			this.butPickClin.Click += new System.EventHandler(this.butPickClin_Click);
+			// 
+			// butPickProv
+			// 
+			this.butPickProv.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickProv.Autosize = false;
+			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickProv.CornerRadius = 2F;
+			this.butPickProv.Location = new System.Drawing.Point(412, 102);
+			this.butPickProv.Name = "butPickProv";
+			this.butPickProv.Size = new System.Drawing.Size(23, 21);
+			this.butPickProv.TabIndex = 122;
+			this.butPickProv.Text = "...";
+			this.butPickProv.Click += new System.EventHandler(this.butPickProv_Click);
+			// 
+			// butPickHyg
+			// 
+			this.butPickHyg.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPickHyg.Autosize = false;
+			this.butPickHyg.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPickHyg.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPickHyg.CornerRadius = 2F;
+			this.butPickHyg.Location = new System.Drawing.Point(412, 123);
+			this.butPickHyg.Name = "butPickHyg";
+			this.butPickHyg.Size = new System.Drawing.Size(23, 21);
+			this.butPickHyg.TabIndex = 123;
+			this.butPickHyg.Text = "...";
+			this.butPickHyg.Click += new System.EventHandler(this.butPickHyg_Click);
+			// 
 			// FormOperatoryEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(574, 266);
+			this.Controls.Add(this.butPickHyg);
+			this.Controls.Add(this.butPickProv);
+			this.Controls.Add(this.butPickClin);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.checkIsWebSched);
 			this.Controls.Add(this.comboClinic);
@@ -301,8 +352,8 @@ namespace OpenDental{
 			this.Controls.Add(this.checkSetProspective);
 			this.Controls.Add(this.checkIsHygiene);
 			this.Controls.Add(this.label8);
-			this.Controls.Add(this.comboProvHygienist);
-			this.Controls.Add(this.comboProvDentist);
+			this.Controls.Add(this.comboHyg);
+			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.checkIsHidden);
@@ -333,6 +384,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyNoClinics)){
 				labelClinic.Visible=false;
 				comboClinic.Visible=false;
+				butPickClin.Visible=false;
 			}
 			comboClinic.Items.Add(Lan.g(this,"none"));
 			comboClinic.SelectedIndex=0;
@@ -341,23 +393,69 @@ namespace OpenDental{
 				if(Clinics.List[i].ClinicNum==OpCur.ClinicNum)
 					comboClinic.SelectedIndex=i+1;
 			}
-			comboProvDentist.Items.Add(Lan.g(this,"none"));
-			comboProvDentist.SelectedIndex=0;
+			comboProv.Items.Add(Lan.g(this,"none"));
+			comboProv.SelectedIndex=0;
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvDentist.Items.Add(ProviderC.ListShort[i].Abbr);
+				comboProv.Items.Add(ProviderC.ListShort[i].Abbr);
 				if(ProviderC.ListShort[i].ProvNum==OpCur.ProvDentist)
-					comboProvDentist.SelectedIndex=i+1;
+					comboProv.SelectedIndex=i+1;
 			}
-			comboProvHygienist.Items.Add(Lan.g(this,"none"));
-			comboProvHygienist.SelectedIndex=0;
+			comboHyg.Items.Add(Lan.g(this,"none"));
+			comboHyg.SelectedIndex=0;
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvHygienist.Items.Add(ProviderC.ListShort[i].Abbr);
+				comboHyg.Items.Add(ProviderC.ListShort[i].Abbr);
 				if(ProviderC.ListShort[i].ProvNum==OpCur.ProvHygienist)
-					comboProvHygienist.SelectedIndex=i+1;
+					comboHyg.SelectedIndex=i+1;
 			}
 			checkIsHygiene.Checked=OpCur.IsHygiene;
 			checkSetProspective.Checked=OpCur.SetProspective;
 			checkIsWebSched.Checked=OpCur.IsWebSched;
+		}
+
+		private void butPickClin_Click(object sender,EventArgs e) {
+			FormClinics FormC=new FormClinics();
+			FormC.IsSelectionMode=true;
+			FormC.ShowDialog();
+			if(FormC.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			Clinic[] arrayClinics=Clinics.GetList();
+			for(int i=0;i<arrayClinics.Length;i++) {
+				if(arrayClinics[i].ClinicNum!=FormC.SelectedClinicNum) {
+					continue;
+				}
+				comboClinic.SelectedIndex=i+1;
+			}
+		}
+
+		private void butPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP=new FormProviderPick();
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			List<Provider> listProvs=ProviderC.ListShort;
+			for(int i=0;i<listProvs.Count;i++) {
+				if(listProvs[i].ProvNum!=FormPP.SelectedProvNum) {
+					continue;
+				}
+				comboProv.SelectedIndex=i+1;
+			}
+		}
+
+		private void butPickHyg_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP=new FormProviderPick();
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			List<Provider> listProvs=ProviderC.ListShort;
+			for(int i=0;i<listProvs.Count;i++) {
+				if(listProvs[i].ProvNum!=FormPP.SelectedProvNum) {
+					continue;
+				}
+				comboHyg.SelectedIndex=i+1;
+			}
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -377,14 +475,14 @@ namespace OpenDental{
 				OpCur.ClinicNum=0;
 			else
 				OpCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			if(comboProvDentist.SelectedIndex==0)//none
+			if(comboProv.SelectedIndex==0)//none
 				OpCur.ProvDentist=0;
 			else
-				OpCur.ProvDentist=ProviderC.ListShort[comboProvDentist.SelectedIndex-1].ProvNum;
-			if(comboProvHygienist.SelectedIndex==0)//none
+				OpCur.ProvDentist=ProviderC.ListShort[comboProv.SelectedIndex-1].ProvNum;
+			if(comboHyg.SelectedIndex==0)//none
 				OpCur.ProvHygienist=0;
 			else
-				OpCur.ProvHygienist=ProviderC.ListShort[comboProvHygienist.SelectedIndex-1].ProvNum;
+				OpCur.ProvHygienist=ProviderC.ListShort[comboHyg.SelectedIndex-1].ProvNum;
 			OpCur.IsHygiene=checkIsHygiene.Checked;
 			OpCur.SetProspective=checkSetProspective.Checked;
 			OpCur.IsWebSched=checkIsWebSched.Checked;
@@ -400,14 +498,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-
 	}
 }
 

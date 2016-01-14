@@ -225,6 +225,7 @@ namespace OpenDental{
 		private void butOK_Click(object sender,EventArgs e) {
 			if(IsSelectionMode && gridMain.SelectedIndices.Length>0) {
 				SelectedClinicNum=((Clinic)gridMain.Rows[gridMain.GetSelectedIndex()].Tag).ClinicNum;
+				DialogResult=DialogResult.OK;
 			}
 			Close();
 		}
