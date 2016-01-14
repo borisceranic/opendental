@@ -46,12 +46,15 @@ namespace OpenDentBusiness.Crud{
 			FeeSched feeSched;
 			foreach(DataRow row in table.Rows) {
 				feeSched=new FeeSched();
-				feeSched.FeeSchedNum = PIn.Long  (row["FeeSchedNum"].ToString());
-				feeSched.Description = PIn.String(row["Description"].ToString());
-				feeSched.FeeSchedType= (OpenDentBusiness.FeeScheduleType)PIn.Int(row["FeeSchedType"].ToString());
-				feeSched.ItemOrder   = PIn.Int   (row["ItemOrder"].ToString());
-				feeSched.IsHidden    = PIn.Bool  (row["IsHidden"].ToString());
-				feeSched.IsGlobal    = PIn.Bool  (row["IsGlobal"].ToString());
+				feeSched.FeeSchedNum    = PIn.Long  (row["FeeSchedNum"].ToString());
+				feeSched.Description    = PIn.String(row["Description"].ToString());
+				feeSched.FeeSchedType   = (OpenDentBusiness.FeeScheduleType)PIn.Int(row["FeeSchedType"].ToString());
+				feeSched.ItemOrder      = PIn.Int   (row["ItemOrder"].ToString());
+				feeSched.IsHidden       = PIn.Bool  (row["IsHidden"].ToString());
+				feeSched.IsGlobal       = PIn.Bool  (row["IsGlobal"].ToString());
+				feeSched.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				feeSched.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				feeSched.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(feeSched);
 			}
 			return retVal;
@@ -69,6 +72,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ItemOrder");
 			table.Columns.Add("IsHidden");
 			table.Columns.Add("IsGlobal");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(FeeSched feeSched in listFeeScheds) {
 				table.Rows.Add(new object[] {
 					POut.Long  (feeSched.FeeSchedNum),
@@ -77,6 +83,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (feeSched.ItemOrder),
 					POut.Bool  (feeSched.IsHidden),
 					POut.Bool  (feeSched.IsGlobal),
+					POut.Long  (feeSched.SecUserNumEntry),
+					POut.Date  (feeSched.SecDateEntry),
+					POut.DateT (feeSched.SecDateTEdit),
 				});
 			}
 			return table;
@@ -117,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="FeeSchedNum,";
 			}
-			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal) VALUES(";
+			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(feeSched.FeeSchedNum)+",";
 			}
@@ -126,7 +135,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)feeSched.FeeSchedType)+","
 				+    POut.Int   (feeSched.ItemOrder)+","
 				+    POut.Bool  (feeSched.IsHidden)+","
-				+    POut.Bool  (feeSched.IsGlobal)+")";
+				+    POut.Bool  (feeSched.IsGlobal)+","
+				+    POut.Long  (feeSched.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -159,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="FeeSchedNum,";
 			}
-			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal) VALUES(";
+			command+="Description,FeeSchedType,ItemOrder,IsHidden,IsGlobal,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(feeSched.FeeSchedNum)+",";
 			}
@@ -168,7 +180,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)feeSched.FeeSchedType)+","
 				+    POut.Int   (feeSched.ItemOrder)+","
 				+    POut.Bool  (feeSched.IsHidden)+","
-				+    POut.Bool  (feeSched.IsGlobal)+")";
+				+    POut.Bool  (feeSched.IsGlobal)+","
+				+    POut.Long  (feeSched.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -181,11 +196,14 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one FeeSched in the database.</summary>
 		public static void Update(FeeSched feeSched){
 			string command="UPDATE feesched SET "
-				+"Description = '"+POut.String(feeSched.Description)+"', "
-				+"FeeSchedType=  "+POut.Int   ((int)feeSched.FeeSchedType)+", "
-				+"ItemOrder   =  "+POut.Int   (feeSched.ItemOrder)+", "
-				+"IsHidden    =  "+POut.Bool  (feeSched.IsHidden)+", "
-				+"IsGlobal    =  "+POut.Bool  (feeSched.IsGlobal)+" "
+				+"Description    = '"+POut.String(feeSched.Description)+"', "
+				+"FeeSchedType   =  "+POut.Int   ((int)feeSched.FeeSchedType)+", "
+				+"ItemOrder      =  "+POut.Int   (feeSched.ItemOrder)+", "
+				+"IsHidden       =  "+POut.Bool  (feeSched.IsHidden)+", "
+				+"IsGlobal       =  "+POut.Bool  (feeSched.IsGlobal)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE FeeSchedNum = "+POut.Long(feeSched.FeeSchedNum);
 			Db.NonQ(command);
 		}
@@ -213,6 +231,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsGlobal = "+POut.Bool(feeSched.IsGlobal)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}
@@ -229,8 +250,9 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<FeeSched> listNew,List<FeeSched> listDB) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.
+		///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.</summary>
+		public static bool Sync(List<FeeSched> listNew,List<FeeSched> listDB,long userNum) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<FeeSched> listIns    =new List<FeeSched>();
 			List<FeeSched> listUpdNew =new List<FeeSched>();
@@ -283,6 +305,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
+				listIns[i].SecUserNumEntry=userNum;
 				Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {

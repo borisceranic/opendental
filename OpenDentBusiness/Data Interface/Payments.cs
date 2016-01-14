@@ -143,7 +143,10 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>There's only one place in the program where this is called from.  Date is today, so no need to validate the date.</summary>
-		public static long Insert(Payment pay){
+		public static long Insert(Payment pay) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				pay.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				pay.PayNum=Meth.GetLong(MethodBase.GetCurrentMethod(),pay);
 				return pay.PayNum;
@@ -153,6 +156,9 @@ namespace OpenDentBusiness{
 
 		///<summary>There's only one place in the program where this is called from.  Date is today, so no need to validate the date.</summary>
 		public static long Insert(Payment pay,bool useExistingPK) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				pay.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				pay.PayNum=Meth.GetLong(MethodBase.GetCurrentMethod(),pay,useExistingPK);
 				return pay.PayNum;

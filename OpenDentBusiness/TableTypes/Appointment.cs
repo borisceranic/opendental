@@ -7,7 +7,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>Appointments can show in the Appointments module, or they can be on the unscheduled list.  An appointment object is also used to store the Planned appointment.  The planned appointment never gets scheduled, but instead gets copied.</summary>
 	[Serializable()]
-	[CrudTable(IsDeleteForbidden=true,IsSynchable=true,
+	[CrudTable(IsDeleteForbidden=true,IsSynchable=true,IsSecurityStamped=true,
 		AuditPerms=CrudAuditPerm.AppointmentCompleteEdit|CrudAuditPerm.AppointmentCreate|CrudAuditPerm.AppointmentEdit|CrudAuditPerm.AppointmentMove)]
 	public class Appointment:TableBase{
 		///<summary>Primary key.</summary>
@@ -74,6 +74,13 @@ namespace OpenDentBusiness{
 		public Color ColorOverride;
 		///<summary>FK to appointmenttype.AppointmentTypeNum.</summary>
 		public long AppointmentTypeNum;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		//No SecDateTEdit, DateTStamp already exists and is the timestamp updated by MySQL when a row is added or changed
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ColorOverride",typeof(int))]

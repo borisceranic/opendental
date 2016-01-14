@@ -66,6 +66,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(TreatPlan tp) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				tp.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				tp.TreatPlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),tp);
 				return tp.TreatPlanNum;
@@ -114,14 +117,18 @@ namespace OpenDentBusiness{
 			return Encoding.ASCII.GetString(hash);
 		}
 
-		///<summary>This is the automation behind keeping treatplans correct.  Many calls to DB, consider optimizing or calling sparingly.
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.
+		///<para>This is the automation behind keeping treatplans correct.  Many calls to DB, consider optimizing or calling sparingly.</para>
 		///<para>Ensures patients only have one active treatplan, marks extras inactive and creates an active if necessary.</para>
 		///<para>Attaches procedures to the active plan if the proc status is TP or status is TPi and the procs is attached to a sched/planned appt.</para>
 		///<para>Creates an unassigned treatplan if necessary and attaches any unassigned procedures to it.</para>
 		///<para>Also maintains priorities of treatplanattaches and procedures and updates the procstatus of TP and TPi procs if necessary.</para></summary>
-		public static void AuditPlans(long patNum) {
+		public static void AuditPlans(long patNum,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,userNum);
 				return;
 			}
 			#region Pseudo Code
@@ -178,7 +185,8 @@ namespace OpenDentBusiness{
 					Heading=Lans.g("TreatPlans","Active Treatment Plan"),
 					Note=PrefC.GetString(PrefName.TreatmentPlanNote),
 					TPStatus=TreatPlanStatus.Active,
-					PatNum=patNum
+					PatNum=patNum,
+					SecUserNumEntry=userNum
 				};
 				TreatPlans.Insert(activePlan);
 				listTreatPlans.Add(activePlan);
@@ -195,7 +203,8 @@ namespace OpenDentBusiness{
 					Heading=Lans.g("TreatPlans","Unassigned"),
 					Note=PrefC.GetString(PrefName.TreatmentPlanNote),
 					TPStatus=TreatPlanStatus.Inactive,
-					PatNum=patNum
+					PatNum=patNum,
+					SecUserNumEntry=userNum
 				};
 				TreatPlans.Insert(unassignedPlan);
 				listTreatPlans.Add(unassignedPlan);

@@ -16,6 +16,9 @@ namespace OpenDentBusiness {
 		
 		///<summary>Also fills PlanNum from db.</summary>
 		public static long Insert(InsPlan plan,bool useExistingPK) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				plan.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				plan.PlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),plan,useExistingPK);
 				return plan.PlanNum;
@@ -756,10 +759,15 @@ namespace OpenDentBusiness {
 			return Db.NonQ(command);
 		}
 
-		///<summary>Returns the number of fee schedules added.  It doesn't inform the user of how many plans were affected, but there will obviously be a certain number of plans for every new fee schedule.</summary>
-		public static long GenerateAllowedFeeSchedules() {
+		///<summary>Returns the number of fee schedules added.  It doesn't inform the user of how many plans were affected, but there will obviously be a
+		///certain number of plans for every new fee schedule.  No need to pass in userNum, it's set before remoting role check and passed to the server
+		///if necessary.</summary>
+		public static long GenerateAllowedFeeSchedules(long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod());
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),userNum);
 			}
 			//get carrier names for all plans without an allowed fee schedule that are also not hidden.
 			string command="SELECT carrier.CarrierName "
@@ -790,6 +798,7 @@ namespace OpenDentBusiness {
 					sched.FeeSchedType=FeeScheduleType.OutNetwork;
 					//sched.IsNew=true;
 					sched.ItemOrder=itemOrder;
+					sched.SecUserNumEntry=userNum;
 					FeeScheds.Insert(sched);
 					itemOrder++;
 				}
@@ -1064,9 +1073,13 @@ namespace OpenDentBusiness {
 			return Db.NonQ(command);
 		}
 
-		public static InsPlan GetByCarrierName(string carrierName) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		public static InsPlan GetByCarrierName(string carrierName,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<InsPlan>(MethodBase.GetCurrentMethod(),carrierName);
+				return Meth.GetObject<InsPlan>(MethodBase.GetCurrentMethod(),carrierName,userNum);
 			}
 			string command="SELECT * FROM insplan WHERE CarrierNum=(SELECT CarrierNum FROM carrier WHERE CarrierName='"+POut.String(carrierName)+"')";
 			InsPlan plan=Crud.InsPlanCrud.SelectOne(command);
@@ -1076,6 +1089,7 @@ namespace OpenDentBusiness {
 			Carrier carrier=Carriers.GetByNameAndPhone(carrierName,"");
 			plan=new InsPlan();
 			plan.CarrierNum=carrier.CarrierNum;
+			plan.SecUserNumEntry=userNum;
 			InsPlans.Insert(plan);
 			return plan;
 		}

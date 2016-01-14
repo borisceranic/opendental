@@ -586,7 +586,15 @@ namespace OpenDental {
 			}
 			//We know that this method supports giving the user a break down and shall call the method's fix section where the break down results should be.
 			//TODO: Make sure that DBM methods with break downs ALWAYS have the break down in the fix section.
-			object[] parameters=new object[] { checkShow.Checked,false };//break downs are ALWAYS in the fix section of the method.
+			object[] parameters;
+			if(_listDbmMethodsGrid[e.Row].GetCustomAttributes(typeof(DbmMethod),true).Any(x => ((DbmMethod)x).HasUserNum)) {
+				//Break downs are ALWAYS in the fix section of the method. Send UserNum=0, it will be set if not remoting role ServerWeb.
+				parameters=new object[] { checkShow.Checked,false,0 };//break downs are ALWAYS in the fix section of the method.
+			}
+			else {
+				//Break downs are ALWAYS in the fix section of the method.
+				parameters=new object[] { checkShow.Checked,false };
+			}
 			string result=(string)_listDbmMethodsGrid[e.Row].Invoke(null,parameters);
 			if(result=="") {//Only possible if running a check / fix in non-verbose mode and nothing happened or needs to happen.
 				result=Lan.g("FormDatabaseMaintenance","Done.  No maintenance needed.");
@@ -828,7 +836,15 @@ namespace OpenDental {
 					//Double clicking on the row will take them to a new window which will call the fix aka the break down results.
 					isCheckParam=true;
 				}
-				object[] parameters=new object[] { verbose,isCheckParam };
+				object[] parameters;
+				if(_listDbmMethodsGrid[selectedIndices[i]].GetCustomAttributes(typeof(DbmMethod),true).Any(x => ((DbmMethod)x).HasUserNum)) {
+					//Break downs are ALWAYS in the fix section of the method. Send UserNum=0, it will be set if not remoting role ServerWeb.
+					parameters=new object[] { verbose,isCheckParam,0 };
+				}
+				else {
+					//Break downs are ALWAYS in the fix section of the method.
+					parameters=new object[] { verbose,isCheckParam };
+				}
 				gridMain.ScrollToIndexBottom(selectedIndices[i]);
 				UpdateResultTextForRow(selectedIndices[i],Lan.g("FormDatabaseMaintenance","Running")+"...");
 				result=(string)_listDbmMethodsGrid[selectedIndices[i]].Invoke(null,parameters);

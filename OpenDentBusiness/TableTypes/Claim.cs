@@ -8,7 +8,7 @@ namespace OpenDentBusiness{
 
 	///<summary>The claim table holds information about individual claims.  Each row represents one claim.</summary>
 	[Serializable()]
-	[CrudTable(AuditPerms=CrudAuditPerm.ClaimHistoryEdit)]
+	[CrudTable(AuditPerms=CrudAuditPerm.ClaimHistoryEdit,IsSecurityStamped=true)]
 	public class Claim:TableBase{
 		///<summary>Primary key</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -161,6 +161,16 @@ namespace OpenDentBusiness{
 		///Goes out in X12 4010/5010 loop 2300 AMT segment if greater than zero.  Default value is 0, thus will not go out by default unless the user
 		///enters a value.  This field was added for Denti-Cal certification, but can go out for any clearinghouse.</summary>
 		public double ShareOfCost;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary>Not a data column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

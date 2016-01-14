@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>These are copies of procedures that are attached to treatment plans.</summary>
 	[Serializable]
+	[CrudTable(IsSecurityStamped=true)]
 	public class ProcTP:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -43,7 +44,17 @@ namespace OpenDentBusiness{
 		public string Dx;
 		///<summary>The ProcedureCode abbreviation.  Can be changed by user at any time.</summary>
 		public string ProcAbbr;
-		
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
+
 		///<summary></summary>
 		public ProcTP Copy(){
 			return (ProcTP)MemberwiseClone();

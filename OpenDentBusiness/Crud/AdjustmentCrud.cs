@@ -46,18 +46,20 @@ namespace OpenDentBusiness.Crud{
 			Adjustment adjustment;
 			foreach(DataRow row in table.Rows) {
 				adjustment=new Adjustment();
-				adjustment.AdjNum      = PIn.Long  (row["AdjNum"].ToString());
-				adjustment.AdjDate     = PIn.Date  (row["AdjDate"].ToString());
-				adjustment.AdjAmt      = PIn.Double(row["AdjAmt"].ToString());
-				adjustment.PatNum      = PIn.Long  (row["PatNum"].ToString());
-				adjustment.AdjType     = PIn.Long  (row["AdjType"].ToString());
-				adjustment.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
-				adjustment.AdjNote     = PIn.String(row["AdjNote"].ToString());
-				adjustment.ProcDate    = PIn.Date  (row["ProcDate"].ToString());
-				adjustment.ProcNum     = PIn.Long  (row["ProcNum"].ToString());
-				adjustment.DateEntry   = PIn.Date  (row["DateEntry"].ToString());
-				adjustment.ClinicNum   = PIn.Long  (row["ClinicNum"].ToString());
-				adjustment.StatementNum= PIn.Long  (row["StatementNum"].ToString());
+				adjustment.AdjNum         = PIn.Long  (row["AdjNum"].ToString());
+				adjustment.AdjDate        = PIn.Date  (row["AdjDate"].ToString());
+				adjustment.AdjAmt         = PIn.Double(row["AdjAmt"].ToString());
+				adjustment.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				adjustment.AdjType        = PIn.Long  (row["AdjType"].ToString());
+				adjustment.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
+				adjustment.AdjNote        = PIn.String(row["AdjNote"].ToString());
+				adjustment.ProcDate       = PIn.Date  (row["ProcDate"].ToString());
+				adjustment.ProcNum        = PIn.Long  (row["ProcNum"].ToString());
+				adjustment.DateEntry      = PIn.Date  (row["DateEntry"].ToString());
+				adjustment.ClinicNum      = PIn.Long  (row["ClinicNum"].ToString());
+				adjustment.StatementNum   = PIn.Long  (row["StatementNum"].ToString());
+				adjustment.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				adjustment.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(adjustment);
 			}
 			return retVal;
@@ -81,6 +83,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("DateEntry");
 			table.Columns.Add("ClinicNum");
 			table.Columns.Add("StatementNum");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(Adjustment adjustment in listAdjustments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (adjustment.AdjNum),
@@ -95,6 +99,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (adjustment.DateEntry),
 					POut.Long  (adjustment.ClinicNum),
 					POut.Long  (adjustment.StatementNum),
+					POut.Long  (adjustment.SecUserNumEntry),
+					POut.DateT (adjustment.SecDateTEdit),
 				});
 			}
 			return table;
@@ -135,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="AdjNum,";
 			}
-			command+="AdjDate,AdjAmt,PatNum,AdjType,ProvNum,AdjNote,ProcDate,ProcNum,DateEntry,ClinicNum,StatementNum) VALUES(";
+			command+="AdjDate,AdjAmt,PatNum,AdjType,ProvNum,AdjNote,ProcDate,ProcNum,DateEntry,ClinicNum,StatementNum,SecUserNumEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(adjustment.AdjNum)+",";
 			}
@@ -150,7 +156,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (adjustment.ProcNum)+","
 				+    DbHelper.Now()+","
 				+    POut.Long  (adjustment.ClinicNum)+","
-				+    POut.Long  (adjustment.StatementNum)+")";
+				+    POut.Long  (adjustment.StatementNum)+","
+				+    POut.Long  (adjustment.SecUserNumEntry)+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -183,7 +191,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="AdjNum,";
 			}
-			command+="AdjDate,AdjAmt,PatNum,AdjType,ProvNum,AdjNote,ProcDate,ProcNum,DateEntry,ClinicNum,StatementNum) VALUES(";
+			command+="AdjDate,AdjAmt,PatNum,AdjType,ProvNum,AdjNote,ProcDate,ProcNum,DateEntry,ClinicNum,StatementNum,SecUserNumEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(adjustment.AdjNum)+",";
 			}
@@ -198,7 +206,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (adjustment.ProcNum)+","
 				+    DbHelper.Now()+","
 				+    POut.Long  (adjustment.ClinicNum)+","
-				+    POut.Long  (adjustment.StatementNum)+")";
+				+    POut.Long  (adjustment.StatementNum)+","
+				+    POut.Long  (adjustment.SecUserNumEntry)+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -211,17 +221,19 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Adjustment in the database.</summary>
 		public static void Update(Adjustment adjustment){
 			string command="UPDATE adjustment SET "
-				+"AdjDate     =  "+POut.Date  (adjustment.AdjDate)+", "
-				+"AdjAmt      = '"+POut.Double(adjustment.AdjAmt)+"', "
-				+"PatNum      =  "+POut.Long  (adjustment.PatNum)+", "
-				+"AdjType     =  "+POut.Long  (adjustment.AdjType)+", "
-				+"ProvNum     =  "+POut.Long  (adjustment.ProvNum)+", "
-				+"AdjNote     = '"+POut.String(adjustment.AdjNote)+"', "
-				+"ProcDate    =  "+POut.Date  (adjustment.ProcDate)+", "
-				+"ProcNum     =  "+POut.Long  (adjustment.ProcNum)+", "
+				+"AdjDate        =  "+POut.Date  (adjustment.AdjDate)+", "
+				+"AdjAmt         = '"+POut.Double(adjustment.AdjAmt)+"', "
+				+"PatNum         =  "+POut.Long  (adjustment.PatNum)+", "
+				+"AdjType        =  "+POut.Long  (adjustment.AdjType)+", "
+				+"ProvNum        =  "+POut.Long  (adjustment.ProvNum)+", "
+				+"AdjNote        = '"+POut.String(adjustment.AdjNote)+"', "
+				+"ProcDate       =  "+POut.Date  (adjustment.ProcDate)+", "
+				+"ProcNum        =  "+POut.Long  (adjustment.ProcNum)+", "
 				//DateEntry not allowed to change
-				+"ClinicNum   =  "+POut.Long  (adjustment.ClinicNum)+", "
-				+"StatementNum=  "+POut.Long  (adjustment.StatementNum)+" "
+				+"ClinicNum      =  "+POut.Long  (adjustment.ClinicNum)+", "
+				+"StatementNum   =  "+POut.Long  (adjustment.StatementNum)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE AdjNum = "+POut.Long(adjustment.AdjNum);
 			Db.NonQ(command);
 		}
@@ -270,6 +282,8 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="StatementNum = "+POut.Long(adjustment.StatementNum)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

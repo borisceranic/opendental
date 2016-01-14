@@ -106,6 +106,8 @@ namespace OpenDentBusiness.Crud{
 				procedure.IsDateProsthEst   = PIn.Bool  (row["IsDateProsthEst"].ToString());
 				procedure.IcdVersion        = PIn.Byte  (row["IcdVersion"].ToString());
 				procedure.IsCpoe            = PIn.Bool  (row["IsCpoe"].ToString());
+				procedure.SecUserNumEntry   = PIn.Long  (row["SecUserNumEntry"].ToString());
+				procedure.SecDateEntry      = PIn.Date  (row["SecDateEntry"].ToString());
 				retVal.Add(procedure);
 			}
 			return retVal;
@@ -177,6 +179,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsDateProsthEst");
 			table.Columns.Add("IcdVersion");
 			table.Columns.Add("IsCpoe");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
 			foreach(Procedure procedure in listProcedures) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procedure.ProcNum),
@@ -239,6 +243,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (procedure.IsDateProsthEst),
 					POut.Byte  (procedure.IcdVersion),
 					POut.Bool  (procedure.IsCpoe),
+					POut.Long  (procedure.SecUserNumEntry),
+					POut.Date  (procedure.SecDateEntry),
 				});
 			}
 			return table;
@@ -279,7 +285,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -342,7 +348,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (procedure.ProvOrderOverride)+","
 				+    POut.Bool  (procedure.IsDateProsthEst)+","
 				+    POut.Byte  (procedure.IcdVersion)+","
-				+    POut.Bool  (procedure.IsCpoe)+")";
+				+    POut.Bool  (procedure.IsCpoe)+","
+				+    POut.Long  (procedure.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -375,7 +383,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -438,7 +446,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (procedure.ProvOrderOverride)+","
 				+    POut.Bool  (procedure.IsDateProsthEst)+","
 				+    POut.Byte  (procedure.IcdVersion)+","
-				+    POut.Bool  (procedure.IsCpoe)+")";
+				+    POut.Bool  (procedure.IsCpoe)+","
+				+    POut.Long  (procedure.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -510,6 +520,8 @@ namespace OpenDentBusiness.Crud{
 				+"IsDateProsthEst   =  "+POut.Bool  (procedure.IsDateProsthEst)+", "
 				+"IcdVersion        =  "+POut.Byte  (procedure.IcdVersion)+", "
 				+"IsCpoe            =  "+POut.Bool  (procedure.IsCpoe)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
 				+"WHERE ProcNum = "+POut.Long(procedure.ProcNum);
 			Db.NonQ(command);
 		}
@@ -750,6 +762,8 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsCpoe = "+POut.Bool(procedure.IsCpoe)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
 			if(command==""){
 				return false;
 			}
@@ -764,8 +778,9 @@ namespace OpenDentBusiness.Crud{
 		//
 		//}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<Procedure> listNew,List<Procedure> listDB) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.
+		///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.</summary>
+		public static bool Sync(List<Procedure> listNew,List<Procedure> listDB,long userNum) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<Procedure> listIns    =new List<Procedure>();
 			List<Procedure> listUpdNew =new List<Procedure>();
@@ -818,6 +833,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
+				listIns[i].SecUserNumEntry=userNum;
 				Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {

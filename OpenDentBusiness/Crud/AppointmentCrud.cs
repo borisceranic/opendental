@@ -74,6 +74,8 @@ namespace OpenDentBusiness.Crud{
 				appointment.ProcsColored         = PIn.String(row["ProcsColored"].ToString());
 				appointment.ColorOverride        = Color.FromArgb(PIn.Int(row["ColorOverride"].ToString()));
 				appointment.AppointmentTypeNum   = PIn.Long  (row["AppointmentTypeNum"].ToString());
+				appointment.SecUserNumEntry      = PIn.Long  (row["SecUserNumEntry"].ToString());
+				appointment.SecDateEntry         = PIn.Date  (row["SecDateEntry"].ToString());
 				retVal.Add(appointment);
 			}
 			return retVal;
@@ -113,6 +115,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ProcsColored");
 			table.Columns.Add("ColorOverride");
 			table.Columns.Add("AppointmentTypeNum");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
 			foreach(Appointment appointment in listAppointments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (appointment.AptNum),
@@ -143,6 +147,8 @@ namespace OpenDentBusiness.Crud{
 					POut.String(appointment.ProcsColored),
 					POut.Int   (appointment.ColorOverride.ToArgb()),
 					POut.Long  (appointment.AppointmentTypeNum),
+					POut.Long  (appointment.SecUserNumEntry),
+					POut.Date  (appointment.SecDateEntry),
 				});
 			}
 			return table;
@@ -183,7 +189,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="AptNum,";
 			}
-			command+="PatNum,AptStatus,Pattern,Confirmed,TimeLocked,Op,Note,ProvNum,ProvHyg,AptDateTime,NextAptNum,UnschedStatus,IsNewPatient,ProcDescript,Assistant,ClinicNum,IsHygiene,DateTimeArrived,DateTimeSeated,DateTimeDismissed,InsPlan1,InsPlan2,DateTimeAskedToArrive,ProcsColored,ColorOverride,AppointmentTypeNum) VALUES(";
+			command+="PatNum,AptStatus,Pattern,Confirmed,TimeLocked,Op,Note,ProvNum,ProvHyg,AptDateTime,NextAptNum,UnschedStatus,IsNewPatient,ProcDescript,Assistant,ClinicNum,IsHygiene,DateTimeArrived,DateTimeSeated,DateTimeDismissed,InsPlan1,InsPlan2,DateTimeAskedToArrive,ProcsColored,ColorOverride,AppointmentTypeNum,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(appointment.AptNum)+",";
 			}
@@ -214,7 +220,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (appointment.DateTimeAskedToArrive)+","
 				+"'"+POut.String(appointment.ProcsColored)+"',"
 				+    POut.Int   (appointment.ColorOverride.ToArgb())+","
-				+    POut.Long  (appointment.AppointmentTypeNum)+")";
+				+    POut.Long  (appointment.AppointmentTypeNum)+","
+				+    POut.Long  (appointment.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -247,7 +255,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="AptNum,";
 			}
-			command+="PatNum,AptStatus,Pattern,Confirmed,TimeLocked,Op,Note,ProvNum,ProvHyg,AptDateTime,NextAptNum,UnschedStatus,IsNewPatient,ProcDescript,Assistant,ClinicNum,IsHygiene,DateTimeArrived,DateTimeSeated,DateTimeDismissed,InsPlan1,InsPlan2,DateTimeAskedToArrive,ProcsColored,ColorOverride,AppointmentTypeNum) VALUES(";
+			command+="PatNum,AptStatus,Pattern,Confirmed,TimeLocked,Op,Note,ProvNum,ProvHyg,AptDateTime,NextAptNum,UnschedStatus,IsNewPatient,ProcDescript,Assistant,ClinicNum,IsHygiene,DateTimeArrived,DateTimeSeated,DateTimeDismissed,InsPlan1,InsPlan2,DateTimeAskedToArrive,ProcsColored,ColorOverride,AppointmentTypeNum,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(appointment.AptNum)+",";
 			}
@@ -278,7 +286,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (appointment.DateTimeAskedToArrive)+","
 				+"'"+POut.String(appointment.ProcsColored)+"',"
 				+    POut.Int   (appointment.ColorOverride.ToArgb())+","
-				+    POut.Long  (appointment.AppointmentTypeNum)+")";
+				+    POut.Long  (appointment.AppointmentTypeNum)+","
+				+    POut.Long  (appointment.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -318,6 +328,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProcsColored         = '"+POut.String(appointment.ProcsColored)+"', "
 				+"ColorOverride        =  "+POut.Int   (appointment.ColorOverride.ToArgb())+", "
 				+"AppointmentTypeNum   =  "+POut.Long  (appointment.AppointmentTypeNum)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
 				+"WHERE AptNum = "+POut.Long(appointment.AptNum);
 			Db.NonQ(command);
 		}
@@ -430,6 +442,8 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="AppointmentTypeNum = "+POut.Long(appointment.AppointmentTypeNum)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
 			if(command==""){
 				return false;
 			}
@@ -444,8 +458,9 @@ namespace OpenDentBusiness.Crud{
 		//
 		//}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<Appointment> listNew,List<Appointment> listDB) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.
+		///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.</summary>
+		public static bool Sync(List<Appointment> listNew,List<Appointment> listDB,long userNum) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<Appointment> listIns    =new List<Appointment>();
 			List<Appointment> listUpdNew =new List<Appointment>();
@@ -498,6 +513,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
+				listIns[i].SecUserNumEntry=userNum;
 				Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {

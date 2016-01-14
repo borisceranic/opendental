@@ -34,6 +34,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(FeeSched feeSched) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				feeSched.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				feeSched.FeeSchedNum=Meth.GetLong(MethodBase.GetCurrentMethod(),feeSched);
 				return feeSched.FeeSchedNum;
@@ -50,14 +53,18 @@ namespace OpenDentBusiness{
 			Crud.FeeSchedCrud.Update(feeSched);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Sync(List<FeeSched> listNew) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  No need to pass in userNum, it's set before remoting role check
+		///and passed to the server if necessary.</summary>
+		public static void Sync(List<FeeSched> listNew,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,userNum);
 				return;
 			}
 			List<FeeSched> listDB=FeeSchedC.GetListLong();
-			Crud.FeeSchedCrud.Sync(listNew,listDB);
+			Crud.FeeSchedCrud.Sync(listNew,listDB,userNum);
 		}
 
 		///<summary>Gets one fee sched from the cache.  Will return null if not found.</summary>

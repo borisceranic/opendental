@@ -46,15 +46,18 @@ namespace OpenDentBusiness.Crud{
 			Fee fee;
 			foreach(DataRow row in table.Rows) {
 				fee=new Fee();
-				fee.FeeNum       = PIn.Long  (row["FeeNum"].ToString());
-				fee.Amount       = PIn.Double(row["Amount"].ToString());
-				fee.OldCode      = PIn.String(row["OldCode"].ToString());
-				fee.FeeSched     = PIn.Long  (row["FeeSched"].ToString());
-				fee.UseDefaultFee= PIn.Bool  (row["UseDefaultFee"].ToString());
-				fee.UseDefaultCov= PIn.Bool  (row["UseDefaultCov"].ToString());
-				fee.CodeNum      = PIn.Long  (row["CodeNum"].ToString());
-				fee.ClinicNum    = PIn.Long  (row["ClinicNum"].ToString());
-				fee.ProvNum      = PIn.Long  (row["ProvNum"].ToString());
+				fee.FeeNum         = PIn.Long  (row["FeeNum"].ToString());
+				fee.Amount         = PIn.Double(row["Amount"].ToString());
+				fee.OldCode        = PIn.String(row["OldCode"].ToString());
+				fee.FeeSched       = PIn.Long  (row["FeeSched"].ToString());
+				fee.UseDefaultFee  = PIn.Bool  (row["UseDefaultFee"].ToString());
+				fee.UseDefaultCov  = PIn.Bool  (row["UseDefaultCov"].ToString());
+				fee.CodeNum        = PIn.Long  (row["CodeNum"].ToString());
+				fee.ClinicNum      = PIn.Long  (row["ClinicNum"].ToString());
+				fee.ProvNum        = PIn.Long  (row["ProvNum"].ToString());
+				fee.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				fee.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				fee.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(fee);
 			}
 			return retVal;
@@ -75,6 +78,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("CodeNum");
 			table.Columns.Add("ClinicNum");
 			table.Columns.Add("ProvNum");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(Fee fee in listFees) {
 				table.Rows.Add(new object[] {
 					POut.Long  (fee.FeeNum),
@@ -86,6 +92,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (fee.CodeNum),
 					POut.Long  (fee.ClinicNum),
 					POut.Long  (fee.ProvNum),
+					POut.Long  (fee.SecUserNumEntry),
+					POut.Date  (fee.SecDateEntry),
+					POut.DateT (fee.SecDateTEdit),
 				});
 			}
 			return table;
@@ -126,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="FeeNum,";
 			}
-			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum) VALUES(";
+			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(fee.FeeNum)+",";
 			}
@@ -138,7 +147,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (fee.UseDefaultCov)+","
 				+    POut.Long  (fee.CodeNum)+","
 				+    POut.Long  (fee.ClinicNum)+","
-				+    POut.Long  (fee.ProvNum)+")";
+				+    POut.Long  (fee.ProvNum)+","
+				+    POut.Long  (fee.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -171,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="FeeNum,";
 			}
-			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum) VALUES(";
+			command+="Amount,OldCode,FeeSched,UseDefaultFee,UseDefaultCov,CodeNum,ClinicNum,ProvNum,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(fee.FeeNum)+",";
 			}
@@ -183,7 +195,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (fee.UseDefaultCov)+","
 				+    POut.Long  (fee.CodeNum)+","
 				+    POut.Long  (fee.ClinicNum)+","
-				+    POut.Long  (fee.ProvNum)+")";
+				+    POut.Long  (fee.ProvNum)+","
+				+    POut.Long  (fee.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -196,14 +211,17 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Fee in the database.</summary>
 		public static void Update(Fee fee){
 			string command="UPDATE fee SET "
-				+"Amount       = '"+POut.Double(fee.Amount)+"', "
-				+"OldCode      = '"+POut.String(fee.OldCode)+"', "
-				+"FeeSched     =  "+POut.Long  (fee.FeeSched)+", "
-				+"UseDefaultFee=  "+POut.Bool  (fee.UseDefaultFee)+", "
-				+"UseDefaultCov=  "+POut.Bool  (fee.UseDefaultCov)+", "
-				+"CodeNum      =  "+POut.Long  (fee.CodeNum)+", "
-				+"ClinicNum    =  "+POut.Long  (fee.ClinicNum)+", "
-				+"ProvNum      =  "+POut.Long  (fee.ProvNum)+" "
+				+"Amount         = '"+POut.Double(fee.Amount)+"', "
+				+"OldCode        = '"+POut.String(fee.OldCode)+"', "
+				+"FeeSched       =  "+POut.Long  (fee.FeeSched)+", "
+				+"UseDefaultFee  =  "+POut.Bool  (fee.UseDefaultFee)+", "
+				+"UseDefaultCov  =  "+POut.Bool  (fee.UseDefaultCov)+", "
+				+"CodeNum        =  "+POut.Long  (fee.CodeNum)+", "
+				+"ClinicNum      =  "+POut.Long  (fee.ClinicNum)+", "
+				+"ProvNum        =  "+POut.Long  (fee.ProvNum)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE FeeNum = "+POut.Long(fee.FeeNum);
 			Db.NonQ(command);
 		}
@@ -243,6 +261,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProvNum = "+POut.Long(fee.ProvNum)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}
@@ -259,8 +280,9 @@ namespace OpenDentBusiness.Crud{
 			Db.NonQ(command);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<Fee> listNew,List<Fee> listDB) {
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.
+		///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.</summary>
+		public static bool Sync(List<Fee> listNew,List<Fee> listDB,long userNum) {
 			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
 			List<Fee> listIns    =new List<Fee>();
 			List<Fee> listUpdNew =new List<Fee>();
@@ -313,6 +335,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			//Commit changes to DB
 			for(int i=0;i<listIns.Count;i++) {
+				listIns[i].SecUserNumEntry=userNum;
 				Insert(listIns[i]);
 			}
 			for(int i=0;i<listUpdNew.Count;i++) {

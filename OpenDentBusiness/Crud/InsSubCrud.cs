@@ -46,16 +46,19 @@ namespace OpenDentBusiness.Crud{
 			InsSub insSub;
 			foreach(DataRow row in table.Rows) {
 				insSub=new InsSub();
-				insSub.InsSubNum    = PIn.Long  (row["InsSubNum"].ToString());
-				insSub.PlanNum      = PIn.Long  (row["PlanNum"].ToString());
-				insSub.Subscriber   = PIn.Long  (row["Subscriber"].ToString());
-				insSub.DateEffective= PIn.Date  (row["DateEffective"].ToString());
-				insSub.DateTerm     = PIn.Date  (row["DateTerm"].ToString());
-				insSub.ReleaseInfo  = PIn.Bool  (row["ReleaseInfo"].ToString());
-				insSub.AssignBen    = PIn.Bool  (row["AssignBen"].ToString());
-				insSub.SubscriberID = PIn.String(row["SubscriberID"].ToString());
-				insSub.BenefitNotes = PIn.String(row["BenefitNotes"].ToString());
-				insSub.SubscNote    = PIn.String(row["SubscNote"].ToString());
+				insSub.InsSubNum      = PIn.Long  (row["InsSubNum"].ToString());
+				insSub.PlanNum        = PIn.Long  (row["PlanNum"].ToString());
+				insSub.Subscriber     = PIn.Long  (row["Subscriber"].ToString());
+				insSub.DateEffective  = PIn.Date  (row["DateEffective"].ToString());
+				insSub.DateTerm       = PIn.Date  (row["DateTerm"].ToString());
+				insSub.ReleaseInfo    = PIn.Bool  (row["ReleaseInfo"].ToString());
+				insSub.AssignBen      = PIn.Bool  (row["AssignBen"].ToString());
+				insSub.SubscriberID   = PIn.String(row["SubscriberID"].ToString());
+				insSub.BenefitNotes   = PIn.String(row["BenefitNotes"].ToString());
+				insSub.SubscNote      = PIn.String(row["SubscNote"].ToString());
+				insSub.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				insSub.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				insSub.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(insSub);
 			}
 			return retVal;
@@ -77,6 +80,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("SubscriberID");
 			table.Columns.Add("BenefitNotes");
 			table.Columns.Add("SubscNote");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(InsSub insSub in listInsSubs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (insSub.InsSubNum),
@@ -89,6 +95,9 @@ namespace OpenDentBusiness.Crud{
 					POut.String(insSub.SubscriberID),
 					POut.String(insSub.BenefitNotes),
 					POut.String(insSub.SubscNote),
+					POut.Long  (insSub.SecUserNumEntry),
+					POut.Date  (insSub.SecDateEntry),
+					POut.DateT (insSub.SecDateTEdit),
 				});
 			}
 			return table;
@@ -129,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="InsSubNum,";
 			}
-			command+="PlanNum,Subscriber,DateEffective,DateTerm,ReleaseInfo,AssignBen,SubscriberID,BenefitNotes,SubscNote) VALUES(";
+			command+="PlanNum,Subscriber,DateEffective,DateTerm,ReleaseInfo,AssignBen,SubscriberID,BenefitNotes,SubscNote,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(insSub.InsSubNum)+",";
 			}
@@ -142,7 +151,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (insSub.AssignBen)+","
 				+"'"+POut.String(insSub.SubscriberID)+"',"
 				+    DbHelper.ParamChar+"paramBenefitNotes,"
-				+"'"+POut.String(insSub.SubscNote)+"')";
+				+"'"+POut.String(insSub.SubscNote)+"',"
+				+    POut.Long  (insSub.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(insSub.BenefitNotes==null) {
 				insSub.BenefitNotes="";
 			}
@@ -179,7 +191,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="InsSubNum,";
 			}
-			command+="PlanNum,Subscriber,DateEffective,DateTerm,ReleaseInfo,AssignBen,SubscriberID,BenefitNotes,SubscNote) VALUES(";
+			command+="PlanNum,Subscriber,DateEffective,DateTerm,ReleaseInfo,AssignBen,SubscriberID,BenefitNotes,SubscNote,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(insSub.InsSubNum)+",";
 			}
@@ -192,7 +204,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (insSub.AssignBen)+","
 				+"'"+POut.String(insSub.SubscriberID)+"',"
 				+    DbHelper.ParamChar+"paramBenefitNotes,"
-				+"'"+POut.String(insSub.SubscNote)+"')";
+				+"'"+POut.String(insSub.SubscNote)+"',"
+				+    POut.Long  (insSub.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(insSub.BenefitNotes==null) {
 				insSub.BenefitNotes="";
 			}
@@ -209,15 +224,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one InsSub in the database.</summary>
 		public static void Update(InsSub insSub){
 			string command="UPDATE inssub SET "
-				+"PlanNum      =  "+POut.Long  (insSub.PlanNum)+", "
-				+"Subscriber   =  "+POut.Long  (insSub.Subscriber)+", "
-				+"DateEffective=  "+POut.Date  (insSub.DateEffective)+", "
-				+"DateTerm     =  "+POut.Date  (insSub.DateTerm)+", "
-				+"ReleaseInfo  =  "+POut.Bool  (insSub.ReleaseInfo)+", "
-				+"AssignBen    =  "+POut.Bool  (insSub.AssignBen)+", "
-				+"SubscriberID = '"+POut.String(insSub.SubscriberID)+"', "
-				+"BenefitNotes =  "+DbHelper.ParamChar+"paramBenefitNotes, "
-				+"SubscNote    = '"+POut.String(insSub.SubscNote)+"' "
+				+"PlanNum        =  "+POut.Long  (insSub.PlanNum)+", "
+				+"Subscriber     =  "+POut.Long  (insSub.Subscriber)+", "
+				+"DateEffective  =  "+POut.Date  (insSub.DateEffective)+", "
+				+"DateTerm       =  "+POut.Date  (insSub.DateTerm)+", "
+				+"ReleaseInfo    =  "+POut.Bool  (insSub.ReleaseInfo)+", "
+				+"AssignBen      =  "+POut.Bool  (insSub.AssignBen)+", "
+				+"SubscriberID   = '"+POut.String(insSub.SubscriberID)+"', "
+				+"BenefitNotes   =  "+DbHelper.ParamChar+"paramBenefitNotes, "
+				+"SubscNote      = '"+POut.String(insSub.SubscNote)+"' "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE InsSubNum = "+POut.Long(insSub.InsSubNum);
 			if(insSub.BenefitNotes==null) {
 				insSub.BenefitNotes="";
@@ -265,6 +283,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SubscNote = '"+POut.String(insSub.SubscNote)+"'";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

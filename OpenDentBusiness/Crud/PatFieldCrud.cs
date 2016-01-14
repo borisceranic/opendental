@@ -46,10 +46,13 @@ namespace OpenDentBusiness.Crud{
 			PatField patField;
 			foreach(DataRow row in table.Rows) {
 				patField=new PatField();
-				patField.PatFieldNum= PIn.Long  (row["PatFieldNum"].ToString());
-				patField.PatNum     = PIn.Long  (row["PatNum"].ToString());
-				patField.FieldName  = PIn.String(row["FieldName"].ToString());
-				patField.FieldValue = PIn.String(row["FieldValue"].ToString());
+				patField.PatFieldNum    = PIn.Long  (row["PatFieldNum"].ToString());
+				patField.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				patField.FieldName      = PIn.String(row["FieldName"].ToString());
+				patField.FieldValue     = PIn.String(row["FieldValue"].ToString());
+				patField.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				patField.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				patField.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(patField);
 			}
 			return retVal;
@@ -65,12 +68,18 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("PatNum");
 			table.Columns.Add("FieldName");
 			table.Columns.Add("FieldValue");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(PatField patField in listPatFields) {
 				table.Rows.Add(new object[] {
 					POut.Long  (patField.PatFieldNum),
 					POut.Long  (patField.PatNum),
 					POut.String(patField.FieldName),
 					POut.String(patField.FieldValue),
+					POut.Long  (patField.SecUserNumEntry),
+					POut.Date  (patField.SecDateEntry),
+					POut.DateT (patField.SecDateTEdit),
 				});
 			}
 			return table;
@@ -111,14 +120,17 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PatFieldNum,";
 			}
-			command+="PatNum,FieldName,FieldValue) VALUES(";
+			command+="PatNum,FieldName,FieldValue,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(patField.PatFieldNum)+",";
 			}
 			command+=
 				     POut.Long  (patField.PatNum)+","
 				+"'"+POut.String(patField.FieldName)+"',"
-				+"'"+POut.String(patField.FieldValue)+"')";
+				+"'"+POut.String(patField.FieldValue)+"',"
+				+    POut.Long  (patField.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -151,14 +163,17 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PatFieldNum,";
 			}
-			command+="PatNum,FieldName,FieldValue) VALUES(";
+			command+="PatNum,FieldName,FieldValue,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(patField.PatFieldNum)+",";
 			}
 			command+=
 				     POut.Long  (patField.PatNum)+","
 				+"'"+POut.String(patField.FieldName)+"',"
-				+"'"+POut.String(patField.FieldValue)+"')";
+				+"'"+POut.String(patField.FieldValue)+"',"
+				+    POut.Long  (patField.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -171,9 +186,12 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one PatField in the database.</summary>
 		public static void Update(PatField patField){
 			string command="UPDATE patfield SET "
-				+"PatNum     =  "+POut.Long  (patField.PatNum)+", "
-				+"FieldName  = '"+POut.String(patField.FieldName)+"', "
-				+"FieldValue = '"+POut.String(patField.FieldValue)+"' "
+				+"PatNum         =  "+POut.Long  (patField.PatNum)+", "
+				+"FieldName      = '"+POut.String(patField.FieldName)+"', "
+				+"FieldValue     = '"+POut.String(patField.FieldValue)+"' "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE PatFieldNum = "+POut.Long(patField.PatFieldNum);
 			Db.NonQ(command);
 		}
@@ -193,6 +211,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="FieldValue = '"+POut.String(patField.FieldValue)+"'";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

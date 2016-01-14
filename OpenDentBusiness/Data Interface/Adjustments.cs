@@ -59,6 +59,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(Adjustment adj) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				adj.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				adj.AdjNum=Meth.GetLong(MethodBase.GetCurrentMethod(),adj);
 				return adj.AdjNum;

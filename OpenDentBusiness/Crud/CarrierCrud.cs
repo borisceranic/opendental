@@ -62,6 +62,9 @@ namespace OpenDentBusiness.Crud{
 				carrier.IsHidden                = PIn.Bool  (row["IsHidden"].ToString());
 				carrier.CanadianEncryptionMethod= PIn.Byte  (row["CanadianEncryptionMethod"].ToString());
 				carrier.CanadianSupportedTypes  = (OpenDentBusiness.CanSupTransTypes)PIn.Int(row["CanadianSupportedTypes"].ToString());
+				carrier.SecUserNumEntry         = PIn.Long  (row["SecUserNumEntry"].ToString());
+				carrier.SecDateEntry            = PIn.Date  (row["SecDateEntry"].ToString());
+				carrier.SecDateTEdit            = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(carrier);
 			}
 			return retVal;
@@ -89,6 +92,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsHidden");
 			table.Columns.Add("CanadianEncryptionMethod");
 			table.Columns.Add("CanadianSupportedTypes");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(Carrier carrier in listCarriers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (carrier.CarrierNum),
@@ -107,6 +113,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (carrier.IsHidden),
 					POut.Byte  (carrier.CanadianEncryptionMethod),
 					POut.Int   ((int)carrier.CanadianSupportedTypes),
+					POut.Long  (carrier.SecUserNumEntry),
+					POut.Date  (carrier.SecDateEntry),
+					POut.DateT (carrier.SecDateTEdit),
 				});
 			}
 			return table;
@@ -147,7 +156,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CarrierNum,";
 			}
-			command+="CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes) VALUES(";
+			command+="CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(carrier.CarrierNum)+",";
 			}
@@ -166,7 +175,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (carrier.CanadianNetworkNum)+","
 				+    POut.Bool  (carrier.IsHidden)+","
 				+    POut.Byte  (carrier.CanadianEncryptionMethod)+","
-				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+")";
+				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+","
+				+    POut.Long  (carrier.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -199,7 +211,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CarrierNum,";
 			}
-			command+="CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes) VALUES(";
+			command+="CarrierName,Address,Address2,City,State,Zip,Phone,ElectID,NoSendElect,IsCDA,CDAnetVersion,CanadianNetworkNum,IsHidden,CanadianEncryptionMethod,CanadianSupportedTypes,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(carrier.CarrierNum)+",";
 			}
@@ -218,7 +230,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (carrier.CanadianNetworkNum)+","
 				+    POut.Bool  (carrier.IsHidden)+","
 				+    POut.Byte  (carrier.CanadianEncryptionMethod)+","
-				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+")";
+				+    POut.Int   ((int)carrier.CanadianSupportedTypes)+","
+				+    POut.Long  (carrier.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -246,6 +261,9 @@ namespace OpenDentBusiness.Crud{
 				+"IsHidden                =  "+POut.Bool  (carrier.IsHidden)+", "
 				+"CanadianEncryptionMethod=  "+POut.Byte  (carrier.CanadianEncryptionMethod)+", "
 				+"CanadianSupportedTypes  =  "+POut.Int   ((int)carrier.CanadianSupportedTypes)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE CarrierNum = "+POut.Long(carrier.CarrierNum);
 			Db.NonQ(command);
 		}
@@ -313,6 +331,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CanadianSupportedTypes = "+POut.Int   ((int)carrier.CanadianSupportedTypes)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

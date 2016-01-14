@@ -58,6 +58,9 @@ namespace OpenDentBusiness.Crud{
 				claimPayment.DateIssued     = PIn.Date  (row["DateIssued"].ToString());
 				claimPayment.IsPartial      = PIn.Bool  (row["IsPartial"].ToString());
 				claimPayment.PayType        = PIn.Long  (row["PayType"].ToString());
+				claimPayment.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				claimPayment.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				claimPayment.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(claimPayment);
 			}
 			return retVal;
@@ -81,6 +84,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("DateIssued");
 			table.Columns.Add("IsPartial");
 			table.Columns.Add("PayType");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(ClaimPayment claimPayment in listClaimPayments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (claimPayment.ClaimPaymentNum),
@@ -95,6 +101,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (claimPayment.DateIssued),
 					POut.Bool  (claimPayment.IsPartial),
 					POut.Long  (claimPayment.PayType),
+					POut.Long  (claimPayment.SecUserNumEntry),
+					POut.Date  (claimPayment.SecDateEntry),
+					POut.DateT (claimPayment.SecDateTEdit),
 				});
 			}
 			return table;
@@ -135,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimPaymentNum,";
 			}
-			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType) VALUES(";
+			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claimPayment.ClaimPaymentNum)+",";
 			}
@@ -150,7 +159,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claimPayment.CarrierName)+"',"
 				+    POut.Date  (claimPayment.DateIssued)+","
 				+    POut.Bool  (claimPayment.IsPartial)+","
-				+    POut.Long  (claimPayment.PayType)+")";
+				+    POut.Long  (claimPayment.PayType)+","
+				+    POut.Long  (claimPayment.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -183,7 +195,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClaimPaymentNum,";
 			}
-			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType) VALUES(";
+			command+="CheckDate,CheckAmt,CheckNum,BankBranch,Note,ClinicNum,DepositNum,CarrierName,DateIssued,IsPartial,PayType,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(claimPayment.ClaimPaymentNum)+",";
 			}
@@ -198,7 +210,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(claimPayment.CarrierName)+"',"
 				+    POut.Date  (claimPayment.DateIssued)+","
 				+    POut.Bool  (claimPayment.IsPartial)+","
-				+    POut.Long  (claimPayment.PayType)+")";
+				+    POut.Long  (claimPayment.PayType)+","
+				+    POut.Long  (claimPayment.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -222,6 +237,9 @@ namespace OpenDentBusiness.Crud{
 				+"DateIssued     =  "+POut.Date  (claimPayment.DateIssued)+", "
 				+"IsPartial      =  "+POut.Bool  (claimPayment.IsPartial)+", "
 				+"PayType        =  "+POut.Long  (claimPayment.PayType)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE ClaimPaymentNum = "+POut.Long(claimPayment.ClaimPaymentNum);
 			Db.NonQ(command);
 		}
@@ -273,6 +291,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PayType = "+POut.Long(claimPayment.PayType)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

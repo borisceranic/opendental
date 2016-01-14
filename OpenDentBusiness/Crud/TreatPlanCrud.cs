@@ -46,16 +46,19 @@ namespace OpenDentBusiness.Crud{
 			TreatPlan treatPlan;
 			foreach(DataRow row in table.Rows) {
 				treatPlan=new TreatPlan();
-				treatPlan.TreatPlanNum= PIn.Long  (row["TreatPlanNum"].ToString());
-				treatPlan.PatNum      = PIn.Long  (row["PatNum"].ToString());
-				treatPlan.DateTP      = PIn.Date  (row["DateTP"].ToString());
-				treatPlan.Heading     = PIn.String(row["Heading"].ToString());
-				treatPlan.Note        = PIn.String(row["Note"].ToString());
-				treatPlan.Signature   = PIn.String(row["Signature"].ToString());
-				treatPlan.SigIsTopaz  = PIn.Bool  (row["SigIsTopaz"].ToString());
-				treatPlan.ResponsParty= PIn.Long  (row["ResponsParty"].ToString());
-				treatPlan.DocNum      = PIn.Long  (row["DocNum"].ToString());
-				treatPlan.TPStatus    = (OpenDentBusiness.TreatPlanStatus)PIn.Int(row["TPStatus"].ToString());
+				treatPlan.TreatPlanNum   = PIn.Long  (row["TreatPlanNum"].ToString());
+				treatPlan.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				treatPlan.DateTP         = PIn.Date  (row["DateTP"].ToString());
+				treatPlan.Heading        = PIn.String(row["Heading"].ToString());
+				treatPlan.Note           = PIn.String(row["Note"].ToString());
+				treatPlan.Signature      = PIn.String(row["Signature"].ToString());
+				treatPlan.SigIsTopaz     = PIn.Bool  (row["SigIsTopaz"].ToString());
+				treatPlan.ResponsParty   = PIn.Long  (row["ResponsParty"].ToString());
+				treatPlan.DocNum         = PIn.Long  (row["DocNum"].ToString());
+				treatPlan.TPStatus       = (OpenDentBusiness.TreatPlanStatus)PIn.Int(row["TPStatus"].ToString());
+				treatPlan.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				treatPlan.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				treatPlan.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(treatPlan);
 			}
 			return retVal;
@@ -77,6 +80,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ResponsParty");
 			table.Columns.Add("DocNum");
 			table.Columns.Add("TPStatus");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(TreatPlan treatPlan in listTreatPlans) {
 				table.Rows.Add(new object[] {
 					POut.Long  (treatPlan.TreatPlanNum),
@@ -89,6 +95,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (treatPlan.ResponsParty),
 					POut.Long  (treatPlan.DocNum),
 					POut.Int   ((int)treatPlan.TPStatus),
+					POut.Long  (treatPlan.SecUserNumEntry),
+					POut.Date  (treatPlan.SecDateEntry),
+					POut.DateT (treatPlan.SecDateTEdit),
 				});
 			}
 			return table;
@@ -129,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -142,7 +151,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+","
 				+    POut.Long  (treatPlan.DocNum)+","
-				+    POut.Int   ((int)treatPlan.TPStatus)+")";
+				+    POut.Int   ((int)treatPlan.TPStatus)+","
+				+    POut.Long  (treatPlan.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -175,7 +187,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="TreatPlanNum,";
 			}
-			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus) VALUES(";
+			command+="PatNum,DateTP,Heading,Note,Signature,SigIsTopaz,ResponsParty,DocNum,TPStatus,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(treatPlan.TreatPlanNum)+",";
 			}
@@ -188,7 +200,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (treatPlan.SigIsTopaz)+","
 				+    POut.Long  (treatPlan.ResponsParty)+","
 				+    POut.Long  (treatPlan.DocNum)+","
-				+    POut.Int   ((int)treatPlan.TPStatus)+")";
+				+    POut.Int   ((int)treatPlan.TPStatus)+","
+				+    POut.Long  (treatPlan.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -201,15 +216,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one TreatPlan in the database.</summary>
 		public static void Update(TreatPlan treatPlan){
 			string command="UPDATE treatplan SET "
-				+"PatNum      =  "+POut.Long  (treatPlan.PatNum)+", "
-				+"DateTP      =  "+POut.Date  (treatPlan.DateTP)+", "
-				+"Heading     = '"+POut.String(treatPlan.Heading)+"', "
-				+"Note        = '"+POut.String(treatPlan.Note)+"', "
-				+"Signature   = '"+POut.String(treatPlan.Signature)+"', "
-				+"SigIsTopaz  =  "+POut.Bool  (treatPlan.SigIsTopaz)+", "
-				+"ResponsParty=  "+POut.Long  (treatPlan.ResponsParty)+", "
-				+"DocNum      =  "+POut.Long  (treatPlan.DocNum)+", "
-				+"TPStatus    =  "+POut.Int   ((int)treatPlan.TPStatus)+" "
+				+"PatNum         =  "+POut.Long  (treatPlan.PatNum)+", "
+				+"DateTP         =  "+POut.Date  (treatPlan.DateTP)+", "
+				+"Heading        = '"+POut.String(treatPlan.Heading)+"', "
+				+"Note           = '"+POut.String(treatPlan.Note)+"', "
+				+"Signature      = '"+POut.String(treatPlan.Signature)+"', "
+				+"SigIsTopaz     =  "+POut.Bool  (treatPlan.SigIsTopaz)+", "
+				+"ResponsParty   =  "+POut.Long  (treatPlan.ResponsParty)+", "
+				+"DocNum         =  "+POut.Long  (treatPlan.DocNum)+", "
+				+"TPStatus       =  "+POut.Int   ((int)treatPlan.TPStatus)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE TreatPlanNum = "+POut.Long(treatPlan.TreatPlanNum);
 			Db.NonQ(command);
 		}
@@ -253,6 +271,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="TPStatus = "+POut.Int   ((int)treatPlan.TPStatus)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

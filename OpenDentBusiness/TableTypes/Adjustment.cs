@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>An adjustment in the patient account.  Usually, adjustments are very simple, just being assigned to one patient and provider.  But they can also be attached to a procedure to represent a discount on that procedure.  Attaching adjustments to procedures is not automated, so it is not very common.</summary>
 	[Serializable()]
+	[CrudTable(IsSecurityStamped=true)]
 	public class Adjustment:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -32,6 +33,14 @@ namespace OpenDentBusiness{
 		public long ClinicNum;
 		///<summary>FK to statement.StatementNum.  Only used when the statement in an invoice.</summary>
 		public long StatementNum;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		//No SecDateEntry, DateEntry already exists and is set by MySQL when the row is inserted and never updated
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary></summary>
 		public Adjustment Clone() {

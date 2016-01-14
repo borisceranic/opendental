@@ -188,6 +188,9 @@ namespace OpenDentBusiness{
 
 		///<summary>ONLY for new patients. Set includePatNum to true for use the patnum from the import function.  Used in HL7.  Otherwise, uses InsertID to fill PatNum.</summary>
 		public static long Insert(Patient pat,bool useExistingPK) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				pat.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				pat.PatNum=Meth.GetLong(MethodBase.GetCurrentMethod(),pat,useExistingPK);
 				return pat.PatNum;

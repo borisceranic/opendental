@@ -5,7 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>There is one entry in this table for each fee for a single procedurecode.  So if there are 5 different fees stored for one procedurecode, then there will be five entries here.</summary>
 	[Serializable]
-	[CrudTable(IsSynchable=true)]
+	[CrudTable(IsSynchable=true,IsSecurityStamped=true)]
 	public class Fee:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -28,6 +28,16 @@ namespace OpenDentBusiness{
 		public long ClinicNum;
 		///<summary>FK to provider.ProvNum.  (Used if localization of fees for a feesched is enabled)</summary>
 		public long ProvNum;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary></summary>
 		public Fee Copy(){

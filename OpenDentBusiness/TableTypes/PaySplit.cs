@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Always attached to a payment.  Always affects exactly one patient account and one provider.</summary>
 	[Serializable]
+	[CrudTable(IsSecurityStamped=true)]
 	public class PaySplit:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -36,6 +37,14 @@ namespace OpenDentBusiness{
 		public long UnearnedType;
 		///<summary>FK to clinic.ClinicNum.  Can be 0.  Need not match the ClinicNum of the Payment, because a payment can be split between clinics.</summary>
 		public long ClinicNum;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		//No SecDateEntry, DateEntry already exists and is set by MySQL when the row is inserted and never updated
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary>Returns a copy of this PaySplit.</summary>
 		public PaySplit Copy(){

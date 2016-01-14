@@ -185,6 +185,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(Fee fee) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				fee.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				fee.FeeNum=Meth.GetLong(MethodBase.GetCurrentMethod(),fee);
 				return fee.FeeNum;
@@ -219,13 +222,16 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<Fee> listNew) {
+		public static bool Sync(List<Fee> listNew,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,userNum);
 			}
 			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
 			List<Fee> listDB=Fees.GetFeesAll(dictFeesByFeeSchedNumsAndCodeNums);
-			return Crud.FeeCrud.Sync(listNew,listDB);
+			return Crud.FeeCrud.Sync(listNew,listDB,userNum);
 		}
 
 		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>

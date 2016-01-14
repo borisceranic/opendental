@@ -214,7 +214,10 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Surround with try/catch if possibly adding a Canadian carrier.</summary>
-		public static long Insert(Carrier carrier){
+		public static long Insert(Carrier carrier) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				carrier.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				carrier.CarrierNum=Meth.GetLong(MethodBase.GetCurrentMethod(),carrier);
 				return carrier.CarrierNum;
@@ -339,10 +342,15 @@ namespace OpenDentBusiness{
 			return retVall;
 		}
 
-		///<summary>Primarily used when user clicks OK from the InsPlan window.  Gets a carrierNum from the database based on the other supplied carrier data.  Sets the CarrierNum accordingly. If there is no matching carrier, then a new carrier is created.  The end result is a valid carrierNum to use.</summary>
-		public static Carrier GetIndentical(Carrier carrier){
+		///<summary>Primarily used when user clicks OK from the InsPlan window.  Gets a carrierNum from the database based on the other supplied carrier
+		///data.  Sets the CarrierNum accordingly. If there is no matching carrier, then a new carrier is created.  The end result is a valid carrierNum
+		///to use.  No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		public static Carrier GetIndentical(Carrier carrier,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Carrier>(MethodBase.GetCurrentMethod(),carrier);
+				return Meth.GetObject<Carrier>(MethodBase.GetCurrentMethod(),carrier,userNum);
 			}
 			if(carrier.CarrierName=="") {
 				return new Carrier();//should probably be null instead
@@ -382,6 +390,7 @@ namespace OpenDentBusiness{
 				}*/
 				//Notice that if inserting a carrier, it's never possible to create a canadian carrier.
 			}
+			carrier.SecUserNumEntry=userNum;
 			Insert(carrier);
 			retVal.CarrierNum=carrier.CarrierNum;
 			return retVal;

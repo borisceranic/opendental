@@ -184,7 +184,7 @@ namespace OpenDentBusiness.Crud{
 				+"UserNum      =  "+POut.Long  (wikiPage.UserNum)+", "
 				+"PageTitle    = '"+POut.String(wikiPage.PageTitle)+"', "
 				+"KeyWords     = '"+POut.String(wikiPage.KeyWords)+"', "
-				+"PageContent  = '"+POut.String(wikiPage.PageContent)+"', "
+				+"PageContent  = '"+POut.String(wikiPage.PageContent)+"' "
 				//DateTimeSaved not allowed to change
 				+"WHERE WikiPageNum = "+POut.Long(wikiPage.WikiPageNum);
 			Db.NonQ(command);

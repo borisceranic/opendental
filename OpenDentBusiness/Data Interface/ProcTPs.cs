@@ -40,7 +40,10 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static long Insert(ProcTP proc){
+		public static long Insert(ProcTP proc) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				proc.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				proc.ProcTPNum=Meth.GetLong(MethodBase.GetCurrentMethod(),proc);
 				return proc.ProcTPNum;

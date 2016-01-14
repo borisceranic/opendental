@@ -5,7 +5,7 @@ namespace OpenDentBusiness{
 	//Any changes made to this tabletype needs to be documented on the Online Manual
 	///<summary>Subscribers can share insplans by using the InsSub table.  The patplan table determines coverage for individual patients.  InsPlans can also exist without any subscriber. </summary>
 	[Serializable]
-	[CrudTable(AuditPerms=CrudAuditPerm.InsPlanChangeCarrierName)]
+	[CrudTable(AuditPerms=CrudAuditPerm.InsPlanChangeCarrierName,IsSecurityStamped=true)]
 	public class InsPlan:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -66,7 +66,16 @@ namespace OpenDentBusiness{
 		public EnumCobRule CobRule;
 		///<summary>FK to sop.SopCode. Examples: 121, 3115, etc.  Acts as default for all patients using this insurance.  When code is changed for an insplan, it should change automatically for patients having that primary insurance. </summary>
 		public string SopCode;
-		
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary>This is not a database column.  It is just used to display the number of plans with the same info.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

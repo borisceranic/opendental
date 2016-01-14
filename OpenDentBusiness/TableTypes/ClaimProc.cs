@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Links procedures to claims.  Also links ins payments to procedures or claims.  Also used for estimating procedures even if no claim yet.  Warning: One proc might be linked twice to a given claim if insurance made two payments.  Many of the important fields are actually optional.  For instance, ProcNum is only required if itemizing ins payment, and ClaimNum is blank if Status=adjustment,cap,or estimate.</summary>
 	[Serializable()]
+	[CrudTable(IsSecurityStamped=true)]
 	public class ClaimProc:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -93,8 +94,16 @@ namespace OpenDentBusiness{
 		public long PayPlanNum;
 		///<summary>FK to definition.DefNum.  Connected to the ClaimPaymentTracking DefCat.</summary>
 		public long ClaimPaymentTracking;
-		
-
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		///<summary>Returns a copy of this ClaimProc.</summary>
 		public ClaimProc Copy(){

@@ -6,6 +6,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Every InsPlan has a Carrier.  The carrier stores the name and address.</summary>
 	[Serializable()]
+	[CrudTable(IsSecurityStamped=true)]
 	public class Carrier:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -39,7 +40,17 @@ namespace OpenDentBusiness{
 		///<summary>1=No Encryption, 2=CDAnet standard #1, 3=CDAnet standard #2.  Field A10.</summary>
 		public byte CanadianEncryptionMethod;
 		///<summary>Bit flags.</summary>
-		public CanSupTransTypes CanadianSupportedTypes; 
+		public CanSupTransTypes CanadianSupportedTypes;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 
 		public Carrier Copy(){

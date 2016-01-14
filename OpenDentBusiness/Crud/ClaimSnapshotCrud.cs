@@ -190,7 +190,7 @@ namespace OpenDentBusiness.Crud{
 				+"ClaimType       = '"+POut.String(claimSnapshot.ClaimType)+"', "
 				+"Writeoff        = '"+POut.Double(claimSnapshot.Writeoff)+"', "
 				+"InsPayEst       = '"+POut.Double(claimSnapshot.InsPayEst)+"', "
-				+"Fee             = '"+POut.Double(claimSnapshot.Fee)+"', "
+				+"Fee             = '"+POut.Double(claimSnapshot.Fee)+"' "
 				//DateTEntry not allowed to change
 				+"WHERE ClaimSnapshotNum = "+POut.Long(claimSnapshot.ClaimSnapshotNum);
 			Db.NonQ(command);

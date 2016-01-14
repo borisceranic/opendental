@@ -7,6 +7,7 @@ namespace OpenDentBusiness{
 
 	///<summary>A treatment plan saved by a user.  Does not include the default tp, which is just a list of procedurelog entries with a status of tp.  A treatplan has many proctp's attached to it.</summary>
 	[Serializable]
+	[CrudTable(IsSecurityStamped=true)]
 	public class TreatPlan:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -29,6 +30,17 @@ namespace OpenDentBusiness{
 		public long DocNum;
 		///<summary>Determines the type of treatment plan this is.</summary>
 		public TreatPlanStatus TPStatus;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
+
 		///<summary>Used to pass the list of ProcTPs in memory with the TreatPlan.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		[XmlIgnore]

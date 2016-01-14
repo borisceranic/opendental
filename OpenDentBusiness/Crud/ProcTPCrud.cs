@@ -46,24 +46,27 @@ namespace OpenDentBusiness.Crud{
 			ProcTP procTP;
 			foreach(DataRow row in table.Rows) {
 				procTP=new ProcTP();
-				procTP.ProcTPNum   = PIn.Long  (row["ProcTPNum"].ToString());
-				procTP.TreatPlanNum= PIn.Long  (row["TreatPlanNum"].ToString());
-				procTP.PatNum      = PIn.Long  (row["PatNum"].ToString());
-				procTP.ProcNumOrig = PIn.Long  (row["ProcNumOrig"].ToString());
-				procTP.ItemOrder   = PIn.Int   (row["ItemOrder"].ToString());
-				procTP.Priority    = PIn.Long  (row["Priority"].ToString());
-				procTP.ToothNumTP  = PIn.String(row["ToothNumTP"].ToString());
-				procTP.Surf        = PIn.String(row["Surf"].ToString());
-				procTP.ProcCode    = PIn.String(row["ProcCode"].ToString());
-				procTP.Descript    = PIn.String(row["Descript"].ToString());
-				procTP.FeeAmt      = PIn.Double(row["FeeAmt"].ToString());
-				procTP.PriInsAmt   = PIn.Double(row["PriInsAmt"].ToString());
-				procTP.SecInsAmt   = PIn.Double(row["SecInsAmt"].ToString());
-				procTP.PatAmt      = PIn.Double(row["PatAmt"].ToString());
-				procTP.Discount    = PIn.Double(row["Discount"].ToString());
-				procTP.Prognosis   = PIn.String(row["Prognosis"].ToString());
-				procTP.Dx          = PIn.String(row["Dx"].ToString());
-				procTP.ProcAbbr    = PIn.String(row["ProcAbbr"].ToString());
+				procTP.ProcTPNum      = PIn.Long  (row["ProcTPNum"].ToString());
+				procTP.TreatPlanNum   = PIn.Long  (row["TreatPlanNum"].ToString());
+				procTP.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				procTP.ProcNumOrig    = PIn.Long  (row["ProcNumOrig"].ToString());
+				procTP.ItemOrder      = PIn.Int   (row["ItemOrder"].ToString());
+				procTP.Priority       = PIn.Long  (row["Priority"].ToString());
+				procTP.ToothNumTP     = PIn.String(row["ToothNumTP"].ToString());
+				procTP.Surf           = PIn.String(row["Surf"].ToString());
+				procTP.ProcCode       = PIn.String(row["ProcCode"].ToString());
+				procTP.Descript       = PIn.String(row["Descript"].ToString());
+				procTP.FeeAmt         = PIn.Double(row["FeeAmt"].ToString());
+				procTP.PriInsAmt      = PIn.Double(row["PriInsAmt"].ToString());
+				procTP.SecInsAmt      = PIn.Double(row["SecInsAmt"].ToString());
+				procTP.PatAmt         = PIn.Double(row["PatAmt"].ToString());
+				procTP.Discount       = PIn.Double(row["Discount"].ToString());
+				procTP.Prognosis      = PIn.String(row["Prognosis"].ToString());
+				procTP.Dx             = PIn.String(row["Dx"].ToString());
+				procTP.ProcAbbr       = PIn.String(row["ProcAbbr"].ToString());
+				procTP.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				procTP.SecDateEntry   = PIn.Date  (row["SecDateEntry"].ToString());
+				procTP.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(procTP);
 			}
 			return retVal;
@@ -93,6 +96,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Prognosis");
 			table.Columns.Add("Dx");
 			table.Columns.Add("ProcAbbr");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(ProcTP procTP in listProcTPs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procTP.ProcTPNum),
@@ -113,6 +119,9 @@ namespace OpenDentBusiness.Crud{
 					POut.String(procTP.Prognosis),
 					POut.String(procTP.Dx),
 					POut.String(procTP.ProcAbbr),
+					POut.Long  (procTP.SecUserNumEntry),
+					POut.Date  (procTP.SecDateEntry),
+					POut.DateT (procTP.SecDateTEdit),
 				});
 			}
 			return table;
@@ -153,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcTPNum,";
 			}
-			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr) VALUES(";
+			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procTP.ProcTPNum)+",";
 			}
@@ -174,7 +183,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(procTP.Discount)+"',"
 				+"'"+POut.String(procTP.Prognosis)+"',"
 				+"'"+POut.String(procTP.Dx)+"',"
-				+"'"+POut.String(procTP.ProcAbbr)+"')";
+				+"'"+POut.String(procTP.ProcAbbr)+"',"
+				+    POut.Long  (procTP.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -207,7 +219,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProcTPNum,";
 			}
-			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr) VALUES(";
+			command+="TreatPlanNum,PatNum,ProcNumOrig,ItemOrder,Priority,ToothNumTP,Surf,ProcCode,Descript,FeeAmt,PriInsAmt,SecInsAmt,PatAmt,Discount,Prognosis,Dx,ProcAbbr,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procTP.ProcTPNum)+",";
 			}
@@ -228,7 +240,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(procTP.Discount)+"',"
 				+"'"+POut.String(procTP.Prognosis)+"',"
 				+"'"+POut.String(procTP.Dx)+"',"
-				+"'"+POut.String(procTP.ProcAbbr)+"')";
+				+"'"+POut.String(procTP.ProcAbbr)+"',"
+				+    POut.Long  (procTP.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -241,23 +256,26 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one ProcTP in the database.</summary>
 		public static void Update(ProcTP procTP){
 			string command="UPDATE proctp SET "
-				+"TreatPlanNum=  "+POut.Long  (procTP.TreatPlanNum)+", "
-				+"PatNum      =  "+POut.Long  (procTP.PatNum)+", "
-				+"ProcNumOrig =  "+POut.Long  (procTP.ProcNumOrig)+", "
-				+"ItemOrder   =  "+POut.Int   (procTP.ItemOrder)+", "
-				+"Priority    =  "+POut.Long  (procTP.Priority)+", "
-				+"ToothNumTP  = '"+POut.String(procTP.ToothNumTP)+"', "
-				+"Surf        = '"+POut.String(procTP.Surf)+"', "
-				+"ProcCode    = '"+POut.String(procTP.ProcCode)+"', "
-				+"Descript    = '"+POut.String(procTP.Descript)+"', "
-				+"FeeAmt      = '"+POut.Double(procTP.FeeAmt)+"', "
-				+"PriInsAmt   = '"+POut.Double(procTP.PriInsAmt)+"', "
-				+"SecInsAmt   = '"+POut.Double(procTP.SecInsAmt)+"', "
-				+"PatAmt      = '"+POut.Double(procTP.PatAmt)+"', "
-				+"Discount    = '"+POut.Double(procTP.Discount)+"', "
-				+"Prognosis   = '"+POut.String(procTP.Prognosis)+"', "
-				+"Dx          = '"+POut.String(procTP.Dx)+"', "
-				+"ProcAbbr    = '"+POut.String(procTP.ProcAbbr)+"' "
+				+"TreatPlanNum   =  "+POut.Long  (procTP.TreatPlanNum)+", "
+				+"PatNum         =  "+POut.Long  (procTP.PatNum)+", "
+				+"ProcNumOrig    =  "+POut.Long  (procTP.ProcNumOrig)+", "
+				+"ItemOrder      =  "+POut.Int   (procTP.ItemOrder)+", "
+				+"Priority       =  "+POut.Long  (procTP.Priority)+", "
+				+"ToothNumTP     = '"+POut.String(procTP.ToothNumTP)+"', "
+				+"Surf           = '"+POut.String(procTP.Surf)+"', "
+				+"ProcCode       = '"+POut.String(procTP.ProcCode)+"', "
+				+"Descript       = '"+POut.String(procTP.Descript)+"', "
+				+"FeeAmt         = '"+POut.Double(procTP.FeeAmt)+"', "
+				+"PriInsAmt      = '"+POut.Double(procTP.PriInsAmt)+"', "
+				+"SecInsAmt      = '"+POut.Double(procTP.SecInsAmt)+"', "
+				+"PatAmt         = '"+POut.Double(procTP.PatAmt)+"', "
+				+"Discount       = '"+POut.Double(procTP.Discount)+"', "
+				+"Prognosis      = '"+POut.String(procTP.Prognosis)+"', "
+				+"Dx             = '"+POut.String(procTP.Dx)+"', "
+				+"ProcAbbr       = '"+POut.String(procTP.ProcAbbr)+"' "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE ProcTPNum = "+POut.Long(procTP.ProcTPNum);
 			Db.NonQ(command);
 		}
@@ -333,6 +351,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ProcAbbr = '"+POut.String(procTP.ProcAbbr)+"'";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

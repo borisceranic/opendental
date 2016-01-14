@@ -37,6 +37,9 @@ namespace OpenDentBusiness {
 
 		///<summary></summary>
 		public static long Insert(PatField patField) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				patField.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				patField.PatFieldNum=Meth.GetLong(MethodBase.GetCurrentMethod(),patField);
 				return patField.PatFieldNum;

@@ -68,6 +68,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(ClaimProc cp) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				cp.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				cp.ClaimProcNum=Meth.GetLong(MethodBase.GetCurrentMethod(),cp);
 				return cp.ClaimProcNum;

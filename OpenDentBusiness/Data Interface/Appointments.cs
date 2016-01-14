@@ -313,6 +313,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Set includeAptNum to true only in rare situations.  Like when we are inserting for eCW.</summary>
 		public static long InsertIncludeAptNum(Appointment appt,bool useExistingPK) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				appt.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				appt.AptNum=Meth.GetLong(MethodBase.GetCurrentMethod(),appt,useExistingPK);
 				return appt.AptNum;
@@ -2395,14 +2398,17 @@ namespace OpenDentBusiness{
 			return listProcs;
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  It doesn't create any ApptComm items, but it will delete ApptComm items.
-		///If you use Sync, you need to create new Apptcomm items.</summary>
-		public static void Sync(List<Appointment> listNew,long patNum) {
+		///<summary>Inserts, updates, or deletes db rows to match listNew.  No need to pass in userNum, it's set before remoting role check and passed to
+		///the server if necessary.  Doesn't create ApptComm items, but will delete them.  If you use Sync, you must create new Apptcomm items.</summary>
+		public static void Sync(List<Appointment> listNew,long patNum,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum,userNum);
 			}
 			List<Appointment> listDB=Appointments.GetListForPat(patNum);
-			Crud.AppointmentCrud.Sync(listNew,listDB);
+			Crud.AppointmentCrud.Sync(listNew,listDB,userNum);
 		}
 
 		///<summary>Zeros securitylog FKey column for rows that are using the matching aptNum as FKey and are related to Appointment.

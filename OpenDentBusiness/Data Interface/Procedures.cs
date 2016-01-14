@@ -46,7 +46,10 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
-		public static long Insert(Procedure procedure){
+		public static long Insert(Procedure procedure) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				procedure.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				procedure.ProcNum=Meth.GetLong(MethodBase.GetCurrentMethod(),procedure);
 				return procedure.ProcNum;
@@ -1763,13 +1766,16 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in two lists.</summary>
-		public static void Sync(List<Procedure> listNew,Appointment apptCur) {
+		public static void Sync(List<Procedure> listNew,Appointment apptCur,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,apptCur);//Never pass DB list through the web service (Note: Why?  Our proc list is special, it doesn't contain all procs so we shouldn't code this method to always use our limited list of procs........)
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,apptCur,userNum);
 				return;
 			}
 			List<Procedure> listDB=Procedures.GetProcsForApptEdit(apptCur);
-			Crud.ProcedureCrud.Sync(listNew,listDB);
+			Crud.ProcedureCrud.Sync(listNew,listDB,userNum);
 		}
 
 		public static void SetTPActive(long patNum,List<long> listProcNums) {

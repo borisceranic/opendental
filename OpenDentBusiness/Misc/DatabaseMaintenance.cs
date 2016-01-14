@@ -127,11 +127,11 @@ namespace OpenDentBusiness {
 			return retVal.ToString();
 		}
 
-		[DbmMethod]
 		///<summary>This method updates many invalid date columns to '0001-01-01' and a few invalid DateTStamp columns to '1970-01-01 00:00:01'.
 		///DateTStamp columns are TIMESTAMP data type.  The TIMESTAMP data type has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
 		///https://dev.mysql.com/doc/refman/5.0/en/datetime.html
 		///Always safe to backport changes to this function to the current stable version. As per conversation between OD engineers. 2/24/2014</summary>
+		[DbmMethod]
 		public static string DatesNoZeros(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -273,8 +273,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
 		///<summary>also checks patient.AddrNote</summary>
+		[DbmMethod]
 		public static string SpecialCharactersInNotes(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -484,11 +484,15 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
-
-		[DbmMethod]
-		public static string AppointmentsNoPatients(bool verbose,bool isCheck) {
+		
+		///<summary>userNum can be 0, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string AppointmentsNoPatients(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			command="SELECT Count(*) FROM appointment WHERE PatNum NOT IN (SELECT PatNum FROM patient)";
@@ -513,7 +517,7 @@ namespace OpenDentBusiness {
 							PatStatus=PatientStatus.Inactive,
 							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv)
 						};
-						
+						tempPat.SecUserNumEntry=userNum;
 						Patients.Insert(tempPat,false);
 						Patient oldPat=tempPat.Copy();
 						tempPat.Guarantor=tempPat.PatNum;
@@ -533,7 +537,8 @@ namespace OpenDentBusiness {
 							Birthdate=DateTime.MinValue,
 							BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType),
 							PatStatus=PatientStatus.Inactive,
-							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv)
+							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv),
+							SecUserNumEntry=userNum
 						},true);
 						patientsAdded++;
 					}
@@ -796,8 +801,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod(HasBreakDown=true)]
 		///<summary>Identify duplicates where all benefit columns match except for BenefitNum, Percent, and MonetaryAmt.</summary>
+		[DbmMethod(HasBreakDown=true)]
 		public static string BenefitsWithPartialDuplicatesForInsPlan(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1164,11 +1169,15 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
-
-		[DbmMethod]
-		public static string ClaimWithInvalidInsSubNum(bool verbose,bool isCheck) {
+		
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string ClaimWithInvalidInsSubNum(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			if(isCheck) {
@@ -1200,6 +1209,7 @@ namespace OpenDentBusiness {
 					plan=new InsPlan();//Create a dummy plan and carrier to attach claims and claim procs to.
 					plan.IsHidden=true;
 					plan.CarrierNum=Carriers.GetByNameAndPhone("UNKNOWN CARRIER","").CarrierNum;
+					plan.SecUserNumEntry=userNum;
 					InsPlans.Insert(plan);
 					long claimNum=PIn.Long(table.Rows[i]["ClaimNum"].ToString());
 					long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
@@ -1207,6 +1217,7 @@ namespace OpenDentBusiness {
 					sub.PlanNum=plan.PlanNum;
 					sub.Subscriber=PIn.Long(table.Rows[i]["PatNum"].ToString());
 					sub.SubscriberID="unknown";
+					sub.SecUserNumEntry=userNum;
 					InsSubs.Insert(sub);
 					command="UPDATE claim SET PlanNum="+plan.PlanNum+",InsSubNum="+sub.InsSubNum+" WHERE ClaimNum="+claimNum;
 					Db.NonQ(command);
@@ -1222,8 +1233,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
 		///<summary>Also fixes situations where PatNum=0</summary>
+		[DbmMethod]
 		public static string ClaimWithInvalidPatNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -1316,11 +1327,15 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod(HasBreakDown=true)]
-		///<Summary>also fixes resulting deposit misbalances.</Summary>
-		public static string ClaimPaymentCheckAmt(bool verbose,bool isCheck) {
+		///<summary>Also fixes resulting deposit misbalances.
+		///No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasBreakDown=true,HasUserNum=true)]
+		public static string ClaimPaymentCheckAmt(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
@@ -1359,6 +1374,7 @@ namespace OpenDentBusiness {
 						dummyPatient.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
 						dummyPatient.PatStatus=PatientStatus.Archived;
 						dummyPatient.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
+						dummyPatient.SecUserNumEntry=userNum;
 						long dummyPatNum=Patients.Insert(dummyPatient,true);
 						pat=Patients.GetPat(dummyPatient.PatNum);
 					}
@@ -1509,9 +1525,8 @@ namespace OpenDentBusiness {
 			 return log;
 		}
 
-
-		[DbmMethod]
 		///<summary>Deletes claimprocs that are attached to group notes.</summary>
+		[DbmMethod]
 		public static string ClaimProcEstimateAttachedToGroupNote(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -2012,10 +2027,14 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string ClaimProcWithInvalidClaimNum(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string ClaimProcWithInvalidClaimNum(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			if(isCheck) {
@@ -2051,6 +2070,7 @@ namespace OpenDentBusiness {
 					claim.PlanNum=cpList[i].PlanNum;
 					claim.InsSubNum=cpList[i].InsSubNum;
 					claim.ProvTreat=cpList[i].ProvNum;
+					claim.SecUserNumEntry=userNum;
 					Crud.ClaimCrud.Insert(claim,true);//Allows us to use a primary key that was "used".
 					Patient pat=Patients.GetLim(claim.PatNum);
 					log+=Lans.g("FormDatabaseMaintenance","Claim created due to claimprocs with invalid ClaimNums for patient: ")
@@ -2450,11 +2470,15 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string InsPlanInvalidNum(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string InsPlanInvalidNum(bool verbose,bool isCheck,long userNum=0) {
 			//Many sections removed because they are now fixed in InsSubNumMismatchPlanNum.
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			if(isCheck) {
@@ -2561,6 +2585,7 @@ namespace OpenDentBusiness {
 						InsPlan insplan=new InsPlan();
 						insplan.IsHidden=true;
 						insplan.CarrierNum=Carriers.GetByNameAndPhone("UNKNOWN CARRIER","").CarrierNum;
+						insplan.SecUserNumEntry=userNum;
 						long insPlanNum=InsPlans.Insert(insplan);
 						command="UPDATE inssub SET PlanNum="+POut.Long(insPlanNum)+" WHERE InsSubNum="+POut.Long(insSubNum);
 						Db.NonQ(command);
@@ -2599,10 +2624,14 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string InsSubInvalidSubscriber(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string InsSubInvalidSubscriber(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			command="SELECT Subscriber FROM inssub WHERE Subscriber NOT IN (SELECT PatNum FROM patient) AND Subscriber != 0 GROUP BY Subscriber";
@@ -2625,6 +2654,7 @@ namespace OpenDentBusiness {
 					pat.Guarantor=pat.PatNum;
 					pat.PriProv=priProv;
 					pat.BillingType=billType;
+					pat.SecUserNumEntry=userNum;
 					Patients.Insert(pat,true);
 				}
 				int numberFixed=table.Rows.Count;
@@ -2635,11 +2665,15 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string InsSubNumMismatchPlanNum(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string InsSubNumMismatchPlanNum(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			//Checks for situations where there are valid InsSubNums, but mismatched PlanNums. 
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			if(isCheck) {
@@ -2726,6 +2760,7 @@ namespace OpenDentBusiness {
 						plan.PlanNum=PIn.Long(table.Rows[i]["PlanNum"].ToString());//reuse the existing FK
 						plan.IsHidden=true;
 						plan.CarrierNum=Carriers.GetByNameAndPhone("UNKNOWN CARRIER","").CarrierNum;
+						plan.SecUserNumEntry=userNum;
 						InsPlans.Insert(plan,true);
 					}
 					long patNum=PIn.Long(table.Rows[i]["PatNum"].ToString());
@@ -2737,6 +2772,7 @@ namespace OpenDentBusiness {
 						sub.PlanNum=PIn.Long(table.Rows[i]["PlanNum"].ToString());
 						sub.Subscriber=patNum;//if this sub was created on a previous loop, this may be some other patient.
 						sub.SubscriberID="unknown";
+						sub.SecUserNumEntry=userNum;
 						InsSubs.Insert(sub,true);
 					}
 					Patient pat=Patients.GetLim(patNum);
@@ -2759,6 +2795,7 @@ namespace OpenDentBusiness {
 					sub.PlanNum=PIn.Long(table.Rows[i]["PlanNum"].ToString());
 					sub.Subscriber=PIn.Long(table.Rows[i]["PatNum"].ToString());
 					sub.SubscriberID="unknown";
+					sub.SecUserNumEntry=userNum;
 					InsSubs.Insert(sub,true);
 				}
 				numFixed=table.Rows.Count;
@@ -2788,6 +2825,7 @@ namespace OpenDentBusiness {
 					sub.PlanNum=PIn.Long(table.Rows[i]["PlanNum"].ToString());
 					sub.Subscriber=PIn.Long(table.Rows[i]["PatNum"].ToString());
 					sub.SubscriberID="unknown";
+					sub.SecUserNumEntry=userNum;
 					InsSubs.Insert(sub,true);
 				}
 				numFixed=table.Rows.Count;
@@ -3718,10 +3756,14 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string PaySplitWithInvalidPayNum(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string PaySplitWithInvalidPayNum(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			if(isCheck) {
@@ -3749,6 +3791,7 @@ namespace OpenDentBusiness {
 						payment.PayAmt=PIn.Double(table.Rows[i]["SplitAmt_"].ToString());
 						payment.PayNote="Dummy payment. Original payment entry missing from the database.";
 						payment.PayNum=PIn.Long(table.Rows[i]["PayNum"].ToString());
+						payment.SecUserNumEntry=userNum;
 						Payments.Insert(payment,true);
 					}
 					log+=Lans.g("FormDatabaseMaintenance","Paysplits found with invalid PayNum fixed: ")+table.Rows.Count+"\r\n";
@@ -5163,10 +5206,14 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
-		public static string TreatPlansInvalid(bool verbose,bool isCheck) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		[DbmMethod(HasUserNum=true)]
+		public static string TreatPlansInvalid(bool verbose,bool isCheck,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck,userNum);
 			}
 			string log="";
 			command="SELECT treatplan.PatNum FROM procedurelog	"//procs for 1 pat attached to a treatplan for another
@@ -5181,7 +5228,7 @@ namespace OpenDentBusiness {
 				}
 			}
 			else {
-				listPatNumsForAudit.ForEach(TreatPlans.AuditPlans);
+				listPatNumsForAudit.ForEach(x => TreatPlans.AuditPlans(x,userNum));
 				TreatPlanAttaches.DeleteOrphaned();
 				if(listPatNumsForAudit.Count>0 || verbose) {
 					log+=Lans.g("FormDatabaseMaintenance","Patients with one or more invalid treatment plans fixed")+": "+listPatNumsForAudit.Count+"\r\n";
@@ -5190,8 +5237,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod(HasBreakDown=true)]
 		/// <summary>Only one user of a given UserName may be unhidden at a time. Warn the user and instruct them to hide extras.</summary>
+		[DbmMethod(HasBreakDown=true)]
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -5281,8 +5328,8 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
-		[DbmMethod]
 		/// <summary>userod is restricted to ClinicNum 0 - All.  Restricted to All clinics doesn't make sense.  This will set the ClinicIsRestricted bool to false if ClinicNum=0.</summary>
+		[DbmMethod]
 		public static string UserodInvalidRestrictedClinic(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
@@ -5826,9 +5873,13 @@ HAVING cnt>1";
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
-		public static string CreateMissingActiveTPs(List<Procedure> listTpTpiProcs) {
+		///<summary>No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		public static string CreateMissingActiveTPs(List<Procedure> listTpTpiProcs,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),listTpTpiProcs);
+				return Meth.GetString(MethodBase.GetCurrentMethod(),listTpTpiProcs,userNum);
 			}
 			if(listTpTpiProcs.Count==0) {//should never happen, won't get called if the list is empty, but just in case
 				return "";
@@ -5845,7 +5896,8 @@ HAVING cnt>1";
 						Heading=Lans.g("TreatPlans","Active Treatment Plan"),
 						Note=PrefC.GetString(PrefName.TreatmentPlanNote),
 						TPStatus=TreatPlanStatus.Active,
-						PatNum=procCur.PatNum
+						PatNum=procCur.PatNum,
+						SecUserNumEntry=userNum
 					};
 					activePlan.TreatPlanNum=TreatPlans.Insert(activePlan);
 					patNumCur=procCur.PatNum;
@@ -5857,10 +5909,13 @@ HAVING cnt>1";
 
 	}
 
-	///<summary>An attribute that should get applied to any method that needs to show up in the main grid of FormDatabaseMaintenance.</summary>
+	///<summary>An attribute that should get applied to any method that needs to show up in the main grid of FormDatabaseMaintenance.
+	///Also, an attribute that identifies methods that require a userNum parameter for sending the current user through the middle tier to set the
+	///SecUserNumEntry field.</summary>
 	[System.AttributeUsage(System.AttributeTargets.Method,AllowMultiple=false)]
 	public class DbmMethod:System.Attribute {
 		private bool hasBreakDown;
+		private bool _hasUserNum;
 		///<summary>Set to true if this dbm method needs to be able to show the user a list or break down of items that need manual attention.</summary>
 		public bool HasBreakDown {
 			get {
@@ -5871,8 +5926,15 @@ HAVING cnt>1";
 			}
 		}
 
+		///<summary>Set to true if this dbm method requires a userNum parameter.  The parameter can be 0, it will be set if not ServerWeb remoting role.</summary>
+		public bool HasUserNum {
+			get { return _hasUserNum; }
+			set { _hasUserNum=value; }
+		}
+
 		public DbmMethod() {
 			this.hasBreakDown=false;
+			this._hasUserNum=false;
 		}
 
 	}

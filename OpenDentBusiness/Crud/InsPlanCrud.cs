@@ -75,6 +75,9 @@ namespace OpenDentBusiness.Crud{
 				insPlan.RxBIN                  = PIn.String(row["RxBIN"].ToString());
 				insPlan.CobRule                = (OpenDentBusiness.EnumCobRule)PIn.Int(row["CobRule"].ToString());
 				insPlan.SopCode                = PIn.String(row["SopCode"].ToString());
+				insPlan.SecUserNumEntry        = PIn.Long  (row["SecUserNumEntry"].ToString());
+				insPlan.SecDateEntry           = PIn.Date  (row["SecDateEntry"].ToString());
+				insPlan.SecDateTEdit           = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(insPlan);
 			}
 			return retVal;
@@ -115,6 +118,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("RxBIN");
 			table.Columns.Add("CobRule");
 			table.Columns.Add("SopCode");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(InsPlan insPlan in listInsPlans) {
 				table.Rows.Add(new object[] {
 					POut.Long  (insPlan.PlanNum),
@@ -146,6 +152,9 @@ namespace OpenDentBusiness.Crud{
 					POut.String(insPlan.RxBIN),
 					POut.Int   ((int)insPlan.CobRule),
 					POut.String(insPlan.SopCode),
+					POut.Long  (insPlan.SecUserNumEntry),
+					POut.Date  (insPlan.SecDateEntry),
+					POut.DateT (insPlan.SecDateTEdit),
 				});
 			}
 			return table;
@@ -186,7 +195,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PlanNum,";
 			}
-			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode) VALUES(";
+			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(insPlan.PlanNum)+",";
 			}
@@ -218,7 +227,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(insPlan.CanadianInstitutionCode)+"',"
 				+"'"+POut.String(insPlan.RxBIN)+"',"
 				+    POut.Int   ((int)insPlan.CobRule)+","
-				+"'"+POut.String(insPlan.SopCode)+"')";
+				+"'"+POut.String(insPlan.SopCode)+"',"
+				+    POut.Long  (insPlan.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -251,7 +263,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PlanNum,";
 			}
-			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode) VALUES(";
+			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(insPlan.PlanNum)+",";
 			}
@@ -283,7 +295,10 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(insPlan.CanadianInstitutionCode)+"',"
 				+"'"+POut.String(insPlan.RxBIN)+"',"
 				+    POut.Int   ((int)insPlan.CobRule)+","
-				+"'"+POut.String(insPlan.SopCode)+"')";
+				+"'"+POut.String(insPlan.SopCode)+"',"
+				+    POut.Long  (insPlan.SecUserNumEntry)+","
+				+    DbHelper.Now()+")";
+				//SecDateTEdit can only be set by MySQL
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -324,6 +339,9 @@ namespace OpenDentBusiness.Crud{
 				+"RxBIN                  = '"+POut.String(insPlan.RxBIN)+"', "
 				+"CobRule                =  "+POut.Int   ((int)insPlan.CobRule)+", "
 				+"SopCode                = '"+POut.String(insPlan.SopCode)+"' "
+				//SecUserNumEntry excluded from update
+				//SecDateEntry not allowed to change
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE PlanNum = "+POut.Long(insPlan.PlanNum);
 			Db.NonQ(command);
 		}
@@ -443,6 +461,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="SopCode = '"+POut.String(insPlan.SopCode)+"'";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

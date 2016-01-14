@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>Multiple subscribers can have the same insurance plan.  But the patplan table is still what determines coverage for individual patients.</summary>
 	[Serializable]
+	[CrudTable(IsSecurityStamped=true)]
 	public class InsSub:TableBase{
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -29,6 +30,16 @@ namespace OpenDentBusiness{
 		public string BenefitNotes;
 		///<summary>Use to store any other info that affects coverage.</summary>
 		public string SubscNote;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 
 		///<summary>Returns a copy of this InsSub.</summary>

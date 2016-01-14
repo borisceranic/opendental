@@ -78,7 +78,10 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static long Insert(InsSub insSub,bool useExistingPK){
+		public static long Insert(InsSub insSub,bool useExistingPK) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				insSub.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				insSub.InsSubNum=Meth.GetLong(MethodBase.GetCurrentMethod(),insSub,useExistingPK);
 				return insSub.InsSubNum;
@@ -261,10 +264,14 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>Returns the number of subscribers moved.</summary>
-		public static long MoveSubscribers(long insPlanNumFrom,long insPlanNumTo) {
+		///<summary>Returns the number of subscribers moved.
+		///No need to pass in userNum, it's set before remoting role check and passed to the server if necessary.</summary>
+		public static long MoveSubscribers(long insPlanNumFrom,long insPlanNumTo,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod(),insPlanNumFrom,insPlanNumTo);
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),insPlanNumFrom,insPlanNumTo,userNum);
 			}
 			List<InsSub> listInsSubsFrom=GetListForPlanNum(insPlanNumFrom);
 			List<long> listBlockedPatNums=new List<long>();
@@ -313,6 +320,7 @@ namespace OpenDentBusiness{
 				inssub.DateEffective=DateTime.MinValue;
 				inssub.BenefitNotes="";
 				inssub.SubscNote="";
+				inssub.SecUserNumEntry=userNum;
 				long insSubNumNew=InsSubs.Insert(inssub);
 				string command="SELECT PatNum FROM patplan WHERE InsSubNum="+POut.Long(oldInsSubNum);
 				DataTable tablePatsForInsSub=Db.GetTable(command);

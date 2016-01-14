@@ -46,20 +46,22 @@ namespace OpenDentBusiness.Crud{
 			Payment payment;
 			foreach(DataRow row in table.Rows) {
 				payment=new Payment();
-				payment.PayNum       = PIn.Long  (row["PayNum"].ToString());
-				payment.PayType      = PIn.Long  (row["PayType"].ToString());
-				payment.PayDate      = PIn.Date  (row["PayDate"].ToString());
-				payment.PayAmt       = PIn.Double(row["PayAmt"].ToString());
-				payment.CheckNum     = PIn.String(row["CheckNum"].ToString());
-				payment.BankBranch   = PIn.String(row["BankBranch"].ToString());
-				payment.PayNote      = PIn.String(row["PayNote"].ToString());
-				payment.IsSplit      = PIn.Bool  (row["IsSplit"].ToString());
-				payment.PatNum       = PIn.Long  (row["PatNum"].ToString());
-				payment.ClinicNum    = PIn.Long  (row["ClinicNum"].ToString());
-				payment.DateEntry    = PIn.Date  (row["DateEntry"].ToString());
-				payment.DepositNum   = PIn.Long  (row["DepositNum"].ToString());
-				payment.Receipt      = PIn.String(row["Receipt"].ToString());
-				payment.IsRecurringCC= PIn.Bool  (row["IsRecurringCC"].ToString());
+				payment.PayNum         = PIn.Long  (row["PayNum"].ToString());
+				payment.PayType        = PIn.Long  (row["PayType"].ToString());
+				payment.PayDate        = PIn.Date  (row["PayDate"].ToString());
+				payment.PayAmt         = PIn.Double(row["PayAmt"].ToString());
+				payment.CheckNum       = PIn.String(row["CheckNum"].ToString());
+				payment.BankBranch     = PIn.String(row["BankBranch"].ToString());
+				payment.PayNote        = PIn.String(row["PayNote"].ToString());
+				payment.IsSplit        = PIn.Bool  (row["IsSplit"].ToString());
+				payment.PatNum         = PIn.Long  (row["PatNum"].ToString());
+				payment.ClinicNum      = PIn.Long  (row["ClinicNum"].ToString());
+				payment.DateEntry      = PIn.Date  (row["DateEntry"].ToString());
+				payment.DepositNum     = PIn.Long  (row["DepositNum"].ToString());
+				payment.Receipt        = PIn.String(row["Receipt"].ToString());
+				payment.IsRecurringCC  = PIn.Bool  (row["IsRecurringCC"].ToString());
+				payment.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
+				payment.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
 				retVal.Add(payment);
 			}
 			return retVal;
@@ -85,6 +87,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("DepositNum");
 			table.Columns.Add("Receipt");
 			table.Columns.Add("IsRecurringCC");
+			table.Columns.Add("SecUserNumEntry");
+			table.Columns.Add("SecDateTEdit");
 			foreach(Payment payment in listPayments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (payment.PayNum),
@@ -101,6 +105,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (payment.DepositNum),
 					POut.String(payment.Receipt),
 					POut.Bool  (payment.IsRecurringCC),
+					POut.Long  (payment.SecUserNumEntry),
+					POut.DateT (payment.SecDateTEdit),
 				});
 			}
 			return table;
@@ -141,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PayNum,";
 			}
-			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC) VALUES(";
+			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(payment.PayNum)+",";
 			}
@@ -158,7 +164,9 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.Now()+","
 				+    POut.Long  (payment.DepositNum)+","
 				+    DbHelper.ParamChar+"paramReceipt,"
-				+    POut.Bool  (payment.IsRecurringCC)+")";
+				+    POut.Bool  (payment.IsRecurringCC)+","
+				+    POut.Long  (payment.SecUserNumEntry)+")";
+				//SecDateTEdit can only be set by MySQL
 			if(payment.Receipt==null) {
 				payment.Receipt="";
 			}
@@ -195,7 +203,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PayNum,";
 			}
-			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC) VALUES(";
+			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(payment.PayNum)+",";
 			}
@@ -212,7 +220,9 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.Now()+","
 				+    POut.Long  (payment.DepositNum)+","
 				+    DbHelper.ParamChar+"paramReceipt,"
-				+    POut.Bool  (payment.IsRecurringCC)+")";
+				+    POut.Bool  (payment.IsRecurringCC)+","
+				+    POut.Long  (payment.SecUserNumEntry)+")";
+				//SecDateTEdit can only be set by MySQL
 			if(payment.Receipt==null) {
 				payment.Receipt="";
 			}
@@ -229,19 +239,21 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Payment in the database.</summary>
 		public static void Update(Payment payment){
 			string command="UPDATE payment SET "
-				+"PayType      =  "+POut.Long  (payment.PayType)+", "
-				+"PayDate      =  "+POut.Date  (payment.PayDate)+", "
-				+"PayAmt       = '"+POut.Double(payment.PayAmt)+"', "
-				+"CheckNum     = '"+POut.String(payment.CheckNum)+"', "
-				+"BankBranch   = '"+POut.String(payment.BankBranch)+"', "
-				+"PayNote      = '"+POut.String(payment.PayNote)+"', "
-				+"IsSplit      =  "+POut.Bool  (payment.IsSplit)+", "
-				+"PatNum       =  "+POut.Long  (payment.PatNum)+", "
-				+"ClinicNum    =  "+POut.Long  (payment.ClinicNum)+", "
+				+"PayType        =  "+POut.Long  (payment.PayType)+", "
+				+"PayDate        =  "+POut.Date  (payment.PayDate)+", "
+				+"PayAmt         = '"+POut.Double(payment.PayAmt)+"', "
+				+"CheckNum       = '"+POut.String(payment.CheckNum)+"', "
+				+"BankBranch     = '"+POut.String(payment.BankBranch)+"', "
+				+"PayNote        = '"+POut.String(payment.PayNote)+"', "
+				+"IsSplit        =  "+POut.Bool  (payment.IsSplit)+", "
+				+"PatNum         =  "+POut.Long  (payment.PatNum)+", "
+				+"ClinicNum      =  "+POut.Long  (payment.ClinicNum)+", "
 				//DateEntry not allowed to change
 				//DepositNum excluded from update
-				+"Receipt      =  "+DbHelper.ParamChar+"paramReceipt, "
-				+"IsRecurringCC=  "+POut.Bool  (payment.IsRecurringCC)+" "
+				+"Receipt        =  "+DbHelper.ParamChar+"paramReceipt, "
+				+"IsRecurringCC  =  "+POut.Bool  (payment.IsRecurringCC)+" "
+				//SecUserNumEntry excluded from update
+				//SecDateTEdit can only be set by MySQL
 				+"WHERE PayNum = "+POut.Long(payment.PayNum);
 			if(payment.Receipt==null) {
 				payment.Receipt="";
@@ -299,6 +311,8 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsRecurringCC = "+POut.Bool(payment.IsRecurringCC)+"";
 			}
+			//SecUserNumEntry excluded from update
+			//SecDateTEdit can only be set by MySQL
 			if(command==""){
 				return false;
 			}

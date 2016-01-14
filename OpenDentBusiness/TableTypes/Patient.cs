@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace OpenDentBusiness{
 	///<summary>One row for each patient.  Includes deleted patients.</summary>
 	[Serializable()]
-	[CrudTable(AuditPerms=CrudAuditPerm.PatientPortal)]
+	[CrudTable(AuditPerms=CrudAuditPerm.PatientPortal,IsSecurityStamped=true)]
 	public class Patient : TableBase {
 		/// <summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -192,6 +192,13 @@ namespace OpenDentBusiness{
 		///<summary>A number between 1 and 31 that is the day of month that repeat charges should be applied to this account. 
 		///Previously this was determined by the start date of the repeate charges.</summary>
 		public int BillingCycleDay;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		///<summary>Timestamp automatically generated and user not allowed to change.  The actual date of entry.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
+		public DateTime SecDateEntry;
+		//No SecDateTEdit, DateTStamp already exists and is the timestamp updated by MySQL when a row is added or changed
 
 		/////<summary>Decided not to add since this data is already available and synchronizing would take too much time.  Will add later.  
 		/////Not editable. If the patient happens to have a future appointment, this will contain the date of that appointment.  

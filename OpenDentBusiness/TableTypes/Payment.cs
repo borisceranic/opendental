@@ -5,6 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>A patient payment.  Always has at least one split.</summary>
 	[Serializable]
+	[CrudTable(IsSecurityStamped=true)]
 	public class Payment:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -38,6 +39,14 @@ namespace OpenDentBusiness{
 		public string Receipt;
 		///<summary>True if this was an automatically added recurring CC charge rather then one entered by the user.  This was set to true for all historical entries before version 11.1, but will be accurate after that.</summary>
 		public bool IsRecurringCC;
+		///<summary>FK to userod.UserNum.  Set to the user logged in when the row was inserted at SecDateEntry date and time.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.ExcludeFromUpdate)]
+		public long SecUserNumEntry;
+		//No SecDateEntry, DateEntry already exists and is set by MySQL when the row is inserted and never updated
+		///<summary>Automatically updated by MySQL every time a row is added or changed. Could be changed due to user editing, custom queries or program
+		///updates.  Not user editable with the UI.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		public DateTime SecDateTEdit;
 
 		public Payment Clone() {
 			return (Payment)this.MemberwiseClone();

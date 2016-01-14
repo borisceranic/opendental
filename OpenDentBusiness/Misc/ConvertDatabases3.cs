@@ -11952,6 +11952,521 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE signalod ADD FKeyType varchar2(255)";
 					Db.NonQ(command);
 				}
+				#region Security Timestamp Tables (grouped by table instead of by column)
+				//adjustment table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE adjustment ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE adjustment ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE adjustment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE adjustment SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE adjustment ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE adjustment SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE adjustment MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX adjustment_SecUserNumEntry ON adjustment (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE adjustment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE adjustment SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//appointment table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE appointment ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE appointment ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE appointment SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX appointment_SecUserNumEntry ON appointment (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE appointment SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE appointment MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+				}
+				//carrier table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE carrier ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE carrier SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE carrier ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE carrier SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX carrier_SecUserNumEntry ON carrier (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE carrier SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE carrier ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE carrier SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//claim table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claim ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claim SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claim ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE claim SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claim_SecUserNumEntry ON claim (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE claim SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claim ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claim SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//claimpayment table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimpayment ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claimpayment SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimpayment ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimpayment SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimpayment_SecUserNumEntry ON claimpayment (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE claimpayment SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimpayment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claimpayment SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//claimproc table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimproc ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimproc ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimproc_SecUserNumEntry ON claimproc (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//fee table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE fee ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE fee ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE fee ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE fee ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE fee SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE fee ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE fee SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE fee MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX fee_SecUserNumEntry ON fee (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE fee ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE fee SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE fee MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE fee ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE fee SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//feesched table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE feesched ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE feesched SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE feesched ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE feesched SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX feesched_SecUserNumEntry ON feesched (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE feesched SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE feesched ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE feesched SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//insplan table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE insplan ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE insplan SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE insplan ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE insplan SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX insplan_SecUserNumEntry ON insplan (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE insplan SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE insplan SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//inssub table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE inssub ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE inssub SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE inssub ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE inssub SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX inssub_SecUserNumEntry ON inssub (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE inssub SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE inssub ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE inssub SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//patfield table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patfield ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE patfield SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patfield ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE patfield SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX patfield_SecUserNumEntry ON patfield (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE patfield SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patfield ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE patfield SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//patient table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patient ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patient ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE patient ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patient ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE patient SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patient MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX patient_SecUserNumEntry ON patient (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE patient ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE patient SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patient MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+				}
+				//payment table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payment ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payment ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE payment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE payment SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payment ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE payment SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payment MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX payment_SecUserNumEntry ON payment (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE payment ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE payment SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//paysplit table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE paysplit ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE paysplit SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE paysplit ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE paysplit SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX paysplit_SecUserNumEntry ON paysplit (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE paysplit SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//procedurelog table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX procedurelog_SecUserNumEntry ON procedurelog (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+				}
+				//proctp table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE proctp ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE proctp SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE proctp ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE proctp SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX proctp_SecUserNumEntry ON proctp (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE proctp SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE proctp ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE proctp SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				//treatplan table
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE treatplan ADD SecUserNumEntry bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD INDEX (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD SecDateEntry date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET SecDateTEdit = NOW()";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE treatplan ADD SecUserNumEntry number(20)";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET SecUserNumEntry = 0 WHERE SecUserNumEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan MODIFY SecUserNumEntry NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX treatplan_SecUserNumEntry ON treatplan (SecUserNumEntry)";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD SecDateEntry date";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET SecDateEntry = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE SecDateEntry IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan MODIFY SecDateEntry NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE treatplan ADD SecDateTEdit timestamp";
+					Db.NonQ(command);
+					command="UPDATE treatplan SET SecDateTEdit = SYSTIMESTAMP";
+					Db.NonQ(command);
+				}
+				#endregion Security Timestamp Tables (grouped by table instead of by column)
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";

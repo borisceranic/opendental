@@ -51,6 +51,9 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static long Insert(PaySplit split) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				split.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				split.SplitNum=Meth.GetLong(MethodBase.GetCurrentMethod(),split);
 				return split.SplitNum;
