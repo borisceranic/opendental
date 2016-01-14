@@ -570,7 +570,9 @@ namespace OpenDental{
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.TaskNoteEdit);
 					node.Nodes.Add(node2);
-				treePermissions.Nodes.Add(node);
+				node2=SetNode(Permissions.TaskListCreate);
+					node.Nodes.Add(node2);
+			treePermissions.Nodes.Add(node);
 			node=SetNode(Permissions.AppointmentsModule);
 				node2=SetNode(Permissions.AppointmentCreate);
 					node.Nodes.Add(node2);

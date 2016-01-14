@@ -12467,6 +12467,23 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				#endregion Security Timestamp Tables (grouped by table instead of by column)
+				//Add TaskListCreate permission to everyone
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				table = Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(DataRow row in table.Rows) {
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							 +"VALUES("+POut.Long(PIn.Long(row["UserGroupNum"].ToString()))+",105)";  //TaskListCreate
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(DataRow row in table.Rows) {
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) VALUES("
+							 +"(SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(PIn.Long(row["UserGroupNum"].ToString()))+",105)";  //TaskListCreate
+						Db.NonQ(command);
+					}
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";

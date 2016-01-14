@@ -295,6 +295,7 @@ namespace OpenDentBusiness{
 				//case Permissions.MedicationMerge:
 				//case Permissions.AccountQuickCharge:
 				//case Permissions.ClaimSend:
+				//case Permissions.TaskListCreate:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -462,6 +463,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Sheet Edit");
 				case Permissions.TaskEdit:
 					return Lans.g("enumPermissions","Task Edit");
+				case Permissions.TaskListCreate:
+					return Lans.g("enumPermissions","TaskList Create");
 				case Permissions.TaskNoteEdit:
 					return Lans.g("enumPermissions","Task Note Edit");
 				case Permissions.TimecardDeleteEntry:

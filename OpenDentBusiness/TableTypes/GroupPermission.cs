@@ -240,7 +240,9 @@ namespace OpenDentBusiness{
 		///<summary>103- Allow users to use the Quick Add tool in the Account module.</summary>
 		AccountProcsQuickAdd,
 		///<summary>104- Allow users to send claims.</summary>
-		ClaimSend
+		ClaimSend,
+		///<summary>105- Allow users to create new task lists.</summary>
+		TaskListCreate
 	}
 
 	

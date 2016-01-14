@@ -300,6 +300,7 @@ namespace OpenDental{
 			try{
 				if(IsNew) {
 					TaskLists.Insert(Cur);
+					SecurityLogs.MakeLogEntry(Permissions.TaskListCreate,0,Cur.Descript+" "+Lan.g(this,"added"));
 				}
 				else {
 					TaskLists.Update(Cur);

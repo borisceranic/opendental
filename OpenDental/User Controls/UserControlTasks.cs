@@ -655,6 +655,9 @@ namespace OpenDental {
 		}
 
 		private void AddList_Clicked() {
+			if(!Security.IsAuthorized(Permissions.TaskListCreate,false)) {
+				return;
+			}
 			if(tabContr.SelectedTab==tabUser && TreeHistory.Count==0) {//trunk of user tab
 				MsgBox.Show(this,"Not allowed to add a task list to the trunk of the user tab.  Either use the subscription feature, or add it to a child list.");
 				return;
