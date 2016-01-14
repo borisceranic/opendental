@@ -72,7 +72,7 @@ namespace OpenDental {
 					//	continue;
 					//}
 					transCheck=XChargeTransactions.GetOneByBatchItem(trans.BatchNum,trans.ItemNum);
-					if(transCheck!=null && trans.Result!="AP DUPE") {
+					if(transCheck!=null && trans.Result!="AP DUPE" && trans.TransType!="CCVoid") {
 						XChargeTransactions.Delete(transCheck.XChargeTransactionNum);
 						XChargeTransactions.Insert(trans);
 					}
@@ -115,7 +115,7 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query="SET @pos=0; "
-				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt,PayType "
+				+"SELECT @pos:=@pos+1 AS 'Count',patient.PatNum,LName,FName,DateEntry,PayDate,PayNote,PayAmt "
 				+"FROM patient INNER JOIN payment ON payment.PatNum=patient.PatNum "
 				+"INNER JOIN ("
 					+"SELECT ClinicNum,PropertyValue AS PaymentType FROM programproperty "
