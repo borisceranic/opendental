@@ -110,8 +110,6 @@ namespace OpenDental{
 		private Label label14;
 		private Label label15;
 		private Label label16;
-		private OpenDental.UI.Button butClearSig;
-		private OpenDental.UI.SignatureBox sigBox;
 		private List <Benefit> BenefitList;
 		private bool SigChanged;
 		private ComboBox comboProvNum;
@@ -150,9 +148,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butM;
 		private OpenDental.UI.Button butV;
 		private OpenDental.UI.Button butOI;
-		private OpenDental.UI.Button butTopazSign;
-		private Label labelInvalidSig;
-		private Control sigBoxTopaz;
     //private bool allowTopaz;
 		private OpenDental.UI.Button butPickSite;
 		private TextBox textSite;
@@ -269,6 +264,7 @@ namespace OpenDental{
 		private ODGrid gridAdj;
 		private ODGrid gridPay;
 		private long _provNumOrderingSelected;
+		private SignatureBoxWrapper signatureBoxWrapper;
 		private bool _isQuickAdd=false;
 		
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
@@ -283,26 +279,6 @@ namespace OpenDental{
 			//LoopList=null;
 			InitializeComponent();
 			Lan.F(this);
-			//allowTopaz=(Environment.OSVersion.Platform!=PlatformID.Unix && !CodeBase.ODEnvironment.Is64BitOperatingSystem());
-			sigBox.SetTabletState(1);
-			//if(!allowTopaz) {
-			//	butTopazSign.Visible=false;
-			//	sigBox.Visible=true;
-			//}
-			//else{
-				//Add signature box for Topaz signatures.
-				sigBoxTopaz=CodeBase.TopazWrapper.GetTopaz();
-				sigBoxTopaz.Location=sigBox.Location;//this puts both boxes in the same spot.
-				sigBoxTopaz.Name="sigBoxTopaz";
-				sigBoxTopaz.Size=new System.Drawing.Size(362,79);
-				sigBoxTopaz.TabIndex=92;
-				sigBoxTopaz.Text="sigPlusNET1";
-				sigBoxTopaz.Visible=false;
-				sigBoxTopaz.Leave+=new EventHandler(sigBoxTopaz_Leave);
-				Controls.Add(sigBoxTopaz);
-				//It starts out accepting input. It will be set to 0 if a sig is already present.  It will be set back to 1 if note changes or if user clicks Clear.
-				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,1);
-			//}
 			if(!PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance)) {
 				tabControl.TabPages.Remove(tabPageMedical);
 				//groupMedical.Visible=false;
@@ -421,7 +397,6 @@ namespace OpenDental{
 			this.comboBillingTypeOne = new System.Windows.Forms.ComboBox();
 			this.labelBillingTypeOne = new System.Windows.Forms.Label();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.labelInvalidSig = new System.Windows.Forms.Label();
 			this.textSite = new System.Windows.Forms.TextBox();
 			this.labelSite = new System.Windows.Forms.Label();
 			this.checkHideGraphics = new System.Windows.Forms.CheckBox();
@@ -513,16 +488,14 @@ namespace OpenDental{
 			this.textClaimNote = new OpenDental.ODtextBox();
 			this.butReferral = new OpenDental.UI.Button();
 			this.butPickProv = new OpenDental.UI.Button();
-			this.butTopazSign = new OpenDental.UI.Button();
 			this.buttonUseAutoNote = new OpenDental.UI.Button();
-			this.sigBox = new OpenDental.UI.SignatureBox();
-			this.butClearSig = new OpenDental.UI.Button();
 			this.textNotes = new OpenDental.ODtextBox();
 			this.butSetComplete = new OpenDental.UI.Button();
 			this.butEditAnyway = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.signatureBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
 			this.groupQuadrant.SuspendLayout();
 			this.groupArch.SuspendLayout();
 			this.panelSurfaces.SuspendLayout();
@@ -1561,17 +1534,6 @@ namespace OpenDental{
 			this.labelBillingTypeOne.TabIndex = 105;
 			this.labelBillingTypeOne.Text = "Billing Type 1";
 			this.labelBillingTypeOne.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// labelInvalidSig
-			// 
-			this.labelInvalidSig.BackColor = System.Drawing.SystemColors.Window;
-			this.labelInvalidSig.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelInvalidSig.Location = new System.Drawing.Point(589, 337);
-			this.labelInvalidSig.Name = "labelInvalidSig";
-			this.labelInvalidSig.Size = new System.Drawing.Size(196, 59);
-			this.labelInvalidSig.TabIndex = 109;
-			this.labelInvalidSig.Text = "Invalid Signature -  Note or user has changed since it was signed.";
-			this.labelInvalidSig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// textSite
 			// 
@@ -2647,21 +2609,6 @@ namespace OpenDental{
 			this.butPickProv.Text = "...";
 			this.butPickProv.Click += new System.EventHandler(this.butPickProv_Click);
 			// 
-			// butTopazSign
-			// 
-			this.butTopazSign.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTopazSign.Autosize = true;
-			this.butTopazSign.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTopazSign.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTopazSign.CornerRadius = 4F;
-			this.butTopazSign.Location = new System.Drawing.Point(873, 356);
-			this.butTopazSign.Name = "butTopazSign";
-			this.butTopazSign.Size = new System.Drawing.Size(81, 24);
-			this.butTopazSign.TabIndex = 108;
-			this.butTopazSign.Text = "Sign Topaz";
-			this.butTopazSign.UseVisualStyleBackColor = true;
-			this.butTopazSign.Click += new System.EventHandler(this.butTopazSign_Click);
-			// 
 			// buttonUseAutoNote
 			// 
 			this.buttonUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -2675,28 +2622,6 @@ namespace OpenDental{
 			this.buttonUseAutoNote.TabIndex = 106;
 			this.buttonUseAutoNote.Text = "Auto Note";
 			this.buttonUseAutoNote.Click += new System.EventHandler(this.buttonUseAutoNote_Click);
-			// 
-			// sigBox
-			// 
-			this.sigBox.Location = new System.Drawing.Point(505, 325);
-			this.sigBox.Name = "sigBox";
-			this.sigBox.Size = new System.Drawing.Size(362, 79);
-			this.sigBox.TabIndex = 86;
-			this.sigBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sigBox_MouseUp);
-			// 
-			// butClearSig
-			// 
-			this.butClearSig.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClearSig.Autosize = true;
-			this.butClearSig.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClearSig.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClearSig.CornerRadius = 4F;
-			this.butClearSig.Location = new System.Drawing.Point(873, 325);
-			this.butClearSig.Name = "butClearSig";
-			this.butClearSig.Size = new System.Drawing.Size(81, 24);
-			this.butClearSig.TabIndex = 85;
-			this.butClearSig.Text = "Clear Sig";
-			this.butClearSig.Click += new System.EventHandler(this.butClearSig_Click);
 			// 
 			// textNotes
 			// 
@@ -2790,10 +2715,20 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// signatureBoxWrapper
+			// 
+			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.signatureBoxWrapper.Location = new System.Drawing.Point(505, 325);
+			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
+			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
+			this.signatureBoxWrapper.TabIndex = 181;
+			this.signatureBoxWrapper.SignatureChanged += new System.EventHandler(this.signatureBoxWrapper_SignatureChanged);
+			// 
 			// FormProcEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(962, 696);
+			this.Controls.Add(this.signatureBoxWrapper);
 			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.butLock);
 			this.Controls.Add(this.butInvalidate);
@@ -2809,8 +2744,6 @@ namespace OpenDental{
 			this.Controls.Add(this.comboProvNum);
 			this.Controls.Add(this.checkHideGraphics);
 			this.Controls.Add(this.butPickProv);
-			this.Controls.Add(this.labelInvalidSig);
-			this.Controls.Add(this.butTopazSign);
 			this.Controls.Add(this.buttonUseAutoNote);
 			this.Controls.Add(this.textUser);
 			this.Controls.Add(this.comboDx);
@@ -2820,8 +2753,6 @@ namespace OpenDental{
 			this.Controls.Add(this.labelPriority);
 			this.Controls.Add(this.labelDx);
 			this.Controls.Add(this.label9);
-			this.Controls.Add(this.sigBox);
-			this.Controls.Add(this.butClearSig);
 			this.Controls.Add(this.groupProsth);
 			this.Controls.Add(this.textNotes);
 			this.Controls.Add(this.label16);
@@ -3120,14 +3051,6 @@ namespace OpenDental{
 			}
 		}
 
-		private void sigBoxTopaz_Leave(object sender,EventArgs e) {
-			//If the Topaz state does not get set to 0 before trying to accept input again (e.g. from another Topaz object), BSB Topaz signature pads 
-			//	will not be able to accept input from a new Topaz signature box instance.
-			//E.g. launching FormProcNoteAppend causes two Topaz signature boxes to be present.
-			if(CodeBase.TopazWrapper.GetTopazState(sigBoxTopaz)==1) {//if accepting input.
-				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
-			}
-		}
 
 		///<summary>ONLY run on startup. Fills the basic controls, except not the ones in the upper left panel which are handled in SetControlsUpperLeft.</summary>
 		private void FillControlsOnStartup(){
@@ -3354,69 +3277,8 @@ namespace OpenDental{
 			}
 			textClaimNote.Text=ProcCur.ClaimNote;
 			textUser.Text=Userods.GetName(ProcCur.UserNum);//might be blank. Will change automatically if user changes note or alters sig.
-			labelInvalidSig.Visible=false;
-			sigBox.Visible=true;
-			if(ProcCur.SigIsTopaz) {
-				if(ProcCur.Signature!="") {
-					//if(allowTopaz){
-					sigBox.Visible=false;
-					sigBoxTopaz.Visible=true;
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,ProcCur.Signature);
-					//older notes may have been signed with zeros due to a bug.  We still want to show the sig in that case.
-					//but if a sig is not showing, then set the key string to try to get it to show.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,ProcCur.Note+ProcCur.UserNum.ToString());
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,ProcCur.Signature);
-					}
-					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,ProcCur.Signature);
-					}
-					//if still not showing, then it must be invalid
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						labelInvalidSig.Visible=true;
-					}
-					CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,0);
-					//}
-				}
-			}
-			else {
-				if(ProcCur.Signature!=null && ProcCur.Signature!="") {
-					sigBox.Visible=true;
-					if(sigBoxTopaz!=null) {
-						sigBoxTopaz.Visible=false;
-					}
-					sigBox.ClearTablet();
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString("0000000000000000");
-					//Note.Replace("\r\n","\n") will only revert the changes Middle Tier made to the note back it's original form, which would invalidate this signature. No effect when not using Middle Tier.
-					sigBox.SetAutoKeyData(ProcCur.Note.Replace("\r\n","\n")+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);//high encryption
-					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(ProcCur.Signature);
-					if(sigBox.NumberOfTabletPoints()==0) {  //Signature invalid.
-						//At this point we think the signature is invalid.  We must now recheck signature without replacing \r\n with \n.  This is because old 
-						//	signatures were captured with \r\n instead of \n, and updating to a newer version would invalidate all valid signatures.
-						sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-						sigBox.SetSigString(ProcCur.Signature);
-						if(sigBox.NumberOfTabletPoints()==0) {  //Both signature checks were invalid.
-							labelInvalidSig.Visible=true;
-						}
-						else { //The first signature check was invalid, but the second was valid.
-							labelInvalidSig.Visible=false;
-						}
-					}
-					sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
-				}
-			}
+			string keyData=GetSignatureKey();
+			signatureBoxWrapper.FillSignature(ProcCur.SigIsTopaz,keyData,ProcCur.Signature);
 			if(Programs.UsingOrion) {//panelOrion.Visible) {
 				comboDPC.Items.Clear();
 				//comboDPC.Items.AddRange(Enum.GetNames(typeof(OrionDPC)));
@@ -3498,6 +3360,12 @@ namespace OpenDental{
 					textDateStop.Text="";
 				}
 			}
+		}
+
+		private string GetSignatureKey() {
+			string keyData=ProcCur.Note;
+			keyData+=ProcCur.UserNum.ToString();
+			return keyData;
 		}
 
 		private void SetSurfButtons(){
@@ -4366,15 +4234,8 @@ namespace OpenDental{
 			if(!IsStartingUp//so this happens only if user changes the note
 				&& !SigChanged)//and the original signature is still showing.
 			{
-				sigBox.ClearTablet();
-				//if(allowTopaz){
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					sigBoxTopaz.Visible=false;//until user explicitly starts it.
-				//}
-				sigBox.SetTabletState(1);//on-screen box is now accepting input.
-				SigChanged=true;
-				ProcCur.UserNum=Security.CurUser.UserNum;
-				textUser.Text=Userods.GetName(ProcCur.UserNum);
+				signatureBoxWrapper.ClearSignature();
+				//this will call OnSignatureChanged to set UserNum, textUser, and SigChanged
 			}
 		}
 
@@ -4404,45 +4265,10 @@ namespace OpenDental{
 			textNotes.Select(index,searchText.Length);
 		}
 
-		private void butClearSig_Click(object sender,EventArgs e) {
-			sigBox.ClearTablet();
-			sigBox.Visible=true;
-			//if(allowTopaz) {
-				CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-				sigBoxTopaz.Visible=false;//until user explicitly starts it.
-			//}
-			sigBox.SetTabletState(1);//on-screen box is now accepting input.
+		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
 			SigChanged=true;
-			labelInvalidSig.Visible=false;
 			ProcCur.UserNum=Security.CurUser.UserNum;
 			textUser.Text=Userods.GetName(ProcCur.UserNum);
-		}
-
-		private void butTopazSign_Click(object sender,EventArgs e) {
-			sigBox.Visible=false;
-			sigBoxTopaz.Visible=true;
-			sigBoxTopaz.Focus();//If the Topaz signature box does not have focus, the leave event will not work correctly.
-			//if(allowTopaz){
-				CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz); 
-				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-				CodeBase.TopazWrapper.SetTopazState(sigBoxTopaz,1);
-			//}
-			SigChanged=true;
-			labelInvalidSig.Visible=false;
-			ProcCur.UserNum=Security.CurUser.UserNum;
-			textUser.Text=Userods.GetName(ProcCur.UserNum);
-		}
-
-		private void sigBox_MouseUp(object sender,MouseEventArgs e) {
-			//this is done on mouse up so that the initial pen capture won't be delayed.
-			if(sigBox.GetTabletState()==1//if accepting input.
-				&& !SigChanged)//and sig not changed yet
-			{
-				//sigBox handles its own pen input.
-				SigChanged=true;
-				ProcCur.UserNum=Security.CurUser.UserNum;
-				textUser.Text=Userods.GetName(ProcCur.UserNum);
-			}
 		}
 
 		private void buttonUseAutoNote_Click(object sender,EventArgs e) {
@@ -5852,36 +5678,9 @@ namespace OpenDental{
 
 		private void SaveSignature(){
 			if(SigChanged){
-				//Topaz boxes are written in Windows native code.
-				//if(allowTopaz && sigBoxTopaz.Visible){
-				if(sigBoxTopaz.Visible){
-					ProcCur.SigIsTopaz=true;
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0){
-						ProcCur.Signature="";
-						return;
-					}
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
-					CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,ProcCur.Note+ProcCur.UserNum.ToString());
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);
-					ProcCur.Signature=CodeBase.TopazWrapper.GetTopazString(sigBoxTopaz);
-				}
-				else{
-					ProcCur.SigIsTopaz=false;
-					if(sigBox.NumberOfTabletPoints()==0) {
-						ProcCur.Signature="";
-						return;
-					}
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString("0000000000000000");
-					sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);
-					//sigBox.SetSigCompressionMode(2);
-					ProcCur.Signature=sigBox.GetSigString();
-				}
+				string keyData=GetSignatureKey();
+				ProcCur.Signature=signatureBoxWrapper.GetSignature(keyData);
+				ProcCur.SigIsTopaz=signatureBoxWrapper.GetSigIsTopaz();
 			}
 		}
 

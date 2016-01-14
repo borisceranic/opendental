@@ -263,8 +263,10 @@ namespace OpenDental {
 					continue;
 				}
 				if(SheetCur.SheetType==SheetTypeEnum.TreatmentPlan) {
-					FillSigBoxTpHelper(SheetCur,field);
-					continue;
+					//==TG 01/12/2016: Removed helper function here after conversation with Ryan.  We never fill any signature boxes for treatment plans in this
+					//form.  It is done in FormTPsign, or printed in SheetPrinting.
+					MsgBox.Show(this,"Treatment Plan Signatures not currently supported in FormSheetFillEdit.  Contact Support.");
+					break;
 				}
 				OpenDental.UI.SignatureBoxWrapper sigBox=new OpenDental.UI.SignatureBoxWrapper();
 				sigBox.Location=new Point(field.XPos,field.YPos);
@@ -284,68 +286,6 @@ namespace OpenDental {
 				sigBox.TabIndex=field.TabOrder;
 				panelMain.Controls.Add(sigBox);
 				sigBox.BringToFront();
-			}
-		}
-
-		private void FillSigBoxTpHelper(Sheet sheet, SheetField field) {
-			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
-			if(treatPlan.SigIsTopaz) {
-				if(treatPlan.Signature!="") {
-					Control sigBoxTopaz=new Control("sigPlusNET1",field.XPos,field.YPos,field.Width,field.Height);
-					sigBoxTopaz.Name="sigBoxTopaz";
-					sigBoxTopaz.Enabled=false;//cannot edit TP signatures from here.
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					string keystring=TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
-					panelMain.Controls.Add(sigBoxTopaz);
-					sigBoxTopaz.BringToFront();
-					sigBoxTopaz.Refresh();
-					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
-					}
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						Label invalidSignature=new Label();
-						invalidSignature.Location=sigBoxTopaz.Location;
-						invalidSignature.Size=sigBoxTopaz.Size;
-						invalidSignature.Text=Lan.g("sigPlusNet1","Invalid Signature");
-						panelMain.Controls.Add(invalidSignature);
-					}
-				}
-			}
-			else {
-				SignatureBox sigBox= new OpenDental.UI.SignatureBox();
-				sigBox.Location=new Point(field.XPos,field.YPos);
-				sigBox.Width=field.Width;
-				sigBox.Height=field.Height;
-				sigBox.Enabled=false;
-				if(treatPlan.Signature!="") {
-					sigBox.Visible=true;
-					sigBox.ClearTablet();
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString(TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs));
-					//"0000000000000000");
-					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);//high encryption
-					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(treatPlan.Signature);
-					panelMain.Controls.Add(sigBox);
-					sigBox.BringToFront();
-					if(sigBox.NumberOfTabletPoints()==0) {
-						Label invalidSignature=new Label();
-						invalidSignature.Location=sigBox.Location;
-						invalidSignature.Size=sigBox.Size;
-						invalidSignature.Text=Lan.g("sigPlusNet1","Invalid Signature");
-						panelMain.Controls.Add(invalidSignature);
-					}
-				}
 			}
 		}
 

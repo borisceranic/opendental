@@ -93,25 +93,36 @@ namespace OpenDentBusiness{
  			Db.NonQ(command);
 		}
 
-		public static string GetHashString(TreatPlan tp,List<ProcTP> proclist) {
+		///<summary>Gets the hashstring for generating signatures.
+		///Should only be used when saving signatures, for validating see GetKeyDataForSignatureHash() and GetHashStringForSignature()</summary>
+		public static string GetKeyDataForSignatureSaving(TreatPlan tp,List<ProcTP> proclist) {
+			string keyData = GetKeyDataForSignatureHash(tp,proclist);
+			return GetHashStringForSignature(keyData);
+		}
+
+		///<summary>Gets the key data string needed to create a hashstring to be used later when filling the signature.
+		///This is done seperate of the hashing so that new line replacements can be done when validating signatures before hashing.</summary>
+		public static string GetKeyDataForSignatureHash(TreatPlan tp,List<ProcTP> proclist) {
 			//No need to check RemotingRole; no call to db.
 			//the key data is a concatenation of the following:
 			//tp: Note, DateTP
 			//each proctp: Descript,PatAmt
 			//The procedures MUST be in the correct order, and we'll use ItemOrder to order them.
-			StringBuilder strb=new StringBuilder();
+			StringBuilder strb = new StringBuilder();
 			strb.Append(tp.Note);
 			strb.Append(tp.DateTP.ToString("yyyyMMdd"));
-			for(int i=0;i<proclist.Count;i++){
+			for(int i = 0;i<proclist.Count;i++) {
 				strb.Append(proclist[i].Descript);
 				strb.Append(proclist[i].PatAmt.ToString("F2"));
 			}
-			byte[] textbytes=Encoding.UTF8.GetBytes(strb.ToString());
-			//byte[] filebytes = GetBytes(doc);
-			//int fileLength = filebytes.Length;
-			//byte[] buffer = new byte[textbytes.Length + filebytes.Length];
-			//Array.Clone(filebytes,0,buffer,0,fileLength);
-			//Array.Clone(textbytes,0,buffer,fileLength,textbytes.Length);
+			return strb.ToString();
+		}
+
+		///<summary>Gets the hashstring from the provided string that is typically generated from GetStringForSignatureHash().
+		///This is done seperate of building the string so that new line replacements can be done when validating signatures before hashing.</summary>
+		public static string GetHashStringForSignature(string str) {
+			//No need to check RemotingRole; no call to db.
+			byte[] textbytes = Encoding.UTF8.GetBytes(str);
 			HashAlgorithm algorithm = MD5.Create();
 			byte[] hash = algorithm.ComputeHash(textbytes);//always results in length of 16.
 			return Encoding.ASCII.GetString(hash);

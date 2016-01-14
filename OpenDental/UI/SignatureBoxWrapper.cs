@@ -16,6 +16,8 @@ namespace OpenDental.UI {
 		///<summary>The reason for this event is so that if a different user is signing, that it properly records the change in users.  See the example pattern in FormProcGroup.</summary>
 		[Category("Action"),Description("Event raised when signature is cleared or altered.")]
 		public event EventHandler SignatureChanged=null;
+		///<summary>Used for special cases where signature logic varies from our default.</summary>
+		public SigMode SignatureMode=SigMode.Default;
 
 		[Category("Property"),Description("Set the text that shows in the invalid signature label"),DefaultValue("Invalid Signature")]
 		///<summary>Usually "Invalid Signature", but this can be changed for different situations.</summary>
@@ -28,7 +30,10 @@ namespace OpenDental.UI {
 			}
 		}
 
-		///<summary>A new Width property with local scope to SignatureBoxWrapper.  Sets the width of this control as well as the width of the topaz signature control.</summary>
+		///<summary>A new Width property with local scope to SignatureBoxWrapper.  
+		///Sets the width of this control as well as the width of the topaz signature control.
+		///This is necessary because resizing the SigBoxWrapper will cause the sigBox control (via anchors) to resize.
+		///sigBoxTopaz should always be the same size as sigBox.</summary>
 		public new int Width {
 			get {
 				return base.Width;
@@ -41,7 +46,10 @@ namespace OpenDental.UI {
 			}
 		}
 
-		///<summary>A new Height property with local scope to SignatureBoxWrapper.  Set the height of this control as well as the width of the topaz signature control.</summary>
+		///<summary>A new Height property with local scope to SignatureBoxWrapper.  
+		///Set the height of this control as well as the width of the topaz signature control.
+		///This is necessary because resizing the SigBoxWrapper will cause the sigBox control (via anchors) to resize.
+		///sigBoxTopaz should always be the same size as sigBox.</summary>
 		public new int Height {
 			get {
 				return base.Height;
@@ -97,6 +105,7 @@ namespace OpenDental.UI {
 			//Check 2:  Normal keydata.  This is for cases that had "\r\n" as the original note.  These are keydata that were captured with a textbox.
 			//Check 3:  keyData.Replace("\r\n","\n").Replace("\n","\r\n").  This is for cases where the original note was captured with a textbox, and then
 			//					was filled into an ODTextBox(richtextbox) and the "\r\n" was changed to "\n" then the user clicked ok changing the note.
+			//Note that if the keydata was hashed before this point, these replacements have to be dealt with outside of this function.
 			if(sigIsTopaz) {
 				FillSignatureHelperTopaz(keyData.Replace("\r\n","\n"),signature);
 				if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
@@ -124,20 +133,44 @@ namespace OpenDental.UI {
 			CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
 			CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
 			CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-			CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
-			CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-			CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
-			CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
-			//older items may have been signed with zeros due to a bug.  We still want to show the sig in that case.
-			//but if a sig is not showing, then set the key string to try to get it to show.
-			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-				CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
-				CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
-			}
-			//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-				CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+			//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
+			switch(SignatureMode) {
+				case SigMode.Document:
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keyData);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					break;
+				case SigMode.TreatPlan:
+					string hashedKeyData= OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,hashedKeyData);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					sigBoxTopaz.Refresh();
+					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					}
+					break;
+				case SigMode.Default:
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					//older items may have been signed with zeros due to a bug.  We still want to show the sig in that case.
+					//but if a sig is not showing, then set the key string to try to get it to show.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					}
+					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					}
+					break;
 			}
 			//If sig still not showing it must be invalid.
 			if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
@@ -153,8 +186,22 @@ namespace OpenDental.UI {
 			sigBox.ClearTablet();
 			//sigBox.SetSigCompressionMode(0);
 			//sigBox.SetEncryptionMode(0);
-			sigBox.SetKeyString("0000000000000000");
-			sigBox.SetAutoKeyData(keyData);
+			//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
+			switch(SignatureMode) {
+				case SigMode.Document:
+					//No auto key data set, only key string.
+					sigBox.SetKeyString(keyData);
+					break;
+				case SigMode.TreatPlan:
+					string hashedKeyData = OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					//No auto key data set, only key string.
+					sigBox.SetKeyString(hashedKeyData);
+					break;
+				case SigMode.Default:
+					sigBox.SetKeyString("0000000000000000");
+					sigBox.SetAutoKeyData(keyData);
+					break;
+			}
 			//sigBox.SetEncryptionMode(2);//high encryption
 			//sigBox.SetSigCompressionMode(2);//high compression
 			sigBox.SetSigString(signature);
@@ -162,6 +209,13 @@ namespace OpenDental.UI {
 				labelInvalidSig.Visible=true;
 			}
 			sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
+		}
+
+		public int GetNumberOfTabletPoints(bool sigIsTopaz) {
+			if(sigIsTopaz) {
+				return CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz);
+			}
+			return sigBox.NumberOfTabletPoints();
 		}
 
 		///<summary>This can be used to determine whether the signature has changed since the control was created.  It is, however, preferrable to have the parent form use the SignatureChanged event to track changes.</summary>
@@ -229,8 +283,18 @@ namespace OpenDental.UI {
 				}
 				CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
 				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-				CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
-				CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
+				//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
+				switch(SignatureMode) {
+					case SigMode.Document:
+					case SigMode.TreatPlan:
+						//No auto key data set, only key string.
+						CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keyData);
+						break;
+					case SigMode.Default:
+						CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,"0000000000000000");
+						CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,keyData);
+						break;
+				}
 				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);
 				CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);
 				return CodeBase.TopazWrapper.GetTopazString(sigBoxTopaz);
@@ -242,8 +306,18 @@ namespace OpenDental.UI {
 				}
 				//sigBox.SetSigCompressionMode(0);
 				//sigBox.SetEncryptionMode(0);
-				sigBox.SetKeyString("0000000000000000");
-				sigBox.SetAutoKeyData(keyData);
+				//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
+				switch(SignatureMode) {
+					case SigMode.Document:
+					case SigMode.TreatPlan:
+						//No auto key data set, only key string.
+						sigBox.SetKeyString(keyData);
+						break;
+					case SigMode.Default:
+						sigBox.SetKeyString("0000000000000000");
+						sigBox.SetAutoKeyData(keyData);
+						break;
+				}
 				//sigBox.SetEncryptionMode(2);
 				//sigBox.SetSigCompressionMode(2);
 				return sigBox.GetSigString();
@@ -325,5 +399,14 @@ namespace OpenDental.UI {
 
 
 
+		///<summary></summary>
+		public enum SigMode {
+			///<summary>Default case</summary>
+			Default,
+			///<summary>Signatures used for documents in the Images module.</summary>
+			Document,
+			///<summary>Signatures used for treatment plans.</summary>
+			TreatPlan
+		}
 	}
 }

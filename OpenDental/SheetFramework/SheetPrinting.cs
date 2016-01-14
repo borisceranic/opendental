@@ -1360,54 +1360,13 @@ namespace OpenDental {
 
 		private static Bitmap GetSigTPHelper(Sheet sheet,SheetField field) {
 			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
-			if(treatPlan.SigIsTopaz) {
-				if(treatPlan.Signature!="") {
-					Control sigBoxTopaz=new Control("sigPlusNET1",field.XPos,field.YPos,362,79);//sized to the FormTPSign sigbox control size.
-					sigBoxTopaz.Name="sigBoxTopaz";
-					sigBoxTopaz.Enabled=false;//cannot edit TP signatures from here.
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
-					string keystring=TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
-					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,treatPlan.Signature);
-					}
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						return new Bitmap(field.Width,field.Height);
-					}
-					SignatureBoxWrapper sbw=new SignatureBoxWrapper(){Width=362,Height=79};
-					sbw.SetControlSigBoxTopaz(sigBoxTopaz);
-					return sbw.GetSigImage();
-				}
-			}
-			else {
-				SignatureBox sigBox= new OpenDental.UI.SignatureBox();
-				sigBox.Location=new Point(field.XPos,field.YPos);
-				sigBox.Width=362;
-				sigBox.Height=79;
-				sigBox.Enabled=false;
-				if(treatPlan.Signature!="") {
-					sigBox.Visible=true;
-					sigBox.ClearTablet();
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString(TreatPlans.GetHashString(treatPlan,treatPlan.ListProcTPs));
-					//"0000000000000000");
-					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);//high encryption
-					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(treatPlan.Signature);
-					//panelMain.Controls.Add(sigBox);
-					//sigBox.BringToFront();
-					if(sigBox.NumberOfTabletPoints()!=0) {
-						return new Bitmap(sigBox.GetSigImage(true));
-					}
+			if(treatPlan.Signature!="") {
+				SignatureBoxWrapper sigBoxWrapper=new SignatureBoxWrapper();
+				sigBoxWrapper.SignatureMode=SignatureBoxWrapper.SigMode.TreatPlan;
+				string keyData=TreatPlans.GetKeyDataForSignatureHash(treatPlan,treatPlan.ListProcTPs);
+				sigBoxWrapper.FillSignature(treatPlan.SigIsTopaz,keyData,treatPlan.Signature);
+				if(sigBoxWrapper.GetNumberOfTabletPoints(treatPlan.SigIsTopaz)!=0) {
+					return sigBoxWrapper.GetSigImage();
 				}
 			}
 			return new Bitmap(field.Width,field.Height);
