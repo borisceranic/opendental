@@ -141,6 +141,11 @@ namespace xCrudGenerator {
 			return false;
 		}
 
+		///<summary></summary>
+		public static bool IsSecurityStamped(Type typeClass) {
+			return typeClass.GetCustomAttributes(typeof(CrudTableAttribute),true).Any(x => ((CrudTableAttribute)x).IsSecurityStamped);
+		}
+
 		///<summary>Returns a bitwise enum that represents all permissions used by the security log FKey column for the class passed in.</summary>
 		public static CrudAuditPerm GetCrudAuditPermForClass(Type typeClass) {
 			object[] attributes=typeClass.GetCustomAttributes(typeof(CrudTableAttribute),true);

@@ -867,13 +867,13 @@ using System.Drawing;"+rn);
 						strb.Append(" \"+POut.Time  ("+obj+"."+fieldsExceptPri[f].Name+")+\"");
 						break;
 				}
-				if(f==fieldsExceptPri.Count-2
-					&& CrudGenHelper.GetSpecialType(fieldsExceptPri[f+1])==CrudSpecialColType.TimeStamp) 
+				//If ALL the rest of the fields should be skipped, don't add comma
+				if(!fieldsExceptPri.Skip(f+1).All(x => new[] {
+					CrudSpecialColType.TimeStamp,
+					CrudSpecialColType.DateEntry,
+					CrudSpecialColType.DateTEntry,
+					CrudSpecialColType.ExcludeFromUpdate }.Contains(CrudGenHelper.GetSpecialType(x)))) 
 				{
-					//in case the last field is a timestamp
-					//strb.Append(" \"");
-				}
-				else if(f<fieldsExceptPri.Count-1) {
 					strb.Append(",");
 				}
 				strb.Append(" \"");
@@ -1057,8 +1057,15 @@ using System.Drawing;"+rn);
 			#region Sync
 			//Synch-----------------------------------------------------------------------------------------
 			if(CrudGenHelper.IsSynchable(typeClass)) {
-				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>");
-				strb.Append(rn+t2+"public static bool Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
+				strb.Append(rn+rn+t2+"///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.");
+				if(CrudGenHelper.IsSecurityStamped(typeClass)) {//sec tables that are synchable must have userNum passed in.
+					strb.Append(rn+t2+"///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.</summary>");
+					strb.Append(rn+t2+"public static bool Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB,long userNum) {");
+				}
+				else {
+					strb.Append("</summary>");
+					strb.Append(rn+t2+"public static bool Sync(List<"+typeClass.Name+"> listNew,List<"+typeClass.Name+"> listDB) {");
+				}
 				strb.Append(rn+t3+"//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listIns    =new List<"+typeClass.Name+">();");
 				strb.Append(rn+t3+"List<"+typeClass.Name+"> listUpdNew =new List<"+typeClass.Name+">();");
@@ -1111,6 +1118,10 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"//Commit changes to DB");
 				strb.Append(rn+t3+"for(int i=0;i<listIns.Count;i++) {");
+				if(CrudGenHelper.IsSecurityStamped(typeClass)) {
+					//if this table IsSecurityStamped, there is a SecUserNumEntry field that needs to be set to the userNum passed in for inserts
+					strb.Append(rn+t4+"listIns[i].SecUserNumEntry=userNum;");
+				}
 				strb.Append(rn+t4+"Insert(listIns[i]);");
 				strb.Append(rn+t3+"}");
 				strb.Append(rn+t3+"for(int i=0;i<listUpdNew.Count;i++) {");

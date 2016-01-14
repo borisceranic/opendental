@@ -14,6 +14,7 @@ namespace OpenDentBusiness {
 			this.isMobile=false;
 			this.isSynchable=false;
 			this._auditPerms=CrudAuditPerm.None;
+			this._isSecurityStamped=false;
 		}
 
 		private string tableName;
@@ -60,6 +61,15 @@ namespace OpenDentBusiness {
 			set { _auditPerms=value; }
 		}
 
+		private bool _isSecurityStamped;
+		///<summary>If IsSecurityStamped is true, the table must include the field SecUserNumEntry.
+		///<para>If IsSynchable and IsSecurityStamped are BOTH true, the Crud generator will create a Sync function that takes userNum and sets the
+		///SecUserNumEntry field before inserting.  Security.CurUser isn't accessible from the Crud due to remoting role, must be passed in.</para>
+		///<para>IsSecurityStamped is ignored if IsSynchable is false.</para></summary>
+		public bool IsSecurityStamped {
+			get { return _isSecurityStamped; }
+			set { _isSecurityStamped=value; }
+		}
 	}
 
 	///<summary>Hard coded list of all permission names that are used for securitylog.FKey.  Uses 2^n values for use in bitwise operations.
