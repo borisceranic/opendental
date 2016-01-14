@@ -868,9 +868,9 @@ namespace OpenDental {
 			#region printHeading
 			int headingPrintH=0;
 			if(!HeadingPrinted) {
-				text=Lan.g(this,"Heading Text");
+				text=Lan.g(this,"Pay Period")+": "+textDateStart.Text+" - "+textDateStop.Text+"\r\n"+Lan.g(this,"Paycheck Date")+": "+textDatePaycheck.Text;
 				g.DrawString(text,headingFont,Brushes.Black,center-g.MeasureString(text,headingFont).Width/2,y);
-				y+=25;
+				y+=50;//To move the grid down two lines to make room for the header text
 				HeadingPrinted=true;
 				headingPrintH=y;
 			}
