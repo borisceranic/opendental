@@ -112,10 +112,10 @@ namespace OpenDentBusiness{
 			List<ApptComm> listApptComms=GetAll();
 			string errorText="";
 			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.
-				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).Days > 0) {
+				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).TotalDays > 1) {//Skip if daily and not within one day of send date
 					continue;//It's not currently enough days prior to the appointment to send a reminder.
 				}
-				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).Hours > 0) {
+				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).TotalHours > 1) {//Skip if hourly and not within one hour of send date
 					continue;//It's not the correct number of hours prior to the appointment to send a reminder.
 				}
 				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 30 minutes leeway was deemed enough to 
@@ -124,7 +124,7 @@ namespace OpenDentBusiness{
 					Delete(apptComm.ApptCommNum);
 					continue;
 				}
-				//It's within the correct day interval and within the correct hour interval, time to send a reminder.
+				//It's within the correct day interval or within the correct hour interval, time to send a reminder.
 				bool sendAll=PrefC.GetBool(PrefName.ApptReminderSendAll);
 				string[] arraySendPriorities=PrefC.GetString(PrefName.ApptReminderSendOrder).Split(',');
 				Appointment appt=Appointments.GetOneApt(apptComm.ApptNum);
@@ -157,6 +157,7 @@ namespace OpenDentBusiness{
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
+#warning delete this commlog insert, maybe, a commlog is also inserted from the SendText method.
 						Commlogs.Insert(comm);
 					}
 					errorText+=textError;
