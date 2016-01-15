@@ -12484,6 +12484,51 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//UserClinic linker table.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS userclinic";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userclinic (
+						UserClinicNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNum bigint NOT NULL,
+						ClinicNum bigint NOT NULL,
+						INDEX(UserNum),
+						INDEX(ClinicNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE userclinic'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userclinic (
+						UserClinicNum number(20) NOT NULL,
+						UserNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						CONSTRAINT userclinic_UserClinicNum PRIMARY KEY (UserClinicNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userclinic_UserNum ON userclinic (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userclinic_ClinicNum ON userclinic (ClinicNum)";
+					Db.NonQ(command);
+				}
+				command="SELECT UserNum,ClinicNum,ClinicIsRestricted FROM userod";//Get all users and their default clinics
+				table=Db.GetTable(command);
+				for(int i=0;i<table.Rows.Count;i++) {//Insert a UserClinic entry for each user's default clinic.
+					//If they're restricted enter their clinic into the table.  If they're not restricted we don't care.
+					if(PIn.Bool(table.Rows[i]["ClinicIsRestricted"].ToString())) {
+						if(DataConnection.DBtype==DatabaseType.MySql) {
+							command="INSERT INTO userclinic (UserNum,ClinicNum) VALUES ("
+								+table.Rows[i]["UserNum"].ToString()+","+table.Rows[i]["ClinicNum"].ToString()+")";
+							Db.NonQ(command);
+						}
+						else {//oracle
+							command="INSERT INTO userclinic (UserClinicNum,UserNum,ClinicNum) VALUES((SELECT MAX(UserClinicNum)+1 FROM userclinic),"
+								+table.Rows[i]["UserNum"].ToString()+","+table.Rows[i]["ClinicNum"].ToString()+")";
+							Db.NonQ(command);
+						}
+					}				
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -12495,7 +12540,3 @@ namespace OpenDentBusiness {
 
 	}
 }
-
-
-
-				

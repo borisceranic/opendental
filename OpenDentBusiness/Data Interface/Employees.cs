@@ -273,7 +273,8 @@ namespace OpenDentBusiness{
 						continue;
 					}
 					//User is associated to a clinic.  Make sure it matches the clinicNum passed in before adding them to the list of results.
-					if(listUsers[j].ClinicNum==clinicNum) {
+					List<UserClinic> listUserClinics=UserClinics.GetForUser(listUsers[j].UserNum);
+					if(listUserClinics.Exists(x => x.ClinicNum==clinicNum)) {//This user has access to this clinic.  It may not be their default one.
 						if(listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
 							continue;//Employee already added to the results.
 						}

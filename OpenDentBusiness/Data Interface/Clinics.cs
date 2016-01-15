@@ -339,18 +339,15 @@ namespace OpenDentBusiness{
 			return 0;
 		}
 
-		///<summary>Returns a list of clinics the curUser has permission to access.  If the user is restricted to a clinic, the list will contain a single clinic.  If the user is not restricted, the list will contain all of the clinics.  In the future, users may be restricted to multiple clinics and this will allow the list returned to contain a subset of all clinics.</summary>
+		///<summary>Returns a list of clinics the curUser has permission to access.  If the user is not restricted, the list will contain all of the clinics.</summary>
 		public static List<Clinic> GetForUserod(Userod curUser) {
-			List<Clinic> listClinics=new List<Clinic>();
-			//user is restricted to a single clinic, so return a list with only that clinic in it
-			if(curUser.ClinicIsRestricted && curUser.ClinicNum>0) {//for now a user can only be restricted to a single clinic, but in the future we will likely allow users to be restricted to more than one clinic
-				listClinics.Add(GetClinic(curUser.ClinicNum));
-				return listClinics;
+			List<Clinic> listClinics=GetList().ToList();
+			if(curUser.ClinicIsRestricted && curUser.ClinicNum!=0) {//User is restricted, return clinics the person has permission for.
+				List<UserClinic> listUserClinics=UserClinics.GetForUser(curUser.UserNum);
+				//Find all clinics that there is a UserClinic entry for.
+				return listClinics.FindAll(x => listUserClinics.Exists(y => y.ClinicNum==x.ClinicNum)).ToList();
 			}
-			Clinic[] arrayClinics=GetList();
-			for(int i=0;i<arrayClinics.Length;i++) {
-				listClinics.Add(arrayClinics[i].Copy());
-			}
+			//User is not restricted, return all clinics.
 			return listClinics;
 		}
 

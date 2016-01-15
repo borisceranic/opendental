@@ -342,7 +342,10 @@ namespace OpenDentBusiness{
 				if(prov==null) {
 					continue;
 				}
-				if(clinicNum > 0 && listUsersShort[i].ClinicNum!=clinicNum) {//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
+				List<UserClinic> listUserClinics=UserClinics.GetForUser(listUsersShort[i].UserNum);
+				//If filtering by a specific clinic, make sure the clinic matches the clinic passed in.
+				//If the user is associated to multiple clinics we check to make sure one of them isn't the clinic in question.
+				if(clinicNum > 0 && !listUserClinics.Exists(x => x.ClinicNum==clinicNum)) {
 					continue;
 				}
 				if(listUsersShort[i].ClinicNum > 0) {//User is associated to a clinic, add the provider to the list of provs with clinics.

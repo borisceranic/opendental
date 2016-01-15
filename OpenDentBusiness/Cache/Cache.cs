@@ -260,6 +260,9 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.ToolBut) || isAll){
 				ds.Tables.Add(ToolButItems.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.UserClinics) || isAll) {
+				ds.Tables.Add(UserClinics.RefreshCache());
+			}
 			if(itypes.Contains((int)InvalidType.Vaccines) || isAll) {
 				ds.Tables.Add(VaccineDefs.RefreshCache());
 				ds.Tables.Add(DrugManufacturers.RefreshCache());
@@ -471,6 +474,9 @@ namespace OpenDentBusiness {
 			//InvalidTypes.Tasks not handled here.
 			if(itypes.Contains((int)InvalidType.ToolBut) || isAll) {
 				ToolButItems.FillCache(ds.Tables["ToolButItem"]);
+			}
+			if(itypes.Contains((int)InvalidType.UserClinics) || isAll) {
+				UserClinics.FillCache(ds.Tables["UserClinic"]);
 			}
 			if(itypes.Contains((int)InvalidType.Vaccines) || isAll) {
 				VaccineDefs.FillCache(ds.Tables["VaccineDef"]);

@@ -296,7 +296,9 @@ namespace OpenDentBusiness{
 		///<summary>65</summary>
 		RequiredFields,
 		///<summary>66</summary>
-		Ebills
+		Ebills,
+		///<summary>67</summary>
+		UserClinics
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

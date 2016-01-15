@@ -420,6 +420,7 @@
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Crud\TreatPlanAttachCrud.cs" />
+    <Compile Include="Crud\UserClinicCrud.cs" />
     <Compile Include="Data Interface\ApptComms.cs" />
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
@@ -429,7 +430,7 @@
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="InternalTools\Job Manager\BugCrud.cs" />
     <Compile Include="InternalTools\Job Manager\Bugs.cs" />
-    <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
+    <Compile Include="Data Interface\UserClinics.cs" />    <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobPermissions.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
@@ -1012,6 +1013,7 @@
     <Compile Include="TableTypes\MedLab.cs" />
     <Compile Include="TableTypes\StateAbbr.cs" />
     <Compile Include="TableTypes\TaskHist.cs" />
+    <Compile Include="TableTypes\UserClinic.cs" />
     <Compile Include="TableTypes\UserodApptView.cs" />
     <Compile Include="TableTypes\WikiListHist.cs" />
     <Compile Include="TableTypes\DispSupply.cs" />
