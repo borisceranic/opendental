@@ -348,6 +348,24 @@ namespace OpenDentBusiness
 		}
 	}
 
+	public class X12_COB {
+		///<summary>COB01</summary>
+		public string PayerResponsibilitySequenceNumberCode;
+		///<summary>COB02</summary>
+		public string ReferenceIdentification;
+		///<summary>COB03</summary>
+		public string CoordinationOfBenefitsCode;
+		///<summary>COB04</summary>
+		public string ServiceTypeCode;
+
+		public X12_COB(X12Segment seg) {
+			PayerResponsibilitySequenceNumberCode=seg.Get(1);
+			ReferenceIdentification=seg.Get(2);
+			CoordinationOfBenefitsCode=seg.Get(3);
+			ServiceTypeCode=seg.Get(4);
+		}
+	}
+
 	public class X12_DMG {
 		///<summary>DMG01</summary>
 		public string DateTimePeriodFormatQualifier;
@@ -550,6 +568,24 @@ namespace OpenDentBusiness
 			DateTimePeriod=seg.Get(12);
 			ConfidentialityCode=seg.Get(13);
 			Number=seg.Get(17);
+		}
+	}
+
+	public class X12_LE {
+		///<summary>LE01</summary>
+		public string LoopIdentifierCode;
+
+		public X12_LE(X12Segment seg) {
+			LoopIdentifierCode=seg.Get(1);
+		}
+	}
+
+	public class X12_LS {
+		///<summary>LS01</summary>
+		public string LoopIdentifierCode;
+
+		public X12_LS(X12Segment seg) {
+			LoopIdentifierCode=seg.Get(1);
 		}
 	}
 

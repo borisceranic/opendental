@@ -76,6 +76,7 @@ namespace OpenDental{
 		///<summary>This is public so that FormOpenDental can access it.</summary>
 		public FormTasks FormT;
 		public FormAccounting FormA;
+		private UI.Button butImportInsPlans;
 		private List<Employee> _listEmployees=new List<Employee>();
 
 		///<summary></summary>
@@ -142,6 +143,7 @@ namespace OpenDental{
 			this.butSendClaims = new OpenDental.UI.Button();
 			this.butTasks = new OpenDental.UI.Button();
 			this.timerSending = new System.Windows.Forms.Timer(this.components);
+			this.butImportInsPlans = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -220,6 +222,8 @@ namespace OpenDental{
 			// gridEmp
 			// 
 			this.gridEmp.AllowSelection = false;
+			this.gridEmp.HasAddButton = false;
+			this.gridEmp.HasMultilineHeaders = false;
 			this.gridEmp.HScrollVisible = false;
 			this.gridEmp.Location = new System.Drawing.Point(22, 22);
 			this.gridEmp.Name = "gridEmp";
@@ -408,6 +412,8 @@ namespace OpenDental{
 			// 
 			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMessages.HasAddButton = false;
+			this.gridMessages.HasMultilineHeaders = false;
 			this.gridMessages.HScrollVisible = false;
 			this.gridMessages.Location = new System.Drawing.Point(356, 35);
 			this.gridMessages.Name = "gridMessages";
@@ -517,6 +523,7 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.butImportInsPlans);
 			this.groupBox3.Controls.Add(this.butEmailInbox);
 			this.groupBox3.Controls.Add(this.butSupply);
 			this.groupBox3.Controls.Add(this.butClaimPay);
@@ -678,6 +685,20 @@ namespace OpenDental{
 			this.timerSending.Interval = 1000;
 			this.timerSending.Tick += new System.EventHandler(this.timerSending_Tick);
 			// 
+			// butImportInsPlans
+			// 
+			this.butImportInsPlans.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butImportInsPlans.Autosize = true;
+			this.butImportInsPlans.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butImportInsPlans.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butImportInsPlans.CornerRadius = 4F;
+			this.butImportInsPlans.Location = new System.Drawing.Point(148, 123);
+			this.butImportInsPlans.Name = "butImportInsPlans";
+			this.butImportInsPlans.Size = new System.Drawing.Size(104, 26);
+			this.butImportInsPlans.TabIndex = 29;
+			this.butImportInsPlans.Text = "Import Ins Plans";
+			this.butImportInsPlans.Click += new System.EventHandler(this.butImportInsPlans_Click);
+			// 
 			// ContrStaff
 			// 
 			this.Controls.Add(this.groupBox3);
@@ -769,6 +790,10 @@ namespace OpenDental{
 			}
 			else {
 				butManage.Enabled=false;
+			}
+			butImportInsPlans.Visible=true;
+			if(PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
+				butImportInsPlans.Visible=false;//Import Ins Plans button is only visible when Public Health feature is enabled.
 			}
 		}
 		/*
@@ -1022,6 +1047,11 @@ namespace OpenDental{
 		private void butEmailInbox_Click(object sender,EventArgs e) {
 			FormEmailInbox formEI=new FormEmailInbox();
 			formEI.ShowDialog();
+		}
+
+		private void butImportInsPlans_Click(object sender,EventArgs e) {
+			FormEtrans834Import Form=new FormEtrans834Import();
+			Form.ShowDialog();
 		}
 
 		//private void butClear_Click(object sender, System.EventArgs e) {
@@ -1521,44 +1551,44 @@ namespace OpenDental{
 		#endregion Messaging
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
-
-	
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 
 	public delegate void OnPatientSelected(Patient pat);

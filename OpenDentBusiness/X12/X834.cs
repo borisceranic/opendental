@@ -31,6 +31,20 @@ namespace OpenDentBusiness {
 		///<summary>Shortcut to get current segment based on _segNum.</summary>
 		private X12Segment _segCur { get { return _listSegments[_segNum]; } }
 
+		#region Static Globals
+
+		public static bool Is834(X12object xobj) {
+      if(xobj.FunctGroups.Count==0) {//At least 1 GS segment in each 834.
+        return false;
+      }
+      if(xobj.FunctGroups[0].Header.Get(1)=="BE") {//GS01 (pg. 237 and pg. 7)
+        return true;
+      }
+      return false;
+    }
+
+		#endregion Static Globals
+
 		public X834(string messageText):base(messageText) {
 			ReadMessage();
 		}
@@ -65,13 +79,14 @@ namespace OpenDentBusiness {
 
 		///<summary>BGN: Beginning Segment.  Required.  Repeat 1.  Guide page 32.</summary>
 		private void ReadLoopST_BGN() {
+			AssertSegCur("BGN");
 			BeginningSegment=new X12_BGN(_segCur);
 			_segNum++;
 		}
 
 		///<summary>REF: Transaction Set Policy Number.  Situational.  Repeat 1.  Guide page 36.</summary>
 		private void ReadLoopST_REF() {
-			if(_segCur.SegmentID!="REF") {
+			if(!IsSeg("REF","38")) {
 				return;
 			}
 			TransactionSetPolicyNumber=new X12_REF(_segCur);
@@ -81,7 +96,7 @@ namespace OpenDentBusiness {
 		///<summary>DTP: File Effictive Date.  Situational.  Repeat >1.  Guide page 37.</summary>
 		private void ReadLoopST_DTP() {
 			ListFileEffectiveDates.Clear();
-			while(_segCur.SegmentID=="DTP") {
+			while(IsSeg("DTP","007","090","091","303","382","388")) {
 				ListFileEffectiveDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
@@ -90,7 +105,7 @@ namespace OpenDentBusiness {
 		///<summary>QTY: Transaction Set Control Totals.  Situational.  Repeat 3.  Guide page 38.</summary>
 		private void ReadLoopST_QTY() {
 			ListTransactionSetControlTotals.Clear();
-			while(_segCur.SegmentID=="QTY") {
+			while(IsSeg("QTY","DT","ET","TO")) {
 				ListTransactionSetControlTotals.Add(new X12_QTY(_segCur));
 				_segNum++;
 			}
@@ -103,6 +118,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: Sponsor Name.  Required.  Repeat 1.  Guide page 39.</summary>
 		private void ReadLoop1000A_N1() {
+			AssertSegCur("N1","P5");
 			SponsorName=new X12_N1(_segCur);
 			_segNum++;
 		}
@@ -114,6 +130,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: Payer.  Required.  Repeat 1.  Guide page 41.</summary>
 		private void ReadLoop1000B_N1() {
+			AssertSegCur("N1","IN");
 			Payer=new X12_N1(_segCur);
 			_segNum++;
 		}
@@ -121,7 +138,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 1000C: TPA/Broker Name.  Repeat 2.  Guide page 22.</summary>
 		private void ReadLoop1000C() {
 			ListBrokers.Clear();
-			while(_segCur.SegmentID=="N1") {
+			while(IsSeg("N1","BO","TV")) {
 				Hx834_Broker broker=new Hx834_Broker();
 				ReadLoop1000C_N1(broker);
 				ReadLoop1100C(broker);
@@ -131,7 +148,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: TPA/Broker Name.  Situational.  Repeat 1.  Guide page 43.</summary>
 		private void ReadLoop1000C_N1(Hx834_Broker broker) {
-			if(_segCur.SegmentID!="N1") {
+			if(!IsSeg("N1","BO","TV")) {
 				return;
 			}
 			broker.Name=new X12_N1(_segCur);
@@ -172,9 +189,9 @@ namespace OpenDentBusiness {
 				ReadLoop2100H(member);
 				ReadLoop2200(member);
 				ReadLoop2300(member);
-				ReadLoop2000_LS();
-				ReadLoop2700();
-				ReadLoop2000_LE();
+				ReadLoop2000_LS(member);
+				ReadLoop2700(member);
+				ReadLoop2000_LE(member);
 				ListMembers.Add(member);
 			}
 		}
@@ -785,142 +802,210 @@ namespace OpenDentBusiness {
 			healthCoverage.ListCoordinationOfBeneifts.Clear();
 			while(_segCur.SegmentID=="COB") {
 				Hx834_Cob cob=new Hx834_Cob();
-				ReadLoop2320_COB();
-				ReadLoop2320_REF();
-				ReadLoop2320_DTP();
-				ReadLoop2330();
+				ReadLoop2320_COB(cob);
+				ReadLoop2320_REF(cob);
+				ReadLoop2320_DTP(cob);
+				ReadLoop2330(cob);
 				healthCoverage.ListCoordinationOfBeneifts.Add(cob);
 			}
 		}
 
 		///<summary>COB: Coordination of Benefits.  Situational.  Repeat 1.  Guide page 166.</summary>
-		private void ReadLoop2320_COB() {
+		private void ReadLoop2320_COB(Hx834_Cob cob) {
 			if(_segCur.SegmentID!="COB") {
 				return;
 			}
+			cob.CoordinationOfBenefits=new X12_COB(_segCur);
 			_segNum++;
 		}
 
 		///<summary>REF: Additional Coordination of Benefits Identifiers.  Situational.  Repeat 4.  Guide page 168.</summary>
-		private void ReadLoop2320_REF() {
+		private void ReadLoop2320_REF(Hx834_Cob cob) {
+			cob.ListAdditionalCobIdentifiers.Clear();
 			List <string> listRefQualifiers=new List<string>(new string[] { "60","6P","SY","ZZ" });
 			while(_segCur.SegmentID=="REF" && listRefQualifiers.Contains(_segCur.Get(1))) {
+				cob.ListAdditionalCobIdentifiers.Add(new X12_REF(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>DTP: Coordination of Benefits Eligibility Dates.  Situational.  Repeat 2.  Guide page 170.</summary>
-		private void ReadLoop2320_DTP() {
+		private void ReadLoop2320_DTP(Hx834_Cob cob) {
+			cob.ListCobEligibilityDates.Clear();
 			while(_segCur.SegmentID=="DTP") {
+				cob.ListCobEligibilityDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
 		}
 
 		///<summary>Loop 2330: Coordination of Benefits Related Entity.  Repeat 3.  Guide page 23.</summary>
-		private void ReadLoop2330() {
+		private void ReadLoop2330(Hx834_Cob cob) {
+			cob.ListCobRelatedEntities.Clear();
 			List <string> listIdentifierCodes=new List<string>(new string[] { "36","GW","IN" });
 			while(_segCur.SegmentID=="NM1" && listIdentifierCodes.Contains(_segCur.Get(1))) {
-				ReadLoop2330_NM1();
-				ReadLoop2330_N3();
-				ReadLoop2330_N4();
-				ReadLoop2330_PER();
+				Hx834_CobRelatedEntity cobre=new Hx834_CobRelatedEntity();
+				ReadLoop2330_NM1(cobre);
+				ReadLoop2330_N3(cobre);
+				ReadLoop2330_N4(cobre);
+				ReadLoop2330_PER(cobre);
+				cob.ListCobRelatedEntities.Add(cobre);
 			}
 		}
 
 		///<summary>NM1: Coordination of Benefits Releated Entity.  Situational.  Repeat 1.  Guide page 171.</summary>
-		private void ReadLoop2330_NM1() {
+		private void ReadLoop2330_NM1(Hx834_CobRelatedEntity cobre) {
 			if(_segCur.SegmentID!="NM1") {
 				return;
 			}
+			cobre.CobRelatedEntity=new X12_NM1(_segCur);
 			_segNum++;
 		}
 
 		///<summary>N3: Coordination of Benefits Related Entity Address.  Situational.  Repeat 1.  Guide page 173.</summary>
-		private void ReadLoop2330_N3() {
+		private void ReadLoop2330_N3(Hx834_CobRelatedEntity cobre) {
 			if(_segCur.SegmentID!="N3") {
 				return;
 			}
+			cobre.CobRelatedEntityAddress=new X12_N3(_segCur);
 			_segNum++;
 		}
 
 		///<summary>N4: Coordination of Benefits Other Insurance Company City, State, Zip Code.  Repeat 1.  Guide page 174.</summary>
-		private void ReadLoop2330_N4() {
+		private void ReadLoop2330_N4(Hx834_CobRelatedEntity cobre) {
 			if(_segCur.SegmentID!="N4") {
 				return;
 			}
+			cobre.CobOtherInsurance=new X12_N4(_segCur);
 			_segNum++;
 		}
 
 		///<summary>PER: Administrative Communications Contact.  Situational.  Repeat 1.  Guide page 176.</summary>
-		private void ReadLoop2330_PER() {
+		private void ReadLoop2330_PER(Hx834_CobRelatedEntity cobre) {
 			if(_segCur.SegmentID!="PER") {
 				return;
 			}
+			cobre.AdministrativeCommunicationsContact=new X12_PER(_segCur);
 			_segNum++;
 		}
 
 		///<summary>LS: Additional Reporting Categories.  Situational.  Repeat 1.  Guide page 178.</summary>
-		private void ReadLoop2000_LS() {
+		private void ReadLoop2000_LS(Hx834_Member member) {
 			if(_segCur.SegmentID!="LS") {
 				return;
 			}
+			member.AdditionalReportingCategories=new X12_LS(_segCur);
 			_segNum++;
 		}
 
 		///<summary>Loop 2700: Member Reporting Categories.  Repeat >1.  Guide page 24.</summary>
-		private void ReadLoop2700() {
+		private void ReadLoop2700(Hx834_Member member) {
+			member.ListMemberReportingCategories.Clear();
 			while(_segCur.SegmentID=="LX") {
-				ReadLoop2700_LX();
-				ReadLoop2750();
+				Hx834_MemberReportingCategory mrc=new Hx834_MemberReportingCategory();
+				ReadLoop2700_LX(mrc);
+				ReadLoop2750(mrc);
+				member.ListMemberReportingCategories.Add(mrc);
 			}
 		}
 
 		///<summary>LX: Member Reporting Categories.  Situational.  Repeat 1.  Guide page 179.</summary>
-		private void ReadLoop2700_LX() {
+		private void ReadLoop2700_LX(Hx834_MemberReportingCategory mrc) {
 			if(_segCur.SegmentID!="LX") {
 				return;
 			}
+			mrc.MemberReportingCategories=new X12_LX(_segCur);
 			_segNum++;
 		}
 
 		///<summary>Loop 2750: Reporting Category.  Repeat 1.  Guide page 24.</summary>
-		private void ReadLoop2750() {
-			ReadLoop2750_N1();
-			ReadLoop2750_REF();
-			ReadLoop2750_DTP();
+		private void ReadLoop2750(Hx834_MemberReportingCategory mrc) {
+			ReadLoop2750_N1(mrc.ReportingCategory);
+			ReadLoop2750_REF(mrc.ReportingCategory);
+			ReadLoop2750_DTP(mrc.ReportingCategory);
 		}
 
 		///<summary>N1: Reporting Category.  Situational.  Repeat 1.  Guide page 180.</summary>
-		private void ReadLoop2750_N1() {
+		private void ReadLoop2750_N1(Hx834_ReportingCategory rc) {
 			if(_segCur.SegmentID!="N1") {
 				return;
 			}
+			rc.ReportingCategory=new X12_N1(_segCur);
 			_segNum++;
 		}
 
 		///<summary>REF: Reporting Category Reference.  Situational.  Repeat 1.  Guide page 181.</summary>
-		private void ReadLoop2750_REF() {
+		private void ReadLoop2750_REF(Hx834_ReportingCategory rc) {
 			if(_segCur.SegmentID!="REF") {
 				return;
 			}
+			rc.ReportingCategoryReference=new X12_REF(_segCur);
 			_segNum++;
 		}
 
 		///<summary>DTP: Reporting Category Date.  Situational.  Repeat 1.  Guide page 183.</summary>
-		private void ReadLoop2750_DTP() {
+		private void ReadLoop2750_DTP(Hx834_ReportingCategory rc) {
 			if(_segCur.SegmentID!="DTP") {
 				return;
 			}
+			rc.ReportingCategoryDate=new X12_DTP(_segCur);
 			_segNum++;
 		}
 
 		///<summary>LE: Additional Reporting Categories Loop Termination.  Situational.  Repeat 1.  Guide page 185.</summary>
-		private void ReadLoop2000_LE() {
+		private void ReadLoop2000_LE(Hx834_Member member) {
 			if(_segCur.SegmentID!="LE") {
 				return;
 			}
+			member.AdditionalReportingCategoriesLoopTermination=new X12_LE(_segCur);
 			_segNum++;
 		}
+
+		#region Helper Functions
+
+		///<summary>Returns true if the current segment has the specified segmentId,
+		///and the first element of the segment is one of the specified values.</summary>
+		private bool IsSeg(string segmentId,params string[] arrayElement01Values) {
+			if(_segCur.SegmentID!=segmentId) {
+				return false;
+			}
+			bool isElement01Valid=false;
+			string element01=_segCur.Get(1);
+			for(int i=0;i<arrayElement01Values.Length;i++) {
+				if(element01==arrayElement01Values[i]) {
+					isElement01Valid=true;
+					break;
+				}
+			}
+			if(!isElement01Valid) {
+				return false;
+			}
+			return true;
+		}
+
+		///<summary>Verifies that the current segment has the specified segmentId and that the first element of the segment is one of the specified values.</summary>
+		private void AssertSegCur(string segmentId,params string[] arrayElement01Values) {
+			if(_segCur.SegmentID!=segmentId) {
+				ReadError(segmentId+" segment expected.");
+			}
+			bool isElement01Valid=false;
+			string element01=_segCur.Get(1);
+			for(int i=0;i<arrayElement01Values.Length;i++) {
+				if(element01==arrayElement01Values[i]) {
+					isElement01Valid=true;
+					break;
+				}
+			}
+			if(!isElement01Valid) {
+				ReadError(segmentId+" segment expected with element 01 set to one of the following values: "+String.Join(",",arrayElement01Values));
+			}
+		}
+
+		///<summary>Throws the given message with extra detail added.  Helper function ensures the same pattern for all error messages.</summary>
+		private void ReadError(string message) {
+			throw new ApplicationException("Error on line "+_segNum+": "+message);
+		}
+
+		#endregion Helper Functions
 
 	}
 
@@ -936,7 +1021,26 @@ namespace OpenDentBusiness {
 
 	///<summary>Loop 2320</summary>
 	public class Hx834_Cob {
+		///<summary>Loop 2320 COB</summary>
+		public X12_COB CoordinationOfBenefits;
+		///<summary>Loop 2320 REF.  Repeat 4.</summary>
+		public List <X12_REF> ListAdditionalCobIdentifiers=new List<X12_REF>();
+		///<summary>Loop 2320 DTP.  Repeat 2.</summary>
+		public List <X12_DTP> ListCobEligibilityDates=new List<X12_DTP>();
+		///<summary>Loop 2330.  Repeat 3.</summary>
+		public List <Hx834_CobRelatedEntity> ListCobRelatedEntities=new List<Hx834_CobRelatedEntity>();
+	}
 
+	///<summary>Loop 2330</summary>
+	public class Hx834_CobRelatedEntity {
+		///<summary>Loop 2330 NM1</summary>
+		public X12_NM1 CobRelatedEntity;
+		///<summary>Loop 2330 N3</summary>
+		public X12_N3 CobRelatedEntityAddress;
+		///<summary>Loop 2330 N4</summary>
+		public X12_N4 CobOtherInsurance;
+		///<summary>Loop 2330 PER</summary>
+		public X12_PER AdministrativeCommunicationsContact;
 	}
 
 	///<summary>Loop 2200</summary>
@@ -1045,6 +1149,20 @@ namespace OpenDentBusiness {
 		public List<Hx834_DisabilityInformation> ListDisabilityInformation=new List<Hx834_DisabilityInformation>();
 		///<summary>Loop 2300</summary>
 		public List<Hx834_HealthCoverage> ListHealthCoverage=new List<Hx834_HealthCoverage>();
+		///<summary>Loop 2000 LS</summary>
+		public X12_LS AdditionalReportingCategories;
+		///<summary>Loop 2700.  Repeat >1.</summary>
+		public List<Hx834_MemberReportingCategory> ListMemberReportingCategories=new List<Hx834_MemberReportingCategory>();
+		///<summary>Loop 2000 LE</summary>
+		public X12_LE AdditionalReportingCategoriesLoopTermination;
+	}
+
+	///<summary>Loop 2700</summary>
+	public class Hx834_MemberReportingCategory {
+		///<summary>Loop 2700 LX</summary>
+		public X12_LX MemberReportingCategories;
+		///<summary>Loop 2750.  Repeat 1.</summary>
+		public Hx834_ReportingCategory ReportingCategory;
 	}
 
 	///<summary>Loop 2310</summary>
@@ -1061,6 +1179,16 @@ namespace OpenDentBusiness {
 		public List <X12_PER> ListProviderCommunicationsNumbers=new List<X12_PER>();
 		///<summary>Loop 2310 PLA</summary>
 		public X12_PLA ProviderChangeReason;
+	}
+
+	///<summary>Loop 2750</summary>
+	public class Hx834_ReportingCategory {
+		///<summary>Loop 2750 N1</summary>
+		public X12_N1 ReportingCategory;
+		///<summary>Loop 2750 REF</summary>
+		public X12_REF ReportingCategoryReference;
+		///<summary>Loop 2750 DTP</summary>
+		public X12_DTP ReportingCategoryDate;
 	}
 
 	///<summary>Loop 2100G</summary>
