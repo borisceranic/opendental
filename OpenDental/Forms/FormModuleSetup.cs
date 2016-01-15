@@ -11,7 +11,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private IContainer components;
-		private System.Windows.Forms.TextBox textTreatNote;
 		private System.Windows.Forms.CheckBox checkTreatPlanShowGraphics;
 		private System.Windows.Forms.CheckBox checkTreatPlanShowCompleted;
 		private System.Windows.Forms.CheckBox checkEclaimsSeparateTreatProv;
@@ -149,9 +148,9 @@ namespace OpenDental{
 		private CheckBox checkBrokenApptProcedure;
 		private GroupBox groupBox2;
 		private CheckBox checkApptTimeReset;
-
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
+		private ODtextBox textTreatNote;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
 		public FormModuleSetup():this(0) {
@@ -183,7 +182,6 @@ namespace OpenDental{
 		private void InitializeComponent(){
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormModuleSetup));
-			this.textTreatNote = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkTreatPlanShowGraphics = new System.Windows.Forms.CheckBox();
 			this.checkTreatPlanShowCompleted = new System.Windows.Forms.CheckBox();
@@ -321,6 +319,8 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.tabControl1.SuspendLayout();
+			this.textTreatNote = new OpenDental.ODtextBox();
+			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tabFamily.SuspendLayout();
@@ -331,15 +331,6 @@ namespace OpenDental{
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// textTreatNote
-			// 
-			this.textTreatNote.AcceptsReturn = true;
-			this.textTreatNote.Location = new System.Drawing.Point(77, 7);
-			this.textTreatNote.Multiline = true;
-			this.textTreatNote.Name = "textTreatNote";
-			this.textTreatNote.Size = new System.Drawing.Size(363, 53);
-			this.textTreatNote.TabIndex = 3;
 			// 
 			// label1
 			// 
@@ -1255,6 +1246,7 @@ namespace OpenDental{
 			// tabTreatPlan
 			// 
 			this.tabTreatPlan.BackColor = System.Drawing.SystemColors.Window;
+			this.tabTreatPlan.Controls.Add(this.textTreatNote);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanUseSheets);
 			this.tabTreatPlan.Controls.Add(this.checkTPSaveSigned);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanItemized);
@@ -1263,7 +1255,6 @@ namespace OpenDental{
 			this.tabTreatPlan.Controls.Add(this.comboProcDiscountType);
 			this.tabTreatPlan.Controls.Add(this.label19);
 			this.tabTreatPlan.Controls.Add(this.label1);
-			this.tabTreatPlan.Controls.Add(this.textTreatNote);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanShowCompleted);
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanShowGraphics);
 			this.tabTreatPlan.Location = new System.Drawing.Point(4, 22);
@@ -1903,6 +1894,21 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// textTreatNote
+			// 
+			this.textTreatNote.AcceptsTab = true;
+			this.textTreatNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textTreatNote.DetectUrls = false;
+			this.textTreatNote.Location = new System.Drawing.Point(77, 7);
+			this.textTreatNote.MaxLength = 32767;
+			this.textTreatNote.Name = "textTreatNote";
+			this.textTreatNote.QuickPasteType = OpenDentBusiness.QuickPasteType.TreatPlan;
+			this.textTreatNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textTreatNote.Size = new System.Drawing.Size(363, 53);
+			this.textTreatNote.SpellCheckIsEnabled = false;
+			this.textTreatNote.TabIndex = 215;
+			this.textTreatNote.Text = "";
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2416,8 +2422,8 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.AppointmentTimeLineColor,butApptLineColor.BackColor.ToArgb())
 				| Prefs.UpdateBool(PrefName.ApptModuleDefaultToWeek,checkApptModuleDefaultToWeek.Checked)
 				| Prefs.UpdateBool(PrefName.AppointmentClinicTimeReset,checkApptTimeReset.Checked)
-			#endregion
-			#region Family Module
+				#endregion
+				#region Family Module
 				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
 				| Prefs.UpdateBool(PrefName.InsurancePlansShared,checkInsurancePlansShared.Checked)
 				| Prefs.UpdateBool(PrefName.InsDefaultPPOpercent,checkPPOpercentage.Checked)

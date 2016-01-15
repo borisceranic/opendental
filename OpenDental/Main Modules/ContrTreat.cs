@@ -138,6 +138,8 @@ namespace OpenDental{
 		private UI.Button butSaveTP;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
+		///<summary>Set to true when TP Note changes.</summary>
+		private bool _hasNoteChanged=false;
 
 		///<summary></summary>
 		public ContrTreat(){
@@ -533,15 +535,17 @@ namespace OpenDental{
 			// 
 			this.textNote.AcceptsTab = true;
 			this.textNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textNote.BackColor = System.Drawing.Color.White;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(0, 654);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.TreatPlan;
+			this.textNote.ReadOnly = true;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(745, 52);
 			this.textNote.TabIndex = 54;
 			this.textNote.Text = "";
+			this.textNote.TextChanged += new System.EventHandler(this.textNote_TextChanged);
+			this.textNote.Leave += new System.EventHandler(this.textNote_Leave);
 			// 
 			// imageListMain
 			// 
@@ -901,6 +905,7 @@ namespace OpenDental{
 
 		///<summary></summary>
 		public void ModuleUnselected(){
+			SaveTPNoteIfNeeded();//Handle this here because this happens before textNote_Leave() and we dont want anything nulled before saving;
 			FamCur=null;
 			PatCur=null;
 			InsPlanList=null;
@@ -912,6 +917,7 @@ namespace OpenDental{
 			//Procedures.HList=null;
 			//Procedures.MissingTeeth=null;
 			_patNumLast=0;//Clear out the last pat num so that a security log gets entered that the module was "visited" or "refreshed".
+			_hasNoteChanged=false;
 			Plugins.HookAddCode(this,"ContrTreat.ModuleUnselected_end");
 		}
 
@@ -1233,6 +1239,16 @@ namespace OpenDental{
 			}
 		}
 		textNote.Text=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
+		if((_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Saved 
+			&& _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="") 
+			|| (_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Inactive 
+			&& _listTreatPlans[gridPlans.SelectedIndices[0]].Heading==Lan.g("TreatPlan","Unassigned")))
+		{
+			textNote.ReadOnly=true;
+		}
+		else {
+			textNote.ReadOnly=false;
+		}
 		if(checkShowTotals.Checked) {
 			row=new TpRow();
 			row.Description="Total";
@@ -2426,6 +2442,16 @@ namespace OpenDental{
 			#endregion subtotal
 		}
 		textNote.Text=_listTreatPlans[gridPlans.SelectedIndices[0]].Note;
+		if((_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Saved 
+				&& _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="") 
+			|| (_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus==TreatPlanStatus.Inactive 
+				&& _listTreatPlans[gridPlans.SelectedIndices[0]].Heading==Lan.g(this,"Unassigned"))) 
+		{
+			textNote.ReadOnly=true;
+		}
+		else {
+			textNote.ReadOnly=false;
+		}
 		#region Totals
 		if(checkShowTotals.Checked) {
 			TpRow row=new TpRow();
@@ -2752,50 +2778,15 @@ namespace OpenDental{
 			if(gridPlans.SelectedIndices[0]!=0//can't be default TP
 				&& _listTreatPlans[gridPlans.SelectedIndices[0]].Signature!="")
 			{
-				System.Drawing.Bitmap sigBitmap=null;
-				List<ProcTP> proctpList=ProcTPs.RefreshForTP(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
-				if(_listTreatPlans[gridPlans.SelectedIndices[0]].SigIsTopaz){
-					Control sigBoxTopaz=CodeBase.TopazWrapper.GetTopaz();
-					sigBoxTopaz.Size=new System.Drawing.Size(362,79);
-					Controls.Add(sigBoxTopaz);
-					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);					
-					string keystring=TreatPlans.GetHashString(_listTreatPlans[gridPlans.SelectedIndices[0]],proctpList);
-					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keystring);
-					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
-					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
-					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
-					sigBoxTopaz.Refresh();
-					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
-					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
-						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
-						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
-					}
-					sigBitmap=new Bitmap(362,79);
-					sigBoxTopaz.DrawToBitmap(sigBitmap,new Rectangle(0,0,362,79));//GetBitmap would probably work.
-					Controls.Remove(sigBoxTopaz);
-					sigBoxTopaz.Dispose();
-				}
-				else{
-					SignatureBox sigBox=new SignatureBox();
-					sigBox.Size=new System.Drawing.Size(362,79);
-					sigBox.ClearTablet();
-					//sigBox.SetSigCompressionMode(0);
-					//sigBox.SetEncryptionMode(0);
-					sigBox.SetKeyString(TreatPlans.GetHashString(_listTreatPlans[gridPlans.SelectedIndices[0]],proctpList));
-					//"0000000000000000");
-					//sigBox.SetAutoKeyData(ProcCur.Note+ProcCur.UserNum.ToString());
-					//sigBox.SetEncryptionMode(2);//high encryption
-					//sigBox.SetSigCompressionMode(2);//high compression
-					sigBox.SetSigString(_listTreatPlans[gridPlans.SelectedIndices[0]].Signature);
-					//if(sigBox.NumberOfTabletPoints()==0) {
-					//	labelInvalidSig.Visible=true;
-					//}
-					//sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
-					sigBitmap=(Bitmap)sigBox.GetSigImage(true);
-				}
-				if(sigBitmap!=null){
+				TreatPlan treatPlan = _listTreatPlans[gridPlans.SelectedIndices[0]];
+				List<ProcTP> proctpList = ProcTPs.RefreshForTP(_listTreatPlans[gridPlans.SelectedIndices[0]].TreatPlanNum);
+				System.Drawing.Bitmap sigBitmap = null;
+				SignatureBoxWrapper sigBoxWrapper = new SignatureBoxWrapper();
+				sigBoxWrapper.SignatureMode=SignatureBoxWrapper.SigMode.TreatPlan;
+				string keyData = TreatPlans.GetKeyDataForSignatureHash(treatPlan,proctpList);
+				sigBoxWrapper.FillSignature(treatPlan.SigIsTopaz,keyData,treatPlan.Signature);
+				sigBitmap=sigBoxWrapper.GetSigImage();  //Previous tp code did not care if signature is valid or not.
+				if(sigBitmap!=null) { 
 					frame=MigraDocHelper.CreateContainer(section);
 					MigraDocHelper.DrawBitmap(frame,sigBitmap,widthDoc/2-sigBitmap.Width/2,20);
 				}
@@ -3615,6 +3606,24 @@ namespace OpenDental{
 			}
 			FormInsRemain FormIR=new FormInsRemain(PatCur.PatNum);
 			FormIR.ShowDialog();
+		}
+
+		private void textNote_Leave(object sender,EventArgs e) {
+			SaveTPNoteIfNeeded();
+		}
+
+		private void textNote_TextChanged(object sender,EventArgs e) {
+			_hasNoteChanged=true;
+		}
+
+		///<summary>Saves TP note to the database if changes were made</summary>
+		private void SaveTPNoteIfNeeded() {
+			if(textNote.ReadOnly || !_hasNoteChanged) {
+				return;
+			}
+			_listTreatPlans[gridPlans.SelectedIndices[0]].Note=PIn.String(textNote.Text);
+			TreatPlans.Update(_listTreatPlans[gridPlans.SelectedIndices[0]]);
+			_hasNoteChanged=false;
 		}
 
 	}

@@ -15,7 +15,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private OpenDental.ValidDate textDateTP;
 		private System.Windows.Forms.TextBox textHeading;
-		private System.Windows.Forms.TextBox textNote;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		/// <summary>
@@ -32,6 +31,7 @@ namespace OpenDental{
 		private Label labelDocument;
 		private UI.Button butDocumentDetach;
 		private UI.Button butDocumentView;
+		private ODtextBox textNote;
 		private OpenDental.UI.Button butDelete;
 
 		///<summary></summary>
@@ -73,7 +73,6 @@ namespace OpenDental{
 			this.textDateTP = new OpenDental.ValidDate();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textHeading = new System.Windows.Forms.TextBox();
-			this.textNote = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.butDelete = new OpenDental.UI.Button();
@@ -86,6 +85,7 @@ namespace OpenDental{
 			this.labelDocument = new System.Windows.Forms.Label();
 			this.butDocumentDetach = new OpenDental.UI.Button();
 			this.butDocumentView = new OpenDental.UI.Button();
+			this.textNote = new OpenDental.ODtextBox();
 			this.SuspendLayout();
 			// 
 			// butCancel
@@ -140,15 +140,6 @@ namespace OpenDental{
 			this.textHeading.Name = "textHeading";
 			this.textHeading.Size = new System.Drawing.Size(489, 20);
 			this.textHeading.TabIndex = 4;
-			// 
-			// textNote
-			// 
-			this.textNote.AcceptsReturn = true;
-			this.textNote.Location = new System.Drawing.Point(136, 94);
-			this.textNote.Multiline = true;
-			this.textNote.Name = "textNote";
-			this.textNote.Size = new System.Drawing.Size(489, 181);
-			this.textNote.TabIndex = 5;
 			// 
 			// label2
 			// 
@@ -296,10 +287,24 @@ namespace OpenDental{
 			this.butDocumentView.Text = "View";
 			this.butDocumentView.Click += new System.EventHandler(this.butDocumentView_Click);
 			// 
+			// textNote
+			// 
+			this.textNote.AcceptsTab = true;
+			this.textNote.DetectUrls = false;
+			this.textNote.Location = new System.Drawing.Point(136, 94);
+			this.textNote.Name = "textNote";
+			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.TreatPlan;
+			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textNote.Size = new System.Drawing.Size(489, 181);
+			this.textNote.SpellCheckIsEnabled = false;
+			this.textNote.TabIndex = 80;
+			this.textNote.Text = "";
+			// 
 			// FormTreatPlanEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(676, 420);
+			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.butDocumentView);
 			this.Controls.Add(this.butDocumentDetach);
 			this.Controls.Add(this.textDocument);
@@ -310,7 +315,6 @@ namespace OpenDental{
 			this.Controls.Add(this.textResponsParty);
 			this.Controls.Add(this.labelResponsParty);
 			this.Controls.Add(this.butDelete);
-			this.Controls.Add(this.textNote);
 			this.Controls.Add(this.textHeading);
 			this.Controls.Add(this.textDateTP);
 			this.Controls.Add(this.butOK);
