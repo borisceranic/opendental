@@ -992,6 +992,16 @@ namespace OpenDental {
 				}
 				List<TaskNote> noteList=TaskNotes.GetForTask(newT.TaskNum);
 				long newTaskNum=Tasks.Insert(newT);
+				TaskHist hist=new TaskHist(newT);
+				if(WasCut) {
+					//Reassign old taskHist.TaskNums
+					TaskHists.UpdateTaskNums(ClipTask,newT);
+					hist.Descript="This task was cut from task list "+TaskLists.GetFullPath(ClipTask.TaskListNum);
+				}
+				else { 
+					hist.Descript="This task was copied from task "+ClipTask.TaskNum+" in task list "+TaskLists.GetFullPath(ClipTask.TaskListNum);
+				}
+				TaskHists.Insert(hist);
 				for(int t=0;t<noteList.Count;t++) {
 					noteList[t].TaskNum=newTaskNum;
 					TaskNotes.Insert(noteList[t]);//Creates the new note with the current datetime stamp.

@@ -35,44 +35,44 @@ namespace OpenDental {
 			col=new ODGridColumn(Lan.g("TableTaskAudit","Changes"),100);
 			gridTaskHist.Columns.Add(col);
 			gridTaskHist.Rows.Clear();
-			ODGridRow row;
+			ODGridRow row;//Row describes difference between current row and the Next row. Last row will be the last TaskHist compared to the current Task.
 			for(int i=1;i<_listTaskAudit.Count;i++) {
-				TaskHist taskHistCur=_listTaskAudit[i];
-				TaskHist taskHistOld=_listTaskAudit[i-1];
+				TaskHist taskHistCur=_listTaskAudit[i-1];
+				TaskHist taskHistNext=_listTaskAudit[i];
 				row=new ODGridRow();
-				if(taskHistOld.DateTimeEntry==DateTime.MinValue) {
+				if(taskHistCur.DateTimeEntry==DateTime.MinValue) {
 					row.Cells.Add(_listTaskAudit[i].DateTimeEntry.ToString());
 				}
 				else {
-					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
+					row.Cells.Add(taskHistCur.DateTimeEntry.ToString());
 				}
-				row.Cells.Add(taskHistOld.DateTStamp.ToString());
-				long usernum=taskHistOld.UserNumHist;
+				row.Cells.Add(taskHistCur.DateTStamp.ToString());
+				long usernum=taskHistCur.UserNumHist;
 				if(usernum==0) {
-					usernum=taskHistOld.UserNum;
+					usernum=taskHistCur.UserNum;
 				}
 				row.Cells.Add(Userods.GetUser(usernum).UserName);
-				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
+				row.Cells.Add(TaskHists.GetChangesDescription(taskHistCur,taskHistNext));
 				gridTaskHist.Rows.Add(row);
 			}
 			//Compare the current task with the last hist entry (Add the "current revision" of the task if necessary.)
 			if(_listTaskAudit.Count>0) {
-				TaskHist taskHistOld=_listTaskAudit[_listTaskAudit.Count-1];
-				TaskHist taskHistCur=new TaskHist(Tasks.GetOne(TaskNumCur));
+				TaskHist taskHistCur=_listTaskAudit[_listTaskAudit.Count-1];
+				TaskHist taskHistNext=new TaskHist(Tasks.GetOne(TaskNumCur));
 				row=new ODGridRow();
-				if(taskHistOld.DateTimeEntry==DateTime.MinValue) {
-					row.Cells.Add(taskHistCur.DateTimeEntry.ToString());
+				if(taskHistCur.DateTimeEntry==DateTime.MinValue) {
+					row.Cells.Add(taskHistNext.DateTimeEntry.ToString());
 				}
 				else {
-					row.Cells.Add(taskHistOld.DateTimeEntry.ToString());
+					row.Cells.Add(taskHistCur.DateTimeEntry.ToString());
 				}
-				row.Cells.Add(taskHistOld.DateTStamp.ToString());
-				long usernum=taskHistOld.UserNumHist;
+				row.Cells.Add(taskHistCur.DateTStamp.ToString());
+				long usernum=taskHistCur.UserNumHist;
 				if(usernum==0) {
-					usernum=taskHistOld.UserNum;
+					usernum=taskHistCur.UserNum;
 				}
 				row.Cells.Add(Userods.GetUser(usernum).UserName);
-				row.Cells.Add(TaskHists.GetChangesDescription(taskHistOld,taskHistCur));
+				row.Cells.Add(TaskHists.GetChangesDescription(taskHistCur,taskHistNext));
 				gridTaskHist.Rows.Add(row);
 			}
 			gridTaskHist.EndUpdate();
