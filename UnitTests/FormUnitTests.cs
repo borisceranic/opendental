@@ -143,6 +143,7 @@ namespace UnitTests {
 			else {
 				textResults.Text+=DatabaseTools.ClearDb();
 			}
+			Security.CurUser=Userods.GetAdminUser();  //Inserts of some objects now require a UserNum of currently logged in user.
 			Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,false);
 			try{
 				textResults.Text+=BenefitT.BenefitComputeRenewDate();
@@ -514,6 +515,13 @@ namespace UnitTests {
 			}
 			catch(Exception ex) {
 				textResults.Text+="51: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftyTwo(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="52: Failed. "+ex.Message;
 			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
