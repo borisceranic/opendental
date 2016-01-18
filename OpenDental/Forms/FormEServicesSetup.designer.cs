@@ -42,6 +42,8 @@ namespace OpenDental{
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabListenerService = new System.Windows.Forms.TabPage();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.textEConnectorListeningType = new System.Windows.Forms.TextBox();
+			this.label38 = new System.Windows.Forms.Label();
 			this.checkAllowEConnectorComm = new System.Windows.Forms.CheckBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.textListenerPort = new OpenDental.ValidNum();
@@ -137,7 +139,7 @@ namespace OpenDental{
 			this.gridSmsSummary = new OpenDental.UI.ODGrid();
 			this.gridClinics = new OpenDental.UI.ODGrid();
 			this.butFwdMonth = new OpenDental.UI.Button();
-			this.butToday = new OpenDental.UI.Button();
+			this.butThisMonth = new OpenDental.UI.Button();
 			this.label32 = new System.Windows.Forms.Label();
 			this.label23 = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
@@ -161,8 +163,6 @@ namespace OpenDental{
 			this.button6 = new OpenDental.UI.Button();
 			this.button7 = new OpenDental.UI.Button();
 			this.label37 = new System.Windows.Forms.Label();
-			this.textEConnectorListeningType = new System.Windows.Forms.TextBox();
-			this.label38 = new System.Windows.Forms.Label();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -390,6 +390,24 @@ namespace OpenDental{
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "eConnector Service Settings";
 			// 
+			// textEConnectorListeningType
+			// 
+			this.textEConnectorListeningType.Location = new System.Drawing.Point(282, 78);
+			this.textEConnectorListeningType.Name = "textEConnectorListeningType";
+			this.textEConnectorListeningType.ReadOnly = true;
+			this.textEConnectorListeningType.Size = new System.Drawing.Size(100, 20);
+			this.textEConnectorListeningType.TabIndex = 249;
+			// 
+			// label38
+			// 
+			this.label38.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label38.Location = new System.Drawing.Point(91, 79);
+			this.label38.Name = "label38";
+			this.label38.Size = new System.Drawing.Size(185, 17);
+			this.label38.TabIndex = 248;
+			this.label38.Text = "eConnector Listening Type";
+			this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkAllowEConnectorComm
 			// 
 			this.checkAllowEConnectorComm.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -554,6 +572,7 @@ namespace OpenDental{
 			this.gridListenerServiceStatusHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridListenerServiceStatusHistory.HasAddButton = false;
 			this.gridListenerServiceStatusHistory.HasMultilineHeaders = false;
 			this.gridListenerServiceStatusHistory.HScrollVisible = false;
 			this.gridListenerServiceStatusHistory.Location = new System.Drawing.Point(6, 117);
@@ -1094,6 +1113,7 @@ namespace OpenDental{
 			// 
 			this.gridWebSchedTimeSlots.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridWebSchedTimeSlots.HasAddButton = false;
 			this.gridWebSchedTimeSlots.HasMultilineHeaders = false;
 			this.gridWebSchedTimeSlots.HScrollVisible = false;
 			this.gridWebSchedTimeSlots.Location = new System.Drawing.Point(18, 19);
@@ -1198,6 +1218,7 @@ namespace OpenDental{
 			// gridWebSchedRecallTypes
 			// 
 			this.gridWebSchedRecallTypes.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.gridWebSchedRecallTypes.HasAddButton = false;
 			this.gridWebSchedRecallTypes.HasMultilineHeaders = false;
 			this.gridWebSchedRecallTypes.HScrollVisible = false;
 			this.gridWebSchedRecallTypes.Location = new System.Drawing.Point(573, 31);
@@ -1214,6 +1235,7 @@ namespace OpenDental{
 			// gridWebSchedOperatories
 			// 
 			this.gridWebSchedOperatories.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.gridWebSchedOperatories.HasAddButton = false;
 			this.gridWebSchedOperatories.HasMultilineHeaders = false;
 			this.gridWebSchedOperatories.HScrollVisible = false;
 			this.gridWebSchedOperatories.Location = new System.Drawing.Point(18, 31);
@@ -1307,7 +1329,7 @@ namespace OpenDental{
 			this.tabSmsServices.Controls.Add(this.gridSmsSummary);
 			this.tabSmsServices.Controls.Add(this.gridClinics);
 			this.tabSmsServices.Controls.Add(this.butFwdMonth);
-			this.tabSmsServices.Controls.Add(this.butToday);
+			this.tabSmsServices.Controls.Add(this.butThisMonth);
 			this.tabSmsServices.Location = new System.Drawing.Point(4, 22);
 			this.tabSmsServices.Name = "tabSmsServices";
 			this.tabSmsServices.Padding = new System.Windows.Forms.Padding(3);
@@ -1495,6 +1517,7 @@ namespace OpenDental{
 			this.gridSmsSummary.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridSmsSummary.HasAddButton = false;
 			this.gridSmsSummary.HasMultilineHeaders = true;
 			this.gridSmsSummary.HScrollVisible = false;
 			this.gridSmsSummary.Location = new System.Drawing.Point(343, 6);
@@ -1511,6 +1534,7 @@ namespace OpenDental{
 			// 
 			this.gridClinics.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridClinics.HasAddButton = false;
 			this.gridClinics.HasMultilineHeaders = false;
 			this.gridClinics.HScrollVisible = false;
 			this.gridClinics.Location = new System.Drawing.Point(13, 6);
@@ -1542,20 +1566,20 @@ namespace OpenDental{
 			this.butFwdMonth.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butFwdMonth.Click += new System.EventHandler(this.butFwdMonth_Click);
 			// 
-			// butToday
+			// butThisMonth
 			// 
-			this.butToday.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butToday.Autosize = false;
-			this.butToday.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butToday.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butToday.CornerRadius = 4F;
-			this.butToday.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.butToday.Location = new System.Drawing.Point(614, 504);
-			this.butToday.Name = "butToday";
-			this.butToday.Size = new System.Drawing.Size(54, 22);
-			this.butToday.TabIndex = 262;
-			this.butToday.Text = "Today";
-			this.butToday.Click += new System.EventHandler(this.butToday_Click);
+			this.butThisMonth.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butThisMonth.Autosize = false;
+			this.butThisMonth.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butThisMonth.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butThisMonth.CornerRadius = 4F;
+			this.butThisMonth.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.butThisMonth.Location = new System.Drawing.Point(604, 504);
+			this.butThisMonth.Name = "butThisMonth";
+			this.butThisMonth.Size = new System.Drawing.Size(75, 22);
+			this.butThisMonth.TabIndex = 262;
+			this.butThisMonth.Text = "This Month";
+			this.butThisMonth.Click += new System.EventHandler(this.butThisMonth_Click);
 			// 
 			// label32
 			// 
@@ -1794,6 +1818,7 @@ namespace OpenDental{
 			this.odGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.odGrid1.HasAddButton = false;
 			this.odGrid1.HasMultilineHeaders = true;
 			this.odGrid1.HScrollVisible = false;
 			this.odGrid1.Location = new System.Drawing.Point(346, 9);
@@ -1810,6 +1835,7 @@ namespace OpenDental{
 			// 
 			this.odGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.odGrid2.HasAddButton = false;
 			this.odGrid2.HasMultilineHeaders = false;
 			this.odGrid2.HScrollVisible = false;
 			this.odGrid2.Location = new System.Drawing.Point(16, 9);
@@ -1859,24 +1885,6 @@ namespace OpenDental{
 			this.label37.Name = "label37";
 			this.label37.Size = new System.Drawing.Size(100, 23);
 			this.label37.TabIndex = 0;
-			// 
-			// textEConnectorListeningType
-			// 
-			this.textEConnectorListeningType.Location = new System.Drawing.Point(282, 78);
-			this.textEConnectorListeningType.Name = "textEConnectorListeningType";
-			this.textEConnectorListeningType.ReadOnly = true;
-			this.textEConnectorListeningType.Size = new System.Drawing.Size(100, 20);
-			this.textEConnectorListeningType.TabIndex = 249;
-			// 
-			// label38
-			// 
-			this.label38.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label38.Location = new System.Drawing.Point(91, 79);
-			this.label38.Name = "label38";
-			this.label38.Size = new System.Drawing.Size(185, 17);
-			this.label38.TabIndex = 248;
-			this.label38.Text = "eConnector Listening Type";
-			this.label38.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormEServicesSetup
 			// 
@@ -2020,7 +2028,7 @@ namespace OpenDental{
 		private System.Windows.Forms.DateTimePicker dateTimePickerSms;
 		private UI.Button butBackMonth;
 		private UI.Button butFwdMonth;
-		private UI.Button butToday;
+		private UI.Button butThisMonth;
 		private UI.ODGrid gridWebSchedRecallTypes;
 		private System.Windows.Forms.Label label35;
 		private UI.ODGrid gridWebSchedTimeSlots;

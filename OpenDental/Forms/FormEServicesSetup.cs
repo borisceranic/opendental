@@ -1973,7 +1973,7 @@ namespace OpenDental {
 			dateTimePickerSms.Value=dateTimePickerSms.Value.AddMonths(1);//triggers refresh
 		}
 
-		private void butToday_Click(object sender,EventArgs e) {
+		private void butThisMonth_Click(object sender,EventArgs e) {
 			dateTimePickerSms.Value=DateTime.Now.Date;//triggers refresh
 		}
 
