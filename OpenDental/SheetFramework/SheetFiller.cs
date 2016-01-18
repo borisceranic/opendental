@@ -209,6 +209,9 @@ namespace OpenDental{
 			string ins2Deductible="";
 			string ins2DeductibleUsed="";
 			string ins2Employer="";
+			string ins2FreqBW="";
+			string ins2FreqExams="";
+			string ins2FreqPanoFMX="";
 			string ins2PlanGroupNumber="";
 			string ins2PlanGroupName="";
 			string ins2Pending="";
@@ -552,6 +555,9 @@ namespace OpenDental{
 							ins2Percentages+=",  ";
 						}
 						ins2Percentages+=CovCats.GetDesc(benefitList[j].CovCatNum)+" "+benefitList[j].Percent.ToString()+"%";
+						ins2FreqBW=Benefits.GetFrequencyDisplay(FrequencyType.BW,benefitList,plan.PlanNum);
+						ins2FreqExams=Benefits.GetFrequencyDisplay(FrequencyType.Exam,benefitList,plan.PlanNum);
+						ins2FreqPanoFMX=Benefits.GetFrequencyDisplay(FrequencyType.PanoFMX,benefitList,plan.PlanNum);
 					}
 					ins2Employer=Employers.GetEmployer(plan.EmployerNum).EmpName;//blank if no Employer listed
 				}
@@ -927,6 +933,9 @@ namespace OpenDental{
 					fldval=fldval.Replace("[ins2Deductible]",ins2Deductible);
 					fldval=fldval.Replace("[ins2DeductibleUsed]",ins2DeductibleUsed);
 					fldval=fldval.Replace("[ins2Employer]",ins2Employer);
+					fldval=fldval.Replace("[ins2FreqBW]",ins2FreqBW.TrimEnd());
+					fldval=fldval.Replace("[ins2FreqExams]",ins2FreqExams.TrimEnd());
+					fldval=fldval.Replace("[ins2FreqPanoFMX]",ins2FreqPanoFMX.TrimEnd());
 					fldval=fldval.Replace("[ins2PlanGroupNumber]",ins2PlanGroupNumber);
 					fldval=fldval.Replace("[ins2PlanGroupName]",ins2PlanGroupName);
 					fldval=fldval.Replace("[ins2Pending]",ins2Pending);
