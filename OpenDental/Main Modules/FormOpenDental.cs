@@ -3184,7 +3184,7 @@ namespace OpenDental{
 		///<summary>Happens when any of the modules changes the current patient or when this main form changes the patient.  The calling module should refresh itself.  The current patNum is stored here in the parent form so that when switching modules, the parent form knows which patient to call up for that module.</summary>
 		private void Contr_PatientSelected(object sender,PatientSelectedEventArgs e) {
 			CurPatNum=e.Pat.PatNum;
-			//RefreshCurrentModule();//We think this should be here because this function does the same thing as menuPatient_Click, but we're unsure of the extent of the change so left it out for now.
+			RefreshCurrentModule();
 			FillPatientButton(e.Pat);
 		}
 

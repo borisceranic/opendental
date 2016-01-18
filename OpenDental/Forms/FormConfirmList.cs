@@ -449,11 +449,6 @@ namespace OpenDental{
 				butText.Enabled=false;
 			}
 			FillMain();
-			_menuRightClick.Items.Clear();
-			_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 			Cursor=Cursors.Default;
 			Plugins.HookAddCode(this,"FormConfirmList.Load_End",butText);
 		}
@@ -485,6 +480,13 @@ namespace OpenDental{
 
 		private void gridMain_MouseUp(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right && gridMain.SelectedIndices.Length>0) {
+				//To maintain legacy behavior we will use the last selected index if multiple are selected.
+				Patient pat=Patients.GetPat(PIn.Long(Table.Rows[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]]["PatNum"].ToString()));
+				_menuRightClick.Items.Clear();
+				_menuRightClick.Items.Add(Lan.g(this,"Select Patient")+" ("+pat.GetNameFL()+")",null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Show(gridMain,new Point(e.X,e.Y));
 			}
 		}
