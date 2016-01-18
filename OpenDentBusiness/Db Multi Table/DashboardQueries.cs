@@ -275,17 +275,17 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary>Only one dimension to the list for now.</summary>
-		public static List<List<int>> GetAR(DateTime dateFrom,DateTime dateTo,List<DashboardAR> listDashAR) {
+		///<summary>Returns all DashbaordAR(s) for the given time period. Caution, this will run aging and calculate a/r if a month within the given range is missing.
+		///This can take several seconds per month missing.</summary>
+		public static List<DashboardAR> GetAR(DateTime dateFrom,DateTime dateTo,List<DashboardAR> listDashAR) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<List<int>>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listDashAR);
+				return Meth.GetObject<List<DashboardAR>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listDashAR);
 			}
 			//assumes that dateFrom is the first of the month and that there are 12 periods
 			//listDashAR may be empty, in which case, this routine will take about 18 seconds, but the user was warned.
 			//listDashAR may also me incomplete, especially the most recent month(s).
 			string command;
-			List<int> listInt;
-			listInt=new List<int>();
+			List<DashboardAR> listRet=new List<DashboardAR>();
 			bool agingWasRun=false;
 #if DEBUG
 			_elapsedTimeAR="";
@@ -305,7 +305,7 @@ namespace OpenDentBusiness {
 					dash=listDashAR[d];
 				}
 				if(dash!=null) {//we found a DashboardAR object from the database for this month, so use it.
-					listInt.Add((int)dash.BalTotal);
+					listRet.Add(dash);
 					continue;
 				}
 				agingWasRun=true;
@@ -326,7 +326,7 @@ namespace OpenDentBusiness {
 				dash.BalTotal=PIn.Double(table.Rows[0][0].ToString());
 				dash.InsEst=PIn.Double(table.Rows[0][1].ToString());
 				DashboardARs.Insert(dash);//save it to the db for later.
-				listInt.Add((int)dash.BalTotal);//and also use it now.
+				listRet.Add(dash); //and also use it now.
 			}
 			if(agingWasRun) {
 #if DEBUG
@@ -347,9 +347,7 @@ namespace OpenDentBusiness {
 				System.Windows.Forms.MessageBox.Show(_elapsedTimeAR);
 			}
 #endif
-			List<List<int>> retVal=new List<List<int>>();
-			retVal.Add(listInt);
-			return retVal;
+			return listRet;
 		}
 
 		public static List<List<int>> GetProdInc(DateTime dateFrom,DateTime dateTo) {

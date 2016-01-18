@@ -19,6 +19,7 @@ using System.Windows.Markup;
 using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDentalWpf {
 	/// <summary></summary>
@@ -37,8 +38,8 @@ namespace OpenDentalWpf {
 			//A/R
 			List<Color> listColorsAR=new List<Color>();
 			listColorsAR.Add(Colors.Firebrick);
-			List<DashboardAR> listDashAR=DashboardARs.Refresh(contrDashAR.DateStart);
-			if(listDashAR.Count==0) {
+			List<DashboardAR> listDashARIn=DashboardARs.Refresh(contrDashAR.DateStart);
+			if(listDashARIn.Count==0) {
 				//Make a guess as to how long the user might have to wait.
 				double agingInMilliseconds=Ledgers.GetAgingComputationTime();
 				//Aging will be run a total of 13 times.
@@ -57,7 +58,10 @@ namespace OpenDentalWpf {
 					return;
 				}
 			}
-			List<List<int>> listDataAR=DashboardQueries.GetAR(contrDashAR.DateStart,contrDashAR.DateEnd,listDashAR);
+			List<DashboardAR> listDashAROut=DashboardQueries.GetAR(contrDashAR.DateStart,contrDashAR.DateEnd,listDashARIn);
+			List<List<int>> listDataAR=new List<List<int>>();
+			//1 dimensional for now.
+			listDataAR.Add(listDashAROut.OrderBy(x => x.DateCalc).Select(x => (int)x.BalTotal).ToList());
 			contrDashAR.FillData(Lans.g(this,"Accounts Receivable"),1000,listColorsAR,listDataAR);
 			//ProdInc
 			contrDashProdInc.FillData();
