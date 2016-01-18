@@ -29,7 +29,14 @@ namespace OpenDentBusiness {
 		public List <Hx834_Member> ListMembers=new List<Hx834_Member>();
 		
 		///<summary>Shortcut to get current segment based on _segNum.</summary>
-		private X12Segment _segCur { get { return _listSegments[_segNum]; } }
+		private X12Segment _segCur {
+			get{
+				if(_segNum < _listSegments.Count) {
+					return _listSegments[_segNum];
+				}
+				return _listSegments[_listSegments.Count-1];
+			}
+		}
 
 		#region Static Globals
 
@@ -51,7 +58,12 @@ namespace OpenDentBusiness {
 
 		///<summary>See guide pages 22 and 208 for overview.</summary>
 		private void ReadMessage() {
-			ReadLoopGS();
+			try {
+				ReadLoopGS();
+			}
+			catch(ApplicationException aex) {
+				throw new ApplicationException("Error on line "+(_segNum+1)+": "+aex.Message);
+			}
 		}
 
 		///<summary>GS: Functional Group.  Required.  Repeat unlimited.  Guide page 208.</summary>
@@ -79,14 +91,13 @@ namespace OpenDentBusiness {
 
 		///<summary>BGN: Beginning Segment.  Required.  Repeat 1.  Guide page 32.</summary>
 		private void ReadLoopST_BGN() {
-			AssertSegCur("BGN");
 			BeginningSegment=new X12_BGN(_segCur);
 			_segNum++;
 		}
 
 		///<summary>REF: Transaction Set Policy Number.  Situational.  Repeat 1.  Guide page 36.</summary>
 		private void ReadLoopST_REF() {
-			if(!IsSeg("REF","38")) {
+			if(!_segCur.IsType("REF","38")) {
 				return;
 			}
 			TransactionSetPolicyNumber=new X12_REF(_segCur);
@@ -96,7 +107,7 @@ namespace OpenDentBusiness {
 		///<summary>DTP: File Effictive Date.  Situational.  Repeat >1.  Guide page 37.</summary>
 		private void ReadLoopST_DTP() {
 			ListFileEffectiveDates.Clear();
-			while(IsSeg("DTP","007","090","091","303","382","388")) {
+			while(_segCur.IsType("DTP","007","090","091","303","382","388")) {
 				ListFileEffectiveDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
@@ -105,7 +116,7 @@ namespace OpenDentBusiness {
 		///<summary>QTY: Transaction Set Control Totals.  Situational.  Repeat 3.  Guide page 38.</summary>
 		private void ReadLoopST_QTY() {
 			ListTransactionSetControlTotals.Clear();
-			while(IsSeg("QTY","DT","ET","TO")) {
+			while(_segCur.IsType("QTY","DT","ET","TO")) {
 				ListTransactionSetControlTotals.Add(new X12_QTY(_segCur));
 				_segNum++;
 			}
@@ -118,8 +129,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: Sponsor Name.  Required.  Repeat 1.  Guide page 39.</summary>
 		private void ReadLoop1000A_N1() {
-			AssertSegCur("N1","P5");
-			SponsorName=new X12_N1(_segCur);
+			SponsorName=new X12_N1(_segCur,"P5");
 			_segNum++;
 		}
 
@@ -130,15 +140,14 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: Payer.  Required.  Repeat 1.  Guide page 41.</summary>
 		private void ReadLoop1000B_N1() {
-			AssertSegCur("N1","IN");
-			Payer=new X12_N1(_segCur);
+			Payer=new X12_N1(_segCur,"IN");
 			_segNum++;
 		}
 
 		///<summary>Loop 1000C: TPA/Broker Name.  Repeat 2.  Guide page 22.</summary>
 		private void ReadLoop1000C() {
 			ListBrokers.Clear();
-			while(IsSeg("N1","BO","TV")) {
+			while(_segCur.IsType("N1","BO","TV")) {
 				Hx834_Broker broker=new Hx834_Broker();
 				ReadLoop1000C_N1(broker);
 				ReadLoop1100C(broker);
@@ -148,7 +157,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: TPA/Broker Name.  Situational.  Repeat 1.  Guide page 43.</summary>
 		private void ReadLoop1000C_N1(Hx834_Broker broker) {
-			if(!IsSeg("N1","BO","TV")) {
+			if(!_segCur.IsType("N1","BO","TV")) {
 				return;
 			}
 			broker.Name=new X12_N1(_segCur);
@@ -162,7 +171,7 @@ namespace OpenDentBusiness {
 
 		///<summary>ACT: TPA/Broker Account Information.  Situational.  Repeat 1.  Guide page 45.</summary>
 		private void ReadLoop1100C_ACT(Hx834_Broker broker) {
-			if(_segCur.SegmentID!="ACT") {
+			if(!_segCur.IsType("ACT")) {
 				return;
 			}
 			broker.TpaBrokerAccountInformation=new X12_ACT(_segCur);
@@ -172,7 +181,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2000: Member Level Detail.  Repeat >1.  Guide page 22.</summary>
 		private void ReadLoop2000() {
 			ListMembers.Clear();
-			while(_segCur.SegmentID=="INS") {
+			while(_segCur.IsType("INS")) {
 				Hx834_Member member=new Hx834_Member();
 				ReadLoop2000_INS(member);
 				ReadLoop2000_REF_1(member);
@@ -204,13 +213,13 @@ namespace OpenDentBusiness {
 
 		///<summary>REF: Subscriber Identifier.  Required.  Repeat 1.  Guide page 55.</summary>
 		private void ReadLoop2000_REF_1(Hx834_Member member) {
-			member.SubscriberIdentifier=new X12_REF(_segCur);
+			member.SubscriberIdentifier=new X12_REF(_segCur,"0F");
 			_segNum++;
 		}
 
 		///<summary>REF: Member Policy Number.  Situational.  Repeat 1.  Guide page 56.</summary>
 		private void ReadLoop2000_REF_2(Hx834_Member member) {
-			if(_segCur.SegmentID!="REF" || _segCur.Get(1)!="1L") {
+			if(!_segCur.IsType("REF","1L")) {
 				return;
 			}
 			member.MemberPolicyNumber=new X12_REF(_segCur);
@@ -220,7 +229,7 @@ namespace OpenDentBusiness {
 		///<summary>REF: Member Supplemental Identifier.  Situational.  Repeat 13.  Guide page 57.</summary>
 		private void ReadLoop2000_REF_3(Hx834_Member member) {
 			member.ListMemberSupplementalIdentifiers.Clear();
-			while(_segCur.SegmentID=="REF") {
+			while(_segCur.IsType("REF","17","23","3H","4A","6O","ABB","D3","DX","F6","P5","Q4","QQ","ZZ")) {
 				X12_REF href=new X12_REF(_segCur);
 				member.ListMemberSupplementalIdentifiers.Add(href);
 				_segNum++;
@@ -230,7 +239,9 @@ namespace OpenDentBusiness {
 		///<summary>DTP: Member Level Dates.  Situational.  Repeat 24.  Guide page 59.</summary>
 		private void ReadLoop2000_DTP(Hx834_Member member) {
 			member.ListMemberLevelDates.Clear();
-			while(_segCur.SegmentID=="DTP") {
+			while(_segCur.IsType("DTP",
+				"050","286","296","297","300","301","303","336","337","338","339","340","341","350","351","356","357","383","385","386","393","394","473","474"))
+			{
 				X12_DTP dtp=new X12_DTP(_segCur);
 				member.ListMemberLevelDates.Add(dtp);
 				_segNum++;
@@ -253,13 +264,13 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Member Name.  Required.  Repeat 1.  Guide page 62.</summary>
 		private void ReadLoop2100A_NM1(Hx834_Member member) {
-			member.MemberName=new X12_NM1(_segCur);
+			member.MemberName=new X12_NM1(_segCur,"74","IL");
 			_segNum++;
 		}
 
 		///<summary>PER: Member Communications Numbers.  Situational.  Repeat 1.  Guide page 65.</summary>
 		private void ReadLoop2100A_PER(Hx834_Member member) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","IP")) {
 				return;
 			}
 			member.MemberCommunicationsNumbers=new X12_PER(_segCur);
@@ -268,7 +279,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Member Residence Street Address.  Situational.  Repeat 1.  Guide page 68.</summary>
 		private void ReadLoop2100A_N3(Hx834_Member member) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			member.MemberResidenceStreetAddress=new X12_N3(_segCur);
@@ -277,7 +288,7 @@ namespace OpenDentBusiness {
 		
 		///<summary>N4: Member City, State, Zip Code.  Situational.  Repeat 1.  Guide page 69.</summary>
 		private void ReadLoop2100A_N4(Hx834_Member member) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			member.MemberCityStateZipCode=new X12_N4(_segCur);
@@ -286,7 +297,7 @@ namespace OpenDentBusiness {
 
 		///<summary>DMG: Member Demographics.  Situational.  Repeat 1.  Guide page 72.</summary>
 		private void ReadLoop2100A_DMG(Hx834_Member member) {
-			if(_segCur.SegmentID!="DMG") {
+			if(!_segCur.IsType("DMG")) {
 				return;
 			}
 			member.MemberDemographics=new X12_DMG(_segCur);
@@ -296,7 +307,7 @@ namespace OpenDentBusiness {
 		///<summary>EC: Employment Class.  Situational.  Repeat >1.  Guide page 76.</summary>
 		private void ReadLoop2100A_EC(Hx834_Member member) {
 			member.ListEmploymentClass.Clear();
-			while(_segCur.SegmentID=="EC") {
+			while(_segCur.IsType("EC")) {
 				member.ListEmploymentClass.Add(new X12_EC(_segCur));
 				_segNum++;
 			}
@@ -304,7 +315,7 @@ namespace OpenDentBusiness {
 
 		///<summary>ICM: Member Income.  Situational.  Repeat 1.  Guide page 79.</summary>
 		private void ReadLoop2100A_ICM(Hx834_Member member) {
-			if(_segCur.SegmentID!="ICM") {
+			if(!_segCur.IsType("ICM")) {
 				return;
 			}
 			member.MemberIncome=new X12_ICM(_segCur);
@@ -314,7 +325,7 @@ namespace OpenDentBusiness {
 		///<summary>AMT: Member Policy Amounts.  Situational.  Repeat 7.  Guide page 81.</summary>
 		private void ReadLoop2100A_AMT(Hx834_Member member) {
 			member.ListMemberPolicyAmounts.Clear();
-			while(_segCur.SegmentID=="AMT") {
+			while(_segCur.IsType("AMT","B9","C1","D2","EBA","FK","P3","R")) {
 				member.ListMemberPolicyAmounts.Add(new X12_AMT(_segCur));
 				_segNum++;
 			}
@@ -322,7 +333,7 @@ namespace OpenDentBusiness {
 
 		///<summary>HLH: Member Health Information.  Situational.  Repeat 1.  Guide page 82.</summary>
 		private void ReadLoop2100A_HLH(Hx834_Member member) {
-			if(_segCur.SegmentID!="HLH") {
+			if(!_segCur.IsType("HLH")) {
 				return;
 			}
 			member.MemberHealthInformation=new X12_HLH(_segCur);
@@ -332,7 +343,7 @@ namespace OpenDentBusiness {
 		///<summary>LUI: Member Language.  Situational.  Repeat >1.  Guide page 84.</summary>
 		private void ReadLoop2100A_LUI(Hx834_Member member) {
 			member.ListMemberLanguages.Clear();
-			while(_segCur.SegmentID=="LUI") {
+			while(_segCur.IsType("LUI")) {
 				member.ListMemberLanguages.Add(new X12_LUI(_segCur));
 				_segNum++;
 			}
@@ -340,7 +351,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Loop 2100B: Incorrect Member Name.  Repeat 1.  Guide page 22.</summary>
 		private void ReadLoop2100B(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1" || _segCur.Get(1)!="70") {
+			if(!_segCur.IsType("NM1","70")) {
 				return;
 			}
 			ReadLoop2100B_NM1(member);
@@ -349,7 +360,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Incorrect Member Name.  Situational.  Repeat 1.  Guide page 86.</summary>
 		private void ReadLoop2100B_NM1(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","70")) {
 				return;
 			}
 			member.IncorrectMemberName=new X12_NM1(_segCur);
@@ -358,7 +369,7 @@ namespace OpenDentBusiness {
 
 		///<summary>DMG: Incorrect Member Demographics.  Situational.  Repeat 1.  Guide page 89.</summary>
 		private void ReadLoop2100B_DMG(Hx834_Member member) {
-			if(_segCur.SegmentID!="DMG") {
+			if(!_segCur.IsType("DMG")) {
 				return;
 			}
 			member.IncorrectMemberDemographics=new X12_DMG(_segCur);
@@ -367,7 +378,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Loop 2100C: Member Mailing Address.  Repeat 1.  Guide page 22.</summary>
 		private void ReadLoop2100C(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1" || _segCur.Get(1)!="31") {
+			if(!_segCur.IsType("NM1","31")) {
 				return;
 			}
 			ReadLoop2100C_NM1(member);
@@ -377,7 +388,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Member Mailing Address.  Situational.  Repeat 1.  Guide page 93.</summary>
 		private void ReadLoop2100C_NM1(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","31")) {
 				return;
 			}
 			member.MemberMailingAddress=new X12_NM1(_segCur);
@@ -399,7 +410,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2100D: Member Employer.  Repeat 3.  Guide page 23.</summary>
 		private void ReadLoop2100D(Hx834_Member member) {
 			member.ListMemberEmployers.Clear();
-			while(_segCur.SegmentID=="NM1" && _segCur.Get(1)=="36") {
+			while(_segCur.IsType("NM1","36")) {
 				Hx834_Employer employer=new Hx834_Employer();
 				ReadLoop2100D_NM1(employer);
 				ReadLoop2100D_PER(employer);
@@ -411,7 +422,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Member Employer.  Situational.  Repeat 1.  Guide page 98.</summary>
 		private void ReadLoop2100D_NM1(Hx834_Employer employer) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","36")) {
 				return;
 			}
 			employer.MemberEmployer=new X12_NM1(_segCur);
@@ -420,7 +431,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PER: Member Employer Communications Numbers.  Situational.  Repeat 1.  Guide page 101.</summary>
 		private void ReadLoop2100D_PER(Hx834_Employer employer) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","EP")) {
 				return;
 			}
 			employer.MemberEmployerCommunicationsNumbers=new X12_PER(_segCur);
@@ -429,7 +440,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Member Employer Street Address.  Situational.  Repeat 1.  Guide page 104.</summary>
 		private void ReadLoop2100D_N3(Hx834_Employer employer) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			employer.MemberEmployerStreetAddress=new X12_N3(_segCur);
@@ -438,7 +449,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Member Employer City, State, Zip Code.  Situational.  Repeat 1.  Guide page 105.</summary>
 		private void ReadLoop2100D_N4(Hx834_Employer employer) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			employer.MemberEmployerCityStateZipCode=new X12_N4(_segCur);
@@ -448,7 +459,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2100E: Member School.  Repeat 3.  Guide page 23.</summary>
 		private void ReadLoop2100E(Hx834_Member member) {
 			member.ListMemberSchools.Clear();
-			while(_segCur.SegmentID=="NM1" && _segCur.Get(1)=="M8") {
+			while(_segCur.IsType("NM1","M8")) {
 				Hx834_School school=new Hx834_School();
 				ReadLoop2100E_NM1(school);
 				ReadLoop2100E_PER(school);
@@ -460,7 +471,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Member School.  Situational.  Repeat 1.  Guide page 107.</summary>
 		private void ReadLoop2100E_NM1(Hx834_School school) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","M8")) {
 				return;
 			}
 			school.MemberSchool=new X12_NM1(_segCur);
@@ -469,7 +480,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PER: Member School Communications Numbers.  Situational.  Repeat 1.  Guide page 109.</summary>
 		private void ReadLoop2100E_PER(Hx834_School school) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","SK")) {
 				return;
 			}
 			school.MemberSchoolCommunicationsNumbers=new X12_PER(_segCur);
@@ -478,7 +489,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Member School Street Address.  Situational.  Repeat 1.  Guide page 112.</summary>
 		private void ReadLoop2100E_N3(Hx834_School school) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			school.MemberSchoolStreetAddress=new X12_N3(_segCur);
@@ -487,7 +498,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Member School City, State, Zip Code.  Repeat 1.  Guide page 113.</summary>
 		private void ReadLoop2100E_N4(Hx834_School school) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			school.MemberSchoolCityStateZipCode=new X12_N4(_segCur);
@@ -496,7 +507,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Loop 2100F: Custodial Parent.  Repeat 1.  Guide page 23.</summary>
 		private void ReadLoop2100F(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1" || _segCur.Get(1)=="S3") {
+			if(!_segCur.IsType("NM1","S3")) {
 				return;
 			}
 			ReadLoop2100F_NM1(member);
@@ -507,7 +518,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Custodial Parent.  Situational.  Repeat 1.  Guide page 115.</summary>
 		private void ReadLoop2100F_NM1(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","S3")) {
 				return;
 			}
 			member.CustodialParent=new X12_NM1(_segCur);
@@ -516,7 +527,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PER: Custodial Parent Communications Numbers.  Situational.  Repeat 1.  Guide page 118.</summary>
 		private void ReadLoop2100F_PER(Hx834_Member member) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","PQ")) {
 				return;
 			}
 			member.CustodialParentCommunicationsNumbers=new X12_PER(_segCur);
@@ -525,7 +536,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Custodial Parent Street Address.  Situational.  Repeat 1.  Guide page 121.</summary>
 		private void ReadLoop2100F_N3(Hx834_Member member) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			member.CustodialParentStreetAddress=new X12_N3(_segCur);
@@ -534,7 +545,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Custodial Parent City, State, Zip Code.  Situational.  Repeat 1.  Guide page 122.</summary>
 		private void ReadLoop2100F_N4(Hx834_Member member) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			member.CustodialParentCityStateZipCode=new X12_N4(_segCur);
@@ -544,8 +555,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2100G: Responsible Person.  Repeat 13.  Guide page 23.</summary>
 		private void ReadLoop2100G(Hx834_Member member) {
 			member.ListResponsiblePerson.Clear();
-			List <string> listNm1EntityCodes=new List<string>(new string[] { "6Y","9K","E1","EI","EXS","GB","GD","J6","LR","QD","S1","TZ","X4" });
-			while(_segCur.SegmentID=="NM1" && listNm1EntityCodes.Contains(_segCur.Get(1))) {
+			while(_segCur.IsType("NM1","6Y","9K","E1","EI","EXS","GB","GD","J6","LR","QD","S1","TZ","X4")) {
 				Hx834_ResponsiblePerson person=new Hx834_ResponsiblePerson();
 				ReadLoop2100G_NM1(person);
 				ReadLoop2100G_PER(person);
@@ -557,7 +567,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Responsible Person.  Situational.  Repeat 1.  Guide page 124.</summary>
 		private void ReadLoop2100G_NM1(Hx834_ResponsiblePerson person) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","6Y","9K","E1","EI","EXS","GB","GD","J6","LR","QD","S1","TZ","X4")) {
 				return;
 			}
 			person.ResponsiblePerson=new X12_NM1(_segCur);
@@ -566,7 +576,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PER: Responsible Person Communications Numbers.  Situational.  Repeat 1.  Guide page 127.</summary>
 		private void ReadLoop2100G_PER(Hx834_ResponsiblePerson person) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","IP")) {
 				return;
 			}
 			person.ResponsiblePersonCommunicationsNumbers=new X12_PER(_segCur);
@@ -575,7 +585,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Responsible Person Street Address.  Situational.  Repeat 1.  Guide page 130.</summary>
 		private void ReadLoop2100G_N3(Hx834_ResponsiblePerson person) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			person.ResponsiblePersonStreetAddress=new X12_N3(_segCur);
@@ -584,7 +594,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Responsible Person City, State, Zip Code.  Situational.  Repeat 1.  Guide page 131.</summary>
 		private void ReadLoop2100G_N4(Hx834_ResponsiblePerson person) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			person.ResponsiblePersonCityStateZipCode=new X12_N4(_segCur);
@@ -593,7 +603,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Loop 2100H: Drop Off Location.  Repeat 1.  Guide page 23.</summary>
 		private void ReadLoop2100H(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1" || _segCur.Get(1)=="45") {
+			if(!_segCur.IsType("NM1","45")) {
 				return;
 			}
 			ReadLoop2100H_NM1(member);
@@ -603,7 +613,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Drop Off Location.  Situational.  Repeat 1.  Guide page 133.</summary>
 		private void ReadLoop2100H_NM1(Hx834_Member member) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","45")) {
 				return;
 			}
 			member.DropOffLocation=new X12_NM1(_segCur);
@@ -612,7 +622,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Drop Off Location Street Address.  Situational.  Repeat 1.  Guide page 135.</summary>
 		private void ReadLoop2100H_N3(Hx834_Member member) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			member.DropOffLocationStreetAddress=new X12_N3(_segCur);
@@ -621,7 +631,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Drop Off Location City, State, Zip Code.  Situational.  Repeat 1.  Guide page 136.</summary>
 		private void ReadLoop2100H_N4(Hx834_Member member) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			member.DropOffLocationCityStateZipCode=new X12_N4(_segCur);
@@ -631,7 +641,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2200: Disability Information.  Repeat >1.  Guide page 23.</summary>
 		private void ReadLoop2200(Hx834_Member member) {
 			member.ListDisabilityInformation.Clear();
-			while(_segCur.SegmentID=="DSB") {
+			while(_segCur.IsType("DSB")) {
 				Hx834_DisabilityInformation disabilityInfo=new Hx834_DisabilityInformation();
 				ReadLoop2200_DSB(disabilityInfo);
 				ReadLoop2200_DTP(disabilityInfo);
@@ -641,7 +651,7 @@ namespace OpenDentBusiness {
 
 		///<summary>DSB: Disability Information.  Situational.  Repeat 1.  Guide page 138.</summary>
 		private void ReadLoop2200_DSB(Hx834_DisabilityInformation disabilityInfo) {
-			if(_segCur.SegmentID!="DSB") {
+			if(!_segCur.IsType("DSB")) {
 				return;
 			}
 			disabilityInfo.DisabilityInformation=new X12_DSB(_segCur);
@@ -651,7 +661,7 @@ namespace OpenDentBusiness {
 		///<summary>DTP: Disability Eligibility Dates.  Situational.  Repeat 2.  Guide page 140.</summary>
 		private void ReadLoop2200_DTP(Hx834_DisabilityInformation disabilityInfo) {
 			disabilityInfo.ListDisabilityEligibilityDates.Clear();
-			while(_segCur.SegmentID=="DTP") {
+			while(_segCur.IsType("DTP","360","361")) {
 				disabilityInfo.ListDisabilityEligibilityDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
@@ -660,7 +670,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2300: Health Coverage.  Repeat 99.  Guide page 23.</summary>
 		private void ReadLoop2300(Hx834_Member member) {
 			member.ListHealthCoverage.Clear();
-			while(_segCur.SegmentID=="HD") {
+			while(_segCur.IsType("HD")) {
 				Hx834_HealthCoverage healthCoverage=new Hx834_HealthCoverage();
 				ReadLoop2300_HD(healthCoverage);
 				ReadLoop2300_DTP(healthCoverage);
@@ -676,7 +686,7 @@ namespace OpenDentBusiness {
 
 		///<summary>HD: Health Coverage.  Situational.  Repeat 1.  Guide page 141.</summary>
 		private void ReadLoop2300_HD(Hx834_HealthCoverage healthCoverage) {
-			if(_segCur.SegmentID!="HD") {
+			if(!_segCur.IsType("HD")) {
 				return;
 			}
 			healthCoverage.HealthCoverage=new X12_HD(_segCur);
@@ -686,7 +696,7 @@ namespace OpenDentBusiness {
 		///<summary>DTP: Health Coverage Dates.  Required.  Repeat 6.  Guide page 145.</summary>
 		private void ReadLoop2300_DTP(Hx834_HealthCoverage healthCoverage) {
 			healthCoverage.ListHealthCoverageDates.Clear();
-			while(_segCur.SegmentID=="DTP") {
+			while(_segCur.IsType("DTP","300","303","343","348","349","543","695")) {
 				healthCoverage.ListHealthCoverageDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
@@ -695,7 +705,7 @@ namespace OpenDentBusiness {
 		///<summary>AMT: Health Coverage Policy.  Situational.  Repeat 9.  Guide page 147.</summary>
 		private void ReadLoop2300_AMT(Hx834_HealthCoverage healthCoverage) {
 			healthCoverage.ListHealthCoveragePolicies.Clear();
-			while(_segCur.SegmentID=="AMT") {
+			while(_segCur.IsType("AMT","B9","C1","D2","EBA","FK","P3","R")) {
 				healthCoverage.ListHealthCoveragePolicies.Add(new X12_AMT(_segCur));
 				_segNum++;
 			}
@@ -704,8 +714,7 @@ namespace OpenDentBusiness {
 		///<summary>REF: Health Coverage Policy Number.  Situational.  Repeat 14.  Guide page 148.</summary>
 		private void ReadLoop2300_REF_1(Hx834_HealthCoverage healthCoverage) {
 			healthCoverage.ListHealthCoveragePolicyNumbers.Clear();
-			List <string> listRefQualifiers=new List<string>(new string[] { "17","1L","9V","CE","E8","M7","PID","RB","X9","XM","XX1","XX2","ZX","ZZ" });
-			while(_segCur.SegmentID=="REF" && listRefQualifiers.Contains(_segCur.Get(1))) {
+			while(_segCur.IsType("REF","17","1L","9V","CE","E8","M7","PID","RB","X9","XM","XX1","XX2","ZX","ZZ")) {
 				healthCoverage.ListHealthCoveragePolicyNumbers.Add(new X12_REF(_segCur));
 				_segNum++;
 			}
@@ -713,7 +722,7 @@ namespace OpenDentBusiness {
 
 		///<summary>REF: Prior Coverage Months.  Situational.  Repeat 1.  Guide page 150.</summary>
 		private void ReadLoop2300_REF_2(Hx834_HealthCoverage healthCoverage) {
-			if(_segCur.SegmentID!="REF" || _segCur.Get(1)!="QQ") {
+			if(!_segCur.IsType("REF","QQ")) {
 				return;
 			}
 			healthCoverage.PriorCoverageMonths=new X12_REF(_segCur);
@@ -723,7 +732,7 @@ namespace OpenDentBusiness {
 		///<summary>IDC: IDentification Card.  Situational.  Repeat 3.  Guide page 152.</summary>
 		private void ReadLoop2300_IDC(Hx834_HealthCoverage healthCoverage) {
 			healthCoverage.ListIdentificationCards.Clear();
-			while(_segCur.SegmentID=="IDC") {
+			while(_segCur.IsType("IDC")) {
 				healthCoverage.ListIdentificationCards.Add(new X12_IDC(_segCur));
 				_segNum++;
 			}
@@ -734,7 +743,9 @@ namespace OpenDentBusiness {
 			healthCoverage.ListProviderInformation.Clear();
 			//There are two different LX segments which could be at this spot.
 			//The LX segments have the same simple format, so we have to look at the following segment to figure out which LX we are looking at.
-			while(_segCur.SegmentID=="LX" && (_segNum+1) < _listSegments.Count && _listSegments[_segNum+1].SegmentID=="NM1") {
+			while(_segCur.IsType("LX") && (_segNum+1) < _listSegments.Count 
+				&& _listSegments[_segNum+1].IsType("NM1","1X","3D","80","FA","OD","P3","QA","QN","Y2"))
+			{
 				Hx834_Provider prov=new Hx834_Provider();
 				ReadLoop2310_LX(prov);
 				ReadLoop2310_NM1(prov);
@@ -748,7 +759,7 @@ namespace OpenDentBusiness {
 
 		///<summary>LX: Provider Information.  Situational.  Repeat 1.  Guide page 154.</summary>
 		private void ReadLoop2310_LX(Hx834_Provider prov) {
-			if(_segCur.SegmentID!="LX") {
+			if(!_segCur.IsType("LX")) {
 				return;
 			}
 			prov.ProviderInformation=new X12_LX(_segCur);
@@ -757,14 +768,14 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Provider Name.  Required.  Repeat 1.  Guide page 155.</summary>
 		private void ReadLoop2310_NM1(Hx834_Provider prov) {
-			prov.ProviderName=new X12_NM1(_segCur);
+			prov.ProviderName=new X12_NM1(_segCur,"1X","3D","80","FA","OD","P3","QA","QN","Y2");
 			_segNum++;
 		}
 
 		///<summary>N3: Provider Address. Situational.  Repeat 2.  Guide page 158.</summary>
 		private void ReadLoop2310_N3(Hx834_Provider prov) {
 			prov.ListProviderAddresses.Clear();
-			while(_segCur.SegmentID=="N3") {
+			while(_segCur.IsType("N3")) {
 				prov.ListProviderAddresses.Add(new X12_N3(_segCur));
 				_segNum++;
 			}
@@ -772,7 +783,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Provider City, State, Zip Code.  Situational.  Repeat 1.  Guide page 159.</summary>
 		private void ReadLoop2310_N4(Hx834_Provider prov) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			prov.ProviderCityStateZipCode=new X12_N4(_segCur);
@@ -782,7 +793,7 @@ namespace OpenDentBusiness {
 		///<summary>PER: Provider Communications Numbers.  Situational.  Repeat 2.  Guide page 161.</summary>
 		private void ReadLoop2310_PER(Hx834_Provider prov) {
 			prov.ListProviderCommunicationsNumbers.Clear();
-			while(_segCur.SegmentID=="PER") {
+			while(_segCur.IsType("PER","IC")) {
 				prov.ListProviderCommunicationsNumbers.Add(new X12_PER(_segCur));
 				_segNum++;
 			}
@@ -790,7 +801,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PLA: PRovider Change Reason.  Situational.  Repeat 1.  Guide page 164.</summary>
 		private void ReadLoop2310_PLA(Hx834_Provider prov) {
-			if(_segCur.SegmentID!="PLA") {
+			if(!_segCur.IsType("PLA")) {
 				return;
 			}
 			prov.ProviderChangeReason=new X12_PLA(_segCur);
@@ -800,7 +811,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2320: Coordination of Benefits.  Repeat 5.  Guide page 23.</summary>
 		private void ReadLoop2320(Hx834_HealthCoverage healthCoverage) {
 			healthCoverage.ListCoordinationOfBeneifts.Clear();
-			while(_segCur.SegmentID=="COB") {
+			while(_segCur.IsType("COB")) {
 				Hx834_Cob cob=new Hx834_Cob();
 				ReadLoop2320_COB(cob);
 				ReadLoop2320_REF(cob);
@@ -812,7 +823,7 @@ namespace OpenDentBusiness {
 
 		///<summary>COB: Coordination of Benefits.  Situational.  Repeat 1.  Guide page 166.</summary>
 		private void ReadLoop2320_COB(Hx834_Cob cob) {
-			if(_segCur.SegmentID!="COB") {
+			if(!_segCur.IsType("COB")) {
 				return;
 			}
 			cob.CoordinationOfBenefits=new X12_COB(_segCur);
@@ -822,8 +833,7 @@ namespace OpenDentBusiness {
 		///<summary>REF: Additional Coordination of Benefits Identifiers.  Situational.  Repeat 4.  Guide page 168.</summary>
 		private void ReadLoop2320_REF(Hx834_Cob cob) {
 			cob.ListAdditionalCobIdentifiers.Clear();
-			List <string> listRefQualifiers=new List<string>(new string[] { "60","6P","SY","ZZ" });
-			while(_segCur.SegmentID=="REF" && listRefQualifiers.Contains(_segCur.Get(1))) {
+			while(_segCur.IsType("REF","60","6P","SY","ZZ")) {
 				cob.ListAdditionalCobIdentifiers.Add(new X12_REF(_segCur));
 				_segNum++;
 			}
@@ -832,7 +842,7 @@ namespace OpenDentBusiness {
 		///<summary>DTP: Coordination of Benefits Eligibility Dates.  Situational.  Repeat 2.  Guide page 170.</summary>
 		private void ReadLoop2320_DTP(Hx834_Cob cob) {
 			cob.ListCobEligibilityDates.Clear();
-			while(_segCur.SegmentID=="DTP") {
+			while(_segCur.IsType("DTP","344","345")) {
 				cob.ListCobEligibilityDates.Add(new X12_DTP(_segCur));
 				_segNum++;
 			}
@@ -841,8 +851,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2330: Coordination of Benefits Related Entity.  Repeat 3.  Guide page 23.</summary>
 		private void ReadLoop2330(Hx834_Cob cob) {
 			cob.ListCobRelatedEntities.Clear();
-			List <string> listIdentifierCodes=new List<string>(new string[] { "36","GW","IN" });
-			while(_segCur.SegmentID=="NM1" && listIdentifierCodes.Contains(_segCur.Get(1))) {
+			while(_segCur.IsType("NM1","36","GW","IN")) {
 				Hx834_CobRelatedEntity cobre=new Hx834_CobRelatedEntity();
 				ReadLoop2330_NM1(cobre);
 				ReadLoop2330_N3(cobre);
@@ -854,7 +863,7 @@ namespace OpenDentBusiness {
 
 		///<summary>NM1: Coordination of Benefits Releated Entity.  Situational.  Repeat 1.  Guide page 171.</summary>
 		private void ReadLoop2330_NM1(Hx834_CobRelatedEntity cobre) {
-			if(_segCur.SegmentID!="NM1") {
+			if(!_segCur.IsType("NM1","36","GW","IN")) {
 				return;
 			}
 			cobre.CobRelatedEntity=new X12_NM1(_segCur);
@@ -863,7 +872,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N3: Coordination of Benefits Related Entity Address.  Situational.  Repeat 1.  Guide page 173.</summary>
 		private void ReadLoop2330_N3(Hx834_CobRelatedEntity cobre) {
-			if(_segCur.SegmentID!="N3") {
+			if(!_segCur.IsType("N3")) {
 				return;
 			}
 			cobre.CobRelatedEntityAddress=new X12_N3(_segCur);
@@ -872,7 +881,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N4: Coordination of Benefits Other Insurance Company City, State, Zip Code.  Repeat 1.  Guide page 174.</summary>
 		private void ReadLoop2330_N4(Hx834_CobRelatedEntity cobre) {
-			if(_segCur.SegmentID!="N4") {
+			if(!_segCur.IsType("N4")) {
 				return;
 			}
 			cobre.CobOtherInsurance=new X12_N4(_segCur);
@@ -881,7 +890,7 @@ namespace OpenDentBusiness {
 
 		///<summary>PER: Administrative Communications Contact.  Situational.  Repeat 1.  Guide page 176.</summary>
 		private void ReadLoop2330_PER(Hx834_CobRelatedEntity cobre) {
-			if(_segCur.SegmentID!="PER") {
+			if(!_segCur.IsType("PER","CN")) {
 				return;
 			}
 			cobre.AdministrativeCommunicationsContact=new X12_PER(_segCur);
@@ -890,7 +899,7 @@ namespace OpenDentBusiness {
 
 		///<summary>LS: Additional Reporting Categories.  Situational.  Repeat 1.  Guide page 178.</summary>
 		private void ReadLoop2000_LS(Hx834_Member member) {
-			if(_segCur.SegmentID!="LS") {
+			if(!_segCur.IsType("LS")) {
 				return;
 			}
 			member.AdditionalReportingCategories=new X12_LS(_segCur);
@@ -900,7 +909,7 @@ namespace OpenDentBusiness {
 		///<summary>Loop 2700: Member Reporting Categories.  Repeat >1.  Guide page 24.</summary>
 		private void ReadLoop2700(Hx834_Member member) {
 			member.ListMemberReportingCategories.Clear();
-			while(_segCur.SegmentID=="LX") {
+			while(_segCur.IsType("LX")) {
 				Hx834_MemberReportingCategory mrc=new Hx834_MemberReportingCategory();
 				ReadLoop2700_LX(mrc);
 				ReadLoop2750(mrc);
@@ -910,7 +919,7 @@ namespace OpenDentBusiness {
 
 		///<summary>LX: Member Reporting Categories.  Situational.  Repeat 1.  Guide page 179.</summary>
 		private void ReadLoop2700_LX(Hx834_MemberReportingCategory mrc) {
-			if(_segCur.SegmentID!="LX") {
+			if(!_segCur.IsType("LX")) {
 				return;
 			}
 			mrc.MemberReportingCategories=new X12_LX(_segCur);
@@ -919,6 +928,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Loop 2750: Reporting Category.  Repeat 1.  Guide page 24.</summary>
 		private void ReadLoop2750(Hx834_MemberReportingCategory mrc) {
+			mrc.ReportingCategory=new Hx834_ReportingCategory();
 			ReadLoop2750_N1(mrc.ReportingCategory);
 			ReadLoop2750_REF(mrc.ReportingCategory);
 			ReadLoop2750_DTP(mrc.ReportingCategory);
@@ -926,7 +936,7 @@ namespace OpenDentBusiness {
 
 		///<summary>N1: Reporting Category.  Situational.  Repeat 1.  Guide page 180.</summary>
 		private void ReadLoop2750_N1(Hx834_ReportingCategory rc) {
-			if(_segCur.SegmentID!="N1") {
+			if(!_segCur.IsType("N1","75")) {
 				return;
 			}
 			rc.ReportingCategory=new X12_N1(_segCur);
@@ -935,7 +945,7 @@ namespace OpenDentBusiness {
 
 		///<summary>REF: Reporting Category Reference.  Situational.  Repeat 1.  Guide page 181.</summary>
 		private void ReadLoop2750_REF(Hx834_ReportingCategory rc) {
-			if(_segCur.SegmentID!="REF") {
+			if(!_segCur.IsType("REF","00","17","18","19","26","3L","6M","9V","9X","GE","LU","PID","XX1","XX2","YY","ZZ")) {
 				return;
 			}
 			rc.ReportingCategoryReference=new X12_REF(_segCur);
@@ -944,7 +954,7 @@ namespace OpenDentBusiness {
 
 		///<summary>DTP: Reporting Category Date.  Situational.  Repeat 1.  Guide page 183.</summary>
 		private void ReadLoop2750_DTP(Hx834_ReportingCategory rc) {
-			if(_segCur.SegmentID!="DTP") {
+			if(!_segCur.IsType("DTP","007")) {
 				return;
 			}
 			rc.ReportingCategoryDate=new X12_DTP(_segCur);
@@ -953,59 +963,12 @@ namespace OpenDentBusiness {
 
 		///<summary>LE: Additional Reporting Categories Loop Termination.  Situational.  Repeat 1.  Guide page 185.</summary>
 		private void ReadLoop2000_LE(Hx834_Member member) {
-			if(_segCur.SegmentID!="LE") {
+			if(!_segCur.IsType("LE")) {
 				return;
 			}
 			member.AdditionalReportingCategoriesLoopTermination=new X12_LE(_segCur);
 			_segNum++;
 		}
-
-		#region Helper Functions
-
-		///<summary>Returns true if the current segment has the specified segmentId,
-		///and the first element of the segment is one of the specified values.</summary>
-		private bool IsSeg(string segmentId,params string[] arrayElement01Values) {
-			if(_segCur.SegmentID!=segmentId) {
-				return false;
-			}
-			bool isElement01Valid=false;
-			string element01=_segCur.Get(1);
-			for(int i=0;i<arrayElement01Values.Length;i++) {
-				if(element01==arrayElement01Values[i]) {
-					isElement01Valid=true;
-					break;
-				}
-			}
-			if(!isElement01Valid) {
-				return false;
-			}
-			return true;
-		}
-
-		///<summary>Verifies that the current segment has the specified segmentId and that the first element of the segment is one of the specified values.</summary>
-		private void AssertSegCur(string segmentId,params string[] arrayElement01Values) {
-			if(_segCur.SegmentID!=segmentId) {
-				ReadError(segmentId+" segment expected.");
-			}
-			bool isElement01Valid=false;
-			string element01=_segCur.Get(1);
-			for(int i=0;i<arrayElement01Values.Length;i++) {
-				if(element01==arrayElement01Values[i]) {
-					isElement01Valid=true;
-					break;
-				}
-			}
-			if(!isElement01Valid) {
-				ReadError(segmentId+" segment expected with element 01 set to one of the following values: "+String.Join(",",arrayElement01Values));
-			}
-		}
-
-		///<summary>Throws the given message with extra detail added.  Helper function ensures the same pattern for all error messages.</summary>
-		private void ReadError(string message) {
-			throw new ApplicationException("Error on line "+_segNum+": "+message);
-		}
-
-		#endregion Helper Functions
 
 	}
 

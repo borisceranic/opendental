@@ -25,7 +25,6 @@ namespace OpenDental {
 		private void butImportPathPick_Click(object sender,EventArgs e) {
 			if(folderBrowserImportPath.ShowDialog()==DialogResult.OK) {
 				textImportPath.Text=folderBrowserImportPath.SelectedPath;
-				FillGridInsPlans();
 			}
 		}
 
@@ -42,10 +41,13 @@ namespace OpenDental {
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Errors",0));
 			}
 			gridInsPlans.Rows.Clear();
+			gridInsPlans.EndUpdate();
 			if(!Directory.Exists(textImportPath.Text)) {
-				gridInsPlans.EndUpdate();
 				return;
 			}
+			Application.DoEvents();//To show empty grid while the window is loading.
+			Cursor=Cursors.WaitCursor;
+			gridInsPlans.BeginUpdate();
 			string[] arrayImportFilePaths=Directory.GetFiles(textImportPath.Text);
 			for(int i=0;i<arrayImportFilePaths.Length;i++) {
 				string filePath=arrayImportFilePaths[i];
@@ -64,9 +66,13 @@ namespace OpenDental {
 					MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste("Failed to load file '"+filePath+"'. "+aex.Message);
 					msgBox.ShowDialog();
 				}
-
+				catch(Exception ex) {
+					MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste("Failed to load file '"+filePath+"'. "+ex.ToString());
+					msgBox.ShowDialog();
+				}
 			}
 			gridInsPlans.EndUpdate();
+			Cursor=Cursors.Default;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
