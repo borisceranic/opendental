@@ -473,9 +473,9 @@ namespace OpenDental{
 						}
 						insPercentages+=CovCats.GetDesc(benefitList[j].CovCatNum)+" "+benefitList[j].Percent.ToString()+"%";
 					}
-					insFreqBW=Benefits.GetFrequencyDisplay(FrequencyType.BW,benefitList);
-					insFreqExams=Benefits.GetFrequencyDisplay(FrequencyType.Exam,benefitList);
-					insFreqPanoFMX=Benefits.GetFrequencyDisplay(FrequencyType.PanoFMX,benefitList);
+					insFreqBW=Benefits.GetFrequencyDisplay(FrequencyType.BW,benefitList,plan.PlanNum);
+					insFreqExams=Benefits.GetFrequencyDisplay(FrequencyType.Exam,benefitList,plan.PlanNum);
+					insFreqPanoFMX=Benefits.GetFrequencyDisplay(FrequencyType.PanoFMX,benefitList,plan.PlanNum);
 					switch(plan.PlanType) {//(ppo, etc)
 						case "p":
 							insType="PPO Percentage";

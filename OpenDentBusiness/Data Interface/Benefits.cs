@@ -1703,121 +1703,126 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		public static string GetFrequencyDisplay(FrequencyType freqType,List<Benefit> benList) {
+		///<summary>Get the string for displaying the frequence for the specified type for the specified plan (primary, secondary).</summary>
+		public static string GetFrequencyDisplay(FrequencyType freqType,List<Benefit> benList, long planNum) {
 			string retVal="";
 			for(int i=0;i<benList.Count;i++){
+				Benefit ben=benList[i];
+				if(ben.PlanNum!=planNum) {
+					continue;
+				}
 				switch(freqType) {
 					case FrequencyType.BW:
-						if(ProcedureCodes.GetStringProcCode(benList[i].CodeNum)=="D0274"//4BW
-						&& benList[i].BenefitType==InsBenefitType.Limitations
+						if(ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D0274"//4BW
+						&& ben.BenefitType==InsBenefitType.Limitations
 						//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
-						&& benList[i].MonetaryAmt==-1
-						&& benList[i].PatPlanNum==0
-						&& benList[i].Percent==-1
-						&& (benList[i].QuantityQualifier==BenefitQuantity.Months 
-							|| benList[i].QuantityQualifier==BenefitQuantity.Years
-							|| benList[i].QuantityQualifier==BenefitQuantity.NumberOfServices))
+						&& ben.MonetaryAmt==-1
+						&& ben.PatPlanNum==0
+						&& ben.Percent==-1
+						&& (ben.QuantityQualifier==BenefitQuantity.Months 
+							|| ben.QuantityQualifier==BenefitQuantity.Years
+							|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices))
 						//&& ben.TimePeriod might be none, or calYear, or ServiceYear, or Years.
 						{
-							if(benList[i].QuantityQualifier==BenefitQuantity.Months) {
-								if(benList[i].Quantity==1) {
+							if(ben.QuantityQualifier==BenefitQuantity.Months) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every month.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
 								}
 							}
-							else if(benList[i].QuantityQualifier==BenefitQuantity.Years) {
-								if(benList[i].Quantity==1) {
+							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every year.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," years.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
 								}
 							}
 							else {
-								if(benList[i].Quantity==1) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once per year.\r\n");
 								}
 								else {
-									retVal+=benList[i].Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
 								}
 							}
 						}
 						continue;
 					case FrequencyType.PanoFMX:
-						if(ProcedureCodes.GetStringProcCode(benList[i].CodeNum)=="D0330"//Pano
-						&& benList[i].BenefitType==InsBenefitType.Limitations
+						if(ProcedureCodes.GetStringProcCode(ben.CodeNum)=="D0330"//Pano
+						&& ben.BenefitType==InsBenefitType.Limitations
 						//&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.Db).CovCatNum//ignored
-						&& benList[i].MonetaryAmt==-1
-						&& benList[i].PatPlanNum==0
-						&& benList[i].Percent==-1
-						&& (benList[i].QuantityQualifier==BenefitQuantity.Months 
-							|| benList[i].QuantityQualifier==BenefitQuantity.Years
-							|| benList[i].QuantityQualifier==BenefitQuantity.NumberOfServices))
+						&& ben.MonetaryAmt==-1
+						&& ben.PatPlanNum==0
+						&& ben.Percent==-1
+						&& (ben.QuantityQualifier==BenefitQuantity.Months 
+							|| ben.QuantityQualifier==BenefitQuantity.Years
+							|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices))
 							//&& ben.TimePeriod might be none, or calYear, or ServiceYear, or Years.
 						{
-							if(benList[i].QuantityQualifier==BenefitQuantity.Months) {
-								if(benList[i].Quantity==1) {
+							if(ben.QuantityQualifier==BenefitQuantity.Months) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every month.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
 								}
 							}
-							else if(benList[i].QuantityQualifier==BenefitQuantity.Years) {
-								if(benList[i].Quantity==1) {
+							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every year.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," years.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
 								}
 							}
 							else {
-								if(benList[i].Quantity==1) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once per year.\r\n");
 								}
 								else {
-									retVal+=benList[i].Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
 								}
 							}
 						}
 						continue;
 					case FrequencyType.Exam:
-						if(benList[i].CodeNum==0
-						&& benList[i].BenefitType==InsBenefitType.Limitations
+						if(ben.CodeNum==0
+						&& ben.BenefitType==InsBenefitType.Limitations
 						&& CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive)!=null
-						&& benList[i].CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive).CovCatNum
-						&& benList[i].MonetaryAmt==-1
-						&& benList[i].PatPlanNum==0
-						&& benList[i].Percent==-1
-						&& (benList[i].QuantityQualifier==BenefitQuantity.Months 
-							|| benList[i].QuantityQualifier==BenefitQuantity.Years
-							|| benList[i].QuantityQualifier==BenefitQuantity.NumberOfServices))
+						&& ben.CovCatNum==CovCats.GetForEbenCat(EbenefitCategory.RoutinePreventive).CovCatNum
+						&& ben.MonetaryAmt==-1
+						&& ben.PatPlanNum==0
+						&& ben.Percent==-1
+						&& (ben.QuantityQualifier==BenefitQuantity.Months 
+							|| ben.QuantityQualifier==BenefitQuantity.Years
+							|| ben.QuantityQualifier==BenefitQuantity.NumberOfServices))
 							//&& ben.TimePeriod might be none, or calYear, or ServiceYear, or Years.
 						{
-							if(benList[i].QuantityQualifier==BenefitQuantity.Months) {
-								if(benList[i].Quantity==1) {
+							if(ben.QuantityQualifier==BenefitQuantity.Months) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every month.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
 								}
 							}
-							else if(benList[i].QuantityQualifier==BenefitQuantity.Years) {
-								if(benList[i].Quantity==1) {
+							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once every year.\r\n");
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+benList[i].Quantity+Lans.g(null," years.\r\n");
+									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
 								}
 							}
 							else {
-								if(benList[i].Quantity==1) {
+								if(ben.Quantity==1) {
 									retVal+=Lans.g(null,"Once per year.\r\n");
 								}
 								else {
-									retVal+=benList[i].Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
 								}
 							}
 						}
