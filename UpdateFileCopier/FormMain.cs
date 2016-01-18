@@ -54,6 +54,11 @@ namespace UpdateFileCopier {
 			//web cam relies on shared library, OpenDentBusiness.dll (shared ref with OpenDental). 
 			//if this lib can't be updated then the opendental update/install fails
 			KillProcess("WebCamOD");
+			//Kill known applications that are present within the installation directory so that the resources are freed if currently in use.
+			//A customer complained on the forums about CentralManager explicitly.  DatabaseIntegrityCheck and ServiceManager are just in case.
+			KillProcess("CentralManager");
+			KillProcess("DatabaseIntegrityCheck");
+			KillProcess("ServiceManager");
 			//Create a separate thread to copy over the files from the UpdateFiles folder share.
 			//In putting this logic in a thread, the user can close the window and not disrupt the copying process.
 			ODThread odThread=new ODThread(OnThreadStart);
