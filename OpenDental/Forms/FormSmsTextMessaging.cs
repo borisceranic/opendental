@@ -56,6 +56,7 @@ namespace OpenDental {
 			checkSent.Checked=IsSent;			
 			checkRead.Checked=IsReceived;
 			FillGridTextMessages();
+			Plugins.HookAddCode(this,"FormSmsTextMessaging.Load_end");
 		}
 
 		private void FillGridTextMessages(bool isRedrawOnly=false) {
