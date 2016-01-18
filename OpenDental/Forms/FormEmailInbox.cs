@@ -47,7 +47,9 @@ namespace OpenDental {
 		private void FormEmailInbox_Load(object sender,EventArgs e) {
 			FillComboEmail();
 			if(_listEmailAddresses.Count==0) {
-				throw new Exception(Lan.g(this,"No email addresses available for current user.  Edit email address info in the File menu or Setup menu."));
+				MsgBox.Show(this,"No email addresses available for current user.  Edit email address info in the File menu or Setup menu.");
+				DialogResult=DialogResult.Cancel;
+				return;
 			}
 			textComputerNameReceive.Text=PrefC.GetString(PrefName.EmailInboxComputerName);
 			textComputerName.Text=Dns.GetHostName();
