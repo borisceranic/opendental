@@ -1084,10 +1084,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void gridReview_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(!(gridNotes.Rows[e.Row].Tag is JobReview)) {
+			if(!(gridReview.Rows[e.Row].Tag is JobReview)) {
 				return;//should never happen.
 			}
-			JobReview jobReview=(JobReview)gridNotes.Rows[e.Row].Tag;
+			JobReview jobReview=(JobReview)gridReview.Rows[e.Row].Tag;
 			bool readOnly=(jobReview.ReviewerNum!=Security.CurUser.UserNum);//read only if you are not the expert.
 			FormJobReviewEdit FormJRE=new FormJobReviewEdit(jobReview,readOnly);
 			FormJRE.ShowDialog();
