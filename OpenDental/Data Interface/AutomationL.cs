@@ -208,7 +208,7 @@ namespace OpenDental {
 		}
 
 		private static bool ProblemComparison(AutomationCondition autoCond,long patNum) {
-			List<Disease> problemList=Diseases.Refresh(patNum);
+			List<Disease> problemList=Diseases.Refresh(patNum,true);
 			switch(autoCond.Comparison) {//Find out what operand to use.
 				case AutoCondComparison.Equals:
 					for(int i=0;i<problemList.Count;i++) {//Includes hidden
