@@ -36,6 +36,8 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.EditableAcceptsCR = true;
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 42);
 			this.gridMain.Name = "gridMain";
@@ -44,7 +46,7 @@ namespace OpenDental{
 			this.gridMain.Size = new System.Drawing.Size(857, 317);
 			this.gridMain.TabIndex = 27;
 			this.gridMain.Title = "Code Systems Available";
-			this.gridMain.TranslationName = "";
+			this.gridMain.TranslationName = "TableCodeSystems";
 			// 
 			// butCheckUpdates
 			// 

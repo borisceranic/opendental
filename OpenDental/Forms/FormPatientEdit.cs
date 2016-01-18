@@ -243,14 +243,14 @@ namespace OpenDental{
 			listSites.BringToFront();
 			Lan.F(this);
 			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				labelST.Text="ST, Country";
+				labelST.Text=Lan.g(this,"ST, Country");
 				textCountry.Visible=true;
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-				labelSSN.Text="SIN";
-				labelZip.Text="Postal Code";
-				labelST.Text="Province";
-				butEditZip.Text="Edit Postal";
+				labelSSN.Text=Lan.g(this,"SIN");
+				labelZip.Text=Lan.g(this,"Postal Code");
+				labelST.Text=Lan.g(this,"Province");
+				butEditZip.Text=Lan.g(this,"Edit Postal");
 				labelCanadianEligibilityCode.Visible=true;
 				comboCanadianEligibilityCode.Visible=true;
 				radioStudentN.Visible=false;
@@ -259,9 +259,9 @@ namespace OpenDental{
 			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("GB")){//en-GB
 				//labelSSN.Text="?";
-				labelZip.Text="Postcode";
+				labelZip.Text=Lan.g(this,"Postcode");
 				labelST.Text="";//no such thing as state in GB
-				butEditZip.Text="Edit Postcode";
+				butEditZip.Text=Lan.g(this,"Edit Postcode");
 			}
 			_referredFromToolTip=new ToolTip();
 			_referredFromToolTip.InitialDelay=500;

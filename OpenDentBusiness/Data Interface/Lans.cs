@@ -79,26 +79,29 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
-		///<summary>This is where all the action happens.  This method is used by all the others.  This is always run on the client rather than the server, unless, of course, it's being called from the server.  If it inserts an item into the db table, it will also add it to the local cache, but will not trigger a refresh on both ends.</summary>
+		///<summary>This is where all the action happens.  This method is used by all the others.
+		///This is always run on the client rather than the server, unless, of course, it's being called from the server.
+		///If it inserts an item into the db table, it will also add it to the local cache, but will not trigger a refresh on both ends.</summary>
 		public static string ConvertString(string classType,string text) {
 			//No need to check RemotingRole; no call to db.
+			if(classType==null || text==null) {
+				return "";
+			}
 			if(CultureInfo.CurrentCulture.Name=="en-US") {
 				return text;
 			}
-			if(text=="") {
+			if(text.Trim()=="") {
 				return "";
 			}
 			if(hList==null) {
 				return text;
 			}
-			//ItemInserted=false;
 			if(!hList.ContainsKey(classType+text)) {
 				Language mylan=new Language();
 				mylan.ClassType=classType;
 				mylan.English=text;
 				Insert(mylan);
 				HList.Add(classType+text,mylan);
-				//ItemInserted=true;
 				return text;
 			}
 			if(LanguageForeigns.HList.Contains(classType+text)) {

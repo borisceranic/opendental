@@ -27,9 +27,7 @@ namespace OpenDental {
 			InitializeComponent();
 			//this.listMain.ContextMenu = this.menuEdit;
 			//Lan.F(this);
-			for(int i=0;i<menuEdit.MenuItems.Count;i++) {
-				Lan.C(this,menuEdit.MenuItems[i]);
-			}
+			Lan.C(this,menuEdit);
 			this.gridMain.ContextMenu=this.menuEdit;
 			JobHandler.JobFired+=ODEvent_Fired;
 		}

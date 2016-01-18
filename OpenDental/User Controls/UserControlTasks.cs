@@ -43,10 +43,13 @@ namespace OpenDental {
 			InitializeComponent();
 			//this.listMain.ContextMenu = this.menuEdit;
 			//Lan.F(this);
-			for(int i=0;i<menuEdit.MenuItems.Count;i++) {
-				Lan.C(this,menuEdit.MenuItems[i]);
-			}
-			this.gridMain.ContextMenu=this.menuEdit;
+			Lan.C(this,new Control[] {
+				checkShowFinished,
+				gridMain,
+				labelStartDate,
+			});
+			Lan.C(this,menuEdit);
+			gridMain.ContextMenu=menuEdit;
 		}
 
 		///<summary>The parent might call this if it gets a signal that a relevant task was added from another workstation.  The parent should only call this if it has been verified that there is a change to tasks.</summary>

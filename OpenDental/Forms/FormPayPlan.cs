@@ -1935,10 +1935,10 @@ namespace OpenDental{
 
 		private void SetNote() {
 			textNote.Text=_payPlanNote+DateTime.Today.ToShortDateString()
-				+" - Date of Agreement: "+textDate.Text
-				+", Total Amount: "+textAmount.Text
-				+", APR: "+textAPR.Text
-				+", Total Cost of Loan: "+textTotalCost.Text;
+				+" - "+Lan.g(this,"Date of Agreement")+": "+textDate.Text
+				+", "+Lan.g(this,"Total Amount")+": "+textAmount.Text
+				+", "+Lan.g(this,"APR")+": "+textAPR.Text
+				+", "+Lan.g(this,"Total Cost of Loan")+": "+textTotalCost.Text;
 		}
 
 		private decimal CalcPeriodPayment(double principalAmt,double periodRate,double interestUnpaidAmt,int payPlanChargesCount,bool isRecalculate) {

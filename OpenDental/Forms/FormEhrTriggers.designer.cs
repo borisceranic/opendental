@@ -37,6 +37,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 12);
@@ -45,7 +46,7 @@ namespace OpenDental{
 			this.gridMain.Size = new System.Drawing.Size(683, 560);
 			this.gridMain.TabIndex = 199;
 			this.gridMain.Title = "EHR Triggers";
-			this.gridMain.TranslationName = "";
+			this.gridMain.TranslationName = "TableEHRTriggers";
 			this.gridMain.WrapText = false;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 

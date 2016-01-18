@@ -37,11 +37,11 @@ namespace OpenDental {
 		private void FillGrid() {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("Description",200);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableEHRTriggers","Description"),200);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Cardinality",140);
+			col=new ODGridColumn(Lan.g("TableEHRTriggers","Cardinality"),140);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Trigger Categories",200);
+			col=new ODGridColumn(Lan.g("TableEHRTriggers","Trigger Categories"),200);
 			gridMain.Columns.Add(col);
 			ListEhrTriggers=EhrTriggers.GetAll();
 			gridMain.Rows.Clear();
@@ -92,7 +92,7 @@ namespace OpenDental {
 			EhrMeasureEvent measureEvent=new EhrMeasureEvent();
 			measureEvent.DateTEvent=DateTime.Now;
 			measureEvent.EventType=EhrMeasureEventType.ClinicalInterventionRules;
-			measureEvent.MoreInfo="Triggers currently enabled: "+ListEhrTriggers.Count;
+			measureEvent.MoreInfo=Lan.g(this,"Triggers currently enabled")+": "+ListEhrTriggers.Count;
 			EhrMeasureEvents.Insert(measureEvent);
 		}
 

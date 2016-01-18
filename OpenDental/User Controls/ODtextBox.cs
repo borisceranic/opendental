@@ -133,27 +133,21 @@ namespace OpenDental {
 			ListCorrect.Add("\t");
 			ListIncorrect=new List<string>();
 			EventHandler onClick=new EventHandler(menuItem_Click);
-			MenuItem menuItem;
 			contextMenu.MenuItems.Add("",onClick);//These five menu items will hold the suggested spelling for misspelled words.  If no misspelled words, they will not be visible.
 			contextMenu.MenuItems.Add("",onClick);
 			contextMenu.MenuItems.Add("",onClick);
 			contextMenu.MenuItems.Add("",onClick);
 			contextMenu.MenuItems.Add("",onClick);
 			contextMenu.MenuItems.Add("-");
-			contextMenu.MenuItems.Add("Add to Dictionary",onClick);
-			contextMenu.MenuItems.Add("Disable Spell Check",onClick);
+			contextMenu.MenuItems.Add(Lan.g(this,"Add to Dictionary"),onClick);
+			contextMenu.MenuItems.Add(Lan.g(this,"Disable Spell Check"),onClick);
 			contextMenu.MenuItems.Add("-");
-			menuItem=new MenuItem(Lan.g(this,"Insert Date"),onClick,Shortcut.CtrlD);
-			contextMenu.MenuItems.Add(menuItem);
-			menuItem=new MenuItem(Lan.g(this,"Insert Quick Note"),onClick,Shortcut.CtrlQ);
-			contextMenu.MenuItems.Add(menuItem);
+			contextMenu.MenuItems.Add(new MenuItem(Lan.g(this,"Insert Date"),onClick,Shortcut.CtrlD));
+			contextMenu.MenuItems.Add(new MenuItem(Lan.g(this,"Insert Quick Note"),onClick,Shortcut.CtrlQ));
 			contextMenu.MenuItems.Add("-");
-			menuItem=new MenuItem(Lan.g(this,"Cut"),onClick,Shortcut.CtrlX);
-			contextMenu.MenuItems.Add(menuItem);
-			menuItem=new MenuItem(Lan.g(this,"Copy"),onClick,Shortcut.CtrlC);
-			contextMenu.MenuItems.Add(menuItem);
-			menuItem=new MenuItem(Lan.g(this,"Paste"),onClick,Shortcut.CtrlV);
-			contextMenu.MenuItems.Add(menuItem);
+			contextMenu.MenuItems.Add(new MenuItem(Lan.g(this,"Cut"),onClick,Shortcut.CtrlX));
+			contextMenu.MenuItems.Add(new MenuItem(Lan.g(this,"Copy"),onClick,Shortcut.CtrlC));
+			contextMenu.MenuItems.Add(new MenuItem(Lan.g(this,"Paste"),onClick,Shortcut.CtrlV));
 			base.BackColor=SystemColors.Window;//Needed for OnReadOnlyChanged() to change backcolor when ReadOnly because of an issue with RichTextBox.
 		}
 

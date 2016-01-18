@@ -35,6 +35,8 @@ namespace OpenDental{
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 12);
 			this.gridMain.Name = "gridMain";
@@ -79,6 +81,8 @@ namespace OpenDental{
 			// 
 			this.gridOld.AllowSortingByColumn = true;
 			this.gridOld.EditableAcceptsCR = true;
+			this.gridOld.HasAddButton = false;
+			this.gridOld.HasMultilineHeaders = false;
 			this.gridOld.HScrollVisible = true;
 			this.gridOld.Location = new System.Drawing.Point(266, 12);
 			this.gridOld.Name = "gridOld";
@@ -87,13 +91,15 @@ namespace OpenDental{
 			this.gridOld.Size = new System.Drawing.Size(310, 614);
 			this.gridOld.TabIndex = 85;
 			this.gridOld.Title = "Old Revision";
-			this.gridOld.TranslationName = "";
+			this.gridOld.TranslationName = "TableOldRevision";
 			// 
 			// gridCur
 			// 
 			this.gridCur.AllowSortingByColumn = true;
 			this.gridCur.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.gridCur.EditableAcceptsCR = true;
+			this.gridCur.HasAddButton = false;
+			this.gridCur.HasMultilineHeaders = false;
 			this.gridCur.HScrollVisible = true;
 			this.gridCur.Location = new System.Drawing.Point(582, 12);
 			this.gridCur.Name = "gridCur";
@@ -102,7 +108,7 @@ namespace OpenDental{
 			this.gridCur.Size = new System.Drawing.Size(299, 614);
 			this.gridCur.TabIndex = 86;
 			this.gridCur.Title = "Current Revision";
-			this.gridCur.TranslationName = "";
+			this.gridCur.TranslationName = "TableCurrentRevision";
 			// 
 			// FormWikiListHistory
 			// 

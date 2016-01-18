@@ -2338,9 +2338,7 @@ namespace OpenDental{
 				myOutlookBar.Buttons[3].ImageIndex=7;
 				myOutlookBar.Buttons[4].ImageIndex=8;
 			}
-			foreach(MenuItem menuItem in mainMenu.MenuItems){
-				TranslateMenuItem(menuItem);
-			}
+			Lan.C("MainMenu",mainMenu);
 			if(CultureInfo.CurrentCulture.Name=="en-US") {
 				//for the business layer, this functionality is duplicated in the Lan class.  Need for SL.
 				CultureInfo cInfo=(CultureInfo)CultureInfo.CurrentCulture.Clone();
@@ -5294,16 +5292,6 @@ namespace OpenDental{
 			RefreshCurrentModule();
 			FillPatientButton(CurPatNum,pat.GetNameLF(),pat.Email!="",pat.ChartNumber);
 		}*/
-
-		///<summary>This is recursive</summary>
-		private void TranslateMenuItem(MenuItem menuItem){
-			//first translate any child menuItems
-			foreach(MenuItem mi in menuItem.MenuItems){
-				TranslateMenuItem(mi);
-			}
-			//then this menuitem
-			Lan.C("MainMenu",menuItem);
-		}
 
 		#region MenuEvents
 		private void menuItemLogOff_Click(object sender, System.EventArgs e) {

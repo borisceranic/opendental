@@ -286,7 +286,7 @@ namespace OpenDentBusiness{
 			string command="SELECT * FROM treatplan "
 				+"WHERE PatNum="+POut.Long(patNum)+" "
 				+"AND TPStatus="+POut.Int((int)TreatPlanStatus.Inactive)+" "
-				+"AND Heading='"+POut.String(Lans.g("TreatPlan","Unassigned"))+"'";
+				+"AND Heading='"+POut.String(Lans.g("TreatPlans","Unassigned"))+"'";
 			return Crud.TreatPlanCrud.SelectOne(command)??new TreatPlan();
 		}
 
@@ -305,15 +305,15 @@ namespace OpenDentBusiness{
 			//Make Active TP's inactive. Rename if TP's still have default name.
 			List<TreatPlan> listActivePlans=Crud.TreatPlanCrud.SelectMany(command);
 			foreach(TreatPlan tp in listActivePlans) {//should only ever be one, but just in case there are multiple this will rectify the problem.
-				if(tp.Heading==Lans.g("TreatPlan","Active Treatment Plan")) {
-					tp.Heading=Lans.g("TreatPlan","Inactive Treatment Plan");
+				if(tp.Heading==Lans.g("TreatPlans","Active Treatment Plan")) {
+					tp.Heading=Lans.g("TreatPlans","Inactive Treatment Plan");
 				}
 				tp.TPStatus=TreatPlanStatus.Inactive;
 				TreatPlans.Update(tp);
 			}
 			//Heading is changed from within the form, if they have changed it back to Inactive Treatment Plan it was deliberate.
-			//if(treatPlanCur.Heading==Lans.g("TreatPlan","Inactive Treatment Plan")) {
-			//	treatPlanCur.Heading=Lans.g("TreatPlan","Active Treatment Plan");
+			//if(treatPlanCur.Heading==Lans.g("TreatPlans","Inactive Treatment Plan")) {
+			//	treatPlanCur.Heading=Lans.g("TreatPlans","Active Treatment Plan");
 			//}
 			//Not necessary, treatPlanCur should be set to Active prior to calling this function.
 			//treatPlanCur.TPStatus=TreatPlanStatus.Active;
