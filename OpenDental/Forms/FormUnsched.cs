@@ -106,7 +106,6 @@ namespace OpenDental{
 			this.grid.Title = "Unscheduled List";
 			this.grid.TranslationName = "TableUnsched";
 			this.grid.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.grid_CellDoubleClick);
-			this.grid.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grid_MouseDown);
 			this.grid.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grid_MouseUp);
 			// 
 			// butPrint
@@ -306,37 +305,44 @@ namespace OpenDental{
 			}
 			_listAptSelected=new List<long>();
 			FillGrid();
-			_menuRightClick.Items.Clear();
-			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 			Cursor=Cursors.Default;
 		}
 
 		private void menuRight_click(object sender,System.EventArgs e) {
 			switch(_menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
 				case 0:
-					SeeChart_Click();
+					SelectPatient_Click();
 					break;
 				case 1:
-					SendPinboard_Click();
+					SeeChart_Click();
 					break;
 				case 2:
+					SendPinboard_Click();
+					break;
+				case 3:
 					Delete_Click();
 					break;
 			}
 		}
 
-		private void grid_MouseDown(object sender,MouseEventArgs e) {
-			
+		private void grid_MouseUp(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right && grid.SelectedIndices.Length>0) {
+				//To maintain legacy behavior we will use the last selected index if multiple are selected.
+				Patient pat=Patients.GetPat(ListUn[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);
+				_menuRightClick.Items.Clear();
+				_menuRightClick.Items.Add(Lan.g(this,"Select Patient")+" ("+pat.GetNameFL()+")",null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Show(grid,new Point(e.X,e.Y));
+			}
 		}
 
-		private void grid_MouseUp(object sender,MouseEventArgs e) {
-			if(e.Button==MouseButtons.Right) {
-				if(grid.SelectedIndices.Length>0) {
-					_menuRightClick.Show(grid,new Point(e.X,e.Y));
-				}
-			}
+		private void SelectPatient_Click() {
+			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			long patNum=ListUn[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum;
+			Patient pat=Patients.GetPat(patNum);
+			PatientGoTo(this,new OpenDental.PatientSelectedEventArgs(pat));
 		}
 
 		///<summary>If multiple patients are selected in UnchedList, will select the last patient to remain consistent with sending to pinboard behavior.</summary>

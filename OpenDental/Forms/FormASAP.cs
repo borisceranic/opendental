@@ -268,12 +268,6 @@ namespace OpenDental{
 				}
 			}
 			FillGrid();
-			_menuRightClick.Items.Clear();
-			//Menu items added dynamically so that we can translate each menu item.  We do not do Lan.F() here, and it would not help anyway.
-			_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
-			_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 			Cursor=Cursors.Default;
 		}
 
@@ -375,9 +369,17 @@ namespace OpenDental{
 
 		private void grid_MouseUp(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right && grid.SelectedIndices.Length>0) {
+				//To maintain legacy behavior we will use the last selected index if multiple are selected.
+				Patient pat=Patients.GetPat(ListASAP[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);
+				_menuRightClick.Items.Clear();
+				//Menu items added dynamically so that we can translate each menu item.  We do not do Lan.F() here, and it would not help anyway.
+				_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Show(grid,new Point(e.X,e.Y));
 			}
-		}		
+		}
 
 		///<summary>If multiple patients are selected in the list, it will use the last patient to show the chart for.</summary>
 		private void SeeChart_Click() {

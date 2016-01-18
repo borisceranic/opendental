@@ -97,6 +97,8 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 53);
 			this.gridMain.Name = "gridMain";
@@ -291,18 +293,18 @@ namespace OpenDental{
 			}
 			RefreshAptList();
 			FillGrid();
-			menuRightClick.Items.Clear();
-			menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
-			menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
 			Cursor=Cursors.Default;
 		}
 
 		private void menuRight_click(object sender,System.EventArgs e) {
 			switch(menuRightClick.Items.IndexOf((ToolStripMenuItem)sender)) {
-				case 0:
-					SeeChart_Click();
+				case 0: 
+					SelectPatient_Click();
 					break;
 				case 1:
+					SeeChart_Click();
+					break;
+				case 2:
 					SendPinboard_Click();
 					break;
 			}
@@ -384,11 +386,21 @@ namespace OpenDental{
 		}
 
 		private void grid_MouseUp(object sender,MouseEventArgs e) {
-			if(e.Button==MouseButtons.Right) {
-				if(gridMain.SelectedIndices.Length>0) {
-					menuRightClick.Show(gridMain,new Point(e.X,e.Y));
-				}
+			if(e.Button==MouseButtons.Right && gridMain.SelectedIndices.Length>0) {
+				Patient pat=Patients.GetPat(AptList[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]].PatNum);
+				menuRightClick.Items.Clear();
+				menuRightClick.Items.Add(Lan.g(this,"Select Patient")+" ("+pat.GetNameFL()+")",null,new EventHandler(menuRight_click));
+				menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
+				menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
+				menuRightClick.Show(gridMain,new Point(e.X,e.Y));
 			}
+		}
+
+		private void SelectPatient_Click() {
+			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
+			long patNum=AptList[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]].PatNum;
+			Patient pat=Patients.GetPat(patNum);
+			PatientGoTo(this,new OpenDental.PatientSelectedEventArgs(pat));
 		}
 
 		private void SeeChart_Click() {
