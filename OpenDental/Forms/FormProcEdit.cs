@@ -283,6 +283,13 @@ namespace OpenDental{
 			//LoopList=null;
 			InitializeComponent();
 			Lan.F(this);
+			Lan.C(this,new Control[] {
+				tabPageCanada,
+				tabPageFinancial,
+				tabPageMedical,
+				tabPageMisc,
+				tabPageOrion,
+			});
 			//allowTopaz=(Environment.OSVersion.Platform!=PlatformID.Unix && !CodeBase.ODEnvironment.Is64BitOperatingSystem());
 			sigBox.SetTabletState(1);
 			//if(!allowTopaz) {

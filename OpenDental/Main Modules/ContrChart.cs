@@ -3230,8 +3230,16 @@ namespace OpenDental {
 				tabPrimary,
 				tabPlanned,
 				tabShow,
-				tabDraw},
-				true);
+				tabDraw,
+				gridChartViews,
+				gridCustomerViews,
+				gridPlanned,
+				gridProg,
+				gridPtInfo,
+				gridTpProcs,
+				gridTreatPlans,
+			},true);
+			Lan.C(this,menuProgRight,menuErx,menuToothChart);
 			LayoutToolBar();
 			//ComputerPref localComputerPrefs=ComputerPrefs.GetForLocalComputer();
 			this.toothChart.DeviceFormat=new ToothChartDirectX.DirectXDeviceFormat(ComputerPrefs.LocalComputer.DirectXFormat);

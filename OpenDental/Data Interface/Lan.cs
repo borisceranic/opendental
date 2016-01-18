@@ -49,6 +49,15 @@ namespace OpenDental{
 			//}
 		}
 
+		///<summary>Translates every menu item in the menus passed in.</summary>
+		public static void C(Control sender,params Menu[] arrayMenus) {
+			foreach(Menu menu in arrayMenus) {
+				foreach(MenuItem menuItem in menu.MenuItems) {
+					C(sender,menuItem);
+				}
+			}
+		}
+
 		//controls-----------------------------------------------
 		///<summary></summary>
 		public static void C(string classType,System.Windows.Forms.Control[] contr) {
