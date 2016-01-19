@@ -952,7 +952,7 @@ namespace OpenDentBusiness {
 			//Column order: ElectID,CanadianEncryptionMethod,CDAnetVersion,CanadianSupportedTypes,CanadianNetworkNum
 			object[] carrierInfo=new object[] {
 				//accerta
-				"311140",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
+				"311140",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//adsc
 				"000105",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes|eligibilityTypes,canadianNetworkNumCSI,
 				//aga
@@ -966,33 +966,33 @@ namespace OpenDentBusiness {
 				//autoben
 				"628151",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//benecaid health benefit solutions
-				"610708",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
+				"610708",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//benefits trust
 				"610146",1,"02",claimTypes|predeterminationTypes,canadianNetworkNumTelusB,
-				//beneplan
+				//beneplan - Old carrier that is no longer listed one iTrans supported list.
 				"400008",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
-				//boilermakers' national benefit plan
+				//boilermakers' national benefit plan - Old carrier that is no longer listed one iTrans supported list.
 				"000116",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//canadian benefit providers
 				"610202",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
 				//capitale
-				"600502",1,"04",claimTypes,canadianNetworkNumTelusB,
+				"600502",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes,canadianNetworkNumTelusB,
 				//carpenters and allied workers local
 				"000117",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//cdcs
 				"610129",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCDCS,
 				//claimsecure
 				"610099",1,"04",claimTypes|eligibilityTypes,canadianNetworkNumTelusB,
-				//ccq
-				"000036",1,"02",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//co-operators
-				"606258",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
+				"606258",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
+				//Commision de la construction du Quebec
+				"000036",1,"02",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//coughlin & associates
 				"610105",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes,canadianNetworkNumTelusB,
 				//cowan wright beauchamps
-				"610153",1,"04",claimTypes|reversalTypes,canadianNetworkNumCSI,
+				"610153",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//desjardins financial security
-				"000051",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
+				"000051",1,"04",claimTypes,canadianNetworkNumTelusB,
 				//empire life insurance company
 				"000033",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//equitable life
@@ -1000,31 +1000,31 @@ namespace OpenDentBusiness {
 				//esorse corporation
 				"610650",1,"04",claimTypes|reversalTypes|predeterminationTypes|rprTypes|cobTypes,canadianNetworkNumTelusB,
 				//fas administrators
-				"610614",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
+				"610614",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
+				//GMS Insurance Inc. (GMS) (ESC)
+				"610218",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//great west life assurance company
 				"000011",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
 				//green sheild canada
 				"000102",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
 				//group medical services
-				"610217",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
-				//group medical services saskatchewan
-				"610218",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
-				//groupsource
-				"605064",1,"04",claimTypes|reversalTypes|eligibilityTypes,canadianNetworkNumCSI,
+				"610217",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//groupe premier medical
 				"610266",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
+				//groupsource - Old carrier that is no longer listed one iTrans supported list.
+				"605064",1,"04",claimTypes|reversalTypes|eligibilityTypes,canadianNetworkNumCSI,
+				//Humania Assurance Inc (formerly La Survivance) (ESC)
+				"000080",1,"04",claimTypes,canadianNetworkNumTelusB,
 				//industrial alliance
 				"000060",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
-				//industrial alliance pacific insuarnce and financial
+				//industrial alliance pacific insurance and financial
 				"000024",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
-				//internationale campagnie d'assurance vie
-				"610643",1,"04",claimTypes|reversalTypes,canadianNetworkNumCSI,
 				//johnson inc.
 				"627265",1,"04",claimTypes,canadianNetworkNumTelusB,
 				//johnston group
-				"627223",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusA,
+				"627223",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//lee-power & associates
-				"627585",1,"02",claimTypes,canadianNetworkNumTelusB,
+				"627585",1,"02",claimTypes,canadianNetworkNumTelusA,
 				//local 1030 health benefity plan
 				"000118",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//manion wilkins
@@ -1048,44 +1048,46 @@ namespace OpenDentBusiness {
 				//medavie blue cross
 				"610047",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//nexgenrx
-				"610634",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumCSI,
-				//nihb
-				"610124",1,"04",claimTypes|reversalTypes,canadianNetworkNumCSI,
+				"610634",1,"04",claimTypes|reversalTypes|predeterminationTypes|cobTypes,canadianNetworkNumTelusB,
+				//Non-Insured Health Benefits (NIHB) Program (ESC)
+				"610124",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//nova scotia community services
 				"000109",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes|eligibilityTypes,canadianNetworkNumCSI,
 				//nova scotia medical services insurance
 				"000108",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes|eligibilityTypes,canadianNetworkNumCSI,
 				//nunatsiavut government department of health
 				"610172",1,"04",claimTypes|reversalTypes,canadianNetworkNumCSI,
+				//ontario ironworkers
+				"000123",1,"04",claimTypes|predeterminationTypes|cobTypes,canadianNetworkNumCSI,
 				//pacific blue cross
-				"000064",1,"04",claimTypes|predeterminationTypes|rotTypes,canadianNetworkNumPBC,
-				//quickcard
-				"000103",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes|eligibilityTypes,canadianNetworkNumCSI,
+				"000064",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumPBC,
 				//pbas
 				"610256",1,"04",claimTypes|predeterminationTypes|rotTypes,canadianNetworkNumCSI,
+				//quickcard
+				"000103",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes|eligibilityTypes,canadianNetworkNumCSI,
 				//rwam insurance
 				"610616",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//saskatchewan blue cross
 				"000096",1,"04",claimTypes,canadianNetworkNumTelusB,
 				//ses benefits
 				"610196",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
-				//sheet metal workers local 30 benefit plan
+				//sheet metal workers local 30 benefit plan - Old carrier that is no longer listed one iTrans supported list.
 				"000119",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//ssq societe d'assurance-vie inc.
-				"000079",1,"04",claimTypes,canadianNetworkNumCSI,
+				"000079",1,"04",claimTypes,canadianNetworkNumTelusB,
 				//standard life assurance company
 				"000020",1,"04",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
 				//sun life of canada
 				"000016",1,"04",claimTypes|reversalTypes|predeterminationTypes|rotTypes|cobTypes,canadianNetworkNumTelusB,
-				//survivance
-				"000080",1,"04",claimTypes,canadianNetworkNumCSI,
 				//syndicat des fonctionnaires municipaux mtl
-				"610677",1,"04",claimTypes|reversalTypes,canadianNetworkNumCSI,
+				"610677",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//the building union of canada health beneift plan
 				"000120",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
+				//U-L Mutual (ESC)
+				"610643",1,"04",claimTypes|reversalTypes,canadianNetworkNumTelusB,
 				//u.a. local 46 dental plan
 				"000115",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
-				//u.a. local 787 health trust fund dental plan
+				//u.a. local 787 health trust fund dental plan - Old carrier that is no longer listed one iTrans supported list.
 				"000110",1,"04",claimTypes|predeterminationTypes,canadianNetworkNumCSI,
 				//wawanesa
 				"311109",1,"02",claimTypes|reversalTypes|predeterminationTypes,canadianNetworkNumTelusB,
