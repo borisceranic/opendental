@@ -111,7 +111,7 @@ namespace OpenDental {
 			Dictionary<long,string> dictPatNames=Patients.GetAllPatientNames();
 			if(listSmsFromStatuses.Count>0) {
 				if(!isRedrawOnly) {
-					_listSmsFromMobile=SmsFromMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum,listSmsFromStatuses.ToArray());
+					_listSmsFromMobile=SmsFromMobiles.GetMessages(dateFrom,dateTo,listClinicNums,_patNum,false,listSmsFromStatuses.ToArray());
 				}
 				for(int i=0;i<_listSmsFromMobile.Count;i++) {
 					if(!checkHidden.Checked && _listSmsFromMobile[i].IsHidden) {
@@ -244,7 +244,7 @@ namespace OpenDental {
 				selectedTag=gridMessages.Rows[gridMessages.GetSelectedIndex()].Tag;
 			}
 			List<SmsThreadMessage> listSmsThreadMessages=new List<SmsThreadMessage>();
-			List<SmsFromMobile> listSmsFromMobile=SmsFromMobiles.GetMessages(DateTime.MinValue,DateTime.MinValue,listClinicNums,patNum);
+			List<SmsFromMobile> listSmsFromMobile=SmsFromMobiles.GetMessages(DateTime.MinValue,DateTime.MinValue,listClinicNums,patNum,true);
 			for(int i=0;i<listSmsFromMobile.Count;i++) {
 				bool isHighlighted=false;
 				if(selectedTag is SmsFromMobile	&& ((SmsFromMobile)selectedTag).SmsFromMobileNum==listSmsFromMobile[i].SmsFromMobileNum) {
