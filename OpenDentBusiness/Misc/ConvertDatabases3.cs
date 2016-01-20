@@ -12544,7 +12544,80 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'Ins834IsPatientCreate','1')";
 					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS dashboardlayout";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dashboardlayout (
+						DashboardLayoutNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNum bigint NOT NULL,
+						UserGroupNum bigint NOT NULL,
+						DashboardTabName varchar(255) NOT NULL,
+						DashboardTabOrder int NOT NULL,
+						DashboardRows int NOT NULL,
+						DashboardColumns int NOT NULL,
+						INDEX(UserNum),
+						INDEX(UserGroupNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
 				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE dashboardlayout'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dashboardlayout (
+						DashboardLayoutNum number(20) NOT NULL,
+						UserNum number(20) NOT NULL,
+						UserGroupNum number(20) NOT NULL,
+						DashboardTabName varchar2(255),
+						DashboardTabOrder number(11) NOT NULL,
+						DashboardRows number(11) NOT NULL,
+						DashboardColumns number(11) NOT NULL,
+						CONSTRAINT dashboardlayout_DashboardLayou PRIMARY KEY (DashboardLayoutNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX dashboardlayout_UserNum ON dashboardlayout (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX dashboardlayout_UserGroupNum ON dashboardlayout (UserGroupNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS dashboardcell";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dashboardcell (
+						DashboardCellNum bigint NOT NULL auto_increment PRIMARY KEY,
+						DashboardLayoutNum bigint NOT NULL,
+						CellRow int NOT NULL,
+						CellColumn int NOT NULL,
+						CellType varchar(255) NOT NULL,
+						CellSettings text NOT NULL,
+						LastQueryTime datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						LastQueryData text NOT NULL,
+						RefreshRateSeconds int NOT NULL,
+						INDEX(DashboardLayoutNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE dashboardcell'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE dashboardcell (
+						DashboardCellNum number(20) NOT NULL,
+						DashboardLayoutNum number(20) NOT NULL,
+						CellRow number(11) NOT NULL,
+						CellColumn number(11) NOT NULL,
+						CellType varchar2(255),
+						CellSettings clob,
+						LastQueryTime date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						LastQueryData clob,
+						RefreshRateSeconds number(11) NOT NULL,
+						CONSTRAINT dashboardcell_DashboardCellNum PRIMARY KEY (DashboardCellNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX dashboardcell_DashboardLayoutN ON dashboardcell (DashboardLayoutNum)";
+					Db.NonQ(command);
+				}
+
+
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
