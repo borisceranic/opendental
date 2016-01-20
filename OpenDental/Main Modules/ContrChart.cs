@@ -5793,7 +5793,7 @@ namespace OpenDental {
 			//DisplayFields.RefreshCache();
 			if(gridChartViews.Rows.Count==0) {//No chart views, Use default values.
 				fields=DisplayFields.GetDefaultList(DisplayFieldCategory.None);
-				gridProg.Title="Progress Notes";
+				gridProg.Title=Lan.g("TableProg","Progress Notes");
 				if(!chartCustViewChanged) {
 					checkSheets.Checked=true;
 					checkTasks.Checked=true;
@@ -5812,7 +5812,7 @@ namespace OpenDental {
 					checkNotes.Checked=true;
 					checkShowTeeth.Checked=false;
 					checkAudit.Checked=false;
-					textShowDateRange.Text="All Dates";
+					textShowDateRange.Text=Lan.g(this,"All Dates");
 				}
 			}
 			else {
