@@ -22,7 +22,6 @@ namespace OpenDental.Bridges {
 				return;
 			}
 			string fileName=ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Document folder");
-			fileName+=Tidy(pat.LName+pat.FName);
 			string oldFileName=ODFileUtils.CombinePaths(fileName,Tidy(pat.LName+pat.FName));
 			//ProgramProperties.GetPropVal() is the way to get program properties.
 			if(ProgramProperties.GetPropVal(ProgramCur.ProgramNum,"Enter 0 to use PatientNum, or 1 to use ChartNum")=="0") {
