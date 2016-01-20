@@ -183,6 +183,8 @@
     <Compile Include="Crud\ClaimSnapshotCrud.cs" />
     <Compile Include="Crud\ConnectionGroupCrud.cs" />
     <Compile Include="Crud\ConnGroupAttachCrud.cs" />
+    <Compile Include="Crud\DashboardCellCrud.cs" />
+    <Compile Include="Crud\DashboardLayoutCrud.cs" />
     <Compile Include="Crud\DispSupplyCrud.cs" />
     <Compile Include="Crud\EbillCrud.cs" />
     <Compile Include="Crud\EhrAptObsCrud.cs" />
@@ -423,6 +425,8 @@
     <Compile Include="Crud\UserClinicCrud.cs" />
     <Compile Include="Data Interface\ApptComms.cs" />
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
+    <Compile Include="Data Interface\DashboardCells.cs" />
+    <Compile Include="Data Interface\DashboardLayouts.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="Data Interface\InsVerifies.cs" />
@@ -430,7 +434,8 @@
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="InternalTools\Job Manager\BugCrud.cs" />
     <Compile Include="InternalTools\Job Manager\Bugs.cs" />
-    <Compile Include="Data Interface\UserClinics.cs" />    <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
+    <Compile Include="Data Interface\UserClinics.cs" />
+    <Compile Include="InternalTools\Job Manager\JobNotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobQuotes.cs" />
     <Compile Include="InternalTools\Job Manager\JobPermissions.cs" />
     <Compile Include="Data Interface\ProviderErxs.cs" />
