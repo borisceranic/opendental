@@ -581,6 +581,14 @@ namespace OpenDentBusiness {
 			return retVal;
 		}
 
+		#region OpenDentalGraph Queries
+		public static DataTable GetTable(string command) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod(),command);
+			}
+			return DataCore.GetTable(command);
+		}
+		#endregion
 
 	}
 }
