@@ -1362,7 +1362,9 @@ namespace OpenDental {
 			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
 			if(treatPlan.SigIsTopaz) {
 				if(treatPlan.Signature!="") {
-					Control sigBoxTopaz=new Control("sigPlusNET1",field.XPos,field.YPos,362,79);//sized to the FormTPSign sigbox control size.
+					Control sigBoxTopaz=TopazWrapper.GetTopaz();
+					sigBoxTopaz.Text="sigPlusNET1";
+					sigBoxTopaz.Size=new Size(362,79);//sized to the FormTPSign sigbox control size.
 					sigBoxTopaz.Name="sigBoxTopaz";
 					sigBoxTopaz.Enabled=false;//cannot edit TP signatures from here.
 					CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
@@ -1381,9 +1383,9 @@ namespace OpenDental {
 					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
 						return new Bitmap(field.Width,field.Height);
 					}
-					SignatureBoxWrapper sbw=new SignatureBoxWrapper(){Width=362,Height=79};
-					sbw.SetControlSigBoxTopaz(sigBoxTopaz);
-					return sbw.GetSigImage();
+					Bitmap sigBitmap=new Bitmap(sigBoxTopaz.Width-2,sigBoxTopaz.Height-2);//2 pixels smaller so that the border does not show
+					sigBoxTopaz.DrawToBitmap(sigBitmap,new Rectangle(0,0,sigBoxTopaz.Width-2,sigBoxTopaz.Height-2));
+					return sigBitmap;
 				}
 			}
 			else {
