@@ -1714,6 +1714,7 @@ namespace OpenDental {
 					butDatesAll,
 					butRefresh
 				});
+			Lan.C(this,contextMenuIns,contextMenuStatement);
 			LayoutToolBar();
 			textQuickProcs.AcceptsTab=true;
 			textQuickProcs.KeyDown+=textQuickCharge_KeyDown;
