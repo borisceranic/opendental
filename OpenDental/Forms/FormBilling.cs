@@ -66,6 +66,7 @@ namespace OpenDental{
 		private Label label6;
 		///<summary>Do not pass a list of clinics in.  This list gets filled on load based on the user logged in.  ListClinics is used in other forms so it is public.</summary>
 		public List<Clinic> ListClinics;
+
 		///<summary>List of emails not attached to a clinic, the practice default, or a user.</summary>
 		private List<EmailAddress> _listEmailAddresses;
 
@@ -198,6 +199,7 @@ namespace OpenDental{
 			this.gridBill.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.gridBill.ContextMenuStrip = this.contextMenu;
+			this.gridBill.HasAddButton = false;
 			this.gridBill.HasMultilineHeaders = false;
 			this.gridBill.HScrollVisible = false;
 			this.gridBill.Location = new System.Drawing.Point(12, 58);
@@ -590,7 +592,13 @@ namespace OpenDental{
 			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,clinicNums);
 			gridBill.BeginUpdate();
 			gridBill.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableBilling","Name"),180);
+			ODGridColumn col=null;
+			if(PrefC.HasSuperStatementsEnabled) {
+				col=new ODGridColumn(Lan.g("TableBilling","Name"),150);
+			}
+			else {
+				col=new ODGridColumn(Lan.g("TableBilling","Name"),180);
+			}
 			gridBill.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableBilling","BillType"),110);
 			gridBill.Columns.Add(col);
@@ -606,6 +614,10 @@ namespace OpenDental{
 			gridBill.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableBilling","PayPlanDue"),70,HorizontalAlignment.Right);
 			gridBill.Columns.Add(col);
+			if(PrefC.HasSuperStatementsEnabled) {
+				col=new ODGridColumn(Lan.g("TableBilling","SF"),30);
+				gridBill.Columns.Add(col);
+			}
 			gridBill.Rows.Clear();
 			OpenDental.UI.ODGridRow row;
 			for(int i=0;i<table.Rows.Count;i++){
@@ -623,6 +635,11 @@ namespace OpenDental{
 					row.Cells.Add(table.Rows[i]["amountDue"].ToString());
 				}
 				row.Cells.Add(table.Rows[i]["payPlanDue"].ToString());
+				if(PrefC.HasSuperStatementsEnabled) {
+					if(PIn.Long(table.Rows[i]["SuperFamily"].ToString())!=0) {
+						row.Cells.Add("X");
+					}
+				}
 				row.Tag=PIn.Long(table.Rows[i]["StatementNum"].ToString());
 				gridBill.Rows.Add(row);
 			}
@@ -713,7 +730,7 @@ namespace OpenDental{
 		private void gridBill_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormStatementOptions FormSO=new FormStatementOptions();
 			Statement stmt;
-			stmt=Statements.CreateObject(PIn.Long(table.Rows[e.Row]["StatementNum"].ToString()));
+			stmt=Statements.GetStatement(PIn.Long(table.Rows[e.Row]["StatementNum"].ToString()));
 			//FormSO.StmtList=stmtList;
 			FormSO.StmtCur=stmt;
 			FormSO.ShowDialog();
@@ -739,21 +756,16 @@ namespace OpenDental{
 		}
 
 		private void butEdit_Click(object sender,EventArgs e) {
-			if(gridBill.SelectedIndices.Length==0){
+			if(gridBill.SelectedIndices.Length==0) {
 				MsgBox.Show(this,"Please select one or more bills first.");
 				return;
 			}
 			FormStatementOptions FormSO=new FormStatementOptions();
-			List<Statement> stmtList=new List<Statement>();
-			Statement stmt;
-			for(int i=0;i<gridBill.SelectedIndices.Length;i++){
-				stmt=Statements.CreateObject(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
-				stmtList.Add(stmt.Copy());
+			List<long> listStatementNums=new List<long>();
+			foreach(int index in gridBill.SelectedIndices) {
+				listStatementNums.Add(PIn.Long(table.Rows[gridBill.SelectedIndices[index]]["StatementNum"].ToString()));
 			}
-			FormSO.StmtList=stmtList;
-			//Statement stmt=new Statement();
-			//stmt.DateRangeFrom=DateTime.
-			//FormSO.StmtCur=stmt;
+			FormSO.StmtList=Statements.GetStatements(listStatementNums);
 			FormSO.ShowDialog();
 			//FillGrid happens automatically through Activated event.
 		}
@@ -841,7 +853,6 @@ namespace OpenDental{
 			EmailAddress emailAddress;
 			Family fam;
 			Patient pat;
-			Clinic clinic;
 			string patFolder;
 			int skipped=0;
 			int skippedElect=0;
@@ -865,7 +876,7 @@ namespace OpenDental{
 			Dictionary<long,List<EbillStatement>> dictEbills=new Dictionary<long,List<EbillStatement>>();
 			//TODO: Query the database to get an updated list of unsent bills and compare them to the local list to make sure that we do not resend statements that have already been sent by another user.
 			for(int i=0;i<gridBill.SelectedIndices.Length;i++){
-				stmt=Statements.CreateObject(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
+				stmt=Statements.GetStatement(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
 				fam=Patients.GetFamily(stmt.PatNum);
 				pat=fam.GetPatient(stmt.PatNum);
 				patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());

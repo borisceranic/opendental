@@ -1997,7 +1997,9 @@ namespace OpenDental{
 		private void FillGridSuperFam() {
 			gridSuperFam.BeginUpdate();
 			gridSuperFam.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("gridSuperFam",""),140);
+			ODGridColumn col=new ODGridColumn(Lan.g("gridSuperFam","Name"),280);
+			gridSuperFam.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("gridSuperFam","Stmt"),0);
 			gridSuperFam.Columns.Add(col);
 			gridSuperFam.Rows.Clear();
 			if(PatCur==null) {
@@ -2019,6 +2021,12 @@ namespace OpenDental{
 				if(i==0) {
 					row.Cells[0].Bold=YN.Yes;
 					row.Cells[0].ColorText=Color.OrangeRed;
+				}
+				if(SuperFamilyGuarantors[i].HasSuperBilling) {
+					row.Cells.Add("X");
+				}
+				else {
+					row.Cells.Add("");
 				}
 				gridSuperFam.Rows.Add(row);
 			}

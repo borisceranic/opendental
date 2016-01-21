@@ -16,6 +16,23 @@ namespace OpenDentBusiness{
 		  string command="SELECT * FROM installmentplan WHERE PatNum = "+POut.Long(guarNum)+" LIMIT 1";
 		  return Crud.InstallmentPlanCrud.SelectOne(command);
 		}
+		
+		///<summary>Gets the installment plans for a SuperFamily.  If none, returns empty list.</summary>
+		public static List<InstallmentPlan> GetForSuperFam(long superFamNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<InstallmentPlan>>(MethodBase.GetCurrentMethod(),superFamNum);
+			}
+			string command="SELECT installmentplan.* FROM installmentplan "
+				+"INNER JOIN patient ON installmentplan.PatNum=patient.PatNum "
+				+"WHERE patient.SuperFamily="+POut.Long(superFamNum)+" "
+				+"AND patient.HasSuperBilling=1 "
+				+"GROUP BY installmentplan.PatNum";
+			if(DataConnection.DBtype!=DatabaseType.MySql) {
+				command+=",installmentplan.InstallmentPlanNum,installmentplan.DateAgreement,installmentplan.DateFirstPayment"
+					+",installmentplan.MonthlyPayment,installmentplan.APR,installmentplan.Note";
+			}
+			return Crud.InstallmentPlanCrud.SelectMany(command);
+		}
 
 		///<summary>Gets one InstallmentPlan from the db.</summary>
 		public static InstallmentPlan GetOne(long installmentPlanNum){
@@ -52,8 +69,6 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM installmentplan WHERE InstallmentPlanNum = "+POut.Long(installmentPlanNum);
 			Db.NonQ(command);
 		}
-
-
 
 	}
 }

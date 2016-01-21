@@ -125,6 +125,7 @@ namespace OpenDentBusiness.Crud{
 				patient.BillingCycleDay          = PIn.Int   (row["BillingCycleDay"].ToString());
 				patient.SecUserNumEntry          = PIn.Long  (row["SecUserNumEntry"].ToString());
 				patient.SecDateEntry             = PIn.Date  (row["SecDateEntry"].ToString());
+				patient.HasSuperBilling          = PIn.Bool  (row["HasSuperBilling"].ToString());
 				retVal.Add(patient);
 			}
 			return retVal;
@@ -215,6 +216,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("BillingCycleDay");
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("HasSuperBilling");
 			foreach(Patient patient in listPatients) {
 				table.Rows.Add(new object[] {
 					POut.Long  (patient.PatNum),
@@ -296,6 +298,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (patient.BillingCycleDay),
 					POut.Long  (patient.SecUserNumEntry),
 					POut.Date  (patient.SecDateEntry),
+					POut.Bool  (patient.HasSuperBilling),
 				});
 			}
 			return table;
@@ -336,7 +339,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PatNum,";
 			}
-			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased,BillingCycleDay,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased,BillingCycleDay,SecUserNumEntry,SecDateEntry,HasSuperBilling) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(patient.PatNum)+",";
 			}
@@ -418,7 +421,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (patient.DateTimeDeceased)+","
 				+    POut.Int   (patient.BillingCycleDay)+","
 				+    POut.Long  (patient.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Bool  (patient.HasSuperBilling)+")";
 			if(patient.FamFinUrgNote==null) {
 				patient.FamFinUrgNote="";
 			}
@@ -455,7 +459,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PatNum,";
 			}
-			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased,BillingCycleDay,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="LName,FName,MiddleI,Preferred,PatStatus,Gender,Position,Birthdate,SSN,Address,Address2,City,State,Zip,HmPhone,WkPhone,WirelessPhone,Guarantor,CreditType,Email,Salutation,EstBalance,PriProv,SecProv,FeeSched,BillingType,ImageFolder,AddrNote,FamFinUrgNote,MedUrgNote,ApptModNote,StudentStatus,SchoolName,ChartNumber,MedicaidID,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,InsEst,BalTotal,EmployerNum,EmploymentNote,County,GradeLevel,Urgency,DateFirstVisit,ClinicNum,HasIns,TrophyFolder,PlannedIsDone,Premed,Ward,PreferConfirmMethod,PreferContactMethod,PreferRecallMethod,SchedBeforeTime,SchedAfterTime,SchedDayOfWeek,Language,AdmitDate,Title,PayPlanDue,SiteNum,ResponsParty,CanadianEligibilityCode,AskToArriveEarly,OnlinePassword,PreferContactConfidential,SuperFamily,TxtMsgOk,SmokingSnoMed,Country,DateTimeDeceased,BillingCycleDay,SecUserNumEntry,SecDateEntry,HasSuperBilling) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(patient.PatNum)+",";
 			}
@@ -537,7 +541,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (patient.DateTimeDeceased)+","
 				+    POut.Int   (patient.BillingCycleDay)+","
 				+    POut.Long  (patient.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Bool  (patient.HasSuperBilling)+")";
 			if(patient.FamFinUrgNote==null) {
 				patient.FamFinUrgNote="";
 			}
@@ -629,9 +634,10 @@ namespace OpenDentBusiness.Crud{
 				+"SmokingSnoMed            = '"+POut.String(patient.SmokingSnoMed)+"', "
 				+"Country                  = '"+POut.String(patient.Country)+"', "
 				+"DateTimeDeceased         =  "+POut.DateT (patient.DateTimeDeceased)+", "
-				+"BillingCycleDay          =  "+POut.Int   (patient.BillingCycleDay)+" "
+				+"BillingCycleDay          =  "+POut.Int   (patient.BillingCycleDay)+", "
 				//SecUserNumEntry excluded from update
 				//SecDateEntry not allowed to change
+				+"HasSuperBilling          =  "+POut.Bool  (patient.HasSuperBilling)+" "
 				+"WHERE PatNum = "+POut.Long(patient.PatNum);
 			if(patient.FamFinUrgNote==null) {
 				patient.FamFinUrgNote="";
@@ -946,6 +952,10 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
+			if(patient.HasSuperBilling != oldPatient.HasSuperBilling) {
+				if(command!=""){ command+=",";}
+				command+="HasSuperBilling = "+POut.Bool(patient.HasSuperBilling)+"";
+			}
 			if(command==""){
 				return false;
 			}

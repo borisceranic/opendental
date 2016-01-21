@@ -2149,9 +2149,16 @@ namespace OpenDental{
 		}
 
 		private static void FillFieldsForStatement(Sheet sheet,Statement Stmt,DataSet dataSet) {
-			Patient pat=Patients.GetPat(sheet.PatNum);
+			Patient pat=null;
+			if(Stmt.SuperFamily!=0) {//Superfamily statement
+				pat=Patients.GetPat(Stmt.SuperFamily);
+			}
+			else {
+				pat=Patients.GetPat(Stmt.PatNum);
+			}
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
 			DataTable tableAppt=dataSet.Tables["appts"];
+			string[] totInsBalVals=totInsBalValsHelper(sheet,Stmt,dataSet);
 			if(tableAppt==null){
 				tableAppt=new DataTable();	
 			}
@@ -2202,13 +2209,13 @@ namespace OpenDental{
 						field.FieldValue=totInsBalLabsHelper(sheet,Stmt)[2];
 						break;
 					case "totalValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[0];
+						field.FieldValue=totInsBalVals[0];
 						break;
 					case "insEstValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[1];
+						field.FieldValue=totInsBalVals[1];
 						break;
 					case "balanceValue":
-						field.FieldValue=totInsBalValsHelper(sheet,Stmt,dataSet)[2];
+						field.FieldValue=totInsBalVals[2];
 						break;
 					case "amountDueValue":
 						try {
@@ -2951,7 +2958,13 @@ namespace OpenDental{
 			if(tableMisc==null) {
 				tableMisc=new DataTable();
 			}
-			Patient pat=Patients.GetPat(Stmt.PatNum);
+			Patient pat=null;
+			if(Stmt.SuperFamily!=0) {//Superfamily statement
+				pat=Patients.GetPat(Stmt.SuperFamily);
+			}
+			else {
+				pat=Patients.GetPat(Stmt.PatNum);
+			}
 			Patient PatGuar=Patients.GetPat(pat.Guarantor);
 			if(Stmt.IsInvoice) {
 				double adjAmt=0;
@@ -2982,8 +2995,22 @@ namespace OpenDental{
 					sLine1+=pat.EstBalance.ToString("c");
 				}
 				else {
-					//Show the current family's balance without subtracting insurance estimates.
-					sLine1+=PatGuar.BalTotal.ToString("c");
+					if(Stmt.SuperFamily!=0) {//Superfam statement
+						double balTot=0;
+						List<Patient> listFamilyGuarantors=Patients.GetSuperFamilyGuarantors(Stmt.SuperFamily);
+						foreach(Patient guarantor in listFamilyGuarantors) {
+							//If the family is included in superfamily billing, sum their totals into the running total.
+							if(!guarantor.HasSuperBilling) {
+								continue;
+							}
+							balTot+=guarantor.BalTotal;
+						}
+						sLine1+=balTot.ToString("c");
+					}
+					else {
+						//Show the current family's balance without subtracting insurance estimates.
+						sLine1+=PatGuar.BalTotal.ToString("c");
+					}
 				}
 			}
 			else {//more common
@@ -3000,9 +3027,27 @@ namespace OpenDental{
 					sLine3+=patBal.ToString("c");
 				}
 				else {
-					sLine1+=PatGuar.BalTotal.ToString("c");
-					sLine2+=PatGuar.InsEst.ToString("c");
-					sLine3+=(PatGuar.BalTotal - PatGuar.InsEst).ToString("c");
+					if(Stmt.SuperFamily!=0) {//Superfam statement
+						double balTot=0;
+						double insEst=0;
+						List<Patient> listFamilyGuarantors=Patients.GetSuperFamilyGuarantors(Stmt.SuperFamily);
+						foreach(Patient guarantor in listFamilyGuarantors) {
+							//If the family is included in superfamily billing, sum their totals into the running total.
+							if(!guarantor.HasSuperBilling) {
+								continue;
+							}
+							balTot+=guarantor.BalTotal;
+							insEst+=guarantor.InsEst;
+						}
+						sLine1+=balTot.ToString("c");
+						sLine2+=insEst.ToString("c");
+						sLine3+=(balTot-insEst).ToString("c");
+					}
+					else {
+						sLine1+=PatGuar.BalTotal.ToString("c");
+						sLine2+=PatGuar.InsEst.ToString("c");
+						sLine3+=(PatGuar.BalTotal - PatGuar.InsEst).ToString("c");
+					}
 				}
 			}
 			return new string[] { sLine1,sLine2,sLine3 };

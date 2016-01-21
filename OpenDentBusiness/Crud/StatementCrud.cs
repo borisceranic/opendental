@@ -48,6 +48,7 @@ namespace OpenDentBusiness.Crud{
 				statement=new Statement();
 				statement.StatementNum = PIn.Long  (row["StatementNum"].ToString());
 				statement.PatNum       = PIn.Long  (row["PatNum"].ToString());
+				statement.SuperFamily  = PIn.Long  (row["SuperFamily"].ToString());
 				statement.DateSent     = PIn.Date  (row["DateSent"].ToString());
 				statement.DateRangeFrom= PIn.Date  (row["DateRangeFrom"].ToString());
 				statement.DateRangeTo  = PIn.Date  (row["DateRangeTo"].ToString());
@@ -78,6 +79,7 @@ namespace OpenDentBusiness.Crud{
 			DataTable table=new DataTable(tableName);
 			table.Columns.Add("StatementNum");
 			table.Columns.Add("PatNum");
+			table.Columns.Add("SuperFamily");
 			table.Columns.Add("DateSent");
 			table.Columns.Add("DateRangeFrom");
 			table.Columns.Add("DateRangeTo");
@@ -99,6 +101,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (statement.StatementNum),
 					POut.Long  (statement.PatNum),
+					POut.Long  (statement.SuperFamily),
 					POut.Date  (statement.DateSent),
 					POut.Date  (statement.DateRangeFrom),
 					POut.Date  (statement.DateRangeTo),
@@ -156,12 +159,13 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
 			command+=
 				     POut.Long  (statement.PatNum)+","
+				+    POut.Long  (statement.SuperFamily)+","
 				+    POut.Date  (statement.DateSent)+","
 				+    POut.Date  (statement.DateRangeFrom)+","
 				+    POut.Date  (statement.DateRangeTo)+","
@@ -215,12 +219,13 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
 			command+=
 				     POut.Long  (statement.PatNum)+","
+				+    POut.Long  (statement.SuperFamily)+","
 				+    POut.Date  (statement.DateSent)+","
 				+    POut.Date  (statement.DateRangeFrom)+","
 				+    POut.Date  (statement.DateRangeTo)+","
@@ -255,6 +260,7 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(Statement statement){
 			string command="UPDATE statement SET "
 				+"PatNum       =  "+POut.Long  (statement.PatNum)+", "
+				+"SuperFamily  =  "+POut.Long  (statement.SuperFamily)+", "
 				+"DateSent     =  "+POut.Date  (statement.DateSent)+", "
 				+"DateRangeFrom=  "+POut.Date  (statement.DateRangeFrom)+", "
 				+"DateRangeTo  =  "+POut.Date  (statement.DateRangeTo)+", "
@@ -286,6 +292,10 @@ namespace OpenDentBusiness.Crud{
 			if(statement.PatNum != oldStatement.PatNum) {
 				if(command!=""){ command+=",";}
 				command+="PatNum = "+POut.Long(statement.PatNum)+"";
+			}
+			if(statement.SuperFamily != oldStatement.SuperFamily) {
+				if(command!=""){ command+=",";}
+				command+="SuperFamily = "+POut.Long(statement.SuperFamily)+"";
 			}
 			if(statement.DateSent.Date != oldStatement.DateSent.Date) {
 				if(command!=""){ command+=",";}

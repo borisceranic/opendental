@@ -982,7 +982,13 @@ namespace OpenDentBusiness{
 			bool excludeIfUnsentProcs,bool ignoreInPerson,List<long> clinicNums)
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PatAging>>(MethodBase.GetCurrentMethod(),age,lastStatement,billingNums,excludeAddr,excludeNeg,excludeLessThan,excludeInactive,includeChanged,excludeInsPending,excludeIfUnsentProcs,ignoreInPerson,clinicNums);
+				return Meth.GetObject<List<PatAging>>(MethodBase.GetCurrentMethod(),age,lastStatement,billingNums,excludeAddr
+					,excludeNeg,excludeLessThan,excludeInactive,includeChanged,excludeInsPending
+					,excludeIfUnsentProcs,ignoreInPerson,clinicNums);
+			}
+			if(DataConnection.DBtype!=DatabaseType.MySql) {
+				//We are going to purposefully throw an exception so that users will call in and complain.
+				throw new ApplicationException(Lans.g("Patients","Aging not currently supported by Oracle.  Please call us for support."));
 			}
 			string command="";
 			Random rnd=new Random();
@@ -1047,7 +1053,7 @@ namespace OpenDentBusiness{
 					+"GROUP BY patient.Guarantor;";
 			}
 			command+="SELECT patient.PatNum,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,BalTotal,BillingType,"
-				+"InsEst,LName,FName,MiddleI,PayPlanDue,Preferred, "
+				+"InsEst,LName,FName,MiddleI,PayPlanDue,Preferred,patient.SuperFamily,patient.HasSuperBilling, "
 				+"IFNULL(MAX(statement.DateSent),'0001-01-01') AS LastStatement ";
 			if(includeChanged){
 				command+=",IFNULL(templastproc"+rndStr+@".LastProc,'0001-01-01') AS LastChange,"
@@ -1130,10 +1136,8 @@ namespace OpenDentBusiness{
 			if(clinicNums.Count>0) {
 				command+="AND patient.ClinicNum IN ("+string.Join(",",clinicNums)+") ";
 			}
-			command+=" GROUP BY patient.PatNum,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,BalTotal,BillingType,"
-				+"InsEst,LName,FName,MiddleI,PayPlanDue,Preferred "
+			command+=" GROUP BY patient.PatNum "
 				+"HAVING (LastStatement < "+POut.Date(lastStatement.AddDays(1))+" ";//<midnight of lastStatement date
-				//+"OR PayPlanDue>0 ";we don't have a great way to trigger due to a payplancharge yet
 			if(includeChanged){
 				command+=
 					 "OR LastChange > LastStatement "//eg '2005-10-25' > '2005-10-24 15:00:00'
@@ -1149,14 +1153,13 @@ namespace OpenDentBusiness{
 				command+="AND unsentProcCount_=0 ";
 			}
 			command+="ORDER BY LName,FName";
-			//Debug.WriteLine(command);
 			DataTable table=Db.GetTable(command);
 			List<PatAging> agingList=new List<PatAging>();
 			PatAging patage;
 			Patient pat;
 			for(int i=0;i<table.Rows.Count;i++){
 				patage=new PatAging();
-				patage.PatNum   = PIn.Long   (table.Rows[i]["PatNum"].ToString());
+				patage.PatNum   = PIn.Long  (table.Rows[i]["PatNum"].ToString());
 				patage.Bal_0_30 = PIn.Double(table.Rows[i]["Bal_0_30"].ToString());
 				patage.Bal_31_60= PIn.Double(table.Rows[i]["Bal_31_60"].ToString());
 				patage.Bal_61_90= PIn.Double(table.Rows[i]["Bal_61_90"].ToString());
@@ -1173,17 +1176,10 @@ namespace OpenDentBusiness{
 				patage.DateLastStatement=PIn.Date(table.Rows[i]["LastStatement"].ToString());
 				patage.BillingType=PIn.Long(table.Rows[i]["BillingType"].ToString());
 				patage.PayPlanDue =PIn.Double(table.Rows[i]["PayPlanDue"].ToString());
-				//if(excludeInsPending && patage.InsEst>0){
-					//don't add
-				//}
-				//else{
+				patage.SuperFamily=PIn.Long(table.Rows[i]["SuperFamily"].ToString());
+				patage.HasSuperBilling=PIn.Bool(table.Rows[i]["HasSuperBilling"].ToString());
 				agingList.Add(patage);
-				//}
 			}
-			//PatAging[] retVal=new PatAging[agingList.Count];
-			//for(int i=0;i<retVal.Length;i++){
-			//	retVal[i]=agingList[i];
-			//}
 			if(includeChanged){
 				command="DROP TABLE IF EXISTS templastproc"+rndStr+@"";
 				Db.NonQ(command);
@@ -2732,6 +2728,10 @@ FROM insplan";
 		public long BillingType;
 		///<summary></summary>
 		public double PayPlanDue;
+		///<summary></summary>
+		public long SuperFamily;
+		///<summary></summary>
+		public bool HasSuperBilling;
 	}
 
 }

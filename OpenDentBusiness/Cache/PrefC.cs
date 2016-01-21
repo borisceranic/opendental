@@ -66,6 +66,13 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>This property is just a shortcut.  Returns true if both StatementsUseSheets and ShowFeatureSuperFamilies are true.</summary>
+		public static bool HasSuperStatementsEnabled {
+			get {
+				return (GetBool(PrefName.StatementsUseSheets) && GetBool(PrefName.ShowFeatureSuperfamilies));
+			}
+		}
+
 		///<summary>Returns true if DockPhonePanelShow is enabled. Convenience function that should be used if for ODHQ only, and not resellers.</summary>
 		/// <returns></returns>
 		public static bool IsODHQ {

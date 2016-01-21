@@ -12624,6 +12624,34 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'RecurringChargesUsePriProv','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE statement ADD SuperFamily bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE statement ADD INDEX (SuperFamily)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE statement ADD SuperFamily number(20)";
+					Db.NonQ(command);
+					command="UPDATE statement SET SuperFamily = 0 WHERE SuperFamily IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE statement MODIFY SuperFamily NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX statement_SuperFamily ON statement (SuperFamily)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE patient ADD HasSuperBilling tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE patient ADD HasSuperBilling number(3)";
+					Db.NonQ(command);
+					command="UPDATE patient SET HasSuperBilling = 0 WHERE HasSuperBilling IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE patient MODIFY HasSuperBilling NOT NULL";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

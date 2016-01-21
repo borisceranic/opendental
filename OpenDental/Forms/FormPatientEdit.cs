@@ -204,6 +204,7 @@ namespace OpenDental{
 		private bool _isMissingRequiredFields;
 		private bool _isLoad;//To keep track if ListBoxes' selected index is changed by the user
 		private ErrorProvider _errorProv=new ErrorProvider();
+		private CheckBox checkSuperBilling;
 		private bool _isValidating=false;
 
 		///<summary></summary>
@@ -428,6 +429,7 @@ namespace OpenDental{
 			this.checkEmailPhoneSame = new System.Windows.Forms.CheckBox();
 			this.labelEmail = new System.Windows.Forms.Label();
 			this.groupBillProv = new System.Windows.Forms.GroupBox();
+			this.checkSuperBilling = new System.Windows.Forms.CheckBox();
 			this.checkBillProvSame = new System.Windows.Forms.CheckBox();
 			this.butPickSecondary = new OpenDental.UI.Button();
 			this.comboBillType = new System.Windows.Forms.ComboBox();
@@ -1028,6 +1030,7 @@ namespace OpenDental{
 			// textAddrNotes
 			// 
 			this.textAddrNotes.AcceptsTab = true;
+			this.textAddrNotes.BackColor = System.Drawing.SystemColors.Window;
 			this.textAddrNotes.DetectUrls = false;
 			this.textAddrNotes.Location = new System.Drawing.Point(161, 32);
 			this.textAddrNotes.Name = "textAddrNotes";
@@ -1775,6 +1778,7 @@ namespace OpenDental{
 			// groupBillProv
 			// 
 			this.groupBillProv.Controls.Add(this.checkBillProvSame);
+			this.groupBillProv.Controls.Add(this.checkSuperBilling);
 			this.groupBillProv.Controls.Add(this.butPickSecondary);
 			this.groupBillProv.Controls.Add(this.comboBillType);
 			this.groupBillProv.Controls.Add(this.butPickPrimary);
@@ -1794,12 +1798,25 @@ namespace OpenDental{
 			this.groupBillProv.TabStop = false;
 			this.groupBillProv.Text = "Billing and Provider(s)";
 			// 
+			// checkSuperBilling
+			// 
+			this.checkSuperBilling.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperBilling.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSuperBilling.Location = new System.Drawing.Point(183, 32);
+			this.checkSuperBilling.Name = "checkSuperBilling";
+			this.checkSuperBilling.Size = new System.Drawing.Size(176, 17);
+			this.checkSuperBilling.TabIndex = 47;
+			this.checkSuperBilling.TabStop = false;
+			this.checkSuperBilling.Text = "Included in Super Family Billing";
+			this.checkSuperBilling.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperBilling.Visible = false;
+			// 
 			// checkBillProvSame
 			// 
 			this.checkBillProvSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkBillProvSame.Location = new System.Drawing.Point(161, 13);
 			this.checkBillProvSame.Name = "checkBillProvSame";
-			this.checkBillProvSame.Size = new System.Drawing.Size(254, 17);
+			this.checkBillProvSame.Size = new System.Drawing.Size(165, 17);
 			this.checkBillProvSame.TabIndex = 1;
 			this.checkBillProvSame.TabStop = false;
 			this.checkBillProvSame.Text = "Same for entire family";
@@ -2547,6 +2564,15 @@ namespace OpenDental{
 				_listRequiredFields.RemoveAll(x => x.FieldName==RequiredFieldName.EligibilityExceptCode);
 			}
 			_errorProv.BlinkStyle=ErrorBlinkStyle.NeverBlink;
+			if(PrefC.GetBool(PrefName.ShowFeatureSuperfamilies) 
+				&& PrefC.GetBool(PrefName.StatementsUseSheets) 
+				&& PatCur.SuperFamily!=0 
+				&& PatCur.Guarantor==PatCur.PatNum) 
+			{
+				//If the patient is a guarantor in a superfamily then enable the checkbox to opt into superfamily billing.
+				checkSuperBilling.Visible=true;
+				checkSuperBilling.Checked=PatCur.HasSuperBilling;
+			}
 			SetRequiredFields();
 			_isLoad=false;
 			Plugins.HookAddCode(this,"FormPatientEdit.Load_end",PatCur);
@@ -4502,6 +4528,7 @@ namespace OpenDental{
 			PatCur.Country=textCountry.Text;
 			PatCur.Zip=textZip.Text;
 			PatCur.CreditType=textCreditType.Text;
+			PatCur.HasSuperBilling=checkSuperBilling.Checked;
 			GetEmployerNum();
 			//PatCur.EmploymentNote=textEmploymentNote.Text;
 			if(comboLanguage.SelectedIndex==0){

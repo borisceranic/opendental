@@ -13,11 +13,22 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class Statements{
 		///<Summary>Gets one statement from the database.</Summary>
-		public static Statement CreateObject(long statementNum) {
+		public static Statement GetStatement(long statementNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Statement>(MethodBase.GetCurrentMethod(),statementNum);
 			}
 			return Crud.StatementCrud.SelectOne(statementNum);
+		}
+
+		public static List<Statement> GetStatements(List<long> listStatementNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Statement>>(MethodBase.GetCurrentMethod(),listStatementNums);
+			}
+			if(listStatementNums==null || listStatementNums.Count < 1) {
+				return new List<Statement>();
+			}
+			string command="SELECT * FROM statement WHERE StatementNum IN ("+string.Join(",",listStatementNums)+")";
+			return Crud.StatementCrud.SelectMany(command);
 		}
 
 		///<summary></summary>
@@ -125,11 +136,12 @@ namespace OpenDentBusiness{
 			table.Columns.Add("PatNum");
 			table.Columns.Add("payPlanDue");
 			table.Columns.Add("StatementNum");
+			table.Columns.Add("SuperFamily");
 			List<DataRow> rows=new List<DataRow>();
 			string command="SELECT BalTotal,BillingType,FName,InsEst,statement.IsSent,"
 				+"IFNULL(MAX(s2.DateSent),"+POut.Date(DateTime.MinValue)+") LastStatement,"
 				+"LName,MiddleI,statement.Mode_,PayPlanDue,Preferred,"
-				+"statement.PatNum,statement.StatementNum "
+				+"statement.PatNum,statement.StatementNum,statement.SuperFamily "
 				+"FROM statement "
 				+"LEFT JOIN patient ON statement.PatNum=patient.PatNum "
 				+"LEFT JOIN statement s2 ON s2.PatNum=patient.PatNum "
@@ -152,7 +164,7 @@ namespace OpenDentBusiness{
 			}
 			command+="GROUP BY BalTotal,BillingType,FName,InsEst,statement.IsSent,"
 				+"LName,MiddleI,statement.Mode_,PayPlanDue,Preferred,"
-				+"statement.PatNum,statement.StatementNum "; 
+				+"statement.PatNum,statement.StatementNum,statement.SuperFamily "; 
 			if(orderBy==0){//BillingType
 				command+="ORDER BY definition.ItemOrder,LName,FName,MiddleI,PayPlanDue";
 			}
@@ -204,6 +216,7 @@ namespace OpenDentBusiness{
 					row["payPlanDue"]=payPlanDue.ToString("F");
 				}
 				row["StatementNum"]=rawTable.Rows[i]["StatementNum"].ToString();
+				row["SuperFamily"]=rawTable.Rows[i]["SuperFamily"].ToString();
 				rows.Add(row);
 			}
 			for(int i=0;i<rows.Count;i++) {

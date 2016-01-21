@@ -52,7 +52,13 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),stmt);
 			}
-			long patNum=stmt.PatNum;
+			long patNum;
+			if(stmt.SuperFamily!=0) {//Superfamily statement
+				patNum=stmt.SuperFamily;
+			}
+			else {
+				patNum=stmt.PatNum;
+			}
 			Family fam=Patients.GetFamily(patNum);
 			if(stmt.Intermingled) {
 				patNum=fam.ListPats[0].PatNum;//guarantor
@@ -63,9 +69,17 @@ namespace OpenDentBusiness {
 			if(stmt.IsInvoice) {
 				showProcBreakdown=false;
 			}
-			DataSet retVal=GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
-				stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
-				PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			DataSet retVal;
+			if(stmt.SuperFamily!=0) {//Superfamily statement, Intermingled and SinglePatient should always be false
+				retVal=GetSuperFamAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,
+					stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
+					PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
+			else {
+				retVal=GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
+					stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
+					PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			}
 			return retVal;
 		}
 
@@ -521,6 +535,36 @@ namespace OpenDentBusiness {
 			table.Columns.Add("ToothNum");
 			table.Columns.Add("ToothRange");
 			table.Columns.Add("tth");
+			table.Columns.Add("SuperFamily");
+		}
+		
+		///<summary>Returns a data set that is designed for a super family statement.
+		///This means that GetAccount will be run for every guarantor that HasSuperBilling within the super family.</summary>
+		public static DataSet GetSuperFamAccount(long superFam,DateTime fromDate,DateTime toDate,long statementNum,bool showProcBreakdown
+			,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting) 
+		{
+			//This method does not call the database directly but still requires a remoting role check because it calls a method that uses out variables.
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),superFam,fromDate,toDate,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
+					,isForStatementPrinting);
+			}
+			List<Patient> listFamilyGuarantors=Patients.GetSuperFamilyGuarantors(superFam);
+			DataSet retVal=new DataSet();
+			foreach(Patient guarantor in listFamilyGuarantors) {
+				if(!guarantor.HasSuperBilling) {
+					continue;
+				}
+				//Add each family account to the data set that is included in superfamily billing.
+				Family fam=Patients.GetFamily(guarantor.PatNum);
+				decimal payPlanDue=0;
+				decimal balanceForward=0;
+				DataSet account=GetAccount(guarantor.PatNum,fromDate,toDate,true,false,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
+					,isForStatementPrinting,guarantor,fam,out payPlanDue,out balanceForward);
+				account.Tables.Add(GetApptTable(fam,false,guarantor.PatNum));
+				account.Tables.Add(GetMisc(fam,guarantor.PatNum,payPlanDue,balanceForward));
+				retVal.Merge(account);//This works for the purposes we need it for.  Sheets framework auto-splits entries by patnum.
+			}
+			return retVal;
 		}
 
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
@@ -544,7 +588,7 @@ namespace OpenDentBusiness {
 			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward));//table = misc.  Just holds a few bits of info that we can't find anywhere else.
 			return retVal;
 		}
-		
+
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
 		///If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
 		///If IsInvoice, this does some extra filtering.
@@ -1268,14 +1312,13 @@ namespace OpenDentBusiness {
 			#endregion Claims
 			#region Statements
 			//Statement----------------------------------------------------------------------------------------
-			command="SELECT DateSent,IsSent,Mode_,StatementNum,PatNum,Note,NoteBold,IsInvoice "
+			List<long> listPatNums=fam.ListPats.ToList().Select(x => x.PatNum).Distinct().ToList();
+			command="SELECT DateSent,IsSent,Mode_,StatementNum,PatNum,Note,NoteBold,IsInvoice,SuperFamily "
 				+"FROM statement "
-				+"WHERE (";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
+				+"WHERE (PatNum IN ("+string.Join(",",listPatNums)+") ";
+			//Always include all statements from the super family if a super family is set.  They will be filtered out later.
+			if(fam.ListPats[0].SuperFamily > 0) {
+				command+="OR SuperFamily ="+POut.Long(fam.ListPats[0].SuperFamily)+" ";//Get all statements for the superfamily as well.
 			}
 			command+=") ";
 			if(statementNum>0) {
@@ -1348,6 +1391,7 @@ namespace OpenDentBusiness {
 				row["ToothNum"]="";
 				row["ToothRange"]="";
 				row["tth"]="";
+				row["SuperFamily"]=rawState.Rows[i]["SuperFamily"].ToString();
 				rows.Add(row);
 			}
 			#endregion Statements
@@ -1477,9 +1521,16 @@ namespace OpenDentBusiness {
 			retVal.Tables.Add(GetPatientTable(fam,rows,isInvoice));
 			//Regroup rows by patient---------------------------------------------------------------------------
 			DataTable[] rowsByPat=null;//will only used if multiple patients not intermingled
-			if(singlePatient){//This is usually used for Account module grid.
+			if(singlePatient) {//This is usually used for Account module grid.  Always gets used for superstatements.
 				for(int i=rows.Count-1;i>=0;i--) {//go backwards and remove from end
-					if(rows[i]["PatNum"].ToString()!=patNum.ToString()){
+					if(PIn.Long(rows[i]["SuperFamily"].ToString())!=0) {
+						long superFamNum=PIn.Long(rows[i]["SuperFamily"].ToString());
+						Patient patGuarantor=Patients.GetFamily(patNum).ListPats[0];
+						if(!patGuarantor.HasSuperBilling) {
+							rows.RemoveAt(i);//SuperStatement, but this family isn't included.  Remove the statement so it doesn't show in account module.
+						}
+					}
+					else if(rows[i]["PatNum"].ToString()!=patNum.ToString()){
 						rows.RemoveAt(i);
 					}
 				}
@@ -1487,7 +1538,7 @@ namespace OpenDentBusiness {
 			else if(intermingled){
 				//leave the rows alone
 			}
-			else{//multiple patients not intermingled.  This is most common for an ordinary statement.
+			else{//multiple patients not intermingled.  This is most common for an ordinary statement.  Never gets used with superstatements.
 				for(int i=0;i<rows.Count;i++){
 					table.Rows.Add(rows[i]);
 				}

@@ -199,7 +199,8 @@ namespace OpenDentBusiness{
 		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
 		public DateTime SecDateEntry;
 		//No SecDateTEdit, DateTStamp already exists and is the timestamp updated by MySQL when a row is added or changed
-
+		///<summary>0 by default.  If true, this guarantor should be included in superbilling statements.</summary>
+		public bool HasSuperBilling;
 		/////<summary>Decided not to add since this data is already available and synchronizing would take too much time.  Will add later.  
 		/////Not editable. If the patient happens to have a future appointment, this will contain the date of that appointment.  
 		/////Once appointment is set complete, this date is deleted.  If there is more than one appointment scheduled, this will only contain the 

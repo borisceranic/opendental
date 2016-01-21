@@ -2829,7 +2829,7 @@ namespace OpenDental {
 				FormClaimEdit2.ShowDialog();
 			}
 			else if(table.Rows[e.Row]["StatementNum"].ToString()!="0"){
-				Statement stmt=Statements.CreateObject(PIn.Long(table.Rows[e.Row]["StatementNum"].ToString()));
+				Statement stmt=Statements.GetStatement(PIn.Long(table.Rows[e.Row]["StatementNum"].ToString()));
 				FormStatementOptions FormS=new FormStatementOptions();
 				FormS.StmtCur=stmt;
 				FormS.ShowDialog();

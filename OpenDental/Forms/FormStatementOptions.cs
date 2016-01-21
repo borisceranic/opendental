@@ -57,6 +57,10 @@ namespace OpenDental{
 		private CheckBox checkIsInvoice;
 		private TextBox textInvoiceNum;
 		private Label label5;
+		private CheckBox checkSuperStatement;
+		private bool _canSendSuperStatements;
+		private Patient _superHead;
+
 		///<summary>js This is superfluous and should be removed some day.</summary>
 		private int electIndex;
 
@@ -132,6 +136,7 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.checkIsInvoiceCopy = new System.Windows.Forms.CheckBox();
 			this.checkIsInvoice = new System.Windows.Forms.CheckBox();
+			this.checkSuperStatement = new System.Windows.Forms.CheckBox();
 			this.groupFuchs.SuspendLayout();
 			this.groupDateRange.SuspendLayout();
 			this.groupInvoice.SuspendLayout();
@@ -149,7 +154,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(606, 539);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 0;
+			this.butCancel.TabIndex = 18;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -164,7 +169,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(514, 539);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 1;
+			this.butOK.TabIndex = 17;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -175,7 +180,7 @@ namespace OpenDental{
 			this.checkHidePayment.Location = new System.Drawing.Point(1, 120);
 			this.checkHidePayment.Name = "checkHidePayment";
 			this.checkHidePayment.Size = new System.Drawing.Size(158, 20);
-			this.checkHidePayment.TabIndex = 11;
+			this.checkHidePayment.TabIndex = 3;
 			this.checkHidePayment.Text = "Hide payment options";
 			this.checkHidePayment.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -191,13 +196,14 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
-			this.textNote.Location = new System.Drawing.Point(105, 290);
+			this.textNote.Location = new System.Drawing.Point(105, 291);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Statement;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(462, 147);
-			this.textNote.TabIndex = 14;
+			this.textNote.TabIndex = 12;
 			this.textNote.Text = "";
 			// 
 			// buttonFuchs1
@@ -210,7 +216,7 @@ namespace OpenDental{
 			this.buttonFuchs1.Location = new System.Drawing.Point(6, 19);
 			this.buttonFuchs1.Name = "buttonFuchs1";
 			this.buttonFuchs1.Size = new System.Drawing.Size(86, 24);
-			this.buttonFuchs1.TabIndex = 18;
+			this.buttonFuchs1.TabIndex = 0;
 			this.buttonFuchs1.Text = "Ins. Not Paid";
 			this.buttonFuchs1.Visible = false;
 			this.buttonFuchs1.Click += new System.EventHandler(this.buttonFuchs1_Click);
@@ -225,7 +231,7 @@ namespace OpenDental{
 			this.buttonFuchs2.Location = new System.Drawing.Point(6, 46);
 			this.buttonFuchs2.Name = "buttonFuchs2";
 			this.buttonFuchs2.Size = new System.Drawing.Size(103, 24);
-			this.buttonFuchs2.TabIndex = 19;
+			this.buttonFuchs2.TabIndex = 1;
 			this.buttonFuchs2.Text = "Ins. Paid, Bal. Left";
 			this.buttonFuchs2.Visible = false;
 			this.buttonFuchs2.Click += new System.EventHandler(this.buttonFuchs2_Click);
@@ -240,7 +246,7 @@ namespace OpenDental{
 			this.buttonFuchs3.Location = new System.Drawing.Point(6, 73);
 			this.buttonFuchs3.Name = "buttonFuchs3";
 			this.buttonFuchs3.Size = new System.Drawing.Size(117, 24);
-			this.buttonFuchs3.TabIndex = 20;
+			this.buttonFuchs3.TabIndex = 2;
 			this.buttonFuchs3.Text = "Ins. Paid, Credit Left";
 			this.buttonFuchs3.Visible = false;
 			this.buttonFuchs3.Click += new System.EventHandler(this.buttonFuchs3_Click);
@@ -253,7 +259,7 @@ namespace OpenDental{
 			this.groupFuchs.Location = new System.Drawing.Point(297, 81);
 			this.groupFuchs.Name = "groupFuchs";
 			this.groupFuchs.Size = new System.Drawing.Size(129, 105);
-			this.groupFuchs.TabIndex = 21;
+			this.groupFuchs.TabIndex = 10;
 			this.groupFuchs.TabStop = false;
 			this.groupFuchs.Text = "Fuchs hidden options";
 			this.groupFuchs.Visible = false;
@@ -268,7 +274,7 @@ namespace OpenDental{
 			this.butToday.Location = new System.Drawing.Point(75, 64);
 			this.butToday.Name = "butToday";
 			this.butToday.Size = new System.Drawing.Size(77, 24);
-			this.butToday.TabIndex = 229;
+			this.butToday.TabIndex = 2;
 			this.butToday.Text = "Today";
 			this.butToday.Click += new System.EventHandler(this.butToday_Click);
 			// 
@@ -282,7 +288,7 @@ namespace OpenDental{
 			this.butDatesAll.Location = new System.Drawing.Point(75, 142);
 			this.butDatesAll.Name = "butDatesAll";
 			this.butDatesAll.Size = new System.Drawing.Size(77, 24);
-			this.butDatesAll.TabIndex = 228;
+			this.butDatesAll.TabIndex = 5;
 			this.butDatesAll.Text = "All Dates";
 			this.butDatesAll.Click += new System.EventHandler(this.butDatesAll_Click);
 			// 
@@ -296,7 +302,7 @@ namespace OpenDental{
 			this.but90days.Location = new System.Drawing.Point(75, 116);
 			this.but90days.Name = "but90days";
 			this.but90days.Size = new System.Drawing.Size(77, 24);
-			this.but90days.TabIndex = 227;
+			this.but90days.TabIndex = 4;
 			this.but90days.Text = "Last 90 Days";
 			this.but90days.Click += new System.EventHandler(this.but90days_Click);
 			// 
@@ -310,7 +316,7 @@ namespace OpenDental{
 			this.but45days.Location = new System.Drawing.Point(75, 90);
 			this.but45days.Name = "but45days";
 			this.but45days.Size = new System.Drawing.Size(77, 24);
-			this.but45days.TabIndex = 226;
+			this.but45days.TabIndex = 3;
 			this.but45days.Text = "Last 45 Days";
 			this.but45days.Click += new System.EventHandler(this.but45days_Click);
 			// 
@@ -335,15 +341,16 @@ namespace OpenDental{
 			// textNoteBold
 			// 
 			this.textNoteBold.AcceptsTab = true;
+			this.textNoteBold.BackColor = System.Drawing.SystemColors.Window;
 			this.textNoteBold.DetectUrls = false;
 			this.textNoteBold.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textNoteBold.ForeColor = System.Drawing.Color.DarkRed;
-			this.textNoteBold.Location = new System.Drawing.Point(105, 443);
+			this.textNoteBold.Location = new System.Drawing.Point(105, 444);
 			this.textNoteBold.Name = "textNoteBold";
 			this.textNoteBold.QuickPasteType = OpenDentBusiness.QuickPasteType.Statement;
 			this.textNoteBold.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNoteBold.Size = new System.Drawing.Size(462, 74);
-			this.textNoteBold.TabIndex = 231;
+			this.textNoteBold.TabIndex = 13;
 			this.textNoteBold.Text = "";
 			// 
 			// label1
@@ -370,17 +377,17 @@ namespace OpenDental{
 			this.listMode.Location = new System.Drawing.Point(146, 60);
 			this.listMode.Name = "listMode";
 			this.listMode.Size = new System.Drawing.Size(113, 56);
-			this.listMode.TabIndex = 233;
+			this.listMode.TabIndex = 2;
 			this.listMode.Click += new System.EventHandler(this.listMode_Click);
 			// 
 			// checkIntermingled
 			// 
 			this.checkIntermingled.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIntermingled.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIntermingled.Location = new System.Drawing.Point(1, 162);
+			this.checkIntermingled.Location = new System.Drawing.Point(1, 154);
 			this.checkIntermingled.Name = "checkIntermingled";
 			this.checkIntermingled.Size = new System.Drawing.Size(158, 20);
-			this.checkIntermingled.TabIndex = 234;
+			this.checkIntermingled.TabIndex = 5;
 			this.checkIntermingled.Text = "Intermingle family members";
 			this.checkIntermingled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIntermingled.Click += new System.EventHandler(this.checkIntermingled_Click);
@@ -389,10 +396,10 @@ namespace OpenDental{
 			// 
 			this.checkSinglePatient.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSinglePatient.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSinglePatient.Location = new System.Drawing.Point(1, 141);
+			this.checkSinglePatient.Location = new System.Drawing.Point(1, 137);
 			this.checkSinglePatient.Name = "checkSinglePatient";
 			this.checkSinglePatient.Size = new System.Drawing.Size(158, 20);
-			this.checkSinglePatient.TabIndex = 235;
+			this.checkSinglePatient.TabIndex = 4;
 			this.checkSinglePatient.Text = "Single patient only";
 			this.checkSinglePatient.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSinglePatient.Click += new System.EventHandler(this.checkSinglePatient_Click);
@@ -410,7 +417,7 @@ namespace OpenDental{
 			this.groupDateRange.Location = new System.Drawing.Point(446, 12);
 			this.groupDateRange.Name = "groupDateRange";
 			this.groupDateRange.Size = new System.Drawing.Size(162, 174);
-			this.groupDateRange.TabIndex = 236;
+			this.groupDateRange.TabIndex = 11;
 			this.groupDateRange.TabStop = false;
 			this.groupDateRange.Text = "Date Range";
 			// 
@@ -419,7 +426,7 @@ namespace OpenDental{
 			this.textDateEnd.Location = new System.Drawing.Point(75, 41);
 			this.textDateEnd.Name = "textDateEnd";
 			this.textDateEnd.Size = new System.Drawing.Size(77, 20);
-			this.textDateEnd.TabIndex = 246;
+			this.textDateEnd.TabIndex = 1;
 			this.textDateEnd.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textDateEnd_KeyDown);
 			this.textDateEnd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textDateEnd_KeyPress);
 			this.textDateEnd.Validating += new System.ComponentModel.CancelEventHandler(this.textDateEnd_Validating);
@@ -429,7 +436,7 @@ namespace OpenDental{
 			this.textDateStart.Location = new System.Drawing.Point(75, 18);
 			this.textDateStart.Name = "textDateStart";
 			this.textDateStart.Size = new System.Drawing.Size(77, 20);
-			this.textDateStart.TabIndex = 245;
+			this.textDateStart.TabIndex = 0;
 			this.textDateStart.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textDateStart_KeyDown);
 			this.textDateStart.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textDateStart_KeyPress);
 			this.textDateStart.Validating += new System.ComponentModel.CancelEventHandler(this.textDateStart_Validating);
@@ -450,7 +457,7 @@ namespace OpenDental{
 			this.checkIsSent.Location = new System.Drawing.Point(1, 39);
 			this.checkIsSent.Name = "checkIsSent";
 			this.checkIsSent.Size = new System.Drawing.Size(159, 18);
-			this.checkIsSent.TabIndex = 239;
+			this.checkIsSent.TabIndex = 1;
 			this.checkIsSent.Text = "Sent";
 			this.checkIsSent.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsSent.Click += new System.EventHandler(this.checkIsSent_Click);
@@ -468,7 +475,7 @@ namespace OpenDental{
 			this.butDelete.Location = new System.Drawing.Point(40, 539);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(79, 24);
-			this.butDelete.TabIndex = 240;
+			this.butDelete.TabIndex = 19;
 			this.butDelete.Text = "Delete";
 			this.butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
@@ -484,7 +491,7 @@ namespace OpenDental{
 			this.butPrint.Location = new System.Drawing.Point(210, 539);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(79, 24);
-			this.butPrint.TabIndex = 241;
+			this.butPrint.TabIndex = 14;
 			this.butPrint.Text = "Print";
 			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
 			// 
@@ -500,7 +507,7 @@ namespace OpenDental{
 			this.butEmail.Location = new System.Drawing.Point(295, 539);
 			this.butEmail.Name = "butEmail";
 			this.butEmail.Size = new System.Drawing.Size(79, 24);
-			this.butEmail.TabIndex = 242;
+			this.butEmail.TabIndex = 15;
 			this.butEmail.Text = "E-mail";
 			this.butEmail.Click += new System.EventHandler(this.butEmail_Click);
 			// 
@@ -516,7 +523,7 @@ namespace OpenDental{
 			this.butPreview.Location = new System.Drawing.Point(380, 539);
 			this.butPreview.Name = "butPreview";
 			this.butPreview.Size = new System.Drawing.Size(79, 24);
-			this.butPreview.TabIndex = 243;
+			this.butPreview.TabIndex = 16;
 			this.butPreview.Text = "View";
 			this.butPreview.Click += new System.EventHandler(this.butPreview_Click);
 			// 
@@ -525,7 +532,7 @@ namespace OpenDental{
 			this.textDate.Location = new System.Drawing.Point(146, 15);
 			this.textDate.Name = "textDate";
 			this.textDate.Size = new System.Drawing.Size(77, 20);
-			this.textDate.TabIndex = 244;
+			this.textDate.TabIndex = 0;
 			this.textDate.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textDate_KeyDown);
 			this.textDate.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textDate_KeyPress);
 			this.textDate.Validating += new System.ComponentModel.CancelEventHandler(this.textDate_Validating);
@@ -534,10 +541,10 @@ namespace OpenDental{
 			// 
 			this.checkIsReceipt.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsReceipt.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIsReceipt.Location = new System.Drawing.Point(1, 183);
+			this.checkIsReceipt.Location = new System.Drawing.Point(1, 171);
 			this.checkIsReceipt.Name = "checkIsReceipt";
 			this.checkIsReceipt.Size = new System.Drawing.Size(158, 20);
-			this.checkIsReceipt.TabIndex = 245;
+			this.checkIsReceipt.TabIndex = 6;
 			this.checkIsReceipt.Text = "Receipt";
 			this.checkIsReceipt.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -547,10 +554,10 @@ namespace OpenDental{
 			this.groupInvoice.Controls.Add(this.label5);
 			this.groupInvoice.Controls.Add(this.checkIsInvoiceCopy);
 			this.groupInvoice.Controls.Add(this.checkIsInvoice);
-			this.groupInvoice.Location = new System.Drawing.Point(12, 202);
+			this.groupInvoice.Location = new System.Drawing.Point(12, 205);
 			this.groupInvoice.Name = "groupInvoice";
 			this.groupInvoice.Size = new System.Drawing.Size(247, 82);
-			this.groupInvoice.TabIndex = 247;
+			this.groupInvoice.TabIndex = 8;
 			this.groupInvoice.TabStop = false;
 			this.groupInvoice.Text = "Invoice";
 			// 
@@ -560,7 +567,7 @@ namespace OpenDental{
 			this.textInvoiceNum.Name = "textInvoiceNum";
 			this.textInvoiceNum.ReadOnly = true;
 			this.textInvoiceNum.Size = new System.Drawing.Size(108, 20);
-			this.textInvoiceNum.TabIndex = 250;
+			this.textInvoiceNum.TabIndex = 2;
 			// 
 			// label5
 			// 
@@ -578,7 +585,7 @@ namespace OpenDental{
 			this.checkIsInvoiceCopy.Location = new System.Drawing.Point(5, 32);
 			this.checkIsInvoiceCopy.Name = "checkIsInvoiceCopy";
 			this.checkIsInvoiceCopy.Size = new System.Drawing.Size(142, 20);
-			this.checkIsInvoiceCopy.TabIndex = 248;
+			this.checkIsInvoiceCopy.TabIndex = 1;
 			this.checkIsInvoiceCopy.Text = "Invoice Copy";
 			this.checkIsInvoiceCopy.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
@@ -589,20 +596,35 @@ namespace OpenDental{
 			this.checkIsInvoice.Location = new System.Drawing.Point(5, 12);
 			this.checkIsInvoice.Name = "checkIsInvoice";
 			this.checkIsInvoice.Size = new System.Drawing.Size(142, 20);
-			this.checkIsInvoice.TabIndex = 247;
+			this.checkIsInvoice.TabIndex = 0;
 			this.checkIsInvoice.Text = "Invoice";
 			this.checkIsInvoice.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIsInvoice.Click += new System.EventHandler(this.checkIsInvoice_Click);
+			// 
+			// checkSuperStatement
+			// 
+			this.checkSuperStatement.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperStatement.Enabled = false;
+			this.checkSuperStatement.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSuperStatement.Location = new System.Drawing.Point(1, 188);
+			this.checkSuperStatement.Name = "checkSuperStatement";
+			this.checkSuperStatement.Size = new System.Drawing.Size(158, 20);
+			this.checkSuperStatement.TabIndex = 7;
+			this.checkSuperStatement.Text = "Send to Super Family";
+			this.checkSuperStatement.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperStatement.Visible = false;
+			this.checkSuperStatement.CheckedChanged += new System.EventHandler(this.checkSuperStatement_CheckedChanged);
 			// 
 			// FormStatementOptions
 			// 
 			this.AcceptButton = this.butOK;
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(709, 575);
+			this.Controls.Add(this.groupInvoice);
+			this.Controls.Add(this.checkSuperStatement);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.butEmail);
 			this.Controls.Add(this.butPreview);
-			this.Controls.Add(this.groupInvoice);
 			this.Controls.Add(this.checkIsReceipt);
 			this.Controls.Add(this.textDate);
 			this.Controls.Add(this.butDelete);
@@ -695,6 +717,21 @@ namespace OpenDental{
 				}
 				textNote.Text=StmtCur.Note;
 				textNoteBold.Text=StmtCur.NoteBold;
+				if(PrefC.GetBool(PrefName.ShowFeatureSuperfamilies)) {//Superfamilies enabled, show checkbox.
+					checkSuperStatement.Visible=true;
+					Patient guarantor=Patients.GetFamily(StmtCur.PatNum).ListPats[0];
+					_superHead=Patients.GetPat(guarantor.SuperFamily);
+					if(StmtCur.IsSent==false && PrefC.GetBool(PrefName.StatementsUseSheets) 
+						&& guarantor.HasSuperBilling 
+						&& guarantor.SuperFamily!=0 
+						&& _superHead.HasSuperBilling) 
+					{
+						//Statement not sent, statements use sheets, and guarantor is a member of a superfamily, guarantor and superhead both have superbilling enabled.
+						//Enable superfam checkbox.
+						checkSuperStatement.Enabled=true;
+					}
+					checkSuperStatement.Checked=(StmtCur.SuperFamily!=0);//Check the box if statement has superfam != 0
+				}
 			}
 			else{
 				//bulk edit
@@ -902,6 +939,19 @@ namespace OpenDental{
 			}
 		}
 
+		private void checkSuperStatement_CheckedChanged(object sender,EventArgs e) {
+			if(checkSuperStatement.Checked) {
+				checkIntermingled.Checked=false;
+				checkIntermingled.Enabled=false;
+				checkSinglePatient.Checked=false;
+				checkSinglePatient.Enabled=false;
+			}
+			else {
+				checkIntermingled.Enabled=true;
+				checkSinglePatient.Enabled=true;
+			}
+		}
+
 		private void SetEnabled(bool boolval){
 			textDate.Enabled=boolval;
 			listMode.Enabled=boolval;
@@ -913,6 +963,7 @@ namespace OpenDental{
 			textNote.Enabled=boolval;
 			textNoteBold.Enabled=boolval;
 			groupInvoice.Enabled=boolval;
+			checkSuperStatement.Enabled=boolval;
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
@@ -1008,10 +1059,20 @@ namespace OpenDental{
 					return;
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+				DataSet dataSet=null;
+				if(checkSuperStatement.Checked) {
+					StmtCur.SuperFamily=Patients.GetPat(StmtCur.PatNum).SuperFamily;
+					StmtCur.PatNum=StmtCur.SuperFamily;
+					dataSet=AccountModules.GetSuperFamAccount(StmtCur.SuperFamily,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.StatementNum
+						,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				else {
+					dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
 						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
 						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
 				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
 				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
@@ -1140,10 +1201,20 @@ namespace OpenDental{
 					return;
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+				DataSet dataSet=null;
+				if(checkSuperStatement.Checked) {
+					StmtCur.SuperFamily=Patients.GetPat(StmtCur.PatNum).SuperFamily;
+					StmtCur.PatNum=StmtCur.SuperFamily;
+					dataSet=AccountModules.GetSuperFamAccount(StmtCur.SuperFamily,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.StatementNum
+						,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				else {
+					dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
 						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
 						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
 				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
 				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur);
 				string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),StmtCur.PatNum.ToString()+".pdf");
@@ -1296,10 +1367,20 @@ namespace OpenDental{
 					return;
 				}
 				SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
-				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
-				DataSet dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
+				DataSet dataSet=null;
+				if(checkSuperStatement.Checked) {
+					StmtCur.SuperFamily=Patients.GetPat(StmtCur.PatNum).SuperFamily;
+					StmtCur.PatNum=StmtCur.SuperFamily;
+					dataSet=AccountModules.GetSuperFamAccount(StmtCur.SuperFamily,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.StatementNum
+						,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				else {
+					dataSet=AccountModules.GetAccount(StmtCur.PatNum,StmtCur.DateRangeFrom,StmtCur.DateRangeTo,StmtCur.Intermingled,StmtCur.SinglePatient
 						,StmtCur.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
 						,StmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				Sheet sheet=SheetUtil.CreateSheet(sheetDef,StmtCur.PatNum,StmtCur.HidePayment);
 				SheetFiller.FillFields(sheet,dataSet,StmtCur,null);
 				SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,StmtCur,true,40,60);
 				//print directly to PDF here, and save it.
@@ -1713,6 +1794,10 @@ namespace OpenDental{
 			//	return false;
 			//}
 			if(StmtList==null){
+				if(checkSuperStatement.Checked) {
+					StmtCur.PatNum=_superHead.PatNum;
+					StmtCur.SuperFamily=_superHead.PatNum;
+				}
 				StmtCur.DateSent=PIn.Date(textDate.Text);
 				StmtCur.IsSent=checkIsSent.Checked;
 				StmtCur.Mode_=(StatementMode)listMode.SelectedIndex;

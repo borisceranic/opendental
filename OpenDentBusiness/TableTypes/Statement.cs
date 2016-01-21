@@ -11,6 +11,9 @@ namespace OpenDentBusiness{
 		public long StatementNum;
 		/// <summary>FK to patient.PatNum. Typically the guarantor.  Can also be the patient for walkout statements.</summary>
 		public long PatNum;
+		///<summary>FK to patient.PatNum.  Typically zero unless a super family statement is desired.
+		///Will be non-zero if the patient is associated with a super family and a super family statement is desired.</summary>
+		public long SuperFamily;
 		/// <summary>This will always be a valid and reasonable date regardless of whether it's actually been sent yet.</summary>
 		public DateTime DateSent;
 		/// <summary>Typically 45 days before dateSent</summary>

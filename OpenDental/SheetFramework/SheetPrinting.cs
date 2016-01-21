@@ -159,9 +159,15 @@ namespace OpenDental {
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
-				_dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				if(stmt.SuperFamily!=0) {
+					_dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				else {
+					_dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+							,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
 			}
 			return Print(sheet,_dataSet,copies,isRxControlled,stmt,medLab,isPrintDocument);
 		}
@@ -1781,9 +1787,15 @@ namespace OpenDental {
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
-				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				if(stmt.SuperFamily!=0) {
+					dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
+				else {
+					dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
+							,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
+							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				}
 			}
 			CreatePdf(sheet,fullFileName,stmt,dataSet,medLab);
 		}

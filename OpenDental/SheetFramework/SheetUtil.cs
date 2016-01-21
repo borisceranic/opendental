@@ -945,12 +945,34 @@ namespace OpenDental{
 			retVal.Columns.Add(new DataColumn("Age31to60"));
 			retVal.Columns.Add(new DataColumn("Age61to90"));
 			retVal.Columns.Add(new DataColumn("Age90plus"));
-			Patient guar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
 			DataRow row=retVal.NewRow();
-			row[0]=guar.Bal_0_30.ToString("F");
-			row[1]=guar.Bal_31_60.ToString("F");
-			row[2]=guar.Bal_61_90.ToString("F");
-			row[3]=guar.BalOver90.ToString("F");
+			if(stmt.SuperFamily!=0) {//Superfamily statement
+				List<Patient> listSuperfamGuars=Patients.GetSuperFamilyGuarantors(stmt.SuperFamily);
+				double bal0to30=0;
+				double bal31to60=0;
+				double bal61to90=0;
+				double balOver90=0;
+				foreach(Patient guarantor in listSuperfamGuars) {
+					if(!guarantor.HasSuperBilling) {
+						continue;
+					}
+					bal0to30+=guarantor.Bal_0_30;
+					bal31to60+=guarantor.Bal_31_60;
+					bal61to90+=guarantor.Bal_61_90;
+					balOver90+=guarantor.BalOver90;
+				}
+				row[0]=bal0to30.ToString("F");
+				row[1]=bal31to60.ToString("F");
+				row[2]=bal61to90.ToString("F");
+				row[3]=balOver90.ToString("F");
+			}
+			else {
+				Patient guar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
+				row[0]=guar.Bal_0_30.ToString("F");
+				row[1]=guar.Bal_31_60.ToString("F");
+				row[2]=guar.Bal_61_90.ToString("F");
+				row[3]=guar.BalOver90.ToString("F");
+			}
 			retVal.Rows.Add(row);
 			return retVal;
 		}
@@ -973,16 +995,45 @@ namespace OpenDental{
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
 		private static DataTable getTable_StatementEnclosed(DataSet dataSet,Statement stmt) {
 			DataTable tableMisc=dataSet.Tables["misc"];
-			string text;
+			string text="";
 			DataTable table=new DataTable();
 			table.Columns.Add(new DataColumn("AmountDue"));
 			table.Columns.Add(new DataColumn("DateDue"));
 			table.Columns.Add(new DataColumn("AmountEnclosed"));
 			DataRow row=table.NewRow();
-			Patient patGuar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
-			double balTotal=patGuar.BalTotal;
+			Patient patGuar=null;
+			List<Patient> listSuperFamGuars=new List<Patient>();
+			if(stmt.SuperFamily!=0) {//Superfamily statement
+				patGuar=Patients.GetPat(Patients.GetPat(stmt.SuperFamily).Guarantor);
+				listSuperFamGuars=Patients.GetSuperFamilyGuarantors(patGuar.SuperFamily);
+			}
+			else {
+				patGuar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
+			}
+			double balTotal=0;
+			if(stmt.SuperFamily!=0) {//Superfamily statement
+				foreach(Patient guarantor in listSuperFamGuars) {
+					if(!guarantor.HasSuperBilling) {
+						continue;
+					}
+					balTotal+=guarantor.BalTotal;
+				}
+			}
+			else {
+				balTotal=patGuar.BalTotal;
+			}
 			if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
-				balTotal-=patGuar.InsEst;
+				if(stmt.SuperFamily!=0) {//Superfamily statement
+					foreach(Patient guarantor in listSuperFamGuars) {
+						if(!guarantor.HasSuperBilling) {
+							continue;
+						}
+						balTotal-=guarantor.InsEst;
+					}
+				}
+				else {
+					balTotal-=patGuar.InsEst;
+				}
 			}
 			for(int m=0;m<tableMisc.Rows.Count;m++) {
 				if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue") {
@@ -990,18 +1041,38 @@ namespace OpenDental{
 					//payPlanDue;//PatGuar.PayPlanDue;
 				}
 			}
-			InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(patGuar.PatNum);
-			if(installPlan!=null) {
-				//show lesser of normal total balance or the monthly payment amount.
-				if(installPlan.MonthlyPayment < balTotal) {
-					text=installPlan.MonthlyPayment.ToString("F");
+			if(stmt.SuperFamily!=0) {//Superfamily statement
+				List<InstallmentPlan> listInstallPlans=InstallmentPlans.GetForSuperFam(patGuar.SuperFamily);
+				if(listInstallPlans.Count>0) {
+					double installPlanTotal=0;
+					foreach(InstallmentPlan plan in listInstallPlans) {
+						installPlanTotal+=plan.MonthlyPayment;
+					}
+					if(installPlanTotal < balTotal) {
+						text=installPlanTotal.ToString("F");
+					}
+					else {
+						text=balTotal.ToString("F");
+					}
 				}
-				else {
+				else {//No installment plans
 					text=balTotal.ToString("F");
 				}
 			}
-			else {//no installmentplan
-				text=balTotal.ToString("F");
+			else {
+				InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(patGuar.PatNum);
+				if(installPlan!=null) {
+					//show lesser of normal total balance or the monthly payment amount.
+					if(installPlan.MonthlyPayment < balTotal) {
+						text=installPlan.MonthlyPayment.ToString("F");
+					}
+					else {
+						text=balTotal.ToString("F");
+					}
+				}
+				else {//no installmentplan
+					text=balTotal.ToString("F");
+				}
 			}
 			row[0]=text;
 			if(PrefC.GetLong(PrefName.StatementsCalcDueDate)==-1) {
