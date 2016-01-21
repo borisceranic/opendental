@@ -67,9 +67,9 @@ namespace OpenDentBusiness{
 			if(appt.AptStatus!=ApptStatus.Scheduled && appt.AptStatus!=ApptStatus.ASAP) {
 				return;//Do nothing unless it's scheduled or ASAP.
 			}
-			int dayInterval=PrefC.GetInt(PrefName.ApptReminderDayInterval);
 			ApptComm apptComm;
-			DateTime daySend=appt.AptDateTime.Subtract(new TimeSpan(dayInterval,0,0,0));
+			double dayInterval=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
+			DateTime daySend=appt.AptDateTime.Subtract(TimeSpan.FromDays(dayInterval));
 			//This prevents a UE while pre-inserting new appointments and prevents adding reminder if the interval can't be reached.
 			if(dayInterval > 0 && appt.AptNum!=0 && daySend > DateTime.Now) {
 				apptComm=new ApptComm();
@@ -78,8 +78,8 @@ namespace OpenDentBusiness{
 				apptComm.DateTimeSend=daySend;//Setting the ApptComm reminder to be sent dayInterval days before the appt.
 				ApptComms.Insert(apptComm);
 			}
-			int hourInterval=PrefC.GetInt(PrefName.ApptReminderHourInterval);
-			DateTime hourSend=appt.AptDateTime.Subtract(new TimeSpan(0,hourInterval,0,0));
+			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
+			DateTime hourSend=appt.AptDateTime.Subtract(TimeSpan.FromHours(hourInterval));
 			if(hourInterval > 0 && appt.AptNum!=0 && hourSend > DateTime.Now) {//This prevents a UE while pre-inserting new appointments.
 				apptComm=new ApptComm();
 				apptComm.ApptNum=appt.AptNum;
@@ -157,8 +157,6 @@ namespace OpenDentBusiness{
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
-#warning delete this commlog insert, maybe, a commlog is also inserted from the SendText method.
-						Commlogs.Insert(comm);
 					}
 					errorText+=textError;
 					if(emailError=="" || textError=="") {//If either are successful, delete.
