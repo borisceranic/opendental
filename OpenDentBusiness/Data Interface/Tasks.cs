@@ -289,7 +289,29 @@ namespace OpenDentBusiness{
 			}
 			command+="ORDER BY task.DateTimeEntry";
 			DataTable table=Db.GetTable(command);
-			return TableToList(table);
+			List<DataRow> listRows=new List<DataRow>();
+			for(int i=0;i<table.Rows.Count;i++) {
+				listRows.Add(table.Rows[i]);
+			}
+			#region Set Sort Variables. This greatly increases sort speed.
+			_isHQ=PrefC.GetBool(PrefName.DockPhonePanelShow);//increases speed of the sort function performed below.
+			List<Def> listTaskPriorities=new List<Def>();
+			listTaskPriorities.AddRange(DefC.GetList(DefCat.TaskPriorities));
+			for(int i=0;i<listTaskPriorities.Count;i++) {
+				if(listTaskPriorities[i].ItemValue.ToUpper()=="D") {
+					_defaultTaskPriorityDefNum=listTaskPriorities[i].DefNum;
+					break;
+				}
+			}
+			#endregion
+			listRows.Sort(TaskComparer);
+			DataTable tableSorted=table.Clone();//Easy way to copy the columns.
+			tableSorted.Rows.Clear();
+			for(int i=0;i<listRows.Count;i++) {
+				tableSorted.Rows.Add(listRows[i].ItemArray);
+			}
+			List<Task> listTasks=TableToList(tableSorted);
+			return listTasks;
 		}
 
 		///<summary>Gets all 'open ticket' tasks for a user.  An open ticket is a task that was created by this user, is attached to a patient, and is not done.</summary>
