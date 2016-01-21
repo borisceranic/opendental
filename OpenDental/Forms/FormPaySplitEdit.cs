@@ -1089,7 +1089,7 @@ namespace OpenDental
 			else {
 				PaySplitCur.UnearnedType=DefC.Short[(int)DefCat.PaySplitUnearnedType][comboUnearnedTypes.SelectedIndex-1].DefNum;
 			}
-			if(PrefC.HasClinicsEnabled && comboClinic.SelectedIndex>0 && _listUserClinicNums.Count>comboClinic.SelectedIndex) {
+			if(PrefC.HasClinicsEnabled) {
 				//_listUserClinicNums contains all clinics the user has access to as well as ClinicNum 0 for 'none'
 				PaySplitCur.ClinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
 			}
