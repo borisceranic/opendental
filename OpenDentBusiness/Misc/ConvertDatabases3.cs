@@ -12652,6 +12652,38 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE patient MODIFY HasSuperBilling NOT NULL";
 					Db.NonQ(command);
 				}
+                //UserOdPref Table
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS userodpref";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userodpref (
+						UserOdPrefNum bigint NOT NULL auto_increment PRIMARY KEY,
+						UserNum bigint NOT NULL,
+						Fkey bigint NOT NULL,
+						FkeyType tinyint NOT NULL,
+						ValueString varchar(255) NOT NULL,
+						INDEX(UserNum),
+						INDEX(Fkey)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE userodpref'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE userodpref (
+						UserOdPrefNum number(20) NOT NULL,
+						UserNum number(20) NOT NULL,
+						Fkey number(20) NOT NULL,
+						FkeyType number(3) NOT NULL,
+						ValueString varchar2(255),
+						CONSTRAINT userodpref_UserOdPrefNum PRIMARY KEY (UserOdPrefNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userodpref_UserNum ON userodpref (UserNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX userodpref_Fkey ON userodpref (Fkey)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
