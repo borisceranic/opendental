@@ -65,8 +65,8 @@ namespace OpenDental{
 		private ODGrid gridPriorities;
 		private Label label10;
 		private Label label11;
-		private ValidNumber textHoursPrior;
-		private ValidNumber textDaysPrior;
+		private ValidDouble textHoursPrior;
+		private ValidDouble textDaysPrior;
 		private bool changed;
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
@@ -104,8 +104,8 @@ namespace OpenDental{
 		private Label label27;
 		private Label label32;
 		private string[] _arrayPriorities;
-		private int _daysPrior;
-		private int _hoursPrior;
+		private double _daysPrior;
+		private double _hoursPrior;
 
 		///<summary></summary>
 		public FormRecallSetup(){
@@ -206,8 +206,8 @@ namespace OpenDental{
 			this.butUp = new OpenDental.UI.Button();
 			this.label10 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
-			this.textHoursPrior = new OpenDental.ValidNumber();
-			this.textDaysPrior = new OpenDental.ValidNumber();
+			this.textHoursPrior = new OpenDental.ValidDouble();
+			this.textDaysPrior = new OpenDental.ValidDouble();
 			this.gridPriorities = new OpenDental.UI.ODGrid();
 			this.tabAutomationSettings = new System.Windows.Forms.TabPage();
 			this.groupBox8 = new System.Windows.Forms.GroupBox();
@@ -1034,8 +1034,8 @@ namespace OpenDental{
 			// textHoursPrior
 			// 
 			this.textHoursPrior.Location = new System.Drawing.Point(66, 376);
-			this.textHoursPrior.MaxVal = 255;
-			this.textHoursPrior.MinVal = 0;
+			this.textHoursPrior.MaxVal = 100000000D;
+			this.textHoursPrior.MinVal = 0D;
 			this.textHoursPrior.Name = "textHoursPrior";
 			this.textHoursPrior.Size = new System.Drawing.Size(51, 20);
 			this.textHoursPrior.TabIndex = 13;
@@ -1045,11 +1045,12 @@ namespace OpenDental{
 			// textDaysPrior
 			// 
 			this.textDaysPrior.Location = new System.Drawing.Point(66, 85);
-			this.textDaysPrior.MaxVal = 255;
-			this.textDaysPrior.MinVal = 0;
+			this.textDaysPrior.MaxVal = 100000000D;
+			this.textDaysPrior.MinVal = 0D;
 			this.textDaysPrior.Name = "textDaysPrior";
 			this.textDaysPrior.Size = new System.Drawing.Size(51, 20);
 			this.textDaysPrior.TabIndex = 12;
+			this.textDaysPrior.Text = "0";
 			this.textDaysPrior.Leave += new System.EventHandler(this.textDayInterval_Leave);
 			// 
 			// gridPriorities
@@ -1661,8 +1662,8 @@ namespace OpenDental{
 		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
-			_daysPrior=PIn.Int(PrefC.GetString(PrefName.ApptReminderDayInterval));
-			_hoursPrior=PIn.Int(PrefC.GetString(PrefName.ApptReminderHourInterval));
+			_daysPrior=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
+			_hoursPrior=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
 			textDaysPrior.Text=_daysPrior.ToString();
 			textDayMsg.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
 			textHoursPrior.Text=_hoursPrior.ToString();
@@ -1677,14 +1678,10 @@ namespace OpenDental{
 		}
 
 		private void FillPriorityMetrics() {
-			int daysPrior;
-			int hoursPrior;
-			try {
-				daysPrior=PIn.Int(textDaysPrior.Text);
-				hoursPrior=PIn.Int(textHoursPrior.Text);
-			}
-			catch(Exception) {
-				return;//ValidNumber box will tell them what's wrong. No need for a message.
+			double daysPrior;
+			double hoursPrior;
+			if(!double.TryParse(textDaysPrior.Text,out daysPrior) || !double.TryParse(textHoursPrior.Text,out hoursPrior)) {
+				return;//ValidDouble displays the error message.  This is to prevent this code executing prior to ValidDouble performing validation.
 			}
 			DateTime dateDayStart=DateTime.Now.AddDays(daysPrior);
 			DateTime dateHourStart=DateTime.Now.AddHours(hoursPrior);
@@ -2081,9 +2078,9 @@ namespace OpenDental{
 				Prefs.UpdateBool(PrefName.RecallUseEmailIfHasEmailAddress,false);
 			}
 			Prefs.UpdateBool(PrefName.ApptReminderSendAll,checkSendAll.Checked);
-			if(_daysPrior!=PIn.Int(textDaysPrior.Text) || _hoursPrior!=PIn.Int(textHoursPrior.Text)) {
-				Prefs.UpdateInt(PrefName.ApptReminderDayInterval,PIn.Int(textDaysPrior.Text));
-				Prefs.UpdateInt(PrefName.ApptReminderHourInterval,PIn.Int(textHoursPrior.Text));
+			if(_daysPrior!=PIn.Double(textDaysPrior.Text) || _hoursPrior!=PIn.Double(textHoursPrior.Text)) {
+				Prefs.UpdateDouble(PrefName.ApptReminderDayInterval,PIn.Double(textDaysPrior.Text));
+				Prefs.UpdateDouble(PrefName.ApptReminderHourInterval,PIn.Double(textHoursPrior.Text));
 				//Update ApptComms with new reminder entries.
 				ApptComms.InsertForFutureAppts();
 			}

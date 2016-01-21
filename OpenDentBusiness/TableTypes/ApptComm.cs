@@ -14,7 +14,7 @@ namespace OpenDentBusiness {
 		public long ApptNum;
 		///<summary>Enum: IntervalType.</summary>
 		public IntervalType ApptCommType;
-		///<summary>DateTime this AptComm should be sent.</summary>
+		///<summary>AptComm should not be sent until after this datetime. EConnector tick interval causes this to be sent between 0 and 30 minutes after.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeSend;
 	}
