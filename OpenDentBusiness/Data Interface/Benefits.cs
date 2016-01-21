@@ -1726,26 +1726,26 @@ namespace OpenDentBusiness {
 						{
 							if(ben.QuantityQualifier==BenefitQuantity.Months) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every month.\r\n");
+									retVal+=Lans.g("Benefits","Once every month.")+"\r\n";
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","months.")+"\r\n";
 								}
 							}
 							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every year.\r\n");
+									retVal+=Lans.g("Benefits","Once every year.")+"\r\n";
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","years.")+"\r\n";
 								}
 							}
-							else {
+							else {//number of services
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once per year.\r\n");
+									retVal+=Lans.g("Benefits","Once per year.")+"\r\n";
 								}
 								else {
-									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+" "+Lans.g("Benefits","times per year.")+"\r\n";
 								}
 							}
 						}
@@ -1764,26 +1764,26 @@ namespace OpenDentBusiness {
 						{
 							if(ben.QuantityQualifier==BenefitQuantity.Months) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every month.\r\n");
+									retVal+=Lans.g("Benefits","Once every month.")+"\r\n";
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","months.")+"\r\n";
 								}
 							}
 							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every year.\r\n");
+									retVal+=Lans.g("Benefits","Once every year.")+"\r\n";
 								}
-								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
+								else {//number of services
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","years.")+"\r\n";
 								}
 							}
 							else {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once per year.\r\n");
+									retVal+=Lans.g("Benefits","Once per year.")+"\r\n";
 								}
 								else {
-									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+" "+Lans.g("Benefits","times per year.")+"\r\n";
 								}
 							}
 						}
@@ -1803,26 +1803,26 @@ namespace OpenDentBusiness {
 						{
 							if(ben.QuantityQualifier==BenefitQuantity.Months) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every month.\r\n");
+									retVal+=Lans.g("Benefits","Once every month.")+"\r\n";
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," months.\r\n");
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","months.")+"\r\n";
 								}
 							}
 							else if(ben.QuantityQualifier==BenefitQuantity.Years) {
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once every year.\r\n");
+									retVal+=Lans.g("Benefits","Once every year.")+"\r\n";
 								}
 								else {
-									retVal+=Lans.g(null,"Once every ")+ben.Quantity+Lans.g(null," years.\r\n");
+									retVal+=Lans.g("Benefits","Once every")+" "+ben.Quantity+" "+Lans.g("Benefits","years.")+"\r\n";
 								}
 							}
-							else {
+							else {//number of services
 								if(ben.Quantity==1) {
-									retVal+=Lans.g(null,"Once per year.\r\n");
+									retVal+=Lans.g("Benefits","Once per year.")+"\r\n";
 								}
 								else {
-									retVal+=ben.Quantity+Lans.g(null," times per year.\r\n");
+									retVal+=ben.Quantity+" "+Lans.g("Benefits","times per year.")+"\r\n";
 								}
 							}
 						}

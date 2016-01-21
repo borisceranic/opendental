@@ -247,12 +247,12 @@ namespace OpenDental{
 			#region Patient Fields
 			if(pat!=null) {
 				fam=Patients.GetFamily(pat.PatNum);
-				premedicateYN="No";
-				recallScheduledYN="No";
-				dueForBWYN="No";
-				dueForPanoYN="No";
+				premedicateYN=Lan.g("All","No");
+				recallScheduledYN=Lan.g("All","No");
+				dueForBWYN=Lan.g("All","No");
+				dueForPanoYN=Lan.g("All","No");
 				if(pat.Premed) {
-					premedicateYN="Yes";
+					premedicateYN=Lan.g("All","Yes");
 				}
 				patNote=PatientNotes.Refresh(pat.PatNum,pat.Guarantor);
 				medicalSummary=patNote.Medical;
@@ -262,40 +262,40 @@ namespace OpenDental{
 				#region Gender
 				switch(pat.Gender) {
 					case PatientGender.Male:
-						genderHeShe="He";
-						genderheshe="he";
-						genderHimHer="Him";
-						genderhimher="him";
-						genderHimselfHerself="Himself";
-						genderhimselfherself="Herself";
-						genderHisHer="His";
-						genderhisher="his";
-						genderHisHers="His";
-						genderhishers="his";
+						genderHeShe=Lan.g("PatientInfo","He");
+						genderheshe=Lan.g("PatientInfo","he");
+						genderHimHer=Lan.g("PatientInfo","Him");
+						genderhimher=Lan.g("PatientInfo","him");
+						genderHimselfHerself=Lan.g("PatientInfo","Himself");
+						genderhimselfherself=Lan.g("PatientInfo","Herself");
+						genderHisHer=Lan.g("PatientInfo","His");
+						genderhisher=Lan.g("PatientInfo","his");
+						genderHisHers=Lan.g("PatientInfo","His");
+						genderhishers=Lan.g("PatientInfo","his");
 						break;
 					case PatientGender.Female:
-						genderHeShe="She";
-						genderheshe="she";
-						genderHimHer="Her";
-						genderhimher="her";
-						genderHimselfHerself="Herself";
-						genderhimselfherself="herself";
-						genderHisHer="Her";
-						genderhisher="her";
-						genderHisHers="Hers";
-						genderhishers="hers";
+						genderHeShe=Lan.g("PatientInfo","She");
+						genderheshe=Lan.g("PatientInfo","she");
+						genderHimHer=Lan.g("PatientInfo","Her");
+						genderhimher=Lan.g("PatientInfo","her");
+						genderHimselfHerself=Lan.g("PatientInfo","Herself");
+						genderhimselfherself=Lan.g("PatientInfo","herself");
+						genderHisHer=Lan.g("PatientInfo","Her");
+						genderhisher=Lan.g("PatientInfo","her");
+						genderHisHers=Lan.g("PatientInfo","Hers");
+						genderhishers=Lan.g("PatientInfo","hers");
 						break;
 					case PatientGender.Unknown:
-						genderHeShe="The patient";
-						genderheshe="the patient";
-						genderHimHer="The patient";
-						genderhimher="the patient";
-						genderHimselfHerself="The patient";
-						genderhimselfherself="the patient";
-						genderHisHer="The patient's";
-						genderhisher="the patient's";
-						genderHisHers="The patient's";
-						genderhishers="the patient's";
+						genderHeShe=Lan.g("PatientInfo","The patient");
+						genderheshe=Lan.g("PatientInfo","the patient");
+						genderHimHer=Lan.g("PatientInfo","The patient");
+						genderhimher=Lan.g("PatientInfo","the patient");
+						genderHimselfHerself=Lan.g("PatientInfo","The patient");
+						genderhimselfherself=Lan.g("PatientInfo","the patient");
+						genderHisHer=Lan.g("PatientInfo","The patient's");
+						genderhisher=Lan.g("PatientInfo","the patient's");
+						genderHisHers=Lan.g("PatientInfo","The patient's");
+						genderhishers=Lan.g("PatientInfo","the patient's");
 						break;
 				}
 				#endregion
@@ -355,7 +355,7 @@ namespace OpenDental{
 							//Get the procedure's priority.
 							string priority=DefC.GetName(DefCat.TxPriorities,procListTP[i].Priority);
 							if(priority=="") {
-								priority="No priority";
+								priority=Lan.g("TreatmentPlans","No priority");
 							}
 							//Set the corresponding static field text.
 							treatmentPlanProcsPriority+=priority+", "+procDescript;
@@ -481,16 +481,16 @@ namespace OpenDental{
 					insFreqPanoFMX=Benefits.GetFrequencyDisplay(FrequencyType.PanoFMX,benefitList,plan.PlanNum);
 					switch(plan.PlanType) {//(ppo, etc)
 						case "p":
-							insType="PPO Percentage";
+							insType=Lan.g("InsurancePlans","PPO Percentage");
 							break;
 						case "f":
-							insType="Medicaid or Flat Copay";
+							insType=Lan.g("InsurancePlans","Medicaid or Flat Copay");
 							break;
 						case "c":
-							insType="Capitation";
+							insType=Lan.g("InsurancePlans","Capitation");
 							break;
 						case "":
-							insType="Category Percentage";
+							insType=Lan.g("InsurancePlans","Category Percentage");
 							break;
 					}
 					insEmployer=Employers.GetEmployer(plan.EmployerNum).EmpName; //blank if no Employer listed
@@ -655,12 +655,12 @@ namespace OpenDental{
 							||listProcCodes[j]=="D0277"//vertical bitewings - 7 to 8 films											   
 							||listProcCodes[j]=="D0273")//bitewings - three films
 						{
-							dueForBWYN="Yes";
+							dueForBWYN=Lan.g("All","Yes");
 						}
 						if(listProcCodes[j]=="D0210"//intraoral - complete series (including bitewings)				   
 							||listProcCodes[j]=="D0330")//panoramic film
 						{
-							dueForPanoYN="Yes";
+							dueForPanoYN=Lan.g("All","Yes");
 						}
 					}
 				}
@@ -671,7 +671,7 @@ namespace OpenDental{
 					}
 					recallInterval=recall.RecallInterval.ToString();
 					if(recall.DateScheduled>=DateTime.Today) {
-						recallScheduledYN="Yes";
+						recallScheduledYN=Lan.g("All","Yes");
 					}
 				}
 				for(int i=0;i<fam.ListPats.Length;i++) {
@@ -722,16 +722,16 @@ namespace OpenDental{
 					PlannedAppt plannedAppt=PlannedAppts.GetOneOrderedByItemOrder(pat.PatNum);
 					for(int i=0;i<apptList.Count;i++) {
 						if(plannedAppt!=null && apptList[i].AptNum==plannedAppt.AptNum) {
-							plannedAppointmentInfo="Procedures: ";
+							plannedAppointmentInfo=Lan.g("Appointments","Procedures:")+" ";
 							plannedAppointmentInfo+=apptList[i].ProcDescript+"\r\n";
 							int minutesTotal=apptList[i].Pattern.Length*5;
 							int hours=minutesTotal/60;//automatically rounds down
 							int minutes=minutesTotal-hours*60;
-							plannedAppointmentInfo+="Appt Length: ";
+							plannedAppointmentInfo+=Lan.g("Appointments","Appt Length:")+" ";
 							if(hours>0) {
-								plannedAppointmentInfo+=hours.ToString()+" hours, ";
+								plannedAppointmentInfo+=hours.ToString()+" "+Lan.g("Appointments","hours")+", ";
 							}
-							plannedAppointmentInfo+=minutes.ToString()+" min\r\n";
+							plannedAppointmentInfo+=minutes.ToString()+" "+Lan.g("Appointments","min")+"\r\n";
 							if(Programs.UsingOrion) {
 								DateTime newDateSched=new DateTime();
 								for(int p=0;p<procsList.Count;p++) {
@@ -750,10 +750,10 @@ namespace OpenDental{
 									}
 								}
 								if(newDateSched.Year>1880) {
-									plannedAppointmentInfo+="Schedule by: "+newDateSched.ToShortDateString();
+									plannedAppointmentInfo+=Lan.g("Appointments","Schedule by")+": "+newDateSched.ToShortDateString();
 								}
 								else {
-									plannedAppointmentInfo+="No schedule by date.";
+									plannedAppointmentInfo+=Lan.g("Appointments","No schedule by date.");
 								}
 							}
 						}
@@ -2030,7 +2030,8 @@ namespace OpenDental{
 						field.FieldValue=deposit.DateDeposit.ToShortDateString();
 						break;
 					case "depositList":
-						StringBuilder depositListB=new StringBuilder("Date        Name                              Check Number    Bank-Branch    Amount"+Environment.NewLine);
+						StringBuilder depositListB=new StringBuilder(Lan.g("Deposits","Date").PadRight(12)+Lan.g("Deposits","Name").PadRight(34)
+							+Lan.g("Deposits","Check Number").PadRight(16)+Lan.g("Deposits","Bank-Branch").PadRight(15)+Lan.g("Deposits","Amount")+Environment.NewLine);
 						for(int i=0;i<depositList.Count;i++){
 							if(i>0){
 								depositListB.Append(Environment.NewLine);
