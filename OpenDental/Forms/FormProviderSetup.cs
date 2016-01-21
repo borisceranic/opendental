@@ -566,7 +566,7 @@ namespace OpenDental{
 		private void FillGrid(){
 			long selectedProvNum=0;
 			if(gridMain.SelectedIndices.Length==1){
-				selectedProvNum=PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString());
+				selectedProvNum=(long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;
 			}
 			int scroll=gridMain.ScrollValue;
 			if(groupDentalSchools.Visible) {
@@ -657,12 +657,12 @@ namespace OpenDental{
 				}
 				row.Cells.Add(table.Rows[i]["PatCountPri"].ToString());
 				row.Cells.Add(table.Rows[i]["PatCountSec"].ToString());
-				//row.Tag
+				row.Tag=PIn.Long(table.Rows[i]["ProvNum"].ToString());
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			for(int i=0;i<table.Rows.Count;i++){
-				if(table.Rows[i]["ProvNum"].ToString()==selectedProvNum.ToString()){
+			for(int i=0;i<gridMain.Rows.Count;i++){
+				if((long)gridMain.Rows[i].Tag==selectedProvNum){
 					gridMain.SetSelected(i,true);
 					break;
 				}
@@ -732,10 +732,10 @@ namespace OpenDental{
 			else {//Not using Dental Schools feature.
 				Cache.Refresh(InvalidType.Providers);//Refresh the cache to get current information for the item orders
 				if(gridMain.SelectedIndices.Length>0) {//place new provider after the first selected index. No changes are made to DB until after provider is actually inserted.
-					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString())).ItemOrder;//now two with this itemorder
+					FormPE.ProvCur.ItemOrder=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag).ItemOrder;//now two with this itemorder
 				}
 				else if(gridMain.Rows.Count>0) {
-					FormPE.ProvCur.ItemOrder=Providers.GetProv(PIn.Long(table.Rows[gridMain.Rows.Count-1]["ProvNum"].ToString())).ItemOrder;
+					FormPE.ProvCur.ItemOrder=Providers.GetProv((long)gridMain.Rows[gridMain.Rows.Count-1].Tag).ItemOrder+1;
 				}
 				else {
 					FormPE.ProvCur.ItemOrder=0;
@@ -770,8 +770,8 @@ namespace OpenDental{
 			Cache.Refresh(InvalidType.Providers);//This refresh may be unnecessary, but it is here for safety reasons
 			FillGrid();
 			gridMain.ScrollToEnd();//should change this to scroll to the same place as before.
-			for(int i=0;i<table.Rows.Count;i++) {//ProviderC.ListLong.Count;i++) {
-				if(table.Rows[i]["ProvNum"].ToString()==provCur.ProvNum.ToString()) {
+			for(int i=0;i<gridMain.Rows.Count;i++) {//ProviderC.ListLong.Count;i++) {
+				if((long)gridMain.Rows[i].Tag==provCur.ProvNum) {
 					//ProviderC.ListLong[i].ProvNum==FormP.ProvCur.ProvNum) {
 					gridMain.SetSelected(i,true);
 					break;
@@ -797,16 +797,18 @@ namespace OpenDental{
 				return;
 			}
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			Provider prov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
-			Provider otherprov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]-1]["ProvNum"].ToString()));
-			prov.ItemOrder--;
+			Provider prov=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
+			Provider otherprov=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]-1].Tag);
+			int oldItemOrder = prov.ItemOrder;
+			prov.ItemOrder=otherprov.ItemOrder;
 			Providers.Update(prov);
-			otherprov.ItemOrder++;
+			otherprov.ItemOrder=oldItemOrder;
 			Providers.Update(otherprov);
 			changed=true;
+			int oldSelectedInx=gridMain.SelectedIndices[0];
 			gridMain.SetSelected(false);
 			FillGrid();
-			gridMain.SetSelected(prov.ItemOrder,true);
+			gridMain.SetSelected(oldSelectedInx-1,true);
 		}
 
 		///<summary>Won't be visible if using Dental Schools.  So list will be unfiltered and ItemOrders won't get messed up.</summary>
@@ -819,21 +821,23 @@ namespace OpenDental{
 				return;
 			}
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			Provider prov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
-			Provider otherprov=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]+1]["ProvNum"].ToString()));
-			prov.ItemOrder++;
+			Provider prov=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
+			Provider otherprov=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]+1].Tag);
+			int oldItemOrder = prov.ItemOrder;
+			prov.ItemOrder=otherprov.ItemOrder;
 			Providers.Update(prov);
-			otherprov.ItemOrder--;
+			otherprov.ItemOrder=oldItemOrder;
 			Providers.Update(otherprov);
 			changed=true;
+			int oldSelectedInx=gridMain.SelectedIndices[0];
 			gridMain.SetSelected(false);
 			FillGrid();
-			gridMain.SetSelected(prov.ItemOrder,true);
+			gridMain.SetSelected(oldSelectedInx+1,true);
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			Provider provSelected=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+			Provider provSelected=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools) && Providers.IsAttachedToUser(provSelected.ProvNum)) {//Dental schools is turned on and the provider selected is attached to a user.
 				//provSelected could be a provider or a student at this point.
 				if(!provSelected.IsInstructor && !Security.IsAuthorized(Permissions.AdminDentalStudents)) {
@@ -844,7 +848,7 @@ namespace OpenDental{
 				}
 				if(!radioStudents.Checked) {
 					FormProvEdit FormPE=new FormProvEdit();
-					FormPE.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+					FormPE.ProvCur=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 					FormPE.ShowDialog();
 					if(FormPE.DialogResult!=DialogResult.OK) {
 						return;
@@ -852,7 +856,7 @@ namespace OpenDental{
 				}
 				else {
 					FormProvStudentEdit FormPSE=new FormProvStudentEdit();
-					FormPSE.ProvStudent=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+					FormPSE.ProvStudent=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 					FormPSE.ShowDialog();
 					if(FormPSE.DialogResult!=DialogResult.OK) {
 						return;
@@ -861,7 +865,7 @@ namespace OpenDental{
 			}
 			else {//No Dental Schools or provider is not attached to a user
 				FormProvEdit FormPE=new FormProvEdit();
-				FormPE.ProvCur=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+				FormPE.ProvCur=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 				FormPE.ShowDialog();
 				if(FormPE.DialogResult!=DialogResult.OK) {
 					return;
@@ -905,7 +909,7 @@ namespace OpenDental{
 				return;
 			}
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			Provider provFrom=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+			Provider provFrom=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 			Provider provTo=Providers.GetProv(_provNumMoveTo);
 			string msg=Lan.g(this,"Move all primary patients from")+" "+provFrom.GetLongDesc()+" "+Lan.g(this,"to")+" "+provTo.GetLongDesc()+"?";
 			if(MessageBox.Show(msg,"",MessageBoxButtons.OKCancel)==DialogResult.OK) {
@@ -926,7 +930,7 @@ namespace OpenDental{
 				return;
 			}
 			Cache.Refresh(InvalidType.Providers);//Get the most recent information from the cache so we do not have null references to providers
-			Provider provFrom=Providers.GetProv(PIn.Long(table.Rows[gridMain.SelectedIndices[0]]["ProvNum"].ToString()));
+			Provider provFrom=Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 			Provider provTo=Providers.GetProv(_provNumMoveTo);
 			string msg;
 			if(provTo==null) {
@@ -954,10 +958,10 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;//On a very large database we have seen this take as long as 106 seconds.  The first loop takes about 80% of the time.
 			List<long> provsFrom=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				provsFrom.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ProvNum"].ToString()));
+				provsFrom.Add((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 			}
 			DataTable tablePats=Patients.GetPatsByPriProvs(provsFrom);//list of all patients who are using the selected providers.
-			if(tablePats==null || table.Rows.Count==0) {
+			if(tablePats==null || gridMain.Rows.Count==0) {
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"No patients to reassign.");
 				return;
@@ -1001,7 +1005,7 @@ namespace OpenDental{
 				return;
 			}
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				if(table.Rows[gridMain.SelectedIndices[i]]["UserName"].ToString()!="") {
+				if(Providers.IsAttachedToUser((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag)) {
 					MsgBox.Show(this,"Not allowed to create users on providers which already have users.");
 					return;
 				}
@@ -1011,11 +1015,11 @@ namespace OpenDental{
 				return;
 			}
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
+				Provider prov = Providers.GetProv((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 				Userod user=new Userod();
 				user.UserGroupNum=_listUserGroups[comboUserGroup.SelectedIndex].UserGroupNum;
-				user.ProvNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ProvNum"].ToString());
-				user.UserName=GetUniqueUserName(table.Rows[gridMain.SelectedIndices[i]]["LName"].ToString(),
-					table.Rows[gridMain.SelectedIndices[i]]["FName"].ToString());
+				user.ProvNum=(long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;
+				user.UserName=GetUniqueUserName(prov.LName,prov.FName);
 				user.Password=user.UserName;//this will be enhanced later.
 				try{
 					Userods.Insert(user);
