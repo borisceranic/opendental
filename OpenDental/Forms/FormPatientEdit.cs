@@ -429,8 +429,8 @@ namespace OpenDental{
 			this.checkEmailPhoneSame = new System.Windows.Forms.CheckBox();
 			this.labelEmail = new System.Windows.Forms.Label();
 			this.groupBillProv = new System.Windows.Forms.GroupBox();
-			this.checkSuperBilling = new System.Windows.Forms.CheckBox();
 			this.checkBillProvSame = new System.Windows.Forms.CheckBox();
+			this.checkSuperBilling = new System.Windows.Forms.CheckBox();
 			this.butPickSecondary = new OpenDental.UI.Button();
 			this.comboBillType = new System.Windows.Forms.ComboBox();
 			this.butPickPrimary = new OpenDental.UI.Button();
@@ -1798,6 +1798,16 @@ namespace OpenDental{
 			this.groupBillProv.TabStop = false;
 			this.groupBillProv.Text = "Billing and Provider(s)";
 			// 
+			// checkBillProvSame
+			// 
+			this.checkBillProvSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkBillProvSame.Location = new System.Drawing.Point(161, 13);
+			this.checkBillProvSame.Name = "checkBillProvSame";
+			this.checkBillProvSame.Size = new System.Drawing.Size(165, 17);
+			this.checkBillProvSame.TabIndex = 1;
+			this.checkBillProvSame.TabStop = false;
+			this.checkBillProvSame.Text = "Same for entire family";
+			// 
 			// checkSuperBilling
 			// 
 			this.checkSuperBilling.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1810,16 +1820,7 @@ namespace OpenDental{
 			this.checkSuperBilling.Text = "Included in Super Family Billing";
 			this.checkSuperBilling.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkSuperBilling.Visible = false;
-			// 
-			// checkBillProvSame
-			// 
-			this.checkBillProvSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkBillProvSame.Location = new System.Drawing.Point(161, 13);
-			this.checkBillProvSame.Name = "checkBillProvSame";
-			this.checkBillProvSame.Size = new System.Drawing.Size(165, 17);
-			this.checkBillProvSame.TabIndex = 1;
-			this.checkBillProvSame.TabStop = false;
-			this.checkBillProvSame.Text = "Same for entire family";
+			this.checkSuperBilling.MouseDown += new System.Windows.Forms.MouseEventHandler(this.checkSuperBilling_MouseDown);
 			// 
 			// butPickSecondary
 			// 
@@ -3378,6 +3379,12 @@ namespace OpenDental{
 				textZip.Text=FormZS.ZipSelected.ZipCodeDigits;
 			}
 			SetRequiredFields();
+		}
+
+		private void checkSuperBilling_MouseDown(object sender,MouseEventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Billing)) {
+				return;
+			}
 		}
 
 		private void butEditZip_Click(object sender, System.EventArgs e) {

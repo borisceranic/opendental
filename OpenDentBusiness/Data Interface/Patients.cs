@@ -2508,7 +2508,7 @@ FROM insplan";
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),guarantor,superFamilyNum);
 				return;
 			}
-			string command="UPDATE patient SET SuperFamily="+POut.Long(superFamilyNum)+" WHERE Guarantor="+POut.Long(guarantor);
+			string command="UPDATE patient SET SuperFamily="+POut.Long(superFamilyNum)+", HasSuperBilling=1 WHERE Guarantor="+POut.Long(guarantor);
 			Db.NonQ(command);
 		}
 

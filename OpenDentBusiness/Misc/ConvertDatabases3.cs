@@ -12643,6 +12643,8 @@ namespace OpenDentBusiness {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE patient ADD HasSuperBilling tinyint NOT NULL";
 					Db.NonQ(command);
+					command="UPDATE patient SET HasSuperBilling=1 WHERE SuperFamily!=0 AND PatNum=Guarantor";//Include all superfamily member guarantors by default
+					Db.NonQ(command);
 				}
 				else {//oracle
 					command="ALTER TABLE patient ADD HasSuperBilling number(3)";
@@ -12650,6 +12652,8 @@ namespace OpenDentBusiness {
 					command="UPDATE patient SET HasSuperBilling = 0 WHERE HasSuperBilling IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE patient MODIFY HasSuperBilling NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE patient SET HasSuperBilling=1 WHERE SuperFamily!=0 AND PatNum=Guarantor";
 					Db.NonQ(command);
 				}
                 //UserOdPref Table
