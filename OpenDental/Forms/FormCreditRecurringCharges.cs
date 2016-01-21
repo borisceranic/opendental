@@ -669,7 +669,12 @@ namespace OpenDental {
 						continue;
 					}
 					highestAmt=afterIns;
-					provNumRegPmts=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
+					if(PrefC.GetBool(PrefName.RecurringChargesUsePriProv)) {
+						provNumRegPmts=patCur.PriProv;
+					}
+					else { 
+						provNumRegPmts=PIn.Long(dt.Rows[j]["ProvNum"].ToString());
+					}
 				}
 			}
 			PaySplit split=new PaySplit();

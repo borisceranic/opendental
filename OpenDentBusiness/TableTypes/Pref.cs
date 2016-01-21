@@ -516,6 +516,9 @@ namespace OpenDentBusiness {
 		RecallTypesShowingInList,
 		///<summary>If false, then it will only use email in the recall list if email is the preferred recall method.</summary>
 		RecallUseEmailIfHasEmailAddress,
+		///<summary>Bool, 0 by default.  When true, recurring charges will use the primary provider of the patient when creating paysplits.
+		///When false, the provider that the family is most in debt to will be used.</summary>
+		RecurringChargesUsePriProv,
 		RegistrationKey,
 		RegistrationKeyIsDisabled,
 		RegistrationNumberClaim,

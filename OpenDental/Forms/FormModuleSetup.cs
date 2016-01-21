@@ -150,6 +150,7 @@ namespace OpenDental{
 		private CheckBox checkApptTimeReset;
 		///<summary>Used to determine a specific tab to have opened upon load.  Only set via the constructor and only used during load.</summary>
 		private int _selectedTab;
+		private CheckBox checkRecurChargPriProv;
 		private ODtextBox textTreatNote;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -263,6 +264,7 @@ namespace OpenDental{
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
 			this.checkClaimMedTypeIsInstWhenInsPlanIsMedical = new System.Windows.Forms.CheckBox();
 			this.tabTreatPlan = new System.Windows.Forms.TabPage();
+			this.textTreatNote = new OpenDental.ODtextBox();
 			this.checkTreatPlanUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkTPSaveSigned = new System.Windows.Forms.CheckBox();
 			this.checkTreatPlanItemized = new System.Windows.Forms.CheckBox();
@@ -318,8 +320,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.tabControl1.SuspendLayout();
-			this.textTreatNote = new OpenDental.ODtextBox();
+			this.checkRecurChargPriProv = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -1143,6 +1144,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.checkRecurChargPriProv);
 			this.tabAccount.Controls.Add(this.textInsWriteoffDescript);
 			this.tabAccount.Controls.Add(this.label17);
 			this.tabAccount.Controls.Add(this.checkPromptAutoSplit);
@@ -1262,6 +1264,21 @@ namespace OpenDental{
 			this.tabTreatPlan.Size = new System.Drawing.Size(466, 479);
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
+			// 
+			// textTreatNote
+			// 
+			this.textTreatNote.AcceptsTab = true;
+			this.textTreatNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textTreatNote.DetectUrls = false;
+			this.textTreatNote.Location = new System.Drawing.Point(77, 7);
+			this.textTreatNote.MaxLength = 32767;
+			this.textTreatNote.Name = "textTreatNote";
+			this.textTreatNote.QuickPasteType = OpenDentBusiness.QuickPasteType.TreatPlan;
+			this.textTreatNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textTreatNote.Size = new System.Drawing.Size(363, 53);
+			this.textTreatNote.SpellCheckIsEnabled = false;
+			this.textTreatNote.TabIndex = 215;
+			this.textTreatNote.Text = "";
 			// 
 			// checkTreatPlanUseSheets
 			// 
@@ -1894,20 +1911,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// textTreatNote
+			// checkRecurChargPriProv
 			// 
-			this.textTreatNote.AcceptsTab = true;
-			this.textTreatNote.BackColor = System.Drawing.SystemColors.Window;
-			this.textTreatNote.DetectUrls = false;
-			this.textTreatNote.Location = new System.Drawing.Point(77, 7);
-			this.textTreatNote.MaxLength = 32767;
-			this.textTreatNote.Name = "textTreatNote";
-			this.textTreatNote.QuickPasteType = OpenDentBusiness.QuickPasteType.TreatPlan;
-			this.textTreatNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textTreatNote.Size = new System.Drawing.Size(363, 53);
-			this.textTreatNote.SpellCheckIsEnabled = false;
-			this.textTreatNote.TabIndex = 215;
-			this.textTreatNote.Text = "";
+			this.checkRecurChargPriProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkRecurChargPriProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 323);
+			this.checkRecurChargPriProv.Name = "checkRecurChargPriProv";
+			this.checkRecurChargPriProv.Size = new System.Drawing.Size(396, 17);
+			this.checkRecurChargPriProv.TabIndex = 209;
+			this.checkRecurChargPriProv.Text = "Recurring charges use primary provider";
+			this.checkRecurChargPriProv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -2090,6 +2103,7 @@ namespace OpenDental{
 			checkStatementsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
 			checkPromptAutoSplit.Checked=PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit);
 			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
+			checkRecurChargPriProv.Checked=PrefC.GetBool(PrefName.RecurringChargesUsePriProv);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -2455,6 +2469,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.AccountShowPaymentNums,checkAccountShowPaymentNums.Checked)
 				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
 				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
+				| Prefs.UpdateBool(PrefName.RecurringChargesUsePriProv,checkRecurChargPriProv.Checked)
 				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
 				#endregion
 				#region TP Module
