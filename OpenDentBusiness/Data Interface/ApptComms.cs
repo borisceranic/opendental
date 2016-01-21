@@ -112,10 +112,10 @@ namespace OpenDentBusiness{
 			List<ApptComm> listApptComms=GetAll();
 			string errorText="";
 			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.
-				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).TotalDays > 1) {//Skip if daily and not within one day of send date
+				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).TotalDays > 0) {//Send if Now is <= 0 days prior to the send day.
 					continue;//It's not currently enough days prior to the appointment to send a reminder.
 				}
-				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).TotalHours > 1) {//Skip if hourly and not within one hour of send date
+				if(apptComm.ApptCommType==IntervalType.Hourly && (apptComm.DateTimeSend-DateTime.Now).TotalHours > 0) {//Send if Now <= 0 hours prior to the send hour.
 					continue;//It's not the correct number of hours prior to the appointment to send a reminder.
 				}
 				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 30 minutes leeway was deemed enough to 
