@@ -706,12 +706,13 @@ namespace OpenDentBusiness{
 						AND paysplit.PayPlanNum=0
 						GROUP BY patient.PatNum,paysplit.ProvNum,paysplit.ClinicNum)
 					UNION ALL
-						/*payplan princ reduction*/
-						(SELECT patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum,-SUM(payplancharge.Principal) AmtBal,0 InsEst
-						FROM payplancharge,patient
-						WHERE patient.PatNum=payplancharge.PatNum
-						AND patient.Guarantor="+POut.Long(guarNum)+@"
-						GROUP BY patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum)
+						/*payplan completedamt reduction (to match aging in Ledgers.cs).*/
+						/*All payplancharges for a payplan have the same (PatNum, Guarnator PatNum, ProvNum, ClinicNum) as shown in FormPayPlan.CreateCharge()*/
+						(SELECT patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum,-payplan.CompletedAmt AmtBal,0 InsEst
+						FROM payplancharge
+						INNER JOIN payplan ON payplan.PayPlanNum=payplancharge.PayPlanNum
+						INNER JOIN patient ON patient.PatNum=payplancharge.PatNum AND patient.Guarantor="+POut.Long(guarNum)+@"
+						GROUP BY payplan.PayPlanNum,payplan.CompletedAmt,patient.PatNum,payplancharge.ProvNum,payplancharge.ClinicNum)
 					) tempfambal,patient
 					WHERE tempfambal.PatNum=patient.PatNum 
 					GROUP BY tempfambal.PatNum,tempfambal.ProvNum,";

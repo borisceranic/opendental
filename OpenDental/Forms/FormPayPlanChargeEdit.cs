@@ -149,6 +149,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(108, 33);
 			this.textNote.Name = "textNote";
@@ -206,6 +207,7 @@ namespace OpenDental{
 			// 
 			this.textProv.Location = new System.Drawing.Point(108, 143);
 			this.textProv.Name = "textProv";
+			this.textProv.ReadOnly = true;
 			this.textProv.Size = new System.Drawing.Size(201, 20);
 			this.textProv.TabIndex = 3;
 			// 
@@ -213,6 +215,7 @@ namespace OpenDental{
 			// 
 			this.textClinic.Location = new System.Drawing.Point(108, 168);
 			this.textClinic.Name = "textClinic";
+			this.textClinic.ReadOnly = true;
 			this.textClinic.Size = new System.Drawing.Size(201, 20);
 			this.textClinic.TabIndex = 4;
 			// 
@@ -245,6 +248,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label4);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
