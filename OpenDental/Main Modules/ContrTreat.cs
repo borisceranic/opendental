@@ -1010,6 +1010,9 @@ namespace OpenDental{
 				//we have decided not to show this button in other countries for now.
 				butInsRem.Visible=true;
 			}
+			if(_listTreatPlans.Count==0) {
+				textNote.Text="";
+			}
 		}
 
 		private delegate void ToolBarClick();
@@ -3618,7 +3621,9 @@ namespace OpenDental{
 
 		///<summary>Saves TP note to the database if changes were made</summary>
 		private void SaveTPNoteIfNeeded() {
-			if(textNote.ReadOnly || !_hasNoteChanged) {
+			if(textNote.ReadOnly || !_hasNoteChanged
+				|| gridPlans.SelectedIndices.Length==0 || _listTreatPlans.Count<=gridPlans.SelectedIndices[0]) 
+			{
 				return;
 			}
 			_listTreatPlans[gridPlans.SelectedIndices[0]].Note=PIn.String(textNote.Text);
