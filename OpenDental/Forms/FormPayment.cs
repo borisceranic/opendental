@@ -1090,6 +1090,8 @@ namespace OpenDental {
 			}
 			double amt;
 			for(int i=0;i<_listPaySplits.Count;i++) {//loop through each current paysplit that's showing
+				PaySplit paySplit=_listPaySplits[i];
+				bool hasSplitApplied=false;
 				for(int f=0;f<_tableBalances.Rows.Count;f++) {//loop through the balances on the right
 					if(_tableBalances.Rows[f]["PatNum"].ToString()!=_listPaySplits[i].PatNum.ToString()) {
 						continue;
@@ -1109,6 +1111,23 @@ namespace OpenDental {
 					amt=PIn.Double(_tableBalances.Rows[f]["EndBal"].ToString())-_listPaySplits[i].SplitAmt;
 					//this is summing over multiple i and f loops.  NOT elegantly.
 					_tableBalances.Rows[f]["EndBal"]=amt.ToString("N");
+					hasSplitApplied=true;
+				}
+				if(hasSplitApplied) {
+					continue;
+				}
+				Patient patInFam=_famCur.ListPats.FirstOrDefault(x => x.PatNum==paySplit.PatNum);//Paysplits can point to patients outside the family.
+				if(patInFam!=null) {//No matching row was found and the pay split is for a family member.  Create a row and populate it.
+					DataRow rowUnallocated=rowUnallocated=_tableBalances.NewRow();
+					_tableBalances.Rows.Add(rowUnallocated);
+					rowUnallocated["ProvNum"]=paySplit.ProvNum;
+					rowUnallocated["ClinicNum"]=paySplit.ClinicNum;
+					rowUnallocated["PatNum"]=paySplit.PatNum;
+					rowUnallocated["Preferred"]=patInFam.Preferred;
+					rowUnallocated["FName"]=patInFam.FName;
+					rowUnallocated["StartBal"]=0;
+					rowUnallocated["AfterIns"]=0;
+					rowUnallocated["EndBal"]=-paySplit.SplitAmt;
 				}
 			}
 			double famend=0;
@@ -1139,6 +1158,12 @@ namespace OpenDental {
 			gridBal.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_tableBalances.Rows.Count;i++) {
+				double startBal=PIn.Double(_tableBalances.Rows[i]["StartBal"].ToString());
+				double afterInsAmt=PIn.Double(_tableBalances.Rows[i]["AfterIns"].ToString());
+				double endBal=PIn.Double(_tableBalances.Rows[i]["EndBal"].ToString());
+				if(startBal==0 && afterInsAmt==0 && endBal==0) {
+					continue;//This can only happen if a row was added manually above and then the user changed the split amount corresponding to the row.
+				}
 				row=new ODGridRow();
 				row.Cells.Add(Providers.GetAbbr(PIn.Long(_tableBalances.Rows[i]["ProvNum"].ToString())));
 				if(checkBalanceGroupByProv.Checked) {
@@ -1153,14 +1178,14 @@ namespace OpenDental {
 				else {
 					row.Cells.Add("'"+_tableBalances.Rows[i]["Preferred"].ToString()+"'");
 				}
-				row.Cells.Add(PIn.Double(_tableBalances.Rows[i]["StartBal"].ToString()).ToString("N"));
+				row.Cells.Add(startBal.ToString("N"));
 				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
 					row.Cells.Add("");
 				}
 				else {
-					row.Cells.Add(PIn.Double(_tableBalances.Rows[i]["AfterIns"].ToString()).ToString("N"));
+					row.Cells.Add(afterInsAmt.ToString("N"));
 				}
-				row.Cells.Add(PIn.Double(_tableBalances.Rows[i]["EndBal"].ToString()).ToString("N"));
+				row.Cells.Add(endBal.ToString("N"));
 				//row.ColorBackG=SystemColors.Control;//Color.FromArgb(240,240,240);
 				gridBal.Rows.Add(row);
 			}
