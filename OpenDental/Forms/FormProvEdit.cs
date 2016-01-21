@@ -1223,6 +1223,13 @@ namespace OpenDental{
 			if(comboProv.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
 				comboProv.Text=Providers.GetLongDesc(_provNumSelected);//Appends "(hidden)" to the end of the long description.
 			}
+			if(ProvCur.ProvStatus==ProviderStatus.Deleted) {
+				foreach(Control con in this.Controls) {
+					con.Enabled=false;
+				}
+				//Make the cancel button the only thing the user can click on.
+				butCancel.Enabled=true;
+			}
 		}
 
 		private void butColor_Click(object sender, System.EventArgs e) {
