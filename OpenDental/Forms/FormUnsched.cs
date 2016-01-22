@@ -374,7 +374,7 @@ namespace OpenDental{
 				return;
 			}
 			if(grid.SelectedIndices.Length>1) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete all selected appointments?")) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete all selected appointments permanently?")) {
 					return;
 				}
 			}
