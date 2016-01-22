@@ -283,7 +283,7 @@ namespace OpenDental{
 					SendPinboard_Click();
 					break;
 				case 3:
-					Delete_Click();
+					Remove_Click();
 					break;
 			}
 		}
@@ -376,7 +376,7 @@ namespace OpenDental{
 				_menuRightClick.Items.Add(Lan.g(this,"Select Patient"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
-				_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
+				_menuRightClick.Items.Add(Lan.g(this,"Remove from ASAP"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Show(grid,new Point(e.X,e.Y));
 			}
 		}
@@ -393,12 +393,17 @@ namespace OpenDental{
 			GotoModule.GotoChart(pat.PatNum);
 		}
 
-		private void Delete_Click() {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete appointments?")) {
+		private void Remove_Click() {
+			if(!Security.IsAuthorized(Permissions.AppointmentEdit)) {
+				return;
+			}
+			if(grid.SelectedIndices.Length>1 && !MsgBox.Show(this,MsgBoxButtons.OKCancel,"Change status to Scheduled for all selected appointments?")) {
 				return;
 			}
 			for(int i=0;i<grid.SelectedIndices.Length;i++) {
-				Appointments.Delete(ListASAP[grid.SelectedIndices[i]].AptNum);
+				Appointment apt=ListASAP[grid.SelectedIndices[i]];
+				Appointments.SetAptStatus(apt.AptNum,ApptStatus.Scheduled);
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,"Appointment status set from ASAP to Scheduled from ASAP list.",apt.AptNum);
 			}
 			FillGrid();
 		}
