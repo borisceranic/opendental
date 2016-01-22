@@ -1,4 +1,6 @@
-﻿namespace OpenDentBusiness {
+﻿using System.Collections.Generic;
+
+namespace OpenDentBusiness {
 	///<summary>Each tab in the dashboard has a corresponding DashboardLayout. DashboardLayout and DashboardCell work in conjunction to form the dashboard layout.</summary>
 	public class DashboardLayout:TableBase {
 		///<summary>PK.</summary>
@@ -17,7 +19,10 @@
 		///<summary>Number of columns for this DashboardLayout. Min value of 1.</summary>
 		public int DashboardColumns;
 		///<summary>Groups multiple DashboardLayout(s) together.</summary>
-		public string DashboardGroupName;
+		public string DashboardGroupName;		
+
+		[CrudColumn(IsNotDbColumn=true)]
+		public List<DashboardCell> Cells=new List<DashboardCell>();
 
 		///<summary></summary>
 		public DashboardLayout Copy() {
