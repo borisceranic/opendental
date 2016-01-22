@@ -53,6 +53,7 @@ namespace OpenDentBusiness.Crud{
 				dashboardLayout.DashboardTabOrder = PIn.Int   (row["DashboardTabOrder"].ToString());
 				dashboardLayout.DashboardRows     = PIn.Int   (row["DashboardRows"].ToString());
 				dashboardLayout.DashboardColumns  = PIn.Int   (row["DashboardColumns"].ToString());
+				dashboardLayout.DashboardGroupName= PIn.String(row["DashboardGroupName"].ToString());
 				retVal.Add(dashboardLayout);
 			}
 			return retVal;
@@ -71,6 +72,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("DashboardTabOrder");
 			table.Columns.Add("DashboardRows");
 			table.Columns.Add("DashboardColumns");
+			table.Columns.Add("DashboardGroupName");
 			foreach(DashboardLayout dashboardLayout in listDashboardLayouts) {
 				table.Rows.Add(new object[] {
 					POut.Long  (dashboardLayout.DashboardLayoutNum),
@@ -80,6 +82,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (dashboardLayout.DashboardTabOrder),
 					POut.Int   (dashboardLayout.DashboardRows),
 					POut.Int   (dashboardLayout.DashboardColumns),
+					POut.String(dashboardLayout.DashboardGroupName),
 				});
 			}
 			return table;
@@ -120,7 +123,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="DashboardLayoutNum,";
 			}
-			command+="UserNum,UserGroupNum,DashboardTabName,DashboardTabOrder,DashboardRows,DashboardColumns) VALUES(";
+			command+="UserNum,UserGroupNum,DashboardTabName,DashboardTabOrder,DashboardRows,DashboardColumns,DashboardGroupName) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(dashboardLayout.DashboardLayoutNum)+",";
 			}
@@ -130,7 +133,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(dashboardLayout.DashboardTabName)+"',"
 				+    POut.Int   (dashboardLayout.DashboardTabOrder)+","
 				+    POut.Int   (dashboardLayout.DashboardRows)+","
-				+    POut.Int   (dashboardLayout.DashboardColumns)+")";
+				+    POut.Int   (dashboardLayout.DashboardColumns)+","
+				+"'"+POut.String(dashboardLayout.DashboardGroupName)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -163,7 +167,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="DashboardLayoutNum,";
 			}
-			command+="UserNum,UserGroupNum,DashboardTabName,DashboardTabOrder,DashboardRows,DashboardColumns) VALUES(";
+			command+="UserNum,UserGroupNum,DashboardTabName,DashboardTabOrder,DashboardRows,DashboardColumns,DashboardGroupName) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(dashboardLayout.DashboardLayoutNum)+",";
 			}
@@ -173,7 +177,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(dashboardLayout.DashboardTabName)+"',"
 				+    POut.Int   (dashboardLayout.DashboardTabOrder)+","
 				+    POut.Int   (dashboardLayout.DashboardRows)+","
-				+    POut.Int   (dashboardLayout.DashboardColumns)+")";
+				+    POut.Int   (dashboardLayout.DashboardColumns)+","
+				+"'"+POut.String(dashboardLayout.DashboardGroupName)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -191,7 +196,8 @@ namespace OpenDentBusiness.Crud{
 				+"DashboardTabName  = '"+POut.String(dashboardLayout.DashboardTabName)+"', "
 				+"DashboardTabOrder =  "+POut.Int   (dashboardLayout.DashboardTabOrder)+", "
 				+"DashboardRows     =  "+POut.Int   (dashboardLayout.DashboardRows)+", "
-				+"DashboardColumns  =  "+POut.Int   (dashboardLayout.DashboardColumns)+" "
+				+"DashboardColumns  =  "+POut.Int   (dashboardLayout.DashboardColumns)+", "
+				+"DashboardGroupName= '"+POut.String(dashboardLayout.DashboardGroupName)+"' "
 				+"WHERE DashboardLayoutNum = "+POut.Long(dashboardLayout.DashboardLayoutNum);
 			Db.NonQ(command);
 		}
@@ -222,6 +228,10 @@ namespace OpenDentBusiness.Crud{
 			if(dashboardLayout.DashboardColumns != oldDashboardLayout.DashboardColumns) {
 				if(command!=""){ command+=",";}
 				command+="DashboardColumns = "+POut.Int(dashboardLayout.DashboardColumns)+"";
+			}
+			if(dashboardLayout.DashboardGroupName != oldDashboardLayout.DashboardGroupName) {
+				if(command!=""){ command+=",";}
+				command+="DashboardGroupName = '"+POut.String(dashboardLayout.DashboardGroupName)+"'";
 			}
 			if(command==""){
 				return false;

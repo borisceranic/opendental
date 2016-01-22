@@ -16,6 +16,8 @@
 		public int DashboardRows;
 		///<summary>Number of columns for this DashboardLayout. Min value of 1.</summary>
 		public int DashboardColumns;
+		///<summary>Groups multiple DashboardLayout(s) together.</summary>
+		public string DashboardGroupName;
 
 		///<summary></summary>
 		public DashboardLayout Copy() {
