@@ -464,9 +464,6 @@ namespace OpenDental{
 				case 2:
 					SendPinboard_Click();
 					break;
-				case 3:
-					Delete_Click();
-					break;
 			}
 		}
 
@@ -486,7 +483,6 @@ namespace OpenDental{
 				_menuRightClick.Items.Add(Lan.g(this,"Select Patient")+" ("+pat.GetNameFL()+")",null,new EventHandler(menuRight_click));
 				_menuRightClick.Items.Add(Lan.g(this,"See Chart"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Items.Add(Lan.g(this,"Send to Pinboard"),null,new EventHandler(menuRight_click));
-				_menuRightClick.Items.Add(Lan.g(this,"Delete"),null,new EventHandler(menuRight_click));
 				_menuRightClick.Show(gridMain,new Point(e.X,e.Y));
 			}
 		}
@@ -516,16 +512,6 @@ namespace OpenDental{
 			}
 			//This will send all appointments in listAptSelected to the pinboard, and will select the patient attached to the last appointment.
 			GotoModule.PinToAppt(listAptSelected,0);
-		}
-
-		private void Delete_Click() {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete appointments?")) {
-				return;
-			}
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				Appointments.Delete(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()));
-			}
-			FillMain();
 		}
 
 		///<summary>Adds the specified number of work days, skipping saturday and sunday.</summary>
