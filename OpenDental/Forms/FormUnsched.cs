@@ -364,11 +364,18 @@ namespace OpenDental{
 		}
 
 		private void Delete_Click() {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete appointments?")) {
+			if(!Security.IsAuthorized(Permissions.AppointmentEdit)) {
 				return;
 			}
-			for(int i=0;i<grid.SelectedIndices.Length;i++) {
+			if(grid.SelectedIndices.Length>1) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete all selected appointments permanently?")) {
+					return;
+				}
+			}
+			for(int i = 0;i<grid.SelectedIndices.Length;i++) {
 				Appointments.Delete(ListUn[grid.SelectedIndices[i]].AptNum);
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,ListUn[grid.SelectedIndices[i]].PatNum,
+					Lan.g(this,"Appointment deleted from the Unscheduled list."));
 			}
 			FillGrid();
 		}
