@@ -412,6 +412,12 @@
     <Compile Include="Forms Reports\FormRpBrokenAppointments.Designer.cs">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEtrans834Preview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEtrans834Preview.designer.cs">
+      <DependentUpon>FormEtrans834Preview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormEtrans834Import.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4030,6 +4036,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms Reports\FormRpBrokenAppointments.resx">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEtrans834Preview.resx">
+      <DependentUpon>FormEtrans834Preview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormEtrans834Import.resx">
       <DependentUpon>FormEtrans834Import.cs</DependentUpon>
