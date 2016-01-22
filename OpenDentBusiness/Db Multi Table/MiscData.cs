@@ -185,6 +185,18 @@ namespace OpenDentBusiness {
 			return maxAllowedPacket;
 		}
 
+		///<summary>Sets the global MySQL variable max_allowed_packet to the passed in size (in bytes).
+		///Returns the results of GetMaxAllowedPacket() after running the SET GLOBAL command.</summary>
+		public static int SetMaxAllowedPacket(int sizeBytes) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),sizeBytes);
+			}
+			//As of MySQL 5.0.84 the session level max_allowed_packet variable is read only so we only need to change the global.
+			string command="SET GLOBAL max_allowed_packet="+POut.Int(sizeBytes);
+			Db.NonQ(command);
+			return GetMaxAllowedPacket();
+		}
+
 		///<summary>Returns a collection of unique AtoZ folders for the array of dbnames passed in.  It will not include the current AtoZ folder for this database, even if shared by another db.  This is used for the feature that updates multiple databases simultaneously.</summary>
 		public static List<string> GetAtoZforDb(string[] dbNames) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
