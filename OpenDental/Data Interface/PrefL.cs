@@ -108,6 +108,30 @@ namespace OpenDental {
 				return false;
 			}
 			//Starting in v15.3, we always insert the UpdateFiles into the database.
+			int maxAllowedPacket=0;
+			int defaultMaxAllowedPacketSize=41943040;//40MB
+			if(DataConnection.DBtype==DatabaseType.MySql) {
+				maxAllowedPacket=MiscData.GetMaxAllowedPacket();
+				//If trying to get the max_allowed_packet value for MySQL failed, assume they can handle 40MB of data.
+				//Our installations of MySQL defaults the global property 'max_allowed_packet' to 40MB.
+				//Nathan suggested forcing the global and local max_allowed_packet to 40MB if it was set to anything less.
+				if(maxAllowedPacket < defaultMaxAllowedPacketSize) {
+					try {
+						maxAllowedPacket=MiscData.SetMaxAllowedPacket(defaultMaxAllowedPacketSize);
+					}
+					catch(Exception) {
+						//Do nothing.  Either maxAllowedPacket is set to something small (e.g. 10MB) and we failed to update it to 40MB (should be fine)
+						//             OR we failed to get and set the global variable due to MySQL permissions and a UE was thrown.
+						//             Regardless, if maxAllowedPacket is 0 (the only thing that we can't have happen) it will get updated to 40MB later down.
+					}
+				}
+			}
+			//Only change maxAllowedPacket if we couldn't successfully get the current value from the database or using Oracle.
+			//This will let the program attempt to insert the UpdateFiles into the db with the assumption that they are using our default setting (40MB).
+			//Worst case scenario, the user will hit the max_packet_allowed error below which will simply notify them to update their my.ini manually.
+			if(maxAllowedPacket==0) {
+				maxAllowedPacket=defaultMaxAllowedPacketSize;
+			}
 			ZipFile zipFile=new ZipFile();
 			MemoryStream memStream=new MemoryStream();
 			try {

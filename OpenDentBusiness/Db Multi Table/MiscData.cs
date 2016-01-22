@@ -165,6 +165,34 @@ namespace OpenDentBusiness {
 			return retval;
 		}
 
+		///<summary>Returns the current value in the GLOBAL max_allowed_packet variable.
+		///max_allowed_packet is stored as an integer in multiples of 1,024 with a min value of 1,024 and a max value of 1,073,741,824.</summary>
+		public static int GetMaxAllowedPacket() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod());
+			}
+			int maxAllowedPacket=0;
+			//The SHOW command is used because it was able to run with a user that had no permissions whatsoever.
+			string command="SHOW GLOBAL VARIABLES WHERE Variable_name='max_allowed_packet'";
+			DataTable table=Db.GetTable(command);
+			if(table.Rows.Count > 0) {
+				maxAllowedPacket=PIn.Int(table.Rows[0]["Value"].ToString());
+			}
+			return maxAllowedPacket;
+		}
+
+		///<summary>Sets the global MySQL variable max_allowed_packet to the passed in size (in bytes).
+		///Returns the results of GetMaxAllowedPacket() after running the SET GLOBAL command.</summary>
+		public static int SetMaxAllowedPacket(int sizeBytes) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),sizeBytes);
+			}
+			//As of MySQL 5.0.84 the session level max_allowed_packet variable is read only so we only need to change the global.
+			string command="SET GLOBAL max_allowed_packet="+POut.Int(sizeBytes);
+			Db.NonQ(command);
+			return GetMaxAllowedPacket();
+		}
+
 		///<summary>Returns a collection of unique AtoZ folders for the array of dbnames passed in.  It will not include the current AtoZ folder for this database, even if shared by another db.  This is used for the feature that updates multiple databases simultaneously.</summary>
 		public static List<string> GetAtoZforDb(string[] dbNames) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
