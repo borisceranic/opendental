@@ -65,7 +65,7 @@ namespace OpenDentBusiness{
 		///<summary>True if this clinic's billing address should be used on outgoing claims.</summary>
 		public bool UseBillAddrOnClaims;
 		///<summary>FK to definition.DefNum when definition.DefCat is Regions.</summary>
-		public bool Region;
+		public long Region;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

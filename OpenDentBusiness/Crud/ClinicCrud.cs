@@ -74,7 +74,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.SmsMonthlyLimit    = PIn.Double(row["SmsMonthlyLimit"].ToString());
 				clinic.IsMedicalOnly      = PIn.Bool  (row["IsMedicalOnly"].ToString());
 				clinic.UseBillAddrOnClaims= PIn.Bool  (row["UseBillAddrOnClaims"].ToString());
-				clinic.Region             = PIn.Bool  (row["Region"].ToString());
+				clinic.Region             = PIn.Long  (row["Region"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -145,7 +145,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(clinic.SmsMonthlyLimit),
 					POut.Bool  (clinic.IsMedicalOnly),
 					POut.Bool  (clinic.UseBillAddrOnClaims),
-					POut.Bool  (clinic.Region),
+					POut.Long  (clinic.Region),
 				});
 			}
 			return table;
@@ -218,7 +218,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
-				+    POut.Bool  (clinic.Region)+")";
+				+    POut.Long  (clinic.Region)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -283,7 +283,7 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
-				+    POut.Bool  (clinic.Region)+")";
+				+    POut.Long  (clinic.Region)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -323,7 +323,7 @@ namespace OpenDentBusiness.Crud{
 				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"', "
 				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+", "
 				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+", "
-				+"Region             =  "+POut.Bool  (clinic.Region)+" "
+				+"Region             =  "+POut.Long  (clinic.Region)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -441,7 +441,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(clinic.Region != oldClinic.Region) {
 				if(command!=""){ command+=",";}
-				command+="Region = "+POut.Bool(clinic.Region)+"";
+				command+="Region = "+POut.Long(clinic.Region)+"";
 			}
 			if(command==""){
 				return false;

@@ -11593,15 +11593,19 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE clinic ADD Region tinyint NOT NULL";
+					command="ALTER TABLE clinic ADD Region bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic ADD INDEX (Region)";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE clinic ADD Region number(3)";
+					command="ALTER TABLE clinic ADD Region number(20)";
 					Db.NonQ(command);
 					command="UPDATE clinic SET Region = 0 WHERE Region IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE clinic MODIFY Region NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX clinic_Region ON clinic (Region)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
