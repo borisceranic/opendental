@@ -423,6 +423,7 @@
     <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Crud\TreatPlanAttachCrud.cs" />
     <Compile Include="Crud\UserClinicCrud.cs" />
+    <Compile Include="Crud\UserOdPrefCrud.cs" />
     <Compile Include="Data Interface\ApptComms.cs" />
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
     <Compile Include="Data Interface\DashboardCells.cs" />
@@ -432,6 +433,7 @@
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
+    <Compile Include="Data Interface\UserOdPrefs.cs" />
     <Compile Include="InternalTools\Job Manager\BugCrud.cs" />
     <Compile Include="InternalTools\Job Manager\Bugs.cs" />
     <Compile Include="Data Interface\UserClinics.cs" />
@@ -1022,6 +1024,7 @@
     <Compile Include="TableTypes\TaskHist.cs" />
     <Compile Include="TableTypes\UserClinic.cs" />
     <Compile Include="TableTypes\UserodApptView.cs" />
+    <Compile Include="TableTypes\UserOdPref.cs" />
     <Compile Include="TableTypes\WikiListHist.cs" />
     <Compile Include="TableTypes\DispSupply.cs" />
     <Compile Include="TableTypes\ProcButtonQuick.cs" />

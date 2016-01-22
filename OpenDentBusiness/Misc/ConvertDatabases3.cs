@@ -12660,8 +12660,8 @@ namespace OpenDentBusiness {
 					command="UPDATE patient SET HasSuperBilling=1 WHERE SuperFamily!=0 AND PatNum=Guarantor";
 					Db.NonQ(command);
 				}
-                //UserOdPref Table
-                if(DataConnection.DBtype==DatabaseType.MySql) {
+				//UserOdPref Table
+        if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="DROP TABLE IF EXISTS userodpref";
 					Db.NonQ(command);
 					command=@"CREATE TABLE userodpref (
@@ -12669,7 +12669,7 @@ namespace OpenDentBusiness {
 						UserNum bigint NOT NULL,
 						Fkey bigint NOT NULL,
 						FkeyType tinyint NOT NULL,
-						ValueString varchar(255) NOT NULL,
+						ValueString text NOT NULL,
 						INDEX(UserNum),
 						INDEX(Fkey)
 						) DEFAULT CHARSET=utf8";
@@ -12683,7 +12683,7 @@ namespace OpenDentBusiness {
 						UserNum number(20) NOT NULL,
 						Fkey number(20) NOT NULL,
 						FkeyType number(3) NOT NULL,
-						ValueString varchar2(255),
+						ValueString clob,
 						CONSTRAINT userodpref_UserOdPrefNum PRIMARY KEY (UserOdPrefNum)
 						)";
 					Db.NonQ(command);
