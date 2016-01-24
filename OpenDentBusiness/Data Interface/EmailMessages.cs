@@ -593,7 +593,9 @@ namespace OpenDentBusiness{
 					message.Attachments.Add(attach);
 				}
 				client.Send(message);
-				SecurityLogs.MakeLogEntry(Permissions.EmailSend,emailMessage.PatNum,"Email Sent");
+				if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb){//user not accessible if patient portal or OC web server is sending an email
+					SecurityLogs.MakeLogEntry(Permissions.EmailSend,emailMessage.PatNum,"Email Sent");
+				}
 			}
 		}
 
