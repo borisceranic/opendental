@@ -4583,7 +4583,11 @@ namespace OpenDental {
 				//The distributor forgot to change the "Server Address for Updates" inside of the Update Setup window for this customer.
 				//Do not contact the OD web service.
 			}
-			else if(!provErxCur.IsEnabled || !provErxCur.IsSentToHq || PrefC.GetDate(PrefName.NewCropDateLastAccessCheck).Month < DateTimeOD.Today.Month) {
+			else if(!provErxCur.IsEnabled//If prov is not yet enabled, always check with OD HQ to see if the prov has been enabled yet.
+				|| (!PrefC.GetBool(PrefName.NewCropIsLegacy) && !provErxCur.IsIdentifyProofed)//If new prov is not yet identity proofed, send to OD HQ.
+				|| !provErxCur.IsSentToHq//If prov has not been sent to OD HQ yet, always send to OD HQ so we can track our providers using eRx.
+				|| PrefC.GetDate(PrefName.NewCropDateLastAccessCheck).Month < DateTimeOD.Today.Month)//If it has been over a month since sent to OD HQ, send.
+			{
 				//An OD customer, or a Distributor customer if the distributor has a custom web service for updates.
 				//For distributors who implement this feature, you will be able to use FormErxAccess at your office to control individual provider access.
 				//We compare the last access date by month above, because eRx charges are based on monthly usage.  Avoid extra charges for disabled providers.
