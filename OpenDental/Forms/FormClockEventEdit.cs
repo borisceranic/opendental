@@ -693,6 +693,9 @@ namespace OpenDental{
 			if(ClockEventCur.OTimeHours==TimeSpan.FromHours(-1)) {//no override
 				textOTimeHours.Text="";
 			}
+			else if(ClockEventCur.OTimeHours==TimeSpan.Zero) {
+				textOTimeHours.Text="0";
+			}
 			else {
 				textOTimeHours.Text=ClockEvents.Format(ClockEventCur.OTimeHours);
 			}
@@ -714,6 +717,9 @@ namespace OpenDental{
 			textRate2Auto.Text=ClockEvents.Format(ClockEventCur.Rate2Auto);
 			if(ClockEventCur.Rate2Hours==TimeSpan.FromHours(-1)) {
 				textRate2Hours.Text="";
+			}
+			else if(ClockEventCur.Rate2Hours==TimeSpan.Zero) {
+				textRate2Hours.Text="0";
 			}
 			else {
 				textRate2Hours.Text=ClockEvents.Format(ClockEventCur.Rate2Hours);
