@@ -400,7 +400,7 @@ namespace OpenDentBusiness{
 
 		public static bool IsClaimIdentifierInUse(string claimIdentifier,long claimNumExclude,string claimType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),claimIdentifier,claimNumExclude);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),claimIdentifier,claimNumExclude,claimType);
 			}
 			string command="SELECT COUNT(*) FROM claim WHERE ClaimIdentifier='"+POut.String(claimIdentifier)+"' AND ClaimNum<>"+POut.Long(claimNumExclude);
 			if(claimType=="PreAuth") {
