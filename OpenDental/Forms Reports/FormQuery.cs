@@ -1341,7 +1341,7 @@ namespace OpenDental{
 			while(yPos<bounds.Top+bounds.Height-18//The 18 is minimum allowance for the line about to print. 
 				&& linesPrinted < report.TableQ.Rows.Count)//Page might finish early on the last page.
 			{
-				bool isColWrap=PrefC.GetBool(PrefName.ReportPrintWrapColumns);
+				bool isColWrap=PrefC.GetBool(PrefName.ReportsWrapColumns);
 				if(isColWrap && yPos > yPosTableTop) {//First row always prints.  Otherwise the row might be pushed to next page if too tall.
 					int cellWidth;//Width to be adjusted and used to calculate row height.
 					bool isRowTooTall=false;//Bool to indicate if a row we are about to print is too tall for the avaible space on page.
