@@ -22,11 +22,18 @@ namespace OpenDental {
 		}
 
 		void FillGridInsPlans() {
+			int sortedByColumnIdx=gridInsPlans.SortedByColumnIdx;
+			bool isSortAscending=gridInsPlans.SortedIsAscending;
 			gridInsPlans.BeginUpdate();
+			if(gridInsPlans.Columns.Count==0) {	
+				gridInsPlans.Columns.Clear();
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Patient",200));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("PatMaintType",100));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("CoverageMaintType",100));
+				sortedByColumnIdx=0;//Sort by Patient Name by default.
+				isSortAscending=true;//Start with A and progress to Z.
+			}
 			gridInsPlans.Rows.Clear();
-			gridInsPlans.Columns.Clear();
-			gridInsPlans.Columns.Add(new UI.ODGridColumn("Patient",200));
-			gridInsPlans.Columns.Add(new UI.ODGridColumn("Carrier",200));
 			for(int i=0;i<_listX834s.Count;i++) {
 				X834 x834=_listX834s[i];
 				for(int j=0;j<x834.ListMembers.Count;j++) {
@@ -37,7 +44,8 @@ namespace OpenDental {
 						row=new UI.ODGridRow();
 						row.Tag=eIns;
 						gridInsPlans.Rows.Add(row);
-						row.Cells.Add(eIns.Pat.GetNameFL());
+						row.Cells.Add(eIns.Pat.GetNameLF());
+						row.Cells.Add(eIns.GetPatMaintTypeDescript());
 						row.Cells.Add("");
 					}
 					else {
@@ -47,17 +55,14 @@ namespace OpenDental {
 							row=new UI.ODGridRow();
 							row.Tag=eIns;
 							gridInsPlans.Rows.Add(row);
-							row.Cells.Add(eIns.Pat.GetNameFL());
-							if(healthCoverage.HealthCoverage!=null) {
-								row.Cells.Add(healthCoverage.HealthCoverage.PlanCoverageDescription);
-							}
-							else {
-								row.Cells.Add("");
-							}
+							row.Cells.Add(eIns.Pat.GetNameLF());
+							row.Cells.Add(eIns.GetPatMaintTypeDescript());
+							row.Cells.Add(eIns.GetCoverageMaintTypeDescript());
 						}
 					}
 				}
 			}
+			gridInsPlans.SortForced(sortedByColumnIdx,isSortAscending);
 			gridInsPlans.EndUpdate();
 		}
 

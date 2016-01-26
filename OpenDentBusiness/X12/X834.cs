@@ -1184,111 +1184,224 @@ namespace OpenDentBusiness {
 		public Hx834_Member Member;
 		public Hx834_HealthCoverage HealthCoverage;
 		public Patient Pat=new Patient();
+		public List <PatRace> ListPatRaces=new List<PatRace>();
 		public InsPlan Ins=new InsPlan();
 		public PatPlan Plan=new PatPlan();
 		public InsSub Sub=new InsSub();
+		public List <Benefit> ListBenefits=new List<Benefit>();
 
 		public Hx834Ins(Hx834_Member member,Hx834_HealthCoverage healthCoverage) {
 			Member=member;
-			Pat.FName=member.MemberName.NameFirst;
-			Pat.MiddleI=member.MemberName.NameMiddle;
-			Pat.LName=member.MemberName.NameLast;
-			if(member.MemberName.IdentificationCodeQualifier=="34") {
-				Pat.SSN=member.MemberName.IdentificationCode;
-			}
-			if(member.MemberCommunicationsNumbers!=null) {
-				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier1,member.MemberCommunicationsNumbers.CommunicationNumber1);
-				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier2,member.MemberCommunicationsNumbers.CommunicationNumber2);
-				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier3,member.MemberCommunicationsNumbers.CommunicationNumber3);
-			}
-			if(member.MemberDemographics!=null) {
-				SetGender(member.MemberDemographics.GenderCode);
-				//TODO: continue with this segment next time.
-			}
-			if(member.MemberMailingAddress!=null) {
-				Pat.Address=member.MemberMailStreetAddress.AddressInformation1;
-				Pat.Address2=member.MemberMailStreetAddress.AddressInformation2;
-				Pat.City=member.MemberMailCityStateZipCode.CityName;
-				Pat.State=member.MemberMailCityStateZipCode.StateOrProvinceCode;
-				Pat.Zip=member.MemberMailCityStateZipCode.PostalCode;
-			}
-			Pat.StudentStatus="N";
-			if(member.ListMemberSchools.Count > 0) {
-				Pat.SchoolName=member.ListMemberSchools[0].MemberSchool.NameLast;
-			}
+			ProcessMember();
 			HealthCoverage=healthCoverage;
-			if(healthCoverage!=null) {
-				Pat.HasIns="I";
-			}
-			ReadMemberLevelDetail(member.MemberLevelDetail);
-			Sub.SubscriberID=member.SubscriberIdentifier.ReferenceId;
-			if(member.MemberPolicyNumber!=null) {
-				Ins.GroupNum=member.MemberPolicyNumber.ReferenceId;
-			}
+			ProcessHealthCoverage();
 		}
 
-		private void SetContactInfo(string qualifier,string number) {
-			if(qualifier=="AP") {//Alternate Phone
-				if(Pat.AddrNote!="") {
-					Pat.AddrNote+="\r\n";
-				}
-				Pat.AddrNote+="Alternate Phone: "+number;
+		public string GetPatMaintTypeDescript() {
+			if(Member.MemberLevelDetail.MaintenanceTypeCode=="001") {//Change
+				return "Change";
 			}
-			else if(qualifier=="") {//Beeper Number
-				if(Pat.AddrNote!="") {
-					Pat.AddrNote+="\r\n";
-				}
-				Pat.AddrNote+="Beeper: "+number;
+			else if(Member.MemberLevelDetail.MaintenanceTypeCode=="021") {//Addition
+				return "Addition";
 			}
-			else if(qualifier=="") {//Cellular Phone
-				Pat.WirelessPhone=number;
+			else if(Member.MemberLevelDetail.MaintenanceTypeCode=="024") {//Cancellation or Termination
+				return "Cancel";
 			}
-			else if(qualifier=="") {//Electronic Mail
-				Pat.Email=number;
+			else if(Member.MemberLevelDetail.MaintenanceTypeCode=="025") {//Reinstatement
+				return "Reinstate";
 			}
-			else if(qualifier=="") {//Telephone Extension
-				if(Pat.AddrNote!="") {
-					Pat.AddrNote+="\r\n";
-				}
-				Pat.AddrNote+="Extension: "+number;
+			else if(Member.MemberLevelDetail.MaintenanceTypeCode=="030") {//Audit or Compare
+				return "Audit";
 			}
-			else if(qualifier=="") {//Facsimile
-				if(Pat.AddrNote!="") {
-					Pat.AddrNote+="\r\n";
-				}
-				Pat.AddrNote+="Fax: "+number;
-			}
-			else if(qualifier=="") {//Home Phone Number
-				Pat.HmPhone=number;
-			}
-			else if(qualifier=="") {//Telephone
-				if(Pat.AddrNote!="") {
-					Pat.AddrNote+="\r\n";
-				}
-				Pat.AddrNote+="Phone: "+number;
-			}
-			else if(qualifier=="") {//Work Phone Number
-				Pat.WkPhone=number;
-			}
+			return "";
 		}
 
-		private void SetGender(string genderCode) {
-			if(genderCode=="F") {
-				Pat.Gender=PatientGender.Female;
+		public string GetCoverageMaintTypeDescript() {
+			if(HealthCoverage==null) {
+				return "";
 			}
-			else if(genderCode=="M") {
-				Pat.Gender=PatientGender.Male;
+			if(HealthCoverage.HealthCoverage==null) {
+				return "";
 			}
-			Pat.Gender=PatientGender.Unknown;
+			if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="001") {//Change
+				return "Change";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="002") {//Delete
+				return "Delete";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="021") {//Addition
+				return "Addition";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="024") {//Cancellation or Termination
+				return "Cancel";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="025") {//Reinstatement
+				return "Reinstate";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="026") {//Correction
+				return "Correct";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="030") {//Audit or Compare
+				return "Audit";
+			}
+			else if(HealthCoverage.HealthCoverage.MaintenanceTypeCode=="032") {//Employee Information Not Applicable
+				return "NA";
+			}
+			return "";
 		}
 
-		private void ReadMemberLevelDetail(X12_INS mld) {
+		private void ProcessMember() {
+			ProcessMemberLevelDetail(Member.MemberLevelDetail);//Loop 2000 INS
+			ProcessSubscriberIdentifier(Member.SubscriberIdentifier);//Loop 2000 REF 0F
+			ProcessMemberPolicyNumber(Member.MemberPolicyNumber);//Loop 2000 REF 1L
+			//Loop 2000 REF - Member Supplemental Identifier.  Nowhere to store this information.  Perhaps this is a way to receive PatNum?
+			//Loop 2000 DTP - Member Level Dates.  Nowhere to store this information.
+			ProcessMemberName(Member.MemberName);//Loop 2100A NM1
+			ProcessMemberCommunicationsNumbers(Member.MemberCommunicationsNumbers);//Loop 2100A PER
+			ProcessMemberResidenceStreetAddress(Member.MemberResidenceStreetAddress);//Loop 2100A N3
+			ProcessMemberCityStateZipCode(Member.MemberCityStateZipCode);//Loop 2100A N4
+			ProcessMemberDemographics(Member.MemberDemographics);//Loop 2100A DMG
+			//Loop 2100A EC - Employment Class.  Nowhere to store this information.
+			//Loop 2100A ICM - Member Income.  Nowhere to store this information.
+			ProcessMemberPolicyAmounts(Member.ListMemberPolicyAmounts);
+			//Loop 2100A HLH - Member Health Information.  Could be useful for EHR, but difficult to convert, and not useful enough for now.
+			ProcessMemberLanguages(Member.ListMemberLanguages);
+			//Loop 2100B - Incorrect Member Name.  I doubt we can do anything with this information except display it somewhere.
+			if(Member.MemberMailStreetAddress!=null && Member.MemberMailCityStateZipCode!=null) {//Loop 2100C.  Override Loop 2100A if present.
+				ProcessMemberResidenceStreetAddress(Member.MemberMailStreetAddress);//Loop 2100C N3.
+				ProcessMemberCityStateZipCode(Member.MemberMailCityStateZipCode);//Loop 2100C N4.  
+			}
+			//Loop 2100D - Member Employer.  TODO: This could be attached via Pat and InsPlan, but we would need insert into Employer table if not present.
+			ProcessMemberSchools(Member.ListMemberSchools);
+			//Loop 2100F - Custodial Parent.  TODO: Create a new patient for this person in family if not present.
+			//Loop 2100G - Responsible Person.  TODO: Create a new patient for this person in family if not present.  Use Pat.ResponsParty to link FK.
+			//Loop 2100H - Drop Off Location.  Address where patient would like shipments sent.  Nowhere to store this information.
+			//Loop 2200 - Disability Information.  Nowhere to store this information.
+		}
+
+		private void ProcessMemberLevelDetail(X12_INS mld) {
 			//INS01: Useless, because INS02 provides the same information with more detail.
-			Plan.Relationship=GetRelatForCode(mld.IndividualRelationshipCode);//INS02:
-			//INS03: TODO
+			//INS02:
+			Plan.Relationship=Relat.Dependent;
+			if(mld.IndividualRelationshipCode=="01") {//Spouse
+				Plan.Relationship=Relat.Spouse;
+			}
+			else if(mld.IndividualRelationshipCode=="03") {//Father or Mother
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="04") {//Grandfather or Grandmother
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="05") {//Grandson or Granddaughter
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="06") {//Uncle or Aunt
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="07") {//Niece or Nephew
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="08") {//Cousin
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="09") {//Adopted Child
+				Plan.Relationship=Relat.Child;
+			}
+			else if(mld.IndividualRelationshipCode=="10") {//Foster Child
+				Plan.Relationship=Relat.Child;
+			}
+			else if(mld.IndividualRelationshipCode=="11") {//Son-in-law or Daugther-in-law
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="12") {//Brother-in-law or Sister-in-law
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="13") {//Mother-in-law or Father-in-law
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="14") {//Brother or Sister
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="15") {//Ward
+				Plan.Relationship=Relat.HandicapDep;
+			}
+			else if(mld.IndividualRelationshipCode=="16") {//Stepparent
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="17") {//Stepson or Stepdaughter
+				Plan.Relationship=Relat.Child;
+			}
+			else if(mld.IndividualRelationshipCode=="18") {//Self
+				Plan.Relationship=Relat.Self;
+			}
+			else if(mld.IndividualRelationshipCode=="19") {//Child
+				Plan.Relationship=Relat.Child;
+			}
+			else if(mld.IndividualRelationshipCode=="23") {//Sponsored Dependent
+				Plan.Relationship=Relat.Dependent;
+			}
+			else if(mld.IndividualRelationshipCode=="24") {//Dependent of Minor Dependent
+				Plan.Relationship=Relat.Dependent;
+			}
+			else if(mld.IndividualRelationshipCode=="25") {//Ex-spouse
+				Plan.Relationship=Relat.SignifOther;
+			}
+			else if(mld.IndividualRelationshipCode=="26") {//Guardian
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="31") {//Court Appointed Guardian
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="38") {//Collateral Dependent
+				Plan.Relationship=Relat.Dependent;
+			}
+			else if(mld.IndividualRelationshipCode=="53") {//Life Partner
+				Plan.Relationship=Relat.LifePartner;
+			}
+			else if(mld.IndividualRelationshipCode=="60") {//Annuitant
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="D2") {//Trustee
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="G8") {//Other Relationship
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(mld.IndividualRelationshipCode=="G9") {//Other Relative
+				Plan.Relationship=Relat.Dependent;//No direct correlation to the standard.
+			}
+			//INS03: Useful when importing.  No conversion needed.
 			//INS04: Nowhere to store this information, and nobody cares why the change has occured, only that it did occur.
-			//INS05: Nowhere to store this information.  Plus this does not tell us if the subscriber is inactive.			
-			Ins.FilingCode=GetInsFilingCodeNum(mld.MedicareStatusCode);//INS06:
+			//INS05: Nowhere to store this information.  Plus this does not tell us if the subscriber is inactive.
+			//INS06:
+			bool isMedicareA=false;
+			bool isMedicareB=false;
+			if(mld.MedicareStatusCode.StartsWith("A")) {//Medicare Part A (Hospital Insurance)
+				isMedicareA=true;
+			}
+			else if(mld.MedicareStatusCode.StartsWith("B")) {//Medicare Part B (Medical Insurance)
+				isMedicareB=true;
+			}
+			else if(mld.MedicareStatusCode.StartsWith("C")) {//Medicare Part A (Hospital Insurance) and Part B (Medical Insurance)
+				//We can only specify one filing code, so we have to pick either A or B.
+				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
+			}
+			else if(mld.MedicareStatusCode.StartsWith("D")) {//Medicare.  Presumably this is the same as "C" above.
+				//We can only specify one filing code, so we have to pick either A or B.
+				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
+			}
+			else {//"E"
+				//Not Medicare.  Do not set filing code, since we do not know what to set it to.  Will go out as Commercial Ins in 837, since unspecified.
+			}
+			Ins.FilingCode=0;
+			if(isMedicareA) {
+				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartA","MA");
+				Ins.FilingCode=insFilingCode.InsFilingCodeNum;
+			}
+			else if(isMedicareB) {
+				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartB","MB");
+				Ins.FilingCode=insFilingCode.InsFilingCodeNum;
+			}
 			//INS07: Nowhere to store this information, and nobody cares why the change has occured, only that it did occur.
 			//INS08: Nowhere to store Employment Status, but there is a place to store the Employer Name.
 			Pat.StudentStatus=mld.StudentStatusCode;//INS09: Student Status Code.  One-to-one conversion.
@@ -1305,129 +1418,330 @@ namespace OpenDentBusiness {
 			//INS17: Birth Sequence Number.  Nowhere to store this information.			
 		}
 
-		///<summary>Relationship of the patient to the subscriber.</summary>
-		private Relat GetRelatForCode(string relationshipCode) {
-			if(relationshipCode=="01") {//Spouse
-				return Relat.Spouse;
-			}
-			else if(relationshipCode=="03") {//Father or Mother
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="04") {//Grandfather or Grandmother
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="05") {//Grandson or Granddaughter
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="06") {//Uncle or Aunt
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="07") {//Niece or Nephew
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="08") {//Cousin
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="09") {//Adopted Child
-				return Relat.Child;
-			}
-			else if(relationshipCode=="10") {//Foster Child
-				return Relat.Child;
-			}
-			else if(relationshipCode=="11") {//Son-in-law or Daugther-in-law
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="12") {//Brother-in-law or Sister-in-law
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="13") {//Mother-in-law or Father-in-law
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="14") {//Brother or Sister
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="15") {//Ward
-				return Relat.HandicapDep;
-			}
-			else if(relationshipCode=="16") {//Stepparent
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="17") {//Stepson or Stepdaughter
-				return Relat.Child;
-			}
-			else if(relationshipCode=="18") {//Self
-				return Relat.Self;
-			}
-			else if(relationshipCode=="19") {//Child
-				return Relat.Child;
-			}
-			else if(relationshipCode=="23") {//Sponsored Dependent
-				return Relat.Dependent;
-			}
-			else if(relationshipCode=="24") {//Dependent of Minor Dependent
-				return Relat.Dependent;
-			}
-			else if(relationshipCode=="25") {//Ex-spouse
-				return Relat.SignifOther;
-			}
-			else if(relationshipCode=="26") {//Guardian
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="31") {//Court Appointed Guardian
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="38") {//Collateral Dependent
-				return Relat.Dependent;
-			}
-			else if(relationshipCode=="53") {//Life Partner
-				return Relat.LifePartner;
-			}
-			else if(relationshipCode=="60") {//Annuitant
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="D2") {//Trustee
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="G8") {//Other Relationship
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			else if(relationshipCode=="G9") {//Other Relative
-				return Relat.Dependent;//No direct correlation to the standard.
-			}
-			return Relat.Dependent;//Worst case.
+		private void ProcessSubscriberIdentifier(X12_REF sid) {
+			//REF01: Useless
+			//REF02:
+			Sub.SubscriberID=sid.ReferenceId;
+			//REF03: Not used
+			//REF04: Not used
 		}
 
-		private long GetInsFilingCodeNum(string medicareStatusCode) {
-			bool isMedicareA=false;
-			bool isMedicareB=false;
-			if(medicareStatusCode.StartsWith("A")) {//Medicare Part A (Hospital Insurance)
-				isMedicareA=true;
+		private void ProcessMemberPolicyNumber(X12_REF mpn) {
+			if(mpn==null) {
+				return;
 			}
-			else if(medicareStatusCode.StartsWith("B")) {//Medicare Part B (Medical Insurance)
-				isMedicareB=true;
-			}
-			else if(medicareStatusCode.StartsWith("C")) {//Medicare Part A (Hospital Insurance) and Part B (Medical Insurance)
-				//We can only specify one filing code, so we have to pick either A or B.
-				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
-			}
-			else if(medicareStatusCode.StartsWith("D")) {//Medicare.  Presumably this is the same as "C" above.
-				//We can only specify one filing code, so we have to pick either A or B.
-				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
-			}
-			else {
-				//Not Medicare.  Do not set filing code, since we do not know what to set it to.  Will go out as Commercial Ins in 837, since unspecified.
-			}
-			if(isMedicareA) {
-				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartA","MA");
-				return insFilingCode.InsFilingCodeNum;
-			}
-			if(isMedicareB) {
-				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartB","MB");
-				return insFilingCode.InsFilingCodeNum;
-			}
-			return 0;
+			//REF01: Useless
+			//REF02:
+			Ins.GroupNum=mpn.ReferenceId;
+			//REF03: Not used
+			//REF04: Not used
 		}
 
+		private void ProcessMemberName(X12_NM1 mn) {
+			//NM101: Useless, because this information is provided INS02.
+			//NM102: Useless
+			//NM103:
+			Pat.LName=mn.NameLast;
+			//NM104:
+			Pat.FName=mn.NameFirst;
+			//NM105:
+			Pat.MiddleI=mn.NameMiddle;
+			//NM106: Nowhere to store this information.
+			//NM107: Nowhere to store this information.
+			//NM108 & NM109:			
+			if(mn.IdentificationCodeQualifier=="34") {//The only other code is "ZZ" which is useless to us.
+				Pat.SSN=mn.IdentificationCode;
+			}
+			//NM110 through NM112: Not used
+			Pat.Preferred="";
+		}
+
+		private void ProcessMemberCommunicationsNumbers(X12_PER mcn) {
+			if(mcn==null) {
+				return;
+			}
+			string[] arrayNumbers=new string[] {
+				mcn.CommunicationNumberQualifier1,mcn.CommunicationNumber1,
+				mcn.CommunicationNumberQualifier2,mcn.CommunicationNumber2,
+				mcn.CommunicationNumberQualifier3,mcn.CommunicationNumber3,
+			};
+			for(int i=0;i<arrayNumbers.Length;i+=2) {
+				string qualifier=arrayNumbers[i];
+				string number=arrayNumbers[i+1];
+				if(qualifier=="AP") {//Alternate Phone
+					if(Pat.AddrNote!="") {
+						Pat.AddrNote+="\r\n";
+					}
+					Pat.AddrNote+="Alternate Phone: "+number;//No specific patient field for this information.  
+				}
+				else if(qualifier=="BN") {//Beeper Number
+					if(Pat.AddrNote!="") {
+						Pat.AddrNote+="\r\n";
+					}
+					Pat.AddrNote+="Beeper: "+number;//No specific patient field for this information. 
+				}
+				else if(qualifier=="CP") {//Cellular Phone
+					Pat.WirelessPhone=number;
+				}
+				else if(qualifier=="EM") {//Electronic Mail
+					Pat.Email=number;
+				}
+				else if(qualifier=="EX") {//Telephone Extension
+					if(Pat.AddrNote!="") {
+						Pat.AddrNote+="\r\n";
+					}
+					Pat.AddrNote+="Extension: "+number;//No specific patient field for this information. 
+				}
+				else if(qualifier=="FX") {//Facsimile
+					if(Pat.AddrNote!="") {
+						Pat.AddrNote+="\r\n";
+					}
+					Pat.AddrNote+="Fax: "+number;//No specific patient field for this information. 
+				}
+				else if(qualifier=="HP") {//Home Phone Number
+					Pat.HmPhone=number;
+				}
+				else if(qualifier=="TE") {//Telephone
+					if(Pat.AddrNote!="") {
+						Pat.AddrNote+="\r\n";
+					}
+					Pat.AddrNote+="Phone: "+number;//No specific patient field for this information. 
+				}
+				else if(qualifier=="WP") {//Work Phone Number
+					Pat.WkPhone=number;
+				}
+			}
+		}
+
+		private void ProcessMemberResidenceStreetAddress(X12_N3 ra) {
+			if(ra==null) {
+				return;
+			}
+			//N301:
+			Pat.Address=ra.AddressInformation1;
+			//N302:
+			Pat.Address2=ra.AddressInformation2;
+		}
+
+		private void ProcessMemberCityStateZipCode(X12_N4 mcsz) {
+			if(mcsz==null) {
+				return;
+			}
+			Pat.City=mcsz.CityName;
+			Pat.State=mcsz.StateOrProvinceCode;
+			Pat.Zip=mcsz.PostalCode;
+		}
+
+		private void ProcessMemberDemographics(X12_DMG md) {
+			if(md==null) {
+				return;
+			}
+			//DMG01: Useless
+			//DMG02:
+			Pat.Birthdate=X12Parse.ToDate(md.DateTimePeriod);
+			//DMG03:
+			if(md.GenderCode=="F") {
+				Pat.Gender=PatientGender.Female;
+			}
+			else if(md.GenderCode=="M") {
+				Pat.Gender=PatientGender.Male;
+			}
+			Pat.Gender=PatientGender.Unknown;
+			//DMG04:
+			if(md.MaritalStatusCode=="B") {//Registered Domestic Partner
+				Pat.Position=PatientPosition.Married;//We do not have this status currently.  Closest match used instead.
+			}
+			else if(md.MaritalStatusCode=="D") {//Divorced
+				Pat.Position=PatientPosition.Divorced;
+			}
+			else if(md.MaritalStatusCode=="I") {//Single
+				Pat.Position=PatientPosition.Single;
+			}
+			else if(md.MaritalStatusCode=="M") {//Married
+				Pat.Position=PatientPosition.Married;
+			}
+			else if(md.MaritalStatusCode=="R") {//Unreported
+				Pat.Position=PatientPosition.Single;//We do not have this status currently.  Closest match used instead.
+			}
+			else if(md.MaritalStatusCode=="S") {//Separated
+				Pat.Position=PatientPosition.Married;//We do not have this status currently.  Closest match used instead.
+			}
+			else if(md.MaritalStatusCode=="U") {//Unmarried
+				Pat.Position=PatientPosition.Single;//We do not have this status currently.  Closest match used instead.
+			}
+			else if(md.MaritalStatusCode=="W") {//Widowed
+				Pat.Position=PatientPosition.Widowed;
+			}
+			else if(md.MaritalStatusCode=="X") {//Legally Separated
+				Pat.Position=PatientPosition.Married;//We do not have this status currently.  Closest match used instead.
+			}
+			//DMG05:
+			//TODO: After inserting Pat, call: PatientRaces.Reconcile(PatCur.PatNum,listPatRaces);//Insert, Update, Delete if needed.
+			ListPatRaces.Clear();
+			if(md.CompositeRaceOrEthnicityInformation.StartsWith("7")) {//Not Provided
+				ListPatRaces.Add(PatRace.DeclinedToSpecifyRace);
+				ListPatRaces.Add(PatRace.DeclinedToSpecifyEthnicity);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("8")) {//Not Applicable
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("A")) {//Asian or Pacific Islander
+				ListPatRaces.Add(PatRace.Asian);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("B")) {//Black
+				ListPatRaces.Add(PatRace.AfricanAmerican);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("C")) {//Caucasian
+				ListPatRaces.Add(PatRace.White);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("D")) {//Subcontinent Asian American
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("E")) {//Other Race or Ethnicity
+				ListPatRaces.Add(PatRace.Other);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("F")) {//Asian Pacific American
+				ListPatRaces.Add(PatRace.Asian);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("G")) {//Native American
+				ListPatRaces.Add(PatRace.AmericanIndian);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("H")) {//Hispanic
+				ListPatRaces.Add(PatRace.Hispanic);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("I")) {//American Indian or Alaskan Native
+				ListPatRaces.Add(PatRace.AmericanIndian);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("J")) {//Native Hawaiian
+				ListPatRaces.Add(PatRace.HawaiiOrPacIsland);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("N")) {//Black (Non-Hispanic)
+				ListPatRaces.Add(PatRace.AfricanAmerican);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("O")) {//White (Non-Hispanic)
+				ListPatRaces.Add(PatRace.White);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("P")) {//Pacific Islander
+				ListPatRaces.Add(PatRace.HawaiiOrPacIsland);
+			}
+			else if(md.CompositeRaceOrEthnicityInformation.StartsWith("Z")) {//Mutually Defined
+				ListPatRaces.Add(PatRace.Other);
+			}
+			//DMG06: Nowhere to put this information.
+			//DMG07 through DMG09: Not used
+			//DMG10: Nowhere to put this information.
+			//DMG11: Nowhere to put this information.
+		}
+
+		private void ProcessMemberPolicyAmounts(List <X12_AMT> listAmts) {
+			ListBenefits.Clear();
+			for(int i=0;i<listAmts.Count;i++) {
+				X12_AMT amt=listAmts[i];
+				Benefit ben=new Benefit();
+				ben.CoverageLevel=BenefitCoverageLevel.Individual;//Individual benefit, since this is the member loop.
+				//AMT01:
+				if(amt.AmountQualifierCode=="B9") {//Co-insurance - Autual
+					ben.BenefitType=InsBenefitType.CoInsurance;
+				}
+				else if(amt.AmountQualifierCode=="C1") {//Co-Payment Amount
+					ben.BenefitType=InsBenefitType.CoPayment;
+				}
+				else if(amt.AmountQualifierCode=="D2") {//Deductible Amount
+					ben.BenefitType=InsBenefitType.Deductible;
+				}
+				else if(amt.AmountQualifierCode=="EBA") {//Expected Expenditure Amount
+					continue;//Nowhere to store this information.  Skip benefit.
+				}
+				else if(amt.AmountQualifierCode=="FK") {//Other Unlisted Amount
+					continue;//Nowhere to store this information.  Skip benefit.
+				}
+				else if(amt.AmountQualifierCode=="P3") {//Premium Amount
+					continue;//Nowhere to store this information.  Skip benefit.
+				}
+				else if(amt.AmountQualifierCode=="R") {//Spend Down
+					continue;//Nowhere to store this information.  Skip benefit.
+				}
+				//AMT02:
+				ben.MonetaryAmt=PIn.Double(amt.MonetaryAmount);
+				//AMT03: Not used
+			}
+		}
+
+		private void ProcessMemberLanguages(List <X12_LUI> listLanguages) {
+			List <string> listLangRead=new List<string>();
+			List <string> listLangWrite=new List<string>();
+			List <string> listLangSpeak=new List<string>();
+			List <string> listLangNative=new List<string>();
+			for(int i=0;i<listLanguages.Count;i++) {
+				X12_LUI lui=listLanguages[i];
+				string lang="";
+				//LUI01 & LUI02:
+				if(lui.IdentificationCodeQualifier=="LD") {//NISO Z39.53 Language Code
+					lang=lui.IdentificationCode;//I think this is the same as ISO 639-2.  We support ISO 639-2 direclty.
+				}
+				else if(lui.IdentificationCodeQualifier=="LE") {//ISO 639 Langauge Code.
+					lang=lui.IdentificationCode;//We support ISO 639 direclty.
+				}
+				//LUI03:
+				if(lang=="") {
+					lang=lui.Description;
+				}
+				//LUI04:
+				if(lui.UseOfLanguageIndicator=="5") {//Language Reading
+					listLangRead.Add(lang);
+				}
+				else if(lui.UseOfLanguageIndicator=="6") {//Language Writing
+					listLangWrite.Add(lang);
+				}
+				else if(lui.UseOfLanguageIndicator=="7") {//Langauge Speaking
+					listLangSpeak.Add(lang);
+				}
+				else if(lui.UseOfLanguageIndicator=="8") {//Native Language
+					listLangNative.Add(lang);
+				}
+				//LUI05: Not used.
+			}
+			//We currently only support one language per patient.  Try to figure out what their primary language is.
+			Pat.Language="";
+			if(listLangNative.Count > 0) {
+				Pat.Language=listLangNative[0];
+			}
+			else if(listLangSpeak.Count > 0) {
+				Pat.Language=listLangSpeak[0];
+			}
+			else if(listLangRead.Count > 0) {
+				Pat.Language=listLangRead[0];
+			}
+			else if(listLangWrite.Count > 0) {
+				Pat.Language=listLangWrite[0];
+			}
+		}
+
+		private void ProcessMemberSchools(List <Hx834_School> listSchools) {
+			//We only have a spot to store the school name.  Nowhere to store the school contact information.
+			if(listSchools.Count > 0) {
+				Pat.SchoolName=listSchools[0].MemberSchool.NameLast;
+			}
+		}
+
+		///<summary>Loop 2300</summary>
+		private void ProcessHealthCoverage() {
+			if(HealthCoverage==null) {
+				return;
+			}
+			ProcessHD();
+			//TODO: Continue from Loop 2300 DTP.
+
+		}
+
+		private void ProcessHD() {
+			//HD01: Maintenance Type Code.  Useful when importing.  No conversion needed.
+			//HD02: Not used
+			//HD03: Insurance Line Code.  TODO: This might be useful, although the IDC segment identifies Dental/Health insurance.
+			//HD04: Plan Coverage Descriptiopn.  Useless
+			//HD05: Coverage Level Code.  Might be useful, although nowhere to store this information in specific.
+			//HD06 through HD08: Not used
+			//HD09: Late Enrollment Indicator.  Nowhere to store this information and it is useless anyway.
+			//HD10 through HD11: Not used
+		}
 
 	}
 

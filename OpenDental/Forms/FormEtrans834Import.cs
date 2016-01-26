@@ -65,6 +65,8 @@ namespace OpenDental {
 		}
 
 		private void FillGridInsPlanFiles() {
+			int sortedByColumnIdx=gridInsPlanFiles.SortedByColumnIdx;
+			bool isSortAscending=gridInsPlanFiles.SortedIsAscending;
 			gridInsPlanFiles.BeginUpdate();
 			if(gridInsPlanFiles.Columns.Count==0) {
 				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("FileName",300));
@@ -76,10 +78,9 @@ namespace OpenDental {
 				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("Errors",0));
 				gridInsPlanFiles.Columns[gridInsPlanFiles.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
 				_colErrorIndex=gridInsPlanFiles.Columns.Count-1;
-				gridInsPlanFiles.SortForced(_colErrorIndex,true);//Sort by error messages when first loaded.  This will push files without errors to the top.
-			}
-			int sortedByColumnIdx=gridInsPlanFiles.SortedByColumnIdx;
-			bool isSortAscending=gridInsPlanFiles.SortedIsAscending;
+				sortedByColumnIdx=_colErrorIndex;//Sort by error messages when first loaded.
+				isSortAscending=true;//This will push files without errors to the top.
+			}			
 			gridInsPlanFiles.Rows.Clear();
 			gridInsPlanFiles.EndUpdate();
 			if(!Directory.Exists(textImportPath.Text)) {
@@ -137,7 +138,7 @@ namespace OpenDental {
 					row.Cells.Add(ex.ToString());//Errors
 				}
 			}
-			gridInsPlanFiles.SortForced(sortedByColumnIdx,isSortAscending);//Mantain previous sort order chosen by user.
+			gridInsPlanFiles.SortForced(sortedByColumnIdx,isSortAscending);
 			gridInsPlanFiles.EndUpdate();
 			//Select all files which do not have an error.
 			for(int i=0;i<gridInsPlanFiles.Rows.Count;i++) {
