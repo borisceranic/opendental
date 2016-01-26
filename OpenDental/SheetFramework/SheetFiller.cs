@@ -111,15 +111,15 @@ namespace OpenDental{
 					FillFieldsForMedLabResults(sheet,medLab,pat);
 					break;
 				case SheetTypeEnum.TreatmentPlan:
-					FillFieldsForTreatPlan(sheet);
+					pat=Patients.GetPat(sheet.PatNum);
+					FillFieldsForTreatPlan(sheet,pat);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
 			FillPatientImages(sheet,pat);
 		}
 
-		private static void FillFieldsForTreatPlan(Sheet sheet) {
-			Patient pat=Patients.GetPat(sheet.PatNum);
+		private static void FillFieldsForTreatPlan(Sheet sheet,Patient pat) {
 			TreatPlan treatPlan=(TreatPlan)SheetParameter.GetParamByName(sheet.Parameters,"TreatPlan").ParamValue;
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
