@@ -24,7 +24,7 @@ namespace OpenDental {
 			checkReportsShowPatNum.Checked=PrefC.GetBool(PrefName.ReportsShowPatNum);
 			checkReportProdWO.Checked=PrefC.GetBool(PrefName.ReportPandIschedProdSubtractsWO);
 			checkReportPIClinic.Checked=PrefC.GetBool(PrefName.ReportPandIhasClinicBreakdown);
-			checkReportPrintWrapColumns.Checked=PrefC.GetBool(PrefName.ReportPrintWrapColumns);
+			checkReportPrintWrapColumns.Checked=PrefC.GetBool(PrefName.ReportsWrapColumns);
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -32,7 +32,7 @@ namespace OpenDental {
 				| Prefs.UpdateBool(PrefName.ReportsShowPatNum,checkReportsShowPatNum.Checked)
 				| Prefs.UpdateBool(PrefName.ReportPandIschedProdSubtractsWO,checkReportProdWO.Checked)
 				| Prefs.UpdateBool(PrefName.ReportPandIhasClinicBreakdown,checkReportPIClinic.Checked)
-				| Prefs.UpdateBool(PrefName.ReportPrintWrapColumns,checkReportPrintWrapColumns.Checked)
+				| Prefs.UpdateBool(PrefName.ReportsWrapColumns,checkReportPrintWrapColumns.Checked)
 				) {
 				changed=true;
 			}

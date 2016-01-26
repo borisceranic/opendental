@@ -532,7 +532,7 @@ namespace OpenDentBusiness {
 		ReportPandIschedProdSubtractsWO,
 		ReportsPPOwriteoffDefaultToProcDate,
 		///<summary>Bool.  False by defualt, used to wrap columns when printing a custom report.</summary>
-		ReportPrintWrapColumns,
+		ReportsWrapColumns,
 		ReportsShowPatNum,
 		RequiredFieldColor,
 		RxSendNewToQueue,

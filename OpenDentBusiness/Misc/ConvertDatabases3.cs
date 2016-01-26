@@ -11786,11 +11786,11 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				//Wrap columns when printing
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO preference(PrefName,ValueString) VALUES ('ReportPrintWrapColumns','0')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('ReportsWrapColumns','0')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES ((SELECT MAX(PrefNum)+1 FROM preference),'ReportPrintWrapColumns','0')";
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES ((SELECT MAX(PrefNum)+1 FROM preference),'ReportsWrapColumns','0')";
 					Db.NonQ(command);
 				}
 				//Screenings use sheets preference.  Defaults to being off so that this new functionality is opt in.

@@ -18,22 +18,12 @@ namespace OpenDental.ReportingComplex
 {
 	///<summary></summary>
 	public class FormReportComplex : System.Windows.Forms.Form{
-		private System.Windows.Forms.Panel panel1;
 		private System.ComponentModel.IContainer components;
-		private OpenDental.UI.Button butClose;
-		private OpenDental.UI.Button butPrint;
 		private System.Drawing.Printing.PrintDocument pd2;
-		private OpenDental.UI.Button butSetup;
 		private System.Windows.Forms.PageSetupDialog setupDialog2;
-		///<summary>The y position printed through so far in the current section.</summary>
-		//private int printedThroughYPos; For now, assume all sections must remain together.
-		private OpenDental.UI.Button button1;
-		private System.Windows.Forms.Label labelTotPages;
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private System.Windows.Forms.ImageList imageListMain;
 		private System.Windows.Forms.PrintPreviewControl printPreviewControl2;
-		private OpenDental.UI.Button butBack;
-		private OpenDental.UI.Button butFwd;
 		///<summary>The report to display.</summary>
 		private ReportComplex _myReport;
 		///<summary>The name of the last section printed. It really only keeps track of whether the details section and the reportfooter have finished printing. This variable will be refined when groups are implemented.</summary>
@@ -42,6 +32,7 @@ namespace OpenDental.ReportingComplex
 		private int _totalPages;
 		private int _pagesPrinted;
 		private int _heightRemaining=0;
+    private bool _isWrappingText;
 
 		///<summary></summary>
 		public FormReportComplex(ReportComplex myReport){
@@ -69,206 +60,99 @@ namespace OpenDental.ReportingComplex
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportComplex));
-			this.panel1 = new System.Windows.Forms.Panel();
-			this.button1 = new OpenDental.UI.Button();
-			this.labelTotPages = new System.Windows.Forms.Label();
-			this.butBack = new OpenDental.UI.Button();
-			this.butFwd = new OpenDental.UI.Button();
-			this.butSetup = new OpenDental.UI.Button();
-			this.butPrint = new OpenDental.UI.Button();
-			this.butClose = new OpenDental.UI.Button();
-			this.pd2 = new System.Drawing.Printing.PrintDocument();
-			this.setupDialog2 = new System.Windows.Forms.PageSetupDialog();
-			this.imageListMain = new System.Windows.Forms.ImageList(this.components);
-			this.printPreviewControl2 = new System.Windows.Forms.PrintPreviewControl();
-			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.panel1.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// panel1
-			// 
-			this.panel1.Controls.Add(this.button1);
-			this.panel1.Controls.Add(this.labelTotPages);
-			this.panel1.Controls.Add(this.butBack);
-			this.panel1.Controls.Add(this.butFwd);
-			this.panel1.Controls.Add(this.butSetup);
-			this.panel1.Controls.Add(this.butPrint);
-			this.panel1.Controls.Add(this.butClose);
-			this.panel1.Location = new System.Drawing.Point(-1, 178);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(831, 35);
-			this.panel1.TabIndex = 4;
-			this.panel1.Visible = false;
-			// 
-			// button1
-			// 
-			this.button1.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.button1.Autosize = true;
-			this.button1.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.button1.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.button1.CornerRadius = 4F;
-			this.button1.Location = new System.Drawing.Point(501, 8);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 4;
-			this.button1.Text = "Test";
-			this.button1.Visible = false;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
-			// 
-			// labelTotPages
-			// 
-			this.labelTotPages.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelTotPages.Location = new System.Drawing.Point(137, 4);
-			this.labelTotPages.Name = "labelTotPages";
-			this.labelTotPages.Size = new System.Drawing.Size(54, 18);
-			this.labelTotPages.TabIndex = 19;
-			this.labelTotPages.Text = "1 / 2";
-			this.labelTotPages.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			// 
-			// butBack
-			// 
-			this.butBack.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBack.Autosize = true;
-			this.butBack.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBack.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBack.CornerRadius = 4F;
-			this.butBack.Image = global::OpenDental.Properties.Resources.Left;
-			this.butBack.Location = new System.Drawing.Point(115, 1);
-			this.butBack.Name = "butBack";
-			this.butBack.Size = new System.Drawing.Size(18, 23);
-			this.butBack.TabIndex = 20;
-			// 
-			// butFwd
-			// 
-			this.butFwd.AdjustImageLocation = new System.Drawing.Point(1, 0);
-			this.butFwd.Autosize = true;
-			this.butFwd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butFwd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butFwd.CornerRadius = 4F;
-			this.butFwd.Image = global::OpenDental.Properties.Resources.Right;
-			this.butFwd.Location = new System.Drawing.Point(193, 1);
-			this.butFwd.Name = "butFwd";
-			this.butFwd.Size = new System.Drawing.Size(18, 23);
-			this.butFwd.TabIndex = 21;
-			// 
-			// butSetup
-			// 
-			this.butSetup.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSetup.Autosize = true;
-			this.butSetup.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSetup.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSetup.CornerRadius = 4F;
-			this.butSetup.Location = new System.Drawing.Point(590, 2);
-			this.butSetup.Name = "butSetup";
-			this.butSetup.Size = new System.Drawing.Size(75, 23);
-			this.butSetup.TabIndex = 3;
-			this.butSetup.Text = "&Setup";
-			this.butSetup.Visible = false;
-			this.butSetup.Click += new System.EventHandler(this.butSetup_Click);
-			// 
-			// butPrint
-			// 
-			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPrint.Autosize = true;
-			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPrint.CornerRadius = 4F;
-			this.butPrint.Location = new System.Drawing.Point(1, 2);
-			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(75, 23);
-			this.butPrint.TabIndex = 2;
-			this.butPrint.Text = "&Print";
-			// 
-			// butClose
-			// 
-			this.butClose.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClose.Autosize = true;
-			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(239, 2);
-			this.butClose.Name = "butClose";
-			this.butClose.Size = new System.Drawing.Size(75, 23);
-			this.butClose.TabIndex = 1;
-			this.butClose.Text = "&Close";
-			// 
-			// imageListMain
-			// 
-			this.imageListMain.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListMain.ImageStream")));
-			this.imageListMain.TransparentColor = System.Drawing.Color.Transparent;
-			this.imageListMain.Images.SetKeyName(0, "");
-			this.imageListMain.Images.SetKeyName(1, "");
-			this.imageListMain.Images.SetKeyName(2, "");
-			this.imageListMain.Images.SetKeyName(3, "");
-			this.imageListMain.Images.SetKeyName(4, "butZoomIn.gif");
-			this.imageListMain.Images.SetKeyName(5, "butZoomOut.gif");
-			// 
-			// printPreviewControl2
-			// 
-			this.printPreviewControl2.AutoZoom = false;
-			this.printPreviewControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.printPreviewControl2.Location = new System.Drawing.Point(0, 0);
-			this.printPreviewControl2.Name = "printPreviewControl2";
-			this.printPreviewControl2.Size = new System.Drawing.Size(831, 570);
-			this.printPreviewControl2.TabIndex = 6;
-			// 
-			// ToolBarMain
-			// 
-			this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
-			this.ToolBarMain.ImageList = this.imageListMain;
-			this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
-			this.ToolBarMain.Name = "ToolBarMain";
-			this.ToolBarMain.Size = new System.Drawing.Size(831, 25);
-			this.ToolBarMain.TabIndex = 5;
-			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
-			// 
-			// FormReportComplex
-			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(831, 570);
-			this.Controls.Add(this.ToolBarMain);
-			this.Controls.Add(this.panel1);
-			this.Controls.Add(this.printPreviewControl2);
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Name = "FormReportComplex";
-			this.ShowInTaskbar = false;
-			this.Text = "Report";
-			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-			this.Load += new System.EventHandler(this.FormReport_Load);
-			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.FormReport_Layout);
-			this.panel1.ResumeLayout(false);
-			this.ResumeLayout(false);
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportComplex));
+      this.pd2 = new System.Drawing.Printing.PrintDocument();
+      this.setupDialog2 = new System.Windows.Forms.PageSetupDialog();
+      this.imageListMain = new System.Windows.Forms.ImageList(this.components);
+      this.printPreviewControl2 = new System.Windows.Forms.PrintPreviewControl();
+      this.ToolBarMain = new OpenDental.UI.ODToolBar();
+      this.SuspendLayout();
+      // 
+      // imageListMain
+      // 
+      this.imageListMain.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListMain.ImageStream")));
+      this.imageListMain.TransparentColor = System.Drawing.Color.Transparent;
+      this.imageListMain.Images.SetKeyName(0, "");
+      this.imageListMain.Images.SetKeyName(1, "");
+      this.imageListMain.Images.SetKeyName(2, "");
+      this.imageListMain.Images.SetKeyName(3, "");
+      this.imageListMain.Images.SetKeyName(4, "butZoomIn.gif");
+      this.imageListMain.Images.SetKeyName(5, "butZoomOut.gif");
+      // 
+      // printPreviewControl2
+      // 
+      this.printPreviewControl2.AutoZoom = false;
+      this.printPreviewControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.printPreviewControl2.Location = new System.Drawing.Point(0, 0);
+      this.printPreviewControl2.Name = "printPreviewControl2";
+      this.printPreviewControl2.Size = new System.Drawing.Size(831, 570);
+      this.printPreviewControl2.TabIndex = 6;
+      // 
+      // ToolBarMain
+      // 
+      this.ToolBarMain.Dock = System.Windows.Forms.DockStyle.Top;
+      this.ToolBarMain.ImageList = this.imageListMain;
+      this.ToolBarMain.Location = new System.Drawing.Point(0, 0);
+      this.ToolBarMain.Name = "ToolBarMain";
+      this.ToolBarMain.Size = new System.Drawing.Size(831, 25);
+      this.ToolBarMain.TabIndex = 5;
+      this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
+      // 
+      // FormReportComplex
+      // 
+      this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+      this.ClientSize = new System.Drawing.Size(831, 570);
+      this.Controls.Add(this.ToolBarMain);
+      this.Controls.Add(this.printPreviewControl2);
+      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+      this.Name = "FormReportComplex";
+      this.ShowInTaskbar = false;
+      this.Text = "Report";
+      this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+      this.Load += new System.EventHandler(this.FormReport_Load);
+      this.Layout += new System.Windows.Forms.LayoutEventHandler(this.FormReport_Layout);
+      this.ResumeLayout(false);
 
 		}
 		#endregion
 
 		private void FormReport_Load(object sender, System.EventArgs e) {
-			LayoutToolBar();
+      RefreshWindow();
+      _isWrappingText=PrefC.GetBool(PrefName.ReportsWrapColumns);
+		}
+
+    ///<summary>Used to refresh the print window when something changes.</summary>
+    public void RefreshWindow() {
+      LayoutToolBar();
 			ResetPd2();
-			labelTotPages.Text="/ "+_totalPages.ToString();
 			SetDefaultZoom();
 			printPreviewControl2.Document=pd2;
-		}
+    }
 
 		///<summary>Causes the toolbar to be laid out again.</summary>
 		public void LayoutToolBar(){
 			ToolBarMain.Buttons.Clear();
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print"),0,"","Print"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
-			ToolBarMain.Buttons.Add(new ODToolBarButton("",1,"Go Back One Page","Back"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton("",1,Lan.g(this,"Go Back One Page"),"Back"));
 			ODToolBarButton button=new ODToolBarButton("",-1,"","PageNum");
 			button.Style=ODToolBarButtonStyle.Label;
 			ToolBarMain.Buttons.Add(button);
-			ToolBarMain.Buttons.Add(new ODToolBarButton("",2,"Go Forward One Page","Fwd"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton("",2,Lan.g(this,"Go Forward One Page"),"Fwd"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",4,"","ZoomIn"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",5,"","ZoomOut"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton("100",-1,"","ZoomReset"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+      ODToolBarButton butWrapText=new ODToolBarButton(Lan.g(this,"Wrap Text"),-1,Lan.g(this,"Wrap Text In Columns"),"WrapText");
+      butWrapText.Style=ODToolBarButtonStyle.ToggleButton;
+      butWrapText.Pushed=_isWrappingText;
+      ToolBarMain.Buttons.Add(butWrapText);
+      ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Export"),3,"","Export"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Close"),-1,"Close This Window","Close"));
+      ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Close"),-1,Lan.g(this,"Close This Window"),"Close"));
 			//ToolBarMain.Invalidate();
 		}
 
@@ -285,8 +169,8 @@ namespace OpenDental.ReportingComplex
 		}
 
 		private void FormReport_Layout(object sender, System.Windows.Forms.LayoutEventArgs e) {
-			printPreviewControl2.Location=new System.Drawing.Point(0,panel1.Height);
-			printPreviewControl2.Height=ClientSize.Height-panel1.Height;
+			printPreviewControl2.Location=new System.Drawing.Point(0,ToolBarMain.Height);
+			printPreviewControl2.Height=ClientSize.Height-ToolBarMain.Height;
 			printPreviewControl2.Width=ClientSize.Width;	
 		}
 		
@@ -307,6 +191,7 @@ namespace OpenDental.ReportingComplex
 			foreach(ReportObject reportObject in _myReport.ReportObjects) {
 				if(reportObject.ObjectType==ReportObjectType.QueryObject) {
 					QueryObject queryObject=(QueryObject)reportObject;
+          queryObject.CalculateRowHeights(_isWrappingText);
 					if(queryObject.IsPrinted==true) {
 						queryObject.IsPrinted=false;
 					}
@@ -337,6 +222,9 @@ namespace OpenDental.ReportingComplex
 					break;
 				case "Export":
 					OnExport_Click();
+					break;
+        case "WrapText":
+					OnWrapText_Click();
 					break;
 				case "Close":
 					OnClose_Click();
@@ -1256,6 +1144,11 @@ namespace OpenDental.ReportingComplex
 				return;
 			}
 			MessageBox.Show(Lan.g(this,"File created successfully"));
+		}
+
+    private void OnWrapText_Click() {
+      _isWrappingText=!_isWrappingText;
+			RefreshWindow();
 		}
 
 		private void OnClose_Click() {

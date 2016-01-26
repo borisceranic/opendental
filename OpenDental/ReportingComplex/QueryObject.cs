@@ -882,9 +882,22 @@ namespace OpenDental.ReportingComplex {
 					return false;
 				}
 			}
-			_rowHeightValues=new List<int>();
-			Graphics g=Graphics.FromImage(new Bitmap(1,1));
+      _rowHeightValues=new List<int>();
+			DataRow row;
 			for(int i=0;i<_reportTable.Rows.Count;i++) {
+				row=_exportTable.NewRow();
+				for(int j=0;j<_exportTable.Columns.Count;j++) {
+					row[j]=_reportTable.Rows[i][j];
+				}
+				_exportTable.Rows.Add(row);
+			}
+			return true;
+		}
+
+     public void CalculateRowHeights(bool isWrapping) {
+      Graphics g=Graphics.FromImage(new Bitmap(1,1));
+      _rowHeightValues=new List<int>();
+      for(int i=0;i<_reportTable.Rows.Count;i++) {
 				string rawText;
 				string displayText="";
 				string prevDisplayText="";
@@ -901,8 +914,15 @@ namespace OpenDental.ReportingComplex {
 						List<string> listString=GetDisplayString(rawText,prevDisplayText,reportObject,i);
 						displayText=listString[0];
 						prevDisplayText=listString[1];
-						int curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),
-							ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
+            int curCellHeight=0;
+            if(isWrapping) {
+              curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),
+							  ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
+            }
+            else {
+              curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,0,
+							  ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
+            }
 						if(curCellHeight>rowHeight) {
 							rowHeight=curCellHeight;
 						}
@@ -910,17 +930,8 @@ namespace OpenDental.ReportingComplex {
 				}
 				_rowHeightValues.Add(rowHeight);
 			}
-			DataRow row;
-			for(int i=0;i<_reportTable.Rows.Count;i++) {
-				row=_exportTable.NewRow();
-				for(int j=0;j<_exportTable.Columns.Count;j++) {
-					row[j]=_reportTable.Rows[i][j];
-				}
-				_exportTable.Rows.Add(row);
-			}
-			g.Dispose();
-			return true;
-		}
+      g.Dispose();
+    }
 
 		private List<string> GetDisplayString(string rawText,string prevDisplayText,ReportObject reportObject,int i) {
 			string displayText="";
