@@ -780,6 +780,7 @@ namespace OpenDental{
 				writeoffWidth=70;
 			}
 			query=report.AddQuery(tableDailyProd,Lan.g(this,"Date")+": "+DateTime.Today.ToShortDateString(),"ClinicSplit",SplitByKind.Value,1,true);
+      query.IsWrappingText=false;
 			query.AddColumn("Date",dateWidth,FieldValueType.String,new Font("Tahoma",8));
 			query.AddColumn("Patient Name",patientNameWidth,FieldValueType.String,new Font("Tahoma",8));
 			query.AddColumn("Description",descriptionWidth,FieldValueType.String,new Font("Tahoma",8));
@@ -797,6 +798,7 @@ namespace OpenDental{
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && listClinicNums.Count > 1) {
 				DataTable tableClinicTotals=GetClinicTotals(dataSetDailyProdSplitByClinic);
 				query=report.AddQuery(tableClinicTotals,"Clinic Totals","",SplitByKind.None,2,true);
+        query.IsWrappingText=false;
 				query.AddColumn("Clinic",410,FieldValueType.String,new Font("Tahoma",8));
 				query.AddColumn("Production",75,FieldValueType.Number,new Font("Tahoma",8));
 				query.AddColumn("Adjust",75,FieldValueType.Number,new Font("Tahoma",8));
@@ -827,6 +829,7 @@ namespace OpenDental{
 				//Add tableTotals to the report.
 				//No column name and no header because we want to display this table to NOT look like a table.
 				query=report.AddQuery(tableTotals,"","",SplitByKind.None,2,false);
+        query.IsWrappingText=false;
 				query.AddColumn("",785,FieldValueType.String,new Font("Tahoma",8,FontStyle.Bold));
 			}
 			report.AddPageNum();

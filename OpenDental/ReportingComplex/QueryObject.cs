@@ -31,6 +31,7 @@ namespace OpenDental.ReportingComplex {
 		private bool _suppressHeaders;
 		private bool _isLastSplit;
 		private bool _isNegativeSummary;
+    private bool _isWrappingText=true;
 		public bool IsPrinted;
 
 		#region Properties
@@ -158,6 +159,15 @@ namespace OpenDental.ReportingComplex {
 			}
 			set {
 				_isNegativeSummary=value;
+			}
+		}
+
+    public bool IsWrappingText {
+			get {
+				return _isWrappingText;
+			}
+			set {
+				_isWrappingText=value;
 			}
 		}
 		#endregion
@@ -905,10 +915,15 @@ namespace OpenDental.ReportingComplex {
 						List<string> listString=GetDisplayString(rawText,prevDisplayText,reportObject,i);
 						displayText=listString[0];
 						prevDisplayText=listString[1];
-						int curCellHeight=(int)(g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height;
-						if(curCellHeight>rowHeight) {
-							rowHeight=curCellHeight;
-						}
+            int curCellHeight=0;
+            if(_isWrappingText) { 
+						  curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,(int)(reportObject.Size.Width),
+							  ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
+            }
+            else {
+              curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,0,
+							  ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
+            }
 					}
 				}
 				_rowHeightValues.Add(rowHeight);
@@ -1025,6 +1040,7 @@ namespace OpenDental.ReportingComplex {
 			queryObj._isLastSplit=this._isLastSplit;//Doesn't need to be a deep copy.
 			queryObj._rowHeightValues=new List<int>();
 			queryObj._isNegativeSummary=this._isNegativeSummary;
+      queryObj._isWrappingText=this._isWrappingText;
 			for(int i=0;i<this._rowHeightValues.Count;i++) {
 				queryObj._rowHeightValues.Add(this._rowHeightValues[i]);
 			}
