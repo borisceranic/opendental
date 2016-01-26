@@ -230,6 +230,7 @@ namespace OpenDental{
 			if(!PrefC.HasClinicsEnabled) {
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
+				butPickClinic.Visible=false;
 			}
 			else {
 				comboClinic.Items.Add(Lan.g(this,"All"));
