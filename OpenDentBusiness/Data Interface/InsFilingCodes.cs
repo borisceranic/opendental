@@ -35,6 +35,27 @@ namespace OpenDentBusiness{
 			return "CI";
 		}
 
+		///<summary>Gets the InsFilingCode for the specified eclaimCode, or creates one if the eclaimCodes does not exist.</summary>
+		public static InsFilingCode GetOrInsertForEclaimCode(string descript,string eclaimCode) {
+			//No need to check RemotingRole; no call to db.
+			int itemOrderMax=0;
+			for(int i=0;i<InsFilingCodeC.Listt.Count;i++) {
+				if(InsFilingCodeC.Listt[i].ItemOrder > itemOrderMax) {
+					itemOrderMax=InsFilingCodeC.Listt[i].ItemOrder;
+				}
+				if(InsFilingCodeC.Listt[i].EclaimCode != eclaimCode) {
+					continue;
+				}
+				return InsFilingCodeC.Listt[i];
+			}
+			InsFilingCode insFilingCode=new InsFilingCode();
+			insFilingCode.Descript=descript;
+			insFilingCode.EclaimCode=eclaimCode;
+			insFilingCode.ItemOrder=(itemOrderMax+1);
+			Insert(insFilingCode);
+			return insFilingCode;
+		}
+
 		///<summary></summary>
 		public static long Insert(InsFilingCode insFilingCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

@@ -597,7 +597,7 @@ namespace OpenDentBusiness
 		///<summary>INS11</summary>
 		public string DateTimePeriodFormatQualifier;
 		///<summary>INS12</summary>
-		public string DateTimePeriod;
+		public string DateOfDeath;
 		///<summary>INS13</summary>
 		public string ConfidentialityCode;
 		///<summary>INS17</summary>
@@ -616,7 +616,7 @@ namespace OpenDentBusiness
 			StudentStatusCode=seg.Get(9);
 			YesNoConditionOrResponseCode2=seg.Get(10);
 			DateTimePeriodFormatQualifier=seg.Get(11);
-			DateTimePeriod=seg.Get(12);
+			DateOfDeath=seg.Get(12);
 			ConfidentialityCode=seg.Get(13);
 			Number=seg.Get(17);
 		}

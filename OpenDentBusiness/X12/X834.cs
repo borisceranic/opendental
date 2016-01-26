@@ -1178,5 +1178,258 @@ namespace OpenDentBusiness {
 		public X12_N4 MemberSchoolCityStateZipCode;
 	}
 
+	///<summary>We use this object to convert formalized objects into OD formalized objects.</summary>
+	public class Hx834Ins {
+
+		public Hx834_Member Member;
+		public Hx834_HealthCoverage HealthCoverage;
+		public Patient Pat=new Patient();
+		public InsPlan Ins=new InsPlan();
+		public PatPlan Plan=new PatPlan();
+		public InsSub Sub=new InsSub();
+
+		public Hx834Ins(Hx834_Member member,Hx834_HealthCoverage healthCoverage) {
+			Member=member;
+			Pat.FName=member.MemberName.NameFirst;
+			Pat.MiddleI=member.MemberName.NameMiddle;
+			Pat.LName=member.MemberName.NameLast;
+			if(member.MemberName.IdentificationCodeQualifier=="34") {
+				Pat.SSN=member.MemberName.IdentificationCode;
+			}
+			if(member.MemberCommunicationsNumbers!=null) {
+				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier1,member.MemberCommunicationsNumbers.CommunicationNumber1);
+				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier2,member.MemberCommunicationsNumbers.CommunicationNumber2);
+				SetContactInfo(member.MemberCommunicationsNumbers.CommunicationNumberQualifier3,member.MemberCommunicationsNumbers.CommunicationNumber3);
+			}
+			if(member.MemberDemographics!=null) {
+				SetGender(member.MemberDemographics.GenderCode);
+				//TODO: continue with this segment next time.
+			}
+			if(member.MemberMailingAddress!=null) {
+				Pat.Address=member.MemberMailStreetAddress.AddressInformation1;
+				Pat.Address2=member.MemberMailStreetAddress.AddressInformation2;
+				Pat.City=member.MemberMailCityStateZipCode.CityName;
+				Pat.State=member.MemberMailCityStateZipCode.StateOrProvinceCode;
+				Pat.Zip=member.MemberMailCityStateZipCode.PostalCode;
+			}
+			Pat.StudentStatus="N";
+			if(member.ListMemberSchools.Count > 0) {
+				Pat.SchoolName=member.ListMemberSchools[0].MemberSchool.NameLast;
+			}
+			HealthCoverage=healthCoverage;
+			if(healthCoverage!=null) {
+				Pat.HasIns="I";
+			}
+			ReadMemberLevelDetail(member.MemberLevelDetail);
+			Sub.SubscriberID=member.SubscriberIdentifier.ReferenceId;
+			if(member.MemberPolicyNumber!=null) {
+				Ins.GroupNum=member.MemberPolicyNumber.ReferenceId;
+			}
+		}
+
+		private void SetContactInfo(string qualifier,string number) {
+			if(qualifier=="AP") {//Alternate Phone
+				if(Pat.AddrNote!="") {
+					Pat.AddrNote+="\r\n";
+				}
+				Pat.AddrNote+="Alternate Phone: "+number;
+			}
+			else if(qualifier=="") {//Beeper Number
+				if(Pat.AddrNote!="") {
+					Pat.AddrNote+="\r\n";
+				}
+				Pat.AddrNote+="Beeper: "+number;
+			}
+			else if(qualifier=="") {//Cellular Phone
+				Pat.WirelessPhone=number;
+			}
+			else if(qualifier=="") {//Electronic Mail
+				Pat.Email=number;
+			}
+			else if(qualifier=="") {//Telephone Extension
+				if(Pat.AddrNote!="") {
+					Pat.AddrNote+="\r\n";
+				}
+				Pat.AddrNote+="Extension: "+number;
+			}
+			else if(qualifier=="") {//Facsimile
+				if(Pat.AddrNote!="") {
+					Pat.AddrNote+="\r\n";
+				}
+				Pat.AddrNote+="Fax: "+number;
+			}
+			else if(qualifier=="") {//Home Phone Number
+				Pat.HmPhone=number;
+			}
+			else if(qualifier=="") {//Telephone
+				if(Pat.AddrNote!="") {
+					Pat.AddrNote+="\r\n";
+				}
+				Pat.AddrNote+="Phone: "+number;
+			}
+			else if(qualifier=="") {//Work Phone Number
+				Pat.WkPhone=number;
+			}
+		}
+
+		private void SetGender(string genderCode) {
+			if(genderCode=="F") {
+				Pat.Gender=PatientGender.Female;
+			}
+			else if(genderCode=="M") {
+				Pat.Gender=PatientGender.Male;
+			}
+			Pat.Gender=PatientGender.Unknown;
+		}
+
+		private void ReadMemberLevelDetail(X12_INS mld) {
+			//INS01: Useless, because INS02 provides the same information with more detail.
+			Plan.Relationship=GetRelatForCode(mld.IndividualRelationshipCode);//INS02:
+			//INS03: TODO
+			//INS04: Nowhere to store this information, and nobody cares why the change has occured, only that it did occur.
+			//INS05: Nowhere to store this information.  Plus this does not tell us if the subscriber is inactive.			
+			Ins.FilingCode=GetInsFilingCodeNum(mld.MedicareStatusCode);//INS06:
+			//INS07: Nowhere to store this information, and nobody cares why the change has occured, only that it did occur.
+			//INS08: Nowhere to store Employment Status, but there is a place to store the Employer Name.
+			Pat.StudentStatus=mld.StudentStatusCode;//INS09: Student Status Code.  One-to-one conversion.
+			//INS10: Nowhere to store this information.  If Handicapped Dependent, then the information was already given to us in INS02.
+			//INS11: All dates are always D8 format.
+			Pat.DateTimeDeceased=X12Parse.ToDate(mld.DateOfDeath);//INS12:
+			Sub.ReleaseInfo=false;//INS13:
+			if(mld.ConfidentialityCode=="U") {
+				Sub.ReleaseInfo=true;
+			}
+			//INS14: Not used.
+			//INS15: Not used.
+			//INS16: Not used.
+			//INS17: Birth Sequence Number.  Nowhere to store this information.			
+		}
+
+		///<summary>Relationship of the patient to the subscriber.</summary>
+		private Relat GetRelatForCode(string relationshipCode) {
+			if(relationshipCode=="01") {//Spouse
+				return Relat.Spouse;
+			}
+			else if(relationshipCode=="03") {//Father or Mother
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="04") {//Grandfather or Grandmother
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="05") {//Grandson or Granddaughter
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="06") {//Uncle or Aunt
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="07") {//Niece or Nephew
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="08") {//Cousin
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="09") {//Adopted Child
+				return Relat.Child;
+			}
+			else if(relationshipCode=="10") {//Foster Child
+				return Relat.Child;
+			}
+			else if(relationshipCode=="11") {//Son-in-law or Daugther-in-law
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="12") {//Brother-in-law or Sister-in-law
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="13") {//Mother-in-law or Father-in-law
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="14") {//Brother or Sister
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="15") {//Ward
+				return Relat.HandicapDep;
+			}
+			else if(relationshipCode=="16") {//Stepparent
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="17") {//Stepson or Stepdaughter
+				return Relat.Child;
+			}
+			else if(relationshipCode=="18") {//Self
+				return Relat.Self;
+			}
+			else if(relationshipCode=="19") {//Child
+				return Relat.Child;
+			}
+			else if(relationshipCode=="23") {//Sponsored Dependent
+				return Relat.Dependent;
+			}
+			else if(relationshipCode=="24") {//Dependent of Minor Dependent
+				return Relat.Dependent;
+			}
+			else if(relationshipCode=="25") {//Ex-spouse
+				return Relat.SignifOther;
+			}
+			else if(relationshipCode=="26") {//Guardian
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="31") {//Court Appointed Guardian
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="38") {//Collateral Dependent
+				return Relat.Dependent;
+			}
+			else if(relationshipCode=="53") {//Life Partner
+				return Relat.LifePartner;
+			}
+			else if(relationshipCode=="60") {//Annuitant
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="D2") {//Trustee
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="G8") {//Other Relationship
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			else if(relationshipCode=="G9") {//Other Relative
+				return Relat.Dependent;//No direct correlation to the standard.
+			}
+			return Relat.Dependent;//Worst case.
+		}
+
+		private long GetInsFilingCodeNum(string medicareStatusCode) {
+			bool isMedicareA=false;
+			bool isMedicareB=false;
+			if(medicareStatusCode.StartsWith("A")) {//Medicare Part A (Hospital Insurance)
+				isMedicareA=true;
+			}
+			else if(medicareStatusCode.StartsWith("B")) {//Medicare Part B (Medical Insurance)
+				isMedicareB=true;
+			}
+			else if(medicareStatusCode.StartsWith("C")) {//Medicare Part A (Hospital Insurance) and Part B (Medical Insurance)
+				//We can only specify one filing code, so we have to pick either A or B.
+				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
+			}
+			else if(medicareStatusCode.StartsWith("D")) {//Medicare.  Presumably this is the same as "C" above.
+				//We can only specify one filing code, so we have to pick either A or B.
+				isMedicareB=true;//Medical insurance is more likely for OD users than Hospital insurance is.
+			}
+			else {
+				//Not Medicare.  Do not set filing code, since we do not know what to set it to.  Will go out as Commercial Ins in 837, since unspecified.
+			}
+			if(isMedicareA) {
+				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartA","MA");
+				return insFilingCode.InsFilingCodeNum;
+			}
+			if(isMedicareB) {
+				InsFilingCode insFilingCode=InsFilingCodes.GetOrInsertForEclaimCode("MedicarePartB","MB");
+				return insFilingCode.InsFilingCodeNum;
+			}
+			return 0;
+		}
+
+
+	}
+
 	#endregion Helper Classes
 }
