@@ -2406,6 +2406,7 @@ namespace OpenDentBusiness{
 			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum,userNum);
+				return;
 			}
 			List<Appointment> listDB=Appointments.GetListForPat(patNum);
 			Crud.AppointmentCrud.Sync(listNew,listDB,userNum);
