@@ -49,6 +49,10 @@ namespace CentralManager {
 			}
 			else{
 				HashedResult=Userods.HashPassword(textPassword.Text);
+				if(Userods.GetUserByName(textUserName.Text,false).UserName==Security.CurUser.UserName) {
+					Security.PasswordTyped=textPassword.Text;
+					//They're updating the password for the logged in user.  Update CurUser for when they sync then attempt to log into remote DB.
+				}
 			}
 			DialogResult=DialogResult.OK;
 		}
