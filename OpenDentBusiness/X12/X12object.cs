@@ -161,6 +161,9 @@ namespace OpenDentBusiness
 		}
 
 		public bool Is271() {
+			if(this.FunctGroups.Count!=1) {
+				return false;
+			}
 			if(this.FunctGroups[0].Transactions[0].Header.Get(1)=="271") {
 				return true;
 			}
