@@ -4175,31 +4175,82 @@ namespace OpenDental{
 			comboSecProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum)+1;
 		}
 
-		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {			
+		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {
+			RemoveIllogicalRaceCombinations();
+			SetRequiredFields();
+		}
+
+		///<summary>Disallows the user from selecting illogical combinations such as 'DeclinedToSpecify' and 'Asian'.</summary>
+		private void RemoveIllogicalRaceCombinations() {
 			if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
-				SetRequiredFields();
 				return;
+			}
+			int declinedIdx;
+			int otherIdx;
+			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				declinedIdx=4;
+				otherIdx=6;
+			}
+			else {
+				declinedIdx=5;
+				otherIdx=9;
 			}
 			//The first selected is 'None', so unselect it.
 			if(comboBoxMultiRace.ListSelectedIndices[0]==0) {
-				comboBoxMultiRace.SelectedIndices.Remove(0);
+				comboBoxMultiRace.SetSelected(0,false);
+				if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
+					return;
+				}
 			}
 			//The first selected is 'DeclinedToSpecify', so unselect it.
-			if(comboBoxMultiRace.ListSelectedIndices[0]==4) {
-				comboBoxMultiRace.SelectedIndices.Remove(4);
+			if(comboBoxMultiRace.ListSelectedIndices[0]==declinedIdx) {
+				comboBoxMultiRace.SetSelected(declinedIdx,false);
+				if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
+					return;
+				}
+			}
+			//The first selected is 'Other', so unselect it.
+			if(comboBoxMultiRace.ListSelectedIndices[0]==otherIdx) {
+				comboBoxMultiRace.SetSelected(otherIdx,false);
+				if(comboBoxMultiRace.ListSelectedIndices.Count<2) {
+					return;
+				}
 			}
 			//'None' is either the last one selected or in the middle of the items selected, so unselect all but 'None'.
 			if(comboBoxMultiRace.ListSelectedIndices.Contains(0)) {
-				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {0});
-				SetRequiredFields();
+				comboBoxMultiRace.SelectedIndices.Clear();
+				comboBoxMultiRace.SetSelected(0,true);
 				return;
 			}
 			//'DeclinedToSpecify' is either the last one selected or in the middle of the items selected, so unselect all but 'DeclinedToSpecify'.
-			if(comboBoxMultiRace.ListSelectedIndices.Contains(4)) {
-				comboBoxMultiRace.SelectedIndices=new System.Collections.ArrayList(new int[] {4});
+			if(comboBoxMultiRace.ListSelectedIndices.Contains(declinedIdx)) {
+				comboBoxMultiRace.SelectedIndices.Clear();
+				comboBoxMultiRace.SetSelected(declinedIdx,true);
+				return;
 			}
-			SetRequiredFields();
-		}	
+			//'Other' is either the last one selected or in the middle of the items selected, so unselect all but 'Other'.
+			if(comboBoxMultiRace.ListSelectedIndices.Contains(otherIdx)) {
+				comboBoxMultiRace.SelectedIndices.Clear();
+				comboBoxMultiRace.SetSelected(otherIdx,true);
+				return;
+			}
+			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				return;
+			}
+			//Guaranteed to be at least 2 selected indices if we get here
+			int hispanicIdx = 7;
+			int nonHispanicIdx = 11;
+			//The last one selected is 'Hispanic' and 'NotHispanic' is also selected.
+			if(comboBoxMultiRace.ListSelectedIndices[comboBoxMultiRace.ListSelectedIndices.Count-1]==hispanicIdx
+				&& comboBoxMultiRace.ListSelectedIndices.Contains(nonHispanicIdx)) {
+				comboBoxMultiRace.SetSelected(nonHispanicIdx,false);
+			}
+			//The last one selected is 'NotHispanic' and 'Hispanic' is also selected.
+			else if(comboBoxMultiRace.ListSelectedIndices[comboBoxMultiRace.ListSelectedIndices.Count-1]==nonHispanicIdx
+				&& comboBoxMultiRace.ListSelectedIndices.Contains(hispanicIdx)) {
+				comboBoxMultiRace.SetSelected(hispanicIdx,false);
+			}
+		}
 
 		///<summary>Gets an employerNum based on the name entered. Called from FillCur</summary>
 		private void GetEmployerNum(){
