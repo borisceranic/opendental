@@ -924,6 +924,9 @@ namespace OpenDental.ReportingComplex {
               curCellHeight=(int)((g.MeasureString(displayText,reportObject.Font,0,
 							  ReportObject.GetStringFormatAlignment(reportObject.ContentAlignment))).Height*(100f/96f));//due to pixel factor
             }
+            if(curCellHeight>rowHeight) {
+							rowHeight=curCellHeight;
+						}
 					}
 				}
 				_rowHeightValues.Add(rowHeight);
