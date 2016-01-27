@@ -60,6 +60,10 @@ namespace CentralManager {
 			}
 			_userCur.IsHidden=checkIsHidden.Checked;
 			_userCur.UserName=textUserName.Text;
+			if(_userCur.UserNum==Security.CurUser.UserNum) {
+				Security.CurUser.UserName=textUserName.Text;
+				//They changed their logged in user's information.  Update for when they sync then attempt to connect to remote DB.
+			}
 			_userCur.UserGroupNum=UserGroups.List[listUserGroup.SelectedIndex].UserGroupNum;
 			_userCur.EmployeeNum=0;
 			_userCur.ProvNum=0;
