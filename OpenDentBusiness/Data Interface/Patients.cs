@@ -1977,7 +1977,8 @@ FROM insplan";
 				//screenpat.ScreenPatNum IS NOT a PatNum so it is should not be merged.  It is a primary key.
 				//"securitylog.FKey",  //This would only matter when the FKey pointed to a PatNum.  Currently this is only for the PatientPortal permission
 				//  which per Allen is not needed to be merged. 11/06/2015.
-				"securitylog.PatNum",
+				//"securitylog.PatNum",//Changing the PatNum of a securitylog record will cause it to show a red (untrusted) in the audit trail.
+				//  Best to preserve history in the securitylog and leave the corresponding PatNums static.
 				"sheet.PatNum",
 				"smsfrommobile.PatNum",
 				"smstomobile.PatNum",
