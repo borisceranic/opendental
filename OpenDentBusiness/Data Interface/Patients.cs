@@ -1927,7 +1927,8 @@ FROM insplan";
 				"reseller.PatNum",
 				"rxpat.PatNum",
 				"screenpat.PatNum",
-				"securitylog.PatNum",
+				//"securitylog.PatNum",//Changing the PatNum of a securitylog record will cause it to show a red (untrusted) in the audit trail.
+				//  Best to preserve history in the securitylog and leave the corresponding PatNums static.
 				"sheet.PatNum",
 				"statement.PatNum",
 				//task.KeyNum,  //Taken care of in a seperate step, because it is not always a patnum.
