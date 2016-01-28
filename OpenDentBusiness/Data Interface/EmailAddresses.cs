@@ -61,6 +61,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets the default email address for the clinic/practice. Takes a clinic num. If clinic num is 0 or there is no default for that clinic, it will get practice default. May return a new blank object.</summary>
 		public static EmailAddress GetByClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
 			EmailAddress emailAddress=null;
 			Clinic clinic=Clinics.GetClinic(clinicNum);
 			if(PrefC.GetBool(PrefName.EasyNoClinics) || clinic==null) {//No clinic, get practice default
@@ -122,6 +123,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Checks to make sure at least one non-user email address has a valid (not blank) SMTP server.</summary>
 		public static bool ExistsValidEmail() {
+			//No need to check RemotingRole; no call to db.
 			List<EmailAddress> listEmailAddresses=GetListt();
 			for(int i=0;i<listEmailAddresses.Count;i++) {
 				if(listEmailAddresses[i].SMTPserver!="") {
