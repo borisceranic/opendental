@@ -11932,15 +11932,22 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE proctp ADD ProcAbbr varchar2(50)";
 					Db.NonQ(command);
 				}
-				command="SELECT ProcCode,AbbrDesc FROM procedurecode GROUP BY ProcCode";
-				if(DataConnection.DBtype!=DatabaseType.MySql) {
-					command+=",AbbrDesc";
-				}
-				DataTable dataTableProcCodes=Db.GetTable(command);
-				foreach(DataRow row in dataTableProcCodes.Rows) {
-					command="UPDATE proctp SET ProcAbbr='"+POut.String(row["AbbrDesc"].ToString())+"' "
-						+"WHERE ProcCode='"+POut.String(row["ProcCode"].ToString())+"'";
+				//Update the new ProcAbbr column on the proctp column to match the AbbrDesc of the corresponding procedurecode.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="UPDATE proctp,procedurecode SET proctp.ProcAbbr=procedurecode.AbbrDesc WHERE proctp.ProcCode=procedurecode.ProcCode";
 					Db.NonQ(command);
+				}
+				else {//Oracle
+					//Oracle can't do the fast thing... so do the slow thing...
+					//The following loops were taking FAR too long in MySQL.  E.g. db with ~1K procedure codes and ~6K proctps was taking over 5 minutes.
+					//No one uses Oracle so who cares how long it takes.
+					command="SELECT ProcCode,AbbrDesc FROM procedurecode GROUP BY ProcCode,AbbrDesc";
+					DataTable dataTableProcCodes=Db.GetTable(command);
+					foreach(DataRow row in dataTableProcCodes.Rows) {
+						command="UPDATE proctp SET ProcAbbr='"+POut.String(row["AbbrDesc"].ToString())+"' "
+							+"WHERE ProcCode='"+POut.String(row["ProcCode"].ToString())+"'";
+						Db.NonQ(command);
+					}
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE screen ADD SheetNum bigint NOT NULL";
