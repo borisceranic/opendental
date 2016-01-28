@@ -11382,6 +11382,33 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.4.19.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To15_4_24();
+		}
+
+		private static void To15_4_24() {
+			if(FromVersion<new Version("15.4.24.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.24.0"));//No translation in convert script.
+				string command="";
+				//Add referring provider information to the 1500_02_12 medical claim form.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12' LIMIT 1";
+				}
+				else {//oracle doesn't have LIMIT
+					command="SELECT * FROM (SELECT ClaimFormNum FROM claimform WHERE UniqueID='OD12') WHERE RowNum<=1";
+				}
+				long claimFormNum=PIn.Long(Db.GetScalar(command));
+				command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+					+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','ReferringProvNPI','','349','587','166','14')";
+				Db.NonQ(command);
+				command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+					+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','ReferringProvNameFL','','69','587','226','14')";
+				Db.NonQ(command);
+				command="INSERT INTO claimformitem (ClaimFormItemNum,ClaimFormNum,ImageFileName,FieldName,FormatString,XPos,YPos,Width,Height) "
+					+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','FixedText','DN','33','587','24','14')";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '15.4.24.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_1_0();
 		}
 
