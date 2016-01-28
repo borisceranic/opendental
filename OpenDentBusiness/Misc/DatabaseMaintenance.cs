@@ -1718,25 +1718,29 @@ namespace OpenDentBusiness {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
 			}
 			string log="";
+			command="SELECT ClaimProcNum FROM claimproc "
+				+"INNER JOIN procedurelog ON procedurelog.ProcNum=claimproc.ProcNum "
+				+"WHERE claimproc.ProcNum>0 "
+				+"AND claimproc.PatNum!=procedurelog.PatNum "
+				+"AND claimproc.InsPayAmt=0 "
+				+"AND(claimproc.WriteOff=0 "
+				+"OR(claimproc.Status="+(int)ClaimProcStatus.CapEstimate+" "
+				+"AND claimproc.WriteOff=procedurelog.ProcFee AND procedurelog.ProcStatus IN("+(int)ProcStat.TP+","+(int)ProcStat.TPi+")))";
+			List<long> listClaimProcNums = Db.GetListLong(command);
 			if(isCheck) {
-				//claimproc.PatNum != procedurelog.PatNum
-				command="SELECT COUNT(*) FROM claimproc "
-					+"WHERE ProcNum > 0 " 
-					+"AND claimproc.PatNum!=(SELECT procedurelog.PatNum FROM procedurelog WHERE claimproc.ProcNum=procedurelog.ProcNum) "
-					+"AND claimproc.InsPayAmt=0 AND claimproc.WriteOff=0";
-				int numFound=PIn.Int(Db.GetCount(command));
+				int numFound=listClaimProcNums.Count;
 				if(numFound>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claimprocs found with PatNum that doesn't match the procedure PatNum: ")+numFound+"\r\n";
+					log+=Lans.g("FormDatabaseMaintenance","Claimprocs found with PatNum that doesn't match the procedure PatNum:")+" "+numFound+"\r\n";
 				}
 			}
 			else {
-				command="DELETE FROM claimproc "
-					+"WHERE ProcNum > 0 " 
-					+"AND claimproc.PatNum!=(SELECT procedurelog.PatNum FROM procedurelog WHERE claimproc.ProcNum=procedurelog.ProcNum) "
-					+"AND claimproc.InsPayAmt=0 AND claimproc.WriteOff=0";
-				long numberFixed=Db.NonQ(command);
-				if(numberFixed>0 || verbose) {
-					log+=Lans.g("FormDatabaseMaintenance","Claimprocs deleted due to PatNum not matching the procedure PatNum: ")+numberFixed.ToString()+"\r\n";
+				if(listClaimProcNums.Count>0) {
+					command="DELETE FROM claimproc WHERE ClaimProcNum IN("+string.Join(",",listClaimProcNums)+")";
+					long numberFixed=Db.NonQ(command);
+					if(numberFixed>0 || verbose) {
+						log+=Lans.g("FormDatabaseMaintenance","Claimprocs deleted due to PatNum not matching the procedure PatNum:")+" "
+							+numberFixed.ToString()+"\r\n";
+					}
 				}
 			}
 			return log;
