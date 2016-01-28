@@ -30,7 +30,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM wikipage WHERE PageTitle='_Master'";
+			string command="SELECT * FROM wikipage WHERE PageTitle='_Master' AND IsDraft=0";//There is currently no way for a master page to be a draft.
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="WikiPage";
 			FillCache(table);
@@ -44,35 +44,48 @@ namespace OpenDentBusiness{
 		}
 		#endregion CachePattern
 
-		///<summary>Returns null if page does not exist.</summary>
+		///<summary>Returns null if page does not exist. Does not return drafts.</summary>
 		public static WikiPage GetByTitle(string pageTitle) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<WikiPage>(MethodBase.GetCurrentMethod(),pageTitle);
 			}
-			string command="SELECT * FROM wikipage WHERE PageTitle='"+POut.String(pageTitle)+"'";
+			string command="SELECT * FROM wikipage WHERE PageTitle='"+POut.String(pageTitle)+"' AND IsDraft=0";
 			return Crud.WikiPageCrud.SelectOne(command);
 		}
 
-		///<summary>Returns a list of pages with PageTitle LIKE '%searchText%'.  Excludes titles that start with underscore.</summary>
+		///<summary>Returns a list of pages with PageTitle LIKE '%searchText%'.  Excludes titles that start with underscore.
+		///Does not return drafts.</summary>
 		public static List<WikiPage> GetByTitleContains(string searchText) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<WikiPage>>(MethodBase.GetCurrentMethod(),searchText);
 			}
-			string command="SELECT * FROM wikipage WHERE PageTitle NOT LIKE '\\_%' "
+			string command="SELECT * FROM wikipage WHERE PageTitle NOT LIKE '\\_%' AND IsDraft=0 "
 				+"AND PageTitle LIKE '%"+POut.String(searchText)+"%' ORDER BY PageTitle";
 			return Crud.WikiPageCrud.SelectMany(command);
 		}
 
-		///<summary>Used when saving a page to check and fix the capitalization on each internal link. So the returned pagetitle might have different capitalization than the supplied pagetitle</summary>
+		///<summary>Returns empty list if page does not exist.</summary>
+		public static List<WikiPage> GetDraftsByTitle(string pageTitle) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<WikiPage>>(MethodBase.GetCurrentMethod(),pageTitle);
+			}
+			string command="SELECT * FROM wikipage WHERE PageTitle='"+POut.String(pageTitle)+"' AND IsDraft=1";
+			return Crud.WikiPageCrud.SelectMany(command);
+		}
+
+		///<summary>Used when saving a page to check and fix the capitalization on each internal link. 
+		///So the returned pagetitle might have different capitalization than the supplied pagetitle.
+		///Does not return drafts.</summary>
 		public static string GetTitle(string pageTitle) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),pageTitle);
 			}
-			string command="SELECT PageTitle FROM wikipage WHERE PageTitle = '"+POut.String(pageTitle)+"'";
+			string command="SELECT PageTitle FROM wikipage WHERE PageTitle = '"+POut.String(pageTitle)+"' AND IsDraft=0";
 			return Db.GetScalar(command);
 		}
 
-		///<summary>Archives first by moving to WikiPageHist if it already exists.  Then, in either case, it inserts the new page.</summary>
+		///<summary>Archives first by moving to WikiPageHist if it already exists.  Then, in either case, it inserts the new page.
+		///Does not delete drafts.</summary>
 		public static long InsertAndArchive(WikiPage wikiPage) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				wikiPage.WikiPageNum=Meth.GetLong(MethodBase.GetCurrentMethod(),wikiPage);
@@ -82,13 +95,36 @@ namespace OpenDentBusiness{
 			if(wpExisting!=null) {
 				WikiPageHist wpHist=PageToHist(wpExisting);
 				WikiPageHists.Insert(wpHist);
-				string command= "DELETE FROM wikipage WHERE PageTitle = '"+POut.String(wikiPage.PageTitle)+"'";
+				string command="DELETE FROM wikipage WHERE PageTitle = '"+POut.String(wikiPage.PageTitle)+"' AND IsDraft=0";
 				Db.NonQ(command);
 			}
+			wikiPage.IsDraft=false;
 			return Crud.WikiPageCrud.Insert(wikiPage);
 		}
 
-		///<summary>Searches keywords, title, content.</summary>
+		///<summary>Should only be used for inserting drafts.  Inserting a non-draft wikipage should call InsertAndArchive.</summary>
+		public static void InsertAsDraft(WikiPage wikiPage) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiPage);
+				return;
+			}
+			wikiPage.IsDraft=true;
+			Crud.WikiPageCrud.Insert(wikiPage);
+		}
+
+		///<summary>Throws Exceptions, surround with try catch. Should only be used for updating drafts.  Updating a non-draft wikipage should never happen.</summary>
+		public static void UpdateDraft(WikiPage wikiPage) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiPage);
+				return;
+			}
+			if(!wikiPage.IsDraft) {
+				throw new Exception("Can only use for updating drafts.");
+			}
+			Crud.WikiPageCrud.Update(wikiPage);
+		}
+
+		///<summary>Searches keywords, title, content.  Does not return pagetitles for drafts.</summary>
 		public static List<string> GetForSearch(string searchText,bool ignoreContent) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),searchText,ignoreContent);
@@ -102,7 +138,7 @@ namespace OpenDentBusiness{
 				"SELECT PageTitle FROM wikiPage "
 				// \_ represents a literal _ because _ has a special meaning in LIKE clauses.
 				//The second \ is just to escape the first \.  The other option would be to pass the \ through POut.String.
-				+"WHERE PageTitle NOT LIKE '\\_%' ";
+				+"WHERE PageTitle NOT LIKE '\\_%' AND IsDraft=0 ";
 			for(int i=0;i<searchTokens.Length;i++) {
 				command+="AND KeyWords LIKE '%"+POut.String(searchTokens[i])+"%' ";
 			}
@@ -118,7 +154,7 @@ namespace OpenDentBusiness{
 			//Match PageTitle Second-----------------------------------------------------------------------------------
 			command=
 				"SELECT PageTitle FROM wikiPage "
-				+"WHERE PageTitle NOT LIKE '\\_%' ";
+				+"WHERE PageTitle NOT LIKE '\\_%' AND IsDraft=0 ";
 			for(int i=0;i<searchTokens.Length;i++) {
 				command+="AND PageTitle LIKE '%"+POut.String(searchTokens[i])+"%' ";
 			}
@@ -135,7 +171,7 @@ namespace OpenDentBusiness{
 			if(!ignoreContent) {
 				command=
 					"SELECT PageTitle FROM wikiPage "
-					+"WHERE PageTitle NOT LIKE '\\_%' ";
+					+"WHERE PageTitle NOT LIKE '\\_%' AND IsDraft=0 ";
 				for(int i=0;i<searchTokens.Length;i++) {
 					command+="AND PageContent LIKE '%"+POut.String(searchTokens[i])+"%' ";
 				}
@@ -152,17 +188,19 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>Returns a list of all pages that reference "PageTitle".  No historical pages.</summary>
+		///<summary>Returns a list of all pages that reference "PageTitle".  No historical pages or drafts.</summary>
 		public static List<WikiPage> GetIncomingLinks(string pageTitle) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<WikiPage>>(MethodBase.GetCurrentMethod(),pageTitle);
 			}
 			List<WikiPage> retVal=new List<WikiPage>();
-			string command="SELECT * FROM wikipage WHERE PageContent LIKE '%[["+POut.String(pageTitle)+"]]%' ORDER BY PageTitle";
+			string command="SELECT * FROM wikipage WHERE PageContent LIKE '%[["+POut.String(pageTitle)+"]]%' AND IsDraft=0 ORDER BY PageTitle";
 			return Crud.WikiPageCrud.SelectMany(command);
 		}
 
-		///<summary>Validation was already done in FormWikiRename to make sure that the page does not already exist in WikiPage table.  But what if the page already exists in WikiPageHistory?  In that case, previous history for the other page would start showing as history for the newly renamed page, which is fine.</summary>
+		///<summary>Validation was already done in FormWikiRename to make sure that the page does not already exist in WikiPage table.
+		///But what if the page already exists in WikiPageHistory?  In that case, previous history for the other page would start showing as history for
+		///the newly renamed page, which is fine.  Also renamed drafts, so that we can still match them to their parent wiki page.</summary>
 		public static void Rename(WikiPage wikiPage, string newPageTitle) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiPage,newPageTitle);
@@ -691,8 +729,20 @@ namespace OpenDentBusiness{
 			return paragraph;
 		}
 
-		///<summary>Creates historical entry of deletion into wikiPageHist, and deletes current page from WikiPage.</summary>
-		public static void Delete(string pageTitle) {
+		///<summary>Throws exceptions, surround with Try catch.Only delete wiki drafts with this function.  Normal wiki pages cannot be deleted, only archived.</summary>
+		public static void DeleteDraft(WikiPage wikiPage) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),wikiPage);
+				return;
+			}
+			if(!wikiPage.IsDraft) {
+				throw new Exception("Can only use for deleting drafts.");
+			}
+			Crud.WikiPageCrud.Delete(wikiPage.WikiPageNum);
+		}
+
+		///<summary>Creates historical entry of deletion into wikiPageHist, and deletes current non-draft page from WikiPage.</summary>
+		public static void Archive(string pageTitle) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),pageTitle);
 				return;
@@ -705,7 +755,7 @@ namespace OpenDentBusiness{
 			wikiPageHist.IsDeleted=true;
 			wikiPageHist.UserNum=Security.CurUser.UserNum;
 			WikiPageHists.Insert(wikiPageHist);
-			string command= "DELETE FROM wikipage WHERE PageTitle = '"+POut.String(pageTitle)+"'";
+			string command= "DELETE FROM wikipage WHERE PageTitle = '"+POut.String(pageTitle)+"' AND IsDraft=0 ";
 			Db.NonQ(command);
 		}
 

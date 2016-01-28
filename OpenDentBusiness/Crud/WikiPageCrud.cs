@@ -52,6 +52,7 @@ namespace OpenDentBusiness.Crud{
 				wikiPage.KeyWords     = PIn.String(row["KeyWords"].ToString());
 				wikiPage.PageContent  = PIn.String(row["PageContent"].ToString());
 				wikiPage.DateTimeSaved= PIn.DateT (row["DateTimeSaved"].ToString());
+				wikiPage.IsDraft      = PIn.Bool  (row["IsDraft"].ToString());
 				retVal.Add(wikiPage);
 			}
 			return retVal;
@@ -69,6 +70,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("KeyWords");
 			table.Columns.Add("PageContent");
 			table.Columns.Add("DateTimeSaved");
+			table.Columns.Add("IsDraft");
 			foreach(WikiPage wikiPage in listWikiPages) {
 				table.Rows.Add(new object[] {
 					POut.Long  (wikiPage.WikiPageNum),
@@ -77,6 +79,7 @@ namespace OpenDentBusiness.Crud{
 					POut.String(wikiPage.KeyWords),
 					POut.String(wikiPage.PageContent),
 					POut.DateT (wikiPage.DateTimeSaved),
+					POut.Bool  (wikiPage.IsDraft),
 				});
 			}
 			return table;
@@ -117,7 +120,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="WikiPageNum,";
 			}
-			command+="UserNum,PageTitle,KeyWords,PageContent,DateTimeSaved) VALUES(";
+			command+="UserNum,PageTitle,KeyWords,PageContent,DateTimeSaved,IsDraft) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(wikiPage.WikiPageNum)+",";
 			}
@@ -126,7 +129,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(wikiPage.PageTitle)+"',"
 				+"'"+POut.String(wikiPage.KeyWords)+"',"
 				+"'"+POut.String(wikiPage.PageContent)+"',"
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Bool  (wikiPage.IsDraft)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -159,7 +163,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="WikiPageNum,";
 			}
-			command+="UserNum,PageTitle,KeyWords,PageContent,DateTimeSaved) VALUES(";
+			command+="UserNum,PageTitle,KeyWords,PageContent,DateTimeSaved,IsDraft) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(wikiPage.WikiPageNum)+",";
 			}
@@ -168,7 +172,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(wikiPage.PageTitle)+"',"
 				+"'"+POut.String(wikiPage.KeyWords)+"',"
 				+"'"+POut.String(wikiPage.PageContent)+"',"
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Bool  (wikiPage.IsDraft)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -184,8 +189,9 @@ namespace OpenDentBusiness.Crud{
 				+"UserNum      =  "+POut.Long  (wikiPage.UserNum)+", "
 				+"PageTitle    = '"+POut.String(wikiPage.PageTitle)+"', "
 				+"KeyWords     = '"+POut.String(wikiPage.KeyWords)+"', "
-				+"PageContent  = '"+POut.String(wikiPage.PageContent)+"' "
-				//DateTimeSaved not allowed to change
+				+"PageContent  = '"+POut.String(wikiPage.PageContent)+"', "
+				+"DateTimeSaved=  "+POut.DateT (wikiPage.DateTimeSaved)+", "
+				+"IsDraft      =  "+POut.Bool  (wikiPage.IsDraft)+" "
 				+"WHERE WikiPageNum = "+POut.Long(wikiPage.WikiPageNum);
 			Db.NonQ(command);
 		}
@@ -209,7 +215,14 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PageContent = '"+POut.String(wikiPage.PageContent)+"'";
 			}
-			//DateTimeSaved not allowed to change
+			if(wikiPage.DateTimeSaved != oldWikiPage.DateTimeSaved) {
+				if(command!=""){ command+=",";}
+				command+="DateTimeSaved = "+POut.DateT(wikiPage.DateTimeSaved)+"";
+			}
+			if(wikiPage.IsDraft != oldWikiPage.IsDraft) {
+				if(command!=""){ command+=",";}
+				command+="IsDraft = "+POut.Bool(wikiPage.IsDraft)+"";
+			}
 			if(command==""){
 				return false;
 			}

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace OpenDentBusiness {
-	///<summary>Rows never edited, just added.  Contains all only newest versions of each page.</summary>
+	///<summary>Rows never edited, just added, unless the wiki page is a draft.  Contains only newest versions of each page and all drafts.</summary>
 	[Serializable]
 	public class WikiPage:TableBase {
 		///<summary>Primary key.</summary>
@@ -13,13 +13,15 @@ namespace OpenDentBusiness {
 		public string PageTitle;
 		///<summary>Automatically filled from the [[Keywords:]] tab in the PageContent field as page is being saved.</summary>
 		public string KeyWords;
-		///<summary>Content of page stored in "wiki markup language".  This should never be updated.  Medtext (16M)</summary>
+		///<summary>Content of page stored in "wiki markup language".  This should never be updated, unless it is a draft.  Medtext (16M)</summary>
 		public string PageContent;
-		///<summary>The DateTime that the page was saved to the DB.  User can't edit.</summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
+		///<summary>The DateTime that the page was saved to the DB.  User can't directly edit.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntryEditable)]
 		public DateTime DateTimeSaved;
 		//<summary>Deprecated.  Remove this.  When used in wikipagehist, this flag will only be set for the revision where the user marked it deleted (the last one).</summary>
 		//public bool IsDeleted;
+		///<summary>Signifies that the wiki page is a draft, and will only show in the Wiki Drafts form.</summary>
+		public bool IsDraft;
 
 		///<summary></summary>
 		public WikiPage Copy() {

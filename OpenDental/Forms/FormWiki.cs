@@ -127,6 +127,7 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Rename"),6,"","Rename"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Archive"),7,"","Archive"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"History"),8,"","History"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Drafts"),14,"","Drafts"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Incoming Links"),9,"","Inc Links"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add"),10,"","Add"));
@@ -165,6 +166,9 @@ namespace OpenDental {
 					break;
 				case "History":
 					History_Click();
+					break;
+				case "Drafts":
+					Drafts_Click();
 					break;
 				case "Inc Links":
 					Inc_Link_Click();
@@ -270,8 +274,16 @@ namespace OpenDental {
 			if(WikiPageCur==null) {
 				return;
 			}
+			if(WikiPages.GetDraftsByTitle(WikiPageCur.PageTitle).Count > 0 && MsgBox.Show(this,MsgBoxButtons.YesNo,
+				"This page has one or more drafts associated with it.  Would you like to open a draft instead of the current Wiki page?"))
+			{
+				FormWikiDrafts FormWD=new FormWikiDrafts();
+				FormWD.OwnerForm=this;
+				FormWD.ShowDialog();
+				return;
+			}
 			FormWikiEdit FormWE=new FormWikiEdit();
-			FormWE.WikiPageCur=WikiPageCur;
+			FormWE.WikiPageCur=WikiPageCur.Copy();
 			FormWE.OwnerForm=this;
 			FormWE.Show();
 		}
@@ -310,7 +322,7 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Archive this wiki page?  It will still be available from the Search window if needed.")) {
 				return;
 			}
-			WikiPages.Delete(WikiPageCur.PageTitle);
+			WikiPages.Archive(WikiPageCur.PageTitle);
 			//historyNavBack--;//do not decrement, load will consider this a branch and put "wiki:Home" in place of the deleted page and remove "forward" history.
 			LoadWikiPage("Home");
 		}
@@ -328,6 +340,19 @@ namespace OpenDental {
 			//	return;
 			//}
 			//Nothing to do here.
+		}
+
+		private void Drafts_Click() {
+			if(WikiPageCur==null) {
+				return;
+			}
+			if(WikiPages.GetDraftsByTitle(WikiPageCur.PageTitle).Count==0) {
+				MsgBox.Show(this,"There are no drafts for this Wiki Page.");
+				return;
+			}
+			FormWikiDrafts FormWD=new FormWikiDrafts();
+			FormWD.OwnerForm=this;
+			FormWD.ShowDialog();
 		}
 
 		private void Inc_Link_Click() {

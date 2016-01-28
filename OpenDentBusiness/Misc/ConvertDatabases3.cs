@@ -12700,7 +12700,20 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE dashboardlayout ADD DashboardGroupName varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE wikipage ADD IsDraft tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE wikipage ADD IsDraft number(3)";
+					Db.NonQ(command);
+					command="UPDATE wikipage SET IsDraft = 0 WHERE IsDraft IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE wikipage MODIFY IsDraft NOT NULL";
+					Db.NonQ(command);
+				}
 
+				
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

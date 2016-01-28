@@ -17,7 +17,7 @@ namespace OpenDental {
 		public WikiPage WikiPageCur;
 		///<summary>Need a reference to the form where this was launched from so that we can tell it to refresh later.</summary>
 		public FormWiki OwnerForm;
-		private bool closingIsSave;//used to differentiate what action caused the form to close.
+		public bool HasSaved;//used to differentiate what action caused the form to close.
 		private string AggregateContent;
 		private int ScrollTop;
 		
@@ -198,6 +198,7 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Clear();
 			//Refresh no longer needed.
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Save"),1,"","Save"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Save as Draft"),18,"","SaveDraft"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Cancel"),2,"","Cancel"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Int Link"),7,"","Int Link"));
@@ -234,6 +235,9 @@ namespace OpenDental {
 			switch(e.Button.Tag.ToString()) {
 				case "Save":
 					Save_Click();
+					break;
+				case "SaveDraft":
+					SaveDraft_Click();
 					break;
 				case "Cancel":
 					Cancel_Click();
@@ -319,7 +323,12 @@ namespace OpenDental {
 			}
 			WikiPage wikiPageDB=WikiPages.GetByTitle(WikiPageCur.PageTitle);
 			if(wikiPageDB!=null && WikiPageCur.DateTimeSaved<wikiPageDB.DateTimeSaved) {
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This page has been modified and saved since it was opened on this computer.  Save anyway?")) {
+				if(WikiPageCur.IsDraft) {
+					if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"The wiki page has been edited since this draft was last saved.  Overwrite and continue?")) {
+						return;
+					}
+				}
+				else if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This page has been modified and saved since it was opened on this computer.  Save anyway?")) {
 					return;
 				}
 			}
@@ -352,13 +361,70 @@ namespace OpenDental {
 			Regex regex=new Regex(@"\[\[(keywords:).+?\]\]");//only grab first match
 			Match m=regex.Match(textContent.Text);
 			WikiPageCur.KeyWords=m.Value.Replace("[[keywords:","").TrimEnd(']');//will be empty string if no match
+			if(WikiPageCur.IsDraft) {
+				WikiPages.DeleteDraft(WikiPageCur); //remove the draft from the database.
+				WikiPageCur.IsDraft=false; //no longer a draft
+			}
 			WikiPages.InsertAndArchive(WikiPageCur);
 			FormWiki formWiki=(FormWiki)this.OwnerForm;
 			if(formWiki!=null && !formWiki.IsDisposed) {
 				formWiki.RefreshPage(WikiPageCur.PageTitle);
 			}
-			closingIsSave=true;
+			HasSaved=true;
 			Close();//should be dialog result??
+		}
+
+		///<summary>Saves the the currently edited Wikipage as a draft. This method is copied from Save_Click with a few modifications.</summary>
+		private void SaveDraft_Click() {
+				if(!ValidateWikiPage(true)) {
+				return;
+			}
+			WikiPageCur.PageContent=textContent.Text;
+			//Fix case on all internal links
+			MatchCollection matches=Regex.Matches(WikiPageCur.PageContent,@"\[\[.+?\]\]");
+			foreach(Match match in matches) {
+				if(match.Value.StartsWith("[[img:")
+					|| match.Value.StartsWith("[[keywords:")
+					|| match.Value.StartsWith("[[file:")
+					|| match.Value.StartsWith("[[folder:")
+					|| match.Value.StartsWith("[[list:")
+					|| match.Value.StartsWith("[[color:")
+ 					|| match.Value.StartsWith("[[font:")) 
+				{
+					continue;//We don't care about these.  We are only checking internal links.
+				}
+				//Get the pagename of the link
+				string oldTitle=match.Value.Substring(2,match.Value.Length-4);
+				string newTitle=WikiPages.GetTitle(oldTitle);
+				if(oldTitle==newTitle) {//casing matches
+					continue;
+				}
+				if(newTitle=="") {//broken link, leave alone
+					continue;
+				}
+				WikiPageCur.PageContent=WikiPageCur.PageContent.Replace("[["+oldTitle+"]]","[["+newTitle+"]]");
+			}
+			WikiPageCur.UserNum=Security.CurUser.UserNum;
+			Regex regex=new Regex(@"\[\[(keywords:).+?\]\]");//only grab first match
+			Match m=regex.Match(textContent.Text);
+			WikiPageCur.KeyWords=m.Value.Replace("[[keywords:","").TrimEnd(']');//will be empty string if no match
+			if(WikiPageCur.IsDraft) { //If it's already a draft, overwrite the current one.
+				WikiPageCur.DateTimeSaved=DateTime.Now;
+				try {
+					WikiPages.UpdateDraft(WikiPageCur);
+				}
+				catch (Exception ex){
+					//should never happen due to the if Draft check above.
+					MessageBox.Show(ex.Message);
+					return;
+				}
+			}
+			else { //otherwise, set it as a draft, then insert it.
+				WikiPageCur.IsDraft=true;
+				WikiPages.InsertAsDraft(WikiPageCur);
+			}
+			//HasSaved not set so that the user will stay in FormWikiDrafts when this window closes, causing the grid to update.
+			Close();
 		}
 
 		private void Cancel_Click() {
@@ -824,7 +890,7 @@ namespace OpenDental {
 
 		private void FormWikiEdit_FormClosing(object sender,FormClosingEventArgs e) {
 			//handles both the Cancel button and the user clicking on the x, and also the save button.
-			if(closingIsSave) {
+			if(HasSaved) {
 				return;
 			}
 			if(textContent.Text!=WikiPageCur.PageContent){//why is this line of code here, why is it important?--Ryan
