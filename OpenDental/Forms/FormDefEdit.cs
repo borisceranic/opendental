@@ -228,7 +228,11 @@ namespace OpenDental{
 			if(IsNew){
 				;//handled from previous form
 			}
-			if(!CanEditName){
+			string itemName=DefCur.ItemName;
+			if(!CanEditName) {
+				//Allow foreign users to translate definitions that they do not have access to translate.
+				//Use FormDefinitions instead of 'this' because the users will have already translated the item names in that form and no need to duplicate.
+				itemName=Lan.g("FormDefinitions",DefCur.ItemName);
 				textName.ReadOnly=true;
 				if(!DefCur.IsHidden || DefC.IsDefDeprecated(DefCur)) {
 					checkHidden.Enabled=false;//prevent hiding defs that are hard-coded into OD. Prevent unhiding defs that are deprecated.
@@ -253,7 +257,7 @@ namespace OpenDental{
 			if(!CanDelete){
 				butDelete.Visible=false;
 			}
-			textName.Text=DefCur.ItemName;
+			textName.Text=itemName;
 			textValue.Text=DefCur.ItemValue;
 			butColor.BackColor=DefCur.ItemColor;
 			checkHidden.Checked=DefCur.IsHidden;

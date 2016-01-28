@@ -549,7 +549,12 @@ namespace OpenDental{
 				if(DefC.IsDefDeprecated(DefsList[i])) {
 					DefsList[i].IsHidden=true;
 				}
-				tbDefs.Cell[0,i]=DefsList[i].ItemName;
+				if(FormDefEdit.CanEditName) {
+					tbDefs.Cell[0,i]=DefsList[i].ItemName;
+				}
+				else {//Users cannot edit the item name so let them translate them.
+					tbDefs.Cell[0,i]=Lan.g("FormDefinitions",DefsList[i].ItemName);//Doesn't use 'this' so that renaming the form doesn't change the translation
+				}
 				if(lookupCat[listCategory.SelectedIndex]==DefCat.ImageCats) {
 					tbDefs.Cell[1,i]=GetItemDescForImages(DefsList[i].ItemValue);
 				}
