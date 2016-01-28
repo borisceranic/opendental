@@ -377,6 +377,13 @@ namespace OpenDental{
 						}
 					}
 					break;
+				case DefCat.ClaimCustomTracking:
+					int value=0;
+					if(!Int32.TryParse(textValue.Text,out value) || value<0) {
+						MsgBox.Show(this,"Days Suppressed must be a valid non-negative number.");
+						return;
+					}
+					break;
 				case DefCat.InsurancePaymentType:
 					if(textValue.Text!="" && textValue.Text!="N") {
 						MsgBox.Show(this,"Valid values are blank or N.");

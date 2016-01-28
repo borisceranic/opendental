@@ -413,7 +413,11 @@ namespace OpenDental{
 					FormDefEdit.CanDelete=true;
 					FormDefEdit.CanHide=false;
 					FormDefEdit.EnableColor=false;
-					FormDefEdit.HelpText=Lan.g(this,"Some offices may set up claim tracking statuses such as 'review', 'hold', 'riskmanage', etc.");
+					FormDefEdit.EnableValue=true;
+					FormDefEdit.ValueText=Lan.g(this,"Days Suppressed");
+					FormDefEdit.HelpText=Lan.g(this,"Some offices may set up claim tracking statuses such as 'review', 'hold', 'riskmanage', etc.")+"\r\n"
+						+Lan.g(this,"Set the value of 'Days Suppressed' to the number of days the claim will be suppressed from the Outstanding Claims Report "
+						+"when the status is changed to the selected status.");
 					break;
 				case 10://"Payment Tracking":
 					FormDefEdit.EnableColor=false;

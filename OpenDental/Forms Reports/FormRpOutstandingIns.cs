@@ -40,6 +40,7 @@ namespace OpenDental {
 		private ComboBoxMulti comboBoxMultiClinics;
 		private Label labelClinic;
 		private decimal total;
+		private CheckBox checkIgnoreCustom;
 		private List<Clinic> _listClinics;
 
 		public FormRpOutstandingIns() {
@@ -66,6 +67,7 @@ namespace OpenDental {
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.comboBoxMultiClinics = new OpenDental.UI.ComboBoxMulti();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this.checkIgnoreCustom = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// checkPreauth
@@ -74,9 +76,9 @@ namespace OpenDental {
 			this.checkPreauth.Checked = true;
 			this.checkPreauth.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkPreauth.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPreauth.Location = new System.Drawing.Point(296, 9);
+			this.checkPreauth.Location = new System.Drawing.Point(313, 9);
 			this.checkPreauth.Name = "checkPreauth";
-			this.checkPreauth.Size = new System.Drawing.Size(113, 18);
+			this.checkPreauth.Size = new System.Drawing.Size(149, 18);
 			this.checkPreauth.TabIndex = 51;
 			this.checkPreauth.Text = "Include Preauths";
 			this.checkPreauth.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -84,7 +86,7 @@ namespace OpenDental {
 			// 
 			// labelProv
 			// 
-			this.labelProv.Location = new System.Drawing.Point(410, 8);
+			this.labelProv.Location = new System.Drawing.Point(482, 8);
 			this.labelProv.Name = "labelProv";
 			this.labelProv.Size = new System.Drawing.Size(87, 16);
 			this.labelProv.TabIndex = 48;
@@ -93,7 +95,7 @@ namespace OpenDental {
 			// 
 			// labelDaysOldMin
 			// 
-			this.labelDaysOldMin.Location = new System.Drawing.Point(9, 7);
+			this.labelDaysOldMin.Location = new System.Drawing.Point(4, 7);
 			this.labelDaysOldMin.Name = "labelDaysOldMin";
 			this.labelDaysOldMin.Size = new System.Drawing.Size(93, 18);
 			this.labelDaysOldMin.TabIndex = 46;
@@ -102,7 +104,7 @@ namespace OpenDental {
 			// 
 			// labelDaysOldMax
 			// 
-			this.labelDaysOldMax.Location = new System.Drawing.Point(163, 7);
+			this.labelDaysOldMax.Location = new System.Drawing.Point(164, 7);
 			this.labelDaysOldMax.Name = "labelDaysOldMax";
 			this.labelDaysOldMax.Size = new System.Drawing.Size(53, 18);
 			this.labelDaysOldMax.TabIndex = 46;
@@ -111,9 +113,9 @@ namespace OpenDental {
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(100, 28);
+			this.label1.Location = new System.Drawing.Point(94, 28);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(175, 16);
+			this.label1.Size = new System.Drawing.Size(182, 19);
 			this.label1.TabIndex = 54;
 			this.label1.Text = "(leave both blank to show all)";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -173,7 +175,7 @@ namespace OpenDental {
 			this.comboBoxMultiProv.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiProv.DroppedDown = false;
 			this.comboBoxMultiProv.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiProv.Items")));
-			this.comboBoxMultiProv.Location = new System.Drawing.Point(498, 7);
+			this.comboBoxMultiProv.Location = new System.Drawing.Point(570, 7);
 			this.comboBoxMultiProv.Name = "comboBoxMultiProv";
 			this.comboBoxMultiProv.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiProv.SelectedIndices")));
 			this.comboBoxMultiProv.Size = new System.Drawing.Size(160, 21);
@@ -199,7 +201,7 @@ namespace OpenDental {
 			// 
 			// textDaysOldMax
 			// 
-			this.textDaysOldMax.Location = new System.Drawing.Point(219, 7);
+			this.textDaysOldMax.Location = new System.Drawing.Point(220, 7);
 			this.textDaysOldMax.MaxVal = 255;
 			this.textDaysOldMax.MinVal = 0;
 			this.textDaysOldMax.Name = "textDaysOldMax";
@@ -209,7 +211,7 @@ namespace OpenDental {
 			// 
 			// textDaysOldMin
 			// 
-			this.textDaysOldMin.Location = new System.Drawing.Point(106, 7);
+			this.textDaysOldMin.Location = new System.Drawing.Point(101, 7);
 			this.textDaysOldMin.MaxVal = 255;
 			this.textDaysOldMin.MinVal = 0;
 			this.textDaysOldMin.Name = "textDaysOldMin";
@@ -239,6 +241,7 @@ namespace OpenDental {
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 56);
@@ -256,7 +259,7 @@ namespace OpenDental {
 			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiClinics.DroppedDown = false;
 			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
-			this.comboBoxMultiClinics.Location = new System.Drawing.Point(498, 29);
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(570, 29);
 			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
@@ -265,7 +268,7 @@ namespace OpenDental {
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(410, 31);
+			this.labelClinic.Location = new System.Drawing.Point(482, 31);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(87, 16);
 			this.labelClinic.TabIndex = 60;
@@ -273,9 +276,22 @@ namespace OpenDental {
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			this.labelClinic.Visible = false;
 			// 
+			// checkIgnoreCustom
+			// 
+			this.checkIgnoreCustom.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIgnoreCustom.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkIgnoreCustom.Location = new System.Drawing.Point(313, 29);
+			this.checkIgnoreCustom.Name = "checkIgnoreCustom";
+			this.checkIgnoreCustom.Size = new System.Drawing.Size(149, 18);
+			this.checkIgnoreCustom.TabIndex = 61;
+			this.checkIgnoreCustom.Text = "Ignore Custom Tracking";
+			this.checkIgnoreCustom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkIgnoreCustom.CheckedChanged += new System.EventHandler(this.checkIgnoreCustom_CheckedChanged);
+			// 
 			// FormRpOutstandingIns
 			// 
 			this.ClientSize = new System.Drawing.Size(844, 512);
+			this.Controls.Add(this.checkIgnoreCustom);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.comboBoxMultiClinics);
 			this.Controls.Add(this.butRefresh);
@@ -417,6 +433,11 @@ namespace OpenDental {
 			string type;
 			total=0;
 			for(int i=0;i<Table.Rows.Count;i++){
+				DateTime dateLastLog=PIn.Date(Table.Rows[i]["DateLog"].ToString());
+				int daysSuppressed=PIn.Int(Table.Rows[i]["DaysSuppressed"].ToString());
+				if(!checkIgnoreCustom.Checked && dateLastLog.AddDays(daysSuppressed)>DateTime.Today) {
+					continue;
+				}
 				row=new ODGridRow();
 				row.Cells.Add(Table.Rows[i]["CarrierName"].ToString());
 				row.Cells.Add(Table.Rows[i]["Phone"].ToString());
@@ -491,6 +512,10 @@ namespace OpenDental {
 		}
 
 		private void checkPreauth_CheckedChanged(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void checkIgnoreCustom_CheckedChanged(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -733,11 +758,5 @@ namespace OpenDental {
 			}
 			MessageBox.Show(Lan.g(this,"File created successfully"));
 		}
-
-
-		
-
-
-
 	}
 }

@@ -14,12 +14,12 @@ namespace OpenDentBusiness {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),isAllProv,listProvNums,dateMin,dateMax,isPreauth,listClinicNums); 
 			} 
 			string command;
-			command = "SELECT carrier.CarrierName,carrier.Phone,claim.ClaimType,patient.FName,patient.LName,"
-				+"patient.MiddleI,patient.PatNum,claim.DateService,claim.DateSent,claim.ClaimFee,claim.ClaimNum,claim.ClinicNum "
-				+"FROM carrier,patient,claim,insplan "
-				+"WHERE carrier.CarrierNum = insplan.CarrierNum "
-				+"AND claim.PlanNum = insplan.PlanNum "
-				+"AND claim.PatNum = patient.PatNum "
+			command = "SELECT carrier.CarrierName,carrier.Phone,claim.ClaimType,patient.FName,patient.LName,patient.MiddleI,patient.PatNum,"
+				+"claim.DateService,claim.DateSent,claim.ClaimFee,claim.ClaimNum,claim.ClinicNum,"
+				+"definition.ItemValue DaysSuppressed,"+DbHelper.DtimeToDate("securitylog.LogDateTime")+" DateLog "
+				+"FROM carrier "
+				+"INNER JOIN insplan ON insplan.CarrierNum=carrier.CarrierNum "
+				+"INNER JOIN claim ON claim.PlanNum=insplan.PlanNum "
 				+"AND claim.ClaimStatus='S' ";
 			if(dateMin!=DateTime.MinValue) {
 				command+="AND claim.DateSent <= "+POut.Date(dateMin)+" ";
@@ -38,6 +38,12 @@ namespace OpenDentBusiness {
 			if(!isPreauth) {
 				command+="AND claim.ClaimType!='Preauth' ";
 			}
+			command+="LEFT JOIN definition ON definition.DefNum=claim.CustomTracking "
+				+"LEFT JOIN securitylog ON securitylog.FKey=claim.ClaimNum " //FKey matches ClaimNum
+					+"AND securitylog.DefNum=definition.DefNum "	//DefNum only used for claim custom history edits
+					+"AND securitylog.LogDateTime=(SELECT MAX(sl.LogDateTime) FROM securitylog sl WHERE sl.FKey=claim.ClaimNum AND sl.DefNum!=0) "
+					+"AND securitylog.PermType="+(int)Permissions.ClaimHistoryEdit+" "
+				+"INNER JOIN patient ON patient.PatNum=claim.PatNum ";
 			command+="ORDER BY carrier.Phone,insplan.PlanNum";
 			object[] parameters={command};
 			Plugins.HookAddCode(null,"Claims.GetOutInsClaims_beforequeryrun",parameters);//Moved entire method from Claims.cs
