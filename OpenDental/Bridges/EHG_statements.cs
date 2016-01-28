@@ -205,11 +205,11 @@ namespace OpenDental.Bridges {
 				fulldesc=procCode+" "+tth+" "+descript;//There are frequently CRs within a procedure description for things like ins est.
 				lineArray=fulldesc.Split(new string[] { "\r\n" },StringSplitOptions.RemoveEmptyEntries);
 				lines=new List<string>(lineArray);
-				//The specs say that the line limit is 30 char.  But in testing, it will take 50 char.
-				//We will use 40 char to be safe.
-				if(lines[0].Length>40) {
-					string newline=lines[0].Substring(40);
-					lines[0]=lines[0].Substring(0,40);//first half
+				//Jessica at DentalXchange says limit is 120.  Specs say limit is 30.
+				const int lineMaxLen=120;
+				if(lines[0].Length > lineMaxLen) {
+					string newline=lines[0].Substring(lineMaxLen);
+					lines[0]=lines[0].Substring(0,lineMaxLen);//first half
 					lines.Insert(1,newline);//second half
 				}
 				for(int li=0;li<lines.Count;li++) {
@@ -226,7 +226,7 @@ namespace OpenDental.Bridges {
 						writer.WriteElementString("PatientName","");
 					}
 					writer.WriteStartElement("Description");
-					writer.WriteCData(Tidy(lines[li],40));//Jessica at DentalXchange says limit is 120.  Docs say limit is 30. CData to allow any string.
+					writer.WriteCData(Tidy(lines[li],lineMaxLen));//CData to allow any string, including punctuation, syntax characters and special characters.
 					writer.WriteEndElement();//Description
 					if(li==0) {
 						writer.WriteElementString("Charges",tableAccount.Rows[i]["charges"].ToString());
