@@ -3387,6 +3387,8 @@ namespace OpenDental {
 					pattern="///";
 				}
 				Appointments.SetPattern(PIn.Long(TempApptSingle.DataRoww["AptNum"].ToString()),pattern);
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,PatCur.PatNum,Lan.g(this,"Appointment resized from the appointment module."),
+					PIn.Long(TempApptSingle.DataRoww["AptNum"].ToString()));//Generate FKey to the appointment to show the audit entry in the ApptEdit window.
 				ResizingAppt=false;
 				mouseIsDown=false;
 				TempApptSingle.Dispose();
