@@ -861,10 +861,8 @@ namespace OpenDental.InternalTools.Job_Manager {
 			if(_jobCur==null) {
 				return;//should never happen
 			}
-			List<Userod> listUsersForPicker=Userods.GetUsersByJobRole(JobPerm.Engineer,false);
 			FormUserPick FormUP=new FormUserPick {
-				IsSelectionmode=true,
-				ListUser=listUsersForPicker
+				IsSelectionmode=true
 			};
 			if(FormUP.ShowDialog()!=DialogResult.OK) {
 				return;
