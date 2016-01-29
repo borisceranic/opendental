@@ -7820,6 +7820,7 @@ namespace OpenDental {
 				return;
 			}
 			int skippedSecurity=0;
+			int skippedRxSecurity=0;
 			int skippedC=0;
 			int skippedComlog=0;
 			int skippedLabCases=0;
@@ -7855,6 +7856,10 @@ namespace OpenDental {
 					}
 				}
 				else if(row["RxNum"].ToString()!="0"){
+					if(!Security.IsAuthorized(Permissions.RxEdit,true)) {
+						skippedRxSecurity++;
+						continue;
+					}
 					RxPat rxPat=RxPats.GetRx(PIn.Long(row["RxNum"].ToString()));
 					SecurityLogs.MakeLogEntry(Permissions.RxEdit,PatCur.PatNum,"FROM("+rxPat.RxDate.ToShortDateString()+","+rxPat.Drug+","+rxPat.ProvNum+","+rxPat.Disp+","+rxPat.Refills+")"+"\r\nTO('deleted')",rxPat.RxNum);
 					RxPats.Delete(PIn.Long(row["RxNum"].ToString()));
@@ -7890,6 +7895,10 @@ namespace OpenDental {
 			if(skippedSecurity>0) {
 				MessageBox.Show(Lan.g(this,"Not allowed to delete procedures due to security.")+"\r"
 					+skippedSecurity.ToString()+" "+Lan.g(this,"item(s) skipped."));
+			}
+			if(skippedRxSecurity>0) {
+				MessageBox.Show(Lan.g(this,"Not allowed to delete Rx due to security.")+"\r"
+					+skippedRxSecurity.ToString()+" "+Lan.g(this,"item(s) skipped."));
 			}
 			if(skippedLabCases>0) {
 				MessageBox.Show(Lan.g(this,"Not allowed to delete lab case entries from here.")+"\r"
