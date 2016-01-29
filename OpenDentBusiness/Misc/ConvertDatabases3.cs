@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.24.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.25.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11445,6 +11445,18 @@ namespace OpenDentBusiness {
 					+"VALUES ("+GetClaimFormItemNum()+","+POut.Long(claimFormNum)+",'','FixedText','DN','33','587','24','14')";
 				Db.NonQ(command);
 				command="UPDATE preference SET ValueString = '15.4.24.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_4_25();
+		}
+
+		private static void To15_4_25() {
+			if(FromVersion<new Version("15.4.25.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.25.0"));//No translation in convert script.
+				string command="";
+				command="UPDATE preference SET ValueString='' WHERE PrefName='EmailUsername' OR PrefName='EmailPassword'";//MySQL and Oracle compatible.
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString='15.4.25.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_4_X();
