@@ -102,8 +102,10 @@ namespace OpenDentBusiness{
 				listWhereClauses.Add("DATE(task.DateTimeFinished)<="+POut.Date(dateCompletedTo));
 			}
 			if(taskDescription!="") {
-				listWhereClauses.Add("task.Descript LIKE '%"+POut.String(taskDescription)+"%'");
-				listWhereNoteClauses.Add("tasknote.Note LIKE '%"+POut.String(taskDescription)+"%'");
+        foreach(string param in taskDescription.Split(' ')) {
+				  listWhereClauses.Add("task.Descript LIKE '%"+POut.String(param)+"%'");
+				  listWhereNoteClauses.Add("tasknote.Note LIKE '%"+param+"%'");
+        }
 			}
 			if(taskPriorityNum!=0) {
 				listWhereClauses.Add("task.PriorityDefNum="+POut.Long(taskPriorityNum));
