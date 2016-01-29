@@ -340,6 +340,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textExportPath);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
@@ -357,16 +358,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPath_Load(object sender, System.EventArgs e){
-			if(IsStartingUp) {//and failed to find path
-				//if(Security.IsAuthorized(Permissions.Setup,true)) {//suppress the regular message//can't do this because we don't have access to security yet.
-				//	MsgBox.Show(this,"Could not find the path for the AtoZ folder");
-				//}
-				//else{//not authorized for security
-				MsgBox.Show(this,"Could not find the path for the AtoZ folder.");
-				//butOK.Enabled=false;
-				//}
-			}
-			else if(!Security.IsAuthorized(Permissions.Setup)) {
+			if(!IsStartingUp && !Security.IsAuthorized(Permissions.Setup)) {//Verify user has Setup permission to change paths, after user has logged in.
 				butOK.Enabled=false;
 			}
 			textDocPath.Text=PrefC.GetString(PrefName.DocPath);
@@ -392,6 +384,27 @@ namespace OpenDental{
 			// The opt***_checked event will enable/disable the appropriate UI elements.
 			checkMultiplePaths.Checked=(textDocPath.Text.LastIndexOf(';')!=-1);	
 			//Also set the "multiple paths" checkbox at startup based on the current image folder list format. No need to store this info in the db.
+			if(IsStartingUp) {//and failed to find path
+				MsgBox.Show(this,"Could not find the path for the AtoZ folder.");
+				//When NOT starting up (see above), we check security to ensure current user has Setup permission before allowing changes to data paths.
+				//Here we cannot check security, because we do not have access to CurUser (the user has not logged in yet).
+				//We disable most of the controls in this form when the program is starting up, because there is no way for us to check Setup permission.
+				//The user is still allowed to set the "Path override for this computer", thus the user has a way to temporariliy get into OD in worst case.
+				//For example, if the primary folder path is wrong or has changed, the user can set the path override for this computer to get into OD, then
+				//can to to Setup | Data Paths to fix the primary path.
+				radioUseFolder.Enabled=false;
+				textDocPath.ReadOnly=true;
+				butBrowseDoc.Enabled=false;
+				checkMultiplePaths.Enabled=false;
+				textServerPath.ReadOnly=true;
+				butBrowseServer.Enabled=false;
+				radioAtoZfolderNotRequired.Enabled=false;
+				textExportPath.ReadOnly=true;
+				butBrowseExport.Enabled=false;
+				textLetterMergePath.ReadOnly=true;
+				butBrowseLetter.Enabled=false;
+				ActiveControl=textLocalPath;//Focus on textLocalPath, since this is the only textbox the user can edit in this case.
+			}
 		}
 
 		///<summary>Returns the given path with the local OS path separators as necessary.</summary>
