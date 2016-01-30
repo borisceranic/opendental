@@ -155,6 +155,14 @@ namespace CodeBase {
 			return hasJoined;
 		}
 
+		///<summary>Raises onExit when all thread's from the given groupName have exited. Returns immediately.</summary>
+		public static void AddGroupNameExitHandler(string groupName,EventHandler onExit) {
+			new ODThread(new WorkerDelegate((ODThread thread) => {
+				JoinThreadsByGroupName(Timeout.Infinite,groupName,false);
+				onExit(groupName,new EventArgs());
+			})).Start(true);			
+		}
+
 		///<summary>Synchronously waits for all threads in the specified group to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for all threads to join.  Set doRemoveThreads to true to remove all threads from the global list of threads.</summary>
 		public static void JoinThreadsByGroupName(int timeoutMS,string groupName,bool doRemoveThreads=false) {
 			List<ODThread> listOdThreadsForGroup=GetThreadsByGroupName(groupName);
