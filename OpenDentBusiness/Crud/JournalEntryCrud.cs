@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JournalEntry,JournalEntry) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JournalEntry journalEntry,JournalEntry oldJournalEntry) {
+			if(journalEntry.TransactionNum != oldJournalEntry.TransactionNum) {
+				return true;
+			}
+			if(journalEntry.AccountNum != oldJournalEntry.AccountNum) {
+				return true;
+			}
+			if(journalEntry.DateDisplayed.Date != oldJournalEntry.DateDisplayed.Date) {
+				return true;
+			}
+			if(journalEntry.DebitAmt != oldJournalEntry.DebitAmt) {
+				return true;
+			}
+			if(journalEntry.CreditAmt != oldJournalEntry.CreditAmt) {
+				return true;
+			}
+			if(journalEntry.Memo != oldJournalEntry.Memo) {
+				return true;
+			}
+			if(journalEntry.Splits != oldJournalEntry.Splits) {
+				return true;
+			}
+			if(journalEntry.CheckNumber != oldJournalEntry.CheckNumber) {
+				return true;
+			}
+			if(journalEntry.ReconcileNum != oldJournalEntry.ReconcileNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JournalEntry from the database.</summary>
 		public static void Delete(long journalEntryNum){
 			string command="DELETE FROM journalentry "

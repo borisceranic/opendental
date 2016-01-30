@@ -242,6 +242,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobControl,JobControl) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobControl jobControl,JobControl oldJobControl) {
+			if(jobControl.UserNum != oldJobControl.UserNum) {
+				return true;
+			}
+			if(jobControl.JobControlType != oldJobControl.JobControlType) {
+				return true;
+			}
+			if(jobControl.ControlData != oldJobControl.ControlData) {
+				return true;
+			}
+			if(jobControl.XPos != oldJobControl.XPos) {
+				return true;
+			}
+			if(jobControl.YPos != oldJobControl.YPos) {
+				return true;
+			}
+			if(jobControl.Width != oldJobControl.Width) {
+				return true;
+			}
+			if(jobControl.Height != oldJobControl.Height) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobControl from the database.</summary>
 		public static void Delete(long jobControlNum){
 			string command="DELETE FROM jobcontrol "

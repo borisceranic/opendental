@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(GroupPermission,GroupPermission) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(GroupPermission groupPermission,GroupPermission oldGroupPermission) {
+			if(groupPermission.NewerDate.Date != oldGroupPermission.NewerDate.Date) {
+				return true;
+			}
+			if(groupPermission.NewerDays != oldGroupPermission.NewerDays) {
+				return true;
+			}
+			if(groupPermission.UserGroupNum != oldGroupPermission.UserGroupNum) {
+				return true;
+			}
+			if(groupPermission.PermType != oldGroupPermission.PermType) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one GroupPermission from the database.</summary>
 		public static void Delete(long groupPermNum){
 			string command="DELETE FROM grouppermission "

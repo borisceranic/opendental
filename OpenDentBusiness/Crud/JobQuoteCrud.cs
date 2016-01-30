@@ -228,6 +228,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobQuote,JobQuote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobQuote jobQuote,JobQuote oldJobQuote) {
+			if(jobQuote.JobNum != oldJobQuote.JobNum) {
+				return true;
+			}
+			if(jobQuote.PatNum != oldJobQuote.PatNum) {
+				return true;
+			}
+			if(jobQuote.Amount != oldJobQuote.Amount) {
+				return true;
+			}
+			if(jobQuote.Note != oldJobQuote.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobQuote from the database.</summary>
 		public static void Delete(long jobQuoteNum){
 			string command="DELETE FROM jobquote "

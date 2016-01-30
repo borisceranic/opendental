@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ToolButItem,ToolButItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ToolButItem toolButItem,ToolButItem oldToolButItem) {
+			if(toolButItem.ProgramNum != oldToolButItem.ProgramNum) {
+				return true;
+			}
+			if(toolButItem.ToolBar != oldToolButItem.ToolBar) {
+				return true;
+			}
+			if(toolButItem.ButtonText != oldToolButItem.ButtonText) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ToolButItem from the database.</summary>
 		public static void Delete(long toolButItemNum){
 			string command="DELETE FROM toolbutitem "

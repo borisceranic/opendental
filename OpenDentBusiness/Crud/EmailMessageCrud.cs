@@ -318,6 +318,51 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EmailMessage,EmailMessage) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EmailMessage emailMessage,EmailMessage oldEmailMessage) {
+			if(emailMessage.PatNum != oldEmailMessage.PatNum) {
+				return true;
+			}
+			if(emailMessage.ToAddress != oldEmailMessage.ToAddress) {
+				return true;
+			}
+			if(emailMessage.FromAddress != oldEmailMessage.FromAddress) {
+				return true;
+			}
+			if(emailMessage.Subject != oldEmailMessage.Subject) {
+				return true;
+			}
+			if(emailMessage.BodyText != oldEmailMessage.BodyText) {
+				return true;
+			}
+			if(emailMessage.MsgDateTime != oldEmailMessage.MsgDateTime) {
+				return true;
+			}
+			if(emailMessage.SentOrReceived != oldEmailMessage.SentOrReceived) {
+				return true;
+			}
+			if(emailMessage.RecipientAddress != oldEmailMessage.RecipientAddress) {
+				return true;
+			}
+			if(emailMessage.RawEmailIn != oldEmailMessage.RawEmailIn) {
+				return true;
+			}
+			if(emailMessage.ProvNumWebMail != oldEmailMessage.ProvNumWebMail) {
+				return true;
+			}
+			if(emailMessage.PatNumSubj != oldEmailMessage.PatNumSubj) {
+				return true;
+			}
+			if(emailMessage.CcAddress != oldEmailMessage.CcAddress) {
+				return true;
+			}
+			if(emailMessage.BccAddress != oldEmailMessage.BccAddress) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EmailMessage from the database.</summary>
 		public static void Delete(long emailMessageNum){
 			string command="DELETE FROM emailmessage "

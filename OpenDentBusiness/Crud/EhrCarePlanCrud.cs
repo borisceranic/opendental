@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrCarePlan,EhrCarePlan) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrCarePlan ehrCarePlan,EhrCarePlan oldEhrCarePlan) {
+			if(ehrCarePlan.PatNum != oldEhrCarePlan.PatNum) {
+				return true;
+			}
+			if(ehrCarePlan.SnomedEducation != oldEhrCarePlan.SnomedEducation) {
+				return true;
+			}
+			if(ehrCarePlan.Instructions != oldEhrCarePlan.Instructions) {
+				return true;
+			}
+			if(ehrCarePlan.DatePlanned.Date != oldEhrCarePlan.DatePlanned.Date) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrCarePlan from the database.</summary>
 		public static void Delete(long ehrCarePlanNum){
 			string command="DELETE FROM ehrcareplan "

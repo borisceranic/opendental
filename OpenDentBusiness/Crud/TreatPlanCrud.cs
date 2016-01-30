@@ -283,6 +283,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TreatPlan,TreatPlan) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TreatPlan treatPlan,TreatPlan oldTreatPlan) {
+			if(treatPlan.PatNum != oldTreatPlan.PatNum) {
+				return true;
+			}
+			if(treatPlan.DateTP.Date != oldTreatPlan.DateTP.Date) {
+				return true;
+			}
+			if(treatPlan.Heading != oldTreatPlan.Heading) {
+				return true;
+			}
+			if(treatPlan.Note != oldTreatPlan.Note) {
+				return true;
+			}
+			if(treatPlan.Signature != oldTreatPlan.Signature) {
+				return true;
+			}
+			if(treatPlan.SigIsTopaz != oldTreatPlan.SigIsTopaz) {
+				return true;
+			}
+			if(treatPlan.ResponsParty != oldTreatPlan.ResponsParty) {
+				return true;
+			}
+			if(treatPlan.DocNum != oldTreatPlan.DocNum) {
+				return true;
+			}
+			if(treatPlan.TPStatus != oldTreatPlan.TPStatus) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one TreatPlan from the database.</summary>
 		public static void Delete(long treatPlanNum){
 			string command="DELETE FROM treatplan "

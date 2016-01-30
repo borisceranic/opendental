@@ -77,15 +77,18 @@ namespace OpenDental{
 		private List<Fee> _listFees;
 		///<summary>Set to true if _listFees ever changes and needs to get synced to the database.</summary>
 		private bool _changed=false;
+		///<summary>Stale local copy of all fees, stored in memory for use with Fees.Sync() if DialogResult==DialogResult.OK and _changed==true</summary>
+		private List<Fee> _listFeesOld;
 
 		///<summary>Supply the fee schedule num(DefNum) to which all these changes will apply</summary>
-		public FormFeeSchedTools(long schedNum,List<FeeSched> listFeeScheds,List<Fee> listFees,List<Provider> listProvs,Clinic[] arrayClinics) {
+		public FormFeeSchedTools(long schedNum,List<FeeSched> listFeeScheds,List<Fee> listFees,List<Fee> listFeesOld,List<Provider> listProvs,Clinic[] arrayClinics) {
 			// Required for Windows Form Designer support
 			InitializeComponent();
 			Lan.F(this);
 			_schedNum=schedNum;
 			_listFeeScheds=listFeeScheds;
 			_listFees=listFees;
+			_listFeesOld=listFeesOld;
 			_listProvs=listProvs;
 			_arrayClinics=arrayClinics;
 		}
@@ -1491,7 +1494,7 @@ namespace OpenDental{
 		private void FormFeeSchedTools_FormClosing(object sender,FormClosingEventArgs e) {
 			if(DialogResult==DialogResult.OK && _changed) {
 				Cursor=Cursors.WaitCursor;
-				Fees.Sync(_listFees);//Sync any changes made in this window to the database.
+				Fees.Sync(_listFees,_listFeesOld);//Sync any changes made in this window to the database.
 				DataValid.SetInvalid(InvalidType.Fees);//Notify all other workstations about the changes made to the Fees.
 				Cursor=Cursors.Default;
 			}

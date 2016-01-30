@@ -222,6 +222,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(CovCat,CovCat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(CovCat covCat,CovCat oldCovCat) {
+			if(covCat.Description != oldCovCat.Description) {
+				return true;
+			}
+			if(covCat.DefaultPercent != oldCovCat.DefaultPercent) {
+				return true;
+			}
+			if(covCat.CovOrder != oldCovCat.CovOrder) {
+				return true;
+			}
+			if(covCat.IsHidden != oldCovCat.IsHidden) {
+				return true;
+			}
+			if(covCat.EbenefitCat != oldCovCat.EbenefitCat) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one CovCat from the database.</summary>
 		public static void Delete(long covCatNum){
 			string command="DELETE FROM covcat "

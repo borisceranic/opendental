@@ -232,6 +232,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TimeAdjust,TimeAdjust) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TimeAdjust timeAdjust,TimeAdjust oldTimeAdjust) {
+			if(timeAdjust.EmployeeNum != oldTimeAdjust.EmployeeNum) {
+				return true;
+			}
+			if(timeAdjust.TimeEntry != oldTimeAdjust.TimeEntry) {
+				return true;
+			}
+			if(timeAdjust.RegHours != oldTimeAdjust.RegHours) {
+				return true;
+			}
+			if(timeAdjust.OTimeHours != oldTimeAdjust.OTimeHours) {
+				return true;
+			}
+			if(timeAdjust.Note != oldTimeAdjust.Note) {
+				return true;
+			}
+			if(timeAdjust.IsAuto != oldTimeAdjust.IsAuto) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TimeAdjust from the database.</summary>
 		public static void Delete(long timeAdjustNum){
 			string command="DELETE FROM timeadjust "

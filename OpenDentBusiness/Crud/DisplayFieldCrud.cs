@@ -258,6 +258,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DisplayField,DisplayField) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DisplayField displayField,DisplayField oldDisplayField) {
+			if(displayField.InternalName != oldDisplayField.InternalName) {
+				return true;
+			}
+			if(displayField.ItemOrder != oldDisplayField.ItemOrder) {
+				return true;
+			}
+			if(displayField.Description != oldDisplayField.Description) {
+				return true;
+			}
+			if(displayField.ColumnWidth != oldDisplayField.ColumnWidth) {
+				return true;
+			}
+			if(displayField.Category != oldDisplayField.Category) {
+				return true;
+			}
+			if(displayField.ChartViewNum != oldDisplayField.ChartViewNum) {
+				return true;
+			}
+			if(displayField.PickList != oldDisplayField.PickList) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DisplayField from the database.</summary>
 		public static void Delete(long displayFieldNum){
 			string command="DELETE FROM displayfield "

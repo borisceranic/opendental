@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(OrthoChart,OrthoChart) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(OrthoChart orthoChart,OrthoChart oldOrthoChart) {
+			if(orthoChart.PatNum != oldOrthoChart.PatNum) {
+				return true;
+			}
+			if(orthoChart.DateService.Date != oldOrthoChart.DateService.Date) {
+				return true;
+			}
+			if(orthoChart.FieldName != oldOrthoChart.FieldName) {
+				return true;
+			}
+			if(orthoChart.FieldValue != oldOrthoChart.FieldValue) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one OrthoChart from the database.</summary>
 		public static void Delete(long orthoChartNum){
 			string command="DELETE FROM orthochart "

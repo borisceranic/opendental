@@ -245,6 +245,28 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(HL7Msg,HL7Msg) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(HL7Msg hL7Msg,HL7Msg oldHL7Msg) {
+			if(hL7Msg.HL7Status != oldHL7Msg.HL7Status) {
+				return true;
+			}
+			if(hL7Msg.MsgText != oldHL7Msg.MsgText) {
+				return true;
+			}
+			if(hL7Msg.AptNum != oldHL7Msg.AptNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(hL7Msg.PatNum != oldHL7Msg.PatNum) {
+				return true;
+			}
+			if(hL7Msg.Note != oldHL7Msg.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one HL7Msg from the database.</summary>
 		public static void Delete(long hL7MsgNum){
 			string command="DELETE FROM hl7msg "

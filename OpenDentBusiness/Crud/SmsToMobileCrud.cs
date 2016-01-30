@@ -348,6 +348,60 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SmsToMobile,SmsToMobile) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SmsToMobile smsToMobile,SmsToMobile oldSmsToMobile) {
+			if(smsToMobile.PatNum != oldSmsToMobile.PatNum) {
+				return true;
+			}
+			if(smsToMobile.GuidMessage != oldSmsToMobile.GuidMessage) {
+				return true;
+			}
+			if(smsToMobile.GuidBatch != oldSmsToMobile.GuidBatch) {
+				return true;
+			}
+			if(smsToMobile.SmsPhoneNumber != oldSmsToMobile.SmsPhoneNumber) {
+				return true;
+			}
+			if(smsToMobile.MobilePhoneNumber != oldSmsToMobile.MobilePhoneNumber) {
+				return true;
+			}
+			if(smsToMobile.IsTimeSensitive != oldSmsToMobile.IsTimeSensitive) {
+				return true;
+			}
+			if(smsToMobile.MsgType != oldSmsToMobile.MsgType) {
+				return true;
+			}
+			if(smsToMobile.MsgText != oldSmsToMobile.MsgText) {
+				return true;
+			}
+			if(smsToMobile.SmsStatus != oldSmsToMobile.SmsStatus) {
+				return true;
+			}
+			if(smsToMobile.MsgParts != oldSmsToMobile.MsgParts) {
+				return true;
+			}
+			if(smsToMobile.MsgChargeUSD != oldSmsToMobile.MsgChargeUSD) {
+				return true;
+			}
+			if(smsToMobile.ClinicNum != oldSmsToMobile.ClinicNum) {
+				return true;
+			}
+			if(smsToMobile.CustErrorText != oldSmsToMobile.CustErrorText) {
+				return true;
+			}
+			if(smsToMobile.DateTimeSent != oldSmsToMobile.DateTimeSent) {
+				return true;
+			}
+			if(smsToMobile.DateTimeTerminated != oldSmsToMobile.DateTimeTerminated) {
+				return true;
+			}
+			if(smsToMobile.IsHidden != oldSmsToMobile.IsHidden) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SmsToMobile from the database.</summary>
 		public static void Delete(long smsToMobileNum){
 			string command="DELETE FROM smstomobile "

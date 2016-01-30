@@ -312,6 +312,54 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(XChargeTransaction,XChargeTransaction) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(XChargeTransaction xChargeTransaction,XChargeTransaction oldXChargeTransaction) {
+			if(xChargeTransaction.TransType != oldXChargeTransaction.TransType) {
+				return true;
+			}
+			if(xChargeTransaction.Amount != oldXChargeTransaction.Amount) {
+				return true;
+			}
+			if(xChargeTransaction.CCEntry != oldXChargeTransaction.CCEntry) {
+				return true;
+			}
+			if(xChargeTransaction.PatNum != oldXChargeTransaction.PatNum) {
+				return true;
+			}
+			if(xChargeTransaction.Result != oldXChargeTransaction.Result) {
+				return true;
+			}
+			if(xChargeTransaction.ClerkID != oldXChargeTransaction.ClerkID) {
+				return true;
+			}
+			if(xChargeTransaction.ResultCode != oldXChargeTransaction.ResultCode) {
+				return true;
+			}
+			if(xChargeTransaction.Expiration != oldXChargeTransaction.Expiration) {
+				return true;
+			}
+			if(xChargeTransaction.CCType != oldXChargeTransaction.CCType) {
+				return true;
+			}
+			if(xChargeTransaction.CreditCardNum != oldXChargeTransaction.CreditCardNum) {
+				return true;
+			}
+			if(xChargeTransaction.BatchNum != oldXChargeTransaction.BatchNum) {
+				return true;
+			}
+			if(xChargeTransaction.ItemNum != oldXChargeTransaction.ItemNum) {
+				return true;
+			}
+			if(xChargeTransaction.ApprCode != oldXChargeTransaction.ApprCode) {
+				return true;
+			}
+			if(xChargeTransaction.TransactionDateTime != oldXChargeTransaction.TransactionDateTime) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one XChargeTransaction from the database.</summary>
 		public static void Delete(long xChargeTransactionNum){
 			string command="DELETE FROM xchargetransaction "

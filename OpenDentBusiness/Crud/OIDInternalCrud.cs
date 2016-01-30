@@ -201,6 +201,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(OIDInternal,OIDInternal) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(OIDInternal oIDInternal,OIDInternal oldOIDInternal) {
+			if(oIDInternal.IDType != oldOIDInternal.IDType) {
+				return true;
+			}
+			if(oIDInternal.IDRoot != oldOIDInternal.IDRoot) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one OIDInternal from the database.</summary>
 		public static void Delete(long oIDInternalNum){
 			string command="DELETE FROM oidinternal "

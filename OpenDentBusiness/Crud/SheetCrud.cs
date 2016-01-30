@@ -302,6 +302,51 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Sheet,Sheet) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Sheet sheet,Sheet oldSheet) {
+			if(sheet.SheetType != oldSheet.SheetType) {
+				return true;
+			}
+			if(sheet.PatNum != oldSheet.PatNum) {
+				return true;
+			}
+			if(sheet.DateTimeSheet != oldSheet.DateTimeSheet) {
+				return true;
+			}
+			if(sheet.FontSize != oldSheet.FontSize) {
+				return true;
+			}
+			if(sheet.FontName != oldSheet.FontName) {
+				return true;
+			}
+			if(sheet.Width != oldSheet.Width) {
+				return true;
+			}
+			if(sheet.Height != oldSheet.Height) {
+				return true;
+			}
+			if(sheet.IsLandscape != oldSheet.IsLandscape) {
+				return true;
+			}
+			if(sheet.InternalNote != oldSheet.InternalNote) {
+				return true;
+			}
+			if(sheet.Description != oldSheet.Description) {
+				return true;
+			}
+			if(sheet.ShowInTerminal != oldSheet.ShowInTerminal) {
+				return true;
+			}
+			if(sheet.IsWebForm != oldSheet.IsWebForm) {
+				return true;
+			}
+			if(sheet.IsMultiPage != oldSheet.IsMultiPage) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Sheet from the database.</summary>
 		public static void Delete(long sheetNum){
 			string command="DELETE FROM sheet "

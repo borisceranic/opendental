@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LetterMergeField,LetterMergeField) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LetterMergeField letterMergeField,LetterMergeField oldLetterMergeField) {
+			if(letterMergeField.LetterMergeNum != oldLetterMergeField.LetterMergeNum) {
+				return true;
+			}
+			if(letterMergeField.FieldName != oldLetterMergeField.FieldName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LetterMergeField from the database.</summary>
 		public static void Delete(long fieldNum){
 			string command="DELETE FROM lettermergefield "

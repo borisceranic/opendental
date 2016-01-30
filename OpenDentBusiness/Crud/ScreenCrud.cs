@@ -342,6 +342,63 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Screen,Screen) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Screen screen,Screen oldScreen) {
+			if(screen.Gender != oldScreen.Gender) {
+				return true;
+			}
+			if(screen.RaceOld != oldScreen.RaceOld) {
+				return true;
+			}
+			if(screen.GradeLevel != oldScreen.GradeLevel) {
+				return true;
+			}
+			if(screen.Age != oldScreen.Age) {
+				return true;
+			}
+			if(screen.Urgency != oldScreen.Urgency) {
+				return true;
+			}
+			if(screen.HasCaries != oldScreen.HasCaries) {
+				return true;
+			}
+			if(screen.NeedsSealants != oldScreen.NeedsSealants) {
+				return true;
+			}
+			if(screen.CariesExperience != oldScreen.CariesExperience) {
+				return true;
+			}
+			if(screen.EarlyChildCaries != oldScreen.EarlyChildCaries) {
+				return true;
+			}
+			if(screen.ExistingSealants != oldScreen.ExistingSealants) {
+				return true;
+			}
+			if(screen.MissingAllTeeth != oldScreen.MissingAllTeeth) {
+				return true;
+			}
+			if(screen.Birthdate.Date != oldScreen.Birthdate.Date) {
+				return true;
+			}
+			if(screen.ScreenGroupNum != oldScreen.ScreenGroupNum) {
+				return true;
+			}
+			if(screen.ScreenGroupOrder != oldScreen.ScreenGroupOrder) {
+				return true;
+			}
+			if(screen.Comments != oldScreen.Comments) {
+				return true;
+			}
+			if(screen.ScreenPatNum != oldScreen.ScreenPatNum) {
+				return true;
+			}
+			if(screen.SheetNum != oldScreen.SheetNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Screen from the database.</summary>
 		public static void Delete(long screenNum){
 			string command="DELETE FROM screen "

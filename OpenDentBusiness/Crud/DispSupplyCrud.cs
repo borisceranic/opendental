@@ -238,6 +238,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DispSupply,DispSupply) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DispSupply dispSupply,DispSupply oldDispSupply) {
+			if(dispSupply.SupplyNum != oldDispSupply.SupplyNum) {
+				return true;
+			}
+			if(dispSupply.ProvNum != oldDispSupply.ProvNum) {
+				return true;
+			}
+			if(dispSupply.DateDispensed.Date != oldDispSupply.DateDispensed.Date) {
+				return true;
+			}
+			if(dispSupply.DispQuantity != oldDispSupply.DispQuantity) {
+				return true;
+			}
+			if(dispSupply.Note != oldDispSupply.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DispSupply from the database.</summary>
 		public static void Delete(long dispSupplyNum){
 			string command="DELETE FROM dispsupply "

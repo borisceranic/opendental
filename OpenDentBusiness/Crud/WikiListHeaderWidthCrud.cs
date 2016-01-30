@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(WikiListHeaderWidth,WikiListHeaderWidth) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(WikiListHeaderWidth wikiListHeaderWidth,WikiListHeaderWidth oldWikiListHeaderWidth) {
+			if(wikiListHeaderWidth.ListName != oldWikiListHeaderWidth.ListName) {
+				return true;
+			}
+			if(wikiListHeaderWidth.ColName != oldWikiListHeaderWidth.ColName) {
+				return true;
+			}
+			if(wikiListHeaderWidth.ColWidth != oldWikiListHeaderWidth.ColWidth) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one WikiListHeaderWidth from the database.</summary>
 		public static void Delete(long wikiListHeaderWidthNum){
 			string command="DELETE FROM wikilistheaderwidth "

@@ -232,6 +232,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ToothInitial,ToothInitial) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ToothInitial toothInitial,ToothInitial oldToothInitial) {
+			if(toothInitial.PatNum != oldToothInitial.PatNum) {
+				return true;
+			}
+			if(toothInitial.ToothNum != oldToothInitial.ToothNum) {
+				return true;
+			}
+			if(toothInitial.InitialType != oldToothInitial.InitialType) {
+				return true;
+			}
+			if(toothInitial.Movement != oldToothInitial.Movement) {
+				return true;
+			}
+			if(toothInitial.DrawingSegment != oldToothInitial.DrawingSegment) {
+				return true;
+			}
+			if(toothInitial.ColorDraw != oldToothInitial.ColorDraw) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ToothInitial from the database.</summary>
 		public static void Delete(long toothInitialNum){
 			string command="DELETE FROM toothinitial "

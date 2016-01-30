@@ -208,6 +208,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Letter,Letter) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Letter letter,Letter oldLetter) {
+			if(letter.Description != oldLetter.Description) {
+				return true;
+			}
+			if(letter.BodyText != oldLetter.BodyText) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Letter from the database.</summary>
 		public static void Delete(long letterNum){
 			string command="DELETE FROM letter "

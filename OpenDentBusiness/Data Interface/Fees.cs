@@ -92,13 +92,27 @@ namespace OpenDentBusiness{
 			return dictFeesBySchedNumsAndCodeNums;
 		}
 
-		///<summary>Returns a list of all fees in the given dictionary.</summary>
-		public static List<Fee> GetFeesAll(Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
+		///<summary>Returns a shallow copy of all fees from the given dictionary.</summary>
+		public static List<Fee> GetFeesAllShallow(Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
 			//No need to check RemotingRole; no call to db.
 			List<Fee> listFees=new List<Fee>();
 			foreach(KeyValuePair<long,Dictionary<long,List<Fee>>> dictByFeeSchedNums in dictFeesByFeeSchedNumsAndCodeNums) {
 				foreach(KeyValuePair<long,List<Fee>> dictFeesByCodeNums in dictByFeeSchedNums.Value) {
 					listFees.AddRange((List<Fee>)dictFeesByCodeNums.Value);
+				}
+			}
+			return listFees;
+		}
+
+		///<summary>Returns a deep copy of every fee from the given dictionary.</summary>
+		public static List<Fee> GetFeesAllDeepCopy(Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums) {
+			//No need to check RemotingRole; no call to db.
+			List<Fee> listFees = new List<Fee>();
+			foreach(KeyValuePair<long,Dictionary<long,List<Fee>>> dictByFeeSchedNums in dictFeesByFeeSchedNumsAndCodeNums) {
+				foreach(KeyValuePair<long,List<Fee>> dictFeesByCodeNums in dictByFeeSchedNums.Value) {
+					foreach(Fee fee in (List<Fee>)dictFeesByCodeNums.Value) {
+						listFees.Add(fee.Copy());
+					}
 				}
 			}
 			return listFees;
@@ -219,19 +233,6 @@ namespace OpenDentBusiness{
 			}
 			string command="DELETE FROM fee WHERE FeeSched="+POut.Long(feeSchedNum)+" AND ClinicNum!=0";
 			Db.NonQ(command);
-		}
-
-		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<Fee> listNew,long userNum=0) {
-			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
-				userNum=Security.CurUser.UserNum;
-			}
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,userNum);
-			}
-			Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
-			List<Fee> listDB=Fees.GetFeesAll(dictFeesByFeeSchedNumsAndCodeNums);
-			return Crud.FeeCrud.Sync(listNew,listDB,userNum);
 		}
 
 		///<summary>Returns null if no fee exists, returns a default fee for the passed in feeSchedNum.</summary>
@@ -610,6 +611,114 @@ namespace OpenDentBusiness{
 			return listFees;
 		}
 
+		///<summary>Inserts, updates, or deletes the passed in listNew against the stale listOld.  Returns true if db changes were made.
+		///This does not call the normal crud.Sync due to the special case of making sure we do not insert a duplicate fee.</summary>
+		public static bool Sync(List<Fee> listNew,List<Fee> listOld) {
+			//No call to DB yet, remoting role to be checked later.
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<Fee> listIns = new List<Fee>();
+			List<Fee> listUpdNew = new List<Fee>();
+			List<Fee> listUpdDB = new List<Fee>();
+			List<Fee> listDel = new List<Fee>();
+			listNew.Sort((Fee x,Fee y) => { return x.FeeNum.CompareTo(y.FeeNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listOld.Sort((Fee x,Fee y) => { return x.FeeNum.CompareTo(y.FeeNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew = 0;
+			int idxDB = 0;
+			Fee fieldNew;
+			Fee fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listOld.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listOld.Count) {
+					fieldDB=listOld[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.FeeNum<fieldDB.FeeNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.FeeNum>fieldDB.FeeNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Everything past this point needs to increment idxNew and idxDB.
+				else if(Crud.FeeCrud.UpdateComparison(fieldNew,fieldDB)) {
+					//Both lists contain the 'next' item, update required
+					listUpdNew.Add(fieldNew);
+					listUpdDB.Add(fieldDB);
+				}
+				idxNew++;
+				idxDB++;
+				//There is nothing to do with this fee?
+			}
+			//This sync logic was split up from the typical sync logic in order to restrict payload sizes that are sent over middle tier.
+			//Without first making the lists of fees as small as possible, some fee lists were so large that the maximum SOAP payload size was getting met.
+			//If this method starts having issues in the future we will need to serialize the lists of fees into DataTables to further save size.
+			return SyncToDbHelper(listIns,listUpdNew,listUpdDB,listDel);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows sepcified in the supplied lists.  Returns true if db changes were made.
+		///Supply Security.CurUser.UserNum, used to set the SecUserNumEntry field for Inserts.
+		///This was split from the list building logic to limit the payload that needed to be sent over middle tier.</summary>
+		public static bool SyncToDbHelper(List<Fee> listIns,List<Fee> listUpdNew,List<Fee> listUpdDB,List<Fee> listDel,long userNum = 0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
+			}
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listIns,listUpdNew,listUpdDB,listDel,userNum);
+			}
+			int rowsUpdatedCount = 0;
+			//Commit changes to DB
+			//Delete any potential duplicate fees before inserting new ones.
+			if(listIns.Count > 0) {
+				//A duplicate fee is one that has the exact same FeeSchedNum, CodeNum, ClinicNum, and ProvNum.  ClinicNum and ProvNum may be 0.
+				//Future TODO:  Find a safer way to do this.  Transaction the deletes with the inserts?
+				string command = "DELETE FROM fee WHERE ";
+				for(int i = 0;i<listIns.Count;i++) {
+					if(i>0) {
+						command+="OR ";
+					}
+					command += "(fee.FeeSched="+POut.Long(listIns[i].FeeSched)+" "
+						+"AND fee.CodeNum="+POut.Long(listIns[i].CodeNum)+" "
+						+"AND fee.ClinicNum="+POut.Long(listIns[i].ClinicNum)+" "
+						+"AND fee.ProvNum="+POut.Long(listIns[i].ProvNum)+") ";
+				}
+				Db.NonQ(command);
+			}
+			for(int i = 0;i<listIns.Count;i++) {
+				listIns[i].SecUserNumEntry=userNum;
+				Crud.FeeCrud.Insert(listIns[i]);
+			}
+			for(int i = 0;i<listUpdNew.Count;i++) {
+				if(Crud.FeeCrud.Update(listUpdNew[i],listUpdDB[i])) {
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i = 0;i<listDel.Count;i++) {
+				Crud.FeeCrud.Delete(listDel[i].FeeNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
+		}
 	}
 
 	public struct FeeKey{

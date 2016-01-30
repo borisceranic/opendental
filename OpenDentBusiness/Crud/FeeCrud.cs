@@ -273,6 +273,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Fee,Fee) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Fee fee,Fee oldFee) {
+			if(fee.Amount != oldFee.Amount) {
+				return true;
+			}
+			if(fee.OldCode != oldFee.OldCode) {
+				return true;
+			}
+			if(fee.FeeSched != oldFee.FeeSched) {
+				return true;
+			}
+			if(fee.UseDefaultFee != oldFee.UseDefaultFee) {
+				return true;
+			}
+			if(fee.UseDefaultCov != oldFee.UseDefaultCov) {
+				return true;
+			}
+			if(fee.CodeNum != oldFee.CodeNum) {
+				return true;
+			}
+			if(fee.ClinicNum != oldFee.ClinicNum) {
+				return true;
+			}
+			if(fee.ProvNum != oldFee.ProvNum) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one Fee from the database.</summary>
 		public static void Delete(long feeNum){
 			string command="DELETE FROM fee "

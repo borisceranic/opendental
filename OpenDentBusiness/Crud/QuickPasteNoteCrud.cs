@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(QuickPasteNote,QuickPasteNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(QuickPasteNote quickPasteNote,QuickPasteNote oldQuickPasteNote) {
+			if(quickPasteNote.QuickPasteCatNum != oldQuickPasteNote.QuickPasteCatNum) {
+				return true;
+			}
+			if(quickPasteNote.ItemOrder != oldQuickPasteNote.ItemOrder) {
+				return true;
+			}
+			if(quickPasteNote.Note != oldQuickPasteNote.Note) {
+				return true;
+			}
+			if(quickPasteNote.Abbreviation != oldQuickPasteNote.Abbreviation) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one QuickPasteNote from the database.</summary>
 		public static void Delete(long quickPasteNoteNum){
 			string command="DELETE FROM quickpastenote "

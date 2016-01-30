@@ -285,6 +285,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(HL7DefMessage,HL7DefMessage) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(HL7DefMessage hL7DefMessage,HL7DefMessage oldHL7DefMessage) {
+			if(hL7DefMessage.HL7DefNum != oldHL7DefMessage.HL7DefNum) {
+				return true;
+			}
+			if(hL7DefMessage.MessageType != oldHL7DefMessage.MessageType) {
+				return true;
+			}
+			if(hL7DefMessage.EventType != oldHL7DefMessage.EventType) {
+				return true;
+			}
+			if(hL7DefMessage.InOrOut != oldHL7DefMessage.InOrOut) {
+				return true;
+			}
+			if(hL7DefMessage.ItemOrder != oldHL7DefMessage.ItemOrder) {
+				return true;
+			}
+			if(hL7DefMessage.Note != oldHL7DefMessage.Note) {
+				return true;
+			}
+			if(hL7DefMessage.MessageStructure != oldHL7DefMessage.MessageStructure) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one HL7DefMessage from the database.</summary>
 		public static void Delete(long hL7DefMessageNum){
 			string command="DELETE FROM hl7defmessage "

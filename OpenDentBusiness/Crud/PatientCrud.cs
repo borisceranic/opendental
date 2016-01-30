@@ -969,6 +969,243 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Patient,Patient) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Patient patient,Patient oldPatient) {
+			if(patient.LName != oldPatient.LName) {
+				return true;
+			}
+			if(patient.FName != oldPatient.FName) {
+				return true;
+			}
+			if(patient.MiddleI != oldPatient.MiddleI) {
+				return true;
+			}
+			if(patient.Preferred != oldPatient.Preferred) {
+				return true;
+			}
+			if(patient.PatStatus != oldPatient.PatStatus) {
+				return true;
+			}
+			if(patient.Gender != oldPatient.Gender) {
+				return true;
+			}
+			if(patient.Position != oldPatient.Position) {
+				return true;
+			}
+			if(patient.Birthdate.Date != oldPatient.Birthdate.Date) {
+				return true;
+			}
+			if(patient.SSN != oldPatient.SSN) {
+				return true;
+			}
+			if(patient.Address != oldPatient.Address) {
+				return true;
+			}
+			if(patient.Address2 != oldPatient.Address2) {
+				return true;
+			}
+			if(patient.City != oldPatient.City) {
+				return true;
+			}
+			if(patient.State != oldPatient.State) {
+				return true;
+			}
+			if(patient.Zip != oldPatient.Zip) {
+				return true;
+			}
+			if(patient.HmPhone != oldPatient.HmPhone) {
+				return true;
+			}
+			if(patient.WkPhone != oldPatient.WkPhone) {
+				return true;
+			}
+			if(patient.WirelessPhone != oldPatient.WirelessPhone) {
+				return true;
+			}
+			if(patient.Guarantor != oldPatient.Guarantor) {
+				return true;
+			}
+			if(patient.CreditType != oldPatient.CreditType) {
+				return true;
+			}
+			if(patient.Email != oldPatient.Email) {
+				return true;
+			}
+			if(patient.Salutation != oldPatient.Salutation) {
+				return true;
+			}
+			if(patient.EstBalance != oldPatient.EstBalance) {
+				return true;
+			}
+			if(patient.PriProv != oldPatient.PriProv) {
+				return true;
+			}
+			if(patient.SecProv != oldPatient.SecProv) {
+				return true;
+			}
+			if(patient.FeeSched != oldPatient.FeeSched) {
+				return true;
+			}
+			if(patient.BillingType != oldPatient.BillingType) {
+				return true;
+			}
+			if(patient.ImageFolder != oldPatient.ImageFolder) {
+				return true;
+			}
+			if(patient.AddrNote != oldPatient.AddrNote) {
+				return true;
+			}
+			if(patient.FamFinUrgNote != oldPatient.FamFinUrgNote) {
+				return true;
+			}
+			if(patient.MedUrgNote != oldPatient.MedUrgNote) {
+				return true;
+			}
+			if(patient.ApptModNote != oldPatient.ApptModNote) {
+				return true;
+			}
+			if(patient.StudentStatus != oldPatient.StudentStatus) {
+				return true;
+			}
+			if(patient.SchoolName != oldPatient.SchoolName) {
+				return true;
+			}
+			if(patient.ChartNumber != oldPatient.ChartNumber) {
+				return true;
+			}
+			if(patient.MedicaidID != oldPatient.MedicaidID) {
+				return true;
+			}
+			if(patient.Bal_0_30 != oldPatient.Bal_0_30) {
+				return true;
+			}
+			if(patient.Bal_31_60 != oldPatient.Bal_31_60) {
+				return true;
+			}
+			if(patient.Bal_61_90 != oldPatient.Bal_61_90) {
+				return true;
+			}
+			if(patient.BalOver90 != oldPatient.BalOver90) {
+				return true;
+			}
+			if(patient.InsEst != oldPatient.InsEst) {
+				return true;
+			}
+			if(patient.BalTotal != oldPatient.BalTotal) {
+				return true;
+			}
+			if(patient.EmployerNum != oldPatient.EmployerNum) {
+				return true;
+			}
+			if(patient.EmploymentNote != oldPatient.EmploymentNote) {
+				return true;
+			}
+			if(patient.County != oldPatient.County) {
+				return true;
+			}
+			if(patient.GradeLevel != oldPatient.GradeLevel) {
+				return true;
+			}
+			if(patient.Urgency != oldPatient.Urgency) {
+				return true;
+			}
+			if(patient.DateFirstVisit.Date != oldPatient.DateFirstVisit.Date) {
+				return true;
+			}
+			if(patient.ClinicNum != oldPatient.ClinicNum) {
+				return true;
+			}
+			if(patient.HasIns != oldPatient.HasIns) {
+				return true;
+			}
+			if(patient.TrophyFolder != oldPatient.TrophyFolder) {
+				return true;
+			}
+			if(patient.PlannedIsDone != oldPatient.PlannedIsDone) {
+				return true;
+			}
+			if(patient.Premed != oldPatient.Premed) {
+				return true;
+			}
+			if(patient.Ward != oldPatient.Ward) {
+				return true;
+			}
+			if(patient.PreferConfirmMethod != oldPatient.PreferConfirmMethod) {
+				return true;
+			}
+			if(patient.PreferContactMethod != oldPatient.PreferContactMethod) {
+				return true;
+			}
+			if(patient.PreferRecallMethod != oldPatient.PreferRecallMethod) {
+				return true;
+			}
+			if(patient.SchedBeforeTime != oldPatient.SchedBeforeTime) {
+				return true;
+			}
+			if(patient.SchedAfterTime != oldPatient.SchedAfterTime) {
+				return true;
+			}
+			if(patient.SchedDayOfWeek != oldPatient.SchedDayOfWeek) {
+				return true;
+			}
+			if(patient.Language != oldPatient.Language) {
+				return true;
+			}
+			if(patient.AdmitDate.Date != oldPatient.AdmitDate.Date) {
+				return true;
+			}
+			if(patient.Title != oldPatient.Title) {
+				return true;
+			}
+			if(patient.PayPlanDue != oldPatient.PayPlanDue) {
+				return true;
+			}
+			if(patient.SiteNum != oldPatient.SiteNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(patient.ResponsParty != oldPatient.ResponsParty) {
+				return true;
+			}
+			if(patient.CanadianEligibilityCode != oldPatient.CanadianEligibilityCode) {
+				return true;
+			}
+			if(patient.AskToArriveEarly != oldPatient.AskToArriveEarly) {
+				return true;
+			}
+			if(patient.OnlinePassword != oldPatient.OnlinePassword) {
+				return true;
+			}
+			if(patient.PreferContactConfidential != oldPatient.PreferContactConfidential) {
+				return true;
+			}
+			if(patient.SuperFamily != oldPatient.SuperFamily) {
+				return true;
+			}
+			if(patient.TxtMsgOk != oldPatient.TxtMsgOk) {
+				return true;
+			}
+			if(patient.SmokingSnoMed != oldPatient.SmokingSnoMed) {
+				return true;
+			}
+			if(patient.Country != oldPatient.Country) {
+				return true;
+			}
+			if(patient.DateTimeDeceased != oldPatient.DateTimeDeceased) {
+				return true;
+			}
+			if(patient.BillingCycleDay != oldPatient.BillingCycleDay) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			if(patient.HasSuperBilling != oldPatient.HasSuperBilling) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Patient from the database.</summary>
 		public static void Delete(long patNum){
 			ClearFkey(patNum);

@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(GradingScaleItem,GradingScaleItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(GradingScaleItem gradingScaleItem,GradingScaleItem oldGradingScaleItem) {
+			if(gradingScaleItem.GradingScaleNum != oldGradingScaleItem.GradingScaleNum) {
+				return true;
+			}
+			if(gradingScaleItem.GradeShowing != oldGradingScaleItem.GradeShowing) {
+				return true;
+			}
+			if(gradingScaleItem.GradeNumber != oldGradingScaleItem.GradeNumber) {
+				return true;
+			}
+			if(gradingScaleItem.Description != oldGradingScaleItem.Description) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one GradingScaleItem from the database.</summary>
 		public static void Delete(long gradingScaleItemNum){
 			string command="DELETE FROM gradingscaleitem "

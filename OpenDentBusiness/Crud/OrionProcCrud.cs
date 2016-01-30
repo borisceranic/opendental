@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(OrionProc,OrionProc) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(OrionProc orionProc,OrionProc oldOrionProc) {
+			if(orionProc.ProcNum != oldOrionProc.ProcNum) {
+				return true;
+			}
+			if(orionProc.DPC != oldOrionProc.DPC) {
+				return true;
+			}
+			if(orionProc.DPCpost != oldOrionProc.DPCpost) {
+				return true;
+			}
+			if(orionProc.DateScheduleBy.Date != oldOrionProc.DateScheduleBy.Date) {
+				return true;
+			}
+			if(orionProc.DateStopClock.Date != oldOrionProc.DateStopClock.Date) {
+				return true;
+			}
+			if(orionProc.Status2 != oldOrionProc.Status2) {
+				return true;
+			}
+			if(orionProc.IsOnCall != oldOrionProc.IsOnCall) {
+				return true;
+			}
+			if(orionProc.IsEffectiveComm != oldOrionProc.IsEffectiveComm) {
+				return true;
+			}
+			if(orionProc.IsRepair != oldOrionProc.IsRepair) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one OrionProc from the database.</summary>
 		public static void Delete(long orionProcNum){
 			string command="DELETE FROM orionproc "

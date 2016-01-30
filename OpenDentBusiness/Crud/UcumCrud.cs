@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Ucum,Ucum) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Ucum ucum,Ucum oldUcum) {
+			if(ucum.UcumCode != oldUcum.UcumCode) {
+				return true;
+			}
+			if(ucum.Description != oldUcum.Description) {
+				return true;
+			}
+			if(ucum.IsInUse != oldUcum.IsInUse) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Ucum from the database.</summary>
 		public static void Delete(long ucumNum){
 			string command="DELETE FROM ucum "

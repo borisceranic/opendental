@@ -248,6 +248,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(InsVerify,InsVerify) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(InsVerify insVerify,InsVerify oldInsVerify) {
+			if(insVerify.DateLastVerified.Date != oldInsVerify.DateLastVerified.Date) {
+				return true;
+			}
+			if(insVerify.UserNum != oldInsVerify.UserNum) {
+				return true;
+			}
+			if(insVerify.VerifyType != oldInsVerify.VerifyType) {
+				return true;
+			}
+			if(insVerify.FKey != oldInsVerify.FKey) {
+				return true;
+			}
+			if(insVerify.DefNum != oldInsVerify.DefNum) {
+				return true;
+			}
+			if(insVerify.Note != oldInsVerify.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one InsVerify from the database.</summary>
 		public static void Delete(long insVerifyNum){
 			string command="DELETE FROM insverify "

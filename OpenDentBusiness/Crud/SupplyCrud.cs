@@ -302,6 +302,51 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Supply,Supply) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Supply supply,Supply oldSupply) {
+			if(supply.SupplierNum != oldSupply.SupplierNum) {
+				return true;
+			}
+			if(supply.CatalogNumber != oldSupply.CatalogNumber) {
+				return true;
+			}
+			if(supply.Descript != oldSupply.Descript) {
+				return true;
+			}
+			if(supply.Category != oldSupply.Category) {
+				return true;
+			}
+			if(supply.ItemOrder != oldSupply.ItemOrder) {
+				return true;
+			}
+			if(supply.LevelDesired != oldSupply.LevelDesired) {
+				return true;
+			}
+			if(supply.IsHidden != oldSupply.IsHidden) {
+				return true;
+			}
+			if(supply.Price != oldSupply.Price) {
+				return true;
+			}
+			if(supply.BarCodeOrID != oldSupply.BarCodeOrID) {
+				return true;
+			}
+			if(supply.DispDefaultQuant != oldSupply.DispDefaultQuant) {
+				return true;
+			}
+			if(supply.DispUnitsCount != oldSupply.DispUnitsCount) {
+				return true;
+			}
+			if(supply.DispUnitDesc != oldSupply.DispUnitDesc) {
+				return true;
+			}
+			if(supply.LevelOnHand != oldSupply.LevelOnHand) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Supply from the database.</summary>
 		public static void Delete(long supplyNum){
 			string command="DELETE FROM supply "

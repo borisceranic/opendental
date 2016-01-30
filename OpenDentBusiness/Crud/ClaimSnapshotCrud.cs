@@ -229,6 +229,28 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimSnapshot,ClaimSnapshot) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimSnapshot claimSnapshot,ClaimSnapshot oldClaimSnapshot) {
+			if(claimSnapshot.ProcNum != oldClaimSnapshot.ProcNum) {
+				return true;
+			}
+			if(claimSnapshot.ClaimType != oldClaimSnapshot.ClaimType) {
+				return true;
+			}
+			if(claimSnapshot.Writeoff != oldClaimSnapshot.Writeoff) {
+				return true;
+			}
+			if(claimSnapshot.InsPayEst != oldClaimSnapshot.InsPayEst) {
+				return true;
+			}
+			if(claimSnapshot.Fee != oldClaimSnapshot.Fee) {
+				return true;
+			}
+			//DateTEntry not allowed to change
+			return false;
+		}
+
 		///<summary>Deletes one ClaimSnapshot from the database.</summary>
 		public static void Delete(long claimSnapshotNum){
 			string command="DELETE FROM claimsnapshot "

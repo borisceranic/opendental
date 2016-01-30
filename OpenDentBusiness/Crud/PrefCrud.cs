@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Pref,Pref) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Pref pref,Pref oldPref) {
+			if(pref.PrefName != oldPref.PrefName) {
+				return true;
+			}
+			if(pref.ValueString != oldPref.ValueString) {
+				return true;
+			}
+			if(pref.Comments != oldPref.Comments) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Pref from the database.</summary>
 		public static void Delete(long prefNum){
 			string command="DELETE FROM preference "

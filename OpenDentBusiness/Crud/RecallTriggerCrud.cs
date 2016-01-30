@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RecallTrigger,RecallTrigger) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RecallTrigger recallTrigger,RecallTrigger oldRecallTrigger) {
+			if(recallTrigger.RecallTypeNum != oldRecallTrigger.RecallTypeNum) {
+				return true;
+			}
+			if(recallTrigger.CodeNum != oldRecallTrigger.CodeNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RecallTrigger from the database.</summary>
 		public static void Delete(long recallTriggerNum){
 			string command="DELETE FROM recalltrigger "

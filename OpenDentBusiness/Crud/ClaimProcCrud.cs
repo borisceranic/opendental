@@ -583,6 +583,132 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimProc,ClaimProc) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimProc claimProc,ClaimProc oldClaimProc) {
+			if(claimProc.ProcNum != oldClaimProc.ProcNum) {
+				return true;
+			}
+			if(claimProc.ClaimNum != oldClaimProc.ClaimNum) {
+				return true;
+			}
+			if(claimProc.PatNum != oldClaimProc.PatNum) {
+				return true;
+			}
+			if(claimProc.ProvNum != oldClaimProc.ProvNum) {
+				return true;
+			}
+			if(claimProc.FeeBilled != oldClaimProc.FeeBilled) {
+				return true;
+			}
+			if(claimProc.InsPayEst != oldClaimProc.InsPayEst) {
+				return true;
+			}
+			if(claimProc.DedApplied != oldClaimProc.DedApplied) {
+				return true;
+			}
+			if(claimProc.Status != oldClaimProc.Status) {
+				return true;
+			}
+			if(claimProc.InsPayAmt != oldClaimProc.InsPayAmt) {
+				return true;
+			}
+			if(claimProc.Remarks != oldClaimProc.Remarks) {
+				return true;
+			}
+			if(claimProc.ClaimPaymentNum != oldClaimProc.ClaimPaymentNum) {
+				return true;
+			}
+			if(claimProc.PlanNum != oldClaimProc.PlanNum) {
+				return true;
+			}
+			if(claimProc.DateCP.Date != oldClaimProc.DateCP.Date) {
+				return true;
+			}
+			if(claimProc.WriteOff != oldClaimProc.WriteOff) {
+				return true;
+			}
+			if(claimProc.CodeSent != oldClaimProc.CodeSent) {
+				return true;
+			}
+			if(claimProc.AllowedOverride != oldClaimProc.AllowedOverride) {
+				return true;
+			}
+			if(claimProc.Percentage != oldClaimProc.Percentage) {
+				return true;
+			}
+			if(claimProc.PercentOverride != oldClaimProc.PercentOverride) {
+				return true;
+			}
+			if(claimProc.CopayAmt != oldClaimProc.CopayAmt) {
+				return true;
+			}
+			if(claimProc.NoBillIns != oldClaimProc.NoBillIns) {
+				return true;
+			}
+			if(claimProc.PaidOtherIns != oldClaimProc.PaidOtherIns) {
+				return true;
+			}
+			if(claimProc.BaseEst != oldClaimProc.BaseEst) {
+				return true;
+			}
+			if(claimProc.CopayOverride != oldClaimProc.CopayOverride) {
+				return true;
+			}
+			if(claimProc.ProcDate.Date != oldClaimProc.ProcDate.Date) {
+				return true;
+			}
+			if(claimProc.DateEntry.Date != oldClaimProc.DateEntry.Date) {
+				return true;
+			}
+			if(claimProc.LineNumber != oldClaimProc.LineNumber) {
+				return true;
+			}
+			if(claimProc.DedEst != oldClaimProc.DedEst) {
+				return true;
+			}
+			if(claimProc.DedEstOverride != oldClaimProc.DedEstOverride) {
+				return true;
+			}
+			if(claimProc.InsEstTotal != oldClaimProc.InsEstTotal) {
+				return true;
+			}
+			if(claimProc.InsEstTotalOverride != oldClaimProc.InsEstTotalOverride) {
+				return true;
+			}
+			if(claimProc.PaidOtherInsOverride != oldClaimProc.PaidOtherInsOverride) {
+				return true;
+			}
+			if(claimProc.EstimateNote != oldClaimProc.EstimateNote) {
+				return true;
+			}
+			if(claimProc.WriteOffEst != oldClaimProc.WriteOffEst) {
+				return true;
+			}
+			if(claimProc.WriteOffEstOverride != oldClaimProc.WriteOffEstOverride) {
+				return true;
+			}
+			if(claimProc.ClinicNum != oldClaimProc.ClinicNum) {
+				return true;
+			}
+			if(claimProc.InsSubNum != oldClaimProc.InsSubNum) {
+				return true;
+			}
+			if(claimProc.PaymentRow != oldClaimProc.PaymentRow) {
+				return true;
+			}
+			if(claimProc.PayPlanNum != oldClaimProc.PayPlanNum) {
+				return true;
+			}
+			if(claimProc.ClaimPaymentTracking != oldClaimProc.ClaimPaymentTracking) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one ClaimProc from the database.</summary>
 		public static void Delete(long claimProcNum){
 			string command="DELETE FROM claimproc "

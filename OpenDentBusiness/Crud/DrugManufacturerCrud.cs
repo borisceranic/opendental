@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DrugManufacturer,DrugManufacturer) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DrugManufacturer drugManufacturer,DrugManufacturer oldDrugManufacturer) {
+			if(drugManufacturer.ManufacturerName != oldDrugManufacturer.ManufacturerName) {
+				return true;
+			}
+			if(drugManufacturer.ManufacturerCode != oldDrugManufacturer.ManufacturerCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DrugManufacturer from the database.</summary>
 		public static void Delete(long drugManufacturerNum){
 			string command="DELETE FROM drugmanufacturer "

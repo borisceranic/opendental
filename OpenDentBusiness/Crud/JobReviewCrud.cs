@@ -244,6 +244,25 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobReview,JobReview) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobReview jobReview,JobReview oldJobReview) {
+			if(jobReview.JobNum != oldJobReview.JobNum) {
+				return true;
+			}
+			if(jobReview.ReviewerNum != oldJobReview.ReviewerNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(jobReview.Description != oldJobReview.Description) {
+				return true;
+			}
+			if(jobReview.ReviewStatus != oldJobReview.ReviewStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobReview from the database.</summary>
 		public static void Delete(long jobReviewNum){
 			string command="DELETE FROM jobreview "

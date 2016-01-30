@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskUnread,TaskUnread) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskUnread taskUnread,TaskUnread oldTaskUnread) {
+			if(taskUnread.TaskNum != oldTaskUnread.TaskNum) {
+				return true;
+			}
+			if(taskUnread.UserNum != oldTaskUnread.UserNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskUnread from the database.</summary>
 		public static void Delete(long taskUnreadNum){
 			string command="DELETE FROM taskunread "

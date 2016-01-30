@@ -299,6 +299,49 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Recall,Recall) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Recall recall,Recall oldRecall) {
+			if(recall.PatNum != oldRecall.PatNum) {
+				return true;
+			}
+			if(recall.DateDueCalc.Date != oldRecall.DateDueCalc.Date) {
+				return true;
+			}
+			if(recall.DateDue.Date != oldRecall.DateDue.Date) {
+				return true;
+			}
+			if(recall.DatePrevious.Date != oldRecall.DatePrevious.Date) {
+				return true;
+			}
+			if(recall.RecallInterval != oldRecall.RecallInterval) {
+				return true;
+			}
+			if(recall.RecallStatus != oldRecall.RecallStatus) {
+				return true;
+			}
+			if(recall.Note != oldRecall.Note) {
+				return true;
+			}
+			if(recall.IsDisabled != oldRecall.IsDisabled) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(recall.RecallTypeNum != oldRecall.RecallTypeNum) {
+				return true;
+			}
+			if(recall.DisableUntilBalance != oldRecall.DisableUntilBalance) {
+				return true;
+			}
+			if(recall.DisableUntilDate.Date != oldRecall.DisableUntilDate.Date) {
+				return true;
+			}
+			if(recall.DateScheduled.Date != oldRecall.DateScheduled.Date) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Recall from the database.</summary>
 		public static void Delete(long recallNum){
 			string command="DELETE FROM recall "

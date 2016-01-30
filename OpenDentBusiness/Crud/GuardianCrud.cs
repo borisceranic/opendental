@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Guardian,Guardian) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Guardian guardian,Guardian oldGuardian) {
+			if(guardian.PatNumChild != oldGuardian.PatNumChild) {
+				return true;
+			}
+			if(guardian.PatNumGuardian != oldGuardian.PatNumGuardian) {
+				return true;
+			}
+			if(guardian.Relationship != oldGuardian.Relationship) {
+				return true;
+			}
+			if(guardian.IsGuardian != oldGuardian.IsGuardian) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Guardian from the database.</summary>
 		public static void Delete(long guardianNum){
 			string command="DELETE FROM guardian "

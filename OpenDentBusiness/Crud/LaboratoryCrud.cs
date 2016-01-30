@@ -272,6 +272,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Laboratory,Laboratory) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Laboratory laboratory,Laboratory oldLaboratory) {
+			if(laboratory.Description != oldLaboratory.Description) {
+				return true;
+			}
+			if(laboratory.Phone != oldLaboratory.Phone) {
+				return true;
+			}
+			if(laboratory.Notes != oldLaboratory.Notes) {
+				return true;
+			}
+			if(laboratory.Slip != oldLaboratory.Slip) {
+				return true;
+			}
+			if(laboratory.Address != oldLaboratory.Address) {
+				return true;
+			}
+			if(laboratory.City != oldLaboratory.City) {
+				return true;
+			}
+			if(laboratory.State != oldLaboratory.State) {
+				return true;
+			}
+			if(laboratory.Zip != oldLaboratory.Zip) {
+				return true;
+			}
+			if(laboratory.Email != oldLaboratory.Email) {
+				return true;
+			}
+			if(laboratory.WirelessPhone != oldLaboratory.WirelessPhone) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Laboratory from the database.</summary>
 		public static void Delete(long laboratoryNum){
 			string command="DELETE FROM laboratory "

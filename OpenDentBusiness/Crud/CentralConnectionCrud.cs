@@ -282,6 +282,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(CentralConnection,CentralConnection) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(CentralConnection centralConnection,CentralConnection oldCentralConnection) {
+			if(centralConnection.ServerName != oldCentralConnection.ServerName) {
+				return true;
+			}
+			if(centralConnection.DatabaseName != oldCentralConnection.DatabaseName) {
+				return true;
+			}
+			if(centralConnection.MySqlUser != oldCentralConnection.MySqlUser) {
+				return true;
+			}
+			if(centralConnection.MySqlPassword != oldCentralConnection.MySqlPassword) {
+				return true;
+			}
+			if(centralConnection.ServiceURI != oldCentralConnection.ServiceURI) {
+				return true;
+			}
+			if(centralConnection.OdUser != oldCentralConnection.OdUser) {
+				return true;
+			}
+			if(centralConnection.OdPassword != oldCentralConnection.OdPassword) {
+				return true;
+			}
+			if(centralConnection.Note != oldCentralConnection.Note) {
+				return true;
+			}
+			if(centralConnection.ItemOrder != oldCentralConnection.ItemOrder) {
+				return true;
+			}
+			if(centralConnection.WebServiceIsEcw != oldCentralConnection.WebServiceIsEcw) {
+				return true;
+			}
+			if(centralConnection.ConnectionStatus != oldCentralConnection.ConnectionStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one CentralConnection from the database.</summary>
 		public static void Delete(long centralConnectionNum){
 			string command="DELETE FROM centralconnection "

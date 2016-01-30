@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(UserodApptView,UserodApptView) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(UserodApptView userodApptView,UserodApptView oldUserodApptView) {
+			if(userodApptView.UserNum != oldUserodApptView.UserNum) {
+				return true;
+			}
+			if(userodApptView.ClinicNum != oldUserodApptView.ClinicNum) {
+				return true;
+			}
+			if(userodApptView.ApptViewNum != oldUserodApptView.ApptViewNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one UserodApptView from the database.</summary>
 		public static void Delete(long userodApptViewNum){
 			string command="DELETE FROM userodapptview "

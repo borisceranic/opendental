@@ -259,6 +259,37 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Disease,Disease) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Disease disease,Disease oldDisease) {
+			if(disease.PatNum != oldDisease.PatNum) {
+				return true;
+			}
+			if(disease.DiseaseDefNum != oldDisease.DiseaseDefNum) {
+				return true;
+			}
+			if(disease.PatNote != oldDisease.PatNote) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(disease.ProbStatus != oldDisease.ProbStatus) {
+				return true;
+			}
+			if(disease.DateStart.Date != oldDisease.DateStart.Date) {
+				return true;
+			}
+			if(disease.DateStop.Date != oldDisease.DateStop.Date) {
+				return true;
+			}
+			if(disease.SnomedProblemType != oldDisease.SnomedProblemType) {
+				return true;
+			}
+			if(disease.FunctionStatus != oldDisease.FunctionStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Disease from the database.</summary>
 		public static void Delete(long diseaseNum){
 			string command="DELETE FROM disease "

@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AutoNoteControl,AutoNoteControl) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AutoNoteControl autoNoteControl,AutoNoteControl oldAutoNoteControl) {
+			if(autoNoteControl.Descript != oldAutoNoteControl.Descript) {
+				return true;
+			}
+			if(autoNoteControl.ControlType != oldAutoNoteControl.ControlType) {
+				return true;
+			}
+			if(autoNoteControl.ControlLabel != oldAutoNoteControl.ControlLabel) {
+				return true;
+			}
+			if(autoNoteControl.ControlOptions != oldAutoNoteControl.ControlOptions) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AutoNoteControl from the database.</summary>
 		public static void Delete(long autoNoteControlNum){
 			string command="DELETE FROM autonotecontrol "

@@ -228,6 +228,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DocumentMisc,DocumentMisc) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DocumentMisc documentMisc,DocumentMisc oldDocumentMisc) {
+			if(documentMisc.DateCreated.Date != oldDocumentMisc.DateCreated.Date) {
+				return true;
+			}
+			if(documentMisc.FileName != oldDocumentMisc.FileName) {
+				return true;
+			}
+			if(documentMisc.DocMiscType != oldDocumentMisc.DocMiscType) {
+				return true;
+			}
+			if(documentMisc.RawBase64 != oldDocumentMisc.RawBase64) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DocumentMisc from the database.</summary>
 		public static void Delete(long docMiscNum){
 			string command="DELETE FROM documentmisc "

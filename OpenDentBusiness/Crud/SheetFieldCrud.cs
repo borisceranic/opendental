@@ -378,6 +378,69 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SheetField,SheetField) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SheetField sheetField,SheetField oldSheetField) {
+			if(sheetField.SheetNum != oldSheetField.SheetNum) {
+				return true;
+			}
+			if(sheetField.FieldType != oldSheetField.FieldType) {
+				return true;
+			}
+			if(sheetField.FieldName != oldSheetField.FieldName) {
+				return true;
+			}
+			if(sheetField.FieldValue != oldSheetField.FieldValue) {
+				return true;
+			}
+			if(sheetField.FontSize != oldSheetField.FontSize) {
+				return true;
+			}
+			if(sheetField.FontName != oldSheetField.FontName) {
+				return true;
+			}
+			if(sheetField.FontIsBold != oldSheetField.FontIsBold) {
+				return true;
+			}
+			if(sheetField.XPos != oldSheetField.XPos) {
+				return true;
+			}
+			if(sheetField.YPos != oldSheetField.YPos) {
+				return true;
+			}
+			if(sheetField.Width != oldSheetField.Width) {
+				return true;
+			}
+			if(sheetField.Height != oldSheetField.Height) {
+				return true;
+			}
+			if(sheetField.GrowthBehavior != oldSheetField.GrowthBehavior) {
+				return true;
+			}
+			if(sheetField.RadioButtonValue != oldSheetField.RadioButtonValue) {
+				return true;
+			}
+			if(sheetField.RadioButtonGroup != oldSheetField.RadioButtonGroup) {
+				return true;
+			}
+			if(sheetField.IsRequired != oldSheetField.IsRequired) {
+				return true;
+			}
+			if(sheetField.TabOrder != oldSheetField.TabOrder) {
+				return true;
+			}
+			if(sheetField.ReportableName != oldSheetField.ReportableName) {
+				return true;
+			}
+			if(sheetField.TextAlign != oldSheetField.TextAlign) {
+				return true;
+			}
+			if(sheetField.ItemColor != oldSheetField.ItemColor) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SheetField from the database.</summary>
 		public static void Delete(long sheetFieldNum){
 			string command="DELETE FROM sheetfield "

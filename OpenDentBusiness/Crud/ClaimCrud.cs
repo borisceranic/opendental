@@ -913,6 +913,231 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Claim,Claim) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Claim claim,Claim oldClaim) {
+			if(claim.PatNum != oldClaim.PatNum) {
+				return true;
+			}
+			if(claim.DateService.Date != oldClaim.DateService.Date) {
+				return true;
+			}
+			if(claim.DateSent.Date != oldClaim.DateSent.Date) {
+				return true;
+			}
+			if(claim.ClaimStatus != oldClaim.ClaimStatus) {
+				return true;
+			}
+			if(claim.DateReceived.Date != oldClaim.DateReceived.Date) {
+				return true;
+			}
+			if(claim.PlanNum != oldClaim.PlanNum) {
+				return true;
+			}
+			if(claim.ProvTreat != oldClaim.ProvTreat) {
+				return true;
+			}
+			if(claim.ClaimFee != oldClaim.ClaimFee) {
+				return true;
+			}
+			if(claim.InsPayEst != oldClaim.InsPayEst) {
+				return true;
+			}
+			if(claim.InsPayAmt != oldClaim.InsPayAmt) {
+				return true;
+			}
+			if(claim.DedApplied != oldClaim.DedApplied) {
+				return true;
+			}
+			if(claim.PreAuthString != oldClaim.PreAuthString) {
+				return true;
+			}
+			if(claim.IsProsthesis != oldClaim.IsProsthesis) {
+				return true;
+			}
+			if(claim.PriorDate.Date != oldClaim.PriorDate.Date) {
+				return true;
+			}
+			if(claim.ReasonUnderPaid != oldClaim.ReasonUnderPaid) {
+				return true;
+			}
+			if(claim.ClaimNote != oldClaim.ClaimNote) {
+				return true;
+			}
+			if(claim.ClaimType != oldClaim.ClaimType) {
+				return true;
+			}
+			if(claim.ProvBill != oldClaim.ProvBill) {
+				return true;
+			}
+			if(claim.ReferringProv != oldClaim.ReferringProv) {
+				return true;
+			}
+			if(claim.RefNumString != oldClaim.RefNumString) {
+				return true;
+			}
+			if(claim.PlaceService != oldClaim.PlaceService) {
+				return true;
+			}
+			if(claim.AccidentRelated != oldClaim.AccidentRelated) {
+				return true;
+			}
+			if(claim.AccidentDate.Date != oldClaim.AccidentDate.Date) {
+				return true;
+			}
+			if(claim.AccidentST != oldClaim.AccidentST) {
+				return true;
+			}
+			if(claim.EmployRelated != oldClaim.EmployRelated) {
+				return true;
+			}
+			if(claim.IsOrtho != oldClaim.IsOrtho) {
+				return true;
+			}
+			if(claim.OrthoRemainM != oldClaim.OrthoRemainM) {
+				return true;
+			}
+			if(claim.OrthoDate.Date != oldClaim.OrthoDate.Date) {
+				return true;
+			}
+			if(claim.PatRelat != oldClaim.PatRelat) {
+				return true;
+			}
+			if(claim.PlanNum2 != oldClaim.PlanNum2) {
+				return true;
+			}
+			if(claim.PatRelat2 != oldClaim.PatRelat2) {
+				return true;
+			}
+			if(claim.WriteOff != oldClaim.WriteOff) {
+				return true;
+			}
+			if(claim.Radiographs != oldClaim.Radiographs) {
+				return true;
+			}
+			if(claim.ClinicNum != oldClaim.ClinicNum) {
+				return true;
+			}
+			if(claim.ClaimForm != oldClaim.ClaimForm) {
+				return true;
+			}
+			if(claim.AttachedImages != oldClaim.AttachedImages) {
+				return true;
+			}
+			if(claim.AttachedModels != oldClaim.AttachedModels) {
+				return true;
+			}
+			if(claim.AttachedFlags != oldClaim.AttachedFlags) {
+				return true;
+			}
+			if(claim.AttachmentID != oldClaim.AttachmentID) {
+				return true;
+			}
+			if(claim.CanadianMaterialsForwarded != oldClaim.CanadianMaterialsForwarded) {
+				return true;
+			}
+			if(claim.CanadianReferralProviderNum != oldClaim.CanadianReferralProviderNum) {
+				return true;
+			}
+			if(claim.CanadianReferralReason != oldClaim.CanadianReferralReason) {
+				return true;
+			}
+			if(claim.CanadianIsInitialLower != oldClaim.CanadianIsInitialLower) {
+				return true;
+			}
+			if(claim.CanadianDateInitialLower.Date != oldClaim.CanadianDateInitialLower.Date) {
+				return true;
+			}
+			if(claim.CanadianMandProsthMaterial != oldClaim.CanadianMandProsthMaterial) {
+				return true;
+			}
+			if(claim.CanadianIsInitialUpper != oldClaim.CanadianIsInitialUpper) {
+				return true;
+			}
+			if(claim.CanadianDateInitialUpper.Date != oldClaim.CanadianDateInitialUpper.Date) {
+				return true;
+			}
+			if(claim.CanadianMaxProsthMaterial != oldClaim.CanadianMaxProsthMaterial) {
+				return true;
+			}
+			if(claim.InsSubNum != oldClaim.InsSubNum) {
+				return true;
+			}
+			if(claim.InsSubNum2 != oldClaim.InsSubNum2) {
+				return true;
+			}
+			if(claim.CanadaTransRefNum != oldClaim.CanadaTransRefNum) {
+				return true;
+			}
+			if(claim.CanadaEstTreatStartDate.Date != oldClaim.CanadaEstTreatStartDate.Date) {
+				return true;
+			}
+			if(claim.CanadaInitialPayment != oldClaim.CanadaInitialPayment) {
+				return true;
+			}
+			if(claim.CanadaPaymentMode != oldClaim.CanadaPaymentMode) {
+				return true;
+			}
+			if(claim.CanadaTreatDuration != oldClaim.CanadaTreatDuration) {
+				return true;
+			}
+			if(claim.CanadaNumAnticipatedPayments != oldClaim.CanadaNumAnticipatedPayments) {
+				return true;
+			}
+			if(claim.CanadaAnticipatedPayAmount != oldClaim.CanadaAnticipatedPayAmount) {
+				return true;
+			}
+			if(claim.PriorAuthorizationNumber != oldClaim.PriorAuthorizationNumber) {
+				return true;
+			}
+			if(claim.SpecialProgramCode != oldClaim.SpecialProgramCode) {
+				return true;
+			}
+			if(claim.UniformBillType != oldClaim.UniformBillType) {
+				return true;
+			}
+			if(claim.MedType != oldClaim.MedType) {
+				return true;
+			}
+			if(claim.AdmissionTypeCode != oldClaim.AdmissionTypeCode) {
+				return true;
+			}
+			if(claim.AdmissionSourceCode != oldClaim.AdmissionSourceCode) {
+				return true;
+			}
+			if(claim.PatientStatusCode != oldClaim.PatientStatusCode) {
+				return true;
+			}
+			if(claim.CustomTracking != oldClaim.CustomTracking) {
+				return true;
+			}
+			if(claim.DateResent.Date != oldClaim.DateResent.Date) {
+				return true;
+			}
+			if(claim.CorrectionType != oldClaim.CorrectionType) {
+				return true;
+			}
+			if(claim.ClaimIdentifier != oldClaim.ClaimIdentifier) {
+				return true;
+			}
+			if(claim.OrigRefNum != oldClaim.OrigRefNum) {
+				return true;
+			}
+			if(claim.ProvOrderOverride != oldClaim.ProvOrderOverride) {
+				return true;
+			}
+			if(claim.OrthoTotalM != oldClaim.OrthoTotalM) {
+				return true;
+			}
+			if(claim.ShareOfCost != oldClaim.ShareOfCost) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one Claim from the database.</summary>
 		public static void Delete(long claimNum){
 			ClearFkey(claimNum);

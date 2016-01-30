@@ -402,6 +402,81 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Referral,Referral) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Referral referral,Referral oldReferral) {
+			if(referral.LName != oldReferral.LName) {
+				return true;
+			}
+			if(referral.FName != oldReferral.FName) {
+				return true;
+			}
+			if(referral.MName != oldReferral.MName) {
+				return true;
+			}
+			if(referral.SSN != oldReferral.SSN) {
+				return true;
+			}
+			if(referral.UsingTIN != oldReferral.UsingTIN) {
+				return true;
+			}
+			if(referral.Specialty != oldReferral.Specialty) {
+				return true;
+			}
+			if(referral.ST != oldReferral.ST) {
+				return true;
+			}
+			if(referral.Telephone != oldReferral.Telephone) {
+				return true;
+			}
+			if(referral.Address != oldReferral.Address) {
+				return true;
+			}
+			if(referral.Address2 != oldReferral.Address2) {
+				return true;
+			}
+			if(referral.City != oldReferral.City) {
+				return true;
+			}
+			if(referral.Zip != oldReferral.Zip) {
+				return true;
+			}
+			if(referral.Note != oldReferral.Note) {
+				return true;
+			}
+			if(referral.Phone2 != oldReferral.Phone2) {
+				return true;
+			}
+			if(referral.IsHidden != oldReferral.IsHidden) {
+				return true;
+			}
+			if(referral.NotPerson != oldReferral.NotPerson) {
+				return true;
+			}
+			if(referral.Title != oldReferral.Title) {
+				return true;
+			}
+			if(referral.EMail != oldReferral.EMail) {
+				return true;
+			}
+			if(referral.PatNum != oldReferral.PatNum) {
+				return true;
+			}
+			if(referral.NationalProvID != oldReferral.NationalProvID) {
+				return true;
+			}
+			if(referral.Slip != oldReferral.Slip) {
+				return true;
+			}
+			if(referral.IsDoctor != oldReferral.IsDoctor) {
+				return true;
+			}
+			if(referral.IsTrustedDirect != oldReferral.IsTrustedDirect) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Referral from the database.</summary>
 		public static void Delete(long referralNum){
 			string command="DELETE FROM referral "

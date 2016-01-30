@@ -309,6 +309,52 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClockEvent,ClockEvent) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClockEvent clockEvent,ClockEvent oldClockEvent) {
+			if(clockEvent.EmployeeNum != oldClockEvent.EmployeeNum) {
+				return true;
+			}
+			//TimeEntered1 not allowed to change
+			if(clockEvent.TimeDisplayed1 != oldClockEvent.TimeDisplayed1) {
+				return true;
+			}
+			if(clockEvent.ClockStatus != oldClockEvent.ClockStatus) {
+				return true;
+			}
+			if(clockEvent.Note != oldClockEvent.Note) {
+				return true;
+			}
+			if(clockEvent.TimeEntered2 != oldClockEvent.TimeEntered2) {
+				return true;
+			}
+			if(clockEvent.TimeDisplayed2 != oldClockEvent.TimeDisplayed2) {
+				return true;
+			}
+			if(clockEvent.OTimeHours != oldClockEvent.OTimeHours) {
+				return true;
+			}
+			if(clockEvent.OTimeAuto != oldClockEvent.OTimeAuto) {
+				return true;
+			}
+			if(clockEvent.Adjust != oldClockEvent.Adjust) {
+				return true;
+			}
+			if(clockEvent.AdjustAuto != oldClockEvent.AdjustAuto) {
+				return true;
+			}
+			if(clockEvent.AdjustIsOverridden != oldClockEvent.AdjustIsOverridden) {
+				return true;
+			}
+			if(clockEvent.Rate2Hours != oldClockEvent.Rate2Hours) {
+				return true;
+			}
+			if(clockEvent.Rate2Auto != oldClockEvent.Rate2Auto) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ClockEvent from the database.</summary>
 		public static void Delete(long clockEventNum){
 			string command="DELETE FROM clockevent "

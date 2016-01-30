@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SigButDefElement,SigButDefElement) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SigButDefElement sigButDefElement,SigButDefElement oldSigButDefElement) {
+			if(sigButDefElement.SigButDefNum != oldSigButDefElement.SigButDefNum) {
+				return true;
+			}
+			if(sigButDefElement.SigElementDefNum != oldSigButDefElement.SigElementDefNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SigButDefElement from the database.</summary>
 		public static void Delete(long elementNum){
 			string command="DELETE FROM sigbutdefelement "

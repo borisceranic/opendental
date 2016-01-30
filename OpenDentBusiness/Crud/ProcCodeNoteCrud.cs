@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProcCodeNote,ProcCodeNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProcCodeNote procCodeNote,ProcCodeNote oldProcCodeNote) {
+			if(procCodeNote.CodeNum != oldProcCodeNote.CodeNum) {
+				return true;
+			}
+			if(procCodeNote.ProvNum != oldProcCodeNote.ProvNum) {
+				return true;
+			}
+			if(procCodeNote.Note != oldProcCodeNote.Note) {
+				return true;
+			}
+			if(procCodeNote.ProcTime != oldProcCodeNote.ProcTime) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProcCodeNote from the database.</summary>
 		public static void Delete(long procCodeNoteNum){
 			string command="DELETE FROM proccodenote "

@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Computer,Computer) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Computer computer,Computer oldComputer) {
+			if(computer.CompName != oldComputer.CompName) {
+				return true;
+			}
+			if(computer.LastHeartBeat != oldComputer.LastHeartBeat) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Computer from the database.</summary>
 		public static void Delete(long computerNum){
 			string command="DELETE FROM computer "

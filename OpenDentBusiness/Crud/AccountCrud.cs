@@ -222,6 +222,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Account,Account) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Account account,Account oldAccount) {
+			if(account.Description != oldAccount.Description) {
+				return true;
+			}
+			if(account.AcctType != oldAccount.AcctType) {
+				return true;
+			}
+			if(account.BankNumber != oldAccount.BankNumber) {
+				return true;
+			}
+			if(account.Inactive != oldAccount.Inactive) {
+				return true;
+			}
+			if(account.AccountColor != oldAccount.AccountColor) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Account from the database.</summary>
 		public static void Delete(long accountNum){
 			string command="DELETE FROM account "

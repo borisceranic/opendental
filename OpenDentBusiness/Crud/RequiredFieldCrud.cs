@@ -201,6 +201,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RequiredField,RequiredField) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RequiredField requiredField,RequiredField oldRequiredField) {
+			if(requiredField.FieldType != oldRequiredField.FieldType) {
+				return true;
+			}
+			if(requiredField.FieldName != oldRequiredField.FieldName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RequiredField from the database.</summary>
 		public static void Delete(long requiredFieldNum){
 			string command="DELETE FROM requiredfield "

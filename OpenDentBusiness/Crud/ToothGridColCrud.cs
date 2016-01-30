@@ -242,6 +242,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ToothGridCol,ToothGridCol) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ToothGridCol toothGridCol,ToothGridCol oldToothGridCol) {
+			if(toothGridCol.SheetFieldNum != oldToothGridCol.SheetFieldNum) {
+				return true;
+			}
+			if(toothGridCol.NameItem != oldToothGridCol.NameItem) {
+				return true;
+			}
+			if(toothGridCol.CellType != oldToothGridCol.CellType) {
+				return true;
+			}
+			if(toothGridCol.ItemOrder != oldToothGridCol.ItemOrder) {
+				return true;
+			}
+			if(toothGridCol.ColumnWidth != oldToothGridCol.ColumnWidth) {
+				return true;
+			}
+			if(toothGridCol.CodeNum != oldToothGridCol.CodeNum) {
+				return true;
+			}
+			if(toothGridCol.ProcStatus != oldToothGridCol.ProcStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ToothGridCol from the database.</summary>
 		public static void Delete(long toothGridColNum){
 			string command="DELETE FROM toothgridcol "

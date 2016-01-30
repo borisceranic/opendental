@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobLink,JobLink) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobLink jobLink,JobLink oldJobLink) {
+			if(jobLink.JobNum != oldJobLink.JobNum) {
+				return true;
+			}
+			if(jobLink.FKey != oldJobLink.FKey) {
+				return true;
+			}
+			if(jobLink.LinkType != oldJobLink.LinkType) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobLink from the database.</summary>
 		public static void Delete(long jobLinkNum){
 			string command="DELETE FROM joblink "

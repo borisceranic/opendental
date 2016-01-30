@@ -222,6 +222,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobProject,JobProject) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobProject jobProject,JobProject oldJobProject) {
+			if(jobProject.RootProjectNum != oldJobProject.RootProjectNum) {
+				return true;
+			}
+			if(jobProject.ParentProjectNum != oldJobProject.ParentProjectNum) {
+				return true;
+			}
+			if(jobProject.Title != oldJobProject.Title) {
+				return true;
+			}
+			if(jobProject.Description != oldJobProject.Description) {
+				return true;
+			}
+			if(jobProject.ProjectStatus != oldJobProject.ProjectStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobProject from the database.</summary>
 		public static void Delete(long jobProjectNum){
 			string command="DELETE FROM jobproject "

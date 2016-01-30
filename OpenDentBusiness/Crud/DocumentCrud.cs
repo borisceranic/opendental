@@ -421,6 +421,76 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Document,Document) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Document document,Document oldDocument) {
+			if(document.Description != oldDocument.Description) {
+				return true;
+			}
+			if(document.DateCreated != oldDocument.DateCreated) {
+				return true;
+			}
+			if(document.DocCategory != oldDocument.DocCategory) {
+				return true;
+			}
+			if(document.PatNum != oldDocument.PatNum) {
+				return true;
+			}
+			if(document.FileName != oldDocument.FileName) {
+				return true;
+			}
+			if(document.ImgType != oldDocument.ImgType) {
+				return true;
+			}
+			if(document.IsFlipped != oldDocument.IsFlipped) {
+				return true;
+			}
+			if(document.DegreesRotated != oldDocument.DegreesRotated) {
+				return true;
+			}
+			if(document.ToothNumbers != oldDocument.ToothNumbers) {
+				return true;
+			}
+			if(document.Note != oldDocument.Note) {
+				return true;
+			}
+			if(document.SigIsTopaz != oldDocument.SigIsTopaz) {
+				return true;
+			}
+			if(document.Signature != oldDocument.Signature) {
+				return true;
+			}
+			if(document.CropX != oldDocument.CropX) {
+				return true;
+			}
+			if(document.CropY != oldDocument.CropY) {
+				return true;
+			}
+			if(document.CropW != oldDocument.CropW) {
+				return true;
+			}
+			if(document.CropH != oldDocument.CropH) {
+				return true;
+			}
+			if(document.WindowingMin != oldDocument.WindowingMin) {
+				return true;
+			}
+			if(document.WindowingMax != oldDocument.WindowingMax) {
+				return true;
+			}
+			if(document.MountItemNum != oldDocument.MountItemNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(document.RawBase64 != oldDocument.RawBase64) {
+				return true;
+			}
+			if(document.Thumbnail != oldDocument.Thumbnail) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Document from the database.</summary>
 		public static void Delete(long docNum){
 			ClearFkey(docNum);

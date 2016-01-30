@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Printer,Printer) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Printer printer,Printer oldPrinter) {
+			if(printer.ComputerNum != oldPrinter.ComputerNum) {
+				return true;
+			}
+			if(printer.PrintSit != oldPrinter.PrintSit) {
+				return true;
+			}
+			if(printer.PrinterName != oldPrinter.PrinterName) {
+				return true;
+			}
+			if(printer.DisplayPrompt != oldPrinter.DisplayPrompt) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Printer from the database.</summary>
 		public static void Delete(long printerNum){
 			string command="DELETE FROM printer "

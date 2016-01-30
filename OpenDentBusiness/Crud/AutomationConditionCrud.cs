@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AutomationCondition,AutomationCondition) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AutomationCondition automationCondition,AutomationCondition oldAutomationCondition) {
+			if(automationCondition.AutomationNum != oldAutomationCondition.AutomationNum) {
+				return true;
+			}
+			if(automationCondition.CompareField != oldAutomationCondition.CompareField) {
+				return true;
+			}
+			if(automationCondition.Comparison != oldAutomationCondition.Comparison) {
+				return true;
+			}
+			if(automationCondition.CompareString != oldAutomationCondition.CompareString) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AutomationCondition from the database.</summary>
 		public static void Delete(long automationConditionNum){
 			string command="DELETE FROM automationcondition "

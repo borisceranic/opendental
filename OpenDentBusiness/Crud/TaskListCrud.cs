@@ -252,6 +252,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskList,TaskList) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskList taskList,TaskList oldTaskList) {
+			if(taskList.Descript != oldTaskList.Descript) {
+				return true;
+			}
+			if(taskList.Parent != oldTaskList.Parent) {
+				return true;
+			}
+			if(taskList.DateTL.Date != oldTaskList.DateTL.Date) {
+				return true;
+			}
+			if(taskList.IsRepeating != oldTaskList.IsRepeating) {
+				return true;
+			}
+			if(taskList.DateType != oldTaskList.DateType) {
+				return true;
+			}
+			if(taskList.FromNum != oldTaskList.FromNum) {
+				return true;
+			}
+			if(taskList.ObjectType != oldTaskList.ObjectType) {
+				return true;
+			}
+			if(taskList.DateTimeEntry != oldTaskList.DateTimeEntry) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskList from the database.</summary>
 		public static void Delete(long taskListNum){
 			string command="DELETE FROM tasklist "

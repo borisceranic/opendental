@@ -222,6 +222,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProviderErx,ProviderErx) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProviderErx providerErx,ProviderErx oldProviderErx) {
+			if(providerErx.PatNum != oldProviderErx.PatNum) {
+				return true;
+			}
+			if(providerErx.NationalProviderID != oldProviderErx.NationalProviderID) {
+				return true;
+			}
+			if(providerErx.IsEnabled != oldProviderErx.IsEnabled) {
+				return true;
+			}
+			if(providerErx.IsIdentifyProofed != oldProviderErx.IsIdentifyProofed) {
+				return true;
+			}
+			if(providerErx.IsSentToHq != oldProviderErx.IsSentToHq) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProviderErx from the database.</summary>
 		public static void Delete(long providerErxNum){
 			string command="DELETE FROM providererx "

@@ -232,6 +232,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SmsPhone,SmsPhone) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SmsPhone smsPhone,SmsPhone oldSmsPhone) {
+			if(smsPhone.ClinicNum != oldSmsPhone.ClinicNum) {
+				return true;
+			}
+			if(smsPhone.PhoneNumber != oldSmsPhone.PhoneNumber) {
+				return true;
+			}
+			if(smsPhone.DateTimeActive != oldSmsPhone.DateTimeActive) {
+				return true;
+			}
+			if(smsPhone.DateTimeInactive != oldSmsPhone.DateTimeInactive) {
+				return true;
+			}
+			if(smsPhone.InactiveCode != oldSmsPhone.InactiveCode) {
+				return true;
+			}
+			if(smsPhone.CountryCode != oldSmsPhone.CountryCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SmsPhone from the database.</summary>
 		public static void Delete(long smsPhoneNum){
 			string command="DELETE FROM smsphone "

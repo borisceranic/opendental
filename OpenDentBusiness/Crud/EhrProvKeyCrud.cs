@@ -242,6 +242,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrProvKey,EhrProvKey) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrProvKey ehrProvKey,EhrProvKey oldEhrProvKey) {
+			if(ehrProvKey.PatNum != oldEhrProvKey.PatNum) {
+				return true;
+			}
+			if(ehrProvKey.LName != oldEhrProvKey.LName) {
+				return true;
+			}
+			if(ehrProvKey.FName != oldEhrProvKey.FName) {
+				return true;
+			}
+			if(ehrProvKey.ProvKey != oldEhrProvKey.ProvKey) {
+				return true;
+			}
+			if(ehrProvKey.FullTimeEquiv != oldEhrProvKey.FullTimeEquiv) {
+				return true;
+			}
+			if(ehrProvKey.Notes != oldEhrProvKey.Notes) {
+				return true;
+			}
+			if(ehrProvKey.YearValue != oldEhrProvKey.YearValue) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrProvKey from the database.</summary>
 		public static void Delete(long ehrProvKeyNum){
 			string command="DELETE FROM ehrprovkey "

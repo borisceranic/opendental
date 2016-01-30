@@ -244,6 +244,25 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobEvent,JobEvent) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobEvent jobEvent,JobEvent oldJobEvent) {
+			if(jobEvent.JobNum != oldJobEvent.JobNum) {
+				return true;
+			}
+			if(jobEvent.OwnerNum != oldJobEvent.OwnerNum) {
+				return true;
+			}
+			//DateTimeEntry not allowed to change
+			if(jobEvent.Description != oldJobEvent.Description) {
+				return true;
+			}
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobEvent from the database.</summary>
 		public static void Delete(long jobEventNum){
 			string command="DELETE FROM jobevent "

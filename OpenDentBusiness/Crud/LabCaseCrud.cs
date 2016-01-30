@@ -292,6 +292,48 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LabCase,LabCase) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LabCase labCase,LabCase oldLabCase) {
+			if(labCase.PatNum != oldLabCase.PatNum) {
+				return true;
+			}
+			if(labCase.LaboratoryNum != oldLabCase.LaboratoryNum) {
+				return true;
+			}
+			if(labCase.AptNum != oldLabCase.AptNum) {
+				return true;
+			}
+			if(labCase.PlannedAptNum != oldLabCase.PlannedAptNum) {
+				return true;
+			}
+			if(labCase.DateTimeDue != oldLabCase.DateTimeDue) {
+				return true;
+			}
+			if(labCase.DateTimeCreated != oldLabCase.DateTimeCreated) {
+				return true;
+			}
+			if(labCase.DateTimeSent != oldLabCase.DateTimeSent) {
+				return true;
+			}
+			if(labCase.DateTimeRecd != oldLabCase.DateTimeRecd) {
+				return true;
+			}
+			if(labCase.DateTimeChecked != oldLabCase.DateTimeChecked) {
+				return true;
+			}
+			if(labCase.ProvNum != oldLabCase.ProvNum) {
+				return true;
+			}
+			if(labCase.Instructions != oldLabCase.Instructions) {
+				return true;
+			}
+			if(labCase.LabFee != oldLabCase.LabFee) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LabCase from the database.</summary>
 		public static void Delete(long labCaseNum){
 			string command="DELETE FROM labcase "

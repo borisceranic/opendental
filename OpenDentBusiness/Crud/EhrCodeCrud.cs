@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrCode,EhrCode) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrCode ehrCode,EhrCode oldEhrCode) {
+			if(ehrCode.MeasureIds != oldEhrCode.MeasureIds) {
+				return true;
+			}
+			if(ehrCode.ValueSetName != oldEhrCode.ValueSetName) {
+				return true;
+			}
+			if(ehrCode.ValueSetOID != oldEhrCode.ValueSetOID) {
+				return true;
+			}
+			if(ehrCode.QDMCategory != oldEhrCode.QDMCategory) {
+				return true;
+			}
+			if(ehrCode.CodeValue != oldEhrCode.CodeValue) {
+				return true;
+			}
+			if(ehrCode.Description != oldEhrCode.Description) {
+				return true;
+			}
+			if(ehrCode.CodeSystem != oldEhrCode.CodeSystem) {
+				return true;
+			}
+			if(ehrCode.CodeSystemOID != oldEhrCode.CodeSystemOID) {
+				return true;
+			}
+			if(ehrCode.IsInDb != oldEhrCode.IsInDb) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrCode from the database.</summary>
 		public static void Delete(long ehrCodeNum){
 			string command="DELETE FROM ehrcode "

@@ -467,6 +467,93 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(HL7Def,HL7Def) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(HL7Def hL7Def,HL7Def oldHL7Def) {
+			if(hL7Def.Description != oldHL7Def.Description) {
+				return true;
+			}
+			if(hL7Def.ModeTx != oldHL7Def.ModeTx) {
+				return true;
+			}
+			if(hL7Def.IncomingFolder != oldHL7Def.IncomingFolder) {
+				return true;
+			}
+			if(hL7Def.OutgoingFolder != oldHL7Def.OutgoingFolder) {
+				return true;
+			}
+			if(hL7Def.IncomingPort != oldHL7Def.IncomingPort) {
+				return true;
+			}
+			if(hL7Def.OutgoingIpPort != oldHL7Def.OutgoingIpPort) {
+				return true;
+			}
+			if(hL7Def.FieldSeparator != oldHL7Def.FieldSeparator) {
+				return true;
+			}
+			if(hL7Def.ComponentSeparator != oldHL7Def.ComponentSeparator) {
+				return true;
+			}
+			if(hL7Def.SubcomponentSeparator != oldHL7Def.SubcomponentSeparator) {
+				return true;
+			}
+			if(hL7Def.RepetitionSeparator != oldHL7Def.RepetitionSeparator) {
+				return true;
+			}
+			if(hL7Def.EscapeCharacter != oldHL7Def.EscapeCharacter) {
+				return true;
+			}
+			if(hL7Def.IsInternal != oldHL7Def.IsInternal) {
+				return true;
+			}
+			if(hL7Def.InternalType != oldHL7Def.InternalType) {
+				return true;
+			}
+			if(hL7Def.InternalTypeVersion != oldHL7Def.InternalTypeVersion) {
+				return true;
+			}
+			if(hL7Def.IsEnabled != oldHL7Def.IsEnabled) {
+				return true;
+			}
+			if(hL7Def.Note != oldHL7Def.Note) {
+				return true;
+			}
+			if(hL7Def.HL7Server != oldHL7Def.HL7Server) {
+				return true;
+			}
+			if(hL7Def.HL7ServiceName != oldHL7Def.HL7ServiceName) {
+				return true;
+			}
+			if(hL7Def.ShowDemographics != oldHL7Def.ShowDemographics) {
+				return true;
+			}
+			if(hL7Def.ShowAppts != oldHL7Def.ShowAppts) {
+				return true;
+			}
+			if(hL7Def.ShowAccount != oldHL7Def.ShowAccount) {
+				return true;
+			}
+			if(hL7Def.IsQuadAsToothNum != oldHL7Def.IsQuadAsToothNum) {
+				return true;
+			}
+			if(hL7Def.LabResultImageCat != oldHL7Def.LabResultImageCat) {
+				return true;
+			}
+			if(hL7Def.SftpUsername != oldHL7Def.SftpUsername) {
+				return true;
+			}
+			if(hL7Def.SftpPassword != oldHL7Def.SftpPassword) {
+				return true;
+			}
+			if(hL7Def.SftpInSocket != oldHL7Def.SftpInSocket) {
+				return true;
+			}
+			if(hL7Def.HasLongDCodes != oldHL7Def.HasLongDCodes) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one HL7Def from the database.</summary>
 		public static void Delete(long hL7DefNum){
 			string command="DELETE FROM hl7def "

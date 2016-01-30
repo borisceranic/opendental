@@ -293,6 +293,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Adjustment,Adjustment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Adjustment adjustment,Adjustment oldAdjustment) {
+			if(adjustment.AdjDate.Date != oldAdjustment.AdjDate.Date) {
+				return true;
+			}
+			if(adjustment.AdjAmt != oldAdjustment.AdjAmt) {
+				return true;
+			}
+			if(adjustment.PatNum != oldAdjustment.PatNum) {
+				return true;
+			}
+			if(adjustment.AdjType != oldAdjustment.AdjType) {
+				return true;
+			}
+			if(adjustment.ProvNum != oldAdjustment.ProvNum) {
+				return true;
+			}
+			if(adjustment.AdjNote != oldAdjustment.AdjNote) {
+				return true;
+			}
+			if(adjustment.ProcDate.Date != oldAdjustment.ProcDate.Date) {
+				return true;
+			}
+			if(adjustment.ProcNum != oldAdjustment.ProcNum) {
+				return true;
+			}
+			//DateEntry not allowed to change
+			if(adjustment.ClinicNum != oldAdjustment.ClinicNum) {
+				return true;
+			}
+			if(adjustment.StatementNum != oldAdjustment.StatementNum) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one Adjustment from the database.</summary>
 		public static void Delete(long adjNum){
 			string command="DELETE FROM adjustment "

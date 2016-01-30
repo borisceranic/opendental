@@ -382,6 +382,75 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Etrans,Etrans) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Etrans etrans,Etrans oldEtrans) {
+			if(etrans.DateTimeTrans != oldEtrans.DateTimeTrans) {
+				return true;
+			}
+			if(etrans.ClearingHouseNum != oldEtrans.ClearingHouseNum) {
+				return true;
+			}
+			if(etrans.Etype != oldEtrans.Etype) {
+				return true;
+			}
+			if(etrans.ClaimNum != oldEtrans.ClaimNum) {
+				return true;
+			}
+			if(etrans.OfficeSequenceNumber != oldEtrans.OfficeSequenceNumber) {
+				return true;
+			}
+			if(etrans.CarrierTransCounter != oldEtrans.CarrierTransCounter) {
+				return true;
+			}
+			if(etrans.CarrierTransCounter2 != oldEtrans.CarrierTransCounter2) {
+				return true;
+			}
+			if(etrans.CarrierNum != oldEtrans.CarrierNum) {
+				return true;
+			}
+			if(etrans.CarrierNum2 != oldEtrans.CarrierNum2) {
+				return true;
+			}
+			if(etrans.PatNum != oldEtrans.PatNum) {
+				return true;
+			}
+			if(etrans.BatchNumber != oldEtrans.BatchNumber) {
+				return true;
+			}
+			if(etrans.AckCode != oldEtrans.AckCode) {
+				return true;
+			}
+			if(etrans.TransSetNum != oldEtrans.TransSetNum) {
+				return true;
+			}
+			if(etrans.Note != oldEtrans.Note) {
+				return true;
+			}
+			if(etrans.EtransMessageTextNum != oldEtrans.EtransMessageTextNum) {
+				return true;
+			}
+			if(etrans.AckEtransNum != oldEtrans.AckEtransNum) {
+				return true;
+			}
+			if(etrans.PlanNum != oldEtrans.PlanNum) {
+				return true;
+			}
+			if(etrans.InsSubNum != oldEtrans.InsSubNum) {
+				return true;
+			}
+			if(etrans.TranSetId835 != oldEtrans.TranSetId835) {
+				return true;
+			}
+			if(etrans.CarrierNameRaw != oldEtrans.CarrierNameRaw) {
+				return true;
+			}
+			if(etrans.PatientNameRaw != oldEtrans.PatientNameRaw) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Etrans from the database.</summary>
 		public static void Delete(long etransNum){
 			string command="DELETE FROM etrans "

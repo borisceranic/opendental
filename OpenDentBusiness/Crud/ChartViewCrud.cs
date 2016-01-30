@@ -272,6 +272,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ChartView,ChartView) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ChartView chartView,ChartView oldChartView) {
+			if(chartView.Description != oldChartView.Description) {
+				return true;
+			}
+			if(chartView.ItemOrder != oldChartView.ItemOrder) {
+				return true;
+			}
+			if(chartView.ProcStatuses != oldChartView.ProcStatuses) {
+				return true;
+			}
+			if(chartView.ObjectTypes != oldChartView.ObjectTypes) {
+				return true;
+			}
+			if(chartView.ShowProcNotes != oldChartView.ShowProcNotes) {
+				return true;
+			}
+			if(chartView.IsAudit != oldChartView.IsAudit) {
+				return true;
+			}
+			if(chartView.SelectedTeethOnly != oldChartView.SelectedTeethOnly) {
+				return true;
+			}
+			if(chartView.OrionStatusFlags != oldChartView.OrionStatusFlags) {
+				return true;
+			}
+			if(chartView.DatesShowing != oldChartView.DatesShowing) {
+				return true;
+			}
+			if(chartView.IsTpCharting != oldChartView.IsTpCharting) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ChartView from the database.</summary>
 		public static void Delete(long chartViewNum){
 			string command="DELETE FROM chartview "

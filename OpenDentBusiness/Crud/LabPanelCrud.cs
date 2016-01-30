@@ -275,6 +275,37 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LabPanel,LabPanel) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LabPanel labPanel,LabPanel oldLabPanel) {
+			if(labPanel.PatNum != oldLabPanel.PatNum) {
+				return true;
+			}
+			if(labPanel.RawMessage != oldLabPanel.RawMessage) {
+				return true;
+			}
+			if(labPanel.LabNameAddress != oldLabPanel.LabNameAddress) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(labPanel.SpecimenCondition != oldLabPanel.SpecimenCondition) {
+				return true;
+			}
+			if(labPanel.SpecimenSource != oldLabPanel.SpecimenSource) {
+				return true;
+			}
+			if(labPanel.ServiceId != oldLabPanel.ServiceId) {
+				return true;
+			}
+			if(labPanel.ServiceName != oldLabPanel.ServiceName) {
+				return true;
+			}
+			if(labPanel.MedicalOrderNum != oldLabPanel.MedicalOrderNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LabPanel from the database.</summary>
 		public static void Delete(long labPanelNum){
 			string command="DELETE FROM labpanel "

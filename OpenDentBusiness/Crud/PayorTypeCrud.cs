@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PayorType,PayorType) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PayorType payorType,PayorType oldPayorType) {
+			if(payorType.PatNum != oldPayorType.PatNum) {
+				return true;
+			}
+			if(payorType.DateStart.Date != oldPayorType.DateStart.Date) {
+				return true;
+			}
+			if(payorType.SopCode != oldPayorType.SopCode) {
+				return true;
+			}
+			if(payorType.Note != oldPayorType.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PayorType from the database.</summary>
 		public static void Delete(long payorTypeNum){
 			string command="DELETE FROM payortype "

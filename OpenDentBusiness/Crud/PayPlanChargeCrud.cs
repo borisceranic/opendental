@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PayPlanCharge,PayPlanCharge) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PayPlanCharge payPlanCharge,PayPlanCharge oldPayPlanCharge) {
+			if(payPlanCharge.PayPlanNum != oldPayPlanCharge.PayPlanNum) {
+				return true;
+			}
+			if(payPlanCharge.Guarantor != oldPayPlanCharge.Guarantor) {
+				return true;
+			}
+			if(payPlanCharge.PatNum != oldPayPlanCharge.PatNum) {
+				return true;
+			}
+			if(payPlanCharge.ChargeDate.Date != oldPayPlanCharge.ChargeDate.Date) {
+				return true;
+			}
+			if(payPlanCharge.Principal != oldPayPlanCharge.Principal) {
+				return true;
+			}
+			if(payPlanCharge.Interest != oldPayPlanCharge.Interest) {
+				return true;
+			}
+			if(payPlanCharge.Note != oldPayPlanCharge.Note) {
+				return true;
+			}
+			if(payPlanCharge.ProvNum != oldPayPlanCharge.ProvNum) {
+				return true;
+			}
+			if(payPlanCharge.ClinicNum != oldPayPlanCharge.ClinicNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PayPlanCharge from the database.</summary>
 		public static void Delete(long payPlanChargeNum){
 			string command="DELETE FROM payplancharge "

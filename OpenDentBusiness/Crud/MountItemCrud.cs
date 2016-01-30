@@ -232,6 +232,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MountItem,MountItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MountItem mountItem,MountItem oldMountItem) {
+			if(mountItem.MountNum != oldMountItem.MountNum) {
+				return true;
+			}
+			if(mountItem.Xpos != oldMountItem.Xpos) {
+				return true;
+			}
+			if(mountItem.Ypos != oldMountItem.Ypos) {
+				return true;
+			}
+			if(mountItem.OrdinalPos != oldMountItem.OrdinalPos) {
+				return true;
+			}
+			if(mountItem.Width != oldMountItem.Width) {
+				return true;
+			}
+			if(mountItem.Height != oldMountItem.Height) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MountItem from the database.</summary>
 		public static void Delete(long mountItemNum){
 			string command="DELETE FROM mountitem "

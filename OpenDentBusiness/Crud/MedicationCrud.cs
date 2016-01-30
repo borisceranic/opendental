@@ -219,6 +219,25 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Medication,Medication) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Medication medication,Medication oldMedication) {
+			if(medication.MedName != oldMedication.MedName) {
+				return true;
+			}
+			if(medication.GenericNum != oldMedication.GenericNum) {
+				return true;
+			}
+			if(medication.Notes != oldMedication.Notes) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(medication.RxCui != oldMedication.RxCui) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Medication from the database.</summary>
 		public static void Delete(long medicationNum){
 			string command="DELETE FROM medication "

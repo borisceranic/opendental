@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AppointmentType,AppointmentType) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AppointmentType appointmentType,AppointmentType oldAppointmentType) {
+			if(appointmentType.AppointmentTypeName != oldAppointmentType.AppointmentTypeName) {
+				return true;
+			}
+			if(appointmentType.AppointmentTypeColor != oldAppointmentType.AppointmentTypeColor) {
+				return true;
+			}
+			if(appointmentType.ItemOrder != oldAppointmentType.ItemOrder) {
+				return true;
+			}
+			if(appointmentType.IsHidden != oldAppointmentType.IsHidden) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AppointmentType from the database.</summary>
 		public static void Delete(long appointmentTypeNum){
 			string command="DELETE FROM appointmenttype "

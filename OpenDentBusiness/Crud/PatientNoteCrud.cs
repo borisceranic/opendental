@@ -245,6 +245,28 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PatientNote,PatientNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PatientNote patientNote,PatientNote oldPatientNote) {
+			//FamFinancial excluded from update
+			if(patientNote.ApptPhone != oldPatientNote.ApptPhone) {
+				return true;
+			}
+			if(patientNote.Medical != oldPatientNote.Medical) {
+				return true;
+			}
+			if(patientNote.Service != oldPatientNote.Service) {
+				return true;
+			}
+			if(patientNote.MedicalComp != oldPatientNote.MedicalComp) {
+				return true;
+			}
+			if(patientNote.Treatment != oldPatientNote.Treatment) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PatientNote from the database.</summary>
 		public static void Delete(long patNum){
 			string command="DELETE FROM patientnote "

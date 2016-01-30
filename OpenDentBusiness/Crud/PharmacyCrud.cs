@@ -279,6 +279,43 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Pharmacy,Pharmacy) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Pharmacy pharmacy,Pharmacy oldPharmacy) {
+			if(pharmacy.PharmID != oldPharmacy.PharmID) {
+				return true;
+			}
+			if(pharmacy.StoreName != oldPharmacy.StoreName) {
+				return true;
+			}
+			if(pharmacy.Phone != oldPharmacy.Phone) {
+				return true;
+			}
+			if(pharmacy.Fax != oldPharmacy.Fax) {
+				return true;
+			}
+			if(pharmacy.Address != oldPharmacy.Address) {
+				return true;
+			}
+			if(pharmacy.Address2 != oldPharmacy.Address2) {
+				return true;
+			}
+			if(pharmacy.City != oldPharmacy.City) {
+				return true;
+			}
+			if(pharmacy.State != oldPharmacy.State) {
+				return true;
+			}
+			if(pharmacy.Zip != oldPharmacy.Zip) {
+				return true;
+			}
+			if(pharmacy.Note != oldPharmacy.Note) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one Pharmacy from the database.</summary>
 		public static void Delete(long pharmacyNum){
 			string command="DELETE FROM pharmacy "

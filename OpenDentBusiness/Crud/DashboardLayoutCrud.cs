@@ -242,6 +242,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DashboardLayout,DashboardLayout) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DashboardLayout dashboardLayout,DashboardLayout oldDashboardLayout) {
+			if(dashboardLayout.UserNum != oldDashboardLayout.UserNum) {
+				return true;
+			}
+			if(dashboardLayout.UserGroupNum != oldDashboardLayout.UserGroupNum) {
+				return true;
+			}
+			if(dashboardLayout.DashboardTabName != oldDashboardLayout.DashboardTabName) {
+				return true;
+			}
+			if(dashboardLayout.DashboardTabOrder != oldDashboardLayout.DashboardTabOrder) {
+				return true;
+			}
+			if(dashboardLayout.DashboardRows != oldDashboardLayout.DashboardRows) {
+				return true;
+			}
+			if(dashboardLayout.DashboardColumns != oldDashboardLayout.DashboardColumns) {
+				return true;
+			}
+			if(dashboardLayout.DashboardGroupName != oldDashboardLayout.DashboardGroupName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DashboardLayout from the database.</summary>
 		public static void Delete(long dashboardLayoutNum){
 			string command="DELETE FROM dashboardlayout "

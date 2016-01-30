@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ReqNeeded,ReqNeeded) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ReqNeeded reqNeeded,ReqNeeded oldReqNeeded) {
+			if(reqNeeded.Descript != oldReqNeeded.Descript) {
+				return true;
+			}
+			if(reqNeeded.SchoolCourseNum != oldReqNeeded.SchoolCourseNum) {
+				return true;
+			}
+			if(reqNeeded.SchoolClassNum != oldReqNeeded.SchoolClassNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ReqNeeded from the database.</summary>
 		public static void Delete(long reqNeededNum){
 			string command="DELETE FROM reqneeded "

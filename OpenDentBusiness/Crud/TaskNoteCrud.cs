@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskNote,TaskNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskNote taskNote,TaskNote oldTaskNote) {
+			if(taskNote.TaskNum != oldTaskNote.TaskNum) {
+				return true;
+			}
+			if(taskNote.UserNum != oldTaskNote.UserNum) {
+				return true;
+			}
+			if(taskNote.DateTimeNote != oldTaskNote.DateTimeNote) {
+				return true;
+			}
+			if(taskNote.Note != oldTaskNote.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskNote from the database.</summary>
 		public static void Delete(long taskNoteNum){
 			string command="DELETE FROM tasknote "

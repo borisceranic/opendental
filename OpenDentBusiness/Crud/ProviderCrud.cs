@@ -529,6 +529,118 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Provider,Provider) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Provider provider,Provider oldProvider) {
+			if(provider.Abbr != oldProvider.Abbr) {
+				return true;
+			}
+			if(provider.ItemOrder != oldProvider.ItemOrder) {
+				return true;
+			}
+			if(provider.LName != oldProvider.LName) {
+				return true;
+			}
+			if(provider.FName != oldProvider.FName) {
+				return true;
+			}
+			if(provider.MI != oldProvider.MI) {
+				return true;
+			}
+			if(provider.Suffix != oldProvider.Suffix) {
+				return true;
+			}
+			if(provider.FeeSched != oldProvider.FeeSched) {
+				return true;
+			}
+			if(provider.Specialty != oldProvider.Specialty) {
+				return true;
+			}
+			if(provider.SSN != oldProvider.SSN) {
+				return true;
+			}
+			if(provider.StateLicense != oldProvider.StateLicense) {
+				return true;
+			}
+			if(provider.DEANum != oldProvider.DEANum) {
+				return true;
+			}
+			if(provider.IsSecondary != oldProvider.IsSecondary) {
+				return true;
+			}
+			if(provider.ProvColor != oldProvider.ProvColor) {
+				return true;
+			}
+			if(provider.IsHidden != oldProvider.IsHidden) {
+				return true;
+			}
+			if(provider.UsingTIN != oldProvider.UsingTIN) {
+				return true;
+			}
+			if(provider.BlueCrossID != oldProvider.BlueCrossID) {
+				return true;
+			}
+			if(provider.SigOnFile != oldProvider.SigOnFile) {
+				return true;
+			}
+			if(provider.MedicaidID != oldProvider.MedicaidID) {
+				return true;
+			}
+			if(provider.OutlineColor != oldProvider.OutlineColor) {
+				return true;
+			}
+			if(provider.SchoolClassNum != oldProvider.SchoolClassNum) {
+				return true;
+			}
+			if(provider.NationalProvID != oldProvider.NationalProvID) {
+				return true;
+			}
+			if(provider.CanadianOfficeNum != oldProvider.CanadianOfficeNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(provider.AnesthProvType != oldProvider.AnesthProvType) {
+				return true;
+			}
+			if(provider.TaxonomyCodeOverride != oldProvider.TaxonomyCodeOverride) {
+				return true;
+			}
+			if(provider.IsCDAnet != oldProvider.IsCDAnet) {
+				return true;
+			}
+			if(provider.EcwID != oldProvider.EcwID) {
+				return true;
+			}
+			if(provider.StateRxID != oldProvider.StateRxID) {
+				return true;
+			}
+			if(provider.IsNotPerson != oldProvider.IsNotPerson) {
+				return true;
+			}
+			if(provider.StateWhereLicensed != oldProvider.StateWhereLicensed) {
+				return true;
+			}
+			if(provider.EmailAddressNum != oldProvider.EmailAddressNum) {
+				return true;
+			}
+			if(provider.IsInstructor != oldProvider.IsInstructor) {
+				return true;
+			}
+			if(provider.EhrMuStage != oldProvider.EhrMuStage) {
+				return true;
+			}
+			if(provider.ProvNumBillingOverride != oldProvider.ProvNumBillingOverride) {
+				return true;
+			}
+			if(provider.CustomID != oldProvider.CustomID) {
+				return true;
+			}
+			if(provider.ProvStatus != oldProvider.ProvStatus) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Provider from the database.</summary>
 		public static void Delete(long provNum){
 			string command="DELETE FROM provider "

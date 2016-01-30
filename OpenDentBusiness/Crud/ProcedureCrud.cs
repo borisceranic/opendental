@@ -773,6 +773,189 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Procedure,Procedure) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Procedure procedure,Procedure oldProcedure) {
+			if(procedure.PatNum != oldProcedure.PatNum) {
+				return true;
+			}
+			if(procedure.AptNum != oldProcedure.AptNum) {
+				return true;
+			}
+			if(procedure.OldCode != oldProcedure.OldCode) {
+				return true;
+			}
+			if(procedure.ProcDate.Date != oldProcedure.ProcDate.Date) {
+				return true;
+			}
+			if(procedure.ProcFee != oldProcedure.ProcFee) {
+				return true;
+			}
+			if(procedure.Surf != oldProcedure.Surf) {
+				return true;
+			}
+			if(procedure.ToothNum != oldProcedure.ToothNum) {
+				return true;
+			}
+			if(procedure.ToothRange != oldProcedure.ToothRange) {
+				return true;
+			}
+			if(procedure.Priority != oldProcedure.Priority) {
+				return true;
+			}
+			if(procedure.ProcStatus != oldProcedure.ProcStatus) {
+				return true;
+			}
+			if(procedure.ProvNum != oldProcedure.ProvNum) {
+				return true;
+			}
+			if(procedure.Dx != oldProcedure.Dx) {
+				return true;
+			}
+			if(procedure.PlannedAptNum != oldProcedure.PlannedAptNum) {
+				return true;
+			}
+			if(procedure.PlaceService != oldProcedure.PlaceService) {
+				return true;
+			}
+			if(procedure.Prosthesis != oldProcedure.Prosthesis) {
+				return true;
+			}
+			if(procedure.DateOriginalProsth.Date != oldProcedure.DateOriginalProsth.Date) {
+				return true;
+			}
+			if(procedure.ClaimNote != oldProcedure.ClaimNote) {
+				return true;
+			}
+			if(procedure.DateEntryC.Date != oldProcedure.DateEntryC.Date) {
+				return true;
+			}
+			if(procedure.ClinicNum != oldProcedure.ClinicNum) {
+				return true;
+			}
+			if(procedure.MedicalCode != oldProcedure.MedicalCode) {
+				return true;
+			}
+			if(procedure.DiagnosticCode != oldProcedure.DiagnosticCode) {
+				return true;
+			}
+			if(procedure.IsPrincDiag != oldProcedure.IsPrincDiag) {
+				return true;
+			}
+			if(procedure.ProcNumLab != oldProcedure.ProcNumLab) {
+				return true;
+			}
+			if(procedure.BillingTypeOne != oldProcedure.BillingTypeOne) {
+				return true;
+			}
+			if(procedure.BillingTypeTwo != oldProcedure.BillingTypeTwo) {
+				return true;
+			}
+			if(procedure.CodeNum != oldProcedure.CodeNum) {
+				return true;
+			}
+			if(procedure.CodeMod1 != oldProcedure.CodeMod1) {
+				return true;
+			}
+			if(procedure.CodeMod2 != oldProcedure.CodeMod2) {
+				return true;
+			}
+			if(procedure.CodeMod3 != oldProcedure.CodeMod3) {
+				return true;
+			}
+			if(procedure.CodeMod4 != oldProcedure.CodeMod4) {
+				return true;
+			}
+			if(procedure.RevCode != oldProcedure.RevCode) {
+				return true;
+			}
+			if(procedure.UnitQty != oldProcedure.UnitQty) {
+				return true;
+			}
+			if(procedure.BaseUnits != oldProcedure.BaseUnits) {
+				return true;
+			}
+			if(procedure.StartTime != oldProcedure.StartTime) {
+				return true;
+			}
+			if(procedure.StopTime != oldProcedure.StopTime) {
+				return true;
+			}
+			if(procedure.DateTP.Date != oldProcedure.DateTP.Date) {
+				return true;
+			}
+			if(procedure.SiteNum != oldProcedure.SiteNum) {
+				return true;
+			}
+			if(procedure.HideGraphics != oldProcedure.HideGraphics) {
+				return true;
+			}
+			if(procedure.CanadianTypeCodes != oldProcedure.CanadianTypeCodes) {
+				return true;
+			}
+			if(procedure.ProcTime != oldProcedure.ProcTime) {
+				return true;
+			}
+			if(procedure.ProcTimeEnd != oldProcedure.ProcTimeEnd) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(procedure.Prognosis != oldProcedure.Prognosis) {
+				return true;
+			}
+			if(procedure.DrugUnit != oldProcedure.DrugUnit) {
+				return true;
+			}
+			if(procedure.DrugQty != oldProcedure.DrugQty) {
+				return true;
+			}
+			if(procedure.UnitQtyType != oldProcedure.UnitQtyType) {
+				return true;
+			}
+			if(procedure.StatementNum != oldProcedure.StatementNum) {
+				return true;
+			}
+			if(procedure.IsLocked != oldProcedure.IsLocked) {
+				return true;
+			}
+			if(procedure.BillingNote != oldProcedure.BillingNote) {
+				return true;
+			}
+			if(procedure.RepeatChargeNum != oldProcedure.RepeatChargeNum) {
+				return true;
+			}
+			if(procedure.DiagnosticCode2 != oldProcedure.DiagnosticCode2) {
+				return true;
+			}
+			if(procedure.DiagnosticCode3 != oldProcedure.DiagnosticCode3) {
+				return true;
+			}
+			if(procedure.DiagnosticCode4 != oldProcedure.DiagnosticCode4) {
+				return true;
+			}
+			if(procedure.Discount != oldProcedure.Discount) {
+				return true;
+			}
+			if(procedure.SnomedBodySite != oldProcedure.SnomedBodySite) {
+				return true;
+			}
+			if(procedure.ProvOrderOverride != oldProcedure.ProvOrderOverride) {
+				return true;
+			}
+			if(procedure.IsDateProsthEst != oldProcedure.IsDateProsthEst) {
+				return true;
+			}
+			if(procedure.IcdVersion != oldProcedure.IcdVersion) {
+				return true;
+			}
+			if(procedure.IsCpoe != oldProcedure.IsCpoe) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateEntry not allowed to change
+			return false;
+		}
+
 		//Delete not allowed for this table
 		//public static void Delete(long procNum){
 		//

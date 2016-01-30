@@ -429,6 +429,88 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Clearinghouse,Clearinghouse) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Clearinghouse clearinghouse,Clearinghouse oldClearinghouse) {
+			if(clearinghouse.Description != oldClearinghouse.Description) {
+				return true;
+			}
+			if(clearinghouse.ExportPath != oldClearinghouse.ExportPath) {
+				return true;
+			}
+			if(clearinghouse.Payors != oldClearinghouse.Payors) {
+				return true;
+			}
+			if(clearinghouse.Eformat != oldClearinghouse.Eformat) {
+				return true;
+			}
+			if(clearinghouse.ISA05 != oldClearinghouse.ISA05) {
+				return true;
+			}
+			if(clearinghouse.SenderTIN != oldClearinghouse.SenderTIN) {
+				return true;
+			}
+			if(clearinghouse.ISA07 != oldClearinghouse.ISA07) {
+				return true;
+			}
+			if(clearinghouse.ISA08 != oldClearinghouse.ISA08) {
+				return true;
+			}
+			if(clearinghouse.ISA15 != oldClearinghouse.ISA15) {
+				return true;
+			}
+			if(clearinghouse.Password != oldClearinghouse.Password) {
+				return true;
+			}
+			if(clearinghouse.ResponsePath != oldClearinghouse.ResponsePath) {
+				return true;
+			}
+			if(clearinghouse.CommBridge != oldClearinghouse.CommBridge) {
+				return true;
+			}
+			if(clearinghouse.ClientProgram != oldClearinghouse.ClientProgram) {
+				return true;
+			}
+			//LastBatchNumber excluded from update
+			if(clearinghouse.ModemPort != oldClearinghouse.ModemPort) {
+				return true;
+			}
+			if(clearinghouse.LoginID != oldClearinghouse.LoginID) {
+				return true;
+			}
+			if(clearinghouse.SenderName != oldClearinghouse.SenderName) {
+				return true;
+			}
+			if(clearinghouse.SenderTelephone != oldClearinghouse.SenderTelephone) {
+				return true;
+			}
+			if(clearinghouse.GS03 != oldClearinghouse.GS03) {
+				return true;
+			}
+			if(clearinghouse.ISA02 != oldClearinghouse.ISA02) {
+				return true;
+			}
+			if(clearinghouse.ISA04 != oldClearinghouse.ISA04) {
+				return true;
+			}
+			if(clearinghouse.ISA16 != oldClearinghouse.ISA16) {
+				return true;
+			}
+			if(clearinghouse.SeparatorData != oldClearinghouse.SeparatorData) {
+				return true;
+			}
+			if(clearinghouse.SeparatorSegment != oldClearinghouse.SeparatorSegment) {
+				return true;
+			}
+			if(clearinghouse.ClinicNum != oldClearinghouse.ClinicNum) {
+				return true;
+			}
+			if(clearinghouse.HqClearinghouseNum != oldClearinghouse.HqClearinghouseNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Clearinghouse from the database.</summary>
 		public static void Delete(long clearinghouseNum){
 			string command="DELETE FROM clearinghouse "

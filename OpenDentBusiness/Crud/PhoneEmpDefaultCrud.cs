@@ -282,6 +282,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PhoneEmpDefault,PhoneEmpDefault) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PhoneEmpDefault phoneEmpDefault,PhoneEmpDefault oldPhoneEmpDefault) {
+			if(phoneEmpDefault.IsGraphed != oldPhoneEmpDefault.IsGraphed) {
+				return true;
+			}
+			if(phoneEmpDefault.HasColor != oldPhoneEmpDefault.HasColor) {
+				return true;
+			}
+			if(phoneEmpDefault.RingGroups != oldPhoneEmpDefault.RingGroups) {
+				return true;
+			}
+			if(phoneEmpDefault.EmpName != oldPhoneEmpDefault.EmpName) {
+				return true;
+			}
+			if(phoneEmpDefault.PhoneExt != oldPhoneEmpDefault.PhoneExt) {
+				return true;
+			}
+			if(phoneEmpDefault.StatusOverride != oldPhoneEmpDefault.StatusOverride) {
+				return true;
+			}
+			if(phoneEmpDefault.Notes != oldPhoneEmpDefault.Notes) {
+				return true;
+			}
+			if(phoneEmpDefault.ComputerName != oldPhoneEmpDefault.ComputerName) {
+				return true;
+			}
+			if(phoneEmpDefault.IsPrivateScreen != oldPhoneEmpDefault.IsPrivateScreen) {
+				return true;
+			}
+			if(phoneEmpDefault.IsTriageOperator != oldPhoneEmpDefault.IsTriageOperator) {
+				return true;
+			}
+			if(phoneEmpDefault.EscalationOrder != oldPhoneEmpDefault.EscalationOrder) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PhoneEmpDefault from the database.</summary>
 		public static void Delete(long employeeNum){
 			string command="DELETE FROM phoneempdefault "

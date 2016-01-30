@@ -201,6 +201,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(JobPermission,JobPermission) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobPermission jobPermission,JobPermission oldJobPermission) {
+			if(jobPermission.UserNum != oldJobPermission.UserNum) {
+				return true;
+			}
+			if(jobPermission.JobPermType != oldJobPermission.JobPermType) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one JobPermission from the database.</summary>
 		public static void Delete(long jobPermissionNum){
 			string command="DELETE FROM jobpermission "

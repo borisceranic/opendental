@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrMeasureEvent,EhrMeasureEvent) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrMeasureEvent ehrMeasureEvent,EhrMeasureEvent oldEhrMeasureEvent) {
+			if(ehrMeasureEvent.DateTEvent != oldEhrMeasureEvent.DateTEvent) {
+				return true;
+			}
+			if(ehrMeasureEvent.EventType != oldEhrMeasureEvent.EventType) {
+				return true;
+			}
+			if(ehrMeasureEvent.PatNum != oldEhrMeasureEvent.PatNum) {
+				return true;
+			}
+			if(ehrMeasureEvent.MoreInfo != oldEhrMeasureEvent.MoreInfo) {
+				return true;
+			}
+			if(ehrMeasureEvent.CodeValueEvent != oldEhrMeasureEvent.CodeValueEvent) {
+				return true;
+			}
+			if(ehrMeasureEvent.CodeSystemEvent != oldEhrMeasureEvent.CodeSystemEvent) {
+				return true;
+			}
+			if(ehrMeasureEvent.CodeValueResult != oldEhrMeasureEvent.CodeValueResult) {
+				return true;
+			}
+			if(ehrMeasureEvent.CodeSystemResult != oldEhrMeasureEvent.CodeSystemResult) {
+				return true;
+			}
+			if(ehrMeasureEvent.FKey != oldEhrMeasureEvent.FKey) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrMeasureEvent from the database.</summary>
 		public static void Delete(long ehrMeasureEventNum){
 			string command="DELETE FROM ehrmeasureevent "

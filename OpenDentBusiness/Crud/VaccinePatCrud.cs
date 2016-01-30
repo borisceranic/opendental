@@ -372,6 +372,72 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(VaccinePat,VaccinePat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(VaccinePat vaccinePat,VaccinePat oldVaccinePat) {
+			if(vaccinePat.VaccineDefNum != oldVaccinePat.VaccineDefNum) {
+				return true;
+			}
+			if(vaccinePat.DateTimeStart != oldVaccinePat.DateTimeStart) {
+				return true;
+			}
+			if(vaccinePat.DateTimeEnd != oldVaccinePat.DateTimeEnd) {
+				return true;
+			}
+			if(vaccinePat.AdministeredAmt != oldVaccinePat.AdministeredAmt) {
+				return true;
+			}
+			if(vaccinePat.DrugUnitNum != oldVaccinePat.DrugUnitNum) {
+				return true;
+			}
+			if(vaccinePat.LotNumber != oldVaccinePat.LotNumber) {
+				return true;
+			}
+			if(vaccinePat.PatNum != oldVaccinePat.PatNum) {
+				return true;
+			}
+			if(vaccinePat.Note != oldVaccinePat.Note) {
+				return true;
+			}
+			if(vaccinePat.FilledCity != oldVaccinePat.FilledCity) {
+				return true;
+			}
+			if(vaccinePat.FilledST != oldVaccinePat.FilledST) {
+				return true;
+			}
+			if(vaccinePat.CompletionStatus != oldVaccinePat.CompletionStatus) {
+				return true;
+			}
+			if(vaccinePat.AdministrationNoteCode != oldVaccinePat.AdministrationNoteCode) {
+				return true;
+			}
+			if(vaccinePat.UserNum != oldVaccinePat.UserNum) {
+				return true;
+			}
+			if(vaccinePat.ProvNumOrdering != oldVaccinePat.ProvNumOrdering) {
+				return true;
+			}
+			if(vaccinePat.ProvNumAdminister != oldVaccinePat.ProvNumAdminister) {
+				return true;
+			}
+			if(vaccinePat.DateExpire.Date != oldVaccinePat.DateExpire.Date) {
+				return true;
+			}
+			if(vaccinePat.RefusalReason != oldVaccinePat.RefusalReason) {
+				return true;
+			}
+			if(vaccinePat.ActionCode != oldVaccinePat.ActionCode) {
+				return true;
+			}
+			if(vaccinePat.AdministrationRoute != oldVaccinePat.AdministrationRoute) {
+				return true;
+			}
+			if(vaccinePat.AdministrationSite != oldVaccinePat.AdministrationSite) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one VaccinePat from the database.</summary>
 		public static void Delete(long vaccinePatNum){
 			string command="DELETE FROM vaccinepat "

@@ -253,6 +253,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabSpecimenRejectReason,EhrLabSpecimenRejectReason) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason,EhrLabSpecimenRejectReason oldEhrLabSpecimenRejectReason) {
+			if(ehrLabSpecimenRejectReason.EhrLabSpecimenNum != oldEhrLabSpecimenRejectReason.EhrLabSpecimenNum) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonID != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonID) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonText != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonText) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal != oldEhrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabSpecimenRejectReason from the database.</summary>
 		public static void Delete(long ehrLabSpecimenRejectReasonNum){
 			string command="DELETE FROM ehrlabspecimenrejectreason "

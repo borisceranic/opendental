@@ -282,6 +282,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Benefit,Benefit) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Benefit benefit,Benefit oldBenefit) {
+			if(benefit.PlanNum != oldBenefit.PlanNum) {
+				return true;
+			}
+			if(benefit.PatPlanNum != oldBenefit.PatPlanNum) {
+				return true;
+			}
+			if(benefit.CovCatNum != oldBenefit.CovCatNum) {
+				return true;
+			}
+			if(benefit.BenefitType != oldBenefit.BenefitType) {
+				return true;
+			}
+			if(benefit.Percent != oldBenefit.Percent) {
+				return true;
+			}
+			if(benefit.MonetaryAmt != oldBenefit.MonetaryAmt) {
+				return true;
+			}
+			if(benefit.TimePeriod != oldBenefit.TimePeriod) {
+				return true;
+			}
+			if(benefit.QuantityQualifier != oldBenefit.QuantityQualifier) {
+				return true;
+			}
+			if(benefit.Quantity != oldBenefit.Quantity) {
+				return true;
+			}
+			if(benefit.CodeNum != oldBenefit.CodeNum) {
+				return true;
+			}
+			if(benefit.CoverageLevel != oldBenefit.CoverageLevel) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Benefit from the database.</summary>
 		public static void Delete(long benefitNum){
 			string command="DELETE FROM benefit "

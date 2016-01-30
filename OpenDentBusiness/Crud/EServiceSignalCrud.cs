@@ -284,6 +284,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EServiceSignal,EServiceSignal) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EServiceSignal eServiceSignal,EServiceSignal oldEServiceSignal) {
+			if(eServiceSignal.ServiceCode != oldEServiceSignal.ServiceCode) {
+				return true;
+			}
+			if(eServiceSignal.ReasonCategory != oldEServiceSignal.ReasonCategory) {
+				return true;
+			}
+			if(eServiceSignal.ReasonCode != oldEServiceSignal.ReasonCode) {
+				return true;
+			}
+			if(eServiceSignal.Severity != oldEServiceSignal.Severity) {
+				return true;
+			}
+			if(eServiceSignal.Description != oldEServiceSignal.Description) {
+				return true;
+			}
+			if(eServiceSignal.SigDateTime != oldEServiceSignal.SigDateTime) {
+				return true;
+			}
+			if(eServiceSignal.Tag != oldEServiceSignal.Tag) {
+				return true;
+			}
+			if(eServiceSignal.IsProcessed != oldEServiceSignal.IsProcessed) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EServiceSignal from the database.</summary>
 		public static void Delete(long eServiceSignalNum){
 			string command="DELETE FROM eservicesignal "

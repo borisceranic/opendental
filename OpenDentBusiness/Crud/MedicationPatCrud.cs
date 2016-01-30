@@ -279,6 +279,43 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedicationPat,MedicationPat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedicationPat medicationPat,MedicationPat oldMedicationPat) {
+			if(medicationPat.PatNum != oldMedicationPat.PatNum) {
+				return true;
+			}
+			if(medicationPat.MedicationNum != oldMedicationPat.MedicationNum) {
+				return true;
+			}
+			if(medicationPat.PatNote != oldMedicationPat.PatNote) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(medicationPat.DateStart.Date != oldMedicationPat.DateStart.Date) {
+				return true;
+			}
+			if(medicationPat.DateStop.Date != oldMedicationPat.DateStop.Date) {
+				return true;
+			}
+			if(medicationPat.ProvNum != oldMedicationPat.ProvNum) {
+				return true;
+			}
+			if(medicationPat.MedDescript != oldMedicationPat.MedDescript) {
+				return true;
+			}
+			if(medicationPat.RxCui != oldMedicationPat.RxCui) {
+				return true;
+			}
+			if(medicationPat.NewCropGuid != oldMedicationPat.NewCropGuid) {
+				return true;
+			}
+			if(medicationPat.IsCpoe != oldMedicationPat.IsCpoe) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedicationPat from the database.</summary>
 		public static void Delete(long medicationPatNum){
 			string command="DELETE FROM medicationpat "

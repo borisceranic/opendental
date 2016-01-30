@@ -229,6 +229,28 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AllergyDef,AllergyDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AllergyDef allergyDef,AllergyDef oldAllergyDef) {
+			if(allergyDef.Description != oldAllergyDef.Description) {
+				return true;
+			}
+			if(allergyDef.IsHidden != oldAllergyDef.IsHidden) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(allergyDef.SnomedType != oldAllergyDef.SnomedType) {
+				return true;
+			}
+			if(allergyDef.MedicationNum != oldAllergyDef.MedicationNum) {
+				return true;
+			}
+			if(allergyDef.UniiCode != oldAllergyDef.UniiCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AllergyDef from the database.</summary>
 		public static void Delete(long allergyDefNum){
 			string command="DELETE FROM allergydef "

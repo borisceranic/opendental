@@ -313,6 +313,51 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PaySplit,PaySplit) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PaySplit paySplit,PaySplit oldPaySplit) {
+			if(paySplit.SplitAmt != oldPaySplit.SplitAmt) {
+				return true;
+			}
+			if(paySplit.PatNum != oldPaySplit.PatNum) {
+				return true;
+			}
+			if(paySplit.ProcDate.Date != oldPaySplit.ProcDate.Date) {
+				return true;
+			}
+			if(paySplit.PayNum != oldPaySplit.PayNum) {
+				return true;
+			}
+			if(paySplit.IsDiscount != oldPaySplit.IsDiscount) {
+				return true;
+			}
+			if(paySplit.DiscountType != oldPaySplit.DiscountType) {
+				return true;
+			}
+			if(paySplit.ProvNum != oldPaySplit.ProvNum) {
+				return true;
+			}
+			if(paySplit.PayPlanNum != oldPaySplit.PayPlanNum) {
+				return true;
+			}
+			if(paySplit.DatePay.Date != oldPaySplit.DatePay.Date) {
+				return true;
+			}
+			if(paySplit.ProcNum != oldPaySplit.ProcNum) {
+				return true;
+			}
+			//DateEntry not allowed to change
+			if(paySplit.UnearnedType != oldPaySplit.UnearnedType) {
+				return true;
+			}
+			if(paySplit.ClinicNum != oldPaySplit.ClinicNum) {
+				return true;
+			}
+			//SecUserNumEntry excluded from update
+			//SecDateTEdit can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one PaySplit from the database.</summary>
 		public static void Delete(long splitNum){
 			string command="DELETE FROM paysplit "

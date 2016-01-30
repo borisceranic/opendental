@@ -192,6 +192,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Snomed,Snomed) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Snomed snomed,Snomed oldSnomed) {
+			if(snomed.SnomedCode != oldSnomed.SnomedCode) {
+				return true;
+			}
+			if(snomed.Description != oldSnomed.Description) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Snomed from the database.</summary>
 		public static void Delete(long snomedNum){
 			string command="DELETE FROM snomed "

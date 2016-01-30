@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(VaccineObs,VaccineObs) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(VaccineObs vaccineObs,VaccineObs oldVaccineObs) {
+			if(vaccineObs.VaccinePatNum != oldVaccineObs.VaccinePatNum) {
+				return true;
+			}
+			if(vaccineObs.ValType != oldVaccineObs.ValType) {
+				return true;
+			}
+			if(vaccineObs.IdentifyingCode != oldVaccineObs.IdentifyingCode) {
+				return true;
+			}
+			if(vaccineObs.ValReported != oldVaccineObs.ValReported) {
+				return true;
+			}
+			if(vaccineObs.ValCodeSystem != oldVaccineObs.ValCodeSystem) {
+				return true;
+			}
+			if(vaccineObs.VaccineObsNumGroup != oldVaccineObs.VaccineObsNumGroup) {
+				return true;
+			}
+			if(vaccineObs.UcumCode != oldVaccineObs.UcumCode) {
+				return true;
+			}
+			if(vaccineObs.DateObs.Date != oldVaccineObs.DateObs.Date) {
+				return true;
+			}
+			if(vaccineObs.MethodCode != oldVaccineObs.MethodCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one VaccineObs from the database.</summary>
 		public static void Delete(long vaccineObsNum){
 			string command="DELETE FROM vaccineobs "

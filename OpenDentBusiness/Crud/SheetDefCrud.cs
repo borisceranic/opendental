@@ -262,6 +262,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SheetDef,SheetDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SheetDef sheetDef,SheetDef oldSheetDef) {
+			if(sheetDef.Description != oldSheetDef.Description) {
+				return true;
+			}
+			if(sheetDef.SheetType != oldSheetDef.SheetType) {
+				return true;
+			}
+			if(sheetDef.FontSize != oldSheetDef.FontSize) {
+				return true;
+			}
+			if(sheetDef.FontName != oldSheetDef.FontName) {
+				return true;
+			}
+			if(sheetDef.Width != oldSheetDef.Width) {
+				return true;
+			}
+			if(sheetDef.Height != oldSheetDef.Height) {
+				return true;
+			}
+			if(sheetDef.IsLandscape != oldSheetDef.IsLandscape) {
+				return true;
+			}
+			if(sheetDef.PageCount != oldSheetDef.PageCount) {
+				return true;
+			}
+			if(sheetDef.IsMultiPage != oldSheetDef.IsMultiPage) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SheetDef from the database.</summary>
 		public static void Delete(long sheetDefNum){
 			string command="DELETE FROM sheetdef "

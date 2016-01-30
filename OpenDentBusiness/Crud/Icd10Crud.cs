@@ -202,6 +202,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Icd10,Icd10) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Icd10 icd10,Icd10 oldIcd10) {
+			if(icd10.Icd10Code != oldIcd10.Icd10Code) {
+				return true;
+			}
+			if(icd10.Description != oldIcd10.Description) {
+				return true;
+			}
+			if(icd10.IsCode != oldIcd10.IsCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Icd10 from the database.</summary>
 		public static void Delete(long icd10Num){
 			string command="DELETE FROM icd10 "

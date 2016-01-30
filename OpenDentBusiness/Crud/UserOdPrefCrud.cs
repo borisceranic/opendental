@@ -212,6 +212,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(UserOdPref,UserOdPref) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(UserOdPref userOdPref,UserOdPref oldUserOdPref) {
+			if(userOdPref.UserNum != oldUserOdPref.UserNum) {
+				return true;
+			}
+			if(userOdPref.Fkey != oldUserOdPref.Fkey) {
+				return true;
+			}
+			if(userOdPref.FkeyType != oldUserOdPref.FkeyType) {
+				return true;
+			}
+			if(userOdPref.ValueString != oldUserOdPref.ValueString) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one UserOdPref from the database.</summary>
 		public static void Delete(long userOdPrefNum){
 			string command="DELETE FROM userodpref "
